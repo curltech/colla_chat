@@ -83,7 +83,7 @@ dependencies:
   #share: ^0.6.5
   flutter_emoji: ^2.2.1+1
   animated_bottom_navigation_bar: ^0.1.2+2
-  fluro: ^1.6.3
+  fluro: ^2.0.3
   # 界面样式和组件
   #flui: 0.9.2
   flutter_neumorphic: ^3.0.3

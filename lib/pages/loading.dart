@@ -41,16 +41,19 @@ class _LoadingState extends State<Loading> {
         title: Text(widget.title),
       ),
       body: Swiper(
-        itemBuilder: (BuildContext context, int index) {
-          return Image.asset(
-            images[index],
-            fit: BoxFit.fill,
-          );
-        },
-        itemCount: images.length,
-        pagination: SwiperPagination(),
-        control: SwiperControl(),
-      ),
+          itemBuilder: (BuildContext context, int index) {
+            return Image.asset(
+              images[index],
+              fit: BoxFit.fill,
+            );
+          },
+          itemCount: images.length,
+          autoplay: true,
+          pagination: SwiperPagination(),
+          //control: SwiperControl(),
+          onTap: (index) {
+
+          }),
     );
   }
 }
