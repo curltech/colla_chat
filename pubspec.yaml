@@ -34,84 +34,101 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+  # 获取系统信息和操作
   device_info: ^2.0.3
-  shared_preferences: ^2.0.10
   path_provider: ^2.0.7
-  sqflite: ^2.0.2+1
-  sqflite_common_ffi: ^2.1.1
-  dio: ^4.0.6
-  dio_http2_adapter: ^2.0.0
-  web_socket_channel: ^2.2.0
-  flutter_webrtc: ^0.8.6
-  openpgp: ^3.2.8
-  flui: 0.9.2
-  flutter_neumorphic: ^3.0.3
-  fl_chart: ^0.50.5
-  livekit_client: ^0.5.9
-  libsignal_protocol_dart: ^0.5.6
-  #本地化
-  flutter_localizations:
-    sdk: flutter
-  #状态管理
-  provider: ^6.0.1 #Flutter2.5用这个
-  cached_network_image: ^3.0.0 #Flutter2用这个
-  #toast提示框
-  toast: ^0.3.0
-  #web显示
-  webview_flutter: ^2.0.2
-  #选取图库
-  image_picker: ^0.8.5+3
-  #文本扩展显示
-  extended_text: ^9.1.0 #flutter2.5用这个,,其他可注释
-  #文字表情混入
-  extended_text_field: ^10.1.0 #Flutter2.5用这个,,其他可注释
-  extended_text_library: ^9.1.0 #Flutter2.5用这个,,其他可注释
-  #打开系统浏览器
-  url_launcher: ^6.1.2
-  #网络连接
-  connectivity: ^3.0.6
-  #图片显示
-  photo_view: ^0.13.0
-  #打开文件 1
-  open_file: ^3.2.1
-  #获取包信息
-  package_info: ^2.0.2
-  #音频处理
-  flutter_sound: ^9.2.12
-  #权限处理1
-  permission_handler: ^9.2.0
-  #音频处理
-  audioplayers: ^0.20.1 #Flutter2用这个
-  #调用相机
-  camera: ^0.9.5
-  #视频播放
-  video_player: ^2.1.1 #Flutter2用这个
-  #图片压缩1
-  flutter_image_compress: ^1.1.0
-  #拼音
-  lpinyin: ^2.0.3
-  #特殊列表滑动
-  azlistview: ^2.0.0
-  #微信图库
-  wechat_assets_picker: ^7.3.0 #flutter2.5用这个
-  # 控制屏幕旋转
-  orientation: ^1.2.0
-  qr_code_scanner: ^0.7.0
-  flutter_echarts: ^2.3.0
-  flutter_local_notifications: ^9.5.3+1
+  image_picker: ^0.8.5+3 #选取图库
+  url_launcher: ^6.1.2 #打开系统浏览器
+  package_info: ^2.0.2 #获取包信息
+  open_file: ^3.2.1 #打开文件
+  camera: ^0.9.5 #调用相机
+  orientation: ^1.2.0 # 控制屏幕旋转
   geolocator: ^8.2.1
-  connectivity_plus: ^2.3.0
-  share_plus: ^4.0.4
   package_info_plus: ^1.4.2
   device_info_plus: ^3.2.3
-  fluent_ui: ^3.12.0
-  macos_ui: ^1.4.1
   network_info_plus: ^2.1.3
   beamer: ^1.4.1+1
   sensors_plus: ^1.3.1
+  #contacts_service: ^0.4.6
+  # 存储
+  shared_preferences: ^2.0.10
+  sqflite: ^2.0.2+1
+  sqflite_common_ffi: ^2.1.1
+  sqlite3: ^1.7.1
+  sqlite3_flutter_libs: ^0.5.7
   idb_shim: ^2.0.1
   idb_sqflite: ^1.1.0
-
+  # 网络功能
+  dio: ^4.0.6
+  dio_http2_adapter: ^2.0.0
+  web_socket_channel: ^2.2.0
+  cached_network_image: ^3.0.0
+  connectivity: ^3.0.6 #网络连接
+  connectivity_plus: ^2.3.0
+  # 加密安全
+  openpgp: ^3.2.8
+  libsignal_protocol_dart: ^0.5.6
+  crypto: ^3.0.1
+  # 辅助开发工具
+  json_annotation: ^4.3.0
+  permission_handler: ^9.2.0 #权限处理1
+  provider: ^6.0.1 #状态管理
+  flutter_local_notifications: ^9.5.3+1
+  share_plus: ^4.0.4
+  logging: ^1.0.2
+  country_pickers: ^1.3.0
+  font_awesome_flutter: ^8.8.1
+  onesignal_flutter: ^3.3.0
+  flushbar: ^1.10.4
+  #share: ^0.6.5
+  flutter_emoji: ^2.2.1+1
+  animated_bottom_navigation_bar: ^0.1.2+2
+  fluro: ^1.6.3
+  # 界面样式和组件
+  #flui: 0.9.2
+  flutter_neumorphic: ^3.0.3
+  fl_chart: ^0.50.5
+  toast: ^0.3.0 #toast提示框
+  extended_text: ^9.1.0 #文本扩展显示
+  extended_text_field: ^10.1.0 #文字表情混入
+  extended_text_library: ^9.1.0 #Flutter2.5用这个,,其他可注释
+  azlistview: ^2.0.0 #特殊列表滑动
+  webview_flutter: ^2.0.2 #web显示
+  flutter_echarts: ^2.3.0
+  fluent_ui: ^3.12.0
+  macos_ui: ^1.4.1
+  flutter_material_color_picker: ^1.1.0+2
+  animated_text_kit: ^4.2.1
+  after_layout: ^1.1.0
+  snapping_sheet: ^3.1.0
+  google_fonts: ^2.1.0
+  material_design_icons_flutter: ^5.0.6295
+  #flutter_bloc: ^6.1.0
+  flutter_swiper: 1.1.6 # Flutter 轮播图 https://github.com/best-flutter/flutter_swiper
+  flutter_screenutil: 0.6.0 # Flutter 屏幕适配 https://github.com/OpenFlutter/flutter_screenutil
+  # webrtc
+  flutter_webrtc: ^0.8.6
+  dart_webrtc: ^1.0.5
+  livekit_client: ^0.5.9
+  # 多媒体
+  photo_view: ^0.13.0 #图片显示
+  flutter_sound: ^9.2.12 #音频处理
+  audioplayers: ^0.20.1 #音频处理
+  video_player: ^2.1.1 #视频播放
+  flutter_image_compress: ^1.1.0 #图片压缩1
+  qr_code_scanner: ^0.7.0
+  extended_image: ^6.0.1
+  #本地化
+  lpinyin: ^2.0.3 #拼音
+  wechat_assets_picker: ^7.3.0 #微信图库
+  flutter_localizations:
+    sdk: flutter
+  # 参考学习
+  stream_chat_flutter: ^4.0.0
+  stream_chat_flutter_core: ^4.1.0
+  stream_chat: ^4.1.0
+  stream_chat_persistence: ^4.1.0
+  stream_chat_localizations: ^3.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -139,6 +156,29 @@ flutter:
     - packages/openpgp/web/assets/worker.js
     - packages/openpgp/web/assets/wasm_exec.js
     - packages/openpgp/web/assets/openpgp.wasm
+    - assets/images/bg/login-bg-wd-1.jpg
+    - assets/images/bg/login-bg-wd-2.jpg
+    - assets/images/bg/login-bg-wd-3.jpg
+    - assets/images/bg/login-bg-wd-4.jpg
+    - assets/images/bg/login-bg-wd-5.jpg
+    - assets/images/bg/login-bg-wd-6.jpg
+    - assets/images/bg/login-bg-wd-7.jpg
+    - assets/images/bg/login-bg-wd-8.jpg
+    - assets/images/bg/login-bg-wd-9.jpg
+    - assets/images/bg/login-bg-wd-10.jpg
+    - assets/images/bg/login-bg-wd-11.jpg
+    - assets/images/bg/login-bg-wl-1.jpg
+    - assets/images/bg/login-bg-wl-2.jpg
+    - assets/images/bg/login-bg-wl-3.jpg
+    - assets/images/bg/login-bg-wl-4.jpg
+    - assets/images/bg/login-bg-wl-5.jpg
+    - assets/images/bg/login-bg-wl-6.jpg
+    - assets/images/bg/login-bg-wl-7.jpg
+    - assets/images/bg/login-bg-wl-8.jpg
+    - assets/images/bg/login-bg-wl-9.jpg
+    - assets/images/bg/login-bg-wl-10.jpg
+    - assets/images/bg/login-bg-wl-11.jpg
+    - assets/images/bg/login-bg-wl-12.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

@@ -1,3 +1,4 @@
+import 'package:colla_chat/pages/loading.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -12,17 +13,10 @@ class CollaChatApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     ///创建了一个具有 Material Design 风格的应用
-    return MaterialApp(
+    return const MaterialApp(
       title: 'Welcome to CollaChat',
       ///Scaffold 是 Material 库中提供的一个 widget，它提供了默认的导航栏、标题和包含主屏幕 widget 树的 body 属性
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Welcome to CollaChat'),
-        ),
-        body: const Center(
-          child: Text('你好'),
-        ),
-      ),
+      home: Loading(title: 'Flutter Swiper'),
     );
   }
 }

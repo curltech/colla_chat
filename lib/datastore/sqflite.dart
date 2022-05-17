@@ -2,12 +2,13 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+
 import 'datastore.dart';
 
 /**
  * 适用于移动手机（无数据限制），electron和chrome浏览器的sqlite3的数据库（50M数据限制）
  */
-class Sqlite3 extends DataStore {
+class Sqflite extends DataStore {
   late Database db;
   late String path;
 
@@ -17,6 +18,7 @@ class Sqlite3 extends DataStore {
    */
   open([String name = 'colla_chat.db']) async {
     var databasesPath = await getDatabasesPath();
+
     String path = join(databasesPath, name);
 
     db = await openDatabase(
@@ -141,7 +143,7 @@ class Sqlite3 extends DataStore {
         offset: offset);
     clause = 'select count(*) from (' + clause + ")";
     var totalResults = await db.rawQuery(clause, whereArgs);
-    var total = Sqflite.firstIntValue(totalResults);
+    var total = sqlite3.firstIntValue(totalResults);
     var results = await find(table,
         distinct: distinct,
         columns: columns,
@@ -323,4 +325,4 @@ class Sqlite3 extends DataStore {
   }
 }
 
-var sqlite3 = Sqlite3().open();
+var sqlite3 = Sqflite().open();
