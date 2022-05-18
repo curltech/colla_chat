@@ -10,13 +10,13 @@ class User {
   //用户令牌
   String token = '';
   //用户自选，当前指定(显示在标题上)
-  List<Map<String,dynamic>> shares= <Map<String,dynamic>>[];
-  Map<String,dynamic>? _share;
+  List<Map<String, dynamic>> shares = <Map<String, dynamic>>[];
+  Map<String, dynamic>? _share;
   int? tradeDate;
   //用户自选股的当前股票，修改将同时修改share
   int _currentIndex = -1;
   //多选选择的股票代码,注意share有可能不在shares中
-  List<Map<String,dynamic>> selectedShares=<Map<String,dynamic>>[];
+  List<Map<String, dynamic>> selectedShares = <Map<String, dynamic>>[];
   List<int> terms = [0];
   //用户在index页的选择
   String _drawer = 'me';
@@ -24,14 +24,13 @@ class User {
   String tab = 'selfselection';
   String error = 'error';
 
-  constructor() {
-  }
+  constructor() {}
 
-  Map<String,dynamic>? getShare() {
+  Map<String, dynamic>? getShare() {
     return _share;
   }
 
-  set share(Map<String,dynamic> val) {
+  set share(Map<String, dynamic> val) {
     _share = val;
     if (shares.isNotEmpty) {
       for (var i = 0; i < shares.length; ++i) {
@@ -79,10 +78,10 @@ class User {
   }
 
   addSubscription(String ts_code) {
-    if (account==null){
+    if (account == null) {
       return;
     }
-    var subscription=account?.subscription;
+    var subscription = account?.subscription;
     subscription ??= '';
 
     var pos = subscription.indexOf(ts_code);
@@ -97,10 +96,10 @@ class User {
   }
 
   removeSubscription(String ts_code) {
-    if (account==null){
+    if (account == null) {
       return;
     }
-    var subscription=account?.subscription;
+    var subscription = account?.subscription;
     subscription ??= '';
     var pos = subscription.indexOf(ts_code);
     if (pos != -1) {
@@ -120,7 +119,7 @@ class User {
   }
 
   bool canbenRemove(String ts_code) {
-  account?.subscription ??= '';
+    account?.subscription ??= '';
     var pos = account?.subscription?.indexOf(ts_code);
     if (pos != -1) {
       return true;
@@ -159,58 +158,58 @@ class User {
    * @param params
    */
   Future<Account?> regist(String url, dynamic params) async {
-      var response = await webClient.send(url, params);
-      if (response!=null) {
-        var data = response.data;
-        if (data!=null) {
-          if (TypeUtil.isString(data)) {
-            error = data;
-          } else {
-            var account = await accountService.getOrRegist(data);
-            account = account;
-            return account;
-          }
+    var response = await webClient.send(url, params);
+    if (response != null) {
+      var data = response.data;
+      if (data != null) {
+        if (TypeUtil.isString(data)) {
+          error = data;
+        } else {
+          var account = await accountService.getOrRegist(data);
+          account = account;
+          return account;
         }
       }
-      return null;
+    }
+    return null;
   }
 
   Future<User> login(String url, dynamic params) async {
-      var response = await webClient.send(url, params);
-      if (response) {
-        var data = response.data;
-        if (data) {
-          if (TypeUtil.isString(data)) {
-            error = data;
-          } else {
-            var user = response.data.user;
-            var token = response.data.token;
-            if (user!=null) {
-              user.lastLoginDate = DateTime.now();
-              account = await accountService.getOrRegist(user);
-              loginStatus = true;
-              token = token;
-            }
+    var response = await webClient.send(url, params);
+    if (response != null) {
+      var data = response.data;
+      if (data != null) {
+        if (TypeUtil.isString(data)) {
+          error = data;
+        } else {
+          var user = data['user'];
+          var token = data['token'];
+          if (user != null) {
+            user['lastLoginDate'] = DateTime.now();
+            account = await accountService.getOrRegist(user);
+            loginStatus = true;
+            token = token;
           }
         }
       }
+    }
 
     return this;
   }
 
-  Future<User>  logout(String url) async{
-      var response = await webClient.send(url, {});
-      if (response) {
-        account = null;
-        loginStatus = false;
-        token = '';
-      }
+  Future<User> logout(String url) async {
+    var response = await webClient.send(url, {});
+    if (response) {
+      account = null;
+      loginStatus = false;
+      token = '';
+    }
 
     return this;
   }
 
   bool isAdmin() {
-    if (account!=null && account?.roles!=null) {
+    if (account != null && account?.roles != null) {
       var pos = account?.roles?.indexOf('admin');
       if (pos! > -1) {
         return true;

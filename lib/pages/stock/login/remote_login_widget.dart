@@ -1,5 +1,7 @@
+import 'package:colla_chat/transport/webclient.dart';
 import 'package:flutter/material.dart';
 
+import '../../../config.dart';
 import '../../../entity/stock/user.dart';
 import '../../../routers/application.dart';
 import '../../../routers/routes.dart';
@@ -48,7 +50,7 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
               padding: EdgeInsets.symmetric(horizontal: 50.0),
               child: TextField(
                 keyboardType: TextInputType.text,
-                controller: _credentialController,
+                //controller: _credentialController,
                 decoration: InputDecoration(
                   labelText: '登录凭证(手机/邮件/登录名)',
                   prefixIcon: Icon(Icons.person),
@@ -109,6 +111,8 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
   }
 
   Future<void> _login() async {
+    config.saveAppParams();
+    webClient.setDefault('https');
     var current = await user.login('/user/Login', {
       'credential_': _credential,
       'password_': _password,

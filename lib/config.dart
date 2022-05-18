@@ -41,6 +41,8 @@ class AppParams {
   String? language;
   String? localeName;
 
+  AppParams() {}
+
   AppParams.fromJson(Map<String, dynamic> json)
       : language = json['language'],
         mode = json['mode'];
@@ -61,8 +63,10 @@ class AppParams {
 
   // libp2p的链协议号码
   String? chainProtocolId;
+
   // 目标的libp2p节点的peerId
   var connectPeerId = <String>[];
+
   // 本机作为libp2p节点的监听地址
   var listenerAddress = <String>[];
 
@@ -164,13 +168,17 @@ class AppParams {
 
 /// 全局配置，包含平台参数和应用参数
 class Config {
-  PlatformParams platformParams = PlatformParams();
+  late PlatformParams platformParams;
   late AppParams appParams;
 
   Config() {
     String json = LocalStorage.get('AppParams');
-    var jsonObject = jsonDecode(json);
-    appParams = AppParams.fromJson(jsonObject);
+    if (json == null) {
+      appParams = AppParams();
+    } else {
+      var jsonObject = jsonDecode(json);
+      appParams = AppParams.fromJson(jsonObject);
+    }
   }
 
   saveAppParams() {

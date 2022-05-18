@@ -27,7 +27,7 @@ class WebClient extends IWebClient {
     }
   }
 
-  set setDefaultClient(String address) {
+  setDefault(String address) {
     if (address.startsWith('wss') || address.startsWith('ws')) {
       if (address == 'wss' || address == 'ws') {
         var cas = config.appParams.wsConnectAddress;
@@ -51,6 +51,7 @@ class WebClient extends IWebClient {
     }
   }
 
+  @override
   register(String name, Function func) {
     if (_wsDefault != null) {
       _wsDefault?.register(name, func);

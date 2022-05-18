@@ -1,4 +1,4 @@
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:colla_chat/config.dart';
 
 import '../../datastore/base.dart';
 
@@ -28,8 +28,7 @@ class AccountService extends BaseService {
     if (accounts != null && accounts.isNotEmpty && accounts[0] != null) {
       account = accounts[0] as Account?;
     } else {
-      var sharedPreferences = await SharedPreferences.getInstance();
-      var subscription = sharedPreferences.getString('StockSubscription');
+      var subscription = LocalStorage.get('StockSubscription');
       account = Account();
       account.status = user['status'];
       account.accountId = user['userId'];
