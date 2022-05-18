@@ -1,4 +1,5 @@
 import 'package:colla_chat/pages/loading.dart';
+import 'package:colla_chat/pages/stock/login/remote_login.dart';
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
 
@@ -11,11 +12,9 @@ var loadingHandler = Handler(
 });
 
 // 登录页面
-Handler loginHandler = Handler(
+Handler remoteLoginHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
-  return const Loading(
-    title: '',
-  );
+  return RemoteLogin();
 });
 
 // 首页

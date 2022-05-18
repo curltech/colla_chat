@@ -30,7 +30,7 @@ class Websocket implements IWebClient {
   }
 
   @override
-  regist(String name, Function func) {
+  register(String name, Function func) {
     // 监听消息，如果有消息到来，就打印出来
     channel?.stream.listen((message) {
       if (func != null) {

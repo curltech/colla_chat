@@ -204,9 +204,9 @@ abstract class BaseService {
   Future<int> upsert(dynamic entity, [dynamic? ignore, dynamic? parent]) {
     var id = entity['id'];
     if (id != null) {
-      return this.update(entity, ignore, parent);
+      return update(entity, ignore, parent);
     } else {
-      return this.insert(entity, ignore, parent);
+      return insert(entity, ignore, parent);
     }
   }
 }

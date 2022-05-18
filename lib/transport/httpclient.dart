@@ -46,7 +46,7 @@ class HttpClient implements IWebClient {
   }
 
   @override
-  regist(String name, Function func) {}
+  register(String name, Function func) {}
 }
 
 class HttpClientPool {

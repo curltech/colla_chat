@@ -8,7 +8,7 @@ import '../tool/util.dart';
 import 'httpclient.dart';
 
 abstract class IWebClient {
-  regist(String name, Function func);
+  register(String name, Function func);
 
   dynamic send(String url, dynamic data);
 
@@ -27,7 +27,7 @@ class WebClient extends IWebClient {
     }
   }
 
-  set defalutClient(String address) {
+  set setDefaultClient(String address) {
     if (address.startsWith('wss') || address.startsWith('ws')) {
       if (address == 'wss' || address == 'ws') {
         var cas = config.appParams.wsConnectAddress;
@@ -51,9 +51,9 @@ class WebClient extends IWebClient {
     }
   }
 
-  regist(String name, Function func) {
+  register(String name, Function func) {
     if (_wsDefault != null) {
-      _wsDefault?.regist(name, func);
+      _wsDefault?.register(name, func);
     }
   }
 

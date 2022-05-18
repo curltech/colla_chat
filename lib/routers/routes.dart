@@ -4,7 +4,7 @@ import './router_handler.dart';
 
 class Routes {
   static String loading = '/';
-  static String login = '/login';
+  static String remoteLogin = '/remote_login';
   static String index = '/index';
 
   static void configureRoutes(FluroRouter router) {
@@ -16,7 +16,7 @@ class Routes {
 
     // 路由页面配置
     router.define(loading, handler: loadingHandler);
-    router.define(login, handler: loginHandler);
+    router.define(remoteLogin, handler: remoteLoginHandler);
     router.define(index, handler: indexHandler);
   }
 }

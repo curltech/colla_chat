@@ -7,6 +7,10 @@ import 'package:device_info/device_info.dart';
  * 平台的参数，包括平台的硬件和系统软件特征
  */
 class PlatformParams {
+  ///在loading页面创建的时候初始化,包含屏幕大小，系统字体，语言，黑暗明亮模式等信息
+  late MediaQueryData mediaQueryData;
+
+  ///直接获取的平台信息，包含操作系统版本，类型，语言，国别，主机名等
   var isIOS = Platform.isIOS;
   var isAndroid = Platform.isAndroid;
   var isLinux = Platform.isLinux;
@@ -23,11 +27,6 @@ class PlatformParams {
   String? language;
   String? clientDevice;
   String? clientType;
-  Size? screenSize;
-
-  setScreenSize(BuildContext context) {
-    screenSize = MediaQuery.of(context).size;
-  }
 
   void getDeviceInfo() async {
     DeviceInfoPlugin deviceInfo = new DeviceInfoPlugin();
@@ -42,14 +41,15 @@ class PlatformParams {
    * 屏幕宽度较小，是移动尺寸
    */
   bool ifMobileSize() {
-    return (screenSize!.width < 481);
+    return (mediaQueryData.size.width < 481);
   }
 
   /**
    * 可以采用移动窄屏的样式
    */
   bool ifMobileStyle() {
-    return (this.screenSize!.width < 481 || this.screenSize!.height < 481) ||
+    return (mediaQueryData.size.width < 481 ||
+            mediaQueryData.size.height < 481) ||
         ((this.isAndroid || this.isIOS));
   }
 }
