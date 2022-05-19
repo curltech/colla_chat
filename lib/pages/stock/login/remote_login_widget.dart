@@ -112,11 +112,8 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
   }
 
   Future<void> _login() async {
-    var db = await IndexedDb.getInstance();
-    await db.test();
     AppParams appParams = await AppParams.getInstance();
     await appParams.saveAppParams();
-    webClient.setDefault('https');
     var current = await user.login('/user/Login', {
       'credential_': _credential,
       'password_': _password,

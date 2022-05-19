@@ -250,6 +250,9 @@ abstract class DataStore {
   Future<int> update(String table, dynamic entity,
       {String? where, List<Object>? whereArgs});
 
+  Future<int> upsert(String table, dynamic entity,
+      {String? where, List<Object>? whereArgs});
+
   /**
    * 在一个事务里面执行多个操作（insert,update,devare)
    * operators是一个operator对象的数组，operator有四个属性（type，tableName，entity，condition）

@@ -26,8 +26,8 @@ enum EntityStatus {
 
 abstract class BaseEntity {
   int? id;
-  DateTime? createDate;
-  DateTime? updateDate;
+  String? createDate;
+  String? updateDate;
   String? entityId;
   String? state;
 }
@@ -35,7 +35,7 @@ abstract class BaseEntity {
 abstract class StatusEntity extends BaseEntity {
   String? status;
   String? statusReason;
-  DateTime? statusDate;
+  String? statusDate;
 }
 
 /**
@@ -200,7 +200,7 @@ abstract class BaseService {
   save(List<Object> entities, [dynamic? ignore, dynamic? parent]) {
     List<Map<String, dynamic>> operators = [];
     for (var entity in entities) {
-      operators.add({'table': this.tableName, 'entity': entity});
+      operators.add({'table': tableName, 'entity': entity});
     }
     return dataStore.transaction(operators);
   }
@@ -210,12 +210,7 @@ abstract class BaseService {
    * @param entity
    */
   Future<int> upsert(dynamic entity, [dynamic? ignore, dynamic? parent]) {
-    var id = entity['id'];
-    if (id != null) {
-      return update(entity, ignore, parent);
-    } else {
-      return insert(entity, ignore, parent);
-    }
+    return dataStore.upsert(tableName, entity);
   }
 }
 
@@ -230,7 +225,8 @@ class ServiceLocator {
   static init() async {
     var accountService = await AccountService.init(
         tableName: 'stk_account',
-        fields: ['accountId', 'accountName', 'status', 'updateDate']);
+        fields: ['accountId', 'accountName', 'status', 'updateDate'],
+        indexFields: ['accountId']);
     services['accountService'] = accountService;
 
     PlatformParams platformParams = await PlatformParams.getInstance();

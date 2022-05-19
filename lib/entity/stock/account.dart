@@ -10,8 +10,8 @@ class Account extends StatusEntity {
   String? accountName;
   String? name;
   String? subscription;
-  DateTime? lastLoginDate;
-  DateTime? lastReadDate;
+  String? lastLoginDate;
+  String? lastReadDate;
   String? roles = '';
 }
 
@@ -59,13 +59,13 @@ class AccountService extends BaseService {
       if (subscription != null) {
         account.subscription = subscription;
       }
-      var currentDate = DateTime.now();
+      var currentDate = DateTime.now().toIso8601String();
       account.createDate = currentDate;
       account.updateDate = currentDate;
       account.statusDate = currentDate;
     }
     account?.lastLoginDate = user['lastLoginDate'];
-    account?.roles = user.roles;
+    account?.roles = user['roles'];
     await upsert(account);
 
     return account;

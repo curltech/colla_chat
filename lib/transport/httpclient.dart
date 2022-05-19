@@ -22,9 +22,12 @@ class HttpClient implements IWebClient {
     // request interceptor
     _client.interceptors
         .add(InterceptorsWrapper(onResponse: (response, handler) {
-      if (response.statusCode != 200) {}
+      if (response.statusCode != 200) {
+        print(response.statusCode);
+      }
       return handler.next(response);
     }, onError: (DioError e, handler) {
+      print(e.message);
       var statusCode = e.response?.statusCode;
       if (statusCode == 401) {
       } else if (statusCode == 500) {}
@@ -52,31 +55,33 @@ class HttpClient implements IWebClient {
 class HttpClientPool {
   static HttpClientPool instance = HttpClientPool();
   static bool initStatus = false;
+  final _httpClients = <String, HttpClient>{};
+  HttpClient? _default;
 
+  HttpClientPool();
+
+  /// 初始化连接池，设置缺省httpclient，返回连接池
   static Future<HttpClientPool> getInstance() async {
     if (!initStatus) {
       var appParams = await AppParams.getInstance();
       var connectAddress = appParams.httpConnectAddress;
       int i = 0;
-      for (var address in connectAddress) {
-        if (address.startsWith('http')) {
-          var httpClient = HttpClient(address);
-          instance._httpClients[address] = httpClient;
-          if (i == 0) {
-            instance._default ??= httpClient;
+      if (connectAddress.isNotEmpty) {
+        for (var address in connectAddress) {
+          if (address.startsWith('http')) {
+            var httpClient = HttpClient(address);
+            instance._httpClients[address] = httpClient;
+            if (i == 0) {
+              instance._default ??= httpClient;
+            }
           }
+          i++;
         }
-        i++;
       }
       initStatus = true;
     }
     return instance;
   }
-
-  final _httpClients = <String, HttpClient>{};
-  HttpClient? _default;
-
-  HttpClientPool() {}
 
   HttpClient? get(String address) {
     if (_httpClients.containsKey(address)) {
@@ -93,17 +98,16 @@ class HttpClientPool {
     return _default;
   }
 
-  setDefalutHttpClient(String address) {
+  HttpClient? setDefalutHttpClient(String address) {
     HttpClient? httpClient;
     if (_httpClients.containsKey(address)) {
       httpClient = _httpClients[address];
     } else {
       httpClient = HttpClient(address);
-      this._httpClients[address] = httpClient;
+      _httpClients[address] = httpClient;
     }
-
     _default = httpClient;
+
+    return _default;
   }
 }
-
-final httpClientPool = HttpClientPool();

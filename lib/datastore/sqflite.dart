@@ -254,6 +254,19 @@ class Sqflite extends DataStore {
     return result;
   }
 
+  @override
+  Future<int> upsert(String table, dynamic entity,
+      {String? where, List<Object>? whereArgs}) async {
+    var json = jsonEncode(entity);
+    entity = jsonDecode(json);
+    var id = entity['id'];
+    if (id != null) {
+      return update(table, entity);
+    } else {
+      return insert(table, entity);
+    }
+  }
+
   /**
    * 在一个事务里面执行多个操作（insert,update,devare)
    * operators是一个operator对象的数组，operator有四个属性（type，tableName，entity，condition）

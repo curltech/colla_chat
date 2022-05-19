@@ -74,17 +74,20 @@ class WebsocketPool {
   static WebsocketPool instance = WebsocketPool();
   static bool initStatus = false;
 
+  /// 初始化连接池，设置缺省websocketclient，返回连接池
   static Future<WebsocketPool> getInstance() async {
     if (!initStatus) {
       var appParams = await AppParams.getInstance();
       var connectAddress = appParams.wsConnectAddress;
       int i = 0;
-      for (var addr in connectAddress) {
-        if (addr.startsWith('ws')) {
-          var websocket = Websocket(addr);
-          instance.websockets[addr] = websocket;
-          if (i == 0 && instance._default == null) {
-            instance._default = websocket;
+      if (connectAddress.isNotEmpty) {
+        for (var addr in connectAddress) {
+          if (addr.startsWith('ws')) {
+            var websocket = Websocket(addr);
+            instance.websockets[addr] = websocket;
+            if (i == 0 && instance._default == null) {
+              instance._default = websocket;
+            }
           }
         }
       }
@@ -134,16 +137,16 @@ class WebsocketPool {
     }
   }
 
-  setDefalutWebsocket(String address) {
+  Websocket? setDefaultWebsocket(String address) {
     Websocket? websocket;
-    if (this.websockets.containsKey(address)) {
+    if (websockets.containsKey(address)) {
       websocket = websockets[address];
     } else {
       websocket = Websocket(address);
       websockets[address] = websocket;
     }
     _default = websocket;
+
+    return _default;
   }
 }
-
-final websocketPool = WebsocketPool();

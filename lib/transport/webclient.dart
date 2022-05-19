@@ -16,39 +16,34 @@ abstract class IWebClient {
 }
 
 class WebClient extends IWebClient {
+  static WebClient instance = WebClient();
+  static bool initStatus = false;
   IWebClient? _httpDefault;
   IWebClient? _wsDefault;
 
-  IWebClient? get defaultClient {
-    if (_wsDefault != null) {
-      return _wsDefault;
-    } else {
-      return _httpDefault;
+  static Future<WebClient> getInstance() async {
+    if (!initStatus) {
+      HttpClientPool httpClientPool = await HttpClientPool.getInstance();
+      WebsocketPool websocketPool = await WebsocketPool.getInstance();
+      instance._httpDefault = httpClientPool.defaultHttpClient;
+      instance._wsDefault = websocketPool.defaultWebsocket;
+      if (instance._httpDefault == null && instance._wsDefault == null) {
+        throw 'NoDefaultWebClient';
+      }
+      initStatus = true;
     }
+    return instance;
   }
 
   setDefault(String address) async {
-    var appParams = await AppParams.getInstance();
     if (address.startsWith('wss') || address.startsWith('ws')) {
-      if (address == 'wss' || address == 'ws') {
-        var cas = appParams.wsConnectAddress;
-        if (cas.isNotEmpty) {
-          websocketPool.setDefalutWebsocket(cas[0]);
-        }
-      } else {
-        websocketPool.setDefalutWebsocket(address);
-      }
-      _wsDefault = websocketPool.defaultWebsocket;
+      WebsocketPool websocketPool = await WebsocketPool.getInstance();
+      _wsDefault = websocketPool.setDefaultWebsocket(address);
     } else if (address.startsWith('https') || address.startsWith('http')) {
       if (address == 'https' || address == 'http') {
-        var cas = appParams.httpConnectAddress;
-        if (cas.isNotEmpty) {
-          httpClientPool.setDefalutHttpClient(cas[0]);
-        }
-      } else {
-        httpClientPool.setDefalutHttpClient(address);
+        HttpClientPool httpClientPool = await HttpClientPool.getInstance();
+        _httpDefault = httpClientPool.setDefalutHttpClient(address);
       }
-      _httpDefault = httpClientPool.defaultHttpClient;
     }
   }
 

@@ -29,9 +29,11 @@ class IndexedDb extends DataStore {
           for (BaseService service in ServiceLocator.services.values) {
             instance.create(
                 service.tableName, service.fields, service.indexFields);
-            service.dataStore = instance;
           }
         });
+      }
+      for (BaseService service in ServiceLocator.services.values) {
+        service.dataStore = instance;
       }
       initStatus = true;
     }
@@ -317,6 +319,19 @@ class IndexedDb extends DataStore {
       return key as int;
     }
     return 0;
+  }
+
+  @override
+  Future<int> upsert(String table, dynamic entity,
+      {String? where, List<Object>? whereArgs}) async {
+    var json = jsonEncode(entity);
+    entity = jsonDecode(json);
+    var id = entity['id'];
+    if (id != null) {
+      return update(table, entity, where: where, whereArgs: whereArgs);
+    } else {
+      return insert(table, entity);
+    }
   }
 
   /**

@@ -5,21 +5,28 @@ import 'account.dart';
 class User {
   //登录用户的基本信息
   Account? account;
+
   //登录状态
   bool loginStatus = false;
+
   //用户令牌
   String token = '';
+
   //用户自选，当前指定(显示在标题上)
   List<Map<String, dynamic>> shares = <Map<String, dynamic>>[];
   Map<String, dynamic>? _share;
   int? tradeDate;
+
   //用户自选股的当前股票，修改将同时修改share
   int _currentIndex = -1;
+
   //多选选择的股票代码,注意share有可能不在shares中
   List<Map<String, dynamic>> selectedShares = <Map<String, dynamic>>[];
   List<int> terms = [0];
+
   //用户在index页的选择
   String _drawer = 'me';
+
   //用户的当前页的选择
   String tab = 'selfselection';
   String error = 'error';
@@ -182,6 +189,7 @@ class User {
   }
 
   Future<User> login(String url, dynamic params) async {
+    WebClient webClient = await WebClient.getInstance();
     var response = await webClient.send(url, params);
     if (response != null) {
       var data = response.data;
@@ -192,7 +200,7 @@ class User {
           var user = data['user'];
           var token = data['token'];
           if (user != null) {
-            user['lastLoginDate'] = DateTime.now();
+            user['lastLoginDate'] = DateTime.now().toIso8601String();
             account = await AccountService.getInstance().getOrRegist(user);
             loginStatus = true;
             token = token;
