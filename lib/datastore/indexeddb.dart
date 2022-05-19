@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:colla_chat/datastore/base.dart';
+import 'package:colla_chat/tool/util.dart';
 import 'package:idb_shim/idb.dart';
 import 'package:path/path.dart';
 import 'package:idb_shim/idb_browser.dart';
@@ -262,8 +263,7 @@ class IndexedDb extends DataStore {
    */
   @override
   Future<int> insert(String table, dynamic entity) async {
-    var json = jsonEncode(entity);
-    entity = jsonDecode(json);
+    entity = JsonUtil.toJson(entity);
 
     var txn = db.transaction(table, "readwrite");
     var store = txn.objectStore(table);
@@ -283,8 +283,7 @@ class IndexedDb extends DataStore {
   Future<int> delete(String table,
       {dynamic entity, String? where, List<Object>? whereArgs}) async {
     if (entity != null) {
-      var json = jsonEncode(entity);
-      entity = jsonDecode(json);
+      entity = JsonUtil.toJson(entity);
       var id = entity['id'];
       if (id != null) {
         var txn = db.transaction(table, "readwrite");
@@ -308,8 +307,7 @@ class IndexedDb extends DataStore {
   @override
   Future<int> update(String table, dynamic entity,
       {String? where, List<Object>? whereArgs}) async {
-    var json = jsonEncode(entity);
-    entity = jsonDecode(json);
+    entity = JsonUtil.toJson(entity);
     var id = entity['id'];
     if (id != null) {
       var txn = db.transaction(table, "readwrite");
@@ -324,8 +322,7 @@ class IndexedDb extends DataStore {
   @override
   Future<int> upsert(String table, dynamic entity,
       {String? where, List<Object>? whereArgs}) async {
-    var json = jsonEncode(entity);
-    entity = jsonDecode(json);
+    entity = JsonUtil.toJson(entity);
     var id = entity['id'];
     if (id != null) {
       return update(table, entity, where: where, whereArgs: whereArgs);

@@ -30,12 +30,36 @@ abstract class BaseEntity {
   String? updateDate;
   String? entityId;
   String? state;
+
+  BaseEntity();
+
+  BaseEntity.fromJson(Map<String, dynamic> json)
+      : id = json['id'],
+        createDate = json['createDate'],
+        updateDate = json['updateDate'];
+
+  Map<String, dynamic> toJson() =>
+      {'id': id, 'createDate': createDate, 'updateDate': updateDate};
 }
 
 abstract class StatusEntity extends BaseEntity {
   String? status;
   String? statusReason;
   String? statusDate;
+
+  StatusEntity();
+
+  StatusEntity.fromJson(Map<String, dynamic> json)
+      : status = json['status'],
+        statusReason = json['statusReason'],
+        statusDate = json['statusDate'],
+        super.fromJson(json);
+
+  Map<String, dynamic> toJson() {
+    var json = super.toJson();
+    json.addAll({'id': id, 'createDate': createDate, 'updateDate': updateDate});
+    return json;
+  }
 }
 
 /**

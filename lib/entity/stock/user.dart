@@ -5,13 +5,10 @@ import 'account.dart';
 class User {
   //登录用户的基本信息
   Account? account;
-
   //登录状态
   bool loginStatus = false;
-
   //用户令牌
   String token = '';
-
   //用户自选，当前指定(显示在标题上)
   List<Map<String, dynamic>> shares = <Map<String, dynamic>>[];
   Map<String, dynamic>? _share;

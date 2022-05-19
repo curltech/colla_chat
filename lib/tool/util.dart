@@ -59,3 +59,12 @@ class MobileUtil {
 }
 
 class VersionUtil {}
+
+class JsonUtil {
+  static Map<String, dynamic> toJson(dynamic entity) {
+    if (entity is Map) {
+      return entity as Map<String, dynamic>;
+    }
+    return entity.toJson();
+  }
+}

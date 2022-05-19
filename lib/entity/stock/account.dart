@@ -13,6 +13,31 @@ class Account extends StatusEntity {
   String? lastLoginDate;
   String? lastReadDate;
   String? roles = '';
+
+  Account();
+
+  Account.fromJson(Map<String, dynamic> json)
+      : accountId = json['accountId'],
+        accountName = json['accountName'],
+        name = json['name'],
+        subscription = json['subscription'],
+        lastLoginDate = json['lastLoginDate'],
+        roles = json['roles'],
+        super.fromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() {
+    var json = super.toJson();
+    json.addAll({
+      'accountId': accountId,
+      'accountName': accountName,
+      'name': name,
+      'subscription': subscription,
+      'lastLoginDate': lastLoginDate,
+      'roles': roles,
+    });
+    return json;
+  }
 }
 
 class AccountService extends BaseService {
