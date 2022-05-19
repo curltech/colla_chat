@@ -90,7 +90,7 @@ dependencies:
   phone_form_field: ^6.0.0
   #flutter-international-phone-input:
   intl_phone_field: ^3.1.0
-  mobile_number: ^1.0.4
+  #mobile_number: ^1.0.4
   # 界面样式和组件
   #flui: 0.9.2
   flutter_neumorphic: ^3.0.3
@@ -111,8 +111,8 @@ dependencies:
   google_fonts: ^2.1.0
   material_design_icons_flutter: ^5.0.6295
   #flutter_bloc: ^6.1.0
-  flutter_swiper: 1.1.6 # Flutter 轮播图 https://github.com/best-flutter/flutter_swiper
-  flutter_screenutil: 5.5.3 # Flutter 屏幕适配 https://github.com/OpenFlutter/flutter_screenutil
+  #flutter_swiper: 1.1.6 # Flutter 轮播图 https://github.com/best-flutter/flutter_swiper
+  #flutter_screenutil: 5.5.3 # Flutter 屏幕适配 https://github.com/OpenFlutter/flutter_screenutil
   # webrtc
   flutter_webrtc: ^0.8.6
   dart_webrtc: ^1.0.5

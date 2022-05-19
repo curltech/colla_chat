@@ -4,7 +4,7 @@ import 'package:colla_chat/transport/webclient.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import '../config.dart';
+import '../app.dart';
 import '../tool/util.dart';
 
 class Websocket implements IWebClient {
@@ -71,22 +71,32 @@ class Websocket implements IWebClient {
 }
 
 class WebsocketPool {
+  static WebsocketPool instance = WebsocketPool();
+  static bool initStatus = false;
+
+  static Future<WebsocketPool> getInstance() async {
+    if (!initStatus) {
+      var appParams = await AppParams.getInstance();
+      var connectAddress = appParams.wsConnectAddress;
+      int i = 0;
+      for (var addr in connectAddress) {
+        if (addr.startsWith('ws')) {
+          var websocket = Websocket(addr);
+          instance.websockets[addr] = websocket;
+          if (i == 0 && instance._default == null) {
+            instance._default = websocket;
+          }
+        }
+      }
+      initStatus = true;
+    }
+    return instance;
+  }
+
   var websockets = <String, Websocket>{};
   Websocket? _default;
 
-  WebsocketPool() {
-    var connectAddress = config.appParams.wsConnectAddress;
-    int i = 0;
-    for (var addr in connectAddress) {
-      if (addr.startsWith('ws')) {
-        var websocket = Websocket(addr);
-        websockets[addr] = websocket;
-        if (i == 0 && _default == null) {
-          _default = websocket;
-        }
-      }
-    }
-  }
+  WebsocketPool() {}
 
   Websocket? get(String address) {
     if (websockets.containsKey(address)) {

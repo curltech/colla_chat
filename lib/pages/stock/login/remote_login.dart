@@ -1,7 +1,6 @@
 import 'package:colla_chat/pages/stock/login/remote_login_widget.dart';
 import 'package:colla_chat/pages/stock/login/remote_register_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_swiper/flutter_swiper.dart';
 
 /// 远程登录页面，一个Scaffold，IndexStack下的远程登录组件，注册组件和配置组件
 class RemoteLogin extends StatefulWidget {

@@ -1,6 +1,9 @@
-import 'package:colla_chat/config.dart';
+import 'package:colla_chat/app.dart';
+import 'package:colla_chat/platform.dart';
 
 import '../../datastore/base.dart';
+import '../../datastore/indexeddb.dart';
+import '../../datastore/sqflite.dart';
 
 class Account extends StatusEntity {
   String? accountId;
@@ -13,9 +16,27 @@ class Account extends StatusEntity {
 }
 
 class AccountService extends BaseService {
-  AccountService(String tableName, List<String> fields,
-      [List<String>? indexFields])
-      : super(tableName, fields, indexFields);
+  static AccountService instance = AccountService();
+  static bool initStatus = false;
+
+  static AccountService getInstance() {
+    if (!initStatus) {
+      throw 'please init!';
+    }
+    return instance;
+  }
+
+  static Future<AccountService> init(
+      {required String tableName,
+      required List<String> fields,
+      List<String>? indexFields}) async {
+    if (!initStatus) {
+      await BaseService.init(instance,
+          tableName: tableName, fields: fields, indexFields: indexFields);
+      initStatus = true;
+    }
+    return instance;
+  }
 
   /**
    * 根据用户的信息查询本地是否存在账号，存在更新账号信息，不存在，创建新的账号
@@ -28,7 +49,8 @@ class AccountService extends BaseService {
     if (accounts != null && accounts.isNotEmpty && accounts[0] != null) {
       account = accounts[0] as Account?;
     } else {
-      var subscription = LocalStorage.get('StockSubscription');
+      LocalStorage localStorage = await LocalStorage.getInstance();
+      var subscription = await localStorage.get('StockSubscription');
       account = Account();
       account.status = user['status'];
       account.accountId = user['userId'];
@@ -49,6 +71,3 @@ class AccountService extends BaseService {
     return account;
   }
 }
-
-var accountService = AccountService(
-    'stk_account', ['accountId', 'accountName', 'status', 'updateDate'], []);

@@ -1,7 +1,8 @@
+import 'package:colla_chat/datastore/indexeddb.dart';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:flutter/material.dart';
 
-import '../../../config.dart';
+import '../../../app.dart';
 import '../../../entity/stock/user.dart';
 import '../../../routers/application.dart';
 import '../../../routers/routes.dart';
@@ -111,7 +112,10 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
   }
 
   Future<void> _login() async {
-    config.saveAppParams();
+    var db = await IndexedDb.getInstance();
+    await db.test();
+    AppParams appParams = await AppParams.getInstance();
+    await appParams.saveAppParams();
     webClient.setDefault('https');
     var current = await user.login('/user/Login', {
       'credential_': _credential,

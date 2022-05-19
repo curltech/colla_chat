@@ -7,28 +7,36 @@ import 'package:shared_preferences/shared_preferences.dart';
 import './constants.dart';
 
 class LocalStorage {
-  static SharedPreferences? prefs;
+  static LocalStorage instance = LocalStorage();
+  late SharedPreferences prefs;
+  static bool initStatus = false;
 
-  static initSP() async {
-    prefs = await SharedPreferences.getInstance();
+  static Future<LocalStorage> getInstance() async {
+    if (!initStatus) {
+      instance.prefs = await SharedPreferences.getInstance();
+      initStatus = true;
+    }
+    return instance;
   }
 
-  static save(String key, String value) {
-    prefs?.setString(key, value);
+  save(String key, String value) {
+    prefs.setString(key, value);
   }
 
-  static get(String key) {
-    return prefs?.get(key);
+  get(String key) {
+    return prefs.get(key);
   }
 
-  static remove(String key) {
-    prefs?.remove(key);
+  remove(String key) {
+    prefs.remove(key);
   }
 }
 
 /// 本应用的参数，与操作系统系统和硬件无关，需要保存到本地的存储中
 /// 在系统启动的config对象初始化从本地存储中加载
 class AppParams {
+  static AppParams instance = AppParams();
+  static bool initStatus = false;
   //本应用的版本情况
   String? latestVersion;
   String? currentVersion;
@@ -42,6 +50,19 @@ class AppParams {
   String? localeName;
 
   AppParams() {}
+
+  static Future<AppParams> getInstance() async {
+    if (!initStatus) {
+      LocalStorage localStorage = await LocalStorage.getInstance();
+      Object? json = localStorage.get('AppParams');
+      if (json != null) {
+        var jsonObject = jsonDecode(json as String);
+        instance = AppParams.fromJson(jsonObject);
+      }
+      initStatus = true;
+    }
+    return instance;
+  }
 
   AppParams.fromJson(Map<String, dynamic> json)
       : language = json['language'],
@@ -96,6 +117,13 @@ class AppParams {
     }
   }
 
+  saveAppParams() async {
+    var jsonObject = toJson();
+    var json = jsonEncode(jsonObject);
+    LocalStorage localStorage = await LocalStorage.getInstance();
+    localStorage.save('AppParams', json);
+  }
+
   /// 检查版本
   /// @param currentVersion
   /// @param version
@@ -121,14 +149,15 @@ class AppParams {
   }
 
   /// 进入版本升级下载页面
-  updateVersion() {
+  updateVersion() async {
     var appleUrl = 'https://apps.apple.com/cn/app/collachat/id1546363298';
     var downloadUrl = 'https://curltech.io/#/collachat/downloadapps';
-    if (config.platformParams.isIOS) {
+    var platformParams = await PlatformParams.getInstance();
+    if (platformParams.ios) {
       //inAppBrowserComponent.open(appleUrl, '_system', 'location=no')
-    } else if (config.platformParams.isAndroid) {
+    } else if (platformParams.android) {
       //inAppBrowserComponent.open(downloadUrl, '_system', 'location=no')
-    } else if (config.platformParams.isMacOS) {
+    } else if (platformParams.macos) {
       //window.open(appleUrl, '_blank')
     } else {
       //window.open(downloadUrl, '_blank')
@@ -137,19 +166,20 @@ class AppParams {
 
   /// 根据版本历史修改版本信息
   /// @param versions
-  bool upgradeVersion(List<String> versions) {
-    config.appParams.currentVersion = '1.1.12';
-    config.appParams.mandatory = false;
+  Future<bool> upgradeVersion(List<String> versions) async {
+    var appParams = await AppParams.getInstance();
+    appParams.currentVersion = '1.1.12';
+    appParams.mandatory = false;
     if (versions.isNotEmpty) {
       var no = 1;
       for (var version in versions) {
-        var currentVersion = config.appParams.currentVersion;
+        var currentVersion = appParams.currentVersion;
         if (checkVersion(currentVersion!, version)) {
           if (no == 1) {
-            config.appParams.latestVersion = version.replaceAll('/[vV]/', '');
+            appParams.latestVersion = version.replaceAll('/[vV]/', '');
           }
           if (version.substring(0, 1) == 'V') {
-            config.appParams.mandatory = true;
+            appParams.mandatory = true;
             break;
           }
         } else {
@@ -157,9 +187,8 @@ class AppParams {
         }
         no++;
       }
-      config.appParams.latestVersion ??= config.appParams.currentVersion;
-      return (config.appParams.latestVersion !=
-          config.appParams.currentVersion);
+      appParams.latestVersion ??= appParams.currentVersion;
+      return (appParams.latestVersion != appParams.currentVersion);
     }
 
     return false;
@@ -168,24 +197,13 @@ class AppParams {
 
 /// 全局配置，包含平台参数和应用参数
 class Config {
-  late PlatformParams platformParams;
-  late AppParams appParams;
+  static Config instance = Config();
+  static bool initStatus = false;
 
-  Config() {
-    String json = LocalStorage.get('AppParams');
-    if (json == null) {
-      appParams = AppParams();
-    } else {
-      var jsonObject = jsonDecode(json);
-      appParams = AppParams.fromJson(jsonObject);
+  static Future<Config> getInstance() async {
+    if (!initStatus) {
+      initStatus = true;
     }
-  }
-
-  saveAppParams() {
-    var jsonObject = appParams.toJson();
-    var json = jsonEncode(jsonObject);
-    LocalStorage.save('AppParams', json);
+    return instance;
   }
 }
-
-final config = Config();

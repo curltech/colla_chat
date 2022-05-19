@@ -176,22 +176,8 @@ class SqlBuilder {
 
 var sqlBuilder = new SqlBuilder();
 
-class DataStoreDef {
-  late String tableName;
-  List<String>? fields;
-  List<String>? indexFields;
-
-  DataStoreDef(String tableName,
-      [List<String>? fields, List<String>? indexFields]) {
-    this.tableName = tableName;
-    this.fields = fields;
-    this.indexFields = indexFields;
-  }
-}
-
 abstract class DataStore {
-  List<DataStoreDef>? dataStoreDefs;
-
+  ///建表和索引
   dynamic create(String tableName, List<String> fields,
       [List<String>? indexFields]);
 
@@ -201,7 +187,7 @@ abstract class DataStore {
 
   Future<Object?> get(String table, dynamic id);
 
-  Future<List<Object?>> find(String table,
+  Future<List<Object>> find(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -253,7 +239,7 @@ abstract class DataStore {
    * @param {*} condition
    */
   Future<int> delete(String table,
-      {dynamic entity, String? where, List<Object?>? whereArgs});
+      {dynamic entity, String? where, List<Object>? whereArgs});
 
   /**
    * 更新记录
@@ -262,7 +248,7 @@ abstract class DataStore {
    * @param {*} condition
    */
   Future<int> update(String table, dynamic entity,
-      {String? where, List<Object?>? whereArgs});
+      {String? where, List<Object>? whereArgs});
 
   /**
    * 在一个事务里面执行多个操作（insert,update,devare)

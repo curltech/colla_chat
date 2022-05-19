@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:colla_chat/datastore/base.dart';
 import 'package:idb_shim/idb.dart';
 import 'package:path/path.dart';
 import 'package:idb_shim/idb_browser.dart';
@@ -10,27 +11,31 @@ import 'datastore.dart';
  * 适用于移动手机（无数据限制），electron和chrome浏览器的sqlite3的数据库（50M数据限制）
  */
 class IndexedDb extends DataStore {
+  static IndexedDb instance = IndexedDb();
+  static bool initStatus = false;
+
   late Database db;
   late String path;
 
-  /**
-   * 创建或者打开数据库
-   * @param {*} options
-   */
-  open([String name = 'colla_chat.db']) async {
-    IdbFactory? idbFactory = getIdbFactory();
-    if (idbFactory != null) {
-      db = await idbFactory.open(name, version: 1,
-          onUpgradeNeeded: (VersionChangeEvent event) {
-        Database db = event.database;
-        // create the store
-        for (var dataStoreDef in this.dataStoreDefs!) {
-          this.create(dataStoreDef.tableName, dataStoreDef.fields!,
-              dataStoreDef.indexFields);
-        }
-      });
+  ///打开数据库，创建所有的表和索引
+  static Future<IndexedDb> getInstance({String name = 'colla_chat.db'}) async {
+    if (!initStatus) {
+      IdbFactory? idbFactory = getIdbFactory();
+      if (idbFactory != null) {
+        instance.db = await idbFactory.open(name, version: 1,
+            onUpgradeNeeded: (VersionChangeEvent event) {
+          Database db = event.database;
+          instance.db = db;
+          for (BaseService service in ServiceLocator.services.values) {
+            instance.create(
+                service.tableName, service.fields, service.indexFields);
+            service.dataStore = instance;
+          }
+        });
+      }
+      initStatus = true;
     }
-    return this;
+    return instance;
   }
 
   /**
@@ -62,18 +67,16 @@ class IndexedDb extends DataStore {
   @override
   dynamic run(Sql sql) {}
 
-  /**
-   * 建表
-   * @param {*} tableName
-   * @param {*} fields
-   */
+  /// 建表和索引
   @override
   dynamic create(String tableName, List<String> fields,
       [List<String>? indexFields]) {
     var store =
         db.createObjectStore(tableName, autoIncrement: true, keyPath: 'id');
-    for (var indexField in indexFields!) {
-      store.createIndex(indexField, indexField);
+    if (indexFields != null && indexFields.isNotEmpty) {
+      for (var indexField in indexFields) {
+        store.createIndex(indexField, indexField);
+      }
     }
 
     return store;
@@ -83,10 +86,11 @@ class IndexedDb extends DataStore {
    * 删除表
    * @param {*} tableName
    */
-  drop(String tableName) {
-    var query = sqlBuilder.drop(tableName);
-
-    return run(Sql(query));
+  drop(String tableName) async {
+    var txn = db.transaction(tableName, "readonly");
+    var store = txn.objectStore(tableName);
+    await store.clear();
+    await txn.completed;
   }
 
   @override
@@ -142,7 +146,7 @@ class IndexedDb extends DataStore {
   }
 
   @override
-  Future<List<Object?>> find(String table,
+  Future<List<Object>> find(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -157,14 +161,27 @@ class IndexedDb extends DataStore {
     if (where != null && whereArgs != null && whereArgs.isNotEmpty) {
       var keyRange = _buildKeyRange(where, whereArgs);
       if (keyRange != null) {
-        var index = store.index(keyRange['key']);
-        var results = index.getAll(keyRange['keyRange'], limit);
+        var indexName = keyRange['key'];
+        List<Object> results = [];
+        if (indexName == 'id') {
+          KeyRange range = keyRange['keyRange'] as KeyRange;
+          Object? id = range.lower;
+          if (id != null) {
+            Object? result = await store.getObject(id);
+            if (result != null) {
+              results.add(result);
+            }
+          }
+        } else {
+          var index = store.index(indexName);
+          results = await index.getAll(keyRange['keyRange'], limit);
+        }
         await txn.completed;
 
         return results;
       }
     }
-    var results = store.getAll();
+    var results = await store.getAll();
     await txn.completed;
     return results;
   }
@@ -250,8 +267,9 @@ class IndexedDb extends DataStore {
     var store = txn.objectStore(table);
     var key = await store.add(entity);
     await txn.completed;
+    entity['id'] = key;
 
-    return 1;
+    return key as int;
   }
 
   /**
@@ -261,7 +279,7 @@ class IndexedDb extends DataStore {
    */
   @override
   Future<int> delete(String table,
-      {dynamic entity, String? where, List<Object?>? whereArgs}) async {
+      {dynamic entity, String? where, List<Object>? whereArgs}) async {
     if (entity != null) {
       var json = jsonEncode(entity);
       entity = jsonDecode(json);
@@ -272,7 +290,7 @@ class IndexedDb extends DataStore {
         var key = await store.delete(id);
         await txn.completed;
 
-        return 1;
+        return id;
       }
     }
 
@@ -287,16 +305,16 @@ class IndexedDb extends DataStore {
    */
   @override
   Future<int> update(String table, dynamic entity,
-      {String? where, List<Object?>? whereArgs}) async {
+      {String? where, List<Object>? whereArgs}) async {
     var json = jsonEncode(entity);
     entity = jsonDecode(json);
     var id = entity['id'];
     if (id != null) {
       var txn = db.transaction(table, "readwrite");
       var store = txn.objectStore(table);
-      var key = await store.put(entity, id);
+      var key = await store.put(entity);
       await txn.completed;
-      return 1;
+      return key as int;
     }
     return 0;
   }
@@ -358,20 +376,11 @@ class IndexedDb extends DataStore {
   }
 
   test() async {
-    this.open();
-    var sqls = <Sql>[];
-    sqls.add(Sql('DROP TABLE IF EXISTS test_table'));
-    sqls.add(Sql(
-        'CREATE TABLE IF NOT EXISTS test_table (id integer primary key, data text, data_num integer)'));
-    this.execute(sqls);
-    this.insert('test_table', {'id': 1, 'data': 'hello1', 'data_num': 1234561});
-    this.insert('test_table', {'id': 2, 'data': 'hello2', 'data_num': 1234562});
-    var results =
-        await this.findOne('test_table', where: 'id=?', whereArgs: [1]);
-    this.update('test_table', {'data': 'hello-update', 'data_num': 12345678},
-        where: 'id=?', whereArgs: [1]);
-    this.delete('test_table', where: 'id=?', whereArgs: [1]);
+    await insert('stk_account', {'data': 'hello1', 'data_num': 1234561});
+    await insert('stk_account', {'data': 'hello2', 'data_num': 1234562});
+    var results = await findOne('stk_account', where: 'id = ?', whereArgs: [1]);
+    await update('stk_account',
+        {'id': 1, 'data': 'hello-update1', 'data_num': 12345678});
+    await delete('stk_account', entity: {'id': 2});
   }
 }
-
-var indexeddb = IndexedDb().open();

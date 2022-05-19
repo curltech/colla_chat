@@ -1,31 +1,37 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:colla_chat/tool/util.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'base.dart';
 import 'datastore.dart';
 
 /**
  * 适用于移动手机（无数据限制），electron和chrome浏览器的sqlite3的数据库（50M数据限制）
  */
 class Sqflite extends DataStore {
+  static Sqflite instance = Sqflite();
+  static bool initStatus = false;
   late Database db;
   late String path;
 
-  /**
-   * 创建或者打开数据库
-   * @param {*} options
-   */
-  open([String name = 'colla_chat.db']) async {
-    var databasesPath = await getDatabasesPath();
-
-    String path = join(databasesPath, name);
-
-    db = await openDatabase(
-      path,
-      version: 1,
-    );
-    return this;
+  /// 打开数据库，创建所有的表和索引
+  static Future<Sqflite> getInstance({String name = 'colla_chat.db'}) async {
+    if (!initStatus) {
+      var databasesPath = await getDatabasesPath();
+      String path = join(databasesPath, name);
+      instance.db = await openDatabase(
+        path,
+        version: 1,
+      );
+      for (BaseService service in ServiceLocator.services.values) {
+        instance.create(service.tableName, service.fields, service.indexFields);
+        service.dataStore = instance;
+      }
+      initStatus = true;
+    }
+    return instance;
   }
 
   /**
@@ -69,11 +75,7 @@ class Sqflite extends DataStore {
     return db.execute(sql.clause, sql.params);
   }
 
-  /**
-   * 建表
-   * @param {*} tableName
-   * @param {*} fields
-   */
+  /// 建表和索引
   @override
   dynamic create(String tableName, List<String> fields,
       [List<String>? indexFields]) {
@@ -94,11 +96,11 @@ class Sqflite extends DataStore {
 
   @override
   Future<Object?> get(String table, dynamic id) {
-    return sqlite3.findOne(table, where: 'id=?', whereArgs: [id]);
+    return findOne(table, where: 'id=?', whereArgs: [id]);
   }
 
   @override
-  Future<List<Object?>> find(String table,
+  Future<List<Object>> find(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -143,7 +145,7 @@ class Sqflite extends DataStore {
         offset: offset);
     clause = 'select count(*) from (' + clause + ")";
     var totalResults = await db.rawQuery(clause, whereArgs);
-    var total = sqlite3.firstIntValue(totalResults);
+    var total = TypeUtil.firstIntValue(totalResults);
     var results = await find(table,
         distinct: distinct,
         columns: columns,
@@ -215,7 +217,7 @@ class Sqflite extends DataStore {
    */
   @override
   Future<int> delete(String table,
-      {dynamic entity, String? where, List<Object?>? whereArgs}) async {
+      {dynamic entity, String? where, List<Object>? whereArgs}) async {
     if (entity != null) {
       var json = jsonEncode(entity);
       entity = jsonDecode(json);
@@ -239,7 +241,7 @@ class Sqflite extends DataStore {
    */
   @override
   Future<int> update(String table, dynamic entity,
-      {String? where, List<Object?>? whereArgs}) async {
+      {String? where, List<Object>? whereArgs}) async {
     var json = jsonEncode(entity);
     entity = jsonDecode(json);
     var id = entity['id'];
@@ -309,20 +311,11 @@ class Sqflite extends DataStore {
   }
 
   test() async {
-    this.open();
-    var sqls = <Sql>[];
-    sqls.add(Sql('DROP TABLE IF EXISTS test_table'));
-    sqls.add(Sql(
-        'CREATE TABLE IF NOT EXISTS test_table (id integer primary key, data text, data_num integer)'));
-    this.execute(sqls);
-    this.insert('test_table', {'id': 1, 'data': 'hello1', 'data_num': 1234561});
-    this.insert('test_table', {'id': 2, 'data': 'hello2', 'data_num': 1234562});
-    var results =
-        await this.findOne('test_table', where: 'id=?', whereArgs: [1]);
-    this.update('test_table', {'data': 'hello-update', 'data_num': 12345678},
+    insert('stk_account', {'id': 1, 'data': 'hello1', 'data_num': 1234561});
+    insert('stk_account', {'id': 2, 'data': 'hello2', 'data_num': 1234562});
+    var results = await findOne('stk_account', where: 'id=?', whereArgs: [1]);
+    update('stk_account', {'data': 'hello-update', 'data_num': 12345678},
         where: 'id=?', whereArgs: [1]);
-    this.delete('test_table', where: 'id=?', whereArgs: [1]);
+    delete('stk_account', where: 'id=?', whereArgs: [1]);
   }
 }
-
-var sqlite3 = Sqflite().open();

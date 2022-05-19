@@ -1,6 +1,9 @@
 import 'package:colla_chat/datastore/indexeddb.dart';
-import 'package:colla_chat/datastore/sqlite3.dart';
+import '../../datastore/indexeddb.dart';
+import '../../datastore/sqflite.dart';
 
+import '../entity/stock/account.dart';
+import '../platform.dart';
 import 'datastore.dart';
 
 enum EntityStatus {
@@ -40,17 +43,22 @@ abstract class StatusEntity extends BaseEntity {
  */
 abstract class BaseService {
   late String tableName;
+  late List<String> fields;
+  List<String>? indexFields;
   late DataStore dataStore;
 
-  BaseService(String tableName, List<String> fields,
-      [List<String>? indexFields]) {
-    this.tableName = tableName;
-    if (indexeddb.db != null) {
-      dataStore = indexeddb;
-    } else {
-      dataStore = sqlite3;
-    }
-    dataStore.create(this.tableName, fields, indexFields);
+  /**
+   * 通用的初始化服务类的方法
+   */
+  static Future<BaseService> init(BaseService instance,
+      {required String tableName,
+      required List<String> fields,
+      List<String>? indexFields}) async {
+    instance.tableName = tableName;
+    instance.fields = fields;
+    instance.indexFields = indexFields;
+
+    return instance;
   }
 
   Future<Object?> get(int id) {
@@ -207,6 +215,29 @@ abstract class BaseService {
       return update(entity, ignore, parent);
     } else {
       return insert(entity, ignore, parent);
+    }
+  }
+}
+
+class ServiceLocator {
+  static Map<String, BaseService> services = Map();
+
+  static get(String serviceName) {
+    return services[serviceName];
+  }
+
+  ///初始化并注册服务类，在应用启动后调用
+  static init() async {
+    var accountService = await AccountService.init(
+        tableName: 'stk_account',
+        fields: ['accountId', 'accountName', 'status', 'updateDate']);
+    services['accountService'] = accountService;
+
+    PlatformParams platformParams = await PlatformParams.getInstance();
+    if (platformParams.web) {
+      await IndexedDb.getInstance();
+    } else {
+      await Sqflite.getInstance();
     }
   }
 }

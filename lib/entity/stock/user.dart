@@ -78,51 +78,58 @@ class User {
   }
 
   addSubscription(String ts_code) {
-    if (account == null) {
-      return;
-    }
-    var subscription = account?.subscription;
-    subscription ??= '';
-
-    var pos = subscription.indexOf(ts_code);
-    if (pos == -1) {
-      if (subscription == '') {
-        account?.subscription = (subscription + ts_code)!;
-      } else {
-        account?.subscription = '$subscription,$ts_code';
+    final account = this.account;
+    if (account != null) {
+      var subscription = account.subscription;
+      subscription ??= '';
+      var pos = subscription.indexOf(ts_code);
+      if (pos == -1) {
+        if (subscription == '') {
+          account.subscription = (subscription + ts_code);
+        } else {
+          account.subscription = '$subscription,$ts_code';
+        }
+        AccountService.getInstance().upsert(account);
       }
-      accountService.upsert(account);
     }
   }
 
   removeSubscription(String ts_code) {
-    if (account == null) {
-      return;
-    }
-    var subscription = account?.subscription;
-    subscription ??= '';
-    var pos = subscription.indexOf(ts_code);
-    if (pos != -1) {
-      account?.subscription = subscription.replaceAll(',$ts_code', '')!;
-      account?.subscription = subscription.replaceAll(ts_code, '')!;
-      accountService.upsert(account);
+    final account = this.account;
+    if (account != null) {
+      var subscription = account.subscription;
+      subscription ??= '';
+      var pos = subscription.indexOf(ts_code);
+      if (pos != -1) {
+        account.subscription = subscription.replaceAll(',$ts_code', '');
+        account.subscription = subscription.replaceAll(ts_code, '');
+        AccountService.getInstance().upsert(account);
+      }
     }
   }
 
   bool canbeAdd(String ts_code) {
-    account?.subscription ??= '';
-    var pos = account?.subscription?.indexOf(ts_code);
-    if (pos == -1) {
-      return true;
+    final account = this.account;
+    if (account != null) {
+      account.subscription ??= '';
+      var subscription = account.subscription;
+      var pos = subscription?.indexOf(ts_code);
+      if (pos == -1) {
+        return true;
+      }
     }
     return false;
   }
 
   bool canbenRemove(String ts_code) {
-    account?.subscription ??= '';
-    var pos = account?.subscription?.indexOf(ts_code);
-    if (pos != -1) {
-      return true;
+    final account = this.account;
+    if (account != null) {
+      account.subscription ??= '';
+      var subscription = account.subscription;
+      var pos = subscription?.indexOf(ts_code);
+      if (pos != -1) {
+        return true;
+      }
     }
     return false;
   }
@@ -165,7 +172,7 @@ class User {
         if (TypeUtil.isString(data)) {
           error = data;
         } else {
-          var account = await accountService.getOrRegist(data);
+          var account = await AccountService.getInstance().getOrRegist(data);
           account = account;
           return account;
         }
@@ -186,7 +193,7 @@ class User {
           var token = data['token'];
           if (user != null) {
             user['lastLoginDate'] = DateTime.now();
-            account = await accountService.getOrRegist(user);
+            account = await AccountService.getInstance().getOrRegist(user);
             loginStatus = true;
             token = token;
           }

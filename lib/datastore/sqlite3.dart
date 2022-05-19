@@ -96,7 +96,7 @@ class Sqlite3 extends DataStore {
   }
 
   @override
-  Future<List<Object?>> find(String table,
+  Future<List<Object>> find(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -213,7 +213,7 @@ class Sqlite3 extends DataStore {
    */
   @override
   Future<int> delete(String table,
-      {dynamic entity, String? where, List<Object?>? whereArgs}) async {
+      {dynamic entity, String? where, List<Object>? whereArgs}) async {
     if (entity != null) {
       var json = jsonEncode(entity);
       entity = jsonDecode(json);
@@ -237,7 +237,7 @@ class Sqlite3 extends DataStore {
    */
   @override
   Future<int> update(String table, dynamic entity,
-      {String? where, List<Object?>? whereArgs}) async {
+      {String? where, List<Object>? whereArgs}) async {
     var json = jsonEncode(entity);
     entity = jsonDecode(json);
     var id = entity['id'];

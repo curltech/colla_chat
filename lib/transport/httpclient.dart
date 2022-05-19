@@ -1,7 +1,7 @@
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:dio/dio.dart';
 
-import '../config.dart';
+import '../app.dart';
 
 class HttpClient implements IWebClient {
   Dio _client = Dio();
@@ -50,23 +50,33 @@ class HttpClient implements IWebClient {
 }
 
 class HttpClientPool {
+  static HttpClientPool instance = HttpClientPool();
+  static bool initStatus = false;
+
+  static Future<HttpClientPool> getInstance() async {
+    if (!initStatus) {
+      var appParams = await AppParams.getInstance();
+      var connectAddress = appParams.httpConnectAddress;
+      int i = 0;
+      for (var address in connectAddress) {
+        if (address.startsWith('http')) {
+          var httpClient = HttpClient(address);
+          instance._httpClients[address] = httpClient;
+          if (i == 0) {
+            instance._default ??= httpClient;
+          }
+        }
+        i++;
+      }
+      initStatus = true;
+    }
+    return instance;
+  }
+
   final _httpClients = <String, HttpClient>{};
   HttpClient? _default;
 
-  HttpClientPool() {
-    var connectAddress = config.appParams.httpConnectAddress;
-    int i = 0;
-    for (var address in connectAddress) {
-      if (address.startsWith('http')) {
-        var httpClient = HttpClient(address);
-        _httpClients[address] = httpClient;
-        if (i == 0) {
-          _default ??= httpClient;
-        }
-      }
-      i++;
-    }
-  }
+  HttpClientPool() {}
 
   HttpClient? get(String address) {
     if (_httpClients.containsKey(address)) {

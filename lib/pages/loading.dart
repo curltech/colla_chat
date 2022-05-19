@@ -1,6 +1,8 @@
+import 'package:colla_chat/datastore/base.dart';
 import 'package:flutter/material.dart';
 
-import '../config.dart';
+import '../app.dart';
+import '../platform.dart';
 import '../routers/application.dart';
 import '../routers/routes.dart';
 
@@ -38,16 +40,31 @@ class _LoadingState extends State<Loading> {
   int _currentIndex = 0;
   bool _autoPlay = false;
 
+  void initConfig() async {
+    //初始化系统信息
+    PlatformParams platformParams = await PlatformParams.getInstance();
+    MediaQueryData mediaQueryData = MediaQuery.of(context);
+    platformParams.mediaQueryData = mediaQueryData;
+
+    //初始化服务类
+    await ServiceLocator.init();
+  }
+
   @override
   void initState() {
     super.initState();
+    initConfig();
     if (_autoPlay) {
       Future.doWhile(() async {
         setState(() {
-          _currentIndex++;
+          if (_currentIndex == images.length - 1) {
+            _currentIndex = 0;
+          } else {
+            _currentIndex++;
+          }
         });
         await Future.delayed(const Duration(seconds: 1));
-        if (_currentIndex >= images.length) {
+        if (_currentIndex >= images.length - 1) {
           return false;
         }
         return true;
@@ -61,9 +78,6 @@ class _LoadingState extends State<Loading> {
 
   @override
   Widget build(BuildContext context) {
-    //初始化系统信息
-    MediaQueryData mediaQueryData = MediaQuery.of(context);
-    config.platformParams.mediaQueryData = mediaQueryData;
     return Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
@@ -71,7 +85,11 @@ class _LoadingState extends State<Loading> {
         body: GestureDetector(
             onHorizontalDragEnd: (DragEndDetails details) {
               setState(() {
-                _currentIndex++;
+                if (_currentIndex == images.length - 1) {
+                  _currentIndex = 0;
+                } else {
+                  _currentIndex++;
+                }
               });
             },
             child: Center(

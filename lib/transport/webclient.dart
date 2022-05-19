@@ -3,7 +3,7 @@
  */
 import 'package:colla_chat/transport/websocket.dart';
 
-import '../config.dart';
+import '../app.dart';
 import '../tool/util.dart';
 import 'httpclient.dart';
 
@@ -27,10 +27,11 @@ class WebClient extends IWebClient {
     }
   }
 
-  setDefault(String address) {
+  setDefault(String address) async {
+    var appParams = await AppParams.getInstance();
     if (address.startsWith('wss') || address.startsWith('ws')) {
       if (address == 'wss' || address == 'ws') {
-        var cas = config.appParams.wsConnectAddress;
+        var cas = appParams.wsConnectAddress;
         if (cas.isNotEmpty) {
           websocketPool.setDefalutWebsocket(cas[0]);
         }
@@ -40,7 +41,7 @@ class WebClient extends IWebClient {
       _wsDefault = websocketPool.defaultWebsocket;
     } else if (address.startsWith('https') || address.startsWith('http')) {
       if (address == 'https' || address == 'http') {
-        var cas = config.appParams.httpConnectAddress;
+        var cas = appParams.httpConnectAddress;
         if (cas.isNotEmpty) {
           httpClientPool.setDefalutHttpClient(cas[0]);
         }
