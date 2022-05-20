@@ -233,4 +233,4 @@ class StockUser {
   }
 }
 
-var user = StockUser();
+var stockUser = StockUser();

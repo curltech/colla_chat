@@ -114,11 +114,11 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
   Future<void> _login() async {
     AppParams appParams = await AppParams.getInstance();
     await appParams.saveAppParams();
-    var current = await user.login('/user/Login', {
+    var current = await stockUser.login('/user/Login', {
       'credential_': _credential,
       'password_': _password,
     });
-    if (user.loginStatus == true) {
+    if (stockUser.loginStatus == true) {
       Application.router.navigateTo(context, Routes.index, replace: true);
     }
   }
