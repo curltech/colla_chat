@@ -1,4 +1,5 @@
 import 'package:colla_chat/datastore/indexeddb.dart';
+import 'package:colla_chat/tool/util.dart';
 import '../../datastore/indexeddb.dart';
 import '../../datastore/sqflite.dart';
 
@@ -33,7 +34,7 @@ abstract class BaseEntity {
 
   BaseEntity();
 
-  BaseEntity.fromJson(Map<String, dynamic> json)
+  BaseEntity.fromJson(Map json)
       : id = json['id'],
         createDate = json['createDate'],
         updateDate = json['updateDate'];
@@ -49,7 +50,7 @@ abstract class StatusEntity extends BaseEntity {
 
   StatusEntity();
 
-  StatusEntity.fromJson(Map<String, dynamic> json)
+  StatusEntity.fromJson(Map json)
       : status = json['status'],
         statusReason = json['statusReason'],
         statusDate = json['statusDate'],
@@ -204,6 +205,7 @@ abstract class BaseService {
   }
 
   Future<int> insert(dynamic entity, [dynamic? ignore, dynamic? parent]) {
+    EntityUtil.createTimestamp(entity);
     return dataStore.insert(this.tableName, entity);
   }
 
@@ -212,6 +214,7 @@ abstract class BaseService {
   }
 
   Future<int> update(dynamic entity, [dynamic? ignore, dynamic? parent]) {
+    EntityUtil.updateTimestamp(entity);
     return dataStore.update(this.tableName, entity);
   }
 
@@ -234,7 +237,12 @@ abstract class BaseService {
    * @param entity
    */
   Future<int> upsert(dynamic entity, [dynamic? ignore, dynamic? parent]) {
-    return dataStore.upsert(tableName, entity);
+    var id = EntityUtil.getId(entity);
+    if (id != null) {
+      return update(entity, ignore, parent);
+    } else {
+      return insert(entity, ignore, parent);
+    }
   }
 }
 

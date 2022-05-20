@@ -263,13 +263,17 @@ class IndexedDb extends DataStore {
    */
   @override
   Future<int> insert(String table, dynamic entity) async {
-    entity = JsonUtil.toJson(entity);
-
+    Map map = JsonUtil.toMap(entity);
+    EntityUtil.removeNullId(map);
     var txn = db.transaction(table, "readwrite");
     var store = txn.objectStore(table);
     var key = await store.add(entity);
     await txn.completed;
-    entity['id'] = key;
+
+    Object? id = EntityUtil.getId(map);
+    if (id == null) {
+      EntityUtil.setId(entity, key);
+    }
 
     return key as int;
   }
@@ -283,15 +287,15 @@ class IndexedDb extends DataStore {
   Future<int> delete(String table,
       {dynamic entity, String? where, List<Object>? whereArgs}) async {
     if (entity != null) {
-      entity = JsonUtil.toJson(entity);
-      var id = entity['id'];
+      var map = JsonUtil.toMap(entity);
+      var id = EntityUtil.getId(map);
       if (id != null) {
         var txn = db.transaction(table, "readwrite");
         var store = txn.objectStore(table);
         var key = await store.delete(id);
         await txn.completed;
 
-        return id;
+        return id as int;
       }
     }
 
@@ -307,12 +311,12 @@ class IndexedDb extends DataStore {
   @override
   Future<int> update(String table, dynamic entity,
       {String? where, List<Object>? whereArgs}) async {
-    entity = JsonUtil.toJson(entity);
-    var id = entity['id'];
+    var map = JsonUtil.toMap(entity);
+    var id = EntityUtil.getId(map);
     if (id != null) {
       var txn = db.transaction(table, "readwrite");
       var store = txn.objectStore(table);
-      var key = await store.put(entity);
+      var key = await store.put(map);
       await txn.completed;
       return key as int;
     }
@@ -322,12 +326,12 @@ class IndexedDb extends DataStore {
   @override
   Future<int> upsert(String table, dynamic entity,
       {String? where, List<Object>? whereArgs}) async {
-    entity = JsonUtil.toJson(entity);
-    var id = entity['id'];
+    var map = JsonUtil.toMap(entity);
+    var id = EntityUtil.getId(map);
     if (id != null) {
-      return update(table, entity, where: where, whereArgs: whereArgs);
+      return update(table, map, where: where, whereArgs: whereArgs);
     } else {
-      return insert(table, entity);
+      return insert(table, map);
     }
   }
 
@@ -344,47 +348,37 @@ class IndexedDb extends DataStore {
       var txn = db.transaction(table, "readwrite");
       var store = txn.objectStore(table);
       var entity = operator['entity'];
-      var where = operator['where'];
-      var whereArgs = operator['whereArgs'];
       if (entity != null) {
-        var json = jsonEncode(entity);
-        entity = jsonDecode(json);
         if (entity is List) {
           for (var e in entity as List) {
-            var json = jsonEncode(e);
-            var m = jsonDecode(json);
-            var id = m['id'];
-            var state = m['state'];
-            if (EntityState.New == state) {
-              m.remove('state');
-              store.add(m, id);
-            } else if (EntityState.Modified == state) {
-              m.remove('state');
-              store.put(m, id);
-            } else if (EntityState.Deleted == state) {
-              m.remove('state');
-              store.delete(id);
-            }
+            _transaction(store, e);
           }
         } else {
-          var id = entity['id'];
-          var state = entity['state'];
-          if (EntityState.New == state) {
-            entity.remove('state');
-            store.add(entity, id);
-          } else if (EntityState.Modified == state) {
-            entity.remove('state');
-            store.put(entity, id);
-          } else if (EntityState.Deleted == state) {
-            entity.remove('state');
-            store.delete(id);
-          }
+          _transaction(store, entity);
         }
       }
       await txn.completed;
     }
 
     return null;
+  }
+
+  _transaction(ObjectStore store, dynamic entity) {
+    var map = JsonUtil.toMap(entity);
+    Object? id = EntityUtil.getId(map);
+    var state = map['state'];
+    if (EntityState.New == state) {
+      map.remove('state');
+      store.add(map, id);
+    } else if (EntityState.Modified == state) {
+      map.remove('state');
+      store.put(map, id);
+    } else if (EntityState.Deleted == state) {
+      map.remove('state');
+      if (id != null) {
+        store.delete(id);
+      }
+    }
   }
 
   test() async {

@@ -227,7 +227,7 @@ abstract class DataStore {
       int? offset});
 
   /**
-   * 插入一条记录
+   * 插入一条记录,假设entity时一个有id属性的Object，或者Map
    * @param {*} tableName
    * @param {*} entity
    */

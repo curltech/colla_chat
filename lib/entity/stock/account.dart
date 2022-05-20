@@ -16,7 +16,7 @@ class Account extends StatusEntity {
 
   Account();
 
-  Account.fromJson(Map<String, dynamic> json)
+  Account.fromJson(Map json)
       : accountId = json['accountId'],
         accountName = json['accountName'],
         name = json['name'],
@@ -69,10 +69,11 @@ class AccountService extends BaseService {
    */
   Future<Account?> getOrRegist(dynamic user) async {
     String where = 'accountId = ?';
-    Account? account;
+    Account account;
     var accounts = await find(where, whereArgs: [user['userId']]);
     if (accounts != null && accounts.isNotEmpty && accounts[0] != null) {
-      account = accounts[0] as Account?;
+      var acc = accounts[0];
+      account = Account.fromJson(acc as Map);
     } else {
       LocalStorage localStorage = await LocalStorage.getInstance();
       var subscription = await localStorage.get('StockSubscription');
@@ -85,12 +86,10 @@ class AccountService extends BaseService {
         account.subscription = subscription;
       }
       var currentDate = DateTime.now().toIso8601String();
-      account.createDate = currentDate;
-      account.updateDate = currentDate;
       account.statusDate = currentDate;
     }
-    account?.lastLoginDate = user['lastLoginDate'];
-    account?.roles = user['roles'];
+    account.lastLoginDate = user['lastLoginDate'];
+    account.roles = user['roles'];
     await upsert(account);
 
     return account;

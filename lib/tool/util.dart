@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 class TypeUtil {
   static bool isString(dynamic obj) {
     return (obj is String);
@@ -60,11 +62,66 @@ class MobileUtil {
 
 class VersionUtil {}
 
+/// 实体有toJason和fromJson两个方法
 class JsonUtil {
-  static Map<String, dynamic> toJson(dynamic entity) {
+  /// 把map，json字符串和一般的实体转换成map，map转换成一般实体使用实体的fromJson构造函数
+  static Map toMap(dynamic entity) {
     if (entity is Map) {
-      return entity as Map<String, dynamic>;
+      return entity;
+    } else if (entity is String) {
+      Map map = jsonDecode(entity);
+      return map;
     }
     return entity.toJson();
+  }
+
+  /// 把map和一般的实体转换成json字符串
+  static String toJsonString(dynamic entity) {
+    return jsonEncode(entity);
+  }
+}
+
+class EntityUtil {
+  static Object? getId(dynamic entity) {
+    if (entity is Map) {
+      return entity['id'];
+    } else {
+      return entity.id;
+    }
+  }
+
+  static setId(dynamic entity, Object val) {
+    if (entity is Map) {
+      entity['id'] = val;
+    } else {
+      entity.id = val;
+    }
+  }
+
+  static createTimestamp(dynamic entity) {
+    var currentDate = DateTime.now().toIso8601String();
+    if (entity is Map) {
+      entity['createDate'] = currentDate;
+      entity['updateDate'] = currentDate;
+    } else {
+      entity.createDate = currentDate;
+      entity.updateDate = currentDate;
+    }
+  }
+
+  static updateTimestamp(dynamic entity) {
+    var currentDate = DateTime.now().toIso8601String();
+    if (entity is Map) {
+      entity['updateDate'] = currentDate;
+    } else {
+      entity.updateDate = currentDate;
+    }
+  }
+
+  static removeNullId(Map map) {
+    var id = getId(map);
+    if (id == null) {
+      map.remove('id');
+    }
   }
 }
