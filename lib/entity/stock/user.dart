@@ -2,9 +2,9 @@ import '../../tool/util.dart';
 import '../../transport/webclient.dart';
 import 'account.dart';
 
-class User {
+class StockUser {
   //登录用户的基本信息
-  Account? account;
+  StockAccount? account;
   //登录状态
   bool loginStatus = false;
   //用户令牌
@@ -168,7 +168,7 @@ class User {
    * @param url
    * @param params
    */
-  Future<Account?> regist(String url, dynamic params) async {
+  Future<StockAccount?> regist(String url, dynamic params) async {
     var response = await webClient.send(url, params);
     if (response != null) {
       var data = response.data;
@@ -185,7 +185,7 @@ class User {
     return null;
   }
 
-  Future<User> login(String url, dynamic params) async {
+  Future<StockUser> login(String url, dynamic params) async {
     WebClient webClient = await WebClient.getInstance();
     var response = await webClient.send(url, params);
     if (response != null) {
@@ -209,7 +209,7 @@ class User {
     return this;
   }
 
-  Future<User> logout(String url) async {
+  Future<StockUser> logout(String url) async {
     var response = await webClient.send(url, {});
     if (response) {
       account = null;
@@ -232,4 +232,4 @@ class User {
   }
 }
 
-var user = User();
+var user = StockUser();

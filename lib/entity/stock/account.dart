@@ -5,7 +5,7 @@ import '../../datastore/base.dart';
 import '../../datastore/indexeddb.dart';
 import '../../datastore/sqflite.dart';
 
-class Account extends StatusEntity {
+class StockAccount extends StatusEntity {
   String? accountId;
   String? accountName;
   String? name;
@@ -14,9 +14,9 @@ class Account extends StatusEntity {
   String? lastReadDate;
   String? roles = '';
 
-  Account();
+  StockAccount();
 
-  Account.fromJson(Map json)
+  StockAccount.fromJson(Map json)
       : accountId = json['accountId'],
         accountName = json['accountName'],
         name = json['name'],
@@ -67,17 +67,17 @@ class AccountService extends BaseService {
    * 根据用户的信息查询本地是否存在账号，存在更新账号信息，不存在，创建新的账号
    * @param user
    */
-  Future<Account?> getOrRegist(dynamic user) async {
+  Future<StockAccount?> getOrRegist(dynamic user) async {
     String where = 'accountId = ?';
-    Account account;
+    StockAccount account;
     var accounts = await find(where, whereArgs: [user['userId']]);
     if (accounts != null && accounts.isNotEmpty && accounts[0] != null) {
       var acc = accounts[0];
-      account = Account.fromJson(acc as Map);
+      account = StockAccount.fromJson(acc as Map);
     } else {
       LocalStorage localStorage = await LocalStorage.getInstance();
       var subscription = await localStorage.get('StockSubscription');
-      account = Account();
+      account = StockAccount();
       account.status = user['status'];
       account.accountId = user['userId'];
       account.accountName = user['userName'];
