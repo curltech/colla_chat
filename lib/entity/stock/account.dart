@@ -40,18 +40,18 @@ class StockAccount extends StatusEntity {
   }
 }
 
-class AccountService extends BaseService {
-  static AccountService instance = AccountService();
+class StockAccountService extends BaseService {
+  static StockAccountService instance = StockAccountService();
   static bool initStatus = false;
 
-  static AccountService getInstance() {
+  static StockAccountService getInstance() {
     if (!initStatus) {
       throw 'please init!';
     }
     return instance;
   }
 
-  static Future<AccountService> init(
+  static Future<StockAccountService> init(
       {required String tableName,
       required List<String> fields,
       List<String>? indexFields}) async {

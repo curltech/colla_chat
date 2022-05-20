@@ -255,7 +255,7 @@ class ServiceLocator {
 
   ///初始化并注册服务类，在应用启动后调用
   static init() async {
-    var accountService = await AccountService.init(
+    var accountService = await StockAccountService.init(
         tableName: 'stk_account',
         fields: ['accountId', 'accountName', 'status', 'updateDate'],
         indexFields: ['accountId']);
