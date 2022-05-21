@@ -27,11 +27,23 @@ class CryptoGraphy {
     return Uint8List.fromList(hash.bytes);
   }
 
+  /// 随机字节数组
+  Future<Uint8List> getRandomBytes({int length = 32}) async {
+    final randomBytes = Uint8List(length);
+
+    var random = Random.secure();
+    for (var i = 0; i < randomBytes.length; i++) {
+      randomBytes[i] = random.nextInt(256);
+    }
+    var hash = await this.hash(randomBytes);
+
+    return hash;
+  }
+
   /// 随机base64位字符串
   Future<String> getRandomAsciiString({int length = 32}) async {
-    var randomBytes = CryptoUtil.getRandomBytes(length: length);
-    var hash = await this.hash(randomBytes);
-    var randomAscii = CryptoUtil.encodeBase64(hash);
+    var randomBytes = await getRandomBytes(length: length);
+    var randomAscii = CryptoUtil.encodeBase64(randomBytes);
 
     return randomAscii;
   }
@@ -230,6 +242,38 @@ class CryptoGraphy {
     );
 
     return clearText;
+  }
+
+  /// 对消息先进行AES加密，密钥是随机数，对密钥用ecc加密，用自己的私钥和对方的公钥，对方是一个数组
+  /// 返回加密后的消息和加密后的密钥数组
+  /// 这种方案的最大优势是有多个接收者的时候，对消息只加密一次，节省了运算量，劣势是传递了加密密钥，安全性差一些
+  /// @param {*} msg
+  /// @param {*} receivers
+  /// @param {*} options privateKey私钥
+  Future<Map<String, Object>> encrypt(List<int> msg, SimpleKeyPair privateKey,
+      List<SimplePublicKey> receivers) async {
+    List<int> key = await getRandomBytes();
+    List<int> encrypted = await aesEncrypt(msg, key);
+    List<List<int>> encryptedKeys = [];
+    for (var receiver in receivers) {
+      var encryptedKey = await eccEncrypt(key, remotePublicKey: receiver);
+      encryptedKeys.add(encryptedKey);
+    }
+
+    return {'encrypted': encrypted, 'encryptedKeys': encryptedKeys};
+  }
+
+  ///
+  /// @param {*} msg
+  /// @param {*} privateKey
+  /// @param {*} receiver
+  /// @param {*} options
+  Future<List<int>> decrypt(List<int> msg, List<int> encryptedKey,
+      SimpleKeyPair privateKey, SimplePublicKey senderPublicKey) async {
+    var key = await eccDecrypt(encryptedKey, localKeyPair: privateKey);
+    var decrypted = aesDecrypt(msg, key);
+
+    return decrypted;
   }
 }
 

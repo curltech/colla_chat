@@ -25,24 +25,26 @@ class CryptoUtil {
     return base58.decode(code);
   }
 
-  /// 把输入的Uint8Array转换成base58的string
+  /// 把输入的Uint8List转换成base64url的string,保证网络传输安全
   static String encodeBase64Url(List<int> data) {
     return base64Url.encode(data);
   }
 
-  /// 把输入的base58格式的string转换成普通的Uint8Array
+  /// 把输入的base64url格式的string还原成普通的Uint8List
   static Uint8List decodeBase64Url(String code) {
     return base64Url.decode(code);
   }
 
-  static String stringToUtf8(String str) {
-    List<int> l = utf8.encode(str);
+  /// Dart中的String编码格式是UTF-16，把普通字符串（前端）转换成utf8编码，方便支持中文
+  static List<int> stringToUtf8(String data) {
+    List<int> result = utf8.encode(data);
 
-    return String.fromCharCodes(l);
+    return result;
   }
 
-  static String utf8ToString(String str) {
-    String data = utf8.decode(str.codeUnits);
+  /// 把utf8编码的字节还原成普通字符串（前端）
+  static String utf8ToString(List<int> raw) {
+    String data = utf8.decode(raw);
 
     return data;
   }
@@ -57,18 +59,6 @@ class CryptoUtil {
     String msg = String.fromCharCodes(message);
 
     return msg;
-  }
-
-  /// 随机字节数组
-  static Uint8List getRandomBytes({int length = 32}) {
-    final bytes = Uint8List(length);
-
-    var random = Random.secure();
-    for (var i = 0; i < bytes.length; i++) {
-      bytes[i] = random.nextInt(256);
-    }
-
-    return bytes;
   }
 
   static Uint8List concat(List<int> src, List<int> target) {
