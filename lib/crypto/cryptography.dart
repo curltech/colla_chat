@@ -43,7 +43,7 @@ class CryptoGraphy {
   /// 随机base64位字符串
   Future<String> getRandomAsciiString({int length = 32}) async {
     var randomBytes = await getRandomBytes(length: length);
-    var randomAscii = CryptoUtil.encodeBase64(randomBytes);
+    var randomAscii = CryptoUtil.encodeBase64Url(randomBytes);
 
     return randomAscii;
   }
