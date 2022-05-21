@@ -37,7 +37,7 @@ class CryptoGraphy {
   }
 
   /// 产生密钥对，返回对象为密钥对象（公钥和私钥对象）
-  Future<SimpleKeyPair> generateKey(String passphrase,
+  Future<SimpleKeyPair> generateKeyPair(
       {String keyPairType = 'ed25519'}) async {
     // Generate a keypair.
     if (keyPairType == 'ed25519') {
@@ -55,7 +55,7 @@ class CryptoGraphy {
   }
 
   ///
-  Future<Uint8List> getSecretKey(int length) async {
+  Future<List<int>> getSecretKey(int length) async {
     // Choose the cipher
     final algorithm = AesGcm.with256bits();
 
@@ -75,11 +75,11 @@ class CryptoGraphy {
     if (type == 'x25519') {
       type = KeyPairType.x25519;
     }
-    Uint8List rawText = base64Decode(base64PublicKey);
+    Uint8List rawText = CryptoUtil.decodeBase64(base64PublicKey);
     SimplePublicKey publicKey = SimplePublicKey(rawText, type: type);
 
     if (base64KeyPair != null && passphrase != null && passphrase.isNotEmpty) {
-      rawText = base64Decode(base64KeyPair);
+      rawText = CryptoUtil.decodeBase64(base64KeyPair);
       var clearText = await aesDecrypt(rawText, passphrase);
       SimpleKeyPair simpleKeyPair =
           SimpleKeyPairData(clearText, publicKey: publicKey, type: type);
@@ -92,59 +92,60 @@ class CryptoGraphy {
 
   /// 将密钥对象转换成base64字符串，可以保存
   /// 如果passphrase有值，则到处密钥对并加密，否则，到处公钥，不加密
-  Future<String> export(SimpleKeyPair keyPair, {List<int>? passphrase}) async {
+  Future<String> export(SimpleKeyPair keyPair,
+      {List<int>? passphrase, String base = '64'}) async {
     String base64;
     if (passphrase != null && passphrase.isNotEmpty) {
       SimpleKeyPairData simpleKeyPairData = await keyPair.extract();
       List<int> keyPairBytes = simpleKeyPairData.bytes;
-      Uint8List encryptText = await aesEncrypt(keyPairBytes, passphrase);
-      base64 = base64Encode(encryptText);
+      List<int> encryptText = await aesEncrypt(keyPairBytes, passphrase);
+      base64 = CryptoUtil.encodeBase64(encryptText);
     } else {
       SimplePublicKey publicKey = await keyPair.extractPublicKey();
-      base64 = base64Encode(publicKey.bytes);
+      if (base == '58') {
+        base64 = CryptoUtil.encodeBase58(publicKey.bytes);
+      } else {
+        base64 = CryptoUtil.encodeBase64(publicKey.bytes);
+      }
     }
 
     return base64;
   }
 
-  Future<String?> sign(String message, KeyPair keyPair,
+  Future<List<int>> sign(List<int> message, KeyPair keyPair,
       {bool includePublicKey = false}) async {
-    var msg = CryptoUtil.strToUint8List(message);
-
     // Generate a keypair.
     final algorithm = Ed25519();
     // Sign
-    final Signature signature = await algorithm.sign(msg, keyPair: keyPair);
+    final Signature signature = await algorithm.sign(message, keyPair: keyPair);
     SimplePublicKey publicKey = signature.publicKey as SimplePublicKey;
-    var base64Sign = base64Encode(signature.bytes);
-    var base64PublicKey = base64Encode(publicKey.bytes);
-    var base64 = "{'signature':'$base64Sign'";
+    List<int> result;
     if (includePublicKey) {
-      base64 = "$base64,'publicKey':'$base64PublicKey'";
+      result = CryptoUtil.concat(signature.bytes, publicKey.bytes);
+    } else {
+      result = signature.bytes;
     }
-    return base64;
+    return result;
   }
 
-  Future<bool> verify(String message, String base64Signature,
+  Future<bool> verify(List<int> message, List<int> signature,
       {String? base64PublicKey, PublicKey? publicKey}) async {
-    var sign = JsonUtil.toMap(base64Signature);
-    var rawSignature = base64Decode(sign['signature']);
+    List<int> signatureBytes = signature.sublist(0, 256);
     if (publicKey == null) {
       if (base64PublicKey != null) {
         publicKey = import(base64PublicKey) as PublicKey;
       } else {
-        publicKey = import(sign['publicKey']) as PublicKey;
+        List<int> publicKeyBytes = signature.sublist(256);
+        publicKey = SimplePublicKey(publicKeyBytes, type: KeyPairType.ed25519);
       }
     }
 
-    var signature = Signature(rawSignature, publicKey: publicKey);
     // Generate a keypair.
     final algorithm = Ed25519();
     // Verify signature
-    var msg = CryptoUtil.strToUint8List(message);
     final isSignatureCorrect = await algorithm.verify(
-      msg,
-      signature: signature,
+      message,
+      signature: Signature(signatureBytes, publicKey: publicKey),
     );
     return isSignatureCorrect;
   }
@@ -162,11 +163,14 @@ class CryptoGraphy {
       remotePublicKey: remotePublicKey,
     );
     final sharedSecretBytes = await sharedSecret.extractBytes();
+    var localPublicKey = await localKeyPair.extractPublicKey();
+    var localPublicKeyBytes = localPublicKey.bytes;
 
-    return sharedSecretBytes;
+    return CryptoUtil.concat(localPublicKeyBytes, sharedSecretBytes);
   }
 
   /// 结合x25519密钥交换和aes进行ecc加解密,里面涉及的密钥对是x25519协议
+  /// ecc加密是采用公钥加密，私钥解密，这种加密方式信息不要太大，速度较慢，一般用于加密对称密钥
   Future<Uint8List> eccEncrypt(List<int> message,
       {String? base64PublicKey, PublicKey? remotePublicKey}) async {
     if (remotePublicKey == null) {
@@ -177,25 +181,31 @@ class CryptoGraphy {
     if (remotePublicKey != null) {
       var passphrase =
           await generateSessionKey(remotePublicKey: remotePublicKey);
-      var result = aesEncrypt(message, passphrase);
+      var localPublicKeyBytes = passphrase.sublist(0, 256);
+      var sharedSecretBytes = passphrase.sublist(256);
+      var result = await aesEncrypt(message, sharedSecretBytes);
 
-      return result;
+      return CryptoUtil.concat(localPublicKeyBytes, result);
     }
     throw 'EccEncryptFail';
   }
 
-  Future<List<int>> eccDecrypt(Uint8List message,
-      {required SimpleKeyPair localKeyPair,
-      required PublicKey remotePublicKey}) async {
+  Future<List<int>> eccDecrypt(List<int> message,
+      {required SimpleKeyPair localKeyPair}) async {
+    var remotePublicKeyBytes = message.sublist(0, 256);
+    var msg = message.sublist(256);
+    SimplePublicKey remotePublicKey =
+        SimplePublicKey(remotePublicKeyBytes, type: KeyPairType.x25519);
     var passphrase = await generateSessionKey(
         localKeyPair: localKeyPair, remotePublicKey: remotePublicKey);
-
-    var result = aesDecrypt(message, passphrase);
+    var localPublicKeyBytes = passphrase.sublist(0, 256);
+    var sharedSecretBytes = passphrase.sublist(256);
+    var result = await aesDecrypt(msg, sharedSecretBytes);
 
     return result;
   }
 
-  Future<Uint8List> aesEncrypt(List<int> message, List<int> passphrase) async {
+  Future<List<int>> aesEncrypt(List<int> message, List<int> passphrase) async {
     // Choose the cipher
     final algorithm = AesGcm.with256bits();
     final secretKey = SecretKey(passphrase);
@@ -207,7 +217,7 @@ class CryptoGraphy {
     return secretBox.concatenation();
   }
 
-  Future<List<int>> aesDecrypt(Uint8List message, List<int> passphrase) async {
+  Future<List<int>> aesDecrypt(List<int> message, List<int> passphrase) async {
     final algorithm = AesGcm.with256bits();
     final secretKey = SecretKey(passphrase);
 
@@ -222,3 +232,5 @@ class CryptoGraphy {
     return clearText;
   }
 }
+
+final cryptoGraphy = CryptoGraphy();

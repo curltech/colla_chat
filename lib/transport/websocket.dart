@@ -77,7 +77,7 @@ class WebsocketPool {
   /// 初始化连接池，设置缺省websocketclient，返回连接池
   static Future<WebsocketPool> getInstance() async {
     if (!initStatus) {
-      var appParams = await AppParams.getInstance();
+      var appParams = await AppParams.instance;
       var connectAddress = appParams.wsConnectAddress;
       int i = 0;
       if (connectAddress.isNotEmpty) {

@@ -1,10 +1,11 @@
-import 'package:colla_chat/datastore/base.dart';
+import 'package:colla_chat/entity/base.dart';
 import 'package:flutter/material.dart';
 
 import '../app.dart';
 import '../platform.dart';
 import '../routers/application.dart';
 import '../routers/routes.dart';
+import '../service/servicelocator.dart';
 
 const List<String> images = [
   'assets/images/bg/login-bg-wd-1.jpg',
@@ -42,7 +43,7 @@ class _LoadingState extends State<Loading> {
 
   void initConfig() async {
     //初始化系统信息
-    PlatformParams platformParams = await PlatformParams.getInstance();
+    PlatformParams platformParams = await PlatformParams.instance;
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     platformParams.mediaQueryData = mediaQueryData;
 

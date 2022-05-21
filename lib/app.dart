@@ -7,16 +7,16 @@ import 'package:shared_preferences/shared_preferences.dart';
 import './constants.dart';
 
 class LocalStorage {
-  static LocalStorage instance = LocalStorage();
+  static final LocalStorage _instance = LocalStorage();
   late SharedPreferences prefs;
   static bool initStatus = false;
 
-  static Future<LocalStorage> getInstance() async {
+  static Future<LocalStorage> get instance async {
     if (!initStatus) {
-      instance.prefs = await SharedPreferences.getInstance();
+      _instance.prefs = await SharedPreferences.getInstance();
       initStatus = true;
     }
-    return instance;
+    return _instance;
   }
 
   save(String key, String value) {
@@ -35,8 +35,9 @@ class LocalStorage {
 /// 本应用的参数，与操作系统系统和硬件无关，需要保存到本地的存储中
 /// 在系统启动的config对象初始化从本地存储中加载
 class AppParams {
-  static AppParams instance = AppParams();
+  static AppParams _instance = AppParams();
   static bool initStatus = false;
+  AppParams();
   //本应用的版本情况
   String? latestVersion;
   String? currentVersion;
@@ -49,19 +50,17 @@ class AppParams {
   String? language;
   String? localeName;
 
-  AppParams() {}
-
-  static Future<AppParams> getInstance() async {
+  static Future<AppParams> get instance async {
     if (!initStatus) {
-      LocalStorage localStorage = await LocalStorage.getInstance();
+      LocalStorage localStorage = await LocalStorage.instance;
       Object? json = localStorage.get('AppParams');
       if (json != null) {
         var jsonObject = jsonDecode(json as String);
-        instance = AppParams.fromJson(jsonObject);
+        _instance = AppParams.fromJson(jsonObject);
       }
       initStatus = true;
     }
-    return instance;
+    return _instance;
   }
 
   AppParams.fromJson(Map<String, dynamic> json)
@@ -86,7 +85,7 @@ class AppParams {
   String? chainProtocolId;
 
   // 目标的libp2p节点的peerId
-  var connectPeerId = <String>[];
+  List<String> connectPeerId = <String>[];
 
   // 本机作为libp2p节点的监听地址
   var listenerAddress = <String>[];
@@ -120,7 +119,7 @@ class AppParams {
   saveAppParams() async {
     var jsonObject = toJson();
     var json = jsonEncode(jsonObject);
-    LocalStorage localStorage = await LocalStorage.getInstance();
+    LocalStorage localStorage = await LocalStorage.instance;
     localStorage.save('AppParams', json);
   }
 
@@ -152,7 +151,7 @@ class AppParams {
   updateVersion() async {
     var appleUrl = 'https://apps.apple.com/cn/app/collachat/id1546363298';
     var downloadUrl = 'https://curltech.io/#/collachat/downloadapps';
-    var platformParams = await PlatformParams.getInstance();
+    var platformParams = await PlatformParams.instance;
     if (platformParams.ios) {
       //inAppBrowserComponent.open(appleUrl, '_system', 'location=no')
     } else if (platformParams.android) {
@@ -167,7 +166,7 @@ class AppParams {
   /// 根据版本历史修改版本信息
   /// @param versions
   Future<bool> upgradeVersion(List<String> versions) async {
-    var appParams = await AppParams.getInstance();
+    var appParams = await AppParams.instance;
     appParams.currentVersion = '1.1.12';
     appParams.mandatory = false;
     if (versions.isNotEmpty) {

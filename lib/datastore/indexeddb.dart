@@ -1,11 +1,10 @@
 import 'dart:async';
-import 'dart:convert';
-import 'package:colla_chat/datastore/base.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:idb_shim/idb.dart';
-import 'package:path/path.dart';
 import 'package:idb_shim/idb_browser.dart';
 
+import '../service/base.dart';
+import '../service/servicelocator.dart';
 import 'datastore.dart';
 
 /**
@@ -149,7 +148,7 @@ class IndexedDb extends DataStore {
   }
 
   @override
-  Future<List<Object>> find(String table,
+  Future<List<Map>> find(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -161,36 +160,38 @@ class IndexedDb extends DataStore {
       int? offset}) async {
     var txn = db.transaction(table, "readonly");
     var store = txn.objectStore(table);
+    List<Map>? results = [];
     if (where != null && whereArgs != null && whereArgs.isNotEmpty) {
       var keyRange = _buildKeyRange(where, whereArgs);
       if (keyRange != null) {
         var indexName = keyRange['key'];
-        List<Object> results = [];
         if (indexName == 'id') {
           KeyRange range = keyRange['keyRange'] as KeyRange;
           Object? id = range.lower;
           if (id != null) {
-            Object? result = await store.getObject(id);
+            Map? result = (await store.getObject(id)) as Map?;
             if (result != null) {
               results.add(result);
             }
           }
         } else {
           var index = store.index(indexName);
-          results = await index.getAll(keyRange['keyRange'], limit);
+          results =
+              (await index.getAll(keyRange['keyRange'], limit)).cast<Map>();
         }
         await txn.completed;
 
         return results;
       }
     }
-    var results = await store.getAll();
+    results = (await store.getAll()).cast<Map>();
     await txn.completed;
+
     return results;
   }
 
   @override
-  Future<Map<String, Object?>> findPage(String table,
+  Future<Map<String, Object>> findPage(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -202,6 +203,7 @@ class IndexedDb extends DataStore {
       int? offset}) async {
     var txn = db.transaction(table, "readonly");
     var store = txn.objectStore(table);
+    List<Map> results = [];
     if (where != null && whereArgs != null && whereArgs.isNotEmpty) {
       var keyRange = _buildKeyRange(where, whereArgs);
       if (keyRange != null) {
@@ -209,15 +211,15 @@ class IndexedDb extends DataStore {
         var total = index.count(keyRange['keyRange']);
         var results = index.getAll(keyRange['keyRange'], limit);
         await txn.completed;
-        var page = {'data': results, 'total': total};
+        Map<String, Object> page = {'data': results, 'total': total};
 
         return page;
       }
     }
-    var results = store.getAll();
+    results = await store.getAll() as List<Map>;
     var total = store.count();
     await txn.completed;
-    var page = {'data': results, 'total': total};
+    Map<String, Object> page = {'data': results, 'total': total};
 
     return page;
   }
@@ -229,7 +231,7 @@ class IndexedDb extends DataStore {
    * @param {*} condition
    */
   @override
-  Future<Object?> findOne(String table,
+  Future<Map?> findOne(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,

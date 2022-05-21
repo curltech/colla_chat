@@ -4,7 +4,8 @@ import 'package:colla_chat/tool/util.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import 'base.dart';
+import '../service/base.dart';
+import '../service/servicelocator.dart';
 import 'datastore.dart';
 
 /**
@@ -100,7 +101,7 @@ class Sqflite extends DataStore {
   }
 
   @override
-  Future<List<Object>> find(String table,
+  Future<List<Map>> find(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -123,7 +124,7 @@ class Sqflite extends DataStore {
   }
 
   @override
-  Future<Map<String, Object?>> findPage(String table,
+  Future<Map<String, Object>> findPage(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -143,7 +144,7 @@ class Sqflite extends DataStore {
         orderBy: orderBy,
         limit: limit,
         offset: offset);
-    clause = 'select count(*) from (' + clause + ")";
+    clause = 'select count(*) from ($clause)';
     var totalResults = await db.rawQuery(clause, whereArgs);
     var total = TypeUtil.firstIntValue(totalResults);
     var results = await find(table,
@@ -157,7 +158,7 @@ class Sqflite extends DataStore {
         limit: limit,
         offset: offset);
 
-    var page = {'data': results, 'total': total};
+    Map<String, Object> page = {'data': results, 'total': total};
 
     return page;
   }
@@ -169,7 +170,7 @@ class Sqflite extends DataStore {
    * @param {*} condition
    */
   @override
-  Future<Object?> findOne(String table,
+  Future<Map?> findOne(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,

@@ -1,3 +1,4 @@
+import '../../service/stock/account.dart';
 import '../../tool/util.dart';
 import '../../transport/webclient.dart';
 import 'account.dart';
@@ -5,10 +6,13 @@ import 'account.dart';
 class StockUser {
   //登录用户的基本信息
   StockAccount? account;
+
   //登录状态
   bool loginStatus = false;
+
   //用户令牌
   String token = '';
+
   //用户自选，当前指定(显示在标题上)
   List<Map<String, dynamic>> shares = <Map<String, dynamic>>[];
   Map<String, dynamic>? _share;
@@ -93,7 +97,7 @@ class StockUser {
         } else {
           account.subscription = '$subscription,$ts_code';
         }
-        StockAccountService.getInstance().upsert(account);
+        StockAccountService.instance.upsert(account);
       }
     }
   }
@@ -107,7 +111,7 @@ class StockUser {
       if (pos != -1) {
         account.subscription = subscription.replaceAll(',$ts_code', '');
         account.subscription = subscription.replaceAll(ts_code, '');
-        StockAccountService.getInstance().upsert(account);
+        StockAccountService.instance.upsert(account);
       }
     }
   }
@@ -176,8 +180,7 @@ class StockUser {
         if (TypeUtil.isString(data)) {
           error = data;
         } else {
-          var account =
-              await StockAccountService.getInstance().getOrRegist(data);
+          var account = await StockAccountService.instance.getOrRegist(data);
           account = account;
           return account;
         }
@@ -199,7 +202,7 @@ class StockUser {
           var token = data['token'];
           if (user != null) {
             user['lastLoginDate'] = DateTime.now().toIso8601String();
-            account = await StockAccountService.getInstance().getOrRegist(user);
+            account = await StockAccountService.instance.getOrRegist(user);
             loginStatus = true;
             token = token;
           }

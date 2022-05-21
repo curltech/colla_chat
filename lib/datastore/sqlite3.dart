@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
+import '../tool/util.dart';
 import 'datastore.dart';
 
 /**
@@ -96,7 +97,7 @@ class Sqlite3 extends DataStore {
   }
 
   @override
-  Future<List<Object>> find(String table,
+  Future<List<Map>> find(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -119,7 +120,7 @@ class Sqlite3 extends DataStore {
   }
 
   @override
-  Future<Map<String, Object?>> findPage(String table,
+  Future<Map<String, Object>> findPage(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -141,7 +142,7 @@ class Sqlite3 extends DataStore {
         offset: offset);
     clause = 'select count(*) from (' + clause + ")";
     var totalResults = await db.rawQuery(clause, whereArgs);
-    var total = Sqflite.firstIntValue(totalResults);
+    var total = TypeUtil.firstIntValue(totalResults);
     var results = await find(table,
         distinct: distinct,
         columns: columns,
@@ -153,7 +154,7 @@ class Sqlite3 extends DataStore {
         limit: limit,
         offset: offset);
 
-    var page = {'data': results, 'total': total};
+    Map<String, Object> page = {'data': results, 'total': total};
 
     return page;
   }
@@ -165,7 +166,7 @@ class Sqlite3 extends DataStore {
    * @param {*} condition
    */
   @override
-  Future<Object?> findOne(String table,
+  Future<Map?> findOne(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,

@@ -187,7 +187,7 @@ abstract class DataStore {
 
   Future<Object?> get(String table, dynamic id);
 
-  Future<List<Object>> find(String table,
+  Future<List<Map>> find(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -198,7 +198,7 @@ abstract class DataStore {
       int? limit,
       int? offset});
 
-  Future<Map<String, Object?>> findPage(String table,
+  Future<Map<String, Object>> findPage(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -215,7 +215,7 @@ abstract class DataStore {
    * @param {*} fields
    * @param {*} condition
    */
-  Future<Object?> findOne(String table,
+  Future<Map?> findOne(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,

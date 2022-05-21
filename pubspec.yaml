@@ -68,12 +68,14 @@ dependencies:
   # 加密安全
   cryptography: ^2.0.5 #ecc,aes
   cryptography_flutter: ^2.0.2
+  bs58: ^1.0.2
   webcrypto: ^0.5.2
   pinenacl: ^0.3.4
   encrypt: ^5.0.1 #aes
   openpgp: ^3.2.8 #rsa,sha
   libsignal_protocol_dart: ^0.5.6
   crypto: ^3.0.1 #sha
+  archive: any
   # 辅助开发工具
   json_annotation: ^4.3.0
   permission_handler: ^9.2.0 #权限处理1
@@ -95,7 +97,7 @@ dependencies:
   phone_form_field: ^6.0.0
   #flutter-international-phone-input:
   intl_phone_field: ^3.1.0
-  #mobile_number: ^1.0.4
+  mobile_number: ^1.0.4
   # 界面样式和组件
   #flui: 0.9.2
   flutter_neumorphic: ^3.0.3
@@ -119,7 +121,7 @@ dependencies:
   #flutter_swiper: 1.1.6 # Flutter 轮播图 https://github.com/best-flutter/flutter_swiper
   #flutter_screenutil: 5.5.3 # Flutter 屏幕适配 https://github.com/OpenFlutter/flutter_screenutil
   # webrtc
-  flutter_webrtc: ^0.8.6
+  flutter_webrtc: ^0.8.7
   dart_webrtc: ^1.0.5
   livekit_client: ^1.0.0
   # 多媒体
