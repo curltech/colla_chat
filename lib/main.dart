@@ -1,11 +1,16 @@
 import 'package:colla_chat/pages/loading.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/routers/application.dart';
 import 'package:colla_chat/routers/routes.dart';
+import 'package:colla_chat/service/servicelocator.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const CollaChatApp());
+  //初始化服务类
+  ServiceLocator.init().then((value) {
+    runApp(const CollaChatApp());
+  });
 }
 
 ///应用是一个无态的组件

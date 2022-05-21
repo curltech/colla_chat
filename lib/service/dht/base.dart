@@ -1,4 +1,9 @@
+import 'package:cryptography/cryptography.dart';
+
+import '../../crypto/cryptography.dart';
 import '../../entity/base.dart';
+import '../../entity/dht/base.dart';
+import '../../entity/dht/myselfpeer.dart';
 import '../base.dart';
 
 abstract class PeerEntityService extends BaseService {

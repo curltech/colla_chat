@@ -46,9 +46,6 @@ class _LoadingState extends State<Loading> {
     PlatformParams platformParams = await PlatformParams.instance;
     MediaQueryData mediaQueryData = MediaQuery.of(context);
     platformParams.mediaQueryData = mediaQueryData;
-
-    //初始化服务类
-    await ServiceLocator.init();
   }
 
   @override
@@ -96,7 +93,7 @@ class _LoadingState extends State<Loading> {
               children: [
                 Image.asset(
                   images[_currentIndex],
-                  fit: BoxFit.cover,
+                  fit: BoxFit.fill,
                 )
               ],
             ))));

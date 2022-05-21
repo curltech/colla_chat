@@ -37,7 +37,9 @@ class LocalStorage {
 class AppParams {
   static AppParams _instance = AppParams();
   static bool initStatus = false;
+
   AppParams();
+
   //本应用的版本情况
   String? latestVersion;
   String? currentVersion;
@@ -196,13 +198,13 @@ class AppParams {
 
 /// 全局配置，包含平台参数和应用参数
 class Config {
-  static Config instance = Config();
+  static final Config _instance = Config();
   static bool initStatus = false;
 
-  static Future<Config> getInstance() async {
+  static Future<Config> get instance async {
     if (!initStatus) {
       initStatus = true;
     }
-    return instance;
+    return _instance;
   }
 }
