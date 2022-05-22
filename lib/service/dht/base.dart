@@ -1,10 +1,16 @@
+import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:cryptography/cryptography.dart';
 
+import '../../app.dart';
 import '../../crypto/cryptography.dart';
 import '../../entity/base.dart';
 import '../../entity/dht/base.dart';
 import '../../entity/dht/myselfpeer.dart';
+import '../../entity/dht/peerprofile.dart';
+import '../../tool/util.dart';
 import '../base.dart';
+import 'myselfpeer.dart';
 
 abstract class PeerEntityService extends BaseService {
   Future<List<Map>> findByPeerId(String peerId) async {
@@ -50,16 +56,15 @@ abstract class PeerEntityService extends BaseService {
   }
 }
 
-class MyselfService{
-
-  Future<Myself> initMyself(String password, MyselfPeer myselfPeer) async{
-    if (myselfPeer==null) {
+class MyselfService {
+  Future<Myself> initMyself(String password, MyselfPeer myselfPeer) async {
+    if (myselfPeer == null) {
       throw 'NoMyselfPeer';
     }
-    if (myselfPeer.name==null) {
+    if (myselfPeer.name == null) {
       throw 'NoMyselfPeerName';
     }
-    if (password==null) {
+    if (password == null) {
       throw 'NoPassword';
     }
     /**
@@ -67,15 +72,17 @@ class MyselfService{
      */
     SimpleKeyPair peerPrivateKey = await cryptoGraphy.generateKeyPair();
     SimplePublicKey publicKey = await peerPrivateKey.extractPublicKey();
-    myselfPeer.peerPrivateKey = await cryptoGraphy.export(peerPrivateKey,passphrase:password.codeUnits);
+    myselfPeer.peerPrivateKey = await cryptoGraphy.export(peerPrivateKey,
+        passphrase: password.codeUnits);
     myselfPeer.peerPublicKey = await cryptoGraphy.export(peerPrivateKey);
-    var peerId = await cryptoGraphy.export(peerPrivateKey,base: '58');
+    var peerId = await cryptoGraphy.export(peerPrivateKey, base: '58');
     myselfPeer.peerId = peerId;
     /**
         加密对应的密钥对x25519
      */
-    var keyPair = await cryptoGraphy.generateKeyPair(keyPairType:'x25519');
-    myselfPeer.privateKey = await cryptoGraphy.export(keyPair,passphrase:password.codeUnits);
+    var keyPair = await cryptoGraphy.generateKeyPair(keyPairType: 'x25519');
+    myselfPeer.privateKey =
+        await cryptoGraphy.export(keyPair, passphrase: password.codeUnits);
     myselfPeer.publicKey = await cryptoGraphy.export(keyPair);
 
     myself.myselfPeer = myselfPeer;
@@ -89,75 +96,59 @@ class MyselfService{
   }
 
   /// 获取自己节点的记录，并解开私钥
-  Future<Myself> getMyself(String password, String peerId, String mobile, String name)  async {
-    if (password==null) {
+  Future<Myself> getMyself(
+      String password, String peerId, String mobile, String name) async {
+    if (password == null) {
       throw 'NoPassword';
     }
-    if (peerId==null && mobile==null && name==null) {
+    if (peerId == null && mobile == null && name == null) {
       throw 'NoPeerIdAndMobileAndName';
     }
-    var where = 'status =? ';
-    var whereArgs=[EntityStatus.Effective.toString()];
-    if (peerId) {
-      param.peerId = peerId;
+    var myselfPeer = await myselfPeerService.findOneEffectiveByPeerId(peerId);
+    if (myselfPeer == null) {
+      throw 'AccountNotExists';
     }
-    if (mobile) {
-      param.mobile = mobile;
-    }
-    if (name) {
-      param.name = name;
-    }
-    var myselfPeer = await myselfPeerService.findOne(param, null, null);
-    if (!myselfPeer) {
-      throw new Error("AccountNotExists");
-    }
-    if (!myselfPeer.peerId) {
-      console.error('!myselfPeer.peerId');
-      throw new Error("InvalidAccount");
-    }
-    if (!peerId) {
-      peerId = myselfPeer.peerId;
-    }
-    var publicKey = await openpgp.import(myselfPeer.publicKey);
-    var buf = openpgp.decodeBase64(myselfPeer.peerPublicKey);
+    var publicKey = await cryptoGraphy.import(myselfPeer.publicKey);
+    var buf = CryptoUtil.decodeBase64(myselfPeer.peerPublicKey);
     var pub = await libp2pcrypto.keys.unmarshalPublicKey(buf);
     var privateKey = null;
     var priv = null;
     try {
-      privateKey = await openpgp.import(myselfPeer.privateKey, {password: password});
+      privateKey = await cryptoGraphy
+          .import(myselfPeer.privateKey, {password: password});
       if (!privateKey) {
         console.error('!import(myselfPeer.privateKey)');
         throw new Error("InvalidAccount");
       }
       var isDecrypted = privateKey.isDecrypted();
-      console.log('isDecrypted:' + isDecrypted);
+      logger.i('isDecrypted:$isDecrypted');
       if (!isDecrypted) {
         await privateKey.decrypt(password);
       }
-      priv = await libp2pcrypto.keys.import(myselfPeer.peerPrivateKey, password);
+      priv =
+          await libp2pcrypto.keys.import(myselfPeer.peerPrivateKey, password);
     } catch (e) {
-      console.error(e);
-      throw new Error('WrongPassword');
+      logger.e(e);
+      throw 'WrongPassword';
     }
     this.peerId = await PeerId.createFromPrivKey(priv.bytes);
-    if (peerId !== this.peerId.toB58String()) {
-    console.error('peerId !== PeerId.createFromPrivKey(priv.bytes).toB58String()');
-    throw new Error("InvalidAccount");
+    if (peerId != this.peerId.toB58String()) {
+      logger.e('peerId !== PeerId.createFromPrivKey(priv.bytes).toB58String()');
+      throw 'InvalidAccount';
     }
-    var timestamp_ = new Date().getTime();
-    var random_ = await openpgp.getRandomAsciiString();
+    var timestamp_ = DateTime.now().microsecondsSinceEpoch;
+    var random_ = await cryptoGraphy.getRandomAsciiString();
     var key = timestamp_ + random_;
-    var signature = await openpgp.sign(key, privateKey);
-    var pass = await openpgp.verify(key, signature, publicKey);
+    var signature = await cryptoGraphy.sign(key, privateKey);
+    bool pass = await cryptoGraphy.verify(key, signature, publicKey);
     if (!pass) {
-    throw new Error('VerifyNotPass');
+      throw 'VerifyNotPass';
     }
-    param = {status: EntityStatus[EntityStatus.Effective]};
-    param.peerId = peerId;
-    var peerProfile = await peerProfileService.findOne(param, null, null);
+    var peerProfile =
+        await PeerProfileService.instance.findOneEffectiveByPeerId(peerId);
 
     myself.myselfPeer = myselfPeer;
-    myself.peerProfile = peerProfile;
+    myself.peerProfile = PeerProfile.fromJson(peerProfile);
     myself.password = password;
     myself.peerPrivateKey = priv;
     myself.peerPublicKey = pub;
@@ -167,27 +158,28 @@ class MyselfService{
     return myself;
   }
 
-  upsertMyselfPeer() {
+  upsertMyselfPeer() async {
     var myselfPeer = myself.myselfPeer;
-    var id: number = myselfPeer._id;
-    if (!id) { //新的
-    myselfPeer.status = EntityStatus[EntityStatus.Effective];
-    var saddrs = this.host.addressManager.getListenAddrs();
-    myselfPeer.address = JSON.stringify(saddrs);
-    myselfPeer = myselfPeerService.insert(myselfPeer);
+    int? id = myselfPeer.id;
+    var myselfPeerService = MyselfPeerService.instance;
+    if (id == null) {
+      //新的
+      myselfPeer.status = EntityStatus.Effective.toString();
+      var saddrs = await NetworkInfoUtil.getWifiIp();
+      myselfPeer.address = saddrs;
+      myselfPeer = (await myselfPeerService.insert(myselfPeer)) as MyselfPeer;
     } else {
-    var needUpdate = false;
-    var saddrs = this.host.addressManager.getListenAddrs();
-    var addrs: string = JSON.stringify(saddrs);
-    console.log('address:' + addrs);
-    if (myselfPeer.address !== addrs) {
-    needUpdate = true;
-    myselfPeer.address = addrs;
-    }
+      var needUpdate = false;
+      var addrs = await NetworkInfoUtil.getWifiIp();
+      logger.i('address:$addrs');
+      if (myselfPeer.address != addrs) {
+        needUpdate = true;
+        myselfPeer.address = addrs;
+      }
 
-    if (needUpdate === true) {
-    myselfPeer = myselfPeerService.update(myselfPeer);
-    }
+      if (needUpdate) {
+        myselfPeer = (await myselfPeerService.update(myselfPeer)) as MyselfPeer;
+      }
     }
     myself.myselfPeer = myselfPeer;
   }

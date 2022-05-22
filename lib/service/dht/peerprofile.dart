@@ -26,3 +26,5 @@ class PeerProfileService extends PeerEntityService {
     return _instance;
   }
 }
+
+final peerProfileService = PeerProfileService.instance;

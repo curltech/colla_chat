@@ -60,3 +60,5 @@ class StockAccountService extends BaseService {
     return account;
   }
 }
+
+final stockAccountService = StockAccountService.instance;

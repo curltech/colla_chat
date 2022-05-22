@@ -23,3 +23,5 @@ class PeerEndpointService extends BaseService {
     return _instance;
   }
 }
+
+final peerEndpointService = PeerEndpointService.instance;

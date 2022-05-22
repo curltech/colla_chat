@@ -24,3 +24,5 @@ class ChainAppService extends BaseService {
     return _instance;
   }
 }
+
+final chainAppService = ChainAppService.instance;

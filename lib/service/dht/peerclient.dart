@@ -32,7 +32,7 @@ class PeerClientService extends PeerEntityService {
 
   Future<any> getPublic(String peerId) async {
     var peerClient = await this.getCachedPeerClient(peerId);
-    if (peerClient) {
+    if (peerClient!=null) {
       return this.publicKeys.get(peerId);
     }
 
@@ -257,3 +257,4 @@ Future<PeerClient>  preparePeerClient(connectPeerId: string, activeStatus: strin
     }
   }
 }
+final peerClientService = PeerClientService.instance;

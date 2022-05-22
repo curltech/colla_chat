@@ -1,7 +1,18 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:html';
+import 'dart:io';
+import 'dart:ui';
 
+import 'package:connectivity/connectivity.dart';
 import 'package:mobile_number/mobile_number.dart';
+import 'package:package_info/package_info.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:phone_number/phone_number.dart' as phone_number;
+import 'package:network_info_plus/network_info_plus.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:sensors_plus/sensors_plus.dart';
 
 class TypeUtil {
   static bool isString(dynamic obj) {
@@ -174,5 +185,189 @@ class EntityUtil {
     if (id == null) {
       map.remove('id');
     }
+  }
+}
+
+class NetworkInfoUtil {
+  static NetworkInfo getWifiInfo() {
+    // var wifiName = await info.getWifiName(); // FooNetwork
+    // var wifiBSSID = await info.getWifiBSSID(); // 11:22:33:44:55:66
+    // var wifiIP = await info.getWifiIP(); // 192.168.1.43
+    // var wifiIPv6 = await info.getWifiIPv6(); // 2001:0db8:85a3:0000:0000:8a2e:0370:7334
+    // var wifiSubmask = await info.getWifiSubmask(); // 255.255.255.0
+    // var wifiBroadcast = await info.getWifiBroadcast(); // 192.168.1.255
+    // var wifiGateway = await info.getWifiGatewayIP(); // 192.168.1.1
+
+    final info = NetworkInfo();
+
+    return info;
+  }
+
+  static Future<String?> getWifiIp() async {
+    var info = getWifiInfo();
+    var wifiIp = await info.getWifiIP(); // 192.168.1.43
+
+    return wifiIp;
+  }
+}
+
+class NetworkConnectivity {
+  final Connectivity _connectivity = Connectivity();
+  late StreamSubscription<ConnectivityResult> _connectivitySubscription;
+  ConnectivityResult connectivityResult = ConnectivityResult.none;
+
+  ///当前的网络连接状态，null:未连接;mobile:wifi:
+  Future<String?> connective() async {
+    ConnectivityResult connectivityResult =
+        await _connectivity.checkConnectivity();
+
+    if (connectivityResult == ConnectivityResult.mobile) {
+      return 'mobile';
+    } else if (connectivityResult == ConnectivityResult.wifi) {
+      return 'wifi';
+    }
+
+    return null;
+  }
+
+  /// 注册连接状态监听器
+  register([Function(ConnectivityResult result)? fn]) {
+    if (fn == null) {
+      _connectivitySubscription =
+          _connectivity.onConnectivityChanged.listen(_updateConnectionStatus);
+    } else {
+      _connectivitySubscription =
+          _connectivity.onConnectivityChanged.listen(fn);
+    }
+  }
+
+  Future<void> _updateConnectionStatus(ConnectivityResult result) async {
+    connectivityResult = result;
+  }
+}
+
+final networkConnectivity = NetworkConnectivity();
+
+class DeviceInfo {
+  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+
+  Future<AndroidDeviceInfo> getAndroidInfo() async {
+    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+    return androidInfo;
+  }
+
+  Future<IosDeviceInfo> getIosDeviceInfo() async {
+    IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+    return iosInfo;
+  }
+
+  Future<WebBrowserInfo> getWebBrowserInfo() async {
+    WebBrowserInfo webBrowserInfo = await deviceInfo.webBrowserInfo;
+    return webBrowserInfo;
+  }
+
+  Future<LinuxDeviceInfo> getLinuxDeviceInfo() async {
+    LinuxDeviceInfo linuxDeviceInfo = await deviceInfo.linuxInfo;
+    return linuxDeviceInfo;
+  }
+
+  Future<MacOsDeviceInfo> getMacOsDeviceInfo() async {
+    MacOsDeviceInfo macOsDeviceInfo = await deviceInfo.macOsInfo;
+    return macOsDeviceInfo;
+  }
+
+  Future<WindowsDeviceInfo> getWindowsDeviceInfo() async {
+    WindowsDeviceInfo windowsInfo = await deviceInfo.windowsInfo;
+    return windowsInfo;
+  }
+}
+
+final deviceInfo = DeviceInfo();
+
+class PackageInfoUtil {
+  Future<PackageInfo> getPackageInfo() async {
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+    // String appName = packageInfo.appName;
+    // String packageName = packageInfo.packageName;
+    // String version = packageInfo.version;
+    // String buildNumber = packageInfo.buildNumber;
+
+    return packageInfo;
+  }
+}
+
+class ShareUtil {
+  static Future<ShareResult> share(String text,
+      {String? subject, Rect? sharePositionOrigin}) async {
+    return await Share.shareWithResult(text,
+        subject: subject, sharePositionOrigin: sharePositionOrigin);
+  }
+
+  static Future<ShareResult> shareFiles(
+    List<String> paths, {
+    List<String>? mimeTypes,
+    String? subject,
+    String? text,
+    Rect? sharePositionOrigin,
+  }) async {
+    return await Share.shareFilesWithResult(paths,
+        mimeTypes: mimeTypes,
+        subject: subject,
+        text: text,
+        sharePositionOrigin: sharePositionOrigin);
+  }
+}
+
+class SensorsUtil {
+  static registerAccelerometerEvent([Function(AccelerometerEvent event)? fn]) {
+    // [AccelerometerEvent (x: 0.0, y: 9.8, z: 0.0)]
+    accelerometerEvents.listen(fn);
+  }
+
+  static registerUserAccelerometerEvent(
+      [Function(UserAccelerometerEvent event)? fn]) {
+    // [UserAccelerometerEvent (x: 0.0, y: 0.0, z: 0.0)]
+    userAccelerometerEvents.listen(fn);
+  }
+
+  static registerGyroscopeEvent([Function(GyroscopeEvent event)? fn]) {
+    // [GyroscopeEvent (x: 0.0, y: 0.0, z: 0.0)]
+    gyroscopeEvents.listen(fn);
+  }
+}
+
+class PathUtil {
+  /// 获取文档目录文件
+  static Future<Directory> getLocalDocumentFile() async {
+    final dir = await getApplicationDocumentsDirectory();
+    return dir;
+  }
+
+  /// 获取临时目录文件
+  static Future<Directory> getLocalTemporaryFile() async {
+    final dir = await getTemporaryDirectory();
+    return dir;
+  }
+
+  /// 获取应用程序目录文件
+  static Future<Directory> getLocalSupportFile() async {
+    final dir = await getApplicationSupportDirectory();
+    return dir;
+  }
+
+  static Future<Directory> getLibraryDirectory() async {
+    final dir = await getLibraryDirectory();
+    return dir;
+  }
+
+  static Future<Directory> getExternalStorageDirectory() async {
+    final dir = await getLibraryDirectory();
+    return dir;
+  }
+
+  static Future<Directory> getDownloadsDirectory() async {
+    final dir = await getDownloadsDirectory();
+    return dir;
   }
 }

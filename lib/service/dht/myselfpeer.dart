@@ -15,7 +15,7 @@ class MyselfPeerService extends PeerEntityService {
   static final MyselfPeerService _instance = MyselfPeerService();
   static bool initStatus = false;
 
-  static MyselfPeerService get instance {
+  static MyselfPeerService get instance{
     if (!initStatus) {
       throw 'please init!';
     }
@@ -419,3 +419,4 @@ myself.myselfPeerClient.signalPrivateKey = myself.myselfPeer.signalPrivateKey;
     return myself.myselfPeerClient;
   }
 }
+final myselfPeerService = MyselfPeerService.instance;
