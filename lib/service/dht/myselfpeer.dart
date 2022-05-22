@@ -4,6 +4,7 @@ import 'package:colla_chat/app.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 
 import '../../entity/base.dart';
+import '../../entity/dht/base.dart';
 import '../../entity/dht/myselfpeer.dart';
 import '../../entity/dht/peerprofile.dart';
 import '../../platform.dart';

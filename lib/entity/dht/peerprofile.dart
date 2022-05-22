@@ -7,8 +7,10 @@ class PeerProfile extends StatusEntity {
   String? clientType;
   String? clientDevice;
   String? deviceToken;
+
   // 对应的用户编号
   String? userId;
+
   // 用户名
   String? username;
 
@@ -25,4 +27,53 @@ class PeerProfile extends StatusEntity {
   String? logLevel;
   String? lastSyncTime;
   String? avatar;
+  PeerProfile();
+  PeerProfile.fromJson(Map json)
+      : peerId = json['peerId'],
+        clientId = json['clientId'],
+        clientDevice = json['clientDevice'],
+        clientType = json['clientType'],
+        deviceToken = json['deviceToken'],
+        language = json['language'],
+        avatar = json['avatar'],
+        userId = json['userId'],
+        username = json['username'],
+        primaryColor = json['primaryColor'],
+        secondaryColor = json['secondaryColor'],
+        lightDarkMode = json['lightDarkMode'],
+        udpSwitch = json['udpSwitch'],
+        downloadSwitch = json['downloadSwitch'],
+        localDataCryptoSwitch = json['localDataCryptoSwitch'],
+        autoLoginSwitch = json['autoLoginSwitch'],
+        developerOption = json['developerOption'],
+        logLevel = json['logLevel'],
+        lastSyncTime = json['lastSyncTime'],
+        super.fromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() {
+    var json = super.toJson();
+    json.addAll({
+      'peerId': peerId,
+      'clientId': clientId,
+      'clientDevice': clientDevice,
+      'clientType': clientType,
+      'deviceToken': deviceToken,
+      'language': language,
+      'avatar': avatar,
+      'userId': userId,
+      'username': username,
+      'primaryColor': primaryColor,
+      'secondaryColor': secondaryColor,
+      'lightDarkMode': lightDarkMode,
+      'udpSwitch': udpSwitch,
+      'downloadSwitch': downloadSwitch,
+      'localDataCryptoSwitch': localDataCryptoSwitch,
+      'autoLoginSwitch': autoLoginSwitch,
+      'developerOption': developerOption,
+      'logLevel': logLevel,
+      'lastSyncTime': lastSyncTime,
+    });
+    return json;
+  }
 }

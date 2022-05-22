@@ -78,50 +78,56 @@ class CryptoGraphy {
     return Uint8List.fromList(secretKeyBytes);
   }
 
-  /// 将base64的密钥字符串导入转换成密钥对象，如果是私钥，passphrase必须有值用于解密私钥
-  Future<Object> import(String base64PublicKey,
-      {String? type = 'ed25519',
-      String? base64KeyPair,
-      List<int>? passphrase}) async {
+  /// 将密钥对象转换成base64字符串，可以保存
+  /// 如果passphrase有值，则到处密钥对并加密，否则，到处公钥，不加密
+  Future<String> export(SimpleKeyPair keyPair, List<int> passphrase) async {
+    SimpleKeyPairData simpleKeyPairData = await keyPair.extract();
+    List<int> keyPairBytes = simpleKeyPairData.bytes;
+    List<int> encryptText = await aesEncrypt(keyPairBytes, passphrase);
+    String baseStr = CryptoUtil.encodeBase64(encryptText);
+
+    return baseStr;
+  }
+
+  /// 将base64的密钥字符串导入转换成密钥对象，passphrase必须有值用于解密私钥
+  Future<SimpleKeyPair> import(
+      String base64KeyPair, List<int> passphrase, SimplePublicKey publicKey,
+      {String? type = 'ed25519'}) async {
     KeyPairType type = KeyPairType.ed25519;
     if (type == 'x25519') {
       type = KeyPairType.x25519;
     }
-    Uint8List rawText = CryptoUtil.decodeBase64(base64PublicKey);
-    SimplePublicKey publicKey = SimplePublicKey(rawText, type: type);
-
-    if (base64KeyPair != null && passphrase != null && passphrase.isNotEmpty) {
-      rawText = CryptoUtil.decodeBase64(base64KeyPair);
+    if (passphrase != null && passphrase.isNotEmpty) {
+      Uint8List rawText = CryptoUtil.decodeBase64(base64KeyPair);
       var clearText = await aesDecrypt(rawText, passphrase);
       SimpleKeyPair simpleKeyPair =
           SimpleKeyPairData(clearText, publicKey: publicKey, type: type);
 
       return simpleKeyPair;
-    } else {
-      return publicKey;
     }
+    throw '';
   }
 
-  /// 将密钥对象转换成base64字符串，可以保存
+  /// 将密钥对象转换成base58字符串，可以保存
   /// 如果passphrase有值，则到处密钥对并加密，否则，到处公钥，不加密
-  Future<String> export(SimpleKeyPair keyPair,
-      {List<int>? passphrase, String base = '64'}) async {
-    String base64;
-    if (passphrase != null && passphrase.isNotEmpty) {
-      SimpleKeyPairData simpleKeyPairData = await keyPair.extract();
-      List<int> keyPairBytes = simpleKeyPairData.bytes;
-      List<int> encryptText = await aesEncrypt(keyPairBytes, passphrase);
-      base64 = CryptoUtil.encodeBase64(encryptText);
-    } else {
-      SimplePublicKey publicKey = await keyPair.extractPublicKey();
-      if (base == '58') {
-        base64 = CryptoUtil.encodeBase58(publicKey.bytes);
-      } else {
-        base64 = CryptoUtil.encodeBase64(publicKey.bytes);
-      }
-    }
+  Future<String> exportPublicKey(SimpleKeyPair keyPair) async {
+    SimplePublicKey publicKey = await keyPair.extractPublicKey();
+    String baseStr = CryptoUtil.encodeBase58(publicKey.bytes);
 
-    return base64;
+    return baseStr;
+  }
+
+  /// 将base64的密钥字符串导入转换成私钥，passphrase必须有值用于解密私钥
+  Future<SimplePublicKey> importPublicKey(String base58PublicKey,
+      {String? type = 'ed25519'}) async {
+    KeyPairType type = KeyPairType.ed25519;
+    if (type == 'x25519') {
+      type = KeyPairType.x25519;
+    }
+    Uint8List rawText = CryptoUtil.decodeBase58(base58PublicKey);
+    SimplePublicKey publicKey = SimplePublicKey(rawText, type: type);
+
+    return publicKey;
   }
 
   Future<List<int>> sign(List<int> message, KeyPair keyPair,
@@ -145,7 +151,7 @@ class CryptoGraphy {
     List<int> signatureBytes = signature.sublist(0, 256);
     if (publicKey == null) {
       if (base64PublicKey != null) {
-        publicKey = import(base64PublicKey) as PublicKey;
+        publicKey = importPublicKey(base64PublicKey) as PublicKey;
       } else {
         List<int> publicKeyBytes = signature.sublist(256);
         publicKey = SimplePublicKey(publicKeyBytes, type: KeyPairType.ed25519);
@@ -187,7 +193,7 @@ class CryptoGraphy {
       {String? base64PublicKey, PublicKey? remotePublicKey}) async {
     if (remotePublicKey == null) {
       if (base64PublicKey != null) {
-        remotePublicKey = import(base64PublicKey) as PublicKey;
+        remotePublicKey = importPublicKey(base64PublicKey) as PublicKey;
       }
     }
     if (remotePublicKey != null) {
