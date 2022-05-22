@@ -49,7 +49,7 @@ class Websocket implements IWebClient {
   @override
   send(String url, dynamic data) {
     var message = {url: url, data: data};
-    var json = jsonEncode(message);
+    var json = JsonUtil.toJsonString(message);
     sendMsg(json);
   }
 

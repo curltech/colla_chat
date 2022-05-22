@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:logger/logger.dart';
 import './constants.dart';
 
 class LocalStorage {
@@ -60,6 +60,7 @@ class AppParams {
         var jsonObject = jsonDecode(json as String);
         _instance = AppParams.fromJson(jsonObject);
       }
+      Logger.level = Level.warning;
       initStatus = true;
     }
     return _instance;
@@ -208,3 +209,7 @@ class Config {
     return _instance;
   }
 }
+
+var logger = Logger(
+  printer: PrettyPrinter(),
+);

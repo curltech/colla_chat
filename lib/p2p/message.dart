@@ -21,11 +21,11 @@ class ChainMessage {
   /// ,第一个连接节点
   String? SrcConnectSessionId;
   String? SrcConnectPeerId;
-  String? LocalConnectPeerId;
+  late String LocalConnectPeerId;
   String? LocalConnectAddress;
-  String? SrcPeerId;
+  late String SrcPeerId;
   String? SrcAddress;
-  String? ConnectPeerId;
+  late String ConnectPeerId;
   String? ConnectAddress;
   String? ConnectSessionId;
   late String MessageType;
@@ -33,7 +33,7 @@ class ChainMessage {
   String? MessageDirect;
 
   /// 经过目标peer的公钥加密过的对称密钥，这个对称密钥是随机生成，每次不同，用于加密payload
-  String? PayloadKey;
+  late String PayloadKey;
   bool NeedCompress = true;
   bool NeedEncrypt = true;
   bool NeedSlice = false;

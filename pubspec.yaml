@@ -82,7 +82,7 @@ dependencies:
   provider: ^6.0.1 #状态管理
   flutter_local_notifications: ^9.5.3+1
   share_plus: ^4.0.4
-  logging: ^1.0.2
+  #logging: ^1.0.2
   country_pickers: ^2.0.0
   font_awesome_flutter: ^10.1.0
   onesignal_flutter: ^3.3.0

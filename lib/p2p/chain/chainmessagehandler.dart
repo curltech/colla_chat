@@ -1,7 +1,10 @@
 import '../../entity/dht/base.dart';
 import '../../tool/util.dart';
+import '../../transport/httpclient.dart';
+import '../../transport/websocket.dart';
 import '../message.dart';
 import '../payload.dart';
+import 'baseaction.dart';
 
 const packetSize = 4 * 1024 * 1024;
 const webRtcPacketSize = 128 * 1024;
@@ -20,8 +23,8 @@ class ChainMessageHandler {
       将接收的原始数据还原成ChainMessage，然后根据消息类型进行分支处理
       并将处理的结果转换成原始数据，发回去
    */
-  Future<List<int>> receiveRaw(List<int> data, String remotePeerId,
-      String remoteAddr) async {
+  Future<List<int>> receiveRaw(
+      List<int> data, String remotePeerId, String remoteAddr) async {
     ChainMessage response;
     var json = JsonUtil.toMap(String.fromCharCodes(data));
     ChainMessage chainMessage = ChainMessage.fromJson(json);
@@ -38,27 +41,23 @@ class ChainMessageHandler {
     if (response != null) {
       try {
         await chainMessageHandler.encrypt(response);
-      }
-      catch
-      (err) {
+      } catch (err) {
         response = chainMessageHandler.error(chainMessage.MessageType, err);
       }
       chainMessageHandler.setResponse(chainMessage, response);
       List<int> responseData = MessageSerializer.marshal(response);
 
-      return
-        responseData;
+      return responseData;
     }
-    return
-      null;
+    throw '';
   }
 
   /// 将返回的原始报文数据转换成chainmessge
   /// @param data
   /// @param remotePeerId
   /// @param remoteAddr
-  Future<ChainMessage> responseRaw(List<int> data, String remotePeerId,
-      String remoteAddr) async {
+  Future<ChainMessage> responseRaw(
+      List<int> data, String remotePeerId, String remoteAddr) async {
     ChainMessage response;
     var json = JsonUtil.toMap(String.fromCharCodes(data));
     ChainMessage chainMessage = ChainMessage.fromJson(json);
@@ -82,113 +81,81 @@ class ChainMessageHandler {
      * targetPeerId表示发送到p2p节点
      * targetAddress表示采用外部发送方式，比如http，wss
      */
-    var
-    targetPeerId = msg.TargetPeerId;
-    var topic = msg.Topic;
-    var connectPeerId = msg.ConnectPeerId;
+    var targetPeerId = msg.TargetPeerId;
     var connectAddress = msg.ConnectAddress;
-    List<int> data;
+    List<int> data = [];
     if (msg.MessageType != MsgType.P2PCHAT.toString()) {
       await chainMessageHandler.encrypt(msg);
       data = MessageSerializer.marshal(msg);
     }
-    /**
-     * 发送数据后返回的响应数据
-     */
+    //// 发送数据后返回的响应数据
     var success = false;
     var result = null;
     try {
-      if (targetPeerId) {
-    var
-    webrtcPeers
-    : WebrtcPeer[] = webrtcPeerPool.getConnected(targetPeerId);
-    if ((msg.MessageType != MsgType[MsgType.P2PCHAT] || (msg.MessageType == MsgType[MsgType.P2PCHAT] && msg.Payload.payload.length <= webRtcPacketSize)) && (webrtcPeers && webrtcPeers.length > 0)) {
-    success = true;
-    if (msg.MessageType == MsgType[MsgType.P2PCHAT]) {
-    msg.Payload = msg.Payload.payload;
-    await chainMessageHandler.encrypt(msg);
-    data = messageSerializer.marshal(msg);
-    }
-    // @ts-ignore
-    if (data) {
-    result = await webrtcPeerPool.send(targetPeerId, data);
-    }
-    }
-    }
-    if (success == false && connectPeerId) {
-    success = true;
-    if (msg.MessageType == MsgType[MsgType.P2PCHAT]) {
-    msg.Payload.payload = null;
-    msg.PayloadType = PayloadType.DataBlock;
-    await chainMessageHandler.encrypt(msg);
-    data = messageSerializer.marshal(msg);
-    }
-    if (data) {
-    result = await libp2pClientPool.send(connectPeerId, p2pPeer.chainProtocolId, data);
-    }
-    }
-    if (success == false && connectAddress) {
-    if (connectAddress.startsWith('ws')) {
-    var websocket = websocketPool.get(connectAddress);
-    if (websocket) {
-    success = true;
-    if (data) {
-    result = websocket.sendMsg(data);
-    }
-    }
-    }
-    if (success == false && connectAddress.startsWith('http')) {
-    var httpClient = httpClientPool.get(connectAddress);
-    if (httpClient) {
-    success = true;
-    result = httpClient.send('/receive', data);
-    }
-    }
-    }
-    if (topic) {
-    if (data) {
-    result = await pubsubPool.send(topic, data);
-    }
-    }
+      if (targetPeerId != null) {
+        if (!success && connectAddress != null) {
+          if (connectAddress.startsWith('ws')) {
+            var websocket = WebsocketPool.instance.get(connectAddress);
+            if (websocket != null) {
+              success = true;
+              if (data != null) {
+                result = websocket.sendMsg(data);
+              }
+            }
+          }
+          if (!success == false && connectAddress.startsWith('http')) {
+            var httpClient = HttpClientPool.instance.get(connectAddress);
+            if (httpClient != null) {
+              success = true;
+              result = httpClient.send('/receive', data);
+            }
+          }
+        }
+      }
     } catch (err) {
-    console.error('send message:' + err);
+      print('send message:' + err.toString());
     }
     /**
      * 把响应数据转换成chainmessage
      */
-    if (result && result.data) {
-    var response = await chainMessageHandler.responseRaw(result.data, result.remotePeerId, result.remoteAddr);
-    return response;
+    if (result != null && result.data != null) {
+      var response = await chainMessageHandler.responseRaw(
+          result.data, result.remotePeerId, result.remoteAddr);
+      return response;
     }
 
-    return
-    null;
+    throw '';
   }
 
   /**
       接收报文处理的入口，包括接收请求报文和返回报文，并分配不同的处理方法
    */
-  Future<ChainMessage?> receive(ChainMessage chainMessage) async {
+  Future<ChainMessage> receive(ChainMessage chainMessage) async {
     await chainMessageHandler.decrypt(chainMessage);
     var typ = chainMessage.MessageType;
     var direct = chainMessage.MessageDirect;
     var handlers = chainMessageDispatch.getChainMessageHandler(typ);
-    ChainMessage response ;
+    var sendHandler = handlers['sendHandler'];
+    var receiveHandler = handlers['receiveHandler'];
+    var responseHandler = handlers['responseHandler'];
+    ChainMessage? response;
     //分发到对应注册好的处理器，主要是Receive和Response方法
     if (direct == MsgDirect.Request.toString()) {
-    try {
-    response = await receiveHandler(chainMessage);
-    } catch (err) {
-    print('receiveHandler chainMessage:' + err.toString());
-    response = chainMessageHandler.error(typ, err);
+      try {
+        response = await receiveHandler(chainMessage);
+      } catch (err) {
+        print('receiveHandler chainMessage:' + err.toString());
+        response = chainMessageHandler.error(typ, err);
 
-    return response;
-    }
+        return response;
+      }
     } else if (direct == MsgDirect.Response.toString()) {
-    response = await responseHandler(chainMessage);
+      response = await responseHandler(chainMessage);
     }
-
-    return response;
+    if (response != null) {
+      return response;
+    }
+    throw '';
   }
 
   /**
@@ -200,8 +167,7 @@ class ChainMessageHandler {
     if (!payload) {
       return null;
     }
-    SecurityParams
-    securityParams = SecurityParams();
+    SecurityParams securityParams = SecurityParams();
     securityParams.NeedCompress = chainMessage.NeedCompress;
     securityParams.NeedEncrypt = chainMessage.NeedEncrypt;
     var targetPeerId = chainMessage.TargetPeerId;
@@ -209,13 +175,14 @@ class ChainMessageHandler {
       targetPeerId = chainMessage.ConnectPeerId;
     }
     securityParams.TargetPeerId = targetPeerId;
-    if (chainMessage.ConnectPeerId != null && targetPeerId != null &&
+    if (chainMessage.ConnectPeerId != null &&
+        targetPeerId != null &&
         chainMessage.ConnectPeerId.contains(targetPeerId) &&
         securityParams.NeedEncrypt) {
       print('ConnectPeerId equals TargetPeerId && NeedEncrypt is true!');
     }
-    SecurityParams result = await SecurityPayload.encrypt(
-        payload, securityParams);
+    SecurityParams result =
+        await SecurityPayload.encrypt(payload, securityParams);
     if (result != null) {
       chainMessage.TransportPayload = result.TransportPayload;
       chainMessage.Payload = null;
@@ -227,8 +194,7 @@ class ChainMessageHandler {
       chainMessage.PayloadKey = result.PayloadKey;
     }
 
-    return
-      chainMessage;
+    return chainMessage;
   }
 
   /**
@@ -269,7 +235,7 @@ class ChainMessageHandler {
   }
 
   ChainMessage response(String msgType, dynamic payload) {
-    var responseMessage = new ChainMessage();
+    var responseMessage = ChainMessage();
     responseMessage.Payload = payload;
     responseMessage.MessageType = msgType;
     responseMessage.MessageDirect = MsgDirect.Response.toString();
@@ -278,7 +244,7 @@ class ChainMessageHandler {
   }
 
   ChainMessage ok(String msgType) {
-    var okMessage = new ChainMessage();
+    var okMessage = ChainMessage();
     okMessage.Payload = MsgType.OK.toString();
     okMessage.MessageType = msgType;
     okMessage.Tip = "OK";
@@ -313,7 +279,7 @@ class ChainMessageHandler {
       throw 'NullConnectPeerId';
     }
     if (chainMessage.SrcPeerId == null) {
-      throw'NullSrcPeerId';
+      throw 'NullSrcPeerId';
     }
   }
 
@@ -323,8 +289,7 @@ class ChainMessageHandler {
     var _packSize = (chainMessage.MessageType != MsgType.P2PCHAT.toString())
         ? packetSize
         : webRtcPacketSize;
-    if (chainMessage.NeedSlice
-        || chainMessage.Payload.length <= _packSize) {
+    if (chainMessage.NeedSlice || chainMessage.Payload.length <= _packSize) {
       return [chainMessage];
     }
     /**
@@ -352,14 +317,14 @@ class ChainMessageHandler {
       slice.Payload = slicePayload;
       slices.add(slice);
     }
-    return
-      slices;
+    return slices;
   }
 
   /// 如果分片进行合并
   ChainMessage? merge(ChainMessage chainMessage) {
-    if (!chainMessage.NeedSlice
-        || chainMessage.SliceSize == null || chainMessage.SliceSize < 2) {
+    if (!chainMessage.NeedSlice ||
+        chainMessage.SliceSize == null ||
+        chainMessage.SliceSize < 2) {
       return chainMessage;
     }
     /**
@@ -406,18 +371,19 @@ class ChainMessageDispatch {
   /**
       为每个消息类型注册接收和发送的处理函数，从ChainMessage中解析出消息类型，自动分发到合适的处理函数
    */
-  Map<String,dynamic> chainMessageHandlers = {};
+  Map<String, Map<String, dynamic>> chainMessageHandlers = {};
 
-
-  Map<String,dynamic> getChainMessageHandler(String msgType) {
-    return chainMessageHandlers[msgType];
+  Map<String, dynamic> getChainMessageHandler(String msgType) {
+    var chainMessageHandler = chainMessageHandlers[msgType];
+    if (chainMessageHandler != null) {
+      return chainMessageHandler;
+    }
+    throw '';
   }
 
-  registChainMessageHandler(String msgType,
-      dynamic sendHandler,
-      dynamic receiveHandler,
-      dynamic responseHandler) {
-    dynamic chainMessageHandler = {
+  registChainMessageHandler(String msgType, dynamic sendHandler,
+      dynamic receiveHandler, dynamic responseHandler) {
+    Map<String, dynamic> chainMessageHandler = {
       'sendHandler': sendHandler,
       'receiveHandler': receiveHandler,
       'responseHandler': responseHandler
