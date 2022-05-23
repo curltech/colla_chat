@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:math';
+import 'package:colla_chat/tool/util.dart';
 import 'package:flutter/material.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -44,7 +45,6 @@ class AppParams {
   String? latestVersion;
   String? currentVersion;
   bool? mandatory;
-
   String? deviceToken;
   String? p2pProtocol;
   String? timeFormat;
@@ -57,8 +57,8 @@ class AppParams {
       LocalStorage localStorage = await LocalStorage.instance;
       Object? json = localStorage.get('AppParams');
       if (json != null) {
-        var jsonObject = jsonDecode(json as String);
-        _instance = AppParams.fromJson(jsonObject);
+        Map<dynamic, dynamic> jsonObject = JsonUtil.toMap(json as String);
+        _instance = AppParams.fromJson(jsonObject as Map<String, dynamic>);
       }
       Logger.level = Level.warning;
       initStatus = true;
@@ -196,6 +196,8 @@ class AppParams {
     return false;
   }
 }
+
+var appParams = AppParams.instance;
 
 /// 全局配置，包含平台参数和应用参数
 class Config {

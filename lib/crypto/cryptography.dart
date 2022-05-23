@@ -79,7 +79,7 @@ class CryptoGraphy {
   }
 
   /// 将密钥对象转换成base64字符串，可以保存
-  /// 如果passphrase有值，则到处密钥对并加密，否则，到处公钥，不加密
+  /// 如果passphrase有值，则到处密钥对并加密，否则，输出公钥，不加密
   Future<String> export(SimpleKeyPair keyPair, List<int> passphrase) async {
     SimpleKeyPairData simpleKeyPairData = await keyPair.extract();
     List<int> keyPairBytes = simpleKeyPairData.bytes;

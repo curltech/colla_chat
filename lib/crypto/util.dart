@@ -95,9 +95,9 @@ class CryptoUtil {
     //先来转换一下
     List<int> stringBytes = utf8.encode(str);
     //然后使用 gzip 压缩
-    List<int>? gzipBytes = compress(stringBytes);
+    List<int> gzipBytes = compress(stringBytes);
     //然后再编码一下进行网络传输
-    String compressedString = encodeBase64Url(gzipBytes!);
+    String compressedString = encodeBase64Url(gzipBytes);
     return compressedString;
   }
 

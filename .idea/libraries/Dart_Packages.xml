@@ -86,6 +86,13 @@
             </list>
           </value>
         </entry>
+        <entry key="battery_plus">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/battery_plus-0.0.1+1/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="beamer">
           <value>
             <list>
@@ -2026,6 +2033,7 @@
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/azlistview-2.0.0/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/base58check-2.0.0/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/base_x-2.0.0/lib" />
+      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/battery_plus-0.0.1+1/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/beamer-1.4.1+1/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/bech32-0.2.1/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/boolean_selector-2.1.0/lib" />

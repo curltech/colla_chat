@@ -84,17 +84,9 @@ class SignalSession {
   }
 
   Future<Uint8List> decrypt(CiphertextMessage ciphertext) async {
-    var signalProtocolStore = InMemorySignalProtocolStore(
-        signalProtocol.signalKeyPair.identityKeyPair,
-        signalProtocol.signalKeyPair.registrationId);
+    var signalProtocolStore = signalProtocol.signalProtocolStore;
     var sessionCipher =
         SessionCipher.fromStore(signalProtocolStore, signalProtocolAddress);
-    for (final p in signalProtocol.signalKeyPair.preKeys) {
-      await signalProtocolStore.storePreKey(p.id, p);
-    }
-    await signalProtocolStore.storeSignedPreKey(
-        signalProtocol.signalKeyPair.signedPreKey.id,
-        signalProtocol.signalKeyPair.signedPreKey);
 
     // ciphertext: MessageType
     var messageType = ciphertext.getType();
@@ -151,9 +143,11 @@ class SignalProtocol {
     signalKeyPair = SignalKeyPair();
     signalPublicKey = SignalPublicKey.fromSignalKeyPair(signalKeyPair);
 
-    sessionStore = InMemorySessionStore();
-    preKeyStore = InMemoryPreKeyStore();
-    signedPreKeyStore = InMemorySignedPreKeyStore();
+    signalProtocolStore = InMemorySignalProtocolStore(
+        signalKeyPair.identityKeyPair, signalKeyPair.registrationId);
+    sessionStore = signalProtocolStore.sessionStore;
+    preKeyStore = signalProtocolStore.preKeyStore;
+    signedPreKeyStore = signalProtocolStore.signedPreKeyStore;
     identityKeyStore = InMemoryIdentityKeyStore(
         signalKeyPair.identityKeyPair, signalKeyPair.registrationId);
     for (final p in signalKeyPair.preKeys) {

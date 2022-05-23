@@ -61,17 +61,19 @@ class NamespacePrefix {
   }
 }
 
+/// 发送和接受链消息的抽象类
 abstract class BaseAction {
   late MsgType msgType;
   Map<String, dynamic> receivers = <String, dynamic>{};
 
   BaseAction(MsgType msgType) {
-    this.msgType = msgType;
-    chainMessageDispatch.registChainMessageHandler(
-        msgType.toString(), this.send, this.receive, this.response);
+    msgType = msgType;
+    chainMessageDispatch.registerChainMessageHandler(
+        msgType.toString(), send, receive, response);
   }
 
-  bool registReceiver(String name, dynamic receiver) {
+  ///注册接收消息的处理器
+  bool registerReceiver(String name, dynamic receiver) {
     if (receivers.containsKey(name)) {
       return false;
     }
@@ -80,8 +82,9 @@ abstract class BaseAction {
     return true;
   }
 
-  Future<ChainMessage> prepareSend(
-      String connectPeerId, dynamic data, String targetPeerId) async {
+  ///发送前的预处理，设置消息的初始值
+  Future<ChainMessage> prepareSend(String connectPeerId, dynamic data,
+      {String? targetPeerId}) async {
     ChainMessage chainMessage = ChainMessage();
     var appParams = await AppParams.instance;
     connectPeerId ??= appParams.connectPeerId[0];
@@ -89,19 +92,17 @@ abstract class BaseAction {
     chainMessage.Payload = data;
     chainMessage.TargetPeerId = targetPeerId;
     chainMessage.PayloadType = PayloadType.Map.toString();
-    chainMessage.MessageType = this.msgType.toString();
+    chainMessage.MessageType = msgType.toString();
     chainMessage.MessageDirect = MsgDirect.Request.toString();
     chainMessage.NeedCompress = true;
     chainMessage.NeedEncrypt = false;
-    // @ts-ignore
     chainMessage.UUID = '';
 
     return chainMessage;
   }
 
-  /**
-      主动发送消息，在发送之前对消息进行必要的分片处理
-   */
+  /// 主动发送消息，在发送之前对消息进行必要的分片处理
+  /// 接受返回的消息
   Future<ChainMessage?> send(ChainMessage chainMessage) async {
     List<ChainMessage> slices = chainMessageHandler.slice(chainMessage);
     if (slices.isNotEmpty) {
@@ -116,7 +117,7 @@ abstract class BaseAction {
         }
         List<dynamic> responses = await Future.wait(ps);
         if (responses != null && responses.length > 1) {
-          var response = new ChainMessage();
+          var response = ChainMessage();
           //ObjectUtil.copy(responses[0], response);
           var payloads = [];
           for (var res in responses) {
@@ -134,17 +135,13 @@ abstract class BaseAction {
     return null;
   }
 
-  /**
-      接收消息进行处理，在接收之前对消息进行必要的分片合并处理
-      返回为空则没有返回消息，否则，有返回消息
-   */
+  /// 接收消息进行处理，在接收之前对消息进行必要的分片合并处理
+  /// 返回为空则没有返回消息，否则，有返回消息
   Future<ChainMessage?> receive(ChainMessage chainMessage) async {
     return chainMessageHandler.merge(chainMessage);
   }
 
-  /**
-      处理返回消息
-   */
+  ///  处理返回消息
   Future<ChainMessage> response(ChainMessage chainMessage) async {
     return chainMessage;
   }

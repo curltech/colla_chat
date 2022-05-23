@@ -122,26 +122,3 @@ abstract class PeerEntity extends PeerLocation {
     return json;
   }
 }
-
-/// 单例本节点对象，包含公私钥，本节点配置，密码和过往的节点信息
-/// 可以随时获取本节点的信息
-class Myself {
-  // peer是ed25519,英语身份认证
-  Object? peerPublicKey;
-  Object? peerPrivateKey;
-
-  /// x25519，用于加解密
-  SimplePublicKey? publicKey;
-  SimpleKeyPair? privateKey;
-
-  /// signal协议
-  String? signalPublicKey;
-  String? signalPrivateKey;
-  late MyselfPeer myselfPeer;
-  PeerProfile? peerProfile;
-  String? myselfPeerClient; // combine myselfPeer & peerProfile
-  String? password;
-  List<SimpleKeyPair> expiredKeys = [];
-}
-
-final myself = Myself();

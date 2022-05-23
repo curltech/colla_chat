@@ -1,11 +1,9 @@
-import 'package:colla_chat/entity/base.dart';
 import 'package:flutter/material.dart';
 
 import '../app.dart';
 import '../platform.dart';
 import '../routers/application.dart';
 import '../routers/routes.dart';
-import '../service/servicelocator.dart';
 
 const List<String> images = [
   'assets/images/bg/login-bg-wd-1.jpg',
@@ -70,7 +68,7 @@ class _LoadingState extends State<Loading> {
     }
 
     Future.delayed(Duration(seconds: 10), () {
-      Application.router.navigateTo(context, Routes.remoteLogin, replace: true);
+      Application.router.navigateTo(context, Routes.p2pLogin, replace: true);
     });
   }
 

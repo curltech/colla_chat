@@ -3,6 +3,8 @@ import 'package:colla_chat/pages/stock/login/remote_login.dart';
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
 
+import '../pages/chat/login/p2p_login.dart';
+
 //加载页
 var loadingHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
@@ -15,6 +17,12 @@ var loadingHandler = Handler(
 Handler remoteLoginHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return RemoteLogin();
+});
+
+// p2p登录页面
+Handler p2pLoginHandler = Handler(
+    handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
+  return P2pLogin();
 });
 
 // 首页

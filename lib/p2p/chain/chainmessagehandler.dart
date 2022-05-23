@@ -1,4 +1,5 @@
 import '../../entity/dht/base.dart';
+import '../../entity/dht/myself.dart';
 import '../../tool/util.dart';
 import '../../transport/httpclient.dart';
 import '../../transport/websocket.dart';
@@ -381,7 +382,7 @@ class ChainMessageDispatch {
     throw '';
   }
 
-  registChainMessageHandler(String msgType, dynamic sendHandler,
+  registerChainMessageHandler(String msgType, dynamic sendHandler,
       dynamic receiveHandler, dynamic responseHandler) {
     Map<String, dynamic> chainMessageHandler = {
       'sendHandler': sendHandler,

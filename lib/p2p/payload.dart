@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../crypto/cryptography.dart';
 import '../crypto/util.dart';
 import '../entity/dht/base.dart';
+import '../entity/dht/myself.dart';
 import '../service/dht/peerclient.dart';
 import '../tool/util.dart';
 import 'package:cryptography_flutter/cryptography_flutter.dart';
@@ -204,8 +205,10 @@ class SecurityPayload {
                   publicKey: srcPublicKey);
             }
             if (!pass && securityParams.SrcPeerId != null) {
-              var peerClients = await PeerClientService.instance
-                  .getPeerClient(securityParams.SrcPeerId, '', '', '');
+              var peerClients = [
+                peerClientService
+                    .getPeerClientFromCache(securityParams.SrcPeerId)
+              ];
               if (peerClients != null && peerClients.isNotEmpty) {
                 srcPublicKey = await PeerClientService.instance
                     .getPublic(securityParams.SrcPeerId);
