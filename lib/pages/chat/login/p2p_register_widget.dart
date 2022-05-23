@@ -1,5 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../../app.dart';
+import '../../../routers/application.dart';
+import '../../../routers/routes.dart';
+import '../../../service/dht/myselfpeer.dart';
+
 /// 远程登录组件，一个card下的录入框和按钮组合
 class P2pRegisterWidget extends StatefulWidget {
   const P2pRegisterWidget({Key? key}) : super(key: key);
@@ -10,12 +15,12 @@ class P2pRegisterWidget extends StatefulWidget {
 
 class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
   final _formKey = GlobalKey<FormState>();
-  String _name = '';
-  String _username = '';
-  String _mobile = '';
-  String _email = '';
-  String _plainPassword = '';
-  String _confirmPassword = '';
+  String _name = '胡劲松';
+  String _loginName = 'hujs';
+  String _mobile = '13609619603';
+  String _email = 'hujs@colla.cc';
+  String _plainPassword = '1234';
+  String _confirmPassword = '1234';
   bool _pwdShow = false;
 
   @override
@@ -26,10 +31,10 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
         _name = nameController.text;
       });
     });
-    TextEditingController usernameController = TextEditingController();
-    usernameController.addListener(() {
+    TextEditingController loginNameController = TextEditingController();
+    loginNameController.addListener(() {
       setState(() {
-        _username = usernameController.text;
+        _loginName = loginNameController.text;
       });
     });
     TextEditingController mobileController = TextEditingController();
@@ -63,72 +68,76 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
         children: <Widget>[
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextField(
-                controller: nameController,
+              child: TextFormField(
+                //controller: nameController,
                 decoration: InputDecoration(
                   labelText: '用户名',
                   prefixIcon: Icon(Icons.person),
                 ),
+                initialValue: _name,
                 onChanged: (String val) {
                   setState(() {
                     _name = val;
                   });
                 },
-                onSubmitted: (String val) {},
+                onFieldSubmitted: (String val) {},
               )),
           SizedBox(height: 10.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextField(
-                //controller: usernameController,
+              child: TextFormField(
+                //controller: loginNameController,
                 decoration: InputDecoration(
                   labelText: '登录名',
                   prefixIcon: Icon(Icons.desktop_mac),
                 ),
+                initialValue: _loginName,
                 onChanged: (String val) {
                   setState(() {
-                    _username = val;
+                    _loginName = val;
                   });
                 },
-                onSubmitted: (String val) {},
+                onFieldSubmitted: (String val) {},
               )),
           SizedBox(height: 10.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextField(
+              child: TextFormField(
                 //controller: mobileController,
                 decoration: InputDecoration(
                   labelText: '手机',
                   prefixIcon: Icon(Icons.mobile_friendly),
                 ),
+                initialValue: _mobile,
                 onChanged: (String val) {
                   setState(() {
                     _mobile = val;
                   });
                 },
-                onSubmitted: (String val) {},
+                onFieldSubmitted: (String val) {},
               )),
           SizedBox(height: 10.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextField(
+              child: TextFormField(
                 //controller: emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   labelText: '邮箱',
                   prefixIcon: Icon(Icons.email),
                 ),
+                initialValue: _email,
                 onChanged: (String val) {
                   setState(() {
                     _email = val;
                   });
                 },
-                onSubmitted: (String val) {},
+                onFieldSubmitted: (String val) {},
               )),
           SizedBox(height: 10.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextField(
+              child: TextFormField(
                 keyboardType: TextInputType.text,
                 obscureText: !_pwdShow,
                 //controller: passwordController,
@@ -145,17 +154,18 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
                     },
                   ),
                 ),
+                initialValue: _plainPassword,
                 onChanged: (String val) {
                   setState(() {
                     _plainPassword = val;
                   });
                 },
-                onSubmitted: (String val) {},
+                onFieldSubmitted: (String val) {},
               )),
           SizedBox(height: 10.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextField(
+              child: TextFormField(
                 keyboardType: TextInputType.text,
                 obscureText: !_pwdShow,
                 //controller: passwordController,
@@ -172,12 +182,13 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
                     },
                   ),
                 ),
+                initialValue: _confirmPassword,
                 onChanged: (String val) {
                   setState(() {
                     _confirmPassword = val;
                   });
                 },
-                onSubmitted: (String val) {},
+                onFieldSubmitted: (String val) {},
               )),
           SizedBox(height: 10.0),
           Padding(
@@ -185,7 +196,9 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
             child: Row(children: [
               TextButton(
                 child: Text('注册'),
-                onPressed: () async {},
+                onPressed: () async {
+                  await _register();
+                },
               ),
               TextButton(
                 child: Text('重置'),
@@ -196,5 +209,18 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
         ],
       ),
     );
+  }
+
+  Future<void> _register() async {
+    if (_plainPassword == _confirmPassword) {
+      var registerStatus = await myselfPeerService.register(
+          _name, _loginName, _plainPassword,
+          mobile: _mobile, email: _email);
+      if (registerStatus) {
+        Application.router.navigateTo(context, Routes.index, replace: true);
+      }
+    } else {
+      logger.e('password is not matched');
+    }
   }
 }

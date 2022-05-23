@@ -80,40 +80,6 @@ class MyselfService {
     myself.privateKey = privateKey;
     myself.publicKey = publicKey;
   }
-
-  ///保存当前用户中的账户信息
-  Future<MyselfPeer> saveMyselfPeer() async {
-    var myselfPeer = myself.myselfPeer;
-    int? id = myselfPeer.id;
-    Map peer;
-    if (id == null) {
-      //新的
-      myselfPeer.status = EntityStatus.Effective.toString();
-      var addrs = await NetworkInfoUtil.getWifiIp();
-      myselfPeer.address = addrs;
-      peer = JsonUtil.toMap(myselfPeer);
-      await myselfPeerService.insert(peer);
-
-      myselfPeer = MyselfPeer.fromJson(peer);
-      myself.myselfPeer = myselfPeer;
-    } else {
-      var needUpdate = false;
-      var addrs = await NetworkInfoUtil.getWifiIp();
-      if (myselfPeer.address != addrs) {
-        needUpdate = true;
-        myselfPeer.address = addrs;
-      }
-
-      if (needUpdate) {
-        peer = JsonUtil.toMap(myselfPeer);
-        await myselfPeerService.update(peer);
-
-        myselfPeer = MyselfPeer.fromJson(peer);
-        myself.myselfPeer = myselfPeer;
-      }
-    }
-    return myselfPeer;
-  }
 }
 
 final myselfService = MyselfService();

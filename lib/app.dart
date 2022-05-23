@@ -52,6 +52,21 @@ class AppParams {
   String? language;
   String? localeName;
 
+  /// 各种语言的连接地址选项，从服务器获取，或者是常量定义
+  var connectAddressOptionsISO = Constants.connectAddressOptionsISO;
+
+  /// 可选的连接地址，比如http、ws、libp2p、turn
+  var httpConnectAddress = <String>['https://localhost:9091']; //https服务器
+  var wsConnectAddress = <String>[]; //wss服务器
+  var libp2pConnectAddress = <String>[]; //libp2p服务器
+  var iceServers = <String>[]; //ice服务器
+  // libp2p的链协议号码
+  String? chainProtocolId;
+  // 目标的libp2p节点的peerId
+  List<String> connectPeerId = <String>[];
+  // 本机作为libp2p节点的监听地址
+  var listenerAddress = <String>[];
+
   static Future<AppParams> get instance async {
     if (!initStatus) {
       LocalStorage localStorage = await LocalStorage.instance;
@@ -74,24 +89,6 @@ class AppParams {
         'language': language,
         'mode': mode,
       };
-
-  /// 各种语言的连接地址选项，从服务器获取，或者是常量定义
-  var connectAddressOptionsISO = Constants.connectAddressOptionsISO;
-
-  /// 可选的连接地址，比如http、ws、libp2p、turn
-  var httpConnectAddress = <String>['https://localhost:9091']; //https服务器
-  var wsConnectAddress = <String>[]; //wss服务器
-  var libp2pConnectAddress = <String>[]; //libp2p服务器
-  var iceServers = <String>[]; //ice服务器
-
-  // libp2p的链协议号码
-  String? chainProtocolId;
-
-  // 目标的libp2p节点的peerId
-  List<String> connectPeerId = <String>[];
-
-  // 本机作为libp2p节点的监听地址
-  var listenerAddress = <String>[];
 
   /**
    * 设置第一个连接地址，自动识别https，wss，libp2p协议
@@ -196,8 +193,6 @@ class AppParams {
     return false;
   }
 }
-
-var appParams = AppParams.instance;
 
 /// 全局配置，包含平台参数和应用参数
 class Config {

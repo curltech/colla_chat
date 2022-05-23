@@ -10,12 +10,12 @@ class RemoteRegisterWidget extends StatefulWidget {
 
 class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
   final _formKey = GlobalKey<FormState>();
-  String _name = '';
-  String _username = '';
-  String _mobile = '';
-  String _email = '';
-  String _plainPassword = '';
-  String _confirmPassword = '';
+  String _name = '胡劲松';
+  String _loginName = 'hujs';
+  String _mobile = '13609619603';
+  String _email = 'hujs@colla.cc';
+  String _plainPassword = '123456';
+  String _confirmPassword = '123456';
   bool _pwdShow = false;
 
   @override
@@ -26,10 +26,10 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
         _name = nameController.text;
       });
     });
-    TextEditingController usernameController = TextEditingController();
-    usernameController.addListener(() {
+    TextEditingController loginNameController = TextEditingController();
+    loginNameController.addListener(() {
       setState(() {
-        _username = usernameController.text;
+        _loginName = loginNameController.text;
       });
     });
     TextEditingController mobileController = TextEditingController();
@@ -63,72 +63,76 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
         children: <Widget>[
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextField(
+              child: TextFormField(
                 controller: nameController,
                 decoration: InputDecoration(
                   labelText: '用户名',
                   prefixIcon: Icon(Icons.person),
                 ),
+                initialValue: _name,
                 onChanged: (String val) {
                   setState(() {
                     _name = val;
                   });
                 },
-                onSubmitted: (String val) {},
+                onFieldSubmitted: (String val) {},
               )),
           SizedBox(height: 10.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextField(
-                //controller: usernameController,
+              child: TextFormField(
+                //controller: loginNameController,
                 decoration: InputDecoration(
                   labelText: '登录名',
                   prefixIcon: Icon(Icons.desktop_mac),
                 ),
+                initialValue: _loginName,
                 onChanged: (String val) {
                   setState(() {
-                    _username = val;
+                    _loginName = val;
                   });
                 },
-                onSubmitted: (String val) {},
+                onFieldSubmitted: (String val) {},
               )),
           SizedBox(height: 10.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextField(
+              child: TextFormField(
                 //controller: mobileController,
                 decoration: InputDecoration(
                   labelText: '手机',
                   prefixIcon: Icon(Icons.mobile_friendly),
                 ),
+                initialValue: _mobile,
                 onChanged: (String val) {
                   setState(() {
                     _mobile = val;
                   });
                 },
-                onSubmitted: (String val) {},
+                onFieldSubmitted: (String val) {},
               )),
           SizedBox(height: 10.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextField(
+              child: TextFormField(
                 //controller: emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   labelText: '邮箱',
                   prefixIcon: Icon(Icons.email),
                 ),
+                initialValue: _email,
                 onChanged: (String val) {
                   setState(() {
                     _email = val;
                   });
                 },
-                onSubmitted: (String val) {},
+                onFieldSubmitted: (String val) {},
               )),
           SizedBox(height: 10.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextField(
+              child: TextFormField(
                 keyboardType: TextInputType.text,
                 obscureText: !_pwdShow,
                 //controller: passwordController,
@@ -145,17 +149,18 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
                     },
                   ),
                 ),
+                initialValue: _plainPassword,
                 onChanged: (String val) {
                   setState(() {
                     _plainPassword = val;
                   });
                 },
-                onSubmitted: (String val) {},
+                onFieldSubmitted: (String val) {},
               )),
           SizedBox(height: 10.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextField(
+              child: TextFormField(
                 keyboardType: TextInputType.text,
                 obscureText: !_pwdShow,
                 //controller: passwordController,
@@ -172,12 +177,13 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
                     },
                   ),
                 ),
+                initialValue: _confirmPassword,
                 onChanged: (String val) {
                   setState(() {
                     _confirmPassword = val;
                   });
                 },
-                onSubmitted: (String val) {},
+                onFieldSubmitted: (String val) {},
               )),
           SizedBox(height: 10.0),
           Padding(

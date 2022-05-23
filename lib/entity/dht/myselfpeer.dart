@@ -2,6 +2,7 @@ import 'base.dart';
 
 /// 本节点实体
 class MyselfPeer extends PeerEntity {
+  late String loginName;
   late String peerPrivateKey;
   late String privateKey;
   String? signalPublicKey;
@@ -37,7 +38,7 @@ class MyselfPeer extends PeerEntity {
   MyselfPeer();
 
   MyselfPeer.fromJson(Map json)
-      : peerPrivateKey = json['peerPrivateKey'],
+      : loginName = json['loginName'],
         privateKey = json['privateKey'],
         signalPublicKey = json['signalPublicKey'],
         signalPrivateKey = json['signalPrivateKey'],
@@ -60,6 +61,7 @@ class MyselfPeer extends PeerEntity {
   Map<String, dynamic> toJson() {
     var json = super.toJson();
     json.addAll({
+      'loginName': loginName,
       'peerPrivateKey': peerPrivateKey,
       'privateKey': privateKey,
       'signalPublicKey': signalPublicKey,

@@ -22,7 +22,7 @@ abstract class BaseService {
   }
 
   Future<Map?> get(int id) {
-    return dataStore.findOne(this.tableName, where: 'id=?', whereArgs: [id]);
+    return dataStore.findOne(tableName, where: 'id=?', whereArgs: [id]);
   }
 
   Future<Map?> findOne(String? where,

@@ -14,8 +14,8 @@ class CryptoGraphy {
   }
 
   /// 对消息进行hash处理，输入消息可以为字符串或者uintarray，
-  Future<Uint8List> hash(List<int> data) async {
-    final sink = Sha512().newHashSink();
+  Future<List<int>> hash(List<int> data) async {
+    final sink = Sha256().newHashSink();
 
     // Add all parts of the authenticated message
     sink.add(data);
@@ -24,11 +24,11 @@ class CryptoGraphy {
     sink.close();
     final hash = await sink.hash();
 
-    return Uint8List.fromList(hash.bytes);
+    return hash.bytes;
   }
 
   /// 随机字节数组
-  Future<Uint8List> getRandomBytes({int length = 32}) async {
+  Future<List<int>> getRandomBytes({int length = 32}) async {
     final randomBytes = Uint8List(length);
 
     var random = Random.secure();
@@ -225,8 +225,9 @@ class CryptoGraphy {
 
   Future<List<int>> aesEncrypt(List<int> message, List<int> passphrase) async {
     // Choose the cipher
+    var hashPassphrase = await hash(passphrase);
     final algorithm = AesGcm.with256bits();
-    final secretKey = SecretKey(passphrase);
+    final secretKey = SecretKey(hashPassphrase);
     // Encrypt
     final secretBox = await algorithm.encrypt(
       message,
@@ -236,8 +237,9 @@ class CryptoGraphy {
   }
 
   Future<List<int>> aesDecrypt(List<int> message, List<int> passphrase) async {
+    var hashPassphrase = await hash(passphrase);
     final algorithm = AesGcm.with256bits();
-    final secretKey = SecretKey(passphrase);
+    final secretKey = SecretKey(hashPassphrase);
 
     SecretBox secretBox =
         SecretBox.fromConcatenation(message, macLength: 16, nonceLength: 16);

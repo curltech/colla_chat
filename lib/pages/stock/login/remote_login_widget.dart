@@ -17,8 +17,8 @@ class RemoteLoginWidget extends StatefulWidget {
 
 class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
   final _formKey = GlobalKey<FormState>();
-  String _credential = '';
-  String _password = '';
+  String _credential = '13609619603';
+  String _password = '123456';
   bool _pwdShow = false;
   late TextEditingController _credentialController;
 
@@ -49,24 +49,25 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
         children: <Widget>[
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 50.0),
-              child: TextField(
+              child: TextFormField(
                 keyboardType: TextInputType.text,
                 //controller: _credentialController,
                 decoration: InputDecoration(
                   labelText: '登录凭证(手机/邮件/登录名)',
                   prefixIcon: Icon(Icons.person),
                 ),
+                initialValue: _credential,
                 onChanged: (String val) {
                   setState(() {
                     _credential = val;
                   });
                 },
-                onSubmitted: (String val) {},
+                onFieldSubmitted: (String val) {},
               )),
           SizedBox(height: 30.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 50.0),
-              child: TextField(
+              child: TextFormField(
                 keyboardType: TextInputType.text,
                 obscureText: !_pwdShow,
                 //controller: passwordController,
@@ -83,12 +84,13 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
                     },
                   ),
                 ),
+                initialValue: _password,
                 onChanged: (String val) {
                   setState(() {
                     _password = val;
                   });
                 },
-                onSubmitted: (String val) {},
+                onFieldSubmitted: (String val) {},
               )),
           SizedBox(height: 30.0),
           Padding(

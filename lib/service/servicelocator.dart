@@ -37,7 +37,7 @@ class ServiceLocator {
         tableName: "blc_peerEndpoint",
         fields: [],
         indexFields: ['ownerPeerId', 'priority', 'address']);
-    services['peerProfileService'] = peerEndpointService;
+    services['peerEndpointService'] = peerEndpointService;
 
     var peerClientService = await PeerClientService.init(
         tableName: "blc_peerClient",
@@ -52,6 +52,7 @@ class ServiceLocator {
           'peerId',
           'name',
           'mobile',
+          'email',
           'status',
           'updateDate'
         ],

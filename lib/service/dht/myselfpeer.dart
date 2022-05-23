@@ -46,7 +46,7 @@ class MyselfPeerService extends PeerEntityService {
   }
 
   /// 注册新的p2p账户
-  Future<Myself> register(String name, String username, String password,
+  Future<bool> register(String name, String loginName, String password,
       {String? code, String? mobile, String? email}) async {
     if (code != null && mobile != null) {
       var isPhoneNumberValid = false;
@@ -67,7 +67,9 @@ class MyselfPeerService extends PeerEntityService {
     var myselfPeer = MyselfPeer();
     myselfPeer.status = EntityStatus.Effective.toString();
     myselfPeer.mobile = mobile;
+    myselfPeer.email = email;
     myselfPeer.name = name;
+    myselfPeer.loginName = loginName;
     myselfPeer.address = await NetworkInfoUtil.getWifiIp();
     await myselfService.createMyself(myselfPeer, password);
 
@@ -82,7 +84,7 @@ class MyselfPeerService extends PeerEntityService {
     myselfPeer.creditScore = 300;
     myselfPeer.mobileVerified = 'N';
     myselfPeer.visibilitySetting = 'YYYYYY';
-    myselfService.saveMyselfPeer();
+    await upsert(myselfPeer);
     myself.myselfPeer = myselfPeer;
 
     // 初始化profile
@@ -113,7 +115,7 @@ class MyselfPeerService extends PeerEntityService {
     await peerProfileService.upsert(peerProfile);
     myself.peerProfile = peerProfile;
 
-    return myself;
+    return true;
   }
 
   /// 登录，验证本地账户，连接p2p服务节点，注册成功

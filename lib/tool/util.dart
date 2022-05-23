@@ -4,6 +4,7 @@ import 'dart:html';
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:colla_chat/platform.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:mobile_number/mobile_number.dart';
 import 'package:package_info/package_info.dart';
@@ -204,10 +205,14 @@ class NetworkInfoUtil {
   }
 
   static Future<String?> getWifiIp() async {
-    var info = getWifiInfo();
-    var wifiIp = await info.getWifiIP(); // 192.168.1.43
+    var platformParams = await PlatformParams.instance;
+    if (!platformParams.web) {
+      var info = getWifiInfo();
+      var wifiIp = await info.getWifiIP(); // 192.168.1.43
 
-    return wifiIp;
+      return wifiIp;
+    }
+    return null;
   }
 }
 

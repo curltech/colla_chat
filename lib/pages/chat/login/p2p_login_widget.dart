@@ -18,8 +18,8 @@ class P2pLoginWidget extends StatefulWidget {
 
 class _P2pLoginWidgetState extends State<P2pLoginWidget> {
   final _formKey = GlobalKey<FormState>();
-  String _credential = '';
-  String _password = '';
+  String _credential = '13609619603';
+  String _password = '1234';
   bool _pwdShow = false;
   late TextEditingController _credentialController;
 
@@ -50,24 +50,25 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
         children: <Widget>[
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 50.0),
-              child: TextField(
+              child: TextFormField(
                 keyboardType: TextInputType.text,
                 //controller: _credentialController,
                 decoration: InputDecoration(
                   labelText: '登录凭证(手机/邮件/登录名)',
                   prefixIcon: Icon(Icons.person),
                 ),
+                initialValue: _credential,
                 onChanged: (String val) {
                   setState(() {
                     _credential = val;
                   });
                 },
-                onSubmitted: (String val) {},
+                onFieldSubmitted: (String val) {},
               )),
           SizedBox(height: 30.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 50.0),
-              child: TextField(
+              child: TextFormField(
                 keyboardType: TextInputType.text,
                 obscureText: !_pwdShow,
                 //controller: passwordController,
@@ -84,12 +85,13 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
                     },
                   ),
                 ),
+                initialValue: _password,
                 onChanged: (String val) {
                   setState(() {
                     _password = val;
                   });
                 },
-                onSubmitted: (String val) {},
+                onFieldSubmitted: (String val) {},
               )),
           SizedBox(height: 30.0),
           Padding(
@@ -98,7 +100,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
               TextButton(
                 child: Text('登录'),
                 onPressed: () async {
-                  _login();
+                  await _login();
                 },
               ),
               TextButton(
@@ -115,8 +117,8 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
   Future<void> _login() async {
     AppParams appParams = await AppParams.instance;
     await appParams.saveAppParams();
-    var current = await myselfPeerService.login(_credential, _password);
-    if (stockUser.loginStatus == true) {
+    var loginStatus = await myselfPeerService.login(_credential, _password);
+    if (loginStatus) {
       Application.router.navigateTo(context, Routes.index, replace: true);
     }
   }

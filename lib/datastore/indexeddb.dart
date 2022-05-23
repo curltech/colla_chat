@@ -258,18 +258,16 @@ class IndexedDb extends DataStore {
     return null;
   }
 
-  /**
-   * 插入一条记录
-   * @param {*} tableName
-   * @param {*} entity
-   */
+  /// 插入一条记录,自动生成的id将会回写到对象中
+  /// @param {*} tableName
+  /// @param {*} entity
   @override
   Future<int> insert(String table, dynamic entity) async {
     Map map = JsonUtil.toMap(entity);
     EntityUtil.removeNullId(map);
     var txn = db.transaction(table, "readwrite");
     var store = txn.objectStore(table);
-    var key = await store.add(entity);
+    var key = await store.add(map);
     await txn.completed;
 
     Object? id = EntityUtil.getId(map);
@@ -331,9 +329,9 @@ class IndexedDb extends DataStore {
     var map = JsonUtil.toMap(entity);
     var id = EntityUtil.getId(map);
     if (id != null) {
-      return update(table, map, where: where, whereArgs: whereArgs);
+      return update(table, entity, where: where, whereArgs: whereArgs);
     } else {
-      return insert(table, map);
+      return insert(table, entity);
     }
   }
 

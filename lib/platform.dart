@@ -21,17 +21,17 @@ class PlatformParams {
   late bool linux;
   late bool macos;
   late bool windows;
-  late String localeName;
-  late String localHostname;
-  late String operatingSystem;
-  late String operatingSystemVersion;
-  late String version;
-  late String dark;
-  late String phoneNumber;
-  late String countryCode;
-  late String language;
-  late String clientDevice;
-  late String clientType;
+  String? localeName;
+  String? localHostname;
+  String? operatingSystem;
+  String? operatingSystemVersion;
+  String? version;
+  String? dark;
+  String? phoneNumber;
+  String? countryCode;
+  String? language;
+  String? clientDevice;
+  String? clientType;
 
   late Map<String, dynamic> deviceData;
   late Map<String, dynamic>? webDeviceData;
