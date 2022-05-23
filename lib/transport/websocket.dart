@@ -9,9 +9,11 @@ import '../tool/util.dart';
 
 class Websocket implements IWebClient {
   String prefix = 'wss://';
-  String? address;
-  IOWebSocketChannel? channel;
+  late String address;
+  late WebSocketChannel channel;
   bool _status = false;
+  Duration pingInterval = const Duration(seconds: 10);
+  Map<String, dynamic> headers = {};
   String? heartbeatTimer;
 
   Websocket(String addr) {
@@ -23,27 +25,33 @@ class Websocket implements IWebClient {
       addr = addr.substring(0, addr.length - 1);
     }
     address = addr;
-    Map<String, dynamic> headers = {};
-    var pingInterval = const Duration(seconds: 10);
+
     channel = IOWebSocketChannel.connect(addr,
         headers: headers, pingInterval: pingInterval);
+    _status = true;
   }
 
   @override
   register(String name, Function func) {
     // 监听消息，如果有消息到来，就打印出来
-    channel?.stream.listen((message) {
-      if (func != null) {
-        func(message);
-      } else {
-        print(message);
-      }
-    }, onError: (error) {}, onDone: () {}, cancelOnError: false);
+    channel.stream.listen((message) {
+      func(message);
+    }, onError: onError, onDone: onDone, cancelOnError: false);
     _status = true;
   }
 
+  onDone() async {
+    logger.i("websocket onDone");
+    await reconnect();
+  }
+
+  onError(err) async {
+    logger.i("websocket onError, ${err}");
+    await reconnect();
+  }
+
   sendMsg(dynamic data) {
-    channel?.sink.add(data);
+    channel.sink.add(data);
   }
 
   @override
@@ -62,12 +70,19 @@ class Websocket implements IWebClient {
     return _status;
   }
 
-  void close() {
-    channel?.sink.close();
-    _status = false;
+  Future<void> close() async {
+    if (_status) {
+      await channel.sink.close();
+      _status = false;
+    }
   }
 
-  reconnect() {}
+  reconnect() async {
+    await close();
+    channel = IOWebSocketChannel.connect(address,
+        headers: headers, pingInterval: pingInterval);
+    _status = true;
+  }
 }
 
 class WebsocketPool {
