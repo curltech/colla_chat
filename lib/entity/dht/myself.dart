@@ -18,7 +18,9 @@ class Myself {
 
   MyselfPeer? myselfPeer;
   PeerProfile? peerProfile;
-  String? myselfPeerClient; // combine myselfPeer & peerProfile
+
+  ///当连接p2p节点成功后设置
+  String? myselfPeerClient;
   String? password;
   List<SimpleKeyPair> expiredKeys = [];
 
