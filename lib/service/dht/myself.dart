@@ -43,15 +43,16 @@ class MyselfService {
 
   /// 获取自己节点的记录，并解开私钥，设置当前myself
   /// 一般发生在登录后重新设置当前的账户
-  setMyself(MyselfPeer myselfPeer, String password) async {
+  Future<bool> setMyself(MyselfPeer myselfPeer, String password) async {
     //解开身份公钥和加密公钥
-    SimplePublicKey publicKey =
-        await cryptoGraphy.importPublicKey(myselfPeer.publicKey);
+    SimplePublicKey publicKey = await cryptoGraphy
+        .importPublicKey(myselfPeer.publicKey, typeStr: 'x25519');
     SimplePublicKey peerPublicKey =
         await cryptoGraphy.importPublicKey(myselfPeer.peerPublicKey);
     //解开身份密钥对和加密密钥对
     SimpleKeyPair privateKey = await cryptoGraphy.import(
-        myselfPeer.privateKey, password.codeUnits, publicKey);
+        myselfPeer.privateKey, password.codeUnits, publicKey,
+        typeStr: 'x25519');
     SimpleKeyPair peerPrivateKey = await cryptoGraphy.import(
         myselfPeer.peerPrivateKey, password.codeUnits, peerPublicKey);
 
@@ -66,6 +67,11 @@ class MyselfService {
       throw 'VerifyNotPass';
     }
     myself.myselfPeer = myselfPeer;
+    myself.password = password;
+    myself.peerPrivateKey = peerPrivateKey;
+    myself.peerPublicKey = peerPublicKey;
+    myself.privateKey = privateKey;
+    myself.publicKey = publicKey;
 
     //查找配置信息
     var peer =
@@ -74,11 +80,17 @@ class MyselfService {
       var peerProfile = PeerProfile.fromJson(peer);
       myself.peerProfile = peerProfile;
     }
-    myself.password = password;
-    myself.peerPrivateKey = peerPrivateKey;
-    myself.peerPublicKey = peerPublicKey;
-    myself.privateKey = privateKey;
-    myself.publicKey = publicKey;
+
+    return true;
+  }
+
+  clear() {
+    myself.myselfPeer = null;
+    myself.password = null;
+    myself.peerPrivateKey = null;
+    myself.peerPublicKey = null;
+    myself.privateKey = null;
+    myself.publicKey = null;
   }
 }
 

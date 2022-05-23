@@ -92,9 +92,9 @@ class CryptoGraphy {
   /// 将base64的密钥字符串导入转换成密钥对象，passphrase必须有值用于解密私钥
   Future<SimpleKeyPair> import(
       String base64KeyPair, List<int> passphrase, SimplePublicKey publicKey,
-      {String? type = 'ed25519'}) async {
+      {String? typeStr = 'ed25519'}) async {
     KeyPairType type = KeyPairType.ed25519;
-    if (type == 'x25519') {
+    if (typeStr == 'x25519') {
       type = KeyPairType.x25519;
     }
     if (passphrase != null && passphrase.isNotEmpty) {
@@ -119,9 +119,9 @@ class CryptoGraphy {
 
   /// 将base64的密钥字符串导入转换成私钥，passphrase必须有值用于解密私钥
   Future<SimplePublicKey> importPublicKey(String base58PublicKey,
-      {String? type = 'ed25519'}) async {
+      {String? typeStr = 'ed25519'}) async {
     KeyPairType type = KeyPairType.ed25519;
-    if (type == 'x25519') {
+    if (typeStr == 'x25519') {
       type = KeyPairType.x25519;
     }
     Uint8List rawText = CryptoUtil.decodeBase58(base58PublicKey);
@@ -148,12 +148,12 @@ class CryptoGraphy {
 
   Future<bool> verify(List<int> message, List<int> signature,
       {String? base64PublicKey, PublicKey? publicKey}) async {
-    List<int> signatureBytes = signature.sublist(0, 256);
+    List<int> signatureBytes = signature.sublist(0, 64);
     if (publicKey == null) {
       if (base64PublicKey != null) {
         publicKey = importPublicKey(base64PublicKey) as PublicKey;
       } else {
-        List<int> publicKeyBytes = signature.sublist(256);
+        List<int> publicKeyBytes = signature.sublist(64);
         publicKey = SimplePublicKey(publicKeyBytes, type: KeyPairType.ed25519);
       }
     }
@@ -242,7 +242,7 @@ class CryptoGraphy {
     final secretKey = SecretKey(hashPassphrase);
 
     SecretBox secretBox =
-        SecretBox.fromConcatenation(message, macLength: 16, nonceLength: 16);
+        SecretBox.fromConcatenation(message, macLength: 16, nonceLength: 12);
     // Decrypt
     final clearText = await algorithm.decrypt(
       secretBox,

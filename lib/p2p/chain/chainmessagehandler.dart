@@ -333,7 +333,8 @@ class ChainMessageHandler {
      */
     var targetPeerId = chainMessage.TargetPeerId;
     targetPeerId ??= chainMessage.ConnectPeerId;
-    if (targetPeerId != myself.myselfPeer.peerId) {
+    var myselfPeer = myself.myselfPeer;
+    if (myselfPeer != null && targetPeerId != myselfPeer.peerId) {
       return chainMessage;
     }
     var uuid = chainMessage.UUID;

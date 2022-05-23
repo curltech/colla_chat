@@ -9,22 +9,22 @@ import 'package:cryptography/cryptography.dart';
 /// 可以随时获取本节点的信息
 class Myself {
   // peer是ed25519,英语身份认证
-  late SimplePublicKey peerPublicKey;
-  late SimpleKeyPair peerPrivateKey;
+  SimplePublicKey? peerPublicKey;
+  SimpleKeyPair? peerPrivateKey;
 
   /// x25519，用于加解密
-  late SimplePublicKey publicKey;
-  late SimpleKeyPair privateKey;
+  SimplePublicKey? publicKey;
+  SimpleKeyPair? privateKey;
 
-  late MyselfPeer myselfPeer;
+  MyselfPeer? myselfPeer;
   PeerProfile? peerProfile;
   String? myselfPeerClient; // combine myselfPeer & peerProfile
-  late String password;
+  String? password;
   List<SimpleKeyPair> expiredKeys = [];
 
   /// signal协议
-  late String signalPublicKey;
-  late String signalPrivateKey;
+  String? signalPublicKey;
+  String? signalPrivateKey;
 }
 
 ///全集唯一的当前用户，存放在内存中，当前重新登录时里面的值会钱换到新的值

@@ -51,9 +51,11 @@ class SecurityPayload {
     result.NeedCompress = securityParams.NeedCompress;
     // 1.设置签名（本地保存前加密不签名）
     var targetPeerId = securityParams.TargetPeerId;
+    var myselfPeer = myself.myselfPeer;
     if (securityParams.NeedEncrypt &&
         targetPeerId != null &&
-        !targetPeerId.contains(myself.myselfPeer.peerId)) {
+        myselfPeer != null &&
+        !targetPeerId.contains(myselfPeer.peerId)) {
       var payloadSignature = await cryptoGraphy.sign(data, privateKey);
       result.PayloadSignature = CryptoUtil.uint8ListToStr(payloadSignature);
       if (myself.expiredKeys.isNotEmpty) {
@@ -76,9 +78,10 @@ class SecurityPayload {
     }
     if (securityParams.NeedEncrypt == true) {
       //3. 数据加密，base64
-      var targetPublicKey = null;
+      var targetPublicKey;
       if (targetPeerId != null &&
-          !targetPeerId.contains(myself.myselfPeer.peerId)) {
+          myselfPeer != null &&
+          !targetPeerId.contains(myselfPeer.peerId)) {
         targetPublicKey =
             await PeerClientService.instance.getPublic(targetPeerId);
       } else {
@@ -128,9 +131,10 @@ class SecurityPayload {
   static Future<dynamic> decrypt(
       dynamic transportPayload, SecurityParams securityParams) async {
     var targetPeerId = securityParams.TargetPeerId;
+    var myselfPeer = myself.myselfPeer;
     // 本地保存前加密targetPeerId可为空
     if (targetPeerId == null ||
-        targetPeerId.contains(myself.myselfPeer.peerId)) {
+        (myselfPeer != null && targetPeerId == myselfPeer.peerId)) {
       // 消息的数据部分，base64
       List<int> data = CryptoUtil.decodeBase64(transportPayload);
       var needEncrypt = securityParams.NeedEncrypt;
@@ -183,7 +187,7 @@ class SecurityPayload {
           var srcPublicKey = null;
           var srcPeerId = securityParams.SrcPeerId;
           if (srcPeerId != null &&
-              !srcPeerId.contains(myself.myselfPeer.peerId)) {
+              (myselfPeer != null && !srcPeerId.contains(myselfPeer.peerId))) {
             srcPublicKey =
                 await PeerClientService.instance.getPublic(srcPeerId);
           } else {

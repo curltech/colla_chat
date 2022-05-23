@@ -65,7 +65,7 @@ class MyselfPeerService extends PeerEntityService {
       throw 'SameNameAccountExists';
     }
     var myselfPeer = MyselfPeer();
-    myselfPeer.status = EntityStatus.Effective.toString();
+    myselfPeer.status = EntityStatus.Effective.name;
     myselfPeer.mobile = mobile;
     myselfPeer.email = email;
     myselfPeer.name = name;
@@ -95,7 +95,7 @@ class MyselfPeerService extends PeerEntityService {
     }
     var peerProfile = PeerProfile();
     peerProfile.peerId = peerId;
-    peerProfile.status = EntityStatus.Effective.toString();
+    peerProfile.status = EntityStatus.Effective.name;
     peerProfile.clientId = myselfPeer.id.toString();
     var platformParams = await PlatformParams.instance;
     peerProfile.clientType = platformParams.clientType;

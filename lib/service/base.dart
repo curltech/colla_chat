@@ -160,11 +160,11 @@ abstract class BaseService {
   }
 
   Future<List<Map>> findEffective() async {
-    return await findByStatus(EntityStatus.Effective.toString());
+    return await findByStatus(EntityStatus.Effective.name);
   }
 
   Future<Map?> findOneEffective() async {
-    var es = await findByStatus(EntityStatus.Effective.toString());
+    var es = await findByStatus(EntityStatus.Effective.name);
     if (es.isNotEmpty) {
       return es[0];
     }

@@ -25,7 +25,7 @@ abstract class PeerLocationService extends BaseService {
     var peers = await findByPeerId(peerId);
     if (peers.isNotEmpty) {
       for (var peer in peers) {
-        if (peer['status'] == EntityStatus.Effective.toString()) {
+        if (peer['status'] == EntityStatus.Effective.name) {
           return peer;
         }
       }
@@ -46,7 +46,7 @@ abstract class PeerLocationService extends BaseService {
     var peers = await findByName(name);
     if (peers.isNotEmpty) {
       for (var peer in peers) {
-        if (peer['status'] == EntityStatus.Effective.toString()) {
+        if (peer['status'] == EntityStatus.Effective.name) {
           return peer;
         }
       }
@@ -69,7 +69,7 @@ abstract class PeerEntityService extends PeerLocationService {
     var peers = await findByMobile(mobile);
     if (peers.isNotEmpty) {
       for (var peer in peers) {
-        if (peer['status'] == EntityStatus.Effective.toString()) {
+        if (peer['status'] == EntityStatus.Effective.name) {
           return peer;
         }
       }
@@ -90,7 +90,7 @@ abstract class PeerEntityService extends PeerLocationService {
     var peers = await findByEmail(email);
     if (peers.isNotEmpty) {
       for (var peer in peers) {
-        if (peer['status'] == EntityStatus.Effective.toString()) {
+        if (peer['status'] == EntityStatus.Effective.name) {
           return peer;
         }
       }
