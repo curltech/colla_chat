@@ -119,7 +119,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
     await appParams.saveAppParams();
     var loginStatus = await myselfPeerService.login(_credential, _password);
     if (loginStatus) {
-      Application.router.navigateTo(context, Routes.index, replace: true);
+      Application.router.navigateTo(context, Routes.mobileIndex, replace: true);
     }
   }
 }

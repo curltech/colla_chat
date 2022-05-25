@@ -1,9 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 
 import '../../../app.dart';
 import '../../../routers/application.dart';
 import '../../../routers/routes.dart';
 import '../../../service/dht/myselfpeer.dart';
+import '../../../tool/util.dart';
 
 /// 远程登录组件，一个card下的录入框和按钮组合
 class P2pRegisterWidget extends StatefulWidget {
@@ -17,6 +21,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
   final _formKey = GlobalKey<FormState>();
   String _name = '胡劲松';
   String _loginName = 'hujs';
+  String _countryCode = 'CN';
   String _mobile = '13609619603';
   String _email = 'hujs@colla.cc';
   String _plainPassword = '1234';
@@ -67,6 +72,27 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           Padding(
+            padding: EdgeInsets.symmetric(horizontal: 15.0),
+            child: IntlPhoneField(
+              initialCountryCode: _countryCode,
+              initialValue: _mobile,
+              decoration: InputDecoration(
+                labelText: '电话',
+              ),
+              onChanged: (phone) {
+                setState(() {
+                  _mobile = phone.completeNumber;
+                });
+              },
+              onCountryChanged: (country) {
+                setState(() {
+                  _countryCode = country.name;
+                });
+              },
+            ),
+          ),
+          SizedBox(height: 10.0),
+          Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
               child: TextFormField(
                 //controller: nameController,
@@ -95,23 +121,6 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
                 onChanged: (String val) {
                   setState(() {
                     _loginName = val;
-                  });
-                },
-                onFieldSubmitted: (String val) {},
-              )),
-          SizedBox(height: 10.0),
-          Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextFormField(
-                //controller: mobileController,
-                decoration: InputDecoration(
-                  labelText: '手机',
-                  prefixIcon: Icon(Icons.mobile_friendly),
-                ),
-                initialValue: _mobile,
-                onChanged: (String val) {
-                  setState(() {
-                    _mobile = val;
                   });
                 },
                 onFieldSubmitted: (String val) {},
@@ -217,7 +226,8 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
           _name, _loginName, _plainPassword,
           mobile: _mobile, email: _email);
       if (registerStatus) {
-        Application.router.navigateTo(context, Routes.index, replace: true);
+        Application.router
+            .navigateTo(context, Routes.mobileIndex, replace: true);
       }
     } else {
       logger.e('password is not matched');

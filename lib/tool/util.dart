@@ -1,12 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:html';
 import 'dart:io';
 import 'dart:ui';
 
 import 'package:colla_chat/platform.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:mobile_number/mobile_number.dart';
+import 'package:phone_numbers_parser/phone_numbers_parser.dart'
+    as phone_numbers_parser;
 import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:phone_number/phone_number.dart' as phone_number;
@@ -121,6 +122,35 @@ class PhoneNumberUtil {
 
     return code;
   }
+
+  static phone_numbers_parser.PhoneNumber fromNational(
+      phone_numbers_parser.IsoCode isoCode, String phoneNumber) {
+    return phone_numbers_parser.PhoneNumber.fromNational(isoCode, phoneNumber);
+  }
+
+  static phone_numbers_parser.PhoneNumber fromIsoCode(
+      phone_numbers_parser.IsoCode isoCode, String phoneNumber) {
+    return phone_numbers_parser.PhoneNumber.fromNational(isoCode, phoneNumber);
+  }
+
+  static phone_numbers_parser.PhoneNumber fromRaw(String phoneNumber) {
+    return phone_numbers_parser.PhoneNumber.fromRaw(phoneNumber);
+  }
+
+  static phone_numbers_parser.PhoneNumber fromCountryCode(
+      String countryCode, String phoneNumber) {
+    return phone_numbers_parser.PhoneNumber.fromCountryCode(
+        countryCode, phoneNumber);
+  }
+
+  static isValid(phone_numbers_parser.PhoneNumber phoneNumber,
+      phone_numbers_parser.PhoneNumberType type) {
+    return phoneNumber.validate(type: type);
+  }
+
+  static formatNsn(phone_numbers_parser.PhoneNumber phoneNumber) {
+    return phoneNumber.getFormattedNsn();
+  }
 }
 
 class VersionUtil {}
@@ -185,6 +215,15 @@ class EntityUtil {
     var id = getId(map);
     if (id == null) {
       map.remove('id');
+    }
+  }
+
+  static removeNull(Map map) {
+    for (var key in map.keys) {
+      var value = map[key];
+      if (value == null) {
+        map.remove(key);
+      }
     }
   }
 }

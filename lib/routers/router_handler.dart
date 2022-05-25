@@ -3,6 +3,8 @@ import 'package:colla_chat/pages/stock/login/remote_login.dart';
 import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
 
+import '../pages/chat/index/desktop_index.dart';
+import '../pages/chat/index/mobile_index.dart';
 import '../pages/chat/login/p2p_login.dart';
 
 //加载页
@@ -26,9 +28,16 @@ Handler p2pLoginHandler = Handler(
 });
 
 // 首页
-Handler indexHandler = Handler(
+Handler mobileIndexHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
-  return const Loading(
+  return const MobileIndex(
+    title: '',
+  );
+});
+
+Handler desktopIndexHandler = Handler(
+    handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
+  return const DesktopIndex(
     title: '',
   );
 });

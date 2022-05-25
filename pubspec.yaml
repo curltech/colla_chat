@@ -49,7 +49,7 @@ dependencies:
   network_info_plus: ^2.1.3
   beamer: ^1.4.1+1
   sensors_plus: ^1.3.1
-  battery_plus: "^0.0.1"
+  battery_plus: ^2.1.3
   #contacts_service: ^0.4.6
   # 存储
   shared_preferences: ^2.0.10
@@ -85,6 +85,8 @@ dependencies:
   share_plus: ^4.0.4
   #logging: ^1.0.2
   country_pickers: ^2.0.0
+  #international_phone_input: ^1.0.4
+  phone_numbers_parser: any
   font_awesome_flutter: ^10.1.0
   onesignal_flutter: ^3.3.0
   flushbar: ^1.10.4
@@ -108,15 +110,15 @@ dependencies:
   extended_text_field: ^10.1.0 #文字表情混入
   extended_text_library: ^9.1.0 #Flutter2.5用这个,,其他可注释
   azlistview: ^2.0.0 #特殊列表滑动
-  webview_flutter: ^2.0.2 #web显示
-  flutter_echarts: ^2.3.0
+  webview_flutter: ^3.0.4 #web显示
+  # flutter_echarts: ^2.3.0
   fluent_ui: ^3.12.0
   macos_ui: ^1.4.1
   flutter_material_color_picker: ^1.1.0+2
   animated_text_kit: ^4.2.1
   after_layout: ^1.1.0
   snapping_sheet: ^3.1.0
-  google_fonts: ^2.1.0
+  google_fonts: ^3.0.1
   material_design_icons_flutter: ^5.0.6295
   #flutter_bloc: ^6.1.0
   #flutter_swiper: 1.1.6 # Flutter 轮播图 https://github.com/best-flutter/flutter_swiper
@@ -126,7 +128,7 @@ dependencies:
   dart_webrtc: ^1.0.5
   livekit_client: ^1.0.0
   # 多媒体
-  photo_view: ^0.13.0 #图片显示
+  photo_view: ^0.14.0 #图片显示
   flutter_sound: ^9.2.12 #音频处理
   audioplayers: ^0.20.1 #音频处理
   video_player: ^2.1.1 #视频播放
@@ -139,11 +141,11 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   # 参考学习
-  stream_chat_flutter: ^4.0.0
-  stream_chat_flutter_core: ^4.1.0
-  stream_chat: ^4.1.0
-  stream_chat_persistence: ^4.1.0
-  stream_chat_localizations: ^3.1.0
+  #stream_chat_flutter: ^4.0.0
+  #stream_chat_flutter_core: ^4.1.0
+  #stream_chat: ^4.1.0
+  #stream_chat_persistence: ^4.1.0
+  #stream_chat_localizations: ^3.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
