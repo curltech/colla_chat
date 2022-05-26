@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'message_data.dart';
+import '../chat/message_data.dart';
 
 class MessageItem extends StatefulWidget {
   const MessageItem({Key? key}) : super(key: key);

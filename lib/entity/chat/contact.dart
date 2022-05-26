@@ -34,7 +34,7 @@ enum ActiveStatus { DOWN, UP }
 class Linkman extends StatusEntity {
   String? ownerPeerId; // 区分本地不同peerClient属主
   String? peerId; // peerId
-  String? name; // 用户名
+  late String name; // 用户名
   String? pyName; // 用户名拼音
   String? mobile; // 手机号
   String? avatar; // 头像
