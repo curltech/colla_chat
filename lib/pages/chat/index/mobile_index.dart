@@ -92,14 +92,16 @@ class _MobileIndexState extends State<MobileIndex> {
         ],
       ),
     );
+    List<Widget> children = <Widget>[
+      MessagePage(title: ''),
+      LinkmanList(),
+      Channel(),
+      Me()
+    ];
     return Scaffold(
         body: Center(
-            child: IndexedStack(index: _currentIndex, children: <Widget>[
-          MessagePage(title: ''),
-          LinkmanList(),
-          Channel(),
-          Me()
-        ])),
+            child: IndexedStack(
+                index: 0, children: <Widget>[children[_currentIndex]])),
         drawer: drawer,
         bottomNavigationBar: bottomNavigationBar);
   }

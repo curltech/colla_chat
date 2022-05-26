@@ -1,9 +1,6 @@
-import 'package:colla_chat/entity/dht/myself.dart';
-import 'package:colla_chat/service/dht/myself.dart';
 import 'package:flutter/material.dart';
 
 import '../../../app.dart';
-import '../../../entity/stock/user.dart';
 import '../../../routers/application.dart';
 import '../../../routers/routes.dart';
 import '../../../service/dht/myselfpeer.dart';
