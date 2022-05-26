@@ -1,6 +1,10 @@
+import 'package:colla_chat/pages/chat/channel/channel.dart';
+import 'package:colla_chat/pages/chat/chat/message_page.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman_list.dart';
 import 'package:flutter/material.dart';
 
 import '../../../platform.dart';
+import '../me/me.dart';
 
 class MobileIndex extends StatefulWidget {
   final String title;
@@ -90,8 +94,12 @@ class _MobileIndexState extends State<MobileIndex> {
     );
     return Scaffold(
         body: Center(
-          child: Text(_widgetOptions.elementAt(_currentIndex)),
-        ),
+            child: IndexedStack(index: _currentIndex, children: <Widget>[
+          MessagePage(title: ''),
+          LinkmanList(),
+          Channel(),
+          Me()
+        ])),
         drawer: drawer,
         bottomNavigationBar: bottomNavigationBar);
   }
