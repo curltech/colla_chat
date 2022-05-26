@@ -4,6 +4,7 @@ import '../datastore/indexeddb.dart';
 import '../datastore/sqflite.dart';
 import '../platform.dart';
 import 'base.dart';
+import 'chat/contact.dart';
 import 'dht/chainapp.dart';
 import 'dht/myselfpeer.dart';
 import 'dht/peerclient.dart';
@@ -58,6 +59,74 @@ class ServiceLocator {
         ],
         fields: []);
     services['myselfPeerService'] = myselfPeerService;
+
+    var linkmanService = await LinkmanService.init(
+        tableName: 'chat_linkman',
+        indexFields: [
+          'givenName',
+          'name',
+          'ownerPeerId',
+          'peerId',
+          'mobile',
+          'collectionType'
+        ],
+        fields: []);
+    services['linkmanService'] = linkmanService;
+
+    var linkmanTagService = await LinkmanTagService.init(
+        tableName: "chat_linkmanTag",
+        indexFields: ['ownerPeerId', 'createDate', 'name'],
+        fields: []);
+    services['linkmanService'] = linkmanService;
+
+    var linkmanTagLinkmanService = await LinkmanTagLinkmanService.init(
+        tableName: "chat_linkmanTagLinkman",
+        indexFields: ['ownerPeerId', 'createDate', 'tagId', 'linkmanPeerId'],
+        fields: []);
+    services['linkmanTagLinkmanService'] = linkmanTagLinkmanService;
+
+    var linkmanRequestService = await LinkmanRequestService.init(
+        tableName: "chat_linkmanRequest",
+        indexFields: [
+          'ownerPeerId',
+          'createDate',
+          'receiverPeerId',
+          'senderPeerId',
+          'status'
+        ],
+        fields: []);
+    services['linkmanRequestService'] = linkmanRequestService;
+
+    var groupService =
+        await GroupService.init(tableName: "chat_group", indexFields: [
+      'givenName',
+      'name',
+      'description',
+      'ownerPeerId',
+      'createDate',
+      'groupId',
+      'groupCategory',
+      'groupType'
+    ], fields: []);
+    services['groupService'] = groupService;
+
+    var groupMemberService = await GroupMemberService.init(
+        tableName: "chat_groupmember",
+        indexFields: [
+          'ownerPeerId',
+          'createDate',
+          'groupId',
+          'memberPeerId',
+          'memberType'
+        ],
+        fields: []);
+    services['groupMemberService'] = groupMemberService;
+
+    var contactService = await ContactService.init(
+        tableName: "chat_contact",
+        indexFields: ['peerId', 'mobile', 'formattedName', 'name'],
+        fields: []);
+    services['contactService'] = contactService;
 
     PlatformParams platformParams = await PlatformParams.instance;
     if (platformParams.web) {

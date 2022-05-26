@@ -7,9 +7,7 @@ import '../service/base.dart';
 import '../service/servicelocator.dart';
 import 'datastore.dart';
 
-/**
- * 适用于移动手机（无数据限制），electron和chrome浏览器的sqlite3的数据库（50M数据限制）
- */
+/// 适用于移动手机（无数据限制），electron和chrome浏览器的sqlite3的数据库（50M数据限制）
 class IndexedDb extends DataStore {
   static IndexedDb instance = IndexedDb();
   static bool initStatus = false;
@@ -40,32 +38,24 @@ class IndexedDb extends DataStore {
     return instance;
   }
 
-  /**
-   * 关闭数据库
-   */
+  /// 关闭数据库
   close() {
     db.close();
   }
 
-  /**
-   * 删除数据库
-   * @param {*} options
-   */
+  /// 删除数据库
+  /// @param {*} options
   remove({name = 'colla_chat.db', location = 'default'}) async {}
 
-  /**
-   * 批量执行sql，参数是二维数组
-   * @param {*} sqls
-   * @param {*} params
-   */
+  /// 批量执行sql，参数是二维数组
+  /// @param {*} sqls
+  /// @param {*} params
   @override
   execute(List<Sql> sqls) {}
 
-  /**
-   * 执行单条sql
-   * @param {*} sqls
-   * @param {*} params
-   */
+  /// 执行单条sql
+  /// @param {*} sqls
+  /// @param {*} params
   @override
   dynamic run(Sql sql) {}
 
@@ -84,10 +74,8 @@ class IndexedDb extends DataStore {
     return store;
   }
 
-  /**
-   * 删除表
-   * @param {*} tableName
-   */
+  /// 删除表
+  /// @param {*} tableName
   drop(String tableName) async {
     var txn = db.transaction(tableName, "readonly");
     var store = txn.objectStore(tableName);
@@ -224,12 +212,10 @@ class IndexedDb extends DataStore {
     return page;
   }
 
-  /**
-   * 查询单条记录
-   * @param {*} tableName
-   * @param {*} fields
-   * @param {*} condition
-   */
+  /// 查询单条记录
+  /// @param {*} tableName
+  /// @param {*} fields
+  /// @param {*} condition
   @override
   Future<Map?> findOne(String table,
       {bool? distinct,
@@ -278,11 +264,9 @@ class IndexedDb extends DataStore {
     return key as int;
   }
 
-  /**
-   * 删除记录
-   * @param {*} tableName
-   * @param {*} condition
-   */
+  /// 删除记录
+  /// @param {*} tableName
+  /// @param {*} condition
   @override
   Future<int> delete(String table,
       {dynamic entity, String? where, List<Object>? whereArgs}) async {
@@ -302,12 +286,10 @@ class IndexedDb extends DataStore {
     return 0;
   }
 
-  /**
-   * 更新记录
-   * @param {*} tableName
-   * @param {*} entity
-   * @param {*} condition
-   */
+  /// 更新记录
+  /// @param {*} tableName
+  /// @param {*} entity
+  /// @param {*} condition
   @override
   Future<int> update(String table, dynamic entity,
       {String? where, List<Object>? whereArgs}) async {
@@ -335,11 +317,9 @@ class IndexedDb extends DataStore {
     }
   }
 
-  /**
-   * 在一个事务里面执行多个操作（insert,update,devare)
-   * operators是一个operator对象的数组，operator有四个属性（type，tableName，entity，condition）
-   * @param {*} operators
-   */
+  /// 在一个事务里面执行多个操作（insert,update,devare)
+  /// operators是一个operator对象的数组，operator有四个属性（type，tableName，entity，condition）
+  /// @param {*} operators
   @override
   Future<Object?> transaction(List<Map<String, dynamic>> operators) async {
     for (var i = 0; i < operators.length; ++i) {

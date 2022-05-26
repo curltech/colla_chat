@@ -46,6 +46,10 @@ abstract class BaseService {
         offset: offset);
   }
 
+  Future<List<Map>> findAll() {
+    return find(null);
+  }
+
   /// 原生的查询
   Future<List<Map>> find(String? where,
       {bool? distinct,
@@ -103,7 +107,7 @@ abstract class BaseService {
     List<Object> whereArgs = [];
     for (var key in whereBean.keys) {
       var value = whereBean[key];
-      where = where + ' and ' + key + '=?';
+      where = '$where and $key=?';
       whereArgs.add(value!);
     }
     return dataStore.find(tableName,
