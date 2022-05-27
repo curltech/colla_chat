@@ -14,7 +14,7 @@ class ChatMessageData {
 /// 访问方法：Provider
 ///         .of<WebsocketProvider>(context)
 ///         .messages;
-class WebsocketProvider with ChangeNotifier {
+class WebsocketMessageProvider with ChangeNotifier {
   List<ChatMessageData> messages = [];
 
   ///这个方法需要被websocket的监听回调函数调用，把收到的信息处理后传过来

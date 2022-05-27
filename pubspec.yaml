@@ -98,7 +98,7 @@ dependencies:
   flutter_multi_formatter: ^2.5.1
   phone_number: ^0.12.0+2
   #sim_info: ^0.1.3
-  phone_form_field: ^6.0.0
+  phone_form_field: ^6.1.0
   #flutter-international-phone-input:
   intl_phone_field: ^3.1.0
   mobile_number: ^1.0.4
@@ -139,6 +139,9 @@ dependencies:
   #本地化
   lpinyin: ^2.0.3 #拼音
   wechat_assets_picker: ^7.3.0 #微信图库
+  intl: ^0.17.0
+  #intl_translation: any
+  #intl_translation_format: any
   flutter_localizations:
     sdk: flutter
   # 参考学习
@@ -168,6 +171,7 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+  generate: true
 
   # To add assets to your application, add an assets section, like this:
   assets:

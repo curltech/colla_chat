@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../websocket_provider.dart';
+import '../../../provider/websocket_message.dart';
 
 /// 我发送的消息展示组件，展示在右边
 class ChatMeMessage extends StatefulWidget {

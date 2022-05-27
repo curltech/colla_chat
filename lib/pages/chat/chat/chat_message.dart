@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../app.dart';
-import '../websocket_provider.dart';
+import '../../../provider/websocket_message.dart';
 
 /// 消息发送和接受展示的界面组件
 /// 此界面展示特定的目标对象的收到的消息，并且可以发送消息
@@ -71,7 +71,7 @@ class _ChatMessageState extends State<ChatMessage>
   Widget messageItem(BuildContext context, int index) {
     // 通过websocket获取消息
     List<ChatMessageData> messages =
-        Provider.of<WebsocketProvider>(context).messages;
+        Provider.of<WebsocketMessageProvider>(context).messages;
     ChatMessageData item = messages[index];
     // 创建消息动画控制器
     var animate =
@@ -109,10 +109,10 @@ class _ChatMessageState extends State<ChatMessage>
   Widget build(BuildContext context) {
     return Column(children: <Widget>[
       //使用Consumer来获取WebSocketProvider对象
-      Consumer<WebsocketProvider>(builder: (BuildContext context,
-          WebsocketProvider websocketProvider, Widget? child) {
+      Consumer<WebsocketMessageProvider>(builder: (BuildContext context,
+          WebsocketMessageProvider websocketmessageProvider, Widget? child) {
         //获取消息列表数据
-        var messages = websocketProvider.messages;
+        var messages = websocketmessageProvider.messages;
         return Flexible(
           //使用列表渲染消息
           child: ListView.builder(

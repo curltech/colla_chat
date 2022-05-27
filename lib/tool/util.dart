@@ -66,6 +66,36 @@ class TypeUtil {
   }
 }
 
+class StringUtil {
+  // 是否是空字符串
+  static bool isEmptyString(String str) {
+    if (str == null || str.isEmpty) {
+      return true;
+    }
+    return false;
+  }
+
+  // 是否不是空字符串
+  static bool isNotEmptyString(String str) {
+    if (str != null && str.isNotEmpty) {
+      return true;
+    }
+    return false;
+  }
+
+  /// 匹配
+  static bool matches(String regex, String input) {
+    if (input == null || input.isEmpty) return false;
+    return new RegExp(regex).hasMatch(input);
+  }
+
+  /// 纯数字 ^[0-9]*$
+  static bool pureDigitCharacters(String input) {
+    final String regex = "^[0-9]*\$";
+    return matches(regex, input);
+  }
+}
+
 /**
  * 只支持android，获取手机号码
  */
@@ -122,6 +152,24 @@ class PhoneNumberUtil {
     String code = await phone_number.PhoneNumberUtil().carrierRegionCode();
 
     return code;
+  }
+
+  // 格式化手机号为344
+  static String formatMobile344(String mobile) {
+    if (StringUtil.isEmptyString(mobile)) return '';
+    mobile =
+        mobile.replaceAllMapped(new RegExp(r"(^\d{3}|\d{4}\B)"), (Match match) {
+      return '${match.group(0)} ';
+    });
+    if (mobile.endsWith(' ')) {
+      mobile = mobile.substring(0, mobile.length - 1);
+    }
+    return mobile;
+  }
+
+  // 电话格式化
+  static String formatPhone(String zoneCode, String mobile) {
+    return "+$zoneCode ${formatMobile344(mobile)}";
   }
 
   static phone_numbers_parser.PhoneNumber fromNational(
@@ -471,17 +519,17 @@ class ContactUtil {
     FlutterContacts.addListener(fn);
   }
 
-  // Insert new contact
-  // final newContact = Contact()
-  //   ..name.first = 'John'
-  //   ..name.last = 'Smith'
-  //   ..phones = [Phone('555-123-4567')];
-  // await newContact.insert();
-  //
-  // // Update contact
-  // contact.name.first = 'Bob';
-  // await contact.update();
-  //
-  // // Delete contact
-  // await contact.delete();
+// Insert new contact
+// final newContact = Contact()
+//   ..name.first = 'John'
+//   ..name.last = 'Smith'
+//   ..phones = [Phone('555-123-4567')];
+// await newContact.insert();
+//
+// // Update contact
+// contact.name.first = 'Bob';
+// await contact.update();
+//
+// // Delete contact
+// await contact.delete();
 }

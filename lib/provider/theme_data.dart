@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class AppProfile with ChangeNotifier {
+class ThemeDataProvider with ChangeNotifier {
   ThemeData _themeData = ThemeData(primarySwatch: Colors.cyan);
 
   ThemeData get themeData {
