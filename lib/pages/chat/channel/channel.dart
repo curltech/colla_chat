@@ -1,37 +1,32 @@
 import 'package:flutter/material.dart';
 
-import '../../../widgets/data_tile.dart';
-import '../../../widgets/document_tile.dart';
+import '../../../widgets/data_listview.dart';
 
-final List<DocumentData> channelTileData = [
-  DocumentData(
-    icon: const Icon(Icons.collections),
-    title: '胡劲松',
-  ),
-  DocumentData(
-    icon: const Icon(Icons.settings),
-    title: '胡百水',
-  )
-];
+final Map<String, List<TileData>> mockTileData = {
+  '未知': [
+    TileData(
+        icon: const Icon(Icons.collections),
+        title: '李志群',
+        routeName: '/chat/collection'),
+    TileData(
+        icon: const Icon(Icons.settings),
+        title: '胡百水',
+        routeName: '/chat/setting'),
+  ]
+};
 
-//频道页面
+//频道的页面
 class Channel extends StatelessWidget {
-  final List<DocumentData> documentData = channelTileData;
+  late final Map<String, List<TileData>> channelTileData = mockTileData;
 
   Channel({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> children = [];
-    for (var tile in documentData) {
-      var widget = DocumentTile(documentData: tile);
-      children.add(widget);
-    }
+    var body = DataListView(tileData: channelTileData);
     return Scaffold(
       //列表
-      body: ListView(
-        children: children,
-      ),
+      body: body,
     );
   }
 }

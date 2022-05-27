@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../widgets/data_tile.dart';
+import '../../../widgets/data_listview.dart';
 
-final List<List<TileData>> meTileData = [
-  [
+final Map<String, List<TileData>> mockTileData = {
+  '未知': [
     TileData(
         icon: const Icon(Icons.collections),
         title: '收藏',
@@ -12,41 +12,21 @@ final List<List<TileData>> meTileData = [
         icon: const Icon(Icons.settings),
         title: '设置',
         routeName: '/chat/setting'),
-  ],
-];
+  ]
+};
 
 //我的页面
 class Me extends StatelessWidget {
-  final List<List<TileData>> tileData = meTileData;
+  late final Map<String, List<TileData>> meTileData = mockTileData;
 
   Me({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> children = [];
-    for (var groupTile in tileData) {
-      for (var tile in groupTile) {
-        var widget = Container(
-            margin: const EdgeInsets.only(top: 20.0),
-            color: Colors.white,
-            child: Column(children: <Widget>[
-              DataTile(tileData: tile),
-              Padding(
-                padding: const EdgeInsets.only(left: 15.0, right: 15.0),
-                child: Divider(
-                  height: 0.5,
-                  color: Colors.grey,
-                ),
-              ),
-            ]));
-        children.add(widget);
-      }
-    }
+    var body = DataListView(tileData: meTileData);
     return Scaffold(
       //列表
-      body: ListView(
-        children: children,
-      ),
+      body: body,
     );
   }
 }

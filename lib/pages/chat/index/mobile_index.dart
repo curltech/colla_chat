@@ -1,9 +1,8 @@
 import 'package:colla_chat/pages/chat/channel/channel.dart';
-import 'package:colla_chat/pages/chat/chat/message_page.dart';
-import 'package:colla_chat/pages/chat/linkman/linkman_list.dart';
 import 'package:flutter/material.dart';
 
-import '../../../platform.dart';
+import '../chat/chat_target.dart';
+import '../linkman/linkman.dart';
 import '../me/me.dart';
 
 class MobileIndex extends StatefulWidget {
@@ -92,12 +91,7 @@ class _MobileIndexState extends State<MobileIndex> {
         ],
       ),
     );
-    List<Widget> children = <Widget>[
-      MessagePage(title: ''),
-      LinkmanList(),
-      Channel(),
-      Me()
-    ];
+    List<Widget> children = <Widget>[ChatTarget(), Linkman(), Channel(), Me()];
     return Scaffold(
         body: Center(
             child: IndexedStack(

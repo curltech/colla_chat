@@ -6,18 +6,20 @@ import 'package:provider/provider.dart';
 import '../../../app.dart';
 import '../websocket_provider.dart';
 
-class MessageChat extends StatefulWidget {
+/// 消息发送和接受展示的界面组件
+/// 此界面展示特定的目标对象的收到的消息，并且可以发送消息
+class ChatMessage extends StatefulWidget {
   final String title;
 
-  const MessageChat({Key? key, required this.title}) : super(key: key);
+  const ChatMessage({Key? key, required this.title}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return _MessageChatState();
+    return _ChatMessageState();
   }
 }
 
-class _MessageChatState extends State<MessageChat>
+class _ChatMessageState extends State<ChatMessage>
     with TickerProviderStateMixin {
   final TextEditingController textEditingController = TextEditingController();
   FocusNode textFocusNode = FocusNode();
@@ -68,9 +70,9 @@ class _MessageChatState extends State<MessageChat>
 
   Widget messageItem(BuildContext context, int index) {
     // 通过websocket获取消息
-    List<ChatMessage> messages =
+    List<ChatMessageData> messages =
         Provider.of<WebsocketProvider>(context).messages;
-    ChatMessage item = messages[index];
+    ChatMessageData item = messages[index];
     // 创建消息动画控制器
     var animate =
         AnimationController(vsync: this, duration: Duration(milliseconds: 500));

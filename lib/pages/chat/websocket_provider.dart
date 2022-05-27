@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class ChatMessage {
+/// 展示的消息数据
+class ChatMessageData {
   bool isMe = false;
   late String peerId;
   late String avatar;
@@ -14,9 +15,10 @@ class ChatMessage {
 ///         .of<WebsocketProvider>(context)
 ///         .messages;
 class WebsocketProvider with ChangeNotifier {
-  List<ChatMessage> messages = [];
+  List<ChatMessageData> messages = [];
 
-  void listenMessage(ChatMessage message) {
+  ///这个方法需要被websocket的监听回调函数调用，把收到的信息处理后传过来
+  void listenMessage(ChatMessageData message) {
     messages.insert(0, message);
     notifyListeners();
   }

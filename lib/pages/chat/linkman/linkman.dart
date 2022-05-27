@@ -1,29 +1,32 @@
-import 'package:colla_chat/pages/chat/linkman/linkman_list.dart';
 import 'package:flutter/material.dart';
 
-import '../../../entity/chat/contact.dart';
+import '../../../widgets/data_listview.dart';
 
-class Linkman extends StatefulWidget {
-  const Linkman({Key? key}) : super(key: key);
+final Map<String, List<TileData>> mockTileData = {
+  '未知': [
+    TileData(
+        icon: const Icon(Icons.collections),
+        title: '收藏',
+        routeName: '/chat/collection'),
+    TileData(
+        icon: const Icon(Icons.settings),
+        title: '设置',
+        routeName: '/chat/setting'),
+  ]
+};
 
-  @override
-  State<StatefulWidget> createState() {
-    return _LinkmanState();
-  }
-}
+//我的页面
+class Linkman extends StatelessWidget {
+  late final Map<String, List<TileData>> linkmanTileData = mockTileData;
 
-class _LinkmanState extends State<Linkman> {
-  late final Linkman linkman;
-
-  @override
-  void initState() {
-    super.initState();
-  }
+  Linkman({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: LinkmanList(),
+    var body = DataListView(tileData: linkmanTileData);
+    return Scaffold(
+      //列表
+      body: body,
     );
   }
 }
