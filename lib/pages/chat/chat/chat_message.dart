@@ -81,7 +81,7 @@ class _ChatMessageState extends State<ChatMessage>
     // 读取自己的用户id，判断是否是发送给自己的
     var myselfPeer = myself.myselfPeer;
     if (myselfPeer != null) {
-      String peerId = myselfPeer.peerId;
+      String? peerId = myselfPeer.peerId;
       if (peerId == item.peerId) {
         item.isMe = true;
       } else {

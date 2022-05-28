@@ -2,9 +2,9 @@ import 'base.dart';
 
 /// 本节点实体
 class MyselfPeer extends PeerEntity {
-  late String loginName;
-  late String peerPrivateKey = '';
-  late String privateKey = '';
+  String loginName = '';
+  String peerPrivateKey = '';
+  String privateKey = '';
   String signalPublicKey = '';
   String signalPrivateKey = '';
   String? loginStatus;

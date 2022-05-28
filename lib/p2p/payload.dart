@@ -52,10 +52,12 @@ class SecurityPayload {
     // 1.设置签名（本地保存前加密不签名）
     var targetPeerId = securityParams.TargetPeerId;
     var myselfPeer = myself.myselfPeer;
+    var peerId = myselfPeer?.peerId;
     if (securityParams.NeedEncrypt &&
         targetPeerId != null &&
         myselfPeer != null &&
-        !targetPeerId.contains(myselfPeer.peerId)) {
+        peerId != null &&
+        !targetPeerId.contains(peerId)) {
       var payloadSignature = await cryptoGraphy.sign(data, privateKey);
       result.PayloadSignature = CryptoUtil.uint8ListToStr(payloadSignature);
       if (myself.expiredKeys.isNotEmpty) {
@@ -81,7 +83,8 @@ class SecurityPayload {
       var targetPublicKey;
       if (targetPeerId != null &&
           myselfPeer != null &&
-          !targetPeerId.contains(myselfPeer.peerId)) {
+          peerId != null &&
+          !targetPeerId.contains(peerId)) {
         targetPublicKey =
             await PeerClientService.instance.getPublic(targetPeerId);
       } else {
@@ -181,13 +184,15 @@ class SecurityPayload {
         data = CryptoUtil.uncompress(data);
       }
       //3. 消息的数据部分，验证签名
+      var peerId = myselfPeer?.peerId;
       if (needEncrypt == true) {
         var payloadSignature = securityParams.PayloadSignature;
         if (payloadSignature != null) {
           var srcPublicKey = null;
           var srcPeerId = securityParams.SrcPeerId;
           if (srcPeerId != null &&
-              (myselfPeer != null && !srcPeerId.contains(myselfPeer.peerId))) {
+              peerId != null &&
+              (myselfPeer != null && !srcPeerId.contains(peerId))) {
             srcPublicKey =
                 await PeerClientService.instance.getPublic(srcPeerId);
           } else {

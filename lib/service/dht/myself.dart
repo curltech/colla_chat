@@ -74,8 +74,8 @@ class MyselfService {
     myself.publicKey = publicKey;
 
     //查找配置信息
-    var peer =
-        await peerProfileService.findOneEffectiveByPeerId(myselfPeer.peerId);
+    var peerId = myselfPeer.peerId;
+    var peer = await peerProfileService.findOneEffectiveByPeerId(peerId!);
     if (peer != null) {
       var peerProfile = PeerProfile.fromJson(peer);
       myself.peerProfile = peerProfile;

@@ -4,7 +4,6 @@ import 'package:colla_chat/platform.dart';
 import '../../entity/stock/account.dart';
 import '../../service/base.dart';
 import '../base.dart';
-import '../../datastore/indexeddb.dart';
 import '../../datastore/sqflite.dart';
 
 class StockAccountService extends BaseService {

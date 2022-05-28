@@ -1,5 +1,3 @@
-import 'package:colla_chat/datastore/indexeddb.dart';
-import 'package:colla_chat/transport/webclient.dart';
 import 'package:flutter/material.dart';
 
 import '../../../app.dart';

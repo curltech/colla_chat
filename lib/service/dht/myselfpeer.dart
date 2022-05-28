@@ -37,12 +37,17 @@ class MyselfPeerService extends PeerEntityService {
   }
 
   Future<Map?> findOneByLogin(String credential) async {
-    Map<dynamic, dynamic>? peer = await findOneEffectiveByMobile(credential);
-    peer ??= await findOneEffectiveByPeerId(credential);
-    peer ??= await findOneEffectiveByName(credential);
-    peer ??= await findOneEffectiveByEmail(credential);
-
-    return peer;
+    var where = 'peerId=? or mobile=? or name=? or email=?';
+    var whereArgs = [credential, credential, credential, credential];
+    var peers = await find(where, whereArgs: whereArgs);
+    if (peers.isNotEmpty) {
+      for (var peer in peers) {
+        if (peer['status'] == EntityStatus.Effective.name) {
+          return peer;
+        }
+      }
+    }
+    return null;
   }
 
   /// 注册新的p2p账户
@@ -88,8 +93,8 @@ class MyselfPeerService extends PeerEntityService {
     myself.myselfPeer = myselfPeer;
 
     // 初始化profile
-    String peerId = myselfPeer.peerId;
-    var profile = await peerProfileService.findOneEffectiveByPeerId(peerId);
+    String? peerId = myselfPeer.peerId;
+    var profile = await peerProfileService.findOneEffectiveByPeerId(peerId!);
     if (profile != null) {
       await peerProfileService.delete(profile);
     }

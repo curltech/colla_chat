@@ -2,7 +2,6 @@ import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/service/stock/account.dart';
 import 'package:colla_chat/tool/util.dart';
 
-import '../datastore/indexeddb.dart';
 import '../datastore/sqflite.dart';
 import '../entity/chat/contact.dart';
 import '../entity/dht/chainapp.dart';
@@ -35,43 +34,43 @@ class ServiceLocator {
         indexFields: ['accountId', 'accountName', 'status', 'updateDate']);
     services['accountService'] = accountService;
 
-    // var chainAppService = await ChainAppService.init(
-    //     tableName: "blc_chainApp",
-    //     fields: buildFields(ChainApp(), []),
-    //     indexFields: []);
-    // services['chainAppService'] = chainAppService;
-    //
-    // var peerProfileService = await PeerProfileService.init(
-    //     tableName: "blc_peerProfile",
-    //     fields: buildFields(PeerProfile(), []),
-    //     indexFields: ['peerId']);
-    // services['peerProfileService'] = peerProfileService;
-    //
-    // var peerEndpointService = await PeerEndpointService.init(
-    //     tableName: "blc_peerEndpoint",
-    //     fields: buildFields(PeerEndpoint(), []),
-    //     indexFields: ['ownerPeerId', 'priority', 'address']);
-    // services['peerEndpointService'] = peerEndpointService;
-    //
-    // var peerClientService = await PeerClientService.init(
-    //     tableName: "blc_peerClient",
-    //     indexFields: ['peerId', 'name', 'mobile'],
-    //     fields: buildFields(PeerClient(), []));
-    // services['peerClientService'] = peerClientService;
-    //
-    // var myselfPeerService = await MyselfPeerService.init(
-    //     tableName: "blc_myselfPeer",
-    //     indexFields: [
-    //       'endDate',
-    //       'peerId',
-    //       'name',
-    //       'mobile',
-    //       'email',
-    //       'status',
-    //       'updateDate'
-    //     ],
-    //     fields: buildFields(MyselfPeer(), []));
-    // services['myselfPeerService'] = myselfPeerService;
+    var chainAppService = await ChainAppService.init(
+        tableName: "blc_chainApp",
+        fields: buildFields(ChainApp(), []),
+        indexFields: []);
+    services['chainAppService'] = chainAppService;
+
+    var peerProfileService = await PeerProfileService.init(
+        tableName: "blc_peerProfile",
+        fields: buildFields(PeerProfile(), []),
+        indexFields: ['peerId']);
+    services['peerProfileService'] = peerProfileService;
+
+    var peerEndpointService = await PeerEndpointService.init(
+        tableName: "blc_peerEndpoint",
+        fields: buildFields(PeerEndpoint(), []),
+        indexFields: ['ownerPeerId', 'priority', 'address']);
+    services['peerEndpointService'] = peerEndpointService;
+
+    var peerClientService = await PeerClientService.init(
+        tableName: "blc_peerClient",
+        indexFields: ['peerId', 'name', 'mobile'],
+        fields: buildFields(PeerClient(), []));
+    services['peerClientService'] = peerClientService;
+
+    var myselfPeerService = await MyselfPeerService.init(
+        tableName: "blc_myselfPeer",
+        indexFields: [
+          'endDate',
+          'peerId',
+          'name',
+          'mobile',
+          'email',
+          'status',
+          'updateDate'
+        ],
+        fields: buildFields(MyselfPeer(), []));
+    services['myselfPeerService'] = myselfPeerService;
     //
     // var linkmanService = await LinkmanService.init(
     //     tableName: 'chat_linkman',

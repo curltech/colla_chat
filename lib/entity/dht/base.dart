@@ -9,16 +9,16 @@ enum ActiveStatus { Up, Down }
 /// 通过peerId和address表明自己的位置，包含有ed25519和x25519两个公钥
 abstract class PeerLocation extends StatusEntity {
   /// ed25519的公钥,表明身份,用于人，设备，如果是libp2p节点直接使用libp2p的id
-  late String peerId;
+  String? peerId;
   String? kind;
   String? name;
   String? securityContext;
 
   ///   ed25519的公私钥,表明身份，用于签名
-  late String peerPublicKey;
+  String peerPublicKey = '';
 
   /// x25519的公私钥,加解密，交换信息
-  late String publicKey;
+  String publicKey = '';
   String? address;
   String? lastUpdateTime;
   PeerLocation();
