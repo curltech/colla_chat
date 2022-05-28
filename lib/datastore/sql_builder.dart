@@ -17,7 +17,7 @@ class SqlBuilder {
       [List<String>? indexFields]) {
     List<String> clauses = [];
     var query =
-        'CREATE TABLE IF NOT EXISTS $tableName(id INT PRIMARY KEY AUTOINCREMENT NOT NULL,';
+        'CREATE TABLE IF NOT EXISTS $tableName(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,';
     var i = 0;
     for (var field in fields) {
       if (i == 0) {
@@ -31,7 +31,9 @@ class SqlBuilder {
     clauses.add(query);
 
     for (var indexField in indexFields!) {
-      query = 'CREATE INDEX index_name ON $tableName($indexField)';
+      query = 'CREATE INDEX $tableName' +
+          '_' +
+          '$indexField ON $tableName($indexField)';
       clauses.add(query);
     }
 

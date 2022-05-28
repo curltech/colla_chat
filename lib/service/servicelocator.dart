@@ -35,113 +35,114 @@ class ServiceLocator {
         indexFields: ['accountId', 'accountName', 'status', 'updateDate']);
     services['accountService'] = accountService;
 
-    var chainAppService = await ChainAppService.init(
-        tableName: "blc_chainApp",
-        fields: buildFields(ChainApp(), []),
-        indexFields: []);
-    services['chainAppService'] = chainAppService;
+    // var chainAppService = await ChainAppService.init(
+    //     tableName: "blc_chainApp",
+    //     fields: buildFields(ChainApp(), []),
+    //     indexFields: []);
+    // services['chainAppService'] = chainAppService;
+    //
+    // var peerProfileService = await PeerProfileService.init(
+    //     tableName: "blc_peerProfile",
+    //     fields: buildFields(PeerProfile(), []),
+    //     indexFields: ['peerId']);
+    // services['peerProfileService'] = peerProfileService;
+    //
+    // var peerEndpointService = await PeerEndpointService.init(
+    //     tableName: "blc_peerEndpoint",
+    //     fields: buildFields(PeerEndpoint(), []),
+    //     indexFields: ['ownerPeerId', 'priority', 'address']);
+    // services['peerEndpointService'] = peerEndpointService;
+    //
+    // var peerClientService = await PeerClientService.init(
+    //     tableName: "blc_peerClient",
+    //     indexFields: ['peerId', 'name', 'mobile'],
+    //     fields: buildFields(PeerClient(), []));
+    // services['peerClientService'] = peerClientService;
+    //
+    // var myselfPeerService = await MyselfPeerService.init(
+    //     tableName: "blc_myselfPeer",
+    //     indexFields: [
+    //       'endDate',
+    //       'peerId',
+    //       'name',
+    //       'mobile',
+    //       'email',
+    //       'status',
+    //       'updateDate'
+    //     ],
+    //     fields: buildFields(MyselfPeer(), []));
+    // services['myselfPeerService'] = myselfPeerService;
+    //
+    // var linkmanService = await LinkmanService.init(
+    //     tableName: 'chat_linkman',
+    //     indexFields: [
+    //       'givenName',
+    //       'name',
+    //       'ownerPeerId',
+    //       'peerId',
+    //       'mobile',
+    //       'collectionType'
+    //     ],
+    //     fields: buildFields(Linkman(), []));
+    // services['linkmanService'] = linkmanService;
+    //
+    // var linkmanTagService = await LinkmanTagService.init(
+    //     tableName: "chat_linkmanTag",
+    //     indexFields: ['ownerPeerId', 'createDate', 'name'],
+    //     fields: buildFields(LinkmanTag(), []));
+    // services['linkmanService'] = linkmanService;
+    //
+    // var linkmanTagLinkmanService = await LinkmanTagLinkmanService.init(
+    //     tableName: "chat_linkmanTagLinkman",
+    //     indexFields: ['ownerPeerId', 'createDate', 'tagId', 'linkmanPeerId'],
+    //     fields: buildFields(LinkmanTagLinkman(), []));
+    // services['linkmanTagLinkmanService'] = linkmanTagLinkmanService;
+    //
+    // var linkmanRequestService = await LinkmanRequestService.init(
+    //     tableName: "chat_linkmanRequest",
+    //     indexFields: [
+    //       'ownerPeerId',
+    //       'createDate',
+    //       'receiverPeerId',
+    //       'senderPeerId',
+    //       'status'
+    //     ],
+    //     fields: buildFields(LinkmanRequest(), []));
+    // services['linkmanRequestService'] = linkmanRequestService;
+    //
+    // var groupService = await GroupService.init(
+    //     tableName: "chat_group",
+    //     indexFields: [
+    //       'givenName',
+    //       'name',
+    //       'description',
+    //       'ownerPeerId',
+    //       'createDate',
+    //       'groupId',
+    //       'groupCategory',
+    //       'groupType'
+    //     ],
+    //     fields: buildFields(Group(), []));
+    // services['groupService'] = groupService;
+    //
+    // var groupMemberService = await GroupMemberService.init(
+    //     tableName: "chat_groupmember",
+    //     indexFields: [
+    //       'ownerPeerId',
+    //       'createDate',
+    //       'groupId',
+    //       'memberPeerId',
+    //       'memberType'
+    //     ],
+    //     fields: buildFields(GroupMember(), []));
+    // services['groupMemberService'] = groupMemberService;
+    //
+    // var contactService = await ContactService.init(
+    //     tableName: "chat_contact",
+    //     indexFields: ['peerId', 'mobile', 'formattedName', 'name'],
+    //     fields: buildFields(Contact(), []));
+    // services['contactService'] = contactService;
 
-    var peerProfileService = await PeerProfileService.init(
-        tableName: "blc_peerProfile",
-        fields: buildFields(PeerProfile(), []),
-        indexFields: ['peerId']);
-    services['peerProfileService'] = peerProfileService;
-
-    var peerEndpointService = await PeerEndpointService.init(
-        tableName: "blc_peerEndpoint",
-        fields: buildFields(PeerEndpoint(), []),
-        indexFields: ['ownerPeerId', 'priority', 'address']);
-    services['peerEndpointService'] = peerEndpointService;
-
-    var peerClientService = await PeerClientService.init(
-        tableName: "blc_peerClient",
-        indexFields: ['peerId', 'name', 'mobile'],
-        fields: buildFields(PeerClient(), []));
-    services['peerClientService'] = peerClientService;
-
-    var myselfPeerService = await MyselfPeerService.init(
-        tableName: "blc_myselfPeer",
-        indexFields: [
-          'endDate',
-          'peerId',
-          'name',
-          'mobile',
-          'email',
-          'status',
-          'updateDate'
-        ],
-        fields: buildFields(MyselfPeer(), []));
-    services['myselfPeerService'] = myselfPeerService;
-
-    var linkmanService = await LinkmanService.init(
-        tableName: 'chat_linkman',
-        indexFields: [
-          'givenName',
-          'name',
-          'ownerPeerId',
-          'peerId',
-          'mobile',
-          'collectionType'
-        ],
-        fields: buildFields(Linkman(), []));
-    services['linkmanService'] = linkmanService;
-
-    var linkmanTagService = await LinkmanTagService.init(
-        tableName: "chat_linkmanTag",
-        indexFields: ['ownerPeerId', 'createDate', 'name'],
-        fields: buildFields(LinkmanTag(), []));
-    services['linkmanService'] = linkmanService;
-
-    var linkmanTagLinkmanService = await LinkmanTagLinkmanService.init(
-        tableName: "chat_linkmanTagLinkman",
-        indexFields: ['ownerPeerId', 'createDate', 'tagId', 'linkmanPeerId'],
-        fields: buildFields(LinkmanTagLinkman(), []));
-    services['linkmanTagLinkmanService'] = linkmanTagLinkmanService;
-
-    var linkmanRequestService = await LinkmanRequestService.init(
-        tableName: "chat_linkmanRequest",
-        indexFields: [
-          'ownerPeerId',
-          'createDate',
-          'receiverPeerId',
-          'senderPeerId',
-          'status'
-        ],
-        fields: buildFields(LinkmanRequest(), []));
-    services['linkmanRequestService'] = linkmanRequestService;
-
-    var groupService = await GroupService.init(
-        tableName: "chat_group",
-        indexFields: [
-          'givenName',
-          'name',
-          'description',
-          'ownerPeerId',
-          'createDate',
-          'groupId',
-          'groupCategory',
-          'groupType'
-        ],
-        fields: buildFields(Group(), []));
-    services['groupService'] = groupService;
-
-    var groupMemberService = await GroupMemberService.init(
-        tableName: "chat_groupmember",
-        indexFields: [
-          'ownerPeerId',
-          'createDate',
-          'groupId',
-          'memberPeerId',
-          'memberType'
-        ],
-        fields: buildFields(GroupMember(), []));
-    services['groupMemberService'] = groupMemberService;
-
-    var contactService = await ContactService.init(
-        tableName: "chat_contact",
-        indexFields: ['peerId', 'mobile', 'formattedName', 'name'],
-        fields: buildFields(Contact(), []));
-    services['contactService'] = contactService;
     await Sqlite3.getInstance();
 
     // PlatformParams platformParams = await PlatformParams.instance;
@@ -154,7 +155,7 @@ class ServiceLocator {
 
   /// entity包含所有的字段，假设是字符串类型，fields是需要特别说明的字段，比如不是字符串类型
   /// 结果是fields中包含有全部的字段
-  static buildFields(dynamic entity, List<String> fields) {
+  static List<String> buildFields(dynamic entity, List<String> fields) {
     Set<String> fs = {};
     for (var field in fields) {
       var f = field.substring(0, field.indexOf(' '));
@@ -166,5 +167,7 @@ class ServiceLocator {
         fields.add(key + ' TEXT');
       }
     }
+
+    return fields;
   }
 }

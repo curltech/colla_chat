@@ -1,23 +1,18 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/util.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
-import 'package:sqlite3/sqlite3.dart';
-import 'package:sqlite3/wasm.dart';
+
+import 'package:sqlite3/common.dart';
+import './condition_import/unsupport.dart'
+    if (dart.library.html) './condition_import/web.dart'
+    if (dart.library.io) './condition_import/desktop.dart' as sqlite3_open;
 
 import '../app.dart';
 import '../service/base.dart';
 import '../service/servicelocator.dart';
 import 'datastore.dart';
-
-import 'package:http/http.dart' as http;
-import 'package:sqlite3/common.dart';
-import 'package:sqlite3/wasm.dart';
-import 'package:flutter/services.dart' show rootBundle;
 
 /// 适用于移动手机（无数据限制），desktop和chrome浏览器的sqlite3的数据库（50M数据限制）
 class Sqlite3 extends DataStore {
@@ -36,28 +31,11 @@ class Sqlite3 extends DataStore {
   }
 
   open({String name = 'colla_chat.db'}) async {
+    db = await sqlite3_open.openSqlite3(name: name);
+    await init(db);
     var platformParams = await PlatformParams.instance;
     if (platformParams.web) {
-      //web下的创建打开数据库的方式
-      final fs = await IndexedDbFileSystem.open(dbName: 'name');
-      var byteData = await rootBundle.load('assets/wasm/sqlite3.wasm');
-      var source = byteData.buffer.asUint8List();
-
-      final response = await http.get(Uri.parse('sqlite3.wasm'));
-      source = response.bodyBytes;
-
-      WasmSqlite3 wasmSqlite3 =
-          await WasmSqlite3.load(source, SqliteEnvironment(fileSystem: fs));
-      db = wasmSqlite3.open(name);
-      await init(db);
-      await fs.flush();
-    } else {
-      /// 除了web之外的创建打开数据库的方式
-      final dbFolder = await getApplicationDocumentsDirectory();
-      path = p.join(dbFolder.path, name);
-      db = sqlite3.open(path);
-      await init(db);
-    }
+    } else {}
   }
 
   init(CommonDatabase db) {

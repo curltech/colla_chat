@@ -19,6 +19,7 @@ void main() {
   //         ChangeNotifierProvider(create: (context) => AppProfile()),
   //         Provider(create: (context) => AppProfile()),
   //       ],
+  WidgetsFlutterBinding.ensureInitialized();
   ServiceLocator.init().then((value) {
     runApp(MultiProvider(providers: [
       ChangeNotifierProvider(create: (context) => ThemeDataProvider()),
