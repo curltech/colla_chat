@@ -31,9 +31,8 @@ class SqlBuilder {
     clauses.add(query);
 
     for (var indexField in indexFields!) {
-      query = 'CREATE INDEX $tableName' +
-          '_' +
-          '$indexField ON $tableName($indexField)';
+      query =
+          'CREATE INDEX IF NOT EXISTS ${tableName}_$indexField ON $tableName($indexField)';
       clauses.add(query);
     }
 
@@ -92,10 +91,10 @@ class SqlBuilder {
     if (having != null) {
       query = '$query HAVING $having';
     }
-    if (limit! > 0) {
+    if (limit != null && limit > 0) {
       query = '$query LIMIT $limit';
     }
-    if (offset! > 0) {
+    if (offset != null && offset > 0) {
       query = '$query OFFSET $offset';
     }
 
@@ -106,7 +105,7 @@ class SqlBuilder {
   /// @param {*} tableName
   /// @param {*} entity
   Sql insert(String tableName, Map<String, dynamic> entity) {
-    List<Object>? params = [];
+    List<Object?>? params = [];
     var query = 'INSERT INTO $tableName (';
     var i = 0;
     var valueQuery = '';
@@ -141,9 +140,9 @@ class SqlBuilder {
   /// @param {*} entity
   /// @param {*} where
   Sql update(String tableName, dynamic entity, String where,
-      [List<Object>? whereArgs]) {
+      [List<Object?>? whereArgs]) {
     var query = 'UPDATE $tableName SET ';
-    var params = <Object>[];
+    var params = <Object?>[];
     var i = 0;
     for (var key in entity) {
       var param = entity[key];

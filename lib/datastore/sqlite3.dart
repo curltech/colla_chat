@@ -44,6 +44,7 @@ class Sqlite3 extends DataStore {
         instance.create(service.tableName, service.fields, service.indexFields);
         service.dataStore = instance;
       }
+      db.userVersion = 1;
     }
   }
 
@@ -64,14 +65,14 @@ class Sqlite3 extends DataStore {
   @override
   execute(List<Sql> sqls) {
     for (var sql in sqls) {
-      logger.i('execute sql:${sql.clause}');
-      logger.i('execute sql params:${sql.params}');
       if (sql.params != null) {
         var params = sql.params;
         db.execute(sql.clause, params!);
       } else {
         db.execute(sql.clause);
       }
+      logger.i('execute sql:${sql.clause}');
+      logger.i('execute sql params:${sql.params}');
     }
   }
 
@@ -80,14 +81,16 @@ class Sqlite3 extends DataStore {
   /// @param {*} params
   @override
   dynamic run(Sql sql) {
-    logger.i('execute sql:${sql.clause}');
-    logger.i('execute sql params:${sql.params}');
     if (sql.params != null) {
       var params = sql.params;
-      return db.execute(sql.clause, params!);
+      db.execute(sql.clause, params!);
     } else {
-      return db.execute(sql.clause);
+      db.execute(sql.clause);
     }
+    logger.i('execute sql:${sql.clause}');
+    logger.i('execute sql params:${sql.params}');
+
+    return null;
   }
 
   /// 建表和索引
@@ -135,7 +138,11 @@ class Sqlite3 extends DataStore {
         orderBy: orderBy,
         limit: limit,
         offset: offset);
-    return db.select(clause, whereArgs!);
+    var results = db.select(clause, whereArgs!);
+    logger.i('execute sql:$clause');
+    logger.i('execute sql params:$whereArgs');
+
+    return results;
   }
 
   @override
@@ -161,6 +168,8 @@ class Sqlite3 extends DataStore {
         offset: offset);
     clause = 'select count(*) from ($clause)';
     var totalResults = db.select(clause, whereArgs!);
+    logger.i('execute sql:$clause');
+    logger.i('execute sql params:$whereArgs');
     var total = TypeUtil.firstIntValue(totalResults);
     var results = await find(table,
         distinct: distinct,
