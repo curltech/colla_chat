@@ -9,6 +9,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/sqlite3.dart';
 import 'package:sqlite3/wasm.dart';
 
+import '../app.dart';
 import '../service/base.dart';
 import '../service/servicelocator.dart';
 import 'datastore.dart';
@@ -89,6 +90,8 @@ class Sqlite3 extends DataStore {
   @override
   execute(List<Sql> sqls) {
     for (var sql in sqls) {
+      logger.i('execute sql:${sql.clause}');
+      logger.i('execute sql params:${sql.params}');
       if (sql.params != null) {
         var params = sql.params;
         db.execute(sql.clause, params!);
@@ -103,6 +106,8 @@ class Sqlite3 extends DataStore {
   /// @param {*} params
   @override
   dynamic run(Sql sql) {
+    logger.i('execute sql:${sql.clause}');
+    logger.i('execute sql params:${sql.params}');
     if (sql.params != null) {
       var params = sql.params;
       return db.execute(sql.clause, params!);
@@ -117,7 +122,7 @@ class Sqlite3 extends DataStore {
       [List<String>? indexFields]) {
     var query = sqlBuilder.create(tableName, fields);
 
-    return this.run(Sql(query));
+    return run(Sql(query));
   }
 
   /// 删除表
