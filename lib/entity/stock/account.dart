@@ -1,12 +1,15 @@
 import 'package:colla_chat/app.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:floor/floor.dart';
 
 import '../../service/base.dart';
 import '../base.dart';
 import '../../datastore/indexeddb.dart';
 import '../../datastore/sqflite.dart';
 
+@Entity(tableName: 'stk_account')
 class StockAccount extends StatusEntity {
+  @ColumnInfo() //创建索引
   String? accountId;
   String? accountName;
   String? name;

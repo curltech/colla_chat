@@ -1,3 +1,5 @@
+import 'package:colla_chat/tool/util.dart';
+
 class Sql {
   late String clause;
   late List<Object?>? params;
@@ -11,10 +13,11 @@ class SqlBuilder {
   /// 建表
   /// @param {*} tableName
   /// @param {*} fields
-  String create(String tableName, List<String> fields) {
+  List<String> create(String tableName, List<String> fields,
+      [List<String>? indexFields]) {
+    List<String> clauses = [];
     var query =
-        'CREATE TABLE IF NOT EXISTS $tableName(id INTEGER PRIMARY KEY AUTOINCREMENT,';
-
+        'CREATE TABLE IF NOT EXISTS $tableName(id INT PRIMARY KEY AUTOINCREMENT NOT NULL,';
     var i = 0;
     for (var field in fields) {
       if (i == 0) {
@@ -25,8 +28,14 @@ class SqlBuilder {
       ++i;
     }
     query = '$query)';
+    clauses.add(query);
 
-    return query;
+    for (var indexField in indexFields!) {
+      query = 'CREATE INDEX index_name ON $tableName($indexField)';
+      clauses.add(query);
+    }
+
+    return clauses;
   }
 
   /// 删除表

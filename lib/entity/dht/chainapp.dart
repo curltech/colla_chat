@@ -11,6 +11,8 @@ class ChainApp extends StatusEntity {
   String? appHash;
   String? appSignature;
 
+  ChainApp();
+
   ChainApp.fromJson(Map json)
       : peerId = json['peerId'],
         appType = json['appType'],

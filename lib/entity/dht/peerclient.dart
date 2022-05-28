@@ -24,7 +24,7 @@ class PeerClient extends PeerLocation {
   String? signature;
   String? previousPublicKeySignature;
   String? trustLevel;
-
+  PeerClient();
   PeerClient.fromJson(Map json)
       : mobile = json['mobile'],
         clientId = json['clientId'],

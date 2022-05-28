@@ -7,6 +7,8 @@ class PeerEndpoint extends PeerEntity {
   String? ownerPeerId;
   String? lastConnectTime;
 
+  PeerEndpoint();
+
   PeerEndpoint.fromJson(Map json)
       : endpointType = json['endpointType'],
         discoveryAddress = json['discoveryAddress'],

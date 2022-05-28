@@ -66,10 +66,6 @@ class Sqlite3 extends DataStore {
         instance.create(service.tableName, service.fields, service.indexFields);
         service.dataStore = instance;
       }
-      db
-        ..execute('CREATE TABLE foo (x TEXT);')
-        ..execute("INSERT INTO foo VALUES ('foo'), ('bar');")
-        ..userVersion = 1;
     }
   }
 
@@ -120,9 +116,11 @@ class Sqlite3 extends DataStore {
   @override
   dynamic create(String tableName, List<String> fields,
       [List<String>? indexFields]) {
-    var query = sqlBuilder.create(tableName, fields);
-
-    return run(Sql(query));
+    List<String> clauses = sqlBuilder.create(tableName, fields, indexFields);
+    for (var query in clauses) {
+      run(Sql(query));
+    }
+    return null;
   }
 
   /// 删除表

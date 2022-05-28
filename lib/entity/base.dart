@@ -1,5 +1,6 @@
 import 'package:colla_chat/datastore/indexeddb.dart';
 import 'package:colla_chat/tool/util.dart';
+import 'package:floor/floor.dart';
 import '../../datastore/indexeddb.dart';
 import '../../datastore/sqflite.dart';
 
@@ -26,10 +27,14 @@ enum EntityStatus {
 }
 
 abstract class BaseEntity {
+  @PrimaryKey(autoGenerate: true)
   int? id;
+  @ColumnInfo() //创建索引
   String? createDate;
   String? updateDate;
+  @ignore
   String? entityId;
+  @ignore
   String? state;
 
   BaseEntity();
@@ -44,6 +49,7 @@ abstract class BaseEntity {
 }
 
 abstract class StatusEntity extends BaseEntity {
+  @ColumnInfo() //创建索引
   String? status;
   String? statusReason;
   String? statusDate;

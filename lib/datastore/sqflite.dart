@@ -71,9 +71,11 @@ class Sqflite extends DataStore {
   @override
   dynamic create(String tableName, List<String> fields,
       [List<String>? indexFields]) {
-    var query = sqlBuilder.create(tableName, fields);
-
-    return this.run(Sql(query));
+    List<String> clauses = sqlBuilder.create(tableName, fields, indexFields);
+    for (var query in clauses) {
+      run(Sql(query));
+    }
+    return null;
   }
 
   /// 删除表
