@@ -60,6 +60,7 @@ dependencies:
   sqlite3_flutter_libs: ^0.5.7
   idb_shim: ^2.0.1
   idb_sqflite: ^1.1.0
+  drift: ^1.6.0
   # 网络功能
   dio: ^4.0.6
   dio_http2_adapter: ^2.0.0
@@ -160,6 +161,8 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  drift_dev: ^1.6.0
+  build_runner: ^2.1.10
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -202,6 +205,8 @@ flutter:
     - assets/images/bg/login-bg-wl-11.jpg
     - assets/images/bg/login-bg-wl-12.jpg
 
+    - assets/wasm/sqlite3.wasm
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 
@@ -227,3 +232,6 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+analyzer:
+  plugins:
+    - drift

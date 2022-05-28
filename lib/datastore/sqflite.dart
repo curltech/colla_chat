@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -8,9 +9,7 @@ import '../service/base.dart';
 import '../service/servicelocator.dart';
 import 'datastore.dart';
 
-/**
- * 适用于移动手机（无数据限制），electron和chrome浏览器的sqlite3的数据库（50M数据限制）
- */
+/// 适用于移动手机（无数据限制），electron和chrome浏览器的sqlite3的数据库（50M数据限制）
 class Sqflite extends DataStore {
   static Sqflite instance = Sqflite();
   static bool initStatus = false;
@@ -35,28 +34,22 @@ class Sqflite extends DataStore {
     return instance;
   }
 
-  /**
-   * 关闭数据库
-   */
+  /// 关闭数据库
   close() {
     db.close();
   }
 
-  /**
-   * 删除数据库
-   * @param {*} options
-   */
+  /// 删除数据库
+  /// @param {*} options
   remove({name = 'colla_chat.db', location = 'default'}) async {
     var databasesPath = await getDatabasesPath();
     String path = join(databasesPath, name);
     deleteDatabase(path);
   }
 
-  /**
-   * 批量执行sql，参数是二维数组
-   * @param {*} sqls
-   * @param {*} params
-   */
+  /// 批量执行sql，参数是二维数组
+  /// @param {*} sqls
+  /// @param {*} params
   @override
   execute(List<Sql> sqls) {
     db.transaction((txn) async {
@@ -66,11 +59,9 @@ class Sqflite extends DataStore {
     });
   }
 
-  /**
-   * 执行单条sql
-   * @param {*} sqls
-   * @param {*} params
-   */
+  /// 执行单条sql
+  /// @param {*} sqls
+  /// @param {*} params
   @override
   dynamic run(Sql sql) {
     return db.execute(sql.clause, sql.params);
@@ -85,10 +76,8 @@ class Sqflite extends DataStore {
     return this.run(Sql(query));
   }
 
-  /**
-   * 删除表
-   * @param {*} tableName
-   */
+  /// 删除表
+  /// @param {*} tableName
   drop(String tableName) {
     var query = sqlBuilder.drop(tableName);
 
@@ -163,12 +152,10 @@ class Sqflite extends DataStore {
     return page;
   }
 
-  /**
-   * 查询单条记录
-   * @param {*} tableName
-   * @param {*} fields
-   * @param {*} condition
-   */
+  /// 查询单条记录
+  /// @param {*} tableName
+  /// @param {*} fields
+  /// @param {*} condition
   @override
   Future<Map?> findOne(String table,
       {bool? distinct,
@@ -197,11 +184,9 @@ class Sqflite extends DataStore {
     return null;
   }
 
-  /**
-   * 插入一条记录
-   * @param {*} tableName
-   * @param {*} entity
-   */
+  /// 插入一条记录
+  /// @param {*} tableName
+  /// @param {*} entity
   @override
   Future<int> insert(String table, dynamic entity) async {
     entity = JsonUtil.toMap(entity);
@@ -214,11 +199,9 @@ class Sqflite extends DataStore {
     return key;
   }
 
-  /**
-   * 删除记录
-   * @param {*} tableName
-   * @param {*} condition
-   */
+  /// 删除记录
+  /// @param {*} tableName
+  /// @param {*} condition
   @override
   Future<int> delete(String table,
       {dynamic entity, String? where, List<Object>? whereArgs}) async {
@@ -236,12 +219,10 @@ class Sqflite extends DataStore {
     return result;
   }
 
-  /**
-   * 更新记录
-   * @param {*} tableName
-   * @param {*} entity
-   * @param {*} condition
-   */
+  /// 更新记录
+  /// @param {*} tableName
+  /// @param {*} entity
+  /// @param {*} condition
   @override
   Future<int> update(String table, dynamic entity,
       {String? where, List<Object>? whereArgs}) async {
@@ -268,11 +249,9 @@ class Sqflite extends DataStore {
     }
   }
 
-  /**
-   * 在一个事务里面执行多个操作（insert,update,devare)
-   * operators是一个operator对象的数组，operator有四个属性（type，tableName，entity，condition）
-   * @param {*} operators
-   */
+  /// 在一个事务里面执行多个操作（insert,update,devare)
+  /// operators是一个operator对象的数组，operator有四个属性（type，tableName，entity，condition）
+  /// @param {*} operators
   @override
   Future<Object?> transaction(List<Map<String, dynamic>> operators) async {
     var results = await db.transaction((txn) async {

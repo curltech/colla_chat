@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:idb_shim/idb.dart';
 import 'package:idb_shim/idb_browser.dart';
