@@ -1,5 +1,3 @@
-import 'package:floor/floor.dart';
-
 enum EntityStatus {
   Draft,
   Effective,
@@ -19,14 +17,10 @@ enum EntityStatus {
 }
 
 abstract class BaseEntity {
-  @PrimaryKey(autoGenerate: true)
   int? id;
-  @ColumnInfo() //创建索引
   String? createDate;
   String? updateDate;
-  @ignore
   String? entityId;
-  @ignore
   String? state;
 
   BaseEntity();
@@ -41,7 +35,6 @@ abstract class BaseEntity {
 }
 
 abstract class StatusEntity extends BaseEntity {
-  @ColumnInfo() //创建索引
   String? status;
   String? statusReason;
   String? statusDate;

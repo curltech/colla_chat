@@ -60,7 +60,7 @@ dependencies:
   sqlite3_flutter_libs: ^0.5.7
   idb_shim: ^2.0.1
   idb_sqflite: ^1.1.0
-  floor: ^1.2.0
+  #floor: ^1.2.0
   # 网络功能
   dio: ^4.0.6
   dio_http2_adapter: ^2.0.0

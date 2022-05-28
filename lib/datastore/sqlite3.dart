@@ -42,9 +42,11 @@ class Sqlite3 extends DataStore {
     if (db.userVersion == 0) {
       for (BaseService service in ServiceLocator.services.values) {
         instance.create(service.tableName, service.fields, service.indexFields);
-        service.dataStore = instance;
       }
       db.userVersion = 1;
+    }
+    for (BaseService service in ServiceLocator.services.values) {
+      service.dataStore = instance;
     }
   }
 
