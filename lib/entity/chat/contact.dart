@@ -34,7 +34,7 @@ enum ActiveStatus { DOWN, UP }
 class Linkman extends StatusEntity {
   String? ownerPeerId; // 区分本地不同peerClient属主
   String? peerId; // peerId
-  late String name; // 用户名
+  String? name; // 用户名
   String? pyName; // 用户名拼音
   String? mobile; // 手机号
   String? avatar; // 头像
@@ -43,11 +43,11 @@ class Linkman extends StatusEntity {
   String? pyGivenName; // 备注名拼音
   String? sourceType; // 来源，包括：Search&Add（搜索添加）, AcceptRequest（接受请求）…
   String? lastConnectTime; // 最近连接时间
-  bool? locked; // 是否锁定，包括：true（锁定）, false（未锁定）
-  bool? notAlert; // 消息免打扰，包括：true（提醒）, false（免打扰）
-  bool? top; // 是否置顶，包括：true（置顶）, false（不置顶）
-  bool? blackedMe; // true-对方已将你加入黑名单
-  bool? droppedMe; // true-对方已将你从好友中删除
+  bool locked = false; // 是否锁定，包括：true（锁定）, false（未锁定）
+  bool notAlert = false; // 消息免打扰，包括：true（提醒）, false（免打扰）
+  bool top = false; // 是否置顶，包括：true（置顶）, false（不置顶）
+  bool blackedMe = false; // true-对方已将你加入黑名单
+  bool droppedMe = false; // true-对方已将你从好友中删除
 
   // 非持久化属性
   //activeStatus: 活动状态，包括：Up（连接）, Down（未连接）
@@ -57,10 +57,10 @@ class Linkman extends StatusEntity {
   //tag: 标签
   //pyTag: 标签拼音
   String? activeStatus;
-  bool? recallTimeLimit;
-  bool? recallAlert;
-  bool? myselfRecallTimeLimit;
-  bool? myselfRecallAlert;
+  bool recallTimeLimit = false;
+  bool recallAlert = false;
+  bool myselfRecallTimeLimit = false;
+  bool myselfRecallAlert = false;
 }
 
 // 联系人标签
@@ -113,9 +113,9 @@ class Group extends StatusEntity {
   String? pyName; // 组名称拼音
   String? pyDescription; // 组描述拼音
   String? pyTag; // 标签拼音
-  bool? locked; // 是否锁定（群聊不使用，频道使用），包括：true（锁定）, false（未锁定）
-  bool? alert; // 是否提醒，包括：true（提醒）, false（免打扰）
-  bool? top; // 是否置顶，包括：true（置顶）, false（不置顶）
+  bool locked = false; // 是否锁定（群聊不使用，频道使用），包括：true（锁定）, false（未锁定）
+  bool alert = false; // 是否提醒，包括：true（提醒）, false（免打扰）
+  bool top = false; // 是否置顶，包括：true（置顶）, false（不置顶）
   String? myAlias; // 我在本群的昵称
 
 //this.avatar = null // 头像（保留，适用于频道）
@@ -140,13 +140,13 @@ class Contact extends StatusEntity {
   String? peerId;
   String? name;
   String? formattedName;
-  late String mobile;
+  String? mobile;
   String? trustLevel;
   String? publicKey;
   String? avatar;
   String? pyName;
   String? givenName;
   String? pyGivenName;
-  bool? locked;
-  bool? isLinkman;
+  bool locked = false;
+  bool isLinkman = false;
 }

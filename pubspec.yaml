@@ -68,6 +68,10 @@ dependencies:
   cached_network_image: ^3.0.0
   connectivity: ^3.0.6 #网络连接
   connectivity_plus: ^2.3.0
+  enough_mail: ^2.0.0
+  enough_mail_html: ^2.0.0
+  enough_mail_flutter: ^2.0.0
+  xml: ^6.0.1
   # 加密安全
   cryptography: ^2.0.5 #ecc,aes
   cryptography_flutter: ^2.0.2
@@ -130,7 +134,7 @@ dependencies:
   dart_webrtc: ^1.0.5
   livekit_client: ^1.0.0
   # 多媒体
-  photo_view: ^0.14.0 #图片显示
+  photo_view: ^0.13.0 #图片显示
   flutter_sound: ^9.2.12 #音频处理
   audioplayers: ^0.20.1 #音频处理
   video_player: ^2.1.1 #视频播放

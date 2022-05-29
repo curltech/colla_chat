@@ -54,7 +54,7 @@ abstract class PeerEntity extends PeerLocation {
   String? email;
   String? startDate;
   String? endDate;
-  int? creditScore;
+  int creditScore = 0;
   String? preferenceScore;
   String? badCount;
   String? staleCount;
@@ -69,7 +69,7 @@ abstract class PeerEntity extends PeerLocation {
   String? signature;
   String? signatureData;
   String? expireDate;
-  int? version;
+  int version = 0;
   PeerEntity();
   PeerEntity.fromJson(Map json)
       : mobile = json['mobile'],

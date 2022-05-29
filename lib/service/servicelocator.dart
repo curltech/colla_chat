@@ -162,8 +162,30 @@ class ServiceLocator {
     }
     Map map = JsonUtil.toMap(entity);
     for (var key in map.keys) {
-      if (!fs.contains(key) && key != 'id') {
-        fields.add(key + ' TEXT');
+      var value = map[key];
+      if (key == 'id') {
+        continue;
+      }
+      String field;
+      if (value != null) {
+        if (value is int) {
+          field = key + ' INT';
+        } else if (value is double) {
+          field = key + ' REAL';
+        } else if (value is bool) {
+          field = key + ' INT';
+        } else if (value is DateTime) {
+          field = key + ' TEXT';
+        } else if (value is String) {
+          field = key + ' TEXT';
+        } else {
+          field = key + ' CLOB';
+        }
+      } else {
+        field = key + ' TEXT';
+      }
+      if (!fs.contains(key)) {
+        fields.add(field);
       }
     }
 

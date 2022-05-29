@@ -19,15 +19,17 @@ class PeerProfile extends StatusEntity {
   String? primaryColor;
   String? secondaryColor;
   String? lightDarkMode;
-  bool? udpSwitch;
-  bool? downloadSwitch;
-  bool? localDataCryptoSwitch;
-  bool? autoLoginSwitch;
-  bool? developerOption;
+  bool udpSwitch = false;
+  bool downloadSwitch = false;
+  bool localDataCryptoSwitch = false;
+  bool autoLoginSwitch = false;
+  bool developerOption = false;
   String? logLevel;
   String? lastSyncTime;
   String? avatar;
+
   PeerProfile();
+
   PeerProfile.fromJson(Map json)
       : peerId = json['peerId'],
         clientId = json['clientId'],
@@ -41,11 +43,12 @@ class PeerProfile extends StatusEntity {
         primaryColor = json['primaryColor'],
         secondaryColor = json['secondaryColor'],
         lightDarkMode = json['lightDarkMode'],
-        udpSwitch = json['udpSwitch'],
-        downloadSwitch = json['downloadSwitch'],
-        localDataCryptoSwitch = json['localDataCryptoSwitch'],
-        autoLoginSwitch = json['autoLoginSwitch'],
-        developerOption = json['developerOption'],
+        udpSwitch = json['udpSwitch'] == 1 ? true : false,
+        downloadSwitch = json['downloadSwitch'] == 1 ? true : false,
+        localDataCryptoSwitch =
+            json['localDataCryptoSwitch'] == 1 ? true : false,
+        autoLoginSwitch = json['autoLoginSwitch'] == 1 ? true : false,
+        developerOption = json['developerOption'] == 1 ? true : false,
         logLevel = json['logLevel'],
         lastSyncTime = json['lastSyncTime'],
         super.fromJson(json);

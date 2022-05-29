@@ -267,22 +267,20 @@ class ContactService extends BaseService {
 
   // 从服务器端获取是否有peerClient
   Future<Contact?> refresh(Contact peerContact) async {
-    if (peerContact != null) {
-      var mobileNumber = await this.formatMobile(peerContact.mobile);
-      if (mobileNumber != null) {
-        var peer =
-            await peerClientService.findOneEffectiveByMobile(mobileNumber);
-        if (peer != null) {
-          var peerClient = PeerClient.fromJson(peer);
-          peerContact.peerId = peerClient.peerId;
-          peerContact.name = peerClient.name;
-          peerContact.trustLevel = peerClient.trustLevel;
-          peerContact.status = peerClient.status;
-          peerContact.publicKey = peerClient.publicKey;
-          peerContact.avatar = peerClient.avatar;
+    var mobile = peerContact.mobile;
+    if (mobile != null) {
+      var mobileNumber = await formatMobile(mobile);
+      var peer = await peerClientService.findOneEffectiveByMobile(mobileNumber);
+      if (peer != null) {
+        var peerClient = PeerClient.fromJson(peer);
+        peerContact.peerId = peerClient.peerId;
+        peerContact.name = peerClient.name;
+        peerContact.trustLevel = peerClient.trustLevel;
+        peerContact.status = peerClient.status;
+        peerContact.publicKey = peerClient.publicKey;
+        peerContact.avatar = peerClient.avatar;
 
-          return peerContact;
-        }
+        return peerContact;
       }
     }
 
