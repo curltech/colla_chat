@@ -2,6 +2,7 @@ import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/service/stock/account.dart';
 import 'package:colla_chat/tool/util.dart';
 
+import '../entity/chat/chat.dart';
 import '../entity/chat/contact.dart';
 import '../entity/dht/chainapp.dart';
 import '../entity/dht/myselfpeer.dart';
@@ -79,7 +80,6 @@ class ServiceLocator {
           'ownerPeerId',
           'peerId',
           'mobile',
-          'collectionType'
         ],
         fields: buildFields(Linkman(), []));
     services['linkmanService'] = linkmanService;
@@ -149,23 +149,21 @@ class ServiceLocator {
           'createDate',
           'receiveTime',
           'actualReceiveTime',
-          'blockId',
           'messageType',
-          'attachBlockId'
         ],
-        fields: buildFields(Contact(), []));
+        fields: buildFields(ChatMessage(), []));
     services['chatMessageService'] = chatMessageService;
 
     var mergeMessageService = await MergeMessageService.init(
         tableName: "chat_mergemessage",
         indexFields: ['ownerPeerId', 'mergeMessageId', 'createDate'],
-        fields: buildFields(Contact(), []));
+        fields: buildFields(MergeMessage(), []));
     services['mergeMessageService'] = mergeMessageService;
 
     var chatAttachService = await ChatAttachService.init(
         tableName: "chat_attach",
         indexFields: ['ownerPeerId', 'subjectId', 'createDate', 'messageId'],
-        fields: buildFields(Contact(), []));
+        fields: buildFields(ChatAttach(), []));
     services['chatAttachService'] = chatAttachService;
 
     var receiveService = await ReceiveService.init(
@@ -176,15 +174,14 @@ class ServiceLocator {
           'createDate',
           'subjectType',
           'receiverPeerId',
-          'blockId'
         ],
-        fields: buildFields(Contact(), []));
+        fields: buildFields(Receive(), []));
     services['receiveService'] = receiveService;
 
     var chatService = await ChatService.init(
         tableName: "chat_chat",
-        indexFields: ['ownerPeerId', 'subjectId', 'createDate', 'updateTime'],
-        fields: buildFields(Contact(), []));
+        indexFields: ['ownerPeerId', 'subjectId', 'createDate'],
+        fields: buildFields(Chat(), []));
     services['chatService'] = chatService;
 
     await Sqlite3.getInstance();

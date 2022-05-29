@@ -43,12 +43,24 @@ class PeerProfile extends StatusEntity {
         primaryColor = json['primaryColor'],
         secondaryColor = json['secondaryColor'],
         lightDarkMode = json['lightDarkMode'],
-        udpSwitch = json['udpSwitch'] == 1 ? true : false,
-        downloadSwitch = json['downloadSwitch'] == 1 ? true : false,
-        localDataCryptoSwitch =
-            json['localDataCryptoSwitch'] == 1 ? true : false,
-        autoLoginSwitch = json['autoLoginSwitch'] == 1 ? true : false,
-        developerOption = json['developerOption'] == 1 ? true : false,
+        udpSwitch =
+            json['udpSwitch'] == true || json['udpSwitch'] == 1 ? true : false,
+        downloadSwitch =
+            json['downloadSwitch'] == true || json['downloadSwitch'] == 1
+                ? true
+                : false,
+        localDataCryptoSwitch = json['localDataCryptoSwitch'] == true ||
+                json['localDataCryptoSwitch'] == 1
+            ? true
+            : false,
+        autoLoginSwitch =
+            json['autoLoginSwitch'] == true || json['autoLoginSwitch'] == 1
+                ? true
+                : false,
+        developerOption =
+            json['developerOption'] == true || json['developerOption'] == 1
+                ? true
+                : false,
         logLevel = json['logLevel'],
         lastSyncTime = json['lastSyncTime'],
         super.fromJson(json);

@@ -181,14 +181,26 @@ class ChatMessage extends StatusEntity {
 }
 
 class MergeMessage extends BaseEntity {
+  String? ownerPeerId;
+  String? mergeMessageId;
+  String? createDate;
+
   MergeMessage();
 
-  MergeMessage.fromJson(Map json) : super.fromJson(json);
+  MergeMessage.fromJson(Map json)
+      : ownerPeerId = json['ownerPeerId'],
+        mergeMessageId = json['mergeMessageId'],
+        createDate = json['createDate'],
+        super.fromJson(json);
 
   @override
   Map<String, dynamic> toJson() {
     var json = super.toJson();
-    json.addAll({});
+    json.addAll({
+      'ownerPeerId': ownerPeerId,
+      'mergeMessageId': mergeMessageId,
+      'createDate': createDate,
+    });
     return json;
   }
 }
