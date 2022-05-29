@@ -1,4 +1,4 @@
-import '../../message.dart';
+import '../../../entity/p2p/message.dart';
 import '../baseaction.dart';
 
 /**
@@ -14,7 +14,7 @@ class QueryValueAction extends BaseAction {
 
     ChainMessage? response = await send(chainMessage);
     if (response != null) {
-      return response.Payload;
+      return response.payload;
     }
 
     return null;

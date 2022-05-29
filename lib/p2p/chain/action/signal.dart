@@ -1,4 +1,4 @@
-import '../../message.dart';
+import '../../../entity/p2p/message.dart';
 import '../baseaction.dart';
 
 /**
@@ -18,7 +18,7 @@ class SignalAction extends BaseAction {
 
     ChainMessage? response = await signalAction.send(chainMessage);
     if (response != null) {
-      return response.Payload;
+      return response.payload;
     }
 
     return null;
@@ -28,8 +28,8 @@ class SignalAction extends BaseAction {
     ChainMessage? _chainMessage = await super.receive(chainMessage);
     if (_chainMessage != null && receivers.isNotEmpty) {
       signalAction.receivers.forEach((String key, dynamic receiver) => {
-            receiver(_chainMessage.SrcPeerId, _chainMessage.SrcConnectPeerId,
-                _chainMessage.SrcConnectSessionId, _chainMessage.Payload)
+            receiver(_chainMessage.srcPeerId, _chainMessage.srcConnectPeerId,
+                _chainMessage.srcConnectSessionId, _chainMessage.payload)
           });
 
       return null;

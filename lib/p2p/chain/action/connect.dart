@@ -1,4 +1,4 @@
-import '../../message.dart';
+import '../../../entity/p2p/message.dart';
 import '../baseaction.dart';
 
 ///在chain目录下的采用自定义protocol "/chain"的方式自己实现的功能
@@ -7,11 +7,11 @@ class ConnectAction extends BaseAction {
 
   Future<dynamic> connect(String connectPeerId, dynamic peerClient) async {
     ChainMessage chainMessage = await prepareSend(connectPeerId, peerClient);
-    chainMessage.PayloadType = PayloadType.PeerClient.toString();
+    chainMessage.payloadType = PayloadType.PeerClient.toString();
 
     ChainMessage? response = await send(chainMessage);
     if (response != null) {
-      return response.Payload;
+      return response.payload;
     }
 
     return null;

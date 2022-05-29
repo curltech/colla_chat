@@ -1,4 +1,4 @@
-import '../../message.dart';
+import '../../../entity/p2p/message.dart';
 import '../baseaction.dart';
 import '../chainmessagehandler.dart';
 
@@ -24,15 +24,15 @@ class ConsensusAction extends BaseAction {
   Future<dynamic?> consensus(String connectPeerId, dynamic dataBlock,
       {String? msgType}) async {
     ChainMessage chainMessage = await prepareSend(connectPeerId, dataBlock);
-    chainMessage.PayloadType = PayloadType.DataBlock.name;
+    chainMessage.payloadType = PayloadType.DataBlock.name;
     if (msgType == null) {
       msgType = MsgType.CONSENSUS.name;
     }
-    chainMessage.MessageType = msgType;
+    chainMessage.messageType = msgType;
 
     ChainMessage? response = await send(chainMessage);
     if (response != null) {
-      return response.Payload;
+      return response.payload;
     }
 
     return null;

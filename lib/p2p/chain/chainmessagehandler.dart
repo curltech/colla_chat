@@ -1,11 +1,11 @@
-import '../../entity/dht/base.dart';
 import '../../entity/dht/myself.dart';
+import '../../entity/p2p/security_context.dart';
+import '../../service/p2p/message.dart';
+import '../../service/p2p/security_context.dart';
 import '../../tool/util.dart';
 import '../../transport/httpclient.dart';
 import '../../transport/websocket.dart';
-import '../message.dart';
-import '../payload.dart';
-import 'baseaction.dart';
+import '../../entity/p2p/message.dart';
 
 const packetSize = 4 * 1024 * 1024;
 const webRtcPacketSize = 128 * 1024;
@@ -30,11 +30,11 @@ class ChainMessageHandler {
     var json = JsonUtil.toMap(String.fromCharCodes(data));
     ChainMessage chainMessage = ChainMessage.fromJson(json);
     // 源节点的id和地址
-    chainMessage.SrcPeerId ??= remotePeerId;
-    chainMessage.SrcAddress ??= remoteAddr;
+    chainMessage.srcPeerId ??= remotePeerId;
+    chainMessage.srcAddress ??= remoteAddr;
     // 本次连接的源节点id和地址
-    chainMessage.LocalConnectPeerId = remotePeerId;
-    chainMessage.LocalConnectAddress = remoteAddr;
+    chainMessage.localConnectPeerId = remotePeerId;
+    chainMessage.localConnectAddress = remoteAddr;
     response = await chainMessageHandler.receive(chainMessage);
     /**
      * 把响应报文转成原始数据
@@ -43,7 +43,7 @@ class ChainMessageHandler {
       try {
         await chainMessageHandler.encrypt(response);
       } catch (err) {
-        response = chainMessageHandler.error(chainMessage.MessageType, err);
+        response = chainMessageHandler.error(chainMessage.messageType, err);
       }
       chainMessageHandler.setResponse(chainMessage, response);
       List<int> responseData = MessageSerializer.marshal(response);
@@ -62,8 +62,8 @@ class ChainMessageHandler {
     ChainMessage response;
     var json = JsonUtil.toMap(String.fromCharCodes(data));
     ChainMessage chainMessage = ChainMessage.fromJson(json);
-    chainMessage.LocalConnectPeerId = remotePeerId;
-    chainMessage.LocalConnectAddress = remoteAddr;
+    chainMessage.localConnectPeerId = remotePeerId;
+    chainMessage.localConnectAddress = remoteAddr;
     response = await chainMessageHandler.receive(chainMessage);
 
     return response;
@@ -82,10 +82,10 @@ class ChainMessageHandler {
      * targetPeerId表示发送到p2p节点
      * targetAddress表示采用外部发送方式，比如http，wss
      */
-    var targetPeerId = msg.TargetPeerId;
-    var connectAddress = msg.ConnectAddress;
+    var targetPeerId = msg.targetPeerId;
+    var connectAddress = msg.connectAddress;
     List<int> data = [];
-    if (msg.MessageType != MsgType.P2PCHAT.toString()) {
+    if (msg.messageType != MsgType.P2PCHAT.toString()) {
       await chainMessageHandler.encrypt(msg);
       data = MessageSerializer.marshal(msg);
     }
@@ -133,8 +133,8 @@ class ChainMessageHandler {
    */
   Future<ChainMessage> receive(ChainMessage chainMessage) async {
     await chainMessageHandler.decrypt(chainMessage);
-    var typ = chainMessage.MessageType;
-    var direct = chainMessage.MessageDirect;
+    var typ = chainMessage.messageType;
+    var direct = chainMessage.messageDirect;
     var handlers = chainMessageDispatch.getChainMessageHandler(typ);
     var sendHandler = handlers['sendHandler'];
     var receiveHandler = handlers['receiveHandler'];
@@ -164,35 +164,35 @@ class ChainMessageHandler {
    * @param chainMessage
    */
   Future<ChainMessage?> encrypt(ChainMessage chainMessage) async {
-    var payload = chainMessage.Payload;
+    var payload = chainMessage.payload;
     if (!payload) {
       return null;
     }
-    SecurityParams securityParams = SecurityParams();
-    securityParams.NeedCompress = chainMessage.NeedCompress;
-    securityParams.NeedEncrypt = chainMessage.NeedEncrypt;
-    var targetPeerId = chainMessage.TargetPeerId;
+    SecurityContext securityContext = SecurityContext();
+    securityContext.needCompress = chainMessage.needCompress;
+    securityContext.needEncrypt = chainMessage.needEncrypt;
+    var targetPeerId = chainMessage.targetPeerId;
     if (targetPeerId == null) {
-      targetPeerId = chainMessage.ConnectPeerId;
+      targetPeerId = chainMessage.connectPeerId;
     }
-    securityParams.TargetPeerId = targetPeerId;
-    if (chainMessage.ConnectPeerId != null &&
+    securityContext.targetPeerId = targetPeerId;
+    if (chainMessage.connectPeerId != null &&
         targetPeerId != null &&
-        chainMessage.ConnectPeerId.contains(targetPeerId) &&
-        securityParams.NeedEncrypt) {
+        chainMessage.connectPeerId.contains(targetPeerId) &&
+        securityContext.needEncrypt) {
       print('ConnectPeerId equals TargetPeerId && NeedEncrypt is true!');
     }
-    SecurityParams result =
-        await SecurityPayload.encrypt(payload, securityParams);
+    SecurityContext result =
+        await SecurityContextService.encrypt(payload, securityContext);
     if (result != null) {
-      chainMessage.TransportPayload = result.TransportPayload;
-      chainMessage.Payload = null;
-      chainMessage.PayloadSignature = result.PayloadSignature;
-      chainMessage.PreviousPublicKeyPayloadSignature =
-          result.PreviousPublicKeyPayloadSignature;
-      chainMessage.NeedCompress = result.NeedCompress;
-      chainMessage.NeedEncrypt = result.NeedEncrypt;
-      chainMessage.PayloadKey = result.PayloadKey;
+      chainMessage.transportPayload = result.transportPayload;
+      chainMessage.payload = null;
+      chainMessage.payloadSignature = result.payloadSignature;
+      chainMessage.previousPublicKeyPayloadSignature =
+          result.previousPublicKeyPayloadSignature;
+      chainMessage.needCompress = result.needCompress;
+      chainMessage.needEncrypt = result.needEncrypt;
+      chainMessage.payloadKey = result.payloadKey!;
     }
 
     return chainMessage;
@@ -203,83 +203,83 @@ class ChainMessageHandler {
    * @param chainMessage
    */
   Future<ChainMessage?> decrypt(ChainMessage chainMessage) async {
-    if (chainMessage.TransportPayload == null) {
+    if (chainMessage.transportPayload == null) {
       return null;
     }
-    SecurityParams securityParams = SecurityParams();
-    securityParams.NeedCompress = chainMessage.NeedCompress;
-    securityParams.NeedEncrypt = chainMessage.NeedEncrypt;
-    securityParams.PayloadSignature = chainMessage.PayloadSignature;
-    securityParams.PreviousPublicKeyPayloadSignature =
-        chainMessage.PreviousPublicKeyPayloadSignature;
-    securityParams.PayloadKey = chainMessage.PayloadKey;
-    var targetPeerId = chainMessage.TargetPeerId;
-    targetPeerId ??= chainMessage.ConnectPeerId;
-    securityParams.TargetPeerId = targetPeerId;
-    securityParams.SrcPeerId = chainMessage.SrcPeerId;
-    var payload = await SecurityPayload.decrypt(
-        chainMessage.TransportPayload, securityParams);
-    if (payload) {
-      chainMessage.Payload = payload;
-      chainMessage.TransportPayload = null;
+    SecurityContext securityContext = SecurityContext();
+    securityContext.needCompress = chainMessage.needCompress;
+    securityContext.needEncrypt = chainMessage.needEncrypt;
+    securityContext.payloadSignature = chainMessage.payloadSignature;
+    securityContext.previousPublicKeyPayloadSignature =
+        chainMessage.previousPublicKeyPayloadSignature;
+    securityContext.payloadKey = chainMessage.payloadKey;
+    var targetPeerId = chainMessage.targetPeerId;
+    targetPeerId ??= chainMessage.connectPeerId;
+    securityContext.targetPeerId = targetPeerId;
+    securityContext.srcPeerId = chainMessage.srcPeerId;
+    var payload = await SecurityContextService.decrypt(
+        chainMessage.transportPayload, securityContext);
+    if (payload != null) {
+      chainMessage.payload = payload;
+      chainMessage.transportPayload = '';
     }
   }
 
   ChainMessage error(String msgType, dynamic err) {
     var errMessage = ChainMessage();
-    errMessage.Payload = MsgType.ERROR.toString();
-    errMessage.MessageType = msgType;
-    errMessage.Tip = err.message;
-    errMessage.MessageDirect = MsgDirect.Response.toString();
+    errMessage.payload = MsgType.ERROR.toString();
+    errMessage.messageType = msgType;
+    errMessage.tip = err.message;
+    errMessage.messageDirect = MsgDirect.Response.toString();
 
     return errMessage;
   }
 
   ChainMessage response(String msgType, dynamic payload) {
     var responseMessage = ChainMessage();
-    responseMessage.Payload = payload;
-    responseMessage.MessageType = msgType;
-    responseMessage.MessageDirect = MsgDirect.Response.toString();
+    responseMessage.payload = payload;
+    responseMessage.messageType = msgType;
+    responseMessage.messageDirect = MsgDirect.Response.toString();
 
     return responseMessage;
   }
 
   ChainMessage ok(String msgType) {
     var okMessage = ChainMessage();
-    okMessage.Payload = MsgType.OK.toString();
-    okMessage.MessageType = msgType;
-    okMessage.Tip = "OK";
-    okMessage.MessageDirect = MsgDirect.Response.toString();
+    okMessage.payload = MsgType.OK.toString();
+    okMessage.messageType = msgType;
+    okMessage.tip = "OK";
+    okMessage.messageDirect = MsgDirect.Response.toString();
 
     return okMessage;
   }
 
   ChainMessage wait(String msgType) {
     var waitMessage = ChainMessage();
-    waitMessage.Payload = MsgType.WAIT.toString();
+    waitMessage.payload = MsgType.WAIT.toString();
 
-    waitMessage.MessageType = msgType;
+    waitMessage.messageType = msgType;
 
-    waitMessage.Tip = "WAIT";
+    waitMessage.tip = "WAIT";
 
-    waitMessage.MessageDirect = MsgDirect.Response.toString();
+    waitMessage.messageDirect = MsgDirect.Response.toString();
 
     return waitMessage;
   }
 
   setResponse(ChainMessage request, ChainMessage response) {
-    response.LocalConnectAddress = "";
-    response.LocalConnectPeerId = "";
-    response.ConnectAddress = request.LocalConnectAddress;
-    response.ConnectPeerId = request.LocalConnectPeerId;
-    response.Topic = request.Topic;
+    response.localConnectAddress = "";
+    response.localConnectPeerId = "";
+    response.connectAddress = request.localConnectAddress;
+    response.connectPeerId = request.localConnectPeerId;
+    response.topic = request.topic;
   }
 
   validate(ChainMessage chainMessage) {
-    if (chainMessage.ConnectPeerId == null) {
+    if (chainMessage.connectPeerId == null) {
       throw 'NullConnectPeerId';
     }
-    if (chainMessage.SrcPeerId == null) {
+    if (chainMessage.srcPeerId == null) {
       throw 'NullSrcPeerId';
     }
   }
@@ -287,35 +287,35 @@ class ChainMessageHandler {
   /// 如果消息太大，而且被要求分片的话
   /// @param chainMessage
   List<ChainMessage> slice(ChainMessage chainMessage) {
-    var _packSize = (chainMessage.MessageType != MsgType.P2PCHAT.toString())
+    var _packSize = (chainMessage.messageType != MsgType.P2PCHAT.toString())
         ? packetSize
         : webRtcPacketSize;
-    if (chainMessage.NeedSlice || chainMessage.Payload.length <= _packSize) {
+    if (chainMessage.needSlice || chainMessage.payload.length <= _packSize) {
       return [chainMessage];
     }
     /**
      * 如果源已经有值，说明不是最开始的节点，不用分片
      */
-    if (chainMessage.SrcPeerId != null) {
+    if (chainMessage.srcPeerId != null) {
       return [chainMessage];
     }
-    var _payload = chainMessage.Payload;
+    var _payload = chainMessage.payload;
 
-    int sliceSize = chainMessage.Payload.length / _packSize;
+    int sliceSize = chainMessage.payload.length / _packSize;
     //sliceSize = math.ceil(sliceSize);
-    chainMessage.SliceSize = sliceSize;
+    chainMessage.sliceSize = sliceSize;
     List<ChainMessage> slices = [];
     for (var i = 0; i < sliceSize; ++i) {
       ChainMessage slice = ChainMessage();
       //ObjectUtil.copy(chainMessage, slice);
-      slice.SliceNumber = i;
+      slice.sliceNumber = i;
       var slicePayload = null;
       if (i == sliceSize - 1) {
         slicePayload = _payload.substr(i * _packSize, _payload.length);
       } else {
         slicePayload = _payload.substring(i * _packSize, (i + 1) * _packSize);
       }
-      slice.Payload = slicePayload;
+      slice.payload = slicePayload;
       slices.add(slice);
     }
     return slices;
@@ -323,22 +323,22 @@ class ChainMessageHandler {
 
   /// 如果分片进行合并
   ChainMessage? merge(ChainMessage chainMessage) {
-    if (!chainMessage.NeedSlice ||
-        chainMessage.SliceSize == null ||
-        chainMessage.SliceSize < 2) {
+    if (!chainMessage.needSlice ||
+        chainMessage.sliceSize == null ||
+        chainMessage.sliceSize < 2) {
       return chainMessage;
     }
     /**
      * 如果不是最终目标，不用合并
      */
-    var targetPeerId = chainMessage.TargetPeerId;
-    targetPeerId ??= chainMessage.ConnectPeerId;
+    var targetPeerId = chainMessage.targetPeerId;
+    targetPeerId ??= chainMessage.connectPeerId;
     var myselfPeer = myself.myselfPeer;
     if (myselfPeer != null && targetPeerId != myselfPeer.peerId) {
       return chainMessage;
     }
-    var uuid = chainMessage.UUID;
-    var sliceSize = chainMessage.SliceSize;
+    var uuid = chainMessage.uuid;
+    var sliceSize = chainMessage.sliceSize;
     if (!caches.containsKey(uuid)) {
       List<ChainMessage> slices = [];
       caches[uuid] = slices;
@@ -347,17 +347,17 @@ class ChainMessageHandler {
     if (slices == null) {
       return null;
     }
-    slices[chainMessage.SliceNumber] = chainMessage;
+    slices[chainMessage.sliceNumber] = chainMessage;
     if (slices.length == sliceSize) {
       var payload = null;
       for (var slice in slices) {
-        var _payload = slice.Payload;
+        var _payload = slice.payload;
         payload = payload ? payload + _payload : _payload;
       }
       print("merge");
       print(chainMessage);
       print(payload);
-      chainMessage.Payload = payload;
+      chainMessage.payload = payload;
       caches.remove(uuid);
 
       return chainMessage;

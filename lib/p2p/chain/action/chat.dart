@@ -1,4 +1,4 @@
-import '../../message.dart';
+import '../../../entity/p2p/message.dart';
 import '../baseaction.dart';
 
 // Socket消息类型
@@ -19,11 +19,11 @@ class ChatAction extends BaseAction {
       String connectPeerId, dynamic data, String targetPeerId) async {
     ChainMessage chainMessage =
         await prepareSend(connectPeerId, data, targetPeerId: targetPeerId);
-    chainMessage.NeedEncrypt = true;
+    chainMessage.needEncrypt = true;
 
     ChainMessage? response = await send(chainMessage);
     if (response != null) {
-      return response.Payload;
+      return response.payload;
     }
 
     return null;
@@ -34,7 +34,7 @@ class ChatAction extends BaseAction {
     ChainMessage? _chainMessage = await super.receive(chainMessage);
     if (_chainMessage != null && receivers.isNotEmpty) {
       receivers.forEach((String key, dynamic receiver) async =>
-          {await receiver(_chainMessage.Payload)});
+          {await receiver(_chainMessage.payload)});
 
       return null;
     }

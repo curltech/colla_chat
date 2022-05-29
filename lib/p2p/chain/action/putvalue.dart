@@ -1,4 +1,4 @@
-import '../../message.dart';
+import '../../../entity/p2p/message.dart';
 import '../baseaction.dart';
 
 /**
@@ -12,14 +12,14 @@ class PutValueAction extends BaseAction {
   Future<dynamic> putValue(
       String connectPeerId, String payloadType, dynamic value) async {
     ChainMessage? chainMessage = await prepareSend(connectPeerId, value);
-    chainMessage.PayloadType = payloadType;
+    chainMessage.payloadType = payloadType;
 
     ChainMessage? response = await send(chainMessage);
     if (response != null) {
-      if (response.Payload == MsgType.ERROR) {
-        return response.Tip;
+      if (response.payload == MsgType.ERROR) {
+        return response.tip;
       } else {
-        return response.Payload;
+        return response.payload;
       }
     }
 

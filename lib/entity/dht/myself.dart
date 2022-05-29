@@ -1,3 +1,4 @@
+import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/dht/peerprofile.dart';
 
 import '../base.dart';
@@ -8,6 +9,8 @@ import 'package:cryptography/cryptography.dart';
 /// 在登录成功后被初始化
 /// 可以随时获取本节点的信息
 class Myself {
+  String peerId = '';
+
   // peer是ed25519,英语身份认证
   SimplePublicKey? peerPublicKey;
   SimpleKeyPair? peerPrivateKey;
@@ -20,7 +23,7 @@ class Myself {
   PeerProfile? peerProfile;
 
   ///当连接p2p节点成功后设置
-  String? myselfPeerClient;
+  PeerClient? myselfPeerClient;
   String? password;
   List<SimpleKeyPair> expiredKeys = [];
 

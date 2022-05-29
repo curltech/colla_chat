@@ -2,7 +2,6 @@ import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/service/stock/account.dart';
 import 'package:colla_chat/tool/util.dart';
 
-import '../datastore/sqflite.dart';
 import '../entity/chat/contact.dart';
 import '../entity/dht/chainapp.dart';
 import '../entity/dht/myselfpeer.dart';
@@ -10,8 +9,8 @@ import '../entity/dht/peerclient.dart';
 import '../entity/dht/peerendpoint.dart';
 import '../entity/dht/peerprofile.dart';
 import '../entity/stock/account.dart';
-import '../platform.dart';
 import 'base.dart';
+import 'chat/chat.dart';
 import 'chat/contact.dart';
 import 'dht/chainapp.dart';
 import 'dht/myselfpeer.dart';
@@ -71,76 +70,122 @@ class ServiceLocator {
         ],
         fields: buildFields(MyselfPeer(), []));
     services['myselfPeerService'] = myselfPeerService;
-    //
-    // var linkmanService = await LinkmanService.init(
-    //     tableName: 'chat_linkman',
-    //     indexFields: [
-    //       'givenName',
-    //       'name',
-    //       'ownerPeerId',
-    //       'peerId',
-    //       'mobile',
-    //       'collectionType'
-    //     ],
-    //     fields: buildFields(Linkman(), []));
-    // services['linkmanService'] = linkmanService;
-    //
-    // var linkmanTagService = await LinkmanTagService.init(
-    //     tableName: "chat_linkmanTag",
-    //     indexFields: ['ownerPeerId', 'createDate', 'name'],
-    //     fields: buildFields(LinkmanTag(), []));
-    // services['linkmanService'] = linkmanService;
-    //
-    // var linkmanTagLinkmanService = await LinkmanTagLinkmanService.init(
-    //     tableName: "chat_linkmanTagLinkman",
-    //     indexFields: ['ownerPeerId', 'createDate', 'tagId', 'linkmanPeerId'],
-    //     fields: buildFields(LinkmanTagLinkman(), []));
-    // services['linkmanTagLinkmanService'] = linkmanTagLinkmanService;
-    //
-    // var linkmanRequestService = await LinkmanRequestService.init(
-    //     tableName: "chat_linkmanRequest",
-    //     indexFields: [
-    //       'ownerPeerId',
-    //       'createDate',
-    //       'receiverPeerId',
-    //       'senderPeerId',
-    //       'status'
-    //     ],
-    //     fields: buildFields(LinkmanRequest(), []));
-    // services['linkmanRequestService'] = linkmanRequestService;
-    //
-    // var groupService = await GroupService.init(
-    //     tableName: "chat_group",
-    //     indexFields: [
-    //       'givenName',
-    //       'name',
-    //       'description',
-    //       'ownerPeerId',
-    //       'createDate',
-    //       'groupId',
-    //       'groupCategory',
-    //       'groupType'
-    //     ],
-    //     fields: buildFields(Group(), []));
-    // services['groupService'] = groupService;
-    //
-    // var groupMemberService = await GroupMemberService.init(
-    //     tableName: "chat_groupmember",
-    //     indexFields: [
-    //       'ownerPeerId',
-    //       'createDate',
-    //       'groupId',
-    //       'memberPeerId',
-    //       'memberType'
-    //     ],
-    //     fields: buildFields(GroupMember(), []));
-    // services['groupMemberService'] = groupMemberService;
-    //
-    // var contactService = await ContactService.init(
-    //     tableName: "chat_contact",
-    //     indexFields: ['peerId', 'mobile', 'formattedName', 'name'],
-    //     fields: buildFields(Contact(), []));
-    // services['contactService'] = contactService;
+
+    var linkmanService = await LinkmanService.init(
+        tableName: 'chat_linkman',
+        indexFields: [
+          'givenName',
+          'name',
+          'ownerPeerId',
+          'peerId',
+          'mobile',
+          'collectionType'
+        ],
+        fields: buildFields(Linkman(), []));
+    services['linkmanService'] = linkmanService;
+
+    var linkmanTagService = await LinkmanTagService.init(
+        tableName: "chat_linkmanTag",
+        indexFields: ['ownerPeerId', 'createDate', 'name'],
+        fields: buildFields(LinkmanTag(), []));
+    services['linkmanTagService'] = linkmanTagService;
+
+    var linkmanTagLinkmanService = await LinkmanTagLinkmanService.init(
+        tableName: "chat_linkmanTagLinkman",
+        indexFields: ['ownerPeerId', 'createDate', 'tagId', 'linkmanPeerId'],
+        fields: buildFields(LinkmanTagLinkman(), []));
+    services['linkmanTagLinkmanService'] = linkmanTagLinkmanService;
+
+    var linkmanRequestService = await LinkmanRequestService.init(
+        tableName: "chat_linkmanRequest",
+        indexFields: [
+          'ownerPeerId',
+          'createDate',
+          'receiverPeerId',
+          'senderPeerId',
+          'status'
+        ],
+        fields: buildFields(LinkmanRequest(), []));
+    services['linkmanRequestService'] = linkmanRequestService;
+
+    var groupService = await GroupService.init(
+        tableName: "chat_group",
+        indexFields: [
+          'givenName',
+          'name',
+          'description',
+          'ownerPeerId',
+          'createDate',
+          'groupId',
+          'groupCategory',
+          'groupType'
+        ],
+        fields: buildFields(Group(), []));
+    services['groupService'] = groupService;
+
+    var groupMemberService = await GroupMemberService.init(
+        tableName: "chat_groupmember",
+        indexFields: [
+          'ownerPeerId',
+          'createDate',
+          'groupId',
+          'memberPeerId',
+          'memberType'
+        ],
+        fields: buildFields(GroupMember(), []));
+    services['groupMemberService'] = groupMemberService;
+
+    var contactService = await ContactService.init(
+        tableName: "chat_contact",
+        indexFields: ['peerId', 'mobile', 'formattedName', 'name'],
+        fields: buildFields(Contact(), []));
+    services['contactService'] = contactService;
+
+    var chatMessageService = await ChatMessageService.init(
+        tableName: "chat_message",
+        indexFields: [
+          'ownerPeerId',
+          'subjectId',
+          'createDate',
+          'receiveTime',
+          'actualReceiveTime',
+          'blockId',
+          'messageType',
+          'attachBlockId'
+        ],
+        fields: buildFields(Contact(), []));
+    services['chatMessageService'] = chatMessageService;
+
+    var mergeMessageService = await MergeMessageService.init(
+        tableName: "chat_mergemessage",
+        indexFields: ['ownerPeerId', 'mergeMessageId', 'createDate'],
+        fields: buildFields(Contact(), []));
+    services['mergeMessageService'] = mergeMessageService;
+
+    var chatAttachService = await ChatAttachService.init(
+        tableName: "chat_attach",
+        indexFields: ['ownerPeerId', 'subjectId', 'createDate', 'messageId'],
+        fields: buildFields(Contact(), []));
+    services['chatAttachService'] = chatAttachService;
+
+    var receiveService = await ReceiveService.init(
+        tableName: "chat_receive",
+        indexFields: [
+          'ownerPeerId',
+          'subjectId',
+          'createDate',
+          'subjectType',
+          'receiverPeerId',
+          'blockId'
+        ],
+        fields: buildFields(Contact(), []));
+    services['receiveService'] = receiveService;
+
+    var chatService = await ChatService.init(
+        tableName: "chat_chat",
+        indexFields: ['ownerPeerId', 'subjectId', 'createDate', 'updateTime'],
+        fields: buildFields(Contact(), []));
+    services['chatService'] = chatService;
 
     await Sqlite3.getInstance();
 

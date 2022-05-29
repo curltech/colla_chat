@@ -1,6 +1,6 @@
 import '../../../app.dart';
 import '../../../tool/util.dart';
-import '../../message.dart';
+import '../../../entity/p2p/message.dart';
 import '../baseaction.dart';
 
 /**
@@ -15,12 +15,12 @@ class IonSignalAction extends BaseAction {
       String connectPeerId, dynamic data, String targetPeerId) async {
     ChainMessage? chainMessage =
         await prepareSend(connectPeerId, data, targetPeerId: targetPeerId);
-    chainMessage.NeedEncrypt = true;
+    chainMessage.needEncrypt = true;
 
     ChainMessage? response = await send(chainMessage);
     if (response != null) {
       logger.i('IonSignal response:${JsonUtil.toJsonString(response)}');
-      return response.Payload;
+      return response.payload;
     }
 
     return null;
@@ -30,8 +30,8 @@ class IonSignalAction extends BaseAction {
     ChainMessage? _chainMessage = await super.receive(chainMessage);
     if (_chainMessage != null && receivers.isNotEmpty) {
       ionSignalAction.receivers.forEach((String key, dynamic receiver) => {
-            receiver(_chainMessage.SrcPeerId, _chainMessage.SrcConnectPeerId,
-                _chainMessage.SrcConnectSessionId, _chainMessage.Payload)
+            receiver(_chainMessage.srcPeerId, _chainMessage.srcConnectPeerId,
+                _chainMessage.srcConnectSessionId, _chainMessage.payload)
           });
 
       return null;

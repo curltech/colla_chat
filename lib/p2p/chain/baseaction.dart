@@ -1,7 +1,7 @@
 import 'dart:core';
 
 import '../../app.dart';
-import '../message.dart';
+import '../../entity/p2p/message.dart';
 import 'chainmessagehandler.dart';
 
 enum PayloadType {
@@ -88,15 +88,15 @@ abstract class BaseAction {
     ChainMessage chainMessage = ChainMessage();
     var appParams = await AppParams.instance;
     connectPeerId ??= appParams.connectPeerId[0];
-    chainMessage.ConnectPeerId = connectPeerId;
-    chainMessage.Payload = data;
-    chainMessage.TargetPeerId = targetPeerId;
-    chainMessage.PayloadType = PayloadType.Map.toString();
-    chainMessage.MessageType = msgType.toString();
-    chainMessage.MessageDirect = MsgDirect.Request.toString();
-    chainMessage.NeedCompress = true;
-    chainMessage.NeedEncrypt = false;
-    chainMessage.UUID = '';
+    chainMessage.connectPeerId = connectPeerId;
+    chainMessage.payload = data;
+    chainMessage.targetPeerId = targetPeerId;
+    chainMessage.payloadType = PayloadType.Map.toString();
+    chainMessage.messageType = msgType.toString();
+    chainMessage.messageDirect = MsgDirect.Request.toString();
+    chainMessage.needCompress = true;
+    chainMessage.needEncrypt = false;
+    chainMessage.uuid = '';
 
     return chainMessage;
   }
@@ -121,11 +121,11 @@ abstract class BaseAction {
           //ObjectUtil.copy(responses[0], response);
           var payloads = [];
           for (var res in responses) {
-            if (res && res.Payload) {
-              payloads.add(res.Payload);
+            if (res && res.payload) {
+              payloads.add(res.payload);
             }
           }
-          response.Payload = payloads;
+          response.payload = payloads;
 
           return response;
         }
