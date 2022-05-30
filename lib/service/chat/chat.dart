@@ -174,7 +174,11 @@ class ChatAttachService extends BaseService {
 
   load(String attachBlockId, int? offset) async {
     var where = 'attachBlockId=? and ownerPeerId=?';
-    List<Object> whereArgs = [attachBlockId, myself.peerId];
+    var peerId = myself.peerId;
+    if (peerId == null) {
+      return;
+    }
+    List<Object> whereArgs = [attachBlockId, peerId];
     List<ChatAttach> attaches = [];
     var data = await find(where, whereArgs: whereArgs);
     SecurityContext securityContext = SecurityContext();

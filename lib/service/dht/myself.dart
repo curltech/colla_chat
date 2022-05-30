@@ -67,6 +67,7 @@ class MyselfService {
       throw 'VerifyNotPass';
     }
     myself.myselfPeer = myselfPeer;
+    myself.peerId = myselfPeer.peerId;
     myself.password = password;
     myself.peerPrivateKey = peerPrivateKey;
     myself.peerPublicKey = peerPublicKey;

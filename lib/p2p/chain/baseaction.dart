@@ -86,7 +86,7 @@ abstract class BaseAction {
   Future<ChainMessage> prepareSend(String connectPeerId, dynamic data,
       {String? targetPeerId}) async {
     ChainMessage chainMessage = ChainMessage();
-    var appParams = await AppParams.instance;
+    var appParams = AppParams.instance;
     connectPeerId ??= appParams.connectPeerId[0];
     chainMessage.connectPeerId = connectPeerId;
     chainMessage.payload = data;

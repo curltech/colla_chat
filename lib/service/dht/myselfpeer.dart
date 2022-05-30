@@ -8,6 +8,7 @@ import '../../entity/dht/base.dart';
 import '../../entity/dht/myself.dart';
 import '../../entity/dht/myselfpeer.dart';
 import '../../entity/dht/peerprofile.dart';
+import '../../p2p/chain/action/connect.dart';
 import '../../platform.dart';
 import '../../service/base.dart';
 import '../../tool/util.dart';
@@ -133,6 +134,7 @@ class MyselfPeerService extends PeerEntityService {
       await myselfService.setMyself(myselfPeer, password);
 
       ///2.连接篇p2p的节点，把自己的信息注册上去
+      // connectAction.connect(connectPeerId, peerClient);
 
       return true;
     }

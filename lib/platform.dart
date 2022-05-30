@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
  * 平台的参数，包括平台的硬件和系统软件特征
  */
 class PlatformParams {
-  static final PlatformParams _instance = PlatformParams();
+  static PlatformParams instance = PlatformParams();
   static bool initStatus = false;
 
   ///在loading页面创建的时候初始化,包含屏幕大小，系统字体，语言，黑暗明亮模式等信息
@@ -36,50 +36,54 @@ class PlatformParams {
   late Map<String, dynamic> deviceData;
   late Map<String, dynamic>? webDeviceData;
 
-  static Future<PlatformParams> get instance async {
+  static Future<PlatformParams> init() async {
     if (!initStatus) {
       final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
       try {
-        if (Platform.isAndroid || Platform.isIOS) {
-          _instance.ios = Platform.isIOS;
-          _instance.android = Platform.isAndroid;
-          _instance.linux = Platform.isLinux;
-          _instance.macos = Platform.isMacOS;
-          _instance.windows = Platform.isWindows;
-          _instance.localeName = Platform.localeName;
-          _instance.localHostname = Platform.localHostname;
-          _instance.operatingSystem = Platform.operatingSystem;
-          _instance.operatingSystemVersion = Platform.operatingSystemVersion;
-          _instance.version = Platform.version;
+        if (Platform.isAndroid ||
+            Platform.isIOS ||
+            Platform.isWindows ||
+            Platform.isMacOS ||
+            Platform.isLinux) {
+          instance.ios = Platform.isIOS;
+          instance.android = Platform.isAndroid;
+          instance.linux = Platform.isLinux;
+          instance.macos = Platform.isMacOS;
+          instance.windows = Platform.isWindows;
+          instance.localeName = Platform.localeName;
+          instance.localHostname = Platform.localHostname;
+          instance.operatingSystem = Platform.operatingSystem;
+          instance.operatingSystemVersion = Platform.operatingSystemVersion;
+          instance.version = Platform.version;
           if (Platform.isAndroid) {
-            _instance.deviceData = _instance
+            instance.deviceData = instance
                 ._readAndroidBuildData(await deviceInfoPlugin.androidInfo);
           } else if (Platform.isIOS) {
-            _instance.deviceData =
-                _instance._readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
+            instance.deviceData =
+                instance._readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
           } else if (Platform.isLinux) {
-            _instance.deviceData = _instance
-                ._readLinuxDeviceInfo(await deviceInfoPlugin.linuxInfo);
+            instance.deviceData =
+                instance._readLinuxDeviceInfo(await deviceInfoPlugin.linuxInfo);
           } else if (Platform.isMacOS) {
-            _instance.deviceData = _instance
-                ._readMacOsDeviceInfo(await deviceInfoPlugin.macOsInfo);
+            instance.deviceData =
+                instance._readMacOsDeviceInfo(await deviceInfoPlugin.macOsInfo);
           } else if (Platform.isWindows) {
-            _instance.deviceData = _instance
+            instance.deviceData = instance
                 ._readWindowsDeviceInfo(await deviceInfoPlugin.windowsInfo);
           }
         } else {
-          _instance.web = true;
+          instance.web = true;
         }
       } catch (e) {
-        _instance.web = true;
+        instance.web = true;
       }
-      if (_instance.web) {
-        _instance.webDeviceData = _instance
-            ._readWebBrowserInfo(await deviceInfoPlugin.webBrowserInfo);
+      if (instance.web) {
+        instance.webDeviceData =
+            instance._readWebBrowserInfo(await deviceInfoPlugin.webBrowserInfo);
       }
       initStatus = true;
     }
-    return _instance;
+    return instance;
   }
 
   Map<String, dynamic> _readAndroidBuildData(AndroidDeviceInfo build) {

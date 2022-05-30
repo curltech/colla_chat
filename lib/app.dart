@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:logger/logger.dart';
-import './constants.dart';
 
 class LocalStorage {
   static final LocalStorage _instance = LocalStorage();
@@ -36,7 +35,8 @@ class LocalStorage {
 /// 本应用的参数，与操作系统系统和硬件无关，需要保存到本地的存储中
 /// 在系统启动的config对象初始化从本地存储中加载
 class AppParams {
-  static AppParams _instance = AppParams();
+  static AppParams instance = AppParams();
+
   static bool initStatus = false;
 
   AppParams();
@@ -52,9 +52,6 @@ class AppParams {
   String? language;
   String? localeName;
 
-  /// 各种语言的连接地址选项，从服务器获取，或者是常量定义
-  var connectAddressOptionsISO = Constants.connectAddressOptionsISO;
-
   /// 可选的连接地址，比如http、ws、libp2p、turn
   var httpConnectAddress = <String>['https://localhost:9091']; //https服务器
   var wsConnectAddress = <String>['wss://localhost:9090']; //wss服务器
@@ -62,23 +59,25 @@ class AppParams {
   var iceServers = <String>[]; //ice服务器
   // libp2p的链协议号码
   String? chainProtocolId;
+
   // 目标的libp2p节点的peerId
   List<String> connectPeerId = <String>[];
+
   // 本机作为libp2p节点的监听地址
   var listenerAddress = <String>[];
 
-  static Future<AppParams> get instance async {
+  static Future<AppParams> init() async {
     if (!initStatus) {
       LocalStorage localStorage = await LocalStorage.instance;
       Object? json = localStorage.get('AppParams');
       if (json != null) {
         Map<dynamic, dynamic> jsonObject = JsonUtil.toMap(json as String);
-        _instance = AppParams.fromJson(jsonObject as Map<String, dynamic>);
+        instance = AppParams.fromJson(jsonObject as Map<String, dynamic>);
       }
       Logger.level = Level.warning;
       initStatus = true;
     }
-    return _instance;
+    return instance;
   }
 
   AppParams.fromJson(Map<String, dynamic> json)

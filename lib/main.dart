@@ -1,3 +1,4 @@
+import 'package:colla_chat/app.dart';
 import 'package:colla_chat/pages/loading.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/locale_data.dart';

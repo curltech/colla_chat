@@ -4,6 +4,7 @@ import '../../../app.dart';
 import '../../../routers/application.dart';
 import '../../../routers/routes.dart';
 import '../../../service/dht/myselfpeer.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 /// 远程登录组件，一个card下的录入框和按钮组合
 class P2pLoginWidget extends StatefulWidget {
@@ -95,7 +96,9 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
             padding: EdgeInsets.symmetric(horizontal: 50.0),
             child: Row(children: [
               TextButton(
-                child: Text('登录'),
+                child: Text(
+                  '登录',
+                ),
                 onPressed: () async {
                   await _login();
                 },

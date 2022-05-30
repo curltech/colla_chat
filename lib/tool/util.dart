@@ -18,6 +18,7 @@ import 'package:device_info_plus/device_info_plus.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:flutter/material.dart';
 
 class TypeUtil {
   static bool isString(dynamic obj) {

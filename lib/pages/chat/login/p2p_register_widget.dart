@@ -9,7 +9,7 @@ import '../../../routers/routes.dart';
 import '../../../service/dht/myselfpeer.dart';
 import '../../../tool/util.dart';
 
-/// 远程登录组件，一个card下的录入框和按钮组合
+/// 用户注册组件，一个card下的录入框和按钮组合
 class P2pRegisterWidget extends StatefulWidget {
   const P2pRegisterWidget({Key? key}) : super(key: key);
 

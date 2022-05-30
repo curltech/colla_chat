@@ -2,6 +2,7 @@ import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/service/stock/account.dart';
 import 'package:colla_chat/tool/util.dart';
 
+import '../app.dart';
 import '../entity/chat/chat.dart';
 import '../entity/chat/contact.dart';
 import '../entity/dht/chainapp.dart';
@@ -10,6 +11,7 @@ import '../entity/dht/peerclient.dart';
 import '../entity/dht/peerendpoint.dart';
 import '../entity/dht/peerprofile.dart';
 import '../entity/stock/account.dart';
+import '../platform.dart';
 import 'base.dart';
 import 'chat/chat.dart';
 import 'chat/contact.dart';
@@ -28,6 +30,8 @@ class ServiceLocator {
 
   ///初始化并注册服务类，在应用启动后调用
   static Future<void> init() async {
+    await PlatformParams.init();
+    await AppParams.init();
     var accountService = await StockAccountService.init(
         tableName: 'stk_account',
         fields: buildFields(StockAccount(), []),

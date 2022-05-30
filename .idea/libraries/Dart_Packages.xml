@@ -422,6 +422,13 @@
             </list>
           </value>
         </entry>
+        <entry key="country_picker">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/country_picker-2.0.15/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="country_pickers">
           <value>
             <list>
@@ -762,6 +769,13 @@
           <value>
             <list>
               <option value="$PROJECT_DIR$/../../flutter/packages/flutter/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="flutter_awesome_select">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/flutter_awesome_select-6.3.0/lib" />
             </list>
           </value>
         </entry>
@@ -2256,6 +2270,7 @@
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/connectivity_plus_web-1.2.0/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/connectivity_plus_windows-1.2.0/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/convert-3.0.1/lib" />
+      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/country_picker-2.0.15/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/country_pickers-2.0.0/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/cross_file-0.3.3+1/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/crypto-3.0.2/lib" />
@@ -2304,6 +2319,7 @@
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/fluent_ui-3.12.0/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/fluro-2.0.3/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/flushbar-1.10.4/lib" />
+      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/flutter_awesome_select-6.3.0/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/flutter_blurhash-0.7.0/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/flutter_cache_manager-3.3.0/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/flutter_contacts-1.1.4/lib" />

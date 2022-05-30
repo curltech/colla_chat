@@ -1,6 +1,5 @@
 import 'package:country_pickers/country.dart';
 import 'package:country_pickers/country_picker_cupertino.dart';
-import 'package:country_pickers/country_picker_dialog.dart';
 import 'package:country_pickers/country_picker_dropdown.dart';
 import 'package:country_pickers/utils/utils.dart';
 import 'package:fluent_ui/fluent_ui.dart';
@@ -10,10 +9,16 @@ import 'package:flutter/material.dart';
 var countryPicker = CountryPickerDropdown(
   initialValue: 'CN',
   itemBuilder: _buildDropdownItem,
-  itemFilter: (c) => ['US', 'AR', 'DE', 'GB', 'CN'].contains(c.isoCode),
+  itemFilter: (c) => [
+    'CN',
+    'US',
+    'TW',
+    'JP',
+    'KR',
+  ].contains(c.isoCode),
   priorityList: [
-    CountryPickerUtils.getCountryByIsoCode('US'),
     CountryPickerUtils.getCountryByIsoCode('CN'),
+    CountryPickerUtils.getCountryByIsoCode('US'),
   ],
   sortComparator: (Country a, Country b) => a.isoCode.compareTo(b.isoCode),
   onValuePicked: (Country country) {},
