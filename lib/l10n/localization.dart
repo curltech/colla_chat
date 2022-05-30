@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show SynchronousFuture;
 import 'package:flutter/services.dart';
 
+import '../app.dart';
+
 /// 自己写的，不是gen_l10n创建的，需要从assets目录加载语言包
 /// 配置方法：localeResolutionCallback:
 //           (Locale locale, Iterable<Locale> supportedLocales) {
@@ -34,7 +36,11 @@ class AppLocalizations {
   }
 
   String text(String key) {
-    return _localisedValues[key] ?? "$key not found";
+    if (_localisedValues.containsKey(key)) {
+      return _localisedValues[key];
+    }
+    logger.e("$key not found");
+    return key;
   }
 }
 

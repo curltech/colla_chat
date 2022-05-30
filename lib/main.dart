@@ -8,7 +8,6 @@ import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
-
 import 'l10n/localization.dart';
 
 void main() {
@@ -41,7 +40,10 @@ class CollaChatApp extends StatelessWidget {
 
     ///创建了一个具有 Material Design 风格的应用
     return MaterialApp(
-      title: AppLocalizations.instance.text('Welcome to CollaChat'),
+      onGenerateTitle: (context) {
+        return AppLocalizations.instance.text('Welcome to CollaChat');
+      },
+      //title: 'Welcome to CollaChat',
       debugShowCheckedModeBanner: false,
       // 取值方法Provider.of<AppProfile>(context)
       //  当ChangeNotifier 发生变化的时候会调用 builder 这个函数
@@ -58,13 +60,11 @@ class CollaChatApp extends StatelessWidget {
 
       // AppLocalizations.localizationsDelegates,
       localizationsDelegates: const [
-        // AppLocalizations.of(context)!.helloWorld
         AppLocalizationsDelegate(),
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      // AppLocalizations.supportedLocales,
       supportedLocales: const [
         Locale('zh', 'CN'),
         Locale('en', 'US'),
