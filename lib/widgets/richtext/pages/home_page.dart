@@ -21,7 +21,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late QuillController _controller;
+  QuillController? _controller;
   final FocusNode _focusNode = FocusNode();
 
   @override
@@ -172,15 +172,23 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: <Widget>[
-          QuillToolbar.basic(controller: _controller),
+          kIsWeb
+              ? Expanded(
+                  child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                  child: toolbar,
+                ))
+              : Container(child: toolbar),
+          Spacer(flex: 2),
           Expanded(
+            flex: 15,
             child: Container(
-              child: QuillEditor.basic(
-                controller: _controller,
-                readOnly: false, // true for view only mode
-              ),
+              color: Colors.white,
+              padding: const EdgeInsets.only(left: 16, right: 16),
+              child: quillEditor,
             ),
-          )
+          ),
         ],
       ),
     );
