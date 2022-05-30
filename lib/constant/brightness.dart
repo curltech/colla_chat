@@ -29,7 +29,7 @@ final brightnessOptionsKO = [
 final brightnessOptionsISO = {
   'zh_CN': brightnessOptionsZH,
   'zh_TW': brightnessOptionsTW,
-  'en_US': brightnessOptionsZH,
+  'en_US': brightnessOptions,
   'ja_JP': brightnessOptionsJA,
   'ko_KR': brightnessOptionsKO
 };

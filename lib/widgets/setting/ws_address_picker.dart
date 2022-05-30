@@ -18,6 +18,7 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
   bool _visibility = true;
   String _wsConnectAddress = AppParams.instance.wsConnectAddress[0];
   late TextEditingController _wsConnectAddressController;
+  List<S2Choice<String>> _items = [];
 
   @override
   void initState() {
@@ -33,12 +34,12 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
     var selectedLocale = Provider.of<LocaleDataProvider>(context).locale;
     var wsAddressOptions = wsAddressOptionsISO[
         '${selectedLocale.languageCode}_${selectedLocale.countryCode}'];
-    List<S2Choice<String>> items = [];
+    _items = [];
     if (wsAddressOptions != null) {
       for (var wsAddressOption in wsAddressOptions) {
         var item = S2Choice<String>(
             value: wsAddressOption.value, title: wsAddressOption.label);
-        items.add(item);
+        _items.add(item);
       }
     }
     return Column(children: <Widget>[
@@ -47,7 +48,7 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
         placeholder: '请选择地址',
         title: '请选择地址',
         selectedValue: _wsConnectAddress,
-        choiceItems: items,
+        choiceItems: _items,
         onChange: (dynamic state) {
           String value = state.value;
           _wsConnectAddressController.text = value;

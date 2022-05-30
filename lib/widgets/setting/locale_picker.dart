@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_awesome_select/flutter_awesome_select.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/localization.dart';
 import '../../provider/locale_data.dart';
 import '../../provider/locale_data.dart';
 
@@ -10,8 +10,8 @@ class LocalePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var t = AppLocalizations.of(context)!;
-    var selectedLocale = Localizations.localeOf(context).toString();
+    var selectedLocale =
+        Provider.of<LocaleDataProvider>(context).locale.languageCode;
     List<S2Choice<String>> items = [];
     for (var localeOption in localeOptions) {
       var item = S2Choice<String>(

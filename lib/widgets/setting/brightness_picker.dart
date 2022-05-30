@@ -5,20 +5,28 @@ import '../../provider/locale_data.dart';
 import '../../provider/theme_data.dart';
 import 'package:flutter_awesome_select/flutter_awesome_select.dart';
 
-class BrightnessPicker extends StatelessWidget {
+class BrightnessPicker extends StatefulWidget {
   const BrightnessPicker({Key? key}) : super(key: key);
 
+  @override
+  State<StatefulWidget> createState() {
+    return _BrightnessPickerState();
+  }
+}
+
+class _BrightnessPickerState extends State<BrightnessPicker> {
+  List<S2Choice<String>> _items = [];
   @override
   Widget build(BuildContext context) {
     var selectedLocale = Provider.of<LocaleDataProvider>(context).locale;
     var brightnessOptions = brightnessOptionsISO[
         '${selectedLocale.languageCode}_${selectedLocale.countryCode}'];
-    List<S2Choice<String>> items = [];
+    _items = [];
     if (brightnessOptions != null) {
       for (var brightnessOption in brightnessOptions) {
         var item = S2Choice<String>(
             value: brightnessOption.value, title: brightnessOption.label);
-        items.add(item);
+        _items.add(item);
       }
     }
     return Consumer<ThemeDataProvider>(
@@ -27,7 +35,7 @@ class BrightnessPicker extends StatelessWidget {
         placeholder: '请选择亮度',
         title: '请选择亮度',
         selectedValue: Provider.of<ThemeDataProvider>(context).brightness,
-        choiceItems: items,
+        choiceItems: _items,
         onChange: (dynamic state) {
           if (state != null) {
             String brightness = state.value;

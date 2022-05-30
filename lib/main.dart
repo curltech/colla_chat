@@ -1,6 +1,4 @@
-import 'package:colla_chat/app.dart';
 import 'package:colla_chat/pages/loading.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/locale_data.dart';
 import 'package:colla_chat/provider/theme_data.dart';
 import 'package:colla_chat/routers/application.dart';
@@ -9,8 +7,9 @@ import 'package:colla_chat/service/servicelocator.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:provider/provider.dart';
+
+import 'l10n/localization.dart';
 
 void main() {
   //初始化服务类
@@ -42,7 +41,7 @@ class CollaChatApp extends StatelessWidget {
 
     ///创建了一个具有 Material Design 风格的应用
     return MaterialApp(
-      title: 'Welcome to CollaChat',
+      title: AppLocalizations.instance.text('Welcome to CollaChat'),
       debugShowCheckedModeBanner: false,
       // 取值方法Provider.of<AppProfile>(context)
       //  当ChangeNotifier 发生变化的时候会调用 builder 这个函数
@@ -60,7 +59,7 @@ class CollaChatApp extends StatelessWidget {
       // AppLocalizations.localizationsDelegates,
       localizationsDelegates: const [
         // AppLocalizations.of(context)!.helloWorld
-        AppLocalizations.delegate,
+        AppLocalizationsDelegate(),
         GlobalMaterialLocalizations.delegate,
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
@@ -73,6 +72,21 @@ class CollaChatApp extends StatelessWidget {
         Locale('ja', 'JP'),
         Locale('ko', 'KR'),
       ],
+      // localeResolutionCallback:
+      //     (Locale? locale, Iterable<Locale>? supportedLocales) {
+      //   if (locale != null &&
+      //       supportedLocales != null &&
+      //       supportedLocales.isNotEmpty) {
+      //     for (Locale supportedLocale in supportedLocales!) {
+      //       if (supportedLocale.languageCode == locale.languageCode ||
+      //           supportedLocale.countryCode == locale.countryCode) {
+      //         return supportedLocale;
+      //       }
+      //     }
+      //
+      //     return supportedLocales.first;
+      //   }
+      // },
       locale: Provider.of<LocaleDataProvider>(context).locale,
     );
   }

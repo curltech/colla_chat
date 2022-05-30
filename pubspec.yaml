@@ -215,6 +215,12 @@ flutter:
 
     - assets/wasm/sqlite3.wasm
 
+    - assets/locale/localization_en.json
+    - assets/locale/localization_zh.json
+    - assets/locale/localization_zh_Hant.json
+    - assets/locale/localization_ja.json
+    - assets/locale/localization_ko.json
+
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
 
