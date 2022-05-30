@@ -68,10 +68,11 @@ dependencies:
   cached_network_image: ^3.0.0
   connectivity: ^3.0.6 #网络连接
   connectivity_plus: ^2.3.0
-  enough_mail: ^2.0.0
-  enough_mail_html: ^2.0.0
-  enough_mail_flutter: ^2.0.0
-  xml: ^6.0.1
+  #enough_mail: ^2.0.0
+  #enough_media: ^2.2.0
+  #enough_mail_html: ^2.0.0
+  #enough_mail_flutter: ^2.0.0
+  #xml: ^6.0.1
   # 加密安全
   cryptography: ^2.0.5 #ecc,aes
   cryptography_flutter: ^2.0.2
@@ -130,13 +131,13 @@ dependencies:
   material_design_icons_flutter: ^5.0.6295
   #flutter_bloc: ^6.1.0
   #flutter_swiper: 1.1.6 # Flutter 轮播图 https://github.com/best-flutter/flutter_swiper
-  #flutter_screenutil: 5.5.3 # Flutter 屏幕适配 https://github.com/OpenFlutter/flutter_screenutil
+  flutter_screenutil: ^5.5.3 # Flutter 屏幕适配 https://github.com/OpenFlutter/flutter_screenutil
   # webrtc
   flutter_webrtc: ^0.8.7
   dart_webrtc: ^1.0.5
   livekit_client: ^1.0.0
   # 多媒体
-  photo_view: ^0.13.0 #图片显示
+  photo_view: 0.14.0 #图片显示
   flutter_sound: ^9.2.12 #音频处理
   audioplayers: ^0.20.1 #音频处理
   video_player: ^2.1.1 #视频播放
@@ -144,6 +145,10 @@ dependencies:
   qr_code_scanner: ^0.7.0
   extended_image: ^6.0.1
   extended_image_library: ^3.3.0
+  filesystem_picker: ^2.0.1
+  file_picker: ^4.6.0
+  flutter_quill: ^5.0.3
+  universal_html: ^2.0.8
   #本地化
   lpinyin: ^2.0.3 #拼音
   wechat_assets_picker: ^7.3.0 #微信图库
@@ -169,7 +174,7 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
   #analyzer: ^4.1.0
-  floor_generator: ^1.2.0
+  #floor_generator: ^1.2.0
   build_runner: ^2.1.10
 
 # For information on the generic Dart part of this file, see the
@@ -215,11 +220,11 @@ flutter:
 
     - assets/wasm/sqlite3.wasm
 
-    - assets/locale/localization_en.json
-    - assets/locale/localization_zh.json
-    - assets/locale/localization_zh_Hant.json
-    - assets/locale/localization_ja.json
-    - assets/locale/localization_ko.json
+    - assets/locale/localization_en_US.json
+    - assets/locale/localization_zh_CN.json
+    - assets/locale/localization_zh_TW.json
+    - assets/locale/localization_ja_JP.json
+    - assets/locale/localization_ko_KR.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

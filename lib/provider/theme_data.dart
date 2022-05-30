@@ -9,7 +9,9 @@ class ThemeDataProvider with ChangeNotifier {
   ThemeData? _themeData;
 
   ThemeData? get themeData {
-    buildThemeData();
+    if (_themeData == null) {
+      buildThemeData();
+    }
     return _themeData;
   }
 
@@ -49,6 +51,7 @@ class ThemeDataProvider with ChangeNotifier {
   set seedColor(MaterialColor? color) {
     _seedColor = color;
     _primarySwatch = null;
+    buildThemeData();
     notifyListeners();
   }
 
@@ -59,6 +62,7 @@ class ThemeDataProvider with ChangeNotifier {
   set primarySwatch(MaterialColor? color) {
     _seedColor = null;
     _primarySwatch = color;
+    buildThemeData();
     notifyListeners();
   }
 
@@ -68,6 +72,7 @@ class ThemeDataProvider with ChangeNotifier {
 
   set fontFamily(String fontFamily) {
     _fontFamily = fontFamily;
+    buildThemeData();
     notifyListeners();
   }
 
@@ -77,6 +82,7 @@ class ThemeDataProvider with ChangeNotifier {
 
   set brightness(String brightness) {
     _brightness = brightness;
+    buildThemeData();
     notifyListeners();
   }
 }
