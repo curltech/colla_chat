@@ -7,9 +7,8 @@ import '../baseaction.dart';
 class FindPeerAction extends BaseAction {
   FindPeerAction(MsgType msgType) : super(msgType);
 
-  Future<dynamic> findPeer(String connectPeerId, String targetPeerId) async {
-    ChainMessage? chainMessage =
-        await prepareSend(connectPeerId, {'peerId': targetPeerId});
+  Future<dynamic> findPeer(String targetPeerId) async {
+    ChainMessage? chainMessage = await prepareSend({'peerId': targetPeerId});
 
     ChainMessage? response = await send(chainMessage);
     if (response != null) {

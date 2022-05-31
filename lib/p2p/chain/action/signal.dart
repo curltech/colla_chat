@@ -9,10 +9,9 @@ class SignalAction extends BaseAction {
     //webrtcPeerPool.registSignalAction(this);
   }
 
-  Future<dynamic> signal(
-      String connectPeerId, dynamic data, String targetPeerId) async {
-    ChainMessage? chainMessage = await signalAction
-        .prepareSend(connectPeerId, data, targetPeerId: targetPeerId);
+  Future<dynamic> signal(dynamic data, String targetPeerId) async {
+    ChainMessage? chainMessage =
+        await signalAction.prepareSend(data, targetPeerId: targetPeerId);
     // TODO: 视频通话的signal加密送过去解密完数据有问题，具体原因还没找到
     //chainMessage.NeedEncrypt = true
 

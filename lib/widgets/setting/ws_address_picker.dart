@@ -50,15 +50,17 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
         selectedValue: _wsConnectAddress,
         choiceItems: _items,
         onChange: (dynamic state) {
-          String value = state.value;
-          _wsConnectAddressController.text = value;
-          if (value != '') {
-            _wsConnectAddress = value;
-            AppParams.instance.wsConnectAddress[0] = value;
-            _visibility = true;
-          } else {
-            _visibility = false;
-          }
+          setState(() {
+            String value = state.value;
+            _wsConnectAddressController.text = value;
+            if (value != '') {
+              _wsConnectAddress = value;
+              AppParams.instance.wsConnectAddress[0] = value;
+              _visibility = true;
+            } else {
+              _visibility = false;
+            }
+          });
         },
       ),
       SizedBox(height: 10.0),

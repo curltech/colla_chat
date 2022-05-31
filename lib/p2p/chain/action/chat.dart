@@ -15,10 +15,9 @@ enum ChatMessageType {
 class ChatAction extends BaseAction {
   ChatAction(MsgType msgType) : super(msgType);
 
-  Future<dynamic> chat(
-      String connectPeerId, dynamic data, String targetPeerId) async {
+  Future<dynamic> chat(dynamic data, String targetPeerId) async {
     ChainMessage chainMessage =
-        await prepareSend(connectPeerId, data, targetPeerId: targetPeerId);
+        await prepareSend(data, targetPeerId: targetPeerId);
     chainMessage.needEncrypt = true;
 
     ChainMessage? response = await send(chainMessage);

@@ -83,12 +83,27 @@ abstract class BaseAction {
   }
 
   ///发送前的预处理，设置消息的初始值
-  Future<ChainMessage> prepareSend(String connectPeerId, dynamic data,
-      {String? targetPeerId}) async {
+  Future<ChainMessage> prepareSend(dynamic data,
+      {String? connectAddress,
+      String? connectPeerId,
+      String? topic,
+      String? targetPeerId}) async {
     ChainMessage chainMessage = ChainMessage();
     var appParams = AppParams.instance;
+    if (connectAddress == null) {
+      if (appParams.wsConnectAddress.isNotEmpty) {
+        connectAddress = appParams.wsConnectAddress[0];
+      } else if (appParams.httpConnectAddress.isNotEmpty) {
+        connectAddress = appParams.httpConnectAddress[0];
+      }
+    }
+    chainMessage.connectAddress = connectAddress;
     connectPeerId ??= appParams.connectPeerId[0];
     chainMessage.connectPeerId = connectPeerId;
+    if (topic == null && appParams.topics.isNotEmpty) {
+      topic ??= appParams.topics[0];
+    }
+    chainMessage.topic = topic;
     chainMessage.payload = data;
     chainMessage.targetPeerId = targetPeerId;
     chainMessage.payloadType = PayloadType.Map.toString();
@@ -116,7 +131,7 @@ abstract class BaseAction {
           ps.add(p);
         }
         List<dynamic> responses = await Future.wait(ps);
-        if (responses != null && responses.length > 1) {
+        if (responses.length > 1) {
           var response = ChainMessage();
           //ObjectUtil.copy(responses[0], response);
           var payloads = [];

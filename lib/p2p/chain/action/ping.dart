@@ -7,10 +7,9 @@ import '../baseaction.dart';
 class PingAction extends BaseAction {
   PingAction(MsgType msgType) : super(msgType);
 
-  Future<dynamic> ping(
-      String connectPeerId, dynamic data, String targetPeerId) async {
+  Future<dynamic> ping(dynamic data, String targetPeerId) async {
     ChainMessage chainMessage =
-        await prepareSend(connectPeerId, data, targetPeerId: targetPeerId);
+        await prepareSend(data, targetPeerId: targetPeerId);
     //chainMessage.NeedEncrypt = true
 
     ChainMessage? response = await send(chainMessage);

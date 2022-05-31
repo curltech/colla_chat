@@ -5,8 +5,8 @@ import '../baseaction.dart';
 class ConnectAction extends BaseAction {
   ConnectAction(MsgType msgType) : super(msgType);
 
-  Future<dynamic> connect(String connectPeerId, dynamic peerClient) async {
-    ChainMessage chainMessage = await prepareSend(connectPeerId, peerClient);
+  Future<dynamic> connect(dynamic peerClient) async {
+    ChainMessage chainMessage = await prepareSend(peerClient);
     chainMessage.payloadType = PayloadType.PeerClient.toString();
 
     ChainMessage? response = await send(chainMessage);

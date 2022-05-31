@@ -1,3 +1,4 @@
+import '../../app.dart';
 import '../../entity/dht/myself.dart';
 import '../../entity/p2p/security_context.dart';
 import '../../service/p2p/message.dart';
@@ -114,7 +115,7 @@ class ChainMessageHandler {
         }
       }
     } catch (err) {
-      print('send message:' + err.toString());
+      logger.e('send message:' + err.toString());
     }
     /**
      * 把响应数据转换成chainmessage
@@ -145,7 +146,7 @@ class ChainMessageHandler {
       try {
         response = await receiveHandler(chainMessage);
       } catch (err) {
-        print('receiveHandler chainMessage:' + err.toString());
+        logger.e('receiveHandler chainMessage:' + err.toString());
         response = chainMessageHandler.error(typ, err);
 
         return response;
@@ -180,7 +181,7 @@ class ChainMessageHandler {
         targetPeerId != null &&
         chainMessage.connectPeerId.contains(targetPeerId) &&
         securityContext.needEncrypt) {
-      print('ConnectPeerId equals TargetPeerId && NeedEncrypt is true!');
+      logger.e('ConnectPeerId equals TargetPeerId && NeedEncrypt is true!');
     }
     SecurityContext result =
         await SecurityContextService.encrypt(payload, securityContext);

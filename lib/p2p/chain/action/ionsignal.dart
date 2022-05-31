@@ -11,10 +11,9 @@ class IonSignalAction extends BaseAction {
     //ionSfuClientPool.registSignalAction(this);
   }
 
-  Future<dynamic> signal(
-      String connectPeerId, dynamic data, String targetPeerId) async {
+  Future<dynamic> signal(dynamic data, String targetPeerId) async {
     ChainMessage? chainMessage =
-        await prepareSend(connectPeerId, data, targetPeerId: targetPeerId);
+        await prepareSend(data, targetPeerId: targetPeerId);
     chainMessage.needEncrypt = true;
 
     ChainMessage? response = await send(chainMessage);

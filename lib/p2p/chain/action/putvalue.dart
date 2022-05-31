@@ -9,9 +9,8 @@ import '../baseaction.dart';
 class PutValueAction extends BaseAction {
   PutValueAction(MsgType msgType) : super(msgType);
 
-  Future<dynamic> putValue(
-      String connectPeerId, String payloadType, dynamic value) async {
-    ChainMessage? chainMessage = await prepareSend(connectPeerId, value);
+  Future<dynamic> putValue(String payloadType, dynamic value) async {
+    ChainMessage? chainMessage = await prepareSend(value);
     chainMessage.payloadType = payloadType;
 
     ChainMessage? response = await send(chainMessage);

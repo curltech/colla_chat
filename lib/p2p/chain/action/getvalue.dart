@@ -9,8 +9,8 @@ import '../baseaction.dart';
 class GetValueAction extends BaseAction {
   GetValueAction(MsgType msgType) : super(msgType);
 
-  Future<dynamic> getValue(String connectPeerId, String key) async {
-    ChainMessage chainMessage = await prepareSend(connectPeerId, {'key': key});
+  Future<dynamic> getValue(String key) async {
+    ChainMessage chainMessage = await prepareSend({'key': key});
 
     ChainMessage? response = await send(chainMessage);
     if (response != null) {

@@ -57,6 +57,7 @@ class AppParams {
   var wsConnectAddress = <String>['wss://localhost:9090']; //wss服务器
   var libp2pConnectAddress = <String>[]; //libp2p服务器
   var iceServers = <String>[]; //ice服务器
+  var topics = <String>[]; //订阅的主题
   // libp2p的链协议号码
   String? chainProtocolId;
 

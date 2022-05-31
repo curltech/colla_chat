@@ -9,9 +9,8 @@ import '../baseaction.dart';
 class QueryPeerTransAction extends BaseAction {
   QueryPeerTransAction(MsgType msgType) : super(msgType);
 
-  Future<List<dynamic>?> queryPeerTrans(
-      String connectPeerId, dynamic data) async {
-    ChainMessage chainMessage = await prepareSend(connectPeerId, data);
+  Future<List<dynamic>?> queryPeerTrans(dynamic data) async {
+    ChainMessage chainMessage = await prepareSend(data);
 
     ChainMessage? response = await send(chainMessage);
     if (response != null) {

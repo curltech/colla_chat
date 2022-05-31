@@ -21,9 +21,8 @@ class ConsensusAction extends BaseAction {
         MsgType.CONSENSUS_PBFT_REPLY.name, send, receive, response);
   }
 
-  Future<dynamic?> consensus(String connectPeerId, dynamic dataBlock,
-      {String? msgType}) async {
-    ChainMessage chainMessage = await prepareSend(connectPeerId, dataBlock);
+  Future<dynamic?> consensus(dynamic dataBlock, {String? msgType}) async {
+    ChainMessage chainMessage = await prepareSend(dataBlock);
     chainMessage.payloadType = PayloadType.DataBlock.name;
     if (msgType == null) {
       msgType = MsgType.CONSENSUS.name;
