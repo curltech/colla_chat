@@ -31,22 +31,19 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
 
   @override
   Widget build(BuildContext context) {
-    var selectedLocale = Provider.of<LocaleDataProvider>(context).locale;
-    logger.i('wsAddress will switch to ${selectedLocale.toString()}');
-    var wsAddressOptions = wsAddressOptionsISO[selectedLocale];
+    var locale = Provider.of<LocaleDataProvider>(context).locale;
+    var instance = AppLocalizations.instance;
     List<S2Choice<String>> items = [];
-    if (wsAddressOptions != null) {
-      for (var wsAddressOption in wsAddressOptions) {
-        var item = S2Choice<String>(
-            value: wsAddressOption.value, title: wsAddressOption.label);
-        items.add(item);
-      }
+    for (var wsAddressOption in wsAddressOptions) {
+      var label = instance.text(wsAddressOption.label);
+      var item = S2Choice<String>(value: wsAddressOption.value, title: label);
+      items.add(item);
     }
     return Column(children: <Widget>[
       SmartSelect<String>.single(
         modalType: S2ModalType.bottomSheet,
-        placeholder: AppLocalizations.instance.text('Please select address'),
-        title: AppLocalizations.instance.text('Address'),
+        placeholder: instance.text('Please select address'),
+        title: instance.text('Address'),
         selectedValue: _wsConnectAddress,
         choiceItems: items,
         onChange: (dynamic state) {
@@ -73,7 +70,7 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
                 controller: _wsConnectAddressController,
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(
-                  labelText: AppLocalizations.instance.text('Primary Address'),
+                  labelText: instance.text('Primary Address'),
                   prefixIcon: Icon(Icons.location_city),
                 ),
                 //initialValue: _wsConnectAddress,
