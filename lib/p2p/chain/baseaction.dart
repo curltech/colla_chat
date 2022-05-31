@@ -67,9 +67,9 @@ abstract class BaseAction {
   Map<String, dynamic> receivers = <String, dynamic>{};
 
   BaseAction(MsgType msgType) {
-    msgType = msgType;
+    this.msgType = msgType;
     chainMessageDispatch.registerChainMessageHandler(
-        msgType.toString(), send, receive, response);
+        msgType.name, send, receive, response);
   }
 
   ///注册接收消息的处理器
@@ -98,17 +98,19 @@ abstract class BaseAction {
       }
     }
     chainMessage.connectAddress = connectAddress;
-    connectPeerId ??= appParams.connectPeerId[0];
-    chainMessage.connectPeerId = connectPeerId;
+    if (appParams.connectPeerId.isNotEmpty) {
+      connectPeerId = appParams.connectPeerId[0];
+      chainMessage.connectPeerId = connectPeerId;
+    }
     if (topic == null && appParams.topics.isNotEmpty) {
       topic ??= appParams.topics[0];
     }
     chainMessage.topic = topic;
     chainMessage.payload = data;
     chainMessage.targetPeerId = targetPeerId;
-    chainMessage.payloadType = PayloadType.Map.toString();
-    chainMessage.messageType = msgType.toString();
-    chainMessage.messageDirect = MsgDirect.Request.toString();
+    chainMessage.payloadType = PayloadType.Map.name;
+    chainMessage.messageType = msgType.name;
+    chainMessage.messageDirect = MsgDirect.Request.name;
     chainMessage.needCompress = true;
     chainMessage.needEncrypt = false;
     chainMessage.uuid = '';

@@ -115,7 +115,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
   }
 
   Future<void> _login() async {
-    AppParams appParams = await AppParams.instance;
+    AppParams appParams = AppParams.instance;
     await appParams.saveAppParams();
     var loginStatus = await myselfPeerService.login(_credential, _password);
     if (loginStatus) {

@@ -54,7 +54,7 @@ class AppParams {
 
   /// 可选的连接地址，比如http、ws、libp2p、turn
   var httpConnectAddress = <String>['https://localhost:9091']; //https服务器
-  var wsConnectAddress = <String>['wss://localhost:9090']; //wss服务器
+  var wsConnectAddress = <String>['wss://localhost:9090/websocket']; //wss服务器
   var libp2pConnectAddress = <String>[]; //libp2p服务器
   var iceServers = <String>[]; //ice服务器
   var topics = <String>[]; //订阅的主题

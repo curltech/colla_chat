@@ -1,6 +1,8 @@
 import 'dart:convert';
 
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/transport/webclient.dart';
+import 'package:web_socket_channel/html.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -17,17 +19,20 @@ class Websocket implements IWebClient {
   String? heartbeatTimer;
 
   Websocket(String addr) {
-    var pos = addr.indexOf(prefix);
-    if (pos == 0) {
-      addr = addr.substring(6);
-    }
-    while (addr.endsWith('/')) {
-      addr = addr.substring(0, addr.length - 1);
+    if (!addr.startsWith(prefix)) {
+      throw 'error wss address prefix';
     }
     address = addr;
+    connect();
+  }
 
-    channel = IOWebSocketChannel.connect(addr,
-        headers: headers, pingInterval: pingInterval);
+  connect() async {
+    if (PlatformParams.instance.web) {
+      channel = HtmlWebSocketChannel.connect(Uri.parse(address));
+    } else {
+      channel = IOWebSocketChannel.connect(Uri.parse(address),
+          headers: headers, pingInterval: pingInterval);
+    }
     _status = true;
   }
 
@@ -46,7 +51,7 @@ class Websocket implements IWebClient {
   }
 
   onError(err) async {
-    logger.i("websocket onError, ${err}");
+    logger.e("websocket onError, ${err}");
     await reconnect();
   }
 
@@ -79,9 +84,7 @@ class Websocket implements IWebClient {
 
   reconnect() async {
     await close();
-    channel = IOWebSocketChannel.connect(address,
-        headers: headers, pingInterval: pingInterval);
-    _status = true;
+    connect();
   }
 }
 
@@ -121,7 +124,6 @@ class WebsocketPool {
       return websockets[address];
     } else {
       var websocket = Websocket(address);
-      websocket.reconnect();
       websockets[address] = websocket;
 
       return websocket;

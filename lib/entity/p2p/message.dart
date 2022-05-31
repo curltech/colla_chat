@@ -18,10 +18,10 @@ class ChainMessage extends SecurityContext {
   /// ,第一个连接节点
   String? srcConnectSessionId;
   String? srcConnectPeerId;
-  late String localConnectPeerId;
+  String? localConnectPeerId;
   String? localConnectAddress;
   String? srcAddress;
-  late String connectPeerId;
+  String? connectPeerId;
   String? connectAddress;
   String? connectSessionId;
   late String messageType;

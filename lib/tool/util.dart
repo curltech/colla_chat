@@ -273,12 +273,7 @@ class EntityUtil {
   }
 
   static removeNull(Map map) {
-    for (var key in map.keys) {
-      var value = map[key];
-      if (value == null) {
-        map.remove(key);
-      }
-    }
+    map.removeWhere((key, value) => value == null);
   }
 }
 

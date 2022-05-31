@@ -134,9 +134,9 @@ class MyselfPeerService extends PeerEntityService {
       await myselfService.setMyself(myselfPeer, password);
 
       ///2.连接篇p2p的节点，把自己的信息注册上去
-      // connectAction.connect(connectPeerId, peerClient);
+      connectAction.connect(myselfPeer);
 
-      return true;
+      return false;
     }
 
     return false;

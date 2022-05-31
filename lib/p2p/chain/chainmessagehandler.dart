@@ -86,7 +86,7 @@ class ChainMessageHandler {
     var targetPeerId = msg.targetPeerId;
     var connectAddress = msg.connectAddress;
     List<int> data = [];
-    if (msg.messageType != MsgType.P2PCHAT.toString()) {
+    if (msg.messageType != MsgType.P2PCHAT.name) {
       await chainMessageHandler.encrypt(msg);
       data = MessageSerializer.marshal(msg);
     }
@@ -94,7 +94,7 @@ class ChainMessageHandler {
     var success = false;
     var result = null;
     try {
-      if (targetPeerId != null) {
+      if (targetPeerId == null) {
         if (!success && connectAddress != null) {
           if (connectAddress.startsWith('ws')) {
             var websocket = WebsocketPool.instance.get(connectAddress);
@@ -142,7 +142,7 @@ class ChainMessageHandler {
     var responseHandler = handlers['responseHandler'];
     ChainMessage? response;
     //分发到对应注册好的处理器，主要是Receive和Response方法
-    if (direct == MsgDirect.Request.toString()) {
+    if (direct == MsgDirect.Request.name) {
       try {
         response = await receiveHandler(chainMessage);
       } catch (err) {
@@ -151,7 +151,7 @@ class ChainMessageHandler {
 
         return response;
       }
-    } else if (direct == MsgDirect.Response.toString()) {
+    } else if (direct == MsgDirect.Response.name) {
       response = await responseHandler(chainMessage);
     }
     if (response != null) {
@@ -166,7 +166,7 @@ class ChainMessageHandler {
    */
   Future<ChainMessage?> encrypt(ChainMessage chainMessage) async {
     var payload = chainMessage.payload;
-    if (!payload) {
+    if (payload == null) {
       return null;
     }
     SecurityContext securityContext = SecurityContext();
@@ -179,7 +179,7 @@ class ChainMessageHandler {
     securityContext.targetPeerId = targetPeerId;
     if (chainMessage.connectPeerId != null &&
         targetPeerId != null &&
-        chainMessage.connectPeerId.contains(targetPeerId) &&
+        chainMessage.connectPeerId == targetPeerId &&
         securityContext.needEncrypt) {
       logger.e('ConnectPeerId equals TargetPeerId && NeedEncrypt is true!');
     }
@@ -193,7 +193,7 @@ class ChainMessageHandler {
           result.previousPublicKeyPayloadSignature;
       chainMessage.needCompress = result.needCompress;
       chainMessage.needEncrypt = result.needEncrypt;
-      chainMessage.payloadKey = result.payloadKey!;
+      chainMessage.payloadKey = result.payloadKey;
     }
 
     return chainMessage;
@@ -228,10 +228,10 @@ class ChainMessageHandler {
 
   ChainMessage error(String msgType, dynamic err) {
     var errMessage = ChainMessage();
-    errMessage.payload = MsgType.ERROR.toString();
+    errMessage.payload = MsgType.ERROR.name;
     errMessage.messageType = msgType;
     errMessage.tip = err.message;
-    errMessage.messageDirect = MsgDirect.Response.toString();
+    errMessage.messageDirect = MsgDirect.Response.name;
 
     return errMessage;
   }
@@ -240,30 +240,30 @@ class ChainMessageHandler {
     var responseMessage = ChainMessage();
     responseMessage.payload = payload;
     responseMessage.messageType = msgType;
-    responseMessage.messageDirect = MsgDirect.Response.toString();
+    responseMessage.messageDirect = MsgDirect.Response.name;
 
     return responseMessage;
   }
 
   ChainMessage ok(String msgType) {
     var okMessage = ChainMessage();
-    okMessage.payload = MsgType.OK.toString();
+    okMessage.payload = MsgType.OK.name;
     okMessage.messageType = msgType;
     okMessage.tip = "OK";
-    okMessage.messageDirect = MsgDirect.Response.toString();
+    okMessage.messageDirect = MsgDirect.Response.name;
 
     return okMessage;
   }
 
   ChainMessage wait(String msgType) {
     var waitMessage = ChainMessage();
-    waitMessage.payload = MsgType.WAIT.toString();
+    waitMessage.payload = MsgType.WAIT.name;
 
     waitMessage.messageType = msgType;
 
     waitMessage.tip = "WAIT";
 
-    waitMessage.messageDirect = MsgDirect.Response.toString();
+    waitMessage.messageDirect = MsgDirect.Response.name;
 
     return waitMessage;
   }
@@ -288,10 +288,12 @@ class ChainMessageHandler {
   /// 如果消息太大，而且被要求分片的话
   /// @param chainMessage
   List<ChainMessage> slice(ChainMessage chainMessage) {
-    var _packSize = (chainMessage.messageType != MsgType.P2PCHAT.toString())
+    var payload = chainMessage.payload;
+    var jsonStr = JsonUtil.toJsonString(payload);
+    var _packSize = (chainMessage.messageType != MsgType.P2PCHAT.name)
         ? packetSize
         : webRtcPacketSize;
-    if (chainMessage.needSlice || chainMessage.payload.length <= _packSize) {
+    if (!chainMessage.needSlice || jsonStr.length <= _packSize) {
       return [chainMessage];
     }
     /**
@@ -302,7 +304,7 @@ class ChainMessageHandler {
     }
     var _payload = chainMessage.payload;
 
-    int sliceSize = chainMessage.payload.length / _packSize;
+    int sliceSize = jsonStr.length ~/ _packSize;
     //sliceSize = math.ceil(sliceSize);
     chainMessage.sliceSize = sliceSize;
     List<ChainMessage> slices = [];
