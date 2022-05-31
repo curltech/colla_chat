@@ -3,6 +3,7 @@ import 'package:colla_chat/provider/theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../l10n/localization.dart';
 import '../../../widgets/richtext/pages/home_page.dart';
 import '../chat/chat_target.dart';
 import '../linkman/linkman.dart';
@@ -21,7 +22,12 @@ class MobileIndex extends StatefulWidget {
 
 class _MobileIndexState extends State<MobileIndex> {
   int _currentIndex = 0;
-  final _widgetLabels = ['聊天', '联系人', '频道', '我'];
+  final _widgetLabels = [
+    AppLocalizations.instance.text('Chat'),
+    AppLocalizations.instance.text('Linkman'),
+    AppLocalizations.instance.text('Channel'),
+    AppLocalizations.instance.text('Me')
+  ];
 
   @override
   void initState() {
@@ -32,10 +38,14 @@ class _MobileIndexState extends State<MobileIndex> {
   Widget build(BuildContext context) {
     var bottomNavigationBar = BottomNavigationBar(
       items: <BottomNavigationBarItem>[
-        BottomNavigationBarItem(icon: const Icon(Icons.chat), label: '聊天'),
-        BottomNavigationBarItem(icon: const Icon(Icons.contacts), label: '联系人'),
         BottomNavigationBarItem(
-            icon: const Icon(Icons.wifi_channel), label: '频道'),
+            icon: const Icon(Icons.chat), label: _widgetLabels.elementAt(0)),
+        BottomNavigationBarItem(
+            icon: const Icon(Icons.contacts),
+            label: _widgetLabels.elementAt(1)),
+        BottomNavigationBarItem(
+            icon: const Icon(Icons.wifi_channel),
+            label: _widgetLabels.elementAt(2)),
         BottomNavigationBarItem(
             icon: const Icon(Icons.person), label: _widgetLabels.elementAt(3)),
       ],
@@ -62,7 +72,7 @@ class _MobileIndexState extends State<MobileIndex> {
               ),
               ListTile(
                   leading: Icon(Icons.chat),
-                  title: Text('聊天'),
+                  title: Text(_widgetLabels.elementAt(0)),
                   onTap: () {
                     setState(() {
                       _currentIndex = 0;
@@ -70,7 +80,7 @@ class _MobileIndexState extends State<MobileIndex> {
                   }),
               ListTile(
                   leading: Icon(Icons.contacts),
-                  title: Text('联系人'),
+                  title: Text(_widgetLabels.elementAt(1)),
                   onTap: () {
                     setState(() {
                       _currentIndex = 1;
@@ -78,7 +88,7 @@ class _MobileIndexState extends State<MobileIndex> {
                   }),
               ListTile(
                   leading: Icon(Icons.wifi_channel),
-                  title: Text('频道'),
+                  title: Text(_widgetLabels.elementAt(2)),
                   onTap: () {
                     setState(() {
                       _currentIndex = 2;
@@ -86,7 +96,7 @@ class _MobileIndexState extends State<MobileIndex> {
                   }),
               ListTile(
                   leading: Icon(Icons.person),
-                  title: Text('我'),
+                  title: Text(_widgetLabels.elementAt(3)),
                   onTap: () {
                     setState(() {
                       _currentIndex = 3;
@@ -100,8 +110,8 @@ class _MobileIndexState extends State<MobileIndex> {
         appBar: AppBar(
           elevation: 0,
           centerTitle: false,
-          title: const Text(
-            'Flutter Index',
+          title: Text(
+            AppLocalizations.instance.text('CollaChat'),
           ),
           actions: [],
         ),

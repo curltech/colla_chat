@@ -2,13 +2,9 @@ import 'package:colla_chat/widgets/setting/locale_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
 
 import '../../../app.dart';
-import '../../../routers/application.dart';
-import '../../../routers/routes.dart';
-import '../../../service/dht/myselfpeer.dart';
-import '../../../tool/util.dart';
+import '../../../l10n/localization.dart';
 import '../../../widgets/setting/brightness_picker.dart';
 import '../../../widgets/setting/ws_address_picker.dart';
 
@@ -55,7 +51,8 @@ class _P2pSettingWidgetState extends State<P2pSettingWidget> {
                     keyboardType: TextInputType.text,
                     //controller: passwordController,
                     decoration: InputDecoration(
-                      labelText: '自定义地址',
+                      labelText:
+                          AppLocalizations.instance.text('customized address'),
                       prefixIcon: Icon(Icons.location_city),
                     ),
                     initialValue: '',

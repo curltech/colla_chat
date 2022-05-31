@@ -28,10 +28,14 @@ class AppLocalizations {
 
   late Map<dynamic, dynamic> _localisedValues;
 
+  late Locale _locale;
+
   Future<AppLocalizations> load(Locale locale) async {
     String jsonContent = await rootBundle
         .loadString("assets/locale/localization_${locale.toString()}.json");
     _localisedValues = json.decode(jsonContent);
+    _locale = locale;
+
     return this;
   }
 
@@ -39,7 +43,7 @@ class AppLocalizations {
     if (_localisedValues.containsKey(key)) {
       return _localisedValues[key];
     }
-    logger.e("$key not found");
+    logger.e("${_locale.toString()}:'$key' not found");
     return key;
   }
 }

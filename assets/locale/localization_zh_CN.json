@@ -1,4 +1,10 @@
 {
-    "Welcome to CollaChat": "CollaChat欢迎你",
-    "Chinese": "中文"
+    "Welcome to CollaChat": "欢迎使用CollaChat",
+    "Please select brightness": "请选择亮度",
+    "Please select address": "请选择地址",
+    "Please select language": "请选择语言",
+    "Brightness": "亮度",
+    "Address": "地址",
+    "Language": "语言",
+    "Primary Address": "首选地址"
 }

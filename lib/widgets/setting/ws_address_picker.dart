@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_awesome_select/flutter_awesome_select.dart';
 import 'package:provider/provider.dart';
 import '../../constant/address.dart';
+import '../../l10n/localization.dart';
 import '../../provider/locale_data.dart';
 
 class WsAddressPicker extends StatefulWidget {
@@ -45,8 +46,8 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
     return Column(children: <Widget>[
       SmartSelect<String>.single(
         modalType: S2ModalType.bottomSheet,
-        placeholder: '请选择地址',
-        title: '请选择地址',
+        placeholder: AppLocalizations.instance.text('Please select address'),
+        title: AppLocalizations.instance.text('Address'),
         selectedValue: _wsConnectAddress,
         choiceItems: _items,
         onChange: (dynamic state) {
@@ -73,7 +74,7 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
                 controller: _wsConnectAddressController,
                 keyboardType: TextInputType.text,
                 decoration: InputDecoration(
-                  labelText: '首选地址',
+                  labelText: AppLocalizations.instance.text('Primary Address'),
                   prefixIcon: Icon(Icons.location_city),
                 ),
                 //initialValue: _wsConnectAddress,

@@ -3,7 +3,6 @@ import 'package:flutter_awesome_select/flutter_awesome_select.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/localization.dart';
 import '../../provider/locale_data.dart';
-import '../../provider/locale_data.dart';
 
 class LocalePicker extends StatelessWidget {
   const LocalePicker({Key? key}) : super(key: key);
@@ -21,9 +20,10 @@ class LocalePicker extends StatelessWidget {
     return Consumer<LocaleDataProvider>(
       builder: (context, localeData, child) => SmartSelect<String>.single(
         modalType: S2ModalType.bottomSheet,
-        placeholder: '请选择语言',
-        title: '请选择语言',
-        selectedValue: selectedLocale,
+        placeholder: AppLocalizations.instance.text('Please select language'),
+        title: AppLocalizations.instance.text('Language'),
+        selectedValue:
+            Provider.of<LocaleDataProvider>(context).locale.toString(),
         choiceItems: items,
         onChange: (dynamic state) {
           String value = state.value;
