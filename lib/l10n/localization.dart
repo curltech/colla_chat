@@ -8,42 +8,47 @@ import 'package:flutter/services.dart';
 import '../app.dart';
 
 /// 自己写的，不是gen_l10n创建的，需要从assets目录加载语言包
-/// 配置方法：localeResolutionCallback:
-//           (Locale locale, Iterable<Locale> supportedLocales) {
-//         for (Locale supportedLocale in supportedLocales) {
-//           if (supportedLocale.languageCode == locale.languageCode ||
-//               supportedLocale.countryCode == locale.countryCode) {
-//             return supportedLocale;
-//           }
-//         }
-//         return supportedLocales.first;
-//       },
 /// 使用的方法是：AppLocalizations.instance.text('page_one')
 class AppLocalizations {
-  static final AppLocalizations _singleton = AppLocalizations._internal();
+  static AppLocalizations _current =
+      AppLocalizations(const Locale('zh', 'CN'), {});
+  static final Map<Locale, AppLocalizations> _all = {};
 
-  AppLocalizations._internal();
+  final Map<dynamic, dynamic> _localisedValues;
+  final Locale _locale;
 
-  static AppLocalizations get instance => _singleton;
+  AppLocalizations(this._locale, this._localisedValues);
 
-  late Map<dynamic, dynamic> _localisedValues;
+  static AppLocalizations get instance {
+    return _current;
+  }
 
-  late Locale _locale;
+  static set instance(AppLocalizations appLocalizations) {
+    _current = appLocalizations;
+  }
 
-  Future<AppLocalizations> load(Locale locale) async {
-    String jsonContent = await rootBundle
-        .loadString("assets/locale/localization_${locale.toString()}.json");
-    _localisedValues = json.decode(jsonContent);
-    _locale = locale;
+  static Future<AppLocalizations> load(Locale locale) async {
+    Map<Locale, AppLocalizations> all = AppLocalizations._all;
+    AppLocalizations? current = all[locale];
+    if (current == null) {
+      String jsonContent = await rootBundle
+          .loadString("assets/locale/localization_${locale.toString()}.json");
+      var localisedValues = json.decode(jsonContent);
+      current = AppLocalizations(locale, localisedValues);
+      all[locale] = current;
+    }
+    AppLocalizations.instance = current;
 
-    return this;
+    return AppLocalizations.instance;
   }
 
   String text(String key) {
-    if (_localisedValues.containsKey(key)) {
-      return _localisedValues[key];
+    final localisedValues = _localisedValues;
+    if (localisedValues.containsKey(key)) {
+      return localisedValues[key];
     }
     logger.e("${_locale.toString()}:'$key' not found");
+
     return key;
   }
 }
@@ -52,12 +57,16 @@ class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const AppLocalizationsDelegate();
 
   @override
-  bool isSupported(Locale locale) =>
-      ['zh', 'en', 'zh_Hant', 'ja', 'ko'].contains(locale.languageCode);
+  bool isSupported(Locale locale) {
+    return ['zh_CN', 'en_US', 'zh_TW', 'ja_JP', 'ko_KR']
+        .contains(locale.toString());
+  }
 
   @override
   Future<AppLocalizations> load(Locale locale) {
-    return AppLocalizations.instance.load(locale);
+    logger.i('will load ${locale.toString()}');
+
+    return AppLocalizations.load(locale);
   }
 
   @override

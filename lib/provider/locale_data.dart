@@ -11,12 +11,21 @@ final localeOptions = [
   Option('한국어', 'ko_KR')
 ];
 
-class LocaleDataProvider extends ChangeNotifier {
-  Locale _locale = const Locale('zh', 'CN');
+class LocaleDataProvider with ChangeNotifier {
+  String _locale = 'zh_CN';
 
-  Locale get locale => _locale;
+  Locale getLocale() {
+    var locales = _locale.split('_');
+    return Locale(locales[0], locales[1]);
+  }
 
-  set locale(Locale locale) {
+  setLocale(Locale locale) {
+    _locale = locale.toString();
+  }
+
+  String get locale => _locale.toString();
+
+  set locale(String locale) {
     _locale = locale;
     notifyListeners();
   }

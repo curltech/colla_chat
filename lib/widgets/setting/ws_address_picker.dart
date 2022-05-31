@@ -19,7 +19,6 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
   bool _visibility = true;
   String _wsConnectAddress = AppParams.instance.wsConnectAddress[0];
   late TextEditingController _wsConnectAddressController;
-  List<S2Choice<String>> _items = [];
 
   @override
   void initState() {
@@ -33,14 +32,14 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
   @override
   Widget build(BuildContext context) {
     var selectedLocale = Provider.of<LocaleDataProvider>(context).locale;
-    var wsAddressOptions = wsAddressOptionsISO[
-        '${selectedLocale.languageCode}_${selectedLocale.countryCode}'];
-    _items = [];
+    logger.i('wsAddress will switch to ${selectedLocale.toString()}');
+    var wsAddressOptions = wsAddressOptionsISO[selectedLocale];
+    List<S2Choice<String>> items = [];
     if (wsAddressOptions != null) {
       for (var wsAddressOption in wsAddressOptions) {
         var item = S2Choice<String>(
             value: wsAddressOption.value, title: wsAddressOption.label);
-        _items.add(item);
+        items.add(item);
       }
     }
     return Column(children: <Widget>[
@@ -49,7 +48,7 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
         placeholder: AppLocalizations.instance.text('Please select address'),
         title: AppLocalizations.instance.text('Address'),
         selectedValue: _wsConnectAddress,
-        choiceItems: _items,
+        choiceItems: items,
         onChange: (dynamic state) {
           setState(() {
             String value = state.value;

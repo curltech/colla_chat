@@ -8,6 +8,7 @@ import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
+import 'package:provider/single_child_widget.dart';
 import 'l10n/localization.dart';
 
 void main() {
@@ -39,55 +40,62 @@ class CollaChatApp extends StatelessWidget {
     Application.router = router;
 
     ///创建了一个具有 Material Design 风格的应用
-    return MaterialApp(
-      onGenerateTitle: (context) {
-        return AppLocalizations.instance.text('Welcome to CollaChat');
-      },
-      //title: 'Welcome to CollaChat',
-      debugShowCheckedModeBanner: false,
-      // 取值方法Provider.of<AppProfile>(context)
-      //  当ChangeNotifier 发生变化的时候会调用 builder 这个函数
-      // Consumer<AppProfile>(
-      //   builder: (context, appProfile, child) {
-      //     return Text("Total price: ${appProfile.themeData}");
-      //   },
-      // );
-      theme: Provider.of<ThemeDataProvider>(context).themeData,
+    ///监控两个数据提供者：theme，locale
+    ///整个应用都会消费这两个提供者，当两个提供者的数据发生变化时，整个应用都会重绘
+    ///相当于整个应用都注册了两个提供者的数据变化
+    return MultiProvider(
+        providers: <SingleChildWidget>[
+          ChangeNotifierProvider.value(value: ThemeDataProvider()),
+          ChangeNotifierProvider.value(value: LocaleDataProvider()),
+        ],
+        child: Consumer2<ThemeDataProvider, LocaleDataProvider>(builder:
+            (BuildContext context, themeDataProvider, localeDataProvider,
+                Widget? child) {
+          return MaterialApp(
+            onGenerateTitle: (context) {
+              return AppLocalizations.instance.text('Welcome to CollaChat');
+            },
+            //title: 'Welcome to CollaChat',
+            debugShowCheckedModeBanner: false,
+            theme: Provider.of<ThemeDataProvider>(context).themeData,
 
-      ///Scaffold 是 Material 库中提供的一个 widget，它提供了默认的导航栏、标题和包含主屏幕 widget 树的 body 属性
-      home: Loading(title: 'Flutter Swiper'),
-      onGenerateRoute: Application.router.generator,
+            ///Scaffold 是 Material 库中提供的一个 widget，它提供了默认的导航栏、标题和包含主屏幕 widget 树的 body 属性
+            home: Loading(title: AppLocalizations.instance.text('Loading')),
+            onGenerateRoute: Application.router.generator,
 
-      // AppLocalizations.localizationsDelegates,
-      localizationsDelegates: const [
-        AppLocalizationsDelegate(),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: const [
-        Locale('zh', 'CN'),
-        Locale('en', 'US'),
-        Locale('zh', 'TW'),
-        Locale('ja', 'JP'),
-        Locale('ko', 'KR'),
-      ],
-      // localeResolutionCallback:
-      //     (Locale? locale, Iterable<Locale>? supportedLocales) {
-      //   if (locale != null &&
-      //       supportedLocales != null &&
-      //       supportedLocales.isNotEmpty) {
-      //     for (Locale supportedLocale in supportedLocales!) {
-      //       if (supportedLocale.languageCode == locale.languageCode ||
-      //           supportedLocale.countryCode == locale.countryCode) {
-      //         return supportedLocale;
-      //       }
-      //     }
-      //
-      //     return supportedLocales.first;
-      //   }
-      // },
-      locale: Provider.of<LocaleDataProvider>(context).locale,
-    );
+            // AppLocalizations.localizationsDelegates,
+            localizationsDelegates: const [
+              AppLocalizationsDelegate(),
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: const [
+              Locale('zh', 'CN'),
+              Locale('en', 'US'),
+              Locale('zh', 'TW'),
+              Locale('ja', 'JP'),
+              Locale('ko', 'KR'),
+            ],
+            // localeResolutionCallback:
+            //     (Locale? locale, Iterable<Locale> supportedLocales) {
+            //   if (localeDataProvider.getLocale() != null) {
+            //     return localeDataProvider.getLocale();
+            //   } else {
+            //     Locale? _locale;
+            //     if (supportedLocales.contains(locale)) {
+            //       _locale = locale;
+            //       Provider.of<LocaleDataProvider>(context, listen: false)
+            //           .setLocale(_locale);
+            //     } else {
+            //       _locale =
+            //           Provider.of<LocaleDataProvider>(context).getLocale();
+            //     }
+            //     return _locale;
+            //   }
+            // },
+            locale: Provider.of<LocaleDataProvider>(context).getLocale(),
+          );
+        }));
   }
 }
