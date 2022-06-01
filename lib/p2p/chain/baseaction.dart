@@ -1,7 +1,11 @@
+import 'dart:convert';
 import 'dart:core';
+
+import 'package:uuid/uuid.dart';
 
 import '../../app.dart';
 import '../../entity/p2p/message.dart';
+import '../../tool/util.dart';
 import 'chainmessagehandler.dart';
 
 enum PayloadType {
@@ -61,6 +65,8 @@ class NamespacePrefix {
   }
 }
 
+const int compressLimit = 2048;
+
 /// 发送和接受链消息的抽象类
 abstract class BaseAction {
   late MsgType msgType;
@@ -106,14 +112,28 @@ abstract class BaseAction {
       topic ??= appParams.topics[0];
     }
     chainMessage.topic = topic;
-    chainMessage.payload = data;
+    //把负载变成字符串格式
+    var jsonStr = JsonUtil.toJsonString(data);
+
+    /// 把负载变成utf8的二进制的数组，方便计数和进一步的处理
+    List<int> payload = utf8.encode(jsonStr);
+    chainMessage.payload = payload;
+    if (payload.length < compressLimit) {
+      chainMessage.needCompress = false;
+    }
+
+    /// 当targetPeerId不为空的时候才可以进行加密，否则没有对方的公钥
+    /// 所以消息发送给客户端时必须有targetPeerId有客户端的peerId，必须加密
+    if (targetPeerId == null) {
+      chainMessage.needEncrypt = false;
+    }
     chainMessage.targetPeerId = targetPeerId;
+
     chainMessage.payloadType = PayloadType.Map.name;
     chainMessage.messageType = msgType.name;
     chainMessage.messageDirect = MsgDirect.Request.name;
-    chainMessage.needCompress = true;
-    chainMessage.needEncrypt = false;
-    chainMessage.uuid = '';
+    var uuid = Uuid();
+    chainMessage.uuid = uuid.v4();
 
     return chainMessage;
   }

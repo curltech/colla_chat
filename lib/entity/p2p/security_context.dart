@@ -1,5 +1,3 @@
-const int compressLimit = 2048;
-
 class SecurityContext {
   /// 消息负载序列化后的寄送格式，再经过客户端自己的加密方式比如openpgp（更安全）加密，签名，压缩，base64处理后的字符串
   String transportPayload = '';
@@ -9,6 +7,7 @@ class SecurityContext {
   String? previousPublicKeyPayloadSignature;
   bool needCompress = true;
   bool needEncrypt = true;
+  List<int>? secretKey;
 
   /// 经过目标peer的公钥加密过的对称密钥，这个对称密钥是随机生成，每次不同，用于加密payload
   String? payloadKey;

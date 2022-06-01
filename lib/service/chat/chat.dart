@@ -1,3 +1,5 @@
+import 'package:colla_chat/crypto/util.dart';
+
 import '../../datastore/datastore.dart';
 import '../../entity/chat/chat.dart';
 import '../../entity/dht/myself.dart';
@@ -45,13 +47,18 @@ class ChatMessageService extends BaseService {
       var content = chatMessage.content;
       var thumbnail = chatMessage.thumbnail;
       if (content != null) {
-        content =
+        List<int>? data =
             await SecurityContextService.decrypt(content, securityContext);
-        chatMessage.content = content;
+        if (data != null) {
+          chatMessage.content = CryptoUtil.uint8ListToStr(data);
+        }
       }
       if (thumbnail != null) {
-        thumbnail =
+        var data =
             await SecurityContextService.decrypt(thumbnail, securityContext);
+        if (data != null) {
+          thumbnail = CryptoUtil.uint8ListToStr(data);
+        }
         chatMessage.thumbnail = thumbnail;
       }
       chatMessages.add(chatMessage);
@@ -77,8 +84,8 @@ class ChatMessageService extends BaseService {
         securityContext.payloadKey = chatMessage.payloadKey;
         var content = chatMessage.content;
         if (content != null) {
-          var result =
-              await SecurityContextService.encrypt(content, securityContext);
+          var result = await SecurityContextService.encrypt(
+              content.codeUnits, securityContext);
           chatMessage.payloadKey = result.payloadKey;
           chatMessage.needCompress = result.needCompress;
           chatMessage.content = result.transportPayload;
@@ -86,8 +93,8 @@ class ChatMessageService extends BaseService {
         }
         var thumbnail = chatMessage.thumbnail;
         if (thumbnail != null) {
-          var result =
-              await SecurityContextService.encrypt(thumbnail, securityContext);
+          var result = await SecurityContextService.encrypt(
+              thumbnail.codeUnits, securityContext);
           chatMessage.thumbnail = result.transportPayload;
         }
       }
@@ -157,8 +164,8 @@ class ChatAttachService extends BaseService {
         }
         var content = attach.content;
         if (content != null) {
-          var result =
-              await SecurityContextService.encrypt(content, securityContext);
+          var result = await SecurityContextService.encrypt(
+              content.codeUnits, securityContext);
           attach.payloadKey = result.payloadKey;
           attach.needCompress = result.needCompress;
           attach.needCompress = result.needEncrypt;
@@ -191,10 +198,12 @@ class ChatAttachService extends BaseService {
         securityContext.payloadKey = payloadKey;
         var content = chatAttach.content;
         if (content != null) {
-          content =
+          List<int>? data =
               await SecurityContextService.decrypt(content, securityContext);
           //d.content = StringUtil.decodeURI(payload)
-          chatAttach.content = content;
+          if (data != null) {
+            chatAttach.content = CryptoUtil.uint8ListToStr(data);
+          }
         }
       }
       attaches.add(chatAttach);

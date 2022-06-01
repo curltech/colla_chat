@@ -30,6 +30,7 @@ class ChainMessage extends SecurityContext {
   bool needSlice = false;
 
   /// 不跨网络传输，是transportPayload检验过后还原的对象，传输时通过转换成transportPayload传输
+  //List<int>? payload;
   dynamic payload;
 
   ///

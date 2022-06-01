@@ -22,7 +22,7 @@ class P2pChatAction extends BaseAction {
   Future<ChainMessage?> receive(ChainMessage chainMessage) async {
     ChainMessage? _chainMessage = await super.receive(chainMessage);
     String? srcPeerId = chainMessage.srcPeerId;
-    String payload;
+    List<int>? payload;
     if (_chainMessage != null &&
         _chainMessage.payloadType == PayloadType.DataBlock.name) {
       dynamic _dataBlock = _chainMessage.payload;

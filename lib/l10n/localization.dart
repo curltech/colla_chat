@@ -51,6 +51,10 @@ class AppLocalizations {
 
     return key;
   }
+
+  static t(String key) {
+    return AppLocalizations.instance.text(key);
+  }
 }
 
 class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

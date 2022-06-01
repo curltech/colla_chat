@@ -1,3 +1,5 @@
+import 'package:cryptography/cryptography.dart';
+
 import '../../entity/dht/peerclient.dart';
 import '../base.dart';
 import 'base.dart';
@@ -26,9 +28,9 @@ class PeerClientService extends PeerEntityService {
   }
 
   var peerClients = <String, PeerClient>{};
-  var publicKeys = <String, dynamic>{};
+  var publicKeys = <String, SimplePublicKey>{};
 
-  Future<PeerClient?> getPublic(String peerId) async {
+  Future<SimplePublicKey?> getPublicKey(String peerId) async {
     var peerClient = getPeerClientFromCache(peerId);
     if (peerClient != null) {
       return publicKeys[peerId];

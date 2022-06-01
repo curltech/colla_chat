@@ -1,6 +1,18 @@
 {
     "Welcome to CollaChat": "Welcome to CollaChat",
     "Please select brightness": "Please choose brightness",
+    "Please select address": "Please select address",
+    "Please select language": "Please select language",
     "Brightness": "Brightness",
-    "Primary Address": "Primary Address"
+    "Address": "Address",
+    "Language": "Language",
+    "Primary Address": "Primary Address",
+    "Loading": "Loading",
+    "Customized address": "Customized address",
+    "China-Shenzhen": "China-Shenzhen",
+    "China-Hangzhou": "China-Hangzhou",
+    "South Korea": "South Korea",
+    "Auto": "Auto",
+    "Light": "Light",
+    "Dark": "Dark"
 }

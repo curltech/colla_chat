@@ -6,5 +6,13 @@
     "Brightness": "亮度",
     "Address": "地址",
     "Language": "语言",
-    "Primary Address": "首选地址"
+    "Primary Address": "首选地址",
+    "Loading": "加载中",
+    "Customized address": "自选地址",
+    "China-Shenzhen": "中国深圳",
+    "China-Hangzhou": "中国杭州",
+    "South Korea": "韩国",
+    "Auto": "自动",
+    "Light": "亮",
+    "Dark": "暗"
 }
