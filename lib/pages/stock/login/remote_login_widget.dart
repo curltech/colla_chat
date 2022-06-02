@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../app.dart';
 import '../../../entity/stock/user.dart';
+import '../../../l10n/localization.dart';
 import '../../../routers/application.dart';
 import '../../../routers/routes.dart';
 
@@ -51,7 +52,8 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
                 keyboardType: TextInputType.text,
                 //controller: _credentialController,
                 decoration: InputDecoration(
-                  labelText: '登录凭证(手机/邮件/登录名)',
+                  labelText:
+                      AppLocalizations.t('Credential(Mobile/Email/LoginName)'),
                   prefixIcon: Icon(Icons.person),
                 ),
                 initialValue: _credential,
@@ -70,7 +72,7 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
                 obscureText: !_pwdShow,
                 //controller: passwordController,
                 decoration: InputDecoration(
-                  labelText: '密码',
+                  labelText: AppLocalizations.t('Password'),
                   prefixIcon: Icon(Icons.lock),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -95,13 +97,13 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
             padding: EdgeInsets.symmetric(horizontal: 50.0),
             child: Row(children: [
               TextButton(
-                child: Text('登录'),
+                child: Text(AppLocalizations.t('Login')),
                 onPressed: () async {
                   _login();
                 },
               ),
               TextButton(
-                child: Text('重置'),
+                child: Text(AppLocalizations.t('Reset')),
                 onPressed: () async {},
               )
             ]),

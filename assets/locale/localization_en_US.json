@@ -14,5 +14,16 @@
     "South Korea": "South Korea",
     "Auto": "Auto",
     "Light": "Light",
-    "Dark": "Dark"
+    "Dark": "Dark",
+    "Login": "Login",
+    "Register": "Register",
+    "Reset": "Reset",
+    "Setting": "Setting",
+    "Username": "Username",
+    "Password": "Password",
+    "Mobile": "Mobile",
+    "Email": "Email",
+    "Credentia(Mobile/Email/LoginName)": "Credentia(Mobile/Email/LoginName)",
+    "LoginName": "LoginName",
+    "Confirm Password": "Confirm Password"
 }

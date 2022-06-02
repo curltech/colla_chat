@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app.dart';
+import '../../../l10n/localization.dart';
 import '../../../routers/application.dart';
 import '../../../routers/routes.dart';
 import '../../../service/dht/myselfpeer.dart';
@@ -52,7 +53,8 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
                 keyboardType: TextInputType.text,
                 //controller: _credentialController,
                 decoration: InputDecoration(
-                  labelText: '登录凭证(手机/邮件/登录名)',
+                  labelText:
+                      AppLocalizations.t('Credentia(Mobile/Email/LoginName)'),
                   prefixIcon: Icon(Icons.person),
                 ),
                 initialValue: _credential,
@@ -71,7 +73,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
                 obscureText: !_pwdShow,
                 //controller: passwordController,
                 decoration: InputDecoration(
-                  labelText: '密码',
+                  labelText: AppLocalizations.t('Password'),
                   prefixIcon: Icon(Icons.lock),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -97,14 +99,14 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
             child: Row(children: [
               TextButton(
                 child: Text(
-                  '登录',
+                  AppLocalizations.t('Login'),
                 ),
                 onPressed: () async {
                   await _login();
                 },
               ),
               TextButton(
-                child: Text('重置'),
+                child: Text(AppLocalizations.t('Reset')),
                 onPressed: () async {},
               )
             ]),

@@ -14,5 +14,16 @@
     "South Korea": "韩国",
     "Auto": "自动",
     "Light": "亮",
-    "Dark": "暗"
+    "Dark": "暗",
+    "Login": "登录",
+    "Register": "注册",
+    "Reset": "重置",
+    "Setting": "设置",
+    "Username": "用户",
+    "Password": "密码",
+    "Mobile": "手机",
+    "Email": "邮件",
+    "Credentia(Mobile/Email/LoginName)": "凭证(手机/邮件/登录名)",
+    "LoginName": "登录名",
+    "Confirm Password": "验证密码"
 }

@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
 import '../../../app.dart';
+import '../../../l10n/localization.dart';
 import '../../../routers/application.dart';
 import '../../../routers/routes.dart';
 import '../../../service/dht/myselfpeer.dart';
@@ -77,7 +78,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
               initialCountryCode: _countryCode,
               initialValue: _mobile,
               decoration: InputDecoration(
-                labelText: '电话',
+                labelText: AppLocalizations.t('Mobile'),
               ),
               onChanged: (phone) {
                 setState(() {
@@ -97,7 +98,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
               child: TextFormField(
                 //controller: nameController,
                 decoration: InputDecoration(
-                  labelText: '用户名',
+                  labelText: AppLocalizations.t('Username'),
                   prefixIcon: Icon(Icons.person),
                 ),
                 initialValue: _name,
@@ -114,7 +115,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
               child: TextFormField(
                 //controller: loginNameController,
                 decoration: InputDecoration(
-                  labelText: '登录名',
+                  labelText: AppLocalizations.t('LoginName'),
                   prefixIcon: Icon(Icons.desktop_mac),
                 ),
                 initialValue: _loginName,
@@ -132,7 +133,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
                 //controller: emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  labelText: '邮箱',
+                  labelText: AppLocalizations.t('Email'),
                   prefixIcon: Icon(Icons.email),
                 ),
                 initialValue: _email,
@@ -151,7 +152,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
                 obscureText: !_pwdShow,
                 //controller: passwordController,
                 decoration: InputDecoration(
-                  labelText: '密码',
+                  labelText: AppLocalizations.t('Password'),
                   prefixIcon: Icon(Icons.lock),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -179,7 +180,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
                 obscureText: !_pwdShow,
                 //controller: passwordController,
                 decoration: InputDecoration(
-                  labelText: '确认密码',
+                  labelText: AppLocalizations.t('Confirm Password'),
                   prefixIcon: Icon(Icons.lock),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -204,13 +205,13 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
             padding: EdgeInsets.symmetric(horizontal: 15.0),
             child: Row(children: [
               TextButton(
-                child: Text('注册'),
+                child: Text(AppLocalizations.t('Register')),
                 onPressed: () async {
                   await _register();
                 },
               ),
               TextButton(
-                child: Text('重置'),
+                child: Text(AppLocalizations.t('Reset')),
                 onPressed: () async {},
               )
             ]),

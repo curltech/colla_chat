@@ -1,5 +1,4 @@
-import 'package:colla_chat/pages/stock/login/remote_login_widget.dart';
-import 'package:colla_chat/pages/stock/login/remote_register_widget.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:flutter/material.dart';
 
 import 'p2p_login_widget.dart';
@@ -39,7 +38,7 @@ class _P2pLoginState extends State<P2pLogin> {
       children: _children,
     );
     var appBar = AppBar(
-      title: Text('登录'),
+      title: Text(AppLocalizations.t('Login')),
       actions: [
         IconButton(
             onPressed: () async {
@@ -48,7 +47,7 @@ class _P2pLoginState extends State<P2pLogin> {
               });
             },
             icon: const Icon(Icons.login),
-            tooltip: '登录'),
+            tooltip: AppLocalizations.t('Login')),
         IconButton(
           onPressed: () async {
             setState(() {
@@ -56,7 +55,7 @@ class _P2pLoginState extends State<P2pLogin> {
             });
           },
           icon: const Icon(Icons.app_registration),
-          tooltip: '注册',
+          tooltip: AppLocalizations.t('Register'),
         ),
         IconButton(
           onPressed: () async {
@@ -65,7 +64,7 @@ class _P2pLoginState extends State<P2pLogin> {
             });
           },
           icon: const Icon(Icons.settings),
-          tooltip: '设置',
+          tooltip: AppLocalizations.t('Setting'),
         ),
       ],
     );

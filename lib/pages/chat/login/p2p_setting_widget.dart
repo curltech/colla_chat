@@ -52,7 +52,7 @@ class _P2pSettingWidgetState extends State<P2pSettingWidget> {
                     //controller: passwordController,
                     decoration: InputDecoration(
                       labelText:
-                          AppLocalizations.instance.text('customized address'),
+                          AppLocalizations.instance.text('Customized address'),
                       prefixIcon: Icon(Icons.location_city),
                     ),
                     initialValue: '',

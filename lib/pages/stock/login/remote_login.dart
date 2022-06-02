@@ -1,3 +1,4 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/stock/login/remote_login_widget.dart';
 import 'package:colla_chat/pages/stock/login/remote_register_widget.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +33,7 @@ class _RemoteLoginState extends State<RemoteLogin> {
       children: _children,
     );
     var appBar = AppBar(
-      title: Text('登录'),
+      title: Text(AppLocalizations.t('Login')),
       actions: [
         IconButton(
           onPressed: () async {
@@ -41,7 +42,7 @@ class _RemoteLoginState extends State<RemoteLogin> {
             });
           },
           icon: const Icon(Icons.app_registration),
-          tooltip: '注册',
+          tooltip: AppLocalizations.t('Register'),
         ),
         IconButton(
             onPressed: () async {
@@ -50,7 +51,7 @@ class _RemoteLoginState extends State<RemoteLogin> {
               });
             },
             icon: const Icon(Icons.login),
-            tooltip: '登录'),
+            tooltip: AppLocalizations.t('Login')),
       ],
     );
     return Scaffold(

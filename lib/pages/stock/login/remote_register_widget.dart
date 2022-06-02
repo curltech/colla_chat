@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../l10n/localization.dart';
+
 /// 远程登录组件，一个card下的录入框和按钮组合
 class RemoteRegisterWidget extends StatefulWidget {
   const RemoteRegisterWidget({Key? key}) : super(key: key);
@@ -66,7 +68,7 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
               child: TextFormField(
                 controller: nameController,
                 decoration: InputDecoration(
-                  labelText: '用户名',
+                  labelText: AppLocalizations.t('Username'),
                   prefixIcon: Icon(Icons.person),
                 ),
                 initialValue: _name,
@@ -83,7 +85,7 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
               child: TextFormField(
                 //controller: loginNameController,
                 decoration: InputDecoration(
-                  labelText: '登录名',
+                  labelText: AppLocalizations.t('LoginName'),
                   prefixIcon: Icon(Icons.desktop_mac),
                 ),
                 initialValue: _loginName,
@@ -100,7 +102,7 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
               child: TextFormField(
                 //controller: mobileController,
                 decoration: InputDecoration(
-                  labelText: '手机',
+                  labelText: AppLocalizations.t('Mobile'),
                   prefixIcon: Icon(Icons.mobile_friendly),
                 ),
                 initialValue: _mobile,
@@ -118,7 +120,7 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
                 //controller: emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  labelText: '邮箱',
+                  labelText: AppLocalizations.t('Email'),
                   prefixIcon: Icon(Icons.email),
                 ),
                 initialValue: _email,
@@ -137,7 +139,7 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
                 obscureText: !_pwdShow,
                 //controller: passwordController,
                 decoration: InputDecoration(
-                  labelText: '密码',
+                  labelText: AppLocalizations.t('Password'),
                   prefixIcon: Icon(Icons.lock),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -165,7 +167,7 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
                 obscureText: !_pwdShow,
                 //controller: passwordController,
                 decoration: InputDecoration(
-                  labelText: '确认密码',
+                  labelText: AppLocalizations.t('Confirm Password'),
                   prefixIcon: Icon(Icons.lock),
                   suffixIcon: IconButton(
                     icon: Icon(
@@ -190,11 +192,11 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
             padding: EdgeInsets.symmetric(horizontal: 15.0),
             child: Row(children: [
               TextButton(
-                child: Text('注册'),
+                child: Text(AppLocalizations.t('Register')),
                 onPressed: () async {},
               ),
               TextButton(
-                child: Text('重置'),
+                child: Text(AppLocalizations.t('Reset')),
                 onPressed: () async {},
               )
             ]),

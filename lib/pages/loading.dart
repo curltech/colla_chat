@@ -30,26 +30,16 @@ class Loading extends StatefulWidget {
   }
 }
 
-/**
- * 继承State的类管理状态数据，状态数据为类的属性，当属性发生变化时，组件的自动重绘，
- * 类似Vue的data与组件v-model的关系但是是单向的，绑定的组件修改时，状态数据不会自动修改
- * 修改属性必须在setState方法的回调函数中进行
- */
+/// 继承State的类管理状态数据，状态数据为类的属性，当属性发生变化时，组件的自动重绘，
+/// 类似Vue的data与组件v-model的关系但是是单向的，绑定的组件修改时，状态数据不会自动修改
+/// 修改属性必须在setState方法的回调函数中进行
 class _LoadingState extends State<Loading> {
   int _currentIndex = 0;
   bool _autoPlay = false;
 
-  void initConfig() async {
-    //初始化系统信息
-    PlatformParams platformParams = await PlatformParams.instance;
-    MediaQueryData mediaQueryData = MediaQuery.of(context);
-    platformParams.mediaQueryData = mediaQueryData;
-  }
-
   @override
   void initState() {
     super.initState();
-    initConfig();
     if (_autoPlay) {
       Future.doWhile(() async {
         setState(() {
