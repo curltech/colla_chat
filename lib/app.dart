@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:html';
 import 'dart:math';
 import 'package:colla_chat/tool/util.dart';
 import 'package:flutter/material.dart';
@@ -32,6 +33,79 @@ class LocalStorage {
   }
 }
 
+class NodeAddress {
+  static final defaultName = 'default';
+  String name;
+  String? httpConnectAddress; //https服务器
+  String? wsConnectAddress; //wss服务器
+  String? libp2pConnectAddress; //libp2p服务器
+  String? iceServers; //ice服务器
+  // libp2p的链协议号码
+  String? chainProtocolId;
+
+  // 目标的libp2p节点的peerId
+  String? connectPeerId = '';
+
+  NodeAddress(this.name,
+      {this.httpConnectAddress,
+      this.wsConnectAddress,
+      this.libp2pConnectAddress,
+      this.iceServers,
+      this.connectPeerId,
+      this.chainProtocolId});
+
+  NodeAddress.fromJson(Map json)
+      : name = json['name'],
+        httpConnectAddress = json['httpConnectAddress'],
+        wsConnectAddress = json['wsConnectAddress'],
+        libp2pConnectAddress = json['libp2pConnectAddress'],
+        iceServers = json['iceServers'],
+        connectPeerId = json['connectPeerId'],
+        chainProtocolId = json['chainProtocolId'];
+
+  @override
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json.addAll({
+      'name': name,
+      'httpConnectAddress': httpConnectAddress,
+      'wsConnectAddress': wsConnectAddress,
+      'libp2pConnectAddress': libp2pConnectAddress,
+      'iceServers': iceServers,
+      'connectPeerId': connectPeerId,
+      'chainProtocolId': chainProtocolId,
+    });
+    return json;
+  }
+
+  void validate(NodeAddress address) {
+    if (address.name == '') {
+      throw 'NameFormatError';
+    }
+    var wsConnectAddress = address.wsConnectAddress;
+    if (wsConnectAddress != null) {
+      if (!wsConnectAddress.startsWith('wss') &&
+          !wsConnectAddress.startsWith('ws')) {
+        throw 'WsConnectAddressFormatError';
+      }
+    }
+    var httpConnectAddress = address.httpConnectAddress;
+    if (httpConnectAddress != null) {
+      if (!httpConnectAddress.startsWith('https') &&
+          !httpConnectAddress.startsWith('http')) {
+        throw 'HttpConnectAddressFormatError';
+      }
+    }
+    var libp2pConnectAddress = address.libp2pConnectAddress;
+    if (libp2pConnectAddress != null) {
+      if (!libp2pConnectAddress.startsWith('/dns') &&
+          !libp2pConnectAddress.startsWith('/ip')) {
+        throw 'Libp2pConnectAddressFormatError';
+      }
+    }
+  }
+}
+
 /// 本应用的参数，与操作系统系统和硬件无关，需要保存到本地的存储中
 /// 在系统启动的config对象初始化从本地存储中加载
 class AppParams {
@@ -53,16 +127,12 @@ class AppParams {
   String? localeName;
 
   /// 可选的连接地址，比如http、ws、libp2p、turn
-  var httpConnectAddress = <String>['https://localhost:9091']; //https服务器
-  var wsConnectAddress = <String>['wss://localhost:9090/websocket']; //wss服务器
-  var libp2pConnectAddress = <String>[]; //libp2p服务器
-  var iceServers = <String>[]; //ice服务器
+  Map<String, NodeAddress> nodeAddress = <String, NodeAddress>{
+    'default': NodeAddress('localhost',
+        httpConnectAddress: 'https://localhost:9091',
+        wsConnectAddress: 'wss://localhost:9090/websocket')
+  };
   var topics = <String>[]; //订阅的主题
-  // libp2p的链协议号码
-  String? chainProtocolId;
-
-  // 目标的libp2p节点的peerId
-  List<String> connectPeerId = <String>[];
 
   // 本机作为libp2p节点的监听地址
   var listenerAddress = <String>[];
@@ -90,30 +160,22 @@ class AppParams {
         'mode': mode,
       };
 
-  /**
-   * 设置第一个连接地址，自动识别https，wss，libp2p协议
-   */
-  setConnectAddress(String address) {
-    if (address.startsWith('wss') || address.startsWith('ws')) {
-      wsConnectAddress[0] = address;
-    } else if (address.startsWith('https') || address.startsWith('http')) {
-      httpConnectAddress[0] = address;
-    } else if (address.startsWith('/dns') || address.startsWith('/ip')) {
-      libp2pConnectAddress[0] = address;
-    }
+  setConnectAddress(NodeAddress address) {
+    address.validate(address);
+    nodeAddress[address.name] = address;
   }
 
-  /**
-   * 增加一个连接地址，自动识别https，wss，libp2p协议
-   */
-  addConnectAddress(String address) {
-    if (address.startsWith('wss') || address.startsWith('ws')) {
-      wsConnectAddress.add(address);
-    } else if (address.startsWith('https') || address.startsWith('http')) {
-      httpConnectAddress.add(address);
-    } else if (address.startsWith('/dns') || address.startsWith('/ip')) {
-      libp2pConnectAddress.add(address);
+  /// 缺省连接地址
+  NodeAddress get defaultNodeAddress {
+    var d = nodeAddress[NodeAddress.defaultName];
+    if (d == null) {
+      throw 'NoDefaultNodeAddress';
     }
+    return d;
+  }
+
+  set defaultNodeAddress(NodeAddress address) {
+    nodeAddress[NodeAddress.defaultName] = address;
   }
 
   saveAppParams() async {

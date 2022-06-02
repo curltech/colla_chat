@@ -18,7 +18,6 @@ class P2pSettingWidget extends StatefulWidget {
 
 class _P2pSettingWidgetState extends State<P2pSettingWidget> {
   final _formKey = GlobalKey<FormState>();
-  var _offstage = true;
 
   @override
   Widget build(BuildContext context) {
@@ -41,29 +40,6 @@ class _P2pSettingWidgetState extends State<P2pSettingWidget> {
             padding: EdgeInsets.symmetric(horizontal: 15.0),
             child: BrightnessPicker(),
           ),
-          SizedBox(height: 10.0),
-          Offstage(
-            offstage: _offstage,
-            child: Container(
-              child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 15.0),
-                  child: TextFormField(
-                    keyboardType: TextInputType.text,
-                    //controller: passwordController,
-                    decoration: InputDecoration(
-                      labelText:
-                          AppLocalizations.instance.text('Customized address'),
-                      prefixIcon: Icon(Icons.location_city),
-                    ),
-                    initialValue: '',
-                    onChanged: (String val) {
-                      var appParams = AppParams.instance;
-                      appParams.wsConnectAddress[0] = val;
-                    },
-                    onFieldSubmitted: (String val) {},
-                  )),
-            ),
-          )
         ],
       ),
     );

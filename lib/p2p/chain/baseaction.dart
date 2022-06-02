@@ -97,17 +97,21 @@ abstract class BaseAction {
     ChainMessage chainMessage = ChainMessage();
     var appParams = AppParams.instance;
     if (connectAddress == null) {
-      if (appParams.wsConnectAddress.isNotEmpty) {
-        connectAddress = appParams.wsConnectAddress[0];
-      } else if (appParams.httpConnectAddress.isNotEmpty) {
-        connectAddress = appParams.httpConnectAddress[0];
+      if (appParams.nodeAddress.isNotEmpty) {
+        connectAddress = appParams.defaultNodeAddress.wsConnectAddress;
+        if (connectAddress == null) {
+          connectAddress = appParams.defaultNodeAddress.httpConnectAddress;
+        }
       }
     }
     chainMessage.connectAddress = connectAddress;
-    if (appParams.connectPeerId.isNotEmpty) {
-      connectPeerId = appParams.connectPeerId[0];
-      chainMessage.connectPeerId = connectPeerId;
+    if (connectPeerId == null) {
+      if (appParams.nodeAddress.isNotEmpty) {
+        connectPeerId = appParams.defaultNodeAddress.connectPeerId;
+      }
     }
+    chainMessage.connectPeerId = connectPeerId;
+
     if (topic == null && appParams.topics.isNotEmpty) {
       topic ??= appParams.topics[0];
     }
@@ -126,9 +130,9 @@ abstract class BaseAction {
     /// 所以消息发送给客户端时必须有targetPeerId有客户端的peerId，必须加密
     if (targetPeerId == null) {
       chainMessage.needEncrypt = false;
+      targetPeerId = connectPeerId;
     }
     chainMessage.targetPeerId = targetPeerId;
-
     chainMessage.payloadType = PayloadType.Map.name;
     chainMessage.messageType = msgType.name;
     chainMessage.messageDirect = MsgDirect.Request.name;

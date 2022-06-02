@@ -17,12 +17,18 @@ class WsAddressPicker extends StatefulWidget {
 
 class _WsAddressPickerState extends State<WsAddressPicker> {
   bool _visibility = true;
-  String _wsConnectAddress = AppParams.instance.wsConnectAddress[0];
+  String _name = '';
+  String _wsConnectAddress = '';
   late TextEditingController _wsConnectAddressController;
 
   @override
   void initState() {
     super.initState();
+    var wsConnectAddress =
+        AppParams.instance.defaultNodeAddress.wsConnectAddress;
+    if (wsConnectAddress != null) {
+      _wsConnectAddress = wsConnectAddress;
+    }
     _wsConnectAddressController =
         TextEditingController(text: _wsConnectAddress);
     // 初始化子项集合
@@ -34,9 +40,9 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
     var locale = Provider.of<LocaleDataProvider>(context).locale;
     var instance = AppLocalizations.instance;
     List<S2Choice<String>> items = [];
-    for (var wsAddressOption in wsAddressOptions) {
-      var label = instance.text(wsAddressOption.label);
-      var item = S2Choice<String>(value: wsAddressOption.value, title: label);
+    for (var nodeAddressOption in nodeAddressOptions.values) {
+      var label = instance.text(nodeAddressOption.name);
+      var item = S2Choice<String>(value: nodeAddressOption.name, title: label);
       items.add(item);
     }
     return Column(children: <Widget>[
@@ -44,15 +50,23 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
         modalType: S2ModalType.bottomSheet,
         placeholder: instance.text('Please select address'),
         title: instance.text('Address'),
-        selectedValue: _wsConnectAddress,
+        selectedValue: _name,
         choiceItems: items,
         onChange: (dynamic state) {
           setState(() {
             String value = state.value;
-            _wsConnectAddressController.text = value;
+            _name = value;
             if (value != '') {
-              _wsConnectAddress = value;
-              AppParams.instance.wsConnectAddress[0] = value;
+              var nodeAddress = nodeAddressOptions[value];
+              var appParams = AppParams.instance;
+              if (nodeAddress != null) {
+                var wsConnectAddress = nodeAddress.wsConnectAddress;
+                if (wsConnectAddress == null) {
+                  wsConnectAddress = '';
+                }
+                _wsConnectAddressController.text = wsConnectAddress;
+                appParams.defaultNodeAddress = nodeAddress;
+              }
               _visibility = true;
             } else {
               _visibility = false;
@@ -75,8 +89,10 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
                 ),
                 //initialValue: _wsConnectAddress,
                 onChanged: (String val) {
+                  var nodeAddress = NodeAddress(NodeAddress.defaultName,
+                      wsConnectAddress: val);
                   var appParams = AppParams.instance;
-                  appParams.wsConnectAddress[0] = val;
+                  appParams.defaultNodeAddress = nodeAddress;
                 },
                 onFieldSubmitted: (String val) {},
               )),

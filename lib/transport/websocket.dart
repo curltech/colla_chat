@@ -95,15 +95,16 @@ class WebsocketPool {
   /// 初始化连接池，设置缺省websocketclient，返回连接池
   static Future<WebsocketPool> getInstance() async {
     if (!initStatus) {
-      var appParams = await AppParams.instance;
-      var connectAddress = appParams.wsConnectAddress;
-      int i = 0;
-      if (connectAddress.isNotEmpty) {
-        for (var addr in connectAddress) {
-          if (addr.startsWith('ws')) {
-            var websocket = Websocket(addr);
-            instance.websockets[addr] = websocket;
-            if (i == 0 && instance._default == null) {
+      var appParams = AppParams.instance;
+      var nodeAddress = appParams.nodeAddress;
+      if (nodeAddress.isNotEmpty) {
+        for (var address in nodeAddress.entries) {
+          var name = address.key;
+          var wsConnectAddress = address.value.wsConnectAddress;
+          if (wsConnectAddress != null && wsConnectAddress.startsWith('ws')) {
+            var websocket = Websocket(wsConnectAddress);
+            instance.websockets[wsConnectAddress] = websocket;
+            if (name == NodeAddress.defaultName) {
               instance._default = websocket;
             }
           }

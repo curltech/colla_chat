@@ -1,3 +1,5 @@
+import 'dart:html';
+
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:dio/dio.dart';
 
@@ -63,19 +65,20 @@ class HttpClientPool {
   /// 初始化连接池，设置缺省httpclient，返回连接池
   static Future<HttpClientPool> getInstance() async {
     if (!initStatus) {
-      var appParams = await AppParams.instance;
-      var connectAddress = appParams.httpConnectAddress;
-      int i = 0;
-      if (connectAddress.isNotEmpty) {
-        for (var address in connectAddress) {
-          if (address.startsWith('http')) {
-            var httpClient = HttpClient(address);
-            instance._httpClients[address] = httpClient;
-            if (i == 0) {
-              instance._default ??= httpClient;
+      var appParams = AppParams.instance;
+      var nodeAddress = appParams.nodeAddress;
+      if (nodeAddress.isNotEmpty) {
+        for (var address in nodeAddress.entries) {
+          var name = address.key;
+          var httpConnectAddress = address.value.httpConnectAddress;
+          if (httpConnectAddress != null &&
+              httpConnectAddress.startsWith('http')) {
+            var httpClient = HttpClient(httpConnectAddress);
+            instance._httpClients[httpConnectAddress] = httpClient;
+            if (name == NodeAddress.defaultName) {
+              instance._default = httpClient;
             }
           }
-          i++;
         }
       }
       initStatus = true;
