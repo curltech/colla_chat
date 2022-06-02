@@ -3,6 +3,12 @@ import 'base.dart';
 
 /// 地址选择框的选项
 final Map<String, NodeAddress> nodeAddressOptions = {
+  'default': NodeAddress('localhost',
+      wsConnectAddress: 'wss://localhost:9090/websocket',
+      httpConnectAddress: 'https://localhost',
+      connectPeerId: '12D3KooWPUFtWFhP2HbAKbGEo8Xfru4Y68su1e1so4Ndr5Xb1cF4',
+      libp2pConnectAddress:
+          '/ip4/127.0.0.1/tcp/5720/wss/p2p/12D3KooWPUFtWFhP2HbAKbGEo8Xfru4Y68su1e1so4Ndr5Xb1cF4'),
   'China-Shenzhen': NodeAddress('China-Shenzhen',
       wsConnectAddress: 'wss://sz.curltech.com.cn:9090/websocket',
       httpConnectAddress: 'https://sz.curltech.com.cn',
