@@ -4,6 +4,7 @@ import 'dart:core';
 import 'package:uuid/uuid.dart';
 
 import '../../app.dart';
+import '../../entity/dht/myself.dart';
 import '../../entity/p2p/message.dart';
 import '../../tool/util.dart';
 import 'chainmessagehandler.dart';
@@ -138,6 +139,7 @@ abstract class BaseAction {
     chainMessage.messageDirect = MsgDirect.Request.name;
     var uuid = Uuid();
     chainMessage.uuid = uuid.v4();
+    chainMessage.srcPeerId = myself.peerId;
 
     return chainMessage;
   }

@@ -1,40 +1,29 @@
 import 'base.dart';
 
+const int defaultExpireDate = 3600 * 24 * 365;
+
 class PeerClient extends PeerLocation {
   String? clientId;
-  String? clientDevice;
-  String? clientType;
   String? deviceToken;
-  String? language;
-  // 用户头像（base64字符串）
-  String? avatar;
   String? mobile;
-  String? mobileVerified;
-  String? visibilitySetting;
-  /**
-   * 客户连接到节点的位置
-   */
+
+  /// 客户连接到节点的位置
   String? connectPeerId;
   String? connectSessionId;
   String? activeStatus;
   String? lastAccessTime;
-
-  String? expireDate;
+  int? expireDate = defaultExpireDate;
   String? signatureData;
   String? signature;
   String? previousPublicKeySignature;
   String? trustLevel;
+
   PeerClient();
+
   PeerClient.fromJson(Map json)
       : mobile = json['mobile'],
         clientId = json['clientId'],
-        clientDevice = json['clientDevice'],
-        clientType = json['clientType'],
         deviceToken = json['deviceToken'],
-        language = json['language'],
-        avatar = json['avatar'],
-        mobileVerified = json['mobileVerified'],
-        visibilitySetting = json['visibilitySetting'],
         lastAccessTime = json['lastAccessTime'],
         activeStatus = json['activeStatus'],
         connectPeerId = json['connectPeerId'],
@@ -42,7 +31,8 @@ class PeerClient extends PeerLocation {
         signature = json['signature'],
         previousPublicKeySignature = json['previousPublicKeySignature'],
         signatureData = json['signatureData'],
-        expireDate = json['expireDate'],
+        expireDate =
+            json['expireDate'] != null ? json['expireDate'] : defaultExpireDate,
         trustLevel = json['trustLevel'],
         super.fromJson(json);
 
@@ -52,13 +42,7 @@ class PeerClient extends PeerLocation {
     json.addAll({
       'mobile': mobile,
       'clientId': clientId,
-      'clientDevice': clientDevice,
-      'clientType': clientType,
       'deviceToken': deviceToken,
-      'language': language,
-      'avatar': avatar,
-      'mobileVerified': mobileVerified,
-      'visibilitySetting': visibilitySetting,
       'lastAccessTime': lastAccessTime,
       'activeStatus': activeStatus,
       'connectPeerId': connectPeerId,

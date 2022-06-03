@@ -275,10 +275,8 @@ class ContactService extends BaseService {
         var peerClient = PeerClient.fromJson(peer);
         peerContact.peerId = peerClient.peerId;
         peerContact.name = peerClient.name;
-        peerContact.trustLevel = peerClient.trustLevel;
         peerContact.status = peerClient.status;
         peerContact.publicKey = peerClient.publicKey;
-        peerContact.avatar = peerClient.avatar;
 
         return peerContact;
       }

@@ -24,16 +24,8 @@ class MyselfPeer extends PeerEntity {
   String? newCertPassword;
   String? certContent;
 
-  /// 主发现地址，表示可信的，可以推荐你的peer地址
-  String? discoveryAddress;
-  String? lastFindNodeTime;
-
-  // 用户头像（base64字符串）
-  String? avatar;
-  String? mobileVerified;
-
-  // 可见性YYYYYY (peerId, mobileNumber, groupChat, qrCode, contactCard, name）
-  String? visibilitySetting;
+  String? clientId;
+  String? deviceToken;
 
   MyselfPeer();
 
@@ -51,17 +43,16 @@ class MyselfPeer extends PeerEntity {
         oldCertPassword = json['oldCertPassword'],
         newCertPassword = json['newCertPassword'],
         certContent = json['certContent'],
-        discoveryAddress = json['discoveryAddress'],
-        lastFindNodeTime = json['lastFindNodeTime'],
-        avatar = json['avatar'],
-        mobileVerified = json['mobileVerified'],
-        visibilitySetting = json['visibilitySetting'],
+        clientId = json['clientId'],
+        deviceToken = json['deviceToken'],
         super.fromJson(json);
 
   @override
   Map<String, dynamic> toJson() {
     var json = super.toJson();
     json.addAll({
+      'clientId': clientId,
+      'deviceToken': deviceToken,
       'loginName': loginName,
       'peerPrivateKey': peerPrivateKey,
       'privateKey': privateKey,
@@ -75,11 +66,6 @@ class MyselfPeer extends PeerEntity {
       'oldCertPassword': oldCertPassword,
       'newCertPassword': newCertPassword,
       'certContent': certContent,
-      'discoveryAddress': discoveryAddress,
-      'lastFindNodeTime': lastFindNodeTime,
-      'avatar': avatar,
-      'mobileVerified': mobileVerified,
-      'visibilitySetting': visibilitySetting,
     });
     return json;
   }

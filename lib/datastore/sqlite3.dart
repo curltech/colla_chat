@@ -33,7 +33,7 @@ class Sqlite3 extends DataStore {
   open({String name = 'colla_chat.db'}) async {
     db = await sqlite3_open.openSqlite3(name: name);
     await init(db);
-    var platformParams = await PlatformParams.instance;
+    var platformParams = PlatformParams.instance;
     if (platformParams.web) {
     } else {}
   }
@@ -48,6 +48,10 @@ class Sqlite3 extends DataStore {
     for (BaseService service in ServiceLocator.services.values) {
       service.dataStore = instance;
     }
+  }
+
+  reset() {
+    db.userVersion = 0;
   }
 
   /// 关闭数据库
@@ -89,8 +93,8 @@ class Sqlite3 extends DataStore {
     } else {
       db.execute(sql.clause);
     }
-    logger.i('execute sql:${sql.clause}');
-    logger.i('execute sql params:${sql.params}');
+    logger.w('execute sql:${sql.clause}');
+    logger.w('execute sql params:${sql.params}');
 
     return null;
   }
@@ -99,6 +103,8 @@ class Sqlite3 extends DataStore {
   @override
   dynamic create(String tableName, List<String> fields,
       [List<String>? indexFields]) {
+    String clause = sqlBuilder.drop(tableName);
+    run(Sql(clause));
     List<String> clauses = sqlBuilder.create(tableName, fields, indexFields);
     for (var query in clauses) {
       run(Sql(query));

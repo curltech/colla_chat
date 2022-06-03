@@ -1,8 +1,6 @@
 import 'dart:convert';
-import 'dart:html';
 import 'dart:math';
 import 'package:colla_chat/tool/util.dart';
-import 'package:flutter/material.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:logger/logger.dart';
@@ -263,6 +261,7 @@ class Config {
     if (!initStatus) {
       initStatus = true;
     }
+
     return _instance;
   }
 }

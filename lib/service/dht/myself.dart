@@ -68,6 +68,7 @@ class MyselfService {
     }
     myself.myselfPeer = myselfPeer;
     myself.peerId = myselfPeer.peerId;
+    myself.clientId = myselfPeer.clientId;
     myself.password = password;
     myself.peerPrivateKey = peerPrivateKey;
     myself.peerPublicKey = peerPublicKey;

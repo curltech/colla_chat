@@ -21,17 +21,14 @@ class PlatformParams {
   late bool linux;
   late bool macos;
   late bool windows;
-  String? localeName;
+  Locale? locale;
   String? localHostname;
   String? operatingSystem;
   String? operatingSystemVersion;
   String? version;
-  String? dark;
+  String? brightness;
   String? phoneNumber;
-  String? countryCode;
-  String? language;
   String? clientDevice;
-  String? clientType;
 
   late Map<String, dynamic> deviceData;
   late Map<String, dynamic>? webDeviceData;
@@ -50,7 +47,8 @@ class PlatformParams {
           instance.linux = Platform.isLinux;
           instance.macos = Platform.isMacOS;
           instance.windows = Platform.isWindows;
-          instance.localeName = Platform.localeName;
+          var locales = Platform.localeName.split('_');
+          instance.locale = Locale(locales[0], locales[1]);
           instance.localHostname = Platform.localHostname;
           instance.operatingSystem = Platform.operatingSystem;
           instance.operatingSystemVersion = Platform.operatingSystemVersion;
@@ -61,7 +59,6 @@ class PlatformParams {
           } else if (Platform.isIOS) {
             instance.deviceData =
                 instance._readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
-          } else if (Platform.isLinux) {
             instance.deviceData =
                 instance._readLinuxDeviceInfo(await deviceInfoPlugin.linuxInfo);
           } else if (Platform.isMacOS) {
@@ -152,6 +149,13 @@ class PlatformParams {
   }
 
   Map<String, dynamic> _readWebBrowserInfo(WebBrowserInfo data) {
+    var language = data.language;
+    if (language != null) {
+      var locales = language.split('-');
+      instance.locale = Locale(locales[0], locales[1]);
+    }
+    instance.clientDevice = data.appVersion;
+    instance.operatingSystem = data.platform;
     return <String, dynamic>{
       'browserName': describeEnum(data.browserName),
       'appCodeName': data.appCodeName,
@@ -194,16 +198,12 @@ class PlatformParams {
     };
   }
 
-  /**
-   * 屏幕宽度较小，是移动尺寸
-   */
+  /// 屏幕宽度较小，是移动尺寸
   bool ifMobileSize() {
     return (mediaQueryData.size.width < 481);
   }
 
-  /**
-   * 可以采用移动窄屏的样式
-   */
+  /// 可以采用移动窄屏的样式
   bool ifMobileStyle() {
     return (mediaQueryData.size.width < 481 ||
             mediaQueryData.size.height < 481) ||

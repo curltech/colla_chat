@@ -1,4 +1,5 @@
 import '../../../app.dart';
+import '../../../entity/dht/peerclient.dart';
 import '../../../entity/p2p/message.dart';
 import '../baseaction.dart';
 
@@ -8,7 +9,7 @@ class ConnectAction extends BaseAction {
     logger.i('Action MsgType $msgType');
   }
 
-  Future<dynamic> connect(dynamic peerClient) async {
+  Future<dynamic> connect(PeerClient peerClient) async {
     ChainMessage chainMessage = await prepareSend(peerClient);
     chainMessage.payloadType = PayloadType.peerClient.name;
 

@@ -3,10 +3,12 @@ import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/service/dht/myself.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 
+import '../../crypto/util.dart';
 import '../../entity/base.dart';
 import '../../entity/dht/base.dart';
 import '../../entity/dht/myself.dart';
 import '../../entity/dht/myselfpeer.dart';
+import '../../entity/dht/peerclient.dart';
 import '../../entity/dht/peerprofile.dart';
 import '../../p2p/chain/action/connect.dart';
 import '../../platform.dart';
@@ -74,6 +76,11 @@ class MyselfPeerService extends PeerEntityService {
     myselfPeer.status = EntityStatus.Effective.name;
     myselfPeer.mobile = mobile;
     myselfPeer.email = email;
+    var clientDevice = PlatformParams.instance.clientDevice;
+    if (clientDevice != null) {
+      var hash = await cryptoGraphy.hash(clientDevice.codeUnits);
+      myselfPeer.clientId = CryptoUtil.encodeBase58(hash);
+    }
     myselfPeer.name = name;
     myselfPeer.loginName = loginName;
     myselfPeer.address = await NetworkInfoUtil.getWifiIp();
@@ -87,9 +94,6 @@ class MyselfPeerService extends PeerEntityService {
     myselfPeer.endDate = '9999-12-31T11:59:59.999Z';
     myselfPeer.statusDate = currentDate;
     myselfPeer.version = 0;
-    myselfPeer.creditScore = 300;
-    myselfPeer.mobileVerified = 'N';
-    myselfPeer.visibilitySetting = 'YYYYYY';
     await upsert(myselfPeer);
     myself.myselfPeer = myselfPeer;
 
@@ -102,11 +106,12 @@ class MyselfPeerService extends PeerEntityService {
     var peerProfile = PeerProfile();
     peerProfile.peerId = peerId;
     peerProfile.status = EntityStatus.Effective.name;
-    peerProfile.clientId = myselfPeer.id.toString();
-    var platformParams = await PlatformParams.instance;
-    peerProfile.clientType = platformParams.clientType;
+    peerProfile.creditScore = 300;
+    peerProfile.mobileVerified = 'N';
+    peerProfile.visibilitySetting = 'YYYYYY';
+    var platformParams = PlatformParams.instance;
     peerProfile.clientDevice = platformParams.clientDevice;
-    var appParams = await AppParams.instance;
+    var appParams = AppParams.instance;
     peerProfile.language = appParams.language;
     peerProfile.lightDarkMode = 'auto';
     peerProfile.primaryColor = '#19B7C7';
@@ -134,7 +139,13 @@ class MyselfPeerService extends PeerEntityService {
       await myselfService.setMyself(myselfPeer, password);
 
       ///2.连接篇p2p的节点，把自己的信息注册上去
-      connectAction.connect(myselfPeer);
+      var json = JsonUtil.toMap(myselfPeer);
+      var peerClient = PeerClient.fromJson(json);
+      peerClient.activeStatus = ActiveStatus.Up.name;
+      peerClient.clientId = myselfPeer.clientId;
+      peerClient.kind = null;
+      peerClient.name = null;
+      await connectAction.connect(peerClient);
 
       return false;
     }

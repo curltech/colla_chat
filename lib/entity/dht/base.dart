@@ -54,17 +54,9 @@ abstract class PeerEntity extends PeerLocation {
   String? email;
   String? startDate;
   String? endDate;
-  int creditScore = 0;
-  String? preferenceScore;
-  String? badCount;
-  String? staleCount;
   String? lastAccessMillis;
   String? lastAccessTime;
   String? activeStatus;
-  String? blockId;
-  String? balance;
-  String? currency;
-  String? lastTransactionTime;
   String? previousPublicKeySignature;
   String? signature;
   String? signatureData;
@@ -76,17 +68,9 @@ abstract class PeerEntity extends PeerLocation {
         email = json['email'],
         startDate = json['startDate'],
         endDate = json['endDate'],
-        creditScore = json['creditScore'],
-        preferenceScore = json['preferenceScore'],
-        badCount = json['badCount'],
-        staleCount = json['staleCount'],
         lastAccessMillis = json['lastAccessMillis'],
         lastAccessTime = json['lastAccessTime'],
         activeStatus = json['activeStatus'],
-        blockId = json['blockId'],
-        balance = json['balance'],
-        currency = json['currency'],
-        lastTransactionTime = json['lastTransactionTime'],
         previousPublicKeySignature = json['previousPublicKeySignature'],
         signature = json['signature'],
         signatureData = json['signatureData'],
@@ -102,17 +86,9 @@ abstract class PeerEntity extends PeerLocation {
       'email': email,
       'startDate': startDate,
       'endDate': endDate,
-      'creditScore': creditScore,
-      'preferenceScore': preferenceScore,
-      'badCount': badCount,
-      'staleCount': staleCount,
       'lastAccessMillis': lastAccessMillis,
       'lastAccessTime': lastAccessTime,
       'activeStatus': activeStatus,
-      'blockId': blockId,
-      'balance': balance,
-      'currency': currency,
-      'lastTransactionTime': lastTransactionTime,
       'previousPublicKeySignature': previousPublicKeySignature,
       'signature': signature,
       'signatureData': signatureData,

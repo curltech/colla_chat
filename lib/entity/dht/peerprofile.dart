@@ -3,15 +3,11 @@ import '../base.dart';
 /// 节点的附属信息，包括个性化的配置
 class PeerProfile extends StatusEntity {
   String? peerId;
-  String? clientId;
-  String? clientType;
   String? clientDevice;
-  String? deviceToken;
+  String? clientType;
 
   // 对应的用户编号
   String? userId;
-
-  // 用户名
   String? username;
 
   // 个性化配置
@@ -26,16 +22,32 @@ class PeerProfile extends StatusEntity {
   bool developerOption = false;
   String? logLevel;
   String? lastSyncTime;
+
+  /// 主发现地址，表示可信的，可以推荐你的peer地址
+  String? discoveryAddress;
+  String? lastFindNodeTime;
+
+  // 用户头像（base64字符串）
   String? avatar;
+  String? mobileVerified;
+
+  // 可见性YYYYYY (peerId, mobileNumber, groupChat, qrCode, contactCard, name）
+  String? visibilitySetting;
+  int creditScore = 0;
+  String? preferenceScore;
+  String? badCount;
+  String? staleCount;
+  String? blockId;
+  String? balance;
+  String? currency;
+  String? lastTransactionTime;
 
   PeerProfile();
 
   PeerProfile.fromJson(Map json)
       : peerId = json['peerId'],
-        clientId = json['clientId'],
         clientDevice = json['clientDevice'],
         clientType = json['clientType'],
-        deviceToken = json['deviceToken'],
         language = json['language'],
         avatar = json['avatar'],
         userId = json['userId'],
@@ -63,6 +75,18 @@ class PeerProfile extends StatusEntity {
                 : false,
         logLevel = json['logLevel'],
         lastSyncTime = json['lastSyncTime'],
+        discoveryAddress = json['discoveryAddress'],
+        lastFindNodeTime = json['lastFindNodeTime'],
+        mobileVerified = json['mobileVerified'],
+        visibilitySetting = json['visibilitySetting'],
+        creditScore = json['creditScore'] != null ? json['creditScore'] : 0,
+        preferenceScore = json['preferenceScore'],
+        badCount = json['badCount'],
+        staleCount = json['staleCount'],
+        blockId = json['blockId'],
+        balance = json['balance'],
+        currency = json['currency'],
+        lastTransactionTime = json['lastTransactionTime'],
         super.fromJson(json);
 
   @override
@@ -70,10 +94,8 @@ class PeerProfile extends StatusEntity {
     var json = super.toJson();
     json.addAll({
       'peerId': peerId,
-      'clientId': clientId,
       'clientDevice': clientDevice,
       'clientType': clientType,
-      'deviceToken': deviceToken,
       'language': language,
       'avatar': avatar,
       'userId': userId,
@@ -88,6 +110,18 @@ class PeerProfile extends StatusEntity {
       'developerOption': developerOption,
       'logLevel': logLevel,
       'lastSyncTime': lastSyncTime,
+      'discoveryAddress': discoveryAddress,
+      'lastFindNodeTime': lastFindNodeTime,
+      'mobileVerified': mobileVerified,
+      'visibilitySetting': visibilitySetting,
+      'creditScore': creditScore,
+      'preferenceScore': preferenceScore,
+      'badCount': badCount,
+      'staleCount': staleCount,
+      'blockId': blockId,
+      'balance': balance,
+      'currency': currency,
+      'lastTransactionTime': lastTransactionTime,
     });
     return json;
   }

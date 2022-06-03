@@ -1,7 +1,7 @@
 import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/service/stock/account.dart';
 import 'package:colla_chat/tool/util.dart';
-
+import 'package:logger/logger.dart';
 import '../app.dart';
 import '../entity/chat/chat.dart';
 import '../entity/chat/contact.dart';
@@ -30,6 +30,7 @@ class ServiceLocator {
 
   ///初始化并注册服务类，在应用启动后调用
   static Future<void> init() async {
+    Logger.level = Level.info;
     await PlatformParams.init();
     await AppParams.init();
     var accountService = await StockAccountService.init(
