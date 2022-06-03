@@ -140,6 +140,7 @@ abstract class BaseAction {
     var uuid = Uuid();
     chainMessage.uuid = uuid.v4();
     chainMessage.srcPeerId = myself.peerId;
+    chainMessage.srcClientId = myself.clientId;
 
     return chainMessage;
   }

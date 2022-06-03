@@ -2,7 +2,7 @@ import 'package:colla_chat/entity/p2p/security_context.dart';
 
 class ChainMessage extends SecurityContext {
   late String uuid;
-  String? clientId;
+  String? srcClientId;
 
   /// 最终的消息接收目标，如果当前节点不是最终的目标，可以进行转发
   /// 如果目标是服务器节点，直接转发，
@@ -49,7 +49,7 @@ class ChainMessage extends SecurityContext {
 
   ChainMessage.fromJson(Map json)
       : uuid = json['uuid'],
-        clientId = json['clientId'],
+        srcClientId = json['srcClientId'],
         targetConnectPeerId = json['targetConnectPeerId'],
         targetConnectSessionId = json['targetConnectSessionId'],
         topic = json['topic'],
@@ -77,7 +77,7 @@ class ChainMessage extends SecurityContext {
     var json = super.toJson();
     json.addAll({
       'uuid': uuid,
-      'clientId': clientId,
+      'srcClientId': srcClientId,
       'targetConnectPeerId': targetConnectPeerId,
       'targetConnectSessionId': targetConnectSessionId,
       'topic': topic,
