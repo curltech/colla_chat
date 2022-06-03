@@ -10,7 +10,7 @@ class ConnectAction extends BaseAction {
 
   Future<dynamic> connect(dynamic peerClient) async {
     ChainMessage chainMessage = await prepareSend(peerClient);
-    chainMessage.payloadType = PayloadType.PeerClient.name;
+    chainMessage.payloadType = PayloadType.peerClient.name;
 
     ChainMessage? response = await send(chainMessage);
     if (response != null) {

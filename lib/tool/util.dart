@@ -228,6 +228,13 @@ class JsonUtil {
   }
 }
 
+class DateUtil {
+  static String currentDate() {
+    var currentDate = DateTime.now().toUtc().toIso8601String();
+    return currentDate;
+  }
+}
+
 class EntityUtil {
   static Object? getId(dynamic entity) {
     if (entity is Map) {
@@ -246,7 +253,7 @@ class EntityUtil {
   }
 
   static createTimestamp(dynamic entity) {
-    var currentDate = DateTime.now().toIso8601String();
+    var currentDate = DateUtil.currentDate();
     if (entity is Map) {
       entity['createDate'] = currentDate;
       entity['updateDate'] = currentDate;
@@ -257,7 +264,7 @@ class EntityUtil {
   }
 
   static updateTimestamp(dynamic entity) {
-    var currentDate = DateTime.now().toIso8601String();
+    var currentDate = DateUtil.currentDate();
     if (entity is Map) {
       entity['updateDate'] = currentDate;
     } else {

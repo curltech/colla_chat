@@ -23,7 +23,7 @@ class ConsensusAction extends BaseAction {
 
   Future<dynamic?> consensus(dynamic dataBlock, {String? msgType}) async {
     ChainMessage chainMessage = await prepareSend(dataBlock);
-    chainMessage.payloadType = PayloadType.DataBlock.name;
+    chainMessage.payloadType = PayloadType.dataBlock.name;
     if (msgType == null) {
       msgType = MsgType.CONSENSUS.name;
     }

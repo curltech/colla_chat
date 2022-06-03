@@ -3,6 +3,7 @@ import 'package:colla_chat/platform.dart';
 
 import '../../entity/stock/account.dart';
 import '../../service/base.dart';
+import '../../tool/util.dart';
 import '../base.dart';
 import '../../datastore/sqflite.dart';
 
@@ -49,7 +50,7 @@ class StockAccountService extends BaseService {
       if (subscription != null) {
         account.subscription = subscription;
       }
-      var currentDate = DateTime.now().toIso8601String();
+      var currentDate = DateUtil.currentDate();
       account.statusDate = currentDate;
     }
     account.lastLoginDate = user['lastLoginDate'];

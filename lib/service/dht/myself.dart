@@ -57,7 +57,7 @@ class MyselfService {
         myselfPeer.peerPrivateKey, password.codeUnits, peerPublicKey);
 
     //检查身份密钥对，如果通过，设置本地myself的属性
-    var timestamp_ = DateTime.now().toIso8601String();
+    var timestamp_ = DateUtil.currentDate();
     var random_ = await cryptoGraphy.getRandomAsciiString();
     var key = timestamp_ + random_;
     var signature = await cryptoGraphy.sign(key.codeUnits, peerPrivateKey);

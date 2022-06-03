@@ -69,7 +69,7 @@ class MyselfPeerService extends PeerEntityService {
     myselfPeer.address = '127.0.0.1:8088';
     //await p2pPeer.initMyself(password, myselfPeer);
     myselfPeer = myself.myselfPeer;
-    var currentDate = DateTime.now().toIso8601String();
+    var currentDate = DateUtil.currentDate();
     myselfPeer.createDate = currentDate;
     myselfPeer.updateDate = currentDate;
     myselfPeer.lastUpdateTime = currentDate;

@@ -24,7 +24,7 @@ class P2pChatAction extends BaseAction {
     String? srcPeerId = chainMessage.srcPeerId;
     List<int>? payload;
     if (_chainMessage != null &&
-        _chainMessage.payloadType == PayloadType.DataBlock.name) {
+        _chainMessage.payloadType == PayloadType.dataBlock.name) {
       dynamic _dataBlock = _chainMessage.payload;
       //await dataBlockService.decrypt(_dataBlock);
       payload = _dataBlock.payload;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../tool/util.dart';
 import '../../../widgets/common/data_listview.dart';
 
 final Map<String, List<TileData>> mockTileData = {
@@ -7,17 +8,17 @@ final Map<String, List<TileData>> mockTileData = {
     TileData(
         title: '家庭群',
         subtitle: '美国留学',
-        suffix: DateTime.now().toIso8601String()),
+        suffix: DateUtil.currentDate()),
     TileData(
         title: 'MBA群',
         subtitle: '上海团购',
-        suffix: DateTime.now().toIso8601String()),
+        suffix: DateUtil.currentDate()),
   ],
   '个人': [
     TileData(
-        title: '李志群', subtitle: '', suffix: DateTime.now().toIso8601String()),
+        title: '李志群', subtitle: '', suffix: DateUtil.currentDate()),
     TileData(
-        title: '胡百水', subtitle: '', suffix: DateTime.now().toIso8601String()),
+        title: '胡百水', subtitle: '', suffix: DateUtil.currentDate()),
   ]
 };
 

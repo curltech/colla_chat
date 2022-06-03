@@ -9,17 +9,17 @@ import '../../tool/util.dart';
 import 'chainmessagehandler.dart';
 
 enum PayloadType {
-  PeerClient,
-  PeerEndpoint,
-  ChainApp,
-  DataBlock,
-  ConsensusLog,
-  PeerClients,
-  PeerEndpoints,
-  ChainApps,
-  DataBlocks,
-  String,
-  Map,
+  peerClient,
+  peerEndpoint,
+  chainApp,
+  dataBlock,
+  consensusLog,
+  peerClients,
+  peerEndpoints,
+  chainApps,
+  dataBlocks,
+  string,
+  map,
 }
 
 class NamespacePrefix {
@@ -133,7 +133,7 @@ abstract class BaseAction {
       targetPeerId = connectPeerId;
     }
     chainMessage.targetPeerId = targetPeerId;
-    chainMessage.payloadType = PayloadType.Map.name;
+    chainMessage.payloadType = PayloadType.map.name;
     chainMessage.messageType = msgType.name;
     chainMessage.messageDirect = MsgDirect.Request.name;
     var uuid = Uuid();

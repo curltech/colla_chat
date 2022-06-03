@@ -24,8 +24,8 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
   @override
   void initState() {
     super.initState();
-    var wsConnectAddress =
-        AppParams.instance.defaultNodeAddress.wsConnectAddress;
+    var defaultNodeAddress = AppParams.instance.defaultNodeAddress;
+    var wsConnectAddress = defaultNodeAddress.wsConnectAddress;
     if (wsConnectAddress != null) {
       _wsConnectAddress = wsConnectAddress;
     }
@@ -33,6 +33,11 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
         TextEditingController(text: _wsConnectAddress);
     // 初始化子项集合
     _wsConnectAddressController.addListener(() {});
+
+    var name = defaultNodeAddress.name;
+    if (name != null) {
+      _name = name;
+    }
   }
 
   @override

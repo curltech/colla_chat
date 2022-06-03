@@ -79,7 +79,7 @@ class MyselfPeerService extends PeerEntityService {
     myselfPeer.address = await NetworkInfoUtil.getWifiIp();
     await myselfService.createMyself(myselfPeer, password);
 
-    var currentDate = DateTime.now().toIso8601String();
+    var currentDate = DateUtil.currentDate();
     myselfPeer.createDate = currentDate;
     myselfPeer.updateDate = currentDate;
     myselfPeer.lastUpdateTime = currentDate;

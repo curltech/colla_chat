@@ -201,7 +201,7 @@ class StockUser {
           var user = data['user'];
           var token = data['token'];
           if (user != null) {
-            user['lastLoginDate'] = DateTime.now().toIso8601String();
+            user['lastLoginDate'] = DateUtil.currentDate();
             account = await StockAccountService.instance.getOrRegist(user);
             loginStatus = true;
             token = token;

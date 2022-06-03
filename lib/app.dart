@@ -7,6 +7,8 @@ import 'package:colla_chat/platform.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:logger/logger.dart';
 
+import 'constant/address.dart';
+
 class LocalStorage {
   static final LocalStorage _instance = LocalStorage();
   late SharedPreferences prefs;
@@ -127,11 +129,7 @@ class AppParams {
   String? localeName;
 
   /// 可选的连接地址，比如http、ws、libp2p、turn
-  Map<String, NodeAddress> nodeAddress = <String, NodeAddress>{
-    'default': NodeAddress('localhost',
-        httpConnectAddress: 'https://localhost:9091',
-        wsConnectAddress: 'wss://localhost:9090/websocket')
-  };
+  Map<String, NodeAddress> nodeAddress = nodeAddressOptions;
   var topics = <String>[]; //订阅的主题
 
   // 本机作为libp2p节点的监听地址

@@ -471,6 +471,13 @@
             </list>
           </value>
         </entry>
+        <entry key="date_format">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/date_format-2.0.6/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="dbus">
           <value>
             <list>
@@ -2214,6 +2221,7 @@
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/dart_countries-3.0.2/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/dart_style-2.2.1/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/dart_webrtc-1.0.6/lib" />
+      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/date_format-2.0.6/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/dbus-0.7.4/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/device_info-2.0.3/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.dartlang.org/device_info_platform_interface-2.0.1/lib" />
