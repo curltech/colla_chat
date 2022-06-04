@@ -1,4 +1,4 @@
-import '../../app.dart';
+import '../../provider/app_data.dart';
 import '../../entity/chat/contact.dart';
 import '../../entity/dht/peerclient.dart';
 import '../../tool/util.dart';

@@ -3,7 +3,7 @@ import 'dart:html';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:dio/dio.dart';
 
-import '../app.dart';
+import '../provider/app_data.dart';
 
 class HttpClient implements IWebClient {
   Dio _client = Dio();
@@ -65,7 +65,7 @@ class HttpClientPool {
   /// 初始化连接池，设置缺省httpclient，返回连接池
   static Future<HttpClientPool> getInstance() async {
     if (!initStatus) {
-      var appParams = AppParams.instance;
+      var appParams = AppDataProvider.instance;
       var nodeAddress = appParams.nodeAddress;
       if (nodeAddress.isNotEmpty) {
         for (var address in nodeAddress.entries) {

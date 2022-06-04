@@ -1,10 +1,8 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../app.dart';
+import '../../provider/app_data.dart';
 import '../../constant/brightness.dart';
-import '../../provider/locale_data.dart';
-import '../../provider/theme_data.dart';
 import 'package:flutter_awesome_select/flutter_awesome_select.dart';
 
 class BrightnessPicker extends StatelessWidget {
@@ -22,19 +20,19 @@ class BrightnessPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var locale = Provider.of<LocaleDataProvider>(context).locale;
+    var locale = Provider.of<AppDataProvider>(context).locale;
     var items = _buildItems(context);
     var instance = AppLocalizations.instance;
     return SmartSelect<String>.single(
       modalType: S2ModalType.bottomSheet,
       placeholder: instance.text('Please select brightness'),
       title: instance.text('Brightness'),
-      selectedValue: Provider.of<ThemeDataProvider>(context).brightness,
+      selectedValue: Provider.of<AppDataProvider>(context).brightness,
       choiceItems: items,
       onChange: (dynamic state) {
         if (state != null) {
           String brightness = state.value;
-          Provider.of<ThemeDataProvider>(context, listen: false).brightness =
+          Provider.of<AppDataProvider>(context, listen: false).brightness =
               brightness;
         }
       },

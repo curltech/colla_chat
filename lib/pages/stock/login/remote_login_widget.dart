@@ -1,6 +1,6 @@
+import 'package:colla_chat/provider/app_data.dart';
 import 'package:flutter/material.dart';
 
-import '../../../app.dart';
 import '../../../entity/stock/user.dart';
 import '../../../l10n/localization.dart';
 import '../../../routers/application.dart';
@@ -114,7 +114,7 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
   }
 
   Future<void> _login() async {
-    AppParams appParams = await AppParams.instance;
+    AppDataProvider appParams = await AppDataProvider.instance;
     await appParams.saveAppParams();
     var current = await stockUser.login('/user/Login', {
       'credential_': _credential,

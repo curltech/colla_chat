@@ -1,9 +1,8 @@
-import 'package:colla_chat/pages/chat/channel/channel.dart';
-import 'package:colla_chat/provider/theme_data.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../l10n/localization.dart';
+import '../../../provider/app_data.dart';
 import '../../../widgets/richtext/pages/home_page.dart';
 import '../chat/chat_target.dart';
 import '../linkman/linkman.dart';
@@ -51,7 +50,7 @@ class _MobileIndexState extends State<MobileIndex> {
       ],
       currentIndex: _currentIndex,
       selectedItemColor:
-          Provider.of<ThemeDataProvider>(context).themeData?.primaryColorDark,
+          Provider.of<AppDataProvider>(context).themeData?.primaryColorDark,
       unselectedItemColor: Colors.grey,
       selectedFontSize: 14.0,
       unselectedFontSize: 14.0,

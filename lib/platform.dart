@@ -4,9 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/foundation.dart';
 
-/**
- * 平台的参数，包括平台的硬件和系统软件特征
- */
+/// 平台的参数，包括平台的硬件和系统软件特征，是只读的数据
 class PlatformParams {
   static PlatformParams instance = PlatformParams();
   static bool initStatus = false;

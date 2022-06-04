@@ -1,5 +1,4 @@
-import '../app.dart';
-import 'base.dart';
+import '../provider/app_data.dart';
 
 /// 地址选择框的选项
 final Map<String, NodeAddress> nodeAddressOptions = {

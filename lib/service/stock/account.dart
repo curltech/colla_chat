@@ -1,4 +1,4 @@
-import 'package:colla_chat/app.dart';
+import 'package:colla_chat/provider/app_data.dart';
 import 'package:colla_chat/platform.dart';
 
 import '../../entity/stock/account.dart';

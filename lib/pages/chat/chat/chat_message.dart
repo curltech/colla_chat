@@ -3,7 +3,7 @@ import 'package:colla_chat/pages/chat/chat/chat_me_message.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../app.dart';
+import '../../../provider/app_data.dart';
 import '../../../provider/websocket_message.dart';
 
 /// 消息发送和接受展示的界面组件

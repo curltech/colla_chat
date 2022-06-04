@@ -1,11 +1,28 @@
 import 'dart:convert';
-import 'dart:math';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:colla_chat/tool/util.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:logger/logger.dart';
 
-import 'constant/address.dart';
+import '../constant/address.dart';
+
+class Option {
+  String label;
+  String value;
+  String? hint;
+
+  Option(this.label, this.value, {this.hint});
+}
+
+/// 不同语言版本的下拉选择框的选项
+final localeOptions = [
+  Option('中文', 'zh_CN'),
+  Option('繁体中文', 'zh_TW'),
+  Option('English', 'en_US'),
+  Option('日本語', 'ja_JP'),
+  Option('한국어', 'ko_KR')
+];
 
 class LocalStorage {
   static final LocalStorage _instance = LocalStorage();
@@ -34,7 +51,7 @@ class LocalStorage {
 }
 
 class NodeAddress {
-  static final defaultName = 'default';
+  static const defaultName = 'default';
   String name;
   String? httpConnectAddress; //https服务器
   String? wsConnectAddress; //wss服务器
@@ -42,7 +59,6 @@ class NodeAddress {
   String? iceServers; //ice服务器
   // libp2p的链协议号码
   String? chainProtocolId;
-
   // 目标的libp2p节点的peerId
   String? connectPeerId = '';
 
@@ -107,39 +123,35 @@ class NodeAddress {
 }
 
 /// 本应用的参数，与操作系统系统和硬件无关，需要保存到本地的存储中
-/// 在系统启动的config对象初始化从本地存储中加载
-class AppParams {
-  static AppParams instance = AppParams();
-
+/// 在系统启动的对象初始化从本地存储中加载
+class AppDataProvider with ChangeNotifier {
+  static AppDataProvider instance = AppDataProvider();
   static bool initStatus = false;
-
-  AppParams();
-
-  //本应用的版本情况
-  String? latestVersion;
-  String? currentVersion;
-  bool? mandatory;
-  String? deviceToken;
-  String? p2pProtocol;
-  String? timeFormat;
-  String? mode;
-  String? language;
-  String? localeName;
 
   /// 可选的连接地址，比如http、ws、libp2p、turn
   Map<String, NodeAddress> nodeAddress = nodeAddressOptions;
   var topics = <String>[]; //订阅的主题
-
   // 本机作为libp2p节点的监听地址
   var listenerAddress = <String>[];
 
-  static Future<AppParams> init() async {
+  ///locale和Theme属性
+  String _locale = 'zh_CN';
+  MaterialColor? _primarySwatch = Colors.cyan;
+  MaterialColor? _seedColor = Colors.cyan;
+  String _fontFamily = 'Lato';
+  String _brightness = 'light';
+  ThemeData? _themeData;
+
+  AppDataProvider();
+
+  ///初始化一些参数
+  static Future<AppDataProvider> init() async {
     if (!initStatus) {
       LocalStorage localStorage = await LocalStorage.instance;
       Object? json = localStorage.get('AppParams');
       if (json != null) {
         Map<dynamic, dynamic> jsonObject = JsonUtil.toMap(json as String);
-        instance = AppParams.fromJson(jsonObject as Map<String, dynamic>);
+        instance = AppDataProvider.fromJson(jsonObject as Map<String, dynamic>);
       }
       Logger.level = Level.warning;
       initStatus = true;
@@ -147,14 +159,106 @@ class AppParams {
     return instance;
   }
 
-  AppParams.fromJson(Map<String, dynamic> json)
-      : language = json['language'],
-        mode = json['mode'];
+  ///序列化和反序列化操作
+  AppDataProvider.fromJson(Map<String, dynamic> json);
 
-  Map<String, dynamic> toJson() => {
-        'language': language,
-        'mode': mode,
-      };
+  Map<String, dynamic> toJson() => {};
+
+  /// locale操作
+  Locale getLocale() {
+    var locales = _locale.split('_');
+    return Locale(locales[0], locales[1]);
+  }
+
+  setLocale(Locale locale) {
+    _locale = locale.toString();
+  }
+
+  String get locale => _locale.toString();
+
+  set locale(String locale) {
+    _locale = locale;
+    notifyListeners();
+  }
+
+  /// theme操作
+  ThemeData? get themeData {
+    if (_themeData == null) {
+      _buildThemeData();
+    }
+    return _themeData;
+  }
+
+  _buildThemeData() {
+    Brightness brightness =
+        Brightness.values.firstWhere((element) => element.name == _brightness);
+    ColorScheme colorScheme;
+    if (_seedColor != null) {
+      colorScheme = ColorScheme.fromSeed(
+          seedColor: _seedColor ?? Colors.cyan, brightness: brightness);
+    } else if (_primarySwatch != null) {
+      colorScheme = ColorScheme.fromSwatch(
+          primarySwatch: _primarySwatch ?? Colors.cyan, brightness: brightness);
+    } else {
+      colorScheme =
+          ColorScheme.fromSeed(seedColor: Colors.cyan, brightness: brightness);
+    }
+    TextTheme textTheme;
+    if (_fontFamily != '') {
+      textTheme = GoogleFonts.getTextTheme(_fontFamily);
+    } else {
+      textTheme = const TextTheme();
+    }
+
+    ThemeData themeData = ThemeData(
+      colorScheme: colorScheme,
+      textTheme: textTheme,
+      brightness: brightness,
+    );
+    _themeData = themeData;
+  }
+
+  MaterialColor? get seedColor {
+    return _seedColor;
+  }
+
+  set seedColor(MaterialColor? color) {
+    _seedColor = color;
+    _primarySwatch = null;
+    _buildThemeData();
+    notifyListeners();
+  }
+
+  MaterialColor? get primarySwatch {
+    return _primarySwatch;
+  }
+
+  set primarySwatch(MaterialColor? color) {
+    _seedColor = null;
+    _primarySwatch = color;
+    _buildThemeData();
+    notifyListeners();
+  }
+
+  String get fontFamily {
+    return _fontFamily;
+  }
+
+  set fontFamily(String fontFamily) {
+    _fontFamily = fontFamily;
+    _buildThemeData();
+    notifyListeners();
+  }
+
+  String get brightness {
+    return _brightness;
+  }
+
+  set brightness(String brightness) {
+    _brightness = brightness;
+    _buildThemeData();
+    notifyListeners();
+  }
 
   setConnectAddress(NodeAddress address) {
     address.validate(address);
@@ -179,90 +283,6 @@ class AppParams {
     var json = jsonEncode(jsonObject);
     LocalStorage localStorage = await LocalStorage.instance;
     localStorage.save('AppParams', json);
-  }
-
-  /// 检查版本
-  /// @param currentVersion
-  /// @param version
-  bool checkVersion(String currentVersion, String version) {
-    currentVersion = currentVersion != null
-        ? currentVersion.replaceAll('/[vV]/', '')
-        : '0.0.0';
-    version = version != null ? version.replaceAll('/[vV]/', '') : '0.0.0';
-    if (currentVersion == version) {
-      return false;
-    }
-    var currentVerArr = currentVersion.split(".");
-    var verArr = version.split(".");
-    var len = max(currentVerArr.length, verArr.length);
-    for (var i = 0; i < len; i++) {
-      var currentVer = int.parse(currentVerArr[i]);
-      var ver = int.parse(verArr[i]);
-      if (currentVer < ver) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  /// 进入版本升级下载页面
-  updateVersion() async {
-    var appleUrl = 'https://apps.apple.com/cn/app/collachat/id1546363298';
-    var downloadUrl = 'https://curltech.io/#/collachat/downloadapps';
-    var platformParams = await PlatformParams.instance;
-    if (platformParams.ios) {
-      //inAppBrowserComponent.open(appleUrl, '_system', 'location=no')
-    } else if (platformParams.android) {
-      //inAppBrowserComponent.open(downloadUrl, '_system', 'location=no')
-    } else if (platformParams.macos) {
-      //window.open(appleUrl, '_blank')
-    } else {
-      //window.open(downloadUrl, '_blank')
-    }
-  }
-
-  /// 根据版本历史修改版本信息
-  /// @param versions
-  Future<bool> upgradeVersion(List<String> versions) async {
-    var appParams = await AppParams.instance;
-    appParams.currentVersion = '1.1.12';
-    appParams.mandatory = false;
-    if (versions.isNotEmpty) {
-      var no = 1;
-      for (var version in versions) {
-        var currentVersion = appParams.currentVersion;
-        if (checkVersion(currentVersion!, version)) {
-          if (no == 1) {
-            appParams.latestVersion = version.replaceAll('/[vV]/', '');
-          }
-          if (version.substring(0, 1) == 'V') {
-            appParams.mandatory = true;
-            break;
-          }
-        } else {
-          break;
-        }
-        no++;
-      }
-      appParams.latestVersion ??= appParams.currentVersion;
-      return (appParams.latestVersion != appParams.currentVersion);
-    }
-
-    return false;
-  }
-}
-
-/// 全局配置，包含平台参数和应用参数
-class Config {
-  static final Config _instance = Config();
-  static bool initStatus = false;
-
-  static Future<Config> get instance async {
-    if (!initStatus) {
-      initStatus = true;
-    }
-
-    return _instance;
   }
 }
 

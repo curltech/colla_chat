@@ -2,7 +2,6 @@ import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/service/stock/account.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:logger/logger.dart';
-import '../app.dart';
 import '../entity/chat/chat.dart';
 import '../entity/chat/contact.dart';
 import '../entity/dht/chainapp.dart';
@@ -12,6 +11,7 @@ import '../entity/dht/peerendpoint.dart';
 import '../entity/dht/peerprofile.dart';
 import '../entity/stock/account.dart';
 import '../platform.dart';
+import '../provider/app_data.dart';
 import 'base.dart';
 import 'chat/chat.dart';
 import 'chat/contact.dart';
@@ -32,7 +32,7 @@ class ServiceLocator {
   static Future<void> init() async {
     Logger.level = Level.info;
     await PlatformParams.init();
-    await AppParams.init();
+    await AppDataProvider.init();
     var accountService = await StockAccountService.init(
         tableName: 'stk_account',
         fields: buildFields(StockAccount(), []),

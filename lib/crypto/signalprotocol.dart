@@ -1,9 +1,6 @@
-import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
-
-import '../app.dart';
 
 /// 协议的密钥对
 class SignalKeyPair {

@@ -6,7 +6,7 @@ import 'package:web_socket_channel/html.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
-import '../app.dart';
+import '../provider/app_data.dart';
 import '../tool/util.dart';
 
 class Websocket implements IWebClient {
@@ -33,16 +33,21 @@ class Websocket implements IWebClient {
       channel = IOWebSocketChannel.connect(Uri.parse(address),
           headers: headers, pingInterval: pingInterval);
     }
+    register('', onData);
     _status = true;
   }
 
   @override
   register(String name, Function func) {
     // 监听消息，如果有消息到来，就打印出来
-    channel.stream.listen((message) {
-      func(message);
+    channel.stream.listen((dynamic data) {
+      func(data);
     }, onError: onError, onDone: onDone, cancelOnError: false);
     _status = true;
+  }
+
+  onData(dynamic data) {
+    logger.w(data);
   }
 
   onDone() async {
@@ -95,7 +100,7 @@ class WebsocketPool {
   /// 初始化连接池，设置缺省websocketclient，返回连接池
   static Future<WebsocketPool> getInstance() async {
     if (!initStatus) {
-      var appParams = AppParams.instance;
+      var appParams = AppDataProvider.instance;
       var nodeAddress = appParams.nodeAddress;
       if (nodeAddress.isNotEmpty) {
         for (var address in nodeAddress.entries) {
@@ -118,7 +123,7 @@ class WebsocketPool {
   var websockets = <String, Websocket>{};
   Websocket? _default;
 
-  WebsocketPool() {}
+  WebsocketPool();
 
   Websocket? get(String address) {
     if (websockets.containsKey(address)) {

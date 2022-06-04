@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
-import '../../../app.dart';
+import '../../../provider/app_data.dart';
 import '../../../l10n/localization.dart';
 import '../../../routers/application.dart';
 import '../../../routers/routes.dart';

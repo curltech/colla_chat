@@ -3,7 +3,7 @@ import 'dart:core';
 
 import 'package:uuid/uuid.dart';
 
-import '../../app.dart';
+import '../../provider/app_data.dart';
 import '../../entity/dht/myself.dart';
 import '../../entity/p2p/message.dart';
 import '../../tool/util.dart';
@@ -96,7 +96,7 @@ abstract class BaseAction {
       String? topic,
       String? targetPeerId}) async {
     ChainMessage chainMessage = ChainMessage();
-    var appParams = AppParams.instance;
+    var appParams = AppDataProvider.instance;
     if (connectAddress == null) {
       if (appParams.nodeAddress.isNotEmpty) {
         connectAddress = appParams.defaultNodeAddress.wsConnectAddress;

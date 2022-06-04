@@ -1,5 +1,5 @@
-import 'package:colla_chat/app.dart';
 import 'package:colla_chat/crypto/cryptography.dart';
+import 'package:colla_chat/provider/app_data.dart';
 import 'package:colla_chat/service/dht/myself.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 
@@ -111,9 +111,9 @@ class MyselfPeerService extends PeerEntityService {
     peerProfile.visibilitySetting = 'YYYYYY';
     var platformParams = PlatformParams.instance;
     peerProfile.clientDevice = platformParams.clientDevice;
-    var appParams = AppParams.instance;
-    peerProfile.language = appParams.language;
-    peerProfile.lightDarkMode = 'auto';
+    var appParams = AppDataProvider.instance;
+    peerProfile.locale = appParams.locale;
+    peerProfile.brightness = appParams.brightness;
     peerProfile.primaryColor = '#19B7C7';
     peerProfile.secondaryColor = '#117EED';
     peerProfile.udpSwitch = false;

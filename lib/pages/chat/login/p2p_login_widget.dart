@@ -1,6 +1,5 @@
+import 'package:colla_chat/provider/app_data.dart';
 import 'package:flutter/material.dart';
-
-import '../../../app.dart';
 import '../../../l10n/localization.dart';
 import '../../../routers/application.dart';
 import '../../../routers/routes.dart';
@@ -117,7 +116,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
   }
 
   Future<void> _login() async {
-    AppParams appParams = AppParams.instance;
+    AppDataProvider appParams = AppDataProvider.instance;
     await appParams.saveAppParams();
     var loginStatus = await myselfPeerService.login(_credential, _password);
     if (loginStatus) {

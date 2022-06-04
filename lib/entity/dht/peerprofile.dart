@@ -11,10 +11,10 @@ class PeerProfile extends StatusEntity {
   String? username;
 
   // 个性化配置
-  String? language;
+  String? locale;
   String? primaryColor;
   String? secondaryColor;
-  String? lightDarkMode;
+  String? brightness;
   bool udpSwitch = false;
   bool downloadSwitch = false;
   bool localDataCryptoSwitch = false;
@@ -48,13 +48,13 @@ class PeerProfile extends StatusEntity {
       : peerId = json['peerId'],
         clientDevice = json['clientDevice'],
         clientType = json['clientType'],
-        language = json['language'],
+        locale = json['locale'],
         avatar = json['avatar'],
         userId = json['userId'],
         username = json['username'],
         primaryColor = json['primaryColor'],
         secondaryColor = json['secondaryColor'],
-        lightDarkMode = json['lightDarkMode'],
+        brightness = json['brightness'],
         udpSwitch =
             json['udpSwitch'] == true || json['udpSwitch'] == 1 ? true : false,
         downloadSwitch =
@@ -96,13 +96,13 @@ class PeerProfile extends StatusEntity {
       'peerId': peerId,
       'clientDevice': clientDevice,
       'clientType': clientType,
-      'language': language,
+      'locale': locale,
       'avatar': avatar,
       'userId': userId,
       'username': username,
       'primaryColor': primaryColor,
       'secondaryColor': secondaryColor,
-      'lightDarkMode': lightDarkMode,
+      'brightness': brightness,
       'udpSwitch': udpSwitch,
       'downloadSwitch': downloadSwitch,
       'localDataCryptoSwitch': localDataCryptoSwitch,

@@ -1,10 +1,9 @@
-import 'package:colla_chat/app.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_awesome_select/flutter_awesome_select.dart';
 import 'package:provider/provider.dart';
 import '../../constant/address.dart';
 import '../../l10n/localization.dart';
-import '../../provider/locale_data.dart';
+import '../../provider/app_data.dart';
 
 class WsAddressPicker extends StatefulWidget {
   const WsAddressPicker({Key? key}) : super(key: key);
@@ -24,7 +23,7 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
   @override
   void initState() {
     super.initState();
-    var defaultNodeAddress = AppParams.instance.defaultNodeAddress;
+    var defaultNodeAddress = AppDataProvider.instance.defaultNodeAddress;
     var wsConnectAddress = defaultNodeAddress.wsConnectAddress;
     if (wsConnectAddress != null) {
       _wsConnectAddress = wsConnectAddress;
@@ -42,7 +41,7 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
 
   @override
   Widget build(BuildContext context) {
-    var locale = Provider.of<LocaleDataProvider>(context).locale;
+    var locale = Provider.of<AppDataProvider>(context).locale;
     var instance = AppLocalizations.instance;
     List<S2Choice<String>> items = [];
     for (var nodeAddressOption in nodeAddressOptions.values) {
@@ -63,7 +62,7 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
             _name = value;
             if (value != '') {
               var nodeAddress = nodeAddressOptions[value];
-              var appParams = AppParams.instance;
+              var appParams = AppDataProvider.instance;
               if (nodeAddress != null) {
                 var wsConnectAddress = nodeAddress.wsConnectAddress;
                 if (wsConnectAddress == null) {
@@ -96,7 +95,7 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
                 onChanged: (String val) {
                   var nodeAddress = NodeAddress(NodeAddress.defaultName,
                       wsConnectAddress: val);
-                  var appParams = AppParams.instance;
+                  var appParams = AppDataProvider.instance;
                   appParams.defaultNodeAddress = nodeAddress;
                 },
                 onFieldSubmitted: (String val) {},

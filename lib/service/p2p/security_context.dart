@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../app.dart';
+import '../../provider/app_data.dart';
 import '../../crypto/cryptography.dart';
 import '../../crypto/util.dart';
 import '../../entity/dht/myself.dart';

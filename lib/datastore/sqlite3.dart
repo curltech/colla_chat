@@ -9,7 +9,7 @@ import './condition_import/unsupport.dart'
     if (dart.library.html) './condition_import/web.dart'
     if (dart.library.io) './condition_import/desktop.dart' as sqlite3_open;
 
-import '../app.dart';
+import '../provider/app_data.dart';
 import '../service/base.dart';
 import '../service/servicelocator.dart';
 import 'datastore.dart';

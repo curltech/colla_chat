@@ -1,10 +1,5 @@
-/**
- * webclient代表httpclient或者websocketclient
- */
+/// webclient代表httpclient或者websocketclient
 import 'package:colla_chat/transport/websocket.dart';
-
-import '../app.dart';
-import '../tool/util.dart';
 import 'httpclient.dart';
 
 abstract class IWebClient {

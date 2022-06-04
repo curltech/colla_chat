@@ -1,6 +1,5 @@
 import 'package:colla_chat/pages/loading.dart';
-import 'package:colla_chat/provider/locale_data.dart';
-import 'package:colla_chat/provider/theme_data.dart';
+import 'package:colla_chat/provider/app_data.dart';
 import 'package:colla_chat/routers/application.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/servicelocator.dart';
@@ -22,8 +21,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   ServiceLocator.init().then((value) {
     runApp(MultiProvider(providers: [
-      ChangeNotifierProvider(create: (context) => ThemeDataProvider()),
-      ChangeNotifierProvider(create: (context) => LocaleDataProvider()),
+      ChangeNotifierProvider(create: (context) => AppDataProvider.instance),
     ], child: const CollaChatApp()));
   });
 }
@@ -45,19 +43,17 @@ class CollaChatApp extends StatelessWidget {
     ///相当于整个应用都注册了两个提供者的数据变化
     return MultiProvider(
         providers: <SingleChildWidget>[
-          ChangeNotifierProvider.value(value: ThemeDataProvider()),
-          ChangeNotifierProvider.value(value: LocaleDataProvider()),
+          ChangeNotifierProvider.value(value: AppDataProvider()),
         ],
-        child: Consumer2<ThemeDataProvider, LocaleDataProvider>(builder:
-            (BuildContext context, themeDataProvider, localeDataProvider,
-                Widget? child) {
+        child: Consumer<AppDataProvider>(
+            builder: (BuildContext context, appDataProvider, Widget? child) {
           return MaterialApp(
             onGenerateTitle: (context) {
               return AppLocalizations.instance.text('Welcome to CollaChat');
             },
             //title: 'Welcome to CollaChat',
             debugShowCheckedModeBanner: false,
-            theme: Provider.of<ThemeDataProvider>(context).themeData,
+            theme: Provider.of<AppDataProvider>(context).themeData,
 
             ///Scaffold 是 Material 库中提供的一个 widget，它提供了默认的导航栏、标题和包含主屏幕 widget 树的 body 属性
             home: Loading(title: AppLocalizations.instance.text('Loading')),
@@ -94,7 +90,7 @@ class CollaChatApp extends StatelessWidget {
             //     return _locale;
             //   }
             // },
-            locale: Provider.of<LocaleDataProvider>(context).getLocale(),
+            locale: Provider.of<AppDataProvider>(context).getLocale(),
           );
         }));
   }
