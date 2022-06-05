@@ -216,6 +216,9 @@ class JsonUtil {
     } else if (entity is String) {
       Map map = jsonDecode(entity);
       return map;
+    } else if (entity is List<int>) {
+      Map map = jsonDecode(String.fromCharCodes(entity));
+      return map;
     }
     return entity.toJson();
   }

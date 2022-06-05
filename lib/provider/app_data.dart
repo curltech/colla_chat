@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:logger/logger.dart';
-
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../constant/address.dart';
 
 class Option {
@@ -26,6 +26,7 @@ final localeOptions = [
 
 class LocalStorage {
   static final LocalStorage _instance = LocalStorage();
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
   late SharedPreferences prefs;
   static bool initStatus = false;
 
@@ -38,14 +39,17 @@ class LocalStorage {
   }
 
   save(String key, String value) {
-    prefs.setString(key, value);
+    _secureStorage.write(key: key, value: value);
+    //prefs.setString(key, value);
   }
 
-  get(String key) {
-    return prefs.get(key);
+  Future<String?> get(String key) {
+    return _secureStorage.read(key: key);
+    //return prefs.get(key);
   }
 
   remove(String key) {
+    _secureStorage.delete(key: key);
     prefs.remove(key);
   }
 }
@@ -59,6 +63,7 @@ class NodeAddress {
   String? iceServers; //ice服务器
   // libp2p的链协议号码
   String? chainProtocolId;
+
   // 目标的libp2p节点的peerId
   String? connectPeerId = '';
 

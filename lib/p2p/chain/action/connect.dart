@@ -9,8 +9,11 @@ class ConnectAction extends BaseAction {
     logger.i('Action MsgType $msgType');
   }
 
+  ///走https协议，同步获取返回信息
   Future<dynamic> connect(PeerClient peerClient) async {
-    ChainMessage chainMessage = await prepareSend(peerClient);
+    var appParams = AppDataProvider.instance;
+    ChainMessage chainMessage = await prepareSend(peerClient,
+        connectAddress: appParams.defaultNodeAddress.httpConnectAddress);
     chainMessage.payloadType = PayloadType.peerClient.name;
 
     ChainMessage? response = await send(chainMessage);

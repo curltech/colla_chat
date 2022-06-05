@@ -190,7 +190,7 @@ class StockUser {
   }
 
   Future<StockUser> login(String url, dynamic params) async {
-    WebClient webClient = await WebClient.getInstance();
+    WebClient webClient = WebClient.instance;
     var response = await webClient.send(url, params);
     if (response != null) {
       var data = response.data;

@@ -25,11 +25,11 @@ class HttpClient implements IWebClient {
     _client.interceptors
         .add(InterceptorsWrapper(onResponse: (response, handler) {
       if (response.statusCode != 200) {
-        print(response.statusCode);
+        logger.e(response.statusCode);
       }
       return handler.next(response);
     }, onError: (DioError e, handler) {
-      print(e.message);
+      logger.e(e.message);
       var statusCode = e.response?.statusCode;
       if (statusCode == 401) {
       } else if (statusCode == 500) {}
@@ -55,7 +55,7 @@ class HttpClient implements IWebClient {
 }
 
 class HttpClientPool {
-  static HttpClientPool instance = HttpClientPool();
+  static HttpClientPool _instance = HttpClientPool();
   static bool initStatus = false;
   final _httpClients = <String, HttpClient>{};
   HttpClient? _default;
@@ -63,7 +63,7 @@ class HttpClientPool {
   HttpClientPool();
 
   /// 初始化连接池，设置缺省httpclient，返回连接池
-  static Future<HttpClientPool> getInstance() async {
+  static HttpClientPool get instance {
     if (!initStatus) {
       var appParams = AppDataProvider.instance;
       var nodeAddress = appParams.nodeAddress;
@@ -74,16 +74,16 @@ class HttpClientPool {
           if (httpConnectAddress != null &&
               httpConnectAddress.startsWith('http')) {
             var httpClient = HttpClient(httpConnectAddress);
-            instance._httpClients[httpConnectAddress] = httpClient;
+            _instance._httpClients[httpConnectAddress] = httpClient;
             if (name == NodeAddress.defaultName) {
-              instance._default = httpClient;
+              _instance._default = httpClient;
             }
           }
         }
       }
       initStatus = true;
     }
-    return instance;
+    return _instance;
   }
 
   HttpClient? get(String address) {

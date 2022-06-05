@@ -11,32 +11,32 @@ abstract class IWebClient {
 }
 
 class WebClient extends IWebClient {
-  static WebClient instance = WebClient();
+  static final WebClient _instance = WebClient();
   static bool initStatus = false;
   IWebClient? _httpDefault;
   IWebClient? _wsDefault;
 
-  static Future<WebClient> getInstance() async {
+  static WebClient get instance {
     if (!initStatus) {
-      HttpClientPool httpClientPool = await HttpClientPool.getInstance();
-      WebsocketPool websocketPool = await WebsocketPool.getInstance();
-      instance._httpDefault = httpClientPool.defaultHttpClient;
-      instance._wsDefault = websocketPool.defaultWebsocket;
-      if (instance._httpDefault == null && instance._wsDefault == null) {
+      HttpClientPool httpClientPool = HttpClientPool.instance;
+      WebsocketPool websocketPool = WebsocketPool.instance;
+      _instance._httpDefault = httpClientPool.defaultHttpClient;
+      _instance._wsDefault = websocketPool.defaultWebsocket;
+      if (_instance._httpDefault == null && _instance._wsDefault == null) {
         throw 'NoDefaultWebClient';
       }
       initStatus = true;
     }
-    return instance;
+    return _instance;
   }
 
   setDefault(String address) async {
     if (address.startsWith('wss') || address.startsWith('ws')) {
-      WebsocketPool websocketPool = await WebsocketPool.getInstance();
+      WebsocketPool websocketPool = WebsocketPool.instance;
       _wsDefault = websocketPool.setDefaultWebsocket(address);
     } else if (address.startsWith('https') || address.startsWith('http')) {
       if (address == 'https' || address == 'http') {
-        HttpClientPool httpClientPool = await HttpClientPool.getInstance();
+        HttpClientPool httpClientPool = HttpClientPool.instance;
         _httpDefault = httpClientPool.setDefalutHttpClient(address);
       }
     }

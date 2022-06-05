@@ -1,11 +1,13 @@
 import 'dart:convert';
 
+import 'package:colla_chat/entity/p2p/message.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:web_socket_channel/html.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
+import '../p2p/chain/chainmessagehandler.dart';
 import '../provider/app_data.dart';
 import '../tool/util.dart';
 
@@ -46,8 +48,15 @@ class Websocket implements IWebClient {
     _status = true;
   }
 
-  onData(dynamic data) {
-    logger.w(data);
+  onData(dynamic data) async {
+    var msg = String.fromCharCodes(data);
+    if (msg == 'heartbeat') {
+      logger.i('receive heartbeat message');
+    } else {
+      logger.w(msg);
+      var response = await chainMessageHandler.receiveRaw(data, '', '');
+      sendMsg(response);
+    }
   }
 
   onDone() async {
@@ -94,11 +103,11 @@ class Websocket implements IWebClient {
 }
 
 class WebsocketPool {
-  static WebsocketPool instance = WebsocketPool();
+  static final WebsocketPool _instance = WebsocketPool();
   static bool initStatus = false;
 
   /// 初始化连接池，设置缺省websocketclient，返回连接池
-  static Future<WebsocketPool> getInstance() async {
+  static WebsocketPool get instance {
     if (!initStatus) {
       var appParams = AppDataProvider.instance;
       var nodeAddress = appParams.nodeAddress;
@@ -108,16 +117,16 @@ class WebsocketPool {
           var wsConnectAddress = address.value.wsConnectAddress;
           if (wsConnectAddress != null && wsConnectAddress.startsWith('ws')) {
             var websocket = Websocket(wsConnectAddress);
-            instance.websockets[wsConnectAddress] = websocket;
+            _instance.websockets[wsConnectAddress] = websocket;
             if (name == NodeAddress.defaultName) {
-              instance._default = websocket;
+              _instance._default = websocket;
             }
           }
         }
       }
       initStatus = true;
     }
-    return instance;
+    return _instance;
   }
 
   var websockets = <String, Websocket>{};

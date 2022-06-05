@@ -145,7 +145,7 @@ class MyselfPeerService extends PeerEntityService {
       peerClient.clientId = myselfPeer.clientId;
       peerClient.kind = null;
       peerClient.name = null;
-      await connectAction.connect(peerClient);
+      var response = await connectAction.connect(peerClient);
 
       return false;
     }

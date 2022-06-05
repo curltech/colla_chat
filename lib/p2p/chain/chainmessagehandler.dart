@@ -19,7 +19,6 @@ class ChainMessageHandler {
   Map<String, List<ChainMessage>> caches = <String, List<ChainMessage>>{};
 
   ChainMessageHandler() {
-    // libp2pClientPool.registProtocolHandler(config.appParams.chainProtocolId, this.receiveRaw);
     // webrtcPeerPool.registProtocolHandler(config.appParams.chainProtocolId, this.receiveRaw);
     // ionSfuClientPool.registProtocolHandler(config.appParams.chainProtocolId, this.receiveRaw);
   }
@@ -123,9 +122,7 @@ class ChainMessageHandler {
     return null;
   }
 
-  /**
-      接收报文处理的入口，包括接收请求报文和返回报文，并分配不同的处理方法
-   */
+  ///   接收报文处理的入口，包括接收请求报文和返回报文，并分配不同的处理方法
   Future<ChainMessage> receive(ChainMessage chainMessage) async {
     await chainMessageHandler.decrypt(chainMessage);
     var typ = chainMessage.messageType;
@@ -211,6 +208,7 @@ class ChainMessageHandler {
       chainMessage.payload = payload;
       chainMessage.transportPayload = '';
     }
+    return null;
   }
 
   ChainMessage error(String msgType, dynamic err) {
