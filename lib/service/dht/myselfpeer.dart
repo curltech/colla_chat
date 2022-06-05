@@ -143,6 +143,7 @@ class MyselfPeerService extends PeerEntityService {
       var peerClient = PeerClient.fromJson(json);
       peerClient.activeStatus = ActiveStatus.Up.name;
       peerClient.clientId = myselfPeer.clientId;
+      peerClient.expireDate = DateTime.now().millisecond;
       peerClient.kind = null;
       peerClient.name = null;
       var response = await connectAction.connect(peerClient);

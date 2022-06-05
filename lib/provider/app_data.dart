@@ -60,20 +60,28 @@ class NodeAddress {
   String? httpConnectAddress; //https服务器
   String? wsConnectAddress; //wss服务器
   String? libp2pConnectAddress; //libp2p服务器
-  String? iceServers; //ice服务器
+  //ice服务器
+  List<Map<String, String>>? iceServers;
+  String? username;
+  String? credential;
+
   // libp2p的链协议号码
   String? chainProtocolId;
 
   // 目标的libp2p节点的peerId
-  String? connectPeerId = '';
+  String? connectPeerId;
 
   NodeAddress(this.name,
       {this.httpConnectAddress,
       this.wsConnectAddress,
       this.libp2pConnectAddress,
       this.iceServers,
+      this.username,
+      this.credential,
       this.connectPeerId,
-      this.chainProtocolId});
+      this.chainProtocolId}) {
+    _setIceServers();
+  }
 
   NodeAddress.fromJson(Map json)
       : name = json['name'],
@@ -81,10 +89,11 @@ class NodeAddress {
         wsConnectAddress = json['wsConnectAddress'],
         libp2pConnectAddress = json['libp2pConnectAddress'],
         iceServers = json['iceServers'],
+        username = json['username'],
+        credential = json['credential'],
         connectPeerId = json['connectPeerId'],
         chainProtocolId = json['chainProtocolId'];
 
-  @override
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json.addAll({
@@ -93,10 +102,26 @@ class NodeAddress {
       'wsConnectAddress': wsConnectAddress,
       'libp2pConnectAddress': libp2pConnectAddress,
       'iceServers': iceServers,
+      'username': username,
+      'credential': credential,
       'connectPeerId': connectPeerId,
       'chainProtocolId': chainProtocolId,
     });
     return json;
+  }
+
+  _setIceServers() {
+    var ices = iceServers;
+    if (ices != null && ices.isNotEmpty) {
+      for (var iceServer in ices) {
+        if (username != null) {
+          iceServer['username'] = username!;
+        }
+        if (credential != null) {
+          iceServer['credential'] = credential!;
+        }
+      }
+    }
   }
 
   void validate(NodeAddress address) {

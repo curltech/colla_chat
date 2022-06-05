@@ -19,6 +19,9 @@ import 'package:share_plus/share_plus.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:flutter/material.dart';
+import 'package:telephony/telephony.dart';
+
+import '../provider/app_data.dart';
 
 class TypeUtil {
   static bool isString(dynamic obj) {
@@ -99,9 +102,7 @@ class StringUtil {
   }
 }
 
-/**
- * 只支持android，获取手机号码
- */
+/// 只支持android，获取手机号码
 class MobileUtil {
   static Future<String?> getMobileNumber() async {
     String? mobileNumber = "";
@@ -112,7 +113,7 @@ class MobileUtil {
       }
       mobileNumber = await MobileNumber.mobileNumber;
     } on Exception catch (e) {
-      print("Failed to get mobile number because of '${e.toString()}'");
+      logger.e("Failed to get mobile number because of '${e.toString()}'");
     }
 
     return mobileNumber;
@@ -659,5 +660,72 @@ class DialogUtil {
       BuildContext context,
       {required Widget Function(BuildContext) builder}) {
     return showBottomSheet(context: context, builder: builder);
+  }
+}
+
+class SmsUtil {
+  static send(String data, String recipient) async {
+    final Telephony telephony = Telephony.backgroundInstance;
+    var result = telephony.sendSms(
+        to: recipient,
+        message: data,
+        isMultipart: true,
+        statusListener: (SendStatus status) {
+          logger.i(status);
+        });
+    return result;
+  }
+
+  static Future<List<SmsMessage>> getInboxSms(
+      String address, String keyword) async {
+    final Telephony telephony = Telephony.backgroundInstance;
+    List<SmsMessage> messages = await telephony.getInboxSms(
+        columns: [SmsColumn.ADDRESS, SmsColumn.BODY],
+        filter: SmsFilter.where(SmsColumn.ADDRESS)
+            .equals(address)
+            .and(SmsColumn.BODY)
+            .like(keyword),
+        sortOrder: [
+          OrderBy(SmsColumn.ADDRESS, sort: Sort.ASC),
+          OrderBy(SmsColumn.BODY)
+        ]);
+    return messages;
+  }
+
+  static Future<List<SmsConversation>> getConversations(
+      String msgCount, String threadId) async {
+    final Telephony telephony = Telephony.backgroundInstance;
+    List<SmsConversation> messages = await telephony.getConversations(
+        filter: ConversationFilter.where(ConversationColumn.MSG_COUNT)
+            .equals(msgCount)
+            .and(ConversationColumn.THREAD_ID)
+            .greaterThan(threadId),
+        sortOrder: [OrderBy(ConversationColumn.THREAD_ID, sort: Sort.ASC)]);
+    return messages;
+  }
+
+  static register(dynamic Function(SmsMessage)? fn) {
+    final Telephony telephony = Telephony.backgroundInstance;
+    telephony.listenIncomingSms(
+      onNewMessage: (SmsMessage message) {
+        if (fn != null) {
+          fn(message);
+        }
+      },
+      onBackgroundMessage: fn,
+    );
+  }
+
+  static Future<bool?> isSmsCapable() async {
+    final Telephony telephony = Telephony.backgroundInstance;
+    bool? canSendSms = await telephony.isSmsCapable;
+    return canSendSms;
+  }
+
+  static Future<SimState> simState() async {
+    final Telephony telephony = Telephony.backgroundInstance;
+    SimState simState = await telephony.simState;
+
+    return simState;
   }
 }
