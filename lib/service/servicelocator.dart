@@ -15,6 +15,7 @@ import '../provider/app_data.dart';
 import 'base.dart';
 import 'chat/chat.dart';
 import 'chat/contact.dart';
+import 'chat/mailaddress.dart';
 import 'dht/chainapp.dart';
 import 'dht/myselfpeer.dart';
 import 'dht/peerclient.dart';
@@ -188,6 +189,12 @@ class ServiceLocator {
         indexFields: ['ownerPeerId', 'subjectId', 'createDate'],
         fields: buildFields(Chat(), []));
     services['chatService'] = chatService;
+
+    var mailAddressService = await MailAddressService.init(
+        tableName: "chat_mailaddress",
+        indexFields: ['ownerPeerId', 'mail', 'name'],
+        fields: buildFields(Chat(), []));
+    services['chat_mailaddress'] = mailAddressService;
 
     await Sqlite3.getInstance();
 
