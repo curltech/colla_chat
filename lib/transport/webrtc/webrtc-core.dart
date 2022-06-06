@@ -6,17 +6,21 @@ class WebrtcSignal {
   Map<String, dynamic>? transceiverRequest; //收发器请求
   //ice candidate信息，ice服务器的地址
   dynamic candidate;
+
   // sdp信息，peer的信息
   String? sdp;
 }
 
 /// 简单包装webrtc的基本方法
-class WebrtcCore {
+class WebrtcRenderer {
+  MediaStream? mediaStream;
+  RTCVideoRenderer? renderer;
+
   ///获取本机视频流
   Future<MediaStream> getUserMedia(
       Map<String, dynamic> mediaConstraints) async {
     mediaConstraints = <String, dynamic>{
-      'audio': false,
+      'audio': true,
       'video': {
         'mandatory': {
           'minWidth':
@@ -25,33 +29,27 @@ class WebrtcCore {
           'minFrameRate': '30',
         },
         'facingMode': 'user',
-        'optional': [],
+        'optional': [
+          {'DtlsSrtpKeyAgreement': true}
+        ],
       }
     };
-    var stream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+    var mediaStream =
+        await navigator.mediaDevices.getUserMedia(mediaConstraints);
+    this.mediaStream = mediaStream;
 
-    return stream;
+    return mediaStream;
   }
 
   ///获取本机屏幕流
   Future<MediaStream> getDisplayMedia(
       Map<String, dynamic> mediaConstraints) async {
-    mediaConstraints = <String, dynamic>{
-      'audio': false,
-      'video': {
-        'mandatory': {
-          'minWidth':
-              '640', // Provide your own width, height and frame rate here
-          'minHeight': '480',
-          'minFrameRate': '30',
-        },
-        'facingMode': 'user',
-        'optional': [],
-      }
-    };
-    var stream = await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
+    mediaConstraints = <String, dynamic>{'audio': false, 'video': true};
+    var mediaStream =
+        await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
+    this.mediaStream = mediaStream;
 
-    return stream;
+    return mediaStream;
   }
 
   //获取本机的设备清单
@@ -71,10 +69,83 @@ class WebrtcCore {
 
   //绑定视频流到渲染器
   RTCVideoRenderer bindRTCVideoRenderer(MediaStream stream) {
-    final localRenderer = RTCVideoRenderer();
-    localRenderer.initialize();
-    localRenderer.srcObject = stream;
+    var renderer = RTCVideoRenderer();
+    renderer.initialize();
+    this.renderer = renderer;
+    renderer.srcObject = stream;
 
-    return localRenderer;
+    return renderer;
+  }
+
+  close() async {
+    var mediaStream = this.mediaStream;
+    if (mediaStream != null) {
+      await mediaStream.dispose();
+      this.mediaStream = null;
+    }
+    var renderer = this.renderer;
+    if (renderer != null) {
+      renderer.srcObject = null;
+      this.renderer = null;
+    }
+  }
+
+  RTCVideoView? createView() {
+    var renderer = this.renderer;
+    if (renderer != null) {
+      return RTCVideoView(renderer);
+    }
+    return null;
+  }
+
+  Future<bool> switchCamera() async {
+    var mediaStream = this.mediaStream;
+    if (mediaStream != null) {
+      var tracks = mediaStream.getVideoTracks();
+      if (tracks.isNotEmpty) {
+        return await Helper.switchCamera(tracks[0]);
+      }
+    }
+    return false;
+  }
+
+  void switchSpeaker(bool enable) async {
+    var mediaStream = this.mediaStream;
+    if (mediaStream != null) {
+      var tracks = mediaStream.getAudioTracks();
+      if (tracks.isNotEmpty) {
+        tracks[0].enableSpeakerphone(enable);
+      }
+    }
+  }
+
+  void setMute(bool mute) {
+    var mediaStream = this.mediaStream;
+    if (mediaStream != null) {
+      var tracks = mediaStream.getAudioTracks();
+      if (tracks.isNotEmpty) {
+        Helper.setMicrophoneMute(mute, tracks[0]);
+      }
+    }
+  }
+
+  void turnCamera(bool mute) {
+    var mediaStream = this.mediaStream;
+    if (mediaStream != null) {
+      var tracks = mediaStream.getVideoTracks();
+      if (tracks.isNotEmpty) {
+        tracks[0].enabled = mute;
+      }
+    }
+  }
+
+  void setVolume(double volume) {
+    var mediaStream = this.mediaStream;
+    if (mediaStream != null) {
+      var tracks = mediaStream.getAudioTracks();
+      if (tracks.isNotEmpty) {
+        Helper.setVolume(volume, tracks[0]);
+      }
+    }
   }
 }
