@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:logger/logger.dart';
+//import 'package:flutter_easylogger/flutter_logger.dart' as easylogger;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../constant/address.dart';
 
@@ -163,6 +164,7 @@ class AppDataProvider with ChangeNotifier {
   var topics = <String>[]; //订阅的主题
   // 本机作为libp2p节点的监听地址
   var listenerAddress = <String>[];
+  var chainProtocolId = '/chain/1.0.0';
 
   ///locale和Theme属性
   String _locale = 'zh_CN';
@@ -318,4 +320,7 @@ class AppDataProvider with ChangeNotifier {
 
 var logger = Logger(
   printer: PrettyPrinter(),
+  level: Level.info,
 );
+
+//var log = easylogger.Logger;

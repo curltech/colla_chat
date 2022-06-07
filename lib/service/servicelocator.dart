@@ -31,7 +31,6 @@ class ServiceLocator {
 
   ///初始化并注册服务类，在应用启动后调用
   static Future<void> init() async {
-    Logger.level = Level.info;
     await PlatformParams.init();
     await AppDataProvider.init();
     var accountService = await StockAccountService.init(

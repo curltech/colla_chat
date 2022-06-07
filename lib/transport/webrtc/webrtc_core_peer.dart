@@ -231,7 +231,9 @@ abstract class WebrtcCorePeer {
     }
   }
 
-  //被叫方的数据传输事件
+  // 被叫方的数据传输事件
+  // webrtc的数据通道发来的消息可以是ChainMessage，
+  // 也可以是简单的非ChainMessage，比如最简单的文本或者复合文档，也就是ChatMessage
   onMessage(RTCDataChannelMessage message) {
     if (destroyed) {
       return;
@@ -375,7 +377,7 @@ abstract class WebrtcCorePeer {
   /// 注册一组回调函数，内部可以调用外部注册事件的方法
   /// name包括'signal','stream','track'
   /// 内部通过调用emit方法调用外部注册的方法
-  on(String name, Function(dynamic event)? fn) {
+  on(String name, Function? fn) {
     if (fn != null) {
       handlers[name] = fn;
     } else {
