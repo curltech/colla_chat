@@ -30,13 +30,14 @@ enum MemberType { MEMBER, OWNER }
 
 enum ActiveStatus { DOWN, UP }
 
-// 联系人，或者叫好友
-class Linkman extends StatusEntity {
-  String? ownerPeerId; // 区分本地不同peerClient属主
-  String? peerId; // peerId
+//当事方，联系人，群，手机联系人（潜在联系人）的共同父类
+abstract class Party extends StatusEntity {
+  String? ownerPeerId; // 区分属主
+  String? peerId; // peerId,事实上的单个属主的主键
   String? name; // 用户名
   String? pyName; // 用户名拼音
   String? mobile; // 手机号
+  String? email; // 手机号
   String? avatar; // 头像
   String? publicKey; // 公钥
   String? givenName; // 备注名
@@ -48,28 +49,28 @@ class Linkman extends StatusEntity {
   bool top = false; // 是否置顶，包括：true（置顶）, false（不置顶）
   bool blackedMe = false; // true-对方已将你加入黑名单
   bool droppedMe = false; // true-对方已将你从好友中删除
-
-  // 非持久化属性
-  //activeStatus: 活动状态，包括：Up（连接）, Down（未连接）
-  //downloadSwitch: 自动下载文件开关
-  //udpSwitch: 启用UDP开关
-  //groupChats: 关联群聊列表
-  //tag: 标签
-  //pyTag: 标签拼音
-  String? activeStatus;
   bool recallTimeLimit = false;
   bool recallAlert = false;
   bool myselfRecallTimeLimit = false;
   bool myselfRecallAlert = false;
 
-  Linkman();
+  // 非持久化属性
+  String? activeStatus; //: 活动状态，包括：Up（连接）, Down（未连接）
+  bool downloadSwitch = true; //: 自动下载文件开关
+  bool udpSwitch = false; //: 启用UDP开关
+  String? groupChats; // 关联群聊列表
+  String? tag; //: 标签
+  String? pyTag; //: 标签拼音
 
-  Linkman.fromJson(Map json)
+  Party() : super();
+
+  Party.fromJson(Map json)
       : ownerPeerId = json['ownerPeerId'],
         peerId = json['peerId'],
         name = json['name'],
         pyName = json['pyName'],
         mobile = json['mobile'],
+        email = json['email'],
         avatar = json['avatar'],
         publicKey = json['publicKey'],
         givenName = json['givenName'],
@@ -111,6 +112,7 @@ class Linkman extends StatusEntity {
       'name': name,
       'pyName': pyName,
       'mobile': mobile,
+      'email': email,
       'avatar': avatar,
       'publicKey': publicKey,
       'givenName': givenName,
@@ -132,15 +134,29 @@ class Linkman extends StatusEntity {
   }
 }
 
-// 联系人标签
-class LinkmanTag extends BaseEntity {
-  String? ownerPeerId; // 区分本地不同peerClient属主
-  String? name; // 标签名称
-  LinkmanTag();
+// 联系人，或者叫好友，发起请求通过后才能成为联系人
+class Linkman extends Party {
+  Linkman() : super();
 
-  LinkmanTag.fromJson(Map json)
+  Linkman.fromJson(Map json) : super.fromJson(json);
+
+  @override
+  Map<String, dynamic> toJson() {
+    var json = super.toJson();
+    json.addAll({});
+    return json;
+  }
+}
+
+// 联系人标签
+class Tag extends BaseEntity {
+  String? ownerPeerId; // 区分本地不同peerClient属主
+  String? tag; // 标签名称
+  Tag();
+
+  Tag.fromJson(Map json)
       : ownerPeerId = json['ownerPeerId'],
-        name = json['name'],
+        tag = json['tag'],
         super.fromJson(json);
 
   @override
@@ -148,23 +164,25 @@ class LinkmanTag extends BaseEntity {
     var json = super.toJson();
     json.addAll({
       'ownerPeerId': ownerPeerId,
-      'name': name,
+      'tag': tag,
     });
     return json;
   }
 }
 
 // 联系人标签关系
-class LinkmanTagLinkman extends BaseEntity {
+class PartyTag extends BaseEntity {
   String? ownerPeerId; // 区分本地不同peerClient属主
-  String? tagId; // 标签主键_id
-  String? linkmanPeerId; // 联系人peerId
-  LinkmanTagLinkman();
+  String? tag; // 标签
+  String? partyPeerId; // party peerId
+  String? partyType; // party type:linkman,group,channel,contact
+  PartyTag();
 
-  LinkmanTagLinkman.fromJson(Map json)
+  PartyTag.fromJson(Map json)
       : ownerPeerId = json['ownerPeerId'],
-        tagId = json['tagId'],
-        linkmanPeerId = json['linkmanPeerId'],
+        tag = json['tag'],
+        partyPeerId = json['partyPeerId'],
+        partyType = json['partyType'],
         super.fromJson(json);
 
   @override
@@ -172,8 +190,9 @@ class LinkmanTagLinkman extends BaseEntity {
     var json = super.toJson();
     json.addAll({
       'ownerPeerId': ownerPeerId,
-      'tagId': tagId,
-      'linkmanPeerId': linkmanPeerId,
+      'tag': tag,
+      'partyPeerId': partyPeerId,
+      'partyType': partyType,
     });
     return json;
   }
@@ -249,73 +268,36 @@ class LinkmanRequest extends StatusEntity {
 }
 
 // 组（群聊/频道）
-class Group extends StatusEntity {
-  String? ownerPeerId; // 区分本地不同peerClient属主
-  String? groupId; // 组的唯一id标识
+class Group extends Party {
   String? groupCategory; // 组类别，包括：Chat（群聊）, Channel（频道）
   String?
       groupType; // 组类型，包括：Private（私有，群聊群主才能添加成员，频道外部不可见）, Public（公有，群聊非群主也能添加成员，频道外部可见）
-  String? name; // 组名称
   String? description; // 组描述
-  String? givenName; // 备注名
-  String? pyGivenName; // 备注名拼音
-  String? tag; // 搜索标签
-  String? pyName; // 组名称拼音
   String? pyDescription; // 组描述拼音
-  String? pyTag; // 标签拼音
-  bool locked = false; // 是否锁定（群聊不使用，频道使用），包括：true（锁定）, false（未锁定）
-  bool alert = false; // 是否提醒，包括：true（提醒）, false（免打扰）
-  bool top = false; // 是否置顶，包括：true（置顶）, false（不置顶）
   String? myAlias; // 我在本群的昵称
-
-//this.avatar = null // 头像（保留，适用于频道）
-//this.shareLink = null // 分享链接（保留，适用于频道）
-
-// 非持久化属性（群聊groupChat）
-//activeStatus: 活动状态（除自己以外至少一个成员activeStatus为Up，则为Up，否则为Down），包括：Up（有连接）, Down（无连接）
-//groupOwnerPeerId: 群主peerId
+  String? groupOwnerPeerId; // 群主peerId
 
   Group();
 
   Group.fromJson(Map json)
-      : ownerPeerId = json['ownerPeerId'],
-        groupId = json['groupId'],
-        groupCategory = json['groupCategory'],
+      : groupCategory = json['groupCategory'],
         groupType = json['groupType'],
-        name = json['name'],
         description = json['description'],
-        givenName = json['givenName'],
-        pyGivenName = json['pyGivenName'],
-        tag = json['tag'],
-        pyName = json['pyName'],
         pyDescription = json['pyDescription'],
-        pyTag = json['pyTag'],
-        locked = json['locked'] == true || json['locked'] == 1 ? true : false,
-        alert = json['alert'] == true || json['alert'] == 1 ? true : false,
-        top = json['top'] == true || json['top'] == 1 ? true : false,
         myAlias = json['myAlias'],
+        groupOwnerPeerId = json['groupOwnerPeerId'],
         super.fromJson(json);
 
   @override
   Map<String, dynamic> toJson() {
     var json = super.toJson();
     json.addAll({
-      'ownerPeerId': ownerPeerId,
-      'groupId': groupId,
       'groupCategory': groupCategory,
       'groupType': groupType,
-      'name': name,
       'description': description,
-      'givenName': givenName,
-      'pyGivenName': pyGivenName,
-      'tag': tag,
-      'pyName': pyName,
       'pyDescription': pyDescription,
-      'pyTag': pyTag,
-      'locked': locked,
-      'alert': alert,
-      'top': top,
       'myAlias': myAlias,
+      'groupOwnerPeerId': groupOwnerPeerId,
     });
     return json;
   }
@@ -354,34 +336,16 @@ class GroupMember extends StatusEntity {
 }
 
 /// 手机联系人,从移动设备中读取出来的
-class Contact extends StatusEntity {
-  String? peerId;
-  String? name;
+class Contact extends Party {
   String? formattedName;
-  String? mobile;
   String? trustLevel;
-  String? publicKey;
-  String? avatar;
-  String? pyName;
-  String? givenName;
-  String? pyGivenName;
-  bool locked = false;
   bool isLinkman = false;
 
   Contact();
 
   Contact.fromJson(Map json)
-      : peerId = json['peerId'],
-        name = json['name'],
-        formattedName = json['formattedName'],
-        mobile = json['mobile'],
+      : formattedName = json['formattedName'],
         trustLevel = json['trustLevel'],
-        publicKey = json['publicKey'],
-        avatar = json['avatar'],
-        pyName = json['pyName'],
-        givenName = json['givenName'],
-        pyGivenName = json['pyGivenName'],
-        locked = json['locked'] == true || json['locked'] == 1 ? true : false,
         isLinkman =
             json['isLinkman'] == true || json['isLinkman'] == 1 ? true : false,
         super.fromJson(json);
@@ -390,17 +354,8 @@ class Contact extends StatusEntity {
   Map<String, dynamic> toJson() {
     var json = super.toJson();
     json.addAll({
-      'peerId': peerId,
-      'name': name,
       'formattedName': formattedName,
-      'mobile': mobile,
       'trustLevel': trustLevel,
-      'publicKey': publicKey,
-      'avatar': avatar,
-      'pyName': pyName,
-      'givenName': givenName,
-      'pyGivenName': pyGivenName,
-      'locked': locked,
       'isLinkman': isLinkman,
     });
     return json;

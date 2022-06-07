@@ -1,8 +1,6 @@
 import '../base.dart';
 
-/**
- * 聊天的定义
- */
+/// 聊天的定义
 
 var period = 300; //5m
 
@@ -81,14 +79,22 @@ enum SubjectType {
   GROUP_CHAT,
 }
 
-// 消息（单聊/群聊），以后想设计成泛指一切社交复合文档，最简单的是一句话，最复杂可以是非常复杂的混合文本，图片，视频的文档
+// 消息，泛指一切社交复合文档，最简单的是一句话，最复杂可以是非常复杂的混合文本，图片，视频的文档
 class ChatMessage extends StatusEntity {
   String? ownerPeerId; // 区分本地不同peerClient属主
-  String? subjectType; // 包括：Chat（单聊）, GroupChat（群聊）
-  String? subjectId; // 主题的唯一id标识（单聊对应linkman-peerId，群聊对应group-groupId）
+  String? transportType; // 包括：websocket,webrtc,email,sms
   String? messageId; // 消息的唯一id标识
   String? messageType; // 消息类型（对应channel消息类型）
+  String? direct; //对自己而言，消息是属于发或者接受
+  //发送的人是自己，记录目标接收者的id和类型名称，自己是接收人，记录的是对方的目标群
+  String? targetPeerId; // 目标的唯一id标识（单聊对应linkman-peerId，群聊对应group-peerId）
+  String? targetType; // 包括：Linkman（单聊）, Group（群聊）,Channel,
+  String? targetName;
+  //接受的人是自己，记录发送者的id和名称
   String? senderPeerId; // 消息发送方（作者）peerId
+  String? senderType;
+  String? senderName;
+  String? sendTime; // 发送时间
   String? receiveTime; // 接收时间
   String?
       actualReceiveTime; // 实际接收时间 1.发送端发送消息时receiveTime=createDate，actualReceiveTime=null；2.根据actualReceiveTime是否为null判断是否需要重发，收到接受回执时更新actualReceiveTime；3.聊天区按receiveTime排序，查找聊天内容按createDate排序
@@ -104,25 +110,26 @@ class ChatMessage extends StatusEntity {
   String? primaryPublicKey;
   String? primaryAddress;
   String? ephemeralPublicKey;
-
   String? content; // 消息内容
   bool needCompress = true;
   bool needEncrypt = true;
+  bool needReceipt = false;
+  bool needReadReceipt = false;
   String? payloadHash;
   String? payloadSignature;
   String? payloadKey;
-
-// 其它: 加密相关字段，自动销毁相关字段
 
   ChatMessage();
 
   ChatMessage.fromJson(Map json)
       : ownerPeerId = json['ownerPeerId'],
-        subjectType = json['subjectType'],
-        subjectId = json['subjectId'],
+        targetType = json['targetType'],
+        targetPeerId = json['targetPeerId'],
         messageId = json['messageId'],
         messageType = json['messageType'],
         senderPeerId = json['senderPeerId'],
+        senderType = json['senderType'],
+        sendTime = json['sendTime'],
         receiveTime = json['receiveTime'],
         actualReceiveTime = json['actualReceiveTime'],
         readTime = json['readTime'],
@@ -145,6 +152,13 @@ class ChatMessage extends StatusEntity {
         needEncrypt = json['needEncrypt'] == true || json['needEncrypt'] == 1
             ? true
             : false,
+        needReceipt = json['needReceipt'] == true || json['needReceipt'] == 1
+            ? true
+            : false,
+        needReadReceipt =
+            json['needReadReceipt'] == true || json['needReadReceipt'] == 1
+                ? true
+                : false,
         super.fromJson(json);
 
   @override
@@ -152,11 +166,13 @@ class ChatMessage extends StatusEntity {
     var json = super.toJson();
     json.addAll({
       'ownerPeerId': ownerPeerId,
-      'subjectType': subjectType,
-      'subjectId': subjectId,
+      'targetType': targetType,
+      'targetPeerId': targetPeerId,
       'messageId': messageId,
       'messageType': messageType,
       'senderPeerId': senderPeerId,
+      'senderType': senderType,
+      'sendTime': sendTime,
       'receiveTime': receiveTime,
       'actualReceiveTime': actualReceiveTime,
       'readTime': readTime,
@@ -175,22 +191,24 @@ class ChatMessage extends StatusEntity {
       'ephemeralPublicKey': ephemeralPublicKey,
       'needCompress': needCompress,
       'needEncrypt': needEncrypt,
+      'needReceipt': needReceipt,
+      'needReadReceipt': needReadReceipt,
     });
     return json;
   }
 }
 
-class MergeMessage extends BaseEntity {
+class MergedMessage extends BaseEntity {
   String? ownerPeerId;
-  String? mergeMessageId;
-  String? createDate;
+  String? messageId;
+  String? mergedMessageId;
 
-  MergeMessage();
+  MergedMessage();
 
-  MergeMessage.fromJson(Map json)
+  MergedMessage.fromJson(Map json)
       : ownerPeerId = json['ownerPeerId'],
-        mergeMessageId = json['mergeMessageId'],
-        createDate = json['createDate'],
+        messageId = json['messageId'],
+        mergedMessageId = json['mergedMessageId'],
         super.fromJson(json);
 
   @override
@@ -198,18 +216,18 @@ class MergeMessage extends BaseEntity {
     var json = super.toJson();
     json.addAll({
       'ownerPeerId': ownerPeerId,
-      'mergeMessageId': mergeMessageId,
-      'createDate': createDate,
+      'messageId': messageId,
+      'mergedMessageId': mergedMessageId,
     });
     return json;
   }
 }
 
 // 附件（单聊/群聊/频道/收藏）
-class ChatAttach extends BaseEntity {
+class MessageAttachment extends BaseEntity {
   String? ownerPeerId; // 区分本地不同peerClient属主
   String? messageId; // 消息的唯一id标识
-  String? subjectId; // 外键（对应subject-subjectId）
+  String? targetPeerId; // 外键（对应targetPeerId）
   String?
       content; // 消息内容（基于mime+自定义标识区分内容类型，如：application/audio/image/message/text/video/x-word, contact联系人名片, groupChat群聊, channel频道）
 
@@ -219,12 +237,12 @@ class ChatAttach extends BaseEntity {
   String? payloadSignature;
   String? payloadKey;
 
-  ChatAttach();
+  MessageAttachment();
 
-  ChatAttach.fromJson(Map json)
+  MessageAttachment.fromJson(Map json)
       : ownerPeerId = json['ownerPeerId'],
         messageId = json['messageId'],
-        subjectId = json['subjectId'],
+        targetPeerId = json['targetPeerId'],
         content = json['content'],
         needCompress = json['needCompress'] == true || json['needCompress'] == 1
             ? true
@@ -243,7 +261,7 @@ class ChatAttach extends BaseEntity {
     json.addAll({
       'ownerPeerId': ownerPeerId,
       'messageId': messageId,
-      'subjectId': subjectId,
+      'targetPeerId': targetPeerId,
       'content': content,
       'needCompress': needCompress,
       'needEncrypt': needEncrypt,
@@ -258,22 +276,24 @@ class ChatAttach extends BaseEntity {
 // 发送接收记录（群聊联系人请求/群聊/频道）
 class Receive extends BaseEntity {
   String? ownerPeerId; // 区分本地不同peerClient属主
-  String? subjectType; // 外键（对应message-subjectType、对群聊联系人请求为LinkmanRequest）
-  String? subjectId; // 外键（对应message-subjectId、对群聊联系人请求为空）
+  String? targetType; // 外键（对应message-targetType、对群聊联系人请求为LinkmanRequest）
+  String? targetPeerId; // 外键（对应message-targetPeerId、对群聊联系人请求为空）
   String? messageType; // 外键（对应message-messageType、linkmanRequest-requestType）
   String? messageId; // 外键（对应message-messageId、linkmanRequest-_id）
   String? receiverPeerId; // 消息接收方peerId
   String? receiveTime; // 接收时间
+  String? readTime; // 阅读时间
   Receive();
 
   Receive.fromJson(Map json)
       : ownerPeerId = json['ownerPeerId'],
-        subjectType = json['subjectType'],
-        subjectId = json['subjectId'],
+        targetType = json['targetType'],
+        targetPeerId = json['targetPeerId'],
         messageType = json['messageType'],
         messageId = json['messageId'],
         receiverPeerId = json['receiverPeerId'],
         receiveTime = json['receiveTime'],
+        readTime = json['readTime'],
         super.fromJson(json);
 
   @override
@@ -281,30 +301,44 @@ class Receive extends BaseEntity {
     var json = super.toJson();
     json.addAll({
       'ownerPeerId': ownerPeerId,
-      'subjectType': subjectType,
-      'subjectId': subjectId,
+      'targetType': targetType,
+      'targetPeerId': targetPeerId,
       'messageType': messageType,
       'messageId': messageId,
       'receiverPeerId': receiverPeerId,
       'receiveTime': receiveTime,
+      'readTime': readTime,
     });
     return json;
   }
 }
 
+/// party的最新消息，可以通过消息计算出来
+/// 需要对消息表的targetPeerId和senderPeerId分组，找到最新的时间的消息,并进行合并
 class Chat extends BaseEntity {
-  String? ownerPeerId; // 区分本地不同peerClient属主
-  String? subjectType; // 包括：Chat（单聊）, GroupChat（群聊）
-  String? subjectId; // 主题的唯一id标识（单聊对应linkman-peerId，群聊对应group-groupId）
+  String? ownerPeerId; // 区分属主
+  String? peerId; // 接收者联系人或群
+  String? partyType; // 接收者类型
+  String? messageId; // 消息Id
+  String? name; // 联系人或者群
+  String? title; // 标题
+  String? thumbBody; // 预览内容（适用需预览的content，如笔记、转发聊天）
+  String? thumbnail; // 预览缩略图（base64图片，适用需预览的content，如笔记、联系人名片）
   String? content;
+  String? sendReceiveTime; // 发送接收时间
 
   Chat();
 
   Chat.fromJson(Map json)
       : ownerPeerId = json['ownerPeerId'],
-        subjectType = json['subjectType'],
-        subjectId = json['subjectId'],
+        peerId = json['peerId'],
+        partyType = json['partyType'],
+        name = json['name'],
+        title = json['title'],
+        thumbBody = json['thumbBody'],
+        thumbnail = json['thumbnail'],
         content = json['content'],
+        sendReceiveTime = json['sendReceiveTime'],
         super.fromJson(json);
 
   @override
@@ -312,9 +346,14 @@ class Chat extends BaseEntity {
     var json = super.toJson();
     json.addAll({
       'ownerPeerId': ownerPeerId,
-      'subjectType': subjectType,
-      'subjectId': subjectId,
+      'peerId': peerId,
+      'partyType': partyType,
+      'name': name,
+      'title': title,
+      'thumbBody': thumbBody,
+      'thumbnail': thumbnail,
       'content': content,
+      'sendReceiveTime': sendReceiveTime,
     });
     return json;
   }
