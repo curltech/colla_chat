@@ -198,22 +198,14 @@ class PartyTag extends BaseEntity {
   }
 }
 
-// 联系人请求
-class LinkmanRequest extends StatusEntity {
-  String? ownerPeerId; // 区分本地不同peerClient属主
-  String? senderPeerId; // 发送者peerId
-  String? name; // 用户名
-  String? mobile; // 手机号
-  String? avatar; // 头像
-  String? publicKey; // 公钥
-  String? receiverPeerId; // 接收者peerId
-  String? requestType; // 请求类型
-  String? receiveTime; // 接收时间
+// 联系人请求是消息的一种，这里记录了消息的内容字段经过标准化的数据，
+// 本表的数据经过json格式序列化后成为消息表中的content字段的内容
+class PartyRequest extends Party {
+  String? requestType; // 请求类型，加好友，入群，订阅频道
   // 状态，包括：Sent/Received/Accepted/Expired/Ignored（已发送/已接收/已同意/已过期/已忽略）
-  String? message; // 邀请信息
-  String? groupId; // 群Id
-  String? groupCreateDate; // 群创建时间
-  String? groupName; // 群名称
+  String? messageId; // 邀请信息
+  String? targetPeerId; // 群Id
+  String? targetType; // 群Id
   String? groupDescription; // 群公告
   String? myAlias; // 发送人在本群的昵称
   String? data; // 消息数据（群成员列表）
