@@ -1,3 +1,4 @@
+import '../entity/chat/mailaddress.dart';
 import '../provider/app_data.dart';
 
 /// 地址选择框的选项
@@ -58,4 +59,37 @@ final Map<String, NodeAddress> nodeAddressOptions = {
           'urls': 'turn:kr.curltech.cc:3478',
         }
       ])
+};
+
+/// 地址选择框的选项
+final Map<String, MailAddress> mailAddressOptions = {
+  'hujs@colla.cc': MailAddress(
+    name: 'hujs',
+    domain: 'colla.cc',
+    isDefault: true,
+    imapServerHost: 'imaphz.qiye.163.com',
+    popServerHost: 'pophz.qiye.163.com',
+    smtpServerHost: 'smtphz.qiye.163.com',
+  ),
+  'hujs@curltech.io': MailAddress(
+      name: 'hujs',
+      domain: 'curltech.io',
+      isDefault: true,
+      imapServerHost: 'imaphz.qiye.163.com',
+      popServerHost: 'pophz.qiye.163.com',
+      smtpServerHost: 'smtphz.qiye.163.com'),
+  '13609619603@163.com': MailAddress(
+      name: 'hujs',
+      domain: '163.com',
+      isDefault: false,
+      imapServerHost: 'imap.163.com',
+      popServerHost: 'pop.163.com',
+      smtpServerHost: 'smtp.163.com'),
+  'hujs06@163.com': MailAddress(
+      name: 'hujs',
+      domain: '163.com',
+      isDefault: false,
+      imapServerHost: 'imap.163.com',
+      popServerHost: 'pop.163.com',
+      smtpServerHost: 'smtp.163.com'),
 };

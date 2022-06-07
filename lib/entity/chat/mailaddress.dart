@@ -19,7 +19,19 @@ class MailAddress extends BaseEntity {
   bool smtpServerSecure = true;
   bool isDefault = false;
 
-  MailAddress();
+  MailAddress(
+      {this.name,
+      this.username,
+      this.domain,
+      this.imapServerHost,
+      this.imapServerPort = 143,
+      this.popServerHost,
+      this.popServerPort = 110,
+      this.smtpServerHost,
+      this.smtpServerPort = 25,
+      this.isDefault = false}) {
+    email = '$username@$domain';
+  }
 
   MailAddress.fromJson(Map json)
       : ownerPeerId = json['ownerPeerId'],

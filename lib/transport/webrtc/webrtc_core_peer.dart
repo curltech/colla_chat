@@ -375,8 +375,12 @@ abstract class WebrtcCorePeer {
   /// 注册一组回调函数，内部可以调用外部注册事件的方法
   /// name包括'signal','stream','track'
   /// 内部通过调用emit方法调用外部注册的方法
-  on(String name, Function(dynamic event) fn) {
-    handlers[name] = fn;
+  on(String name, Function(dynamic event)? fn) {
+    if (fn != null) {
+      handlers[name] = fn;
+    } else {
+      handlers.remove(name);
+    }
   }
 
   /// 调用外部事件注册方法
@@ -389,6 +393,8 @@ abstract class WebrtcCorePeer {
 
   ///被叫不能在第一次的时候主动发起协议过程，主叫或者被叫不在第一次的时候可以发起协商过程
   negotiate() async {}
+
+  signal(dynamic data) async {}
 
   /// Filter trickle lines when trickle is disabled #354
   filterTrickle(sdp) {

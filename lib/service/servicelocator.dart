@@ -192,7 +192,7 @@ class ServiceLocator {
 
     var mailAddressService = await MailAddressService.init(
         tableName: "chat_mailaddress",
-        indexFields: ['ownerPeerId', 'mail', 'name'],
+        indexFields: ['ownerPeerId', 'email', 'name'],
         fields: buildFields(Chat(), []));
     services['chat_mailaddress'] = mailAddressService;
 
