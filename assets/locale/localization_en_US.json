@@ -25,5 +25,6 @@
     "Email": "Email",
     "Credentia(Mobile/Email/LoginName)": "Credentia(Mobile/Email/LoginName)",
     "LoginName": "LoginName",
-    "Confirm Password": "Confirm Password"
+    "Confirm Password": "Confirm Password",
+    "localhost": "localhost"
 }

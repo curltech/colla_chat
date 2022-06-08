@@ -1,3 +1,4 @@
+import 'package:colla_chat/platform.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -43,7 +44,10 @@ class _MobileIndexState extends State<MobileIndex> {
       ),
       actions: [],
     );
-    var bottomNavigationBar = BottomNavigationBar(
+    BottomNavigationBar bottomNavigationBar;
+    //左边栏，和底部按钮功能一样，在桌面版才有
+    Container drawer;
+    bottomNavigationBar = BottomNavigationBar(
       //底部按钮，移动版才有
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
@@ -67,8 +71,7 @@ class _MobileIndexState extends State<MobileIndex> {
       showUnselectedLabels: true,
       onTap: _onItemTapped,
     );
-    //左边栏，和底部按钮功能一样，在桌面版才有
-    var drawer = Container(
+    drawer = Container(
         constraints:
             BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
         color: Colors.grey.shade800,
@@ -166,14 +169,26 @@ class _MobileIndexState extends State<MobileIndex> {
           ),
         ));
     List<Widget> children = <Widget>[ChatTarget(), Linkman(), HomePage(), Me()];
-    return Scaffold(
-        appBar: appBar,
-        body: Center(
-            child: IndexedStack(
-                index: 0, children: <Widget>[children[_currentIndex]])),
-        drawer: drawer,
-        endDrawer: endDrawer,
-        bottomNavigationBar: bottomNavigationBar);
+    Scaffold scaffold;
+    var platformParams = PlatformParams.instance;
+    if (platformParams.android || platformParams.ios) {
+      scaffold = Scaffold(
+          appBar: appBar,
+          body: Center(
+              child: IndexedStack(
+                  index: 0, children: <Widget>[children[_currentIndex]])),
+          endDrawer: endDrawer,
+          bottomNavigationBar: bottomNavigationBar);
+    } else {
+      scaffold = Scaffold(
+          appBar: appBar,
+          body: Center(
+              child: IndexedStack(
+                  index: 0, children: <Widget>[children[_currentIndex]])),
+          drawer: drawer,
+          endDrawer: endDrawer);
+    }
+    return scaffold;
   }
 
   void _onItemTapped(int index) {

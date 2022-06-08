@@ -25,5 +25,6 @@
     "Email": "邮件",
     "Credentia(Mobile/Email/LoginName)": "凭证(手机/邮件/登录名)",
     "LoginName": "登录名",
-    "Confirm Password": "验证密码"
+    "Confirm Password": "验证密码",
+    "localhost": "localhost"
 }
