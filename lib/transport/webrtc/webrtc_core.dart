@@ -18,15 +18,17 @@ class WebrtcRenderer {
 
   ///获取本机视频流
   Future<MediaStream> getUserMedia(
-      Map<String, dynamic> mediaConstraints) async {
-    mediaConstraints = <String, dynamic>{
-      'audio': true,
+      {bool audio = true,
+      int minWidth = 640,
+      int minHeight = 480,
+      int minFrameRate = 30}) async {
+    Map<String, dynamic> mediaConstraints = <String, dynamic>{
+      'audio': audio,
       'video': {
         'mandatory': {
-          'minWidth':
-              '640', // Provide your own width, height and frame rate here
-          'minHeight': '480',
-          'minFrameRate': '30',
+          'minWidth': minWidth.toString(),
+          'minHeight': minHeight.toString(),
+          'minFrameRate': minFrameRate.toString(),
         },
         'facingMode': 'user',
         'optional': [
@@ -43,8 +45,11 @@ class WebrtcRenderer {
 
   ///获取本机屏幕流
   Future<MediaStream> getDisplayMedia(
-      Map<String, dynamic> mediaConstraints) async {
-    mediaConstraints = <String, dynamic>{'audio': false, 'video': true};
+      {bool audio = false, bool video = true}) async {
+    Map<String, dynamic> mediaConstraints = <String, dynamic>{
+      'audio': audio,
+      'video': video
+    };
     var mediaStream =
         await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
     this.mediaStream = mediaStream;

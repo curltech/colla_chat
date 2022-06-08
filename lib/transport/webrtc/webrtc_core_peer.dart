@@ -17,42 +17,73 @@ final Map<String, dynamic> sdpConstraints = {
   "optional": [],
 };
 
-//核心的Peer，实现建立连接和sdp协商
+enum WebrtcEvent { signal, connect, close, data, stream, track, error }
+
+/// 核心的Peer，实现建立连接和sdp协商
+/// 代表一个本地与远程的webrtc连接，这个类不含业务含义，不包含与信号服务器的交互部分
+/// 有两个子类，分别代表主动发起连接的，和被动接受连接的，在两种场景下，协商过程中的行为稍有不同
 abstract class WebrtcCorePeer {
+  //唯一随机码，代表webrtc的连接
   late String id;
+
+  //webrtc连接
   late RTCPeerConnection peerConnection;
 
+  //主动发送数据的通道
   late RTCDataChannel dataChannel;
+
+  //是否需要主动建立数据通道
   bool needDataChannel = true;
-  bool dataChannelReady = false;
+
+  //数据通道的状态是否打开
+  bool dataChannelOpen = false;
+
+  //数据通道的标签
   late String dataChannelLabel;
 
+  //本地的媒体流，在初始化的时候设置
   late List<MediaStream> streams;
-  List<Map<String, dynamic>> remoteTracks = [];
+
+  //远程媒体流，在onTrack的回调方法中得到
   List<MediaStream> remoteStreams = [];
+
+  //远程媒体流的轨道和对应的流的数组
+  List<Map<MediaStreamTrack, MediaStream>> remoteTracks = [];
+
+  //远程媒体流的轨道，流和发送者之间的关系
   Map<MediaStreamTrack, Map<MediaStream, RTCRtpSender>> trackSenders = {};
 
+  //外部使用时注册的回调方法，也就是注册事件
+  //WebrtcEvent定义了事件的名称
   Map<String, Function> handlers = {};
 
+  //是否第一次协商
   bool firstNegotiation = true;
+  //是否正在协商，连接创建到连接建立完成的这段时间
   bool isNegotiating = false;
+  //是否支持trickle，连接双方要协商turn的地址和端口，也就是candidate协商过程
+  //trickle可以加快这个过程
   bool trickle = true;
   bool allowHalfTrickle = false;
+  //连接双方要协商turn的地址和端口，也就是candidate协商过程是否完成
+  //这个过程在offer，answer协商之后
   bool iceComplete = false;
-
-  //sdp扩展属性，由外部传入
-  Map<String, dynamic> extension = {};
-
-  String Function(String sdp)? sdpTransform;
-  bool _connected = false;
+  //在传入candidate信息后缓存起来，等待offer到来以后统一处理
   List<String> pendingCandidates = [];
 
-  bool destroying = false;
+  //sdp扩展属性，由外部传入，这个属性用于传递定制的属性
+  Map<String, dynamic> extension = {};
+
+  //连接是否完全建立，即协商过程结束
+  bool connected = false;
+
+  //是否关闭连接完成
   bool destroyed = false;
 
+  //建立连接的配置
   Map<String, dynamic> configuration = {};
 
-  //PeerConnection约束
+  //建立连接的PeerConnection约束
   Map<String, dynamic> pcConstraints = {
     "mandatory": {},
     "optional": [
@@ -63,7 +94,9 @@ abstract class WebrtcCorePeer {
 
   WebrtcCorePeer();
 
-  ///初始化连接，可以传入外部视频流
+  ///初始化连接，可以传入外部视频流，这是异步的函数，不能在构造里调用
+  ///建立连接对象，设置好回调函数，然后发起协商，只有协商完成，数据通道打开，才算真正完成连接
+  ///可输入的参数包括外部媒体流和定制扩展属性
   Future<bool> init(
       {List<MediaStream> streams = const [],
       Map<String, dynamic> extension = const {}}) async {
@@ -161,7 +194,7 @@ abstract class WebrtcCorePeer {
 
     if (state == RTCIceConnectionState.RTCIceConnectionStateConnected ||
         state == RTCIceConnectionState.RTCIceConnectionStateCompleted) {
-      _connected = true;
+      connected = true;
     }
     if (state == RTCIceConnectionState.RTCIceConnectionStateFailed) {
       destroy('Ice connection failed.,ERR_ICE_CONNECTION_FAILURE');
@@ -216,13 +249,13 @@ abstract class WebrtcCorePeer {
 
   //主叫方的数据通道状态事件
   onDataChannelState(RTCDataChannelState state) {
-    if (_connected || destroyed) {
+    if (connected || destroyed) {
       return;
     }
     //数据通道打开
     if (state == RTCDataChannelState.RTCDataChannelOpen) {
       logger.i('on channel open');
-      dataChannelReady = true;
+      dataChannelOpen = true;
     }
     //数据通道关闭
     if (state == RTCDataChannelState.RTCDataChannelClosed) {
@@ -245,7 +278,6 @@ abstract class WebrtcCorePeer {
   /// 把流加入到连接中，比如把本地的视频流加入到连接中，从而让远程peer能够接收到
   /// @param {MediaStream} stream
   addStream(MediaStream stream) {
-    if (destroying) return;
     if (destroyed) {
       throw 'cannot addStream after peer is destroyed,ERR_DESTROYED';
     }
@@ -261,7 +293,6 @@ abstract class WebrtcCorePeer {
   /// @param {MediaStreamTrack} track
   /// @param {MediaStream} stream
   addTrack(MediaStreamTrack track, MediaStream stream) async {
-    if (destroying) return;
     if (destroyed) {
       throw 'cannot addTrack after peer is destroyed,ERR_DESTROYED';
     }
@@ -288,7 +319,6 @@ abstract class WebrtcCorePeer {
   /// @param {MediaStream} stream
   replaceTrack(MediaStreamTrack oldTrack, MediaStreamTrack newTrack,
       MediaStream stream) async {
-    if (destroying) return;
     if (destroyed) {
       throw 'cannot replaceTrack after peer is destroyed,ERR_DESTROYED';
     }
@@ -316,7 +346,6 @@ abstract class WebrtcCorePeer {
   /// @param {MediaStreamTrack} track
   /// @param {MediaStream} stream
   removeTrack(MediaStreamTrack track, MediaStream stream) async {
-    if (destroying) return;
     if (destroyed) {
       throw 'cannot removeTrack after peer is destroyed,ERR_DESTROYED';
     }
@@ -341,7 +370,6 @@ abstract class WebrtcCorePeer {
   /// 从连接中移除流
   /// @param {MediaStream} stream
   removeStream(MediaStream stream) {
-    if (destroying) return;
     if (destroyed) {
       throw 'cannot removeStream after peer is destroyed,ERR_DESTROYED';
     }
@@ -360,7 +388,7 @@ abstract class WebrtcCorePeer {
       logger.i('on track');
       emit('track', {'track': event.track, 'stream': eventStream});
 
-      remoteTracks.add({'track': event.track, 'stream': eventStream});
+      remoteTracks.add({event.track: eventStream});
 
       if (remoteStreams != null && remoteStreams.isNotEmpty) {
         if (remoteStreams[0].id == eventStream.id) {
@@ -412,13 +440,6 @@ abstract class WebrtcCorePeer {
     return 0;
   }
 
-  // 连接状态
-  get connected {
-    return (_connected &&
-        dataChannel != null &&
-        dataChannel.state == RTCDataChannelState.RTCDataChannelOpen);
-  }
-
   //为连接加上候选的服务器
   addIceCandidate(Map<String, dynamic> candidate) async {
     var iceCandidate = RTCIceCandidate(candidate['candidate'],
@@ -428,9 +449,6 @@ abstract class WebrtcCorePeer {
 
   /// 发送二进制消息 text/binary data to the remote peer.
   send(Uint8List message) {
-    if (destroying) {
-      return;
-    }
     if (destroyed) {
       throw 'cannot send after peer is destroyed,ERR_DESTROYED';
     }
@@ -441,11 +459,10 @@ abstract class WebrtcCorePeer {
   }
 
   destroy(String err) {
-    if (destroyed || destroying) return;
+    if (destroyed) return;
     logger.i('destroying (error: $err)');
     destroyed = true;
-    destroying = false;
-    _connected = false;
+    connected = false;
     remoteTracks = [];
     remoteStreams = [];
     trackSenders = {};
@@ -454,7 +471,7 @@ abstract class WebrtcCorePeer {
     if (dataChannel != null) {
       try {
         dataChannel.close();
-        dataChannelReady = false;
+        dataChannelOpen = false;
       } catch (err) {
         logger.e('close dataChannel err:$err');
       }
@@ -494,9 +511,6 @@ class MasterWebrtcCorePeer extends WebrtcCorePeer {
   ///主叫发起协商过程
   @override
   negotiate() async {
-    if (destroying) {
-      return;
-    }
     if (destroyed) {
       throw 'cannot negotiate after peer is destroyed,ERR_DESTROYED';
     }
@@ -522,10 +536,6 @@ class MasterWebrtcCorePeer extends WebrtcCorePeer {
     }
     if (!trickle && !allowHalfTrickle && sdp != null) {
       offer.sdp = filterTrickle(sdp);
-    }
-    //传入的sdp的处理方法
-    if (sdpTransform != null && sdp != null) {
-      offer.sdp = sdpTransform!(sdp);
     }
 
     await peerConnection.setLocalDescription(offer);
@@ -554,9 +564,6 @@ class MasterWebrtcCorePeer extends WebrtcCorePeer {
 
   //从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
   signal(dynamic data) async {
-    if (destroying) {
-      return;
-    }
     if (destroyed) {
       throw 'cannot signal after peer is destroyed,ERR_DESTROYED';
     }
@@ -618,7 +625,6 @@ class MasterWebrtcCorePeer extends WebrtcCorePeer {
     required RTCRtpMediaType kind,
     required RTCRtpTransceiverInit init,
   }) async {
-    if (destroying) return;
     if (destroyed) {
       throw 'cannot addTransceiver after peer is destroyed,ERR_DESTROYED';
     }
@@ -642,9 +648,6 @@ class FollowWebrtcCorePeer extends WebrtcCorePeer {
   ///被叫的协商时发送再协商信号给主叫，要求重新发起协商
   @override
   negotiate() async {
-    if (destroying) {
-      return;
-    }
     if (destroyed) {
       throw 'cannot negotiate after peer is destroyed,ERR_DESTROYED';
     }
@@ -684,9 +687,6 @@ class FollowWebrtcCorePeer extends WebrtcCorePeer {
     if (!trickle && !allowHalfTrickle && sdp != null) {
       answer.sdp = filterTrickle(sdp);
     }
-    if (sdpTransform != null && sdp != null) {
-      answer.sdp = sdpTransform!(sdp);
-    }
 
     if (trickle || iceComplete) {
       sendAnswer(answer);
@@ -713,7 +713,6 @@ class FollowWebrtcCorePeer extends WebrtcCorePeer {
 
   //从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
   signal(dynamic data) async {
-    if (destroying) return;
     if (destroyed) throw 'cannot signal after peer is destroyed,ERR_DESTROYED';
     if (data is String) {
       try {
@@ -765,7 +764,6 @@ class FollowWebrtcCorePeer extends WebrtcCorePeer {
     required RTCRtpMediaType kind,
     required RTCRtpTransceiverInit init,
   }) async {
-    if (destroying) return;
     if (destroyed) {
       throw 'cannot addTransceiver after peer is destroyed,ERR_DESTROYED';
     }
