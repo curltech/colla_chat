@@ -90,7 +90,7 @@ class WebrtcPeer {
     //下面的三个事件对于发起方和被发起方是一样的
     //可以发起信号
     final webrtcPeer = this.webrtcPeer;
-    webrtcPeer.on('signal', (data) async {
+    webrtcPeer.on(WebrtcEvent.signal, (data) async {
       if (this.roomId != null) {
         data.router = this.roomId;
       }
@@ -102,7 +102,7 @@ class WebrtcPeer {
     });
 
     //连接建立/
-    webrtcPeer.on('connect', (data) async {
+    webrtcPeer.on(WebrtcEvent.connect, (data) async {
       end = DateTime.now().millisecondsSinceEpoch;
       if (end != null && start != null) {
         var interval = end! - start!;
@@ -111,19 +111,19 @@ class WebrtcPeer {
       await webrtcPeerPool.emitEvent('connect', {'source': this});
     });
 
-    webrtcPeer.on('close', (data) async {
+    webrtcPeer.on(WebrtcEvent.close, (data) async {
       if (this.targetPeerId != null) {
         await webrtcPeerPool.remove(this.targetPeerId!);
       }
     });
 
     //收到数据
-    webrtcPeer.on('data', (data) async {
+    webrtcPeer.on(WebrtcEvent.data, (data) async {
       logger.i('${DateTime.now().toUtc()}:got a message from peer: $data');
       await webrtcPeerPool.emitEvent('data', {'data': data, 'source': this});
     });
 
-    webrtcPeer.on('stream', (stream) async {
+    webrtcPeer.on(WebrtcEvent.stream, (stream) async {
       remoteStreams.add(stream);
       if (stream != null) {
         stream.onremovetrack = (event) {
@@ -134,16 +134,17 @@ class WebrtcPeer {
           .emitEvent('stream', {'stream': stream, 'source': this});
     });
 
-    webrtcPeer.on('track', (track, stream) async {
+    webrtcPeer.on(WebrtcEvent.track, (track, stream) async {
       logger.i('${DateTime.now().toUtc().toIso8601String()}:track');
       await webrtcPeerPool.emitEvent(
           'track', {'track': track, 'stream': stream, 'source': this});
     });
 
-    webrtcPeer.on('error', (err) => {logger.e('webrtcPeerError:$err')});
+    webrtcPeer.on(
+        WebrtcEvent.error, (err) => {logger.e('webrtcPeerError:$err')});
   }
 
-  on(String name, Function(dynamic)? fn) {
+  on(WebrtcEvent name, Function(dynamic)? fn) {
     webrtcPeer.on(name, fn);
   }
 
