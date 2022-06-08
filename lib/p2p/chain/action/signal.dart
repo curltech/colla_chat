@@ -1,12 +1,11 @@
 import '../../../entity/p2p/message.dart';
+import '../../../transport/webrtc/webrtcpeerpool.dart';
 import '../baseaction.dart';
 
-/**
-    在chain目录下的采用自定义protocol "/chain"的方式自己实现的功能
- */
+///在chain目录下的采用自定义protocol "/chain"的方式自己实现的功能
 class SignalAction extends BaseAction {
   SignalAction(MsgType msgType) : super(msgType) {
-    //webrtcPeerPool.registSignalAction(this);
+    webrtcPeerPool.registerSignalAction(this);
   }
 
   Future<dynamic> signal(dynamic data, String targetPeerId) async {
@@ -23,6 +22,7 @@ class SignalAction extends BaseAction {
     return null;
   }
 
+  @override
   Future<ChainMessage?> receive(ChainMessage chainMessage) async {
     ChainMessage? _chainMessage = await super.receive(chainMessage);
     if (_chainMessage != null && receivers.isNotEmpty) {

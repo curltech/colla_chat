@@ -81,7 +81,7 @@ class NodeAddress {
       this.credential,
       this.connectPeerId,
       this.chainProtocolId}) {
-    _setIceServers();
+    setIceServers();
   }
 
   NodeAddress.fromJson(Map json)
@@ -111,7 +111,7 @@ class NodeAddress {
     return json;
   }
 
-  _setIceServers() {
+  setIceServers() {
     var ices = iceServers;
     if (ices != null && ices.isNotEmpty) {
       for (var iceServer in ices) {

@@ -1,16 +1,5 @@
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-class WebrtcSignal {
-  String signalType = '';
-  bool? renegotiate; //是否需要重新协商
-  Map<String, dynamic>? transceiverRequest; //收发器请求
-  //ice candidate信息，ice服务器的地址
-  dynamic candidate;
-
-  // sdp信息，peer的信息
-  String? sdp;
-}
-
 /// 简单包装webrtc的基本方法
 class WebrtcRenderer {
   MediaStream? mediaStream;

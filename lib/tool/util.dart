@@ -729,3 +729,18 @@ class SmsUtil {
     return simState;
   }
 }
+
+class TraceUtil {
+  DateTime start(String msg) {
+    DateTime t = DateTime.now().toUtc();
+    logger.i('$msg, trace start:${t.toIso8601String()}');
+    return t;
+  }
+
+  Duration end(DateTime start, String msg) {
+    DateTime t = DateTime.now().toUtc();
+    Duration diff = t.difference(start);
+    logger.i('$msg, trace end:${t.toIso8601String()}, interval $diff');
+    return diff;
+  }
+}
