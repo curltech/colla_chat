@@ -103,18 +103,18 @@ class ChatMessageService extends BaseService {
   }
 }
 
-class MergeMessageService extends BaseService {
-  static final MergeMessageService _instance = MergeMessageService();
+class MergedMessageService extends BaseService {
+  static final MergedMessageService _instance = MergedMessageService();
   static bool initStatus = false;
 
-  static MergeMessageService get instance {
+  static MergedMessageService get instance {
     if (!initStatus) {
       throw 'please init!';
     }
     return _instance;
   }
 
-  static Future<MergeMessageService> init(
+  static Future<MergedMessageService> init(
       {required String tableName,
       required List<String> fields,
       List<String>? indexFields}) async {
@@ -127,18 +127,18 @@ class MergeMessageService extends BaseService {
   }
 }
 
-class ChatAttachService extends BaseService {
-  static final ChatAttachService _instance = ChatAttachService();
+class MessageAttachmentService extends BaseService {
+  static final MessageAttachmentService _instance = MessageAttachmentService();
   static bool initStatus = false;
 
-  static ChatAttachService get instance {
+  static MessageAttachmentService get instance {
     if (!initStatus) {
       throw 'please init!';
     }
     return _instance;
   }
 
-  static Future<ChatAttachService> init(
+  static Future<MessageAttachmentService> init(
       {required String tableName,
       required List<String> fields,
       List<String>? indexFields}) async {
@@ -151,7 +151,7 @@ class ChatAttachService extends BaseService {
   }
 
   store(dynamic entity) async {
-    List<ChatAttach> attaches = entity.attaches;
+    List<MessageAttachment> attaches = entity.attaches;
     var peerProfile = myself.peerProfile;
     if (peerProfile != null && peerProfile.localDataCryptoSwitch) {
       SecurityContext securityContext = SecurityContext();
@@ -186,13 +186,13 @@ class ChatAttachService extends BaseService {
       return;
     }
     List<Object> whereArgs = [attachBlockId, peerId];
-    List<ChatAttach> attaches = [];
+    List<MessageAttachment> attaches = [];
     var data = await find(where, whereArgs: whereArgs);
     SecurityContext securityContext = SecurityContext();
     securityContext.needCompress = true;
     securityContext.needEncrypt = true;
     for (var d in data) {
-      var chatAttach = ChatAttach.fromJson(d);
+      var chatAttach = MessageAttachment.fromJson(d);
       var payloadKey = chatAttach.payloadKey;
       if (payloadKey != null) {
         securityContext.payloadKey = payloadKey;

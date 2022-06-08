@@ -118,6 +118,10 @@ class ChatMessage extends StatusEntity {
   String? payloadHash;
   String? payloadSignature;
   String? payloadKey;
+  //消息附件
+  List<MessageAttachment> attaches = [];
+  //本消息是合并消息
+  List<ChatMessage> messages = [];
 
   ChatMessage();
 

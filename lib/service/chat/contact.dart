@@ -7,7 +7,9 @@ import 'package:flutter_contacts/flutter_contacts.dart' as flutter_contacts;
 
 import '../dht/peerclient.dart';
 
-class LinkmanService extends BaseService {
+abstract class PartyService extends BaseService {}
+
+class LinkmanService extends PartyService {
   static final LinkmanService _instance = LinkmanService();
   static bool initStatus = false;
 
@@ -34,18 +36,18 @@ class LinkmanService extends BaseService {
 final linkmanService = LinkmanService.instance;
 final List<Linkman> linkmans = [];
 
-class LinkmanTagService extends BaseService {
-  static final LinkmanService _instance = LinkmanService();
+class TagService extends BaseService {
+  static final TagService _instance = TagService();
   static bool initStatus = false;
 
-  static LinkmanService get instance {
+  static TagService get instance {
     if (!initStatus) {
       throw 'please init!';
     }
     return _instance;
   }
 
-  static Future<LinkmanService> init(
+  static Future<TagService> init(
       {required String tableName,
       required List<String> fields,
       List<String>? indexFields}) async {
@@ -58,18 +60,18 @@ class LinkmanTagService extends BaseService {
   }
 }
 
-class LinkmanTagLinkmanService extends BaseService {
-  static final LinkmanTagLinkmanService _instance = LinkmanTagLinkmanService();
+class PartyTagService extends BaseService {
+  static final PartyTagService _instance = PartyTagService();
   static bool initStatus = false;
 
-  static LinkmanTagLinkmanService get instance {
+  static PartyTagService get instance {
     if (!initStatus) {
       throw 'please init!';
     }
     return _instance;
   }
 
-  static Future<LinkmanTagLinkmanService> init(
+  static Future<PartyTagService> init(
       {required String tableName,
       required List<String> fields,
       List<String>? indexFields}) async {
@@ -82,18 +84,18 @@ class LinkmanTagLinkmanService extends BaseService {
   }
 }
 
-class LinkmanRequestService extends BaseService {
-  static final LinkmanRequestService _instance = LinkmanRequestService();
+class PartyRequestService extends BaseService {
+  static final PartyRequestService _instance = PartyRequestService();
   static bool initStatus = false;
 
-  static LinkmanRequestService get instance {
+  static PartyRequestService get instance {
     if (!initStatus) {
       throw 'please init!';
     }
     return _instance;
   }
 
-  static Future<LinkmanRequestService> init(
+  static Future<PartyRequestService> init(
       {required String tableName,
       required List<String> fields,
       List<String>? indexFields}) async {
@@ -106,7 +108,7 @@ class LinkmanRequestService extends BaseService {
   }
 }
 
-class GroupService extends BaseService {
+class GroupService extends PartyService {
   static final GroupService _instance = GroupService();
   static bool initStatus = false;
 
@@ -154,7 +156,7 @@ class GroupMemberService extends BaseService {
   }
 }
 
-class ContactService extends BaseService {
+class ContactService extends PartyService {
   static final ContactService _instance = ContactService();
   static bool initStatus = false;
 
@@ -181,15 +183,13 @@ class ContactService extends BaseService {
     return mobile;
   }
 
-  /**
-   * 获取手机电话本的数据填充peerContacts数组，校验是否好友，是否存在peerId
-   * @param {*} peerContacts
-   * @param {*} linkmans
-   */
+  /// 获取手机电话本的数据填充peerContacts数组，校验是否好友，是否存在peerId
+  /// @param {*} peerContacts
+  /// @param {*} linkmans
   fillPeerContact(List<dynamic> peerContacts, List<Linkman> linkmans) async {
     List<flutter_contacts.Contact> contacts = await ContactUtil.getContacts();
     // 把通讯录的数据规整化，包含手机号和名称，然后根据手机号建立索引
-    var peerContactMap = new Map();
+    var peerContactMap = Map();
     if (contacts.isNotEmpty) {
       for (var contact in contacts) {
         Contact peerContact = Contact();

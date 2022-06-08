@@ -89,29 +89,30 @@ class ServiceLocator {
         fields: buildFields(Linkman(), []));
     services['linkmanService'] = linkmanService;
 
-    var linkmanTagService = await LinkmanTagService.init(
-        tableName: "chat_linkmanTag",
-        indexFields: ['ownerPeerId', 'createDate', 'name'],
-        fields: buildFields(LinkmanTag(), []));
-    services['linkmanTagService'] = linkmanTagService;
+    var tagService = await TagService.init(
+        tableName: "chat_tag",
+        indexFields: ['ownerPeerId', 'createDate', 'tag'],
+        fields: buildFields(Tag(), []));
+    services['tagService'] = tagService;
 
-    var linkmanTagLinkmanService = await LinkmanTagLinkmanService.init(
-        tableName: "chat_linkmanTagLinkman",
-        indexFields: ['ownerPeerId', 'createDate', 'tagId', 'linkmanPeerId'],
-        fields: buildFields(LinkmanTagLinkman(), []));
-    services['linkmanTagLinkmanService'] = linkmanTagLinkmanService;
+    var partyTagService = await PartyTagService.init(
+        tableName: "chat_partyTag",
+        indexFields: ['ownerPeerId', 'createDate', 'tag', 'partyPeerId'],
+        fields: buildFields(PartyTag(), []));
+    services['partyTagService'] = partyTagService;
 
-    var linkmanRequestService = await LinkmanRequestService.init(
-        tableName: "chat_linkmanRequest",
+    var partyRequestService = await PartyRequestService.init(
+        tableName: "chat_partyRequest",
         indexFields: [
           'ownerPeerId',
           'createDate',
           'receiverPeerId',
-          'senderPeerId',
-          'status'
+          'targetPeerId',
+          'targetType',
+          'status',
         ],
-        fields: buildFields(LinkmanRequest(), []));
-    services['linkmanRequestService'] = linkmanRequestService;
+        fields: buildFields(PartyRequest(), []));
+    services['partyRequestService'] = partyRequestService;
 
     var groupService = await GroupService.init(
         tableName: "chat_group",
@@ -159,33 +160,39 @@ class ServiceLocator {
         fields: buildFields(ChatMessage(), []));
     services['chatMessageService'] = chatMessageService;
 
-    var mergeMessageService = await MergeMessageService.init(
-        tableName: "chat_mergemessage",
-        indexFields: ['ownerPeerId', 'mergeMessageId', 'createDate'],
-        fields: buildFields(MergeMessage(), []));
-    services['mergeMessageService'] = mergeMessageService;
+    var mergedMessageService = await MergedMessageService.init(
+        tableName: "chat_mergedmessage",
+        indexFields: [
+          'ownerPeerId',
+          'mergedMessageId',
+          'messageId',
+          'createDate'
+        ],
+        fields: buildFields(MergedMessage(), []));
+    services['mergeMessageService'] = mergedMessageService;
 
-    var chatAttachService = await ChatAttachService.init(
-        tableName: "chat_attach",
-        indexFields: ['ownerPeerId', 'subjectId', 'createDate', 'messageId'],
-        fields: buildFields(ChatAttach(), []));
-    services['chatAttachService'] = chatAttachService;
+    var messageAttachmentService = await MessageAttachmentService.init(
+        tableName: "chat_messageattachment",
+        indexFields: ['ownerPeerId', 'messageId', 'createDate', 'targetPeerId'],
+        fields: buildFields(MessageAttachment(), []));
+    services['messageAttachmentService'] = messageAttachmentService;
 
     var receiveService = await ReceiveService.init(
         tableName: "chat_receive",
         indexFields: [
           'ownerPeerId',
-          'subjectId',
+          'targetPeerId',
           'createDate',
-          'subjectType',
+          'targetType',
           'receiverPeerId',
+          'messageType',
         ],
         fields: buildFields(Receive(), []));
     services['receiveService'] = receiveService;
 
     var chatService = await ChatService.init(
         tableName: "chat_chat",
-        indexFields: ['ownerPeerId', 'subjectId', 'createDate'],
+        indexFields: ['ownerPeerId', 'peerId', 'sendReceiveTime'],
         fields: buildFields(Chat(), []));
     services['chatService'] = chatService;
 
@@ -219,7 +226,7 @@ class ServiceLocator {
       if (key == 'id') {
         continue;
       }
-      String field;
+      String? field;
       if (value != null) {
         if (value is int) {
           field = key + ' INT';
@@ -231,13 +238,14 @@ class ServiceLocator {
           field = key + ' TEXT';
         } else if (value is String) {
           field = key + ' TEXT';
+        } else if (value is List) {
         } else {
           field = key + ' CLOB';
         }
       } else {
         field = key + ' TEXT';
       }
-      if (!fs.contains(key)) {
+      if (field != null && !fs.contains(key)) {
         fields.add(field);
       }
     }

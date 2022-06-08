@@ -61,6 +61,7 @@ abstract class Party extends StatusEntity {
   String? groupChats; // 关联群聊列表
   String? tag; //: 标签
   String? pyTag; //: 标签拼音
+  List<Tag> tags = [];
 
   Party() : super();
 
@@ -204,56 +205,35 @@ class PartyRequest extends Party {
   String? requestType; // 请求类型，加好友，入群，订阅频道
   // 状态，包括：Sent/Received/Accepted/Expired/Ignored（已发送/已接收/已同意/已过期/已忽略）
   String? messageId; // 邀请信息
-  String? targetPeerId; // 群Id
-  String? targetType; // 群Id
+  String? targetPeerId; // 要加入的好友的peerId
+  String? targetType; // 类型
   String? groupDescription; // 群公告
   String? myAlias; // 发送人在本群的昵称
-  String? data; // 消息数据（群成员列表）
-  String? blackedMe;
+  String? content; // 消息数据（群成员列表）
 
-  LinkmanRequest();
+  PartyRequest();
 
-  LinkmanRequest.fromJson(Map json)
-      : ownerPeerId = json['ownerPeerId'],
-        senderPeerId = json['senderPeerId'],
-        name = json['name'],
-        mobile = json['mobile'],
-        avatar = json['avatar'],
-        publicKey = json['publicKey'],
-        receiverPeerId = json['receiverPeerId'],
-        requestType = json['requestType'],
-        receiveTime = json['receiveTime'],
-        message = json['message'],
-        groupId = json['groupId'],
-        groupCreateDate = json['groupCreateDate'],
-        groupName = json['groupName'],
+  PartyRequest.fromJson(Map json)
+      : requestType = json['requestType'],
         groupDescription = json['groupDescription'],
         myAlias = json['myAlias'],
-        data = json['data'],
-        blackedMe = json['blackedMe'],
+        messageId = json['messageId'],
+        targetPeerId = json['targetPeerId'],
+        targetType = json['targetType'],
+        content = json['content'],
         super.fromJson(json);
 
   @override
   Map<String, dynamic> toJson() {
     var json = super.toJson();
     json.addAll({
-      'ownerPeerId': ownerPeerId,
-      'senderPeerId': senderPeerId,
-      'name': name,
-      'mobile': mobile,
-      'avatar': avatar,
-      'publicKey': publicKey,
-      'receiverPeerId': receiverPeerId,
       'requestType': requestType,
-      'receiveTime': receiveTime,
-      'message': message,
-      'groupId': groupId,
-      'groupCreateDate': groupCreateDate,
-      'groupName': groupName,
       'groupDescription': groupDescription,
       'myAlias': myAlias,
-      'data': data,
-      'blackedMe': blackedMe,
+      'messageId': messageId,
+      'targetPeerId': targetPeerId,
+      'targetType': targetType,
+      'content': content,
     });
     return json;
   }
@@ -268,6 +248,7 @@ class Group extends Party {
   String? pyDescription; // 组描述拼音
   String? myAlias; // 我在本群的昵称
   String? groupOwnerPeerId; // 群主peerId
+  List<Linkman> members = [];
 
   Group();
 
