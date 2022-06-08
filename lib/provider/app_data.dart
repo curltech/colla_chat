@@ -180,7 +180,7 @@ class AppDataProvider with ChangeNotifier {
   static Future<AppDataProvider> init() async {
     if (!initStatus) {
       LocalStorage localStorage = await LocalStorage.instance;
-      Object? json = localStorage.get('AppParams');
+      Object? json = await localStorage.get('AppParams');
       if (json != null) {
         Map<dynamic, dynamic> jsonObject = JsonUtil.toMap(json as String);
         instance = AppDataProvider.fromJson(jsonObject as Map<String, dynamic>);

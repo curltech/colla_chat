@@ -95,8 +95,8 @@ class Sqlite3 extends DataStore {
     } else {
       db.execute(sql.clause);
     }
-    logger.w('execute sql:${sql.clause}');
-    logger.w('execute sql params:${sql.params}');
+    logger.i('execute sql:${sql.clause}');
+    logger.i('execute sql params:${sql.params}');
 
     return null;
   }

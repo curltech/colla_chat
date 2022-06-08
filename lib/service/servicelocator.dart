@@ -4,6 +4,7 @@ import 'package:colla_chat/tool/util.dart';
 import 'package:logger/logger.dart';
 import '../entity/chat/chat.dart';
 import '../entity/chat/contact.dart';
+import '../entity/chat/mailaddress.dart';
 import '../entity/dht/chainapp.dart';
 import '../entity/dht/myselfpeer.dart';
 import '../entity/dht/peerclient.dart';
@@ -106,7 +107,6 @@ class ServiceLocator {
         indexFields: [
           'ownerPeerId',
           'createDate',
-          'receiverPeerId',
           'targetPeerId',
           'targetType',
           'status',
@@ -122,7 +122,7 @@ class ServiceLocator {
           'description',
           'ownerPeerId',
           'createDate',
-          'groupId',
+          'peerId',
           'groupCategory',
           'groupType'
         ],
@@ -151,11 +151,19 @@ class ServiceLocator {
         tableName: "chat_message",
         indexFields: [
           'ownerPeerId',
-          'subjectId',
+          'transportType',
+          'messageId',
+          'messageType',
+          'direct',
+          'targetPeerId',
+          'targetType',
+          'senderPeerId',
+          'senderType',
           'createDate',
+          'sendTime',
           'receiveTime',
           'actualReceiveTime',
-          'messageType',
+          'title',
         ],
         fields: buildFields(ChatMessage(), []));
     services['chatMessageService'] = chatMessageService;
@@ -199,7 +207,7 @@ class ServiceLocator {
     var mailAddressService = await MailAddressService.init(
         tableName: "chat_mailaddress",
         indexFields: ['ownerPeerId', 'email', 'name'],
-        fields: buildFields(Chat(), []));
+        fields: buildFields(MailAddress(), []));
     services['chat_mailaddress'] = mailAddressService;
 
     await Sqlite3.getInstance();

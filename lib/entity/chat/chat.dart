@@ -128,6 +128,8 @@ class ChatMessage extends StatusEntity {
   ChatMessage.fromJson(Map json)
       : ownerPeerId = json['ownerPeerId'],
         targetType = json['targetType'],
+        transportType = json['transportType'],
+        direct = json['direct'],
         targetPeerId = json['targetPeerId'],
         messageId = json['messageId'],
         messageType = json['messageType'],
@@ -170,6 +172,8 @@ class ChatMessage extends StatusEntity {
     var json = super.toJson();
     json.addAll({
       'ownerPeerId': ownerPeerId,
+      'transportType': transportType,
+      'direct': direct,
       'targetType': targetType,
       'targetPeerId': targetPeerId,
       'messageId': messageId,

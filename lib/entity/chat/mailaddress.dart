@@ -23,6 +23,7 @@ class MailAddress extends BaseEntity {
       {this.name,
       this.username,
       this.domain,
+      this.email,
       this.imapServerHost,
       this.imapServerPort = 143,
       this.popServerHost,
