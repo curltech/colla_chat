@@ -111,7 +111,7 @@ abstract class WebrtcCorePeer {
   bool iceComplete = false;
 
   //在传入candidate信息后缓存起来，等待offer到来以后统一处理
-  List<String> pendingCandidates = [];
+  List<RTCIceCandidate> pendingCandidates = [];
 
   //sdp扩展属性，由外部传入，这个属性用于传递定制的属性
   Map<String, dynamic> extension = {};
@@ -474,7 +474,7 @@ abstract class WebrtcCorePeer {
   ///被叫不能在第一次的时候主动发起协议过程，主叫或者被叫不在第一次的时候可以发起协商过程
   negotiate() async {}
 
-  signal(dynamic data) async {}
+  signal(WebrtcSignal webrtcSignal) async {}
 
   /// Filter trickle lines when trickle is disabled #354
   filterTrickle(sdp) {
@@ -491,9 +491,9 @@ abstract class WebrtcCorePeer {
   }
 
   //为连接加上候选的服务器
-  addIceCandidate(Map<String, dynamic> candidate) async {
-    var iceCandidate = RTCIceCandidate(candidate['candidate'],
-        candidate['sdpMid'], candidate['sdpMLineIndex']);
+  addIceCandidate(RTCIceCandidate iceCandidate) async {
+    // var iceCandidate = RTCIceCandidate(candidate['candidate'],
+    //     candidate['sdpMid'], candidate['sdpMLineIndex']);
     await peerConnection.addCandidate(iceCandidate);
   }
 
@@ -616,51 +616,45 @@ class MasterWebrtcCorePeer extends WebrtcCorePeer {
 
   //从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
   @override
-  signal(dynamic data) async {
+  signal(WebrtcSignal webrtcSignal) async {
     if (destroyed) {
       throw 'cannot signal after peer is destroyed,ERR_DESTROYED';
     }
-    if (data is String) {
-      try {
-        data = JsonUtil.toMap(data);
-      } catch (err) {
-        data = {};
-      }
-    }
     logger.i('signal()');
-
+    var candidate = webrtcSignal.candidate;
     //被要求重新协商，则发起协商
-    if (data.renegotiate != null) {
+    if (webrtcSignal.renegotiate != null) {
       logger.i('got request to renegotiate');
       negotiate();
     }
     //被要求收发，则加收发器
-    else if (data.transceiverRequest != null) {
+    else if (webrtcSignal.transceiverRequest != null) {
       logger.i('got request for transceiver');
       // addTransceiver(
       //     kind: data.transceiverRequest.kind,
       //     init: data.transceiverRequest.init);
     }
     //如果是候选信息
-    else if (data.candidate != null) {
+    else if (candidate != null) {
       RTCSessionDescription? remoteDescription =
           await peerConnection.getRemoteDescription();
       //如果远程描述已经设置，加候选，否则，加入候选清单
       if (remoteDescription != null && remoteDescription.type != null) {
-        addIceCandidate(data.candidate);
+        addIceCandidate(candidate);
       } else {
-        pendingCandidates.add(data.candidate);
+        pendingCandidates.add(candidate);
       }
     }
     //如果sdp信息，则设置远程描述，并处理所有的候选清单中候选服务器
-    else if (data.sdp != null) {
-      await peerConnection.setRemoteDescription(data as RTCSessionDescription);
+    else if (webrtcSignal.sdp != null) {
+      await peerConnection
+          .setRemoteDescription(webrtcSignal.sdp as RTCSessionDescription);
       if (destroyed) return;
 
       for (var candidate in pendingCandidates) {
-        Map<String, dynamic> map =
-            JsonUtil.toMap(candidate) as Map<String, dynamic>;
-        addIceCandidate(map);
+        // Map<String, dynamic> map =
+        //     JsonUtil.toMap(candidate) as Map<String, dynamic>;
+        addIceCandidate(candidate);
       }
       pendingCandidates = [];
     }
@@ -766,36 +760,29 @@ class FollowWebrtcCorePeer extends WebrtcCorePeer {
 
   //从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
   @override
-  signal(dynamic data) async {
+  signal(WebrtcSignal webrtcSignal) async {
     if (destroyed) throw 'cannot signal after peer is destroyed,ERR_DESTROYED';
-    if (data is String) {
-      try {
-        data = JsonUtil.toMap(data);
-      } catch (err) {
-        data = {};
-      }
-    }
-    logger.i('signal()');
 
+    logger.i('signal()');
+    var candidate = webrtcSignal.candidate;
+    var sdp = webrtcSignal.sdp;
     //如果是候选信息
-    if (data.candidate != null) {
+    if (candidate != null) {
       RTCSessionDescription? remoteDescription =
           await peerConnection.getRemoteDescription();
       //如果远程描述已经设置，加候选，否则，加入候选清单
       if (remoteDescription != null && remoteDescription.type != null) {
-        addIceCandidate(data.candidate);
+        addIceCandidate(candidate);
       } else {
-        pendingCandidates.add(data.candidate);
+        pendingCandidates.add(candidate);
       }
     }
     //如果sdp信息，则设置远程描述，并处理所有的候选清单中候选服务器
-    else if (data.sdp != null) {
-      await peerConnection.setRemoteDescription(data as RTCSessionDescription);
+    else if (sdp != null) {
+      await peerConnection.setRemoteDescription(sdp);
       if (destroyed) return;
       for (var candidate in pendingCandidates) {
-        Map<String, dynamic> map =
-            JsonUtil.toMap(candidate) as Map<String, dynamic>;
-        addIceCandidate(map);
+        addIceCandidate(candidate);
       }
       pendingCandidates = [];
       //如果远程描述是offer请求，则创建answer
