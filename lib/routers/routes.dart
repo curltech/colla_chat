@@ -20,6 +20,5 @@ class Routes {
     router.define(remoteLogin, handler: remoteLoginHandler);
     router.define(p2pLogin, handler: p2pLoginHandler);
     router.define(mobileIndex, handler: mobileIndexHandler);
-    router.define(desktopIndex, handler: desktopIndexHandler);
   }
 }
