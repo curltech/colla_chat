@@ -8,7 +8,7 @@ import '../../provider/app_data.dart';
 enum SignalType { renegotiate, transceiverRequest, candidate, sdp }
 
 class WebrtcSignal {
-  SignalType signalType;
+  String? signalType;
   bool? renegotiate; //是否需要重新协商
   Map<String, dynamic>? transceiverRequest; //收发器请求
   //ice candidate信息，ice服务器的地址
@@ -24,6 +24,39 @@ class WebrtcSignal {
       this.candidate,
       this.sdp,
       this.extension});
+
+  WebrtcSignal.fromJson(Map json) {
+    signalType = json['signalType'];
+    renegotiate = json['renegotiate'];
+    transceiverRequest = json['transceiverRequest'];
+    Map<String, dynamic> iceCandidate = json['candidate'];
+    candidate = RTCIceCandidate(iceCandidate['candidate'],
+        iceCandidate['sdpMid'], iceCandidate['sdpMLineIndex']);
+    Map<String, dynamic> sessionDescription = json['sdp'];
+    sdp = RTCSessionDescription(
+        sessionDescription['sdp'], sessionDescription['type']);
+    extension = json['extension'];
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json.addAll({
+      'signalType': signalType,
+      'renegotiate': renegotiate,
+      'transceiverRequest': transceiverRequest,
+      'extension': extension,
+    });
+    var sdp = this.sdp;
+    if (sdp != null) {
+      json['sdp'] = sdp.toMap();
+    }
+    var candidate = this.candidate;
+    if (candidate != null) {
+      json['candidate'] = candidate.toMap();
+    }
+    return json;
+  }
 }
 
 class Router {
@@ -295,7 +328,7 @@ abstract class WebrtcCorePeer {
     if (candidate.candidate != null && trickle) {
       //发送candidate信号
       emit(WebrtcEvent.signal,
-          WebrtcSignal(SignalType.candidate, candidate: candidate));
+          WebrtcSignal(SignalType.candidate.name, candidate: candidate));
     } else if (candidate.candidate == null && !iceComplete) {
       iceComplete = true;
       logger.i('onIceCandidate event，iceComplete true');
@@ -618,7 +651,7 @@ class MasterWebrtcCorePeer extends WebrtcCorePeer {
       sdp = offer;
       logger.i('signal');
       emit(WebrtcEvent.signal,
-          WebrtcSignal(SignalType.sdp, sdp: sdp, extension: extension));
+          WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
     }
   }
 
@@ -760,7 +793,7 @@ class FollowWebrtcCorePeer extends WebrtcCorePeer {
     logger.i('signal');
     if (sdp != null) {
       emit(WebrtcEvent.signal,
-          WebrtcSignal(SignalType.sdp, sdp: sdp, extension: extension));
+          WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
     }
     //if (!this.initiator) this._requestMissingTransceivers() //ios unSupport
   }
@@ -819,7 +852,7 @@ class FollowWebrtcCorePeer extends WebrtcCorePeer {
 
     emit(
         WebrtcEvent.signal,
-        WebrtcSignal(SignalType.transceiverRequest,
+        WebrtcSignal(SignalType.transceiverRequest.name,
             transceiverRequest: {'kind': kind, 'init': init}));
   }
 }
