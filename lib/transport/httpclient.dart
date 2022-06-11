@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:dio/dio.dart';
 

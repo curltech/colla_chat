@@ -1,11 +1,9 @@
-import 'dart:convert';
-
-import 'package:colla_chat/entity/p2p/message.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/transport/webclient.dart';
-import 'package:web_socket_channel/html.dart';
-import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import './condition_import/unsupport.dart'
+    if (dart.library.html) './condition_import/web.dart'
+    if (dart.library.io) './condition_import/desktop.dart' as websocket_connect;
 
 import '../p2p/chain/chainmessagehandler.dart';
 import '../provider/app_data.dart';
@@ -30,9 +28,7 @@ class Websocket implements IWebClient {
 
   connect() async {
     if (PlatformParams.instance.web) {
-      channel = HtmlWebSocketChannel.connect(Uri.parse(address));
-    } else {
-      channel = IOWebSocketChannel.connect(Uri.parse(address),
+      channel = websocket_connect.websocketConnect(address,
           headers: headers, pingInterval: pingInterval);
     }
     register('', onData);

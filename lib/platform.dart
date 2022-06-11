@@ -40,6 +40,7 @@ class PlatformParams {
             Platform.isWindows ||
             Platform.isMacOS ||
             Platform.isLinux) {
+          instance.web=false;
           instance.ios = Platform.isIOS;
           instance.android = Platform.isAndroid;
           instance.linux = Platform.isLinux;
