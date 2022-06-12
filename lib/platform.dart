@@ -13,12 +13,12 @@ class PlatformParams {
   late MediaQueryData mediaQueryData;
 
   ///直接获取的平台信息，包含操作系统版本，类型，语言，国别，主机名等
-  late bool web;
-  late bool ios;
-  late bool android = false;
-  late bool linux;
-  late bool macos;
-  late bool windows;
+  bool web = false;
+  bool ios = false;
+  bool android = false;
+  bool linux = false;
+  bool macos = false;
+  bool windows = false;
   Locale? locale;
   String? localHostname;
   String? operatingSystem;
@@ -40,7 +40,6 @@ class PlatformParams {
             Platform.isWindows ||
             Platform.isMacOS ||
             Platform.isLinux) {
-          instance.web=false;
           instance.ios = Platform.isIOS;
           instance.android = Platform.isAndroid;
           instance.linux = Platform.isLinux;
