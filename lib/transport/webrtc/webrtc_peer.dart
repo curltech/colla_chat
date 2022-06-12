@@ -7,8 +7,44 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../provider/app_data.dart';
 
+class SignalExtension {
+  String? peerId;
+  String? clientId;
+  Router? router;
+  List<Map<String, String>>? iceServers;
+
+  SignalExtension(this.peerId, this.clientId, {this.router, this.iceServers});
+
+  SignalExtension.fromJson(Map json) {
+    peerId = json['peerId'];
+    clientId = json['clientId'];
+    Map<String, dynamic> router = json['router'];
+    this.router = Router(router['roomId'],
+        id: router['id'],
+        type: router['type'],
+        action: router['action'],
+        identity: router['identity']);
+    iceServers = json['iceServers'];
+  }
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json.addAll({
+      'peerId': peerId,
+      'clientId': clientId,
+      'iceServers': iceServers,
+    });
+    var router = this.router;
+    if (router != null) {
+      json['router'] = router.toJson();
+    }
+    return json;
+  }
+}
+
+///核心的Peer之上加入了业务的编号，peerId和clientId
 class WebrtcPeer {
-  late WebrtcCorePeer webrtcPeer;
+  late WebrtcCorePeer webrtcCorePeer;
   String? targetPeerId;
   String? clientId;
   String? peerId;
@@ -17,7 +53,6 @@ class WebrtcPeer {
   List<Map<String, String>>? iceServers = [];
   List<MediaStream> localStreams = [];
   List<MediaStream> remoteStreams = [];
-  Map<String, dynamic> options = {};
   Router? router;
   int? start;
   int? end;
@@ -42,16 +77,14 @@ class WebrtcPeer {
   WebrtcPeer(String targetPeerId, String clientId, bool initiator,
       {List<MediaStream> streams = const [],
       List<Map<String, String>>? iceServers,
-      Map<String, dynamic> options = const {},
       Router? router}) {
     init(targetPeerId, clientId, initiator,
-        iceServers: iceServers, options: options, router: router);
+        iceServers: iceServers, router: router);
   }
 
   init(String targetPeerId, String clientId, bool initiator,
       {List<MediaStream> streams = const [],
       List<Map<String, String>>? iceServers,
-      Map<String, dynamic> options = const {},
       Router? router}) async {
     this.targetPeerId = targetPeerId;
     this.clientId = clientId;
@@ -62,42 +95,33 @@ class WebrtcPeer {
     } else {
       this.iceServers = iceServers;
     }
-    if (options != null) {
-      this.options = options;
-    }
     if (streams != null) {
       localStreams.addAll(streams);
     }
     // 自定义属性，表示本节点createOffer时加入的sfu的编号，作为出版者还是订阅者，还是都是
     this.router = router;
     start = DateTime.now().millisecondsSinceEpoch;
-    Map<String, dynamic> extension = {
-      'clientId': myself.clientId,
-      'peerId': myself.peerId,
-      'router': router?.toJson()
-    };
+    SignalExtension extension = SignalExtension(myself.peerId, myself.clientId,
+        router: router, iceServers: iceServers);
     if (initiator) {
-      this.webrtcPeer = MasterWebrtcCorePeer();
-      final webrtcPeer = this.webrtcPeer;
+      webrtcCorePeer = MasterWebrtcCorePeer();
+      final webrtcPeer = this.webrtcCorePeer;
       if (webrtcPeer != null) {
         await webrtcPeer.init(streams: streams, extension: extension);
       }
     } else {
-      this.webrtcPeer = FollowWebrtcCorePeer();
-      final webrtcPeer = this.webrtcPeer;
+      this.webrtcCorePeer = FollowWebrtcCorePeer();
+      final webrtcPeer = this.webrtcCorePeer;
       if (webrtcPeer != null) {
         await webrtcPeer.init(streams: streams, extension: extension);
       }
     }
     //下面的三个事件对于发起方和被发起方是一样的
     //可以发起信号
-    final webrtcPeer = this.webrtcPeer;
+    final webrtcPeer = this.webrtcCorePeer;
     webrtcPeer.on(WebrtcEvent.signal, (WebrtcSignal signal) async {
-      bool? force = extension['force'];
-      if (force != null && force) {
-        extension.remove('force');
-      }
-      await webrtcPeerPool.emit(WebrtcEvent.signal.name, {'data': signal, 'source': this});
+      await webrtcPeerPool
+          .emit(WebrtcEvent.signal.name, {'data': signal, 'source': this});
     });
 
     //连接建立/
@@ -119,7 +143,8 @@ class WebrtcPeer {
     //收到数据
     webrtcPeer.on(WebrtcEvent.data, (data) async {
       logger.i('${DateTime.now().toUtc()}:got a message from peer: $data');
-      await webrtcPeerPool.emit(WebrtcEvent.data.name, {'data': data, 'source': this});
+      await webrtcPeerPool
+          .emit(WebrtcEvent.data.name, {'data': data, 'source': this});
     });
 
     webrtcPeer.on(WebrtcEvent.stream, (stream) async {
@@ -135,8 +160,8 @@ class WebrtcPeer {
 
     webrtcPeer.on(WebrtcEvent.track, (track, stream) async {
       logger.i('${DateTime.now().toUtc().toIso8601String()}:track');
-      await webrtcPeerPool.emit(
-          WebrtcEvent.track.name, {'track': track, 'stream': stream, 'source': this});
+      await webrtcPeerPool.emit(WebrtcEvent.track.name,
+          {'track': track, 'stream': stream, 'source': this});
     });
 
     webrtcPeer.on(
@@ -144,7 +169,7 @@ class WebrtcPeer {
   }
 
   on(WebrtcEvent name, Function(dynamic)? fn) {
-    webrtcPeer.on(name, fn);
+    webrtcCorePeer.on(name, fn);
   }
 
   RTCVideoView attachStream(MediaStream stream) {
@@ -156,7 +181,7 @@ class WebrtcPeer {
 
   addStream(MediaStream stream) {
     logger.i('add stream to webrtc');
-    webrtcPeer.addStream(stream);
+    webrtcCorePeer.addStream(stream);
     localStreams.add(stream);
   }
 
@@ -172,7 +197,7 @@ class WebrtcPeer {
     for (var _stream in localStreams) {
       if (_stream == stream) {
         localStreams.remove(_stream);
-        webrtcPeer.removeStream(_stream);
+        webrtcCorePeer.removeStream(_stream);
       }
     }
   }
@@ -187,16 +212,16 @@ class WebrtcPeer {
   }
 
   signal(WebrtcSignal signal) {
-    webrtcPeer.signal(signal);
+    webrtcCorePeer.signal(signal);
   }
 
   bool get connected {
-    return webrtcPeer.connected;
+    return webrtcCorePeer.connected;
   }
 
   send(Uint8List data) {
-    if (webrtcPeer.connected) {
-      webrtcPeer.send(data);
+    if (webrtcCorePeer.connected) {
+      webrtcCorePeer.send(data);
     } else {
       logger.e(
           'send failed , peerId:$targetPeerId;connectPeer:$connectPeerId session:$connectSessionId webrtc connection state is not connected');
@@ -204,6 +229,6 @@ class WebrtcPeer {
   }
 
   destroy(String err) async {
-    await webrtcPeer.destroy(err);
+    await webrtcCorePeer.destroy(err);
   }
 }

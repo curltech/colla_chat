@@ -107,10 +107,13 @@ class WebrtcPeerPool {
   String? peerId;
   SimplePublicKey? peerPublicKey;
   String? clientId;
+
   ///对方的队列，每一个peerId的元素是一个列表，具有相同的peerId和不同的clientId
   LruQueue<List<WebrtcPeer>> webrtcPeers = LruQueue();
+
   //所以注册的事件处理器
   Map<String, Function> events = {};
+
   //signal事件的处理器
   late SignalAction _signalAction;
   Map<String, dynamic> protocolHandlers = {};
@@ -120,8 +123,8 @@ class WebrtcPeerPool {
     clientId = myself.clientId;
     peerPublicKey = myself.peerPublicKey;
     _signalAction = signalAction;
-    registerEvent('signal', sendSignal);
-    registerEvent('data', receiveData);
+    registerEvent(WebrtcEvent.signal.name, sendSignal);
+    registerEvent(WebrtcEvent.data.name, receiveData);
   }
 
   registerSignalAction(SignalAction signalAction) {
@@ -170,8 +173,7 @@ class WebrtcPeerPool {
     if (webrtcPeers == null) {
       webrtcPeers = [];
     }
-    var webrtcPeer =
-        WebrtcPeer(peerId, clientId, true, options: options, router: router);
+    var webrtcPeer = WebrtcPeer(peerId, clientId, true, router: router);
     webrtcPeers.add(webrtcPeer);
 
     ///如果有溢出的连接，将溢出连接关闭
@@ -292,16 +294,15 @@ class WebrtcPeerPool {
     Router? router;
     var extension = signal.extension;
     if (extension != null) {
-      clientId = extension['clientId'];
-      force = extension['force'];
-      iceServers = extension['iceServers'];
-      router = extension['router'];
+      clientId = extension.clientId;
+      iceServers = extension.iceServers;
+      router = extension.router;
     }
     if (clientId == null) {
       throw 'NoClient';
     }
-    var sdp=signal.sdp;
-    if (signalType == 'sdp' && sdp!=null) {
+    var sdp = signal.sdp;
+    if (signalType == 'sdp' && sdp != null) {
       var type = sdp.type;
       if (clientId != null && force) {
         await remove(peerId, clientId: clientId);

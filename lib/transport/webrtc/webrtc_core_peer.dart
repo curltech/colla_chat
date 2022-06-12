@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:colla_chat/transport/webrtc/webrtc_peer.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../crypto/cryptography.dart';
@@ -16,7 +17,7 @@ class WebrtcSignal {
 
   // sdp信息，peer的信息
   RTCSessionDescription? sdp;
-  Map<String, dynamic>? extension;
+  SignalExtension? extension;
 
   WebrtcSignal(this.signalType,
       {this.renegotiate,
@@ -35,7 +36,8 @@ class WebrtcSignal {
     Map<String, dynamic> sessionDescription = json['sdp'];
     sdp = RTCSessionDescription(
         sessionDescription['sdp'], sessionDescription['type']);
-    extension = json['extension'];
+    var extension = json['extension'];
+    this.extension = SignalExtension.fromJson(extension);
   }
 
   @override
@@ -45,7 +47,6 @@ class WebrtcSignal {
       'signalType': signalType,
       'renegotiate': renegotiate,
       'transceiverRequest': transceiverRequest,
-      'extension': extension,
     });
     var sdp = this.sdp;
     if (sdp != null) {
@@ -54,6 +55,10 @@ class WebrtcSignal {
     var candidate = this.candidate;
     if (candidate != null) {
       json['candidate'] = candidate.toMap();
+    }
+    var extension = this.extension;
+    if (extension != null) {
+      json['extension'] = extension.toJson();
     }
     return json;
   }
@@ -155,16 +160,12 @@ abstract class WebrtcCorePeer {
   //外部使用时注册的回调方法，也就是注册事件
   //WebrtcEvent定义了事件的名称
   Map<WebrtcEvent, Function> handlers = {};
+
   //是否第一次协商
   bool firstNegotiation = true;
 
   //是否正在协商，连接创建到连接建立完成的这段时间
   bool isNegotiating = false;
-
-  //是否支持trickle，连接双方要协商turn的地址和端口，也就是candidate协商过程
-  //trickle可以加快这个过程
-  bool trickle = true;
-  bool allowHalfTrickle = false;
 
   //连接双方要协商turn的地址和端口，也就是candidate协商过程是否完成
   //这个过程在offer，answer协商之后
@@ -174,16 +175,14 @@ abstract class WebrtcCorePeer {
   List<RTCIceCandidate> pendingCandidates = [];
 
   //sdp扩展属性，由外部传入，这个属性用于传递定制的属性
-  Map<String, dynamic> extension = {};
+  //一般包括指定的iceServer，router信息，peerId，clientId
+  SignalExtension? extension;
 
   //连接是否完全建立，即协商过程结束
   bool connected = false;
 
   //是否关闭连接完成
   bool destroyed = false;
-
-  //建立连接的配置
-  Map<String, dynamic> configuration = {};
 
   //建立连接的PeerConnection约束
   Map<String, dynamic> pcConstraints = {
@@ -202,13 +201,19 @@ abstract class WebrtcCorePeer {
   ///可输入的参数包括外部媒体流和定制扩展属性
   Future<bool> init(
       {List<MediaStream> streams = const [],
-      Map<String, dynamic> extension = const {}}) async {
+      SignalExtension? extension}) async {
     id = await cryptoGraphy.getRandomAsciiString(length: 8);
     this.extension = extension;
     var appDataProvider = AppDataProvider.instance;
     var iceServers = appDataProvider.defaultNodeAddress.iceServers;
     try {
-      configuration['iceServers'] = iceServers;
+      var configuration = {'iceServers': iceServers};
+      if (extension != null) {
+        var iceServers = extension.iceServers;
+        if (iceServers != null) {
+          configuration['iceServers'] = iceServers;
+        }
+      }
       //1.创建连接
       peerConnection = await createPeerConnection(configuration, pcConstraints);
       logger.i('createPeerConnection end:$id');
@@ -346,7 +351,7 @@ abstract class WebrtcCorePeer {
     if (destroyed) {
       return;
     }
-    if (candidate.candidate != null && trickle) {
+    if (candidate.candidate != null) {
       //发送candidate信号
       emit(WebrtcEvent.signal,
           WebrtcSignal(SignalType.candidate.name, candidate: candidate));
@@ -540,11 +545,6 @@ abstract class WebrtcCorePeer {
 
   ///外部在收到信号的时候调用
   signal(WebrtcSignal webrtcSignal) async {}
-
-  /// 不应该被调用Filter trickle lines when trickle is disabled #354
-  filterTrickle(sdp) {
-    return sdp.replace('/a=ice-options:trickle\s\n/g', '');
-  }
 
   ///数据通道的缓冲区大小
   get bufferSize {
