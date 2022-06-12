@@ -45,9 +45,10 @@ class SignalExtension {
 ///核心的Peer之上加入了业务的编号，peerId和clientId
 class WebrtcPeer {
   late WebrtcCorePeer webrtcCorePeer;
-  String? targetPeerId;
-  String? clientId;
+
+  //对方的参数
   String? peerId;
+  String? clientId;
   String? connectPeerId;
   String? connectSessionId;
   List<Map<String, String>>? iceServers = [];
@@ -74,19 +75,19 @@ class WebrtcPeer {
 //		objectMode: false
 //	}
 
-  WebrtcPeer(String targetPeerId, String clientId, bool initiator,
+  WebrtcPeer(String peerId, String clientId, bool initiator,
       {List<MediaStream> streams = const [],
       List<Map<String, String>>? iceServers,
       Router? router}) {
-    init(targetPeerId, clientId, initiator,
+    init(peerId, clientId, initiator,
         iceServers: iceServers, router: router);
   }
 
-  init(String targetPeerId, String clientId, bool initiator,
+  init(String peerId, String clientId, bool initiator,
       {List<MediaStream> streams = const [],
       List<Map<String, String>>? iceServers,
       Router? router}) async {
-    this.targetPeerId = targetPeerId;
+    this.peerId = peerId;
     this.clientId = clientId;
     this.router = router;
     var appDataProvider = AppDataProvider.instance;
@@ -135,8 +136,8 @@ class WebrtcPeer {
     });
 
     webrtcPeer.on(WebrtcEvent.close, (data) async {
-      if (this.targetPeerId != null) {
-        await webrtcPeerPool.remove(this.targetPeerId!);
+      if (this.peerId != null) {
+        await webrtcPeerPool.remove(this.peerId!);
       }
     });
 
@@ -224,7 +225,7 @@ class WebrtcPeer {
       webrtcCorePeer.send(data);
     } else {
       logger.e(
-          'send failed , peerId:$targetPeerId;connectPeer:$connectPeerId session:$connectSessionId webrtc connection state is not connected');
+          'send failed , peerId:$peerId;connectPeer:$connectPeerId session:$connectSessionId webrtc connection state is not connected');
     }
   }
 

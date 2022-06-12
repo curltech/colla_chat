@@ -275,7 +275,7 @@ class WebrtcPeerPool {
   clear() async {
     var webrtcPeers = getAll();
     for (var peer in webrtcPeers) {
-      var peerId = peer.targetPeerId;
+      var peerId = peer.peerId;
       if (peerId != null) {
         await remove(peerId);
       }
@@ -293,7 +293,6 @@ class WebrtcPeerPool {
     var signalType = signal.signalType;
     logger.i('receive signal type: $signalType from webrtcPeer: $peerId');
     String? clientId;
-    bool force = false;
     List<Map<String, String>>? iceServers;
     Router? router;
     var extension = signal.extension;
@@ -308,7 +307,7 @@ class WebrtcPeerPool {
     var sdp = signal.sdp;
     if (signalType == 'sdp' && sdp != null) {
       var type = sdp.type;
-      if (clientId != null && force) {
+      if (clientId != null ) {
         await remove(peerId, clientId: clientId);
       }
     }
