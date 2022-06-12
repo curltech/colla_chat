@@ -108,9 +108,9 @@ class WebrtcPeerPool {
   static bool initStatus = false;
 
   ///自己的peerId,clientId和公钥
-  String? peerId;
-  SimplePublicKey? peerPublicKey;
-  String? clientId;
+  late String peerId;
+  late SimplePublicKey peerPublicKey;
+  late String clientId;
 
   ///对方的队列，每一个peerId的元素是一个列表，具有相同的peerId和不同的clientId
   LruQueue<List<WebrtcPeer>> webrtcPeers = LruQueue();
@@ -124,10 +124,6 @@ class WebrtcPeerPool {
 
   static WebrtcPeerPool get instance {
     if (!initStatus) {
-      var peerId = myself.peerId;
-      if (peerId == null) {
-        throw 'myself peerId is null';
-      }
       _instance = WebrtcPeerPool();
       _instance.registerSignalAction(signalAction);
       initStatus = true;
@@ -137,9 +133,21 @@ class WebrtcPeerPool {
   }
 
   WebrtcPeerPool() {
-    peerId = myself.peerId;
-    clientId = myself.clientId;
-    peerPublicKey = myself.peerPublicKey;
+    var peerId = myself.peerId;
+    if (peerId == null) {
+      throw 'myself peerId is null';
+    }
+    this.peerId = peerId;
+    var clientId = myself.clientId;
+    if (clientId == null) {
+      throw 'myself clientId is null';
+    }
+    this.clientId = clientId;
+    var peerPublicKey = myself.peerPublicKey;
+    if (peerPublicKey == null) {
+      throw 'myself peerPublicKey is null';
+    }
+    this.peerPublicKey = peerPublicKey;
     _signalAction = signalAction;
     registerEvent(WebrtcEventType.signal.name, sendSignal);
     registerEvent(WebrtcEventType.data.name, receiveData);
