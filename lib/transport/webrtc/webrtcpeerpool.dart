@@ -4,6 +4,7 @@ import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/transport/webrtc/webrtc_core_peer.dart';
 import 'package:colla_chat/transport/webrtc/webrtc_peer.dart';
 import 'package:cryptography/cryptography.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../p2p/chain/action/signal.dart';
 import '../../provider/app_data.dart';
@@ -168,12 +169,15 @@ class WebrtcPeerPool {
 
   ///主动方创建
   Future<WebrtcPeer> create(String peerId, String clientId,
-      {Map<String, dynamic> options = const {}, Router? router}) async {
+      {List<MediaStream> streams = const [],
+      List<Map<String, String>>? iceServers,
+      Router? router}) async {
     List<WebrtcPeer>? webrtcPeers = this.webrtcPeers.get(peerId);
     if (webrtcPeers == null) {
       webrtcPeers = [];
     }
-    var webrtcPeer = WebrtcPeer(peerId, clientId, true, router: router);
+    var webrtcPeer = WebrtcPeer(peerId, clientId, true,
+        streams: streams, iceServers: iceServers, router: router);
     webrtcPeers.add(webrtcPeer);
 
     ///如果有溢出的连接，将溢出连接关闭
