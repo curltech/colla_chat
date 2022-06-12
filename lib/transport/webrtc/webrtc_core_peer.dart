@@ -8,7 +8,7 @@ import '../../provider/app_data.dart';
 enum SignalType { renegotiate, transceiverRequest, candidate, sdp }
 
 class WebrtcSignal {
-  String? signalType;
+  late String signalType;
   bool? renegotiate; //是否需要重新协商
   Map<String, dynamic>? transceiverRequest; //收发器请求
   //ice candidate信息，ice服务器的地址
@@ -59,14 +59,35 @@ class WebrtcSignal {
   }
 }
 
+///加入的房间号
 class Router {
   String? id;
   String? type;
   String? action;
-  String roomId;
+  String? roomId;
   String? identity;
 
   Router(this.roomId, {this.id, this.type, this.action, this.identity});
+
+  Router.fromJson(Map json) {
+    id = json['id'];
+    roomId = json['roomId'];
+    type = json['type'];
+    action = json['action'];
+    identity = json['identity'];
+  }
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json.addAll({
+      'id': id,
+      'roomId': roomId,
+      'type': type,
+      'action': action,
+      'identity': identity,
+    });
+    return json;
+  }
 }
 
 //sdp约束
@@ -80,6 +101,7 @@ final Map<String, dynamic> sdpConstraints = {
   "optional": [],
 };
 
+///可以注册的事件
 enum WebrtcEvent {
   signal,
   connect,
@@ -107,7 +129,7 @@ abstract class WebrtcCorePeer {
   late RTCPeerConnection peerConnection;
 
   //主动发送数据的通道
-  late RTCDataChannel dataChannel;
+  RTCDataChannel? dataChannel;
 
   //是否需要主动建立数据通道
   bool needDataChannel = true;
@@ -133,7 +155,6 @@ abstract class WebrtcCorePeer {
   //外部使用时注册的回调方法，也就是注册事件
   //WebrtcEvent定义了事件的名称
   Map<WebrtcEvent, Function> handlers = {};
-
   //是否第一次协商
   bool firstNegotiation = true;
 
@@ -308,11 +329,11 @@ abstract class WebrtcCorePeer {
 
   /// signal状态事件
   onSignalingState(RTCSignalingState state) {
+    logger.i(
+        'signalingState:${peerConnection.signalingState},onSignalingState event:$state');
     if (destroyed) {
       return;
     }
-    logger.i(
-        'signalingState:${peerConnection.signalingState},onSignalingState event:$state');
     if (state == RTCSignalingState.RTCSignalingStateStable) {
       isNegotiating = false;
     }
@@ -321,10 +342,10 @@ abstract class WebrtcCorePeer {
 
   ///onIceCandidate事件表示本地candidate准备好，可以发送IceCandidate到远端
   onIceCandidate(RTCIceCandidate candidate) {
+    logger.i('onIceCandidate event:${candidate.toMap()}');
     if (destroyed) {
       return;
     }
-    logger.i('onIceCandidate event:${candidate.toMap()}');
     if (candidate.candidate != null && trickle) {
       //发送candidate信号
       emit(WebrtcEvent.signal,
@@ -342,6 +363,7 @@ abstract class WebrtcCorePeer {
 
   //数据通道状态事件
   onDataChannelState(RTCDataChannelState state) {
+    logger.i('onDataChannelState event:$state');
     if (destroyed) {
       return;
     }
@@ -361,21 +383,21 @@ abstract class WebrtcCorePeer {
   /// webrtc的数据通道发来的消息可以是ChainMessage，
   /// 也可以是简单的非ChainMessage，比如最简单的文本或者复合文档，也就是ChatMessage
   onMessage(RTCDataChannelMessage message) {
+    logger.i('onMessage event:${message.text}');
     if (destroyed) {
       return;
     }
     var data = message.binary;
-    logger.i('onMessage event:${message.text}');
     emit(WebrtcEvent.data, data);
   }
 
   /// 把流加入到连接中，比如把本地的视频流加入到连接中，从而让远程peer能够接收到
   /// @param {MediaStream} stream
   addStream(MediaStream stream) {
+    logger.i('addStream()');
     if (destroyed) {
       throw 'cannot addStream after peer is destroyed,ERR_DESTROYED';
     }
-    logger.i('addStream()');
     var tracks = stream.getTracks();
     for (var track in tracks) {
       addTrack(track, stream);
@@ -386,10 +408,10 @@ abstract class WebrtcCorePeer {
   /// @param {MediaStreamTrack} track
   /// @param {MediaStream} stream
   addTrack(MediaStreamTrack track, MediaStream stream) async {
+    logger.i('addTrack()');
     if (destroyed) {
       throw 'cannot addTrack after peer is destroyed,ERR_DESTROYED';
     }
-    logger.i('addTrack()');
     var streamSenders = trackSenders[track];
     if (streamSenders == null) {
       streamSenders = {};
@@ -411,10 +433,10 @@ abstract class WebrtcCorePeer {
   /// @param {MediaStream} stream
   replaceTrack(MediaStreamTrack oldTrack, MediaStreamTrack newTrack,
       MediaStream stream) async {
+    logger.i('replaceTrack()');
     if (destroyed) {
       throw 'cannot replaceTrack after peer is destroyed,ERR_DESTROYED';
     }
-    logger.i('replaceTrack()');
     var streamSenders = trackSenders[oldTrack];
     if (streamSenders != null) {
       RTCRtpSender? sender = streamSenders[stream];
@@ -437,10 +459,10 @@ abstract class WebrtcCorePeer {
   /// @param {MediaStreamTrack} track
   /// @param {MediaStream} stream
   removeTrack(MediaStreamTrack track, MediaStream stream) async {
+    logger.i('removeSender()');
     if (destroyed) {
       throw 'cannot removeTrack after peer is destroyed,ERR_DESTROYED';
     }
-    logger.i('removeSender()');
     var streamSenders = trackSenders[track];
     if (streamSenders != null) {
       RTCRtpSender? sender = streamSenders[stream];
@@ -460,10 +482,10 @@ abstract class WebrtcCorePeer {
   /// 从连接中移除流
   /// @param {MediaStream} stream
   removeStream(MediaStream stream) {
+    logger.i('removeStream');
     if (destroyed) {
       throw 'cannot removeStream after peer is destroyed,ERR_DESTROYED';
     }
-    logger.i('removeStream');
     var tracks = stream.getTracks();
     for (var track in tracks) {
       removeTrack(track, stream);
@@ -472,6 +494,7 @@ abstract class WebrtcCorePeer {
 
   ///连接的监听轨道到来的监听器，当远方由轨道来的时候执行
   onTrack(RTCTrackEvent event) {
+    logger.i('onTrack event');
     if (destroyed) {
       return;
     }
@@ -515,14 +538,15 @@ abstract class WebrtcCorePeer {
   ///被叫不能在第一次的时候主动发起协议过程，主叫或者被叫不在第一次的时候可以发起协商过程
   negotiate() async {}
 
+  ///外部在收到信号的时候调用
   signal(WebrtcSignal webrtcSignal) async {}
 
-  /// Filter trickle lines when trickle is disabled #354
+  /// 不应该被调用Filter trickle lines when trickle is disabled #354
   filterTrickle(sdp) {
     return sdp.replace('/a=ice-options:trickle\s\n/g', '');
   }
 
-  //数据通道的缓冲区大小
+  ///数据通道的缓冲区大小
   get bufferSize {
     final dataChannel = this.dataChannel;
     if (dataChannel != null) {
@@ -531,10 +555,8 @@ abstract class WebrtcCorePeer {
     return 0;
   }
 
-  //为连接加上候选的服务器
+  ///为连接加上候选的服务器
   addIceCandidate(RTCIceCandidate iceCandidate) async {
-    // var iceCandidate = RTCIceCandidate(candidate['candidate'],
-    //     candidate['sdpMid'], candidate['sdpMLineIndex']);
     await peerConnection.addCandidate(iceCandidate);
   }
 
@@ -543,15 +565,19 @@ abstract class WebrtcCorePeer {
     if (destroyed) {
       throw 'cannot send after peer is destroyed,ERR_DESTROYED';
     }
+    final dataChannel = this.dataChannel;
     if (dataChannel != null) {
       var dataChannelMessage = RTCDataChannelMessage.fromBinary(message);
-      dataChannel?.send(dataChannelMessage);
+      dataChannel.send(dataChannelMessage);
     }
   }
 
+  ///关闭连接
   destroy(String err) {
-    if (destroyed) return;
     logger.i('destroying (error: $err)');
+    if (destroyed) {
+      return;
+    }
     destroyed = true;
     connected = false;
     remoteTracks = [];
@@ -562,14 +588,14 @@ abstract class WebrtcCorePeer {
     if (dataChannel != null) {
       try {
         dataChannel.close();
-        dataChannelOpen = false;
       } catch (err) {
         logger.e('close dataChannel err:$err');
       }
-
+      dataChannelOpen = false;
       // allow events concurrent with destruction to be handled
       dataChannel.onMessage = null;
       dataChannel.onDataChannelState = null;
+      this.dataChannel = null;
     }
     final peerConnection = this.peerConnection;
     if (peerConnection != null) {
@@ -587,9 +613,6 @@ abstract class WebrtcCorePeer {
       peerConnection.onTrack = null;
       peerConnection.onDataChannel = null;
     }
-    // this.peerConnection = null;
-    // this.dataChannel = null;
-
     emit(WebrtcEvent.error, err);
     emit(WebrtcEvent.close, '');
   }
@@ -617,54 +640,51 @@ class MasterWebrtcCorePeer extends WebrtcCorePeer {
 
   ///创建offer，设置到本地会话描述，并发送offer
   createOffer() async {
+    logger.i('start createOffer');
     if (destroyed) {
       return;
     }
 
     RTCSessionDescription offer =
         await peerConnection.createOffer(sdpConstraints);
-    String? sdp = offer.sdp;
-    if (destroyed) {
-      return;
-    }
-    if (!trickle && !allowHalfTrickle && sdp != null) {
-      offer.sdp = filterTrickle(sdp);
-    }
-
     await peerConnection.setLocalDescription(offer);
     logger.i('createOffer success');
     if (destroyed) {
       return;
     }
-    if (trickle || iceComplete) {
-      await sendOffer(offer);
+    if (!iceComplete) {
+      logger.i('sendOffer iceComplete false');
     }
+    await sendOffer(offer);
   }
 
   ///调用外部方法发送offer
   sendOffer(RTCSessionDescription offer) async {
+    logger.i('sendOffer');
     if (destroyed) {
       return;
     }
     var sdp = await peerConnection.getLocalDescription();
     if (sdp == null) {
       sdp = offer;
-      logger.i('signal');
       emit(WebrtcEvent.signal,
           WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
     }
   }
 
-  //从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
+  ///从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
   @override
   signal(WebrtcSignal webrtcSignal) async {
     if (destroyed) {
       throw 'cannot signal after peer is destroyed,ERR_DESTROYED';
     }
-    logger.i('signal()');
+    String signalType = webrtcSignal.signalType;
+    logger.i('signal signalType:$signalType');
     var candidate = webrtcSignal.candidate;
+    var sdp = webrtcSignal.sdp;
     //被要求重新协商，则发起协商
-    if (webrtcSignal.renegotiate != null) {
+    if (signalType == SignalType.renegotiate.name &&
+        webrtcSignal.renegotiate != null) {
       logger.i('got request to renegotiate');
       negotiate();
     }
@@ -676,7 +696,7 @@ class MasterWebrtcCorePeer extends WebrtcCorePeer {
       //     init: data.transceiverRequest.init);
     }
     //如果是候选信息
-    else if (candidate != null) {
+    else if (signalType == SignalType.candidate.name && candidate != null) {
       RTCSessionDescription? remoteDescription =
           await peerConnection.getRemoteDescription();
       //如果远程描述已经设置，加候选，否则，加入候选清单
@@ -687,21 +707,21 @@ class MasterWebrtcCorePeer extends WebrtcCorePeer {
       }
     }
     //如果sdp信息，则设置远程描述，并处理所有的候选清单中候选服务器
-    else if (webrtcSignal.sdp != null) {
-      await peerConnection
-          .setRemoteDescription(webrtcSignal.sdp as RTCSessionDescription);
-      if (destroyed) return;
+    //对主叫节点来说，sdp应该是answer
+    else if (signalType == SignalType.sdp.name && sdp != null) {
+      await peerConnection.setRemoteDescription(sdp);
+      if (destroyed) {
+        return;
+      }
 
       for (var candidate in pendingCandidates) {
-        // Map<String, dynamic> map =
-        //     JsonUtil.toMap(candidate) as Map<String, dynamic>;
         addIceCandidate(candidate);
       }
       pendingCandidates = [];
     }
     //如果什么都不是，报错
     else {
-      destroy('signal() called with invalid signal data,ERR_SIGNALING');
+      throw 'signal called with invalid signal type,ERR_SIGNALING';
     }
   }
 
@@ -713,10 +733,10 @@ class MasterWebrtcCorePeer extends WebrtcCorePeer {
     required RTCRtpMediaType kind,
     required RTCRtpTransceiverInit init,
   }) async {
+    logger.i('addTransceiver()');
     if (destroyed) {
       throw 'cannot addTransceiver after peer is destroyed,ERR_DESTROYED';
     }
-    logger.i('addTransceiver()');
 
     //直接加上收发器，并开始协商
     try {
@@ -724,7 +744,7 @@ class MasterWebrtcCorePeer extends WebrtcCorePeer {
       negotiate();
     } catch (err) {
       logger.e(err);
-      //this.destroy(errCode(err, 'ERR_ADD_TRANSCEIVER'))
+      destroy('$err.ERR_ADD_TRANSCEIVER');
     }
   }
 }
@@ -736,6 +756,7 @@ class FollowWebrtcCorePeer extends WebrtcCorePeer {
   ///被叫的协商时发送再协商信号给主叫，要求重新发起协商
   @override
   negotiate() async {
+    logger.i('requesting negotiation from initiator');
     if (destroyed) {
       throw 'cannot negotiate after peer is destroyed,ERR_DESTROYED';
     }
@@ -751,38 +772,32 @@ class FollowWebrtcCorePeer extends WebrtcCorePeer {
       return;
     }
     //被叫收到协商的请求
-    logger.i('requesting negotiation from initiator');
-    emit(WebrtcEvent.signal, {
-      // request initiator to renegotiate
-      'type': 'renegotiate',
-      'renegotiate': true
-    });
+    emit(WebrtcEvent.signal, WebrtcSignal('renegotiate', renegotiate: true));
     isNegotiating = true;
   }
 
   ///创建answer，发生在被叫方，将answer回到主叫方
   createAnswer() async {
+    logger.i('createAnswer');
     if (destroyed) {
       return;
     }
 
     RTCSessionDescription answer =
         await peerConnection.createAnswer(sdpConstraints);
+    await peerConnection.setLocalDescription(answer);
     if (destroyed) {
       return;
     }
-    if (!trickle && !allowHalfTrickle && answer != null) {
-      answer.sdp = filterTrickle(answer.sdp);
+    if (!iceComplete) {
+      logger.i('sendAnswer iceComplete false');
     }
-
-    if (trickle || iceComplete) {
-      sendAnswer(answer);
-    }
-    await peerConnection.setLocalDescription(answer);
+    await sendAnswer(answer);
   }
 
   //发送answer
   sendAnswer(RTCSessionDescription answer) async {
+    logger.i('sendAnswer');
     if (destroyed) {
       return;
     }
@@ -790,24 +805,24 @@ class FollowWebrtcCorePeer extends WebrtcCorePeer {
     if (sdp != null) {
       sdp = answer;
     }
-    logger.i('signal');
     if (sdp != null) {
       emit(WebrtcEvent.signal,
           WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
     }
-    //if (!this.initiator) this._requestMissingTransceivers() //ios unSupport
   }
 
-  //从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
+  ///从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
   @override
   signal(WebrtcSignal webrtcSignal) async {
-    if (destroyed) throw 'cannot signal after peer is destroyed,ERR_DESTROYED';
-
-    logger.i('signal()');
+    logger.i('signal');
+    if (destroyed) {
+      throw 'cannot signal after peer is destroyed,ERR_DESTROYED';
+    }
+    String signalType = webrtcSignal.signalType;
     var candidate = webrtcSignal.candidate;
     var sdp = webrtcSignal.sdp;
     //如果是候选信息
-    if (candidate != null) {
+    if (signalType == SignalType.candidate.name && candidate != null) {
       RTCSessionDescription? remoteDescription =
           await peerConnection.getRemoteDescription();
       //如果远程描述已经设置，加候选，否则，加入候选清单
@@ -818,9 +833,11 @@ class FollowWebrtcCorePeer extends WebrtcCorePeer {
       }
     }
     //如果sdp信息，则设置远程描述，并处理所有的候选清单中候选服务器
-    else if (sdp != null) {
+    else if (signalType == SignalType.sdp.name && sdp != null) {
       await peerConnection.setRemoteDescription(sdp);
-      if (destroyed) return;
+      if (destroyed) {
+        return;
+      }
       for (var candidate in pendingCandidates) {
         addIceCandidate(candidate);
       }
@@ -828,12 +845,12 @@ class FollowWebrtcCorePeer extends WebrtcCorePeer {
       //如果远程描述是offer请求，则创建answer
       var remoteDescription = await peerConnection.getRemoteDescription();
       if (remoteDescription != null && remoteDescription.type == 'offer') {
-        createAnswer();
+        await createAnswer();
       }
     }
     //如果什么都不是，报错
     else {
-      destroy('signal() called with invalid signal data,ERR_SIGNALING');
+      throw 'signal called with invalid signal data,ERR_SIGNALING';
     }
   }
 

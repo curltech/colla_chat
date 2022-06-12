@@ -148,7 +148,7 @@ dependencies:
   audioplayers: ^0.20.1 #音频处理
   video_player: ^2.1.1 #视频播放
   flutter_image_compress: ^1.1.0 #图片压缩1
-  qr_code_scanner: ^0.7.0
+  qr_code_scanner: ^1.0.0
   extended_image: ^6.0.1
   extended_image_library: ^3.3.0
   filesystem_picker: ^2.0.1

@@ -18,7 +18,7 @@ class WebrtcPeer {
   List<MediaStream> localStreams = [];
   List<MediaStream> remoteStreams = [];
   Map<String, dynamic> options = {};
-  String? roomId;
+  Router? router;
   int? start;
   int? end;
 
@@ -43,18 +43,19 @@ class WebrtcPeer {
       {List<MediaStream> streams = const [],
       List<Map<String, String>>? iceServers,
       Map<String, dynamic> options = const {},
-      String? roomId}) {
+      Router? router}) {
     init(targetPeerId, clientId, initiator,
-        iceServers: iceServers, options: options, roomId: roomId);
+        iceServers: iceServers, options: options, router: router);
   }
 
   init(String targetPeerId, String clientId, bool initiator,
       {List<MediaStream> streams = const [],
       List<Map<String, String>>? iceServers,
       Map<String, dynamic> options = const {},
-      String? roomId}) async {
+      Router? router}) async {
     this.targetPeerId = targetPeerId;
     this.clientId = clientId;
+    this.router = router;
     var appDataProvider = AppDataProvider.instance;
     if (iceServers == null) {
       this.iceServers = appDataProvider.defaultNodeAddress.iceServers;
@@ -68,11 +69,12 @@ class WebrtcPeer {
       localStreams.addAll(streams);
     }
     // 自定义属性，表示本节点createOffer时加入的sfu的编号，作为出版者还是订阅者，还是都是
-    this.roomId = roomId;
+    this.router = router;
     start = DateTime.now().millisecondsSinceEpoch;
     Map<String, dynamic> extension = {
       'clientId': myself.clientId,
-      'peerId': myself.peerId
+      'peerId': myself.peerId,
+      'router': router?.toJson()
     };
     if (initiator) {
       this.webrtcPeer = MasterWebrtcCorePeer();
@@ -90,15 +92,12 @@ class WebrtcPeer {
     //下面的三个事件对于发起方和被发起方是一样的
     //可以发起信号
     final webrtcPeer = this.webrtcPeer;
-    webrtcPeer.on(WebrtcEvent.signal, (data) async {
-      if (this.roomId != null) {
-        data.router = this.roomId;
-      }
+    webrtcPeer.on(WebrtcEvent.signal, (WebrtcSignal signal) async {
       bool? force = extension['force'];
       if (force != null && force) {
         extension.remove('force');
       }
-      await webrtcPeerPool.emitEvent('signal', {'data': data, 'source': this});
+      await webrtcPeerPool.emit(WebrtcEvent.signal.name, {'data': signal, 'source': this});
     });
 
     //连接建立/
@@ -108,7 +107,7 @@ class WebrtcPeer {
         var interval = end! - start!;
         logger.i('connect time:$interval');
       }
-      await webrtcPeerPool.emitEvent('connect', {'source': this});
+      await webrtcPeerPool.emit(WebrtcEvent.connect.name, {'source': this});
     });
 
     webrtcPeer.on(WebrtcEvent.close, (data) async {
@@ -120,7 +119,7 @@ class WebrtcPeer {
     //收到数据
     webrtcPeer.on(WebrtcEvent.data, (data) async {
       logger.i('${DateTime.now().toUtc()}:got a message from peer: $data');
-      await webrtcPeerPool.emitEvent('data', {'data': data, 'source': this});
+      await webrtcPeerPool.emit(WebrtcEvent.data.name, {'data': data, 'source': this});
     });
 
     webrtcPeer.on(WebrtcEvent.stream, (stream) async {
@@ -131,13 +130,13 @@ class WebrtcPeer {
         };
       }
       await webrtcPeerPool
-          .emitEvent('stream', {'stream': stream, 'source': this});
+          .emit(WebrtcEvent.stream.name, {'stream': stream, 'source': this});
     });
 
     webrtcPeer.on(WebrtcEvent.track, (track, stream) async {
       logger.i('${DateTime.now().toUtc().toIso8601String()}:track');
-      await webrtcPeerPool.emitEvent(
-          'track', {'track': track, 'stream': stream, 'source': this});
+      await webrtcPeerPool.emit(
+          WebrtcEvent.track.name, {'track': track, 'stream': stream, 'source': this});
     });
 
     webrtcPeer.on(
@@ -148,7 +147,7 @@ class WebrtcPeer {
     webrtcPeer.on(name, fn);
   }
 
-  attachStream(MediaStream stream) {
+  RTCVideoView attachStream(MediaStream stream) {
     var renderer = RTCVideoRenderer();
     renderer.initialize();
     renderer.srcObject = stream;
@@ -161,36 +160,34 @@ class WebrtcPeer {
     localStreams.add(stream);
   }
 
-  /// 空参数全部删除
+  ///
   removeStream(MediaStream stream) {
-    this.removeLocalStream(stream);
-    this.removeRemoteStream(stream);
+    removeLocalStream(stream);
+    removeRemoteStream(stream);
   }
 
-  /// 空参数全部删除
+  ///
   removeLocalStream(MediaStream stream) {
     int i = 0;
-    for (var i = localStreams.length - 1; i >= 0; i--) {
-      var _stream = localStreams[i];
-      if (stream == null || _stream == stream) {
+    for (var _stream in localStreams) {
+      if (_stream == stream) {
         localStreams.remove(_stream);
         webrtcPeer.removeStream(_stream);
       }
     }
   }
 
-  /// 空参数全部删除
+  ///
   removeRemoteStream(MediaStream stream) {
-    for (var i = remoteStreams.length - 1; i >= 0; i--) {
-      var _stream = remoteStreams[i];
-      if (stream == null || _stream == stream) {
+    for (var _stream in localStreams) {
+      if (_stream == stream) {
         remoteStreams.remove(_stream);
       }
     }
   }
 
-  signal(dynamic data) {
-    webrtcPeer.signal(data);
+  signal(WebrtcSignal signal) {
+    webrtcPeer.signal(signal);
   }
 
   bool get connected {

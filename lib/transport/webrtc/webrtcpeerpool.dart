@@ -8,15 +8,20 @@ import 'package:cryptography/cryptography.dart';
 import '../../p2p/chain/action/signal.dart';
 import '../../provider/app_data.dart';
 
+///一个队列，按照被使用的新旧排序，当元素超过最大数量的时候，溢出最旧的元素
 class LruQueue<T> {
   int _maxLength = 200;
   final Map<String, T> _elements = {};
+
   //指向比自己新的元素的键值，只有最新的键值例外，指向第二新的键值
   final Map<String, String> _nexts = {};
+
   //最新的元素的键值
   String? _head;
+
   //最老的元素的键值
   String? _tail;
+
   LruQueue({int maxLength = 200}) {
     _maxLength = _maxLength;
   }
@@ -98,11 +103,15 @@ class LruQueue<T> {
 
 /// webrtc的连接池，键值是对方的peerId
 class WebrtcPeerPool {
+  ///自己的peerId,clientId和公钥
   String? peerId;
   SimplePublicKey? peerPublicKey;
   String? clientId;
+  ///对方的队列，每一个peerId的元素是一个列表，具有相同的peerId和不同的clientId
   LruQueue<List<WebrtcPeer>> webrtcPeers = LruQueue();
+  //所以注册的事件处理器
   Map<String, Function> events = {};
+  //signal事件的处理器
   late SignalAction _signalAction;
   Map<String, dynamic> protocolHandlers = {};
 
@@ -155,15 +164,17 @@ class WebrtcPeerPool {
   }
 
   ///主动方创建
-  Future<WebrtcPeer> create(
-      String peerId, String clientId, dynamic options, String roomId) async {
+  Future<WebrtcPeer> create(String peerId, String clientId,
+      {Map<String, dynamic> options = const {}, Router? router}) async {
     List<WebrtcPeer>? webrtcPeers = this.webrtcPeers.get(peerId);
     if (webrtcPeers == null) {
       webrtcPeers = [];
     }
     var webrtcPeer =
-        WebrtcPeer(peerId, clientId, true, options: options, roomId: roomId);
+        WebrtcPeer(peerId, clientId, true, options: options, router: router);
     webrtcPeers.add(webrtcPeer);
+
+    ///如果有溢出的连接，将溢出连接关闭
     List<WebrtcPeer>? outs = this.webrtcPeers.put(peerId, webrtcPeers);
     if (outs != null && outs.isNotEmpty) {
       for (WebrtcPeer out in outs) {
@@ -217,7 +228,7 @@ class WebrtcPeerPool {
         webrtcPeerPool.webrtcPeers.remove(peerId);
       }
       if (!_connected) {
-        await emitEvent('close', {'source': webrtcPeer});
+        await emit('close', {'source': webrtcPeer});
       }
 
       return true;
@@ -272,28 +283,31 @@ class WebrtcPeerPool {
   /// @param connectSessionId
   /// @param data
   receive(String peerId, String connectPeerId, String connectSessionId,
-      dynamic data) async {
-    var type = data.type;
-    if (type != null) {
-      logger.i('receive signal type: $type from webrtcPeer: $peerId');
-    }
+      WebrtcSignal signal) async {
+    var signalType = signal.signalType;
+    logger.i('receive signal type: $signalType from webrtcPeer: $peerId');
     String? clientId;
-    var extension = data['extension'];
-    if (data['extension'] != null) {
+    bool force = false;
+    List<Map<String, String>>? iceServers;
+    Router? router;
+    var extension = signal.extension;
+    if (extension != null) {
       clientId = extension['clientId'];
+      force = extension['force'];
+      iceServers = extension['iceServers'];
+      router = extension['router'];
     }
     if (clientId == null) {
       throw 'NoClient';
     }
-    bool force = extension['force'];
-    List<Map<String, String>>? iceServers = extension['iceServers'];
-    if (type == 'offer' || type == 'answer') {
-      if (clientId != null && type == 'offer' && force) {
+    var sdp=signal.sdp;
+    if (signalType == 'sdp' && sdp!=null) {
+      var type = sdp.type;
+      if (clientId != null && force) {
         await remove(peerId, clientId: clientId);
       }
     }
     WebrtcPeer? webrtcPeer;
-    var roomId = data['roomId'];
     List<WebrtcPeer>? webrtcPeers = this.webrtcPeers.get(peerId);
     // peerId的连接不存在，被动方创建WebrtcPeer，被动创建WebrtcPeer
     if (webrtcPeers == null || webrtcPeers.isEmpty) {
@@ -307,7 +321,7 @@ class WebrtcPeerPool {
         }
       }
       webrtcPeer = WebrtcPeer(peerId, clientId, false,
-          iceServers: iceServers, roomId: roomId);
+          iceServers: iceServers, router: router);
       webrtcPeer.connectPeerId = connectPeerId;
       webrtcPeer.connectSessionId = connectSessionId;
       List<WebrtcPeer> webrtcPeers = [webrtcPeer];
@@ -336,7 +350,7 @@ class WebrtcPeerPool {
       if (clientId != null) {
         webrtcPeer.clientId = clientId;
       }
-      webrtcPeer.signal(data);
+      webrtcPeer.signal(signal);
     }
   }
 
@@ -386,7 +400,7 @@ class WebrtcPeerPool {
     }
   }
 
-  Future<dynamic> emitEvent(String name, dynamic evt) async {
+  Future<dynamic> emit(String name, dynamic evt) async {
     if (events.containsKey(name)) {
       var func = events[name];
       if (func != null) {
