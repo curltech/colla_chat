@@ -107,7 +107,7 @@ final Map<String, dynamic> sdpConstraints = {
 };
 
 ///可以注册的事件
-enum WebrtcEvent {
+enum WebrtcEventType {
   signal,
   connect,
   close,
@@ -159,7 +159,7 @@ abstract class WebrtcCorePeer {
 
   //外部使用时注册的回调方法，也就是注册事件
   //WebrtcEvent定义了事件的名称
-  Map<WebrtcEvent, Function> handlers = {};
+  Map<WebrtcEventType, Function> handlers = {};
 
   //是否第一次协商
   bool firstNegotiation = true;
@@ -201,7 +201,7 @@ abstract class WebrtcCorePeer {
   ///可输入的参数包括外部媒体流和定制扩展属性
   Future<bool> init(
       {List<MediaStream> streams = const [],
-      SignalExtension? extension}) async {
+      required SignalExtension extension}) async {
     id = await cryptoGraphy.getRandomAsciiString(length: 8);
     this.extension = extension;
     var appDataProvider = AppDataProvider.instance;
@@ -295,7 +295,7 @@ abstract class WebrtcCorePeer {
     if (destroyed) {
       return;
     }
-    emit(WebrtcEvent.connectionState, state);
+    emit(WebrtcEventType.connectionState, state);
     if (peerConnection.connectionState ==
         RTCPeerConnectionState.RTCPeerConnectionStateFailed) {
       destroy('Connection failed.ERR_CONNECTION_FAILURE');
@@ -310,7 +310,7 @@ abstract class WebrtcCorePeer {
       return;
     }
 
-    emit(WebrtcEvent.iceConnectionState, state);
+    emit(WebrtcEventType.iceConnectionState, state);
     if (state == RTCIceConnectionState.RTCIceConnectionStateConnected ||
         state == RTCIceConnectionState.RTCIceConnectionStateCompleted) {
       connected = true;
@@ -329,7 +329,7 @@ abstract class WebrtcCorePeer {
     if (destroyed) {
       return;
     }
-    emit(WebrtcEvent.iceGatheringState, state);
+    emit(WebrtcEventType.iceGatheringState, state);
   }
 
   /// signal状态事件
@@ -342,7 +342,7 @@ abstract class WebrtcCorePeer {
     if (state == RTCSignalingState.RTCSignalingStateStable) {
       isNegotiating = false;
     }
-    emit(WebrtcEvent.signalingState, state);
+    emit(WebrtcEventType.signalingState, state);
   }
 
   ///onIceCandidate事件表示本地candidate准备好，可以发送IceCandidate到远端
@@ -353,12 +353,12 @@ abstract class WebrtcCorePeer {
     }
     if (candidate.candidate != null) {
       //发送candidate信号
-      emit(WebrtcEvent.signal,
+      emit(WebrtcEventType.signal,
           WebrtcSignal(SignalType.candidate.name, candidate: candidate));
     } else if (candidate.candidate == null && !iceComplete) {
       iceComplete = true;
       logger.i('onIceCandidate event，iceComplete true');
-      emit(WebrtcEvent.iceComplete, '');
+      emit(WebrtcEventType.iceComplete, '');
     }
   }
 
@@ -393,7 +393,7 @@ abstract class WebrtcCorePeer {
       return;
     }
     var data = message.binary;
-    emit(WebrtcEvent.data, data);
+    emit(WebrtcEventType.data, data);
   }
 
   /// 把流加入到连接中，比如把本地的视频流加入到连接中，从而让远程peer能够接收到
@@ -506,7 +506,7 @@ abstract class WebrtcCorePeer {
 
     for (var eventStream in event.streams) {
       logger.i('on track');
-      emit(WebrtcEvent.track, {event.track: eventStream});
+      emit(WebrtcEventType.track, {event.track: eventStream});
       remoteTracks.add({event.track: eventStream});
 
       if (remoteStreams.isNotEmpty) {
@@ -517,14 +517,14 @@ abstract class WebrtcCorePeer {
 
       remoteStreams.add(eventStream);
       logger.i('on stream');
-      emit(WebrtcEvent.stream, eventStream);
+      emit(WebrtcEventType.stream, eventStream);
     }
   }
 
   /// 注册一组回调函数，内部可以调用外部注册事件的方法
   /// name包括'signal','stream','track'
   /// 内部通过调用emit方法调用外部注册的方法
-  on(WebrtcEvent name, Function? fn) {
+  on(WebrtcEventType name, Function? fn) {
     if (fn != null) {
       handlers[name] = fn;
     } else {
@@ -533,7 +533,7 @@ abstract class WebrtcCorePeer {
   }
 
   /// 调用外部事件注册方法
-  emit(WebrtcEvent name, dynamic event) {
+  emit(WebrtcEventType name, dynamic event) {
     var handler = handlers[name];
     if (handler != null) {
       handler(event);
@@ -613,8 +613,8 @@ abstract class WebrtcCorePeer {
       peerConnection.onTrack = null;
       peerConnection.onDataChannel = null;
     }
-    emit(WebrtcEvent.error, err);
-    emit(WebrtcEvent.close, '');
+    emit(WebrtcEventType.error, err);
+    emit(WebrtcEventType.close, '');
   }
 }
 
@@ -667,7 +667,7 @@ class MasterWebrtcCorePeer extends WebrtcCorePeer {
     var sdp = await peerConnection.getLocalDescription();
     if (sdp == null) {
       sdp = offer;
-      emit(WebrtcEvent.signal,
+      emit(WebrtcEventType.signal,
           WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
     }
   }
@@ -772,7 +772,7 @@ class FollowWebrtcCorePeer extends WebrtcCorePeer {
       return;
     }
     //被叫收到协商的请求
-    emit(WebrtcEvent.signal, WebrtcSignal('renegotiate', renegotiate: true));
+    emit(WebrtcEventType.signal, WebrtcSignal('renegotiate', renegotiate: true));
     isNegotiating = true;
   }
 
@@ -806,7 +806,7 @@ class FollowWebrtcCorePeer extends WebrtcCorePeer {
       sdp = answer;
     }
     if (sdp != null) {
-      emit(WebrtcEvent.signal,
+      emit(WebrtcEventType.signal,
           WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
     }
   }
@@ -868,7 +868,7 @@ class FollowWebrtcCorePeer extends WebrtcCorePeer {
     logger.i('addTransceiver()');
 
     emit(
-        WebrtcEvent.signal,
+        WebrtcEventType.signal,
         WebrtcSignal(SignalType.transceiverRequest.name,
             transceiverRequest: {'kind': kind, 'init': init}));
   }
