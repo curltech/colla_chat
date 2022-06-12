@@ -41,7 +41,9 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
 
   @override
   Widget build(BuildContext context) {
-    var locale = Provider.of<AppDataProvider>(context).locale;
+    Provider.of<AppDataProvider>(context).locale;
+    Provider.of<AppDataProvider>(context).themeData;
+    Provider.of<AppDataProvider>(context).brightness;
     var instance = AppLocalizations.instance;
     List<S2Choice<String>> items = [];
     for (var nodeAddressOption in nodeAddressOptions.values) {

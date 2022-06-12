@@ -20,7 +20,9 @@ class BrightnessPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var locale = Provider.of<AppDataProvider>(context).locale;
+    Provider.of<AppDataProvider>(context).locale;
+    Provider.of<AppDataProvider>(context).themeData;
+    Provider.of<AppDataProvider>(context).brightness;
     var items = _buildItems(context);
     var instance = AppLocalizations.instance;
     return SmartSelect<String>.single(

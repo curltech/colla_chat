@@ -1,5 +1,6 @@
 import 'package:colla_chat/provider/app_data.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../../l10n/localization.dart';
 import '../../../routers/application.dart';
 import '../../../routers/routes.dart';
@@ -41,6 +42,9 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<AppDataProvider>(context).locale;
+    Provider.of<AppDataProvider>(context).themeData;
+    Provider.of<AppDataProvider>(context).brightness;
     return Card(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

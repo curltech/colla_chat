@@ -9,6 +9,9 @@ class LocalePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<AppDataProvider>(context).locale;
+    Provider.of<AppDataProvider>(context).themeData;
+    Provider.of<AppDataProvider>(context).brightness;
     List<S2Choice<String>> items = [];
     for (var localeOption in localeOptions) {
       var item = S2Choice<String>(

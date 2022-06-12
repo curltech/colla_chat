@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:provider/provider.dart';
 
 import '../../../provider/app_data.dart';
 import '../../../l10n/localization.dart';
@@ -67,6 +68,9 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
         _confirmPassword = confirmPasswordController.text;
       });
     });
+    Provider.of<AppDataProvider>(context).locale;
+    Provider.of<AppDataProvider>(context).themeData;
+    Provider.of<AppDataProvider>(context).brightness;
     return Card(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
