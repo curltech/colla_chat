@@ -34,6 +34,16 @@ class _MobileIndexState extends State<MobileIndex> {
     super.initState();
   }
 
+  Color? _getIconColor(int index){
+    if (index==_currentIndex){
+      return Provider.of<AppDataProvider>(context)
+          .themeData
+          ?.colorScheme.primary;
+    }else{
+      return Colors.grey;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     var appBar = AppBar(
@@ -44,10 +54,7 @@ class _MobileIndexState extends State<MobileIndex> {
       ),
       actions: [],
     );
-    BottomNavigationBar bottomNavigationBar;
-    //左边栏，和底部按钮功能一样，在桌面版才有
-    Container drawer;
-    bottomNavigationBar = BottomNavigationBar(
+    BottomNavigationBar bottomNavigationBar = BottomNavigationBar(
       //底部按钮，移动版才有
       items: <BottomNavigationBarItem>[
         BottomNavigationBarItem(
@@ -71,18 +78,16 @@ class _MobileIndexState extends State<MobileIndex> {
       showUnselectedLabels: true,
       onTap: _onItemTapped,
     );
-    drawer = Container(
+    //左边栏，和底部按钮功能一样，在桌面版才有
+    Container drawer = Container(
         constraints:
-            BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
-        color: Colors.grey.shade800,
+            BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.3),
         child: Drawer(
+          width: MediaQuery.of(context).size.width * 0.15,
           child: ListView(
             children: <Widget>[
-              UserAccountsDrawerHeader(
-                accountEmail: Text('hujs@colla.cc'),
-                accountName: Text('胡劲松'),
-              ),
               ListTile(
+                  iconColor: _getIconColor(0),
                   leading: Icon(Icons.chat),
                   title: Text(_widgetLabels.elementAt(0)),
                   onTap: () {
@@ -92,6 +97,7 @@ class _MobileIndexState extends State<MobileIndex> {
                     });
                   }),
               ListTile(
+                  iconColor: _getIconColor(1),
                   leading: Icon(Icons.contacts),
                   title: Text(_widgetLabels.elementAt(1)),
                   onTap: () {
@@ -101,6 +107,7 @@ class _MobileIndexState extends State<MobileIndex> {
                     });
                   }),
               ListTile(
+                  iconColor: _getIconColor(2),
                   leading: Icon(Icons.wifi_channel),
                   title: Text(_widgetLabels.elementAt(2)),
                   onTap: () {
@@ -110,6 +117,7 @@ class _MobileIndexState extends State<MobileIndex> {
                     });
                   }),
               ListTile(
+                  iconColor: _getIconColor(3),
                   leading: Icon(Icons.person),
                   title: Text(_widgetLabels.elementAt(3)),
                   onTap: () {

@@ -143,7 +143,7 @@ class MyselfPeerService extends PeerEntityService {
       var peerClient = PeerClient.fromJson(json);
       peerClient.activeStatus = ActiveStatus.Up.name;
       peerClient.clientId = myselfPeer.clientId;
-      peerClient.expireDate = DateTime.now().millisecond;
+      peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
       peerClient.kind = null;
       peerClient.name = null;
       var loginStatus = await connectAction.connect(peerClient);
@@ -154,6 +154,36 @@ class MyselfPeerService extends PeerEntityService {
     }
 
     return false;
+  }
+
+  Future<bool> logout() async {
+    ///本地查找账户
+    var peerId = myself.peerId;
+    if (peerId == null) {
+      return true;
+    }
+    var logoutStatus = false;
+    var peer = await myselfPeerService.findOneEffectiveByPeerId(peerId);
+    if (peer != null) {
+      /// 1.验证账户与密码匹配
+      var myselfPeer = MyselfPeer.fromJson(peer);
+
+      ///2.连接篇p2p的节点，把自己的信息注册上去
+      var json = JsonUtil.toMap(myselfPeer);
+      var peerClient = PeerClient.fromJson(json);
+      peerClient.activeStatus = ActiveStatus.Down.name;
+      peerClient.clientId = myselfPeer.clientId;
+      peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
+      peerClient.kind = null;
+      peerClient.name = null;
+      logoutStatus = await connectAction.connect(peerClient);
+      if (!logoutStatus) {
+        logger.e('logout fail');
+      }
+    }
+    myselfService.clear();
+
+    return logoutStatus;
   }
 }
 
