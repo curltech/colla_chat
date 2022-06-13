@@ -90,7 +90,8 @@ class ChatMessage extends StatusEntity {
   String? targetPeerId; // 目标的唯一id标识（单聊对应linkman-peerId，群聊对应group-peerId）
   String? targetType; // 包括：Linkman（单聊）, Group（群聊）,Channel,
   String? targetName;
-  //接受的人是自己，记录发送者的id和名称
+  //当发送者向群里发消息，自己作为群成员的时候
+  //targetPeerId是群的peerId，senderPeerId是发送者的peerId，其他时候为空
   String? senderPeerId; // 消息发送方（作者）peerId
   String? senderType;
   String? senderName;

@@ -1,32 +1,73 @@
+import 'package:colla_chat/pages/chat/linkman/linkman_add.dart';
+import 'package:colla_chat/provider/linkman_data.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../../../widgets/common/data_listview.dart';
+import '../../../l10n/localization.dart';
+import 'linkman_widget.dart';
 
-final Map<String, List<TileData>> mockTileData = {
-  '未知': [
-    TileData(
-        icon: const Icon(Icons.collections),
-        title: '收藏',
-        routeName: '/chat/collection'),
-    TileData(
-        icon: const Icon(Icons.settings),
-        title: '设置',
-        routeName: '/chat/setting'),
-  ]
-};
+//好友页面
+class Linkman extends StatefulWidget {
+  const Linkman({Key? key}) : super(key: key);
 
-//我的页面
-class Linkman extends StatelessWidget {
-  late final Map<String, List<TileData>> linkmanTileData = mockTileData;
+  @override
+  State<StatefulWidget> createState() => _LinkmanState();
+}
 
-  Linkman({Key? key}) : super(key: key);
+class _LinkmanState extends State<Linkman> {
+  int _currentIndex = 0;
+  late List<Widget> _children;
+
+  @override
+  void initState() {
+    super.initState();
+    // 初始化子项集合
+    var linkmanWidget = const LinkmanWidget();
+    var linkmanAddWidget = const LinkmanAddWidget();
+    _children = [
+      linkmanWidget,
+      linkmanAddWidget,
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
-    var body = DataListView(tileData: linkmanTileData);
-    return Scaffold(
-      //列表
-      body: body,
+    var stack = IndexedStack(
+      index: _currentIndex,
+      children: _children,
+    );
+    var appBar = AppBar(
+      title: Text(AppLocalizations.t('Linkman')),
+      actions: [
+        IconButton(
+            onPressed: () async {
+              setState(() {
+                _currentIndex = 0;
+              });
+            },
+            icon: const Icon(Icons.person),
+            tooltip: AppLocalizations.t('Linkman')),
+        IconButton(
+          onPressed: () async {
+            setState(() {
+              _currentIndex = 1;
+            });
+          },
+          icon: const Icon(Icons.person_add),
+          tooltip: AppLocalizations.t('Add'),
+        ),
+      ],
+    );
+    return ChangeNotifierProvider.value(
+      value: LinkmenDataProvider(),
+      child: Scaffold(
+          appBar: appBar,
+          body: Center(
+              child: SizedBox(
+            width: 380,
+            height: 500,
+            child: stack,
+          ))),
     );
   }
 }

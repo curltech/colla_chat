@@ -1,8 +1,4 @@
-import 'package:colla_chat/entity/dht/peerprofile.dart';
-
 import '../base.dart';
-import 'myselfpeer.dart';
-import 'package:cryptography/cryptography.dart';
 
 enum ActiveStatus { Up, Down }
 
@@ -11,7 +7,7 @@ abstract class PeerLocation extends StatusEntity {
   /// ed25519的公钥,表明身份,用于人，设备，如果是libp2p节点直接使用libp2p的id
   String? peerId;
   String? kind;
-  String? name;
+  String name = '';
   String? securityContext;
 
   ///   ed25519的公私钥,表明身份，用于签名

@@ -34,7 +34,7 @@ enum ActiveStatus { DOWN, UP }
 abstract class Party extends StatusEntity {
   String? ownerPeerId; // 区分属主
   String? peerId; // peerId,事实上的单个属主的主键
-  String? name; // 用户名
+  String name; // 用户名
   String? pyName; // 用户名拼音
   String? mobile; // 手机号
   String? email; // 手机号
@@ -63,7 +63,7 @@ abstract class Party extends StatusEntity {
   String? pyTag; //: 标签拼音
   List<Tag> tags = [];
 
-  Party() : super();
+  Party(this.name) : super();
 
   Party.fromJson(Map json)
       : ownerPeerId = json['ownerPeerId'],
@@ -137,7 +137,7 @@ abstract class Party extends StatusEntity {
 
 // 联系人，或者叫好友，发起请求通过后才能成为联系人
 class Linkman extends Party {
-  Linkman() : super();
+  Linkman(String name) : super(name);
 
   Linkman.fromJson(Map json) : super.fromJson(json);
 
@@ -211,7 +211,7 @@ class PartyRequest extends Party {
   String? myAlias; // 发送人在本群的昵称
   String? content; // 消息数据（群成员列表）
 
-  PartyRequest();
+  PartyRequest(String name) : super(name);
 
   PartyRequest.fromJson(Map json)
       : requestType = json['requestType'],
@@ -250,7 +250,7 @@ class Group extends Party {
   String? groupOwnerPeerId; // 群主peerId
   List<Linkman> members = [];
 
-  Group();
+  Group(String name) : super(name);
 
   Group.fromJson(Map json)
       : groupCategory = json['groupCategory'],
@@ -314,7 +314,7 @@ class Contact extends Party {
   String? trustLevel;
   bool isLinkman = false;
 
-  Contact();
+  Contact(String name) : super(name);
 
   Contact.fromJson(Map json)
       : formattedName = json['formattedName'],

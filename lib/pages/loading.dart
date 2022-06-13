@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../routers/application.dart';
 import '../routers/routes.dart';
 
@@ -54,7 +55,7 @@ class _LoadingState extends State<Loading> {
       });
     }
 
-    Future.delayed(Duration(seconds: 10), () {
+    Future.delayed(Duration(seconds: 1), () {
       Application.router.navigateTo(context, Routes.p2pLogin, replace: true);
     });
   }

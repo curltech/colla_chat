@@ -40,17 +40,17 @@ class MyselfPeerService extends PeerEntityService {
   }
 
   Future<Map?> findOneByLogin(String credential) async {
-    var where = 'peerId=? or mobile=? or name=? or email=?';
-    var whereArgs = [credential, credential, credential, credential];
-    var peers = await find(where, whereArgs: whereArgs);
-    if (peers.isNotEmpty) {
-      for (var peer in peers) {
-        if (peer['status'] == EntityStatus.Effective.name) {
-          return peer;
-        }
-      }
-    }
-    return null;
+    var where = '(peerId=? or mobile=? or name=? or email=?) and status=?';
+    var whereArgs = [
+      credential,
+      credential,
+      credential,
+      credential,
+      EntityStatus.Effective.name
+    ];
+    var peer = await findOne(where, whereArgs: whereArgs);
+
+    return peer;
   }
 
   /// 注册新的p2p账户
@@ -137,6 +137,7 @@ class MyselfPeerService extends PeerEntityService {
       /// 1.验证账户与密码匹配
       var myselfPeer = MyselfPeer.fromJson(peer);
       await myselfService.setMyself(myselfPeer, password);
+      return true;
 
       ///2.连接篇p2p的节点，把自己的信息注册上去
       var json = JsonUtil.toMap(myselfPeer);
@@ -145,7 +146,7 @@ class MyselfPeerService extends PeerEntityService {
       peerClient.clientId = myselfPeer.clientId;
       peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
       peerClient.kind = null;
-      peerClient.name = null;
+      peerClient.name = '';
       var loginStatus = await connectAction.connect(peerClient);
 
       return loginStatus;
@@ -175,7 +176,7 @@ class MyselfPeerService extends PeerEntityService {
       peerClient.clientId = myselfPeer.clientId;
       peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
       peerClient.kind = null;
-      peerClient.name = null;
+      peerClient.name = '';
       logoutStatus = await connectAction.connect(peerClient);
       if (!logoutStatus) {
         logger.e('logout fail');

@@ -1,4 +1,4 @@
-import 'package:colla_chat/tool/util.dart';
+import '../tool/util.dart';
 
 class Sql {
   late String clause;
@@ -79,16 +79,16 @@ class SqlBuilder {
       query = '$query*';
     }
     query = '$query FROM $table';
-    if (where != null) {
+    if (StringUtil.isNotEmpty(where)) {
       query = '$query WHERE $where';
     }
-    if (orderBy != null) {
+    if (StringUtil.isNotEmpty(orderBy)) {
       query = '$query ORDER BY $orderBy';
     }
-    if (groupBy != null) {
+    if (StringUtil.isNotEmpty(groupBy)) {
       query = '$query GROUP BY $groupBy';
     }
-    if (having != null) {
+    if (StringUtil.isNotEmpty(having)) {
       query = '$query HAVING $having';
     }
     if (limit != null && limit > 0) {

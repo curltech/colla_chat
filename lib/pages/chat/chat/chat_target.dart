@@ -1,24 +1,17 @@
 import 'package:flutter/material.dart';
 
+import '../../../l10n/localization.dart';
 import '../../../tool/util.dart';
 import '../../../widgets/common/data_listview.dart';
 
 final Map<String, List<TileData>> mockTileData = {
   '群': [
-    TileData(
-        title: '家庭群',
-        subtitle: '美国留学',
-        suffix: DateUtil.currentDate()),
-    TileData(
-        title: 'MBA群',
-        subtitle: '上海团购',
-        suffix: DateUtil.currentDate()),
+    TileData(title: '家庭群', subtitle: '美国留学', suffix: DateUtil.currentDate()),
+    TileData(title: 'MBA群', subtitle: '上海团购', suffix: DateUtil.currentDate()),
   ],
   '个人': [
-    TileData(
-        title: '李志群', subtitle: '', suffix: DateUtil.currentDate()),
-    TileData(
-        title: '胡百水', subtitle: '', suffix: DateUtil.currentDate()),
+    TileData(title: '李志群', subtitle: '', suffix: DateUtil.currentDate()),
+    TileData(title: '胡百水', subtitle: '', suffix: DateUtil.currentDate()),
   ]
 };
 
@@ -32,7 +25,15 @@ class ChatTarget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var appBar = AppBar(
+      elevation: 0,
+      centerTitle: false,
+      title: Text(
+        AppLocalizations.instance.text('Chat'),
+      ),
+      actions: [],
+    );
     var body = DataListView(tileData: chatTargets);
-    return Scaffold(body: body);
+    return Scaffold(appBar: appBar, body: body);
   }
 }

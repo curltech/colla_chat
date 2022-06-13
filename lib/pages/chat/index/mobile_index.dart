@@ -34,26 +34,19 @@ class _MobileIndexState extends State<MobileIndex> {
     super.initState();
   }
 
-  Color? _getIconColor(int index){
-    if (index==_currentIndex){
+  Color? _getIconColor(int index) {
+    if (index == _currentIndex) {
       return Provider.of<AppDataProvider>(context)
           .themeData
-          ?.colorScheme.primary;
-    }else{
+          ?.colorScheme
+          .primary;
+    } else {
       return Colors.grey;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    var appBar = AppBar(
-      elevation: 0,
-      centerTitle: false,
-      title: Text(
-        AppLocalizations.instance.text('CollaChat'),
-      ),
-      actions: [],
-    );
     BottomNavigationBar bottomNavigationBar = BottomNavigationBar(
       //底部按钮，移动版才有
       items: <BottomNavigationBarItem>[
@@ -181,7 +174,6 @@ class _MobileIndexState extends State<MobileIndex> {
     var platformParams = PlatformParams.instance;
     if (platformParams.android || platformParams.ios) {
       scaffold = Scaffold(
-          appBar: appBar,
           body: Center(
               child: IndexedStack(
                   index: 0, children: <Widget>[children[_currentIndex]])),
@@ -189,7 +181,6 @@ class _MobileIndexState extends State<MobileIndex> {
           bottomNavigationBar: bottomNavigationBar);
     } else {
       scaffold = Scaffold(
-          appBar: appBar,
           body: Center(
               child: IndexedStack(
                   index: 0, children: <Widget>[children[_currentIndex]])),

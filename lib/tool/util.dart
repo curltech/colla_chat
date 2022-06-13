@@ -5,20 +5,19 @@ import 'dart:ui';
 
 import 'package:colla_chat/platform.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:mobile_number/mobile_number.dart';
-import 'package:phone_numbers_parser/phone_numbers_parser.dart'
-    as phone_numbers_parser;
+import 'package:network_info_plus/network_info_plus.dart';
 import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:phone_number/phone_number.dart' as phone_number;
-import 'package:network_info_plus/network_info_plus.dart';
-import 'package:device_info_plus/device_info_plus.dart';
-import 'package:share_plus/share_plus.dart';
+import 'package:phone_numbers_parser/phone_numbers_parser.dart'
+    as phone_numbers_parser;
 import 'package:sensors_plus/sensors_plus.dart';
-import 'package:flutter_contacts/flutter_contacts.dart';
-import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:telephony/telephony.dart';
 
 import '../provider/app_data.dart';
@@ -74,7 +73,7 @@ class TypeUtil {
 
 class StringUtil {
   // 是否是空字符串
-  static bool isEmptyString(String str) {
+  static bool isEmpty(String? str) {
     if (str == null || str.isEmpty) {
       return true;
     }
@@ -82,7 +81,7 @@ class StringUtil {
   }
 
   // 是否不是空字符串
-  static bool isNotEmptyString(String str) {
+  static bool isNotEmpty(String? str) {
     if (str != null && str.isNotEmpty) {
       return true;
     }
@@ -160,7 +159,7 @@ class PhoneNumberUtil {
 
   // 格式化手机号为344
   static String formatMobile344(String mobile) {
-    if (StringUtil.isEmptyString(mobile)) return '';
+    if (StringUtil.isEmpty(mobile)) return '';
     mobile =
         mobile.replaceAllMapped(new RegExp(r"(^\d{3}|\d{4}\B)"), (Match match) {
       return '${match.group(0)} ';

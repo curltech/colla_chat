@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../l10n/localization.dart';
 import '../../../widgets/common/data_listview.dart';
 
 final Map<String, List<TileData>> mockTileData = {
@@ -23,8 +24,17 @@ class Channel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var appBar = AppBar(
+      elevation: 0,
+      centerTitle: false,
+      title: Text(
+        AppLocalizations.instance.text('Channel'),
+      ),
+      actions: [],
+    );
     var body = DataListView(tileData: channelTileData);
     return Scaffold(
+      appBar: appBar,
       //列表
       body: body,
     );
