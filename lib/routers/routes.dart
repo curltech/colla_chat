@@ -6,8 +6,7 @@ class Routes {
   static String loading = '/';
   static String remoteLogin = '/remote_login';
   static String p2pLogin = '/p2p_login';
-  static String mobileIndex = '/mobileIndex';
-  static String desktopIndex = '/desktopIndex';
+  static String index = '/index';
 
   static void configureRoutes(FluroRouter router) {
     router.notFoundHandler = Handler(
@@ -19,6 +18,6 @@ class Routes {
     router.define(loading, handler: loadingHandler);
     router.define(remoteLogin, handler: remoteLoginHandler);
     router.define(p2pLogin, handler: p2pLoginHandler);
-    router.define(mobileIndex, handler: mobileIndexHandler);
+    router.define(index, handler: indexHandler);
   }
 }

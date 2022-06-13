@@ -23,12 +23,8 @@ class NavigatorUtil {
   }
 
   // 跳转到主页面
-  static void goMobileIndexPage(BuildContext context) {
-    Application.router.navigateTo(context, Routes.mobileIndex, replace: true);
-  }
-
-  static void goDesktopIndexPage(BuildContext context) {
-    Application.router.navigateTo(context, Routes.desktopIndex, replace: true);
+  static void goIndexPage(BuildContext context) {
+    Application.router.navigateTo(context, Routes.index, replace: true);
   }
 
   /// 跳转到 转场动画 页面 ， 这边只展示 inFromLeft ，剩下的自己去尝试下，

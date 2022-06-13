@@ -26,7 +26,7 @@ Handler p2pLoginHandler = Handler(
 });
 
 // 首页
-Handler mobileIndexHandler = Handler(
+Handler indexHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return const MobileIndex(
     title: '',

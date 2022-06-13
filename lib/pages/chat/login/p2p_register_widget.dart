@@ -232,7 +232,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
           mobile: _mobile, email: _email);
       if (registerStatus) {
         Application.router
-            .navigateTo(context, Routes.mobileIndex, replace: true);
+            .navigateTo(context, Routes.index, replace: true);
       }
     } else {
       logger.e('password is not matched');

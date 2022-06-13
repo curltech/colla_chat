@@ -121,7 +121,7 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
       'password_': _password,
     });
     if (stockUser.loginStatus == true) {
-      Application.router.navigateTo(context, Routes.mobileIndex, replace: true);
+      Application.router.navigateTo(context, Routes.index, replace: true);
     }
   }
 }
