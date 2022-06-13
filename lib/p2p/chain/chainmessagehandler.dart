@@ -1,4 +1,4 @@
-import 'package:colla_chat/crypto/cryptography.dart';
+import 'package:dio/dio.dart';
 
 import '../../provider/app_data.dart';
 import '../../crypto/util.dart';
@@ -57,8 +57,8 @@ class ChainMessageHandler {
   /// @param data
   /// @param remotePeerId
   /// @param remoteAddr
-  Future<ChainMessage> responseRaw(
-      List<int> data, String remotePeerId, String remoteAddr) async {
+  Future<ChainMessage> responseRaw(List<int> data,
+      {String? remotePeerId, String? remoteAddr}) async {
     ChainMessage response;
     var json = JsonUtil.toMap(String.fromCharCodes(data));
     ChainMessage chainMessage = ChainMessage.fromJson(json);
@@ -82,9 +82,7 @@ class ChainMessageHandler {
     /// 目前flutter没有libp2p的客户端，所以connectPeerId总是为空，不支持走libp2p协议
     var connectPeerId = msg.connectPeerId;
     var connectAddress = msg.connectAddress;
-    List<int> data = [];
     await chainMessageHandler.encrypt(msg);
-    data = MessageSerializer.marshal(msg);
     //// 发送数据后返回的响应数据
     var success = false;
     dynamic result;
@@ -94,16 +92,21 @@ class ChainMessageHandler {
           connectAddress.startsWith('ws')) {
         var websocket = WebsocketPool.instance.get(connectAddress);
         if (websocket != null) {
-          websocket.sendMsg(data);
+          var data = MessageSerializer.marshal(msg);
+          await websocket.sendMsg(data);
           success = true;
         }
       }
-      if (!success == false &&
+      if (!success &&
           connectAddress != null &&
           connectAddress.startsWith('http')) {
         var httpClient = HttpClientPool.instance.get(connectAddress);
         if (httpClient != null) {
-          result = httpClient.send('/receive', data);
+          var data = JsonUtil.toJsonString(msg);
+          Response response = await httpClient.send('/receive', data);
+          if (response != null) {
+            result = response.data;
+          }
           success = true;
         }
       }
@@ -113,9 +116,15 @@ class ChainMessageHandler {
     }
 
     // 把响应数据转换成chainmessage
-    if (result != null && result.data != null) {
-      var response = await chainMessageHandler.responseRaw(
-          result.data, result.remotePeerId, result.remoteAddr);
+    if (result != null) {
+      ChainMessage? response;
+      if (result is Map) {
+        response = ChainMessage.fromJson(result);
+        response = await chainMessageHandler.receive(response);
+      } else if (result is List<int>) {
+        response = await chainMessageHandler.responseRaw(result);
+      }
+
       return response;
     }
 

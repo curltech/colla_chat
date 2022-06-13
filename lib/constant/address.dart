@@ -6,9 +6,9 @@ final Map<String, NodeAddress> nodeAddressOptions = {
   'default': NodeAddress('localhost',
       wsConnectAddress: 'wss://localhost:9090/websocket',
       httpConnectAddress: 'https://localhost:9090',
-      connectPeerId: '12D3KooWPUFtWFhP2HbAKbGEo8Xfru4Y68su1e1so4Ndr5Xb1cF4',
+      connectPeerId: '12D3KooWGHzEzdyaet3Qk4mSVHcvXUh6CJTX8tCus9ZmrMXpi6HV',
       libp2pConnectAddress:
-          '/ip4/127.0.0.1/tcp/5720/wss/p2p/12D3KooWPUFtWFhP2HbAKbGEo8Xfru4Y68su1e1so4Ndr5Xb1cF4',
+          '/ip4/127.0.0.1/tcp/5720/wss/p2p/12D3KooWGHzEzdyaet3Qk4mSVHcvXUh6CJTX8tCus9ZmrMXpi6HV',
       iceServers: [
         {
           'urls': 'stun:localhost:3478',

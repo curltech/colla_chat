@@ -44,6 +44,7 @@ class ChainMessage extends SecurityContext {
 
   int sliceSize = 0;
   int sliceNumber = 0;
+  int statusCode=0;
 
   ChainMessage();
 
@@ -68,8 +69,9 @@ class ChainMessage extends SecurityContext {
             json['needSlice'] == true || json['needSlice'] == 1 ? true : false,
         payloadType = json['payloadType'],
         createTimestamp = json['createTimestamp'],
-        sliceSize = json['sliceSize'],
-        sliceNumber = json['sliceNumber'],
+        sliceSize = json['sliceSize'] ?? 0,
+        sliceNumber = json['sliceNumber'] ?? 0,
+        statusCode = json['statusCode'] ?? 0,
         super.fromJson(json);
 
   @override
@@ -97,6 +99,7 @@ class ChainMessage extends SecurityContext {
       'createTimestamp': createTimestamp,
       'sliceSize': sliceSize,
       'sliceNumber': sliceNumber,
+      'statusCode': statusCode,
     });
     return json;
   }

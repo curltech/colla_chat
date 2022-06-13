@@ -7,6 +7,8 @@ import '../../../routers/routes.dart';
 import '../../../service/dht/myselfpeer.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../tool/util.dart';
+
 /// 远程登录组件，一个card下的录入框和按钮组合
 class P2pLoginWidget extends StatefulWidget {
   const P2pLoginWidget({Key? key}) : super(key: key);
@@ -122,9 +124,15 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
   Future<void> _login() async {
     AppDataProvider appParams = AppDataProvider.instance;
     await appParams.saveAppParams();
-    var loginStatus = await myselfPeerService.login(_credential, _password);
-    if (loginStatus) {
-      Application.router.navigateTo(context, Routes.mobileIndex, replace: true);
-    }
+    myselfPeerService.login(_credential, _password).then((bool loginStatus) {
+      if (loginStatus) {
+        Application.router
+            .navigateTo(context, Routes.mobileIndex, replace: true);
+      } else {
+        DialogUtil.error(context, content: 'login fail');
+      }
+    }).catchError((e) {
+      DialogUtil.error(context, content: e.toString());
+    });
   }
 }

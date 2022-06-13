@@ -10,7 +10,7 @@ class ConnectAction extends BaseAction {
   }
 
   ///走https协议，同步获取返回信息
-  Future<dynamic> connect(PeerClient peerClient) async {
+  Future<bool> connect(PeerClient peerClient) async {
     var appParams = AppDataProvider.instance;
     ChainMessage chainMessage = await prepareSend(peerClient,
         connectAddress: appParams.defaultNodeAddress.httpConnectAddress);
@@ -18,10 +18,12 @@ class ConnectAction extends BaseAction {
 
     ChainMessage? response = await send(chainMessage);
     if (response != null) {
-      return response.payload;
+      if (response.statusCode == 200) {
+        return true;
+      }
     }
 
-    return null;
+    return false;
   }
 }
 

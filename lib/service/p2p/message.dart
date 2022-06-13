@@ -6,7 +6,7 @@ class MessageSerializer {
   MessageSerializer();
 
   static Uint8List marshal(dynamic value) {
-    String json = '${JsonUtil.toJsonString(value)}\n';
+    String json = JsonUtil.toJsonString(value);
 
     return CryptoUtil.strToUint8List(json);
   }

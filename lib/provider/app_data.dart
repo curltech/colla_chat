@@ -170,7 +170,7 @@ class AppDataProvider with ChangeNotifier {
   String _locale = 'zh_CN';
   MaterialColor? _primarySwatch = Colors.cyan;
   MaterialColor? _seedColor = Colors.cyan;
-  String _fontFamily = 'Lato';
+  String _fontFamily = '';
   String _brightness = 'light';
   ThemeData? _themeData;
 

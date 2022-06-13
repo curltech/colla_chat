@@ -36,14 +36,14 @@ class HttpClient implements IWebClient {
   }
 
   @override
-  dynamic send(String url, dynamic data) {
+  Future<Response> send(String url, dynamic data) {
     var response = _client.post(url, data: data);
 
     return response;
   }
 
   @override
-  dynamic get(String url) {
+  Future<Response> get(String url) {
     var response = _client.get(url);
     return response;
   }

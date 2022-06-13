@@ -146,9 +146,11 @@ class MyselfPeerService extends PeerEntityService {
       peerClient.expireDate = DateTime.now().millisecond;
       peerClient.kind = null;
       peerClient.name = null;
-      var response = await connectAction.connect(peerClient);
+      var loginStatus = await connectAction.connect(peerClient);
 
-      return false;
+      return loginStatus;
+    } else {
+      logger.e('$credential is not exist');
     }
 
     return false;
