@@ -1,14 +1,15 @@
 import 'package:colla_chat/pages/loading.dart';
 import 'package:colla_chat/pages/stock/login/remote_login.dart';
-import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
+import 'package:flutter/material.dart';
+
 import '../pages/chat/index/mobile_index.dart';
 import '../pages/chat/login/p2p_login.dart';
 
 //加载页
 var loadingHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
-  return const Loading(
+  return Loading(
     title: '',
   );
 });

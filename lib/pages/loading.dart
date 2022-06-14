@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../routers/application.dart';
 import '../routers/routes.dart';
+import '../widgets/common/keep_alive_wrapper.dart';
 
 const List<String> images = [
   'assets/images/bg/login-bg-wd-1.jpg',
@@ -19,8 +20,10 @@ const List<String> images = [
 
 class Loading extends StatefulWidget {
   final String title;
+  bool autoPlay;
 
-  const Loading({Key? key, required this.title}) : super(key: key);
+  Loading({Key? key, required this.title, this.autoPlay = false})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -28,60 +31,57 @@ class Loading extends StatefulWidget {
   }
 }
 
-/// 继承State的类管理状态数据，状态数据为类的属性，当属性发生变化时，组件的自动重绘，
-/// 类似Vue的data与组件v-model的关系但是是单向的，绑定的组件修改时，状态数据不会自动修改
-/// 修改属性必须在setState方法的回调函数中进行
-class _LoadingState extends State<Loading> {
-  int _currentIndex = 0;
-  bool _autoPlay = false;
+class _LoadingState extends State<Loading> with SingleTickerProviderStateMixin {
+  var children = <Widget>[];
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
-    if (_autoPlay) {
+
+    _tabController = TabController(length: images.length, vsync: this);
+    for (int i = 0; i < images.length; ++i) {
+      var image = KeepAliveWrapper(
+          keepAlive: true,
+          child: Image.asset(
+            images[i],
+            fit: BoxFit.fill,
+          ));
+      children.add(image);
+    }
+    if (widget.autoPlay) {
       Future.doWhile(() async {
-        setState(() {
-          if (_currentIndex == images.length - 1) {
-            _currentIndex = 0;
-          } else {
-            _currentIndex++;
-          }
-        });
+        var currentIndex = _tabController.index;
+        if (currentIndex >= images.length - 1) {
+          _tabController.index = 0;
+        } else {
+          _tabController.index = currentIndex + 1;
+        }
         await Future.delayed(const Duration(seconds: 1));
-        if (_currentIndex >= images.length - 1) {
+        if (currentIndex >= images.length - 1) {
           return false;
         }
         return true;
       });
     }
 
-    Future.delayed(Duration(seconds: 1), () {
+    Future.delayed(const Duration(seconds: 10), () {
       Application.router.navigateTo(context, Routes.p2pLogin, replace: true);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: GestureDetector(
-            onHorizontalDragEnd: (DragEndDetails details) {
-              setState(() {
-                if (_currentIndex == images.length - 1) {
-                  _currentIndex = 0;
-                } else {
-                  _currentIndex++;
-                }
-              });
-            },
-            child: Center(
-                child: IndexedStack(
-              index: 0,
-              children: [
-                Image.asset(
-                  images[_currentIndex],
-                  fit: BoxFit.fill,
-                )
-              ],
-            ))));
+    return TabBarView(
+      controller: _tabController,
+      children: children,
+    );
+  }
+
+  @override
+  void dispose() {
+    // 释放资源
+    _tabController.dispose();
+    super.dispose();
   }
 }

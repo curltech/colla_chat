@@ -1,10 +1,12 @@
-import 'package:flutter/material.dart';
 import 'package:fluro/fluro.dart';
-import '../pages/loading.dart';
+import 'package:flutter/material.dart';
+
 import './application.dart';
 import './routes.dart';
+import '../pages/loading.dart';
 
 class NavigatorUtil {
+  static late BuildContext context;
   // 返回
   static void goBack(BuildContext context) {
     /// 其实这边调用的是
@@ -47,7 +49,9 @@ class NavigatorUtil {
   static Future jumpRemove(BuildContext context) {
     return Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-          builder: (context) => const Loading(title: '',),
+          builder: (context) => Loading(
+            title: '',
+          ),
         ),
         (route) => route == null);
   }
@@ -88,7 +92,9 @@ class NavigatorUtil {
   static void goToIndexRemovePage(BuildContext context) {
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-          builder: (context) => const Loading(title: '',),
+          builder: (context) => Loading(
+            title: '',
+          ),
         ),
         (route) => route == null);
   }
@@ -97,7 +103,9 @@ class NavigatorUtil {
   static void goToLoginRemovePage(BuildContext context) {
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-          builder: (context) => const Loading(title: '',),
+          builder: (context) => Loading(
+            title: '',
+          ),
         ),
         (route) => route == null);
   }

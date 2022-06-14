@@ -1,11 +1,13 @@
 import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:colla_chat/tool/util.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:logger/logger.dart';
+import 'package:flutter/material.dart';
 //import 'package:flutter_easylogger/flutter_logger.dart' as easylogger;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:logger/logger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import '../constant/address.dart';
 
 class Option {
@@ -174,6 +176,10 @@ class AppDataProvider with ChangeNotifier {
   String _brightness = 'light';
   ThemeData? _themeData;
 
+  //屏幕宽高
+  double _keyboardHeight = 270.0;
+  Size _size = Size(0.0, 0.0);
+
   AppDataProvider();
 
   ///初始化一些参数
@@ -292,6 +298,33 @@ class AppDataProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Size get size {
+    return _size;
+  }
+
+  set size(Size size) {
+    if (_size.height != size.height || _size.width != size.width) {
+      _size = size;
+      logger.i(
+          'Screen size changed:height ${_size.height},width  ${_size.width}');
+    }
+  }
+
+  bool get mobile {
+    return _size.height > _size.width;
+  }
+
+  double get keyboardHeight {
+    return _keyboardHeight;
+  }
+
+  set keyboardHeight(double keyboardHeight) {
+    if (_keyboardHeight != keyboardHeight) {
+      _keyboardHeight = keyboardHeight;
+      logger.i('keyboardHeight changed:$_keyboardHeight');
+    }
+  }
+
   setConnectAddress(NodeAddress address) {
     address.validate(address);
     nodeAddress[address.name] = address;
@@ -316,7 +349,18 @@ class AppDataProvider with ChangeNotifier {
     LocalStorage localStorage = await LocalStorage.instance;
     localStorage.save('AppParams', json);
   }
+
+  changeSize(BuildContext context) {
+    size = MediaQuery.of(context).size;
+    var keyboardHeight = appDataProvider.keyboardHeight;
+    if (keyboardHeight == 270.0 &&
+        MediaQuery.of(context).viewInsets.bottom != 0) {
+      keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    }
+  }
 }
+
+var appDataProvider = AppDataProvider();
 
 var logger = Logger(
   printer: PrettyPrinter(),

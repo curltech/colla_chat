@@ -47,6 +47,7 @@ class _MobileIndexState extends State<MobileIndex> {
 
   @override
   Widget build(BuildContext context) {
+    appDataProvider.changeSize(context);
     BottomNavigationBar bottomNavigationBar = BottomNavigationBar(
       //底部按钮，移动版才有
       items: <BottomNavigationBarItem>[
@@ -63,7 +64,7 @@ class _MobileIndexState extends State<MobileIndex> {
       ],
       currentIndex: _currentIndex,
       selectedItemColor:
-          Provider.of<AppDataProvider>(context).themeData?.primaryColorDark,
+          Provider.of<AppDataProvider>(context).themeData?.colorScheme.primary,
       unselectedItemColor: Colors.grey,
       selectedFontSize: 14.0,
       unselectedFontSize: 14.0,
@@ -181,7 +182,7 @@ class _MobileIndexState extends State<MobileIndex> {
     Scaffold scaffold;
     var platformParams = PlatformParams.instance;
     //移动手机不需要左边栏，需要底部栏
-    if (platformParams.android || platformParams.ios) {
+    if (appDataProvider.mobile) {
       scaffold = Scaffold(
           body: Center(
               child: IndexedStack(

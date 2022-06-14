@@ -1,6 +1,7 @@
 import 'package:colla_chat/pages/loading.dart';
 import 'package:colla_chat/provider/app_data.dart';
 import 'package:colla_chat/routers/application.dart';
+import 'package:colla_chat/routers/navigator_util.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:fluro/fluro.dart';
@@ -8,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
+
 import 'l10n/localization.dart';
 
 void main() {
@@ -22,7 +24,7 @@ void main() {
   ServiceLocator.init().then((value) {
     runApp(MultiProvider(providers: [
       ChangeNotifierProvider(create: (context) => AppDataProvider.instance),
-    ], child: const CollaChatApp()));
+    ], child: CollaChatApp()));
   });
 }
 
@@ -36,14 +38,11 @@ class CollaChatApp extends StatelessWidget {
     final router = FluroRouter();
     Routes.configureRoutes(router);
     Application.router = router;
+    NavigatorUtil.context = context;
 
-    ///创建了一个具有 Material Design 风格的应用
-    ///监控两个数据提供者：theme，locale
-    ///整个应用都会消费这两个提供者，当两个提供者的数据发生变化时，整个应用都会重绘
-    ///相当于整个应用都注册了两个提供者的数据变化
     return MultiProvider(
         providers: <SingleChildWidget>[
-          ChangeNotifierProvider.value(value: AppDataProvider()),
+          ChangeNotifierProvider.value(value: appDataProvider),
         ],
         child: Consumer<AppDataProvider>(
             builder: (BuildContext context, appDataProvider, Widget? child) {
