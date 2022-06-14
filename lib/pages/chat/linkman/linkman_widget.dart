@@ -37,9 +37,9 @@ class LinkmanWidget extends StatelessWidget {
     }
     Map<String, List<TileData>> linkmanTileData = {'linkmen': tileData};
     var body = DataListView(tileData: linkmanTileData);
-    return Scaffold(
+    return Container(
       //列表
-      body: body,
+      child: body,
     );
   }
 }

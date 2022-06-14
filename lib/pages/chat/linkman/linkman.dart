@@ -17,7 +17,9 @@ class Linkman extends StatefulWidget {
 
 class _LinkmanState extends State<Linkman> {
   int _currentIndex = 0;
+  String _key = '';
   late List<Widget> _children;
+  LinkmenDataProvider _linkmenDataProvider = LinkmenDataProvider();
 
   @override
   void initState() {
@@ -31,7 +33,7 @@ class _LinkmanState extends State<Linkman> {
     ];
   }
 
-  PopupMenuButton _popupMenuButton(BuildContext context) {
+  PopupMenuButton _popupMenuButton() {
     return PopupMenuButton<int>(
       itemBuilder: (BuildContext context) {
         return [
@@ -73,12 +75,29 @@ class _LinkmanState extends State<Linkman> {
                   .themeData
                   ?.colorScheme
                   .primary)),
-      trailing: _popupMenuButton(context),
+      trailing: _popupMenuButton(),
     );
+    var searchBar = Padding(
+        padding: EdgeInsets.symmetric(horizontal: 15.0),
+        child: TextFormField(
+          decoration: InputDecoration(
+            labelText: AppLocalizations.t('search'),
+            suffixIcon: Icon(Icons.search),
+          ),
+          initialValue: _key,
+          onChanged: (String val) {
+            setState(() {
+              _key = val;
+            });
+          },
+          onTap: () {
+            logger.i('search $_key');
+          },
+        ));
     return ChangeNotifierProvider.value(
-      value: LinkmenDataProvider(),
+      value: _linkmenDataProvider,
       child: Column(
-        children: [toolBar, Expanded(child: stack)],
+        children: [toolBar, searchBar, Expanded(child: stack)],
       ),
     );
   }

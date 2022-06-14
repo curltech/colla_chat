@@ -73,7 +73,7 @@ class _MobileIndexState extends State<MobileIndex> {
     );
     //左边栏，和底部按钮功能一样，在桌面版才有
     SizedBox leftToolBar = SizedBox(
-      width: 100.0,
+      width: 90.0,
       child: ListView(
         children: <Widget>[
           ListTile(
@@ -195,6 +195,7 @@ class _MobileIndexState extends State<MobileIndex> {
               child: Row(
             children: <Widget>[
               leftToolBar,
+              VerticalDivider(thickness: 0.5),
               Expanded(
                   child: IndexedStack(
                       index: 0, children: <Widget>[children[_currentIndex]])),

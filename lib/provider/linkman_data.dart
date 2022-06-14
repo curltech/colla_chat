@@ -5,15 +5,22 @@ import '../entity/chat/contact.dart';
 
 class LinkmenDataProvider with ChangeNotifier {
   List<Linkman> _linkmen = [];
+  bool initStatus=false;
 
-  LinkmenDataProvider() {
+  LinkmenDataProvider();
+
+  init() {
     linkmanService.findAllLinkmen().then((linkmen) {
       _linkmen = linkmen;
+      initStatus=true;
       notifyListeners();
     });
   }
 
   List<Linkman> get linkmen {
+    if (!initStatus){
+      init();
+    }
     return _linkmen;
   }
 
