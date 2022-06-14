@@ -72,61 +72,69 @@ class _MobileIndexState extends State<MobileIndex> {
       onTap: _onItemTapped,
     );
     //左边栏，和底部按钮功能一样，在桌面版才有
-    Container drawer = Container(
-        constraints:
-            BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.3),
-        child: Drawer(
-          width: MediaQuery.of(context).size.width * 0.15,
-          child: ListView(
-            children: <Widget>[
-              ListTile(
-                  iconColor: _getIconColor(0),
-                  leading: Icon(Icons.chat),
-                  title: Text(_widgetLabels.elementAt(0)),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    setState(() {
-                      _currentIndex = 0;
-                    });
-                  }),
-              ListTile(
-                  iconColor: _getIconColor(1),
-                  leading: Icon(Icons.contacts),
-                  title: Text(_widgetLabels.elementAt(1)),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    setState(() {
-                      _currentIndex = 1;
-                    });
-                  }),
-              ListTile(
-                  iconColor: _getIconColor(2),
-                  leading: Icon(Icons.wifi_channel),
-                  title: Text(_widgetLabels.elementAt(2)),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    setState(() {
-                      _currentIndex = 2;
-                    });
-                  }),
-              ListTile(
-                  iconColor: _getIconColor(3),
-                  leading: Icon(Icons.person),
-                  title: Text(_widgetLabels.elementAt(3)),
-                  onTap: () {
-                    Navigator.of(context).pop();
-                    setState(() {
-                      _currentIndex = 3;
-                    });
-                  }),
-            ],
-          ),
-        ));
+    SizedBox leftToolBar = SizedBox(
+      width: 100.0,
+      child: ListView(
+        children: <Widget>[
+          ListTile(
+              iconColor: _getIconColor(0),
+              title: Icon(Icons.chat),
+              subtitle: Text(
+                _widgetLabels.elementAt(0),
+                textAlign: TextAlign.center,
+                style: TextStyle(color: _getIconColor(0)),
+              ),
+              onTap: () {
+                setState(() {
+                  _currentIndex = 0;
+                });
+              }),
+          ListTile(
+              iconColor: _getIconColor(1),
+              title: Icon(Icons.contacts),
+              subtitle: Text(
+                _widgetLabels.elementAt(1),
+                textAlign: TextAlign.center,
+                style: TextStyle(color: _getIconColor(1)),
+              ),
+              onTap: () {
+                setState(() {
+                  _currentIndex = 1;
+                });
+              }),
+          ListTile(
+              iconColor: _getIconColor(2),
+              title: Icon(Icons.wifi_channel),
+              subtitle: Text(
+                _widgetLabels.elementAt(2),
+                textAlign: TextAlign.center,
+                style: TextStyle(color: _getIconColor(2)),
+              ),
+              onTap: () {
+                setState(() {
+                  _currentIndex = 2;
+                });
+              }),
+          ListTile(
+              iconColor: _getIconColor(3),
+              title: Icon(Icons.person),
+              subtitle: Text(
+                _widgetLabels.elementAt(3),
+                textAlign: TextAlign.center,
+                style: TextStyle(color: _getIconColor(3)),
+              ),
+              onTap: () {
+                setState(() {
+                  _currentIndex = 3;
+                });
+              }),
+        ],
+      ),
+    );
     //右边栏，用于展示当前用户信息，当前用户的配置信息
     var endDrawer = Container(
         constraints:
             BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
-        color: Colors.grey.shade800,
         child: Drawer(
           child: ListView(
             children: <Widget>[
@@ -172,6 +180,7 @@ class _MobileIndexState extends State<MobileIndex> {
     List<Widget> children = <Widget>[ChatTarget(), Linkman(), HomePage(), Me()];
     Scaffold scaffold;
     var platformParams = PlatformParams.instance;
+    //移动手机不需要左边栏，需要底部栏
     if (platformParams.android || platformParams.ios) {
       scaffold = Scaffold(
           body: Center(
@@ -180,11 +189,17 @@ class _MobileIndexState extends State<MobileIndex> {
           endDrawer: endDrawer,
           bottomNavigationBar: bottomNavigationBar);
     } else {
+      //桌面版不需要底部栏，需要固定的左边栏
       scaffold = Scaffold(
           body: Center(
-              child: IndexedStack(
-                  index: 0, children: <Widget>[children[_currentIndex]])),
-          drawer: drawer,
+              child: Row(
+            children: <Widget>[
+              leftToolBar,
+              Expanded(
+                  child: IndexedStack(
+                      index: 0, children: <Widget>[children[_currentIndex]])),
+            ],
+          )),
           endDrawer: endDrawer);
     }
     return scaffold;

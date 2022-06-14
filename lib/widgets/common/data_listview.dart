@@ -89,14 +89,12 @@ class DataListView extends StatelessWidget {
       for (var tile in tiles) {
         var item = Container(
             margin: const EdgeInsets.only(top: 5.0),
-            color: Colors.white,
             child: Column(children: <Widget>[
               DataListTile(tileData: tile),
               Padding(
                 padding: const EdgeInsets.only(left: 5.0, right: 5.0),
                 child: Divider(
                   height: 0.5,
-                  color: Colors.grey,
                 ),
               ),
             ]));
@@ -104,7 +102,6 @@ class DataListView extends StatelessWidget {
       }
       var group = Container(
           margin: const EdgeInsets.only(top: 5.0),
-          color: Colors.white,
           child: Column(children: items));
       groups.add(group);
     }

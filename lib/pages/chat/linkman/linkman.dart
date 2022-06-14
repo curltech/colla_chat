@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../l10n/localization.dart';
+import '../../../provider/app_data.dart';
 import 'linkman_widget.dart';
 
 //好友页面
@@ -30,44 +31,55 @@ class _LinkmanState extends State<Linkman> {
     ];
   }
 
+  PopupMenuButton _popupMenuButton(BuildContext context) {
+    return PopupMenuButton<int>(
+      itemBuilder: (BuildContext context) {
+        return [
+          PopupMenuItem(
+            child: Text("Linkman"),
+            value: 0,
+          ),
+          PopupMenuItem(
+            child: Text("LinkmanAdd"),
+            value: 1,
+          ),
+        ];
+      },
+      icon: Icon(
+        Icons.add_box_rounded,
+        color: Provider.of<AppDataProvider>(context)
+            .themeData
+            ?.colorScheme
+            .primary,
+      ),
+      onSelected: (dynamic item) {
+        setState(() {
+          _currentIndex = item;
+        });
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var stack = IndexedStack(
       index: _currentIndex,
       children: _children,
     );
-    var appBar = AppBar(
-      title: Text(AppLocalizations.t('Linkman')),
-      actions: [
-        IconButton(
-            onPressed: () async {
-              setState(() {
-                _currentIndex = 0;
-              });
-            },
-            icon: const Icon(Icons.person),
-            tooltip: AppLocalizations.t('Linkman')),
-        IconButton(
-          onPressed: () async {
-            setState(() {
-              _currentIndex = 1;
-            });
-          },
-          icon: const Icon(Icons.person_add),
-          tooltip: AppLocalizations.t('Add'),
-        ),
-      ],
+    var toolBar = ListTile(
+      title: Text(AppLocalizations.t('Linkman'),
+          style: TextStyle(
+              color: Provider.of<AppDataProvider>(context)
+                  .themeData
+                  ?.colorScheme
+                  .primary)),
+      trailing: _popupMenuButton(context),
     );
     return ChangeNotifierProvider.value(
       value: LinkmenDataProvider(),
-      child: Scaffold(
-          appBar: appBar,
-          body: Center(
-              child: SizedBox(
-            width: 380,
-            height: 500,
-            child: stack,
-          ))),
+      child: Column(
+        children: [toolBar, Expanded(child: stack)],
+      ),
     );
   }
 }
