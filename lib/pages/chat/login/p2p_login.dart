@@ -1,6 +1,8 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/login/loading.dart';
 import 'package:flutter/material.dart';
 
+import '../../../widgets/common/keep_alive_wrapper.dart';
 import 'p2p_login_widget.dart';
 import 'p2p_register_widget.dart';
 import 'p2p_setting_widget.dart';
@@ -13,28 +15,30 @@ class P2pLogin extends StatefulWidget {
   State<StatefulWidget> createState() => _P2pLoginState();
 }
 
-class _P2pLoginState extends State<P2pLogin> {
-  int _currentIndex = 0;
+class _P2pLoginState extends State<P2pLogin>
+    with SingleTickerProviderStateMixin {
   late List<Widget> _children;
+  late TabController _tabController;
 
   @override
   void initState() {
     super.initState();
     // 初始化子项集合
-    var p2pLoginWidget = const P2pLoginWidget();
-    var p2pRegisterWidget = const P2pRegisterWidget();
-    var p2pSettingWidget = const P2pSettingWidget();
+    var p2pLoginWidget = const KeepAliveWrapper(child: P2pLoginWidget());
+    var p2pRegisterWidget = const KeepAliveWrapper(child: P2pRegisterWidget());
+    var p2pSettingWidget = const KeepAliveWrapper(child: P2pSettingWidget());
     _children = [
       p2pLoginWidget,
       p2pRegisterWidget,
       p2pSettingWidget,
     ];
+    _tabController = TabController(length: _children.length, vsync: this);
   }
 
   @override
   Widget build(BuildContext context) {
-    var stack = IndexedStack(
-      index: _currentIndex,
+    var tabBarView = TabBarView(
+      controller: _tabController,
       children: _children,
     );
     var appBar = AppBar(
@@ -42,26 +46,20 @@ class _P2pLoginState extends State<P2pLogin> {
       actions: [
         IconButton(
             onPressed: () async {
-              setState(() {
-                _currentIndex = 0;
-              });
+              _tabController.index = 0;
             },
             icon: const Icon(Icons.login),
             tooltip: AppLocalizations.t('Login')),
         IconButton(
           onPressed: () async {
-            setState(() {
-              _currentIndex = 1;
-            });
+            _tabController.index = 1;
           },
           icon: const Icon(Icons.app_registration),
           tooltip: AppLocalizations.t('Register'),
         ),
         IconButton(
           onPressed: () async {
-            setState(() {
-              _currentIndex = 2;
-            });
+            _tabController.index = 2;
           },
           icon: const Icon(Icons.settings),
           tooltip: AppLocalizations.t('Setting'),
@@ -70,11 +68,16 @@ class _P2pLoginState extends State<P2pLogin> {
     );
     return Scaffold(
         appBar: appBar,
-        body: Center(
-            child: SizedBox(
-          width: 380,
-          height: 500,
-          child: stack,
-        )));
+        body: Stack(children: <Widget>[
+          Loading(title: ''),
+          Opacity(
+              opacity: 0.7,
+              child: Center(
+                  child: SizedBox(
+                width: 380,
+                height: 500,
+                child: tabBarView,
+              )))
+        ]));
   }
 }

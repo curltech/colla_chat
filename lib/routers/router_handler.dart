@@ -1,20 +1,10 @@
-import 'package:colla_chat/pages/loading.dart';
 import 'package:colla_chat/pages/stock/login/remote_login.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 
-import '../pages/chat/index/mobile_index.dart';
+import '../pages/chat/index/index.dart';
 import '../pages/chat/login/p2p_login.dart';
 
-//加载页
-var loadingHandler = Handler(
-    handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
-  return Loading(
-    title: '',
-  );
-});
-
-// 登录页面
 Handler remoteLoginHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
   return RemoteLogin();
@@ -29,7 +19,7 @@ Handler p2pLoginHandler = Handler(
 // 首页
 Handler indexHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
-  return const MobileIndex(
+  return const Index(
     title: '',
   );
 });

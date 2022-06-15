@@ -4,12 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:provider/provider.dart';
 
-import '../../../provider/app_data.dart';
 import '../../../l10n/localization.dart';
+import '../../../provider/app_data.dart';
 import '../../../routers/application.dart';
 import '../../../routers/routes.dart';
 import '../../../service/dht/myselfpeer.dart';
-import '../../../tool/util.dart';
 
 /// 用户注册组件，一个card下的录入框和按钮组合
 class P2pRegisterWidget extends StatefulWidget {
@@ -73,9 +72,10 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
     Provider.of<AppDataProvider>(context).brightness;
     return Card(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
+          SizedBox(height: 30.0),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 15.0),
             child: IntlPhoneField(
@@ -231,8 +231,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
           _name, _loginName, _plainPassword,
           mobile: _mobile, email: _email);
       if (registerStatus) {
-        Application.router
-            .navigateTo(context, Routes.index, replace: true);
+        Application.router.navigateTo(context, Routes.index, replace: true);
       }
     } else {
       logger.e('password is not matched');

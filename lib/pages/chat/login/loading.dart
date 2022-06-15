@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../routers/application.dart';
-import '../routers/routes.dart';
-import '../widgets/common/keep_alive_wrapper.dart';
+import '../../../widgets/common/keep_alive_wrapper.dart';
 
 const List<String> images = [
   'assets/images/bg/login-bg-wd-1.jpg',
@@ -45,7 +43,7 @@ class _LoadingState extends State<Loading> with SingleTickerProviderStateMixin {
           keepAlive: true,
           child: Image.asset(
             images[i],
-            fit: BoxFit.fill,
+            fit: BoxFit.cover,
           ));
       children.add(image);
     }
@@ -65,9 +63,9 @@ class _LoadingState extends State<Loading> with SingleTickerProviderStateMixin {
       });
     }
 
-    Future.delayed(const Duration(seconds: 10), () {
-      Application.router.navigateTo(context, Routes.p2pLogin, replace: true);
-    });
+    // Future.delayed(const Duration(seconds: 10), () {
+    //   Application.router.navigateTo(context, Routes.p2pLogin, replace: true);
+    // });
   }
 
   @override

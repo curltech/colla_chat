@@ -2,6 +2,7 @@ import 'package:colla_chat/widgets/setting/locale_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../../provider/app_data.dart';
 import '../../../widgets/setting/brightness_picker.dart';
 import '../../../widgets/setting/ws_address_picker.dart';
@@ -24,9 +25,10 @@ class _P2pSettingWidgetState extends State<P2pSettingWidget> {
     Provider.of<AppDataProvider>(context).brightness;
     return Card(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
+          SizedBox(height: 30.0),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 15.0),
             child: LocalePicker(),

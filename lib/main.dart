@@ -1,4 +1,4 @@
-import 'package:colla_chat/pages/loading.dart';
+import 'package:colla_chat/pages/chat/login/p2p_login.dart';
 import 'package:colla_chat/provider/app_data.dart';
 import 'package:colla_chat/routers/application.dart';
 import 'package:colla_chat/routers/navigator_util.dart';
@@ -55,7 +55,7 @@ class CollaChatApp extends StatelessWidget {
             theme: Provider.of<AppDataProvider>(context).themeData,
 
             ///Scaffold 是 Material 库中提供的一个 widget，它提供了默认的导航栏、标题和包含主屏幕 widget 树的 body 属性
-            home: Loading(title: AppLocalizations.instance.text('Loading')),
+            home: const P2pLogin(),
             onGenerateRoute: Application.router.generator,
 
             // AppLocalizations.localizationsDelegates,

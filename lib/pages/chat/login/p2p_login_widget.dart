@@ -1,11 +1,11 @@
 import 'package:colla_chat/provider/app_data.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
 import '../../../l10n/localization.dart';
 import '../../../routers/application.dart';
 import '../../../routers/routes.dart';
 import '../../../service/dht/myselfpeer.dart';
-
 import '../../../tool/util.dart';
 
 /// 远程登录组件，一个card下的录入框和按钮组合
@@ -48,9 +48,10 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
     Provider.of<AppDataProvider>(context).brightness;
     return Card(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
+          SizedBox(height: 30.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 50.0),
               child: TextFormField(
@@ -125,8 +126,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
     await appParams.saveAppParams();
     myselfPeerService.login(_credential, _password).then((bool loginStatus) {
       if (loginStatus) {
-        Application.router
-            .navigateTo(context, Routes.index, replace: true);
+        Application.router.navigateTo(context, Routes.index, replace: true);
       } else {
         DialogUtil.error(context, content: 'login fail');
       }

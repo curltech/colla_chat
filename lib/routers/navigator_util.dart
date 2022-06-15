@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import './application.dart';
 import './routes.dart';
-import '../pages/loading.dart';
+import '../pages/chat/login/loading.dart';
 
 class NavigatorUtil {
   static late BuildContext context;
