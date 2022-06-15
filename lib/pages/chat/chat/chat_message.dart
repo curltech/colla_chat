@@ -1,25 +1,27 @@
 import 'package:colla_chat/entity/dht/myself.dart';
-import 'package:colla_chat/pages/chat/chat/chat_me_message.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../entity/chat/chat.dart';
 import '../../../provider/app_data.dart';
-import '../../../provider/websocket_message.dart';
+import '../../../provider/chat_message_data.dart';
+import 'chat_me_message.dart';
+import 'chat_other_message.dart';
 
 /// 消息发送和接受展示的界面组件
 /// 此界面展示特定的目标对象的收到的消息，并且可以发送消息
-class ChatMessage extends StatefulWidget {
+class ChatMessagePage extends StatefulWidget {
   final String title;
 
-  const ChatMessage({Key? key, required this.title}) : super(key: key);
+  const ChatMessagePage({Key? key, required this.title}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return _ChatMessageState();
+    return _ChatMessagePageState();
   }
 }
 
-class _ChatMessageState extends State<ChatMessage>
+class _ChatMessagePageState extends State<ChatMessagePage>
     with TickerProviderStateMixin {
   final TextEditingController textEditingController = TextEditingController();
   FocusNode textFocusNode = FocusNode();
@@ -69,23 +71,23 @@ class _ChatMessageState extends State<ChatMessage>
   }
 
   Widget messageItem(BuildContext context, int index) {
-    // 通过websocket获取消息
-    List<ChatMessageData> messages =
-        Provider.of<WebsocketMessageProvider>(context).messages;
-    ChatMessageData item = messages[index];
+    List<ChatMessage> messages =
+        Provider.of<ChatMessageDataProvider>(context).chatMessages;
+    ChatMessage item = messages[index];
     // 创建消息动画控制器
     var animate =
         AnimationController(vsync: this, duration: Duration(milliseconds: 500));
-    // 创建消息组件
-    ChatMeMessage message = ChatMeMessage(message: item);
+    Widget chatMessageWidget = ChatOtherMessage(message: item);
     // 读取自己的用户id，判断是否是发送给自己的
     var myselfPeer = myself.myselfPeer;
     if (myselfPeer != null) {
       String? peerId = myselfPeer.peerId;
-      if (peerId == item.peerId) {
-        item.isMe = true;
+      if (peerId == item.targetPeerId) {
+        // 创建消息组件
+        chatMessageWidget = ChatMeMessage(message: item);
       } else {
-        item.isMe = false;
+        // 创建消息组件
+        chatMessageWidget = ChatOtherMessage(message: item);
       }
     }
     // index=0执行动画，对最新的消息执行动画
@@ -98,21 +100,21 @@ class _ChatMessageState extends State<ChatMessage>
         sizeFactor: CurvedAnimation(parent: animate, curve: Curves.easeInOut),
         axisAlignment: 0.0,
         // 指定为当前消息组件
-        child: message,
+        child: chatMessageWidget,
       );
     }
     // 不添加动画消息组件
-    return message;
+    return chatMessageWidget;
   }
 
   @override
   Widget build(BuildContext context) {
     return Column(children: <Widget>[
       //使用Consumer来获取WebSocketProvider对象
-      Consumer<WebsocketMessageProvider>(builder: (BuildContext context,
-          WebsocketMessageProvider websocketmessageProvider, Widget? child) {
+      Consumer<ChatMessageDataProvider>(builder: (BuildContext context,
+          ChatMessageDataProvider chatMessageDataProvider, Widget? child) {
         //获取消息列表数据
-        var messages = websocketmessageProvider.messages;
+        var messages = chatMessageDataProvider.chatMessages;
         return Flexible(
           //使用列表渲染消息
           child: ListView.builder(

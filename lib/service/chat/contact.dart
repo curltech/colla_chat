@@ -58,9 +58,6 @@ class LinkmanService extends PartyService {
   }
 }
 
-final linkmanService = LinkmanService.instance;
-final List<Linkman> linkmans = [];
-
 class TagService extends BaseService {
   static final TagService _instance = TagService();
   static bool initStatus = false;

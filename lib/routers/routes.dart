@@ -5,8 +5,8 @@ import './router_handler.dart';
 
 class Routes {
   static String remoteLogin = '/remote_login';
-  static String p2pLogin = '/p2p_login';
-  static String index = '/';
+  static String p2pLogin = '/';
+  static String index = '/index';
 
   static void configureRoutes(FluroRouter router) {
     router.notFoundHandler = Handler(

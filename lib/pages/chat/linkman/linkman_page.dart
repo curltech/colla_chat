@@ -5,18 +5,20 @@ import 'package:provider/provider.dart';
 
 import '../../../l10n/localization.dart';
 import '../../../provider/app_data.dart';
+import '../../../widgets/common/keep_alive_wrapper.dart';
 import 'linkman_widget.dart';
 
 //好友页面
-class Linkman extends StatefulWidget {
-  const Linkman({Key? key}) : super(key: key);
+class LinkmanPage extends StatefulWidget {
+  const LinkmanPage({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _LinkmanState();
+  State<StatefulWidget> createState() => _LinkmanPageState();
 }
 
-class _LinkmanState extends State<Linkman> {
-  int _currentIndex = 0;
+class _LinkmanPageState extends State<LinkmanPage>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
   String _key = '';
   late List<Widget> _children;
   LinkmenDataProvider _linkmenDataProvider = LinkmenDataProvider();
@@ -24,9 +26,12 @@ class _LinkmanState extends State<Linkman> {
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     // 初始化子项集合
-    var linkmanWidget = const LinkmanWidget();
-    var linkmanAddWidget = const LinkmanAddWidget();
+    var linkmanWidget =
+        const KeepAliveWrapper(keepAlive: true, child: LinkmanWidget());
+    var linkmanAddWidget =
+        const KeepAliveWrapper(keepAlive: true, child: LinkmanAddWidget());
     _children = [
       linkmanWidget,
       linkmanAddWidget,
@@ -56,7 +61,7 @@ class _LinkmanState extends State<Linkman> {
       ),
       onSelected: (dynamic item) {
         setState(() {
-          _currentIndex = item;
+          _tabController.index = item;
         });
       },
     );
@@ -64,8 +69,8 @@ class _LinkmanState extends State<Linkman> {
 
   @override
   Widget build(BuildContext context) {
-    var stack = IndexedStack(
-      index: _currentIndex,
+    var tabBarView = TabBarView(
+      controller: _tabController,
       children: _children,
     );
     var toolBar = ListTile(
@@ -94,10 +99,24 @@ class _LinkmanState extends State<Linkman> {
             logger.i('search $_key');
           },
         ));
+    var tabBar = RotatedBox(
+        quarterTurns: 0,
+        child: TabBar(
+          controller: _tabController,
+          indicatorColor: Provider.of<AppDataProvider>(context)
+              .themeData
+              ?.colorScheme
+              .primary,
+          labelColor: Provider.of<AppDataProvider>(context)
+              .themeData
+              ?.colorScheme
+              .primary,
+          tabs: const [Tab(text: 'Linkman'), Tab(text: 'LinkmanAdd')],
+        ));
     return ChangeNotifierProvider.value(
       value: _linkmenDataProvider,
       child: Column(
-        children: [toolBar, searchBar, Expanded(child: stack)],
+        children: [toolBar, searchBar, tabBar, Expanded(child: tabBarView)],
       ),
     );
   }

@@ -1,7 +1,9 @@
+import 'package:colla_chat/provider/linkman_data.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 
 import '../../../entity/chat/contact.dart';
 import '../../../l10n/localization.dart';
@@ -25,6 +27,7 @@ class _LinkmanAddWidgetState extends State<LinkmanAddWidget> {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<LinkmenDataProvider>(context).linkmen;
     TextEditingController nameController = TextEditingController();
     nameController.addListener(() {
       setState(() {
@@ -175,7 +178,9 @@ class _LinkmanAddWidgetState extends State<LinkmanAddWidget> {
       linkman.peerId = _peerId;
       linkman.email = _email;
       linkman.mobile = _mobile;
-      await linkmanService.insert(linkman);
+      LinkmanService.instance.insert(linkman).then((value) {
+        Provider.of<LinkmenDataProvider>(context, listen: false).add([linkman]);
+      });
     } else {
       logger.e('name is null');
     }

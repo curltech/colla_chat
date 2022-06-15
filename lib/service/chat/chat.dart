@@ -101,6 +101,18 @@ class ChatMessageService extends BaseService {
     }
     await save(chatMessages, [], parent);
   }
+
+  Future<List<ChatMessage>> findAllChatMessages() async {
+    var chatMessages_ = await find(null, whereArgs: [], orderBy: 'sendTime');
+    List<ChatMessage> chatMessages = [];
+    if (chatMessages_.isNotEmpty) {
+      for (var chatMessage_ in chatMessages_) {
+        var chatMessage = ChatMessage.fromJson(chatMessage_);
+        chatMessages.add(chatMessage);
+      }
+    }
+    return chatMessages;
+  }
 }
 
 class MergedMessageService extends BaseService {

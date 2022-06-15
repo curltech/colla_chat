@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../../provider/websocket_message.dart';
+import '../../../entity/chat/chat.dart';
 
 /// 我发送的消息展示组件，展示在右边
 class ChatMeMessage extends StatefulWidget {
-  final ChatMessageData message;
+  final ChatMessage message;
 
   const ChatMeMessage({Key? key, required this.message}) : super(key: key);
 

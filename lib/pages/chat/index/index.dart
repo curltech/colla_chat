@@ -7,7 +7,7 @@ import '../../../l10n/localization.dart';
 import '../../../provider/app_data.dart';
 import '../../../widgets/richtext/pages/home_page.dart';
 import '../chat/chat_target.dart';
-import '../linkman/linkman.dart';
+import '../linkman/linkman_page.dart';
 import '../me/me.dart';
 
 class Index extends StatefulWidget {
@@ -32,7 +32,12 @@ class _IndexState extends State<Index> {
   var endDrawer = const EndDrawer();
   late SizedBox leftToolBar;
   late BottomNavigationBar bottomNavigationBar;
-  List<Widget> children = <Widget>[ChatTarget(), Linkman(), HomePage(), Me()];
+  List<Widget> children = <Widget>[
+    ChatTarget(),
+    LinkmanPage(),
+    HomePage(),
+    Me()
+  ];
 
   SizedBox _createLeftBar() {
     return SizedBox(
