@@ -207,7 +207,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
           SizedBox(height: 10.0),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 15.0),
-            child: Row(children: [
+            child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
               TextButton(
                 child: Text(AppLocalizations.t('Register')),
                 onPressed: () async {

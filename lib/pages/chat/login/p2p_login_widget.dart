@@ -21,16 +21,23 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
   String _credential = '13609619603';
   String _password = '1234';
   bool _pwdShow = false;
-  late TextEditingController _credentialController;
 
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Provider.of<AppDataProvider>(context).locale;
+    Provider.of<AppDataProvider>(context).themeData;
+    Provider.of<AppDataProvider>(context).brightness;
     // 初始化子项集合
-    _credentialController = TextEditingController(text: '13609619603');
-    _credentialController.addListener(() {
+    TextEditingController credentialController =
+        TextEditingController(text: '13609619603');
+    credentialController.addListener(() {
       setState(() {
-        _credential = _credentialController.text;
+        _credential = credentialController.text;
       });
     });
     TextEditingController passwordController = TextEditingController();
@@ -39,13 +46,6 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
         _password = passwordController.text;
       });
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Provider.of<AppDataProvider>(context).locale;
-    Provider.of<AppDataProvider>(context).themeData;
-    Provider.of<AppDataProvider>(context).brightness;
     return Card(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -101,7 +101,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
           SizedBox(height: 30.0),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 50.0),
-            child: Row(children: [
+            child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
               TextButton(
                 child: Text(
                   AppLocalizations.t('Login'),
