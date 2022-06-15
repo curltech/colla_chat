@@ -178,7 +178,8 @@ class AppDataProvider with ChangeNotifier {
 
   //屏幕宽高
   double _keyboardHeight = 270.0;
-  Size _size = Size(0.0, 0.0);
+  Size _size = const Size(0.0, 0.0);
+  String sqlite3Path = '';
 
   AppDataProvider();
 

@@ -1,63 +1,61 @@
-import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
-import 'package:colla_chat/provider/linkman_data.dart';
-import 'package:colla_chat/service/chat/contact.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
-import '../../../entity/chat/contact.dart';
+import '../../../entity/chat/chat.dart';
 import '../../../l10n/localization.dart';
 import '../../../provider/app_data.dart';
+import '../../../provider/chat_message_data.dart';
+import '../../../service/chat/chat.dart';
 
-/// 用户注册组件，一个card下的录入框和按钮组合
-class LinkmanAddWidget extends StatefulWidget {
-  const LinkmanAddWidget({Key? key}) : super(key: key);
+/// 消息增加组件组件，模拟发送和接受消息，方便测试，一个card下的录入框和按钮组合
+class ChatMessageAddWidget extends StatefulWidget {
+  const ChatMessageAddWidget({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _LinkmanAddWidgetState();
+  State<StatefulWidget> createState() => _ChatMessageAddWidgetState();
 }
 
-class _LinkmanAddWidgetState extends State<LinkmanAddWidget> {
+class _ChatMessageAddWidgetState extends State<ChatMessageAddWidget> {
   final _formKey = GlobalKey<FormState>();
-  String _name = '胡劲松';
-  String _peerId = '';
-  String _mobile = '';
-  String _email = '';
-  String _giveName = '';
+  String _messageId = '';
+  String _targetPeerId = '';
+  String _targetName = '';
+  String _title = '';
+  String _content = '';
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<LinkmenDataProvider>(context).linkmen;
-    // TextEditingController nameController = TextEditingController();
-    // nameController.addListener(() {
+    Provider.of<ChatMessageDataProvider>(context).chatMessages;
+    // TextEditingController messageIdController = TextEditingController();
+    // messageIdController.addListener(() {
     //   setState(() {
-    //     _name = nameController.text;
+    //     _messageId = messageIdController.text;
     //   });
     // });
-    // TextEditingController peerIdController = TextEditingController();
-    // peerIdController.addListener(() {
+    // TextEditingController targetPeerIdController = TextEditingController();
+    // targetPeerIdController.addListener(() {
     //   setState(() {
-    //     _peerId = peerIdController.text;
+    //     _targetPeerId = targetPeerIdController.text;
     //   });
     // });
-    // TextEditingController mobileController = TextEditingController();
-    // mobileController.addListener(() {
+    // TextEditingController targetNameController = TextEditingController();
+    // targetNameController.addListener(() {
     //   setState(() {
-    //     _mobile = mobileController.text;
+    //     _targetName = targetNameController.text;
     //   });
     // });
-    // TextEditingController emailController = TextEditingController();
-    // emailController.addListener(() {
+    // TextEditingController titleController = TextEditingController();
+    // titleController.addListener(() {
     //   setState(() {
-    //     _email = emailController.text;
+    //     _title = titleController.text;
     //   });
     // });
-    // TextEditingController giveNameController = TextEditingController();
-    // giveNameController.addListener(() {
+    // TextEditingController contentController = TextEditingController();
+    // contentController.addListener(() {
     //   setState(() {
-    //     _giveName = giveNameController.text;
+    //     _content = contentController.text;
     //   });
     // });
     return Card(
@@ -70,13 +68,13 @@ class _LinkmanAddWidgetState extends State<LinkmanAddWidget> {
               child: TextFormField(
                 //controller: nameController,
                 decoration: InputDecoration(
-                  labelText: AppLocalizations.t('name'),
-                  prefixIcon: Icon(Icons.person),
+                  labelText: AppLocalizations.t('messageId'),
+                  prefixIcon: Icon(Icons.message),
                 ),
-                initialValue: _name,
+                initialValue: _messageId,
                 onChanged: (String val) {
                   setState(() {
-                    _name = val;
+                    _messageId = val;
                   });
                 },
                 onFieldSubmitted: (String val) {},
@@ -87,13 +85,13 @@ class _LinkmanAddWidgetState extends State<LinkmanAddWidget> {
               child: TextFormField(
                 //controller: loginNameController,
                 decoration: InputDecoration(
-                  labelText: AppLocalizations.t('giveName'),
-                  prefixIcon: Icon(Icons.desktop_mac),
+                  labelText: AppLocalizations.t('targetPeerId'),
+                  prefixIcon: Icon(Icons.person),
                 ),
-                initialValue: _giveName,
+                initialValue: _targetPeerId,
                 onChanged: (String val) {
                   setState(() {
-                    _giveName = val;
+                    _targetPeerId = val;
                   });
                 },
                 onFieldSubmitted: (String val) {},
@@ -103,15 +101,14 @@ class _LinkmanAddWidgetState extends State<LinkmanAddWidget> {
               padding: EdgeInsets.symmetric(horizontal: 15.0),
               child: TextFormField(
                 //controller: emailController,
-                keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
-                  labelText: AppLocalizations.t('Email'),
-                  prefixIcon: Icon(Icons.email),
+                  labelText: AppLocalizations.t('targetName'),
+                  prefixIcon: Icon(Icons.person),
                 ),
-                initialValue: _email,
+                initialValue: _targetName,
                 onChanged: (String val) {
                   setState(() {
-                    _email = val;
+                    _targetName = val;
                   });
                 },
                 onFieldSubmitted: (String val) {},
@@ -121,15 +118,14 @@ class _LinkmanAddWidgetState extends State<LinkmanAddWidget> {
               padding: EdgeInsets.symmetric(horizontal: 15.0),
               child: TextFormField(
                 //controller: emailController,
-                keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  labelText: AppLocalizations.t('mobile'),
-                  prefixIcon: Icon(Icons.mobile_friendly),
+                  labelText: AppLocalizations.t('title'),
+                  prefixIcon: Icon(Icons.title),
                 ),
-                initialValue: _mobile,
+                initialValue: _title,
                 onChanged: (String val) {
                   setState(() {
-                    _mobile = val;
+                    _title = val;
                   });
                 },
                 onFieldSubmitted: (String val) {},
@@ -138,16 +134,15 @@ class _LinkmanAddWidgetState extends State<LinkmanAddWidget> {
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
               child: TextFormField(
-                keyboardType: TextInputType.text,
                 //controller: passwordController,
                 decoration: InputDecoration(
-                  labelText: AppLocalizations.t('peerId'),
-                  prefixIcon: Icon(Icons.lock),
+                  labelText: AppLocalizations.t('content'),
+                  prefixIcon: Icon(Icons.content_copy),
                 ),
-                initialValue: _peerId,
+                initialValue: _content,
                 onChanged: (String val) {
                   setState(() {
-                    _peerId = val;
+                    _content = val;
                   });
                 },
                 onFieldSubmitted: (String val) {},
@@ -174,17 +169,17 @@ class _LinkmanAddWidgetState extends State<LinkmanAddWidget> {
   }
 
   Future<void> _add() async {
-    if (_name != '') {
-      var linkman = Linkman(_name);
-      linkman.ownerPeerId = myself.peerId;
-      linkman.givenName = _giveName;
-      var keyPair = await cryptoGraphy.generateKeyPair();
-      var publicKey = await cryptoGraphy.exportPublicKey(keyPair);
-      linkman.peerId = publicKey;
-      linkman.email = _email;
-      linkman.mobile = _mobile;
-      LinkmanService.instance.insert(linkman).then((value) {
-        Provider.of<LinkmenDataProvider>(context, listen: false).add([linkman]);
+    if (_targetName != '') {
+      var chatMessage = ChatMessage();
+      chatMessage.ownerPeerId = myself.peerId;
+      chatMessage.messageId = _messageId;
+      chatMessage.targetPeerId = _targetPeerId;
+      chatMessage.targetName = _targetName;
+      chatMessage.title = _title;
+      chatMessage.content = _content;
+      ChatMessageService.instance.insert(chatMessage).then((value) {
+        Provider.of<ChatMessageDataProvider>(context, listen: false)
+            .add([chatMessage]);
       });
     } else {
       logger.e('name is null');

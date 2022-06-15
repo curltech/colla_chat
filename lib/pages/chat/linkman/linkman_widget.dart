@@ -30,7 +30,7 @@ class LinkmanWidget extends StatelessWidget {
         var tile = TileData(
             avatar: linkman.avatar,
             title: linkman.name,
-            subtitle: linkman.givenName,
+            subtitle: linkman.peerId,
             routeName: '/chat/setting');
         tileData.add(tile);
       }

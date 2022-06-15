@@ -1,5 +1,6 @@
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 import '../provider/app_data.dart';
 
@@ -112,3 +113,5 @@ class HttpClientPool {
     return _default;
   }
 }
+
+final DefaultCacheManager defaultCacheManager = DefaultCacheManager();

@@ -19,6 +19,7 @@ import 'package:phone_numbers_parser/phone_numbers_parser.dart'
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:telephony/telephony.dart';
+import 'package:toast/toast.dart';
 
 import '../provider/app_data.dart';
 
@@ -660,6 +661,10 @@ class DialogUtil {
       {required Widget Function(BuildContext) builder}) {
     return showBottomSheet(context: context, builder: builder);
   }
+
+  static showToast(String msg, {int duration = 1, int gravity = 0}) {
+    Toast.show(msg, duration: duration, gravity: gravity);
+  }
 }
 
 class SmsUtil {
@@ -741,5 +746,152 @@ class TraceUtil {
     Duration diff = t.difference(start);
     logger.i('$msg, trace end:${t.toIso8601String()}, interval $diff');
     return diff;
+  }
+}
+
+class ImageUtil {
+  /// 判断是否网络
+  static bool isNetWorkImg(String img) {
+    return img.startsWith('http') || img.startsWith('https');
+  }
+
+  /// 判断是否资源图片
+  static bool isAssetsImg(String img) {
+    return img.startsWith('asset') || img.startsWith('assets');
+  }
+}
+
+class ScreenUtil {
+  static double winWidth(BuildContext context) {
+    return MediaQuery.of(context).size.width;
+  }
+
+  static double winHeight(BuildContext context) {
+    return MediaQuery.of(context).size.height;
+  }
+
+  static double winTop(BuildContext context) {
+    return MediaQuery.of(context).padding.top;
+  }
+
+  static double winBottom(BuildContext context) {
+    return MediaQuery.of(context).padding.bottom;
+  }
+
+  static double winLeft(BuildContext context) {
+    return MediaQuery.of(context).padding.left;
+  }
+
+  static double winRight(BuildContext context) {
+    return MediaQuery.of(context).padding.right;
+  }
+
+  static double winKeyHeight(BuildContext context) {
+    return MediaQuery.of(context).viewInsets.bottom;
+  }
+
+  static double statusBarHeight(BuildContext context) {
+    return MediaQueryData.fromWindow(window).padding.top;
+  }
+
+  static double navigationBarHeight(BuildContext context) {
+    return kToolbarHeight;
+  }
+
+  static double topBarHeight(BuildContext context) {
+    return kToolbarHeight + MediaQueryData.fromWindow(window).padding.top;
+  }
+}
+
+class CollectUtil {
+  ///判断List是否为空
+  static bool listNoEmpty(List? list) {
+    if (list == null) return false;
+
+    if (list.isEmpty) return false;
+
+    return true;
+  }
+}
+
+typedef void OnTimerTickCallback(int millisUntilFinished);
+
+class TimerUtil {
+  TimerUtil(
+      {this.mInterval = Duration.millisecondsPerSecond,
+      required this.mTotalTime});
+
+  late OnTimerTickCallback _onTimerTickCallback;
+
+  /// Timer是否启动.
+  bool _isActive = false;
+
+  Timer? _mTimer;
+
+  /// Timer间隔 单位毫秒，默认1000毫秒(1秒).
+  int mInterval;
+
+  /// 倒计时总时间
+  int mTotalTime; //单位毫秒
+
+  /// 设置Timer间隔.
+  void setInterval(int interval) {
+    if (interval <= 0) interval = Duration.millisecondsPerSecond;
+    mInterval = interval;
+  }
+
+  /// 设置倒计时总时间.
+  void setTotalTime(int totalTime) {
+    if (totalTime <= 0) return;
+    mTotalTime = totalTime;
+  }
+
+  /// Timer是否启动.
+  bool isActive() {
+    return _isActive;
+  }
+
+  void _doCallback(int time) {
+    if (_onTimerTickCallback != null) {
+      _onTimerTickCallback(time);
+    }
+  }
+
+  void startCountDown() {
+    if (_isActive || mInterval <= 0 || mTotalTime <= 0) return;
+    _isActive = true;
+    Duration duration = Duration(milliseconds: mInterval);
+    _doCallback(mTotalTime);
+    _mTimer = Timer.periodic(duration, (Timer timer) {
+      int time = mTotalTime - mInterval;
+      mTotalTime = time;
+      if (time >= mInterval) {
+        _doCallback(time);
+      } else if (time == 0) {
+        _doCallback(time);
+        cancel();
+      } else {
+        timer.cancel();
+        Future.delayed(Duration(milliseconds: time), () {
+          mTotalTime = 0;
+          _doCallback(0);
+          cancel();
+        });
+      }
+    });
+  }
+
+  void cancel() {
+    final _mTimer = this._mTimer;
+    if (_mTimer != null) {
+      _mTimer.cancel();
+      this._mTimer = null;
+    }
+    _isActive = false;
+  }
+
+  // set timer callback.
+  void setOnTimerTickCallback(OnTimerTickCallback callback) {
+    _onTimerTickCallback = callback;
   }
 }

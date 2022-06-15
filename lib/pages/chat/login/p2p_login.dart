@@ -19,6 +19,7 @@ class _P2pLoginState extends State<P2pLogin>
     with SingleTickerProviderStateMixin {
   late List<Widget> _children;
   late TabController _tabController;
+  bool _visible = false;
 
   @override
   void initState() {
@@ -33,6 +34,12 @@ class _P2pLoginState extends State<P2pLogin>
       p2pSettingWidget,
     ];
     _tabController = TabController(length: _children.length, vsync: this);
+
+    Future.delayed(const Duration(milliseconds: 500), () {
+      setState(() {
+        _visible = !_visible;
+      });
+    });
   }
 
   @override
@@ -66,18 +73,17 @@ class _P2pLoginState extends State<P2pLogin>
         ),
       ],
     );
+    var workspace = AnimatedOpacity(
+        opacity: _visible ? 0.7 : 0.0,
+        duration: Duration(seconds: 2),
+        child: Center(
+            child: SizedBox(
+          width: 380,
+          height: 500,
+          child: tabBarView,
+        )));
     return Scaffold(
         appBar: appBar,
-        body: Stack(children: <Widget>[
-          Loading(title: ''),
-          Opacity(
-              opacity: 0.7,
-              child: Center(
-                  child: SizedBox(
-                width: 380,
-                height: 500,
-                child: tabBarView,
-              )))
-        ]));
+        body: Stack(children: <Widget>[Loading(title: ''), workspace]));
   }
 }
