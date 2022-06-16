@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../tool/util.dart';
-import '../chat/widget/app_bar_widget.dart';
+import '../chat/widget/app_bar_view.dart';
 import '../chat/widget/commom_button.dart';
 import '../chat/widget/main_input.dart';
 import '../chat/widget/tip_verify_Input.dart';
@@ -60,10 +60,10 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
       radius: 4.0,
     );
 
-    return Scaffold(
-      backgroundColor: Colors.cyan,
-      appBar: AppBarWidget(title: '更改名字', rightDMActions: [rWidget]),
-      body: MainInputBody(color: Colors.cyan, child: body()),
+    return AppBarView(
+      title: '更改名字',
+      rightActions: [rWidget],
+      child: MainInputBody(color: Colors.cyan, child: body()),
     );
   }
 }

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 import '../../../constant/base.dart';
 import '../../../transport/httpclient.dart';
-import '../chat/widget/app_bar_widget.dart';
+import '../chat/widget/app_bar_view.dart';
 import '../chat/widget/label_row.dart';
 
 class PersonalInfoPage extends StatefulWidget {
@@ -98,9 +98,9 @@ class _PersonalInfoPageState extends State<PersonalInfoPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBarWidget(title: '个人信息'),
-      body: SingleChildScrollView(child: body()),
+    return AppBarView(
+      title: '个人信息',
+      child: body(),
     );
   }
 }

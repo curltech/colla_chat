@@ -2,7 +2,7 @@ import 'package:colla_chat/pages/chat/chat/widget/tip_verify_Input.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:flutter/material.dart';
 
-import 'app_bar_widget.dart';
+import 'app_bar_view.dart';
 import 'commom_button.dart';
 import 'main_input.dart';
 
@@ -49,13 +49,10 @@ class _SetRemarkPageState extends State<SetRemarkPage> {
       },
     );
 
-    return Scaffold(
-      backgroundColor: Colors.cyan,
-      appBar: AppBarWidget(
-        title: '设置备注和标签',
-        rightDMActions: <Widget>[rWidget],
-      ),
-      body: MainInputBody(child: body(), color: Colors.cyan),
+    return AppBarView(
+      title: '设置备注和标签',
+      rightActions: <Widget>[rWidget],
+      child: MainInputBody(child: body(), color: Colors.cyan),
     );
   }
 }

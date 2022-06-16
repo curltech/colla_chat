@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'app_bar_widget.dart';
+import 'app_bar_view.dart';
 import 'chat_mamber.dart';
 import 'label_row.dart';
 
@@ -108,12 +108,9 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.cyan,
-      appBar: AppBarWidget(title: '聊天信息'),
-      body: SingleChildScrollView(
-        child: Column(children: body()),
-      ),
+    return AppBarView(
+      title: '聊天信息',
+      child: Column(children: body()),
     );
   }
 }

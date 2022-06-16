@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:colla_chat/provider/app_data.dart';
 import 'package:flutter/material.dart';
 
 /// 通用列表项的数据模型
@@ -47,7 +48,8 @@ class DataListTile extends StatelessWidget {
     }
     Widget? trailing;
     if (_tileData.routeName != null) {
-      trailing = Icon(Icons.arrow_forward_ios);
+      trailing = Icon(Icons.arrow_forward_ios,
+          color: appDataProvider.themeData?.colorScheme.primary);
     } else if (_tileData.suffix != null) {
       trailing = Text(
         _tileData.suffix!,
@@ -73,7 +75,6 @@ class DataListTile extends StatelessWidget {
   }
 }
 
-//我的页面
 class DataListView extends StatelessWidget {
   late final Map<String, List<TileData>> _tileData;
 
@@ -91,8 +92,8 @@ class DataListView extends StatelessWidget {
             margin: const EdgeInsets.only(top: 5.0),
             child: Column(children: <Widget>[
               DataListTile(tileData: tile),
-              Padding(
-                padding: const EdgeInsets.only(left: 5.0, right: 5.0),
+              const Padding(
+                padding: EdgeInsets.only(left: 5.0, right: 5.0),
                 child: Divider(
                   height: 0.5,
                 ),
@@ -100,12 +101,10 @@ class DataListView extends StatelessWidget {
             ]));
         items.add(item);
       }
-      var group = Container(
-          margin: const EdgeInsets.only(top: 5.0),
-          child: Column(children: items));
+      var group = Column(children: items);
       groups.add(group);
     }
-    var view = ListView(
+    var view = Column(
       children: groups,
     );
 
@@ -114,9 +113,6 @@ class DataListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      //列表
-      body: _build(context),
-    );
+    return _build(context);
   }
 }

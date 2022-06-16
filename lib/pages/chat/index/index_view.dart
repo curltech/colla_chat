@@ -45,7 +45,7 @@ class IndexViewState extends State<IndexView>
       KeepAliveWrapper(child: ChatTarget()),
       const KeepAliveWrapper(child: LinkmanPage()),
       KeepAliveWrapper(child: HomePage()),
-      KeepAliveWrapper(child: Me())
+      KeepAliveWrapper(child: MeWidget())
     ];
     _tabController = TabController(length: _children.length, vsync: this);
     _tabController.addListener(() {

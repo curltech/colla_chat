@@ -1,12 +1,12 @@
 import 'dart:async';
 
 import 'package:colla_chat/entity/chat/chat.dart';
-import 'package:colla_chat/pages/chat/chat/widget/app_bar_widget.dart';
 import 'package:colla_chat/pages/chat/chat/widget/text_span_builder.dart';
 import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../provider/app_data.dart';
+import 'app_bar_view.dart';
 import 'chat_details_body.dart';
 import 'chat_details_row.dart';
 import 'chat_more_icon.dart';
@@ -237,10 +237,10 @@ class _ChatPageState extends State<ChatPage> {
       )
     ];
 
-    return Scaffold(
-      appBar: AppBarWidget(
-          title: newGroupName ?? widget.title, rightDMActions: rWidget),
-      body: MainInputBody(
+    return AppBarView(
+      title: newGroupName ?? widget.title,
+      rightActions: rWidget,
+      child: MainInputBody(
         onTap: () => setState(
           () {
             _isMore = false;

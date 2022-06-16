@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../constant/base.dart';
 import '../../../tool/util.dart';
-import '../chat/widget/app_bar_widget.dart';
+import '../chat/widget/app_bar_view.dart';
 import '../chat/widget/image_view.dart';
 import '../chat/widget/ui.dart';
 
@@ -82,11 +82,10 @@ class _QrCodePageState extends State<QrCodePage> {
         ),
       )
     ];
-    return Scaffold(
-      backgroundColor: Colors.cyan,
-      appBar: AppBarWidget(
-          title: '${widget.isGroup ? '群' : ''}二维码名片', rightDMActions: rWidget),
-      body: SingleChildScrollView(child: Column(children: body)),
+    return AppBarView(
+      title: '${widget.isGroup ? '群' : ''}二维码名片',
+      rightActions: rWidget,
+      child: Column(children: body),
     );
   }
 }

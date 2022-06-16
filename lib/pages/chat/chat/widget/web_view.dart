@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-import 'app_bar_widget.dart';
+import 'app_bar_view.dart';
 
 class WebViewPage extends StatefulWidget {
   final String url;
@@ -49,11 +49,10 @@ class WebViewPageState extends State<WebViewPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBarWidget(
-          title: '${widget.title}', leadingImg: 'assets/images/bar_close.png'),
-      body: body(),
-    );
+    return AppBarView(
+        title: '${widget.title}',
+        leadingImage: 'assets/images/bar_close.png',
+        child: body());
   }
 
   JavascriptChannel _toasterJavascriptChannel(BuildContext context) {

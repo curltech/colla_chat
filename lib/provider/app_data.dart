@@ -249,12 +249,11 @@ class AppDataProvider with ChangeNotifier {
       textTheme = const TextTheme();
     }
 
-    ThemeData themeData = ThemeData(
+    _themeData = ThemeData(
       colorScheme: colorScheme,
       textTheme: textTheme,
       brightness: brightness,
     );
-    _themeData = themeData;
   }
 
   MaterialColor? get seedColor {
