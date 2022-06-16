@@ -30,7 +30,7 @@ class Loading extends StatefulWidget {
 }
 
 class _LoadingState extends State<Loading> with SingleTickerProviderStateMixin {
-  var children = <Widget>[];
+  var _children = <Widget>[];
   late TabController _tabController;
 
   @override
@@ -45,7 +45,7 @@ class _LoadingState extends State<Loading> with SingleTickerProviderStateMixin {
             backgroudImages[i],
             fit: BoxFit.cover,
           ));
-      children.add(image);
+      _children.add(image);
     }
     if (widget.autoPlay) {
       Future.doWhile(() async {
@@ -72,7 +72,7 @@ class _LoadingState extends State<Loading> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return TabBarView(
       controller: _tabController,
-      children: children,
+      children: _children,
     );
   }
 

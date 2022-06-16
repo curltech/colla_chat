@@ -5,23 +5,25 @@ import 'package:provider/provider.dart';
 
 import '../../../l10n/localization.dart';
 import '../../../provider/app_data.dart';
+import '../../../widgets/common/keep_alive_wrapper.dart';
 import '../../../widgets/richtext/pages/home_page.dart';
 import '../chat/chat_target.dart';
 import '../linkman/linkman_page.dart';
 import '../me/me.dart';
 
-class Index extends StatefulWidget {
+class IndexView extends StatefulWidget {
   final String title;
 
-  const Index({Key? key, required this.title}) : super(key: key);
+  const IndexView({Key? key, required this.title}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return _IndexState();
+    return IndexViewState();
   }
 }
 
-class _IndexState extends State<Index> {
+class IndexViewState extends State<IndexView>
+    with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
   final _widgetLabels = [
     AppLocalizations.instance.text('Chat'),
@@ -32,12 +34,26 @@ class _IndexState extends State<Index> {
   var endDrawer = const EndDrawer();
   late SizedBox leftToolBar;
   late BottomNavigationBar bottomNavigationBar;
-  List<Widget> children = <Widget>[
-    ChatTarget(),
-    LinkmanPage(),
-    HomePage(),
-    Me()
-  ];
+  List<Widget> _children = <Widget>[];
+
+  late TabController _tabController;
+
+  @override
+  void initState() {
+    super.initState();
+    _children = <Widget>[
+      KeepAliveWrapper(child: ChatTarget()),
+      const KeepAliveWrapper(child: LinkmanPage()),
+      KeepAliveWrapper(child: HomePage()),
+      KeepAliveWrapper(child: Me())
+    ];
+    _tabController = TabController(length: _children.length, vsync: this);
+    _tabController.addListener(() {
+      setState(() {
+        _currentIndex = _tabController.index;
+      });
+    });
+  }
 
   SizedBox _createLeftBar() {
     return SizedBox(
@@ -53,9 +69,7 @@ class _IndexState extends State<Index> {
                 style: TextStyle(color: _getIconColor(0)),
               ),
               onTap: () {
-                setState(() {
-                  _currentIndex = 0;
-                });
+                _tabController.index = 0;
               }),
           ListTile(
               iconColor: _getIconColor(1),
@@ -66,9 +80,7 @@ class _IndexState extends State<Index> {
                 style: TextStyle(color: _getIconColor(1)),
               ),
               onTap: () {
-                setState(() {
-                  _currentIndex = 1;
-                });
+                _tabController.index = 1;
               }),
           ListTile(
               iconColor: _getIconColor(2),
@@ -79,9 +91,7 @@ class _IndexState extends State<Index> {
                 style: TextStyle(color: _getIconColor(2)),
               ),
               onTap: () {
-                setState(() {
-                  _currentIndex = 2;
-                });
+                _tabController.index = 2;
               }),
           ListTile(
               iconColor: _getIconColor(3),
@@ -92,9 +102,7 @@ class _IndexState extends State<Index> {
                 style: TextStyle(color: _getIconColor(3)),
               ),
               onTap: () {
-                setState(() {
-                  _currentIndex = 3;
-                });
+                _tabController.index = 3;
               }),
         ],
       ),
@@ -102,7 +110,7 @@ class _IndexState extends State<Index> {
   }
 
   Color? _getIconColor(int index) {
-    if (index == _currentIndex) {
+    if (index == _tabController.index) {
       return Provider.of<AppDataProvider>(context)
           .themeData
           ?.colorScheme
@@ -112,46 +120,8 @@ class _IndexState extends State<Index> {
     }
   }
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    appDataProvider.changeSize(context);
-    //左边栏，和底部按钮功能一样，在桌面版才有
-    leftToolBar = _createLeftBar();
-    bottomNavigationBar = _createBottomBar(context);
-    Scaffold scaffold;
-    var platformParams = PlatformParams.instance;
-    //移动手机不需要左边栏，需要底部栏
-    if (appDataProvider.mobile) {
-      scaffold = Scaffold(
-          body: Center(
-              child: IndexedStack(
-                  index: 0, children: <Widget>[children[_currentIndex]])),
-          endDrawer: endDrawer,
-          bottomNavigationBar: bottomNavigationBar);
-    } else {
-      //桌面版不需要底部栏，需要固定的左边栏
-      scaffold = Scaffold(
-          body: Center(
-              child: Row(
-            children: <Widget>[
-              leftToolBar,
-              const VerticalDivider(thickness: 0.5),
-              Expanded(
-                  child: IndexedStack(
-                      index: 0, children: <Widget>[children[_currentIndex]])),
-            ],
-          )),
-          endDrawer: endDrawer);
-    }
-    return scaffold;
-  }
-
   BottomNavigationBar _createBottomBar(BuildContext context) {
+    var index = _tabController.index;
     BottomNavigationBar bottomNavigationBar = BottomNavigationBar(
       //底部按钮，移动版才有
       items: <BottomNavigationBarItem>[
@@ -180,8 +150,47 @@ class _IndexState extends State<Index> {
   }
 
   void _onItemTapped(int index) {
-    setState(() {
-      _currentIndex = index;
-    });
+    _tabController.index = index;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    appDataProvider.changeSize(context);
+    //左边栏，和底部按钮功能一样，在桌面版才有
+    leftToolBar = _createLeftBar();
+    bottomNavigationBar = _createBottomBar(context);
+    Scaffold scaffold;
+    var platformParams = PlatformParams.instance;
+    var tabBarView = TabBarView(
+      controller: _tabController,
+      children: _children,
+    );
+    //移动手机不需要左边栏，需要底部栏
+    if (appDataProvider.mobile) {
+      scaffold = Scaffold(
+          body: Center(child: tabBarView),
+          endDrawer: endDrawer,
+          bottomNavigationBar: bottomNavigationBar);
+    } else {
+      //桌面版不需要底部栏，需要固定的左边栏
+      scaffold = Scaffold(
+          body: Center(
+              child: Row(
+            children: <Widget>[
+              leftToolBar,
+              const VerticalDivider(thickness: 0.5),
+              Expanded(child: tabBarView),
+            ],
+          )),
+          endDrawer: endDrawer);
+    }
+    return scaffold;
+  }
+
+  @override
+  void dispose() {
+    // 释放资源
+    _tabController.dispose();
+    super.dispose();
   }
 }
