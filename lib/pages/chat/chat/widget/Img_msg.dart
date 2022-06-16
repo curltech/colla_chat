@@ -35,11 +35,11 @@ class ImgMsg extends StatelessWidget {
               color: Colors.white,
               borderRadius: BorderRadius.all(Radius.circular(10.0)),
             ),
-            child: new ClipRRect(
+            child: ClipRRect(
               borderRadius: BorderRadius.all(Radius.circular(10.0)),
               child: isFile
-                  ? new Image.file(File(url))
-                  : new CachedNetworkImage(
+                  ? Image.file(File(url))
+                  : CachedNetworkImage(
                       imageUrl: url, height: resultH, fit: BoxFit.cover),
             ),
           ),
@@ -65,7 +65,7 @@ class ImgMsg extends StatelessWidget {
     }
     return Container(
       padding: EdgeInsets.symmetric(vertical: 5.0),
-      child: new Row(children: body),
+      child: Row(children: body),
     );
   }
 }

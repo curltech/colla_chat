@@ -13,10 +13,10 @@ class HorizontalLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Container(
+    return Container(
       height: height,
       color: color,
-      margin: new EdgeInsets.symmetric(horizontal: horizontal),
+      margin: EdgeInsets.symmetric(horizontal: horizontal),
     );
   }
 }
@@ -36,10 +36,10 @@ class VerticalLine extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Container(
+    return Container(
       width: width,
       color: Color(0xffDCE0E5),
-      margin: new EdgeInsets.symmetric(vertical: vertical),
+      margin: EdgeInsets.symmetric(vertical: vertical),
       height: height,
     );
   }
@@ -55,6 +55,6 @@ class Space extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Container(width: width, height: height);
+    return Container(width: width, height: height);
   }
 }

@@ -1,5 +1,4 @@
 import 'package:colla_chat/widgets/setting/locale_picker.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -27,7 +26,7 @@ class _P2pSettingWidgetState extends State<P2pSettingWidget> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
+        children: const <Widget>[
           SizedBox(height: 30.0),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 15.0),

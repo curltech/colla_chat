@@ -2,7 +2,7 @@ import 'package:colla_chat/pages/chat/chat/widget/tip_verify_Input.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:flutter/material.dart';
 
-import 'commom_bar.dart';
+import 'app_bar_widget.dart';
 import 'commom_button.dart';
 import 'main_input.dart';
 
@@ -12,16 +12,16 @@ class SetRemarkPage extends StatefulWidget {
 }
 
 class _SetRemarkPageState extends State<SetRemarkPage> {
-  TextEditingController _tc = new TextEditingController();
-  FocusNode _f = new FocusNode();
+  TextEditingController _tc = TextEditingController();
+  FocusNode _f = FocusNode();
 
   String initContent = '';
 
   Widget body() {
-    return new SingleChildScrollView(
-      child: new Column(
+    return SingleChildScrollView(
+      child: Column(
         children: [
-          new TipVerifyInput(
+          TipVerifyInput(
             title: '备注',
             defStr: initContent,
             controller: _tc,
@@ -51,7 +51,7 @@ class _SetRemarkPageState extends State<SetRemarkPage> {
 
     return Scaffold(
       backgroundColor: Colors.cyan,
-      appBar: new ComMomBar(
+      appBar: AppBarWidget(
         title: '设置备注和标签',
         rightDMActions: <Widget>[rWidget],
       ),

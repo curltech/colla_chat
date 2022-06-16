@@ -1,19 +1,8 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:wechat_flutter/im/entity/i_person_info_entity.dart';
-import 'package:wechat_flutter/im/entity/person_info_entity.dart';
-import 'package:wechat_flutter/im/info_handle.dart';
-import 'package:wechat_flutter/pages/home/search_page.dart';
-import 'package:wechat_flutter/pages/settings/chat_background_page.dart';
-import 'package:wechat_flutter/tools/wechat_flutter.dart';
-import 'package:wechat_flutter/ui/dialog/confirm_alert.dart';
-import 'package:wechat_flutter/ui/item/chat_mamber.dart';
-import 'package:wechat_flutter/ui/orther/label_row.dart';
 
-import 'commom_bar.dart';
+import 'app_bar_widget.dart';
+import 'chat_mamber.dart';
 import 'label_row.dart';
 
 class ChatInfoPage extends StatefulWidget {
@@ -33,14 +22,14 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
   bool isDoNotDisturb = true;
 
   Widget buildSwitch(item) {
-    return new LabelRow(
+    return LabelRow(
       label: item['label'],
       margin: item['label'] == '消息免打扰' ? EdgeInsets.only(top: 10.0) : null,
       isLine: item['label'] != '强提醒',
       isRight: false,
-      rightW: new SizedBox(
+      rightW: SizedBox(
         height: 25.0,
-        child: new CupertinoSwitch(
+        child: CupertinoSwitch(
           value: item['value'],
           onChanged: (v) {},
         ),
@@ -57,38 +46,44 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
     ];
 
     return [
-      new ChatMamBer(model: model),
-      new LabelRow(
+      ChatMamBer(model: model),
+      LabelRow(
         label: '查找聊天记录',
         margin: EdgeInsets.only(top: 10.0),
-        onPressed: () => routePush(new SearchPage()),
+        onPressed: () {
+          //routePush(SearchPage());
+        },
       ),
-      new Column(
+      Column(
         children: switchItems.map(buildSwitch).toList(),
       ),
-      new LabelRow(
+      LabelRow(
         label: '设置当前聊天背景',
         margin: EdgeInsets.only(top: 10.0),
-        onPressed: () => routePush(new ChatBackgroundPage()),
+        onPressed: () {
+          //routePush(ChatBackgroundPage());
+        },
       ),
-      new LabelRow(
+      LabelRow(
         label: '清空聊天记录',
         margin: EdgeInsets.only(top: 10.0),
         onPressed: () {
-          confirmAlert(
-            context,
-            (isOK) {
-              if (isOK) showToast(context, '敬请期待');
-            },
-            tips: '确定删除群的聊天记录吗？',
-            okBtn: '清空',
-          );
+          // confirmAlert(
+          //   context,
+          //   (isOK) {
+          //     if (isOK) DialogUtil.showToast('敬请期待');
+          //   },
+          //   tips: '确定删除群的聊天记录吗？',
+          //   okBtn: '清空',
+          // );
         },
       ),
-      new LabelRow(
+      LabelRow(
         label: '投诉',
         margin: EdgeInsets.only(top: 10.0),
-        onPressed: () => routePush(new WebViewPage(helpUrl, '投诉')),
+        onPressed: () {
+          //routePush(WebViewPage(helpUrl, '投诉'));
+        },
       ),
     ];
   }
@@ -100,24 +95,24 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
   }
 
   getInfo() async {
-    final info = await getUsersProfile([widget.id]);
-    List infoList = json.decode(info);
-    setState(() {
-      if (Platform.isIOS) {
-        model = IPersonInfoEntity.fromJson(infoList[0]);
-      } else {
-        model = PersonInfoEntity.fromJson(infoList[0]);
-      }
-    });
+    // final info = await getUsersProfile([widget.id]);
+    // List infoList = json.decode(info);
+    // setState(() {
+    //   if (Platform.isIOS) {
+    //     model = IPersonInfoEntity.fromJson(infoList[0]);
+    //   } else {
+    //     model = PersonInfoEntity.fromJson(infoList[0]);
+    //   }
+    // });
   }
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-      backgroundColor: chatBg,
-      appBar: new ComMomBar(title: '聊天信息'),
-      body: new SingleChildScrollView(
-        child: new Column(children: body()),
+    return Scaffold(
+      backgroundColor: Colors.cyan,
+      appBar: AppBarWidget(title: '聊天信息'),
+      body: SingleChildScrollView(
+        child: Column(children: body()),
       ),
     );
   }

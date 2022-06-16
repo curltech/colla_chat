@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import 'package:wechat_flutter/tools/wechat_flutter.dart';
+import '../../../../tool/util.dart';
+import 'commom_button.dart';
 
 class ChatMoreIcon extends StatelessWidget {
   final bool isMore;
@@ -10,15 +11,15 @@ class ChatMoreIcon extends StatelessWidget {
 
   ChatMoreIcon({
     this.isMore = false,
-    this.value,
-    this.onTap,
-    this.moreTap,
+    required this.value,
+    required this.onTap,
+    required this.moreTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return strNoEmpty(value)
-        ? new ComMomButton(
+    return StringUtil.isNotEmpty(value)
+        ? ComMomButton(
             text: '发送',
             style: TextStyle(color: Colors.white),
             width: 45.0,
@@ -26,13 +27,13 @@ class ChatMoreIcon extends StatelessWidget {
             radius: 4.0,
             onTap: onTap ?? () {},
           )
-        : new InkWell(
-            child: new Container(
+        : InkWell(
+            child: Container(
               width: 23,
               margin: EdgeInsets.symmetric(horizontal: 5.0),
-              child: new Image.asset(
+              child: Image.asset(
                 'assets/images/chat/ic_chat_more.webp',
-                color: mainTextColor,
+                color: Colors.black,
                 fit: BoxFit.cover,
               ),
             ),

@@ -175,11 +175,10 @@ class _LinkmanAddWidgetState extends State<LinkmanAddWidget> {
 
   Future<void> _add() async {
     if (_name != '') {
-      var linkman = Linkman(_name);
-      linkman.ownerPeerId = myself.peerId;
-      linkman.givenName = _giveName;
       var keyPair = await cryptoGraphy.generateKeyPair();
       var publicKey = await cryptoGraphy.exportPublicKey(keyPair);
+      var linkman = Linkman(myself.peerId!, publicKey, _name);
+      linkman.givenName = _giveName;
       linkman.peerId = publicKey;
       linkman.email = _email;
       linkman.mobile = _mobile;

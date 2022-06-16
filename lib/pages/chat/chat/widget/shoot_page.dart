@@ -82,30 +82,30 @@ class _ShootPageState extends State<ShootPage> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-        body: new Stack(
+    return Scaffold(
+        body: Stack(
       children: <Widget>[
-        new Container(
+        Container(
           child: Center(child: _cameraPreviewWidget()),
           color: Colors.black,
         ),
-        new Positioned(
+        Positioned(
           right: 10,
           top: MediaQuery.of(context).size.height / 2,
           child: _thumbnailWidget(),
         ),
-        new Positioned(
+        Positioned(
           left: 0.0,
           right: 0.0,
           top: 30.0,
-          child: new Row(
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
-              new InkWell(
-                child: new Container(
+              InkWell(
+                child: Container(
                   width: 60.0,
                   padding: EdgeInsets.symmetric(horizontal: 20.0),
-                  child: new Icon(CupertinoIcons.back, color: Colors.white),
+                  child: Icon(CupertinoIcons.back, color: Colors.white),
                 ),
                 onTap: () => Navigator.of(context).maybePop(),
               ),
@@ -113,31 +113,31 @@ class _ShootPageState extends State<ShootPage> with WidgetsBindingObserver {
             ],
           ),
         ),
-        new Positioned(
+        Positioned(
           bottom: 30.0,
           left: 0,
           right: 0,
-          child: new Row(
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.end,
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
-              new Container(width: 40),
-              new Column(
+              Container(width: 40),
+              Column(
                 children: <Widget>[
                   !isOnPress
-                      ? new Padding(
+                      ? Padding(
                           padding: EdgeInsets.only(bottom: 45.0),
-                          child: new Text(
+                          child: Text(
                             '轻触拍照，长按摄像',
                             style: TextStyle(color: Colors.white),
                           ),
                         )
-                      : new Text(
+                      : Text(
                           '计时: ${_timing ?? 0}',
                           style: TextStyle(color: Colors.white),
                         ),
-                  new Listener(
-                    child: new Container(
+                  Listener(
+                    child: Container(
                       height: isOnPress ? 100 : 80.0,
                       width: isOnPress ? 100 : 80.0,
                       decoration: BoxDecoration(
@@ -147,7 +147,7 @@ class _ShootPageState extends State<ShootPage> with WidgetsBindingObserver {
                         ),
                       ),
                       padding: EdgeInsets.all(isOnPress ? 30 : 10.0),
-                      child: new Container(
+                      child: Container(
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.all(Radius.circular(30.0)),
@@ -195,7 +195,7 @@ class _ShootPageState extends State<ShootPage> with WidgetsBindingObserver {
 //              },
                 ],
               ),
-              new Container(width: 40.0),
+              Container(width: 40.0),
             ],
           ),
         )
@@ -207,12 +207,12 @@ class _ShootPageState extends State<ShootPage> with WidgetsBindingObserver {
     if (widget.cameras.isEmpty) return const Text('No camera found');
 
     cameraDescription = widget.cameras[isReverse ? 0 : 1];
-    return new InkWell(
-      child: new Container(
+    return InkWell(
+      child: Container(
         alignment: Alignment.topRight,
         width: 60.0,
         padding: EdgeInsets.symmetric(horizontal: 20.0),
-        child: new Image.asset('assets/images/chat/flip_camera_icon_nor.webp',
+        child: Image.asset('assets/images/chat/flip_camera_icon_nor.webp',
             fit: BoxFit.cover),
       ),
       onTap: () {
@@ -233,9 +233,9 @@ class _ShootPageState extends State<ShootPage> with WidgetsBindingObserver {
         ),
       );
     } else {
-      return new AspectRatio(
+      return AspectRatio(
         aspectRatio: controller.value.aspectRatio,
-        child: new CameraPreview(controller),
+        child: CameraPreview(controller),
       );
     }
   }
@@ -247,7 +247,7 @@ class _ShootPageState extends State<ShootPage> with WidgetsBindingObserver {
         mainAxisSize: MainAxisSize.min,
         children: <Widget>[
           videoController == null && imagePath == null
-              ? new Container()
+              ? Container()
               : SizedBox(
                   child: (videoController == null)
                       ? Image.file(File(imagePath!))
@@ -267,16 +267,16 @@ class _ShootPageState extends State<ShootPage> with WidgetsBindingObserver {
                   height: 64.0,
                 ),
           videoController == null && imagePath == null
-              ? new Container()
-              : new Container(
+              ? Container()
+              : Container(
                   margin: EdgeInsets.only(top: 10.0),
                   width: 60.0,
                   height: 25.0,
-                  child: new FlatButton(
+                  child: FlatButton(
                     onPressed: () {},
                     color: Colors.white,
                     padding: EdgeInsets.all(0),
-                    child: new Text(
+                    child: Text(
                       '发送',
                       style: TextStyle(fontSize: 11.0),
                     ),

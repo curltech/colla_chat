@@ -32,12 +32,12 @@ class LabelRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return new Container(
-      child: new FlatButton(
+    return Container(
+      child: FlatButton(
         color: Colors.white,
         padding: EdgeInsets.all(0),
         onPressed: onPressed ?? () {},
-        child: new Container(
+        child: Container(
           padding: padding,
           margin: EdgeInsets.only(left: 20.0),
           decoration: BoxDecoration(
@@ -46,34 +46,34 @@ class LabelRow extends StatelessWidget {
                     bottom: BorderSide(color: Colors.grey, width: lineWidth))
                 : null,
           ),
-          child: new Row(
+          child: Row(
             children: <Widget>[
               if (headW != null) headW,
-              new SizedBox(
+              SizedBox(
                 width: labelWidth,
-                child: new Text(
+                child: Text(
                   label ?? '',
                   style: TextStyle(fontSize: 17.0),
                 ),
               ),
               value != null
-                  ? new Text(value,
+                  ? Text(value,
                       style: TextStyle(
                         color: Colors.black.withOpacity(0.7),
                       ))
-                  : new Container(),
-              new Spacer(),
+                  : Container(),
+              Spacer(),
               rValue != null
-                  ? new Text(rValue,
+                  ? Text(rValue,
                       style: TextStyle(
                           color: Colors.black.withOpacity(0.7),
                           fontWeight: FontWeight.w400))
-                  : new Container(),
-              rightW != null ? rightW : new Container(),
+                  : Container(),
+              rightW != null ? rightW : Container(),
               isRight
-                  ? new Icon(CupertinoIcons.right_chevron,
+                  ? Icon(CupertinoIcons.right_chevron,
                       color: Colors.black.withOpacity(0.5))
-                  : new Container(width: 10.0)
+                  : Container(width: 10.0)
             ],
           ),
         ),

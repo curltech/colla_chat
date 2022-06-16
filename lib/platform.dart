@@ -1,7 +1,8 @@
 import 'dart:core';
-import 'dart:io';
-import 'package:flutter/cupertino.dart';
+import 'dart:io' as io;
+
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
 /// 平台的参数，包括平台的硬件和系统软件特征，是只读的数据
@@ -35,34 +36,34 @@ class PlatformParams {
     if (!initStatus) {
       final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
       try {
-        if (Platform.isAndroid ||
-            Platform.isIOS ||
-            Platform.isWindows ||
-            Platform.isMacOS ||
-            Platform.isLinux) {
-          instance.ios = Platform.isIOS;
-          instance.android = Platform.isAndroid;
-          instance.linux = Platform.isLinux;
-          instance.macos = Platform.isMacOS;
-          instance.windows = Platform.isWindows;
-          var locales = Platform.localeName.split('_');
+        if (io.Platform.isAndroid ||
+            io.Platform.isIOS ||
+            io.Platform.isWindows ||
+            io.Platform.isMacOS ||
+            io.Platform.isLinux) {
+          instance.ios = io.Platform.isIOS;
+          instance.android = io.Platform.isAndroid;
+          instance.linux = io.Platform.isLinux;
+          instance.macos = io.Platform.isMacOS;
+          instance.windows = io.Platform.isWindows;
+          var locales = io.Platform.localeName.split('_');
           instance.locale = Locale(locales[0], locales[1]);
-          instance.localHostname = Platform.localHostname;
-          instance.operatingSystem = Platform.operatingSystem;
-          instance.operatingSystemVersion = Platform.operatingSystemVersion;
-          instance.version = Platform.version;
-          if (Platform.isAndroid) {
+          instance.localHostname = io.Platform.localHostname;
+          instance.operatingSystem = io.Platform.operatingSystem;
+          instance.operatingSystemVersion = io.Platform.operatingSystemVersion;
+          instance.version = io.Platform.version;
+          if (io.Platform.isAndroid) {
             instance.deviceData = instance
                 ._readAndroidBuildData(await deviceInfoPlugin.androidInfo);
-          } else if (Platform.isIOS) {
+          } else if (io.Platform.isIOS) {
             instance.deviceData =
                 instance._readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
             instance.deviceData =
                 instance._readLinuxDeviceInfo(await deviceInfoPlugin.linuxInfo);
-          } else if (Platform.isMacOS) {
+          } else if (io.Platform.isMacOS) {
             instance.deviceData =
                 instance._readMacOsDeviceInfo(await deviceInfoPlugin.macOsInfo);
-          } else if (Platform.isWindows) {
+          } else if (io.Platform.isWindows) {
             instance.deviceData = instance
                 ._readWindowsDeviceInfo(await deviceInfoPlugin.windowsInfo);
           }

@@ -41,7 +41,7 @@ class _SoundMsgState extends State<SoundMsg> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    flutterSound = new FlutterSound();
+    flutterSound = FlutterSound();
     // flutterSound.setSubscriptionDuration(0.01);
     // flutterSound.setDbPeakLevelUpdate(0.8);
     // flutterSound.setDbLevelEnabled(true);
@@ -76,8 +76,8 @@ class _SoundMsgState extends State<SoundMsg> with TickerProviderStateMixin {
 //      }
 //    }, onError: (msg) {
 //      setState(() {
-//        duration = new Duration(seconds: 0);
-//        position = new Duration(seconds: 0);
+//        duration = Duration(seconds: 0);
+//        position = Duration(seconds: 0);
 //      });
 //    });
   }
@@ -95,7 +95,7 @@ class _SoundMsgState extends State<SoundMsg> with TickerProviderStateMixin {
     //       sliderCurrentPosition = e.currentPosition;
     //       maxDuration = e.duration;
     //
-    //       DateTime date = new DateTime.fromMillisecondsSinceEpoch(
+    //       DateTime date = DateTime.fromMillisecondsSinceEpoch(
     //           e.currentPosition.toInt(),
     //           isUtc: true);
     //       String txt = DateFormat('mm:ss:SS', 'en_GB').format(date);
@@ -154,20 +154,20 @@ class _SoundMsgState extends State<SoundMsg> with TickerProviderStateMixin {
         padding: EdgeInsets.only(right: 10.0),
         child: FlatButton(
           padding: EdgeInsets.only(left: 18.0, right: 4.0),
-          child: new Row(
+          child: Row(
             mainAxisAlignment:
                 isSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
             children: [
-              new Text("0\"", textAlign: TextAlign.start, maxLines: 1),
-              new Spacer(),
-              new Image.asset(
+              Text("0\"", textAlign: TextAlign.start, maxLines: 1),
+              Spacer(),
+              Image.asset(
                   animation != null
                       ? soundImg[animation.value % 3]
                       : soundImg[3],
                   height: 20.0,
                   color: Colors.black,
                   fit: BoxFit.cover),
-              new Spacer()
+              Spacer()
             ],
           ),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
@@ -183,7 +183,7 @@ class _SoundMsgState extends State<SoundMsg> with TickerProviderStateMixin {
           },
         ),
       ),
-      new Spacer(),
+      Spacer(),
     ];
     if (isSelf) {
       body = body.reversed.toList();
@@ -192,7 +192,7 @@ class _SoundMsgState extends State<SoundMsg> with TickerProviderStateMixin {
     }
     return Container(
       padding: EdgeInsets.symmetric(vertical: 5.0),
-      child: new Row(children: body),
+      child: Row(children: body),
     );
   }
 

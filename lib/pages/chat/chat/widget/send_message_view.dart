@@ -53,7 +53,7 @@ class _SendMessageViewState extends State<SendMessageView> {
     } else if (msgType == 'ModifyName') {
       return ModifyGroupInfoMessage(widget.model);
     } else {
-      return new Text('未知消息');
+      return Text('未知消息');
     }
   }
 }

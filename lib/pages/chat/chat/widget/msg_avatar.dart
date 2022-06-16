@@ -41,10 +41,10 @@ class _MsgAvatarState extends State<MsgAvatar> with TickerProviderStateMixin {
   }
 
   Widget build(BuildContext context) {
-    return new InkWell(
+    return InkWell(
       child: AnimateWidget(
         animation: animation,
-        child: new Container(
+        child: Container(
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.all(Radius.circular(5.0)),
@@ -52,7 +52,7 @@ class _MsgAvatarState extends State<MsgAvatar> with TickerProviderStateMixin {
           margin: EdgeInsets.only(right: 10.0),
 
           ///目前是缺省头像
-          child: new ImageView(
+          child: ImageView(
             img: defaultIcon,
             height: 35,
             width: 35,
@@ -65,7 +65,7 @@ class _MsgAvatarState extends State<MsgAvatar> with TickerProviderStateMixin {
       },
       onTap: () {
         ///点击头像显示联系人的信息页面，等待实现
-        // routePush(new ContactsDetailsPage(
+        // routePush(ContactsDetailsPage(
         //   title: widget.model.nickName,
         //   avatar: widget.model.avatar,
         //   id: widget.model.id,
@@ -94,7 +94,7 @@ class AnimateWidget extends AnimatedWidget {
     var result = Transform(
       transform: Matrix4.rotationZ(animation.value * pi / 180),
       alignment: Alignment.bottomCenter,
-      child: new ClipRRect(
+      child: ClipRRect(
         borderRadius: BorderRadius.all(Radius.circular(5)),
         child: child,
       ),

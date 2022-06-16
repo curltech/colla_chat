@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../widgets/common/keep_alive_wrapper.dart';
 
-const List<String> images = [
+const List<String> backgroudImages = [
   'assets/images/bg/login-bg-wd-1.jpg',
   'assets/images/bg/login-bg-wd-2.jpg',
   'assets/images/bg/login-bg-wd-3.jpg',
@@ -37,12 +37,12 @@ class _LoadingState extends State<Loading> with SingleTickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    _tabController = TabController(length: images.length, vsync: this);
-    for (int i = 0; i < images.length; ++i) {
+    _tabController = TabController(length: backgroudImages.length, vsync: this);
+    for (int i = 0; i < backgroudImages.length; ++i) {
       var image = KeepAliveWrapper(
           keepAlive: true,
           child: Image.asset(
-            images[i],
+            backgroudImages[i],
             fit: BoxFit.cover,
           ));
       children.add(image);
@@ -50,13 +50,13 @@ class _LoadingState extends State<Loading> with SingleTickerProviderStateMixin {
     if (widget.autoPlay) {
       Future.doWhile(() async {
         var currentIndex = _tabController.index;
-        if (currentIndex >= images.length - 1) {
+        if (currentIndex >= backgroudImages.length - 1) {
           _tabController.index = 0;
         } else {
           _tabController.index = currentIndex + 1;
         }
         await Future.delayed(const Duration(seconds: 1));
-        if (currentIndex >= images.length - 1) {
+        if (currentIndex >= backgroudImages.length - 1) {
           return false;
         }
         return true;

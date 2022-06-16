@@ -20,7 +20,7 @@ class _ContentMsgState extends State<ContentMsg> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.msg == null) return new Text('未知消息', style: _style);
+    if (widget.msg == null) return Text('未知消息', style: _style);
     Map msg = widget.msg['message'];
     String msgType = msg['type'];
     String msgStr = msg.toString();
@@ -51,7 +51,7 @@ class _ContentMsgState extends State<ContentMsg> {
       str = '[未知消息]';
     }
 
-    return new ExtendedText(
+    return ExtendedText(
       str,
       specialTextSpanBuilder: TextSpanBuilder(showAtBackground: true),
       maxLines: 1,

@@ -1,9 +1,9 @@
 import 'package:colla_chat/pages/chat/chat/widget/text_span_builder.dart';
-import 'package:colla_chat/tool/util.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../../provider/app_data.dart';
 import 'magic_pop.dart';
 
 ///文本组件，包含ExtendedText（包含emoji）和长按的菜单，行为
@@ -24,11 +24,11 @@ class _TextItemContainerState extends State<TextItemContainer> {
 
   @override
   Widget build(BuildContext context) {
-    return new MagicPop(
+    return MagicPop(
       onValueChanged: (int value) {
         switch (value) {
           case 0:
-            Clipboard.setData(new ClipboardData(text: widget.text));
+            Clipboard.setData(ClipboardData(text: widget.text));
             break;
           case 3:
             break;
@@ -36,9 +36,9 @@ class _TextItemContainerState extends State<TextItemContainer> {
       },
       pressType: PressType.longPress,
       actions: ['复制', '转发', '收藏', '撤回', '删除'],
-      child: new Container(
+      child: Container(
         width: widget.text.length > 24
-            ? (ScreenUtil.winWidth(context) - 66) - 100
+            ? (appDataProvider.size.width - 66) - 100
             : null,
         padding: EdgeInsets.all(5.0),
         decoration: BoxDecoration(

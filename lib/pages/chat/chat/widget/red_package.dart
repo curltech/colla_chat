@@ -69,7 +69,7 @@ class RedPackage extends StatelessWidget {
     }
     return Container(
       padding: EdgeInsets.symmetric(vertical: 5.0),
-      child: new Row(
+      child: Row(
         mainAxisAlignment: model.targetPeerId != myself.peerId
             ? MainAxisAlignment.start
             : MainAxisAlignment.end,

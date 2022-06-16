@@ -1,6 +1,8 @@
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:colla_chat/crypto/util.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../constant/base.dart';
@@ -12,13 +14,13 @@ import '../../../../transport/httpclient.dart';
 class ImageView extends StatelessWidget {
   final String img;
   final double width;
-  final double height;
+  final double? height;
   final BoxFit fit;
   final bool isRadius;
 
   ImageView({
     required this.img,
-    required this.height,
+    this.height,
     required this.width,
     required this.fit,
     this.isRadius = true,
@@ -26,9 +28,9 @@ class ImageView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget image;
+    Widget? image;
     if (ImageUtil.isNetWorkImg(img)) {
-      image = new CachedNetworkImage(
+      image = CachedNetworkImage(
         imageUrl: img,
         width: width,
         height: height,
@@ -36,36 +38,38 @@ class ImageView extends StatelessWidget {
         cacheManager: defaultCacheManager,
       );
     } else if (File(img).existsSync()) {
-      image = new Image.file(
+      image = Image.file(
         File(img),
         width: width,
         height: height,
         fit: fit,
       );
     } else if (ImageUtil.isAssetsImg(img)) {
-      image = new Image.asset(
+      image = Image.asset(
         img,
         width: width,
         height: height,
         fit: width != null && height != null ? BoxFit.fill : fit,
       );
-    } else {
-      image = new Container(
-        decoration: BoxDecoration(
-            color: Colors.black26.withOpacity(0.1),
-            border:
-                Border.all(color: Colors.black.withOpacity(0.2), width: 0.3)),
-        child: new Image.asset(
-          defaultIcon,
-          width: width - 1,
-          height: height - 1,
-          fit: width != null && height != null ? BoxFit.fill : fit,
-        ),
-      );
+    } else if (ImageUtil.isBase64Img(img)) {
+      int pos = img.indexOf(',');
+      Uint8List bytes = CryptoUtil.decodeBase64(img.substring(pos));
+      image = Image.memory(bytes, fit: BoxFit.contain);
     }
+    image ??= Container(
+      decoration: BoxDecoration(
+          color: Colors.black26.withOpacity(0.1),
+          border: Border.all(color: Colors.black.withOpacity(0.2), width: 0.3)),
+      child: Image.asset(
+        defaultIcon,
+        width: width - 1,
+        height: height! - 1,
+        fit: width != null && height != null ? BoxFit.fill : fit,
+      ),
+    );
     if (isRadius) {
-      return new ClipRRect(
-        borderRadius: BorderRadius.all(
+      return ClipRRect(
+        borderRadius: const BorderRadius.all(
           Radius.circular(4.0),
         ),
         child: image,

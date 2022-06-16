@@ -11,7 +11,7 @@ class JoinMessage extends StatelessWidget {
     return Container(
       alignment: Alignment.center,
       margin: EdgeInsets.symmetric(vertical: 5.0),
-      child: new Text(
+      child: Text(
         data['changedGroupMemberInfo'].toString().substring(
                     data['changedGroupMemberInfo'].toString().indexOf('{') + 1,
                     data['changedGroupMemberInfo'].toString().indexOf(':')) ==

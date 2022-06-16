@@ -41,7 +41,7 @@ dependencies:
   url_launcher: ^6.1.2 #打开系统浏览器
   package_info: ^2.0.2 #获取包信息
   open_file: ^3.2.1 #打开文件
-  camera: ^0.9.5 #调用相机
+  camera: ^0.9.8+1 #调用相机
   orientation: ^1.2.0 # 控制屏幕旋转
   geolocator: ^8.2.1
   package_info_plus: ^1.4.2
@@ -157,7 +157,7 @@ dependencies:
   universal_html: ^2.0.8
   #本地化
   lpinyin: ^2.0.3 #拼音
-  wechat_assets_picker: ^7.3.0 #微信图库
+  wechat_assets_picker: ^7.3.2 #微信图库
   intl: ^0.17.0
   #intl_translation: any
   #intl_translation_format: any

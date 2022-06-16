@@ -1,20 +1,21 @@
-import 'package:wechat_flutter/im/model/contacts.dart';
-import 'package:wechat_flutter/ui/view/indicator_page_view.dart';
+import 'package:colla_chat/pages/chat/chat/widget/ui.dart';
 import 'package:flutter/material.dart';
-import 'package:wechat_flutter/tools/wechat_flutter.dart';
+
+import '../../../../entity/chat/contact.dart';
 import 'contact_item.dart';
+import 'indicator_page_view.dart';
 
 enum ClickType { select, open }
 
 class ContactView extends StatelessWidget {
   final ScrollController sC;
   final List<ContactItem> functionButtons;
-  final List<Contact> contacts;
-  final ClickType type;
-  final Callback callback;
+  final List<Linkman> contacts;
+  final ClickType? type;
+  final Function(dynamic data)? callback;
 
   ContactView({
-    this.sC,
+    required this.sC,
     this.functionButtons = const [],
     this.contacts = const [],
     this.type,
@@ -24,63 +25,63 @@ class ContactView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<String> data = [];
-    return new ScrollConfiguration(
+    return ScrollConfiguration(
       behavior: MyBehavior(),
-      child: new ListView.builder(
+      child: ListView.builder(
         controller: sC,
         itemBuilder: (BuildContext context, int index) {
           if (index < functionButtons.length) return functionButtons[index];
 
           int _contactIndex = index - functionButtons.length;
           bool _isGroupTitle = true;
-          Contact _contact = contacts[_contactIndex];
+          Linkman _contact = contacts[_contactIndex];
           if (_contactIndex >= 1 &&
-              _contact.nameIndex == contacts[_contactIndex - 1].nameIndex) {
+              _contact.ownerPeerId == contacts[_contactIndex - 1].ownerPeerId) {
             _isGroupTitle = false;
           }
           bool _isBorder = _contactIndex < contacts.length - 1 &&
-              _contact.nameIndex == contacts[_contactIndex + 1].nameIndex;
+              _contact.ownerPeerId == contacts[_contactIndex + 1].ownerPeerId;
           if (_contact.name != contacts[contacts.length - 1].name) {
-            return new ContactItem(
-              avatar: _contact.avatar,
+            return ContactItem(
+              avatar: _contact.avatar!,
               title: _contact.name,
-              identifier: _contact.identifier,
-              groupTitle: _isGroupTitle ? _contact.nameIndex : null,
+              identifier: _contact.peerId!,
+              groupTitle: _contact.ownerPeerId,
               isLine: _isBorder,
-              type: type,
+              type: type!,
               cancel: (v) {
                 data.remove(v);
-                callback(data);
+                callback!(data);
               },
               add: (v) {
                 data.add(v);
-                callback(data);
+                callback!(data);
               },
             );
           } else {
-            return new Column(children: <Widget>[
-              new ContactItem(
-                avatar: _contact.avatar,
+            return Column(children: <Widget>[
+              ContactItem(
+                avatar: _contact.avatar!,
                 title: _contact.name,
-                identifier: _contact.identifier,
-                groupTitle: _isGroupTitle ? _contact.nameIndex : null,
+                identifier: _contact.peerId!,
+                groupTitle: _contact.ownerPeerId,
                 isLine: false,
-                type: type,
+                type: type!,
                 cancel: (v) {
                   data.remove(v);
-                  callback(data);
+                  callback!(data);
                 },
                 add: (v) {
                   data.add(v);
-                  callback(data);
+                  callback!(data);
                 },
               ),
-              new HorizontalLine(),
-              new Container(
+              HorizontalLine(),
+              Container(
                 padding: EdgeInsets.symmetric(vertical: 10.0),
-                child: new Text(
+                child: Text(
                   '${contacts.length}位联系人',
-                  style: TextStyle(color: mainTextColor, fontSize: 16),
+                  style: TextStyle(color: Colors.black, fontSize: 16),
                 ),
               )
             ]);

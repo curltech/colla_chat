@@ -38,17 +38,17 @@ class ModifyGroupInfoMessageState extends State<ModifyGroupInfoMessage> {
   @override
   Widget build(BuildContext context) {
     if (widget.data['groupInfoList'].toString() != '[]') {
-      return new Container(
+      return Container(
         alignment: Alignment.center,
         margin: EdgeInsets.symmetric(vertical: 5.0),
-        child: new Text(
+        child: Text(
           '${name ?? ''} 修改群名称为 ”${widget.data['groupInfoList'][0]['content']}“',
           style: TextStyle(
               color: Color.fromRGBO(108, 108, 108, 0.8), fontSize: 11),
         ),
       );
     } else {
-      return new Container();
+      return Container();
     }
   }
 }

@@ -1,7 +1,9 @@
-import 'package:wechat_flutter/tools/wechat_flutter.dart';
-import 'package:wechat_flutter/ui/view/image_view.dart';
+import 'package:colla_chat/pages/chat/chat/widget/ui.dart';
 import 'package:flutter/material.dart';
-import 'package:photo_view/photo_view.dart';
+
+import '../../../../provider/app_data.dart';
+import '../../../../tool/util.dart';
+import 'image_view.dart';
 
 class ContactCard extends StatelessWidget {
   final String img, title, nickName, id, area;
@@ -9,57 +11,57 @@ class ContactCard extends StatelessWidget {
   final double lineWidth;
 
   ContactCard({
-    @required this.img,
-    this.title,
-    this.id,
-    this.nickName,
-    this.area,
+    required this.img,
+    required this.title,
+    required this.id,
+    required this.nickName,
+    required this.area,
     this.isBorder = false,
-    this.lineWidth = mainLineWidth,
+    this.lineWidth = 1,
   }) : assert(id != null);
 
   @override
   Widget build(BuildContext context) {
-    TextStyle labelStyle = TextStyle(fontSize: 14, color: mainTextColor);
+    TextStyle labelStyle = TextStyle(fontSize: 14, color: Colors.black);
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         border: isBorder
             ? Border(
-                bottom: BorderSide(color: lineColor, width: lineWidth),
+                bottom: BorderSide(color: Colors.black, width: lineWidth),
               )
             : null,
       ),
-      width: winWidth(context),
+      width: appDataProvider.size.width,
       padding: EdgeInsets.only(right: 15.0, left: 15.0, bottom: 20.0),
-      child: new Row(
+      child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          new GestureDetector(
-            child: new ImageView(
-                img: img, width: 55, height: 55, fit: BoxFit.cover),
+          GestureDetector(
+            child:
+                ImageView(img: img, width: 55, height: 55, fit: BoxFit.cover),
             onTap: () {
-              if (isNetWorkImg(img)) {
-                routePush(
-                  new PhotoView(
-                    imageProvider: NetworkImage(img),
-                    onTapUp: (c, f, s) => Navigator.of(context).pop(),
-                    maxScale: 3.0,
-                    minScale: 1.0,
-                  ),
-                );
+              if (ImageUtil.isNetWorkImg(img)) {
+                // routePush(
+                //   PhotoView(
+                //     imageProvider: NetworkImage(img),
+                //     onTapUp: (c, f, s) => Navigator.of(context).pop(),
+                //     maxScale: 3.0,
+                //     minScale: 1.0,
+                //   ),
+                //);
               } else {
-                showToast(context, '无头像');
+                DialogUtil.showToast('无头像');
               }
             },
           ),
-          new Space(width: mainSpace * 2),
-          new Column(
+          Space(width: mainSpace * 2),
+          Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              new Row(
+              Row(
                 children: <Widget>[
-                  new Text(
+                  Text(
                     title ?? '未知',
                     style: TextStyle(
                       color: Colors.black,
@@ -67,17 +69,17 @@ class ContactCard extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  new Space(width: mainSpace / 3),
-                  new Image.asset('assets/images/Contact_Female.webp',
+                  Space(width: mainSpace / 3),
+                  Image.asset('assets/images/Contact_Female.webp',
                       width: 20.0, fit: BoxFit.fill),
                 ],
               ),
-              new Padding(
+              Padding(
                 padding: EdgeInsets.only(top: 3.0),
-                child: new Text("昵称：" + nickName ?? '', style: labelStyle),
+                child: Text("昵称：" + nickName ?? '', style: labelStyle),
               ),
-              new Text("微信号：" + id ?? '', style: labelStyle),
-              new Text("地区：" + area ?? '', style: labelStyle),
+              Text("微信号：" + id ?? '', style: labelStyle),
+              Text("地区：" + area ?? '', style: labelStyle),
             ],
           )
         ],

@@ -29,7 +29,7 @@ class ModifyNotificationMessageState extends State<ModifyNotificationMessage> {
     // var userPhone = await getStoreValue('userPhone');
     // if (listNoEmpty(membersData)) if (user == userPhone)
     //   name = '你';
-    // else if (strNoEmpty(membersData[0]['nameCard']))
+    // else if (StringUtil.isNotEmpty(membersData[0]['nameCard']))
     //   name = membersData[0]['nameCard'];
     // else
     //   name = user;
@@ -41,7 +41,7 @@ class ModifyNotificationMessageState extends State<ModifyNotificationMessage> {
     return Container(
       alignment: Alignment.center,
       margin: EdgeInsets.symmetric(vertical: 5.0),
-      child: new Text(
+      child: Text(
         '${name ?? ''}' + ' 修改了群公告',
         style:
             TextStyle(color: Color.fromRGBO(108, 108, 108, 0.8), fontSize: 11),

@@ -1,18 +1,19 @@
 import 'dart:async';
-import 'dart:io';
-import 'package:wechat_flutter/tools/date.dart';
-import 'package:wechat_flutter/tools/wechat_flutter.dart';
-import 'package:wechat_flutter/ui/dialog/voice_dialog.dart';
-import 'package:intl/date_symbol_data_local.dart';
+
+import 'package:colla_chat/pages/chat/chat/widget/voice_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
+import 'package:intl/date_symbol_data_local.dart';
+
+import '../../../../provider/app_data.dart';
+import '../../../../tool/util.dart';
 
 typedef VoiceFile = void Function(String path);
 
 class ChatVoice extends StatefulWidget {
   final VoiceFile voiceFile;
 
-  ChatVoice({this.voiceFile});
+  ChatVoice({required this.voiceFile});
 
   @override
   _ChatVoiceWidgetState createState() => _ChatVoiceWidgetState();
@@ -21,25 +22,25 @@ class ChatVoice extends StatefulWidget {
 class _ChatVoiceWidgetState extends State<ChatVoice> {
   double startY = 0.0;
   double offset = 0.0;
-  int index;
+  int index = 0;
 
   bool isUp = false;
   String textShow = "按住说话";
   String toastShow = "手指上滑,取消发送";
   String voiceIco = "images/voice_volume_1.png";
 
-  StreamSubscription _recorderSubscription;
-  StreamSubscription _dbPeakSubscription;
+  late StreamSubscription _recorderSubscription;
+  late StreamSubscription _dbPeakSubscription;
 
   ///默认隐藏状态
   bool voiceState = true;
-  OverlayEntry overlayEntry;
-  FlutterSound flutterSound;
+  OverlayEntry? overlayEntry;
+  late FlutterSound flutterSound;
 
   @override
   void initState() {
     super.initState();
-    flutterSound = new FlutterSound();
+    flutterSound = FlutterSound();
     // flutterSound.setSubscriptionDuration(0.01);
     // flutterSound.setDbPeakLevelUpdate(0.8);
     // flutterSound.setDbLevelEnabled(true);
@@ -48,7 +49,7 @@ class _ChatVoiceWidgetState extends State<ChatVoice> {
 
   void start() async {
     print('开始拉。当前路径');
-    showToast(context, "正在兼容最新flutter");
+    DialogUtil.showToast("正在兼容最新flutter");
     // try {
     //   String path = await flutterSound
     //       .startRecorder(Platform.isIOS ? 'ios.m4a' : 'android.mp4');
@@ -57,7 +58,7 @@ class _ChatVoiceWidgetState extends State<ChatVoice> {
     //       flutterSound.onRecorderStateChanged.listen((e) {});
     // } catch (err) {
     //   RecorderRunningException e = err;
-    //   showToast(context, 'startRecorder error: ${e.message}');
+    //   DialogUtil.showToast('startRecorder error: ${e.message}');
     // }
   }
 
@@ -76,21 +77,20 @@ class _ChatVoiceWidgetState extends State<ChatVoice> {
     //   }
     // } catch (err) {
     //   RecorderStoppedException e = err;
-    //   showToast(context, 'stopRecorder error: ${e.message}');
+    //   DialogUtil.showToast('stopRecorder error: ${e.message}');
     // }
   }
 
   showVoiceView() {
-    int index;
+    int index = 0;
     setState(() {
       textShow = "松开结束";
       voiceState = false;
-      DateTime now = new DateTime.now();
+      DateTime now = DateTime.now();
       int date = now.millisecondsSinceEpoch;
       DateTime current = DateTime.fromMillisecondsSinceEpoch(date);
 
-      String recordingTime =
-          DateTimeForMater.formatDateV(current, format: "ss:SS");
+      String recordingTime = DateUtil.formatDateV(current, format: "ss:SS");
       index = int.parse(recordingTime.toString().substring(3, 5));
     });
 
@@ -109,7 +109,7 @@ class _ChatVoiceWidgetState extends State<ChatVoice> {
 
     stop();
     if (overlayEntry != null) {
-      overlayEntry.remove();
+      overlayEntry!.remove();
       overlayEntry = null;
     }
 
@@ -117,7 +117,7 @@ class _ChatVoiceWidgetState extends State<ChatVoice> {
       print("取消发送");
     } else {
       print("进行发送");
-      Notice.send(WeChatActions.voiceImg(), true);
+      //Notice.send(WeChatActions.voiceImg(), true);
     }
   }
 
@@ -136,7 +136,7 @@ class _ChatVoiceWidgetState extends State<ChatVoice> {
 
   @override
   Widget build(BuildContext context) {
-    return new GestureDetector(
+    return GestureDetector(
       onVerticalDragStart: (details) {
         startY = details.globalPosition.dy;
         showVoiceView();
@@ -151,10 +151,10 @@ class _ChatVoiceWidgetState extends State<ChatVoice> {
         offset = details.globalPosition.dy;
         moveVoiceView();
       },
-      child: new Container(
+      child: Container(
         height: 50.0,
         alignment: Alignment.center,
-        width: winWidth(context),
+        width: appDataProvider.size.width,
         color: Colors.white,
         child: Text(textShow),
       ),

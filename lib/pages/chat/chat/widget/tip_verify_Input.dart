@@ -17,7 +17,7 @@ class TipVerifyInput extends StatefulWidget {
       this.color = Colors.white});
 
   @override
-  _VerifyInputState createState() => new _VerifyInputState();
+  _VerifyInputState createState() => _VerifyInputState();
 }
 
 class _VerifyInputState extends State<TipVerifyInput> {
@@ -29,8 +29,8 @@ class _VerifyInputState extends State<TipVerifyInput> {
 
   Widget contentBuild() {
     var view = [
-      new Expanded(
-        child: new TextField(
+      Expanded(
+        child: TextField(
           controller: widget.controller,
           focusNode: widget.focusNode,
           decoration: InputDecoration(border: InputBorder.none),
@@ -45,27 +45,27 @@ class _VerifyInputState extends State<TipVerifyInput> {
         ),
       ),
       widget.controller!.text != ''
-          ? new Visibility(
+          ? Visibility(
               visible: widget.focusNode!.hasFocus,
-              child: new InkWell(
-                child: new Padding(
+              child: InkWell(
+                child: Padding(
                   padding: EdgeInsets.all(2.0),
-                  child: new Image.asset('assets/images/ic_delete.webp'),
+                  child: Image.asset('assets/images/ic_delete.webp'),
                 ),
                 onTap: () {
                   widget.controller!.text = '';
                   setState(() {});
                 },
               ))
-          : new Container()
+          : Container()
     ];
 
-    return new Column(
+    return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        new Space(height: mainSpace),
-        new Expanded(
-          child: new Container(
+        Space(height: mainSpace),
+        Expanded(
+          child: Container(
             width: appDataProvider.size.width - 20,
             decoration: BoxDecoration(
               border: Border(
@@ -78,11 +78,11 @@ class _VerifyInputState extends State<TipVerifyInput> {
             ),
             padding: EdgeInsets.symmetric(horizontal: 5.0),
             alignment: Alignment.center,
-            child: new Row(children: view),
+            child: Row(children: view),
           ),
         ),
-        new Space(height: mainSpace),
-        new Text(
+        Space(height: mainSpace),
+        Text(
           widget.title ?? '',
           style:
               TextStyle(color: Colors.black.withOpacity(0.7), fontSize: 15.0),
@@ -93,7 +93,7 @@ class _VerifyInputState extends State<TipVerifyInput> {
 
   @override
   Widget build(BuildContext context) {
-    return new Container(
+    return Container(
       height: 100.0,
       width: appDataProvider.size.width,
       color: widget.color,

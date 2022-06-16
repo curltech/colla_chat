@@ -214,7 +214,8 @@ class ContactService extends PartyService {
     var peerContactMap = Map();
     if (contacts.isNotEmpty) {
       for (var contact in contacts) {
-        Contact peerContact = Contact(contact.name.last + contact.name.first);
+        Contact peerContact =
+            Contact('', '', contact.name.last + contact.name.first);
         if (contact.name != null) {
           peerContact.formattedName = contact.name.toString();
           //peerContact.pyFormattedName = pinyinUtil.getPinyin(peerContact.formattedName);
@@ -295,7 +296,7 @@ class ContactService extends PartyService {
       var peer = await peerClientService.findOneEffectiveByMobile(mobileNumber);
       if (peer != null) {
         var peerClient = PeerClient.fromJson(peer);
-        peerContact.peerId = peerClient.peerId;
+        peerContact.peerId = peerClient.peerId!;
         peerContact.name = peerClient.name;
         peerContact.status = peerClient.status;
         peerContact.publicKey = peerClient.publicKey;

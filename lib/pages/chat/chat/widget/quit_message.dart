@@ -11,7 +11,7 @@ class QuitMessage extends StatelessWidget {
     return Container(
       alignment: Alignment.center,
       margin: EdgeInsets.symmetric(vertical: 5.0),
-      child: new Text(
+      child: Text(
         '${data['opGroupMemberInfo']['user'] == myself.peerId ? '你' : data['opGroupMemberInfo']['user']}' +
             ' 退出了群聊',
         style:

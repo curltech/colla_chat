@@ -18,13 +18,13 @@ class TextMsg extends StatelessWidget {
     final chatMessageDataProvider =
         Provider.of<ChatMessageDataProvider>(context);
     var body = <Widget>[
-      new MsgAvatar(model: chatMessage),
-      new TextItemContainer(
+      MsgAvatar(model: chatMessage),
+      TextItemContainer(
         text: text ?? '文字为空',
         action: '',
         isMyself: chatMessage.targetPeerId != myself.peerId,
       ),
-      new Spacer(),
+      Spacer(),
     ];
     if (chatMessage.targetPeerId != myself.peerId) {
       body = body.reversed.toList();
@@ -33,7 +33,7 @@ class TextMsg extends StatelessWidget {
     }
     return Container(
       padding: EdgeInsets.symmetric(vertical: 5.0),
-      child: new Row(children: body),
+      child: Row(children: body),
     );
   }
 }

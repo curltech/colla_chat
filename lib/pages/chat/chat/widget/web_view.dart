@@ -4,7 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-import 'commom_bar.dart';
+import 'app_bar_widget.dart';
 
 class WebViewPage extends StatefulWidget {
   final String url;
@@ -13,16 +13,16 @@ class WebViewPage extends StatefulWidget {
   WebViewPage(this.url, this.title);
 
   @override
-  State<StatefulWidget> createState() => new WebViewPageState();
+  State<StatefulWidget> createState() => WebViewPageState();
 }
 
 class WebViewPageState extends State<WebViewPage> {
   final Completer<WebViewController> _controller =
-      new Completer<WebViewController>();
+      Completer<WebViewController>();
 
   Widget body() {
-    return new Builder(builder: (BuildContext context) {
-      return new WebView(
+    return Builder(builder: (BuildContext context) {
+      return WebView(
         initialUrl: widget.url,
         javascriptMode: JavascriptMode.unrestricted,
         onWebViewCreated: (WebViewController webViewController) {
@@ -50,18 +50,18 @@ class WebViewPageState extends State<WebViewPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: ComMomBar(
+      appBar: AppBarWidget(
           title: '${widget.title}', leadingImg: 'assets/images/bar_close.png'),
       body: body(),
     );
   }
 
   JavascriptChannel _toasterJavascriptChannel(BuildContext context) {
-    return new JavascriptChannel(
+    return JavascriptChannel(
       name: 'Toaster',
       onMessageReceived: (JavascriptMessage message) {
         Scaffold.of(context).showSnackBar(
-          new SnackBar(content: Text(message.message)),
+          SnackBar(content: Text(message.message)),
         );
       },
     );

@@ -1,14 +1,14 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:photo_manager/photo_manager.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
-import 'package:wechat_flutter/im/message_handle.dart';
-import 'package:wechat_flutter/im/send_handle.dart';
-import 'package:wechat_flutter/pages/chat/shoot_page.dart';
-import 'package:wechat_flutter/tools/utils/handle_util.dart';
-import 'package:wechat_flutter/tools/wechat_flutter.dart';
-import 'package:wechat_flutter/ui/card/more_item_card.dart';
+
+import '../../../../provider/app_data.dart';
+import '../../../../tool/util.dart';
+import 'more_item_card.dart';
 
 class ChatMorePage extends StatefulWidget {
   final int index;
@@ -44,26 +44,25 @@ class _ChatMorePageState extends State<ChatMorePage> {
 
   action(String name) async {
     if (name == '相册') {
-      AssetPicker.pickAssets(
-        context,
+      var pickerConfig = AssetPickerConfig(
         maxAssets: 9,
         pageSize: 320,
-        pathThumbSize: 80,
+        pathThumbnailSize: ThumbnailSize(80, 80),
         gridCount: 4,
         selectedAssets: assets,
         themeColor: Colors.green,
-        // textDelegate: DefaultAssetsPickerTextDelegate(),
-        routeCurve: Curves.easeIn,
-        routeDuration: const Duration(milliseconds: 500),
-      ).then((List<AssetEntity> result) {
-        result.forEach((AssetEntity element) async {
-          sendImageMsg(widget.id, widget.type, file: await element.file,
-              callback: (v) {
-            if (v == null) return;
-            Notice.send(WeChatActions.msg(), v ?? '');
-          });
-          element.file;
-        });
+      );
+      final List<AssetEntity>? result =
+          await AssetPicker.pickAssets(context, pickerConfig: pickerConfig);
+
+      result?.forEach((AssetEntity element) async {
+        //   sendImageMsg(widget.id, widget.type, file: await element.file
+        //     //   callback: (v) {
+        //     // if (v == null) return;
+        //     //Notice.send(WeChatActions.msg(), v ?? '');
+        //   // });
+        //   // element.file;
+        // );
       });
     } else if (name == '拍摄') {
       try {
@@ -72,29 +71,29 @@ class _ChatMorePageState extends State<ChatMorePage> {
         WidgetsFlutterBinding.ensureInitialized();
         cameras = await availableCameras();
 
-        routePush(new ShootPage(cameras));
+        //routePush(ShootPage(cameras));
       } on CameraException catch (e) {
-        logError(e.code, e.description);
+        logger.e(e.code, e.description);
       }
     } else if (name == '红包') {
-      showToast(context, '测试发送红包消息');
-      await sendTextMsg('${widget?.id}', widget.type, "测试发送红包消息");
+      DialogUtil.showToast('测试发送红包消息');
+      //await sendTextMsg('${widget?.id}', widget.type, "测试发送红包消息");
     } else {
-      showToast(context, '敬请期待$name');
+      DialogUtil.showToast('敬请期待$name');
     }
   }
 
   itemBuild(data) {
-    return new Container(
+    return Container(
       margin: EdgeInsets.all(20.0),
       padding: EdgeInsets.only(bottom: 20.0),
-      child: new Wrap(
+      child: Wrap(
         runSpacing: 10.0,
         spacing: 10,
         children: List.generate(data.length, (index) {
           String name = data[index]['name'];
           String icon = data[index]['icon'];
-          return new MoreItemCard(
+          return MoreItemCard(
             name: name,
             icon: icon,
             keyboardHeight: widget.keyboardHeight,
@@ -112,5 +111,33 @@ class _ChatMorePageState extends State<ChatMorePage> {
     } else {
       return itemBuild(dataS);
     }
+  }
+}
+
+Future<void> sendImageMsg(String userName, int type,
+    {required ImageSource source, required File file}) async {
+  XFile? image;
+  if (file.existsSync()) {
+    image = XFile(file.path);
+  } else {
+    image = await ImagePicker().pickImage(source: source);
+  }
+  if (image == null) return;
+  File compressImg = await File(image.path);
+
+  try {
+    //await im.sendImageMessages(userName, compressImg.path, type: type);
+    //callback(compressImg.path);
+  } on PlatformException {
+    debugPrint("发送图片消息失败");
+  }
+}
+
+Future<dynamic> sendSoundMessages(
+    String id, String soundPath, int duration, int type) async {
+  try {
+    //var result = await im.sendSoundMessages(id, soundPath, type, duration);
+  } on PlatformException {
+    debugPrint('发送语音  失败');
   }
 }

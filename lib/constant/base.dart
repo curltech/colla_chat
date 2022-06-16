@@ -8,3 +8,4 @@ class Option {
 
 const defaultIcon = 'assets/icons/favicon-96x96.png';
 const defaultAvatar = 'assets/images/colla-o1.png';
+const defaultGroupAvatar = 'assets/images/colla-o1.png';

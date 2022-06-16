@@ -87,7 +87,7 @@ class ServiceLocator {
           'peerId',
           'mobile',
         ],
-        fields: buildFields(Linkman(''), []));
+        fields: buildFields(Linkman('', '', ''), []));
     services['linkmanService'] = linkmanService;
 
     var tagService = await TagService.init(
@@ -111,7 +111,7 @@ class ServiceLocator {
           'targetType',
           'status',
         ],
-        fields: buildFields(PartyRequest(''), []));
+        fields: buildFields(PartyRequest('', '', ''), []));
     services['partyRequestService'] = partyRequestService;
 
     var groupService = await GroupService.init(
@@ -126,7 +126,7 @@ class ServiceLocator {
           'groupCategory',
           'groupType'
         ],
-        fields: buildFields(Group(''), []));
+        fields: buildFields(Group('', '', ''), []));
     services['groupService'] = groupService;
 
     var groupMemberService = await GroupMemberService.init(
@@ -144,7 +144,7 @@ class ServiceLocator {
     var contactService = await ContactService.init(
         tableName: "chat_contact",
         indexFields: ['peerId', 'mobile', 'formattedName', 'name'],
-        fields: buildFields(Contact(''), []));
+        fields: buildFields(Contact('', '', ''), []));
     services['contactService'] = contactService;
 
     var chatMessageService = await ChatMessageService.init(

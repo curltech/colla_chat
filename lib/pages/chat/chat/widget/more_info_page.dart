@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'commom_bar.dart';
+import 'app_bar_widget.dart';
 import 'label_row.dart';
 
 class MoreInfoPage extends StatefulWidget {
@@ -11,12 +11,12 @@ class MoreInfoPage extends StatefulWidget {
 class _MoreInfoPageState extends State<MoreInfoPage> {
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
+    return Scaffold(
       backgroundColor: Colors.cyan,
-      appBar: new ComMomBar(title: '更多'),
-      body: new Column(
+      appBar: AppBarWidget(title: '更多'),
+      body: Column(
         children: <Widget>[
-          new LabelRow(
+          LabelRow(
             label: '个性签名',
             rValue: '暂无',
             isRight: false,
