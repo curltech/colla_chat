@@ -18,7 +18,7 @@ class MineWidget extends StatelessWidget {
             icon: Icon(Icons.collections,
                 color: appDataProvider.themeData?.colorScheme.primary),
             title: '收藏',
-            callback: () {
+            routerCallback: () {
               var routerCallback = this.routerCallback;
               if (routerCallback != null) {
                 routerCallback(1);
@@ -28,7 +28,7 @@ class MineWidget extends StatelessWidget {
             icon: Icon(Icons.settings,
                 color: appDataProvider.themeData?.colorScheme.primary),
             title: '设置',
-            callback: () {
+            routerCallback: () {
               var routerCallback = this.routerCallback;
               if (routerCallback != null) {
                 routerCallback(2);
