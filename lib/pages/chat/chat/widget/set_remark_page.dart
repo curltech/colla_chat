@@ -2,7 +2,7 @@ import 'package:colla_chat/pages/chat/chat/widget/tip_verify_Input.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:flutter/material.dart';
 
-import 'app_bar_view.dart';
+import '../../../../widgets/common/app_bar_view.dart';
 import 'commom_button.dart';
 import 'main_input.dart';
 

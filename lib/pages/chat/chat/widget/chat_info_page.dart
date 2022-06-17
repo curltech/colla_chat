@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-import 'app_bar_view.dart';
+import '../../../../widgets/common/app_bar_view.dart';
 import 'chat_mamber.dart';
 import 'label_row.dart';
 

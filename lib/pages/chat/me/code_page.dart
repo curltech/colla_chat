@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../../../constant/base.dart';
 import '../../../tool/util.dart';
-import '../chat/widget/app_bar_view.dart';
-import '../chat/widget/image_view.dart';
+import '../../../widgets/common/app_bar_view.dart';
+import '../../../widgets/common/image_widget.dart';
 import '../chat/widget/ui.dart';
 
 class QrCodePage extends StatefulWidget {
@@ -101,8 +101,8 @@ class CardPerson extends StatelessWidget {
       children: <Widget>[
         Padding(
           padding: EdgeInsets.only(right: 15.0),
-          child: ImageView(
-            img: StringUtil.isNotEmpty(groupName)
+          child: ImageWidget(
+            image: StringUtil.isNotEmpty(groupName)
                 ? defaultGroupAvatar
                 : defaultAvatar,
             width: 45,

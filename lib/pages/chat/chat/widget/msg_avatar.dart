@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:colla_chat/entity/chat/chat.dart';
-import 'package:colla_chat/pages/chat/chat/widget/image_view.dart';
+import 'package:colla_chat/widgets/common/image_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../constant/base.dart';
@@ -52,8 +52,8 @@ class _MsgAvatarState extends State<MsgAvatar> with TickerProviderStateMixin {
           margin: EdgeInsets.only(right: 10.0),
 
           ///目前是缺省头像
-          child: ImageView(
-            img: defaultIcon,
+          child: ImageWidget(
+            image: defaultIcon,
             height: 35,
             width: 35,
             fit: BoxFit.cover,

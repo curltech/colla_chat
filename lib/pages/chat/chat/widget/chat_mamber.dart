@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../../constant/base.dart';
 import '../../../../provider/app_data.dart';
 import '../../../../tool/util.dart';
-import 'image_view.dart';
+import '../../../../widgets/common/image_widget.dart';
 
 class ChatMamBer extends StatefulWidget {
   final dynamic model;
@@ -37,8 +37,8 @@ class _ChatMamBerState extends State<ChatMamBer> {
               width: 55.0,
               child: Column(
                 children: <Widget>[
-                  ImageView(
-                    img: StringUtil.isNotEmpty(face) ? face : defaultIcon,
+                  ImageWidget(
+                    image: StringUtil.isNotEmpty(face) ? face : defaultIcon,
                     width: 55.0,
                     height: 55.0,
                     fit: BoxFit.cover,

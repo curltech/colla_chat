@@ -1,9 +1,8 @@
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/dht/peerprofile.dart';
-
-import '../base.dart';
-import 'myselfpeer.dart';
 import 'package:cryptography/cryptography.dart';
+
+import 'myselfpeer.dart';
 
 /// 单例本节点对象，包含公私钥，本节点配置，密码和过往的节点信息
 /// 在登录成功后被初始化

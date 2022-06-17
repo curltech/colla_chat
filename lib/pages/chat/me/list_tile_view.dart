@@ -1,7 +1,7 @@
 import 'package:colla_chat/provider/app_data.dart';
 import 'package:flutter/material.dart';
 
-import '../chat/widget/image_view.dart';
+import '../../../widgets/common/image_widget.dart';
 import '../chat/widget/ui.dart';
 
 class ListTileView extends StatelessWidget {
@@ -66,7 +66,7 @@ class ListTileView extends StatelessWidget {
         Container(
           width: width - 5,
           margin: EdgeInsets.symmetric(horizontal: horizontal),
-          child: ImageView(img: icon, width: width, fit: fit!),
+          child: ImageWidget(image: icon, width: width, fit: fit!),
         ),
         Container(
           width: appDataProvider.size.width - 60,
@@ -79,9 +79,7 @@ class ListTileView extends StatelessWidget {
 
     return Container(
       margin: margin,
-      child: FlatButton(
-        color: Colors.white,
-        padding: EdgeInsets.all(0),
+      child: TextButton(
         onPressed: onPressed ?? () {},
         child: row,
       ),

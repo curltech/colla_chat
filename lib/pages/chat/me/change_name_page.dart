@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../tool/util.dart';
-import '../chat/widget/app_bar_view.dart';
+import '../../../widgets/common/app_bar_view.dart';
 import '../chat/widget/commom_button.dart';
 import '../chat/widget/main_input.dart';
 import '../chat/widget/tip_verify_Input.dart';

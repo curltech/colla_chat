@@ -2,8 +2,8 @@ import 'package:colla_chat/pages/chat/chat/widget/ui.dart';
 import 'package:colla_chat/provider/app_data.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../widgets/common/image_widget.dart';
 import 'content_msg.dart';
-import 'image_view.dart';
 
 class MyConversationView extends StatefulWidget {
   final String imageUrl;
@@ -59,8 +59,8 @@ class _MyConversationViewState extends State<MyConversationView> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          ImageView(
-              img: widget.imageUrl,
+          ImageWidget(
+              image: widget.imageUrl,
               height: 50.0,
               width: 50.0,
               fit: BoxFit.cover),

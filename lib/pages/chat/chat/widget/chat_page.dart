@@ -6,7 +6,7 @@ import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../provider/app_data.dart';
-import 'app_bar_view.dart';
+import '../../../../widgets/common/app_bar_view.dart';
 import 'chat_details_body.dart';
 import 'chat_details_row.dart';
 import 'chat_more_icon.dart';

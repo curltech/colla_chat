@@ -6,10 +6,10 @@ import 'package:provider/provider.dart';
 import '../../../l10n/localization.dart';
 import '../../../provider/app_data.dart';
 import '../../../widgets/common/keep_alive_wrapper.dart';
-import '../../../widgets/richtext/pages/home_page.dart';
 import '../chat/chat_target.dart';
 import '../linkman/linkman_page.dart';
-import '../me/me.dart';
+import '../me/collection/collection_widget.dart';
+import '../me/me_view.dart';
 
 class IndexView extends StatefulWidget {
   final String title;
@@ -44,8 +44,11 @@ class IndexViewState extends State<IndexView>
     _children = <Widget>[
       KeepAliveWrapper(child: ChatTarget()),
       const KeepAliveWrapper(child: LinkmanPage()),
-      KeepAliveWrapper(child: HomePage()),
-      KeepAliveWrapper(child: MeWidget())
+      KeepAliveWrapper(child: CollectionWidget()),
+      const KeepAliveWrapper(
+          child: MeView(
+        title: 'Me',
+      ))
     ];
     _tabController = TabController(length: _children.length, vsync: this);
     _tabController.addListener(() {

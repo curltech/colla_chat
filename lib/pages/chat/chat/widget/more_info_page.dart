@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'app_bar_view.dart';
+import '../../../../widgets/common/app_bar_view.dart';
 import 'label_row.dart';
 
 class MoreInfoPage extends StatefulWidget {

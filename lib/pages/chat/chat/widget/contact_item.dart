@@ -1,8 +1,8 @@
 import 'package:colla_chat/pages/chat/chat/widget/ui.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../widgets/common/image_widget.dart';
 import 'contact_view.dart';
-import 'image_view.dart';
 
 typedef OnAdd = void Function(String v);
 typedef OnCancel = void Function(String v);
@@ -66,8 +66,8 @@ class ContactItemState extends State<ContactItem> {
   @override
   Widget build(BuildContext context) {
     /// 定义左边图标Widget
-    Widget _avatarIcon = ImageView(
-      img: widget.avatar,
+    Widget _avatarIcon = ImageWidget(
+      image: widget.avatar,
       width: 32,
       height: 32,
       fit: BoxFit.cover,

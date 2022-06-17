@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../provider/app_data.dart';
 import '../../../../tool/util.dart';
-import 'image_view.dart';
+import '../../../../widgets/common/image_widget.dart';
 
 class ContactCard extends StatelessWidget {
   final String img, title, nickName, id, area;
@@ -38,8 +38,8 @@ class ContactCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           GestureDetector(
-            child:
-                ImageView(img: img, width: 55, height: 55, fit: BoxFit.cover),
+            child: ImageWidget(
+                image: img, width: 55, height: 55, fit: BoxFit.cover),
             onTap: () {
               if (ImageUtil.isNetWorkImg(img)) {
                 // routePush(

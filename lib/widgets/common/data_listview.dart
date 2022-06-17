@@ -17,6 +17,7 @@ class TileData {
   late final String? suffix;
   late final String? routeName;
   late final String? tileType;
+  Function()? callback;
 
   TileData(
       {this.icon,
@@ -25,7 +26,8 @@ class TileData {
       this.subtitle,
       this.suffix,
       this.tileType,
-      this.routeName});
+      this.routeName,
+      this.callback});
 }
 
 /// 通用列表项
@@ -47,7 +49,7 @@ class DataListTile extends StatelessWidget {
       leading = Image.memory(Uint8List.fromList(avatar.codeUnits));
     }
     Widget? trailing;
-    if (_tileData.routeName != null) {
+    if (_tileData.routeName != null || _tileData.callback != null) {
       trailing = Icon(Icons.arrow_forward_ios,
           color: appDataProvider.themeData?.colorScheme.primary);
     } else if (_tileData.suffix != null) {
@@ -67,7 +69,10 @@ class DataListTile extends StatelessWidget {
           : null,
       trailing: trailing,
       onTap: () {
-        if (_tileData.routeName != null) {
+        var call = _tileData.callback;
+        if (call != null) {
+          call();
+        } else if (_tileData.routeName != null) {
           Navigator.pushNamed(context, _tileData.routeName!);
         }
       },
