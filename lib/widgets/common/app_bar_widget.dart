@@ -23,7 +23,7 @@ class AppBarWidget extends StatelessWidget {
     final backCallBack = this.backCallBack;
     if (backCallBack != null) {
       backButton = IconButton(
-        icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
+        icon: const Icon(Icons.chevron_left, color: Colors.white),
         onPressed: () {
           final backCallBack = this.backCallBack;
           if (backCallBack != null) {

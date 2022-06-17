@@ -225,6 +225,9 @@ flutter:
     - assets/images/bg/login-bg-wl-10.jpg
     - assets/images/bg/login-bg-wl-11.jpg
     - assets/images/bg/login-bg-wl-12.jpg
+    - assets/icons/favicon-96x96.png
+    - assets/images/colla-o1.png
+    - assets/images/colla-o1.png
 
     - assets/wasm/sqlite3.wasm
 

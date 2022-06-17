@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../provider/app_data.dart';
-import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/common/data_listview.dart';
+import 'mine_head_widget.dart';
 
 //我的页面，带有路由回调函数
 class MineWidget extends StatelessWidget {
@@ -36,8 +36,10 @@ class MineWidget extends StatelessWidget {
             }),
       ]
     };
-    var mine =
-        AppBarView(title: 'Mine', child: DataListView(tileData: mineTileData));
+    var mine = Column(children: <Widget>[
+      MineHeadWidget(),
+      Expanded(child: DataListView(tileData: mineTileData))
+    ]);
     return mine;
   }
 }

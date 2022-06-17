@@ -50,7 +50,7 @@ class DataListTile extends StatelessWidget {
     }
     Widget? trailing;
     if (_tileData.routeName != null || _tileData.callback != null) {
-      trailing = Icon(Icons.arrow_forward_ios,
+      trailing = Icon(Icons.chevron_right,
           color: appDataProvider.themeData?.colorScheme.primary);
     } else if (_tileData.suffix != null) {
       trailing = Text(

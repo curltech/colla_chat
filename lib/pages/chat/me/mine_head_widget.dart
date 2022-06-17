@@ -10,8 +10,8 @@ class MineHeadWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var listTile = ListTile(
       leading: const ImageWidget(
-        width: 64.0,
-        height: 64.0,
+        width: 32.0,
+        height: 32.0,
       ),
       title: Text(myself.myselfPeer!.name!),
       subtitle: Text(myself.peerId!),
