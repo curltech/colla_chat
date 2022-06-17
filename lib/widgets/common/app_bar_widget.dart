@@ -6,14 +6,16 @@ import '../../provider/app_data.dart';
 ///工作区的顶部栏AppBar，定义了回退按钮
 class AppBarWidget extends StatelessWidget {
   final String title;
-  final List<Widget> rightActions;
+  final List<String>? rightActions;
+  final Function(int index)? rightCallBack;
   final Widget? bottom;
   final Function? backCallBack;
 
   const AppBarWidget(
       {Key? key,
       this.title = '',
-      this.rightActions = const <Widget>[],
+      this.rightActions,
+      this.rightCallBack,
       this.bottom,
       this.backCallBack})
       : super(key: key);
@@ -35,6 +37,39 @@ class AppBarWidget extends StatelessWidget {
     return backButton;
   }
 
+  PopupMenuButton<int>? rightAction() {
+    PopupMenuButton<int>? menus;
+    var rightActions = this.rightActions;
+    if (rightActions != null && rightActions.isNotEmpty) {
+      List<PopupMenuItem<int>> items = [];
+      int i = 0;
+      for (var rightAction in rightActions) {
+        var item = PopupMenuItem<int>(
+          value: i,
+          child: Text(rightAction),
+        );
+        items.add(item);
+        ++i;
+      }
+      menus = PopupMenuButton<int>(
+        itemBuilder: (BuildContext context) {
+          return items;
+        },
+        icon: Icon(
+          Icons.add,
+          color: appDataProvider.themeData?.colorScheme.primary,
+        ),
+        onSelected: (int index) {
+          if (rightCallBack != null) {
+            rightCallBack!(index);
+          }
+        },
+      );
+    }
+
+    return menus;
+  }
+
   @override
   Widget build(BuildContext context) {
     var listTiles = <Widget>[];
@@ -44,9 +79,7 @@ class AppBarWidget extends StatelessWidget {
           style: const TextStyle(color: Colors.white)),
       tileColor: appDataProvider.themeData?.colorScheme.primary,
       leading: backButton(),
-      // trailing: Row(
-      //   children: rightActions,
-      // )
+      trailing: rightAction(),
     );
     listTiles.add(listTile);
     var bottom = this.bottom;

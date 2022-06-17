@@ -1,8 +1,12 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:barcode_scan2/barcode_scan2.dart';
+import 'package:barcode_scan2/model/scan_options.dart';
+import 'package:barcode_scan2/platform_wrapper.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -10,17 +14,20 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:mobile_number/mobile_number.dart';
+import 'package:mobile_scanner/mobile_scanner.dart' as mobile_scanner;
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:phone_number/phone_number.dart' as phone_number;
 import 'package:phone_numbers_parser/phone_numbers_parser.dart'
     as phone_numbers_parser;
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:telephony/telephony.dart';
 import 'package:toast/toast.dart';
 
+import '../crypto/util.dart';
 import '../provider/app_data.dart';
 
 class TypeUtil {
@@ -937,5 +944,63 @@ class TimerUtil {
   // set timer callback.
   void setOnTimerTickCallback(OnTimerTickCallback callback) {
     _onTimerTickCallback = callback;
+  }
+}
+
+class QrcodeUtil {
+  static QrImage create(String data, {double size = 320, String? embed}) {
+    Uint8List? bytes;
+    if (embed != null && ImageUtil.isBase64Img(embed)) {
+      int pos = embed.indexOf(',');
+      bytes = CryptoUtil.decodeBase64(embed.substring(pos));
+    }
+    return QrImage(
+      data: data,
+      version: QrVersions.auto,
+      size: size,
+      gapless: false,
+      embeddedImage: bytes != null ? MemoryImage(bytes) : null,
+      embeddedImageStyle: QrEmbeddedImageStyle(
+        size: const Size(80, 80),
+      ),
+    );
+  }
+
+  static Future<ScanResult> scan(
+      {List<BarcodeFormat> restrictFormat = const [],
+      int useCamera = -1,
+      AndroidOptions android = const AndroidOptions(),
+      bool autoEnableFlash = false,
+      Map<String, String> strings = const {
+        'cancel': 'Cancel',
+        'flash_on': 'Flash on',
+        'flash_off': 'Flash off',
+      }}) async {
+    var options = ScanOptions(
+      restrictFormat: restrictFormat,
+      useCamera: useCamera,
+      android: android,
+      autoEnableFlash: autoEnableFlash,
+      strings: strings,
+    );
+
+    ScanResult result = await BarcodeScanner.scan(options: options);
+
+    return result;
+  }
+
+  static Future<String?> mobileScan() async {
+    mobile_scanner.MobileScannerController cameraController =
+        mobile_scanner.MobileScannerController();
+    Future<String?> result = Future(() {
+      mobile_scanner.MobileScanner(
+          allowDuplicates: false,
+          controller: cameraController,
+          onDetect: (barcode, args) {
+            return barcode.rawValue;
+          });
+    });
+
+    return result;
   }
 }

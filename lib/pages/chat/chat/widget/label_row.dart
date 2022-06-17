@@ -33,6 +33,7 @@ class LabelRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      margin: margin,
       child: FlatButton(
         color: Colors.white,
         padding: EdgeInsets.all(0),
@@ -78,7 +79,6 @@ class LabelRow extends StatelessWidget {
           ),
         ),
       ),
-      margin: margin,
     );
   }
 }

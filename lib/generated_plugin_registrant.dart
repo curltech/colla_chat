@@ -19,6 +19,7 @@ import 'package:flutter_sound_web/flutter_sound_web.dart';
 import 'package:geolocator_web/geolocator_web.dart';
 import 'package:image_picker_for_web/image_picker_for_web.dart';
 import 'package:livekit_client/livekit_client_web.dart';
+import 'package:mobile_scanner/mobile_scanner_web_plugin.dart';
 import 'package:network_info_plus_web/network_info_plus_web.dart';
 import 'package:openpgp/web/openpgp_web.dart';
 import 'package:package_info_plus_web/package_info_plus_web.dart';
@@ -49,6 +50,7 @@ void registerPlugins(Registrar registrar) {
   GeolocatorPlugin.registerWith(registrar);
   ImagePickerPlugin.registerWith(registrar);
   LiveKitWebPlugin.registerWith(registrar);
+  MobileScannerWebPlugin.registerWith(registrar);
   NetworkInfoPlusPlugin.registerWith(registrar);
   OpenpgpPlugin.registerWith(registrar);
   PackageInfoPlugin.registerWith(registrar);

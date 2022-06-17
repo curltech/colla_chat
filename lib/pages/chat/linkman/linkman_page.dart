@@ -53,7 +53,7 @@ class _LinkmanPageState extends State<LinkmanPage>
         ];
       },
       icon: Icon(
-        Icons.add_box_rounded,
+        Icons.add,
         color: Provider.of<AppDataProvider>(context)
             .themeData
             ?.colorScheme

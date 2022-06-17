@@ -3,10 +3,10 @@ import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:flutter/material.dart';
 
-import '../../../constant/base.dart';
-import '../../../transport/httpclient.dart';
-import '../../../widgets/common/app_bar_view.dart';
-import '../chat/widget/label_row.dart';
+import '../../../../constant/base.dart';
+import '../../../../transport/httpclient.dart';
+import '../../../../widgets/common/app_bar_view.dart';
+import '../../chat/widget/label_row.dart';
 
 class PersonalInfoPage extends StatefulWidget {
   @override

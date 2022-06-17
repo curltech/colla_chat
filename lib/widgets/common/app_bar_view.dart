@@ -6,7 +6,8 @@ import 'app_bar_widget.dart';
 class AppBarView extends StatelessWidget {
   final String title;
   final Widget child;
-  final List<Widget> rightActions;
+  final List<String>? rightActions;
+  final Function(int index)? rightCallBack;
   final Widget? bottom;
   final Function? backCallBack;
 
@@ -14,7 +15,8 @@ class AppBarView extends StatelessWidget {
       {Key? key,
       required this.title,
       required this.child,
-      this.rightActions = const <Widget>[],
+      this.rightActions,
+      this.rightCallBack,
       this.bottom,
       this.backCallBack})
       : super(key: key);
@@ -26,7 +28,8 @@ class AppBarView extends StatelessWidget {
           title: title,
           rightActions: rightActions,
           bottom: bottom,
-          backCallBack: backCallBack),
+          backCallBack: backCallBack,
+          rightCallBack: rightCallBack),
       SingleChildScrollView(child: child),
     ]);
   }

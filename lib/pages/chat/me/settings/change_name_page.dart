@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../tool/util.dart';
-import '../../../widgets/common/app_bar_view.dart';
-import '../chat/widget/commom_button.dart';
-import '../chat/widget/main_input.dart';
-import '../chat/widget/tip_verify_Input.dart';
+import '../../../../tool/util.dart';
+import '../../../../widgets/common/app_bar_view.dart';
+import '../../chat/widget/main_input.dart';
+import '../../chat/widget/tip_verify_Input.dart';
 
 class ChangeNamePage extends StatefulWidget {
   final String name;
@@ -52,13 +51,14 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
 
   @override
   Widget build(BuildContext context) {
-    var rWidget = ComMomButton(
-      text: '保存',
-      style: TextStyle(color: Colors.white),
-      width: 55.0,
-      margin: EdgeInsets.only(right: 15.0, top: 10.0, bottom: 10.0),
-      radius: 4.0,
-    );
+    var rWidget = '';
+    // ComMomButton(
+    //   text: '保存',
+    //   style: TextStyle(color: Colors.white),
+    //   width: 55.0,
+    //   margin: EdgeInsets.only(right: 15.0, top: 10.0, bottom: 10.0),
+    //   radius: 4.0,
+    // );
 
     return AppBarView(
       title: '更改名字',

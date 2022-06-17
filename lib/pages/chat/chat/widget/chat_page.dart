@@ -223,19 +223,7 @@ class _ChatPageState extends State<ChatPage> {
       ),
     ];
 
-    var rWidget = [
-      InkWell(
-        child: Image.asset('assets/images/right_more.png'),
-        onTap: () {
-          // routePush(widget.type == 2
-          //     ? GroupDetailsPage(
-          //         widget?.id ?? widget.title,
-          //         callBack: (v) {},
-          //       )
-          //     : ChatInfoPage(widget.id));
-        },
-      )
-    ];
+    List<String> rWidget = [];
 
     return AppBarView(
       title: newGroupName ?? widget.title,
