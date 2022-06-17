@@ -2,7 +2,6 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/login/loading.dart';
 import 'package:flutter/material.dart';
 
-import '../../../widgets/common/keep_alive_wrapper.dart';
 import 'p2p_login_widget.dart';
 import 'p2p_register_widget.dart';
 import 'p2p_setting_widget.dart';
@@ -25,9 +24,9 @@ class _P2pLoginState extends State<P2pLogin>
   void initState() {
     super.initState();
     // 初始化子项集合
-    var p2pLoginWidget = const KeepAliveWrapper(child: P2pLoginWidget());
-    var p2pRegisterWidget = const KeepAliveWrapper(child: P2pRegisterWidget());
-    var p2pSettingWidget = const KeepAliveWrapper(child: P2pSettingWidget());
+    var p2pLoginWidget = const P2pLoginWidget();
+    var p2pRegisterWidget = const P2pRegisterWidget();
+    var p2pSettingWidget = const P2pSettingWidget();
     _children = [
       p2pLoginWidget,
       p2pRegisterWidget,

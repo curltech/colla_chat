@@ -18,7 +18,8 @@ class P2pRegisterWidget extends StatefulWidget {
   State<StatefulWidget> createState() => _P2pRegisterWidgetState();
 }
 
-class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
+class _P2pRegisterWidgetState extends State<P2pRegisterWidget>
+    with AutomaticKeepAliveClientMixin {
   final _formKey = GlobalKey<FormState>();
   String _name = '胡劲松';
   String _loginName = 'hujs';
@@ -237,4 +238,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
       logger.e('password is not matched');
     }
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

@@ -16,7 +16,8 @@ class P2pLoginWidget extends StatefulWidget {
   State<StatefulWidget> createState() => _P2pLoginWidgetState();
 }
 
-class _P2pLoginWidgetState extends State<P2pLoginWidget> {
+class _P2pLoginWidgetState extends State<P2pLoginWidget>
+    with AutomaticKeepAliveClientMixin {
   final _formKey = GlobalKey<FormState>();
   String _credential = '13609619603';
   String _password = '1234';
@@ -134,4 +135,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
       DialogUtil.error(context, content: e.toString());
     });
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

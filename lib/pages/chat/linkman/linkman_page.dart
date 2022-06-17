@@ -17,7 +17,7 @@ class LinkmanPage extends StatefulWidget {
 }
 
 class _LinkmanPageState extends State<LinkmanPage>
-    with SingleTickerProviderStateMixin {
+    with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late TabController _tabController;
   String _key = '';
   late List<Widget> _children;
@@ -120,4 +120,7 @@ class _LinkmanPageState extends State<LinkmanPage>
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

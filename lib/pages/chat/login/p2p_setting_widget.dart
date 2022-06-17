@@ -14,7 +14,8 @@ class P2pSettingWidget extends StatefulWidget {
   State<StatefulWidget> createState() => _P2pSettingWidgetState();
 }
 
-class _P2pSettingWidgetState extends State<P2pSettingWidget> {
+class _P2pSettingWidgetState extends State<P2pSettingWidget>
+    with AutomaticKeepAliveClientMixin {
   final _formKey = GlobalKey<FormState>();
 
   @override
@@ -46,4 +47,7 @@ class _P2pSettingWidgetState extends State<P2pSettingWidget> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

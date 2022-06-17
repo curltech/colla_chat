@@ -24,7 +24,8 @@ class CollectionWidget extends StatefulWidget {
   CollectionWidgetState createState() => CollectionWidgetState();
 }
 
-class CollectionWidgetState extends State<CollectionWidget> {
+class CollectionWidgetState extends State<CollectionWidget>
+    with AutomaticKeepAliveClientMixin {
   QuillController? _controller;
   final FocusNode _focusNode = FocusNode();
 
@@ -254,4 +255,7 @@ class CollectionWidgetState extends State<CollectionWidget> {
           ),
         ),
       );
+
+  @override
+  bool get wantKeepAlive => true;
 }

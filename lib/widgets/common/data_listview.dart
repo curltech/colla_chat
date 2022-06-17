@@ -1,7 +1,9 @@
 import 'dart:typed_data';
 
 import 'package:colla_chat/provider/app_data.dart';
+import 'package:colla_chat/provider/index_views.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 /// 通用列表项的数据模型
 class TileData {
@@ -73,7 +75,9 @@ class DataListTile extends StatelessWidget {
         if (call != null) {
           call();
         } else if (_tileData.routeName != null) {
-          Navigator.pushNamed(context, _tileData.routeName!);
+          var indexViewProvider = Provider.of<IndexViewProvider>(context,listen: false);
+          indexViewProvider.push(_tileData.routeName!);
+          //Navigator.pushNamed(context, _tileData.routeName!);
         }
       },
     );
