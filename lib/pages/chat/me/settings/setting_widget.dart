@@ -31,14 +31,17 @@ final Map<String, List<TileData>> settingTileData = {
 
 //设置页面，带有回退回调函数
 class SettingWidget extends StatelessWidget {
+  final bool withBack;
   final Function? backCallBack;
 
-  const SettingWidget({Key? key, this.backCallBack}) : super(key: key);
+  const SettingWidget({Key? key, this.withBack = false, this.backCallBack})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var mine = AppBarView(
         title: 'Setting',
+        withBack: withBack,
         backCallBack: backCallBack,
         child: DataListView(tileData: settingTileData));
     return mine;

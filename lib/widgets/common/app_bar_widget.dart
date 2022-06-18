@@ -1,5 +1,7 @@
+import 'package:colla_chat/provider/index_views.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../provider/app_data.dart';
 
@@ -9,6 +11,7 @@ class AppBarWidget extends StatelessWidget {
   final List<String>? rightActions;
   final Function(int index)? rightCallBack;
   final Widget? bottom;
+  final bool withBack;
   final Function? backCallBack;
 
   const AppBarWidget(
@@ -17,19 +20,24 @@ class AppBarWidget extends StatelessWidget {
       this.rightActions,
       this.rightCallBack,
       this.bottom,
+      this.withBack = false,
       this.backCallBack})
       : super(key: key);
 
-  Widget? backButton() {
+  Widget? backButton(BuildContext context) {
     Widget? backButton;
-    final backCallBack = this.backCallBack;
-    if (backCallBack != null) {
+    bool withBack = this.withBack;
+    if (withBack) {
       backButton = IconButton(
         icon: const Icon(Icons.chevron_left, color: Colors.white),
         onPressed: () {
           final backCallBack = this.backCallBack;
           if (backCallBack != null) {
             backCallBack();
+          } else {
+            var indexViewProvider =
+                Provider.of<IndexViewProvider>(context, listen: false);
+            indexViewProvider.pop();
           }
         },
       );
@@ -78,7 +86,7 @@ class AppBarWidget extends StatelessWidget {
           textAlign: TextAlign.center,
           style: const TextStyle(color: Colors.white)),
       tileColor: appDataProvider.themeData?.colorScheme.primary,
-      leading: backButton(),
+      leading: backButton(context),
       trailing: rightAction(),
     );
     listTiles.add(listTile);

@@ -1,7 +1,6 @@
 import 'package:colla_chat/pages/chat/login/p2p_login.dart';
 import 'package:colla_chat/provider/app_data.dart';
 import 'package:colla_chat/routers/application.dart';
-import 'package:colla_chat/routers/navigator_util.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:fluro/fluro.dart';
@@ -38,7 +37,6 @@ class CollaChatApp extends StatelessWidget {
     final router = FluroRouter();
     Routes.configureRoutes(router);
     Application.router = router;
-    NavigatorUtil.context = context;
 
     return MultiProvider(
         providers: <SingleChildWidget>[

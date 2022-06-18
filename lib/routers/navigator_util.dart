@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 
 import './application.dart';
 import './routes.dart';
-import '../pages/chat/login/loading.dart';
+import '../pages/chat/login/p2p_login.dart';
 
 class NavigatorUtil {
-  static late BuildContext context;
   // 返回
   static void goBack(BuildContext context) {
     /// 其实这边调用的是
@@ -29,6 +28,11 @@ class NavigatorUtil {
     Application.router.navigateTo(context, Routes.index, replace: true);
   }
 
+  // 跳转到登录页面
+  static void goLoginPage(BuildContext context) {
+    Application.router.navigateTo(context, Routes.p2pLogin, replace: true);
+  }
+
   /// 跳转到 转场动画 页面 ， 这边只展示 inFromLeft ，剩下的自己去尝试下，
   /// 框架自带的有 native，nativeModal，inFromLeft，inFromRight，inFromBottom，fadeIn，custom
   static Future jump(BuildContext context, String title) {
@@ -49,9 +53,7 @@ class NavigatorUtil {
   static Future jumpRemove(BuildContext context) {
     return Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-          builder: (context) => Loading(
-            title: '',
-          ),
+          builder: (context) => P2pLogin(),
         ),
         (route) => route == null);
   }
@@ -92,9 +94,7 @@ class NavigatorUtil {
   static void goToIndexRemovePage(BuildContext context) {
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-          builder: (context) => Loading(
-            title: '',
-          ),
+          builder: (context) => P2pLogin(),
         ),
         (route) => route == null);
   }
@@ -103,9 +103,7 @@ class NavigatorUtil {
   static void goToLoginRemovePage(BuildContext context) {
     Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-          builder: (context) => Loading(
-            title: '',
-          ),
+          builder: (context) => P2pLogin(),
         ),
         (route) => route == null);
   }

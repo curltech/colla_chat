@@ -10,6 +10,8 @@ import '../linkman/linkman_page.dart';
 import '../me/collection/collection_widget.dart';
 import '../me/me_widget.dart';
 
+final List<String> widgetPosition = ['chat', 'linkman', 'channel', 'me'];
+
 class IndexView extends StatefulWidget {
   final String title;
 
@@ -24,13 +26,8 @@ class IndexView extends StatefulWidget {
 class IndexViewState extends State<IndexView>
     with SingleTickerProviderStateMixin {
   int _currentIndex = 0;
-  final _widgetLabels = [
-    AppLocalizations.instance.text('Chat'),
-    AppLocalizations.instance.text('Linkman'),
-    AppLocalizations.instance.text('Channel'),
-    AppLocalizations.instance.text('Me')
-  ];
   var endDrawer = const EndDrawer();
+  late Map<String, String> _widgetLabels;
 
   @override
   void initState() {
@@ -44,75 +41,73 @@ class IndexViewState extends State<IndexView>
     indexViewProvider.define('me', MeWidget());
   }
 
-  SizedBox _createLeftBar(BuildContext context) {
-    var indexViewProvider = Provider.of<IndexViewProvider>(context);
-    return SizedBox(
-      width: 90.0,
-      child: ListView(
-        children: <Widget>[
-          ListTile(
-              iconColor: _getIconColor(0),
-              title: Icon(Icons.chat),
-              subtitle: Text(
-                _widgetLabels.elementAt(0),
-                textAlign: TextAlign.center,
-                style: TextStyle(color: _getIconColor(0)),
-              ),
-              onTap: () {
-                setState(() {
-                  _currentIndex = 0;
-                });
-                indexViewProvider.current = 'chat';
-                indexViewProvider.jumpTo('chat');
-              }),
-          ListTile(
-              iconColor: _getIconColor(1),
-              title: Icon(Icons.contacts),
-              subtitle: Text(
-                _widgetLabels.elementAt(1),
-                textAlign: TextAlign.center,
-                style: TextStyle(color: _getIconColor(1)),
-              ),
-              onTap: () {
-                setState(() {
-                  _currentIndex = 1;
-                });
-                indexViewProvider.current = 'linkman';
-                indexViewProvider.jumpTo('linkman');
-              }),
-          ListTile(
-              iconColor: _getIconColor(2),
-              title: Icon(Icons.wifi_channel),
-              subtitle: Text(
-                _widgetLabels.elementAt(2),
-                textAlign: TextAlign.center,
-                style: TextStyle(color: _getIconColor(2)),
-              ),
-              onTap: () {
-                setState(() {
-                  _currentIndex = 2;
-                });
-                indexViewProvider.current = 'channel';
-                indexViewProvider.jumpTo('channel');
-              }),
-          ListTile(
-              iconColor: _getIconColor(3),
-              title: Icon(Icons.person),
-              subtitle: Text(
-                _widgetLabels.elementAt(3),
-                textAlign: TextAlign.center,
-                style: TextStyle(color: _getIconColor(3)),
-              ),
-              onTap: () {
-                setState(() {
-                  _currentIndex = 3;
-                });
-                indexViewProvider.current = 'me';
-                indexViewProvider.jumpTo('me');
-              }),
-        ],
-      ),
-    );
+  _push(BuildContext context, int currentIndex) {
+    var indexViewProvider =
+        Provider.of<IndexViewProvider>(context, listen: false);
+    setState(() {
+      _currentIndex = currentIndex;
+    });
+    String name = widgetPosition[currentIndex];
+    indexViewProvider.pop();
+    indexViewProvider.current = name;
+    indexViewProvider.push(name);
+  }
+
+  Widget _createLeftBar(BuildContext context) {
+    return Consumer<IndexViewProvider>(
+        builder: (context, indexViewProvider, child) {
+      return SizedBox(
+        width: 90.0,
+        child: ListView(
+          children: <Widget>[
+            ListTile(
+                iconColor: _getIconColor(0),
+                title: Icon(Icons.chat),
+                subtitle: Text(
+                  _getLabel(0),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: _getIconColor(0)),
+                ),
+                onTap: () {
+                  _push(context, 0);
+                }),
+            ListTile(
+                iconColor: _getIconColor(1),
+                title: Icon(Icons.contacts),
+                subtitle: Text(
+                  _getLabel(1),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: _getIconColor(1)),
+                ),
+                onTap: () {
+                  _push(context, 1);
+                }),
+            ListTile(
+                iconColor: _getIconColor(2),
+                title: Icon(Icons.wifi_channel),
+                subtitle: Text(
+                  _getLabel(2),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: _getIconColor(2)),
+                ),
+                onTap: () {
+                  _push(context, 2);
+                }),
+            ListTile(
+                iconColor: _getIconColor(3),
+                title: Icon(Icons.person),
+                subtitle: Text(
+                  _getLabel(3),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: _getIconColor(3)),
+                ),
+                onTap: () {
+                  _push(context, 3);
+                }),
+          ],
+        ),
+      );
+    });
   }
 
   Color? _getIconColor(int index) {
@@ -123,36 +118,44 @@ class IndexViewState extends State<IndexView>
     }
   }
 
-  BottomNavigationBar _createBottomBar(BuildContext context) {
-    var indexViewProvider = Provider.of<IndexViewProvider>(context);
-    BottomNavigationBar bottomNavigationBar = BottomNavigationBar(
-      //底部按钮，移动版才有
-      items: <BottomNavigationBarItem>[
-        BottomNavigationBarItem(
-            icon: const Icon(Icons.chat), label: _widgetLabels.elementAt(0)),
-        BottomNavigationBarItem(
-            icon: const Icon(Icons.contacts),
-            label: _widgetLabels.elementAt(1)),
-        BottomNavigationBarItem(
-            icon: const Icon(Icons.wifi_channel),
-            label: _widgetLabels.elementAt(2)),
-        BottomNavigationBarItem(
-            icon: const Icon(Icons.person), label: _widgetLabels.elementAt(3)),
-      ],
-      currentIndex: _currentIndex,
-      selectedItemColor:
-          Provider.of<AppDataProvider>(context).themeData?.colorScheme.primary,
-      unselectedItemColor: Colors.grey,
-      selectedFontSize: 14.0,
-      unselectedFontSize: 14.0,
-      showSelectedLabels: true,
-      showUnselectedLabels: true,
-      onTap: (int index) {
-        setState(() {
-          _currentIndex = index;
-        });
-      },
-    );
+  String _getLabel(int index) {
+    String name = widgetPosition[index];
+    String? label = _widgetLabels[name];
+    label = label ?? '';
+
+    return label;
+  }
+
+  Widget _createBottomBar(BuildContext context) {
+    Widget bottomNavigationBar = Consumer<IndexViewProvider>(
+        builder: (context, indexViewProvider, child) {
+      return BottomNavigationBar(
+        //底部按钮，移动版才有
+        items: <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.chat), label: _getLabel(0)),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.contacts), label: _getLabel(1)),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.wifi_channel), label: _getLabel(2)),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.person), label: _getLabel(3)),
+        ],
+        currentIndex: _currentIndex,
+        selectedItemColor: Provider.of<AppDataProvider>(context)
+            .themeData
+            ?.colorScheme
+            .primary,
+        unselectedItemColor: Colors.grey,
+        selectedFontSize: 14.0,
+        unselectedFontSize: 14.0,
+        showSelectedLabels: true,
+        showUnselectedLabels: true,
+        onTap: (int index) {
+          _push(context, index);
+        },
+      );
+    });
     return bottomNavigationBar;
   }
 
@@ -202,6 +205,12 @@ class IndexViewState extends State<IndexView>
 
   @override
   Widget build(BuildContext context) {
+    _widgetLabels = {
+      'chat': AppLocalizations.instance.text('Chat'),
+      'linkman': AppLocalizations.instance.text('Linkman'),
+      'channel': AppLocalizations.instance.text('Channel'),
+      'me': AppLocalizations.instance.text('Me'),
+    };
     appDataProvider.changeSize(context);
     var scaffold = ChangeNotifierProvider.value(
         value: IndexViewProvider.instance,

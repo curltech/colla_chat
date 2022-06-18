@@ -1,7 +1,6 @@
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
 import 'package:colla_chat/provider/index_views.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../../provider/app_data.dart';
 import '../../../widgets/common/app_bar_view.dart';
@@ -11,19 +10,19 @@ import 'mine_head_widget.dart';
 
 //我的页面，带有路由回调函数
 class MeWidget extends StatelessWidget {
-  final Function? backCallBack;
-  final Function(dynamic target)? routerCallback;
   CollectionWidget collectionWidget = const CollectionWidget();
-  SettingWidget settingWidget = const SettingWidget();
+  SettingWidget settingWidget = const SettingWidget(
+    withBack: true,
+  );
 
-  MeWidget({Key? key, this.backCallBack, this.routerCallback})
-      : super(key: key);
+  MeWidget({Key? key}) : super(key: key) {
+    var indexViewProvider = IndexViewProvider.instance;
+    indexViewProvider.define('collection', collectionWidget);
+    indexViewProvider.define('setting', settingWidget);
+  }
 
   @override
   Widget build(BuildContext context) {
-    var indexViewProvider = Provider.of<IndexViewProvider>(context);
-    indexViewProvider.define('collection', collectionWidget);
-    indexViewProvider.define('setting', settingWidget);
     final Map<String, List<TileData>> mineTileData = {
       'Mine': [
         TileData(
@@ -54,7 +53,6 @@ class MeWidget extends StatelessWidget {
     };
     var me = AppBarView(
         title: 'Me',
-        backCallBack: backCallBack,
         child: Column(children: <Widget>[
           MineHeadWidget(),
           DataListView(tileData: mineTileData)

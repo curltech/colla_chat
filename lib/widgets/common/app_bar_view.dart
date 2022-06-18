@@ -9,6 +9,7 @@ class AppBarView extends StatelessWidget {
   final List<String>? rightActions;
   final Function(int index)? rightCallBack;
   final Widget? bottom;
+  final bool withBack;
   final Function? backCallBack;
 
   const AppBarView(
@@ -18,6 +19,7 @@ class AppBarView extends StatelessWidget {
       this.rightActions,
       this.rightCallBack,
       this.bottom,
+      this.withBack = false,
       this.backCallBack})
       : super(key: key);
 
@@ -28,6 +30,7 @@ class AppBarView extends StatelessWidget {
           title: title,
           rightActions: rightActions,
           bottom: bottom,
+          withBack: withBack,
           backCallBack: backCallBack,
           rightCallBack: rightCallBack),
       SingleChildScrollView(child: child),
