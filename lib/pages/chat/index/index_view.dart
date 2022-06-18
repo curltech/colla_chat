@@ -41,9 +41,7 @@ class IndexViewState extends State<IndexView>
     indexViewProvider.define('me', MeWidget());
   }
 
-  _push(BuildContext context, int currentIndex) {
-    var indexViewProvider =
-        Provider.of<IndexViewProvider>(context, listen: false);
+  _push(IndexViewProvider indexViewProvider, int currentIndex) {
     setState(() {
       _currentIndex = currentIndex;
     });
@@ -69,7 +67,7 @@ class IndexViewState extends State<IndexView>
                   style: TextStyle(color: _getIconColor(0)),
                 ),
                 onTap: () {
-                  _push(context, 0);
+                  _push(indexViewProvider, 0);
                 }),
             ListTile(
                 iconColor: _getIconColor(1),
@@ -80,7 +78,7 @@ class IndexViewState extends State<IndexView>
                   style: TextStyle(color: _getIconColor(1)),
                 ),
                 onTap: () {
-                  _push(context, 1);
+                  _push(indexViewProvider, 1);
                 }),
             ListTile(
                 iconColor: _getIconColor(2),
@@ -91,7 +89,7 @@ class IndexViewState extends State<IndexView>
                   style: TextStyle(color: _getIconColor(2)),
                 ),
                 onTap: () {
-                  _push(context, 2);
+                  _push(indexViewProvider, 2);
                 }),
             ListTile(
                 iconColor: _getIconColor(3),
@@ -102,7 +100,7 @@ class IndexViewState extends State<IndexView>
                   style: TextStyle(color: _getIconColor(3)),
                 ),
                 onTap: () {
-                  _push(context, 3);
+                  _push(indexViewProvider, 3);
                 }),
           ],
         ),
@@ -152,7 +150,7 @@ class IndexViewState extends State<IndexView>
         showSelectedLabels: true,
         showUnselectedLabels: true,
         onTap: (int index) {
-          _push(context, index);
+          _push(indexViewProvider, index);
         },
       );
     });
