@@ -2,13 +2,86 @@ import 'package:flutter/material.dart';
 
 import 'app_data.dart';
 
+class Stack<T> {
+  T? _head;
+
+  ///存放元素的上一个元素
+  final Map<T, T> _stacks = {};
+
+  T? get head {
+    return _head;
+  }
+
+  T? push(T element) {
+    if (_head != null) {
+      _stacks[element] = _head as T;
+    }
+    _head = element;
+    return _stacks[_head];
+  }
+
+  T? pushRepeat(T element) {
+    if (_head == null) {
+      return push(element);
+    }
+    if (_head == element) {
+      return _head;
+    }
+    T? current = _head;
+    T? next;
+    bool found = false;
+    while (current != null) {
+      T? pre = _stacks[current];
+      if (current == element) {
+        found = true;
+        if (next != null && pre != null) {
+          _stacks[next] = pre;
+        }
+        if (next != null && pre == null) {
+          _stacks.remove(next);
+        }
+        if (_head != null) {
+          _stacks[element] = _head as T;
+        }
+        _head = element;
+
+        return _stacks[_head];
+      }
+      next = current;
+      current = pre;
+    }
+    if (!found) {
+      return push(element);
+    }
+
+    return null;
+  }
+
+  T? pop() {
+    if (_head != null) {
+      T? pre = _stacks[_head];
+      if (pre != null) {
+        _head = pre;
+      } else {
+        _head = null;
+      }
+      return _head;
+    }
+    return null;
+  }
+
+  canPop() {
+    return _head != null;
+  }
+}
+
 class IndexViewProvider with ChangeNotifier {
   static IndexViewProvider instance = IndexViewProvider();
   Map<String, int> viewPosition = {};
   List<Widget> views = [];
-  List<String> stack = [];
+  Stack<String> stack = Stack<String>();
+  static const String _head = '_head';
   PageController? _pageController;
-  String _current = 'chat';
 
   IndexViewProvider();
 
@@ -35,28 +108,30 @@ class IndexViewProvider with ChangeNotifier {
   }
 
   String get current {
-    return _current;
-  }
-
-  set current(String current) {
-    if (viewPosition.containsKey(current)) {
-      _current = current;
-      notifyListeners();
-    }
+    String? head = stack.head;
+    head ??= '';
+    return head;
   }
 
   int get currentIndex {
-    var index = viewPosition[_current];
-    index ??= -1;
-    return index;
+    var head = current;
+    if (head != '') {
+      var index = viewPosition[head];
+      index ??= -1;
+      return index;
+    } else {
+      return -1;
+    }
   }
 
   set currentIndex(int index) {
     for (var entry in viewPosition.entries) {
       if (entry.value == index) {
         var current_ = entry.key;
-        _current = current_;
-        notifyListeners();
+        if (stack.head != current_) {
+          stack.pushRepeat(current_);
+          notifyListeners();
+        }
         break;
       }
     }
@@ -65,24 +140,25 @@ class IndexViewProvider with ChangeNotifier {
   ///把名字压入堆栈，然后跳转
   push(String name) {
     if (viewPosition.containsKey(name)) {
-      stack.add(name);
-      jumpTo(name);
+      if (stack.head != name) {
+        stack.pushRepeat(name);
+        jumpTo(name);
+      }
     }
   }
 
   ///弹出最新的，跳转到第二新的
   pop() {
-    if (stack.isNotEmpty) {
-      stack.removeLast();
-    }
-    if (stack.isNotEmpty) {
-      jumpTo(stack.last);
+    stack.pop();
+    String? head = stack.head;
+    if (head != null) {
+      jumpTo(head);
     }
   }
 
   ///判断是否有可弹出的视图
   bool canPop() {
-    return stack.isNotEmpty;
+    return stack.canPop();
   }
 
   ///直接跳转到位置的视图

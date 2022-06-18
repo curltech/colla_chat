@@ -5,9 +5,9 @@ import 'package:provider/provider.dart';
 import '../../../l10n/localization.dart';
 import '../../../provider/app_data.dart';
 import '../../../provider/index_views.dart';
+import '../channel/channel.dart';
 import '../chat/chat_target.dart';
 import '../linkman/linkman_page.dart';
-import '../me/collection/collection_widget.dart';
 import '../me/me_widget.dart';
 
 final List<String> widgetPosition = ['chat', 'linkman', 'channel', 'me'];
@@ -37,7 +37,7 @@ class IndexViewState extends State<IndexView>
     indexViewProvider.pageController = pageController;
     indexViewProvider.define('chat', ChatTarget());
     indexViewProvider.define('linkman', const LinkmanPage());
-    indexViewProvider.define('collection', const CollectionWidget());
+    indexViewProvider.define('channel', Channel());
     indexViewProvider.define('me', MeWidget());
   }
 
@@ -46,8 +46,6 @@ class IndexViewState extends State<IndexView>
       _currentIndex = currentIndex;
     });
     String name = widgetPosition[currentIndex];
-    indexViewProvider.pop();
-    indexViewProvider.current = name;
     indexViewProvider.push(name);
   }
 
