@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../l10n/localization.dart';
-import '../../../routers/application.dart';
 import '../../../routers/routes.dart';
 import '../../../service/dht/myselfpeer.dart';
 import '../../../tool/util.dart';
@@ -127,7 +126,8 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget>
     await appParams.saveAppParams();
     myselfPeerService.login(_credential, _password).then((bool loginStatus) {
       if (loginStatus) {
-        Application.router.navigateTo(context, Routes.index, replace: true);
+        Application.router
+            .navigateTo(context, Application.index, replace: true);
       } else {
         DialogUtil.error(context, content: 'login fail');
       }

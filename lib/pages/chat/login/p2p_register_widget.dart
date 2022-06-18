@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 
 import '../../../l10n/localization.dart';
 import '../../../provider/app_data.dart';
-import '../../../routers/application.dart';
 import '../../../routers/routes.dart';
 import '../../../service/dht/myselfpeer.dart';
 
@@ -232,7 +231,8 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget>
           _name, _loginName, _plainPassword,
           mobile: _mobile, email: _email);
       if (registerStatus) {
-        Application.router.navigateTo(context, Routes.index, replace: true);
+        Application.router
+            .navigateTo(context, Application.index, replace: true);
       }
     } else {
       logger.e('password is not matched');

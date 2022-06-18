@@ -1,9 +1,7 @@
 import 'package:colla_chat/pages/chat/login/p2p_login.dart';
 import 'package:colla_chat/provider/app_data.dart';
-import 'package:colla_chat/routers/application.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/servicelocator.dart';
-import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
@@ -34,10 +32,6 @@ class CollaChatApp extends StatelessWidget {
   ///widget 的主要工作是提供一个 build() 方法来描述如何根据其他较低级别的 widgets 来显示自己
   @override
   Widget build(BuildContext context) {
-    final router = FluroRouter();
-    Routes.configureRoutes(router);
-    Application.router = router;
-
     return MultiProvider(
         providers: <SingleChildWidget>[
           ChangeNotifierProvider.value(value: appDataProvider),

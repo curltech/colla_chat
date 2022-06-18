@@ -1,21 +1,20 @@
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 
-import './application.dart';
 import './routes.dart';
 import '../pages/chat/login/p2p_login.dart';
 
 class NavigatorUtil {
   // 返回
   static void goBack(BuildContext context) {
-    /// 其实这边调用的是
-    Navigator.pop(context);
+    //Navigator.pop(context);
     Application.router.pop(context);
   }
 
   // 带参数的返回
   static void goBackWithParams(BuildContext context, result) {
-    Navigator.pop(context, result);
+    //Navigator.pop(context, result);
+    Application.router.pop(context, result);
   }
 
   // 路由返回指定页面
@@ -25,12 +24,12 @@ class NavigatorUtil {
 
   // 跳转到主页面
   static void goIndexPage(BuildContext context) {
-    Application.router.navigateTo(context, Routes.index, replace: true);
+    Application.router.navigateTo(context, Application.index, replace: true);
   }
 
   // 跳转到登录页面
   static void goLoginPage(BuildContext context) {
-    Application.router.navigateTo(context, Routes.p2pLogin, replace: true);
+    Application.router.navigateTo(context, Application.p2pLogin, replace: true);
   }
 
   /// 跳转到 转场动画 页面 ， 这边只展示 inFromLeft ，剩下的自己去尝试下，

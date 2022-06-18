@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import '../../../entity/stock/user.dart';
 import '../../../l10n/localization.dart';
-import '../../../routers/application.dart';
 import '../../../routers/routes.dart';
 
 /// 远程登录组件，一个card下的录入框和按钮组合
@@ -121,7 +120,7 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
       'password_': _password,
     });
     if (stockUser.loginStatus == true) {
-      Application.router.navigateTo(context, Routes.index, replace: true);
+      Application.router.navigateTo(context, Application.index, replace: true);
     }
   }
 }
