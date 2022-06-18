@@ -63,9 +63,9 @@ class AppBarWidget extends StatelessWidget {
         itemBuilder: (BuildContext context) {
           return items;
         },
-        icon: Icon(
+        icon: const Icon(
           Icons.add,
-          color: appDataProvider.themeData?.colorScheme.primary,
+          color: Colors.white,
         ),
         onSelected: (int index) {
           if (rightCallBack != null) {

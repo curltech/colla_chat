@@ -56,11 +56,12 @@ class DataListTile extends StatelessWidget {
       if (suffix is Widget) {
         trailing.add(suffix);
       } else if (suffix is String) {
-        trailing.add(Text(
+        trailing.add(Expanded(
+            child: Text(
           suffix,
-          softWrap: false,
+          softWrap: true,
           overflow: TextOverflow.ellipsis,
-        ));
+        )));
       }
     }
     if (_tileData.routeName != null || _tileData.routerCallback != null) {
@@ -76,6 +77,8 @@ class DataListTile extends StatelessWidget {
           child: Row(
               mainAxisAlignment: MainAxisAlignment.end, children: trailing));
     }
+
+    ///未来不使用ListTile，因为高度固定，不够灵活
     return ListTile(
       leading: leading,
       title: Text(
@@ -95,7 +98,6 @@ class DataListTile extends StatelessWidget {
           var indexViewProvider =
               Provider.of<IndexViewProvider>(context, listen: false);
           indexViewProvider.push(_tileData.routeName!);
-          //Navigator.pushNamed(context, _tileData.routeName!);
         }
       },
     );
