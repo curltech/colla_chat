@@ -16,7 +16,7 @@ class TileData {
   //标题
   late final String title;
   late final String? subtitle;
-  late final String? suffix;
+  late final dynamic suffix;
   late final String? routeName;
   late final String? tileType;
   Function()? routerCallback;
@@ -50,14 +50,29 @@ class DataListTile extends StatelessWidget {
     } else if (avatar != null) {
       leading = Image.memory(Uint8List.fromList(avatar.codeUnits));
     }
-    Widget? trailing;
+    List<Widget>? trailing = <Widget>[];
+    var suffix = _tileData.suffix;
+    if (suffix != null) {
+      if (suffix is Widget) {
+        trailing.add(suffix);
+      } else if (suffix is String) {
+        trailing.add(Text(
+          suffix,
+        ));
+      }
+    }
     if (_tileData.routeName != null || _tileData.routerCallback != null) {
-      trailing = Icon(Icons.chevron_right,
-          color: appDataProvider.themeData?.colorScheme.primary);
-    } else if (_tileData.suffix != null) {
-      trailing = Text(
-        _tileData.suffix!,
-      );
+      trailing.add(Icon(Icons.chevron_right,
+          color: appDataProvider.themeData?.colorScheme.primary));
+    }
+    Widget? trailingWidget;
+    if (trailing.length == 1) {
+      trailingWidget = trailing[0];
+    } else if (trailing.length > 1) {
+      trailingWidget = SizedBox(
+          width: 200,
+          child: Row(
+              mainAxisAlignment: MainAxisAlignment.end, children: trailing));
     }
     return ListTile(
       leading: leading,
@@ -69,13 +84,14 @@ class DataListTile extends StatelessWidget {
               _tileData.subtitle!,
             )
           : null,
-      trailing: trailing,
+      trailing: trailingWidget,
       onTap: () {
         var call = _tileData.routerCallback;
         if (call != null) {
           call();
         } else if (_tileData.routeName != null) {
-          var indexViewProvider = Provider.of<IndexViewProvider>(context,listen: false);
+          var indexViewProvider =
+              Provider.of<IndexViewProvider>(context, listen: false);
           indexViewProvider.push(_tileData.routeName!);
           //Navigator.pushNamed(context, _tileData.routeName!);
         }

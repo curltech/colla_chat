@@ -1,3 +1,4 @@
+import 'package:colla_chat/pages/chat/me/settings/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
 import 'package:colla_chat/provider/index_views.dart';
 import 'package:flutter/material.dart';
@@ -14,11 +15,15 @@ class MeWidget extends StatelessWidget {
   SettingWidget settingWidget = const SettingWidget(
     withBack: true,
   );
+  PersonalInfoWidget personalInfoWidget = const PersonalInfoWidget(
+    withBack: true,
+  );
 
   MeWidget({Key? key}) : super(key: key) {
     var indexViewProvider = IndexViewProvider.instance;
     indexViewProvider.define('collection', collectionWidget);
     indexViewProvider.define('setting', settingWidget);
+    indexViewProvider.define('personal_info', personalInfoWidget);
   }
 
   @override
@@ -54,7 +59,7 @@ class MeWidget extends StatelessWidget {
     var me = AppBarView(
         title: 'Me',
         child: Column(children: <Widget>[
-          MineHeadWidget(),
+          const MineHeadWidget(),
           DataListView(tileData: mineTileData)
         ]));
     return me;

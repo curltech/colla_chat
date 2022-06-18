@@ -39,11 +39,11 @@ class SettingWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var mine = AppBarView(
+    var setting = AppBarView(
         title: 'Setting',
         withBack: withBack,
         backCallBack: backCallBack,
         child: DataListView(tileData: settingTileData));
-    return mine;
+    return setting;
   }
 }

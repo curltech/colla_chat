@@ -1,6 +1,8 @@
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../../provider/index_views.dart';
 import '../../../widgets/common/image_widget.dart';
 
 class MineHeadWidget extends StatelessWidget {
@@ -25,7 +27,9 @@ class MineHeadWidget extends StatelessWidget {
       subtitle: Text(peerId),
       trailing: const Icon(Icons.chevron_right),
       onTap: () {
-        //routePush(PersonalInfoPage());
+        var indexViewProvider =
+            Provider.of<IndexViewProvider>(context, listen: false);
+        indexViewProvider.push('personal_info');
       },
     );
     return InkWell(
