@@ -5,8 +5,8 @@ import 'package:provider/provider.dart';
 import '../../../provider/index_views.dart';
 import '../../../widgets/common/image_widget.dart';
 
-class MineHeadWidget extends StatelessWidget {
-  const MineHeadWidget({Key? key}) : super(key: key);
+class MeHeadWidget extends StatelessWidget {
+  const MeHeadWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

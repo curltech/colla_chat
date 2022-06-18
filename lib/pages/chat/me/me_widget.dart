@@ -6,24 +6,21 @@ import 'package:flutter/material.dart';
 import '../../../provider/app_data.dart';
 import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/common/data_listview.dart';
+import '../../../widgets/common/widget_mixin.dart';
 import 'collection/collection_widget.dart';
-import 'mine_head_widget.dart';
+import 'me_head_widget.dart';
 
 //我的页面，带有路由回调函数
-class MeWidget extends StatelessWidget {
-  CollectionWidget collectionWidget = const CollectionWidget();
-  SettingWidget settingWidget = const SettingWidget(
-    withBack: true,
-  );
-  PersonalInfoWidget personalInfoWidget = const PersonalInfoWidget(
-    withBack: true,
-  );
+class MeWidget extends StatelessWidget with BackButtonMixin, RouteNameMixin {
+  CollectionWidget collectionWidget = CollectionWidget();
+  SettingWidget settingWidget = SettingWidget();
+  PersonalInfoWidget personalInfoWidget = PersonalInfoWidget();
 
   MeWidget({Key? key}) : super(key: key) {
     var indexViewProvider = IndexViewProvider.instance;
-    indexViewProvider.define('collection', collectionWidget);
-    indexViewProvider.define('setting', settingWidget);
-    indexViewProvider.define('personal_info', personalInfoWidget);
+    indexViewProvider.define(collectionWidget);
+    indexViewProvider.define(settingWidget);
+    indexViewProvider.define(personalInfoWidget);
   }
 
   @override
@@ -59,9 +56,15 @@ class MeWidget extends StatelessWidget {
     var me = AppBarView(
         title: 'Me',
         child: Column(children: <Widget>[
-          const MineHeadWidget(),
+          const MeHeadWidget(),
           DataListView(tileData: mineTileData)
         ]));
     return me;
   }
+
+  @override
+  bool get withBack => true;
+
+  @override
+  String get routeName => 'me';
 }

@@ -58,6 +58,8 @@ class DataListTile extends StatelessWidget {
       } else if (suffix is String) {
         trailing.add(Text(
           suffix,
+          softWrap: false,
+          overflow: TextOverflow.ellipsis,
         ));
       }
     }
@@ -70,7 +72,7 @@ class DataListTile extends StatelessWidget {
       trailingWidget = trailing[0];
     } else if (trailing.length > 1) {
       trailingWidget = SizedBox(
-          width: 200,
+          width: 300,
           child: Row(
               mainAxisAlignment: MainAxisAlignment.end, children: trailing));
     }

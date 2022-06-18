@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../l10n/localization.dart';
 import '../../../widgets/common/data_listview.dart';
+import '../../../widgets/common/widget_mixin.dart';
 
 final Map<String, List<TileData>> mockTileData = {
   '未知': [
@@ -17,10 +18,11 @@ final Map<String, List<TileData>> mockTileData = {
 };
 
 //频道的页面
-class Channel extends StatelessWidget {
+class ChannelWidget extends StatelessWidget
+    with BackButtonMixin, RouteNameMixin {
   late final Map<String, List<TileData>> channelTileData = mockTileData;
 
-  Channel({Key? key}) : super(key: key);
+  ChannelWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -39,4 +41,9 @@ class Channel extends StatelessWidget {
       body: body,
     );
   }
+
+  @override
+  bool get withBack => true;
+  @override
+  String get routeName => 'channel';
 }

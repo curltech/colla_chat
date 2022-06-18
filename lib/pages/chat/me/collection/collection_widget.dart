@@ -13,15 +13,23 @@ import 'package:path_provider/path_provider.dart';
 import 'package:tuple/tuple.dart';
 
 import '../../../../widgets/common/app_bar_view.dart';
+import '../../../../widgets/common/widget_mixin.dart';
 import '../../../../widgets/richtext/universal_ui/universal_ui.dart';
 
-class CollectionWidget extends StatefulWidget {
+class CollectionWidget extends StatefulWidget
+    with BackButtonMixin, RouteNameMixin {
   final Function? backCallBack;
 
-  const CollectionWidget({Key? key, this.backCallBack}) : super(key: key);
+  CollectionWidget({Key? key, this.backCallBack}) : super(key: key);
 
   @override
   CollectionWidgetState createState() => CollectionWidgetState();
+
+  @override
+  String get routeName => 'collection';
+
+  @override
+  bool get withBack => true;
 }
 
 class CollectionWidgetState extends State<CollectionWidget>

@@ -6,17 +6,24 @@ import 'package:provider/provider.dart';
 import '../../../l10n/localization.dart';
 import '../../../provider/app_data.dart';
 import '../../../widgets/common/keep_alive_wrapper.dart';
+import '../../../widgets/common/widget_mixin.dart';
 import 'linkman_widget.dart';
 
 //好友页面
-class LinkmanPage extends StatefulWidget {
-  const LinkmanPage({Key? key}) : super(key: key);
+class LinkmanView extends StatefulWidget with BackButtonMixin, RouteNameMixin {
+  LinkmanView({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _LinkmanPageState();
+  State<StatefulWidget> createState() => _LinkmanViewState();
+
+  @override
+  String get routeName => 'linkman';
+
+  @override
+  bool get withBack => false;
 }
 
-class _LinkmanPageState extends State<LinkmanPage>
+class _LinkmanViewState extends State<LinkmanView>
     with SingleTickerProviderStateMixin, AutomaticKeepAliveClientMixin {
   late TabController _tabController;
   String _key = '';

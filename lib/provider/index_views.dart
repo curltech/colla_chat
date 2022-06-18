@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/common/widget_mixin.dart';
 import 'app_data.dart';
 
 class Stack<T> {
@@ -99,10 +100,10 @@ class IndexViewProvider with ChangeNotifier {
   }
 
   ///增加新的视图，不能在build构建方法中调用，因为本方法会引起整个pageview视图的重新构建
-  define(String name, Widget view) {
-    if (!viewPosition.containsKey(name)) {
+  define(RouteNameMixin view) {
+    if (!viewPosition.containsKey(view.routeName)) {
       views.add(view);
-      viewPosition[name] = views.length - 1;
+      viewPosition[view.routeName] = views.length - 1;
       notifyListeners();
     }
   }

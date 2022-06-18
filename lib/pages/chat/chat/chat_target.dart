@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../l10n/localization.dart';
 import '../../../tool/util.dart';
 import '../../../widgets/common/data_listview.dart';
+import '../../../widgets/common/widget_mixin.dart';
 
 final Map<String, List<TileData>> mockTileData = {
   '群': [
@@ -17,7 +18,7 @@ final Map<String, List<TileData>> mockTileData = {
 
 /// 聊天的主页面，展示可以聊天的目标对象，可以是一个人，或者是一个群
 /// 选择好目标点击进入具体的聊天页面ChatMessage
-class ChatTarget extends StatelessWidget {
+class ChatTarget extends StatelessWidget with BackButtonMixin, RouteNameMixin {
   /// 聊天目标的数据
   late final Map<String, List<TileData>> chatTargets = mockTileData;
 
@@ -36,4 +37,8 @@ class ChatTarget extends StatelessWidget {
     var body = DataListView(tileData: chatTargets);
     return Scaffold(appBar: appBar, body: body);
   }
+  @override
+  bool get withBack => true;
+  @override
+  String get routeName => 'chat';
 }
