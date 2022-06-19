@@ -45,27 +45,20 @@ class _P2pLoginState extends State<P2pLogin>
       children: _children,
     );
     var appBar = AppBar(
-      title: Text(AppLocalizations.t('Login')),
+      title: Text(AppLocalizations.t('Add email address')),
       actions: [
         IconButton(
             onPressed: () async {
               _tabController.index = 0;
             },
             icon: const Icon(Icons.login),
-            tooltip: AppLocalizations.t('Login')),
+            tooltip: AppLocalizations.t('Auto')),
         IconButton(
           onPressed: () async {
             _tabController.index = 1;
           },
           icon: const Icon(Icons.app_registration),
-          tooltip: AppLocalizations.t('Register'),
-        ),
-        IconButton(
-          onPressed: () async {
-            _tabController.index = 2;
-          },
-          icon: const Icon(Icons.settings),
-          tooltip: AppLocalizations.t('Setting'),
+          tooltip: AppLocalizations.t('Manual'),
         ),
       ],
     );

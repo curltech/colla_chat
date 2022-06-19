@@ -48,6 +48,7 @@ class _P2pLoginState extends State<P2pLogin>
       children: _children,
     );
     var appBar = AppBar(
+      automaticallyImplyLeading: false,
       title: Text(AppLocalizations.t('Login')),
       actions: [
         IconButton(
