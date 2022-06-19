@@ -2,7 +2,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/login/loading.dart';
 import 'package:flutter/material.dart';
 
-import 'auto_discovy_widget.dart';
+import 'auto_discover_widget.dart';
 import 'manual_add_widget.dart';
 
 /// 地址增加页面，一个Scaffold，IndexStack下的远程登录组件，注册组件和配置组件
@@ -23,7 +23,7 @@ class _P2pLoginState extends State<P2pLogin>
   void initState() {
     super.initState();
     // 初始化子项集合
-    var p2pLoginWidget = const AutoDiscovyWidget();
+    var p2pLoginWidget = const AutoDiscoverWidget();
     var p2pRegisterWidget = const ManualAddWidget();
     _children = [
       p2pLoginWidget,

@@ -129,16 +129,16 @@ class EmailClient {
 
   late String email = '$username@$domain';
 
-  String imapServerHost;
-  int imapServerPort;
+  String? imapServerHost;
+  int? imapServerPort;
   bool imapServerSecure = true;
 
-  String popServerHost;
-  int popServerPort;
+  String? popServerHost;
+  int? popServerPort;
   bool popServerSecure = true;
 
-  String smtpServerHost;
-  int smtpServerPort;
+  String? smtpServerHost;
+  int? smtpServerPort;
   bool smtpServerSecure = true;
 
   ///mailClient是自动发现产生的客户端
@@ -152,12 +152,12 @@ class EmailClient {
       {required this.personalName,
       required this.username,
       required this.domain,
-      required this.imapServerHost,
-      required this.imapServerPort,
-      required this.popServerHost,
-      required this.popServerPort,
-      required this.smtpServerHost,
-      required this.smtpServerPort});
+      this.imapServerHost,
+      this.imapServerPort,
+      this.popServerHost,
+      this.popServerPort,
+      this.smtpServerHost,
+      this.smtpServerPort});
 
   Future<bool> connect(String? password) async {
     bool success = false;
@@ -189,6 +189,7 @@ class EmailClient {
     }
     logger.i('connecting to ${config.displayName}.');
     this.config = config;
+
     return config;
   }
 
@@ -338,11 +339,13 @@ class EmailClient {
         defaultWriteTimeout: defaultWriteTimeout,
         defaultResponseTimeout: defaultResponseTimeout);
     try {
-      await client.connectToServer(imapServerHost, imapServerPort,
-          isSecure: imapServerSecure);
-      await client.login(username, password);
+      if (imapServerHost != null && imapServerPort != null) {
+        await client.connectToServer(imapServerHost!, imapServerPort!,
+            isSecure: imapServerSecure);
+        await client.login(username, password);
 
-      imapClient = client;
+        imapClient = client;
+      }
     } on enough_mail.ImapException catch (e) {
       logger.i('IMAP failed with $e');
     }
@@ -429,22 +432,24 @@ class EmailClient {
     var client = enough_mail.SmtpClient(domain, isLogEnabled: true);
     bool result = false;
     try {
-      var connectionInfo = await client.connectToServer(
-          smtpServerHost, smtpServerPort,
-          isSecure: smtpServerSecure);
-      logger.i(connectionInfo);
-      SmtpResponse smtpResponse = await client.ehlo();
-      if (!smtpResponse.isOkStatus) {
-        return false;
-      }
-      if (client.serverInfo.supportsAuth(enough_mail.AuthMechanism.plain)) {
-        SmtpResponse smtpResponse = await client.authenticate(
-            username, password, enough_mail.AuthMechanism.plain);
+      if (smtpServerHost != null && smtpServerPort != null) {
+        var connectionInfo = await client.connectToServer(
+            smtpServerHost!, smtpServerPort!,
+            isSecure: smtpServerSecure);
+        logger.i(connectionInfo);
+        SmtpResponse smtpResponse = await client.ehlo();
         if (!smtpResponse.isOkStatus) {
           return false;
         }
-        smtpClient = client;
-        return true;
+        if (client.serverInfo.supportsAuth(enough_mail.AuthMechanism.plain)) {
+          SmtpResponse smtpResponse = await client.authenticate(
+              username, password, enough_mail.AuthMechanism.plain);
+          if (!smtpResponse.isOkStatus) {
+            return false;
+          }
+          smtpClient = client;
+          return true;
+        }
       } else if (client.serverInfo
           .supportsAuth(enough_mail.AuthMechanism.login)) {
         SmtpResponse smtpResponse = await client.authenticate(
@@ -477,18 +482,20 @@ class EmailClient {
   Future<PopStatus?> popConnect() async {
     final client = enough_mail.PopClient(isLogEnabled: false);
     try {
-      var connectionInfo = await client.connectToServer(
-          popServerHost, popServerPort,
-          isSecure: popServerSecure);
-      logger.i(connectionInfo);
-      await client.login(username, password);
-      // alternative login:
-      // await client.loginWithApop(username, password);
-      final status = await client.status();
-      logger.i('status: messages count=${status.numberOfMessages}, '
-          'messages size=${status.totalSizeInBytes}');
-      popClient = client;
-      return status;
+      if (popServerHost != null && popServerPort != null) {
+        var connectionInfo = await client.connectToServer(
+            popServerHost!, popServerPort!,
+            isSecure: popServerSecure);
+        logger.i(connectionInfo);
+        await client.login(username, password);
+        // alternative login:
+        // await client.loginWithApop(username, password);
+        final status = await client.status();
+        logger.i('status: messages count=${status.numberOfMessages}, '
+            'messages size=${status.totalSizeInBytes}');
+        popClient = client;
+        return status;
+      }
     } on enough_mail.PopException catch (e) {
       logger.e('POP failed with $e');
     }
@@ -573,17 +580,21 @@ class EmailClientPool {
 
   EmailClientPool();
 
-  Future<EmailClient> create(
-      {required String username,
-      required String domain,
+  Future<EmailClient?> create(
+      {required String address,
       required String personalName,
-      required String imapServerHost,
-      required int imapServerPort,
-      required String popServerHost,
-      required int popServerPort,
-      required String smtpServerHost,
-      required int smtpServerPort}) async {
-    var address = '$username@$domain';
+      String? imapServerHost,
+      int? imapServerPort,
+      String? popServerHost,
+      int? popServerPort,
+      String? smtpServerHost,
+      int? smtpServerPort}) async {
+    var emails = address.split('@');
+    if (emails.length != 2) {
+      return null;
+    }
+    var username = emails[0];
+    var domain = emails[1];
     EmailClient? mailClient = mailClients[address];
     if (mailClient != null) {
       return mailClient;
@@ -600,6 +611,7 @@ class EmailClientPool {
           smtpServerPort: smtpServerPort);
       await mailClient.mailClientDiscover();
       mailClients[address] = mailClient;
+
       return mailClient;
     }
   }
@@ -608,17 +620,8 @@ class EmailClientPool {
     EmailClient? mailClient = get(address);
     bool success = false;
     if (mailClient != null) {
-      success = await mailClient.mailClientConnect();
-      if (!success) {
-        success = await mailClient.imapConnect();
-        logger.i('imapConnect $success');
-        if (success) {
-          PopStatus? status = await mailClient.popConnect();
-          if (status != null) {
-            success = true;
-          }
-        }
-      }
+      success = await mailClient.connect(password);
+      return success;
     }
     return success;
   }

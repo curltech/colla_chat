@@ -1,12 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
 
 import '../../../../../l10n/localization.dart';
-import '../../../../../provider/app_data.dart';
-import '../../../../../routers/routes.dart';
-import '../../../../../service/dht/myselfpeer.dart';
 
 /// 邮件地址手工注册组件，一个card下的录入框和按钮组合
 class ManualAddWidget extends StatefulWidget {
@@ -19,13 +15,18 @@ class ManualAddWidget extends StatefulWidget {
 class _ManualAddWidgetState extends State<ManualAddWidget>
     with AutomaticKeepAliveClientMixin {
   final _formKey = GlobalKey<FormState>();
-  String _name = '胡劲松';
-  String _loginName = 'hujs';
-  String _countryCode = 'CN';
-  String _mobile = '13609619603';
-  String _email = 'hujs@colla.cc';
-  String _plainPassword = '1234';
-  String _confirmPassword = '1234';
+  String? _personalName;
+  String? _password;
+  String? _email;
+  String? _imapServerHost;
+  String? _imapServerPort;
+  bool _imapServerSecure = true;
+  String? _popServerHost;
+  String? _popServerPort;
+  bool _popServerSecure = true;
+  String? _smtpServerHost;
+  String? _smtpServerPort;
+  bool _smtpServerSecure = true;
   bool _pwdShow = false;
 
   @override
@@ -35,27 +36,6 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
-          SizedBox(height: 30.0),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 15.0),
-            child: IntlPhoneField(
-              initialCountryCode: _countryCode,
-              initialValue: _mobile,
-              decoration: InputDecoration(
-                labelText: AppLocalizations.t('Mobile'),
-              ),
-              onChanged: (phone) {
-                setState(() {
-                  _mobile = phone.completeNumber;
-                });
-              },
-              onCountryChanged: (country) {
-                setState(() {
-                  _countryCode = country.name;
-                });
-              },
-            ),
-          ),
           SizedBox(height: 10.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
@@ -65,27 +45,10 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
                   labelText: AppLocalizations.t('Username'),
                   prefixIcon: Icon(Icons.person),
                 ),
-                initialValue: _name,
+                initialValue: _personalName,
                 onChanged: (String val) {
                   setState(() {
-                    _name = val;
-                  });
-                },
-                onFieldSubmitted: (String val) {},
-              )),
-          SizedBox(height: 10.0),
-          Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextFormField(
-                //controller: loginNameController,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.t('LoginName'),
-                  prefixIcon: Icon(Icons.desktop_mac),
-                ),
-                initialValue: _loginName,
-                onChanged: (String val) {
-                  setState(() {
-                    _loginName = val;
+                    _personalName = val;
                   });
                 },
                 onFieldSubmitted: (String val) {},
@@ -128,10 +91,10 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
                     },
                   ),
                 ),
-                initialValue: _plainPassword,
+                initialValue: _password,
                 onChanged: (String val) {
                   setState(() {
-                    _plainPassword = val;
+                    _password = val;
                   });
                 },
                 onFieldSubmitted: (String val) {},
@@ -140,26 +103,31 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
               child: TextFormField(
-                keyboardType: TextInputType.text,
-                obscureText: !_pwdShow,
-                //controller: passwordController,
+                //controller: nameController,
                 decoration: InputDecoration(
-                  labelText: AppLocalizations.t('Confirm Password'),
-                  prefixIcon: Icon(Icons.lock),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                        _pwdShow ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () {
-                      setState(() {
-                        _pwdShow = !_pwdShow;
-                      });
-                    },
-                  ),
+                  labelText: AppLocalizations.t('SmtpServerHost'),
+                  prefixIcon: Icon(Icons.desktop_mac),
                 ),
-                initialValue: _confirmPassword,
+                initialValue: _smtpServerHost,
                 onChanged: (String val) {
                   setState(() {
-                    _confirmPassword = val;
+                    _smtpServerHost = val;
+                  });
+                },
+                onFieldSubmitted: (String val) {},
+              )),
+          SizedBox(height: 10.0),
+          Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15.0),
+              child: TextFormField(
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.t('SmtpServerPort'),
+                  prefixIcon: Icon(Icons.router),
+                ),
+                initialValue: _smtpServerPort,
+                onChanged: (String val) {
+                  setState(() {
+                    _smtpServerPort = val;
                   });
                 },
                 onFieldSubmitted: (String val) {},
@@ -169,13 +137,13 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
             padding: EdgeInsets.symmetric(horizontal: 15.0),
             child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
               TextButton(
-                child: Text(AppLocalizations.t('Register')),
+                child: Text(AppLocalizations.t('Connect')),
                 onPressed: () async {
-                  await _register();
+                  await _connect();
                 },
               ),
               TextButton(
-                child: Text(AppLocalizations.t('Reset')),
+                child: Text(AppLocalizations.t('Add')),
                 onPressed: () async {},
               )
             ]),
@@ -185,19 +153,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
     );
   }
 
-  Future<void> _register() async {
-    if (_plainPassword == _confirmPassword) {
-      var registerStatus = await myselfPeerService.register(
-          _name, _loginName, _plainPassword,
-          mobile: _mobile, email: _email);
-      if (registerStatus) {
-        Application.router
-            .navigateTo(context, Application.index, replace: true);
-      }
-    } else {
-      logger.e('password is not matched');
-    }
-  }
+  Future<void> _connect() async {}
 
   @override
   bool get wantKeepAlive => true;
