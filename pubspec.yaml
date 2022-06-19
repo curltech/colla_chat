@@ -69,6 +69,7 @@ dependencies:
   cached_network_image: ^3.0.0
   connectivity: ^3.0.6 #网络连接
   connectivity_plus: ^2.3.0
+  flutter_web_auth: ^0.4.0
   enough_mail: ^2.1.0
   enough_media: ^2.2.0
   enough_mail_html: ^2.0.0

@@ -30,7 +30,7 @@ final List<TileData> mailAddrTileData = [
   TileData(
       icon: Icon(Icons.delete,
           color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'Deleted'),
+      title: 'Trash'),
   TileData(
       icon: Icon(Icons.bug_report,
           color: appDataProvider.themeData?.colorScheme.primary),
@@ -41,14 +41,15 @@ final List<TileData> mailAddrTileData = [
       title: 'Ads'),
 ];
 
-//设置页面，带有回退回调函数
-class MailWidget extends StatefulWidget with BackButtonMixin, RouteNameMixin {
+//邮件地址组件，带有回退回调函数
+class MailAddressWidget extends StatefulWidget
+    with BackButtonMixin, RouteNameMixin {
   final Function? backCallBack;
 
-  MailWidget({Key? key, this.backCallBack}) : super(key: key) {}
+  MailAddressWidget({Key? key, this.backCallBack}) : super(key: key) {}
 
   @override
-  State<StatefulWidget> createState() => _MailWidgetState();
+  State<StatefulWidget> createState() => _MailAddressWidgetState();
 
   @override
   String get routeName => 'mail';
@@ -57,7 +58,7 @@ class MailWidget extends StatefulWidget with BackButtonMixin, RouteNameMixin {
   bool get withBack => false;
 }
 
-class _MailWidgetState extends State<MailWidget> {
+class _MailAddressWidgetState extends State<MailAddressWidget> {
   Map<TileData, List<TileData>> mailAddressTileData = {};
 
   @override

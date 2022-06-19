@@ -41,14 +41,14 @@ final List<TileData> mailAddrTileData = [
       title: 'Ads'),
 ];
 
-//设置页面，带有回退回调函数
-class MailWidget extends StatefulWidget with BackButtonMixin, RouteNameMixin {
+//邮件总体视图，带有回退回调函数
+class MailView extends StatefulWidget with BackButtonMixin, RouteNameMixin {
   final Function? backCallBack;
 
-  MailWidget({Key? key, this.backCallBack}) : super(key: key) {}
+  MailView({Key? key, this.backCallBack}) : super(key: key) {}
 
   @override
-  State<StatefulWidget> createState() => _MailWidgetState();
+  State<StatefulWidget> createState() => _MailViewState();
 
   @override
   String get routeName => 'mail';
@@ -57,7 +57,7 @@ class MailWidget extends StatefulWidget with BackButtonMixin, RouteNameMixin {
   bool get withBack => false;
 }
 
-class _MailWidgetState extends State<MailWidget> {
+class _MailViewState extends State<MailView> {
   Map<TileData, List<TileData>> mailAddressTileData = {};
 
   @override

@@ -16,6 +16,7 @@ import 'package:file_picker/_internal/file_picker_web.dart';
 import 'package:flutter_keyboard_visibility_web/flutter_keyboard_visibility_web.dart';
 import 'package:flutter_secure_storage_web/flutter_secure_storage_web.dart';
 import 'package:flutter_sound_web/flutter_sound_web.dart';
+import 'package:flutter_web_auth/src/flutter_web_auth_web.dart';
 import 'package:geolocator_web/geolocator_web.dart';
 import 'package:image_picker_for_web/image_picker_for_web.dart';
 import 'package:livekit_client/livekit_client_web.dart';
@@ -47,6 +48,7 @@ void registerPlugins(Registrar registrar) {
   FlutterKeyboardVisibilityPlugin.registerWith(registrar);
   FlutterSecureStorageWeb.registerWith(registrar);
   FlutterSoundPlugin.registerWith(registrar);
+  FlutterWebAuthPlugin.registerWith(registrar);
   GeolocatorPlugin.registerWith(registrar);
   ImagePickerPlugin.registerWith(registrar);
   LiveKitWebPlugin.registerWith(registrar);

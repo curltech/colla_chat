@@ -5,7 +5,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import '../provider/app_data.dart';
 
 class HttpClient implements IWebClient {
-  Dio _client = Dio();
+  final Dio _client = Dio();
   String? _address;
 
   HttpClient(String address) {
@@ -54,7 +54,7 @@ class HttpClient implements IWebClient {
 }
 
 class HttpClientPool {
-  static HttpClientPool _instance = HttpClientPool();
+  static final HttpClientPool _instance = HttpClientPool();
   static bool initStatus = false;
   final _httpClients = <String, HttpClient>{};
   HttpClient? _default;
