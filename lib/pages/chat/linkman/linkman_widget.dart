@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 
 import '../../../widgets/common/data_listview.dart';
 
-final Map<String, List<TileData>> mockTileData = {
-  '未知': [
+final Map<TileData, List<TileData>> mockTileData = {
+  TileData(title: '未知'): [
     TileData(
         icon: const Icon(Icons.collections),
         title: '收藏',
@@ -35,7 +35,9 @@ class LinkmanWidget extends StatelessWidget {
         tileData.add(tile);
       }
     }
-    Map<String, List<TileData>> linkmanTileData = {'linkmen': tileData};
+    Map<TileData, List<TileData>> linkmanTileData = {
+      TileData(title: 'linkmen'): tileData
+    };
     var body = DataListView(tileData: linkmanTileData);
     return Container(
       //列表

@@ -5,8 +5,8 @@ import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/data_listview.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
-final Map<String, List<TileData>> settingTileData = {
-  'Setting': [
+final Map<TileData, List<TileData>> settingTileData = {
+  TileData(title: 'Setting'): [
     TileData(
         icon: Icon(Icons.security,
             color: appDataProvider.themeData?.colorScheme.primary),

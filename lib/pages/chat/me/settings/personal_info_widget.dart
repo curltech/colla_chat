@@ -27,8 +27,8 @@ class PersonalInfoWidget extends StatelessWidget
     } else {
       name = myself.myselfPeer!.name;
     }
-    final Map<String, List<TileData>> personalInfoTileData = {
-      'Setting': [
+    final Map<TileData, List<TileData>> personalInfoTileData = {
+      TileData(title: 'Setting'): [
         TileData(
           title: 'Avatar',
           suffix: const ImageWidget(

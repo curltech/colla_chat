@@ -25,8 +25,8 @@ class MeWidget extends StatelessWidget with BackButtonMixin, RouteNameMixin {
 
   @override
   Widget build(BuildContext context) {
-    final Map<String, List<TileData>> meTileData = {
-      'Me': [
+    final Map<TileData, List<TileData>> meTileData = {
+      TileData(title: 'Me'): [
         TileData(
           icon: Icon(Icons.collections,
               color: appDataProvider.themeData?.colorScheme.primary),
