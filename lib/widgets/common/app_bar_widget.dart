@@ -67,9 +67,9 @@ class AppBarWidget extends StatelessWidget {
           Icons.add,
           color: Colors.white,
         ),
-        onSelected: (int index) {
+        onSelected: (int index) async {
           if (rightCallBack != null) {
-            rightCallBack!(index);
+            await rightCallBack!(index);
           }
         },
       );

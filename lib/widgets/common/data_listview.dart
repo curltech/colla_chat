@@ -9,17 +9,14 @@ import 'package:provider/provider.dart';
 class TileData {
   //图标
   late final Icon? icon;
-
   //头像
   late final String? avatar;
-
   //标题
   late final String title;
   late final String? subtitle;
   late final dynamic suffix;
   late final String? routeName;
-  late final String? tileType;
-  Function()? routerCallback;
+  Function()? routeCallback;
 
   TileData(
       {this.icon,
@@ -27,9 +24,8 @@ class TileData {
       required this.title,
       this.subtitle,
       this.suffix,
-      this.tileType,
       this.routeName,
-      this.routerCallback});
+      this.routeCallback});
 }
 
 /// 通用列表项
@@ -56,15 +52,14 @@ class DataListTile extends StatelessWidget {
       if (suffix is Widget) {
         trailing.add(suffix);
       } else if (suffix is String) {
-        trailing.add(Expanded(
-            child: Text(
+        trailing.add(Text(
           suffix,
           softWrap: true,
           overflow: TextOverflow.ellipsis,
-        )));
+        ));
       }
     }
-    if (_tileData.routeName != null || _tileData.routerCallback != null) {
+    if (_tileData.routeName != null || _tileData.routeCallback != null) {
       trailing.add(Icon(Icons.chevron_right,
           color: appDataProvider.themeData?.colorScheme.primary));
     }
@@ -91,7 +86,7 @@ class DataListTile extends StatelessWidget {
           : null,
       trailing: trailingWidget,
       onTap: () {
-        var call = _tileData.routerCallback;
+        var call = _tileData.routeCallback;
         if (call != null) {
           call();
         } else if (_tileData.routeName != null) {

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
-import 'dart:ui';
+import 'dart:ui' as ui;
 
 import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:barcode_scan2/model/scan_options.dart';
@@ -12,12 +12,15 @@ import 'package:connectivity/connectivity.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:mobile_number/mobile_number.dart';
 import 'package:mobile_scanner/mobile_scanner.dart' as mobile_scanner;
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:phone_number/phone_number.dart' as phone_number;
 import 'package:phone_numbers_parser/phone_numbers_parser.dart'
     as phone_numbers_parser;
@@ -810,6 +813,51 @@ class ImageUtil {
   static bool isBase64Img(String img) {
     return img.startsWith('data:image/') && img.contains(';base64,');
   }
+
+  static Future<Uint8List> clipImageBytes(GlobalKey globalKey,
+      {ui.ImageByteFormat format = ui.ImageByteFormat.png}) async {
+    RenderRepaintBoundary? boundary =
+        globalKey.currentContext?.findRenderObject()! as RenderRepaintBoundary;
+
+    ui.Image uiImage = await boundary.toImage();
+    ByteData? byteData = await uiImage.toByteData(format: format);
+    Uint8List bytes = byteData!.buffer.asUint8List();
+
+    return bytes;
+  }
+
+  static Future<bool> saveImageGallery(Uint8List bytes, String name) async {
+    final result = await ImageGallerySaver.saveImage(bytes,
+        quality: 100, name: name + DateTime.now().toString());
+    if (result['isSuccess'].toString() == 'true') {
+      return true;
+    } else {
+      return false;
+    }
+  }
+}
+
+class FileUtil {
+  static Future<File> writeFile(Uint8List bytes, String name) async {
+    final document = await getApplicationDocumentsDirectory();
+    final dir = Directory(document.path + name);
+    final imageFile = File(dir.path);
+    await imageFile.writeAsBytes(bytes);
+
+    return imageFile;
+  }
+}
+
+class PermissionUtil {
+  static Future<PermissionStatus> requestStoragePermission(
+      Permission permission) async {
+    var status = await permission.status;
+    if (!status.isGranted) {
+      status = await permission.request();
+    }
+
+    return status;
+  }
 }
 
 class ScreenUtil {
@@ -842,7 +890,7 @@ class ScreenUtil {
   }
 
   static double statusBarHeight(BuildContext context) {
-    return MediaQueryData.fromWindow(window).padding.top;
+    return MediaQueryData.fromWindow(ui.window).padding.top;
   }
 
   static double navigationBarHeight(BuildContext context) {
@@ -850,7 +898,7 @@ class ScreenUtil {
   }
 
   static double topBarHeight(BuildContext context) {
-    return kToolbarHeight + MediaQueryData.fromWindow(window).padding.top;
+    return kToolbarHeight + MediaQueryData.fromWindow(ui.window).padding.top;
   }
 }
 

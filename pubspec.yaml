@@ -89,7 +89,7 @@ dependencies:
   uuid: 3.0.6
   # 辅助开发工具
   json_annotation: ^4.3.0
-  permission_handler: ^9.2.0 #权限处理1
+  permission_handler: ^10.0.0 #权限处理1
   provider: ^6.0.1 #状态管理
   flutter_local_notifications: ^9.5.3+1
   share_plus: ^4.0.4
@@ -151,6 +151,7 @@ dependencies:
   qr_flutter: ^4.0.0
   barcode_scan2: ^4.2.1
   mobile_scanner: ^2.0.0
+  image_gallery_saver: ^1.7.1
   extended_image: ^6.0.1
   extended_image_library: ^3.3.0
   filesystem_picker: ^2.0.1
