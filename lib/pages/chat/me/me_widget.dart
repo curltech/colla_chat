@@ -32,24 +32,18 @@ class MeWidget extends StatelessWidget with BackButtonMixin, RouteNameMixin {
               color: appDataProvider.themeData?.colorScheme.primary),
           title: '收藏',
           routeName: 'collection',
-          // routerCallback: () {
-          //   var routerCallback = this.routerCallback;
-          //   if (routerCallback != null) {
-          //     routerCallback(1);
-          //   }
-          // }
+        ),
+        TileData(
+          icon: Icon(Icons.email,
+              color: appDataProvider.themeData?.colorScheme.primary),
+          title: '邮件',
+          routeName: 'mail',
         ),
         TileData(
           icon: Icon(Icons.settings,
               color: appDataProvider.themeData?.colorScheme.primary),
           title: '设置',
           routeName: 'setting',
-          // routerCallback: () {
-          //   var routerCallback = this.routerCallback;
-          //   if (routerCallback != null) {
-          //     routerCallback(2);
-          //   }
-          // }
         ),
       ]
     };

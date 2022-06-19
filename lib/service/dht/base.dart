@@ -1,16 +1,5 @@
-import 'package:colla_chat/crypto/util.dart';
-import 'package:colla_chat/service/dht/peerprofile.dart';
-import 'package:cryptography/cryptography.dart';
-
-import '../../provider/app_data.dart';
-import '../../crypto/cryptography.dart';
 import '../../entity/base.dart';
-import '../../entity/dht/base.dart';
-import '../../entity/dht/myselfpeer.dart';
-import '../../entity/dht/peerprofile.dart';
-import '../../tool/util.dart';
 import '../base.dart';
-import 'myselfpeer.dart';
 
 abstract class PeerLocationService extends BaseService {
   Future<List<Map>> findByPeerId(String peerId) async {
@@ -79,7 +68,7 @@ abstract class PeerEntityService extends PeerLocationService {
   }
 
   Future<List<Map>> findByEmail(String email) async {
-    var where = 'email = ?';
+    var where = 'mail = ?';
     var whereArgs = [email];
     var peers = await find(where, whereArgs: whereArgs);
 

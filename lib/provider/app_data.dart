@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:colla_chat/tool/util.dart';
 import 'package:flutter/material.dart';
-//import 'package:flutter_easylogger/flutter_logger.dart' as easylogger;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:logger/logger.dart';

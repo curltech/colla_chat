@@ -82,7 +82,7 @@ enum SubjectType {
 // 消息，泛指一切社交复合文档，最简单的是一句话，最复杂可以是非常复杂的混合文本，图片，视频的文档
 class ChatMessage extends StatusEntity {
   String? ownerPeerId; // 区分本地不同peerClient属主
-  String? transportType; // 包括：websocket,webrtc,email,sms
+  String? transportType; // 包括：websocket,webrtc,mail,sms
   String? messageId; // 消息的唯一id标识
   String messageType = ''; // 消息类型（对应channel消息类型）
   String? direct; //对自己而言，消息是属于发或者接受
@@ -90,11 +90,14 @@ class ChatMessage extends StatusEntity {
   String? targetPeerId; // 目标的唯一id标识（单聊对应linkman-peerId，群聊对应group-peerId）
   String? targetType; // 包括：Linkman（单聊）, Group（群聊）,Channel,
   String? targetName;
+  String? targetAddress;
+
   //当发送者向群里发消息，自己作为群成员的时候
   //targetPeerId是群的peerId，senderPeerId是发送者的peerId，其他时候为空
   String? senderPeerId; // 消息发送方（作者）peerId
   String? senderType;
   String? senderName;
+  String? senderAddress;
   String? sendTime; // 发送时间
   String? receiveTime; // 接收时间
   String?
@@ -103,15 +106,15 @@ class ChatMessage extends StatusEntity {
   String? title; // 消息标题
   String? thumbBody; // 预览内容（适用需预览的content，如笔记、转发聊天）
   String? thumbnail; // 预览缩略图（base64图片，适用需预览的content，如笔记、联系人名片）
+  String content = ''; // 消息内容
   String? contentType;
   String? destroyTime;
-  String? primaryPeerId;
 
   /// primary peer的publicKey
+  String? primaryPeerId;
   String? primaryPublicKey;
   String? primaryAddress;
   String? ephemeralPublicKey;
-  String content = ''; // 消息内容
   bool needCompress = true;
   bool needEncrypt = true;
   bool needReceipt = false;
@@ -119,8 +122,10 @@ class ChatMessage extends StatusEntity {
   String? payloadHash;
   String? payloadSignature;
   String? payloadKey;
+
   //消息附件
   List<MessageAttachment> attaches = [];
+
   //本消息是合并消息
   List<ChatMessage> messages = [];
 
@@ -132,9 +137,13 @@ class ChatMessage extends StatusEntity {
         transportType = json['transportType'],
         direct = json['direct'],
         targetPeerId = json['targetPeerId'],
+        targetName = json['targetName'],
+        targetAddress = json['targetAddress'],
         messageId = json['messageId'],
         messageType = json['messageType'],
         senderPeerId = json['senderPeerId'],
+        senderName = json['senderName'],
+        senderAddress = json['senderAddress'],
         senderType = json['senderType'],
         sendTime = json['sendTime'],
         receiveTime = json['receiveTime'],
@@ -177,10 +186,14 @@ class ChatMessage extends StatusEntity {
       'direct': direct,
       'targetType': targetType,
       'targetPeerId': targetPeerId,
+      'targetName': targetName,
+      'targetAddress': targetAddress,
       'messageId': messageId,
       'messageType': messageType,
       'senderPeerId': senderPeerId,
       'senderType': senderType,
+      'senderName': senderName,
+      'senderAddress': senderAddress,
       'sendTime': sendTime,
       'receiveTime': receiveTime,
       'actualReceiveTime': actualReceiveTime,
@@ -239,7 +252,7 @@ class MessageAttachment extends BaseEntity {
   String? targetPeerId; // 外键（对应targetPeerId）
   String?
       content; // 消息内容（基于mime+自定义标识区分内容类型，如：application/audio/image/message/text/video/x-word, contact联系人名片, groupChat群聊, channel频道）
-
+  String? contentType;
   bool needCompress = true;
   bool needEncrypt = true;
   String? payloadHash;
@@ -253,6 +266,7 @@ class MessageAttachment extends BaseEntity {
         messageId = json['messageId'],
         targetPeerId = json['targetPeerId'],
         content = json['content'],
+        contentType = json['contentType'],
         needCompress = json['needCompress'] == true || json['needCompress'] == 1
             ? true
             : false,
@@ -272,6 +286,7 @@ class MessageAttachment extends BaseEntity {
       'messageId': messageId,
       'targetPeerId': targetPeerId,
       'content': content,
+      'contentType': contentType,
       'needCompress': needCompress,
       'needEncrypt': needEncrypt,
       'payloadHash': payloadHash,

@@ -1,3 +1,4 @@
+import '../../entity/chat/mailaddress.dart';
 import '../base.dart';
 
 class MailAddressService extends BaseService {
@@ -21,5 +22,17 @@ class MailAddressService extends BaseService {
       initStatus = true;
     }
     return _instance;
+  }
+
+  Future<List<MailAddress>> findAllMailAddress() async {
+    var mailAddress_ = await find(null, whereArgs: []);
+    List<MailAddress> mailAddress = [];
+    if (mailAddress_.isNotEmpty) {
+      for (var mailAddr_ in mailAddress_) {
+        var mailAddr = MailAddress.fromJson(mailAddr_);
+        mailAddress.add(mailAddr);
+      }
+    }
+    return mailAddress;
   }
 }
