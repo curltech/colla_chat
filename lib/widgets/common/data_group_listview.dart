@@ -49,8 +49,8 @@ class GroupDataListView extends StatelessWidget {
     }
     List<TileData>? tileData = _tileData[tile];
     tileData = tileData ?? [];
-    DataListView dataListView =
-        DataListView(DataListViewController(tileData: tileData));
+    DataListView dataListView = DataListView(
+        dataListViewController: DataListViewController(tileData: tileData));
 
     ///未来不使用ListTile，因为高度固定，不够灵活
     return ExpansionTile(
@@ -74,7 +74,8 @@ class GroupDataListView extends StatelessWidget {
     if (_tileData.isNotEmpty) {
       if (_tileData.length == 1) {
         Widget groupWidget = DataListView(
-            DataListViewController(tileData: _tileData.values.first));
+            dataListViewController:
+                DataListViewController(tileData: _tileData.values.first));
         return groupWidget;
       } else {
         for (var tileEntry in _tileData.entries) {

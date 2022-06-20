@@ -59,12 +59,13 @@ class ImageWidget extends StatelessWidget {
         );
       }
     }
-    imageWidget ??= Image.asset(
-      defaultIcon,
-      width: width,
-      height: height!,
-      fit: fit,
-    );
+    imageWidget ??= defaultImage;
+    // Image.asset(
+    //   defaultIcon,
+    //   width: width,
+    //   height: height!,
+    //   fit: fit,
+    // );
     if (isRadius) {
       return ClipRRect(
         borderRadius: const BorderRadius.all(

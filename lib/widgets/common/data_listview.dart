@@ -31,8 +31,15 @@ class DataListViewController extends ChangeNotifier {
 class DataListView extends StatefulWidget {
   DataListViewController dataListViewController;
   final ScrollController scrollController = ScrollController();
+  Function()? onScrollMax;
+  Future<void> Function()? onRefresh;
 
-  DataListView(this.dataListViewController, {Key? key}) : super(key: key);
+  DataListView(
+      {Key? key,
+      required this.dataListViewController,
+      this.onScrollMax,
+      this.onRefresh})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -57,6 +64,9 @@ class _DataListView extends State<DataListView> {
       if (widget.scrollController.position.pixels ==
           widget.scrollController.position.maxScrollExtent) {
         logger.i('scrolled to max');
+        if (widget.onScrollMax != null) {
+          widget.onScrollMax!();
+        }
       }
       if (widget.scrollController.position.pixels ==
           widget.scrollController.position.minScrollExtent) {
@@ -84,6 +94,9 @@ class _DataListView extends State<DataListView> {
 
   Future<void> _onRefresh() async {
     ///下拉刷新数据的地方，比如从数据库取更多数据
+    if (widget.onRefresh != null) {
+      await widget.onRefresh!();
+    }
   }
 
   Widget _buildGroup(BuildContext context) {
