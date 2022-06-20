@@ -1,10 +1,10 @@
 import 'package:colla_chat/pages/chat/linkman/linkman_add.dart';
-import 'package:colla_chat/provider/linkman_data.dart';
+import 'package:colla_chat/provider/linkmen_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../l10n/localization.dart';
-import '../../../provider/app_data.dart';
+import '../../../provider/app_data_provider.dart';
 import '../../../widgets/common/keep_alive_wrapper.dart';
 import '../../../widgets/common/widget_mixin.dart';
 import 'linkman_widget.dart';
@@ -28,7 +28,7 @@ class _LinkmanViewState extends State<LinkmanView>
   late TabController _tabController;
   String _key = '';
   late List<Widget> _children;
-  LinkmenDataProvider _linkmenDataProvider = LinkmenDataProvider();
+  LinkmenProvider _linkmenDataProvider = LinkmenProvider();
 
   @override
   void initState() {

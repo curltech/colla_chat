@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../widgets/common/widget_mixin.dart';
-import 'app_data.dart';
+import 'app_data_provider.dart';
 
 class Stack<T> {
   T? _head;
@@ -76,6 +76,7 @@ class Stack<T> {
   }
 }
 
+/// 主工作区的视图状态管理器，维护了主工作区的控制器，视图列表，当前视图
 class IndexViewProvider with ChangeNotifier {
   static IndexViewProvider instance = IndexViewProvider();
   Map<String, int> viewPosition = {};

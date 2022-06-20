@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../entity/chat/mailaddress.dart';
-import '../../../../provider/app_data.dart';
+import '../../../../provider/app_data_provider.dart';
 import '../../../../service/chat/mailaddress.dart';
 import '../../../../widgets/common/data_listview.dart';
 import '../../../../widgets/common/widget_mixin.dart';

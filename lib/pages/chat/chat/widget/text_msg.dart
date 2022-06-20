@@ -2,7 +2,7 @@ import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/pages/chat/chat/widget/msg_avatar.dart';
 import 'package:colla_chat/pages/chat/chat/widget/text_item_container.dart';
-import 'package:colla_chat/provider/chat_message_data.dart';
+import 'package:colla_chat/provider/chat_messages_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -15,8 +15,7 @@ class TextMsg extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final chatMessageDataProvider =
-        Provider.of<ChatMessageDataProvider>(context);
+    final chatMessageDataProvider = Provider.of<ChatMessagesProvider>(context);
     var body = <Widget>[
       MsgAvatar(model: chatMessage),
       TextItemContainer(

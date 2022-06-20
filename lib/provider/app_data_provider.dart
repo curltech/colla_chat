@@ -154,7 +154,7 @@ class NodeAddress {
   }
 }
 
-/// 本应用的参数，与操作系统系统和硬件无关，需要保存到本地的存储中
+/// 本应用的参数状态管理器，与操作系统系统和硬件无关，需要保存到本地的存储中
 /// 在系统启动的对象初始化从本地存储中加载
 class AppDataProvider with ChangeNotifier {
   static AppDataProvider instance = AppDataProvider();

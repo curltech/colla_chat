@@ -5,7 +5,7 @@ import 'package:colla_chat/pages/chat/chat/widget/text_span_builder.dart';
 import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../provider/app_data.dart';
+import '../../../../provider/app_data_provider.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import 'chat_details_body.dart';
 import 'chat_details_row.dart';

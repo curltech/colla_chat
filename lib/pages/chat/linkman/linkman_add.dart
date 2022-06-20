@@ -1,6 +1,6 @@
 import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
-import 'package:colla_chat/provider/linkman_data.dart';
+import 'package:colla_chat/provider/linkmen_provider.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +9,7 @@ import 'package:provider/provider.dart';
 
 import '../../../entity/chat/contact.dart';
 import '../../../l10n/localization.dart';
-import '../../../provider/app_data.dart';
+import '../../../provider/app_data_provider.dart';
 
 /// 用户注册组件，一个card下的录入框和按钮组合
 class LinkmanAddWidget extends StatefulWidget {
@@ -29,7 +29,7 @@ class _LinkmanAddWidgetState extends State<LinkmanAddWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<LinkmenDataProvider>(context).linkmen;
+    Provider.of<LinkmenProvider>(context).linkmen;
     // TextEditingController nameController = TextEditingController();
     // nameController.addListener(() {
     //   setState(() {
@@ -183,7 +183,7 @@ class _LinkmanAddWidgetState extends State<LinkmanAddWidget> {
       linkman.email = _email;
       linkman.mobile = _mobile;
       LinkmanService.instance.insert(linkman).then((value) {
-        Provider.of<LinkmenDataProvider>(context, listen: false).add([linkman]);
+        Provider.of<LinkmenProvider>(context, listen: false).add([linkman]);
       });
     } else {
       logger.e('name is null');

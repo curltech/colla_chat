@@ -12,7 +12,7 @@ import '../entity/dht/peerendpoint.dart';
 import '../entity/dht/peerprofile.dart';
 import '../entity/stock/account.dart';
 import '../platform.dart';
-import '../provider/app_data.dart';
+import '../provider/app_data_provider.dart';
 import 'base.dart';
 import 'chat/chat.dart';
 import 'chat/contact.dart';

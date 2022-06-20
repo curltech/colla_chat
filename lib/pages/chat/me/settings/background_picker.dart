@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../../../provider/app_data.dart';
+import '../../../../provider/app_data_provider.dart';
 import '../../chat/widget/ui.dart';
 
 ///通过选择相册或者拍照选择背景图

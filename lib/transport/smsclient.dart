@@ -1,7 +1,8 @@
 import 'package:colla_chat/p2p/chain/chainmessagehandler.dart';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:telephony/telephony.dart';
-import '../provider/app_data.dart';
+
+import '../provider/app_data_provider.dart';
 
 var backgrounMessageHandler = (SmsMessage message) async {
   var body = message.body;

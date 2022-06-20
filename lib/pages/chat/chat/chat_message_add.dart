@@ -5,8 +5,8 @@ import 'package:provider/provider.dart';
 
 import '../../../entity/chat/chat.dart';
 import '../../../l10n/localization.dart';
-import '../../../provider/app_data.dart';
-import '../../../provider/chat_message_data.dart';
+import '../../../provider/app_data_provider.dart';
+import '../../../provider/chat_messages_provider.dart';
 import '../../../service/chat/chat.dart';
 
 /// 消息增加组件组件，模拟发送和接受消息，方便测试，一个card下的录入框和按钮组合
@@ -27,7 +27,7 @@ class _ChatMessageAddWidgetState extends State<ChatMessageAddWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<ChatMessageDataProvider>(context).chatMessages;
+    Provider.of<ChatMessagesProvider>(context).chatMessages;
     // TextEditingController messageIdController = TextEditingController();
     // messageIdController.addListener(() {
     //   setState(() {
@@ -178,7 +178,7 @@ class _ChatMessageAddWidgetState extends State<ChatMessageAddWidget> {
       chatMessage.title = _title;
       chatMessage.content = _content;
       ChatMessageService.instance.insert(chatMessage).then((value) {
-        Provider.of<ChatMessageDataProvider>(context, listen: false)
+        Provider.of<ChatMessagesProvider>(context, listen: false)
             .add([chatMessage]);
       });
     } else {

@@ -3,15 +3,17 @@ import 'package:flutter/material.dart';
 
 import '../entity/chat/contact.dart';
 
-class LinkmenDataProvider with ChangeNotifier {
+/// 好友的状态管理器，维护了好友列表，当前好友
+class LinkmenProvider with ChangeNotifier {
   List<Linkman> _linkmen = [];
+  int _currentIndex = 0;
   bool initStatus = false;
 
-  LinkmenDataProvider();
+  LinkmenProvider();
 
   init() {
     LinkmanService.instance.findAllLinkmen().then((linkmen) {
-      _linkmen = linkmen;
+      _linkmen.addAll(linkmen);
       initStatus = true;
       notifyListeners();
     });
@@ -31,6 +33,19 @@ class LinkmenDataProvider with ChangeNotifier {
 
   add(List<Linkman> linkmen) {
     _linkmen.addAll(linkmen);
+    notifyListeners();
+  }
+
+  Linkman get linkman {
+    return _linkmen[_currentIndex];
+  }
+
+  int get currentIndex {
+    return _currentIndex;
+  }
+
+  set currentIndex(int currentIndex) {
+    _currentIndex = currentIndex;
     notifyListeners();
   }
 }

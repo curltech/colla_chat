@@ -1,9 +1,9 @@
 import 'package:colla_chat/pages/chat/me/settings/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
-import 'package:colla_chat/provider/index_views.dart';
+import 'package:colla_chat/provider/index_views_provider.dart';
 import 'package:flutter/material.dart';
 
-import '../../../provider/app_data.dart';
+import '../../../provider/app_data_provider.dart';
 import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/common/data_listview.dart';
 import '../../../widgets/common/widget_mixin.dart';

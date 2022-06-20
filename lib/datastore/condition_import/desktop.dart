@@ -4,7 +4,7 @@ import 'package:sqlite3/common.dart';
 import 'package:sqlite3/sqlite3.dart';
 
 import '../../platform.dart';
-import '../../provider/app_data.dart';
+import '../../provider/app_data_provider.dart';
 
 Future<CommonDatabase> openSqlite3({String name = 'colla_chat.db'}) async {
   var platformParams = PlatformParams.instance;

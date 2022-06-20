@@ -2,7 +2,7 @@ import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/pages/chat/me/settings/qrcode_widget.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../provider/index_views.dart';
+import '../../../../provider/index_views_provider.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/data_listview.dart';
 import '../../../../widgets/common/image_widget.dart';

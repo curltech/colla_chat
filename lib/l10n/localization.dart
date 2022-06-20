@@ -2,10 +2,9 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart' show SynchronousFuture;
 import 'package:flutter/services.dart';
 
-import '../provider/app_data.dart';
+import '../provider/app_data_provider.dart';
 
 /// 自己写的，不是gen_l10n创建的，需要从assets目录加载语言包
 /// 使用的方法是：AppLocalizations.instance.text('page_one')

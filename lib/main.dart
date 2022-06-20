@@ -1,5 +1,5 @@
 import 'package:colla_chat/pages/chat/login/p2p_login.dart';
-import 'package:colla_chat/provider/app_data.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:flutter/material.dart';

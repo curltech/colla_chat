@@ -1,11 +1,9 @@
-import 'package:colla_chat/provider/app_data.dart';
-import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 
 import '../../entity/stock/account.dart';
 import '../../service/base.dart';
 import '../../tool/util.dart';
 import '../base.dart';
-import '../../datastore/sqflite.dart';
 
 class StockAccountService extends BaseService {
   static final StockAccountService _instance = StockAccountService();

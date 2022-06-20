@@ -5,7 +5,7 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:provider/provider.dart';
 
 import '../../../l10n/localization.dart';
-import '../../../provider/app_data.dart';
+import '../../../provider/app_data_provider.dart';
 import '../../../routers/routes.dart';
 import '../../../service/dht/myselfpeer.dart';
 

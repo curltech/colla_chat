@@ -7,7 +7,7 @@ import 'package:enough_mail_html/enough_mail_html.dart';
 import 'package:event_bus/event_bus.dart';
 
 import '../entity/chat/chat.dart';
-import '../provider/app_data.dart';
+import '../provider/app_data_provider.dart';
 
 class EmailMessageUtil {
   /// 创建带附件的消息

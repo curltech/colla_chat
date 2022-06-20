@@ -1,15 +1,11 @@
-import 'dart:convert';
 import 'package:cryptography/cryptography.dart';
-import 'package:flutter/foundation.dart';
 
-import '../../provider/app_data.dart';
 import '../../crypto/cryptography.dart';
 import '../../crypto/util.dart';
 import '../../entity/dht/myself.dart';
 import '../../entity/p2p/security_context.dart';
+import '../../provider/app_data_provider.dart';
 import '../../service/dht/peerclient.dart';
-import '../../tool/util.dart';
-import 'message.dart';
 
 /// 对任意结构的负载进行压缩，签名，加密处理
 class SecurityContextService {

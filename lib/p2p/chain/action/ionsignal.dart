@@ -1,6 +1,6 @@
-import '../../../provider/app_data.dart';
-import '../../../tool/util.dart';
 import '../../../entity/p2p/message.dart';
+import '../../../provider/app_data_provider.dart';
+import '../../../tool/util.dart';
 import '../baseaction.dart';
 
 /**

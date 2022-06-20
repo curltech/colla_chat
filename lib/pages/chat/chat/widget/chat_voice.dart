@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
-import '../../../../provider/app_data.dart';
+import '../../../../provider/app_data_provider.dart';
 import '../../../../tool/util.dart';
 
 typedef VoiceFile = void Function(String path);

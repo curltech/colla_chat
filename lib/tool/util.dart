@@ -31,7 +31,7 @@ import 'package:telephony/telephony.dart';
 import 'package:toast/toast.dart';
 
 import '../crypto/util.dart';
-import '../provider/app_data.dart';
+import '../provider/app_data_provider.dart';
 
 class TypeUtil {
   static bool isString(dynamic obj) {

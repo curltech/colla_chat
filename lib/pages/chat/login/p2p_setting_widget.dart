@@ -2,7 +2,7 @@ import 'package:colla_chat/widgets/setting/locale_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../provider/app_data.dart';
+import '../../../provider/app_data_provider.dart';
 import '../../../widgets/setting/brightness_picker.dart';
 import '../../../widgets/setting/ws_address_picker.dart';
 

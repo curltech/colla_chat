@@ -1,6 +1,6 @@
-import '../../../provider/app_data.dart';
 import '../../../entity/dht/peerclient.dart';
 import '../../../entity/p2p/message.dart';
+import '../../../provider/app_data_provider.dart';
 import '../baseaction.dart';
 
 ///在chain目录下的采用自定义protocol "/chain"的方式自己实现的功能

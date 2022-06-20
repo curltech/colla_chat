@@ -7,7 +7,7 @@ import 'package:cryptography/cryptography.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../p2p/chain/action/signal.dart';
-import '../../provider/app_data.dart';
+import '../../provider/app_data_provider.dart';
 
 ///一个队列，按照被使用的新旧排序，当元素超过最大数量的时候，溢出最旧的元素
 class LruQueue<T> {

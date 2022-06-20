@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/util.dart';
-
 import 'package:sqlite3/common.dart';
+
 import './condition_import/unsupport.dart'
     if (dart.library.html) './condition_import/web.dart'
     if (dart.library.io) './condition_import/desktop.dart' as sqlite3_open;
-
-import '../provider/app_data.dart';
+import '../provider/app_data_provider.dart';
 import '../service/base.dart';
 import '../service/servicelocator.dart';
 import 'datastore.dart';

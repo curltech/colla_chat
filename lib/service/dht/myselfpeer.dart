@@ -1,5 +1,5 @@
 import 'package:colla_chat/crypto/cryptography.dart';
-import 'package:colla_chat/provider/app_data.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/dht/myself.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 

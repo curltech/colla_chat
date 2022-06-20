@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../l10n/localization.dart';
-import '../../../provider/app_data.dart';
-import '../../../provider/index_views.dart';
+import '../../../provider/app_data_provider.dart';
+import '../../../provider/index_views_provider.dart';
 import '../channel/channel_widget.dart';
 import '../chat/chat_target.dart';
 import '../linkman/linkman_view.dart';

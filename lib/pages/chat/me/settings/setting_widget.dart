@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../provider/app_data.dart';
+import '../../../../provider/app_data_provider.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/data_listview.dart';
 import '../../../../widgets/common/widget_mixin.dart';

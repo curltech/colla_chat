@@ -5,7 +5,7 @@ import 'package:colla_chat/transport/webrtc/webrtc_core_peer.dart';
 import 'package:colla_chat/transport/webrtc/webrtcpeerpool.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-import '../../provider/app_data.dart';
+import '../../provider/app_data_provider.dart';
 
 class SignalExtension {
   late String peerId;
@@ -130,8 +130,8 @@ class WebrtcPeer {
         var interval = end! - start!;
         logger.i('connect time:$interval');
       }
-      await WebrtcPeerPool.instance.emit(
-          WebrtcEventType.connect.name, WebrtcEvent(peerId, clientId));
+      await WebrtcPeerPool.instance
+          .emit(WebrtcEventType.connect.name, WebrtcEvent(peerId, clientId));
     });
 
     webrtcPeer.on(WebrtcEventType.close, (data) async {

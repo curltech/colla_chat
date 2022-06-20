@@ -3,7 +3,7 @@ import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../../../../provider/app_data.dart';
+import '../../../../provider/app_data_provider.dart';
 import 'magic_pop.dart';
 
 ///文本组件，包含ExtendedText（包含emoji）和长按的菜单，行为

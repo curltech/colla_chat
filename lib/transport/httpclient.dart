@@ -2,7 +2,7 @@ import 'package:colla_chat/transport/webclient.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
-import '../provider/app_data.dart';
+import '../provider/app_data_provider.dart';
 
 class HttpClient implements IWebClient {
   final Dio _client = Dio();

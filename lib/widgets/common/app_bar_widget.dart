@@ -1,9 +1,9 @@
-import 'package:colla_chat/provider/index_views.dart';
+import 'package:colla_chat/provider/index_views_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../provider/app_data.dart';
+import '../../provider/app_data_provider.dart';
 
 ///工作区的顶部栏AppBar，定义了回退按钮
 class AppBarWidget extends StatelessWidget {

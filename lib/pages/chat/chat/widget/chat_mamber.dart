@@ -4,7 +4,7 @@ import 'package:colla_chat/pages/chat/chat/widget/ui.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../constant/base.dart';
-import '../../../../provider/app_data.dart';
+import '../../../../provider/app_data_provider.dart';
 import '../../../../tool/util.dart';
 import '../../../../widgets/common/image_widget.dart';
 

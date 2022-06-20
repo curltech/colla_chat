@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../../../../provider/app_data.dart';
+import '../../../../provider/app_data_provider.dart';
 import 'magic_pop.dart';
 
 class ImgItemContainer extends StatefulWidget {

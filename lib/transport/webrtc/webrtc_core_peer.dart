@@ -4,7 +4,7 @@ import 'package:colla_chat/transport/webrtc/webrtc_peer.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../crypto/cryptography.dart';
-import '../../provider/app_data.dart';
+import '../../provider/app_data_provider.dart';
 
 enum SignalType { renegotiate, transceiverRequest, candidate, sdp }
 
@@ -772,7 +772,8 @@ class FollowWebrtcCorePeer extends WebrtcCorePeer {
       return;
     }
     //被叫收到协商的请求
-    emit(WebrtcEventType.signal, WebrtcSignal('renegotiate', renegotiate: true));
+    emit(
+        WebrtcEventType.signal, WebrtcSignal('renegotiate', renegotiate: true));
     isNegotiating = true;
   }
 

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_awesome_select/flutter_awesome_select.dart';
 import 'package:provider/provider.dart';
+
 import '../../constant/address.dart';
 import '../../l10n/localization.dart';
-import '../../provider/app_data.dart';
+import '../../provider/app_data_provider.dart';
 
 class WsAddressPicker extends StatefulWidget {
   const WsAddressPicker({Key? key}) : super(key: key);

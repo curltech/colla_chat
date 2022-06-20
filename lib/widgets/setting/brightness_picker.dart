@@ -1,9 +1,10 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../provider/app_data.dart';
-import '../../constant/brightness.dart';
 import 'package:flutter_awesome_select/flutter_awesome_select.dart';
+import 'package:provider/provider.dart';
+
+import '../../constant/brightness.dart';
+import '../../provider/app_data_provider.dart';
 
 class BrightnessPicker extends StatelessWidget {
   const BrightnessPicker({Key? key}) : super(key: key);

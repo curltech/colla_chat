@@ -1,5 +1,5 @@
 import '../entity/chat/mailaddress.dart';
-import '../provider/app_data.dart';
+import '../provider/app_data_provider.dart';
 
 /// 地址选择框的选项
 final Map<String, NodeAddress> nodeAddressOptions = {

@@ -3,26 +3,19 @@ import 'package:flutter/material.dart';
 import '../entity/chat/chat.dart';
 import '../service/chat/chat.dart';
 
-/// 管理websocket接收到的消息，并进行状态管理
-/// 访问方法：Provider
-///         .of<WebsocketProvider>(context)
-///         .messages;
-class ChatMessageDataProvider with ChangeNotifier {
+/// 接收到的消息列表状态管理器，维护了消息列表，当前消息
+class ChatMessagesProvider with ChangeNotifier {
   List<ChatMessage> _chatMessages = [];
-  bool initStatus = false;
+  int _currentIndex = 0;
 
-  init() {
+  ChatMessagesProvider() {
     ChatMessageService.instance.findAllChatMessages().then((chatMessages) {
-      _chatMessages = chatMessages;
-      initStatus = true;
+      _chatMessages.addAll(chatMessages);
       notifyListeners();
     });
   }
 
   List<ChatMessage> get chatMessages {
-    if (!initStatus) {
-      init();
-    }
     return _chatMessages;
   }
 
@@ -35,4 +28,19 @@ class ChatMessageDataProvider with ChangeNotifier {
     _chatMessages.addAll(chatMessages);
     notifyListeners();
   }
+
+  ChatMessage get chatMessage {
+    return _chatMessages[_currentIndex];
+  }
+
+  int get currentIndex {
+    return _currentIndex;
+  }
+
+  set currentIndex(int currentIndex) {
+    _currentIndex = currentIndex;
+    notifyListeners();
+  }
 }
+
+var chatMessagesProvider = ChatMessagesProvider;
