@@ -160,10 +160,14 @@ class IndexViewState extends State<IndexView>
         builder: (context, indexViewProvider, child) {
       return PageView(
         //physics: const NeverScrollableScrollPhysics(),
+        //scrollBehavior: ScrollBehavior.
         controller: indexViewProvider.pageController,
         children: indexViewProvider.views,
         onPageChanged: (int index) {
-          indexViewProvider.currentIndex = index;
+          setState(() {
+            _currentIndex = index;
+            indexViewProvider.currentIndex = index;
+          });
         },
       );
     });
