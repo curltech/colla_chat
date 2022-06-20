@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'data_listtile.dart';
 
+///无状态组件，根据传入的数据一次性展示
 ///包含很多项的滚动视图，如果只有一个分组，采用ListView实现
 ///如果有多个分组，ListView的每个组件是每个分组ExpansionTile，每个分组ExpansionTile下面是ListView，
 ///每个ListView下面是ListTile
@@ -86,7 +87,7 @@ class GroupDataListView extends StatelessWidget {
       }
     }
 
-    return ListView(shrinkWrap: true, children: groups);
+    return ListView(children: groups);
   }
 
   @override

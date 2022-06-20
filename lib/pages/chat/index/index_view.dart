@@ -159,6 +159,7 @@ class IndexViewState extends State<IndexView>
     var pageView = Consumer<IndexViewProvider>(
         builder: (context, indexViewProvider, child) {
       return PageView(
+        //physics: const NeverScrollableScrollPhysics(),
         controller: indexViewProvider.pageController,
         children: indexViewProvider.views,
         onPageChanged: (int index) {
