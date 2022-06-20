@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../../../../entity/chat/mailaddress.dart';
 import '../../../../provider/app_data_provider.dart';
-import '../../../../service/chat/mailaddress.dart';
 import '../../../../widgets/common/data_group_listview.dart';
 import '../../../../widgets/common/data_listtile.dart';
 import '../../../../widgets/common/widget_mixin.dart';
+import 'mail_address_controller.dart';
 
 final List<TileData> mailAddrTileData = [
   TileData(
@@ -46,14 +46,17 @@ final List<TileData> mailAddrTileData = [
 class MailAddressWidget extends StatefulWidget
     with BackButtonMixin, RouteNameMixin {
   final Function? backCallBack;
+  MailAddressController mailAddressController;
 
-  MailAddressWidget({Key? key, this.backCallBack}) : super(key: key) {}
+  MailAddressWidget(
+      {Key? key, required this.mailAddressController, this.backCallBack})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MailAddressWidgetState();
 
   @override
-  String get routeName => 'mail';
+  String get routeName => 'mail_address';
 
   @override
   bool get withBack => false;
@@ -65,13 +68,17 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
   @override
   initState() async {
     super.initState();
-    Map<TileData, List<TileData>> mailAddressTileData = {};
-    List<MailAddress> mailAddress =
-        await MailAddressService.instance.findAllMailAddress();
-    for (var mailAddr in mailAddress) {
-      TileData key = TileData(title: mailAddr.email!, icon: Icon(Icons.email));
-      mailAddressTileData[key] = mailAddrTileData;
-    }
+    widget.mailAddressController.addListener(() {
+      setState(() {
+        List<MailAddress> mailAddress =
+            widget.mailAddressController.mailAddresses;
+        for (var mailAddr in mailAddress) {
+          TileData key =
+              TileData(title: mailAddr.email!, icon: Icon(Icons.email));
+          mailAddressTileData[key] = mailAddrTileData;
+        }
+      });
+    });
   }
 
   @override
