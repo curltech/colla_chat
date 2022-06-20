@@ -1,4 +1,4 @@
-import 'package:colla_chat/provider/linkmen_provider.dart';
+import 'package:colla_chat/provider/linkman_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -23,7 +23,7 @@ class LinkmanWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var linkmen = Provider.of<LinkmenProvider>(context).linkmen;
+    var linkmen = Provider.of<LinkmanProvider>(context).linkmen;
     List<TileData> tileData = [];
     if (linkmen.isNotEmpty) {
       for (var linkman in linkmen) {

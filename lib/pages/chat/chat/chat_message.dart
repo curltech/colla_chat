@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 
 import '../../../entity/chat/chat.dart';
 import '../../../provider/app_data_provider.dart';
-import '../../../provider/chat_messages_provider.dart';
+import '../../../provider/chat_message_provider.dart';
 import 'chat_me_message.dart';
 import 'chat_other_message.dart';
 
@@ -72,7 +72,7 @@ class _ChatMessagePageState extends State<ChatMessagePage>
 
   Widget messageItem(BuildContext context, int index) {
     List<ChatMessage> messages =
-        Provider.of<ChatMessagesProvider>(context).chatMessages;
+        Provider.of<ChatMessageProvider>(context).chatMessages;
     ChatMessage item = messages[index];
     // 创建消息动画控制器
     var animate =
@@ -111,8 +111,8 @@ class _ChatMessagePageState extends State<ChatMessagePage>
   Widget build(BuildContext context) {
     return Column(children: <Widget>[
       //使用Consumer来获取WebSocketProvider对象
-      Consumer<ChatMessagesProvider>(builder: (BuildContext context,
-          ChatMessagesProvider chatMessageDataProvider, Widget? child) {
+      Consumer<ChatMessageProvider>(builder: (BuildContext context,
+          ChatMessageProvider chatMessageDataProvider, Widget? child) {
         //获取消息列表数据
         var messages = chatMessageDataProvider.chatMessages;
         return Flexible(

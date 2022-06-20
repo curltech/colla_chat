@@ -2,7 +2,7 @@ import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../provider/index_views_provider.dart';
+import '../../../provider/index_view_provider.dart';
 import '../../../widgets/common/image_widget.dart';
 
 class MeHeadWidget extends StatelessWidget {

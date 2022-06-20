@@ -1,5 +1,5 @@
 import 'package:colla_chat/pages/chat/linkman/linkman_add.dart';
-import 'package:colla_chat/provider/linkmen_provider.dart';
+import 'package:colla_chat/provider/linkman_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -28,7 +28,7 @@ class _LinkmanViewState extends State<LinkmanView>
   late TabController _tabController;
   String _key = '';
   late List<Widget> _children;
-  LinkmenProvider _linkmenDataProvider = LinkmenProvider();
+  LinkmanProvider _linkmenDataProvider = LinkmanProvider();
 
   @override
   void initState() {

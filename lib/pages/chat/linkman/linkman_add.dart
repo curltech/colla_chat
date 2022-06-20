@@ -1,6 +1,6 @@
 import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
-import 'package:colla_chat/provider/linkmen_provider.dart';
+import 'package:colla_chat/provider/linkman_provider.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -29,7 +29,7 @@ class _LinkmanAddWidgetState extends State<LinkmanAddWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<LinkmenProvider>(context).linkmen;
+    Provider.of<LinkmanProvider>(context).linkmen;
     // TextEditingController nameController = TextEditingController();
     // nameController.addListener(() {
     //   setState(() {
@@ -183,7 +183,7 @@ class _LinkmanAddWidgetState extends State<LinkmanAddWidget> {
       linkman.email = _email;
       linkman.mobile = _mobile;
       LinkmanService.instance.insert(linkman).then((value) {
-        Provider.of<LinkmenProvider>(context, listen: false).add([linkman]);
+        Provider.of<LinkmanProvider>(context, listen: false).add([linkman]);
       });
     } else {
       logger.e('name is null');

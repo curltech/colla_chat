@@ -1,4 +1,4 @@
-import 'package:colla_chat/provider/index_views_provider.dart';
+import 'package:colla_chat/provider/index_view_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

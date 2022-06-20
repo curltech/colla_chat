@@ -1,6 +1,6 @@
 import 'package:colla_chat/pages/chat/me/settings/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
-import 'package:colla_chat/provider/index_views_provider.dart';
+import 'package:colla_chat/provider/index_view_provider.dart';
 import 'package:flutter/material.dart';
 
 import '../../../provider/app_data_provider.dart';

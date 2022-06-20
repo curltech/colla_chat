@@ -4,11 +4,11 @@ import '../entity/chat/chat.dart';
 import '../service/chat/chat.dart';
 
 /// 接收到的消息列表状态管理器，维护了消息列表，当前消息
-class ChatMessagesProvider with ChangeNotifier {
+class ChatMessageProvider with ChangeNotifier {
   List<ChatMessage> _chatMessages = [];
   int _currentIndex = 0;
 
-  ChatMessagesProvider() {
+  ChatMessageProvider() {
     ChatMessageService.instance.findAllChatMessages().then((chatMessages) {
       _chatMessages.addAll(chatMessages);
       notifyListeners();
@@ -43,4 +43,4 @@ class ChatMessagesProvider with ChangeNotifier {
   }
 }
 
-var chatMessagesProvider = ChatMessagesProvider;
+var chatMessagesProvider = ChatMessageProvider;

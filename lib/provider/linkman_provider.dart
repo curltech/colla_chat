@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import '../entity/chat/contact.dart';
 
 /// 好友的状态管理器，维护了好友列表，当前好友
-class LinkmenProvider with ChangeNotifier {
+class LinkmanProvider with ChangeNotifier {
   List<Linkman> _linkmen = [];
   int _currentIndex = 0;
   bool initStatus = false;
 
-  LinkmenProvider();
+  LinkmanProvider();
 
   init() {
     LinkmanService.instance.findAllLinkmen().then((linkmen) {

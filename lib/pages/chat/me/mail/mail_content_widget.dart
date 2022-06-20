@@ -1,4 +1,4 @@
-import 'package:colla_chat/provider/chat_messages_provider.dart';
+import 'package:colla_chat/provider/chat_message_provider.dart';
 import 'package:enough_mail/codecs.dart';
 import 'package:enough_mail/highlevel.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
@@ -34,7 +34,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
   Widget _build() {
     return Provider.value(
         value: chatMessagesProvider,
-        child: Consumer<ChatMessagesProvider>(builder:
+        child: Consumer<ChatMessageProvider>(builder:
             (BuildContext context, chatMessagesProvider, Widget? child) {
           var chatMessage = chatMessagesProvider.chatMessage;
           var mimeMessage = EmailMessageUtil.convertToMimeMessage(chatMessage);
