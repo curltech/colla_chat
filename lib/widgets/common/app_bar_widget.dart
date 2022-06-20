@@ -9,6 +9,7 @@ import '../../provider/app_data_provider.dart';
 class AppBarWidget extends StatelessWidget {
   final String title;
   final List<String>? rightActions;
+  final List<Widget>? rightWidgets;
   final Function(int index)? rightCallBack;
   final Widget? bottom;
   final bool withBack;
@@ -18,6 +19,7 @@ class AppBarWidget extends StatelessWidget {
       {Key? key,
       this.title = '',
       this.rightActions,
+      this.rightWidgets,
       this.rightCallBack,
       this.bottom,
       this.withBack = false,
@@ -78,9 +80,21 @@ class AppBarWidget extends StatelessWidget {
     return menus;
   }
 
+  Widget? rightWidget() {
+    var rightWidgets = this.rightWidgets;
+    if (rightWidgets != null && rightWidgets.isNotEmpty) {
+      return Row(
+        children: rightWidgets,
+      );
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     var listTiles = <Widget>[];
+    Widget? trailing = rightWidget();
+    trailing = trailing ?? rightAction();
     var listTile = ListTile(
       title: Text(title,
           textAlign: TextAlign.center,

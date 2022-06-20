@@ -248,6 +248,24 @@ class DateUtil {
     return currentDate;
   }
 
+  static formatChinese(String strDate) {
+    DateTime t = DateTime.parse(strDate);
+    DateTime c = DateTime.now().toUtc();
+    Duration diff = c.difference(t);
+    switch (diff.inDays) {
+      case 0:
+        return '今天';
+      case 1:
+        return '昨天';
+      case 3:
+        return '前天';
+      case 4:
+        return '四天前';
+      default:
+        return strDate;
+    }
+  }
+
   static const String full = "yyyy-MM-dd HH:mm:ss";
 
   static String formatDateV(DateTime dateTime,
