@@ -19,13 +19,13 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
   String? _password;
   String? _email;
   String? _imapServerHost;
-  String? _imapServerPort;
+  String _imapServerPort = '993';
   bool _imapServerSecure = true;
   String? _popServerHost;
-  String? _popServerPort;
+  String _popServerPort = '995';
   bool _popServerSecure = true;
   String? _smtpServerHost;
-  String? _smtpServerPort;
+  String _smtpServerPort = '465';
   bool _smtpServerSecure = true;
   bool _pwdShow = false;
 
@@ -57,7 +57,6 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
               child: TextFormField(
-                //controller: emailController,
                 keyboardType: TextInputType.emailAddress,
                 decoration: InputDecoration(
                   labelText: AppLocalizations.t('Email'),
@@ -103,7 +102,6 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
               child: TextFormField(
-                //controller: nameController,
                 decoration: InputDecoration(
                   labelText: AppLocalizations.t('SmtpServerHost'),
                   prefixIcon: Icon(Icons.desktop_mac),
@@ -120,6 +118,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
               child: TextFormField(
+                keyboardType: TextInputType.number,
                 decoration: InputDecoration(
                   labelText: AppLocalizations.t('SmtpServerPort'),
                   prefixIcon: Icon(Icons.router),
@@ -128,6 +127,72 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
                 onChanged: (String val) {
                   setState(() {
                     _smtpServerPort = val;
+                  });
+                },
+                onFieldSubmitted: (String val) {},
+              )),
+          SizedBox(height: 10.0),
+          Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15.0),
+              child: TextFormField(
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.t('ImapServerHost'),
+                  prefixIcon: Icon(Icons.desktop_mac),
+                ),
+                initialValue: _imapServerHost,
+                onChanged: (String val) {
+                  setState(() {
+                    _imapServerHost = val;
+                  });
+                },
+                onFieldSubmitted: (String val) {},
+              )),
+          SizedBox(height: 10.0),
+          Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15.0),
+              child: TextFormField(
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.t('ImapServerPort'),
+                  prefixIcon: Icon(Icons.router),
+                ),
+                initialValue: _imapServerPort,
+                onChanged: (String val) {
+                  setState(() {
+                    _imapServerPort = val;
+                  });
+                },
+                onFieldSubmitted: (String val) {},
+              )),
+          SizedBox(height: 10.0),
+          Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15.0),
+              child: TextFormField(
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.t('PopServerHost'),
+                  prefixIcon: Icon(Icons.desktop_mac),
+                ),
+                initialValue: _popServerHost,
+                onChanged: (String val) {
+                  setState(() {
+                    _popServerHost = val;
+                  });
+                },
+                onFieldSubmitted: (String val) {},
+              )),
+          SizedBox(height: 10.0),
+          Padding(
+              padding: EdgeInsets.symmetric(horizontal: 15.0),
+              child: TextFormField(
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.t('PopServerPort'),
+                  prefixIcon: Icon(Icons.router),
+                ),
+                initialValue: _popServerPort,
+                onChanged: (String val) {
+                  setState(() {
+                    _popServerPort = val;
                   });
                 },
                 onFieldSubmitted: (String val) {},

@@ -130,15 +130,15 @@ class EmailClient {
   late String email = '$username@$domain';
 
   String? imapServerHost;
-  int? imapServerPort;
+  int imapServerPort = 993;
   bool imapServerSecure = true;
 
   String? popServerHost;
-  int? popServerPort;
+  int popServerPort = 995;
   bool popServerSecure = true;
 
   String? smtpServerHost;
-  int? smtpServerPort;
+  int smtpServerPort = 465;
   bool smtpServerSecure = true;
 
   ///mailClient是自动发现产生的客户端
@@ -153,11 +153,11 @@ class EmailClient {
       required this.username,
       required this.domain,
       this.imapServerHost,
-      this.imapServerPort,
+      this.imapServerPort = 993,
       this.popServerHost,
-      this.popServerPort,
+      this.popServerPort = 995,
       this.smtpServerHost,
-      this.smtpServerPort});
+      this.smtpServerPort = 465});
 
   Future<bool> connect(String? password) async {
     bool success = false;
@@ -584,11 +584,11 @@ class EmailClientPool {
       {required String address,
       required String personalName,
       String? imapServerHost,
-      int? imapServerPort,
+      int imapServerPort = 993,
       String? popServerHost,
-      int? popServerPort,
+      int popServerPort = 995,
       String? smtpServerHost,
-      int? smtpServerPort}) async {
+      int smtpServerPort = 465}) async {
     var emails = address.split('@');
     if (emails.length != 2) {
       return null;

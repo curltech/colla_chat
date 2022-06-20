@@ -1,5 +1,4 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/login/loading.dart';
 import 'package:flutter/material.dart';
 
 import 'auto_discover_widget.dart';
@@ -23,11 +22,11 @@ class _P2pLoginState extends State<P2pLogin>
   void initState() {
     super.initState();
     // 初始化子项集合
-    var p2pLoginWidget = const AutoDiscoverWidget();
-    var p2pRegisterWidget = const ManualAddWidget();
+    var autoDiscoverWidget = const AutoDiscoverWidget();
+    var manualAddWidget = const ManualAddWidget();
     _children = [
-      p2pLoginWidget,
-      p2pRegisterWidget,
+      autoDiscoverWidget,
+      manualAddWidget,
     ];
     _tabController = TabController(length: _children.length, vsync: this);
 
@@ -45,19 +44,20 @@ class _P2pLoginState extends State<P2pLogin>
       children: _children,
     );
     var appBar = AppBar(
+      automaticallyImplyLeading: false,
       title: Text(AppLocalizations.t('Add email address')),
       actions: [
         IconButton(
             onPressed: () async {
               _tabController.index = 0;
             },
-            icon: const Icon(Icons.login),
+            icon: const Icon(Icons.auto_awesome),
             tooltip: AppLocalizations.t('Auto')),
         IconButton(
           onPressed: () async {
             _tabController.index = 1;
           },
-          icon: const Icon(Icons.app_registration),
+          icon: const Icon(Icons.fiber_manual_record),
           tooltip: AppLocalizations.t('Manual'),
         ),
       ],
@@ -71,8 +71,6 @@ class _P2pLoginState extends State<P2pLogin>
           height: 500,
           child: tabBarView,
         )));
-    return Scaffold(
-        appBar: appBar,
-        body: Stack(children: <Widget>[Loading(title: ''), workspace]));
+    return Scaffold(appBar: appBar, body: Stack(children: <Widget>[workspace]));
   }
 }
