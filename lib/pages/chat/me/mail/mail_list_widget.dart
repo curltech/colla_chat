@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../../entity/chat/mailaddress.dart';
 import '../../../../provider/app_data_provider.dart';
 import '../../../../service/chat/mailaddress.dart';
-import '../../../../widgets/common/data_listview.dart';
+import '../../../../widgets/common/data_group_listview.dart';
+import '../../../../widgets/common/data_listtile.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
 final List<TileData> mailAddrTileData = [
@@ -76,7 +77,7 @@ class _MailListWidgetState extends State<MailListWidget> {
   @override
   Widget build(BuildContext context) {
     var email = Row(children: [
-      DataListView(tileData: mailAddressTileData),
+      GroupDataListView(tileData: mailAddressTileData),
     ]);
     return email;
   }

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../l10n/localization.dart';
-import '../../../widgets/common/data_listview.dart';
+import '../../../widgets/common/data_group_listview.dart';
+import '../../../widgets/common/data_listtile.dart';
 import '../../../widgets/common/widget_mixin.dart';
 
 final Map<TileData, List<TileData>> mockTileData = {
@@ -34,7 +35,7 @@ class ChannelWidget extends StatelessWidget
       ),
       actions: [],
     );
-    var body = DataListView(tileData: channelTileData);
+    var body = GroupDataListView(tileData: channelTileData);
     return Scaffold(
       appBar: appBar,
       //列表

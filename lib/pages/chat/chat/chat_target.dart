@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../../l10n/localization.dart';
 import '../../../tool/util.dart';
-import '../../../widgets/common/data_listview.dart';
+import '../../../widgets/common/data_group_listview.dart';
+import '../../../widgets/common/data_listtile.dart';
 import '../../../widgets/common/widget_mixin.dart';
 
 final Map<TileData, List<TileData>> mockTileData = {
@@ -34,7 +35,7 @@ class ChatTarget extends StatelessWidget with BackButtonMixin, RouteNameMixin {
       ),
       actions: [],
     );
-    var body = DataListView(tileData: chatTargets);
+    var body = GroupDataListView(tileData: chatTargets);
     return Scaffold(appBar: appBar, body: body);
   }
 

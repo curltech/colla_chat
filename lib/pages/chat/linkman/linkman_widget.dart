@@ -2,7 +2,8 @@ import 'package:colla_chat/provider/linkman_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../widgets/common/data_listview.dart';
+import '../../../widgets/common/data_group_listview.dart';
+import '../../../widgets/common/data_listtile.dart';
 
 final Map<TileData, List<TileData>> mockTileData = {
   TileData(title: '未知'): [
@@ -38,7 +39,7 @@ class LinkmanWidget extends StatelessWidget {
     Map<TileData, List<TileData>> linkmanTileData = {
       TileData(title: 'linkmen'): tileData
     };
-    var body = DataListView(tileData: linkmanTileData);
+    var body = GroupDataListView(tileData: linkmanTileData);
     return Container(
       //列表
       child: body,

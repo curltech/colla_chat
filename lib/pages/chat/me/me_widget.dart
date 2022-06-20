@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 
 import '../../../provider/app_data_provider.dart';
 import '../../../widgets/common/app_bar_view.dart';
-import '../../../widgets/common/data_listview.dart';
+import '../../../widgets/common/data_group_listview.dart';
+import '../../../widgets/common/data_listtile.dart';
 import '../../../widgets/common/widget_mixin.dart';
 import 'collection/collection_widget.dart';
 import 'me_head_widget.dart';
@@ -51,7 +52,7 @@ class MeWidget extends StatelessWidget with BackButtonMixin, RouteNameMixin {
         title: 'Me',
         child: Column(children: <Widget>[
           const MeHeadWidget(),
-          DataListView(tileData: meTileData)
+          GroupDataListView(tileData: meTileData)
         ]));
     return me;
   }

@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 
 import '../../../../provider/index_view_provider.dart';
 import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/common/data_listview.dart';
+import '../../../../widgets/common/data_group_listview.dart';
+import '../../../../widgets/common/data_listtile.dart';
 import '../../../../widgets/common/image_widget.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
@@ -56,7 +57,7 @@ class PersonalInfoWidget extends StatelessWidget
     var personalInfo = AppBarView(
         title: 'Personal Information',
         withBack: withBack,
-        child: DataListView(tileData: personalInfoTileData));
+        child: GroupDataListView(tileData: personalInfoTileData));
     return personalInfo;
   }
 
