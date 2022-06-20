@@ -50,7 +50,6 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget>
                 onFieldSubmitted: (String val) {},
               )),
           SizedBox(height: 30.0),
-          SizedBox(height: 30.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 50.0),
               child: TextFormField(

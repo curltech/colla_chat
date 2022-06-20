@@ -29,74 +29,23 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
   bool _smtpServerSecure = true;
   bool _pwdShow = false;
 
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
+  Widget _buildSmtp() {
+    return ExpansionTile(
+      leading: Icon(Icons.send),
+      title: Text('Smtp'),
+      initiallyExpanded: false,
+      children: <Widget>[
+        Column(children: <Widget>[
           SizedBox(height: 10.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextFormField(
-                //controller: nameController,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.t('Username'),
-                  prefixIcon: Icon(Icons.person),
-                ),
-                initialValue: _personalName,
-                onChanged: (String val) {
+              child: Switch(
+                value: _smtpServerSecure,
+                onChanged: (bool val) {
                   setState(() {
-                    _personalName = val;
+                    _smtpServerSecure = val;
                   });
                 },
-                onFieldSubmitted: (String val) {},
-              )),
-          SizedBox(height: 10.0),
-          Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextFormField(
-                keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.t('Email'),
-                  prefixIcon: Icon(Icons.email),
-                ),
-                initialValue: _email,
-                onChanged: (String val) {
-                  setState(() {
-                    _email = val;
-                  });
-                },
-                onFieldSubmitted: (String val) {},
-              )),
-          SizedBox(height: 10.0),
-          Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                obscureText: !_pwdShow,
-                //controller: passwordController,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.t('Password'),
-                  prefixIcon: Icon(Icons.lock),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                        _pwdShow ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () {
-                      setState(() {
-                        _pwdShow = !_pwdShow;
-                      });
-                    },
-                  ),
-                ),
-                initialValue: _password,
-                onChanged: (String val) {
-                  setState(() {
-                    _password = val;
-                  });
-                },
-                onFieldSubmitted: (String val) {},
               )),
           SizedBox(height: 10.0),
           Padding(
@@ -131,72 +80,201 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
                 },
                 onFieldSubmitted: (String val) {},
               )),
-          SizedBox(height: 10.0),
-          Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextFormField(
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.t('ImapServerHost'),
-                  prefixIcon: Icon(Icons.desktop_mac),
+        ]),
+      ],
+    );
+  }
+
+  Widget _buildImap() {
+    return ExpansionTile(
+        leading: Icon(Icons.receipt),
+        title: Text('Imap'),
+        initiallyExpanded: false,
+        children: <Widget>[
+          Column(children: <Widget>[
+            SizedBox(height: 10.0),
+            Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15.0),
+                child: Switch(
+                  value: _imapServerSecure,
+                  onChanged: (bool val) {
+                    setState(() {
+                      _imapServerSecure = val;
+                    });
+                  },
+                )),
+            SizedBox(height: 10.0),
+            Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15.0),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.t('ImapServerHost'),
+                    prefixIcon: Icon(Icons.desktop_mac),
+                  ),
+                  initialValue: _imapServerHost,
+                  onChanged: (String val) {
+                    setState(() {
+                      _imapServerHost = val;
+                    });
+                  },
+                  onFieldSubmitted: (String val) {},
+                )),
+            SizedBox(height: 10.0),
+            Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15.0),
+                child: TextFormField(
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.t('ImapServerPort'),
+                    prefixIcon: Icon(Icons.router),
+                  ),
+                  initialValue: _imapServerPort,
+                  onChanged: (String val) {
+                    setState(() {
+                      _imapServerPort = val;
+                    });
+                  },
+                  onFieldSubmitted: (String val) {},
+                )),
+          ])
+        ]);
+  }
+
+  Widget _buildPop() {
+    return ExpansionTile(
+        leading: Icon(Icons.receipt),
+        title: Text('Pop3'),
+        initiallyExpanded: false,
+        children: <Widget>[
+          Column(children: <Widget>[
+            SizedBox(height: 10.0),
+            Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15.0),
+                child: Switch(
+                  value: _popServerSecure,
+                  onChanged: (bool val) {
+                    setState(() {
+                      _popServerSecure = val;
+                    });
+                  },
+                )),
+            SizedBox(height: 10.0),
+            Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15.0),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.t('PopServerHost'),
+                    prefixIcon: Icon(Icons.desktop_mac),
+                  ),
+                  initialValue: _popServerHost,
+                  onChanged: (String val) {
+                    setState(() {
+                      _popServerHost = val;
+                    });
+                  },
+                  onFieldSubmitted: (String val) {},
+                )),
+            SizedBox(height: 10.0),
+            Padding(
+                padding: EdgeInsets.symmetric(horizontal: 15.0),
+                child: TextFormField(
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    labelText: AppLocalizations.t('PopServerPort'),
+                    prefixIcon: Icon(Icons.router),
+                  ),
+                  initialValue: _popServerPort,
+                  onChanged: (String val) {
+                    setState(() {
+                      _popServerPort = val;
+                    });
+                  },
+                  onFieldSubmitted: (String val) {},
+                ))
+          ])
+        ]);
+  }
+
+  Widget _buildEmail() {
+    return Column(
+      children: [
+        SizedBox(height: 10.0),
+        Padding(
+            padding: EdgeInsets.symmetric(horizontal: 15.0),
+            child: TextFormField(
+              //controller: nameController,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.t('Username'),
+                prefixIcon: Icon(Icons.person),
+              ),
+              initialValue: _personalName,
+              onChanged: (String val) {
+                setState(() {
+                  _personalName = val;
+                });
+              },
+              onFieldSubmitted: (String val) {},
+            )),
+        SizedBox(height: 10.0),
+        Padding(
+            padding: EdgeInsets.symmetric(horizontal: 15.0),
+            child: TextFormField(
+              keyboardType: TextInputType.emailAddress,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.t('Email'),
+                prefixIcon: Icon(Icons.email),
+              ),
+              initialValue: _email,
+              onChanged: (String val) {
+                setState(() {
+                  _email = val;
+                });
+              },
+              onFieldSubmitted: (String val) {},
+            )),
+        SizedBox(height: 10.0),
+        Padding(
+            padding: EdgeInsets.symmetric(horizontal: 15.0),
+            child: TextFormField(
+              keyboardType: TextInputType.text,
+              obscureText: !_pwdShow,
+              //controller: passwordController,
+              decoration: InputDecoration(
+                labelText: AppLocalizations.t('Password'),
+                prefixIcon: Icon(Icons.lock),
+                suffixIcon: IconButton(
+                  icon:
+                      Icon(_pwdShow ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      _pwdShow = !_pwdShow;
+                    });
+                  },
                 ),
-                initialValue: _imapServerHost,
-                onChanged: (String val) {
-                  setState(() {
-                    _imapServerHost = val;
-                  });
-                },
-                onFieldSubmitted: (String val) {},
-              )),
-          SizedBox(height: 10.0),
-          Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextFormField(
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.t('ImapServerPort'),
-                  prefixIcon: Icon(Icons.router),
-                ),
-                initialValue: _imapServerPort,
-                onChanged: (String val) {
-                  setState(() {
-                    _imapServerPort = val;
-                  });
-                },
-                onFieldSubmitted: (String val) {},
-              )),
-          SizedBox(height: 10.0),
-          Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextFormField(
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.t('PopServerHost'),
-                  prefixIcon: Icon(Icons.desktop_mac),
-                ),
-                initialValue: _popServerHost,
-                onChanged: (String val) {
-                  setState(() {
-                    _popServerHost = val;
-                  });
-                },
-                onFieldSubmitted: (String val) {},
-              )),
-          SizedBox(height: 10.0),
-          Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextFormField(
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.t('PopServerPort'),
-                  prefixIcon: Icon(Icons.router),
-                ),
-                initialValue: _popServerPort,
-                onChanged: (String val) {
-                  setState(() {
-                    _popServerPort = val;
-                  });
-                },
-                onFieldSubmitted: (String val) {},
-              )),
+              ),
+              initialValue: _password,
+              onChanged: (String val) {
+                setState(() {
+                  _password = val;
+                });
+              },
+              onFieldSubmitted: (String val) {},
+            )),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: <Widget>[
+          _buildEmail(),
+          _buildSmtp(),
+          _buildImap(),
+          _buildPop(),
           SizedBox(height: 10.0),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 15.0),
