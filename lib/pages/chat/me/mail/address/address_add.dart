@@ -2,15 +2,22 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../widgets/common/app_bar_view.dart';
+import '../../../../../widgets/common/widget_mixin.dart';
 import 'auto_discover_widget.dart';
 import 'manual_add_widget.dart';
 
-/// 地址增加页面，一个Scaffold，IndexStack下的远程登录组件，注册组件和配置组件
-class P2pLogin extends StatefulWidget {
+/// 地址增加页面
+class P2pLogin extends StatefulWidget with BackButtonMixin, RouteNameMixin {
   const P2pLogin({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _P2pLoginState();
+
+  @override
+  String get routeName => 'mail_address';
+
+  @override
+  bool get withBack => true;
 }
 
 class _P2pLoginState extends State<P2pLogin>

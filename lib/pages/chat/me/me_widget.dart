@@ -35,6 +35,12 @@ class MeWidget extends StatelessWidget with BackButtonMixin, RouteNameMixin {
           routeName: 'collection',
         ),
         TileData(
+          icon: Icon(Icons.contact_mail,
+              color: appDataProvider.themeData?.colorScheme.primary),
+          title: '邮件地址',
+          routeName: 'mail_address',
+        ),
+        TileData(
           icon: Icon(Icons.email,
               color: appDataProvider.themeData?.colorScheme.primary),
           title: '邮件',
