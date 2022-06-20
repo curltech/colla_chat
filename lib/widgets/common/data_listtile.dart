@@ -18,7 +18,7 @@ class TileData {
   late final String? subtitle;
   late final dynamic suffix;
   late final String? routeName;
-  Function()? routeCallback;
+  Function(String title)? onTap;
 
   TileData(
       {this.icon,
@@ -27,14 +27,16 @@ class TileData {
       this.subtitle,
       this.suffix,
       this.routeName,
-      this.routeCallback});
+      this.onTap});
 }
 
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
 class DataListTile extends StatelessWidget {
   late final TileData _tileData;
+  bool selected;
 
-  DataListTile({Key? key, required TileData tileData}) : super(key: key) {
+  DataListTile({Key? key, required TileData tileData, this.selected = false})
+      : super(key: key) {
     _tileData = tileData;
   }
 
@@ -60,7 +62,7 @@ class DataListTile extends StatelessWidget {
         ));
       }
     }
-    if (_tileData.routeName != null || _tileData.routeCallback != null) {
+    if (_tileData.routeName != null) {
       trailing.add(Icon(Icons.chevron_right,
           color: appDataProvider.themeData?.colorScheme.primary));
     }
@@ -76,6 +78,7 @@ class DataListTile extends StatelessWidget {
 
     ///未来不使用ListTile，因为高度固定，不够灵活
     var listTile = ListTile(
+      selected: selected,
       leading: leading,
       title: Text(
         _tileData.title,
@@ -88,17 +91,17 @@ class DataListTile extends StatelessWidget {
       trailing: trailingWidget,
       dense: true,
       onTap: () {
-        var call = _tileData.routeCallback;
+        var call = _tileData.onTap;
         if (call != null) {
-          call();
-        } else if (_tileData.routeName != null) {
+          call(_tileData.title);
+        }
+        if (_tileData.routeName != null) {
           var indexViewProvider =
               Provider.of<IndexViewProvider>(context, listen: false);
           indexViewProvider.push(_tileData.routeName!);
         }
       },
     );
-
     return Container(
         margin: const EdgeInsets.only(top: 5.0),
         child: Column(children: <Widget>[

@@ -48,6 +48,8 @@ class DataListView extends StatefulWidget {
 }
 
 class _DataListView extends State<DataListView> {
+  String _title = '';
+
   @override
   initState() {
     super.initState();
@@ -79,13 +81,6 @@ class _DataListView extends State<DataListView> {
     });
   }
 
-  @override
-  dispose() {
-    super.dispose();
-    widget.dataListViewController.dispose();
-    widget.scrollController.dispose();
-  }
-
   bool _onNotification(ScrollNotification notification) {
     String type = notification.runtimeType.toString();
     logger.i('scrolled to $type');
@@ -99,6 +94,12 @@ class _DataListView extends State<DataListView> {
     }
   }
 
+  _onTap(String title) {
+    setState(() {
+      _title = title;
+    });
+  }
+
   Widget _buildGroup(BuildContext context) {
     Widget groupWidget = RefreshIndicator(
         onRefresh: _onRefresh,
@@ -109,7 +110,15 @@ class _DataListView extends State<DataListView> {
             controller: widget.scrollController,
             itemBuilder: (BuildContext context, int index) {
               TileData tile = widget.dataListViewController.getTileData(index);
-              DataListTile tileWidget = DataListTile(tileData: tile);
+              tile.onTap = _onTap;
+              bool selected = false;
+              if (_title == tile.title) {
+                selected = true;
+              }
+              DataListTile tileWidget = DataListTile(
+                tileData: tile,
+                selected: selected,
+              );
 
               return tileWidget;
             }));
