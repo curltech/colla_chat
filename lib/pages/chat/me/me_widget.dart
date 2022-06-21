@@ -1,7 +1,7 @@
+import 'package:colla_chat/pages/chat/index/index_widget_controller.dart';
 import 'package:colla_chat/pages/chat/me/mail/mail_view.dart';
 import 'package:colla_chat/pages/chat/me/settings/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
-import 'package:colla_chat/provider/index_view_provider.dart';
 import 'package:flutter/material.dart';
 
 import '../../../provider/app_data_provider.dart';
@@ -21,7 +21,7 @@ class MeWidget extends StatelessWidget with BackButtonMixin, RouteNameMixin {
   AddressAddWidget addressAddWidget = const AddressAddWidget();
 
   MeWidget({Key? key}) : super(key: key) {
-    var indexViewProvider = IndexViewProvider.instance;
+    var indexViewProvider = IndexWidgetController.instance;
     //indexViewProvider.define(collectionWidget);
     indexViewProvider.define(settingWidget);
     indexViewProvider.define(personalInfoWidget);

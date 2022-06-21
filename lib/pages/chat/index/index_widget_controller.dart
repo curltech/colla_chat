@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 
-import '../widgets/common/widget_mixin.dart';
-import 'app_data_provider.dart';
+import '../../../l10n/localization.dart';
+import '../../../provider/app_data_provider.dart';
+import '../../../widgets/common/widget_mixin.dart';
 
 class Stack<T> {
   T? _head;
@@ -76,16 +77,21 @@ class Stack<T> {
   }
 }
 
+final List<String> widgetPosition = ['chat', 'linkman', 'channel', 'me'];
+
 /// 主工作区的视图状态管理器，维护了主工作区的控制器，视图列表，当前视图
-class IndexViewProvider with ChangeNotifier {
-  static IndexViewProvider instance = IndexViewProvider();
+class IndexWidgetController with ChangeNotifier {
+  static IndexWidgetController instance = IndexWidgetController();
   Map<String, int> viewPosition = {};
   List<Widget> views = [];
   Stack<String> stack = Stack<String>();
   static const String _head = '_head';
   PageController? _pageController;
 
-  IndexViewProvider();
+  ///左边栏和底部栏的指示，范围0-3
+  int _mainIndex = 0;
+
+  IndexWidgetController();
 
   PageController? get pageController {
     return _pageController;
@@ -100,12 +106,15 @@ class IndexViewProvider with ChangeNotifier {
     }
   }
 
-  ///增加新的视图，不能在build构建方法中调用，因为本方法会引起整个pageview视图的重新构建
-  define(RouteNameMixin view) {
+  ///增加新的视图，不能在initState和build构建方法中调用listen=true，
+  ///因为本方法会引起整个pageview视图的重新构建
+  define(RouteNameMixin view, {bool listen = false}) {
     if (!viewPosition.containsKey(view.routeName)) {
       views.add(view);
       viewPosition[view.routeName] = views.length - 1;
-      notifyListeners();
+      if (listen) {
+        notifyListeners();
+      }
     }
   }
 
@@ -131,11 +140,29 @@ class IndexViewProvider with ChangeNotifier {
       if (entry.value == index) {
         var current_ = entry.key;
         if (stack.head != current_) {
+          for (var i = 0; i < widgetPosition.length; ++i) {
+            var name = widgetPosition[i];
+            if (name == current_) {
+              _mainIndex = i;
+              break;
+            }
+          }
           stack.pushRepeat(current_);
           notifyListeners();
         }
         break;
       }
+    }
+  }
+
+  int get mainIndex {
+    return _mainIndex;
+  }
+
+  set mainIndex(int index) {
+    if (index >= 0 && index < widgetPosition.length) {
+      _mainIndex = index;
+      notifyListeners();
     }
   }
 
@@ -185,9 +212,32 @@ class IndexViewProvider with ChangeNotifier {
     }
   }
 
+  Color? getIconColor(int index) {
+    if (index == mainIndex) {
+      return appDataProvider.themeData?.colorScheme.primary;
+    } else {
+      return Colors.grey;
+    }
+  }
+
+  String getLabel(int index) {
+    var widgetLabels = {
+      'chat': AppLocalizations.instance.text('Chat'),
+      'linkman': AppLocalizations.instance.text('Linkman'),
+      'channel': AppLocalizations.instance.text('Channel'),
+      'me': AppLocalizations.instance.text('Me'),
+    };
+    String name = widgetPosition[index];
+    name = name ?? '';
+    String? label = widgetLabels[name];
+    label = label ?? '';
+
+    return label;
+  }
+
   @override
   dispose() {
     super.dispose();
-    instance = IndexViewProvider();
+    instance = IndexWidgetController();
   }
 }

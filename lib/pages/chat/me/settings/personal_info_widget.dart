@@ -2,19 +2,19 @@ import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/pages/chat/me/settings/qrcode_widget.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../provider/index_view_provider.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/data_group_listview.dart';
 import '../../../../widgets/common/data_listtile.dart';
 import '../../../../widgets/common/image_widget.dart';
 import '../../../../widgets/common/widget_mixin.dart';
+import '../../index/index_widget_controller.dart';
 
 class PersonalInfoWidget extends StatelessWidget
     with BackButtonMixin, RouteNameMixin {
   final QrcodeWidget qrcodeWidget = QrcodeWidget();
 
   PersonalInfoWidget({Key? key}) : super(key: key) {
-    var indexViewProvider = IndexViewProvider.instance;
+    var indexViewProvider = IndexWidgetController.instance;
     indexViewProvider.define(qrcodeWidget);
   }
 
