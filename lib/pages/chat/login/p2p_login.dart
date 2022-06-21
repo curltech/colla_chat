@@ -1,5 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/login/loading.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
 
 import 'p2p_login_widget.dart';
@@ -43,7 +44,9 @@ class _P2pLoginState extends State<P2pLogin>
 
   @override
   Widget build(BuildContext context) {
+    appDataProvider.changeSize(context);
     var tabBarView = TabBarView(
+      //physics: const NeverScrollableScrollPhysics(),
       controller: _tabController,
       children: _children,
     );
@@ -78,8 +81,8 @@ class _P2pLoginState extends State<P2pLogin>
         duration: Duration(seconds: 2),
         child: Center(
             child: SizedBox(
-          width: 380,
-          height: 500,
+          width: 350,
+          height: 480,
           child: tabBarView,
         )));
     return Scaffold(

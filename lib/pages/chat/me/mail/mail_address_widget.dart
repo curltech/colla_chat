@@ -1,46 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../../../../entity/chat/mailaddress.dart';
-import '../../../../provider/app_data_provider.dart';
 import '../../../../widgets/common/data_group_listview.dart';
 import '../../../../widgets/common/data_listtile.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 import 'mail_address_controller.dart';
-
-final List<TileData> mailAddrTileData = [
-  TileData(
-      icon: Icon(Icons.inbox,
-          color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'Inbox'),
-  TileData(
-      icon: Icon(Icons.mark_as_unread,
-          color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'Unread'),
-  TileData(
-      icon: Icon(Icons.drafts,
-          color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'Draft'),
-  TileData(
-      icon: Icon(Icons.send,
-          color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'Sent'),
-  TileData(
-      icon: Icon(Icons.flag,
-          color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'Mark'),
-  TileData(
-      icon: Icon(Icons.delete,
-          color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'Trash'),
-  TileData(
-      icon: Icon(Icons.bug_report,
-          color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'Junk'),
-  TileData(
-      icon: Icon(Icons.ads_click,
-          color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'Ads'),
-];
 
 //邮件地址组件，带有回退回调函数
 class MailAddressWidget extends StatefulWidget

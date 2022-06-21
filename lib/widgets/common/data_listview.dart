@@ -104,6 +104,8 @@ class _DataListView extends State<DataListView> {
     Widget groupWidget = RefreshIndicator(
         onRefresh: _onRefresh,
         child: ListView.builder(
+            //该属性将决定列表的长度是否仅包裹其内容的长度。
+            // 当 ListView 嵌在一个无限长的容器组件中时， shrinkWrap 必须为true
             shrinkWrap: true,
             itemCount: widget.dataListViewController.tileData.length,
             //physics: const NeverScrollableScrollPhysics(),

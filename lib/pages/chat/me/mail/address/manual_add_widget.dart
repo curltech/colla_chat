@@ -266,7 +266,8 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
 
   @override
   Widget build(BuildContext context) {
-    return Center(
+    return Card(
+        child: SingleChildScrollView(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -293,7 +294,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
           )
         ],
       ),
-    );
+    ));
   }
 
   Future<void> _connect() async {}

@@ -87,8 +87,9 @@ class GroupDataListView extends StatelessWidget {
         }
       }
     }
-
-    return ListView(children: groups);
+    //该属性将决定列表的长度是否仅包裹其内容的长度。
+    //当ListView 嵌在一个无限长的容器组件中时， shrinkWrap 必须为true
+    return ListView(shrinkWrap: true, children: groups);
   }
 
   @override

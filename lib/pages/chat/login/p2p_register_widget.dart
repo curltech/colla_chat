@@ -71,9 +71,8 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget>
     Provider.of<AppDataProvider>(context).themeData;
     Provider.of<AppDataProvider>(context).brightness;
     return Card(
+        child: SingleChildScrollView(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: <Widget>[
           SizedBox(height: 30.0),
           Padding(
@@ -222,7 +221,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget>
           )
         ],
       ),
-    );
+    ));
   }
 
   Future<void> _register() async {

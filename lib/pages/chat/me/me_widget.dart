@@ -1,3 +1,4 @@
+import 'package:colla_chat/pages/chat/me/mail/mail_view.dart';
 import 'package:colla_chat/pages/chat/me/settings/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
 import 'package:colla_chat/provider/index_view_provider.dart';
@@ -8,20 +9,24 @@ import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/common/data_group_listview.dart';
 import '../../../widgets/common/data_listtile.dart';
 import '../../../widgets/common/widget_mixin.dart';
-import 'collection/collection_widget.dart';
+import 'mail/address/address_add.dart';
 import 'me_head_widget.dart';
 
 //我的页面，带有路由回调函数
 class MeWidget extends StatelessWidget with BackButtonMixin, RouteNameMixin {
-  CollectionWidget collectionWidget = CollectionWidget();
+  //CollectionWidget collectionWidget = CollectionWidget();
   SettingWidget settingWidget = SettingWidget();
   PersonalInfoWidget personalInfoWidget = PersonalInfoWidget();
+  MailView mailView = MailView();
+  AddressAddWidget addressAddWidget = const AddressAddWidget();
 
   MeWidget({Key? key}) : super(key: key) {
     var indexViewProvider = IndexViewProvider.instance;
-    indexViewProvider.define(collectionWidget);
+    //indexViewProvider.define(collectionWidget);
     indexViewProvider.define(settingWidget);
     indexViewProvider.define(personalInfoWidget);
+    indexViewProvider.define(mailView);
+    indexViewProvider.define(addressAddWidget);
   }
 
   @override

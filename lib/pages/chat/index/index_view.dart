@@ -155,12 +155,12 @@ class IndexViewState extends State<IndexView>
     return bottomNavigationBar;
   }
 
+  ///workspace工作区视图
   Widget _createPageView(BuildContext context) {
     var pageView = Consumer<IndexViewProvider>(
         builder: (context, indexViewProvider, child) {
       return PageView(
         //physics: const NeverScrollableScrollPhysics(),
-        //scrollBehavior: ScrollBehavior.
         controller: indexViewProvider.pageController,
         children: indexViewProvider.views,
         onPageChanged: (int index) {

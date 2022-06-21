@@ -178,6 +178,7 @@ class AppDataProvider with ChangeNotifier {
   //屏幕宽高
   double _keyboardHeight = 270.0;
   Size _size = const Size(0.0, 0.0);
+  double leftBarWidth = 90;
   String sqlite3Path = '';
 
   AppDataProvider();
@@ -301,6 +302,16 @@ class AppDataProvider with ChangeNotifier {
     return _size;
   }
 
+  Size get workspaceSize {
+    double width = _size.width - leftBarWidth;
+    double height = _size.height;
+    if (mobile) {
+      height = height - 80;
+    }
+
+    return Size(width, height);
+  }
+
   set size(Size size) {
     if (_size.height != size.height || _size.width != size.width) {
       _size = size;
@@ -349,6 +360,7 @@ class AppDataProvider with ChangeNotifier {
     localStorage.save('AppParams', json);
   }
 
+  ///当外部改变屏幕大小的时候引起index页面的重建，从而调用这个方法改变size
   changeSize(BuildContext context) {
     size = MediaQuery.of(context).size;
     var keyboardHeight = appDataProvider.keyboardHeight;

@@ -7,11 +7,12 @@ import 'auto_discover_widget.dart';
 import 'manual_add_widget.dart';
 
 /// 地址增加页面
-class P2pLogin extends StatefulWidget with BackButtonMixin, RouteNameMixin {
-  const P2pLogin({Key? key}) : super(key: key);
+class AddressAddWidget extends StatefulWidget
+    with BackButtonMixin, RouteNameMixin {
+  const AddressAddWidget({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _P2pLoginState();
+  State<StatefulWidget> createState() => _AddressAddWidgetState();
 
   @override
   String get routeName => 'mail_address';
@@ -20,7 +21,7 @@ class P2pLogin extends StatefulWidget with BackButtonMixin, RouteNameMixin {
   bool get withBack => true;
 }
 
-class _P2pLoginState extends State<P2pLogin>
+class _AddressAddWidgetState extends State<AddressAddWidget>
     with SingleTickerProviderStateMixin {
   late List<Widget> _children;
   late TabController _tabController;
@@ -40,10 +41,15 @@ class _P2pLoginState extends State<P2pLogin>
 
   @override
   Widget build(BuildContext context) {
-    var tabBarView = TabBarView(
-      controller: _tabController,
-      children: _children,
-    );
+    var tabBarView = Center(
+        child: SizedBox(
+            width: 350,
+            height: 480,
+            child: TabBarView(
+              //physics: const NeverScrollableScrollPhysics(),
+              controller: _tabController,
+              children: _children,
+            )));
     List<Widget> rightWidgets = [
       IconButton(
           onPressed: () async {

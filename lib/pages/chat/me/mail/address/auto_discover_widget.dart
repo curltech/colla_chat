@@ -28,6 +28,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget>
   @override
   Widget build(BuildContext context) {
     return Card(
+        child: SingleChildScrollView(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -122,7 +123,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget>
           )
         ],
       ),
-    );
+    ));
   }
 
   Future<void> _discover() async {
