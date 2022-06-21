@@ -61,7 +61,7 @@ class _MeWidgetState extends State<MeWidget> {
           icon: Icon(Icons.contact_mail,
               color: appDataProvider.themeData?.colorScheme.primary),
           title: '邮件地址',
-          routeName: 'mail_address',
+          routeName: 'mail_address_add',
         ),
         TileData(
           icon: Icon(Icons.email,

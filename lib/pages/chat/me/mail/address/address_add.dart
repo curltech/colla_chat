@@ -15,7 +15,7 @@ class AddressAddWidget extends StatefulWidget
   State<StatefulWidget> createState() => _AddressAddWidgetState();
 
   @override
-  String get routeName => 'mail_address';
+  String get routeName => 'mail_address_add';
 
   @override
   bool get withBack => true;
@@ -44,7 +44,7 @@ class _AddressAddWidgetState extends State<AddressAddWidget>
     var tabBarView = Center(
         child: SizedBox(
             width: 350,
-            height: 480,
+            height: 450,
             child: TabBarView(
               //physics: const NeverScrollableScrollPhysics(),
               controller: _tabController,
@@ -67,6 +67,7 @@ class _AddressAddWidgetState extends State<AddressAddWidget>
     ];
     var appBarView = AppBarView(
         title: 'Mail address add',
+        withBack: widget.withBack,
         rightActions: [
           AppLocalizations.t('Auto'),
           AppLocalizations.t('Manual')

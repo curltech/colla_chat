@@ -28,7 +28,7 @@ class MeHeadWidget extends StatelessWidget {
       trailing: const Icon(Icons.chevron_right),
       onTap: () {
         var indexWidgetController =
-            Provider.of<IndexWidgetController>(context, listen: true);
+            Provider.of<IndexWidgetController>(context, listen: false);
         indexWidgetController.push('personal_info');
       },
     );

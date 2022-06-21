@@ -97,7 +97,7 @@ class DataListTile extends StatelessWidget {
         }
         if (_tileData.routeName != null) {
           var indexWidgetController =
-              Provider.of<IndexWidgetController>(context, listen: true);
+              Provider.of<IndexWidgetController>(context, listen: false);
           indexWidgetController.push(_tileData.routeName!);
         }
       },

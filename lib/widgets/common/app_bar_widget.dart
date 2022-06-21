@@ -37,7 +37,7 @@ class AppBarWidget extends StatelessWidget {
             backCallBack();
           } else {
             var indexWidgetController =
-                Provider.of<IndexWidgetController>(context, listen: true);
+                Provider.of<IndexWidgetController>(context, listen: false);
             indexWidgetController.pop();
           }
         },
