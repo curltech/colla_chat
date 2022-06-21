@@ -3,6 +3,7 @@ import 'package:colla_chat/pages/chat/me/mail/mail_view.dart';
 import 'package:colla_chat/pages/chat/me/settings/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../provider/app_data_provider.dart';
 import '../../../widgets/common/app_bar_view.dart';
@@ -13,20 +14,37 @@ import 'mail/address/address_add.dart';
 import 'me_head_widget.dart';
 
 //我的页面，带有路由回调函数
-class MeWidget extends StatelessWidget with BackButtonMixin, RouteNameMixin {
-  //CollectionWidget collectionWidget = CollectionWidget();
-  SettingWidget settingWidget = SettingWidget();
-  PersonalInfoWidget personalInfoWidget = PersonalInfoWidget();
-  MailView mailView = MailView();
-  AddressAddWidget addressAddWidget = const AddressAddWidget();
+class MeWidget extends StatefulWidget with BackButtonMixin, RouteNameMixin {
+  MeWidget({Key? key}) : super(key: key);
 
-  MeWidget({Key? key}) : super(key: key) {
-    var indexViewProvider = IndexWidgetController.instance;
-    //indexViewProvider.define(collectionWidget);
-    indexViewProvider.define(settingWidget);
-    indexViewProvider.define(personalInfoWidget);
-    indexViewProvider.define(mailView);
-    indexViewProvider.define(addressAddWidget);
+  @override
+  bool get withBack => true;
+
+  @override
+  String get routeName => 'me';
+
+  @override
+  State<StatefulWidget> createState() {
+    return _MeWidgetState();
+  }
+}
+
+class _MeWidgetState extends State<MeWidget> {
+  @override
+  initState() {
+    super.initState();
+    //CollectionWidget collectionWidget = CollectionWidget();
+    SettingWidget settingWidget = SettingWidget();
+    PersonalInfoWidget personalInfoWidget = PersonalInfoWidget();
+    MailView mailView = MailView();
+    AddressAddWidget addressAddWidget = const AddressAddWidget();
+    var indexWidgetController =
+        Provider.of<IndexWidgetController>(context, listen: false);
+    //indexWidgetController.define(collectionWidget);
+    indexWidgetController.define(settingWidget);
+    indexWidgetController.define(personalInfoWidget);
+    indexWidgetController.define(mailView);
+    indexWidgetController.define(addressAddWidget);
   }
 
   @override
@@ -67,10 +85,4 @@ class MeWidget extends StatelessWidget with BackButtonMixin, RouteNameMixin {
         ]));
     return me;
   }
-
-  @override
-  bool get withBack => true;
-
-  @override
-  String get routeName => 'me';
 }

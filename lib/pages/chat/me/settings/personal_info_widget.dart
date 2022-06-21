@@ -1,6 +1,7 @@
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/pages/chat/me/settings/qrcode_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/data_group_listview.dart';
@@ -9,13 +10,31 @@ import '../../../../widgets/common/image_widget.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 import '../../index/index_widget_controller.dart';
 
-class PersonalInfoWidget extends StatelessWidget
+class PersonalInfoWidget extends StatefulWidget
     with BackButtonMixin, RouteNameMixin {
-  final QrcodeWidget qrcodeWidget = QrcodeWidget();
+  PersonalInfoWidget({Key? key}) : super(key: key);
 
-  PersonalInfoWidget({Key? key}) : super(key: key) {
-    var indexViewProvider = IndexWidgetController.instance;
-    indexViewProvider.define(qrcodeWidget);
+  @override
+  State<StatefulWidget> createState() {
+    return _PersonalInfoWidgetState();
+  }
+
+  @override
+  bool get withBack => true;
+
+  @override
+  String get routeName => 'personal_info';
+}
+
+class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
+    with SingleTickerProviderStateMixin {
+  @override
+  void initState() {
+    super.initState();
+    var indexWidgetController =
+        Provider.of<IndexWidgetController>(context, listen: false);
+    final QrcodeWidget qrcodeWidget = QrcodeWidget();
+    indexWidgetController.define(qrcodeWidget);
   }
 
   @override
@@ -56,14 +75,8 @@ class PersonalInfoWidget extends StatelessWidget
     };
     var personalInfo = AppBarView(
         title: 'Personal Information',
-        withBack: withBack,
+        withBack: widget.withBack,
         child: GroupDataListView(tileData: personalInfoTileData));
     return personalInfo;
   }
-
-  @override
-  bool get withBack => true;
-
-  @override
-  String get routeName => 'personal_info';
 }

@@ -1,5 +1,6 @@
 import 'package:colla_chat/pages/chat/index/index_widget_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../provider/app_data_provider.dart';
 
@@ -35,8 +36,9 @@ class AppBarWidget extends StatelessWidget {
           if (backCallBack != null) {
             backCallBack();
           } else {
-            var indexViewProvider = IndexWidgetController.instance;
-            indexViewProvider.pop();
+            var indexWidgetController =
+                Provider.of<IndexWidgetController>(context, listen: true);
+            indexWidgetController.pop();
           }
         },
       );
