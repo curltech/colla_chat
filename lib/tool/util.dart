@@ -249,21 +249,44 @@ class DateUtil {
   }
 
   static formatChinese(String strDate) {
-    DateTime t = DateTime.parse(strDate);
-    DateTime c = DateTime.now().toUtc();
-    Duration diff = c.difference(t);
-    switch (diff.inDays) {
+    DateTime t = DateTime.parse(strDate).toLocal();
+    strDate = t.toIso8601String();
+    int pos = strDate.indexOf('T');
+    var strDay = strDate.substring(0, pos);
+    var strTime = strDate.substring(pos);
+    pos = strTime.indexOf('.');
+    strTime = strTime.substring(1, pos);
+    DateTime c = DateTime.now().toLocal();
+    int diff = c.day - t.day;
+    switch (diff) {
+      case -3:
+        strDay = '大后天';
+        break;
+      case -2:
+        strDay = '后天';
+        break;
+      case -1:
+        strDay = '明天';
+        break;
       case 0:
-        return '今天';
+        strDay = '今天';
+        break;
       case 1:
-        return '昨天';
+        strDay = '昨天';
+        break;
+      case 2:
+        strDay = '前天';
+        break;
       case 3:
-        return '前天';
+        strDay = '大前天';
+        break;
       case 4:
-        return '四天前';
+        strDay = '四天前';
+        break;
       default:
-        return strDate;
+        break;
     }
+    return '$strDay $strTime';
   }
 
   static const String full = "yyyy-MM-dd HH:mm:ss";

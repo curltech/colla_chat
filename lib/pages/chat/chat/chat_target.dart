@@ -8,12 +8,24 @@ import '../../../widgets/common/widget_mixin.dart';
 
 final Map<TileData, List<TileData>> mockTileData = {
   TileData(title: '群'): [
-    TileData(title: '家庭群', subtitle: '美国留学', suffix: DateUtil.currentDate()),
-    TileData(title: 'MBA群', subtitle: '上海团购', suffix: DateUtil.currentDate()),
+    TileData(
+        title: '家庭群',
+        subtitle: '美国留学',
+        suffix: DateUtil.formatChinese(DateUtil.currentDate())),
+    TileData(
+        title: 'MBA群',
+        subtitle: '上海团购',
+        suffix: DateUtil.formatChinese('2022-06-20T09:23:45.000Z')),
   ],
   TileData(title: '个人'): [
-    TileData(title: '李志群', subtitle: '', suffix: DateUtil.currentDate()),
-    TileData(title: '胡百水', subtitle: '', suffix: DateUtil.currentDate()),
+    TileData(
+        title: '李志群',
+        subtitle: '',
+        suffix: DateUtil.formatChinese('2022-06-21T16:23:45.000Z')),
+    TileData(
+        title: '胡百水',
+        subtitle: '',
+        suffix: DateUtil.formatChinese('2022-06-20T21:23:45.000Z')),
   ]
 };
 
