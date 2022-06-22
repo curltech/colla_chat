@@ -207,7 +207,7 @@ class ServiceLocator {
     var mailAddressService = await MailAddressService.init(
         tableName: "chat_mailaddress",
         indexFields: ['ownerPeerId', 'mail', 'name'],
-        fields: buildFields(MailAddress(), []));
+        fields: buildFields(MailAddress(name: '', email: ''), []));
     services['chat_mailaddress'] = mailAddressService;
 
     await Sqlite3.getInstance();

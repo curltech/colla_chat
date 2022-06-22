@@ -3,35 +3,37 @@ import '../base.dart';
 /// 邮件地址
 class MailAddress extends BaseEntity {
   String? ownerPeerId;
-  String? name;
+  String name;
+  String email;
   String? username;
   String? password;
   String? domain;
-  String? email;
   String? imapServerHost;
-  int imapServerPort = 143;
+  int imapServerPort = 993;
   bool imapServerSecure = true;
   String? popServerHost;
-  int popServerPort = 110;
+  int popServerPort = 995;
   bool popServerSecure = true;
   String? smtpServerHost;
-  int smtpServerPort = 25;
+  int smtpServerPort = 465;
   bool smtpServerSecure = true;
   bool isDefault = false;
 
   MailAddress(
-      {this.name,
+      {required this.name,
+      required this.email,
       this.username,
       this.domain,
-      this.email,
       this.imapServerHost,
-      this.imapServerPort = 143,
+      this.imapServerPort = 993,
       this.popServerHost,
-      this.popServerPort = 110,
+      this.popServerPort = 995,
       this.smtpServerHost,
-      this.smtpServerPort = 25,
+      this.smtpServerPort = 465,
       this.isDefault = false}) {
-    email = '$username@$domain';
+    var emails = email.split('@');
+    username = emails[0];
+    domain = emails[1];
   }
 
   MailAddress.fromJson(Map json)

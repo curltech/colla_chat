@@ -35,4 +35,23 @@ class MailAddressService extends BaseService {
     }
     return mailAddress;
   }
+
+  Future<MailAddress?> findByMailAddress(String email) async {
+    var mailAddress_ = await findOne('email=?', whereArgs: [email]);
+    if (mailAddress_ != null) {
+      var mailAddr = MailAddress.fromJson(mailAddress_);
+      return mailAddr;
+    }
+    return null;
+  }
+
+  store(MailAddress mailAddress) async {
+    MailAddress? old = await findByMailAddress(mailAddress.email);
+    if (old != null) {
+      mailAddress.id = old.id;
+      await update(mailAddress);
+    } else {
+      await insert(mailAddress);
+    }
+  }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../../../l10n/localization.dart';
+import '../../../../../provider/app_data_provider.dart';
+import '../../../../../service/chat/mailaddress.dart';
 import '../../../../../tool/util.dart';
 import '../../../../../transport/emailclient.dart';
 
@@ -15,9 +17,9 @@ class AutoDiscoverWidget extends StatefulWidget {
 class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget>
     with AutomaticKeepAliveClientMixin {
   final _formKey = GlobalKey<FormState>();
-  String _name = '';
-  String _email = '';
-  String _password = '';
+  String _name = '胡劲松';
+  String _email = 'hujs06@163.com';
+  String _password = 'OZJBOVNGLGCWAZZX';
   bool _pwdShow = false;
 
   @override
@@ -127,31 +129,56 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget>
   }
 
   Future<void> _discover() async {
-    var emailClient = await EmailClientPool.instance
-        .create(address: _email, personalName: _name);
-    if (emailClient != null) {
-      if (emailClient.config != null) {
-        DialogUtil.info(context, content: 'auto discovry success');
-      } else {
-        DialogUtil.error(context, content: 'auto discovry fail');
-      }
+    if (StringUtil.isEmpty(_email) || StringUtil.isEmpty(_name)) {
+      logger.e('email or name is empty');
+      return;
     }
+    await EmailClientPool.instance
+        .create(email: _email, name: _name)
+        .then((EmailClient? emailClient) {
+      if (emailClient != null) {
+        if (emailClient.config != null) {
+          DialogUtil.info(context, content: 'auto discover successfully');
+        } else {
+          DialogUtil.error(context, content: 'auto discover failure');
+        }
+      }
+    });
   }
 
-  Future<void> _connect() async {
-    var emailClient = await EmailClientPool.instance
-        .create(address: _email, personalName: _name);
-    if (emailClient != null) {
-      if (emailClient.config != null) {
-        DialogUtil.info(context, content: 'auto discovry success');
-        bool success = await emailClient.connect(_password);
-        if (!success) {
-          DialogUtil.error(context, content: 'auto connect fail');
-        }
-      } else {
-        DialogUtil.error(context, content: 'auto discovry fail');
-      }
+  _connect() {
+    if (StringUtil.isEmpty(_email) ||
+        StringUtil.isEmpty(_name) ||
+        StringUtil.isEmpty(_password)) {
+      logger.e('email or name or password is empty');
+      return;
     }
+    EmailClientPool.instance
+        .create(email: _email, name: _name)
+        .then((EmailClient? emailClient) {
+      if (emailClient != null) {
+        var config = emailClient.config;
+        if (config != null) {
+          emailClient.connect(_password).then((bool success) {
+            if (!success) {
+              logger.e('connect fail to ${config.displayName}.');
+            } else {
+              logger.i('connect success to ${config.displayName}.');
+              DialogUtil.alert(context, content: '保存为地址吗?')
+                  .then((bool? result) async {
+                if (result != null && result) {
+                  ///保存地址
+                  var mailAddress = emailClient.mailAddress;
+                  await MailAddressService.instance.store(mailAddress);
+                }
+              });
+            }
+          });
+        } else {
+          logger.e('discover fail.');
+        }
+      }
+    });
   }
 
   @override
