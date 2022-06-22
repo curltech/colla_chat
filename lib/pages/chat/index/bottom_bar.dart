@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../provider/app_data_provider.dart';
-import 'index_widget_controller.dart';
+import '../../../provider/index_widget_provider.dart';
 
 ///mobile底边栏，用于指示当前主页面
 class BottomBar extends StatefulWidget {
@@ -21,25 +21,25 @@ class _BottomBarState extends State<BottomBar> {
   }
 
   Widget _createBottomBar(BuildContext context) {
-    Widget bottomNavigationBar = Consumer<IndexWidgetController>(
-        builder: (context, indexWidgetController, child) {
+    Widget bottomNavigationBar = Consumer<IndexWidgetProvider>(
+        builder: (context, indexWidgetProvider, child) {
       return BottomNavigationBar(
         //底部按钮，移动版才有
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
               icon: const Icon(Icons.chat),
-              label: indexWidgetController.getLabel(0)),
+              label: indexWidgetProvider.getLabel(0)),
           BottomNavigationBarItem(
               icon: const Icon(Icons.contacts),
-              label: indexWidgetController.getLabel(1)),
+              label: indexWidgetProvider.getLabel(1)),
           BottomNavigationBarItem(
               icon: const Icon(Icons.wifi_channel),
-              label: indexWidgetController.getLabel(2)),
+              label: indexWidgetProvider.getLabel(2)),
           BottomNavigationBarItem(
               icon: const Icon(Icons.person),
-              label: indexWidgetController.getLabel(3)),
+              label: indexWidgetProvider.getLabel(3)),
         ],
-        currentIndex: indexWidgetController.mainIndex,
+        currentIndex: indexWidgetProvider.mainIndex,
         selectedItemColor: Provider.of<AppDataProvider>(context)
             .themeData
             ?.colorScheme
@@ -50,8 +50,9 @@ class _BottomBarState extends State<BottomBar> {
         showSelectedLabels: true,
         showUnselectedLabels: true,
         onTap: (int index) {
-          indexWidgetController.mainIndex = index;
-          indexWidgetController.push(widgetPosition[index]);
+          indexWidgetProvider.mainIndex = index;
+          //不传入路由context和样式，走工作区路由
+          indexWidgetProvider.push(widgetPosition[index]);
         },
       );
     });

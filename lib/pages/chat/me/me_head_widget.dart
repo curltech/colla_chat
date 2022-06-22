@@ -2,8 +2,8 @@ import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../provider/index_widget_provider.dart';
 import '../../../widgets/common/image_widget.dart';
-import '../index/index_widget_controller.dart';
 
 class MeHeadWidget extends StatelessWidget {
   const MeHeadWidget({Key? key}) : super(key: key);
@@ -27,9 +27,9 @@ class MeHeadWidget extends StatelessWidget {
       subtitle: Text(peerId),
       trailing: const Icon(Icons.chevron_right),
       onTap: () {
-        var indexWidgetController =
-            Provider.of<IndexWidgetController>(context, listen: false);
-        indexWidgetController.push('personal_info');
+        var indexWidgetProvider =
+            Provider.of<IndexWidgetProvider>(context, listen: false);
+        indexWidgetProvider.push('personal_info', context: context);
       },
     );
     return InkWell(

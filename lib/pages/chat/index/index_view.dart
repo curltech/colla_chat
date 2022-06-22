@@ -1,5 +1,5 @@
 import 'package:colla_chat/pages/chat/index/end_drawer.dart';
-import 'package:colla_chat/pages/chat/index/index_widget_controller.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -61,9 +61,8 @@ class IndexViewState extends State<IndexView>
   Widget build(BuildContext context) {
     appDataProvider.changeSize(context);
     var scaffold = _createScaffold(context);
-    var provider = ChangeNotifierProvider.value(
-      value: IndexWidgetController.instance,
-      child: scaffold,
+    var provider = Consumer<IndexWidgetProvider>(
+      builder: (context, indexWidgetProvider, child) => scaffold,
     );
     return provider;
   }

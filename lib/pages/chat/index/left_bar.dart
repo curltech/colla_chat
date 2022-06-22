@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'index_widget_controller.dart';
+import '../../../provider/index_widget_provider.dart';
 
 ///destop右边栏，用于指示当前主页面
 class LeftBar extends StatefulWidget {
@@ -20,63 +20,60 @@ class _LeftBarState extends State<LeftBar> {
   }
 
   Widget _createLeftBar(BuildContext context) {
-    return Consumer<IndexWidgetController>(
-        builder: (context, indexWidgetController, child) {
+    return Consumer<IndexWidgetProvider>(
+        builder: (context, indexWidgetProvider, child) {
       return SizedBox(
-        width: 90.0,
+        width: indexWidgetProvider.leftBarWidth,
         child: ListView(
           children: <Widget>[
             ListTile(
-                iconColor: indexWidgetController.getIconColor(0),
+                iconColor: indexWidgetProvider.getIconColor(0),
                 title: Icon(Icons.chat),
                 subtitle: Text(
-                  indexWidgetController.getLabel(0),
+                  indexWidgetProvider.getLabel(0),
                   textAlign: TextAlign.center,
-                  style:
-                      TextStyle(color: indexWidgetController.getIconColor(0)),
+                  style: TextStyle(color: indexWidgetProvider.getIconColor(0)),
                 ),
                 onTap: () {
-                  indexWidgetController.mainIndex = 0;
-                  indexWidgetController.push(widgetPosition[0]);
+                  indexWidgetProvider.mainIndex = 0;
+                  //不传入路由context和样式，走工作区路由
+                  indexWidgetProvider.push(widgetPosition[0]);
                 }),
             ListTile(
-                iconColor: indexWidgetController.getIconColor(1),
+                iconColor: indexWidgetProvider.getIconColor(1),
                 title: Icon(Icons.contacts),
                 subtitle: Text(
-                  indexWidgetController.getLabel(1),
+                  indexWidgetProvider.getLabel(1),
                   textAlign: TextAlign.center,
-                  style:
-                      TextStyle(color: indexWidgetController.getIconColor(1)),
+                  style: TextStyle(color: indexWidgetProvider.getIconColor(1)),
                 ),
                 onTap: () {
-                  indexWidgetController.mainIndex = 1;
-                  indexWidgetController.push(widgetPosition[1]);
+                  indexWidgetProvider.mainIndex = 1;
+                  indexWidgetProvider.push(widgetPosition[1]);
                 }),
             ListTile(
-                iconColor: indexWidgetController.getIconColor(2),
+                iconColor: indexWidgetProvider.getIconColor(2),
                 title: Icon(Icons.wifi_channel),
                 subtitle: Text(
-                  indexWidgetController.getLabel(2),
+                  indexWidgetProvider.getLabel(2),
                   textAlign: TextAlign.center,
-                  style:
-                      TextStyle(color: indexWidgetController.getIconColor(2)),
+                  style: TextStyle(color: indexWidgetProvider.getIconColor(2)),
                 ),
                 onTap: () {
-                  indexWidgetController.mainIndex = 2;
-                  indexWidgetController.push(widgetPosition[2]);
+                  indexWidgetProvider.mainIndex = 2;
+                  indexWidgetProvider.push(widgetPosition[2]);
                 }),
             ListTile(
-                iconColor: indexWidgetController.getIconColor(3),
+                iconColor: indexWidgetProvider.getIconColor(3),
                 title: Icon(Icons.person),
                 subtitle: Text(
-                  indexWidgetController.getLabel(3),
+                  indexWidgetProvider.getLabel(3),
                   textAlign: TextAlign.center,
-                  style:
-                      TextStyle(color: indexWidgetController.getIconColor(3)),
+                  style: TextStyle(color: indexWidgetProvider.getIconColor(3)),
                 ),
                 onTap: () {
-                  indexWidgetController.mainIndex = 3;
-                  indexWidgetController.push(widgetPosition[3]);
+                  indexWidgetProvider.mainIndex = 3;
+                  indexWidgetProvider.push(widgetPosition[3]);
                 }),
           ],
         ),

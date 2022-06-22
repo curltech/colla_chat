@@ -1,8 +1,12 @@
+import 'package:colla_chat/routers/routes.dart';
+import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 
-import '../../../l10n/localization.dart';
-import '../../../provider/app_data_provider.dart';
-import '../../../widgets/common/widget_mixin.dart';
+import '../l10n/localization.dart';
+import '../routers/navigator_util.dart';
+import '../widgets/common/data_listtile.dart';
+import '../widgets/common/widget_mixin.dart';
+import 'app_data_provider.dart';
 
 class Stack<T> {
   T? _head;
@@ -80,8 +84,8 @@ class Stack<T> {
 final List<String> widgetPosition = ['chat', 'linkman', 'channel', 'me'];
 
 /// 主工作区的视图状态管理器，维护了主工作区的控制器，视图列表，当前视图
-class IndexWidgetController with ChangeNotifier {
-  static IndexWidgetController instance = IndexWidgetController();
+class IndexWidgetProvider with ChangeNotifier {
+  static IndexWidgetProvider instance = IndexWidgetProvider();
   Map<String, int> viewPosition = {};
   List<Widget> views = [];
   Stack<String> stack = Stack<String>();
@@ -91,7 +95,9 @@ class IndexWidgetController with ChangeNotifier {
   ///左边栏和底部栏的指示，范围0-3
   int _mainIndex = 0;
 
-  IndexWidgetController();
+  double _leftBarWidth = 90;
+
+  IndexWidgetProvider();
 
   PageController? get pageController {
     return _pageController;
@@ -112,6 +118,11 @@ class IndexWidgetController with ChangeNotifier {
     if (!viewPosition.containsKey(view.routeName)) {
       views.add(view);
       viewPosition[view.routeName] = views.length - 1;
+      Application.router.define('/${view.routeName}', handler: Handler(
+          handlerFunc:
+              (BuildContext? context, Map<String, List<String>> params) {
+        return view;
+      }));
       if (listen) {
         notifyListeners();
       }
@@ -135,22 +146,30 @@ class IndexWidgetController with ChangeNotifier {
     }
   }
 
-  set currentIndex(int index) {
+  setCurrentIndex(int index, {BuildContext? context, RouteStyle? routeStyle}) {
+    String? name;
     for (var entry in viewPosition.entries) {
       if (entry.value == index) {
-        var current_ = entry.key;
-        if (stack.head != current_) {
-          for (var i = 0; i < widgetPosition.length; ++i) {
-            var name = widgetPosition[i];
-            if (name == current_) {
-              _mainIndex = i;
-              break;
-            }
-          }
-          stack.pushRepeat(current_);
+        name = entry.key;
+        break;
+      }
+    }
+    if (name != null) {
+      for (var i = 0; i < widgetPosition.length; ++i) {
+        if (name == widgetPosition[i]) {
+          _mainIndex = i;
+          routeStyle = RouteStyle.workspace;
+          break;
+        }
+      }
+      routeStyle ??= _getRouteStyle(context: context, routeStyle: routeStyle);
+      if (routeStyle == RouteStyle.workspace) {
+        if (stack.head != name) {
+          stack.pushRepeat(name);
           notifyListeners();
         }
-        break;
+      } else if (context != null) {
+        jumpTo(name, context: context, routeStyle: routeStyle);
       }
     }
   }
@@ -166,28 +185,67 @@ class IndexWidgetController with ChangeNotifier {
     }
   }
 
+  double get leftBarWidth {
+    return _leftBarWidth;
+  }
+
+  set leftBarWidth(double width) {
+    if (width < 0) {
+      width = 0;
+    }
+    _leftBarWidth = width;
+    notifyListeners();
+  }
+
   ///把名字压入堆栈，然后跳转
-  push(String name) {
-    if (viewPosition.containsKey(name)) {
-      if (stack.head != name) {
-        stack.pushRepeat(name);
-        jumpTo(name);
+  push(String name, {BuildContext? context, RouteStyle? routeStyle}) {
+    routeStyle = _getRouteStyle(context: context, routeStyle: routeStyle);
+    if (routeStyle == RouteStyle.workspace) {
+      if (viewPosition.containsKey(name)) {
+        if (stack.head != name) {
+          stack.pushRepeat(name);
+          jumpTo(name, context: context, routeStyle: routeStyle);
+        }
       }
+    } else if (context != null) {
+      jumpTo(name, context: context, routeStyle: routeStyle);
     }
   }
 
+  RouteStyle _getRouteStyle({BuildContext? context, RouteStyle? routeStyle}) {
+    if (routeStyle == null) {
+      if (appDataProvider.mobile && context != null) {
+        routeStyle = RouteStyle.navigator;
+      } else {
+        routeStyle = RouteStyle.workspace;
+      }
+    }
+    return routeStyle;
+  }
+
   ///弹出最新的，跳转到第二新的
-  pop() {
-    stack.pop();
-    String? head = stack.head;
-    if (head != null) {
-      jumpTo(head);
+  pop({BuildContext? context, RouteStyle? routeStyle}) {
+    routeStyle = _getRouteStyle(context: context, routeStyle: routeStyle);
+    if (routeStyle == RouteStyle.workspace) {
+      stack.pop();
+      String? head = stack.head;
+      if (head != null) {
+        jumpTo(head);
+      }
+    } else if (context != null) {
+      NavigatorUtil.goBack(context);
     }
   }
 
   ///判断是否有可弹出的视图
-  bool canPop() {
-    return stack.canPop();
+  bool canPop({BuildContext? context, RouteStyle? routeStyle}) {
+    routeStyle = _getRouteStyle(context: context, routeStyle: routeStyle);
+    if (routeStyle == RouteStyle.workspace) {
+      return stack.canPop();
+    } else if (context != null) {
+      return NavigatorUtil.canBack(context);
+    }
+    return false;
   }
 
   ///直接跳转到位置的视图
@@ -202,13 +260,18 @@ class IndexWidgetController with ChangeNotifier {
   }
 
   ///直接跳转到名字的视图
-  jumpTo(String name) {
-    int? index = viewPosition[name];
-    if (index != null &&
-        index > -1 &&
-        index < views.length &&
-        _pageController != null) {
-      _pageController!.jumpToPage(index);
+  jumpTo(String name, {BuildContext? context, RouteStyle? routeStyle}) {
+    routeStyle = _getRouteStyle(context: context, routeStyle: routeStyle);
+    if (routeStyle == RouteStyle.workspace) {
+      int? index = viewPosition[name];
+      if (index != null &&
+          index > -1 &&
+          index < views.length &&
+          _pageController != null) {
+        _pageController!.jumpToPage(index);
+      }
+    } else if (context != null) {
+      NavigatorUtil.jump(context, '/$name');
     }
   }
 
@@ -233,11 +296,5 @@ class IndexWidgetController with ChangeNotifier {
     label = label ?? '';
 
     return label;
-  }
-
-  @override
-  dispose() {
-    super.dispose();
-    instance = IndexWidgetController();
   }
 }

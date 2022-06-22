@@ -1,8 +1,9 @@
-import 'package:colla_chat/pages/chat/index/index_widget_controller.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../provider/app_data_provider.dart';
+import 'data_listtile.dart';
 
 ///工作区的顶部栏AppBar，定义了回退按钮
 class AppBarWidget extends StatelessWidget {
@@ -12,6 +13,8 @@ class AppBarWidget extends StatelessWidget {
   final Function(int index)? rightCallBack;
   final Widget? bottom;
   final bool withBack;
+  //回退路由样式
+  final RouteStyle? backRouteStyle;
   final Function? backCallBack;
 
   const AppBarWidget(
@@ -22,6 +25,7 @@ class AppBarWidget extends StatelessWidget {
       this.rightCallBack,
       this.bottom,
       this.withBack = false,
+      this.backRouteStyle,
       this.backCallBack})
       : super(key: key);
 
@@ -36,9 +40,10 @@ class AppBarWidget extends StatelessWidget {
           if (backCallBack != null) {
             backCallBack();
           } else {
-            var indexWidgetController =
-                Provider.of<IndexWidgetController>(context, listen: false);
-            indexWidgetController.pop();
+            var indexWidgetProvider =
+                Provider.of<IndexWidgetProvider>(context, listen: false);
+            indexWidgetProvider.pop(
+                routeStyle: backRouteStyle, context: context);
           }
         },
       );
@@ -89,8 +94,7 @@ class AppBarWidget extends StatelessWidget {
     return null;
   }
 
-  @override
-  Widget build(BuildContext context) {
+  _build(BuildContext context) {
     var listTiles = <Widget>[];
     Widget? trailing = rightWidget();
     trailing = trailing ?? rightAction();
@@ -107,8 +111,14 @@ class AppBarWidget extends StatelessWidget {
     if (bottom != null) {
       listTiles.add(Expanded(child: bottom));
     }
-    return Column(
-      children: listTiles,
-    );
+    return Column(children: listTiles);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<IndexWidgetProvider>(
+        builder: (context, indexWidgetProvider, child) {
+      return _build(context);
+    });
   }
 }

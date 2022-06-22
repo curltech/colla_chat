@@ -11,6 +11,10 @@ class NavigatorUtil {
     Application.router.pop(context);
   }
 
+  static bool canBack(BuildContext context) {
+    return Navigator.canPop(context);
+  }
+
   // 带参数的返回
   static void goBackWithParams(BuildContext context, result) {
     //Navigator.pop(context, result);

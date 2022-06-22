@@ -3,12 +3,12 @@ import 'package:colla_chat/pages/chat/me/settings/qrcode_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../provider/index_widget_provider.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/data_group_listview.dart';
 import '../../../../widgets/common/data_listtile.dart';
 import '../../../../widgets/common/image_widget.dart';
 import '../../../../widgets/common/widget_mixin.dart';
-import '../../index/index_widget_controller.dart';
 
 class PersonalInfoWidget extends StatefulWidget
     with BackButtonMixin, RouteNameMixin {
@@ -31,10 +31,10 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
   @override
   void initState() {
     super.initState();
-    var indexWidgetController =
-        Provider.of<IndexWidgetController>(context, listen: false);
+    var indexWidgetProvider =
+        Provider.of<IndexWidgetProvider>(context, listen: false);
     final QrcodeWidget qrcodeWidget = QrcodeWidget();
-    indexWidgetController.define(qrcodeWidget);
+    indexWidgetProvider.define(qrcodeWidget);
   }
 
   @override

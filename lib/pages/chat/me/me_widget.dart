@@ -1,7 +1,7 @@
-import 'package:colla_chat/pages/chat/index/index_widget_controller.dart';
 import 'package:colla_chat/pages/chat/me/mail/mail_view.dart';
 import 'package:colla_chat/pages/chat/me/settings/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -38,13 +38,13 @@ class _MeWidgetState extends State<MeWidget> {
     PersonalInfoWidget personalInfoWidget = PersonalInfoWidget();
     MailView mailView = MailView();
     AddressAddWidget addressAddWidget = const AddressAddWidget();
-    var indexWidgetController =
-        Provider.of<IndexWidgetController>(context, listen: false);
-    //indexWidgetController.define(collectionWidget);
-    indexWidgetController.define(settingWidget);
-    indexWidgetController.define(personalInfoWidget);
-    indexWidgetController.define(mailView);
-    indexWidgetController.define(addressAddWidget);
+    var indexWidgetProvider =
+        Provider.of<IndexWidgetProvider>(context, listen: false);
+    //indexWidgetProvider.define(collectionWidget);
+    indexWidgetProvider.define(settingWidget);
+    indexWidgetProvider.define(personalInfoWidget);
+    indexWidgetProvider.define(mailView);
+    indexWidgetProvider.define(addressAddWidget);
   }
 
   @override

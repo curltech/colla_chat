@@ -1,9 +1,12 @@
 import 'dart:typed_data';
 
-import 'package:colla_chat/pages/chat/index/index_widget_controller.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+///指定路由样式，不指定则系统判断，系统判断的方法是如果是移动则走全局路由，否则走工作区路由
+enum RouteStyle { workspace, navigator }
 
 /// 通用列表项的数据模型
 class TileData {
@@ -18,6 +21,8 @@ class TileData {
   late final String? subtitle;
   late final dynamic suffix;
   late final String? routeName;
+  //进入路由样式
+  late final RouteStyle? routeStyle;
   Function(String title)? onTap;
 
   TileData(
@@ -27,6 +32,7 @@ class TileData {
       this.subtitle,
       this.suffix,
       this.routeName,
+      this.routeStyle,
       this.onTap});
 }
 
@@ -96,9 +102,10 @@ class DataListTile extends StatelessWidget {
           call(_tileData.title);
         }
         if (_tileData.routeName != null) {
-          var indexWidgetController =
-              Provider.of<IndexWidgetController>(context, listen: false);
-          indexWidgetController.push(_tileData.routeName!);
+          var indexWidgetProvider =
+              Provider.of<IndexWidgetProvider>(context, listen: false);
+          indexWidgetProvider.push(_tileData.routeName!,
+              context: context, routeStyle: _tileData.routeStyle);
         }
       },
     );
