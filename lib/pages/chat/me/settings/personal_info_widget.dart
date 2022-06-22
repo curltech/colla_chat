@@ -64,7 +64,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
         ),
         TileData(
           title: 'PeerId',
-          suffix: peerId,
+          subtitle: peerId,
           routeName: 'peerId',
         ),
         TileData(
