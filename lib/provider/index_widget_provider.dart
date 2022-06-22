@@ -257,11 +257,12 @@ class IndexWidgetProvider with ChangeNotifier {
     if (head != null) {
       _jumpTo(head);
     }
-    if (needNavigator) {
-      routeStyle = _getRouteStyle(context: context, routeStyle: routeStyle);
-      if (RouteStyle.navigator == routeStyle && context != null) {
-        NavigatorUtil.goBack(context);
-      }
+    if (!needNavigator) {
+      return;
+    }
+    routeStyle = _getRouteStyle(context: context, routeStyle: routeStyle);
+    if (RouteStyle.navigator == routeStyle && context != null) {
+      NavigatorUtil.goBack(context);
     }
   }
 
@@ -292,11 +293,12 @@ class IndexWidgetProvider with ChangeNotifier {
           break;
         }
       }
-      if (needNavigator) {
-        routeStyle = _getRouteStyle(context: context, routeStyle: routeStyle);
-        if (RouteStyle.navigator == routeStyle && context != null) {
-          NavigatorUtil.jump(context, '/$name');
-        }
+      if (!needNavigator) {
+        return;
+      }
+      routeStyle = _getRouteStyle(context: context, routeStyle: routeStyle);
+      if (RouteStyle.navigator == routeStyle && context != null) {
+        NavigatorUtil.jump(context, '/$name');
       }
     }
   }
