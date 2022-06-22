@@ -11,69 +11,89 @@ import 'app_data_provider.dart';
 class Stack<T> {
   T? _head;
 
-  ///存放元素的上一个元素
-  final Map<T, T> _stacks = {};
+  ///存放元素的上一个元素,最后一个元素的上一个元素为null
+  final Map<T, T?> _stacks = {};
+
+  ///存放元素的下一个元素，,最早一个元素的下一个元素为null
+  final Map<T, T?> _reverse = {};
 
   T? get head {
     return _head;
   }
 
+  ///直接压栈，头变成新元素，返回原来的头
   T? push(T element) {
-    if (_head != null) {
-      _stacks[element] = _head as T;
+    var back = _head;
+    if (element == back) {
+      return null;
+    }
+    _stacks[element] = _head;
+    _reverse[element] = null;
+    if (back != null) {
+      _reverse[back] = element;
     }
     _head = element;
-    return _stacks[_head];
+    logger.i('head:$_head');
+    logger.i('stacks:$_stacks');
+    logger.i('reverse:$_reverse');
+
+    return back;
   }
 
+  ///不重复压栈，如果新元素不存在，直接压栈，
+  ///如果存在，
   T? pushRepeat(T element) {
-    if (_head == null) {
-      return push(element);
-    }
+    //是头
     if (_head == element) {
-      return _head;
+      logger.i('head == new element,no change');
+      return null;
     }
-    T? current = _head;
-    T? next;
-    bool found = false;
-    while (current != null) {
-      T? pre = _stacks[current];
-      if (current == element) {
-        found = true;
-        if (next != null && pre != null) {
-          _stacks[next] = pre;
-        }
-        if (next != null && pre == null) {
-          _stacks.remove(next);
-        }
-        if (_head != null) {
-          _stacks[element] = _head as T;
-        }
-        _head = element;
-
-        return _stacks[_head];
-      }
-      next = current;
-      current = pre;
-    }
-    if (!found) {
+    if (!_stacks.containsKey(element)) {
       return push(element);
     }
+    //更早的元素
+    var pre = _stacks[element];
+    //更晚的元素,新元素不是头，所以next不为null
+    var next = _reverse[element];
+    //更新的元素的的上一个是新元素的上一个
+    if (next != null) {
+      _stacks[next] = pre;
+    }
+    if (pre != null) {
+      _reverse[pre] = next;
+    }
+    //新元素成为最晚的
+    var back = _head;
+    _stacks[element] = _head;
+    if (back != null) {
+      _reverse[back] = element;
+    }
+    _reverse[element] = null;
+    _head = element;
+    logger.i('head:$_head');
+    logger.i('stacks:$_stacks');
+    logger.i('reverse:$_reverse');
 
     return null;
   }
 
   T? pop() {
-    if (_head != null) {
-      T? pre = _stacks[_head];
-      if (pre != null) {
-        _head = pre;
-      } else {
-        _head = null;
-      }
-      return _head;
+    if (_head == null) {
+      return null;
     }
-    return null;
+    T? pre = _stacks[_head];
+    _stacks.remove(_head);
+    _reverse.remove(_head);
+    if (pre != null) {
+      _head = pre;
+      _reverse[pre] = null;
+    } else {
+      _head = null;
+    }
+    logger.i('head:$_head');
+    logger.i('stacks:$_stacks');
+    logger.i('reverse:$_reverse');
+    return _head;
   }
 
   canPop() {
@@ -155,21 +175,23 @@ class IndexWidgetProvider with ChangeNotifier {
       }
     }
     if (name != null) {
+      bool needNotify = false;
       for (var i = 0; i < widgetPosition.length; ++i) {
-        if (name == widgetPosition[i]) {
+        if (name == widgetPosition[i] && _mainIndex != i) {
           _mainIndex = i;
-          routeStyle = RouteStyle.workspace;
+          needNotify = true;
           break;
         }
       }
-      routeStyle ??= _getRouteStyle(context: context, routeStyle: routeStyle);
-      if (routeStyle == RouteStyle.workspace) {
-        if (stack.head != name) {
-          stack.pushRepeat(name);
-          notifyListeners();
+      if (stack.head != name) {
+        stack.pushRepeat(name);
+        routeStyle = _getRouteStyle(context: context, routeStyle: routeStyle);
+        if (RouteStyle.navigator == routeStyle && context != null) {
+          _jumpTo(name, context: context, routeStyle: routeStyle);
         }
-      } else if (context != null) {
-        jumpTo(name, context: context, routeStyle: routeStyle);
+      }
+      if (needNotify) {
+        notifyListeners();
       }
     }
   }
@@ -199,16 +221,11 @@ class IndexWidgetProvider with ChangeNotifier {
 
   ///把名字压入堆栈，然后跳转
   push(String name, {BuildContext? context, RouteStyle? routeStyle}) {
-    routeStyle = _getRouteStyle(context: context, routeStyle: routeStyle);
-    if (routeStyle == RouteStyle.workspace) {
-      if (viewPosition.containsKey(name)) {
-        if (stack.head != name) {
-          stack.pushRepeat(name);
-          jumpTo(name, context: context, routeStyle: routeStyle);
-        }
+    if (viewPosition.containsKey(name)) {
+      if (stack.head != name) {
+        stack.pushRepeat(name);
+        _jumpTo(name, context: context, routeStyle: routeStyle);
       }
-    } else if (context != null) {
-      jumpTo(name, context: context, routeStyle: routeStyle);
     }
   }
 
@@ -225,53 +242,62 @@ class IndexWidgetProvider with ChangeNotifier {
 
   ///弹出最新的，跳转到第二新的
   pop({BuildContext? context, RouteStyle? routeStyle}) {
-    routeStyle = _getRouteStyle(context: context, routeStyle: routeStyle);
-    if (routeStyle == RouteStyle.workspace) {
-      stack.pop();
-      String? head = stack.head;
-      if (head != null) {
-        jumpTo(head);
+    String? head = stack.head;
+    var needNavigator = true;
+    if (head != null) {
+      for (var i = 0; i < widgetPosition.length; ++i) {
+        if (head == widgetPosition[i]) {
+          needNavigator = false;
+          break;
+        }
       }
-    } else if (context != null) {
-      NavigatorUtil.goBack(context);
+    }
+    stack.pop();
+    head = stack.head;
+    if (head != null) {
+      _jumpTo(head);
+    }
+    if (needNavigator) {
+      routeStyle = _getRouteStyle(context: context, routeStyle: routeStyle);
+      if (RouteStyle.navigator == routeStyle && context != null) {
+        NavigatorUtil.goBack(context);
+      }
     }
   }
 
   ///判断是否有可弹出的视图
   bool canPop({BuildContext? context, RouteStyle? routeStyle}) {
+    bool can = stack.canPop();
     routeStyle = _getRouteStyle(context: context, routeStyle: routeStyle);
-    if (routeStyle == RouteStyle.workspace) {
-      return stack.canPop();
-    } else if (context != null) {
-      return NavigatorUtil.canBack(context);
-    }
-    return false;
-  }
-
-  ///直接跳转到位置的视图
-  jumpToPage(int index) {
-    if (index > -1 && _pageController != null && index < views.length) {
-      try {
-        _pageController!.jumpToPage(index);
-      } catch (e) {
-        logger.e('error:$e');
+    if (RouteStyle.navigator == routeStyle && context != null) {
+      if (can != NavigatorUtil.canBack(context)) {
+        logger.e('error: workspace canPop != navigator canPop');
       }
     }
+    return can;
   }
 
-  ///直接跳转到名字的视图
-  jumpTo(String name, {BuildContext? context, RouteStyle? routeStyle}) {
-    routeStyle = _getRouteStyle(context: context, routeStyle: routeStyle);
-    if (routeStyle == RouteStyle.workspace) {
-      int? index = viewPosition[name];
-      if (index != null &&
-          index > -1 &&
-          index < views.length &&
-          _pageController != null) {
-        _pageController!.jumpToPage(index);
+  ///直接跳转到名字的视图,不压栈
+  _jumpTo(String name, {BuildContext? context, RouteStyle? routeStyle}) {
+    int? index = viewPosition[name];
+    if (index != null &&
+        index > -1 &&
+        index < views.length &&
+        _pageController != null) {
+      _pageController!.jumpToPage(index);
+      var needNavigator = true;
+      for (var i = 0; i < widgetPosition.length; ++i) {
+        if (name == widgetPosition[i]) {
+          needNavigator = false;
+          break;
+        }
       }
-    } else if (context != null) {
-      NavigatorUtil.jump(context, '/$name');
+      if (needNavigator) {
+        routeStyle = _getRouteStyle(context: context, routeStyle: routeStyle);
+        if (RouteStyle.navigator == routeStyle && context != null) {
+          NavigatorUtil.jump(context, '/$name');
+        }
+      }
     }
   }
 

@@ -122,9 +122,10 @@ class _LinkmanViewState extends State<LinkmanView>
         ));
     return ChangeNotifierProvider.value(
       value: _linkmenDataProvider,
-      child: Column(
+      child: Card(
+          child: Column(
         children: [toolBar, searchBar, tabBar, Expanded(child: tabBarView)],
-      ),
+      )),
     );
   }
 

@@ -44,7 +44,7 @@ class _IndexWidgetState extends State<IndexWidget>
         controller: indexWidgetProvider.pageController,
         children: indexWidgetProvider.views,
         onPageChanged: (int index) {
-          indexWidgetProvider.setCurrentIndex(index);
+          indexWidgetProvider.setCurrentIndex(index, context: context);
         },
       );
     });
