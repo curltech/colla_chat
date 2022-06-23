@@ -8,7 +8,7 @@ import 'manual_add_widget.dart';
 
 /// 地址增加页面
 class AddressAddWidget extends StatefulWidget
-    with BackButtonMixin, RouteNameMixin {
+    with LeadingButtonMixin, RouteNameMixin {
   const AddressAddWidget({Key? key}) : super(key: key);
 
   @override
@@ -18,7 +18,7 @@ class AddressAddWidget extends StatefulWidget
   String get routeName => 'mail_address_add';
 
   @override
-  bool get withBack => true;
+  bool get withLeading => true;
 }
 
 class _AddressAddWidgetState extends State<AddressAddWidget>
@@ -67,7 +67,7 @@ class _AddressAddWidgetState extends State<AddressAddWidget>
     ];
     var appBarView = AppBarView(
         title: 'Mail address add',
-        withBack: widget.withBack,
+        withLeading: widget.withLeading,
         rightActions: [
           AppLocalizations.t('Auto'),
           AppLocalizations.t('Manual')

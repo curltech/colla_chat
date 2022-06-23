@@ -20,7 +20,7 @@ final Map<TileData, List<TileData>> mockTileData = {
 
 //频道的页面
 class ChannelWidget extends StatelessWidget
-    with BackButtonMixin, RouteNameMixin {
+    with LeadingButtonMixin, RouteNameMixin {
   late final Map<TileData, List<TileData>> channelTileData = mockTileData;
 
   ChannelWidget({Key? key}) : super(key: key);
@@ -44,7 +44,7 @@ class ChannelWidget extends StatelessWidget
   }
 
   @override
-  bool get withBack => true;
+  bool get withLeading => true;
 
   @override
   String get routeName => 'channel';

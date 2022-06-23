@@ -71,7 +71,7 @@ class ServiceLocator {
           'peerId',
           'name',
           'mobile',
-          'mail',
+          'email',
           'status',
           'updateDate'
         ],

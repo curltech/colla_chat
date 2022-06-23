@@ -17,7 +17,7 @@ import '../../../../widgets/common/widget_mixin.dart';
 import '../../../../widgets/richtext/universal_ui/universal_ui.dart';
 
 class CollectionWidget extends StatefulWidget
-    with BackButtonMixin, RouteNameMixin {
+    with LeadingButtonMixin, RouteNameMixin {
   final Function? backCallBack;
 
   CollectionWidget({Key? key, this.backCallBack}) : super(key: key);
@@ -29,7 +29,7 @@ class CollectionWidget extends StatefulWidget
   String get routeName => 'collection';
 
   @override
-  bool get withBack => true;
+  bool get withLeading => true;
 }
 
 class CollectionWidgetState extends State<CollectionWidget>
@@ -189,7 +189,7 @@ class CollectionWidgetState extends State<CollectionWidget>
       ],
     );
     var collection = AppBarView(
-        title: 'Collection', backCallBack: widget.backCallBack, child: view);
+        title: 'Collection', leadingCallBack: widget.backCallBack, child: view);
     return collection;
   }
 

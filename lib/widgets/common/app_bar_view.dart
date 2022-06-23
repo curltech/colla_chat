@@ -1,50 +1,59 @@
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import 'app_bar_widget.dart';
 import 'data_listtile.dart';
 
 ///工作区的标准视图，包裹了顶部栏AppBarWidget和一个包裹了child
 class AppBarView extends StatelessWidget {
+  final bool withLeading;
+
+  //指定回退路由样式，不指定则系统判断
+  final RouteStyle? leadingRouteStyle;
+  final Function? leadingCallBack;
   final String title;
-  final Widget child;
+  final bool centerTitle;
   final List<String>? rightActions;
+  final List<Icon>? rightIcons;
   final List<Widget>? rightWidgets;
   final Function(int index)? rightCallBack;
-  final Widget? bottom;
-  final bool withBack;
-  //指定回退路由样式，不指定则系统判断
-  final RouteStyle? backRouteStyle;
-  final Function? backCallBack;
+  final PreferredSizeWidget? bottom;
+  final Widget child;
 
-  const AppBarView(
-      {Key? key,
-      required this.title,
-      required this.child,
-      this.rightActions,
-      this.rightWidgets,
-      this.rightCallBack,
-      this.bottom,
-      this.withBack = false,
-      this.backRouteStyle,
-      this.backCallBack})
-      : super(key: key);
+  const AppBarView({
+    Key? key,
+    this.withLeading = false,
+    this.leadingRouteStyle,
+    this.leadingCallBack,
+    required this.title,
+    this.centerTitle = false,
+    this.rightActions,
+    this.rightIcons,
+    this.rightWidgets,
+    this.rightCallBack,
+    this.bottom,
+    required this.child,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-        borderOnForeground: false,
-        elevation: 0.0,
-        child: Column(children: <Widget>[
-          AppBarWidget(
-              title: title,
-              rightActions: rightActions,
-              rightWidgets: rightWidgets,
-              bottom: bottom,
-              withBack: withBack,
-              backRouteStyle: backRouteStyle,
-              backCallBack: backCallBack,
-              rightCallBack: rightCallBack),
-          child,
-        ]));
+    return Consumer<IndexWidgetProvider>(
+        builder: (context, indexWidgetProvider, child) {
+      return Scaffold(
+        appBar: AppBarWidget.build(context,
+            withLeading: withLeading,
+            leadingRouteStyle: leadingRouteStyle,
+            leadingCallBack: leadingCallBack,
+            title: title,
+            centerTitle: centerTitle,
+            rightActions: rightActions,
+            rightIcons: rightIcons,
+            rightWidgets: rightWidgets,
+            bottom: bottom,
+            rightCallBack: rightCallBack),
+        body: this.child,
+      );
+    });
   }
 }

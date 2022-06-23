@@ -10,7 +10,8 @@ import '../../../widgets/common/widget_mixin.dart';
 import 'linkman_widget.dart';
 
 //好友页面
-class LinkmanView extends StatefulWidget with BackButtonMixin, RouteNameMixin {
+class LinkmanView extends StatefulWidget
+    with LeadingButtonMixin, RouteNameMixin {
   LinkmanView({Key? key}) : super(key: key);
 
   @override
@@ -20,7 +21,7 @@ class LinkmanView extends StatefulWidget with BackButtonMixin, RouteNameMixin {
   String get routeName => 'linkman';
 
   @override
-  bool get withBack => false;
+  bool get withLeading => false;
 }
 
 class _LinkmanViewState extends State<LinkmanView>

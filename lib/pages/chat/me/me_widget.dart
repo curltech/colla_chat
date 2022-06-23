@@ -14,11 +14,11 @@ import 'mail/address/address_add.dart';
 import 'me_head_widget.dart';
 
 //我的页面，带有路由回调函数
-class MeWidget extends StatefulWidget with BackButtonMixin, RouteNameMixin {
+class MeWidget extends StatefulWidget with LeadingButtonMixin, RouteNameMixin {
   MeWidget({Key? key}) : super(key: key);
 
   @override
-  bool get withBack => true;
+  bool get withLeading => true;
 
   @override
   String get routeName => 'me';

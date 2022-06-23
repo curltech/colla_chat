@@ -10,7 +10,7 @@ import '../../../../widgets/common/widget_mixin.dart';
 
 //邮件内容组件
 class MailContentWidget extends StatefulWidget
-    with BackButtonMixin, RouteNameMixin {
+    with LeadingButtonMixin, RouteNameMixin {
   final Function? backCallBack;
 
   MailContentWidget({Key? key, this.backCallBack}) : super(key: key);
@@ -22,7 +22,7 @@ class MailContentWidget extends StatefulWidget
   String get routeName => 'mail_content';
 
   @override
-  bool get withBack => true;
+  bool get withLeading => true;
 }
 
 class _MailContentWidgetState extends State<MailContentWidget> {

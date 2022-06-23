@@ -44,7 +44,7 @@ final List<TileData> mailAddrTileData = [
 
 //邮件列表组件，带有回退回调函数
 class MailListWidget extends StatefulWidget
-    with BackButtonMixin, RouteNameMixin {
+    with LeadingButtonMixin, RouteNameMixin {
   final Function? backCallBack;
 
   MailListWidget({Key? key, this.backCallBack}) : super(key: key) {}
@@ -56,7 +56,7 @@ class MailListWidget extends StatefulWidget
   String get routeName => 'mail';
 
   @override
-  bool get withBack => false;
+  bool get withLeading => false;
 }
 
 class _MailListWidgetState extends State<MailListWidget> {

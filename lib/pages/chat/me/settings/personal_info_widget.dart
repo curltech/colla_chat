@@ -11,7 +11,7 @@ import '../../../../widgets/common/image_widget.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
 class PersonalInfoWidget extends StatefulWidget
-    with BackButtonMixin, RouteNameMixin {
+    with LeadingButtonMixin, RouteNameMixin {
   PersonalInfoWidget({Key? key}) : super(key: key);
 
   @override
@@ -20,7 +20,7 @@ class PersonalInfoWidget extends StatefulWidget
   }
 
   @override
-  bool get withBack => true;
+  bool get withLeading => true;
 
   @override
   String get routeName => 'personal_info';
@@ -75,7 +75,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
     };
     var personalInfo = AppBarView(
         title: 'Personal Information',
-        withBack: widget.withBack,
+        withLeading: widget.withLeading,
         child: GroupDataListView(tileData: personalInfoTileData));
     return personalInfo;
   }

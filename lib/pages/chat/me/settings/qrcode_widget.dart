@@ -11,7 +11,8 @@ import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/image_widget.dart';
 import '../../chat/widget/ui.dart';
 
-class QrcodeWidget extends StatefulWidget with BackButtonMixin, RouteNameMixin {
+class QrcodeWidget extends StatefulWidget
+    with LeadingButtonMixin, RouteNameMixin {
   final List<String> menus = ['保存文件', '保存图片', '分享', '重置二维码'];
   String? content;
   GlobalKey globalKey = GlobalKey();
@@ -19,7 +20,7 @@ class QrcodeWidget extends StatefulWidget with BackButtonMixin, RouteNameMixin {
   QrcodeWidget({Key? key, this.content}) : super(key: key);
 
   @override
-  bool get withBack => true;
+  bool get withLeading => true;
 
   @override
   String get routeName => 'qrcode';
@@ -65,7 +66,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
     ];
     return AppBarView(
       title: '二维码',
-      withBack: widget.withBack,
+      withLeading: widget.withLeading,
       rightActions: widget.menus,
       rightCallBack: _rightCallBack,
       child: Column(children: children),

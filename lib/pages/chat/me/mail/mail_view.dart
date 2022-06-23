@@ -5,7 +5,7 @@ import '../../../../widgets/common/data_listtile.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
 //邮件总体视图，带有回退回调函数
-class MailView extends StatefulWidget with BackButtonMixin, RouteNameMixin {
+class MailView extends StatefulWidget with LeadingButtonMixin, RouteNameMixin {
   final Function? backCallBack;
 
   MailView({Key? key, this.backCallBack}) : super(key: key) {}
@@ -17,7 +17,7 @@ class MailView extends StatefulWidget with BackButtonMixin, RouteNameMixin {
   String get routeName => 'mail';
 
   @override
-  bool get withBack => false;
+  bool get withLeading => false;
 }
 
 class _MailViewState extends State<MailView> {

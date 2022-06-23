@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-mixin BackButtonMixin on Widget {
-  bool get withBack;
+mixin LeadingButtonMixin on Widget {
+  bool get withLeading;
 }
 
 mixin RouteNameMixin on Widget {

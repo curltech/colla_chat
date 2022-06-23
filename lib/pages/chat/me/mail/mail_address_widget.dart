@@ -8,7 +8,7 @@ import 'mail_address_controller.dart';
 
 //邮件地址组件，带有回退回调函数
 class MailAddressWidget extends StatefulWidget
-    with BackButtonMixin, RouteNameMixin {
+    with LeadingButtonMixin, RouteNameMixin {
   final Function? backCallBack;
   MailAddressController mailAddressController;
 
@@ -23,7 +23,7 @@ class MailAddressWidget extends StatefulWidget
   String get routeName => 'mail_address';
 
   @override
-  bool get withBack => false;
+  bool get withLeading => false;
 }
 
 class _MailAddressWidgetState extends State<MailAddressWidget> {

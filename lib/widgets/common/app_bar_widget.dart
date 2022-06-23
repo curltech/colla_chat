@@ -2,77 +2,111 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../provider/app_data_provider.dart';
 import 'data_listtile.dart';
 
 ///工作区的顶部栏AppBar，定义了回退按钮
-class AppBarWidget extends StatelessWidget {
-  final String title;
-  final List<String>? rightActions;
-  final List<Widget>? rightWidgets;
-  final Function(int index)? rightCallBack;
-  final Widget? bottom;
-  final bool withBack;
-  //回退路由样式
-  final RouteStyle? backRouteStyle;
-  final Function? backCallBack;
+class AppBarWidget {
+  static AppBar build(
+    BuildContext context, {
+    withLeading = false,
+    leadingRouteStyle,
+    leadingCallBack,
+    title = '',
+    centerTitle = false,
+    rightActions,
+    rightIcons,
+    rightWidgets,
+    rightCallBack,
+    bottom,
+  }) {
+    var actions = <Widget>[];
+    if (rightWidgets != null && rightWidgets.isNotEmpty) {
+      actions.addAll(rightWidgets);
+    }
+    var action = popMenuButton(context,
+        rightActions: rightActions,
+        rightIcons: rightIcons,
+        rightCallBack: rightCallBack,
+        rightWidgets: rightWidgets);
+    if (action != null) {
+      actions.add(action);
+    }
+    var leading = backButton(context,
+        withLeading: withLeading,
+        leadingRouteStyle: leadingRouteStyle,
+        leadingCallBack: leadingCallBack);
+    AppBar appBar = AppBar(
+      title: Text(title),
+      elevation: 0,
+      centerTitle: centerTitle,
+      automaticallyImplyLeading: false,
+      leading: leading,
+      actions: actions,
+      bottom: bottom,
+    );
+    return appBar;
+  }
 
-  const AppBarWidget(
-      {Key? key,
-      this.title = '',
-      this.rightActions,
-      this.rightWidgets,
-      this.rightCallBack,
-      this.bottom,
-      this.withBack = false,
-      this.backRouteStyle,
-      this.backCallBack})
-      : super(key: key);
-
-  Widget? backButton(BuildContext context) {
-    Widget? backButton;
-    bool withBack = this.withBack;
-    if (withBack) {
-      backButton = IconButton(
+  static Widget? backButton(BuildContext context,
+      {bool withLeading = false,
+      final Function? leadingCallBack,
+      RouteStyle? leadingRouteStyle}) {
+    Widget? leadingButton;
+    if (withLeading) {
+      leadingButton = IconButton(
         icon: const Icon(Icons.chevron_left, color: Colors.white),
         onPressed: () {
-          final backCallBack = this.backCallBack;
-          if (backCallBack != null) {
-            backCallBack();
+          if (leadingCallBack != null) {
+            leadingCallBack();
           } else {
             var indexWidgetProvider =
                 Provider.of<IndexWidgetProvider>(context, listen: false);
             indexWidgetProvider.pop(
-                routeStyle: backRouteStyle, context: context);
+                routeStyle: leadingRouteStyle, context: context);
           }
         },
       );
     }
-    return backButton;
+    return leadingButton;
   }
 
-  PopupMenuButton<int>? rightAction() {
-    PopupMenuButton<int>? menus;
-    var rightActions = this.rightActions;
+  static PopupMenuButton<int>? popMenuButton(
+    BuildContext context, {
+    List<String>? rightActions,
+    List<Icon>? rightIcons,
+    List<Widget>? rightWidgets,
+    Function(int index)? rightCallBack,
+  }) {
+    PopupMenuButton<int>? popMenuButton;
     if (rightActions != null && rightActions.isNotEmpty) {
       List<PopupMenuItem<int>> items = [];
       int i = 0;
       for (var rightAction in rightActions) {
-        var item = PopupMenuItem<int>(
-          value: i,
-          child: Text(rightAction),
-        );
+        PopupMenuItem<int> item;
+        if (rightIcons != null && rightIcons.length > i) {
+          item = PopupMenuItem<int>(
+              value: i,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [rightIcons[i], Text(rightAction)],
+              ));
+        } else {
+          item = PopupMenuItem<int>(
+            value: i,
+            child: Text(rightAction),
+          );
+        }
         items.add(item);
         ++i;
       }
-      menus = PopupMenuButton<int>(
+      popMenuButton = PopupMenuButton<int>(
         itemBuilder: (BuildContext context) {
           return items;
         },
-        icon: const Icon(
-          Icons.add,
-          color: Colors.white,
-        ),
+        // icon: const Icon(
+        //   Icons.add,
+        //   color: Colors.white,
+        // ),
         onSelected: (int index) async {
           if (rightCallBack != null) {
             await rightCallBack!(index);
@@ -81,44 +115,6 @@ class AppBarWidget extends StatelessWidget {
       );
     }
 
-    return menus;
-  }
-
-  Widget? rightWidget() {
-    var rightWidgets = this.rightWidgets;
-    if (rightWidgets != null && rightWidgets.isNotEmpty) {
-      return Row(
-        children: rightWidgets,
-      );
-    }
-    return null;
-  }
-
-  _build(BuildContext context) {
-    var listTiles = <Widget>[];
-    Widget? trailing = rightWidget();
-    trailing = trailing ?? rightAction();
-    var listTile = ListTile(
-      title: Text(title,
-          textAlign: TextAlign.center,
-          style: const TextStyle(color: Colors.white)),
-      tileColor: appDataProvider.themeData?.colorScheme.primary,
-      leading: backButton(context),
-      trailing: rightAction(),
-    );
-    listTiles.add(listTile);
-    var bottom = this.bottom;
-    if (bottom != null) {
-      listTiles.add(Expanded(child: bottom));
-    }
-    return Column(children: listTiles);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<IndexWidgetProvider>(
-        builder: (context, indexWidgetProvider, child) {
-      return _build(context);
-    });
+    return popMenuButton;
   }
 }
