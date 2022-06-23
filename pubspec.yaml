@@ -36,7 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   # 获取系统信息和操作
   device_info: ^2.0.3
-  path_provider: ^2.0.7
+  path_provider: ^2.0.11
   image_picker: ^0.8.5+3 #选取图库
   url_launcher: ^6.1.2 #打开系统浏览器
   package_info: ^2.0.2 #获取包信息
@@ -241,6 +241,10 @@ flutter:
     - assets/locale/localization_zh_TW.json
     - assets/locale/localization_ja_JP.json
     - assets/locale/localization_ko_KR.json
+
+    - packages/openpgp/web/assets/worker.js
+    - packages/openpgp/web/assets/wasm_exec.js
+    - packages/openpgp/web/assets/openpgp.wasm
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

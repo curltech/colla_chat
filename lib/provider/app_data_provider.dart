@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:logger/logger.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../constant/address.dart';
 
@@ -29,12 +28,10 @@ final localeOptions = [
 class LocalStorage {
   static final LocalStorage _instance = LocalStorage();
   final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
-  late SharedPreferences prefs;
   static bool initStatus = false;
 
   static Future<LocalStorage> get instance async {
     if (!initStatus) {
-      _instance.prefs = await SharedPreferences.getInstance();
       initStatus = true;
     }
     return _instance;
@@ -42,7 +39,6 @@ class LocalStorage {
 
   save(String key, String value) {
     _secureStorage.write(key: key, value: value);
-    //prefs.setString(key, value);
   }
 
   Future<String?> get(String key) {
@@ -52,7 +48,6 @@ class LocalStorage {
 
   remove(String key) {
     _secureStorage.delete(key: key);
-    prefs.remove(key);
   }
 }
 

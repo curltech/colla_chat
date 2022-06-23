@@ -61,7 +61,7 @@ abstract class PeerEntity extends PeerLocation {
   PeerEntity();
   PeerEntity.fromJson(Map json)
       : mobile = json['mobile'],
-        email = json['mail'],
+        email = json['email'],
         startDate = json['startDate'],
         endDate = json['endDate'],
         lastAccessMillis = json['lastAccessMillis'],
@@ -79,7 +79,7 @@ abstract class PeerEntity extends PeerLocation {
     var json = super.toJson();
     json.addAll({
       'mobile': mobile,
-      'mail': email,
+      'email': email,
       'startDate': startDate,
       'endDate': endDate,
       'lastAccessMillis': lastAccessMillis,
