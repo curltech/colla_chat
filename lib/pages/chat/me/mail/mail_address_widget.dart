@@ -1,20 +1,17 @@
+import 'package:colla_chat/pages/chat/me/mail/mail_address_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../../../../entity/chat/mailaddress.dart';
 import '../../../../widgets/common/data_group_listview.dart';
 import '../../../../widgets/common/data_listtile.dart';
 import '../../../../widgets/common/widget_mixin.dart';
-import 'mail_address_controller.dart';
 
 //邮件地址组件，带有回退回调函数
 class MailAddressWidget extends StatefulWidget
     with LeadingButtonMixin, RouteNameMixin {
-  final Function? backCallBack;
-  MailAddressController mailAddressController;
+  final Function? leadingCallBack;
 
-  MailAddressWidget(
-      {Key? key, required this.mailAddressController, this.backCallBack})
-      : super(key: key);
+  MailAddressWidget({Key? key, this.leadingCallBack}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MailAddressWidgetState();
@@ -30,26 +27,26 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
   Map<TileData, List<TileData>> mailAddressTileData = {};
 
   @override
-  initState() async {
+  initState() {
     super.initState();
-    widget.mailAddressController.addListener(() {
-      setState(() {
-        List<MailAddress> mailAddress =
-            widget.mailAddressController.mailAddresses;
-        for (var mailAddr in mailAddress) {
-          TileData key =
-              TileData(title: mailAddr.email!, icon: Icon(Icons.email));
-          mailAddressTileData[key] = mailAddrTileData;
-        }
-      });
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    var email = Row(children: [
-      GroupDataListView(tileData: mailAddressTileData),
-    ]);
-    return email;
+    return Consumer<MailAddressProvider>(
+        builder: (context, mailAddressProvider, child) {
+      var mailAddresses = mailAddressProvider.mailAddresses;
+      if (mailAddresses.isNotEmpty) {
+        for (var mailAddress in mailAddresses) {
+          TileData key =
+              TileData(title: mailAddress.email, icon: Icon(Icons.email));
+          mailAddressTileData[key] = mailAddrTileData;
+        }
+      }
+      var mailAddressWidget = Row(children: [
+        GroupDataListView(tileData: mailAddressTileData),
+      ]);
+      return mailAddressWidget;
+    });
   }
 }

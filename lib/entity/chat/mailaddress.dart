@@ -11,12 +11,15 @@ class MailAddress extends BaseEntity {
   String? imapServerHost;
   int imapServerPort = 993;
   bool imapServerSecure = true;
+  String? imapServerConfig;
   String? popServerHost;
   int popServerPort = 995;
   bool popServerSecure = true;
+  String? popServerConfig;
   String? smtpServerHost;
   int smtpServerPort = 465;
   bool smtpServerSecure = true;
+  String? smtpServerConfig;
   bool isDefault = false;
 
   MailAddress(
@@ -46,12 +49,15 @@ class MailAddress extends BaseEntity {
         imapServerHost = json['imapServerHost'],
         imapServerPort = json['imapServerPort'],
         imapServerSecure = json['imapServerSecure'],
+        imapServerConfig = json['imapServerConfig'],
         popServerHost = json['popServerHost'],
         popServerPort = json['popServerPort'],
         popServerSecure = json['popServerSecure'],
+        popServerConfig = json['popServerConfig'],
         smtpServerHost = json['smtpServerHost'],
         smtpServerPort = json['smtpServerPort'],
         smtpServerSecure = json['smtpServerSecure'],
+        smtpServerConfig = json['smtpServerConfig'],
         isDefault = json['isDefault'],
         super.fromJson(json);
 
@@ -68,12 +74,15 @@ class MailAddress extends BaseEntity {
       'imapServerHost': imapServerHost,
       'imapServerPort': imapServerPort,
       'imapServerSecure': imapServerSecure,
+      'imapServerConfig': imapServerConfig,
       'popServerHost': popServerHost,
       'popServerPort': popServerPort,
       'popServerSecure': popServerSecure,
+      'popServerConfig': popServerConfig,
       'smtpServerHost': smtpServerHost,
       'smtpServerPort': smtpServerPort,
       'smtpServerSecure': smtpServerSecure,
+      'smtpServerConfig': smtpServerConfig,
       'isDefault': isDefault,
     });
     return json;

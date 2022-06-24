@@ -9,7 +9,9 @@ class ChatMessageProvider with ChangeNotifier {
   int _currentIndex = 0;
 
   ChatMessageProvider() {
-    ChatMessageService.instance.findAllChatMessages().then((chatMessages) {
+    ChatMessageService.instance
+        .findByMessageType(MessageType.email.name)
+        .then((chatMessages) {
       _chatMessages.addAll(chatMessages);
       notifyListeners();
     });

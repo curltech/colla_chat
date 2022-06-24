@@ -102,8 +102,9 @@ class ChatMessageService extends BaseService {
     await save(chatMessages, [], parent);
   }
 
-  Future<List<ChatMessage>> findAllChatMessages() async {
-    var chatMessages_ = await find(null, whereArgs: [], orderBy: 'sendTime');
+  Future<List<ChatMessage>> findByMessageType(String messageType) async {
+    var chatMessages_ = await find('messageType=?',
+        whereArgs: [messageType], orderBy: 'sendTime');
     List<ChatMessage> chatMessages = [];
     if (chatMessages_.isNotEmpty) {
       for (var chatMessage_ in chatMessages_) {

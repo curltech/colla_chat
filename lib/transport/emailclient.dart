@@ -9,6 +9,7 @@ import 'package:event_bus/event_bus.dart';
 import '../entity/chat/chat.dart';
 import '../entity/chat/mailaddress.dart' as entity;
 import '../provider/app_data_provider.dart';
+import '../tool/util.dart';
 
 class EmailMessageUtil {
   /// 创建带附件的消息
@@ -85,6 +86,48 @@ class EmailMessageUtil {
         enough_mail.MimeMessage.parseFromText(chatMessage.content);
 
     return message;
+  }
+
+  enough_mail.ClientConfig? buildDiscoverConfig(
+      entity.MailAddress mailAddress) {
+    enough_mail.ClientConfig config = enough_mail.ClientConfig();
+    bool incoming = false;
+    bool outcoming = false;
+    var imapServerConfigStr = mailAddress.imapServerConfig;
+    ConfigEmailProvider provider =
+        ConfigEmailProvider(displayName: mailAddress.name);
+    config.addEmailProvider(provider);
+    if (imapServerConfigStr != null) {
+      Map<String, dynamic> imapServerConfigMap =
+          JsonUtil.toMap(imapServerConfigStr) as Map<String, dynamic>;
+      ServerConfig imapServerConfig = ServerConfig();
+      imapServerConfig.read(imapServerConfigMap);
+      provider.addIncomingServer(imapServerConfig);
+      incoming = true;
+    }
+    var popServerConfigStr = mailAddress.popServerConfig;
+    if (popServerConfigStr != null) {
+      Map<String, dynamic> popServerConfigMap =
+          JsonUtil.toMap(popServerConfigStr) as Map<String, dynamic>;
+      ServerConfig popServerConfig = ServerConfig();
+      popServerConfig.read(popServerConfigMap);
+      provider.addIncomingServer(popServerConfig);
+      incoming = true;
+    }
+    var smtpServerConfigStr = mailAddress.smtpServerConfig;
+    if (smtpServerConfigStr != null) {
+      Map<String, dynamic> smtpServerConfigMap =
+          JsonUtil.toMap(smtpServerConfigStr) as Map<String, dynamic>;
+      ServerConfig smtpServerConfig = ServerConfig();
+      smtpServerConfig.read(smtpServerConfigMap);
+      ConfigEmailProvider provider = ConfigEmailProvider();
+      provider.addIncomingServer(smtpServerConfig);
+      outcoming = true;
+    }
+    if (incoming && outcoming) {
+      return config;
+    }
+    return null;
   }
 
   /// 自动发现邮件地址配置
@@ -185,6 +228,9 @@ class EmailClient {
           mailAddress.imapServerPort = port;
         }
         mailAddress.imapServerHost = imapServerConfig.hostname;
+        Map<String, dynamic> attributes = {};
+        imapServerConfig.write(attributes);
+        mailAddress.imapServerConfig = JsonUtil.toJsonString(attributes);
       }
       ServerConfig? popServerConfig = provider.preferredIncomingPopServer;
       if (popServerConfig != null) {
@@ -194,6 +240,9 @@ class EmailClient {
           mailAddress.popServerPort = port;
         }
         mailAddress.popServerHost = popServerConfig.hostname;
+        Map<String, dynamic> attributes = {};
+        popServerConfig.write(attributes);
+        mailAddress.popServerConfig = JsonUtil.toJsonString(attributes);
       }
       ServerConfig? smtpServerConfig = provider.preferredOutgoingSmtpServer;
       if (smtpServerConfig != null) {
@@ -203,6 +252,9 @@ class EmailClient {
           mailAddress.smtpServerPort = port;
         }
         mailAddress.smtpServerHost = smtpServerConfig.hostname;
+        Map<String, dynamic> attributes = {};
+        smtpServerConfig.write(attributes);
+        mailAddress.smtpServerConfig = JsonUtil.toJsonString(attributes);
       }
       break;
     }

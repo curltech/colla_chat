@@ -1,4 +1,3 @@
-import 'package:colla_chat/provider/chat_message_provider.dart';
 import 'package:enough_mail/codecs.dart';
 import 'package:enough_mail/highlevel.dart';
 import 'package:enough_mail_flutter/enough_mail_flutter.dart';
@@ -7,13 +6,14 @@ import 'package:provider/provider.dart';
 
 import '../../../../transport/emailclient.dart';
 import '../../../../widgets/common/widget_mixin.dart';
+import 'mail_address_provider.dart';
 
 //邮件内容组件
 class MailContentWidget extends StatefulWidget
     with LeadingButtonMixin, RouteNameMixin {
-  final Function? backCallBack;
+  final Function? leadingCallBack;
 
-  MailContentWidget({Key? key, this.backCallBack}) : super(key: key);
+  MailContentWidget({Key? key, this.leadingCallBack}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MailContentWidgetState();
@@ -26,24 +26,25 @@ class MailContentWidget extends StatefulWidget
 }
 
 class _MailContentWidgetState extends State<MailContentWidget> {
+  MimeMessage mimeMessage = MimeMessage();
+
   @override
   initState() async {
     super.initState();
   }
 
-  Widget _build() {
-    return Provider.value(
-        value: chatMessagesProvider,
-        child: Consumer<ChatMessageProvider>(builder:
-            (BuildContext context, chatMessagesProvider, Widget? child) {
-          var chatMessage = chatMessagesProvider.chatMessage;
-          var mimeMessage = EmailMessageUtil.convertToMimeMessage(chatMessage);
-          return MimeMessageViewer(
-            mimeMessage: mimeMessage,
-            blockExternalImages: false,
-            mailtoDelegate: handleMailto,
-          );
-        }));
+  Widget _build(BuildContext context) {
+    MailAddressProvider mailAddressProvider =
+        Provider.of<MailAddressProvider>(context);
+    var currentChatMessage = mailAddressProvider.currentChatMessage;
+    if (currentChatMessage != null) {
+      mimeMessage = EmailMessageUtil.convertToMimeMessage(currentChatMessage);
+    }
+    return MimeMessageViewer(
+      mimeMessage: mimeMessage,
+      blockExternalImages: false,
+      mailtoDelegate: handleMailto,
+    );
   }
 
   Future<dynamic> handleMailto(Uri mailto, MimeMessage mimeMessage) async {
@@ -67,11 +68,11 @@ class _MailContentWidgetState extends State<MailContentWidget> {
 
   void onMessageDownloaded(MimeMessage mimeMessage) {
     // update other things to show eg attachment view, e.g.:
-    //setState(() {});
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    return _build();
+    return _build(context);
   }
 }

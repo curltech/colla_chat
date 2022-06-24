@@ -1,3 +1,4 @@
+import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../entity/chat/mailaddress.dart';
@@ -40,34 +41,57 @@ final List<TileData> mailAddrTileData = [
       title: 'Ads'),
 ];
 
-/// 邮件地址的状态管理器，维护了好友列表，当前好友
-class MailAddressController with ChangeNotifier {
-  List<MailAddress> _mailAddresses = [];
+/// 邮件地址的状态管理器
+class MailAddressProvider with ChangeNotifier {
+  final Map<MailAddress, List<ChatMessage>> _mailAddresses = {};
+  MailAddress? _currentMailAddress;
   int _currentIndex = 0;
 
-  MailAddressController() {
-    MailAddressService.instance.findAllMailAddress().then((mailAddress) {
-      _mailAddresses.addAll(mailAddress);
-      notifyListeners();
+  MailAddressProvider() {
+    MailAddressService.instance
+        .findAllMailAddress()
+        .then((List<MailAddress> mailAddresses) {
+      this.mailAddresses = mailAddresses;
     });
   }
 
   List<MailAddress> get mailAddresses {
-    return _mailAddresses;
+    return _mailAddresses.keys.toList();
   }
 
   set mailAddresses(List<MailAddress> mailAddress) {
-    _mailAddresses = mailAddress;
+    if (mailAddresses.isNotEmpty) {
+      for (var mailAddress in mailAddresses) {
+        _mailAddresses[mailAddress] = [];
+        if (mailAddress.isDefault) {
+          _currentMailAddress = mailAddress;
+        }
+      }
+    }
+    if (_currentMailAddress == null && _mailAddresses.isEmpty) {
+      _currentMailAddress = _mailAddresses.keys.first;
+    }
     notifyListeners();
   }
 
   add(List<MailAddress> mailAddresses) {
-    _mailAddresses.addAll(mailAddresses);
+    if (mailAddresses.isNotEmpty) {
+      for (var mailAddress in mailAddresses) {
+        if (!_mailAddresses.containsKey(mailAddress)) {
+          _mailAddresses[mailAddress] = [];
+        }
+      }
+    }
     notifyListeners();
   }
 
-  MailAddress get mailAddress {
-    return _mailAddresses[_currentIndex];
+  MailAddress? get currentMailAddress {
+    return _currentMailAddress;
+  }
+
+  set currentMailAddress(MailAddress? mailAddress) {
+    _currentMailAddress = mailAddress;
+    notifyListeners();
   }
 
   int get currentIndex {
@@ -78,4 +102,20 @@ class MailAddressController with ChangeNotifier {
     _currentIndex = currentIndex;
     notifyListeners();
   }
+
+  List<ChatMessage>? get currentChatMessages {
+    List<ChatMessage>? chatMessages = _mailAddresses[currentMailAddress];
+
+    return chatMessages;
+  }
+
+  ChatMessage? get currentChatMessage {
+    List<ChatMessage>? chatMessages = _mailAddresses[currentMailAddress];
+    if (chatMessages != null && chatMessages.isNotEmpty) {
+      return chatMessages[_currentIndex];
+    }
+    return null;
+  }
 }
+
+final mailAddressProvider = MailAddressProvider();

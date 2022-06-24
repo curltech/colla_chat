@@ -1,46 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
-import '../../../../entity/chat/mailaddress.dart';
-import '../../../../provider/app_data_provider.dart';
-import '../../../../service/chat/mailaddress.dart';
-import '../../../../widgets/common/data_group_listview.dart';
+import '../../../../entity/chat/chat.dart';
 import '../../../../widgets/common/data_listtile.dart';
+import '../../../../widgets/common/data_listview.dart';
 import '../../../../widgets/common/widget_mixin.dart';
-
-final List<TileData> mailAddrTileData = [
-  TileData(
-      icon: Icon(Icons.inbox,
-          color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'Inbox'),
-  TileData(
-      icon: Icon(Icons.mark_as_unread,
-          color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'Unread'),
-  TileData(
-      icon: Icon(Icons.drafts,
-          color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'Draft'),
-  TileData(
-      icon: Icon(Icons.send,
-          color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'Sent'),
-  TileData(
-      icon: Icon(Icons.flag,
-          color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'Mark'),
-  TileData(
-      icon: Icon(Icons.delete,
-          color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'Deleted'),
-  TileData(
-      icon: Icon(Icons.bug_report,
-          color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'Junk'),
-  TileData(
-      icon: Icon(Icons.ads_click,
-          color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'Ads'),
-];
+import 'mail_address_provider.dart';
 
 //邮件列表组件，带有回退回调函数
 class MailListWidget extends StatefulWidget
@@ -60,25 +25,42 @@ class MailListWidget extends StatefulWidget
 }
 
 class _MailListWidgetState extends State<MailListWidget> {
-  Map<TileData, List<TileData>> mailAddressTileData = {};
+  List<TileData> mailAddressTileData = [];
+
+  DataListViewController dataListViewController =
+      DataListViewController(tileData: []);
+
+  late final DataListView dataListView;
 
   @override
   initState() async {
     super.initState();
-    Map<TileData, List<TileData>> mailAddressTileData = {};
-    List<MailAddress> mailAddress =
-        await MailAddressService.instance.findAllMailAddress();
-    for (var mailAddr in mailAddress) {
-      TileData key = TileData(title: mailAddr.email!, icon: Icon(Icons.email));
-      mailAddressTileData[key] = mailAddrTileData;
-    }
+    dataListView = DataListView(
+      dataListViewController: dataListViewController,
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    var email = Row(children: [
-      GroupDataListView(tileData: mailAddressTileData),
-    ]);
-    return email;
+    return Consumer<MailAddressProvider>(
+        builder: (context, mailAddressProvider, child) {
+      var currentChatMessages = mailAddressProvider.currentChatMessages;
+      List<TileData> adds = [];
+      if (currentChatMessages != null && currentChatMessages.isNotEmpty) {
+        for (var i = 0;
+            i <
+                currentChatMessages.length -
+                    dataListViewController.tileData.length;
+            ++i) {
+          ChatMessage chatMessage =
+              currentChatMessages[dataListViewController.tileData.length + i];
+          var title = chatMessage.title ?? '';
+          TileData tile = TileData(title: title);
+          adds.add(tile);
+        }
+      }
+      dataListViewController.add(adds);
+      return dataListView;
+    });
   }
 }

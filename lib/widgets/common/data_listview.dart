@@ -20,8 +20,10 @@ class DataListViewController extends ChangeNotifier {
   }
 
   add(List<TileData> tiles) {
-    tileData.addAll(tiles);
-    notifyListeners();
+    if (tiles.isNotEmpty) {
+      tileData.addAll(tiles);
+      notifyListeners();
+    }
   }
 }
 
