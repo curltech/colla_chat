@@ -88,7 +88,7 @@ class EmailMessageUtil {
     return message;
   }
 
-  enough_mail.ClientConfig? buildDiscoverConfig(
+  static enough_mail.ClientConfig? buildDiscoverConfig(
       entity.MailAddress mailAddress) {
     enough_mail.ClientConfig config = enough_mail.ClientConfig();
     bool incoming = false;
@@ -147,77 +147,18 @@ class EmailMessageUtil {
         logger.i(provider.preferredOutgoingServer);
       }
     } else {
-      logger.i('Unable to auto-discover settings for $email');
+      logger.e('Unable to auto-discover settings for $email');
     }
 
     return config;
   }
 
-  ///用自动发现的配置创建邮件客户端
-  static enough_mail.MailClient getMailClient(
-      {required String name,
-      required String email,
-      required String password,
-      required enough_mail.ClientConfig config}) {
-    final account = enough_mail.MailAccount.fromDiscoveredSettings(
-        name, email, password, config,
-        outgoingClientDomain: '');
-    final mailClient = enough_mail.MailClient(account, isLogEnabled: true);
-
-    return mailClient;
-  }
-}
-
-class EmailClient {
-  entity.MailAddress mailAddress;
-
-  ///mailClient是自动发现产生的客户端
-  ClientConfig? config;
-  enough_mail.MailClient? mailClient;
-  enough_mail.ImapClient? imapClient;
-  enough_mail.PopClient? popClient;
-  enough_mail.SmtpClient? smtpClient;
-
-  EmailClient({
-    required this.mailAddress,
-  });
-
-  ///统一的连接方法，先用自动发现的参数连接，不成功再用imap等手工配置的参数
-  Future<bool> connect(String? password) async {
-    if (password != null && mailAddress.password != password) {
-      mailAddress.password = password;
-    }
-    bool success = false;
-    if (mailClient == null) {
-      success = await mailClientConnect(password: password);
-      if (!success) {
-        success = await imapConnect();
-        logger.i('imapConnect $success');
-        if (success) {
-          PopStatus? status = await popConnect();
-          if (status != null) {
-            success = true;
-          }
-        }
-      }
-    }
-    return success;
-  }
-
-  bool get status {
-    return (mailClient != null ||
-        (smtpClient != null && (imapClient != null || popClient != null)));
-  }
-
-  ///自动发现邮件配置
-  Future<ClientConfig?> mailClientDiscover() async {
-    final config = await EmailMessageUtil.discover(mailAddress.email);
-    if (config == null) {
-      logger.e('email ${mailAddress.email} discover failure');
-      return null;
-    }
-    logger.i('discover to ${config.displayName}.');
-    this.config = config;
+  ///自动发现邮件配置，产生新的邮件地址
+  static entity.MailAddress buildDiscoverMailAddress(
+      String email, String name, ClientConfig config) {
+    logger.i('config displayName: ${config.displayName}.');
+    entity.MailAddress mailAddress =
+        entity.MailAddress(email: email, name: name);
 
     for (final provider in config.emailProviders!) {
       ServerConfig? imapServerConfig = provider.preferredIncomingImapServer;
@@ -259,25 +200,98 @@ class EmailClient {
       break;
     }
 
-    return config;
+    return mailAddress;
   }
 
-  ///用email自动发现和连接
-  Future<bool> mailClientConnect({String? password}) async {
+  static const clientId = Id(
+      name: 'myname',
+      version: '1.0.0',
+      vendor: 'myclient',
+      nonStandardFields: {'support-email': 'testmail@test.com'});
+
+  ///用自动发现的配置创建邮件客户端
+  static enough_mail.MailClient createMailClient(
+      {required String name,
+      required String email,
+      required String password,
+      required enough_mail.ClientConfig config}) {
+    final account = enough_mail.MailAccount.fromDiscoveredSettings(
+        name, email, password, config,
+        outgoingClientDomain: '');
+
+    final mailClient =
+        enough_mail.MailClient(account, isLogEnabled: true, clientId: clientId);
+    logger.i(mailClient.serverId);
+
+    return mailClient;
+  }
+}
+
+class EmailClient {
+  entity.MailAddress mailAddress;
+
+  ///mailClient是自动发现产生的客户端
+  ClientConfig? config;
+  enough_mail.MailClient? mailClient;
+  enough_mail.ImapClient? imapClient;
+  enough_mail.PopClient? popClient;
+  enough_mail.SmtpClient? smtpClient;
+
+  EmailClient({
+    required this.mailAddress,
+  });
+
+  ///统一的连接方法，先用自动发现的参数连接，不成功再用imap等手工配置的参数
+  Future<bool> connect(String? password, {ClientConfig? config}) async {
     if (password != null && mailAddress.password != password) {
       mailAddress.password = password;
     }
-    var config = this.config;
+    bool success = false;
+    if (mailClient == null) {
+      success = await mailClientConnect(password: password, config: config);
+      if (!success) {
+        success = await imapConnect();
+        logger.i('imapConnect $success');
+        if (success) {
+          PopStatus? status = await popConnect();
+          if (status != null) {
+            success = true;
+          }
+        }
+      }
+    }
+    return success;
+  }
+
+  bool get status {
+    return (mailClient != null ||
+        (smtpClient != null && (imapClient != null || popClient != null)));
+  }
+
+  ///用mailaddress参数解析出自动发现的config进行连接
+  Future<bool> mailClientConnect(
+      {String? password, ClientConfig? config}) async {
+    if (password != null && mailAddress.password != password) {
+      mailAddress.password = password;
+    }
+    if (config != null) {
+      this.config = config;
+    }
+    config = this.config;
     if (config == null) {
-      logger.e('no discover config');
-      return false;
+      this.config = EmailMessageUtil.buildDiscoverConfig(mailAddress);
+      config = this.config;
+      if (config == null) {
+        logger.e('no discover config');
+        return false;
+      }
     }
     password = mailAddress.password;
     if (password == null) {
       logger.e('no password');
       return false;
     }
-    final enough_mail.MailClient mailClient = EmailMessageUtil.getMailClient(
+    final enough_mail.MailClient mailClient = EmailMessageUtil.createMailClient(
         name: mailAddress.name,
         email: mailAddress.email,
         password: password,
@@ -417,6 +431,10 @@ class EmailClient {
         logName: logName,
         defaultWriteTimeout: defaultWriteTimeout,
         defaultResponseTimeout: defaultResponseTimeout);
+    if (client.serverInfo.supportsId) {
+      final serverId = await client.id(clientId: EmailMessageUtil.clientId);
+      logger.i(serverId);
+    }
     try {
       if (mailAddress.imapServerHost != null) {
         await client.connectToServer(
@@ -669,45 +687,32 @@ class EmailClientPool {
 
   EmailClientPool();
 
-  Future<EmailClient?> create(
-      {required String email,
-      required String name,
-      String? imapServerHost,
-      int imapServerPort = 993,
-      String? popServerHost,
-      int popServerPort = 995,
-      String? smtpServerHost,
-      int smtpServerPort = 465}) async {
-    var emails = email.split('@');
+  ///在连接池中创建一个邮件的连接，必须连接成功才能创建
+  ///传入的邮件地址参数必须含有email，或者有自动发现的配置，或者有imap和smtp的配置
+  Future<EmailClient?> create(entity.MailAddress mailAddress, String password,
+      {ClientConfig? config}) async {
+    var emails = mailAddress.email.split('@');
     if (emails.length != 2) {
+      logger.e('mailAddress email error');
       return null;
     }
-    var username = emails[0];
-    var domain = emails[1];
-    EmailClient? mailClient = mailClients[email];
+    EmailClient? mailClient = mailClients[mailAddress.email];
     if (mailClient != null) {
       return mailClient;
     } else {
-      var mailAddress = entity.MailAddress(
-        name: name,
-        email: email,
-        username: username,
-        domain: domain,
-        imapServerHost: imapServerHost,
-        imapServerPort: imapServerPort,
-        popServerHost: popServerHost,
-        popServerPort: popServerPort,
-        smtpServerHost: smtpServerHost,
-        smtpServerPort: smtpServerPort,
-      );
       mailClient = EmailClient(mailAddress: mailAddress);
-      await mailClient.mailClientDiscover();
-      mailClients[email] = mailClient;
+      bool success = await mailClient.connect(password, config: config);
+      if (success) {
+        mailClients[mailAddress.email] = mailClient;
 
-      return mailClient;
+        return mailClient;
+      }
     }
+
+    return null;
   }
 
+  ///如果池中的邮件客户端断开了，可以重新进行连接
   Future<bool> connect(String email, String? password) async {
     EmailClient? mailClient = get(email);
     bool success = false;

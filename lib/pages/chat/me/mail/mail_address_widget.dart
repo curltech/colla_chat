@@ -1,7 +1,11 @@
 import 'package:colla_chat/pages/chat/me/mail/mail_address_provider.dart';
+import 'package:colla_chat/transport/emailclient.dart';
+import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../entity/chat/mailaddress.dart';
+import '../../../../provider/app_data_provider.dart';
 import '../../../../widgets/common/data_group_listview.dart';
 import '../../../../widgets/common/data_listtile.dart';
 import '../../../../widgets/common/widget_mixin.dart';
@@ -31,6 +35,36 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
     super.initState();
   }
 
+  _connect(MailAddress mailAddress) {
+    EmailClient? emailClient = EmailClientPool.instance.get(mailAddress.email);
+    if (emailClient == null) {
+      var password = mailAddress.password;
+      if (password != null) {
+        EmailClientPool.instance
+            .create(mailAddress, password)
+            .then((EmailClient? emailClient) {
+          if (emailClient != null) {
+            // emailClient
+            //     .listMailboxesAsTree()
+            //     .then((enough_mail.Tree<enough_mail.Mailbox?>? tree) {
+            //   logger.i(tree!);
+            // });
+            emailClient.selectInbox().then((enough_mail.Mailbox? mailbox) {
+              logger.i(mailbox!);
+              emailClient
+                  .fetchMessages(mailbox: mailbox)
+                  .then((List<enough_mail.MimeMessage>? mimeMessages) {
+                logger.i(mimeMessages!);
+              }).catchError((err) {
+                logger.e(err);
+              });
+            });
+          }
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<MailAddressProvider>(
@@ -38,8 +72,9 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
       var mailAddresses = mailAddressProvider.mailAddresses;
       if (mailAddresses.isNotEmpty) {
         for (var mailAddress in mailAddresses) {
+          _connect(mailAddress);
           TileData key =
-              TileData(title: mailAddress.email, icon: Icon(Icons.email));
+              TileData(title: mailAddress.email, icon: const Icon(Icons.email));
           mailAddressTileData[key] = mailAddrTileData;
         }
       }
