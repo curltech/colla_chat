@@ -72,19 +72,12 @@ class GroupDataListView extends StatelessWidget {
   Widget _build(BuildContext context) {
     List<Widget> groups = [];
     if (_tileData.isNotEmpty) {
-      if (_tileData.length == 1) {
-        Widget groupWidget = DataListView(
-            dataListViewController:
-                DataListViewController(tileData: _tileData.values.first));
-        return groupWidget;
-      } else {
-        for (var tileEntry in _tileData.entries) {
-          Widget groupExpansionTile = _buildExpansionTile(
-            context,
-            tileEntry.key,
-          );
-          groups.add(groupExpansionTile);
-        }
+      for (var tileEntry in _tileData.entries) {
+        Widget groupExpansionTile = _buildExpansionTile(
+          context,
+          tileEntry.key,
+        );
+        groups.add(groupExpansionTile);
       }
     }
     //该属性将决定列表的长度是否仅包裹其内容的长度。

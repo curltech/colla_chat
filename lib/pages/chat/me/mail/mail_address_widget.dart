@@ -43,8 +43,9 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
           mailAddressTileData[key] = mailAddrTileData;
         }
       }
-      var mailAddressWidget = Row(children: [
-        GroupDataListView(tileData: mailAddressTileData),
+      var mailAddressWidget =
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Expanded(child: GroupDataListView(tileData: mailAddressTileData)),
       ]);
       return mailAddressWidget;
     });

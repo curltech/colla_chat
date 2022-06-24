@@ -59,30 +59,39 @@ class MailAddressProvider with ChangeNotifier {
     return _mailAddresses.keys.toList();
   }
 
-  set mailAddresses(List<MailAddress> mailAddress) {
+  set mailAddresses(List<MailAddress> mailAddresses) {
+    bool needNotify = false;
     if (mailAddresses.isNotEmpty) {
       for (var mailAddress in mailAddresses) {
         _mailAddresses[mailAddress] = [];
         if (mailAddress.isDefault) {
           _currentMailAddress = mailAddress;
         }
+        needNotify = true;
       }
     }
-    if (_currentMailAddress == null && _mailAddresses.isEmpty) {
+    if (_currentMailAddress == null && _mailAddresses.isNotEmpty) {
       _currentMailAddress = _mailAddresses.keys.first;
+      needNotify = true;
     }
-    notifyListeners();
+    if (needNotify) {
+      notifyListeners();
+    }
   }
 
   add(List<MailAddress> mailAddresses) {
+    bool needNotify = false;
     if (mailAddresses.isNotEmpty) {
       for (var mailAddress in mailAddresses) {
         if (!_mailAddresses.containsKey(mailAddress)) {
           _mailAddresses[mailAddress] = [];
+          needNotify = true;
         }
       }
     }
-    notifyListeners();
+    if (needNotify) {
+      notifyListeners();
+    }
   }
 
   MailAddress? get currentMailAddress {

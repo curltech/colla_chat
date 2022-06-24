@@ -20,10 +20,11 @@ class MailView extends StatefulWidget with LeadingButtonMixin, RouteNameMixin {
   String get routeName => 'mail';
 
   @override
-  bool get withLeading => false;
+  bool get withLeading => true;
 }
 
-class _MailViewState extends State<MailView> {
+class _MailViewState extends State<MailView>
+    with SingleTickerProviderStateMixin {
   Map<TileData, List<TileData>> mailAddressTileData = {};
 
   @override
@@ -36,7 +37,10 @@ class _MailViewState extends State<MailView> {
     var mailAddressWidget = MailAddressWidget();
     List<Widget> children = <Widget>[];
     children.add(mailAddressWidget);
-    var tabBarView = TabBarView(children: children);
+    var tabBarView = TabBarView(
+      controller: TabController(length: children.length, vsync: this),
+      children: children,
+    );
     var child = AppBarView(
         title: 'Mail', withLeading: widget.withLeading, child: tabBarView);
     var appBarView = ChangeNotifierProvider<MailAddressProvider>.value(
