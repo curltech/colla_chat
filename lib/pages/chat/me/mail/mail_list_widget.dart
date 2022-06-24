@@ -36,6 +36,7 @@ class _MailListWidgetState extends State<MailListWidget> {
   initState() async {
     super.initState();
     dataListView = DataListView(
+      scrollController: ScrollController(),
       dataListViewController: dataListViewController,
     );
   }

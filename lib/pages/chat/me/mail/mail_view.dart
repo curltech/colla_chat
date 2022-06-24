@@ -34,8 +34,8 @@ class _MailViewState extends State<MailView>
 
   @override
   Widget build(BuildContext context) {
-    var mailAddressWidget = MailAddressWidget();
-    List<Widget> children = <Widget>[];
+    var mailAddressWidget = const MailAddressWidget();
+    const List<Widget> children = <Widget>[];
     children.add(mailAddressWidget);
     var tabBarView = TabBarView(
       controller: TabController(length: children.length, vsync: this),

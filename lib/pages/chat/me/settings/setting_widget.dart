@@ -36,7 +36,7 @@ class SettingWidget extends StatelessWidget
     with LeadingButtonMixin, RouteNameMixin {
   final Function? leadingCallBack;
 
-  SettingWidget({Key? key, this.leadingCallBack}) : super(key: key);
+  const SettingWidget({Key? key, this.leadingCallBack}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

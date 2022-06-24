@@ -11,7 +11,7 @@ class MailAddressWidget extends StatefulWidget
     with LeadingButtonMixin, RouteNameMixin {
   final Function? leadingCallBack;
 
-  MailAddressWidget({Key? key, this.leadingCallBack}) : super(key: key);
+  const MailAddressWidget({Key? key, this.leadingCallBack}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MailAddressWidgetState();

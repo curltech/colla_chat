@@ -10,12 +10,9 @@ import 'data_listtile.dart';
 ///如果有多个分组，ListView的每个组件是每个分组ExpansionTile，每个分组ExpansionTile下面是ListView，
 ///每个ListView下面是ListTile
 class GroupDataListView extends StatelessWidget {
-  late final Map<TileData, List<TileData>> _tileData;
+  final Map<TileData, List<TileData>> tileData;
 
-  GroupDataListView({Key? key, required Map<TileData, List<TileData>> tileData})
-      : super(key: key) {
-    _tileData = tileData;
-  }
+  const GroupDataListView({Key? key, required this.tileData}) : super(key: key);
 
   Widget _buildExpansionTile(BuildContext context, TileData tile) {
     Widget? leading;
@@ -47,9 +44,10 @@ class GroupDataListView extends StatelessWidget {
           child: Row(
               mainAxisAlignment: MainAxisAlignment.end, children: trailing));
     }
-    List<TileData>? tileData = _tileData[tile];
+    List<TileData>? tileData = this.tileData[tile];
     tileData = tileData ?? [];
     DataListView dataListView = DataListView(
+        scrollController: ScrollController(),
         dataListViewController: DataListViewController(tileData: tileData));
 
     ///未来不使用ListTile，因为高度固定，不够灵活
@@ -71,8 +69,8 @@ class GroupDataListView extends StatelessWidget {
 
   Widget _build(BuildContext context) {
     List<Widget> groups = [];
-    if (_tileData.isNotEmpty) {
-      for (var tileEntry in _tileData.entries) {
+    if (tileData.isNotEmpty) {
+      for (var tileEntry in tileData.entries) {
         Widget groupExpansionTile = _buildExpansionTile(
           context,
           tileEntry.key,

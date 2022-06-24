@@ -38,25 +38,23 @@ class TileData {
 
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
 class DataListTile extends StatelessWidget {
-  late final TileData _tileData;
-  bool selected;
+  final TileData tileData;
+  final bool selected;
 
-  DataListTile({Key? key, required TileData tileData, this.selected = false})
-      : super(key: key) {
-    _tileData = tileData;
-  }
+  const DataListTile({Key? key, required this.tileData, this.selected = false})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     Widget? leading;
-    final avatar = _tileData.avatar;
-    if (_tileData.icon != null) {
-      leading = _tileData.icon;
+    final avatar = tileData.avatar;
+    if (tileData.icon != null) {
+      leading = tileData.icon;
     } else if (avatar != null) {
       leading = Image.memory(Uint8List.fromList(avatar.codeUnits));
     }
     List<Widget>? trailing = <Widget>[];
-    var suffix = _tileData.suffix;
+    var suffix = tileData.suffix;
     if (suffix != null) {
       if (suffix is Widget) {
         trailing.add(suffix);
@@ -68,7 +66,7 @@ class DataListTile extends StatelessWidget {
         ));
       }
     }
-    if (_tileData.routeName != null) {
+    if (tileData.routeName != null) {
       trailing.add(Icon(Icons.chevron_right,
           color: appDataProvider.themeData?.colorScheme.primary));
     }
@@ -87,25 +85,25 @@ class DataListTile extends StatelessWidget {
       selected: selected,
       leading: leading,
       title: Text(
-        _tileData.title,
+        tileData.title,
       ),
-      subtitle: _tileData.subtitle != null
+      subtitle: tileData.subtitle != null
           ? Text(
-              _tileData.subtitle!,
+              tileData.subtitle!,
             )
           : null,
       trailing: trailingWidget,
       dense: true,
       onTap: () {
-        var call = _tileData.onTap;
+        var call = tileData.onTap;
         if (call != null) {
-          call(_tileData.title);
+          call(tileData.title);
         }
-        if (_tileData.routeName != null) {
+        if (tileData.routeName != null) {
           var indexWidgetProvider =
               Provider.of<IndexWidgetProvider>(context, listen: false);
-          indexWidgetProvider.push(_tileData.routeName!,
-              context: context, routeStyle: _tileData.routeStyle);
+          indexWidgetProvider.push(tileData.routeName!,
+              context: context, routeStyle: tileData.routeStyle);
         }
       },
     );

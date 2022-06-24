@@ -31,14 +31,15 @@ class DataListViewController extends ChangeNotifier {
 ///利用DataListViewController修改数据，然后重新执行ListView.build
 ///外部可能有ListView或者PageView等滚动视图，所以shrinkWrap: true,
 class DataListView extends StatefulWidget {
-  DataListViewController dataListViewController;
-  final ScrollController scrollController = ScrollController();
-  Function()? onScrollMax;
-  Future<void> Function()? onRefresh;
+  final DataListViewController dataListViewController;
+  final ScrollController scrollController;
+  final Function()? onScrollMax;
+  final Future<void> Function()? onRefresh;
 
-  DataListView(
+  const DataListView(
       {Key? key,
       required this.dataListViewController,
+      required this.scrollController,
       this.onScrollMax,
       this.onRefresh})
       : super(key: key);
