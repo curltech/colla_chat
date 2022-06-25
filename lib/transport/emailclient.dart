@@ -325,6 +325,19 @@ class EmailClient {
   }
 
   ///用邮件客户端获取邮箱，知道邮箱的概况
+  Future<List<Mailbox>?> listMailboxes(
+      {List<MailboxFlag> order =
+          enough_mail.MailClient.defaultMailboxOrder}) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      final mailboxes = await mailClient.listMailboxes(order: order);
+      logger.i(mailboxes);
+      return mailboxes;
+    }
+    return null;
+  }
+
+  ///用邮件客户端获取收件箱
   Future<Mailbox?> selectInbox(
       {bool enableCondStore = false, QResyncParameters? qresync}) async {
     final enough_mail.MailClient? mailClient = this.mailClient;
@@ -332,6 +345,50 @@ class EmailClient {
       var mailbox = await mailClient.selectInbox(
           enableCondStore: enableCondStore, qresync: qresync);
       return mailbox;
+    }
+    return null;
+  }
+
+  ///创建收件箱
+  Future<Mailbox?> createMailbox(String mailboxName,
+      {Mailbox? parentMailbox}) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      var mailbox = await mailClient.createMailbox(mailboxName,
+          parentMailbox: parentMailbox);
+      return mailbox;
+    }
+    return null;
+  }
+
+  ///创建收件箱
+  Future<void> deleteMailbox(Mailbox mailbox) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      await mailClient.deleteMailbox(mailbox);
+      return;
+    }
+  }
+
+  ///创建收件箱
+  Mailbox? getMailbox(MailboxFlag flag, [List<Mailbox>? mailBoxes]) {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      var mailbox = mailClient.getMailbox(flag, mailBoxes);
+      return mailbox;
+    }
+    return null;
+  }
+
+  Future<enough_mail.Mailbox?> selectMailbox(
+    Mailbox mailbox, {
+    bool enableCondStore = false,
+    QResyncParameters? qresync,
+  }) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      return await mailClient.selectMailbox(mailbox,
+          enableCondStore: enableCondStore, qresync: qresync);
     }
     return null;
   }
@@ -350,6 +407,129 @@ class EmailClient {
           mailbox: mailbox,
           page: page);
       return messages;
+    }
+    return null;
+  }
+
+  Future<List<MimeMessage>?> fetchMessagesNextPage(
+    PagedMessageSequence pagedSequence, {
+    Mailbox? mailbox,
+    FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
+    bool markAsSeen = false,
+  }) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      return await mailClient.fetchMessagesNextPage(pagedSequence,
+          mailbox: mailbox,
+          fetchPreference: fetchPreference,
+          markAsSeen: markAsSeen);
+    }
+    return null;
+  }
+
+  Future<DeleteResult?> deleteMessage(MimeMessage message,
+      {bool expunge = false}) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      return await mailClient.deleteMessage(message, expunge: expunge);
+    }
+    return null;
+  }
+
+  Future<DeleteResult?> deleteMessages(MessageSequence sequence,
+      {bool expunge = false, List<MimeMessage>? messages}) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      return await mailClient.deleteMessages(sequence,
+          expunge: expunge, messages: messages);
+    }
+    return null;
+  }
+
+  Future<DeleteResult?> deleteAllMessages(Mailbox mailbox,
+      {bool expunge = false}) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      return await mailClient.deleteAllMessages(mailbox, expunge: expunge);
+    }
+    return null;
+  }
+
+  Future<List<enough_mail.MimeMessage>?> fetchMessageSequence(
+    MessageSequence sequence, {
+    Mailbox? mailbox,
+    FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
+    bool markAsSeen = false,
+  }) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      return await mailClient.fetchMessageSequence(sequence,
+          mailbox: mailbox,
+          fetchPreference: fetchPreference,
+          markAsSeen: markAsSeen);
+    }
+    return null;
+  }
+
+  Future<void> flagMessage(
+    MimeMessage message, {
+    bool? isSeen,
+    bool? isFlagged,
+    bool? isAnswered,
+    bool? isForwarded,
+    bool? isDeleted,
+    bool? isMdnSent,
+    bool? isReadReceiptSent,
+  }) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      return await mailClient.flagMessage(message,
+          isSeen: isSeen,
+          isFlagged: isFlagged,
+          isAnswered: isAnswered,
+          isForwarded: isForwarded,
+          isDeleted: isDeleted,
+          isMdnSent: isMdnSent,
+          isReadReceiptSent: isReadReceiptSent);
+    }
+  }
+
+  Future<List<enough_mail.MimeMessage>?> searchMessagesNextPage(
+      MailSearchResult searchResult) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      return await mailClient.searchMessagesNextPage(searchResult);
+    }
+    return null;
+  }
+
+  Future<enough_mail.MailSearchResult?> searchMessages(
+      MailSearch search) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      return await mailClient.searchMessages(search);
+    }
+    return null;
+  }
+
+  Future<enough_mail.MoveResult?> moveMessage(
+      MimeMessage message, Mailbox target) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      return await mailClient.moveMessage(message, target);
+    }
+    return null;
+  }
+
+  Future<enough_mail.MoveResult?> moveMessages(
+    MessageSequence sequence,
+    Mailbox target, {
+    List<MimeMessage>? messages,
+  }) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      return await mailClient.moveMessages(sequence, target,
+          messages: messages);
     }
     return null;
   }
@@ -385,6 +565,60 @@ class EmailClient {
       return true;
     }
     return false;
+  }
+
+  Future<bool> stopPolling() async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      await mailClient.stopPolling();
+      return true;
+    }
+    return false;
+  }
+
+  Future<bool> reconnect() async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      await mailClient.reconnect();
+      return true;
+    }
+    return false;
+  }
+
+  Future<MoveResult?> junkMessage(MimeMessage message) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      return await mailClient.junkMessage(message);
+    }
+    return null;
+  }
+
+  Future<MoveResult?> junkMessages(MessageSequence sequence,
+      {List<enough_mail.MimeMessage>? messages}) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      return await mailClient.junkMessages(sequence, messages: messages);
+    }
+    return null;
+  }
+
+  Future<enough_mail.DeleteResult?> undoDeleteMessages(
+      DeleteResult deleteResult) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      return await mailClient.undoDeleteMessages(deleteResult);
+    }
+    return null;
+  }
+
+  Future<UidResponseCode?> saveDraftMessage(MimeMessage message,
+      {Mailbox? draftsMailbox}) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      return await mailClient.saveDraftMessage(message,
+          draftsMailbox: draftsMailbox);
+    }
+    return null;
   }
 
   ///用邮件客户端发送消息
