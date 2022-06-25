@@ -134,7 +134,7 @@ class IndexWidgetProvider with ChangeNotifier {
 
   ///增加新的视图，不能在initState和build构建方法中调用listen=true，
   ///因为本方法会引起整个pageview视图的重新构建
-  define(RouteNameMixin view, {bool listen = false}) {
+  define(TileDataMixin view, {bool listen = false}) {
     if (!viewPosition.containsKey(view.routeName)) {
       views.add(view);
       viewPosition[view.routeName] = views.length - 1;

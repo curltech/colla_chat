@@ -31,8 +31,7 @@ final Map<TileData, List<TileData>> mockTileData = {
 
 /// 聊天的主页面，展示可以聊天的目标对象，可以是一个人，或者是一个群
 /// 选择好目标点击进入具体的聊天页面ChatMessage
-class ChatTarget extends StatelessWidget
-    with LeadingButtonMixin, RouteNameMixin {
+class ChatTarget extends StatelessWidget with TileDataMixin {
   /// 聊天目标的数据
   late final Map<TileData, List<TileData>> chatTargets = mockTileData;
 
@@ -44,7 +43,7 @@ class ChatTarget extends StatelessWidget
       elevation: 0,
       centerTitle: false,
       title: Text(
-        AppLocalizations.instance.text('Chat'),
+        AppLocalizations.instance.text(title),
       ),
       actions: [],
     );
@@ -57,4 +56,10 @@ class ChatTarget extends StatelessWidget
 
   @override
   String get routeName => 'chat';
+
+  @override
+  Icon get icon => const Icon(Icons.chat);
+
+  @override
+  String get title => 'Chat';
 }

@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../../entity/dht/myself.dart';
@@ -11,13 +10,10 @@ import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/image_widget.dart';
 import '../../chat/widget/ui.dart';
 
-class QrcodeWidget extends StatefulWidget
-    with LeadingButtonMixin, RouteNameMixin {
-  final List<String> menus = ['保存文件', '保存图片', '分享', '重置二维码'];
-  String? content;
-  GlobalKey globalKey = GlobalKey();
+class QrcodeWidget extends StatefulWidget with TileDataMixin {
+  final List<String> menus = const ['保存文件', '保存图片', '分享', '重置二维码'];
 
-  QrcodeWidget({Key? key, this.content}) : super(key: key);
+  const QrcodeWidget({Key? key}) : super(key: key);
 
   @override
   bool get withLeading => true;
@@ -27,26 +23,35 @@ class QrcodeWidget extends StatefulWidget
 
   @override
   State<StatefulWidget> createState() => _QrcodeWidgetState();
+
+  @override
+  Icon get icon => const Icon(Icons.qr_code);
+
+  @override
+  String get title => 'Qrcode';
 }
 
 class _QrcodeWidgetState extends State<QrcodeWidget> {
   String peerId = '未登录';
   String name = '未登录';
   QrImage? qrImage;
+  GlobalKey? globalKey;
+  String? content;
   @override
   void initState() {
     super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     var peerId = myself.peerId;
     if (peerId != null) {
       this.peerId = peerId;
       name = myself.myselfPeer!.name;
     }
-    widget.content ??= this.peerId;
-    qrImage = QrcodeUtil.create(widget.content!);
-  }
-
-  @override
-  Widget build(BuildContext context) {
+    content = this.peerId;
+    qrImage = QrcodeUtil.create(content!);
+    globalKey = GlobalKey();
     var children = <Widget>[
       ListTile(
           leading: const ImageWidget(
@@ -54,9 +59,9 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
             height: 32.0,
           ),
           title: Text(name),
-          subtitle: Text(peerId)),
+          subtitle: Text(this.peerId)),
       RepaintBoundary(
-          key: widget.globalKey,
+          key: globalKey,
           child: Padding(
             padding: const EdgeInsets.all(10.0),
             child: qrImage,
@@ -76,21 +81,21 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
   Future<void> _rightCallBack(int index) async {
     switch (index) {
       case 0:
-        Uint8List bytes = await ImageUtil.clipImageBytes(widget.globalKey);
+        Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
         FileUtil.writeFile(bytes, peerId);
         break;
       case 1:
-        Uint8List bytes = await ImageUtil.clipImageBytes(widget.globalKey);
+        Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
         ImageUtil.saveImageGallery(bytes, peerId);
         break;
       case 2:
-        Uint8List bytes = await ImageUtil.clipImageBytes(widget.globalKey);
+        Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
         var path = await FileUtil.writeFile(bytes, peerId);
         ShareUtil.shareFiles([path.path]);
         break;
       case 3:
         setState(() {
-          qrImage = QrcodeUtil.create(widget.content!);
+          qrImage = QrcodeUtil.create(content!);
         });
         break;
       default:

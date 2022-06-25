@@ -5,12 +5,9 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:barcode_scan2/barcode_scan2.dart';
-import 'package:barcode_scan2/model/scan_options.dart';
-import 'package:barcode_scan2/platform_wrapper.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:device_info_plus/device_info_plus.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -97,6 +94,22 @@ class StringUtil {
       return true;
     }
     return false;
+  }
+
+  // 首字符小写
+  static String? lowerFirst(String? str) {
+    if (str != null && str.isNotEmpty) {
+      return str[0].toLowerCase() + str.substring(1);
+    }
+    return str;
+  }
+
+  // 首字符小写
+  static String? upperFirst(String? str) {
+    if (str != null && str.isNotEmpty) {
+      return str[0].toUpperCase() + str.substring(1);
+    }
+    return str;
   }
 
   /// 匹配

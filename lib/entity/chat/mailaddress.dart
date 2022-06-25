@@ -48,17 +48,27 @@ class MailAddress extends BaseEntity {
         email = json['email'],
         imapServerHost = json['imapServerHost'],
         imapServerPort = json['imapServerPort'],
-        imapServerSecure = json['imapServerSecure'] == 1 ? true : false,
+        imapServerSecure =
+            json['imapServerSecure'] == true || json['imapServerSecure'] == 1
+                ? true
+                : false,
         imapServerConfig = json['imapServerConfig'],
         popServerHost = json['popServerHost'],
         popServerPort = json['popServerPort'],
-        popServerSecure = json['popServerSecure'] == 1 ? true : false,
+        popServerSecure =
+            json['popServerSecure'] == true || json['popServerSecure'] == 1
+                ? true
+                : false,
         popServerConfig = json['popServerConfig'],
         smtpServerHost = json['smtpServerHost'],
         smtpServerPort = json['smtpServerPort'],
-        smtpServerSecure = json['smtpServerSecure'] == 1 ? true : false,
+        smtpServerSecure =
+            json['smtpServerSecure'] == true || json['smtpServerSecure'] == 1
+                ? true
+                : false,
         smtpServerConfig = json['smtpServerConfig'],
-        isDefault = json['isDefault'] == 1 ? true : false,
+        isDefault =
+            json['isDefault'] == true || json['isDefault'] == 1 ? true : false,
         super.fromJson(json);
 
   @override

@@ -1,4 +1,5 @@
 import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/tool/util.dart';
 
 import '../../datastore/datastore.dart';
 import '../../entity/chat/chat.dart';
@@ -102,9 +103,16 @@ class ChatMessageService extends BaseService {
     await save(chatMessages, [], parent);
   }
 
-  Future<List<ChatMessage>> findByMessageType(String messageType) async {
-    var chatMessages_ = await find('messageType=?',
-        whereArgs: [messageType], orderBy: 'sendTime');
+  Future<List<ChatMessage>> findByMessageType(String messageType,
+      {String? subMessageType}) async {
+    String where = 'messageType=?';
+    List<Object> whereArgs = [messageType];
+    if (StringUtil.isNotEmpty(subMessageType) && subMessageType != null) {
+      where = '$where and subMessageType';
+      whereArgs.add(subMessageType);
+    }
+    var chatMessages_ =
+        await find(where, whereArgs: whereArgs, orderBy: 'sendTime');
     List<ChatMessage> chatMessages = [];
     if (chatMessages_.isNotEmpty) {
       for (var chatMessage_ in chatMessages_) {

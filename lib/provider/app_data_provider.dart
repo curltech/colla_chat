@@ -244,9 +244,12 @@ class AppDataProvider with ChangeNotifier {
       textTheme = const TextTheme();
     }
 
+    IconThemeData iconTheme = IconThemeData(color: colorScheme.primary);
+
     _themeData = ThemeData(
       colorScheme: colorScheme,
       textTheme: textTheme,
+      iconTheme: iconTheme,
       brightness: brightness,
     );
   }

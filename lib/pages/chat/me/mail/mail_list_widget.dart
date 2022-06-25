@@ -8,20 +8,23 @@ import '../../../../widgets/common/widget_mixin.dart';
 import 'mail_address_provider.dart';
 
 //邮件列表组件，带有回退回调函数
-class MailListWidget extends StatefulWidget
-    with LeadingButtonMixin, RouteNameMixin {
-  final Function? backCallBack;
-
-  MailListWidget({Key? key, this.backCallBack}) : super(key: key) {}
+class MailListWidget extends StatefulWidget with TileDataMixin {
+  const MailListWidget({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MailListWidgetState();
 
   @override
-  String get routeName => 'mail';
+  String get routeName => 'mails';
 
   @override
-  bool get withLeading => false;
+  bool get withLeading => true;
+
+  @override
+  Icon get icon => const Icon(Icons.alternate_email);
+
+  @override
+  String get title => 'Mails';
 }
 
 class _MailListWidgetState extends State<MailListWidget> {
@@ -33,7 +36,7 @@ class _MailListWidgetState extends State<MailListWidget> {
   late final DataListView dataListView;
 
   @override
-  initState() async {
+  initState() {
     super.initState();
     dataListView = DataListView(
       scrollController: ScrollController(),

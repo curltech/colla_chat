@@ -10,7 +10,7 @@ import '../me/me_widget.dart';
 
 ///主工作区，是PageView
 class IndexWidget extends StatefulWidget {
-  IndexWidget({Key? key}) : super(key: key);
+  const IndexWidget({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {

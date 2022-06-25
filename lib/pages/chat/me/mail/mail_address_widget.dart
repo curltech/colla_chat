@@ -11,11 +11,8 @@ import '../../../../widgets/common/data_listtile.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
 //邮件地址组件，带有回退回调函数
-class MailAddressWidget extends StatefulWidget
-    with LeadingButtonMixin, RouteNameMixin {
-  final Function? leadingCallBack;
-
-  const MailAddressWidget({Key? key, this.leadingCallBack}) : super(key: key);
+class MailAddressWidget extends StatefulWidget with TileDataMixin {
+  const MailAddressWidget({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MailAddressWidgetState();
@@ -24,7 +21,13 @@ class MailAddressWidget extends StatefulWidget
   String get routeName => 'mail_address';
 
   @override
-  bool get withLeading => false;
+  bool get withLeading => true;
+
+  @override
+  Icon get icon => const Icon(Icons.email);
+
+  @override
+  String get title => 'MailAddress';
 }
 
 class _MailAddressWidgetState extends State<MailAddressWidget> {
@@ -44,11 +47,11 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
             .create(mailAddress, password)
             .then((EmailClient? emailClient) {
           if (emailClient != null) {
-            // emailClient
-            //     .listMailboxesAsTree()
-            //     .then((enough_mail.Tree<enough_mail.Mailbox?>? tree) {
-            //   logger.i(tree!);
-            // });
+            emailClient
+                .listMailboxes()
+                .then((List<enough_mail.Mailbox?>? mailboxes) {
+              logger.i(mailboxes!);
+            });
             emailClient.selectInbox().then((enough_mail.Mailbox? mailbox) {
               logger.i(mailbox!);
               emailClient

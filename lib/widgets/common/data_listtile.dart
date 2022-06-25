@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -11,18 +12,19 @@ enum RouteStyle { workspace, navigator }
 /// 通用列表项的数据模型
 class TileData {
   //图标
-  late final Icon? icon;
+  final Icon? icon;
 
   //头像
-  late final String? avatar;
+  final String? avatar;
 
   //标题
-  late final String title;
-  late final String? subtitle;
-  late final dynamic suffix;
-  late final String? routeName;
+  final String title;
+  final String? subtitle;
+  final dynamic suffix;
+  final String? routeName;
+
   //进入路由样式
-  late final RouteStyle? routeStyle;
+  final RouteStyle? routeStyle;
   Function(String title)? onTap;
 
   TileData(
@@ -34,6 +36,23 @@ class TileData {
       this.routeName,
       this.routeStyle,
       this.onTap});
+
+  static TileData of(TileDataMixin mixin) {
+    return TileData(
+        title: mixin.title, routeName: mixin.routeName, icon: mixin.icon);
+  }
+
+  static List<TileData> from(List<TileDataMixin> mixins) {
+    List<TileData> tileData = [];
+    if (mixins.isNotEmpty) {
+      for (var mixin in mixins) {
+        TileData tile = TileData.of(mixin);
+        tileData.add(tile);
+      }
+    }
+
+    return tileData;
+  }
 }
 
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项

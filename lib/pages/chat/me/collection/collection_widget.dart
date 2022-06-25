@@ -16,11 +16,8 @@ import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 import '../../../../widgets/richtext/universal_ui/universal_ui.dart';
 
-class CollectionWidget extends StatefulWidget
-    with LeadingButtonMixin, RouteNameMixin {
-  final Function? backCallBack;
-
-  CollectionWidget({Key? key, this.backCallBack}) : super(key: key);
+class CollectionWidget extends StatefulWidget with TileDataMixin {
+  CollectionWidget({Key? key}) : super(key: key);
 
   @override
   CollectionWidgetState createState() => CollectionWidgetState();
@@ -30,6 +27,12 @@ class CollectionWidget extends StatefulWidget
 
   @override
   bool get withLeading => true;
+
+  @override
+  Icon get icon => const Icon(Icons.collections);
+
+  @override
+  String get title => 'collections';
 }
 
 class CollectionWidgetState extends State<CollectionWidget>
@@ -188,8 +191,7 @@ class CollectionWidgetState extends State<CollectionWidget>
         ),
       ],
     );
-    var collection = AppBarView(
-        title: 'Collection', leadingCallBack: widget.backCallBack, child: view);
+    var collection = AppBarView(title: 'Collection', child: view);
     return collection;
   }
 

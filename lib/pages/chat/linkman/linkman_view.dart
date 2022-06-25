@@ -10,8 +10,7 @@ import '../../../widgets/common/widget_mixin.dart';
 import 'linkman_widget.dart';
 
 //好友页面
-class LinkmanView extends StatefulWidget
-    with LeadingButtonMixin, RouteNameMixin {
+class LinkmanView extends StatefulWidget with TileDataMixin {
   LinkmanView({Key? key}) : super(key: key);
 
   @override
@@ -22,6 +21,12 @@ class LinkmanView extends StatefulWidget
 
   @override
   bool get withLeading => false;
+
+  @override
+  Icon get icon => const Icon(Icons.contacts);
+
+  @override
+  String get title => 'Linkman';
 }
 
 class _LinkmanViewState extends State<LinkmanView>
@@ -29,7 +34,7 @@ class _LinkmanViewState extends State<LinkmanView>
   late TabController _tabController;
   String _key = '';
   late List<Widget> _children;
-  LinkmanProvider _linkmenDataProvider = LinkmanProvider();
+  final LinkmanProvider _linkmenDataProvider = LinkmanProvider();
 
   @override
   void initState() {
@@ -82,7 +87,7 @@ class _LinkmanViewState extends State<LinkmanView>
       children: _children,
     );
     var toolBar = ListTile(
-      title: Text(AppLocalizations.t('Linkman'),
+      title: Text(AppLocalizations.t(widget.title),
           style: TextStyle(
               color: Provider.of<AppDataProvider>(context)
                   .themeData

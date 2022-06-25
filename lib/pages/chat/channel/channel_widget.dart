@@ -19,8 +19,7 @@ final Map<TileData, List<TileData>> mockTileData = {
 };
 
 //频道的页面
-class ChannelWidget extends StatelessWidget
-    with LeadingButtonMixin, RouteNameMixin {
+class ChannelWidget extends StatelessWidget with TileDataMixin {
   late final Map<TileData, List<TileData>> channelTileData = mockTileData;
 
   ChannelWidget({Key? key}) : super(key: key);
@@ -31,7 +30,7 @@ class ChannelWidget extends StatelessWidget
       elevation: 0,
       centerTitle: false,
       title: Text(
-        AppLocalizations.instance.text('Channel'),
+        AppLocalizations.instance.text(title),
       ),
       actions: [],
     );
@@ -48,4 +47,10 @@ class ChannelWidget extends StatelessWidget
 
   @override
   String get routeName => 'channel';
+
+  @override
+  Icon get icon => const Icon(Icons.point_of_sale_sharp);
+
+  @override
+  String get title => 'Channel';
 }

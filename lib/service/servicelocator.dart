@@ -154,7 +154,7 @@ class ServiceLocator {
           'transportType',
           'messageId',
           'messageType',
-          'chatMessageType',
+          'subMessageType',
           'direct',
           'targetPeerId',
           'targetType',

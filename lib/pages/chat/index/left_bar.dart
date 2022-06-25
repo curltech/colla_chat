@@ -5,7 +5,7 @@ import '../../../provider/index_widget_provider.dart';
 
 ///destop右边栏，用于指示当前主页面
 class LeftBar extends StatefulWidget {
-  LeftBar({Key? key}) : super(key: key);
+  const LeftBar({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {

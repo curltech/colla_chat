@@ -32,18 +32,14 @@ final Map<TileData, List<TileData>> settingTileData = {
 };
 
 //设置页面，带有回退回调函数
-class SettingWidget extends StatelessWidget
-    with LeadingButtonMixin, RouteNameMixin {
-  final Function? leadingCallBack;
-
-  const SettingWidget({Key? key, this.leadingCallBack}) : super(key: key);
+class SettingWidget extends StatelessWidget with TileDataMixin {
+  const SettingWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var setting = AppBarView(
         title: 'Setting',
         withLeading: withLeading,
-        leadingCallBack: leadingCallBack,
         child: GroupDataListView(tileData: settingTileData));
     return setting;
   }
@@ -53,4 +49,10 @@ class SettingWidget extends StatelessWidget
 
   @override
   String get routeName => 'setting';
+
+  @override
+  Icon get icon => const Icon(Icons.settings);
+
+  @override
+  String get title => 'Setting';
 }

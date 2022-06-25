@@ -10,9 +10,8 @@ import '../../../../widgets/common/data_listtile.dart';
 import '../../../../widgets/common/image_widget.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
-class PersonalInfoWidget extends StatefulWidget
-    with LeadingButtonMixin, RouteNameMixin {
-  PersonalInfoWidget({Key? key}) : super(key: key);
+class PersonalInfoWidget extends StatefulWidget with TileDataMixin {
+  const PersonalInfoWidget({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -24,6 +23,12 @@ class PersonalInfoWidget extends StatefulWidget
 
   @override
   String get routeName => 'personal_info';
+
+  @override
+  Icon get icon => const Icon(Icons.personal_video);
+
+  @override
+  String get title => 'PersonalInfo';
 }
 
 class _PersonalInfoWidgetState extends State<PersonalInfoWidget>

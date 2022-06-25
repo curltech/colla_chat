@@ -1,4 +1,5 @@
 import 'package:colla_chat/pages/chat/login/p2p_login.dart';
+import 'package:colla_chat/pages/chat/me/mail/mail_address_provider.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/routers/routes.dart';
@@ -37,6 +38,7 @@ class CollaChatApp extends StatelessWidget {
         providers: <SingleChildWidget>[
           ChangeNotifierProvider.value(value: appDataProvider),
           ChangeNotifierProvider.value(value: IndexWidgetProvider.instance),
+          ChangeNotifierProvider.value(value: mailAddressProvider),
         ],
         child: Consumer<AppDataProvider>(
             builder: (BuildContext context, appDataProvider, Widget? child) {

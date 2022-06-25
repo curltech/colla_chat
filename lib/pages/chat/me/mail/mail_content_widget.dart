@@ -9,11 +9,8 @@ import '../../../../widgets/common/widget_mixin.dart';
 import 'mail_address_provider.dart';
 
 //邮件内容组件
-class MailContentWidget extends StatefulWidget
-    with LeadingButtonMixin, RouteNameMixin {
-  final Function? leadingCallBack;
-
-  MailContentWidget({Key? key, this.leadingCallBack}) : super(key: key);
+class MailContentWidget extends StatefulWidget with TileDataMixin {
+  const MailContentWidget({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _MailContentWidgetState();
@@ -23,13 +20,19 @@ class MailContentWidget extends StatefulWidget
 
   @override
   bool get withLeading => true;
+
+  @override
+  Icon get icon => const Icon(Icons.attach_email);
+
+  @override
+  String get title => 'MailContent';
 }
 
 class _MailContentWidgetState extends State<MailContentWidget> {
   MimeMessage mimeMessage = MimeMessage();
 
   @override
-  initState() async {
+  initState() {
     super.initState();
   }
 

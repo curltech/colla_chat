@@ -29,7 +29,7 @@ class IndexViewState extends State<IndexView>
   }
 
   Widget _createScaffold(BuildContext context) {
-    var indexWidget = IndexWidget();
+    var indexWidget = const IndexWidget();
     //左边栏，和底部按钮功能一样，在桌面版才有
     var leftToolBar = LeftBar();
     var bottomNavigationBar = BottomBar();

@@ -7,8 +7,7 @@ import 'auto_discover_widget.dart';
 import 'manual_add_widget.dart';
 
 /// 地址增加页面
-class AddressAddWidget extends StatefulWidget
-    with LeadingButtonMixin, RouteNameMixin {
+class AddressAddWidget extends StatefulWidget with TileDataMixin {
   const AddressAddWidget({Key? key}) : super(key: key);
 
   @override
@@ -19,6 +18,12 @@ class AddressAddWidget extends StatefulWidget
 
   @override
   bool get withLeading => true;
+
+  @override
+  Icon get icon => const Icon(Icons.contact_mail);
+
+  @override
+  String get title => 'MailAddressAdd';
 }
 
 class _AddressAddWidgetState extends State<AddressAddWidget>

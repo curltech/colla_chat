@@ -6,7 +6,7 @@ import '../../../provider/index_widget_provider.dart';
 
 ///mobile底边栏，用于指示当前主页面
 class BottomBar extends StatefulWidget {
-  BottomBar({Key? key}) : super(key: key);
+  const BottomBar({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {

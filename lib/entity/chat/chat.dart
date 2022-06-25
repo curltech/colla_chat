@@ -91,7 +91,7 @@ class ChatMessage extends StatusEntity {
   String? transportType; // 包括：websocket,webrtc,mail,sms
   String? messageId; // 消息的唯一id标识
   String messageType = ''; // 消息类型（对应channel消息类型）
-  String? chatMessageType;
+  String? subMessageType;
   String? direct; //对自己而言，消息是属于发或者接受
   //发送的人是自己，记录目标接收者的id和类型名称，自己是接收人，记录的是对方的目标群
   String? targetPeerId; // 目标的唯一id标识（单聊对应linkman-peerId，群聊对应group-peerId）
@@ -148,7 +148,7 @@ class ChatMessage extends StatusEntity {
         targetAddress = json['targetAddress'],
         messageId = json['messageId'],
         messageType = json['messageType'],
-        chatMessageType = json['chatMessageType'],
+        subMessageType = json['subMessageType'],
         senderPeerId = json['senderPeerId'],
         senderName = json['senderName'],
         senderAddress = json['senderAddress'],
@@ -198,7 +198,7 @@ class ChatMessage extends StatusEntity {
       'targetAddress': targetAddress,
       'messageId': messageId,
       'messageType': messageType,
-      'chatMessageType': chatMessageType,
+      'subMessageType': subMessageType,
       'senderPeerId': senderPeerId,
       'senderType': senderType,
       'senderName': senderName,

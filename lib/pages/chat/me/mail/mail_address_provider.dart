@@ -18,7 +18,7 @@ final List<TileData> mailAddrTileData = [
   TileData(
       icon: Icon(Icons.drafts,
           color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'Draft'),
+      title: 'Drafts'),
   TileData(
       icon: Icon(Icons.send,
           color: appDataProvider.themeData?.colorScheme.primary),
