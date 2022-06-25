@@ -220,6 +220,10 @@ class MailAddressProvider with ChangeNotifier {
               await ChatMessageService.instance.insert(chatMessage);
             }
             emailClient.deleteMessage(mimeMessage);
+            var currentChatMessages = this.currentChatMessages;
+            if (currentChatMessages != null) {
+              currentChatMessages.add(chatMessage);
+            }
           }
         }
         notifyListeners();
