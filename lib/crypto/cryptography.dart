@@ -1,12 +1,9 @@
-import 'dart:convert';
 import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
-import 'package:cryptography_flutter/cryptography_flutter.dart';
 import 'package:cryptography/cryptography.dart';
-
-import '../tool/util.dart';
+import 'package:cryptography_flutter/cryptography_flutter.dart';
 
 class CryptoGraphy {
   CryptoGraphy() {
@@ -223,10 +220,31 @@ class CryptoGraphy {
     return result;
   }
 
-  Future<List<int>> aesEncrypt(List<int> message, List<int> passphrase) async {
+  Future<List<int>> aesEncrypt(List<int> message, List<int> passphrase,
+      {String type = 'gcm'}) async {
     // Choose the cipher
     var hashPassphrase = await hash(passphrase);
-    final algorithm = AesGcm.with256bits();
+    Cipher algorithm;
+    switch (type) {
+      case 'gcm':
+        algorithm = AesGcm.with256bits();
+        break;
+      case 'ctr':
+        algorithm = AesCtr.with256bits(macAlgorithm: Hmac.sha256());
+        break;
+      case 'cbc':
+        algorithm = AesCbc.with256bits(macAlgorithm: Hmac.sha256());
+        break;
+      case 'chacha20':
+        algorithm = Chacha20.poly1305Aead();
+        break;
+      case 'xchacha20':
+        algorithm = Xchacha20.poly1305Aead();
+        break;
+      default:
+        algorithm = AesGcm.with256bits();
+        break;
+    }
     final secretKey = SecretKey(hashPassphrase);
     // Encrypt
     final secretBox = await algorithm.encrypt(
@@ -236,9 +254,30 @@ class CryptoGraphy {
     return secretBox.concatenation();
   }
 
-  Future<List<int>> aesDecrypt(List<int> message, List<int> passphrase) async {
+  Future<List<int>> aesDecrypt(List<int> message, List<int> passphrase,
+      {String type = 'gcm'}) async {
     var hashPassphrase = await hash(passphrase);
-    final algorithm = AesGcm.with256bits();
+    Cipher algorithm;
+    switch (type) {
+      case 'gcm':
+        algorithm = AesGcm.with256bits();
+        break;
+      case 'ctr':
+        algorithm = AesCtr.with256bits(macAlgorithm: Hmac.sha256());
+        break;
+      case 'cbc':
+        algorithm = AesCbc.with256bits(macAlgorithm: Hmac.sha256());
+        break;
+      case 'chacha20':
+        algorithm = Chacha20.poly1305Aead();
+        break;
+      case 'xchacha20':
+        algorithm = Xchacha20.poly1305Aead();
+        break;
+      default:
+        algorithm = AesGcm.with256bits();
+        break;
+    }
     final secretKey = SecretKey(hashPassphrase);
 
     SecretBox secretBox =
