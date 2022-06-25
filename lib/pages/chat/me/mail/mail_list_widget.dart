@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../entity/chat/chat.dart';
+import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/data_listtile.dart';
 import '../../../../widgets/common/data_listview.dart';
 import '../../../../widgets/common/widget_mixin.dart';
@@ -64,7 +65,12 @@ class _MailListWidgetState extends State<MailListWidget> {
         }
       }
       dataListViewController.add(adds);
-      return dataListView;
+      var appBarView = AppBarView(
+          title: widget.title,
+          withLeading: widget.withLeading,
+          child: dataListView);
+
+      return appBarView;
     });
   }
 }

@@ -1,11 +1,9 @@
 import 'package:colla_chat/pages/chat/me/mail/mail_address_provider.dart';
-import 'package:colla_chat/transport/emailclient.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../entity/chat/mailaddress.dart';
-import '../../../../provider/app_data_provider.dart';
+import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/data_group_listview.dart';
 import '../../../../widgets/common/data_listtile.dart';
 import '../../../../widgets/common/widget_mixin.dart';
@@ -31,61 +29,94 @@ class MailAddressWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _MailAddressWidgetState extends State<MailAddressWidget> {
-  Map<TileData, List<TileData>> mailAddressTileData = {};
-
   @override
   initState() {
     super.initState();
   }
 
-  _connect(MailAddress mailAddress) {
-    EmailClient? emailClient = EmailClientPool.instance.get(mailAddress.email);
-    if (emailClient == null) {
-      var password = mailAddress.password;
-      if (password != null) {
-        EmailClientPool.instance
-            .create(mailAddress, password)
-            .then((EmailClient? emailClient) {
-          if (emailClient != null) {
-            emailClient
-                .listMailboxes()
-                .then((List<enough_mail.Mailbox?>? mailboxes) {
-              logger.i(mailboxes!);
-            });
-            emailClient.selectInbox().then((enough_mail.Mailbox? mailbox) {
-              logger.i(mailbox!);
-              emailClient
-                  .fetchMessages(mailbox: mailbox)
-                  .then((List<enough_mail.MimeMessage>? mimeMessages) {
-                logger.i(mimeMessages!);
-              }).catchError((err) {
-                logger.e(err);
-              });
-            });
-          }
-        });
-      }
+  Icon _createIcon(String name) {
+    Icon icon;
+    switch (name) {
+      case 'inbox':
+        icon = const Icon(Icons.inbox);
+        break;
+      case 'drafts':
+        icon = const Icon(Icons.drafts);
+        break;
+      case 'sent':
+        icon = const Icon(Icons.send);
+        break;
+      case 'trash':
+        icon = const Icon(Icons.delete);
+        break;
+      case 'junk':
+        icon = const Icon(Icons.garage);
+        break;
+      case 'mark':
+        icon = const Icon(Icons.flag);
+        break;
+      case 'backup':
+        icon = const Icon(Icons.backup);
+        break;
+      case 'evidence':
+        icon = const Icon(Icons.approval);
+        break;
+      case 'ads':
+        icon = const Icon(Icons.ads_click);
+        break;
+      case 'virus':
+        icon = const Icon(Icons.coronavirus);
+        break;
+      case 'subscript':
+        icon = const Icon(Icons.subscript);
+        break;
+      default:
+        icon = const Icon(Icons.folder);
+        break;
     }
+    return icon;
   }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<MailAddressProvider>(
         builder: (context, mailAddressProvider, child) {
+      Map<TileData, List<TileData>> mailAddressTileData = {};
       var mailAddresses = mailAddressProvider.mailAddresses;
       if (mailAddresses.isNotEmpty) {
         for (var mailAddress in mailAddresses) {
-          _connect(mailAddress);
           TileData key =
               TileData(title: mailAddress.email, icon: const Icon(Icons.email));
-          mailAddressTileData[key] = mailAddrTileData;
+          List<enough_mail.Mailbox?>? mailboxes =
+              mailAddressProvider.getMailboxes(mailAddress.email);
+          if (mailboxes != null && mailboxes.isNotEmpty) {
+            List<TileData> tiles = [];
+            for (var mailbox in mailboxes) {
+              if (mailbox != null) {
+                Icon icon;
+                var flags = mailbox.flags;
+                if (flags.isNotEmpty) {
+                  enough_mail.MailboxFlag flag = flags[0];
+                  icon = _createIcon(flag.name);
+                } else {
+                  icon = _createIcon(mailbox.name);
+                }
+                TileData tile = TileData(
+                    title: mailbox.name, icon: icon, routeName: 'mails');
+                tiles.add(tile);
+              }
+            }
+            mailAddressTileData[key] = tiles;
+          }
         }
       }
-      var mailAddressWidget =
-          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Expanded(child: GroupDataListView(tileData: mailAddressTileData)),
-      ]);
-      return mailAddressWidget;
+      var mailAddressWidget = GroupDataListView(tileData: mailAddressTileData);
+      var appBarView = AppBarView(
+          title: widget.title,
+          withLeading: widget.withLeading,
+          child: mailAddressWidget);
+
+      return appBarView;
     });
   }
 }

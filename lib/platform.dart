@@ -196,16 +196,4 @@ class PlatformParams {
       'systemMemoryInMegabytes': data.systemMemoryInMegabytes,
     };
   }
-
-  /// 屏幕宽度较小，是移动尺寸
-  bool ifMobileSize() {
-    return (mediaQueryData.size.width < 481);
-  }
-
-  /// 可以采用移动窄屏的样式
-  bool ifMobileStyle() {
-    return (mediaQueryData.size.width < 481 ||
-            mediaQueryData.size.height < 481) ||
-        ((this.android || this.ios));
-  }
 }

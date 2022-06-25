@@ -63,6 +63,7 @@ class EmailMessageUtil {
   ///转换邮件信息为聊天信息
   static ChatMessage convertToChatMessage(enough_mail.MimeMessage message) {
     ChatMessage chatMessage = ChatMessage();
+    chatMessage.id = message.guid;
     chatMessage.title = message.decodeSubject();
     chatMessage.senderName = message.from.toString();
     chatMessage.contentType = message.mediaType.toString();
