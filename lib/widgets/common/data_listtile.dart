@@ -58,13 +58,23 @@ class TileData {
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
 class DataListTile extends StatelessWidget {
   final TileData tileData;
+
+  ///是否被选择，颜色不同
   final bool selected;
 
-  const DataListTile({Key? key, required this.tileData, this.selected = false})
+  ///是否缩小
+  final bool dense;
+
+  const DataListTile(
+      {Key? key,
+      required this.tileData,
+      this.selected = false,
+      this.dense = false})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    ///前导组件，一般是自定义图标或者图像
     Widget? leading;
     final avatar = tileData.avatar;
     if (tileData.icon != null) {
@@ -72,6 +82,8 @@ class DataListTile extends StatelessWidget {
     } else if (avatar != null) {
       leading = Image.memory(Uint8List.fromList(avatar.codeUnits));
     }
+
+    ///尾部组件数组，首先加入suffix自定义组件或者文本
     List<Widget>? trailing = <Widget>[];
     var suffix = tileData.suffix;
     if (suffix != null) {
@@ -85,10 +97,14 @@ class DataListTile extends StatelessWidget {
         ));
       }
     }
+
+    ///然后，如果路由名称存在，加入路由图标
     if (tileData.routeName != null) {
       trailing.add(Icon(Icons.chevron_right,
           color: appDataProvider.themeData?.colorScheme.primary));
     }
+
+    ///横向排列尾部的组件
     Widget? trailingWidget;
     if (trailing.length == 1) {
       trailingWidget = trailing[0];
@@ -112,12 +128,15 @@ class DataListTile extends StatelessWidget {
             )
           : null,
       trailing: trailingWidget,
-      dense: true,
+      dense: dense,
       onTap: () {
+        ///如果定义了点击回调函数，一标题为参数进行回调
         var call = tileData.onTap;
         if (call != null) {
           call(tileData.title);
         }
+
+        ///如果路由名称存在，点击会调用路由
         if (tileData.routeName != null) {
           var indexWidgetProvider =
               Provider.of<IndexWidgetProvider>(context, listen: false);
