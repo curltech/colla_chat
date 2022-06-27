@@ -1,3 +1,4 @@
+import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../provider/app_data_provider.dart';
@@ -33,14 +34,15 @@ final Map<TileData, List<TileData>> settingTileData = {
 
 //设置页面，带有回退回调函数
 class SettingWidget extends StatelessWidget with TileDataMixin {
-  const SettingWidget({Key? key}) : super(key: key);
+  SettingWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var setting = AppBarView(
-        title: 'Setting',
-        withLeading: withLeading,
-        child: GroupDataListView(tileData: settingTileData));
+    var setting = KeepAliveWrapper(
+        child: AppBarView(
+            title: 'Setting',
+            withLeading: withLeading,
+            child: GroupDataListView(tileData: settingTileData)));
     return setting;
   }
 

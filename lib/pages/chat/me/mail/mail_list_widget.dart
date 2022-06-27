@@ -30,19 +30,12 @@ class MailListWidget extends StatefulWidget with TileDataMixin {
 
 class _MailListWidgetState extends State<MailListWidget> {
   List<TileData> mailAddressTileData = [];
-
-  DataListViewController dataListViewController =
-      DataListViewController(tileData: []);
-
   late final DataListView dataListView;
 
   @override
   initState() {
     super.initState();
-    dataListView = DataListView(
-      scrollController: ScrollController(),
-      dataListViewController: dataListViewController,
-    );
+    dataListView = DataListView(tileData: []);
   }
 
   @override
@@ -55,16 +48,16 @@ class _MailListWidgetState extends State<MailListWidget> {
         for (var i = 0;
             i <
                 currentChatMessages.length -
-                    dataListViewController.tileData.length;
+                    dataListView.dataListViewController.tileData.length;
             ++i) {
-          ChatMessage chatMessage =
-              currentChatMessages[dataListViewController.tileData.length + i];
+          ChatMessage chatMessage = currentChatMessages[
+              dataListView.dataListViewController.tileData.length + i];
           var title = chatMessage.title ?? '';
           TileData tile = TileData(title: title);
           adds.add(tile);
         }
       }
-      dataListViewController.add(adds);
+      dataListView.dataListViewController.add(adds);
       var appBarView = AppBarView(
           title: widget.title,
           withLeading: widget.withLeading,

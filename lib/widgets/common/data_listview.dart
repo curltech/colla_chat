@@ -5,7 +5,7 @@ import 'data_listtile.dart';
 
 class DataListViewController extends ChangeNotifier {
   List<TileData> tileData;
-  int currentIndex = 0;
+  int _currentIndex = 0;
 
   DataListViewController(
       {this.tileData = const <TileData>[],
@@ -17,6 +17,15 @@ class DataListViewController extends ChangeNotifier {
 
   TileData getTileData(int index) {
     return tileData[index];
+  }
+
+  int get currentIndex {
+    return _currentIndex;
+  }
+
+  set currentIndex(int index) {
+    _currentIndex = index;
+    notifyListeners();
   }
 
   add(List<TileData> tiles) {
@@ -31,18 +40,28 @@ class DataListViewController extends ChangeNotifier {
 ///利用DataListViewController修改数据，然后重新执行ListView.build
 ///外部可能有ListView或者PageView等滚动视图，所以shrinkWrap: true,
 class DataListView extends StatefulWidget {
-  final DataListViewController dataListViewController;
-  final ScrollController scrollController;
+  static int count = 0;
+  late int index;
+  final List<TileData> tileData;
+  late final DataListViewController dataListViewController;
+  final ScrollController scrollController = ScrollController();
   final Function()? onScrollMax;
   final Future<void> Function()? onRefresh;
+  final Function(int index)? onTap;
 
-  const DataListView(
+  DataListView(
       {Key? key,
-      required this.dataListViewController,
-      required this.scrollController,
+      required this.tileData,
       this.onScrollMax,
-      this.onRefresh})
-      : super(key: key);
+      this.onRefresh,
+      this.onTap})
+      : super(key: key) {
+    count++;
+    index = count;
+    dataListViewController = DataListViewController(tileData: tileData);
+    logger.w(
+        'key: $index,new dataListViewController: ${dataListViewController.tileData.length}:${dataListViewController.currentIndex}');
+  }
 
   @override
   State<StatefulWidget> createState() {
@@ -51,30 +70,24 @@ class DataListView extends StatefulWidget {
 }
 
 class _DataListView extends State<DataListView> {
-  String _title = '';
-
   @override
   initState() {
-    super.initState();
-
-    widget.dataListViewController.addListener(() {
-      setState(() {});
-    });
-
-    widget.scrollController.addListener(() {
+    widget.dataListViewController.addListener(update);
+    var scrollController = widget.scrollController;
+    scrollController.addListener(() {
       double offset = widget.scrollController.offset;
       logger.i('scrolled to $offset');
 
       ///判断是否滚动到最底，需要加载更多数据
-      if (widget.scrollController.position.pixels ==
-          widget.scrollController.position.maxScrollExtent) {
+      if (scrollController.position.pixels ==
+          scrollController.position.maxScrollExtent) {
         logger.i('scrolled to max');
         if (widget.onScrollMax != null) {
           widget.onScrollMax!();
         }
       }
-      if (widget.scrollController.position.pixels ==
-          widget.scrollController.position.minScrollExtent) {
+      if (scrollController.position.pixels ==
+          scrollController.position.minScrollExtent) {
         logger.i('scrolled to min');
       }
 
@@ -82,6 +95,23 @@ class _DataListView extends State<DataListView> {
       // widget.scrollController.animateTo(offset,
       //     duration: const Duration(milliseconds: 1000), curve: Curves.ease);
     });
+
+    super.initState();
+  }
+
+  void update() {
+    //如果数据发生变化（model类调用了notifyListeners），重新构建InheritedProvider
+    setState(() => {});
+  }
+
+  @override
+  void didUpdateWidget(DataListView oldWidget) {
+    //当Provider更新时，如果新旧数据不"=="，则解绑旧数据监听，同时添加新数据监听
+    if (widget.dataListViewController != oldWidget.dataListViewController) {
+      oldWidget.dataListViewController.removeListener(update);
+      widget.dataListViewController.addListener(update);
+    }
+    super.didUpdateWidget(oldWidget);
   }
 
   bool _onNotification(ScrollNotification notification) {
@@ -97,10 +127,14 @@ class _DataListView extends State<DataListView> {
     }
   }
 
-  _onTap(String title) {
-    setState(() {
-      _title = title;
-    });
+  _onTap(int index) {
+    logger.w(
+        'index: ${widget.index}, onTap dataListViewController:${widget.dataListViewController.tileData.length}:${widget.dataListViewController.currentIndex}');
+    widget.dataListViewController.currentIndex = index;
+    var onTap = widget.onTap;
+    if (onTap != null) {
+      onTap(index);
+    }
   }
 
   Widget _buildGroup(BuildContext context) {
@@ -115,13 +149,19 @@ class _DataListView extends State<DataListView> {
             controller: widget.scrollController,
             itemBuilder: (BuildContext context, int index) {
               TileData tile = widget.dataListViewController.getTileData(index);
-              tile.onTap = _onTap;
+              var onTap = tile.onTap;
+              if (onTap == null) {
+                tile.onTap = _onTap;
+              }
+
+              ///如果当前选择的项目的标题相符，则选择标志为true
               bool selected = false;
-              if (_title == tile.title) {
+              if (widget.dataListViewController.currentIndex == index) {
                 selected = true;
               }
               DataListTile tileWidget = DataListTile(
                 tileData: tile,
+                index: index,
                 selected: selected,
               );
 
@@ -134,5 +174,15 @@ class _DataListView extends State<DataListView> {
   @override
   Widget build(BuildContext context) {
     return _buildGroup(context);
+  }
+
+  @override
+  void dispose() {
+    widget.scrollController.dispose();
+    logger.w(
+        'key: ${widget.index}, dispose dataListViewController:${widget.dataListViewController.tileData.length}:${widget.dataListViewController.currentIndex}');
+    widget.dataListViewController.removeListener(update);
+    widget.dataListViewController.dispose();
+    super.dispose();
   }
 }

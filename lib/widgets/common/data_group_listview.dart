@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:colla_chat/widgets/common/data_listview.dart';
+import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:flutter/material.dart';
 
 import 'data_listtile.dart';
@@ -11,10 +12,9 @@ import 'data_listtile.dart';
 ///每个ListView下面是ListTile
 class GroupDataListView extends StatelessWidget {
   final Map<TileData, List<TileData>> tileData;
-
   const GroupDataListView({Key? key, required this.tileData}) : super(key: key);
 
-  Widget _buildExpansionTile(BuildContext context, TileData tile) {
+  Widget _buildExpansionTile(TileData tile) {
     Widget? leading;
     final avatar = tile.avatar;
     if (tile.icon != null) {
@@ -46,9 +46,8 @@ class GroupDataListView extends StatelessWidget {
     }
     List<TileData>? tileData = this.tileData[tile];
     tileData = tileData ?? [];
-    DataListView dataListView = DataListView(
-        scrollController: ScrollController(),
-        dataListViewController: DataListViewController(tileData: tileData));
+    Widget dataListView = KeepAliveWrapper(
+        keepAlive: true, child: DataListView(tileData: tileData));
 
     ///未来不使用ListTile，因为高度固定，不够灵活
     return ExpansionTile(
@@ -67,12 +66,11 @@ class GroupDataListView extends StatelessWidget {
     );
   }
 
-  Widget _build(BuildContext context) {
+  Widget _build() {
     List<Widget> groups = [];
     if (tileData.isNotEmpty) {
       for (var tileEntry in tileData.entries) {
         Widget groupExpansionTile = _buildExpansionTile(
-          context,
           tileEntry.key,
         );
         groups.add(groupExpansionTile);
@@ -85,6 +83,6 @@ class GroupDataListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _build(context);
+    return _build();
   }
 }

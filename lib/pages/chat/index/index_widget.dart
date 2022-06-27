@@ -57,4 +57,9 @@ class _IndexWidgetState extends State<IndexWidget>
     var pageView = _createPageView(context);
     return pageView;
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 }

@@ -2,15 +2,12 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'data_listtile.dart';
-
 ///工作区的顶部栏AppBar，定义了前导组件，比如回退按钮
 ///定义了尾部组件和下拉按钮
 class AppBarWidget {
   static AppBar build(
     BuildContext context, {
     withLeading = false, //是否有缺省的回退按钮
-    leadingRouteStyle, //回退按钮的样式
     leadingCallBack, //回退按钮的回调
     title = '',
     centerTitle = false, //标题是否居中
@@ -40,9 +37,7 @@ class AppBarWidget {
 
     ///左边的回退按钮
     var leading = backButton(context,
-        withLeading: withLeading,
-        leadingRouteStyle: leadingRouteStyle,
-        leadingCallBack: leadingCallBack);
+        withLeading: withLeading, leadingCallBack: leadingCallBack);
     AppBar appBar = AppBar(
       title: Text(title),
       elevation: 0,
@@ -56,9 +51,7 @@ class AppBarWidget {
   }
 
   static Widget? backButton(BuildContext context,
-      {bool withLeading = false,
-      final Function? leadingCallBack,
-      RouteStyle? leadingRouteStyle}) {
+      {bool withLeading = false, final Function? leadingCallBack}) {
     Widget? leadingButton;
 
     ///是否加上回退按钮，如果回调存在，调用回调函数，然后回退路由
@@ -71,8 +64,7 @@ class AppBarWidget {
           }
           var indexWidgetProvider =
               Provider.of<IndexWidgetProvider>(context, listen: false);
-          indexWidgetProvider.pop(
-              routeStyle: leadingRouteStyle, context: context);
+          indexWidgetProvider.pop(context: context);
         },
       );
     }

@@ -34,21 +34,24 @@ final Map<TileData, List<TileData>> mockTileData = {
 class ChatTarget extends StatelessWidget with TileDataMixin {
   /// 聊天目标的数据
   late final Map<TileData, List<TileData>> chatTargets = mockTileData;
+  late final Widget child;
 
-  ChatTarget({Key? key}) : super(key: key);
+  ChatTarget({Key? key}) : super(key: key) {
+    child = GroupDataListView(tileData: chatTargets);
+  }
 
   @override
   Widget build(BuildContext context) {
     var appBar = AppBar(
+      automaticallyImplyLeading: false,
       elevation: 0,
       centerTitle: false,
       title: Text(
         AppLocalizations.instance.text(title),
       ),
-      actions: [],
+      actions: const [],
     );
-    var body = GroupDataListView(tileData: chatTargets);
-    return Scaffold(appBar: appBar, body: body);
+    return Scaffold(appBar: appBar, body: child);
   }
 
   @override

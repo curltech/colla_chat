@@ -28,11 +28,13 @@ class IndexViewState extends State<IndexView>
     super.initState();
   }
 
-  Widget _createScaffold(BuildContext context) {
+  Widget _createScaffold(
+      BuildContext context, IndexWidgetProvider indexWidgetProvider) {
     var indexWidget = const IndexWidget();
     //左边栏，和底部按钮功能一样，在桌面版才有
-    var leftToolBar = LeftBar();
-    var bottomNavigationBar = BottomBar();
+    var leftToolBar = const LeftBar();
+    var bottomNavigationBar = Offstage(
+        offstage: !indexWidgetProvider.bottomBarVisible, child: BottomBar());
     Scaffold scaffold;
     //移动手机不需要左边栏，需要底部栏
     if (appDataProvider.mobile) {
@@ -60,10 +62,15 @@ class IndexViewState extends State<IndexView>
   @override
   Widget build(BuildContext context) {
     appDataProvider.changeSize(context);
-    var scaffold = _createScaffold(context);
     var provider = Consumer<IndexWidgetProvider>(
-      builder: (context, indexWidgetProvider, child) => scaffold,
+      builder: (context, indexWidgetProvider, child) =>
+          _createScaffold(context, indexWidgetProvider),
     );
     return provider;
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

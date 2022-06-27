@@ -52,7 +52,7 @@ class _BottomBarState extends State<BottomBar> {
         onTap: (int index) {
           indexWidgetProvider.mainIndex = index;
           //不传入路由context和样式，走工作区路由
-          indexWidgetProvider.push(widgetPosition[index]);
+          indexWidgetProvider.push(workspaceViews[index]);
         },
       );
     });

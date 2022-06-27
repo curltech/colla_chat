@@ -28,7 +28,7 @@ class _LeftBarState extends State<LeftBar> {
           children: <Widget>[
             ListTile(
                 iconColor: indexWidgetProvider.getIconColor(0),
-                title: Icon(Icons.chat),
+                title: const Icon(Icons.chat),
                 subtitle: Text(
                   indexWidgetProvider.getLabel(0),
                   textAlign: TextAlign.center,
@@ -37,11 +37,11 @@ class _LeftBarState extends State<LeftBar> {
                 onTap: () {
                   indexWidgetProvider.mainIndex = 0;
                   //不传入路由context和样式，走工作区路由
-                  indexWidgetProvider.push(widgetPosition[0]);
+                  indexWidgetProvider.push(workspaceViews[0]);
                 }),
             ListTile(
                 iconColor: indexWidgetProvider.getIconColor(1),
-                title: Icon(Icons.contacts),
+                title: const Icon(Icons.contacts),
                 subtitle: Text(
                   indexWidgetProvider.getLabel(1),
                   textAlign: TextAlign.center,
@@ -49,11 +49,11 @@ class _LeftBarState extends State<LeftBar> {
                 ),
                 onTap: () {
                   indexWidgetProvider.mainIndex = 1;
-                  indexWidgetProvider.push(widgetPosition[1]);
+                  indexWidgetProvider.push(workspaceViews[1]);
                 }),
             ListTile(
                 iconColor: indexWidgetProvider.getIconColor(2),
-                title: Icon(Icons.wifi_channel),
+                title: const Icon(Icons.wifi_channel),
                 subtitle: Text(
                   indexWidgetProvider.getLabel(2),
                   textAlign: TextAlign.center,
@@ -61,11 +61,11 @@ class _LeftBarState extends State<LeftBar> {
                 ),
                 onTap: () {
                   indexWidgetProvider.mainIndex = 2;
-                  indexWidgetProvider.push(widgetPosition[2]);
+                  indexWidgetProvider.push(workspaceViews[2]);
                 }),
             ListTile(
                 iconColor: indexWidgetProvider.getIconColor(3),
-                title: Icon(Icons.person),
+                title: const Icon(Icons.person),
                 subtitle: Text(
                   indexWidgetProvider.getLabel(3),
                   textAlign: TextAlign.center,
@@ -73,7 +73,7 @@ class _LeftBarState extends State<LeftBar> {
                 ),
                 onTap: () {
                   indexWidgetProvider.mainIndex = 3;
-                  indexWidgetProvider.push(widgetPosition[3]);
+                  indexWidgetProvider.push(workspaceViews[3]);
                 }),
           ],
         ),

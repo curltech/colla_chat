@@ -119,4 +119,9 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
       return appBarView;
     });
   }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
 }

@@ -34,7 +34,7 @@ class MailView extends StatefulWidget with TileDataMixin {
 class _MailViewState extends State<MailView>
     with SingleTickerProviderStateMixin {
   Map<TileData, List<TileData>> mailAddressTileData = {};
-  var mailAddressWidget = const MailAddressWidget();
+  var mailAddressWidget = MailAddressWidget();
   var mailListWidget = const MailListWidget();
   var mailContentWidget = const MailContentWidget();
 

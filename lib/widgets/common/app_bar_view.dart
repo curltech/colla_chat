@@ -3,14 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'app_bar_widget.dart';
-import 'data_listtile.dart';
 
 ///工作区的标准视图，包裹了顶部栏AppBarWidget和一个包裹了child
 class AppBarView extends StatelessWidget {
   final bool withLeading;
 
   //指定回退路由样式，不指定则系统判断
-  final RouteStyle? leadingRouteStyle;
   final Function? leadingCallBack;
   final String title;
   final bool centerTitle;
@@ -24,7 +22,6 @@ class AppBarView extends StatelessWidget {
   const AppBarView({
     Key? key,
     this.withLeading = false,
-    this.leadingRouteStyle,
     this.leadingCallBack,
     required this.title,
     this.centerTitle = false,
@@ -43,7 +40,6 @@ class AppBarView extends StatelessWidget {
       return Scaffold(
         appBar: AppBarWidget.build(context,
             withLeading: withLeading,
-            leadingRouteStyle: leadingRouteStyle,
             leadingCallBack: leadingCallBack,
             title: title,
             centerTitle: centerTitle,

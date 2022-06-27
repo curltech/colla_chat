@@ -27,6 +27,7 @@ class ChannelWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     var appBar = AppBar(
+      automaticallyImplyLeading: false,
       elevation: 0,
       centerTitle: false,
       title: Text(
