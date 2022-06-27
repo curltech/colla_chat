@@ -3,20 +3,51 @@ import 'package:flutter/material.dart';
 import '../../provider/app_data_provider.dart';
 import 'data_listtile.dart';
 
-class DataListViewController extends ChangeNotifier {
+///TileData转换器接口定义，根据序列号获取TileData
+mixin TileDataConvertMixin {
+  TileData getTileData(int index);
+
+  bool add(List<TileData> tiles);
+
+  int get length;
+}
+
+///TileData数组的转换器实现类
+class ListTileDataConvertMixin with TileDataConvertMixin {
   List<TileData> tileData;
+
+  ListTileDataConvertMixin({required this.tileData});
+
+  @override
+  TileData getTileData(int index) {
+    return tileData[index];
+  }
+
+  @override
+  bool add(List<TileData> tiles) {
+    if (tiles.isNotEmpty) {
+      tileData.addAll(tiles);
+      return true;
+    }
+    return false;
+  }
+
+  @override
+  int get length => tileData.length;
+}
+
+class DataListViewController extends ChangeNotifier {
+  TileDataConvertMixin tileData;
   int _currentIndex = 0;
 
-  DataListViewController(
-      {this.tileData = const <TileData>[],
-      Future<List<TileData>> Function(int limit)? more});
+  DataListViewController({required this.tileData});
 
   TileData get current {
-    return tileData[currentIndex];
+    return tileData.getTileData(_currentIndex);
   }
 
   TileData getTileData(int index) {
-    return tileData[index];
+    return tileData.getTileData(index);
   }
 
   int get currentIndex {
@@ -29,21 +60,21 @@ class DataListViewController extends ChangeNotifier {
   }
 
   add(List<TileData> tiles) {
-    if (tiles.isNotEmpty) {
-      tileData.addAll(tiles);
+    bool success = tileData.add(tiles);
+    if (success) {
       notifyListeners();
     }
   }
+
+  int get length => tileData.length;
 }
 
 ///根据构造函数传入的数据列表，构造内容与空间匹配的ListView列表视图
 ///利用DataListViewController修改数据，然后重新执行ListView.build
 ///外部可能有ListView或者PageView等滚动视图，所以shrinkWrap: true,
 class DataListView extends StatefulWidget {
-  static int count = 0;
-  late int index;
   final TileData? group;
-  final List<TileData> tileData;
+  final TileDataConvertMixin tileData;
   late final DataListViewController dataListViewController;
   final ScrollController scrollController = ScrollController();
   final Function()? onScrollMax;
@@ -62,11 +93,9 @@ class DataListView extends StatefulWidget {
       this.onRefresh,
       this.onTap})
       : super(key: key) {
-    count++;
-    index = count;
     dataListViewController = DataListViewController(tileData: tileData);
     logger.w(
-        'key: $index,new dataListViewController: ${dataListViewController.tileData.length}:${dataListViewController.currentIndex}');
+        'key: $key,new dataListViewController: ${dataListViewController.length}:${dataListViewController.currentIndex}');
   }
 
   @override
@@ -135,7 +164,7 @@ class _DataListView extends State<DataListView> {
 
   _onTap(int index, String title) {
     logger.w(
-        'index: $index, title: $title,onTap dataListViewController:${widget.dataListViewController.tileData.length}:${widget.dataListViewController.currentIndex}');
+        'index: $index, title: $title,onTap dataListViewController:${widget.dataListViewController.length}:${widget.dataListViewController.currentIndex}');
     widget.dataListViewController.currentIndex = index;
     var onTap = widget.onTap;
     if (onTap != null) {
@@ -150,7 +179,7 @@ class _DataListView extends State<DataListView> {
             //该属性将决定列表的长度是否仅包裹其内容的长度。
             // 当 ListView 嵌在一个无限长的容器组件中时， shrinkWrap 必须为true
             shrinkWrap: true,
-            itemCount: widget.dataListViewController.tileData.length,
+            itemCount: widget.dataListViewController.length,
             //physics: const NeverScrollableScrollPhysics(),
             controller: widget.scrollController,
             itemBuilder: (BuildContext context, int index) {
@@ -182,7 +211,7 @@ class _DataListView extends State<DataListView> {
   @override
   void dispose() {
     logger.w(
-        'key: ${widget.index}, dispose DataListView:${widget.dataListViewController.tileData.length}:${widget.dataListViewController.currentIndex}');
+        'key: ${widget.key}, dispose DataListView:${widget.dataListViewController.length}:${widget.dataListViewController.currentIndex}');
     // widget.scrollController.dispose();
     // widget.dataListViewController.removeListener(update);
     // widget.dataListViewController.dispose();

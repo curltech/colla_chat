@@ -30,6 +30,30 @@ class MailListWidget extends StatefulWidget with TileDataMixin {
   String get title => 'Mails';
 }
 
+///ChatMessage数组的转换器实现类
+class ChatMessageTileDataConvertMixin with TileDataConvertMixin {
+  List<ChatMessage> chatMessages;
+
+  ChatMessageTileDataConvertMixin({required this.chatMessages});
+
+  @override
+  TileData getTileData(int index) {
+    ChatMessage chatMessage = chatMessages[index];
+    var title = chatMessage.title ?? '';
+    TileData tile = TileData(title: title);
+
+    return tile;
+  }
+
+  @override
+  bool add(List<TileData> tiles) {
+    return false;
+  }
+
+  @override
+  int get length => chatMessages.length;
+}
+
 class _MailListWidgetState extends State<MailListWidget> {
   @override
   initState() {
@@ -47,17 +71,12 @@ class _MailListWidgetState extends State<MailListWidget> {
     return Consumer<MailAddressProvider>(
         builder: (context, mailAddressProvider, child) {
       var currentChatMessages = mailAddressProvider.currentChatMessages;
-      List<TileData> adds = [];
-      if (currentChatMessages != null && currentChatMessages.isNotEmpty) {
-        for (var i = 0; i < currentChatMessages.length; ++i) {
-          ChatMessage chatMessage = currentChatMessages[i];
-          var title = chatMessage.title ?? '';
-          TileData tile = TileData(title: title);
-          adds.add(tile);
-        }
-      }
-      var dataListView =
-          KeepAliveWrapper(child: DataListView(onTap: _onTap, tileData: adds));
+      currentChatMessages ??= [];
+      var chatMessageTileDataConvertMixin =
+          ChatMessageTileDataConvertMixin(chatMessages: currentChatMessages);
+      var dataListView = KeepAliveWrapper(
+          child: DataListView(
+              onTap: _onTap, tileData: chatMessageTileDataConvertMixin));
       var appBarView = AppBarView(
           title: widget.title,
           withLeading: widget.withLeading,

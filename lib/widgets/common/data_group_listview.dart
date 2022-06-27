@@ -58,9 +58,11 @@ class GroupDataListView extends StatelessWidget {
     }
     List<TileData>? tileData = this.tileData[tile];
     tileData = tileData ?? [];
+    var listTileDataConvertMixin = ListTileDataConvertMixin(tileData: tileData);
     Widget dataListView = KeepAliveWrapper(
         keepAlive: true,
-        child: DataListView(onTap: _onTap, group: tile, tileData: tileData));
+        child: DataListView(
+            onTap: _onTap, group: tile, tileData: listTileDataConvertMixin));
 
     ///未来不使用ListTile，因为高度固定，不够灵活
     return ExpansionTile(
