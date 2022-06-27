@@ -76,7 +76,7 @@ class _MailListWidgetState extends State<MailListWidget> {
           ChatMessageTileDataConvertMixin(chatMessages: currentChatMessages);
       var dataListView = KeepAliveWrapper(
           child: DataListView(
-              onTap: _onTap, tileData: chatMessageTileDataConvertMixin));
+              onTap: _onTap, tileDataMix: chatMessageTileDataConvertMixin));
       var appBarView = AppBarView(
           title: widget.title,
           withLeading: widget.withLeading,

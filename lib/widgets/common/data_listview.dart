@@ -37,17 +37,17 @@ class ListTileDataConvertMixin with TileDataConvertMixin {
 }
 
 class DataListViewController extends ChangeNotifier {
-  TileDataConvertMixin tileData;
+  TileDataConvertMixin tileDataMix;
   int _currentIndex = 0;
 
-  DataListViewController({required this.tileData});
+  DataListViewController({required this.tileDataMix});
 
   TileData get current {
-    return tileData.getTileData(_currentIndex);
+    return tileDataMix.getTileData(_currentIndex);
   }
 
   TileData getTileData(int index) {
-    return tileData.getTileData(index);
+    return tileDataMix.getTileData(index);
   }
 
   int get currentIndex {
@@ -60,13 +60,13 @@ class DataListViewController extends ChangeNotifier {
   }
 
   add(List<TileData> tiles) {
-    bool success = tileData.add(tiles);
+    bool success = tileDataMix.add(tiles);
     if (success) {
       notifyListeners();
     }
   }
 
-  int get length => tileData.length;
+  int get length => tileDataMix.length;
 }
 
 ///根据构造函数传入的数据列表，构造内容与空间匹配的ListView列表视图
@@ -74,7 +74,8 @@ class DataListViewController extends ChangeNotifier {
 ///外部可能有ListView或者PageView等滚动视图，所以shrinkWrap: true,
 class DataListView extends StatefulWidget {
   final TileData? group;
-  final TileDataConvertMixin tileData;
+  final List<TileData>? tileData;
+  late final TileDataConvertMixin? tileDataMix;
   late final DataListViewController dataListViewController;
   final ScrollController scrollController = ScrollController();
   final Function()? onScrollMax;
@@ -88,12 +89,16 @@ class DataListView extends StatefulWidget {
   DataListView(
       {Key? key,
       this.group,
-      required this.tileData,
+      this.tileData,
+      this.tileDataMix,
       this.onScrollMax,
       this.onRefresh,
       this.onTap})
       : super(key: key) {
-    dataListViewController = DataListViewController(tileData: tileData);
+    if (tileDataMix == null && tileData != null) {
+      tileDataMix = ListTileDataConvertMixin(tileData: tileData!);
+    }
+    dataListViewController = DataListViewController(tileDataMix: tileDataMix!);
     logger.w(
         'key: $key,new dataListViewController: ${dataListViewController.length}:${dataListViewController.currentIndex}');
   }
