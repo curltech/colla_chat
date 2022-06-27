@@ -1,7 +1,9 @@
+import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../entity/chat/chat.dart';
+import '../../../../provider/app_data_provider.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/data_listtile.dart';
 import '../../../../widgets/common/data_listview.dart';
@@ -29,13 +31,15 @@ class MailListWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _MailListWidgetState extends State<MailListWidget> {
-  List<TileData> mailAddressTileData = [];
-  late final DataListView dataListView;
-
   @override
   initState() {
     super.initState();
-    dataListView = DataListView(tileData: []);
+  }
+
+  _onTap(int index, String title, {TileData? group}) {
+    logger.w('index: $index, title: $title,onTap MailListWidget');
+    var mailAddressProvider = Provider.of<MailAddressProvider>(context);
+    mailAddressProvider.setCurrentMailboxName(title);
   }
 
   @override
@@ -45,19 +49,15 @@ class _MailListWidgetState extends State<MailListWidget> {
       var currentChatMessages = mailAddressProvider.currentChatMessages;
       List<TileData> adds = [];
       if (currentChatMessages != null && currentChatMessages.isNotEmpty) {
-        for (var i = 0;
-            i <
-                currentChatMessages.length -
-                    dataListView.dataListViewController.tileData.length;
-            ++i) {
-          ChatMessage chatMessage = currentChatMessages[
-              dataListView.dataListViewController.tileData.length + i];
+        for (var i = 0; i < currentChatMessages.length; ++i) {
+          ChatMessage chatMessage = currentChatMessages[i];
           var title = chatMessage.title ?? '';
           TileData tile = TileData(title: title);
           adds.add(tile);
         }
       }
-      dataListView.dataListViewController.add(adds);
+      var dataListView =
+          KeepAliveWrapper(child: DataListView(onTap: _onTap, tileData: adds));
       var appBarView = AppBarView(
           title: widget.title,
           withLeading: widget.withLeading,

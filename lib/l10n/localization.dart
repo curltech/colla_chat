@@ -47,7 +47,7 @@ class AppLocalizations {
       return localisedValues[key];
     }
     if (_all.isNotEmpty) {
-      logger.e("${_locale.toString()}:'$key' not found");
+      //logger.e("${_locale.toString()}:'$key' not found");
     }
     return key;
   }

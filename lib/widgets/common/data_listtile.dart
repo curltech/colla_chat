@@ -25,8 +25,9 @@ class TileData {
 
   //进入路由样式
   final RouteStyle? routeStyle;
+
   //缺省行为，为空的时候，是打上选择标志，颜色变化
-  Function(int index)? onTap;
+  Function(int index, String title)? onTap;
 
   TileData(
       {this.icon,
@@ -68,12 +69,18 @@ class DataListTile extends StatelessWidget {
   ///是否缩小
   final bool dense;
 
+  ///如果定义了点击回调函数，序号为参数进行回调
+  ///回调函数有两个，一个构造函数传入的成员变量，用于处理高亮显示
+  ///二是数据项里面定义的，用于自定义的后续任务
+  final Function(int index, String title)? onTap;
+
   const DataListTile(
       {Key? key,
       required this.tileData,
       required this.index,
       this.selected = false,
-      this.dense = false})
+      this.dense = false,
+      this.onTap})
       : super(key: key);
 
   @override
@@ -134,10 +141,13 @@ class DataListTile extends StatelessWidget {
       trailing: trailingWidget,
       dense: dense,
       onTap: () {
-        ///如果定义了点击回调函数，一标题为参数进行回调
-        var call = tileData.onTap;
-        if (call != null) {
-          call(index);
+        var fn = onTap;
+        if (fn != null) {
+          fn(index, tileData.title);
+        }
+        fn = tileData.onTap;
+        if (fn != null) {
+          fn(index, tileData.title);
         }
 
         ///如果路由名称存在，点击会调用路由

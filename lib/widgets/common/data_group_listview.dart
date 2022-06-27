@@ -4,6 +4,7 @@ import 'package:colla_chat/widgets/common/data_listview.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:flutter/material.dart';
 
+import '../../provider/app_data_provider.dart';
 import 'data_listtile.dart';
 
 ///无状态组件，根据传入的数据一次性展示
@@ -12,7 +13,18 @@ import 'data_listtile.dart';
 ///每个ListView下面是ListTile
 class GroupDataListView extends StatelessWidget {
   final Map<TileData, List<TileData>> tileData;
-  const GroupDataListView({Key? key, required this.tileData}) : super(key: key);
+  final Function(int index, String title, {TileData? group})? onTap;
+
+  const GroupDataListView({Key? key, required this.tileData, this.onTap})
+      : super(key: key);
+
+  _onTap(int index, String title, {TileData? group}) {
+    logger.w('index: $index, title: $title,onTap GroupDataListView');
+    var onTap = this.onTap;
+    if (onTap != null) {
+      onTap(index, title, group: group);
+    }
+  }
 
   Widget _buildExpansionTile(TileData tile) {
     Widget? leading;
@@ -47,10 +59,12 @@ class GroupDataListView extends StatelessWidget {
     List<TileData>? tileData = this.tileData[tile];
     tileData = tileData ?? [];
     Widget dataListView = KeepAliveWrapper(
-        keepAlive: true, child: DataListView(tileData: tileData));
+        keepAlive: true,
+        child: DataListView(onTap: _onTap, group: tile, tileData: tileData));
 
     ///未来不使用ListTile，因为高度固定，不够灵活
     return ExpansionTile(
+      maintainState: true,
       leading: leading,
       title: Text(
         tile.title,

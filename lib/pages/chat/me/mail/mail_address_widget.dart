@@ -3,6 +3,7 @@ import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../provider/app_data_provider.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/data_group_listview.dart';
 import '../../../../widgets/common/data_listtile.dart';
@@ -77,6 +78,13 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
     return icon;
   }
 
+  _onTap(int index, String title, {TileData? group}) {
+    logger.w('index: $index, title: $title,onTap MailListWidget');
+    var mailAddressProvider =
+        Provider.of<MailAddressProvider>(context, listen: false);
+    mailAddressProvider.setCurrentMailboxName(title);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<MailAddressProvider>(
@@ -110,7 +118,10 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
           }
         }
       }
-      var mailAddressWidget = GroupDataListView(tileData: mailAddressTileData);
+      var mailAddressWidget = GroupDataListView(
+        tileData: mailAddressTileData,
+        onTap: _onTap,
+      );
       var appBarView = AppBarView(
           title: widget.title,
           withLeading: widget.withLeading,

@@ -42,15 +42,21 @@ class DataListViewController extends ChangeNotifier {
 class DataListView extends StatefulWidget {
   static int count = 0;
   late int index;
+  final TileData? group;
   final List<TileData> tileData;
   late final DataListViewController dataListViewController;
   final ScrollController scrollController = ScrollController();
   final Function()? onScrollMax;
   final Future<void> Function()? onRefresh;
-  final Function(int index)? onTap;
+  final Function(
+    int index,
+    String title, {
+    TileData? group,
+  })? onTap;
 
   DataListView(
       {Key? key,
+      this.group,
       required this.tileData,
       this.onScrollMax,
       this.onRefresh,
@@ -127,13 +133,13 @@ class _DataListView extends State<DataListView> {
     }
   }
 
-  _onTap(int index) {
+  _onTap(int index, String title) {
     logger.w(
-        'index: ${widget.index}, onTap dataListViewController:${widget.dataListViewController.tileData.length}:${widget.dataListViewController.currentIndex}');
+        'index: $index, title: $title,onTap dataListViewController:${widget.dataListViewController.tileData.length}:${widget.dataListViewController.currentIndex}');
     widget.dataListViewController.currentIndex = index;
     var onTap = widget.onTap;
     if (onTap != null) {
-      onTap(index);
+      onTap(index, title, group: widget.group);
     }
   }
 
@@ -149,10 +155,6 @@ class _DataListView extends State<DataListView> {
             controller: widget.scrollController,
             itemBuilder: (BuildContext context, int index) {
               TileData tile = widget.dataListViewController.getTileData(index);
-              var onTap = tile.onTap;
-              if (onTap == null) {
-                tile.onTap = _onTap;
-              }
 
               ///如果当前选择的项目的标题相符，则选择标志为true
               bool selected = false;
@@ -163,6 +165,7 @@ class _DataListView extends State<DataListView> {
                 tileData: tile,
                 index: index,
                 selected: selected,
+                onTap: _onTap,
               );
 
               return tileWidget;
@@ -178,11 +181,11 @@ class _DataListView extends State<DataListView> {
 
   @override
   void dispose() {
-    widget.scrollController.dispose();
     logger.w(
-        'key: ${widget.index}, dispose dataListViewController:${widget.dataListViewController.tileData.length}:${widget.dataListViewController.currentIndex}');
-    widget.dataListViewController.removeListener(update);
-    widget.dataListViewController.dispose();
+        'key: ${widget.index}, dispose DataListView:${widget.dataListViewController.tileData.length}:${widget.dataListViewController.currentIndex}');
+    // widget.scrollController.dispose();
+    // widget.dataListViewController.removeListener(update);
+    // widget.dataListViewController.dispose();
     super.dispose();
   }
 }
