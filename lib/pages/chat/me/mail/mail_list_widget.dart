@@ -62,8 +62,6 @@ class _MailListWidgetState extends State<MailListWidget> {
 
   _onTap(int index, String title, {TileData? group}) {
     logger.w('index: $index, title: $title,onTap MailListWidget');
-    var mailAddressProvider = Provider.of<MailAddressProvider>(context);
-    mailAddressProvider.setCurrentMailboxName(title);
   }
 
   @override

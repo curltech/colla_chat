@@ -13,7 +13,7 @@ import 'data_listtile.dart';
 ///每个ListView下面是ListTile
 class GroupDataListView extends StatelessWidget {
   final Map<TileData, List<TileData>>? tileData;
-  late final Map<TileData, TileDataConvertMixin>? tileDataMix;
+  late Map<TileData, TileDataConvertMixin>? tileDataMix;
   final Function(int index, String title, {TileData? group})? onTap;
 
   GroupDataListView({Key? key, this.tileData, this.tileDataMix, this.onTap})

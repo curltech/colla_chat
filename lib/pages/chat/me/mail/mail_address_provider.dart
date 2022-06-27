@@ -200,6 +200,7 @@ class MailAddressProvider with ChangeNotifier {
 
   ///设置当前邮箱名称
   setCurrentMailboxName(String? currentMailboxName) async {
+    _currentMailboxName = currentMailboxName;
     var currentMailAddress = _currentMailAddress;
     if (currentMailAddress == null) {
       return;
@@ -226,9 +227,9 @@ class MailAddressProvider with ChangeNotifier {
             }
           }
         }
-        notifyListeners();
       }
     }
+    notifyListeners();
   }
 
   ///当前邮件位置
@@ -257,9 +258,15 @@ class MailAddressProvider with ChangeNotifier {
   List<ChatMessage>? get currentChatMessages {
     Map<String, List<ChatMessage>>? mailboxChatMessages =
         _addressMessages[currentMailAddress];
-    if (mailboxChatMessages != null && mailboxChatMessages.isNotEmpty) {
-      List<ChatMessage>? chatMessages =
-          mailboxChatMessages[_currentMailboxName];
+    var currentMailboxName = _currentMailboxName;
+    if (currentMailboxName != null &&
+        mailboxChatMessages != null &&
+        mailboxChatMessages.isNotEmpty) {
+      List<ChatMessage>? chatMessages = mailboxChatMessages[currentMailboxName];
+      if (chatMessages == null) {
+        chatMessages = [];
+        mailboxChatMessages[currentMailboxName] = chatMessages;
+      }
       return chatMessages;
     }
     return null;

@@ -75,7 +75,7 @@ class DataListViewController extends ChangeNotifier {
 class DataListView extends StatefulWidget {
   final TileData? group;
   final List<TileData>? tileData;
-  late final TileDataConvertMixin? tileDataMix;
+  TileDataConvertMixin? tileDataMix;
   late final DataListViewController dataListViewController;
   final ScrollController scrollController = ScrollController();
   final Function()? onScrollMax;
