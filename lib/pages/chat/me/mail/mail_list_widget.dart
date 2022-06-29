@@ -68,7 +68,7 @@ class _MailListWidgetState extends State<MailListWidget> {
   Widget build(BuildContext context) {
     return Consumer<MailDataProvider>(
         builder: (context, mailAddressProvider, child) {
-      var currentChatMessagePages = mailAddressProvider.currentChatMessagePages;
+      var currentChatMessagePages = mailAddressProvider.currentChatMessagePage;
       List<ChatMessage> currentChatMessages = [];
       if (currentChatMessagePages != null) {
         currentChatMessages = currentChatMessagePages.data;

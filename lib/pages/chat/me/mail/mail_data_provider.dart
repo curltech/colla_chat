@@ -15,7 +15,9 @@ class MailDataProvider with ChangeNotifier {
   final Map<String, MailAddress> _mailAddress = {};
   final Map<String, Map<String, enough_mail.Mailbox?>> _addressMailboxes = {};
   final Map<String, Map<String, datastore.Page<ChatMessage>>>
-      _addressMessagePages = {};
+      _addressChatMessagePages = {};
+  final Map<String, Map<String, datastore.Page<enough_mail.MimeMessage>>>
+      _addressMimeMessagePages = {};
   MailAddress? _currentMailAddress;
   String? _currentMailboxName;
   int _currentIndex = 0;
@@ -54,7 +56,8 @@ class MailDataProvider with ChangeNotifier {
     if (mailAddresses.isNotEmpty) {
       for (var mailAddress in mailAddresses) {
         _mailAddress[mailAddress.email] = mailAddress;
-        _addressMessagePages[mailAddress.email] = {};
+        _addressChatMessagePages[mailAddress.email] = {};
+        _addressMimeMessagePages[mailAddress.email] = {};
         if (mailAddress.isDefault) {
           _currentMailAddress = mailAddress;
         }
@@ -75,9 +78,10 @@ class MailDataProvider with ChangeNotifier {
     bool needNotify = false;
     if (mailAddresses.isNotEmpty) {
       for (var mailAddress in mailAddresses) {
-        if (!_addressMessagePages.containsKey(mailAddress)) {
+        if (!_addressChatMessagePages.containsKey(mailAddress)) {
           _mailAddress[mailAddress.email] = mailAddress;
-          _addressMessagePages[mailAddress.email] = {};
+          _addressChatMessagePages[mailAddress.email] = {};
+          _addressMimeMessagePages[mailAddress.email] = {};
           needNotify = true;
         }
       }
@@ -210,7 +214,14 @@ class MailDataProvider with ChangeNotifier {
     if (currentMailAddress == null) {
       return;
     }
-
+    if (currentMailboxName == null) {
+      return;
+    }
+    var currentMailbox = this.currentMailbox;
+    if (currentMailbox == null) {
+      return;
+    }
+    loadMimeMessages();
     notifyListeners();
   }
 
@@ -230,39 +241,59 @@ class MailDataProvider with ChangeNotifier {
   ///获取当前地址的当前邮箱的邮件
   datastore.Page<ChatMessage>? getMailboxChatMessages(String mailboxName) {
     Map<String, datastore.Page<ChatMessage>>? mailboxChatMessages =
-        _addressMessagePages[currentMailAddress];
+        _addressChatMessagePages[currentMailAddress];
     if (mailboxChatMessages != null && mailboxChatMessages.isNotEmpty) {
       datastore.Page<ChatMessage>? chatMessages =
-          mailboxChatMessages![mailboxName];
+          mailboxChatMessages[mailboxName];
       return chatMessages;
     }
     return null;
   }
 
   ///获取当前地址的当前邮箱的邮件
-  datastore.Page<ChatMessage>? get currentChatMessagePages {
+  datastore.Page<ChatMessage>? get currentChatMessagePage {
     Map<String, datastore.Page<ChatMessage>>? mailboxChatMessages =
-        _addressMessagePages[currentMailAddress];
+        _addressChatMessagePages[currentMailAddress];
     var currentMailboxName = _currentMailboxName;
     if (currentMailboxName != null &&
         mailboxChatMessages != null &&
         mailboxChatMessages.isNotEmpty) {
-      datastore.Page<ChatMessage>? chatMessages =
+      datastore.Page<ChatMessage>? chatMessagePage =
           mailboxChatMessages[currentMailboxName];
-      if (chatMessages == null) {
-        chatMessages = datastore.Page(total: 0, data: []);
-        mailboxChatMessages[currentMailboxName] = chatMessages;
+      if (chatMessagePage == null) {
+        chatMessagePage = datastore.Page(total: 0, data: []);
+        mailboxChatMessages[currentMailboxName] = chatMessagePage;
       }
-      return chatMessages;
+      return chatMessagePage;
+    }
+    return null;
+  }
+
+  ///获取当前地址的当前邮箱的邮件
+  datastore.Page<enough_mail.MimeMessage>? get currentMineMessagePage {
+    Map<String, datastore.Page<enough_mail.MimeMessage>>? mailboxMimeMessages =
+        _addressMimeMessagePages[currentMailAddress];
+    var currentMailboxName = _currentMailboxName;
+    if (currentMailboxName != null &&
+        mailboxMimeMessages != null &&
+        mailboxMimeMessages.isNotEmpty) {
+      datastore.Page<enough_mail.MimeMessage>? mimeMessagePage =
+          mailboxMimeMessages[currentMailboxName];
+      if (mimeMessagePage == null) {
+        mimeMessagePage = datastore.Page(total: 0, data: []);
+        mailboxMimeMessages[currentMailboxName] = mimeMessagePage;
+      }
+      return mimeMessagePage;
     }
     return null;
   }
 
   ///获取当前地址的当前邮箱的当前邮件
   ChatMessage? get currentChatMessage {
-    List<ChatMessage>? chatMessages = currentChatMessagePages!.data;
-    if (chatMessages != null && chatMessages.isNotEmpty) {
-      return chatMessages[_currentIndex];
+    var currentChatMessagePage = this.currentChatMessagePage;
+    if (currentChatMessagePage != null &&
+        currentChatMessagePage.data.isNotEmpty) {
+      return currentChatMessagePage.data[_currentIndex];
     }
     return null;
   }
@@ -270,31 +301,48 @@ class MailDataProvider with ChangeNotifier {
   ///以下是从数据库取邮件的部分
 
   ///从邮件服务器中取当前地址当前邮箱的下一页的邮件数据，放入数据提供者的数组中
-  load() async {
-    String email = currentMailAddress!.email;
+  loadMimeMessages() async {
+    var currentMailAddress = this.currentMailAddress;
+    if (currentMailAddress == null) {
+      return;
+    }
+    String email = currentMailAddress.email;
     EmailClient? emailClient = EmailClientPool.instance.get(email);
-    if (emailClient != null) {
-      enough_mail.Mailbox? currentMailbox = this.currentMailbox;
-      if (currentMailbox != null) {
-        datastore.Page<enough_mail.MimeMessage>? mimeMessages =
-            await emailClient.fetchMessages(mailbox: currentMailbox);
-        if (mimeMessages != null && mimeMessages.data.isNotEmpty) {
-          for (var mimeMessage in mimeMessages.data) {
-            var chatMessage =
-                EmailMessageUtil.convertToChatMessage(mimeMessage);
-            chatMessage.subMessageType = currentMailboxName;
-            chatMessage.targetAddress = email;
-            chatMessage.actualReceiveTime = DateUtil.currentDate();
-            var old = await ChatMessageService.instance.get(mimeMessage.guid!);
-            if (old == null) {
-              await ChatMessageService.instance.insert(chatMessage);
-            }
-            emailClient.deleteMessage(mimeMessage);
-            var currentChatMessages = this.currentChatMessagePages;
-            if (currentChatMessages != null) {
-              currentChatMessages.data.add(chatMessage);
-            }
-          }
+    if (emailClient == null) {
+      return;
+    }
+    enough_mail.Mailbox? currentMailbox = this.currentMailbox;
+    if (currentMailbox == null) {
+      return;
+    }
+
+    var currentMineMessagePage = this.currentMineMessagePage;
+    datastore.Page<enough_mail.MimeMessage>? mineMessagePage;
+    if (currentMineMessagePage == null) {
+      mineMessagePage =
+          await emailClient.fetchMessages(mailbox: currentMailbox);
+    } else {
+      mineMessagePage = await emailClient.fetchMessages(
+          mailbox: currentMailbox,
+          offset: currentMineMessagePage.offset + currentMineMessagePage.limit);
+      if (mineMessagePage != null) {
+        currentMineMessagePage.data.addAll(mineMessagePage.data);
+      }
+    }
+    if (mineMessagePage != null && mineMessagePage.data.isNotEmpty) {
+      for (var mimeMessage in mineMessagePage.data) {
+        var chatMessage = EmailMessageUtil.convertToChatMessage(mimeMessage);
+        chatMessage.subMessageType = currentMailboxName;
+        chatMessage.targetAddress = email;
+        chatMessage.actualReceiveTime = DateUtil.currentDate();
+        var old = await ChatMessageService.instance.get(mimeMessage.guid!);
+        if (old == null) {
+          await ChatMessageService.instance.insert(chatMessage);
+        }
+        emailClient.deleteMessage(mimeMessage);
+        var currentChatMessagePage = this.currentChatMessagePage;
+        if (currentChatMessagePage != null) {
+          currentChatMessagePage.data.add(chatMessage);
         }
       }
     }
@@ -302,24 +350,25 @@ class MailDataProvider with ChangeNotifier {
 
   ///从数据库中取当前地址当前邮箱的下一页的邮件数据，放入数据提供者的数组中
   loadChatMessages() {
-    var currentChatMessages = this.currentChatMessagePages;
-    if (currentChatMessages != null) {
-      if (currentChatMessages?.limit == null) {
-        ChatMessageService.instance
-            .findByMessageType('', MessageType.email.name, '')
-            .then((chatMessages) {
-          currentChatMessages!.data.addAll(chatMessages.data);
-          notifyListeners();
-        });
-      } else {
-        var offset = currentChatMessages.offset! + currentChatMessages.limit!;
-        ChatMessageService.instance
-            .findByMessageType('', MessageType.email.name, '', offset: offset)
-            .then((chatMessages) {
-          currentChatMessages!.data.addAll(chatMessages.data);
-          notifyListeners();
-        });
-      }
+    var currentChatMessagePage = this.currentChatMessagePage;
+    if (currentChatMessagePage == null) {
+      return;
+    }
+    if (currentChatMessagePage.limit == 0) {
+      ChatMessageService.instance
+          .findByMessageType('', MessageType.email.name, '')
+          .then((chatMessages) {
+        currentChatMessagePage.data.addAll(chatMessages.data);
+        notifyListeners();
+      });
+    } else {
+      var offset = currentChatMessagePage.offset + currentChatMessagePage.limit;
+      ChatMessageService.instance
+          .findByMessageType('', MessageType.email.name, '', offset: offset)
+          .then((chatMessages) {
+        currentChatMessagePage.data.addAll(chatMessages.data);
+        notifyListeners();
+      });
     }
   }
 }
