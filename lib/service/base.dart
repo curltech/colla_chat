@@ -1,3 +1,4 @@
+import '../constant/base.dart';
 import '../datastore/datastore.dart';
 import '../entity/base.dart';
 import '../tool/util.dart';
@@ -80,8 +81,8 @@ abstract class BaseService {
       String? groupBy,
       String? having,
       String? orderBy,
-      int limit = 10,
-      int offset = 0}) {
+      int limit = defaultLimit,
+      int offset = defaultOffset}) {
     return dataStore.findPage(tableName,
         where: where,
         distinct: distinct,

@@ -6,6 +6,7 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_html/enough_mail_html.dart';
 import 'package:event_bus/event_bus.dart';
 
+import '../constant/base.dart';
 import '../datastore/datastore.dart';
 import '../entity/chat/chat.dart';
 import '../entity/chat/mailaddress.dart' as entity;
@@ -408,10 +409,10 @@ class EmailClient {
 
   ///用邮件客户端获取消息
   Future<Page<MimeMessage>?> fetchMessages(
-      {int limit = 10,
+      {int limit = defaultLimit,
       FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
       Mailbox? mailbox,
-      int offset = 0}) async {
+      int offset = defaultOffset}) async {
     final enough_mail.MailClient? mailClient = this.mailClient;
     if (mailClient != null && mailbox != null) {
       int total = mailbox.messagesExists;

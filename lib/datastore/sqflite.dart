@@ -6,6 +6,7 @@ import 'package:colla_chat/tool/util.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
+import '../constant/base.dart';
 import '../service/base.dart';
 import '../service/servicelocator.dart';
 import 'datastore.dart';
@@ -124,8 +125,8 @@ class Sqflite extends DataStore {
       String? groupBy,
       String? having,
       String? orderBy,
-      int limit = 10,
-      int offset = 0}) async {
+      int limit = defaultLimit,
+      int offset = defaultOffset}) async {
     var clause = sqlBuilder.select(table,
         distinct: distinct,
         columns: columns,

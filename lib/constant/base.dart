@@ -8,6 +8,9 @@ class Option {
   Option(this.label, this.value, {this.hint});
 }
 
+const int defaultLimit = 10;
+const int defaultOffset = 0;
+
 const defaultIcon = 'assets/icons/favicon-96x96.png';
 final defaultImage = Image.asset(
   defaultIcon,

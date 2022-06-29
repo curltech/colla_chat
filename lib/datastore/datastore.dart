@@ -1,5 +1,7 @@
 import 'package:colla_chat/datastore/sql_builder.dart';
 
+import '../constant/base.dart';
+
 enum EntityState {
   None,
   New,
@@ -10,7 +12,7 @@ enum EntityState {
 class Page<T> {
   int total;
   List<T> data;
-  int offset = 0;
+  int offset = defaultOffset;
   int limit = 0;
 
   static int getPage(int offset, int limit) {
@@ -87,8 +89,8 @@ abstract class DataStore {
       String? groupBy,
       String? having,
       String? orderBy,
-      int limit = 10,
-      int offset = 0});
+      int limit = defaultLimit,
+      int offset = defaultOffset});
 
   /// 查询单条记录
   /// @param {*} tableName

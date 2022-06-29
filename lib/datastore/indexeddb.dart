@@ -5,6 +5,7 @@ import 'package:colla_chat/tool/util.dart';
 import 'package:idb_shim/idb.dart';
 import 'package:idb_shim/idb_browser.dart';
 
+import '../constant/base.dart';
 import '../service/base.dart';
 import '../service/servicelocator.dart';
 import 'datastore.dart';
@@ -189,8 +190,8 @@ class IndexedDb extends DataStore {
       String? groupBy,
       String? having,
       String? orderBy,
-      int limit = 10,
-      int offset = 0}) async {
+      int limit = defaultLimit,
+      int offset = defaultOffset}) async {
     var txn = db.transaction(table, "readonly");
     var store = txn.objectStore(table);
     List<Map> results = [];

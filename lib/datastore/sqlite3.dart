@@ -9,6 +9,7 @@ import 'package:sqlite3/common.dart';
 import './condition_import/unsupport.dart'
     if (dart.library.html) './condition_import/web.dart'
     if (dart.library.io) './condition_import/desktop.dart' as sqlite3_open;
+import '../constant/base.dart';
 import '../provider/app_data_provider.dart';
 import '../service/base.dart';
 import '../service/servicelocator.dart';
@@ -164,8 +165,8 @@ class Sqlite3 extends DataStore {
       String? groupBy,
       String? having,
       String? orderBy,
-      int limit = 10,
-      int offset = 0}) async {
+      int limit = defaultLimit,
+      int offset = defaultOffset}) async {
     var clause = sqlBuilder.select(table,
         distinct: distinct,
         columns: columns,

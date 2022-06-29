@@ -1,5 +1,6 @@
 import 'package:colla_chat/crypto/util.dart';
 
+import '../../constant/base.dart';
 import '../../datastore/datastore.dart';
 import '../../entity/chat/chat.dart';
 import '../../entity/dht/myself.dart';
@@ -106,8 +107,8 @@ class ChatMessageService extends BaseService {
     String messageType,
     String targetAddress,
     String subMessageType, {
-    int limit = 10,
-    int offset = 0,
+    int limit = defaultLimit,
+    int offset = defaultOffset,
   }) async {
     String where = 'messageType=? and targetAddress=? and subMessageType=?';
     List<Object> whereArgs = [messageType, targetAddress, subMessageType];
