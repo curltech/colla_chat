@@ -10,9 +10,9 @@ class ChatMessageProvider with ChangeNotifier {
 
   ChatMessageProvider() {
     ChatMessageService.instance
-        .findByMessageType(MessageType.email.name)
+        .findByMessageType('', MessageType.email.name, '')
         .then((chatMessages) {
-      _chatMessages.addAll(chatMessages);
+      _chatMessages.addAll(chatMessages.data);
       notifyListeners();
     });
   }

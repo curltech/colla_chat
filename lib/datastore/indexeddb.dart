@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:idb_shim/idb.dart';
@@ -180,7 +181,7 @@ class IndexedDb extends DataStore {
   }
 
   @override
-  Future<Map<String, Object>> findPage(String table,
+  Future<Page> findPage(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -188,8 +189,8 @@ class IndexedDb extends DataStore {
       String? groupBy,
       String? having,
       String? orderBy,
-      int? limit,
-      int? offset}) async {
+      int limit = 10,
+      int offset = 0}) async {
     var txn = db.transaction(table, "readonly");
     var store = txn.objectStore(table);
     List<Map> results = [];
@@ -197,18 +198,19 @@ class IndexedDb extends DataStore {
       var keyRange = _buildKeyRange(where, whereArgs);
       if (keyRange != null) {
         var index = store.index(keyRange['key']);
-        var total = index.count(keyRange['keyRange']);
-        var results = index.getAll(keyRange['keyRange'], limit);
+        var total = await index.count(keyRange['keyRange']);
+        var results = await index.getAll(keyRange['keyRange'], limit);
         await txn.completed;
-        Map<String, Object> page = {'data': results, 'total': total};
+        Page page =
+            Page(data: results, total: total, offset: offset, limit: limit);
 
         return page;
       }
     }
     results = await store.getAll() as List<Map>;
-    var total = store.count();
+    var total = await store.count();
     await txn.completed;
-    Map<String, Object> page = {'data': results, 'total': total};
+    Page page = Page(data: results, total: total, offset: offset, limit: limit);
 
     return page;
   }

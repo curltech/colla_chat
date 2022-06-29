@@ -1,5 +1,4 @@
 import 'package:colla_chat/crypto/util.dart';
-import 'package:colla_chat/tool/util.dart';
 
 import '../../datastore/datastore.dart';
 import '../../entity/chat/chat.dart';
@@ -103,24 +102,34 @@ class ChatMessageService extends BaseService {
     await save(chatMessages, [], parent);
   }
 
-  Future<List<ChatMessage>> findByMessageType(String messageType,
-      {String? subMessageType}) async {
-    String where = 'messageType=?';
-    List<Object> whereArgs = [messageType];
-    if (StringUtil.isNotEmpty(subMessageType) && subMessageType != null) {
-      where = '$where and subMessageType';
-      whereArgs.add(subMessageType);
-    }
-    var chatMessages_ =
-        await find(where, whereArgs: whereArgs, orderBy: 'sendTime');
+  Future<Page<ChatMessage>> findByMessageType(
+    String messageType,
+    String targetAddress,
+    String subMessageType, {
+    int limit = 10,
+    int offset = 0,
+  }) async {
+    String where = 'messageType=? and targetAddress=? and subMessageType=?';
+    List<Object> whereArgs = [messageType, targetAddress, subMessageType];
+    var chatMessages_ = await findPage(where,
+        whereArgs: whereArgs,
+        orderBy: 'sendTime',
+        offset: offset,
+        limit: limit);
     List<ChatMessage> chatMessages = [];
-    if (chatMessages_.isNotEmpty) {
-      for (var chatMessage_ in chatMessages_) {
+    if (chatMessages_.data.isNotEmpty) {
+      for (var chatMessage_ in chatMessages_.data) {
         var chatMessage = ChatMessage.fromJson(chatMessage_);
         chatMessages.add(chatMessage);
       }
     }
-    return chatMessages;
+    Page<ChatMessage> page = Page(
+        total: chatMessages_.total,
+        data: chatMessages,
+        offset: chatMessages_.offset,
+        limit: chatMessages_.limit);
+
+    return page;
   }
 }
 

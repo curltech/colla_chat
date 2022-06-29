@@ -73,16 +73,16 @@ abstract class BaseService {
   }
 
   /// 与find的不同是返回值是带有result，from，limit，total字段的对象
-  Future<Map<String, Object>> findPage(String? where,
+  Future<Page> findPage(String? where,
       {bool? distinct,
       List<String>? columns,
       List<Object>? whereArgs,
       String? groupBy,
       String? having,
       String? orderBy,
-      int? limit,
-      int? offset}) {
-    return dataStore.findPage(this.tableName,
+      int limit = 10,
+      int offset = 0}) {
+    return dataStore.findPage(tableName,
         where: where,
         distinct: distinct,
         columns: columns,

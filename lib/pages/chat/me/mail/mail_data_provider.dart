@@ -1,3 +1,4 @@
+import 'package:colla_chat/datastore/datastore.dart' as datastore;
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:flutter/material.dart';
@@ -6,25 +7,40 @@ import '../../../../entity/chat/mailaddress.dart';
 import '../../../../provider/app_data_provider.dart';
 import '../../../../service/chat/chat.dart';
 import '../../../../service/chat/mailaddress.dart';
+import '../../../../tool/util.dart';
 import '../../../../transport/emailclient.dart';
 
-/// 邮件地址的状态管理器
-class MailAddressProvider with ChangeNotifier {
+/// 邮件数据的状态管理器，每个地址有多个邮箱，每个邮箱包含多个邮件
+class MailDataProvider with ChangeNotifier {
   final Map<String, MailAddress> _mailAddress = {};
   final Map<String, Map<String, enough_mail.Mailbox?>> _addressMailboxes = {};
-  final Map<String, Map<String, List<ChatMessage>>> _addressMessages = {};
+  final Map<String, Map<String, datastore.Page<ChatMessage>>>
+      _addressMessagePages = {};
   MailAddress? _currentMailAddress;
   String? _currentMailboxName;
   int _currentIndex = 0;
 
-  ///构造函数从数据库获取所有的邮件地址，初始化数据
-  MailAddressProvider() {
+  ///构造函数从数据库获取所有的邮件地址，初始化邮箱数据
+  MailDataProvider() {
     MailAddressService.instance
         .findAllMailAddress()
         .then((List<MailAddress> mailAddresses) {
       this.mailAddresses = mailAddresses;
       connect(mailAddresses);
     });
+  }
+
+  ///以下是与邮件地址相关的部分
+
+  ///获取当前的邮件地址
+  MailAddress? get currentMailAddress {
+    return _currentMailAddress;
+  }
+
+  ///设置当前邮件地址
+  set currentMailAddress(MailAddress? mailAddress) {
+    _currentMailAddress = mailAddress;
+    notifyListeners();
   }
 
   ///获取所有的邮件地址
@@ -38,7 +54,7 @@ class MailAddressProvider with ChangeNotifier {
     if (mailAddresses.isNotEmpty) {
       for (var mailAddress in mailAddresses) {
         _mailAddress[mailAddress.email] = mailAddress;
-        _addressMessages[mailAddress.email] = {};
+        _addressMessagePages[mailAddress.email] = {};
         if (mailAddress.isDefault) {
           _currentMailAddress = mailAddress;
         }
@@ -55,13 +71,13 @@ class MailAddressProvider with ChangeNotifier {
   }
 
   ///增加邮件地址
-  add(List<MailAddress> mailAddresses) {
+  addMailAddress(List<MailAddress> mailAddresses) {
     bool needNotify = false;
     if (mailAddresses.isNotEmpty) {
       for (var mailAddress in mailAddresses) {
-        if (!_addressMessages.containsKey(mailAddress)) {
+        if (!_addressMessagePages.containsKey(mailAddress)) {
           _mailAddress[mailAddress.email] = mailAddress;
-          _addressMessages[mailAddress.email] = {};
+          _addressMessagePages[mailAddress.email] = {};
           needNotify = true;
         }
       }
@@ -71,6 +87,9 @@ class MailAddressProvider with ChangeNotifier {
     }
   }
 
+  ///以下是与邮件邮箱相关的部分
+
+  ///连接服务器，设置所有地址的邮箱
   connect(List<MailAddress> mailAddresses) async {
     bool needNotify = false;
     if (mailAddresses.isNotEmpty) {
@@ -98,6 +117,7 @@ class MailAddressProvider with ChangeNotifier {
     return addressMailBoxes;
   }
 
+  ///连接邮件服务器，获取地址的所有的邮箱
   Future<List<enough_mail.Mailbox?>> connectMailAddress(MailAddress mailAddress,
       {bool listen = true}) async {
     var password = mailAddress.password;
@@ -111,10 +131,6 @@ class MailAddressProvider with ChangeNotifier {
         setMailboxes(mailAddress.email, mailboxes, listen: listen);
 
         return mailboxes;
-        // enough_mail.Mailbox? mailbox = await emailClient.selectInbox();
-        // logger.i(mailbox!);
-        // List<enough_mail.MimeMessage>? mimeMessages =
-        //     await emailClient.fetchMessages(mailbox: mailbox);
       }
     }
     setMailboxes(mailAddress.email, [], listen: listen);
@@ -168,17 +184,6 @@ class MailAddressProvider with ChangeNotifier {
     }
   }
 
-  ///当前的邮件地址
-  MailAddress? get currentMailAddress {
-    return _currentMailAddress;
-  }
-
-  ///设置当前邮件地址
-  set currentMailAddress(MailAddress? mailAddress) {
-    _currentMailAddress = mailAddress;
-    notifyListeners();
-  }
-
   ///当前的邮箱名称
   String? get currentMailboxName {
     return _currentMailboxName;
@@ -198,39 +203,18 @@ class MailAddressProvider with ChangeNotifier {
     return null;
   }
 
-  ///设置当前邮箱名称
+  ///设置当前邮箱名称,从服务器获取新的邮件，将新邮件存入数据库，并放入邮件数组中
   setCurrentMailboxName(String? currentMailboxName) async {
     _currentMailboxName = currentMailboxName;
     var currentMailAddress = _currentMailAddress;
     if (currentMailAddress == null) {
       return;
     }
-    String email = currentMailAddress.email;
-    EmailClient? emailClient = EmailClientPool.instance.get(email);
-    if (emailClient != null) {
-      enough_mail.Mailbox? currentMailbox = this.currentMailbox;
-      if (currentMailbox != null) {
-        List<enough_mail.MimeMessage>? mimeMessages =
-            await emailClient.fetchMessages(mailbox: currentMailbox);
-        if (mimeMessages != null && mimeMessages.isNotEmpty) {
-          for (var mimeMessage in mimeMessages) {
-            var chatMessage =
-                EmailMessageUtil.convertToChatMessage(mimeMessage);
-            var old = await ChatMessageService.instance.get(mimeMessage.guid!);
-            if (old == null) {
-              await ChatMessageService.instance.insert(chatMessage);
-            }
-            emailClient.deleteMessage(mimeMessage);
-            var currentChatMessages = this.currentChatMessages;
-            if (currentChatMessages != null) {
-              currentChatMessages.add(chatMessage);
-            }
-          }
-        }
-      }
-    }
+
     notifyListeners();
   }
+
+  ///以下是与邮件的部分
 
   ///当前邮件位置
   int get currentIndex {
@@ -244,27 +228,29 @@ class MailAddressProvider with ChangeNotifier {
   }
 
   ///获取当前地址的当前邮箱的邮件
-  List<ChatMessage>? getMailboxChatMessages(String mailboxName) {
-    Map<String, List<ChatMessage>>? mailboxChatMessages =
-        _addressMessages[currentMailAddress];
+  datastore.Page<ChatMessage>? getMailboxChatMessages(String mailboxName) {
+    Map<String, datastore.Page<ChatMessage>>? mailboxChatMessages =
+        _addressMessagePages[currentMailAddress];
     if (mailboxChatMessages != null && mailboxChatMessages.isNotEmpty) {
-      List<ChatMessage>? chatMessages = mailboxChatMessages![mailboxName];
+      datastore.Page<ChatMessage>? chatMessages =
+          mailboxChatMessages![mailboxName];
       return chatMessages;
     }
     return null;
   }
 
   ///获取当前地址的当前邮箱的邮件
-  List<ChatMessage>? get currentChatMessages {
-    Map<String, List<ChatMessage>>? mailboxChatMessages =
-        _addressMessages[currentMailAddress];
+  datastore.Page<ChatMessage>? get currentChatMessagePages {
+    Map<String, datastore.Page<ChatMessage>>? mailboxChatMessages =
+        _addressMessagePages[currentMailAddress];
     var currentMailboxName = _currentMailboxName;
     if (currentMailboxName != null &&
         mailboxChatMessages != null &&
         mailboxChatMessages.isNotEmpty) {
-      List<ChatMessage>? chatMessages = mailboxChatMessages[currentMailboxName];
+      datastore.Page<ChatMessage>? chatMessages =
+          mailboxChatMessages[currentMailboxName];
       if (chatMessages == null) {
-        chatMessages = [];
+        chatMessages = datastore.Page(total: 0, data: []);
         mailboxChatMessages[currentMailboxName] = chatMessages;
       }
       return chatMessages;
@@ -274,12 +260,68 @@ class MailAddressProvider with ChangeNotifier {
 
   ///获取当前地址的当前邮箱的当前邮件
   ChatMessage? get currentChatMessage {
-    List<ChatMessage>? chatMessages = currentChatMessages;
+    List<ChatMessage>? chatMessages = currentChatMessagePages!.data;
     if (chatMessages != null && chatMessages.isNotEmpty) {
       return chatMessages[_currentIndex];
     }
     return null;
   }
+
+  ///以下是从数据库取邮件的部分
+
+  ///从邮件服务器中取当前地址当前邮箱的下一页的邮件数据，放入数据提供者的数组中
+  load() async {
+    String email = currentMailAddress!.email;
+    EmailClient? emailClient = EmailClientPool.instance.get(email);
+    if (emailClient != null) {
+      enough_mail.Mailbox? currentMailbox = this.currentMailbox;
+      if (currentMailbox != null) {
+        datastore.Page<enough_mail.MimeMessage>? mimeMessages =
+            await emailClient.fetchMessages(mailbox: currentMailbox);
+        if (mimeMessages != null && mimeMessages.data.isNotEmpty) {
+          for (var mimeMessage in mimeMessages.data) {
+            var chatMessage =
+                EmailMessageUtil.convertToChatMessage(mimeMessage);
+            chatMessage.subMessageType = currentMailboxName;
+            chatMessage.targetAddress = email;
+            chatMessage.actualReceiveTime = DateUtil.currentDate();
+            var old = await ChatMessageService.instance.get(mimeMessage.guid!);
+            if (old == null) {
+              await ChatMessageService.instance.insert(chatMessage);
+            }
+            emailClient.deleteMessage(mimeMessage);
+            var currentChatMessages = this.currentChatMessagePages;
+            if (currentChatMessages != null) {
+              currentChatMessages.data.add(chatMessage);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  ///从数据库中取当前地址当前邮箱的下一页的邮件数据，放入数据提供者的数组中
+  loadChatMessages() {
+    var currentChatMessages = this.currentChatMessagePages;
+    if (currentChatMessages != null) {
+      if (currentChatMessages?.limit == null) {
+        ChatMessageService.instance
+            .findByMessageType('', MessageType.email.name, '')
+            .then((chatMessages) {
+          currentChatMessages!.data.addAll(chatMessages.data);
+          notifyListeners();
+        });
+      } else {
+        var offset = currentChatMessages.offset! + currentChatMessages.limit!;
+        ChatMessageService.instance
+            .findByMessageType('', MessageType.email.name, '', offset: offset)
+            .then((chatMessages) {
+          currentChatMessages!.data.addAll(chatMessages.data);
+          notifyListeners();
+        });
+      }
+    }
+  }
 }
 
-final mailAddressProvider = MailAddressProvider();
+final mailDataProvider = MailDataProvider();

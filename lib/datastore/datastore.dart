@@ -1,12 +1,60 @@
 import 'package:colla_chat/datastore/sql_builder.dart';
 
-import '../tool/util.dart';
-
 enum EntityState {
   None,
   New,
   Modified,
   Deleted,
+}
+
+class Page<T> {
+  int total;
+  List<T> data;
+  int offset = 0;
+  int limit = 0;
+
+  static int getPage(int offset, int limit) {
+    int mod = offset % limit;
+    int page = offset ~/ limit;
+    if (mod > 0) {
+      page++;
+    }
+
+    return page;
+  }
+
+  static int getPageCount(int total, int limit) {
+    int mod = total % limit;
+    int pageCount = total ~/ limit;
+    if (mod > 0) {
+      pageCount++;
+    }
+
+    return pageCount;
+  }
+
+  Page(
+      {required this.total,
+      required this.data,
+      this.offset = 0,
+      this.limit = 10});
+
+  int get page {
+    return getPage(offset, limit);
+  }
+
+  int get pageCount {
+    return getPageCount(total, limit);
+  }
+
+  Page.fromJson(Map json)
+      : total = json['total'],
+        data = json['data'],
+        offset = json['offset'],
+        limit = json['limit'];
+
+  Map<String, dynamic> toJson() =>
+      {'total': total, 'data': data, 'offset': offset, 'limit': limit};
 }
 
 abstract class DataStore {
@@ -31,7 +79,7 @@ abstract class DataStore {
       int? limit,
       int? offset});
 
-  Future<Map<String, Object>> findPage(String table,
+  Future<Page> findPage(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -39,8 +87,8 @@ abstract class DataStore {
       String? groupBy,
       String? having,
       String? orderBy,
-      int? limit,
-      int? offset});
+      int limit = 10,
+      int offset = 0});
 
   /// 查询单条记录
   /// @param {*} tableName

@@ -1,4 +1,4 @@
-import 'package:colla_chat/pages/chat/me/mail/mail_address_provider.dart';
+import 'package:colla_chat/pages/chat/me/mail/mail_data_provider.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -81,13 +81,13 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
   _onTap(int index, String title, {TileData? group}) {
     logger.w('index: $index, title: $title,onTap MailListWidget');
     var mailAddressProvider =
-        Provider.of<MailAddressProvider>(context, listen: false);
+        Provider.of<MailDataProvider>(context, listen: false);
     mailAddressProvider.setCurrentMailboxName(title);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MailAddressProvider>(
+    return Consumer<MailDataProvider>(
         builder: (context, mailAddressProvider, child) {
       Map<TileData, List<TileData>> mailAddressTileData = {};
       var mailAddresses = mailAddressProvider.mailAddresses;

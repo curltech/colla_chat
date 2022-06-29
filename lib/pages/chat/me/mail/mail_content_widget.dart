@@ -8,7 +8,7 @@ import '../../../../platform.dart';
 import '../../../../transport/emailclient.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/widget_mixin.dart';
-import 'mail_address_provider.dart';
+import 'mail_data_provider.dart';
 
 //邮件内容组件
 class MailContentWidget extends StatefulWidget with TileDataMixin {
@@ -37,7 +37,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
   }
 
   Widget _buildMimeMessageViewer(
-      BuildContext context, MailAddressProvider mailAddressProvider) {
+      BuildContext context, MailDataProvider mailAddressProvider) {
     var currentChatMessage = mailAddressProvider.currentChatMessage;
     MimeMessage mimeMessage;
     if (currentChatMessage != null) {
@@ -84,7 +84,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MailAddressProvider>(
+    return Consumer<MailDataProvider>(
         builder: (context, mailAddressProvider, child) {
       var mimeMessageViewer =
           _buildMimeMessageViewer(context, mailAddressProvider);

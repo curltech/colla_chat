@@ -8,7 +8,7 @@ import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/data_listtile.dart';
 import '../../../../widgets/common/data_listview.dart';
 import '../../../../widgets/common/widget_mixin.dart';
-import 'mail_address_provider.dart';
+import 'mail_data_provider.dart';
 
 //邮件列表组件，带有回退回调函数
 class MailListWidget extends StatefulWidget with TileDataMixin {
@@ -66,10 +66,13 @@ class _MailListWidgetState extends State<MailListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<MailAddressProvider>(
+    return Consumer<MailDataProvider>(
         builder: (context, mailAddressProvider, child) {
-      var currentChatMessages = mailAddressProvider.currentChatMessages;
-      currentChatMessages ??= [];
+      var currentChatMessagePages = mailAddressProvider.currentChatMessagePages;
+      List<ChatMessage> currentChatMessages = [];
+      if (currentChatMessagePages != null) {
+        currentChatMessages = currentChatMessagePages.data;
+      }
       var chatMessageTileDataConvertMixin =
           ChatMessageTileDataConvertMixin(chatMessages: currentChatMessages);
       var dataListView = KeepAliveWrapper(

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+
 import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:path/path.dart';
@@ -115,7 +116,7 @@ class Sqflite extends DataStore {
   }
 
   @override
-  Future<Map<String, Object>> findPage(String table,
+  Future<Page> findPage(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -123,8 +124,8 @@ class Sqflite extends DataStore {
       String? groupBy,
       String? having,
       String? orderBy,
-      int? limit,
-      int? offset}) async {
+      int limit = 10,
+      int offset = 0}) async {
     var clause = sqlBuilder.select(table,
         distinct: distinct,
         columns: columns,
@@ -149,7 +150,7 @@ class Sqflite extends DataStore {
         limit: limit,
         offset: offset);
 
-    Map<String, Object> page = {'data': results, 'total': total};
+    Page page = Page(data: results, total: total, offset: offset, limit: limit);
 
     return page;
   }

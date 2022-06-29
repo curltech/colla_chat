@@ -6,6 +6,7 @@ import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_html/enough_mail_html.dart';
 import 'package:event_bus/event_bus.dart';
 
+import '../datastore/datastore.dart';
 import '../entity/chat/chat.dart';
 import '../entity/chat/mailaddress.dart' as entity;
 import '../provider/app_data_provider.dart';
@@ -64,8 +65,19 @@ class EmailMessageUtil {
   static ChatMessage convertToChatMessage(enough_mail.MimeMessage message) {
     ChatMessage chatMessage = ChatMessage();
     chatMessage.id = message.guid;
+    chatMessage.messageId = message.uid.toString();
+    chatMessage.messageType = MessageType.email.name;
     chatMessage.title = message.decodeSubject();
-    chatMessage.senderName = message.from.toString();
+    var from = message.from;
+    if (from != null && from.isNotEmpty) {
+      chatMessage.senderName = from.first.personalName;
+      chatMessage.senderAddress = from.first.email;
+    }
+    var to = message.to;
+    if (to != null && to.isNotEmpty) {
+      chatMessage.targetName = to.first.personalName;
+      chatMessage.targetAddress = to.first.email;
+    }
     chatMessage.contentType = message.mediaType.toString();
     chatMessage.content = message.renderMessage();
     //MimeMessage mimeMessage=MimeMessage.parseFromText(chatMessage.content);
@@ -395,19 +407,20 @@ class EmailClient {
   }
 
   ///用邮件客户端获取消息
-  Future<List<MimeMessage>?> fetchMessages(
-      {int count = 20,
+  Future<Page<MimeMessage>?> fetchMessages(
+      {int limit = 10,
       FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
       Mailbox? mailbox,
-      int page = 1}) async {
+      int offset = 0}) async {
     final enough_mail.MailClient? mailClient = this.mailClient;
-    if (mailClient != null) {
+    if (mailClient != null && mailbox != null) {
+      int total = mailbox.messagesExists;
       final messages = await mailClient.fetchMessages(
-          count: count,
+          count: limit,
           fetchPreference: fetchPreference,
           mailbox: mailbox,
-          page: page);
-      return messages;
+          page: Page.getPage(offset, limit));
+      return Page(total: total!, data: messages, limit: limit, offset: offset);
     }
     return null;
   }
