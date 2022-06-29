@@ -14,6 +14,7 @@ class Page<T> {
   List<T> data;
   int offset = defaultOffset;
   int limit = 0;
+  int page = 0;
 
   static int getPage(int offset, int limit) {
     int mod = offset % limit;
@@ -41,12 +42,25 @@ class Page<T> {
       this.offset = 0,
       this.limit = 10});
 
-  int get page {
-    return getPage(offset, limit);
-  }
-
   int get pageCount {
     return getPageCount(total, limit);
+  }
+
+  ///上一页的offset
+  int previous() {
+    if (offset < limit) {
+      return 0;
+    }
+    return offset - limit;
+  }
+
+  ///下一页的offset
+  int next() {
+    var off = offset + limit;
+    if (off > total) {
+      return total;
+    }
+    return off;
   }
 
   Page.fromJson(Map json)

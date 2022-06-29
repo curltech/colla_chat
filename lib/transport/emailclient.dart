@@ -421,7 +421,7 @@ class EmailClient {
           fetchPreference: fetchPreference,
           mailbox: mailbox,
           page: Page.getPage(offset, limit));
-      return Page(total: total!, data: messages, limit: limit, offset: offset);
+      return Page(total: total, data: messages, limit: limit, offset: offset);
     }
     return null;
   }

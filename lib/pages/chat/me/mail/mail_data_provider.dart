@@ -322,11 +322,12 @@ class MailDataProvider with ChangeNotifier {
       mineMessagePage =
           await emailClient.fetchMessages(mailbox: currentMailbox);
     } else {
+      int offset = currentMineMessagePage.next();
       mineMessagePage = await emailClient.fetchMessages(
-          mailbox: currentMailbox,
-          offset: currentMineMessagePage.offset + currentMineMessagePage.limit);
+          mailbox: currentMailbox, offset: offset);
       if (mineMessagePage != null) {
         currentMineMessagePage.data.addAll(mineMessagePage.data);
+        currentMineMessagePage.page++;
       }
     }
     if (mineMessagePage != null && mineMessagePage.data.isNotEmpty) {
@@ -362,11 +363,12 @@ class MailDataProvider with ChangeNotifier {
         notifyListeners();
       });
     } else {
-      var offset = currentChatMessagePage.offset + currentChatMessagePage.limit;
+      var offset = currentChatMessagePage.next();
       ChatMessageService.instance
           .findByMessageType('', MessageType.email.name, '', offset: offset)
-          .then((chatMessages) {
-        currentChatMessagePage.data.addAll(chatMessages.data);
+          .then((chatMessagePage) {
+        currentChatMessagePage.data.addAll(chatMessagePage.data);
+        currentChatMessagePage.page++;
         notifyListeners();
       });
     }
