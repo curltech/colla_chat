@@ -30,42 +30,33 @@ class MailListWidget extends StatefulWidget with TileDataMixin {
   String get title => 'Mails';
 }
 
-///ChatMessage数组的转换器实现类
-class ChatMessageTileDataConvertMixin with TileDataConvertMixin {
-  List<ChatMessage> chatMessages;
-
-  ChatMessageTileDataConvertMixin({required this.chatMessages});
-
-  @override
-  TileData getTileData(int index) {
-    ChatMessage chatMessage = chatMessages[index];
-    var title = chatMessage.title ?? '';
-    TileData tile = TileData(title: title);
-
-    return tile;
-  }
-
-  @override
-  bool add(List<TileData> tiles) {
-    return false;
-  }
-
-  @override
-  int get length => chatMessages.length;
-}
-
 class _MailListWidgetState extends State<MailListWidget> {
+  late Widget dataListView;
+
   @override
   initState() {
     super.initState();
+    dataListView = _build(context);
   }
 
   _onTap(int index, String title, {TileData? group}) {
     logger.w('index: $index, title: $title,onTap MailListWidget');
   }
 
-  @override
-  Widget build(BuildContext context) {
+  List<TileData> _convert(List<ChatMessage> chatMessages) {
+    List<TileData> tiles = [];
+    if (chatMessages.isNotEmpty) {
+      for (var chatMessage in chatMessages) {
+        var title = chatMessage.title ?? '';
+        TileData tile = TileData(title: title);
+        tiles.add(tile);
+      }
+    }
+
+    return tiles;
+  }
+
+  Widget _build(BuildContext context) {
     return Consumer<MailDataProvider>(
         builder: (context, mailAddressProvider, child) {
       var currentChatMessagePages = mailAddressProvider.currentChatMessagePage;
@@ -73,17 +64,21 @@ class _MailListWidgetState extends State<MailListWidget> {
       if (currentChatMessagePages != null) {
         currentChatMessages = currentChatMessagePages.data;
       }
-      var chatMessageTileDataConvertMixin =
-          ChatMessageTileDataConvertMixin(chatMessages: currentChatMessages);
-      var dataListView = KeepAliveWrapper(
-          child: DataListView(
-              onTap: _onTap, tileDataMix: chatMessageTileDataConvertMixin));
-      var appBarView = AppBarView(
-          title: widget.title,
-          withLeading: widget.withLeading,
-          child: dataListView);
+      var tiles = _convert(currentChatMessages);
+      var dataListView =
+          KeepAliveWrapper(child: DataListView(onTap: _onTap, tileData: tiles));
 
-      return appBarView;
+      return dataListView;
     });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var appBarView = AppBarView(
+        title: widget.title,
+        withLeading: widget.withLeading,
+        child: dataListView);
+
+    return appBarView;
   }
 }

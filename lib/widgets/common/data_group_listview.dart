@@ -12,21 +12,15 @@ import 'data_listtile.dart';
 ///如果有多个分组，ListView的每个组件是每个分组ExpansionTile，每个分组ExpansionTile下面是ListView，
 ///每个ListView下面是ListTile
 class GroupDataListView extends StatelessWidget {
-  final Map<TileData, List<TileData>>? tileData;
-  late Map<TileData, TileDataConvertMixin>? tileDataMix;
+  final Map<TileData, List<TileData>> tileData;
+
+  ///类变量，不用每次重建
+  late final Widget listView;
   final Function(int index, String title, {TileData? group})? onTap;
 
-  GroupDataListView({Key? key, this.tileData, this.tileDataMix, this.onTap})
+  GroupDataListView({Key? key, required this.tileData, this.onTap})
       : super(key: key) {
-    if (tileDataMix == null && tileData != null) {
-      tileDataMix = {};
-      for (var entry in tileData!.entries) {
-        var key = entry.key;
-        var value = entry.value;
-        var dataTileMix = ListTileDataConvertMixin(tileData: value);
-        tileDataMix![key] = dataTileMix;
-      }
-    }
+    listView = _build();
   }
 
   _onTap(int index, String title, {TileData? group}) {
@@ -67,12 +61,11 @@ class GroupDataListView extends StatelessWidget {
           child: Row(
               mainAxisAlignment: MainAxisAlignment.end, children: trailing));
     }
-    TileDataConvertMixin? tileDataMixin = tileDataMix![tile];
-    tileDataMixin = tileDataMixin ?? ListTileDataConvertMixin(tileData: []);
+    var tiles = tileData[tile];
+    tiles = tiles ?? [];
     Widget dataListView = KeepAliveWrapper(
         keepAlive: true,
-        child: DataListView(
-            onTap: _onTap, group: tile, tileDataMix: tileDataMixin));
+        child: DataListView(onTap: _onTap, group: tile, tileData: tiles));
 
     ///未来不使用ListTile，因为高度固定，不够灵活
     return ExpansionTile(
@@ -94,8 +87,8 @@ class GroupDataListView extends StatelessWidget {
 
   Widget _build() {
     List<Widget> groups = [];
-    if (tileDataMix!.isNotEmpty) {
-      for (var tileEntry in tileDataMix!.entries) {
+    if (tileData.isNotEmpty) {
+      for (var tileEntry in tileData.entries) {
         Widget groupExpansionTile = _buildExpansionTile(
           tileEntry.key,
         );
@@ -109,6 +102,6 @@ class GroupDataListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return _build();
+    return listView;
   }
 }

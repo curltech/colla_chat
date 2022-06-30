@@ -30,9 +30,12 @@ class MailAddressWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _MailAddressWidgetState extends State<MailAddressWidget> {
+  late Widget mailAddressWidget;
+
   @override
   initState() {
     super.initState();
+    mailAddressWidget = _build(context);
   }
 
   Icon _createIcon(String name) {
@@ -85,8 +88,7 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
     mailAddressProvider.setCurrentMailboxName(title);
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _build(BuildContext context) {
     return Consumer<MailDataProvider>(
         builder: (context, mailAddressProvider, child) {
       Map<TileData, List<TileData>> mailAddressTileData = {};
@@ -122,17 +124,18 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
         tileData: mailAddressTileData,
         onTap: _onTap,
       );
-      var appBarView = AppBarView(
-          title: widget.title,
-          withLeading: widget.withLeading,
-          child: mailAddressWidget);
 
-      return appBarView;
+      return mailAddressWidget;
     });
   }
 
   @override
-  void dispose() {
-    super.dispose();
+  Widget build(BuildContext context) {
+    var appBarView = AppBarView(
+        title: widget.title,
+        withLeading: widget.withLeading,
+        child: mailAddressWidget);
+
+    return appBarView;
   }
 }

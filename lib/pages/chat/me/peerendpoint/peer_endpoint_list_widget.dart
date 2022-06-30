@@ -73,31 +73,6 @@ class PeerEndpointController with ChangeNotifier {
   }
 }
 
-class PeerEndpointTileDataConvertMixin with TileDataConvertMixin {
-  List<PeerEndpoint> peerEndpoints;
-
-  PeerEndpointTileDataConvertMixin({required this.peerEndpoints});
-
-  @override
-  TileData getTileData(int index) {
-    PeerEndpoint peerEndpoint = peerEndpoints[index];
-    var title = peerEndpoint.name ?? '';
-    var subTitle = peerEndpoint.peerId ?? '';
-    TileData tile = TileData(
-        title: title, subtitle: subTitle, routeName: 'peer_endpoint_show');
-
-    return tile;
-  }
-
-  @override
-  bool add(List<TileData> tiles) {
-    return false;
-  }
-
-  @override
-  int get length => peerEndpoints.length;
-}
-
 //设置页面，带有回退回调函数
 class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
   final PeerEndpointController controller = PeerEndpointController();
@@ -129,12 +104,33 @@ class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
+  late KeepAliveWrapper dataListView;
+
   @override
   initState() {
     super.initState();
     widget.controller.addListener(() {
       setState(() {});
     });
+    var peerEndpoints = widget.controller.peerEndpoints;
+    var tiles = _convert(peerEndpoints);
+    dataListView =
+        KeepAliveWrapper(child: DataListView(onTap: _onTap, tileData: tiles));
+  }
+
+  List<TileData> _convert(List<PeerEndpoint> peerEndpoints) {
+    List<TileData> tiles = [];
+    if (peerEndpoints.isNotEmpty) {
+      for (var peerEndpoint in peerEndpoints) {
+        var title = peerEndpoint.name ?? '';
+        var subtitle = peerEndpoint.peerId ?? '';
+        TileData tile = TileData(
+            title: title, subtitle: subtitle, routeName: 'peer_endpoint_edit');
+        tiles.add(tile);
+      }
+    }
+
+    return tiles;
   }
 
   _onTap(int index, String title, {TileData? group}) {
@@ -143,12 +139,6 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var peerEndpoints = widget.controller.peerEndpoints;
-    var peerEndpointTileDataConvertMixin =
-        PeerEndpointTileDataConvertMixin(peerEndpoints: peerEndpoints);
-    var dataListView = KeepAliveWrapper(
-        child: DataListView(
-            onTap: _onTap, tileDataMix: peerEndpointTileDataConvertMixin));
     var peerendpointWidget = KeepAliveWrapper(
         child: AppBarView(
             title: widget.title,

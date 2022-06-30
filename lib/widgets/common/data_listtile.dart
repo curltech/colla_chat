@@ -6,6 +6,8 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../provider/data_list_controller.dart';
+
 ///指定路由样式，不指定则系统判断，系统判断的方法是如果是移动则走全局路由，否则走工作区路由
 enum RouteStyle { workspace, navigator }
 
@@ -59,12 +61,9 @@ class TileData {
 
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
 class DataListTile extends StatelessWidget {
+  final DataListController<TileData> dataListViewController;
   final TileData tileData;
-
   final int index;
-
-  ///是否被选择，颜色不同
-  final bool selected;
 
   ///是否缩小
   final bool dense;
@@ -76,15 +75,14 @@ class DataListTile extends StatelessWidget {
 
   const DataListTile(
       {Key? key,
+      required this.dataListViewController,
       required this.tileData,
       required this.index,
-      this.selected = false,
       this.dense = false,
       this.onTap})
       : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildListTile(BuildContext context) {
     ///前导组件，一般是自定义图标或者图像
     Widget? leading;
     final avatar = tileData.avatar;
@@ -125,6 +123,10 @@ class DataListTile extends StatelessWidget {
           child: Row(
               mainAxisAlignment: MainAxisAlignment.end, children: trailing));
     }
+    bool selected = false;
+    if (dataListViewController.currentIndex == index) {
+      selected = true;
+    }
 
     ///未来不使用ListTile，因为高度固定，不够灵活
     var listTile = ListTile(
@@ -141,6 +143,7 @@ class DataListTile extends StatelessWidget {
       trailing: trailingWidget,
       dense: dense,
       onTap: () {
+        dataListViewController.currentIndex = index;
         var fn = onTap;
         if (fn != null) {
           fn(index, tileData.title);
@@ -159,10 +162,16 @@ class DataListTile extends StatelessWidget {
         }
       },
     );
+
+    return listTile;
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
         margin: const EdgeInsets.only(top: 5.0),
         child: Column(children: <Widget>[
-          listTile,
+          _buildListTile(context),
           const Padding(
             padding: EdgeInsets.only(left: 5.0, right: 5.0),
             child: Divider(

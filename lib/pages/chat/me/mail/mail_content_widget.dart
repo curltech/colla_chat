@@ -31,9 +31,11 @@ class MailContentWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _MailContentWidgetState extends State<MailContentWidget> {
+  late Widget mimeMessageViewer;
   @override
   initState() {
     super.initState();
+    mimeMessageViewer = _build(context);
   }
 
   Widget _buildMimeMessageViewer(
@@ -82,17 +84,21 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     setState(() {});
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _build(BuildContext context) {
     return Consumer<MailDataProvider>(
         builder: (context, mailAddressProvider, child) {
       var mimeMessageViewer =
           _buildMimeMessageViewer(context, mailAddressProvider);
-      var appBarView = AppBarView(
-          title: widget.title,
-          withLeading: widget.withLeading,
-          child: mimeMessageViewer);
-      return appBarView;
+      return mimeMessageViewer;
     });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var appBarView = AppBarView(
+        title: widget.title,
+        withLeading: widget.withLeading,
+        child: mimeMessageViewer);
+    return appBarView;
   }
 }

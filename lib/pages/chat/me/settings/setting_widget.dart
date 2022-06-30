@@ -34,6 +34,10 @@ final Map<TileData, List<TileData>> settingTileData = {
 
 //设置页面，带有回退回调函数
 class SettingWidget extends StatelessWidget with TileDataMixin {
+  ///类变量，不用每次重建
+  final GroupDataListView groupDataListView =
+      GroupDataListView(tileData: settingTileData);
+
   SettingWidget({Key? key}) : super(key: key);
 
   @override
@@ -42,7 +46,7 @@ class SettingWidget extends StatelessWidget with TileDataMixin {
         child: AppBarView(
             title: 'Setting',
             withLeading: withLeading,
-            child: GroupDataListView(tileData: settingTileData)));
+            child: groupDataListView));
     return setting;
   }
 
