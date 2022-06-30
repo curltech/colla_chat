@@ -8,6 +8,8 @@ import '../../../../widgets/common/card_text_widget.dart';
 import '../../../../widgets/common/keep_alive_wrapper.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
+final List<String> peerEndpointFields = ['id', 'name', 'peerId'];
+
 //邮件内容组件
 class PeerEndpointShowWidget extends StatefulWidget with TileDataMixin {
   final PeerEndpointController controller;
@@ -45,9 +47,9 @@ class _PeerEndpointShowWidgetState extends State<PeerEndpointShowWidget> {
     PeerEndpoint? currentPeerEndpoint = widget.controller.current;
     if (currentPeerEndpoint != null) {
       var peerEndpointMap = currentPeerEndpoint.toJson();
-      for (var entry in peerEndpointMap.entries) {
-        var label = entry.key;
-        var value = entry.value;
+      for (var peerEndpointField in peerEndpointFields) {
+        var label = peerEndpointField;
+        var value = peerEndpointMap[peerEndpointField];
         value = value ?? '';
         options.add(Option(label, value.toString()));
       }

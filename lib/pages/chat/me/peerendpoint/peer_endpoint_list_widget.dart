@@ -20,10 +20,11 @@ class PeerEndpointController extends DataListController<PeerEndpoint> {
   }
 
   init() {
-    PeerEndpointService.instance.findAllPeerEndpoint().then((peerEndpoints) {
+    PeerEndpointService.instance
+        .findAllPeerEndpoint()
+        .then((List<PeerEndpoint> peerEndpoints) {
       if (peerEndpoints.isNotEmpty) {
-        data.addAll(peerEndpoints);
-        notifyListeners();
+        add(peerEndpoints);
       } else {
         for (var entry in nodeAddressOptions.entries) {
           var nodeAddressOption = entry.value;

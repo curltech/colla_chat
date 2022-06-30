@@ -1,10 +1,14 @@
 import 'package:fluent_ui/fluent_ui.dart';
 
 class DataListController<T> with ChangeNotifier {
-  final List<T> data;
+  List<T> data = <T>[];
   int _currentIndex = 0;
 
-  DataListController({this.data = const []});
+  DataListController({List<T>? data}) {
+    if (data != null && data.isNotEmpty) {
+      this.data.addAll(data);
+    }
+  }
 
   T getData(int index) {
     return data[index];
