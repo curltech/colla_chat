@@ -5,6 +5,7 @@ import '../../../../entity/dht/peerendpoint.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/form_input_widget.dart';
 import '../../../../widgets/common/input_field_widget.dart';
+import '../../../../widgets/common/keep_alive_wrapper.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
 final List<InputFieldDef> peerEndpointInputFieldDefs = [
@@ -68,12 +69,13 @@ class _PeerEndpointEditWidgetState extends State<PeerEndpointEditWidget> {
         }
       }
     }
-    Widget formInputWidget = FormInputWidget(
+    Widget formInputWidget = KeepAliveWrapper(
+        child: FormInputWidget(
       onOk: (Map<String, dynamic> values) {
         _onOk(values);
       },
       inputFieldDefs: peerEndpointInputFieldDefs,
-    );
+    ));
     return formInputWidget;
   }
 

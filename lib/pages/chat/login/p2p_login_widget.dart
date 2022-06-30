@@ -19,7 +19,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget>
     with AutomaticKeepAliveClientMixin {
   final _formKey = GlobalKey<FormState>();
   String _credential = '13609619603';
-  String _password = '1234';
+  String _password = '123456';
   bool _pwdShow = false;
 
   @override

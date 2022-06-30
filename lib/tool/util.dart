@@ -249,8 +249,12 @@ class JsonUtil {
 
   /// 把map和一般的实体转换成json字符串
   static String toJsonString(dynamic entity) {
+    if (entity is List) {
+      return jsonEncode(entity);
+    }
     Map map = toMap(entity);
     EntityUtil.removeNull(map);
+
     return jsonEncode(map);
   }
 }

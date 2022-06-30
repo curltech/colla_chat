@@ -4,6 +4,8 @@ import 'package:intl_phone_field/intl_phone_field.dart';
 
 import '../../../l10n/localization.dart';
 import '../../../provider/app_data_provider.dart';
+import '../../../routers/routes.dart';
+import '../../../service/dht/myselfpeer.dart';
 import '../../../widgets/common/input_field_widget.dart';
 
 final List<InputFieldDef> p2pRegisterInputFieldDef = [
@@ -87,22 +89,25 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget>
   }
 
   _onOk(Map<String, dynamic> values) {
-    logger.i(values);
+    String plainPassword = values['plainPassword'];
+    String confirmPassword = values['confirmPassword'];
+    String name = values['name'];
+    String loginName = values['loginName'];
+    String email = values['email'];
+    if (plainPassword == confirmPassword) {
+      myselfPeerService
+          .register(name, loginName, plainPassword,
+              mobile: _mobile, email: email)
+          .then((registerStatus) {
+        if (registerStatus) {
+          Application.router
+              .navigateTo(context, Application.index, replace: true);
+        }
+      });
+    } else {
+      logger.e('password is not matched');
+    }
   }
-
-  // Future<void> _register() async {
-  //   if (_plainPassword == _confirmPassword) {
-  //     var registerStatus = await myselfPeerService.register(
-  //         _name, _loginName, _plainPassword,
-  //         mobile: _mobile, email: _email);
-  //     if (registerStatus) {
-  //       Application.router
-  //           .navigateTo(context, Application.index, replace: true);
-  //     }
-  //   } else {
-  //     logger.e('password is not matched');
-  //   }
-  // }
 
   @override
   bool get wantKeepAlive => true;

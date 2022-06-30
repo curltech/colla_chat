@@ -5,6 +5,7 @@ import '../../../../constant/base.dart';
 import '../../../../entity/dht/peerendpoint.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/card_text_widget.dart';
+import '../../../../widgets/common/keep_alive_wrapper.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
 //邮件内容组件
@@ -45,12 +46,16 @@ class _PeerEndpointShowWidgetState extends State<PeerEndpointShowWidget> {
     if (currentPeerEndpoint != null) {
       var peerEndpointMap = currentPeerEndpoint.toJson();
       for (var entry in peerEndpointMap.entries) {
-        options.add(Option(entry.key, entry.value));
+        var label = entry.key;
+        var value = entry.value;
+        value = value ?? '';
+        options.add(Option(label, value.toString()));
       }
     }
-    Widget formInputWidget = CardTextWidget(
+    Widget formInputWidget = KeepAliveWrapper(
+        child: CardTextWidget(
       options: options,
-    );
+    ));
     return formInputWidget;
   }
 

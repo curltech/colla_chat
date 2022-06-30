@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../constant/base.dart';
 import '../../l10n/localization.dart';
+import '../../tool/util.dart';
 
 class CardTextWidget extends StatelessWidget {
   final List<Option> options;
@@ -11,19 +12,22 @@ class CardTextWidget extends StatelessWidget {
   Widget _build(BuildContext context) {
     List<Widget> children = [];
     for (var option in options) {
-      Widget label = Text(AppLocalizations.t(option.label));
-      Widget value = Text(option.value);
-      children.add(Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [label, value])));
+      var value = option.value;
+      if (StringUtil.isNotEmpty(value)) {
+        Widget label = Text(AppLocalizations.t(option.label) + ':');
+        Widget value = Text(option.value);
+        children.add(Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [label, value])));
+      }
     }
-    return Column(children: children);
+    return ListView(children: children);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Card(elevation: 0.0, child: Center(child: _build(context)));
+    return _build(context);
   }
 }
