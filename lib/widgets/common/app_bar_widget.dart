@@ -113,7 +113,7 @@ class AppBarWidget {
         ///调用下拉按钮的回调函数，参数为按钮序号
         onSelected: (int index) async {
           if (rightCallBack != null) {
-            await rightCallBack!(index);
+            await rightCallBack(index);
           }
         },
       );

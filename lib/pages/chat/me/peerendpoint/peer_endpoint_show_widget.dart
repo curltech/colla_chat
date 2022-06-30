@@ -42,7 +42,7 @@ class _PeerEndpointShowWidgetState extends State<PeerEndpointShowWidget> {
 
   Widget _buildCardTextWidget(BuildContext context) {
     List<Option> options = [];
-    PeerEndpoint? currentPeerEndpoint = widget.controller.currentPeerEndpoint;
+    PeerEndpoint? currentPeerEndpoint = widget.controller.current;
     if (currentPeerEndpoint != null) {
       var peerEndpointMap = currentPeerEndpoint.toJson();
       for (var entry in peerEndpointMap.entries) {

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../constant/address.dart';
 import '../../../../entity/dht/peerendpoint.dart';
+import '../../../../provider/data_list_controller.dart';
 import '../../../../provider/index_widget_provider.dart';
 import '../../../../service/dht/peerendpoint.dart';
 import '../../../../widgets/common/app_bar_view.dart';
@@ -13,23 +14,15 @@ import '../../../../widgets/common/data_listtile.dart';
 import '../../../../widgets/common/data_listview.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
-class PeerEndpointController with ChangeNotifier {
-  final List<PeerEndpoint> _peerEndpoints = [];
-
-  int _currentIndex = 0;
-
+class PeerEndpointController extends DataListController<PeerEndpoint> {
   PeerEndpointController() {
     init();
-  }
-
-  List<PeerEndpoint> get peerEndpoints {
-    return _peerEndpoints;
   }
 
   init() {
     PeerEndpointService.instance.findAllPeerEndpoint().then((peerEndpoints) {
       if (peerEndpoints.isNotEmpty) {
-        _peerEndpoints.addAll(peerEndpoints);
+        data.addAll(peerEndpoints);
         notifyListeners();
       } else {
         for (var entry in nodeAddressOptions.entries) {
@@ -45,31 +38,11 @@ class PeerEndpointController with ChangeNotifier {
           peerEndpoint.iceServers =
               JsonUtil.toJsonString(nodeAddressOption.iceServers);
           PeerEndpointService.instance.insert(peerEndpoint);
-          _peerEndpoints.add(peerEndpoint);
+          data.add(peerEndpoint);
         }
         notifyListeners();
       }
     });
-  }
-
-  int get currentIndex {
-    return _currentIndex;
-  }
-
-  PeerEndpoint? get currentPeerEndpoint {
-    return _peerEndpoints[_currentIndex];
-  }
-
-  set currentIndex(int index) {
-    if (_currentIndex != index) {
-      _currentIndex = index;
-      notifyListeners();
-    }
-  }
-
-  add(List<PeerEndpoint> peerEndpoints) {
-    _peerEndpoints.addAll(peerEndpoints);
-    notifyListeners();
   }
 }
 
@@ -112,7 +85,7 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
     widget.controller.addListener(() {
       setState(() {});
     });
-    var peerEndpoints = widget.controller.peerEndpoints;
+    var peerEndpoints = widget.controller.data;
     var tiles = _convert(peerEndpoints);
     dataListView =
         KeepAliveWrapper(child: DataListView(onTap: _onTap, tileData: tiles));
