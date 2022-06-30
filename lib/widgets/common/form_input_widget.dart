@@ -1,0 +1,132 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../l10n/localization.dart';
+import 'input_field_widget.dart';
+
+class FormInputController with ChangeNotifier {
+  final Map<String, dynamic> values = {};
+  final Map<String, dynamic> flags = {};
+  final Map<String, TextEditingController> controllers = {};
+
+  FormInputController();
+
+  initController(String name, TextEditingController controller) {
+    controllers[name] = controller;
+    controller.addListener(() {
+      notifyListeners();
+    });
+  }
+
+  clear() {
+    values.clear();
+    flags.clear();
+    for (var controller in controllers.values) {
+      controller.text = '';
+    }
+    notifyListeners();
+  }
+
+  dynamic getValue(String name) {
+    var controller = controllers[name];
+    if (controller != null) {
+      return controller.text;
+    } else {
+      return values[name];
+    }
+  }
+
+  dynamic getValues() {
+    Map<String, dynamic> values = {};
+    values.addAll(this.values);
+    for (var entry in controllers.entries) {
+      String name = entry.key;
+      values[name] = entry.value.text;
+    }
+    return values;
+  }
+
+  ///内部改变值
+  changeValue(String name, dynamic value) {
+    var controller = controllers[name];
+    if (controller != null) {
+      controller.text = value;
+    } else {
+      values[name] = value;
+      notifyListeners();
+    }
+  }
+
+  ///外部设置值
+  setValue(String name, dynamic value) {
+    var controller = controllers[name];
+    if (controller != null) {
+      controller.text = value;
+    } else {
+      values[name] = value;
+      notifyListeners();
+    }
+  }
+
+  dynamic getFlag(String name) {
+    return flags[name];
+  }
+
+  changeFlag(String name, dynamic flag) {
+    if (flags[name] != flag) {
+      flags[name] = flag;
+      notifyListeners();
+    }
+  }
+}
+
+class FormInputWidget extends StatelessWidget {
+  final List<InputFieldDef> inputFieldDefs;
+  final Function(Map<String, dynamic>) onOk;
+
+  const FormInputWidget(
+      {Key? key, required this.inputFieldDefs, required this.onOk})
+      : super(key: key);
+
+  Widget _build(BuildContext context) {
+    FormInputController formInputController =
+        Provider.of<FormInputController>(context);
+    List<Widget> children = [];
+    for (var inputFieldDef in inputFieldDefs) {
+      Widget inputFieldWidget = InputFieldWidget(inputFieldDef: inputFieldDef);
+
+      children.add(inputFieldWidget);
+    }
+    children.add(const SizedBox(
+      height: 30.0,
+    ));
+    children.add(Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15.0),
+      child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+        TextButton(
+          child: Text(AppLocalizations.t('Ok')),
+          onPressed: () {
+            onOk(formInputController.getValues());
+          },
+        ),
+        TextButton(
+          child: Text(AppLocalizations.t('Reset')),
+          onPressed: () {
+            formInputController.clear();
+          },
+        )
+      ]),
+    ));
+    return Column(children: children);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ChangeNotifierProvider(
+        builder: (BuildContext context, Widget? child) {
+      return _build(context);
+    }, create: (BuildContext context) {
+      return FormInputController();
+    });
+  }
+}
