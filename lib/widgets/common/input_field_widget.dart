@@ -15,6 +15,7 @@ class InputFieldDef {
   final String name;
   final String label;
   final InputType inputType;
+  String initValue;
 
   //图标
   final Widget? prefixIcon;
@@ -30,6 +31,8 @@ class InputFieldDef {
 
   final int? maxLines;
 
+  bool readOnly;
+
   final List<Option>? options;
 
   final Function(String value)? validator;
@@ -40,12 +43,14 @@ class InputFieldDef {
     required this.name,
     required this.label,
     this.inputType = InputType.text,
+    this.initValue = '',
     this.prefixIcon,
     this.avatar,
     this.hintText,
     this.textInputType = TextInputType.text,
     this.suffixIcon,
     this.maxLines = 1,
+    this.readOnly = false,
     this.options,
     this.validator,
     this.autoValidate = false,
@@ -75,11 +80,13 @@ class InputFieldWidget extends StatelessWidget {
     FormInputController formInputController =
         Provider.of<FormInputController>(context);
     var controller = TextEditingController();
+    controller.text = inputDef.initValue;
     formInputController.initController(inputDef.name, controller);
     var widget = TextFormField(
       controller: controller,
       keyboardType: inputFieldDef.textInputType,
       maxLines: inputFieldDef.maxLines,
+      readOnly: inputFieldDef.readOnly,
       decoration: InputDecoration(
           labelText: AppLocalizations.t(inputDef.label),
           prefixIcon: _buildIcon(inputDef),
@@ -96,11 +103,12 @@ class InputFieldWidget extends StatelessWidget {
     bool? pwdShow = formInputController.getFlag(inputDef.name);
     pwdShow ??= false;
     var controller = TextEditingController();
+    controller.text = inputDef.initValue;
     formInputController.initController(inputDef.name, controller);
     var widget = TextFormField(
       controller: controller,
       keyboardType: inputFieldDef.textInputType,
-      obscureText: pwdShow,
+      obscureText: !pwdShow,
       decoration: InputDecoration(
           labelText: AppLocalizations.t(inputDef.label),
           prefixIcon: _buildIcon(inputDef),

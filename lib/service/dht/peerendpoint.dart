@@ -1,3 +1,4 @@
+import '../../entity/dht/peerendpoint.dart';
 import '../base.dart';
 
 class PeerEndpointService extends BaseService {
@@ -21,6 +22,18 @@ class PeerEndpointService extends BaseService {
       initStatus = true;
     }
     return _instance;
+  }
+
+  Future<List<PeerEndpoint>> findAllPeerEndpoint() async {
+    var peerEndpoints_ = await find(null, whereArgs: []);
+    List<PeerEndpoint> peerEndpoints = [];
+    if (peerEndpoints_.isNotEmpty) {
+      for (var peerEndpoint_ in peerEndpoints_) {
+        var peerEndpoint = PeerEndpoint.fromJson(peerEndpoint_);
+        peerEndpoints.add(peerEndpoint);
+      }
+    }
+    return peerEndpoints;
   }
 }
 

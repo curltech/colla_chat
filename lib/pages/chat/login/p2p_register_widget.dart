@@ -8,25 +8,32 @@ import '../../../widgets/common/input_field_widget.dart';
 
 final List<InputFieldDef> p2pRegisterInputFieldDef = [
   InputFieldDef(
-      name: 'name', label: 'name', prefixIcon: const Icon(Icons.person)),
+      name: 'name',
+      label: 'name',
+      prefixIcon: const Icon(Icons.person),
+      initValue: '胡劲松'),
   InputFieldDef(
       name: 'loginName',
       label: 'loginName',
-      prefixIcon: const Icon(Icons.person)),
+      prefixIcon: const Icon(Icons.person),
+      initValue: '13609619603'),
   InputFieldDef(
       name: 'email',
       label: 'email',
       prefixIcon: const Icon(Icons.email),
+      initValue: 'hujs@colla.cc',
       textInputType: TextInputType.emailAddress),
   InputFieldDef(
       name: 'plainPassword',
       label: 'plainPassword',
       inputType: InputType.password,
+      initValue: '123456',
       prefixIcon: const Icon(Icons.password)),
   InputFieldDef(
       name: 'confirmPassword',
       label: 'confirmPassword',
       inputType: InputType.password,
+      initValue: '123456',
       prefixIcon: const Icon(Icons.confirmation_num))
 ];
 
@@ -49,9 +56,9 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget>
         child: SingleChildScrollView(
       child: Column(
         children: <Widget>[
-          SizedBox(height: 30.0),
+          const SizedBox(height: 30.0),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: 15.0),
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
             child: IntlPhoneField(
               initialCountryCode: _countryCode,
               initialValue: _mobile,

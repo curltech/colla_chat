@@ -1,3 +1,4 @@
+import 'package:colla_chat/pages/chat/me/peerendpoint/peer_endpoint_list_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -11,7 +12,6 @@ import '../../../widgets/common/widget_mixin.dart';
 import 'collection/collection_widget.dart';
 import 'mail/address/address_add.dart';
 import 'mail/mail_address_widget.dart';
-import 'mail/mail_content_widget.dart';
 import 'mail/mail_list_widget.dart';
 import 'me_head_widget.dart';
 
@@ -23,9 +23,10 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   final AddressAddWidget addressAddWidget = const AddressAddWidget();
 
   // MailView mailView = MailView();
-  final MailAddressWidget mailAddressWidget = MailAddressWidget();
+  final MailAddressWidget mailAddressWidget = const MailAddressWidget();
   final MailListWidget mailListWidget = const MailListWidget();
-  final MailContentWidget mailContentWidget = const MailContentWidget();
+  final PeerEndpointListWidget peerEndpointListWidget =
+      PeerEndpointListWidget();
 
   late final Widget child;
 
@@ -40,13 +41,14 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     // indexWidgetProvider.define(mailView);
     indexWidgetProvider.define(mailAddressWidget);
     indexWidgetProvider.define(mailListWidget);
-    indexWidgetProvider.define(mailContentWidget);
+    indexWidgetProvider.define(peerEndpointListWidget);
 
     List<TileDataMixin> mixins = [
       collectionWidget,
       addressAddWidget,
       mailAddressWidget,
-      settingWidget
+      settingWidget,
+      peerEndpointListWidget
     ];
     final Map<TileData, List<TileData>> meTileData = {
       TileData(title: title): TileData.from(mixins),
