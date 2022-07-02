@@ -99,7 +99,7 @@ class _DataListView extends State<DataListView> {
             //physics: const NeverScrollableScrollPhysics(),
             controller: widget.scrollController,
             itemBuilder: (BuildContext context, int index) {
-              TileData tile = widget.dataListViewController.getData(index);
+              TileData tile = widget.dataListViewController.get(index);
 
               DataListTile tileWidget = DataListTile(
                 dataListViewController: widget.dataListViewController,

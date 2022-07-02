@@ -10,10 +10,6 @@ class DataListController<T> with ChangeNotifier {
     }
   }
 
-  T getData(int index) {
-    return data[index];
-  }
-
   T get current {
     return data[_currentIndex];
   }
@@ -32,6 +28,31 @@ class DataListController<T> with ChangeNotifier {
   add(List<T> ds) {
     if (ds.isNotEmpty) {
       data.addAll(ds);
+      notifyListeners();
+    }
+  }
+
+  T get(int index) {
+    return data[index];
+  }
+
+  insert(int index, T d) {
+    if (index >= 0 && index < data.length) {
+      data.insert(index, d);
+      notifyListeners();
+    }
+  }
+
+  delete(int index) {
+    if (index >= 0 && index < data.length) {
+      data.removeAt(index);
+      notifyListeners();
+    }
+  }
+
+  update(int index, T d) {
+    if (index >= 0 && index < data.length) {
+      data[index] = d;
       notifyListeners();
     }
   }
