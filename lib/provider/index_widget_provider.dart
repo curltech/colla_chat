@@ -102,7 +102,7 @@ class Stack<T> {
 }
 
 final List<String> mainViews = ['chat', 'linkman', 'channel', 'me'];
-final bool useNavigator = false;
+const bool useNavigator = false;
 
 /// 主工作区的视图状态管理器，维护了主工作区的控制器，视图列表，当前视图
 class IndexWidgetProvider with ChangeNotifier {
