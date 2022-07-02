@@ -1,4 +1,3 @@
-import 'package:colla_chat/pages/chat/index/end_drawer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,8 +19,6 @@ class IndexWidget extends StatefulWidget {
 
 class _IndexWidgetState extends State<IndexWidget>
     with SingleTickerProviderStateMixin {
-  var endDrawer = const EndDrawer();
-
   @override
   void initState() {
     super.initState();
@@ -39,12 +36,15 @@ class _IndexWidgetState extends State<IndexWidget>
   Widget _createPageView(BuildContext context) {
     var pageView = Consumer<IndexWidgetProvider>(
         builder: (context, indexWidgetProvider, child) {
-      return PageView(
+      return PageView.builder(
         //physics: const NeverScrollableScrollPhysics(),
         controller: indexWidgetProvider.pageController,
-        children: indexWidgetProvider.views,
         onPageChanged: (int index) {
           indexWidgetProvider.setCurrentIndex(index, context: context);
+        },
+        itemCount: indexWidgetProvider.views.length,
+        itemBuilder: (BuildContext context, int index) {
+          return indexWidgetProvider.views[index];
         },
       );
     });

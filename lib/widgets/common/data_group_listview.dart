@@ -4,7 +4,6 @@ import 'package:colla_chat/widgets/common/data_listview.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:flutter/material.dart';
 
-import '../../provider/app_data_provider.dart';
 import 'data_listtile.dart';
 
 ///无状态组件，根据传入的数据一次性展示
@@ -24,7 +23,7 @@ class GroupDataListView extends StatelessWidget {
   }
 
   _onTap(int index, String title, {TileData? group}) {
-    logger.w('index: $index, title: $title,onTap GroupDataListView');
+    //logger.w('index: $index, title: $title,onTap GroupDataListView');
     var onTap = this.onTap;
     if (onTap != null) {
       onTap(index, title, group: group);

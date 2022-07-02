@@ -33,9 +33,9 @@ class Stack<T> {
       _reverse[back] = element;
     }
     _head = element;
-    logger.i('head:$_head');
-    logger.i('stacks:$_stacks');
-    logger.i('reverse:$_reverse');
+    // logger.i('head:$_head');
+    // logger.i('stacks:$_stacks');
+    // logger.i('reverse:$_reverse');
 
     return back;
   }
@@ -90,9 +90,9 @@ class Stack<T> {
     } else {
       _head = null;
     }
-    logger.i('head:$_head');
-    logger.i('stacks:$_stacks');
-    logger.i('reverse:$_reverse');
+    // logger.i('head:$_head');
+    // logger.i('stacks:$_stacks');
+    // logger.i('reverse:$_reverse');
     return _head;
   }
 
@@ -213,7 +213,7 @@ class IndexWidgetProvider with ChangeNotifier {
   ///视图转换已经发生
   setCurrentIndex(int index, {BuildContext? context}) {
     if (_currentIndex == index) {
-      return;
+      //return;
     }
     if (index >= views.length) {
       logger.e('index: $index over workspace view');
@@ -221,22 +221,16 @@ class IndexWidgetProvider with ChangeNotifier {
     }
 
     logger.i('mainIndex:$mainIndex;currentIndex:$_currentIndex;index:$index');
+    //无论是非主视图还是主视图，转换到主视图，需要退出堆栈
+    if (index < mainViews.length) {
+      _pop();
+    }
     //主视图转换到主视图，通知边栏和底栏
     if (_currentIndex < mainViews.length && index < mainViews.length) {
       if (_mainIndex != index) {
         _mainIndex = index;
       }
     }
-    //非主视图转换到主视图
-    else if (_currentIndex >= mainViews.length && index < mainViews.length) {
-      _pop();
-    }
-    //非主视图转换到非主视图
-    else if (_currentIndex >= mainViews.length && index >= mainViews.length) {
-      _pop();
-    }
-    //主视图转换到非主视图
-    else if (_currentIndex < mainViews.length && index >= mainViews.length) {}
     _currentIndex = index;
     notifyListeners();
   }
@@ -273,10 +267,10 @@ class IndexWidgetProvider with ChangeNotifier {
         if (push) {
           stack.pushRepeat(name);
         }
-        pageController.jumpToPage(index);
-        // pageController.animateToPage(index,
-        //     duration: const Duration(milliseconds: 100),
-        //     curve: Curves.easeInOut);
+        //pageController.jumpToPage(index);
+        pageController.animateToPage(index,
+            duration: const Duration(milliseconds: 100),
+            curve: Curves.easeInOut);
         notifyListeners();
       } else {
         logger.e('$name error,not exist');
@@ -335,7 +329,10 @@ class IndexWidgetProvider with ChangeNotifier {
 
       int? index = _pop();
       if (index != null) {
-        pageController.jumpToPage(index);
+        //pageController.jumpToPage(index);
+        pageController.animateToPage(index,
+            duration: const Duration(milliseconds: 100),
+            curve: Curves.easeInOut);
         _currentIndex = index;
         notifyListeners();
       }
