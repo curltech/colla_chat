@@ -4,6 +4,7 @@ import '../../../l10n/localization.dart';
 import '../../../tool/util.dart';
 import '../../../widgets/common/data_group_listview.dart';
 import '../../../widgets/common/data_listtile.dart';
+import '../../../widgets/common/keep_alive_wrapper.dart';
 import '../../../widgets/common/widget_mixin.dart';
 
 final Map<TileData, List<TileData>> mockTileData = {
@@ -37,7 +38,7 @@ class ChatTarget extends StatelessWidget with TileDataMixin {
   late final Widget child;
 
   ChatTarget({Key? key}) : super(key: key) {
-    child = GroupDataListView(tileData: chatTargets);
+    child = KeepAliveWrapper(child: GroupDataListView(tileData: chatTargets));
   }
 
   @override

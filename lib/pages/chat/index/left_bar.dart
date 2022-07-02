@@ -37,7 +37,7 @@ class _LeftBarState extends State<LeftBar> {
                 onTap: () {
                   indexWidgetProvider.mainIndex = 0;
                   //不传入路由context和样式，走工作区路由
-                  indexWidgetProvider.push(workspaceViews[0]);
+                  indexWidgetProvider.push(mainViews[0], push: false);
                 }),
             ListTile(
                 iconColor: indexWidgetProvider.getIconColor(1),
@@ -49,7 +49,7 @@ class _LeftBarState extends State<LeftBar> {
                 ),
                 onTap: () {
                   indexWidgetProvider.mainIndex = 1;
-                  indexWidgetProvider.push(workspaceViews[1]);
+                  indexWidgetProvider.push(mainViews[1], push: false);
                 }),
             ListTile(
                 iconColor: indexWidgetProvider.getIconColor(2),
@@ -61,7 +61,7 @@ class _LeftBarState extends State<LeftBar> {
                 ),
                 onTap: () {
                   indexWidgetProvider.mainIndex = 2;
-                  indexWidgetProvider.push(workspaceViews[2]);
+                  indexWidgetProvider.push(mainViews[2], push: false);
                 }),
             ListTile(
                 iconColor: indexWidgetProvider.getIconColor(3),
@@ -73,7 +73,7 @@ class _LeftBarState extends State<LeftBar> {
                 ),
                 onTap: () {
                   indexWidgetProvider.mainIndex = 3;
-                  indexWidgetProvider.push(workspaceViews[3]);
+                  indexWidgetProvider.push(mainViews[3], push: false);
                 }),
           ],
         ),

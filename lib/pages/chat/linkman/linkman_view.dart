@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../../l10n/localization.dart';
 import '../../../provider/app_data_provider.dart';
+import '../../../widgets/common/keep_alive_wrapper.dart';
 import '../../../widgets/common/widget_mixin.dart';
 import 'linkman_widget.dart';
 
@@ -41,9 +42,9 @@ class _LinkmanViewState extends State<LinkmanView>
     _tabController = TabController(length: 2, vsync: this);
     // 初始化子项集合
     var linkmanWidget =
-        const KeepAlive(keepAlive: true, child: LinkmanWidget());
+        const KeepAliveWrapper(keepAlive: true, child: LinkmanWidget());
     var linkmanAddWidget =
-        const KeepAlive(keepAlive: true, child: LinkmanAddWidget());
+        const KeepAliveWrapper(keepAlive: true, child: LinkmanAddWidget());
     _children = [
       linkmanWidget,
       linkmanAddWidget,

@@ -1,10 +1,10 @@
+import 'package:colla_chat/widgets/common/blank_widget.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 
 import '../l10n/localization.dart';
 import '../routers/navigator_util.dart';
 import '../routers/routes.dart';
-import '../widgets/common/data_listtile.dart';
 import '../widgets/common/widget_mixin.dart';
 import 'app_data_provider.dart';
 
@@ -101,48 +101,47 @@ class Stack<T> {
   }
 }
 
-final List<String> workspaceViews = ['chat', 'linkman', 'channel', 'me'];
+final List<String> mainViews = ['chat', 'linkman', 'channel', 'me'];
 final bool useNavigator = false;
 
 /// 主工作区的视图状态管理器，维护了主工作区的控制器，视图列表，当前视图
 class IndexWidgetProvider with ChangeNotifier {
   static IndexWidgetProvider instance = IndexWidgetProvider();
+
+  ///所有视图名称和位置的映射
   Map<String, int> viewPosition = {};
+
+  ///所以可以出现在工作区的视图，0-3是主视图
+  Map<String, Widget> allViews = {};
+
+  ///当前出现在工作区的视图，0-3是主视图，始终都在，然后每进入一个新视图，则添加
+  ///每退出一个则删除
   List<Widget> views = [];
   Stack<String> stack = Stack<String>();
-  static const String _head = '_head';
-  PageController? _pageController;
-
+  PageController? pageController;
   int _currentIndex = 0;
 
   ///左边栏和底部栏的指示，范围0-3
   int _mainIndex = 0;
-
   double _leftBarWidth = 90;
 
-  IndexWidgetProvider();
-
-  PageController? get pageController {
-    return _pageController;
-  }
-
-  set pageController(PageController? pageController) {
-    _pageController = pageController;
-    if (_pageController != null) {
-      _pageController!.addListener(() {
-        //currentIndex = pageController.page!.floor();
-      });
+  IndexWidgetProvider() {
+    for (var i = 0; i < mainViews.length; ++i) {
+      String name = mainViews[i];
+      allViews[name] = blankWidget;
+      views.add(blankWidget);
+      viewPosition[name] = i;
     }
   }
 
   ///增加新的视图，不能在initState和build构建方法中调用listen=true，
   ///因为本方法会引起整个pageview视图的重新构建
   define(TileDataMixin view, {bool listen = false}) {
-    int workspaceViewIndex = _workspaceViewIndex(view.routeName);
-    if (workspaceViewIndex > -1 || !useNavigator || !appDataProvider.mobile) {
-      if (!viewPosition.containsKey(view.routeName)) {
-        views.add(view);
-        viewPosition[view.routeName] = views.length - 1;
+    if (!useNavigator || !appDataProvider.mobile) {
+      allViews[view.routeName] = view;
+      int? viewIndex = viewPosition[view.routeName];
+      if (viewIndex != null && viewIndex < mainViews.length) {
+        views[viewIndex] = view;
       }
     } else {
       Application.router.define('/${view.routeName}', handler: Handler(
@@ -177,26 +176,12 @@ class IndexWidgetProvider with ChangeNotifier {
     return name;
   }
 
-  setCurrentIndex(int index, {BuildContext? context}) {
-    _currentIndex = index;
-    String? name = _getName(index);
-    if (name != null) {
-      int workspaceViewIndex = _workspaceViewIndex(name);
-      if (workspaceViewIndex > -1 && _mainIndex != workspaceViewIndex) {
-        _mainIndex = workspaceViewIndex;
-      }
-      _jumpTo(name, context: context);
-    } else {
-      logger.e('index:$index no name,not exist');
-    }
-  }
-
   int get mainIndex {
     return _mainIndex;
   }
 
   set mainIndex(int index) {
-    if (index >= 0 && index < workspaceViews.length) {
+    if (index >= 0 && index < mainViews.length) {
       _mainIndex = index;
       notifyListeners();
     }
@@ -216,54 +201,145 @@ class IndexWidgetProvider with ChangeNotifier {
 
   bool get bottomBarVisible {
     if (appDataProvider.mobile) {
-      String? name = _getName(_currentIndex);
-      if (name != null) {
-        int workspaceViewIndex = _workspaceViewIndex(name);
-        if (workspaceViewIndex > -1) {
-          return true;
-        } else {
-          return false;
-        }
+      if (_currentIndex < mainViews.length) {
+        return true;
+      } else {
+        return false;
       }
     }
     return false;
   }
 
-  ///把名字压入堆栈，然后跳转
-  push(String name, {BuildContext? context, RouteStyle? routeStyle}) {
-    _jumpTo(name, isPush: true, context: context);
+  ///视图转换已经发生
+  setCurrentIndex(int index, {BuildContext? context}) {
+    if (_currentIndex == index) {
+      return;
+    }
+    if (index >= views.length) {
+      logger.e('index: $index over workspace view');
+      return;
+    }
+
+    logger.i('mainIndex:$mainIndex;currentIndex:$_currentIndex;index:$index');
+    //主视图转换到主视图，通知边栏和底栏
+    if (_currentIndex < mainViews.length && index < mainViews.length) {
+      if (_mainIndex != index) {
+        _mainIndex = index;
+      }
+    }
+    //非主视图转换到主视图
+    else if (_currentIndex >= mainViews.length && index < mainViews.length) {
+      _pop();
+    }
+    //非主视图转换到非主视图
+    else if (_currentIndex >= mainViews.length && index >= mainViews.length) {
+      _pop();
+    }
+    //主视图转换到非主视图
+    else if (_currentIndex < mainViews.length && index >= mainViews.length) {}
+    _currentIndex = index;
+    notifyListeners();
   }
 
-  int _workspaceViewIndex(String name) {
-    var index = -1;
-    for (var i = 0; i < workspaceViews.length; ++i) {
-      if (name == workspaceViews[i]) {
-        index = i;
-        break;
+  ///把名字压入堆栈，然后跳转
+  push(String name, {bool push = true, BuildContext? context}) {
+    //判断要进入的页面是否存在
+    Widget? view = allViews[name];
+    if (view == null) {
+      logger.e('view: $name is not exist');
+      return;
+    }
+    //桌面工作区模式
+    if (!useNavigator || !appDataProvider.mobile) {
+      var pageController = this.pageController;
+      if (pageController == null) {
+        logger.e('pageController is not exist');
+        return;
       }
+      //判断要进入的页面是否已在工作区
+      int? index = viewPosition[name];
+      if (index == null) {
+        //不是主页面，增加到工作区
+        views.add(view);
+        index = views.length - 1;
+        viewPosition[name] = index;
+      } else {
+        if (_currentIndex == index) {
+          return;
+        }
+      }
+      if (index < allViews.length) {
+        _currentIndex = index;
+        if (push) {
+          stack.pushRepeat(name);
+        }
+        pageController.jumpToPage(index);
+        // pageController.animateToPage(index,
+        //     duration: const Duration(milliseconds: 100),
+        //     curve: Curves.easeInOut);
+        notifyListeners();
+      } else {
+        logger.e('$name error,not exist');
+      }
+    } else {
+      //移动版路由模式
+      if (context != null) {
+        NavigatorUtil.jump(context, '/$name');
+      } else {
+        logger.e('jump to $name error, no context');
+      }
+    }
+  }
+
+  ///堆栈弹出，然后计算弹出堆栈后要跳转的视图
+  int? _pop() {
+    String? head = stack.head;
+    if (head == null) {
+      logger.i('head is null');
+      return null;
+    }
+    //堆栈有头视图，可以弹出
+    int? index = viewPosition[head];
+    //头视图在工作区内
+    if (index != null) {
+      //堆栈头视图不是主视图，可以弹出，计算弹出后的视图
+      if (index >= mainViews.length) {
+        //否则弹出后跳转
+        stack.pop();
+        String name = head;
+        head = stack.head;
+        if (head != null) {
+          index = viewPosition[head];
+        } else {
+          index = _mainIndex;
+        }
+        index ??= _mainIndex;
+        views.removeLast();
+        viewPosition.remove(name);
+      }
+    } else {
+      logger.e('head is not in workspace');
     }
     return index;
   }
 
   ///弹出最新的，跳转到第二新的
   pop({BuildContext? context}) {
-    String? head = stack.head;
-    if (head != null) {
-      int workspaceViewIndex = _workspaceViewIndex(head);
-      if (workspaceViewIndex > -1 || !useNavigator || !appDataProvider.mobile) {
-        stack.pop();
-        head = stack.head;
-        if (head != null) {
-          _jumpTo(head);
-        }
-      } else {
-        if (context != null) {
-          NavigatorUtil.goBack(context);
-        } else {
-          logger.e('pop error, no context');
-        }
+    //桌面工作区模式
+    if (!useNavigator || !appDataProvider.mobile) {
+      var pageController = this.pageController;
+      if (pageController == null) {
+        logger.e('pageController is not exist');
+        return;
       }
-    } else if (useNavigator && appDataProvider.mobile) {
+
+      int? index = _pop();
+      if (index != null) {
+        pageController.jumpToPage(index);
+        _currentIndex = index;
+        notifyListeners();
+      }
+    } else {
       if (context != null) {
         NavigatorUtil.goBack(context);
       } else {
@@ -277,9 +353,13 @@ class IndexWidgetProvider with ChangeNotifier {
     bool can = false;
     String? head = stack.head;
     if (head != null) {
-      int workspaceViewIndex = _workspaceViewIndex(head);
-      if (workspaceViewIndex > -1 || !useNavigator || !appDataProvider.mobile) {
-        can = stack.canPop();
+      int? viewIndex = viewPosition[head];
+      if (viewIndex != null) {
+        if (viewIndex >= mainViews.length ||
+            !useNavigator ||
+            !appDataProvider.mobile) {
+          can = stack.canPop();
+        }
       } else {
         if (context != null) {
           can = NavigatorUtil.canBack(context);
@@ -297,36 +377,6 @@ class IndexWidgetProvider with ChangeNotifier {
     return can;
   }
 
-  ///直接跳转到名字的视图
-  _jumpTo(String name, {bool isPush = false, BuildContext? context}) {
-    int? index = viewPosition[name];
-    var pageController = _pageController;
-    if (index != null &&
-        index > -1 &&
-        index < views.length &&
-        pageController != null) {
-      int workspaceViewIndex = _workspaceViewIndex(name);
-      if (workspaceViewIndex > -1 || !useNavigator || !appDataProvider.mobile) {
-        if (viewPosition.containsKey(name)) {
-          _currentIndex = index;
-          if (isPush) {
-            stack.pushRepeat(name);
-          }
-          pageController.jumpToPage(index);
-          notifyListeners();
-        } else {
-          logger.e('$name error,not exist');
-        }
-      } else {
-        if (context != null) {
-          NavigatorUtil.jump(context, '/$name');
-        } else {
-          logger.e('jump to $name error, no context');
-        }
-      }
-    }
-  }
-
   Color? getIconColor(int index) {
     if (index == mainIndex) {
       return appDataProvider.themeData?.colorScheme.primary;
@@ -342,7 +392,7 @@ class IndexWidgetProvider with ChangeNotifier {
       'channel': AppLocalizations.instance.text('Channel'),
       'me': AppLocalizations.instance.text('Me'),
     };
-    String name = workspaceViews[index];
+    String name = mainViews[index];
     name = name ?? '';
     String? label = widgetLabels[name];
     label = label ?? '';

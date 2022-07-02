@@ -25,9 +25,6 @@ class TileData {
   final dynamic suffix;
   final String? routeName;
 
-  //进入路由样式
-  final RouteStyle? routeStyle;
-
   //缺省行为，为空的时候，是打上选择标志，颜色变化
   Function(int index, String title)? onTap;
 
@@ -38,7 +35,6 @@ class TileData {
       this.subtitle,
       this.suffix,
       this.routeName,
-      this.routeStyle,
       this.onTap});
 
   static TileData of(TileDataMixin mixin) {
@@ -157,8 +153,7 @@ class DataListTile extends StatelessWidget {
         if (tileData.routeName != null) {
           var indexWidgetProvider =
               Provider.of<IndexWidgetProvider>(context, listen: false);
-          indexWidgetProvider.push(tileData.routeName!,
-              context: context, routeStyle: tileData.routeStyle);
+          indexWidgetProvider.push(tileData.routeName!, context: context);
         }
       },
     );
