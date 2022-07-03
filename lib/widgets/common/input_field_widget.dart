@@ -8,7 +8,7 @@ import '../../l10n/localization.dart';
 import 'form_input_widget.dart';
 
 ///指定路由样式，不指定则系统判断，系统判断的方法是如果是移动则走全局路由，否则走工作区路由
-enum InputType { text, password, radio, checkbox, select, textarea }
+enum InputType { label, text, password, radio, checkbox, select, textarea }
 
 /// 通用列表项的数据模型
 class InputFieldDef {
@@ -63,6 +63,17 @@ class InputFieldWidget extends StatelessWidget {
 
   const InputFieldWidget({Key? key, required this.inputFieldDef})
       : super(key: key);
+
+  Widget? _buildLabel(BuildContext context, InputFieldDef inputDef) {
+    final label = inputDef.label;
+    final name = inputDef.name;
+    FormInputController formInputController =
+        Provider.of<FormInputController>(context);
+    dynamic value = formInputController.getValue(name);
+    value = value ?? '';
+
+    return Text(AppLocalizations.t(label) + ':' + value);
+  }
 
   Widget? _buildIcon(InputFieldDef inputDef) {
     Widget? icon;
