@@ -29,8 +29,9 @@ final List<InputFieldDef> peerEndpointInputFieldDefs = [
 //邮件内容组件
 class PeerEndpointEditWidget extends StatefulWidget with TileDataMixin {
   final PeerEndpointController controller;
+  late final KeepAliveWrapper<FormInputWidget> formInputWidget;
 
-  const PeerEndpointEditWidget({Key? key, required this.controller})
+  PeerEndpointEditWidget({Key? key, required this.controller})
       : super(key: key);
 
   @override
@@ -56,38 +57,34 @@ class _PeerEndpointEditWidgetState extends State<PeerEndpointEditWidget> {
     widget.controller.addListener(() {
       setState(() {});
     });
+    _buildFormInputWidget(context);
   }
 
   Widget _buildFormInputWidget(BuildContext context) {
-    PeerEndpoint? currentPeerEndpoint = widget.controller.current;
-    if (currentPeerEndpoint != null) {
-      var peerEndpoint = currentPeerEndpoint.toJson();
-      for (var peerEndpointInputFieldDef in peerEndpointInputFieldDefs) {
-        var value = peerEndpoint[peerEndpointInputFieldDef.name];
-        if (value != null) {
-          peerEndpointInputFieldDef.initValue = value;
-        }
-      }
-    }
-    Widget formInputWidget = KeepAliveWrapper(
-        child: FormInputWidget(
+    var formInputWidget = FormInputWidget(
       onOk: (Map<String, dynamic> values) {
         _onOk(values);
       },
       inputFieldDefs: peerEndpointInputFieldDefs,
-    ));
-    return formInputWidget;
+    );
+    PeerEndpoint? currentPeerEndpoint = widget.controller.current;
+    var peerEndpoint = currentPeerEndpoint.toJson();
+    formInputWidget.controller.setValues(peerEndpoint);
+
+    widget.formInputWidget =
+        KeepAliveWrapper<FormInputWidget>(child: formInputWidget);
+
+    return widget.formInputWidget;
   }
 
   _onOk(Map<String, dynamic> values) {}
 
   @override
   Widget build(BuildContext context) {
-    var formInputWidget = _buildFormInputWidget(context);
     var appBarView = AppBarView(
         title: widget.title,
         withLeading: widget.withLeading,
-        child: formInputWidget);
+        child: widget.formInputWidget);
     return appBarView;
   }
 }

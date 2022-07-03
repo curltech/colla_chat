@@ -1,14 +1,14 @@
 import 'package:fluent_ui/fluent_ui.dart';
 
 ///官方的实现KeepAlive只能在SliverWithKeepAliveWidget下使用
-class KeepAliveWrapper extends StatefulWidget {
+class KeepAliveWrapper<T extends Widget> extends StatefulWidget {
   const KeepAliveWrapper({
     Key? key,
     this.keepAlive = true,
     required this.child,
   }) : super(key: key);
   final bool keepAlive;
-  final Widget child;
+  final T child;
 
   @override
   State createState() => _KeepAliveWrapperState();

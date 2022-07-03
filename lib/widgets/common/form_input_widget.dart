@@ -5,8 +5,11 @@ import '../../l10n/localization.dart';
 import 'input_field_widget.dart';
 
 class FormInputController with ChangeNotifier {
-  final Map<String, dynamic> values = {};
+  //非文本框的值
+  Map<String, dynamic> values = const {};
   final Map<String, dynamic> flags = {};
+
+  //文本框的值
   final Map<String, TextEditingController> controllers = {};
 
   FormInputController();
@@ -27,6 +30,7 @@ class FormInputController with ChangeNotifier {
     notifyListeners();
   }
 
+  //获取值，先找文本框
   dynamic getValue(String name) {
     var controller = controllers[name];
     if (controller != null) {
@@ -36,6 +40,7 @@ class FormInputController with ChangeNotifier {
     }
   }
 
+  //所有值，合并文本框和非文本框
   dynamic getValues() {
     Map<String, dynamic> values = {};
     values.addAll(this.values);
@@ -68,6 +73,22 @@ class FormInputController with ChangeNotifier {
     }
   }
 
+  setValues(Map<String, dynamic> values) {
+    for (var entry in values.entries) {
+      var name = entry.key;
+      var value = entry.value;
+      var controller = controllers[name];
+      if (controller != null) {
+        controller.text = value;
+      } else {
+        values[name] = value;
+      }
+    }
+    if (values.isNotEmpty) {
+      notifyListeners();
+    }
+  }
+
   dynamic getFlag(String name) {
     return flags[name];
   }
@@ -82,10 +103,10 @@ class FormInputController with ChangeNotifier {
 
 class FormInputWidget extends StatelessWidget {
   final List<InputFieldDef> inputFieldDefs;
+  final FormInputController controller = FormInputController();
   final Function(Map<String, dynamic>) onOk;
 
-  const FormInputWidget(
-      {Key? key, required this.inputFieldDefs, required this.onOk})
+  FormInputWidget({Key? key, required this.inputFieldDefs, required this.onOk})
       : super(key: key);
 
   Widget _build(BuildContext context) {
@@ -126,7 +147,7 @@ class FormInputWidget extends StatelessWidget {
         builder: (BuildContext context, Widget? child) {
       return _build(context);
     }, create: (BuildContext context) {
-      return FormInputController();
+      return controller;
     });
   }
 }
