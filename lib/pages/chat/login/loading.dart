@@ -30,7 +30,7 @@ class Loading extends StatefulWidget {
 }
 
 class _LoadingState extends State<Loading> with SingleTickerProviderStateMixin {
-  var _children = <Widget>[];
+  final _children = <Widget>[];
   late TabController _tabController;
 
   @override

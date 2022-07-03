@@ -17,7 +17,7 @@ final List<InputFieldDef> p2pRegisterInputFieldDef = [
   InputFieldDef(
       name: 'loginName',
       label: 'loginName',
-      prefixIcon: const Icon(Icons.person),
+      prefixIcon: const Icon(Icons.mobile_friendly),
       initValue: '13609619603'),
   InputFieldDef(
       name: 'email',
@@ -30,13 +30,13 @@ final List<InputFieldDef> p2pRegisterInputFieldDef = [
       label: 'plainPassword',
       inputType: InputType.password,
       initValue: '123456',
-      prefixIcon: const Icon(Icons.password)),
+      prefixIcon: const Icon(Icons.lock)),
   InputFieldDef(
       name: 'confirmPassword',
       label: 'confirmPassword',
       inputType: InputType.password,
       initValue: '123456',
-      prefixIcon: const Icon(Icons.confirmation_num))
+      prefixIcon: const Icon(Icons.lock))
 ];
 
 /// 用户注册组件，一个card下的录入框和按钮组合

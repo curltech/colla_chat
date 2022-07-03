@@ -2,10 +2,25 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../l10n/localization.dart';
 import '../../../routers/routes.dart';
 import '../../../service/dht/myselfpeer.dart';
 import '../../../tool/util.dart';
+import '../../../widgets/common/form_input_widget.dart';
+import '../../../widgets/common/input_field_widget.dart';
+
+final List<InputFieldDef> p2pRegisterInputFieldDef = [
+  InputFieldDef(
+      name: 'credential',
+      label: 'Credentia(Mobile/Email/LoginName)',
+      prefixIcon: const Icon(Icons.person),
+      initValue: '13609619603'),
+  InputFieldDef(
+      name: 'password',
+      label: 'password',
+      inputType: InputType.password,
+      initValue: '123456',
+      prefixIcon: const Icon(Icons.lock)),
+];
 
 /// 远程登录组件，一个card下的录入框和按钮组合
 class P2pLoginWidget extends StatefulWidget {
@@ -15,13 +30,7 @@ class P2pLoginWidget extends StatefulWidget {
   State<StatefulWidget> createState() => _P2pLoginWidgetState();
 }
 
-class _P2pLoginWidgetState extends State<P2pLoginWidget>
-    with AutomaticKeepAliveClientMixin {
-  final _formKey = GlobalKey<FormState>();
-  String _credential = '13609619603';
-  String _password = '123456';
-  bool _pwdShow = false;
-
+class _P2pLoginWidgetState extends State<P2pLoginWidget> {
   @override
   void initState() {
     super.initState();
@@ -29,102 +38,24 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget>
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<AppDataProvider>(context).locale;
-    Provider.of<AppDataProvider>(context).themeData;
-    Provider.of<AppDataProvider>(context).brightness;
-    // 初始化子项集合
-    TextEditingController credentialController =
-        TextEditingController(text: '13609619603');
-    credentialController.addListener(() {
-      setState(() {
-        _credential = credentialController.text;
-      });
-    });
-    TextEditingController passwordController = TextEditingController();
-    passwordController.addListener(() {
-      setState(() {
-        _password = passwordController.text;
-      });
-    });
+    Provider.of<AppDataProvider>(context);
     return Card(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          SizedBox(height: 30.0),
-          Padding(
-              padding: EdgeInsets.symmetric(horizontal: 50.0),
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                //controller: _credentialController,
-                decoration: InputDecoration(
-                  labelText:
-                      AppLocalizations.t('Credentia(Mobile/Email/LoginName)'),
-                  prefixIcon: Icon(Icons.person),
-                ),
-                initialValue: _credential,
-                onChanged: (String val) {
-                  setState(() {
-                    _credential = val;
-                  });
-                },
-                onFieldSubmitted: (String val) {},
-              )),
-          SizedBox(height: 30.0),
-          Padding(
-              padding: EdgeInsets.symmetric(horizontal: 50.0),
-              child: TextFormField(
-                keyboardType: TextInputType.text,
-                obscureText: !_pwdShow,
-                //controller: passwordController,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.t('Password'),
-                  prefixIcon: Icon(Icons.lock),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                        _pwdShow ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () {
-                      setState(() {
-                        _pwdShow = !_pwdShow;
-                      });
-                    },
-                  ),
-                ),
-                initialValue: _password,
-                onChanged: (String val) {
-                  setState(() {
-                    _password = val;
-                  });
-                },
-                onFieldSubmitted: (String val) {},
-              )),
-          SizedBox(height: 30.0),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 50.0),
-            child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-              TextButton(
-                child: Text(
-                  AppLocalizations.t('Login'),
-                ),
-                onPressed: () async {
-                  await _login();
-                },
-              ),
-              TextButton(
-                child: Text(AppLocalizations.t('Reset')),
-                onPressed: () async {},
-              )
-            ]),
-          )
-        ],
-      ),
-    );
+        child: Center(
+      child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+          child: FormInputWidget(
+              mainAxisAlignment: MainAxisAlignment.center,
+              inputFieldDefs: p2pRegisterInputFieldDef,
+              onOk: _login)),
+    ));
   }
 
-  Future<void> _login() async {
+  _login(Map<String, dynamic> values) {
     AppDataProvider appParams = AppDataProvider.instance;
-    await appParams.saveAppParams();
-    myselfPeerService.login(_credential, _password).then((bool loginStatus) {
+    appParams.saveAppParams();
+    String credential = values['credential'];
+    String password = values['password'];
+    myselfPeerService.login(credential, password).then((bool loginStatus) {
       if (loginStatus) {
         Application.router
             .navigateTo(context, Application.index, replace: true);
@@ -135,7 +66,4 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget>
       DialogUtil.error(context, content: e.toString());
     });
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }

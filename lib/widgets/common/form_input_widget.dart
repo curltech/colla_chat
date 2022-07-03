@@ -105,8 +105,15 @@ class FormInputWidget extends StatelessWidget {
   final List<InputFieldDef> inputFieldDefs;
   final FormInputController controller = FormInputController();
   final Function(Map<String, dynamic>) onOk;
+  final MainAxisAlignment mainAxisAlignment;
+  final double spacing;
 
-  FormInputWidget({Key? key, required this.inputFieldDefs, required this.onOk})
+  FormInputWidget(
+      {Key? key,
+      required this.inputFieldDefs,
+      required this.onOk,
+      this.mainAxisAlignment = MainAxisAlignment.start,
+      this.spacing = 0.0})
       : super(key: key);
 
   Widget _build(BuildContext context) {
@@ -114,8 +121,10 @@ class FormInputWidget extends StatelessWidget {
         Provider.of<FormInputController>(context);
     List<Widget> children = [];
     for (var inputFieldDef in inputFieldDefs) {
+      children.add(SizedBox(
+        height: spacing,
+      ));
       Widget inputFieldWidget = InputFieldWidget(inputFieldDef: inputFieldDef);
-
       children.add(inputFieldWidget);
     }
     children.add(const SizedBox(
@@ -138,7 +147,7 @@ class FormInputWidget extends StatelessWidget {
         )
       ]),
     ));
-    return Column(children: children);
+    return Column(mainAxisAlignment: mainAxisAlignment, children: children);
   }
 
   @override
