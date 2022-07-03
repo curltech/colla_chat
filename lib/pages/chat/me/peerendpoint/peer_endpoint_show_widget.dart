@@ -5,7 +5,6 @@ import '../../../../constant/base.dart';
 import '../../../../entity/dht/peerendpoint.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/card_text_widget.dart';
-import '../../../../widgets/common/keep_alive_wrapper.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
 final List<String> peerEndpointFields = ['id', 'name', 'peerId'];
@@ -54,10 +53,9 @@ class _PeerEndpointShowWidgetState extends State<PeerEndpointShowWidget> {
         options.add(Option(label, value.toString()));
       }
     }
-    Widget formInputWidget = KeepAliveWrapper(
-        child: CardTextWidget(
+    Widget formInputWidget = CardTextWidget(
       options: options,
-    ));
+    );
     return formInputWidget;
   }
 

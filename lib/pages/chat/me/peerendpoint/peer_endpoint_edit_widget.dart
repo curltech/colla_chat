@@ -5,7 +5,6 @@ import '../../../../entity/dht/peerendpoint.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/form_input_widget.dart';
 import '../../../../widgets/common/input_field_widget.dart';
-import '../../../../widgets/common/keep_alive_wrapper.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
 final List<InputFieldDef> peerEndpointInputFieldDefs = [
@@ -29,7 +28,6 @@ final List<InputFieldDef> peerEndpointInputFieldDefs = [
 //邮件内容组件
 class PeerEndpointEditWidget extends StatefulWidget with TileDataMixin {
   final PeerEndpointController controller;
-  late final KeepAliveWrapper<FormInputWidget> formInputWidget;
 
   PeerEndpointEditWidget({Key? key, required this.controller})
       : super(key: key);
@@ -57,24 +55,28 @@ class _PeerEndpointEditWidgetState extends State<PeerEndpointEditWidget> {
     widget.controller.addListener(() {
       setState(() {});
     });
-    _buildFormInputWidget(context);
   }
 
   Widget _buildFormInputWidget(BuildContext context) {
+    PeerEndpoint? currentPeerEndpoint = widget.controller.current;
+    if (currentPeerEndpoint != null) {
+      var peerEndpoint = currentPeerEndpoint.toJson();
+      for (var peerEndpointInputFieldDef in peerEndpointInputFieldDefs) {
+        String name = peerEndpointInputFieldDef.name;
+        var value = peerEndpoint[name];
+        if (value != null) {
+          peerEndpointInputFieldDef.initValue = value;
+        }
+      }
+    }
     var formInputWidget = FormInputWidget(
       onOk: (Map<String, dynamic> values) {
         _onOk(values);
       },
       inputFieldDefs: peerEndpointInputFieldDefs,
     );
-    PeerEndpoint? currentPeerEndpoint = widget.controller.current;
-    var peerEndpoint = currentPeerEndpoint.toJson();
-    formInputWidget.controller.setValues(peerEndpoint);
 
-    widget.formInputWidget =
-        KeepAliveWrapper<FormInputWidget>(child: formInputWidget);
-
-    return widget.formInputWidget;
+    return formInputWidget;
   }
 
   _onOk(Map<String, dynamic> values) {}
@@ -84,7 +86,7 @@ class _PeerEndpointEditWidgetState extends State<PeerEndpointEditWidget> {
     var appBarView = AppBarView(
         title: widget.title,
         withLeading: widget.withLeading,
-        child: widget.formInputWidget);
+        child: _buildFormInputWidget(context));
     return appBarView;
   }
 }

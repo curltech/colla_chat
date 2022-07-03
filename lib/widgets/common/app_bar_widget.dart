@@ -11,10 +11,10 @@ class AppBarWidget {
     leadingCallBack, //回退按钮的回调
     title = '',
     centerTitle = false, //标题是否居中
-    rightActions, //右边的下拉组件
-    rightIcons, //右边下拉组件的图标
-    rightWidgets, //右边的排列组件
-    rightCallBack, //右边下拉组件的回调
+    rightWidgets, //右边的排列组件（按钮）
+    rightActions, //右边的下拉菜单组件
+    rightIcons, //右边下拉菜单组件的图标
+    rightCallBack, //右边下拉菜单组件的回调
     bottom, //底部组件
   }) {
     ///右边排列的按钮组件，最后一个是下拉按钮组件

@@ -64,6 +64,8 @@ class DataListTile extends StatelessWidget {
   ///是否缩小
   final bool dense;
 
+  final bool isThreeLine;
+
   ///如果定义了点击回调函数，序号为参数进行回调
   ///回调函数有两个，一个构造函数传入的成员变量，用于处理高亮显示
   ///二是数据项里面定义的，用于自定义的后续任务
@@ -75,6 +77,7 @@ class DataListTile extends StatelessWidget {
       required this.tileData,
       required this.index,
       this.dense = false,
+      this.isThreeLine = false,
       this.onTap})
       : super(key: key);
 
@@ -137,6 +140,7 @@ class DataListTile extends StatelessWidget {
             )
           : null,
       trailing: trailingWidget,
+      isThreeLine: isThreeLine,
       dense: dense,
       onTap: () {
         dataListViewController.currentIndex = index;

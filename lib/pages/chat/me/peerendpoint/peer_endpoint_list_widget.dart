@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 
 import '../../../../constant/address.dart';
 import '../../../../entity/dht/peerendpoint.dart';
+import '../../../../l10n/localization.dart';
+import '../../../../provider/app_data_provider.dart';
 import '../../../../provider/data_list_controller.dart';
 import '../../../../provider/index_widget_provider.dart';
 import '../../../../service/dht/peerendpoint.dart';
@@ -24,7 +26,7 @@ class PeerEndpointController extends DataListController<PeerEndpoint> {
         .findAllPeerEndpoint()
         .then((List<PeerEndpoint> peerEndpoints) {
       if (peerEndpoints.isNotEmpty) {
-        add(peerEndpoints);
+        addAll(peerEndpoints);
       } else {
         for (var entry in nodeAddressOptions.entries) {
           var nodeAddressOption = entry.value;
@@ -50,6 +52,7 @@ class PeerEndpointController extends DataListController<PeerEndpoint> {
 //设置页面，带有回退回调函数
 class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
   final PeerEndpointController controller = PeerEndpointController();
+  late final List<Widget> rightWidgets;
   late final PeerEndpointShowWidget peerEndpointShowWidget;
   late final PeerEndpointEditWidget peerEndpointEditWidget;
 
@@ -59,6 +62,20 @@ class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
     var indexWidgetProvider = IndexWidgetProvider.instance;
     indexWidgetProvider.define(peerEndpointShowWidget);
     indexWidgetProvider.define(peerEndpointEditWidget);
+    rightWidgets = [
+      IconButton(
+          onPressed: () {
+            controller.add(PeerEndpoint());
+          },
+          icon: const Icon(Icons.add),
+          tooltip: AppLocalizations.t('Add')),
+      IconButton(
+          onPressed: () {
+            controller.delete();
+          },
+          icon: const Icon(Icons.delete),
+          tooltip: AppLocalizations.t('Delete')),
+    ];
   }
 
   @override
@@ -78,18 +95,14 @@ class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
-  late KeepAliveWrapper dataListView;
-
   @override
   initState() {
     super.initState();
-    widget.controller.addListener(() {
-      setState(() {});
-    });
-    var peerEndpoints = widget.controller.data;
-    var tiles = _convert(peerEndpoints);
-    dataListView =
-        KeepAliveWrapper(child: DataListView(onTap: _onTap, tileData: tiles));
+    widget.controller.addListener(update);
+  }
+
+  update() {
+    setState(() {});
   }
 
   List<TileData> _convert(List<PeerEndpoint> peerEndpoints) {
@@ -113,11 +126,28 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var peerendpointWidget = KeepAliveWrapper(
-        child: AppBarView(
-            title: widget.title,
-            withLeading: widget.withLeading,
-            child: dataListView));
+    var peerEndpoints = widget.controller.data;
+    var tiles = _convert(peerEndpoints);
+    var currentIndex = widget.controller.currentIndex;
+    var dataListView = KeepAliveWrapper(
+        child: DataListView(
+            onTap: _onTap, tileData: tiles, currentIndex: currentIndex));
+    var peerendpointWidget = AppBarView(
+      title: widget.title,
+      withLeading: widget.withLeading,
+      rightWidgets: widget.rightWidgets,
+      child: dataListView,
+    );
     return peerendpointWidget;
   }
+
+  @override
+  void dispose() {
+    logger.w('PeerEndpointListWidget dispose');
+    widget.controller.removeListener(update);
+    super.dispose();
+  }
+
+  @override
+  bool get wantKeepAlive => true;
 }

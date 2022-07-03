@@ -22,12 +22,14 @@ class DataListView extends StatefulWidget {
   DataListView(
       {Key? key,
       List<TileData> tileData = const [],
+      int? currentIndex,
       this.group,
       this.onScrollMax,
       this.onRefresh,
       this.onTap})
       : super(key: key) {
-    controller = DataListController<TileData>(data: tileData);
+    controller = DataListController<TileData>(
+        data: tileData, currentIndex: currentIndex);
   }
 
   @override

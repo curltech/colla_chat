@@ -12,9 +12,11 @@ class AppBarView extends StatelessWidget {
   final Function? leadingCallBack;
   final String title;
   final bool centerTitle;
+  //右边按钮
+  final List<Widget>? rightWidgets;
+  //右边下拉菜单
   final List<String>? rightActions;
   final List<Icon>? rightIcons;
-  final List<Widget>? rightWidgets;
   final Function(int index)? rightCallBack;
   final PreferredSizeWidget? bottom;
   final Widget child;
@@ -25,9 +27,9 @@ class AppBarView extends StatelessWidget {
     this.leadingCallBack,
     required this.title,
     this.centerTitle = false,
+    this.rightWidgets,
     this.rightActions,
     this.rightIcons,
-    this.rightWidgets,
     this.rightCallBack,
     this.bottom,
     required this.child,
@@ -43,9 +45,9 @@ class AppBarView extends StatelessWidget {
             leadingCallBack: leadingCallBack,
             title: title,
             centerTitle: centerTitle,
+            rightWidgets: rightWidgets,
             rightActions: rightActions,
             rightIcons: rightIcons,
-            rightWidgets: rightWidgets,
             bottom: bottom,
             rightCallBack: rightCallBack),
         body: this.child,

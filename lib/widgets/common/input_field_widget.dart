@@ -64,13 +64,20 @@ class InputFieldWidget extends StatelessWidget {
   const InputFieldWidget({Key? key, required this.inputFieldDef})
       : super(key: key);
 
-  Widget? _buildLabel(BuildContext context, InputFieldDef inputDef) {
-    final label = inputDef.label;
+  dynamic _getValue(BuildContext context, InputFieldDef inputDef) {
     final name = inputDef.name;
     FormInputController formInputController =
         Provider.of<FormInputController>(context);
     dynamic value = formInputController.getValue(name);
+    value = value ?? inputDef.initValue;
     value = value ?? '';
+
+    return value;
+  }
+
+  Widget? _buildLabel(BuildContext context, InputFieldDef inputDef) {
+    final label = inputDef.label;
+    dynamic value = _getValue(context, inputDef);
 
     return Text(AppLocalizations.t(label) + ':' + value);
   }
@@ -91,7 +98,7 @@ class InputFieldWidget extends StatelessWidget {
     FormInputController formInputController =
         Provider.of<FormInputController>(context);
     var controller = TextEditingController();
-    controller.text = inputDef.initValue;
+    controller.text = _getValue(context, inputDef);
     formInputController.initController(inputDef.name, controller);
     var widget = TextFormField(
       controller: controller,
@@ -114,7 +121,7 @@ class InputFieldWidget extends StatelessWidget {
     bool? pwdShow = formInputController.getFlag(inputDef.name);
     pwdShow ??= false;
     var controller = TextEditingController();
-    controller.text = inputDef.initValue;
+    controller.text = _getValue(context, inputDef);
     formInputController.initController(inputDef.name, controller);
     var widget = TextFormField(
       controller: controller,
@@ -147,7 +154,7 @@ class InputFieldWidget extends StatelessWidget {
             formInputController.setValue(inputDef.name, value);
           },
           value: option.value,
-          groupValue: formInputController.getValue(inputDef.name),
+          groupValue: _getValue(context, inputDef),
         );
         var row = Row(
           children: [radio, Text(option.label)],
@@ -167,7 +174,7 @@ class InputFieldWidget extends StatelessWidget {
     if (options != null && options.isNotEmpty) {
       for (var i = 0; i < options.length; ++i) {
         var option = options[i];
-        Set<String>? value = formInputController.getValue(inputDef.name);
+        Set<String>? value = _getValue(context, inputDef);
         value ??= <String>{};
         var checkbox = Checkbox(
           onChanged: (bool? selected) {
@@ -200,7 +207,7 @@ class InputFieldWidget extends StatelessWidget {
     if (options != null && options.isNotEmpty) {
       for (var i = 0; i < options.length; ++i) {
         var option = options[i];
-        Set<String>? value = formInputController.getValue(inputDef.name);
+        Set<String>? value = _getValue(context, inputDef);
         value ??= <String>{};
         var checkbox = Switch(
           onChanged: (bool? selected) {

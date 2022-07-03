@@ -67,8 +67,10 @@ class _PeerClientEditWidgetState extends State<PeerClientEditWidget> {
       inputFieldDefs: peerClientInputFieldDefs,
     );
     PeerClient? currentPeerClient = widget.controller.current;
-    var peerClient = currentPeerClient.toJson();
-    formInputWidget.controller.setValues(peerClient);
+    if (currentPeerClient != null) {
+      var peerClient = currentPeerClient.toJson();
+      formInputWidget.controller.setValues(peerClient);
+    }
 
     widget.formInputWidget =
         KeepAliveWrapper<FormInputWidget>(child: formInputWidget);
