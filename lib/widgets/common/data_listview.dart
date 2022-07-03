@@ -9,7 +9,7 @@ import 'data_listtile.dart';
 ///外部可能有ListView或者PageView等滚动视图，所以shrinkWrap: true,
 class DataListView extends StatefulWidget {
   final TileData? group;
-  late final DataListController<TileData> dataListViewController;
+  late final DataListController<TileData> controller;
   final ScrollController scrollController = ScrollController();
   final Function()? onScrollMax;
   final Future<void> Function()? onRefresh;
@@ -27,7 +27,7 @@ class DataListView extends StatefulWidget {
       this.onRefresh,
       this.onTap})
       : super(key: key) {
-    dataListViewController = DataListController<TileData>(data: tileData);
+    controller = DataListController<TileData>(data: tileData);
   }
 
   @override
@@ -39,7 +39,7 @@ class DataListView extends StatefulWidget {
 class _DataListView extends State<DataListView> {
   @override
   initState() {
-    widget.dataListViewController.addListener(() {
+    widget.controller.addListener(() {
       setState(() {});
     });
     var scrollController = widget.scrollController;
@@ -95,14 +95,14 @@ class _DataListView extends State<DataListView> {
             //该属性将决定列表的长度是否仅包裹其内容的长度。
             // 当 ListView 嵌在一个无限长的容器组件中时， shrinkWrap 必须为true
             shrinkWrap: true,
-            itemCount: widget.dataListViewController.length,
+            itemCount: widget.controller.length,
             //physics: const NeverScrollableScrollPhysics(),
             controller: widget.scrollController,
             itemBuilder: (BuildContext context, int index) {
-              TileData tile = widget.dataListViewController.get(index);
+              TileData tile = widget.controller.get(index);
 
               DataListTile tileWidget = DataListTile(
-                dataListViewController: widget.dataListViewController,
+                dataListViewController: widget.controller,
                 tileData: tile,
                 index: index,
                 onTap: _onTap,

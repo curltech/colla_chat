@@ -1,14 +1,11 @@
 import 'package:colla_chat/pages/chat/me/peerclient/peer_client_edit_widget.dart';
 import 'package:colla_chat/pages/chat/me/peerclient/peer_client_show_widget.dart';
-import 'package:colla_chat/tool/util.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../constant/address.dart';
 import '../../../../entity/dht/peerclient.dart';
 import '../../../../provider/data_list_controller.dart';
 import '../../../../provider/index_widget_provider.dart';
-import '../../../../service/dht/peerclient.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/data_listtile.dart';
 import '../../../../widgets/common/data_listview.dart';
@@ -46,7 +43,7 @@ class PeerClientListWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _PeerClientListWidgetState extends State<PeerClientListWidget> {
-  late KeepAliveWrapper dataListView;
+  late KeepAliveWrapper<DataListView> dataListView;
 
   @override
   initState() {
