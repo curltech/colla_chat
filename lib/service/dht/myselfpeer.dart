@@ -136,19 +136,21 @@ class MyselfPeerService extends PeerEntityService {
     if (peer != null) {
       /// 1.验证账户与密码匹配
       var myselfPeer = MyselfPeer.fromJson(peer);
-      await myselfService.setMyself(myselfPeer, password);
-      return true;
+      var loginStatus = await myselfService.setMyself(myselfPeer, password);
 
-      ///2.连接篇p2p的节点，把自己的信息注册上去
-      var json = JsonUtil.toMap(myselfPeer);
-      var peerClient = PeerClient.fromJson(json);
-      peerClient.activeStatus = ActiveStatus.Up.name;
-      peerClient.clientId = myselfPeer.clientId;
-      peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
-      peerClient.kind = null;
-      peerClient.name = '';
-      var loginStatus = await connectAction.connect(peerClient);
-
+      if (loginStatus) {
+        ///2.连接篇p2p的节点，把自己的信息注册上去
+        var json = JsonUtil.toMap(myselfPeer);
+        var peerClient = PeerClient.fromJson(json);
+        peerClient.activeStatus = ActiveStatus.Up.name;
+        peerClient.clientId = myselfPeer.clientId;
+        peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
+        peerClient.kind = null;
+        peerClient.name = '';
+        connectAction.connect(peerClient).then((response) {
+          logger.i(response);
+        });
+      }
       return loginStatus;
     } else {
       logger.e('$credential is not exist');
@@ -168,6 +170,8 @@ class MyselfPeerService extends PeerEntityService {
     if (peer != null) {
       /// 1.验证账户与密码匹配
       var myselfPeer = MyselfPeer.fromJson(peer);
+      myselfService.clear();
+      logoutStatus = true;
 
       ///2.连接篇p2p的节点，把自己的信息注册上去
       var json = JsonUtil.toMap(myselfPeer);
@@ -177,12 +181,9 @@ class MyselfPeerService extends PeerEntityService {
       peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
       peerClient.kind = null;
       peerClient.name = '';
-      logoutStatus = await connectAction.connect(peerClient);
-      if (!logoutStatus) {
-        logger.e('logout fail');
-      }
+      var response = await connectAction.connect(peerClient);
+      logger.i(response);
     }
-    myselfService.clear();
 
     return logoutStatus;
   }
