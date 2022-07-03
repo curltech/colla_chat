@@ -2,12 +2,15 @@ import 'package:colla_chat/pages/chat/me/peerendpoint/peer_endpoint_list_widget.
 import 'package:flutter/material.dart';
 
 import '../../../../entity/dht/peerendpoint.dart';
+import '../../../../service/dht/peerendpoint.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/form_input_widget.dart';
 import '../../../../widgets/common/input_field_widget.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
 final List<InputFieldDef> peerEndpointInputFieldDefs = [
+  InputFieldDef(
+      name: 'id', label: 'id', prefixIcon: const Icon(Icons.perm_identity)),
   InputFieldDef(
       name: 'name', label: 'name', prefixIcon: const Icon(Icons.person)),
   InputFieldDef(
@@ -58,17 +61,7 @@ class _PeerEndpointEditWidgetState extends State<PeerEndpointEditWidget> {
   }
 
   Widget _buildFormInputWidget(BuildContext context) {
-    PeerEndpoint? currentPeerEndpoint = widget.controller.current;
-    if (currentPeerEndpoint != null) {
-      var peerEndpoint = currentPeerEndpoint.toJson();
-      for (var peerEndpointInputFieldDef in peerEndpointInputFieldDefs) {
-        String name = peerEndpointInputFieldDef.name;
-        var value = peerEndpoint[name];
-        if (value != null) {
-          peerEndpointInputFieldDef.initValue = value;
-        }
-      }
-    }
+    widget.controller.setInitValue(peerEndpointInputFieldDefs);
     var formInputWidget = FormInputWidget(
       onOk: (Map<String, dynamic> values) {
         _onOk(values);
@@ -79,7 +72,12 @@ class _PeerEndpointEditWidgetState extends State<PeerEndpointEditWidget> {
     return formInputWidget;
   }
 
-  _onOk(Map<String, dynamic> values) {}
+  _onOk(Map<String, dynamic> values) {
+    PeerEndpoint currentPeerEndpoint = PeerEndpoint.fromJson(values);
+    PeerEndpointService.instance.upsert(currentPeerEndpoint).then((count) {
+      widget.controller.update(currentPeerEndpoint);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

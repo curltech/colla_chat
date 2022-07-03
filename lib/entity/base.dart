@@ -26,7 +26,7 @@ abstract class BaseEntity {
   BaseEntity();
 
   BaseEntity.fromJson(Map json)
-      : id = json['id'],
+      : id = json['id'] == '' ? null : json['id'],
         createDate = json['createDate'],
         updateDate = json['updateDate'];
 

@@ -21,9 +21,9 @@ abstract class PeerLocation extends StatusEntity {
   PeerLocation.fromJson(Map json)
       : peerId = json['peerId'],
         kind = json['kind'],
-        name = json['name'],
-        peerPublicKey = json['peerPublicKey'],
-        publicKey = json['publicKey'],
+        name = json['name'] ?? '',
+        peerPublicKey = json['peerPublicKey'] ?? '',
+        publicKey = json['publicKey'] ?? '',
         address = json['address'],
         lastUpdateTime = json['lastUpdateTime'],
         super.fromJson(json);
@@ -71,7 +71,7 @@ abstract class PeerEntity extends PeerLocation {
         signature = json['signature'],
         signatureData = json['signatureData'],
         expireDate = json['expireDate'],
-        version = json['version'],
+        version = json['version'] ?? 0,
         super.fromJson(json);
 
   @override

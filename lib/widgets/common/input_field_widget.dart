@@ -98,7 +98,11 @@ class InputFieldWidget extends StatelessWidget {
     FormInputController formInputController =
         Provider.of<FormInputController>(context);
     var controller = TextEditingController();
-    controller.text = _getValue(context, inputDef);
+    var value = _getValue(context, inputDef);
+    controller.value = TextEditingValue(
+        text: value,
+        selection: TextSelection.fromPosition(TextPosition(
+            offset: value.length, affinity: TextAffinity.downstream)));
     formInputController.initController(inputDef.name, controller);
     var widget = TextFormField(
       controller: controller,
@@ -121,7 +125,11 @@ class InputFieldWidget extends StatelessWidget {
     bool? pwdShow = formInputController.getFlag(inputDef.name);
     pwdShow ??= false;
     var controller = TextEditingController();
-    controller.text = _getValue(context, inputDef);
+    var value = _getValue(context, inputDef);
+    controller.value = TextEditingValue(
+        text: value,
+        selection: TextSelection.fromPosition(TextPosition(
+            offset: value.length, affinity: TextAffinity.downstream)));
     formInputController.initController(inputDef.name, controller);
     var widget = TextFormField(
       controller: controller,

@@ -6,7 +6,7 @@ import 'input_field_widget.dart';
 
 class FormInputController with ChangeNotifier {
   //非文本框的值
-  Map<String, dynamic> values = const {};
+  Map<String, dynamic> values = {};
   final Map<String, dynamic> flags = {};
 
   //文本框的值
@@ -102,6 +102,7 @@ class FormInputController with ChangeNotifier {
 }
 
 class FormInputWidget extends StatelessWidget {
+  //格式定义
   final List<InputFieldDef> inputFieldDefs;
   final FormInputController controller = FormInputController();
   final Function(Map<String, dynamic>) onOk;

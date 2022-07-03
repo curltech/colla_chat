@@ -1,4 +1,7 @@
+import 'package:colla_chat/tool/util.dart';
 import 'package:fluent_ui/fluent_ui.dart';
+
+import '../widgets/common/input_field_widget.dart';
 
 class DataListController<T> with ChangeNotifier {
   List<T> data = <T>[];
@@ -75,7 +78,8 @@ class DataListController<T> with ChangeNotifier {
     }
   }
 
-  update(int index, T d) {
+  update(T d, {int? index}) {
+    index = index ?? _currentIndex;
     if (index >= 0 && index < data.length) {
       data[index] = d;
       notifyListeners();
@@ -98,4 +102,20 @@ class DataListController<T> with ChangeNotifier {
   }
 
   int get length => data.length;
+
+  setInitValue(List<InputFieldDef> inputFieldDefs) {
+    T? current = this.current;
+    if (current != null) {
+      var currentMap = JsonUtil.toMap(current);
+      for (var inputFieldDef in inputFieldDefs) {
+        String name = inputFieldDef.name;
+        var value = currentMap[name];
+        if (value != null) {
+          inputFieldDef.initValue = '$value';
+        } else {
+          inputFieldDef.initValue = '';
+        }
+      }
+    }
+  }
 }
