@@ -119,4 +119,22 @@ class DataListController<T> with ChangeNotifier {
     }
     return null;
   }
+
+  sort(String name, bool sortAscending) {
+    if (sortAscending) {
+      data.sort((a, b) {
+        var aMap = JsonUtil.toMap(a);
+        var bMap = JsonUtil.toMap(b);
+        return aMap[name].compareTo(bMap[name]);
+      });
+    } else {
+      data.sort((a, b) {
+        var aMap = JsonUtil.toMap(a);
+        var bMap = JsonUtil.toMap(b);
+        return bMap[name].compareTo(aMap[name]);
+      });
+    }
+    _currentIndex = 0;
+    notifyListeners();
+  }
 }

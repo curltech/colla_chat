@@ -8,7 +8,17 @@ import '../../l10n/localization.dart';
 import 'form_input_widget.dart';
 
 ///指定路由样式，不指定则系统判断，系统判断的方法是如果是移动则走全局路由，否则走工作区路由
-enum InputType { label, text, password, radio, checkbox, select, textarea }
+enum InputType {
+  label,
+  text,
+  password,
+  radio,
+  checkbox,
+  select,
+  textarea,
+  date,
+  time
+}
 
 enum DataType { int, double, string, bool, date, set, list, map }
 
@@ -303,6 +313,141 @@ class InputFieldWidget extends StatelessWidget {
     );
 
     return dropdownButton;
+  }
+
+  Widget _buildInputDate(BuildContext context, InputFieldDef inputDef) {
+    FormInputController formInputController =
+        Provider.of<FormInputController>(context);
+    var controller = TextEditingController();
+    var value = _getInitValue(context, inputDef);
+    controller.value = TextEditingValue(
+        text: value,
+        selection: TextSelection.fromPosition(TextPosition(
+            offset: value.length, affinity: TextAffinity.downstream)));
+    formInputController.initController(inputDef.name, controller);
+    Widget? suffix;
+    if (inputFieldDef.cancel) {
+      suffix = controller.text.isNotEmpty
+          ? IconButton(
+              //如果文本长度不为空则显示清除按钮
+              onPressed: () {
+                controller.clear();
+              },
+              icon: const Icon(Icons.cancel, color: Colors.grey))
+          : null;
+    }
+    var widget = TextFormField(
+      controller: controller,
+      keyboardType: inputFieldDef.textInputType,
+      readOnly: true,
+      decoration: InputDecoration(
+          labelText: AppLocalizations.t(inputDef.label),
+          prefixIcon: _buildIcon(inputDef),
+          suffixIcon:
+              IconButton(icon: const Icon(Icons.date_range), onPressed: () {}),
+          suffix: suffix,
+          hintText: inputDef.hintText),
+    );
+
+    return widget;
+  }
+
+  _showDatePicker(BuildContext context, TextEditingController controller) {
+    showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      // 初始化选中日期
+      firstDate: DateTime(2018, 6),
+      // 开始日期
+      lastDate: DateTime(2025, 6),
+      // 结束日期
+      currentDate: DateTime(2020, 10, 20),
+      // 当前日期
+      helpText: "helpText",
+      // 左上方提示
+      cancelText: "cancelText",
+      // 取消按钮文案
+      confirmText: "confirmText", // 确认按钮文案
+    ).then((value) {
+      if (value != null) {
+        controller.text = value.toUtc().toIso8601String();
+      }
+    });
+  }
+
+  _showDatePickerInput(BuildContext context) {
+    showDatePicker(
+        context: context,
+        initialDate: DateTime.now(),
+        // 初始化选中日期
+        firstDate: DateTime(2020, 6),
+        // 开始日期
+        lastDate: DateTime(2021, 6),
+        // 结束日期
+        initialEntryMode: DatePickerEntryMode.input,
+        // 日历弹框样式
+
+        textDirection: TextDirection.ltr,
+        // 文字方向
+
+        currentDate: DateTime(2020, 10, 20),
+        // 当前日期
+        helpText: "helpText",
+        // 左上方提示
+        cancelText: "cancelText",
+        // 取消按钮文案
+        confirmText: "confirmText",
+        // 确认按钮文案
+
+        errorFormatText: "errorFormatText",
+        // 格式错误提示
+        errorInvalidText: "errorInvalidText",
+        // 输入不在 first 与 last 之间日期提示
+
+        fieldLabelText: "fieldLabelText",
+        // 输入框上方提示
+        fieldHintText: "fieldHintText",
+        // 输入框为空时内部提示
+
+        initialDatePickerMode: DatePickerMode.day,
+        // 日期选择模式，默认为天数选择
+        useRootNavigator: true,
+        // 是否为根导航器
+        // 设置不可选日期，这里将 2020-10-15，2020-10-16，2020-10-17 三天设置不可选
+        selectableDayPredicate: (dayTime) {
+          if (dayTime == DateTime(2020, 10, 15) ||
+              dayTime == DateTime(2020, 10, 16) ||
+              dayTime == DateTime(2020, 10, 17)) {
+            return false;
+          }
+          return true;
+        });
+  }
+
+  CalendarDatePicker _calendarDatePicker(DatePickerMode mode) {
+    return CalendarDatePicker(
+        initialDate: DateTime.now(), // 初始化选中日期
+        currentDate: DateTime(2020, 10, 18),
+        firstDate: DateTime(2020, 9, 10), // 开始日期
+        lastDate: DateTime(2022, 9, 10), // 结束日期
+        initialCalendarMode: mode, // 日期选择样式
+        // 选中日期改变回调函数
+        onDateChanged: (dateTime) {
+          logger.i("onDateChanged $dateTime");
+        },
+        // 月份改变回调函数
+        onDisplayedMonthChanged: (dateTime) {
+          logger.i("onDisplayedMonthChanged $dateTime");
+        },
+        // 筛选日期可不可点回调函数
+        selectableDayPredicate: (dayTime) {
+          if (dayTime == DateTime(2020, 10, 15) ||
+              dayTime == DateTime(2020, 10, 16) ||
+              dayTime == DateTime(2020, 10, 17)) {
+            return false;
+          }
+          return true;
+        });
   }
 
   @override

@@ -41,9 +41,7 @@ class DataListView extends StatefulWidget {
 class _DataListView extends State<DataListView> {
   @override
   initState() {
-    widget.controller.addListener(() {
-      setState(() {});
-    });
+    widget.controller.addListener(_update);
     var scrollController = widget.scrollController;
     scrollController.addListener(() {
       double offset = widget.scrollController.offset;
@@ -68,6 +66,10 @@ class _DataListView extends State<DataListView> {
     });
 
     super.initState();
+  }
+
+  _update() {
+    setState(() {});
   }
 
   bool _onNotification(ScrollNotification notification) {
@@ -119,5 +121,11 @@ class _DataListView extends State<DataListView> {
   @override
   Widget build(BuildContext context) {
     return _buildGroup(context);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_update);
+    super.dispose();
   }
 }
