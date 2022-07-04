@@ -1,27 +1,42 @@
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../../entity/chat/chat.dart';
 import '../../../provider/app_data_provider.dart';
-import '../../../provider/chat_message_provider.dart';
+import '../../../provider/data_list_controller.dart';
+import '../../../widgets/common/widget_mixin.dart';
 import 'chat_me_message.dart';
 import 'chat_other_message.dart';
 
 /// 消息发送和接受展示的界面组件
 /// 此界面展示特定的目标对象的收到的消息，并且可以发送消息
-class ChatMessagePage extends StatefulWidget {
-  final String title;
+class ChatMessageWidget extends StatefulWidget with TileDataMixin {
+  final String subtitle;
+  final DataListController<ChatMessage> controller;
 
-  const ChatMessagePage({Key? key, required this.title}) : super(key: key);
+  const ChatMessageWidget(
+      {Key? key, required this.subtitle, required this.controller})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return _ChatMessagePageState();
+    return _ChatMessageWidgetState();
   }
+
+  @override
+  bool get withLeading => true;
+
+  @override
+  String get routeName => 'chat_message';
+
+  @override
+  Icon get icon => const Icon(Icons.chat);
+
+  @override
+  String get title => 'ChatMessage';
 }
 
-class _ChatMessagePageState extends State<ChatMessagePage>
+class _ChatMessageWidgetState extends State<ChatMessageWidget>
     with TickerProviderStateMixin {
   final TextEditingController textEditingController = TextEditingController();
   FocusNode textFocusNode = FocusNode();
@@ -71,8 +86,7 @@ class _ChatMessagePageState extends State<ChatMessagePage>
   }
 
   Widget messageItem(BuildContext context, int index) {
-    List<ChatMessage> messages =
-        Provider.of<ChatMessageProvider>(context).chatMessages;
+    List<ChatMessage> messages = widget.controller.data;
     ChatMessage item = messages[index];
     // 创建消息动画控制器
     var animate =
@@ -110,24 +124,18 @@ class _ChatMessagePageState extends State<ChatMessagePage>
   @override
   Widget build(BuildContext context) {
     return Column(children: <Widget>[
-      //使用Consumer来获取WebSocketProvider对象
-      Consumer<ChatMessageProvider>(builder: (BuildContext context,
-          ChatMessageProvider chatMessageDataProvider, Widget? child) {
-        //获取消息列表数据
-        var messages = chatMessageDataProvider.chatMessages;
-        return Flexible(
-          //使用列表渲染消息
-          child: ListView.builder(
-            padding: EdgeInsets.all(8.0),
-            reverse: true,
-            //消息组件渲染
-            itemBuilder: messageItem,
-            //消息条目数
-            itemCount: messages.length,
-          ),
-        );
-      }),
-      Divider(
+      Flexible(
+        //使用列表渲染消息
+        child: ListView.builder(
+          padding: const EdgeInsets.all(8.0),
+          reverse: true,
+          //消息组件渲染
+          itemBuilder: messageItem,
+          //消息条目数
+          itemCount: widget.controller.data.length,
+        ),
+      ),
+      const Divider(
         height: 1.0,
       ),
       Container(

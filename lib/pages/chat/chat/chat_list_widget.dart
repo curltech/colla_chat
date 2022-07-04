@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
+import '../../../entity/chat/chat.dart';
 import '../../../entity/chat/contact.dart';
 import '../../../l10n/localization.dart';
 import '../../../provider/data_list_controller.dart';
+import '../../../provider/index_widget_provider.dart';
 import '../../../tool/util.dart';
 import '../../../widgets/common/data_group_listview.dart';
 import '../../../widgets/common/data_listtile.dart';
 import '../../../widgets/common/keep_alive_wrapper.dart';
 import '../../../widgets/common/widget_mixin.dart';
+import 'chat_message.dart';
 
 final Map<TileData, List<TileData>> mockTileData = {
   TileData(title: '群'): [
@@ -34,15 +38,17 @@ final Map<TileData, List<TileData>> mockTileData = {
 
 /// 聊天的主页面，展示可以聊天的目标对象，可以是一个人，或者是一个群
 /// 选择好目标点击进入具体的聊天页面ChatMessage
-class ChatTarget extends StatefulWidget with TileDataMixin {
+class ChatListWidget extends StatefulWidget with TileDataMixin {
+  final DataListController<ChatMessage> controller =
+      DataListController<ChatMessage>();
   final DataListController<Linkman> linkmanController =
       DataListController<Linkman>();
   final DataListController<Group> groupController = DataListController<Group>();
 
-  ChatTarget({Key? key}) : super(key: key);
+  ChatListWidget({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _ChatTargetState();
+  State<StatefulWidget> createState() => _ChatListWidgetState();
 
   @override
   bool get withLeading => true;
@@ -57,7 +63,7 @@ class ChatTarget extends StatefulWidget with TileDataMixin {
   String get title => 'Chat';
 }
 
-class _ChatTargetState extends State<ChatTarget> {
+class _ChatListWidgetState extends State<ChatListWidget> {
   late KeepAliveWrapper<GroupDataListView> groupDataListView;
 
   @override
@@ -80,6 +86,13 @@ class _ChatTargetState extends State<ChatTarget> {
 
     groupDataListView =
         KeepAliveWrapper(child: GroupDataListView(tileData: chatTileData));
+
+    var indexWidgetProvider =
+        Provider.of<IndexWidgetProvider>(context, listen: false);
+    indexWidgetProvider.define(ChatMessageWidget(
+      subtitle: '',
+      controller: widget.controller,
+    ));
   }
 
   List<TileData> _convertLinkman(List<Linkman> linkmen) {

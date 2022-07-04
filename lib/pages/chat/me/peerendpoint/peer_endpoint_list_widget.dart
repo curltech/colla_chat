@@ -71,6 +71,8 @@ class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
           tooltip: AppLocalizations.t('Add')),
       IconButton(
           onPressed: () {
+            var current = controller.current;
+            PeerEndpointService.instance.delete(current);
             controller.delete();
           },
           icon: const Icon(Icons.delete),
