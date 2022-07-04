@@ -13,13 +13,15 @@ final List<InputFieldDef> p2pRegisterInputFieldDef = [
       name: 'credential',
       label: 'Credentia(Mobile/Email/LoginName)',
       prefixIcon: const Icon(Icons.person),
+      cancel: true,
       initValue: '13609619603'),
   InputFieldDef(
-      name: 'password',
-      label: 'password',
-      inputType: InputType.password,
-      initValue: '123456',
-      prefixIcon: const Icon(Icons.lock)),
+    name: 'password',
+    label: 'password',
+    inputType: InputType.password,
+    initValue: '123456',
+    prefixIcon: const Icon(Icons.lock),
+  ),
 ];
 
 /// 远程登录组件，一个card下的录入框和按钮组合

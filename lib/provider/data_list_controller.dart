@@ -1,6 +1,6 @@
-import 'package:colla_chat/tool/util.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 
+import '../tool/util.dart';
 import '../widgets/common/input_field_widget.dart';
 
 class DataListController<T> with ChangeNotifier {
@@ -103,19 +103,20 @@ class DataListController<T> with ChangeNotifier {
 
   int get length => data.length;
 
-  setInitValue(List<InputFieldDef> inputFieldDefs) {
+  Map<String, dynamic>? getInitValue(List<InputFieldDef> inputFieldDefs) {
     T? current = this.current;
     if (current != null) {
       var currentMap = JsonUtil.toMap(current);
+      Map<String, dynamic> values = {};
       for (var inputFieldDef in inputFieldDefs) {
         String name = inputFieldDef.name;
         var value = currentMap[name];
         if (value != null) {
-          inputFieldDef.initValue = '$value';
-        } else {
-          inputFieldDef.initValue = '';
+          values[name] = value;
         }
       }
+      return values;
     }
+    return null;
   }
 }

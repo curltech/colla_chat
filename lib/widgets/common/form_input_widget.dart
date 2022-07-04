@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../l10n/localization.dart';
+import '../../tool/util.dart';
 import 'input_field_widget.dart';
 
 class FormInputController with ChangeNotifier {
@@ -16,18 +17,14 @@ class FormInputController with ChangeNotifier {
 
   initController(String name, TextEditingController controller) {
     controllers[name] = controller;
-    controller.addListener(() {
-      notifyListeners();
-    });
   }
 
   clear() {
     values.clear();
     flags.clear();
     for (var controller in controllers.values) {
-      controller.text = '';
+      controller.clear();
     }
-    notifyListeners();
   }
 
   //获取值，先找文本框
@@ -104,6 +101,7 @@ class FormInputController with ChangeNotifier {
 class FormInputWidget extends StatelessWidget {
   //格式定义
   final List<InputFieldDef> inputFieldDefs;
+  final Map<String, dynamic>? initValues;
   final FormInputController controller = FormInputController();
   final Function(Map<String, dynamic>) onOk;
   final MainAxisAlignment mainAxisAlignment;
@@ -112,20 +110,50 @@ class FormInputWidget extends StatelessWidget {
   FormInputWidget(
       {Key? key,
       required this.inputFieldDefs,
+      this.initValues,
       required this.onOk,
       this.mainAxisAlignment = MainAxisAlignment.start,
       this.spacing = 0.0})
       : super(key: key);
 
+  _adjustValues(Map<String, dynamic> values) {
+    for (var inputFieldDef in inputFieldDefs) {
+      String name = inputFieldDef.name;
+      if (values.containsKey(name)) {
+        DataType dataType = inputFieldDef.dataType;
+        dynamic value = values[name];
+        if (value == null) {
+          continue;
+        }
+        if (value is String && dataType == DataType.string) {
+          continue;
+        }
+        if (value is String && dataType != DataType.string) {
+          var v = StringUtil.toObject(value, dataType);
+          if (v == null) {
+            values.remove(name);
+          } else {
+            values[name] = v;
+          }
+        }
+      }
+    }
+  }
+
   Widget _build(BuildContext context) {
-    FormInputController formInputController =
-        Provider.of<FormInputController>(context);
+    FormInputController controller = Provider.of<FormInputController>(context);
     List<Widget> children = [];
     for (var inputFieldDef in inputFieldDefs) {
       children.add(SizedBox(
         height: spacing,
       ));
-      Widget inputFieldWidget = InputFieldWidget(inputFieldDef: inputFieldDef);
+      String name = inputFieldDef.name;
+      dynamic initValue;
+      if (initValues != null) {
+        initValue = initValues![name];
+      }
+      Widget inputFieldWidget =
+          InputFieldWidget(inputFieldDef: inputFieldDef, initValue: initValue);
       children.add(inputFieldWidget);
     }
     children.add(const SizedBox(
@@ -137,13 +165,15 @@ class FormInputWidget extends StatelessWidget {
         TextButton(
           child: Text(AppLocalizations.t('Ok')),
           onPressed: () {
-            onOk(formInputController.getValues());
+            var values = controller.getValues();
+            _adjustValues(values);
+            onOk(values);
           },
         ),
         TextButton(
           child: Text(AppLocalizations.t('Reset')),
           onPressed: () {
-            formInputController.clear();
+            controller.clear();
           },
         )
       ]),

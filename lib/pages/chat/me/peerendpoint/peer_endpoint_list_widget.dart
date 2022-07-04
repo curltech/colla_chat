@@ -98,10 +98,10 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
   @override
   initState() {
     super.initState();
-    widget.controller.addListener(update);
+    widget.controller.addListener(_update);
   }
 
-  update() {
+  _update() {
     setState(() {});
   }
 
@@ -144,10 +144,7 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
   @override
   void dispose() {
     logger.w('PeerEndpointListWidget dispose');
-    widget.controller.removeListener(update);
+    widget.controller.removeListener(_update);
     super.dispose();
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }

@@ -139,12 +139,12 @@ class SqlBuilder {
   /// @param {*} tableName
   /// @param {*} entity
   /// @param {*} where
-  Sql update(String tableName, dynamic entity, String where,
+  Sql update(String tableName, Map<String, dynamic> entity, String where,
       [List<Object?>? whereArgs]) {
     var query = 'UPDATE $tableName SET ';
     var params = <Object?>[];
     var i = 0;
-    for (var key in entity) {
+    for (var key in entity.keys) {
       var param = entity[key];
       params.add(param);
       if (i == 0) {

@@ -10,12 +10,15 @@ import 'form_input_widget.dart';
 ///指定路由样式，不指定则系统判断，系统判断的方法是如果是移动则走全局路由，否则走工作区路由
 enum InputType { label, text, password, radio, checkbox, select, textarea }
 
+enum DataType { int, double, string, bool, date, set, list, map }
+
 /// 通用列表项的数据模型
 class InputFieldDef {
   final String name;
   final String label;
   final InputType inputType;
-  String initValue;
+  final DataType dataType;
+  dynamic initValue;
 
   //图标
   final Widget? prefixIcon;
@@ -28,6 +31,8 @@ class InputFieldDef {
   final TextInputType? textInputType;
 
   final Widget? suffixIcon;
+
+  final bool cancel;
 
   final int? maxLines;
 
@@ -43,12 +48,14 @@ class InputFieldDef {
     required this.name,
     required this.label,
     this.inputType = InputType.text,
+    this.dataType = DataType.string,
     this.initValue = '',
     this.prefixIcon,
     this.avatar,
     this.hintText,
     this.textInputType = TextInputType.text,
     this.suffixIcon,
+    this.cancel = false,
     this.maxLines = 1,
     this.readOnly = false,
     this.options,
@@ -60,24 +67,33 @@ class InputFieldDef {
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
 class InputFieldWidget extends StatelessWidget {
   final InputFieldDef inputFieldDef;
+  final dynamic initValue;
 
-  const InputFieldWidget({Key? key, required this.inputFieldDef})
+  const InputFieldWidget(
+      {Key? key, required this.inputFieldDef, this.initValue})
       : super(key: key);
 
-  dynamic _getValue(BuildContext context, InputFieldDef inputDef) {
-    final name = inputDef.name;
-    FormInputController formInputController =
-        Provider.of<FormInputController>(context);
-    dynamic value = formInputController.getValue(name);
-    value = value ?? inputDef.initValue;
-    value = value ?? '';
-
-    return value;
+  dynamic _getInitValue(BuildContext context, InputFieldDef inputDef) {
+    var dataType = inputDef.dataType;
+    dynamic v = initValue ?? inputDef.initValue;
+    if (dataType == DataType.set ||
+        dataType == DataType.list ||
+        dataType == DataType.map) {
+      return v;
+    }
+    if (v == null) {
+      return '';
+    }
+    if (dataType == DataType.date) {
+      var d = v as DateTime;
+      return d.toUtc().toIso8601String();
+    }
+    return v.toString();
   }
 
   Widget? _buildLabel(BuildContext context, InputFieldDef inputDef) {
     final label = inputDef.label;
-    dynamic value = _getValue(context, inputDef);
+    dynamic value = _getInitValue(context, inputDef);
 
     return Text(AppLocalizations.t(label) + ':' + value);
   }
@@ -98,12 +114,23 @@ class InputFieldWidget extends StatelessWidget {
     FormInputController formInputController =
         Provider.of<FormInputController>(context);
     var controller = TextEditingController();
-    var value = _getValue(context, inputDef);
+    var value = _getInitValue(context, inputDef);
     controller.value = TextEditingValue(
         text: value,
         selection: TextSelection.fromPosition(TextPosition(
             offset: value.length, affinity: TextAffinity.downstream)));
     formInputController.initController(inputDef.name, controller);
+    Widget? suffix;
+    if (inputFieldDef.cancel) {
+      suffix = controller.text.isNotEmpty
+          ? IconButton(
+              //如果文本长度不为空则显示清除按钮
+              onPressed: () {
+                controller.clear();
+              },
+              icon: const Icon(Icons.cancel, color: Colors.grey))
+          : null;
+    }
     var widget = TextFormField(
       controller: controller,
       keyboardType: inputFieldDef.textInputType,
@@ -113,6 +140,7 @@ class InputFieldWidget extends StatelessWidget {
           labelText: AppLocalizations.t(inputDef.label),
           prefixIcon: _buildIcon(inputDef),
           suffixIcon: inputFieldDef.suffixIcon,
+          suffix: suffix,
           hintText: inputDef.hintText),
     );
 
@@ -125,12 +153,23 @@ class InputFieldWidget extends StatelessWidget {
     bool? pwdShow = formInputController.getFlag(inputDef.name);
     pwdShow ??= false;
     var controller = TextEditingController();
-    var value = _getValue(context, inputDef);
+    var value = _getInitValue(context, inputDef);
     controller.value = TextEditingValue(
         text: value,
         selection: TextSelection.fromPosition(TextPosition(
             offset: value.length, affinity: TextAffinity.downstream)));
     formInputController.initController(inputDef.name, controller);
+    Widget? suffix;
+    if (inputFieldDef.cancel) {
+      suffix = controller.text.isNotEmpty
+          ? IconButton(
+              //如果文本长度不为空则显示清除按钮
+              onPressed: () {
+                controller.clear();
+              },
+              icon: const Icon(Icons.cancel, color: Colors.grey))
+          : null;
+    }
     var widget = TextFormField(
       controller: controller,
       keyboardType: inputFieldDef.textInputType,
@@ -144,6 +183,7 @@ class InputFieldWidget extends StatelessWidget {
               formInputController.changeFlag(inputDef.name, !pwdShow!);
             },
           ),
+          suffix: suffix,
           hintText: inputDef.hintText),
     );
     return widget;
@@ -162,7 +202,7 @@ class InputFieldWidget extends StatelessWidget {
             formInputController.setValue(inputDef.name, value);
           },
           value: option.value,
-          groupValue: _getValue(context, inputDef),
+          groupValue: _getInitValue(context, inputDef),
         );
         var row = Row(
           children: [radio, Text(option.label)],
@@ -182,7 +222,7 @@ class InputFieldWidget extends StatelessWidget {
     if (options != null && options.isNotEmpty) {
       for (var i = 0; i < options.length; ++i) {
         var option = options[i];
-        Set<String>? value = _getValue(context, inputDef);
+        Set<String>? value = _getInitValue(context, inputDef);
         value ??= <String>{};
         var checkbox = Checkbox(
           onChanged: (bool? selected) {
@@ -215,7 +255,7 @@ class InputFieldWidget extends StatelessWidget {
     if (options != null && options.isNotEmpty) {
       for (var i = 0; i < options.length; ++i) {
         var option = options[i];
-        Set<String>? value = _getValue(context, inputDef);
+        Set<String>? value = _getInitValue(context, inputDef);
         value ??= <String>{};
         var checkbox = Switch(
           onChanged: (bool? selected) {

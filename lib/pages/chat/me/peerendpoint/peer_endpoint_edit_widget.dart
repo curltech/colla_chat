@@ -10,7 +10,10 @@ import '../../../../widgets/common/widget_mixin.dart';
 
 final List<InputFieldDef> peerEndpointInputFieldDefs = [
   InputFieldDef(
-      name: 'id', label: 'id', prefixIcon: const Icon(Icons.perm_identity)),
+      name: 'id',
+      label: 'id',
+      dataType: DataType.int,
+      prefixIcon: const Icon(Icons.perm_identity)),
   InputFieldDef(
       name: 'name', label: 'name', prefixIcon: const Icon(Icons.person)),
   InputFieldDef(
@@ -55,19 +58,21 @@ class _PeerEndpointEditWidgetState extends State<PeerEndpointEditWidget> {
   @override
   initState() {
     super.initState();
-    widget.controller.addListener(() {
-      setState(() {});
-    });
+    widget.controller.addListener(_update);
+  }
+
+  _update() {
+    setState(() {});
   }
 
   Widget _buildFormInputWidget(BuildContext context) {
-    widget.controller.setInitValue(peerEndpointInputFieldDefs);
+    var initValues = widget.controller.getInitValue(peerEndpointInputFieldDefs);
     var formInputWidget = FormInputWidget(
-      onOk: (Map<String, dynamic> values) {
-        _onOk(values);
-      },
-      inputFieldDefs: peerEndpointInputFieldDefs,
-    );
+        onOk: (Map<String, dynamic> values) {
+          _onOk(values);
+        },
+        inputFieldDefs: peerEndpointInputFieldDefs,
+        initValues: initValues);
 
     return formInputWidget;
   }
@@ -86,5 +91,11 @@ class _PeerEndpointEditWidgetState extends State<PeerEndpointEditWidget> {
         withLeading: widget.withLeading,
         child: _buildFormInputWidget(context));
     return appBarView;
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_update);
+    super.dispose();
   }
 }
