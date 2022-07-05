@@ -18,21 +18,20 @@ class DataTableView<T> extends StatefulWidget {
   final String? routeName;
   final Function(bool?)? onSelectChanged;
   final Function(int index)? onLongPress;
-  final List<DataColumn> dataColumns;
+  final List<DataColumn> dataColumns = [];
 
-  DataTableView(
-      {Key? key,
-      required this.columnDefs,
-      List<T> data = const [],
-      int? currentIndex,
-      this.onScrollMax,
-      this.onRefresh,
-      this.onTap,
-      this.routeName,
-      this.onSelectChanged,
-      this.onLongPress,
-      this.dataColumns = const []})
-      : super(key: key) {
+  DataTableView({
+    Key? key,
+    required this.columnDefs,
+    List<T> data = const [],
+    int? currentIndex,
+    this.onScrollMax,
+    this.onRefresh,
+    this.onTap,
+    this.routeName,
+    this.onSelectChanged,
+    this.onLongPress,
+  }) : super(key: key) {
     controller = DataListController<T>(data: data, currentIndex: currentIndex);
   }
 
@@ -43,6 +42,7 @@ class DataTableView<T> extends StatefulWidget {
 }
 
 class _DataListView<T> extends State<DataTableView> {
+  late DataTableSource _sourceData;
   int? sortColumnIndex;
   bool sortAscending = true;
 
@@ -71,8 +71,20 @@ class _DataListView<T> extends State<DataTableView> {
       // widget.scrollController.animateTo(offset,
       //     duration: const Duration(milliseconds: 1000), curve: Curves.ease);
     });
+    _buildColumnDefs();
+    _sourceData = DataPageSource<T>(
+        widget: widget as DataTableView<T>, context: context, rowCount: 0);
+    super.initState();
+  }
 
-    widget.dataColumns.clear();
+  _update() {
+    setState(() {});
+  }
+
+  _buildColumnDefs() {
+    if (widget.dataColumns.isNotEmpty) {
+      widget.dataColumns.clear();
+    }
     for (var columnDef in widget.columnDefs) {
       var dataColumn = DataColumn(
           label: Text(AppLocalizations.t(columnDef.label)),
@@ -82,12 +94,6 @@ class _DataListView<T> extends State<DataTableView> {
           onSort: columnDef.onSort ?? _onSort);
       widget.dataColumns.add(dataColumn);
     }
-
-    super.initState();
-  }
-
-  _update() {
-    setState(() {});
   }
 
   _onSort(int sortColumnIndex, bool sortAscending) {
@@ -111,52 +117,21 @@ class _DataListView<T> extends State<DataTableView> {
   }
 
   Widget _build(BuildContext context) {
-    List data = widget.controller.data;
-    List<DataRow> rows = [];
-    for (var i = 0; i < data.length; ++i) {
-      var d = data[i];
-      var dataMap = JsonUtil.toMap(d);
-      List<DataCell> cells = [];
-      for (var columnDef in widget.columnDefs) {
-        var value = dataMap[columnDef.name];
-        var dataCell = DataCell(Text(value), onTap: () {
-          widget.controller.currentIndex = i;
-          var fn = widget.onTap;
-          if (fn != null) {
-            fn(i);
-          } else {
-            ///如果路由名称存在，点击会调用路由
-            if (widget.routeName != null) {
-              var indexWidgetProvider =
-                  Provider.of<IndexWidgetProvider>(context, listen: false);
-              indexWidgetProvider.push(widget.routeName!, context: context);
-            }
-          }
-        });
-        cells.add(dataCell);
-      }
-      var selected = false;
-      if (i == widget.controller.currentIndex) {
-        selected = true;
-      }
-      var dataRow = DataRow(
-        cells: cells,
-        selected: selected,
-        onSelectChanged: (selected) {},
-        onLongPress: () {
-          var fn = widget.onLongPress;
-          if (fn != null) {
-            fn(i);
-          }
-        },
-      );
-      rows.add(dataRow);
+    if (widget.dataColumns.isEmpty) {
+      _buildColumnDefs();
     }
-    Widget dataTableView = DataTable(
+    Widget dataTableView = PaginatedDataTable(
+      header: const Text(''),
+      actions: [],
+      rowsPerPage: 10,
+      initialFirstRowIndex: 20,
+      onPageChanged: (i) {},
       sortColumnIndex: sortColumnIndex,
       sortAscending: sortAscending,
+      showCheckboxColumn: false,
+      onSelectAll: (state) {},
       columns: widget.dataColumns,
-      rows: rows,
+      source: _sourceData,
     );
 
     return dataTableView;
@@ -167,12 +142,77 @@ class _DataListView<T> extends State<DataTableView> {
     var dataTableView = _build(context);
 
     return SingleChildScrollView(
-        scrollDirection: Axis.horizontal, child: dataTableView);
+        scrollDirection: Axis.vertical,
+        child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal, child: dataTableView));
   }
 
   @override
   void dispose() {
     widget.controller.removeListener(_update);
     super.dispose();
+  }
+}
+
+class DataPageSource<T> extends DataTableSource {
+  final BuildContext context;
+  final DataTableView<T> widget;
+  late final int _rowCount;
+
+  DataPageSource(
+      {required this.widget, required this.context, required int rowCount}) {
+    _rowCount = rowCount;
+  }
+
+  @override
+  bool get isRowCountApproximate => false;
+
+  @override
+  int get rowCount => _rowCount;
+
+  @override
+  int get selectedRowCount => 0;
+
+  @override
+  DataRow getRow(int index) {
+    List data = widget.controller.data;
+    var d = data[index];
+    var dataMap = JsonUtil.toMap(d);
+    List<DataCell> cells = [];
+    for (var columnDef in widget.columnDefs) {
+      var value = dataMap[columnDef.name];
+      value = value ?? '';
+      var dataCell = DataCell(Text(value), onTap: () {
+        widget.controller.currentIndex = index;
+        var fn = widget.onTap;
+        if (fn != null) {
+          fn(index);
+        } else {
+          ///如果路由名称存在，点击会调用路由
+          if (widget.routeName != null) {
+            var indexWidgetProvider =
+                Provider.of<IndexWidgetProvider>(context, listen: false);
+            indexWidgetProvider.push(widget.routeName!, context: context);
+          }
+        }
+      });
+      cells.add(dataCell);
+    }
+    var selected = false;
+    if (index == widget.controller.currentIndex) {
+      selected = true;
+    }
+    var dataRow = DataRow(
+      cells: cells,
+      selected: selected,
+      onSelectChanged: (selected) {},
+      onLongPress: () {
+        var fn = widget.onLongPress;
+        if (fn != null) {
+          fn(index);
+        }
+      },
+    );
+    return dataRow;
   }
 }
