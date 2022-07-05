@@ -182,7 +182,7 @@ class IndexedDb extends DataStore {
   }
 
   @override
-  Future<Page> findPage(String table,
+  Future<Pagination> findPage(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -202,8 +202,8 @@ class IndexedDb extends DataStore {
         var total = await index.count(keyRange['keyRange']);
         var results = await index.getAll(keyRange['keyRange'], limit);
         await txn.completed;
-        Page page =
-            Page(data: results, total: total, offset: offset, limit: limit);
+        Pagination page = Pagination(
+            data: results, total: total, offset: offset, limit: limit);
 
         return page;
       }
@@ -211,7 +211,8 @@ class IndexedDb extends DataStore {
     results = await store.getAll() as List<Map>;
     var total = await store.count();
     await txn.completed;
-    Page page = Page(data: results, total: total, offset: offset, limit: limit);
+    Pagination page =
+        Pagination(data: results, total: total, offset: offset, limit: limit);
 
     return page;
   }

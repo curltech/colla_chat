@@ -13,10 +13,37 @@ import '../../../../widgets/common/data_listtile.dart';
 import '../../../../widgets/common/data_table_view.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
+class PeerClientDataPageController extends DataPageController<PeerClient> {
+  @override
+  void first() {
+    // TODO: implement first
+  }
+
+  @override
+  void last() {
+    // TODO: implement last
+  }
+
+  @override
+  void move(int index) {
+    // TODO: implement move
+  }
+
+  @override
+  void next() {
+    // TODO: implement next
+  }
+
+  @override
+  void previous() {
+    // TODO: implement previous
+  }
+}
+
 //设置页面，带有回退回调函数
 class PeerClientListWidget extends StatefulWidget with TileDataMixin {
-  final DataListController<PeerClient> controller =
-      DataListController<PeerClient>();
+  final DataPageController<PeerClient> controller =
+      PeerClientDataPageController();
   late final List<Widget> rightWidgets;
   late final PeerClientShowWidget peerClientShowWidget;
   late final PeerClientEditWidget peerClientEditWidget;
@@ -95,9 +122,9 @@ class _PeerClientListWidgetState extends State<PeerClientListWidget> {
   @override
   Widget build(BuildContext context) {
     KeepAliveWrapper<DataTableView> dataTableView = KeepAliveWrapper(
-        child: DataTableView(
+        child: DataTableView<PeerClient>(
       columnDefs: peerClientColumnFieldDefs,
-      data: widget.controller.data,
+      controller: widget.controller,
       routeName: 'peer_client_edit',
     ));
 

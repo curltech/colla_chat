@@ -74,7 +74,7 @@ abstract class BaseService {
   }
 
   /// 与find的不同是返回值是带有result，from，limit，total字段的对象
-  Future<Page> findPage(String? where,
+  Future<Pagination> findPage(String? where,
       {bool? distinct,
       List<String>? columns,
       List<Object>? whereArgs,

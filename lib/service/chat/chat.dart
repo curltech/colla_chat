@@ -103,7 +103,7 @@ class ChatMessageService extends BaseService {
     await save(chatMessages, [], parent);
   }
 
-  Future<Page<ChatMessage>> findByMessageType(
+  Future<Pagination<ChatMessage>> findByMessageType(
     String messageType,
     String targetAddress,
     String subMessageType, {
@@ -124,7 +124,7 @@ class ChatMessageService extends BaseService {
         chatMessages.add(chatMessage);
       }
     }
-    Page<ChatMessage> page = Page(
+    Pagination<ChatMessage> page = Pagination(
         total: chatMessages_.total,
         data: chatMessages,
         offset: chatMessages_.offset,

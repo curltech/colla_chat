@@ -10,7 +10,7 @@ import 'column_field_widget.dart';
 
 class DataTableView<T> extends StatefulWidget {
   final List<ColumnFieldDef> columnDefs;
-  late final DataListController<T> controller;
+  final DataPageController<T> controller;
   final ScrollController scrollController = ScrollController();
   final Function()? onScrollMax;
   final Future<void> Function()? onRefresh;
@@ -23,17 +23,14 @@ class DataTableView<T> extends StatefulWidget {
   DataTableView({
     Key? key,
     required this.columnDefs,
-    List<T> data = const [],
-    int? currentIndex,
     this.onScrollMax,
     this.onRefresh,
     this.onTap,
     this.routeName,
     this.onSelectChanged,
     this.onLongPress,
-  }) : super(key: key) {
-    controller = DataListController<T>(data: data, currentIndex: currentIndex);
-  }
+    required this.controller,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {

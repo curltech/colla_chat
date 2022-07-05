@@ -9,7 +9,7 @@ enum EntityState {
   Deleted,
 }
 
-class Page<T> {
+class Pagination<T> {
   int total;
   List<T> data;
   int offset = defaultOffset;
@@ -36,7 +36,7 @@ class Page<T> {
     return pageCount;
   }
 
-  Page(
+  Pagination(
       {required this.total,
       required this.data,
       this.offset = 0,
@@ -63,7 +63,7 @@ class Page<T> {
     return off;
   }
 
-  Page.fromJson(Map json)
+  Pagination.fromJson(Map json)
       : total = json['total'],
         data = json['data'],
         offset = json['offset'],
@@ -95,7 +95,7 @@ abstract class DataStore {
       int? limit,
       int? offset});
 
-  Future<Page> findPage(String table,
+  Future<Pagination> findPage(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,

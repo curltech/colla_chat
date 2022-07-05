@@ -157,7 +157,7 @@ class Sqlite3 extends DataStore {
   }
 
   @override
-  Future<Page> findPage(String table,
+  Future<Pagination> findPage(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -193,7 +193,8 @@ class Sqlite3 extends DataStore {
         limit: limit,
         offset: offset);
 
-    Page page = Page(data: results, total: total, offset: offset, limit: limit);
+    Pagination page =
+        Pagination(data: results, total: total, offset: offset, limit: limit);
 
     return page;
   }

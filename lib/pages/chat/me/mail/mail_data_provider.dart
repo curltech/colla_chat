@@ -14,9 +14,9 @@ import '../../../../transport/emailclient.dart';
 class MailDataProvider with ChangeNotifier {
   final Map<String, MailAddress> _mailAddress = {};
   final Map<String, Map<String, enough_mail.Mailbox?>> _addressMailboxes = {};
-  final Map<String, Map<String, datastore.Page<ChatMessage>>>
+  final Map<String, Map<String, datastore.Pagination<ChatMessage>>>
       _addressChatMessagePages = {};
-  final Map<String, Map<String, datastore.Page<enough_mail.MimeMessage>>>
+  final Map<String, Map<String, datastore.Pagination<enough_mail.MimeMessage>>>
       _addressMimeMessagePages = {};
   MailAddress? _currentMailAddress;
   String? _currentMailboxName;
@@ -243,41 +243,43 @@ class MailDataProvider with ChangeNotifier {
   }
 
   ///获取当前地址的邮箱名称的邮件
-  datastore.Page<ChatMessage>? getMailboxChatMessages(String mailboxName) {
+  datastore.Pagination<ChatMessage>? getMailboxChatMessages(
+      String mailboxName) {
     var currentMailAddress = this.currentMailAddress;
     if (currentMailAddress == null) {
       return null;
     }
     var email = currentMailAddress.email;
-    Map<String, datastore.Page<ChatMessage>>? mailboxChatMessagePages =
+    Map<String, datastore.Pagination<ChatMessage>>? mailboxChatMessagePages =
         _addressChatMessagePages[email];
     if (mailboxChatMessagePages == null) {
       return null;
     }
-    datastore.Page<ChatMessage>? chatMessages =
+    datastore.Pagination<ChatMessage>? chatMessages =
         mailboxChatMessagePages[mailboxName];
     return chatMessages;
   }
 
   ///获取当前地址的当前邮箱的邮件
-  datastore.Page<ChatMessage>? get currentChatMessagePage {
+  datastore.Pagination<ChatMessage>? get currentChatMessagePage {
     var currentMailboxName = _currentMailboxName;
     if (currentMailboxName == null) {
       return null;
     }
-    datastore.Page<ChatMessage>? chatMessagePage =
+    datastore.Pagination<ChatMessage>? chatMessagePage =
         getMailboxChatMessages(currentMailboxName);
     return chatMessagePage;
   }
 
   ///获取当前地址的当前邮箱的邮件
-  set currentChatMessagePage(datastore.Page<ChatMessage>? chatMessagePage) {
+  set currentChatMessagePage(
+      datastore.Pagination<ChatMessage>? chatMessagePage) {
     var currentMailAddress = this.currentMailAddress;
     if (currentMailAddress == null) {
       return;
     }
     var email = currentMailAddress.email;
-    Map<String, datastore.Page<ChatMessage>>? mailboxChatMessagePages =
+    Map<String, datastore.Pagination<ChatMessage>>? mailboxChatMessagePages =
         _addressChatMessagePages[email];
     if (mailboxChatMessagePages == null) {
       return;
@@ -294,13 +296,13 @@ class MailDataProvider with ChangeNotifier {
   }
 
   ///获取当前地址的当前邮箱的邮件
-  datastore.Page<enough_mail.MimeMessage>? get currentMimeMessagePage {
+  datastore.Pagination<enough_mail.MimeMessage>? get currentMimeMessagePage {
     var currentMailAddress = this.currentMailAddress;
     if (currentMailAddress == null) {
       return null;
     }
     var email = currentMailAddress.email;
-    Map<String, datastore.Page<enough_mail.MimeMessage>>?
+    Map<String, datastore.Pagination<enough_mail.MimeMessage>>?
         mailboxMimeMessagePages = _addressMimeMessagePages[email];
     if (mailboxMimeMessagePages == null) {
       return null;
@@ -309,20 +311,20 @@ class MailDataProvider with ChangeNotifier {
     if (currentMailboxName == null) {
       return null;
     }
-    datastore.Page<enough_mail.MimeMessage>? mimeMessagePage =
+    datastore.Pagination<enough_mail.MimeMessage>? mimeMessagePage =
         mailboxMimeMessagePages[currentMailboxName];
     return mimeMessagePage;
   }
 
   ///获取当前地址的当前邮箱的邮件
   set currentMimeMessagePage(
-      datastore.Page<enough_mail.MimeMessage>? mimeMessagePage) {
+      datastore.Pagination<enough_mail.MimeMessage>? mimeMessagePage) {
     var currentMailAddress = this.currentMailAddress;
     if (currentMailAddress == null) {
       return;
     }
     var email = currentMailAddress.email;
-    Map<String, datastore.Page<enough_mail.MimeMessage>>?
+    Map<String, datastore.Pagination<enough_mail.MimeMessage>>?
         mailboxMimeMessagePages = _addressMimeMessagePages[email];
     if (mailboxMimeMessagePages == null) {
       return;
@@ -367,7 +369,7 @@ class MailDataProvider with ChangeNotifier {
     }
 
     var currentMimeMessagePage = this.currentMimeMessagePage;
-    datastore.Page<enough_mail.MimeMessage>? mimeMessagePage;
+    datastore.Pagination<enough_mail.MimeMessage>? mimeMessagePage;
     if (currentMimeMessagePage == null) {
       mimeMessagePage =
           await emailClient.fetchMessages(mailbox: currentMailbox);
@@ -385,8 +387,8 @@ class MailDataProvider with ChangeNotifier {
     if (mimeMessagePage != null && mimeMessagePage.data.isNotEmpty) {
       var currentChatMessagePage = this.currentChatMessagePage;
       if (currentChatMessagePage == null) {
-        currentChatMessagePage =
-            datastore.Page(total: currentMailbox.messagesExists, data: []);
+        currentChatMessagePage = datastore.Pagination(
+            total: currentMailbox.messagesExists, data: []);
         this.currentChatMessagePage = currentChatMessagePage;
       }
       for (var mimeMessage in mimeMessagePage.data) {

@@ -1,6 +1,7 @@
-import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart';
 
+import '../constant/base.dart';
+import '../datastore/datastore.dart';
 import '../tool/util.dart';
 import '../widgets/common/column_field_widget.dart';
 
@@ -138,4 +139,50 @@ class DataListController<T> with ChangeNotifier {
     _currentIndex = 0;
     notifyListeners();
   }
+}
+
+abstract class DataPageController<T> extends DataListController<T> {
+  int total;
+  int offset = defaultOffset;
+  int limit = 0;
+  int page = 0;
+
+  DataPageController({
+    this.total = 0,
+    this.offset = 0,
+    this.limit = 10,
+    List<T>? data,
+    int? currentIndex,
+  }) : super(data: data, currentIndex: currentIndex);
+
+  int get pageCount {
+    return Pagination.getPageCount(total, limit);
+  }
+
+  ///上一页的offset
+  int get previousOffset {
+    if (offset < limit) {
+      return 0;
+    }
+    return offset - limit;
+  }
+
+  ///下一页的offset
+  int get nextOffset {
+    var off = offset + limit;
+    if (off > total) {
+      return total;
+    }
+    return off;
+  }
+
+  void previous();
+
+  void next();
+
+  void first();
+
+  void last();
+
+  void move(int index);
 }
