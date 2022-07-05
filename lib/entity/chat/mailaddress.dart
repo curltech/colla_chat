@@ -2,7 +2,7 @@ import '../base.dart';
 
 /// 邮件地址
 class MailAddress extends BaseEntity {
-  String? ownerPeerId;
+  String ownerPeerId;
   String name;
   String email;
   String? username;
@@ -23,7 +23,8 @@ class MailAddress extends BaseEntity {
   bool isDefault = false;
 
   MailAddress(
-      {required this.name,
+      {required this.ownerPeerId,
+      required this.name,
       required this.email,
       this.username,
       this.domain,

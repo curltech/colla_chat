@@ -10,6 +10,7 @@ import '../constant/base.dart';
 import '../datastore/datastore.dart';
 import '../entity/chat/chat.dart';
 import '../entity/chat/mailaddress.dart' as entity;
+import '../entity/dht/myself.dart';
 import '../provider/app_data_provider.dart';
 import '../tool/util.dart';
 
@@ -64,7 +65,7 @@ class EmailMessageUtil {
 
   ///转换邮件信息为聊天信息
   static ChatMessage convertToChatMessage(enough_mail.MimeMessage message) {
-    ChatMessage chatMessage = ChatMessage();
+    ChatMessage chatMessage = ChatMessage(myself.peerId ?? '');
     chatMessage.id = message.guid;
     chatMessage.messageId = message.uid.toString();
     chatMessage.messageType = MessageType.email.name;
@@ -171,8 +172,8 @@ class EmailMessageUtil {
   static entity.MailAddress buildDiscoverMailAddress(
       String email, String name, ClientConfig config) {
     logger.i('config displayName: ${config.displayName}.');
-    entity.MailAddress mailAddress =
-        entity.MailAddress(email: email, name: name);
+    entity.MailAddress mailAddress = entity.MailAddress(
+        ownerPeerId: myself.peerId ?? '', email: email, name: name);
 
     for (final provider in config.emailProviders!) {
       ServerConfig? imapServerConfig = provider.preferredIncomingImapServer;

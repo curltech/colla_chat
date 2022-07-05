@@ -61,7 +61,7 @@ class MyselfPeerService extends PeerEntityService {
       try {
         isPhoneNumberValid = await PhoneNumberUtil.validate(mobile, code);
       } catch (e) {
-        print(e);
+        logger.e(e);
       }
       if (!isPhoneNumberValid) {
         throw 'InvalidMobileNumber';
@@ -72,7 +72,7 @@ class MyselfPeerService extends PeerEntityService {
     if (peer != null) {
       throw 'SameNameAccountExists';
     }
-    var myselfPeer = MyselfPeer();
+    var myselfPeer = MyselfPeer('');
     myselfPeer.status = EntityStatus.Effective.name;
     myselfPeer.mobile = mobile;
     myselfPeer.email = email;

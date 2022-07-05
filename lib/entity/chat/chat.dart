@@ -84,7 +84,7 @@ enum ChatDirect { receive, send }
 
 // 消息，泛指一切社交复合文档，最简单的是一句话，最复杂可以是非常复杂的混合文本，图片，视频的文档
 class ChatMessage extends StatusEntity {
-  String? ownerPeerId; // 区分本地不同peerClient属主
+  String ownerPeerId; // 区分本地不同peerClient属主
   String? transportType; // 包括：websocket,webrtc,mail,sms
   String? messageId; // 消息的唯一id标识
   String messageType = ''; // 消息类型（对应channel消息类型）
@@ -136,7 +136,7 @@ class ChatMessage extends StatusEntity {
   //本消息是合并消息
   List<ChatMessage> messages = [];
 
-  ChatMessage();
+  ChatMessage(this.ownerPeerId);
 
   ChatMessage.fromJson(Map json)
       : ownerPeerId = json['ownerPeerId'],
@@ -349,7 +349,7 @@ class Receive extends BaseEntity {
 /// party的最新消息汇总
 /// 每次有新消息到达，则更新，每个party一条记录
 class ChatSummary extends BaseEntity {
-  String? ownerPeerId; // 区分属主
+  String ownerPeerId; // 区分属主
   String? peerId; // 接收者或者发送者的联系人或群
   String? partyType; // 接收者或者发送者类型
   String? messageId; // 最新的消息Id
@@ -363,9 +363,9 @@ class ChatSummary extends BaseEntity {
   String? content;
   String? contentType;
   String? sendReceiveTime; // 发送接收时间
-  int? unreadNumber;
+  int unreadNumber = 0;
 
-  ChatSummary();
+  ChatSummary(this.ownerPeerId);
 
   ChatSummary.fromJson(Map json)
       : ownerPeerId = json['ownerPeerId'],

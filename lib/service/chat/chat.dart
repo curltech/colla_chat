@@ -310,6 +310,22 @@ class ChatSummaryService extends BaseService {
 
     return chatSummary;
   }
+
+  Future<ChatSummary?> findByPeerId(
+    String peerId,
+  ) async {
+    String where = 'peerId=?';
+    List<Object> whereArgs = [peerId];
+    var chatSummary_ = await findOne(
+      where,
+      whereArgs: whereArgs,
+    );
+    if (chatSummary_ != null) {
+      var chatSummary = ChatSummary.fromJson(chatSummary_);
+      return chatSummary;
+    }
+    return null;
+  }
 }
 
 class ChatBlockService {}

@@ -4,6 +4,8 @@ enum ActiveStatus { Up, Down }
 
 /// 通过peerId和address表明自己的位置，包含有ed25519和x25519两个公钥
 abstract class PeerLocation extends StatusEntity {
+  String ownerPeerId;
+
   /// ed25519的公钥,表明身份,用于人，设备，如果是libp2p节点直接使用libp2p的id
   String? peerId;
   String? kind;
@@ -17,9 +19,10 @@ abstract class PeerLocation extends StatusEntity {
   String publicKey = '';
   String? address;
   String? lastUpdateTime;
-  PeerLocation();
+  PeerLocation(this.ownerPeerId);
   PeerLocation.fromJson(Map json)
-      : peerId = json['peerId'],
+      : ownerPeerId = json['ownerPeerId'],
+        peerId = json['peerId'],
         kind = json['kind'],
         name = json['name'] ?? '',
         peerPublicKey = json['peerPublicKey'] ?? '',
@@ -32,6 +35,7 @@ abstract class PeerLocation extends StatusEntity {
   Map<String, dynamic> toJson() {
     var json = super.toJson();
     json.addAll({
+      'ownerPeerId': ownerPeerId,
       'peerId': peerId,
       'kind': kind,
       'name': name,
@@ -58,7 +62,7 @@ abstract class PeerEntity extends PeerLocation {
   String? signatureData;
   String? expireDate;
   int version = 0;
-  PeerEntity();
+  PeerEntity(String ownerPeerId) : super(ownerPeerId);
   PeerEntity.fromJson(Map json)
       : mobile = json['mobile'],
         email = json['email'],

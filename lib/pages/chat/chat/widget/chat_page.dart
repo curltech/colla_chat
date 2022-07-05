@@ -5,6 +5,7 @@ import 'package:colla_chat/pages/chat/chat/widget/text_span_builder.dart';
 import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../entity/dht/myself.dart';
 import '../../../../provider/app_data_provider.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import 'chat_details_body.dart';
@@ -115,7 +116,7 @@ class _ChatPageState extends State<ChatPage> {
 
   _handleSubmittedData(String text) async {
     _textController.clear();
-    chatData.insert(0, ChatMessage());
+    chatData.insert(0, ChatMessage(myself.peerId ?? ''));
     //await sendTextMsg('${widget?.id ?? widget.title}', widget.type, text);
   }
 

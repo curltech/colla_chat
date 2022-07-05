@@ -41,31 +41,31 @@ class ServiceLocator {
     services['accountService'] = accountService;
 
     var chainAppService = await ChainAppService.init(
-        tableName: "blc_chainApp",
+        tableName: "blc_chainapp",
         fields: buildFields(ChainApp(), []),
         indexFields: []);
     services['chainAppService'] = chainAppService;
 
     var peerProfileService = await PeerProfileService.init(
-        tableName: "blc_peerProfile",
+        tableName: "blc_peerprofile",
         fields: buildFields(PeerProfile(), []),
         indexFields: ['peerId']);
     services['peerProfileService'] = peerProfileService;
 
     var peerEndpointService = await PeerEndpointService.init(
-        tableName: "blc_peerEndpoint",
-        fields: buildFields(PeerEndpoint(), []),
+        tableName: "blc_peerendpoint",
+        fields: buildFields(PeerEndpoint(''), []),
         indexFields: ['ownerPeerId', 'priority', 'address']);
     services['peerEndpointService'] = peerEndpointService;
 
     var peerClientService = await PeerClientService.init(
-        tableName: "blc_peerClient",
+        tableName: "blc_peerclient",
         indexFields: ['peerId', 'name', 'mobile'],
-        fields: buildFields(PeerClient(), []));
+        fields: buildFields(PeerClient(''), []));
     services['peerClientService'] = peerClientService;
 
     var myselfPeerService = await MyselfPeerService.init(
-        tableName: "blc_myselfPeer",
+        tableName: "blc_myselfpeer",
         indexFields: [
           'endDate',
           'peerId',
@@ -75,7 +75,7 @@ class ServiceLocator {
           'status',
           'updateDate'
         ],
-        fields: buildFields(MyselfPeer(), []));
+        fields: buildFields(MyselfPeer(''), []));
     services['myselfPeerService'] = myselfPeerService;
 
     var linkmanService = await LinkmanService.init(
@@ -93,17 +93,17 @@ class ServiceLocator {
     var tagService = await TagService.init(
         tableName: "chat_tag",
         indexFields: ['ownerPeerId', 'createDate', 'tag'],
-        fields: buildFields(Tag(), []));
+        fields: buildFields(Tag(''), []));
     services['tagService'] = tagService;
 
     var partyTagService = await PartyTagService.init(
-        tableName: "chat_partyTag",
+        tableName: "chat_partytag",
         indexFields: ['ownerPeerId', 'createDate', 'tag', 'partyPeerId'],
-        fields: buildFields(PartyTag(), []));
+        fields: buildFields(PartyTag(''), []));
     services['partyTagService'] = partyTagService;
 
     var partyRequestService = await PartyRequestService.init(
-        tableName: "chat_partyRequest",
+        tableName: "chat_partyrequest",
         indexFields: [
           'ownerPeerId',
           'createDate',
@@ -138,7 +138,7 @@ class ServiceLocator {
           'memberPeerId',
           'memberType'
         ],
-        fields: buildFields(GroupMember(), []));
+        fields: buildFields(GroupMember(''), []));
     services['groupMemberService'] = groupMemberService;
 
     var contactService = await ContactService.init(
@@ -168,7 +168,7 @@ class ServiceLocator {
           'actualReceiveTime',
           'title',
         ],
-        fields: buildFields(ChatMessage(), []));
+        fields: buildFields(ChatMessage(''), []));
     services['chatMessageService'] = chatMessageService;
 
     var mergedMessageService = await MergedMessageService.init(
@@ -204,13 +204,14 @@ class ServiceLocator {
     var chatSummaryService = await ChatSummaryService.init(
         tableName: "chat_summary",
         indexFields: ['ownerPeerId', 'peerId', 'partyType', 'sendReceiveTime'],
-        fields: buildFields(ChatSummary(), []));
+        fields: buildFields(ChatSummary(''), []));
     services['chatSummaryService'] = chatSummaryService;
 
     var mailAddressService = await MailAddressService.init(
         tableName: "chat_mailaddress",
         indexFields: ['ownerPeerId', 'email', 'name'],
-        fields: buildFields(MailAddress(name: '', email: '@'), []));
+        fields: buildFields(
+            MailAddress(ownerPeerId: '', name: '', email: '@'), []));
     services['chat_mailaddress'] = mailAddressService;
 
     await Sqlite3.getInstance();

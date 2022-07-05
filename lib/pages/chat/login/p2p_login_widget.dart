@@ -5,8 +5,8 @@ import 'package:provider/provider.dart';
 import '../../../routers/routes.dart';
 import '../../../service/dht/myselfpeer.dart';
 import '../../../tool/util.dart';
-import '../../../widgets/common/form_input_widget.dart';
 import '../../../widgets/common/column_field_widget.dart';
+import '../../../widgets/common/form_input_widget.dart';
 
 final List<ColumnFieldDef> p2pRegisterInputFieldDef = [
   ColumnFieldDef(

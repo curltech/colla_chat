@@ -3,6 +3,7 @@ import 'package:colla_chat/pages/chat/me/peerclient/peer_client_show_widget.dart
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../entity/dht/myself.dart';
 import '../../../../entity/dht/peerclient.dart';
 import '../../../../l10n/localization.dart';
 import '../../../../provider/data_list_controller.dart';
@@ -58,7 +59,7 @@ class PeerClientListWidget extends StatefulWidget with TileDataMixin {
     rightWidgets = [
       IconButton(
           onPressed: () {
-            controller.add(PeerClient());
+            controller.add(PeerClient(myself.peerId ?? ''));
           },
           icon: const Icon(Icons.add),
           tooltip: AppLocalizations.t('Add')),

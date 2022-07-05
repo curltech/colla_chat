@@ -26,8 +26,6 @@ enum GroupStatus {
   DISBANDED // 已解散
 }
 
-enum MemberType { MEMBER, OWNER }
-
 enum ActiveStatus { DOWN, UP }
 
 //当事方，联系人，群，手机联系人（潜在联系人）的共同父类
@@ -40,6 +38,7 @@ abstract class Party extends StatusEntity {
   String? email; // 手机号
   String? avatar; // 头像
   String? publicKey; // 公钥
+  String? peerPublicKey; // 公钥
   String? givenName; // 备注名
   String? pyGivenName; // 备注名拼音
   String? sourceType; // 来源，包括：Search&Add（搜索添加）, AcceptRequest（接受请求）…
@@ -74,6 +73,7 @@ abstract class Party extends StatusEntity {
         email = json['mail'],
         avatar = json['avatar'],
         publicKey = json['publicKey'],
+        peerPublicKey = json['peerPublicKey'],
         givenName = json['givenName'],
         pyGivenName = json['pyGivenName'],
         sourceType = json['sourceType'],
@@ -116,6 +116,7 @@ abstract class Party extends StatusEntity {
       'mail': email,
       'avatar': avatar,
       'publicKey': publicKey,
+      'peerPublicKey': peerPublicKey,
       'givenName': givenName,
       'pyGivenName': pyGivenName,
       'sourceType': sourceType,
@@ -152,9 +153,9 @@ class Linkman extends Party {
 
 // 联系人标签
 class Tag extends BaseEntity {
-  String? ownerPeerId; // 区分本地不同peerClient属主
+  String ownerPeerId; // 区分本地不同peerClient属主
   String? tag; // 标签名称
-  Tag();
+  Tag(this.ownerPeerId);
 
   Tag.fromJson(Map json)
       : ownerPeerId = json['ownerPeerId'],
@@ -174,11 +175,11 @@ class Tag extends BaseEntity {
 
 // 联系人标签关系
 class PartyTag extends BaseEntity {
-  String? ownerPeerId; // 区分本地不同peerClient属主
+  String ownerPeerId; // 区分本地不同peerClient属主
   String? tag; // 标签
   String? partyPeerId; // party peerId
   String? partyType; // party type:linkman,group,channel,contact
-  PartyTag();
+  PartyTag(this.ownerPeerId);
 
   PartyTag.fromJson(Map json)
       : ownerPeerId = json['ownerPeerId'],
@@ -279,15 +280,17 @@ class Group extends Party {
   }
 }
 
+enum MemberType { owner, admin, member }
+
 // 组成员
 class GroupMember extends StatusEntity {
-  String? ownerPeerId; // 区分本地不同peerClient属主
+  String ownerPeerId; // 区分本地不同peerClient属主
   String? groupId; // 外键（对应group-groupId）
   String? memberPeerId; // 外键（对应linkman-peerId）
   String? memberAlias; // 成员别名
   String?
       memberType; // 成员类型，包括：Owner（创建者/群主，默认管理员）, Member（一般成员）,…可能的扩充：Admin（管理员）, Subscriber（订阅者）
-  GroupMember();
+  GroupMember(this.ownerPeerId);
 
   GroupMember.fromJson(Map json)
       : ownerPeerId = json['ownerPeerId'],

@@ -27,7 +27,7 @@ class MyselfPeer extends PeerEntity {
   String? clientId;
   String? deviceToken;
 
-  MyselfPeer();
+  MyselfPeer(String ownerPeerId) : super(ownerPeerId);
 
   MyselfPeer.fromJson(Map json)
       : loginName = json['loginName'],

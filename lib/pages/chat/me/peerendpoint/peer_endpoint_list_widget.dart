@@ -1,3 +1,4 @@
+import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/pages/chat/me/peerendpoint/peer_endpoint_edit_widget.dart';
 import 'package:colla_chat/pages/chat/me/peerendpoint/peer_endpoint_show_widget.dart';
 import 'package:colla_chat/tool/util.dart';
@@ -30,7 +31,7 @@ class PeerEndpointController extends DataListController<PeerEndpoint> {
       } else {
         for (var entry in nodeAddressOptions.entries) {
           var nodeAddressOption = entry.value;
-          var peerEndpoint = PeerEndpoint();
+          var peerEndpoint = PeerEndpoint(myself.peerId ?? '');
           peerEndpoint.peerId = nodeAddressOption.connectPeerId;
           peerEndpoint.name = entry.key;
           peerEndpoint.wsConnectAddress = nodeAddressOption.wsConnectAddress;
@@ -65,7 +66,7 @@ class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
     rightWidgets = [
       IconButton(
           onPressed: () {
-            controller.add(PeerEndpoint());
+            controller.add(PeerEndpoint(myself.peerId ?? ''));
           },
           icon: const Icon(Icons.add),
           tooltip: AppLocalizations.t('Add')),
