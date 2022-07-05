@@ -4,17 +4,20 @@ import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../entity/dht/peerclient.dart';
+import '../../../../l10n/localization.dart';
 import '../../../../provider/data_list_controller.dart';
 import '../../../../provider/index_widget_provider.dart';
+import '../../../../service/dht/peerclient.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/data_listtile.dart';
-import '../../../../widgets/common/data_listview.dart';
+import '../../../../widgets/common/data_table_view.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
 //设置页面，带有回退回调函数
 class PeerClientListWidget extends StatefulWidget with TileDataMixin {
   final DataListController<PeerClient> controller =
       DataListController<PeerClient>();
+  late final List<Widget> rightWidgets;
   late final PeerClientShowWidget peerClientShowWidget;
   late final PeerClientEditWidget peerClientEditWidget;
 
@@ -24,6 +27,23 @@ class PeerClientListWidget extends StatefulWidget with TileDataMixin {
     var indexWidgetProvider = IndexWidgetProvider.instance;
     indexWidgetProvider.define(peerClientShowWidget);
     indexWidgetProvider.define(peerClientEditWidget);
+
+    rightWidgets = [
+      IconButton(
+          onPressed: () {
+            controller.add(PeerClient());
+          },
+          icon: const Icon(Icons.add),
+          tooltip: AppLocalizations.t('Add')),
+      IconButton(
+          onPressed: () {
+            var current = controller.current;
+            PeerClientService.instance.delete(current);
+            controller.delete();
+          },
+          icon: const Icon(Icons.delete),
+          tooltip: AppLocalizations.t('Delete')),
+    ];
   }
 
   @override
@@ -43,18 +63,14 @@ class PeerClientListWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _PeerClientListWidgetState extends State<PeerClientListWidget> {
-  late KeepAliveWrapper<DataListView> dataListView;
-
   @override
   initState() {
     super.initState();
-    widget.controller.addListener(() {
-      setState(() {});
-    });
-    var peerClients = widget.controller.data;
-    var tiles = _convert(peerClients);
-    dataListView =
-        KeepAliveWrapper(child: DataListView(onTap: _onTap, tileData: tiles));
+    widget.controller.addListener(_update);
+  }
+
+  _update() {
+    setState(() {});
   }
 
   List<TileData> _convert(List<PeerClient> peerClients) {
@@ -78,11 +94,25 @@ class _PeerClientListWidgetState extends State<PeerClientListWidget> {
 
   @override
   Widget build(BuildContext context) {
+    KeepAliveWrapper<DataTableView> dataTableView = KeepAliveWrapper(
+        child: DataTableView(
+      columnDefs: peerClientColumnFieldDefs,
+      data: widget.controller.data,
+      routeName: 'peer_client_edit',
+    ));
+
     var peerclientWidget = KeepAliveWrapper(
         child: AppBarView(
             title: widget.title,
             withLeading: widget.withLeading,
-            child: dataListView));
+            rightWidgets: widget.rightWidgets,
+            child: dataTableView));
     return peerclientWidget;
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_update);
+    super.dispose();
   }
 }

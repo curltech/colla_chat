@@ -1,11 +1,12 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../provider/app_data_provider.dart';
 import '../../provider/data_list_controller.dart';
+import '../../provider/index_widget_provider.dart';
 import '../../tool/util.dart';
 import 'column_field_widget.dart';
-import 'data_listtile.dart';
 
 class DataTableView<T> extends StatefulWidget {
   final List<ColumnFieldDef> columnDefs;
@@ -13,13 +14,11 @@ class DataTableView<T> extends StatefulWidget {
   final ScrollController scrollController = ScrollController();
   final Function()? onScrollMax;
   final Future<void> Function()? onRefresh;
-  final Function(
-    int index,
-    String title, {
-    TileData? group,
-  })? onTap;
+  final Function(int index)? onTap;
+  final String? routeName;
   final Function(bool?)? onSelectChanged;
-  late final List<DataColumn> dataColumns;
+  final Function(int index)? onLongPress;
+  final List<DataColumn> dataColumns;
 
   DataTableView(
       {Key? key,
@@ -29,9 +28,10 @@ class DataTableView<T> extends StatefulWidget {
       this.onScrollMax,
       this.onRefresh,
       this.onTap,
-      required this.controller,
+      this.routeName,
       this.onSelectChanged,
-      required this.dataColumns})
+      this.onLongPress,
+      this.dataColumns = const []})
       : super(key: key) {
     controller = DataListController<T>(data: data, currentIndex: currentIndex);
   }
@@ -72,7 +72,7 @@ class _DataListView<T> extends State<DataTableView> {
       //     duration: const Duration(milliseconds: 1000), curve: Curves.ease);
     });
 
-    List<DataColumn> dataColumns = [];
+    widget.dataColumns.clear();
     for (var columnDef in widget.columnDefs) {
       var dataColumn = DataColumn(
           label: Text(AppLocalizations.t(columnDef.label)),
@@ -80,7 +80,7 @@ class _DataListView<T> extends State<DataTableView> {
               columnDef.dataType == DataType.double,
           tooltip: columnDef.hintText,
           onSort: columnDef.onSort ?? _onSort);
-      dataColumns.add(dataColumn);
+      widget.dataColumns.add(dataColumn);
     }
 
     super.initState();
@@ -119,7 +119,20 @@ class _DataListView<T> extends State<DataTableView> {
       List<DataCell> cells = [];
       for (var columnDef in widget.columnDefs) {
         var value = dataMap[columnDef.name];
-        var dataCell = DataCell(Text(value));
+        var dataCell = DataCell(Text(value), onTap: () {
+          widget.controller.currentIndex = i;
+          var fn = widget.onTap;
+          if (fn != null) {
+            fn(i);
+          } else {
+            ///如果路由名称存在，点击会调用路由
+            if (widget.routeName != null) {
+              var indexWidgetProvider =
+                  Provider.of<IndexWidgetProvider>(context, listen: false);
+              indexWidgetProvider.push(widget.routeName!, context: context);
+            }
+          }
+        });
         cells.add(dataCell);
       }
       var selected = false;
@@ -127,11 +140,16 @@ class _DataListView<T> extends State<DataTableView> {
         selected = true;
       }
       var dataRow = DataRow(
-          cells: cells,
-          selected: selected,
-          onSelectChanged: (selected) {
-            widget.controller.currentIndex = i;
-          });
+        cells: cells,
+        selected: selected,
+        onSelectChanged: (selected) {},
+        onLongPress: () {
+          var fn = widget.onLongPress;
+          if (fn != null) {
+            fn(i);
+          }
+        },
+      );
       rows.add(dataRow);
     }
     Widget dataTableView = DataTable(

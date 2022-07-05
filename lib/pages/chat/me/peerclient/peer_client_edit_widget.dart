@@ -8,7 +8,7 @@ import '../../../../widgets/common/form_input_widget.dart';
 import '../../../../widgets/common/keep_alive_wrapper.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
-final List<ColumnFieldDef> peerClientInputFieldDefs = [
+final List<ColumnFieldDef> peerClientColumnFieldDefs = [
   ColumnFieldDef(
       name: 'name', label: 'name', prefixIcon: const Icon(Icons.person)),
   ColumnFieldDef(
@@ -64,7 +64,7 @@ class _PeerClientEditWidgetState extends State<PeerClientEditWidget> {
       onOk: (Map<String, dynamic> values) {
         _onOk(values);
       },
-      inputFieldDefs: peerClientInputFieldDefs,
+      inputFieldDefs: peerClientColumnFieldDefs,
     );
     PeerClient? currentPeerClient = widget.controller.current;
     if (currentPeerClient != null) {
