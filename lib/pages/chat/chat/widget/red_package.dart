@@ -24,7 +24,7 @@ class RedPackage extends StatelessWidget {
             borderRadius: BorderRadius.all(Radius.circular(5.0)),
           ),
           child: Column(
-            crossAxisAlignment: model.targetPeerId != myself.peerId
+            crossAxisAlignment: model.receiverPeerId != myself.peerId
                 ? CrossAxisAlignment.start
                 : CrossAxisAlignment.end,
             children: [
@@ -62,7 +62,7 @@ class RedPackage extends StatelessWidget {
         },
       ),
     ];
-    if (model.targetPeerId != myself.peerId) {
+    if (model.receiverPeerId != myself.peerId) {
       body = body.reversed.toList();
     } else {
       body = body;
@@ -70,7 +70,7 @@ class RedPackage extends StatelessWidget {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 5.0),
       child: Row(
-        mainAxisAlignment: model.targetPeerId != myself.peerId
+        mainAxisAlignment: model.receiverPeerId != myself.peerId
             ? MainAxisAlignment.start
             : MainAxisAlignment.end,
         children: body,

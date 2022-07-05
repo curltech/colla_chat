@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../l10n/localization.dart';
 import '../../tool/util.dart';
-import 'input_field_widget.dart';
+import 'column_field_widget.dart';
 
 class FormInputController with ChangeNotifier {
   //非文本框的值
@@ -100,7 +100,7 @@ class FormInputController with ChangeNotifier {
 
 class FormInputWidget extends StatelessWidget {
   //格式定义
-  final List<InputFieldDef> inputFieldDefs;
+  final List<ColumnFieldDef> inputFieldDefs;
   final Map<String, dynamic>? initValues;
   final FormInputController controller = FormInputController();
   final Function(Map<String, dynamic>) onOk;

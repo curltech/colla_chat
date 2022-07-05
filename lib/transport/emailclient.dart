@@ -76,8 +76,8 @@ class EmailMessageUtil {
     }
     var to = message.to;
     if (to != null && to.isNotEmpty) {
-      chatMessage.targetName = to.first.personalName;
-      chatMessage.targetAddress = to.first.email;
+      chatMessage.receiverName = to.first.personalName;
+      chatMessage.receiverAddress = to.first.email;
     }
     chatMessage.contentType = message.mediaType.toString();
     chatMessage.content = message.renderMessage();

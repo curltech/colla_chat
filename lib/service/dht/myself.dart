@@ -6,6 +6,7 @@ import '../../entity/dht/myself.dart';
 import '../../entity/dht/myselfpeer.dart';
 import '../../entity/dht/peerprofile.dart';
 import '../../tool/util.dart';
+import '../../widgets/common/image_widget.dart';
 
 class MyselfService {
   ///创建新的myself，创建新的密钥对，设置到当前
@@ -71,10 +72,21 @@ class MyselfService {
 
     //查找配置信息
     var peerId = myselfPeer.peerId;
-    var peer = await peerProfileService.findOneEffectiveByPeerId(peerId!);
-    if (peer != null) {
-      var peerProfile = PeerProfile.fromJson(peer);
-      myself.peerProfile = peerProfile;
+    if (peerId != null) {
+      var peer = await peerProfileService.findOneEffectiveByPeerId(peerId);
+      if (peer != null) {
+        var peerProfile = PeerProfile.fromJson(peer);
+        myself.peerProfile = peerProfile;
+        String? avatar = peerProfile.avatar;
+        if (avatar != null) {
+          var avatarImage = ImageWidget(
+            image: avatar,
+            height: 32,
+            width: 32,
+          );
+          myself.avatar = avatarImage;
+        }
+      }
     }
 
     return true;

@@ -267,18 +267,18 @@ class ReceiveService extends BaseService {
   }
 }
 
-class ChatService extends BaseService {
-  static final ChatService _instance = ChatService();
+class ChatSummaryService extends BaseService {
+  static final ChatSummaryService _instance = ChatSummaryService();
   static bool initStatus = false;
 
-  static ChatService get instance {
+  static ChatSummaryService get instance {
     if (!initStatus) {
       throw 'please init!';
     }
     return _instance;
   }
 
-  static Future<ChatService> init(
+  static Future<ChatSummaryService> init(
       {required String tableName,
       required List<String> fields,
       List<String>? indexFields}) async {
@@ -288,6 +288,27 @@ class ChatService extends BaseService {
       initStatus = true;
     }
     return _instance;
+  }
+
+  Future<List<ChatSummary>> findByPartyType(
+    String partyType,
+  ) async {
+    String where = 'partyType=?';
+    List<Object> whereArgs = [partyType];
+    var chatSummary_ = await find(
+      where,
+      whereArgs: whereArgs,
+      orderBy: 'sendReceiveTime',
+    );
+    List<ChatSummary> chatSummary = [];
+    if (chatSummary_.isNotEmpty) {
+      for (var summary_ in chatSummary_) {
+        var summary = ChatSummary.fromJson(summary_);
+        chatSummary.add(summary);
+      }
+    }
+
+    return chatSummary;
   }
 }
 

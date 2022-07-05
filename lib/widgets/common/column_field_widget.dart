@@ -23,7 +23,7 @@ enum InputType {
 enum DataType { int, double, string, bool, date, set, list, map }
 
 /// 通用列表项的数据模型
-class InputFieldDef {
+class ColumnFieldDef {
   final String name;
   final String label;
   final InputType inputType;
@@ -54,36 +54,38 @@ class InputFieldDef {
 
   final bool autoValidate;
 
-  InputFieldDef({
-    required this.name,
-    required this.label,
-    this.inputType = InputType.text,
-    this.dataType = DataType.string,
-    this.initValue = '',
-    this.prefixIcon,
-    this.avatar,
-    this.hintText,
-    this.textInputType = TextInputType.text,
-    this.suffixIcon,
-    this.cancel = false,
-    this.maxLines = 1,
-    this.readOnly = false,
-    this.options,
-    this.validator,
-    this.autoValidate = false,
-  });
+  Function(int, bool)? onSort;
+
+  ColumnFieldDef(
+      {required this.name,
+      required this.label,
+      this.inputType = InputType.text,
+      this.dataType = DataType.string,
+      this.initValue = '',
+      this.prefixIcon,
+      this.avatar,
+      this.hintText,
+      this.textInputType = TextInputType.text,
+      this.suffixIcon,
+      this.cancel = false,
+      this.maxLines = 1,
+      this.readOnly = false,
+      this.options,
+      this.validator,
+      this.autoValidate = false,
+      this.onSort});
 }
 
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
 class InputFieldWidget extends StatelessWidget {
-  final InputFieldDef inputFieldDef;
+  final ColumnFieldDef inputFieldDef;
   final dynamic initValue;
 
   const InputFieldWidget(
       {Key? key, required this.inputFieldDef, this.initValue})
       : super(key: key);
 
-  dynamic _getInitValue(BuildContext context, InputFieldDef inputDef) {
+  dynamic _getInitValue(BuildContext context, ColumnFieldDef inputDef) {
     var dataType = inputDef.dataType;
     dynamic v = initValue ?? inputDef.initValue;
     if (dataType == DataType.set ||
@@ -101,14 +103,14 @@ class InputFieldWidget extends StatelessWidget {
     return v.toString();
   }
 
-  Widget? _buildLabel(BuildContext context, InputFieldDef inputDef) {
+  Widget? _buildLabel(BuildContext context, ColumnFieldDef inputDef) {
     final label = inputDef.label;
     dynamic value = _getInitValue(context, inputDef);
 
-    return Text(AppLocalizations.t(label) + ':' + value);
+    return Text(value);
   }
 
-  Widget? _buildIcon(InputFieldDef inputDef) {
+  Widget? _buildIcon(ColumnFieldDef inputDef) {
     Widget? icon;
     final avatar = inputDef.avatar;
     if (inputDef.prefixIcon != null) {
@@ -120,7 +122,7 @@ class InputFieldWidget extends StatelessWidget {
     return icon;
   }
 
-  Widget _buildTextFormField(BuildContext context, InputFieldDef inputDef) {
+  Widget _buildTextFormField(BuildContext context, ColumnFieldDef inputDef) {
     FormInputController formInputController =
         Provider.of<FormInputController>(context);
     var controller = TextEditingController();
@@ -157,7 +159,7 @@ class InputFieldWidget extends StatelessWidget {
     return widget;
   }
 
-  Widget _buildPasswordField(BuildContext context, InputFieldDef inputDef) {
+  Widget _buildPasswordField(BuildContext context, ColumnFieldDef inputDef) {
     FormInputController formInputController =
         Provider.of<FormInputController>(context);
     bool? pwdShow = formInputController.getFlag(inputDef.name);
@@ -199,7 +201,7 @@ class InputFieldWidget extends StatelessWidget {
     return widget;
   }
 
-  Widget _buildRadioField(BuildContext context, InputFieldDef inputDef) {
+  Widget _buildRadioField(BuildContext context, ColumnFieldDef inputDef) {
     FormInputController formInputController =
         Provider.of<FormInputController>(context);
     var options = inputDef.options;
@@ -224,7 +226,7 @@ class InputFieldWidget extends StatelessWidget {
     return Column(children: children);
   }
 
-  Widget _buildCheckboxField(BuildContext context, InputFieldDef inputDef) {
+  Widget _buildCheckboxField(BuildContext context, ColumnFieldDef inputDef) {
     FormInputController formInputController =
         Provider.of<FormInputController>(context);
     var options = inputDef.options;
@@ -257,7 +259,7 @@ class InputFieldWidget extends StatelessWidget {
     return Column(children: children);
   }
 
-  Widget _buildSwitchField(BuildContext context, InputFieldDef inputDef) {
+  Widget _buildSwitchField(BuildContext context, ColumnFieldDef inputDef) {
     FormInputController formInputController =
         Provider.of<FormInputController>(context);
     var options = inputDef.options;
@@ -290,7 +292,7 @@ class InputFieldWidget extends StatelessWidget {
     return Column(children: children);
   }
 
-  Widget _buildDropdownButton(BuildContext context, InputFieldDef inputDef) {
+  Widget _buildDropdownButton(BuildContext context, ColumnFieldDef inputDef) {
     FormInputController formInputController =
         Provider.of<FormInputController>(context);
     var options = inputDef.options;
@@ -315,7 +317,7 @@ class InputFieldWidget extends StatelessWidget {
     return dropdownButton;
   }
 
-  Widget _buildInputDate(BuildContext context, InputFieldDef inputDef) {
+  Widget _buildInputDate(BuildContext context, ColumnFieldDef inputDef) {
     FormInputController formInputController =
         Provider.of<FormInputController>(context);
     var controller = TextEditingController();

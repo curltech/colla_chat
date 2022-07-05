@@ -426,7 +426,7 @@ class WebrtcPeerPool {
     var chainProtocolId = appDataProvider.chainProtocolId;
     var receiveHandler = getProtocolHandler(chainProtocolId);
     if (receiveHandler != null) {
-      var remotePeerId = event.source.targetPeerId;
+      var remotePeerId = event.source.receiverPeerId;
       //调用注册的接收处理器处理接收的原始数据
       Uint8List? data = await receiveHandler(event.data, remotePeerId, null);
       //如果有返回的响应数据，则发送回去，不可以调用同步的发送方法send

@@ -6,16 +6,16 @@ import '../../../routers/routes.dart';
 import '../../../service/dht/myselfpeer.dart';
 import '../../../tool/util.dart';
 import '../../../widgets/common/form_input_widget.dart';
-import '../../../widgets/common/input_field_widget.dart';
+import '../../../widgets/common/column_field_widget.dart';
 
-final List<InputFieldDef> p2pRegisterInputFieldDef = [
-  InputFieldDef(
+final List<ColumnFieldDef> p2pRegisterInputFieldDef = [
+  ColumnFieldDef(
       name: 'credential',
       label: 'Credentia(Mobile/Email/LoginName)',
       prefixIcon: const Icon(Icons.person),
       cancel: true,
       initValue: '13609619603'),
-  InputFieldDef(
+  ColumnFieldDef(
     name: 'password',
     label: 'password',
     inputType: InputType.password,

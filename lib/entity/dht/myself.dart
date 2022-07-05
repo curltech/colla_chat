@@ -1,6 +1,7 @@
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/dht/peerprofile.dart';
 import 'package:cryptography/cryptography.dart';
+import 'package:flutter/material.dart';
 
 import 'myselfpeer.dart';
 
@@ -20,6 +21,7 @@ class Myself {
 
   MyselfPeer? myselfPeer;
   PeerProfile? peerProfile;
+  Widget? avatar;
 
   ///当连接p2p节点成功后设置
   PeerClient? myselfPeerClient;

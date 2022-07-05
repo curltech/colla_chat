@@ -58,7 +58,7 @@ class ImgMsg extends StatelessWidget {
       ),
       Spacer(),
     ];
-    if (model.targetPeerId != myself.peerId) {
+    if (model.receiverPeerId != myself.peerId) {
       body = body.reversed.toList();
     } else {
       body = body;

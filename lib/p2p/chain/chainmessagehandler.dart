@@ -224,7 +224,7 @@ class ChainMessageHandler {
     var errMessage = ChainMessage();
     errMessage.payload = MsgType.ERROR.name.codeUnits;
     errMessage.messageType = msgType;
-    errMessage.tip = err.message;
+    errMessage.tip = err.chatMessage;
     errMessage.messageDirect = MsgDirect.Response.name;
 
     return errMessage;

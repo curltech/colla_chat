@@ -4,27 +4,11 @@ import 'package:flutter/material.dart';
 import '../../provider/app_data_provider.dart';
 import '../../provider/data_list_controller.dart';
 import '../../tool/util.dart';
+import 'column_field_widget.dart';
 import 'data_listtile.dart';
 
-class ColumnDef {
-  String name;
-  String label;
-  String? tooltip;
-  bool numeric;
-  bool sort;
-  Function(int, bool)? onSort;
-
-  ColumnDef(
-      {required this.name,
-      required this.label,
-      this.tooltip,
-      this.numeric = false,
-      this.sort = false,
-      this.onSort});
-}
-
 class DataTableView<T> extends StatefulWidget {
-  final List<ColumnDef> columnDefs;
+  final List<ColumnFieldDef> columnDefs;
   late final DataListController<T> controller;
   final ScrollController scrollController = ScrollController();
   final Function()? onScrollMax;
@@ -92,8 +76,9 @@ class _DataListView<T> extends State<DataTableView> {
     for (var columnDef in widget.columnDefs) {
       var dataColumn = DataColumn(
           label: Text(AppLocalizations.t(columnDef.label)),
-          numeric: columnDef.numeric,
-          tooltip: columnDef.tooltip,
+          numeric: columnDef.dataType == DataType.int ||
+              columnDef.dataType == DataType.double,
+          tooltip: columnDef.hintText,
           onSort: columnDef.onSort ?? _onSort);
       dataColumns.add(dataColumn);
     }

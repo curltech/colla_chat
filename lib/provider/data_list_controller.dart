@@ -1,7 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 
 import '../tool/util.dart';
-import '../widgets/common/input_field_widget.dart';
+import '../widgets/common/column_field_widget.dart';
 
 class DataListController<T> with ChangeNotifier {
   List<T> data = <T>[];
@@ -103,7 +103,7 @@ class DataListController<T> with ChangeNotifier {
 
   int get length => data.length;
 
-  Map<String, dynamic>? getInitValue(List<InputFieldDef> inputFieldDefs) {
+  Map<String, dynamic>? getInitValue(List<ColumnFieldDef> inputFieldDefs) {
     T? current = this.current;
     if (current != null) {
       var currentMap = JsonUtil.toMap(current);

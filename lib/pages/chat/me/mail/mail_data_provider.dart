@@ -392,7 +392,7 @@ class MailDataProvider with ChangeNotifier {
       for (var mimeMessage in mimeMessagePage.data) {
         var chatMessage = EmailMessageUtil.convertToChatMessage(mimeMessage);
         chatMessage.subMessageType = currentMailboxName;
-        chatMessage.targetAddress = email;
+        chatMessage.senderAddress = email;
         chatMessage.actualReceiveTime = DateUtil.currentDate();
         var old = await ChatMessageService.instance.get(mimeMessage.guid!);
         if (old == null) {

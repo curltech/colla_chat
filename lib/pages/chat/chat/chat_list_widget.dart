@@ -2,16 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../entity/chat/chat.dart';
-import '../../../entity/chat/contact.dart';
 import '../../../l10n/localization.dart';
 import '../../../provider/data_list_controller.dart';
 import '../../../provider/index_widget_provider.dart';
+import '../../../service/chat/chat.dart';
 import '../../../tool/util.dart';
 import '../../../widgets/common/data_group_listview.dart';
 import '../../../widgets/common/data_listtile.dart';
 import '../../../widgets/common/keep_alive_wrapper.dart';
 import '../../../widgets/common/widget_mixin.dart';
-import 'chat_message.dart';
+import 'chat_message_widget.dart';
 
 final Map<TileData, List<TileData>> mockTileData = {
   TileData(title: '群'): [
@@ -41,11 +41,27 @@ final Map<TileData, List<TileData>> mockTileData = {
 class ChatListWidget extends StatefulWidget with TileDataMixin {
   final DataListController<ChatMessage> controller =
       DataListController<ChatMessage>();
-  final DataListController<Linkman> linkmanController =
-      DataListController<Linkman>();
-  final DataListController<Group> groupController = DataListController<Group>();
+  final DataListController<ChatSummary> linkmanController =
+      DataListController<ChatSummary>();
+  final DataListController<ChatSummary> groupController =
+      DataListController<ChatSummary>();
 
-  ChatListWidget({Key? key}) : super(key: key);
+  ChatListWidget({Key? key}) : super(key: key) {
+    ChatSummaryService.instance
+        .findByPartyType(PartyType.linkman.name)
+        .then((List<ChatSummary> chatSummary) {
+      if (chatSummary.isNotEmpty) {
+        linkmanController.addAll(chatSummary);
+      }
+    });
+    ChatSummaryService.instance
+        .findByPartyType(PartyType.group.name)
+        .then((List<ChatSummary> chatSummary) {
+      if (chatSummary.isNotEmpty) {
+        groupController.addAll(chatSummary);
+      }
+    });
+  }
 
   @override
   State<StatefulWidget> createState() => _ChatListWidgetState();
@@ -64,28 +80,11 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _ChatListWidgetState extends State<ChatListWidget> {
-  late KeepAliveWrapper<GroupDataListView> groupDataListView;
-
   @override
   initState() {
     super.initState();
-    widget.linkmanController.addListener(() {
-      setState(() {});
-    });
-    widget.groupController.addListener(() {
-      setState(() {});
-    });
-
-    Map<TileData, List<TileData>> chatTileData = {};
-    var linkmen = widget.linkmanController.data;
-    var linkmanTiles = _convertLinkman(linkmen);
-    chatTileData[TileData(title: 'linkman')] = linkmanTiles;
-    var groups = widget.groupController.data;
-    var groupTiles = _convertGroup(groups);
-    chatTileData[TileData(title: 'group')] = groupTiles;
-
-    groupDataListView =
-        KeepAliveWrapper(child: GroupDataListView(tileData: chatTileData));
+    widget.linkmanController.addListener(_update);
+    widget.groupController.addListener(_update);
 
     var indexWidgetProvider =
         Provider.of<IndexWidgetProvider>(context, listen: false);
@@ -95,7 +94,11 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     ));
   }
 
-  List<TileData> _convertLinkman(List<Linkman> linkmen) {
+  _update() {
+    setState(() {});
+  }
+
+  List<TileData> _convert(List<ChatSummary> linkmen) {
     List<TileData> tiles = [];
     if (linkmen.isNotEmpty) {
       for (var linkman in linkmen) {
@@ -110,19 +113,19 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     return tiles;
   }
 
-  List<TileData> _convertGroup(List<Group> groups) {
-    List<TileData> tiles = [];
-    if (groups.isNotEmpty) {
-      for (var group in groups) {
-        var title = group.name ?? '';
-        var subtitle = group.peerId ?? '';
-        TileData tile = TileData(
-            title: title, subtitle: subtitle, routeName: 'peer_client_edit');
-        tiles.add(tile);
-      }
-    }
+  Widget _buildGroupDataListView(BuildContext context) {
+    Map<TileData, List<TileData>> chatTileData = {};
+    var linkmenSummary = widget.linkmanController.data;
+    var linkmanTiles = _convert(linkmenSummary);
+    chatTileData[TileData(title: 'linkman')] = linkmanTiles;
+    var groupsSummary = widget.groupController.data;
+    var groupTiles = _convert(groupsSummary);
+    chatTileData[TileData(title: 'group')] = groupTiles;
 
-    return tiles;
+    var groupDataListView =
+        KeepAliveWrapper(child: GroupDataListView(tileData: chatTileData));
+
+    return groupDataListView;
   }
 
   @override
@@ -136,6 +139,13 @@ class _ChatListWidgetState extends State<ChatListWidget> {
       ),
       actions: const [],
     );
-    return Scaffold(appBar: appBar, body: groupDataListView);
+    return Scaffold(appBar: appBar, body: _buildGroupDataListView(context));
+  }
+
+  @override
+  void dispose() {
+    widget.linkmanController.removeListener(_update);
+    widget.groupController.removeListener(_update);
+    super.dispose();
   }
 }

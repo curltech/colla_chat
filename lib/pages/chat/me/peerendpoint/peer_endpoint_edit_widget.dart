@@ -4,28 +4,28 @@ import 'package:flutter/material.dart';
 import '../../../../entity/dht/peerendpoint.dart';
 import '../../../../service/dht/peerendpoint.dart';
 import '../../../../widgets/common/app_bar_view.dart';
+import '../../../../widgets/common/column_field_widget.dart';
 import '../../../../widgets/common/form_input_widget.dart';
-import '../../../../widgets/common/input_field_widget.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
-final List<InputFieldDef> peerEndpointInputFieldDefs = [
-  InputFieldDef(
+final List<ColumnFieldDef> peerEndpointInputFieldDefs = [
+  ColumnFieldDef(
       name: 'id',
       label: 'id',
       dataType: DataType.int,
       prefixIcon: const Icon(Icons.perm_identity)),
-  InputFieldDef(
+  ColumnFieldDef(
       name: 'name', label: 'name', prefixIcon: const Icon(Icons.person)),
-  InputFieldDef(
+  ColumnFieldDef(
       name: 'peerId',
       label: 'peerId',
       prefixIcon: const Icon(Icons.perm_identity)),
-  InputFieldDef(
+  ColumnFieldDef(
       name: 'email',
       label: 'email',
       prefixIcon: const Icon(Icons.email),
       textInputType: TextInputType.emailAddress),
-  InputFieldDef(
+  ColumnFieldDef(
       name: 'mobile',
       label: 'mobile',
       prefixIcon: const Icon(Icons.mobile_friendly)),

@@ -156,9 +156,9 @@ class ServiceLocator {
           'messageType',
           'subMessageType',
           'direct',
-          'targetPeerId',
-          'targetType',
-          'targetAddress',
+          'receiverPeerId',
+          'receiverType',
+          'receiverAddress',
           'senderPeerId',
           'senderType',
           'senderAddress',
@@ -201,11 +201,11 @@ class ServiceLocator {
         fields: buildFields(Receive(), []));
     services['receiveService'] = receiveService;
 
-    var chatService = await ChatService.init(
-        tableName: "chat_chat",
-        indexFields: ['ownerPeerId', 'peerId', 'sendReceiveTime'],
-        fields: buildFields(Chat(), []));
-    services['chatService'] = chatService;
+    var chatSummaryService = await ChatSummaryService.init(
+        tableName: "chat_summary",
+        indexFields: ['ownerPeerId', 'peerId', 'partyType', 'sendReceiveTime'],
+        fields: buildFields(ChatSummary(), []));
+    services['chatSummaryService'] = chatSummaryService;
 
     var mailAddressService = await MailAddressService.init(
         tableName: "chat_mailaddress",

@@ -1,12 +1,10 @@
-import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:flutter/material.dart';
 
 import '../../../entity/chat/chat.dart';
 import '../../../provider/app_data_provider.dart';
 import '../../../provider/data_list_controller.dart';
 import '../../../widgets/common/widget_mixin.dart';
-import 'chat_me_message.dart';
-import 'chat_other_message.dart';
+import 'chat_message_item.dart';
 
 /// 消息发送和接受展示的界面组件
 /// 此界面展示特定的目标对象的收到的消息，并且可以发送消息
@@ -91,19 +89,8 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     // 创建消息动画控制器
     var animate =
         AnimationController(vsync: this, duration: Duration(milliseconds: 500));
-    Widget chatMessageWidget = ChatOtherMessage(message: item);
-    // 读取自己的用户id，判断是否是发送给自己的
-    var myselfPeer = myself.myselfPeer;
-    if (myselfPeer != null) {
-      String? peerId = myselfPeer.peerId;
-      if (peerId == item.targetPeerId) {
-        // 创建消息组件
-        chatMessageWidget = ChatMeMessage(message: item);
-      } else {
-        // 创建消息组件
-        chatMessageWidget = ChatOtherMessage(message: item);
-      }
-    }
+    Widget chatMessageWidget = ChatMessageItem(chatMessage: item);
+
     // index=0执行动画，对最新的消息执行动画
     if (index == 0) {
       // 开始动画

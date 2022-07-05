@@ -4,33 +4,31 @@ import '../base.dart';
 
 var period = 300; //5m
 
-enum ChatDataType { MESSAGE, RECEIVE, ATTACH, CHAT, MERGEMESSAGE }
-
-enum ChatContentType {
-  All, // 根据场景包含类型不同，如非系统类型、可搜索类型等
-  Image,
-  Text,
-  File,
-  Audio,
-  Video,
-  Card,
-  Note,
-  Channel,
-  Article,
-  Chat,
-  Link,
-  Voice,
-  Position,
-  AUDIO_INVITATION,
-  AUDIO_HISTORY,
-  VIDEO_HISTORY,
-  VIDEO_INVITATION,
-  CALL_JOIN_REQUEST,
-  EVENT,
-  TIME,
-  MEDIA_REJECT,
-  MEDIA_CLOSE,
-  MEDIA_BUSY
+enum ContentType {
+  rich, // 根据场景包含类型不同，如非系统类型、可搜索类型等
+  image,
+  text,
+  file,
+  audio,
+  video,
+  card,
+  note,
+  channel,
+  article,
+  chat,
+  link,
+  voice,
+  position,
+  audioInvitation,
+  audioHistory,
+  videoHistory,
+  videoInvitation,
+  callJoinRequest,
+  event,
+  time,
+  reject,
+  close,
+  busy
 }
 
 // 消息类型（messageType）
@@ -40,50 +38,49 @@ enum MessageType {
   sms,
 }
 
-enum ChatMessageType {
-  ADD_LINKMAN, // 新增联系人请求
-  ADD_LINKMAN_REPLY, // 新增联系人请求的回复
-  SYNC_LINKMAN_INFO, // 联系人基本信息同步
-  DROP_LINKMAN, // 从好友中删除
-  DROP_LINKMAN_RECEIPT, // 删除好友通知回复
-  BLACK_LINKMAN, // 加入黑名单
-  BLACK_LINKMAN_RECEIPT, // 加入黑名单通知回复
-  UNBLACK_LINKMAN, // 从黑名单中移除
-  UNBLACK_LINKMAN_RECEIPT, // 移除黑名单通知回复
+enum ChatSubMessageType {
+  addLinkman, // 新增联系人请求
+  addLinkmanReply, // 新增联系人请求的回复
+  syncLinkmanInfo, // 联系人基本信息同步
+  removeLinkman, // 从好友中删除
+  removeLinkmanReceipt, // 删除好友通知回复
+  blackLinkman, // 加入黑名单
+  blackLinkmanReceipt, // 加入黑名单通知回复
+  unblackLinkman, // 从黑名单中移除
+  unblackLinkmanReceipt, // 移除黑名单通知回复
   // 联系人请求
-  ADD_GROUPCHAT, // 新增群聊请求
-  ADD_GROUPCHAT_RECEIPT, // 新增群聊请求接收回复
-  DISBAND_GROUPCHAT, // 解散群聊请求
-  DISBAND_GROUPCHAT_RECEIPT, // 解散群聊请求接收回复
-  MODIFY_GROUPCHAT, // 修改群聊请求
-  MODIFY_GROUPCHAT_RECEIPT, // 修改群聊请求接收回复
-  MODIFY_GROUPCHAT_OWNER, // 修改群主请求
-  MODIFY_GROUPCHAT_OWNER_RECEIPT, // 修改群主请求接收回复
-  ADD_GROUPCHAT_MEMBER, // 新增群聊成员请求
-  ADD_GROUPCHAT_MEMBER_RECEIPT, // 新增群聊成员请求接收回复
-  REMOVE_GROUPCHAT_MEMBER, // 删除群聊成员请求
-  REMOVE_GROUPCHAT_MEMBER_RECEIPT, // 删除群聊成员请求接收回复
+  addGroup, // 新增群聊请求
+  addGroupReceipt, // 新增群聊请求接收回复
+  dismissGroup, // 解散群聊请求
+  dismissGroupReceipt, // 解散群聊请求接收回复
+  modifyGroup, // 修改群聊请求
+  modifyGroupReceipt, // 修改群聊请求接收回复
+  modifyGroupOwner, // 修改群主请求
+  modifyGroupOwnerReceipt, // 修改群主请求接收回复
+  addGroupMember, // 新增群聊成员请求
+  addGroupMemberReceipt, // 新增群聊成员请求接收回复
+  removeGroupMember, // 删除群聊成员请求
+  removeGroupMemberReceipt, // 删除群聊成员请求接收回复
   // 聊天
-  CHAT_SYS, // 系统预定义聊天消息，如群聊动态通知
-  CHAT_LINKMAN, // 联系人发送聊天消息
-  CHAT_RECEIVE_RECEIPT, // 接收回复
-  CALL_CLOSE,
-  CALL_REQUEST, // 通话请求
-  RECALL,
-  GROUP_FILE
+  chatSystem, // 系统预定义聊天消息，如群聊动态通知
+  chat, // 联系人发送聊天消息
+  chatReceipt, // 接收回复
+  callClose,
+  callRequest, // 通话请求
+  recall,
+  groupFile
 }
 
-enum ChatMessageStatus {
-  NORMAL,
-  RECALL,
-  DELETE,
+enum MessageStatus {
+  effective,
+  recall,
+  deleted,
 }
 
-enum SubjectType {
-  CHAT,
-  LINKMAN_REQUEST,
-  GROUP_CHAT,
-}
+///好友，群，潜在，联系人，频道，房间
+enum PartyType { linkman, group, peerClient, contact, channel, room }
+
+enum ChatDirect { receive, send }
 
 // 消息，泛指一切社交复合文档，最简单的是一句话，最复杂可以是非常复杂的混合文本，图片，视频的文档
 class ChatMessage extends StatusEntity {
@@ -92,20 +89,23 @@ class ChatMessage extends StatusEntity {
   String? messageId; // 消息的唯一id标识
   String messageType = ''; // 消息类型（对应channel消息类型）
   String? subMessageType;
-  String? direct; //对自己而言，消息是属于发或者接受
-  //发送的人是自己，记录目标接收者的id和类型名称，自己是接收人，记录的是对方的目标群
-  String? targetPeerId; // 目标的唯一id标识（单聊对应linkman-peerId，群聊对应group-peerId）
-  String? targetType; // 包括：Linkman（单聊）, Group（群聊）,Channel,
-  String? targetName;
-  String? targetAddress;
+  String? direct; //对自己而言，消息是属于发送或者接受
 
-  //当发送者向群里发消息，自己作为群成员的时候
-  //targetPeerId是群的peerId，senderPeerId是发送者的peerId，其他时候为空
+  ///当发送者向群，自己作为群成员或者我发消息，填写发送者的信息
+  ///此时我属于接收方，direct为接收
+  ///此时receiver的信息填写群的信息，如果是发送给我，可以不填写
   String? senderPeerId; // 消息发送方（作者）peerId
   String? senderType;
   String? senderName;
   String? senderAddress;
   String? sendTime; // 发送时间
+  ///如果我作为发送者向别人或者群发送消息，此时direct为send
+  ///receiver填写别人或者群的信息
+  ///此时发送者的信息可以不填写
+  String? receiverPeerId; // 目标的唯一id标识（单聊对应linkman-peerId，群聊对应group-peerId）
+  String? receiverType; // 包括：Linkman（单聊）, Group（群聊）,Channel,
+  String? receiverName;
+  String? receiverAddress;
   String? receiveTime; // 接收时间
   String?
       actualReceiveTime; // 实际接收时间 1.发送端发送消息时receiveTime=createDate，actualReceiveTime=null；2.根据actualReceiveTime是否为null判断是否需要重发，收到接受回执时更新actualReceiveTime；3.聊天区按receiveTime排序，查找聊天内容按createDate排序
@@ -140,12 +140,12 @@ class ChatMessage extends StatusEntity {
 
   ChatMessage.fromJson(Map json)
       : ownerPeerId = json['ownerPeerId'],
-        targetType = json['targetType'],
+        receiverType = json['receiverType'],
         transportType = json['transportType'],
         direct = json['direct'],
-        targetPeerId = json['targetPeerId'],
-        targetName = json['targetName'],
-        targetAddress = json['targetAddress'],
+        receiverPeerId = json['receiverPeerId'],
+        receiverName = json['receiverName'],
+        receiverAddress = json['receiverAddress'],
         messageId = json['messageId'],
         messageType = json['messageType'],
         subMessageType = json['subMessageType'],
@@ -192,10 +192,10 @@ class ChatMessage extends StatusEntity {
       'ownerPeerId': ownerPeerId,
       'transportType': transportType,
       'direct': direct,
-      'targetType': targetType,
-      'targetPeerId': targetPeerId,
-      'targetName': targetName,
-      'targetAddress': targetAddress,
+      'receiverType': receiverType,
+      'receiverPeerId': receiverPeerId,
+      'receiverName': receiverName,
+      'receiverAddress': receiverAddress,
       'messageId': messageId,
       'messageType': messageType,
       'subMessageType': subMessageType,
@@ -346,32 +346,43 @@ class Receive extends BaseEntity {
   }
 }
 
-/// party的最新消息，可以通过消息计算出来
-/// 需要对消息表的targetPeerId和senderPeerId分组，找到最新的时间的消息,并进行合并
-class Chat extends BaseEntity {
+/// party的最新消息汇总
+/// 每次有新消息到达，则更新，每个party一条记录
+class ChatSummary extends BaseEntity {
   String? ownerPeerId; // 区分属主
-  String? peerId; // 接收者联系人或群
-  String? partyType; // 接收者类型
-  String? messageId; // 消息Id
-  String? name; // 联系人或者群
+  String? peerId; // 接收者或者发送者的联系人或群
+  String? partyType; // 接收者或者发送者类型
+  String? messageId; // 最新的消息Id
+  String? messageType; // 最新的消息类型
+  String? subMessageType; // 最新的消息子类型
+  String? name; // 接收者或者发送者联系人或者群的名称
+  String? avatar; //头像
   String? title; // 标题
   String? thumbBody; // 预览内容（适用需预览的content，如笔记、转发聊天）
   String? thumbnail; // 预览缩略图（base64图片，适用需预览的content，如笔记、联系人名片）
   String? content;
+  String? contentType;
   String? sendReceiveTime; // 发送接收时间
+  int? unreadNumber;
 
-  Chat();
+  ChatSummary();
 
-  Chat.fromJson(Map json)
+  ChatSummary.fromJson(Map json)
       : ownerPeerId = json['ownerPeerId'],
         peerId = json['peerId'],
         partyType = json['partyType'],
+        messageId = json['messageId'],
+        messageType = json['messageType'],
+        subMessageType = json['subMessageType'],
+        avatar = json['avatar'],
         name = json['name'],
         title = json['title'],
         thumbBody = json['thumbBody'],
         thumbnail = json['thumbnail'],
         content = json['content'],
+        contentType = json['contentType'],
         sendReceiveTime = json['sendReceiveTime'],
+        unreadNumber = json['unreadNumber'],
         super.fromJson(json);
 
   @override
@@ -381,12 +392,18 @@ class Chat extends BaseEntity {
       'ownerPeerId': ownerPeerId,
       'peerId': peerId,
       'partyType': partyType,
+      'messageId': messageId,
+      'messageType': messageType,
+      'subMessageType': subMessageType,
+      'avatar': avatar,
       'name': name,
       'title': title,
       'thumbBody': thumbBody,
       'thumbnail': thumbnail,
       'content': content,
+      'contentType': contentType,
       'sendReceiveTime': sendReceiveTime,
+      'unreadNumber': unreadNumber,
     });
     return json;
   }

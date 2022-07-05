@@ -7,7 +7,6 @@ import '../../../../provider/index_widget_provider.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/data_group_listview.dart';
 import '../../../../widgets/common/data_listtile.dart';
-import '../../../../widgets/common/image_widget.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
 class PersonalInfoWidget extends StatefulWidget with TileDataMixin {
@@ -56,10 +55,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
       TileData(title: 'Setting'): [
         TileData(
           title: 'Avatar',
-          suffix: const ImageWidget(
-            width: 32.0,
-            height: 32.0,
-          ),
+          suffix: myself.avatar,
           routeName: 'avatar',
         ),
         TileData(

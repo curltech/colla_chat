@@ -6,32 +6,32 @@ import '../../../l10n/localization.dart';
 import '../../../provider/app_data_provider.dart';
 import '../../../routers/routes.dart';
 import '../../../service/dht/myselfpeer.dart';
-import '../../../widgets/common/input_field_widget.dart';
+import '../../../widgets/common/column_field_widget.dart';
 
-final List<InputFieldDef> p2pRegisterInputFieldDef = [
-  InputFieldDef(
+final List<ColumnFieldDef> p2pRegisterInputFieldDef = [
+  ColumnFieldDef(
       name: 'name',
       label: 'name',
       prefixIcon: const Icon(Icons.person),
       initValue: '胡劲松'),
-  InputFieldDef(
+  ColumnFieldDef(
       name: 'loginName',
       label: 'loginName',
       prefixIcon: const Icon(Icons.mobile_friendly),
       initValue: '13609619603'),
-  InputFieldDef(
+  ColumnFieldDef(
       name: 'email',
       label: 'email',
       prefixIcon: const Icon(Icons.email),
       initValue: 'hujs@colla.cc',
       textInputType: TextInputType.emailAddress),
-  InputFieldDef(
+  ColumnFieldDef(
       name: 'plainPassword',
       label: 'plainPassword',
       inputType: InputType.password,
       initValue: '123456',
       prefixIcon: const Icon(Icons.lock)),
-  InputFieldDef(
+  ColumnFieldDef(
       name: 'confirmPassword',
       label: 'confirmPassword',
       inputType: InputType.password,

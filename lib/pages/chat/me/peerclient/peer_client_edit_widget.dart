@@ -3,24 +3,24 @@ import 'package:flutter/material.dart';
 import '../../../../entity/dht/peerclient.dart';
 import '../../../../provider/data_list_controller.dart';
 import '../../../../widgets/common/app_bar_view.dart';
+import '../../../../widgets/common/column_field_widget.dart';
 import '../../../../widgets/common/form_input_widget.dart';
-import '../../../../widgets/common/input_field_widget.dart';
 import '../../../../widgets/common/keep_alive_wrapper.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
-final List<InputFieldDef> peerClientInputFieldDefs = [
-  InputFieldDef(
+final List<ColumnFieldDef> peerClientInputFieldDefs = [
+  ColumnFieldDef(
       name: 'name', label: 'name', prefixIcon: const Icon(Icons.person)),
-  InputFieldDef(
+  ColumnFieldDef(
       name: 'peerId',
       label: 'peerId',
       prefixIcon: const Icon(Icons.perm_identity)),
-  InputFieldDef(
+  ColumnFieldDef(
       name: 'email',
       label: 'email',
       prefixIcon: const Icon(Icons.email),
       textInputType: TextInputType.emailAddress),
-  InputFieldDef(
+  ColumnFieldDef(
       name: 'mobile',
       label: 'mobile',
       prefixIcon: const Icon(Icons.mobile_friendly)),

@@ -18,11 +18,11 @@ class TextMsg extends StatelessWidget {
       TextItemContainer(
         text: text ?? '文字为空',
         action: '',
-        isMyself: chatMessage.targetPeerId != myself.peerId,
+        isMyself: chatMessage.receiverPeerId != myself.peerId,
       ),
       Spacer(),
     ];
-    if (chatMessage.targetPeerId != myself.peerId) {
+    if (chatMessage.receiverPeerId != myself.peerId) {
       body = body.reversed.toList();
     } else {
       body = body;

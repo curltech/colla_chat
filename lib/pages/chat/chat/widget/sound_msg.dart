@@ -119,7 +119,7 @@ class _SoundMsgState extends State<SoundMsg> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    bool isSelf = widget.model.targetPeerId != myself.peerId;
+    bool isSelf = widget.model.receiverPeerId != myself.peerId;
     var soundImg;
     var leftSoundNames = [
       'assets/images/chat/sound_left_0.webp',
@@ -171,7 +171,7 @@ class _SoundMsgState extends State<SoundMsg> with TickerProviderStateMixin {
             ],
           ),
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-          color: widget.model.targetPeerId != myself.peerId
+          color: widget.model.receiverPeerId != myself.peerId
               ? Color(0xff98E165)
               : Colors.white,
           onPressed: () {
