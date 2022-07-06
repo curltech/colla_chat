@@ -64,7 +64,7 @@ class _PeerClientEditWidgetState extends State<PeerClientEditWidget> {
       onOk: (Map<String, dynamic> values) {
         _onOk(values);
       },
-      inputFieldDefs: peerClientColumnFieldDefs,
+      columnFieldDefs: peerClientColumnFieldDefs,
     );
     PeerClient? currentPeerClient = widget.controller.current;
     if (currentPeerClient != null) {

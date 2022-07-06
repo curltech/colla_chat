@@ -46,9 +46,10 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
       child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           child: FormInputWidget(
-              mainAxisAlignment: MainAxisAlignment.center,
-              inputFieldDefs: p2pRegisterInputFieldDef,
-              onOk: _login)),
+            mainAxisAlignment: MainAxisAlignment.center,
+            onOk: _login,
+            columnFieldDefs: p2pRegisterInputFieldDef,
+          )),
     ));
   }
 

@@ -82,7 +82,9 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget>
           Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15.0),
               child: FormInputWidget(
-                  inputFieldDefs: p2pRegisterInputFieldDef, onOk: _onOk)),
+                onOk: _onOk,
+                columnFieldDefs: p2pRegisterInputFieldDef,
+              )),
         ],
       ),
     ));

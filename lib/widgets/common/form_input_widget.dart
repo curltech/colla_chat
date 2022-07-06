@@ -6,22 +6,15 @@ import '../../tool/util.dart';
 import 'column_field_widget.dart';
 
 class FormInputController with ChangeNotifier {
-  //非文本框的值
-  Map<String, dynamic> values = {};
-  final Map<String, dynamic> flags = {};
-
-  //文本框的值
-  final Map<String, TextEditingController> controllers = {};
+  final Map<String, ColumnFieldController> controllers = {};
 
   FormInputController();
 
-  initController(String name, TextEditingController controller) {
+  setController(String name, ColumnFieldController controller) {
     controllers[name] = controller;
   }
 
   clear() {
-    values.clear();
-    flags.clear();
     for (var controller in controllers.values) {
       controller.clear();
     }
@@ -31,19 +24,16 @@ class FormInputController with ChangeNotifier {
   dynamic getValue(String name) {
     var controller = controllers[name];
     if (controller != null) {
-      return controller.text;
-    } else {
-      return values[name];
+      return controller.value;
     }
   }
 
   //所有值，合并文本框和非文本框
   dynamic getValues() {
     Map<String, dynamic> values = {};
-    values.addAll(this.values);
     for (var entry in controllers.entries) {
       String name = entry.key;
-      values[name] = entry.value.text;
+      values[name] = entry.value.value;
     }
     return values;
   }
@@ -52,10 +42,7 @@ class FormInputController with ChangeNotifier {
   changeValue(String name, dynamic value) {
     var controller = controllers[name];
     if (controller != null) {
-      controller.text = value;
-    } else {
-      values[name] = value;
-      notifyListeners();
+      controller.value = value;
     }
   }
 
@@ -63,44 +50,33 @@ class FormInputController with ChangeNotifier {
   setValue(String name, dynamic value) {
     var controller = controllers[name];
     if (controller != null) {
-      controller.text = value;
-    } else {
-      values[name] = value;
-      notifyListeners();
+      controller.value = value;
     }
   }
 
   setValues(Map<String, dynamic> values) {
-    for (var entry in values.entries) {
+    for (var entry in controllers.entries) {
       var name = entry.key;
-      var value = entry.value;
-      var controller = controllers[name];
-      if (controller != null) {
-        controller.text = value;
-      } else {
-        values[name] = value;
+      var value = values[name];
+      var controller = entry.value;
+      if (controller.value != value) {
+        controller.value = value;
       }
     }
-    if (values.isNotEmpty) {
-      notifyListeners();
-    }
   }
 
-  dynamic getFlag(String name) {
-    return flags[name];
-  }
-
-  changeFlag(String name, dynamic flag) {
-    if (flags[name] != flag) {
-      flags[name] = flag;
-      notifyListeners();
+  ///外部设置值
+  setMode(String name, ColumnFieldMode mode) {
+    var controller = controllers[name];
+    if (controller != null) {
+      controller.mode = mode;
     }
   }
 }
 
 class FormInputWidget extends StatelessWidget {
   //格式定义
-  final List<ColumnFieldDef> inputFieldDefs;
+  final List<ColumnFieldDef> columnFieldDefs;
   final Map<String, dynamic>? initValues;
   final FormInputController controller = FormInputController();
   final Function(Map<String, dynamic>) onOk;
@@ -109,7 +85,7 @@ class FormInputWidget extends StatelessWidget {
 
   FormInputWidget(
       {Key? key,
-      required this.inputFieldDefs,
+      required this.columnFieldDefs,
       this.initValues,
       required this.onOk,
       this.mainAxisAlignment = MainAxisAlignment.start,
@@ -117,10 +93,10 @@ class FormInputWidget extends StatelessWidget {
       : super(key: key);
 
   _adjustValues(Map<String, dynamic> values) {
-    for (var inputFieldDef in inputFieldDefs) {
-      String name = inputFieldDef.name;
+    for (var columnFieldDef in columnFieldDefs) {
+      String name = columnFieldDef.name;
       if (values.containsKey(name)) {
-        DataType dataType = inputFieldDef.dataType;
+        DataType dataType = columnFieldDef.dataType;
         dynamic value = values[name];
         if (value == null) {
           continue;
@@ -143,18 +119,21 @@ class FormInputWidget extends StatelessWidget {
   Widget _build(BuildContext context) {
     FormInputController controller = Provider.of<FormInputController>(context);
     List<Widget> children = [];
-    for (var inputFieldDef in inputFieldDefs) {
+    for (var columnFieldDef in columnFieldDefs) {
       children.add(SizedBox(
         height: spacing,
       ));
-      String name = inputFieldDef.name;
+      String name = columnFieldDef.name;
       dynamic initValue;
       if (initValues != null) {
         initValue = initValues![name];
       }
-      Widget inputFieldWidget =
-          InputFieldWidget(inputFieldDef: inputFieldDef, initValue: initValue);
-      children.add(inputFieldWidget);
+      Widget columnFieldWidget = ColumnFieldWidget(
+        columnFieldDef: columnFieldDef,
+        initValue: initValue,
+        mode: ColumnFieldMode.edit,
+      );
+      children.add(columnFieldWidget);
     }
     children.add(const SizedBox(
       height: 30.0,

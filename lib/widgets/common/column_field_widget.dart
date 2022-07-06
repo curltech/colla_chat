@@ -76,18 +76,123 @@ class ColumnFieldDef {
       this.onSort});
 }
 
+enum ColumnFieldMode { edit, show, label }
+
+class ColumnFieldController with ChangeNotifier {
+  //非文本框的值
+  dynamic _value;
+  dynamic _flag;
+
+  //文本框的值
+  TextEditingController? _controller;
+  late ColumnFieldMode _mode;
+
+  ColumnFieldController(
+      {dynamic value,
+      dynamic flag,
+      TextEditingController? controller,
+      ColumnFieldMode mode = ColumnFieldMode.label}) {
+    _value = value;
+    _flag = flag;
+    _controller = controller;
+    _mode = mode;
+  }
+
+  dynamic get value {
+    var controller = _controller;
+    if (controller != null) {
+      return controller.text;
+    } else {
+      return _value;
+    }
+  }
+
+  set value(dynamic value) {
+    var controller = _controller;
+    if (controller != null) {
+      controller.text = value;
+    } else {
+      if (_value != value) {
+        _value = value;
+        notifyListeners();
+      }
+    }
+  }
+
+  dynamic get flag {
+    return _flag;
+  }
+
+  set flag(dynamic flag) {
+    if (_flag != flag) {
+      _flag = flag;
+      notifyListeners();
+    }
+  }
+
+  ColumnFieldMode get mode {
+    return _mode;
+  }
+
+  set mode(ColumnFieldMode mode) {
+    if (_mode != mode) {
+      _mode = mode;
+      notifyListeners();
+    }
+  }
+
+  set controller(TextEditingController? controller) {
+    _controller = controller;
+  }
+
+  clear() {
+    var controller = _controller;
+    if (controller != null) {
+      controller.clear();
+    } else {
+      if (_value != null) {
+        _value = null;
+        notifyListeners();
+      }
+    }
+  }
+}
+
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
-class InputFieldWidget extends StatelessWidget {
-  final ColumnFieldDef inputFieldDef;
+class ColumnFieldWidget extends StatefulWidget {
+  final ColumnFieldDef columnFieldDef;
   final dynamic initValue;
+  late final ColumnFieldController controller;
 
-  const InputFieldWidget(
-      {Key? key, required this.inputFieldDef, this.initValue})
-      : super(key: key);
+  ColumnFieldWidget(
+      {Key? key,
+      required this.columnFieldDef,
+      this.initValue,
+      ColumnFieldMode mode = ColumnFieldMode.edit})
+      : super(key: key) {
+    controller = ColumnFieldController(mode: mode);
+  }
 
-  dynamic _getInitValue(BuildContext context, ColumnFieldDef inputDef) {
-    var dataType = inputDef.dataType;
-    dynamic v = initValue ?? inputDef.initValue;
+  @override
+  State<StatefulWidget> createState() {
+    return _ColumnFieldWidget();
+  }
+}
+
+class _ColumnFieldWidget extends State<ColumnFieldWidget> {
+  @override
+  initState() {
+    super.initState();
+    widget.controller.addListener(_update);
+  }
+
+  _update() {
+    setState(() {});
+  }
+
+  dynamic _getInitValue(BuildContext context) {
+    var dataType = widget.columnFieldDef.dataType;
+    dynamic v = widget.initValue ?? widget.columnFieldDef.initValue;
     if (dataType == DataType.set ||
         dataType == DataType.list ||
         dataType == DataType.map) {
@@ -103,18 +208,11 @@ class InputFieldWidget extends StatelessWidget {
     return v.toString();
   }
 
-  Widget? _buildLabel(BuildContext context, ColumnFieldDef inputDef) {
-    final label = inputDef.label;
-    dynamic value = _getInitValue(context, inputDef);
-
-    return Text(value);
-  }
-
-  Widget? _buildIcon(ColumnFieldDef inputDef) {
+  Widget? _buildIcon() {
     Widget? icon;
-    final avatar = inputDef.avatar;
-    if (inputDef.prefixIcon != null) {
-      icon = inputDef.prefixIcon;
+    final avatar = widget.columnFieldDef.avatar;
+    if (widget.columnFieldDef.prefixIcon != null) {
+      icon = widget.columnFieldDef.prefixIcon;
     } else if (avatar != null) {
       icon = Image.memory(Uint8List.fromList(avatar.codeUnits));
     }
@@ -122,57 +220,44 @@ class InputFieldWidget extends StatelessWidget {
     return icon;
   }
 
-  Widget _buildTextFormField(BuildContext context, ColumnFieldDef inputDef) {
+  Widget _buildLabel(BuildContext context) {
     FormInputController formInputController =
         Provider.of<FormInputController>(context);
-    var controller = TextEditingController();
-    var value = _getInitValue(context, inputDef);
-    controller.value = TextEditingValue(
-        text: value,
-        selection: TextSelection.fromPosition(TextPosition(
-            offset: value.length, affinity: TextAffinity.downstream)));
-    formInputController.initController(inputDef.name, controller);
-    Widget? suffix;
-    if (inputFieldDef.cancel) {
-      suffix = controller.text.isNotEmpty
-          ? IconButton(
-              //如果文本长度不为空则显示清除按钮
-              onPressed: () {
-                controller.clear();
-              },
-              icon: const Icon(Icons.cancel, color: Colors.grey))
-          : null;
-    }
-    var widget = TextFormField(
-      controller: controller,
-      keyboardType: inputFieldDef.textInputType,
-      maxLines: inputFieldDef.maxLines,
-      readOnly: inputFieldDef.readOnly,
-      decoration: InputDecoration(
-          labelText: AppLocalizations.t(inputDef.label),
-          prefixIcon: _buildIcon(inputDef),
-          suffixIcon: inputFieldDef.suffixIcon,
-          suffix: suffix,
-          hintText: inputDef.hintText),
-    );
+    widget.controller.controller = null;
+    formInputController.setController(
+        widget.columnFieldDef.name, widget.controller);
 
-    return widget;
+    dynamic value = _getInitValue(context);
+
+    return Text(value);
   }
 
-  Widget _buildPasswordField(BuildContext context, ColumnFieldDef inputDef) {
+  Widget _buildShowLabel(BuildContext context) {
     FormInputController formInputController =
         Provider.of<FormInputController>(context);
-    bool? pwdShow = formInputController.getFlag(inputDef.name);
-    pwdShow ??= false;
+    widget.controller.controller = null;
+    formInputController.setController(
+        widget.columnFieldDef.name, widget.controller);
+    final label = widget.columnFieldDef.label;
+    dynamic value = _getInitValue(context);
+
+    return Text(AppLocalizations.t(label) + ':' + value);
+  }
+
+  Widget _buildTextFormField(BuildContext context) {
+    FormInputController formInputController =
+        Provider.of<FormInputController>(context);
     var controller = TextEditingController();
-    var value = _getInitValue(context, inputDef);
+    var value = _getInitValue(context);
     controller.value = TextEditingValue(
         text: value,
         selection: TextSelection.fromPosition(TextPosition(
             offset: value.length, affinity: TextAffinity.downstream)));
-    formInputController.initController(inputDef.name, controller);
+    widget.controller.controller = controller;
+    var columnFieldDef = widget.columnFieldDef;
+    formInputController.setController(columnFieldDef.name, widget.controller);
     Widget? suffix;
-    if (inputFieldDef.cancel) {
+    if (columnFieldDef.cancel) {
       suffix = controller.text.isNotEmpty
           ? IconButton(
               //如果文本长度不为空则显示清除按钮
@@ -182,39 +267,83 @@ class InputFieldWidget extends StatelessWidget {
               icon: const Icon(Icons.cancel, color: Colors.grey))
           : null;
     }
-    var widget = TextFormField(
+    var textFormField = TextFormField(
       controller: controller,
-      keyboardType: inputFieldDef.textInputType,
+      keyboardType: columnFieldDef.textInputType,
+      maxLines: columnFieldDef.maxLines,
+      readOnly: columnFieldDef.readOnly,
+      decoration: InputDecoration(
+          labelText: AppLocalizations.t(columnFieldDef.label),
+          prefixIcon: _buildIcon(),
+          suffixIcon: columnFieldDef.suffixIcon,
+          suffix: suffix,
+          hintText: columnFieldDef.hintText),
+    );
+
+    return textFormField;
+  }
+
+  Widget _buildPasswordField(BuildContext context) {
+    FormInputController formInputController =
+        Provider.of<FormInputController>(context);
+    bool? pwdShow = widget.controller.flag;
+    pwdShow ??= false;
+    var controller = TextEditingController();
+    var value = _getInitValue(context);
+    controller.value = TextEditingValue(
+        text: value,
+        selection: TextSelection.fromPosition(TextPosition(
+            offset: value.length, affinity: TextAffinity.downstream)));
+    widget.controller.controller = controller;
+    var columnFieldDef = widget.columnFieldDef;
+    formInputController.setController(columnFieldDef.name, widget.controller);
+    Widget? suffix;
+    if (columnFieldDef.cancel) {
+      suffix = controller.text.isNotEmpty
+          ? IconButton(
+              //如果文本长度不为空则显示清除按钮
+              onPressed: () {
+                controller.clear();
+              },
+              icon: const Icon(Icons.cancel, color: Colors.grey))
+          : null;
+    }
+    var textFormField = TextFormField(
+      controller: controller,
+      keyboardType: columnFieldDef.textInputType,
       obscureText: !pwdShow,
       decoration: InputDecoration(
-          labelText: AppLocalizations.t(inputDef.label),
-          prefixIcon: _buildIcon(inputDef),
+          labelText: AppLocalizations.t(columnFieldDef.label),
+          prefixIcon: _buildIcon(),
           suffixIcon: IconButton(
             icon: Icon(pwdShow ? Icons.visibility : Icons.visibility_off),
             onPressed: () {
-              formInputController.changeFlag(inputDef.name, !pwdShow!);
+              widget.controller.flag = !pwdShow!;
             },
           ),
           suffix: suffix,
-          hintText: inputDef.hintText),
+          hintText: columnFieldDef.hintText),
     );
-    return widget;
+    return textFormField;
   }
 
-  Widget _buildRadioField(BuildContext context, ColumnFieldDef inputDef) {
+  Widget _buildRadioField(BuildContext context) {
     FormInputController formInputController =
         Provider.of<FormInputController>(context);
-    var options = inputDef.options;
+    widget.controller.controller = null;
+    var columnFieldDef = widget.columnFieldDef;
+    formInputController.setController(columnFieldDef.name, widget.controller);
+    var options = columnFieldDef.options;
     List<Widget> children = [];
     if (options != null && options.isNotEmpty) {
       for (var i = 0; i < options.length; ++i) {
         var option = options[i];
         var radio = Radio<String>(
           onChanged: (String? value) {
-            formInputController.setValue(inputDef.name, value);
+            widget.controller.value = value;
           },
           value: option.value,
-          groupValue: _getInitValue(context, inputDef),
+          groupValue: _getInitValue(context),
         );
         var row = Row(
           children: [radio, Text(option.label)],
@@ -226,15 +355,18 @@ class InputFieldWidget extends StatelessWidget {
     return Column(children: children);
   }
 
-  Widget _buildCheckboxField(BuildContext context, ColumnFieldDef inputDef) {
+  Widget _buildCheckboxField(BuildContext context) {
     FormInputController formInputController =
         Provider.of<FormInputController>(context);
-    var options = inputDef.options;
+    widget.controller.controller = null;
+    var columnFieldDef = widget.columnFieldDef;
+    formInputController.setController(columnFieldDef.name, widget.controller);
+    var options = columnFieldDef.options;
     List<Widget> children = [];
     if (options != null && options.isNotEmpty) {
       for (var i = 0; i < options.length; ++i) {
         var option = options[i];
-        Set<String>? value = _getInitValue(context, inputDef);
+        Set<String>? value = _getInitValue(context);
         value ??= <String>{};
         var checkbox = Checkbox(
           onChanged: (bool? selected) {
@@ -245,7 +377,7 @@ class InputFieldWidget extends StatelessWidget {
                 value.add(option.value);
               }
             }
-            formInputController.setValue(inputDef.name, value);
+            widget.controller.value = value;
           },
           value: value.contains(option.value),
         );
@@ -259,15 +391,18 @@ class InputFieldWidget extends StatelessWidget {
     return Column(children: children);
   }
 
-  Widget _buildSwitchField(BuildContext context, ColumnFieldDef inputDef) {
+  Widget _buildSwitchField(BuildContext context) {
     FormInputController formInputController =
         Provider.of<FormInputController>(context);
-    var options = inputDef.options;
+    widget.controller.controller = null;
+    var columnFieldDef = widget.columnFieldDef;
+    formInputController.setController(columnFieldDef.name, widget.controller);
+    var options = columnFieldDef.options;
     List<Widget> children = [];
     if (options != null && options.isNotEmpty) {
       for (var i = 0; i < options.length; ++i) {
         var option = options[i];
-        Set<String>? value = _getInitValue(context, inputDef);
+        Set<String>? value = _getInitValue(context);
         value ??= <String>{};
         var checkbox = Switch(
           onChanged: (bool? selected) {
@@ -278,7 +413,7 @@ class InputFieldWidget extends StatelessWidget {
                 value.add(option.value);
               }
             }
-            formInputController.setValue(inputDef.name, value);
+            widget.controller.value = value;
           },
           value: value.contains(option.value),
         );
@@ -292,10 +427,13 @@ class InputFieldWidget extends StatelessWidget {
     return Column(children: children);
   }
 
-  Widget _buildDropdownButton(BuildContext context, ColumnFieldDef inputDef) {
+  Widget _buildDropdownButton(BuildContext context) {
     FormInputController formInputController =
         Provider.of<FormInputController>(context);
-    var options = inputDef.options;
+    widget.controller.controller = null;
+    var columnFieldDef = widget.columnFieldDef;
+    formInputController.setController(columnFieldDef.name, widget.controller);
+    var options = columnFieldDef.options;
     List<DropdownMenuItem<String>> children = [];
     if (options != null && options.isNotEmpty) {
       for (var i = 0; i < options.length; ++i) {
@@ -310,25 +448,27 @@ class InputFieldWidget extends StatelessWidget {
     var dropdownButton = DropdownButton<String>(
       items: children,
       onChanged: (String? value) {
-        formInputController.setValue(inputDef.name, value);
+        widget.controller.value = value;
       },
     );
 
     return dropdownButton;
   }
 
-  Widget _buildInputDate(BuildContext context, ColumnFieldDef inputDef) {
+  Widget _buildInputDate(BuildContext context) {
     FormInputController formInputController =
         Provider.of<FormInputController>(context);
     var controller = TextEditingController();
-    var value = _getInitValue(context, inputDef);
+    var value = _getInitValue(context);
     controller.value = TextEditingValue(
         text: value,
         selection: TextSelection.fromPosition(TextPosition(
             offset: value.length, affinity: TextAffinity.downstream)));
-    formInputController.initController(inputDef.name, controller);
+    widget.controller.controller = controller;
+    var columnFieldDef = widget.columnFieldDef;
+    formInputController.setController(columnFieldDef.name, widget.controller);
     Widget? suffix;
-    if (inputFieldDef.cancel) {
+    if (columnFieldDef.cancel) {
       suffix = controller.text.isNotEmpty
           ? IconButton(
               //如果文本长度不为空则显示清除按钮
@@ -338,20 +478,20 @@ class InputFieldWidget extends StatelessWidget {
               icon: const Icon(Icons.cancel, color: Colors.grey))
           : null;
     }
-    var widget = TextFormField(
+    var textFormField = TextFormField(
       controller: controller,
-      keyboardType: inputFieldDef.textInputType,
+      keyboardType: columnFieldDef.textInputType,
       readOnly: true,
       decoration: InputDecoration(
-          labelText: AppLocalizations.t(inputDef.label),
-          prefixIcon: _buildIcon(inputDef),
+          labelText: AppLocalizations.t(columnFieldDef.label),
+          prefixIcon: _buildIcon(),
           suffixIcon:
               IconButton(icon: const Icon(Icons.date_range), onPressed: () {}),
           suffix: suffix,
-          hintText: inputDef.hintText),
+          hintText: columnFieldDef.hintText),
     );
 
-    return widget;
+    return textFormField;
   }
 
   _showDatePicker(BuildContext context, TextEditingController controller) {
@@ -428,11 +568,15 @@ class InputFieldWidget extends StatelessWidget {
 
   CalendarDatePicker _calendarDatePicker(DatePickerMode mode) {
     return CalendarDatePicker(
-        initialDate: DateTime.now(), // 初始化选中日期
+        initialDate: DateTime.now(),
+        // 初始化选中日期
         currentDate: DateTime(2020, 10, 18),
-        firstDate: DateTime(2020, 9, 10), // 开始日期
-        lastDate: DateTime(2022, 9, 10), // 结束日期
-        initialCalendarMode: mode, // 日期选择样式
+        firstDate: DateTime(2020, 9, 10),
+        // 开始日期
+        lastDate: DateTime(2022, 9, 10),
+        // 结束日期
+        initialCalendarMode: mode,
+        // 日期选择样式
         // 选中日期改变回调函数
         onDateChanged: (dateTime) {
           logger.i("onDateChanged $dateTime");
@@ -454,18 +598,33 @@ class InputFieldWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget widget;
-    var inputType = inputFieldDef.inputType;
-    switch (inputType) {
-      case InputType.text:
-        widget = _buildTextFormField(context, inputFieldDef);
-        break;
-      case InputType.password:
-        widget = _buildPasswordField(context, inputFieldDef);
-        break;
-      default:
-        widget = _buildTextFormField(context, inputFieldDef);
+    Widget columnFieldWidget;
+    var mode = widget.controller.mode;
+    if (mode == ColumnFieldMode.label) {
+      columnFieldWidget = _buildLabel(context);
+    } else if (mode == ColumnFieldMode.show) {
+      columnFieldWidget = _buildLabel(context);
+    } else if (mode == ColumnFieldMode.edit) {
+      var inputType = widget.columnFieldDef.inputType;
+      switch (inputType) {
+        case InputType.text:
+          columnFieldWidget = _buildTextFormField(context);
+          break;
+        case InputType.password:
+          columnFieldWidget = _buildPasswordField(context);
+          break;
+        default:
+          columnFieldWidget = _buildTextFormField(context);
+      }
+    } else {
+      columnFieldWidget = _buildTextFormField(context);
     }
-    return widget;
+    return columnFieldWidget;
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_update);
+    super.dispose();
   }
 }
