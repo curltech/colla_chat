@@ -17,7 +17,8 @@ enum InputType {
   select,
   textarea,
   date,
-  time
+  time,
+  custom
 }
 
 enum DataType { int, double, string, bool, date, set, list, map }
@@ -56,6 +57,8 @@ class ColumnFieldDef {
 
   Function(int, bool)? onSort;
 
+  final Widget? customWidget;
+
   ColumnFieldDef(
       {required this.name,
       required this.label,
@@ -73,10 +76,11 @@ class ColumnFieldDef {
       this.options,
       this.validator,
       this.autoValidate = false,
-      this.onSort});
+      this.onSort,
+      this.customWidget});
 }
 
-enum ColumnFieldMode { edit, show, label }
+enum ColumnFieldMode { edit, show, label, custom }
 
 class ColumnFieldController with ChangeNotifier {
   //非文本框的值
@@ -600,6 +604,13 @@ class _ColumnFieldWidget extends State<ColumnFieldWidget> {
   Widget build(BuildContext context) {
     Widget columnFieldWidget;
     var mode = widget.controller.mode;
+    if (mode == ColumnFieldMode.custom) {
+      var customWidget = widget.columnFieldDef.customWidget;
+      if (customWidget != null) {
+        columnFieldWidget = customWidget;
+        return columnFieldWidget;
+      }
+    }
     if (mode == ColumnFieldMode.label) {
       columnFieldWidget = _buildLabel(context);
     } else if (mode == ColumnFieldMode.show) {
