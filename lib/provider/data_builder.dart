@@ -27,19 +27,19 @@ class DataBuilder {
           await cryptoGraphy.generateKeyPair(keyPairType: 'x25519');
       peerClient.publicKey = await cryptoGraphy.exportPublicKey(keyPair);
       peerClient.name = 'PeerClient$i';
-      PeerClientService.instance.insert(peerClient);
+      peerClientService.insert(peerClient);
 
       if (i % 3 == 0) {
         Linkman linkman =
             Linkman(myself.peerId ?? '', peerClient.peerId!, peerClient.name);
-        await LinkmanService.instance.insert(linkman);
+        await linkmanService.insert(linkman);
         linkmen.add(linkman);
 
         ChatSummary chatSummary = ChatSummary(myself.peerId ?? '');
         chatSummary.peerId = linkman.peerId;
         chatSummary.name = linkman.name;
         chatSummary.partyType = PartyType.linkman.name;
-        await ChatSummaryService.instance.insert(chatSummary);
+        await chatSummaryService.insert(chatSummary);
       }
     }
 
@@ -59,14 +59,14 @@ class DataBuilder {
       Group group = Group(myself.peerId ?? '', peerId, name);
       group.publicKey = publicKey;
       group.peerPublicKey = peerPublicKey;
-      await GroupService.instance.insert(group);
+      await groupService.insert(group);
       groups.add(group);
 
       ChatSummary chatSummary = ChatSummary(myself.peerId ?? '');
       chatSummary.peerId = group.peerId;
       chatSummary.name = group.name;
       chatSummary.partyType = PartyType.group.name;
-      await ChatSummaryService.instance.insert(chatSummary);
+      await chatSummaryService.insert(chatSummary);
 
       for (var j = 0; j < 3; ++j) {
         ///每个群分别有3，4，5个成员
@@ -78,14 +78,14 @@ class DataBuilder {
         } else {
           groupMember.memberType = MemberType.member.name;
         }
-        await GroupMemberService.instance.insert(groupMember);
+        await groupMemberService.insert(groupMember);
       }
 
       GroupMember groupMember = GroupMember(myself.peerId ?? '');
       groupMember.groupId = group.peerId;
       groupMember.memberPeerId = myself.peerId;
       groupMember.memberType = MemberType.member.name;
-      await GroupMemberService.instance.insert(groupMember);
+      await groupMemberService.insert(groupMember);
     }
 
     /// 100条消息
@@ -108,9 +108,9 @@ class DataBuilder {
           chatMessage.receiverType = PartyType.linkman.name;
         }
         chatMessage.sendTime = DateUtil.currentDate();
-        await ChatMessageService.instance.insert(chatMessage);
-        ChatSummary? chatSummary = await ChatSummaryService.instance
-            .findByPeerId(chatMessage.receiverPeerId!);
+        await chatMessageService.insert(chatMessage);
+        ChatSummary? chatSummary =
+            await chatSummaryService.findByPeerId(chatMessage.receiverPeerId!);
         if (chatSummary != null) {
           chatSummary.messageId = chatMessage.messageId;
           chatSummary.messageType = chatMessage.messageType;
@@ -120,7 +120,7 @@ class DataBuilder {
           chatSummary.sendReceiveTime = chatMessage.sendTime;
           var unreadNumber = chatSummary.unreadNumber;
           chatSummary.unreadNumber = unreadNumber + 1;
-          await ChatSummaryService.instance.update(chatSummary);
+          await chatSummaryService.update(chatSummary);
         }
       } else {
         chatMessage.direct = ChatDirect.receive.name;
@@ -132,10 +132,10 @@ class DataBuilder {
           chatMessage.receiverType = PartyType.linkman.name;
         }
         chatMessage.receiveTime = DateUtil.currentDate();
-        await ChatMessageService.instance.insert(chatMessage);
+        await chatMessageService.insert(chatMessage);
 
-        ChatSummary? chatSummary = await ChatSummaryService.instance
-            .findByPeerId(chatMessage.senderPeerId!);
+        ChatSummary? chatSummary =
+            await chatSummaryService.findByPeerId(chatMessage.senderPeerId!);
         if (chatSummary != null) {
           chatSummary.messageId = chatMessage.messageId;
           chatSummary.messageType = chatMessage.messageType;
@@ -145,7 +145,7 @@ class DataBuilder {
           chatSummary.sendReceiveTime = chatMessage.receiveTime;
           var unreadNumber = chatSummary.unreadNumber;
           chatSummary.unreadNumber = unreadNumber + 1;
-          await ChatSummaryService.instance.update(chatSummary);
+          await chatSummaryService.update(chatSummary);
         }
       }
     }

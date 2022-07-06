@@ -11,7 +11,7 @@ import './condition_import/unsupport.dart'
     if (dart.library.io) './condition_import/desktop.dart' as sqlite3_open;
 import '../constant/base.dart';
 import '../provider/app_data_provider.dart';
-import '../service/base.dart';
+import '../service/general_base.dart';
 import '../service/servicelocator.dart';
 import 'datastore.dart';
 
@@ -43,12 +43,12 @@ class Sqlite3 extends DataStore {
 
   init(CommonDatabase db) {
     if (db.userVersion == 0) {
-      for (BaseService service in ServiceLocator.services.values) {
+      for (GeneralBaseService service in ServiceLocator.services.values) {
         instance.create(service.tableName, service.fields, service.indexFields);
       }
       db.userVersion = 1;
     }
-    for (BaseService service in ServiceLocator.services.values) {
+    for (GeneralBaseService service in ServiceLocator.services.values) {
       service.dataStore = instance;
     }
   }
@@ -149,7 +149,8 @@ class Sqlite3 extends DataStore {
         orderBy: orderBy,
         limit: limit,
         offset: offset);
-    var results = db.select(clause, whereArgs!);
+    whereArgs ??= [];
+    var results = db.select(clause, whereArgs);
     logger.i('execute sql:$clause');
     logger.i('execute sql params:$whereArgs');
 
@@ -181,7 +182,7 @@ class Sqlite3 extends DataStore {
     var totalResults = db.select(clause, whereArgs!);
     logger.i('execute sql:$clause');
     logger.i('execute sql params:$whereArgs');
-    var total = TypeUtil.firstIntValue(totalResults);
+    var rowsNumber = TypeUtil.firstIntValue(totalResults);
     var results = await find(table,
         distinct: distinct,
         columns: columns,
@@ -194,7 +195,10 @@ class Sqlite3 extends DataStore {
         offset: offset);
 
     Pagination page = Pagination(
-        data: results, rowsNumber: total, offset: offset, rowsPerPage: limit);
+        data: results,
+        rowsNumber: rowsNumber,
+        offset: offset,
+        rowsPerPage: limit);
 
     return page;
   }

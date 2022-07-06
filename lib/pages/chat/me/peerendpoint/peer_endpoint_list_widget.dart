@@ -23,7 +23,7 @@ class PeerEndpointController extends DataListController<PeerEndpoint> {
   }
 
   init() {
-    PeerEndpointService.instance
+    peerEndpointService
         .findAllPeerEndpoint()
         .then((List<PeerEndpoint> peerEndpoints) {
       if (peerEndpoints.isNotEmpty) {
@@ -41,7 +41,7 @@ class PeerEndpointController extends DataListController<PeerEndpoint> {
               nodeAddressOption.libp2pConnectAddress;
           peerEndpoint.iceServers =
               JsonUtil.toJsonString(nodeAddressOption.iceServers);
-          PeerEndpointService.instance.insert(peerEndpoint);
+          peerEndpointService.insert(peerEndpoint);
           data.add(peerEndpoint);
         }
         notifyListeners();
@@ -73,7 +73,7 @@ class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
       IconButton(
           onPressed: () {
             var current = controller.current;
-            PeerEndpointService.instance.delete(current);
+            peerEndpointService.delete(current);
             controller.delete();
           },
           icon: const Icon(Icons.delete),

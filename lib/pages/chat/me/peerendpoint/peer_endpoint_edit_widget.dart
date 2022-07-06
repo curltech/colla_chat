@@ -79,7 +79,7 @@ class _PeerEndpointEditWidgetState extends State<PeerEndpointEditWidget> {
 
   _onOk(Map<String, dynamic> values) {
     PeerEndpoint currentPeerEndpoint = PeerEndpoint.fromJson(values);
-    PeerEndpointService.instance.upsert(currentPeerEndpoint).then((count) {
+    peerEndpointService.upsert(currentPeerEndpoint).then((count) {
       widget.controller.update(currentPeerEndpoint);
     });
   }

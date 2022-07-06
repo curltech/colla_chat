@@ -2,6 +2,7 @@ import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/dht/myself.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
+import 'package:colla_chat/service/servicelocator.dart';
 
 import '../../crypto/util.dart';
 import '../../entity/base.dart';
@@ -12,34 +13,20 @@ import '../../entity/dht/peerclient.dart';
 import '../../entity/dht/peerprofile.dart';
 import '../../p2p/chain/action/connect.dart';
 import '../../platform.dart';
-import '../../service/base.dart';
 import '../../tool/util.dart';
 import 'base.dart';
 
-class MyselfPeerService extends PeerEntityService {
-  static final MyselfPeerService _instance = MyselfPeerService();
-  static bool initStatus = false;
-
-  static MyselfPeerService get instance {
-    if (!initStatus) {
-      throw 'please init!';
-    }
-    return _instance;
+class MyselfPeerService extends PeerEntityService<MyselfPeer> {
+  MyselfPeerService(
+      {required super.tableName,
+      required super.fields,
+      required super.indexFields}) {
+    post = (Map map) {
+      return MyselfPeer.fromJson(map);
+    };
   }
 
-  static Future<MyselfPeerService> init(
-      {required String tableName,
-      required List<String> fields,
-      List<String>? indexFields}) async {
-    if (!initStatus) {
-      await BaseService.init(_instance,
-          tableName: tableName, fields: fields, indexFields: indexFields);
-      initStatus = true;
-    }
-    return _instance;
-  }
-
-  Future<Map?> findOneByLogin(String credential) async {
+  Future<MyselfPeer?> findOneByLogin(String credential) async {
     var where = '(peerId=? or mobile=? or name=? or email=?) and status=?';
     var whereArgs = [
       credential,
@@ -50,7 +37,7 @@ class MyselfPeerService extends PeerEntityService {
     ];
     var peer = await findOne(where: where, whereArgs: whereArgs);
 
-    return peer;
+    return peer as MyselfPeer;
   }
 
   /// 注册新的p2p账户
@@ -132,10 +119,9 @@ class MyselfPeerService extends PeerEntityService {
   /// 登录，验证本地账户，连接p2p服务节点，注册成功
   Future<bool> login(String credential, String password) async {
     ///本地查找账户
-    var peer = await myselfPeerService.findOneByLogin(credential);
-    if (peer != null) {
+    var myselfPeer = await myselfPeerService.findOneByLogin(credential);
+    if (myselfPeer != null) {
       /// 1.验证账户与密码匹配
-      var myselfPeer = MyselfPeer.fromJson(peer);
       var loginStatus = await myselfService.setMyself(myselfPeer, password);
 
       if (loginStatus) {
@@ -169,7 +155,7 @@ class MyselfPeerService extends PeerEntityService {
     var peer = await myselfPeerService.findOneEffectiveByPeerId(peerId);
     if (peer != null) {
       /// 1.验证账户与密码匹配
-      var myselfPeer = MyselfPeer.fromJson(peer);
+      var myselfPeer = peer as MyselfPeer;
       myselfService.clear();
       logoutStatus = true;
 
@@ -189,4 +175,15 @@ class MyselfPeerService extends PeerEntityService {
   }
 }
 
-final myselfPeerService = MyselfPeerService.instance;
+final myselfPeerService = MyselfPeerService(
+    tableName: "blc_myselfpeer",
+    indexFields: [
+      'endDate',
+      'peerId',
+      'name',
+      'mobile',
+      'email',
+      'status',
+      'updateDate'
+    ],
+    fields: ServiceLocator.buildFields(MyselfPeer(''), []));

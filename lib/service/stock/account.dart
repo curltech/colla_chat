@@ -1,31 +1,18 @@
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/service/general_base.dart';
 
 import '../../entity/stock/account.dart';
-import '../../service/base.dart';
 import '../../tool/util.dart';
-import '../base.dart';
+import '../servicelocator.dart';
 
-class StockAccountService extends BaseService {
-  static final StockAccountService _instance = StockAccountService();
-  static bool initStatus = false;
-
-  static StockAccountService get instance {
-    if (!initStatus) {
-      throw 'please init!';
-    }
-    return _instance;
-  }
-
-  static Future<StockAccountService> init(
-      {required String tableName,
-      required List<String> fields,
-      List<String>? indexFields}) async {
-    if (!initStatus) {
-      await BaseService.init(_instance,
-          tableName: tableName, fields: fields, indexFields: indexFields);
-      initStatus = true;
-    }
-    return _instance;
+class StockAccountService extends GeneralBaseService<StockAccount> {
+  StockAccountService(
+      {required super.tableName,
+      required super.fields,
+      required super.indexFields}) {
+    post = (Map map) {
+      return StockAccount.fromJson(map);
+    };
   }
 
   /// 根据用户的信息查询本地是否存在账号，存在更新账号信息，不存在，创建新的账号
@@ -59,4 +46,7 @@ class StockAccountService extends BaseService {
   }
 }
 
-final stockAccountService = StockAccountService.instance;
+final stockAccountService = StockAccountService(
+    tableName: 'stk_account',
+    fields: ServiceLocator.buildFields(StockAccount(), []),
+    indexFields: ['accountId', 'accountName', 'status', 'updateDate']);

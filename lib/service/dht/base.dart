@@ -1,8 +1,14 @@
-import '../../entity/base.dart';
-import '../base.dart';
+import 'package:colla_chat/service/general_base.dart';
 
-abstract class PeerLocationService extends BaseService {
-  Future<List<Map>> findByPeerId(String peerId) async {
+import '../../entity/base.dart';
+
+abstract class PeerLocationService<T> extends GeneralBaseService<T> {
+  PeerLocationService(
+      {required super.tableName,
+      required super.fields,
+      required super.indexFields});
+
+  Future<List<T>> findByPeerId(String peerId) async {
     var where = 'peerId = ?';
     var whereArgs = [peerId];
     var peers = await find(where: where, whereArgs: whereArgs);
@@ -10,20 +16,16 @@ abstract class PeerLocationService extends BaseService {
     return peers;
   }
 
-  Future<Map?> findOneEffectiveByPeerId(String peerId) async {
-    var peers = await findByPeerId(peerId);
-    if (peers.isNotEmpty) {
-      for (var peer in peers) {
-        if (peer['status'] == EntityStatus.Effective.name) {
-          return peer;
-        }
-      }
-    }
+  Future<T?> findOneEffectiveByPeerId(String peerId) async {
+    var where = 'peerId = ? and status=?';
+    var whereArgs = [peerId, EntityStatus.Effective.name];
 
-    return null;
+    var peer = await findOne(where: where, whereArgs: whereArgs);
+
+    return peer;
   }
 
-  Future<List<Map>> findByName(String name) async {
+  Future<List<T>> findByName(String name) async {
     var where = 'name = ?';
     var whereArgs = [name];
     var peers = await find(where: where, whereArgs: whereArgs);
@@ -31,22 +33,23 @@ abstract class PeerLocationService extends BaseService {
     return peers;
   }
 
-  Future<Map?> findOneEffectiveByName(String name) async {
-    var peers = await findByName(name);
-    if (peers.isNotEmpty) {
-      for (var peer in peers) {
-        if (peer['status'] == EntityStatus.Effective.name) {
-          return peer;
-        }
-      }
-    }
+  Future<T?> findOneEffectiveByName(String name) async {
+    var where = 'name = ? and status=?';
+    var whereArgs = [name, EntityStatus.Effective.name];
 
-    return null;
+    var peer = await findOne(where: where, whereArgs: whereArgs);
+
+    return peer;
   }
 }
 
-abstract class PeerEntityService extends PeerLocationService {
-  Future<List<Map>> findByMobile(String mobile) async {
+abstract class PeerEntityService<T> extends PeerLocationService<T> {
+  PeerEntityService(
+      {required super.tableName,
+      required super.fields,
+      required super.indexFields});
+
+  Future<List<T>> findByMobile(String mobile) async {
     var where = 'mobile = ?';
     var whereArgs = [mobile];
     var peers = await find(where: where, whereArgs: whereArgs);
@@ -54,20 +57,15 @@ abstract class PeerEntityService extends PeerLocationService {
     return peers;
   }
 
-  Future<Map?> findOneEffectiveByMobile(String mobile) async {
-    var peers = await findByMobile(mobile);
-    if (peers.isNotEmpty) {
-      for (var peer in peers) {
-        if (peer['status'] == EntityStatus.Effective.name) {
-          return peer;
-        }
-      }
-    }
+  Future<T?> findOneEffectiveByMobile(String mobile) async {
+    var where = 'mobile = ? and status=?';
+    var whereArgs = [mobile, EntityStatus.Effective.name];
+    var peer = await findOne(where: where, whereArgs: whereArgs);
 
-    return null;
+    return peer;
   }
 
-  Future<List<Map>> findByEmail(String email) async {
+  Future<List<T>> findByEmail(String email) async {
     var where = 'mail = ?';
     var whereArgs = [email];
     var peers = await find(where: where, whereArgs: whereArgs);
@@ -75,16 +73,11 @@ abstract class PeerEntityService extends PeerLocationService {
     return peers;
   }
 
-  Future<Map?> findOneEffectiveByEmail(String email) async {
-    var peers = await findByEmail(email);
-    if (peers.isNotEmpty) {
-      for (var peer in peers) {
-        if (peer['status'] == EntityStatus.Effective.name) {
-          return peer;
-        }
-      }
-    }
+  Future<T?> findOneEffectiveByEmail(String email) async {
+    var where = 'mail = ? and status=?';
+    var whereArgs = [email, EntityStatus.Effective.name];
+    var peer = await findOne(where: where, whereArgs: whereArgs);
 
-    return null;
+    return peer;
   }
 }

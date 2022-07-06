@@ -1,34 +1,21 @@
+import 'package:colla_chat/service/servicelocator.dart';
 import 'package:cryptography/cryptography.dart';
 
 import '../../entity/dht/peerclient.dart';
-import '../base.dart';
 import 'base.dart';
 
-class PeerClientService extends PeerEntityService {
-  static final PeerClientService _instance = PeerClientService();
-  static bool initStatus = false;
-
-  static PeerClientService get instance {
-    if (!initStatus) {
-      throw 'please init!';
-    }
-    return _instance;
-  }
-
-  static Future<PeerClientService> init(
-      {required String tableName,
-      required List<String> fields,
-      List<String>? indexFields}) async {
-    if (!initStatus) {
-      await BaseService.init(_instance,
-          tableName: tableName, fields: fields, indexFields: indexFields);
-      initStatus = true;
-    }
-    return _instance;
-  }
-
+class PeerClientService extends PeerEntityService<PeerClient> {
   var peerClients = <String, PeerClient>{};
   var publicKeys = <String, SimplePublicKey>{};
+
+  PeerClientService(
+      {required super.tableName,
+      required super.fields,
+      required super.indexFields}) {
+    post = (Map map) {
+      return PeerClient.fromJson(map);
+    };
+  }
 
   Future<SimplePublicKey?> getPublicKey(String peerId) async {
     var peerClient = getPeerClientFromCache(peerId);
@@ -63,4 +50,7 @@ class PeerClientService extends PeerEntityService {
 // }
 }
 
-final peerClientService = PeerClientService.instance;
+final peerClientService = PeerClientService(
+    tableName: "blc_peerclient",
+    indexFields: ['peerId', 'name', 'mobile'],
+    fields: ServiceLocator.buildFields(PeerClient(''), []));

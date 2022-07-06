@@ -1,205 +1,168 @@
+import 'package:colla_chat/service/servicelocator.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as flutter_contacts;
 
 import '../../entity/chat/contact.dart';
 import '../../entity/dht/peerclient.dart';
 import '../../tool/util.dart';
-import '../base.dart';
 import '../dht/peerclient.dart';
+import '../general_base.dart';
 
-abstract class PartyService extends BaseService {}
+abstract class PartyService<T> extends GeneralBaseService<T> {
+  PartyService(
+      {required super.tableName,
+      required super.fields,
+      required super.indexFields});
+}
 
-class LinkmanService extends PartyService {
-  static final LinkmanService _instance = LinkmanService();
-  static bool initStatus = false;
-
-  static LinkmanService get instance {
-    if (!initStatus) {
-      throw 'please init!';
-    }
-    return _instance;
-  }
-
-  static Future<LinkmanService> init(
-      {required String tableName,
-      required List<String> fields,
-      List<String>? indexFields}) async {
-    if (!initStatus) {
-      await BaseService.init(_instance,
-          tableName: tableName, fields: fields, indexFields: indexFields);
-      initStatus = true;
-    }
-    return _instance;
+class LinkmanService extends PartyService<Linkman> {
+  LinkmanService(
+      {required super.tableName,
+      required super.fields,
+      required super.indexFields}) {
+    post = (Map map) {
+      return Linkman.fromJson(map);
+    };
   }
 
   Future<List<Linkman>> search(String key) async {
     var where = 'peerId=? or mobile=? or name=? or pyName=? or mail=?';
     var whereArgs = [key, key, key, key, key];
-    var linkmen_ =
-        await find(where: where, whereArgs: whereArgs, orderBy: 'pyName');
-    List<Linkman> linkmen = [];
-    if (linkmen_.isNotEmpty) {
-      for (var linkman_ in linkmen_) {
-        var linkman = Linkman.fromJson(linkman_);
-        linkmen.add(linkman);
-      }
-    }
+    var linkmen = await find(
+      where: where,
+      whereArgs: whereArgs,
+      orderBy: 'pyName',
+    );
     return linkmen;
   }
 
   Future<List<Linkman>> findAllLinkmen() async {
-    var linkmen_ = await find(orderBy: 'pyName');
-    List<Linkman> linkmen = [];
-    if (linkmen_.isNotEmpty) {
-      for (var linkman_ in linkmen_) {
-        var linkman = Linkman.fromJson(linkman_);
-        linkmen.add(linkman);
-      }
-    }
+    var linkmen = await find(
+      orderBy: 'pyName',
+    );
     return linkmen;
   }
 }
 
-class TagService extends BaseService {
-  static final TagService _instance = TagService();
-  static bool initStatus = false;
+final linkmanService = LinkmanService(
+    tableName: 'chat_linkman',
+    indexFields: [
+      'givenName',
+      'name',
+      'ownerPeerId',
+      'peerId',
+      'mobile',
+    ],
+    fields: ServiceLocator.buildFields(Linkman('', '', ''), []));
 
-  static TagService get instance {
-    if (!initStatus) {
-      throw 'please init!';
-    }
-    return _instance;
-  }
-
-  static Future<TagService> init(
-      {required String tableName,
-      required List<String> fields,
-      List<String>? indexFields}) async {
-    if (!initStatus) {
-      await BaseService.init(_instance,
-          tableName: tableName, fields: fields, indexFields: indexFields);
-      initStatus = true;
-    }
-    return _instance;
+class TagService extends GeneralBaseService<Tag> {
+  TagService(
+      {required super.tableName,
+      required super.fields,
+      required super.indexFields}) {
+    post = (Map map) {
+      return Tag.fromJson(map);
+    };
   }
 }
 
-class PartyTagService extends BaseService {
-  static final PartyTagService _instance = PartyTagService();
-  static bool initStatus = false;
+final tagService = TagService(
+    tableName: "chat_tag",
+    indexFields: ['ownerPeerId', 'createDate', 'tag'],
+    fields: ServiceLocator.buildFields(Tag(''), []));
 
-  static PartyTagService get instance {
-    if (!initStatus) {
-      throw 'please init!';
-    }
-    return _instance;
-  }
-
-  static Future<PartyTagService> init(
-      {required String tableName,
-      required List<String> fields,
-      List<String>? indexFields}) async {
-    if (!initStatus) {
-      await BaseService.init(_instance,
-          tableName: tableName, fields: fields, indexFields: indexFields);
-      initStatus = true;
-    }
-    return _instance;
+class PartyTagService extends GeneralBaseService<PartyTag> {
+  PartyTagService(
+      {required super.tableName,
+      required super.fields,
+      required super.indexFields}) {
+    post = (Map map) {
+      return PartyTag.fromJson(map);
+    };
   }
 }
 
-class PartyRequestService extends BaseService {
-  static final PartyRequestService _instance = PartyRequestService();
-  static bool initStatus = false;
+final partyTagService = PartyTagService(
+    tableName: "chat_partytag",
+    indexFields: ['ownerPeerId', 'createDate', 'tag', 'partyPeerId'],
+    fields: ServiceLocator.buildFields(PartyTag(''), []));
 
-  static PartyRequestService get instance {
-    if (!initStatus) {
-      throw 'please init!';
-    }
-    return _instance;
-  }
-
-  static Future<PartyRequestService> init(
-      {required String tableName,
-      required List<String> fields,
-      List<String>? indexFields}) async {
-    if (!initStatus) {
-      await BaseService.init(_instance,
-          tableName: tableName, fields: fields, indexFields: indexFields);
-      initStatus = true;
-    }
-    return _instance;
+class PartyRequestService extends GeneralBaseService<PartyRequest> {
+  PartyRequestService(
+      {required super.tableName,
+      required super.fields,
+      required super.indexFields}) {
+    post = (Map map) {
+      return PartyRequest.fromJson(map);
+    };
   }
 }
 
-class GroupService extends PartyService {
-  static final GroupService _instance = GroupService();
-  static bool initStatus = false;
+final partyRequestService = PartyRequestService(
+    tableName: "chat_partyrequest",
+    indexFields: [
+      'ownerPeerId',
+      'createDate',
+      'targetPeerId',
+      'targetType',
+      'status',
+    ],
+    fields: ServiceLocator.buildFields(PartyRequest('', '', ''), []));
 
-  static GroupService get instance {
-    if (!initStatus) {
-      throw 'please init!';
-    }
-    return _instance;
-  }
-
-  static Future<GroupService> init(
-      {required String tableName,
-      required List<String> fields,
-      List<String>? indexFields}) async {
-    if (!initStatus) {
-      await BaseService.init(_instance,
-          tableName: tableName, fields: fields, indexFields: indexFields);
-      initStatus = true;
-    }
-    return _instance;
+class GroupService extends PartyService<Group> {
+  GroupService(
+      {required super.tableName,
+      required super.fields,
+      required super.indexFields}) {
+    post = (Map map) {
+      return Group.fromJson(map);
+    };
   }
 }
 
-class GroupMemberService extends BaseService {
-  static final GroupMemberService _instance = GroupMemberService();
-  static bool initStatus = false;
+final groupService = GroupService(
+    tableName: "chat_group",
+    indexFields: [
+      'givenName',
+      'name',
+      'description',
+      'ownerPeerId',
+      'createDate',
+      'peerId',
+      'groupCategory',
+      'groupType'
+    ],
+    fields: ServiceLocator.buildFields(Group('', '', ''), []));
 
-  static GroupMemberService get instance {
-    if (!initStatus) {
-      throw 'please init!';
-    }
-    return _instance;
-  }
-
-  static Future<GroupMemberService> init(
-      {required String tableName,
-      required List<String> fields,
-      List<String>? indexFields}) async {
-    if (!initStatus) {
-      await BaseService.init(_instance,
-          tableName: tableName, fields: fields, indexFields: indexFields);
-      initStatus = true;
-    }
-    return _instance;
+class GroupMemberService extends GeneralBaseService<GroupMember> {
+  GroupMemberService(
+      {required super.tableName,
+      required super.fields,
+      required super.indexFields}) {
+    post = (Map map) {
+      return GroupMember.fromJson(map);
+    };
   }
 }
 
-class ContactService extends PartyService {
-  static final ContactService _instance = ContactService();
-  static bool initStatus = false;
+final groupMemberService = GroupMemberService(
+    tableName: "chat_groupmember",
+    indexFields: [
+      'ownerPeerId',
+      'createDate',
+      'groupId',
+      'memberPeerId',
+      'memberType'
+    ],
+    fields: ServiceLocator.buildFields(GroupMember(''), []));
 
-  static ContactService get instance {
-    if (!initStatus) {
-      throw 'please init!';
-    }
-    return _instance;
-  }
-
-  static Future<ContactService> init(
-      {required String tableName,
-      required List<String> fields,
-      List<String>? indexFields}) async {
-    if (!initStatus) {
-      await BaseService.init(_instance,
-          tableName: tableName, fields: fields, indexFields: indexFields);
-      initStatus = true;
-    }
-    return _instance;
+class ContactService extends PartyService<Contact> {
+  ContactService(
+      {required super.tableName,
+      required super.fields,
+      required super.indexFields}) {
+    post = (Map map) {
+      return Contact.fromJson(map);
+    };
   }
 
   Future<String> formatMobile(String mobile) async {
@@ -237,7 +200,7 @@ class ContactService extends PartyService {
       }
     }
     // 遍历本地库的记录，根据手机号检查索引
-    var pContacts = await findAll();
+    List<Map> pContacts = await findAll() as List<Map>;
     if (pContacts.isNotEmpty) {
       for (var pContact in pContacts) {
         // 如果通讯录中存在，将本地匹配记录放入结果集
@@ -296,7 +259,7 @@ class ContactService extends PartyService {
       var mobileNumber = await formatMobile(mobile);
       var peer = await peerClientService.findOneEffectiveByMobile(mobileNumber);
       if (peer != null) {
-        var peerClient = PeerClient.fromJson(peer);
+        var peerClient = peer as PeerClient;
         peerContact.peerId = peerClient.peerId!;
         peerContact.name = peerClient.name;
         peerContact.status = peerClient.status;
@@ -309,3 +272,8 @@ class ContactService extends PartyService {
     return null;
   }
 }
+
+final contactService = ContactService(
+    tableName: "chat_contact",
+    indexFields: ['peerId', 'mobile', 'formattedName', 'name'],
+    fields: ServiceLocator.buildFields(Contact('', '', ''), []));

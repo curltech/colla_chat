@@ -45,14 +45,14 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
       DataListController<ChatSummary>();
 
   ChatListWidget({Key? key}) : super(key: key) {
-    ChatSummaryService.instance
+    chatSummaryService
         .findByPartyType(PartyType.linkman.name)
         .then((List<ChatSummary> chatSummary) {
       if (chatSummary.isNotEmpty) {
         linkmanController.addAll(chatSummary);
       }
     });
-    ChatSummaryService.instance
+    chatSummaryService
         .findByPartyType(PartyType.group.name)
         .then((List<ChatSummary> chatSummary) {
       if (chatSummary.isNotEmpty) {

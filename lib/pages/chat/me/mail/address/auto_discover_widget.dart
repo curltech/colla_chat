@@ -170,7 +170,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget>
       DialogUtil.alert(context, content: '保存为地址吗?').then((bool? result) async {
         if (result != null && result) {
           ///保存地址
-          await MailAddressService.instance.store(mailAddress);
+          await mailAddressService.store(mailAddress);
         }
       });
     });

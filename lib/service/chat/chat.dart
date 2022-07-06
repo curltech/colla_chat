@@ -1,34 +1,22 @@
 import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/service/general_base.dart';
+import 'package:colla_chat/service/servicelocator.dart';
 
 import '../../constant/base.dart';
 import '../../datastore/datastore.dart';
 import '../../entity/chat/chat.dart';
 import '../../entity/dht/myself.dart';
 import '../../entity/p2p/security_context.dart';
-import '../base.dart';
 import '../p2p/security_context.dart';
 
-class ChatMessageService extends BaseService {
-  static final ChatMessageService _instance = ChatMessageService();
-  static bool initStatus = false;
-
-  static ChatMessageService get instance {
-    if (!initStatus) {
-      throw 'please init!';
-    }
-    return _instance;
-  }
-
-  static Future<ChatMessageService> init(
-      {required String tableName,
-      required List<String> fields,
-      List<String>? indexFields}) async {
-    if (!initStatus) {
-      await BaseService.init(_instance,
-          tableName: tableName, fields: fields, indexFields: indexFields);
-      initStatus = true;
-    }
-    return _instance;
+class ChatMessageService extends GeneralBaseService<ChatMessage> {
+  ChatMessageService(
+      {required super.tableName,
+      required super.fields,
+      required super.indexFields}) {
+    post = (Map map) {
+      return ChatMessage.fromJson(map);
+    };
   }
 
   Future<List<ChatMessage>> load(String where,
@@ -36,15 +24,16 @@ class ChatMessageService extends BaseService {
       String? orderBy,
       int? offset,
       int? limit}) async {
-    List<Map> data = await find(
-        where: where,
-        whereArgs: whereArgs,
-        orderBy: orderBy,
-        offset: offset,
-        limit: limit);
+    List<dynamic> data = await find(
+      where: where,
+      whereArgs: whereArgs,
+      orderBy: orderBy,
+      offset: offset,
+      limit: limit,
+    );
     List<ChatMessage> chatMessages = [];
     for (var d in data) {
-      var chatMessage = ChatMessage.fromJson(d);
+      var chatMessage = d as ChatMessage;
       SecurityContext securityContext = SecurityContext();
       securityContext.needCompress = chatMessage.needCompress;
       securityContext.needEncrypt = chatMessage.needEncrypt;
@@ -116,74 +105,64 @@ class ChatMessageService extends BaseService {
   }) async {
     String where = 'messageType=? and targetAddress=? and subMessageType=?';
     List<Object> whereArgs = [messageType, targetAddress, subMessageType];
-    var chatMessages_ = await findPage(
+    var page = await findPage(
         where: where,
         whereArgs: whereArgs,
         orderBy: 'sendTime',
         offset: offset,
         limit: limit);
-    List<ChatMessage> chatMessages = [];
-    if (chatMessages_.data.isNotEmpty) {
-      for (var chatMessage_ in chatMessages_.data) {
-        var chatMessage = ChatMessage.fromJson(chatMessage_);
-        chatMessages.add(chatMessage);
-      }
-    }
-    Pagination<ChatMessage> page = Pagination(
-        rowsNumber: chatMessages_.rowsNumber,
-        data: chatMessages,
-        offset: chatMessages_.offset,
-        rowsPerPage: chatMessages_.rowsPerPage);
 
     return page;
   }
 }
 
-class MergedMessageService extends BaseService {
-  static final MergedMessageService _instance = MergedMessageService();
-  static bool initStatus = false;
+final chatMessageService = ChatMessageService(
+    tableName: "chat_message",
+    indexFields: [
+      'ownerPeerId',
+      'transportType',
+      'messageId',
+      'messageType',
+      'subMessageType',
+      'direct',
+      'receiverPeerId',
+      'receiverType',
+      'receiverAddress',
+      'senderPeerId',
+      'senderType',
+      'senderAddress',
+      'createDate',
+      'sendTime',
+      'receiveTime',
+      'actualReceiveTime',
+      'title',
+    ],
+    fields: ServiceLocator.buildFields(ChatMessage(''), []));
 
-  static MergedMessageService get instance {
-    if (!initStatus) {
-      throw 'please init!';
-    }
-    return _instance;
-  }
-
-  static Future<MergedMessageService> init(
-      {required String tableName,
-      required List<String> fields,
-      List<String>? indexFields}) async {
-    if (!initStatus) {
-      await BaseService.init(_instance,
-          tableName: tableName, fields: fields, indexFields: indexFields);
-      initStatus = true;
-    }
-    return _instance;
+class MergedMessageService extends GeneralBaseService<MergedMessage> {
+  MergedMessageService(
+      {required super.tableName,
+      required super.fields,
+      required super.indexFields}) {
+    post = (Map map) {
+      return MergedMessage.fromJson(map);
+    };
   }
 }
 
-class MessageAttachmentService extends BaseService {
-  static final MessageAttachmentService _instance = MessageAttachmentService();
-  static bool initStatus = false;
+final mergedMessageService = MergedMessageService(
+    tableName: "chat_mergedmessage",
+    indexFields: ['ownerPeerId', 'mergedMessageId', 'messageId', 'createDate'],
+    fields: ServiceLocator.buildFields(MergedMessage(), []));
 
-  static MessageAttachmentService get instance {
-    if (!initStatus) {
-      throw 'please init!';
-    }
-    return _instance;
-  }
-
-  static Future<MessageAttachmentService> init(
-      {required String tableName,
-      required List<String> fields,
-      List<String>? indexFields}) async {
-    if (!initStatus) {
-      await BaseService.init(_instance,
-          tableName: tableName, fields: fields, indexFields: indexFields);
-      initStatus = true;
-    }
-    return _instance;
+class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
+  MessageAttachmentService(
+      {required super.tableName,
+      required super.fields,
+      required super.indexFields}) {
+    post = (Map map) {
+      return MessageAttachment.fromJson(map);
+    };
   }
 
   store(dynamic entity) async {
@@ -223,12 +202,15 @@ class MessageAttachmentService extends BaseService {
     }
     List<Object> whereArgs = [attachBlockId, peerId];
     List<MessageAttachment> attaches = [];
-    var data = await find(where: where, whereArgs: whereArgs);
+    var data = await find(
+      where: where,
+      whereArgs: whereArgs,
+    );
     SecurityContext securityContext = SecurityContext();
     securityContext.needCompress = true;
     securityContext.needEncrypt = true;
     for (var d in data) {
-      var chatAttach = MessageAttachment.fromJson(d);
+      var chatAttach = d as MessageAttachment;
       var payloadKey = chatAttach.payloadKey;
       if (payloadKey != null) {
         securityContext.payloadKey = payloadKey;
@@ -248,51 +230,42 @@ class MessageAttachmentService extends BaseService {
   }
 }
 
-class ReceiveService extends BaseService {
-  static final ReceiveService _instance = ReceiveService();
-  static bool initStatus = false;
+final messageAttachmentService = MessageAttachmentService(
+    tableName: "chat_messageattachment",
+    indexFields: ['ownerPeerId', 'messageId', 'createDate', 'targetPeerId'],
+    fields: ServiceLocator.buildFields(MessageAttachment(), []));
 
-  static ReceiveService get instance {
-    if (!initStatus) {
-      throw 'please init!';
-    }
-    return _instance;
-  }
-
-  static Future<ReceiveService> init(
-      {required String tableName,
-      required List<String> fields,
-      List<String>? indexFields}) async {
-    if (!initStatus) {
-      await BaseService.init(_instance,
-          tableName: tableName, fields: fields, indexFields: indexFields);
-      initStatus = true;
-    }
-    return _instance;
+class ReceiveService extends GeneralBaseService<Receive> {
+  ReceiveService(
+      {required super.tableName,
+      required super.fields,
+      required super.indexFields}) {
+    post = (Map map) {
+      return Receive.fromJson(map);
+    };
   }
 }
 
-class ChatSummaryService extends BaseService {
-  static final ChatSummaryService _instance = ChatSummaryService();
-  static bool initStatus = false;
+final receiveService = ReceiveService(
+    tableName: "chat_receive",
+    indexFields: [
+      'ownerPeerId',
+      'targetPeerId',
+      'createDate',
+      'targetType',
+      'receiverPeerId',
+      'messageType',
+    ],
+    fields: ServiceLocator.buildFields(Receive(), []));
 
-  static ChatSummaryService get instance {
-    if (!initStatus) {
-      throw 'please init!';
-    }
-    return _instance;
-  }
-
-  static Future<ChatSummaryService> init(
-      {required String tableName,
-      required List<String> fields,
-      List<String>? indexFields}) async {
-    if (!initStatus) {
-      await BaseService.init(_instance,
-          tableName: tableName, fields: fields, indexFields: indexFields);
-      initStatus = true;
-    }
-    return _instance;
+class ChatSummaryService extends GeneralBaseService<ChatSummary> {
+  ChatSummaryService(
+      {required super.tableName,
+      required super.fields,
+      required super.indexFields}) {
+    post = (Map map) {
+      return ChatSummary.fromJson(map);
+    };
   }
 
   Future<List<ChatSummary>> findByPartyType(
@@ -300,18 +273,11 @@ class ChatSummaryService extends BaseService {
   ) async {
     String where = 'partyType=?';
     List<Object> whereArgs = [partyType];
-    var chatSummary_ = await find(
+    var chatSummary = await find(
       where: where,
       whereArgs: whereArgs,
       orderBy: 'sendReceiveTime',
     );
-    List<ChatSummary> chatSummary = [];
-    if (chatSummary_.isNotEmpty) {
-      for (var summary_ in chatSummary_) {
-        var summary = ChatSummary.fromJson(summary_);
-        chatSummary.add(summary);
-      }
-    }
 
     return chatSummary;
   }
@@ -321,18 +287,15 @@ class ChatSummaryService extends BaseService {
   ) async {
     String where = 'peerId=?';
     List<Object> whereArgs = [peerId];
-    var chatSummary_ = await findOne(
+    var chatSummary = await findOne(
       where: where,
       whereArgs: whereArgs,
     );
-    if (chatSummary_ != null) {
-      var chatSummary = ChatSummary.fromJson(chatSummary_);
-      return chatSummary;
-    }
-    return null;
+    return chatSummary;
   }
 }
 
-class ChatBlockService {}
-
-var chatBlockService = ChatBlockService();
+final chatSummaryService = ChatSummaryService(
+    tableName: "chat_summary",
+    indexFields: ['ownerPeerId', 'peerId', 'partyType', 'sendReceiveTime'],
+    fields: ServiceLocator.buildFields(ChatSummary(''), []));

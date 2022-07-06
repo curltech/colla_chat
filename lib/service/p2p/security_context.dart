@@ -53,8 +53,7 @@ class SecurityContextService {
       //3. 数据加密，base64
       SimplePublicKey? targetPublicKey;
       if (targetPeerId != null && peerId != null && targetPeerId != peerId) {
-        targetPublicKey =
-            await PeerClientService.instance.getPublicKey(targetPeerId);
+        targetPublicKey = await peerClientService.getPublicKey(targetPeerId);
       } else {
         // 本地保存前加密
         targetPublicKey = myself.publicKey;
@@ -154,8 +153,7 @@ class SecurityContextService {
           SimplePublicKey? srcPublicKey;
           var srcPeerId = securityContext.srcPeerId;
           if (srcPeerId != null && peerId != null && srcPeerId != peerId) {
-            srcPublicKey =
-                await PeerClientService.instance.getPublicKey(srcPeerId);
+            srcPublicKey = await peerClientService.getPublicKey(srcPeerId);
           } else {
             throw 'NullSrcPeerId';
             // 本地保存前加密如果签名，验签需尝试所有expiredPublicKey
@@ -181,8 +179,7 @@ class SecurityContextService {
                 peerClientService.getPeerClientFromCache(srcPeerId)
               ];
               if (peerClients.isNotEmpty) {
-                srcPublicKey =
-                    await PeerClientService.instance.getPublicKey(srcPeerId);
+                srcPublicKey = await peerClientService.getPublicKey(srcPeerId);
                 if (srcPublicKey != null) {
                   pass = await cryptoGraphy.verify(
                       data, payloadSignature.codeUnits,

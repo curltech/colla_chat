@@ -24,7 +24,7 @@ class MailDataProvider with ChangeNotifier {
 
   ///构造函数从数据库获取所有的邮件地址，初始化邮箱数据
   MailDataProvider() {
-    MailAddressService.instance
+    mailAddressService
         .findAllMailAddress()
         .then((List<MailAddress> mailAddresses) {
       this.mailAddresses = mailAddresses;
@@ -396,9 +396,9 @@ class MailDataProvider with ChangeNotifier {
         chatMessage.subMessageType = currentMailboxName;
         chatMessage.senderAddress = email;
         chatMessage.actualReceiveTime = DateUtil.currentDate();
-        var old = await ChatMessageService.instance.get(mimeMessage.guid!);
+        var old = await chatMessageService.get(mimeMessage.guid!);
         if (old == null) {
-          await ChatMessageService.instance.insert(chatMessage);
+          await chatMessageService.insert(chatMessage);
         }
         try {
           enough_mail.DeleteResult? deleteResult =
@@ -431,7 +431,7 @@ class MailDataProvider with ChangeNotifier {
     }
     var currentChatMessagePage = this.currentChatMessagePage;
     if (currentChatMessagePage == null) {
-      ChatMessageService.instance
+      chatMessageService
           .findByMessageType(MessageType.email.name, email, currentMailboxName)
           .then((chatMessagePage) {
         currentChatMessagePage = chatMessagePage;
@@ -443,7 +443,7 @@ class MailDataProvider with ChangeNotifier {
       });
     } else {
       var offset = currentChatMessagePage.next();
-      ChatMessageService.instance
+      chatMessageService
           .findByMessageType(MessageType.email.name, email, currentMailboxName,
               offset: offset)
           .then((chatMessagePage) {

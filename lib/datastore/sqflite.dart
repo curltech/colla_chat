@@ -7,7 +7,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../constant/base.dart';
-import '../service/base.dart';
+import '../service/general_base.dart';
 import '../service/servicelocator.dart';
 import 'datastore.dart';
 
@@ -27,7 +27,7 @@ class Sqflite extends DataStore {
         path,
         version: 1,
       );
-      for (BaseService service in ServiceLocator.services.values) {
+      for (GeneralBaseService service in ServiceLocator.services.values) {
         instance.create(service.tableName, service.fields, service.indexFields);
         service.dataStore = instance;
       }

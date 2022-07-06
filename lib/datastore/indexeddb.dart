@@ -6,7 +6,7 @@ import 'package:idb_shim/idb.dart';
 import 'package:idb_shim/idb_browser.dart';
 
 import '../constant/base.dart';
-import '../service/base.dart';
+import '../service/general_base.dart';
 import '../service/servicelocator.dart';
 import 'datastore.dart';
 
@@ -27,13 +27,13 @@ class IndexedDb extends DataStore {
             onUpgradeNeeded: (VersionChangeEvent event) {
           Database db = event.database;
           instance.db = db;
-          for (BaseService service in ServiceLocator.services.values) {
+          for (GeneralBaseService service in ServiceLocator.services.values) {
             instance.create(
                 service.tableName, service.fields, service.indexFields);
           }
         });
       }
-      for (BaseService service in ServiceLocator.services.values) {
+      for (GeneralBaseService service in ServiceLocator.services.values) {
         service.dataStore = instance;
       }
       initStatus = true;

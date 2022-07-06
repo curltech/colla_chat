@@ -97,7 +97,7 @@ class StockUser {
         } else {
           account.subscription = '$subscription,$ts_code';
         }
-        StockAccountService.instance.upsert(account);
+        stockAccountService.upsert(account);
       }
     }
   }
@@ -111,7 +111,7 @@ class StockUser {
       if (pos != -1) {
         account.subscription = subscription.replaceAll(',$ts_code', '');
         account.subscription = subscription.replaceAll(ts_code, '');
-        StockAccountService.instance.upsert(account);
+        stockAccountService.upsert(account);
       }
     }
   }
@@ -180,7 +180,7 @@ class StockUser {
         if (TypeUtil.isString(data)) {
           error = data;
         } else {
-          var account = await StockAccountService.instance.getOrRegist(data);
+          var account = await stockAccountService.getOrRegist(data);
           account = account;
           return account;
         }
@@ -202,7 +202,7 @@ class StockUser {
           var token = data['token'];
           if (user != null) {
             user['lastLoginDate'] = DateUtil.currentDate();
-            account = await StockAccountService.instance.getOrRegist(user);
+            account = await stockAccountService.getOrRegist(user);
             loginStatus = true;
             token = token;
           }

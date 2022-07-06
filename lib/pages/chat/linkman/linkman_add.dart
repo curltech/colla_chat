@@ -182,7 +182,7 @@ class _LinkmanAddWidgetState extends State<LinkmanAddWidget> {
       linkman.peerId = publicKey;
       linkman.email = _email;
       linkman.mobile = _mobile;
-      LinkmanService.instance.insert(linkman).then((value) {
+      linkmanService.insert(linkman).then((value) {
         Provider.of<LinkmanProvider>(context, listen: false).add([linkman]);
       });
     } else {

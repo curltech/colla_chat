@@ -4,7 +4,6 @@ import 'package:cryptography/cryptography.dart';
 import '../../crypto/cryptography.dart';
 import '../../entity/dht/myself.dart';
 import '../../entity/dht/myselfpeer.dart';
-import '../../entity/dht/peerprofile.dart';
 import '../../tool/util.dart';
 import '../../widgets/common/image_widget.dart';
 
@@ -73,9 +72,9 @@ class MyselfService {
     //查找配置信息
     var peerId = myselfPeer.peerId;
     if (peerId != null) {
-      var peer = await peerProfileService.findOneEffectiveByPeerId(peerId);
-      if (peer != null) {
-        var peerProfile = PeerProfile.fromJson(peer);
+      var peerProfile =
+          await peerProfileService.findOneEffectiveByPeerId(peerId);
+      if (peerProfile != null) {
         myself.peerProfile = peerProfile;
         String? avatar = peerProfile.avatar;
         if (avatar != null) {

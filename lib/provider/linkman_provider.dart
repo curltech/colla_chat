@@ -12,7 +12,7 @@ class LinkmanProvider with ChangeNotifier {
   LinkmanProvider();
 
   init() {
-    LinkmanService.instance.findAllLinkmen().then((linkmen) {
+    linkmanService.findAllLinkmen().then((linkmen) {
       _linkmen.addAll(linkmen);
       initStatus = true;
       notifyListeners();

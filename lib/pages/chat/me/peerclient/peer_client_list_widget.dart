@@ -17,7 +17,7 @@ import '../../../../widgets/common/widget_mixin.dart';
 class PeerClientDataPageController extends DataPageController<PeerClient> {
   @override
   void first() {
-    PeerClientService.instance.findPage();
+    peerClientService.findPage();
   }
 
   @override
@@ -66,7 +66,7 @@ class PeerClientListWidget extends StatefulWidget with TileDataMixin {
       IconButton(
           onPressed: () {
             var current = controller.current;
-            PeerClientService.instance.delete(current);
+            peerClientService.delete(current);
             controller.delete();
           },
           icon: const Icon(Icons.delete),
