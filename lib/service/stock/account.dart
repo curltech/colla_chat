@@ -33,7 +33,7 @@ class StockAccountService extends BaseService {
   Future<StockAccount?> getOrRegist(dynamic user) async {
     String where = 'accountId = ?';
     StockAccount account;
-    var accounts = await find(where, whereArgs: [user['userId']]);
+    var accounts = await find(where: where, whereArgs: [user['userId']]);
     if (accounts != null && accounts.isNotEmpty && accounts[0] != null) {
       var acc = accounts[0];
       account = StockAccount.fromJson(acc as Map);

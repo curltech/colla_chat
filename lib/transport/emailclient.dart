@@ -423,7 +423,10 @@ class EmailClient {
           mailbox: mailbox,
           page: Pagination.getPage(offset, limit));
       return Pagination(
-          total: total, data: messages, limit: limit, offset: offset);
+          rowsNumber: total,
+          data: messages,
+          rowsPerPage: limit,
+          offset: offset);
     }
     return null;
   }

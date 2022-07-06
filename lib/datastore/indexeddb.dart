@@ -203,7 +203,10 @@ class IndexedDb extends DataStore {
         var results = await index.getAll(keyRange['keyRange'], limit);
         await txn.completed;
         Pagination page = Pagination(
-            data: results, total: total, offset: offset, limit: limit);
+            data: results,
+            rowsNumber: total,
+            offset: offset,
+            rowsPerPage: limit);
 
         return page;
       }
@@ -211,8 +214,8 @@ class IndexedDb extends DataStore {
     results = await store.getAll() as List<Map>;
     var total = await store.count();
     await txn.completed;
-    Pagination page =
-        Pagination(data: results, total: total, offset: offset, limit: limit);
+    Pagination page = Pagination(
+        data: results, rowsNumber: total, offset: offset, rowsPerPage: limit);
 
     return page;
   }

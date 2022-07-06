@@ -36,8 +36,12 @@ class ChatMessageService extends BaseService {
       String? orderBy,
       int? offset,
       int? limit}) async {
-    List<Map> data = await find(where,
-        whereArgs: whereArgs, orderBy: orderBy, offset: offset, limit: limit);
+    List<Map> data = await find(
+        where: where,
+        whereArgs: whereArgs,
+        orderBy: orderBy,
+        offset: offset,
+        limit: limit);
     List<ChatMessage> chatMessages = [];
     for (var d in data) {
       var chatMessage = ChatMessage.fromJson(d);
@@ -112,7 +116,8 @@ class ChatMessageService extends BaseService {
   }) async {
     String where = 'messageType=? and targetAddress=? and subMessageType=?';
     List<Object> whereArgs = [messageType, targetAddress, subMessageType];
-    var chatMessages_ = await findPage(where,
+    var chatMessages_ = await findPage(
+        where: where,
         whereArgs: whereArgs,
         orderBy: 'sendTime',
         offset: offset,
@@ -125,10 +130,10 @@ class ChatMessageService extends BaseService {
       }
     }
     Pagination<ChatMessage> page = Pagination(
-        total: chatMessages_.total,
+        rowsNumber: chatMessages_.rowsNumber,
         data: chatMessages,
         offset: chatMessages_.offset,
-        limit: chatMessages_.limit);
+        rowsPerPage: chatMessages_.rowsPerPage);
 
     return page;
   }
@@ -218,7 +223,7 @@ class MessageAttachmentService extends BaseService {
     }
     List<Object> whereArgs = [attachBlockId, peerId];
     List<MessageAttachment> attaches = [];
-    var data = await find(where, whereArgs: whereArgs);
+    var data = await find(where: where, whereArgs: whereArgs);
     SecurityContext securityContext = SecurityContext();
     securityContext.needCompress = true;
     securityContext.needEncrypt = true;
@@ -296,7 +301,7 @@ class ChatSummaryService extends BaseService {
     String where = 'partyType=?';
     List<Object> whereArgs = [partyType];
     var chatSummary_ = await find(
-      where,
+      where: where,
       whereArgs: whereArgs,
       orderBy: 'sendReceiveTime',
     );
@@ -317,7 +322,7 @@ class ChatSummaryService extends BaseService {
     String where = 'peerId=?';
     List<Object> whereArgs = [peerId];
     var chatSummary_ = await findOne(
-      where,
+      where: where,
       whereArgs: whereArgs,
     );
     if (chatSummary_ != null) {

@@ -25,7 +25,7 @@ class PeerEndpointService extends BaseService {
   }
 
   Future<List<PeerEndpoint>> findAllPeerEndpoint() async {
-    var peerEndpoints_ = await find(null, whereArgs: []);
+    var peerEndpoints_ = await find();
     List<PeerEndpoint> peerEndpoints = [];
     if (peerEndpoints_.isNotEmpty) {
       for (var peerEndpoint_ in peerEndpoints_) {

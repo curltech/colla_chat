@@ -39,8 +39,6 @@ final Map<TileData, List<TileData>> mockTileData = {
 /// 聊天的主页面，展示可以聊天的目标对象，可以是一个人，或者是一个群
 /// 选择好目标点击进入具体的聊天页面ChatMessage
 class ChatListWidget extends StatefulWidget with TileDataMixin {
-  final DataListController<ChatMessage> controller =
-      DataListController<ChatMessage>();
   final DataListController<ChatSummary> linkmanController =
       DataListController<ChatSummary>();
   final DataListController<ChatSummary> groupController =
@@ -90,7 +88,6 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         Provider.of<IndexWidgetProvider>(context, listen: false);
     indexWidgetProvider.define(ChatMessageWidget(
       subtitle: '',
-      controller: widget.controller,
     ));
   }
 
@@ -105,7 +102,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         var title = linkman.name ?? '';
         var subtitle = linkman.peerId ?? '';
         TileData tile = TileData(
-            title: title, subtitle: subtitle, routeName: 'peer_client_edit');
+            title: title, subtitle: subtitle, routeName: 'chat_message');
         tiles.add(tile);
       }
     }

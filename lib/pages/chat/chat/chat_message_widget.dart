@@ -10,10 +10,12 @@ import 'chat_message_item.dart';
 /// 此界面展示特定的目标对象的收到的消息，并且可以发送消息
 class ChatMessageWidget extends StatefulWidget with TileDataMixin {
   final String subtitle;
-  final DataListController<ChatMessage> controller;
 
-  const ChatMessageWidget(
-      {Key? key, required this.subtitle, required this.controller})
+  final DataListController<ChatMessage> controller =
+      DataListController<ChatMessage>();
+
+   ChatMessageWidget(
+      {Key? key, required this.subtitle})
       : super(key: key);
 
   @override

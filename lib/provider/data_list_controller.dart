@@ -5,6 +5,7 @@ import '../datastore/datastore.dart';
 import '../tool/util.dart';
 import '../widgets/common/column_field_widget.dart';
 
+///基础的数组数据控制器
 class DataListController<T> with ChangeNotifier {
   List<T> data = <T>[];
   int _currentIndex = -1;
@@ -141,37 +142,56 @@ class DataListController<T> with ChangeNotifier {
   }
 }
 
+///分页数据控制器，记录了分页的信息
+///页面迁移时，其中的数组的数据被换掉
 abstract class DataPageController<T> extends DataListController<T> {
-  int total;
+  ///总行数
+  int rowsNumber;
   int offset = defaultOffset;
-  int limit = 0;
-  int page = 0;
+
+  ///每页的行数limit
+  int rowsPerPage = 0;
 
   DataPageController({
-    this.total = 0,
+    this.rowsNumber = 0,
     this.offset = 0,
-    this.limit = 10,
+    this.rowsPerPage = 10,
     List<T>? data,
     int? currentIndex,
   }) : super(data: data, currentIndex: currentIndex);
 
-  int get pageCount {
-    return Pagination.getPageCount(total, limit);
+  ///总页数
+  int get pagesNumber {
+    return Pagination.getPagesNumber(rowsNumber, rowsPerPage);
+  }
+
+  int get limit {
+    return rowsPerPage;
+  }
+
+  int get page {
+    return Pagination.getPage(offset, rowsPerPage);
+  }
+
+  set page(int page) {
+    if (page > 0) {
+      offset = (page - 1) * rowsPerPage;
+    }
   }
 
   ///上一页的offset
   int get previousOffset {
-    if (offset < limit) {
+    if (offset < rowsPerPage) {
       return 0;
     }
-    return offset - limit;
+    return offset - rowsPerPage;
   }
 
   ///下一页的offset
   int get nextOffset {
-    var off = offset + limit;
-    if (off > total) {
-      return total;
+    var off = offset + rowsPerPage;
+    if (off > rowsNumber) {
+      return rowsNumber;
     }
     return off;
   }
@@ -185,4 +205,36 @@ abstract class DataPageController<T> extends DataListController<T> {
   void last();
 
   void move(int index);
+}
+
+///更多数据的数据控制器
+///支持通过more方法往数组中添加更多的数据
+abstract class DataMoreController<T> extends DataListController<T> {
+  int rowsNumber;
+  int offset = defaultOffset;
+
+  ///每页的行数limit
+  int rowsPerPage = 0;
+
+  DataMoreController({
+    this.rowsNumber = 0,
+    this.offset = 0,
+    this.rowsPerPage = 10,
+    List<T>? data,
+    int? currentIndex,
+  }) : super(data: data, currentIndex: currentIndex);
+
+  ///对more模式的数据控制器来说，执行more操作就是offset从现有的data.length开始，
+  ///limit取index-data.length+rowsPerPage,offset不变，limit变化
+  int moreLimit(int index) {
+    int diff = index - data.length;
+    if (diff > 0) {
+      int num = diff ~/ rowsPerPage;
+      return (num + 1) * rowsPerPage;
+    }
+    return 0;
+  }
+
+  ///如果有更多数据添加，返回true，否则返回false
+  bool more(int index);
 }

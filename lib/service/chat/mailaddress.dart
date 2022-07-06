@@ -25,7 +25,7 @@ class MailAddressService extends BaseService {
   }
 
   Future<List<MailAddress>> findAllMailAddress() async {
-    var mailAddress_ = await find(null, whereArgs: []);
+    var mailAddress_ = await find();
     List<MailAddress> mailAddress = [];
     if (mailAddress_.isNotEmpty) {
       for (var mailAddr_ in mailAddress_) {
@@ -37,7 +37,7 @@ class MailAddressService extends BaseService {
   }
 
   Future<MailAddress?> findByMailAddress(String email) async {
-    var mailAddress_ = await findOne('email=?', whereArgs: [email]);
+    var mailAddress_ = await findOne(where: 'email=?', whereArgs: [email]);
     if (mailAddress_ != null) {
       var mailAddr = MailAddress.fromJson(mailAddress_);
       return mailAddr;

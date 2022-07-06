@@ -193,8 +193,8 @@ class Sqlite3 extends DataStore {
         limit: limit,
         offset: offset);
 
-    Pagination page =
-        Pagination(data: results, total: total, offset: offset, limit: limit);
+    Pagination page = Pagination(
+        data: results, rowsNumber: total, offset: offset, rowsPerPage: limit);
 
     return page;
   }

@@ -48,7 +48,7 @@ class MyselfPeerService extends PeerEntityService {
       credential,
       EntityStatus.Effective.name
     ];
-    var peer = await findOne(where, whereArgs: whereArgs);
+    var peer = await findOne(where: where, whereArgs: whereArgs);
 
     return peer;
   }

@@ -26,8 +26,9 @@ abstract class BaseService {
     return dataStore.findOne(tableName, where: 'id=?', whereArgs: [id]);
   }
 
-  Future<Map?> findOne(String? where,
-      {bool? distinct,
+  Future<Map?> findOne(
+      {String? where,
+      bool? distinct,
       List<String>? columns,
       List<Object>? whereArgs,
       String? groupBy,
@@ -48,12 +49,13 @@ abstract class BaseService {
   }
 
   Future<List<Map>> findAll() {
-    return find(null);
+    return find();
   }
 
   /// 原生的查询
-  Future<List<Map>> find(String? where,
-      {bool? distinct,
+  Future<List<Map>> find(
+      {String? where,
+      bool? distinct,
       List<String>? columns,
       List<Object>? whereArgs,
       String? groupBy,
@@ -74,8 +76,9 @@ abstract class BaseService {
   }
 
   /// 与find的不同是返回值是带有result，from，limit，total字段的对象
-  Future<Pagination> findPage(String? where,
-      {bool? distinct,
+  Future<Pagination> findPage(
+      {String? where,
+      bool? distinct,
       List<String>? columns,
       List<Object>? whereArgs,
       String? groupBy,
@@ -159,7 +162,7 @@ abstract class BaseService {
   Future<List<Map>> findByStatus(String status) async {
     var where = 'status = ?';
     var whereArgs = [status];
-    var es = await find(where, whereArgs: whereArgs);
+    var es = await find(where: where, whereArgs: whereArgs);
 
     return es;
   }

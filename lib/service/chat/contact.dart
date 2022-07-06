@@ -34,7 +34,8 @@ class LinkmanService extends PartyService {
   Future<List<Linkman>> search(String key) async {
     var where = 'peerId=? or mobile=? or name=? or pyName=? or mail=?';
     var whereArgs = [key, key, key, key, key];
-    var linkmen_ = await find(where, whereArgs: whereArgs, orderBy: 'pyName');
+    var linkmen_ =
+        await find(where: where, whereArgs: whereArgs, orderBy: 'pyName');
     List<Linkman> linkmen = [];
     if (linkmen_.isNotEmpty) {
       for (var linkman_ in linkmen_) {
@@ -46,7 +47,7 @@ class LinkmanService extends PartyService {
   }
 
   Future<List<Linkman>> findAllLinkmen() async {
-    var linkmen_ = await find(null, whereArgs: [], orderBy: 'pyName');
+    var linkmen_ = await find(orderBy: 'pyName');
     List<Linkman> linkmen = [];
     if (linkmen_.isNotEmpty) {
       for (var linkman_ in linkmen_) {

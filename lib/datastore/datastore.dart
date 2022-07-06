@@ -10,11 +10,10 @@ enum EntityState {
 }
 
 class Pagination<T> {
-  int total;
+  int rowsNumber;
   List<T> data;
   int offset = defaultOffset;
-  int limit = 0;
-  int page = 0;
+  int rowsPerPage = 0;
 
   static int getPage(int offset, int limit) {
     int mod = offset % limit;
@@ -26,7 +25,7 @@ class Pagination<T> {
     return page;
   }
 
-  static int getPageCount(int total, int limit) {
+  static int getPagesNumber(int total, int limit) {
     int mod = total % limit;
     int pageCount = total ~/ limit;
     if (mod > 0) {
@@ -37,40 +36,58 @@ class Pagination<T> {
   }
 
   Pagination(
-      {required this.total,
+      {required this.rowsNumber,
       required this.data,
       this.offset = 0,
-      this.limit = 10});
+      this.rowsPerPage = 10});
 
-  int get pageCount {
-    return getPageCount(total, limit);
+  int get pagesNumber {
+    return getPagesNumber(rowsNumber, rowsPerPage);
+  }
+
+  int get page {
+    return getPage(offset, rowsPerPage);
+  }
+
+  set page(int page) {
+    if (page > 0) {
+      offset = (page - 1) * rowsPerPage;
+    }
+  }
+
+  int get limit {
+    return rowsPerPage;
   }
 
   ///上一页的offset
   int previous() {
-    if (offset < limit) {
+    if (offset < rowsPerPage) {
       return 0;
     }
-    return offset - limit;
+    return offset - rowsPerPage;
   }
 
   ///下一页的offset
   int next() {
-    var off = offset + limit;
-    if (off > total) {
-      return total;
+    var off = offset + rowsPerPage;
+    if (off > rowsNumber) {
+      return rowsNumber;
     }
     return off;
   }
 
   Pagination.fromJson(Map json)
-      : total = json['total'],
+      : rowsNumber = json['total'],
         data = json['data'],
         offset = json['offset'],
-        limit = json['limit'];
+        rowsPerPage = json['limit'];
 
-  Map<String, dynamic> toJson() =>
-      {'total': total, 'data': data, 'offset': offset, 'limit': limit};
+  Map<String, dynamic> toJson() => {
+        'total': rowsNumber,
+        'data': data,
+        'offset': offset,
+        'limit': rowsPerPage
+      };
 }
 
 abstract class DataStore {

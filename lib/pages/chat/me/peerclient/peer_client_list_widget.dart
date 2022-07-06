@@ -17,7 +17,7 @@ import '../../../../widgets/common/widget_mixin.dart';
 class PeerClientDataPageController extends DataPageController<PeerClient> {
   @override
   void first() {
-    // TODO: implement first
+    PeerClientService.instance.findPage();
   }
 
   @override

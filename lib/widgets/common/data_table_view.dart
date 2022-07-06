@@ -10,7 +10,7 @@ import 'column_field_widget.dart';
 
 class DataTableView<T> extends StatefulWidget {
   final List<ColumnFieldDef> columnDefs;
-  final DataPageController<T> controller;
+  final DataListController<T> controller;
   final ScrollController scrollController = ScrollController();
   final Function()? onScrollMax;
   final Future<void> Function()? onRefresh;
@@ -39,6 +39,209 @@ class DataTableView<T> extends StatefulWidget {
 }
 
 class _DataListView<T> extends State<DataTableView> {
+  late DataTableSource _sourceData;
+  int? sortColumnIndex;
+  bool sortAscending = true;
+
+  @override
+  initState() {
+    widget.controller.addListener(_update);
+    var scrollController = widget.scrollController;
+    scrollController.addListener(() {
+      double offset = widget.scrollController.offset;
+      logger.i('scrolled to $offset');
+
+      ///判断是否滚动到最底，需要加载更多数据
+      if (scrollController.position.pixels ==
+          scrollController.position.maxScrollExtent) {
+        logger.i('scrolled to max');
+        if (widget.onScrollMax != null) {
+          widget.onScrollMax!();
+        }
+      }
+      if (scrollController.position.pixels ==
+          scrollController.position.minScrollExtent) {
+        logger.i('scrolled to min');
+      }
+
+      ///滚到指定的位置
+      // widget.scrollController.animateTo(offset,
+      //     duration: const Duration(milliseconds: 1000), curve: Curves.ease);
+    });
+    _buildColumnDefs();
+    _sourceData = DataPageSource<T>(
+        widget: widget as DataTableView<T>, context: context, rowCount: 0);
+    super.initState();
+  }
+
+  _update() {
+    setState(() {});
+  }
+
+  _buildColumnDefs() {
+    if (widget.dataColumns.isNotEmpty) {
+      widget.dataColumns.clear();
+    }
+    for (var columnDef in widget.columnDefs) {
+      var dataColumn = DataColumn(
+          label: Text(AppLocalizations.t(columnDef.label)),
+          numeric: columnDef.dataType == DataType.int ||
+              columnDef.dataType == DataType.double,
+          tooltip: columnDef.hintText,
+          onSort: columnDef.onSort ?? _onSort);
+      widget.dataColumns.add(dataColumn);
+    }
+  }
+
+  _onSort(int sortColumnIndex, bool sortAscending) {
+    this.sortColumnIndex = sortColumnIndex;
+    this.sortAscending = sortAscending;
+    String name = widget.columnDefs[sortColumnIndex].name;
+    widget.controller.sort(name, sortAscending);
+  }
+
+  bool _onNotification(ScrollNotification notification) {
+    String type = notification.runtimeType.toString();
+    logger.i('scrolled to $type');
+    return true;
+  }
+
+  Future<void> _onRefresh() async {
+    ///下拉刷新数据的地方，比如从数据库取更多数据
+    if (widget.onRefresh != null) {
+      await widget.onRefresh!();
+    }
+  }
+
+  List<DataRow> _buildRows() {
+    List<DataRow> rows = [];
+    List data = widget.controller.data;
+    for (int index = 0; index < data.length; ++index) {
+      var d = data[index];
+      var dataMap = JsonUtil.toMap(d);
+      List<DataCell> cells = [];
+      for (var columnDef in widget.columnDefs) {
+        var value = dataMap[columnDef.name];
+        value = value ?? '';
+        var dataCell = DataCell(Text(value), onTap: () {
+          widget.controller.currentIndex = index;
+          var fn = widget.onTap;
+          if (fn != null) {
+            fn(index);
+          } else {
+            ///如果路由名称存在，点击会调用路由
+            if (widget.routeName != null) {
+              var indexWidgetProvider =
+                  Provider.of<IndexWidgetProvider>(context, listen: false);
+              indexWidgetProvider.push(widget.routeName!, context: context);
+            }
+          }
+        });
+        cells.add(dataCell);
+      }
+      var selected = false;
+      if (index == widget.controller.currentIndex) {
+        selected = true;
+      }
+      var dataRow = DataRow(
+        cells: cells,
+        selected: selected,
+        onSelectChanged: (selected) {},
+        onLongPress: () {
+          var fn = widget.onLongPress;
+          if (fn != null) {
+            fn(index);
+          }
+        },
+      );
+      rows.add(dataRow);
+    }
+    return rows;
+  }
+
+  Widget _build(BuildContext context) {
+    if (widget.dataColumns.isEmpty) {
+      _buildColumnDefs();
+    }
+    Widget dataTableView = DataTable(
+      sortColumnIndex: sortColumnIndex,
+      sortAscending: sortAscending,
+      showCheckboxColumn: false,
+      onSelectAll: (state) {},
+      columns: widget.dataColumns,
+      rows: _buildRows(),
+    );
+
+    return dataTableView;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var dataTableView = _build(context);
+    var layoutBuilder = LayoutBuilder(
+      builder: (context, constraints) => SingleChildScrollView(
+        child: Column(
+          children: [
+            const Text(''),
+            Container(
+              alignment: Alignment.topLeft,
+              child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minWidth: constraints.minWidth),
+                    child: dataTableView,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    return layoutBuilder;
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_update);
+    super.dispose();
+  }
+}
+
+class DataPageTableView<T> extends StatefulWidget {
+  final List<ColumnFieldDef> columnDefs;
+  final DataPageController<T> controller;
+  final ScrollController scrollController = ScrollController();
+  final Function()? onScrollMax;
+  final Future<void> Function()? onRefresh;
+  final Function(int index)? onTap;
+  final String? routeName;
+  final Function(bool?)? onSelectChanged;
+  final Function(int index)? onLongPress;
+  final List<DataColumn> dataColumns = [];
+
+  DataPageTableView({
+    Key? key,
+    required this.columnDefs,
+    this.onScrollMax,
+    this.onRefresh,
+    this.onTap,
+    this.routeName,
+    this.onSelectChanged,
+    this.onLongPress,
+    required this.controller,
+  }) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() {
+    return _DataPageListView<T>();
+  }
+}
+
+class _DataPageListView<T> extends State<DataPageTableView> {
   late DataTableSource _sourceData;
   int? sortColumnIndex;
   bool sortAscending = true;
