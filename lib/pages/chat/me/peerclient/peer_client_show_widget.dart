@@ -12,7 +12,7 @@ final List<String> peerClientFields = ['id', 'name', 'peerId'];
 
 //邮件内容组件
 class PeerClientShowWidget extends StatefulWidget with TileDataMixin {
-  final DataListController<PeerClient> controller;
+  final DataPageController<PeerClient> controller;
 
   const PeerClientShowWidget({Key? key, required this.controller})
       : super(key: key);

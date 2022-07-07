@@ -3,6 +3,7 @@ import 'package:colla_chat/pages/chat/me/peerclient/peer_client_show_widget.dart
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../datastore/datastore.dart';
 import '../../../../entity/dht/myself.dart';
 import '../../../../entity/dht/peerclient.dart';
 import '../../../../l10n/localization.dart';
@@ -15,29 +16,72 @@ import '../../../../widgets/common/data_table_view.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
 class PeerClientDataPageController extends DataPageController<PeerClient> {
-  @override
-  void first() {
-    peerClientService.findPage();
+  _findPage(int offset, int limit) {
+    peerClientService
+        .findPage(limit: limit, offset: offset)
+        .then((Pagination<PeerClient> page) {
+      pagination = page;
+      if (page.data.isNotEmpty) {
+        setCurrentIndex(0, listen: false);
+      }
+      notifyListeners();
+    });
   }
 
   @override
-  void last() {
-    // TODO: implement last
+  bool first() {
+    var offset = 0;
+    var limit = this.limit;
+    _findPage(offset, limit);
+
+    return true;
   }
 
   @override
-  void move(int index) {
-    // TODO: implement move
+  bool last() {
+    var limit = this.limit;
+    var offset = pagination.rowsNumber - limit;
+    if (offset < 0) {
+      offset = 0;
+    }
+    if (offset > pagination.rowsNumber) {
+      return false;
+    }
+    _findPage(offset, limit);
+    return true;
   }
 
   @override
-  void next() {
-    // TODO: implement next
+  bool move(int index) {
+    if (index > page) {
+      return false;
+    }
+    var limit = this.limit;
+    var offset = index * limit;
+    _findPage(offset, limit);
+    return true;
   }
 
   @override
-  void previous() {
-    // TODO: implement previous
+  bool next() {
+    var limit = this.limit;
+    var offset = pagination.offset + limit;
+    if (offset > pagination.rowsNumber) {
+      return false;
+    }
+    _findPage(offset, limit);
+    return true;
+  }
+
+  @override
+  bool previous() {
+    var limit = this.limit;
+    var offset = pagination.offset - limit;
+    if (offset < 0) {
+      return false;
+    }
+    _findPage(offset, limit);
+    return true;
   }
 }
 
@@ -117,13 +161,13 @@ class _PeerClientListWidgetState extends State<PeerClientListWidget> {
   }
 
   _onTap(int index, String title, {TileData? group}) {
-    widget.controller.currentIndex = index;
+    widget.controller.setCurrentIndex(index);
   }
 
   @override
   Widget build(BuildContext context) {
-    KeepAliveWrapper<DataTableView> dataTableView = KeepAliveWrapper(
-        child: DataTableView<PeerClient>(
+    KeepAliveWrapper<DataPageTableView> dataTableView = KeepAliveWrapper(
+        child: DataPageTableView<PeerClient>(
       columnDefs: peerClientColumnFieldDefs,
       controller: widget.controller,
       routeName: 'peer_client_edit',

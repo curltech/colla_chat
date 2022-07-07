@@ -28,7 +28,7 @@ final List<ColumnFieldDef> peerClientColumnFieldDefs = [
 
 //邮件内容组件
 class PeerClientEditWidget extends StatefulWidget with TileDataMixin {
-  final DataListController<PeerClient> controller;
+  final DataPageController<PeerClient> controller;
   late final KeepAliveWrapper<FormInputWidget> formInputWidget;
 
   PeerClientEditWidget({Key? key, required this.controller}) : super(key: key);
