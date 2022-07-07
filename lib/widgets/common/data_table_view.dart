@@ -34,11 +34,11 @@ class DataTableView<T> extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _DataListView<T>();
+    return _DataTableViewState<T>();
   }
 }
 
-class _DataListView<T> extends State<DataTableView> {
+class _DataTableViewState<T> extends State<DataTableView> {
   late DataTableSource _sourceData;
   int? sortColumnIndex;
   bool sortAscending = true;
@@ -211,7 +211,7 @@ class _DataListView<T> extends State<DataTableView> {
   }
 }
 
-class DataPageTableView<T> extends StatefulWidget {
+class PaginatedDataTableView<T> extends StatefulWidget {
   final List<ColumnFieldDef> columnDefs;
   final DataPageController<T> controller;
   final ScrollController scrollController = ScrollController();
@@ -223,7 +223,7 @@ class DataPageTableView<T> extends StatefulWidget {
   final Function(int index)? onLongPress;
   final List<DataColumn> dataColumns = [];
 
-  DataPageTableView({
+  PaginatedDataTableView({
     Key? key,
     required this.columnDefs,
     this.onScrollMax,
@@ -237,11 +237,11 @@ class DataPageTableView<T> extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _DataPageListView<T>();
+    return _PaginatedDataTableState<T>();
   }
 }
 
-class _DataPageListView<T> extends State<DataPageTableView> {
+class _PaginatedDataTableState<T> extends State<PaginatedDataTableView> {
   late DataTableSource _sourceData;
   int? sortColumnIndex;
   bool sortAscending = true;

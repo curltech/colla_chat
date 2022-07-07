@@ -16,6 +16,8 @@ import '../../../../widgets/common/data_table_view.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
 class PeerClientDataPageController extends DataPageController<PeerClient> {
+  PeerClientDataPageController() : super();
+
   _findPage(int offset, int limit) {
     peerClientService
         .findPage(limit: limit, offset: offset)
@@ -166,8 +168,8 @@ class _PeerClientListWidgetState extends State<PeerClientListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    KeepAliveWrapper<DataPageTableView> dataTableView = KeepAliveWrapper(
-        child: DataPageTableView<PeerClient>(
+    KeepAliveWrapper<PaginatedDataTableView> dataTableView = KeepAliveWrapper(
+        child: PaginatedDataTableView<PeerClient>(
       columnDefs: peerClientColumnFieldDefs,
       controller: widget.controller,
       routeName: 'peer_client_edit',

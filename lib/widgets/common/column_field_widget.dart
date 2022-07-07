@@ -179,11 +179,11 @@ class ColumnFieldWidget extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _ColumnFieldWidget();
+    return _ColumnFieldWidgetState();
   }
 }
 
-class _ColumnFieldWidget extends State<ColumnFieldWidget> {
+class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
   @override
   initState() {
     super.initState();
