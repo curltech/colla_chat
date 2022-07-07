@@ -149,6 +149,7 @@ abstract class DataPageController<T> with ChangeNotifier {
   int _currentIndex = -1;
 
   DataPageController() {
+    pagination = Pagination<T>(data: [], rowsNumber: -1);
     first();
   }
 

@@ -13,14 +13,10 @@ class Pagination<T> {
   int rowsNumber;
   List<T> data;
   int offset = defaultOffset;
-  int rowsPerPage = 0;
+  int rowsPerPage = defaultLimit;
 
   static int getPage(int offset, int limit) {
-    int mod = offset % limit;
-    int page = offset ~/ limit;
-    if (mod > 0) {
-      page++;
-    }
+    int page = offset ~/ limit + 1;
 
     return page;
   }
@@ -36,10 +32,10 @@ class Pagination<T> {
   }
 
   Pagination(
-      {required this.rowsNumber,
-      required this.data,
-      this.offset = 0,
-      this.rowsPerPage = 10});
+      {required this.data,
+      this.rowsNumber = -1,
+      this.offset = defaultOffset,
+      this.rowsPerPage = defaultLimit});
 
   int get pagesNumber {
     return getPagesNumber(rowsNumber, rowsPerPage);

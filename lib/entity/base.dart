@@ -1,19 +1,28 @@
+///实体的业务状态
 enum EntityStatus {
-  Draft,
-  Effective,
-  Expired,
-  Deleted,
-  Canceled,
-  Checking,
-  Undefined,
-  Locked,
-  Checked,
-  Unchecked,
-  Enabled,
-  Disable,
-  Discarded,
-  Merged,
-  Reversed,
+  draft,
+  effective,
+  expired,
+  deleted,
+  canceled,
+  checking,
+  undefined,
+  locked,
+  checked,
+  unchecked,
+  enabled,
+  disable,
+  discarded,
+  merged,
+  reversed,
+}
+
+///实体的脏标志，新增，删除，更新，
+enum EntityState {
+  insert,
+  delete,
+  update,
+  none,
 }
 
 abstract class BaseEntity {

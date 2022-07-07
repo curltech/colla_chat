@@ -5,7 +5,6 @@ import '../../../../entity/dht/peerclient.dart';
 import '../../../../provider/data_list_controller.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/card_text_widget.dart';
-import '../../../../widgets/common/keep_alive_wrapper.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
 final List<String> peerClientFields = ['id', 'name', 'peerId'];
@@ -37,9 +36,11 @@ class _PeerClientShowWidgetState extends State<PeerClientShowWidget> {
   @override
   initState() {
     super.initState();
-    widget.controller.addListener(() {
-      setState(() {});
-    });
+    widget.controller.addListener(_update);
+  }
+
+  _update() {
+    setState(() {});
   }
 
   Widget _buildCardTextWidget(BuildContext context) {
@@ -54,10 +55,9 @@ class _PeerClientShowWidgetState extends State<PeerClientShowWidget> {
         options.add(Option(label, value.toString()));
       }
     }
-    Widget formInputWidget = KeepAliveWrapper(
-        child: CardTextWidget(
+    Widget formInputWidget = CardTextWidget(
       options: options,
-    ));
+    );
     return formInputWidget;
   }
 
@@ -69,5 +69,11 @@ class _PeerClientShowWidgetState extends State<PeerClientShowWidget> {
         withLeading: widget.withLeading,
         child: cardTextWidget);
     return appBarView;
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_update);
+    super.dispose();
   }
 }

@@ -198,11 +198,11 @@ abstract class GeneralBaseService<T> {
   }
 
   Future<List<T>> findEffective() async {
-    return await findByStatus(EntityStatus.Effective.name);
+    return await findByStatus(EntityStatus.effective.name);
   }
 
   Future<Object?> findOneEffective() async {
-    var es = await findByStatus(EntityStatus.Effective.name);
+    var es = await findByStatus(EntityStatus.effective.name);
     if (es.isNotEmpty) {
       return es[0];
     }

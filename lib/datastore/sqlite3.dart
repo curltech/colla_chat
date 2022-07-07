@@ -168,18 +168,19 @@ class Sqlite3 extends DataStore {
       String? orderBy,
       int limit = defaultLimit,
       int offset = defaultOffset}) async {
-    var clause = sqlBuilder.select(table,
-        distinct: distinct,
-        columns: columns,
-        where: where,
-        whereArgs: whereArgs,
-        groupBy: groupBy,
-        having: having,
-        orderBy: orderBy,
-        limit: limit,
-        offset: offset);
+    var clause = sqlBuilder.select(
+      table,
+      distinct: distinct,
+      columns: columns,
+      where: where,
+      whereArgs: whereArgs,
+      groupBy: groupBy,
+      having: having,
+      orderBy: orderBy,
+    );
     clause = 'select count(*) from ($clause)';
-    var totalResults = db.select(clause, whereArgs!);
+    whereArgs = whereArgs ?? [];
+    var totalResults = db.select(clause, whereArgs);
     logger.i('execute sql:$clause');
     logger.i('execute sql params:$whereArgs');
     var rowsNumber = TypeUtil.firstIntValue(totalResults);

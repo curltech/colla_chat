@@ -86,6 +86,7 @@ class ColumnFieldController with ChangeNotifier {
   //非文本框的值
   dynamic _value;
   dynamic _flag;
+  bool _changed = false;
 
   //文本框的值
   TextEditingController? _controller;
@@ -114,10 +115,14 @@ class ColumnFieldController with ChangeNotifier {
   set value(dynamic value) {
     var controller = _controller;
     if (controller != null) {
-      controller.text = value;
+      if (controller.text != value) {
+        controller.text = value;
+        _changed = true;
+      }
     } else {
       if (_value != value) {
         _value = value;
+        _changed = true;
         notifyListeners();
       }
     }
@@ -131,6 +136,16 @@ class ColumnFieldController with ChangeNotifier {
     if (_flag != flag) {
       _flag = flag;
       notifyListeners();
+    }
+  }
+
+  bool get changed {
+    return _changed;
+  }
+
+  set changed(bool changed) {
+    if (_changed != changed) {
+      _changed = changed;
     }
   }
 

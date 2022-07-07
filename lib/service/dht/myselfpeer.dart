@@ -33,7 +33,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       credential,
       credential,
       credential,
-      EntityStatus.Effective.name
+      EntityStatus.effective.name
     ];
     var peer = await findOne(where: where, whereArgs: whereArgs);
 
@@ -60,7 +60,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       throw 'SameNameAccountExists';
     }
     var myselfPeer = MyselfPeer('');
-    myselfPeer.status = EntityStatus.Effective.name;
+    myselfPeer.status = EntityStatus.effective.name;
     myselfPeer.mobile = mobile;
     myselfPeer.email = email;
     var clientDevice = PlatformParams.instance.clientDevice;
@@ -92,7 +92,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     }
     var peerProfile = PeerProfile();
     peerProfile.peerId = peerId;
-    peerProfile.status = EntityStatus.Effective.name;
+    peerProfile.status = EntityStatus.effective.name;
     peerProfile.creditScore = 300;
     peerProfile.mobileVerified = 'N';
     peerProfile.visibilitySetting = 'YYYYYY';

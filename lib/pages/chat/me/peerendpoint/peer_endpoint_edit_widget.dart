@@ -8,7 +8,7 @@ import '../../../../widgets/common/column_field_widget.dart';
 import '../../../../widgets/common/form_input_widget.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
-final List<ColumnFieldDef> peerEndpointInputFieldDefs = [
+final List<ColumnFieldDef> peerEndpointColumnFieldDefs = [
   ColumnFieldDef(
       name: 'id',
       label: 'id',
@@ -66,12 +66,13 @@ class _PeerEndpointEditWidgetState extends State<PeerEndpointEditWidget> {
   }
 
   Widget _buildFormInputWidget(BuildContext context) {
-    var initValues = widget.controller.getInitValue(peerEndpointInputFieldDefs);
+    var initValues =
+        widget.controller.getInitValue(peerEndpointColumnFieldDefs);
     var formInputWidget = FormInputWidget(
       onOk: (Map<String, dynamic> values) {
         _onOk(values);
       },
-      columnFieldDefs: peerEndpointInputFieldDefs,
+      columnFieldDefs: peerEndpointColumnFieldDefs,
       initValues: initValues,
     );
 

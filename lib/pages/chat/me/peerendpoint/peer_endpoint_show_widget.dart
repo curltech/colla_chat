@@ -36,9 +36,11 @@ class _PeerEndpointShowWidgetState extends State<PeerEndpointShowWidget> {
   @override
   initState() {
     super.initState();
-    widget.controller.addListener(() {
-      setState(() {});
-    });
+    widget.controller.addListener(_update);
+  }
+
+  _update() {
+    setState(() {});
   }
 
   Widget _buildCardTextWidget(BuildContext context) {
@@ -67,5 +69,11 @@ class _PeerEndpointShowWidgetState extends State<PeerEndpointShowWidget> {
         withLeading: widget.withLeading,
         child: cardTextWidget);
     return appBarView;
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_update);
+    super.dispose();
   }
 }

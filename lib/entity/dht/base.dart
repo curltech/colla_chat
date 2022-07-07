@@ -21,7 +21,7 @@ abstract class PeerLocation extends StatusEntity {
   String? lastUpdateTime;
   PeerLocation(this.ownerPeerId);
   PeerLocation.fromJson(Map json)
-      : ownerPeerId = json['ownerPeerId'],
+      : ownerPeerId = json['ownerPeerId'] ?? '',
         peerId = json['peerId'],
         kind = json['kind'],
         name = json['name'] ?? '',

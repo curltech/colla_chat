@@ -12,7 +12,7 @@ import '../../../../provider/index_widget_provider.dart';
 import '../../../../service/dht/peerclient.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/data_listtile.dart';
-import '../../../../widgets/common/data_table_view.dart';
+import '../../../../widgets/common/paginated_data_table_view.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
 class PeerClientDataPageController extends DataPageController<PeerClient> {
@@ -32,8 +32,11 @@ class PeerClientDataPageController extends DataPageController<PeerClient> {
 
   @override
   bool first() {
+    if (pagination.rowsNumber != -1 && pagination.offset == 0) {
+      return false;
+    }
     var offset = 0;
-    var limit = this.limit;
+    var limit = pagination.rowsPerPage;
     _findPage(offset, limit);
 
     return true;
@@ -55,11 +58,11 @@ class PeerClientDataPageController extends DataPageController<PeerClient> {
 
   @override
   bool move(int index) {
-    if (index > page) {
+    if (index >= pagination.rowsNumber) {
       return false;
     }
     var limit = this.limit;
-    var offset = index * limit;
+    var offset = index ~/ limit * limit;
     _findPage(offset, limit);
     return true;
   }
@@ -127,7 +130,7 @@ class PeerClientListWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  String get routeName => 'peerclient';
+  String get routeName => 'peer_client';
 
   @override
   Icon get icon => const Icon(Icons.desktop_windows);

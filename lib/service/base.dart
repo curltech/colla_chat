@@ -193,11 +193,11 @@ abstract class BaseService {
   }
 
   Future<List<dynamic>> findEffective({Object Function(Map)? post}) async {
-    return await findByStatus(EntityStatus.Effective.name, post: post);
+    return await findByStatus(EntityStatus.effective.name, post: post);
   }
 
   Future<dynamic> findOneEffective({Object Function(Map)? post}) async {
-    var es = await findByStatus(EntityStatus.Effective.name, post: post);
+    var es = await findByStatus(EntityStatus.effective.name, post: post);
     if (es.isNotEmpty) {
       return es[0];
     }

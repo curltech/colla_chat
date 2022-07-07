@@ -2,13 +2,18 @@ import 'package:flutter/material.dart';
 
 import '../../../../entity/dht/peerclient.dart';
 import '../../../../provider/data_list_controller.dart';
+import '../../../../service/dht/peerclient.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/column_field_widget.dart';
 import '../../../../widgets/common/form_input_widget.dart';
-import '../../../../widgets/common/keep_alive_wrapper.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
 final List<ColumnFieldDef> peerClientColumnFieldDefs = [
+  ColumnFieldDef(
+      name: 'id',
+      label: 'id',
+      dataType: DataType.int,
+      prefixIcon: const Icon(Icons.perm_identity)),
   ColumnFieldDef(
       name: 'name', label: 'name', prefixIcon: const Icon(Icons.person)),
   ColumnFieldDef(
@@ -29,7 +34,6 @@ final List<ColumnFieldDef> peerClientColumnFieldDefs = [
 //邮件内容组件
 class PeerClientEditWidget extends StatefulWidget with TileDataMixin {
   final DataPageController<PeerClient> controller;
-  late final KeepAliveWrapper<FormInputWidget> formInputWidget;
 
   PeerClientEditWidget({Key? key, required this.controller}) : super(key: key);
 
@@ -53,39 +57,45 @@ class _PeerClientEditWidgetState extends State<PeerClientEditWidget> {
   @override
   initState() {
     super.initState();
-    widget.controller.addListener(() {
-      setState(() {});
-    });
-    _buildFormInputWidget(context);
+    widget.controller.addListener(_update);
+  }
+
+  _update() {
+    setState(() {});
   }
 
   Widget _buildFormInputWidget(BuildContext context) {
+    var initValues = widget.controller.getInitValue(peerClientColumnFieldDefs);
     var formInputWidget = FormInputWidget(
       onOk: (Map<String, dynamic> values) {
         _onOk(values);
       },
       columnFieldDefs: peerClientColumnFieldDefs,
+      initValues: initValues,
     );
-    PeerClient? currentPeerClient = widget.controller.current;
-    if (currentPeerClient != null) {
-      var peerClient = currentPeerClient.toJson();
-      formInputWidget.controller.setValues(peerClient);
-    }
 
-    widget.formInputWidget =
-        KeepAliveWrapper<FormInputWidget>(child: formInputWidget);
-
-    return widget.formInputWidget;
+    return formInputWidget;
   }
 
-  _onOk(Map<String, dynamic> values) {}
+  _onOk(Map<String, dynamic> values) {
+    PeerClient currentPeerClient = PeerClient.fromJson(values);
+    peerClientService.upsert(currentPeerClient).then((count) {
+      widget.controller.update(currentPeerClient);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
         title: widget.title,
         withLeading: widget.withLeading,
-        child: widget.formInputWidget);
+        child: _buildFormInputWidget(context));
     return appBarView;
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_update);
+    super.dispose();
   }
 }

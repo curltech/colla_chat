@@ -88,7 +88,7 @@ class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  String get routeName => 'peerendpoint';
+  String get routeName => 'peer_endpoint';
 
   @override
   Icon get icon => const Icon(Icons.desktop_windows);
