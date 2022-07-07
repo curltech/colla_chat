@@ -29,11 +29,11 @@ class DataGridWidget<T> extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _PaginatedDataTableState<T>();
+    return _DataGridWidgetState<T>();
   }
 }
 
-class _PaginatedDataTableState<T> extends State<DataGridWidget> {
+class _DataGridWidgetState<T> extends State<DataGridWidget> {
   int? sortColumnIndex;
   bool sortAscending = true;
 
