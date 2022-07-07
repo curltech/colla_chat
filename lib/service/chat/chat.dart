@@ -4,6 +4,7 @@ import 'package:colla_chat/service/servicelocator.dart';
 
 import '../../constant/base.dart';
 import '../../datastore/datastore.dart';
+import '../../entity/base.dart';
 import '../../entity/chat/chat.dart';
 import '../../entity/dht/myself.dart';
 import '../../entity/p2p/security_context.dart';
@@ -72,7 +73,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       securityContext.needEncrypt = true;
       for (var chatMessage in chatMessages) {
         var state = chatMessage.state;
-        if (EntityState.Deleted.name == state) {
+        if (EntityState.delete.name == state) {
           continue;
         }
         securityContext.payloadKey = chatMessage.payloadKey;
@@ -173,8 +174,8 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
       securityContext.needCompress = true;
       securityContext.needEncrypt = true;
       for (var attach in attaches) {
-        if (EntityState.Deleted.name == entity.state) {
-          attach.state = EntityState.Deleted.name;
+        if (EntityState.delete.name == entity.state) {
+          attach.state = EntityState.delete;
           continue;
         }
         var content = attach.content;

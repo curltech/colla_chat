@@ -30,7 +30,7 @@ abstract class BaseEntity {
   String? createDate;
   String? updateDate;
   String? entityId;
-  String? state;
+  EntityState? state;
 
   BaseEntity();
 

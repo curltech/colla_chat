@@ -6,6 +6,7 @@ import 'package:idb_shim/idb.dart';
 import 'package:idb_shim/idb_browser.dart';
 
 import '../constant/base.dart';
+import '../entity/base.dart';
 import '../service/general_base.dart';
 import '../service/servicelocator.dart';
 import 'datastore.dart';
@@ -355,13 +356,13 @@ class IndexedDb extends DataStore {
     var map = JsonUtil.toMap(entity);
     Object? id = EntityUtil.getId(map);
     var state = map['state'];
-    if (EntityState.New == state) {
+    if (EntityState.insert == state) {
       map.remove('state');
       store.add(map, id);
-    } else if (EntityState.Modified == state) {
+    } else if (EntityState.update == state) {
       map.remove('state');
       store.put(map, id);
-    } else if (EntityState.Deleted == state) {
+    } else if (EntityState.delete == state) {
       map.remove('state');
       if (id != null) {
         store.delete(id);

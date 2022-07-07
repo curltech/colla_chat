@@ -1,3 +1,4 @@
+import 'package:colla_chat/entity/base.dart';
 import 'package:flutter/material.dart';
 
 import '../constant/base.dart';
@@ -116,6 +117,12 @@ class DataListController<T> with ChangeNotifier {
         var value = currentMap[name];
         if (value != null) {
           values[name] = value;
+        }
+      }
+      if (current is BaseEntity) {
+        var state = current.state;
+        if (state != null) {
+          values['state'] = state;
         }
       }
       return values;

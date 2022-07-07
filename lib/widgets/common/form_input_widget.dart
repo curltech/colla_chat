@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../entity/base.dart';
 import '../../l10n/localization.dart';
 import '../../tool/util.dart';
 import 'column_field_widget.dart';
 
 class FormInputController with ChangeNotifier {
   final Map<String, ColumnFieldController> controllers = {};
+  EntityState? state;
 
-  FormInputController();
+  FormInputController({this.state});
 
   setController(String name, ColumnFieldController controller) {
     controllers[name] = controller;
@@ -34,6 +36,15 @@ class FormInputController with ChangeNotifier {
     for (var entry in controllers.entries) {
       String name = entry.key;
       values[name] = entry.value.value;
+      if (state == null) {
+        bool changed = entry.value.changed;
+        if (changed) {
+          state = EntityState.update;
+        }
+      }
+    }
+    if (state != null) {
+      values['state'] = state;
     }
     return values;
   }
@@ -90,7 +101,14 @@ class FormInputWidget extends StatelessWidget {
       required this.onOk,
       this.mainAxisAlignment = MainAxisAlignment.start,
       this.spacing = 0.0})
-      : super(key: key);
+      : super(key: key) {
+    if (initValues != null) {
+      var state = initValues!['state'];
+      if (state != null) {
+        controller.state = state;
+      }
+    }
+  }
 
   _adjustValues(Map<String, dynamic> values) {
     for (var columnFieldDef in columnFieldDefs) {

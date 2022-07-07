@@ -6,6 +6,7 @@ import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../constant/address.dart';
+import '../../../../entity/base.dart';
 import '../../../../entity/dht/peerendpoint.dart';
 import '../../../../l10n/localization.dart';
 import '../../../../provider/app_data_provider.dart';
@@ -66,15 +67,20 @@ class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
     rightWidgets = [
       IconButton(
           onPressed: () {
-            controller.add(PeerEndpoint(myself.peerId ?? ''));
+            var current = PeerEndpoint(myself.peerId ?? '');
+            current.state = EntityState.insert;
+            controller.add(current);
           },
           icon: const Icon(Icons.add),
           tooltip: AppLocalizations.t('Add')),
       IconButton(
           onPressed: () {
             var current = controller.current;
-            peerEndpointService.delete(current);
-            controller.delete();
+            if (current != null) {
+              current.state = EntityState.delete;
+              peerEndpointService.delete(current);
+              controller.delete();
+            }
           },
           icon: const Icon(Icons.delete),
           tooltip: AppLocalizations.t('Delete')),

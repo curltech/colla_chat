@@ -10,6 +10,7 @@ import './condition_import/unsupport.dart'
     if (dart.library.html) './condition_import/web.dart'
     if (dart.library.io) './condition_import/desktop.dart' as sqlite3_open;
 import '../constant/base.dart';
+import '../entity/base.dart';
 import '../provider/app_data_provider.dart';
 import '../service/general_base.dart';
 import '../service/servicelocator.dart';
@@ -328,26 +329,26 @@ class Sqlite3 extends DataStore {
             var json = jsonEncode(e);
             var m = jsonDecode(json);
             var state = m['state'];
-            if (EntityState.New == state) {
+            if (EntityState.insert == state) {
               m.remove('state');
               insert(table, m);
-            } else if (EntityState.Modified == state) {
+            } else if (EntityState.update == state) {
               m.remove('state');
               update(table, m, where: where, whereArgs: whereArgs);
-            } else if (EntityState.Deleted == state) {
+            } else if (EntityState.delete == state) {
               m.remove('state');
               delete(table, where: where, whereArgs: whereArgs);
             }
           }
         } else {
           var state = entity['state'];
-          if (EntityState.New == state) {
+          if (EntityState.insert == state) {
             entity.remove('state');
             insert(table, entity);
-          } else if (EntityState.Modified == state) {
+          } else if (EntityState.update == state) {
             entity.remove('state');
             update(table, entity, where: where, whereArgs: whereArgs);
-          } else if (EntityState.Deleted == state) {
+          } else if (EntityState.delete == state) {
             entity.remove('state');
             delete(table, where: where, whereArgs: whereArgs);
           }

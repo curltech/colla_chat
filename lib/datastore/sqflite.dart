@@ -7,6 +7,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 import '../constant/base.dart';
+import '../entity/base.dart';
 import '../service/general_base.dart';
 import '../service/servicelocator.dart';
 import 'datastore.dart';
@@ -275,26 +276,26 @@ class Sqflite extends DataStore {
               var json = jsonEncode(e);
               var m = jsonDecode(json);
               var state = m['state'];
-              if (EntityState.New == state) {
+              if (EntityState.insert == state) {
                 m.remove('state');
                 batch.insert(table, m);
-              } else if (EntityState.Modified == state) {
+              } else if (EntityState.update == state) {
                 m.remove('state');
                 batch.update(table, m, where: where, whereArgs: whereArgs);
-              } else if (EntityState.Deleted == state) {
+              } else if (EntityState.delete == state) {
                 m.remove('state');
                 batch.delete(table, where: where, whereArgs: whereArgs);
               }
             }
           } else {
             var state = entity['state'];
-            if (EntityState.New == state) {
+            if (EntityState.insert == state) {
               entity.remove('state');
               batch.insert(table, entity);
-            } else if (EntityState.Modified == state) {
+            } else if (EntityState.update == state) {
               entity.remove('state');
               batch.update(table, entity, where: where, whereArgs: whereArgs);
-            } else if (EntityState.Deleted == state) {
+            } else if (EntityState.delete == state) {
               entity.remove('state');
               batch.delete(table, where: where, whereArgs: whereArgs);
             }

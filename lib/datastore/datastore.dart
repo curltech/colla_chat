@@ -2,13 +2,6 @@ import 'package:colla_chat/datastore/sql_builder.dart';
 
 import '../constant/base.dart';
 
-enum EntityState {
-  None,
-  New,
-  Modified,
-  Deleted,
-}
-
 class Pagination<T> {
   int rowsNumber;
   List<T> data;
