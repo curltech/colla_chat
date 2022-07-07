@@ -37,7 +37,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     ];
     var peer = await findOne(where: where, whereArgs: whereArgs);
 
-    return peer as MyselfPeer;
+    return peer;
   }
 
   /// 注册新的p2p账户
