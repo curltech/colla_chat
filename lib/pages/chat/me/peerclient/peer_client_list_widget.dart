@@ -1,6 +1,7 @@
 import 'package:colla_chat/pages/chat/me/peerclient/peer_client_edit_widget.dart';
 import 'package:colla_chat/pages/chat/me/peerclient/peer_client_show_widget.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
+import 'package:colla_chat/widgets/common/pluto_data_grid_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../datastore/datastore.dart';
@@ -13,7 +14,6 @@ import '../../../../provider/index_widget_provider.dart';
 import '../../../../service/dht/peerclient.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/data_listtile.dart';
-import '../../../../widgets/common/paginated_data_table_view.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
 class PeerClientDataPageController extends DataPageController<PeerClient> {
@@ -177,8 +177,8 @@ class _PeerClientListWidgetState extends State<PeerClientListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    KeepAliveWrapper<PaginatedDataTableView> dataTableView = KeepAliveWrapper(
-        child: PaginatedDataTableView<PeerClient>(
+    KeepAliveWrapper<PlutoDataGridWidget> dataTableView = KeepAliveWrapper(
+        child: PlutoDataGridWidget<PeerClient>(
       columnDefs: peerClientColumnFieldDefs,
       controller: widget.controller,
       routeName: 'peer_client_edit',

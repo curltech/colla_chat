@@ -26,7 +26,6 @@ import 'package:network_info_plus_web/network_info_plus_web.dart';
 import 'package:openpgp/web/openpgp_web.dart';
 import 'package:package_info_plus_web/package_info_plus_web.dart';
 import 'package:pdfx/src/renderer/web/pdfx_plugin.dart';
-import 'package:printing/printing_web.dart';
 import 'package:sensors_plus_web/sensors_plus_web.dart';
 import 'package:share_plus_web/share_plus_web.dart';
 import 'package:shared_preferences_web/shared_preferences_web.dart';
@@ -60,7 +59,6 @@ void registerPlugins(Registrar registrar) {
   OpenpgpPlugin.registerWith(registrar);
   PackageInfoPlugin.registerWith(registrar);
   PdfxPlugin.registerWith(registrar);
-  PrintingPlugin.registerWith(registrar);
   SensorsPlugin.registerWith(registrar);
   SharePlusPlugin.registerWith(registrar);
   SharedPreferencesPlugin.registerWith(registrar);

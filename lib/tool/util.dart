@@ -5,7 +5,6 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:barcode_scan2/barcode_scan2.dart';
-import 'package:barcode_widget/barcode_widget.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/common/column_field_widget.dart';
@@ -1088,21 +1087,21 @@ class QrcodeUtil {
     }
 
     // 新版本的写法
-    final qrCode = QrCode(4, QrErrorCorrectLevel.L)..addData(data);
-    final qrImage = QrImage(qrCode);
+    // final qrCode = QrCode(4, QrErrorCorrectLevel.L)..addData(data);
+    // final qrImage = QrImage(qrCode);
+    //
+    // return qrImage;
 
-    return qrImage;
-
-    // return QrImage(
-    //   data: data,
-    //   version: QrVersions.auto,
-    //   size: size,
-    //   gapless: false,
-    //   embeddedImage: bytes != null ? MemoryImage(bytes) : null,
-    //   embeddedImageStyle: QrEmbeddedImageStyle(
-    //     size: const Size(80, 80),
-    //   ),
-    // );
+    return QrImage(
+      data: data,
+      version: QrVersions.auto,
+      size: size,
+      gapless: false,
+      embeddedImage: bytes != null ? MemoryImage(bytes) : null,
+      embeddedImageStyle: QrEmbeddedImageStyle(
+        size: const Size(80, 80),
+      ),
+    );
   }
 
   static Future<ui.Image> _loadEmbedImage(String? embed) async {
@@ -1155,38 +1154,38 @@ class QrcodeUtil {
     return qrFutureBuilder;
   }
 
-  static Widget barcodeWidget(String data,
-      {double width = 300, double height = 300, String? embed}) {
-    Uint8List? bytes;
-    if (embed != null && ImageUtil.isBase64Img(embed)) {
-      int pos = embed.indexOf(',');
-      bytes = CryptoUtil.decodeBase64(embed.substring(pos));
-    }
-    Widget imageWidget = defaultImage;
-    if (bytes != null) {
-      imageWidget = Image.memory(bytes, fit: BoxFit.contain);
-    }
-
-    Widget widget = Stack(
-      alignment: Alignment.center,
-      children: [
-        BarcodeWidget(
-          barcode: Barcode.qrCode(),
-          data: data,
-          width: width,
-          height: height,
-        ),
-        Container(
-          color: Colors.white,
-          width: 60,
-          height: 60,
-          child: imageWidget,
-        ),
-      ],
-    );
-
-    return widget;
-  }
+  // static Widget barcodeWidget(String data,
+  //     {double width = 300, double height = 300, String? embed}) {
+  //   Uint8List? bytes;
+  //   if (embed != null && ImageUtil.isBase64Img(embed)) {
+  //     int pos = embed.indexOf(',');
+  //     bytes = CryptoUtil.decodeBase64(embed.substring(pos));
+  //   }
+  //   Widget imageWidget = defaultImage;
+  //   if (bytes != null) {
+  //     imageWidget = Image.memory(bytes, fit: BoxFit.contain);
+  //   }
+  //
+  //   Widget widget = Stack(
+  //     alignment: Alignment.center,
+  //     children: [
+  //       BarcodeWidget(
+  //         barcode: Barcode.qrCode(),
+  //         data: data,
+  //         width: width,
+  //         height: height,
+  //       ),
+  //       Container(
+  //         color: Colors.white,
+  //         width: 60,
+  //         height: 60,
+  //         child: imageWidget,
+  //       ),
+  //     ],
+  //   );
+  //
+  //   return widget;
+  // }
 
   static Future<ScanResult> scan(
       {List<BarcodeFormat> restrictFormat = const [],

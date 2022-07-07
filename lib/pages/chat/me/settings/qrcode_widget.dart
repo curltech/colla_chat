@@ -1,5 +1,4 @@
 import 'dart:typed_data';
-import 'dart:ui' as ui;
 
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -35,6 +34,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
   String peerId = '未登录';
   String name = '未登录';
   GlobalKey? globalKey;
+  Widget? qrImage;
   String? content;
   @override
   void initState() {
@@ -49,7 +49,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
       name = myself.myselfPeer!.name;
     }
     content = this.peerId;
-    FutureBuilder<ui.Image> qrImage = QrcodeUtil.qrImageWidget(content!);
+    qrImage = QrcodeUtil.create(content!);
     globalKey = GlobalKey();
     var children = <Widget>[
       ListTile(
@@ -95,7 +95,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
         break;
       case 3:
         setState(() {
-          Widget qrImage = QrcodeUtil.barcodeWidget(content!);
+          qrImage = QrcodeUtil.create(content!);
         });
         break;
       default:
