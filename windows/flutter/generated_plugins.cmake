@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   battery_plus_windows
   connectivity_plus_windows
+  file_saver
   flutter_secure_storage_windows
   flutter_webrtc
   geolocator_windows
@@ -13,6 +14,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   openpgp
   pdfx
   permission_handler_windows
+  printing
   sqlite3_flutter_libs
   url_launcher_windows
 )

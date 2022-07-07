@@ -4,6 +4,7 @@ import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../datastore/datastore.dart';
+import '../../../../entity/base.dart';
 import '../../../../entity/dht/myself.dart';
 import '../../../../entity/dht/peerclient.dart';
 import '../../../../l10n/localization.dart';
@@ -108,15 +109,20 @@ class PeerClientListWidget extends StatefulWidget with TileDataMixin {
     rightWidgets = [
       IconButton(
           onPressed: () {
-            controller.add(PeerClient(myself.peerId ?? ''));
+            var current = PeerClient(myself.peerId ?? '');
+            current.state = EntityState.insert;
+            controller.add(current);
           },
           icon: const Icon(Icons.add),
           tooltip: AppLocalizations.t('Add')),
       IconButton(
           onPressed: () {
             var current = controller.current;
-            peerClientService.delete(current);
-            controller.delete();
+            if (current != null) {
+              current.state = EntityState.delete;
+              peerClientService.delete(current);
+              controller.delete();
+            }
           },
           icon: const Icon(Icons.delete),
           tooltip: AppLocalizations.t('Delete')),

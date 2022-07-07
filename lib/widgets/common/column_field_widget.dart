@@ -21,7 +21,7 @@ enum InputType {
   custom
 }
 
-enum DataType { int, double, string, bool, date, set, list, map }
+enum DataType { int, double, string, bool, date, time, set, list, map }
 
 /// 通用列表项的数据模型
 class ColumnFieldDef {
@@ -51,6 +51,10 @@ class ColumnFieldDef {
 
   final List<Option>? options;
 
+  final bool enableColumnFilter = false;
+
+  final Function(dynamic value)? formatter;
+
   final Function(String value)? validator;
 
   final bool autoValidate;
@@ -74,6 +78,7 @@ class ColumnFieldDef {
       this.maxLines = 1,
       this.readOnly = false,
       this.options,
+      this.formatter,
       this.validator,
       this.autoValidate = false,
       this.onSort,

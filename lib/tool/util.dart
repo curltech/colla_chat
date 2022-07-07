@@ -5,12 +5,15 @@ import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:barcode_scan2/barcode_scan2.dart';
+import 'package:barcode_widget/barcode_widget.dart';
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/common/column_field_widget.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:mobile_number/mobile_number.dart';
@@ -1083,16 +1086,106 @@ class QrcodeUtil {
       int pos = embed.indexOf(',');
       bytes = CryptoUtil.decodeBase64(embed.substring(pos));
     }
-    return QrImage(
-      data: data,
-      version: QrVersions.auto,
-      size: size,
-      gapless: false,
-      embeddedImage: bytes != null ? MemoryImage(bytes) : null,
-      embeddedImageStyle: QrEmbeddedImageStyle(
-        size: const Size(80, 80),
-      ),
+
+    // 新版本的写法
+    final qrCode = QrCode(4, QrErrorCorrectLevel.L)..addData(data);
+    final qrImage = QrImage(qrCode);
+
+    return qrImage;
+
+    // return QrImage(
+    //   data: data,
+    //   version: QrVersions.auto,
+    //   size: size,
+    //   gapless: false,
+    //   embeddedImage: bytes != null ? MemoryImage(bytes) : null,
+    //   embeddedImageStyle: QrEmbeddedImageStyle(
+    //     size: const Size(80, 80),
+    //   ),
+    // );
+  }
+
+  static Future<ui.Image> _loadEmbedImage(String? embed) async {
+    Uint8List? bytes;
+    if (embed != null && ImageUtil.isBase64Img(embed)) {
+      int pos = embed.indexOf(',');
+      bytes = CryptoUtil.decodeBase64(embed.substring(pos));
+    }
+    if (bytes == null) {
+      final byteData = await rootBundle.load(defaultAvatar);
+      bytes = byteData.buffer.asUint8List();
+    }
+
+    final completer = Completer<ui.Image>();
+    ui.decodeImageFromList(bytes, completer.complete);
+    return completer.future;
+  }
+
+  static FutureBuilder<ui.Image> qrImageWidget(String data,
+      {double width = 300, double height = 300, String? embed}) {
+    final qrFutureBuilder = FutureBuilder<ui.Image>(
+      future: _loadEmbedImage(embed),
+      builder: (ctx, snapshot) {
+        if (!snapshot.hasData) {
+          return SizedBox(width: width, height: height);
+        }
+        return CustomPaint(
+          size: Size.square(width),
+          painter: QrPainter(
+            data: data,
+            version: QrVersions.auto,
+            eyeStyle: const QrEyeStyle(
+              eyeShape: QrEyeShape.square,
+              color: Color(0xff128760),
+            ),
+            dataModuleStyle: const QrDataModuleStyle(
+              dataModuleShape: QrDataModuleShape.circle,
+              color: Color(0xff1a5441),
+            ),
+            // size: 320.0,
+            embeddedImage: snapshot.data,
+            embeddedImageStyle: QrEmbeddedImageStyle(
+              size: const Size.square(64),
+            ),
+          ),
+        );
+      },
     );
+
+    return qrFutureBuilder;
+  }
+
+  static Widget barcodeWidget(String data,
+      {double width = 300, double height = 300, String? embed}) {
+    Uint8List? bytes;
+    if (embed != null && ImageUtil.isBase64Img(embed)) {
+      int pos = embed.indexOf(',');
+      bytes = CryptoUtil.decodeBase64(embed.substring(pos));
+    }
+    Widget imageWidget = defaultImage;
+    if (bytes != null) {
+      imageWidget = Image.memory(bytes, fit: BoxFit.contain);
+    }
+
+    Widget widget = Stack(
+      alignment: Alignment.center,
+      children: [
+        BarcodeWidget(
+          barcode: Barcode.qrCode(),
+          data: data,
+          width: width,
+          height: height,
+        ),
+        Container(
+          color: Colors.white,
+          width: 60,
+          height: 60,
+          child: imageWidget,
+        ),
+      ],
+    );
+
+    return widget;
   }
 
   static Future<ScanResult> scan(

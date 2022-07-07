@@ -1,8 +1,8 @@
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../../entity/dht/myself.dart';
 import '../../../../tool/util.dart';
@@ -34,7 +34,6 @@ class QrcodeWidget extends StatefulWidget with TileDataMixin {
 class _QrcodeWidgetState extends State<QrcodeWidget> {
   String peerId = '未登录';
   String name = '未登录';
-  QrImage? qrImage;
   GlobalKey? globalKey;
   String? content;
   @override
@@ -50,7 +49,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
       name = myself.myselfPeer!.name;
     }
     content = this.peerId;
-    qrImage = QrcodeUtil.create(content!);
+    FutureBuilder<ui.Image> qrImage = QrcodeUtil.qrImageWidget(content!);
     globalKey = GlobalKey();
     var children = <Widget>[
       ListTile(
@@ -60,7 +59,8 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
           ),
           title: Text(name),
           subtitle: Text(this.peerId)),
-      RepaintBoundary(
+      SizedBox(
+          width: 280,
           key: globalKey,
           child: Padding(
             padding: const EdgeInsets.all(10.0),
@@ -95,7 +95,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
         break;
       case 3:
         setState(() {
-          qrImage = QrcodeUtil.create(content!);
+          Widget qrImage = QrcodeUtil.barcodeWidget(content!);
         });
         break;
       default:

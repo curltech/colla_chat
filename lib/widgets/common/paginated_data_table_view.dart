@@ -8,10 +8,11 @@ import '../../provider/index_widget_provider.dart';
 import '../../tool/util.dart';
 import 'column_field_widget.dart';
 
+///系统提供的分页表格只能用于静态展示，不能进行增加删除等操作
+///因为其计算记录的方法很粗糙，某页发生增删时不适用，自己实现新的会更好
 class PaginatedDataTableView<T> extends StatefulWidget {
   final List<ColumnFieldDef> columnDefs;
   final DataPageController<T> controller;
-  //final Future<void> Function()? onRefresh;
   final Function(int index)? onTap;
   final String? routeName;
   final Function(bool?)? onSelectChanged;
@@ -76,10 +77,11 @@ class _PaginatedDataTableState<T> extends State<PaginatedDataTableView> {
       _buildColumnDefs();
     }
     var sourceData = DataPageSource<T>(widget: widget, context: context);
+    int rowsPerPage = widget.controller.pagination.data.length;
     Widget dataTableView = PaginatedDataTable(
       header: const Text('test'),
       actions: [],
-      rowsPerPage: 10,
+      rowsPerPage: rowsPerPage,
       initialFirstRowIndex: 0,
       onPageChanged: (i) {
         logger.i('go $i page');
@@ -139,8 +141,9 @@ class DataPageSource<T> extends DataTableSource {
 
   @override
   DataRow getRow(int index) {
-    index = index % widget.controller.pagination.rowsPerPage;
     List data = widget.controller.pagination.data;
+    var length = data.length;
+    index = index % length;
     var d = data[index];
     var dataMap = JsonUtil.toMap(d);
     List<DataCell> cells = [];
