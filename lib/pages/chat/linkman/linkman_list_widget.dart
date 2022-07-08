@@ -30,6 +30,8 @@ class LinkmanController extends DataListController<Linkman> {
 //联系人页面，带有回退回调函数
 class LinkmanListWidget extends StatefulWidget with TileDataMixin {
   final LinkmanController controller = LinkmanController();
+  final GroupDataListController groupDataListController =
+      GroupDataListController();
   late final List<Widget> rightWidgets;
   late final LinkmanShowWidget linkmanShowWidget;
 
@@ -73,8 +75,6 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _LinkmanListWidgetState extends State<LinkmanListWidget> {
-  GroupDataListController groupDataListController = GroupDataListController();
-
   @override
   initState() {
     super.initState();
@@ -102,7 +102,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
       }
     }
     var keyTile = TileData(title: 'Linkman');
-    groupDataListController.add(keyTile, tiles);
+    widget.groupDataListController.add(keyTile, tiles);
   }
 
   _onTap(int index, String title, {TileData? group}) {
@@ -115,7 +115,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
     var dataListView = KeepAliveWrapper(
         child: GroupDataListView(
       onTap: _onTap,
-      controller: groupDataListController,
+      controller: widget.groupDataListController,
     ));
     var appBar = AppBar(
       automaticallyImplyLeading: false,
