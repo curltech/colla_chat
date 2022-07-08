@@ -7,6 +7,7 @@ import '../../../service/dht/myselfpeer.dart';
 import '../../../tool/util.dart';
 import '../../../widgets/data_bind/column_field_widget.dart';
 import '../../../widgets/data_bind/form_input_widget.dart';
+import '../../../widgets/style/glass_container_widget.dart';
 
 final List<ColumnFieldDef> p2pRegisterInputFieldDef = [
   ColumnFieldDef(
@@ -41,16 +42,14 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
   @override
   Widget build(BuildContext context) {
     Provider.of<AppDataProvider>(context);
-    return Card(
-        child: Center(
-      child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-          child: FormInputWidget(
-            mainAxisAlignment: MainAxisAlignment.center,
-            onOk: _login,
-            columnFieldDefs: p2pRegisterInputFieldDef,
-          )),
-    ));
+    return GlassFlexContainerWidget(
+        child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            child: FormInputWidget(
+              mainAxisAlignment: MainAxisAlignment.center,
+              onOk: _login,
+              columnFieldDefs: p2pRegisterInputFieldDef,
+            )));
   }
 
   _login(Map<String, dynamic> values) {
