@@ -14,9 +14,9 @@ import '../../../../provider/data_list_controller.dart';
 import '../../../../provider/index_widget_provider.dart';
 import '../../../../service/dht/peerendpoint.dart';
 import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/common/data_listtile.dart';
-import '../../../../widgets/common/data_listview.dart';
 import '../../../../widgets/common/widget_mixin.dart';
+import '../../../../widgets/data_bind/data_listtile.dart';
+import '../../../../widgets/data_bind/data_listview.dart';
 
 class PeerEndpointController extends DataListController<PeerEndpoint> {
   PeerEndpointController() {

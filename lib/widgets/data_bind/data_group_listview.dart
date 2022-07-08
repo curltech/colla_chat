@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 
-import 'package:colla_chat/widgets/common/data_listview.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:flutter/material.dart';
 
 import 'data_listtile.dart';
+import 'data_listview.dart';
 
 ///无状态组件，根据传入的数据一次性展示
 ///包含很多项的滚动视图，如果只有一个分组，采用ListView实现

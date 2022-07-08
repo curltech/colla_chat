@@ -7,9 +7,9 @@ import 'package:flutter/material.dart';
 
 import '../../../provider/app_data_provider.dart';
 import '../../../widgets/common/app_bar_view.dart';
-import '../../../widgets/common/data_group_listview.dart';
-import '../../../widgets/common/data_listtile.dart';
 import '../../../widgets/common/widget_mixin.dart';
+import '../../../widgets/data_bind/data_group_listview.dart';
+import '../../../widgets/data_bind/data_listtile.dart';
 import 'collection/collection_widget.dart';
 import 'mail/address/address_add.dart';
 import 'mail/mail_address_widget.dart';

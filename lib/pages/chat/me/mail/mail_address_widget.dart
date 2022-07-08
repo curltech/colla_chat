@@ -5,9 +5,9 @@ import 'package:provider/provider.dart';
 
 import '../../../../provider/app_data_provider.dart';
 import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/common/data_group_listview.dart';
-import '../../../../widgets/common/data_listtile.dart';
 import '../../../../widgets/common/widget_mixin.dart';
+import '../../../../widgets/data_bind/data_group_listview.dart';
+import '../../../../widgets/data_bind/data_listtile.dart';
 
 //邮件地址组件，带有回退回调函数
 class MailAddressWidget extends StatefulWidget with TileDataMixin {

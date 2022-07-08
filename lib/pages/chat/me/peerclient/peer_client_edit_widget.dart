@@ -4,9 +4,9 @@ import '../../../../entity/dht/peerclient.dart';
 import '../../../../provider/data_list_controller.dart';
 import '../../../../service/dht/peerclient.dart';
 import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/common/column_field_widget.dart';
-import '../../../../widgets/common/form_input_widget.dart';
 import '../../../../widgets/common/widget_mixin.dart';
+import '../../../../widgets/data_bind/column_field_widget.dart';
+import '../../../../widgets/data_bind/form_input_widget.dart';
 
 final List<ColumnFieldDef> peerClientColumnFieldDefs = [
   ColumnFieldDef(

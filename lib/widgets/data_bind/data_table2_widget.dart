@@ -1,4 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -7,7 +8,7 @@ import '../../provider/index_widget_provider.dart';
 import '../../tool/util.dart';
 import 'column_field_widget.dart';
 
-class DataTableView<T> extends StatefulWidget {
+class DataTable2Widget<T> extends StatefulWidget {
   final List<ColumnFieldDef> columnDefs;
   final DataListController<T> controller;
   final Function(int index)? onTap;
@@ -16,7 +17,7 @@ class DataTableView<T> extends StatefulWidget {
   final Function(int index)? onLongPress;
   final List<DataColumn> dataColumns = [];
 
-  DataTableView({
+  DataTable2Widget({
     Key? key,
     required this.columnDefs,
     this.onTap,
@@ -28,11 +29,11 @@ class DataTableView<T> extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return _DataTableViewState<T>();
+    return _DataTable2WidgetState<T>();
   }
 }
 
-class _DataTableViewState<T> extends State<DataTableView> {
+class _DataTable2WidgetState<T> extends State<DataTable2Widget> {
   int? sortColumnIndex;
   bool sortAscending = true;
 
@@ -53,7 +54,7 @@ class _DataTableViewState<T> extends State<DataTableView> {
       widget.dataColumns.clear();
     }
     for (var columnDef in widget.columnDefs) {
-      var dataColumn = DataColumn(
+      var dataColumn = DataColumn2(
           label: Text(AppLocalizations.t(columnDef.label)),
           numeric: columnDef.dataType == DataType.int ||
               columnDef.dataType == DataType.double,
@@ -70,8 +71,8 @@ class _DataTableViewState<T> extends State<DataTableView> {
     widget.controller.sort(name, sortAscending);
   }
 
-  List<DataRow> _buildRows() {
-    List<DataRow> rows = [];
+  List<DataRow2> _buildRows() {
+    List<DataRow2> rows = [];
     List data = widget.controller.data;
     for (int index = 0; index < data.length; ++index) {
       var d = data[index];
@@ -100,7 +101,7 @@ class _DataTableViewState<T> extends State<DataTableView> {
       if (index == widget.controller.currentIndex) {
         selected = true;
       }
-      var dataRow = DataRow(
+      var dataRow = DataRow2(
         cells: cells,
         selected: selected,
         onSelectChanged: (selected) {},
@@ -120,7 +121,7 @@ class _DataTableViewState<T> extends State<DataTableView> {
     if (widget.dataColumns.isEmpty) {
       _buildColumnDefs();
     }
-    Widget dataTableView = DataTable(
+    Widget dataTableView = DataTable2(
       sortColumnIndex: sortColumnIndex,
       sortAscending: sortAscending,
       showCheckboxColumn: false,
@@ -135,27 +136,11 @@ class _DataTableViewState<T> extends State<DataTableView> {
   @override
   Widget build(BuildContext context) {
     var dataTableView = _build(context);
-    var layoutBuilder = LayoutBuilder(
-      builder: (context, constraints) => SingleChildScrollView(
-        child: Column(
-          children: [
-            const Text(''),
-            Container(
-              alignment: Alignment.topLeft,
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minWidth: constraints.minWidth),
-                  child: dataTableView,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+    var card = Card(
+      child: dataTableView,
     );
 
-    return layoutBuilder;
+    return card;
   }
 
   @override

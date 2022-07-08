@@ -4,9 +4,9 @@ import 'package:flutter/material.dart';
 import '../../../../entity/dht/peerendpoint.dart';
 import '../../../../service/dht/peerendpoint.dart';
 import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/common/column_field_widget.dart';
-import '../../../../widgets/common/form_input_widget.dart';
 import '../../../../widgets/common/widget_mixin.dart';
+import '../../../../widgets/data_bind/column_field_widget.dart';
+import '../../../../widgets/data_bind/form_input_widget.dart';
 
 final List<ColumnFieldDef> peerEndpointColumnFieldDefs = [
   ColumnFieldDef(

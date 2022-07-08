@@ -1,4 +1,4 @@
-import 'package:colla_chat/widgets/common/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
@@ -6,7 +6,7 @@ import '../../../l10n/localization.dart';
 import '../../../provider/app_data_provider.dart';
 import '../../../routers/routes.dart';
 import '../../../service/dht/myselfpeer.dart';
-import '../../../widgets/common/column_field_widget.dart';
+import '../../../widgets/data_bind/column_field_widget.dart';
 
 final List<ColumnFieldDef> p2pRegisterInputFieldDef = [
   ColumnFieldDef(

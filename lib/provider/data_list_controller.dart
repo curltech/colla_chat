@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../constant/base.dart';
 import '../datastore/datastore.dart';
 import '../tool/util.dart';
-import '../widgets/common/column_field_widget.dart';
+import '../widgets/data_bind/column_field_widget.dart';
 
 ///基础的数组数据控制器
 class DataListController<T> with ChangeNotifier {
@@ -297,15 +297,15 @@ abstract class DataPageController<T> with ChangeNotifier {
     }
   }
 
-  void previous();
+  Future<bool> previous();
 
-  void next();
+  Future<bool> next();
 
-  void first();
+  Future<bool> first();
 
-  void last();
+  Future<bool> last();
 
-  void move(int index);
+  Future<bool> move(int index);
 }
 
 ///更多数据的数据控制器

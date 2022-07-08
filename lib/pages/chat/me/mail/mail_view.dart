@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/common/data_listtile.dart';
 import '../../../../widgets/common/widget_mixin.dart';
+import '../../../../widgets/data_bind/data_listtile.dart';
 import 'mail_address_widget.dart';
 import 'mail_content_widget.dart';
 import 'mail_list_widget.dart';

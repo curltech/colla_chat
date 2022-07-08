@@ -7,7 +7,7 @@ import 'dart:ui' as ui;
 import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/widgets/common/column_field_widget.dart';
+import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';

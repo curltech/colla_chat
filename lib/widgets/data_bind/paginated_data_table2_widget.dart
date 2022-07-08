@@ -1,4 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -6,11 +7,11 @@ import '../../provider/app_data_provider.dart';
 import '../../provider/data_list_controller.dart';
 import '../../provider/index_widget_provider.dart';
 import '../../tool/util.dart';
-import 'column_field_widget.dart';
+import '../data_bind/column_field_widget.dart';
 
 ///系统提供的分页表格只能用于静态展示，不能进行增加删除等操作
 ///因为其计算记录的方法很粗糙，某页发生增删时不适用，自己实现新的会更好
-class PaginatedDataTableView<T> extends StatefulWidget {
+class PaginatedDataTable2Widget<T> extends StatefulWidget {
   final List<ColumnFieldDef> columnDefs;
   final DataPageController<T> controller;
   final Function(int index)? onTap;
@@ -19,7 +20,7 @@ class PaginatedDataTableView<T> extends StatefulWidget {
   final Function(int index)? onLongPress;
   final List<DataColumn> dataColumns = [];
 
-  PaginatedDataTableView({
+  PaginatedDataTable2Widget({
     Key? key,
     required this.columnDefs,
     this.onTap,
@@ -35,9 +36,10 @@ class PaginatedDataTableView<T> extends StatefulWidget {
   }
 }
 
-class _PaginatedDataTableState<T> extends State<PaginatedDataTableView> {
+class _PaginatedDataTableState<T> extends State<PaginatedDataTable2Widget> {
   int? sortColumnIndex;
   bool sortAscending = true;
+  final PaginatorController _controller = PaginatorController();
 
   @override
   initState() {
@@ -55,7 +57,7 @@ class _PaginatedDataTableState<T> extends State<PaginatedDataTableView> {
       widget.dataColumns.clear();
     }
     for (var columnDef in widget.columnDefs) {
-      var dataColumn = DataColumn(
+      var dataColumn = DataColumn2(
           label: Text(AppLocalizations.t(columnDef.label)),
           numeric: columnDef.dataType == DataType.int ||
               columnDef.dataType == DataType.double,
@@ -78,8 +80,7 @@ class _PaginatedDataTableState<T> extends State<PaginatedDataTableView> {
     }
     var sourceData = DataPageSource<T>(widget: widget, context: context);
     int rowsPerPage = widget.controller.pagination.data.length;
-    Widget dataTableView = PaginatedDataTable(
-      header: const Text('test'),
+    Widget dataTableView = PaginatedDataTable2(
       actions: [],
       rowsPerPage: rowsPerPage,
       initialFirstRowIndex: 0,
@@ -102,16 +103,8 @@ class _PaginatedDataTableState<T> extends State<PaginatedDataTableView> {
   Widget build(BuildContext context) {
     var dataTableView = _build(context);
     var width = appDataProvider.size.width - appDataProvider.leftBarWidth;
-    var view = SingleChildScrollView(
-      controller: ScrollController(),
-      child: Card(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minWidth: width),
-          child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5.0),
-              child: dataTableView),
-        ),
-      ),
+    var view = Card(
+      child: dataTableView,
     );
 
     return view;
@@ -126,7 +119,7 @@ class _PaginatedDataTableState<T> extends State<PaginatedDataTableView> {
 
 class DataPageSource<T> extends DataTableSource {
   final BuildContext context;
-  final PaginatedDataTableView widget;
+  final PaginatedDataTable2Widget widget;
 
   DataPageSource({required this.widget, required this.context});
 
@@ -170,7 +163,7 @@ class DataPageSource<T> extends DataTableSource {
     if (index == widget.controller.currentIndex) {
       selected = true;
     }
-    var dataRow = DataRow(
+    var dataRow = DataRow2(
       cells: cells,
       selected: selected,
       onSelectChanged: (selected) {},

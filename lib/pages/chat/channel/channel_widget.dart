@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../l10n/localization.dart';
-import '../../../widgets/common/data_group_listview.dart';
-import '../../../widgets/common/data_listtile.dart';
 import '../../../widgets/common/widget_mixin.dart';
+import '../../../widgets/data_bind/data_group_listview.dart';
+import '../../../widgets/data_bind/data_listtile.dart';
 
 final Map<TileData, List<TileData>> mockTileData = {
   TileData(title: '未知'): [

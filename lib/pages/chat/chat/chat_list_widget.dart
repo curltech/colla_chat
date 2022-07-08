@@ -7,10 +7,10 @@ import '../../../provider/data_list_controller.dart';
 import '../../../provider/index_widget_provider.dart';
 import '../../../service/chat/chat.dart';
 import '../../../tool/util.dart';
-import '../../../widgets/common/data_group_listview.dart';
-import '../../../widgets/common/data_listtile.dart';
 import '../../../widgets/common/keep_alive_wrapper.dart';
 import '../../../widgets/common/widget_mixin.dart';
+import '../../../widgets/data_bind/data_group_listview.dart';
+import '../../../widgets/data_bind/data_listtile.dart';
 import 'chat_message_widget.dart';
 
 final Map<TileData, List<TileData>> mockTileData = {

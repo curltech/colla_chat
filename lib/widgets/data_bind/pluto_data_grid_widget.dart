@@ -83,6 +83,13 @@ class _PaginatedDataTableState<T> extends State<PlutoDataGridWidget> {
     }
   }
 
+  Future<List<PlutoRow>> fetchRows() async {
+    await widget.controller.first();
+    List<PlutoRow> rows = _buildRows();
+
+    return rows;
+  }
+
   onTap(int index) {
     widget.controller.setCurrentIndex(index);
     var fn = widget.onTap;
@@ -152,6 +159,9 @@ class _PaginatedDataTableState<T> extends State<PlutoDataGridWidget> {
         createHeader: (PlutoGridStateManager stateManager) {
           //前端分页
           stateManager.setPageSize(10, notify: false);
+          //stateManager.setShowLoading(true);
+          //stateManager.refRows
+          //stateManager.refRows.originalList
           return PlutoPagination(stateManager);
         },
         // createFooter: (PlutoGridStateManager event) {},

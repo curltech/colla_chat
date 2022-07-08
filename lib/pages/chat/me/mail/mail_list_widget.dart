@@ -5,9 +5,9 @@ import 'package:provider/provider.dart';
 import '../../../../entity/chat/chat.dart';
 import '../../../../provider/app_data_provider.dart';
 import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/common/data_listtile.dart';
-import '../../../../widgets/common/data_listview.dart';
 import '../../../../widgets/common/widget_mixin.dart';
+import '../../../../widgets/data_bind/data_listtile.dart';
+import '../../../../widgets/data_bind/data_listview.dart';
 import 'mail_data_provider.dart';
 
 //邮件列表组件，带有回退回调函数

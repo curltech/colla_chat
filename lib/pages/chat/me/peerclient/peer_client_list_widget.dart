@@ -1,7 +1,7 @@
 import 'package:colla_chat/pages/chat/me/peerclient/peer_client_edit_widget.dart';
 import 'package:colla_chat/pages/chat/me/peerclient/peer_client_show_widget.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
-import 'package:colla_chat/widgets/common/pluto_data_grid_widget.dart';
+import 'package:colla_chat/widgets/data_bind/pluto_data_grid_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../datastore/datastore.dart';
@@ -13,38 +13,37 @@ import '../../../../provider/data_list_controller.dart';
 import '../../../../provider/index_widget_provider.dart';
 import '../../../../service/dht/peerclient.dart';
 import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/common/data_listtile.dart';
 import '../../../../widgets/common/widget_mixin.dart';
+import '../../../../widgets/data_bind/data_listtile.dart';
 
 class PeerClientDataPageController extends DataPageController<PeerClient> {
   PeerClientDataPageController() : super();
 
-  _findPage(int offset, int limit) {
-    peerClientService
-        .findPage(limit: limit, offset: offset)
-        .then((Pagination<PeerClient> page) {
-      pagination = page;
-      if (page.data.isNotEmpty) {
-        setCurrentIndex(0, listen: false);
-      }
-      notifyListeners();
-    });
+  Future<Pagination<PeerClient>> _findPage(int offset, int limit) async {
+    Pagination<PeerClient> page =
+        await peerClientService.findPage(limit: limit, offset: offset);
+    pagination = page;
+    if (page.data.isNotEmpty) {
+      setCurrentIndex(0, listen: false);
+    }
+    notifyListeners();
+    return page;
   }
 
   @override
-  bool first() {
+  Future<bool> first() async {
     if (pagination.rowsNumber != -1 && pagination.offset == 0) {
       return false;
     }
     var offset = 0;
     var limit = pagination.rowsPerPage;
-    _findPage(offset, limit);
+    await _findPage(offset, limit);
 
     return true;
   }
 
   @override
-  bool last() {
+  Future<bool> last() async {
     var limit = this.limit;
     var offset = pagination.rowsNumber - limit;
     if (offset < 0) {
@@ -53,40 +52,40 @@ class PeerClientDataPageController extends DataPageController<PeerClient> {
     if (offset > pagination.rowsNumber) {
       return false;
     }
-    _findPage(offset, limit);
+    await _findPage(offset, limit);
     return true;
   }
 
   @override
-  bool move(int index) {
+  Future<bool> move(int index) async {
     if (index >= pagination.rowsNumber) {
       return false;
     }
     var limit = this.limit;
     var offset = index ~/ limit * limit;
-    _findPage(offset, limit);
+    await _findPage(offset, limit);
     return true;
   }
 
   @override
-  bool next() {
+  Future<bool> next() async {
     var limit = this.limit;
     var offset = pagination.offset + limit;
     if (offset > pagination.rowsNumber) {
       return false;
     }
-    _findPage(offset, limit);
+    await _findPage(offset, limit);
     return true;
   }
 
   @override
-  bool previous() {
+  Future<bool> previous() async {
     var limit = this.limit;
     var offset = pagination.offset - limit;
     if (offset < 0) {
       return false;
     }
-    _findPage(offset, limit);
+    await _findPage(offset, limit);
     return true;
   }
 }
