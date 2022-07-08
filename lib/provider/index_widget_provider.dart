@@ -269,7 +269,7 @@ class IndexWidgetProvider with ChangeNotifier {
         }
         //pageController.jumpToPage(index);
         pageController.animateToPage(index,
-            duration: const Duration(milliseconds: 100),
+            duration: const Duration(milliseconds: 300),
             curve: Curves.easeInOut);
         notifyListeners();
       } else {

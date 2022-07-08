@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../provider/app_data_provider.dart';
 import '../../../provider/index_widget_provider.dart';
 import '../channel/channel_widget.dart';
 import '../chat/chat_list_widget.dart';
-import '../linkman/linkman_view.dart';
+import '../linkman/linkman_list_widget.dart';
 import '../me/me_widget.dart';
 
 ///主工作区，是PageView
@@ -27,7 +28,7 @@ class _IndexWidgetState extends State<IndexWidget>
         Provider.of<IndexWidgetProvider>(context, listen: false);
     indexWidgetProvider.pageController = pageController;
     indexWidgetProvider.define(ChatListWidget());
-    indexWidgetProvider.define(LinkmanView());
+    indexWidgetProvider.define(LinkmanListWidget());
     indexWidgetProvider.define(ChannelWidget());
     indexWidgetProvider.define(MeWidget());
   }
@@ -37,10 +38,12 @@ class _IndexWidgetState extends State<IndexWidget>
     var pageView = Consumer<IndexWidgetProvider>(
         builder: (context, indexWidgetProvider, child) {
       return PageView.builder(
-        //physics: const NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         controller: indexWidgetProvider.pageController,
         onPageChanged: (int index) {
-          indexWidgetProvider.setCurrentIndex(index, context: context);
+          ///滚动的计算有问题
+          logger.w('onPageChanged $index');
+          //indexWidgetProvider.setCurrentIndex(index, context: context);
         },
         itemCount: indexWidgetProvider.views.length,
         itemBuilder: (BuildContext context, int index) {
@@ -54,7 +57,7 @@ class _IndexWidgetState extends State<IndexWidget>
 
   @override
   Widget build(BuildContext context) {
-    var pageView = _createPageView(context);
+    var pageView = SafeArea(child: _createPageView(context));
     return pageView;
   }
 
