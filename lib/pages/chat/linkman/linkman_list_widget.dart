@@ -23,7 +23,6 @@ class LinkmanController extends DataListController<Linkman> {
       if (linkmen.isNotEmpty) {
         addAll(linkmen);
       }
-      notifyListeners();
     });
   }
 }
@@ -74,17 +73,21 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _LinkmanListWidgetState extends State<LinkmanListWidget> {
+  GroupDataListController groupDataListController = GroupDataListController();
+
   @override
   initState() {
     super.initState();
     widget.controller.addListener(_update);
+    _buildGroupDataListController();
   }
 
   _update() {
     setState(() {});
   }
 
-  Map<TileData, List<TileData>> _convert(List<Linkman> linkmen) {
+  _buildGroupDataListController() {
+    var linkmen = widget.controller.data;
     List<TileData> tiles = [];
     if (linkmen.isNotEmpty) {
       for (var linkman in linkmen) {
@@ -99,8 +102,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
       }
     }
     var keyTile = TileData(title: 'Linkman');
-
-    return {keyTile: tiles};
+    groupDataListController.add(keyTile, tiles);
   }
 
   _onTap(int index, String title, {TileData? group}) {
@@ -109,11 +111,12 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var linkmen = widget.controller.data;
-    var tiles = _convert(linkmen);
-    var currentIndex = widget.controller.currentIndex;
+    _buildGroupDataListController();
     var dataListView = KeepAliveWrapper(
-        child: GroupDataListView(onTap: _onTap, tileData: tiles));
+        child: GroupDataListView(
+      onTap: _onTap,
+      controller: groupDataListController,
+    ));
     var appBar = AppBar(
       automaticallyImplyLeading: false,
       elevation: 0,

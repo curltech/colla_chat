@@ -3,34 +3,111 @@ import 'dart:typed_data';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:flutter/material.dart';
 
+import '../../provider/data_list_controller.dart';
 import 'data_listtile.dart';
 import 'data_listview.dart';
 
-///无状态组件，根据传入的数据一次性展示
-///包含很多项的滚动视图，如果只有一个分组，采用ListView实现
-///如果有多个分组，ListView的每个组件是每个分组ExpansionTile，每个分组ExpansionTile下面是ListView，
-///每个ListView下面是ListTile
-class GroupDataListView extends StatelessWidget {
-  final Map<TileData, List<TileData>> tileData;
+class GroupDataListController with ChangeNotifier {
+  final Map<TileData, DataListController<TileData>> controllers = {};
 
-  ///类变量，不用每次重建
-  late final Widget listView;
+  GroupDataListController({Map<TileData, List<TileData>> tileData = const {}}) {
+    _addAll(tileData: tileData);
+  }
+
+  DataListController<TileData>? get(TileData tile) {
+    return controllers[tile];
+  }
+
+  _addAll({required Map<TileData, List<TileData>> tileData}) {
+    if (tileData.isNotEmpty) {
+      for (var tileEntry in tileData.entries) {
+        int? currentIndex;
+        DataListController<TileData>? dataListController =
+            controllers[tileEntry.key];
+        if (dataListController != null) {
+          currentIndex = dataListController.currentIndex;
+        }
+        dataListController = DataListController<TileData>(
+            data: tileEntry.value, currentIndex: currentIndex);
+        controllers[tileEntry.key] = dataListController;
+      }
+    }
+  }
+
+  addAll({required Map<TileData, List<TileData>> tileData}) {
+    if (tileData.isNotEmpty) {
+      _addAll(tileData: tileData);
+      notifyListeners();
+    }
+  }
+
+  add(TileData tile, List<TileData> tileData) {
+    int? currentIndex;
+    DataListController<TileData>? dataListController = controllers[tile];
+    if (dataListController != null) {
+      currentIndex = dataListController.currentIndex;
+    }
+    dataListController = DataListController<TileData>(
+        data: tileData, currentIndex: currentIndex);
+    controllers[tile] = dataListController;
+    notifyListeners();
+  }
+
+  remove(TileData tile) {
+    if (controllers.containsKey(tile)) {
+      controllers.remove(tile);
+      notifyListeners();
+    }
+  }
+}
+
+class GroupDataListView extends StatefulWidget {
+  late final GroupDataListController controller;
   final Function(int index, String title, {TileData? group})? onTap;
 
-  GroupDataListView({Key? key, required this.tileData, this.onTap})
+  GroupDataListView(
+      {Key? key,
+      GroupDataListController? controller,
+      Map<TileData, List<TileData>> tileData = const {},
+      this.onTap})
       : super(key: key) {
-    listView = _build();
+    if (controller != null) {
+      this.controller = controller;
+    } else {
+      this.controller = GroupDataListController(tileData: tileData);
+    }
+  }
+
+  @override
+  State<StatefulWidget> createState() {
+    return _GroupDataListViewState();
+  }
+}
+
+class _GroupDataListViewState extends State<GroupDataListView> {
+  @override
+  initState() {
+    super.initState();
+    widget.controller.addListener(_update);
+  }
+
+  _update() {
+    setState(() {});
   }
 
   _onTap(int index, String title, {TileData? group}) {
     //logger.w('index: $index, title: $title,onTap GroupDataListView');
-    var onTap = this.onTap;
+    var onTap = widget.onTap;
     if (onTap != null) {
       onTap(index, title, group: group);
     }
   }
 
-  Widget _buildExpansionTile(TileData tile) {
+  Widget? _buildExpansionTile(TileData tile) {
+    var dataListController = widget.controller.get(tile);
+    if (dataListController == null) {
+      return null;
+    }
     Widget? leading;
     final avatar = tile.avatar;
     if (tile.icon != null) {
@@ -60,11 +137,11 @@ class GroupDataListView extends StatelessWidget {
           child: Row(
               mainAxisAlignment: MainAxisAlignment.end, children: trailing));
     }
-    var tiles = tileData[tile];
-    tiles = tiles ?? [];
+
     Widget dataListView = KeepAliveWrapper(
         keepAlive: true,
-        child: DataListView(onTap: _onTap, group: tile, tileData: tiles));
+        child: DataListView(
+            onTap: _onTap, group: tile, controller: dataListController));
 
     ///未来不使用ListTile，因为高度固定，不够灵活
     return ExpansionTile(
@@ -84,14 +161,17 @@ class GroupDataListView extends StatelessWidget {
     );
   }
 
-  Widget _build() {
+  Widget _buildListView(BuildContext context) {
     List<Widget> groups = [];
-    if (tileData.isNotEmpty) {
-      for (var tileEntry in tileData.entries) {
-        Widget groupExpansionTile = _buildExpansionTile(
-          tileEntry.key,
+    var controllers = widget.controller.controllers;
+    if (controllers.isNotEmpty) {
+      for (var entry in controllers.entries) {
+        Widget? groupExpansionTile = _buildExpansionTile(
+          entry.key,
         );
-        groups.add(groupExpansionTile);
+        if (groupExpansionTile != null) {
+          groups.add(groupExpansionTile);
+        }
       }
     }
     //该属性将决定列表的长度是否仅包裹其内容的长度。
@@ -101,6 +181,12 @@ class GroupDataListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return listView;
+    return _buildListView(context);
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_update);
+    super.dispose();
   }
 }

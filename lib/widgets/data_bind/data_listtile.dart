@@ -53,6 +53,20 @@ class TileData {
 
     return tileData;
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) {
+      return true;
+    }
+    if (other is TileData) {
+      return runtimeType == other.runtimeType && title == other.title;
+    }
+    return false;
+  }
+
+  @override
+  int get hashCode => title.hashCode;
 }
 
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项

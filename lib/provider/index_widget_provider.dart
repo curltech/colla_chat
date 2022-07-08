@@ -103,6 +103,7 @@ class Stack<T> {
 
 final List<String> mainViews = ['chat', 'linkman', 'channel', 'me'];
 const bool useNavigator = false;
+const animateDuration = Duration(milliseconds: 500);
 
 /// 主工作区的视图状态管理器，维护了主工作区的控制器，视图列表，当前视图
 class IndexWidgetProvider with ChangeNotifier {
@@ -269,8 +270,7 @@ class IndexWidgetProvider with ChangeNotifier {
         }
         //pageController.jumpToPage(index);
         pageController.animateToPage(index,
-            duration: const Duration(milliseconds: 300),
-            curve: Curves.easeInOut);
+            duration: animateDuration, curve: Curves.easeInOut);
         notifyListeners();
       } else {
         logger.e('$name error,not exist');
@@ -331,8 +331,7 @@ class IndexWidgetProvider with ChangeNotifier {
       if (index != null) {
         //pageController.jumpToPage(index);
         pageController.animateToPage(index,
-            duration: const Duration(milliseconds: 100),
-            curve: Curves.easeInOut);
+            duration: animateDuration, curve: Curves.easeInOut);
         _currentIndex = index;
         notifyListeners();
       }

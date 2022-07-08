@@ -23,22 +23,27 @@ class DataListView extends StatefulWidget {
       {Key? key,
       List<TileData> tileData = const [],
       int? currentIndex,
+      DataListController<TileData>? controller,
       this.group,
       this.onScrollMax,
       this.onRefresh,
       this.onTap})
       : super(key: key) {
-    controller = DataListController<TileData>(
-        data: tileData, currentIndex: currentIndex);
+    if (controller != null) {
+      this.controller = controller;
+    } else {
+      this.controller = DataListController<TileData>(
+          data: tileData, currentIndex: currentIndex);
+    }
   }
 
   @override
   State<StatefulWidget> createState() {
-    return _DataListView();
+    return _DataListViewState();
   }
 }
 
-class _DataListView extends State<DataListView> {
+class _DataListViewState extends State<DataListView> {
   @override
   initState() {
     widget.controller.addListener(_update);
