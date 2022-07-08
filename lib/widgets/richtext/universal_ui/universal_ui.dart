@@ -25,8 +25,12 @@ class UniversalUI {
 
 var ui = UniversalUI();
 
-Widget defaultEmbedBuilderWeb(BuildContext context, QuillController controller,
-    Embed node, bool readOnly) {
+Widget defaultEmbedBuilderWeb(
+    BuildContext context,
+    QuillController controller,
+    Embed node,
+    bool readOnly,
+    void Function(GlobalKey<State<StatefulWidget>>)? fn) {
   switch (node.value.type) {
     case 'image':
       final imageUrl = node.value.data;

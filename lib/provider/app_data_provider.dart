@@ -167,7 +167,7 @@ class AppDataProvider with ChangeNotifier {
   MaterialColor? _primarySwatch = Colors.cyan;
   MaterialColor? _seedColor = Colors.cyan;
   String _fontFamily = '';
-  String _brightness = 'light';
+  String _brightness = 'light'; //or dark / system
   ThemeData? _themeData;
 
   //屏幕宽高
@@ -221,6 +221,12 @@ class AppDataProvider with ChangeNotifier {
       _buildThemeData();
     }
     return _themeData;
+  }
+
+  ThemeMode get themeMode {
+    ThemeMode themeMode =
+        ThemeMode.values.firstWhere((element) => element.name == _brightness);
+    return themeMode;
   }
 
   _buildThemeData() {
