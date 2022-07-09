@@ -48,16 +48,14 @@ class P2pRegisterWidget extends StatefulWidget {
   State<StatefulWidget> createState() => _P2pRegisterWidgetState();
 }
 
-class _P2pRegisterWidgetState extends State<P2pRegisterWidget>
-    with AutomaticKeepAliveClientMixin {
+class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
   String _countryCode = 'CN';
   String _mobile = '13609619603';
 
   @override
   Widget build(BuildContext context) {
     return platformWidgetFactory.buildContainer(
-        child: SingleChildScrollView(
-      child: Column(
+      child: ListView(
         children: <Widget>[
           const SizedBox(height: 30.0),
           Padding(
@@ -88,7 +86,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget>
               )),
         ],
       ),
-    ));
+    );
   }
 
   _onOk(Map<String, dynamic> values) {
