@@ -45,6 +45,22 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
+  Widget buildCard({
+    Widget? child,
+    EdgeInsets? padding,
+    EdgeInsets? margin,
+    BorderRadius? borderRadius,
+    Color backendColor = const Color(0xFF000000),
+  }) {
+    return NeumorphicBackground(
+      padding: padding,
+      margin: margin,
+      backendColor: backendColor,
+      borderRadius: borderRadius,
+      child: child,
+    );
+  }
+
   Widget buildTextFormField({
     Key? key,
     TextEditingController? controller,
@@ -491,22 +507,6 @@ class NeumorphicWidgetFactory extends WidgetFactory {
       curve: curve,
       reverse: reverse,
       height: height,
-    );
-  }
-
-  Widget buildBackground({
-    Widget? child,
-    EdgeInsets? padding,
-    EdgeInsets? margin,
-    BorderRadius? borderRadius,
-    Color backendColor = const Color(0xFF000000),
-  }) {
-    return NeumorphicBackground(
-      padding: padding,
-      margin: margin,
-      backendColor: backendColor,
-      borderRadius: borderRadius,
-      child: child,
     );
   }
 

@@ -117,6 +117,7 @@ dependencies:
   intl_phone_field: ^3.1.0
   mobile_number: ^1.0.4
   # 界面样式和组件
+  badges: ^2.0.3
   glassmorphism: ^3.0.0
   #flui: 0.9.2
   syncfusion_flutter_datagrid: ^20.2.36

@@ -23,7 +23,7 @@ final defaultBorderGradient = LinearGradient(
 );
 
 class GlassWidgetFactory extends WidgetFactory {
-  Widget buildSizedContainer({
+  Widget buildSizedBox({
     Key? key,
     Widget? child,
     AlignmentGeometry? alignment = Alignment.bottomCenter,
