@@ -10,6 +10,13 @@ abstract class WidgetFactory {
     Key? key,
     Widget? child,
   });
+
+  Widget buildSizedBox({
+    Key? key,
+    required double width,
+    required double height,
+    Widget? child,
+  });
 }
 
 class PlatformWidgetFactory {
@@ -35,6 +42,16 @@ class PlatformWidgetFactory {
     Widget? child,
   }) {
     return widgetFactory.buildContainer(key: key, child: child);
+  }
+
+  Widget buildSizedBox({
+    Key? key,
+    required double width,
+    required double height,
+    Widget? child,
+  }) {
+    return widgetFactory.buildSizedBox(
+        key: key, width: width, height: height, child: child);
   }
 }
 

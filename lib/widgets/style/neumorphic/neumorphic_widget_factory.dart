@@ -45,6 +45,36 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     );
   }
 
+  @override
+  Widget buildSizedBox({
+    Key? key,
+    required double width,
+    required double height,
+    Widget? child,
+    Duration duration = Neumorphic.DEFAULT_DURATION,
+    Curve curve = Neumorphic.DEFAULT_CURVE,
+    NeumorphicStyle? style,
+    TextStyle? textStyle,
+    EdgeInsets margin = const EdgeInsets.all(0),
+    EdgeInsets padding = const EdgeInsets.all(0),
+    bool drawSurfaceAboveChild = true,
+  }) {
+    return SizedBox(
+        width: width,
+        height: height,
+        child: Neumorphic(
+          key: key,
+          duration: duration,
+          curve: curve,
+          style: style,
+          textStyle: textStyle,
+          margin: margin,
+          padding: padding,
+          drawSurfaceAboveChild: drawSurfaceAboveChild,
+          child: child,
+        ));
+  }
+
   Widget buildCard({
     Widget? child,
     EdgeInsets? padding,

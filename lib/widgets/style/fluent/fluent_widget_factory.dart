@@ -36,6 +36,33 @@ class FluentWidgetFactory extends WidgetFactory {
     );
   }
 
+  @override
+  Widget buildSizedBox({
+    Key? key,
+    AlignmentGeometry? alignment,
+    EdgeInsetsGeometry? padding,
+    Color? color,
+    Decoration? decoration,
+    Decoration? foregroundDecoration,
+    required double width,
+    required double height,
+    BoxConstraints? constraints,
+    EdgeInsetsGeometry? margin,
+    Matrix4? transform,
+    AlignmentGeometry? transformAlignment,
+    Widget? child,
+    Clip clipBehavior = Clip.none,
+  }) {
+    return Container(
+      key: key,
+      width: width,
+      height: height,
+      margin: margin,
+      padding: padding,
+      child: child,
+    );
+  }
+
   Widget buildTextFormField({
     Key? key,
     TextEditingController? controller,

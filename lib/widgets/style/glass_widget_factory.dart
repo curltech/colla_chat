@@ -23,6 +23,7 @@ final defaultBorderGradient = LinearGradient(
 );
 
 class GlassWidgetFactory extends WidgetFactory {
+  @override
   Widget buildSizedBox({
     Key? key,
     Widget? child,
@@ -34,7 +35,7 @@ class GlassWidgetFactory extends WidgetFactory {
     Matrix4? transform,
     required double width,
     required double height,
-    double borderRadius = 20,
+    double borderRadius = 0,
     LinearGradient? linearGradient,
     double border = 0,
     double blur = 20,
@@ -69,7 +70,7 @@ class GlassWidgetFactory extends WidgetFactory {
     BoxConstraints? constraints,
     EdgeInsetsGeometry? margin,
     Matrix4? transform,
-    double borderRadius = 20,
+    double borderRadius = 0,
     LinearGradient? linearGradient,
     double border = 0,
     double blur = 20,
@@ -82,7 +83,7 @@ class GlassWidgetFactory extends WidgetFactory {
         flex: flex,
         borderRadius: borderRadius,
         blur: blur,
-        alignment: Alignment.bottomCenter,
+        alignment: alignment,
         border: border,
         linearGradient: linearGradient ?? defaultLinearGradient,
         borderGradient: borderGradient ?? defaultBorderGradient,

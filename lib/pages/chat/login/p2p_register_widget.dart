@@ -7,6 +7,7 @@ import '../../../provider/app_data_provider.dart';
 import '../../../routers/routes.dart';
 import '../../../service/dht/myselfpeer.dart';
 import '../../../widgets/data_bind/column_field_widget.dart';
+import '../../../widgets/style/platform_widget_factory.dart';
 
 final List<ColumnFieldDef> p2pRegisterInputFieldDef = [
   ColumnFieldDef(
@@ -54,7 +55,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget>
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return platformWidgetFactory.buildContainer(
         child: SingleChildScrollView(
       child: Column(
         children: <Widget>[

@@ -24,6 +24,7 @@ class _LeftBarState extends State<LeftBar> {
         builder: (context, indexWidgetProvider, child) {
       return SizedBox(
         width: indexWidgetProvider.leftBarWidth,
+        height: MediaQuery.of(context).size.height,
         child: ListView(
           children: <Widget>[
             ListTile(

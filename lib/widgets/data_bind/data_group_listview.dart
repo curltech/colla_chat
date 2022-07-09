@@ -138,7 +138,7 @@ class _GroupDataListViewState extends State<GroupDataListView> {
               mainAxisAlignment: MainAxisAlignment.end, children: trailing));
     }
 
-    Widget dataListView = KeepAliveWrapper(
+    Widget dataListView = KeepAliveWrapper<DataListView>(
         keepAlive: true,
         child: DataListView(
             onTap: _onTap, group: tile, controller: dataListController));

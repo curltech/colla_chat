@@ -39,20 +39,21 @@ class IndexViewState extends State<IndexView>
     //移动手机不需要左边栏，需要底部栏
     if (appDataProvider.mobile) {
       scaffold = Scaffold(
-          body: Center(child: indexWidget),
+          body: SafeArea(child: Center(child: indexWidget)),
           endDrawer: endDrawer,
           bottomNavigationBar: bottomNavigationBar);
     } else {
       //桌面版不需要底部栏，需要固定的左边栏
       scaffold = Scaffold(
-          body: Center(
-              child: Row(
+          body: SafeArea(
+              child: Center(
+                  child: Row(
             children: <Widget>[
               leftToolBar,
               const VerticalDivider(thickness: 0.5),
               Expanded(child: indexWidget),
             ],
-          )),
+          ))),
           endDrawer: endDrawer);
     }
 

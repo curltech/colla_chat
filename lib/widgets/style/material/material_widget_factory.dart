@@ -45,6 +45,7 @@ class MaterialWidgetFactory extends WidgetFactory {
   }
 
   ///指定大小的容器
+  @override
   Widget buildSizedBox({
     Key? key,
     double? width,

@@ -47,7 +47,8 @@ class _IndexWidgetState extends State<IndexWidget>
         },
         itemCount: indexWidgetProvider.views.length,
         itemBuilder: (BuildContext context, int index) {
-          return indexWidgetProvider.views[index];
+          var view = indexWidgetProvider.views[index];
+          return view;
         },
       );
     });

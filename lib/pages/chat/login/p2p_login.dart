@@ -83,7 +83,7 @@ class _P2pLoginState extends State<P2pLogin> {
         appBar: appBar,
         body: Stack(children: <Widget>[
           Opacity(
-            opacity: 0.5,
+            opacity: 1,
             child: Loading(title: ''),
           ),
           workspace
