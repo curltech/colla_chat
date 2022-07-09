@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../provider/app_data_provider.dart';
+import '../login/loading.dart';
 import 'bottom_bar.dart';
 import 'index_widget.dart';
 import 'left_bar.dart';
@@ -45,16 +46,22 @@ class IndexViewState extends State<IndexView>
     } else {
       //桌面版不需要底部栏，需要固定的左边栏
       scaffold = Scaffold(
-          body: SafeArea(
-              child: Center(
-                  child: Row(
+        body: SafeArea(
+            child: Stack(children: <Widget>[
+          Opacity(
+            opacity: 1,
+            child: Loading(title: ''),
+          ),
+          Center(
+              child: Row(
             children: <Widget>[
               leftToolBar,
               const VerticalDivider(thickness: 0.5),
               Expanded(child: indexWidget),
             ],
-          ))),
-          endDrawer: endDrawer);
+          )),
+        ])),
+      );
     }
 
     return scaffold;

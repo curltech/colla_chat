@@ -58,7 +58,7 @@ class _IndexWidgetState extends State<IndexWidget>
 
   @override
   Widget build(BuildContext context) {
-    var pageView = SafeArea(child: _createPageView(context));
+    var pageView = _createPageView(context);
     return pageView;
   }
 

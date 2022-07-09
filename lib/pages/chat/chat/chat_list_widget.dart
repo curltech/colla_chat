@@ -11,7 +11,6 @@ import '../../../widgets/common/keep_alive_wrapper.dart';
 import '../../../widgets/common/widget_mixin.dart';
 import '../../../widgets/data_bind/data_group_listview.dart';
 import '../../../widgets/data_bind/data_listtile.dart';
-import '../../../widgets/style/platform_widget_factory.dart';
 import 'chat_message_widget.dart';
 
 final Map<TileData, List<TileData>> mockTileData = {
@@ -123,7 +122,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     var groupDataListView =
         KeepAliveWrapper(child: GroupDataListView(tileData: chatTileData));
 
-    return platformWidgetFactory.buildContainer(child: groupDataListView);
+    return groupDataListView;
   }
 
   @override

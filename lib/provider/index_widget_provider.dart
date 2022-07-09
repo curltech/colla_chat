@@ -8,7 +8,7 @@ import '../routers/routes.dart';
 import '../widgets/common/widget_mixin.dart';
 import 'app_data_provider.dart';
 
-class Stack<T> {
+class ViewStack<T> {
   T? _head;
 
   ///存放元素的上一个元素,最后一个元素的上一个元素为null
@@ -118,7 +118,7 @@ class IndexWidgetProvider with ChangeNotifier {
   ///当前出现在工作区的视图，0-3是主视图，始终都在，然后每进入一个新视图，则添加
   ///每退出一个则删除
   List<Widget> views = [];
-  Stack<String> stack = Stack<String>();
+  ViewStack<String> stack = ViewStack<String>();
   PageController? pageController;
   int _currentIndex = 0;
 
