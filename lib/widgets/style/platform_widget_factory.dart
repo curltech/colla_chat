@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'glass_widget_factory.dart';
 import 'neumorphic/neumorphic_widget_factory.dart';
 
-enum WidgetStyle { glass, neumorphic, fluent }
+enum WidgetStyle { material, glass, neumorphic, fluent }
 
 abstract class WidgetFactory {
   Widget buildContainer({
