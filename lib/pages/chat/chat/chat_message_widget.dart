@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:flutter/material.dart';
@@ -168,7 +170,17 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
                   hintText: 'Please input message'),
               controller: textEditingController,
               onFieldSubmitted: handleSubmit,
+              autofocus: true,
               focusNode: textFocusNode,
+              onTap: () {
+                // scroll to the bottom of the list when keyboard appears
+                Timer(
+                    const Duration(milliseconds: 200),
+                    () => widget.scrollController.animateTo(
+                        widget.scrollController.position.minScrollExtent,
+                        duration: const Duration(milliseconds: 500),
+                        curve: Curves.easeIn));
+              },
             ),
           ),
           Container(
