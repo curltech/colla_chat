@@ -13,29 +13,21 @@ import '../../../entity/chat/contact.dart';
 import '../../../service/chat/contact.dart';
 import '../../../widgets/data_bind/data_group_listview.dart';
 
-class LinkmanController extends DataListController<Linkman> {
-  LinkmanController() {
-    init();
-  }
-
-  init() {
-    linkmanService.find().then((List<Linkman> linkmen) {
-      if (linkmen.isNotEmpty) {
-        addAll(linkmen);
-      }
-    });
-  }
-}
-
 //联系人页面，带有回退回调函数
 class LinkmanListWidget extends StatefulWidget with TileDataMixin {
-  final LinkmanController controller = LinkmanController();
+  final DataListController<Linkman> controller = DataListController<Linkman>();
   final GroupDataListController groupDataListController =
       GroupDataListController();
   late final List<Widget> rightWidgets;
   late final LinkmanShowWidget linkmanShowWidget;
 
   LinkmanListWidget({Key? key}) : super(key: key) {
+    linkmanService.find().then((List<Linkman> linkmen) {
+      if (linkmen.isNotEmpty) {
+        controller.addAll(linkmen);
+      }
+    });
+
     linkmanShowWidget = LinkmanShowWidget(controller: controller);
     var indexWidgetProvider = IndexWidgetProvider.instance;
     indexWidgetProvider.define(linkmanShowWidget);
@@ -112,7 +104,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
   @override
   Widget build(BuildContext context) {
     _buildGroupDataListController();
-    var dataListView = KeepAliveWrapper(
+    var groupDataListView = KeepAliveWrapper(
         child: GroupDataListView(
       onTap: _onTap,
       controller: widget.groupDataListController,
@@ -126,7 +118,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
       ),
       actions: const [],
     );
-    return Scaffold(appBar: appBar, body: dataListView);
+    return Scaffold(appBar: appBar, body: groupDataListView);
   }
 
   @override

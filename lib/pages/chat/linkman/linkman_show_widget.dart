@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 import '../../../entity/chat/contact.dart';
+import '../../../provider/data_list_controller.dart';
 import 'linkman_info_card.dart';
-import 'linkman_list_widget.dart';
 
 final List<String> linkmanFields = [
   'name',
@@ -21,7 +21,7 @@ final List<String> linkmanFields = [
 
 //联系人显示页面
 class LinkmanShowWidget extends StatefulWidget with TileDataMixin {
-  final LinkmanController controller;
+  final DataListController<Linkman> controller;
 
   const LinkmanShowWidget({Key? key, required this.controller})
       : super(key: key);

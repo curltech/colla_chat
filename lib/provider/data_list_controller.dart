@@ -1,7 +1,6 @@
 import 'package:colla_chat/entity/base.dart';
 import 'package:flutter/material.dart';
 
-import '../constant/base.dart';
 import '../datastore/datastore.dart';
 import '../tool/util.dart';
 import '../widgets/data_bind/column_field_widget.dart';
@@ -311,31 +310,11 @@ abstract class DataPageController<T> with ChangeNotifier {
 ///更多数据的数据控制器
 ///支持通过more方法往数组中添加更多的数据
 abstract class DataMoreController<T> extends DataListController<T> {
-  int rowsNumber;
-  int offset = defaultOffset;
-
-  ///每页的行数limit
-  int rowsPerPage = 0;
-
   DataMoreController({
-    this.rowsNumber = 0,
-    this.offset = 0,
-    this.rowsPerPage = 10,
     List<T>? data,
     int? currentIndex,
   }) : super(data: data, currentIndex: currentIndex);
 
-  ///对more模式的数据控制器来说，执行more操作就是offset从现有的data.length开始，
-  ///limit取index-data.length+rowsPerPage,offset不变，limit变化
-  int moreLimit(int index) {
-    int diff = index - data.length;
-    if (diff > 0) {
-      int num = diff ~/ rowsPerPage;
-      return (num + 1) * rowsPerPage;
-    }
-    return 0;
-  }
-
   ///如果有更多数据添加，返回true，否则返回false
-  bool more(int index);
+  void more(int index);
 }

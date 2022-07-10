@@ -5,8 +5,8 @@ import '../../../../widgets/common/widget_mixin.dart';
 import '../../../../widgets/data_bind/column_field_widget.dart';
 import '../../../../widgets/data_bind/form_input_widget.dart';
 import '../../../entity/chat/contact.dart';
+import '../../../provider/data_list_controller.dart';
 import '../../../service/chat/contact.dart';
-import 'linkman_list_widget.dart';
 
 final List<ColumnFieldDef> linkmanColumnFieldDefs = [
   ColumnFieldDef(
@@ -33,7 +33,7 @@ final List<ColumnFieldDef> linkmanColumnFieldDefs = [
 
 //邮件内容组件
 class LinkmanEditWidget extends StatefulWidget with TileDataMixin {
-  final LinkmanController controller;
+  final DataListController<Linkman> controller;
 
   LinkmanEditWidget({Key? key, required this.controller}) : super(key: key);
 

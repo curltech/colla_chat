@@ -115,6 +115,34 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
 
     return page;
   }
+
+  Future<List<ChatMessage>> findByPeerId(String peerId,
+      {String? direct,
+      String? messageType,
+      String? subMessageType,
+      int? offset,
+      int? limit}) async {
+    String where = '(senderPeerId=? or receiverPeerId=?)'; //
+    List<Object> whereArgs = [peerId, peerId];
+    if (direct != null) {
+      where = '$where and direct=?';
+      whereArgs.add(direct);
+    }
+    if (messageType != null) {
+      where = '$where and messageType=?';
+      whereArgs.add(messageType);
+    }
+    if (subMessageType != null) {
+      where = '$where and subMessageType=?';
+      whereArgs.add(subMessageType);
+    }
+    return find(
+        where: where,
+        whereArgs: whereArgs,
+        orderBy: 'sendTime,receiveTime',
+        offset: offset,
+        limit: limit);
+  }
 }
 
 final chatMessageService = ChatMessageService(

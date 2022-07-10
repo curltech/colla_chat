@@ -43,6 +43,9 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
       DataListController<ChatSummary>();
   final DataListController<ChatSummary> groupController =
       DataListController<ChatSummary>();
+  final GroupDataListController groupDataListController =
+      GroupDataListController();
+  final ChatMessageWidget chatMessageWidget = ChatMessageWidget();
 
   ChatListWidget({Key? key}) : super(key: key) {
     chatSummaryService
@@ -86,41 +89,74 @@ class _ChatListWidgetState extends State<ChatListWidget> {
 
     var indexWidgetProvider =
         Provider.of<IndexWidgetProvider>(context, listen: false);
-    indexWidgetProvider.define(ChatMessageWidget(
-      subtitle: '',
-    ));
+    indexWidgetProvider.define(widget.chatMessageWidget);
+
+    _buildGroupDataListController();
   }
 
   _update() {
     setState(() {});
   }
 
-  List<TileData> _convert(List<ChatSummary> linkmen) {
+  _buildGroupDataListController() {
+    Map<TileData, List<TileData>> tileData = {};
+    var linkmen = widget.linkmanController.data;
     List<TileData> tiles = [];
     if (linkmen.isNotEmpty) {
       for (var linkman in linkmen) {
         var title = linkman.name ?? '';
         var subtitle = linkman.peerId ?? '';
         TileData tile = TileData(
-            title: title, subtitle: subtitle, routeName: 'chat_message');
+            avatar: linkman.avatar,
+            title: title,
+            subtitle: subtitle,
+            routeName: 'chat_message');
         tiles.add(tile);
       }
     }
+    tileData[TileData(title: 'Linkman')] = tiles;
+    widget.groupDataListController.addAll(tileData: tileData);
 
-    return tiles;
+    var groups = widget.groupController.data;
+    tiles = [];
+    if (groups.isNotEmpty) {
+      for (var group in groups) {
+        var title = group.name ?? '';
+        var subtitle = group.peerId ?? '';
+        TileData tile = TileData(
+            avatar: group.avatar,
+            title: title,
+            subtitle: subtitle,
+            routeName: 'chat_message');
+        tiles.add(tile);
+      }
+    }
+    tileData[TileData(title: 'Group')] = tiles;
+    widget.groupDataListController.addAll(tileData: tileData);
+  }
+
+  _onTap(int index, String title, {TileData? group}) {
+    if (group != null) {
+      ChatSummary? current;
+      if (group.title == 'Linkman') {
+        widget.linkmanController.currentIndex = index;
+        current = widget.linkmanController.current;
+      }
+      if (group.title == 'Group') {
+        widget.groupController.currentIndex = index;
+        current = widget.groupController.current;
+      }
+      widget.chatMessageWidget.controller.chatSummary = current;
+    }
   }
 
   Widget _buildGroupDataListView(BuildContext context) {
-    Map<TileData, List<TileData>> chatTileData = {};
-    var linkmenSummary = widget.linkmanController.data;
-    var linkmanTiles = _convert(linkmenSummary);
-    chatTileData[TileData(title: 'linkman')] = linkmanTiles;
-    var groupsSummary = widget.groupController.data;
-    var groupTiles = _convert(groupsSummary);
-    chatTileData[TileData(title: 'group')] = groupTiles;
-
-    var groupDataListView =
-        KeepAliveWrapper(child: GroupDataListView(tileData: chatTileData));
+    _buildGroupDataListController();
+    var groupDataListView = KeepAliveWrapper(
+        child: GroupDataListView(
+      onTap: _onTap,
+      controller: widget.groupDataListController,
+    ));
 
     return groupDataListView;
   }
