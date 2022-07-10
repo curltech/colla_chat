@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import '../base.dart';
 
 /// 节点的附属信息，包括个性化的配置
@@ -29,6 +31,7 @@ class PeerProfile extends StatusEntity {
 
   // 用户头像（base64字符串）
   String? avatar;
+  Widget? avatarImage;
   String? mobileVerified;
 
   // 可见性YYYYYY (peerId, mobileNumber, groupChat, qrCode, contactCard, name）

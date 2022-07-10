@@ -139,7 +139,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return find(
         where: where,
         whereArgs: whereArgs,
-        orderBy: 'sendTime,receiveTime',
+        orderBy: 'id desc',
         offset: offset,
         limit: limit);
   }

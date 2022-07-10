@@ -21,7 +21,7 @@ class Myself {
 
   MyselfPeer? myselfPeer;
   PeerProfile? peerProfile;
-  Widget? avatar;
+  Widget? avatarImage;
 
   ///当连接p2p节点成功后设置
   PeerClient? myselfPeerClient;

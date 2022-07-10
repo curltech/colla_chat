@@ -12,6 +12,7 @@ class DataListView extends StatefulWidget {
   late final DataListController<TileData> controller;
   final ScrollController scrollController = ScrollController();
   final Function()? onScrollMax;
+  final Function()? onScrollMin;
   final Future<void> Function()? onRefresh;
   final Function(
     int index,
@@ -26,6 +27,7 @@ class DataListView extends StatefulWidget {
       DataListController<TileData>? controller,
       this.group,
       this.onScrollMax,
+      this.onScrollMin,
       this.onRefresh,
       this.onTap})
       : super(key: key) {
@@ -48,28 +50,11 @@ class _DataListViewState extends State<DataListView> {
   initState() {
     widget.controller.addListener(_update);
     var scrollController = widget.scrollController;
-    scrollController.addListener(() {
-      double offset = widget.scrollController.offset;
-      logger.i('scrolled to $offset');
+    scrollController.addListener(_onScroll);
 
-      ///判断是否滚动到最底，需要加载更多数据
-      if (scrollController.position.pixels ==
-          scrollController.position.maxScrollExtent) {
-        logger.i('scrolled to max');
-        if (widget.onScrollMax != null) {
-          widget.onScrollMax!();
-        }
-      }
-      if (scrollController.position.pixels ==
-          scrollController.position.minScrollExtent) {
-        logger.i('scrolled to min');
-      }
-
-      ///滚到指定的位置
-      // widget.scrollController.animateTo(offset,
-      //     duration: const Duration(milliseconds: 1000), curve: Curves.ease);
-    });
-
+    ///滚到指定的位置
+    // widget.scrollController.animateTo(offset,
+    //     duration: const Duration(milliseconds: 1000), curve: Curves.ease);
     super.initState();
   }
 
@@ -77,10 +62,25 @@ class _DataListViewState extends State<DataListView> {
     setState(() {});
   }
 
-  bool _onNotification(ScrollNotification notification) {
-    String type = notification.runtimeType.toString();
-    logger.i('scrolled to $type');
-    return true;
+  void _onScroll() {
+    double offset = widget.scrollController.offset;
+    logger.i('scrolled to $offset');
+
+    ///判断是否滚动到最底，需要加载更多数据
+    if (widget.scrollController.position.pixels ==
+        widget.scrollController.position.maxScrollExtent) {
+      logger.i('scrolled to max');
+      if (widget.onScrollMax != null) {
+        widget.onScrollMax!();
+      }
+    }
+    if (widget.scrollController.position.pixels ==
+        widget.scrollController.position.minScrollExtent) {
+      logger.i('scrolled to min');
+      if (widget.onScrollMin != null) {
+        widget.onScrollMin!();
+      }
+    }
   }
 
   Future<void> _onRefresh() async {
@@ -131,6 +131,7 @@ class _DataListViewState extends State<DataListView> {
   @override
   void dispose() {
     widget.controller.removeListener(_update);
+    widget.scrollController.removeListener(_onScroll);
     super.dispose();
   }
 }

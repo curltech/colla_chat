@@ -55,7 +55,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       }
       mobile = await PhoneNumberUtil.format(mobile, code);
     }
-    var peer = await findOneEffectiveByName(name);
+    var peer = await findOneByName(name);
     if (peer != null) {
       throw 'SameNameAccountExists';
     }
@@ -86,7 +86,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
 
     // 初始化profile
     String? peerId = myselfPeer.peerId;
-    var profile = await peerProfileService.findOneEffectiveByPeerId(peerId!);
+    var profile = await peerProfileService.findOneByPeerId(peerId!);
     if (profile != null) {
       await peerProfileService.delete(profile);
     }
@@ -152,7 +152,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       return true;
     }
     var logoutStatus = false;
-    var peer = await myselfPeerService.findOneEffectiveByPeerId(peerId);
+    var peer = await myselfPeerService.findOneByPeerId(peerId);
     if (peer != null) {
       /// 1.验证账户与密码匹配
       var myselfPeer = peer as MyselfPeer;

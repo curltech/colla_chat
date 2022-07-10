@@ -1,3 +1,5 @@
+import 'package:colla_chat/entity/dht/peerprofile.dart';
+
 import 'base.dart';
 
 const int defaultExpireDate = 3600 * 24 * 365;
@@ -17,6 +19,7 @@ class PeerClient extends PeerLocation {
   String? signature;
   String? previousPublicKeySignature;
   String? trustLevel;
+  PeerProfile? peerProfile;
 
   PeerClient(String ownerPeerId) : super(ownerPeerId);
 

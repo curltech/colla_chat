@@ -16,9 +16,9 @@ abstract class PeerLocationService<T> extends GeneralBaseService<T> {
     return peers;
   }
 
-  Future<T?> findOneEffectiveByPeerId(String peerId) async {
-    var where = 'peerId = ? and status=?';
-    var whereArgs = [peerId, EntityStatus.effective.name];
+  Future<T?> findOneByPeerId(String peerId) async {
+    var where = 'peerId = ?';
+    var whereArgs = [peerId];
 
     var peer = await findOne(where: where, whereArgs: whereArgs);
 
@@ -33,9 +33,9 @@ abstract class PeerLocationService<T> extends GeneralBaseService<T> {
     return peers;
   }
 
-  Future<T?> findOneEffectiveByName(String name) async {
-    var where = 'name = ? and status=?';
-    var whereArgs = [name, EntityStatus.effective.name];
+  Future<T?> findOneByName(String name) async {
+    var where = 'name = ?';
+    var whereArgs = [name];
 
     var peer = await findOne(where: where, whereArgs: whereArgs);
 

@@ -1,9 +1,11 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/service/chat/contact.dart';
 import 'package:flutter/material.dart';
 
 import '../../../entity/chat/chat.dart';
 
-/// 我发送的消息展示组件，展示在右边
+/// 每条消息展示组件，我接收的消息展示在左边，我发送的消息展示在右边
 class ChatMessageItem extends StatelessWidget {
   final ChatMessage chatMessage;
 
@@ -18,16 +20,11 @@ class ChatMessageItem extends StatelessWidget {
             children: <Widget>[
               Container(
                   margin: const EdgeInsets.only(right: 16.0),
-                  child: CircleAvatar(
-                    child: Text(chatMessage.senderName ?? ''),
-                  )),
+                  child: defaultImage),
               Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(
-                      chatMessage.sendTime ?? '',
-                      style: Theme.of(context).textTheme.subtitle1,
-                    ),
+                    Text('${chatMessage.id}'),
                     Container(
                       margin: const EdgeInsets.only(top: 5.0),
                       child: Text(chatMessage.content),
@@ -48,10 +45,7 @@ class ChatMessageItem extends StatelessWidget {
               Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(
-                      chatMessage.sendTime ?? '',
-                      style: Theme.of(context).textTheme.subtitle1,
-                    ),
+                    Text('${chatMessage.id}'),
                     Container(
                       margin: const EdgeInsets.only(top: 5.0),
                       child: Text(chatMessage.content),
@@ -59,9 +53,7 @@ class ChatMessageItem extends StatelessWidget {
                   ]),
               Container(
                   margin: const EdgeInsets.only(left: 16.0),
-                  child: const CircleAvatar(
-                    child: Text('Me'),
-                  ))
+                  child: myself.avatarImage)
             ]));
   }
 
@@ -74,6 +66,24 @@ class ChatMessageItem extends StatelessWidget {
       return true;
     }
     return false;
+  }
+
+  Future<Widget?> _getImageWidget() async {
+    var direct = chatMessage.direct;
+    var senderPeerId = chatMessage.senderPeerId;
+    var peerId = myself.peerId;
+    if (direct == ChatDirect.send.name &&
+        (senderPeerId == null || senderPeerId == peerId)) {
+      return myself.avatarImage;
+    }
+    if (senderPeerId != null) {
+      var linkman = await linkmanService.findCachedOneByPeerId(senderPeerId);
+      if (linkman != null) {
+        return linkman.avatarImage;
+      }
+    }
+
+    return defaultImage;
   }
 
   @override

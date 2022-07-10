@@ -1,7 +1,9 @@
+import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:cryptography/cryptography.dart';
 
 import '../../entity/dht/peerclient.dart';
+import '../../entity/dht/peerprofile.dart';
 import 'base.dart';
 
 class PeerClientService extends PeerEntityService<PeerClient> {
@@ -18,7 +20,7 @@ class PeerClientService extends PeerEntityService<PeerClient> {
   }
 
   Future<SimplePublicKey?> getPublicKey(String peerId) async {
-    var peerClient = getPeerClientFromCache(peerId);
+    var peerClient = findCachedOneByPeerId(peerId);
     if (peerClient != null) {
       return publicKeys[peerId];
     }
@@ -26,12 +28,20 @@ class PeerClientService extends PeerEntityService<PeerClient> {
     return null;
   }
 
-  PeerClient? getPeerClientFromCache(String peerId) {
+  Future<PeerClient?> findCachedOneByPeerId(String peerId) async {
     if (peerClients.containsKey(peerId)) {
       return peerClients[peerId];
     }
-
-    return null;
+    PeerClient? peerClient = await findOneByPeerId(peerId);
+    if (peerClient != null) {
+      PeerProfile? peerProfile =
+          await peerProfileService.findCachedOneByPeerId(peerId);
+      if (peerProfile != null) {
+        peerClient.peerProfile = peerProfile;
+      }
+      peerClients[peerId] = peerClient;
+    }
+    return peerClient;
   }
 
 /**

@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import '../base.dart';
 
 enum RequestType {
@@ -61,6 +63,7 @@ abstract class Party extends StatusEntity {
   String? tag; //: 标签
   String? pyTag; //: 标签拼音
   List<Tag> tags = [];
+  Widget? avatarImage;
 
   Party(this.ownerPeerId, this.peerId, this.name) : super();
 

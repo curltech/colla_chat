@@ -176,7 +176,7 @@ class SecurityContextService {
             var srcPeerId = securityContext.srcPeerId;
             if (!pass && srcPeerId != null) {
               var peerClients = [
-                peerClientService.getPeerClientFromCache(srcPeerId)
+                peerClientService.findCachedOneByPeerId(srcPeerId)
               ];
               if (peerClients.isNotEmpty) {
                 srcPublicKey = await peerClientService.getPublicKey(srcPeerId);

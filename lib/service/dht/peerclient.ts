@@ -39,7 +39,7 @@ class PeerClientService extends PeerEntityService {
     return null;
   }
 
-PeerClient getPeerClientFromCache(peerId: string)  {
+    PeerClient getPeerClientFromCache(peerId: string)  {
     if (this.peerClients.has(peerId)) {
       return this.peerClients.get(peerId);
     }

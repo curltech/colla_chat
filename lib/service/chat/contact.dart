@@ -4,6 +4,7 @@ import 'package:flutter_contacts/flutter_contacts.dart' as flutter_contacts;
 import '../../entity/chat/contact.dart';
 import '../../entity/dht/peerclient.dart';
 import '../../tool/util.dart';
+import '../../widgets/common/image_widget.dart';
 import '../dht/peerclient.dart';
 import '../general_base.dart';
 
@@ -12,9 +13,27 @@ abstract class PartyService<T> extends GeneralBaseService<T> {
       {required super.tableName,
       required super.fields,
       required super.indexFields});
+
+  Future<T?> findOneByPeerId(String peerId) async {
+    var where = 'peerId = ?';
+    var whereArgs = [peerId];
+    var peer = await findOne(where: where, whereArgs: whereArgs);
+
+    return peer;
+  }
+
+  Future<T?> findOneByName(String name) async {
+    var where = 'name = ?';
+    var whereArgs = [name];
+    var peer = await findOne(where: where, whereArgs: whereArgs);
+
+    return peer;
+  }
 }
 
 class LinkmanService extends PartyService<Linkman> {
+  Map<String, Linkman> linkmen = {};
+
   LinkmanService(
       {required super.tableName,
       required super.fields,
@@ -35,11 +54,24 @@ class LinkmanService extends PartyService<Linkman> {
     return linkmen;
   }
 
-  Future<List<Linkman>> findAllLinkmen() async {
-    var linkmen = await find(
-      orderBy: 'pyName',
-    );
-    return linkmen;
+  Future<Linkman?> findCachedOneByPeerId(String peerId) async {
+    if (linkmen.containsKey(peerId)) {
+      return linkmen[peerId];
+    }
+    Linkman? linkman = await findOneByPeerId(peerId);
+    if (linkman != null) {
+      String? avatar = linkman.avatar;
+      if (avatar != null) {
+        var avatarImage = ImageWidget(
+          image: avatar,
+          height: 32,
+          width: 32,
+        );
+        linkman.avatarImage = avatarImage;
+      }
+      linkmen[peerId] = linkman;
+    }
+    return linkman;
   }
 }
 
@@ -109,6 +141,7 @@ final partyRequestService = PartyRequestService(
     fields: ServiceLocator.buildFields(PartyRequest('', '', ''), []));
 
 class GroupService extends PartyService<Group> {
+  Map<String, Group> groups = {};
   GroupService(
       {required super.tableName,
       required super.fields,
@@ -116,6 +149,26 @@ class GroupService extends PartyService<Group> {
     post = (Map map) {
       return Group.fromJson(map);
     };
+  }
+
+  Future<Group?> findCachedOneByPeerId(String peerId) async {
+    if (groups.containsKey(peerId)) {
+      return groups[peerId];
+    }
+    Group? group = await findOneByPeerId(peerId);
+    if (group != null) {
+      String? avatar = group.avatar;
+      if (avatar != null) {
+        var avatarImage = ImageWidget(
+          image: avatar,
+          height: 32,
+          width: 32,
+        );
+        group.avatarImage = avatarImage;
+      }
+      groups[peerId] = group;
+    }
+    return group;
   }
 }
 

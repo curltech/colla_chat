@@ -6,6 +6,7 @@ import '../../../entity/chat/chat.dart';
 import '../../../l10n/localization.dart';
 import '../../../provider/app_data_provider.dart';
 import '../../../provider/data_list_controller.dart';
+import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/common/widget_mixin.dart';
 import 'chat_message_item.dart';
 
@@ -47,8 +48,20 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
 /// 此界面展示特定的目标对象的收到的消息，并且可以发送消息
 class ChatMessageWidget extends StatefulWidget with TileDataMixin {
   final ChatMessageController controller = ChatMessageController();
+  final ScrollController scrollController = ScrollController();
+  final Function()? onScrollMax;
+  final Function()? onScrollMin;
+  final Future<void> Function()? onRefresh;
+  final bool Function(ScrollNotification scrollNotification)?
+      notificationPredicate;
 
-  ChatMessageWidget({Key? key}) : super(key: key);
+  ChatMessageWidget(
+      {Key? key,
+      this.onScrollMax,
+      this.onScrollMin,
+      this.onRefresh,
+      this.notificationPredicate})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -77,15 +90,61 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   void initState() {
     super.initState();
     widget.controller.addListener(_update);
+    var scrollController = widget.scrollController;
+    scrollController.addListener(_onScroll);
+
+    ///滚到指定的位置
+    // widget.scrollController.animateTo(offset,
+    //     duration: const Duration(milliseconds: 1000), curve: Curves.ease);
   }
 
   _update() {
     setState(() {});
   }
 
+  void _onScroll() {
+    double offset = widget.scrollController.offset;
+    logger.i('scrolled to $offset');
+
+    ///判断是否滚动到最底，需要加载更多数据
+    if (widget.scrollController.position.pixels ==
+        widget.scrollController.position.maxScrollExtent) {
+      logger.i('scrolled to max');
+      if (widget.onScrollMax != null) {
+        widget.onScrollMax!();
+      }
+    }
+    if (widget.scrollController.position.pixels ==
+        widget.scrollController.position.minScrollExtent) {
+      logger.i('scrolled to min');
+      if (widget.onScrollMin != null) {
+        widget.onScrollMin!();
+      }
+    }
+  }
+
+  Future<void> _onRefresh() async {
+    ///下拉刷新数据的地方，比如从数据库取更多数据
+    logger.i('RefreshIndicator onRefresh');
+    widget.controller.more(defaultLimit);
+    if (widget.onRefresh != null) {
+      await widget.onRefresh!();
+    }
+  }
+
+  bool _notificationPredicate(ScrollNotification scrollNotification) {
+    ///下拉刷新数据的地方，比如从数据库取更多数据
+    //logger.i('RefreshIndicator notificationPredicate');
+    if (widget.notificationPredicate != null) {
+      return widget.notificationPredicate!(scrollNotification);
+    }
+    return scrollNotification.depth == 0;
+  }
+
   @override
   void dispose() {
     widget.controller.removeListener(_update);
+    widget.scrollController.removeListener(_onScroll);
     super.dispose();
   }
 
@@ -129,8 +188,8 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     List<ChatMessage> messages = widget.controller.data;
     ChatMessage item = messages[index];
     // 创建消息动画控制器
-    var animate =
-        AnimationController(vsync: this, duration: Duration(milliseconds: 500));
+    var animate = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 500));
     Widget chatMessageItem = ChatMessageItem(chatMessage: item);
 
     // index=0执行动画，对最新的消息执行动画
@@ -152,19 +211,21 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
 
   ///创建消息显示面板，包含消息的输入框
   Widget _buildListView(BuildContext context) {
-    ScrollController scrollController = ScrollController();
     return Column(children: <Widget>[
       Flexible(
         //使用列表渲染消息
-        child: ListView.builder(
-          controller: scrollController,
-          padding: const EdgeInsets.all(8.0),
-          reverse: true,
-          //消息组件渲染
-          itemBuilder: messageItem,
-          //消息条目数
-          itemCount: widget.controller.data.length,
-        ),
+        child: RefreshIndicator(
+            onRefresh: _onRefresh,
+            //notificationPredicate: _notificationPredicate,
+            child: ListView.builder(
+              controller: widget.scrollController,
+              padding: const EdgeInsets.all(8.0),
+              reverse: true,
+              //消息组件渲染
+              itemBuilder: messageItem,
+              //消息条目数
+              itemCount: widget.controller.data.length,
+            )),
       ),
       const Divider(
         height: 1.0,
@@ -175,15 +236,11 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
 
   @override
   Widget build(BuildContext context) {
-    var appBar = AppBar(
-      automaticallyImplyLeading: false,
-      elevation: 0,
-      centerTitle: true,
-      title: Text(
-        AppLocalizations.instance.text(widget.controller.chatSummary!.name!),
-      ),
-      actions: const [],
-    );
-    return Scaffold(appBar: appBar, body: _buildListView(context));
+    var appBarView = AppBarView(
+        title: AppLocalizations.instance
+            .text(widget.controller.chatSummary!.name!),
+        withLeading: widget.withLeading,
+        child: _buildListView(context));
+    return appBarView;
   }
 }

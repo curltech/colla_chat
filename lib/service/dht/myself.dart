@@ -72,19 +72,16 @@ class MyselfService {
     //查找配置信息
     var peerId = myselfPeer.peerId;
     if (peerId != null) {
-      var peerProfile =
-          await peerProfileService.findOneEffectiveByPeerId(peerId);
+      var peerProfile = await peerProfileService.findOneByPeerId(peerId);
       if (peerProfile != null) {
         myself.peerProfile = peerProfile;
         String? avatar = peerProfile.avatar;
-        if (avatar != null) {
-          var avatarImage = ImageWidget(
-            image: avatar,
-            height: 32,
-            width: 32,
-          );
-          myself.avatar = avatarImage;
-        }
+        var avatarImage = ImageWidget(
+          image: avatar,
+          height: 32,
+          width: 32,
+        );
+        myself.avatarImage = avatarImage;
       }
     }
 

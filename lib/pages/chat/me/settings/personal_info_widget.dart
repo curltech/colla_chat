@@ -55,7 +55,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
       TileData(title: 'Setting'): [
         TileData(
           title: 'Avatar',
-          suffix: myself.avatar,
+          suffix: myself.avatarImage,
           routeName: 'avatar',
         ),
         TileData(
