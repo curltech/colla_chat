@@ -242,8 +242,8 @@ class Sqlite3 extends DataStore {
   /// @param {*} entity
   @override
   Future<int> insert(String table, dynamic entity) async {
-    entity = JsonUtil.toMap(entity);
-    Sql sql = sqlBuilder.insert(table, entity);
+    Map<String, dynamic> map = JsonUtil.toMap(entity) as Map<String, dynamic>;
+    Sql sql = sqlBuilder.insert(table, map);
     await run(sql);
     int key = db.lastInsertRowId;
     Object? id = EntityUtil.getId(entity);
@@ -261,8 +261,8 @@ class Sqlite3 extends DataStore {
   Future<int> delete(String table,
       {dynamic entity, String? where, List<Object>? whereArgs}) async {
     if (entity != null) {
-      entity = JsonUtil.toMap(entity);
-      var id = EntityUtil.getId(entity);
+      Map<String, dynamic> map = JsonUtil.toMap(entity) as Map<String, dynamic>;
+      var id = EntityUtil.getId(map);
       if (id != null) {
         where = 'id=?';
         whereArgs = [id];
@@ -284,13 +284,13 @@ class Sqlite3 extends DataStore {
   @override
   Future<int> update(String table, dynamic entity,
       {String? where, List<Object>? whereArgs}) async {
-    entity = JsonUtil.toMap(entity);
-    var id = EntityUtil.getId(entity);
+    Map<String, dynamic> map = JsonUtil.toMap(entity) as Map<String, dynamic>;
+    var id = EntityUtil.getId(map);
     if (id != null) {
       where = 'id=?';
       whereArgs = [id];
     }
-    Sql sql = sqlBuilder.update(table, entity, where!, whereArgs);
+    Sql sql = sqlBuilder.update(table, map, where!, whereArgs);
 
     await run(sql);
     int result = db.getUpdatedRows();
@@ -301,8 +301,8 @@ class Sqlite3 extends DataStore {
   @override
   Future<int> upsert(String table, dynamic entity,
       {String? where, List<Object>? whereArgs}) async {
-    entity = JsonUtil.toMap(entity);
-    var id = EntityUtil.getId(entity);
+    Map<String, dynamic> map = JsonUtil.toMap(entity) as Map<String, dynamic>;
+    var id = EntityUtil.getId(map);
     if (id != null) {
       return update(table, entity);
     } else {

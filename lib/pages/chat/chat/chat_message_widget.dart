@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:flutter/material.dart';
 
@@ -143,11 +144,14 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     return scrollNotification.depth == 0;
   }
 
-  @override
-  void dispose() {
-    widget.controller.removeListener(_update);
-    widget.scrollController.removeListener(_onScroll);
-    super.dispose();
+  _scrollMin() {
+    // scroll to the bottom of the list when keyboard appears
+    Timer(
+        const Duration(milliseconds: 200),
+        () => widget.scrollController.animateTo(
+            widget.scrollController.position.minScrollExtent,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeIn));
   }
 
   ///发送命令
@@ -157,6 +161,12 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
       return;
     }
     logger.i(message);
+    ChatMessage chatMessage = ChatMessage(myself.peerId!);
+    chatMessage.content = message;
+    chatMessage.contentType = ContentType.text.name;
+    chatMessageService.insert(chatMessage).then((value) {
+      widget.controller.insert(0, chatMessage);
+    });
   }
 
   ///发送消息的输入框和按钮
@@ -174,12 +184,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
               focusNode: textFocusNode,
               onTap: () {
                 // scroll to the bottom of the list when keyboard appears
-                Timer(
-                    const Duration(milliseconds: 200),
-                    () => widget.scrollController.animateTo(
-                        widget.scrollController.position.minScrollExtent,
-                        duration: const Duration(milliseconds: 500),
-                        curve: Curves.easeIn));
+                _scrollMin();
               },
             ),
           ),
@@ -254,5 +259,12 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
         withLeading: widget.withLeading,
         child: _buildListView(context));
     return appBarView;
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_update);
+    widget.scrollController.removeListener(_onScroll);
+    super.dispose();
   }
 }
