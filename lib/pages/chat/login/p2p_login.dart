@@ -1,8 +1,8 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/login/loading.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
 
+import 'loading.dart';
 import 'p2p_login_widget.dart';
 import 'p2p_register_widget.dart';
 import 'p2p_setting_widget.dart';

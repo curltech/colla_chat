@@ -5,7 +5,6 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   battery_plus_windows
   connectivity_plus_windows
-  file_saver
   flutter_secure_storage_windows
   flutter_webrtc
   geolocator_windows

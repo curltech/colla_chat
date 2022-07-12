@@ -13,7 +13,6 @@ import 'package:connectivity_for_web/connectivity_for_web.dart';
 import 'package:connectivity_plus_web/connectivity_plus_web.dart';
 import 'package:device_info_plus_web/device_info_plus_web.dart';
 import 'package:file_picker/_internal/file_picker_web.dart';
-import 'package:file_saver/file_saver_web.dart';
 import 'package:flutter_keyboard_visibility_web/flutter_keyboard_visibility_web.dart';
 import 'package:flutter_secure_storage_web/flutter_secure_storage_web.dart';
 import 'package:flutter_sound_web/flutter_sound_web.dart';
@@ -46,7 +45,6 @@ void registerPlugins(Registrar registrar) {
   ConnectivityPlusPlugin.registerWith(registrar);
   DeviceInfoPlusPlugin.registerWith(registrar);
   FilePickerWeb.registerWith(registrar);
-  FileSaverWeb.registerWith(registrar);
   FlutterKeyboardVisibilityPlugin.registerWith(registrar);
   FlutterSecureStorageWeb.registerWith(registrar);
   FlutterSoundPlugin.registerWith(registrar);

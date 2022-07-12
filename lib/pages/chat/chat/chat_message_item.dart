@@ -9,7 +9,7 @@ import '../../../entity/chat/chat.dart';
 /// 每条消息展示组件，我接收的消息展示在左边，我发送的消息展示在右边
 class ChatMessageItem extends StatelessWidget {
   final ChatMessage chatMessage;
-  late bool isMyself;
+  late final bool isMyself;
 
   ChatMessageItem({Key? key, required this.chatMessage}) : super(key: key) {
     isMyself = _isMyself();
@@ -63,7 +63,7 @@ class ChatMessageItem extends StatelessWidget {
                 topLeft: isMyself ? const Radius.circular(8.0) : Radius.zero,
                 topRight: isMyself ? Radius.zero : const Radius.circular(8.0),
               ),
-              border: Border.all(color: Colors.grey)),
+              border: Border.all(color: Colors.white)),
           margin: EdgeInsets.only(
               right: isMyself ? 5.0 : 0, left: isMyself ? 0 : 5.0),
           child: buildMessageBody(context, content, contentType),

@@ -280,6 +280,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     widget.controller.controller = controller;
     var columnFieldDef = widget.columnFieldDef;
     formInputController.setController(columnFieldDef.name, widget.controller);
+    var suffixIcon = columnFieldDef.suffixIcon;
     Widget? suffix;
     if (columnFieldDef.cancel) {
       suffix = controller.text.isNotEmpty
@@ -288,8 +289,13 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
               onPressed: () {
                 controller.clear();
               },
-              icon: const Icon(Icons.cancel, color: Colors.grey))
+              icon: const Icon(Icons.cancel))
           : null;
+
+      if (suffixIcon == null) {
+        suffixIcon = suffix;
+        suffix = null;
+      }
     }
     var textFormField = TextFormField(
       controller: controller,
@@ -299,7 +305,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
       decoration: InputDecoration(
           labelText: AppLocalizations.t(columnFieldDef.label),
           prefixIcon: _buildIcon(),
-          suffixIcon: columnFieldDef.suffixIcon,
+          suffixIcon: suffixIcon,
           suffix: suffix,
           hintText: columnFieldDef.hintText),
     );
@@ -329,7 +335,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
               onPressed: () {
                 controller.clear();
               },
-              icon: const Icon(Icons.cancel, color: Colors.grey))
+              icon: const Icon(Icons.cancel))
           : null;
     }
     var textFormField = TextFormField(

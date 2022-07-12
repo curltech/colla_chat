@@ -33,7 +33,7 @@ class BackgroudSelector extends StatelessWidget {
         child: Wrap(
           runSpacing: 10.0,
           spacing: 10.0,
-          children: backgroudImages.map(buildBackgroud).toList(),
+          children: darkBackgroudImages.map(buildBackgroud).toList(),
         ),
       ),
     );
