@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -8,32 +10,46 @@ import '../p2p/chain/chainmessagehandler.dart';
 import '../provider/app_data_provider.dart';
 import '../tool/util.dart';
 
+enum SocketStatus {
+  connected, // 已连接
+  failed, // 失败
+  closed, // 连接关闭
+  reconnecting,
+}
+
 class Websocket implements IWebClient {
   String prefix = 'wss://';
   late String address;
   WebSocketChannel? channel;
-  bool _status = false;
-  Duration pingInterval = const Duration(seconds: 10);
+  SocketStatus status = SocketStatus.closed;
+  Duration pingInterval = const Duration(seconds: 30);
   Map<String, dynamic> headers = {};
-  String? heartbeatTimer;
+  Timer? heartBeat; // 心跳定时器
+  int heartTimes = 3000; // 心跳间隔(毫秒)
+  int reconnectCount = 5; // 重连次数，默认5次
+  int reconnectTimes = 0; // 重连计数器
 
   Websocket(String addr) {
     if (!addr.startsWith(prefix)) {
       throw 'error wss address prefix';
     }
     address = addr;
-    connect();
   }
 
-  connect() async {
+  Future<void> connect() async {
+    await close();
     channel = websocket_connect.websocketConnect(address,
         headers: headers, pingInterval: pingInterval);
     if (channel == null) {
       logger.e('wss address:$address connect failure');
       return;
     }
+    // 连接成功，重置重连计数器
+    reconnectTimes = 0;
     register('', onData);
-    _status = true;
+    //initHeartBeat();
+    status = SocketStatus.connected;
+    logger.i('wss address:$address websocket connected');
   }
 
   @override
@@ -43,7 +59,6 @@ class Websocket implements IWebClient {
       channel!.stream.listen((dynamic data) {
         func(data);
       }, onError: onError, onDone: onDone, cancelOnError: false);
-      _status = true;
     }
   }
 
@@ -58,18 +73,52 @@ class Websocket implements IWebClient {
     }
   }
 
+  ///连接被关闭或出错的时候重连
   onDone() async {
-    logger.i("wss address:$address websocket onDone");
+    int? closeCode;
+    String? closeReason;
+    if (channel != null) {
+      closeCode = channel!.closeCode;
+      closeReason = channel!.closeReason;
+    }
+    logger.w(
+        "wss address:$address websocket onDone. closeCode:$closeCode;closeReason:$closeReason");
+    status = SocketStatus.closed;
+    reconnect();
   }
 
   onError(err) async {
     logger.e("wss address:$address websocket onError, ${err}");
+    status = SocketStatus.failed;
     await reconnect();
   }
 
+  /// 初始化心跳
+  void initHeartBeat() {
+    destroyHeartBeat();
+    heartBeat = Timer.periodic(Duration(milliseconds: heartTimes), (timer) {
+      sentHeart();
+    });
+  }
+
+  /// 心跳
+  void sentHeart() {
+    sendMsg('heartbeat');
+  }
+
+  /// 销毁心跳
+  void destroyHeartBeat() {
+    if (heartBeat != null) {
+      heartBeat!.cancel();
+      heartBeat = null;
+    }
+  }
+
   sendMsg(dynamic data) {
-    if (channel != null) {
+    if (channel != null && status == SocketStatus.connected) {
       channel!.sink.add(data);
+    } else {
+      logger.e('status is not connected');
     }
   }
 
@@ -85,22 +134,33 @@ class Websocket implements IWebClient {
     return send(url, {});
   }
 
-  bool get status {
-    return _status;
-  }
-
   Future<void> close() async {
-    if (_status) {
+    if (status != SocketStatus.closed) {
       if (channel != null) {
         await channel!.sink.close();
-        _status = false;
+        channel = null;
+        destroyHeartBeat();
+        status = SocketStatus.closed;
       }
     }
   }
 
-  reconnect() async {
-    await close();
-    connect();
+  /// 重连机制
+  Future<void> reconnect() async {
+    if (reconnectTimes < reconnectCount) {
+      reconnectTimes++;
+      Timer.run(() {
+        status = SocketStatus.reconnecting;
+        logger.i('wss address:$address websocket reconnecting');
+        connect();
+      });
+    } else {
+      logger.i('reconnect count over max count');
+      status = SocketStatus.failed;
+      var instance = await WebsocketPool.instance;
+      instance.close(address);
+      return;
+    }
   }
 }
 
@@ -109,18 +169,19 @@ class WebsocketPool {
   static bool initStatus = false;
 
   /// 初始化连接池，设置缺省websocketclient，返回连接池
-  static WebsocketPool get instance {
+  static Future<WebsocketPool> get instance async {
     if (!initStatus) {
       var appParams = AppDataProvider.instance;
       var nodeAddress = appParams.nodeAddress;
       if (nodeAddress.isNotEmpty) {
-        for (var address in nodeAddress.entries) {
-          var name = address.key;
-          var wsConnectAddress = address.value.wsConnectAddress;
-          if (wsConnectAddress != null && wsConnectAddress.startsWith('ws')) {
-            var websocket = Websocket(wsConnectAddress);
-            _instance.websockets[wsConnectAddress] = websocket;
-            if (name == NodeAddress.defaultName) {
+        NodeAddress? defaultNodeAddress = nodeAddress[NodeAddress.defaultName];
+        if (defaultNodeAddress != null) {
+          var defaultAddress = defaultNodeAddress.wsConnectAddress;
+          if (defaultAddress != null && defaultAddress.startsWith('ws')) {
+            var websocket = Websocket(defaultAddress);
+            await websocket.connect();
+            if (websocket.status == SocketStatus.connected) {
+              _instance.websockets[defaultAddress] = websocket;
               _instance._default = websocket;
             }
           }
@@ -136,15 +197,28 @@ class WebsocketPool {
 
   WebsocketPool();
 
-  Websocket? get(String address) {
-    if (websockets.containsKey(address)) {
-      return websockets[address];
-    } else {
-      var websocket = Websocket(address);
-      websockets[address] = websocket;
-
-      return websocket;
+  Future<Websocket?> get({String? address, bool isDefault = false}) async {
+    if (address == null) {
+      return _instance._default;
     }
+    Websocket? websocket;
+    if (websockets.containsKey(address)) {
+      websocket = websockets[address];
+    } else {
+      if (address.startsWith('ws')) {
+        websocket = Websocket(address);
+        await websocket.connect();
+        if (websocket.status == SocketStatus.connected) {
+          _instance.websockets[address] = websocket;
+        } else {
+          websocket = null;
+        }
+      }
+    }
+    if (isDefault && websocket != null) {
+      _instance._default = websocket;
+    }
+    return websocket;
   }
 
   close(String address) {
@@ -156,31 +230,6 @@ class WebsocketPool {
       websockets.remove(address);
     }
   }
-
-  Websocket? get defaultWebsocket {
-    return _default;
-  }
-
-  setWebsocket(String address) {
-    Websocket? websocket;
-    if (websockets.containsKey(address)) {
-      websocket = websockets[address];
-    } else {
-      websocket = Websocket(address);
-      websockets[address] = websocket;
-    }
-  }
-
-  Websocket? setDefaultWebsocket(String address) {
-    Websocket? websocket;
-    if (websockets.containsKey(address)) {
-      websocket = websockets[address];
-    } else {
-      websocket = Websocket(address);
-      websockets[address] = websocket;
-    }
-    _default = websocket;
-
-    return _default;
-  }
 }
+
+final websocketPool = WebsocketPool.instance;

@@ -1,5 +1,6 @@
 /// webclient代表httpclient或者websocketclient
 import 'package:colla_chat/transport/websocket.dart';
+
 import 'httpclient.dart';
 
 abstract class IWebClient {
@@ -16,12 +17,12 @@ class WebClient extends IWebClient {
   IWebClient? _httpDefault;
   IWebClient? _wsDefault;
 
-  static WebClient get instance {
+  static Future<WebClient> get instance async {
     if (!initStatus) {
       HttpClientPool httpClientPool = HttpClientPool.instance;
-      WebsocketPool websocketPool = WebsocketPool.instance;
+      WebsocketPool websocketPool = await WebsocketPool.instance;
       _instance._httpDefault = httpClientPool.defaultHttpClient;
-      _instance._wsDefault = websocketPool.defaultWebsocket;
+      _instance._wsDefault = await websocketPool.get();
       if (_instance._httpDefault == null && _instance._wsDefault == null) {
         throw 'NoDefaultWebClient';
       }
@@ -32,8 +33,8 @@ class WebClient extends IWebClient {
 
   setDefault(String address) async {
     if (address.startsWith('wss') || address.startsWith('ws')) {
-      WebsocketPool websocketPool = WebsocketPool.instance;
-      _wsDefault = websocketPool.setDefaultWebsocket(address);
+      WebsocketPool websocketPool = await WebsocketPool.instance;
+      _wsDefault = await websocketPool.get(address: address, isDefault: true);
     } else if (address.startsWith('https') || address.startsWith('http')) {
       if (address == 'https' || address == 'http') {
         HttpClientPool httpClientPool = HttpClientPool.instance;

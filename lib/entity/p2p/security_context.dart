@@ -18,7 +18,7 @@ class SecurityContext {
   SecurityContext();
 
   SecurityContext.fromJson(Map json)
-      : transportPayload = json['transportPayload'],
+      : transportPayload = json['transportPayload']??'',
         payloadSignature = json['payloadSignature'],
         previousPublicKeyPayloadSignature =
             json['previousPublicKeyPayloadSignature'],

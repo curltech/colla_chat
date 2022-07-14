@@ -1,3 +1,4 @@
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
@@ -6,8 +7,8 @@ final defaultLinearGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      const Color(0xFFffffff).withOpacity(0.1),
-      const Color(0xFFFFFFFF).withOpacity(0.05),
+      appDataProvider.themeData!.colorScheme.primary.withOpacity(0.1),
+      appDataProvider.themeData!.colorScheme.primary.withOpacity(0.05),
     ],
     stops: const [
       0.1,
@@ -17,8 +18,8 @@ final defaultBorderGradient = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
   colors: [
-    const Color(0xFFffffff).withOpacity(0.5),
-    const Color((0xFFFFFFFF)).withOpacity(0.5),
+    appDataProvider.themeData!.colorScheme.primary.withOpacity(0.5),
+    appDataProvider.themeData!.colorScheme.primary.withOpacity(0.5),
   ],
 );
 
