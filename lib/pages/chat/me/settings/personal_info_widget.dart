@@ -1,9 +1,12 @@
 import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/qrcode_widget.dart';
+import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../provider/index_widget_provider.dart';
+import '../../../../routers/routes.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 import '../../../../widgets/data_bind/data_group_listview.dart';
@@ -41,6 +44,28 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
     indexWidgetProvider.define(qrcodeWidget);
   }
 
+  Widget _buildLogout(BuildContext context) {
+    return TextButton(
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all(const Color(0xFFE8E8E8)),
+          shape: MaterialStateProperty.all(
+            RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8.0),
+            ),
+          ),
+          padding: MaterialStateProperty.all(
+              const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0)),
+          minimumSize: MaterialStateProperty.all(const Size(300, 0)),
+          maximumSize: MaterialStateProperty.all(const Size(375.0, 36.0)),
+        ),
+        onPressed: () {
+          myselfPeerService.logout();
+          Application.router
+              .navigateTo(context, Application.p2pLogin, replace: true);
+        },
+        child: Text(AppLocalizations.t('Logout')));
+  }
+
   @override
   Widget build(BuildContext context) {
     String name;
@@ -75,9 +100,17 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
       ]
     };
     var personalInfo = AppBarView(
-        title: 'Personal Information',
-        withLeading: widget.withLeading,
-        child: GroupDataListView(tileData: personalInfoTileData));
+      title: 'Personal Information',
+      withLeading: widget.withLeading,
+      child: Column(children: [
+        GroupDataListView(tileData: personalInfoTileData),
+        const SizedBox(
+          height: 15.0,
+        ),
+        _buildLogout(context)
+      ]),
+    );
+
     return personalInfo;
   }
 }
