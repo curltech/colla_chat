@@ -1,15 +1,26 @@
+import 'dart:io';
+
 import 'package:colla_chat/transport/webclient.dart';
+import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 import '../provider/app_data_provider.dart';
 
-class HttpClient implements IWebClient {
+class DioHttpClient implements IWebClient {
   final Dio _client = Dio();
   String? _address;
 
-  HttpClient(String address) {
+  DioHttpClient(String address) {
     if (address.startsWith('http')) {
+      ///获取dio中的httpclient，处理证书问题
+      (_client.httpClientAdapter as DefaultHttpClientAdapter)
+          .onHttpClientCreate = (HttpClient client) {
+        client.badCertificateCallback =
+            (X509Certificate cert, String host, int port) => true;
+
+        return client;
+      };
       // Set default configs
       _client.options.baseUrl = address;
       _client.options.connectTimeout = 5000; //5s
@@ -56,8 +67,8 @@ class HttpClient implements IWebClient {
 class HttpClientPool {
   static final HttpClientPool _instance = HttpClientPool();
   static bool initStatus = false;
-  final _httpClients = <String, HttpClient>{};
-  HttpClient? _default;
+  final _httpClients = <String, DioHttpClient>{};
+  DioHttpClient? _default;
 
   HttpClientPool();
 
@@ -72,7 +83,7 @@ class HttpClientPool {
           var httpConnectAddress = address.value.httpConnectAddress;
           if (httpConnectAddress != null &&
               httpConnectAddress.startsWith('http')) {
-            var httpClient = HttpClient(httpConnectAddress);
+            var httpClient = DioHttpClient(httpConnectAddress);
             _instance._httpClients[httpConnectAddress] = httpClient;
             if (name == NodeAddress.defaultName) {
               _instance._default = httpClient;
@@ -85,27 +96,27 @@ class HttpClientPool {
     return _instance;
   }
 
-  HttpClient? get(String address) {
+  DioHttpClient? get(String address) {
     if (_httpClients.containsKey(address)) {
       return _httpClients[address];
     } else {
-      var httpClient = HttpClient(address);
+      var httpClient = DioHttpClient(address);
       _httpClients[address] = httpClient;
 
       return httpClient;
     }
   }
 
-  HttpClient? get defaultHttpClient {
+  DioHttpClient? get defaultHttpClient {
     return _default;
   }
 
-  HttpClient? setDefalutHttpClient(String address) {
-    HttpClient? httpClient;
+  DioHttpClient? setDefalutHttpClient(String address) {
+    DioHttpClient? httpClient;
     if (_httpClients.containsKey(address)) {
       httpClient = _httpClients[address];
     } else {
-      httpClient = HttpClient(address);
+      httpClient = DioHttpClient(address);
       _httpClients[address] = httpClient;
     }
     _default = httpClient;

@@ -1,14 +1,36 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:colla_chat/pages/chat/login/p2p_login.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 
 import 'l10n/localization.dart';
+
+///全局处理证书问题
+class PlatformHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..badCertificateCallback =
+          (X509Certificate cert, String host, int port) => true;
+  }
+}
+
+///安装客户端证书
+Future<void> setCert() async {
+  ByteData data =
+      await PlatformAssetBundle().load('assets/ca/lets-encrypt-r3.pem');
+  SecurityContext.defaultContext
+      .setTrustedCertificatesBytes(data.buffer.asUint8List());
+}
 
 void main() {
   //初始化服务类
@@ -20,6 +42,7 @@ void main() {
   //       ],
   WidgetsFlutterBinding.ensureInitialized();
   ServiceLocator.init().then((value) {
+    HttpOverrides.global = PlatformHttpOverrides();
     runApp(MultiProvider(providers: [
       ChangeNotifierProvider(create: (context) => AppDataProvider.instance),
     ], child: const CollaChatApp()));

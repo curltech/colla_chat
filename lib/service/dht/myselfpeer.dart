@@ -149,7 +149,6 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     ///本地查找账户
     var peerId = myself.peerId;
     if (peerId != null) {
-      myselfService.clear();
       myselfPeerService.findOneByPeerId(peerId).then((MyselfPeer? myselfPeer) {
         ///2.连接篇p2p的节点，把自己的信息注册上去
         if (myselfPeer != null) {
@@ -162,6 +161,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
           peerClient.name = '';
           connectAction.connect(peerClient);
         }
+        myselfService.clear();
       });
     }
   }

@@ -47,7 +47,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
   Widget _buildLogout(BuildContext context) {
     return TextButton(
         style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all(const Color(0xFFE8E8E8)),
+          backgroundColor: MaterialStateProperty.all(Colors.grey),
           shape: MaterialStateProperty.all(
             RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8.0),

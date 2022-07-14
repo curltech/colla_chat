@@ -1,4 +1,3 @@
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -12,7 +11,7 @@ import '../tool/util.dart';
 class Websocket implements IWebClient {
   String prefix = 'wss://';
   late String address;
-  late WebSocketChannel channel;
+  WebSocketChannel? channel;
   bool _status = false;
   Duration pingInterval = const Duration(seconds: 10);
   Map<String, dynamic> headers = {};
@@ -27,9 +26,11 @@ class Websocket implements IWebClient {
   }
 
   connect() async {
-    if (PlatformParams.instance.web) {
-      channel = websocket_connect.websocketConnect(address,
-          headers: headers, pingInterval: pingInterval);
+    channel = websocket_connect.websocketConnect(address,
+        headers: headers, pingInterval: pingInterval);
+    if (channel == null) {
+      logger.e('wss address:$address connect failure');
+      return;
     }
     register('', onData);
     _status = true;
@@ -37,17 +38,19 @@ class Websocket implements IWebClient {
 
   @override
   register(String name, Function func) {
-    // 监听消息，如果有消息到来，就打印出来
-    channel.stream.listen((dynamic data) {
-      func(data);
-    }, onError: onError, onDone: onDone, cancelOnError: false);
-    _status = true;
+    if (channel != null) {
+      // 监听消息，如果有消息到来，就打印出来
+      channel!.stream.listen((dynamic data) {
+        func(data);
+      }, onError: onError, onDone: onDone, cancelOnError: false);
+      _status = true;
+    }
   }
 
   onData(dynamic data) async {
     var msg = String.fromCharCodes(data);
     if (msg == 'heartbeat') {
-      logger.i('receive heartbeat message');
+      logger.i('wss address:$address receive heartbeat message');
     } else {
       logger.w(msg);
       var response = await chainMessageHandler.receiveRaw(data, '', '');
@@ -56,17 +59,18 @@ class Websocket implements IWebClient {
   }
 
   onDone() async {
-    logger.i("websocket onDone");
-    await reconnect();
+    logger.i("wss address:$address websocket onDone");
   }
 
   onError(err) async {
-    logger.e("websocket onError, ${err}");
+    logger.e("wss address:$address websocket onError, ${err}");
     await reconnect();
   }
 
   sendMsg(dynamic data) {
-    channel.sink.add(data);
+    if (channel != null) {
+      channel!.sink.add(data);
+    }
   }
 
   @override
@@ -87,8 +91,10 @@ class Websocket implements IWebClient {
 
   Future<void> close() async {
     if (_status) {
-      await channel.sink.close();
-      _status = false;
+      if (channel != null) {
+        await channel!.sink.close();
+        _status = false;
+      }
     }
   }
 
