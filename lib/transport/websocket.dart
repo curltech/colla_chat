@@ -28,6 +28,7 @@ class Websocket implements IWebClient {
   int heartTimes = 3000; // 心跳间隔(毫秒)
   int reconnectCount = 5; // 重连次数，默认5次
   int reconnectTimes = 0; // 重连计数器
+  Timer? reconnectBeat; // 心跳定时器
 
   Websocket(String addr) {
     if (!addr.startsWith(prefix)) {
@@ -46,6 +47,10 @@ class Websocket implements IWebClient {
     }
     // 连接成功，重置重连计数器
     reconnectTimes = 0;
+    if (reconnectBeat != null) {
+      reconnectBeat!.cancel();
+      reconnectBeat = null;
+    }
     register('', onData);
     //initHeartBeat();
     status = SocketStatus.connected;
@@ -148,11 +153,18 @@ class Websocket implements IWebClient {
   /// 重连机制
   Future<void> reconnect() async {
     if (reconnectTimes < reconnectCount) {
-      reconnectTimes++;
-      Timer.run(() {
+      reconnectBeat =
+          Timer.periodic(Duration(milliseconds: heartTimes), (timer) {
+        reconnectTimes++;
         status = SocketStatus.reconnecting;
         logger.i('wss address:$address websocket reconnecting');
         connect();
+        if (reconnectTimes > reconnectCount) {
+          if (reconnectBeat != null) {
+            reconnectBeat!.cancel();
+            reconnectBeat = null;
+          }
+        }
       });
     } else {
       logger.i('reconnect count over max count');
