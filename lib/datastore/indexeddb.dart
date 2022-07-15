@@ -20,7 +20,7 @@ class IndexedDb extends DataStore {
   late String path;
 
   ///打开数据库，创建所有的表和索引
-  static Future<IndexedDb> getInstance({String name = 'colla_chat.db'}) async {
+  static Future<IndexedDb> getInstance({String name = dbname}) async {
     if (!initStatus) {
       IdbFactory? idbFactory = getIdbFactory();
       if (idbFactory != null) {

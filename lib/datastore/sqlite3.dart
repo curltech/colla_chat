@@ -24,7 +24,7 @@ class Sqlite3 extends DataStore {
   late String path;
 
   /// 打开数据库，创建所有的表和索引
-  static Future<Sqlite3> getInstance({String name = 'colla_chat.db'}) async {
+  static Future<Sqlite3> getInstance({String name = dbname}) async {
     if (!initStatus) {
       await instance.open();
       initStatus = true;

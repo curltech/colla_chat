@@ -79,6 +79,8 @@ class Pagination<T> {
       };
 }
 
+const String dbname = 'colla_chat.db';
+
 abstract class DataStore {
   ///建表和索引
   dynamic create(String tableName, List<String> fields,

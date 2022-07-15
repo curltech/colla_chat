@@ -20,7 +20,7 @@ class Sqflite extends DataStore {
   late String path;
 
   /// 打开数据库，创建所有的表和索引
-  static Future<Sqflite> getInstance({String name = 'colla_chat.db'}) async {
+  static Future<Sqflite> getInstance({String name = dbname}) async {
     if (!initStatus) {
       var databasesPath = await getDatabasesPath();
       String path = join(databasesPath, name);
