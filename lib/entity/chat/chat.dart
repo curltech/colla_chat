@@ -105,6 +105,8 @@ class ChatMessage extends StatusEntity {
   String? receiverPeerId; // 目标的唯一id标识（单聊对应linkman-peerId，群聊对应group-peerId）
   String? receiverType; // 包括：Linkman（单聊）, Group（群聊）,Channel,
   String? receiverName;
+  String? groupPeerId; // 目标的唯一id标识（单聊对应linkman-peerId，群聊对应group-peerId）
+  String? groupName;
   String? receiverAddress;
   String? receiveTime; // 接收时间
   String?
@@ -145,6 +147,8 @@ class ChatMessage extends StatusEntity {
         direct = json['direct'],
         receiverPeerId = json['receiverPeerId'],
         receiverName = json['receiverName'],
+        groupPeerId = json['groupPeerId'],
+        groupName = json['groupName'],
         receiverAddress = json['receiverAddress'],
         messageId = json['messageId'],
         messageType = json['messageType'],
@@ -195,6 +199,8 @@ class ChatMessage extends StatusEntity {
       'receiverType': receiverType,
       'receiverPeerId': receiverPeerId,
       'receiverName': receiverName,
+      'groupPeerId': groupPeerId,
+      'groupName': groupName,
       'receiverAddress': receiverAddress,
       'messageId': messageId,
       'messageType': messageType,

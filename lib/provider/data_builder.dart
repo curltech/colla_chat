@@ -3,9 +3,11 @@ import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:cryptography/cryptography.dart';
 
+import '../crypto/util.dart';
 import '../entity/chat/chat.dart';
 import '../entity/chat/contact.dart';
 import '../entity/dht/peerclient.dart';
+import '../platform.dart';
 import '../service/chat/chat.dart';
 import '../service/chat/contact.dart';
 import '../service/dht/peerclient.dart';
@@ -13,8 +15,14 @@ import '../service/dht/peerclient.dart';
 class DataBuilder {
   static build() async {
     List<Linkman> linkmen = [];
+    var clientDevice = PlatformParams.instance.clientDevice;
+    var clientId = '';
+    if (clientDevice != null) {
+      var hash = await cryptoGraphy.hash(clientDevice.codeUnits);
+      clientId = CryptoUtil.encodeBase58(hash);
+    }
     for (var i = 0; i < 20; ++i) {
-      PeerClient peerClient = PeerClient(myself.peerId ?? '', '', '');
+      PeerClient peerClient = PeerClient(myself.peerId ?? '', '', clientId);
 
       ///peerId对应的密钥对
       SimpleKeyPair peerPrivateKey = await cryptoGraphy.generateKeyPair();

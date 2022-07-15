@@ -1,4 +1,7 @@
+import '../../../entity/dht/peerclient.dart';
 import '../../../entity/p2p/message.dart';
+import '../../../service/dht/peerclient.dart';
+import '../../../tool/util.dart';
 import '../baseaction.dart';
 
 ///根据目标peerclient的peerid，电话和名称搜索，异步返回
@@ -18,17 +21,19 @@ class FindClientAction extends BaseAction {
     return null;
   }
 
+  ///覆盖父亲的返回处理方法，对返回的负载转换成peerclients，再进一步处理
   @override
-  Future<ChainMessage?> receive(ChainMessage chainMessage) async {
-    ChainMessage? chainMessage_ = await super.receive(chainMessage);
-    if (chainMessage_ != null && receivers.isNotEmpty) {
-      receivers.forEach((String key, dynamic receiver) async =>
-          {await receiver(chainMessage_.payload)});
-
-      return null;
+  Future<void> response(ChainMessage chainMessage) async {
+    if (chainMessage.payloadType == PayloadType.peerClients.name) {
+      var payload = chainMessage.payload;
+      var jsons = JsonUtil.toJson(payload);
+      if (jsons is List) {
+        for (var json in jsons) {
+          var peerClient = PeerClient.fromJson(json);
+          await peerClientService.store(peerClient);
+        }
+      }
     }
-
-    return null;
   }
 }
 

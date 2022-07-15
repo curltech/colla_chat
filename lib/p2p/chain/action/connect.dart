@@ -30,7 +30,7 @@ class ConnectAction extends BaseAction {
       if (jsons is List) {
         for (var json in jsons) {
           var peerClient = PeerClient.fromJson(json);
-          peerClientService.store(peerClient);
+          await peerClientService.store(peerClient);
         }
       }
     }
