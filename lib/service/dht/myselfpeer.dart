@@ -11,6 +11,7 @@ import '../../entity/dht/myself.dart';
 import '../../entity/dht/myselfpeer.dart';
 import '../../entity/dht/peerclient.dart';
 import '../../entity/dht/peerprofile.dart';
+import '../../entity/p2p/message.dart';
 import '../../p2p/chain/action/connect.dart';
 import '../../platform.dart';
 import '../../tool/util.dart';
@@ -150,20 +151,29 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     ///本地查找账户
     var peerId = myself.peerId;
     if (peerId != null) {
-      myselfPeerService.findOneByPeerId(peerId).then((MyselfPeer? myselfPeer) {
-        ///2.连接篇p2p的节点，把自己的信息注册上去
-        if (myselfPeer != null) {
-          var json = JsonUtil.toJson(myselfPeer);
-          var peerClient = PeerClient.fromJson(json);
-          peerClient.activeStatus = ActiveStatus.Down.name;
-          peerClient.clientId = myselfPeer.clientId;
-          peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
-          peerClient.kind = null;
-          peerClient.name = '';
-          connectAction.connect(peerClient);
-        }
+      try {
+        myselfPeerService
+            .findOneByPeerId(peerId)
+            .then((MyselfPeer? myselfPeer) {
+          ///2.连接篇p2p的节点，把自己的信息注册上去
+          if (myselfPeer != null) {
+            var json = JsonUtil.toJson(myselfPeer);
+            var peerClient = PeerClient.fromJson(json);
+            peerClient.activeStatus = ActiveStatus.Down.name;
+            peerClient.clientId = myselfPeer.clientId;
+            peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
+            peerClient.kind = null;
+            peerClient.name = '';
+            connectAction
+                .connect(peerClient)
+                .then((ChainMessage? chainMessage) {
+              myselfService.clear();
+            });
+          }
+        });
+      } catch (e) {
         myselfService.clear();
-      });
+      }
     }
   }
 }

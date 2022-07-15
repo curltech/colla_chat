@@ -102,14 +102,11 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
           .then((registerStatus) {
         if (registerStatus) {
           Application.router
-              .navigateTo(context, Application.index, replace: true);
+              .navigateTo(context, Application.p2pLogin, replace: true);
         }
       });
     } else {
       logger.e('password is not matched');
     }
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }

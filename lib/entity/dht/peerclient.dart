@@ -28,7 +28,7 @@ class PeerClient extends PeerLocation {
   PeerClient.fromJson(Map json)
       : mobile = json['mobile'],
         email = json['email'],
-        clientId = json['clientId'],
+        clientId = json['clientId'] ?? '',
         deviceToken = json['deviceToken'],
         lastAccessTime = json['lastAccessTime'],
         activeStatus = json['activeStatus'],
