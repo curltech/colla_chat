@@ -43,7 +43,7 @@ class ChainMessageHandler {
       try {
         await chainMessageHandler.encrypt(response);
       } catch (err) {
-        response = chainMessageHandler.error(chainMessage.msgType, err);
+        response = chainMessageHandler.error(chainMessage.messageType, err);
       }
       chainMessageHandler.setResponse(chainMessage, response);
       List<int> responseData = MessageSerializer.marshal(response);
@@ -135,7 +135,7 @@ class ChainMessageHandler {
   ///   接收报文处理的入口，包括接收请求报文和返回报文，并分配不同的处理方法
   Future<ChainMessage?> receive(ChainMessage chainMessage) async {
     await chainMessageHandler.decrypt(chainMessage);
-    var typ = chainMessage.msgType;
+    var typ = chainMessage.messageType;
     var direct = chainMessage.messageDirect;
     var handlers = chainMessageDispatch.getChainMessageHandler(typ);
     var sendHandler = handlers['sendHandler'];
@@ -222,7 +222,7 @@ class ChainMessageHandler {
   ChainMessage error(String msgType, dynamic err) {
     var errMessage = ChainMessage();
     errMessage.payload = MsgType.ERROR.name.codeUnits;
-    errMessage.msgType = msgType;
+    errMessage.messageType = msgType;
     errMessage.tip = err.chatMessage;
     errMessage.messageDirect = MsgDirect.Response.name;
 
@@ -232,7 +232,7 @@ class ChainMessageHandler {
   ChainMessage response(String msgType, dynamic payload) {
     var responseMessage = ChainMessage();
     responseMessage.payload = payload;
-    responseMessage.msgType = msgType;
+    responseMessage.messageType = msgType;
     responseMessage.messageDirect = MsgDirect.Response.name;
 
     return responseMessage;
@@ -241,7 +241,7 @@ class ChainMessageHandler {
   ChainMessage ok(String msgType) {
     var okMessage = ChainMessage();
     okMessage.payload = MsgType.OK.name.codeUnits;
-    okMessage.msgType = msgType;
+    okMessage.messageType = msgType;
     okMessage.tip = "OK";
     okMessage.messageDirect = MsgDirect.Response.name;
 
@@ -252,7 +252,7 @@ class ChainMessageHandler {
     var waitMessage = ChainMessage();
     waitMessage.payload = MsgType.WAIT.name.codeUnits;
 
-    waitMessage.msgType = msgType;
+    waitMessage.messageType = msgType;
 
     waitMessage.tip = "WAIT";
 
@@ -282,7 +282,7 @@ class ChainMessageHandler {
   /// @param chainMessage
   List<ChainMessage> slice(ChainMessage chainMessage) {
     List<int> payload = chainMessage.payload as List<int>;
-    var _packSize = (chainMessage.msgType != MsgType.P2PCHAT.name)
+    var _packSize = (chainMessage.messageType != MsgType.P2PCHAT.name)
         ? packetSize
         : webRtcPacketSize;
     if (!chainMessage.needSlice || payload.length <= _packSize) {

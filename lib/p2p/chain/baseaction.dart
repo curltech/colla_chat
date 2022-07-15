@@ -144,7 +144,7 @@ abstract class BaseAction {
     }
     chainMessage.targetPeerId = targetPeerId;
     chainMessage.payloadType = PayloadType.map.name;
-    chainMessage.msgType = msgType.name;
+    chainMessage.messageType = msgType.name;
     chainMessage.messageDirect = MsgDirect.Request.name;
     var uuid = Uuid();
     chainMessage.uuid = uuid.v4();

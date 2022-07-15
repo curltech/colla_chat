@@ -23,7 +23,7 @@ class ConsensusAction extends BaseAction {
     ChainMessage chainMessage = await prepareSend(dataBlock);
     chainMessage.payloadType = PayloadType.dataBlock.name;
     msgType ??= MsgType.CONSENSUS.name;
-    chainMessage.msgType = msgType;
+    chainMessage.messageType = msgType;
 
     ChainMessage? response = await send(chainMessage);
     if (response != null) {

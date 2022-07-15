@@ -25,7 +25,7 @@ class ChainMessage extends SecurityContext {
   String? connectPeerId;
   String? connectAddress;
   String? connectSessionId;
-  late String msgType;
+  late String messageType;
   String? tip;
   String? messageDirect;
   bool needSlice = false;
@@ -62,7 +62,7 @@ class ChainMessage extends SecurityContext {
         connectPeerId = json['connectPeerId'],
         connectAddress = json['connectAddress'],
         connectSessionId = json['connectSessionId'],
-        msgType = json['msgType'],
+        messageType = json['messageType'],
         tip = json['tip'],
         messageDirect = json['messageDirect'],
         needSlice =
@@ -91,7 +91,7 @@ class ChainMessage extends SecurityContext {
       'connectPeerId': connectPeerId,
       'connectAddress': connectAddress,
       'connectSessionId': connectSessionId,
-      'msgType': msgType,
+      'messageType': messageType,
       'tip': tip,
       'messageDirect': messageDirect,
       'needSlice': needSlice,
