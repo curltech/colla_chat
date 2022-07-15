@@ -182,7 +182,7 @@ class _PaginatedDataTableState<T> extends State<PlutoDataGridWidget> {
   @override
   Widget build(BuildContext context) {
     var dataTableView = _build(context);
-    var width = appDataProvider.size.width - appDataProvider.leftBarWidth;
+    var width = appDataProvider.size.width;
     var view = Card(
       child: ConstrainedBox(
         constraints: BoxConstraints(minWidth: width),

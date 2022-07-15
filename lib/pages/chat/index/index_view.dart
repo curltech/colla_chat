@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../provider/app_data_provider.dart';
+import '../../../widgets/style/platform_widget_factory.dart';
 import '../login/loading.dart';
 import 'bottom_bar.dart';
 import 'index_widget.dart';
-import 'left_bar.dart';
 
 class IndexView extends StatefulWidget {
   final String title;
@@ -32,37 +32,21 @@ class IndexViewState extends State<IndexView>
   Widget _createScaffold(
       BuildContext context, IndexWidgetProvider indexWidgetProvider) {
     var indexWidget = const IndexWidget();
-    //左边栏，和底部按钮功能一样，在桌面版才有
-    var leftToolBar = const LeftBar();
     var bottomNavigationBar = Offstage(
-        offstage: !indexWidgetProvider.bottomBarVisible, child: BottomBar());
-    Scaffold scaffold;
-    //移动手机不需要左边栏，需要底部栏
-    if (appDataProvider.mobile) {
-      scaffold = Scaffold(
-          body: SafeArea(child: Center(child: indexWidget)),
-          endDrawer: endDrawer,
-          bottomNavigationBar: bottomNavigationBar);
-    } else {
-      //桌面版不需要底部栏，需要固定的左边栏
-      scaffold = Scaffold(
+        offstage: !indexWidgetProvider.bottomBarVisible,
+        child: const BottomBar());
+    Scaffold scaffold = Scaffold(
         body: SafeArea(
             child: Stack(children: <Widget>[
           Opacity(
             opacity: 1,
             child: Loading(title: ''),
           ),
-          Center(
-              child: Row(
-            children: <Widget>[
-              leftToolBar,
-              const VerticalDivider(thickness: 0.5),
-              Expanded(child: indexWidget),
-            ],
-          )),
+          platformWidgetFactory.buildContainer(
+              child: Center(child: indexWidget))
         ])),
-      );
-    }
+        //endDrawer: endDrawer,
+        bottomNavigationBar: bottomNavigationBar);
 
     return scaffold;
   }

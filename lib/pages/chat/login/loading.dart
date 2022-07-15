@@ -38,7 +38,7 @@ class Loading extends StatefulWidget {
 
   final darkChildren = <Widget>[];
 
-  Loading({Key? key, required this.title, this.autoPlay = false})
+  Loading({Key? key, required this.title, this.autoPlay = true})
       : super(key: key) {
     for (int i = 0; i < lightBackgroudImages.length; ++i) {
       var image = Image.asset(
@@ -79,7 +79,7 @@ class _LoadingState extends State<Loading> with SingleTickerProviderStateMixin {
           } else {
             _tabController.index = currentIndex + 1;
           }
-          await Future.delayed(const Duration(seconds: 1));
+          await Future.delayed(const Duration(seconds: 10));
           if (currentIndex >= lightBackgroudImages.length - 1) {
             return false;
           }
@@ -98,7 +98,7 @@ class _LoadingState extends State<Loading> with SingleTickerProviderStateMixin {
           } else {
             _tabController.index = currentIndex + 1;
           }
-          await Future.delayed(const Duration(seconds: 1));
+          await Future.delayed(const Duration(seconds: 10));
           if (currentIndex >= darkBackgroudImages.length - 1) {
             return false;
           }

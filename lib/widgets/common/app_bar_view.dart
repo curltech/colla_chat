@@ -39,8 +39,8 @@ class AppBarView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<IndexWidgetProvider>(
         builder: (context, indexWidgetProvider, child) {
-      return Scaffold(
-        appBar: AppBarWidget.build(context,
+      return Column(children: [
+        AppBarWidget.build(context,
             withLeading: withLeading,
             leadingCallBack: leadingCallBack,
             title: title,
@@ -50,8 +50,8 @@ class AppBarView extends StatelessWidget {
             rightIcons: rightIcons,
             bottom: bottom,
             rightCallBack: rightCallBack),
-        body: this.child,
-      );
+        this.child,
+      ]);
     });
   }
 }

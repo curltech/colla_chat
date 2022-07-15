@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../l10n/localization.dart';
+import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/common/widget_mixin.dart';
 import '../../../widgets/data_bind/data_group_listview.dart';
 import '../../../widgets/data_bind/data_listtile.dart';
@@ -36,10 +37,9 @@ class ChannelWidget extends StatelessWidget with TileDataMixin {
       actions: [],
     );
     var body = GroupDataListView(tileData: channelTileData);
-    return Scaffold(
-      appBar: appBar,
-      //列表
-      body: body,
+    return AppBarView(
+      title: AppLocalizations.instance.text(title),
+      child: body,
     );
   }
 

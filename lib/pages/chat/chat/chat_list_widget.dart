@@ -7,6 +7,7 @@ import '../../../provider/data_list_controller.dart';
 import '../../../provider/index_widget_provider.dart';
 import '../../../service/chat/chat.dart';
 import '../../../tool/util.dart';
+import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/common/keep_alive_wrapper.dart';
 import '../../../widgets/common/widget_mixin.dart';
 import '../../../widgets/data_bind/data_group_listview.dart';
@@ -163,16 +164,9 @@ class _ChatListWidgetState extends State<ChatListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var appBar = AppBar(
-      automaticallyImplyLeading: false,
-      elevation: 0,
-      centerTitle: false,
-      title: Text(
-        AppLocalizations.instance.text(widget.title),
-      ),
-      actions: const [],
-    );
-    return Scaffold(appBar: appBar, body: _buildGroupDataListView(context));
+    return AppBarView(
+        title: AppLocalizations.instance.text(widget.title),
+        child: _buildGroupDataListView(context));
   }
 
   @override

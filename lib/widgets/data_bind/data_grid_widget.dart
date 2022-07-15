@@ -83,7 +83,7 @@ class _DataGridWidgetState<T> extends State<DataGridWidget> {
   @override
   Widget build(BuildContext context) {
     var dataTableView = _build(context);
-    var width = appDataProvider.size.width - appDataProvider.leftBarWidth;
+    var width = appDataProvider.size.width;
     var view = SingleChildScrollView(
       controller: ScrollController(),
       child: Card(

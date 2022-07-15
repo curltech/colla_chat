@@ -188,27 +188,12 @@ class IndexWidgetProvider with ChangeNotifier {
     }
   }
 
-  double get leftBarWidth {
-    return _leftBarWidth;
-  }
-
-  set leftBarWidth(double width) {
-    if (width < 0) {
-      width = 0;
-    }
-    _leftBarWidth = width;
-    notifyListeners();
-  }
-
   bool get bottomBarVisible {
-    if (appDataProvider.mobile) {
-      if (_currentIndex < mainViews.length) {
-        return true;
-      } else {
-        return false;
-      }
+    if (_currentIndex < mainViews.length) {
+      return true;
+    } else {
+      return false;
     }
-    return false;
   }
 
   ///视图转换已经发生

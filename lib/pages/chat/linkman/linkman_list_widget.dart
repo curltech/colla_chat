@@ -11,6 +11,7 @@ import '../../../../widgets/common/widget_mixin.dart';
 import '../../../../widgets/data_bind/data_listtile.dart';
 import '../../../entity/chat/contact.dart';
 import '../../../service/chat/contact.dart';
+import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/data_bind/data_group_listview.dart';
 
 //联系人页面，带有回退回调函数
@@ -109,16 +110,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
       onTap: _onTap,
       controller: widget.groupDataListController,
     ));
-    var appBar = AppBar(
-      automaticallyImplyLeading: false,
-      elevation: 0,
-      centerTitle: false,
-      title: Text(
-        AppLocalizations.instance.text(widget.title),
-      ),
-      actions: const [],
-    );
-    return Scaffold(appBar: appBar, body: groupDataListView);
+    return AppBarView(
+        title: AppLocalizations.instance.text(widget.title),
+        child: groupDataListView);
   }
 
   @override

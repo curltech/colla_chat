@@ -173,7 +173,7 @@ class AppDataProvider with ChangeNotifier {
   //屏幕宽高
   double _keyboardHeight = 270.0;
   Size _size = const Size(0.0, 0.0);
-  double leftBarWidth = 90;
+  double bottomBarHeight = 80;
   String sqlite3Path = '';
 
   AppDataProvider();
@@ -307,11 +307,9 @@ class AppDataProvider with ChangeNotifier {
   }
 
   Size get workspaceSize {
-    double width = _size.width - leftBarWidth;
+    double width = _size.width;
     double height = _size.height;
-    if (mobile) {
-      height = height - 80;
-    }
+    height = height - bottomBarHeight;
 
     return Size(width, height);
   }
