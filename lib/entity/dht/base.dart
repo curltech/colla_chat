@@ -7,7 +7,7 @@ abstract class PeerLocation extends StatusEntity {
   String ownerPeerId;
 
   /// ed25519的公钥,表明身份,用于人，设备，如果是libp2p节点直接使用libp2p的id
-  String? peerId;
+  String peerId;
   String? kind;
   String name = '';
   String? securityContext;
@@ -19,7 +19,7 @@ abstract class PeerLocation extends StatusEntity {
   String publicKey = '';
   String? address;
   String? lastUpdateTime;
-  PeerLocation(this.ownerPeerId);
+  PeerLocation(this.ownerPeerId, this.peerId);
   PeerLocation.fromJson(Map json)
       : ownerPeerId = json['ownerPeerId'] ?? '',
         peerId = json['peerId'],
@@ -62,7 +62,7 @@ abstract class PeerEntity extends PeerLocation {
   String? signatureData;
   String? expireDate;
   int version = 0;
-  PeerEntity(String ownerPeerId) : super(ownerPeerId);
+  PeerEntity(String ownerPeerId, String peerId) : super(ownerPeerId, peerId);
   PeerEntity.fromJson(Map json)
       : mobile = json['mobile'],
         email = json['email'],

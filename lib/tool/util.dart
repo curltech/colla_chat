@@ -258,16 +258,18 @@ class VersionUtil {}
 
 /// 实体有toJason和fromJson两个方法
 class JsonUtil {
-  /// 把map，json字符串和一般的实体转换成map，map转换成一般实体使用实体的fromJson构造函数
-  static Map toMap(dynamic entity) {
-    if (entity is Map) {
+  /// 把map，json字符串和一般的实体转换成map或者list，map转换成一般实体使用实体的fromJson构造函数
+  static dynamic toJson(dynamic entity) {
+    if (entity is List<int>) {
+      dynamic json = jsonDecode(String.fromCharCodes(entity));
+      return json;
+    } else if (entity is List) {
+      return entity;
+    } else if (entity is Map) {
       return entity;
     } else if (entity is String) {
-      Map map = jsonDecode(entity);
-      return map;
-    } else if (entity is List<int>) {
-      Map map = jsonDecode(String.fromCharCodes(entity));
-      return map;
+      dynamic json = jsonDecode(entity);
+      return json;
     }
     return entity.toJson();
   }
@@ -277,7 +279,7 @@ class JsonUtil {
     if (entity is List) {
       return jsonEncode(entity);
     }
-    Map map = toMap(entity);
+    Map map = toJson(entity);
     EntityUtil.removeNull(map);
 
     return jsonEncode(map);

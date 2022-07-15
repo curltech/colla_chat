@@ -258,7 +258,7 @@ class IndexedDb extends DataStore {
   /// @param {*} entity
   @override
   Future<int> insert(String table, dynamic entity) async {
-    Map map = JsonUtil.toMap(entity);
+    Map map = JsonUtil.toJson(entity);
     EntityUtil.removeNullId(map);
     var txn = db.transaction(table, "readwrite");
     var store = txn.objectStore(table);
@@ -280,7 +280,7 @@ class IndexedDb extends DataStore {
   Future<int> delete(String table,
       {dynamic entity, String? where, List<Object>? whereArgs}) async {
     if (entity != null) {
-      var map = JsonUtil.toMap(entity);
+      var map = JsonUtil.toJson(entity);
       var id = EntityUtil.getId(map);
       if (id != null) {
         var txn = db.transaction(table, "readwrite");
@@ -302,7 +302,7 @@ class IndexedDb extends DataStore {
   @override
   Future<int> update(String table, dynamic entity,
       {String? where, List<Object>? whereArgs}) async {
-    var map = JsonUtil.toMap(entity);
+    var map = JsonUtil.toJson(entity);
     var id = EntityUtil.getId(map);
     if (id != null) {
       var txn = db.transaction(table, "readwrite");
@@ -317,7 +317,7 @@ class IndexedDb extends DataStore {
   @override
   Future<int> upsert(String table, dynamic entity,
       {String? where, List<Object>? whereArgs}) async {
-    var map = JsonUtil.toMap(entity);
+    var map = JsonUtil.toJson(entity);
     var id = EntityUtil.getId(map);
     if (id != null) {
       return update(table, entity, where: where, whereArgs: whereArgs);
@@ -353,7 +353,7 @@ class IndexedDb extends DataStore {
   }
 
   _transaction(ObjectStore store, dynamic entity) {
-    var map = JsonUtil.toMap(entity);
+    var map = JsonUtil.toJson(entity);
     Object? id = EntityUtil.getId(map);
     var state = map['state'];
     if (EntityState.insert == state) {

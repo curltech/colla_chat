@@ -59,15 +59,16 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     if (peer != null) {
       throw 'SameNameAccountExists';
     }
-    var myselfPeer = MyselfPeer('');
+    var clientDevice = PlatformParams.instance.clientDevice;
+    var clientId = '';
+    if (clientDevice != null) {
+      var hash = await cryptoGraphy.hash(clientDevice.codeUnits);
+      clientId = CryptoUtil.encodeBase58(hash);
+    }
+    var myselfPeer = MyselfPeer('', '', clientId);
     myselfPeer.status = EntityStatus.effective.name;
     myselfPeer.mobile = mobile;
     myselfPeer.email = email;
-    var clientDevice = PlatformParams.instance.clientDevice;
-    if (clientDevice != null) {
-      var hash = await cryptoGraphy.hash(clientDevice.codeUnits);
-      myselfPeer.clientId = CryptoUtil.encodeBase58(hash);
-    }
     myselfPeer.name = name;
     myselfPeer.loginName = loginName;
     myselfPeer.address = await NetworkInfoUtil.getWifiIp();
@@ -90,7 +91,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     if (profile != null) {
       await peerProfileService.delete(profile);
     }
-    var peerProfile = PeerProfile();
+    var peerProfile = PeerProfile(peerId, myselfPeer.clientId);
     peerProfile.peerId = peerId;
     peerProfile.status = EntityStatus.effective.name;
     peerProfile.creditScore = 300;
@@ -126,7 +127,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
 
       if (loginStatus) {
         ///2.连接篇p2p的节点，把自己的信息注册上去
-        var json = JsonUtil.toMap(myselfPeer);
+        var json = JsonUtil.toJson(myselfPeer);
         var peerClient = PeerClient.fromJson(json);
         peerClient.activeStatus = ActiveStatus.Up.name;
         peerClient.clientId = myselfPeer.clientId;
@@ -152,7 +153,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       myselfPeerService.findOneByPeerId(peerId).then((MyselfPeer? myselfPeer) {
         ///2.连接篇p2p的节点，把自己的信息注册上去
         if (myselfPeer != null) {
-          var json = JsonUtil.toMap(myselfPeer);
+          var json = JsonUtil.toJson(myselfPeer);
           var peerClient = PeerClient.fromJson(json);
           peerClient.activeStatus = ActiveStatus.Down.name;
           peerClient.clientId = myselfPeer.clientId;
@@ -178,4 +179,4 @@ final myselfPeerService = MyselfPeerService(
       'status',
       'updateDate'
     ],
-    fields: ServiceLocator.buildFields(MyselfPeer(''), []));
+    fields: ServiceLocator.buildFields(MyselfPeer('', '', ''), []));

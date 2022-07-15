@@ -7,7 +7,7 @@ import '../../entity/dht/peerprofile.dart';
 import 'base.dart';
 
 class PeerClientService extends PeerEntityService<PeerClient> {
-  var peerClients = <String, PeerClient>{};
+  var peerClients = <String, Map<String, PeerClient>>{};
   var publicKeys = <String, SimplePublicKey>{};
 
   PeerClientService(
@@ -20,7 +20,7 @@ class PeerClientService extends PeerEntityService<PeerClient> {
   }
 
   Future<SimplePublicKey?> getPublicKey(String peerId) async {
-    var peerClient = findCachedOneByPeerId(peerId);
+    var peerClient = await findCachedOneByPeerId(peerId);
     if (peerClient != null) {
       return publicKeys[peerId];
     }
@@ -28,39 +28,69 @@ class PeerClientService extends PeerEntityService<PeerClient> {
     return null;
   }
 
-  Future<PeerClient?> findCachedOneByPeerId(String peerId) async {
+  Future<PeerClient?> findCachedOneByPeerId(String peerId,
+      {String? clientId}) async {
     if (peerClients.containsKey(peerId)) {
-      return peerClients[peerId];
-    }
-    PeerClient? peerClient = await findOneByPeerId(peerId);
-    if (peerClient != null) {
-      PeerProfile? peerProfile =
-          await peerProfileService.findCachedOneByPeerId(peerId);
-      if (peerProfile != null) {
-        peerClient.peerProfile = peerProfile;
+      var peerClients_ = peerClients[peerId];
+      if (peerClients_ != null && peerClients_.containsKey(clientId)) {
+        return peerClients_[clientId];
       }
-      peerClients[peerId] = peerClient;
+    }
+    PeerClient? peerClient;
+    List<PeerClient> peerClients_ = await findByPeerId(peerId);
+    if (peerClients_.isNotEmpty) {
+      for (var peerClient_ in peerClients_) {
+        var clientId_ = peerClient_.clientId;
+        PeerProfile? peerProfile = await peerProfileService
+            .findCachedOneByPeerId(peerId, clientId: clientId_!);
+        if (peerProfile != null) {
+          peerClient_.peerProfile = peerProfile;
+        }
+        if (!peerClients.containsKey(peerId)) {
+          peerClients[peerId] = {};
+        }
+        peerClients[peerId]![clientId_] = peerClient_;
+        if (clientId == clientId_) {
+          peerClient = peerClient_;
+        }
+      }
     }
     return peerClient;
   }
 
-/**
- * Connect
- */
-//  connect() async {
-//   var appParams=await AppParams.instance;
-//   var connectPeerId = appParams.connectPeerId[0];
-//   var activeStatus = ActiveStatus.Up.toString();
-//   var peerClient = await this.preparePeerClient(connectPeerId, activeStatus);
-//   if (peerClient) {
-//     logger.i('connect:' + peerClient.peerId + ';connectPeerId:' + connectPeerId);
-//     var result = await connectAction.connect(connectPeerId, peerClient);
-//     return result;
-//   }
-// }
+  Future<PeerClient?> findOneByClientId(String peerId,
+      {String? clientId}) async {
+    var where = 'peerId=?';
+    var whereArgs = [peerId];
+    if (clientId != null) {
+      where = '$where and clientId =?';
+      whereArgs.add(clientId);
+    }
+
+    var peer = await findOne(where: where, whereArgs: whereArgs);
+
+    return peer;
+  }
+
+  store(PeerClient peerClient) async {
+    PeerClient? peerClient_ = await findOneByClientId(peerClient.peerId,
+        clientId: peerClient.clientId);
+    if (peerClient_ != null) {
+      peerClient.id = peerClient_.id;
+      peerClientService.update(peerClient);
+    } else {
+      peerClientService.insert(peerClient);
+    }
+    var peerId = peerClient.peerId;
+    var clientId = peerClient.clientId;
+    if (!peerClients.containsKey(peerId)) {
+      peerClients[peerId] = {};
+    }
+    peerClients[peerId]![clientId] = peerClient;
+  }
 }
 
 final peerClientService = PeerClientService(
     tableName: "blc_peerclient",
     indexFields: ['peerId', 'name', 'mobile'],
-    fields: ServiceLocator.buildFields(PeerClient(''), []));
+    fields: ServiceLocator.buildFields(PeerClient('', '', ''), []));

@@ -121,7 +121,7 @@ class ListDataGridSource<T> extends DataGridSource {
     List<DataGridRow> rows = [];
     for (int index = 0; index < data.length; ++index) {
       var d = data[index];
-      var dataMap = JsonUtil.toMap(d);
+      var dataMap = JsonUtil.toJson(d);
       List<DataGridCell> cells = [];
       for (var columnDef in columnDefs) {
         var value = dataMap[columnDef.name];

@@ -109,7 +109,7 @@ class DataListController<T> with ChangeNotifier {
   Map<String, dynamic>? getInitValue(List<ColumnFieldDef> inputFieldDefs) {
     T? current = this.current;
     if (current != null) {
-      var currentMap = JsonUtil.toMap(current);
+      var currentMap = JsonUtil.toJson(current);
       Map<String, dynamic> values = {};
       for (var inputFieldDef in inputFieldDefs) {
         String name = inputFieldDef.name;
@@ -132,14 +132,14 @@ class DataListController<T> with ChangeNotifier {
   sort(String name, bool sortAscending) {
     if (sortAscending) {
       data.sort((a, b) {
-        var aMap = JsonUtil.toMap(a);
-        var bMap = JsonUtil.toMap(b);
+        var aMap = JsonUtil.toJson(a);
+        var bMap = JsonUtil.toJson(b);
         return aMap[name].compareTo(bMap[name]);
       });
     } else {
       data.sort((a, b) {
-        var aMap = JsonUtil.toMap(a);
-        var bMap = JsonUtil.toMap(b);
+        var aMap = JsonUtil.toJson(a);
+        var bMap = JsonUtil.toJson(b);
         return bMap[name].compareTo(aMap[name]);
       });
     }
@@ -245,7 +245,7 @@ abstract class DataPageController<T> with ChangeNotifier {
   Map<String, dynamic>? getInitValue(List<ColumnFieldDef> inputFieldDefs) {
     T? current = this.current;
     if (current != null) {
-      var currentMap = JsonUtil.toMap(current);
+      var currentMap = JsonUtil.toJson(current);
       Map<String, dynamic> values = {};
       for (var inputFieldDef in inputFieldDefs) {
         String name = inputFieldDef.name;
@@ -262,14 +262,14 @@ abstract class DataPageController<T> with ChangeNotifier {
   sort(String name, bool sortAscending) {
     if (sortAscending) {
       pagination.data.sort((a, b) {
-        var aMap = JsonUtil.toMap(a);
-        var bMap = JsonUtil.toMap(b);
+        var aMap = JsonUtil.toJson(a);
+        var bMap = JsonUtil.toJson(b);
         return aMap[name].compareTo(bMap[name]);
       });
     } else {
       pagination.data.sort((a, b) {
-        var aMap = JsonUtil.toMap(a);
-        var bMap = JsonUtil.toMap(b);
+        var aMap = JsonUtil.toJson(a);
+        var bMap = JsonUtil.toJson(b);
         return bMap[name].compareTo(aMap[name]);
       });
     }

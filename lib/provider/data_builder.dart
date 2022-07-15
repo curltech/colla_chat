@@ -14,7 +14,7 @@ class DataBuilder {
   static build() async {
     List<Linkman> linkmen = [];
     for (var i = 0; i < 20; ++i) {
-      PeerClient peerClient = PeerClient(myself.peerId ?? '');
+      PeerClient peerClient = PeerClient(myself.peerId ?? '', '', '');
 
       ///peerId对应的密钥对
       SimpleKeyPair peerPrivateKey = await cryptoGraphy.generateKeyPair();

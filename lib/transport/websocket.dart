@@ -74,7 +74,9 @@ class Websocket implements IWebClient {
     } else {
       logger.w(msg);
       var response = await chainMessageHandler.receiveRaw(data, '', '');
-      sendMsg(response);
+      if (response != null) {
+        sendMsg(response);
+      }
     }
   }
 

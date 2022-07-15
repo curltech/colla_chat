@@ -1,11 +1,7 @@
 import '../../../entity/p2p/message.dart';
 import '../baseaction.dart';
 
-/**
-    在chain目录下的采用自定义protocol "/chain"的方式自己实现的功能
-    Ping只是一个演示，适合点对点的通信，这种方式灵活度高，但是需要自己实现全网遍历的功能
-    chat就可以采用这种方式
- */
+///查询服务器的数据
 class QueryValueAction extends BaseAction {
   QueryValueAction(MsgType msgType) : super(msgType);
 
@@ -15,6 +11,19 @@ class QueryValueAction extends BaseAction {
     ChainMessage? response = await send(chainMessage);
     if (response != null) {
       return response.payload;
+    }
+
+    return null;
+  }
+
+  @override
+  Future<ChainMessage?> receive(ChainMessage chainMessage) async {
+    ChainMessage? chainMessage_ = await super.receive(chainMessage);
+    if (chainMessage_ != null && receivers.isNotEmpty) {
+      receivers.forEach((String key, dynamic receiver) async =>
+          {await receiver(chainMessage_.payload)});
+
+      return null;
     }
 
     return null;

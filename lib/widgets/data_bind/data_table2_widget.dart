@@ -76,7 +76,7 @@ class _DataTable2WidgetState<T> extends State<DataTable2Widget> {
     List data = widget.controller.data;
     for (int index = 0; index < data.length; ++index) {
       var d = data[index];
-      var dataMap = JsonUtil.toMap(d);
+      var dataMap = JsonUtil.toJson(d);
       List<DataCell> cells = [];
       for (var columnDef in widget.columnDefs) {
         var value = dataMap[columnDef.name];

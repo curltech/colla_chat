@@ -23,7 +23,7 @@ class OpenPGP {
 
   /// 将armored的密钥字符串导入转换成密钥对象，如果是私钥，options.password必须有值用于解密私钥
   flutter_openpgp.KeyPair import(String jsonString) {
-    Map pair = JsonUtil.toMap(jsonString);
+    Map pair = JsonUtil.toJson(jsonString);
     flutter_openpgp.KeyPair keyPair =
         flutter_openpgp.KeyPair(pair['publicKey'], pair['privateKey']);
 

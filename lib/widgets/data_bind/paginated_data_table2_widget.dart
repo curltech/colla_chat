@@ -138,7 +138,7 @@ class DataPageSource<T> extends DataTableSource {
     var length = data.length;
     index = index % length;
     var d = data[index];
-    var dataMap = JsonUtil.toMap(d);
+    var dataMap = JsonUtil.toJson(d);
     List<DataCell> cells = [];
     for (var columnDef in widget.columnDefs) {
       var value = dataMap[columnDef.name];

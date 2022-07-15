@@ -2,9 +2,7 @@ import '../../../entity/p2p/message.dart';
 import '../baseaction.dart';
 import '../chainmessagehandler.dart';
 
-/**
-    在chain目录下的采用自定义protocol "/chain"的方式自己实现的功能
- */
+///
 class ConsensusAction extends BaseAction {
   ConsensusAction(MsgType msgType) : super(msgType) {
     chainMessageDispatch.registerChainMessageHandler(
@@ -24,10 +22,8 @@ class ConsensusAction extends BaseAction {
   Future<dynamic?> consensus(dynamic dataBlock, {String? msgType}) async {
     ChainMessage chainMessage = await prepareSend(dataBlock);
     chainMessage.payloadType = PayloadType.dataBlock.name;
-    if (msgType == null) {
-      msgType = MsgType.CONSENSUS.name;
-    }
-    chainMessage.messageType = msgType;
+    msgType ??= MsgType.CONSENSUS.name;
+    chainMessage.msgType = msgType;
 
     ChainMessage? response = await send(chainMessage);
     if (response != null) {
@@ -39,10 +35,10 @@ class ConsensusAction extends BaseAction {
 
   @override
   Future<ChainMessage?> receive(ChainMessage chainMessage) async {
-    ChainMessage? _chainMessage = await super.receive(chainMessage);
-    if (_chainMessage != null && consensusAction.receivers.isNotEmpty) {
+    ChainMessage? chainMessage_ = await super.receive(chainMessage);
+    if (chainMessage_ != null && consensusAction.receivers.isNotEmpty) {
       consensusAction.receivers.forEach((String key, dynamic receiver) async =>
-          {await receiver(_chainMessage)});
+          {await receiver(chainMessage_)});
 
       return null;
     }

@@ -72,9 +72,9 @@ const int compressLimit = 2048;
 abstract class BaseAction {
   late MsgType msgType;
   Map<String, dynamic> receivers = <String, dynamic>{};
+  Map<String, dynamic> responsers = <String, dynamic>{};
 
-  BaseAction(MsgType msgType) {
-    this.msgType = msgType;
+  BaseAction(this.msgType) {
     chainMessageDispatch.registerChainMessageHandler(
         msgType.name, send, receive, response);
   }
@@ -85,6 +85,15 @@ abstract class BaseAction {
       return false;
     }
     receivers[name] = receiver;
+
+    return true;
+  }
+
+  bool registerResponser(String name, dynamic responser) {
+    if (responsers.containsKey(name)) {
+      return false;
+    }
+    responsers[name] = responser;
 
     return true;
   }
@@ -135,7 +144,7 @@ abstract class BaseAction {
     }
     chainMessage.targetPeerId = targetPeerId;
     chainMessage.payloadType = PayloadType.map.name;
-    chainMessage.messageType = msgType.name;
+    chainMessage.msgType = msgType.name;
     chainMessage.messageDirect = MsgDirect.Request.name;
     var uuid = Uuid();
     chainMessage.uuid = uuid.v4();
@@ -179,14 +188,28 @@ abstract class BaseAction {
     return null;
   }
 
-  /// 接收消息进行处理，在接收之前对消息进行必要的分片合并处理
-  /// 返回为空则没有返回消息，否则，有返回消息
+  /// 接收消息进行处理的方法，在接收之前对消息进行必要的分片合并处理
+  /// 缺省的行为是调用注册的接收处理器
+  /// 子类可以覆盖这个方法，或者注册自己的接收处理器
   Future<ChainMessage?> receive(ChainMessage chainMessage) async {
-    return chainMessageHandler.merge(chainMessage);
+    var chainMessage_ = chainMessageHandler.merge(chainMessage);
+    if (chainMessage_ != null && receivers.isNotEmpty) {
+      receivers.forEach((String key, dynamic receiver) async =>
+          {await receiver(chainMessage_.payload)});
+
+      return null;
+    }
+
+    return null;
   }
 
-  ///  处理返回消息
-  Future<ChainMessage> response(ChainMessage chainMessage) async {
-    return chainMessage;
+  /// 返回消息进行处理的方法，
+  /// 缺省的行为是调用注册的返回处理器
+  /// 子类可以覆盖这个方法，或者注册自己的返回处理器
+  Future<void> response(ChainMessage chainMessage) async {
+    if (responsers.isNotEmpty) {
+      responsers.forEach((String key, dynamic responser) async =>
+          {await responser(chainMessage.payload)});
+    }
   }
 }

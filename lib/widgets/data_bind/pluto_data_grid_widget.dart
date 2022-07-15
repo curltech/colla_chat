@@ -110,7 +110,7 @@ class _PaginatedDataTableState<T> extends State<PlutoDataGridWidget> {
     List data = widget.controller.pagination.data;
     for (int index = 0; index < data.length; ++index) {
       var d = data[index];
-      var dataMap = JsonUtil.toMap(d);
+      var dataMap = JsonUtil.toJson(d);
       Map<String, PlutoCell> cells = {};
       for (var columnDef in widget.columnDefs) {
         var value = dataMap[columnDef.name];

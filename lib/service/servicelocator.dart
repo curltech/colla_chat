@@ -63,7 +63,7 @@ class ServiceLocator {
       var f = field.substring(0, field.indexOf(' '));
       fs.add(f);
     }
-    Map map = JsonUtil.toMap(entity);
+    Map map = JsonUtil.toJson(entity);
     for (var key in map.keys) {
       var value = map[key];
       if (key == 'id') {

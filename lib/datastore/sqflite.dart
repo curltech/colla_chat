@@ -195,7 +195,7 @@ class Sqflite extends DataStore {
   /// @param {*} entity
   @override
   Future<int> insert(String table, dynamic entity) async {
-    entity = JsonUtil.toMap(entity);
+    entity = JsonUtil.toJson(entity);
     int key = await db.insert(table, entity);
     Object? id = EntityUtil.getId(entity);
     if (id == null) {
@@ -212,7 +212,7 @@ class Sqflite extends DataStore {
   Future<int> delete(String table,
       {dynamic entity, String? where, List<Object>? whereArgs}) async {
     if (entity != null) {
-      entity = JsonUtil.toMap(entity);
+      entity = JsonUtil.toJson(entity);
       var id = EntityUtil.getId(entity);
       if (id != null) {
         where = 'id=?';
@@ -232,7 +232,7 @@ class Sqflite extends DataStore {
   @override
   Future<int> update(String table, dynamic entity,
       {String? where, List<Object>? whereArgs}) async {
-    entity = JsonUtil.toMap(entity);
+    entity = JsonUtil.toJson(entity);
     var id = EntityUtil.getId(entity);
     if (id != null) {
       where = 'id=?';
@@ -246,7 +246,7 @@ class Sqflite extends DataStore {
   @override
   Future<int> upsert(String table, dynamic entity,
       {String? where, List<Object>? whereArgs}) async {
-    entity = JsonUtil.toMap(entity);
+    entity = JsonUtil.toJson(entity);
     var id = EntityUtil.getId(entity);
     if (id != null) {
       return update(table, entity);

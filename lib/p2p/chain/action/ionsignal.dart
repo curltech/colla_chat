@@ -25,12 +25,13 @@ class IonSignalAction extends BaseAction {
     return null;
   }
 
+  @override
   Future<ChainMessage?> receive(ChainMessage chainMessage) async {
-    ChainMessage? _chainMessage = await super.receive(chainMessage);
-    if (_chainMessage != null && receivers.isNotEmpty) {
+    ChainMessage? chainMessage_ = await super.receive(chainMessage);
+    if (chainMessage_ != null && receivers.isNotEmpty) {
       ionSignalAction.receivers.forEach((String key, dynamic receiver) => {
-            receiver(_chainMessage.srcPeerId, _chainMessage.srcConnectPeerId,
-                _chainMessage.srcConnectSessionId, _chainMessage.payload)
+            receiver(chainMessage_.srcPeerId, chainMessage_.srcConnectPeerId,
+                chainMessage_.srcConnectSessionId, chainMessage_.payload)
           });
 
       return null;

@@ -4,7 +4,8 @@ import '../base.dart';
 
 /// 节点的附属信息，包括个性化的配置
 class PeerProfile extends StatusEntity {
-  String? peerId;
+  String peerId;
+  String clientId;
   String? clientDevice;
   String? clientType;
 
@@ -45,10 +46,11 @@ class PeerProfile extends StatusEntity {
   String? currency;
   String? lastTransactionTime;
 
-  PeerProfile();
+  PeerProfile(this.peerId, this.clientId);
 
   PeerProfile.fromJson(Map json)
       : peerId = json['peerId'],
+        clientId = json['clientId'],
         clientDevice = json['clientDevice'],
         clientType = json['clientType'],
         locale = json['locale'],
@@ -82,7 +84,7 @@ class PeerProfile extends StatusEntity {
         lastFindNodeTime = json['lastFindNodeTime'],
         mobileVerified = json['mobileVerified'],
         visibilitySetting = json['visibilitySetting'],
-        creditScore = json['creditScore'] != null ? json['creditScore'] : 0,
+        creditScore = json['creditScore'] ?? 0,
         preferenceScore = json['preferenceScore'],
         badCount = json['badCount'],
         staleCount = json['staleCount'],
@@ -97,6 +99,7 @@ class PeerProfile extends StatusEntity {
     var json = super.toJson();
     json.addAll({
       'peerId': peerId,
+      'clientId': clientId,
       'clientDevice': clientDevice,
       'clientType': clientType,
       'locale': locale,

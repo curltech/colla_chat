@@ -24,10 +24,11 @@ class MyselfPeer extends PeerEntity {
   String? newCertPassword;
   String? certContent;
 
-  String? clientId;
+  String clientId;
   String? deviceToken;
 
-  MyselfPeer(String ownerPeerId) : super(ownerPeerId);
+  MyselfPeer(String ownerPeerId, String peerId, this.clientId)
+      : super(ownerPeerId, peerId);
 
   MyselfPeer.fromJson(Map json)
       : loginName = json['loginName'],

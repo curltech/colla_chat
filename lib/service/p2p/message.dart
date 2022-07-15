@@ -1,5 +1,7 @@
 import 'dart:typed_data';
+
 import 'package:colla_chat/tool/util.dart';
+
 import '../../crypto/util.dart';
 
 class MessageSerializer {
@@ -14,6 +16,6 @@ class MessageSerializer {
   static Map unmarshal(List<int> data) {
     var json = CryptoUtil.uint8ListToStr(data);
 
-    return JsonUtil.toMap(json);
+    return JsonUtil.toJson(json);
   }
 }

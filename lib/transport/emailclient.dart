@@ -114,7 +114,7 @@ class EmailMessageUtil {
     config.addEmailProvider(provider);
     if (imapServerConfigStr != null) {
       Map<String, dynamic> imapServerConfigMap =
-          JsonUtil.toMap(imapServerConfigStr) as Map<String, dynamic>;
+          JsonUtil.toJson(imapServerConfigStr) as Map<String, dynamic>;
       ServerConfig imapServerConfig = ServerConfig();
       imapServerConfig.read(imapServerConfigMap);
       provider.addIncomingServer(imapServerConfig);
@@ -123,7 +123,7 @@ class EmailMessageUtil {
     var popServerConfigStr = mailAddress.popServerConfig;
     if (popServerConfigStr != null) {
       Map<String, dynamic> popServerConfigMap =
-          JsonUtil.toMap(popServerConfigStr) as Map<String, dynamic>;
+          JsonUtil.toJson(popServerConfigStr) as Map<String, dynamic>;
       ServerConfig popServerConfig = ServerConfig();
       popServerConfig.read(popServerConfigMap);
       provider.addIncomingServer(popServerConfig);
@@ -132,7 +132,7 @@ class EmailMessageUtil {
     var smtpServerConfigStr = mailAddress.smtpServerConfig;
     if (smtpServerConfigStr != null) {
       Map<String, dynamic> smtpServerConfigMap =
-          JsonUtil.toMap(smtpServerConfigStr) as Map<String, dynamic>;
+          JsonUtil.toJson(smtpServerConfigStr) as Map<String, dynamic>;
       ServerConfig smtpServerConfig = ServerConfig();
       smtpServerConfig.read(smtpServerConfigMap);
       ConfigEmailProvider provider = ConfigEmailProvider();

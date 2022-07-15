@@ -56,6 +56,7 @@ abstract class StatusEntity extends BaseEntity {
         statusDate = json['statusDate'],
         super.fromJson(json);
 
+  @override
   Map<String, dynamic> toJson() {
     var json = super.toJson();
     json.addAll({

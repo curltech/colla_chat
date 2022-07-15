@@ -24,12 +24,12 @@ class SignalAction extends BaseAction {
 
   @override
   Future<ChainMessage?> receive(ChainMessage chainMessage) async {
-    ChainMessage? _chainMessage = await super.receive(chainMessage);
-    if (_chainMessage != null && receivers.isNotEmpty) {
+    ChainMessage? chainMessage_ = await super.receive(chainMessage);
+    if (chainMessage_ != null && receivers.isNotEmpty) {
       signalAction.receivers.forEach((String key, dynamic receiver) {
-        WebrtcSignal signal = WebrtcSignal.fromJson(_chainMessage.payload);
-        receiver(_chainMessage.srcPeerId, _chainMessage.srcConnectPeerId,
-            _chainMessage.srcConnectSessionId, signal);
+        WebrtcSignal signal = WebrtcSignal.fromJson(chainMessage_.payload);
+        receiver(chainMessage_.srcPeerId, chainMessage_.srcConnectPeerId,
+            chainMessage_.srcConnectSessionId, signal);
       });
 
       return null;

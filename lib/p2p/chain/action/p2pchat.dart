@@ -21,18 +21,18 @@ class P2pChatAction extends BaseAction {
 
   @override
   Future<ChainMessage?> receive(ChainMessage chainMessage) async {
-    ChainMessage? _chainMessage = await super.receive(chainMessage);
+    ChainMessage? chainMessage_ = await super.receive(chainMessage);
     String? srcPeerId = chainMessage.srcPeerId;
     List<int>? payload;
-    if (_chainMessage != null &&
-        _chainMessage.payloadType == PayloadType.dataBlock.name) {
-      dynamic _dataBlock = _chainMessage.payload;
+    if (chainMessage_ != null &&
+        chainMessage_.payloadType == PayloadType.dataBlock.name) {
+      dynamic dataBlock_ = chainMessage_.payload;
       //await dataBlockService.decrypt(_dataBlock);
-      payload = _dataBlock.payload;
+      payload = dataBlock_.payload;
     } else {
       payload = chainMessage.payload;
     }
-    if (_chainMessage != null && receivers.isNotEmpty) {
+    if (chainMessage_ != null && receivers.isNotEmpty) {
       p2pChatAction.receivers.forEach((String key, dynamic receiver) async =>
           {await receiver(srcPeerId, payload)});
       return null;

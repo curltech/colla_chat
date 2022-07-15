@@ -184,7 +184,7 @@ class AppDataProvider with ChangeNotifier {
       LocalStorage localStorage = await LocalStorage.instance;
       Object? json = await localStorage.get('AppParams');
       if (json != null) {
-        Map<dynamic, dynamic> jsonObject = JsonUtil.toMap(json as String);
+        Map<dynamic, dynamic> jsonObject = JsonUtil.toJson(json as String);
         instance = AppDataProvider.fromJson(jsonObject as Map<String, dynamic>);
       }
       Logger.level = Level.warning;
