@@ -32,7 +32,7 @@ class Sqlite3 extends DataStore {
     return instance;
   }
 
-  open({String name = 'colla_chat.db'}) async {
+  open({String name = dbname}) async {
     db = await sqlite3_open.openSqlite3(name: name);
     //开发调试阶段，每次都重建数据库表
     //db.userVersion = 0;
@@ -65,7 +65,7 @@ class Sqlite3 extends DataStore {
 
   /// 删除数据库
   /// @param {*} options
-  remove({name = 'colla_chat.db', location = 'default'}) async {
+  remove({name = dbname, location = 'default'}) async {
     if (path != null) {}
   }
 

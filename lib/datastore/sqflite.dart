@@ -44,7 +44,7 @@ class Sqflite extends DataStore {
 
   /// 删除数据库
   /// @param {*} options
-  remove({name = 'colla_chat.db', location = 'default'}) async {
+  remove({name = dbname, location = 'default'}) async {
     var databasesPath = await getDatabasesPath();
     String path = join(databasesPath, name);
     deleteDatabase(path);

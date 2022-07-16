@@ -49,7 +49,7 @@ class IndexedDb extends DataStore {
 
   /// 删除数据库
   /// @param {*} options
-  remove({name = 'colla_chat.db', location = 'default'}) async {}
+  remove({name = dbname, location = 'default'}) async {}
 
   /// 批量执行sql，参数是二维数组
   /// @param {*} sqls
