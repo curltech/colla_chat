@@ -27,10 +27,8 @@ class PlatformParams {
   String? version;
   String? brightness;
   String? phoneNumber;
-  String? clientDevice;
 
   late Map<String, dynamic> deviceData;
-  late Map<String, dynamic>? webDeviceData;
 
   static Future<PlatformParams> init() async {
     if (!initStatus) {
@@ -74,7 +72,7 @@ class PlatformParams {
         instance.web = true;
       }
       if (instance.web) {
-        instance.webDeviceData =
+        instance.deviceData =
             instance._readWebBrowserInfo(await deviceInfoPlugin.webBrowserInfo);
       }
       initStatus = true;
@@ -153,7 +151,6 @@ class PlatformParams {
       var locales = language.split('-');
       instance.locale = Locale(locales[0], locales[1]);
     }
-    instance.clientDevice = data.appVersion;
     instance.operatingSystem = data.platform;
     return <String, dynamic>{
       'browserName': describeEnum(data.browserName),

@@ -15,12 +15,10 @@ import '../service/dht/peerclient.dart';
 class DataBuilder {
   static build() async {
     List<Linkman> linkmen = [];
-    var clientDevice = PlatformParams.instance.clientDevice;
-    var clientId = '';
-    if (clientDevice != null) {
-      var hash = await cryptoGraphy.hash(clientDevice.codeUnits);
-      clientId = CryptoUtil.encodeBase58(hash);
-    }
+    var deviceData = PlatformParams.instance.deviceData;
+    var clientDevice = JsonUtil.toJsonString(deviceData);
+    var hash = await cryptoGraphy.hash(clientDevice.codeUnits);
+    var clientId = CryptoUtil.encodeBase58(hash);
     for (var i = 0; i < 20; ++i) {
       PeerClient peerClient = PeerClient(myself.peerId ?? '', '', clientId);
 
