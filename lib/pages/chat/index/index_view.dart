@@ -36,6 +36,7 @@ class IndexViewState extends State<IndexView>
         offstage: !indexWidgetProvider.bottomBarVisible,
         child: const BottomBar());
     Scaffold scaffold = Scaffold(
+        appBar: AppBar(toolbarHeight: 0.0, elevation: 0.0),
         body: SafeArea(
             child: Stack(children: <Widget>[
           Opacity(

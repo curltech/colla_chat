@@ -44,7 +44,7 @@ class MyselfPeer extends PeerEntity {
         oldCertPassword = json['oldCertPassword'],
         newCertPassword = json['newCertPassword'],
         certContent = json['certContent'],
-        clientId = json['clientId'],
+        clientId = json['clientId'] ?? '',
         deviceToken = json['deviceToken'],
         super.fromJson(json);
 
