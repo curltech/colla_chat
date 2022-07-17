@@ -3,40 +3,29 @@ import 'package:flutter/material.dart';
 import '../../../l10n/localization.dart';
 import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/common/widget_mixin.dart';
-import '../../../widgets/data_bind/data_group_listview.dart';
 import '../../../widgets/data_bind/data_listtile.dart';
+import '../../../widgets/data_bind/data_listview.dart';
 
-final Map<TileData, List<TileData>> mockTileData = {
-  TileData(title: '未知'): [
-    TileData(
-        icon: const Icon(Icons.collections),
-        title: '李志群',
-        routeName: '/chat/collection'),
-    TileData(
-        icon: const Icon(Icons.settings),
-        title: '胡百水',
-        routeName: '/chat/setting'),
-  ]
-};
+final List<TileData> mockTileData = [
+  TileData(
+      icon: const Icon(Icons.collections),
+      title: '李志群',
+      routeName: '/chat/collection'),
+  TileData(
+      icon: const Icon(Icons.settings),
+      title: '胡百水',
+      routeName: '/chat/setting'),
+];
 
 //频道的页面
 class ChannelWidget extends StatelessWidget with TileDataMixin {
-  late final Map<TileData, List<TileData>> channelTileData = mockTileData;
+  late final List<TileData> channelTileData = mockTileData;
 
   ChannelWidget({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    var appBar = AppBar(
-      automaticallyImplyLeading: false,
-      elevation: 0,
-      centerTitle: false,
-      title: Text(
-        AppLocalizations.instance.text(title),
-      ),
-      actions: [],
-    );
-    var body = GroupDataListView(tileData: channelTileData);
+    var body = DataListView(tileData: channelTileData);
     return AppBarView(
       title: AppLocalizations.instance.text(title),
       child: body,

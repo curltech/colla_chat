@@ -4,39 +4,36 @@ import 'package:flutter/material.dart';
 import '../../../../provider/app_data_provider.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/widget_mixin.dart';
-import '../../../../widgets/data_bind/data_group_listview.dart';
 import '../../../../widgets/data_bind/data_listtile.dart';
+import '../../../../widgets/data_bind/data_listview.dart';
 
-final Map<TileData, List<TileData>> settingTileData = {
-  TileData(title: 'Setting'): [
-    TileData(
-        icon: Icon(Icons.security,
-            color: appDataProvider.themeData?.colorScheme.primary),
-        title: 'Security'),
-    TileData(
-        icon: Icon(Icons.privacy_tip,
-            color: appDataProvider.themeData?.colorScheme.primary),
-        title: 'Privacy'),
-    TileData(
-        icon: Icon(Icons.generating_tokens,
-            color: appDataProvider.themeData?.colorScheme.primary),
-        title: 'General'),
-    TileData(
-        icon: Icon(Icons.high_quality,
-            color: appDataProvider.themeData?.colorScheme.primary),
-        title: 'Advanced'),
-    TileData(
-        icon: Icon(Icons.usb,
-            color: appDataProvider.themeData?.colorScheme.primary),
-        title: 'About'),
-  ]
-};
+final List<TileData> settingTileData = [
+  TileData(
+      icon: Icon(Icons.security,
+          color: appDataProvider.themeData?.colorScheme.primary),
+      title: 'Security'),
+  TileData(
+      icon: Icon(Icons.privacy_tip,
+          color: appDataProvider.themeData?.colorScheme.primary),
+      title: 'Privacy'),
+  TileData(
+      icon: Icon(Icons.generating_tokens,
+          color: appDataProvider.themeData?.colorScheme.primary),
+      title: 'General'),
+  TileData(
+      icon: Icon(Icons.high_quality,
+          color: appDataProvider.themeData?.colorScheme.primary),
+      title: 'Advanced'),
+  TileData(
+      icon: Icon(Icons.usb,
+          color: appDataProvider.themeData?.colorScheme.primary),
+      title: 'About'),
+];
 
 //设置页面，带有回退回调函数
 class SettingWidget extends StatelessWidget with TileDataMixin {
   ///类变量，不用每次重建
-  final GroupDataListView groupDataListView =
-      GroupDataListView(tileData: settingTileData);
+  final DataListView dataListView = DataListView(tileData: settingTileData);
 
   SettingWidget({Key? key}) : super(key: key);
 
@@ -44,9 +41,7 @@ class SettingWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     var setting = KeepAliveWrapper(
         child: AppBarView(
-            title: 'Setting',
-            withLeading: withLeading,
-            child: groupDataListView));
+            title: 'Setting', withLeading: withLeading, child: dataListView));
     return setting;
   }
 

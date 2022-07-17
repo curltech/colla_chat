@@ -173,7 +173,8 @@ class AppDataProvider with ChangeNotifier {
   //屏幕宽高
   double _keyboardHeight = 270.0;
   Size _size = const Size(0.0, 0.0);
-  double bottomBarHeight = 80;
+  double bottomBarHeight = kBottomNavigationBarHeight;
+  double toolbarHeight = kToolbarHeight;
   String sqlite3Path = '';
 
   AppDataProvider();

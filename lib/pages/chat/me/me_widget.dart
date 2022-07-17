@@ -8,8 +8,8 @@ import 'package:flutter/material.dart';
 import '../../../provider/app_data_provider.dart';
 import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/common/widget_mixin.dart';
-import '../../../widgets/data_bind/data_group_listview.dart';
 import '../../../widgets/data_bind/data_listtile.dart';
+import '../../../widgets/data_bind/data_listview.dart';
 import 'collection/collection_widget.dart';
 import 'mail/address/address_add.dart';
 import 'mail/mail_address_widget.dart';
@@ -54,10 +54,8 @@ class MeWidget extends StatelessWidget with TileDataMixin {
       peerEndpointListWidget,
       peerClientListWidget
     ];
-    final Map<TileData, List<TileData>> meTileData = {
-      TileData(title: title): TileData.from(mixins),
-    };
-    child = GroupDataListView(tileData: meTileData);
+    final List<TileData> meTileData = TileData.from(mixins);
+    child = DataListView(tileData: meTileData);
   }
 
   @override

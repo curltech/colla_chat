@@ -183,14 +183,8 @@ class _PaginatedDataTableState<T> extends State<PlutoDataGridWidget> {
   Widget build(BuildContext context) {
     var dataTableView = _build(context);
     var width = appDataProvider.size.width;
-    var view = Card(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(minWidth: width),
-        child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 5.0),
-            child: dataTableView),
-      ),
-    );
+    var height = appDataProvider.size.height - appDataProvider.toolbarHeight;
+    var view = SizedBox(width: width, height: height, child: dataTableView);
 
     return view;
   }
@@ -201,73 +195,73 @@ class _PaginatedDataTableState<T> extends State<PlutoDataGridWidget> {
     super.dispose();
   }
 
-  // void _defaultExportGridAsCSV() async {
-  //   String title = "pluto_grid_export";
-  //   var exported = const Utf8Encoder()
-  //       .convert(pluto_grid_export.PlutoGridExport.exportCSV(stateManager));
-  //   await FileSaver.instance.saveFile("$title.csv", exported, ".csv");
-  // }
-  //
-  // void _defaultExportGridAsCSVCompatibleWithExcel() async {
-  //   String title = "pluto_grid_export";
-  //   var exportCSV = pluto_grid_export.PlutoGridExport.exportCSV(stateManager);
-  //   var exported = const Utf8Encoder().convert(
-  //       // FIX Add starting \u{FEFF} / 0xEF, 0xBB, 0xBF
-  //       // This allows open the file in Excel with proper character interpretation
-  //       // See https://stackoverflow.com/a/155176
-  //       '\u{FEFF}$exportCSV');
-  //   await FileSaver.instance.saveFile("$title.csv", exported, ".csv");
-  // }
-  //
-  // void _defaultExportGridAsCSVFakeExcel() async {
-  //   String title = "pluto_grid_export";
-  //   var exportCSV = pluto_grid_export.PlutoGridExport.exportCSV(stateManager);
-  //   var exported = const Utf8Encoder().convert(
-  //       // FIX Add starting \u{FEFF} / 0xEF, 0xBB, 0xBF
-  //       // This allows open the file in Excel with proper character interpretation
-  //       // See https://stackoverflow.com/a/155176
-  //       '\u{FEFF}$exportCSV');
-  //   await FileSaver.instance.saveFile("$title.xls", exported, ".xls");
-  // }
-  //
-  // // void _exportGridAsTSV() async {
-  // //   String title = "pluto_grid_export";
-  // //   var exported = const Utf8Encoder().convert(PlutoGridExport.exportCSV(
-  // //     widget.stateManager,
-  // //     fieldDelimiter: "\t",
-  // //   ));
-  // //   await FileSaver.instance.saveFile("$title.csv", exported, ".csv");
-  // // }
-  //
-  // void _defaultExportGridAsCSVWithSemicolon() async {
-  //   String title = "pluto_grid_export";
-  //   var exported =
-  //       const Utf8Encoder().convert(pluto_grid_export.PlutoGridExport.exportCSV(
-  //     stateManager,
-  //     fieldDelimiter: ";",
-  //   ));
-  //   await FileSaver.instance.saveFile("$title.csv", exported, ".csv");
-  // }
-  //
-  // void _printToPdfAndShareOrSave() async {
-  //   final themeData = pluto_grid_export.ThemeData.withFont(
-  //     base: pluto_grid_export.Font.ttf(
-  //       await rootBundle.load('assets/fonts/open_sans/OpenSans-Regular.ttf'),
-  //     ),
-  //     bold: pluto_grid_export.Font.ttf(
-  //       await rootBundle.load('assets/fonts/open_sans/OpenSans-Bold.ttf'),
-  //     ),
-  //   );
-  //
-  //   var plutoGridPdfExport = pluto_grid_export.PlutoGridDefaultPdfExport(
-  //     title: "Pluto Grid Sample pdf print",
-  //     creator: "Pluto Grid Rocks!",
-  //     format: pluto_grid_export.PdfPageFormat.a4.landscape,
-  //     themeData: themeData,
-  //   );
-  //
-  //   await pluto_grid_export.Printing.sharePdf(
-  //       bytes: await plutoGridPdfExport.export(stateManager),
-  //       filename: plutoGridPdfExport.getFilename());
-  // }
+// void _defaultExportGridAsCSV() async {
+//   String title = "pluto_grid_export";
+//   var exported = const Utf8Encoder()
+//       .convert(pluto_grid_export.PlutoGridExport.exportCSV(stateManager));
+//   await FileSaver.instance.saveFile("$title.csv", exported, ".csv");
+// }
+//
+// void _defaultExportGridAsCSVCompatibleWithExcel() async {
+//   String title = "pluto_grid_export";
+//   var exportCSV = pluto_grid_export.PlutoGridExport.exportCSV(stateManager);
+//   var exported = const Utf8Encoder().convert(
+//       // FIX Add starting \u{FEFF} / 0xEF, 0xBB, 0xBF
+//       // This allows open the file in Excel with proper character interpretation
+//       // See https://stackoverflow.com/a/155176
+//       '\u{FEFF}$exportCSV');
+//   await FileSaver.instance.saveFile("$title.csv", exported, ".csv");
+// }
+//
+// void _defaultExportGridAsCSVFakeExcel() async {
+//   String title = "pluto_grid_export";
+//   var exportCSV = pluto_grid_export.PlutoGridExport.exportCSV(stateManager);
+//   var exported = const Utf8Encoder().convert(
+//       // FIX Add starting \u{FEFF} / 0xEF, 0xBB, 0xBF
+//       // This allows open the file in Excel with proper character interpretation
+//       // See https://stackoverflow.com/a/155176
+//       '\u{FEFF}$exportCSV');
+//   await FileSaver.instance.saveFile("$title.xls", exported, ".xls");
+// }
+//
+// // void _exportGridAsTSV() async {
+// //   String title = "pluto_grid_export";
+// //   var exported = const Utf8Encoder().convert(PlutoGridExport.exportCSV(
+// //     widget.stateManager,
+// //     fieldDelimiter: "\t",
+// //   ));
+// //   await FileSaver.instance.saveFile("$title.csv", exported, ".csv");
+// // }
+//
+// void _defaultExportGridAsCSVWithSemicolon() async {
+//   String title = "pluto_grid_export";
+//   var exported =
+//       const Utf8Encoder().convert(pluto_grid_export.PlutoGridExport.exportCSV(
+//     stateManager,
+//     fieldDelimiter: ";",
+//   ));
+//   await FileSaver.instance.saveFile("$title.csv", exported, ".csv");
+// }
+//
+// void _printToPdfAndShareOrSave() async {
+//   final themeData = pluto_grid_export.ThemeData.withFont(
+//     base: pluto_grid_export.Font.ttf(
+//       await rootBundle.load('assets/fonts/open_sans/OpenSans-Regular.ttf'),
+//     ),
+//     bold: pluto_grid_export.Font.ttf(
+//       await rootBundle.load('assets/fonts/open_sans/OpenSans-Bold.ttf'),
+//     ),
+//   );
+//
+//   var plutoGridPdfExport = pluto_grid_export.PlutoGridDefaultPdfExport(
+//     title: "Pluto Grid Sample pdf print",
+//     creator: "Pluto Grid Rocks!",
+//     format: pluto_grid_export.PdfPageFormat.a4.landscape,
+//     themeData: themeData,
+//   );
+//
+//   await pluto_grid_export.Printing.sharePdf(
+//       bytes: await plutoGridPdfExport.export(stateManager),
+//       filename: plutoGridPdfExport.getFilename());
+// }
 }

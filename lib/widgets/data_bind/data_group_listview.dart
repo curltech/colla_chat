@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:flutter/material.dart';
 
 import '../../provider/data_list_controller.dart';
@@ -138,10 +137,8 @@ class _GroupDataListViewState extends State<GroupDataListView> {
               mainAxisAlignment: MainAxisAlignment.end, children: trailing));
     }
 
-    Widget dataListView = KeepAliveWrapper<DataListView>(
-        keepAlive: true,
-        child: DataListView(
-            onTap: _onTap, group: tile, controller: dataListController));
+    Widget dataListView = DataListView(
+        onTap: _onTap, group: tile, controller: dataListController);
 
     ///未来不使用ListTile，因为高度固定，不够灵活
     return ExpansionTile(

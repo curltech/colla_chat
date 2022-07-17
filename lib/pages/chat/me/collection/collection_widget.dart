@@ -32,7 +32,7 @@ class CollectionWidget extends StatefulWidget with TileDataMixin {
   Icon get icon => const Icon(Icons.collections);
 
   @override
-  String get title => 'collections';
+  String get title => 'Collections';
 }
 
 class CollectionWidgetState extends State<CollectionWidget>

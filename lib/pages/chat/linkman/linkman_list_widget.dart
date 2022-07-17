@@ -1,5 +1,4 @@
 import 'package:colla_chat/pages/chat/linkman/linkman_show_widget.dart';
-import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../entity/base.dart';
@@ -13,24 +12,50 @@ import '../../../entity/chat/contact.dart';
 import '../../../service/chat/contact.dart';
 import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/data_bind/data_group_listview.dart';
+import '../../../widgets/data_bind/data_listview.dart';
+import 'group_show_widget.dart';
+
+final List<TileData> headTileData = [
+  TileData(
+      icon: Icon(Icons.request_quote,
+          color: appDataProvider.themeData?.colorScheme.primary),
+      title: 'LinkmanRequest'),
+  TileData(
+      icon: Icon(Icons.contact_phone,
+          color: appDataProvider.themeData?.colorScheme.primary),
+      title: 'Contact'),
+  TileData(
+      icon: Icon(Icons.tag_faces,
+          color: appDataProvider.themeData?.colorScheme.primary),
+      title: 'Tag'),
+];
 
 //联系人页面，带有回退回调函数
 class LinkmanListWidget extends StatefulWidget with TileDataMixin {
-  final DataListController<Linkman> controller = DataListController<Linkman>();
+  final DataListView headDataListView = DataListView(tileData: headTileData);
+  final DataListController<Linkman> linkmanController =
+      DataListController<Linkman>();
+  final DataListController<Group> groupController = DataListController<Group>();
   final GroupDataListController groupDataListController =
       GroupDataListController();
   late final List<Widget> rightWidgets;
   late final LinkmanShowWidget linkmanShowWidget;
+  late final GroupShowWidget groupShowWidget;
 
   LinkmanListWidget({Key? key}) : super(key: key) {
     linkmanService.find().then((List<Linkman> linkmen) {
       if (linkmen.isNotEmpty) {
-        controller.addAll(linkmen);
+        linkmanController.addAll(linkmen);
+      }
+    });
+    groupService.find().then((List<Group> groups) {
+      if (groups.isNotEmpty) {
+        groupController.addAll(groups);
       }
     });
 
-    linkmanShowWidget = LinkmanShowWidget(controller: controller);
     var indexWidgetProvider = IndexWidgetProvider.instance;
+    linkmanShowWidget = LinkmanShowWidget(controller: linkmanController);
     indexWidgetProvider.define(linkmanShowWidget);
     rightWidgets = [
       IconButton(
@@ -39,16 +64,19 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
           tooltip: AppLocalizations.t('Add')),
       IconButton(
           onPressed: () {
-            var current = controller.current;
+            var current = linkmanController.current;
             if (current != null) {
               current.state = EntityState.delete;
               linkmanService.delete(current);
-              controller.delete();
+              linkmanController.delete();
             }
           },
           icon: const Icon(Icons.delete),
           tooltip: AppLocalizations.t('Delete')),
     ];
+
+    groupShowWidget = GroupShowWidget(controller: groupController);
+    indexWidgetProvider.define(groupShowWidget);
   }
 
   @override
@@ -71,7 +99,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
   @override
   initState() {
     super.initState();
-    widget.controller.addListener(_update);
+    widget.linkmanController.addListener(_update);
+    widget.groupController.addListener(_update);
     _buildGroupDataListController();
   }
 
@@ -79,8 +108,24 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
     setState(() {});
   }
 
+  _buildSearchTextField(BuildContext context) {
+    var controller = TextEditingController();
+    var searchTextField = TextFormField(
+        controller: controller,
+        keyboardType: TextInputType.text,
+        decoration: InputDecoration(
+          labelText: AppLocalizations.t('Search'),
+          suffixIcon: IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.search),
+          ),
+        ));
+
+    return searchTextField;
+  }
+
   _buildGroupDataListController() {
-    var linkmen = widget.controller.data;
+    var linkmen = widget.linkmanController.data;
     List<TileData> tiles = [];
     if (linkmen.isNotEmpty) {
       for (var linkman in linkmen) {
@@ -96,29 +141,59 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
     }
     var keyTile = TileData(title: 'Linkman');
     widget.groupDataListController.add(keyTile, tiles);
+
+    var groups = widget.groupController.data;
+    tiles = [];
+    if (groups.isNotEmpty) {
+      for (var group in groups) {
+        var title = group.name ?? '';
+        var subtitle = group.peerId ?? '';
+        TileData tile = TileData(
+            avatar: group.avatar,
+            title: title,
+            subtitle: subtitle,
+            routeName: 'group_show');
+        tiles.add(tile);
+      }
+    }
+    keyTile = TileData(title: 'Group');
+    widget.groupDataListController.add(keyTile, tiles);
   }
 
   _onTap(int index, String title, {TileData? group}) {
-    widget.controller.currentIndex = index;
+    if (group != null) {
+      if (group.title == 'Linkman') {
+        widget.linkmanController.currentIndex = index;
+      }
+      if (group.title == 'Group') {
+        widget.groupController.currentIndex = index;
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     _buildGroupDataListController();
-    var groupDataListView = KeepAliveWrapper(
-        child: GroupDataListView(
+    var groupDataListView = GroupDataListView(
       onTap: _onTap,
       controller: widget.groupDataListController,
-    ));
+    );
     return AppBarView(
         title: AppLocalizations.instance.text(widget.title),
-        child: groupDataListView);
+        child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            child: Column(children: [
+              _buildSearchTextField(context),
+              widget.headDataListView,
+              groupDataListView
+            ])));
   }
 
   @override
   void dispose() {
     logger.w('LinkmanListWidget dispose');
-    widget.controller.removeListener(_update);
+    widget.linkmanController.removeListener(_update);
+    widget.groupController.removeListener(_update);
     super.dispose();
   }
 }
