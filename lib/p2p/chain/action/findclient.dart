@@ -8,10 +8,14 @@ import '../baseaction.dart';
 class FindClientAction extends BaseAction {
   FindClientAction(MsgType msgType) : super(msgType);
 
-  Future<List<dynamic>?> findClient(
-      String targetPeerId, String mobileNumber, String name) async {
-    ChainMessage chainMessage = await prepareSend(
-        {'peerId': targetPeerId, 'mobileNumber': mobileNumber, 'name': name});
+  Future<List<dynamic>?> findClient(String targetPeerId, String mobileNumber,
+      String email, String name) async {
+    ChainMessage chainMessage = await prepareSend({
+      'peerId': targetPeerId,
+      'mobileNumber': mobileNumber,
+      'email': email,
+      'name': name
+    });
 
     ChainMessage? response = await send(chainMessage);
     if (response != null) {

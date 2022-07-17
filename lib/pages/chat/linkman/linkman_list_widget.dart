@@ -17,13 +17,24 @@ import 'group_show_widget.dart';
 
 final List<TileData> headTileData = [
   TileData(
-      icon: Icon(Icons.request_quote,
+      icon: Icon(Icons.network_cell,
           color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'LinkmanRequest'),
+      title: 'P2pLinkmanAdd',
+      routeName: 'p2p_linkman_add'),
+  TileData(
+      icon: Icon(Icons.qr_code,
+          color: appDataProvider.themeData?.colorScheme.primary),
+      title: 'QrcodeScanAdd',
+      routeName: 'qr_code_add'),
   TileData(
       icon: Icon(Icons.contact_phone,
           color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'Contact'),
+      title: 'ContactAdd',
+      routeName: 'contact_add'),
+  TileData(
+      icon: Icon(Icons.request_quote,
+          color: appDataProvider.themeData?.colorScheme.primary),
+      title: 'LinkmanRequest'),
   TileData(
       icon: Icon(Icons.tag_faces,
           color: appDataProvider.themeData?.colorScheme.primary),
@@ -180,13 +191,11 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
     );
     return AppBarView(
         title: AppLocalizations.instance.text(widget.title),
-        child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            child: Column(children: [
-              _buildSearchTextField(context),
-              widget.headDataListView,
-              groupDataListView
-            ])));
+        child: Column(children: [
+          _buildSearchTextField(context),
+          widget.headDataListView,
+          groupDataListView
+        ]));
   }
 
   @override
