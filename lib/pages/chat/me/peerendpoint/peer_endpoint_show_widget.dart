@@ -1,11 +1,10 @@
 import 'package:colla_chat/pages/chat/me/peerendpoint/peer_endpoint_list_widget.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../constant/base.dart';
 import '../../../../entity/dht/peerendpoint.dart';
 import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/common/card_text_widget.dart';
 import '../../../../widgets/common/widget_mixin.dart';
+import '../../../../widgets/data_bind/data_listshow.dart';
 
 final List<String> peerEndpointFields = ['id', 'name', 'peerId'];
 
@@ -43,8 +42,8 @@ class _PeerEndpointShowWidgetState extends State<PeerEndpointShowWidget> {
     setState(() {});
   }
 
-  Widget _buildCardTextWidget(BuildContext context) {
-    List<Option> options = [];
+  Widget _buildDataListShow(BuildContext context) {
+    Map<String, dynamic> values = {};
     PeerEndpoint? currentPeerEndpoint = widget.controller.current;
     if (currentPeerEndpoint != null) {
       var peerEndpointMap = currentPeerEndpoint.toJson();
@@ -52,22 +51,22 @@ class _PeerEndpointShowWidgetState extends State<PeerEndpointShowWidget> {
         var label = peerEndpointField;
         var value = peerEndpointMap[peerEndpointField];
         value = value ?? '';
-        options.add(Option(label, value.toString()));
+        values[label] = value;
       }
     }
-    Widget formInputWidget = CardTextWidget(
-      options: options,
+    Widget dataListShow = DataListShow(
+      values: values,
     );
-    return formInputWidget;
+    return dataListShow;
   }
 
   @override
   Widget build(BuildContext context) {
-    var cardTextWidget = _buildCardTextWidget(context);
+    var dataListShow = _buildDataListShow(context);
     var appBarView = AppBarView(
         title: widget.title,
         withLeading: widget.withLeading,
-        child: cardTextWidget);
+        child: dataListShow);
     return appBarView;
   }
 

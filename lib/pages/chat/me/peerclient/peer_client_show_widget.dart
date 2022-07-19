@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../../../constant/base.dart';
 import '../../../../entity/dht/peerclient.dart';
 import '../../../../provider/data_list_controller.dart';
 import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/common/card_text_widget.dart';
 import '../../../../widgets/common/widget_mixin.dart';
+import '../../../../widgets/data_bind/data_listshow.dart';
 
 final List<String> peerClientFields = ['id', 'name', 'peerId'];
 
@@ -43,8 +42,8 @@ class _PeerClientShowWidgetState extends State<PeerClientShowWidget> {
     setState(() {});
   }
 
-  Widget _buildCardTextWidget(BuildContext context) {
-    List<Option> options = [];
+  Widget _buildDataListShow(BuildContext context) {
+    Map<String, dynamic> values = {};
     PeerClient? currentPeerClient = widget.controller.current;
     if (currentPeerClient != null) {
       var peerClientMap = currentPeerClient.toJson();
@@ -52,22 +51,22 @@ class _PeerClientShowWidgetState extends State<PeerClientShowWidget> {
         var label = peerClientField;
         var value = peerClientMap[peerClientField];
         value = value ?? '';
-        options.add(Option(label, value.toString()));
+        values[label] = value;
       }
     }
-    Widget formInputWidget = CardTextWidget(
-      options: options,
+    Widget dataListShow = DataListShow(
+      values: values,
     );
-    return formInputWidget;
+    return dataListShow;
   }
 
   @override
   Widget build(BuildContext context) {
-    var cardTextWidget = _buildCardTextWidget(context);
+    var dataListShow = _buildDataListShow(context);
     var appBarView = AppBarView(
         title: widget.title,
         withLeading: widget.withLeading,
-        child: cardTextWidget);
+        child: dataListShow);
     return appBarView;
   }
 
