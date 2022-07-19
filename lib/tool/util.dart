@@ -139,14 +139,18 @@ class StringUtil {
 
   /// 匹配
   static bool matches(String regex, String input) {
-    if (input == null || input.isEmpty) return false;
-    return new RegExp(regex).hasMatch(input);
+    if (input.isEmpty) return false;
+    return RegExp(regex).hasMatch(input);
   }
 
   /// 纯数字 ^[0-9]*$
   static bool pureDigitCharacters(String input) {
-    final String regex = "^[0-9]*\$";
+    const String regex = "^[0-9]*\$";
     return matches(regex, input);
+  }
+
+  static bool isNumeric(String s) {
+    return double.tryParse(s) != null;
   }
 }
 

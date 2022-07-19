@@ -14,6 +14,7 @@ import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/data_bind/data_group_listview.dart';
 import '../../../widgets/data_bind/data_listview.dart';
 import 'group_show_widget.dart';
+import 'p2p_linkman_add_widget.dart';
 
 final List<TileData> headTileData = [
   TileData(
@@ -52,6 +53,7 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
   late final List<Widget> rightWidgets;
   late final LinkmanShowWidget linkmanShowWidget;
   late final GroupShowWidget groupShowWidget;
+  late final P2pLinkmanAddWidget p2pLinkmanAddWidget;
 
   LinkmanListWidget({Key? key}) : super(key: key) {
     linkmanService.find().then((List<Linkman> linkmen) {
@@ -88,6 +90,9 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
 
     groupShowWidget = GroupShowWidget(controller: groupController);
     indexWidgetProvider.define(groupShowWidget);
+
+    p2pLinkmanAddWidget = P2pLinkmanAddWidget();
+    indexWidgetProvider.define(p2pLinkmanAddWidget);
   }
 
   @override

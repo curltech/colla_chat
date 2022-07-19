@@ -97,7 +97,7 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
         tiles.add(tile);
       }
     }
-    widget.controller.addAll(tiles);
+    widget.controller.replaceAll(tiles);
   }
 
   Future<void> _search(String key) async {
@@ -106,7 +106,7 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
       email = key;
     }
     String mobile = '';
-    bool isPhoneNumber = await PhoneNumberUtil.validate(key, '');
+    bool isPhoneNumber = StringUtil.isNumeric(key);
     if (isPhoneNumber) {
       mobile = key;
     }
@@ -116,6 +116,7 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
+        withLeading: true,
         title: AppLocalizations.instance.text(widget.title),
         child: Column(
             children: [_buildSearchTextField(context), widget.dataListView]));

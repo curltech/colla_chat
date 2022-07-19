@@ -1,9 +1,11 @@
+import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:cryptography/cryptography.dart';
 
 import '../../entity/dht/peerclient.dart';
 import '../../entity/dht/peerprofile.dart';
+import '../../provider/app_data_provider.dart';
 import 'base.dart';
 
 class PeerClientService extends PeerEntityService<PeerClient> {
@@ -73,6 +75,10 @@ class PeerClientService extends PeerEntityService<PeerClient> {
   }
 
   store(PeerClient peerClient) async {
+    if (peerClient.peerId == myself.peerId) {
+      logger.e('cannot store myself');
+      return;
+    }
     PeerClient? peerClient_ = await findOneByClientId(peerClient.peerId,
         clientId: peerClient.clientId);
     if (peerClient_ != null) {
