@@ -1,10 +1,13 @@
+import 'package:colla_chat/entity/p2p/message.dart';
 import 'package:colla_chat/p2p/chain/action/findclient.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 
 import '../../../entity/dht/peerclient.dart';
 import '../../../l10n/localization.dart';
+import '../../../p2p/chain/baseaction.dart';
 import '../../../provider/data_list_controller.dart';
+import '../../../service/dht/peerclient.dart';
 import '../../../tool/util.dart';
 import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/common/widget_mixin.dart';
@@ -45,7 +48,7 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
   initState() {
     super.initState();
     widget.controller.addListener(_update);
-    findClientAction.registerResponser(_receivePeerClients);
+    findClientAction.registerResponser(_responsePeerClients);
   }
 
   _update() {
@@ -69,10 +72,21 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
     return searchTextField;
   }
 
-  Future<void> _receivePeerClients(dynamic payload) async {
-    List<PeerClient>? peerClients = payload;
+  Future<void> _responsePeerClients(ChainMessage chainMessage) async {
+    List<PeerClient>? peerClients = [];
+    if (chainMessage.payloadType == PayloadType.peerClients.name) {
+      var payload = chainMessage.payload;
+      var jsons = JsonUtil.toJson(payload);
+      if (jsons is List) {
+        for (var json in jsons) {
+          var peerClient = PeerClient.fromJson(json);
+          peerClients.add(peerClient);
+          peerClientService.store(peerClient);
+        }
+      }
+    }
     List<TileData> tiles = [];
-    if (peerClients != null && peerClients.isNotEmpty) {
+    if (peerClients.isNotEmpty) {
       for (var peerClient in peerClients) {
         var title = peerClient.name ?? '';
         var subtitle = peerClient.peerId ?? '';
