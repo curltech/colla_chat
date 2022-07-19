@@ -24,43 +24,43 @@ enum PayloadType {
 }
 
 class NamespacePrefix {
-  static String PeerEndpoint = 'peerEndpoint';
-  static String PeerClient = 'peerClient';
-  static String PeerClient_Mobile = 'peerClientMobile';
-  static String ChainApp = 'chainApp';
-  static String DataBlock = 'dataBlock';
-  static String DataBlock_Owner = 'dataBlockOwner';
-  static String PeerTransaction_Src = 'peerTransactionSrc';
-  static String PeerTransaction_Target = 'peerTransactionTarget';
-  static String TransactionKey = 'transactionKey';
+  static String peerEndpoint = 'peerEndpoint';
+  static String peerClient = 'peerClient';
+  static String peerClientMobile = 'peerClientMobile';
+  static String chainApp = 'chainApp';
+  static String dataBlock = 'dataBlock';
+  static String dataBlockOwner = 'dataBlockOwner';
+  static String peerTransactionSrc = 'peerTransactionSrc';
+  static String peerTransactionTarget = 'peerTransactionTarget';
+  static String transactionKey = 'transactionKey';
 
   static String getPeerEndpointKey(String peerId) {
-    String key = '/' + NamespacePrefix.PeerEndpoint + '/' + peerId;
+    String key = '/${NamespacePrefix.peerEndpoint}/$peerId';
 
     return key;
   }
 
   static String getPeerClientKey(String peerId) {
-    String key = '/' + NamespacePrefix.PeerClient + '/' + peerId;
+    String key = '/${NamespacePrefix.peerClient}/$peerId';
 
     return key;
   }
 
   static String getPeerClientMobileKey(String mobile) {
     //mobileHash:= std.EncodeBase64(std.Hash(mobile, "sha3_256"))
-    String key = '/' + NamespacePrefix.PeerClient_Mobile + '/' + mobile;
+    String key = '/${NamespacePrefix.peerClientMobile}/$mobile';
 
     return key;
   }
 
   static String getChainAppKey(String peerId) {
-    String key = '/' + NamespacePrefix.ChainApp + '/' + peerId;
+    String key = '/${NamespacePrefix.chainApp}/$peerId';
 
     return key;
   }
 
   static String getDataBlockKey(String blockId) {
-    String key = '/' + NamespacePrefix.DataBlock + '/' + blockId;
+    String key = '/${NamespacePrefix.dataBlock}/$blockId';
 
     return key;
   }
@@ -71,8 +71,9 @@ const int compressLimit = 2048;
 /// 发送和接受链消息的抽象类
 abstract class BaseAction {
   late MsgType msgType;
-  Map<String, dynamic> receivers = <String, dynamic>{};
-  Map<String, dynamic> responsers = <String, dynamic>{};
+  dynamic Function(ChainMessage)? receiver;
+
+  Future<void> Function(ChainMessage)? responser;
 
   BaseAction(this.msgType) {
     chainMessageDispatch.registerChainMessageHandler(
@@ -80,22 +81,12 @@ abstract class BaseAction {
   }
 
   ///注册接收消息的处理器
-  bool registerReceiver(String name, dynamic receiver) {
-    if (receivers.containsKey(name)) {
-      return false;
-    }
-    receivers[name] = receiver;
-
-    return true;
+  void registerReceiver(dynamic Function(ChainMessage)? receiver) {
+    this.receiver = receiver;
   }
 
-  bool registerResponser(String name, dynamic responser) {
-    if (responsers.containsKey(name)) {
-      return false;
-    }
-    responsers[name] = responser;
-
-    return true;
+  void registerResponser(Future<void> Function(ChainMessage)? responser) {
+    this.responser = responser;
   }
 
   ///发送前的预处理，设置消息的初始值
@@ -109,9 +100,7 @@ abstract class BaseAction {
     if (connectAddress == null) {
       if (appParams.nodeAddress.isNotEmpty) {
         connectAddress = appParams.defaultNodeAddress.wsConnectAddress;
-        if (connectAddress == null) {
-          connectAddress = appParams.defaultNodeAddress.httpConnectAddress;
-        }
+        connectAddress ??= appParams.defaultNodeAddress.httpConnectAddress;
       }
     }
     chainMessage.connectAddress = connectAddress;
@@ -193,13 +182,11 @@ abstract class BaseAction {
   /// 子类可以覆盖这个方法，或者注册自己的接收处理器
   Future<ChainMessage?> receive(ChainMessage chainMessage) async {
     var chainMessage_ = chainMessageHandler.merge(chainMessage);
-    if (chainMessage_ != null && receivers.isNotEmpty) {
-      receivers.forEach((String key, dynamic receiver) async =>
-          {await receiver(chainMessage_.payload)});
+    if (chainMessage_ != null && receiver != null) {
+      dynamic payload = await receiver!(chainMessage_);
 
-      return null;
+      return chainMessageHandler.response(chainMessage.messageType, payload);
     }
-
     return null;
   }
 
@@ -207,9 +194,9 @@ abstract class BaseAction {
   /// 缺省的行为是调用注册的返回处理器
   /// 子类可以覆盖这个方法，或者注册自己的返回处理器
   Future<void> response(ChainMessage chainMessage) async {
-    if (responsers.isNotEmpty) {
-      responsers.forEach((String key, dynamic responser) async =>
-          {await responser(chainMessage.payload)});
+    if (responser != null) {
+      await responser!(chainMessage);
     }
+    return;
   }
 }

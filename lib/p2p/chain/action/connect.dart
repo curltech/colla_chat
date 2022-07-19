@@ -20,21 +20,6 @@ class ConnectAction extends BaseAction {
 
     return response;
   }
-
-  ///覆盖父亲的返回处理方法，对返回的负载转换成peerclients，再进一步处理
-  @override
-  Future<void> response(ChainMessage chainMessage) async {
-    if (chainMessage.payloadType == PayloadType.peerClients.name) {
-      var payload = chainMessage.payload;
-      var jsons = JsonUtil.toJson(payload);
-      if (jsons is List) {
-        for (var json in jsons) {
-          var peerClient = PeerClient.fromJson(json);
-          await peerClientService.store(peerClient);
-        }
-      }
-    }
-  }
 }
 
 final connectAction = ConnectAction(MsgType.CONNECT);

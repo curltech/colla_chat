@@ -20,18 +20,6 @@ class PingAction extends BaseAction {
     return null;
   }
 
-  @override
-  Future<ChainMessage?> receive(ChainMessage chainMessage) async {
-    ChainMessage? chainMessage_ = await super.receive(chainMessage);
-    if (chainMessage_ != null && receivers.isNotEmpty) {
-      receivers.forEach((String key, dynamic receiver) async =>
-          {await receiver(chainMessage_.payload)});
-
-      return null;
-    }
-
-    return null;
-  }
 }
 
 final pingAction = PingAction(MsgType.PING);

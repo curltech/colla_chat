@@ -1,6 +1,8 @@
 import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/dht/myself.dart';
+import 'package:colla_chat/service/dht/peerclient.dart';
+import 'package:colla_chat/service/dht/peerendpoint.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 
@@ -10,9 +12,11 @@ import '../../entity/dht/base.dart';
 import '../../entity/dht/myself.dart';
 import '../../entity/dht/myselfpeer.dart';
 import '../../entity/dht/peerclient.dart';
+import '../../entity/dht/peerendpoint.dart';
 import '../../entity/dht/peerprofile.dart';
 import '../../entity/p2p/message.dart';
 import '../../p2p/chain/action/connect.dart';
+import '../../p2p/chain/baseaction.dart';
 import '../../platform.dart';
 import '../../tool/util.dart';
 import 'base.dart';
@@ -25,6 +29,30 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     post = (Map map) {
       return MyselfPeer.fromJson(map);
     };
+    connectAction.registerResponser(_connectResponse);
+  }
+
+  Future<void> _connectResponse(ChainMessage chainMessage) async {
+    if (chainMessage.payloadType == PayloadType.peerClients.name) {
+      var payload = chainMessage.payload;
+      var jsons = JsonUtil.toJson(payload);
+      if (jsons is List) {
+        for (var json in jsons) {
+          var peerClient = PeerClient.fromJson(json);
+          await peerClientService.store(peerClient);
+        }
+      }
+    }
+    if (chainMessage.payloadType == PayloadType.peerEndpoints.name) {
+      var payload = chainMessage.payload;
+      var jsons = JsonUtil.toJson(payload);
+      if (jsons is List) {
+        for (var json in jsons) {
+          var peerEndpoint = PeerEndpoint.fromJson(json);
+          await peerEndpointService.store(peerEndpoint);
+        }
+      }
+    }
   }
 
   Future<MyselfPeer?> findOneByLogin(String credential) async {
@@ -61,9 +89,8 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       throw 'SameNameAccountExists';
     }
     var deviceData = PlatformParams.instance.deviceData;
-    var clientDevice=JsonUtil.toJsonString(deviceData);
-    var hash =
-        await cryptoGraphy.hash(clientDevice.codeUnits);
+    var clientDevice = JsonUtil.toJsonString(deviceData);
+    var hash = await cryptoGraphy.hash(clientDevice.codeUnits);
     var clientId = CryptoUtil.encodeBase58(hash);
     var myselfPeer = MyselfPeer('', '', clientId);
     myselfPeer.status = EntityStatus.effective.name;

@@ -6,6 +6,7 @@ import 'package:colla_chat/transport/webrtc/webrtc_peer.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
+import '../../entity/p2p/message.dart';
 import '../../p2p/chain/action/signal.dart';
 import '../../provider/app_data_provider.dart';
 
@@ -154,8 +155,7 @@ class WebrtcPeerPool {
   }
 
   registerSignalAction(SignalAction signalAction) {
-    _signalAction.registerReceiver(
-        'webrtcPeerPool', WebrtcPeerPool.instance.receive);
+    _signalAction.registerReceiver(WebrtcPeerPool.instance.receive);
   }
 
   registerProtocolHandler(String protocol, dynamic receiveHandler) {
@@ -197,9 +197,7 @@ class WebrtcPeerPool {
       List<Map<String, String>>? iceServers,
       Router? router}) async {
     List<WebrtcPeer>? webrtcPeers = this.webrtcPeers.get(peerId);
-    if (webrtcPeers == null) {
-      webrtcPeers = [];
-    }
+    webrtcPeers ??= [];
     var webrtcPeer = WebrtcPeer();
     bool result = await webrtcPeer.init(peerId, clientId, true,
         streams: streams, iceServers: iceServers, router: router);
@@ -318,8 +316,11 @@ class WebrtcPeerPool {
   /// @param peerId
   /// @param connectSessionId
   /// @param data
-  receive(String peerId, String connectPeerId, String connectSessionId,
-      WebrtcSignal signal) async {
+  receive(ChainMessage chainMessage) async {
+    String? peerId=chainMessage.srcPeerId;
+    String? connectPeerId= chainMessage.srcConnectPeerId;
+    String? connectSessionId=chainMessage.srcConnectSessionId;
+    WebrtcSignal signal = WebrtcSignal.fromJson(chainMessage.payload);
     var signalType = signal.signalType;
     logger.i('receive signal type: $signalType from webrtcPeer: $peerId');
     String? clientId;
@@ -340,7 +341,7 @@ class WebrtcPeerPool {
       logger.e('clientId is null');
       return;
     }
-    WebrtcPeer? webrtcPeer = getOne(peerId, clientId);
+    WebrtcPeer? webrtcPeer = getOne(peerId!, clientId);
     // peerId的连接存在，而且已经连接，报错
     if (webrtcPeer != null) {
       if (webrtcPeer.connected) {

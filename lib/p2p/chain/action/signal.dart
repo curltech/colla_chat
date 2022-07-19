@@ -21,21 +21,6 @@ class SignalAction extends BaseAction {
 
     return null;
   }
-
-  @override
-  Future<ChainMessage?> receive(ChainMessage chainMessage) async {
-    ChainMessage? chainMessage_ = await super.receive(chainMessage);
-    if (chainMessage_ != null && receivers.isNotEmpty) {
-      signalAction.receivers.forEach((String key, dynamic receiver) {
-        WebrtcSignal signal = WebrtcSignal.fromJson(chainMessage_.payload);
-        receiver(chainMessage_.srcPeerId, chainMessage_.srcConnectPeerId,
-            chainMessage_.srcConnectSessionId, signal);
-      });
-
-      return null;
-    }
-    return null;
-  }
 }
 
 final signalAction = SignalAction(MsgType.SIGNAL);

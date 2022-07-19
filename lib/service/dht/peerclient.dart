@@ -77,9 +77,9 @@ class PeerClientService extends PeerEntityService<PeerClient> {
         clientId: peerClient.clientId);
     if (peerClient_ != null) {
       peerClient.id = peerClient_.id;
-      peerClientService.update(peerClient);
+      update(peerClient);
     } else {
-      peerClientService.insert(peerClient);
+      insert(peerClient);
     }
     var peerId = peerClient.peerId;
     var clientId = peerClient.clientId;

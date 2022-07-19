@@ -45,7 +45,7 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
   initState() {
     super.initState();
     widget.controller.addListener(_update);
-    findClientAction.registerResponser('', _receivePeerClients);
+    findClientAction.registerResponser(_receivePeerClients);
   }
 
   _update() {
@@ -69,7 +69,8 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
     return searchTextField;
   }
 
-  _receivePeerClients(List<PeerClient>? peerClients) {
+  Future<void> _receivePeerClients(dynamic payload) async {
+    List<PeerClient>? peerClients = payload;
     List<TileData> tiles = [];
     if (peerClients != null && peerClients.isNotEmpty) {
       for (var peerClient in peerClients) {

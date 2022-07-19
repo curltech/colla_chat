@@ -32,11 +32,6 @@ class P2pChatAction extends BaseAction {
     } else {
       payload = chainMessage.payload;
     }
-    if (chainMessage_ != null && receivers.isNotEmpty) {
-      p2pChatAction.receivers.forEach((String key, dynamic receiver) async =>
-          {await receiver(srcPeerId, payload)});
-      return null;
-    }
 
     return null;
   }

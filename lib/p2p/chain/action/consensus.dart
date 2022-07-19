@@ -33,18 +33,6 @@ class ConsensusAction extends BaseAction {
     return null;
   }
 
-  @override
-  Future<ChainMessage?> receive(ChainMessage chainMessage) async {
-    ChainMessage? chainMessage_ = await super.receive(chainMessage);
-    if (chainMessage_ != null && consensusAction.receivers.isNotEmpty) {
-      consensusAction.receivers.forEach((String key, dynamic receiver) async =>
-          {await receiver(chainMessage_)});
-
-      return null;
-    }
-
-    return null;
-  }
 }
 
 final consensusAction = ConsensusAction(MsgType.CONSENSUS);
