@@ -1,4 +1,7 @@
+import 'package:colla_chat/entity/chat/chat.dart';
+
 import '../../../entity/p2p/message.dart';
+import '../../../tool/util.dart';
 import '../baseaction.dart';
 
 /// 在chain目录下的采用自定义protocol "/chain"的方式自己实现的功能
@@ -20,20 +23,18 @@ class P2pChatAction extends BaseAction {
   }
 
   @override
-  Future<ChainMessage?> receive(ChainMessage chainMessage) async {
-    ChainMessage? chainMessage_ = await super.receive(chainMessage);
-    String? srcPeerId = chainMessage.srcPeerId;
-    List<int>? payload;
-    if (chainMessage_ != null &&
-        chainMessage_.payloadType == PayloadType.dataBlock.name) {
-      dynamic dataBlock_ = chainMessage_.payload;
-      //await dataBlockService.decrypt(_dataBlock);
-      payload = dataBlock_.payload;
-    } else {
-      payload = chainMessage.payload;
+  Future<void> transferPayload(ChainMessage chainMessage) async {
+    if (chainMessage.payloadType == PayloadType.dataBlock.name) {
+      ChatMessage chatMessage;
+      var payload = chainMessage.payload;
+      var jsons = JsonUtil.toJson(payload);
+      if (jsons is List) {
+        for (var json in jsons) {
+          payload = json['payload'];
+        }
+      }
+      chainMessage.payload = payload;
     }
-
-    return null;
   }
 }
 

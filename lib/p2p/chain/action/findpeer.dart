@@ -1,4 +1,6 @@
+import '../../../entity/dht/peerendpoint.dart';
 import '../../../entity/p2p/message.dart';
+import '../../../tool/util.dart';
 import '../baseaction.dart';
 
 /// 根据目标peerpoint的peerid搜索
@@ -16,6 +18,21 @@ class FindPeerAction extends BaseAction {
     return null;
   }
 
+  @override
+  Future<void> transferPayload(ChainMessage chainMessage) async {
+    if (chainMessage.payloadType == PayloadType.peerEndpoints.name) {
+      List<PeerEndpoint> peerEndpoints = [];
+      var payload = chainMessage.payload;
+      var jsons = JsonUtil.toJson(payload);
+      if (jsons is List) {
+        for (var json in jsons) {
+          var peerEndpoint = PeerEndpoint.fromJson(json);
+          peerEndpoints.add(peerEndpoint);
+        }
+      }
+      chainMessage.payload = peerEndpoints;
+    }
+  }
 }
 
 final findPeerAction = FindPeerAction(MsgType.FINDPEER);

@@ -73,31 +73,28 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
   }
 
   Future<void> _responsePeerClients(ChainMessage chainMessage) async {
-    List<PeerClient>? peerClients = [];
     if (chainMessage.payloadType == PayloadType.peerClients.name) {
-      var payload = chainMessage.payload;
-      var jsons = JsonUtil.toJson(payload);
-      if (jsons is List) {
-        for (var json in jsons) {
-          var peerClient = PeerClient.fromJson(json);
-          peerClients.add(peerClient);
+      List<PeerClient> peerClients = chainMessage.payload;
+      if (peerClients.isNotEmpty) {
+        for (var peerClient in peerClients) {
           peerClientService.store(peerClient);
         }
       }
-    }
-    List<TileData> tiles = [];
-    if (peerClients.isNotEmpty) {
-      for (var peerClient in peerClients) {
-        var title = peerClient.name ?? '';
-        var subtitle = peerClient.peerId ?? '';
-        TileData tile = TileData(
-          title: title,
-          subtitle: subtitle,
-        );
-        tiles.add(tile);
+
+      List<TileData> tiles = [];
+      if (peerClients.isNotEmpty) {
+        for (var peerClient in peerClients) {
+          var title = peerClient.name ?? '';
+          var subtitle = peerClient.peerId ?? '';
+          TileData tile = TileData(
+            title: title,
+            subtitle: subtitle,
+          );
+          tiles.add(tile);
+        }
       }
+      widget.controller.replaceAll(tiles);
     }
-    widget.controller.replaceAll(tiles);
   }
 
   Future<void> _search(String key) async {

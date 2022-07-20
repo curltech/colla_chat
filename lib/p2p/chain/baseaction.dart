@@ -71,9 +71,9 @@ const int compressLimit = 2048;
 /// 发送和接受链消息的抽象类
 abstract class BaseAction {
   late MsgType msgType;
-  dynamic Function(ChainMessage)? receiver;
+  List<dynamic Function(ChainMessage)> receivers = [];
 
-  Future<void> Function(ChainMessage)? responser;
+  List<Future<void> Function(ChainMessage)> responsers = [];
 
   BaseAction(this.msgType) {
     chainMessageDispatch.registerChainMessageHandler(
@@ -81,12 +81,12 @@ abstract class BaseAction {
   }
 
   ///注册接收消息的处理器
-  void registerReceiver(dynamic Function(ChainMessage)? receiver) {
-    this.receiver = receiver;
+  void registerReceiver(dynamic Function(ChainMessage) receiver) {
+    receivers.add(receiver);
   }
 
-  void registerResponser(Future<void> Function(ChainMessage)? responser) {
-    this.responser = responser;
+  void registerResponser(Future<void> Function(ChainMessage) responser) {
+    responsers.add(responser);
   }
 
   ///发送前的预处理，设置消息的初始值
@@ -182,10 +182,13 @@ abstract class BaseAction {
   /// 子类可以覆盖这个方法，或者注册自己的接收处理器
   Future<ChainMessage?> receive(ChainMessage chainMessage) async {
     var chainMessage_ = chainMessageHandler.merge(chainMessage);
-    if (chainMessage_ != null && receiver != null) {
-      dynamic payload = await receiver!(chainMessage_);
-
-      return chainMessageHandler.response(chainMessage.messageType, payload);
+    if (chainMessage_ != null && receivers.isNotEmpty) {
+      await transferPayload(chainMessage_);
+      for (var receiver in receivers) {
+        dynamic responsePayload = receiver(chainMessage_);
+        return chainMessageHandler.response(
+            chainMessage.messageType, responsePayload);
+      }
     }
     return null;
   }
@@ -194,9 +197,15 @@ abstract class BaseAction {
   /// 缺省的行为是调用注册的返回处理器
   /// 子类可以覆盖这个方法，或者注册自己的返回处理器
   Future<void> response(ChainMessage chainMessage) async {
-    if (responser != null) {
-      await responser!(chainMessage);
+    if (responsers.isNotEmpty) {
+      await transferPayload(chainMessage);
+      for (var responser in responsers) {
+        responser(chainMessage);
+      }
     }
     return;
   }
+
+  ///将消息负载转换成具体类型的消息负载
+  Future<void> transferPayload(ChainMessage chainMessage) async {}
 }
