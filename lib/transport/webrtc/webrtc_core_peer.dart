@@ -40,7 +40,6 @@ class WebrtcSignal {
     this.extension = SignalExtension.fromJson(extension);
   }
 
-  @override
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json.addAll({

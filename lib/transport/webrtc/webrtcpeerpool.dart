@@ -50,12 +50,8 @@ class LruQueue<T> {
   T? put(String key, T element) {
     T? tail;
     _elements[key] = element;
-    if (_head == null) {
-      _head = key;
-    }
-    if (_tail == null) {
-      _tail = key;
-    }
+    _head ??= key;
+    _tail ??= key;
     if (_elements.length > _maxLength) {
       tail = _elements[_tail];
       _elements.remove(_tail);
@@ -243,16 +239,16 @@ class WebrtcPeerPool {
   Future<bool> removeWebrtcPeer(String peerId, WebrtcPeer webrtcPeer) async {
     List<WebrtcPeer>? webrtcPeers = this.webrtcPeers.get(peerId);
     if (webrtcPeers != null && webrtcPeers.isNotEmpty) {
-      bool _connected = false;
-      for (WebrtcPeer _webrtcPeer in webrtcPeers) {
-        if (_webrtcPeer == webrtcPeer) {
+      bool connected_ = false;
+      for (WebrtcPeer webrtcPeer_ in webrtcPeers) {
+        if (webrtcPeer_ == webrtcPeer) {
           logger.i('emit removeWebrtcPeer self');
           webrtcPeers.remove(webrtcPeer);
           await webrtcPeer.destroy('rmoved');
         } else {
           logger.i('emit do not removeWebrtcPeer,because other');
-          if (_webrtcPeer.connected) {
-            _connected = true;
+          if (webrtcPeer_.connected) {
+            connected_ = true;
             logger.i('other && connected');
           }
         }
@@ -260,7 +256,7 @@ class WebrtcPeerPool {
       if (webrtcPeers.isEmpty) {
         WebrtcPeerPool.instance.webrtcPeers.remove(peerId);
       }
-      if (!_connected) {
+      if (!connected_) {
         await emit(WebrtcEventType.close.name,
             WebrtcEvent(webrtcPeer.peerId, webrtcPeer.clientId));
       }
@@ -317,9 +313,9 @@ class WebrtcPeerPool {
   /// @param connectSessionId
   /// @param data
   receive(ChainMessage chainMessage) async {
-    String? peerId=chainMessage.srcPeerId;
-    String? connectPeerId= chainMessage.srcConnectPeerId;
-    String? connectSessionId=chainMessage.srcConnectSessionId;
+    String? peerId = chainMessage.srcPeerId;
+    String? connectPeerId = chainMessage.srcConnectPeerId;
+    String? connectSessionId = chainMessage.srcConnectSessionId;
     WebrtcSignal signal = WebrtcSignal.fromJson(chainMessage.payload);
     var signalType = signal.signalType;
     logger.i('receive signal type: $signalType from webrtcPeer: $peerId');
@@ -381,9 +377,7 @@ class WebrtcPeerPool {
         webrtcPeer.connectPeerId = connectPeerId;
         webrtcPeer.connectSessionId = connectSessionId;
         List<WebrtcPeer>? webrtcPeers = this.webrtcPeers.get(peerId);
-        if (webrtcPeers == null) {
-          webrtcPeers = [];
-        }
+        webrtcPeers ??= [];
         webrtcPeers.add(webrtcPeer);
         this.webrtcPeers.put(peerId, webrtcPeers);
         await webrtcPeer.signal(signal);
