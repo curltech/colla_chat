@@ -199,7 +199,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
         child: Column(children: [
           _buildSearchTextField(context),
           widget.headDataListView,
-          groupDataListView
+          Expanded(child: groupDataListView)
         ]));
   }
 

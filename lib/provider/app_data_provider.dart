@@ -368,9 +368,9 @@ class AppDataProvider with ChangeNotifier {
   changeSize(BuildContext context) {
     size = MediaQuery.of(context).size;
     var keyboardHeight = appDataProvider.keyboardHeight;
-    if (keyboardHeight == 270.0 &&
-        MediaQuery.of(context).viewInsets.bottom != 0) {
-      keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    var bottom = MediaQuery.of(context).viewInsets.bottom;
+    if (keyboardHeight == 270.0 && bottom != 0) {
+      appDataProvider.keyboardHeight = bottom;
     }
   }
 }

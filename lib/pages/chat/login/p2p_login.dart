@@ -79,11 +79,6 @@ class _P2pLoginState extends State<P2pLogin> {
       height: 480,
       child: pageView,
     ));
-    var bottom = MediaQuery.of(context).viewInsets.bottom;
-    if (bottom > 0) {
-      appDataProvider.keyboardHeight = bottom;
-      logger.i('Get keyboardHeight $bottom');
-    }
     return Scaffold(
         appBar: appBar,
         body: Stack(children: <Widget>[
