@@ -1,12 +1,24 @@
+import 'dart:io';
+import 'dart:typed_data';
+import 'dart:ui';
+
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:path_provider/path_provider.dart';
+
+import '../../platform.dart';
+import '../../provider/app_data_provider.dart';
 
 /// 简单包装webrtc的基本方法
 class WebrtcRenderer {
   MediaStream? mediaStream;
   RTCVideoRenderer? renderer;
+  MediaRecorder? mediaRecorder;
+  List<MediaDeviceInfo>? mediaDevicesList;
+
+  WebrtcRenderer();
 
   ///获取本机视频流
-  Future<MediaStream> getUserMedia(
+  Future<void> getUserMedia(
       {bool audio = true,
       int minWidth = 640,
       int minHeight = 480,
@@ -28,13 +40,17 @@ class WebrtcRenderer {
     var mediaStream =
         await navigator.mediaDevices.getUserMedia(mediaConstraints);
     this.mediaStream = mediaStream;
-
-    return mediaStream;
   }
 
   ///获取本机屏幕流
-  Future<MediaStream> getDisplayMedia(
-      {bool audio = false, bool video = true}) async {
+  Future<void> getDisplayMedia(
+      {DesktopCapturerSource? selectedSource, bool audio = false}) async {
+    dynamic video = selectedSource == null
+        ? true
+        : {
+            'deviceId': {'exact': selectedSource!.id},
+            'mandatory': {'frameRate': 30.0}
+          };
     Map<String, dynamic> mediaConstraints = <String, dynamic>{
       'audio': audio,
       'video': video
@@ -42,14 +58,11 @@ class WebrtcRenderer {
     var mediaStream =
         await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
     this.mediaStream = mediaStream;
-
-    return mediaStream;
   }
 
   //获取本机的设备清单
-  Future<List<MediaDeviceInfo>> enumerateDevices() async {
-    var mediaDevicesList = await navigator.mediaDevices.enumerateDevices();
-
+  Future<List<MediaDeviceInfo>?> enumerateDevices() async {
+    mediaDevicesList ??= await navigator.mediaDevices.enumerateDevices();
     return mediaDevicesList;
   }
 
@@ -62,16 +75,17 @@ class WebrtcRenderer {
   }
 
   //绑定视频流到渲染器
-  RTCVideoRenderer bindRTCVideoRenderer(MediaStream stream) {
-    var renderer = RTCVideoRenderer();
-    renderer.initialize();
-    this.renderer = renderer;
-    renderer.srcObject = stream;
-
-    return renderer;
+  Future<void> bindRTCVideoRenderer() async {
+    var mediaStream = this.mediaStream;
+    if (mediaStream != null) {
+      RTCVideoRenderer renderer = RTCVideoRenderer();
+      await renderer.initialize();
+      renderer.srcObject = mediaStream;
+      this.renderer = renderer;
+    }
   }
 
-  close() async {
+  dispose() async {
     var mediaStream = this.mediaStream;
     if (mediaStream != null) {
       await mediaStream.dispose();
@@ -80,14 +94,33 @@ class WebrtcRenderer {
     var renderer = this.renderer;
     if (renderer != null) {
       renderer.srcObject = null;
+      renderer.dispose();
       this.renderer = null;
     }
   }
 
-  RTCVideoView? createView() {
+  RTCVideoView? createView({
+    RTCVideoViewObjectFit objectFit =
+        RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
+    bool mirror = false,
+    FilterQuality filterQuality = FilterQuality.low,
+  }) {
     var renderer = this.renderer;
     if (renderer != null) {
-      return RTCVideoView(renderer);
+      return RTCVideoView(renderer,
+          objectFit: objectFit, mirror: mirror, filterQuality: filterQuality);
+    }
+    return null;
+  }
+
+  Future<ByteBuffer?> captureFrame() async {
+    var mediaStream = this.mediaStream;
+    if (mediaStream != null) {
+      final videoTrack = mediaStream
+          .getVideoTracks()
+          .firstWhere((track) => track.kind == 'video');
+      final frame = await videoTrack.captureFrame();
+      return frame;
     }
     return null;
   }
@@ -140,6 +173,35 @@ class WebrtcRenderer {
       if (tracks.isNotEmpty) {
         Helper.setVolume(volume, tracks[0]);
       }
+    }
+  }
+
+  void startRecording({String? filePath}) async {
+    if (mediaStream == null) throw 'Stream is not initialized';
+    if (PlatformParams.instance.ios) {
+      logger.e('Recording is not available on iOS');
+      return;
+    }
+    // TODO(rostopira): request write storage permission
+    if (filePath == null) {
+      Directory? storagePath = await getApplicationDocumentsDirectory();
+      if (storagePath == null) throw 'Can\'t find storagePath';
+      filePath = '${storagePath.path}/webrtc_sample/test.mp4';
+    }
+    mediaRecorder = MediaRecorder();
+    final videoTrack = mediaStream!
+        .getVideoTracks()
+        .firstWhere((track) => track.kind == 'video');
+    await mediaRecorder!.start(
+      filePath,
+      videoTrack: videoTrack,
+    );
+  }
+
+  void stopRecording() async {
+    if (mediaRecorder != null) {
+      await mediaRecorder!.stop();
+      mediaRecorder = null;
     }
   }
 }

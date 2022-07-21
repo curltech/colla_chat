@@ -1,3 +1,4 @@
+import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../tool/util.dart';
@@ -11,7 +12,7 @@ class ChangeNamePage extends StatefulWidget {
   ChangeNamePage(this.name);
 
   @override
-  _ChangeNamePageState createState() => _ChangeNamePageState();
+  State createState() => _ChangeNamePageState();
 }
 
 class _ChangeNamePageState extends State<ChangeNamePage> {
@@ -51,7 +52,7 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
 
   @override
   Widget build(BuildContext context) {
-    var rWidget = '';
+    var rWidget = AppBarPopupMenu();
     // ComMomButton(
     //   text: '保存',
     //   style: TextStyle(color: Colors.white),
@@ -62,7 +63,7 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
 
     return AppBarView(
       title: '更改名字',
-      rightActions: [rWidget],
+      rightPopupMenus: [rWidget],
       child: MainInputBody(color: Colors.cyan, child: body()),
     );
   }

@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/pages/chat/chat/widget/text_span_builder.dart';
+import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
 
@@ -224,11 +225,11 @@ class _ChatPageState extends State<ChatPage> {
       ),
     ];
 
-    List<String> rWidget = [];
+    List<AppBarPopupMenu> rWidget = [];
 
     return AppBarView(
       title: newGroupName ?? widget.title,
-      rightActions: rWidget,
+      rightPopupMenus: rWidget,
       child: MainInputBody(
         onTap: () => setState(
           () {

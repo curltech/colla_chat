@@ -2,6 +2,7 @@ import 'package:colla_chat/pages/chat/chat/widget/tip_verify_Input.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../widgets/common/app_bar_view.dart';
+import '../../../../widgets/common/app_bar_widget.dart';
 import 'main_input.dart';
 
 class SetRemarkPage extends StatefulWidget {
@@ -33,7 +34,7 @@ class _SetRemarkPageState extends State<SetRemarkPage> {
 
   @override
   Widget build(BuildContext context) {
-    var rWidget = '';
+    var rWidget = AppBarPopupMenu();
     // ComMomButton(
     //   text: '完成',
     //   style: TextStyle(color: Colors.white),
@@ -50,7 +51,7 @@ class _SetRemarkPageState extends State<SetRemarkPage> {
 
     return AppBarView(
       title: '设置备注和标签',
-      rightActions: <String>[rWidget],
+      rightPopupMenus: [rWidget],
       child: MainInputBody(child: body(), color: Colors.cyan),
     );
   }

@@ -2,6 +2,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../widgets/common/app_bar_view.dart';
+import '../../../../../widgets/common/app_bar_widget.dart';
 import '../../../../../widgets/common/widget_mixin.dart';
 import 'auto_discover_widget.dart';
 import 'manual_add_widget.dart';
@@ -73,14 +74,10 @@ class _AddressAddWidgetState extends State<AddressAddWidget>
     var appBarView = AppBarView(
         title: 'Mail address add',
         withLeading: widget.withLeading,
-        rightActions: [
-          AppLocalizations.t('Auto'),
-          AppLocalizations.t('Manual')
+        rightPopupMenus: [
+          AppBarPopupMenu(title: AppLocalizations.t('Auto')),
+          AppBarPopupMenu(title: AppLocalizations.t('Manual'))
         ],
-        //rightWidgets: rightWidgets,
-        rightCallBack: (int index) {
-          _tabController.index = index;
-        },
         child: tabBarView);
     return appBarView;
   }

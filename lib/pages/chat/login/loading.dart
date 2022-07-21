@@ -77,7 +77,11 @@ class _LoadingState extends State<Loading> with SingleTickerProviderStateMixin {
           if (currentIndex >= lightBackgroudImages.length - 1) {
             _tabController.index = 0;
           } else {
-            _tabController.index = currentIndex + 1;
+            try {
+              _tabController.index = currentIndex + 1;
+            } catch (e) {
+              logger.e(e);
+            }
           }
           await Future.delayed(const Duration(seconds: 10));
           if (currentIndex >= lightBackgroudImages.length - 1) {

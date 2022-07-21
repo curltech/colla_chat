@@ -2,6 +2,14 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+class AppBarPopupMenu {
+  Icon? icon;
+  void Function()? onPressed;
+  String? title;
+
+  AppBarPopupMenu({this.title, this.icon, this.onPressed});
+}
+
 ///工作区的顶部栏AppBar，定义了前导组件，比如回退按钮
 ///定义了尾部组件和下拉按钮
 class AppBarWidget {
@@ -11,10 +19,8 @@ class AppBarWidget {
     leadingCallBack, //回退按钮的回调
     title = '',
     centerTitle = false, //标题是否居中
-    rightWidgets, //右边的排列组件（按钮）
-    rightActions, //右边的下拉菜单组件
-    rightIcons, //右边下拉菜单组件的图标
-    rightCallBack, //右边下拉菜单组件的回调
+    List<Widget>? rightWidgets, //右边的排列组件（按钮）
+    List<AppBarPopupMenu>? rightPopupMenus, //右边的下拉菜单组件
     bottom, //底部组件
   }) {
     ///右边排列的按钮组件，最后一个是下拉按钮组件
@@ -27,10 +33,7 @@ class AppBarWidget {
 
     ///然后加上右边的下拉组件
     var action = popMenuButton(context,
-        rightActions: rightActions,
-        rightIcons: rightIcons,
-        rightCallBack: rightCallBack,
-        rightWidgets: rightWidgets);
+        rightPopupMenus: rightPopupMenus, rightWidgets: rightWidgets);
     if (action != null) {
       actions.add(action);
     }
@@ -73,32 +76,33 @@ class AppBarWidget {
 
   static PopupMenuButton<int>? popMenuButton(
     BuildContext context, {
-    List<String>? rightActions,
-    List<Icon>? rightIcons,
+    List<AppBarPopupMenu>? rightPopupMenus,
     List<Widget>? rightWidgets,
-    Function(int index)? rightCallBack,
   }) {
     PopupMenuButton<int>? popMenuButton;
 
     ///左右边的下拉按钮
-    if (rightActions != null && rightActions.isNotEmpty) {
+    if (rightPopupMenus != null && rightPopupMenus.isNotEmpty) {
       List<PopupMenuItem<int>> items = [];
+      List<void Function()?> onPressed = [];
       int i = 0;
-      for (var rightAction in rightActions) {
+      for (var rightAction in rightPopupMenus) {
         PopupMenuItem<int> item;
-        if (rightIcons != null && rightIcons.length > i) {
-          item = PopupMenuItem<int>(
-              value: i,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [rightIcons[i], Text(rightAction)],
-              ));
-        } else {
-          item = PopupMenuItem<int>(
-            value: i,
-            child: Text(rightAction),
-          );
+        Widget? iconWidget = rightAction.icon;
+        String text = rightAction.title ?? '';
+        Widget textWidget = Text(text);
+        List<Widget> rows = [];
+        if (iconWidget != null) {
+          rows.add(iconWidget);
         }
+        rows.add(textWidget);
+        item = PopupMenuItem<int>(
+            value: i,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: rows,
+            ));
+        onPressed.add(rightAction.onPressed);
         items.add(item);
         ++i;
       }
@@ -106,14 +110,12 @@ class AppBarWidget {
         itemBuilder: (BuildContext context) {
           return items;
         },
-        // icon: const Icon(
-        //   Icons.add,
-        //   color: Colors.white,
-        // ),
+
         ///调用下拉按钮的回调函数，参数为按钮序号
         onSelected: (int index) async {
-          if (rightCallBack != null) {
-            await rightCallBack(index);
+          var onPress = onPressed[index];
+          if (onPress != null) {
+            onPress();
           }
         },
       );

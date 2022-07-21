@@ -15,9 +15,7 @@ class AppBarView extends StatelessWidget {
   //右边按钮
   final List<Widget>? rightWidgets;
   //右边下拉菜单
-  final List<String>? rightActions;
-  final List<Icon>? rightIcons;
-  final Function(int index)? rightCallBack;
+  final List<AppBarPopupMenu>? rightPopupMenus;
   final PreferredSizeWidget? bottom;
   final Widget child;
 
@@ -28,9 +26,7 @@ class AppBarView extends StatelessWidget {
     required this.title,
     this.centerTitle = true,
     this.rightWidgets,
-    this.rightActions,
-    this.rightIcons,
-    this.rightCallBack,
+    this.rightPopupMenus,
     this.bottom,
     required this.child,
   }) : super(key: key);
@@ -40,17 +36,17 @@ class AppBarView extends StatelessWidget {
     return Consumer<IndexWidgetProvider>(
         builder: (context, indexWidgetProvider, child) {
       return Column(children: [
-        AppBarWidget.build(context,
-            withLeading: withLeading,
-            leadingCallBack: leadingCallBack,
-            title: title,
-            centerTitle: centerTitle,
-            rightWidgets: rightWidgets,
-            rightActions: rightActions,
-            rightIcons: rightIcons,
-            bottom: bottom,
-            rightCallBack: rightCallBack),
-        this.child,
+        AppBarWidget.build(
+          context,
+          withLeading: withLeading,
+          leadingCallBack: leadingCallBack,
+          title: title,
+          centerTitle: centerTitle,
+          rightWidgets: rightWidgets,
+          rightPopupMenus: rightPopupMenus,
+          bottom: bottom,
+        ),
+        Expanded(child: this.child),
       ]);
     });
   }

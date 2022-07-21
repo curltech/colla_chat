@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
@@ -10,9 +11,14 @@ import '../../../../widgets/common/image_widget.dart';
 import '../../chat/widget/ui.dart';
 
 class QrcodeWidget extends StatefulWidget with TileDataMixin {
-  final List<String> menus = const ['保存文件', '保存图片', '分享', '重置二维码'];
+  final List<AppBarPopupMenu> menus = [
+    AppBarPopupMenu(title: '保存文件'),
+    AppBarPopupMenu(title: '保存图片'),
+    AppBarPopupMenu(title: '分享'),
+    AppBarPopupMenu(title: '重置二维码')
+  ];
 
-  const QrcodeWidget({Key? key}) : super(key: key);
+  QrcodeWidget({Key? key}) : super(key: key);
 
   @override
   bool get withLeading => true;
@@ -72,8 +78,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
     return AppBarView(
       title: '二维码',
       withLeading: widget.withLeading,
-      rightActions: widget.menus,
-      rightCallBack: _rightCallBack,
+      rightPopupMenus: widget.menus,
       child: Column(children: children),
     );
   }

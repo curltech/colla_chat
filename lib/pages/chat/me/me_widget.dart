@@ -2,6 +2,7 @@ import 'package:colla_chat/pages/chat/me/peerclient/peer_client_list_widget.dart
 import 'package:colla_chat/pages/chat/me/peerendpoint/peer_endpoint_list_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
+import 'package:colla_chat/pages/chat/me/webrtc/webrtc_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
 
@@ -29,6 +30,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   final PeerEndpointListWidget peerEndpointListWidget =
       PeerEndpointListWidget();
   final PeerClientListWidget peerClientListWidget = PeerClientListWidget();
+  final WebrtcWidget webrtcWidget = WebrtcWidget();
 
   late final Widget child;
 
@@ -45,6 +47,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(mailListWidget);
     indexWidgetProvider.define(peerEndpointListWidget);
     indexWidgetProvider.define(peerClientListWidget);
+    indexWidgetProvider.define(webrtcWidget);
 
     List<TileDataMixin> mixins = [
       collectionWidget,
@@ -52,7 +55,8 @@ class MeWidget extends StatelessWidget with TileDataMixin {
       mailAddressWidget,
       settingWidget,
       peerEndpointListWidget,
-      peerClientListWidget
+      peerClientListWidget,
+      webrtcWidget
     ];
     final List<TileData> meTileData = TileData.from(mixins);
     child = DataListView(tileData: meTileData);
