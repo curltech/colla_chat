@@ -1,4 +1,4 @@
-import 'package:colla_chat/transport/webrtc/webrtc_core_peer.dart';
+import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 
 import '../../../entity/p2p/message.dart';
 import '../baseaction.dart';

@@ -9,13 +9,14 @@ import '../../platform.dart';
 import '../../provider/app_data_provider.dart';
 
 /// 简单包装webrtc的基本方法
-class WebrtcRenderer {
+class PeerVideoRenderer {
+  String? id;
   MediaStream? mediaStream;
   RTCVideoRenderer? renderer;
   MediaRecorder? mediaRecorder;
   List<MediaDeviceInfo>? mediaDevicesList;
 
-  WebrtcRenderer();
+  PeerVideoRenderer({this.mediaStream});
 
   ///获取本机视频流
   Future<void> getUserMedia(

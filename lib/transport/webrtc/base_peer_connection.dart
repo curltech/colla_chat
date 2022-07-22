@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:colla_chat/transport/webrtc/webrtc_peer.dart';
+import 'package:colla_chat/transport/webrtc/peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../crypto/cryptography.dart';
@@ -125,7 +126,7 @@ enum WebrtcEventType {
 /// 核心的Peer，实现建立连接和sdp协商
 /// 代表一个本地与远程的webrtc连接，这个类不含业务含义，不包含与信号服务器的交互部分
 /// 有两个子类，分别代表主动发起连接的，和被动接受连接的，在两种场景下，协商过程中的行为稍有不同
-abstract class WebrtcCorePeer {
+abstract class BasePeerConnection {
   //唯一随机码，代表webrtc的连接
   late String id;
 
@@ -145,10 +146,10 @@ abstract class WebrtcCorePeer {
   late String dataChannelLabel;
 
   //本地的媒体流，在初始化的时候设置
-  late List<MediaStream> streams;
+  List<PeerVideoRenderer> localVideoRenders = [];
 
   //远程媒体流，在onTrack的回调方法中得到
-  List<MediaStream> remoteStreams = [];
+  List<PeerVideoRenderer> remoteVideoRenders = [];
 
   //远程媒体流的轨道和对应的流的数组
   List<Map<MediaStreamTrack, MediaStream>> remoteTracks = [];
@@ -192,7 +193,7 @@ abstract class WebrtcCorePeer {
     ],
   };
 
-  WebrtcCorePeer();
+  BasePeerConnection();
 
   ///初始化连接，可以传入外部视频流，这是异步的函数，不能在构造里调用
   ///建立连接对象，设置好回调函数，然后如果是master发起协商，如果是follow，在收到offer才开始创建，
@@ -265,7 +266,11 @@ abstract class WebrtcCorePeer {
     }
 
     /// 4.把本地的现有的视频流加入到连接中，这个流可以由参数传入
-    this.streams = streams;
+    if (streams.isNotEmpty) {
+      for (var stream in streams) {
+        localVideoRenders.add(PeerVideoRenderer(mediaStream: stream));
+      }
+    }
     if (streams.isNotEmpty) {
       for (var stream in streams) {
         addStream(stream);
@@ -508,13 +513,13 @@ abstract class WebrtcCorePeer {
       emit(WebrtcEventType.track, {event.track: eventStream});
       remoteTracks.add({event.track: eventStream});
 
-      if (remoteStreams.isNotEmpty) {
-        if (remoteStreams[0].id == eventStream.id) {
+      if (remoteVideoRenders.isNotEmpty) {
+        if (remoteVideoRenders[0].id == eventStream.id) {
           return;
         }
       }
 
-      remoteStreams.add(eventStream);
+      remoteVideoRenders.add(PeerVideoRenderer(mediaStream: eventStream));
       logger.i('on stream');
       emit(WebrtcEventType.stream, eventStream);
     }
@@ -580,7 +585,7 @@ abstract class WebrtcCorePeer {
     destroyed = true;
     connected = false;
     remoteTracks = [];
-    remoteStreams = [];
+    remoteVideoRenders = [];
     trackSenders = {};
 
     final dataChannel = this.dataChannel;
@@ -618,8 +623,8 @@ abstract class WebrtcCorePeer {
 }
 
 ///主动发起连接的一方
-class MasterWebrtcCorePeer extends WebrtcCorePeer {
-  MasterWebrtcCorePeer();
+class MasterPeerConnection extends BasePeerConnection {
+  MasterPeerConnection();
 
   ///主叫发起协商过程
   @override
@@ -749,8 +754,8 @@ class MasterWebrtcCorePeer extends WebrtcCorePeer {
 }
 
 ///在收到主动方的signal后，如果不存在，则创建
-class FollowWebrtcCorePeer extends WebrtcCorePeer {
-  FollowWebrtcCorePeer();
+class FollowPeerConnection extends BasePeerConnection {
+  FollowPeerConnection();
 
   ///被叫的协商时发送再协商信号给主叫，要求重新发起协商
   @override

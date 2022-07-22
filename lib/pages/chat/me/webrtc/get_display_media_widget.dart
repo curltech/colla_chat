@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../../../provider/app_data_provider.dart';
-import '../../../../transport/webrtc/webrtc_core.dart';
+import '../../../../transport/webrtc/peer_video_render.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/app_bar_widget.dart';
 import '../../../../widgets/common/widget_mixin.dart';
@@ -31,7 +31,7 @@ class GetDisplayMediaWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
-  WebrtcRenderer webrtcRenderer = WebrtcRenderer();
+  PeerVideoRenderer peerVideoRenderer = PeerVideoRenderer();
   bool _inCalling = false;
   DesktopCapturerSource? selectedSource;
 
@@ -57,9 +57,9 @@ class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
     });
 
     try {
-      await webrtcRenderer.getDisplayMedia(selectedSource: selectedSource);
-      await webrtcRenderer.enumerateDevices();
-      await webrtcRenderer.bindRTCVideoRenderer();
+      await peerVideoRenderer.getDisplayMedia(selectedSource: selectedSource);
+      await peerVideoRenderer.enumerateDevices();
+      await peerVideoRenderer.bindRTCVideoRenderer();
       var stream =
           await navigator.mediaDevices.getDisplayMedia(<String, dynamic>{
         'video': selectedSource == null
@@ -85,7 +85,7 @@ class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
 
   void _hangUp() async {
     try {
-      webrtcRenderer.dispose();
+      peerVideoRenderer.dispose();
       setState(() {
         _inCalling = false;
       });
@@ -107,7 +107,7 @@ class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             decoration: const BoxDecoration(color: Colors.black),
-            child: webrtcRenderer.createView(mirror: true),
+            child: peerVideoRenderer.createView(mirror: true),
           ),
         );
       },

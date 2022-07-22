@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:colla_chat/entity/dht/myself.dart';
-import 'package:colla_chat/transport/webrtc/webrtc_core_peer.dart';
-import 'package:colla_chat/transport/webrtc/webrtc_peer.dart';
+import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/peer_connection.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
@@ -100,17 +100,14 @@ class LruQueue<T> {
 }
 
 /// webrtc的连接池，键值是对方的peerId
-class WebrtcPeerPool {
-  static late WebrtcPeerPool _instance;
-  static bool initStatus = false;
-
+class PeerConnectionPool {
   ///自己的peerId,clientId和公钥
   late String peerId;
-  late SimplePublicKey peerPublicKey;
   late String clientId;
+  late SimplePublicKey peerPublicKey;
 
   ///对方的队列，每一个peerId的元素是一个列表，具有相同的peerId和不同的clientId
-  LruQueue<List<WebrtcPeer>> webrtcPeers = LruQueue();
+  LruQueue<List<PeerConnection>> peerConnections = LruQueue();
 
   //所以注册的事件处理器
   Map<String, Function> events = {};
@@ -119,17 +116,7 @@ class WebrtcPeerPool {
   late SignalAction _signalAction;
   Map<String, dynamic> protocolHandlers = {};
 
-  static WebrtcPeerPool get instance {
-    if (!initStatus) {
-      _instance = WebrtcPeerPool();
-      _instance.registerSignalAction(signalAction);
-      initStatus = true;
-    }
-
-    return _instance;
-  }
-
-  WebrtcPeerPool() {
+  PeerConnectionPool() {
     var peerId = myself.peerId;
     if (peerId == null) {
       throw 'myself peerId is null';
@@ -146,12 +133,13 @@ class WebrtcPeerPool {
     }
     this.peerPublicKey = peerPublicKey;
     _signalAction = signalAction;
+    registerSignalAction(signalAction);
     registerEvent(WebrtcEventType.signal.name, sendSignal);
     registerEvent(WebrtcEventType.data.name, receiveData);
   }
 
   registerSignalAction(SignalAction signalAction) {
-    _signalAction.registerReceiver(WebrtcPeerPool.instance.receive);
+    _signalAction.registerReceiver(receive);
   }
 
   registerProtocolHandler(String protocol, dynamic receiveHandler) {
@@ -166,20 +154,20 @@ class WebrtcPeerPool {
   /// 如果不存在，创建一个新的连接，发起连接尝试
   /// 否则，根据connected状态判断连接是否已经建立
   /// @param peerId
-  List<WebrtcPeer>? get(String peerId) {
-    if (webrtcPeers.containsKey(peerId)) {
-      return webrtcPeers.use(peerId);
+  List<PeerConnection>? get(String peerId) {
+    if (peerConnections.containsKey(peerId)) {
+      return peerConnections.use(peerId);
     }
 
     return null;
   }
 
-  WebrtcPeer? getOne(String peerId, String clientId) {
-    List<WebrtcPeer>? webrtcPeers = get(peerId);
-    if (webrtcPeers != null && webrtcPeers.isNotEmpty) {
-      for (WebrtcPeer webrtcPeer in webrtcPeers) {
-        if (webrtcPeer.clientId == clientId) {
-          return webrtcPeer;
+  PeerConnection? getOne(String peerId, String clientId) {
+    List<PeerConnection>? peerConnections = get(peerId);
+    if (peerConnections != null && peerConnections.isNotEmpty) {
+      for (PeerConnection peerConnection in peerConnections) {
+        if (peerConnection.clientId == clientId) {
+          return peerConnection;
         }
       }
     }
@@ -188,47 +176,48 @@ class WebrtcPeerPool {
   }
 
   ///主动方创建
-  Future<WebrtcPeer?> create(String peerId, String clientId,
+  Future<PeerConnection?> create(String peerId, String clientId,
       {List<MediaStream> streams = const [],
       List<Map<String, String>>? iceServers,
       Router? router}) async {
-    List<WebrtcPeer>? webrtcPeers = this.webrtcPeers.get(peerId);
-    webrtcPeers ??= [];
-    var webrtcPeer = WebrtcPeer();
-    bool result = await webrtcPeer.init(peerId, clientId, true,
+    List<PeerConnection>? peerConnections = this.peerConnections.get(peerId);
+    peerConnections ??= [];
+    var peerConnection = PeerConnection();
+    bool result = await peerConnection.init(peerId, clientId, true,
         streams: streams, iceServers: iceServers, router: router);
     if (!result) {
       logger.e('webrtcPeer.init fail');
       return null;
     }
-    webrtcPeers.add(webrtcPeer);
+    peerConnections.add(peerConnection);
 
     ///如果有溢出的连接，将溢出连接关闭
-    List<WebrtcPeer>? outs = this.webrtcPeers.put(peerId, webrtcPeers);
+    List<PeerConnection>? outs =
+        this.peerConnections.put(peerId, peerConnections);
     if (outs != null && outs.isNotEmpty) {
-      for (WebrtcPeer out in outs) {
+      for (PeerConnection out in outs) {
         await out.destroy('over max webrtc peer number, knocked out');
       }
     }
-    return webrtcPeer;
+    return peerConnection;
   }
 
   Future<bool> remove(String peerId, {String? clientId}) async {
-    List<WebrtcPeer>? webrtcPeers = this.webrtcPeers.get(peerId);
-    if (webrtcPeers == null) {
+    List<PeerConnection>? peerConnections = this.peerConnections.get(peerId);
+    if (peerConnections == null) {
       return false;
     }
-    if (webrtcPeers.isNotEmpty) {
-      for (WebrtcPeer webrtcPeer in webrtcPeers) {
+    if (peerConnections.isNotEmpty) {
+      for (PeerConnection peerConnection in peerConnections) {
         if (clientId == null ||
-            webrtcPeer.clientId == null ||
-            clientId == webrtcPeer.clientId) {
-          webrtcPeers.remove(webrtcPeer);
-          await webrtcPeer.destroy('remove webrtcPeer');
+            peerConnection.clientId == null ||
+            clientId == peerConnection.clientId) {
+          peerConnections.remove(peerConnection);
+          await peerConnection.destroy('remove webrtcPeer');
         }
       }
-      if (webrtcPeers.isEmpty) {
-        this.webrtcPeers.remove(peerId);
+      if (peerConnections.isEmpty) {
+        this.peerConnections.remove(peerId);
       }
 
       return true;
@@ -236,29 +225,30 @@ class WebrtcPeerPool {
     return false;
   }
 
-  Future<bool> removeWebrtcPeer(String peerId, WebrtcPeer webrtcPeer) async {
-    List<WebrtcPeer>? webrtcPeers = this.webrtcPeers.get(peerId);
-    if (webrtcPeers != null && webrtcPeers.isNotEmpty) {
+  Future<bool> removePeerConnection(
+      String peerId, PeerConnection peerConnection) async {
+    List<PeerConnection>? peerConnections = this.peerConnections.get(peerId);
+    if (peerConnections != null && peerConnections.isNotEmpty) {
       bool connected_ = false;
-      for (WebrtcPeer webrtcPeer_ in webrtcPeers) {
-        if (webrtcPeer_ == webrtcPeer) {
+      for (PeerConnection peerConnection_ in peerConnections) {
+        if (peerConnection_ == peerConnection) {
           logger.i('emit removeWebrtcPeer self');
-          webrtcPeers.remove(webrtcPeer);
-          await webrtcPeer.destroy('rmoved');
+          peerConnections.remove(peerConnection);
+          await peerConnection.destroy('rmoved');
         } else {
           logger.i('emit do not removeWebrtcPeer,because other');
-          if (webrtcPeer_.connected) {
+          if (peerConnection_.connected) {
             connected_ = true;
             logger.i('other && connected');
           }
         }
       }
-      if (webrtcPeers.isEmpty) {
-        WebrtcPeerPool.instance.webrtcPeers.remove(peerId);
+      if (peerConnections.isEmpty) {
+        this.peerConnections.remove(peerId);
       }
       if (!connected_) {
         await emit(WebrtcEventType.close.name,
-            WebrtcEvent(webrtcPeer.peerId, webrtcPeer.clientId));
+            WebrtcEvent(peerConnection.peerId, peerConnection.clientId));
       }
 
       return true;
@@ -269,37 +259,37 @@ class WebrtcPeerPool {
 
   /// 获取连接已经建立的连接，可能是多个
   /// @param peerId
-  List<WebrtcPeer>? getConnected(String peerId) {
-    List<WebrtcPeer> peers = [];
-    List<WebrtcPeer>? webrtcPeers = this.webrtcPeers.get(peerId);
-    if (webrtcPeers != null && webrtcPeers.isNotEmpty) {
-      for (WebrtcPeer webrtcPeer in webrtcPeers) {
-        if (webrtcPeer.connected) {
-          peers.add(webrtcPeer);
+  List<PeerConnection>? getConnected(String peerId) {
+    List<PeerConnection> peerConnections_ = [];
+    List<PeerConnection>? peerConnections = this.peerConnections.get(peerId);
+    if (peerConnections != null && peerConnections.isNotEmpty) {
+      for (PeerConnection peerConnection in peerConnections) {
+        if (peerConnection.connected) {
+          peerConnections_.add(peerConnection);
         }
       }
     }
-    if (peers.isNotEmpty) {
-      return peers;
+    if (peerConnections_.isNotEmpty) {
+      return peerConnections_;
     }
 
     return null;
   }
 
-  List<WebrtcPeer> getAll() {
-    List<WebrtcPeer> webrtcPeers = [];
-    for (var peers in this.webrtcPeers.all) {
+  List<PeerConnection> getAll() {
+    List<PeerConnection> peerConnections = [];
+    for (var peers in this.peerConnections.all) {
       for (var peer in peers) {
-        webrtcPeers.add(peer);
+        peerConnections.add(peer);
       }
     }
-    return webrtcPeers;
+    return peerConnections;
   }
 
   clear() async {
-    var webrtcPeers = getAll();
-    for (var peer in webrtcPeers) {
-      var peerId = peer.peerId;
+    var peerConnections = getAll();
+    for (var peerConnection in peerConnections) {
+      var peerId = peerConnection.peerId;
       if (peerId != null) {
         await remove(peerId);
       }
@@ -337,10 +327,10 @@ class WebrtcPeerPool {
       logger.e('clientId is null');
       return;
     }
-    WebrtcPeer? webrtcPeer = getOne(peerId!, clientId);
+    PeerConnection? peerConnection = getOne(peerId!, clientId);
     // peerId的连接存在，而且已经连接，报错
-    if (webrtcPeer != null) {
-      if (webrtcPeer.connected) {
+    if (peerConnection != null) {
+      if (peerConnection.connected) {
         logger.e('peerId:$peerId clientId:$clientId is connected');
         return;
       }
@@ -362,36 +352,37 @@ class WebrtcPeerPool {
           }
         }
         // peerId的连接存在且未完成连接，重复收到offer，报错
-        if (webrtcPeer != null) {
+        if (peerConnection != null) {
           logger.e(
               'peerId:$peerId clientId:$clientId is exist, but is not connected completely');
           return;
         }
-        webrtcPeer = WebrtcPeer();
-        var result = await webrtcPeer.init(peerId, clientId, false,
+        peerConnection = PeerConnection();
+        var result = await peerConnection.init(peerId, clientId, false,
             iceServers: iceServers, router: router);
         if (!result) {
           logger.e('webrtcPeer.init fail');
           return null;
         }
-        webrtcPeer.connectPeerId = connectPeerId;
-        webrtcPeer.connectSessionId = connectSessionId;
-        List<WebrtcPeer>? webrtcPeers = this.webrtcPeers.get(peerId);
-        webrtcPeers ??= [];
-        webrtcPeers.add(webrtcPeer);
-        this.webrtcPeers.put(peerId, webrtcPeers);
-        await webrtcPeer.signal(signal);
+        peerConnection.connectPeerId = connectPeerId;
+        peerConnection.connectSessionId = connectSessionId;
+        List<PeerConnection>? peerConnections =
+            this.peerConnections.get(peerId);
+        peerConnections ??= [];
+        peerConnections.add(peerConnection);
+        this.peerConnections.put(peerId, peerConnections);
+        await peerConnection.signal(signal);
       } else if (type == 'answer') {
         // peerId的连接不存在，报错
-        if (webrtcPeer == null) {
+        if (peerConnection == null) {
           logger.e('peerId:$peerId clientId:$clientId is not exist');
           return;
         }
-        if (webrtcPeer.connectPeerId == null) {
-          webrtcPeer.connectPeerId = connectPeerId;
-          webrtcPeer.connectSessionId = connectSessionId;
+        if (peerConnection.connectPeerId == null) {
+          peerConnection.connectPeerId = connectPeerId;
+          peerConnection.connectSessionId = connectSessionId;
         }
-        await webrtcPeer.signal(signal);
+        await peerConnection.signal(signal);
       } else {
         logger.e('sdp is not offer or answer,err');
         return;
@@ -403,11 +394,11 @@ class WebrtcPeerPool {
   /// @param peerId
   /// @param data
   send(String peerId, Uint8List data) async {
-    List<WebrtcPeer>? webrtcPeers = get(peerId);
-    if (webrtcPeers != null && webrtcPeers.isNotEmpty) {
+    List<PeerConnection>? peerConnections = get(peerId);
+    if (peerConnections != null && peerConnections.isNotEmpty) {
       List<Future> ps = [];
-      for (var webrtcPeer in webrtcPeers) {
-        Future p = webrtcPeer.send(data);
+      for (var peerConnection in peerConnections) {
+        Future p = peerConnection.send(data);
         ps.add(p);
       }
       await Future.wait(ps);
@@ -426,7 +417,7 @@ class WebrtcPeerPool {
       Uint8List? data = await receiveHandler(event.data, remotePeerId, null);
       //如果有返回的响应数据，则发送回去，不可以调用同步的发送方法send
       if (data != null) {
-        WebrtcPeerPool.instance.send(remotePeerId, data);
+        send(remotePeerId, data);
       }
     }
   }
@@ -470,3 +461,5 @@ class WebrtcPeerPool {
     return null;
   }
 }
+
+final peerConnectionPool = PeerConnectionPool();
