@@ -5,7 +5,7 @@ import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../transport/webrtc/webrtc_core.dart';
+import '../../../../transport/webrtc/peer_video_render.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
@@ -29,10 +29,10 @@ class GetUserMediaWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
-  WebrtcRenderer webrtcRenderer = WebrtcRenderer();
+  PeerVideoRenderer peerVideoRenderer = PeerVideoRenderer();
   bool _inCalling = false;
   bool _isTorchOn = false;
-  bool get _isRec => webrtcRenderer.mediaRecorder != null;
+  bool get _isRec => peerVideoRenderer.mediaRecorder != null;
 
   @override
   void initState() {
@@ -42,9 +42,9 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   // Platform messages are asynchronous, so we initialize in an async method.
   void _makeCall() async {
     try {
-      await webrtcRenderer.getUserMedia();
-      await webrtcRenderer.enumerateDevices();
-      await webrtcRenderer.bindRTCVideoRenderer();
+      await peerVideoRenderer.getUserMedia();
+      await peerVideoRenderer.enumerateDevices();
+      await peerVideoRenderer.bindRTCVideoRenderer();
     } catch (e) {
       logger.e(e.toString());
     }
@@ -57,7 +57,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
 
   void _hangUp() async {
     try {
-      webrtcRenderer.dispose();
+      peerVideoRenderer.dispose();
       setState(() {
         _inCalling = false;
       });
@@ -67,21 +67,21 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   }
 
   void _startRecording() async {
-    webrtcRenderer.startRecording();
+    peerVideoRenderer.startRecording();
     setState(() {});
   }
 
   void _stopRecording() async {
-    webrtcRenderer.stopRecording();
+    peerVideoRenderer.stopRecording();
     setState(() {});
   }
 
   void _toggleTorch() async {
-    if (webrtcRenderer.mediaStream == null) {
+    if (peerVideoRenderer.mediaStream == null) {
       throw 'Stream is not initialized';
     }
 
-    final videoTrack = webrtcRenderer.mediaStream!
+    final videoTrack = peerVideoRenderer.mediaStream!
         .getVideoTracks()
         .firstWhere((track) => track.kind == 'video');
     final has = await videoTrack.hasTorch();
@@ -96,17 +96,17 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   }
 
   void _toggleCamera() async {
-    if (webrtcRenderer.mediaStream == null) {
+    if (peerVideoRenderer.mediaStream == null) {
       throw 'Stream is not initialized';
     }
-    webrtcRenderer.switchCamera();
+    peerVideoRenderer.switchCamera();
   }
 
   void _captureFrame() async {
-    if (webrtcRenderer.mediaStream == null) {
+    if (peerVideoRenderer.mediaStream == null) {
       throw 'Stream is not initialized';
     }
-    final frame = await webrtcRenderer.captureFrame();
+    final frame = await peerVideoRenderer.captureFrame();
     if (frame != null) {
       await showDialog(
           context: context,
@@ -132,7 +132,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             decoration: const BoxDecoration(color: Colors.black),
-            child: webrtcRenderer.createView(mirror: true),
+            child: peerVideoRenderer.createView(mirror: true),
           ),
         );
       },
@@ -140,7 +140,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   }
 
   List<Widget>? _buildActions(BuildContext context) {
-    var mediaDevicesList = webrtcRenderer.mediaDevicesList;
+    var mediaDevicesList = peerVideoRenderer.mediaDevicesList;
     return _inCalling
         ? <Widget>[
             IconButton(
@@ -205,7 +205,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   }
 
   void _selectAudioOutput(String deviceId) {
-    webrtcRenderer.renderer!.audioOutput(deviceId);
+    peerVideoRenderer.renderer!.audioOutput(deviceId);
   }
 
   @override

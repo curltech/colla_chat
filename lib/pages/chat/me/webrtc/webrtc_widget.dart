@@ -1,3 +1,4 @@
+import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_widget.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:flutter/material.dart';
 
@@ -7,6 +8,7 @@ import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 import '../../../../widgets/data_bind/data_listtile.dart';
 import '../../../../widgets/data_bind/data_listview.dart';
+import 'data_channel_widget.dart';
 import 'get_display_media_widget.dart';
 import 'get_user_media_widget.dart';
 
@@ -28,7 +30,13 @@ final List<TileData> webrtcTileData = [
   TileData(
       icon: Icon(Icons.data_array,
           color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'DataChannel'),
+      title: 'DataChannel',
+      routeName: 'data_channel'),
+  TileData(
+      icon: Icon(Icons.video_call,
+          color: appDataProvider.themeData?.colorScheme.primary),
+      title: 'PeerConnection',
+      routeName: 'peer_connection'),
 ];
 
 //设置页面，带有回退回调函数
@@ -42,6 +50,10 @@ class WebrtcWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(getUserMediaWidget);
     GetDisplayMediaWidget getDisplayMediaWidget = GetDisplayMediaWidget();
     indexWidgetProvider.define(getDisplayMediaWidget);
+    DataChannelWidget dataChannelWidget = DataChannelWidget();
+    indexWidgetProvider.define(dataChannelWidget);
+    PeerConnectionWidget peerConnectionWidget = PeerConnectionWidget();
+    indexWidgetProvider.define(peerConnectionWidget);
   }
 
   @override
