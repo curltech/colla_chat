@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
-import 'package:colla_chat/transport/webrtc/peer_connection.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
@@ -107,13 +107,10 @@ class PeerConnectionPool {
   late SimplePublicKey peerPublicKey;
 
   ///对方的队列，每一个peerId的元素是一个列表，具有相同的peerId和不同的clientId
-  LruQueue<List<PeerConnection>> peerConnections = LruQueue();
+  LruQueue<List<AdvancedPeerConnection>> peerConnections = LruQueue();
 
   //所以注册的事件处理器
   Map<String, Function> events = {};
-
-  //signal事件的处理器
-  late SignalAction _signalAction;
   Map<String, dynamic> protocolHandlers = {};
 
   PeerConnectionPool() {
@@ -132,14 +129,8 @@ class PeerConnectionPool {
       throw 'myself peerPublicKey is null';
     }
     this.peerPublicKey = peerPublicKey;
-    _signalAction = signalAction;
-    registerSignalAction(signalAction);
     registerEvent(WebrtcEventType.signal.name, sendSignal);
     registerEvent(WebrtcEventType.data.name, receiveData);
-  }
-
-  registerSignalAction(SignalAction signalAction) {
-    _signalAction.registerReceiver(receive);
   }
 
   registerProtocolHandler(String protocol, dynamic receiveHandler) {
@@ -154,7 +145,7 @@ class PeerConnectionPool {
   /// 如果不存在，创建一个新的连接，发起连接尝试
   /// 否则，根据connected状态判断连接是否已经建立
   /// @param peerId
-  List<PeerConnection>? get(String peerId) {
+  List<AdvancedPeerConnection>? get(String peerId) {
     if (peerConnections.containsKey(peerId)) {
       return peerConnections.use(peerId);
     }
@@ -162,10 +153,10 @@ class PeerConnectionPool {
     return null;
   }
 
-  PeerConnection? getOne(String peerId, String clientId) {
-    List<PeerConnection>? peerConnections = get(peerId);
+  AdvancedPeerConnection? getOne(String peerId, String clientId) {
+    List<AdvancedPeerConnection>? peerConnections = get(peerId);
     if (peerConnections != null && peerConnections.isNotEmpty) {
-      for (PeerConnection peerConnection in peerConnections) {
+      for (AdvancedPeerConnection peerConnection in peerConnections) {
         if (peerConnection.clientId == clientId) {
           return peerConnection;
         }
@@ -176,15 +167,20 @@ class PeerConnectionPool {
   }
 
   ///主动方创建
-  Future<PeerConnection?> create(String peerId, String clientId,
-      {List<MediaStream> streams = const [],
+  Future<AdvancedPeerConnection?> create(String peerId, String clientId,
+      {bool getUserMedia = false,
+      List<MediaStream> streams = const [],
       List<Map<String, String>>? iceServers,
-      Router? router}) async {
-    List<PeerConnection>? peerConnections = this.peerConnections.get(peerId);
+      Room? router}) async {
+    List<AdvancedPeerConnection>? peerConnections =
+        this.peerConnections.get(peerId);
     peerConnections ??= [];
-    var peerConnection = PeerConnection();
+    var peerConnection = AdvancedPeerConnection();
     bool result = await peerConnection.init(peerId, clientId, true,
-        streams: streams, iceServers: iceServers, router: router);
+        getUserMedia: getUserMedia,
+        streams: streams,
+        iceServers: iceServers,
+        room: router);
     if (!result) {
       logger.e('webrtcPeer.init fail');
       return null;
@@ -192,28 +188,30 @@ class PeerConnectionPool {
     peerConnections.add(peerConnection);
 
     ///如果有溢出的连接，将溢出连接关闭
-    List<PeerConnection>? outs =
+    List<AdvancedPeerConnection>? outs =
         this.peerConnections.put(peerId, peerConnections);
     if (outs != null && outs.isNotEmpty) {
-      for (PeerConnection out in outs) {
-        await out.destroy('over max webrtc peer number, knocked out');
+      for (AdvancedPeerConnection out in outs) {
+        logger.e('over max webrtc peer number, knocked out');
+        await out.close();
       }
     }
     return peerConnection;
   }
 
   Future<bool> remove(String peerId, {String? clientId}) async {
-    List<PeerConnection>? peerConnections = this.peerConnections.get(peerId);
+    List<AdvancedPeerConnection>? peerConnections =
+        this.peerConnections.get(peerId);
     if (peerConnections == null) {
       return false;
     }
     if (peerConnections.isNotEmpty) {
-      for (PeerConnection peerConnection in peerConnections) {
+      for (AdvancedPeerConnection peerConnection in peerConnections) {
         if (clientId == null ||
             peerConnection.clientId == null ||
             clientId == peerConnection.clientId) {
           peerConnections.remove(peerConnection);
-          await peerConnection.destroy('remove webrtcPeer');
+          await peerConnection.close();
         }
       }
       if (peerConnections.isEmpty) {
@@ -226,15 +224,16 @@ class PeerConnectionPool {
   }
 
   Future<bool> removePeerConnection(
-      String peerId, PeerConnection peerConnection) async {
-    List<PeerConnection>? peerConnections = this.peerConnections.get(peerId);
+      String peerId, AdvancedPeerConnection peerConnection) async {
+    List<AdvancedPeerConnection>? peerConnections =
+        this.peerConnections.get(peerId);
     if (peerConnections != null && peerConnections.isNotEmpty) {
       bool connected_ = false;
-      for (PeerConnection peerConnection_ in peerConnections) {
+      for (AdvancedPeerConnection peerConnection_ in peerConnections) {
         if (peerConnection_ == peerConnection) {
           logger.i('emit removeWebrtcPeer self');
           peerConnections.remove(peerConnection);
-          await peerConnection.destroy('rmoved');
+          await peerConnection.close();
         } else {
           logger.i('emit do not removeWebrtcPeer,because other');
           if (peerConnection_.connected) {
@@ -259,11 +258,12 @@ class PeerConnectionPool {
 
   /// 获取连接已经建立的连接，可能是多个
   /// @param peerId
-  List<PeerConnection>? getConnected(String peerId) {
-    List<PeerConnection> peerConnections_ = [];
-    List<PeerConnection>? peerConnections = this.peerConnections.get(peerId);
+  List<AdvancedPeerConnection>? getConnected(String peerId) {
+    List<AdvancedPeerConnection> peerConnections_ = [];
+    List<AdvancedPeerConnection>? peerConnections =
+        this.peerConnections.get(peerId);
     if (peerConnections != null && peerConnections.isNotEmpty) {
-      for (PeerConnection peerConnection in peerConnections) {
+      for (AdvancedPeerConnection peerConnection in peerConnections) {
         if (peerConnection.connected) {
           peerConnections_.add(peerConnection);
         }
@@ -276,8 +276,8 @@ class PeerConnectionPool {
     return null;
   }
 
-  List<PeerConnection> getAll() {
-    List<PeerConnection> peerConnections = [];
+  List<AdvancedPeerConnection> getAll() {
+    List<AdvancedPeerConnection> peerConnections = [];
     for (var peers in this.peerConnections.all) {
       for (var peer in peers) {
         peerConnections.add(peer);
@@ -311,7 +311,7 @@ class PeerConnectionPool {
     logger.i('receive signal type: $signalType from webrtcPeer: $peerId');
     String? clientId;
     List<Map<String, String>>? iceServers;
-    Router? router;
+    Room? room;
     var extension = signal.extension;
     if (extension != null) {
       if (peerId != extension.peerId) {
@@ -321,13 +321,13 @@ class PeerConnectionPool {
       }
       clientId = extension.clientId;
       iceServers = extension.iceServers;
-      router = extension.router;
+      room = extension.room;
     }
     if (clientId == null) {
       logger.e('clientId is null');
       return;
     }
-    PeerConnection? peerConnection = getOne(peerId!, clientId);
+    AdvancedPeerConnection? peerConnection = getOne(peerId!, clientId);
     // peerId的连接存在，而且已经连接，报错
     if (peerConnection != null) {
       if (peerConnection.connected) {
@@ -357,16 +357,18 @@ class PeerConnectionPool {
               'peerId:$peerId clientId:$clientId is exist, but is not connected completely');
           return;
         }
-        peerConnection = PeerConnection();
+
+        ///如果收到offer，创建被叫连接
+        peerConnection = AdvancedPeerConnection();
         var result = await peerConnection.init(peerId, clientId, false,
-            iceServers: iceServers, router: router);
+            getUserMedia: true, iceServers: iceServers, room: room);
         if (!result) {
           logger.e('webrtcPeer.init fail');
           return null;
         }
         peerConnection.connectPeerId = connectPeerId;
         peerConnection.connectSessionId = connectSessionId;
-        List<PeerConnection>? peerConnections =
+        List<AdvancedPeerConnection>? peerConnections =
             this.peerConnections.get(peerId);
         peerConnections ??= [];
         peerConnections.add(peerConnection);
@@ -394,7 +396,7 @@ class PeerConnectionPool {
   /// @param peerId
   /// @param data
   send(String peerId, Uint8List data) async {
-    List<PeerConnection>? peerConnections = get(peerId);
+    List<AdvancedPeerConnection>? peerConnections = get(peerId);
     if (peerConnections != null && peerConnections.isNotEmpty) {
       List<Future> ps = [];
       for (var peerConnection in peerConnections) {
@@ -450,7 +452,7 @@ class PeerConnectionPool {
   Future<dynamic> sendSignal(WebrtcEvent evt) async {
     try {
       var peerId = evt.peerId;
-      var result = await _signalAction.signal(evt.data, peerId);
+      var result = await signalAction.signal(evt.data, peerId);
       if (result == 'ERROR') {
         logger.e('signal err:$result');
       }

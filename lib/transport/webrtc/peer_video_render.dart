@@ -16,7 +16,11 @@ class PeerVideoRenderer {
   MediaRecorder? mediaRecorder;
   List<MediaDeviceInfo>? mediaDevicesList;
 
-  PeerVideoRenderer({this.mediaStream});
+  PeerVideoRenderer({this.mediaStream}) {
+    if (mediaStream != null) {
+      id = mediaStream!.id;
+    }
+  }
 
   ///获取本机视频流
   Future<void> getUserMedia(

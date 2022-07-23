@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:colla_chat/transport/webrtc/peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
@@ -65,16 +65,16 @@ class WebrtcSignal {
 }
 
 ///加入的房间号
-class Router {
+class Room {
   String? id;
   String? type;
   String? action;
   String? roomId;
   String? identity;
 
-  Router(this.roomId, {this.id, this.type, this.action, this.identity});
+  Room(this.roomId, {this.id, this.type, this.action, this.identity});
 
-  Router.fromJson(Map json) {
+  Room.fromJson(Map json) {
     id = json['id'];
     roomId = json['roomId'];
     type = json['type'];
@@ -123,7 +123,7 @@ enum WebrtcEventType {
   dataChannelState,
 }
 
-/// 核心的Peer，实现建立连接和sdp协商
+/// 基础的PeerConnection，实现建立连接和sdp协商
 /// 代表一个本地与远程的webrtc连接，这个类不含业务含义，不包含与信号服务器的交互部分
 /// 有两个子类，分别代表主动发起连接的，和被动接受连接的，在两种场景下，协商过程中的行为稍有不同
 abstract class BasePeerConnection {
@@ -145,10 +145,10 @@ abstract class BasePeerConnection {
   //数据通道的标签
   late String dataChannelLabel;
 
-  //本地的媒体流，在初始化的时候设置
+  //本地的媒体流渲染器数组，在初始化的时候设置
   List<PeerVideoRenderer> localVideoRenders = [];
 
-  //远程媒体流，在onTrack的回调方法中得到
+  //远程媒体流渲染器数组，在onAddStream,onAddTrack等的回调方法中得到
   List<PeerVideoRenderer> remoteVideoRenders = [];
 
   //远程媒体流的轨道和对应的流的数组
@@ -200,7 +200,8 @@ abstract class BasePeerConnection {
   ///只有协商完成，数据通道打开，才算真正完成连接
   ///可输入的参数包括外部媒体流和定制扩展属性
   Future<bool> init(
-      {List<MediaStream> streams = const [],
+      {bool getUserMedia = false,
+      List<MediaStream> streams = const [],
       required SignalExtension extension}) async {
     id = await cryptoGraphy.getRandomAsciiString(length: 8);
     this.extension = extension;
@@ -266,19 +267,40 @@ abstract class BasePeerConnection {
     }
 
     /// 4.把本地的现有的视频流加入到连接中，这个流可以由参数传入
-    if (streams.isNotEmpty) {
-      for (var stream in streams) {
-        localVideoRenders.add(PeerVideoRenderer(mediaStream: stream));
-      }
+    if (getUserMedia) {
+      var render = PeerVideoRenderer();
+      render.getUserMedia();
+      render.bindRTCVideoRenderer();
+      localVideoRenders.add(render);
+      var streamId = render.mediaStream!.id;
+      addStream(render.mediaStream!);
+      logger.i('add getUserMedia stream $streamId');
     }
     if (streams.isNotEmpty) {
       for (var stream in streams) {
+        var render = PeerVideoRenderer(mediaStream: stream);
+        render.bindRTCVideoRenderer();
+        localVideoRenders.add(render);
         addStream(stream);
+        var streamId = stream.id;
+        logger.i('add stream $streamId');
       }
     }
-    logger.i('addStream end');
 
     /// 5.建立连接的监听轨道到来的监听器，当远方由轨道来的时候执行
+    peerConnection.onAddStream = (MediaStream stream) {
+      onAddStream(stream);
+    };
+    peerConnection.onRemoveStream = (MediaStream stream) {
+      onRemoveStream(stream);
+    };
+    peerConnection.onAddTrack = (MediaStream stream, MediaStreamTrack track) {
+      onAddTrack(stream, track);
+    };
+    peerConnection.onRemoveTrack =
+        (MediaStream stream, MediaStreamTrack track) {
+      onRemoveTrack(stream, track);
+    };
     peerConnection.onTrack = (RTCTrackEvent event) {
       onTrack(event);
     };
@@ -302,7 +324,8 @@ abstract class BasePeerConnection {
     emit(WebrtcEventType.connectionState, state);
     if (peerConnection.connectionState ==
         RTCPeerConnectionState.RTCPeerConnectionStateFailed) {
-      destroy('Connection failed.ERR_CONNECTION_FAILURE');
+      logger.e('Connection failed.ERR_CONNECTION_FAILURE');
+      close();
     }
   }
 
@@ -320,10 +343,12 @@ abstract class BasePeerConnection {
       connected = true;
     }
     if (state == RTCIceConnectionState.RTCIceConnectionStateFailed) {
-      destroy('Ice connection failed.,ERR_ICE_CONNECTION_FAILURE');
+      logger.e('Ice connection failed.,ERR_ICE_CONNECTION_FAILURE');
+      close();
     }
     if (state == RTCIceConnectionState.RTCIceConnectionStateClosed) {
-      destroy('Ice connection closed.,ERR_ICE_CONNECTION_CLOSED');
+      logger.e('Ice connection closed.,ERR_ICE_CONNECTION_CLOSED');
+      close();
     }
   }
 
@@ -384,7 +409,7 @@ abstract class BasePeerConnection {
     //数据通道关闭
     if (state == RTCDataChannelState.RTCDataChannelClosed) {
       logger.i('on channel close');
-      destroy('');
+      close();
     }
   }
 
@@ -458,8 +483,9 @@ abstract class BasePeerConnection {
       if (sender.replaceTrack != null) {
         await sender.replaceTrack(newTrack);
       } else {
-        destroy(
+        logger.e(
             'replaceTrack is not supported in this browser,ERR_UNSUPPORTED_REPLACETRACK');
+        close();
       }
     }
   }
@@ -482,7 +508,8 @@ abstract class BasePeerConnection {
         //sender.removed = true;
         await peerConnection.removeTrack(sender);
       } catch (err) {
-        destroy('ERR_REMOVE_TRACK');
+        logger.e('ERR_REMOVE_TRACK');
+        close();
       }
       negotiate();
     }
@@ -499,6 +526,24 @@ abstract class BasePeerConnection {
     for (var track in tracks) {
       removeTrack(track, stream);
     }
+  }
+
+  ///对远端的连接来说，当有stream或者track到来时触发
+  ///此处将流加入到render中
+  onAddStream(stream) {
+    logger.i('onAddStream event');
+  }
+
+  onRemoveStream(stream) {
+    logger.i('onRemoveStream event');
+  }
+
+  onAddTrack(stream, track) {
+    logger.i('onAddTrack event');
+  }
+
+  onRemoveTrack(stream, track) {
+    logger.i('onRemoveTrack event');
   }
 
   ///连接的监听轨道到来的监听器，当远方由轨道来的时候执行
@@ -577,8 +622,7 @@ abstract class BasePeerConnection {
   }
 
   ///关闭连接
-  destroy(String err) {
-    logger.i('destroying (error: $err)');
+  close() {
     if (destroyed) {
       return;
     }
@@ -617,7 +661,7 @@ abstract class BasePeerConnection {
       peerConnection.onTrack = null;
       peerConnection.onDataChannel = null;
     }
-    emit(WebrtcEventType.error, err);
+    emit(WebrtcEventType.error, '');
     emit(WebrtcEventType.close, '');
   }
 }
@@ -748,7 +792,7 @@ class MasterPeerConnection extends BasePeerConnection {
       negotiate();
     } catch (err) {
       logger.e(err);
-      destroy('$err.ERR_ADD_TRANSCEIVER');
+      close();
     }
   }
 }

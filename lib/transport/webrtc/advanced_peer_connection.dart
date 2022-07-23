@@ -10,16 +10,16 @@ import '../../provider/app_data_provider.dart';
 class SignalExtension {
   late String peerId;
   late String clientId;
-  Router? router;
+  Room? room;
   List<Map<String, String>>? iceServers;
 
-  SignalExtension(this.peerId, this.clientId, {this.router, this.iceServers});
+  SignalExtension(this.peerId, this.clientId, {this.room, this.iceServers});
 
   SignalExtension.fromJson(Map json) {
     peerId = json['peerId'];
     clientId = json['clientId'];
     Map<String, dynamic> router = json['router'];
-    this.router = Router(router['roomId'],
+    room = Room(router['roomId'],
         id: router['id'],
         type: router['type'],
         action: router['action'],
@@ -34,9 +34,9 @@ class SignalExtension {
       'clientId': clientId,
       'iceServers': iceServers,
     });
-    var router = this.router;
-    if (router != null) {
-      json['router'] = router.toJson();
+    var room = this.room;
+    if (room != null) {
+      json['room'] = room.toJson();
     }
     return json;
   }
@@ -50,9 +50,9 @@ class WebrtcEvent {
   WebrtcEvent(this.peerId, this.clientId, {this.data});
 }
 
-///核心的Peer之上加入了业务的编号，peerId和clientId
-class PeerConnection {
-  late BasePeerConnection peerConnection;
+///基础的PeerConnection之上加入了业务的编号，peerId和clientId，自动进行信号的协商
+class AdvancedPeerConnection {
+  late BasePeerConnection basePeerConnection;
 
   //对方的参数
   late String peerId;
@@ -60,58 +60,55 @@ class PeerConnection {
   String? connectPeerId;
   String? connectSessionId;
   List<Map<String, String>>? iceServers = [];
-  List<MediaStream> localStreams = [];
-  List<MediaStream> remoteStreams = [];
-  Router? router;
+  Room? room;
   int? start;
   int? end;
 
-  PeerConnection();
+  AdvancedPeerConnection();
 
   Future<bool> init(String peerId, String clientId, bool initiator,
-      {List<MediaStream> streams = const [],
+      {bool getUserMedia = false,
+      List<MediaStream> streams = const [],
       List<Map<String, String>>? iceServers,
-      Router? router}) async {
+      Room? room}) async {
     this.peerId = peerId;
     this.clientId = clientId;
-    this.router = router;
+    this.room = room;
     var appDataProvider = AppDataProvider.instance;
     if (iceServers == null) {
       this.iceServers = appDataProvider.defaultNodeAddress.iceServers;
     } else {
       this.iceServers = iceServers;
     }
-    if (streams != null) {
-      localStreams.addAll(streams);
+    if (streams.isNotEmpty) {
+      for (var stream in streams) {
+        basePeerConnection.addStream(stream);
+      }
     }
     // 自定义属性，表示本节点createOffer时加入的sfu的编号，作为出版者还是订阅者，还是都是
-    this.router = router;
+    this.room = room;
     start = DateTime.now().millisecondsSinceEpoch;
     var myselfPeerId = myself.peerId;
     var myselfClientId = myself.clientId;
     SignalExtension extension;
     if (myselfPeerId != null && myselfClientId != null) {
       extension = SignalExtension(myselfPeerId, myselfClientId,
-          router: router, iceServers: iceServers);
+          room: room, iceServers: iceServers);
     } else {
       logger.e('myself peerId or clientId is null');
       return false;
     }
     bool result = false;
     if (initiator) {
-      this.peerConnection = MasterPeerConnection();
-      final peerConnection = this.peerConnection;
-      if (peerConnection != null) {
-        result =
-            await peerConnection.init(streams: streams, extension: extension);
-      }
+      basePeerConnection = MasterPeerConnection();
+      final peerConnection = basePeerConnection;
+      result = await peerConnection.init(
+          getUserMedia: getUserMedia, streams: streams, extension: extension);
     } else {
-      this.peerConnection = FollowPeerConnection();
-      final peerConnection = this.peerConnection;
-      if (peerConnection != null) {
-        result =
-            await peerConnection.init(streams: streams, extension: extension);
-      }
+      basePeerConnection = FollowPeerConnection();
+      final peerConnection = basePeerConnection;
+      result = await peerConnection.init(
+          getUserMedia: getUserMedia, streams: streams, extension: extension);
     }
     if (!result) {
       logger.e('WebrtcCorePeer init result is false');
@@ -119,7 +116,7 @@ class PeerConnection {
     }
     //下面的三个事件对于发起方和被发起方是一样的
     //可以发起信号
-    final peerConnection = this.peerConnection;
+    final peerConnection = basePeerConnection;
     peerConnection.on(WebrtcEventType.signal, (WebrtcSignal signal) async {
       await peerConnectionPool.emit(WebrtcEventType.signal.name,
           WebrtcEvent(peerId, clientId, data: signal));
@@ -137,9 +134,7 @@ class PeerConnection {
     });
 
     peerConnection.on(WebrtcEventType.close, (data) async {
-      if (this.peerId != null) {
-        await peerConnectionPool.remove(this.peerId!);
-      }
+      await peerConnectionPool.remove(this.peerId);
     });
 
     //收到数据
@@ -150,7 +145,6 @@ class PeerConnection {
     });
 
     peerConnection.on(WebrtcEventType.stream, (stream) async {
-      remoteStreams.add(stream);
       if (stream != null) {
         stream.onremovetrack = (event) {
           logger.i('Video track: ${event.track.label} removed');
@@ -175,7 +169,7 @@ class PeerConnection {
   }
 
   on(WebrtcEventType name, Function(dynamic)? fn) {
-    peerConnection.on(name, fn);
+    basePeerConnection.on(name, fn);
   }
 
   RTCVideoView attachStream(MediaStream stream) {
@@ -187,8 +181,7 @@ class PeerConnection {
 
   addStream(MediaStream stream) {
     logger.i('add stream to webrtc');
-    peerConnection.addStream(stream);
-    localStreams.add(stream);
+    basePeerConnection.addStream(stream);
   }
 
   ///
@@ -200,41 +193,44 @@ class PeerConnection {
   ///
   removeLocalStream(MediaStream stream) {
     int i = 0;
-    for (var stream_ in localStreams) {
-      if (stream_ == stream) {
-        localStreams.remove(stream_);
-        peerConnection.removeStream(stream_);
+    for (var render_ in basePeerConnection.localVideoRenders) {
+      if (render_.mediaStream == stream) {
+        render_.dispose();
+        basePeerConnection.localVideoRenders.remove(render_);
+        break;
       }
     }
   }
 
   ///
   removeRemoteStream(MediaStream stream) {
-    for (var stream_ in localStreams) {
-      if (stream_ == stream) {
-        remoteStreams.remove(stream_);
+    for (var render_ in basePeerConnection.remoteVideoRenders) {
+      if (render_.mediaStream == stream) {
+        render_.dispose();
+        basePeerConnection.remoteVideoRenders.remove(render_);
+        break;
       }
     }
   }
 
   signal(WebrtcSignal signal) {
-    peerConnection.signal(signal);
+    basePeerConnection.signal(signal);
   }
 
   bool get connected {
-    return peerConnection.connected;
+    return basePeerConnection.connected;
   }
 
   send(Uint8List data) {
-    if (peerConnection.connected) {
-      peerConnection.send(data);
+    if (basePeerConnection.connected) {
+      basePeerConnection.send(data);
     } else {
       logger.e(
           'send failed , peerId:$peerId;connectPeer:$connectPeerId session:$connectSessionId webrtc connection state is not connected');
     }
   }
 
-  destroy(String err) async {
-    await peerConnection.destroy(err);
+  close() async {
+    await basePeerConnection.close();
   }
 }
