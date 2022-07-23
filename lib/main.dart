@@ -46,7 +46,8 @@ Future<bool> startForegroundService() async {
   return FlutterBackground.enableBackgroundExecution();
 }
 
-void main() {
+void main(List<String> args) {
+  logger.i(args.toString());
   //初始化服务类
   // 也初始化了Provider管理的全局状态数据
   //  多状态的MultiProvider(
