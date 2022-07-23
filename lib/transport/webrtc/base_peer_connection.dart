@@ -108,10 +108,11 @@ final Map<String, dynamic> sdpConstraints = {
 
 ///可以注册的事件
 enum WebrtcEventType {
+  create, //创建被叫连接
   signal,
   connect,
   close,
-  data,
+  message,
   stream,
   track,
   error,
@@ -123,6 +124,17 @@ enum WebrtcEventType {
   dataChannelState,
 }
 
+enum PeerConnectionStatus {
+  created,
+  negotiating,
+  failed,
+  connected,
+  closed,
+  //激活和失活状态是连接被关闭，但是保存了sdp和candidate信息的情况下，快速恢复连接的操作，省去了协商过程
+  active,
+  inactive,
+}
+
 /// 基础的PeerConnection，实现建立连接和sdp协商
 /// 代表一个本地与远程的webrtc连接，这个类不含业务含义，不包含与信号服务器的交互部分
 /// 有两个子类，分别代表主动发起连接的，和被动接受连接的，在两种场景下，协商过程中的行为稍有不同
@@ -130,8 +142,19 @@ abstract class BasePeerConnection {
   //唯一随机码，代表webrtc的连接
   late String id;
 
-  //webrtc连接
-  late RTCPeerConnection peerConnection;
+  //webrtc连接，在失活状态下为空，init后不为空
+  RTCPeerConnection? peerConnection;
+
+  //远程传来的sdp，
+  RTCSessionDescription? sdp;
+
+  //本地产生的candidate
+  RTCIceCandidate? localCandidate;
+
+  //远程传入的candidate信息，可能先于offer或者answer到来，缓存起来
+  //对主叫方来说，等待answer到来以后统一处理
+  //对被叫方来说，等待offer到来以后统一处理
+  List<RTCIceCandidate> remoteCandidates = [];
 
   //主动发送数据的通道
   RTCDataChannel? dataChannel;
@@ -171,11 +194,8 @@ abstract class BasePeerConnection {
   //这个过程在offer，answer协商之后
   bool iceComplete = false;
 
-  //在传入candidate信息后缓存起来，等待offer到来以后统一处理
-  List<RTCIceCandidate> pendingCandidates = [];
-
   //sdp扩展属性，由外部传入，这个属性用于传递定制的属性
-  //一般包括指定的iceServer，router信息，peerId，clientId
+  //一般包括指定的iceServer，room，peerId，clientId
   SignalExtension? extension;
 
   //连接是否完全建立，即协商过程结束
@@ -216,12 +236,15 @@ abstract class BasePeerConnection {
         }
       }
       //1.创建连接
-      peerConnection = await createPeerConnection(configuration, pcConstraints);
+      this.peerConnection =
+          await createPeerConnection(configuration, pcConstraints);
       logger.i('createPeerConnection end:$id');
     } catch (err) {
       logger.e('createPeerConnection:$err');
       return false;
     }
+
+    RTCPeerConnection peerConnection = this.peerConnection!;
 
     ///2.注册连接的事件监听器
     peerConnection.onIceConnectionState =
@@ -316,6 +339,7 @@ abstract class BasePeerConnection {
 
   ///连接状态事件
   onConnectionState(RTCPeerConnectionState state) {
+    RTCPeerConnection peerConnection = this.peerConnection!;
     logger.i(
         'connectionState:${peerConnection.connectionState},onConnectionState event:$state');
     if (destroyed) {
@@ -331,6 +355,7 @@ abstract class BasePeerConnection {
 
   ///ice连接状态事件
   onIceConnectionState(RTCIceConnectionState state) {
+    RTCPeerConnection peerConnection = this.peerConnection!;
     logger.i(
         'iceConnectionState:${peerConnection.iceConnectionState},onIceConnectionState event:$state');
     if (destroyed) {
@@ -353,6 +378,7 @@ abstract class BasePeerConnection {
   }
 
   onIceGatheringState(RTCIceGatheringState state) {
+    RTCPeerConnection peerConnection = this.peerConnection!;
     logger.i(
         'iceGatheringState:${peerConnection.iceGatheringState},onIceGatheringState event:$state');
     if (destroyed) {
@@ -363,6 +389,7 @@ abstract class BasePeerConnection {
 
   /// signal状态事件
   onSignalingState(RTCSignalingState state) {
+    RTCPeerConnection peerConnection = this.peerConnection!;
     logger.i(
         'signalingState:${peerConnection.signalingState},onSignalingState event:$state');
     if (destroyed) {
@@ -376,6 +403,7 @@ abstract class BasePeerConnection {
 
   ///onIceCandidate事件表示本地candidate准备好，可以发送IceCandidate到远端
   onIceCandidate(RTCIceCandidate candidate) {
+    localCandidate = candidate;
     logger.i('onIceCandidate event:${candidate.toMap()}');
     if (destroyed) {
       return;
@@ -422,7 +450,7 @@ abstract class BasePeerConnection {
       return;
     }
     var data = message.binary;
-    emit(WebrtcEventType.data, data);
+    emit(WebrtcEventType.message, data);
   }
 
   /// 把流加入到连接中，比如把本地的视频流加入到连接中，从而让远程peer能够接收到
@@ -442,6 +470,7 @@ abstract class BasePeerConnection {
   /// @param {MediaStreamTrack} track
   /// @param {MediaStream} stream
   addTrack(MediaStreamTrack track, MediaStream stream) async {
+    RTCPeerConnection peerConnection = this.peerConnection!;
     logger.i('addTrack()');
     if (destroyed) {
       throw 'cannot addTrack after peer is destroyed,ERR_DESTROYED';
@@ -494,6 +523,7 @@ abstract class BasePeerConnection {
   /// @param {MediaStreamTrack} track
   /// @param {MediaStream} stream
   removeTrack(MediaStreamTrack track, MediaStream stream) async {
+    RTCPeerConnection peerConnection = this.peerConnection!;
     logger.i('removeSender()');
     if (destroyed) {
       throw 'cannot removeTrack after peer is destroyed,ERR_DESTROYED';
@@ -606,6 +636,7 @@ abstract class BasePeerConnection {
 
   ///为连接加上候选的服务器
   addIceCandidate(RTCIceCandidate iceCandidate) async {
+    RTCPeerConnection peerConnection = this.peerConnection!;
     await peerConnection.addCandidate(iceCandidate);
   }
 
@@ -668,6 +699,9 @@ abstract class BasePeerConnection {
 
 ///主动发起连接的一方
 class MasterPeerConnection extends BasePeerConnection {
+  //作为主叫方创建的offer
+  RTCSessionDescription? offer;
+
   MasterPeerConnection();
 
   ///主叫发起协商过程
@@ -688,6 +722,7 @@ class MasterPeerConnection extends BasePeerConnection {
 
   ///创建offer，设置到本地会话描述，并发送offer
   createOffer() async {
+    RTCPeerConnection peerConnection = this.peerConnection!;
     logger.i('start createOffer');
     if (destroyed) {
       return;
@@ -708,6 +743,7 @@ class MasterPeerConnection extends BasePeerConnection {
 
   ///调用外部方法发送offer
   sendOffer(RTCSessionDescription offer) async {
+    RTCPeerConnection peerConnection = this.peerConnection!;
     logger.i('sendOffer');
     if (destroyed) {
       return;
@@ -723,6 +759,7 @@ class MasterPeerConnection extends BasePeerConnection {
   ///从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
   @override
   signal(WebrtcSignal webrtcSignal) async {
+    RTCPeerConnection peerConnection = this.peerConnection!;
     if (destroyed) {
       throw 'cannot signal after peer is destroyed,ERR_DESTROYED';
     }
@@ -751,7 +788,7 @@ class MasterPeerConnection extends BasePeerConnection {
       if (remoteDescription != null && remoteDescription.type != null) {
         addIceCandidate(candidate);
       } else {
-        pendingCandidates.add(candidate);
+        remoteCandidates.add(candidate);
       }
     }
     //如果sdp信息，则设置远程描述，并处理所有的候选清单中候选服务器
@@ -762,10 +799,10 @@ class MasterPeerConnection extends BasePeerConnection {
         return;
       }
 
-      for (var candidate in pendingCandidates) {
+      for (var candidate in remoteCandidates) {
         addIceCandidate(candidate);
       }
-      pendingCandidates = [];
+      remoteCandidates = [];
     }
     //如果什么都不是，报错
     else {
@@ -781,6 +818,7 @@ class MasterPeerConnection extends BasePeerConnection {
     required RTCRtpMediaType kind,
     required RTCRtpTransceiverInit init,
   }) async {
+    RTCPeerConnection peerConnection = this.peerConnection!;
     logger.i('addTransceiver()');
     if (destroyed) {
       throw 'cannot addTransceiver after peer is destroyed,ERR_DESTROYED';
@@ -798,8 +836,11 @@ class MasterPeerConnection extends BasePeerConnection {
 }
 
 ///在收到主动方的signal后，如果不存在，则创建
-class FollowPeerConnection extends BasePeerConnection {
-  FollowPeerConnection();
+class SlavePeerConnection extends BasePeerConnection {
+  //作为被叫方创建的answer
+  RTCSessionDescription? answer;
+
+  SlavePeerConnection();
 
   ///被叫的协商时发送再协商信号给主叫，要求重新发起协商
   @override
@@ -827,6 +868,7 @@ class FollowPeerConnection extends BasePeerConnection {
 
   ///创建answer，发生在被叫方，将answer回到主叫方
   createAnswer() async {
+    RTCPeerConnection peerConnection = this.peerConnection!;
     logger.i('createAnswer');
     if (destroyed) {
       return;
@@ -846,6 +888,7 @@ class FollowPeerConnection extends BasePeerConnection {
 
   //发送answer
   sendAnswer(RTCSessionDescription answer) async {
+    RTCPeerConnection peerConnection = this.peerConnection!;
     logger.i('sendAnswer');
     if (destroyed) {
       return;
@@ -863,6 +906,7 @@ class FollowPeerConnection extends BasePeerConnection {
   ///从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
   @override
   signal(WebrtcSignal webrtcSignal) async {
+    RTCPeerConnection peerConnection = this.peerConnection!;
     logger.i('signal');
     if (destroyed) {
       throw 'cannot signal after peer is destroyed,ERR_DESTROYED';
@@ -878,7 +922,7 @@ class FollowPeerConnection extends BasePeerConnection {
       if (remoteDescription != null && remoteDescription.type != null) {
         addIceCandidate(candidate);
       } else {
-        pendingCandidates.add(candidate);
+        remoteCandidates.add(candidate);
       }
     }
     //如果sdp信息，则设置远程描述，并处理所有的候选清单中候选服务器
@@ -887,10 +931,10 @@ class FollowPeerConnection extends BasePeerConnection {
       if (destroyed) {
         return;
       }
-      for (var candidate in pendingCandidates) {
+      for (var candidate in remoteCandidates) {
         addIceCandidate(candidate);
       }
-      pendingCandidates = [];
+      remoteCandidates = [];
       //如果远程描述是offer请求，则创建answer
       var remoteDescription = await peerConnection.getRemoteDescription();
       if (remoteDescription != null && remoteDescription.type == 'offer') {

@@ -56,6 +56,15 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
     super.dispose();
   }
 
+  AdvancedPeerConnection? _getAdvancedPeerConnection() {
+    AdvancedPeerConnection? advancedPeerConnection;
+    if (widget.peerId != null) {
+      advancedPeerConnection =
+          peerConnectionPool.getOne(widget.peerId!, clientId: widget.clientId);
+    }
+    return null;
+  }
+
   _open() async {
     try {
       AdvancedPeerConnection? advancedPeerConnection = await peerConnectionPool
@@ -86,13 +95,17 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
 
   Widget _buildBody(BuildContext context) {
     AdvancedPeerConnection? advancedPeerConnection =
-        peerConnectionPool.getOne(widget.peerId!, widget.clientId!);
-    RTCVideoView? localView = advancedPeerConnection!
-        .basePeerConnection.localVideoRenders[0]
-        .createView();
-    RTCVideoView? remoteView = advancedPeerConnection!
-        .basePeerConnection.remoteVideoRenders[0]
-        .createView();
+        _getAdvancedPeerConnection();
+    RTCVideoView? localView;
+    RTCVideoView? remoteView;
+    if (advancedPeerConnection != null) {
+      localView = advancedPeerConnection!
+          .basePeerConnection.localVideoRenders[0]
+          .createView();
+      remoteView = advancedPeerConnection!
+          .basePeerConnection.remoteVideoRenders[0]
+          .createView();
+    }
     return OrientationBuilder(
       //orientation为旋转方向
       builder: (context, orientation) {
@@ -141,7 +154,7 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
 
   Widget _buildIconButton(BuildContext context) {
     AdvancedPeerConnection? advancedPeerConnection =
-        peerConnectionPool.getOne(widget.peerId!, widget.clientId!);
+        _getAdvancedPeerConnection();
     return IconButton(
       onPressed: advancedPeerConnection != null ? _close : _open,
       icon: Icon(advancedPeerConnection != null ? Icons.close : Icons.add),

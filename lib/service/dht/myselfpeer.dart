@@ -145,8 +145,6 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
         peerClient.activeStatus = ActiveStatus.Up.name;
         peerClient.clientId = myselfPeer.clientId;
         peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
-        peerClient.kind = null;
-        peerClient.name = '';
         connectAction.connect(peerClient).then((response) {
           logger.i(response);
         });

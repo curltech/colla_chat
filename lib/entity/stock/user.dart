@@ -175,7 +175,7 @@ class StockUser {
   Future<StockAccount?> regist(String url, dynamic params) async {
     var response = await webClient.send(url, params);
     if (response != null) {
-      var data = response.data;
+      var data = response.message;
       if (data != null) {
         if (TypeUtil.isString(data)) {
           error = data;
@@ -193,7 +193,7 @@ class StockUser {
     WebClient webClient = await WebClient.instance;
     var response = await webClient.send(url, params);
     if (response != null) {
-      var data = response.data;
+      var data = response.message;
       if (data != null) {
         if (TypeUtil.isString(data)) {
           error = data;

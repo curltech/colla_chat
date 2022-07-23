@@ -82,7 +82,7 @@ class AdvancedPeerConnection {
     }
     if (streams.isNotEmpty) {
       for (var stream in streams) {
-        basePeerConnection.addStream(stream);
+        this.basePeerConnection.addStream(stream);
       }
     }
     // 自定义属性，表示本节点createOffer时加入的sfu的编号，作为出版者还是订阅者，还是都是
@@ -100,14 +100,14 @@ class AdvancedPeerConnection {
     }
     bool result = false;
     if (initiator) {
-      basePeerConnection = MasterPeerConnection();
-      final peerConnection = basePeerConnection;
-      result = await peerConnection.init(
+      this.basePeerConnection = MasterPeerConnection();
+      final basePeerConnection = this.basePeerConnection;
+      result = await basePeerConnection.init(
           getUserMedia: getUserMedia, streams: streams, extension: extension);
     } else {
-      basePeerConnection = FollowPeerConnection();
-      final peerConnection = basePeerConnection;
-      result = await peerConnection.init(
+      this.basePeerConnection = SlavePeerConnection();
+      final basePeerConnection = this.basePeerConnection;
+      result = await basePeerConnection.init(
           getUserMedia: getUserMedia, streams: streams, extension: extension);
     }
     if (!result) {
@@ -116,53 +116,53 @@ class AdvancedPeerConnection {
     }
     //下面的三个事件对于发起方和被发起方是一样的
     //可以发起信号
-    final peerConnection = basePeerConnection;
-    peerConnection.on(WebrtcEventType.signal, (WebrtcSignal signal) async {
-      await peerConnectionPool.emit(WebrtcEventType.signal.name,
-          WebrtcEvent(peerId, clientId, data: signal));
+    final basePeerConnection = this.basePeerConnection;
+    basePeerConnection.on(WebrtcEventType.signal, (WebrtcSignal signal) async {
+      await peerConnectionPool.emit(
+          WebrtcEventType.signal, WebrtcEvent(peerId, clientId, data: signal));
     });
 
-    //连接建立/
-    peerConnection.on(WebrtcEventType.connect, (data) async {
+    //连接建立
+    basePeerConnection.on(WebrtcEventType.connect, (data) async {
       end = DateTime.now().millisecondsSinceEpoch;
       if (end != null && start != null) {
         var interval = end! - start!;
         logger.i('connect time:$interval');
       }
       await peerConnectionPool.emit(
-          WebrtcEventType.connect.name, WebrtcEvent(peerId, clientId));
+          WebrtcEventType.connect, WebrtcEvent(peerId, clientId));
     });
 
-    peerConnection.on(WebrtcEventType.close, (data) async {
+    basePeerConnection.on(WebrtcEventType.close, (data) async {
       await peerConnectionPool.remove(this.peerId);
     });
 
     //收到数据
-    peerConnection.on(WebrtcEventType.data, (data) async {
+    basePeerConnection.on(WebrtcEventType.message, (data) async {
       logger.i('${DateTime.now().toUtc()}:got a message from peer: $data');
       await peerConnectionPool.emit(
-          WebrtcEventType.data.name, WebrtcEvent(peerId, clientId, data: data));
+          WebrtcEventType.message, WebrtcEvent(peerId, clientId, data: data));
     });
 
-    peerConnection.on(WebrtcEventType.stream, (stream) async {
+    basePeerConnection.on(WebrtcEventType.stream, (stream) async {
       if (stream != null) {
         stream.onremovetrack = (event) {
           logger.i('Video track: ${event.track.label} removed');
         };
       }
-      await peerConnectionPool.emit(WebrtcEventType.stream.name,
-          WebrtcEvent(peerId, clientId, data: stream));
+      await peerConnectionPool.emit(
+          WebrtcEventType.stream, WebrtcEvent(peerId, clientId, data: stream));
     });
 
-    peerConnection.on(WebrtcEventType.track, (track, stream) async {
+    basePeerConnection.on(WebrtcEventType.track, (track, stream) async {
       logger.i('${DateTime.now().toUtc().toIso8601String()}:track');
       await peerConnectionPool.emit(
-          WebrtcEventType.track.name,
+          WebrtcEventType.track,
           WebrtcEvent(peerId, clientId,
               data: {'track': track, 'stream': stream}));
     });
 
-    peerConnection.on(
+    basePeerConnection.on(
         WebrtcEventType.error, (err) => {logger.e('webrtcPeerError:$err')});
 
     return result;
