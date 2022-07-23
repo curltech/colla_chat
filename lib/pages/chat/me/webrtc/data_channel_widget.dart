@@ -14,13 +14,9 @@ import '../../../../widgets/common/widget_mixin.dart';
 
 /// 连接建立示例
 class DataChannelWidget extends StatefulWidget with TileDataMixin {
-  final String? peerId;
-  final String? clientId;
-  final Room? room;
   final PeerConnectionPoolController controller = peerConnectionPoolController;
 
-  DataChannelWidget({Key? key, this.room, this.peerId, this.clientId})
-      : super(key: key);
+  DataChannelWidget({Key? key}) : super(key: key);
 
   @override
   State createState() => _DataChannelWidgetState();
@@ -39,11 +35,20 @@ class DataChannelWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _DataChannelWidgetState extends State<DataChannelWidget> {
-  final TextEditingController textEditingController = TextEditingController();
-  String? message;
+  final TextEditingController messageController = TextEditingController();
+  final TextEditingController peerIdController = TextEditingController();
+  final TextEditingController clientIdController = TextEditingController();
+  final TextEditingController roomController = TextEditingController();
+  String? message = '';
+  String? peerId = '';
+  String? clientId = '';
+  String? roomId = '';
+
   @override
   initState() {
     widget.controller.addListener(_update);
+    //当被叫服务器创建的时候回调
+    peerConnectionPool.on(WebrtcEventType.create, _onCreate);
     super.initState();
   }
 
@@ -58,15 +63,38 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
     super.dispose();
   }
 
+  _onCreate(WebrtcEvent evt) {
+    peerId = evt.peerId;
+    clientId = evt.clientId;
+    peerIdController.text = peerId!;
+    clientIdController.text = clientId!;
+    AdvancedPeerConnection advancedPeerConnection =
+        evt.data as AdvancedPeerConnection;
+    advancedPeerConnection.basePeerConnection
+        .on(WebrtcEventType.message, _onMessage);
+    _update();
+  }
+
+  AdvancedPeerConnection? _getAdvancedPeerConnection() {
+    AdvancedPeerConnection? advancedPeerConnection;
+    if (peerId != null) {
+      advancedPeerConnection =
+          peerConnectionPool.getOne(peerId!, clientId: clientId);
+    }
+    return null;
+  }
+
   _open() async {
+    peerId = peerIdController.text;
+    clientId = clientIdController.text;
+
     try {
       AdvancedPeerConnection? advancedPeerConnection = await peerConnectionPool
-          .create(widget.peerId!, widget.clientId!, getUserMedia: true);
+          .create(peerId!, clientId!, getUserMedia: true);
       if (advancedPeerConnection != null) {
-        await advancedPeerConnection.init(
-            widget.peerId!, widget.clientId!, true);
+        await advancedPeerConnection.init(peerId!, clientId!, true);
         advancedPeerConnection.basePeerConnection
-            .on(WebrtcEventType.data, _onMessage);
+            .on(WebrtcEventType.message, _onMessage);
       }
     } catch (e) {
       logger.i(e.toString());
@@ -85,16 +113,18 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
   //发送消息
   _sendMessage() {
     AdvancedPeerConnection? advancedPeerConnection =
-        peerConnectionPool.getOne(widget.peerId!, widget.clientId!);
-    advancedPeerConnection!.basePeerConnection
-        .send(Uint8List.fromList(textEditingController.text.codeUnits));
-    textEditingController.clear();
+        _getAdvancedPeerConnection();
+    if (advancedPeerConnection != null) {
+      advancedPeerConnection!.basePeerConnection
+          .send(Uint8List.fromList(messageController.text.codeUnits));
+      messageController.clear();
+    }
   }
 
   //关闭处理
   _close() async {
     try {
-      peerConnectionPool.remove(widget.peerId!, clientId: widget.clientId);
+      peerConnectionPool.remove(peerId!, clientId: clientId);
     } catch (e) {
       logger.i(e.toString());
     }
@@ -104,16 +134,33 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
 
   Widget _buildBody(BuildContext context) {
     AdvancedPeerConnection? advancedPeerConnection =
-        peerConnectionPool.getOne(widget.peerId!, widget.clientId!);
+        _getAdvancedPeerConnection();
     var view = Column(
       mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
+        TextFormField(
+          controller: roomController,
+          decoration: const InputDecoration(labelText: 'room'),
+        ),
+        TextFormField(
+          controller: peerIdController,
+          decoration: const InputDecoration(labelText: 'peerId'),
+        ),
+        TextFormField(
+          controller: clientIdController,
+          decoration: const InputDecoration(labelText: 'clientId'),
+        ),
+        const SizedBox(
+          height: 35.0,
+        ),
         Text(
           '接收到的消息:$message',
         ),
         TextFormField(
-          controller: textEditingController,
+          controller: messageController,
           autofocus: true,
+          decoration: const InputDecoration(labelText: 'message'),
         ),
         TextButton(
           child: const Text('点击发送文本'),
@@ -133,20 +180,16 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
             decoration: const BoxDecoration(color: Colors.white),
             child: Stack(
               children: <Widget>[
-                Align(
-                  //判断是否为垂直方向
-                  alignment: orientation == Orientation.portrait
-                      ? const FractionalOffset(0.5, 0.1)
-                      : const FractionalOffset(0.0, 0.5),
-                  child: Container(
-                    margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-                    width: 320.0,
-                    height: 240.0,
-                    decoration: const BoxDecoration(color: Colors.black),
-                    //本地视频渲染
-                    child: view,
-                  ),
-                ),
+                Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 5.0),
+                    child: Container(
+                      margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                      width: 520.0,
+                      height: 400.0,
+                      //decoration: const BoxDecoration(color: Colors.black),
+                      //本地视频渲染
+                      child: view,
+                    )),
               ],
             ),
           ),
@@ -157,7 +200,7 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
 
   Widget _buildIconButton(BuildContext context) {
     AdvancedPeerConnection? advancedPeerConnection =
-        peerConnectionPool.getOne(widget.peerId!, widget.clientId!);
+        _getAdvancedPeerConnection();
     return IconButton(
       onPressed: advancedPeerConnection != null ? _close : _open,
       icon: Icon(advancedPeerConnection != null ? Icons.close : Icons.add),
@@ -168,7 +211,7 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-      title: AppLocalizations.t('video call'),
+      title: AppLocalizations.t(widget.title),
       withLeading: widget.withLeading,
       rightWidgets: [_buildIconButton(context)],
       child: _buildBody(context),

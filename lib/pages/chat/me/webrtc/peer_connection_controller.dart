@@ -14,7 +14,7 @@ class PeerConnectionPoolController with ChangeNotifier {
 
   ///接收信号消息
   receive(ChainMessage chainMessage) async {
-    _peerConnectionPool.receive(chainMessage);
+    _peerConnectionPool.onSignal(chainMessage);
     notifyListeners();
   }
 }
