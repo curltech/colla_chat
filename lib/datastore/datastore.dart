@@ -79,7 +79,8 @@ class Pagination<T> {
       };
 }
 
-const String dbname = 'colla_chat.db';
+const String dbname =
+    String.fromEnvironment('dbname', defaultValue: 'colla_chat.db');
 
 abstract class DataStore {
   ///建表和索引
