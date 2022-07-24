@@ -172,13 +172,6 @@ class AdvancedPeerConnection {
     basePeerConnection.on(name, fn);
   }
 
-  RTCVideoView attachStream(MediaStream stream) {
-    var renderer = RTCVideoRenderer();
-    renderer.initialize();
-    renderer.srcObject = stream;
-    return RTCVideoView(renderer);
-  }
-
   addStream(MediaStream stream) {
     logger.i('add stream to webrtc');
     basePeerConnection.addStream(stream);
