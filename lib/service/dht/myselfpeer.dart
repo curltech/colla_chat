@@ -145,11 +145,11 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
         peerClient.activeStatus = ActiveStatus.Up.name;
         peerClient.clientId = myselfPeer.clientId;
         peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
-        peerClient.name = String.fromCharCodes(
+        peerClient.name = CryptoUtil.encodeBase64(
             await cryptoGraphy.hash(peerClient.name.codeUnits));
-        peerClient.mobile = String.fromCharCodes(
+        peerClient.mobile = CryptoUtil.encodeBase64(
             await cryptoGraphy.hash(peerClient.mobile.codeUnits));
-        peerClient.email = String.fromCharCodes(
+        peerClient.email = CryptoUtil.encodeBase64(
             await cryptoGraphy.hash(peerClient.email.codeUnits));
         connectAction.connect(peerClient).then((response) {
           logger.i(response);

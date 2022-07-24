@@ -1,4 +1,5 @@
 import '../../../crypto/cryptography.dart';
+import '../../../crypto/util.dart';
 import '../../../entity/dht/peerclient.dart';
 import '../../../entity/p2p/message.dart';
 import '../../../tool/util.dart';
@@ -10,9 +11,9 @@ class FindClientAction extends BaseAction {
 
   Future<List<dynamic>?> findClient(
       String targetPeerId, String mobile, String email, String name) async {
-    name = String.fromCharCodes(await cryptoGraphy.hash(name.codeUnits));
-    mobile = String.fromCharCodes(await cryptoGraphy.hash(mobile.codeUnits));
-    email = String.fromCharCodes(await cryptoGraphy.hash(email.codeUnits));
+    name = CryptoUtil.encodeBase64(await cryptoGraphy.hash(name.codeUnits));
+    mobile = CryptoUtil.encodeBase64(await cryptoGraphy.hash(mobile.codeUnits));
+    email = CryptoUtil.encodeBase64(await cryptoGraphy.hash(email.codeUnits));
     ChainMessage chainMessage = await prepareSend({
       'peerId': targetPeerId,
       'mobileNumber': mobile,
