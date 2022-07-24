@@ -7,8 +7,8 @@ const int defaultExpireDate = 3600 * 24 * 365;
 class PeerClient extends PeerLocation {
   String clientId;
   String? deviceToken;
-  String? mobile;
-  String? email;
+  String mobile = '';
+  String email = '';
 
   /// 客户连接到节点的位置
   String? connectPeerId;
