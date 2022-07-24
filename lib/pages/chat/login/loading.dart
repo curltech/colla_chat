@@ -62,50 +62,50 @@ class Loading extends StatefulWidget {
   }
 }
 
-class _LoadingState extends State<Loading> with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _LoadingState extends State<Loading> {
+  PageController controller = PageController();
+  int currentIndex = 0;
+  final animateDuration = const Duration(milliseconds: 500);
 
   @override
   void initState() {
     super.initState();
     if (appDataProvider.brightness == Brightness.light.name) {
-      _tabController =
-          TabController(length: lightBackgroudImages.length, vsync: this);
       if (widget.autoPlay) {
         Future.doWhile(() async {
-          var currentIndex = _tabController.index;
           if (currentIndex >= lightBackgroudImages.length - 1) {
-            _tabController.index = 0;
+            controller.animateToPage(0,
+                duration: animateDuration, curve: Curves.easeInOut);
           } else {
             try {
-              _tabController.index = currentIndex + 1;
+              controller.nextPage(
+                  duration: animateDuration, curve: Curves.easeInOut);
             } catch (e) {
               logger.e(e);
             }
           }
           await Future.delayed(const Duration(seconds: 10));
-          if (currentIndex >= lightBackgroudImages.length - 1) {
-            return false;
-          }
+          // if (currentIndex >= lightBackgroudImages.length - 1) {
+          //   return false;
+          // }
           return true;
         });
       }
     }
     if (appDataProvider.brightness == Brightness.dark.name) {
-      _tabController =
-          TabController(length: darkBackgroudImages.length, vsync: this);
       if (widget.autoPlay) {
         Future.doWhile(() async {
-          var currentIndex = _tabController.index;
           if (currentIndex >= darkBackgroudImages.length - 1) {
-            _tabController.index = 0;
+            controller.animateToPage(0,
+                duration: animateDuration, curve: Curves.easeInOut);
           } else {
-            _tabController.index = currentIndex + 1;
+            controller.nextPage(
+                duration: animateDuration, curve: Curves.easeInOut);
           }
           await Future.delayed(const Duration(seconds: 10));
-          if (currentIndex >= darkBackgroudImages.length - 1) {
-            return false;
-          }
+          // if (currentIndex >= darkBackgroudImages.length - 1) {
+          //   return false;
+          // }
           return true;
         });
       }
@@ -126,8 +126,11 @@ class _LoadingState extends State<Loading> with SingleTickerProviderStateMixin {
     if (appDataProvider.brightness == Brightness.dark.name) {
       children = widget.darkChildren;
     }
-    return TabBarView(
-      controller: _tabController,
+    return PageView(
+      controller: controller,
+      onPageChanged: (int index) {
+        currentIndex = index;
+      },
       children: children,
     );
   }
@@ -135,7 +138,7 @@ class _LoadingState extends State<Loading> with SingleTickerProviderStateMixin {
   @override
   void dispose() {
     // 释放资源
-    _tabController.dispose();
+    controller.dispose();
     super.dispose();
   }
 }
