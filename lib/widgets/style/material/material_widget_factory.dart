@@ -38,8 +38,18 @@ class MaterialWidgetFactory extends WidgetFactory {
   }) {
     return Container(
       key: key,
+      alignment: alignment,
+      color: color,
+      decoration: decoration,
       margin: margin,
+      foregroundDecoration: foregroundDecoration,
       padding: padding,
+      width: width,
+      height: height,
+      constraints: constraints,
+      transform: transform,
+      transformAlignment: transformAlignment,
+      clipBehavior: clipBehavior,
       child: child,
     );
   }
@@ -54,6 +64,8 @@ class MaterialWidgetFactory extends WidgetFactory {
   }) {
     return SizedBox(
       key: key,
+      width: width,
+      height: height,
       child: child,
     );
   }
@@ -72,7 +84,16 @@ class MaterialWidgetFactory extends WidgetFactory {
     bool semanticContainer = true,
   }) {
     return Card(
+      key: key,
+      color: color,
+      shadowColor: shadowColor,
+      surfaceTintColor: surfaceTintColor,
+      elevation: elevation,
+      shape: shape,
+      borderOnForeground: borderOnForeground,
       margin: margin,
+      clipBehavior: clipBehavior,
+      semanticContainer: semanticContainer,
       child: child,
     );
   }
@@ -87,6 +108,9 @@ class MaterialWidgetFactory extends WidgetFactory {
     return ExpansionPanel(
       body: body,
       headerBuilder: headerBuilder,
+      isExpanded: isExpanded,
+      canTapOnHeader: canTapOnHeader,
+      backgroundColor: backgroundColor,
     );
   }
 
@@ -98,7 +122,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     ScrollPhysics? physics,
     bool pageSnapping = true,
     void Function(int)? onPageChanged,
-    List children = const [],
+    List<Widget> children = const [],
     DragStartBehavior dragStartBehavior = DragStartBehavior.start,
     bool allowImplicitScrolling = false,
     String? restorationId,
@@ -106,7 +130,22 @@ class MaterialWidgetFactory extends WidgetFactory {
     ScrollBehavior? scrollBehavior,
     bool padEnds = true,
   }) {
-    return PageView();
+    return PageView(
+      key: key,
+      scrollDirection: scrollDirection,
+      reverse: reverse,
+      controller: controller,
+      physics: physics,
+      pageSnapping: pageSnapping,
+      onPageChanged: onPageChanged,
+      dragStartBehavior: dragStartBehavior,
+      allowImplicitScrolling: allowImplicitScrolling,
+      restorationId: restorationId,
+      clipBehavior: clipBehavior,
+      scrollBehavior: scrollBehavior,
+      padEnds: padEnds,
+      children: children,
+    );
   }
 
   Widget buildDataTable2({
@@ -189,6 +228,10 @@ class MaterialWidgetFactory extends WidgetFactory {
   }) {
     return TabBarView(
       key: key,
+      controller: controller,
+      physics: physics,
+      dragStartBehavior: dragStartBehavior,
+      viewportFraction: viewportFraction,
       children: children,
     );
   }
@@ -201,7 +244,13 @@ class MaterialWidgetFactory extends WidgetFactory {
     Color? selectedColor,
     BorderStyle? borderStyle,
   }) {
-    return TabPageSelector(key: key);
+    return TabPageSelector(
+        key: key,
+        controller: controller,
+        indicatorSize: indicatorSize,
+        color: color,
+        selectedColor: selectedColor,
+        borderStyle: borderStyle);
   }
 
   ///输入小控件
@@ -430,7 +479,14 @@ class MaterialWidgetFactory extends WidgetFactory {
     return TextButton(
       key: key,
       onPressed: onPressed,
-      child: child!,
+      onLongPress: onLongPress,
+      onHover: onHover,
+      onFocusChange: onFocusChange,
+      style: style,
+      focusNode: focusNode,
+      autofocus: autofocus,
+      clipBehavior: clipBehavior,
+      child: child,
     );
   }
 
@@ -442,10 +498,10 @@ class MaterialWidgetFactory extends WidgetFactory {
     MouseCursor? mouseCursor,
     bool toggleable = false,
     Color? activeColor,
-    MaterialStateProperty? fillColor,
+    MaterialStateProperty<Color?>? fillColor,
     Color? focusColor,
     Color? hoverColor,
-    MaterialStateProperty? overlayColor,
+    MaterialStateProperty<Color?>? overlayColor,
     double? splashRadius,
     MaterialTapTargetSize? materialTapTargetSize,
     VisualDensity? visualDensity,
@@ -453,9 +509,22 @@ class MaterialWidgetFactory extends WidgetFactory {
     bool autofocus = false,
   }) {
     return Radio(
+      key: key,
       onChanged: onChanged,
       value: value,
       groupValue: groupValue,
+      mouseCursor: mouseCursor,
+      toggleable: toggleable,
+      activeColor: activeColor,
+      fillColor: fillColor,
+      focusColor: focusColor,
+      hoverColor: hoverColor,
+      overlayColor: overlayColor,
+      splashRadius: splashRadius,
+      materialTapTargetSize: materialTapTargetSize,
+      visualDensity: visualDensity,
+      focusNode: focusNode,
+      autofocus: autofocus,
     );
   }
 
@@ -466,11 +535,11 @@ class MaterialWidgetFactory extends WidgetFactory {
     required void Function(bool?)? onChanged,
     MouseCursor? mouseCursor,
     Color? activeColor,
-    MaterialStateProperty? fillColor,
+    MaterialStateProperty<Color?>? fillColor,
     Color? checkColor,
     Color? focusColor,
     Color? hoverColor,
-    MaterialStateProperty? overlayColor,
+    MaterialStateProperty<Color?>? overlayColor,
     double? splashRadius,
     MaterialTapTargetSize? materialTapTargetSize,
     VisualDensity? visualDensity,
@@ -480,8 +549,24 @@ class MaterialWidgetFactory extends WidgetFactory {
     BorderSide? side,
   }) {
     return Checkbox(
+      key: key,
       onChanged: onChanged,
       value: value,
+      tristate: tristate,
+      mouseCursor: mouseCursor,
+      activeColor: activeColor,
+      fillColor: fillColor,
+      checkColor: checkColor,
+      focusColor: focusColor,
+      hoverColor: hoverColor,
+      overlayColor: overlayColor,
+      splashRadius: splashRadius,
+      materialTapTargetSize: materialTapTargetSize,
+      visualDensity: visualDensity,
+      focusNode: focusNode,
+      autofocus: autofocus,
+      shape: shape,
+      side: side,
     );
   }
 
@@ -504,7 +589,18 @@ class MaterialWidgetFactory extends WidgetFactory {
     return Text(
       data,
       key: key,
+      style: style,
+      strutStyle: strutStyle,
       textAlign: textAlign,
+      textDirection: textDirection,
+      locale: locale,
+      softWrap: softWrap,
+      overflow: overflow,
+      textScaleFactor: textScaleFactor,
+      maxLines: maxLines,
+      semanticsLabel: semanticsLabel,
+      textWidthBasis: textWidthBasis,
+      textHeightBehavior: textHeightBehavior,
     );
   }
 
@@ -515,12 +611,16 @@ class MaterialWidgetFactory extends WidgetFactory {
     Color? color,
     String? semanticLabel,
     TextDirection? textDirection,
-    List? shadows,
+    List<Shadow>? shadows,
   }) {
     return Icon(
       icon,
       key: key,
       size: size,
+      color: color,
+      semanticLabel: semanticLabel,
+      textDirection: textDirection,
+      shadows: shadows,
     );
   }
 
@@ -619,7 +719,7 @@ class MaterialWidgetFactory extends WidgetFactory {
     double? value,
     Color? backgroundColor,
     Color? color,
-    Animation? valueColor,
+    Animation<Color?>? valueColor,
     double? minHeight,
     String? semanticsLabel,
     String? semanticsValue,
@@ -627,6 +727,12 @@ class MaterialWidgetFactory extends WidgetFactory {
     return LinearProgressIndicator(
       key: key,
       value: value,
+      backgroundColor: backgroundColor,
+      color: color,
+      valueColor: valueColor,
+      minHeight: minHeight,
+      semanticsLabel: semanticsLabel,
+      semanticsValue: semanticsValue,
     );
   }
 
@@ -635,13 +741,20 @@ class MaterialWidgetFactory extends WidgetFactory {
     double? value,
     Color? backgroundColor,
     Color? color,
-    Animation? valueColor,
+    Animation<Color?>? valueColor,
     double? minHeight,
     String? semanticsLabel,
     String? semanticsValue,
   }) {
     return LinearProgressIndicator(
       key: key,
+      value: value,
+      backgroundColor: backgroundColor,
+      color: color,
+      valueColor: valueColor,
+      minHeight: minHeight,
+      semanticsLabel: semanticsLabel,
+      semanticsValue: semanticsValue,
     );
   }
 
@@ -678,12 +791,21 @@ class MaterialWidgetFactory extends WidgetFactory {
     double? value,
     Color? backgroundColor,
     Color? color,
-    Animation? valueColor,
+    Animation<Color?>? valueColor,
     double strokeWidth = 4.0,
     String? semanticsLabel,
     String? semanticsValue,
   }) {
-    return CircularProgressIndicator();
+    return CircularProgressIndicator(
+      key: key,
+      value: value,
+      backgroundColor: backgroundColor,
+      color: color,
+      valueColor: valueColor,
+      strokeWidth: strokeWidth,
+      semanticsLabel: semanticsLabel,
+      semanticsValue: semanticsValue,
+    );
   }
 
   Widget buildDivider({
@@ -694,7 +816,14 @@ class MaterialWidgetFactory extends WidgetFactory {
     double? endIndent,
     Color? color,
   }) {
-    return Divider();
+    return Divider(
+      key: key,
+      height: height,
+      thickness: thickness,
+      indent: indent,
+      endIndent: endIndent,
+      color: color,
+    );
   }
 
   Widget buildListTile({
@@ -745,7 +874,17 @@ class MaterialWidgetFactory extends WidgetFactory {
     EdgeInsetsGeometry? margin,
   }) {
     return Stepper(
+      key: key,
       steps: steps,
+      physics: physics,
+      type: type,
+      currentStep: currentStep,
+      onStepTapped: onStepTapped,
+      onStepContinue: onStepContinue,
+      onStepCancel: onStepCancel,
+      controlsBuilder: controlsBuilder,
+      elevation: elevation,
+      margin: margin,
     );
   }
 
@@ -899,8 +1038,15 @@ class MaterialWidgetFactory extends WidgetFactory {
   }) {
     return ElevatedButton(
       key: key,
-      onPressed: () {},
-      child: null,
+      onPressed: onPressed,
+      onLongPress: onLongPress,
+      onHover: onHover,
+      onFocusChange: onFocusChange,
+      style: style,
+      focusNode: focusNode,
+      autofocus: autofocus,
+      clipBehavior: clipBehavior,
+      child: child,
     );
   }
 
@@ -950,7 +1096,14 @@ class MaterialWidgetFactory extends WidgetFactory {
   }) {
     return OutlinedButton(
       key: key,
-      onPressed: () {},
+      onPressed: onPressed,
+      onLongPress: onLongPress,
+      onHover: onHover,
+      onFocusChange: onFocusChange,
+      style: style,
+      focusNode: focusNode,
+      autofocus: autofocus,
+      clipBehavior: clipBehavior,
       child: child,
     );
   }
@@ -999,8 +1152,17 @@ class MaterialWidgetFactory extends WidgetFactory {
   }) {
     return BottomSheet(
       key: key,
+      animationController: animationController,
+      enableDrag: enableDrag,
+      onDragStart: onDragStart,
+      onDragEnd: onDragEnd,
+      backgroundColor: backgroundColor,
+      elevation: elevation,
+      shape: shape,
+      clipBehavior: clipBehavior,
+      constraints: constraints,
+      onClosing: onClosing,
       builder: builder,
-      onClosing: () {},
     );
   }
 
@@ -1328,7 +1490,15 @@ class MaterialWidgetFactory extends WidgetFactory {
     Widget? child,
     String? semanticLabel,
   }) {
-    return Drawer(key: key);
+    return Drawer(
+      key: key,
+      backgroundColor: backgroundColor,
+      elevation: elevation,
+      shape: shape,
+      width: width,
+      semanticLabel: semanticLabel,
+      child: child,
+    );
   }
 
   Widget buildBottomNavigationBar({
