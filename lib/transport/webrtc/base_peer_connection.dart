@@ -225,16 +225,11 @@ abstract class BasePeerConnection {
       required SignalExtension extension}) async {
     id = await cryptoGraphy.getRandomAsciiString(length: 8);
     this.extension = extension;
-    var appDataProvider = AppDataProvider.instance;
-    var iceServers = appDataProvider.defaultNodeAddress.iceServers;
     try {
+      var iceServers = extension.iceServers;
+      var appDataProvider = AppDataProvider.instance;
+      iceServers = iceServers ?? appDataProvider.defaultNodeAddress.iceServers;
       var configuration = {'iceServers': iceServers};
-      if (extension != null) {
-        var iceServers = extension.iceServers;
-        if (iceServers != null) {
-          configuration['iceServers'] = iceServers;
-        }
-      }
       //1.创建连接
       this.peerConnection =
           await createPeerConnection(configuration, pcConstraints);

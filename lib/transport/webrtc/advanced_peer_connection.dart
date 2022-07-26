@@ -74,19 +74,6 @@ class AdvancedPeerConnection {
     this.peerId = peerId;
     this.clientId = clientId;
     this.room = room;
-    var appDataProvider = AppDataProvider.instance;
-    if (iceServers == null) {
-      this.iceServers = appDataProvider.defaultNodeAddress.iceServers;
-    } else {
-      this.iceServers = iceServers;
-    }
-    if (streams.isNotEmpty) {
-      for (var stream in streams) {
-        this.basePeerConnection.addStream(stream);
-      }
-    }
-    // 自定义属性，表示本节点createOffer时加入的sfu的编号，作为出版者还是订阅者，还是都是
-    this.room = room;
     start = DateTime.now().millisecondsSinceEpoch;
     var myselfPeerId = myself.peerId;
     var myselfClientId = myself.clientId;

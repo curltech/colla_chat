@@ -81,7 +81,7 @@ class _LoadingState extends State<Loading> {
               controller.nextPage(
                   duration: animateDuration, curve: Curves.easeInOut);
             } catch (e) {
-              logger.e(e);
+              //logger.e(e);
             }
           }
           await Future.delayed(const Duration(seconds: 10));
