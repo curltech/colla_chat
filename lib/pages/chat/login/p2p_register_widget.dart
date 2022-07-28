@@ -54,8 +54,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return platformWidgetFactory.buildContainer(
-      child: ListView(
+    return ListView(
         children: <Widget>[
           const SizedBox(height: 30.0),
           Padding(
@@ -85,8 +84,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
                 columnFieldDefs: p2pRegisterInputFieldDef,
               )),
         ],
-      ),
-    );
+      );
   }
 
   _onOk(Map<String, dynamic> values) {

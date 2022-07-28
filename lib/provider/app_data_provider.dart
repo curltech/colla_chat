@@ -172,7 +172,7 @@ class AppDataProvider with ChangeNotifier {
 
   //屏幕宽高
   double _keyboardHeight = 270.0;
-  final Size _emulatorSize = const Size(412.0, 869.0);
+  Size _mobileSize = Size(412.0, 869.0);
   Size _size = const Size(0.0, 0.0);
   double bottomBarHeight = kBottomNavigationBarHeight;
   double toolbarHeight = kToolbarHeight;
@@ -311,6 +311,14 @@ class AppDataProvider with ChangeNotifier {
   Size get workspaceSize {
     double width = _size.width;
     double height = _size.height;
+    height = height - bottomBarHeight;
+
+    return Size(width, height);
+  }
+
+  Size get mobileSize {
+    double width = _mobileSize.width;
+    double height = _mobileSize.height;
     height = height - bottomBarHeight;
 
     return Size(width, height);
