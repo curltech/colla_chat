@@ -170,7 +170,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       try {
         myselfPeerService
             .findOneByPeerId(peerId)
-            .then((MyselfPeer? myselfPeer) {
+            .then((MyselfPeer? myselfPeer) async {
           ///2.连接篇p2p的节点，把自己的信息注册上去
           if (myselfPeer != null) {
             var json = JsonUtil.toJson(myselfPeer);
@@ -178,8 +178,13 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
             peerClient.activeStatus = ActiveStatus.Down.name;
             peerClient.clientId = myselfPeer.clientId;
             peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
-            peerClient.kind = null;
-            peerClient.name = '';
+            peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
+            peerClient.name = CryptoUtil.encodeBase64(
+                await cryptoGraphy.hash(peerClient.name.codeUnits));
+          peerClient.mobile = CryptoUtil.encodeBase64(
+          await cryptoGraphy.hash(peerClient.mobile.codeUnits));
+          peerClient.email = CryptoUtil.encodeBase64(
+          await cryptoGraphy.hash(peerClient.email.codeUnits));
             connectAction
                 .connect(peerClient)
                 .then((ChainMessage? chainMessage) {

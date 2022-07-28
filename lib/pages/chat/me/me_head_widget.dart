@@ -10,13 +10,15 @@ class MeHeadWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String peerId;
     String name;
-    var peerId = myself.peerId;
-    if (peerId == null) {
+    var myselfPeer = myself.myselfPeer;
+    if (myselfPeer == null) {
       peerId = '未登录';
       name = '未登录';
     } else {
-      name = myself.myselfPeer!.name;
+      peerId = myselfPeer.peerId;
+      name = myselfPeer.name;
     }
     var listTile = ListTile(
       leading: const ImageWidget(
