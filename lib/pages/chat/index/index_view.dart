@@ -41,7 +41,7 @@ class IndexViewState extends State<IndexView>
             child: Stack(children: <Widget>[
           Opacity(
             opacity: 1,
-            child: Loading(title: ''),
+            child: loadingWidget,
           ),
           Center(
               child: platformWidgetFactory.buildSizedBox(

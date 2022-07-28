@@ -85,7 +85,7 @@ class _P2pLoginState extends State<P2pLogin> {
         body: Stack(children: <Widget>[
           Opacity(
             opacity: 1,
-            child: Loading(title: ''),
+            child: loadingWidget,
           ),
           workspace
         ]));
