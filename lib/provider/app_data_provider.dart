@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -317,8 +318,10 @@ class AppDataProvider with ChangeNotifier {
   }
 
   Size get mobileSize {
-    double width = _mobileSize.width;
-    double height = _mobileSize.height;
+    double width =
+        _size.width < _mobileSize.width ? _size.width : _mobileSize.width;
+    double height =
+        _size.height < _mobileSize.height ? _size.height : _mobileSize.height;
     height = height - bottomBarHeight;
 
     return Size(width, height);
