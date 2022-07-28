@@ -33,9 +33,6 @@ class ChainMessageHandler {
     // 源节点的id和地址
     chainMessage.srcPeerId ??= remotePeerId;
     chainMessage.srcAddress ??= remoteAddr;
-    // 本次连接的源节点id和地址
-    chainMessage.localConnectPeerId = remotePeerId;
-    chainMessage.localConnectAddress = remoteAddr;
     response = await chainMessageHandler.receive(chainMessage);
 
     ///把响应报文转成原始数据
@@ -43,7 +40,7 @@ class ChainMessageHandler {
       try {
         await chainMessageHandler.encrypt(response);
       } catch (err) {
-        response = chainMessageHandler.error(chainMessage.messageType, err);
+        response = chainMessageHandler.error(chainMessage.messageType, err.toString());
       }
       chainMessageHandler.setResponse(chainMessage, response);
       List<int> responseData = MessageSerializer.marshal(response);
@@ -62,8 +59,6 @@ class ChainMessageHandler {
     ChainMessage? response;
     var json = JsonUtil.toJson(String.fromCharCodes(data));
     ChainMessage chainMessage = ChainMessage.fromJson(json);
-    chainMessage.localConnectPeerId = remotePeerId;
-    chainMessage.localConnectAddress = remoteAddr;
     response = await chainMessageHandler.receive(chainMessage);
 
     return response;
@@ -148,7 +143,7 @@ class ChainMessageHandler {
         response = await receiveHandler(chainMessage);
       } catch (err) {
         logger.e('receiveHandler chainMessage:$err');
-        response = chainMessageHandler.error(typ, err);
+        response = chainMessageHandler.error(typ, err.toString());
 
         return response;
       }
@@ -223,7 +218,7 @@ class ChainMessageHandler {
     var errMessage = ChainMessage();
     errMessage.payload = MsgType.ERROR.name.codeUnits;
     errMessage.messageType = msgType;
-    errMessage.tip = err.chatMessage;
+    errMessage.tip = err;
     errMessage.messageDirect = MsgDirect.Response.name;
 
     return errMessage;
@@ -262,10 +257,8 @@ class ChainMessageHandler {
   }
 
   setResponse(ChainMessage request, ChainMessage response) {
-    response.localConnectAddress = "";
-    response.localConnectPeerId = "";
-    response.connectAddress = request.localConnectAddress;
-    response.connectPeerId = request.localConnectPeerId;
+    response.connectAddress = request.connectAddress;
+    response.connectPeerId = request.connectPeerId;
     response.topic = request.topic;
   }
 
@@ -322,9 +315,7 @@ class ChainMessageHandler {
      * 如果不是最终目标，不用合并
      */
     var targetPeerId = chainMessage.targetPeerId;
-    if (targetPeerId == null) {
-      targetPeerId = chainMessage.connectPeerId;
-    }
+    targetPeerId ??= chainMessage.connectPeerId;
     var peerId = myself.peerId;
     if (peerId != null && targetPeerId != peerId) {
       return chainMessage;
@@ -333,7 +324,7 @@ class ChainMessageHandler {
     var sliceSize = chainMessage.sliceSize;
     if (!caches.containsKey(uuid)) {
       List<ChainMessage> slices = [];
-      caches[uuid] = slices;
+      caches[uuid!] = slices;
     }
     List<ChainMessage>? slices = caches[uuid];
     if (slices == null) {

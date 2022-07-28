@@ -1,27 +1,25 @@
 import 'package:colla_chat/entity/p2p/security_context.dart';
 
 class ChainMessage extends SecurityContext {
-  late String uuid;
-  String? srcClientId;
+  String? uuid;
+  String? topic;
 
   /// 最终的消息接收目标，如果当前节点不是最终的目标，可以进行转发
   /// 如果目标是服务器节点，直接转发，
   /// 如果目标是客户机节点，先找到客户机目前连接的服务器节点，也许就是自己，然后转发
   String? targetConnectPeerId;
   String? targetConnectSessionId;
-
-  ///
-  ///   以下两个字段方便对消息处理时寻找目的节点
-  ///
-  String? topic;
+  String? targetClientId;
+  String? targetAddress;
 
   /// src字段在发送的时候不填，到接收端自动填充,ConnectSessionId在发送的时候不填，到接收端自动填充
   /// ,第一个连接节点
+  String? srcClientId;
   String? srcConnectSessionId;
   String? srcConnectPeerId;
-  String? localConnectPeerId;
-  String? localConnectAddress;
   String? srcAddress;
+
+  ///本次连接的信息
   String? connectPeerId;
   String? connectAddress;
   String? connectSessionId;
@@ -50,15 +48,15 @@ class ChainMessage extends SecurityContext {
 
   ChainMessage.fromJson(Map json)
       : uuid = json['uuid'] ?? '',
-        srcClientId = json['srcClientId'],
+        topic = json['topic'],
         targetConnectPeerId = json['targetConnectPeerId'],
         targetConnectSessionId = json['targetConnectSessionId'],
-        topic = json['topic'],
+        targetClientId = json['targetClientId'],
+        targetAddress = json['targetAddress'],
         srcConnectSessionId = json['srcConnectSessionId'],
         srcConnectPeerId = json['srcConnectPeerId'],
-        localConnectPeerId = json['localConnectPeerId'],
-        localConnectAddress = json['localConnectAddress'],
         srcAddress = json['srcAddress'],
+        srcClientId = json['srcClientId'],
         connectPeerId = json['connectPeerId'],
         connectAddress = json['connectAddress'],
         connectSessionId = json['connectSessionId'],
@@ -79,14 +77,14 @@ class ChainMessage extends SecurityContext {
     var json = super.toJson();
     json.addAll({
       'uuid': uuid,
-      'srcClientId': srcClientId,
+      'topic': topic,
       'targetConnectPeerId': targetConnectPeerId,
       'targetConnectSessionId': targetConnectSessionId,
-      'topic': topic,
-      'srcConnectSessionId': srcConnectSessionId,
+      'targetClientId': targetClientId,
+      'targetAddress': targetAddress,
       'srcConnectPeerId': srcConnectPeerId,
-      'localConnectPeerId': localConnectPeerId,
-      'localConnectAddress': localConnectAddress,
+      'srcConnectSessionId': srcConnectSessionId,
+      'srcClientId': srcClientId,
       'srcAddress': srcAddress,
       'connectPeerId': connectPeerId,
       'connectAddress': connectAddress,
