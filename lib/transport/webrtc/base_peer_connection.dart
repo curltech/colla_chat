@@ -510,16 +510,8 @@ abstract class BasePeerConnection {
       if (sender == null) {
         throw 'Cannot replace track that was never added.,ERR_TRACK_NOT_ADDED';
       }
-      if (newTrack != null) {
-        trackSenders[newTrack] = streamSenders!;
-      }
-      if (sender.replaceTrack != null) {
-        await sender.replaceTrack(newTrack);
-      } else {
-        logger.e(
-            'replaceTrack is not supported in this browser,ERR_UNSUPPORTED_REPLACETRACK');
-        close();
-      }
+      trackSenders[newTrack] = streamSenders;
+      await sender.replaceTrack(newTrack);
     }
   }
 
