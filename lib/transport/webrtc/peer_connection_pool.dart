@@ -241,12 +241,14 @@ class PeerConnectionPool {
       return false;
     }
     if (peerConnections.isNotEmpty) {
-      for (AdvancedPeerConnection peerConnection in peerConnections) {
+      peerConnections.removeWhere((peerConnection) {
+        bool match = false;
         if (clientId == null || clientId == peerConnection.clientId) {
-          peerConnections.remove(peerConnection);
-          await peerConnection.close();
+          match = true;
+          peerConnection.close();
         }
-      }
+        return match;
+      });
       if (peerConnections.isEmpty) {
         this.peerConnections.remove(peerId);
       }
