@@ -212,6 +212,5 @@ class AdvancedPeerConnection {
 
   close() async {
     await basePeerConnection.close();
-
   }
 }
