@@ -78,7 +78,7 @@ class NodeAddress {
       this.credential,
       this.connectPeerId,
       this.chainProtocolId}) {
-    setIceServers();
+    //setIceServers();
   }
 
   NodeAddress.fromJson(Map json)
