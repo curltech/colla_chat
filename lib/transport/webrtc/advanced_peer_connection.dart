@@ -193,16 +193,16 @@ class AdvancedPeerConnection {
     }
   }
 
-  signal(WebrtcSignal signal) {
-    basePeerConnection.signal(signal);
+  onSignal(WebrtcSignal signal) {
+    basePeerConnection.onSignal(signal);
   }
 
   bool get connected {
-    return basePeerConnection.connected;
+    return basePeerConnection.status == PeerConnectionStatus.connected;
   }
 
   send(Uint8List data) {
-    if (basePeerConnection.connected) {
+    if (connected) {
       basePeerConnection.send(data);
     } else {
       logger.e(
@@ -212,5 +212,6 @@ class AdvancedPeerConnection {
 
   close() async {
     await basePeerConnection.close();
+
   }
 }
