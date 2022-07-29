@@ -421,7 +421,8 @@ abstract class BasePeerConnection {
   }
 
   onRenegotiationNeeded() {
-    logger.i('onRenegotiationNeeded event');
+    logger.i('Master onRenegotiationNeeded event');
+    negotiate();
   }
 
   //数据通道状态事件
@@ -845,14 +846,13 @@ class SlavePeerConnection extends BasePeerConnection {
   ///被叫的协商时发送再协商信号给主叫，要求重新发起协商
   @override
   negotiate() async {
-    logger.i('requesting negotiation from initiator');
+    logger.i('requesting negotiation from slave');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
     }
     //被叫不能在第一次的时候主动发起协议过程
     if (firstNegotiation) {
-      logger.e('non-initiator initial negotiation request discarded');
       firstNegotiation = false;
       return;
     }
@@ -861,9 +861,9 @@ class SlavePeerConnection extends BasePeerConnection {
       logger.i('already negotiating');
       return;
     }
-    //被叫收到协商的请求
-    emit(
-        WebrtcEventType.signal, WebrtcSignal('renegotiate', renegotiate: true,extension: extension));
+    //被叫发送重新协商的请求
+    emit(WebrtcEventType.signal,
+        WebrtcSignal('renegotiate', renegotiate: true, extension: extension));
     status == PeerConnectionStatus.negotiating;
   }
 
@@ -970,6 +970,7 @@ class SlavePeerConnection extends BasePeerConnection {
     emit(
         WebrtcEventType.signal,
         WebrtcSignal(SignalType.transceiverRequest.name,
-            transceiverRequest: {'kind': kind, 'init': init},extension: extension));
+            transceiverRequest: {'kind': kind, 'init': init},
+            extension: extension));
   }
 }
