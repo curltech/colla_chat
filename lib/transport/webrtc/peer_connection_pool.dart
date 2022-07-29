@@ -406,7 +406,7 @@ class PeerConnectionPool {
           WebrtcEvent(peerId, clientId, data: advancedPeerConnection));
     }
 
-    await advancedPeerConnection.signal(signal);
+    await advancedPeerConnection.onSignal(signal);
   }
 
   /// 向peer发送信息，如果是多个，遍历发送
