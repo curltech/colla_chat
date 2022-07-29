@@ -437,7 +437,8 @@ class PeerConnectionPool {
   Future<dynamic> signal(WebrtcEvent evt) async {
     try {
       var peerId = evt.peerId;
-      var result = await signalAction.signal(evt.data, peerId);
+      var clientId = evt.clientId;
+      var result = await signalAction.signal(evt.data, peerId, clientId);
       if (result == 'ERROR') {
         logger.e('signal err:$result');
       }

@@ -121,6 +121,11 @@ class Websocket implements IWebClient {
       channel!.sink.add(data);
     } else {
       logger.e('status is not connected');
+      reconnect().then((value) {
+        if (channel != null && status == SocketStatus.connected) {
+          sendMsg(data);
+        }
+      });
     }
   }
 
