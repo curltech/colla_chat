@@ -26,7 +26,19 @@ class SignalExtension {
           action: room['action'],
           identity: room['identity']);
     }
-    iceServers = json['iceServers'];
+    var iceServers = json['iceServers'];
+    if (iceServers != null) {
+      if (iceServers is List && iceServers.isNotEmpty) {
+        if (this.iceServers == null) {
+          this.iceServers = [];
+        }
+        for (var iceServer in iceServers) {
+          for (var entry in (iceServer as Map).entries) {
+            this.iceServers!.add({entry.key: entry.value});
+          }
+        }
+      }
+    }
   }
 
   Map<String, dynamic> toJson() {
