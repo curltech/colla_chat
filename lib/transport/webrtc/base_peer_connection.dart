@@ -791,6 +791,7 @@ class MasterPeerConnection extends BasePeerConnection {
     //如果sdp信息，则设置远程描述，并处理所有的候选清单中候选服务器
     //对主叫节点来说，sdp应该是answer
     else if (signalType == SignalType.sdp.name && sdp != null) {
+      logger.i('remote offer sdp:$sdp');
       await peerConnection.setRemoteDescription(sdp);
       if (status == PeerConnectionStatus.closed) {
         logger.e('PeerConnectionStatus closed');
@@ -876,6 +877,7 @@ class SlavePeerConnection extends BasePeerConnection {
 
     RTCSessionDescription answer =
         await peerConnection.createAnswer(sdpConstraints);
+    logger.i('local answer sdp:$answer');
     await peerConnection.setLocalDescription(answer);
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
