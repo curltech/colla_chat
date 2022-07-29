@@ -10,10 +10,10 @@ final Map<String, NodeAddress> nodeAddressOptions = {
       libp2pConnectAddress:
           '/ip4/127.0.0.1/tcp/5720/wss/p2p/12D3KooWGHzEzdyaet3Qk4mSVHcvXUh6CJTX8tCus9ZmrMXpi6HV',
       iceServers: [
-        //{"url": "stun:stun.l.google.com:19302"},
-        {
-          'url': 'stun:localhost:3478',
-        },
+        {"url": "stun:stun.l.google.com:19302"},
+        // {
+        //   'url': 'stun:localhost:3478',
+        // },
         // {
         //   'url': 'turn:localhost:3478',
         // }
