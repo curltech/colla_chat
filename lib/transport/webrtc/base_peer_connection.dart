@@ -126,7 +126,7 @@ enum WebrtcEventType {
   iceConnectionState,
   iceGatheringState,
   signalingState,
-  iceComplete,
+  iceCompleted,
   dataChannelState,
 }
 
@@ -228,6 +228,7 @@ abstract class BasePeerConnection {
       var iceServers = extension.iceServers;
       var appDataProvider = AppDataProvider.instance;
       iceServers = iceServers ?? appDataProvider.defaultNodeAddress.iceServers;
+      extension.iceServers = iceServers;
       var configuration = {'iceServers': iceServers};
       //1.创建连接
       this.peerConnection =
@@ -413,7 +414,7 @@ abstract class BasePeerConnection {
     } else if (candidate.candidate == null && !iceCompleted) {
       iceCompleted = true;
       logger.i('onIceCandidate event，iceComplete true');
-      emit(WebrtcEventType.iceComplete, '');
+      emit(WebrtcEventType.iceCompleted, '');
     }
   }
 
