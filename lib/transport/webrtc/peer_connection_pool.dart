@@ -342,7 +342,7 @@ class PeerConnectionPool {
     WebrtcSignal signal = chainMessage.payload;
     var signalType = signal.signalType;
     logger.i('receive signal type: $signalType from webrtcPeer: $peerId');
-    String? clientId;
+    String? clientId = chainMessage.srcClientId;
     List<Map<String, String>>? iceServers;
     Room? room;
     var extension = signal.extension;
@@ -350,11 +350,19 @@ class PeerConnectionPool {
       if (peerId != extension.peerId) {
         logger.e(
             'peerId:$peerId extension peerId:${extension.peerId} is not same');
-        return;
+        peerId = extension.peerId;
       }
-      clientId = extension.clientId;
+      if (clientId != extension.clientId) {
+        logger.e(
+            'peerId:$peerId extension peerId:${extension.peerId} is not same');
+        clientId = extension.clientId;
+      }
       iceServers = extension.iceServers;
       room = extension.room;
+    }
+    if (peerId == null) {
+      logger.e('peerId is null');
+      return;
     }
     if (clientId == null) {
       logger.e('clientId is null');
@@ -381,7 +389,7 @@ class PeerConnectionPool {
       }
       advancedPeerConnection = AdvancedPeerConnection();
       var result = await advancedPeerConnection.init(peerId, clientId, false,
-          getUserMedia: true, iceServers: iceServers, room: room);
+          getUserMedia: false, iceServers: iceServers, room: room);
       if (!result) {
         logger.e('webrtcPeer.init fail');
         return null;
