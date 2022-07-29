@@ -31,14 +31,20 @@ class WebrtcSignal {
     signalType = json['signalType'];
     renegotiate = json['renegotiate'];
     transceiverRequest = json['transceiverRequest'];
-    Map<String, dynamic> iceCandidate = json['candidate'];
-    candidate = RTCIceCandidate(iceCandidate['candidate'],
-        iceCandidate['sdpMid'], iceCandidate['sdpMLineIndex']);
-    Map<String, dynamic> sessionDescription = json['sdp'];
-    sdp = RTCSessionDescription(
-        sessionDescription['sdp'], sessionDescription['type']);
+    Map<String, dynamic>? iceCandidate = json['candidate'];
+    if (iceCandidate != null) {
+      candidate = RTCIceCandidate(iceCandidate['candidate'],
+          iceCandidate['sdpMid'], iceCandidate['sdpMLineIndex']);
+    }
+    Map<String, dynamic>? sessionDescription = json['sdp'];
+    if (sessionDescription != null) {
+      sdp = RTCSessionDescription(
+          sessionDescription['sdp'], sessionDescription['type']);
+    }
     var extension = json['extension'];
-    this.extension = SignalExtension.fromJson(extension);
+    if (extension != null) {
+      this.extension = SignalExtension.fromJson(extension);
+    }
   }
 
   Map<String, dynamic> toJson() {
