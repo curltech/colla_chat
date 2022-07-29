@@ -18,12 +18,14 @@ class SignalExtension {
   SignalExtension.fromJson(Map json) {
     peerId = json['peerId'];
     clientId = json['clientId'];
-    Map<String, dynamic> router = json['router'];
-    room = Room(router['roomId'],
-        id: router['id'],
-        type: router['type'],
-        action: router['action'],
-        identity: router['identity']);
+    Map<String, dynamic>? room = json['room'];
+    if (room != null) {
+      this.room = Room(room['roomId'],
+          id: room['id'],
+          type: room['type'],
+          action: room['action'],
+          identity: room['identity']);
+    }
     iceServers = json['iceServers'];
   }
 

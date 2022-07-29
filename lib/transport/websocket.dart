@@ -65,9 +65,9 @@ class Websocket implements IWebClient {
   onData(dynamic data) async {
     var msg = String.fromCharCodes(data);
     if (msg == 'heartbeat') {
-      logger.i('wss address:$address receive heartbeat message');
+      //logger.i('wss address:$address receive heartbeat message');
     } else {
-      logger.w(msg);
+      //logger.w(msg);
       var response = await chainMessageHandler.receiveRaw(data, '', '');
       if (response != null) {
         sendMsg(response);
