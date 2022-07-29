@@ -747,11 +747,9 @@ class MasterPeerConnection extends BasePeerConnection {
       return;
     }
     var sdp = await peerConnection.getLocalDescription();
-    if (sdp == null) {
-      sdp = offer;
-      emit(WebrtcEventType.signal,
-          WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
-    }
+    sdp ??= offer;
+    emit(WebrtcEventType.signal,
+        WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
   }
 
   ///从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
@@ -884,7 +882,7 @@ class SlavePeerConnection extends BasePeerConnection {
       return;
     }
     if (!iceCompleted) {
-      logger.i('sendAnswer iceComplete false');
+      logger.i('sendAnswer iceCompleted false');
     }
     await sendAnswer(answer);
   }
@@ -898,13 +896,9 @@ class SlavePeerConnection extends BasePeerConnection {
       return;
     }
     var sdp = await peerConnection.getLocalDescription();
-    if (sdp != null) {
-      sdp = answer;
-    }
-    if (sdp != null) {
-      emit(WebrtcEventType.signal,
-          WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
-    }
+    sdp ??= answer;
+    emit(WebrtcEventType.signal,
+        WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
   }
 
   ///从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
