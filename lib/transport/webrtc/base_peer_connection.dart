@@ -409,8 +409,10 @@ abstract class BasePeerConnection {
     }
     if (candidate.candidate != null) {
       //发送candidate信号
-      emit(WebrtcEventType.signal,
-          WebrtcSignal(SignalType.candidate.name, candidate: candidate));
+      emit(
+          WebrtcEventType.signal,
+          WebrtcSignal(SignalType.candidate.name,
+              candidate: candidate, extension: extension));
     } else if (candidate.candidate == null && !iceCompleted) {
       iceCompleted = true;
       logger.i('onIceCandidate event，iceComplete true');
@@ -861,7 +863,7 @@ class SlavePeerConnection extends BasePeerConnection {
     }
     //被叫收到协商的请求
     emit(
-        WebrtcEventType.signal, WebrtcSignal('renegotiate', renegotiate: true));
+        WebrtcEventType.signal, WebrtcSignal('renegotiate', renegotiate: true,extension: extension));
     status == PeerConnectionStatus.negotiating;
   }
 
@@ -968,6 +970,6 @@ class SlavePeerConnection extends BasePeerConnection {
     emit(
         WebrtcEventType.signal,
         WebrtcSignal(SignalType.transceiverRequest.name,
-            transceiverRequest: {'kind': kind, 'init': init}));
+            transceiverRequest: {'kind': kind, 'init': init},extension: extension));
   }
 }
