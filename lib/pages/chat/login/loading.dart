@@ -33,10 +33,11 @@ const List<String> lightBackgroudImages = [
 class Loading extends StatefulWidget {
   final String title;
   final bool autoPlay;
-
   final lightChildren = <Widget>[];
-
   final darkChildren = <Widget>[];
+  final PageController controller = PageController();
+  int currentIndex = 0;
+  final animateDuration = const Duration(milliseconds: 500);
 
   Loading({Key? key, required this.title, this.autoPlay = true})
       : super(key: key) {
@@ -63,23 +64,19 @@ class Loading extends StatefulWidget {
 }
 
 class _LoadingState extends State<Loading> {
-  PageController controller = PageController();
-  int currentIndex = 0;
-  final animateDuration = const Duration(milliseconds: 500);
-
   @override
   void initState() {
     super.initState();
     if (appDataProvider.brightness == Brightness.light.name) {
       if (widget.autoPlay) {
         Future.doWhile(() async {
-          if (currentIndex >= lightBackgroudImages.length - 1) {
-            controller.animateToPage(0,
-                duration: animateDuration, curve: Curves.easeInOut);
+          if (widget.currentIndex >= lightBackgroudImages.length - 1) {
+            widget.controller.animateToPage(0,
+                duration: widget.animateDuration, curve: Curves.easeInOut);
           } else {
             try {
-              controller.nextPage(
-                  duration: animateDuration, curve: Curves.easeInOut);
+              widget.controller.nextPage(
+                  duration: widget.animateDuration, curve: Curves.easeInOut);
             } catch (e) {
               //logger.e(e);
             }
@@ -95,12 +92,12 @@ class _LoadingState extends State<Loading> {
     if (appDataProvider.brightness == Brightness.dark.name) {
       if (widget.autoPlay) {
         Future.doWhile(() async {
-          if (currentIndex >= darkBackgroudImages.length - 1) {
-            controller.animateToPage(0,
-                duration: animateDuration, curve: Curves.easeInOut);
+          if (widget.currentIndex >= darkBackgroudImages.length - 1) {
+            widget.controller.animateToPage(0,
+                duration: widget.animateDuration, curve: Curves.easeInOut);
           } else {
-            controller.nextPage(
-                duration: animateDuration, curve: Curves.easeInOut);
+            widget.controller.nextPage(
+                duration: widget.animateDuration, curve: Curves.easeInOut);
           }
           await Future.delayed(const Duration(seconds: 10));
           // if (currentIndex >= darkBackgroudImages.length - 1) {
@@ -127,9 +124,9 @@ class _LoadingState extends State<Loading> {
       children = widget.darkChildren;
     }
     return PageView(
-      controller: controller,
+      controller: widget.controller,
       onPageChanged: (int index) {
-        currentIndex = index;
+        widget.currentIndex = index;
       },
       children: children,
     );
@@ -137,8 +134,8 @@ class _LoadingState extends State<Loading> {
 
   @override
   void dispose() {
-    // 释放资源
-    controller.dispose();
     super.dispose();
   }
 }
+
+var loadingWidget = Loading(title: '');

@@ -41,10 +41,13 @@ class IndexViewState extends State<IndexView>
             child: Stack(children: <Widget>[
           Opacity(
             opacity: 1,
-            child: Loading(title: ''),
+            child: loadingWidget,
           ),
-          platformWidgetFactory.buildContainer(
-              child: Center(child: indexWidget))
+          Center(
+              child: platformWidgetFactory.buildSizedBox(
+                  child: indexWidget,
+                  height: appDataProvider.mobileSize.height,
+                  width: appDataProvider.mobileSize.width))
         ])),
         //endDrawer: endDrawer,
         bottomNavigationBar: bottomNavigationBar);

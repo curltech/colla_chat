@@ -42,14 +42,13 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
   @override
   Widget build(BuildContext context) {
     Provider.of<AppDataProvider>(context);
-    return platformWidgetFactory.buildContainer(
-        child: Padding(
+    return Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
             child: FormInputWidget(
               mainAxisAlignment: MainAxisAlignment.center,
               onOk: _login,
               columnFieldDefs: p2pRegisterInputFieldDef,
-            )));
+            ));
   }
 
   _login(Map<String, dynamic> values) {

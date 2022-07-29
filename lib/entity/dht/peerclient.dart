@@ -12,6 +12,7 @@ class PeerClient extends PeerLocation {
 
   /// 客户连接到节点的位置
   String? connectPeerId;
+  String? connectAddress;
   String? connectSessionId;
   String? activeStatus;
   String? lastAccessTime;
@@ -33,6 +34,7 @@ class PeerClient extends PeerLocation {
         lastAccessTime = json['lastAccessTime'],
         activeStatus = json['activeStatus'],
         connectPeerId = json['connectPeerId'],
+        connectAddress = json['connectAddress'],
         connectSessionId = json['connectSessionId'],
         signature = json['signature'],
         previousPublicKeySignature = json['previousPublicKeySignature'],
@@ -52,6 +54,7 @@ class PeerClient extends PeerLocation {
       'lastAccessTime': lastAccessTime,
       'activeStatus': activeStatus,
       'connectPeerId': connectPeerId,
+      'connectAddress': connectAddress,
       'connectSessionId': connectSessionId,
       'previousPublicKeySignature': previousPublicKeySignature,
       'signature': signature,

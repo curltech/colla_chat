@@ -2,6 +2,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
 
+import '../../../widgets/style/platform_widget_factory.dart';
 import 'loading.dart';
 import 'p2p_login_widget.dart';
 import 'p2p_register_widget.dart';
@@ -74,9 +75,9 @@ class _P2pLoginState extends State<P2pLogin> {
       ],
     );
     var workspace = Center(
-        child: SizedBox(
-      width: 350,
-      height: 480,
+        child: platformWidgetFactory.buildSizedBox(
+      height: appDataProvider.mobileSize.height,
+      width: appDataProvider.mobileSize.width,
       child: pageView,
     ));
     return Scaffold(
@@ -84,7 +85,7 @@ class _P2pLoginState extends State<P2pLogin> {
         body: Stack(children: <Widget>[
           Opacity(
             opacity: 1,
-            child: Loading(title: ''),
+            child: loadingWidget,
           ),
           workspace
         ]));

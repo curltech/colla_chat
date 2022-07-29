@@ -94,7 +94,8 @@ abstract class BaseAction {
       {String? connectAddress,
       String? connectPeerId,
       String? topic,
-      String? targetPeerId}) async {
+      String? targetPeerId,
+      String? targetClientId}) async {
     ChainMessage chainMessage = ChainMessage();
     var appParams = AppDataProvider.instance;
     if (connectAddress == null) {
@@ -132,10 +133,11 @@ abstract class BaseAction {
       targetPeerId = connectPeerId;
     }
     chainMessage.targetPeerId = targetPeerId;
+    chainMessage.targetClientId = targetClientId;
     chainMessage.payloadType = PayloadType.map.name;
     chainMessage.messageType = msgType.name;
     chainMessage.messageDirect = MsgDirect.Request.name;
-    var uuid = Uuid();
+    var uuid = const Uuid();
     chainMessage.uuid = uuid.v4();
     chainMessage.srcPeerId = myself.peerId;
     chainMessage.srcClientId = myself.clientId;

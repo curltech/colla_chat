@@ -339,7 +339,7 @@ class PeerConnectionPool {
     String? peerId = chainMessage.srcPeerId;
     String? connectPeerId = chainMessage.srcConnectPeerId;
     String? connectSessionId = chainMessage.srcConnectSessionId;
-    WebrtcSignal signal = WebrtcSignal.fromJson(chainMessage.payload);
+    WebrtcSignal signal = chainMessage.payload;
     var signalType = signal.signalType;
     logger.i('receive signal type: $signalType from webrtcPeer: $peerId');
     String? clientId;

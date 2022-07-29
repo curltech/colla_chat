@@ -24,8 +24,7 @@ class _P2pSettingWidgetState extends State<P2pSettingWidget>
     Provider.of<AppDataProvider>(context).locale;
     Provider.of<AppDataProvider>(context).themeData;
     Provider.of<AppDataProvider>(context).brightness;
-    return platformWidgetFactory.buildContainer(
-      child: Column(
+    return  Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: const <Widget>[
@@ -45,7 +44,6 @@ class _P2pSettingWidgetState extends State<P2pSettingWidget>
             child: BrightnessPicker(),
           ),
         ],
-      ),
     );
   }
 

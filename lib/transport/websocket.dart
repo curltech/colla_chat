@@ -26,6 +26,7 @@ class Websocket implements IWebClient {
   Map<String, dynamic> headers = {};
   Timer? heartBeat; // 心跳定时器
   int heartTimes = 3000; // 心跳间隔(毫秒)
+  Function()? onConnected;
 
   Websocket(String addr) {
     if (!addr.startsWith(prefix)) {
@@ -46,6 +47,9 @@ class Websocket implements IWebClient {
     //initHeartBeat();
     status = SocketStatus.connected;
     logger.i('wss address:$address websocket connected');
+    if (onConnected!=null) {
+      onConnected!();
+    }
   }
 
   @override

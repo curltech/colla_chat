@@ -45,6 +45,8 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
   }
 
   Widget _buildLogout(BuildContext context) {
+    var indexWidgetProvider =
+        Provider.of<IndexWidgetProvider>(context, listen: false);
     return TextButton(
         style: ButtonStyle(
           backgroundColor: MaterialStateProperty.all(Colors.grey),
@@ -60,6 +62,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
         ),
         onPressed: () {
           myselfPeerService.logout();
+          indexWidgetProvider.pop(context: context);
           Application.router
               .navigateTo(context, Application.p2pLogin, replace: true);
         },

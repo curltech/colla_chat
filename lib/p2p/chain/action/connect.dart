@@ -15,6 +15,8 @@ class ConnectAction extends BaseAction {
   Future<ChainMessage?> connect(PeerClient peerClient) async {
     ChainMessage chainMessage = await prepareSend(peerClient);
     chainMessage.payloadType = PayloadType.peerClient.name;
+    peerClient.connectPeerId = chainMessage.connectPeerId;
+    peerClient.connectAddress = chainMessage.connectAddress;
 
     ChainMessage? response = await send(chainMessage);
 
