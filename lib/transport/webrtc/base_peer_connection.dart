@@ -212,7 +212,9 @@ abstract class BasePeerConnection {
     ],
   };
 
-  BasePeerConnection();
+  BasePeerConnection() {
+    logger.i('Create BasePeerConnection');
+  }
 
   ///初始化连接，可以传入外部视频流，这是异步的函数，不能在构造里调用
   ///建立连接对象，设置好回调函数，然后如果是master发起协商，如果是follow，在收到offer才开始创建，
@@ -233,7 +235,7 @@ abstract class BasePeerConnection {
       //1.创建连接
       this.peerConnection =
           await createPeerConnection(configuration, pcConstraints);
-      logger.i('createPeerConnection end:$id');
+      logger.i('Create PeerConnection peerConnection end:$id');
     } catch (err) {
       logger.e('createPeerConnection:$err');
       return false;
@@ -281,7 +283,7 @@ abstract class BasePeerConnection {
             dataChannel.onMessage =
                 (RTCDataChannelMessage message) => {onMessage(message)}
           };
-      logger.i('createDataChannel and onDataChannel end');
+      logger.i('CreateDataChannel and onDataChannel end');
     }
 
     /// 4.把本地的现有的视频流加入到连接中，这个流可以由参数传入
@@ -292,7 +294,7 @@ abstract class BasePeerConnection {
       localVideoRenders.add(render);
       var streamId = render.mediaStream!.id;
       addStream(render.mediaStream!);
-      logger.i('add getUserMedia stream $streamId');
+      logger.i('Add getUserMedia stream $streamId');
     }
     if (streams.isNotEmpty) {
       for (var stream in streams) {
@@ -301,7 +303,7 @@ abstract class BasePeerConnection {
         localVideoRenders.add(render);
         addStream(stream);
         var streamId = stream.id;
-        logger.i('add stream $streamId');
+        logger.i('Add stream $streamId');
       }
     }
 
@@ -325,7 +327,7 @@ abstract class BasePeerConnection {
 
     /// 6. 开始协商，满足条件的话开始主叫创建offer
     /// 或者被叫发起重新发起协商请求
-    logger.i('negotiation start');
+    logger.i('Negotiation start');
     negotiate();
 
     return true;
@@ -343,8 +345,14 @@ abstract class BasePeerConnection {
     emit(WebrtcEventType.connectionState, state);
     if (peerConnection.connectionState ==
         RTCPeerConnectionState.RTCPeerConnectionStateFailed) {
-      logger.e('Connection failed.ERR_CONNECTION_FAILURE');
+      logger.e('Connection failed.');
       close();
+    }
+    if (peerConnection.connectionState ==
+        RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
+      status = PeerConnectionStatus.connected;
+      logger
+          .i('PeerConnectionStatus connected, webrtc connection is completed');
     }
   }
 
@@ -362,13 +370,15 @@ abstract class BasePeerConnection {
     if (state == RTCIceConnectionState.RTCIceConnectionStateConnected ||
         state == RTCIceConnectionState.RTCIceConnectionStateCompleted) {
       status = PeerConnectionStatus.connected;
+      logger
+          .i('PeerConnectionStatus connected, webrtc connection is completed');
     }
     if (state == RTCIceConnectionState.RTCIceConnectionStateFailed) {
-      logger.e('Ice connection failed.,ERR_ICE_CONNECTION_FAILURE');
+      logger.e('Ice connection failed.');
       close();
     }
     if (state == RTCIceConnectionState.RTCIceConnectionStateClosed) {
-      logger.e('Ice connection closed.,ERR_ICE_CONNECTION_CLOSED');
+      logger.e('Ice connection closed.');
       close();
     }
   }
@@ -409,6 +419,7 @@ abstract class BasePeerConnection {
     }
     if (candidate.candidate != null) {
       //发送candidate信号
+      logger.i('Send Candidate signal.');
       emit(
           WebrtcEventType.signal,
           WebrtcSignal(SignalType.candidate.name,
@@ -434,12 +445,12 @@ abstract class BasePeerConnection {
     }
     //数据通道打开
     if (state == RTCDataChannelState.RTCDataChannelOpen) {
-      logger.i('on channel open');
+      logger.i('data channel open');
       dataChannelOpen = true;
     }
     //数据通道关闭
     if (state == RTCDataChannelState.RTCDataChannelClosed) {
-      logger.i('on channel close');
+      logger.i('data channel close');
       close();
     }
   }
@@ -460,7 +471,7 @@ abstract class BasePeerConnection {
   /// 把流加入到连接中，比如把本地的视频流加入到连接中，从而让远程peer能够接收到
   /// @param {MediaStream} stream
   addStream(MediaStream stream) {
-    logger.i('addStream()');
+    logger.i('addStream ${stream.id}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -476,7 +487,7 @@ abstract class BasePeerConnection {
   /// @param {MediaStream} stream
   addTrack(MediaStreamTrack track, MediaStream stream) async {
     RTCPeerConnection peerConnection = this.peerConnection!;
-    logger.i('addTrack()');
+    logger.i('addTrack stream:${stream.id}, track:${track.id}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -492,7 +503,7 @@ abstract class BasePeerConnection {
       streamSenders[stream] = sender;
       negotiate();
     } else {
-      throw 'Track has already been added to that stream.,ERR_SENDER_ALREADY_ADDED';
+      logger.e('Track has already been added to that stream.');
     }
   }
 
@@ -502,7 +513,8 @@ abstract class BasePeerConnection {
   /// @param {MediaStream} stream
   replaceTrack(MediaStreamTrack oldTrack, MediaStreamTrack newTrack,
       MediaStream stream) async {
-    logger.i('replaceTrack()');
+    logger.i(
+        'replaceTrack stream:${stream.id}, oldTrack:${oldTrack.id}, newTrack:${newTrack.id}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -511,10 +523,11 @@ abstract class BasePeerConnection {
     if (streamSenders != null) {
       RTCRtpSender? sender = streamSenders[stream];
       if (sender == null) {
-        throw 'Cannot replace track that was never added.,ERR_TRACK_NOT_ADDED';
+        logger.e('Cannot replace track that was never added.');
+      } else {
+        trackSenders[newTrack] = streamSenders;
+        await sender.replaceTrack(newTrack);
       }
-      trackSenders[newTrack] = streamSenders;
-      await sender.replaceTrack(newTrack);
     }
   }
 
@@ -523,7 +536,7 @@ abstract class BasePeerConnection {
   /// @param {MediaStream} stream
   removeTrack(MediaStreamTrack track, MediaStream stream) async {
     RTCPeerConnection peerConnection = this.peerConnection!;
-    logger.i('removeSender()');
+    logger.i('removeTrack stream:${stream.id}, track:${track.id}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -532,23 +545,24 @@ abstract class BasePeerConnection {
     if (streamSenders != null) {
       RTCRtpSender? sender = streamSenders[stream];
       if (sender == null) {
-        throw 'Cannot remove track that was never added.,ERR_TRACK_NOT_ADDED';
+        logger.e('Cannot remove track that was never added.');
+      } else {
+        try {
+          //sender.removed = true;
+          await peerConnection.removeTrack(sender);
+        } catch (err) {
+          logger.e('removeTrack err $err');
+          close();
+        }
+        negotiate();
       }
-      try {
-        //sender.removed = true;
-        await peerConnection.removeTrack(sender);
-      } catch (err) {
-        logger.e('ERR_REMOVE_TRACK');
-        close();
-      }
-      negotiate();
     }
   }
 
   /// 从连接中移除流
   /// @param {MediaStream} stream
   removeStream(MediaStream stream) {
-    logger.i('removeStream');
+    logger.i('removeStream stream:${stream.id}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -562,19 +576,19 @@ abstract class BasePeerConnection {
   ///对远端的连接来说，当有stream或者track到来时触发
   ///此处将流加入到render中
   onAddStream(stream) {
-    logger.i('onAddStream event');
+    logger.i('onAddStream stream:${stream.id}');
   }
 
   onRemoveStream(stream) {
-    logger.i('onRemoveStream event');
+    logger.i('onRemoveStream stream:${stream.id}');
   }
 
   onAddTrack(stream, track) {
-    logger.i('onAddTrack event');
+    logger.i('onAddTrack stream:${stream.id}, track:${track.id}');
   }
 
   onRemoveTrack(stream, track) {
-    logger.i('onRemoveTrack event');
+    logger.i('onRemoveTrack stream:${stream.id}, track:${track.id}');
   }
 
   ///连接的监听轨道到来的监听器，当远方由轨道来的时候执行
@@ -586,7 +600,7 @@ abstract class BasePeerConnection {
     }
 
     for (var eventStream in event.streams) {
-      logger.i('on track');
+      logger.i('onTrack event stream:${eventStream.id}');
       emit(WebrtcEventType.track, {event.track: eventStream});
       remoteTracks.add({event.track: eventStream});
 
@@ -597,7 +611,6 @@ abstract class BasePeerConnection {
       }
 
       remoteVideoRenders.add(PeerVideoRenderer(mediaStream: eventStream));
-      logger.i('on stream');
       emit(WebrtcEventType.stream, eventStream);
     }
   }
@@ -638,6 +651,7 @@ abstract class BasePeerConnection {
 
   ///为连接加上候选的服务器
   addIceCandidate(RTCIceCandidate iceCandidate) async {
+    logger.i('addIceCandidate: ${iceCandidate.candidate}');
     RTCPeerConnection peerConnection = this.peerConnection!;
     await peerConnection.addCandidate(iceCandidate);
   }
@@ -694,6 +708,7 @@ abstract class BasePeerConnection {
       peerConnection.onDataChannel = null;
     }
     status = PeerConnectionStatus.closed;
+    logger.i('PeerConnectionStatus closed');
     emit(WebrtcEventType.close, '');
   }
 }
@@ -717,7 +732,7 @@ class MasterPeerConnection extends BasePeerConnection {
       logger.e('PeerConnectionStatus already negotiating');
       return;
     }
-    logger.i('start negotiation');
+    logger.i('Start negotiate');
     status == PeerConnectionStatus.negotiating;
     await createOffer();
   }
@@ -725,31 +740,32 @@ class MasterPeerConnection extends BasePeerConnection {
   ///创建offer，设置到本地会话描述，并发送offer
   createOffer() async {
     RTCPeerConnection peerConnection = this.peerConnection!;
-    logger.i('start createOffer');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-
+    logger.i('start createOffer');
     RTCSessionDescription offer =
         await peerConnection.createOffer(sdpConstraints);
     await peerConnection.setLocalDescription(offer);
-    logger.i('createOffer success');
+    logger.i('createOffer and setLocalDescription offer successfully');
     await sendOffer(offer);
   }
 
   ///调用外部方法发送offer
   sendOffer(RTCSessionDescription offer) async {
     RTCPeerConnection peerConnection = this.peerConnection!;
-    logger.i('sendOffer');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
     }
+
+    logger.i('start sendOffer');
     var sdp = await peerConnection.getLocalDescription();
     sdp ??= offer;
     emit(WebrtcEventType.signal,
         WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
+    logger.i('end sendOffer');
   }
 
   ///从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
@@ -761,44 +777,45 @@ class MasterPeerConnection extends BasePeerConnection {
       return;
     }
     String signalType = webrtcSignal.signalType;
-    logger.i('signal signalType:$signalType');
+    logger.i('onSignal signalType:$signalType');
     var candidate = webrtcSignal.candidate;
     var sdp = webrtcSignal.sdp;
     //被要求重新协商，则发起协商
     if (signalType == SignalType.renegotiate.name &&
         webrtcSignal.renegotiate != null) {
-      logger.i('got request to renegotiate');
+      logger.i('onSignal renegotiate');
       negotiate();
     }
     //被要求收发，则加收发器
     else if (webrtcSignal.transceiverRequest != null) {
-      logger.i('got request for transceiver');
+      logger.i('onSignal transceiver');
       // addTransceiver(
       //     kind: data.transceiverRequest.kind,
       //     init: data.transceiverRequest.init);
     }
     //如果是候选信息
     else if (signalType == SignalType.candidate.name && candidate != null) {
+      logger.i('onSignal candidate:${candidate.candidate}');
       RTCSessionDescription? remoteDescription =
           await peerConnection.getRemoteDescription();
       //如果远程描述已经设置，加候选，否则，加入候选清单
       if (remoteDescription != null && remoteDescription.type != null) {
         addIceCandidate(candidate);
       } else {
+        logger.i('remoteDescription null,save candidate');
         remoteCandidates.add(candidate);
       }
     }
     //如果sdp信息，则设置远程描述，并处理所有的候选清单中候选服务器
     //对主叫节点来说，sdp应该是answer
     else if (signalType == SignalType.sdp.name && sdp != null) {
-      logger.i('remote offer sdp:$sdp');
+      logger.i('onSignal sdp answer:${sdp.type}');
       this.sdp = sdp;
       await peerConnection.setRemoteDescription(sdp);
       if (status == PeerConnectionStatus.closed) {
         logger.e('PeerConnectionStatus closed');
         return;
       }
-
       for (var candidate in remoteCandidates) {
         addIceCandidate(candidate);
       }
@@ -806,7 +823,7 @@ class MasterPeerConnection extends BasePeerConnection {
     }
     //如果什么都不是，报错
     else {
-      throw 'signal called with invalid signal type,ERR_SIGNALING';
+      logger.e('signal called with invalid signal type');
     }
   }
 
@@ -819,7 +836,7 @@ class MasterPeerConnection extends BasePeerConnection {
     required RTCRtpTransceiverInit init,
   }) async {
     RTCPeerConnection peerConnection = this.peerConnection!;
-    logger.i('addTransceiver()');
+    logger.i('addTransceiver');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -858,10 +875,11 @@ class SlavePeerConnection extends BasePeerConnection {
     }
     firstNegotiation = false;
     if (status == PeerConnectionStatus.negotiating) {
-      logger.i('already negotiating');
+      logger.e('already negotiating');
       return;
     }
     //被叫发送重新协商的请求
+    logger.i('send signal renegotiate from slave');
     emit(WebrtcEventType.signal,
         WebrtcSignal('renegotiate', renegotiate: true, extension: extension));
     status == PeerConnectionStatus.negotiating;
@@ -870,22 +888,21 @@ class SlavePeerConnection extends BasePeerConnection {
   ///创建answer，发生在被叫方，将answer回到主叫方
   createAnswer() async {
     RTCPeerConnection peerConnection = this.peerConnection!;
-    logger.i('createAnswer');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
     }
 
+    logger.i('start createAnswer');
     RTCSessionDescription answer =
         await peerConnection.createAnswer(sdpConstraints);
-    logger.i('local answer sdp:$answer');
-    peerConnection.setLocalDescription(answer);
+    logger.i('create local sdp answer:${answer.type}, and setLocalDescription');
+    await peerConnection.setLocalDescription(answer);
+    logger
+        .i('setLocalDescription local sdp answer:${answer.type} successfully');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
-    }
-    if (!iceCompleted) {
-      logger.i('sendAnswer iceCompleted false');
     }
     await sendAnswer(answer);
   }
@@ -893,22 +910,22 @@ class SlavePeerConnection extends BasePeerConnection {
   //发送answer
   sendAnswer(RTCSessionDescription answer) async {
     RTCPeerConnection peerConnection = this.peerConnection!;
-    logger.i('sendAnswer');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
     }
+    logger.i('send signal local sdp answer:${answer.type}');
     var sdp = await peerConnection.getLocalDescription();
     sdp ??= answer;
     emit(WebrtcEventType.signal,
         WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
+    logger.i('sendAnswer:${answer.type} successfully');
   }
 
   ///从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
   @override
   onSignal(WebrtcSignal webrtcSignal) async {
     RTCPeerConnection? peerConnection = this.peerConnection;
-    logger.i('signal');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -918,6 +935,7 @@ class SlavePeerConnection extends BasePeerConnection {
     var sdp = webrtcSignal.sdp;
     //如果是候选信息
     if (signalType == SignalType.candidate.name && candidate != null) {
+      logger.i('onSignal candidate:${candidate.candidate}');
       if (peerConnection != null) {
         RTCSessionDescription? remoteDescription =
             await peerConnection.getRemoteDescription();
@@ -925,17 +943,22 @@ class SlavePeerConnection extends BasePeerConnection {
         if (remoteDescription != null && remoteDescription.type != null) {
           addIceCandidate(candidate);
         } else {
+          logger.i('remoteDescription is null,save candidate');
           remoteCandidates.add(candidate);
         }
       } else {
+        logger.i('peerConnection is null,save candidate');
         remoteCandidates.add(candidate);
       }
     }
     //如果sdp信息，则设置远程描述，并处理所有的候选清单中候选服务器
     else if (signalType == SignalType.sdp.name && sdp != null) {
+      logger.i('onSignal sdp offer:${sdp.type}');
       this.sdp = sdp;
       if (peerConnection != null) {
+        logger.i('start setRemoteDescription sdp offer:${sdp.type}');
         await peerConnection.setRemoteDescription(sdp);
+        logger.i('setRemoteDescription sdp offer:${sdp.type} successfully');
         if (status == PeerConnectionStatus.closed) {
           logger.e('PeerConnectionStatus closed');
           return;
@@ -949,11 +972,13 @@ class SlavePeerConnection extends BasePeerConnection {
           addIceCandidate(candidate);
         }
         remoteCandidates = [];
+      } else {
+        logger.e('peerConnection is null');
       }
     }
     //如果什么都不是，报错
     else {
-      throw 'signal called with invalid signal data,ERR_SIGNALING';
+      logger.e('signal called with invalid signal data');
     }
   }
 
