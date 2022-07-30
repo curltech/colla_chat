@@ -67,8 +67,9 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
 
   _open() async {
     try {
-      AdvancedPeerConnection? advancedPeerConnection = await peerConnectionPool
-          .create(widget.peerId!, widget.clientId!, getUserMedia: true);
+      AdvancedPeerConnection? advancedPeerConnection =
+          await peerConnectionPool.create(widget.peerId!,
+              getUserMedia: true, clientId: widget.clientId);
     } catch (e) {
       logger.i(e.toString());
     }

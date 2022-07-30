@@ -209,25 +209,30 @@ class PeerConnectionPool {
     return null;
   }
 
-  ///主动方创建
-  Future<AdvancedPeerConnection?> create(String peerId, String clientId,
-      {bool getUserMedia = false,
+  ///主动方创建，此时clientId有可能不知道
+  Future<AdvancedPeerConnection?> create(String peerId,
+      {String? clientId,
+      bool getUserMedia = false,
       List<MediaStream> streams = const [],
       List<Map<String, String>>? iceServers,
-      Room? router}) async {
+      Room? room}) async {
     Map<String, AdvancedPeerConnection>? peerConnections =
         this.peerConnections.get(peerId);
     peerConnections ??= {};
-    var peerConnection = AdvancedPeerConnection(peerId, clientId, true);
+    var peerConnection =
+        AdvancedPeerConnection(peerId, true, clientId: clientId);
     bool result = await peerConnection.init(
         getUserMedia: getUserMedia,
         streams: streams,
         iceServers: iceServers,
-        room: router);
+        room: room);
     if (!result) {
       logger.e('webrtcPeer.init fail');
       return null;
     }
+    peerConnection.basePeerConnection.negotiate();
+    //clientId没有值的时候以''代替
+    clientId = clientId ?? '';
     peerConnections[clientId] = peerConnection;
 
     ///如果有溢出的连接，将溢出连接关闭
@@ -352,8 +357,21 @@ class PeerConnectionPool {
       logger.e('clientId is null');
       return;
     }
-    AdvancedPeerConnection? advancedPeerConnection =
-        getOne(peerId, clientId: clientId);
+
+    AdvancedPeerConnection? advancedPeerConnection;
+    Map<String, AdvancedPeerConnection>? peerConnections =
+        this.peerConnections.get(peerId);
+    if (peerConnections != null && peerConnections.isNotEmpty) {
+      advancedPeerConnection = peerConnections[clientId];
+      if (advancedPeerConnection == null) {
+        advancedPeerConnection = peerConnections[''];
+        if (advancedPeerConnection != null) {
+          advancedPeerConnection.clientId = clientId;
+          peerConnections.remove('');
+          peerConnections[clientId] = advancedPeerConnection;
+        }
+      }
+    }
     // peerId的连接存在，而且已经连接，报错
     if (advancedPeerConnection != null) {
       if (advancedPeerConnection.connected) {
@@ -372,20 +390,28 @@ class PeerConnectionPool {
     //     }
     //   }
     // }
+
+    //作为主叫收到被叫的answer
+    if ((signalType == SignalType.sdp.name && signal.sdp!.type == 'answer')) {
+      //符合的主叫不存在，说明存在多个同peerid的被叫，其他的被叫的answer先来，将主叫占用了
+      //需要再建新的主叫
+      logger.w('peerId:$peerId, clientId:$clientId has no master to match');
+    }
     if (signalType == SignalType.candidate.name ||
         (signalType == SignalType.sdp.name && signal.sdp!.type == 'offer')) {
       advancedPeerConnection ??=
-          AdvancedPeerConnection(peerId, clientId, false);
+          AdvancedPeerConnection(peerId, false, clientId: clientId);
       advancedPeerConnection.connectPeerId = connectPeerId;
       advancedPeerConnection.connectSessionId = connectSessionId;
       //新建的被叫连接放入池中
-      Map<String, AdvancedPeerConnection>? peerConnections =
-          this.peerConnections.get(peerId);
+
       peerConnections ??= {};
       peerConnections[clientId] = advancedPeerConnection;
       this.peerConnections.put(peerId, peerConnections);
-      emit(WebrtcEventType.create,
-          WebrtcEvent(peerId, clientId, data: advancedPeerConnection));
+      emit(
+          WebrtcEventType.create,
+          WebrtcEvent(peerId,
+              clientId: clientId, data: advancedPeerConnection));
 
       if ((signalType == SignalType.sdp.name && signal.sdp!.type == 'offer')) {
         if (advancedPeerConnection.basePeerConnection.status ==
@@ -442,7 +468,8 @@ class PeerConnectionPool {
     try {
       var peerId = evt.peerId;
       var clientId = evt.clientId;
-      var result = await signalAction.signal(evt.data, peerId, clientId);
+      var result =
+          await signalAction.signal(evt.data, peerId, targetClientId: clientId);
       if (result == 'ERROR') {
         logger.e('signal err:$result');
       }

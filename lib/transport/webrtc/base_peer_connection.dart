@@ -325,11 +325,6 @@ abstract class BasePeerConnection {
       onTrack(event);
     };
 
-    /// 6. 开始协商，满足条件的话开始主叫创建offer
-    /// 或者被叫发起重新发起协商请求
-    logger.i('Negotiation start');
-    negotiate();
-
     return true;
   }
 
@@ -868,7 +863,7 @@ class SlavePeerConnection extends BasePeerConnection {
   ///被叫的协商时发送再协商信号给主叫，要求重新发起协商
   @override
   negotiate() async {
-    logger.i('requesting negotiation from slave');
+    logger.i('Negotiation start, requesting negotiation from slave');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -939,6 +934,7 @@ class SlavePeerConnection extends BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
+    status == PeerConnectionStatus.negotiating;
     String signalType = webrtcSignal.signalType;
     var candidate = webrtcSignal.candidate;
     var sdp = webrtcSignal.sdp;
