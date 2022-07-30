@@ -810,6 +810,11 @@ class MasterPeerConnection extends BasePeerConnection {
     //对主叫节点来说，sdp应该是answer
     else if (signalType == SignalType.sdp.name && sdp != null) {
       logger.i('onSignal sdp answer:${sdp.type}');
+      RTCSessionDescription? remoteDescription =
+          await peerConnection.getRemoteDescription();
+      if (remoteDescription != null) {
+        logger.e('remoteDescription is exist');
+      }
       this.sdp = sdp;
       await peerConnection.setRemoteDescription(sdp);
       if (status == PeerConnectionStatus.closed) {
@@ -894,12 +899,16 @@ class SlavePeerConnection extends BasePeerConnection {
     }
 
     logger.i('start createAnswer');
-    RTCSessionDescription answer =
-        await peerConnection.createAnswer(sdpConstraints);
+    RTCSessionDescription? answer = await peerConnection.getLocalDescription();
+    if (answer != null) {
+      logger.e('getLocalDescription local sdp answer is exist:${answer.type}');
+    }
+    answer = await peerConnection.createAnswer(sdpConstraints);
     logger.i('create local sdp answer:${answer.type}, and setLocalDescription');
     await peerConnection.setLocalDescription(answer);
     logger
         .i('setLocalDescription local sdp answer:${answer.type} successfully');
+
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -957,6 +966,12 @@ class SlavePeerConnection extends BasePeerConnection {
       this.sdp = sdp;
       if (peerConnection != null) {
         logger.i('start setRemoteDescription sdp offer:${sdp.type}');
+        RTCSessionDescription? remoteDescription =
+            await peerConnection.getRemoteDescription();
+        if (remoteDescription != null) {
+          logger.e(
+              'RemoteDescription sdp offer is exist:${remoteDescription.type}');
+        }
         await peerConnection.setRemoteDescription(sdp);
         logger.i('setRemoteDescription sdp offer:${sdp.type} successfully');
         if (status == PeerConnectionStatus.closed) {
@@ -964,7 +979,7 @@ class SlavePeerConnection extends BasePeerConnection {
           return;
         }
         //如果远程描述是offer请求，则创建answer
-        var remoteDescription = await peerConnection.getRemoteDescription();
+        remoteDescription = await peerConnection.getRemoteDescription();
         if (remoteDescription != null && remoteDescription.type == 'offer') {
           await createAnswer();
         }
