@@ -172,7 +172,7 @@ abstract class BasePeerConnection {
   //远程传入的candidate信息，可能先于offer或者answer到来，缓存起来
   //对主叫方来说，等待answer到来以后统一处理
   //对被叫方来说，等待offer到来以后统一处理
-  List<RTCIceCandidate> remoteCandidates = [];
+  Map<String, RTCIceCandidate> remoteCandidates = {};
 
   //主动发送数据的通道
   RTCDataChannel? dataChannel;
@@ -803,7 +803,7 @@ class MasterPeerConnection extends BasePeerConnection {
         addIceCandidate(candidate);
       } else {
         logger.i('remoteDescription null,save candidate');
-        remoteCandidates.add(candidate);
+        remoteCandidates[candidate.candidate ?? ''] = candidate;
       }
     }
     //如果sdp信息，则设置远程描述，并处理所有的候选清单中候选服务器
@@ -821,10 +821,10 @@ class MasterPeerConnection extends BasePeerConnection {
         logger.e('PeerConnectionStatus closed');
         return;
       }
-      for (var candidate in remoteCandidates) {
+      for (var candidate in remoteCandidates.values) {
         addIceCandidate(candidate);
       }
-      remoteCandidates = [];
+      remoteCandidates = {};
     }
     //如果什么都不是，报错
     else {
@@ -953,11 +953,11 @@ class SlavePeerConnection extends BasePeerConnection {
           addIceCandidate(candidate);
         } else {
           logger.i('remoteDescription is null,save candidate');
-          remoteCandidates.add(candidate);
+          remoteCandidates[candidate.candidate ?? ''] = candidate;
         }
       } else {
         logger.i('peerConnection is null,save candidate');
-        remoteCandidates.add(candidate);
+        remoteCandidates[candidate.candidate ?? ''] = candidate;
       }
     }
     //如果sdp信息，则设置远程描述，并处理所有的候选清单中候选服务器
@@ -983,10 +983,10 @@ class SlavePeerConnection extends BasePeerConnection {
         if (remoteDescription != null && remoteDescription.type == 'offer') {
           await createAnswer();
         }
-        for (var candidate in remoteCandidates) {
+        for (var candidate in remoteCandidates.values) {
           addIceCandidate(candidate);
         }
-        remoteCandidates = [];
+        remoteCandidates = {};
       } else {
         logger.e('peerConnection is null');
       }
