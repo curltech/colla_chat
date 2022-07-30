@@ -72,7 +72,7 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
     clientIdController.text = clientId!;
     AdvancedPeerConnection advancedPeerConnection =
         evt.data as AdvancedPeerConnection;
-    advancedPeerConnection.basePeerConnection
+    advancedPeerConnection.basePeerConnection!
         .on(WebrtcEventType.message, _onMessage);
     _update();
   }
@@ -94,8 +94,7 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
       AdvancedPeerConnection? advancedPeerConnection = await peerConnectionPool
           .create(peerId!, clientId!, getUserMedia: false);
       if (advancedPeerConnection != null) {
-        await advancedPeerConnection.init(peerId!, clientId!, true);
-        advancedPeerConnection.basePeerConnection
+        advancedPeerConnection.basePeerConnection!
             .on(WebrtcEventType.message, _onMessage);
       }
     } catch (e) {
@@ -117,7 +116,7 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
     AdvancedPeerConnection? advancedPeerConnection =
         _getAdvancedPeerConnection();
     if (advancedPeerConnection != null) {
-      advancedPeerConnection!.basePeerConnection
+      advancedPeerConnection
           .send(Uint8List.fromList(messageController.text.codeUnits));
       messageController.clear();
     }

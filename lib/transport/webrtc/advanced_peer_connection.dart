@@ -69,8 +69,8 @@ class AdvancedPeerConnection {
   late BasePeerConnection basePeerConnection;
 
   //对方的参数
-  late String peerId;
-  late String clientId;
+  String peerId;
+  String clientId;
   String? connectPeerId;
   String? connectSessionId;
   List<Map<String, String>>? iceServers = [];
@@ -78,15 +78,21 @@ class AdvancedPeerConnection {
   int? start;
   int? end;
 
-  AdvancedPeerConnection();
+  AdvancedPeerConnection(this.peerId, this.clientId, bool initiator) {
+    if (initiator) {
+      final basePeerConnection = MasterPeerConnection();
+      this.basePeerConnection = basePeerConnection;
+    } else {
+      final basePeerConnection = SlavePeerConnection();
+      this.basePeerConnection = basePeerConnection;
+    }
+  }
 
-  Future<bool> init(String peerId, String clientId, bool initiator,
+  Future<bool> init(
       {bool getUserMedia = false,
       List<MediaStream> streams = const [],
       List<Map<String, String>>? iceServers,
       Room? room}) async {
-    this.peerId = peerId;
-    this.clientId = clientId;
     this.room = room;
     start = DateTime.now().millisecondsSinceEpoch;
     var myselfPeerId = myself.peerId;
@@ -99,25 +105,14 @@ class AdvancedPeerConnection {
       logger.e('myself peerId or clientId is null');
       return false;
     }
-    bool result = false;
-    if (initiator) {
-      this.basePeerConnection = MasterPeerConnection();
-      final basePeerConnection = this.basePeerConnection;
-      result = await basePeerConnection.init(
-          getUserMedia: getUserMedia, streams: streams, extension: extension);
-    } else {
-      this.basePeerConnection = SlavePeerConnection();
-      final basePeerConnection = this.basePeerConnection;
-      result = await basePeerConnection.init(
-          getUserMedia: getUserMedia, streams: streams, extension: extension);
-    }
+    bool result = await basePeerConnection.init(
+        getUserMedia: getUserMedia, streams: streams, extension: extension);
     if (!result) {
       logger.e('WebrtcCorePeer init result is false');
       return false;
     }
     //下面的三个事件对于发起方和被发起方是一样的
     //可以发起信号
-    final basePeerConnection = this.basePeerConnection;
     basePeerConnection.on(WebrtcEventType.signal, (WebrtcSignal signal) async {
       await peerConnectionPool.emit(
           WebrtcEventType.signal, WebrtcEvent(peerId, clientId, data: signal));
@@ -135,7 +130,7 @@ class AdvancedPeerConnection {
     });
 
     basePeerConnection.on(WebrtcEventType.close, (data) async {
-      await peerConnectionPool.remove(this.peerId);
+      await peerConnectionPool.remove(peerId);
     });
 
     //收到数据
@@ -186,7 +181,6 @@ class AdvancedPeerConnection {
 
   ///
   removeLocalStream(MediaStream stream) {
-    int i = 0;
     for (var render_ in basePeerConnection.localVideoRenders) {
       if (render_.mediaStream == stream) {
         render_.dispose();
@@ -196,7 +190,6 @@ class AdvancedPeerConnection {
     }
   }
 
-  ///
   removeRemoteStream(MediaStream stream) {
     for (var render_ in basePeerConnection.remoteVideoRenders) {
       if (render_.mediaStream == stream) {
