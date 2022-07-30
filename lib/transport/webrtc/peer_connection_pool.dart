@@ -366,6 +366,8 @@ class PeerConnectionPool {
       if (advancedPeerConnection == null) {
         advancedPeerConnection = peerConnections[''];
         if (advancedPeerConnection != null) {
+          logger.i(
+              'for advancedPeerConnection peerId:$peerId, clientId:$clientId will replace');
           advancedPeerConnection.clientId = clientId;
           peerConnections.remove('');
           peerConnections[clientId] = advancedPeerConnection;
