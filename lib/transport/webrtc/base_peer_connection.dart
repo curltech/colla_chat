@@ -433,7 +433,7 @@ abstract class BasePeerConnection {
 
   onRenegotiationNeeded() {
     logger.i('Master onRenegotiationNeeded event');
-    negotiate();
+    //negotiate();
   }
 
   //数据通道状态事件
@@ -501,7 +501,7 @@ abstract class BasePeerConnection {
     if (sender == null) {
       sender = await peerConnection.addTrack(track, stream);
       streamSenders[stream] = sender;
-      negotiate();
+      //negotiate();
     } else {
       logger.e('Track has already been added to that stream.');
     }
@@ -554,7 +554,7 @@ abstract class BasePeerConnection {
           logger.e('removeTrack err $err');
           close();
         }
-        negotiate();
+        //negotiate();
       }
     }
   }
@@ -784,7 +784,7 @@ class MasterPeerConnection extends BasePeerConnection {
     if (signalType == SignalType.renegotiate.name &&
         webrtcSignal.renegotiate != null) {
       logger.i('onSignal renegotiate');
-      negotiate();
+      //negotiate();
     }
     //被要求收发，则加收发器
     else if (webrtcSignal.transceiverRequest != null) {
@@ -845,7 +845,7 @@ class MasterPeerConnection extends BasePeerConnection {
     //直接加上收发器，并开始协商
     try {
       await peerConnection.addTransceiver(track: track, kind: kind, init: init);
-      negotiate();
+      //negotiate();
     } catch (err) {
       logger.e(err);
       close();
