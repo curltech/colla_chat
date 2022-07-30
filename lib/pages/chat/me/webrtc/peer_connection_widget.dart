@@ -69,10 +69,6 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
     try {
       AdvancedPeerConnection? advancedPeerConnection = await peerConnectionPool
           .create(widget.peerId!, widget.clientId!, getUserMedia: true);
-      if (advancedPeerConnection != null) {
-        await advancedPeerConnection.init(
-            widget.peerId!, widget.clientId!, true);
-      }
     } catch (e) {
       logger.i(e.toString());
     }
@@ -99,11 +95,11 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
     RTCVideoView? localView;
     RTCVideoView? remoteView;
     if (advancedPeerConnection != null) {
-      localView = advancedPeerConnection!
-          .basePeerConnection.localVideoRenders[0]
+      localView = advancedPeerConnection
+          .basePeerConnection!.localVideoRenders[0]
           .createView();
-      remoteView = advancedPeerConnection!
-          .basePeerConnection.remoteVideoRenders[0]
+      remoteView = advancedPeerConnection
+          .basePeerConnection!.remoteVideoRenders[0]
           .createView();
     }
     return OrientationBuilder(
