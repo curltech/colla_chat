@@ -92,7 +92,7 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
 
     try {
       AdvancedPeerConnection? advancedPeerConnection = await peerConnectionPool
-          .create(peerId!, getUserMedia: false, clientId: clientId);
+          .create(peerId!, getUserMedia: false, clientId: null);
       if (advancedPeerConnection != null) {
         advancedPeerConnection.basePeerConnection!
             .on(WebrtcEventType.message, _onMessage);
