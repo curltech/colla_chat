@@ -6,6 +6,7 @@ import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../provider/app_data_provider.dart';
+import '../../tool/util.dart';
 
 class SignalExtension {
   late String peerId;
@@ -58,10 +59,10 @@ class SignalExtension {
 
 class WebrtcEvent {
   String peerId;
-  String clientId;
+  String? clientId;
   dynamic data;
 
-  WebrtcEvent(this.peerId, this.clientId, {this.data});
+  WebrtcEvent(this.peerId, {this.clientId, this.data});
 }
 
 ///基础的PeerConnection之上加入了业务的编号，peerId和clientId，自动进行信号的协商
@@ -70,7 +71,10 @@ class AdvancedPeerConnection {
 
   //对方的参数
   String peerId;
-  String clientId;
+
+  //主叫创建的时候，一般clientId为空，需要在后面填写
+  //作为被叫的时候，clientId是有值的
+  String? clientId;
   String? connectPeerId;
   String? connectSessionId;
   List<Map<String, String>>? iceServers = [];
@@ -78,11 +82,14 @@ class AdvancedPeerConnection {
   int? start;
   int? end;
 
-  AdvancedPeerConnection(this.peerId, this.clientId, bool initiator) {
+  AdvancedPeerConnection(this.peerId, bool initiator, {this.clientId}) {
     if (initiator) {
       final basePeerConnection = MasterPeerConnection();
       this.basePeerConnection = basePeerConnection;
     } else {
+      if (StringUtil.isEmpty(clientId)) {
+        logger.e('SlavePeerConnection clientId must be value');
+      }
       final basePeerConnection = SlavePeerConnection();
       this.basePeerConnection = basePeerConnection;
     }
@@ -114,8 +121,8 @@ class AdvancedPeerConnection {
     //下面的三个事件对于发起方和被发起方是一样的
     //可以发起信号
     basePeerConnection.on(WebrtcEventType.signal, (WebrtcSignal signal) async {
-      await peerConnectionPool.emit(
-          WebrtcEventType.signal, WebrtcEvent(peerId, clientId, data: signal));
+      await peerConnectionPool.emit(WebrtcEventType.signal,
+          WebrtcEvent(peerId, clientId: clientId, data: signal));
     });
 
     //连接建立
@@ -126,7 +133,7 @@ class AdvancedPeerConnection {
         logger.i('connect time:$interval');
       }
       await peerConnectionPool.emit(
-          WebrtcEventType.connect, WebrtcEvent(peerId, clientId));
+          WebrtcEventType.connect, WebrtcEvent(peerId, clientId: clientId));
     });
 
     basePeerConnection.on(WebrtcEventType.close, (data) async {
@@ -136,8 +143,8 @@ class AdvancedPeerConnection {
     //收到数据
     basePeerConnection.on(WebrtcEventType.message, (data) async {
       logger.i('${DateTime.now().toUtc()}:got a message from peer: $data');
-      await peerConnectionPool.emit(
-          WebrtcEventType.message, WebrtcEvent(peerId, clientId, data: data));
+      await peerConnectionPool.emit(WebrtcEventType.message,
+          WebrtcEvent(peerId, clientId: clientId, data: data));
     });
 
     basePeerConnection.on(WebrtcEventType.stream, (stream) async {
@@ -146,16 +153,16 @@ class AdvancedPeerConnection {
           logger.i('Video track: ${event.track.label} removed');
         };
       }
-      await peerConnectionPool.emit(
-          WebrtcEventType.stream, WebrtcEvent(peerId, clientId, data: stream));
+      await peerConnectionPool.emit(WebrtcEventType.stream,
+          WebrtcEvent(peerId, clientId: clientId, data: stream));
     });
 
     basePeerConnection.on(WebrtcEventType.track, (track, stream) async {
       logger.i('${DateTime.now().toUtc().toIso8601String()}:track');
       await peerConnectionPool.emit(
           WebrtcEventType.track,
-          WebrtcEvent(peerId, clientId,
-              data: {'track': track, 'stream': stream}));
+          WebrtcEvent(peerId,
+              clientId: clientId, data: {'track': track, 'stream': stream}));
     });
 
     basePeerConnection.on(
