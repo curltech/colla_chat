@@ -210,22 +210,20 @@ class PeerConnectionPool {
   ///主动方创建，此时clientId有可能不知道
   Future<AdvancedPeerConnection?> create(String peerId,
       {String? clientId,
+      String? name,
+      Room? room,
       bool getUserMedia = false,
       List<MediaStream> streams = const [],
-      List<Map<String, String>>? iceServers,
-      Room? room}) async {
+      List<Map<String, String>>? iceServers}) async {
     Map<String, AdvancedPeerConnection>? peerConnections =
         this.peerConnections.get(peerId);
     peerConnections ??= {};
     var peerConnection =
-        AdvancedPeerConnection(peerId, true, clientId: clientId);
+        AdvancedPeerConnection(peerId, true, clientId: clientId, room: room);
     peerConnectionPoolController.onCreated(
         WebrtcEvent(peerId, clientId: clientId, data: peerConnection));
     bool result = await peerConnection.init(
-        getUserMedia: getUserMedia,
-        streams: streams,
-        iceServers: iceServers,
-        room: room);
+        getUserMedia: getUserMedia, streams: streams, iceServers: iceServers);
     if (!result) {
       logger.e('webrtcPeer.init fail');
       return null;
@@ -332,6 +330,7 @@ class PeerConnectionPool {
     var signalType = signal.signalType;
     logger.i('receive signal type: $signalType from webrtcPeer: $peerId');
     String? clientId = chainMessage.srcClientId;
+    String? name;
     List<Map<String, String>>? iceServers;
     Room? room;
     var extension = signal.extension;
@@ -345,6 +344,11 @@ class PeerConnectionPool {
         logger.e(
             'peerId:$peerId extension peerId:${extension.peerId} is not same');
         clientId = extension.clientId;
+      }
+      if (name != extension.name) {
+        logger.e(
+            'peerId:$peerId extension peerId:${extension.peerId} is not same');
+        name = extension.name;
       }
       iceServers = extension.iceServers;
       room = extension.room;
@@ -403,8 +407,8 @@ class PeerConnectionPool {
     }
     if (signalType == SignalType.candidate.name ||
         (signalType == SignalType.sdp.name && signal.sdp!.type == 'offer')) {
-      advancedPeerConnection ??=
-          AdvancedPeerConnection(peerId, false, clientId: clientId);
+      advancedPeerConnection ??= AdvancedPeerConnection(peerId, false,
+          clientId: clientId, name: name, room: room);
       advancedPeerConnection.connectPeerId = connectPeerId;
       advancedPeerConnection.connectSessionId = connectSessionId;
       //新建的被叫连接放入池中
@@ -419,7 +423,7 @@ class PeerConnectionPool {
         if (advancedPeerConnection.basePeerConnection.status ==
             PeerConnectionStatus.created) {
           var result = await advancedPeerConnection.init(
-              getUserMedia: false, iceServers: iceServers, room: room);
+              getUserMedia: false, iceServers: iceServers);
           if (!result) {
             logger.e('webrtcPeer.init fail');
             return null;

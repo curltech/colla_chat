@@ -1,11 +1,15 @@
 import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
+import 'package:colla_chat/tool/util.dart';
+import 'package:uuid/uuid.dart';
 
 import '../../constant/base.dart';
 import '../../datastore/datastore.dart';
 import '../../entity/base.dart';
 import '../../entity/chat/chat.dart';
+import '../../entity/chat/contact.dart';
 import '../../entity/dht/myself.dart';
 import '../../entity/p2p/security_context.dart';
 import '../p2p/security_context.dart';
@@ -142,6 +146,103 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         orderBy: 'id desc',
         offset: offset,
         limit: limit);
+  }
+
+  Future<void> receiveChatMessage(ChatMessage chatMessage,
+      {TransportType transportType = TransportType.webrtc,
+      bool read = true,
+      bool destroyed = false}) async {
+    chatMessage.direct = ChatDirect.receive.name;
+    chatMessage.receiveTime = DateUtil.currentDate();
+    chatMessage.actualReceiveTime = DateUtil.currentDate();
+    if (read) {
+      chatMessage.readTime = DateUtil.currentDate();
+    }
+    await insert(chatMessage);
+    await chatSummaryService.upsertChatMessage(chatMessage);
+  }
+
+  //未填写的字段：transportType,senderAddress,receiverAddress,receiveTime,actualReceiveTime,readTime,destroyTime
+  Future<ChatMessage> buildChatMessage(
+    String peerId,
+    List<int> data, {
+    String? clientId,
+    ContentType contentType = ContentType.text,
+    String? name,
+    String? groupPeerId,
+    String? groupName,
+    String? title,
+    List<int>? thumbBody,
+    List<int>? thumbnail,
+  }) async {
+    ChatMessage chatMessage = ChatMessage(myself.peerId!);
+    var uuid = const Uuid();
+    chatMessage.messageId = uuid.v4();
+    chatMessage.messageType = MessageType.chat.name;
+    chatMessage.subMessageType = ChatSubMessageType.chat.name;
+    chatMessage.direct = ChatDirect.send.name; //对自己而言，消息是属于发送或者接受
+    chatMessage.senderPeerId = myself.peerId!;
+    chatMessage.senderClientId = myself.clientId;
+    chatMessage.senderType = PartyType.linkman.name;
+    chatMessage.senderName = myself.myselfPeer!.name;
+    chatMessage.sendTime = DateUtil.currentDate();
+    chatMessage.receiverPeerId = peerId;
+    chatMessage.receiverClientId = clientId;
+    chatMessage.receiverType = PartyType.linkman.name;
+    chatMessage.receiverName = name;
+    chatMessage.groupPeerId = groupPeerId;
+    chatMessage.groupName = groupName;
+    chatMessage.title = title;
+    if (thumbBody != null) {
+      chatMessage.thumbBody = CryptoUtil.encodeBase64(thumbBody);
+    }
+    if (thumbnail != null) {
+      chatMessage.thumbnail = CryptoUtil.encodeBase64(thumbnail);
+    }
+    chatMessage.content = CryptoUtil.encodeBase64(data);
+    chatMessage.contentType = contentType.name;
+
+    await insert(chatMessage);
+    await chatSummaryService.upsertChatMessage(chatMessage);
+
+    return chatMessage;
+  }
+
+  //未填写的字段：transportType,senderAddress,receiverAddress,receiveTime,actualReceiveTime,readTime,destroyTime
+  Future<List<ChatMessage>> buildGroupChatMessage(
+    String groupPeerId,
+    List<int> data, {
+    ContentType contentType = ContentType.text,
+    String? title,
+    List<int>? thumbBody,
+    List<int>? thumbnail,
+  }) async {
+    List<ChatMessage> chatMessages = [];
+    Group? group = await groupService.findCachedOneByPeerId(groupPeerId);
+    if (group != null) {
+      var groupName = group.name;
+      List<GroupMember> groupMembers =
+          await groupMemberService.findByGroupId(groupPeerId);
+      List<Linkman> linkmen =
+          await groupMemberService.findLinkmen(groupMembers);
+      for (var linkman in linkmen) {
+        var peerId = linkman.peerId;
+        var name = linkman.name;
+        ChatMessage chatMessage = await buildChatMessage(
+          peerId,
+          data,
+          contentType: contentType,
+          name: name,
+          groupPeerId: groupPeerId,
+          groupName: groupName,
+          title: title,
+          thumbBody: thumbBody,
+          thumbnail: thumbnail,
+        );
+        chatMessages.add(chatMessage);
+      }
+    }
+    return chatMessages;
   }
 }
 
@@ -288,6 +389,8 @@ final receiveService = ReceiveService(
     fields: ServiceLocator.buildFields(Receive(), []));
 
 class ChatSummaryService extends GeneralBaseService<ChatSummary> {
+  Map<String, ChatSummary> chatSummaries = {};
+
   ChatSummaryService(
       {required super.tableName,
       required super.fields,
@@ -321,6 +424,94 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       whereArgs: whereArgs,
     );
     return chatSummary;
+  }
+
+  Future<ChatSummary?> findOneByPeerId(String peerId) async {
+    var where = 'peerId = ?';
+    var whereArgs = [peerId];
+    var peer = await findOne(where: where, whereArgs: whereArgs);
+
+    return peer;
+  }
+
+  Future<ChatSummary?> findCachedOneByPeerId(String peerId) async {
+    if (chatSummaries.containsKey(peerId)) {
+      return chatSummaries[peerId];
+    }
+    ChatSummary? chatSummary = await findOneByPeerId(peerId);
+    if (chatSummary != null) {
+      chatSummaries[peerId] = chatSummary;
+    }
+    return chatSummary;
+  }
+
+  ///新的ChatMessage来了，更新ChatSummary
+  upsertChatMessage(ChatMessage chatMessage) async {
+    var groupPeerId = chatMessage.groupPeerId;
+    var senderPeerId = chatMessage.senderPeerId;
+    var receiverPeerId = chatMessage.receiverPeerId;
+    ChatSummary? chatSummary;
+    if (groupPeerId != null) {
+      chatSummary = await findCachedOneByPeerId(groupPeerId);
+      if (chatSummary == null) {
+        chatSummary = ChatSummary(myself.peerId!);
+        chatSummary.peerId = groupPeerId;
+        chatSummary.partyType = PartyType.group.name;
+        chatSummary.sendReceiveTime = chatMessage.sendTime;
+        Group? group = await groupService.findCachedOneByPeerId(groupPeerId);
+        if (group != null) {
+          chatSummary.name = group.name;
+          chatSummary.avatar = group.avatar;
+        }
+      }
+    } else {
+      if (senderPeerId != null && senderPeerId != myself.peerId) {
+        chatSummary = await findCachedOneByPeerId(senderPeerId);
+        if (chatSummary == null) {
+          chatSummary = ChatSummary(myself.peerId!);
+          chatSummary.peerId = senderPeerId;
+          chatSummary.partyType = PartyType.linkman.name;
+          chatSummary.sendReceiveTime = chatMessage.sendTime;
+          Linkman? linkman =
+              await linkmanService.findCachedOneByPeerId(senderPeerId);
+          if (linkman != null) {
+            chatSummary.name = linkman.name;
+            chatSummary.avatar = linkman.avatar;
+          }
+        }
+      } else if (receiverPeerId != null && receiverPeerId != myself.peerId) {
+        chatSummary = await findCachedOneByPeerId(receiverPeerId);
+        if (chatSummary == null) {
+          chatSummary = ChatSummary(myself.peerId!);
+          chatSummary.peerId = receiverPeerId;
+          chatSummary.partyType = PartyType.linkman.name;
+          chatSummary.sendReceiveTime = chatMessage.sendTime;
+          Linkman? linkman =
+              await linkmanService.findCachedOneByPeerId(receiverPeerId);
+          if (linkman != null) {
+            chatSummary.name = linkman.name;
+            chatSummary.avatar = linkman.avatar;
+          }
+        }
+      }
+    }
+    if (chatSummary != null) {
+      chatSummary.messageId = chatMessage.messageId;
+      chatSummary.messageType = chatMessage.messageType;
+      chatSummary.subMessageType = chatMessage.subMessageType;
+      chatSummary.title = chatMessage.title;
+      chatSummary.thumbBody = chatMessage.thumbBody;
+      chatSummary.thumbnail = chatMessage.thumbnail;
+      chatSummary.content = chatMessage.content;
+      chatSummary.contentType = chatMessage.contentType;
+      chatSummary.unreadNumber = chatSummary.unreadNumber + 1;
+      if (chatSummary.id == null) {
+        insert(chatSummary);
+        chatSummaries[chatSummary.peerId!] = chatSummary;
+      } else {
+        update(chatSummary);
+      }
+    }
   }
 }
 

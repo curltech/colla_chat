@@ -35,6 +35,7 @@ abstract class Party extends StatusEntity {
   String ownerPeerId; // 区分属主
   String peerId; // peerId,事实上的单个属主的主键
   String name; // 用户名
+  String? alias; // 别名
   String? pyName; // 用户名拼音
   String? mobile; // 手机号
   String? email; // 手机号
@@ -71,6 +72,7 @@ abstract class Party extends StatusEntity {
       : ownerPeerId = json['ownerPeerId'],
         peerId = json['peerId'],
         name = json['name'],
+        alias = json['alias'],
         pyName = json['pyName'],
         mobile = json['mobile'],
         email = json['email'],
@@ -114,6 +116,7 @@ abstract class Party extends StatusEntity {
       'ownerPeerId': ownerPeerId,
       'peerId': peerId,
       'name': name,
+      'alias': alias,
       'pyName': pyName,
       'mobile': mobile,
       'email': email,
