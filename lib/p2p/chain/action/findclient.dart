@@ -16,7 +16,7 @@ class FindClientAction extends BaseAction {
     email = CryptoUtil.encodeBase64(await cryptoGraphy.hash(email.codeUnits));
     ChainMessage chainMessage = await prepareSend({
       'peerId': targetPeerId,
-      'mobileNumber': mobile,
+      'mobile': mobile,
       'email': email,
       'name': name
     });
