@@ -454,13 +454,18 @@ abstract class BasePeerConnection {
   /// webrtc的数据通道发来的消息可以是ChainMessage，
   /// 也可以是简单的非ChainMessage，比如最简单的文本或者复合文档，也就是ChatMessage
   onMessage(RTCDataChannelMessage message) {
-    logger.i('onMessage event:${message.text}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    var data = message.binary;
-    emit(WebrtcEventType.message, data);
+    if (message.isBinary) {
+      var data = message.binary;
+      emit(WebrtcEventType.message, data);
+    } else {
+      logger.i('onMessage event:${message.text}');
+      var data = message.text;
+      emit(WebrtcEventType.message, data.codeUnits);
+    }
   }
 
   /// 把流加入到连接中，比如把本地的视频流加入到连接中，从而让远程peer能够接收到
@@ -653,6 +658,7 @@ abstract class BasePeerConnection {
 
   /// 发送二进制消息 text/binary data to the remote peer.
   send(Uint8List message) {
+    logger.i('send message from peer: $message');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;

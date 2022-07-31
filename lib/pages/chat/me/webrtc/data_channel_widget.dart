@@ -1,6 +1,7 @@
 import 'dart:core';
 import 'dart:typed_data';
 
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
@@ -82,6 +83,8 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
     if (peerId != null) {
       advancedPeerConnection =
           peerConnectionPool.getOne(peerId!, clientId: clientId);
+
+      return advancedPeerConnection;
     }
     return null;
   }
@@ -116,8 +119,8 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
     AdvancedPeerConnection? advancedPeerConnection =
         _getAdvancedPeerConnection();
     if (advancedPeerConnection != null) {
-      advancedPeerConnection
-          .send(Uint8List.fromList(messageController.text.codeUnits));
+      var msg = CryptoUtil.stringToUtf8(messageController.text);
+      advancedPeerConnection.send(Uint8List.fromList(msg));
       messageController.clear();
     }
   }
