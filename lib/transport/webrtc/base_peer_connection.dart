@@ -200,8 +200,8 @@ abstract class BasePeerConnection {
   //WebrtcEvent定义了事件的名称
   Map<WebrtcEventType, Function> handlers = {};
 
-  //sdp扩展属性，由外部传入，这个属性用于传递定制的属性
-  //一般包括指定的iceServer，room，peerId，clientId
+  //signal扩展属性，由外部传入，这个属性用于传递定制的属性
+  //一般包括自己的iceServer，room，peerId，clientId，name
   SignalExtension? extension;
 
   //建立连接的PeerConnection约束

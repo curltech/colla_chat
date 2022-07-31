@@ -142,6 +142,7 @@ final partyRequestService = PartyRequestService(
 
 class GroupService extends PartyService<Group> {
   Map<String, Group> groups = {};
+
   GroupService(
       {required super.tableName,
       required super.fields,
@@ -194,6 +195,31 @@ class GroupMemberService extends GeneralBaseService<GroupMember> {
     post = (Map map) {
       return GroupMember.fromJson(map);
     };
+  }
+
+  Future<List<GroupMember>> findByGroupId(String groupId) async {
+    String where = 'groupId=?';
+    List<Object> whereArgs = [groupId];
+    List<GroupMember> groupMembers =
+        await find(where: where, whereArgs: whereArgs);
+
+    return groupMembers;
+  }
+
+  Future<List<Linkman>> findLinkmen(List<GroupMember> groupMembers) async {
+    List<Linkman> linkmen = [];
+    if (groupMembers.isNotEmpty) {
+      for (var groupMember in groupMembers) {
+        var peerId = groupMember.memberPeerId;
+        if (peerId != null) {
+          Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+          if (linkman != null) {
+            linkmen.add(linkman);
+          }
+        }
+      }
+    }
+    return linkmen;
   }
 }
 

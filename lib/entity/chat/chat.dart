@@ -82,6 +82,8 @@ enum PartyType { linkman, group, peerClient, contact, channel, room }
 
 enum ChatDirect { receive, send }
 
+enum TransportType { websocket, webrtc, mail, sms }
+
 // 消息，泛指一切社交复合文档，最简单的是一句话，最复杂可以是非常复杂的混合文本，图片，视频的文档
 class ChatMessage extends StatusEntity {
   String ownerPeerId; // 区分本地不同peerClient属主
@@ -95,6 +97,7 @@ class ChatMessage extends StatusEntity {
   ///此时我属于接收方，direct为接收
   ///此时receiver的信息填写群的信息，如果是发送给我，可以不填写
   String? senderPeerId; // 消息发送方（作者）peerId
+  String? senderClientId;
   String? senderType;
   String? senderName;
   String? senderAddress;
@@ -103,6 +106,7 @@ class ChatMessage extends StatusEntity {
   ///receiver填写别人或者群的信息
   ///此时发送者的信息可以不填写
   String? receiverPeerId; // 目标的唯一id标识（单聊对应linkman-peerId，群聊对应group-peerId）
+  String? receiverClientId;
   String? receiverType; // 包括：Linkman（单聊）, Group（群聊）,Channel,
   String? receiverName;
   String? groupPeerId; // 目标的唯一id标识（单聊对应linkman-peerId，群聊对应group-peerId）
@@ -146,6 +150,7 @@ class ChatMessage extends StatusEntity {
         transportType = json['transportType'],
         direct = json['direct'],
         receiverPeerId = json['receiverPeerId'],
+        receiverClientId = json['receiverClientId'],
         receiverName = json['receiverName'],
         groupPeerId = json['groupPeerId'],
         groupName = json['groupName'],
@@ -154,6 +159,7 @@ class ChatMessage extends StatusEntity {
         messageType = json['messageType'],
         subMessageType = json['subMessageType'],
         senderPeerId = json['senderPeerId'],
+        senderClientId = json['senderClientId'],
         senderName = json['senderName'],
         senderAddress = json['senderAddress'],
         senderType = json['senderType'],
@@ -198,6 +204,7 @@ class ChatMessage extends StatusEntity {
       'direct': direct,
       'receiverType': receiverType,
       'receiverPeerId': receiverPeerId,
+      'receiverClientId': receiverClientId,
       'receiverName': receiverName,
       'groupPeerId': groupPeerId,
       'groupName': groupName,
@@ -206,6 +213,7 @@ class ChatMessage extends StatusEntity {
       'messageType': messageType,
       'subMessageType': subMessageType,
       'senderPeerId': senderPeerId,
+      'senderClientId': senderClientId,
       'senderType': senderType,
       'senderName': senderName,
       'senderAddress': senderAddress,

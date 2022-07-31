@@ -11,14 +11,17 @@ import '../../tool/util.dart';
 class SignalExtension {
   late String peerId;
   late String clientId;
+  String? name;
   Room? room;
   List<Map<String, String>>? iceServers;
 
-  SignalExtension(this.peerId, this.clientId, {this.room, this.iceServers});
+  SignalExtension(this.peerId, this.clientId,
+      {this.name, this.room, this.iceServers});
 
   SignalExtension.fromJson(Map json) {
     peerId = json['peerId'];
     clientId = json['clientId'];
+    name = json['name'];
     Map<String, dynamic>? room = json['room'];
     if (room != null) {
       this.room = Room(room['roomId'],
@@ -47,6 +50,7 @@ class SignalExtension {
     json.addAll({
       'peerId': peerId,
       'clientId': clientId,
+      'name': name,
       'iceServers': iceServers,
     });
     var room = this.room;
@@ -70,11 +74,11 @@ class AdvancedPeerConnection {
   late BasePeerConnection basePeerConnection;
 
   //对方的参数
-  String peerId;
-
   //主叫创建的时候，一般clientId为空，需要在后面填写
   //作为被叫的时候，clientId是有值的
+  String peerId;
   String? clientId;
+  String? name;
   String? connectPeerId;
   String? connectSessionId;
   List<Map<String, String>>? iceServers = [];
@@ -82,7 +86,8 @@ class AdvancedPeerConnection {
   int? start;
   int? end;
 
-  AdvancedPeerConnection(this.peerId, bool initiator, {this.clientId}) {
+  AdvancedPeerConnection(this.peerId, bool initiator,
+      {this.clientId, this.name, this.room}) {
     if (initiator) {
       final basePeerConnection = MasterPeerConnection();
       this.basePeerConnection = basePeerConnection;
@@ -98,16 +103,15 @@ class AdvancedPeerConnection {
   Future<bool> init(
       {bool getUserMedia = false,
       List<MediaStream> streams = const [],
-      List<Map<String, String>>? iceServers,
-      Room? room}) async {
-    this.room = room;
+      List<Map<String, String>>? iceServers}) async {
     start = DateTime.now().millisecondsSinceEpoch;
     var myselfPeerId = myself.peerId;
     var myselfClientId = myself.clientId;
+    var myselfName = myself.myselfPeer!.name;
     SignalExtension extension;
     if (myselfPeerId != null && myselfClientId != null) {
       extension = SignalExtension(myselfPeerId, myselfClientId,
-          room: room, iceServers: iceServers);
+          name: myselfName, room: room, iceServers: iceServers);
     } else {
       logger.e('myself peerId or clientId is null');
       return false;
@@ -138,7 +142,8 @@ class AdvancedPeerConnection {
     });
 
     basePeerConnection.on(WebrtcEventType.closed, (data) async {
-      await peerConnectionPool.onClosed(WebrtcEvent(peerId, clientId: clientId));
+      await peerConnectionPool
+          .onClosed(WebrtcEvent(peerId, clientId: clientId));
     });
 
     //收到数据
