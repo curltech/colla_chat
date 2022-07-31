@@ -118,33 +118,34 @@ class AdvancedPeerConnection {
       logger.e('WebrtcCorePeer init result is false');
       return false;
     }
-    //下面的三个事件对于发起方和被发起方是一样的
-    //可以发起信号
+
+    ///所有basePeerConnection的事件都缺省转发到peerConnectionPool相同的处理
+    //触发basePeerConnection的signal事件，就是调用peerConnectionPool对应的signal方法
     basePeerConnection.on(WebrtcEventType.signal, (WebrtcSignal signal) async {
-      await peerConnectionPool.emit(WebrtcEventType.signal,
-          WebrtcEvent(peerId, clientId: clientId, data: signal));
+      await peerConnectionPool
+          .signal(WebrtcEvent(peerId, clientId: clientId, data: signal));
     });
 
-    //连接建立
-    basePeerConnection.on(WebrtcEventType.connect, (data) async {
+    //触发basePeerConnection的connect事件，就是调用peerConnectionPool对应的signal方法
+    basePeerConnection.on(WebrtcEventType.connected, (data) async {
       end = DateTime.now().millisecondsSinceEpoch;
       if (end != null && start != null) {
         var interval = end! - start!;
         logger.i('connect time:$interval');
       }
-      await peerConnectionPool.emit(
-          WebrtcEventType.connect, WebrtcEvent(peerId, clientId: clientId));
+      await peerConnectionPool
+          .onConnected(WebrtcEvent(peerId, clientId: clientId));
     });
 
-    basePeerConnection.on(WebrtcEventType.close, (data) async {
-      await peerConnectionPool.remove(peerId);
+    basePeerConnection.on(WebrtcEventType.closed, (data) async {
+      await peerConnectionPool.onClosed(WebrtcEvent(peerId, clientId: clientId));
     });
 
     //收到数据
     basePeerConnection.on(WebrtcEventType.message, (data) async {
       logger.i('${DateTime.now().toUtc()}:got a message from peer: $data');
-      await peerConnectionPool.emit(WebrtcEventType.message,
-          WebrtcEvent(peerId, clientId: clientId, data: data));
+      await peerConnectionPool
+          .onMessage(WebrtcEvent(peerId, clientId: clientId, data: data));
     });
 
     basePeerConnection.on(WebrtcEventType.stream, (stream) async {
@@ -153,26 +154,22 @@ class AdvancedPeerConnection {
           logger.i('Video track: ${event.track.label} removed');
         };
       }
-      await peerConnectionPool.emit(WebrtcEventType.stream,
-          WebrtcEvent(peerId, clientId: clientId, data: stream));
+      await peerConnectionPool
+          .onStream(WebrtcEvent(peerId, clientId: clientId, data: stream));
     });
 
     basePeerConnection.on(WebrtcEventType.track, (track, stream) async {
       logger.i('${DateTime.now().toUtc().toIso8601String()}:track');
-      await peerConnectionPool.emit(
-          WebrtcEventType.track,
-          WebrtcEvent(peerId,
-              clientId: clientId, data: {'track': track, 'stream': stream}));
+      await peerConnectionPool.onTrack(WebrtcEvent(peerId,
+          clientId: clientId, data: {'track': track, 'stream': stream}));
     });
 
-    basePeerConnection.on(
-        WebrtcEventType.error, (err) => {logger.e('webrtcPeerError:$err')});
+    basePeerConnection.on(WebrtcEventType.error, (err) async {
+      await peerConnectionPool
+          .onError(WebrtcEvent(peerId, clientId: clientId, data: err));
+    });
 
     return result;
-  }
-
-  on(WebrtcEventType name, Function(dynamic)? fn) {
-    basePeerConnection.on(name, fn);
   }
 
   addStream(MediaStream stream) {
@@ -180,7 +177,6 @@ class AdvancedPeerConnection {
     basePeerConnection.addStream(stream);
   }
 
-  ///
   removeStream(MediaStream stream) {
     removeLocalStream(stream);
     removeRemoteStream(stream);

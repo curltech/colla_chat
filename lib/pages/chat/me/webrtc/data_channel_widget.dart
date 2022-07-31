@@ -48,8 +48,6 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
   @override
   initState() {
     widget.controller.addListener(_update);
-    //当被叫服务器创建的时候回调
-    peerConnectionPool.on(WebrtcEventType.create, _onCreate);
     peerIdController.text = '53HWCVP2BJX8LZ7BLfKEgQGpisNQXcKBfVLhkMEvZ3Zr';
     clientIdController.text = 'EepCRDBTjwPM4c1Jh34G6qeFRf59NgTDpz2QVapJzdBU';
     super.initState();
@@ -61,21 +59,8 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
 
   @override
   dispose() {
-    //挂断
     widget.controller.removeListener(_update);
     super.dispose();
-  }
-
-  _onCreate(WebrtcEvent evt) {
-    peerId = evt.peerId;
-    clientId = evt.clientId;
-    peerIdController.text = peerId!;
-    clientIdController.text = clientId!;
-    AdvancedPeerConnection advancedPeerConnection =
-        evt.data as AdvancedPeerConnection;
-    advancedPeerConnection.basePeerConnection!
-        .on(WebrtcEventType.message, _onMessage);
-    _update();
   }
 
   AdvancedPeerConnection? _getAdvancedPeerConnection() {
@@ -96,10 +81,6 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
     try {
       AdvancedPeerConnection? advancedPeerConnection = await peerConnectionPool
           .create(peerId!, getUserMedia: false, clientId: null);
-      if (advancedPeerConnection != null) {
-        advancedPeerConnection.basePeerConnection!
-            .on(WebrtcEventType.message, _onMessage);
-      }
     } catch (e) {
       logger.i(e.toString());
     }
@@ -107,11 +88,6 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
 
     //设置为连接状态
     setState(() {});
-  }
-
-  _onMessage(Uint8List data) {
-    message = String.fromCharCodes(data);
-    _update();
   }
 
   //发送消息

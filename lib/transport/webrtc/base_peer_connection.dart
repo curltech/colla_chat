@@ -114,11 +114,12 @@ final Map<String, dynamic> sdpConstraints = {
 
 ///可以注册的事件
 enum WebrtcEventType {
-  create, //创建被叫连接
-  signal,
-  connect,
-  close,
-  message,
+  created, //创建被叫连接
+  signal, //发送信号
+  onSignal, //接收到信号
+  connected,
+  closed,
+  message, //接收到消息
   stream,
   track,
   error,
@@ -332,14 +333,16 @@ abstract class BasePeerConnection {
   onConnectionState(RTCPeerConnectionState state) {
     RTCPeerConnection peerConnection = this.peerConnection!;
     logger.i(
-        'connectionState:${peerConnection.connectionState},onConnectionState event:$state');
+        'connectionState:${peerConnection.connectionState},onConnectionState event:${state.name}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
     }
     emit(WebrtcEventType.connectionState, state);
-    if (peerConnection.connectionState ==
-        RTCPeerConnectionState.RTCPeerConnectionStateFailed) {
+    if (state == RTCPeerConnectionState.RTCPeerConnectionStateFailed ||
+        state == RTCPeerConnectionState.RTCPeerConnectionStateClosed ||
+        state == RTCPeerConnectionState.RTCPeerConnectionStateFailed ||
+        state == RTCPeerConnectionState.RTCPeerConnectionStateDisconnected) {
       logger.e('Connection failed.');
       close();
     }
@@ -348,6 +351,7 @@ abstract class BasePeerConnection {
       status = PeerConnectionStatus.connected;
       logger
           .i('PeerConnectionStatus connected, webrtc connection is completed');
+      emit(WebrtcEventType.connected, '');
     }
   }
 
@@ -355,7 +359,7 @@ abstract class BasePeerConnection {
   onIceConnectionState(RTCIceConnectionState state) {
     RTCPeerConnection peerConnection = this.peerConnection!;
     logger.i(
-        'iceConnectionState:${peerConnection.iceConnectionState},onIceConnectionState event:$state');
+        'iceConnectionState:${peerConnection.iceConnectionState},onIceConnectionState event:${state.name}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -366,14 +370,13 @@ abstract class BasePeerConnection {
         state == RTCIceConnectionState.RTCIceConnectionStateCompleted) {
       status = PeerConnectionStatus.connected;
       logger
-          .i('PeerConnectionStatus connected, webrtc connection is completed');
+          .i('PeerConnectionStatus connected, webrtc connection is connected');
+      emit(WebrtcEventType.connected, '');
     }
-    if (state == RTCIceConnectionState.RTCIceConnectionStateFailed) {
+    if (state == RTCIceConnectionState.RTCIceConnectionStateFailed ||
+        state == RTCIceConnectionState.RTCIceConnectionStateClosed ||
+        state == RTCIceConnectionState.RTCIceConnectionStateDisconnected) {
       logger.e('Ice connection failed.');
-      close();
-    }
-    if (state == RTCIceConnectionState.RTCIceConnectionStateClosed) {
-      logger.e('Ice connection closed.');
       close();
     }
   }
@@ -618,6 +621,8 @@ abstract class BasePeerConnection {
   /// 注册一组回调函数，内部可以调用外部注册事件的方法
   /// name包括'signal','stream','track'
   /// 内部通过调用emit方法调用外部注册的方法
+  /// 所有basePeerConnection的事件都缺省转发到peerConnectionPool相同的处理
+  /// 所以调用此方法会覆盖peerConnectionPool的处理
   on(WebrtcEventType name, Function? fn) {
     if (fn != null) {
       handlers[name] = fn;
@@ -710,7 +715,7 @@ abstract class BasePeerConnection {
     }
     status = PeerConnectionStatus.closed;
     logger.i('PeerConnectionStatus closed');
-    emit(WebrtcEventType.close, '');
+    emit(WebrtcEventType.closed, '');
   }
 }
 

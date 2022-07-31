@@ -8,6 +8,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../entity/p2p/message.dart';
 import '../../p2p/chain/action/signal.dart';
+import '../../pages/chat/me/webrtc/peer_connection_controller.dart';
 import '../../provider/app_data_provider.dart';
 
 ///一个队列，按照被使用的新旧排序，当元素超过最大数量的时候，溢出最旧的元素
@@ -138,10 +139,6 @@ class PeerConnectionPool {
       throw 'myself peerPublicKey is null';
     }
     this.peerPublicKey = peerPublicKey;
-
-    ///注册事件后，可以使用emit方法调用注册的事件方法
-    on(WebrtcEventType.signal, signal);
-    on(WebrtcEventType.message, onMessage);
   }
 
   ///webrtc onMessage接收到链协议消息的处理，收到的数据被转换成ChainMessage消息
@@ -155,6 +152,7 @@ class PeerConnectionPool {
   }
 
   ///注册事件，当事件发生时，调用外部注册的方法
+  ///缺省情况下，所有的basePeerConnection的事件都已经注册成peerconnectionpool的相同方法处理
   bool on(WebrtcEventType type, Function(WebrtcEvent)? func) {
     if (func != null) {
       events[type] = func;
@@ -221,6 +219,8 @@ class PeerConnectionPool {
     peerConnections ??= {};
     var peerConnection =
         AdvancedPeerConnection(peerId, true, clientId: clientId);
+    peerConnectionPoolController.onCreated(
+        WebrtcEvent(peerId, clientId: clientId, data: peerConnection));
     bool result = await peerConnection.init(
         getUserMedia: getUserMedia,
         streams: streams,
@@ -412,10 +412,8 @@ class PeerConnectionPool {
       peerConnections ??= {};
       peerConnections[clientId] = advancedPeerConnection;
       this.peerConnections.put(peerId, peerConnections);
-      emit(
-          WebrtcEventType.create,
-          WebrtcEvent(peerId,
-              clientId: clientId, data: advancedPeerConnection));
+      peerConnectionPoolController.onCreated(WebrtcEvent(peerId,
+          clientId: clientId, data: advancedPeerConnection));
 
       if ((signalType == SignalType.sdp.name && signal.sdp!.type == 'offer')) {
         if (advancedPeerConnection.basePeerConnection.status ==
@@ -452,19 +450,47 @@ class PeerConnectionPool {
 
   ///收到发来的ChainMessage消息，进行后续的action处理
   ///webrtc的数据通道发来的消息可以是ChainMessage，也可以是简单的非ChainMessage
-  onMessage(dynamic event) async {
-    var appDataProvider = AppDataProvider.instance;
-    var chainProtocolId = appDataProvider.chainProtocolId;
-    var receiveHandler = getProtocolHandler(chainProtocolId);
-    if (receiveHandler != null) {
-      var remotePeerId = event.source.receiverPeerId;
-      //调用注册的接收处理器处理接收的原始数据
-      Uint8List? data = await receiveHandler(event.message, remotePeerId, null);
-      //如果有返回的响应数据，则发送回去，不可以调用同步的发送方法send
-      if (data != null) {
-        send(remotePeerId, data);
-      }
-    }
+  onMessage(WebrtcEvent event) async {
+    logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onMessage');
+    peerConnectionPoolController.onMessage(event);
+    // var appDataProvider = AppDataProvider.instance;
+    // var chainProtocolId = appDataProvider.chainProtocolId;
+    // var receiveHandler = getProtocolHandler(chainProtocolId);
+    // if (receiveHandler != null) {
+    //   var remotePeerId = event.peerId;
+    //   //调用注册的接收处理器处理接收的原始数据
+    //   Uint8List? data = await receiveHandler(event.data, remotePeerId, null);
+    //   //如果有返回的响应数据，则发送回去，不可以调用同步的发送方法send
+    //   if (data != null) {
+    //     send(remotePeerId, data);
+    //   }
+    // }
+  }
+
+  onConnected(WebrtcEvent event) async {
+    logger.i('peerId: ${event.peerId} clientId:${event.clientId} is connected');
+    peerConnectionPoolController.onConnected(event);
+  }
+
+  onClosed(WebrtcEvent event) async {
+    logger.i('peerId: ${event.peerId} clientId:${event.clientId} is closed');
+    remove(event.peerId, clientId: event.clientId);
+    peerConnectionPoolController.onClosed(event);
+  }
+
+  onError(WebrtcEvent event) async {
+    logger.i('peerId: ${event.peerId} clientId:${event.clientId} is error');
+    peerConnectionPoolController.onError(event);
+  }
+
+  onStream(WebrtcEvent event) async {
+    logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onStream');
+    peerConnectionPoolController.onStream(event);
+  }
+
+  onTrack(WebrtcEvent event) async {
+    logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onTrack');
+    peerConnectionPoolController.onTrack(event);
   }
 
   ///调用signalAction发送signal到信号服务器
