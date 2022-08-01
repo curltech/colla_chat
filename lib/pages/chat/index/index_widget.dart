@@ -42,7 +42,7 @@ class _IndexWidgetState extends State<IndexWidget>
         controller: indexWidgetProvider.pageController,
         onPageChanged: (int index) {
           ///滚动的计算有问题
-          logger.w('onPageChanged $index');
+          //logger.w('onPageChanged $index');
           //indexWidgetProvider.setCurrentIndex(index, context: context);
         },
         itemCount: indexWidgetProvider.views.length,

@@ -205,7 +205,6 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
 
   @override
   void dispose() {
-    logger.w('LinkmanListWidget dispose');
     widget.linkmanController.removeListener(_update);
     widget.groupController.removeListener(_update);
     super.dispose();
