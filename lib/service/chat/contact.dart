@@ -1,4 +1,5 @@
 import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as flutter_contacts;
 
@@ -86,8 +87,17 @@ class LinkmanService extends PartyService<Linkman> {
     if (linkman == null) {
       linkman = Linkman(myself.peerId!, peerClient.peerId, peerClient.name);
       linkman.status = LinkmanStatus.request.name;
+      linkman.peerPublicKey = peerClient.peerPublicKey;
+      linkman.publicKey = peerClient.publicKey;
       await insert(linkman);
       linkmen[linkman.peerId] = linkman;
+      await chatSummaryService.upsertByLinkman(linkman);
+    } else {
+      linkman.name = peerClient.name;
+      linkman.peerPublicKey = peerClient.peerPublicKey;
+      linkman.publicKey = peerClient.publicKey;
+      await update(linkman);
+      await chatSummaryService.upsertByLinkman(linkman);
     }
   }
 }
