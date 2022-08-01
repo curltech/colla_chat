@@ -1,3 +1,4 @@
+import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as flutter_contacts;
 
@@ -72,6 +73,22 @@ class LinkmanService extends PartyService<Linkman> {
       linkmen[peerId] = linkman;
     }
     return linkman;
+  }
+
+  ///发出linkman邀请，把自己的详细的信息发出，当邀请被同意后，就会收到对方详细的信息
+  ///一般来说，采用websocket发送信息，是chainmessage，其中的payload是chatmessage
+  ///而采用webrtc时，直接是chatmessage，content里面是实际的信息
+  Future<void> requestLinkman(Linkman linkman) async {}
+
+  ///把peerclient加入自己的好友
+  Future<void> addLinkman(PeerClient peerClient) async {
+    Linkman? linkman = await findCachedOneByPeerId(peerClient.peerId);
+    if (linkman == null) {
+      linkman = Linkman(myself.peerId!, peerClient.peerId, peerClient.name);
+      linkman.status = LinkmanStatus.request.name;
+      await insert(linkman);
+      linkmen[linkman.peerId] = linkman;
+    }
   }
 }
 
