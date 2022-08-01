@@ -265,7 +265,7 @@ class JsonUtil {
   /// 把map，json字符串和一般的实体转换成map或者list，map转换成一般实体使用实体的fromJson构造函数
   static dynamic toJson(dynamic entity) {
     if (entity is List<int>) {
-      dynamic json = jsonDecode(String.fromCharCodes(entity));
+      dynamic json = jsonDecode(CryptoUtil.utf8ToString(entity));
       return json;
     } else if (entity is List) {
       return entity;

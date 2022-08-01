@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../../../entity/dht/peerclient.dart';
 import '../../../l10n/localization.dart';
 import '../../../p2p/chain/baseaction.dart';
+import '../../../provider/app_data_provider.dart';
 import '../../../provider/data_list_controller.dart';
 import '../../../service/dht/peerclient.dart';
 import '../../../tool/util.dart';
@@ -87,9 +88,15 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
           var title = peerClient.name ?? '';
           var subtitle = peerClient.peerId ?? '';
           TileData tile = TileData(
-            title: title,
-            subtitle: subtitle,
-          );
+              title: title,
+              subtitle: subtitle,
+              suffix: IconButton(
+                iconSize: 32.0,
+                icon: const Icon(Icons.add),
+                onPressed: () {
+                  logger.i('add peerClient:$subtitle as linkman');
+                },
+              ));
           tiles.add(tile);
         }
       }
@@ -121,6 +128,7 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
 
   @override
   void dispose() {
+    widget.controller.removeListener(_update);
     controller.dispose();
     super.dispose();
   }

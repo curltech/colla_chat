@@ -15,10 +15,6 @@ class ConnectAction extends BaseAction {
   }
 
   Future<ChainMessage?> connect(PeerClient peerClient) async {
-    if (StringUtil.isNotEmpty(peerClient.name)) {
-      peerClient.name = CryptoUtil.encodeBase64(
-          await cryptoGraphy.hash(peerClient.name.codeUnits));
-    }
     if (StringUtil.isNotEmpty(peerClient.mobile)) {
       peerClient.mobile = CryptoUtil.encodeBase64(
           await cryptoGraphy.hash(peerClient.mobile.codeUnits));
