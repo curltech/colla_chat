@@ -8,6 +8,7 @@ import '../../../l10n/localization.dart';
 import '../../../p2p/chain/baseaction.dart';
 import '../../../provider/app_data_provider.dart';
 import '../../../provider/data_list_controller.dart';
+import '../../../service/chat/contact.dart';
 import '../../../service/dht/peerclient.dart';
 import '../../../tool/util.dart';
 import '../../../widgets/common/app_bar_view.dart';
@@ -91,10 +92,11 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
               title: title,
               subtitle: subtitle,
               suffix: IconButton(
-                iconSize: 32.0,
+                iconSize: 24.0,
                 icon: const Icon(Icons.add),
                 onPressed: () {
                   logger.i('add peerClient:$subtitle as linkman');
+                  linkmanService.addLinkman(peerClient);
                 },
               ));
           tiles.add(tile);
