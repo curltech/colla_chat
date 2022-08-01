@@ -1,6 +1,8 @@
 import 'package:colla_chat/entity/dht/peerendpoint.dart';
 import 'package:colla_chat/tool/util.dart';
 
+import '../../../crypto/cryptography.dart';
+import '../../../crypto/util.dart';
 import '../../../entity/dht/peerclient.dart';
 import '../../../entity/p2p/message.dart';
 import '../../../provider/app_data_provider.dart';
@@ -13,6 +15,18 @@ class ConnectAction extends BaseAction {
   }
 
   Future<ChainMessage?> connect(PeerClient peerClient) async {
+    if (StringUtil.isNotEmpty(peerClient.name)) {
+      peerClient.name = CryptoUtil.encodeBase64(
+          await cryptoGraphy.hash(peerClient.name.codeUnits));
+    }
+    if (StringUtil.isNotEmpty(peerClient.mobile)) {
+      peerClient.mobile = CryptoUtil.encodeBase64(
+          await cryptoGraphy.hash(peerClient.mobile.codeUnits));
+    }
+    if (StringUtil.isNotEmpty(peerClient.email)) {
+      peerClient.email = CryptoUtil.encodeBase64(
+          await cryptoGraphy.hash(peerClient.email.codeUnits));
+    }
     ChainMessage chainMessage = await prepareSend(peerClient);
     chainMessage.payloadType = PayloadType.peerClient.name;
     peerClient.connectPeerId = chainMessage.connectPeerId;

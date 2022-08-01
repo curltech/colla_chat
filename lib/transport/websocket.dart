@@ -47,7 +47,7 @@ class Websocket implements IWebClient {
     //initHeartBeat();
     status = SocketStatus.connected;
     logger.i('wss address:$address websocket connected');
-    if (onConnected!=null) {
+    if (onConnected != null) {
       onConnected!();
     }
   }
@@ -145,7 +145,8 @@ class Websocket implements IWebClient {
     if (status != SocketStatus.closed) {
       if (channel != null) {
         try {
-          await channel!.sink.close();
+          var sink = channel!.sink;
+          sink.close();
         } catch (e) {
           logger.e('wss address:$address websocket channel!.sink.close error');
         }

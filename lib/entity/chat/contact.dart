@@ -3,32 +3,30 @@ import 'package:flutter/material.dart';
 import '../base.dart';
 
 enum RequestType {
-  ADD_LINKMAN,
-  DROP_LINKMAN,
-  BLACK_LINKMAN,
-  UNBLACK_LINKMAN,
-  ADD_GROUPCHAT,
-  DISBAND_GROUPCHAT,
-  MODIFY_GROUPCHAT,
-  MODIFY_GROUPCHAT_OWNER,
-  ADD_GROUPCHAT_MEMBER,
-  REMOVE_GROUPCHAT_MEMBER
+  addLinkman,
+  dropLinkman,
+  blackLinkman,
+  unblackLinkman,
+  addGroup,
+  disbandGroup,
+  modifyGroup,
+  modifyGroupOwner,
+  addGroupMember,
+  removeGroupMember
 }
 
-enum RequestStatus { SENT, RECEIVED, ACCEPTED, EXPIRED, IGNORED }
+enum RequestStatus { sent, received, accepted, expired, ignored }
 
 enum LinkmanStatus {
-  BLACKED, // 已加入黑名单
-  EFFECTIVE, // 已成为好友
-  REQUESTED // 已发送好友请求
+  blacked, // 已加入黑名单
+  effective, // 已成为好友
+  request // 已发送好友请求
 }
 
 enum GroupStatus {
-  EFFECTIVE, // 有效
-  DISBANDED // 已解散
+  effective, // 有效
+  disbanded // 已解散
 }
-
-enum ActiveStatus { DOWN, UP }
 
 //当事方，联系人，群，手机联系人（潜在联系人）的共同父类
 abstract class Party extends StatusEntity {
