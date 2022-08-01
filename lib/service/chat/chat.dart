@@ -159,7 +159,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       chatMessage.readTime = DateUtil.currentDate();
     }
     await insert(chatMessage);
-    await chatSummaryService.upsertChatMessage(chatMessage);
+    await chatSummaryService.upsertByChatMessage(chatMessage);
   }
 
   //未填写的字段：transportType,senderAddress,receiverAddress,receiveTime,actualReceiveTime,readTime,destroyTime
@@ -203,7 +203,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.contentType = contentType.name;
 
     await insert(chatMessage);
-    await chatSummaryService.upsertChatMessage(chatMessage);
+    await chatSummaryService.upsertByChatMessage(chatMessage);
 
     return chatMessage;
   }
@@ -445,8 +445,42 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
     return chatSummary;
   }
 
+  upsertByLinkman(Linkman linkman) async {
+    ChatSummary? chatSummary = await findCachedOneByPeerId(linkman.peerId);
+    if (chatSummary == null) {
+      chatSummary = ChatSummary(myself.peerId!);
+      chatSummary.peerId = linkman.peerId;
+      chatSummary.partyType = PartyType.linkman.name;
+      chatSummary.name = linkman.name;
+      chatSummary.avatar = linkman.avatar;
+      await insert(chatSummary);
+      chatSummaries[chatSummary.peerId!] = chatSummary;
+    } else {
+      chatSummary.name = linkman.name;
+      chatSummary.avatar = linkman.avatar;
+      await update(chatSummary);
+    }
+  }
+
+  upsertByGroup(Group group) async {
+    ChatSummary? chatSummary = await findCachedOneByPeerId(group.peerId);
+    if (chatSummary == null) {
+      chatSummary = ChatSummary(myself.peerId!);
+      chatSummary.peerId = group.peerId;
+      chatSummary.partyType = PartyType.linkman.name;
+      chatSummary.name = group.name;
+      chatSummary.avatar = group.avatar;
+      await insert(chatSummary);
+      chatSummaries[chatSummary.peerId!] = chatSummary;
+    } else {
+      chatSummary.name = group.name;
+      chatSummary.avatar = group.avatar;
+      await update(chatSummary);
+    }
+  }
+
   ///新的ChatMessage来了，更新ChatSummary
-  upsertChatMessage(ChatMessage chatMessage) async {
+  upsertByChatMessage(ChatMessage chatMessage) async {
     var groupPeerId = chatMessage.groupPeerId;
     var senderPeerId = chatMessage.senderPeerId;
     var receiverPeerId = chatMessage.receiverPeerId;
