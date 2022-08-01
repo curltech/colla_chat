@@ -11,9 +11,13 @@ class FindClientAction extends BaseAction {
 
   Future<List<dynamic>?> findClient(
       String targetPeerId, String mobile, String email, String name) async {
-    name = CryptoUtil.encodeBase64(await cryptoGraphy.hash(name.codeUnits));
-    mobile = CryptoUtil.encodeBase64(await cryptoGraphy.hash(mobile.codeUnits));
-    email = CryptoUtil.encodeBase64(await cryptoGraphy.hash(email.codeUnits));
+    if (StringUtil.isNotEmpty(mobile)) {
+      mobile =
+          CryptoUtil.encodeBase64(await cryptoGraphy.hash(mobile.codeUnits));
+    }
+    if (StringUtil.isNotEmpty(email)) {
+      email = CryptoUtil.encodeBase64(await cryptoGraphy.hash(email.codeUnits));
+    }
     ChainMessage chainMessage = await prepareSend({
       'peerId': targetPeerId,
       'mobile': mobile,

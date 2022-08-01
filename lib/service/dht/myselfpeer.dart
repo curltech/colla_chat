@@ -145,12 +145,6 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
         peerClient.activeStatus = ActiveStatus.Up.name;
         peerClient.clientId = myselfPeer.clientId;
         peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
-        peerClient.name = CryptoUtil.encodeBase64(
-            await cryptoGraphy.hash(peerClient.name.codeUnits));
-        peerClient.mobile = CryptoUtil.encodeBase64(
-            await cryptoGraphy.hash(peerClient.mobile.codeUnits));
-        peerClient.email = CryptoUtil.encodeBase64(
-            await cryptoGraphy.hash(peerClient.email.codeUnits));
         connectAction.connect(peerClient).then((response) {
           logger.i(response);
         });
@@ -179,12 +173,6 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
             peerClient.clientId = myselfPeer.clientId;
             peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
             peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
-            peerClient.name = CryptoUtil.encodeBase64(
-                await cryptoGraphy.hash(peerClient.name.codeUnits));
-          peerClient.mobile = CryptoUtil.encodeBase64(
-          await cryptoGraphy.hash(peerClient.mobile.codeUnits));
-          peerClient.email = CryptoUtil.encodeBase64(
-          await cryptoGraphy.hash(peerClient.email.codeUnits));
             connectAction
                 .connect(peerClient)
                 .then((ChainMessage? chainMessage) {
