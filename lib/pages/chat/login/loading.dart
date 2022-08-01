@@ -81,7 +81,7 @@ class _LoadingState extends State<Loading> {
               //logger.e(e);
             }
           }
-          await Future.delayed(const Duration(seconds: 10));
+          await Future.delayed(const Duration(seconds: 60));
           // if (currentIndex >= lightBackgroudImages.length - 1) {
           //   return false;
           // }
@@ -99,7 +99,7 @@ class _LoadingState extends State<Loading> {
             widget.controller.nextPage(
                 duration: widget.animateDuration, curve: Curves.easeInOut);
           }
-          await Future.delayed(const Duration(seconds: 10));
+          await Future.delayed(const Duration(seconds: 60));
           // if (currentIndex >= darkBackgroudImages.length - 1) {
           //   return false;
           // }
