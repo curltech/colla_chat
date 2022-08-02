@@ -8,6 +8,7 @@ import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
+import '../../crypto/util.dart';
 import '../../entity/chat/chat.dart';
 import '../../entity/p2p/message.dart';
 import '../../p2p/chain/action/signal.dart';
@@ -257,17 +258,20 @@ class PeerConnectionPool {
     return peerConnection;
   }
 
-  Future<bool> remove(String peerId, {String? clientId}) async {
+  ///从池中移除连接，不关心连接的状态
+  Future<Map<String, AdvancedPeerConnection>?> remove(String peerId,
+      {String? clientId}) async {
     Map<String, AdvancedPeerConnection>? peerConnections =
         this.peerConnections.get(peerId);
     if (peerConnections == null) {
-      return false;
+      return null;
     }
+    Map<String, AdvancedPeerConnection>? removePeerConnections = {};
     if (peerConnections.isNotEmpty) {
       List<String> clientIds = [];
       for (var entry in peerConnections.entries) {
         if (clientId == null || clientId == entry.value.clientId) {
-          entry.value.close();
+          removePeerConnections[entry.key] = entry.value;
           clientIds.add(entry.key);
         }
       }
@@ -278,6 +282,21 @@ class PeerConnectionPool {
         this.peerConnections.remove(peerId);
       }
 
+      return removePeerConnections;
+    }
+    return null;
+  }
+
+  ///主动关闭，从池中移除连接
+  Future<bool> close(String peerId, {String? clientId}) async {
+    Map<String, AdvancedPeerConnection>? removePeerConnections =
+        await remove(peerId, clientId: clientId);
+    if (removePeerConnections != null && removePeerConnections.isNotEmpty) {
+      for (var entry in removePeerConnections.entries) {
+        if (clientId == null || clientId == entry.value.clientId) {
+          entry.value.close();
+        }
+      }
       return true;
     }
     return false;
@@ -452,16 +471,17 @@ class PeerConnectionPool {
   /// 向peer发送信息，如果是多个，遍历发送
   /// @param peerId
   /// @param data
-  send(String peerId, Uint8List data) async {
+  Future<void> send(String peerId, Uint8List data) async {
     List<AdvancedPeerConnection>? peerConnections = get(peerId);
     if (peerConnections != null && peerConnections.isNotEmpty) {
-      List<Future> ps = [];
+      List<Future<void>> ps = [];
       for (var peerConnection in peerConnections) {
-        Future p = peerConnection.send(data);
+        Future<void> p = peerConnection.send(data);
         ps.add(p);
       }
       await Future.wait(ps);
     }
+    return;
   }
 
   ///收到发来的ChainMessage消息，进行后续的action处理
@@ -471,6 +491,9 @@ class PeerConnectionPool {
     Map<String, dynamic> json = JsonUtil.toJson(event.data);
     ChatMessage chatMessage = ChatMessage.fromJson(json);
     chatMessageService.receiveChatMessage(chatMessage);
+    var raw = CryptoUtil.decodeBase64(chatMessage.content);
+    var content = CryptoUtil.utf8ToString(raw);
+    logger.i('chatMessage content:$content');
     peerConnectionPoolController.onMessage(chatMessage);
     // var appDataProvider = AppDataProvider.instance;
     // var chainProtocolId = appDataProvider.chainProtocolId;

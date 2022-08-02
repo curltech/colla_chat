@@ -104,7 +104,7 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
   //关闭处理
   _close() async {
     try {
-      peerConnectionPool.remove(peerId!, clientId: clientId);
+      peerConnectionPool.close(peerId!, clientId: clientId);
     } catch (e) {
       logger.i(e.toString());
     }

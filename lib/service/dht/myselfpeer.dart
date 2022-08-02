@@ -4,6 +4,7 @@ import 'package:colla_chat/service/dht/myself.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/service/servicelocator.dart';
+import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 
 import '../../crypto/util.dart';
 import '../../entity/base.dart';
@@ -177,6 +178,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
                 .connect(peerClient)
                 .then((ChainMessage? chainMessage) {
               myselfService.clear();
+              peerConnectionPool.clear();
             });
           }
         });
