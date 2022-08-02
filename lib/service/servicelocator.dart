@@ -1,7 +1,15 @@
 import 'package:colla_chat/datastore/sqlite3.dart';
+import 'package:colla_chat/entity/p2p/message.dart';
+import 'package:colla_chat/p2p/chain/action/connect.dart';
+import 'package:colla_chat/p2p/chain/action/ionsignal.dart';
+import 'package:colla_chat/p2p/chain/action/p2pchat.dart';
 import 'package:colla_chat/service/stock/account.dart';
 import 'package:colla_chat/tool/util.dart';
 
+import '../p2p/chain/action/chat.dart';
+import '../p2p/chain/action/ping.dart';
+import '../p2p/chain/action/signal.dart';
+import '../p2p/chain/baseaction.dart';
 import '../platform.dart';
 import '../provider/app_data_provider.dart';
 import 'chat/chat.dart';
@@ -16,6 +24,7 @@ import 'general_base.dart';
 
 class ServiceLocator {
   static Map<String, GeneralBaseService> services = {};
+  static Map<MsgType, BaseAction> actions = {};
 
   static GeneralBaseService? get(String serviceName) {
     return services[serviceName];
@@ -44,6 +53,13 @@ class ServiceLocator {
     services['receiveService'] = receiveService;
     services['chatSummaryService'] = chatSummaryService;
     services['chat_mailaddress'] = mailAddressService;
+
+    actions[MsgType.CONNECT] = connectAction;
+    actions[MsgType.SIGNAL] = signalAction;
+    actions[MsgType.CHAT] = chatAction;
+    actions[MsgType.P2PCHAT] = p2pChatAction;
+    actions[MsgType.PING] = pingAction;
+    actions[MsgType.IONSIGNAL] = ionSignalAction;
 
     await Sqlite3.getInstance();
 

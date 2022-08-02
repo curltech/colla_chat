@@ -261,9 +261,9 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
 
   @override
   Widget build(BuildContext context) {
+    String name = widget.chatMessageController.chatSummary!.name!;
     var appBarView = AppBarView(
-        title: Text(AppLocalizations.instance
-            .text(widget.chatMessageController.chatSummary!.name!)),
+        title: Text(AppLocalizations.t(name)),
         withLeading: widget.withLeading,
         child: _buildListView(context));
     return appBarView;
