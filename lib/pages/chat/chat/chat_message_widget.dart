@@ -99,10 +99,10 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
     var peerId = widget.chatMessageController.chatSummary!.peerId!;
-    // var peerConnection = peerConnectionPool.getOne(peerId);
-    // if (peerConnection == null) {
+    var peerConnection = peerConnectionPool.getOne(peerId);
+    if (peerConnection == null) {
       peerConnectionPool.create(peerId);
-    // }
+    }
 
     ///滚到指定的位置
     // widget.scrollController.animateTo(offset,
@@ -168,11 +168,10 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     if (message.isEmpty || message == '') {
       return;
     }
-    logger.i(message);
-    ChatMessage chatMessage = ChatMessage(myself.peerId!);
-    chatMessage.content = message;
-    chatMessage.contentType = ContentType.text.name;
-    chatMessageService.insert(chatMessage).then((value) {
+    var peerId = widget.chatMessageController.chatSummary!.peerId!;
+    chatMessageService
+        .buildChatMessage(peerId, message.codeUnits)
+        .then((ChatMessage chatMessage) {
       widget.chatMessageController.insert(0, chatMessage);
     });
   }

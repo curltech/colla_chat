@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../entity/chat/chat.dart';
 import '../../../../entity/p2p/message.dart';
 import '../../../../p2p/chain/action/signal.dart';
 import '../../../../transport/webrtc/advanced_peer_connection.dart';
@@ -13,7 +14,7 @@ class PeerConnectionPoolController with ChangeNotifier {
   }
 
   //新消息到来
-  onMessage(WebrtcEvent event) async {
+  onMessage(ChatMessage chatMessage) async {
     notifyListeners();
   }
 
