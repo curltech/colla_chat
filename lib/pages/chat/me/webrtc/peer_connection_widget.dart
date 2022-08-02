@@ -82,7 +82,7 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
   //关闭处理
   _close() async {
     try {
-      peerConnectionPool.remove(widget.peerId!, clientId: widget.clientId);
+      peerConnectionPool.close(widget.peerId!, clientId: widget.clientId);
     } catch (e) {
       logger.i(e.toString());
     }

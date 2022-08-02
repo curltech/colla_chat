@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:flutter/material.dart';
@@ -9,6 +11,7 @@ import '../../../entity/chat/chat.dart';
 import '../../../l10n/localization.dart';
 import '../../../provider/app_data_provider.dart';
 import '../../../provider/data_list_controller.dart';
+import '../../../tool/util.dart';
 import '../../../transport/webrtc/peer_connection_pool.dart';
 import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/common/widget_mixin.dart';
@@ -169,9 +172,13 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
       return;
     }
     var peerId = widget.chatMessageController.chatSummary!.peerId!;
+    List<int> data=CryptoUtil.stringToUtf8(message);
     chatMessageService
-        .buildChatMessage(peerId, message.codeUnits)
+        .buildChatMessage(peerId, data)
         .then((ChatMessage chatMessage) {
+      String json = JsonUtil.toJsonString(chatMessage);
+      List<int> data=CryptoUtil.stringToUtf8(json);
+      peerConnectionPool.send(peerId, Uint8List.fromList(data));
       widget.chatMessageController.insert(0, chatMessage);
     });
   }

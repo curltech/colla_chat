@@ -216,12 +216,13 @@ class AdvancedPeerConnection {
     return basePeerConnection.status == PeerConnectionStatus.connected;
   }
 
-  send(Uint8List data) {
+  Future<void> send(Uint8List data) async{
     if (connected) {
-      basePeerConnection.send(data);
+      return await basePeerConnection.send(data);
     } else {
       logger.e(
           'send failed , peerId:$peerId;connectPeer:$connectPeerId session:$connectSessionId webrtc connection state is not connected');
+      return;
     }
   }
 

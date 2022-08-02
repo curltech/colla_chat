@@ -1,4 +1,5 @@
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/chat/contact.dart';
@@ -73,6 +74,8 @@ class ChatMessageItem extends StatelessWidget {
   }
 
   Widget _buildOther(BuildContext context) {
+    var raw = CryptoUtil.decodeBase64(chatMessage.content);
+    var content = CryptoUtil.utf8ToString(raw);
     return Container(
         margin: const EdgeInsets.symmetric(vertical: 3.0),
         child: Row(
@@ -85,13 +88,14 @@ class ChatMessageItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text('${chatMessage.id}'),
-                    buildMessageContainer(
-                        context, chatMessage.content, ContentType.text)
+                    buildMessageContainer(context, content, ContentType.text)
                   ]),
             ]));
   }
 
   Widget _buildMe(BuildContext context) {
+    var raw = CryptoUtil.decodeBase64(chatMessage.content);
+    var content = CryptoUtil.utf8ToString(raw);
     return Container(
         margin: const EdgeInsets.symmetric(vertical: 3.0),
         child: Row(
@@ -104,8 +108,7 @@ class ChatMessageItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text('${chatMessage.id}'),
-                    buildMessageContainer(
-                        context, chatMessage.content, ContentType.text)
+                    buildMessageContainer(context, content, ContentType.text)
                   ]),
               Container(
                   margin: const EdgeInsets.only(left: 0.0),
