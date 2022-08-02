@@ -124,6 +124,7 @@ class PeerConnectionPool {
   Map<String, dynamic> protocolHandlers = {};
 
   PeerConnectionPool() {
+    signalAction.registerReceiver(onSignal);
     var peerId = myself.peerId;
     if (peerId == null) {
       throw 'myself peerId is null';
@@ -199,7 +200,7 @@ class PeerConnectionPool {
         if (clientId != null) {
           return aps[clientId];
         } else {
-          aps.values.first;
+          return aps.values.first;
         }
       }
     }
