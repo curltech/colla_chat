@@ -3,7 +3,7 @@ import '../datastore/datastore.dart';
 import '../entity/base.dart';
 import '../tool/util.dart';
 
-/// 本地sqlite3的通用访问类，所有的表访问服务都是这个类的实例
+/// 范型化本地sqlite3的通用访问类，所有的表访问服务都是这个类的实例
 abstract class BaseService {
   final String tableName;
   final List<String> fields;
