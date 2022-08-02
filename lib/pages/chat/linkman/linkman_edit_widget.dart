@@ -5,6 +5,7 @@ import '../../../../widgets/common/widget_mixin.dart';
 import '../../../../widgets/data_bind/column_field_widget.dart';
 import '../../../../widgets/data_bind/form_input_widget.dart';
 import '../../../entity/chat/contact.dart';
+import '../../../l10n/localization.dart';
 import '../../../provider/data_list_controller.dart';
 import '../../../service/chat/contact.dart';
 
@@ -87,7 +88,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
   @override
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
-        title: widget.title,
+        title: Text(AppLocalizations.t(widget.title)),
         withLeading: widget.withLeading,
         child: _buildFormInputWidget(context));
     return appBarView;

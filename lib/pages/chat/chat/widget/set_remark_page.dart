@@ -50,7 +50,7 @@ class _SetRemarkPageState extends State<SetRemarkPage> {
     // );
 
     return AppBarView(
-      title: '设置备注和标签',
+      title: Text('设置备注和标签'),
       rightPopupMenus: [rWidget],
       child: MainInputBody(child: body(), color: Colors.cyan),
     );

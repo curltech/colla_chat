@@ -217,6 +217,14 @@ class PeerConnectionPool {
       List<Map<String, String>>? iceServers}) async {
     Map<String, AdvancedPeerConnection>? peerConnections =
         this.peerConnections.get(peerId);
+    if (peerConnections != null && peerConnections.isNotEmpty) {
+      if (clientId != null) {
+        var peerConnection = peerConnections[clientId];
+        if (peerConnection != null) {
+          return peerConnection;
+        }
+      }
+    }
     peerConnections ??= {};
     var peerConnection =
         AdvancedPeerConnection(peerId, true, clientId: clientId, room: room);

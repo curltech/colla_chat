@@ -2,6 +2,7 @@ import 'package:colla_chat/pages/chat/me/peerendpoint/peer_endpoint_list_widget.
 import 'package:flutter/material.dart';
 
 import '../../../../entity/dht/peerendpoint.dart';
+import '../../../../l10n/localization.dart';
 import '../../../../service/dht/peerendpoint.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/widget_mixin.dart';
@@ -89,7 +90,7 @@ class _PeerEndpointEditWidgetState extends State<PeerEndpointEditWidget> {
   @override
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
-        title: widget.title,
+        title: Text(AppLocalizations.t(widget.title)),
         withLeading: widget.withLeading,
         child: _buildFormInputWidget(context));
     return appBarView;

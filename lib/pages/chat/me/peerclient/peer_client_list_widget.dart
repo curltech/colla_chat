@@ -185,7 +185,7 @@ class _PeerClientListWidgetState extends State<PeerClientListWidget> {
 
     var peerclientWidget = KeepAliveWrapper(
         child: AppBarView(
-            title: widget.title,
+            title: Text(AppLocalizations.t(widget.title)),
             withLeading: widget.withLeading,
             rightWidgets: widget.rightWidgets,
             child: dataTableView));

@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
+import '../../../../l10n/localization.dart';
 import '../../../../provider/app_data_provider.dart';
 import '../../../../transport/webrtc/peer_video_render.dart';
 import '../../../../widgets/common/app_bar_view.dart';
@@ -126,7 +127,7 @@ class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
   @override
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
-      title: 'GetDisplayMedia',
+      title: Text(AppLocalizations.t(widget.title)),
       withLeading: widget.withLeading,
       rightPopupMenus: [_buildAppBarPopupMenu()],
       child: _buildVideoView(context),

@@ -9,8 +9,10 @@ import '../../../entity/chat/chat.dart';
 import '../../../l10n/localization.dart';
 import '../../../provider/app_data_provider.dart';
 import '../../../provider/data_list_controller.dart';
+import '../../../transport/webrtc/peer_connection_pool.dart';
 import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/common/widget_mixin.dart';
+import '../me/webrtc/peer_connection_controller.dart';
 import 'chat_message_item.dart';
 
 class ChatMessageController extends DataMoreController<ChatMessage> {
@@ -50,7 +52,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
 /// 消息发送和接受展示的界面组件
 /// 此界面展示特定的目标对象的收到的消息，并且可以发送消息
 class ChatMessageWidget extends StatefulWidget with TileDataMixin {
-  final ChatMessageController controller = ChatMessageController();
+  final ChatMessageController chatMessageController = ChatMessageController();
   final ScrollController scrollController = ScrollController();
   final Function()? onScrollMax;
   final Function()? onScrollMin;
@@ -92,9 +94,15 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   @override
   void initState() {
     super.initState();
-    widget.controller.addListener(_update);
+    widget.chatMessageController.addListener(_update);
+    peerConnectionPoolController.addListener(_update);
     var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
+    var peerId = widget.chatMessageController.chatSummary!.peerId!;
+    var peerConnection = peerConnectionPool.getOne(peerId);
+    if (peerConnection == null) {
+      peerConnectionPool.create(peerId);
+    }
 
     ///滚到指定的位置
     // widget.scrollController.animateTo(offset,
@@ -129,7 +137,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   Future<void> _onRefresh() async {
     ///下拉刷新数据的地方，比如从数据库取更多数据
     logger.i('RefreshIndicator onRefresh');
-    widget.controller.more(defaultLimit);
+    widget.chatMessageController.more(defaultLimit);
     if (widget.onRefresh != null) {
       await widget.onRefresh!();
     }
@@ -165,7 +173,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     chatMessage.content = message;
     chatMessage.contentType = ContentType.text.name;
     chatMessageService.insert(chatMessage).then((value) {
-      widget.controller.insert(0, chatMessage);
+      widget.chatMessageController.insert(0, chatMessage);
     });
   }
 
@@ -202,7 +210,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
 
   ///创建每一条消息
   Widget messageItem(BuildContext context, int index) {
-    List<ChatMessage> messages = widget.controller.data;
+    List<ChatMessage> messages = widget.chatMessageController.data;
     ChatMessage item = messages[index];
     // 创建消息动画控制器
     var animate = AnimationController(
@@ -241,7 +249,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
               //消息组件渲染
               itemBuilder: messageItem,
               //消息条目数
-              itemCount: widget.controller.data.length,
+              itemCount: widget.chatMessageController.data.length,
             )),
       ),
       const Divider(
@@ -254,8 +262,8 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   @override
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
-        title: AppLocalizations.instance
-            .text(widget.controller.chatSummary!.name!),
+        title: Text(AppLocalizations.instance
+            .text(widget.chatMessageController.chatSummary!.name!)),
         withLeading: widget.withLeading,
         child: _buildListView(context));
     return appBarView;
@@ -263,8 +271,9 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
 
   @override
   void dispose() {
-    widget.controller.removeListener(_update);
+    widget.chatMessageController.removeListener(_update);
     widget.scrollController.removeListener(_onScroll);
+    peerConnectionPoolController.removeListener(_update);
     super.dispose();
   }
 }

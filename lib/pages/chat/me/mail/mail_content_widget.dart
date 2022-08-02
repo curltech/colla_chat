@@ -4,6 +4,7 @@ import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../../l10n/localization.dart';
 import '../../../../platform.dart';
 import '../../../../transport/emailclient.dart';
 import '../../../../widgets/common/app_bar_view.dart';
@@ -96,7 +97,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
   @override
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
-        title: widget.title,
+        title: Text(AppLocalizations.t(widget.title)),
         withLeading: widget.withLeading,
         child: mimeMessageViewer);
     return appBarView;

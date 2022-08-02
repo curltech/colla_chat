@@ -12,7 +12,7 @@ class _MoreInfoPageState extends State<MoreInfoPage> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-      title: '更多',
+      title: Text('更多'),
       child: Column(
         children: <Widget>[
           LabelRow(

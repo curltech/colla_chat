@@ -6,6 +6,7 @@ import 'package:colla_chat/pages/chat/me/webrtc/webrtc_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
 
+import '../../../l10n/localization.dart';
 import '../../../provider/app_data_provider.dart';
 import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/common/widget_mixin.dart';
@@ -77,7 +78,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     var me = AppBarView(
-        title: 'Me',
+        title: Text(AppLocalizations.t('Me')),
         child: Column(children: <Widget>[const MeHeadWidget(), child]));
     return me;
   }

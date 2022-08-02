@@ -50,7 +50,7 @@ class WebViewPageState extends State<WebViewPage> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        title: '${widget.title}',
+        title: Text(widget.title),
         //leadingImage: 'assets/images/bar_close.png',
         child: body());
   }

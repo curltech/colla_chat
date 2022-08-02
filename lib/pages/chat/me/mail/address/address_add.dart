@@ -72,7 +72,7 @@ class _AddressAddWidgetState extends State<AddressAddWidget>
       ),
     ];
     var appBarView = AppBarView(
-        title: 'Mail address add',
+        title: Text(AppLocalizations.t('Mail address add')),
         withLeading: widget.withLeading,
         rightPopupMenus: [
           AppBarPopupMenu(title: AppLocalizations.t('Auto')),

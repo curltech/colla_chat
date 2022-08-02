@@ -1,6 +1,7 @@
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/localization.dart';
 import '../../../../provider/app_data_provider.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/widget_mixin.dart';
@@ -41,7 +42,7 @@ class SettingWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     var setting = KeepAliveWrapper(
         child: AppBarView(
-            title: 'Setting', withLeading: withLeading, child: dataListView));
+            title: Text(AppLocalizations.t('Setting')), withLeading: withLeading, child: dataListView));
     return setting;
   }
 

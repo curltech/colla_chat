@@ -5,6 +5,7 @@ import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/localization.dart';
 import '../../../../transport/webrtc/peer_video_render.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/widget_mixin.dart';
@@ -186,7 +187,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   @override
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
-      title: 'GetUserMedia',
+      title: Text(AppLocalizations.t(widget.title)),
       withLeading: widget.withLeading,
       rightWidgets: _buildActions(context),
       rightPopupMenus: [_buildAppBarPopupMenu()],

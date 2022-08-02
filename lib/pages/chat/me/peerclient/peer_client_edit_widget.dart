@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../entity/dht/peerclient.dart';
+import '../../../../l10n/localization.dart';
 import '../../../../provider/data_list_controller.dart';
 import '../../../../service/dht/peerclient.dart';
 import '../../../../widgets/common/app_bar_view.dart';
@@ -87,7 +88,7 @@ class _PeerClientEditWidgetState extends State<PeerClientEditWidget> {
   @override
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
-        title: widget.title,
+        title: Text(AppLocalizations.t(widget.title)),
         withLeading: widget.withLeading,
         child: _buildFormInputWidget(context));
     return appBarView;
