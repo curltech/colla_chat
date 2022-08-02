@@ -99,10 +99,10 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
     var peerId = widget.chatMessageController.chatSummary!.peerId!;
-    var peerConnection = peerConnectionPool.getOne(peerId);
-    if (peerConnection == null) {
+    // var peerConnection = peerConnectionPool.getOne(peerId);
+    // if (peerConnection == null) {
       peerConnectionPool.create(peerId);
-    }
+    // }
 
     ///滚到指定的位置
     // widget.scrollController.animateTo(offset,
