@@ -109,7 +109,7 @@ class _ChatInfoPageState extends State<ChatInfoPage> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-      title: '聊天信息',
+      title: Text('聊天信息'),
       child: Column(children: body()),
     );
   }

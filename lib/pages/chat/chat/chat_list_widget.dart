@@ -147,7 +147,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         widget.groupController.currentIndex = index;
         current = widget.groupController.current;
       }
-      widget.chatMessageWidget.controller.chatSummary = current;
+      widget.chatMessageWidget.chatMessageController.chatSummary = current;
     }
   }
 
@@ -165,7 +165,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        title: AppLocalizations.instance.text(widget.title),
+        title: Text(AppLocalizations.instance.text(widget.title)),
         child: _buildGroupDataListView(context));
   }
 

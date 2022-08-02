@@ -228,7 +228,7 @@ class _ChatPageState extends State<ChatPage> {
     List<AppBarPopupMenu> rWidget = [];
 
     return AppBarView(
-      title: newGroupName ?? widget.title,
+      title: Text(newGroupName ?? widget.title),
       rightPopupMenus: rWidget,
       child: MainInputBody(
         onTap: () => setState(

@@ -10,10 +10,12 @@ class AppBarView extends StatelessWidget {
 
   //指定回退路由样式，不指定则系统判断
   final Function? leadingCallBack;
-  final String title;
+  final Widget? title;
   final bool centerTitle;
+
   //右边按钮
   final List<Widget>? rightWidgets;
+
   //右边下拉菜单
   final List<AppBarPopupMenu>? rightPopupMenus;
   final PreferredSizeWidget? bottom;

@@ -1,6 +1,7 @@
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/localization.dart';
 import '../../../../tool/util.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../chat/widget/main_input.dart';
@@ -62,7 +63,7 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
     // );
 
     return AppBarView(
-      title: '更改名字',
+      title: Text(AppLocalizations.t('更改名字')),
       rightPopupMenus: [rWidget],
       child: MainInputBody(color: Colors.cyan, child: body()),
     );

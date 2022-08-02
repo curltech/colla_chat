@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../entity/dht/peerclient.dart';
+import '../../../../l10n/localization.dart';
 import '../../../../provider/data_list_controller.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/widget_mixin.dart';
@@ -64,7 +65,7 @@ class _PeerClientShowWidgetState extends State<PeerClientShowWidget> {
   Widget build(BuildContext context) {
     var dataListShow = _buildDataListShow(context);
     var appBarView = AppBarView(
-        title: widget.title,
+        title: Text(AppLocalizations.t(widget.title)),
         withLeading: widget.withLeading,
         child: dataListShow);
     return appBarView;

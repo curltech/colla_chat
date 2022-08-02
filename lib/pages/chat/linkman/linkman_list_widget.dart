@@ -195,7 +195,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
       controller: widget.groupDataListController,
     );
     return AppBarView(
-        title: AppLocalizations.instance.text(widget.title),
+        title: Text(AppLocalizations.t(widget.title)),
         child: Column(children: [
           _buildSearchTextField(context),
           widget.headDataListView,

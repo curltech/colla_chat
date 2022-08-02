@@ -12,6 +12,7 @@ import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:tuple/tuple.dart';
 
+import '../../../../l10n/localization.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 import '../../../../widgets/richtext/universal_ui/universal_ui.dart';
@@ -191,7 +192,8 @@ class CollectionWidgetState extends State<CollectionWidget>
         ),
       ],
     );
-    var collection = AppBarView(title: 'Collection', child: view);
+    var collection =
+        AppBarView(title: Text(AppLocalizations.t('Collection')), child: view);
     return collection;
   }
 

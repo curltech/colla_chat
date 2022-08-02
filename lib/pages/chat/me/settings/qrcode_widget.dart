@@ -5,6 +5,7 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../entity/dht/myself.dart';
+import '../../../../l10n/localization.dart';
 import '../../../../tool/util.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/image_widget.dart';
@@ -76,7 +77,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
       const Text('扫一扫上面的二维码图案，加我为好友'),
     ];
     return AppBarView(
-      title: '二维码',
+      title: Text(AppLocalizations.t('二维码')),
       withLeading: widget.withLeading,
       rightPopupMenus: widget.menus,
       child: Column(children: children),

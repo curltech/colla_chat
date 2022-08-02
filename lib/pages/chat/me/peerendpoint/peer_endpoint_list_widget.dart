@@ -142,7 +142,7 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
         child: DataListView(
             onTap: _onTap, tileData: tiles, currentIndex: currentIndex));
     var peerendpointWidget = AppBarView(
-      title: widget.title,
+      title: Text(AppLocalizations.t(widget.title)),
       withLeading: widget.withLeading,
       rightWidgets: widget.rightWidgets,
       child: dataListView,

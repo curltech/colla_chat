@@ -27,7 +27,7 @@ class ChannelWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     var body = DataListView(tileData: channelTileData);
     return AppBarView(
-      title: AppLocalizations.instance.text(title),
+      title: Text(AppLocalizations.instance.text(title)),
       child: body,
     );
   }

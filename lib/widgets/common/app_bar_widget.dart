@@ -15,13 +15,13 @@ class AppBarPopupMenu {
 class AppBarWidget {
   static AppBar build(
     BuildContext context, {
-    withLeading = false, //是否有缺省的回退按钮
-    leadingCallBack, //回退按钮的回调
-    title = '',
-    centerTitle = false, //标题是否居中
+    bool withLeading = false, //是否有缺省的回退按钮
+    Function? leadingCallBack, //回退按钮的回调
+    Widget? title = const Text(''),
+    bool centerTitle = false, //标题是否居中
     List<Widget>? rightWidgets, //右边的排列组件（按钮）
     List<AppBarPopupMenu>? rightPopupMenus, //右边的下拉菜单组件
-    bottom, //底部组件
+    PreferredSizeWidget? bottom, //底部组件
   }) {
     ///右边排列的按钮组件，最后一个是下拉按钮组件
     var actions = <Widget>[];
@@ -42,7 +42,7 @@ class AppBarWidget {
     var leading = backButton(context,
         withLeading: withLeading, leadingCallBack: leadingCallBack);
     AppBar appBar = AppBar(
-      title: Text(title),
+      title: title,
       elevation: 0,
       centerTitle: centerTitle,
       automaticallyImplyLeading: false,
