@@ -1,3 +1,4 @@
+import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -6,36 +7,12 @@ import '../../../l10n/localization.dart';
 import '../../../provider/data_list_controller.dart';
 import '../../../provider/index_widget_provider.dart';
 import '../../../service/chat/chat.dart';
-import '../../../tool/util.dart';
 import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/common/keep_alive_wrapper.dart';
 import '../../../widgets/common/widget_mixin.dart';
 import '../../../widgets/data_bind/data_group_listview.dart';
 import '../../../widgets/data_bind/data_listtile.dart';
 import 'chat_message_widget.dart';
-
-final Map<TileData, List<TileData>> mockTileData = {
-  TileData(title: '群'): [
-    TileData(
-        title: '家庭群',
-        subtitle: '美国留学',
-        suffix: DateUtil.formatChinese(DateUtil.currentDate())),
-    TileData(
-        title: 'MBA群',
-        subtitle: '上海团购',
-        suffix: DateUtil.formatChinese('2022-06-20T09:23:45.000Z')),
-  ],
-  TileData(title: '个人'): [
-    TileData(
-        title: '李志群',
-        subtitle: '',
-        suffix: DateUtil.formatChinese('2022-06-21T16:23:45.000Z')),
-    TileData(
-        title: '胡百水',
-        subtitle: '',
-        suffix: DateUtil.formatChinese('2022-06-20T21:23:45.000Z')),
-  ]
-};
 
 /// 聊天的主页面，展示可以聊天的目标对象，可以是一个人，或者是一个群
 /// 选择好目标点击进入具体的聊天页面ChatMessage
@@ -87,6 +64,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     super.initState();
     widget.linkmanController.addListener(_update);
     widget.groupController.addListener(_update);
+    peerConnectionPoolController.addListener(_update);
 
     var indexWidgetProvider =
         Provider.of<IndexWidgetProvider>(context, listen: false);
@@ -173,6 +151,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   void dispose() {
     widget.linkmanController.removeListener(_update);
     widget.groupController.removeListener(_update);
+    peerConnectionPoolController.removeListener(_update);
     super.dispose();
   }
 }

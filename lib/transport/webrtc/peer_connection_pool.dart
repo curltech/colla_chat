@@ -1,11 +1,14 @@
 import 'dart:typed_data';
 
 import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/service/chat/chat.dart';
+import 'package:colla_chat/tool/util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
+import '../../entity/chat/chat.dart';
 import '../../entity/p2p/message.dart';
 import '../../p2p/chain/action/signal.dart';
 import '../../pages/chat/me/webrtc/peer_connection_controller.dart';
@@ -465,7 +468,10 @@ class PeerConnectionPool {
   ///webrtc的数据通道发来的消息可以是ChainMessage，也可以是简单的非ChainMessage
   onMessage(WebrtcEvent event) async {
     logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onMessage');
-    peerConnectionPoolController.onMessage(event);
+    Map<String, dynamic> json = JsonUtil.toJson(event.data);
+    ChatMessage chatMessage = ChatMessage.fromJson(json);
+    chatMessageService.receiveChatMessage(chatMessage);
+    peerConnectionPoolController.onMessage(chatMessage);
     // var appDataProvider = AppDataProvider.instance;
     // var chainProtocolId = appDataProvider.chainProtocolId;
     // var receiveHandler = getProtocolHandler(chainProtocolId);
