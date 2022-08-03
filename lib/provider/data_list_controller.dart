@@ -315,6 +315,9 @@ abstract class DataMoreController<T> extends DataListController<T> {
     int? currentIndex,
   }) : super(data: data, currentIndex: currentIndex);
 
-  ///如果有更多数据添加，返回true，否则返回false
-  void more(int index);
+  ///取更多旧的数据，添加
+  void previous({int? limit});
+
+  ///取更多新的数据，添加
+  void latest({int? limit});
 }

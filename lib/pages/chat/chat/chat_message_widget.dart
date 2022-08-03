@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
-import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:flutter/material.dart';
 
@@ -28,11 +27,11 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   set chatSummary(ChatSummary? chatSummary) {
     _chatSummary = chatSummary;
     clear();
-    more(defaultLimit);
+    previous(limit: defaultLimit);
   }
 
   @override
-  void more(int index) {
+  void previous({int? limit}) {
     var chatSummary = _chatSummary;
     if (chatSummary == null) {
       clear();
@@ -43,10 +42,35 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       return;
     }
     chatMessageService
-        .findByPeerId(_chatSummary!.peerId!, offset: data.length, limit: index)
+        .findByPeerId(_chatSummary!.peerId!, offset: data.length, limit: limit)
         .then((List<ChatMessage> chatMessages) {
       if (chatMessages.isNotEmpty) {
         addAll(chatMessages);
+      }
+    });
+  }
+
+  @override
+  void latest({int? limit}) {
+    var chatSummary = _chatSummary;
+    if (chatSummary == null) {
+      clear();
+      return;
+    }
+    if (chatSummary.peerId == null) {
+      clear();
+      return;
+    }
+    int? id;
+    if (data.isNotEmpty) {
+      id = data[0].id;
+    }
+    chatMessageService
+        .findByGreaterId(_chatSummary!.peerId!, id: id, limit: limit)
+        .then((List<ChatMessage> chatMessages) {
+      if (chatMessages.isNotEmpty) {
+        data.insertAll(0, chatMessages);
+        notifyListeners();
       }
     });
   }
@@ -140,7 +164,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   Future<void> _onRefresh() async {
     ///下拉刷新数据的地方，比如从数据库取更多数据
     logger.i('RefreshIndicator onRefresh');
-    widget.chatMessageController.more(defaultLimit);
+    widget.chatMessageController.previous(limit: defaultLimit);
     if (widget.onRefresh != null) {
       await widget.onRefresh!();
     }
@@ -172,12 +196,12 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
       return;
     }
     var peerId = widget.chatMessageController.chatSummary!.peerId!;
-    List<int> data=CryptoUtil.stringToUtf8(message);
+    List<int> data = CryptoUtil.stringToUtf8(message);
     chatMessageService
         .buildChatMessage(peerId, data)
         .then((ChatMessage chatMessage) {
       String json = JsonUtil.toJsonString(chatMessage);
-      List<int> data=CryptoUtil.stringToUtf8(json);
+      List<int> data = CryptoUtil.stringToUtf8(json);
       peerConnectionPool.send(peerId, Uint8List.fromList(data));
       widget.chatMessageController.insert(0, chatMessage);
     });
@@ -267,6 +291,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
 
   @override
   Widget build(BuildContext context) {
+    widget.chatMessageController.latest();
     String name = widget.chatMessageController.chatSummary!.name!;
     var appBarView = AppBarView(
         title: Text(AppLocalizations.t(name)),

@@ -148,7 +148,7 @@ class AdvancedPeerConnection {
 
     //收到数据
     basePeerConnection.on(WebrtcEventType.message, (data) async {
-      logger.i('${DateTime.now().toUtc()}:got a message from peer: $data');
+      logger.i('${DateTime.now().toUtc()}:got a message from peer');
       await peerConnectionPool
           .onMessage(WebrtcEvent(peerId, clientId: clientId, data: data));
     });
