@@ -97,11 +97,11 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
     RTCVideoView? remoteView;
     if (advancedPeerConnection != null) {
       localView = advancedPeerConnection
-          .basePeerConnection!.localVideoRenders[0]
-          .createView();
+          .basePeerConnection!.localVideoRenders[0]!
+          .createVideoView();
       remoteView = advancedPeerConnection
-          .basePeerConnection!.remoteVideoRenders[0]
-          .createView();
+          .basePeerConnection!.remoteVideoRenders[0]!
+          .createVideoView();
     }
     return OrientationBuilder(
       //orientation为旋转方向

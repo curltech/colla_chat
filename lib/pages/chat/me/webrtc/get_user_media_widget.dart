@@ -43,7 +43,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   // Platform messages are asynchronous, so we initialize in an async method.
   void _makeCall() async {
     try {
-      await peerVideoRenderer.getUserMedia();
+      await peerVideoRenderer.createUserMedia();
       await peerVideoRenderer.enumerateDevices();
       await peerVideoRenderer.bindRTCVideoRenderer();
     } catch (e) {
@@ -133,7 +133,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             decoration: const BoxDecoration(color: Colors.black),
-            child: peerVideoRenderer.createView(mirror: true),
+            child: peerVideoRenderer.createVideoView(mirror: true),
           ),
         );
       },

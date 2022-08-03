@@ -101,8 +101,7 @@ class AdvancedPeerConnection {
   }
 
   Future<bool> init(
-      {bool getUserMedia = false,
-      List<MediaStream> streams = const [],
+      {List<MediaStream> streams = const [],
       List<Map<String, String>>? iceServers}) async {
     start = DateTime.now().millisecondsSinceEpoch;
     var myselfPeerId = myself.peerId;
@@ -116,8 +115,8 @@ class AdvancedPeerConnection {
       logger.e('myself peerId or clientId is null');
       return false;
     }
-    bool result = await basePeerConnection.init(
-        getUserMedia: getUserMedia, streams: streams, extension: extension);
+    bool result =
+        await basePeerConnection.init(streams: streams, extension: extension);
     if (!result) {
       logger.e('WebrtcCorePeer init result is false');
       return false;
@@ -177,35 +176,13 @@ class AdvancedPeerConnection {
     return result;
   }
 
-  addStream(MediaStream stream) {
+  addLocalStream(MediaStream stream) {
     logger.i('add stream to webrtc');
-    basePeerConnection.addStream(stream);
+    basePeerConnection.addLocalStream(stream: stream);
   }
 
   removeStream(MediaStream stream) {
-    removeLocalStream(stream);
-    removeRemoteStream(stream);
-  }
-
-  ///
-  removeLocalStream(MediaStream stream) {
-    for (var render_ in basePeerConnection.localVideoRenders) {
-      if (render_.mediaStream == stream) {
-        render_.dispose();
-        basePeerConnection.localVideoRenders.remove(render_);
-        break;
-      }
-    }
-  }
-
-  removeRemoteStream(MediaStream stream) {
-    for (var render_ in basePeerConnection.remoteVideoRenders) {
-      if (render_.mediaStream == stream) {
-        render_.dispose();
-        basePeerConnection.remoteVideoRenders.remove(render_);
-        break;
-      }
-    }
+    basePeerConnection.removeStream(stream);
   }
 
   onSignal(WebrtcSignal signal) {
@@ -216,7 +193,7 @@ class AdvancedPeerConnection {
     return basePeerConnection.status == PeerConnectionStatus.connected;
   }
 
-  Future<void> send(Uint8List data) async{
+  Future<void> send(Uint8List data) async {
     if (connected) {
       return await basePeerConnection.send(data);
     } else {
