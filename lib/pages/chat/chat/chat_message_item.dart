@@ -55,16 +55,17 @@ class ChatMessageItem extends StatelessWidget {
               lrEdgeInsets, tbEdgeInsets, lrEdgeInsets, tbEdgeInsets),
           constraints: const BoxConstraints(maxWidth: 300.0),
           decoration: BoxDecoration(
-              color: isMyself
-                  ? appDataProvider.themeData!.colorScheme.primary
-                  : Colors.white,
-              borderRadius: BorderRadius.only(
-                bottomLeft: const Radius.circular(8.0),
-                bottomRight: const Radius.circular(8.0),
-                topLeft: isMyself ? const Radius.circular(8.0) : Radius.zero,
-                topRight: isMyself ? Radius.zero : const Radius.circular(8.0),
-              ),
-              border: Border.all(color: Colors.white)),
+            color: isMyself
+                ? appDataProvider.themeData!.colorScheme.primary
+                : Colors.white,
+            borderRadius: BorderRadius.only(
+              bottomLeft: const Radius.circular(8.0),
+              bottomRight: const Radius.circular(8.0),
+              topLeft: isMyself ? const Radius.circular(8.0) : Radius.zero,
+              topRight: isMyself ? Radius.zero : const Radius.circular(8.0),
+            ),
+            //border: Border.all(color: Colors.white, width: 0.0),
+          ),
           margin: EdgeInsets.only(
               right: isMyself ? 5.0 : 0, left: isMyself ? 0 : 5.0),
           child: buildMessageBody(context, content, contentType),
