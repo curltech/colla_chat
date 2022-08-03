@@ -39,7 +39,7 @@ class _BottomBarState extends State<BottomBar> {
               icon: const Icon(Icons.person),
               label: indexWidgetProvider.getLabel(3)),
         ],
-        currentIndex: indexWidgetProvider.mainIndex,
+        currentIndex: indexWidgetProvider.currentMainIndex,
         selectedItemColor: Provider.of<AppDataProvider>(context)
             .themeData
             ?.colorScheme
@@ -50,9 +50,7 @@ class _BottomBarState extends State<BottomBar> {
         showSelectedLabels: true,
         showUnselectedLabels: true,
         onTap: (int index) {
-          indexWidgetProvider.mainIndex = index;
-          //不传入路由context和样式，走工作区路由
-          indexWidgetProvider.push(mainViews[index], push: false);
+          indexWidgetProvider.currentMainIndex = index;
         },
       );
     });
