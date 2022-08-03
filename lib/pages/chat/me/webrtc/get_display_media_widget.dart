@@ -58,7 +58,7 @@ class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
     });
 
     try {
-      await peerVideoRenderer.getDisplayMedia(selectedSource: selectedSource);
+      await peerVideoRenderer.createDisplayMedia(selectedSource: selectedSource);
       await peerVideoRenderer.enumerateDevices();
       await peerVideoRenderer.bindRTCVideoRenderer();
       var stream =
@@ -108,7 +108,7 @@ class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             decoration: const BoxDecoration(color: Colors.black),
-            child: peerVideoRenderer.createView(mirror: true),
+            child: peerVideoRenderer.createVideoView(mirror: true),
           ),
         );
       },

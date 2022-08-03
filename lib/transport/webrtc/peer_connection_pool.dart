@@ -235,8 +235,8 @@ class PeerConnectionPool {
         AdvancedPeerConnection(peerId, true, clientId: clientId, room: room);
     peerConnectionPoolController.onCreated(
         WebrtcEvent(peerId, clientId: clientId, data: peerConnection));
-    bool result = await peerConnection.init(
-        getUserMedia: getUserMedia, streams: streams, iceServers: iceServers);
+    bool result =
+        await peerConnection.init(streams: streams, iceServers: iceServers);
     if (!result) {
       logger.e('webrtcPeer.init fail');
       return null;
@@ -453,8 +453,8 @@ class PeerConnectionPool {
       if ((signalType == SignalType.sdp.name && signal.sdp!.type == 'offer')) {
         if (advancedPeerConnection.basePeerConnection.status ==
             PeerConnectionStatus.created) {
-          var result = await advancedPeerConnection.init(
-              getUserMedia: false, iceServers: iceServers);
+          var result =
+              await advancedPeerConnection.init(iceServers: iceServers);
           if (!result) {
             logger.e('webrtcPeer.init fail');
             return null;

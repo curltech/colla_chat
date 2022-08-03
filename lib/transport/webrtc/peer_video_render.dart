@@ -8,7 +8,8 @@ import 'package:path_provider/path_provider.dart';
 import '../../platform.dart';
 import '../../provider/app_data_provider.dart';
 
-/// 简单包装webrtc的基本方法
+/// 简单包装webrtc视频流的渲染器，可以构造本地视频流或者传入的视频流
+/// 视频流绑定渲染器，并创建展示视图
 class PeerVideoRenderer {
   String? id;
   MediaStream? mediaStream;
@@ -23,7 +24,7 @@ class PeerVideoRenderer {
   }
 
   ///获取本机视频流
-  Future<void> getUserMedia(
+  Future<void> createUserMedia(
       {bool audio = true,
       int minWidth = 640,
       int minHeight = 480,
@@ -45,10 +46,11 @@ class PeerVideoRenderer {
     var mediaStream =
         await navigator.mediaDevices.getUserMedia(mediaConstraints);
     this.mediaStream = mediaStream;
+    id=mediaStream.id;
   }
 
   ///获取本机屏幕流
-  Future<void> getDisplayMedia(
+  Future<void> createDisplayMedia(
       {DesktopCapturerSource? selectedSource, bool audio = false}) async {
     dynamic video = selectedSource == null
         ? true
@@ -63,6 +65,7 @@ class PeerVideoRenderer {
     var mediaStream =
         await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
     this.mediaStream = mediaStream;
+    id=mediaStream.id;
   }
 
   //获取本机的设备清单
@@ -104,7 +107,8 @@ class PeerVideoRenderer {
     }
   }
 
-  RTCVideoView? createView({
+  /// 渲染器创建展示视图
+  RTCVideoView? createVideoView({
     RTCVideoViewObjectFit objectFit =
         RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
     bool mirror = false,
@@ -118,6 +122,7 @@ class PeerVideoRenderer {
     return null;
   }
 
+  /// 捕获视频流的帧，就是快照
   Future<ByteBuffer?> captureFrame() async {
     var mediaStream = this.mediaStream;
     if (mediaStream != null) {
@@ -130,6 +135,7 @@ class PeerVideoRenderer {
     return null;
   }
 
+  /// 对视频流的第一个视频轨道切换摄像头，对手机来说，就是切换前置和后置摄像头
   Future<bool> switchCamera() async {
     var mediaStream = this.mediaStream;
     if (mediaStream != null) {
@@ -141,6 +147,7 @@ class PeerVideoRenderer {
     return false;
   }
 
+  /// 对视频流的第一个音频轨道切换音频播放设备，对手机来说就是耳机还是喇叭
   void switchSpeaker(bool enable) async {
     var mediaStream = this.mediaStream;
     if (mediaStream != null) {
@@ -151,6 +158,7 @@ class PeerVideoRenderer {
     }
   }
 
+  /// 对视频流的第一个音频轨道静音设置
   void setMute(bool mute) {
     var mediaStream = this.mediaStream;
     if (mediaStream != null) {
@@ -161,7 +169,8 @@ class PeerVideoRenderer {
     }
   }
 
-  void turnCamera(bool mute) {
+  /// 打开或者关闭视频流的第一个视频轨道
+  void turnTrack(bool mute) {
     var mediaStream = this.mediaStream;
     if (mediaStream != null) {
       var tracks = mediaStream.getVideoTracks();
@@ -171,6 +180,7 @@ class PeerVideoRenderer {
     }
   }
 
+  /// 对视频流的第一个音频轨道设置音量
   void setVolume(double volume) {
     var mediaStream = this.mediaStream;
     if (mediaStream != null) {
@@ -181,6 +191,7 @@ class PeerVideoRenderer {
     }
   }
 
+  /// 开始记录视频流到文件
   void startRecording({String? filePath}) async {
     if (mediaStream == null) throw 'Stream is not initialized';
     if (PlatformParams.instance.ios) {
@@ -190,7 +201,6 @@ class PeerVideoRenderer {
     // TODO(rostopira): request write storage permission
     if (filePath == null) {
       Directory? storagePath = await getApplicationDocumentsDirectory();
-      if (storagePath == null) throw 'Can\'t find storagePath';
       filePath = '${storagePath.path}/webrtc_sample/test.mp4';
     }
     mediaRecorder = MediaRecorder();
@@ -203,6 +213,7 @@ class PeerVideoRenderer {
     );
   }
 
+  /// 停止视频流的记录
   void stopRecording() async {
     if (mediaRecorder != null) {
       await mediaRecorder!.stop();

@@ -185,16 +185,16 @@ abstract class BasePeerConnection {
   late String dataChannelLabel;
 
   //本地的媒体流渲染器数组，在初始化的时候设置
-  List<PeerVideoRenderer> localVideoRenders = [];
+  Map<String, PeerVideoRenderer> localVideoRenders = {};
 
   //远程媒体流渲染器数组，在onAddStream,onAddTrack等的回调方法中得到
-  List<PeerVideoRenderer> remoteVideoRenders = [];
+  Map<String, PeerVideoRenderer> remoteVideoRenders = {};
 
   //远程媒体流的轨道和对应的流的数组
   List<Map<MediaStreamTrack, MediaStream>> remoteTracks = [];
 
   //远程媒体流的轨道，流和发送者之间的关系
-  Map<MediaStreamTrack, Map<MediaStream, RTCRtpSender>> trackSenders = {};
+  Map<MediaStreamTrack, Map<MediaStream, RTCRtpSender>> remoteTrackSenders = {};
 
   //外部使用时注册的回调方法，也就是注册事件
   //WebrtcEvent定义了事件的名称
@@ -222,8 +222,7 @@ abstract class BasePeerConnection {
   ///只有协商完成，数据通道打开，才算真正完成连接
   ///可输入的参数包括外部媒体流和定制扩展属性
   Future<bool> init(
-      {bool getUserMedia = false,
-      List<MediaStream> streams = const [],
+      {List<MediaStream> streams = const [],
       required SignalExtension extension}) async {
     id = await cryptoGraphy.getRandomAsciiString(length: 8);
     this.extension = extension;
@@ -288,23 +287,9 @@ abstract class BasePeerConnection {
     }
 
     /// 4.把本地的现有的视频流加入到连接中，这个流可以由参数传入
-    if (getUserMedia) {
-      var render = PeerVideoRenderer();
-      render.getUserMedia();
-      render.bindRTCVideoRenderer();
-      localVideoRenders.add(render);
-      var streamId = render.mediaStream!.id;
-      addStream(render.mediaStream!);
-      logger.i('Add getUserMedia stream $streamId');
-    }
     if (streams.isNotEmpty) {
       for (var stream in streams) {
-        var render = PeerVideoRenderer(mediaStream: stream);
-        render.bindRTCVideoRenderer();
-        localVideoRenders.add(render);
-        addStream(stream);
-        var streamId = stream.id;
-        logger.i('Add stream $streamId');
+        addLocalStream(stream: stream);
       }
     }
 
@@ -471,34 +456,68 @@ abstract class BasePeerConnection {
     }
   }
 
-  /// 把流加入到连接中，比如把本地的视频流加入到连接中，从而让远程peer能够接收到
+  /// 把渲染器加入到本地渲染器集合，并把渲染器的流加入到连接中
   /// @param {MediaStream} stream
-  addStream(MediaStream stream) {
-    logger.i('addStream ${stream.id}');
+  addLocalRenderer(PeerVideoRenderer render) {
+    var streamId = render.id;
+    if (streamId != null) {
+      if (localVideoRenders.isNotEmpty) {
+        if (remoteVideoRenders.containsKey(streamId)) {
+          return;
+        }
+      }
+
+      render.bindRTCVideoRenderer();
+      localVideoRenders[streamId] = render;
+      logger.i('addStream $streamId');
+
+      var tracks = render.mediaStream!.getTracks();
+      for (var track in tracks) {
+        addLocalTrack(track, render.mediaStream!);
+      }
+    }
+  }
+
+  /// 把流加入到连接中，并创建对应的渲染器，比如把本地的视频流加入到连接中，从而让远程peer能够接收到
+  addLocalStream(
+      {MediaStream? stream,
+      bool userMedia = false,
+      bool displayMedia = false}) {
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    var tracks = stream.getTracks();
-    for (var track in tracks) {
-      addTrack(track, stream);
+
+    if (userMedia) {
+      PeerVideoRenderer render = PeerVideoRenderer();
+      render.createUserMedia();
+      addLocalRenderer(render);
+    }
+    if (displayMedia) {
+      PeerVideoRenderer render = PeerVideoRenderer();
+      render.createDisplayMedia();
+      addLocalRenderer(render);
+    }
+    if (stream != null) {
+      PeerVideoRenderer render = PeerVideoRenderer(mediaStream: stream);
+      addLocalRenderer(render);
     }
   }
 
   /// 把轨道加入到流中，其目的是为了把流加入到连接中
   /// @param {MediaStreamTrack} track
   /// @param {MediaStream} stream
-  addTrack(MediaStreamTrack track, MediaStream stream) async {
+  addLocalTrack(MediaStreamTrack track, MediaStream stream) async {
     RTCPeerConnection peerConnection = this.peerConnection!;
     logger.i('addTrack stream:${stream.id}, track:${track.id}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    var streamSenders = trackSenders[track];
+    var streamSenders = remoteTrackSenders[track];
     if (streamSenders == null) {
       streamSenders = {};
-      trackSenders[track] = streamSenders;
+      remoteTrackSenders[track] = streamSenders;
     }
     RTCRtpSender? sender = streamSenders[stream];
     if (sender == null) {
@@ -522,13 +541,13 @@ abstract class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    var streamSenders = trackSenders[oldTrack];
+    var streamSenders = remoteTrackSenders[oldTrack];
     if (streamSenders != null) {
       RTCRtpSender? sender = streamSenders[stream];
       if (sender == null) {
         logger.e('Cannot replace track that was never added.');
       } else {
-        trackSenders[newTrack] = streamSenders;
+        remoteTrackSenders[newTrack] = streamSenders;
         await sender.replaceTrack(newTrack);
       }
     }
@@ -544,7 +563,7 @@ abstract class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    var streamSenders = trackSenders[track];
+    var streamSenders = remoteTrackSenders[track];
     if (streamSenders != null) {
       RTCRtpSender? sender = streamSenders[stream];
       if (sender == null) {
@@ -607,15 +626,20 @@ abstract class BasePeerConnection {
       emit(WebrtcEventType.track, {event.track: eventStream});
       remoteTracks.add({event.track: eventStream});
 
-      if (remoteVideoRenders.isNotEmpty) {
-        if (remoteVideoRenders[0].id == eventStream.id) {
-          return;
-        }
-      }
-
-      remoteVideoRenders.add(PeerVideoRenderer(mediaStream: eventStream));
+      addRemoteStream(eventStream);
       emit(WebrtcEventType.stream, eventStream);
     }
+  }
+
+  addRemoteStream(MediaStream stream) {
+    if (remoteVideoRenders.isNotEmpty) {
+      if (remoteVideoRenders.containsKey(stream.id)) {
+        return;
+      }
+    }
+    PeerVideoRenderer render = PeerVideoRenderer(mediaStream: stream);
+    render.bindRTCVideoRenderer();
+    remoteVideoRenders[stream.id] = render;
   }
 
   /// 注册一组回调函数，内部可以调用外部注册事件的方法
@@ -681,8 +705,8 @@ abstract class BasePeerConnection {
       return;
     }
     remoteTracks = [];
-    remoteVideoRenders = [];
-    trackSenders = {};
+    remoteVideoRenders = {};
+    remoteTrackSenders = {};
     final dataChannel = this.dataChannel;
     if (dataChannel != null) {
       try {
