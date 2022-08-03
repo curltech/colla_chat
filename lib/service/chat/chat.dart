@@ -148,6 +148,37 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         limit: limit);
   }
 
+  Future<List<ChatMessage>> findByGreaterId(String peerId,
+      {String? direct,
+        String? messageType,
+        String? subMessageType,
+        int? id,
+        int? limit}) async {
+    String where = '(senderPeerId=? or receiverPeerId=?)';
+    List<Object> whereArgs = [peerId, peerId];
+    if (direct != null) {
+      where = '$where and direct=?';
+      whereArgs.add(direct);
+    }
+    if (messageType != null) {
+      where = '$where and messageType=?';
+      whereArgs.add(messageType);
+    }
+    if (subMessageType != null) {
+      where = '$where and subMessageType=?';
+      whereArgs.add(subMessageType);
+    }
+    if (id != null) {
+      where = '$where and id>?';
+      whereArgs.add(id);
+    }
+    return find(
+        where: where,
+        whereArgs: whereArgs,
+        orderBy: 'id desc',
+        limit: limit);
+  }
+
   Future<void> receiveChatMessage(ChatMessage chatMessage,
       {TransportType transportType = TransportType.webrtc,
       bool read = true,
