@@ -150,10 +150,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
 
   Future<List<ChatMessage>> findByGreaterId(String peerId,
       {String? direct,
-        String? messageType,
-        String? subMessageType,
-        int? id,
-        int? limit}) async {
+      String? messageType,
+      String? subMessageType,
+      int? id,
+      int? limit}) async {
     String where = '(senderPeerId=? or receiverPeerId=?)';
     List<Object> whereArgs = [peerId, peerId];
     if (direct != null) {
@@ -173,10 +173,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       whereArgs.add(id);
     }
     return find(
-        where: where,
-        whereArgs: whereArgs,
-        orderBy: 'id desc',
-        limit: limit);
+        where: where, whereArgs: whereArgs, orderBy: 'id desc', limit: limit);
   }
 
   Future<void> receiveChatMessage(ChatMessage chatMessage,
@@ -189,6 +186,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     if (read) {
       chatMessage.readTime = DateUtil.currentDate();
     }
+    chatMessage.id = null;
     await insert(chatMessage);
     await chatSummaryService.upsertByChatMessage(chatMessage);
   }
