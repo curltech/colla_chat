@@ -37,13 +37,23 @@ class _IndexWidgetState extends State<IndexWidget>
   Widget _createPageView(BuildContext context) {
     var pageView = Consumer<IndexWidgetProvider>(
         builder: (context, indexWidgetProvider, child) {
+      ScrollPhysics? physics = const NeverScrollableScrollPhysics();
+      if (!indexWidgetProvider.bottomBarVisible) {
+        physics = null;
+      }
       return PageView.builder(
-        physics: const NeverScrollableScrollPhysics(),
+        physics: physics,
         controller: indexWidgetProvider.pageController,
         onPageChanged: (int index) {
-          ///滚动的计算有问题
-          //logger.w('onPageChanged $index');
-          //indexWidgetProvider.setCurrentIndex(index, context: context);
+          var currentIndex = indexWidgetProvider.currentIndex;
+          //目标是主视图，或者回退到先前的视图都从堆栈弹出
+          if (index < 4 || currentIndex > index) {
+            if (!indexWidgetProvider.popAction) {
+              indexWidgetProvider.pop(context: context);
+            }
+            indexWidgetProvider.popAction = false;
+          }
+          indexWidgetProvider.currentIndex = index;
         },
         itemCount: indexWidgetProvider.views.length,
         itemBuilder: (BuildContext context, int index) {

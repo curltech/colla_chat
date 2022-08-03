@@ -101,6 +101,7 @@ class ViewStack<T> {
   }
 }
 
+///主菜单和对应的主视图
 final List<String> mainViews = ['chat', 'linkman', 'channel', 'me'];
 const bool useNavigator = false;
 const animateDuration = Duration(milliseconds: 500);
@@ -109,29 +110,34 @@ const animateDuration = Duration(milliseconds: 500);
 class IndexWidgetProvider with ChangeNotifier {
   static IndexWidgetProvider instance = IndexWidgetProvider();
 
-  ///所有视图名称和位置的映射
-  Map<String, int> viewPosition = {};
-
-  ///所以可以出现在工作区的视图，0-3是主视图
+  //所以可以出现在工作区的视图，0-3是主视图，其余是副视图，
   Map<String, Widget> allViews = {};
 
   ///当前出现在工作区的视图，0-3是主视图，始终都在，然后每进入一个新视图，则添加
-  ///每退出一个则删除
+  ///每退出一个则删除，
   List<Widget> views = [];
+
+  ///前出现在工作区的视图views名称和位置的映射
+  Map<String, int> viewPositions = {};
+
+  //只有副视图才存储出现在堆栈中
   ViewStack<String> stack = ViewStack<String>();
   PageController? pageController;
+
+  //当前的主视图，左边栏和底部栏的指示，范围0-3
+  int _currentMainIndex = 0;
+
   int _currentIndex = 0;
 
-  ///左边栏和底部栏的指示，范围0-3
-  int _mainIndex = 0;
-  double _leftBarWidth = 90;
+  bool popAction = false;
 
   IndexWidgetProvider() {
+    //初始化主视图，确定好主视图的位置
     for (var i = 0; i < mainViews.length; ++i) {
       String name = mainViews[i];
       allViews[name] = blankWidget;
       views.add(blankWidget);
-      viewPosition[name] = i;
+      viewPositions[name] = i;
     }
   }
 
@@ -140,7 +146,7 @@ class IndexWidgetProvider with ChangeNotifier {
   define(TileDataMixin view, {bool listen = false}) {
     if (!useNavigator || !appDataProvider.mobile) {
       allViews[view.routeName] = view;
-      int? viewIndex = viewPosition[view.routeName];
+      int? viewIndex = viewPositions[view.routeName];
       if (viewIndex != null && viewIndex < mainViews.length) {
         views[viewIndex] = view;
       }
@@ -156,69 +162,53 @@ class IndexWidgetProvider with ChangeNotifier {
     }
   }
 
-  String get current {
+  ///当前的副视图名称
+  String? get current {
     String? head = stack.head;
-    head ??= '';
     return head;
   }
 
-  int get currentIndex {
-    return _currentIndex;
+  ///当前主视图的序号
+  int get currentMainIndex {
+    return _currentMainIndex;
   }
 
-  String? _getName(int index) {
-    String? name;
-    for (var entry in viewPosition.entries) {
-      if (entry.value == index) {
-        name = entry.key;
-        break;
-      }
+  set currentMainIndex(int index) {
+    if (_currentMainIndex == index) {
+      return;
     }
-    return name;
-  }
-
-  int get mainIndex {
-    return _mainIndex;
-  }
-
-  set mainIndex(int index) {
     if (index >= 0 && index < mainViews.length) {
-      _mainIndex = index;
+      _currentMainIndex = index;
+      var pageController = this.pageController;
+      if (pageController == null) {
+        logger.e('pageController is not exist');
+        return;
+      }
+      //pageController.jumpToPage(index);
+      pageController.animateToPage(index,
+          duration: animateDuration, curve: Curves.easeInOut);
       notifyListeners();
     }
   }
 
+  ///当前视图的序号
+  int get currentIndex {
+    return _currentIndex;
+  }
+
+  set currentIndex(int index) {
+    if (_currentIndex == index) {
+      return;
+    }
+    _currentIndex = index;
+  }
+
   bool get bottomBarVisible {
-    if (_currentIndex < mainViews.length) {
+    if (current == null) {
       return true;
     } else {
       return false;
     }
-  }
-
-  ///视图转换已经发生
-  setCurrentIndex(int index, {BuildContext? context}) {
-    if (_currentIndex == index) {
-      //return;
-    }
-    if (index >= views.length) {
-      logger.e('index: $index over workspace view');
-      return;
-    }
-
-    logger.i('mainIndex:$mainIndex;currentIndex:$_currentIndex;index:$index');
-    //无论是非主视图还是主视图，转换到主视图，需要退出堆栈
-    if (index < mainViews.length) {
-      _pop();
-    }
-    //主视图转换到主视图，通知边栏和底栏
-    if (_currentIndex < mainViews.length && index < mainViews.length) {
-      if (_mainIndex != index) {
-        _mainIndex = index;
-      }
-    }
-    _currentIndex = index;
-    notifyListeners();
   }
 
   ///把名字压入堆栈，然后跳转
@@ -229,6 +219,12 @@ class IndexWidgetProvider with ChangeNotifier {
       logger.e('view: $name is not exist');
       return;
     }
+    for (var mainName in mainViews) {
+      if (mainName == name) {
+        logger.e('mainview: $name can not be push stack');
+        return;
+      }
+    }
     //桌面工作区模式
     if (!useNavigator || !appDataProvider.mobile) {
       var pageController = this.pageController;
@@ -237,19 +233,14 @@ class IndexWidgetProvider with ChangeNotifier {
         return;
       }
       //判断要进入的页面是否已在工作区
-      int? index = viewPosition[name];
+      int? index = viewPositions[name];
       if (index == null) {
         //不是主页面，增加到工作区
         views.add(view);
         index = views.length - 1;
-        viewPosition[name] = index;
-      } else {
-        if (_currentIndex == index) {
-          return;
-        }
+        viewPositions[name] = index;
       }
       if (index < allViews.length) {
-        _currentIndex = index;
         if (push) {
           stack.pushRepeat(name);
         }
@@ -278,7 +269,7 @@ class IndexWidgetProvider with ChangeNotifier {
       return null;
     }
     //堆栈有头视图，可以弹出
-    int? index = viewPosition[head];
+    int? index = viewPositions[head];
     //头视图在工作区内
     if (index != null) {
       //堆栈头视图不是主视图，可以弹出，计算弹出后的视图
@@ -288,13 +279,13 @@ class IndexWidgetProvider with ChangeNotifier {
         String name = head;
         head = stack.head;
         if (head != null) {
-          index = viewPosition[head];
+          index = viewPositions[head];
         } else {
-          index = _mainIndex;
+          index = _currentMainIndex;
         }
-        index ??= _mainIndex;
+        index ??= _currentMainIndex;
         views.removeLast();
-        viewPosition.remove(name);
+        viewPositions.remove(name);
       }
     } else {
       logger.e('head is not in workspace');
@@ -317,12 +308,13 @@ class IndexWidgetProvider with ChangeNotifier {
         //pageController.jumpToPage(index);
         pageController.animateToPage(index,
             duration: animateDuration, curve: Curves.easeInOut);
-        _currentIndex = index;
+        popAction = true;
         notifyListeners();
       }
     } else {
       if (context != null) {
         NavigatorUtil.goBack(context);
+        popAction = true;
       } else {
         logger.e('pop error, no context');
       }
@@ -334,20 +326,7 @@ class IndexWidgetProvider with ChangeNotifier {
     bool can = false;
     String? head = stack.head;
     if (head != null) {
-      int? viewIndex = viewPosition[head];
-      if (viewIndex != null) {
-        if (viewIndex >= mainViews.length ||
-            !useNavigator ||
-            !appDataProvider.mobile) {
-          can = stack.canPop();
-        }
-      } else {
-        if (context != null) {
-          can = NavigatorUtil.canBack(context);
-        } else {
-          logger.e('pop error, no context');
-        }
-      }
+      return true;
     } else if (useNavigator && appDataProvider.mobile) {
       if (context != null) {
         can = NavigatorUtil.canBack(context);
@@ -359,7 +338,7 @@ class IndexWidgetProvider with ChangeNotifier {
   }
 
   Color? getIconColor(int index) {
-    if (index == mainIndex) {
+    if (index == currentMainIndex) {
       return appDataProvider.themeData?.colorScheme.primary;
     } else {
       return Colors.grey;
