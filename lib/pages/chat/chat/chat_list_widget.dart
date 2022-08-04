@@ -16,13 +16,17 @@ import '../../../widgets/data_bind/data_group_listview.dart';
 import '../../../widgets/data_bind/data_listtile.dart';
 import 'chat_message_widget.dart';
 
+///好友的汇总控制器，每当消息汇总表的数据有变化时更新控制器
+final DataListController<ChatSummary> linkmanChatSummaryController =
+    DataListController<ChatSummary>();
+
+///群的汇总控制器
+final DataListController<ChatSummary> groupChatSummaryController =
+    DataListController<ChatSummary>();
+
 /// 聊天的主页面，展示可以聊天的目标对象，可以是一个人，或者是一个群
 /// 选择好目标点击进入具体的聊天页面ChatMessage
 class ChatListWidget extends StatefulWidget with TileDataMixin {
-  final DataListController<ChatSummary> linkmanController =
-      DataListController<ChatSummary>();
-  final DataListController<ChatSummary> groupController =
-      DataListController<ChatSummary>();
   final GroupDataListController groupDataListController =
       GroupDataListController();
   final ChatMessageWidget chatMessageWidget = ChatMessageWidget();
@@ -32,14 +36,14 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
         .findByPartyType(PartyType.linkman.name)
         .then((List<ChatSummary> chatSummary) {
       if (chatSummary.isNotEmpty) {
-        linkmanController.addAll(chatSummary);
+        linkmanChatSummaryController.replaceAll(chatSummary);
       }
     });
     chatSummaryService
         .findByPartyType(PartyType.group.name)
         .then((List<ChatSummary> chatSummary) {
       if (chatSummary.isNotEmpty) {
-        groupController.addAll(chatSummary);
+        groupChatSummaryController.replaceAll(chatSummary);
       }
     });
   }
@@ -64,15 +68,12 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   @override
   initState() {
     super.initState();
-    widget.linkmanController.addListener(_update);
-    widget.groupController.addListener(_update);
-    peerConnectionPoolController.addListener(_update);
+    linkmanChatSummaryController.addListener(_update);
+    groupChatSummaryController.addListener(_update);
 
     var indexWidgetProvider =
         Provider.of<IndexWidgetProvider>(context, listen: false);
     indexWidgetProvider.define(widget.chatMessageWidget);
-
-    _buildGroupDataListController();
   }
 
   _update() {
@@ -81,7 +82,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
 
   _buildGroupDataListController() {
     Map<TileData, List<TileData>> tileData = {};
-    var linkmen = widget.linkmanController.data;
+    var linkmen = linkmanChatSummaryController.data;
     List<TileData> tiles = [];
     if (linkmen.isNotEmpty) {
       for (var linkman in linkmen) {
@@ -105,14 +106,21 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     tileData[TileData(title: 'Linkman')] = tiles;
     widget.groupDataListController.addAll(tileData: tileData);
 
-    var groups = widget.groupController.data;
+    var groups = groupChatSummaryController.data;
     tiles = [];
     if (groups.isNotEmpty) {
       for (var group in groups) {
         var title = group.name ?? '';
         var subtitle = group.peerId ?? '';
+        var unreadNumber = group.unreadNumber;
+        var badge = Badge(
+          badgeContent: Text('$unreadNumber'),
+          elevation: 0.0,
+          padding: const EdgeInsets.all(0.0),
+          child: defaultImage,
+        );
         TileData tile = TileData(
-            icon: defaultImage,
+            icon: badge,
             title: title,
             subtitle: subtitle,
             routeName: 'chat_message');
@@ -127,13 +135,14 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     if (group != null) {
       ChatSummary? current;
       if (group.title == 'Linkman') {
-        widget.linkmanController.currentIndex = index;
-        current = widget.linkmanController.current;
+        linkmanChatSummaryController.currentIndex = index;
+        current = linkmanChatSummaryController.current;
       }
       if (group.title == 'Group') {
-        widget.groupController.currentIndex = index;
-        current = widget.groupController.current;
+        groupChatSummaryController.currentIndex = index;
+        current = groupChatSummaryController.current;
       }
+      ///更新消息控制器的当前消息汇总，从而确定拥有消息的好友或者群
       widget.chatMessageWidget.chatMessageController.chatSummary = current;
     }
   }
@@ -158,8 +167,8 @@ class _ChatListWidgetState extends State<ChatListWidget> {
 
   @override
   void dispose() {
-    widget.linkmanController.removeListener(_update);
-    widget.groupController.removeListener(_update);
+    linkmanChatSummaryController.removeListener(_update);
+    groupChatSummaryController.removeListener(_update);
     peerConnectionPoolController.removeListener(_update);
     super.dispose();
   }

@@ -17,6 +17,7 @@ import '../../../widgets/common/widget_mixin.dart';
 import '../me/webrtc/peer_connection_controller.dart';
 import 'chat_message_item.dart';
 
+///好友或者群的消息控制器
 class ChatMessageController extends DataMoreController<ChatMessage> {
   ChatSummary? _chatSummary;
 
@@ -30,6 +31,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     previous(limit: defaultLimit);
   }
 
+  ///访问数据库获取更老的消息
   @override
   void previous({int? limit}) {
     var chatSummary = _chatSummary;
@@ -50,6 +52,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     });
   }
 
+  ///访问数据库获取最新的消息
   @override
   void latest({int? limit}) {
     var chatSummary = _chatSummary;
@@ -291,6 +294,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
 
   @override
   Widget build(BuildContext context) {
+    ///获取最新的消息
     widget.chatMessageController.latest();
     String name = widget.chatMessageController.chatSummary!.name!;
     var appBarView = AppBarView(
