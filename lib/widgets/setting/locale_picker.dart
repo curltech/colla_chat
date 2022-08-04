@@ -10,25 +10,25 @@ class LocalePicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<AppDataProvider>(context).locale;
-    Provider.of<AppDataProvider>(context).themeData;
-    Provider.of<AppDataProvider>(context).brightness;
     List<S2Choice<String>> items = [];
     for (var localeOption in localeOptions) {
       var item = S2Choice<String>(
           value: localeOption.value, title: localeOption.label);
       items.add(item);
     }
-    return SmartSelect<String>.single(
-      modalType: S2ModalType.bottomSheet,
-      placeholder: AppLocalizations.instance.text('Please select language'),
-      title: AppLocalizations.instance.text('Language'),
-      selectedValue: Provider.of<AppDataProvider>(context).locale,
-      choiceItems: items,
-      onChange: (dynamic state) {
-        String value = state.value;
-        Provider.of<AppDataProvider>(context, listen: false).locale = value;
-      },
-    );
+    return Consumer<AppDataProvider>(
+        builder: (BuildContext context, appDataProvider, Widget? child) {
+      return SmartSelect<String>.single(
+        modalType: S2ModalType.bottomSheet,
+        placeholder: AppLocalizations.t('Please select language'),
+        title: AppLocalizations.t('Language'),
+        selectedValue: appDataProvider.locale,
+        choiceItems: items,
+        onChange: (dynamic state) {
+          String value = state.value;
+          appDataProvider.locale = value;
+        },
+      );
+    });
   }
 }
