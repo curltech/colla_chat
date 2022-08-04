@@ -200,6 +200,16 @@ class IndexWidgetProvider with ChangeNotifier {
     if (_currentIndex == index) {
       return;
     }
+    //logger.i('popAction:$popAction,move view from $currentIndex to $index');
+    if (_currentIndex > 3 &&
+        index < _currentIndex &&
+        viewPositions.length > 4 &&
+        !popAction) {
+      pop();
+    }
+    if (popAction) {
+      popAction = false;
+    }
     _currentIndex = index;
   }
 
@@ -286,6 +296,7 @@ class IndexWidgetProvider with ChangeNotifier {
         index ??= _currentMainIndex;
         views.removeLast();
         viewPositions.remove(name);
+        popAction = true;
       }
     } else {
       logger.e('head is not in workspace');
@@ -308,7 +319,6 @@ class IndexWidgetProvider with ChangeNotifier {
         // pageController.jumpToPage(index);
         pageController.animateToPage(index,
             duration: animateDuration, curve: Curves.easeInOut);
-        popAction = true;
         notifyListeners();
       }
     } else {

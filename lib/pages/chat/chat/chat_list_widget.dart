@@ -1,3 +1,5 @@
+import 'package:badges/badges.dart';
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -85,8 +87,15 @@ class _ChatListWidgetState extends State<ChatListWidget> {
       for (var linkman in linkmen) {
         var title = linkman.name ?? '';
         var subtitle = linkman.peerId ?? '';
+        var unreadNumber = linkman.unreadNumber;
+        var badge = Badge(
+          badgeContent: Text('$unreadNumber'),
+          elevation: 0.0,
+          padding: const EdgeInsets.all(0.0),
+          child: defaultImage,
+        );
         TileData tile = TileData(
-            avatar: linkman.avatar,
+            icon: badge,
             title: title,
             subtitle: subtitle,
             routeName: 'chat_message');
@@ -103,7 +112,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         var title = group.name ?? '';
         var subtitle = group.peerId ?? '';
         TileData tile = TileData(
-            avatar: group.avatar,
+            icon: defaultImage,
             title: title,
             subtitle: subtitle,
             routeName: 'chat_message');
@@ -143,7 +152,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        title: Text(AppLocalizations.instance.text(widget.title)),
+        title: Text(AppLocalizations.t(widget.title)),
         child: _buildGroupDataListView(context));
   }
 
