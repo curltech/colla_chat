@@ -185,7 +185,7 @@ class CryptoGraphy {
   }
 
   /// 结合x25519密钥交换和aes进行ecc加解密,里面涉及的密钥对是x25519协议
-  /// ecc加密是采用公钥加密，私钥解密，这种加密方式信息不要太大，速度较慢，一般用于加密对称密钥
+  /// ecc加密是采用公钥加密，私钥解密，
   Future<Uint8List> eccEncrypt(List<int> message,
       {String? base64PublicKey, PublicKey? remotePublicKey}) async {
     if (remotePublicKey == null) {
@@ -205,6 +205,8 @@ class CryptoGraphy {
     throw 'EccEncryptFail';
   }
 
+  /// 结合x25519密钥交换和aes进行ecc加解密,里面涉及的密钥对是x25519协议
+  /// ecc加密是采用公钥加密，私钥解密，
   Future<List<int>> eccDecrypt(List<int> message,
       {required SimpleKeyPair localKeyPair}) async {
     var remotePublicKeyBytes = message.sublist(0, 256);

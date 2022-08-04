@@ -1,20 +1,26 @@
+import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/entity/p2p/security_context.dart';
+
 import '../constant/base.dart';
 import '../datastore/datastore.dart';
 import '../entity/base.dart';
 import '../tool/util.dart';
+import 'p2p/security_context.dart';
 
 /// 本地sqlite3的通用访问类，所有的表访问服务都是这个类的实例
 abstract class GeneralBaseService<T> {
   final String tableName;
   final List<String> fields;
   final List<String> indexFields;
+  final List<String> encryptFields;
   late final DataStore dataStore;
   late final T Function(Map) post;
 
   GeneralBaseService(
       {required this.tableName,
       required this.fields,
-      required this.indexFields});
+      required this.indexFields,
+      this.encryptFields = const []});
 
   Future<T?> get(int id) {
     return findOne(where: 'id=?', whereArgs: [id]);
@@ -42,6 +48,8 @@ abstract class GeneralBaseService<T> {
         offset: offset);
     if (m != null) {
       var o = post(m);
+      var json = await decrypt(o);
+      o = post(json);
       return o;
     }
 
@@ -79,6 +87,8 @@ abstract class GeneralBaseService<T> {
     if (ms.isNotEmpty) {
       for (var m in ms) {
         var o = post(m);
+        var json = await decrypt(o);
+        o = post(json);
         os.add(o);
       }
     }
@@ -113,6 +123,8 @@ abstract class GeneralBaseService<T> {
     if (ms.isNotEmpty) {
       for (var m in ms) {
         var o = post(m);
+        var json = await decrypt(o);
+        o = post(json);
         os.add(o);
       }
     }
@@ -156,25 +168,81 @@ abstract class GeneralBaseService<T> {
     );
   }
 
-  Future<int> insert(dynamic entity, [dynamic? ignore, dynamic? parent]) {
+  Future<Map<String, dynamic>> encrypt(T entity,
+      {bool needCompress = true,
+      bool needEncrypt = true,
+      bool needSign = false,
+      String? payloadKey}) async {
+    Map<String, dynamic> json = JsonUtil.toJson(entity) as Map<String, dynamic>;
+    if (encryptFields.isNotEmpty) {
+      SecurityContext securityContext = SecurityContext();
+      securityContext.needCompress = needCompress;
+      securityContext.needEncrypt = needEncrypt;
+      securityContext.needSign = needSign;
+      securityContext.payloadKey = payloadKey;
+      for (var encryptField in encryptFields) {
+        String? value = json[encryptField];
+        if (value != null) {
+          securityContext = await SecurityContextService.encrypt(
+              CryptoUtil.decodeBase64(value), securityContext);
+          json[encryptField] = securityContext.transportPayload;
+        }
+      }
+    }
+    return json;
+  }
+
+  Future<Map<String, dynamic>> decrypt(T entity,
+      {bool needCompress = true,
+      bool needEncrypt = true,
+      bool needSign = false,
+      String? payloadKey}) async {
+    Map<String, dynamic> json = JsonUtil.toJson(entity) as Map<String, dynamic>;
+    SecurityContext securityContext = SecurityContext();
+    securityContext.needCompress = needCompress;
+    securityContext.needEncrypt = needEncrypt;
+    securityContext.needSign = needSign;
+    securityContext.payloadKey = payloadKey;
+    if (encryptFields.isNotEmpty) {
+      for (var encryptField in encryptFields) {
+        String? value = json[encryptField];
+        if (value != null) {
+          List<int> data =
+              await SecurityContextService.decrypt(value, securityContext);
+          json[encryptField] = CryptoUtil.encodeBase64(data);
+        }
+      }
+    }
+    return json;
+  }
+
+  Future<int> insert(dynamic entity, [dynamic? ignore, dynamic? parent]) async {
     EntityUtil.createTimestamp(entity);
-    return dataStore.insert(tableName, entity);
+    Map<String, dynamic> json = await encrypt(entity);
+    int key = await dataStore.insert(tableName, json);
+    Object? id = EntityUtil.getId(entity);
+    if (id == null) {
+      EntityUtil.setId(entity, key);
+    }
+    return key;
   }
 
   Future<int> delete(dynamic entity) {
     return dataStore.delete(tableName, entity: entity);
   }
 
-  Future<int> update(dynamic entity, [dynamic? ignore, dynamic? parent]) {
+  Future<int> update(dynamic entity, [dynamic? ignore, dynamic? parent]) async {
     EntityUtil.updateTimestamp(entity);
-    return dataStore.update(tableName, entity);
+    Map<String, dynamic> json = await encrypt(entity);
+    return dataStore.update(tableName, json);
   }
 
   /// 批量保存，根据脏标志新增，修改或者删除
-  save(List<Object> entities, [dynamic? ignore, dynamic? parent]) {
+  save(List<T> entities, [dynamic? ignore, dynamic? parent]) async {
     List<Map<String, dynamic>> operators = [];
     for (var entity in entities) {
-      operators.add({'table': tableName, 'entity': entity});
+      Map<String, dynamic> json = await encrypt(entity);
+      operators.add({'table': tableName, 'entity': json});
     }
     return dataStore.transaction(operators);
   }

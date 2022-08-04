@@ -26,21 +26,22 @@ class SecurityContextService {
     }
     result.needEncrypt = securityContext.needEncrypt;
     result.needCompress = securityContext.needCompress;
+    result.needSign = securityContext.needSign;
     // 1.设置签名（本地保存前加密不签名），只有在加密的情况下才设置签名
     var targetPeerId = securityContext.targetPeerId;
     var peerId = myself.peerId;
-    if (securityContext.needEncrypt &&
+    if (securityContext.needSign &&
         targetPeerId != null &&
         peerId != null &&
         targetPeerId != peerId) {
       /// 签名，并且用上一次过期的私钥也签名
       var payloadSignature = await cryptoGraphy.sign(data, myselfPrivateKey);
-      result.payloadSignature = CryptoUtil.uint8ListToStr(payloadSignature);
+      result.payloadSignature = CryptoUtil.encodeBase64(payloadSignature);
       if (myself.expiredKeys.isNotEmpty) {
         var previousPublicKeyPayloadSignature =
             await cryptoGraphy.sign(data, myself.expiredKeys[0]);
         result.previousPublicKeyPayloadSignature =
-            CryptoUtil.uint8ListToStr(previousPublicKeyPayloadSignature);
+            CryptoUtil.encodeBase64(previousPublicKeyPayloadSignature);
       }
     }
 
@@ -76,7 +77,7 @@ class SecurityContextService {
         // 对对称密钥进行目标公钥加密
         var encryptedKey = await cryptoGraphy.eccEncrypt(secretKey,
             remotePublicKey: targetPublicKey);
-        result.payloadKey = CryptoUtil.uint8ListToStr(encryptedKey);
+        result.payloadKey = CryptoUtil.encodeBase64(encryptedKey);
       } else {
         result.payloadKey = '';
       }
@@ -116,7 +117,7 @@ class SecurityContextService {
           List<int>? payloadKeyData;
           try {
             payloadKeyData = await cryptoGraphy.eccDecrypt(
-                CryptoUtil.strToUint8List(payloadKey),
+                CryptoUtil.decodeBase64(payloadKey),
                 localKeyPair: privateKey);
           } catch (e) {
             logger.e(e.toString());
@@ -125,7 +126,7 @@ class SecurityContextService {
           while (payloadKeyData == null && i < myself.expiredKeys.length) {
             try {
               payloadKeyData = await cryptoGraphy.eccDecrypt(
-                  CryptoUtil.strToUint8List(payloadKey),
+                  CryptoUtil.decodeBase64(payloadKey),
                   localKeyPair: myself.expiredKeys[i]);
             } catch (e) {
               logger.e(e.toString());
@@ -147,7 +148,8 @@ class SecurityContextService {
         data = CryptoUtil.uncompress(data);
       }
       //3. 消息的数据部分，验证签名
-      if (needEncrypt) {
+      var needSign = securityContext.needSign;
+      if (needSign) {
         var payloadSignature = securityContext.payloadSignature;
         if (payloadSignature != null) {
           SimplePublicKey? srcPublicKey;
