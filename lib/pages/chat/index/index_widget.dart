@@ -45,14 +45,7 @@ class _IndexWidgetState extends State<IndexWidget>
         physics: physics,
         controller: indexWidgetProvider.pageController,
         onPageChanged: (int index) {
-          var currentIndex = indexWidgetProvider.currentIndex;
-          //目标是主视图，或者回退到先前的视图都从堆栈弹出
-          if (index < 4 || currentIndex > index) {
-            if (!indexWidgetProvider.popAction) {
-              indexWidgetProvider.pop(context: context);
-            }
-            indexWidgetProvider.popAction = false;
-          }
+          logger.i('move view $index');
           indexWidgetProvider.currentIndex = index;
         },
         itemCount: indexWidgetProvider.views.length,

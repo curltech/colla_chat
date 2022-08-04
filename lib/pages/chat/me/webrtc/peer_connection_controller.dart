@@ -10,7 +10,7 @@ import '../../../../transport/webrtc/peer_connection_pool.dart';
 class PeerConnectionPoolController with ChangeNotifier {
   //新连接被创建
   onCreated(WebrtcEvent event) async {
-    notifyListeners();
+    //notifyListeners();
   }
 
   //新消息到来
