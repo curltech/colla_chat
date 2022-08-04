@@ -2,6 +2,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../provider/app_data_provider.dart';
 import 'app_bar_widget.dart';
 
 ///工作区的标准视图，包裹了顶部栏AppBarWidget和一个包裹了child

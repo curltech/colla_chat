@@ -45,7 +45,6 @@ class _IndexWidgetState extends State<IndexWidget>
         physics: physics,
         controller: indexWidgetProvider.pageController,
         onPageChanged: (int index) {
-          logger.i('move view $index');
           indexWidgetProvider.currentIndex = index;
         },
         itemCount: indexWidgetProvider.views.length,
