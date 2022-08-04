@@ -67,50 +67,35 @@ class _LoadingState extends State<Loading> {
   @override
   void initState() {
     super.initState();
-    if (appDataProvider.brightness == Brightness.light.name) {
-      if (widget.autoPlay) {
-        Future.doWhile(() async {
-          if (widget.currentIndex >= lightBackgroudImages.length - 1) {
-            widget.controller.animateToPage(0,
-                duration: widget.animateDuration, curve: Curves.easeInOut);
-          } else {
-            try {
-              widget.controller.nextPage(
-                  duration: widget.animateDuration, curve: Curves.easeInOut);
-            } catch (e) {
-              //logger.e(e);
-            }
-          }
-          await Future.delayed(const Duration(seconds: 60));
-          // if (currentIndex >= lightBackgroudImages.length - 1) {
-          //   return false;
-          // }
-          return true;
-        });
-      }
-    }
+    int count = lightBackgroudImages.length;
     if (appDataProvider.brightness == Brightness.dark.name) {
-      if (widget.autoPlay) {
-        Future.doWhile(() async {
-          if (widget.currentIndex >= darkBackgroudImages.length - 1) {
-            widget.controller.animateToPage(0,
-                duration: widget.animateDuration, curve: Curves.easeInOut);
-          } else {
-            widget.controller.nextPage(
-                duration: widget.animateDuration, curve: Curves.easeInOut);
-          }
-          await Future.delayed(const Duration(seconds: 60));
-          // if (currentIndex >= darkBackgroudImages.length - 1) {
-          //   return false;
-          // }
-          return true;
-        });
-      }
+      count = darkBackgroudImages.length;
     }
 
-    // Future.delayed(const Duration(seconds: 10), () {
-    //   Application.router.navigateTo(context, Routes.p2pLogin, replace: true);
-    // });
+    if (widget.autoPlay) {
+      bool positive = true;
+      Future.doWhile(() async {
+        if (widget.currentIndex >= count - 1) {
+          positive = false;
+        }
+        if (widget.currentIndex == 0) {
+          positive = true;
+        }
+        try {
+          if (positive) {
+            widget.controller.nextPage(
+                duration: widget.animateDuration, curve: Curves.easeInOut);
+          } else {
+            widget.controller.previousPage(
+                duration: widget.animateDuration, curve: Curves.easeInOut);
+          }
+        } catch (e) {
+          logger.e(e);
+        }
+        await Future.delayed(const Duration(seconds: 60));
+        return true;
+      });
+    }
   }
 
   @override

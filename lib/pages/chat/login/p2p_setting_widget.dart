@@ -15,15 +15,10 @@ class P2pSettingWidget extends StatefulWidget {
   State<StatefulWidget> createState() => _P2pSettingWidgetState();
 }
 
-class _P2pSettingWidgetState extends State<P2pSettingWidget>
-    with AutomaticKeepAliveClientMixin {
-  final _formKey = GlobalKey<FormState>();
+class _P2pSettingWidgetState extends State<P2pSettingWidget>{
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<AppDataProvider>(context).locale;
-    Provider.of<AppDataProvider>(context).themeData;
-    Provider.of<AppDataProvider>(context).brightness;
     return  Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -46,7 +41,4 @@ class _P2pSettingWidgetState extends State<P2pSettingWidget>
         ],
     );
   }
-
-  @override
-  bool get wantKeepAlive => true;
 }

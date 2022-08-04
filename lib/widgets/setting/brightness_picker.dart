@@ -12,7 +12,7 @@ class BrightnessPicker extends StatelessWidget {
   List<S2Choice<String>> _buildItems(BuildContext context) {
     List<S2Choice<String>> items = [];
     for (var brightnessOption in brightnessOptions) {
-      var label = AppLocalizations.instance.text(brightnessOption.label);
+      var label = AppLocalizations.t(brightnessOption.label);
       var item = S2Choice<String>(value: brightnessOption.value, title: label);
       items.add(item);
     }
@@ -21,15 +21,11 @@ class BrightnessPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<AppDataProvider>(context).locale;
-    Provider.of<AppDataProvider>(context).themeData;
-    Provider.of<AppDataProvider>(context).brightness;
     var items = _buildItems(context);
-    var instance = AppLocalizations.instance;
     return SmartSelect<String>.single(
       modalType: S2ModalType.bottomSheet,
-      placeholder: instance.text('Please select brightness'),
-      title: instance.text('Brightness'),
+      placeholder: AppLocalizations.t('Please select brightness'),
+      title: AppLocalizations.t('Brightness'),
       selectedValue: Provider.of<AppDataProvider>(context).brightness,
       choiceItems: items,
       onChange: (dynamic state) {
