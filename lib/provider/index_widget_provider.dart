@@ -244,7 +244,7 @@ class IndexWidgetProvider with ChangeNotifier {
         if (push) {
           stack.pushRepeat(name);
         }
-        //pageController.jumpToPage(index);
+        // pageController.jumpToPage(index);
         pageController.animateToPage(index,
             duration: animateDuration, curve: Curves.easeInOut);
         notifyListeners();
@@ -305,7 +305,7 @@ class IndexWidgetProvider with ChangeNotifier {
 
       int? index = _pop();
       if (index != null) {
-        //pageController.jumpToPage(index);
+        // pageController.jumpToPage(index);
         pageController.animateToPage(index,
             duration: animateDuration, curve: Curves.easeInOut);
         popAction = true;
