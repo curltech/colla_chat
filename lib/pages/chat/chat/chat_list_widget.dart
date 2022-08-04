@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -86,7 +87,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         var title = linkman.name ?? '';
         var subtitle = linkman.peerId ?? '';
         TileData tile = TileData(
-            avatar: linkman.avatar,
+            icon: defaultImage,
             title: title,
             subtitle: subtitle,
             routeName: 'chat_message');
@@ -103,7 +104,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         var title = group.name ?? '';
         var subtitle = group.peerId ?? '';
         TileData tile = TileData(
-            avatar: group.avatar,
+            icon: defaultImage,
             title: title,
             subtitle: subtitle,
             routeName: 'chat_message');

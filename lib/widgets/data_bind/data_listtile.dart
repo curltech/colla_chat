@@ -13,10 +13,10 @@ enum RouteStyle { workspace, navigator }
 
 /// 通用列表项的数据模型
 class TileData {
-  //图标
-  final Icon? icon;
+  //图标Widget
+  final Widget? icon;
 
-  //头像
+  //头像字节或者assets路径
   final String? avatar;
 
   //标题
@@ -102,7 +102,16 @@ class DataListTile extends StatelessWidget {
     if (tileData.icon != null) {
       leading = tileData.icon;
     } else if (avatar != null) {
-      leading = Image.memory(Uint8List.fromList(avatar.codeUnits));
+      if (avatar.startsWith('assets/')) {
+        leading = Image.asset(
+          avatar,
+          width: 32,
+          height: 32,
+          fit: BoxFit.fill,
+        );
+      } else {
+        leading = Image.memory(Uint8List.fromList(avatar.codeUnits));
+      }
     }
 
     ///尾部组件数组，首先加入suffix自定义组件或者文本
