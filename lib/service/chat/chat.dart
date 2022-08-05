@@ -15,10 +15,12 @@ import '../../entity/p2p/security_context.dart';
 import '../p2p/security_context.dart';
 
 class ChatMessageService extends GeneralBaseService<ChatMessage> {
-  ChatMessageService(
-      {required super.tableName,
-      required super.fields,
-      required super.indexFields}) {
+  ChatMessageService({
+    required super.tableName,
+    required super.fields,
+    required super.indexFields,
+    super.encryptFields = const [],
+  }) {
     post = (Map map) {
       return ChatMessage.fromJson(map);
     };

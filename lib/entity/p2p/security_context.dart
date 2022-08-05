@@ -7,6 +7,7 @@ class SecurityContext {
   String? previousPublicKeyPayloadSignature;
   bool needCompress = true;
   bool needEncrypt = true;
+  bool needSign = false;
   List<int>? secretKey;
 
   /// 经过目标peer的公钥加密过的对称密钥，这个对称密钥是随机生成，每次不同，用于加密payload
@@ -18,7 +19,7 @@ class SecurityContext {
   SecurityContext();
 
   SecurityContext.fromJson(Map json)
-      : transportPayload = json['transportPayload']??'',
+      : transportPayload = json['transportPayload'] ?? '',
         payloadSignature = json['payloadSignature'],
         previousPublicKeyPayloadSignature =
             json['previousPublicKeyPayloadSignature'],
@@ -28,6 +29,8 @@ class SecurityContext {
         needEncrypt = json['needEncrypt'] == true || json['needEncrypt'] == 1
             ? true
             : false,
+        needSign =
+            json['needSign'] == true || json['needSign'] == 1 ? true : false,
         payloadKey = json['payloadKey'],
         targetPeerId = json['targetPeerId'],
         srcPeerId = json['srcPeerId'],
@@ -41,6 +44,7 @@ class SecurityContext {
       'previousPublicKeyPayloadSignature': previousPublicKeyPayloadSignature,
       'needCompress': needCompress,
       'needEncrypt': needEncrypt,
+      'needSign': needSign,
       'payloadKey': payloadKey,
       'targetPeerId': targetPeerId,
       'srcPeerId': srcPeerId,
