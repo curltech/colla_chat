@@ -1,5 +1,6 @@
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 
 import '../constant/base.dart';
 import '../datastore/datastore.dart';
@@ -188,11 +189,15 @@ abstract class GeneralBaseService<T> {
       for (var encryptField in encryptFields) {
         String? value = json[encryptField];
         if (StringUtil.isNotEmpty(value)) {
-          securityContext = await SecurityContextService.encrypt(
-              CryptoUtil.decodeBase64(value!), securityContext);
-          json[encryptField] = securityContext.transportPayload;
-          json['payloadKey'] = securityContext.payloadKey;
-          json['payloadHash'] = securityContext.payloadHash;
+          try {
+            securityContext = await SecurityContextService.encrypt(
+                CryptoUtil.decodeBase64(value!), securityContext);
+            json[encryptField] = securityContext.transportPayload;
+            json['payloadKey'] = securityContext.payloadKey;
+            json['payloadHash'] = securityContext.payloadHash;
+          } catch (err) {
+            logger.e('SecurityContextService encrypt err:$err');
+          }
         }
       }
     }
@@ -218,9 +223,13 @@ abstract class GeneralBaseService<T> {
       for (var encryptField in encryptFields) {
         String? value = json[encryptField];
         if (StringUtil.isNotEmpty(value)) {
-          List<int> data =
-              await SecurityContextService.decrypt(value!, securityContext);
-          json[encryptField] = CryptoUtil.encodeBase64(data);
+          try {
+            List<int> data =
+                await SecurityContextService.decrypt(value!, securityContext);
+            json[encryptField] = CryptoUtil.encodeBase64(data);
+          } catch (err) {
+            logger.e('SecurityContextService decrypt err:$err');
+          }
         }
       }
     }
