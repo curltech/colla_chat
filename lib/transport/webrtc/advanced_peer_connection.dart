@@ -81,10 +81,7 @@ class AdvancedPeerConnection {
   String? name;
   String? connectPeerId;
   String? connectSessionId;
-  List<Map<String, String>>? iceServers = [];
   Room? room;
-  int? start;
-  int? end;
 
   AdvancedPeerConnection(this.peerId, bool initiator,
       {this.clientId, this.name, this.room}) {
@@ -103,7 +100,6 @@ class AdvancedPeerConnection {
   Future<bool> init(
       {List<MediaStream> streams = const [],
       List<Map<String, String>>? iceServers}) async {
-    start = DateTime.now().millisecondsSinceEpoch;
     var myselfPeerId = myself.peerId;
     var myselfClientId = myself.clientId;
     var myselfName = myself.myselfPeer!.name;
@@ -131,11 +127,6 @@ class AdvancedPeerConnection {
 
     //触发basePeerConnection的connect事件，就是调用peerConnectionPool对应的signal方法
     basePeerConnection.on(WebrtcEventType.connected, (data) async {
-      end = DateTime.now().millisecondsSinceEpoch;
-      if (end != null && start != null) {
-        var interval = end! - start!;
-        logger.i('connect time:$interval');
-      }
       await peerConnectionPool
           .onConnected(WebrtcEvent(peerId, clientId: clientId));
     });

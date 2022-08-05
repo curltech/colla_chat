@@ -213,6 +213,13 @@ abstract class BasePeerConnection {
     ],
   };
 
+  ///从协商开始计时，连接成功结束，计算连接的时间
+  ///如果一直未结束，根据当前状态，可以进行重连操作
+  ///对主动方来说，发出candidate和offer后一直未得到answer回应，重发candidate和offer
+  ///对被动方来说，收到candidate但一直未收到offer，只能等待，或者发出answer一直未连接，重发answer
+  int? start;
+  int? end;
+
   BasePeerConnection() {
     logger.i('Create BasePeerConnection');
   }
@@ -224,6 +231,7 @@ abstract class BasePeerConnection {
   Future<bool> init(
       {List<MediaStream> streams = const [],
       required SignalExtension extension}) async {
+    start = DateTime.now().millisecondsSinceEpoch;
     id = await cryptoGraphy.getRandomAsciiString(length: 8);
     this.extension = extension;
     try {
@@ -314,6 +322,16 @@ abstract class BasePeerConnection {
     return true;
   }
 
+  void connected() {
+    logger.i('PeerConnectionStatus connected, webrtc connection is completed');
+    status = PeerConnectionStatus.connected;
+    if (end != null && start != null) {
+      var interval = end! - start!;
+      logger.i('id:$id connected time:$interval');
+    }
+    emit(WebrtcEventType.connected, '');
+  }
+
   ///连接状态事件
   onConnectionState(RTCPeerConnectionState state) {
     RTCPeerConnection peerConnection = this.peerConnection!;
@@ -333,10 +351,7 @@ abstract class BasePeerConnection {
     }
     if (peerConnection.connectionState ==
         RTCPeerConnectionState.RTCPeerConnectionStateConnected) {
-      status = PeerConnectionStatus.connected;
-      logger
-          .i('PeerConnectionStatus connected, webrtc connection is completed');
-      emit(WebrtcEventType.connected, '');
+      connected();
     }
   }
 
@@ -353,10 +368,7 @@ abstract class BasePeerConnection {
     emit(WebrtcEventType.iceConnectionState, state);
     if (state == RTCIceConnectionState.RTCIceConnectionStateConnected ||
         state == RTCIceConnectionState.RTCIceConnectionStateCompleted) {
-      status = PeerConnectionStatus.connected;
-      logger
-          .i('PeerConnectionStatus connected, webrtc connection is connected');
-      emit(WebrtcEventType.connected, '');
+      connected();
     }
     if (state == RTCIceConnectionState.RTCIceConnectionStateFailed ||
         state == RTCIceConnectionState.RTCIceConnectionStateClosed ||
