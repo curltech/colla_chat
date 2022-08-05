@@ -182,9 +182,9 @@ abstract class GeneralBaseService<T> {
       securityContext.payloadKey = payloadKey;
       for (var encryptField in encryptFields) {
         String? value = json[encryptField];
-        if (value != null) {
+        if (StringUtil.isNotEmpty(value)) {
           securityContext = await SecurityContextService.encrypt(
-              CryptoUtil.decodeBase64(value), securityContext);
+              CryptoUtil.decodeBase64(value!), securityContext);
           json[encryptField] = securityContext.transportPayload;
         }
       }
@@ -206,9 +206,9 @@ abstract class GeneralBaseService<T> {
     if (encryptFields.isNotEmpty) {
       for (var encryptField in encryptFields) {
         String? value = json[encryptField];
-        if (value != null) {
+        if (StringUtil.isNotEmpty(value)) {
           List<int> data =
-              await SecurityContextService.decrypt(value, securityContext);
+              await SecurityContextService.decrypt(value!, securityContext);
           json[encryptField] = CryptoUtil.encodeBase64(data);
         }
       }

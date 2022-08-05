@@ -19,7 +19,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     required super.tableName,
     required super.fields,
     required super.indexFields,
-    super.encryptFields = const [],
+    super.encryptFields = const ['content'],
   }) {
     post = (Map map) {
       return ChatMessage.fromJson(map);
