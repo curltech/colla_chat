@@ -168,11 +168,15 @@ abstract class GeneralBaseService<T> {
     );
   }
 
+  ///payloadKey：null，直接ecc加密
+  ///‘’，产生新的对称密钥并返回
+  ///有值，用于加密,secretKey有值，用于加密
   Future<Map<String, dynamic>> encrypt(T entity,
       {bool needCompress = true,
       bool needEncrypt = true,
       bool needSign = false,
-      String? payloadKey}) async {
+      String? payloadKey,
+      List<int>? secretKey}) async {
     Map<String, dynamic> json = JsonUtil.toJson(entity) as Map<String, dynamic>;
     if (encryptFields.isNotEmpty) {
       SecurityContext securityContext = SecurityContext();
@@ -180,29 +184,36 @@ abstract class GeneralBaseService<T> {
       securityContext.needEncrypt = needEncrypt;
       securityContext.needSign = needSign;
       securityContext.payloadKey = payloadKey;
+      securityContext.secretKey = secretKey;
       for (var encryptField in encryptFields) {
         String? value = json[encryptField];
         if (StringUtil.isNotEmpty(value)) {
           securityContext = await SecurityContextService.encrypt(
               CryptoUtil.decodeBase64(value!), securityContext);
           json[encryptField] = securityContext.transportPayload;
+          json['payloadKey'] = securityContext.payloadKey;
+          json['payloadHash'] = securityContext.payloadHash;
         }
       }
     }
     return json;
   }
 
+  ///payloadKey：空，直接ecc解密
+  ///有值，用于加密,secretKey有值，用于解密
   Future<Map<String, dynamic>> decrypt(T entity,
       {bool needCompress = true,
       bool needEncrypt = true,
       bool needSign = false,
-      String? payloadKey}) async {
+      String? payloadKey,
+      List<int>? secretKey}) async {
     Map<String, dynamic> json = JsonUtil.toJson(entity) as Map<String, dynamic>;
     SecurityContext securityContext = SecurityContext();
     securityContext.needCompress = needCompress;
     securityContext.needEncrypt = needEncrypt;
     securityContext.needSign = needSign;
     securityContext.payloadKey = payloadKey;
+    securityContext.secretKey = secretKey;
     if (encryptFields.isNotEmpty) {
       for (var encryptField in encryptFields) {
         String? value = json[encryptField];
