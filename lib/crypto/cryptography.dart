@@ -168,6 +168,7 @@ class CryptoGraphy {
   /// 密钥交换：采用x25519，做法是本地随机生产一个新的X25519密钥对，与对方的公钥计算出一个对称密钥，
   /// 然后本地用这个对称密钥加密，同时将密文和随机密钥对的公钥发给对方，
   /// 对方利用收到的公钥和自己的私钥（密钥对）同样计算出对称密钥，对密文进行解密
+  /// 产生的会话密钥64位，前32位时生成的本地公钥，后32位是临时会话密钥
   Future<List<int>> generateSessionKey(
       {required PublicKey remotePublicKey, SimpleKeyPair? localKeyPair}) async {
     final X25519 algorithm = X25519();
@@ -186,6 +187,7 @@ class CryptoGraphy {
 
   /// 结合x25519密钥交换和aes进行ecc加解密,里面涉及的密钥对是x25519协议
   /// ecc加密是采用公钥加密，私钥解密，
+  /// 加密后结果的前32位是本地公钥，后面是密文
   Future<Uint8List> eccEncrypt(List<int> message,
       {String? base64PublicKey, PublicKey? remotePublicKey}) async {
     if (remotePublicKey == null) {
@@ -196,8 +198,8 @@ class CryptoGraphy {
     if (remotePublicKey != null) {
       var passphrase =
           await generateSessionKey(remotePublicKey: remotePublicKey);
-      var localPublicKeyBytes = passphrase.sublist(0, 256);
-      var sharedSecretBytes = passphrase.sublist(256);
+      var localPublicKeyBytes = passphrase.sublist(0, 32);
+      var sharedSecretBytes = passphrase.sublist(32);
       var result = await aesEncrypt(message, sharedSecretBytes);
 
       return CryptoUtil.concat(localPublicKeyBytes, result);
@@ -209,14 +211,14 @@ class CryptoGraphy {
   /// ecc加密是采用公钥加密，私钥解密，
   Future<List<int>> eccDecrypt(List<int> message,
       {required SimpleKeyPair localKeyPair}) async {
-    var remotePublicKeyBytes = message.sublist(0, 256);
-    var msg = message.sublist(256);
+    var remotePublicKeyBytes = message.sublist(0, 32);
+    var msg = message.sublist(32);
     SimplePublicKey remotePublicKey =
         SimplePublicKey(remotePublicKeyBytes, type: KeyPairType.x25519);
     var passphrase = await generateSessionKey(
         localKeyPair: localKeyPair, remotePublicKey: remotePublicKey);
-    var localPublicKeyBytes = passphrase.sublist(0, 256);
-    var sharedSecretBytes = passphrase.sublist(256);
+    var localPublicKeyBytes = passphrase.sublist(0, 32);
+    var sharedSecretBytes = passphrase.sublist(32);
     var result = await aesDecrypt(msg, sharedSecretBytes);
 
     return result;
