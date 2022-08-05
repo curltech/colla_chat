@@ -19,88 +19,11 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     required super.tableName,
     required super.fields,
     required super.indexFields,
-    super.encryptFields = const ['content'],
+    super.encryptFields = const ['content', 'thumbBody', 'thumbnail', 'title'],
   }) {
     post = (Map map) {
       return ChatMessage.fromJson(map);
     };
-  }
-
-  Future<List<ChatMessage>> load(String where,
-      {List<Object>? whereArgs,
-      String? orderBy,
-      int? offset,
-      int? limit}) async {
-    List<dynamic> data = await find(
-      where: where,
-      whereArgs: whereArgs,
-      orderBy: orderBy,
-      offset: offset,
-      limit: limit,
-    );
-    List<ChatMessage> chatMessages = [];
-    for (var d in data) {
-      var chatMessage = d as ChatMessage;
-      SecurityContext securityContext = SecurityContext();
-      securityContext.needCompress = chatMessage.needCompress;
-      securityContext.needEncrypt = chatMessage.needEncrypt;
-      securityContext.payloadKey = chatMessage.payloadKey;
-      var content = chatMessage.content;
-      var thumbnail = chatMessage.thumbnail;
-      if (content != null) {
-        List<int>? data =
-            await SecurityContextService.decrypt(content, securityContext);
-        if (data != null) {
-          chatMessage.content = CryptoUtil.uint8ListToStr(data);
-        }
-      }
-      if (thumbnail != null) {
-        var data =
-            await SecurityContextService.decrypt(thumbnail, securityContext);
-        if (data != null) {
-          thumbnail = CryptoUtil.uint8ListToStr(data);
-        }
-        chatMessage.thumbnail = thumbnail;
-      }
-      chatMessages.add(chatMessage);
-    }
-    return chatMessages;
-  }
-
-  /// 批量保存聊天消息
-  store(List<ChatMessage> chatMessages, dynamic parent) async {
-    if (chatMessages.isEmpty) {
-      return;
-    }
-    var peerProfile = myself.peerProfile;
-    if (peerProfile != null && peerProfile.localDataCryptoSwitch) {
-      SecurityContext securityContext = SecurityContext();
-      securityContext.needCompress = true;
-      securityContext.needEncrypt = true;
-      for (var chatMessage in chatMessages) {
-        var state = chatMessage.state;
-        if (EntityState.delete.name == state) {
-          continue;
-        }
-        securityContext.payloadKey = chatMessage.payloadKey;
-        var content = chatMessage.content;
-        if (content != null) {
-          var result = await SecurityContextService.encrypt(
-              content.codeUnits, securityContext);
-          chatMessage.payloadKey = result.payloadKey;
-          chatMessage.needCompress = result.needCompress;
-          chatMessage.content = result.transportPayload;
-          chatMessage.payloadHash = result.payloadHash;
-        }
-        var thumbnail = chatMessage.thumbnail;
-        if (thumbnail != null) {
-          var result = await SecurityContextService.encrypt(
-              thumbnail.codeUnits, securityContext);
-          chatMessage.thumbnail = result.transportPayload;
-        }
-      }
-    }
-    await save(chatMessages, [], parent);
   }
 
   Future<Pagination<ChatMessage>> findByMessageType(
@@ -422,10 +345,12 @@ final receiveService = ReceiveService(
 class ChatSummaryService extends GeneralBaseService<ChatSummary> {
   Map<String, ChatSummary> chatSummaries = {};
 
-  ChatSummaryService(
-      {required super.tableName,
-      required super.fields,
-      required super.indexFields}) {
+  ChatSummaryService({
+    required super.tableName,
+    required super.fields,
+    required super.indexFields,
+    super.encryptFields = const ['content', 'thumbBody', 'thumbnail', 'title'],
+  }) {
     post = (Map map) {
       return ChatSummary.fromJson(map);
     };

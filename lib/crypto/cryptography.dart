@@ -24,8 +24,10 @@ class CryptoGraphy {
     return hash.bytes;
   }
 
+  static const randomBytesLength = 32;
+
   /// 随机字节数组
-  Future<List<int>> getRandomBytes({int length = 32}) async {
+  Future<List<int>> getRandomBytes({int length = randomBytesLength}) async {
     final randomBytes = Uint8List(length);
 
     var random = Random.secure();
@@ -38,12 +40,14 @@ class CryptoGraphy {
   }
 
   /// 随机base64位字符串
-  Future<String> getRandomAsciiString({int length = 32}) async {
+  Future<String> getRandomAsciiString({int length = randomBytesLength}) async {
     var randomBytes = await getRandomBytes(length: length);
     var randomAscii = CryptoUtil.encodeBase64Url(randomBytes);
 
     return randomAscii;
   }
+
+  static const publicKeyLength = 32;
 
   /// 产生密钥对，返回对象为密钥对象（公钥和私钥对象）
   Future<SimpleKeyPair> generateKeyPair(
@@ -63,7 +67,8 @@ class CryptoGraphy {
     throw 'NotSupportKeyPairType';
   }
 
-  ///
+  static const secretKeyLength = 32;
+
   Future<List<int>> getSecretKey(int length) async {
     // Choose the cipher
     final algorithm = AesGcm.with256bits();
@@ -94,7 +99,7 @@ class CryptoGraphy {
     if (typeStr == 'x25519') {
       type = KeyPairType.x25519;
     }
-    if (passphrase != null && passphrase.isNotEmpty) {
+    if (passphrase.isNotEmpty) {
       Uint8List rawText = CryptoUtil.decodeBase64(base64KeyPair);
       var clearText = await aesDecrypt(rawText, passphrase);
       SimpleKeyPair simpleKeyPair =
@@ -127,6 +132,8 @@ class CryptoGraphy {
     return publicKey;
   }
 
+  static const signatureLength = 64;
+
   Future<List<int>> sign(List<int> message, KeyPair keyPair,
       {bool includePublicKey = false}) async {
     // Generate a keypair.
@@ -145,12 +152,12 @@ class CryptoGraphy {
 
   Future<bool> verify(List<int> message, List<int> signature,
       {String? base64PublicKey, PublicKey? publicKey}) async {
-    List<int> signatureBytes = signature.sublist(0, 64);
+    List<int> signatureBytes = signature.sublist(0, signatureLength);
     if (publicKey == null) {
       if (base64PublicKey != null) {
         publicKey = importPublicKey(base64PublicKey) as PublicKey;
       } else {
-        List<int> publicKeyBytes = signature.sublist(64);
+        List<int> publicKeyBytes = signature.sublist(signatureLength);
         publicKey = SimplePublicKey(publicKeyBytes, type: KeyPairType.ed25519);
       }
     }
@@ -198,8 +205,8 @@ class CryptoGraphy {
     if (remotePublicKey != null) {
       var passphrase =
           await generateSessionKey(remotePublicKey: remotePublicKey);
-      var localPublicKeyBytes = passphrase.sublist(0, 32);
-      var sharedSecretBytes = passphrase.sublist(32);
+      var localPublicKeyBytes = passphrase.sublist(0, publicKeyLength);
+      var sharedSecretBytes = passphrase.sublist(publicKeyLength);
       var result = await aesEncrypt(message, sharedSecretBytes);
 
       return CryptoUtil.concat(localPublicKeyBytes, result);
@@ -211,14 +218,14 @@ class CryptoGraphy {
   /// ecc加密是采用公钥加密，私钥解密，
   Future<List<int>> eccDecrypt(List<int> message,
       {required SimpleKeyPair localKeyPair}) async {
-    var remotePublicKeyBytes = message.sublist(0, 32);
-    var msg = message.sublist(32);
+    var remotePublicKeyBytes = message.sublist(0, publicKeyLength);
+    var msg = message.sublist(publicKeyLength);
     SimplePublicKey remotePublicKey =
         SimplePublicKey(remotePublicKeyBytes, type: KeyPairType.x25519);
     var passphrase = await generateSessionKey(
         localKeyPair: localKeyPair, remotePublicKey: remotePublicKey);
-    var localPublicKeyBytes = passphrase.sublist(0, 32);
-    var sharedSecretBytes = passphrase.sublist(32);
+    var localPublicKeyBytes = passphrase.sublist(0, publicKeyLength);
+    var sharedSecretBytes = passphrase.sublist(publicKeyLength);
     var result = await aesDecrypt(msg, sharedSecretBytes);
 
     return result;
@@ -258,6 +265,8 @@ class CryptoGraphy {
     return secretBox.concatenation();
   }
 
+  static const macLength = 16;
+  static const nonceLength = 12;
   Future<List<int>> aesDecrypt(List<int> message, List<int> passphrase,
       {String type = 'gcm'}) async {
     var hashPassphrase = await hash(passphrase);
@@ -285,7 +294,7 @@ class CryptoGraphy {
     final secretKey = SecretKey(hashPassphrase);
 
     SecretBox secretBox =
-        SecretBox.fromConcatenation(message, macLength: 16, nonceLength: 12);
+        SecretBox.fromConcatenation(message, macLength: macLength, nonceLength: nonceLength);
     // Decrypt
     final clearText = await algorithm.decrypt(
       secretBox,

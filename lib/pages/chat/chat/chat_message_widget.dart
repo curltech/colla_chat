@@ -33,7 +33,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
 
   ///访问数据库获取更老的消息
   @override
-  void previous({int? limit}) {
+  Future<void> previous({int? limit}) async {
     var chatSummary = _chatSummary;
     if (chatSummary == null) {
       clear();
@@ -43,18 +43,16 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       clear();
       return;
     }
-    chatMessageService
-        .findByPeerId(_chatSummary!.peerId!, offset: data.length, limit: limit)
-        .then((List<ChatMessage> chatMessages) {
-      if (chatMessages.isNotEmpty) {
-        addAll(chatMessages);
-      }
-    });
+    List<ChatMessage> chatMessages = await chatMessageService
+        .findByPeerId(_chatSummary!.peerId!, offset: data.length, limit: limit);
+    if (chatMessages.isNotEmpty) {
+      addAll(chatMessages);
+    }
   }
 
   ///访问数据库获取最新的消息
   @override
-  void latest({int? limit}) {
+  Future<void> latest({int? limit}) async {
     var chatSummary = _chatSummary;
     if (chatSummary == null) {
       clear();
@@ -68,14 +66,12 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     if (data.isNotEmpty) {
       id = data[0].id;
     }
-    chatMessageService
-        .findByGreaterId(_chatSummary!.peerId!, id: id, limit: limit)
-        .then((List<ChatMessage> chatMessages) {
-      if (chatMessages.isNotEmpty) {
-        data.insertAll(0, chatMessages);
-        notifyListeners();
-      }
-    });
+    List<ChatMessage> chatMessages = await chatMessageService
+        .findByGreaterId(_chatSummary!.peerId!, id: id, limit: limit);
+    if (chatMessages.isNotEmpty) {
+      data.insertAll(0, chatMessages);
+      notifyListeners();
+    }
   }
 }
 
