@@ -324,6 +324,7 @@ abstract class BasePeerConnection {
 
   void connected() {
     logger.i('PeerConnectionStatus connected, webrtc connection is completed');
+    end = DateTime.now().millisecondsSinceEpoch;
     status = PeerConnectionStatus.connected;
     if (end != null && start != null) {
       var interval = end! - start!;
