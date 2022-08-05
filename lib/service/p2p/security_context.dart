@@ -6,6 +6,7 @@ import '../../entity/dht/myself.dart';
 import '../../entity/p2p/security_context.dart';
 import '../../provider/app_data_provider.dart';
 import '../../service/dht/peerclient.dart';
+import '../../tool/util.dart';
 
 /// 对任意结构的负载进行压缩，签名，加密处理
 class SecurityContextService {
@@ -65,12 +66,20 @@ class SecurityContextService {
       }
 
       // 目标公钥不为空时加密数据
-      if (targetPublicKey != null) {
+      if (securityContext.payloadKey != null) {
         /// 安全上下文中没有加密key表示第一次加密，key随机数产生，
         /// 否则表示第n次，要采用同样的加密key做多次加密
         List<int>? secretKey = securityContext.secretKey;
         if (secretKey == null) {
-          secretKey = await cryptoGraphy.getRandomBytes();
+          if (securityContext.payloadKey != '') {
+            var privateKey = myself.privateKey;
+            if (privateKey != null) {
+              secretKey = await cryptoGraphy.eccDecrypt(
+                  CryptoUtil.decodeBase64(securityContext.payloadKey!),
+                  localKeyPair: privateKey);
+            }
+          }
+          secretKey ??= await cryptoGraphy.getRandomBytes();
           result.secretKey = secretKey;
         }
         data = await cryptoGraphy.aesEncrypt(data, secretKey);
@@ -79,7 +88,8 @@ class SecurityContextService {
             remotePublicKey: targetPublicKey);
         result.payloadKey = CryptoUtil.encodeBase64(encryptedKey);
       } else {
-        result.payloadKey = '';
+        data = await cryptoGraphy.eccEncrypt(data,
+            remotePublicKey: targetPublicKey);
       }
     }
     // 无论是否经过压缩和加密，进行based64处理
@@ -106,27 +116,29 @@ class SecurityContextService {
       // 消息的数据部分，base64
       var needEncrypt = securityContext.needEncrypt;
       if (needEncrypt) {
+        var privateKey = myself.privateKey;
+        if (privateKey == null) {
+          throw 'NullPrivateKey';
+        }
         // 1.对对称密钥进行私钥解密
         var payloadKey = securityContext.payloadKey;
-        // 消息的数据部分，数据加密过，解密
-        if (payloadKey != null) {
-          var privateKey = myself.privateKey;
-          if (privateKey == null) {
-            throw 'NullPrivateKey';
-          }
-          List<int>? payloadKeyData;
-          try {
-            payloadKeyData = await cryptoGraphy.eccDecrypt(
-                CryptoUtil.decodeBase64(payloadKey),
-                localKeyPair: privateKey);
-          } catch (e) {
-            logger.e(e.toString());
+        // 如果存在加密密钥，对密钥进行ecc解密
+        List<int>? secretKey = securityContext.secretKey;
+        if (StringUtil.isNotEmpty(payloadKey) || secretKey != null) {
+          if (secretKey == null) {
+            try {
+              secretKey = await cryptoGraphy.eccDecrypt(
+                  CryptoUtil.decodeBase64(payloadKey!),
+                  localKeyPair: privateKey);
+            } catch (e) {
+              logger.e(e.toString());
+            }
           }
           var i = 0;
-          while (payloadKeyData == null && i < myself.expiredKeys.length) {
+          while (secretKey == null && i < myself.expiredKeys.length) {
             try {
-              payloadKeyData = await cryptoGraphy.eccDecrypt(
-                  CryptoUtil.decodeBase64(payloadKey),
+              secretKey = await cryptoGraphy.eccDecrypt(
+                  CryptoUtil.decodeBase64(payloadKey!),
                   localKeyPair: myself.expiredKeys[i]);
             } catch (e) {
               logger.e(e.toString());
@@ -134,11 +146,14 @@ class SecurityContextService {
               i++;
             }
           }
-          if (payloadKeyData == null) {
+          if (secretKey == null) {
             throw 'EccDecryptFailed';
           }
           // 数据解密
-          data = await cryptoGraphy.aesDecrypt(data, payloadKeyData);
+          data = await cryptoGraphy.aesDecrypt(data, secretKey);
+        } else {
+          //直接ecc数据解密
+          data = await cryptoGraphy.eccDecrypt(data, localKeyPair: privateKey);
         }
       }
 

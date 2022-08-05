@@ -8,10 +8,11 @@ class SecurityContext {
   bool needCompress = true;
   bool needEncrypt = true;
   bool needSign = false;
-  List<int>? secretKey;
 
   /// 经过目标peer的公钥加密过的对称密钥，这个对称密钥是随机生成，每次不同，用于加密payload
+  /// 如果为null，表示直接ecc加解密，无对称密钥，如果不为空，secretKey为空，表示产生一个新的对称密钥返回
   String? payloadKey;
+  List<int>? secretKey;
   String? targetPeerId;
   String? srcPeerId;
   String? payloadHash;
