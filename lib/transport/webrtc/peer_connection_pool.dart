@@ -377,8 +377,6 @@ class PeerConnectionPool {
         clientId = extension.clientId;
       }
       if (name != extension.name) {
-        logger.e(
-            'peerId:$peerId extension peerId:${extension.peerId} is not same');
         name = extension.name;
       }
       iceServers = extension.iceServers;
