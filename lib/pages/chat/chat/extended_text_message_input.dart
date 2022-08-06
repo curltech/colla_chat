@@ -123,6 +123,14 @@ class _ExtendedTextMessageInputWidgetState
     widget.textEditingController.value = textEditingValue;
   }
 
+  void _clearText() {
+    widget.textEditingController.value = widget.textEditingController.value
+        .copyWith(
+            text: '',
+            selection: const TextSelection.collapsed(offset: 0),
+            composing: TextRange.empty);
+  }
+
   @override
   Widget build(BuildContext context) {
     //FocusScope.of(context).autofocus(_focusNode);
@@ -143,7 +151,7 @@ class _ExtendedTextMessageInputWidgetState
     return ExtendedTextField(
       key: _key,
       minLines: 1,
-      maxLines: 2,
+      maxLines: 4,
       strutStyle: const StrutStyle(),
       specialTextSpanBuilder: CustomSpecialTextSpanBuilder(
         showAtBackground: true,
@@ -154,13 +162,8 @@ class _ExtendedTextMessageInputWidgetState
       autofocus: true,
       onTap: () => setState(() {
         if (focusNode.hasFocus) {}
-        widget.textEditingController.value = widget.textEditingController.value
-            .copyWith(
-                text: '',
-                selection: const TextSelection.collapsed(offset: 0),
-                composing: TextRange.empty);
       }),
-      onChanged: (v) => setState(() {}),
+      //onChanged: (v) => setState(() {}),
       decoration: const InputDecoration.collapsed(
         hintText: 'Please input message',
       ),

@@ -22,7 +22,10 @@ class ChatMessageInputWidget extends StatefulWidget {
   ///扩展文本输入框的控制器
   final TextEditingController textEditingController;
 
-  const ChatMessageInputWidget({Key? key, required this.textEditingController})
+  final void Function(String text)? onSend;
+
+  const ChatMessageInputWidget(
+      {Key? key, required this.textEditingController, this.onSend})
       : super(key: key);
 
   @override
@@ -43,7 +46,11 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
     setState(() {});
   }
 
-  void onSendPressed() {}
+  void onSendPressed() {
+    if (widget.onSend != null) {
+      widget.onSend!(widget.textEditingController.text);
+    }
+  }
 
   void onEmojiPressed() {
     emojiVisible = !emojiVisible;
@@ -55,8 +62,40 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
     _update();
   }
 
+  void _insertText(String text) {
+    final TextEditingValue value = widget.textEditingController.value;
+    final int start = value.selection.baseOffset;
+    int end = value.selection.extentOffset;
+    if (value.selection.isValid) {
+      String newText = '';
+      if (value.selection.isCollapsed) {
+        if (end > 0) {
+          newText += value.text.substring(0, end);
+        }
+        newText += text;
+        if (value.text.length > end) {
+          newText += value.text.substring(end, value.text.length);
+        }
+      } else {
+        newText = value.text.replaceRange(start, end, text);
+        end = start;
+      }
+
+      widget.textEditingController.value = value.copyWith(
+          text: newText,
+          selection: value.selection.copyWith(
+              baseOffset: end + text.length, extentOffset: end + text.length));
+    } else {
+      widget.textEditingController.value = TextEditingValue(
+          text: text,
+          selection:
+              TextSelection.fromPosition(TextPosition(offset: text.length)));
+    }
+  }
+
   _onEmojiTap(String text) {
     logger.i('Emoji: $text');
+    _insertText(text);
   }
 
   Widget _buildChatMessageInput(BuildContext context) {
@@ -68,6 +107,7 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
         textEditingController: widget.textEditingController,
         onEmojiPressed: onEmojiPressed,
         onMorePressed: onMorePressed,
+        onSendPressed: onSendPressed,
       ),
       Visibility(
           visible: emojiVisible,

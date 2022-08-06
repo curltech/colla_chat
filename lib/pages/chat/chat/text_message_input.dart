@@ -98,6 +98,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
                   onPressed: () {
                     if (widget.onSendPressed != null) {
                       widget.onSendPressed!();
+                      widget.textEditingController.clear();
                     }
                   },
                 ),

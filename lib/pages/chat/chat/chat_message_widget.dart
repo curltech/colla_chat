@@ -192,8 +192,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   }
 
   ///发送命令
-  void handleSubmit(String message) {
-    textEditingController.clear();
+  void send(String message) {
     if (message.isEmpty || message == '') {
       return;
     }
@@ -219,6 +218,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   Widget _buildTextMessageInputWidget(BuildContext context) {
     return ChatMessageInputWidget(
       textEditingController: textEditingController,
+      onSend: send,
     );
   }
 
