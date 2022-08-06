@@ -2,7 +2,7 @@ import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
 
 const String emojiFilePath = "assets/images/emoji";
-const int emojiCount = 113;
+const int emojiCount = 112;
 
 ///emoji/image text
 class EmojiText extends SpecialText {
