@@ -5,6 +5,7 @@ import '../../../../provider/app_data_provider.dart';
 import '../../../../tool/util.dart';
 import '../../../../widgets/common/image_widget.dart';
 
+///联系人详情页面
 class ContactCard extends StatelessWidget {
   final String img, title, nickName, id, area;
   final bool isBorder;

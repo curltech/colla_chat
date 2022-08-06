@@ -7,6 +7,7 @@ import 'indicator_page_view.dart';
 
 enum ClickType { select, open }
 
+///联系人列表
 class ContactView extends StatelessWidget {
   final ScrollController sC;
   final List<ContactItem> functionButtons;

@@ -10,6 +10,7 @@ import '../../../../tool/util.dart';
 
 typedef VoiceFile = void Function(String path);
 
+//聊天录音页面
 class ChatVoice extends StatefulWidget {
   final VoiceFile voiceFile;
 

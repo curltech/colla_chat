@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/pages/chat/chat/text_message_input.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:flutter/material.dart';
 
@@ -206,35 +207,15 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     });
   }
 
-  ///发送消息的输入框和按钮
-  Widget textComposerWidget() {
-    return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: Row(children: <Widget>[
-          Flexible(
-            child: TextFormField(
-              decoration: const InputDecoration.collapsed(
-                  hintText: 'Please input message'),
-              controller: textEditingController,
-              onFieldSubmitted: handleSubmit,
-              autofocus: true,
-              focusNode: textFocusNode,
-              onTap: () {
-                // scroll to the bottom of the list when keyboard appears
-                _scrollMin();
-              },
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: IconButton(
-              icon: const Icon(Icons.send),
-              onPressed: () {
-                handleSubmit(textEditingController.text);
-              },
-            ),
-          )
-        ]));
+  bool _hasValue() {
+    var value = textEditingController.value.text;
+    return StringUtil.isNotEmpty(value);
+  }
+
+  ///发送消息的输入框和按钮，三个按钮，一个输入框，单独一个类
+  ///另外还有各种消息的选择菜单，emoji各一个类
+  Widget _buildTextMessageInputWidget(BuildContext context) {
+    return const TextMessageInputWidget();
   }
 
   ///创建每一条消息
@@ -284,7 +265,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
       const Divider(
         height: 1.0,
       ),
-      textComposerWidget(),
+      _buildTextMessageInputWidget(context),
     ]);
   }
 

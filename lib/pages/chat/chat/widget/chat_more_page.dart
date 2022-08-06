@@ -10,6 +10,7 @@ import '../../../../provider/app_data_provider.dart';
 import '../../../../tool/util.dart';
 import 'more_item_card.dart';
 
+//非文本的输入按钮页面
 class ChatMorePage extends StatefulWidget {
   final int index;
   final String id;

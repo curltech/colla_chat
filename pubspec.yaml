@@ -120,6 +120,7 @@ dependencies:
   mobile_number: ^1.0.4
   # 界面样式和组件
   badges: ^2.0.3
+  extended_list: any
   glassmorphism: ^3.0.0
   #flui: 0.9.2
   syncfusion_flutter_datagrid: ^20.2.36
@@ -219,44 +220,12 @@ flutter:
     - packages/openpgp/web/assets/worker.js
     - packages/openpgp/web/assets/wasm_exec.js
     - packages/openpgp/web/assets/openpgp.wasm
-    - assets/images/bg/login-bg-wd-1.jpg
-    - assets/images/bg/login-bg-wd-2.jpg
-    - assets/images/bg/login-bg-wd-3.jpg
-    - assets/images/bg/login-bg-wd-4.jpg
-    - assets/images/bg/login-bg-wd-5.jpg
-    - assets/images/bg/login-bg-wd-6.jpg
-    - assets/images/bg/login-bg-wd-7.jpg
-    - assets/images/bg/login-bg-wd-8.jpg
-    - assets/images/bg/login-bg-wd-9.jpg
-    - assets/images/bg/login-bg-wd-10.jpg
-    - assets/images/bg/login-bg-wd-11.jpg
-    - assets/images/bg/login-bg-wl-1.jpg
-    - assets/images/bg/login-bg-wl-2.jpg
-    - assets/images/bg/login-bg-wl-3.jpg
-    - assets/images/bg/login-bg-wl-4.jpg
-    - assets/images/bg/login-bg-wl-5.jpg
-    - assets/images/bg/login-bg-wl-6.jpg
-    - assets/images/bg/login-bg-wl-7.jpg
-    - assets/images/bg/login-bg-wl-8.jpg
-    - assets/images/bg/login-bg-wl-9.jpg
-    - assets/images/bg/login-bg-wl-10.jpg
-    - assets/images/bg/login-bg-wl-11.jpg
-    - assets/images/bg/login-bg-wl-12.jpg
-    - assets/icons/favicon-96x96.png
-    - assets/images/colla-o1.png
-    - assets/images/colla-o1.png
-
     - assets/wasm/sqlite3.wasm
-
-    - assets/locale/localization_en_US.json
-    - assets/locale/localization_zh_CN.json
-    - assets/locale/localization_zh_TW.json
-    - assets/locale/localization_ja_JP.json
-    - assets/locale/localization_ko_KR.json
-
-    - packages/openpgp/web/assets/worker.js
-    - packages/openpgp/web/assets/wasm_exec.js
-    - packages/openpgp/web/assets/openpgp.wasm
+    - assets/locale/
+    - assets/icons/
+    - assets/images/
+    - assets/images/bg/
+    - assets/images/emoji/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

@@ -7,6 +7,7 @@ import 'contact_view.dart';
 typedef OnAdd = void Function(String v);
 typedef OnCancel = void Function(String v);
 
+///联系人列表项
 class ContactItem extends StatefulWidget {
   final String avatar;
   final String title;
