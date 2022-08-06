@@ -1,4 +1,6 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 import '../../../widgets/special_text/emoji_text.dart';
@@ -59,41 +61,44 @@ class _EmojiMessageInputWidgetState extends State<EmojiMessageInputWidget> {
     );
   }
 
-  Widget _buildEmojiPicker() {
-    return EmojiPicker(
-        textEditingController: TextEditingController(),
-        onEmojiSelected: (Category category, Emoji emoji) {
-          if (widget.onTap != null) {
-            widget.onTap!(emoji.emoji);
-          }
-        },
-        config: Config(
-            columns: 7,
-            emojiSizeMax: 32 * (PlatformParams.instance.ios ? 1.30 : 1.0),
-            verticalSpacing: 0,
-            horizontalSpacing: 0,
-            gridPadding: EdgeInsets.zero,
-            initCategory: Category.RECENT,
-            bgColor: const Color(0xFFF2F2F2),
-            indicatorColor: Colors.blue,
-            iconColor: Colors.grey,
-            iconColorSelected: Colors.blue,
-            progressIndicatorColor: Colors.blue,
-            backspaceColor: Colors.blue,
-            skinToneDialogBgColor: Colors.white,
-            skinToneIndicatorColor: Colors.grey,
-            enableSkinTones: true,
-            showRecentsTab: true,
-            recentsLimit: 28,
-            replaceEmojiOnLimitExceed: false,
-            noRecents: const Text(
-              'No Recents',
-              style: TextStyle(fontSize: 20, color: Colors.black26),
-              textAlign: TextAlign.center,
-            ),
-            tabIndicatorAnimDuration: kTabScrollDuration,
-            categoryIcons: const CategoryIcons(),
-            buttonMode: ButtonMode.MATERIAL));
+  Widget _buildEmojiPicker(BuildContext context) {
+    Color primary = appDataProvider.themeData!.colorScheme.primary;
+    return SizedBox(
+        height: widget.height,
+        child: EmojiPicker(
+            textEditingController: TextEditingController(),
+            onEmojiSelected: (Category category, Emoji emoji) {
+              if (widget.onTap != null) {
+                widget.onTap!(emoji.emoji);
+              }
+            },
+            config: Config(
+                columns: 10,
+                emojiSizeMax: 24 * (PlatformParams.instance.ios ? 1.30 : 1.0),
+                verticalSpacing: 0,
+                horizontalSpacing: 0,
+                gridPadding: EdgeInsets.zero,
+                initCategory: Category.RECENT,
+                bgColor: Colors.white.withOpacity(0.0),
+                indicatorColor: primary,
+                iconColor: Colors.grey,
+                iconColorSelected: primary,
+                progressIndicatorColor: primary,
+                backspaceColor: primary,
+                skinToneDialogBgColor: Colors.white.withOpacity(0.0),
+                skinToneIndicatorColor: Colors.grey,
+                enableSkinTones: true,
+                showRecentsTab: true,
+                recentsLimit: 28,
+                replaceEmojiOnLimitExceed: false,
+                noRecents: Text(
+                  AppLocalizations.t('No Recents'),
+                  style: const TextStyle(fontSize: 20, color: Colors.black),
+                  textAlign: TextAlign.center,
+                ),
+                tabIndicatorAnimDuration: kTabScrollDuration,
+                categoryIcons: const CategoryIcons(),
+                buttonMode: ButtonMode.MATERIAL)));
   }
 
   @override
