@@ -22,7 +22,7 @@ class ChatMessageInputWidget extends StatefulWidget {
   ///扩展文本输入框的控制器
   final TextEditingController textEditingController;
 
-  final void Function(String text)? onSend;
+  final Future<void> Function(String text)? onSend;
 
   const ChatMessageInputWidget(
       {Key? key, required this.textEditingController, this.onSend})
@@ -46,7 +46,7 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
     setState(() {});
   }
 
-  void onSendPressed() {
+  Future<void> onSendPressed() async {
     if (widget.onSend != null) {
       widget.onSend!(widget.textEditingController.text);
     }

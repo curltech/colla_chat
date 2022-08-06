@@ -5,7 +5,7 @@ import 'extended_text_message_input.dart';
 ///包括声音按钮，扩展文本输入框，emoji按钮，其他多种格式输入按钮和发送按钮
 class TextMessageInputWidget extends StatefulWidget {
   final TextEditingController textEditingController;
-  final void Function()? onSendPressed;
+  final Future<void> Function()? onSendPressed;
   final void Function()? onEmojiPressed;
   final void Function()? onMorePressed;
 

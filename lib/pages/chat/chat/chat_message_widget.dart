@@ -192,20 +192,18 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   }
 
   ///发送命令
-  void send(String message) {
+  Future<void> send(String message) async {
     if (message.isEmpty || message == '') {
       return;
     }
     var peerId = widget.chatMessageController.chatSummary!.peerId!;
     List<int> data = CryptoUtil.stringToUtf8(message);
-    chatMessageService
-        .buildChatMessage(peerId, data)
-        .then((ChatMessage chatMessage) {
-      String json = JsonUtil.toJsonString(chatMessage);
-      List<int> data = CryptoUtil.stringToUtf8(json);
-      peerConnectionPool.send(peerId, Uint8List.fromList(data));
-      widget.chatMessageController.insert(0, chatMessage);
-    });
+    ChatMessage chatMessage =
+        await chatMessageService.buildChatMessage(peerId, data);
+    widget.chatMessageController.insert(0, chatMessage);
+    String json = JsonUtil.toJsonString(chatMessage);
+    data = CryptoUtil.stringToUtf8(json);
+    await peerConnectionPool.send(peerId, Uint8List.fromList(data));
   }
 
   bool _hasValue() {
