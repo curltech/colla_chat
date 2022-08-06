@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 import 'extended_text_message_input.dart';
 
-///发送文本消息的输入框和按钮，三个按钮，一个输入框
+///发送文本消息的输入框和按钮，
+///包括声音按钮，扩展文本输入框，emoji按钮，其他多种格式输入按钮和发送按钮
 class TextMessageInputWidget extends StatefulWidget {
+  final TextEditingController textEditingController;
+  final void Function()? onSendPressed;
+  final void Function()? onEmojiPressed;
+  final void Function()? onMorePressed;
+
   const TextMessageInputWidget({
     Key? key,
+    required this.textEditingController,
+    this.onSendPressed,
+    this.onEmojiPressed,
+    this.onMorePressed,
   }) : super(key: key);
 
   @override
@@ -14,7 +24,6 @@ class TextMessageInputWidget extends StatefulWidget {
 }
 
 class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
-  final TextEditingController textEditingController = TextEditingController();
   FocusNode textFocusNode = FocusNode();
 
   @override
@@ -27,7 +36,9 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   }
 
   Widget _buildExtendedTextField(context) {
-    return const ExtendedTextMessageInputWidget();
+    return ExtendedTextMessageInputWidget(
+      textEditingController: widget.textEditingController,
+    );
   }
 
   Widget _buildTextMessageInput(BuildContext context) {
@@ -52,7 +63,11 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
               padding: EdgeInsets.zero,
               alignment: Alignment.centerRight,
               icon: const Icon(Icons.emoji_emotions),
-              onPressed: () {},
+              onPressed: () {
+                if (widget.onEmojiPressed != null) {
+                  widget.onEmojiPressed!();
+                }
+              },
             ),
           ),
           Visibility(
@@ -64,7 +79,11 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
                   padding: EdgeInsets.zero,
                   alignment: Alignment.centerRight,
                   icon: const Icon(Icons.add),
-                  onPressed: () {},
+                  onPressed: () {
+                    if (widget.onMorePressed != null) {
+                      widget.onMorePressed!();
+                    }
+                  },
                 ),
               )),
           Visibility(
@@ -76,7 +95,11 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
                   padding: EdgeInsets.zero,
                   alignment: Alignment.centerRight,
                   icon: const Icon(Icons.send),
-                  onPressed: () {},
+                  onPressed: () {
+                    if (widget.onSendPressed != null) {
+                      widget.onSendPressed!();
+                    }
+                  },
                 ),
               ))
         ]));

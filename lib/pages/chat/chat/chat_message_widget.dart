@@ -16,6 +16,7 @@ import '../../../transport/webrtc/peer_connection_pool.dart';
 import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/common/widget_mixin.dart';
 import '../me/webrtc/peer_connection_controller.dart';
+import 'chat_message_input.dart';
 import 'chat_message_item.dart';
 
 ///好友或者群的消息控制器
@@ -115,6 +116,7 @@ class ChatMessageWidget extends StatefulWidget with TileDataMixin {
 
 class _ChatMessageWidgetState extends State<ChatMessageWidget>
     with TickerProviderStateMixin {
+  ///扩展文本输入框的控制器
   final TextEditingController textEditingController = TextEditingController();
   FocusNode textFocusNode = FocusNode();
 
@@ -215,7 +217,9 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   ///发送消息的输入框和按钮，三个按钮，一个输入框，单独一个类
   ///另外还有各种消息的选择菜单，emoji各一个类
   Widget _buildTextMessageInputWidget(BuildContext context) {
-    return const TextMessageInputWidget();
+    return ChatMessageInputWidget(
+      textEditingController: textEditingController,
+    );
   }
 
   ///创建每一条消息
@@ -286,6 +290,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     widget.chatMessageController.removeListener(_update);
     widget.scrollController.removeListener(_onScroll);
     peerConnectionPoolController.removeListener(_update);
+    textEditingController.dispose();
     super.dispose();
   }
 }

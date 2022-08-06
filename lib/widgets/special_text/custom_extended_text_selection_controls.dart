@@ -62,7 +62,7 @@ class CustomTextSelectionControls extends TextSelectionControls {
       width: _kHandleSize,
       height: _kHandleSize,
       child: Image.asset(
-        'assets/images/emoji/40.png',
+        'assets/images/emoji/sg40.png',
       ),
     );
 

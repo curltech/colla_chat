@@ -1,53 +1,50 @@
-import 'package:extended_text_library/extended_text_library.dart';
+import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
+
+const String emojiFilePath = "assets/images/emoji";
+const int emojiCount = 113;
 
 ///emoji/image text
 class EmojiText extends SpecialText {
-  EmojiText(TextStyle? textStyle, {this.start})
-      : super(EmojiText.flag, ']', textStyle);
-  static const String flag = '[';
-  final int? start;
+  static const String flag = "[";
+  final int start;
+
+  EmojiText(TextStyle? textStyle, {required this.start})
+      : super(EmojiText.flag, "]", textStyle);
+
   @override
   InlineSpan finishText() {
-    final String key = toString();
+    var key = toString();
+    if (emojiTextCollection.emojiMap.containsKey(key)) {
+      //fontsize id define image height
+      //size = 30.0/26.0 * fontSize
+      const double size = 20.0;
 
-    if (EmojiUitl.instance.emojiMap.containsKey(key)) {
-      double size = 18;
-
-      final TextStyle ts = textStyle!;
-      if (ts.fontSize != null) {
-        size = ts.fontSize! * 1.15;
-      }
-
-      return ImageSpan(
-          AssetImage(
-            EmojiUitl.instance.emojiMap[key]!,
-          ),
+      ///fontSize 26 and text height =30.0
+      //final double fontSize = 26.0;
+      String emoji = emojiTextCollection.emojiMap[key] ?? '';
+      return ImageSpan(AssetImage(emoji),
           actualText: key,
           imageWidth: size,
           imageHeight: size,
-          start: start!,
-          //fit: BoxFit.fill,
-          margin: const EdgeInsets.all(2));
+          start: start,
+          fit: BoxFit.fill,
+          margin: const EdgeInsets.only(left: 2.0, right: 2.0));
     }
 
     return TextSpan(text: toString(), style: textStyle);
   }
 }
 
-class EmojiUitl {
-  EmojiUitl._() {
-    for (int i = 1; i < 49; i++) {
-      _emojiMap['[$i]'] = '$_emojiFilePath/$i.png';
+///emoji文本的集合
+class EmojiTextCollection {
+  final Map<String, String> emojiMap = <String, String>{};
+
+  EmojiTextCollection() {
+    for (int i = 1; i < emojiCount; i++) {
+      emojiMap["[$i]"] = "$emojiFilePath/sg$i.png";
     }
   }
-
-  final Map<String, String> _emojiMap = <String, String>{};
-
-  Map<String, String> get emojiMap => _emojiMap;
-
-  final String _emojiFilePath = 'assets';
-
-  static EmojiUitl? _instance;
-  static EmojiUitl get instance => _instance ??= EmojiUitl._();
 }
+
+final EmojiTextCollection emojiTextCollection = EmojiTextCollection();
