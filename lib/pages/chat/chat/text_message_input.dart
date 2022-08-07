@@ -98,33 +98,49 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
                       : _buildTextButton(context))),
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 0.0),
-            child: IconButton(
-              iconSize: 24,
-              padding: EdgeInsets.zero,
-              alignment: Alignment.centerRight,
-              icon: const Icon(Icons.emoji_emotions),
-              onPressed: () {
+            child: InkWell(
+              child:const Icon(Icons.emoji_emotions),
+              onTap: () {
                 if (widget.onEmojiPressed != null) {
                   widget.onEmojiPressed!();
                 }
               },
             ),
+            // child: IconButton(
+            //   iconSize: 24,
+            //   padding: EdgeInsets.zero,
+            //   alignment: Alignment.centerRight,
+            //   icon: const Icon(Icons.emoji_emotions),
+            //   onPressed: () {
+            //     if (widget.onEmojiPressed != null) {
+            //       widget.onEmojiPressed!();
+            //     }
+            //   },
+            // ),
           ),
           Visibility(
               visible: !_hasValue(),
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 0.0),
-                child: IconButton(
-                  iconSize: 24,
-                  padding: EdgeInsets.zero,
-                  alignment: Alignment.center,
-                  icon: const Icon(Icons.add_circle),
-                  onPressed: () {
+                child: InkWell(
+                  child: const Icon(Icons.add_circle),
+                  onTap: () {
                     if (widget.onMorePressed != null) {
                       widget.onMorePressed!();
                     }
                   },
                 ),
+                // child: IconButton(
+                //   iconSize: 24,
+                //   padding: EdgeInsets.zero,
+                //   alignment: Alignment.center,
+                //   icon: const Icon(Icons.add_circle),
+                //   onPressed: () {
+                //     if (widget.onMorePressed != null) {
+                //       widget.onMorePressed!();
+                //     }
+                //   },
+                // ),
               )),
           Visibility(
               visible: _hasValue(),
