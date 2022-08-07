@@ -1,4 +1,6 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:flutter/material.dart';
+import '../../../tool/util.dart';
 import 'extended_text_message_input.dart';
 
 ///发送文本消息的输入框和按钮，
@@ -25,10 +27,15 @@ class TextMessageInputWidget extends StatefulWidget {
 
 class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   FocusNode textFocusNode = FocusNode();
+  bool voiceVisible = true;
+  bool sendVisible = false;
+  bool moreVisible = false;
+  bool keyboardVisible = false;
 
   @override
   void initState() {
     super.initState();
+    widget.textEditingController.addListener(_update);
   }
 
   _update() {
@@ -41,21 +48,54 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
     );
   }
 
+  Widget _buildTextButton(context) {
+    return TextButton(
+      child: Text(AppLocalizations.t('Press recording')),
+      onPressed: () {},
+    );
+  }
+
+  bool _hasValue() {
+    var value = widget.textEditingController.value.text;
+    return StringUtil.isNotEmpty(value);
+  }
+
   Widget _buildTextMessageInput(BuildContext context) {
     return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 2.0),
+        margin: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 2.0),
         child: Row(children: <Widget>[
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 0.0),
-            child: IconButton(
-              icon: const Icon(Icons.record_voice_over),
-              onPressed: () {},
-            ),
-          ),
+          Visibility(
+              visible: voiceVisible,
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 0.0),
+                child: IconButton(
+                  icon: const Icon(Icons.record_voice_over),
+                  onPressed: () {
+                    setState(() {
+                      voiceVisible = false;
+                    });
+                  },
+                ),
+              )),
+          Visibility(
+              visible: !voiceVisible,
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 0.0),
+                child: IconButton(
+                  icon: const Icon(Icons.keyboard),
+                  onPressed: () {
+                    setState(() {
+                      voiceVisible = true;
+                    });
+                  },
+                ),
+              )),
           Expanded(
               child: Container(
                   margin: const EdgeInsets.symmetric(horizontal: 0.0),
-                  child: _buildExtendedTextField(context))),
+                  child: voiceVisible
+                      ? _buildExtendedTextField(context)
+                      : _buildTextButton(context))),
           Container(
             margin: const EdgeInsets.symmetric(horizontal: 0.0),
             child: IconButton(
@@ -71,14 +111,14 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
             ),
           ),
           Visibility(
-              visible: true,
+              visible: !_hasValue(),
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 0.0),
                 child: IconButton(
                   iconSize: 24,
                   padding: EdgeInsets.zero,
-                  alignment: Alignment.centerRight,
-                  icon: const Icon(Icons.add),
+                  alignment: Alignment.center,
+                  icon: const Icon(Icons.add_circle),
                   onPressed: () {
                     if (widget.onMorePressed != null) {
                       widget.onMorePressed!();
@@ -87,13 +127,13 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
                 ),
               )),
           Visibility(
-              visible: true,
+              visible: _hasValue(),
               child: Container(
                 margin: const EdgeInsets.symmetric(horizontal: 0.0),
                 child: IconButton(
                   iconSize: 24,
                   padding: EdgeInsets.zero,
-                  alignment: Alignment.centerRight,
+                  alignment: Alignment.center,
                   icon: const Icon(Icons.send),
                   onPressed: () {
                     if (widget.onSendPressed != null) {
@@ -113,6 +153,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
 
   @override
   void dispose() {
+    widget.textEditingController.removeListener(_update);
     super.dispose();
   }
 }

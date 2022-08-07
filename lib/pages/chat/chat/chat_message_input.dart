@@ -36,6 +36,7 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
   final double height = 270;
   bool emojiVisible = false;
   bool moreVisible = false;
+  bool keyboardVisible = false;
 
   @override
   void initState() {
@@ -53,12 +54,27 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
   }
 
   void onEmojiPressed() {
-    emojiVisible = !emojiVisible;
-    _update();
+    if (keyboardVisible) {
+      emojiVisible = false;
+      moreVisible = false;
+    } else {
+      emojiVisible = !emojiVisible;
+      if (emojiVisible) {
+        moreVisible = false;
+      }
+      _update();
+    }
   }
 
   void onMorePressed() {
+    if (keyboardVisible) {
+      emojiVisible = false;
+      moreVisible = false;
+    }
     moreVisible = !moreVisible;
+    if (moreVisible) {
+      emojiVisible = false;
+    }
     _update();
   }
 
@@ -125,6 +141,11 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final MediaQueryData mediaQueryData = MediaQuery.of(context);
+    final double keyboardHeight = mediaQueryData.viewInsets.bottom;
+    if (keyboardHeight > 0) {
+      keyboardVisible = true;
+    }
     return _buildChatMessageInput(context);
   }
 }

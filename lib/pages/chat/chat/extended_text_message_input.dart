@@ -163,9 +163,13 @@ class _ExtendedTextMessageInputWidgetState
       onTap: () => setState(() {
         if (focusNode.hasFocus) {}
       }),
-      //onChanged: (v) => setState(() {}),
-      decoration: const InputDecoration.collapsed(
+      //onChanged: onChanged,
+      decoration: InputDecoration(
         hintText: 'Please input message',
+        //isCollapsed: true,
+        fillColor: Colors.grey.withOpacity(0.3),
+        filled: true,
+        border: InputBorder.none,
       ),
       //textDirection: TextDirection.rtl,
     );

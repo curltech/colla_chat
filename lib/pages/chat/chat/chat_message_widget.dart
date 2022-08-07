@@ -206,10 +206,6 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     await peerConnectionPool.send(peerId, Uint8List.fromList(data));
   }
 
-  bool _hasValue() {
-    var value = textEditingController.value.text;
-    return StringUtil.isNotEmpty(value);
-  }
 
   ///发送消息的输入框和按钮，三个按钮，一个输入框，单独一个类
   ///另外还有各种消息的选择菜单，emoji各一个类
