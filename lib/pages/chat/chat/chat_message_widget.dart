@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/pages/chat/chat/text_message_input.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:flutter/material.dart';
 
@@ -15,6 +16,7 @@ import '../../../transport/webrtc/peer_connection_pool.dart';
 import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/common/widget_mixin.dart';
 import '../me/webrtc/peer_connection_controller.dart';
+import 'chat_message_input.dart';
 import 'chat_message_item.dart';
 
 ///好友或者群的消息控制器
@@ -114,6 +116,7 @@ class ChatMessageWidget extends StatefulWidget with TileDataMixin {
 
 class _ChatMessageWidgetState extends State<ChatMessageWidget>
     with TickerProviderStateMixin {
+  ///扩展文本输入框的控制器
   final TextEditingController textEditingController = TextEditingController();
   FocusNode textFocusNode = FocusNode();
 
@@ -189,52 +192,28 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   }
 
   ///发送命令
-  void handleSubmit(String message) {
-    textEditingController.clear();
+  Future<void> send(String message) async {
     if (message.isEmpty || message == '') {
       return;
     }
     var peerId = widget.chatMessageController.chatSummary!.peerId!;
     List<int> data = CryptoUtil.stringToUtf8(message);
-    chatMessageService
-        .buildChatMessage(peerId, data)
-        .then((ChatMessage chatMessage) {
-      String json = JsonUtil.toJsonString(chatMessage);
-      List<int> data = CryptoUtil.stringToUtf8(json);
-      peerConnectionPool.send(peerId, Uint8List.fromList(data));
-      widget.chatMessageController.insert(0, chatMessage);
-    });
+    ChatMessage chatMessage =
+        await chatMessageService.buildChatMessage(peerId, data);
+    widget.chatMessageController.insert(0, chatMessage);
+    String json = JsonUtil.toJsonString(chatMessage);
+    data = CryptoUtil.stringToUtf8(json);
+    await peerConnectionPool.send(peerId, Uint8List.fromList(data));
   }
 
-  ///发送消息的输入框和按钮
-  Widget textComposerWidget() {
-    return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 8.0),
-        child: Row(children: <Widget>[
-          Flexible(
-            child: TextFormField(
-              decoration: const InputDecoration.collapsed(
-                  hintText: 'Please input message'),
-              controller: textEditingController,
-              onFieldSubmitted: handleSubmit,
-              autofocus: true,
-              focusNode: textFocusNode,
-              onTap: () {
-                // scroll to the bottom of the list when keyboard appears
-                _scrollMin();
-              },
-            ),
-          ),
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: IconButton(
-              icon: const Icon(Icons.send),
-              onPressed: () {
-                handleSubmit(textEditingController.text);
-              },
-            ),
-          )
-        ]));
+
+  ///发送消息的输入框和按钮，三个按钮，一个输入框，单独一个类
+  ///另外还有各种消息的选择菜单，emoji各一个类
+  Widget _buildTextMessageInputWidget(BuildContext context) {
+    return ChatMessageInputWidget(
+      textEditingController: textEditingController,
+      onSend: send,
+    );
   }
 
   ///创建每一条消息
@@ -284,7 +263,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
       const Divider(
         height: 1.0,
       ),
-      textComposerWidget(),
+      _buildTextMessageInputWidget(context),
     ]);
   }
 
@@ -305,6 +284,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     widget.chatMessageController.removeListener(_update);
     widget.scrollController.removeListener(_onScroll);
     peerConnectionPoolController.removeListener(_update);
+    textEditingController.dispose();
     super.dispose();
   }
 }

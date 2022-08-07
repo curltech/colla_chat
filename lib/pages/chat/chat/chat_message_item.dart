@@ -6,6 +6,7 @@ import 'package:colla_chat/service/chat/contact.dart';
 import 'package:flutter/material.dart';
 
 import '../../../entity/chat/chat.dart';
+import 'extended_text_message.dart';
 
 /// 每条消息展示组件，我接收的消息展示在左边，我发送的消息展示在右边
 class ChatMessageItem extends StatelessWidget {
@@ -27,20 +28,20 @@ class ChatMessageItem extends StatelessWidget {
     return false;
   }
 
+  ///消息体：扩展文本，图像，声音，视频，页面，复合文本，文件，名片，位置，收藏等种类
+  ///每种消息体一个类
   Widget? buildMessageBody(
       BuildContext context, String content, ContentType contentType) {
     if (contentType == ContentType.text) {
-      return Text(
-        content,
-        style: TextStyle(
-          color: isMyself ? Colors.white : Colors.black,
-          //fontSize: 16.0,
-        ),
+      return ExtendedTextMessage(
+        isMyself: isMyself,
+        content: content,
       );
     }
     return null;
   }
 
+  ///消息容器，内包消息体
   Row buildMessageContainer(
       BuildContext context, String content, ContentType contentType) {
     double lrEdgeInsets = 15.0;
@@ -74,6 +75,7 @@ class ChatMessageItem extends StatelessWidget {
     );
   }
 
+  ///其他人的消息，从左到右，头像，时间，名称，消息容器
   Widget _buildOther(BuildContext context) {
     var raw = CryptoUtil.decodeBase64(chatMessage.content);
     var content = CryptoUtil.utf8ToString(raw);
@@ -94,6 +96,7 @@ class ChatMessageItem extends StatelessWidget {
             ]));
   }
 
+  ///我的消息，从右到左，头像，时间，名称，消息容器
   Widget _buildMe(BuildContext context) {
     var raw = CryptoUtil.decodeBase64(chatMessage.content);
     var content = CryptoUtil.utf8ToString(raw);

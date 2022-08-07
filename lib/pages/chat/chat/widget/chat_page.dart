@@ -19,6 +19,7 @@ import 'main_input.dart';
 
 enum ButtonType { voice, more }
 
+///聊天主页面
 class ChatPage extends StatefulWidget {
   final String title;
   final int type;

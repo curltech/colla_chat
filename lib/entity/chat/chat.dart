@@ -378,6 +378,8 @@ class ChatSummary extends BaseEntity {
   String? contentType;
   String? sendReceiveTime; // 发送接收时间
   int unreadNumber = 0;
+  String? payloadHash;
+  String? payloadKey;
 
   ChatSummary(this.ownerPeerId);
 
@@ -397,6 +399,8 @@ class ChatSummary extends BaseEntity {
         contentType = json['contentType'],
         sendReceiveTime = json['sendReceiveTime'],
         unreadNumber = json['unreadNumber'],
+        payloadKey = json['payloadKey'],
+        payloadHash = json['payloadHash'],
         super.fromJson(json);
 
   @override
@@ -418,6 +422,8 @@ class ChatSummary extends BaseEntity {
       'contentType': contentType,
       'sendReceiveTime': sendReceiveTime,
       'unreadNumber': unreadNumber,
+      'payloadKey': payloadKey,
+      'payloadHash': payloadHash,
     });
     return json;
   }
