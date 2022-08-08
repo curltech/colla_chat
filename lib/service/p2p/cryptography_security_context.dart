@@ -9,14 +9,14 @@ import '../../service/dht/peerclient.dart';
 import '../../tool/util.dart';
 
 /// 对任意结构的负载进行压缩，签名，加密处理
-class SecurityContextService {
-  SecurityContextService();
+class CryptographySecurityContextService {
+  CryptographySecurityContextService();
 
   /// 加密参数必须有是否压缩，是否加密，目标peerId
   /// 返回参数包括结果负载，是否压缩，是否加密，加密键值，签名
   /// @param payload
   /// @param securityParams
-  static Future<SecurityContext> encrypt(
+  Future<SecurityContext> encrypt(
       List<int> payload, SecurityContext securityContext) async {
     List<int> data = payload;
     SecurityContext result = SecurityContext();
@@ -106,7 +106,7 @@ class SecurityContextService {
   /// 返回负载
   /// @param payload
   /// @param securityParams
-  static Future<List<int>> decrypt(
+  Future<List<int>> decrypt(
       String transportPayload, SecurityContext securityContext) async {
     var targetPeerId = securityContext.targetPeerId;
     var peerId = myself.peerId;
@@ -220,3 +220,6 @@ class SecurityContextService {
     return data;
   }
 }
+
+final CryptographySecurityContextService cryptographySecurityContextService =
+    CryptographySecurityContextService();

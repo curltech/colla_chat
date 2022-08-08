@@ -6,7 +6,7 @@ import '../constant/base.dart';
 import '../datastore/datastore.dart';
 import '../entity/base.dart';
 import '../tool/util.dart';
-import 'p2p/security_context.dart';
+import 'p2p/cryptography_security_context.dart';
 
 /// 本地sqlite3的通用访问类，所有的表访问服务都是这个类的实例
 abstract class GeneralBaseService<T> {
@@ -190,7 +190,7 @@ abstract class GeneralBaseService<T> {
         String? value = json[encryptField];
         if (StringUtil.isNotEmpty(value)) {
           try {
-            securityContext = await SecurityContextService.encrypt(
+            securityContext = await cryptographySecurityContextService.encrypt(
                 CryptoUtil.decodeBase64(value!), securityContext);
             json[encryptField] = securityContext.transportPayload;
             json['payloadKey'] = securityContext.payloadKey;
@@ -225,7 +225,7 @@ abstract class GeneralBaseService<T> {
         if (StringUtil.isNotEmpty(value)) {
           try {
             List<int> data =
-                await SecurityContextService.decrypt(value!, securityContext);
+                await cryptographySecurityContextService.decrypt(value!, securityContext);
             json[encryptField] = CryptoUtil.encodeBase64(data);
           } catch (err) {
             logger.e('SecurityContextService decrypt err:$err');

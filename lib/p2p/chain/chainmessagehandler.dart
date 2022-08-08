@@ -6,7 +6,7 @@ import '../../entity/p2p/message.dart';
 import '../../entity/p2p/security_context.dart';
 import '../../provider/app_data_provider.dart';
 import '../../service/p2p/message.dart';
-import '../../service/p2p/security_context.dart';
+import '../../service/p2p/cryptography_security_context.dart';
 import '../../tool/util.dart';
 import '../../transport/httpclient.dart';
 import '../../transport/websocket.dart';
@@ -175,7 +175,7 @@ class ChainMessageHandler {
     //   logger.e('ConnectPeerId equals TargetPeerId && NeedEncrypt is true!');
     // }
     SecurityContext result =
-        await SecurityContextService.encrypt(payload, securityContext);
+        await cryptographySecurityContextService.encrypt(payload, securityContext);
     chainMessage.transportPayload = result.transportPayload;
     chainMessage.payload = null;
     chainMessage.payloadSignature = result.payloadSignature;
@@ -205,7 +205,7 @@ class ChainMessageHandler {
     targetPeerId ??= chainMessage.connectPeerId;
     securityContext.targetPeerId = targetPeerId;
     securityContext.srcPeerId = chainMessage.srcPeerId;
-    var payload = await SecurityContextService.decrypt(
+    var payload = await cryptographySecurityContextService.decrypt(
         chainMessage.transportPayload, securityContext);
     if (payload != null) {
       chainMessage.payload = payload;

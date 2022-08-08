@@ -12,7 +12,7 @@ import '../../entity/chat/chat.dart';
 import '../../entity/chat/contact.dart';
 import '../../entity/dht/myself.dart';
 import '../../entity/p2p/security_context.dart';
-import '../p2p/security_context.dart';
+import '../p2p/cryptography_security_context.dart';
 
 class ChatMessageService extends GeneralBaseService<ChatMessage> {
   ChatMessageService({
@@ -263,7 +263,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
         }
         var content = attach.content;
         if (content != null) {
-          var result = await SecurityContextService.encrypt(
+          var result = await cryptographySecurityContextService.encrypt(
               content.codeUnits, securityContext);
           attach.payloadKey = result.payloadKey;
           attach.needCompress = result.needCompress;
@@ -301,7 +301,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
         var content = chatAttach.content;
         if (content != null) {
           List<int>? data =
-              await SecurityContextService.decrypt(content, securityContext);
+              await cryptographySecurityContextService.decrypt(content, securityContext);
           //d.content = StringUtil.decodeURI(payload)
           if (data != null) {
             chatAttach.content = CryptoUtil.uint8ListToStr(data);
