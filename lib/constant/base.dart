@@ -25,8 +25,8 @@ const xlSize = Size(64, 64);
 const defaultIcon = 'assets/icons/favicon-96x96.png';
 final defaultImage = Image.asset(
   defaultIcon,
-  width: 48,
-  height: 48,
+  width: 32,
+  height: 32,
   fit: BoxFit.fill,
 );
 const defaultAvatar = 'assets/images/colla-o1.png';
