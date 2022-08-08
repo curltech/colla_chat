@@ -232,7 +232,7 @@ abstract class GeneralBaseService<T> {
             var result = await cryptographySecurityContextService
                 .decrypt(securityContext);
             if (result) {
-              var data = CryptoUtil.decodeBase64(securityContext.payload);
+              var data = securityContext.payload;
               json[encryptField] = CryptoUtil.encodeBase64(data);
             }
           } catch (e) {
