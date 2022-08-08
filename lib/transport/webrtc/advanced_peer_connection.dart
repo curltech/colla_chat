@@ -204,7 +204,7 @@ class AdvancedPeerConnection {
 
   ///发送数据，带加密选项
   Future<void> send(List<int> data,
-      {CryptoOption cryptoOption = CryptoOption.none}) async {
+      {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     if (connected) {
       int cryptOptionIndex = cryptoOption.index;
       SecurityContextService? securityContextService =
