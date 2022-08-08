@@ -8,7 +8,7 @@ import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../provider/app_data_provider.dart';
-import '../../service/p2p/cryptography_security_context.dart';
+import '../../service/p2p/security_context.dart';
 import '../../service/servicelocator.dart';
 import '../../tool/util.dart';
 

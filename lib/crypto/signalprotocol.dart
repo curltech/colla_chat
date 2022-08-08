@@ -1,8 +1,12 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/tool/util.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
+
+import '../provider/app_data_provider.dart';
 
 /// Signal协议的密钥对
 class SignalKeyPair {
@@ -61,6 +65,8 @@ class SignalKeyPair {
     await signalProtocolStore.storeSignedPreKey(signedPreKey.id, signedPreKey);
 
     senderKeyStore = InMemorySenderKeyStore();
+
+    logger.i('local SignalKeyPair init successfully');
   }
 
   // 产生预先密钥对包，一般是第一个预先密钥对，签名预先密钥对，身份密钥对等参数组成，
@@ -79,9 +85,72 @@ class SignalKeyPair {
     return preKeyBundle;
   }
 
-  exportPreKeyBundle() {}
+  String preKeyBundleToJson(PreKeyBundle preKeyBundle) {
+    Map<String, dynamic> map = {};
+    map['registrationId'] = preKeyBundle.getRegistrationId();
+    map['deviceId'] = preKeyBundle.getDeviceId();
+    ECPublicKey preKey = preKeyBundle.getPreKey();
+    map['preKey'] = CryptoUtil.encodeBase64(preKey.serialize());
+    map['preKeyId'] = preKeyBundle.getPreKeyId();
+    ECPublicKey? signedPreKey = preKeyBundle.getSignedPreKey();
+    if (signedPreKey != null) {
+      map['signedPreKey'] = CryptoUtil.encodeBase64(signedPreKey!.serialize());
+    }
+    map['signedPreKeyId'] = preKeyBundle.getSignedPreKeyId();
+    Uint8List? signedPreKeySignature = preKeyBundle.getSignedPreKeySignature();
+    if (signedPreKeySignature != null) {
+      map['signedPreKeySignature'] =
+          CryptoUtil.encodeBase64(signedPreKeySignature!);
+    }
+    var identityKey = preKeyBundle.getIdentityKey();
+    map['identityKey'] = CryptoUtil.encodeBase64(identityKey!.serialize());
 
-  importPreKeyBundle() {}
+    return JsonUtil.toJsonString(map);
+  }
+
+  PreKeyBundle? preKeyBundleFromJson(String json) {
+    Map<String, dynamic> map = JsonUtil.toJson(json);
+    var registrationId = map['registrationId'];
+    var deviceId = map['deviceId'];
+    ECPublicKey? preKey;
+    var preKeyStr = map['preKey'];
+    if (preKeyStr != null) {
+      var preKeyList = CryptoUtil.decodeBase64(preKeyStr);
+      preKey = Curve.decodePoint(preKeyList, 0);
+    }
+    var preKeyId = map['preKeyId'];
+    ECPublicKey? signedPreKey;
+    var signedPreKeyStr = map['signedPreKey'];
+    if (signedPreKeyStr != null) {
+      var signedPreKeyList = CryptoUtil.decodeBase64(signedPreKeyStr);
+      signedPreKey = Curve.decodePoint(signedPreKeyList, 0);
+    }
+    var signedPreKeyId = map['signedPreKeyId'];
+    var signedPreKeySignature = map['signedPreKeySignature'];
+    IdentityKey? identityKey;
+    var identityKeyStr = map['identityKey'];
+    if (identityKeyStr != null) {
+      var identityKeyList = CryptoUtil.decodeBase64(identityKeyStr);
+      identityKey = IdentityKey.fromBytes(identityKeyList, 0);
+    }
+    if (preKey != null &&
+        signedPreKeySignature != null &&
+        identityKey != null) {
+      final preKeyBundle = PreKeyBundle(
+          registrationId,
+          deviceId,
+          preKeyId,
+          preKey!,
+          signedPreKeyId,
+          signedPreKey!,
+          signedPreKeySignature,
+          identityKey!);
+
+      return preKeyBundle;
+    }
+
+    return null;
+  }
 }
 
 /// 特定目标的signal加密会话，
@@ -114,6 +183,7 @@ class SignalSession {
     //生成对方客户端的地址
     signalProtocolAddress =
         SignalProtocolAddress('$peerId:$clientId', deviceId);
+
     ///以下未群组的功能
     if (groupId != null) {
       groupSender =
@@ -180,22 +250,33 @@ class SignalSession {
   }
 
   ///在会话加密器产生后，加密
-  Future<CiphertextMessage> encrypt(Uint8List data) async {
-    var ciphertext = await sessionCipher.encrypt(data);
+  Future<List<int>> encrypt(List<int> data) async {
+    var ciphertext = await sessionCipher.encrypt(Uint8List.fromList(data));
 
-    return ciphertext;
+    return ciphertext.serialize();
   }
 
   ///在会话加密器产生后，解密
-  Future<Uint8List> decrypt(CiphertextMessage ciphertext) async {
+  Future<List<int>> decrypt(List<int> data) async {
     var signalProtocolStore =
         signalSessionPool.signalKeyPair.signalProtocolStore;
     var sessionCipher =
         SessionCipher.fromStore(signalProtocolStore, signalProtocolAddress);
 
-    // ciphertext: MessageType
+    CiphertextMessage ciphertext;
+    try {
+      ciphertext = PreKeySignalMessage(Uint8List.fromList(data));
+    } catch (err) {
+      try {
+        ciphertext = SignalMessage.fromSerialized(Uint8List.fromList(data));
+      } catch (err) {
+        logger.e('PreKeySignalMessage or SignalMessage:$err');
+        throw 'PreKeySignalMessage or SignalMessage failure';
+      }
+    }
+
     var messageType = ciphertext.getType();
-    Uint8List? plaintext;
+    List<int> plaintext = data;
     if (messageType == CiphertextMessage.prekeyType) {
       plaintext =
           await sessionCipher.decrypt(ciphertext as PreKeySignalMessage);
@@ -203,10 +284,11 @@ class SignalSession {
       plaintext =
           await sessionCipher.decryptFromSignal(ciphertext as SignalMessage);
     } else if (messageType == CiphertextMessage.senderKeyType) {
+      logger.e('messageType:$messageType senderKeyType');
     } else if (messageType == CiphertextMessage.senderKeyDistributionType) {
-    } else if (messageType == CiphertextMessage.encryptedMessageOverhead) {}
-    if (plaintext == null) {
-      throw '';
+      logger.e('messageType:$messageType senderKeyDistributionType');
+    } else if (messageType == CiphertextMessage.encryptedMessageOverhead) {
+      logger.e('messageType:$messageType encryptedMessageOverhead');
     }
 
     return plaintext;
@@ -247,7 +329,7 @@ class SignalSessionPool {
       {required String peerId,
       required clientId,
       int deviceId = 1,
-      required retrievedPreKeyBundle}) {
+      required PreKeyBundle retrievedPreKeyBundle}) {
     SignalSession? signalSession =
         get(peerId: peerId, clientId: clientId, deviceId: deviceId);
     if (signalSession != null) {

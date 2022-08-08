@@ -6,7 +6,7 @@ import '../constant/base.dart';
 import '../datastore/datastore.dart';
 import '../entity/base.dart';
 import '../tool/util.dart';
-import 'p2p/cryptography_security_context.dart';
+import 'p2p/security_context.dart';
 
 /// 本地sqlite3的通用访问类，所有的表访问服务都是这个类的实例
 abstract class GeneralBaseService<T> {

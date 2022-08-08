@@ -133,7 +133,7 @@ abstract class BaseAction {
       targetPeerId = connectPeerId;
     }
     chainMessage.targetPeerId = targetPeerId;
-    chainMessage.targetClientId = targetClientId;
+    chainMessage.clientId = targetClientId;
     chainMessage.payloadType = PayloadType.map.name;
     chainMessage.messageType = msgType.name;
     chainMessage.messageDirect = MsgDirect.Request.name;

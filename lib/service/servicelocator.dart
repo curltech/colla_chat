@@ -7,6 +7,7 @@ import 'package:colla_chat/service/stock/account.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 
+import '../crypto/signalprotocol.dart';
 import '../entity/p2p/security_context.dart';
 import '../p2p/chain/action/chat.dart';
 import '../p2p/chain/action/ping.dart';
@@ -23,7 +24,7 @@ import 'dht/peerclient.dart';
 import 'dht/peerendpoint.dart';
 import 'dht/peerprofile.dart';
 import 'general_base.dart';
-import 'p2p/cryptography_security_context.dart';
+import 'p2p/security_context.dart';
 
 class ServiceLocator {
   static Map<String, GeneralBaseService> services = {};
@@ -71,15 +72,10 @@ class ServiceLocator {
         compressSecurityContextService;
     securityContextServices[CryptoOption.cryptography.index] =
         cryptographySecurityContextService;
+    securityContextServices[CryptoOption.signal.index] =
+        signalSecurityContextService;
 
     await Sqlite3.getInstance();
-
-    // PlatformParams platformParams = await PlatformParams.instance;
-    // if (platformParams.web) {
-    //   await IndexedDb.getInstance();
-    // } else {
-    //   await Sqflite.getInstance();
-    // }
   }
 
   /// entity包含所有的字段，假设是字符串类型，fields是需要特别说明的字段，比如不是字符串类型

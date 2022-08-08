@@ -6,6 +6,7 @@ import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 
+import '../../crypto/signalprotocol.dart';
 import '../../crypto/util.dart';
 import '../../entity/base.dart';
 import '../../entity/dht/base.dart';
@@ -140,6 +141,8 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       var loginStatus = await myselfService.setMyself(myselfPeer, password);
 
       if (loginStatus) {
+        await signalSessionPool.init();
+
         ///2.连接篇p2p的节点，把自己的信息注册上去
         var json = JsonUtil.toJson(myselfPeer);
         var peerClient = PeerClient.fromJson(json);

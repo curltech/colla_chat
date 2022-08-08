@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/tool/util.dart';
@@ -7,6 +8,7 @@ import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 
 import '../../crypto/util.dart';
 import '../../entity/chat/chat.dart';
@@ -495,29 +497,42 @@ class PeerConnectionPool {
     var content = CryptoUtil.utf8ToString(raw);
     logger.i('chatMessage content:$content');
     peerConnectionPoolController.onMessage(chatMessage);
-    // var appDataProvider = AppDataProvider.instance;
-    // var chainProtocolId = appDataProvider.chainProtocolId;
-    // var receiveHandler = getProtocolHandler(chainProtocolId);
-    // if (receiveHandler != null) {
-    //   var remotePeerId = event.peerId;
-    //   //调用注册的接收处理器处理接收的原始数据
-    //   Uint8List? data = await receiveHandler(event.data, remotePeerId, null);
-    //   //如果有返回的响应数据，则发送回去，不可以调用同步的发送方法send
-    //   if (data != null) {
-    //     send(remotePeerId, data);
-    //   }
-    // }
+
+    if (chatMessage.subMessageType == ChatSubMessageType.preKeyBundle.name) {
+      PreKeyBundle? retrievedPreKeyBundle =
+          signalSessionPool.signalKeyPair.preKeyBundleFromJson(content);
+      if (retrievedPreKeyBundle != null) {
+        SignalSession signalSession = signalSessionPool.create(
+            peerId: peerId,
+            clientId: clientId,
+            deviceId: retrievedPreKeyBundle.getDeviceId(),
+            retrievedPreKeyBundle: retrievedPreKeyBundle);
+      } else {
+        logger.i('chatMessage content transfer to PreKeyBundle failure');
+      }
+    }
   }
 
   onConnected(WebrtcEvent event) async {
     logger.i('peerId: ${event.peerId} clientId:${event.clientId} is connected');
     peerConnectionPoolController.onConnected(event);
+
+    ///发送PreKeyBundle
+    ChatMessage chatMessage = ChatMessage(myself.peerId!);
+    chatMessage.subMessageType = ChatSubMessageType.preKeyBundle.name;
+    PreKeyBundle preKeyBundle =
+        signalSessionPool.signalKeyPair.getPreKeyBundle();
+    chatMessage.content =
+        signalSessionPool.signalKeyPair.preKeyBundleToJson(preKeyBundle);
+    var data = CryptoUtil.stringToUtf8(JsonUtil.toJsonString(chatMessage));
+    send(peerId, Uint8List.fromList(data), clientId: event.clientId);
   }
 
   onClosed(WebrtcEvent event) async {
     logger.i('peerId: ${event.peerId} clientId:${event.clientId} is closed');
     remove(event.peerId, clientId: event.clientId);
     peerConnectionPoolController.onClosed(event);
+    signalSessionPool.close(peerId: peerId, clientId: clientId);
   }
 
   onError(WebrtcEvent event) async {

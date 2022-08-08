@@ -3,6 +3,7 @@ enum CryptoOption { none, compress, cryptography, web, openpgp, signal }
 class SecurityContext {
   int cryptoOptionIndex = CryptoOption.cryptography.index;
   String? targetPeerId;
+  String? clientId;
   String? srcPeerId;
 
   bool needCompress = true;
@@ -24,7 +25,7 @@ class SecurityContext {
 
   String? payloadHash;
 
-  SecurityContext({this.targetPeerId, this.srcPeerId});
+  SecurityContext({this.targetPeerId, this.clientId, this.srcPeerId});
 
   SecurityContext.fromJson(Map json)
       : cryptoOptionIndex =
@@ -42,6 +43,7 @@ class SecurityContext {
             json['needSign'] == true || json['needSign'] == 1 ? true : false,
         payloadKey = json['payloadKey'],
         targetPeerId = json['targetPeerId'],
+        clientId = json['clientId'],
         srcPeerId = json['srcPeerId'],
         payloadHash = json['payloadHash'];
 
@@ -56,6 +58,7 @@ class SecurityContext {
       'needSign': needSign,
       'payloadKey': payloadKey,
       'targetPeerId': targetPeerId,
+      'clientId': clientId,
       'srcPeerId': srcPeerId,
       'payloadHash': payloadHash,
     });

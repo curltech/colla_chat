@@ -12,7 +12,7 @@ import '../../entity/chat/chat.dart';
 import '../../entity/chat/contact.dart';
 import '../../entity/dht/myself.dart';
 import '../../entity/p2p/security_context.dart';
-import '../p2p/cryptography_security_context.dart';
+import '../p2p/security_context.dart';
 
 class ChatMessageService extends GeneralBaseService<ChatMessage> {
   ChatMessageService({
