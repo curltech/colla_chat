@@ -203,7 +203,7 @@ class AdvancedPeerConnection {
   }
 
   ///发送数据，带加密选项
-  Future<void> send(Uint8List data,
+  Future<void> send(List<int> data,
       {CryptoOption cryptoOption = CryptoOption.none}) async {
     if (connected) {
       int cryptOptionIndex = cryptoOption.index;
