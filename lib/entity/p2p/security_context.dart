@@ -1,6 +1,6 @@
 class SecurityContext {
   /// 消息负载序列化后的寄送格式，再经过客户端自己的加密方式比如openpgp（更安全）加密，签名，压缩，base64处理后的字符串
-  String transportPayload = '';
+  String? transportPayload;
 
   /// 负载json的源peer的签名
   String? payloadSignature;

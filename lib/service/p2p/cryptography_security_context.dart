@@ -8,14 +8,58 @@ import '../../provider/app_data_provider.dart';
 import '../../service/dht/peerclient.dart';
 import '../../tool/util.dart';
 
+enum CryptoOption { none, compress, cryptography, web, openpgp, signal }
+
+abstract class SecurityContextService {
+  ///加密，而且把二进制数据base64转换成为securityContext的transportPayload字段String
+  Future<SecurityContext> encrypt(
+      List<int> payload, SecurityContext securityContext);
+
+  ///解密，而且把String数据base64转换成为二进制的返回数据
+  Future<List<int>> decrypt(
+      String transportPayload, SecurityContext securityContext);
+}
+
 /// 对任意结构的负载进行压缩，签名，加密处理
-class CryptographySecurityContextService {
+class NoneSecurityContextService extends SecurityContextService {
+  NoneSecurityContextService();
+
+  /// 加密参数必须有是否压缩，是否加密，目标peerId
+  /// 返回参数包括结果负载，是否压缩，是否加密，加密键值，签名
+  /// @param payload
+  /// @param securityParams
+  @override
+  Future<SecurityContext> encrypt(
+      List<int> payload, SecurityContext securityContext) async {
+    securityContext.transportPayload = CryptoUtil.encodeBase64(payload);
+
+    return securityContext;
+  }
+
+  /// 加密参数必须有是否压缩，是否加密，源peerId，目标peerId，加密键值，签名
+  /// 返回负载
+  /// @param payload
+  /// @param securityParams
+  @override
+  Future<List<int>> decrypt(
+      String transportPayload, SecurityContext securityContext) async {
+    List<int> data = CryptoUtil.decodeBase64(transportPayload);
+    return data;
+  }
+}
+
+final NoneSecurityContextService noneSecurityContextService =
+    NoneSecurityContextService();
+
+/// 对任意结构的负载进行压缩，签名，加密处理
+class CryptographySecurityContextService extends SecurityContextService {
   CryptographySecurityContextService();
 
   /// 加密参数必须有是否压缩，是否加密，目标peerId
   /// 返回参数包括结果负载，是否压缩，是否加密，加密键值，签名
   /// @param payload
   /// @param securityParams
+  @override
   Future<SecurityContext> encrypt(
       List<int> payload, SecurityContext securityContext) async {
     List<int> data = payload;
@@ -106,6 +150,7 @@ class CryptographySecurityContextService {
   /// 返回负载
   /// @param payload
   /// @param securityParams
+  @override
   Future<List<int>> decrypt(
       String transportPayload, SecurityContext securityContext) async {
     var targetPeerId = securityContext.targetPeerId;

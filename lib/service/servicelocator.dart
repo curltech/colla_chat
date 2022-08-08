@@ -22,10 +22,12 @@ import 'dht/peerclient.dart';
 import 'dht/peerendpoint.dart';
 import 'dht/peerprofile.dart';
 import 'general_base.dart';
+import 'p2p/cryptography_security_context.dart';
 
 class ServiceLocator {
   static Map<String, GeneralBaseService> services = {};
   static Map<MsgType, BaseAction> actions = {};
+  static Map<int, SecurityContextService> securityContextServices = {};
 
   static GeneralBaseService? get(String serviceName) {
     return services[serviceName];
@@ -61,6 +63,12 @@ class ServiceLocator {
     actions[MsgType.P2PCHAT] = p2pChatAction;
     actions[MsgType.PING] = pingAction;
     actions[MsgType.IONSIGNAL] = ionSignalAction;
+
+    securityContextServices[CryptoOption.none.index] =
+        noneSecurityContextService;
+    //securityContextServices[CryptoOption.compress.index]=compressSecurityContextService;
+    securityContextServices[CryptoOption.cryptography.index] =
+        cryptographySecurityContextService;
 
     await Sqlite3.getInstance();
 

@@ -6,6 +6,7 @@ import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../provider/app_data_provider.dart';
+import '../../service/p2p/cryptography_security_context.dart';
 import '../../tool/util.dart';
 
 class SignalExtension {
@@ -136,9 +137,10 @@ class AdvancedPeerConnection {
           .onClosed(WebrtcEvent(peerId, clientId: clientId));
     });
 
-    //收到数据
-    basePeerConnection.on(WebrtcEventType.message, (data) async {
+    //收到数据，带解密功能，取最后一位整数，表示解密选项，得到何种解密方式，然后解密
+    basePeerConnection.on(WebrtcEventType.message, (Uint8List data) async {
       logger.i('${DateTime.now().toUtc()}:got a message from peer');
+      int cryptOption = data[data.length - 1];
       await peerConnectionPool
           .onMessage(WebrtcEvent(peerId, clientId: clientId, data: data));
     });
@@ -184,7 +186,9 @@ class AdvancedPeerConnection {
     return basePeerConnection.status == PeerConnectionStatus.connected;
   }
 
-  Future<void> send(Uint8List data) async {
+  ///发送数据，带加密选项
+  Future<void> send(Uint8List data,
+      {CryptoOption cryptoOption = CryptoOption.none}) async {
     if (connected) {
       return await basePeerConnection.send(data);
     } else {

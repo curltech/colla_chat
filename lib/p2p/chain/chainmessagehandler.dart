@@ -206,7 +206,7 @@ class ChainMessageHandler {
     securityContext.targetPeerId = targetPeerId;
     securityContext.srcPeerId = chainMessage.srcPeerId;
     var payload = await cryptographySecurityContextService.decrypt(
-        chainMessage.transportPayload, securityContext);
+        chainMessage.transportPayload!, securityContext);
     if (payload != null) {
       chainMessage.payload = payload;
       chainMessage.transportPayload = '';
