@@ -216,7 +216,7 @@ class AdvancedPeerConnection {
       securityContext.payload = data;
       bool result = await securityContextService.encrypt(securityContext);
       if (result) {
-        data.add(cryptOptionIndex);
+        data = CryptoUtil.concat(securityContext.payload, [cryptOptionIndex]);
         return await basePeerConnection.send(data);
       }
     } else {
