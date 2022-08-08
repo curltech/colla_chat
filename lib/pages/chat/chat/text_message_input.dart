@@ -61,45 +61,67 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   }
 
   Widget _buildTextMessageInput(BuildContext context) {
+    double iconInset = 2.0;
     return Container(
-        margin: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 2.0),
+        margin:
+            EdgeInsets.symmetric(horizontal: iconInset, vertical: iconInset),
         child: Row(children: <Widget>[
           Visibility(
               visible: voiceVisible,
               child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 0.0),
-                child: IconButton(
-                  icon: const Icon(Icons.record_voice_over),
-                  onPressed: () {
+                margin: EdgeInsets.symmetric(
+                    horizontal: iconInset, vertical: iconInset),
+                child: InkWell(
+                  child: const Icon(Icons.record_voice_over),
+                  onTap: () {
                     setState(() {
                       voiceVisible = false;
                     });
                   },
                 ),
+                // child: IconButton(
+                //   icon: const Icon(Icons.record_voice_over),
+                //   onPressed: () {
+                //     setState(() {
+                //       voiceVisible = false;
+                //     });
+                //   },
+                // ),
               )),
           Visibility(
               visible: !voiceVisible,
               child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 0.0),
-                child: IconButton(
-                  icon: const Icon(Icons.keyboard),
-                  onPressed: () {
+                margin: EdgeInsets.symmetric(
+                    horizontal: iconInset, vertical: iconInset),
+                child: InkWell(
+                  child: const Icon(Icons.keyboard),
+                  onTap: () {
                     setState(() {
                       voiceVisible = true;
                     });
                   },
                 ),
+                // child: IconButton(
+                //   icon: const Icon(Icons.keyboard),
+                //   onPressed: () {
+                //     setState(() {
+                //       voiceVisible = true;
+                //     });
+                //   },
+                // ),
               )),
           Expanded(
               child: Container(
-                  margin: const EdgeInsets.symmetric(horizontal: 0.0),
+                  margin: EdgeInsets.symmetric(
+                      horizontal: iconInset, vertical: iconInset),
                   child: voiceVisible
                       ? _buildExtendedTextField(context)
                       : _buildTextButton(context))),
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 0.0),
+            margin: EdgeInsets.symmetric(
+                horizontal: iconInset, vertical: iconInset),
             child: InkWell(
-              child:const Icon(Icons.emoji_emotions),
+              child: const Icon(Icons.emoji_emotions),
               onTap: () {
                 if (widget.onEmojiPressed != null) {
                   widget.onEmojiPressed!();
@@ -121,7 +143,8 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
           Visibility(
               visible: !_hasValue(),
               child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 0.0),
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
                 child: InkWell(
                   child: const Icon(Icons.add_circle),
                   onTap: () {
@@ -131,9 +154,6 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
                   },
                 ),
                 // child: IconButton(
-                //   iconSize: 24,
-                //   padding: EdgeInsets.zero,
-                //   alignment: Alignment.center,
                 //   icon: const Icon(Icons.add_circle),
                 //   onPressed: () {
                 //     if (widget.onMorePressed != null) {
@@ -145,19 +165,26 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
           Visibility(
               visible: _hasValue(),
               child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 0.0),
-                child: IconButton(
-                  iconSize: 24,
-                  padding: EdgeInsets.zero,
-                  alignment: Alignment.center,
-                  icon: const Icon(Icons.send),
-                  onPressed: () {
+                margin:
+                    const EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
+                child: InkWell(
+                  child: const Icon(Icons.send),
+                  onTap: () {
                     if (widget.onSendPressed != null) {
                       widget.onSendPressed!();
                       widget.textEditingController.clear();
                     }
                   },
                 ),
+                // child: IconButton(
+                //   icon: const Icon(Icons.send),
+                //   onPressed: () {
+                //     if (widget.onSendPressed != null) {
+                //       widget.onSendPressed!();
+                //       widget.textEditingController.clear();
+                //     }
+                //   },
+                // ),
               ))
         ]));
   }
