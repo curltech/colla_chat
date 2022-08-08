@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:cryptography/cryptography.dart';
-import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 
 import '../../crypto/cryptography.dart';
 import '../../crypto/util.dart';
@@ -12,11 +11,20 @@ import '../../provider/app_data_provider.dart';
 import '../../service/dht/peerclient.dart';
 import '../../tool/util.dart';
 
-class SecurityContextService {
+abstract class SecurityContextService {
+  Future<bool> encrypt(SecurityContext securityContext);
+
+  Future<bool> decrypt(SecurityContext securityContext);
+}
+
+class CommonSecurityContextService extends SecurityContextService {
   ///加密，而且把二进制数据base64转换成为securityContext的transportPayload字段String
+  @override
   Future<bool> encrypt(SecurityContext securityContext) async {
     int cryptoOptionIndex = securityContext.cryptoOptionIndex;
     if (cryptoOptionIndex == CryptoOption.cryptography.index) {
+      return cryptographySecurityContextService.encrypt(securityContext);
+    } else if (cryptoOptionIndex == CryptoOption.signal.index) {
       return cryptographySecurityContextService.encrypt(securityContext);
     } else if (cryptoOptionIndex == CryptoOption.none.index) {
       return noneSecurityContextService.encrypt(securityContext);
@@ -27,11 +35,12 @@ class SecurityContextService {
   }
 
   ///解密，而且把String数据base64转换成为二进制的返回数据
+  @override
   Future<bool> decrypt(SecurityContext securityContext) async {
     int cryptoOptionIndex = securityContext.cryptoOptionIndex;
     if (cryptoOptionIndex == CryptoOption.cryptography.index) {
       return cryptographySecurityContextService.decrypt(securityContext);
-    } else if (cryptoOptionIndex == CryptoOption.cryptography.index) {
+    } else if (cryptoOptionIndex == CryptoOption.signal.index) {
       return cryptographySecurityContextService.decrypt(securityContext);
     } else if (cryptoOptionIndex == CryptoOption.none.index) {
       return noneSecurityContextService.decrypt(securityContext);
@@ -42,7 +51,8 @@ class SecurityContextService {
   }
 }
 
-final SecurityContextService securityContextService = SecurityContextService();
+final CommonSecurityContextService commonSecurityContextService =
+    CommonSecurityContextService();
 
 class NoneSecurityContextService extends SecurityContextService {
   NoneSecurityContextService();
@@ -168,7 +178,8 @@ class CryptographySecurityContextService extends SecurityContextService {
     if (needEncrypt) {
       SimplePublicKey? targetPublicKey;
       if (targetPeerId != null && peerId != null && targetPeerId != peerId) {
-        targetPublicKey = await peerClientService.getCachedPublicKey(targetPeerId);
+        targetPublicKey =
+            await peerClientService.getCachedPublicKey(targetPeerId);
       } else {
         // 本地保存前加密
         targetPublicKey = myself.publicKey;
@@ -326,7 +337,8 @@ class CryptographySecurityContextService extends SecurityContextService {
               peerClientService.findCachedOneByPeerId(srcPeerId)
             ];
             if (peerClients.isNotEmpty) {
-              srcPublicKey = await peerClientService.getCachedPublicKey(srcPeerId);
+              srcPublicKey =
+                  await peerClientService.getCachedPublicKey(srcPeerId);
               if (srcPublicKey != null) {
                 pass = await cryptoGraphy.verify(
                     data, payloadSignature.codeUnits,
@@ -527,7 +539,8 @@ class SignalSecurityContextService extends SecurityContextService {
               peerClientService.findCachedOneByPeerId(srcPeerId)
             ];
             if (peerClients.isNotEmpty) {
-              srcPublicKey = await peerClientService.getCachedPublicKey(srcPeerId);
+              srcPublicKey =
+                  await peerClientService.getCachedPublicKey(srcPeerId);
               if (srcPublicKey != null) {
                 pass = await cryptoGraphy.verify(
                     data, payloadSignature.codeUnits,

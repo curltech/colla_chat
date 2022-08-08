@@ -13,6 +13,7 @@ import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 import '../../crypto/util.dart';
 import '../../entity/chat/chat.dart';
 import '../../entity/p2p/chain_message.dart';
+import '../../entity/p2p/security_context.dart';
 import '../../p2p/chain/action/signal.dart';
 import '../../pages/chat/me/webrtc/peer_connection_controller.dart';
 import '../../provider/app_data_provider.dart';
@@ -470,13 +471,16 @@ class PeerConnectionPool {
   /// 向peer发送信息，如果是多个，遍历发送
   /// @param peerId
   /// @param data
-  Future<void> send(String peerId, List<int> data, {String? clientId}) async {
+  Future<void> send(String peerId, List<int> data,
+      {String? clientId,
+      CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     List<AdvancedPeerConnection>? peerConnections = get(peerId);
     if (peerConnections != null && peerConnections.isNotEmpty) {
       List<Future<void>> ps = [];
       for (var peerConnection in peerConnections) {
         if (clientId == null || peerConnection.clientId == clientId) {
-          Future<void> p = peerConnection.send(data);
+          Future<void> p =
+              peerConnection.send(data, cryptoOption: cryptoOption);
           ps.add(p);
         }
       }
