@@ -469,13 +469,15 @@ class PeerConnectionPool {
   /// 向peer发送信息，如果是多个，遍历发送
   /// @param peerId
   /// @param data
-  Future<void> send(String peerId, Uint8List data) async {
+  Future<void> send(String peerId, Uint8List data, {String? clientId}) async {
     List<AdvancedPeerConnection>? peerConnections = get(peerId);
     if (peerConnections != null && peerConnections.isNotEmpty) {
       List<Future<void>> ps = [];
       for (var peerConnection in peerConnections) {
-        Future<void> p = peerConnection.send(data);
-        ps.add(p);
+        if (clientId == null || peerConnection.clientId == clientId) {
+          Future<void> p = peerConnection.send(data);
+          ps.add(p);
+        }
       }
       await Future.wait(ps);
     }
