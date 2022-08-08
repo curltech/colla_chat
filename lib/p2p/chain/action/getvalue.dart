@@ -1,4 +1,4 @@
-import '../../../entity/p2p/message.dart';
+import '../../../entity/p2p/chain_message.dart';
 import '../baseaction.dart';
 
 ///根据key值搜索服务器数据

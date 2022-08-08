@@ -1,6 +1,6 @@
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 
-import '../../../entity/p2p/message.dart';
+import '../../../entity/p2p/chain_message.dart';
 import '../../../tool/util.dart';
 import '../baseaction.dart';
 

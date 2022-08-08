@@ -9,7 +9,7 @@ class ChainMessage extends SecurityContext {
   /// 如果目标是客户机节点，先找到客户机目前连接的服务器节点，也许就是自己，然后转发
   String? targetConnectPeerId;
   String? targetConnectSessionId;
-  String? targetClientId;
+  String? clientId;
   String? targetAddress;
 
   /// src字段在发送的时候不填，到接收端自动填充,ConnectSessionId在发送的时候不填，到接收端自动填充
@@ -28,9 +28,8 @@ class ChainMessage extends SecurityContext {
   String? messageDirect;
   bool needSlice = false;
 
-  /// 不跨网络传输，是transportPayload检验过后还原的对象，传输时通过转换成transportPayload传输
-  //List<int>? payload;
-  dynamic payload;
+  /// 二进制格式的消息负载经过base64后的寄送格式，字符串
+  String? transportPayload;
 
   ///
   /// 根据此字段来把TransportPayload对应的字节还原成Payload的对象，最简单的就是字符串
@@ -51,7 +50,7 @@ class ChainMessage extends SecurityContext {
         topic = json['topic'],
         targetConnectPeerId = json['targetConnectPeerId'],
         targetConnectSessionId = json['targetConnectSessionId'],
-        targetClientId = json['targetClientId'],
+        clientId = json['targetClientId'],
         targetAddress = json['targetAddress'],
         srcConnectSessionId = json['srcConnectSessionId'],
         srcConnectPeerId = json['srcConnectPeerId'],
@@ -70,6 +69,7 @@ class ChainMessage extends SecurityContext {
         sliceSize = json['sliceSize'] ?? 0,
         sliceNumber = json['sliceNumber'] ?? 0,
         statusCode = json['statusCode'] ?? 0,
+        transportPayload = json['transportPayload'] ?? '',
         super.fromJson(json);
 
   @override
@@ -80,7 +80,7 @@ class ChainMessage extends SecurityContext {
       'topic': topic,
       'targetConnectPeerId': targetConnectPeerId,
       'targetConnectSessionId': targetConnectSessionId,
-      'targetClientId': targetClientId,
+      'targetClientId': clientId,
       'targetAddress': targetAddress,
       'srcConnectPeerId': srcConnectPeerId,
       'srcConnectSessionId': srcConnectSessionId,
@@ -98,6 +98,7 @@ class ChainMessage extends SecurityContext {
       'sliceSize': sliceSize,
       'sliceNumber': sliceNumber,
       'statusCode': statusCode,
+      'transportPayload': transportPayload,
     });
     return json;
   }

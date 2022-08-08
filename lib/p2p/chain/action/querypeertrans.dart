@@ -1,4 +1,4 @@
-import '../../../entity/p2p/message.dart';
+import '../../../entity/p2p/chain_message.dart';
 import '../baseaction.dart';
 
 ///查询服务器的交易信息

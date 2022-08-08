@@ -68,7 +68,9 @@ enum ChatSubMessageType {
   callClose,
   callRequest, // 通话请求
   recall,
-  groupFile
+  groupFile,
+  //signal加解密
+  preKeyBundle,
 }
 
 enum MessageStatus {

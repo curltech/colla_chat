@@ -1,4 +1,4 @@
-import '../../../entity/p2p/message.dart';
+import '../../../entity/p2p/chain_message.dart';
 import '../../../provider/app_data_provider.dart';
 import '../../../tool/util.dart';
 import '../baseaction.dart';

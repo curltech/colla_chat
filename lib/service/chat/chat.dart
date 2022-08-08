@@ -146,7 +146,11 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.receiverName = name;
     chatMessage.groupPeerId = groupPeerId;
     chatMessage.groupName = groupName;
-    chatMessage.title = title;
+    if (title != null) {
+      List<int> raw = CryptoUtil.stringToUtf8(title);
+      title = CryptoUtil.encodeBase64(raw);
+      chatMessage.title = title;
+    }
     if (thumbBody != null) {
       chatMessage.thumbBody = CryptoUtil.encodeBase64(thumbBody);
     }
@@ -247,70 +251,6 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
     post = (Map map) {
       return MessageAttachment.fromJson(map);
     };
-  }
-
-  store(dynamic entity) async {
-    List<MessageAttachment> attaches = entity.attaches;
-    var peerProfile = myself.peerProfile;
-    if (peerProfile != null && peerProfile.localDataCryptoSwitch) {
-      SecurityContext securityContext = SecurityContext();
-      securityContext.needCompress = true;
-      securityContext.needEncrypt = true;
-      for (var attach in attaches) {
-        if (EntityState.delete.name == entity.state) {
-          attach.state = EntityState.delete;
-          continue;
-        }
-        var content = attach.content;
-        if (content != null) {
-          var result = await SecurityContextService.encrypt(
-              content.codeUnits, securityContext);
-          attach.payloadKey = result.payloadKey;
-          attach.needCompress = result.needCompress;
-          attach.needCompress = result.needEncrypt;
-          attach.content = result.transportPayload;
-          attach.payloadHash = result.payloadHash;
-        }
-      }
-      await save(attaches, [], entity.attachs);
-    } else {
-      await save(attaches, [], entity.attachs);
-    }
-  }
-
-  load(String attachBlockId, int? offset) async {
-    var where = 'attachBlockId=? and ownerPeerId=?';
-    var peerId = myself.peerId;
-    if (peerId == null) {
-      return;
-    }
-    List<Object> whereArgs = [attachBlockId, peerId];
-    List<MessageAttachment> attaches = [];
-    var data = await find(
-      where: where,
-      whereArgs: whereArgs,
-    );
-    SecurityContext securityContext = SecurityContext();
-    securityContext.needCompress = true;
-    securityContext.needEncrypt = true;
-    for (var d in data) {
-      var chatAttach = d as MessageAttachment;
-      var payloadKey = chatAttach.payloadKey;
-      if (payloadKey != null) {
-        securityContext.payloadKey = payloadKey;
-        var content = chatAttach.content;
-        if (content != null) {
-          List<int>? data =
-              await SecurityContextService.decrypt(content, securityContext);
-          //d.content = StringUtil.decodeURI(payload)
-          if (data != null) {
-            chatAttach.content = CryptoUtil.uint8ListToStr(data);
-          }
-        }
-      }
-      attaches.add(chatAttach);
-    }
-    return attaches;
   }
 }
 

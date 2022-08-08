@@ -288,6 +288,18 @@ class JsonUtil {
 
     return jsonEncode(map);
   }
+
+  ///把任意对象转换成List<int>,字符串假设为base64字符串
+  ///其他的对象先转换成json字符串，然后变成utf8字节数组
+  static List<int> toUintList(dynamic entity) {
+    if (entity is List<int>) {
+      return entity;
+    } else if (entity is String) {
+      return CryptoUtil.decodeBase64(entity);
+    }
+    String json = toJsonString(entity);
+    return CryptoUtil.stringToUtf8(json);
+  }
 }
 
 class DateUtil {

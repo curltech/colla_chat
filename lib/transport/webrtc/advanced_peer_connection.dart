@@ -1,11 +1,15 @@
 import 'dart:typed_data';
 
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../provider/app_data_provider.dart';
+import '../../service/p2p/security_context.dart';
+import '../../service/servicelocator.dart';
 import '../../tool/util.dart';
 
 class SignalExtension {
@@ -136,12 +140,8 @@ class AdvancedPeerConnection {
           .onClosed(WebrtcEvent(peerId, clientId: clientId));
     });
 
-    //收到数据
-    basePeerConnection.on(WebrtcEventType.message, (data) async {
-      logger.i('${DateTime.now().toUtc()}:got a message from peer');
-      await peerConnectionPool
-          .onMessage(WebrtcEvent(peerId, clientId: clientId, data: data));
-    });
+    //收到数据，带解密功能，取最后一位整数，表示解密选项，得到何种解密方式，然后解密
+    basePeerConnection.on(WebrtcEventType.message, onMessage);
 
     basePeerConnection.on(WebrtcEventType.stream, (stream) async {
       if (stream != null) {
@@ -184,9 +184,41 @@ class AdvancedPeerConnection {
     return basePeerConnection.status == PeerConnectionStatus.connected;
   }
 
-  Future<void> send(Uint8List data) async {
+  //收到数据，带解密功能，取最后一位整数，表示解密选项，得到何种解密方式，然后解密
+  onMessage(Uint8List data) async {
+    logger.i('${DateTime.now().toUtc()}:got a message from peer');
+    int cryptOption = data[data.length - 1];
+    SecurityContextService? securityContextService =
+        ServiceLocator.securityContextServices[cryptOption];
+    securityContextService =
+        securityContextService ?? noneSecurityContextService;
+    SecurityContext securityContext = SecurityContext();
+    securityContext.srcPeerId = peerId;
+    securityContext.payload = data.sublist(0, data.length - 1);
+    bool result = await securityContextService.decrypt(securityContext);
+    if (result) {
+      await peerConnectionPool.onMessage(WebrtcEvent(peerId,
+          clientId: clientId, data: securityContext.payload));
+    }
+  }
+
+  ///发送数据，带加密选项
+  Future<void> send(Uint8List data,
+      {CryptoOption cryptoOption = CryptoOption.none}) async {
     if (connected) {
-      return await basePeerConnection.send(data);
+      int cryptOptionIndex = cryptoOption.index;
+      SecurityContextService? securityContextService =
+          ServiceLocator.securityContextServices[cryptOptionIndex];
+      securityContextService =
+          securityContextService ?? cryptographySecurityContextService;
+      SecurityContext securityContext = SecurityContext();
+      securityContext.targetPeerId = peerId;
+      securityContext.payload = data;
+      bool result = await securityContextService.encrypt(securityContext);
+      if (result) {
+        data.add(cryptOptionIndex);
+        return await basePeerConnection.send(data);
+      }
     } else {
       logger.e(
           'send failed , peerId:$peerId;connectPeer:$connectPeerId session:$connectSessionId webrtc connection state is not connected');

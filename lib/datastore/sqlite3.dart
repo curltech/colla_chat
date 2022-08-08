@@ -278,7 +278,7 @@ class Sqlite3 extends DataStore {
     return result;
   }
 
-  /// 更新记录
+  /// 更新记录。根据entity的id字段作为条件，其他字段作为更新的值
   /// @param {*} tableName
   /// @param {*} entity
   /// @param {*} condition

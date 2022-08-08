@@ -1,5 +1,5 @@
 import 'package:colla_chat/datastore/sqlite3.dart';
-import 'package:colla_chat/entity/p2p/message.dart';
+import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/p2p/chain/action/connect.dart';
 import 'package:colla_chat/p2p/chain/action/ionsignal.dart';
 import 'package:colla_chat/p2p/chain/action/p2pchat.dart';
@@ -7,6 +7,8 @@ import 'package:colla_chat/service/stock/account.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 
+import '../crypto/signalprotocol.dart';
+import '../entity/p2p/security_context.dart';
 import '../p2p/chain/action/chat.dart';
 import '../p2p/chain/action/ping.dart';
 import '../p2p/chain/action/signal.dart';
@@ -22,10 +24,12 @@ import 'dht/peerclient.dart';
 import 'dht/peerendpoint.dart';
 import 'dht/peerprofile.dart';
 import 'general_base.dart';
+import 'p2p/security_context.dart';
 
 class ServiceLocator {
   static Map<String, GeneralBaseService> services = {};
   static Map<MsgType, BaseAction> actions = {};
+  static Map<int, SecurityContextService> securityContextServices = {};
 
   static GeneralBaseService? get(String serviceName) {
     return services[serviceName];
@@ -62,14 +66,16 @@ class ServiceLocator {
     actions[MsgType.PING] = pingAction;
     actions[MsgType.IONSIGNAL] = ionSignalAction;
 
-    await Sqlite3.getInstance();
+    securityContextServices[CryptoOption.none.index] =
+        noneSecurityContextService;
+    securityContextServices[CryptoOption.compress.index] =
+        compressSecurityContextService;
+    securityContextServices[CryptoOption.cryptography.index] =
+        cryptographySecurityContextService;
+    securityContextServices[CryptoOption.signal.index] =
+        signalSecurityContextService;
 
-    // PlatformParams platformParams = await PlatformParams.instance;
-    // if (platformParams.web) {
-    //   await IndexedDb.getInstance();
-    // } else {
-    //   await Sqflite.getInstance();
-    // }
+    await Sqlite3.getInstance();
   }
 
   /// entity包含所有的字段，假设是字符串类型，fields是需要特别说明的字段，比如不是字符串类型

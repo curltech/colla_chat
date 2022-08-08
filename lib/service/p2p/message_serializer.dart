@@ -7,14 +7,14 @@ import '../../crypto/util.dart';
 class MessageSerializer {
   MessageSerializer();
 
-  static Uint8List marshal(dynamic value) {
+  static List<int> marshal(dynamic value) {
     String json = JsonUtil.toJsonString(value);
 
-    return CryptoUtil.strToUint8List(json);
+    return CryptoUtil.stringToUtf8(json);
   }
 
   static Map unmarshal(List<int> data) {
-    var json = CryptoUtil.uint8ListToStr(data);
+    var json = CryptoUtil.utf8ToString(data);
 
     return JsonUtil.toJson(json);
   }

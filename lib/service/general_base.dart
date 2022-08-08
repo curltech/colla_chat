@@ -190,11 +190,15 @@ abstract class GeneralBaseService<T> {
         String? value = json[encryptField];
         if (StringUtil.isNotEmpty(value)) {
           try {
-            securityContext = await SecurityContextService.encrypt(
-                CryptoUtil.decodeBase64(value!), securityContext);
-            json[encryptField] = securityContext.transportPayload;
-            json['payloadKey'] = securityContext.payloadKey;
-            json['payloadHash'] = securityContext.payloadHash;
+            securityContext.payload = CryptoUtil.decodeBase64(value!);
+            var result = await cryptographySecurityContextService
+                .encrypt(securityContext);
+            if (result) {
+              json[encryptField] =
+                  CryptoUtil.encodeBase64(securityContext.payload);
+              json['payloadKey'] = securityContext.payloadKey;
+              json['payloadHash'] = securityContext.payloadHash;
+            }
           } catch (err) {
             logger.e('SecurityContextService encrypt err:$err');
           }
@@ -224,11 +228,15 @@ abstract class GeneralBaseService<T> {
         String? value = json[encryptField];
         if (StringUtil.isNotEmpty(value)) {
           try {
-            List<int> data =
-                await SecurityContextService.decrypt(value!, securityContext);
-            json[encryptField] = CryptoUtil.encodeBase64(data);
-          } catch (err) {
-            logger.e('SecurityContextService decrypt err:$err');
+            securityContext.payload = CryptoUtil.decodeBase64(value!);
+            var result = await cryptographySecurityContextService
+                .decrypt(securityContext);
+            if (result) {
+              var data = securityContext.payload;
+              json[encryptField] = CryptoUtil.encodeBase64(data);
+            }
+          } catch (e) {
+            logger.e('SecurityContextService decrypt err:$e');
           }
         }
       }
@@ -247,10 +255,12 @@ abstract class GeneralBaseService<T> {
     return key;
   }
 
+  // 删除记录。根据entity的id字段作为条件删除，entity可以是Map
   Future<int> delete(dynamic entity) {
     return dataStore.delete(tableName, entity: entity);
   }
 
+  // 更新记录。根据entity的id字段作为条件，其他字段作为更新的值，entity可以是Map
   Future<int> update(dynamic entity, [dynamic? ignore, dynamic? parent]) async {
     EntityUtil.updateTimestamp(entity);
     Map<String, dynamic> json = await encrypt(entity);
