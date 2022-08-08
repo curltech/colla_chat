@@ -190,11 +190,15 @@ abstract class GeneralBaseService<T> {
         String? value = json[encryptField];
         if (StringUtil.isNotEmpty(value)) {
           try {
-            securityContext = await cryptographySecurityContextService.encrypt(
-                CryptoUtil.decodeBase64(value!), securityContext);
-            json[encryptField] = securityContext.transportPayload;
-            json['payloadKey'] = securityContext.payloadKey;
-            json['payloadHash'] = securityContext.payloadHash;
+            securityContext.payload = CryptoUtil.decodeBase64(value!);
+            var result = await cryptographySecurityContextService
+                .encrypt(securityContext);
+            if (result) {
+              json[encryptField] =
+                  CryptoUtil.encodeBase64(securityContext.payload);
+              json['payloadKey'] = securityContext.payloadKey;
+              json['payloadHash'] = securityContext.payloadHash;
+            }
           } catch (err) {
             logger.e('SecurityContextService encrypt err:$err');
           }
@@ -224,9 +228,13 @@ abstract class GeneralBaseService<T> {
         String? value = json[encryptField];
         if (StringUtil.isNotEmpty(value)) {
           try {
-            List<int> data =
-                await cryptographySecurityContextService.decrypt(value!, securityContext);
-            json[encryptField] = CryptoUtil.encodeBase64(data);
+            securityContext.payload = CryptoUtil.decodeBase64(value!);
+            var result = await cryptographySecurityContextService
+                .decrypt(securityContext);
+            if (result) {
+              var data = CryptoUtil.decodeBase64(securityContext.payload);
+              json[encryptField] = CryptoUtil.encodeBase64(data);
+            }
           } catch (err) {
             logger.e('SecurityContextService decrypt err:$err');
           }

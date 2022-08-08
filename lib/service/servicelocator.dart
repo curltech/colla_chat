@@ -1,5 +1,5 @@
 import 'package:colla_chat/datastore/sqlite3.dart';
-import 'package:colla_chat/entity/p2p/message.dart';
+import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/p2p/chain/action/connect.dart';
 import 'package:colla_chat/p2p/chain/action/ionsignal.dart';
 import 'package:colla_chat/p2p/chain/action/p2pchat.dart';
@@ -7,6 +7,7 @@ import 'package:colla_chat/service/stock/account.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 
+import '../entity/p2p/security_context.dart';
 import '../p2p/chain/action/chat.dart';
 import '../p2p/chain/action/ping.dart';
 import '../p2p/chain/action/signal.dart';
@@ -66,7 +67,8 @@ class ServiceLocator {
 
     securityContextServices[CryptoOption.none.index] =
         noneSecurityContextService;
-    //securityContextServices[CryptoOption.compress.index]=compressSecurityContextService;
+    securityContextServices[CryptoOption.compress.index] =
+        compressSecurityContextService;
     securityContextServices[CryptoOption.cryptography.index] =
         cryptographySecurityContextService;
 

@@ -10,7 +10,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../crypto/util.dart';
 import '../../entity/chat/chat.dart';
-import '../../entity/p2p/message.dart';
+import '../../entity/p2p/chain_message.dart';
 import '../../p2p/chain/action/signal.dart';
 import '../../pages/chat/me/webrtc/peer_connection_controller.dart';
 import '../../provider/app_data_provider.dart';

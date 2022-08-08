@@ -1,4 +1,4 @@
-import 'package:colla_chat/entity/p2p/message.dart';
+import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/p2p/chain/action/findclient.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';

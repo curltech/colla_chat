@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../crypto/util.dart';
 import '../../entity/dht/myself.dart';
-import '../../entity/p2p/message.dart';
+import '../../entity/p2p/chain_message.dart';
 import '../../entity/p2p/security_context.dart';
 import '../../provider/app_data_provider.dart';
 import '../../service/p2p/message.dart';
@@ -40,7 +40,8 @@ class ChainMessageHandler {
       try {
         await chainMessageHandler.encrypt(response);
       } catch (err) {
-        response = chainMessageHandler.error(chainMessage.messageType, err.toString());
+        response =
+            chainMessageHandler.error(chainMessage.messageType, err.toString());
       }
       chainMessageHandler.setResponse(chainMessage, response);
       List<int> responseData = MessageSerializer.marshal(response);
@@ -174,16 +175,20 @@ class ChainMessageHandler {
     //     securityContext.needEncrypt) {
     //   logger.e('ConnectPeerId equals TargetPeerId && NeedEncrypt is true!');
     // }
-    SecurityContext result =
-        await cryptographySecurityContextService.encrypt(payload, securityContext);
-    chainMessage.transportPayload = result.transportPayload;
-    chainMessage.payload = null;
-    chainMessage.payloadSignature = result.payloadSignature;
-    chainMessage.previousPublicKeyPayloadSignature =
-        result.previousPublicKeyPayloadSignature;
-    chainMessage.needCompress = result.needCompress;
-    chainMessage.needEncrypt = result.needEncrypt;
-    chainMessage.payloadKey = result.payloadKey;
+    securityContext.payload = payload;
+    bool result =
+        await cryptographySecurityContextService.encrypt(securityContext);
+    if (result) {
+      chainMessage.transportPayload =
+          CryptoUtil.encodeBase64(securityContext.payload);
+      chainMessage.payload = null;
+      chainMessage.payloadSignature = securityContext.payloadSignature;
+      chainMessage.previousPublicKeyPayloadSignature =
+          securityContext.previousPublicKeyPayloadSignature;
+      chainMessage.needCompress = securityContext.needCompress;
+      chainMessage.needEncrypt = securityContext.needEncrypt;
+      chainMessage.payloadKey = securityContext.payloadKey;
+    }
 
     return chainMessage;
   }
@@ -205,11 +210,15 @@ class ChainMessageHandler {
     targetPeerId ??= chainMessage.connectPeerId;
     securityContext.targetPeerId = targetPeerId;
     securityContext.srcPeerId = chainMessage.srcPeerId;
-    var payload = await cryptographySecurityContextService.decrypt(
-        chainMessage.transportPayload!, securityContext);
-    if (payload != null) {
-      chainMessage.payload = payload;
-      chainMessage.transportPayload = '';
+    securityContext.payload = chainMessage.transportPayload!;
+    var result =
+        await cryptographySecurityContextService.decrypt(securityContext);
+    if (result) {
+      var payload = securityContext.payload;
+      if (payload != null) {
+        chainMessage.payload = payload;
+        chainMessage.transportPayload = '';
+      }
     }
     return null;
   }

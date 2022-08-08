@@ -8,19 +8,38 @@ import '../../provider/app_data_provider.dart';
 import '../../service/dht/peerclient.dart';
 import '../../tool/util.dart';
 
-enum CryptoOption { none, compress, cryptography, web, openpgp, signal }
-
-abstract class SecurityContextService {
+class SecurityContextService {
   ///加密，而且把二进制数据base64转换成为securityContext的transportPayload字段String
-  Future<SecurityContext> encrypt(
-      List<int> payload, SecurityContext securityContext);
+  Future<bool> encrypt(SecurityContext securityContext) async {
+    int cryptoOptionIndex = securityContext.cryptoOptionIndex;
+    if (cryptoOptionIndex == CryptoOption.cryptography.index) {
+      return cryptographySecurityContextService.encrypt(securityContext);
+    } else if (cryptoOptionIndex == CryptoOption.none.index) {
+      return noneSecurityContextService.encrypt(securityContext);
+    } else if (cryptoOptionIndex == CryptoOption.compress.index) {
+      return compressSecurityContextService.encrypt(securityContext);
+    }
+    return cryptographySecurityContextService.encrypt(securityContext);
+  }
 
   ///解密，而且把String数据base64转换成为二进制的返回数据
-  Future<List<int>> decrypt(
-      String transportPayload, SecurityContext securityContext);
+  Future<bool> decrypt(SecurityContext securityContext) async {
+    int cryptoOptionIndex = securityContext.cryptoOptionIndex;
+    if (cryptoOptionIndex == CryptoOption.cryptography.index) {
+      return cryptographySecurityContextService.decrypt(securityContext);
+    } else if (cryptoOptionIndex == CryptoOption.cryptography.index) {
+      return cryptographySecurityContextService.decrypt(securityContext);
+    } else if (cryptoOptionIndex == CryptoOption.none.index) {
+      return noneSecurityContextService.decrypt(securityContext);
+    } else if (cryptoOptionIndex == CryptoOption.compress.index) {
+      return compressSecurityContextService.decrypt(securityContext);
+    }
+    return cryptographySecurityContextService.decrypt(securityContext);
+  }
 }
 
-/// 对任意结构的负载进行压缩，签名，加密处理
+final SecurityContextService securityContextService = SecurityContextService();
+
 class NoneSecurityContextService extends SecurityContextService {
   NoneSecurityContextService();
 
@@ -29,11 +48,12 @@ class NoneSecurityContextService extends SecurityContextService {
   /// @param payload
   /// @param securityParams
   @override
-  Future<SecurityContext> encrypt(
-      List<int> payload, SecurityContext securityContext) async {
-    securityContext.transportPayload = CryptoUtil.encodeBase64(payload);
+  Future<bool> encrypt(SecurityContext securityContext) async {
+    securityContext.needCompress = false;
+    securityContext.needSign = false;
+    securityContext.needEncrypt = false;
 
-    return securityContext;
+    return cryptographySecurityContextService.encrypt(securityContext);
   }
 
   /// 加密参数必须有是否压缩，是否加密，源peerId，目标peerId，加密键值，签名
@@ -41,15 +61,50 @@ class NoneSecurityContextService extends SecurityContextService {
   /// @param payload
   /// @param securityParams
   @override
-  Future<List<int>> decrypt(
-      String transportPayload, SecurityContext securityContext) async {
-    List<int> data = CryptoUtil.decodeBase64(transportPayload);
-    return data;
+  Future<bool> decrypt(SecurityContext securityContext) async {
+    securityContext.needCompress = false;
+    securityContext.needSign = false;
+    securityContext.needEncrypt = false;
+
+    return cryptographySecurityContextService.decrypt(securityContext);
   }
 }
 
 final NoneSecurityContextService noneSecurityContextService =
     NoneSecurityContextService();
+
+class CompressSecurityContextService extends SecurityContextService {
+  CompressSecurityContextService();
+
+  /// 加密参数必须有是否压缩，是否加密，目标peerId
+  /// 返回参数包括结果负载，是否压缩，是否加密，加密键值，签名
+  /// @param payload
+  /// @param securityParams
+  @override
+  Future<bool> encrypt(SecurityContext securityContext) async {
+    securityContext.needCompress = true;
+    securityContext.needSign = false;
+    securityContext.needEncrypt = false;
+
+    return cryptographySecurityContextService.encrypt(securityContext);
+  }
+
+  /// 加密参数必须有是否压缩，是否加密，源peerId，目标peerId，加密键值，签名
+  /// 返回负载
+  /// @param payload
+  /// @param securityParams
+  @override
+  Future<bool> decrypt(SecurityContext securityContext) async {
+    securityContext.needCompress = true;
+    securityContext.needSign = false;
+    securityContext.needEncrypt = false;
+
+    return cryptographySecurityContextService.decrypt(securityContext);
+  }
+}
+
+final CompressSecurityContextService compressSecurityContextService =
+    CompressSecurityContextService();
 
 /// 对任意结构的负载进行压缩，签名，加密处理
 class CryptographySecurityContextService extends SecurityContextService {
@@ -60,43 +115,55 @@ class CryptographySecurityContextService extends SecurityContextService {
   /// @param payload
   /// @param securityParams
   @override
-  Future<SecurityContext> encrypt(
-      List<int> payload, SecurityContext securityContext) async {
-    List<int> data = payload;
-    SecurityContext result = SecurityContext();
-    // 消息的数据部分转换成字符串，签名，加密，压缩，base64
-    var myselfPrivateKey = myself.privateKey;
-    if (myselfPrivateKey == null) {
-      throw 'NullMyselfPrivateKey';
+  Future<bool> encrypt(SecurityContext securityContext) async {
+    bool result = true;
+    dynamic payload = securityContext.payload;
+    bool needEncrypt = securityContext.needEncrypt;
+    bool needCompress = securityContext.needCompress;
+    bool needSign = securityContext.needSign;
+    if (!needEncrypt && !needCompress && !needSign) {
+      return true;
     }
-    result.needEncrypt = securityContext.needEncrypt;
-    result.needCompress = securityContext.needCompress;
-    result.needSign = securityContext.needSign;
+    List<int> data = JsonUtil.toUintList(payload);
+
     // 1.设置签名（本地保存前加密不签名），只有在加密的情况下才设置签名
     var targetPeerId = securityContext.targetPeerId;
     var peerId = myself.peerId;
-    if (securityContext.needSign &&
-        targetPeerId != null &&
-        peerId != null &&
-        targetPeerId != peerId) {
-      /// 签名，并且用上一次过期的私钥也签名
-      var payloadSignature = await cryptoGraphy.sign(data, myselfPrivateKey);
-      result.payloadSignature = CryptoUtil.encodeBase64(payloadSignature);
-      if (myself.expiredKeys.isNotEmpty) {
-        var previousPublicKeyPayloadSignature =
-            await cryptoGraphy.sign(data, myself.expiredKeys[0]);
-        result.previousPublicKeyPayloadSignature =
-            CryptoUtil.encodeBase64(previousPublicKeyPayloadSignature);
+    if (needSign) {
+      if (peerId != null) {
+        /// 签名，并且用上一次过期的私钥也签名
+        var myselfPrivateKey = myself.privateKey;
+        if (myselfPrivateKey == null) {
+          logger.e("myselfPrivateKey is null, will not be signed!");
+          return false;
+        }
+        var payloadSignature = await cryptoGraphy.sign(data, myselfPrivateKey);
+        securityContext.payloadSignature =
+            CryptoUtil.encodeBase64(payloadSignature);
+        if (myself.expiredKeys.isNotEmpty) {
+          var previousPublicKeyPayloadSignature =
+              await cryptoGraphy.sign(data, myself.expiredKeys[0]);
+          securityContext.previousPublicKeyPayloadSignature =
+              CryptoUtil.encodeBase64(previousPublicKeyPayloadSignature);
+        }
+      } else {
+        logger.e("myself is null, will not be signed!");
+        return false;
       }
     }
 
     // 本地保存needCompress为true即压缩
-    if (securityContext.needCompress) {
+    if (needCompress) {
       //2. 压缩数据
-      data = CryptoUtil.compress(data);
+      try {
+        data = CryptoUtil.compress(data);
+      } catch (err) {
+        logger.e("compress failure:$err");
+        return false;
+      }
     }
-    if (securityContext.needEncrypt) {
-      //3. 数据加密，base64
+    if (needEncrypt) {
+      //3. 数据加密
       SimplePublicKey? targetPublicKey;
       if (targetPeerId != null && peerId != null && targetPeerId != peerId) {
         targetPublicKey = await peerClientService.getPublicKey(targetPeerId);
@@ -106,7 +173,7 @@ class CryptographySecurityContextService extends SecurityContextService {
       }
       if (targetPublicKey == null) {
         logger.e("TargetPublicKey is null, will not be encrypted!");
-        throw 'without TargetPublicKey';
+        return false;
       }
 
       // 目标公钥不为空时加密数据
@@ -124,24 +191,24 @@ class CryptographySecurityContextService extends SecurityContextService {
             }
           }
           secretKey ??= await cryptoGraphy.getRandomBytes();
-          result.secretKey = secretKey;
+          securityContext.secretKey = secretKey;
         }
         data = await cryptoGraphy.aesEncrypt(data, secretKey);
         // 对对称密钥进行目标公钥加密
         var encryptedKey = await cryptoGraphy.eccEncrypt(secretKey,
             remotePublicKey: targetPublicKey);
-        result.payloadKey = CryptoUtil.encodeBase64(encryptedKey);
+        securityContext.payloadKey = CryptoUtil.encodeBase64(encryptedKey);
       } else {
+        //直接加密，不用给定的密钥
         data = await cryptoGraphy.eccEncrypt(data,
             remotePublicKey: targetPublicKey);
       }
     }
-    // 无论是否经过压缩和加密，进行based64处理
-    result.transportPayload = CryptoUtil.encodeBase64(data);
+
     // 设置数据的hash，base64
     var payloadHash = await cryptoGraphy.hash(data);
     var payloadHashBase64 = CryptoUtil.encodeBase64(payloadHash);
-    result.payloadHash = payloadHashBase64;
+    securityContext.payloadHash = payloadHashBase64;
 
     return result;
   }
@@ -151,118 +218,140 @@ class CryptographySecurityContextService extends SecurityContextService {
   /// @param payload
   /// @param securityParams
   @override
-  Future<List<int>> decrypt(
-      String transportPayload, SecurityContext securityContext) async {
+  Future<bool> decrypt(SecurityContext securityContext) async {
+    bool result = true;
+    dynamic payload = securityContext.payload;
+    List<int> data = JsonUtil.toUintList(payload);
+    bool needEncrypt = securityContext.needEncrypt;
+    bool needCompress = securityContext.needCompress;
+    bool needSign = securityContext.needSign;
+    if (!needEncrypt && !needCompress && !needSign) {
+      return true;
+    }
     var targetPeerId = securityContext.targetPeerId;
     var peerId = myself.peerId;
-    List<int> data = CryptoUtil.decodeBase64(transportPayload);
-    // 本地保存前加密targetPeerId可为空
-    if (targetPeerId == null || targetPeerId == peerId) {
-      // 消息的数据部分，base64
-      var needEncrypt = securityContext.needEncrypt;
-      if (needEncrypt) {
-        var privateKey = myself.privateKey;
-        if (privateKey == null) {
-          throw 'NullPrivateKey';
-        }
-        // 1.对对称密钥进行私钥解密
-        var payloadKey = securityContext.payloadKey;
-        // 如果存在加密密钥，对密钥进行ecc解密
-        List<int>? secretKey = securityContext.secretKey;
-        if (StringUtil.isNotEmpty(payloadKey) || secretKey != null) {
-          if (secretKey == null) {
-            try {
-              secretKey = await cryptoGraphy.eccDecrypt(
-                  CryptoUtil.decodeBase64(payloadKey!),
-                  localKeyPair: privateKey);
-            } catch (e) {
-              logger.e(e.toString());
-            }
-          }
-          var i = 0;
-          while (secretKey == null && i < myself.expiredKeys.length) {
-            try {
-              secretKey = await cryptoGraphy.eccDecrypt(
-                  CryptoUtil.decodeBase64(payloadKey!),
-                  localKeyPair: myself.expiredKeys[i]);
-            } catch (e) {
-              logger.e(e.toString());
-            } finally {
-              i++;
-            }
-          }
-          if (secretKey == null) {
-            throw 'EccDecryptFailed';
-          }
-          // 数据解密
-          data = await cryptoGraphy.aesDecrypt(data, secretKey);
-        } else {
-          //直接ecc数据解密
-          data = await cryptoGraphy.eccDecrypt(data, localKeyPair: privateKey);
-        }
+    if (targetPeerId != null && peerId != null && targetPeerId != peerId) {
+      logger.e('targetPeerId is not myself');
+      return false;
+    }
+    // 消息的数据部分，base64
+    if (needEncrypt) {
+      var privateKey = myself.privateKey;
+      if (privateKey == null) {
+        logger.e('NullPrivateKey');
+        return false;
       }
-
-      var needCompress = securityContext.needCompress;
-      if (needCompress) {
-        // 2. 解压缩
-        data = CryptoUtil.uncompress(data);
-      }
-      //3. 消息的数据部分，验证签名
-      var needSign = securityContext.needSign;
-      if (needSign) {
-        var payloadSignature = securityContext.payloadSignature;
-        if (payloadSignature != null) {
-          SimplePublicKey? srcPublicKey;
-          var srcPeerId = securityContext.srcPeerId;
-          if (srcPeerId != null && peerId != null && srcPeerId != peerId) {
-            srcPublicKey = await peerClientService.getPublicKey(srcPeerId);
-          } else {
-            throw 'NullSrcPeerId';
-            // 本地保存前加密如果签名，验签需尝试所有expiredPublicKey
-            //srcPublicKey = myself.publicKey
-          }
-          if (srcPublicKey == null) {
-            throw 'NullSrcPublicKey';
-          }
-          var pass = await cryptoGraphy.verify(data, payloadSignature.codeUnits,
-              publicKey: srcPublicKey);
-          if (!pass) {
-            var previousPublicKeyPayloadSignature =
-                securityContext.previousPublicKeyPayloadSignature;
-            if (previousPublicKeyPayloadSignature != null) {
-              pass = await cryptoGraphy.verify(
-                  data, previousPublicKeyPayloadSignature.codeUnits,
-                  publicKey: srcPublicKey);
-            }
-
-            var srcPeerId = securityContext.srcPeerId;
-            if (!pass && srcPeerId != null) {
-              var peerClients = [
-                peerClientService.findCachedOneByPeerId(srcPeerId)
-              ];
-              if (peerClients.isNotEmpty) {
-                srcPublicKey = await peerClientService.getPublicKey(srcPeerId);
-                if (srcPublicKey != null) {
-                  pass = await cryptoGraphy.verify(
-                      data, payloadSignature.codeUnits,
-                      publicKey: srcPublicKey);
-                } else {
-                  throw 'NullSrcPublicKey';
-                }
-              }
-              if (!pass) {
-                logger.e("PayloadVerifyFailure");
-                //throw new Error("PayloadVerifyFailure")
-              }
-            } else {
-              logger.e("PeerClientNotExists");
-            }
+      // 1.对对称密钥进行私钥解密
+      var payloadKey = securityContext.payloadKey;
+      // 如果存在加密密钥，对密钥进行ecc解密
+      List<int>? secretKey = securityContext.secretKey;
+      if (StringUtil.isNotEmpty(payloadKey) || secretKey != null) {
+        if (secretKey == null) {
+          try {
+            secretKey = await cryptoGraphy.eccDecrypt(
+                CryptoUtil.decodeBase64(payloadKey!),
+                localKeyPair: privateKey);
+          } catch (e) {
+            logger.e(e.toString());
           }
         }
+        var i = 0;
+        while (secretKey == null && i < myself.expiredKeys.length) {
+          try {
+            secretKey = await cryptoGraphy.eccDecrypt(
+                CryptoUtil.decodeBase64(payloadKey!),
+                localKeyPair: myself.expiredKeys[i]);
+          } catch (e) {
+            logger.e(e.toString());
+          } finally {
+            i++;
+          }
+        }
+        if (secretKey == null) {
+          logger.e('EccDecryptFailed');
+          return false;
+        }
+        // 数据解密
+        data = await cryptoGraphy.aesDecrypt(data, secretKey);
+      } else {
+        //直接ecc数据解密
+        data = await cryptoGraphy.eccDecrypt(data, localKeyPair: privateKey);
       }
     }
+    if (needCompress) {
+      // 2. 解压缩
+      try {
+        data = CryptoUtil.uncompress(data);
+      } catch (err) {
+        logger.e("uncompress failure:$err");
+        return false;
+      }
+    }
+    //3. 消息的数据部分，验证签名
+    if (needSign) {
+      var payloadSignature = securityContext.payloadSignature;
+      if (payloadSignature != null) {
+        SimplePublicKey? srcPublicKey;
+        var srcPeerId = securityContext.srcPeerId;
+        if (srcPeerId != null && peerId != null && srcPeerId != peerId) {
+          srcPublicKey = await peerClientService.getPublicKey(srcPeerId);
+        } else {
+          logger.e('Null SrcPeerId,cannot verify signature');
+          return false;
+          // 本地保存前加密如果签名，验签需尝试所有expiredPublicKey
+          //srcPublicKey = myself.publicKey
+        }
+        if (srcPublicKey == null) {
+          logger.e('NullSrcPublicKey');
+          return false;
+        }
+        var pass = await cryptoGraphy.verify(data, payloadSignature.codeUnits,
+            publicKey: srcPublicKey);
+        if (!pass) {
+          var previousPublicKeyPayloadSignature =
+              securityContext.previousPublicKeyPayloadSignature;
+          if (previousPublicKeyPayloadSignature != null) {
+            pass = await cryptoGraphy.verify(
+                data, previousPublicKeyPayloadSignature.codeUnits,
+                publicKey: srcPublicKey);
+          }
 
-    return data;
+          var srcPeerId = securityContext.srcPeerId;
+          if (!pass && srcPeerId != null) {
+            var peerClients = [
+              peerClientService.findCachedOneByPeerId(srcPeerId)
+            ];
+            if (peerClients.isNotEmpty) {
+              srcPublicKey = await peerClientService.getPublicKey(srcPeerId);
+              if (srcPublicKey != null) {
+                pass = await cryptoGraphy.verify(
+                    data, payloadSignature.codeUnits,
+                    publicKey: srcPublicKey);
+              } else {
+                logger.e('NullSrcPublicKey');
+                return false;
+              }
+            }
+            if (!pass) {
+              logger.e("PayloadVerifyFailure");
+              return false;
+            }
+          } else {
+            logger.e("PeerClientNotExists");
+            return false;
+          }
+        } else {
+          logger.e("PayloadVerifyFailure");
+          return false;
+        }
+      } else {
+        logger.e("payloadSignature is null, cannot verify signature");
+        return false;
+      }
+    }
+    securityContext.payload = data;
+
+    return result;
   }
 }
 

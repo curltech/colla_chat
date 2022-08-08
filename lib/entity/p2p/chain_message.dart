@@ -28,9 +28,8 @@ class ChainMessage extends SecurityContext {
   String? messageDirect;
   bool needSlice = false;
 
-  /// 不跨网络传输，是transportPayload检验过后还原的对象，传输时通过转换成transportPayload传输
-  //List<int>? payload;
-  dynamic payload;
+  /// 二进制格式的消息负载经过base64后的寄送格式，字符串
+  String? transportPayload;
 
   ///
   /// 根据此字段来把TransportPayload对应的字节还原成Payload的对象，最简单的就是字符串
@@ -70,6 +69,7 @@ class ChainMessage extends SecurityContext {
         sliceSize = json['sliceSize'] ?? 0,
         sliceNumber = json['sliceNumber'] ?? 0,
         statusCode = json['statusCode'] ?? 0,
+        transportPayload = json['transportPayload'] ?? '',
         super.fromJson(json);
 
   @override
@@ -98,6 +98,7 @@ class ChainMessage extends SecurityContext {
       'sliceSize': sliceSize,
       'sliceNumber': sliceNumber,
       'statusCode': statusCode,
+      'transportPayload': transportPayload,
     });
     return json;
   }

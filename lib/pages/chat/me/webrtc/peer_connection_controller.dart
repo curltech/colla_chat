@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../entity/chat/chat.dart';
-import '../../../../entity/p2p/message.dart';
+import '../../../../entity/p2p/chain_message.dart';
 import '../../../../p2p/chain/action/signal.dart';
 import '../../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../../transport/webrtc/peer_connection_pool.dart';

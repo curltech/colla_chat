@@ -13,7 +13,7 @@ import '../../entity/dht/myself.dart';
 import '../../entity/dht/myselfpeer.dart';
 import '../../entity/dht/peerclient.dart';
 import '../../entity/dht/peerprofile.dart';
-import '../../entity/p2p/message.dart';
+import '../../entity/p2p/chain_message.dart';
 import '../../p2p/chain/action/connect.dart';
 import '../../p2p/chain/baseaction.dart';
 import '../../platform.dart';

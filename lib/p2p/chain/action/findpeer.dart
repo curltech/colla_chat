@@ -1,5 +1,5 @@
 import '../../../entity/dht/peerendpoint.dart';
-import '../../../entity/p2p/message.dart';
+import '../../../entity/p2p/chain_message.dart';
 import '../../../tool/util.dart';
 import '../baseaction.dart';
 

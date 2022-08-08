@@ -1,7 +1,7 @@
 import '../../../crypto/cryptography.dart';
 import '../../../crypto/util.dart';
 import '../../../entity/dht/peerclient.dart';
-import '../../../entity/p2p/message.dart';
+import '../../../entity/p2p/chain_message.dart';
 import '../../../tool/util.dart';
 import '../baseaction.dart';
 
