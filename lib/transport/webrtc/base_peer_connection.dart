@@ -700,14 +700,15 @@ abstract class BasePeerConnection {
   }
 
   /// 发送二进制消息 text/binary data to the remote peer.
-  Future<void> send(Uint8List message) async {
+  Future<void> send(List<int> message) async {
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
     }
     final dataChannel = this.dataChannel;
     if (dataChannel != null) {
-      var dataChannelMessage = RTCDataChannelMessage.fromBinary(message);
+      var dataChannelMessage =
+          RTCDataChannelMessage.fromBinary(Uint8List.fromList(message));
       return await dataChannel.send(dataChannelMessage);
     }
   }
