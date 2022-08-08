@@ -76,7 +76,7 @@ class PeerClientService extends PeerEntityService<PeerClient> {
 
   store(PeerClient peerClient) async {
     if (peerClient.peerId == myself.peerId) {
-      logger.e('cannot store myself');
+      //logger.e('cannot store myself');
       return;
     }
     PeerClient? peerClient_ = await findOneByClientId(peerClient.peerId,

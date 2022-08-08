@@ -25,9 +25,7 @@ class SignalKeyPair {
   ///群发的功能
   late InMemorySenderKeyStore senderKeyStore = InMemorySenderKeyStore();
 
-  SignalKeyPair() {
-    init();
-  }
+  SignalKeyPair();
 
   /// 在初始化的时候，客户端需要产生注册编号，身份密钥对，预先生成的密钥对数组，签名后的预先密钥对
   /// 并序列化存储起来，方便后续使用
@@ -366,6 +364,10 @@ class SignalSessionPool {
     var signalProtocolAddress =
         SignalProtocolAddress('$peerId:$clientId', deviceId);
     signalSessions.remove(signalProtocolAddress);
+  }
+
+  clear() {
+    signalSessions.clear();
   }
 }
 

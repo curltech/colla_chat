@@ -138,22 +138,28 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     var myselfPeer = await myselfPeerService.findOneByLogin(credential);
     if (myselfPeer != null) {
       /// 1.验证账户与密码匹配
-      var loginStatus = await myselfService.setMyself(myselfPeer, password);
-
-      if (loginStatus) {
-        await signalSessionPool.init();
-
-        ///2.连接篇p2p的节点，把自己的信息注册上去
-        var json = JsonUtil.toJson(myselfPeer);
-        var peerClient = PeerClient.fromJson(json);
-        peerClient.activeStatus = ActiveStatus.Up.name;
-        peerClient.clientId = myselfPeer.clientId;
-        peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
-        connectAction.connect(peerClient).then((response) {
-          logger.i(response);
-        });
+      try {
+        var loginStatus = await myselfService.login(myselfPeer, password);
+        if (!loginStatus) {
+          return false;
+        }
+      } catch (err) {
+        logger.e('login err:$err');
+        return false;
       }
-      return loginStatus;
+
+      ///2.连接篇p2p的节点，把自己的信息注册上去
+      var json = JsonUtil.toJson(myselfPeer);
+      var peerClient = PeerClient.fromJson(json);
+      peerClient.activeStatus = ActiveStatus.Up.name;
+      peerClient.clientId = myselfPeer.clientId;
+      peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
+      var response = await connectAction.connect(peerClient);
+      if (response != null) {
+        logger.i('connect successfully');
+      }
+      await postLogin();
+      return true;
     } else {
       logger.e('$credential is not exist');
     }
@@ -161,34 +167,50 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     return false;
   }
 
-  void logout() {
+  ///登录成功后执行
+  Future<void> postLogin() async {
+    logger.i('peerConnectionPool init: ${peerConnectionPool.peerId}');
+    await signalSessionPool.init();
+  }
+
+  Future<bool> logout() async {
+    bool result = false;
+
     ///本地查找账户
     var peerId = myself.peerId;
     if (peerId != null) {
       try {
-        myselfPeerService
-            .findOneByPeerId(peerId)
-            .then((MyselfPeer? myselfPeer) async {
-          ///2.连接篇p2p的节点，把自己的信息注册上去
-          if (myselfPeer != null) {
-            var json = JsonUtil.toJson(myselfPeer);
-            var peerClient = PeerClient.fromJson(json);
-            peerClient.activeStatus = ActiveStatus.Down.name;
-            peerClient.clientId = myselfPeer.clientId;
-            peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
-            peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
-            connectAction
-                .connect(peerClient)
-                .then((ChainMessage? chainMessage) {
-              myselfService.clear();
-              peerConnectionPool.clear();
-            });
-          }
-        });
+        MyselfPeer? myselfPeer =
+            await myselfPeerService.findOneByPeerId(peerId);
+
+        ///2.连接篇p2p的节点，把自己的信息注册上去
+        if (myselfPeer != null) {
+          var json = JsonUtil.toJson(myselfPeer);
+          var peerClient = PeerClient.fromJson(json);
+          peerClient.activeStatus = ActiveStatus.Down.name;
+          peerClient.clientId = myselfPeer.clientId;
+          peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
+          peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
+          ChainMessage? chainMessage = await connectAction.connect(peerClient);
+
+          result = true;
+        } else {
+          logger.e('myselfPeer:$peerId is not exist');
+        }
       } catch (e) {
-        myselfService.clear();
+        logger.e('logout err:$e');
       }
     }
+    myselfService.logout();
+    await postLogout();
+
+    return result;
+  }
+
+  ///登出成功后执行
+  Future<void> postLogout() async {
+    peerConnectionPool.clear();
+    signalSessionPool.clear();
   }
 }
 

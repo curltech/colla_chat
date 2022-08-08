@@ -39,7 +39,7 @@ class MyselfService {
 
   /// 获取自己节点的记录，并解开私钥，设置当前myself
   /// 一般发生在登录后重新设置当前的账户
-  Future<bool> setMyself(MyselfPeer myselfPeer, String password) async {
+  Future<bool> login(MyselfPeer myselfPeer, String password) async {
     //解开身份公钥和加密公钥
     SimplePublicKey publicKey = await cryptoGraphy
         .importPublicKey(myselfPeer.publicKey, typeStr: 'x25519');
@@ -60,8 +60,10 @@ class MyselfService {
     bool pass = await cryptoGraphy.verify(key.codeUnits, signature,
         publicKey: peerPublicKey);
     if (!pass) {
-      throw 'VerifyNotPass';
+      logger.e('VerifyNotPass');
+      return false;
     }
+
     myself.myselfPeer = myselfPeer;
     myself.peerId = myselfPeer.peerId;
     myself.clientId = myselfPeer.clientId;
@@ -73,31 +75,30 @@ class MyselfService {
 
     //查找配置信息
     var peerId = myselfPeer.peerId;
-    if (peerId != null) {
-      var peerProfile = await peerProfileService.findOneByPeerId(peerId);
-      if (peerProfile != null) {
-        myself.peerProfile = peerProfile;
-        String? avatar = peerProfile.avatar;
-        var avatarImage = ImageWidget(
-          image: avatar,
-          height: 32,
-          width: 32,
-        );
-        myself.avatarImage = avatarImage;
-      }
+    var peerProfile = await peerProfileService.findOneByPeerId(peerId);
+    if (peerProfile != null) {
+      myself.peerProfile = peerProfile;
+      String? avatar = peerProfile.avatar;
+      var avatarImage = ImageWidget(
+        image: avatar,
+        height: 32,
+        width: 32,
+      );
+      myself.avatarImage = avatarImage;
     }
-    logger.i('peerConnectionPool init: ${peerConnectionPool.peerId}');
 
     return true;
   }
 
-  clear() {
+  bool logout() {
     myself.myselfPeer = null;
     myself.password = null;
     myself.peerPrivateKey = null;
     myself.peerPublicKey = null;
     myself.privateKey = null;
     myself.publicKey = null;
+
+    return true;
   }
 }
 

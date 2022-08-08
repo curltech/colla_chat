@@ -235,8 +235,8 @@ abstract class GeneralBaseService<T> {
               var data = CryptoUtil.decodeBase64(securityContext.payload);
               json[encryptField] = CryptoUtil.encodeBase64(data);
             }
-          } catch (err) {
-            logger.e('SecurityContextService decrypt err:$err');
+          } catch (e) {
+            logger.e('SecurityContextService decrypt err:$e');
           }
         }
       }

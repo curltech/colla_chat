@@ -343,7 +343,6 @@ class PeerConnectionPool {
           peerConnection.close();
         }
         peerConnections.clear();
-        this.peerConnections.remove(peerId);
       }
     }
     peerConnections.clear();
