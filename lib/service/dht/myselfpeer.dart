@@ -170,7 +170,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
   ///登录成功后执行
   Future<void> postLogin() async {
     logger.i('peerConnectionPool init: ${peerConnectionPool.peerId}');
-    await signalSessionPool.init();
+    signalSessionPool.init();
   }
 
   Future<bool> logout() async {
