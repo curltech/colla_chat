@@ -255,10 +255,12 @@ abstract class GeneralBaseService<T> {
     return key;
   }
 
+  // 删除记录。根据entity的id字段作为条件删除，entity可以是Map
   Future<int> delete(dynamic entity) {
     return dataStore.delete(tableName, entity: entity);
   }
 
+  // 更新记录。根据entity的id字段作为条件，其他字段作为更新的值，entity可以是Map
   Future<int> update(dynamic entity, [dynamic? ignore, dynamic? parent]) async {
     EntityUtil.updateTimestamp(entity);
     Map<String, dynamic> json = await encrypt(entity);

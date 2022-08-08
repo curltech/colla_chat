@@ -146,7 +146,11 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.receiverName = name;
     chatMessage.groupPeerId = groupPeerId;
     chatMessage.groupName = groupName;
-    chatMessage.title = title;
+    if (title != null) {
+      List<int> raw = CryptoUtil.stringToUtf8(title);
+      title = CryptoUtil.encodeBase64(raw);
+      chatMessage.title = title;
+    }
     if (thumbBody != null) {
       chatMessage.thumbBody = CryptoUtil.encodeBase64(thumbBody);
     }

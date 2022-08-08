@@ -168,7 +168,7 @@ class CryptographySecurityContextService extends SecurityContextService {
     if (needEncrypt) {
       SimplePublicKey? targetPublicKey;
       if (targetPeerId != null && peerId != null && targetPeerId != peerId) {
-        targetPublicKey = await peerClientService.getPublicKey(targetPeerId);
+        targetPublicKey = await peerClientService.getCachedPublicKey(targetPeerId);
       } else {
         // 本地保存前加密
         targetPublicKey = myself.publicKey;
@@ -298,7 +298,7 @@ class CryptographySecurityContextService extends SecurityContextService {
         SimplePublicKey? srcPublicKey;
         var srcPeerId = securityContext.srcPeerId;
         if (srcPeerId != null && peerId != null && srcPeerId != peerId) {
-          srcPublicKey = await peerClientService.getPublicKey(srcPeerId);
+          srcPublicKey = await peerClientService.getCachedPublicKey(srcPeerId);
         } else {
           logger.e('Null SrcPeerId,cannot verify signature');
           return false;
@@ -326,7 +326,7 @@ class CryptographySecurityContextService extends SecurityContextService {
               peerClientService.findCachedOneByPeerId(srcPeerId)
             ];
             if (peerClients.isNotEmpty) {
-              srcPublicKey = await peerClientService.getPublicKey(srcPeerId);
+              srcPublicKey = await peerClientService.getCachedPublicKey(srcPeerId);
               if (srcPublicKey != null) {
                 pass = await cryptoGraphy.verify(
                     data, payloadSignature.codeUnits,
@@ -499,7 +499,7 @@ class SignalSecurityContextService extends SecurityContextService {
         SimplePublicKey? srcPublicKey;
         var srcPeerId = securityContext.srcPeerId;
         if (srcPeerId != null && peerId != null && srcPeerId != peerId) {
-          srcPublicKey = await peerClientService.getPublicKey(srcPeerId);
+          srcPublicKey = await peerClientService.getCachedPublicKey(srcPeerId);
         } else {
           logger.e('Null SrcPeerId,cannot verify signature');
           return false;
@@ -527,7 +527,7 @@ class SignalSecurityContextService extends SecurityContextService {
               peerClientService.findCachedOneByPeerId(srcPeerId)
             ];
             if (peerClients.isNotEmpty) {
-              srcPublicKey = await peerClientService.getPublicKey(srcPeerId);
+              srcPublicKey = await peerClientService.getCachedPublicKey(srcPeerId);
               if (srcPublicKey != null) {
                 pass = await cryptoGraphy.verify(
                     data, payloadSignature.codeUnits,

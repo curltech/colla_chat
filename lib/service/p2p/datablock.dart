@@ -168,7 +168,7 @@ class DataBlockService extends BaseService {
         }
       }
     } else {
-      var srcPublicKey = await peerClientService.getPublicKey(peerId!);
+      var srcPublicKey = await peerClientService.getCachedPublicKey(peerId!);
       if (srcPublicKey == null) {
         throw 'NullSrcPublicKey';
       }
@@ -272,7 +272,7 @@ class DataBlockService extends BaseService {
           targetPublicKey = myself.publicKey;
         } else {
           targetPublicKey =
-              await peerClientService.getPublicKey(transactionKey.peerId!);
+              await peerClientService.getCachedPublicKey(transactionKey.peerId!);
         }
         if (!targetPublicKey) {
           logger.w('TargetPublicKey is null, will not be encrypted!');
@@ -344,7 +344,7 @@ class DataBlockService extends BaseService {
             }
           } else {
             var srcPublicKey =
-                await peerClientService.getPublicKey(dataBlock.peerId!);
+                await peerClientService.getCachedPublicKey(dataBlock.peerId!);
             if (srcPublicKey == null) {
               throw 'NullSrcPublicKey';
             }
