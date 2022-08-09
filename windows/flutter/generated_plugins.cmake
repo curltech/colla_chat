@@ -3,12 +3,14 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  audioplayers_windows
   battery_plus_windows
   connectivity_plus_windows
   flutter_secure_storage_windows
   flutter_webrtc
   geolocator_windows
   livekit_client
+  local_auth_windows
   network_info_plus_windows
   openpgp
   pdfx

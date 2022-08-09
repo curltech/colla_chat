@@ -32,6 +32,7 @@ import 'package:toast/toast.dart';
 
 import '../crypto/util.dart';
 import '../provider/app_data_provider.dart';
+import 'package:cross_file/cross_file.dart';
 
 class TypeUtil {
   static bool isString(dynamic obj) {
@@ -1241,5 +1242,28 @@ class QrcodeUtil {
     });
 
     return result;
+  }
+}
+
+class StandardMessageCodecUtil {
+  static Uint8List encode(Object o) {
+    final ByteData? data = const StandardMessageCodec().encodeMessage(o);
+    return data!.buffer.asUint8List();
+  }
+
+  static Uint8List decode(List<int> raw) {
+    var data = Uint8List.fromList(raw);
+    final dynamic o =
+        const StandardMessageCodec().decodeMessage(ByteData.view(data.buffer));
+
+    return o;
+  }
+}
+
+class XFileUtil {
+  static XFile open(String filename) {
+    final file = XFile(filename);
+
+    return file;
   }
 }

@@ -46,7 +46,7 @@ class PeerVideoRenderer {
     var mediaStream =
         await navigator.mediaDevices.getUserMedia(mediaConstraints);
     this.mediaStream = mediaStream;
-    id=mediaStream.id;
+    id = mediaStream.id;
   }
 
   ///获取本机屏幕流
@@ -65,7 +65,19 @@ class PeerVideoRenderer {
     var mediaStream =
         await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
     this.mediaStream = mediaStream;
-    id=mediaStream.id;
+    id = mediaStream.id;
+  }
+
+  ///获取本机音频流
+  Future<void> createAudioMedia() async {
+    Map<String, dynamic> mediaConstraints = <String, dynamic>{
+      'audio': true,
+      'video': false,
+    };
+    var mediaStream =
+        await navigator.mediaDevices.getUserMedia(mediaConstraints);
+    this.mediaStream = mediaStream;
+    id = mediaStream.id;
   }
 
   //获取本机的设备清单

@@ -184,7 +184,7 @@ class AdvancedPeerConnection {
     return basePeerConnection.status == PeerConnectionStatus.connected;
   }
 
-  //收到数据，带解密功能，取最后一位整数，表示解密选项，得到何种解密方式，然后解密
+  ///收到数据，带解密功能，取最后一位整数，表示解密选项，得到何种解密方式，然后解密
   onMessage(Uint8List data) async {
     logger.i('${DateTime.now().toUtc()}:got a message from peer');
     int cryptOption = data[data.length - 1];
