@@ -29,9 +29,12 @@ import 'package:sensors_plus/sensors_plus.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:telephony/telephony.dart';
 import 'package:toast/toast.dart';
+import 'package:video_thumbnail/video_thumbnail.dart';
 
 import '../crypto/util.dart';
 import '../provider/app_data_provider.dart';
+import 'package:cross_file/cross_file.dart';
+import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 
 class TypeUtil {
   static bool isString(dynamic obj) {
@@ -1241,5 +1244,86 @@ class QrcodeUtil {
     });
 
     return result;
+  }
+
+  static Widget generate(String value) {
+    return SfBarcodeGenerator(
+      value: value,
+      symbology: QRCode(),
+      showValue: true,
+    );
+  }
+}
+
+class StandardMessageCodecUtil {
+  static Uint8List encode(Object o) {
+    final ByteData? data = const StandardMessageCodec().encodeMessage(o);
+    return data!.buffer.asUint8List();
+  }
+
+  static Uint8List decode(List<int> raw) {
+    var data = Uint8List.fromList(raw);
+    final dynamic o =
+        const StandardMessageCodec().decodeMessage(ByteData.view(data.buffer));
+
+    return o;
+  }
+}
+
+class XFileUtil {
+  static XFile open(String filename) {
+    final file = XFile(filename);
+
+    return file;
+  }
+}
+
+class VideoThumbnailUtil {
+  static Future<Uint8List?> toData({
+    required String videoFile,
+    Map<String, String>? headers,
+    ImageFormat imageFormat = ImageFormat.PNG,
+    int maxHeight = 0,
+    int maxWidth = 0,
+    int timeMs = 0,
+    int quality = 10,
+  }) async {
+    final data = await VideoThumbnail.thumbnailData(
+      video: videoFile,
+      headers: headers,
+      imageFormat: imageFormat,
+      maxHeight: maxHeight,
+      maxWidth: maxWidth,
+      timeMs: timeMs,
+      // specify the width of the thumbnail, let the height auto-scaled to keep the source aspect ratio
+      quality: quality,
+    );
+
+    return data;
+  }
+
+  static Future<String?> toFile({
+    required String videoFile,
+    Map<String, String>? headers,
+    String? thumbnailPath,
+    ImageFormat imageFormat = ImageFormat.PNG,
+    int maxHeight = 0,
+    int maxWidth = 0,
+    int timeMs = 0,
+    int quality = 10,
+  }) async {
+    final file = await VideoThumbnail.thumbnailFile(
+      video: videoFile,
+      headers: headers,
+      thumbnailPath: thumbnailPath,
+      imageFormat: imageFormat,
+      maxHeight: maxHeight,
+      maxWidth: maxWidth,
+      timeMs: timeMs,
+      // specify the width of the thumbnail, let the height auto-scaled to keep the source aspect ratio
+      quality: quality,
+    );
+
+    return file;
   }
 }
