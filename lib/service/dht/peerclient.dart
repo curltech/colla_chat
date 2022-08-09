@@ -27,8 +27,8 @@ class PeerClientService extends PeerEntityService<PeerClient> {
     if (peerClient != null) {
       SimplePublicKey? simplePublicKey = publicKeys[peerId];
       if (simplePublicKey == null) {
-        simplePublicKey =
-            await cryptoGraphy.importPublicKey(peerClient.publicKey);
+        simplePublicKey = await cryptoGraphy
+            .importPublicKey(peerClient.publicKey, typeStr: 'x25519');
         publicKeys[peerId] = simplePublicKey;
       }
       return simplePublicKey;
