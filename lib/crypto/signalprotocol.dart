@@ -124,16 +124,16 @@ class SignalKeyPair {
       signedPreKey = Curve.decodePoint(signedPreKeyList, 0);
     }
     var signedPreKeyId = map['signedPreKeyId'];
-    var signedPreKeySignature = map['signedPreKeySignature'];
+    String? signedPreKeySignatureStr = map['signedPreKeySignature'];
+    var signedPreKeySignature =
+        CryptoUtil.decodeBase64(signedPreKeySignatureStr!);
     IdentityKey? identityKey;
     var identityKeyStr = map['identityKey'];
     if (identityKeyStr != null) {
       var identityKeyList = CryptoUtil.decodeBase64(identityKeyStr);
       identityKey = IdentityKey.fromBytes(identityKeyList, 0);
     }
-    if (preKey != null &&
-        signedPreKeySignature != null &&
-        identityKey != null) {
+    if (preKey != null && identityKey != null) {
       final preKeyBundle = PreKeyBundle(
           registrationId,
           deviceId,
