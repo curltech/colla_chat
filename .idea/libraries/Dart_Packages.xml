@@ -2508,6 +2508,13 @@
             </list>
           </value>
         </entry>
+        <entry key="video_thumbnail">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/video_thumbnail-0.5.2/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="visibility_detector">
           <value>
             <list>
@@ -3011,6 +3018,7 @@
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/video_player_avfoundation-2.3.5/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/video_player_platform_interface-5.1.4/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/video_player_web-2.0.12/lib" />
+      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/video_thumbnail-0.5.2/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/visibility_detector-0.3.3/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/wakelock-0.6.2/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/wakelock_macos-0.4.0/lib" />
