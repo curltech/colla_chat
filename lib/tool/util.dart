@@ -33,6 +33,7 @@ import 'package:toast/toast.dart';
 import '../crypto/util.dart';
 import '../provider/app_data_provider.dart';
 import 'package:cross_file/cross_file.dart';
+import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 
 class TypeUtil {
   static bool isString(dynamic obj) {
@@ -1242,6 +1243,14 @@ class QrcodeUtil {
     });
 
     return result;
+  }
+
+  static Widget generate(String value) {
+    return SfBarcodeGenerator(
+      value: value,
+      symbology: QRCode(),
+      showValue: true,
+    );
   }
 }
 

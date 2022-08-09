@@ -162,7 +162,9 @@ dependencies:
   flutter_sound: ^9.2.12 #音频处理
   audioplayers: ^1.0.1 #音频处理
   video_player: ^2.1.1 #视频播放
+  flick_video_player: any
   flutter_image_compress: ^1.1.0 #图片压缩1
+  syncfusion_flutter_barcodes: any
   qr_flutter: ^4.0.0
   #barcode_widget: ^2.0.2
   barcode_scan2: ^4.2.1

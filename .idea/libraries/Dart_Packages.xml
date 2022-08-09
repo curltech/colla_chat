@@ -863,6 +863,13 @@
             </list>
           </value>
         </entry>
+        <entry key="flick_video_player">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/flick_video_player-0.5.0/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="fluent_ui">
           <value>
             <list>
@@ -2277,6 +2284,13 @@
             </list>
           </value>
         </entry>
+        <entry key="syncfusion_flutter_barcodes">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_flutter_barcodes-20.2.43/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="syncfusion_flutter_core">
           <value>
             <list>
@@ -2767,6 +2781,7 @@
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/fl_chart-0.50.6/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/flat_buffers-2.0.5/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/flex_color_picker-2.5.0/lib" />
+      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/flick_video_player-0.5.0/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/fluent_ui-3.12.0/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/fluro-2.0.3/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/flushbar-1.10.4/lib" />
@@ -2964,6 +2979,7 @@
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/stream_transform-2.0.0/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/string_scanner-1.1.0/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/string_validator-0.3.0/lib" />
+      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_flutter_barcodes-20.2.43/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_flutter_core-20.2.43/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_flutter_datagrid-20.2.43/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/synchronized-3.0.0+2/lib" />

@@ -1,3 +1,4 @@
+import 'package:flick_video_player/flick_video_player.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter/material.dart';
 
@@ -25,12 +26,16 @@ class MobileVideoPlayerWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _MobileVideoPlayerWidgetState extends State<MobileVideoPlayerWidget> {
+  late FlickManager flickManager;
   late VideoPlayerController controller;
   bool startedPlaying = false;
 
   @override
   void initState() {
     super.initState();
+    flickManager = FlickManager(
+      videoPlayerController: VideoPlayerController.network("url"),
+    );
     controller = VideoPlayerController.asset('assets/Butterfly-209.mp4');
     controller = VideoPlayerController.network(
       'https://flutter.github.io/assets-for-api-docs/assets/videos/bee.mp4',
@@ -88,10 +93,11 @@ class _MobileVideoPlayerWidgetState extends State<MobileVideoPlayerWidget> {
             Icon(controller.value.isPlaying ? Icons.pause : Icons.play_arrow));
     rightWidgets.add(playBtn);
     var appBarView = AppBarView(
-        title: Text(AppLocalizations.t(widget.title)),
-        withLeading: widget.withLeading,
-        rightWidgets: rightWidgets,
-        child: _buildVideoPlayer(context));
+      title: Text(AppLocalizations.t(widget.title)),
+      withLeading: widget.withLeading,
+      rightWidgets: rightWidgets,
+      child: FlickVideoPlayer(flickManager: flickManager),
+    );
 
     return appBarView;
   }
@@ -100,5 +106,6 @@ class _MobileVideoPlayerWidgetState extends State<MobileVideoPlayerWidget> {
   void dispose() {
     super.dispose();
     controller.dispose();
+    flickManager.dispose();
   }
 }
