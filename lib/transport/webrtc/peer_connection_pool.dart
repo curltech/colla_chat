@@ -529,7 +529,8 @@ class PeerConnectionPool {
     chatMessage.content =
         CryptoUtil.encodeBase64(CryptoUtil.stringToUtf8(json));
     var data = CryptoUtil.stringToUtf8(JsonUtil.toJsonString(chatMessage));
-    send(event.peerId, Uint8List.fromList(data), clientId: event.clientId);
+    send(event.peerId, Uint8List.fromList(data),
+        clientId: event.clientId, cryptoOption: CryptoOption.cryptography);
   }
 
   onClosed(WebrtcEvent event) async {
