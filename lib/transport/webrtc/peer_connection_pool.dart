@@ -506,8 +506,8 @@ class PeerConnectionPool {
           signalSessionPool.signalKeyPair.preKeyBundleFromJson(content);
       if (retrievedPreKeyBundle != null) {
         SignalSession signalSession = signalSessionPool.create(
-            peerId: peerId,
-            clientId: clientId,
+            peerId: event.peerId,
+            clientId: event.clientId,
             deviceId: retrievedPreKeyBundle.getDeviceId(),
             retrievedPreKeyBundle: retrievedPreKeyBundle);
       } else {
@@ -528,14 +528,14 @@ class PeerConnectionPool {
     chatMessage.content =
         signalSessionPool.signalKeyPair.preKeyBundleToJson(preKeyBundle);
     var data = CryptoUtil.stringToUtf8(JsonUtil.toJsonString(chatMessage));
-    send(peerId, Uint8List.fromList(data), clientId: event.clientId);
+    send(event.peerId, Uint8List.fromList(data), clientId: event.clientId);
   }
 
   onClosed(WebrtcEvent event) async {
     logger.i('peerId: ${event.peerId} clientId:${event.clientId} is closed');
     remove(event.peerId, clientId: event.clientId);
     peerConnectionPoolController.onClosed(event);
-    signalSessionPool.close(peerId: peerId, clientId: clientId);
+    signalSessionPool.close(peerId: event.peerId, clientId: event.clientId!);
   }
 
   onError(WebrtcEvent event) async {
