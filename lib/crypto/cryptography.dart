@@ -5,6 +5,8 @@ import 'package:colla_chat/crypto/util.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:cryptography_flutter/cryptography_flutter.dart';
 
+
+
 class CryptoGraphy {
   CryptoGraphy() {
     FlutterCryptography.enable();
@@ -51,14 +53,14 @@ class CryptoGraphy {
 
   /// 产生密钥对，返回对象为密钥对象（公钥和私钥对象）
   Future<SimpleKeyPair> generateKeyPair(
-      {String keyPairType = 'ed25519'}) async {
+      {KeyPairType keyPairType = KeyPairType.ed25519}) async {
     // Generate a keypair.
-    if (keyPairType == 'ed25519') {
+    if (keyPairType == KeyPairType.ed25519) {
       final algorithm = Ed25519(); //X25519();
       final keyPair = await algorithm.newKeyPair();
 
       return keyPair;
-    } else if (keyPairType == 'x25519') {
+    } else if (keyPairType == KeyPairType.x25519) {
       final algorithm = X25519();
       final keyPair = await algorithm.newKeyPair();
 
@@ -94,11 +96,7 @@ class CryptoGraphy {
   /// 将base64的密钥字符串导入转换成密钥对象，passphrase必须有值用于解密私钥
   Future<SimpleKeyPair> import(
       String base64KeyPair, List<int> passphrase, SimplePublicKey publicKey,
-      {String? typeStr = 'ed25519'}) async {
-    KeyPairType type = KeyPairType.ed25519;
-    if (typeStr == 'x25519') {
-      type = KeyPairType.x25519;
-    }
+      {KeyPairType type = KeyPairType.ed25519}) async {
     if (passphrase.isNotEmpty) {
       Uint8List rawText = CryptoUtil.decodeBase64(base64KeyPair);
       var clearText = await aesDecrypt(rawText, passphrase);
@@ -121,11 +119,7 @@ class CryptoGraphy {
 
   /// 将base64的密钥字符串导入转换成私钥，passphrase必须有值用于解密私钥
   Future<SimplePublicKey> importPublicKey(String base58PublicKey,
-      {String? typeStr = 'ed25519'}) async {
-    KeyPairType type = KeyPairType.ed25519;
-    if (typeStr == 'x25519') {
-      type = KeyPairType.x25519;
-    }
+      {KeyPairType type = KeyPairType.ed25519}) async {
     Uint8List rawText = CryptoUtil.decodeBase58(base58PublicKey);
     SimplePublicKey publicKey = SimplePublicKey(rawText, type: type);
 
@@ -267,6 +261,7 @@ class CryptoGraphy {
 
   static const macLength = 16;
   static const nonceLength = 12;
+
   Future<List<int>> aesDecrypt(List<int> message, List<int> passphrase,
       {String type = 'gcm'}) async {
     var hashPassphrase = await hash(passphrase);
@@ -293,8 +288,8 @@ class CryptoGraphy {
     }
     final secretKey = SecretKey(hashPassphrase);
 
-    SecretBox secretBox =
-        SecretBox.fromConcatenation(message, macLength: macLength, nonceLength: nonceLength);
+    SecretBox secretBox = SecretBox.fromConcatenation(message,
+        macLength: macLength, nonceLength: nonceLength);
     // Decrypt
     final clearText = await algorithm.decrypt(
       secretBox,
