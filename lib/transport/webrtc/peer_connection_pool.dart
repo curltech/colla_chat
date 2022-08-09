@@ -496,7 +496,8 @@ class PeerConnectionPool {
     Map<String, dynamic> json = JsonUtil.toJson(event.data);
     ChatMessage chatMessage = ChatMessage.fromJson(json);
     chatMessageService.receiveChatMessage(chatMessage);
-    var content = chatMessage.content;
+    var content =
+        CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(chatMessage.content));
     logger.i('chatMessage content:$content');
     peerConnectionPoolController.onMessage(chatMessage);
 
@@ -524,8 +525,9 @@ class PeerConnectionPool {
     chatMessage.subMessageType = ChatSubMessageType.preKeyBundle.name;
     PreKeyBundle preKeyBundle =
         signalSessionPool.signalKeyPair.getPreKeyBundle();
+    var json = signalSessionPool.signalKeyPair.preKeyBundleToJson(preKeyBundle);
     chatMessage.content =
-        signalSessionPool.signalKeyPair.preKeyBundleToJson(preKeyBundle);
+        CryptoUtil.encodeBase64(CryptoUtil.stringToUtf8(json));
     var data = CryptoUtil.stringToUtf8(JsonUtil.toJsonString(chatMessage));
     send(event.peerId, Uint8List.fromList(data), clientId: event.clientId);
   }
