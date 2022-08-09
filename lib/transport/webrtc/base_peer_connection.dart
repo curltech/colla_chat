@@ -324,6 +324,10 @@ abstract class BasePeerConnection {
   }
 
   void connected() {
+    if (status == PeerConnectionStatus.connected) {
+      logger.i('PeerConnectionStatus has already connected');
+      return;
+    }
     logger.i('PeerConnectionStatus connected, webrtc connection is completed');
     end = DateTime.now().millisecondsSinceEpoch;
     status = PeerConnectionStatus.connected;
