@@ -39,10 +39,12 @@ class PeerClientService extends PeerEntityService<PeerClient> {
 
   Future<PeerClient?> findCachedOneByPeerId(String peerId,
       {String? clientId}) async {
-    if (peerClients.containsKey(peerId)) {
-      var peerClients_ = peerClients[peerId];
-      if (peerClients_ != null && peerClients_.containsKey(clientId)) {
-        return peerClients_[clientId];
+    var peerClientMap = peerClients[peerId];
+    if (peerClientMap != null) {
+      if (clientId == null) {
+        return peerClientMap.values.first;
+      } else {
+        return peerClientMap[clientId];
       }
     }
     PeerClient? peerClient;
@@ -51,15 +53,15 @@ class PeerClientService extends PeerEntityService<PeerClient> {
       for (var peerClient_ in peerClients_) {
         var clientId_ = peerClient_.clientId;
         PeerProfile? peerProfile = await peerProfileService
-            .findCachedOneByPeerId(peerId, clientId: clientId_!);
+            .findCachedOneByPeerId(peerId, clientId: clientId_);
         if (peerProfile != null) {
           peerClient_.peerProfile = peerProfile;
         }
         if (!peerClients.containsKey(peerId)) {
           peerClients[peerId] = {};
         }
-        peerClients[peerId]![clientId_] = peerClient_;
-        if (clientId == clientId_) {
+        peerClients[peerId]![clientId_ ?? ''] = peerClient_;
+        if (clientId == null || clientId == clientId_) {
           peerClient = peerClient_;
         }
       }
