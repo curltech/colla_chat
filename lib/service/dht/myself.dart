@@ -23,7 +23,7 @@ class MyselfService {
 
     ///加密对应的密钥对x25519
     SimpleKeyPair keyPair =
-        await cryptoGraphy.generateKeyPair(keyPairType: 'x25519');
+        await cryptoGraphy.generateKeyPair(keyPairType: KeyPairType.x25519);
     SimplePublicKey publicKey = await keyPair.extractPublicKey();
     myselfPeer.privateKey =
         await cryptoGraphy.export(keyPair, password.codeUnits);
@@ -42,13 +42,13 @@ class MyselfService {
   Future<bool> login(MyselfPeer myselfPeer, String password) async {
     //解开身份公钥和加密公钥
     SimplePublicKey publicKey = await cryptoGraphy
-        .importPublicKey(myselfPeer.publicKey, typeStr: 'x25519');
+        .importPublicKey(myselfPeer.publicKey, type: KeyPairType.x25519);
     SimplePublicKey peerPublicKey =
         await cryptoGraphy.importPublicKey(myselfPeer.peerPublicKey);
     //解开身份密钥对和加密密钥对
     SimpleKeyPair privateKey = await cryptoGraphy.import(
         myselfPeer.privateKey, password.codeUnits, publicKey,
-        typeStr: 'x25519');
+        type: KeyPairType.x25519);
     SimpleKeyPair peerPrivateKey = await cryptoGraphy.import(
         myselfPeer.peerPrivateKey, password.codeUnits, peerPublicKey);
 

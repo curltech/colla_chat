@@ -30,7 +30,7 @@ class DataBuilder {
 
       ///加密对应的密钥对x25519
       SimpleKeyPair keyPair =
-          await cryptoGraphy.generateKeyPair(keyPairType: 'x25519');
+          await cryptoGraphy.generateKeyPair(keyPairType: KeyPairType.x25519);
       peerClient.publicKey = await cryptoGraphy.exportPublicKey(keyPair);
       peerClient.name = 'PeerClient$i';
       peerClientService.insert(peerClient);
@@ -59,7 +59,7 @@ class DataBuilder {
 
       ///加密对应的密钥对x25519
       SimpleKeyPair keyPair =
-          await cryptoGraphy.generateKeyPair(keyPairType: 'x25519');
+          await cryptoGraphy.generateKeyPair(keyPairType: KeyPairType.x25519);
       var publicKey = await cryptoGraphy.exportPublicKey(keyPair);
       var name = 'Group$i';
       Group group = Group(myself.peerId ?? '', peerId, name);
