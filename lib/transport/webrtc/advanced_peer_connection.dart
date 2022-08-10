@@ -136,6 +136,11 @@ class AdvancedPeerConnection {
           .onConnected(WebrtcEvent(peerId, clientId: clientId));
     });
 
+    basePeerConnection.on(WebrtcEventType.status, (data) async {
+      await peerConnectionPool
+          .onStatus(WebrtcEvent(peerId, clientId: clientId, data: data));
+    });
+
     basePeerConnection.on(WebrtcEventType.closed, (data) async {
       await peerConnectionPool
           .onClosed(WebrtcEvent(peerId, clientId: clientId));

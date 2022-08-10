@@ -267,26 +267,21 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
 
   @override
   Widget build(BuildContext context) {
-    var connected = false;
+    PeerConnectionStatus status = PeerConnectionStatus.none;
     var peerId = widget.chatMessageController.chatSummary!.peerId!;
     var peerConnection = peerConnectionPool.getOne(peerId);
     if (peerConnection != null) {
-      if (peerConnection.status == PeerConnectionStatus.connected) {
-        connected = true;
-      }
+      status = peerConnection.status;
     }
 
     ///获取最新的消息
     widget.chatMessageController.latest();
     String name = widget.chatMessageController.chatSummary!.name!;
     var appBarView = AppBarView(
-        title: Row(children: [
-          Text(AppLocalizations.t(name)),
-          Icon(Icons.light,
-              color: connected
-                  ? appDataProvider.themeData!.colorScheme.primary
-                  : Colors.grey),
-        ]),
+        title: Text(AppLocalizations.t(name) +
+            '(' +
+            AppLocalizations.t(status.name) +
+            ')'),
         withLeading: widget.withLeading,
         child: _buildListView(context));
     return appBarView;

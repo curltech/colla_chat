@@ -540,6 +540,15 @@ class PeerConnectionPool {
     }
   }
 
+  onStatus(WebrtcEvent event) async {
+    Map<String, PeerConnectionStatus> data = event.data;
+    PeerConnectionStatus? oldStatus = data['oldStatus'];
+    PeerConnectionStatus? newStatus = data['newStatus'];
+    logger.i(
+        'peerId: ${event.peerId} clientId:${event.clientId} status from ${oldStatus!.name} to ${newStatus!.name} changed');
+    peerConnectionPoolController.onStatus(event);
+  }
+
   onConnected(WebrtcEvent event) async {
     logger.i('peerId: ${event.peerId} clientId:${event.clientId} is connected');
     peerConnectionPoolController.onConnected(event);

@@ -120,6 +120,7 @@ enum WebrtcEventType {
   onSignal, //接收到信号
   connected,
   closed,
+  status, //状态发生变化
   message, //接收到消息
   stream,
   track,
@@ -133,6 +134,7 @@ enum WebrtcEventType {
 }
 
 enum PeerConnectionStatus {
+  none,
   created,
   negotiating, //协商过程中
   negotiated,
@@ -153,7 +155,7 @@ abstract class BasePeerConnection {
 
   //webrtc连接，在失活状态下为空，init后不为空
   RTCPeerConnection? peerConnection;
-  PeerConnectionStatus status = PeerConnectionStatus.created;
+  PeerConnectionStatus _status = PeerConnectionStatus.created;
 
   //数据通道的状态是否打开
   bool dataChannelOpen = false;
@@ -326,7 +328,16 @@ abstract class BasePeerConnection {
     return true;
   }
 
-  /// 重连机制
+  PeerConnectionStatus get status {
+    return _status;
+  }
+
+  set status(PeerConnectionStatus status) {
+    emit(WebrtcEventType.status, {'oldStatus': _status, 'newStatus': status});
+    _status = status;
+  }
+
+  /// 重连方法，根据状态，决定如何重连，作为主叫方，比如重发offer，作为被叫方可以发出重连信号，answer
   Future<void> reconnect() async {
     Timer.periodic(Duration(milliseconds: heartTimes), (timer) async {
       if (reconnectTimes <= 0 || status == PeerConnectionStatus.connected) {
@@ -775,9 +786,9 @@ abstract class BasePeerConnection {
     status = PeerConnectionStatus.closed;
     logger.i('PeerConnectionStatus closed');
 
-    if (reconnectTimes > 0) {
-      reconnect();
-    }
+    // if (reconnectTimes > 0) {
+    //   reconnect();
+    // }
     emit(WebrtcEventType.closed, '');
   }
 }

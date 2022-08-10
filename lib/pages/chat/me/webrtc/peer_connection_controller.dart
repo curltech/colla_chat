@@ -42,6 +42,10 @@ class PeerConnectionPoolController with ChangeNotifier {
   onTrack(WebrtcEvent event) async {
     notifyListeners();
   }
+
+  void onStatus(WebrtcEvent event) async {
+    notifyListeners();
+  }
 }
 
 final PeerConnectionPoolController peerConnectionPoolController =
