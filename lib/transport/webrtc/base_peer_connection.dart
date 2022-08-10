@@ -168,8 +168,11 @@ class BasePeerConnection {
   //这个过程在offer，answer协商之后
   bool iceCompleted = false;
 
+  //本地的sdp，
+  RTCSessionDescription? localSdp;
+
   //远程传来的sdp，
-  RTCSessionDescription? sdp;
+  RTCSessionDescription? remoteSdp;
 
   //本地产生的candidate
   RTCIceCandidate? localCandidate;
@@ -626,7 +629,7 @@ class BasePeerConnection {
       if (remoteDescription != null) {
         logger.e('remoteDescription is exist');
       }
-      this.sdp = sdp;
+      remoteSdp = sdp;
       await peerConnection.setRemoteDescription(sdp);
       if (status == PeerConnectionStatus.closed) {
         logger.e('PeerConnectionStatus closed');
@@ -765,7 +768,7 @@ class BasePeerConnection {
     //如果sdp信息，则设置远程描述，并处理所有的候选清单中候选服务器
     else if (signalType == SignalType.sdp.name && sdp != null) {
       logger.i('onSignal sdp offer:${sdp.type}');
-      this.sdp = sdp;
+      remoteSdp = sdp;
       if (peerConnection != null) {
         logger.i('start setRemoteDescription sdp offer:${sdp.type}');
         RTCSessionDescription? remoteDescription =
