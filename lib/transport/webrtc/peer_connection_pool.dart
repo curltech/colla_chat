@@ -485,6 +485,9 @@ class PeerConnectionPool {
         }
       }
       await Future.wait(ps);
+    } else {
+      logger.e(
+          'PeerConnection:$peerId,clientId;$clientId is not exist, cannot send');
     }
     return;
   }

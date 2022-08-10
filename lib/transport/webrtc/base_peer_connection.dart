@@ -6,7 +6,6 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../crypto/cryptography.dart';
 import '../../provider/app_data_provider.dart';
-import '../../service/p2p/security_context.dart';
 
 enum SignalType { renegotiate, transceiverRequest, candidate, sdp }
 
@@ -706,7 +705,7 @@ abstract class BasePeerConnection {
   /// 发送二进制消息 text/binary data to the remote peer.
   Future<void> send(List<int> message) async {
     if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
+      logger.e('PeerConnectionStatus closed, cannot send');
       return;
     }
     final dataChannel = this.dataChannel;
