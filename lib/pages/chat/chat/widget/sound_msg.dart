@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/pages/chat/chat/widget/sound_msg_entity.dart';
@@ -29,7 +28,8 @@ class _SoundMsgState extends State<SoundMsg> with TickerProviderStateMixin {
   late AnimationController controller;
   late Animation animation;
   late FlutterSound flutterSound;
-  AudioPlayer audioPlayer = AudioPlayer();
+
+  //AudioPlayer audioPlayer = AudioPlayer();
 
   late StreamSubscription _positionSubscription;
   late StreamSubscription _audioPlayerStateSubscription;
@@ -109,8 +109,8 @@ class _SoundMsgState extends State<SoundMsg> with TickerProviderStateMixin {
   }
 
   playNew(url) async {
-    DeviceFileSource deviceFileSource=DeviceFileSource(url);
-    await audioPlayer.play(deviceFileSource);
+    // DeviceFileSource deviceFileSource=DeviceFileSource(url);
+    // await audioPlayer.play(deviceFileSource);
     // if (result == 1) {
     //   DialogUtil.showToast('播放中');
     // } else {
