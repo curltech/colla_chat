@@ -149,9 +149,10 @@ enum PeerConnectionStatus {
 /// 基础的PeerConnection，实现建立连接和sdp协商
 /// 代表一个本地与远程的webrtc连接，这个类不含业务含义，不包含与信号服务器的交互部分
 /// 有两个子类，分别代表主动发起连接的，和被动接受连接的，在两种场景下，协商过程中的行为稍有不同
-abstract class BasePeerConnection {
+class BasePeerConnection {
   //唯一随机码，代表webrtc的连接
   late String id;
+  bool initiator;
 
   //webrtc连接，在失活状态下为空，init后不为空
   RTCPeerConnection? peerConnection;
@@ -226,8 +227,8 @@ abstract class BasePeerConnection {
   int heartTimes = 3000; // 心跳间隔(毫秒)
   int reconnectTimes = 1;
 
-  BasePeerConnection() {
-    logger.i('Create BasePeerConnection');
+  BasePeerConnection({required this.initiator}) {
+    logger.i('Create initiator:$initiator BasePeerConnection');
   }
 
   ///初始化连接，可以传入外部视频流，这是异步的函数，不能在构造里调用
@@ -502,6 +503,323 @@ abstract class BasePeerConnection {
     }
   }
 
+  ///被叫不能在第一次的时候主动发起协议过程，主叫或者被叫不在第一次的时候可以发起协商过程
+  negotiate() async {
+    if (initiator) {
+      _negotiateOffer();
+    } else {
+      _negotiateAnswer();
+    }
+  }
+
+  ///外部在收到信号的时候调用
+  onSignal(WebrtcSignal webrtcSignal) async {
+    if (initiator) {
+      _onOfferSignal(webrtcSignal);
+    } else {
+      _onAnswerSignal(webrtcSignal);
+    }
+  }
+
+  addTransceiver({
+    required MediaStreamTrack track,
+    required RTCRtpMediaType kind,
+    required RTCRtpTransceiverInit init,
+  }) {
+    if (initiator) {
+      _addOfferTransceiver(track: track, kind: kind, init: init);
+    } else {
+      _addAnswerTransceiver(track: track, kind: kind, init: init);
+    }
+  }
+
+  ///作为主叫，发起协商过程createOffer
+  _negotiateOffer() async {
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return;
+    }
+    firstNegotiation = false;
+    if (status == PeerConnectionStatus.negotiating) {
+      logger.e('PeerConnectionStatus already negotiating');
+      return;
+    }
+    logger.i('Start negotiate');
+    status == PeerConnectionStatus.negotiating;
+    await _createOffer();
+  }
+
+  ///作为主叫，创建offer，设置到本地会话描述，并发送offer
+  _createOffer() async {
+    RTCPeerConnection peerConnection = this.peerConnection!;
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return;
+    }
+    logger.i('start createOffer');
+    RTCSessionDescription offer =
+        await peerConnection.createOffer(sdpConstraints);
+    await peerConnection.setLocalDescription(offer);
+    logger.i('createOffer and setLocalDescription offer successfully');
+    await _sendOffer(offer);
+  }
+
+  ///作为主叫，调用外部方法发送offer
+  _sendOffer(RTCSessionDescription offer) async {
+    RTCPeerConnection peerConnection = this.peerConnection!;
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return;
+    }
+
+    logger.i('start sendOffer');
+    var sdp = await peerConnection.getLocalDescription();
+    sdp ??= offer;
+    emit(WebrtcEventType.signal,
+        WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
+    logger.i('end sendOffer');
+  }
+
+  ///作为主叫，从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
+  _onOfferSignal(WebrtcSignal webrtcSignal) async {
+    RTCPeerConnection peerConnection = this.peerConnection!;
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return;
+    }
+    String signalType = webrtcSignal.signalType;
+    logger.i('onSignal signalType:$signalType');
+    var candidate = webrtcSignal.candidate;
+    var sdp = webrtcSignal.sdp;
+    //被要求重新协商，则发起协商
+    if (signalType == SignalType.renegotiate.name &&
+        webrtcSignal.renegotiate != null) {
+      logger.i('onSignal renegotiate');
+      //negotiate();
+    }
+    //被要求收发，则加收发器
+    else if (webrtcSignal.transceiverRequest != null) {
+      logger.i('onSignal transceiver');
+      // addTransceiver(
+      //     kind: data.transceiverRequest.kind,
+      //     init: data.transceiverRequest.init);
+    }
+    //如果是候选信息
+    else if (signalType == SignalType.candidate.name && candidate != null) {
+      logger.i('onSignal candidate:${candidate.candidate}');
+      RTCSessionDescription? remoteDescription =
+          await peerConnection.getRemoteDescription();
+      //如果远程描述已经设置，加候选，否则，加入候选清单
+      if (remoteDescription != null && remoteDescription.type != null) {
+        addIceCandidate(candidate);
+      } else {
+        logger.i('remoteDescription null,save candidate');
+        remoteCandidates[candidate.candidate ?? ''] = candidate;
+      }
+    }
+    //如果sdp信息，则设置远程描述，并处理所有的候选清单中候选服务器
+    //对主叫节点来说，sdp应该是answer
+    else if (signalType == SignalType.sdp.name && sdp != null) {
+      logger.i('onSignal sdp answer:${sdp.type}');
+      RTCSessionDescription? remoteDescription =
+          await peerConnection.getRemoteDescription();
+      if (remoteDescription != null) {
+        logger.e('remoteDescription is exist');
+      }
+      this.sdp = sdp;
+      await peerConnection.setRemoteDescription(sdp);
+      if (status == PeerConnectionStatus.closed) {
+        logger.e('PeerConnectionStatus closed');
+        return;
+      }
+      for (var candidate in remoteCandidates.values) {
+        addIceCandidate(candidate);
+      }
+      remoteCandidates = {};
+    }
+    //如果什么都不是，报错
+    else {
+      logger.e('signal called with invalid signal type');
+    }
+  }
+
+  /// 作为主叫，为连接加上收发器
+  /// @param {String} kind
+  /// @param {Object} init
+  _addOfferTransceiver({
+    required MediaStreamTrack track,
+    required RTCRtpMediaType kind,
+    required RTCRtpTransceiverInit init,
+  }) async {
+    RTCPeerConnection peerConnection = this.peerConnection!;
+    logger.i('addTransceiver');
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return;
+    }
+
+    //直接加上收发器，并开始协商
+    try {
+      await peerConnection.addTransceiver(track: track, kind: kind, init: init);
+      //negotiate();
+    } catch (err) {
+      logger.e(err);
+      close();
+    }
+  }
+
+  ///作为被叫，协商时发送再协商信号给主叫，要求重新发起协商
+  _negotiateAnswer() async {
+    logger.i('Negotiation start, requesting negotiation from slave');
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return;
+    }
+    //被叫不能在第一次的时候主动发起协议过程
+    if (firstNegotiation) {
+      firstNegotiation = false;
+      return;
+    }
+    firstNegotiation = false;
+    if (status == PeerConnectionStatus.negotiating) {
+      logger.e('already negotiating');
+      return;
+    }
+    //被叫发送重新协商的请求
+    logger.i('send signal renegotiate from slave');
+    emit(WebrtcEventType.signal,
+        WebrtcSignal('renegotiate', renegotiate: true, extension: extension));
+    status == PeerConnectionStatus.negotiating;
+  }
+
+  ///作为被叫，创建answer，发生在被叫方，将answer回到主叫方
+  _createAnswer() async {
+    RTCPeerConnection peerConnection = this.peerConnection!;
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return;
+    }
+
+    logger.i('start createAnswer');
+    RTCSessionDescription? answer = await peerConnection.getLocalDescription();
+    if (answer != null) {
+      logger.e('getLocalDescription local sdp answer is exist:${answer.type}');
+    }
+    answer = await peerConnection.createAnswer(sdpConstraints);
+    logger.i('create local sdp answer:${answer.type}, and setLocalDescription');
+    await peerConnection.setLocalDescription(answer);
+    logger
+        .i('setLocalDescription local sdp answer:${answer.type} successfully');
+
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return;
+    }
+    await _sendAnswer(answer);
+  }
+
+  //作为被叫，发送answer
+  _sendAnswer(RTCSessionDescription answer) async {
+    RTCPeerConnection peerConnection = this.peerConnection!;
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return;
+    }
+    logger.i('send signal local sdp answer:${answer.type}');
+    var sdp = await peerConnection.getLocalDescription();
+    sdp ??= answer;
+    emit(WebrtcEventType.signal,
+        WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
+    logger.i('sendAnswer:${answer.type} successfully');
+  }
+
+  ///作为被叫，从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
+  _onAnswerSignal(WebrtcSignal webrtcSignal) async {
+    RTCPeerConnection? peerConnection = this.peerConnection;
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return;
+    }
+    status == PeerConnectionStatus.negotiating;
+    String signalType = webrtcSignal.signalType;
+    var candidate = webrtcSignal.candidate;
+    var sdp = webrtcSignal.sdp;
+    //如果是候选信息
+    if (signalType == SignalType.candidate.name && candidate != null) {
+      logger.i('onSignal candidate:${candidate.candidate}');
+      if (peerConnection != null) {
+        RTCSessionDescription? remoteDescription =
+            await peerConnection.getRemoteDescription();
+        //如果远程描述已经设置，加候选，否则，加入候选清单
+        if (remoteDescription != null && remoteDescription.type != null) {
+          addIceCandidate(candidate);
+        } else {
+          logger.i('remoteDescription is null,save candidate');
+          remoteCandidates[candidate.candidate ?? ''] = candidate;
+        }
+      } else {
+        logger.i('peerConnection is null,save candidate');
+        remoteCandidates[candidate.candidate ?? ''] = candidate;
+      }
+    }
+    //如果sdp信息，则设置远程描述，并处理所有的候选清单中候选服务器
+    else if (signalType == SignalType.sdp.name && sdp != null) {
+      logger.i('onSignal sdp offer:${sdp.type}');
+      this.sdp = sdp;
+      if (peerConnection != null) {
+        logger.i('start setRemoteDescription sdp offer:${sdp.type}');
+        RTCSessionDescription? remoteDescription =
+            await peerConnection.getRemoteDescription();
+        if (remoteDescription != null) {
+          logger.e(
+              'RemoteDescription sdp offer is exist:${remoteDescription.type}');
+        }
+        await peerConnection.setRemoteDescription(sdp);
+        logger.i('setRemoteDescription sdp offer:${sdp.type} successfully');
+        if (status == PeerConnectionStatus.closed) {
+          logger.e('PeerConnectionStatus closed');
+          return;
+        }
+        //如果远程描述是offer请求，则创建answer
+        remoteDescription = await peerConnection.getRemoteDescription();
+        if (remoteDescription != null && remoteDescription.type == 'offer') {
+          await _createAnswer();
+        }
+        for (var candidate in remoteCandidates.values) {
+          addIceCandidate(candidate);
+        }
+        remoteCandidates = {};
+      } else {
+        logger.e('peerConnection is null');
+      }
+    }
+    //如果什么都不是，报错
+    else {
+      logger.e('signal called with invalid signal data');
+    }
+  }
+
+  /// 作为被叫，为连接加上收发器
+  /// @param {String} kind
+  /// @param {Object} init
+  _addAnswerTransceiver({
+    required MediaStreamTrack track,
+    required RTCRtpMediaType kind,
+    required RTCRtpTransceiverInit init,
+  }) async {
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return;
+    }
+    logger.i('addTransceiver()');
+
+    emit(
+        WebrtcEventType.signal,
+        WebrtcSignal(SignalType.transceiverRequest.name,
+            transceiverRequest: {'kind': kind, 'init': init},
+            extension: extension));
+  }
+
   /// 把渲染器加入到本地渲染器集合，并把渲染器的流加入到连接中
   /// @param {MediaStream} stream
   addLocalRenderer(PeerVideoRenderer render) {
@@ -709,12 +1027,6 @@ abstract class BasePeerConnection {
     }
   }
 
-  ///被叫不能在第一次的时候主动发起协议过程，主叫或者被叫不在第一次的时候可以发起协商过程
-  negotiate() async {}
-
-  ///外部在收到信号的时候调用
-  onSignal(WebrtcSignal webrtcSignal) async {}
-
   ///数据通道的缓冲区大小
   get bufferSize {
     final dataChannel = this.dataChannel;
@@ -790,312 +1102,5 @@ abstract class BasePeerConnection {
     //   reconnect();
     // }
     emit(WebrtcEventType.closed, '');
-  }
-}
-
-///主动发起连接的一方
-class MasterPeerConnection extends BasePeerConnection {
-  //作为主叫方创建的offer
-  RTCSessionDescription? offer;
-
-  MasterPeerConnection();
-
-  ///主叫发起协商过程createOffer
-  @override
-  negotiate() async {
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
-    }
-    firstNegotiation = false;
-    if (status == PeerConnectionStatus.negotiating) {
-      logger.e('PeerConnectionStatus already negotiating');
-      return;
-    }
-    logger.i('Start negotiate');
-    status == PeerConnectionStatus.negotiating;
-    await createOffer();
-  }
-
-  ///创建offer，设置到本地会话描述，并发送offer
-  createOffer() async {
-    RTCPeerConnection peerConnection = this.peerConnection!;
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
-    }
-    logger.i('start createOffer');
-    RTCSessionDescription offer =
-        await peerConnection.createOffer(sdpConstraints);
-    await peerConnection.setLocalDescription(offer);
-    logger.i('createOffer and setLocalDescription offer successfully');
-    await sendOffer(offer);
-  }
-
-  ///调用外部方法发送offer
-  sendOffer(RTCSessionDescription offer) async {
-    RTCPeerConnection peerConnection = this.peerConnection!;
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
-    }
-
-    logger.i('start sendOffer');
-    var sdp = await peerConnection.getLocalDescription();
-    sdp ??= offer;
-    emit(WebrtcEventType.signal,
-        WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
-    logger.i('end sendOffer');
-  }
-
-  ///从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
-  @override
-  onSignal(WebrtcSignal webrtcSignal) async {
-    RTCPeerConnection peerConnection = this.peerConnection!;
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
-    }
-    String signalType = webrtcSignal.signalType;
-    logger.i('onSignal signalType:$signalType');
-    var candidate = webrtcSignal.candidate;
-    var sdp = webrtcSignal.sdp;
-    //被要求重新协商，则发起协商
-    if (signalType == SignalType.renegotiate.name &&
-        webrtcSignal.renegotiate != null) {
-      logger.i('onSignal renegotiate');
-      //negotiate();
-    }
-    //被要求收发，则加收发器
-    else if (webrtcSignal.transceiverRequest != null) {
-      logger.i('onSignal transceiver');
-      // addTransceiver(
-      //     kind: data.transceiverRequest.kind,
-      //     init: data.transceiverRequest.init);
-    }
-    //如果是候选信息
-    else if (signalType == SignalType.candidate.name && candidate != null) {
-      logger.i('onSignal candidate:${candidate.candidate}');
-      RTCSessionDescription? remoteDescription =
-          await peerConnection.getRemoteDescription();
-      //如果远程描述已经设置，加候选，否则，加入候选清单
-      if (remoteDescription != null && remoteDescription.type != null) {
-        addIceCandidate(candidate);
-      } else {
-        logger.i('remoteDescription null,save candidate');
-        remoteCandidates[candidate.candidate ?? ''] = candidate;
-      }
-    }
-    //如果sdp信息，则设置远程描述，并处理所有的候选清单中候选服务器
-    //对主叫节点来说，sdp应该是answer
-    else if (signalType == SignalType.sdp.name && sdp != null) {
-      logger.i('onSignal sdp answer:${sdp.type}');
-      RTCSessionDescription? remoteDescription =
-          await peerConnection.getRemoteDescription();
-      if (remoteDescription != null) {
-        logger.e('remoteDescription is exist');
-      }
-      this.sdp = sdp;
-      await peerConnection.setRemoteDescription(sdp);
-      if (status == PeerConnectionStatus.closed) {
-        logger.e('PeerConnectionStatus closed');
-        return;
-      }
-      for (var candidate in remoteCandidates.values) {
-        addIceCandidate(candidate);
-      }
-      remoteCandidates = {};
-    }
-    //如果什么都不是，报错
-    else {
-      logger.e('signal called with invalid signal type');
-    }
-  }
-
-  /// 为连接加上收发器
-  /// @param {String} kind
-  /// @param {Object} init
-  addTransceiver({
-    required MediaStreamTrack track,
-    required RTCRtpMediaType kind,
-    required RTCRtpTransceiverInit init,
-  }) async {
-    RTCPeerConnection peerConnection = this.peerConnection!;
-    logger.i('addTransceiver');
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
-    }
-
-    //直接加上收发器，并开始协商
-    try {
-      await peerConnection.addTransceiver(track: track, kind: kind, init: init);
-      //negotiate();
-    } catch (err) {
-      logger.e(err);
-      close();
-    }
-  }
-}
-
-///在收到主动方的signal后，如果不存在，则创建
-class SlavePeerConnection extends BasePeerConnection {
-  //作为被叫方创建的answer
-  RTCSessionDescription? answer;
-
-  SlavePeerConnection();
-
-  ///被叫的协商时发送再协商信号给主叫，要求重新发起协商
-  @override
-  negotiate() async {
-    logger.i('Negotiation start, requesting negotiation from slave');
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
-    }
-    //被叫不能在第一次的时候主动发起协议过程
-    if (firstNegotiation) {
-      firstNegotiation = false;
-      return;
-    }
-    firstNegotiation = false;
-    if (status == PeerConnectionStatus.negotiating) {
-      logger.e('already negotiating');
-      return;
-    }
-    //被叫发送重新协商的请求
-    logger.i('send signal renegotiate from slave');
-    emit(WebrtcEventType.signal,
-        WebrtcSignal('renegotiate', renegotiate: true, extension: extension));
-    status == PeerConnectionStatus.negotiating;
-  }
-
-  ///创建answer，发生在被叫方，将answer回到主叫方
-  createAnswer() async {
-    RTCPeerConnection peerConnection = this.peerConnection!;
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
-    }
-
-    logger.i('start createAnswer');
-    RTCSessionDescription? answer = await peerConnection.getLocalDescription();
-    if (answer != null) {
-      logger.e('getLocalDescription local sdp answer is exist:${answer.type}');
-    }
-    answer = await peerConnection.createAnswer(sdpConstraints);
-    logger.i('create local sdp answer:${answer.type}, and setLocalDescription');
-    await peerConnection.setLocalDescription(answer);
-    logger
-        .i('setLocalDescription local sdp answer:${answer.type} successfully');
-
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
-    }
-    await sendAnswer(answer);
-  }
-
-  //发送answer
-  sendAnswer(RTCSessionDescription answer) async {
-    RTCPeerConnection peerConnection = this.peerConnection!;
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
-    }
-    logger.i('send signal local sdp answer:${answer.type}');
-    var sdp = await peerConnection.getLocalDescription();
-    sdp ??= answer;
-    emit(WebrtcEventType.signal,
-        WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
-    logger.i('sendAnswer:${answer.type} successfully');
-  }
-
-  ///从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
-  @override
-  onSignal(WebrtcSignal webrtcSignal) async {
-    RTCPeerConnection? peerConnection = this.peerConnection;
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
-    }
-    status == PeerConnectionStatus.negotiating;
-    String signalType = webrtcSignal.signalType;
-    var candidate = webrtcSignal.candidate;
-    var sdp = webrtcSignal.sdp;
-    //如果是候选信息
-    if (signalType == SignalType.candidate.name && candidate != null) {
-      logger.i('onSignal candidate:${candidate.candidate}');
-      if (peerConnection != null) {
-        RTCSessionDescription? remoteDescription =
-            await peerConnection.getRemoteDescription();
-        //如果远程描述已经设置，加候选，否则，加入候选清单
-        if (remoteDescription != null && remoteDescription.type != null) {
-          addIceCandidate(candidate);
-        } else {
-          logger.i('remoteDescription is null,save candidate');
-          remoteCandidates[candidate.candidate ?? ''] = candidate;
-        }
-      } else {
-        logger.i('peerConnection is null,save candidate');
-        remoteCandidates[candidate.candidate ?? ''] = candidate;
-      }
-    }
-    //如果sdp信息，则设置远程描述，并处理所有的候选清单中候选服务器
-    else if (signalType == SignalType.sdp.name && sdp != null) {
-      logger.i('onSignal sdp offer:${sdp.type}');
-      this.sdp = sdp;
-      if (peerConnection != null) {
-        logger.i('start setRemoteDescription sdp offer:${sdp.type}');
-        RTCSessionDescription? remoteDescription =
-            await peerConnection.getRemoteDescription();
-        if (remoteDescription != null) {
-          logger.e(
-              'RemoteDescription sdp offer is exist:${remoteDescription.type}');
-        }
-        await peerConnection.setRemoteDescription(sdp);
-        logger.i('setRemoteDescription sdp offer:${sdp.type} successfully');
-        if (status == PeerConnectionStatus.closed) {
-          logger.e('PeerConnectionStatus closed');
-          return;
-        }
-        //如果远程描述是offer请求，则创建answer
-        remoteDescription = await peerConnection.getRemoteDescription();
-        if (remoteDescription != null && remoteDescription.type == 'offer') {
-          await createAnswer();
-        }
-        for (var candidate in remoteCandidates.values) {
-          addIceCandidate(candidate);
-        }
-        remoteCandidates = {};
-      } else {
-        logger.e('peerConnection is null');
-      }
-    }
-    //如果什么都不是，报错
-    else {
-      logger.e('signal called with invalid signal data');
-    }
-  }
-
-  /// 为连接加上收发器
-  /// @param {String} kind
-  /// @param {Object} init
-  addTransceiver({
-    required MediaStreamTrack track,
-    required RTCRtpMediaType kind,
-    required RTCRtpTransceiverInit init,
-  }) async {
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
-    }
-    logger.i('addTransceiver()');
-
-    emit(
-        WebrtcEventType.signal,
-        WebrtcSignal(SignalType.transceiverRequest.name,
-            transceiverRequest: {'kind': kind, 'init': init},
-            extension: extension));
   }
 }

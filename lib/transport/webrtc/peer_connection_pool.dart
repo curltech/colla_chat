@@ -415,6 +415,8 @@ class PeerConnectionPool {
       return;
     }
 
+    ///收到信号，连接已经存在，但是clientId为''，表明自己是主叫，建立的时候对方的clientId未知
+    ///设置clientId
     AdvancedPeerConnection? advancedPeerConnection;
     Map<String, AdvancedPeerConnection>? peerConnections =
         this.peerConnections.get(peerId);
@@ -472,7 +474,11 @@ class PeerConnectionPool {
       peerConnectionPoolController.onCreated(WebrtcEvent(peerId,
           clientId: clientId, data: advancedPeerConnection));
 
+      ///收到对方的offer，自己应该是被叫
       if ((signalType == SignalType.sdp.name && signal.sdp!.type == 'offer')) {
+        //如果自己是主叫，比较peerId，如果自己的较大，则自己继续作为主叫，忽略offer信号
+        //否则自己将作为被叫，接收offer信号
+        if (advancedPeerConnection.basePeerConnection.initiator) {}
         if (advancedPeerConnection.basePeerConnection.status ==
             PeerConnectionStatus.created) {
           var result =

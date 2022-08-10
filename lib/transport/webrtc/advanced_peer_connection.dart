@@ -91,13 +91,13 @@ class AdvancedPeerConnection {
   AdvancedPeerConnection(this.peerId, bool initiator,
       {this.clientId, this.name, this.room}) {
     if (initiator) {
-      final basePeerConnection = MasterPeerConnection();
+      final basePeerConnection = BasePeerConnection(initiator: true);
       this.basePeerConnection = basePeerConnection;
     } else {
       if (StringUtil.isEmpty(clientId)) {
         logger.e('SlavePeerConnection clientId must be value');
       }
-      final basePeerConnection = SlavePeerConnection();
+      final basePeerConnection = BasePeerConnection(initiator: false);
       this.basePeerConnection = basePeerConnection;
     }
   }
