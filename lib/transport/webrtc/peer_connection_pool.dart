@@ -239,7 +239,7 @@ class PeerConnectionPool {
     peerConnectionPoolController.onCreated(
         WebrtcEvent(peerId, clientId: clientId, data: peerConnection));
     bool result =
-        await peerConnection.connect(streams: streams, iceServers: iceServers);
+        await peerConnection.init(streams: streams, iceServers: iceServers);
     if (!result) {
       logger.e('webrtcPeer.init fail');
       return null;
@@ -482,7 +482,7 @@ class PeerConnectionPool {
         if (advancedPeerConnection.basePeerConnection.status ==
             PeerConnectionStatus.created) {
           var result =
-              await advancedPeerConnection.connect(iceServers: iceServers);
+              await advancedPeerConnection.init(iceServers: iceServers);
           if (!result) {
             logger.e('webrtcPeer.init fail');
             return null;

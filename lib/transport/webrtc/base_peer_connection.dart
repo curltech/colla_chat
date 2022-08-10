@@ -238,7 +238,7 @@ class BasePeerConnection {
   ///建立连接对象，设置好回调函数，然后如果是master发起协商，如果是follow，在收到offer才开始创建，
   ///只有协商完成，数据通道打开，才算真正完成连接
   ///可输入的参数包括外部媒体流和定制扩展属性
-  Future<bool> connect(
+  Future<bool> init(
       {List<MediaStream> streams = const [],
       required SignalExtension extension}) async {
     start = DateTime.now().millisecondsSinceEpoch;
@@ -351,7 +351,7 @@ class BasePeerConnection {
       reconnectTimes--;
       logger.i(
           'webrtc peerId:${extension!.peerId},clientId:${extension!.clientId} reconnecting');
-      await connect(extension: extension!);
+      await init(extension: extension!);
     });
   }
 
