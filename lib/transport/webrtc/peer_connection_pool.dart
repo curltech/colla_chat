@@ -280,6 +280,7 @@ class PeerConnectionPool {
       }
       for (String clientId in clientIds) {
         peerConnections.remove(clientId);
+        logger.i('remove peerConnection peerId:$peerId,clientId:clientId');
       }
       if (peerConnections.isEmpty) {
         this.peerConnections.remove(peerId);

@@ -461,7 +461,7 @@ abstract class BasePeerConnection {
   }
 
   onRenegotiationNeeded() {
-    logger.i('Master onRenegotiationNeeded event');
+    logger.w('onRenegotiationNeeded event');
     //negotiate();
   }
 
