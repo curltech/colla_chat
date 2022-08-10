@@ -9,6 +9,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:connectivity/connectivity.dart';
+import 'package:cross_file/cross_file.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -27,14 +28,13 @@ import 'package:phone_numbers_parser/phone_numbers_parser.dart'
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:sensors_plus/sensors_plus.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 import 'package:telephony/telephony.dart';
 import 'package:toast/toast.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 import '../crypto/util.dart';
 import '../provider/app_data_provider.dart';
-import 'package:cross_file/cross_file.dart';
-import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 
 class TypeUtil {
   static bool isString(dynamic obj) {

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:colla_chat/pages/chat/chat/widget/quit_message.dart';
 import 'package:colla_chat/pages/chat/chat/widget/red_package.dart';
-import 'package:colla_chat/pages/chat/chat/widget/sound_msg.dart';
+//import 'package:colla_chat/pages/chat/chat/widget/sound_msg.dart';
 import 'package:colla_chat/pages/chat/chat/widget/text_msg.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -39,12 +39,14 @@ class _SendMessageViewState extends State<SendMessageView> {
       return TextMsg(msgStr, widget.model);
     } else if (msgType == "Image" || iosImg) {
       return ImgMsg({}, widget.model);
-    } else if (msgType == 'Sound' || iosSound) {
-      return SoundMsg(widget.model);
+    }
+    // else if (msgType == 'Sound' || iosSound) {
+      //return SoundMsg(widget.model);
 //    } else if (msg.toString().contains('snapshotPath') &&
 //        msg.toString().contains('videoPath')) {
 //      return VideoMessage(msg, msgType, widget.data);
-    } else if (msgType == 'Join') {
+//     }
+    else if (msgType == 'Join') {
       return JoinMessage(widget.model);
     } else if (msgType == 'Quit') {
       return QuitMessage(widget.model);
