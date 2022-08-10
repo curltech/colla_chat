@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
@@ -101,7 +102,7 @@ class AdvancedPeerConnection {
     }
   }
 
-  Future<bool> init(
+  Future<bool> connect(
       {List<MediaStream> streams = const [],
       List<Map<String, String>>? iceServers}) async {
     var myselfPeerId = myself.peerId;
@@ -115,8 +116,8 @@ class AdvancedPeerConnection {
       logger.e('myself peerId or clientId is null');
       return false;
     }
-    bool result =
-        await basePeerConnection.init(streams: streams, extension: extension);
+    bool result = await basePeerConnection.connect(
+        streams: streams, extension: extension);
     if (!result) {
       logger.e('WebrtcCorePeer init result is false');
       return false;
@@ -165,6 +166,10 @@ class AdvancedPeerConnection {
     });
 
     return result;
+  }
+
+  PeerConnectionStatus get status {
+    return basePeerConnection.status;
   }
 
   addLocalStream(MediaStream stream) {

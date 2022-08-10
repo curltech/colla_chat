@@ -363,7 +363,6 @@ class IndexWidgetProvider with ChangeNotifier {
       'me': AppLocalizations.instance.text('Me'),
     };
     String name = mainViews[index];
-    name = name ?? '';
     String? label = widgetLabels[name];
     label = label ?? '';
 

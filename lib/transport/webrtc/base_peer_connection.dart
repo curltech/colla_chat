@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
@@ -220,6 +221,9 @@ abstract class BasePeerConnection {
   int? start;
   int? end;
 
+  int heartTimes = 3000; // 心跳间隔(毫秒)
+  int reconnectTimes = 1;
+
   BasePeerConnection() {
     logger.i('Create BasePeerConnection');
   }
@@ -228,7 +232,7 @@ abstract class BasePeerConnection {
   ///建立连接对象，设置好回调函数，然后如果是master发起协商，如果是follow，在收到offer才开始创建，
   ///只有协商完成，数据通道打开，才算真正完成连接
   ///可输入的参数包括外部媒体流和定制扩展属性
-  Future<bool> init(
+  Future<bool> connect(
       {List<MediaStream> streams = const [],
       required SignalExtension extension}) async {
     start = DateTime.now().millisecondsSinceEpoch;
@@ -320,6 +324,20 @@ abstract class BasePeerConnection {
     };
 
     return true;
+  }
+
+  /// 重连机制
+  Future<void> reconnect() async {
+    Timer.periodic(Duration(milliseconds: heartTimes), (timer) async {
+      if (reconnectTimes <= 0 || status == PeerConnectionStatus.connected) {
+        timer.cancel();
+        return;
+      }
+      reconnectTimes--;
+      logger.i(
+          'webrtc peerId:${extension!.peerId},clientId:${extension!.clientId} reconnecting');
+      await connect(extension: extension!);
+    });
   }
 
   void connected() {
@@ -756,6 +774,10 @@ abstract class BasePeerConnection {
     }
     status = PeerConnectionStatus.closed;
     logger.i('PeerConnectionStatus closed');
+
+    if (reconnectTimes > 0) {
+      reconnect();
+    }
     emit(WebrtcEventType.closed, '');
   }
 }

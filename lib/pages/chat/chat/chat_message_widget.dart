@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/service/chat/chat.dart';
+import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:flutter/material.dart';
 
 import '../../../entity/chat/chat.dart';
@@ -266,11 +267,26 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
 
   @override
   Widget build(BuildContext context) {
+    var connected = false;
+    var peerId = widget.chatMessageController.chatSummary!.peerId!;
+    var peerConnection = peerConnectionPool.getOne(peerId);
+    if (peerConnection != null) {
+      if (peerConnection.status == PeerConnectionStatus.connected) {
+        connected = true;
+      }
+    }
+
     ///获取最新的消息
     widget.chatMessageController.latest();
     String name = widget.chatMessageController.chatSummary!.name!;
     var appBarView = AppBarView(
-        title: Text(AppLocalizations.t(name)),
+        title: Row(children: [
+          Text(AppLocalizations.t(name)),
+          Icon(Icons.light,
+              color: connected
+                  ? appDataProvider.themeData!.colorScheme.primary
+                  : Colors.grey),
+        ]),
         withLeading: widget.withLeading,
         child: _buildListView(context));
     return appBarView;

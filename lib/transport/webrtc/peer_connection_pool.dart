@@ -239,7 +239,7 @@ class PeerConnectionPool {
     peerConnectionPoolController.onCreated(
         WebrtcEvent(peerId, clientId: clientId, data: peerConnection));
     bool result =
-        await peerConnection.init(streams: streams, iceServers: iceServers);
+        await peerConnection.connect(streams: streams, iceServers: iceServers);
     if (!result) {
       logger.e('webrtcPeer.init fail');
       return null;
@@ -335,18 +335,39 @@ class PeerConnectionPool {
     return peerConnections;
   }
 
+  ///清除过一段时间仍没有连接上的连接
   clear() async {
+    List<String> removedPeerIds = [];
     for (var peerId in peerConnections.keys()) {
       Map<String, AdvancedPeerConnection>? peerConnections =
           this.peerConnections.get(peerId);
       if (peerConnections != null && peerConnections.isNotEmpty) {
+        List<String> removedClientIds = [];
         for (AdvancedPeerConnection peerConnection in peerConnections.values) {
-          peerConnection.close();
+          if (peerConnection.basePeerConnection.status !=
+              PeerConnectionStatus.connected) {
+            var start = peerConnection.basePeerConnection.start;
+            var now = DateTime.now().millisecondsSinceEpoch;
+            var gap = now - start!;
+            var limit = const Duration(minutes: 10);
+            if (gap > limit.inMilliseconds) {
+              removedClientIds.add(peerConnection.clientId!);
+              logger.e(
+                  'peerConnection peerId:${peerConnection.peerId},clientId:${peerConnection.clientId} is overtime unconnected');
+            }
+          }
         }
-        peerConnections.clear();
+        for (var removedClientId in removedClientIds) {
+          peerConnections.remove(removedClientId);
+        }
+        if (peerConnections.isEmpty) {
+          removedPeerIds.add(peerId);
+        }
       }
     }
-    peerConnections.clear();
+    for (var removedPeerId in removedPeerIds) {
+      peerConnections.remove(removedPeerId);
+    }
   }
 
   /// 接收到信号服务器发来的signal的处理,没有完成，要仔细考虑多终端的情况
@@ -454,7 +475,7 @@ class PeerConnectionPool {
         if (advancedPeerConnection.basePeerConnection.status ==
             PeerConnectionStatus.created) {
           var result =
-              await advancedPeerConnection.init(iceServers: iceServers);
+              await advancedPeerConnection.connect(iceServers: iceServers);
           if (!result) {
             logger.e('webrtcPeer.init fail');
             return null;
