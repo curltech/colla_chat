@@ -74,9 +74,12 @@ enum ChatSubMessageType {
 }
 
 enum MessageStatus {
-  effective,
-  recall,
-  deleted,
+  unsent, //未发送成功
+  sent, //发送成功
+  received, //已接收
+  read, //已读
+  recall, //回拨
+  deleted, //删除
 }
 
 ///好友，群，潜在，联系人，频道，房间

@@ -7,12 +7,9 @@ import 'package:uuid/uuid.dart';
 
 import '../../constant/base.dart';
 import '../../datastore/datastore.dart';
-import '../../entity/base.dart';
 import '../../entity/chat/chat.dart';
 import '../../entity/chat/contact.dart';
 import '../../entity/dht/myself.dart';
-import '../../entity/p2p/security_context.dart';
-import '../p2p/security_context.dart';
 
 class ChatMessageService extends GeneralBaseService<ChatMessage> {
   ChatMessageService({
@@ -128,6 +125,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String? title,
     List<int>? thumbBody,
     List<int>? thumbnail,
+    String? status,
   }) async {
     ChatMessage chatMessage = ChatMessage(myself.peerId!);
     var uuid = const Uuid();
@@ -159,6 +157,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     }
     chatMessage.content = CryptoUtil.encodeBase64(data);
     chatMessage.contentType = contentType.name;
+    status = MessageStatus.sent.name;
 
     await insert(chatMessage);
     await chatSummaryService.upsertByChatMessage(chatMessage);
