@@ -3,40 +3,47 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
+import '../../../../provider/app_data_provider.dart';
+
+import './condition_import/unsupport.dart'
+    if (dart.library.html) './condition_import/web.dart'
+    if (dart.library.io) './condition_import/desktop.dart' as displayCapturer;
+
 // ignore: must_be_immutable
 class ScreenSelectDialog extends Dialog {
-  ScreenSelectDialog() {
-    Future.delayed(Duration(milliseconds: 100), () {
+  ScreenSelectDialog({Key? key}) : super(key: key) {
+    Future.delayed(const Duration(milliseconds: 100), () {
       _getSources();
-      _timer = Timer.periodic(Duration(milliseconds: 2000), (timer) {
+      _timer = Timer.periodic(const Duration(milliseconds: 2000), (timer) {
         _getSources();
       });
     });
   }
+
   List<DesktopCapturerSource> _sources = [];
   SourceType _sourceType = SourceType.Screen;
-  DesktopCapturerSource? _selected_source;
+  DesktopCapturerSource? _selectedSource;
   StateSetter? _stateSetter;
   Timer? _timer;
 
   void _pop(context) {
     _timer?.cancel();
-    Navigator.pop<DesktopCapturerSource>(context, _selected_source);
+    Navigator.pop<DesktopCapturerSource>(context, _selectedSource);
   }
 
   Future<void> _getSources() async {
     try {
-      var sources = await desktopCapturer.getSources(types: [_sourceType]);
-      sources.forEach((element) {
-        print(
+      var sources = await displayCapturer.getSources(types: [_sourceType]);
+      for (var element in sources) {
+        logger.i(
             'name: ${element.name}, id: ${element.id}, type: ${element.type}');
-      });
+      }
       _stateSetter?.call(() {
         _sources = sources;
       });
       return;
     } catch (e) {
-      print(e.toString());
+      logger.i(e.toString());
     }
   }
 
@@ -52,10 +59,10 @@ class ScreenSelectDialog extends Dialog {
         child: Column(
           children: <Widget>[
             Padding(
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               child: Stack(
                 children: <Widget>[
-                  Align(
+                  const Align(
                     alignment: Alignment.topLeft,
                     child: Text(
                       'Choose what to share',
@@ -65,7 +72,7 @@ class ScreenSelectDialog extends Dialog {
                   Align(
                     alignment: Alignment.topRight,
                     child: InkWell(
-                      child: Icon(Icons.close),
+                      child: const Icon(Icons.close),
                       onTap: () => _pop(context),
                     ),
                   ),
@@ -76,7 +83,7 @@ class ScreenSelectDialog extends Dialog {
               flex: 1,
               child: Container(
                 width: double.infinity,
-                padding: EdgeInsets.all(10),
+                padding: const EdgeInsets.all(10),
                 child: StatefulBuilder(
                   builder: (context, setState) {
                     _stateSetter = setState;
@@ -85,16 +92,17 @@ class ScreenSelectDialog extends Dialog {
                       child: Column(
                         children: <Widget>[
                           Container(
-                            constraints: BoxConstraints.expand(height: 24),
+                            constraints:
+                                const BoxConstraints.expand(height: 24),
                             child: TabBar(
                                 onTap: (value) => Future.delayed(
-                                        Duration(milliseconds: 300), () {
+                                        const Duration(milliseconds: 300), () {
                                       _sourceType = value == 0
                                           ? SourceType.Screen
                                           : SourceType.Window;
                                       _getSources();
                                     }),
-                                tabs: [
+                                tabs: const [
                                   Tab(
                                       child: Text(
                                     'Entrire Screen',
@@ -107,142 +115,130 @@ class ScreenSelectDialog extends Dialog {
                                   )),
                                 ]),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             height: 2,
                           ),
                           Expanded(
-                            child: Container(
-                              child: TabBarView(children: [
-                                Align(
-                                    alignment: Alignment.center,
-                                    child: Container(
-                                      child: GridView.count(
-                                        crossAxisSpacing: 8,
-                                        crossAxisCount: 2,
-                                        children: _sources
-                                            .where((element) =>
-                                                element.type ==
-                                                SourceType.Screen)
-                                            .map((e) => Column(
-                                                  children: [
-                                                    Expanded(
-                                                        child: Container(
-                                                      decoration: (_selected_source !=
-                                                                  null &&
-                                                              _selected_source!
-                                                                      .id ==
-                                                                  e.id)
-                                                          ? BoxDecoration(
-                                                              border: Border.all(
-                                                                  width: 2,
-                                                                  color: Colors
-                                                                      .blueAccent))
-                                                          : null,
-                                                      child: InkWell(
-                                                        onTap: () {
-                                                          print(
-                                                              'Selected screen id => ${e.id}');
-                                                          setState(() {
-                                                            _selected_source =
-                                                                e;
-                                                          });
-                                                        },
-                                                        child:
-                                                            e.thumbnail != null
-                                                                ? Image.memory(
-                                                                    e.thumbnail!,
-                                                                    scale: 1.0,
-                                                                    repeat: ImageRepeat
-                                                                        .noRepeat,
-                                                                  )
-                                                                : Container(),
-                                                      ),
-                                                    )),
-                                                    Text(
-                                                      e.name,
-                                                      style: TextStyle(
-                                                          fontSize: 12,
-                                                          color: Colors.black87,
-                                                          fontWeight: (_selected_source !=
+                            child: TabBarView(children: [
+                              Align(
+                                  alignment: Alignment.center,
+                                  child: GridView.count(
+                                    crossAxisSpacing: 8,
+                                    crossAxisCount: 2,
+                                    children: _sources
+                                        .where((element) =>
+                                            element.type == SourceType.Screen)
+                                        .map((e) => Column(
+                                              children: [
+                                                Expanded(
+                                                    child: Container(
+                                                  decoration: (_selectedSource !=
+                                                              null &&
+                                                          _selectedSource!.id ==
+                                                              e.id)
+                                                      ? BoxDecoration(
+                                                          border: Border.all(
+                                                              width: 2,
+                                                              color: Colors
+                                                                  .blueAccent))
+                                                      : null,
+                                                  child: InkWell(
+                                                    onTap: () {
+                                                      logger.i(
+                                                          'Selected screen id => ${e.id}');
+                                                      setState(() {
+                                                        _selectedSource = e;
+                                                      });
+                                                    },
+                                                    child: e.thumbnail != null
+                                                        ? Image.memory(
+                                                            e.thumbnail!,
+                                                            scale: 1.0,
+                                                            repeat: ImageRepeat
+                                                                .noRepeat,
+                                                          )
+                                                        : Container(),
+                                                  ),
+                                                )),
+                                                Text(
+                                                  e.name,
+                                                  style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.black87,
+                                                      fontWeight:
+                                                          (_selectedSource !=
                                                                       null &&
-                                                                  _selected_source!
+                                                                  _selectedSource!
                                                                           .id ==
                                                                       e.id)
                                                               ? FontWeight.bold
                                                               : FontWeight
                                                                   .normal),
-                                                    ),
-                                                  ],
-                                                ))
-                                            .toList(),
-                                      ),
-                                    )),
-                                Align(
-                                    alignment: Alignment.center,
-                                    child: Container(
-                                      child: GridView.count(
-                                        crossAxisSpacing: 8,
-                                        crossAxisCount: 3,
-                                        children: _sources
-                                            .where((element) =>
-                                                element.type ==
-                                                SourceType.Window)
-                                            .map((e) => Column(
-                                                  children: [
-                                                    Expanded(
-                                                        child: Container(
-                                                      decoration: (_selected_source !=
-                                                                  null &&
-                                                              _selected_source!
-                                                                      .id ==
-                                                                  e.id)
-                                                          ? BoxDecoration(
-                                                              border: Border.all(
-                                                                  width: 2,
-                                                                  color: Colors
-                                                                      .blueAccent))
-                                                          : null,
-                                                      child: InkWell(
-                                                        onTap: () {
-                                                          print(
-                                                              'Selected window id => ${e.id}');
-                                                          setState(() {
-                                                            _selected_source =
-                                                                e;
-                                                          });
-                                                        },
-                                                        child:
-                                                            e.thumbnail != null
-                                                                ? Image.memory(
-                                                                    e.thumbnail!,
-                                                                    scale: 1.0,
-                                                                    repeat: ImageRepeat
-                                                                        .noRepeat,
-                                                                  )
-                                                                : Container(),
-                                                      ),
-                                                    )),
-                                                    Text(
-                                                      e.name,
-                                                      style: TextStyle(
-                                                          fontSize: 12,
-                                                          color: Colors.black87,
-                                                          fontWeight: (_selected_source !=
+                                                ),
+                                              ],
+                                            ))
+                                        .toList(),
+                                  )),
+                              Align(
+                                  alignment: Alignment.center,
+                                  child: GridView.count(
+                                    crossAxisSpacing: 8,
+                                    crossAxisCount: 3,
+                                    children: _sources
+                                        .where((element) =>
+                                            element.type == SourceType.Window)
+                                        .map((e) => Column(
+                                              children: [
+                                                Expanded(
+                                                    child: Container(
+                                                  decoration: (_selectedSource !=
+                                                              null &&
+                                                          _selectedSource!.id ==
+                                                              e.id)
+                                                      ? BoxDecoration(
+                                                          border: Border.all(
+                                                              width: 2,
+                                                              color: Colors
+                                                                  .blueAccent))
+                                                      : null,
+                                                  child: InkWell(
+                                                    onTap: () {
+                                                      logger.i(
+                                                          'Selected window id => ${e.id}');
+                                                      setState(() {
+                                                        _selectedSource = e;
+                                                      });
+                                                    },
+                                                    child: e.thumbnail != null
+                                                        ? Image.memory(
+                                                            e.thumbnail!,
+                                                            scale: 1.0,
+                                                            repeat: ImageRepeat
+                                                                .noRepeat,
+                                                          )
+                                                        : Container(),
+                                                  ),
+                                                )),
+                                                Text(
+                                                  e.name,
+                                                  style: TextStyle(
+                                                      fontSize: 12,
+                                                      color: Colors.black87,
+                                                      fontWeight:
+                                                          (_selectedSource !=
                                                                       null &&
-                                                                  _selected_source!
+                                                                  _selectedSource!
                                                                           .id ==
                                                                       e.id)
                                                               ? FontWeight.bold
                                                               : FontWeight
                                                                   .normal),
-                                                    ),
-                                                  ],
-                                                ))
-                                            .toList(),
-                                      ),
-                                    )),
-                              ]),
-                            ),
+                                                ),
+                                              ],
+                                            ))
+                                        .toList(),
+                                  )),
+                            ]),
                           )
                         ],
                       ),
@@ -251,12 +247,12 @@ class ScreenSelectDialog extends Dialog {
                 ),
               ),
             ),
-            Container(
+            SizedBox(
               width: double.infinity,
               child: ButtonBar(
                 children: <Widget>[
                   MaterialButton(
-                    child: Text(
+                    child: const Text(
                       'Cancel',
                       style: TextStyle(color: Colors.black54),
                     ),
@@ -266,7 +262,7 @@ class ScreenSelectDialog extends Dialog {
                   ),
                   MaterialButton(
                     color: Theme.of(context).primaryColor,
-                    child: Text(
+                    child: const Text(
                       'Share',
                     ),
                     onPressed: () {

@@ -49,6 +49,7 @@ class _P2pLoginState extends State<P2pLogin> {
       children: widget._children,
     );
     var appBar = AppBar(
+      elevation: 0.0,
       automaticallyImplyLeading: false,
       title: Text(AppLocalizations.t('Login')),
       actions: [

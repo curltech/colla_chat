@@ -71,7 +71,7 @@ class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
               }
       });
       stream.getVideoTracks()[0].onEnded = () {
-        print(
+        logger.i(
             'By adding a listener on onEnded you can: 1) catch stop video sharing on Web');
       };
     } catch (e) {

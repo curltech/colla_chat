@@ -1,5 +1,5 @@
+import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
-import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -9,21 +9,10 @@ import '../../../tool/util.dart';
 import '../../../widgets/data_bind/column_field_widget.dart';
 import '../../../widgets/data_bind/form_input_widget.dart';
 
-final List<ColumnFieldDef> p2pRegisterInputFieldDef = [
-  ColumnFieldDef(
-      name: 'credential',
-      label: 'Credentia(Mobile/Email/LoginName)',
-      prefixIcon: const Icon(Icons.person),
-      cancel: true,
-      initValue: '13609619603'),
-  ColumnFieldDef(
-    name: 'password',
-    label: 'password',
-    inputType: InputType.password,
-    initValue: '123456',
-    prefixIcon: const Icon(Icons.lock),
-  ),
-];
+const String skipLoginName = 'skipLogin';
+const String lastLoginName = 'lastLogin';
+const String credentialName = 'credential';
+const String passwordName = 'password';
 
 /// 远程登录组件，一个card下的录入框和按钮组合
 class P2pLoginWidget extends StatefulWidget {
@@ -34,30 +23,79 @@ class P2pLoginWidget extends StatefulWidget {
 }
 
 class _P2pLoginWidgetState extends State<P2pLoginWidget> {
+  final List<ColumnFieldDef> p2pLoginInputFieldDef = [
+    ColumnFieldDef(
+      name: 'credential',
+      label: 'Credentia(Mobile/Email/LoginName)',
+      prefixIcon: const Icon(Icons.person),
+      cancel: true,
+    ),
+    ColumnFieldDef(
+      name: 'password',
+      label: 'password',
+      inputType: InputType.password,
+      prefixIcon: const Icon(Icons.lock),
+    ),
+  ];
+
   @override
   void initState() {
     super.initState();
+    _lastLogin();
+    _skipLogin();
+  }
+
+  _lastLogin() async {
+    String? lastLoginStr = await localSecurityStorage.get(lastLoginName);
+    if (StringUtil.isNotEmpty(lastLoginStr)) {
+      Map<String, dynamic> skipLogin = JsonUtil.toJson(lastLoginStr);
+      String? credential = skipLogin[credentialName];
+      if (StringUtil.isNotEmpty(credential)) {
+        ColumnFieldDef credential = p2pLoginInputFieldDef[0];
+        credential.initValue = credential;
+      }
+    }
+  }
+
+  _skipLogin() async {
+    String? skipLoginStr = await localSecurityStorage.get(skipLoginName);
+    if (StringUtil.isNotEmpty(skipLoginStr)) {
+      Map<String, dynamic> skipLogin = JsonUtil.toJson(skipLoginStr);
+      String? credential = skipLogin[credentialName];
+      String? password = skipLogin[passwordName];
+      if (StringUtil.isNotEmpty(credential) &&
+          StringUtil.isNotEmpty(password)) {
+        _login(skipLogin);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     Provider.of<AppDataProvider>(context);
     return Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            child: FormInputWidget(
-              mainAxisAlignment: MainAxisAlignment.center,
-              onOk: _login,
-              columnFieldDefs: p2pRegisterInputFieldDef,
-            ));
+        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+        child: FormInputWidget(
+          mainAxisAlignment: MainAxisAlignment.center,
+          onOk: _login,
+          columnFieldDefs: p2pLoginInputFieldDef,
+        ));
   }
 
   _login(Map<String, dynamic> values) {
     AppDataProvider appParams = AppDataProvider.instance;
     appParams.saveAppParams();
-    String credential = values['credential'];
-    String password = values['password'];
+    String credential = values[credentialName];
+    String password = values[passwordName];
     myselfPeerService.login(credential, password).then((bool loginStatus) {
       if (loginStatus) {
+        //最后一次成功登录的用户名
+        String lastLogin = JsonUtil.toJsonString({credentialName: credential});
+        localSecurityStorage.save(lastLoginName, lastLogin);
+        //记录最后成功登录的用户名和密码
+        String skipLogin = JsonUtil.toJsonString(
+            {credentialName: credential, passwordName: password});
+        localSecurityStorage.save(skipLoginName, skipLogin);
         Application.router
             .navigateTo(context, Application.index, replace: true);
       } else {
