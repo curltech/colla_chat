@@ -1,12 +1,11 @@
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:cryptography/cryptography.dart';
 
 import '../../crypto/cryptography.dart';
 import '../../entity/dht/myself.dart';
 import '../../entity/dht/myselfpeer.dart';
-import '../../provider/app_data_provider.dart';
 import '../../tool/util.dart';
-import '../../transport/webrtc/peer_connection_pool.dart';
 import '../../widgets/common/image_widget.dart';
 
 class MyselfService {

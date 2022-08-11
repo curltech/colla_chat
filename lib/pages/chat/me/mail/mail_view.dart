@@ -59,8 +59,10 @@ class _MailViewState extends State<MailView>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: children,
     );
-    var appBarView =
-        AppBarView(title: Text(AppLocalizations.t('Mail')), withLeading: widget.withLeading, child: row);
+    var appBarView = AppBarView(
+        title: Text(AppLocalizations.t('Mail')),
+        withLeading: widget.withLeading,
+        child: row);
 
     return appBarView;
   }

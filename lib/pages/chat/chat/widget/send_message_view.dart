@@ -41,7 +41,7 @@ class _SendMessageViewState extends State<SendMessageView> {
       return ImgMsg({}, widget.model);
     }
     // else if (msgType == 'Sound' || iosSound) {
-      //return SoundMsg(widget.model);
+    //return SoundMsg(widget.model);
 //    } else if (msg.toString().contains('snapshotPath') &&
 //        msg.toString().contains('videoPath')) {
 //      return VideoMessage(msg, msgType, widget.data);

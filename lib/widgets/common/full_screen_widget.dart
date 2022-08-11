@@ -45,7 +45,9 @@ class FullScreenWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
-        title: Text(AppLocalizations.t(title)), withLeading: withLeading, child: _buildChild(context));
+        title: Text(AppLocalizations.t(title)),
+        withLeading: withLeading,
+        child: _buildChild(context));
     return appBarView;
   }
 }

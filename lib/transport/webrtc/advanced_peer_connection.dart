@@ -4,11 +4,11 @@ import 'dart:typed_data';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-import '../../provider/app_data_provider.dart';
 import '../../service/p2p/security_context.dart';
 import '../../service/servicelocator.dart';
 import '../../tool/util.dart';
@@ -116,8 +116,8 @@ class AdvancedPeerConnection {
       logger.e('myself peerId or clientId is null');
       return false;
     }
-    bool result = await basePeerConnection.init(
-        streams: streams, extension: extension);
+    bool result =
+        await basePeerConnection.init(streams: streams, extension: extension);
     if (!result) {
       logger.e('WebrtcCorePeer init result is false');
       return false;

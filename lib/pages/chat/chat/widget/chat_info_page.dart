@@ -5,7 +5,6 @@ import '../../../../widgets/common/app_bar_view.dart';
 import 'chat_mamber.dart';
 import 'label_row.dart';
 
-
 ///聊天详情页面
 class ChatInfoPage extends StatefulWidget {
   final String id;

@@ -3,8 +3,8 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
+
 import '../../../widgets/special_text/emoji_text.dart';
-import 'extended_text_message_input.dart';
 
 ///Emoji文本消息的输入面板
 class EmojiMessageInputWidget extends StatefulWidget {

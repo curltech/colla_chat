@@ -1,13 +1,13 @@
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/signalprotocol.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:cryptography/cryptography.dart';
 
 import '../../crypto/cryptography.dart';
 import '../../crypto/util.dart';
 import '../../entity/dht/myself.dart';
 import '../../entity/p2p/security_context.dart';
-import '../../provider/app_data_provider.dart';
 import '../../service/dht/peerclient.dart';
 import '../../tool/util.dart';
 

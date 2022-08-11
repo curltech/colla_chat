@@ -9,8 +9,8 @@ class SignalAction extends BaseAction {
   SignalAction(MsgType msgType) : super(msgType);
 
   ///发送webrtc信号
-  Future<dynamic> signal(
-      WebrtcSignal signal, String targetPeerId, {String? targetClientId}) async {
+  Future<dynamic> signal(WebrtcSignal signal, String targetPeerId,
+      {String? targetClientId}) async {
     ChainMessage? chainMessage = await signalAction.prepareSend(signal,
         targetPeerId: targetPeerId, targetClientId: targetClientId);
     // TODO: 视频通话的signal加密送过去解密完数据有问题，具体原因还没找到

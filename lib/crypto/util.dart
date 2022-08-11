@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'dart:math';
 import 'dart:typed_data';
-import 'package:bs58/bs58.dart';
+
 import 'package:archive/archive.dart';
+import 'package:bs58/bs58.dart';
 
 class CryptoUtil {
   /// 把输入的Uint8Array转换成base64的string

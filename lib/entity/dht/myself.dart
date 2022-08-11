@@ -11,6 +11,7 @@ import 'myselfpeer.dart';
 class Myself {
   String? peerId;
   String? clientId;
+
   // peer是ed25519,英语身份认证
   SimplePublicKey? peerPublicKey;
   SimpleKeyPair? peerPrivateKey;

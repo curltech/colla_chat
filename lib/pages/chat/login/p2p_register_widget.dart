@@ -1,13 +1,12 @@
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 
 import '../../../l10n/localization.dart';
-import '../../../provider/app_data_provider.dart';
 import '../../../routers/routes.dart';
 import '../../../service/dht/myselfpeer.dart';
 import '../../../widgets/data_bind/column_field_widget.dart';
-import '../../../widgets/style/platform_widget_factory.dart';
 
 final List<ColumnFieldDef> p2pRegisterInputFieldDef = [
   ColumnFieldDef(
@@ -55,36 +54,36 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
   @override
   Widget build(BuildContext context) {
     return ListView(
-        children: <Widget>[
-          const SizedBox(height: 30.0),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            child: IntlPhoneField(
-              initialCountryCode: _countryCode,
-              initialValue: _mobile,
-              decoration: InputDecoration(
-                labelText: AppLocalizations.t('Mobile'),
-              ),
-              onChanged: (phone) {
-                setState(() {
-                  _mobile = phone.completeNumber;
-                });
-              },
-              onCountryChanged: (country) {
-                setState(() {
-                  _countryCode = country.name;
-                });
-              },
+      children: <Widget>[
+        const SizedBox(height: 30.0),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+          child: IntlPhoneField(
+            initialCountryCode: _countryCode,
+            initialValue: _mobile,
+            decoration: InputDecoration(
+              labelText: AppLocalizations.t('Mobile'),
             ),
+            onChanged: (phone) {
+              setState(() {
+                _mobile = phone.completeNumber;
+              });
+            },
+            onCountryChanged: (country) {
+              setState(() {
+                _countryCode = country.name;
+              });
+            },
           ),
-          Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              child: FormInputWidget(
-                onOk: _onOk,
-                columnFieldDefs: p2pRegisterInputFieldDef,
-              )),
-        ],
-      );
+        ),
+        Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            child: FormInputWidget(
+              onOk: _onOk,
+              columnFieldDefs: p2pRegisterInputFieldDef,
+            )),
+      ],
+    );
   }
 
   _onOk(Map<String, dynamic> values) {

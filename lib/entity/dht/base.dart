@@ -19,7 +19,9 @@ abstract class PeerLocation extends StatusEntity {
   String publicKey = '';
   String? address;
   String? lastUpdateTime;
+
   PeerLocation(this.ownerPeerId, this.peerId);
+
   PeerLocation.fromJson(Map json)
       : ownerPeerId = json['ownerPeerId'] ?? '',
         peerId = json['peerId'],
@@ -62,7 +64,9 @@ abstract class PeerEntity extends PeerLocation {
   String? signatureData;
   String? expireDate;
   int version = 0;
+
   PeerEntity(String ownerPeerId, String peerId) : super(ownerPeerId, peerId);
+
   PeerEntity.fromJson(Map json)
       : mobile = json['mobile'],
         email = json['email'],

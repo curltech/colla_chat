@@ -33,6 +33,7 @@ class MailContentWidget extends StatefulWidget with TileDataMixin {
 
 class _MailContentWidgetState extends State<MailContentWidget> {
   late Widget mimeMessageViewer;
+
   @override
   initState() {
     super.initState();

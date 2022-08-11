@@ -2,11 +2,11 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../../platform.dart';
-import '../../provider/app_data_provider.dart';
 
 /// 简单包装webrtc视频流的渲染器，可以构造本地视频流或者传入的视频流
 /// 视频流绑定渲染器，并创建展示视图

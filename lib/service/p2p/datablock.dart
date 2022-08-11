@@ -1,11 +1,11 @@
 import 'package:colla_chat/crypto/cryptography.dart';
+import 'package:colla_chat/plugin/logger.dart';
 
 import '../../crypto/util.dart';
 import '../../entity/dht/myself.dart';
 import '../../entity/dht/peerclient.dart';
 import '../../entity/p2p/datablock.dart';
 import '../../p2p/chain/action/queryvalue.dart';
-import '../../provider/app_data_provider.dart';
 import '../../tool/util.dart';
 import '../base.dart';
 import '../dht/peerclient.dart';
@@ -271,8 +271,8 @@ class DataBlockService extends BaseService {
         if (transactionKey.peerId == myself.peerId) {
           targetPublicKey = myself.publicKey;
         } else {
-          targetPublicKey =
-              await peerClientService.getCachedPublicKey(transactionKey.peerId!);
+          targetPublicKey = await peerClientService
+              .getCachedPublicKey(transactionKey.peerId!);
         }
         if (!targetPublicKey) {
           logger.w('TargetPublicKey is null, will not be encrypted!');

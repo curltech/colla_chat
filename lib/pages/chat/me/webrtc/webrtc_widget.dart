@@ -61,7 +61,9 @@ class WebrtcWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     var webrtc = KeepAliveWrapper(
         child: AppBarView(
-            title: Text(AppLocalizations.t('')), withLeading: withLeading, child: dataListView));
+            title: Text(AppLocalizations.t('')),
+            withLeading: withLeading,
+            child: dataListView));
     return webrtc;
   }
 

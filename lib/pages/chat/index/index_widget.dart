@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../provider/app_data_provider.dart';
 import '../../../provider/index_widget_provider.dart';
 import '../channel/channel_widget.dart';
 import '../chat/chat_list_widget.dart';

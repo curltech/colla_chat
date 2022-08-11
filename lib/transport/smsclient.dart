@@ -1,4 +1,4 @@
-import 'package:colla_chat/p2p/chain/chainmessagehandler.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:colla_chat/transport/webclient.dart';
@@ -8,7 +8,6 @@ import '../crypto/util.dart';
 import '../entity/chat/chat.dart';
 import '../entity/dht/peerclient.dart';
 import '../entity/p2p/security_context.dart';
-import '../provider/app_data_provider.dart';
 import '../service/chat/chat.dart';
 import '../service/p2p/security_context.dart';
 import '../service/servicelocator.dart';

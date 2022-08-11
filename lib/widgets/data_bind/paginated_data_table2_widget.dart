@@ -1,4 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

@@ -1,6 +1,7 @@
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/pages/chat/me/peerendpoint/peer_endpoint_edit_widget.dart';
 import 'package:colla_chat/pages/chat/me/peerendpoint/peer_endpoint_show_widget.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:flutter/material.dart';
@@ -9,7 +10,6 @@ import '../../../../constant/address.dart';
 import '../../../../entity/base.dart';
 import '../../../../entity/dht/peerendpoint.dart';
 import '../../../../l10n/localization.dart';
-import '../../../../provider/app_data_provider.dart';
 import '../../../../provider/data_list_controller.dart';
 import '../../../../provider/index_widget_provider.dart';
 import '../../../../service/dht/peerendpoint.dart';

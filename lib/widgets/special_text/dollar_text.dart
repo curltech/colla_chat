@@ -8,6 +8,7 @@ class DollarText extends SpecialText {
       : super(flag, flag, textStyle, onTap: onTap);
   static const String flag = '\$';
   final int? start;
+
   @override
   InlineSpan finishText() {
     final String text = getContent();

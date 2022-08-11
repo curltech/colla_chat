@@ -1,10 +1,10 @@
 import 'package:colla_chat/datastore/datastore.dart' as datastore;
 import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:flutter/material.dart';
 
 import '../../../../entity/chat/mailaddress.dart';
-import '../../../../provider/app_data_provider.dart';
 import '../../../../service/chat/chat.dart';
 import '../../../../service/chat/mailaddress.dart';
 import '../../../../tool/util.dart';

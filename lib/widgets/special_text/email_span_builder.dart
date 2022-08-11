@@ -5,8 +5,10 @@ import 'email_text.dart';
 
 class EmailSpanBuilder extends SpecialTextSpanBuilder {
   EmailSpanBuilder(this.controller, this.context);
+
   final TextEditingController controller;
   final BuildContext context;
+
   @override
   SpecialText? createSpecialText(String flag,
       {TextStyle? textStyle,

@@ -1,3 +1,4 @@
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/common/blank_widget.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';

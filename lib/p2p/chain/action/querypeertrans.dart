@@ -15,7 +15,6 @@ class QueryPeerTransAction extends BaseAction {
 
     return null;
   }
-
 }
 
 final queryPeerTransAction = QueryPeerTransAction(MsgType.QUERYPEERTRANS);

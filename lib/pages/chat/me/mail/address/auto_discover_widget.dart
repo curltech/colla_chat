@@ -1,8 +1,8 @@
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:enough_mail/discover.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../l10n/localization.dart';
-import '../../../../../provider/app_data_provider.dart';
 import '../../../../../service/chat/mailaddress.dart';
 import '../../../../../tool/util.dart';
 import '../../../../../transport/emailclient.dart';

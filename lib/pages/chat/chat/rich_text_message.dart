@@ -1,4 +1,3 @@
-import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
 
 ///消息体：富文本

@@ -4,6 +4,7 @@ import '../../l10n/localization.dart';
 
 class BlankWidget extends StatelessWidget {
   final String text = 'This is blank widget';
+
   const BlankWidget({Key? key}) : super(key: key);
 
   @override

@@ -1,5 +1,6 @@
 import 'dart:core';
 
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:flutter/foundation.dart';
@@ -33,6 +34,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   PeerVideoRenderer peerVideoRenderer = PeerVideoRenderer();
   bool _inCalling = false;
   bool _isTorchOn = false;
+
   bool get _isRec => peerVideoRenderer.mediaRecorder != null;
 
   @override

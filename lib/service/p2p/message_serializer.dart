@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:colla_chat/tool/util.dart';
 
 import '../../crypto/util.dart';

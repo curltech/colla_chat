@@ -3,12 +3,9 @@ import 'dart:typed_data';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../../../entity/dht/myself.dart';
 import '../../../../l10n/localization.dart';
-import '../../../../provider/app_data_provider.dart';
-import '../../../../provider/index_widget_provider.dart';
 import '../../../../tool/util.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/image_widget.dart';

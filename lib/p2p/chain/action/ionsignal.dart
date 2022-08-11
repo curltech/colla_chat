@@ -1,5 +1,6 @@
+import 'package:colla_chat/plugin/logger.dart';
+
 import '../../../entity/p2p/chain_message.dart';
-import '../../../provider/app_data_provider.dart';
 import '../../../tool/util.dart';
 import '../baseaction.dart';
 
@@ -24,7 +25,6 @@ class IonSignalAction extends BaseAction {
 
     return null;
   }
-
 }
 
 final ionSignalAction = IonSignalAction(MsgType.IONSIGNAL);

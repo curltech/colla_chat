@@ -1,4 +1,3 @@
-
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
@@ -44,7 +43,9 @@ class ActionCard extends StatelessWidget {
           const SizedBox(height: 10.0 / 2),
           Text(
             tileData.title ?? '',
-            style: const TextStyle(color: Colors.black,),
+            style: const TextStyle(
+              color: Colors.black,
+            ),
           ),
         ],
       ),

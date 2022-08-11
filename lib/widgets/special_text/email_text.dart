@@ -1,4 +1,5 @@
 import 'dart:ui' as ui show PlaceholderAlignment;
+
 import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/material.dart';
 
@@ -9,6 +10,7 @@ class EmailText extends SpecialText {
   final TextEditingController? controller;
   final int? start;
   final BuildContext? context;
+
   @override
   bool isEnd(String value) {
     final int index = value.indexOf('@');

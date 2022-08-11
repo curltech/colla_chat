@@ -5,9 +5,7 @@ import 'package:colla_chat/p2p/chain/action/ionsignal.dart';
 import 'package:colla_chat/p2p/chain/action/p2pchat.dart';
 import 'package:colla_chat/service/stock/account.dart';
 import 'package:colla_chat/tool/util.dart';
-import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 
-import '../crypto/signalprotocol.dart';
 import '../entity/p2p/security_context.dart';
 import '../p2p/chain/action/chat.dart';
 import '../p2p/chain/action/ping.dart';

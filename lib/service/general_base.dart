@@ -1,6 +1,6 @@
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/plugin/logger.dart';
 
 import '../constant/base.dart';
 import '../datastore/datastore.dart';

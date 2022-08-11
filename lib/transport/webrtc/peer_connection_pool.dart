@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
@@ -16,7 +17,6 @@ import '../../entity/p2p/chain_message.dart';
 import '../../entity/p2p/security_context.dart';
 import '../../p2p/chain/action/signal.dart';
 import '../../pages/chat/me/webrtc/peer_connection_controller.dart';
-import '../../provider/app_data_provider.dart';
 
 ///一个队列，按照被使用的新旧排序，当元素超过最大数量的时候，溢出最旧的元素
 class LruQueue<T> {

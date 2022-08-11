@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 class EmojiText extends SpecialText {
   static const String flag = "[";
   final int start;
+
   EmojiText(TextStyle? textStyle, {required this.start})
       : super(EmojiText.flag, "]", textStyle);
 
@@ -41,6 +42,7 @@ class EmojiUitl {
 
   static late EmojiUitl _instance;
   static bool initStatus = false;
+
   static EmojiUitl get instance {
     if (!initStatus) {
       _instance = EmojiUitl._();

@@ -18,7 +18,9 @@ class ImageText extends SpecialText {
   static const String flag = '<img';
   final int? start;
   String? _imageUrl;
+
   String? get imageUrl => _imageUrl;
+
   @override
   InlineSpan finishText() {
     ///content already has endflag '/'

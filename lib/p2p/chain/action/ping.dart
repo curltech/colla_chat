@@ -19,7 +19,6 @@ class PingAction extends BaseAction {
 
     return null;
   }
-
 }
 
 final pingAction = PingAction(MsgType.PING);

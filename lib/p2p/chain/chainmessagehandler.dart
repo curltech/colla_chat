@@ -1,10 +1,10 @@
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:dio/dio.dart';
 
 import '../../crypto/util.dart';
 import '../../entity/dht/myself.dart';
 import '../../entity/p2p/chain_message.dart';
 import '../../entity/p2p/security_context.dart';
-import '../../provider/app_data_provider.dart';
 import '../../service/p2p/message_serializer.dart';
 import '../../service/p2p/security_context.dart';
 import '../../tool/util.dart';

@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:enough_mail/discover.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:enough_mail/enough_mail.dart';
@@ -11,7 +12,6 @@ import '../datastore/datastore.dart';
 import '../entity/chat/chat.dart';
 import '../entity/chat/mailaddress.dart' as entity;
 import '../entity/dht/myself.dart';
-import '../provider/app_data_provider.dart';
 import '../tool/util.dart';
 
 class EmailMessageUtil {

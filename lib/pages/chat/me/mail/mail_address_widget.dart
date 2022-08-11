@@ -1,10 +1,10 @@
 import 'package:colla_chat/pages/chat/me/mail/mail_data_provider.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../../l10n/localization.dart';
-import '../../../../provider/app_data_provider.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 import '../../../../widgets/data_bind/data_group_listview.dart';

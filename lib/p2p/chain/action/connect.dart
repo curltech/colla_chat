@@ -1,11 +1,11 @@
 import 'package:colla_chat/entity/dht/peerendpoint.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/util.dart';
 
 import '../../../crypto/cryptography.dart';
 import '../../../crypto/util.dart';
 import '../../../entity/dht/peerclient.dart';
 import '../../../entity/p2p/chain_message.dart';
-import '../../../provider/app_data_provider.dart';
 import '../baseaction.dart';
 
 ///把自己的peerclient信息注册到服务器，表示自己上线

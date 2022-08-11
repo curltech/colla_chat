@@ -7,6 +7,7 @@ import 'dart:ui' as ui;
 import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:cross_file/cross_file.dart';
@@ -34,7 +35,6 @@ import 'package:toast/toast.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 import '../crypto/util.dart';
-import '../provider/app_data_provider.dart';
 
 class TypeUtil {
   static bool isString(dynamic obj) {

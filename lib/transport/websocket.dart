@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 

@@ -1,12 +1,12 @@
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/p2p/chain/action/findclient.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 
 import '../../../entity/dht/peerclient.dart';
 import '../../../l10n/localization.dart';
 import '../../../p2p/chain/baseaction.dart';
-import '../../../provider/app_data_provider.dart';
 import '../../../provider/data_list_controller.dart';
 import '../../../service/chat/contact.dart';
 import '../../../service/dht/peerclient.dart';

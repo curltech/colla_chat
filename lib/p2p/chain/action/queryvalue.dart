@@ -15,7 +15,6 @@ class QueryValueAction extends BaseAction {
 
     return null;
   }
-
 }
 
 final queryValueAction = QueryValueAction(MsgType.QUERYVALUE);

@@ -1,10 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import '../provider/app_data_provider.dart';
 
 /// 自己写的，不是gen_l10n创建的，需要从assets目录加载语言包
 /// 使用的方法是：AppLocalizations.instance.text('page_one')

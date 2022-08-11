@@ -3,11 +3,11 @@ import 'package:colla_chat/pages/chat/me/peerendpoint/peer_endpoint_list_widget.
 import 'package:colla_chat/pages/chat/me/settings/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/webrtc_widget.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
 
 import '../../../l10n/localization.dart';
-import '../../../provider/app_data_provider.dart';
 import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/common/widget_mixin.dart';
 import '../../../widgets/data_bind/data_listtile.dart';

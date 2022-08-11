@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
-import '../../../../provider/app_data_provider.dart';
 import '../../../../tool/util.dart';
 import 'more_item_card.dart';
 

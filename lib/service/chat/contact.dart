@@ -363,7 +363,8 @@ class ContactService extends PartyService<Contact> {
     var mobile = peerContact.mobile;
     if (mobile != null) {
       var mobileNumber = await formatMobile(mobile);
-      var peerClient = await peerClientService.findOneEffectiveByMobile(mobileNumber);
+      var peerClient =
+          await peerClientService.findOneEffectiveByMobile(mobileNumber);
       if (peerClient != null) {
         peerContact.peerId = peerClient.peerId!;
         peerContact.name = peerClient.name;

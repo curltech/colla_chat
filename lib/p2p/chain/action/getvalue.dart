@@ -15,7 +15,6 @@ class GetValueAction extends BaseAction {
 
     return null;
   }
-
 }
 
 final getValueAction = GetValueAction(MsgType.GETVALUE);

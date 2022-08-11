@@ -32,7 +32,6 @@ class ConsensusAction extends BaseAction {
 
     return null;
   }
-
 }
 
 final consensusAction = ConsensusAction(MsgType.CONSENSUS);

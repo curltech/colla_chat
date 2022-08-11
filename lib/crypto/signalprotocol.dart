@@ -2,10 +2,9 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
-
-import '../provider/app_data_provider.dart';
 
 /// Signal协议的密钥对
 class SignalKeyPair {

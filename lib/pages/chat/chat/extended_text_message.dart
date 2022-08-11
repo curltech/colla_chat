@@ -1,6 +1,7 @@
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+
 import '../../../widgets/special_text/custom_special_text_span_builder.dart';
 
 ///消息体：扩展文本

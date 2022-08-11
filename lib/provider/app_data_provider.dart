@@ -1,10 +1,9 @@
 import 'dart:convert';
 
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:flutter/material.dart';
-
 import 'package:google_fonts/google_fonts.dart';
-import 'package:logger/logger.dart';
 
 import '../constant/address.dart';
 import '../plugin/security_storage.dart';
@@ -163,7 +162,6 @@ class AppDataProvider with ChangeNotifier {
         Map<dynamic, dynamic> jsonObject = JsonUtil.toJson(json as String);
         instance = AppDataProvider.fromJson(jsonObject as Map<String, dynamic>);
       }
-      Logger.level = Level.warning;
       initStatus = true;
     }
     return instance;
@@ -359,10 +357,3 @@ class AppDataProvider with ChangeNotifier {
 }
 
 var appDataProvider = AppDataProvider();
-
-var logger = Logger(
-  printer: PrettyPrinter(),
-  level: Level.info,
-);
-
-//var log = easylogger.Logger;

@@ -5,8 +5,6 @@ import 'package:colla_chat/crypto/util.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:cryptography_flutter/cryptography_flutter.dart';
 
-
-
 class CryptoGraphy {
   CryptoGraphy() {
     FlutterCryptography.enable();

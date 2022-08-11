@@ -33,23 +33,34 @@ onValidPhoneNumber(
 
 var phoneField = PhoneFormField(
   key: Key('phone-field'),
-  controller: null, // controller & initialValue value
-  initialValue: null, // can't be supplied simultaneously
-  shouldFormat: true, // default
-  defaultCountry: IsoCode.US, // default
+  controller: null,
+  // controller & initialValue value
+  initialValue: null,
+  // can't be supplied simultaneously
+  shouldFormat: true,
+  // default
+  defaultCountry: IsoCode.US,
+  // default
   decoration: InputDecoration(
       labelText: 'Phone', // default to null
       border: OutlineInputBorder() // default to UnderlineInputBorder(),
 // ...
       ),
-  validator: PhoneValidator.validMobile(), // default PhoneValidator.valid()
+  validator: PhoneValidator.validMobile(),
+  // default PhoneValidator.valid()
   countrySelectorNavigator: CountrySelectorNavigator.bottomSheet(),
-  showFlagInInput: true, // default
-  flagSize: 16, // default
-  autofillHints: [AutofillHints.telephoneNumber], // default to null
-  enabled: true, // default
-  autofocus: false, // default
-  autovalidateMode: AutovalidateMode.onUserInteraction, // default
+  showFlagInInput: true,
+  // default
+  flagSize: 16,
+  // default
+  autofillHints: [AutofillHints.telephoneNumber],
+  // default to null
+  enabled: true,
+  // default
+  autofocus: false,
+  // default
+  autovalidateMode: AutovalidateMode.onUserInteraction,
+  // default
   // ignore: avoid_print
   onSaved: (p) => print('saved $p'),
   // ignore: avoid_print

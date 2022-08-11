@@ -1,3 +1,4 @@
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqlite3/common.dart';

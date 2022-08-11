@@ -42,7 +42,9 @@ class SettingWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     var setting = KeepAliveWrapper(
         child: AppBarView(
-            title: Text(AppLocalizations.t('Setting')), withLeading: withLeading, child: dataListView));
+            title: Text(AppLocalizations.t('Setting')),
+            withLeading: withLeading,
+            child: dataListView));
     return setting;
   }
 

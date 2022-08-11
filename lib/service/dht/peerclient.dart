@@ -6,7 +6,6 @@ import 'package:cryptography/cryptography.dart';
 
 import '../../entity/dht/peerclient.dart';
 import '../../entity/dht/peerprofile.dart';
-import '../../provider/app_data_provider.dart';
 import 'base.dart';
 
 class PeerClientService extends PeerEntityService<PeerClient> {

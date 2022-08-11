@@ -1,6 +1,6 @@
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:sqlite3/common.dart';
 import 'package:sqlite3/wasm.dart';
-import 'package:flutter/services.dart' show rootBundle;
 
 Future<CommonDatabase> openSqlite3({String name = 'colla_chat.db'}) async {
 //   var platformParams = await PlatformParams.instance;
