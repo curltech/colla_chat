@@ -501,7 +501,7 @@ class PeerConnectionPool {
   /// @param data
   Future<void> send(String peerId, List<int> data,
       {String? clientId,
-      CryptoOption cryptoOption = CryptoOption.cryptography}) async {
+      CryptoOption cryptoOption = CryptoOption.signal}) async {
     List<AdvancedPeerConnection>? peerConnections = get(peerId);
     if (peerConnections != null && peerConnections.isNotEmpty) {
       List<Future<void>> ps = [];
