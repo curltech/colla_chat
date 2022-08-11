@@ -136,6 +136,7 @@ enum WebrtcEventType {
 enum PeerConnectionStatus {
   none,
   created,
+  init,
   negotiating, //协商过程中
   negotiated,
   failed,
@@ -328,6 +329,7 @@ class BasePeerConnection {
     peerConnection.onTrack = (RTCTrackEvent event) {
       onTrack(event);
     };
+    status = PeerConnectionStatus.init;
 
     return true;
   }

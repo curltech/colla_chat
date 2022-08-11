@@ -1,13 +1,13 @@
 import 'dart:convert';
 
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
 import 'package:google_fonts/google_fonts.dart';
 import 'package:logger/logger.dart';
 
 import '../constant/address.dart';
+import '../plugin/security_storage.dart';
 
 class Option {
   String label;
@@ -25,32 +25,6 @@ final localeOptions = [
   Option('日本語', 'ja_JP'),
   Option('한국어', 'ko_KR')
 ];
-
-class LocalStorage {
-  static final LocalStorage _instance = LocalStorage();
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
-  static bool initStatus = false;
-
-  static Future<LocalStorage> get instance async {
-    if (!initStatus) {
-      initStatus = true;
-    }
-    return _instance;
-  }
-
-  save(String key, String value) {
-    _secureStorage.write(key: key, value: value);
-  }
-
-  Future<String?> get(String key) {
-    return _secureStorage.read(key: key);
-    //return prefs.get(key);
-  }
-
-  remove(String key) {
-    _secureStorage.delete(key: key);
-  }
-}
 
 class NodeAddress {
   static const defaultName = 'default';
@@ -184,8 +158,7 @@ class AppDataProvider with ChangeNotifier {
   ///初始化一些参数
   static Future<AppDataProvider> init() async {
     if (!initStatus) {
-      LocalStorage localStorage = await LocalStorage.instance;
-      Object? json = await localStorage.get('AppParams');
+      Object? json = await localSecurityStorage.get('AppParams');
       if (json != null) {
         Map<dynamic, dynamic> jsonObject = JsonUtil.toJson(json as String);
         instance = AppDataProvider.fromJson(jsonObject as Map<String, dynamic>);
@@ -371,8 +344,7 @@ class AppDataProvider with ChangeNotifier {
   saveAppParams() async {
     var jsonObject = toJson();
     var json = jsonEncode(jsonObject);
-    LocalStorage localStorage = await LocalStorage.instance;
-    localStorage.save('AppParams', json);
+    localSecurityStorage.save('AppParams', json);
   }
 
   ///当外部改变屏幕大小的时候引起index页面的重建，从而调用这个方法改变size

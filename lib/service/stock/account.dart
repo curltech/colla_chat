@@ -2,6 +2,7 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/general_base.dart';
 
 import '../../entity/stock/account.dart';
+import '../../plugin/security_storage.dart';
 import '../../tool/util.dart';
 import '../servicelocator.dart';
 
@@ -25,8 +26,7 @@ class StockAccountService extends GeneralBaseService<StockAccount> {
       var acc = accounts[0];
       account = StockAccount.fromJson(acc as Map);
     } else {
-      LocalStorage localStorage = await LocalStorage.instance;
-      var subscription = await localStorage.get('StockSubscription');
+      var subscription = await localSecurityStorage.get('StockSubscription');
       account = StockAccount();
       account.status = user['status'];
       account.accountId = user['userId'];
