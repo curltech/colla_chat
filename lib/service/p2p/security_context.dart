@@ -66,7 +66,7 @@ class NoneSecurityContextService extends SecurityContextService {
     securityContext.needCompress = false;
     securityContext.needSign = false;
     securityContext.needEncrypt = false;
-
+    logger.i('call none encrypt');
     return cryptographySecurityContextService.encrypt(securityContext);
   }
 
@@ -79,7 +79,7 @@ class NoneSecurityContextService extends SecurityContextService {
     securityContext.needCompress = false;
     securityContext.needSign = false;
     securityContext.needEncrypt = false;
-
+    logger.i('call none decrypt');
     return cryptographySecurityContextService.decrypt(securityContext);
   }
 }
@@ -99,7 +99,7 @@ class CompressSecurityContextService extends SecurityContextService {
     securityContext.needCompress = true;
     securityContext.needSign = false;
     securityContext.needEncrypt = false;
-
+    logger.i('call compress encrypt');
     return cryptographySecurityContextService.encrypt(securityContext);
   }
 
@@ -112,7 +112,7 @@ class CompressSecurityContextService extends SecurityContextService {
     securityContext.needCompress = true;
     securityContext.needSign = false;
     securityContext.needEncrypt = false;
-
+    logger.i('call uncompress decrypt');
     return cryptographySecurityContextService.decrypt(securityContext);
   }
 }
@@ -216,6 +216,7 @@ class CryptographySecurityContextService extends SecurityContextService {
         data = await cryptoGraphy.eccEncrypt(data,
             remotePublicKey: targetPublicKey);
       }
+      logger.i('call cryptoGraphy encrypt');
     }
 
     // 设置数据的hash，base64
@@ -292,6 +293,7 @@ class CryptographySecurityContextService extends SecurityContextService {
         //直接ecc数据解密
         data = await cryptoGraphy.eccDecrypt(data, localKeyPair: privateKey);
       }
+      logger.i('call cryptoGraphy decrypt');
     }
     // 2. 解压缩
     if (needCompress) {
@@ -436,6 +438,7 @@ class SignalSecurityContextService extends SecurityContextService {
           signalSessionPool.get(peerId: targetPeerId!, clientId: clientId!);
       if (signalSession != null) {
         data = await signalSession.encrypt(Uint8List.fromList(data));
+        logger.i('call signal encrypt');
       } else {
         logger.e(
             'encrypt signalSession:$targetPeerId,clientId:$clientId is not exist');
@@ -483,6 +486,7 @@ class SignalSecurityContextService extends SecurityContextService {
       if (signalSession != null) {
         try {
           data = await signalSession.decrypt(data);
+          logger.i('call signal decrypt');
         } catch (err) {
           logger.e(
               'signalSession.decrypt signalSession:$srcPeerId,clientId:$clientId error:$err');
