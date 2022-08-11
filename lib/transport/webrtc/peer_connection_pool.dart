@@ -536,7 +536,7 @@ class PeerConnectionPool {
       PreKeyBundle? retrievedPreKeyBundle =
           signalSessionPool.signalKeyPair.preKeyBundleFromJson(content);
       if (retrievedPreKeyBundle != null) {
-        SignalSession signalSession = signalSessionPool.create(
+        SignalSession signalSession = await signalSessionPool.create(
             peerId: event.peerId,
             clientId: event.clientId,
             deviceId: retrievedPreKeyBundle.getDeviceId(),

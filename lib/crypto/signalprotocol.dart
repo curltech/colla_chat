@@ -322,11 +322,11 @@ class SignalSessionPool {
     await signalKeyPair.init();
   }
 
-  SignalSession create(
+  Future<SignalSession> create(
       {required String peerId,
       required clientId,
       int deviceId = 1,
-      required PreKeyBundle retrievedPreKeyBundle}) {
+      required PreKeyBundle retrievedPreKeyBundle}) async {
     SignalSession? signalSession =
         get(peerId: peerId, clientId: clientId, deviceId: deviceId);
     if (signalSession != null) {
@@ -337,6 +337,7 @@ class SignalSessionPool {
         clientId: clientId,
         deviceId: deviceId,
         retrievedPreKeyBundle: retrievedPreKeyBundle);
+    await signalSession.init();
     var signalProtocolAddress =
         SignalProtocolAddress('$peerId:$clientId', deviceId);
     signalSessions[signalProtocolAddress] = signalSession;
