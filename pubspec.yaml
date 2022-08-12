@@ -99,8 +99,8 @@ dependencies:
   flutter_local_notifications: ^9.5.3+1
   share_plus: ^4.0.4
   date_format: ^2.0.6
-  #logging: ^1.0.2
-  flutter_easylogger: any
+  classic_logger: any
+  #flutter_easylogger: any
   country_pickers: ^2.0.0
   country_picker: ^2.0.15
   #international_phone_input: ^1.0.4
