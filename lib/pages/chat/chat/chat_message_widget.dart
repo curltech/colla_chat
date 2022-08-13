@@ -6,12 +6,15 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../../entity/chat/chat.dart';
 import '../../../l10n/localization.dart';
 import '../../../provider/data_list_controller.dart';
 import '../../../tool/util.dart';
+import '../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../transport/webrtc/peer_connection_pool.dart';
+import '../../../transport/webrtc/peer_video_render.dart';
 import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/common/widget_mixin.dart';
 import '../me/webrtc/peer_connection_controller.dart';
@@ -190,7 +193,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
             curve: Curves.easeIn));
   }
 
-  ///发送命令
+  ///发送文本消息命令
   Future<void> send(String message) async {
     if (message.isEmpty || message == '') {
       return;
@@ -205,12 +208,39 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     await peerConnectionPool.send(peerId, data);
   }
 
+  ///发送其他消息命令
+  Future<void> action(int index, String name) async {
+    switch (name) {
+      case '视频通话':
+        actionVideoChat();
+        break;
+      default:
+        break;
+    }
+  }
+
+  actionVideoChat() {
+    var peerId = widget.chatMessageController.chatSummary!.peerId!;
+    var clientId = widget.chatMessageController.chatSummary!.clientId!;
+    AdvancedPeerConnection? advancedPeerConnection =
+        peerConnectionPool.getOne(peerId, clientId: clientId);
+    if (advancedPeerConnection != null) {
+      PeerVideoRenderer? render = advancedPeerConnection.basePeerConnection
+          .addLocalStream(userMedia: true);
+      if (render != null) {
+        render.bindRTCVideoRenderer();
+        RTCVideoView? videoView = render.createVideoView();
+      }
+    }
+  }
+
   ///发送消息的输入框和按钮，三个按钮，一个输入框，单独一个类
   ///另外还有各种消息的选择菜单，emoji各一个类
   Widget _buildTextMessageInputWidget(BuildContext context) {
     return ChatMessageInputWidget(
       textEditingController: textEditingController,
       onSend: send,
+      onAction: action,
     );
   }
 

@@ -220,7 +220,6 @@ class PeerConnectionPool {
       {String? clientId,
       String? name,
       Room? room,
-      bool getUserMedia = false,
       List<MediaStream> streams = const [],
       List<Map<String, String>>? iceServers}) async {
     Map<String, AdvancedPeerConnection>? peerConnections =

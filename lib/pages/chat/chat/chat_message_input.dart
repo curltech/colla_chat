@@ -16,8 +16,13 @@ class ChatMessageInputWidget extends StatefulWidget {
 
   final Future<void> Function(String text)? onSend;
 
+  final Future<void> Function(int index, String name) onAction;
+
   const ChatMessageInputWidget(
-      {Key? key, required this.textEditingController, this.onSend})
+      {Key? key,
+      required this.textEditingController,
+      this.onSend,
+      required this.onAction})
       : super(key: key);
 
   @override
@@ -127,6 +132,7 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
           visible: moreVisible,
           child: MoreMessageInput(
             height: height,
+            onAction: widget.onAction,
           )),
     ]);
   }

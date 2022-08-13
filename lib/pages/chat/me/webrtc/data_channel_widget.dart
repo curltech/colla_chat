@@ -78,8 +78,8 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
     clientId = clientIdController.text;
 
     try {
-      AdvancedPeerConnection? advancedPeerConnection = await peerConnectionPool
-          .create(peerId!, getUserMedia: false, clientId: null);
+      AdvancedPeerConnection? advancedPeerConnection =
+          await peerConnectionPool.create(peerId!, clientId: null);
     } catch (e) {
       logger.i(e.toString());
     }

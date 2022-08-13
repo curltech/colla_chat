@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
-import '../../../../tool/util.dart';
 import '../../../widgets/common/action_card.dart';
 
 final List<TileData> actionTileData = [
@@ -25,8 +24,10 @@ final List<TileData> actionTileData = [
 ///非文本的其他多种格式输入面板，包括照片等
 class MoreMessageInput extends StatefulWidget {
   final double height;
+  final Future<void> Function(int index, String name) onAction;
 
-  const MoreMessageInput({Key? key, this.height = 0.0}) : super(key: key);
+  const MoreMessageInput({Key? key, this.height = 0.0, required this.onAction})
+      : super(key: key);
 
   @override
   State createState() => _MoreMessageInputState();
@@ -35,7 +36,18 @@ class MoreMessageInput extends StatefulWidget {
 class _MoreMessageInputState extends State<MoreMessageInput> {
   List<AssetEntity> assets = <AssetEntity>[];
 
-  action(int index, String name) async {
+  _action(int index, String name) async {
+    switch (name) {
+      case '视频通话':
+        break;
+      default:
+        break;
+    }
+  }
+
+
+
+  _actionAlbum(int index, String name) async {
     if (name == '相册') {
       var pickerConfig = AssetPickerConfig(
         maxAssets: 9,
@@ -57,7 +69,11 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         //   // element.file;
         // );
       });
-    } else if (name == '拍摄') {
+    }
+  }
+
+  _actionPhoto(int index, String name) async {
+    if (name == '拍摄') {
       try {
         List<CameraDescription> cameras;
 
@@ -68,11 +84,6 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       } on CameraException catch (e) {
         logger.e(e.code, e.description);
       }
-    } else if (name == '红包') {
-      DialogUtil.showToast('测试发送红包消息');
-      //await sendTextMsg('${widget?.id}', widget.type, "测试发送红包消息");
-    } else {
-      DialogUtil.showToast('敬请期待$name');
     }
   }
 
@@ -83,7 +94,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       child: ActionCard(
         actions: actionTileData,
         height: widget.height,
-        onPressed: action,
+        onPressed: widget.onAction,
       ),
     );
   }

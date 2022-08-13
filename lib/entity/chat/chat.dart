@@ -370,6 +370,7 @@ class Receive extends BaseEntity {
 class ChatSummary extends BaseEntity {
   String ownerPeerId; // 区分属主
   String? peerId; // 接收者或者发送者的联系人或群
+  String? clientId; // 接收者或者发送者的联系人或群
   String? partyType; // 接收者或者发送者类型
   String? messageId; // 最新的消息Id
   String? messageType; // 最新的消息类型
@@ -391,6 +392,7 @@ class ChatSummary extends BaseEntity {
   ChatSummary.fromJson(Map json)
       : ownerPeerId = json['ownerPeerId'],
         peerId = json['peerId'],
+        clientId = json['clientId'],
         partyType = json['partyType'],
         messageId = json['messageId'],
         messageType = json['messageType'],
@@ -414,6 +416,7 @@ class ChatSummary extends BaseEntity {
     json.addAll({
       'ownerPeerId': ownerPeerId,
       'peerId': peerId,
+      'clientId': clientId,
       'partyType': partyType,
       'messageId': messageId,
       'messageType': messageType,

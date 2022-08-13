@@ -849,29 +849,32 @@ class BasePeerConnection {
   }
 
   /// 把流加入到连接中，并创建对应的渲染器，比如把本地的视频流加入到连接中，从而让远程peer能够接收到
-  addLocalStream(
+  PeerVideoRenderer? addLocalStream(
       {MediaStream? stream,
       bool userMedia = false,
       bool displayMedia = false}) {
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
-      return;
+      return null;
     }
 
+    PeerVideoRenderer? render;
     if (userMedia) {
-      PeerVideoRenderer render = PeerVideoRenderer();
+      render = PeerVideoRenderer();
       render.createUserMedia();
       addLocalRenderer(render);
     }
     if (displayMedia) {
-      PeerVideoRenderer render = PeerVideoRenderer();
+      render = PeerVideoRenderer();
       render.createDisplayMedia();
       addLocalRenderer(render);
     }
     if (stream != null) {
-      PeerVideoRenderer render = PeerVideoRenderer(mediaStream: stream);
+      render = PeerVideoRenderer(mediaStream: stream);
       addLocalRenderer(render);
     }
+
+    return render;
   }
 
   /// 把轨道加入到流中，其目的是为了把流加入到连接中
