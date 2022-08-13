@@ -840,7 +840,7 @@ class BasePeerConnection {
       render.bindRTCVideoRenderer();
       localVideoRenders[streamId] = render;
       logger.i('addStream $streamId');
-
+      //peerConnection.addStream(stream);
       var tracks = render.mediaStream!.getTracks();
       for (var track in tracks) {
         addLocalTrack(track, render.mediaStream!);
@@ -887,6 +887,7 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
+
     var streamSenders = remoteTrackSenders[track];
     if (streamSenders == null) {
       streamSenders = {};
