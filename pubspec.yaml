@@ -235,6 +235,7 @@ flutter:
     - assets/images/
     - assets/images/bg/
     - assets/images/emoji/
+    - assets/medias/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

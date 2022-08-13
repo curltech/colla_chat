@@ -228,7 +228,6 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
       PeerVideoRenderer? render = advancedPeerConnection.basePeerConnection
           .addLocalStream(userMedia: true);
       if (render != null) {
-        render.bindRTCVideoRenderer();
         RTCVideoView? videoView = render.createVideoView();
       }
     }
