@@ -541,6 +541,8 @@ class PeerConnectionPool {
             clientId: event.clientId,
             deviceId: retrievedPreKeyBundle.getDeviceId(),
             retrievedPreKeyBundle: retrievedPreKeyBundle);
+        logger.i(
+            'peerId: ${event.peerId} clientId:${event.clientId} received PreKeyBundle, signalSession created');
       } else {
         logger.i('chatMessage content transfer to PreKeyBundle failure');
       }
@@ -571,6 +573,8 @@ class PeerConnectionPool {
     var data = CryptoUtil.stringToUtf8(JsonUtil.toJsonString(chatMessage));
     send(event.peerId, Uint8List.fromList(data),
         clientId: event.clientId, cryptoOption: CryptoOption.cryptography);
+    logger.i(
+        'peerId: ${event.peerId} clientId:${event.clientId} sent PreKeyBundle');
   }
 
   onClosed(WebrtcEvent event) async {

@@ -337,6 +337,7 @@ class SignalSessionPool {
         deviceId: deviceId,
         retrievedPreKeyBundle: retrievedPreKeyBundle);
     await signalSession.init();
+    logger.i('peerId: $peerId clientId:$clientId init');
     var signalProtocolAddress =
         SignalProtocolAddress('$peerId:$clientId', deviceId);
     signalSessions[signalProtocolAddress] = signalSession;
@@ -363,6 +364,7 @@ class SignalSessionPool {
     var signalProtocolAddress =
         SignalProtocolAddress('$peerId:$clientId', deviceId);
     signalSessions.remove(signalProtocolAddress);
+    logger.i('peerId: $peerId clientId:$clientId removed');
   }
 
   clear() {

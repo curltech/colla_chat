@@ -152,8 +152,8 @@ class Sqlite3 extends DataStore {
         offset: offset);
     whereArgs ??= [];
     var results = db.select(clause, whereArgs);
-    logger.i('execute sql:$clause');
-    logger.i('execute sql params:$whereArgs');
+    // logger.i('execute sql:$clause');
+    // logger.i('execute sql params:$whereArgs');
 
     return results;
   }
