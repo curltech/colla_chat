@@ -46,7 +46,6 @@ class WebrtcWidget extends StatelessWidget with TileDataMixin {
   final DataListView dataListView = DataListView(tileData: webrtcTileData);
 
   WebrtcWidget({Key? key}) : super(key: key) {
-    var indexWidgetProvider = IndexWidgetProvider.instance;
     GetUserMediaWidget getUserMediaWidget = GetUserMediaWidget();
     indexWidgetProvider.define(getUserMediaWidget);
     GetDisplayMediaWidget getDisplayMediaWidget = GetDisplayMediaWidget();

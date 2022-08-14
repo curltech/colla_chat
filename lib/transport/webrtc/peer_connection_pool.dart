@@ -527,7 +527,7 @@ class PeerConnectionPool {
     ChatMessage chatMessage = ChatMessage.fromJson(json);
     chatMessageService.receiveChatMessage(chatMessage);
     var content =
-        CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(chatMessage.content));
+        CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(chatMessage.content!));
     logger.i('chatMessage content:$content');
     peerConnectionPoolController.onMessage(chatMessage);
 

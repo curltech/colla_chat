@@ -26,7 +26,7 @@ class _SendMessageViewState extends State<SendMessageView> {
   @override
   Widget build(BuildContext context) {
     String msgType = widget.model.messageType;
-    String msgStr = widget.model.content;
+    String msgStr = widget.model.content!;
 
     bool isI = Platform.isIOS;
     bool iosText = isI && msgStr.contains('text:');

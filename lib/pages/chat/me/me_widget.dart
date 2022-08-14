@@ -36,7 +36,6 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   late final Widget child;
 
   MeWidget({Key? key}) : super(key: key) {
-    var indexWidgetProvider = IndexWidgetProvider.instance;
     logger.w('me init');
     //indexWidgetProvider.define(collectionWidget);
     indexWidgetProvider.define(settingWidget);

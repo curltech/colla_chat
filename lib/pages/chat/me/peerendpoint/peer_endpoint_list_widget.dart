@@ -61,7 +61,6 @@ class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
   PeerEndpointListWidget({Key? key}) : super(key: key) {
     peerEndpointShowWidget = PeerEndpointShowWidget(controller: controller);
     peerEndpointEditWidget = PeerEndpointEditWidget(controller: controller);
-    var indexWidgetProvider = IndexWidgetProvider.instance;
     indexWidgetProvider.define(peerEndpointShowWidget);
     indexWidgetProvider.define(peerEndpointEditWidget);
     rightWidgets = [

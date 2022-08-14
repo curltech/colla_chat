@@ -64,6 +64,8 @@ enum ChatSubMessageType {
   // 聊天
   chatSystem, // 系统预定义聊天消息，如群聊动态通知
   chat, // 联系人发送聊天消息
+  videoChat,
+  audioChat,
   chatReceipt, // 接收回复
   callClose,
   callRequest, // 通话请求
@@ -124,7 +126,7 @@ class ChatMessage extends StatusEntity {
   String? title; // 消息标题
   String? thumbBody; // 预览内容（适用需预览的content，如笔记、转发聊天）
   String? thumbnail; // 预览缩略图（base64图片，适用需预览的content，如笔记、联系人名片）
-  String content = ''; // 消息内容
+  String? content; // 消息内容
   String? contentType;
   String? destroyTime;
 

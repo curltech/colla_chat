@@ -155,6 +155,12 @@ class StringUtil {
   static bool isNumeric(String s) {
     return double.tryParse(s) != null;
   }
+
+  ///string转枚举类型
+  static T enumFromString<T>(Iterable<T> values, String value) {
+    return values
+        .firstWhere((type) => type.toString().split('.').last == value);
+  }
 }
 
 /// 只支持android，获取手机号码

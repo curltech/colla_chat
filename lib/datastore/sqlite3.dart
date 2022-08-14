@@ -182,8 +182,8 @@ class Sqlite3 extends DataStore {
     clause = 'select count(*) from ($clause)';
     whereArgs = whereArgs ?? [];
     var totalResults = db.select(clause, whereArgs);
-    logger.i('execute sql:$clause');
-    logger.i('execute sql params:$whereArgs');
+    // logger.i('execute sql:$clause');
+    // logger.i('execute sql params:$whereArgs');
     var rowsNumber = TypeUtil.firstIntValue(totalResults);
     var results = await find(table,
         distinct: distinct,

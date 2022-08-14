@@ -25,7 +25,7 @@ class AppBarView extends StatelessWidget {
     Key? key,
     this.withLeading = false,
     this.leadingCallBack,
-    required this.title,
+    this.title,
     this.centerTitle = true,
     this.rightWidgets,
     this.rightPopupMenus,

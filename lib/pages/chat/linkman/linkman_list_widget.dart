@@ -67,7 +67,6 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
       }
     });
 
-    var indexWidgetProvider = IndexWidgetProvider.instance;
     linkmanShowWidget = LinkmanShowWidget(controller: linkmanController);
     indexWidgetProvider.define(linkmanShowWidget);
     rightWidgets = [

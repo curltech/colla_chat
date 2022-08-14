@@ -31,7 +31,7 @@ class IndexViewState extends State<IndexView>
 
   Widget _createScaffold(
       BuildContext context, IndexWidgetProvider indexWidgetProvider) {
-    var indexWidget = const IndexWidget();
+    var indexWidget = IndexWidget();
     var bottomNavigationBar = Offstage(
         offstage: !indexWidgetProvider.bottomBarVisible,
         child: const BottomBar());

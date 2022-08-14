@@ -75,7 +75,7 @@ class CollaChatApp extends StatelessWidget {
     return MultiProvider(
         providers: <SingleChildWidget>[
           ChangeNotifierProvider.value(value: appDataProvider),
-          ChangeNotifierProvider.value(value: IndexWidgetProvider.instance),
+          ChangeNotifierProvider.value(value: indexWidgetProvider),
         ],
         child: Consumer<AppDataProvider>(
             builder: (BuildContext context, appDataProvider, Widget? child) {

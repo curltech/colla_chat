@@ -67,7 +67,7 @@ class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
 
   @override
   Future<AppLocalizations> load(Locale locale) {
-    logger.i('will load ${locale.toString()}');
+    //logger.i('will load ${locale.toString()}');
 
     return AppLocalizations.load(locale);
   }

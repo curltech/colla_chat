@@ -7,6 +7,8 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
 
+import '../../../entity/chat/chat.dart';
+
 ///聊天消息的输入组件，
 ///第一行：包括声音按钮，扩展文本输入框，emoji按钮，其他多种格式输入按钮和发送按钮
 ///第二行：emoji面板，其他多种格式输入面板
@@ -14,14 +16,15 @@ class ChatMessageInputWidget extends StatefulWidget {
   ///扩展文本输入框的控制器
   final TextEditingController textEditingController;
 
-  final Future<void> Function(String text)? onSend;
+  final Future<void> Function(
+      {String? message, ChatSubMessageType subMessageType}) onSend;
 
   final Future<void> Function(int index, String name) onAction;
 
   const ChatMessageInputWidget(
       {Key? key,
       required this.textEditingController,
-      this.onSend,
+      required this.onSend,
       required this.onAction})
       : super(key: key);
 
@@ -45,9 +48,7 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
   }
 
   Future<void> onSendPressed() async {
-    if (widget.onSend != null) {
-      widget.onSend!(widget.textEditingController.text);
-    }
+    widget.onSend(message: widget.textEditingController.text);
   }
 
   void onEmojiPressed() {

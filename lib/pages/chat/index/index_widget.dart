@@ -9,7 +9,14 @@ import '../me/me_widget.dart';
 
 ///主工作区，是PageView
 class IndexWidget extends StatefulWidget {
-  const IndexWidget({Key? key}) : super(key: key);
+  IndexWidget({Key? key}) : super(key: key) {
+    PageController pageController = PageController();
+    indexWidgetProvider.pageController = pageController;
+    indexWidgetProvider.define(ChatListWidget());
+    indexWidgetProvider.define(LinkmanListWidget());
+    indexWidgetProvider.define(ChannelWidget());
+    indexWidgetProvider.define(MeWidget());
+  }
 
   @override
   State<StatefulWidget> createState() {
@@ -22,14 +29,6 @@ class _IndexWidgetState extends State<IndexWidget>
   @override
   void initState() {
     super.initState();
-    PageController pageController = PageController();
-    var indexWidgetProvider =
-        Provider.of<IndexWidgetProvider>(context, listen: false);
-    indexWidgetProvider.pageController = pageController;
-    indexWidgetProvider.define(ChatListWidget());
-    indexWidgetProvider.define(LinkmanListWidget());
-    indexWidgetProvider.define(ChannelWidget());
-    indexWidgetProvider.define(MeWidget());
   }
 
   ///workspace工作区视图

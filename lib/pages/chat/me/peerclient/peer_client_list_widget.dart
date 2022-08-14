@@ -101,7 +101,6 @@ class PeerClientListWidget extends StatefulWidget with TileDataMixin {
   PeerClientListWidget({Key? key}) : super(key: key) {
     peerClientShowWidget = PeerClientShowWidget(controller: controller);
     peerClientEditWidget = PeerClientEditWidget(controller: controller);
-    var indexWidgetProvider = IndexWidgetProvider.instance;
     indexWidgetProvider.define(peerClientShowWidget);
     indexWidgetProvider.define(peerClientEditWidget);
 

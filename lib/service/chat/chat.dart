@@ -115,9 +115,11 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
 
   //未填写的字段：transportType,senderAddress,receiverAddress,receiveTime,actualReceiveTime,readTime,destroyTime
   Future<ChatMessage> buildChatMessage(
-    String peerId,
-    List<int> data, {
+    String peerId, {
+    List<int>? data,
     String? clientId,
+    MessageType messageType = MessageType.chat,
+    ChatSubMessageType subMessageType = ChatSubMessageType.chat,
     ContentType contentType = ContentType.text,
     String? name,
     String? groupPeerId,
@@ -130,8 +132,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     ChatMessage chatMessage = ChatMessage(myself.peerId!);
     var uuid = const Uuid();
     chatMessage.messageId = uuid.v4();
-    chatMessage.messageType = MessageType.chat.name;
-    chatMessage.subMessageType = ChatSubMessageType.chat.name;
+    chatMessage.messageType = messageType.name;
+    chatMessage.subMessageType = subMessageType.name;
     chatMessage.direct = ChatDirect.send.name; //对自己而言，消息是属于发送或者接受
     chatMessage.senderPeerId = myself.peerId!;
     chatMessage.senderClientId = myself.clientId;
@@ -155,8 +157,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     if (thumbnail != null) {
       chatMessage.thumbnail = CryptoUtil.encodeBase64(thumbnail);
     }
-    chatMessage.content = CryptoUtil.encodeBase64(data);
-    chatMessage.contentType = contentType.name;
+    if (data != null) {
+      chatMessage.content = CryptoUtil.encodeBase64(data);
+      chatMessage.contentType = contentType.name;
+    }
     status = MessageStatus.sent.name;
 
     await insert(chatMessage);
@@ -167,8 +171,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
 
   //未填写的字段：transportType,senderAddress,receiverAddress,receiveTime,actualReceiveTime,readTime,destroyTime
   Future<List<ChatMessage>> buildGroupChatMessage(
-    String groupPeerId,
-    List<int> data, {
+    String groupPeerId, {
+    List<int>? data,
+    MessageType messageType = MessageType.chat,
+    ChatSubMessageType subMessageType = ChatSubMessageType.chat,
     ContentType contentType = ContentType.text,
     String? title,
     List<int>? thumbBody,
@@ -187,7 +193,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         var name = linkman.name;
         ChatMessage chatMessage = await buildChatMessage(
           peerId,
-          data,
+          data: data,
+          messageType: messageType,
+          subMessageType: subMessageType,
           contentType: contentType,
           name: name,
           groupPeerId: groupPeerId,

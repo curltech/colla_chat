@@ -109,8 +109,6 @@ const animateDuration = Duration(milliseconds: 500);
 
 /// 主工作区的视图状态管理器，维护了主工作区的控制器，视图列表，当前视图
 class IndexWidgetProvider with ChangeNotifier {
-  static IndexWidgetProvider instance = IndexWidgetProvider();
-
   //所以可以出现在工作区的视图，0-3是主视图，其余是副视图，
   Map<String, Widget> allViews = {};
 
@@ -370,3 +368,5 @@ class IndexWidgetProvider with ChangeNotifier {
     return label;
   }
 }
+
+final IndexWidgetProvider indexWidgetProvider = IndexWidgetProvider();

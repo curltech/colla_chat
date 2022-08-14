@@ -98,7 +98,7 @@ class EmailMessageUtil {
 
   static enough_mail.MimeMessage convertToMimeMessage(ChatMessage chatMessage) {
     enough_mail.MimeMessage message =
-        enough_mail.MimeMessage.parseFromText(chatMessage.content);
+        enough_mail.MimeMessage.parseFromText(chatMessage.content!);
 
     return message;
   }
