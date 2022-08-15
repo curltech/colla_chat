@@ -3,7 +3,6 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../../entity/chat/chat.dart';
 import '../../../plugin/logger.dart';
@@ -69,21 +68,9 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
       PeerVideoRender render = await PeerVideoRender.from(userMedia: true);
       //advancedPeerConnection.addLocalRender(render);
       await render.bindRTCVideoRender();
-      RTCVideoView? videoView = render.createVideoView(mirror: true);
+      Widget? videoView = render.createVideoView(mirror: true);
       if (videoView != null) {
-        return OrientationBuilder(
-          builder: (context, orientation) {
-            return Center(
-              child: Container(
-                margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                decoration: const BoxDecoration(color: Colors.black),
-                child: videoView,
-              ),
-            );
-          },
-        );
+        return videoView;
       }
     }
 

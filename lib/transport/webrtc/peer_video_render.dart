@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -140,16 +141,34 @@ class PeerVideoRender {
   }
 
   /// 渲染器创建展示视图
-  RTCVideoView? createVideoView({
+  Widget? createVideoView({
     RTCVideoViewObjectFit objectFit =
         RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
     bool mirror = false,
     FilterQuality filterQuality = FilterQuality.low,
+    double? width,
+    double? height,
+    Color color = Colors.black,
   }) {
     var renderer = this.renderer;
     if (renderer != null) {
-      return RTCVideoView(renderer,
+      RTCVideoView videoView = RTCVideoView(renderer,
           objectFit: objectFit, mirror: mirror, filterQuality: filterQuality);
+      return OrientationBuilder(
+        builder: (context, orientation) {
+          width = width ?? MediaQuery.of(context).size.width;
+          height = height ?? MediaQuery.of(context).size.height;
+          return Center(
+            child: Container(
+              margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+              width: width,
+              height: height,
+              decoration: BoxDecoration(color: color),
+              child: videoView,
+            ),
+          );
+        },
+      );
     }
     return null;
   }
@@ -213,12 +232,12 @@ class PeerVideoRender {
   }
 
   /// 对视频流的第一个音频轨道设置音量
-  void setVolume(double volume) {
+  Future<void> setVolume(double volume) async {
     var mediaStream = this.mediaStream;
     if (mediaStream != null) {
       var tracks = mediaStream.getAudioTracks();
       if (tracks.isNotEmpty) {
-        Helper.setVolume(volume, tracks[0]);
+        await Helper.setVolume(volume, tracks[0]);
       }
     }
   }

@@ -6,7 +6,6 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../../transport/webrtc/base_peer_connection.dart';
@@ -92,8 +91,8 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
   Widget _buildBody(BuildContext context) {
     AdvancedPeerConnection? advancedPeerConnection =
         _getAdvancedPeerConnection();
-    RTCVideoView? localView;
-    RTCVideoView? remoteView;
+    Widget? localView;
+    Widget? remoteView;
     if (advancedPeerConnection != null) {
       localView = advancedPeerConnection
           .basePeerConnection!.localVideoRenders[0]!
