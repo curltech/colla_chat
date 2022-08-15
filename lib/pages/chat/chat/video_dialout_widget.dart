@@ -41,6 +41,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   late final String peerId;
   late final String name;
   late final String? clientId;
+  PeerVideoRender render = PeerVideoRender();
 
   @override
   void initState() {
@@ -65,7 +66,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null &&
         advancedPeerConnection.status == PeerConnectionStatus.connected) {
-      PeerVideoRender render = await PeerVideoRender.from(userMedia: true);
+      await render.createUserMedia();
       //advancedPeerConnection.addLocalRender(render);
       await render.bindRTCVideoRender();
       Widget? videoView = render.createVideoView(mirror: true);
@@ -88,7 +89,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
               if (snapshot.hasData) {
                 return snapshot.data!;
               } else {
-                return const Center(child: Text('No video data'));
+                return Center(child: Text(AppLocalizations.t('No video data')));
               }
             },
           ),
@@ -102,6 +103,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
                 ])
               ],
             ),
+            const Expanded(child: Center()),
             Row(children: [
               IconButton(
                   onPressed: () {},
