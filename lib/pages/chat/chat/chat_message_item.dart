@@ -45,10 +45,15 @@ class ChatMessageItem extends StatelessWidget {
       }
     }
     if (subMessageType == ChatSubMessageType.videoChat) {
+      Color color = appDataProvider.themeData!.colorScheme.primary;
+
       return ActionMessage(
         isMyself: isMyself,
-        content: content ?? '',
-        icon: const Icon(Icons.video_call),
+        content: content ?? '视频通话邀请',
+        icon: Icon(
+          Icons.video_call,
+          color: isMyself ? Colors.white : color,
+        ),
       );
     }
     return null;

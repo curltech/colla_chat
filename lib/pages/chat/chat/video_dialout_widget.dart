@@ -5,6 +5,8 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
+import '../../../entity/chat/chat.dart';
+import '../../../plugin/logger.dart';
 import '../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../transport/webrtc/peer_connection_pool.dart';
 import '../../../transport/webrtc/peer_video_render.dart';
@@ -14,11 +16,8 @@ import 'chat_message_widget.dart';
 
 ///视频通话拨出的对话框
 class VideoDialOutWidget extends StatefulWidget with TileDataMixin {
-  final ChatMessageController chatMessageController;
-
   VideoDialOutWidget({
     Key? key,
-    required this.chatMessageController,
   }) : super(key: key);
 
   @override
@@ -47,26 +46,44 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   @override
   void initState() {
     super.initState();
-    widget.chatMessageController.addListener(_update);
-    peerId = widget.chatMessageController.chatSummary!.peerId!;
-    name = widget.chatMessageController.chatSummary!.name!;
-    clientId = widget.chatMessageController.chatSummary!.clientId;
+    chatMessageController.addListener(_update);
+    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    if (chatSummary != null) {
+      peerId = chatSummary.peerId!;
+      name = chatSummary.name!;
+      clientId = chatSummary.clientId;
+    } else {
+      logger.e('chatSummary is null');
+    }
   }
 
   _update() {
     setState(() {});
   }
 
-  Widget _buildVideoView() {
+  Future<Widget> _buildVideoView() async {
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null &&
         advancedPeerConnection.status == PeerConnectionStatus.connected) {
-      PeerVideoRender render = PeerVideoRender.from(userMedia: true);
-      advancedPeerConnection.addLocalRender(render);
-      RTCVideoView? videoView = render.createVideoView();
+      PeerVideoRender render = await PeerVideoRender.from(userMedia: true);
+      //advancedPeerConnection.addLocalRender(render);
+      await render.bindRTCVideoRender();
+      RTCVideoView? videoView = render.createVideoView(mirror: true);
       if (videoView != null) {
-        return videoView;
+        return OrientationBuilder(
+          builder: (context, orientation) {
+            return Center(
+              child: Container(
+                margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                decoration: const BoxDecoration(color: Colors.black),
+                child: videoView,
+              ),
+            );
+          },
+        );
       }
     }
 
@@ -77,7 +94,16 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   Widget build(BuildContext context) {
     return AppBarView(
         child: Stack(children: [
-      _buildVideoView(),
+      FutureBuilder(
+        future: _buildVideoView(),
+        builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+          if (snapshot.hasData) {
+            return snapshot.data!;
+          } else {
+            return const Center(child: Text('No video data'));
+          }
+        },
+      ),
       Column(children: [
         Row(
           children: [
@@ -115,7 +141,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
 
   @override
   void dispose() {
-    widget.chatMessageController.removeListener(_update);
+    chatMessageController.removeListener(_update);
     super.dispose();
   }
 }

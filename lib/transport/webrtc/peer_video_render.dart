@@ -23,18 +23,18 @@ class PeerVideoRender {
     }
   }
 
-  static PeerVideoRender from(
+  static Future<PeerVideoRender> from(
       {MediaStream? stream,
       bool userMedia = false,
-      bool displayMedia = false}) {
+      bool displayMedia = false}) async {
     PeerVideoRender render = PeerVideoRender();
     if (stream == null && !userMedia && !displayMedia) {
       userMedia = true;
     }
     if (userMedia) {
-      render.createUserMedia();
+      await render.createUserMedia();
     } else if (displayMedia) {
-      render.createDisplayMedia();
+      await render.createDisplayMedia();
     } else if (stream != null) {
       render.mediaStream = stream;
       render.id = stream.id;

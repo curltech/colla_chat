@@ -23,15 +23,17 @@ class ActionMessage extends StatelessWidget {
     return InkWell(
         onTap: () {},
         child: Row(children: [
-          icon,
-          ExtendedText(
-            content,
-            style: TextStyle(
-              color: isMyself ? Colors.white : Colors.black,
-              //fontSize: 16.0,
+          Expanded(
+            child: ExtendedText(
+              content,
+              style: TextStyle(
+                color: isMyself ? Colors.white : Colors.black,
+                //fontSize: 16.0,
+              ),
+              specialTextSpanBuilder: customSpecialTextSpanBuilder,
             ),
-            specialTextSpanBuilder: customSpecialTextSpanBuilder,
-          )
+          ),
+          icon
         ]));
   }
 }

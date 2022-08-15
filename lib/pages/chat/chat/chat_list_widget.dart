@@ -144,7 +144,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
       }
 
       ///更新消息控制器的当前消息汇总，从而确定拥有消息的好友或者群
-      widget.chatMessageWidget.chatMessageController.chatSummary = current;
+      chatMessageController.chatSummary = current;
     }
   }
 

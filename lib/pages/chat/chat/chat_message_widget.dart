@@ -79,10 +79,11 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   }
 }
 
+final ChatMessageController chatMessageController = ChatMessageController();
+
 /// 消息发送和接受展示的界面组件
 /// 此界面展示特定的目标对象的收到的消息，并且可以发送消息
 class ChatMessageWidget extends StatefulWidget with TileDataMixin {
-  final ChatMessageController chatMessageController = ChatMessageController();
   final ScrollController scrollController = ScrollController();
   final Function()? onScrollMax;
   final Function()? onScrollMin;
@@ -97,9 +98,7 @@ class ChatMessageWidget extends StatefulWidget with TileDataMixin {
       this.onRefresh,
       this.notificationPredicate})
       : super(key: key) {
-    indexWidgetProvider.define(VideoDialOutWidget(
-      chatMessageController: chatMessageController,
-    ));
+    indexWidgetProvider.define(VideoDialOutWidget());
   }
 
   @override
@@ -132,10 +131,15 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   @override
   void initState() {
     super.initState();
-    widget.chatMessageController.addListener(_update);
-    peerId = widget.chatMessageController.chatSummary!.peerId!;
-    name = widget.chatMessageController.chatSummary!.name!;
-    clientId = widget.chatMessageController.chatSummary!.clientId;
+    chatMessageController.addListener(_update);
+    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    if (chatSummary != null) {
+      peerId = chatSummary.peerId!;
+      name = chatSummary.name!;
+      clientId = chatSummary.clientId;
+    } else {
+      logger.e('chatSummary is null');
+    }
     peerConnectionPoolController.addListener(_update);
     var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
@@ -177,7 +181,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   Future<void> _onRefresh() async {
     ///下拉刷新数据的地方，比如从数据库取更多数据
     logger.i('RefreshIndicator onRefresh');
-    widget.chatMessageController.previous(limit: defaultLimit);
+    chatMessageController.previous(limit: defaultLimit);
     if (widget.onRefresh != null) {
       await widget.onRefresh!();
     }
@@ -213,7 +217,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     }
     ChatMessage chatMessage = await chatMessageService.buildChatMessage(peerId,
         data: data, contentType: contentType, subMessageType: subMessageType);
-    widget.chatMessageController.insert(0, chatMessage);
+    chatMessageController.insert(0, chatMessage);
     String json = JsonUtil.toJsonString(chatMessage);
     data = CryptoUtil.stringToUtf8(json);
     await peerConnectionPool.send(peerId, data);
@@ -224,7 +228,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     switch (name) {
       case '视频通话':
         send(subMessageType: ChatSubMessageType.videoChat);
-        //actionVideoChat();
+        actionVideoChat();
         break;
       default:
         break;
@@ -259,7 +263,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
 
   ///创建每一条消息
   Widget messageItem(BuildContext context, int index) {
-    List<ChatMessage> messages = widget.chatMessageController.data;
+    List<ChatMessage> messages = chatMessageController.data;
     ChatMessage item = messages[index];
     // 创建消息动画控制器
     var animate = AnimationController(
@@ -298,7 +302,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
               //消息组件渲染
               itemBuilder: messageItem,
               //消息条目数
-              itemCount: widget.chatMessageController.data.length,
+              itemCount: chatMessageController.data.length,
             )),
       ),
       const Divider(
@@ -317,7 +321,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     }
 
     ///获取最新的消息
-    widget.chatMessageController.latest();
+    chatMessageController.latest();
     var appBarView = AppBarView(
         title: Text(AppLocalizations.t(name) +
             '(' +
@@ -330,7 +334,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
 
   @override
   void dispose() {
-    widget.chatMessageController.removeListener(_update);
+    chatMessageController.removeListener(_update);
     widget.scrollController.removeListener(_onScroll);
     peerConnectionPoolController.removeListener(_update);
     textEditingController.dispose();

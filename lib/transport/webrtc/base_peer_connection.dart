@@ -309,7 +309,7 @@ class BasePeerConnection {
     /// 4.把本地的现有的视频流加入到连接中，这个流可以由参数传入
     if (streams.isNotEmpty) {
       for (var stream in streams) {
-        PeerVideoRender render = PeerVideoRender.from(stream: stream);
+        PeerVideoRender render = await PeerVideoRender.from(stream: stream);
         addLocalRender(render);
       }
     }
@@ -829,7 +829,7 @@ class BasePeerConnection {
 
   /// 把渲染器加入到本地渲染器集合，并把渲染器的流加入到连接中
   /// @param {MediaStream} stream
-  addLocalRender(PeerVideoRender render) {
+  addLocalRender(PeerVideoRender render) async {
     var streamId = render.id;
     if (streamId != null) {
       if (localVideoRenders.isNotEmpty) {
@@ -844,7 +844,7 @@ class BasePeerConnection {
       //peerConnection.addStream(stream);
       var tracks = render.mediaStream!.getTracks();
       for (var track in tracks) {
-        addLocalTrack(track, render.mediaStream!);
+        await addLocalTrack(track, render.mediaStream!);
       }
     }
   }
