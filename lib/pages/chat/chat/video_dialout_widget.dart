@@ -62,13 +62,11 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null &&
         advancedPeerConnection.status == PeerConnectionStatus.connected) {
-      PeerVideoRenderer? render = advancedPeerConnection.basePeerConnection
-          .addLocalStream(userMedia: true);
-      if (render != null) {
-        RTCVideoView? videoView = render.createVideoView();
-        if (videoView != null) {
-          return videoView;
-        }
+      PeerVideoRender render = PeerVideoRender.from(userMedia: true);
+      advancedPeerConnection.addLocalRender(render);
+      RTCVideoView? videoView = render.createVideoView();
+      if (videoView != null) {
+        return videoView;
       }
     }
 

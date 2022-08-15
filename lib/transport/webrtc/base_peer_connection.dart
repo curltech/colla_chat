@@ -194,10 +194,10 @@ class BasePeerConnection {
   late String dataChannelLabel;
 
   //本地的媒体流渲染器数组，在初始化的时候设置
-  Map<String, PeerVideoRenderer> localVideoRenders = {};
+  Map<String, PeerVideoRender> localVideoRenders = {};
 
   //远程媒体流渲染器数组，在onAddStream,onAddTrack等的回调方法中得到
-  Map<String, PeerVideoRenderer> remoteVideoRenders = {};
+  Map<String, PeerVideoRender> remoteVideoRenders = {};
 
   //远程媒体流的轨道和对应的流的数组
   List<Map<MediaStreamTrack, MediaStream>> remoteTracks = [];
@@ -309,7 +309,8 @@ class BasePeerConnection {
     /// 4.把本地的现有的视频流加入到连接中，这个流可以由参数传入
     if (streams.isNotEmpty) {
       for (var stream in streams) {
-        addLocalStream(stream: stream);
+        PeerVideoRender render = PeerVideoRender.from(stream: stream);
+        addLocalRender(render);
       }
     }
 
@@ -828,7 +829,7 @@ class BasePeerConnection {
 
   /// 把渲染器加入到本地渲染器集合，并把渲染器的流加入到连接中
   /// @param {MediaStream} stream
-  addLocalRenderer(PeerVideoRenderer render) {
+  addLocalRender(PeerVideoRender render) {
     var streamId = render.id;
     if (streamId != null) {
       if (localVideoRenders.isNotEmpty) {
@@ -837,7 +838,7 @@ class BasePeerConnection {
         }
       }
 
-      render.bindRTCVideoRenderer();
+      render.bindRTCVideoRender();
       localVideoRenders[streamId] = render;
       logger.i('addStream $streamId');
       //peerConnection.addStream(stream);
@@ -846,35 +847,6 @@ class BasePeerConnection {
         addLocalTrack(track, render.mediaStream!);
       }
     }
-  }
-
-  /// 把流加入到连接中，并创建对应的渲染器，比如把本地的视频流加入到连接中，从而让远程peer能够接收到
-  PeerVideoRenderer? addLocalStream(
-      {MediaStream? stream,
-      bool userMedia = false,
-      bool displayMedia = false}) {
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return null;
-    }
-
-    PeerVideoRenderer? render;
-    if (userMedia) {
-      render = PeerVideoRenderer();
-      render.createUserMedia();
-      addLocalRenderer(render);
-    }
-    if (displayMedia) {
-      render = PeerVideoRenderer();
-      render.createDisplayMedia();
-      addLocalRenderer(render);
-    }
-    if (stream != null) {
-      render = PeerVideoRenderer(mediaStream: stream);
-      addLocalRenderer(render);
-    }
-
-    return render;
   }
 
   /// 把轨道加入到流中，其目的是为了把流加入到连接中
@@ -1011,8 +983,8 @@ class BasePeerConnection {
         return;
       }
     }
-    PeerVideoRenderer render = PeerVideoRenderer(mediaStream: stream);
-    render.bindRTCVideoRenderer();
+    PeerVideoRender render = PeerVideoRender(mediaStream: stream);
+    render.bindRTCVideoRender();
     remoteVideoRenders[stream.id] = render;
   }
 

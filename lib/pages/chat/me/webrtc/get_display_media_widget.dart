@@ -33,7 +33,7 @@ class GetDisplayMediaWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
-  PeerVideoRenderer peerVideoRenderer = PeerVideoRenderer();
+  PeerVideoRender peerVideoRenderer = PeerVideoRender();
   bool _inCalling = false;
   DesktopCapturerSource? selectedSource;
 
@@ -62,7 +62,7 @@ class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
       await peerVideoRenderer.createDisplayMedia(
           selectedSource: selectedSource);
       await peerVideoRenderer.enumerateDevices();
-      await peerVideoRenderer.bindRTCVideoRenderer();
+      await peerVideoRenderer.bindRTCVideoRender();
       var stream =
           await navigator.mediaDevices.getDisplayMedia(<String, dynamic>{
         'video': selectedSource == null

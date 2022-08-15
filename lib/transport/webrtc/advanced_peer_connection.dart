@@ -7,6 +7,7 @@ import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
+import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../service/p2p/security_context.dart';
@@ -177,9 +178,9 @@ class AdvancedPeerConnection {
     return basePeerConnection.status;
   }
 
-  addLocalStream(MediaStream stream) {
-    logger.i('add stream to webrtc');
-    basePeerConnection.addLocalStream(stream: stream);
+  addLocalRender(PeerVideoRender render) {
+    logger.i('add stream render to webrtc');
+    basePeerConnection.addLocalRender(render);
   }
 
   removeStream(MediaStream stream) {

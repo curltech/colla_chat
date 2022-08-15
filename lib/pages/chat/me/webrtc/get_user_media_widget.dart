@@ -30,7 +30,7 @@ class GetUserMediaWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
-  PeerVideoRenderer peerVideoRenderer = PeerVideoRenderer();
+  PeerVideoRender peerVideoRenderer = PeerVideoRender();
   bool _inCalling = false;
   bool _isTorchOn = false;
 
@@ -46,7 +46,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
     try {
       await peerVideoRenderer.createUserMedia();
       await peerVideoRenderer.enumerateDevices();
-      await peerVideoRenderer.bindRTCVideoRenderer();
+      await peerVideoRenderer.bindRTCVideoRender();
     } catch (e) {
       logger.e(e.toString());
     }

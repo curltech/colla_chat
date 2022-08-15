@@ -10,17 +10,37 @@ import '../../platform.dart';
 
 /// 简单包装webrtc视频流的渲染器，可以构造本地视频流或者传入的视频流
 /// 视频流绑定渲染器，并创建展示视图
-class PeerVideoRenderer {
+class PeerVideoRender {
   String? id;
   MediaStream? mediaStream;
   RTCVideoRenderer? renderer;
   MediaRecorder? mediaRecorder;
   List<MediaDeviceInfo>? mediaDevicesList;
 
-  PeerVideoRenderer({this.mediaStream}) {
+  PeerVideoRender({this.mediaStream}) {
     if (mediaStream != null) {
       id = mediaStream!.id;
     }
+  }
+
+  static PeerVideoRender from(
+      {MediaStream? stream,
+      bool userMedia = false,
+      bool displayMedia = false}) {
+    PeerVideoRender render = PeerVideoRender();
+    if (stream == null && !userMedia && !displayMedia) {
+      userMedia = true;
+    }
+    if (userMedia) {
+      render.createUserMedia();
+    } else if (displayMedia) {
+      render.createDisplayMedia();
+    } else if (stream != null) {
+      render.mediaStream = stream;
+      render.id = stream.id;
+    }
+
+    return render;
   }
 
   ///获取本机视频流
@@ -95,7 +115,7 @@ class PeerVideoRenderer {
   }
 
   //绑定视频流到渲染器
-  Future<void> bindRTCVideoRenderer() async {
+  Future<void> bindRTCVideoRender() async {
     var mediaStream = this.mediaStream;
     if (mediaStream != null) {
       RTCVideoRenderer renderer = RTCVideoRenderer();
