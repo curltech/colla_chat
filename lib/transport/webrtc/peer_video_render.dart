@@ -24,6 +24,17 @@ class PeerVideoRender {
     }
   }
 
+  setStream(MediaStream? mediaStream) async {
+    await dispose();
+    if (mediaStream != null) {
+      this.mediaStream = mediaStream;
+      id = mediaStream.id;
+    } else {
+      this.mediaStream = null;
+      id = null;
+    }
+  }
+
   static Future<PeerVideoRender> from(
       {MediaStream? stream,
       bool userMedia = false,
@@ -64,6 +75,7 @@ class PeerVideoRender {
         ],
       }
     };
+    await dispose();
     var mediaStream =
         await navigator.mediaDevices.getUserMedia(mediaConstraints);
     this.mediaStream = mediaStream;
@@ -83,6 +95,7 @@ class PeerVideoRender {
       'audio': audio,
       'video': video
     };
+    await dispose();
     var mediaStream =
         await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
     this.mediaStream = mediaStream;
@@ -95,6 +108,7 @@ class PeerVideoRender {
       'audio': true,
       'video': false,
     };
+    await dispose();
     var mediaStream =
         await navigator.mediaDevices.getUserMedia(mediaConstraints);
     this.mediaStream = mediaStream;
