@@ -80,50 +80,51 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
+        withLeading: true,
         child: Stack(children: [
-      FutureBuilder(
-        future: _buildVideoView(),
-        builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
-          if (snapshot.hasData) {
-            return snapshot.data!;
-          } else {
-            return const Center(child: Text('No video data'));
-          }
-        },
-      ),
-      Column(children: [
-        Row(
-          children: [
-            const ImageWidget(image: ''),
-            Column(children: [
-              Text(name),
-              Text(AppLocalizations.t('Invite you video chat...'))
-            ])
-          ],
-        ),
-        Row(children: [
-          IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.cameraswitch),
-              color: Colors.grey),
-          Text(AppLocalizations.t('Switch to audio chat')),
-          IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.clear),
-              color: Colors.red),
-          IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.video_call),
-              color: Colors.green)
-        ]),
-        IconButton(
-            onPressed: () {
-              indexWidgetProvider.pop();
+          FutureBuilder(
+            future: _buildVideoView(),
+            builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+              if (snapshot.hasData) {
+                return snapshot.data!;
+              } else {
+                return const Center(child: Text('No video data'));
+              }
             },
-            icon: const Icon(Icons.call_end),
-            color: Colors.red),
-      ])
-    ]));
+          ),
+          Column(children: [
+            Row(
+              children: [
+                const ImageWidget(image: ''),
+                Column(children: [
+                  Text(name),
+                  Text(AppLocalizations.t('Invite you video chat...'))
+                ])
+              ],
+            ),
+            Row(children: [
+              IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.cameraswitch),
+                  color: Colors.grey),
+              Text(AppLocalizations.t('Switch to audio chat')),
+              IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.clear),
+                  color: Colors.red),
+              IconButton(
+                  onPressed: () {},
+                  icon: const Icon(Icons.video_call),
+                  color: Colors.green)
+            ]),
+            IconButton(
+                onPressed: () {
+                  indexWidgetProvider.pop();
+                },
+                icon: const Icon(Icons.call_end),
+                color: Colors.red),
+          ])
+        ]));
   }
 
   @override
