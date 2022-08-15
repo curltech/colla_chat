@@ -387,6 +387,8 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
     var groupPeerId = chatMessage.groupPeerId;
     var senderPeerId = chatMessage.senderPeerId;
     var receiverPeerId = chatMessage.receiverPeerId;
+    var senderClientId = chatMessage.senderClientId;
+    var receiverClientId = chatMessage.receiverClientId;
     ChatSummary? chatSummary;
     if (groupPeerId != null) {
       chatSummary = await findCachedOneByPeerId(groupPeerId);
@@ -407,6 +409,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
         if (chatSummary == null) {
           chatSummary = ChatSummary(myself.peerId!);
           chatSummary.peerId = senderPeerId;
+          chatSummary.clientId = senderClientId;
           chatSummary.partyType = PartyType.linkman.name;
           chatSummary.sendReceiveTime = chatMessage.sendTime;
           Linkman? linkman =
@@ -421,6 +424,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
         if (chatSummary == null) {
           chatSummary = ChatSummary(myself.peerId!);
           chatSummary.peerId = receiverPeerId;
+          chatSummary.clientId = receiverClientId;
           chatSummary.partyType = PartyType.linkman.name;
           chatSummary.sendReceiveTime = chatMessage.sendTime;
           Linkman? linkman =
