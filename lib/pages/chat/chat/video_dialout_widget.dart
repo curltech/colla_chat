@@ -41,7 +41,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   late final String peerId;
   late final String name;
   late final String? clientId;
-  PeerVideoRender render = PeerVideoRender();
+  final PeerVideoRender render = PeerVideoRender();
 
   @override
   void initState() {
