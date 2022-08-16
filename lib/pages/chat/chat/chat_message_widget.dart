@@ -135,16 +135,16 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     peerConnectionPoolController.addListener(_update);
     var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
-    var peerConnection = peerConnectionPool.getOne(peerId);
-    if (peerConnection == null) {
-      peerConnectionPool.create(peerId);
-    }
 
     ChatSummary? chatSummary = chatMessageController.chatSummary;
     if (chatSummary != null) {
       peerId = chatSummary.peerId!;
       name = chatSummary.name!;
       clientId = chatSummary.clientId;
+      var peerConnection = peerConnectionPool.getOne(peerId);
+      if (peerConnection == null) {
+        peerConnectionPool.create(peerId);
+      }
     } else {
       logger.e('chatSummary is null');
     }
