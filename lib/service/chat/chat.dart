@@ -10,6 +10,7 @@ import '../../datastore/datastore.dart';
 import '../../entity/chat/chat.dart';
 import '../../entity/chat/contact.dart';
 import '../../entity/dht/myself.dart';
+import '../../plugin/logger.dart';
 
 class ChatMessageService extends GeneralBaseService<ChatMessage> {
   ChatMessageService({
@@ -21,6 +22,15 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     post = (Map map) {
       return ChatMessage.fromJson(map);
     };
+  }
+
+  Future<ChatMessage?> findByMessageId(String messageId) async {
+    String where = 'messageId=?';
+    List<Object> whereArgs = [messageId];
+    return await findOne(
+      where: where,
+      whereArgs: whereArgs,
+    );
   }
 
   Future<Pagination<ChatMessage>> findByMessageType(
@@ -98,19 +108,82 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         where: where, whereArgs: whereArgs, orderBy: 'id desc', limit: limit);
   }
 
-  Future<void> receiveChatMessage(ChatMessage chatMessage,
-      {TransportType transportType = TransportType.webrtc,
-      bool read = true,
-      bool destroyed = false}) async {
-    chatMessage.direct = ChatDirect.receive.name;
-    chatMessage.receiveTime = DateUtil.currentDate();
-    chatMessage.actualReceiveTime = DateUtil.currentDate();
-    if (read) {
-      chatMessage.readTime = DateUtil.currentDate();
+  Future<void> receiveChatMessage(ChatMessage chatMessage) async {
+    String? subMessageType = chatMessage.subMessageType;
+    //回执
+    if (subMessageType == ChatSubMessageType.chatReceipt.name) {
+      String? messageId = chatMessage.messageId;
+      if (messageId == null) {
+        logger.e('chatReceipt message must have messageId');
+      }
+      ChatMessage? msg = await findByMessageId(messageId!);
+      if (msg == null) {
+        logger.e('chatReceipt message has no chatMessage with same messageId');
+      }
+      String? title = msg!.title;
+      if (title == ChatReceiptType.received.name) {
+        msg.actualReceiveTime = chatMessage.actualReceiveTime;
+        msg.receiveTime = DateUtil.currentDate();
+        msg.status = MessageStatus.received.name;
+      } else if (title == ChatReceiptType.read.name) {
+        msg.readTime = DateUtil.currentDate();
+        msg.status = MessageStatus.read.name;
+      } else if (title == ChatReceiptType.agree.name) {
+        msg.status = MessageStatus.agree.name;
+      } else if (title == ChatReceiptType.reject.name) {
+        msg.status = MessageStatus.reject.name;
+      } else if (title == ChatReceiptType.deleted.name) {
+        msg.deleteTime = chatMessage.deleteTime;
+        msg.status = MessageStatus.deleted.name;
+      }
+      await update(msg);
+      await chatSummaryService.upsertByChatMessage(msg);
+    } else {
+      //一般消息
+      chatMessage.direct = ChatDirect.receive.name;
+      chatMessage.receiveTime = DateUtil.currentDate();
+      chatMessage.actualReceiveTime = DateUtil.currentDate();
+      chatMessage.status = MessageStatus.received.name;
+      chatMessage.id = null;
+      await insert(chatMessage);
+      await chatSummaryService.upsertByChatMessage(chatMessage);
     }
-    chatMessage.id = null;
-    await insert(chatMessage);
-    await chatSummaryService.upsertByChatMessage(chatMessage);
+  }
+
+  Future<ChatMessage> buildChatReceipt(
+      ChatMessage chatMessage, ChatReceiptType receiptType) async {
+    ChatMessage msg = ChatMessage(myself.peerId!);
+    msg.messageId = chatMessage.messageId;
+    msg.messageType = chatMessage.messageType;
+    msg.subMessageType = ChatSubMessageType.chatReceipt.name;
+    msg.direct = ChatDirect.send.name;
+    msg.senderPeerId = myself.peerId!;
+    msg.senderClientId = myself.clientId;
+    msg.senderType = PartyType.linkman.name;
+    msg.senderName = myself.myselfPeer!.name;
+    msg.sendTime = DateUtil.currentDate();
+    msg.receiverPeerId = chatMessage.senderPeerId;
+    msg.receiverClientId = chatMessage.senderClientId;
+    msg.receiverType = chatMessage.subMessageType;
+    msg.receiverName = chatMessage.senderName;
+    if (receiptType == ChatReceiptType.received) {
+      msg.actualReceiveTime = DateUtil.currentDate();
+      msg.receiveTime = DateUtil.currentDate();
+      msg.title = MessageStatus.received.name;
+    } else if (receiptType == ChatReceiptType.read) {
+      msg.readTime = DateUtil.currentDate();
+      msg.title = MessageStatus.read.name;
+    } else if (receiptType == ChatReceiptType.agree) {
+      msg.title = MessageStatus.agree.name;
+    } else if (receiptType == ChatReceiptType.reject) {
+      msg.title = MessageStatus.reject.name;
+    } else if (receiptType == ChatReceiptType.deleted) {
+      msg.deleteTime = chatMessage.deleteTime;
+      msg.title = MessageStatus.deleted.name;
+    }
+    await insert(msg);
+
+    return msg;
   }
 
   //未填写的字段：transportType,senderAddress,receiverAddress,receiveTime,actualReceiveTime,readTime,destroyTime
@@ -146,11 +219,6 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.receiverName = name;
     chatMessage.groupPeerId = groupPeerId;
     chatMessage.groupName = groupName;
-    if (title != null) {
-      List<int> raw = CryptoUtil.stringToUtf8(title);
-      title = CryptoUtil.encodeBase64(raw);
-      chatMessage.title = title;
-    }
     if (thumbBody != null) {
       chatMessage.thumbBody = CryptoUtil.encodeBase64(thumbBody);
     }

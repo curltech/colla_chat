@@ -12,6 +12,8 @@ class PeerConnectionPoolController with ChangeNotifier {
 
   //新消息到来
   onMessage(ChatMessage chatMessage) async {
+    ///回执消息
+    if (chatMessage.subMessageType == ChatSubMessageType.chatReceipt.name) {}
     notifyListeners();
   }
 

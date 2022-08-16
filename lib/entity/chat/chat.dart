@@ -66,13 +66,10 @@ enum ChatSubMessageType {
   chat, // 联系人发送聊天消息
   videoChat,
   audioChat,
+  deleteChat,
   chatReceipt, // 接收回复
-  callClose,
-  callRequest, // 通话请求
-  recall,
   groupFile,
-  //signal加解密
-  preKeyBundle,
+  preKeyBundle, //signal加解密
 }
 
 enum MessageStatus {
@@ -80,8 +77,17 @@ enum MessageStatus {
   sent, //发送成功
   received, //已接收
   read, //已读
-  recall, //回拨
+  agree,
+  reject,
   deleted, //删除
+}
+
+enum ChatReceiptType {
+  received,
+  read,
+  agree,
+  reject,
+  deleted,
 }
 
 ///好友，群，潜在，联系人，频道，房间
@@ -128,17 +134,17 @@ class ChatMessage extends StatusEntity {
   String? thumbnail; // 预览缩略图（base64图片，适用需预览的content，如笔记、联系人名片）
   String? content; // 消息内容
   String? contentType;
-  String? destroyTime;
+  String? deleteTime;
+  bool needCompress = true;
+  bool needEncrypt = true;
+  bool needReceipt = false;
+  bool needReadReceipt = false;
 
   /// primary peer的publicKey
   String? primaryPeerId;
   String? primaryPublicKey;
   String? primaryAddress;
   String? ephemeralPublicKey;
-  bool needCompress = true;
-  bool needEncrypt = true;
-  bool needReceipt = false;
-  bool needReadReceipt = false;
   String? payloadHash;
   String? payloadSignature;
   String? payloadKey;
@@ -179,7 +185,7 @@ class ChatMessage extends StatusEntity {
         thumbnail = json['thumbnail'],
         content = json['content'],
         contentType = json['contentType'],
-        destroyTime = json['destroyTime'],
+        deleteTime = json['deleteTime'],
         payloadHash = json['payloadHash'],
         payloadSignature = json['payloadSignature'],
         primaryPeerId = json['primaryPeerId'],
@@ -233,7 +239,7 @@ class ChatMessage extends StatusEntity {
       'thumbnail': thumbnail,
       'content': content,
       'contentType': contentType,
-      'destroyTime': destroyTime,
+      'deleteTime': deleteTime,
       'payloadHash': payloadHash,
       'payloadSignature': payloadSignature,
       'primaryPeerId': primaryPeerId,

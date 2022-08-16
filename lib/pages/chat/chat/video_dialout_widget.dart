@@ -4,6 +4,8 @@ import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../entity/chat/chat.dart';
+import '../../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../entity/chat/chat.dart';
 import '../../../plugin/logger.dart';
 import '../../../transport/webrtc/advanced_peer_connection.dart';
@@ -11,7 +13,33 @@ import '../../../transport/webrtc/peer_connection_pool.dart';
 import '../../../transport/webrtc/peer_video_render.dart';
 import '../../../widgets/common/image_widget.dart';
 import '../../../widgets/common/widget_mixin.dart';
-import 'chat_message_widget.dart';
+
+///视频通话控制器，内部数据为视频通话的请求消息，当有回执时触发修改
+class VideoDialOutController with ChangeNotifier {
+  ChatMessage? _chatMessage;
+
+  ChatMessage? _chatReceipt;
+
+  ChatMessage? get chatMessage {
+    return _chatMessage;
+  }
+
+  set chatMessage(ChatMessage? chatMessage) {
+    _chatMessage = chatMessage;
+    notifyListeners();
+  }
+
+  ChatMessage? get chatReceipt {
+    return _chatReceipt;
+  }
+
+  set chatReceipt(ChatMessage? chatReceipt) {
+    _chatReceipt = chatReceipt;
+    notifyListeners();
+  }
+}
+
+final VideoDialOutController videoDialOutController = VideoDialOutController();
 
 ///视频通话拨出的对话框
 class VideoDialOutWidget extends StatefulWidget with TileDataMixin {
@@ -46,14 +74,14 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   @override
   void initState() {
     super.initState();
-    chatMessageController.addListener(_update);
-    ChatSummary? chatSummary = chatMessageController.chatSummary;
-    if (chatSummary != null) {
-      peerId = chatSummary.peerId!;
-      name = chatSummary.name!;
-      clientId = chatSummary.clientId;
+    videoDialOutController.addListener(_update);
+    ChatMessage? chatMessage = videoDialOutController.chatMessage;
+    if (chatMessage != null) {
+      peerId = chatMessage.receiverPeerId!;
+      name = chatMessage.receiverName!;
+      clientId = chatMessage.receiverClientId;
     } else {
-      logger.e('chatSummary is null');
+      logger.e('no video chat chatMessage');
     }
   }
 
@@ -131,7 +159,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
 
   @override
   void dispose() {
-    chatMessageController.removeListener(_update);
+    videoDialOutController.removeListener(_update);
     super.dispose();
   }
 }

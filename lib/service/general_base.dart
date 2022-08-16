@@ -190,7 +190,8 @@ abstract class GeneralBaseService<T> {
         String? value = json[encryptField];
         if (StringUtil.isNotEmpty(value)) {
           try {
-            securityContext.payload = CryptoUtil.decodeBase64(value!);
+            List<int> raw = CryptoUtil.stringToUtf8(value!);
+            securityContext.payload = raw;
             var result = await cryptographySecurityContextService
                 .encrypt(securityContext);
             if (result) {
@@ -233,7 +234,7 @@ abstract class GeneralBaseService<T> {
                 .decrypt(securityContext);
             if (result) {
               var data = securityContext.payload;
-              json[encryptField] = CryptoUtil.encodeBase64(data);
+              json[encryptField] = CryptoUtil.utf8ToString(data);
             }
           } catch (e) {
             logger.e('SecurityContextService decrypt err:$e');

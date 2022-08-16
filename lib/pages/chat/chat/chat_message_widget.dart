@@ -208,7 +208,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   }
 
   ///发送文本消息,发送命令消息
-  Future<void> send(
+  Future<ChatMessage> send(
       {String? message,
       ContentType contentType = ContentType.text,
       ChatSubMessageType subMessageType = ChatSubMessageType.chat}) async {
@@ -216,32 +216,38 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     if (message != null) {
       data = CryptoUtil.stringToUtf8(message);
     }
+    //保存消息
     ChatMessage chatMessage = await chatMessageService.buildChatMessage(peerId,
         data: data, contentType: contentType, subMessageType: subMessageType);
+    //修改消息控制器
     chatMessageController.insert(0, chatMessage);
+    //发送消息
     String json = JsonUtil.toJsonString(chatMessage);
     data = CryptoUtil.stringToUtf8(json);
     await peerConnectionPool.send(peerId, data);
+
+    return chatMessage;
   }
 
   ///发送其他消息命令
   Future<void> action(int index, String name) async {
     switch (name) {
       case '视频通话':
-        send(subMessageType: ChatSubMessageType.videoChat);
-        actionVideoChat();
+        await actionVideoChat();
         break;
       default:
         break;
     }
   }
 
-  actionVideoChat() {
+  actionVideoChat() async {
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null) {
       if (advancedPeerConnection.status == PeerConnectionStatus.connected) {
-        send(subMessageType: ChatSubMessageType.videoChat);
+        ChatMessage chatMessage =
+            await send(subMessageType: ChatSubMessageType.videoChat);
+        videoDialOutController.chatMessage = chatMessage;
         indexWidgetProvider.push('video_dialout');
       } else {
         logger.e(

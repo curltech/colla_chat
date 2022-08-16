@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/pages/chat/chat/video_dialout_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/tool/util.dart';
@@ -525,12 +526,15 @@ class PeerConnectionPool {
     logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onMessage');
     Map<String, dynamic> json = JsonUtil.toJson(event.data);
     ChatMessage chatMessage = ChatMessage.fromJson(json);
+
+    ///保存消息
     chatMessageService.receiveChatMessage(chatMessage);
     var content =
         CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(chatMessage.content!));
     logger.i('chatMessage content:$content');
     peerConnectionPoolController.onMessage(chatMessage);
 
+    ///signal加密初始化消息
     if (chatMessage.subMessageType == ChatSubMessageType.preKeyBundle.name) {
       PreKeyBundle? retrievedPreKeyBundle =
           signalSessionPool.signalKeyPair.preKeyBundleFromJson(content);
@@ -545,6 +549,14 @@ class PeerConnectionPool {
       } else {
         logger.i('chatMessage content transfer to PreKeyBundle failure');
       }
+    }
+
+    ///视频通话请求和回执消息
+    if (chatMessage.subMessageType == ChatSubMessageType.videoChat.name) {
+      videoDialOutController.chatMessage = chatMessage;
+    } else if (chatMessage.subMessageType ==
+        ChatSubMessageType.chatReceipt.name) {
+      videoDialOutController.chatReceipt = chatMessage;
     }
   }
 
