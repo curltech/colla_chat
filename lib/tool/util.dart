@@ -809,16 +809,16 @@ class DialogUtil {
 
   /// 底部弹出半屏对话框，内部调用Navigator.of(context).pop(result)关闭
   /// result返回
-  static Future<dynamic> popModalBottomSheet(BuildContext context,
+  static Future<T?> popModalBottomSheet<T>(BuildContext context,
       {required Widget Function(BuildContext) builder}) {
-    return showModalBottomSheet(context: context, builder: builder);
+    return showModalBottomSheet<T>(context: context, builder: builder);
   }
 
   /// 底部弹出全屏，返回的controller可以关闭
-  static PersistentBottomSheetController<dynamic> popBottomSheet(
+  static PersistentBottomSheetController<T> popBottomSheet<T>(
       BuildContext context,
       {required Widget Function(BuildContext) builder}) {
-    return showBottomSheet(context: context, builder: builder);
+    return showBottomSheet<T>(context: context, builder: builder);
   }
 
   static showToast(String msg, {int duration = 1, int gravity = 0}) {

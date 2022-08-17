@@ -137,7 +137,22 @@ class PeerVideoRender {
       await renderer.initialize();
       renderer.srcObject = mediaStream;
       this.renderer = renderer;
+      logger.i('bind VideoRender videoHeight:$height, videoWidth:$width');
     }
+  }
+
+  int? get height {
+    if (renderer != null) {
+      return renderer!.videoHeight;
+    }
+    return null;
+  }
+
+  int? get width {
+    if (renderer != null) {
+      return renderer!.videoWidth;
+    }
+    return null;
   }
 
   dispose() async {

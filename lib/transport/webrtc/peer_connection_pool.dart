@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
-import 'package:colla_chat/pages/chat/chat/video_dialout_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/tool/util.dart';
@@ -17,6 +16,7 @@ import '../../entity/chat/chat.dart';
 import '../../entity/p2p/chain_message.dart';
 import '../../entity/p2p/security_context.dart';
 import '../../p2p/chain/action/signal.dart';
+import '../../pages/chat/index/index_view.dart';
 import '../../pages/chat/me/webrtc/peer_connection_controller.dart';
 
 ///一个队列，按照被使用的新旧排序，当元素超过最大数量的时候，溢出最旧的元素
@@ -533,6 +533,7 @@ class PeerConnectionPool {
         CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(chatMessage.content!));
     logger.i('chatMessage content:$content');
     peerConnectionPoolController.onMessage(chatMessage);
+    globalChatMessageController.chatMessage = chatMessage;
 
     ///signal加密初始化消息
     if (chatMessage.subMessageType == ChatSubMessageType.preKeyBundle.name) {
@@ -549,14 +550,6 @@ class PeerConnectionPool {
       } else {
         logger.i('chatMessage content transfer to PreKeyBundle failure');
       }
-    }
-
-    ///视频通话请求和回执消息
-    if (chatMessage.subMessageType == ChatSubMessageType.videoChat.name) {
-      videoDialOutController.chatMessage = chatMessage;
-    } else if (chatMessage.subMessageType ==
-        ChatSubMessageType.chatReceipt.name) {
-      videoDialOutController.chatReceipt = chatMessage;
     }
   }
 

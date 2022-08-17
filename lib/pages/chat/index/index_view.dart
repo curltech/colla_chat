@@ -1,13 +1,31 @@
-import 'package:colla_chat/pages/chat/index/end_drawer.dart';
+import 'package:colla_chat/pages/chat/chat/video_dialin_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../entity/chat/chat.dart';
 import '../../../provider/app_data_provider.dart';
 import '../../../widgets/style/platform_widget_factory.dart';
 import '../login/loading.dart';
 import 'bottom_bar.dart';
 import 'index_widget.dart';
+
+///影响全局的消息到来
+class GlobalChatMessageController with ChangeNotifier {
+  ChatMessage? _chatMessage;
+
+  ChatMessage? get chatMessage {
+    return _chatMessage;
+  }
+
+  set chatMessage(ChatMessage? chatMessage) {
+    _chatMessage = chatMessage;
+    notifyListeners();
+  }
+}
+
+final GlobalChatMessageController globalChatMessageController =
+    GlobalChatMessageController();
 
 class IndexView extends StatefulWidget {
   final String title;
@@ -16,17 +34,39 @@ class IndexView extends StatefulWidget {
 
   @override
   State<StatefulWidget> createState() {
-    return IndexViewState();
+    return _IndexViewState();
   }
 }
 
-class IndexViewState extends State<IndexView>
+class _IndexViewState extends State<IndexView>
     with SingleTickerProviderStateMixin {
-  var endDrawer = const EndDrawer();
-
   @override
   void initState() {
     super.initState();
+    globalChatMessageController.addListener(_update);
+  }
+
+  _update() async {
+    ChatMessage? chatMessage = globalChatMessageController.chatMessage;
+    if (chatMessage != null) {
+      //视频通话请求消息
+      if (chatMessage.subMessageType == ChatSubMessageType.videoChat.name) {
+        ChatReceiptType? chatReceiptType =
+            await showModalBottomSheet<ChatReceiptType>(
+                context: context, builder: _buildVideoDialIn);
+        if (chatReceiptType == ChatReceiptType.agree) {
+        } else if (chatReceiptType == ChatReceiptType.reject) {}
+      }
+    }
+  }
+
+  Widget _buildVideoDialIn(BuildContext context) {
+    ChatMessage? chatMessage = globalChatMessageController.chatMessage;
+    if (chatMessage != null) {
+      globalChatMessageController.chatMessage;
+      return VideoDialInWidget(chatMessage: chatMessage);
+    }
+    return Container();
   }
 
   Widget _createScaffold(
@@ -67,6 +107,7 @@ class IndexViewState extends State<IndexView>
 
   @override
   void dispose() {
+    globalChatMessageController.removeListener(_update);
     super.dispose();
   }
 }

@@ -1191,6 +1191,23 @@ class MaterialWidgetFactory extends WidgetFactory {
     return PopupMenuButton(
       key: key,
       itemBuilder: itemBuilder,
+      initialValue: initialValue,
+      onSelected: onSelected,
+      onCanceled: onCanceled,
+      tooltip: tooltip,
+      elevation: elevation,
+      padding: padding,
+      splashRadius: splashRadius,
+      icon: icon,
+      iconSize: iconSize,
+      offset: offset,
+      enabled: enabled,
+      shape: shape,
+      color: color,
+      enableFeedback: enableFeedback,
+      constraints: constraints,
+      position: position,
+      child: child,
     );
   }
 
@@ -1222,6 +1239,67 @@ class MaterialWidgetFactory extends WidgetFactory {
       constraints: constraints,
       onClosing: onClosing,
       builder: builder,
+    );
+  }
+
+  Future<T?> popModalBottomSheet<T>({
+    required BuildContext context,
+    required Widget Function(BuildContext) builder,
+    Color? backgroundColor,
+    double? elevation,
+    ShapeBorder? shape,
+    Clip? clipBehavior,
+    BoxConstraints? constraints,
+    Color? barrierColor,
+    bool isScrollControlled = false,
+    bool useRootNavigator = false,
+    bool isDismissible = true,
+    bool enableDrag = true,
+    RouteSettings? routeSettings,
+    AnimationController? transitionAnimationController,
+    Offset? anchorPoint,
+  }) {
+    return showModalBottomSheet<T>(
+      context: context,
+      builder: builder,
+      backgroundColor: backgroundColor,
+      elevation: elevation,
+      shape: shape,
+      clipBehavior: clipBehavior,
+      constraints: constraints,
+      barrierColor: barrierColor,
+      isScrollControlled: isScrollControlled,
+      useRootNavigator: useRootNavigator,
+      isDismissible: isDismissible,
+      enableDrag: enableDrag,
+      routeSettings: routeSettings,
+      transitionAnimationController: transitionAnimationController,
+      anchorPoint: anchorPoint,
+    );
+  }
+
+  /// 底部弹出全屏，返回的controller可以关闭
+  PersistentBottomSheetController<T> popBottomSheet<T>({
+    required BuildContext context,
+    required Widget Function(BuildContext) builder,
+    Color? backgroundColor,
+    double? elevation,
+    ShapeBorder? shape,
+    Clip? clipBehavior,
+    BoxConstraints? constraints,
+    bool? enableDrag,
+    AnimationController? transitionAnimationController,
+  }) {
+    return showBottomSheet<T>(
+      context: context,
+      builder: builder,
+      backgroundColor: backgroundColor,
+      elevation: elevation,
+      shape: shape,
+      clipBehavior: clipBehavior,
+      constraints: constraints,
+      enableDrag: enableDrag,
+      transitionAnimationController: transitionAnimationController,
     );
   }
 
