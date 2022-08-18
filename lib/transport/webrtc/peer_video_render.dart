@@ -133,11 +133,14 @@ class PeerVideoRender {
   Future<void> bindRTCVideoRender() async {
     var mediaStream = this.mediaStream;
     if (mediaStream != null) {
-      RTCVideoRenderer renderer = RTCVideoRenderer();
-      await renderer.initialize();
-      renderer.srcObject = mediaStream;
-      this.renderer = renderer;
-      logger.i('bind VideoRender videoHeight:$height, videoWidth:$width');
+      RTCVideoRenderer? renderer = this.renderer;
+      if (renderer == null) {
+        renderer = RTCVideoRenderer();
+        await renderer.initialize();
+        renderer.srcObject = mediaStream;
+        this.renderer = renderer;
+        logger.i('bind VideoRender videoHeight:$height, videoWidth:$width');
+      }
     }
   }
 

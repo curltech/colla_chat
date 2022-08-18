@@ -178,9 +178,14 @@ class AdvancedPeerConnection {
     return basePeerConnection.status;
   }
 
-  addLocalRender(PeerVideoRender render) {
+  addRender(PeerVideoRender render) {
     logger.i('add stream render to webrtc');
-    basePeerConnection.addLocalRender(render);
+    basePeerConnection.addRender(render);
+  }
+
+  addStream(MediaStream stream) {
+    logger.i('add stream render to webrtc');
+    basePeerConnection.addStream(stream);
   }
 
   removeStream(MediaStream stream) {

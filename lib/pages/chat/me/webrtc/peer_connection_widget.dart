@@ -95,10 +95,10 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
     Widget? remoteView;
     if (advancedPeerConnection != null) {
       localView = advancedPeerConnection
-          .basePeerConnection!.localVideoRenders[0]!
+          .basePeerConnection!.videoRenders.values.first!
           .createVideoView();
       remoteView = advancedPeerConnection
-          .basePeerConnection!.remoteVideoRenders[0]!
+          .basePeerConnection!.videoRenders.values.first!
           .createVideoView();
     }
     return OrientationBuilder(

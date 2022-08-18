@@ -27,7 +27,7 @@ class GlobalChatMessageController with ChangeNotifier {
           AdvancedPeerConnection? advancedPeerConnection =
               peerConnectionPool.getOne(peerId);
           advancedPeerConnection!
-              .addLocalRender(localMediaController.userRender);
+              .addRender(localMediaController.userRender);
           localMediaController.chatReceipt = chatMessage;
         } else if (chatMessage.title == ChatReceiptType.reject.name) {
           //收到视频通话邀请拒绝回执，关闭本地流，关闭拨号窗口VideoDialOutWidget
