@@ -67,7 +67,7 @@ class VideoDialOutWidget extends StatefulWidget with TileDataMixin {
 
 class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   late final String peerId;
-  late final String name;
+  late final String? name;
   late final String? clientId;
   final PeerVideoRender render = PeerVideoRender();
 
@@ -78,7 +78,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
     ChatMessage? chatMessage = videoDialOutController.chatMessage;
     if (chatMessage != null) {
       peerId = chatMessage.receiverPeerId!;
-      name = chatMessage.receiverName!;
+      name = chatMessage.receiverName;
       clientId = chatMessage.receiverClientId;
     } else {
       logger.e('no video chat chatMessage');
@@ -126,7 +126,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
               children: [
                 const ImageWidget(image: ''),
                 Column(children: [
-                  Text(name),
+                  Text(name ?? ''),
                   Text(AppLocalizations.t('Invite you video chat...'))
                 ])
               ],

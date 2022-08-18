@@ -529,8 +529,10 @@ class PeerConnectionPool {
 
     ///保存消息
     chatMessageService.receiveChatMessage(chatMessage);
-    var content =
-        CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(chatMessage.content!));
+    String? content = chatMessage.content;
+    if (content != null) {
+      content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content));
+    }
     logger.i('chatMessage content:$content');
     peerConnectionPoolController.onMessage(chatMessage);
     globalChatMessageController.chatMessage = chatMessage;
@@ -538,7 +540,7 @@ class PeerConnectionPool {
     ///signal加密初始化消息
     if (chatMessage.subMessageType == ChatSubMessageType.preKeyBundle.name) {
       PreKeyBundle? retrievedPreKeyBundle =
-          signalSessionPool.signalKeyPair.preKeyBundleFromJson(content);
+          signalSessionPool.signalKeyPair.preKeyBundleFromJson(content!);
       if (retrievedPreKeyBundle != null) {
         SignalSession signalSession = await signalSessionPool.create(
             peerId: event.peerId,
