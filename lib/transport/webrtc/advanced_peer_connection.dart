@@ -151,18 +151,30 @@ class AdvancedPeerConnection {
     basePeerConnection.on(WebrtcEventType.message, onMessage);
 
     basePeerConnection.on(WebrtcEventType.stream, (stream) async {
-      if (stream != null) {
-        stream.onremovetrack = (event) {
-          logger.i('Video track: ${event.track.label} removed');
-        };
-      }
       await peerConnectionPool
-          .onStream(WebrtcEvent(peerId, clientId: clientId, data: stream));
+          .onAddStream(WebrtcEvent(peerId, clientId: clientId, data: stream));
+    });
+
+    basePeerConnection.on(WebrtcEventType.removeStream, (stream) async {
+      await peerConnectionPool
+          .onRemoveStream(WebrtcEvent(peerId, clientId: clientId, data: stream));
     });
 
     basePeerConnection.on(WebrtcEventType.track, (track, stream) async {
       logger.i('${DateTime.now().toUtc().toIso8601String()}:track');
       await peerConnectionPool.onTrack(WebrtcEvent(peerId,
+          clientId: clientId, data: {'track': track, 'stream': stream}));
+    });
+
+    basePeerConnection.on(WebrtcEventType.addTrack, (track, stream) async {
+      logger.i('${DateTime.now().toUtc().toIso8601String()}:addTrack');
+      await peerConnectionPool.onAddTrack(WebrtcEvent(peerId,
+          clientId: clientId, data: {'track': track, 'stream': stream}));
+    });
+
+    basePeerConnection.on(WebrtcEventType.removeTrack, (track, stream) async {
+      logger.i('${DateTime.now().toUtc().toIso8601String()}:removeTrack');
+      await peerConnectionPool.onRemoveTrack(WebrtcEvent(peerId,
           clientId: clientId, data: {'track': track, 'stream': stream}));
     });
 

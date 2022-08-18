@@ -33,12 +33,24 @@ class PeerConnectionPoolController with ChangeNotifier {
   }
 
   //新流到来
-  onStream(WebrtcEvent event) async {
+  onAddStream(WebrtcEvent event) async {
+    notifyListeners();
+  }
+
+  onRemoveStream(WebrtcEvent event) async {
     notifyListeners();
   }
 
   //新轨道到来
   onTrack(WebrtcEvent event) async {
+    notifyListeners();
+  }
+
+  onAddTrack(WebrtcEvent event) async {
+    notifyListeners();
+  }
+
+  onRemoveTrack(WebrtcEvent event) async {
     notifyListeners();
   }
 

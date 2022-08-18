@@ -595,13 +595,28 @@ class PeerConnectionPool {
     peerConnectionPoolController.onError(event);
   }
 
-  onStream(WebrtcEvent event) async {
-    logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onStream');
-    peerConnectionPoolController.onStream(event);
+  onAddStream(WebrtcEvent event) async {
+    logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onAddStream');
+    peerConnectionPoolController.onAddStream(event);
+  }
+
+  onRemoveStream(WebrtcEvent event) async {
+    logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onRemoveStream');
+    peerConnectionPoolController.onRemoveStream(event);
   }
 
   onTrack(WebrtcEvent event) async {
     logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onTrack');
+    peerConnectionPoolController.onTrack(event);
+  }
+
+  onAddTrack(WebrtcEvent event) async {
+    logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onAddTrack');
+    peerConnectionPoolController.onTrack(event);
+  }
+
+  onRemoveTrack(WebrtcEvent event) async {
+    logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onRemoveTrack');
     peerConnectionPoolController.onTrack(event);
   }
 
