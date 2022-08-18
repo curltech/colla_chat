@@ -202,6 +202,10 @@ class SignalSession {
     //处理预先密钥对包
     await sessionBuilder.processPreKeyBundle(retrievedPreKeyBundle);
     //产生会话加密器
+    // var signalProtocolStore =
+    //     signalSessionPool.signalKeyPair.signalProtocolStore;
+    // var sessionCipher =
+    //     SessionCipher.fromStore(signalProtocolStore, signalProtocolAddress);
     sessionCipher = SessionCipher(
         signalSessionPool.signalKeyPair.sessionStore,
         signalSessionPool.signalKeyPair.preKeyStore,
@@ -256,6 +260,23 @@ class SignalSession {
   Future<List<int>> decrypt(List<int> data) async {
     var signalProtocolStore =
         signalSessionPool.signalKeyPair.signalProtocolStore;
+    bool sessionExist =
+        await signalProtocolStore.containsSession(signalProtocolAddress);
+    if (sessionExist) {
+      //sessionCipher.decrypt
+      logger.i('signal session is exist');
+    } else {
+      //sessionCipher.decryptFromSignal
+      logger.i('signal session is not exist');
+    }
+
+    // var sessionCipher = SessionCipher(
+    //     signalSessionPool.signalKeyPair.sessionStore,
+    //     signalSessionPool.signalKeyPair.preKeyStore,
+    //     signalSessionPool.signalKeyPair.signedPreKeyStore,
+    //     signalSessionPool.signalKeyPair.identityKeyStore,
+    //     signalProtocolAddress);
+
     var sessionCipher =
         SessionCipher.fromStore(signalProtocolStore, signalProtocolAddress);
 
@@ -274,9 +295,11 @@ class SignalSession {
     var messageType = ciphertext.getType();
     List<int> plaintext = data;
     if (messageType == CiphertextMessage.prekeyType) {
+      logger.i('signal session sessionCipher.decrypt');
       plaintext =
           await sessionCipher.decrypt(ciphertext as PreKeySignalMessage);
     } else if (messageType == CiphertextMessage.whisperType) {
+      logger.i('signal session sessionCipher.decryptFromSignal');
       plaintext =
           await sessionCipher.decryptFromSignal(ciphertext as SignalMessage);
     } else if (messageType == CiphertextMessage.senderKeyType) {
