@@ -20,6 +20,7 @@ import '../../../widgets/common/widget_mixin.dart';
 import '../me/webrtc/peer_connection_controller.dart';
 import 'chat_message_input.dart';
 import 'chat_message_item.dart';
+import 'controller/local_media_controller.dart';
 
 ///好友或者群的消息控制器
 class ChatMessageController extends DataMoreController<ChatMessage> {
@@ -247,7 +248,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
       if (advancedPeerConnection.status == PeerConnectionStatus.connected) {
         ChatMessage chatMessage =
             await send(subMessageType: ChatSubMessageType.videoChat);
-        videoDialOutController.chatMessage = chatMessage;
+        localMediaController.chatMessage = chatMessage;
         indexWidgetProvider.push('video_dialout');
       } else {
         logger.e(

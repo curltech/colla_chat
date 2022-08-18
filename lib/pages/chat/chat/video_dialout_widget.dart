@@ -10,36 +10,9 @@ import '../../../entity/chat/chat.dart';
 import '../../../plugin/logger.dart';
 import '../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../transport/webrtc/peer_connection_pool.dart';
-import '../../../transport/webrtc/peer_video_render.dart';
 import '../../../widgets/common/image_widget.dart';
 import '../../../widgets/common/widget_mixin.dart';
-
-///视频通话控制器，内部数据为视频通话的请求消息，当有回执时触发修改
-class VideoDialOutController with ChangeNotifier {
-  ChatMessage? _chatMessage;
-
-  ChatMessage? _chatReceipt;
-
-  ChatMessage? get chatMessage {
-    return _chatMessage;
-  }
-
-  set chatMessage(ChatMessage? chatMessage) {
-    _chatMessage = chatMessage;
-    notifyListeners();
-  }
-
-  ChatMessage? get chatReceipt {
-    return _chatReceipt;
-  }
-
-  set chatReceipt(ChatMessage? chatReceipt) {
-    _chatReceipt = chatReceipt;
-    notifyListeners();
-  }
-}
-
-final VideoDialOutController videoDialOutController = VideoDialOutController();
+import 'controller/local_media_controller.dart';
 
 ///视频通话拨出的对话框
 class VideoDialOutWidget extends StatefulWidget with TileDataMixin {
@@ -69,13 +42,12 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   late final String peerId;
   late final String? name;
   late final String? clientId;
-  final PeerVideoRender render = PeerVideoRender();
 
   @override
   void initState() {
     super.initState();
-    videoDialOutController.addListener(_update);
-    ChatMessage? chatMessage = videoDialOutController.chatMessage;
+    localMediaController.addListener(_update);
+    ChatMessage? chatMessage = localMediaController.chatMessage;
     if (chatMessage != null) {
       peerId = chatMessage.receiverPeerId!;
       name = chatMessage.receiverName;
@@ -94,10 +66,10 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null &&
         advancedPeerConnection.status == PeerConnectionStatus.connected) {
-      await render.createUserMedia();
-      //advancedPeerConnection.addLocalRender(render);
-      await render.bindRTCVideoRender();
-      Widget? videoView = render.createVideoView(mirror: true);
+      await localMediaController.userRender.createUserMedia();
+      await localMediaController.userRender.bindRTCVideoRender();
+      Widget? videoView =
+          localMediaController.userRender.createVideoView(mirror: true);
       if (videoView != null) {
         return videoView;
       }
@@ -159,7 +131,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
 
   @override
   void dispose() {
-    videoDialOutController.removeListener(_update);
+    localMediaController.removeListener(_update);
     super.dispose();
   }
 }

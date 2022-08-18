@@ -1,5 +1,6 @@
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/util.dart';
@@ -10,6 +11,7 @@ import '../../datastore/datastore.dart';
 import '../../entity/chat/chat.dart';
 import '../../entity/chat/contact.dart';
 import '../../entity/dht/myself.dart';
+import '../../entity/dht/peerclient.dart';
 import '../../plugin/logger.dart';
 
 class ChatMessageService extends GeneralBaseService<ChatMessage> {
@@ -150,7 +152,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     }
   }
 
-  Future<ChatMessage> buildChatReceipt(
+  Future<ChatMessage?> buildChatReceipt(
       ChatMessage chatMessage, ChatReceiptType receiptType) async {
     ChatMessage msg = ChatMessage(myself.peerId!);
     msg.messageId = chatMessage.messageId;
@@ -165,7 +167,20 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     msg.receiverPeerId = chatMessage.senderPeerId;
     msg.receiverClientId = chatMessage.senderClientId;
     msg.receiverType = chatMessage.subMessageType;
-    msg.receiverName = chatMessage.senderName;
+    String? receiverPeerId = chatMessage.senderPeerId;
+    if (receiverPeerId == null) {
+      logger.e('receiverPeerId is null');
+      return null;
+    }
+    String? senderName = chatMessage.senderName;
+    if (senderName == null) {
+      PeerClient? peerClient =
+          await peerClientService.findCachedOneByPeerId(receiverPeerId!);
+      if (peerClient != null) {
+        senderName = peerClient.name;
+      }
+    }
+    msg.receiverName = senderName;
     if (receiptType == ChatReceiptType.received) {
       msg.actualReceiveTime = DateUtil.currentDate();
       msg.receiveTime = DateUtil.currentDate();
@@ -216,6 +231,13 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.receiverPeerId = peerId;
     chatMessage.receiverClientId = clientId;
     chatMessage.receiverType = PartyType.linkman.name;
+    if (name == null) {
+      PeerClient? peerClient =
+          await peerClientService.findCachedOneByPeerId(peerId);
+      if (peerClient != null) {
+        name = peerClient.name;
+      }
+    }
     chatMessage.receiverName = name;
     chatMessage.groupPeerId = groupPeerId;
     chatMessage.groupName = groupName;

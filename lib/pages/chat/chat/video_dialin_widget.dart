@@ -35,21 +35,25 @@ class VideoDialInWidget extends StatelessWidget {
             const Text('切换语音通话'),
             IconButton(
                 onPressed: () async {
-                  ChatMessage chatReceipt = await chatMessageService
+                  ChatMessage? chatReceipt = await chatMessageService
                       .buildChatReceipt(chatMessage, ChatReceiptType.reject);
-                  String json = JsonUtil.toJsonString(chatMessage);
-                  List<int> data = CryptoUtil.stringToUtf8(json);
-                  peerConnectionPool.send(chatReceipt.receiverPeerId!, data);
+                  if (chatReceipt != null) {
+                    String json = JsonUtil.toJsonString(chatMessage);
+                    List<int> data = CryptoUtil.stringToUtf8(json);
+                    peerConnectionPool.send(chatReceipt.receiverPeerId!, data);
+                  }
                 },
                 icon: const Icon(Icons.clear),
                 color: Colors.red),
             IconButton(
                 onPressed: () async {
-                  ChatMessage chatReceipt = await chatMessageService
+                  ChatMessage? chatReceipt = await chatMessageService
                       .buildChatReceipt(chatMessage, ChatReceiptType.agree);
-                  String json = JsonUtil.toJsonString(chatMessage);
-                  List<int> data = CryptoUtil.stringToUtf8(json);
-                  peerConnectionPool.send(chatReceipt.receiverPeerId!, data);
+                  if (chatReceipt != null) {
+                    String json = JsonUtil.toJsonString(chatMessage);
+                    List<int> data = CryptoUtil.stringToUtf8(json);
+                    peerConnectionPool.send(chatReceipt.receiverPeerId!, data);
+                  }
                 },
                 icon: const Icon(Icons.video_call),
                 color: Colors.green)

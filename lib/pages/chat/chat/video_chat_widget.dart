@@ -1,5 +1,4 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/chat/video_dialout_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -14,6 +13,7 @@ import '../../../transport/webrtc/peer_connection_pool.dart';
 import '../../../transport/webrtc/peer_video_render.dart';
 import '../../../widgets/common/image_widget.dart';
 import '../../../widgets/common/widget_mixin.dart';
+import 'controller/local_media_controller.dart';
 
 ///视频通话拨出的对话框
 class VideoChatWidget extends StatefulWidget with TileDataMixin {
@@ -48,8 +48,8 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   @override
   void initState() {
     super.initState();
-    videoDialOutController.addListener(_update);
-    ChatMessage? chatMessage = videoDialOutController.chatMessage;
+    localMediaController.addListener(_update);
+    ChatMessage? chatMessage = localMediaController.chatMessage;
     if (chatMessage != null) {
       peerId = chatMessage.receiverPeerId!;
       name = chatMessage.receiverName!;
@@ -133,7 +133,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
 
   @override
   void dispose() {
-    videoDialOutController.removeListener(_update);
+    localMediaController.removeListener(_update);
     super.dispose();
   }
 }

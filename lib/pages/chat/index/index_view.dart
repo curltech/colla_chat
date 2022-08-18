@@ -4,28 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../entity/chat/chat.dart';
+import '../../../plugin/logger.dart';
 import '../../../provider/app_data_provider.dart';
 import '../../../widgets/style/platform_widget_factory.dart';
 import '../login/loading.dart';
 import 'bottom_bar.dart';
+import 'global_chat_message_controller.dart';
 import 'index_widget.dart';
-
-///影响全局的消息到来
-class GlobalChatMessageController with ChangeNotifier {
-  ChatMessage? _chatMessage;
-
-  ChatMessage? get chatMessage {
-    return _chatMessage;
-  }
-
-  set chatMessage(ChatMessage? chatMessage) {
-    _chatMessage = chatMessage;
-    notifyListeners();
-  }
-}
-
-final GlobalChatMessageController globalChatMessageController =
-    GlobalChatMessageController();
 
 class IndexView extends StatefulWidget {
   final String title;
@@ -54,8 +39,12 @@ class _IndexViewState extends State<IndexView>
         ChatReceiptType? chatReceiptType =
             await showModalBottomSheet<ChatReceiptType>(
                 context: context, builder: _buildVideoDialIn);
-        if (chatReceiptType == ChatReceiptType.agree) {
-        } else if (chatReceiptType == ChatReceiptType.reject) {}
+        if (chatReceiptType == ChatReceiptType.agree) {//同意，发出本地流
+          logger.i('ChatReceiptType agree');
+        } else if (chatReceiptType == null ||
+            chatReceiptType == ChatReceiptType.reject) {//拒绝，关闭对话框
+          logger.i('ChatReceiptType reject');
+        }
       }
     }
   }
