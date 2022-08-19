@@ -1,4 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/chat/controller/peer_connections_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -80,6 +81,8 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
             peerConnectionPool.addRender(
                 peerId, localMediaController.userRender,
                 clientId: clientId);
+            peerConnectionsController.clear();
+            peerConnectionsController.add(peerId, clientId: clientId);
             indexWidgetProvider.pop();
             indexWidgetProvider.push('video_chat');
           } else if (title == ChatReceiptType.reject.name) {
@@ -99,7 +102,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
       await localMediaController.userRender.bindRTCVideoRender();
       Widget? videoView =
           localMediaController.userRender.createVideoView(mirror: true);
-        return videoView;
+      return videoView;
     }
 
     return Container();

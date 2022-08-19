@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import '../../../../entity/chat/chat.dart';
 import '../../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../entity/chat/chat.dart';
-import '../../../plugin/logger.dart';
 import '../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../transport/webrtc/peer_connection_pool.dart';
 import '../../../transport/webrtc/peer_video_render.dart';
@@ -47,14 +46,6 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   void initState() {
     super.initState();
     peerConnectionsController.addListener(_update);
-    ChatMessage? chatMessage = localMediaController.chatMessage;
-    if (chatMessage != null) {
-      peerId = localMediaController.peerId;
-      name = localMediaController.name;
-      clientId = localMediaController.clientId;
-    } else {
-      logger.e('no video chat chatMessage');
-    }
   }
 
   _update() {

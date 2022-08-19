@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 
 import '../../../entity/chat/chat.dart';
 import '../../../service/chat/chat.dart';
+import 'controller/peer_connections_controller.dart';
 
 ///视频通话拨入的对话框
 class VideoDialInWidget extends StatelessWidget {
@@ -25,6 +26,8 @@ class VideoDialInWidget extends StatelessWidget {
         var clientId = chatReceipt.receiverClientId!;
         peerConnectionPool.addRender(peerId, localMediaController.userRender,
             clientId: clientId);
+        peerConnectionsController.clear();
+        peerConnectionsController.add(peerId, clientId: clientId);
         indexWidgetProvider.push('video_chat');
       }
     }

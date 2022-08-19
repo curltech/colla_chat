@@ -1,4 +1,5 @@
 import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
+import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../transport/webrtc/advanced_peer_connection.dart';
@@ -10,28 +11,38 @@ class PeerConnectionsController with ChangeNotifier {
   final Map<String, Map<String, AdvancedPeerConnection>> _peerConnections = {};
   String? _roomId;
 
-  add(AdvancedPeerConnection peerConnection) {
-    String peerId = peerConnection.peerId;
-    String clientId = peerConnection.clientId ?? '';
-    var pcs = _peerConnections[peerId];
-    if (pcs == null) {
-      pcs = {};
-      _peerConnections[peerId] = pcs;
+  add(String peerId, {String? clientId}) {
+    AdvancedPeerConnection? peerConnection =
+        peerConnectionPool.getOne(peerId, clientId: clientId);
+    if (peerConnection != null) {
+      clientId = clientId ?? '';
+      var pcs = _peerConnections[peerId];
+      if (pcs == null) {
+        pcs = {};
+        _peerConnections[peerId] = pcs;
+      }
+      pcs[clientId] = peerConnection;
+      notifyListeners();
     }
-    pcs[clientId] = peerConnection;
-    notifyListeners();
   }
 
   remove(String peerId, {String? clientId}) {
-    clientId = clientId ?? '';
     var pcs = _peerConnections[peerId];
     if (pcs != null) {
-      pcs.remove(clientId);
+      if (clientId != null) {
+        pcs.remove(clientId);
+      } else {
+        pcs.clear();
+      }
       if (pcs.isEmpty) {
         _peerConnections.remove(peerId);
       }
     }
     notifyListeners();
+  }
+
+  clear() {
+    _peerConnections.clear();
   }
 
   Map<String, PeerVideoRender> videoRenders(
