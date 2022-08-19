@@ -2,7 +2,6 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:colla_chat/pages/chat/login/p2p_login.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/routers/routes.dart';
@@ -48,7 +47,7 @@ Future<bool> startForegroundService() async {
 }
 
 void main(List<String> args) {
-  logger.i(args.toString());
+  //logger.i(args.toString());
   //初始化服务类
   // 也初始化了Provider管理的全局状态数据
   //  多状态的MultiProvider(

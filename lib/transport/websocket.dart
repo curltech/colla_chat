@@ -47,7 +47,7 @@ class Websocket implements IWebClient {
     register('', onData);
     //initHeartBeat();
     status = SocketStatus.connected;
-    logger.i('wss address:$address websocket connected');
+    //logger.i('wss address:$address websocket connected');
     if (onConnected != null) {
       onConnected!();
     }

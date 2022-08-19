@@ -11,7 +11,7 @@ import '../baseaction.dart';
 ///把自己的peerclient信息注册到服务器，表示自己上线
 class ConnectAction extends BaseAction {
   ConnectAction(MsgType msgType) : super(msgType) {
-    logger.i('Action MsgType $msgType');
+    //logger.i('Action MsgType $msgType');
   }
 
   Future<ChainMessage?> connect(PeerClient peerClient) async {

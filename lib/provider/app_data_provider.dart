@@ -301,8 +301,8 @@ class AppDataProvider with ChangeNotifier {
   set size(Size size) {
     if (_size.height != size.height || _size.width != size.width) {
       _size = size;
-      logger.i(
-          'Screen size changed:height ${_size.height},width  ${_size.width}');
+      // logger.i(
+      //     'Screen size changed:height ${_size.height},width  ${_size.width}');
     }
   }
 

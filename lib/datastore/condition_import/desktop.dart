@@ -14,7 +14,7 @@ Future<CommonDatabase> openSqlite3({String name = 'colla_chat.db'}) async {
     final dbFolder = await getApplicationDocumentsDirectory();
     String path = p.join(dbFolder.path, name);
     CommonDatabase db = sqlite3.open(path);
-    logger.i('sqlite3 path:$path');
+    //logger.i('sqlite3 path:$path');
     appDataProvider.sqlite3Path = path;
 
     return db;

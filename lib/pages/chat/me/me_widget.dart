@@ -3,7 +3,6 @@ import 'package:colla_chat/pages/chat/me/peerendpoint/peer_endpoint_list_widget.
 import 'package:colla_chat/pages/chat/me/settings/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/webrtc_widget.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
 
@@ -36,7 +35,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   late final Widget child;
 
   MeWidget({Key? key}) : super(key: key) {
-    logger.w('me init');
+    //logger.w('me init');
     //indexWidgetProvider.define(collectionWidget);
     indexWidgetProvider.define(settingWidget);
     indexWidgetProvider.define(personalInfoWidget);
