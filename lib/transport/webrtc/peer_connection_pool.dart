@@ -382,7 +382,7 @@ class PeerConnectionPool {
     String? connectSessionId = chainMessage.srcConnectSessionId;
     WebrtcSignal signal = chainMessage.payload;
     var signalType = signal.signalType;
-    logger.i('receive signal type: $signalType from webrtcPeer: $peerId');
+    //logger.i('receive signal type: $signalType from webrtcPeer: $peerId');
     String? clientId = chainMessage.srcClientId;
     String? name;
     List<Map<String, String>>? iceServers;
@@ -424,8 +424,8 @@ class PeerConnectionPool {
       if (advancedPeerConnection == null) {
         advancedPeerConnection = peerConnections[''];
         if (advancedPeerConnection != null) {
-          logger.i(
-              'for advancedPeerConnection peerId:$peerId, clientId:$clientId will replace');
+          // logger.i(
+          //     'for advancedPeerConnection peerId:$peerId, clientId:$clientId will replace');
           advancedPeerConnection.clientId = clientId;
           peerConnections.remove('');
           peerConnections[clientId] = advancedPeerConnection;

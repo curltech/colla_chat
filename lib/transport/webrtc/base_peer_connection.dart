@@ -553,7 +553,7 @@ class BasePeerConnection {
     RTCSessionDescription offer =
         await peerConnection.createOffer(sdpConstraints);
     await peerConnection.setLocalDescription(offer);
-    //logger.i('createOffer and setLocalDescription offer successfully');
+    logger.i('createOffer and setLocalDescription offer successfully');
     await _sendOffer(offer);
   }
 
@@ -581,7 +581,7 @@ class BasePeerConnection {
       return;
     }
     String signalType = webrtcSignal.signalType;
-    logger.i('onSignal signalType:$signalType');
+    //logger.i('onSignal signalType:$signalType');
     var candidate = webrtcSignal.candidate;
     var sdp = webrtcSignal.sdp;
     //被要求重新协商，则发起协商
@@ -599,14 +599,14 @@ class BasePeerConnection {
     }
     //如果是候选信息
     else if (signalType == SignalType.candidate.name && candidate != null) {
-      logger.i('onSignal candidate:${candidate.candidate}');
+      //logger.i('onSignal candidate:${candidate.candidate}');
       RTCSessionDescription? remoteDescription =
           await peerConnection.getRemoteDescription();
       //如果远程描述已经设置，加候选，否则，加入候选清单
       if (remoteDescription != null && remoteDescription.type != null) {
         addIceCandidate(candidate);
       } else {
-        logger.i('remoteDescription null,save candidate');
+        //logger.i('remoteDescription null,save candidate');
         remoteCandidates[candidate.candidate ?? ''] = candidate;
       }
     }
