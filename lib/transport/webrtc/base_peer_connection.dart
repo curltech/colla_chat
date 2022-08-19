@@ -229,7 +229,7 @@ class BasePeerConnection {
   int reconnectTimes = 1;
 
   BasePeerConnection({required this.initiator}) {
-    //logger.i('Create initiator:$initiator BasePeerConnection');
+    logger.i('Create initiator:$initiator BasePeerConnection');
   }
 
   ///初始化连接，可以传入外部视频流，这是异步的函数，不能在构造里调用
