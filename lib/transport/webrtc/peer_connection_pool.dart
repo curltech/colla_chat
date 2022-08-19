@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -568,16 +566,17 @@ class PeerConnectionPool {
     peerConnectionPoolController.onConnected(event);
 
     ///发送PreKeyBundle
-    ChatMessage chatMessage = ChatMessage(myself.peerId!);
-    chatMessage.subMessageType = ChatSubMessageType.preKeyBundle.name;
+
     PreKeyBundle preKeyBundle =
         signalSessionPool.signalKeyPair.getPreKeyBundle();
     var json = signalSessionPool.signalKeyPair.preKeyBundleToJson(preKeyBundle);
-    chatMessage.content =
-        CryptoUtil.encodeBase64(CryptoUtil.stringToUtf8(json));
-    var data = CryptoUtil.stringToUtf8(JsonUtil.toJsonString(chatMessage));
-    send(event.peerId, Uint8List.fromList(data),
-        clientId: event.clientId, cryptoOption: CryptoOption.cryptography);
+    ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+        event.peerId,
+        clientId: event.clientId,
+        subMessageType: ChatSubMessageType.preKeyBundle,
+        data: CryptoUtil.stringToUtf8(json));
+    await chatMessageService.send(chatMessage,
+        cryptoOption: CryptoOption.cryptography);
     logger.i(
         'peerId: ${event.peerId} clientId:${event.clientId} sent PreKeyBundle');
   }

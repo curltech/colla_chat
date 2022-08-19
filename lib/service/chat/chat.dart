@@ -12,6 +12,7 @@ import '../../entity/chat/chat.dart';
 import '../../entity/chat/contact.dart';
 import '../../entity/dht/myself.dart';
 import '../../entity/dht/peerclient.dart';
+import '../../entity/p2p/security_context.dart';
 import '../../plugin/logger.dart';
 import '../../transport/webrtc/peer_connection_pool.dart';
 
@@ -302,13 +303,15 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return chatMessages;
   }
 
-  send(ChatMessage chatMessage) {
+  send(ChatMessage chatMessage,
+      {CryptoOption cryptoOption = CryptoOption.signal}) {
     var peerId = chatMessage.receiverPeerId;
     var clientId = chatMessage.receiverClientId;
     if (peerId != null) {
       String json = JsonUtil.toJsonString(chatMessage);
       var data = CryptoUtil.stringToUtf8(json);
-      peerConnectionPool.send(peerId, data, clientId: clientId);
+      peerConnectionPool.send(peerId, data,
+          clientId: clientId, cryptoOption: cryptoOption);
     }
   }
 }
