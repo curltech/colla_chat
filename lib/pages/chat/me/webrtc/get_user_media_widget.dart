@@ -30,7 +30,7 @@ class GetUserMediaWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
-  PeerVideoRender peerVideoRenderer = PeerVideoRender();
+  PeerVideoRender peerVideoRenderer = PeerVideoRender('');
   bool _inCalling = false;
   bool _isTorchOn = false;
 

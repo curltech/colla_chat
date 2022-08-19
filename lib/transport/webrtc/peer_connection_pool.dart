@@ -222,7 +222,6 @@ class PeerConnectionPool {
       {String? clientId,
       String? name,
       Room? room,
-      List<MediaStream> streams = const [],
       List<Map<String, String>>? iceServers}) async {
     Map<String, AdvancedPeerConnection>? peerConnections =
         this.peerConnections.get(peerId);
@@ -239,8 +238,7 @@ class PeerConnectionPool {
         AdvancedPeerConnection(peerId, true, clientId: clientId, room: room);
     peerConnectionPoolController.onCreated(
         WebrtcEvent(peerId, clientId: clientId, data: peerConnection));
-    bool result =
-        await peerConnection.init(streams: streams, iceServers: iceServers);
+    bool result = await peerConnection.init(iceServers: iceServers);
     if (!result) {
       logger.e('webrtcPeer.init fail');
       return null;
@@ -685,6 +683,17 @@ class PeerConnectionPool {
     }
 
     return PeerConnectionStatus.none;
+  }
+
+  Map<String, PeerVideoRender>? videoRenders(String peerId,
+      {String? clientId}) {
+    AdvancedPeerConnection? advancedPeerConnection =
+        peerConnectionPool.getOne(peerId, clientId: clientId);
+    if (advancedPeerConnection != null) {
+      return advancedPeerConnection.videoRenders;
+    }
+
+    return null;
   }
 
   ///调用signalAction发送signal到信号服务器

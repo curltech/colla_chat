@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
-import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../crypto/cryptography.dart';
@@ -197,7 +196,7 @@ class BasePeerConnection {
   late String dataChannelLabel;
 
   //远程媒体流渲染器数组，在onAddStream,onAddTrack等的回调方法中得到
-  Map<String, PeerVideoRender> videoRenders = {};
+  Map<String, MediaStream> streams = {};
 
   //媒体流的轨道，流和发送者之间的关系
   Map<MediaStreamTrack, Map<MediaStream, RTCRtpSender>> trackSenders = {};
@@ -237,9 +236,7 @@ class BasePeerConnection {
   ///建立连接对象，设置好回调函数，然后如果是master发起协商，如果是follow，在收到offer才开始创建，
   ///只有协商完成，数据通道打开，才算真正完成连接
   ///可输入的参数包括外部媒体流和定制扩展属性
-  Future<bool> init(
-      {List<MediaStream> streams = const [],
-      required SignalExtension extension}) async {
+  Future<bool> init({required SignalExtension extension}) async {
     start = DateTime.now().millisecondsSinceEpoch;
     id = await cryptoGraphy.getRandomAsciiString(length: 8);
     this.extension = extension;
@@ -303,15 +300,7 @@ class BasePeerConnection {
       logger.i('CreateDataChannel and onDataChannel end');
     }
 
-    /// 4.把本地的现有的视频流加入到连接中，这个流可以由参数传入
-    if (streams.isNotEmpty) {
-      for (var stream in streams) {
-        PeerVideoRender render = await PeerVideoRender.from(stream: stream);
-        addRender(render);
-      }
-    }
-
-    /// 5.建立连接的监听轨道到来的监听器，当远方由轨道来的时候执行
+    /// 4.建立连接的监听轨道到来的监听器，当远方由轨道来的时候执行
     peerConnection.onAddStream = (MediaStream stream) {
       onAddStream(stream);
     };
@@ -824,51 +813,23 @@ class BasePeerConnection {
             extension: extension));
   }
 
-  /// 主动把渲染器加入到渲染器集合，并把渲染器的流加入到连接中，然后会激活onAddStream
-  /// @param {MediaStream} stream
-  addRender(PeerVideoRender render) async {
-    logger.i('addLocalRender ${render.id}');
+  ///主动创建新的PeerVideoRender，从连接中增加远程流，然后激活onAddStream
+  Future<void> addStream(MediaStream stream) async {
+    logger.i('addRemoteStream ${stream.id}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    var streamId = render.id;
-    if (streamId != null) {
-      if (videoRenders.containsKey(streamId)) {
-        return;
-      }
-      videoRenders[streamId] = render;
-      if (peerConnection != null && render.mediaStream != null) {
-        await peerConnection!.addStream(render.mediaStream!);
-        var tracks = render.mediaStream!.getTracks();
-        for (var track in tracks) {
-          await addTrack(track, render.mediaStream!);
-        }
-      }
+    var id = stream.id;
+    if (streams.containsKey(id)) {
+      return;
     }
-  }
-
-  ///主动创建新的PeerVideoRender，从连接中增加远程流，然后激活onAddStream
-  Future<PeerVideoRender?> addStream(MediaStream stream) async {
-    logger.i('addRemoteStream ${stream.id}');
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return null;
+    streams[id] = stream;
+    await peerConnection!.addStream(stream);
+    var tracks = stream.getTracks();
+    for (var track in tracks) {
+      await addTrack(track, stream!);
     }
-    if (videoRenders.containsKey(stream.id)) {
-      return videoRenders[stream.id];
-    }
-    PeerVideoRender render = PeerVideoRender(mediaStream: stream);
-    render.bindRTCVideoRender();
-    videoRenders[stream.id] = render;
-    if (peerConnection != null && render.mediaStream != null) {
-      await peerConnection!.addStream(render.mediaStream!);
-      var tracks = render.mediaStream!.getTracks();
-      for (var track in tracks) {
-        await addTrack(track, render.mediaStream!);
-      }
-    }
-    return render;
   }
 
   /// 把轨道加入到流中，其目的是为了把流加入到连接中，然后会激活onAddTrack
@@ -955,8 +916,8 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    var render = videoRenders[stream.id];
-    if (render != null) {
+    var id = stream.id;
+    if (streams.containsKey(id)) {
       RTCPeerConnection? peerConnection = this.peerConnection;
       if (peerConnection != null) {
         await peerConnection.removeStream(stream);
@@ -965,8 +926,6 @@ class BasePeerConnection {
       for (var track in tracks) {
         removeTrack(track, stream);
       }
-      render.dispose();
-      videoRenders.remove(stream.id);
     }
   }
 
@@ -1066,7 +1025,7 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    videoRenders = {};
+    streams = {};
     trackSenders = {};
     final dataChannel = this.dataChannel;
     if (dataChannel != null) {

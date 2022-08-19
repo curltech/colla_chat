@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui';
 
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -9,16 +10,23 @@ import 'package:path_provider/path_provider.dart';
 
 import '../../platform.dart';
 
+final emptyVideoView = Center(
+  child: defaultImage,
+);
+
 /// 简单包装webrtc视频流的渲染器，可以构造本地视频流或者传入的视频流
 /// 视频流绑定渲染器，并创建展示视图
 class PeerVideoRender {
+  String peerId;
+  String? clientId;
+  String? name;
   String? id;
   MediaStream? mediaStream;
   RTCVideoRenderer? renderer;
   MediaRecorder? mediaRecorder;
   List<MediaDeviceInfo>? mediaDevicesList;
 
-  PeerVideoRender({this.mediaStream}) {
+  PeerVideoRender(this.peerId, {this.clientId, this.name, this.mediaStream}) {
     if (mediaStream != null) {
       id = mediaStream!.id;
     }
@@ -35,11 +43,14 @@ class PeerVideoRender {
     }
   }
 
-  static Future<PeerVideoRender> from(
-      {MediaStream? stream,
+  static Future<PeerVideoRender> from(String peerId,
+      {String? clientId,
+      String? name,
+      MediaStream? stream,
       bool userMedia = false,
       bool displayMedia = false}) async {
-    PeerVideoRender render = PeerVideoRender();
+    PeerVideoRender render =
+        PeerVideoRender(peerId, clientId: clientId, name: name);
     if (stream == null && !userMedia && !displayMedia) {
       userMedia = true;
     }
@@ -60,7 +71,15 @@ class PeerVideoRender {
       {bool audio = true,
       int minWidth = 640,
       int minHeight = 480,
-      int minFrameRate = 30}) async {
+      int minFrameRate = 30,
+      bool replace = false}) async {
+    if (id != null) {
+      if (replace) {
+        await dispose();
+      } else {
+        return;
+      }
+    }
     Map<String, dynamic> mediaConstraints = <String, dynamic>{
       'audio': audio,
       'video': {
@@ -75,7 +94,6 @@ class PeerVideoRender {
         ],
       }
     };
-    await dispose();
     var mediaStream =
         await navigator.mediaDevices.getUserMedia(mediaConstraints);
     this.mediaStream = mediaStream;
@@ -84,7 +102,16 @@ class PeerVideoRender {
 
   ///获取本机屏幕流
   Future<void> createDisplayMedia(
-      {DesktopCapturerSource? selectedSource, bool audio = false}) async {
+      {DesktopCapturerSource? selectedSource,
+      bool audio = false,
+      bool replace = false}) async {
+    if (id != null) {
+      if (replace) {
+        await dispose();
+      } else {
+        return;
+      }
+    }
     dynamic video = selectedSource == null
         ? true
         : {
@@ -103,12 +130,18 @@ class PeerVideoRender {
   }
 
   ///获取本机音频流
-  Future<void> createAudioMedia() async {
+  Future<void> createAudioMedia({bool replace = false}) async {
+    if (id != null) {
+      if (replace) {
+        await dispose();
+      } else {
+        return;
+      }
+    }
     Map<String, dynamic> mediaConstraints = <String, dynamic>{
       'audio': true,
       'video': false,
     };
-    await dispose();
     var mediaStream =
         await navigator.mediaDevices.getUserMedia(mediaConstraints);
     this.mediaStream = mediaStream;
@@ -163,6 +196,7 @@ class PeerVideoRender {
     if (mediaStream != null) {
       await mediaStream.dispose();
       this.mediaStream = null;
+      id = null;
     }
     var renderer = this.renderer;
     if (renderer != null) {
@@ -172,37 +206,58 @@ class PeerVideoRender {
     }
   }
 
+  Widget _createVideoViewContainer({
+    double? width,
+    double? height,
+    Color color = Colors.black,
+    Widget? child,
+  }) {
+    child ??= emptyVideoView;
+    Widget container = Center(
+      child: Container(
+        margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+        width: width,
+        height: height,
+        decoration: BoxDecoration(color: color),
+        child: child,
+      ),
+    );
+
+    return container;
+  }
+
   /// 渲染器创建展示视图
-  Widget? createVideoView({
+  Widget createVideoView({
     RTCVideoViewObjectFit objectFit =
         RTCVideoViewObjectFit.RTCVideoViewObjectFitContain,
     bool mirror = false,
     FilterQuality filterQuality = FilterQuality.low,
+    bool fitScreen = false,
     double? width,
     double? height,
     Color color = Colors.black,
   }) {
+    RTCVideoView? videoView;
     var renderer = this.renderer;
     if (renderer != null) {
-      RTCVideoView videoView = RTCVideoView(renderer,
+      videoView = RTCVideoView(renderer,
           objectFit: objectFit, mirror: mirror, filterQuality: filterQuality);
-      return OrientationBuilder(
-        builder: (context, orientation) {
-          width = width ?? MediaQuery.of(context).size.width;
-          height = height ?? MediaQuery.of(context).size.height;
-          return Center(
-            child: Container(
-              margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-              width: width,
-              height: height,
-              decoration: BoxDecoration(color: color),
-              child: videoView,
-            ),
-          );
-        },
-      );
     }
-    return null;
+    Widget container = _createVideoViewContainer(
+        width: width, height: height, child: videoView);
+    if (!fitScreen) {
+      return container;
+    }
+    //用屏幕尺寸
+    return OrientationBuilder(
+      builder: (context, orientation) {
+        width = width ?? MediaQuery.of(context).size.width;
+        height = height ?? MediaQuery.of(context).size.height;
+        container = _createVideoViewContainer(
+            width: width, height: height, child: videoView);
+        return container;
+      },
+    );
   }
 
   /// 捕获视频流的帧，就是快照

@@ -1,5 +1,5 @@
-import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/pages/chat/chat/controller/peer_connections_controller.dart';
+import 'package:colla_chat/pages/chat/chat/video_view_card.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:flutter/material.dart';
@@ -11,11 +11,10 @@ import '../../../plugin/logger.dart';
 import '../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../transport/webrtc/peer_connection_pool.dart';
 import '../../../transport/webrtc/peer_video_render.dart';
-import '../../../widgets/common/image_widget.dart';
 import '../../../widgets/common/widget_mixin.dart';
 import 'controller/local_media_controller.dart';
 
-///视频通话拨出的对话框
+///视频通话窗口，显示多个小视频窗口，每个小窗口代表一个对方，其中一个是自己
 class VideoChatWidget extends StatefulWidget with TileDataMixin {
   VideoChatWidget({
     Key? key,
@@ -40,20 +39,19 @@ class VideoChatWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _VideoChatWidgetState extends State<VideoChatWidget> {
-  late final String peerId;
-  late final String name;
-  late final String? clientId;
-  final PeerVideoRender render = PeerVideoRender();
+  String? peerId;
+  String? name;
+  String? clientId;
 
   @override
   void initState() {
     super.initState();
-    localMediaController.addListener(_update);
+    peerConnectionsController.addListener(_update);
     ChatMessage? chatMessage = localMediaController.chatMessage;
     if (chatMessage != null) {
-      peerId = chatMessage.receiverPeerId!;
-      name = chatMessage.receiverName!;
-      clientId = chatMessage.receiverClientId;
+      peerId = localMediaController.peerId;
+      name = localMediaController.name;
+      clientId = localMediaController.clientId;
     } else {
       logger.e('no video chat chatMessage');
     }
@@ -63,20 +61,38 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     setState(() {});
   }
 
-  Future<Widget> _buildVideoView() async {
+  Future<Widget> _buildLocalVideoView() async {
+    Widget empty = Container();
+    ChatMessage? chatMessage = localMediaController.chatMessage;
+    if (chatMessage == null) {
+      return empty;
+    }
+    var peerId = this.peerId;
+    if (peerId == null) {
+      return empty;
+    }
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
-    if (advancedPeerConnection != null &&
-        advancedPeerConnection.status == PeerConnectionStatus.connected) {
-      await render.createUserMedia();
-      //advancedPeerConnection.addLocalRender(render);
-      await render.bindRTCVideoRender();
-      Widget? videoView = render.createVideoView(mirror: true);
-      if (videoView != null) {
-        return videoView;
-      }
+    if (advancedPeerConnection == null) {
+      return empty;
     }
+    PeerConnectionStatus? status = advancedPeerConnection.status;
+    if (status != PeerConnectionStatus.connected) {
+      return empty;
+    }
+    PeerVideoRender render = localMediaController.userRender;
+    await render.createUserMedia();
+    await render.bindRTCVideoRender();
+    advancedPeerConnection.addRender(render);
+    Widget videoView = render.createVideoView(mirror: true);
 
+    return videoView;
+  }
+
+  Widget _buildVideoViewCard(BuildContext context) {
+    if (peerId != null) {
+      return const VideoViewCard();
+    }
     return Container();
   }
 
@@ -85,55 +101,13 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     return AppBarView(
         withLeading: true,
         child: Stack(children: [
-          FutureBuilder(
-            future: _buildVideoView(),
-            builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
-              if (snapshot.hasData) {
-                return snapshot.data!;
-              } else {
-                return Center(child: Text(AppLocalizations.t('No video data')));
-              }
-            },
-          ),
-          Column(children: [
-            Row(
-              children: [
-                const ImageWidget(image: ''),
-                Column(children: [
-                  Text(name),
-                  Text(AppLocalizations.t('Invite you video chat...'))
-                ])
-              ],
-            ),
-            const Expanded(child: Center()),
-            Row(children: [
-              IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.cameraswitch),
-                  color: Colors.grey),
-              Text(AppLocalizations.t('Switch to audio chat')),
-              IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.clear),
-                  color: Colors.red),
-              IconButton(
-                  onPressed: () {},
-                  icon: const Icon(Icons.video_call),
-                  color: Colors.green)
-            ]),
-            IconButton(
-                onPressed: () {
-                  indexWidgetProvider.pop();
-                },
-                icon: const Icon(Icons.call_end),
-                color: Colors.red),
-          ])
+          _buildVideoViewCard(context),
         ]));
   }
 
   @override
   void dispose() {
-    localMediaController.removeListener(_update);
+    peerConnectionsController.removeListener(_update);
     super.dispose();
   }
 }

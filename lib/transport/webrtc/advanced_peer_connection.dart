@@ -89,6 +89,9 @@ class AdvancedPeerConnection {
   String? connectSessionId;
   Room? room;
 
+  //远程媒体流渲染器数组，在onAddStream,onAddTrack等的回调方法中得到
+  Map<String, PeerVideoRender> videoRenders = {};
+
   AdvancedPeerConnection(this.peerId, bool initiator,
       {this.clientId, this.name, this.room}) {
     if (initiator) {
@@ -103,9 +106,7 @@ class AdvancedPeerConnection {
     }
   }
 
-  Future<bool> init(
-      {List<MediaStream> streams = const [],
-      List<Map<String, String>>? iceServers}) async {
+  Future<bool> init({List<Map<String, String>>? iceServers}) async {
     var myselfPeerId = myself.peerId;
     var myselfClientId = myself.clientId;
     var myselfName = myself.myselfPeer!.name;
@@ -117,8 +118,7 @@ class AdvancedPeerConnection {
       logger.e('myself peerId or clientId is null');
       return false;
     }
-    bool result =
-        await basePeerConnection.init(streams: streams, extension: extension);
+    bool result = await basePeerConnection.init(extension: extension);
     if (!result) {
       logger.e('WebrtcCorePeer init result is false');
       return false;
@@ -190,33 +190,77 @@ class AdvancedPeerConnection {
     return basePeerConnection.status;
   }
 
-  addRender(PeerVideoRender render) {
-    logger.i('add stream render to webrtc');
-    basePeerConnection.addRender(render);
+  /// 主动把渲染器加入到渲染器集合，并把渲染器的流加入到连接中，然后会激活onAddStream
+  /// @param {MediaStream} stream
+  addRender(PeerVideoRender render) async {
+    logger.i('addRender ${render.id}');
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return;
+    }
+    var streamId = render.id;
+    if (streamId != null) {
+      if (videoRenders.containsKey(streamId)) {
+        return;
+      }
+      videoRenders[streamId] = render;
+      if (render.mediaStream != null) {
+        await basePeerConnection.addStream(render.mediaStream!);
+      }
+    }
   }
 
-  addStream(MediaStream stream) {
-    basePeerConnection.addStream(stream);
+  removeRender(PeerVideoRender render) async {
+    logger.i('removeRender ${render.id}');
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return;
+    }
+    var streamId = render.id;
+    if (streamId != null) {
+      if (videoRenders.containsKey(streamId)) {
+        videoRenders.remove(streamId);
+      }
+      if (render.mediaStream != null) {
+        await basePeerConnection.removeStream(render.mediaStream!);
+      }
+      render.dispose();
+    }
   }
 
-  removeStream(MediaStream stream) {
-    basePeerConnection.removeStream(stream);
+  addStream(MediaStream stream) async {
+    PeerVideoRender render = await PeerVideoRender.from(peerId,
+        clientId: clientId, name: name, stream: stream);
+    render.bindRTCVideoRender();
+    addRender(render);
   }
 
-  addTrack(MediaStreamTrack track, MediaStream stream) {
-    basePeerConnection.addTrack(track, stream);
+  removeStream(MediaStream stream) async {
+    var streamId = stream.id;
+    var render = videoRenders[streamId];
+    if (render != null) {
+      videoRenders.remove(streamId);
+      if (render.mediaStream != null) {
+        await basePeerConnection.removeStream(render.mediaStream!);
+      }
+      render.dispose();
+    }
   }
 
-  removeTrack(MediaStreamTrack track, MediaStream stream) {
-    basePeerConnection.removeTrack(track, stream);
+  addTrack(MediaStreamTrack track, MediaStream stream) async {
+    await basePeerConnection.addTrack(track, stream);
+  }
+
+  removeTrack(MediaStreamTrack track, MediaStream stream) async {
+    await basePeerConnection.removeTrack(track, stream);
   }
 
   replaceTrack(
     MediaStreamTrack oldTrack,
     MediaStreamTrack newTrack,
     MediaStream stream,
-  ) {
-    basePeerConnection.replaceTrack(oldTrack, newTrack, stream);
+  ) async {
+    await basePeerConnection.replaceTrack(oldTrack, newTrack, stream);
   }
 
   onSignal(WebrtcSignal signal) {

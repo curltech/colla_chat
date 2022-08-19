@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 
 import '../../../../entity/chat/chat.dart';
+import '../../../../entity/dht/myself.dart';
 import '../../../../transport/webrtc/peer_video_render.dart';
 
 ///媒体通话控制器，内部数据为视频通话的请求消息，和回执消息
@@ -14,10 +15,12 @@ class LocalMediaController with ChangeNotifier {
   bool? initiator;
 
   //用户媒体
-  final PeerVideoRender userRender = PeerVideoRender();
+  final PeerVideoRender userRender = PeerVideoRender(myself.peerId!,
+      clientId: myself.clientId, name: myself.myselfPeer!.name);
 
   //显示媒体
-  final PeerVideoRender displayRender = PeerVideoRender();
+  final PeerVideoRender displayRender = PeerVideoRender(myself.peerId!,
+      clientId: myself.clientId, name: myself.myselfPeer!.name);
 
   ChatMessage? get chatMessage {
     return _chatMessage;

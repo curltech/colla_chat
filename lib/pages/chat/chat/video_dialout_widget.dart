@@ -99,9 +99,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
       await localMediaController.userRender.bindRTCVideoRender();
       Widget? videoView =
           localMediaController.userRender.createVideoView(mirror: true);
-      if (videoView != null) {
         return videoView;
-      }
     }
 
     return Container();
