@@ -38,10 +38,6 @@ class VideoChatWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _VideoChatWidgetState extends State<VideoChatWidget> {
-  String? peerId;
-  String? name;
-  String? clientId;
-
   @override
   void initState() {
     super.initState();
@@ -58,12 +54,12 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     if (chatMessage == null) {
       return empty;
     }
-    var peerId = this.peerId;
+    var peerId = localMediaController.peerId;
     if (peerId == null) {
       return empty;
     }
-    AdvancedPeerConnection? advancedPeerConnection =
-        peerConnectionPool.getOne(peerId, clientId: clientId);
+    AdvancedPeerConnection? advancedPeerConnection = peerConnectionPool
+        .getOne(peerId, clientId: localMediaController.clientId);
     if (advancedPeerConnection == null) {
       return empty;
     }
@@ -81,10 +77,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   }
 
   Widget _buildVideoViewCard(BuildContext context) {
-    if (peerId != null) {
-      return const VideoViewCard();
-    }
-    return Container();
+    return const VideoViewCard();
   }
 
   @override

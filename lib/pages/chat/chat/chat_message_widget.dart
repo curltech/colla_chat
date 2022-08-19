@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/pages/chat/chat/video_chat_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video_dialout_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/chat.dart';
@@ -100,6 +101,7 @@ class ChatMessageWidget extends StatefulWidget with TileDataMixin {
       this.notificationPredicate})
       : super(key: key) {
     indexWidgetProvider.define(VideoDialOutWidget());
+    indexWidgetProvider.define(VideoChatWidget());
   }
 
   @override
