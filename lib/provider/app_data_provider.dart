@@ -317,7 +317,7 @@ class AppDataProvider with ChangeNotifier {
   set keyboardHeight(double keyboardHeight) {
     if (_keyboardHeight != keyboardHeight) {
       _keyboardHeight = keyboardHeight;
-      logger.i('keyboardHeight changed:$_keyboardHeight');
+      //logger.i('keyboardHeight changed:$_keyboardHeight');
     }
   }
 

@@ -293,7 +293,7 @@ class CryptographySecurityContextService extends SecurityContextService {
         //直接ecc数据解密
         data = await cryptoGraphy.eccDecrypt(data, localKeyPair: privateKey);
       }
-      logger.i('call cryptoGraphy decrypt');
+      //logger.i('call cryptoGraphy decrypt');
     }
     // 2. 解压缩
     if (needCompress) {

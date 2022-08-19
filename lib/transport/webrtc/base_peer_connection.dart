@@ -229,7 +229,7 @@ class BasePeerConnection {
   int reconnectTimes = 1;
 
   BasePeerConnection({required this.initiator}) {
-    logger.i('Create initiator:$initiator BasePeerConnection');
+    //logger.i('Create initiator:$initiator BasePeerConnection');
   }
 
   ///初始化连接，可以传入外部视频流，这是异步的函数，不能在构造里调用
@@ -249,7 +249,7 @@ class BasePeerConnection {
       //1.创建连接
       this.peerConnection =
           await createPeerConnection(configuration, pcConstraints);
-      logger.i('Create PeerConnection peerConnection end:$id');
+      //logger.i('Create PeerConnection peerConnection end:$id');
     } catch (err) {
       logger.e('createPeerConnection:$err');
       return false;
@@ -297,7 +297,7 @@ class BasePeerConnection {
             dataChannel.onMessage =
                 (RTCDataChannelMessage message) => {onMessage(message)}
           };
-      logger.i('CreateDataChannel and onDataChannel end');
+      //logger.i('CreateDataChannel and onDataChannel end');
     }
 
     /// 4.建立连接的监听轨道到来的监听器，当远方由轨道来的时候执行
@@ -408,8 +408,8 @@ class BasePeerConnection {
 
   onIceGatheringState(RTCIceGatheringState state) {
     RTCPeerConnection peerConnection = this.peerConnection!;
-    logger.i(
-        'iceGatheringState:${peerConnection.iceGatheringState},onIceGatheringState event:$state');
+    //logger.i(
+    //    'iceGatheringState:${peerConnection.iceGatheringState},onIceGatheringState event:$state');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -420,8 +420,8 @@ class BasePeerConnection {
   /// signal状态事件
   onSignalingState(RTCSignalingState state) {
     RTCPeerConnection peerConnection = this.peerConnection!;
-    logger.i(
-        'signalingState:${peerConnection.signalingState},onSignalingState event:$state');
+    // logger.i(
+    //     'signalingState:${peerConnection.signalingState},onSignalingState event:$state');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -435,14 +435,14 @@ class BasePeerConnection {
   ///onIceCandidate事件表示本地candidate准备好，可以发送IceCandidate到远端
   onIceCandidate(RTCIceCandidate candidate) {
     localCandidate = candidate;
-    logger.i('onIceCandidate event:${candidate.toMap()}');
+    //logger.i('onIceCandidate event:${candidate.toMap()}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
     }
     if (candidate.candidate != null) {
       //发送candidate信号
-      logger.i('Send Candidate signal.');
+      //logger.i('Send Candidate signal.');
       emit(
           WebrtcEventType.signal,
           WebrtcSignal(SignalType.candidate.name,
@@ -455,7 +455,7 @@ class BasePeerConnection {
   }
 
   onRenegotiationNeeded() {
-    logger.w('onRenegotiationNeeded event');
+    //logger.w('onRenegotiationNeeded event');
     //negotiate();
   }
 
@@ -537,7 +537,7 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus already negotiating');
       return;
     }
-    logger.i('Start negotiate');
+    //logger.i('Start negotiate');
     status == PeerConnectionStatus.negotiating;
     await _createOffer();
   }
@@ -549,11 +549,11 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    logger.i('start createOffer');
+    //logger.i('start createOffer');
     RTCSessionDescription offer =
         await peerConnection.createOffer(sdpConstraints);
     await peerConnection.setLocalDescription(offer);
-    logger.i('createOffer and setLocalDescription offer successfully');
+    //logger.i('createOffer and setLocalDescription offer successfully');
     await _sendOffer(offer);
   }
 
@@ -565,7 +565,7 @@ class BasePeerConnection {
       return;
     }
 
-    logger.i('start sendOffer');
+    //logger.i('start sendOffer');
     var sdp = await peerConnection.getLocalDescription();
     sdp ??= offer;
     emit(WebrtcEventType.signal,

@@ -62,7 +62,7 @@ class SignalKeyPair {
 
     senderKeyStore = InMemorySenderKeyStore();
 
-    logger.i('local SignalKeyPair init successfully');
+    //logger.i('local SignalKeyPair init successfully');
   }
 
   // 产生预先密钥对包，一般是第一个预先密钥对，签名预先密钥对，身份密钥对等参数组成，
