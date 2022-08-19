@@ -39,10 +39,12 @@ class _IndexViewState extends State<IndexView>
         ChatReceiptType? chatReceiptType =
             await showModalBottomSheet<ChatReceiptType>(
                 context: context, builder: _buildVideoDialIn);
-        if (chatReceiptType == ChatReceiptType.agree) {//同意，发出本地流
+        if (chatReceiptType == ChatReceiptType.agree) {
+          //同意，发出本地流
           logger.i('ChatReceiptType agree');
         } else if (chatReceiptType == null ||
-            chatReceiptType == ChatReceiptType.reject) {//拒绝，关闭对话框
+            chatReceiptType == ChatReceiptType.reject) {
+          //拒绝，关闭对话框
           logger.i('ChatReceiptType reject');
         }
       }

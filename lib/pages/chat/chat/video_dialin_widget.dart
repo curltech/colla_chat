@@ -1,11 +1,11 @@
-import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/widgets/common/image_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../../../entity/chat/chat.dart';
 import '../../../service/chat/chat.dart';
-import '../../../tool/util.dart';
 
 ///视频通话拨入的对话框
 class VideoDialInWidget extends StatelessWidget {
@@ -14,6 +14,21 @@ class VideoDialInWidget extends StatelessWidget {
 
   const VideoDialInWidget({Key? key, required this.chatMessage})
       : super(key: key);
+
+  _sendReceipt(ChatReceiptType receiptType) async {
+    ChatMessage? chatReceipt =
+        await chatMessageService.buildChatReceipt(chatMessage, receiptType);
+    if (chatReceipt != null) {
+      await chatMessageService.send(chatReceipt);
+      if (receiptType == ChatReceiptType.agree) {
+        var peerId = chatReceipt.receiverPeerId!;
+        var clientId = chatReceipt.receiverClientId!;
+        peerConnectionPool.addRender(peerId, localMediaController.userRender,
+            clientId: clientId);
+        indexWidgetProvider.push('video_chat');
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,26 +49,16 @@ class VideoDialInWidget extends StatelessWidget {
                 color: Colors.grey),
             const Text('切换语音通话'),
             IconButton(
-                onPressed: () async {
-                  ChatMessage? chatReceipt = await chatMessageService
-                      .buildChatReceipt(chatMessage, ChatReceiptType.reject);
-                  if (chatReceipt != null) {
-                    String json = JsonUtil.toJsonString(chatMessage);
-                    List<int> data = CryptoUtil.stringToUtf8(json);
-                    peerConnectionPool.send(chatReceipt.receiverPeerId!, data);
-                  }
+                onPressed: () {
+                  _sendReceipt(ChatReceiptType.reject);
+                  Navigator.pop(context, ChatReceiptType.reject);
                 },
                 icon: const Icon(Icons.clear),
                 color: Colors.red),
             IconButton(
-                onPressed: () async {
-                  ChatMessage? chatReceipt = await chatMessageService
-                      .buildChatReceipt(chatMessage, ChatReceiptType.agree);
-                  if (chatReceipt != null) {
-                    String json = JsonUtil.toJsonString(chatMessage);
-                    List<int> data = CryptoUtil.stringToUtf8(json);
-                    peerConnectionPool.send(chatReceipt.receiverPeerId!, data);
-                  }
+                onPressed: () {
+                  _sendReceipt(ChatReceiptType.agree);
+                  Navigator.pop(context, ChatReceiptType.agree);
                 },
                 icon: const Icon(Icons.video_call),
                 color: Colors.green)

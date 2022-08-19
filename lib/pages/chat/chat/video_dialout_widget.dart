@@ -56,7 +56,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   @override
   void initState() {
     super.initState();
-    localMediaController.addListener(_update);
+    localMediaController.addListener(_receive);
     ChatMessage? chatMessage = localMediaController.chatMessage;
     if (chatMessage != null) {
       peerId = chatMessage.receiverPeerId!;
@@ -67,8 +67,27 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
     }
   }
 
-  _update() {
-    setState(() {});
+  _receive() {
+    ChatMessage? chatReceipt = localMediaController.chatReceipt;
+    if (chatReceipt != null) {
+      String? title = chatReceipt.title;
+      String? subMessageType = chatReceipt.subMessageType;
+      if (subMessageType != null) {
+        if (subMessageType == ChatSubMessageType.chatReceipt.name) {
+          if (title == ChatReceiptType.agree.name) {
+            var peerId = chatReceipt.senderPeerId!;
+            var clientId = chatReceipt.senderClientId!;
+            peerConnectionPool.addRender(
+                peerId, localMediaController.userRender,
+                clientId: clientId);
+            indexWidgetProvider.pop();
+            indexWidgetProvider.push('video_chat');
+          } else if (title == ChatReceiptType.reject.name) {
+            indexWidgetProvider.pop();
+          }
+        }
+      }
+    }
   }
 
   Future<Widget> _buildVideoView() async {
@@ -141,7 +160,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
 
   @override
   void dispose() {
-    localMediaController.removeListener(_update);
+    localMediaController.removeListener(_receive);
     super.dispose();
   }
 }

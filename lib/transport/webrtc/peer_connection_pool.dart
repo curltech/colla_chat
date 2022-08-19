@@ -7,6 +7,7 @@ import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
@@ -596,12 +597,14 @@ class PeerConnectionPool {
   }
 
   onAddStream(WebrtcEvent event) async {
-    logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onAddStream');
+    logger
+        .i('peerId: ${event.peerId} clientId:${event.clientId} is onAddStream');
     peerConnectionPoolController.onAddStream(event);
   }
 
   onRemoveStream(WebrtcEvent event) async {
-    logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onRemoveStream');
+    logger.i(
+        'peerId: ${event.peerId} clientId:${event.clientId} is onRemoveStream');
     peerConnectionPoolController.onRemoveStream(event);
   }
 
@@ -611,13 +614,77 @@ class PeerConnectionPool {
   }
 
   onAddTrack(WebrtcEvent event) async {
-    logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onAddTrack');
+    logger
+        .i('peerId: ${event.peerId} clientId:${event.clientId} is onAddTrack');
     peerConnectionPoolController.onTrack(event);
   }
 
   onRemoveTrack(WebrtcEvent event) async {
-    logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onRemoveTrack');
+    logger.i(
+        'peerId: ${event.peerId} clientId:${event.clientId} is onRemoveTrack');
     peerConnectionPoolController.onTrack(event);
+  }
+
+  addRender(String peerId, PeerVideoRender render, {String? clientId}) {
+    AdvancedPeerConnection? advancedPeerConnection =
+        peerConnectionPool.getOne(peerId, clientId: clientId);
+    if (advancedPeerConnection != null) {
+      advancedPeerConnection.addRender(render);
+    }
+  }
+
+  addStream(String peerId, MediaStream stream, {String? clientId}) {
+    AdvancedPeerConnection? advancedPeerConnection =
+        peerConnectionPool.getOne(peerId, clientId: clientId);
+    if (advancedPeerConnection != null) {
+      advancedPeerConnection.addStream(stream);
+    }
+  }
+
+  removeStream(String peerId, MediaStream stream, {String? clientId}) {
+    AdvancedPeerConnection? advancedPeerConnection =
+        peerConnectionPool.getOne(peerId, clientId: clientId);
+    if (advancedPeerConnection != null) {
+      advancedPeerConnection.removeStream(stream);
+    }
+  }
+
+  addTrack(String peerId, MediaStreamTrack track, MediaStream stream,
+      {String? clientId}) {
+    AdvancedPeerConnection? advancedPeerConnection =
+        peerConnectionPool.getOne(peerId, clientId: clientId);
+    if (advancedPeerConnection != null) {
+      advancedPeerConnection.addTrack(track, stream);
+    }
+  }
+
+  removeTrack(String peerId, MediaStreamTrack track, MediaStream stream,
+      {String? clientId}) {
+    AdvancedPeerConnection? advancedPeerConnection =
+        peerConnectionPool.getOne(peerId, clientId: clientId);
+    if (advancedPeerConnection != null) {
+      advancedPeerConnection.removeTrack(track, stream);
+    }
+  }
+
+  replaceTrack(String peerId, MediaStreamTrack oldTrack,
+      MediaStreamTrack newTrack, MediaStream stream,
+      {String? clientId}) {
+    AdvancedPeerConnection? advancedPeerConnection =
+        peerConnectionPool.getOne(peerId, clientId: clientId);
+    if (advancedPeerConnection != null) {
+      advancedPeerConnection.replaceTrack(oldTrack, newTrack, stream);
+    }
+  }
+
+  PeerConnectionStatus status(String peerId, {String? clientId}) {
+    AdvancedPeerConnection? advancedPeerConnection =
+        peerConnectionPool.getOne(peerId, clientId: clientId);
+    if (advancedPeerConnection != null) {
+      return advancedPeerConnection.status;
+    }
+
+    return PeerConnectionStatus.none;
   }
 
   ///调用signalAction发送signal到信号服务器

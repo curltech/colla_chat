@@ -13,6 +13,7 @@ import '../../entity/chat/contact.dart';
 import '../../entity/dht/myself.dart';
 import '../../entity/dht/peerclient.dart';
 import '../../plugin/logger.dart';
+import '../../transport/webrtc/peer_connection_pool.dart';
 
 class ChatMessageService extends GeneralBaseService<ChatMessage> {
   ChatMessageService({
@@ -152,6 +153,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     }
   }
 
+  //创建回执，subMessageType为chatReceipt，title为
   Future<ChatMessage?> buildChatReceipt(
       ChatMessage chatMessage, ChatReceiptType receiptType) async {
     ChatMessage msg = ChatMessage(myself.peerId!);
@@ -184,17 +186,17 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     if (receiptType == ChatReceiptType.received) {
       msg.actualReceiveTime = DateUtil.currentDate();
       msg.receiveTime = DateUtil.currentDate();
-      msg.title = MessageStatus.received.name;
+      msg.title = ChatReceiptType.received.name;
     } else if (receiptType == ChatReceiptType.read) {
       msg.readTime = DateUtil.currentDate();
-      msg.title = MessageStatus.read.name;
+      msg.title = ChatReceiptType.read.name;
     } else if (receiptType == ChatReceiptType.agree) {
-      msg.title = MessageStatus.agree.name;
+      msg.title = ChatReceiptType.agree.name;
     } else if (receiptType == ChatReceiptType.reject) {
-      msg.title = MessageStatus.reject.name;
+      msg.title = ChatReceiptType.reject.name;
     } else if (receiptType == ChatReceiptType.deleted) {
       msg.deleteTime = chatMessage.deleteTime;
-      msg.title = MessageStatus.deleted.name;
+      msg.title = ChatReceiptType.deleted.name;
     }
     await insert(msg);
 
@@ -298,6 +300,16 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       }
     }
     return chatMessages;
+  }
+
+  send(ChatMessage chatMessage) {
+    var peerId = chatMessage.receiverPeerId;
+    var clientId = chatMessage.receiverClientId;
+    if (peerId != null) {
+      String json = JsonUtil.toJsonString(chatMessage);
+      var data = CryptoUtil.stringToUtf8(json);
+      peerConnectionPool.send(peerId, data, clientId: clientId);
+    }
   }
 }
 

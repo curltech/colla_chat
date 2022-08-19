@@ -246,9 +246,11 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null) {
       if (advancedPeerConnection.status == PeerConnectionStatus.connected) {
+        //发送视频通话请求
         ChatMessage chatMessage =
             await send(subMessageType: ChatSubMessageType.videoChat);
         localMediaController.chatMessage = chatMessage;
+        //打开拨号窗口
         indexWidgetProvider.push('video_dialout');
       } else {
         logger.e(
