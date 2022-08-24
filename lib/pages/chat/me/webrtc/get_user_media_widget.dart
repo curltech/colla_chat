@@ -1,12 +1,12 @@
 import 'dart:core';
 
+import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/localization.dart';
-import '../../../../transport/webrtc/peer_video_render.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
@@ -30,11 +30,10 @@ class GetUserMediaWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
-  PeerVideoRender peerVideoRenderer = PeerVideoRender('');
   bool _inCalling = false;
   bool _isTorchOn = false;
 
-  bool get _isRec => peerVideoRenderer.mediaRecorder != null;
+  bool get _isRec => localMediaController.userRender.mediaRecorder != null;
 
   @override
   void initState() {
@@ -44,9 +43,9 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   // Platform messages are asynchronous, so we initialize in an async method.
   void _makeCall() async {
     try {
-      await peerVideoRenderer.createUserMedia();
-      await peerVideoRenderer.enumerateDevices();
-      await peerVideoRenderer.bindRTCVideoRender();
+      await localMediaController.userRender.createUserMedia();
+      await localMediaController.userRender.enumerateDevices();
+      await localMediaController.userRender.bindRTCVideoRender();
     } catch (e) {
       logger.e(e.toString());
     }
@@ -59,7 +58,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
 
   void _hangUp() async {
     try {
-      peerVideoRenderer.dispose();
+      localMediaController.userRender.dispose();
       setState(() {
         _inCalling = false;
       });
@@ -69,21 +68,21 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   }
 
   void _startRecording() async {
-    peerVideoRenderer.startRecording();
+    localMediaController.userRender.startRecording();
     setState(() {});
   }
 
   void _stopRecording() async {
-    peerVideoRenderer.stopRecording();
+    localMediaController.userRender.stopRecording();
     setState(() {});
   }
 
   void _toggleTorch() async {
-    if (peerVideoRenderer.mediaStream == null) {
+    if (localMediaController.userRender.mediaStream == null) {
       throw 'Stream is not initialized';
     }
 
-    final videoTrack = peerVideoRenderer.mediaStream!
+    final videoTrack = localMediaController.userRender.mediaStream!
         .getVideoTracks()
         .firstWhere((track) => track.kind == 'video');
     final has = await videoTrack.hasTorch();
@@ -98,17 +97,17 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   }
 
   void _toggleCamera() async {
-    if (peerVideoRenderer.mediaStream == null) {
+    if (localMediaController.userRender.mediaStream == null) {
       throw 'Stream is not initialized';
     }
-    peerVideoRenderer.switchCamera();
+    localMediaController.userRender.switchCamera();
   }
 
   void _captureFrame() async {
-    if (peerVideoRenderer.mediaStream == null) {
+    if (localMediaController.userRender.mediaStream == null) {
       throw 'Stream is not initialized';
     }
-    final frame = await peerVideoRenderer.captureFrame();
+    final frame = await localMediaController.userRender.captureFrame();
     if (frame != null) {
       await showDialog(
           context: context,
@@ -134,7 +133,8 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             decoration: const BoxDecoration(color: Colors.black),
-            child: peerVideoRenderer.createVideoView(mirror: true),
+            child:
+                localMediaController.userRender.createVideoView(mirror: true),
           ),
         );
       },
@@ -142,7 +142,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   }
 
   List<Widget>? _buildActions(BuildContext context) {
-    var mediaDevicesList = peerVideoRenderer.mediaDevicesList;
+    var mediaDevicesList = localMediaController.userRender.mediaDevicesList;
     return _inCalling
         ? <Widget>[
             IconButton(
@@ -207,7 +207,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   }
 
   void _selectAudioOutput(String deviceId) {
-    peerVideoRenderer.renderer!.audioOutput(deviceId);
+    localMediaController.userRender.renderer!.audioOutput(deviceId);
   }
 
   @override

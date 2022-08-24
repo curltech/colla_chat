@@ -63,6 +63,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
       peerId = chatMessage.receiverPeerId!;
       name = chatMessage.receiverName;
       clientId = chatMessage.receiverClientId;
+      _call();
     } else {
       logger.e('no video chat chatMessage');
     }
@@ -93,13 +94,28 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
     }
   }
 
-  Future<Widget> _buildVideoView() async {
+  _call() async {
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null &&
         advancedPeerConnection.status == PeerConnectionStatus.connected) {
       await localMediaController.userRender.createUserMedia();
       await localMediaController.userRender.bindRTCVideoRender();
+      setState(() {});
+    }
+  }
+
+  _hangup() {
+    localMediaController.userRender.dispose();
+    //indexWidgetProvider.pop();
+    setState(() {});
+  }
+
+  Future<Widget> _buildVideoView() async {
+    AdvancedPeerConnection? advancedPeerConnection =
+        peerConnectionPool.getOne(peerId, clientId: clientId);
+    if (advancedPeerConnection != null &&
+        advancedPeerConnection.status == PeerConnectionStatus.connected) {
       Widget? videoView =
           localMediaController.userRender.createVideoView(mirror: true);
       return videoView;
@@ -145,14 +161,15 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
                   icon: const Icon(Icons.clear),
                   color: Colors.red),
               IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    _call();
+                  },
                   icon: const Icon(Icons.video_call),
                   color: Colors.green)
             ]),
             IconButton(
                 onPressed: () {
-                  localMediaController.userRender.dispose();
-                  indexWidgetProvider.pop();
+                  _hangup();
                 },
                 icon: const Icon(Icons.call_end),
                 color: Colors.red),
