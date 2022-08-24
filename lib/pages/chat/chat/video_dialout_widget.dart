@@ -151,6 +151,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
             ]),
             IconButton(
                 onPressed: () {
+                  localMediaController.userRender.dispose();
                   indexWidgetProvider.pop();
                 },
                 icon: const Icon(Icons.call_end),
