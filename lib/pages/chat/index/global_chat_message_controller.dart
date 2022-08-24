@@ -21,7 +21,6 @@ class GlobalChatMessageController with ChangeNotifier {
       if (chatMessage.subMessageType == ChatSubMessageType.videoChat.name) {
         if (title == null) {
           //收到视频通话邀请，显示拨入对话框VideoDialInWidget，indexView
-          globalChatMessageController.chatMessage = chatMessage;
         } else if (chatMessage.title == ChatReceiptType.agree.name) {
           //收到视频通话邀请同意回执，发出本地流，关闭拨号窗口VideoDialOutWidget，显示视频通话窗口VideoChatWidget
           AdvancedPeerConnection? advancedPeerConnection =
