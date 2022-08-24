@@ -622,55 +622,55 @@ class PeerConnectionPool {
     peerConnectionPoolController.onTrack(event);
   }
 
-  addRender(String peerId, PeerVideoRender render, {String? clientId}) {
+  addRender(String peerId, PeerVideoRender render, {String? clientId}) async {
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null) {
-      advancedPeerConnection.addRender(render);
+      await advancedPeerConnection.addRender(render);
     }
   }
 
-  addStream(String peerId, MediaStream stream, {String? clientId}) {
+  addStream(String peerId, MediaStream stream, {String? clientId}) async {
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null) {
-      advancedPeerConnection.addStream(stream);
+      await advancedPeerConnection.addStream(stream);
     }
   }
 
-  removeStream(String peerId, MediaStream stream, {String? clientId}) {
+  removeStream(String peerId, MediaStream stream, {String? clientId}) async {
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null) {
-      advancedPeerConnection.removeStream(stream);
+      await advancedPeerConnection.removeStream(stream);
     }
   }
 
   addTrack(String peerId, MediaStreamTrack track, MediaStream stream,
-      {String? clientId}) {
+      {String? clientId}) async {
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null) {
-      advancedPeerConnection.addTrack(track, stream);
+      await advancedPeerConnection.addTrack(track, stream);
     }
   }
 
   removeTrack(String peerId, MediaStreamTrack track, MediaStream stream,
-      {String? clientId}) {
+      {String? clientId}) async {
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null) {
-      advancedPeerConnection.removeTrack(track, stream);
+      await advancedPeerConnection.removeTrack(track, stream);
     }
   }
 
   replaceTrack(String peerId, MediaStreamTrack oldTrack,
       MediaStreamTrack newTrack, MediaStream stream,
-      {String? clientId}) {
+      {String? clientId}) async {
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null) {
-      advancedPeerConnection.replaceTrack(oldTrack, newTrack, stream);
+      await advancedPeerConnection.replaceTrack(oldTrack, newTrack, stream);
     }
   }
 
