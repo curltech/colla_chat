@@ -95,6 +95,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
 
   _open() async {
     if (isOpen) {
+      setState(() {});
       return;
     }
     AdvancedPeerConnection? advancedPeerConnection =
@@ -185,7 +186,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   @override
   void dispose() {
     localMediaController.removeListener(_receive);
-    _close();
+    localMediaController.userRender.dispose();
     super.dispose();
   }
 }
