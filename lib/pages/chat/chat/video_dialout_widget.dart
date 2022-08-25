@@ -117,7 +117,6 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   }
 
   Future<Widget> _buildVideoView() async {
-    await _open();
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null &&
