@@ -19,27 +19,37 @@ class _VideoViewCardState extends State<VideoViewCard> {
     super.initState();
   }
 
-  double _calculateWidth(double totalWidth, int count) {
+  Size _calculateSize(int count) {
+    double totalWidth = appDataProvider.mobileSize.width;
+    double totalHeight = appDataProvider.mobileSize.height;
+    var height = totalHeight;
+    var width = totalWidth;
     if (count <= 4) {
-      return totalWidth;
+      height = totalHeight / count;
+    } else if (count <= 8) {
+      width = totalWidth / 2;
+      height = totalHeight / count / 2;
+    } else if (count <= 12) {
+      width = totalWidth / count / 3;
+    } else {
+      width = totalWidth / count / 4;
+      height = totalHeight / 4;
     }
-    if (count <= 8) {
-      return totalWidth / 2;
-    }
-    if (count <= 12) {
-      return totalWidth / 3;
-    }
-    return totalWidth / 4;
+
+    return Size(width, height);
   }
 
   Widget _buildVideoViews(BuildContext context) {
     Map<String, PeerVideoRender> renders =
         peerConnectionsController.videoRenders();
-    double totalWidth = appDataProvider.mobileSize.width;
-    double width = _calculateWidth(totalWidth, renders.length);
+    Size size = _calculateSize(renders.length);
     List<Widget> videoViews = [];
     for (var render in renders.values) {
-      Widget videoView = VideoViewWidget(render: render, width: width);
+      Widget videoView = VideoViewWidget(
+        render: render,
+        width: size.width,
+        height: size.height,
+      );
       videoViews.add(videoView);
     }
     return SingleChildScrollView(
