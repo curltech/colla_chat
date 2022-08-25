@@ -199,7 +199,7 @@ class BasePeerConnection {
   Map<String, MediaStream> streams = {};
 
   //媒体流的轨道，流和发送者之间的关系
-  Map<MediaStreamTrack, Map<MediaStream, RTCRtpSender>> trackSenders = {};
+  Map<String, Map<String, RTCRtpSender>> trackSenders = {};
 
   //外部使用时注册的回调方法，也就是注册事件
   //WebrtcEvent定义了事件的名称
@@ -836,23 +836,46 @@ class BasePeerConnection {
   /// @param {MediaStreamTrack} track
   /// @param {MediaStream} stream
   addTrack(MediaStreamTrack track, MediaStream stream) async {
-    logger.i('addLocalTrack stream:${stream.id}, track:${track.id}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    RTCPeerConnection peerConnection = this.peerConnection!;
-    var streamSenders = trackSenders[track];
-    if (streamSenders == null) {
-      streamSenders = {};
-      trackSenders[track] = streamSenders;
+    logger.i('addLocalTrack stream:${stream.id}, track:${track.id}');
+    String streamId = stream.id;
+    String? trackId = track.id;
+    if (trackId == null) {
+      logger.e('stream:$streamId, track:$trackId is null');
     }
-    RTCRtpSender? sender = streamSenders[stream];
-    if (sender == null) {
-      sender = await peerConnection.addTrack(track, stream);
-      streamSenders[stream] = sender;
-    } else {
-      logger.e('Track has already been added to that stream.');
+    RTCPeerConnection peerConnection = this.peerConnection!;
+    if (trackId != null) {
+      List<RTCRtpSender> senders = await peerConnection.getSenders();
+      for (var sender in senders) {
+        var senderId = sender.senderId;
+        var senderTrack = sender.track;
+        if (senderTrack == null) {
+          logger.e(
+              'stream:$streamId, track:$trackId , sender:$senderId senderTrack is null');
+          continue;
+        }
+        var senderTrackId = senderTrack.id;
+        if (senderTrackId == null) {
+          logger.e(
+              'stream:$streamId, track:$trackId , senderTrackId:$senderTrackId is null');
+          continue;
+        }
+        var streamSenders = trackSenders[senderTrackId];
+        if (streamSenders == null) {
+          streamSenders = {};
+          trackSenders[senderTrackId] = streamSenders;
+        }
+        RTCRtpSender? streamSender = streamSenders[streamId];
+        if (streamSender == null) {
+          //streamSender = await peerConnection.addTrack(track, stream);
+          streamSenders[streamId] = sender;
+        } else {
+          logger.e('Track has already been added to that stream.');
+        }
+      }
     }
   }
 
@@ -868,13 +891,16 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    var streamSenders = trackSenders[oldTrack];
+    var streamId = stream.id;
+    var oldTrackId = oldTrack.id;
+    var newTrackId = newTrack.id;
+    var streamSenders = trackSenders[oldTrackId];
     if (streamSenders != null) {
-      RTCRtpSender? sender = streamSenders[stream];
+      RTCRtpSender? sender = streamSenders[streamId];
       if (sender == null) {
         logger.e('Cannot replace track that was never added.');
       } else {
-        trackSenders[newTrack] = streamSenders;
+        trackSenders[newTrackId!] = streamSenders;
         await sender.replaceTrack(newTrack);
       }
     }
@@ -889,9 +915,11 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    var streamSenders = trackSenders[track];
+    var streamId = stream.id;
+    var trackId = track.id;
+    var streamSenders = trackSenders[trackId];
     if (streamSenders != null) {
-      RTCRtpSender? sender = streamSenders[stream];
+      RTCRtpSender? sender = streamSenders[streamId];
       if (sender == null) {
         logger.e('Cannot remove track that was never added.');
       } else {

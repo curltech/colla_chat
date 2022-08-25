@@ -125,20 +125,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   }
 
   Widget _buildVideoView(BuildContext context) {
-    return OrientationBuilder(
-      builder: (context, orientation) {
-        return Center(
-          child: Container(
-            margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
-            decoration: const BoxDecoration(color: Colors.black),
-            child:
-                localMediaController.userRender.createVideoView(mirror: true),
-          ),
-        );
-      },
-    );
+    return localMediaController.userRender.createVideoView(mirror: true);
   }
 
   List<Widget>? _buildActions(BuildContext context) {

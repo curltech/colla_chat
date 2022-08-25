@@ -1,15 +1,12 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/peer_connections_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../entity/chat/chat.dart';
-import '../../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../entity/chat/chat.dart';
 import '../../../plugin/logger.dart';
-import '../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../transport/webrtc/peer_connection_pool.dart';
 import '../../../widgets/common/image_widget.dart';
 import '../../../widgets/common/widget_mixin.dart';
@@ -50,23 +47,24 @@ class VideoDialOutWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
-  late final String peerId;
-  late final String? name;
-  late final String? clientId;
+  String? peerId;
+  String? name;
+  String? clientId;
 
   @override
   void initState() {
     super.initState();
-    localMediaController.addListener(_receive);
-    ChatMessage? chatMessage = localMediaController.chatMessage;
-    if (chatMessage != null) {
-      peerId = chatMessage.receiverPeerId!;
-      name = chatMessage.receiverName;
-      clientId = chatMessage.receiverClientId;
-      _call();
-    } else {
-      logger.e('no video chat chatMessage');
-    }
+    _call();
+    // localMediaController.addListener(_receive);
+    // ChatMessage? chatMessage = localMediaController.chatMessage;
+    // if (chatMessage != null) {
+    //   peerId = chatMessage.receiverPeerId!;
+    //   name = chatMessage.receiverName;
+    //   clientId = chatMessage.receiverClientId;
+    //   //
+    // } else {
+    //   logger.e('no video chat chatMessage');
+    // }
   }
 
   _receive() {
@@ -95,14 +93,14 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   }
 
   _call() async {
-    AdvancedPeerConnection? advancedPeerConnection =
-        peerConnectionPool.getOne(peerId, clientId: clientId);
-    if (advancedPeerConnection != null &&
-        advancedPeerConnection.status == PeerConnectionStatus.connected) {
-      await localMediaController.userRender.createUserMedia();
-      await localMediaController.userRender.bindRTCVideoRender();
-      setState(() {});
-    }
+    // AdvancedPeerConnection? advancedPeerConnection =
+    //     peerConnectionPool.getOne(peerId, clientId: clientId);
+    // if (advancedPeerConnection != null &&
+    //     advancedPeerConnection.status == PeerConnectionStatus.connected) {
+    await localMediaController.userRender.createUserMedia();
+    await localMediaController.userRender.bindRTCVideoRender();
+    setState(() {});
+    //}
   }
 
   _hangup() {
@@ -111,17 +109,17 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
     setState(() {});
   }
 
-  Future<Widget> _buildVideoView() async {
-    AdvancedPeerConnection? advancedPeerConnection =
-        peerConnectionPool.getOne(peerId, clientId: clientId);
-    if (advancedPeerConnection != null &&
-        advancedPeerConnection.status == PeerConnectionStatus.connected) {
-      Widget? videoView =
-          localMediaController.userRender.createVideoView(mirror: true);
-      return videoView;
-    }
+  Widget _buildVideoView() {
+    // AdvancedPeerConnection? advancedPeerConnection =
+    //     peerConnectionPool.getOne(peerId, clientId: clientId);
+    // if (advancedPeerConnection != null &&
+    //     advancedPeerConnection.status == PeerConnectionStatus.connected) {
+    Widget? videoView =
+        localMediaController.userRender.createVideoView(mirror: true);
+    return videoView;
+    //}
 
-    return Container();
+    //return Container();
   }
 
   @override
@@ -129,16 +127,17 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
     return AppBarView(
         withLeading: true,
         child: Stack(children: [
-          FutureBuilder(
-            future: _buildVideoView(),
-            builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
-              if (snapshot.hasData) {
-                return snapshot.data!;
-              } else {
-                return Center(child: Text(AppLocalizations.t('No video data')));
-              }
-            },
-          ),
+          _buildVideoView(),
+          // FutureBuilder(
+          //   future: _buildVideoView(),
+          //   builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+          //     if (snapshot.hasData) {
+          //       return snapshot.data!;
+          //     } else {
+          //       return Center(child: Text(AppLocalizations.t('No video data')));
+          //     }
+          //   },
+          // ),
           Column(children: [
             Row(
               children: [
@@ -179,7 +178,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
 
   @override
   void dispose() {
-    localMediaController.removeListener(_receive);
+    //localMediaController.removeListener(_receive);
     super.dispose();
   }
 }
