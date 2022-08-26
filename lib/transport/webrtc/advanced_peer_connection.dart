@@ -181,18 +181,16 @@ class AdvancedPeerConnection {
           clientId: clientId, data: {'track': track, 'stream': stream}));
     });
 
-    basePeerConnection.on(WebrtcEventType.addTrack,
-        (MediaStream stream, MediaStreamTrack track) async {
+    basePeerConnection.on(WebrtcEventType.addTrack, (data) async {
       logger.i('${DateTime.now().toUtc().toIso8601String()}:addTrack');
-      await peerConnectionPool.onAddTrack(WebrtcEvent(peerId,
-          clientId: clientId, data: {'track': track, 'stream': stream}));
+      await peerConnectionPool
+          .onAddTrack(WebrtcEvent(peerId, clientId: clientId, data: data));
     });
 
-    basePeerConnection.on(WebrtcEventType.removeTrack,
-        (MediaStream stream, MediaStreamTrack track) async {
+    basePeerConnection.on(WebrtcEventType.removeTrack, (data) async {
       logger.i('${DateTime.now().toUtc().toIso8601String()}:removeTrack');
-      await peerConnectionPool.onRemoveTrack(WebrtcEvent(peerId,
-          clientId: clientId, data: {'track': track, 'stream': stream}));
+      await peerConnectionPool
+          .onRemoveTrack(WebrtcEvent(peerId, clientId: clientId, data: data));
     });
 
     basePeerConnection.on(WebrtcEventType.error, (err) async {
