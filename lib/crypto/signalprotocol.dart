@@ -68,7 +68,7 @@ class SignalKeyPair {
   // 产生预先密钥对包，一般是第一个预先密钥对，签名预先密钥对，身份密钥对等参数组成，
   // 通过服务器传递给对方，才能启动会话
   PreKeyBundle getPreKeyBundle({int index = 0, int deviceId = 1}) {
-    PreKeyRecord preKey=preKeys[index];
+    PreKeyRecord preKey = preKeys[index];
     final preKeyBundle = PreKeyBundle(
         registrationId,
         deviceId,
@@ -320,7 +320,7 @@ class SignalSession {
 class SignalSessionPool {
   late String peerId;
   late String clientId;
-  int deviceId = 0;
+  int deviceId = 1;
 
   /// 本地的协议地址
   late SignalProtocolAddress signalProtocolAddress;
