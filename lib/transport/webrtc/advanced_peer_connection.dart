@@ -145,9 +145,9 @@ class AdvancedPeerConnection {
     });
 
     //触发basePeerConnection的connect事件，就是调用peerConnectionPool对应的signal方法
-    basePeerConnection.on(WebrtcEventType.connected, () async {
+    basePeerConnection.on(WebrtcEventType.connected, (data) async {
       await peerConnectionPool
-          .onConnected(WebrtcEvent(peerId, clientId: clientId));
+          .onConnected(WebrtcEvent(peerId, clientId: clientId, data: data));
     });
 
     basePeerConnection.on(WebrtcEventType.status, (data) async {
@@ -155,9 +155,9 @@ class AdvancedPeerConnection {
           .onStatus(WebrtcEvent(peerId, clientId: clientId, data: data));
     });
 
-    basePeerConnection.on(WebrtcEventType.closed, () async {
+    basePeerConnection.on(WebrtcEventType.closed, (data) async {
       await peerConnectionPool
-          .onClosed(WebrtcEvent(peerId, clientId: clientId));
+          .onClosed(WebrtcEvent(peerId, clientId: clientId, data: data));
     });
 
     //收到数据，带解密功能，取最后一位整数，表示解密选项，得到何种解密方式，然后解密
