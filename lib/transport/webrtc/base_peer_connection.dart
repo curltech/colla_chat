@@ -140,6 +140,7 @@ enum PeerConnectionStatus {
   none,
   created,
   init,
+  reconnecting,
   negotiating, //协商过程中
   negotiated,
   failed,
@@ -195,6 +196,9 @@ class BasePeerConnection {
   //数据通道的标签
   late String dataChannelLabel;
 
+  //本地媒体流渲染器数组，在init方法中传入
+  //Map<String, MediaStream> localStreams = {};
+
   //远程媒体流渲染器数组，在onAddStream,onAddTrack等的回调方法中得到
   Map<String, MediaStream> streams = {};
 
@@ -236,7 +240,9 @@ class BasePeerConnection {
   ///建立连接对象，设置好回调函数，然后如果是master发起协商，如果是follow，在收到offer才开始创建，
   ///只有协商完成，数据通道打开，才算真正完成连接
   ///可输入的参数包括外部媒体流和定制扩展属性
-  Future<bool> init({required SignalExtension extension}) async {
+  Future<bool> init(
+      {required SignalExtension extension,
+      List<MediaStream> localStreams = const []}) async {
     start = DateTime.now().millisecondsSinceEpoch;
     id = await cryptoGraphy.getRandomAsciiString(length: 8);
     this.extension = extension;
@@ -256,6 +262,11 @@ class BasePeerConnection {
     }
 
     RTCPeerConnection peerConnection = this.peerConnection!;
+    if (localStreams.isNotEmpty) {
+      for (var localStream in localStreams) {
+        addStream(localStream);
+      }
+    }
 
     ///2.注册连接的事件监听器
     peerConnection.onIceConnectionState =
@@ -331,18 +342,21 @@ class BasePeerConnection {
     _status = status;
   }
 
-  /// 重连方法，根据状态，决定如何重连，作为主叫方，比如重发offer，作为被叫方可以发出重连信号，answer
-  Future<void> reconnect() async {
-    Timer.periodic(Duration(milliseconds: heartTimes), (timer) async {
-      if (reconnectTimes <= 0 || status == PeerConnectionStatus.connected) {
-        timer.cancel();
-        return;
+  /// 重连方法
+  Future<void> reconnect({List<MediaStream> localStreams = const []}) async {
+    logger.i(
+        'webrtc peerId:${extension!.peerId},clientId:${extension!.clientId} reconnecting');
+    await close();
+    await init(extension: extension!, localStreams: localStreams);
+    status = PeerConnectionStatus.reconnecting;
+    var peerConnection = this.peerConnection!;
+    if (initiator) {
+      peerConnection.setLocalDescription(localSdp!);
+      peerConnection.setRemoteDescription(remoteSdp!);
+      for (var candidate in remoteCandidates.values) {
+        addIceCandidate(candidate);
       }
-      reconnectTimes--;
-      logger.i(
-          'webrtc peerId:${extension!.peerId},clientId:${extension!.clientId} reconnecting');
-      await init(extension: extension!);
-    });
+    } else {}
   }
 
   void connected() {
@@ -815,7 +829,7 @@ class BasePeerConnection {
 
   ///主动创建新的PeerVideoRender，从连接中增加远程流，然后激活onAddStream
   Future<void> addStream(MediaStream stream) async {
-    logger.i('addRemoteStream ${stream.id}');
+    logger.i('addStream ${stream.id}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -840,7 +854,7 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    logger.i('addLocalTrack stream:${stream.id}, track:${track.id}');
+    logger.i('addTrack stream:${stream.id}, track:${track.id}');
     String streamId = stream.id;
     String? trackId = track.id;
     if (trackId == null) {
@@ -1048,7 +1062,7 @@ class BasePeerConnection {
   }
 
   ///关闭连接
-  close() {
+  close() async {
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -1071,7 +1085,8 @@ class BasePeerConnection {
     final peerConnection = this.peerConnection;
     if (peerConnection != null) {
       try {
-        peerConnection.close();
+        await peerConnection.close();
+        this.peerConnection = null;
       } catch (err) {
         logger.e('close peerConnection err:$err');
       }

@@ -106,7 +106,9 @@ class AdvancedPeerConnection {
     }
   }
 
-  Future<bool> init({List<Map<String, String>>? iceServers}) async {
+  Future<bool> init(
+      {List<Map<String, String>>? iceServers,
+      List<MediaStream> localStreams = const []}) async {
     var myselfPeerId = myself.peerId;
     var myselfClientId = myself.clientId;
     var myselfName = myself.myselfPeer!.name;
@@ -118,7 +120,8 @@ class AdvancedPeerConnection {
       logger.e('myself peerId or clientId is null');
       return false;
     }
-    bool result = await basePeerConnection.init(extension: extension);
+    bool result = await basePeerConnection.init(
+        extension: extension, localStreams: localStreams);
     if (!result) {
       logger.e('WebrtcCorePeer init result is false');
       return false;

@@ -215,28 +215,27 @@ class PeerConnectionPool {
     return null;
   }
 
-  ///主动方创建，此时clientId有可能不知道
+  ///主动方创建，此时clientId有可能不知道，如果已经存在，先关闭删除
   Future<AdvancedPeerConnection?> create(String peerId,
       {String? clientId,
       String? name,
       Room? room,
-      List<Map<String, String>>? iceServers}) async {
-    Map<String, AdvancedPeerConnection>? peerConnections =
-        this.peerConnections.get(peerId);
-    if (peerConnections != null && peerConnections.isNotEmpty) {
-      if (clientId != null) {
-        var peerConnection = peerConnections[clientId];
-        if (peerConnection != null) {
-          return peerConnection;
-        }
-      }
+      List<Map<String, String>>? iceServers,
+      List<MediaStream> localStreams = const []}) async {
+    //如果已经存在，先关闭删除
+    AdvancedPeerConnection? peerConnection = getOne(peerId, clientId: clientId);
+    if (peerConnection != null) {
+      await close(peerId, clientId: clientId);
+      logger.i(
+          'peerId:$peerId clientId:$clientId is closed and will be re-created!');
     }
-    peerConnections ??= {};
-    var peerConnection =
+    //创建新的主叫方
+    peerConnection =
         AdvancedPeerConnection(peerId, true, clientId: clientId, room: room);
     peerConnectionPoolController.onCreated(
         WebrtcEvent(peerId, clientId: clientId, data: peerConnection));
-    bool result = await peerConnection.init(iceServers: iceServers);
+    bool result = await peerConnection.init(
+        iceServers: iceServers, localStreams: localStreams);
     if (!result) {
       logger.e('webrtcPeer.init fail');
       return null;
@@ -244,6 +243,8 @@ class PeerConnectionPool {
     peerConnection.basePeerConnection.negotiate();
     //clientId没有值的时候以''代替
     clientId = clientId ?? '';
+    var peerConnections = this.peerConnections.get(peerId);
+    peerConnections = peerConnections ?? {};
     peerConnections[clientId] = peerConnection;
 
     ///如果有溢出的连接，将溢出连接关闭
@@ -295,7 +296,7 @@ class PeerConnectionPool {
     if (removePeerConnections != null && removePeerConnections.isNotEmpty) {
       for (var entry in removePeerConnections.entries) {
         if (clientId == null || clientId == entry.value.clientId) {
-          entry.value.close();
+          await entry.value.close();
         }
       }
       return true;
