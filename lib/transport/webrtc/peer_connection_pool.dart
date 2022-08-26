@@ -540,13 +540,24 @@ class PeerConnectionPool {
       PreKeyBundle? retrievedPreKeyBundle =
           signalSessionPool.signalKeyPair.preKeyBundleFromJson(content!);
       if (retrievedPreKeyBundle != null) {
-        SignalSession signalSession = await signalSessionPool.create(
-            peerId: event.peerId,
-            clientId: event.clientId,
-            deviceId: retrievedPreKeyBundle.getDeviceId(),
-            retrievedPreKeyBundle: retrievedPreKeyBundle);
-        logger.i(
-            'peerId: ${event.peerId} clientId:${event.clientId} received PreKeyBundle, signalSession created');
+        SignalSession? signalSession;
+        try {
+          signalSession = await signalSessionPool.create(
+              peerId: event.peerId,
+              clientId: event.clientId,
+              deviceId: retrievedPreKeyBundle.getDeviceId(),
+              retrievedPreKeyBundle: retrievedPreKeyBundle);
+        } catch (e) {
+          logger.e(
+              'peerId: ${event.peerId} clientId:${event.clientId} received PreKeyBundle, signalSession create failure:$e');
+        }
+        if (signalSession != null) {
+          logger.i(
+              'peerId: ${event.peerId} clientId:${event.clientId} received PreKeyBundle, signalSession created');
+        } else {
+          logger.e(
+              'peerId: ${event.peerId} clientId:${event.clientId} received PreKeyBundle, signalSession create failure');
+        }
       } else {
         logger.i('chatMessage content transfer to PreKeyBundle failure');
       }
