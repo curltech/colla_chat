@@ -144,10 +144,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
       peerId = chatSummary.peerId!;
       name = chatSummary.name!;
       clientId = chatSummary.clientId;
-      var peerConnection = peerConnectionPool.getOne(peerId);
-      if (peerConnection == null) {
-        peerConnectionPool.create(peerId);
-      }
+      peerConnectionPool.create(peerId);
     } else {
       logger.e('chatSummary is null');
     }

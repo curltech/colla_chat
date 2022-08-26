@@ -221,7 +221,7 @@ class PeerConnectionPool {
       String? name,
       Room? room,
       List<Map<String, String>>? iceServers,
-      List<MediaStream> localStreams = const []}) async {
+      List<PeerVideoRender> localRenders = const []}) async {
     //如果已经存在，先关闭删除
     AdvancedPeerConnection? peerConnection = getOne(peerId, clientId: clientId);
     if (peerConnection != null) {
@@ -235,7 +235,7 @@ class PeerConnectionPool {
     peerConnectionPoolController.onCreated(
         WebrtcEvent(peerId, clientId: clientId, data: peerConnection));
     bool result = await peerConnection.init(
-        iceServers: iceServers, localStreams: localStreams);
+        iceServers: iceServers, localRenders: localRenders);
     if (!result) {
       logger.e('webrtcPeer.init fail');
       return null;

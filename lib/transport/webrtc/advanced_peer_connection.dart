@@ -108,7 +108,7 @@ class AdvancedPeerConnection {
 
   Future<bool> init(
       {List<Map<String, String>>? iceServers,
-      List<MediaStream> localStreams = const []}) async {
+      List<PeerVideoRender> localRenders = const []}) async {
     var myselfPeerId = myself.peerId;
     var myselfClientId = myself.clientId;
     var myselfName = myself.myselfPeer!.name;
@@ -119,6 +119,16 @@ class AdvancedPeerConnection {
     } else {
       logger.e('myself peerId or clientId is null');
       return false;
+    }
+    List<MediaStream> localStreams = [];
+    if (localRenders.isNotEmpty) {
+      for (var localRender in localRenders) {
+        var stream = localRender.mediaStream;
+        if (stream != null) {
+          localStreams.add(stream);
+          videoRenders[localRender.id!] = localRender;
+        }
+      }
     }
     bool result = await basePeerConnection.init(
         extension: extension, localStreams: localStreams);

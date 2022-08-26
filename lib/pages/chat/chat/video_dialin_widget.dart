@@ -26,9 +26,10 @@ class VideoDialInWidget extends StatelessWidget {
         var clientId = chatReceipt.receiverClientId!;
         await localMediaController.displayRender.createDisplayMedia();
         await localMediaController.displayRender.bindRTCVideoRender();
-        await peerConnectionPool.addRender(
-            peerId, localMediaController.displayRender,
-            clientId: clientId);
+        await peerConnectionPool
+            .create(peerId, clientId: clientId, localRenders: [
+          localMediaController.displayRender,
+        ]);
         peerConnectionsController.clear();
         peerConnectionsController.add(peerId, clientId: clientId);
         indexWidgetProvider.push('video_chat');
