@@ -647,31 +647,31 @@ class PeerConnectionPool {
     }
   }
 
-  addTrack(String peerId, MediaStreamTrack track, MediaStream stream,
+  addTrack(String peerId, MediaStream stream, MediaStreamTrack track,
       {String? clientId}) async {
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null) {
-      await advancedPeerConnection.addTrack(track, stream);
+      await advancedPeerConnection.addTrack(stream, track);
     }
   }
 
-  removeTrack(String peerId, MediaStreamTrack track, MediaStream stream,
+  removeTrack(String peerId, MediaStream stream, MediaStreamTrack track,
       {String? clientId}) async {
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null) {
-      await advancedPeerConnection.removeTrack(track, stream);
+      await advancedPeerConnection.removeTrack(stream, track);
     }
   }
 
-  replaceTrack(String peerId, MediaStreamTrack oldTrack,
-      MediaStreamTrack newTrack, MediaStream stream,
+  replaceTrack(String peerId, MediaStream stream, MediaStreamTrack oldTrack,
+      MediaStreamTrack newTrack,
       {String? clientId}) async {
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null) {
-      await advancedPeerConnection.replaceTrack(oldTrack, newTrack, stream);
+      await advancedPeerConnection.replaceTrack(stream, oldTrack, newTrack);
     }
   }
 

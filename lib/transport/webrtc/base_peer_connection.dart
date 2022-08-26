@@ -842,14 +842,14 @@ class BasePeerConnection {
     await peerConnection!.addStream(stream);
     var tracks = stream.getTracks();
     for (var track in tracks) {
-      await addTrack(track, stream!);
+      await addTrack(stream!, track);
     }
   }
 
   /// 把轨道加入到流中，其目的是为了把流加入到连接中，然后会激活onAddTrack
   /// @param {MediaStreamTrack} track
   /// @param {MediaStream} stream
-  addTrack(MediaStreamTrack track, MediaStream stream) async {
+  addTrack(MediaStream stream, MediaStreamTrack track) async {
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -897,8 +897,8 @@ class BasePeerConnection {
   /// @param {MediaStreamTrack} oldTrack
   /// @param {MediaStreamTrack} newTrack
   /// @param {MediaStream} stream
-  replaceTrack(MediaStreamTrack oldTrack, MediaStreamTrack newTrack,
-      MediaStream stream) async {
+  replaceTrack(MediaStream stream, MediaStreamTrack oldTrack,
+      MediaStreamTrack newTrack) async {
     logger.i(
         'replaceTrack stream:${stream.id}, oldTrack:${oldTrack.id}, newTrack:${newTrack.id}');
     if (status == PeerConnectionStatus.closed) {
@@ -923,7 +923,7 @@ class BasePeerConnection {
   /// 主动从连接中移除一个轨道，然后会激活onRemoveTrack
   /// @param {MediaStreamTrack} track
   /// @param {MediaStream} stream
-  removeTrack(MediaStreamTrack track, MediaStream stream) async {
+  removeTrack(MediaStream stream, MediaStreamTrack track) async {
     logger.i('removeTrack stream:${stream.id}, track:${track.id}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
@@ -966,31 +966,31 @@ class BasePeerConnection {
       }
       var tracks = stream.getTracks();
       for (var track in tracks) {
-        removeTrack(track, stream);
+        removeTrack(stream, track);
       }
     }
   }
 
   ///对远端的连接来说，当有stream或者track到来时触发
   ///此处将流加入到render中
-  onAddStream(stream) {
+  onAddStream(MediaStream stream) {
     logger.i('onAddStream stream:${stream.id}');
     emit(WebrtcEventType.stream, stream);
     addStream(stream);
   }
 
-  onRemoveStream(stream) {
+  onRemoveStream(MediaStream stream) {
     logger.i('onRemoveStream stream:${stream.id}');
     emit(WebrtcEventType.removeStream, stream);
     removeStream(stream);
   }
 
-  onAddTrack(stream, track) {
+  onAddTrack(MediaStream stream, MediaStreamTrack track) {
     logger.i('onAddTrack stream:${stream.id}, track:${track.id}');
     emit(WebrtcEventType.addTrack, {'stream': stream, 'track': track});
   }
 
-  onRemoveTrack(stream, track) {
+  onRemoveTrack(MediaStream stream, MediaStreamTrack track) {
     logger.i('onRemoveTrack stream:${stream.id}, track:${track.id}');
     emit(WebrtcEventType.removeTrack, {'stream': stream, 'track': track});
   }

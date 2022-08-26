@@ -145,7 +145,7 @@ class AdvancedPeerConnection {
     });
 
     //触发basePeerConnection的connect事件，就是调用peerConnectionPool对应的signal方法
-    basePeerConnection.on(WebrtcEventType.connected, (data) async {
+    basePeerConnection.on(WebrtcEventType.connected, () async {
       await peerConnectionPool
           .onConnected(WebrtcEvent(peerId, clientId: clientId));
     });
@@ -155,7 +155,7 @@ class AdvancedPeerConnection {
           .onStatus(WebrtcEvent(peerId, clientId: clientId, data: data));
     });
 
-    basePeerConnection.on(WebrtcEventType.closed, (data) async {
+    basePeerConnection.on(WebrtcEventType.closed, () async {
       await peerConnectionPool
           .onClosed(WebrtcEvent(peerId, clientId: clientId));
     });
@@ -163,29 +163,33 @@ class AdvancedPeerConnection {
     //收到数据，带解密功能，取最后一位整数，表示解密选项，得到何种解密方式，然后解密
     basePeerConnection.on(WebrtcEventType.message, onMessage);
 
-    basePeerConnection.on(WebrtcEventType.stream, (stream) async {
+    basePeerConnection.on(WebrtcEventType.stream, (MediaStream stream) async {
       await peerConnectionPool
           .onAddStream(WebrtcEvent(peerId, clientId: clientId, data: stream));
     });
 
-    basePeerConnection.on(WebrtcEventType.removeStream, (stream) async {
+    basePeerConnection.on(WebrtcEventType.removeStream,
+        (MediaStream stream) async {
       await peerConnectionPool.onRemoveStream(
           WebrtcEvent(peerId, clientId: clientId, data: stream));
     });
 
-    basePeerConnection.on(WebrtcEventType.track, (track, stream) async {
+    basePeerConnection.on(WebrtcEventType.track,
+        (MediaStream stream, MediaStreamTrack track) async {
       logger.i('${DateTime.now().toUtc().toIso8601String()}:track');
       await peerConnectionPool.onTrack(WebrtcEvent(peerId,
           clientId: clientId, data: {'track': track, 'stream': stream}));
     });
 
-    basePeerConnection.on(WebrtcEventType.addTrack, (track, stream) async {
+    basePeerConnection.on(WebrtcEventType.addTrack,
+        (MediaStream stream, MediaStreamTrack track) async {
       logger.i('${DateTime.now().toUtc().toIso8601String()}:addTrack');
       await peerConnectionPool.onAddTrack(WebrtcEvent(peerId,
           clientId: clientId, data: {'track': track, 'stream': stream}));
     });
 
-    basePeerConnection.on(WebrtcEventType.removeTrack, (track, stream) async {
+    basePeerConnection.on(WebrtcEventType.removeTrack,
+        (MediaStream stream, MediaStreamTrack track) async {
       logger.i('${DateTime.now().toUtc().toIso8601String()}:removeTrack');
       await peerConnectionPool.onRemoveTrack(WebrtcEvent(peerId,
           clientId: clientId, data: {'track': track, 'stream': stream}));
@@ -260,20 +264,17 @@ class AdvancedPeerConnection {
     }
   }
 
-  addTrack(MediaStreamTrack track, MediaStream stream) async {
-    await basePeerConnection.addTrack(track, stream);
+  addTrack(MediaStream stream, MediaStreamTrack track) async {
+    await basePeerConnection.addTrack(stream, track);
   }
 
-  removeTrack(MediaStreamTrack track, MediaStream stream) async {
-    await basePeerConnection.removeTrack(track, stream);
+  removeTrack(MediaStream stream, MediaStreamTrack track) async {
+    await basePeerConnection.removeTrack(stream, track);
   }
 
-  replaceTrack(
-    MediaStreamTrack oldTrack,
-    MediaStreamTrack newTrack,
-    MediaStream stream,
-  ) async {
-    await basePeerConnection.replaceTrack(oldTrack, newTrack, stream);
+  replaceTrack(MediaStream stream, MediaStreamTrack oldTrack,
+      MediaStreamTrack newTrack) async {
+    await basePeerConnection.replaceTrack(stream, oldTrack, newTrack);
   }
 
   onSignal(WebrtcSignal signal) {
