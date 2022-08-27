@@ -76,6 +76,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
       String? title = chatReceipt.title;
       String? subMessageType = chatReceipt.subMessageType;
       if (subMessageType != null) {
+        logger.i('received videoChat chatReceipt $title');
         if (subMessageType == ChatSubMessageType.chatReceipt.name) {
           if (title == ChatReceiptType.agree.name) {
             var peerId = chatReceipt.senderPeerId!;
@@ -85,6 +86,9 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
             indexWidgetProvider.pop();
             indexWidgetProvider.push('video_chat');
           } else if (title == ChatReceiptType.reject.name) {
+            if (render != null) {
+              localMediaController.hangup(id: render!.id);
+            }
             indexWidgetProvider.pop();
           }
         }
@@ -110,7 +114,6 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   _close() {
     localMediaController.hangup(id: render!.id);
     isOpen = false;
-    //indexWidgetProvider.pop();
     setState(() {});
   }
 
@@ -182,9 +185,6 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   @override
   void dispose() {
     localMediaController.removeListener(_receive);
-    if (render != null) {
-      localMediaController.hangup(id: render!.id);
-    }
     super.dispose();
   }
 }

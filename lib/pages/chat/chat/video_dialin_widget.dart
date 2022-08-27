@@ -5,6 +5,7 @@ import 'package:colla_chat/widgets/common/image_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../../../entity/chat/chat.dart';
+import '../../../plugin/logger.dart';
 import '../../../service/chat/chat.dart';
 import 'controller/peer_connections_controller.dart';
 
@@ -21,6 +22,7 @@ class VideoDialInWidget extends StatelessWidget {
         await chatMessageService.buildChatReceipt(chatMessage, receiptType);
     if (chatReceipt != null) {
       await chatMessageService.send(chatReceipt);
+      logger.i('sent videoChat chatReceipt ${receiptType.name}');
       if (receiptType == ChatReceiptType.agree) {
         var peerId = chatReceipt.receiverPeerId!;
         var clientId = chatReceipt.receiverClientId!;
@@ -30,7 +32,6 @@ class VideoDialInWidget extends StatelessWidget {
           clientId: clientId,
           localRenders: localMediaController.videoRenders.values.toList(),
         );
-        peerConnectionsController.clear();
         peerConnectionsController.add(peerId, clientId: clientId);
         indexWidgetProvider.push('video_chat');
       }

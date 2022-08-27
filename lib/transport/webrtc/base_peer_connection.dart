@@ -266,7 +266,7 @@ class BasePeerConnection {
     RTCPeerConnection peerConnection = this.peerConnection!;
     if (localStreams.isNotEmpty) {
       for (var localStream in localStreams) {
-        addStream(localStream);
+        _addLocalStream(localStream);
       }
     }
 
@@ -829,7 +829,7 @@ class BasePeerConnection {
             extension: extension));
   }
 
-  ///主动创建新的MediaStream，从连接中增加本地流
+  ///增加本地流到本地集合
   _addStream(MediaStream stream) {
     logger.i('_addStream ${stream.id}');
     if (status == PeerConnectionStatus.closed) {
@@ -847,9 +847,9 @@ class BasePeerConnection {
     }
   }
 
-  ///主动创建新的MediaStream，从连接中增加本地流
-  Future<void> addStream(MediaStream stream) async {
-    logger.i('addStream ${stream.id}');
+  ///主动创建新的MediaStream，从连接中增加本地流，只能在init方法中调用
+  Future<void> _addLocalStream(MediaStream stream) async {
+    logger.i('_addLocalStream ${stream.id}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -865,7 +865,7 @@ class BasePeerConnection {
     ///以下是另一种做法
     // var tracks = stream.getTracks();
     // for (var track in tracks) {
-    //   addTrack(stream, track);
+    //   _addLocalTrack(stream, track);
     // }
   }
 
@@ -895,10 +895,10 @@ class BasePeerConnection {
     streamTracks[trackId] = track;
   }
 
-  /// 把轨道加入到流中，其目的是为了把加入远程流的本地集合，连接没有操作
+  /// 把轨道加入到流中，其目的是为了把本地流轨道加入本地集合，只能通过init方法调用_addStream方法，再调用本方法
   /// @param {MediaStreamTrack} track
   /// @param {MediaStream} stream
-  addTrack(MediaStream stream, MediaStreamTrack track) async {
+  _addLocalTrack(MediaStream stream, MediaStreamTrack track) async {
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;

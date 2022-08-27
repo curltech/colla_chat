@@ -203,7 +203,7 @@ class AdvancedPeerConnection {
 
   onAddStream(MediaStream stream) async {
     logger.i('peerId: $peerId clientId:$clientId is onAddStream');
-    await _addStream(stream);
+    await addStream(stream);
     await peerConnectionPool
         .onAddStream(WebrtcEvent(peerId, clientId: clientId, data: stream));
   }
@@ -223,11 +223,11 @@ class AdvancedPeerConnection {
 
   onAddTrack(dynamic data) async {
     logger.i('peerId: $peerId clientId:$clientId is onAddTrack');
-    MediaStream stream = data['stream'];
-    String streamId = stream.id;
-    if (!videoRenders.containsKey(streamId)) {
-      _addStream(stream);
-    }
+    // MediaStream stream = data['stream'];
+    // String streamId = stream.id;
+    // if (!videoRenders.containsKey(streamId)) {
+    //   _addStream(stream);
+    // }
     await peerConnectionPool
         .onAddTrack(WebrtcEvent(peerId, clientId: clientId, data: data));
   }
@@ -262,9 +262,6 @@ class AdvancedPeerConnection {
     var streamId = render.id;
     if (streamId != null) {
       await _addRender(render);
-      if (render.mediaStream != null) {
-        await basePeerConnection.addStream(render.mediaStream!);
-      }
     }
   }
 
@@ -301,7 +298,7 @@ class AdvancedPeerConnection {
   }
 
   ///生成流的渲染器，然后加入到渲染器集合
-  Future<PeerVideoRender> _addStream(MediaStream stream) async {
+  Future<PeerVideoRender> addStream(MediaStream stream) async {
     String streamId = stream.id;
     if (videoRenders.containsKey(streamId)) {
       logger.e('stream:$streamId exist in videoRenders, be replaced');
@@ -312,11 +309,6 @@ class AdvancedPeerConnection {
     await _addRender(render);
 
     return render;
-  }
-
-  addStream(MediaStream stream) async {
-    PeerVideoRender render = await _addStream(stream);
-    await addRender(render);
   }
 
   _removeStream(MediaStream stream) async {
@@ -336,10 +328,6 @@ class AdvancedPeerConnection {
       }
       await _removeRender(render);
     }
-  }
-
-  addTrack(MediaStream stream, MediaStreamTrack track) async {
-    await basePeerConnection.addTrack(stream, track);
   }
 
   removeTrack(MediaStream stream, MediaStreamTrack track) async {
@@ -380,7 +368,7 @@ class AdvancedPeerConnection {
 
   ///发送数据，带加密选项
   Future<void> send(List<int> data,
-      {CryptoOption cryptoOption = CryptoOption.signal}) async {
+      {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     if (connected) {
       int cryptOptionIndex = cryptoOption.index;
       SecurityContextService? securityContextService =

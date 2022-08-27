@@ -3,7 +3,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 
 import '../../../entity/chat/chat.dart';
 
-///影响全局的消息到来
+///跟踪影响全局的消息到来，对不同类型的消息进行分派
 class GlobalChatMessageController with ChangeNotifier {
   ChatMessage? _chatMessage;
 

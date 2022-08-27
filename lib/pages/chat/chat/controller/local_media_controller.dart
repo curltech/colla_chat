@@ -3,6 +3,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../../../entity/chat/chat.dart';
 import '../../../../entity/dht/myself.dart';
+import '../../../../plugin/logger.dart';
 import '../../../../transport/webrtc/peer_video_render.dart';
 
 ///本地媒体通话控制器，内部数据为视频通话的请求消息，和回执消息
@@ -24,6 +25,7 @@ class LocalMediaController with ChangeNotifier {
 
   set chatMessage(ChatMessage? chatMessage) {
     _chatMessage = chatMessage;
+    logger.i('request chatVideo chatMessage');
     notifyListeners();
   }
 
@@ -32,6 +34,7 @@ class LocalMediaController with ChangeNotifier {
   }
 
   set chatReceipt(ChatMessage? chatReceipt) {
+    logger.i('received chatVideo chatReceipt');
     _chatReceipt = chatReceipt;
     notifyListeners();
   }

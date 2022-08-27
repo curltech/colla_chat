@@ -16,6 +16,7 @@ import '../../entity/chat/chat.dart';
 import '../../entity/p2p/chain_message.dart';
 import '../../entity/p2p/security_context.dart';
 import '../../p2p/chain/action/signal.dart';
+import '../../pages/chat/chat/controller/peer_connections_controller.dart';
 import '../../pages/chat/index/global_chat_message_controller.dart';
 import '../../pages/chat/me/webrtc/peer_connection_controller.dart';
 
@@ -535,7 +536,6 @@ class PeerConnectionPool {
       content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content));
     }
     logger.i('chatMessage content:$content');
-    peerConnectionPoolController.onMessage(chatMessage);
     globalChatMessageController.chatMessage = chatMessage;
 
     ///signal加密初始化消息
@@ -611,28 +611,30 @@ class PeerConnectionPool {
   onAddStream(WebrtcEvent event) async {
     logger
         .i('peerId: ${event.peerId} clientId:${event.clientId} is onAddStream');
+    peerConnectionsController.update(event.peerId, clientId: event.clientId);
   }
 
   onRemoveStream(WebrtcEvent event) async {
     logger.i(
         'peerId: ${event.peerId} clientId:${event.clientId} is onRemoveStream');
+    peerConnectionsController.update(event.peerId, clientId: event.clientId);
   }
 
   onTrack(WebrtcEvent event) async {
     logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onTrack');
-    peerConnectionPoolController.onTrack(event);
+    peerConnectionsController.update(event.peerId, clientId: event.clientId);
   }
 
   onAddTrack(WebrtcEvent event) async {
     logger
         .i('peerId: ${event.peerId} clientId:${event.clientId} is onAddTrack');
-    peerConnectionPoolController.onTrack(event);
+    peerConnectionsController.update(event.peerId, clientId: event.clientId);
   }
 
   onRemoveTrack(WebrtcEvent event) async {
     logger.i(
         'peerId: ${event.peerId} clientId:${event.clientId} is onRemoveTrack');
-    peerConnectionPoolController.onTrack(event);
+    peerConnectionsController.update(event.peerId, clientId: event.clientId);
   }
 
   addRender(String peerId, PeerVideoRender render, {String? clientId}) async {
@@ -656,15 +658,6 @@ class PeerConnectionPool {
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null) {
       await advancedPeerConnection.removeStream(stream);
-    }
-  }
-
-  addTrack(String peerId, MediaStream stream, MediaStreamTrack track,
-      {String? clientId}) async {
-    AdvancedPeerConnection? advancedPeerConnection =
-        peerConnectionPool.getOne(peerId, clientId: clientId);
-    if (advancedPeerConnection != null) {
-      await advancedPeerConnection.addTrack(stream, track);
     }
   }
 
