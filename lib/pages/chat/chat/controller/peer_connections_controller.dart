@@ -10,7 +10,7 @@ class PeerConnectionsController with ChangeNotifier {
   final Map<String, Map<String, AdvancedPeerConnection>> _peerConnections = {};
   String? _roomId;
 
-  update(String peerId, {String? clientId}) {
+  modify(String peerId, {String? clientId}) {
     AdvancedPeerConnection? peerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (peerConnection != null) {

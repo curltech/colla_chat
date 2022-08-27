@@ -611,30 +611,30 @@ class PeerConnectionPool {
   onAddStream(WebrtcEvent event) async {
     logger
         .i('peerId: ${event.peerId} clientId:${event.clientId} is onAddStream');
-    peerConnectionsController.update(event.peerId, clientId: event.clientId);
+    peerConnectionsController.modify(event.peerId, clientId: event.clientId);
   }
 
   onRemoveStream(WebrtcEvent event) async {
     logger.i(
         'peerId: ${event.peerId} clientId:${event.clientId} is onRemoveStream');
-    peerConnectionsController.update(event.peerId, clientId: event.clientId);
+    peerConnectionsController.modify(event.peerId, clientId: event.clientId);
   }
 
   onTrack(WebrtcEvent event) async {
     logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onTrack');
-    peerConnectionsController.update(event.peerId, clientId: event.clientId);
+    peerConnectionsController.modify(event.peerId, clientId: event.clientId);
   }
 
   onAddTrack(WebrtcEvent event) async {
     logger
         .i('peerId: ${event.peerId} clientId:${event.clientId} is onAddTrack');
-    peerConnectionsController.update(event.peerId, clientId: event.clientId);
+    peerConnectionsController.modify(event.peerId, clientId: event.clientId);
   }
 
   onRemoveTrack(WebrtcEvent event) async {
     logger.i(
         'peerId: ${event.peerId} clientId:${event.clientId} is onRemoveTrack');
-    peerConnectionsController.update(event.peerId, clientId: event.clientId);
+    peerConnectionsController.modify(event.peerId, clientId: event.clientId);
   }
 
   addRender(String peerId, PeerVideoRender render, {String? clientId}) async {

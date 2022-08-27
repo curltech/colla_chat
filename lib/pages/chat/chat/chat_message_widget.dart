@@ -37,6 +37,17 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     previous(limit: defaultLimit);
   }
 
+  modify(String peerId, {String? clientId}) {
+    if (_chatSummary == null) {
+      return;
+    }
+    if (_chatSummary!.peerId == peerId) {
+      if (clientId == null || _chatSummary!.clientId == clientId) {
+        notifyListeners();
+      }
+    }
+  }
+
   ///访问数据库获取更老的消息
   @override
   Future<void> previous({int? limit}) async {

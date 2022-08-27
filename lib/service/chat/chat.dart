@@ -495,6 +495,9 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
 
   ///新的ChatMessage来了，更新ChatSummary
   upsertByChatMessage(ChatMessage chatMessage) async {
+    if (chatMessage.subMessageType == ChatSubMessageType.preKeyBundle.name) {
+      return;
+    }
     var groupPeerId = chatMessage.groupPeerId;
     var senderPeerId = chatMessage.senderPeerId;
     var receiverPeerId = chatMessage.receiverPeerId;

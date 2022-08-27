@@ -1,3 +1,4 @@
+import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
 import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 
@@ -15,6 +16,7 @@ class GlobalChatMessageController with ChangeNotifier {
     _chatMessage = chatMessage;
     if (chatMessage != null) {
       String peerId = chatMessage.senderPeerId!;
+      String? clientId = chatMessage.senderClientId;
       String? title = chatMessage.title;
       if (chatMessage.subMessageType == ChatSubMessageType.videoChat.name) {
         if (title == null) {
@@ -36,6 +38,9 @@ class GlobalChatMessageController with ChangeNotifier {
           //收到音频通话邀请拒绝回执
 
         }
+      }
+      if (chatMessage.subMessageType != ChatSubMessageType.preKeyBundle.name) {
+        chatMessageController.modify(peerId, clientId: clientId);
       }
     }
     notifyListeners();
