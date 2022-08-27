@@ -182,7 +182,9 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   @override
   void dispose() {
     localMediaController.removeListener(_receive);
-    _close();
+    if (render != null) {
+      localMediaController.hangup(id: render!.id);
+    }
     super.dispose();
   }
 }
