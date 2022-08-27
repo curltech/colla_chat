@@ -637,22 +637,6 @@ class PeerConnectionPool {
     peerConnectionsController.modify(event.peerId, clientId: event.clientId);
   }
 
-  addRender(String peerId, PeerVideoRender render, {String? clientId}) async {
-    AdvancedPeerConnection? advancedPeerConnection =
-        peerConnectionPool.getOne(peerId, clientId: clientId);
-    if (advancedPeerConnection != null) {
-      await advancedPeerConnection.addRender(render);
-    }
-  }
-
-  addStream(String peerId, MediaStream stream, {String? clientId}) async {
-    AdvancedPeerConnection? advancedPeerConnection =
-        peerConnectionPool.getOne(peerId, clientId: clientId);
-    if (advancedPeerConnection != null) {
-      await advancedPeerConnection.addStream(stream);
-    }
-  }
-
   removeStream(String peerId, MediaStream stream, {String? clientId}) async {
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);

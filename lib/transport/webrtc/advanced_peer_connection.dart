@@ -251,20 +251,6 @@ class AdvancedPeerConnection {
     }
   }
 
-  /// 主动把渲染器加入到渲染器集合，并把渲染器的流加入到连接中
-  /// @param {MediaStream} stream
-  addRender(PeerVideoRender render) async {
-    logger.i('addRender ${render.id}');
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
-    }
-    var streamId = render.id;
-    if (streamId != null) {
-      await _addRender(render);
-    }
-  }
-
   ///把渲染器从渲染器集合删除，并关闭
   _removeRender(PeerVideoRender render) async {
     logger.i('_removeRender ${render.id}');

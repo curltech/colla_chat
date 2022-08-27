@@ -310,13 +310,13 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   send(ChatMessage chatMessage,
-      {CryptoOption cryptoOption = CryptoOption.signal}) {
+      {CryptoOption cryptoOption = CryptoOption.signal}) async {
     var peerId = chatMessage.receiverPeerId;
     var clientId = chatMessage.receiverClientId;
     if (peerId != null) {
       String json = JsonUtil.toJsonString(chatMessage);
       var data = CryptoUtil.stringToUtf8(json);
-      peerConnectionPool.send(peerId, data,
+      await peerConnectionPool.send(peerId, data,
           clientId: clientId, cryptoOption: cryptoOption);
     }
   }
