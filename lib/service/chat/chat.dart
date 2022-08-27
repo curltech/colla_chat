@@ -62,7 +62,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       String? subMessageType,
       int? offset,
       int? limit}) async {
-    String where = '(senderPeerId=? or receiverPeerId=?)'; //
+    String where = '(senderPeerId=? or receiverPeerId=?)';
     List<Object> whereArgs = [peerId, peerId];
     if (direct != null) {
       where = '$where and direct=?';
@@ -75,6 +75,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     if (subMessageType != null) {
       where = '$where and subMessageType=?';
       whereArgs.add(subMessageType);
+    } else {
+      where = '$where and subMessageType!=?';
+      whereArgs.add(ChatSubMessageType.preKeyBundle.name);
     }
     return find(
         where: where,
@@ -103,6 +106,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     if (subMessageType != null) {
       where = '$where and subMessageType=?';
       whereArgs.add(subMessageType);
+    } else {
+      where = '$where and subMessageType!=?';
+      whereArgs.add(ChatSubMessageType.preKeyBundle.name);
     }
     if (id != null) {
       where = '$where and id>?';
