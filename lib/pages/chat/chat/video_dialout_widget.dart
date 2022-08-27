@@ -10,6 +10,7 @@ import '../../../plugin/logger.dart';
 import '../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../transport/webrtc/base_peer_connection.dart';
 import '../../../transport/webrtc/peer_connection_pool.dart';
+import '../../../transport/webrtc/peer_video_render.dart';
 import '../../../widgets/common/image_widget.dart';
 import '../../../widgets/common/widget_mixin.dart';
 import 'controller/local_media_controller.dart';
@@ -53,6 +54,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   String? name;
   String? clientId;
   bool isOpen = false;
+  PeerVideoRender? render;
 
   @override
   void initState() {
@@ -78,9 +80,6 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
           if (title == ChatReceiptType.agree.name) {
             var peerId = chatReceipt.senderPeerId!;
             var clientId = chatReceipt.senderClientId!;
-            peerConnectionPool.addRender(
-                peerId, localMediaController.userRender,
-                clientId: clientId);
             peerConnectionsController.clear();
             peerConnectionsController.add(peerId, clientId: clientId);
             indexWidgetProvider.pop();
@@ -102,15 +101,14 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null &&
         advancedPeerConnection.status == PeerConnectionStatus.connected) {
-      await localMediaController.userRender.createUserMedia();
-      await localMediaController.userRender.bindRTCVideoRender();
+      render = await localMediaController.createVideoRender(userMedia: true);
       isOpen = true;
       setState(() {});
     }
   }
 
   _close() {
-    localMediaController.userRender.dispose();
+    localMediaController.hangup(id: render!.id);
     isOpen = false;
     //indexWidgetProvider.pop();
     setState(() {});
@@ -121,8 +119,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null &&
         advancedPeerConnection.status == PeerConnectionStatus.connected) {
-      Widget? videoView =
-          localMediaController.userRender.createVideoView(mirror: true);
+      Widget? videoView = render!.createVideoView(mirror: true);
       return videoView;
     }
 
@@ -185,7 +182,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   @override
   void dispose() {
     localMediaController.removeListener(_receive);
-    localMediaController.userRender.dispose();
+    _close();
     super.dispose();
   }
 }

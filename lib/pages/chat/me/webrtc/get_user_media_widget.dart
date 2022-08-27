@@ -7,6 +7,7 @@ import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/localization.dart';
+import '../../../../transport/webrtc/peer_video_render.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/widget_mixin.dart';
 
@@ -32,8 +33,14 @@ class GetUserMediaWidget extends StatefulWidget with TileDataMixin {
 class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   bool _inCalling = false;
   bool _isTorchOn = false;
+  PeerVideoRender? render;
 
-  bool get _isRec => localMediaController.userRender.mediaRecorder != null;
+  bool get _isRec {
+    if (render != null) {
+      return render!.mediaRecorder != null;
+    }
+    return false;
+  }
 
   @override
   void initState() {
@@ -43,9 +50,12 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   // Platform messages are asynchronous, so we initialize in an async method.
   void _makeCall() async {
     try {
-      await localMediaController.userRender.createUserMedia();
-      await localMediaController.userRender.enumerateDevices();
-      await localMediaController.userRender.bindRTCVideoRender();
+      await localMediaController.createVideoRender(userMedia: true);
+      List<PeerVideoRender> renders = localMediaController.getVideoRenders();
+      if (renders.isNotEmpty) {
+        render = renders[0];
+        await render!.enumerateDevices();
+      }
     } catch (e) {
       logger.e(e.toString());
     }
@@ -58,7 +68,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
 
   void _hangUp() async {
     try {
-      localMediaController.userRender.dispose();
+      localMediaController.hangup();
       setState(() {
         _inCalling = false;
       });
@@ -68,21 +78,21 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   }
 
   void _startRecording() async {
-    localMediaController.userRender.startRecording();
+    render!.startRecording();
     setState(() {});
   }
 
   void _stopRecording() async {
-    localMediaController.userRender.stopRecording();
+    render!.stopRecording();
     setState(() {});
   }
 
   void _toggleTorch() async {
-    if (localMediaController.userRender.mediaStream == null) {
+    if (render!.mediaStream == null) {
       throw 'Stream is not initialized';
     }
 
-    final videoTrack = localMediaController.userRender.mediaStream!
+    final videoTrack = render!.mediaStream!
         .getVideoTracks()
         .firstWhere((track) => track.kind == 'video');
     final has = await videoTrack.hasTorch();
@@ -97,17 +107,17 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   }
 
   void _toggleCamera() async {
-    if (localMediaController.userRender.mediaStream == null) {
+    if (render!.mediaStream == null) {
       throw 'Stream is not initialized';
     }
-    localMediaController.userRender.switchCamera();
+    render!.switchCamera();
   }
 
   void _captureFrame() async {
-    if (localMediaController.userRender.mediaStream == null) {
+    if (render!.mediaStream == null) {
       throw 'Stream is not initialized';
     }
-    final frame = await localMediaController.userRender.captureFrame();
+    final frame = await render!.captureFrame();
     if (frame != null) {
       await showDialog(
           context: context,
@@ -125,11 +135,11 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   }
 
   Widget _buildVideoView(BuildContext context) {
-    return localMediaController.userRender.createVideoView(mirror: true);
+    return render!.createVideoView(mirror: true);
   }
 
   List<Widget>? _buildActions(BuildContext context) {
-    var mediaDevicesList = localMediaController.userRender.mediaDevicesList;
+    var mediaDevicesList = render!.mediaDevicesList;
     return _inCalling
         ? <Widget>[
             IconButton(
@@ -194,7 +204,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   }
 
   void _selectAudioOutput(String deviceId) {
-    localMediaController.userRender.renderer!.audioOutput(deviceId);
+    render!.renderer!.audioOutput(deviceId);
   }
 
   @override

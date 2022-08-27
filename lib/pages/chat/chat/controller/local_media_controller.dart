@@ -1,10 +1,12 @@
 import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../../../entity/chat/chat.dart';
 import '../../../../entity/dht/myself.dart';
 import '../../../../transport/webrtc/peer_video_render.dart';
 
-///媒体通话控制器，内部数据为视频通话的请求消息，和回执消息
+///本地媒体通话控制器，内部数据为视频通话的请求消息，和回执消息
+///如果本地的render存在，在创建peerconnection的时候将加入
 class LocalMediaController with ChangeNotifier {
   //媒体请求消息，对发起方来说是自己生成的(receiverPeerId)，对接受方来说是收到的(senderPeerId)
   ChatMessage? _chatMessage;
@@ -14,13 +16,7 @@ class LocalMediaController with ChangeNotifier {
 
   bool? initiator;
 
-  //用户媒体
-  final PeerVideoRender userRender = PeerVideoRender(myself.peerId!,
-      clientId: myself.clientId, name: myself.myselfPeer!.name);
-
-  //显示媒体
-  final PeerVideoRender displayRender = PeerVideoRender(myself.peerId!,
-      clientId: myself.clientId, name: myself.myselfPeer!.name);
+  Map<String, PeerVideoRender> videoRenders = {};
 
   ChatMessage? get chatMessage {
     return _chatMessage;
@@ -79,12 +75,43 @@ class LocalMediaController with ChangeNotifier {
     }
   }
 
-  hangup() {
+  Future<PeerVideoRender> createVideoRender(
+      {MediaStream? stream,
+      bool userMedia = false,
+      bool displayMedia = false}) async {
+    PeerVideoRender render = await PeerVideoRender.from(myself.peerId!,
+        clientId: myself.clientId,
+        name: myself.myselfPeer!.name,
+        stream: stream,
+        userMedia: userMedia,
+        displayMedia: displayMedia);
+    await render.bindRTCVideoRender();
+    videoRenders[render.id!] = render;
+    notifyListeners();
+
+    return render;
+  }
+
+  List<PeerVideoRender> getVideoRenders() {
+    return videoRenders.values.toList();
+  }
+
+  hangup({String? id}) {
     _chatMessage = null;
     _chatReceipt = null;
     initiator = null;
-    userRender.dispose();
-    displayRender.dispose();
+    if (id == null) {
+      for (var videoRender in videoRenders.values) {
+        videoRender.dispose();
+      }
+      videoRenders.clear();
+    } else {
+      var videoRender = videoRenders[id];
+      if (videoRender != null) {
+        videoRender.dispose();
+        videoRenders.remove(id);
+      }
+    }
     notifyListeners();
   }
 }

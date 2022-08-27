@@ -1,5 +1,6 @@
 import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/tool/util.dart';
@@ -479,8 +480,10 @@ class PeerConnectionPool {
         if (advancedPeerConnection.basePeerConnection.initiator) {}
         if (advancedPeerConnection.basePeerConnection.status ==
             PeerConnectionStatus.created) {
-          var result =
-              await advancedPeerConnection.init(iceServers: iceServers);
+          List<PeerVideoRender> videoRenders =
+              localMediaController.videoRenders.values.toList();
+          var result = await advancedPeerConnection.init(
+              iceServers: iceServers, localRenders: videoRenders);
           if (!result) {
             logger.e('webrtcPeer.init fail');
             return null;

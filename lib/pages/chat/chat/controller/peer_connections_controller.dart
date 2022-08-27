@@ -48,10 +48,7 @@ class PeerConnectionsController with ChangeNotifier {
   Map<String, PeerVideoRender> videoRenders(
       {String? peerId, String? clientId}) {
     Map<String, PeerVideoRender> allVideoRenders = {};
-    String? id = localMediaController.userRender.id;
-    if (id != null) {
-      allVideoRenders[id] = localMediaController.userRender;
-    }
+    allVideoRenders.addAll(localMediaController.videoRenders);
     List<AdvancedPeerConnection> peerConnections = [];
     if (peerId != null) {
       var pcs = _peerConnections[peerId];
@@ -72,7 +69,7 @@ class PeerConnectionsController with ChangeNotifier {
     }
     for (var peerConnection in peerConnections) {
       for (var entry in peerConnection.videoRenders.entries) {
-        id = entry.key;
+        String id = entry.key;
         var render = entry.value;
         if (!allVideoRenders.containsKey(id)) {
           allVideoRenders[id] = render;

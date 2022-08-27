@@ -1,17 +1,9 @@
 import 'package:colla_chat/pages/chat/chat/controller/peer_connections_controller.dart';
 import 'package:colla_chat/pages/chat/chat/video_view_card.dart';
-import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../entity/chat/chat.dart';
-import '../../../../transport/webrtc/advanced_peer_connection.dart';
-import '../../../entity/chat/chat.dart';
-import '../../../transport/webrtc/advanced_peer_connection.dart';
-import '../../../transport/webrtc/peer_connection_pool.dart';
-import '../../../transport/webrtc/peer_video_render.dart';
 import '../../../widgets/common/widget_mixin.dart';
-import 'controller/local_media_controller.dart';
 
 ///视频通话窗口，显示多个小视频窗口，每个小窗口代表一个对方，其中一个是自己
 class VideoChatWidget extends StatefulWidget with TileDataMixin {
@@ -46,34 +38,6 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
 
   _update() {
     setState(() {});
-  }
-
-  Future<Widget> _buildLocalVideoView() async {
-    Widget empty = Container();
-    ChatMessage? chatMessage = localMediaController.chatMessage;
-    if (chatMessage == null) {
-      return empty;
-    }
-    var peerId = localMediaController.peerId;
-    if (peerId == null) {
-      return empty;
-    }
-    AdvancedPeerConnection? advancedPeerConnection = peerConnectionPool
-        .getOne(peerId, clientId: localMediaController.clientId);
-    if (advancedPeerConnection == null) {
-      return empty;
-    }
-    PeerConnectionStatus? status = advancedPeerConnection.status;
-    if (status != PeerConnectionStatus.connected) {
-      return empty;
-    }
-    PeerVideoRender render = localMediaController.userRender;
-    await render.createUserMedia();
-    await render.bindRTCVideoRender();
-    advancedPeerConnection.addRender(render);
-    Widget videoView = render.createVideoView(mirror: true);
-
-    return videoView;
   }
 
   Widget _buildVideoViewCard(BuildContext context) {
