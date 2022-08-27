@@ -608,13 +608,11 @@ class PeerConnectionPool {
   onAddStream(WebrtcEvent event) async {
     logger
         .i('peerId: ${event.peerId} clientId:${event.clientId} is onAddStream');
-    addStream(event.peerId, event.data, clientId: event.clientId);
   }
 
   onRemoveStream(WebrtcEvent event) async {
     logger.i(
         'peerId: ${event.peerId} clientId:${event.clientId} is onRemoveStream');
-    removeStream(event.peerId, event.data, clientId: event.clientId);
   }
 
   onTrack(WebrtcEvent event) async {
