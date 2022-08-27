@@ -42,7 +42,9 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       return;
     }
     if (_chatSummary!.peerId == peerId) {
-      if (clientId == null || _chatSummary!.clientId == clientId) {
+      if (clientId == null ||
+          _chatSummary!.clientId == null ||
+          _chatSummary!.clientId == clientId) {
         notifyListeners();
       }
     }
