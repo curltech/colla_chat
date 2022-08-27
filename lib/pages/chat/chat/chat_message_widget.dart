@@ -144,7 +144,11 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
       peerId = chatSummary.peerId!;
       name = chatSummary.name!;
       clientId = chatSummary.clientId;
-      peerConnectionPool.create(peerId);
+      AdvancedPeerConnection? advancedPeerConnection =
+          peerConnectionPool.getOne(peerId, clientId: clientId);
+      if (advancedPeerConnection == null) {
+        peerConnectionPool.create(peerId);
+      }
     } else {
       logger.e('chatSummary is null');
     }
