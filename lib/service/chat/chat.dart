@@ -310,7 +310,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   send(ChatMessage chatMessage,
-      {CryptoOption cryptoOption = CryptoOption.signal}) async {
+      {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     var peerId = chatMessage.receiverPeerId;
     var clientId = chatMessage.receiverClientId;
     if (peerId != null) {

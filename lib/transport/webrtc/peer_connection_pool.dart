@@ -9,9 +9,7 @@ import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 
-import '../../crypto/util.dart';
 import '../../entity/chat/chat.dart';
 import '../../entity/p2p/chain_message.dart';
 import '../../entity/p2p/security_context.dart';
@@ -531,40 +529,7 @@ class PeerConnectionPool {
 
     ///保存消息
     chatMessageService.receiveChatMessage(chatMessage);
-    String? content = chatMessage.content;
-    if (content != null) {
-      content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content));
-    }
-    logger.i('chatMessage content:$content');
     globalChatMessageController.chatMessage = chatMessage;
-
-    ///signal加密初始化消息
-    if (chatMessage.subMessageType == ChatSubMessageType.preKeyBundle.name) {
-      PreKeyBundle? retrievedPreKeyBundle =
-          signalSessionPool.signalKeyPair.preKeyBundleFromJson(content!);
-      if (retrievedPreKeyBundle != null) {
-        SignalSession? signalSession;
-        try {
-          signalSession = await signalSessionPool.create(
-              peerId: event.peerId,
-              clientId: event.clientId,
-              deviceId: retrievedPreKeyBundle.getDeviceId(),
-              retrievedPreKeyBundle: retrievedPreKeyBundle);
-        } catch (e) {
-          logger.e(
-              'peerId: ${event.peerId} clientId:${event.clientId} received PreKeyBundle, signalSession create failure:$e');
-        }
-        if (signalSession != null) {
-          logger.i(
-              'peerId: ${event.peerId} clientId:${event.clientId} received PreKeyBundle, signalSession created');
-        } else {
-          logger.e(
-              'peerId: ${event.peerId} clientId:${event.clientId} received PreKeyBundle, signalSession create failure');
-        }
-      } else {
-        logger.i('chatMessage content transfer to PreKeyBundle failure');
-      }
-    }
   }
 
   onStatus(WebrtcEvent event) async {
@@ -578,22 +543,9 @@ class PeerConnectionPool {
 
   onConnected(WebrtcEvent event) async {
     logger.i('peerId: ${event.peerId} clientId:${event.clientId} is connected');
+    globalChatMessageController.sendPreKeyBundle(event.peerId,
+        clientId: event.clientId);
     peerConnectionPoolController.onConnected(event);
-
-    ///发送PreKeyBundle
-
-    PreKeyBundle preKeyBundle =
-        signalSessionPool.signalKeyPair.getPreKeyBundle();
-    var json = signalSessionPool.signalKeyPair.preKeyBundleToJson(preKeyBundle);
-    ChatMessage chatMessage = await chatMessageService.buildChatMessage(
-        event.peerId,
-        clientId: event.clientId,
-        subMessageType: ChatSubMessageType.preKeyBundle,
-        data: CryptoUtil.stringToUtf8(json));
-    await chatMessageService.send(chatMessage,
-        cryptoOption: CryptoOption.cryptography);
-    logger.i(
-        'peerId: ${event.peerId} clientId:${event.clientId} sent PreKeyBundle');
   }
 
   onClosed(WebrtcEvent event) async {
@@ -611,7 +563,7 @@ class PeerConnectionPool {
   onAddStream(WebrtcEvent event) async {
     logger
         .i('peerId: ${event.peerId} clientId:${event.clientId} is onAddStream');
-    peerConnectionsController.modify(event.peerId, clientId: event.clientId);
+    peerConnectionsController.add(event.peerId, clientId: event.clientId);
   }
 
   onRemoveStream(WebrtcEvent event) async {
@@ -628,7 +580,7 @@ class PeerConnectionPool {
   onAddTrack(WebrtcEvent event) async {
     logger
         .i('peerId: ${event.peerId} clientId:${event.clientId} is onAddTrack');
-    peerConnectionsController.modify(event.peerId, clientId: event.clientId);
+    peerConnectionsController.add(event.peerId, clientId: event.clientId);
   }
 
   onRemoveTrack(WebrtcEvent event) async {

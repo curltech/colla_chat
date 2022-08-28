@@ -167,7 +167,7 @@ class SmsClientPool {
   }
 
   Future<void> send(List<int> data, String targetPeerId, String clientId,
-      {CryptoOption cryptoOption = CryptoOption.signal}) async {
+      {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     PeerClient? peerClient =
         await peerClientService.findCachedOneByPeerId(targetPeerId);
     if (peerClient != null) {
