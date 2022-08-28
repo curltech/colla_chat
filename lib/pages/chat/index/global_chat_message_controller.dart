@@ -30,7 +30,7 @@ class GlobalChatMessageController with ChangeNotifier {
         content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content));
       }
       logger.i(
-          'chatMessage subMessageType:${chatMessage.subMessageType} content:$content');
+          'chatMessage subMessageType:${chatMessage.subMessageType} title:$title content:$content');
       if (chatMessage.subMessageType == ChatSubMessageType.videoChat.name) {
         if (title == null) {
           //收到视频通话邀请，显示拨入对话框VideoDialInWidget，indexView
