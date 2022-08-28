@@ -29,7 +29,8 @@ class GlobalChatMessageController with ChangeNotifier {
       if (content != null) {
         content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content));
       }
-      logger.i('chatMessage content:$content');
+      logger.i(
+          'chatMessage subMessageType:${chatMessage.subMessageType} content:$content');
       if (chatMessage.subMessageType == ChatSubMessageType.videoChat.name) {
         if (title == null) {
           //收到视频通话邀请，显示拨入对话框VideoDialInWidget，indexView
@@ -50,7 +51,7 @@ class GlobalChatMessageController with ChangeNotifier {
           //收到音频通话邀请拒绝回执
 
         }
-      } else if (chatMessage.subMessageType !=
+      } else if (chatMessage.subMessageType ==
           ChatSubMessageType.preKeyBundle.name) {
         _receivePreKeyBundle(chatMessage, content!);
       }
@@ -94,19 +95,17 @@ class GlobalChatMessageController with ChangeNotifier {
   }
 
   ///发送PreKeyBundle
-  sendPreKeyBundle(String peerId,{String? clientId}) async {
+  sendPreKeyBundle(String peerId, {String? clientId}) async {
     PreKeyBundle preKeyBundle =
         signalSessionPool.signalKeyPair.getPreKeyBundle();
     var json = signalSessionPool.signalKeyPair.preKeyBundleToJson(preKeyBundle);
-    ChatMessage chatMessage = await chatMessageService.buildChatMessage(
-        peerId,
+    ChatMessage chatMessage = await chatMessageService.buildChatMessage(peerId,
         clientId: clientId,
         subMessageType: ChatSubMessageType.preKeyBundle,
         data: CryptoUtil.stringToUtf8(json));
     await chatMessageService.send(chatMessage,
         cryptoOption: CryptoOption.cryptography);
-    logger.i(
-        'peerId: $peerId clientId:$clientId sent PreKeyBundle');
+    logger.i('peerId: $peerId clientId:$clientId sent PreKeyBundle');
   }
 }
 
