@@ -9,6 +9,7 @@ import '../../../entity/chat/chat.dart';
 import '../../../entity/p2p/security_context.dart';
 import '../../../plugin/logger.dart';
 import '../../../service/chat/chat.dart';
+import '../../../tool/util.dart';
 
 ///跟踪影响全局的消息到来，对不同类型的消息进行分派
 class GlobalChatMessageController with ChangeNotifier {
@@ -29,31 +30,29 @@ class GlobalChatMessageController with ChangeNotifier {
       if (content != null) {
         content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content));
       }
+      ChatSubMessageType subMessageType = StringUtil.enumFromString(
+          ChatSubMessageType.values, chatMessage.subMessageType!);
       logger.i(
-          'chatMessage subMessageType:${chatMessage.subMessageType} title:$title content:$content');
-      if (chatMessage.subMessageType == ChatSubMessageType.videoChat.name) {
-        if (title == null) {
-          //收到视频通话邀请，显示拨入对话框VideoDialInWidget，indexView
-        } else if (chatMessage.title == ChatReceiptType.agree.name) {
-          //收到视频通话邀请同意回执，发出本地流，关闭拨号窗口VideoDialOutWidget，显示视频通话窗口VideoChatWidget
-          localMediaController.chatReceipt = chatMessage;
-        } else if (chatMessage.title == ChatReceiptType.reject.name) {
-          //收到视频通话邀请拒绝回执，关闭本地流，关闭拨号窗口VideoDialOutWidget
-          localMediaController.chatReceipt = chatMessage;
-        }
-      } else if (chatMessage.subMessageType ==
-          ChatSubMessageType.audioChat.name) {
-        if (title == null) {
-          //收到音频通话邀请
-        } else if (chatMessage.title == ChatReceiptType.agree.name) {
-          //收到音频通话邀请同意回执
-        } else if (chatMessage.title == ChatReceiptType.reject.name) {
-          //收到音频通话邀请拒绝回执
-
-        }
-      } else if (chatMessage.subMessageType ==
-          ChatSubMessageType.preKeyBundle.name) {
-        _receivePreKeyBundle(chatMessage, content!);
+          'chatMessage subMessageType:${subMessageType.name} title:$title content:$content');
+      switch (subMessageType) {
+        case ChatSubMessageType.videoChat:
+          break;
+        case ChatSubMessageType.chatReceipt:
+          if (chatMessage.title == ChatReceiptType.agree.name) {
+            //收到视频通话邀请同意回执，发出本地流，关闭拨号窗口VideoDialOutWidget，显示视频通话窗口VideoChatWidget
+            localMediaController.chatReceipt = chatMessage;
+          } else if (chatMessage.title == ChatReceiptType.reject.name) {
+            //收到视频通话邀请拒绝回执，关闭本地流，关闭拨号窗口VideoDialOutWidget
+            localMediaController.chatReceipt = chatMessage;
+          }
+          break;
+        case ChatSubMessageType.preKeyBundle:
+          _receivePreKeyBundle(chatMessage, content!);
+          break;
+        case ChatSubMessageType.audioChat:
+          break;
+        default:
+          break;
       }
       if (chatMessage.subMessageType != ChatSubMessageType.preKeyBundle.name) {
         chatMessageController.modify(peerId, clientId: clientId);
