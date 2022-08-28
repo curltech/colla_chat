@@ -240,7 +240,6 @@ class AdvancedPeerConnection {
 
   ///把渲染器加入到渲染器集合
   _addRender(PeerVideoRender render) async {
-    logger.i('_addRender ${render.id}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -248,6 +247,8 @@ class AdvancedPeerConnection {
     var streamId = render.id;
     if (streamId != null) {
       videoRenders[streamId] = render;
+      logger.i(
+          'AdvancedPeerConnection peerId:$peerId _addRender $streamId, videoRenders length:${videoRenders.length}');
     }
   }
 

@@ -2,6 +2,7 @@ import 'package:colla_chat/pages/chat/chat/video_view_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
 
+import '../../../plugin/logger.dart';
 import '../../../transport/webrtc/peer_video_render.dart';
 import 'controller/peer_connections_controller.dart';
 
@@ -42,6 +43,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
   Widget _buildVideoViews(BuildContext context) {
     Map<String, PeerVideoRender> renders =
         peerConnectionsController.videoRenders();
+    logger.i('peerConnectionsController videoRenders length:${renders.length}');
     Size size = _calculateSize(renders.length);
     List<Widget> videoViews = [];
     for (var render in renders.values) {
