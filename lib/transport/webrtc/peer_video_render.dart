@@ -194,14 +194,22 @@ class PeerVideoRender {
   dispose() async {
     var mediaStream = this.mediaStream;
     if (mediaStream != null) {
-      await mediaStream.dispose();
+      try {
+        await mediaStream.dispose();
+      } catch (e) {
+        logger.e('mediaStream.dispose failure:$e');
+      }
       this.mediaStream = null;
       id = null;
     }
     var renderer = this.renderer;
     if (renderer != null) {
       renderer.srcObject = null;
-      renderer.dispose();
+      try {
+        renderer.dispose();
+      } catch (e) {
+        logger.e('renderer.dispose failure:$e');
+      }
       this.renderer = null;
     }
   }
@@ -359,4 +367,3 @@ class PeerVideoRender {
     }
   }
 }
-

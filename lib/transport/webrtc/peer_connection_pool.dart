@@ -528,7 +528,7 @@ class PeerConnectionPool {
     ChatMessage chatMessage = ChatMessage.fromJson(json);
 
     ///保存消息
-    chatMessageService.receiveChatMessage(chatMessage);
+    await chatMessageService.receiveChatMessage(chatMessage);
     globalChatMessageController.chatMessage = chatMessage;
   }
 
