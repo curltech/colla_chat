@@ -1,6 +1,7 @@
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../plugin/logger.dart';
 import '../../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../../transport/webrtc/peer_video_render.dart';
 
@@ -34,7 +35,12 @@ class PeerConnectionsController with ChangeNotifier {
         pcs = {};
         _peerConnections[peerId] = pcs;
       }
-      pcs[clientId] = peerConnection;
+      AdvancedPeerConnection? old = pcs[clientId];
+      if (old == null) {
+        pcs[clientId] = peerConnection;
+        logger.i(
+            'AdvancedPeerConnection peerId:peerId clientId:$clientId added in PeerConnectionsController');
+      }
       notifyListeners();
     }
   }
