@@ -54,6 +54,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
         peerConnectionsController.get();
     Map<String, MediaStream> streams =
         advancedPeerConnection.basePeerConnection.streams;
+    logger.i('peerConnectionsController videoRenders length:${streams.length}');
     if (streams.isEmpty) {
       return Container();
     }
