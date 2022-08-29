@@ -322,7 +322,7 @@ class BasePeerConnection {
       onRemoveStream(stream);
     };
     peerConnection.onAddTrack = (MediaStream stream, MediaStreamTrack track) {
-      //onAddTrack(stream, track);
+      onAddTrack(stream, track);
     };
     peerConnection.onRemoveTrack =
         (MediaStream stream, MediaStreamTrack track) {
@@ -451,11 +451,6 @@ class BasePeerConnection {
 
   ///onIceCandidate事件表示本地candidate准备好，可以发送IceCandidate到远端
   onIceCandidate(RTCIceCandidate candidate) {
-    // var handler = handlers[WebrtcEventType.iceCandidate];
-    // if (handler != null) {
-    //   handler(candidate);
-    //   return;
-    // }
     localCandidate = candidate;
     //logger.i('onIceCandidate event:${candidate.toMap()}');
     if (status == PeerConnectionStatus.closed) {
@@ -847,6 +842,7 @@ class BasePeerConnection {
       return;
     }
     streams[id] = stream;
+    logger.i('BasePeerConnection _addStream:$id');
     var tracks = stream.getTracks();
     for (var track in tracks) {
       _addTrack(stream, track);
@@ -1058,11 +1054,6 @@ class BasePeerConnection {
   ///对远端的连接来说，当有stream或者track到来时触发
   ///什么都不做，由onAddTrack事件处理
   onAddStream(MediaStream stream) {
-    // var handler = handlers[WebrtcEventType.stream];
-    // if (handler != null) {
-    //   handler(stream);
-    //   return;
-    // }
     logger.i('onAddStream stream:${stream.id}');
     _addStream(stream);
     emit(WebrtcEventType.stream, stream);
