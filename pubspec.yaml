@@ -153,7 +153,7 @@ dependencies:
   #flutter_swiper: 1.1.6 # Flutter 轮播图 https://github.com/best-flutter/flutter_swiper
   flutter_screenutil: ^5.5.3 # Flutter 屏幕适配 https://github.com/OpenFlutter/flutter_screenutil
   # webrtc
-  flutter_webrtc: ^0.8.7
+  flutter_webrtc: ^0.9.4
   dart_webrtc: ^1.0.5
   livekit_client: ^1.0.0
   flex_color_picker: ^2.4.0
