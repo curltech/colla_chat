@@ -53,8 +53,12 @@ class _VideoViewCardState extends State<VideoViewCard> {
   Widget _buildVideoView(BuildContext context) {
     AdvancedPeerConnection advancedPeerConnection =
         peerConnectionsController.get();
-    var stream = advancedPeerConnection.basePeerConnection.streams.values.last;
-    render.srcObject = stream;
+    Map<String, MediaStream> streams =
+        advancedPeerConnection.basePeerConnection.streams;
+    if (streams.isEmpty) {
+      return Container();
+    }
+    render.srcObject = streams.values.last;
     var contain = Container(
       margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
       width: 320.0,
