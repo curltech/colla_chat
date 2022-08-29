@@ -238,15 +238,16 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.senderName = myself.myselfPeer!.name;
     chatMessage.sendTime = DateUtil.currentDate();
     chatMessage.receiverPeerId = peerId;
-    chatMessage.receiverClientId = clientId;
-    chatMessage.receiverType = PartyType.linkman.name;
-    if (name == null) {
+    if (clientId == null) {
       PeerClient? peerClient =
           await peerClientService.findCachedOneByPeerId(peerId);
       if (peerClient != null) {
+        clientId = peerClient.clientId;
         name = peerClient.name;
       }
     }
+    chatMessage.receiverType = PartyType.linkman.name;
+    chatMessage.receiverClientId = clientId;
     chatMessage.receiverName = name;
     chatMessage.groupPeerId = groupPeerId;
     chatMessage.groupName = groupName;
