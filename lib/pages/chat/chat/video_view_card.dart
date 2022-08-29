@@ -78,20 +78,20 @@ class _VideoViewCardState extends State<VideoViewCard> {
     logger.i('peerConnectionsController videoRenders length:${renders.length}');
     Size size = _calculateSize(renders.length);
     List<Widget> videoViews = [];
-    Widget videoView = VideoViewWidget(
-      render: renders.values.last,
-      width: size.width,
-      height: size.height,
-    );
-    videoViews.add(videoView);
-    // for (var render in renders.values) {
-    //   Widget videoView = VideoViewWidget(
-    //     render: render,
-    //     width: size.width,
-    //     height: size.height,
-    //   );
-    //   videoViews.add(videoView);
-    // }
+    // Widget videoView = VideoViewWidget(
+    //   render: renders.values.last,
+    //   width: size.width,
+    //   height: size.height,
+    // );
+    // videoViews.add(videoView);
+    for (var render in renders.values) {
+      Widget videoView = VideoViewWidget(
+        render: render,
+        width: size.width,
+        height: size.height,
+      );
+      videoViews.add(videoView);
+    }
     return SingleChildScrollView(
       padding: const EdgeInsets.all(2.0),
       controller: ScrollController(),
@@ -101,15 +101,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: _buildVideoView(context),
-        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          if (snapshot.hasData) {
-            return snapshot.data;
-          } else {
-            return Container();
-          }
-        });
+    return _buildVideoViews(context);
   }
 
   @override
