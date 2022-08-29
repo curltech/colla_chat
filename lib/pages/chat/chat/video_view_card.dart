@@ -59,14 +59,21 @@ class _VideoViewCardState extends State<VideoViewCard> {
       return Container();
     }
     render.srcObject = streams.values.last;
-    var contain = Container(
-      margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-      width: 320.0,
-      height: 240.0,
-      decoration: const BoxDecoration(color: Colors.black),
-      //远端视频渲染
-      child: RTCVideoView(render),
-    );
+    var contain = FutureBuilder(
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+      if (snapshot.hasData) {
+        return Container(
+          margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+          width: 320.0,
+          height: 240.0,
+          decoration: const BoxDecoration(color: Colors.black),
+          //远端视频渲染
+          child: RTCVideoView(render),
+        );
+      } else {
+        return Container();
+      }
+    });
 
     return contain;
   }
