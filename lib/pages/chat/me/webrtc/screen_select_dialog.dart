@@ -8,7 +8,22 @@ import './condition_import/unsupport.dart'
     if (dart.library.html) './condition_import/web.dart'
     if (dart.library.io) './condition_import/desktop.dart' as displayCapturer;
 
-// ignore: must_be_immutable
+class ScreenSelectUtil {
+  static Future<List<DesktopCapturerSource>> getSources(
+      {SourceType sourceType = SourceType.Screen}) async {
+    List<DesktopCapturerSource> sources = [];
+    try {
+      sources = await displayCapturer.getSources(types: [sourceType]);
+
+      return sources;
+    } catch (e) {
+      logger.i(e.toString());
+    }
+
+    return sources;
+  }
+}
+
 class ScreenSelectDialog extends Dialog {
   ScreenSelectDialog({Key? key}) : super(key: key) {
     Future.delayed(const Duration(milliseconds: 100), () {
@@ -32,7 +47,7 @@ class ScreenSelectDialog extends Dialog {
 
   Future<void> _getSources() async {
     try {
-      var sources = await displayCapturer.getSources(types: [_sourceType]);
+      var sources = await ScreenSelectUtil.getSources(sourceType: _sourceType);
       for (var element in sources) {
         logger.i(
             'name: ${element.name}, id: ${element.id}, type: ${element.type}');
