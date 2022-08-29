@@ -51,15 +51,20 @@ class _VideoViewCardState extends State<VideoViewCard> {
     logger.i('peerConnectionsController videoRenders length:${renders.length}');
     Size size = _calculateSize(renders.length);
     List<Widget> videoViews = [];
-    for (var render in renders.values) {
-      Widget videoView = VideoViewWidget(
-        render: render,
-        width: size.width,
-        height: size.height,
-      );
-      videoViews.add(videoView);
-      break;
-    }
+    Widget videoView = VideoViewWidget(
+      render: renders.values.last,
+      width: size.width,
+      height: size.height,
+    );
+    videoViews.add(videoView);
+    // for (var render in renders.values) {
+    //   Widget videoView = VideoViewWidget(
+    //     render: render,
+    //     width: size.width,
+    //     height: size.height,
+    //   );
+    //   videoViews.add(videoView);
+    // }
     return SingleChildScrollView(
       padding: const EdgeInsets.all(2.0),
       controller: ScrollController(),
