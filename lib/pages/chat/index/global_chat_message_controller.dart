@@ -95,6 +95,7 @@ class GlobalChatMessageController with ChangeNotifier {
 
   ///发送PreKeyBundle
   sendPreKeyBundle(String peerId, {String? clientId}) async {
+    return;
     PreKeyBundle preKeyBundle =
         signalSessionPool.signalKeyPair.getPreKeyBundle();
     var json = signalSessionPool.signalKeyPair.preKeyBundleToJson(preKeyBundle);
