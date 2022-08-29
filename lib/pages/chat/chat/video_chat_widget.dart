@@ -1,4 +1,3 @@
-import 'package:colla_chat/pages/chat/chat/controller/peer_connections_controller.dart';
 import 'package:colla_chat/pages/chat/chat/video_view_card.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:flutter/material.dart';
@@ -33,11 +32,6 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   @override
   void initState() {
     super.initState();
-    peerConnectionsController.addListener(_update);
-  }
-
-  _update() {
-    setState(() {});
   }
 
   Widget _buildVideoViewCard(BuildContext context) {
@@ -55,7 +49,6 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
 
   @override
   void dispose() {
-    peerConnectionsController.removeListener(_update);
     super.dispose();
   }
 }

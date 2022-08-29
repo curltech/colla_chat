@@ -18,6 +18,11 @@ class _VideoViewCardState extends State<VideoViewCard> {
   @override
   initState() {
     super.initState();
+    peerConnectionsController.addListener(_update);
+  }
+
+  _update() {
+    setState(() {});
   }
 
   Size _calculateSize(int count) {
@@ -64,5 +69,11 @@ class _VideoViewCardState extends State<VideoViewCard> {
   @override
   Widget build(BuildContext context) {
     return _buildVideoViews(context);
+  }
+
+  @override
+  void dispose() {
+    peerConnectionsController.removeListener(_update);
+    super.dispose();
   }
 }
