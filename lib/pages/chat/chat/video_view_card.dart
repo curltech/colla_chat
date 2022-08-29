@@ -17,10 +17,13 @@ class VideoViewCard extends StatefulWidget {
 }
 
 class _VideoViewCardState extends State<VideoViewCard> {
+  RTCVideoRenderer render = RTCVideoRenderer();
+
   @override
   initState() {
     super.initState();
     peerConnectionsController.addListener(_update);
+    render.initialize();
   }
 
   _update() {
@@ -51,8 +54,6 @@ class _VideoViewCardState extends State<VideoViewCard> {
     AdvancedPeerConnection advancedPeerConnection =
         peerConnectionsController.get();
     var stream = advancedPeerConnection.basePeerConnection.streams.values.last;
-    RTCVideoRenderer render = RTCVideoRenderer();
-    render.initialize();
     render.srcObject = stream;
     var contain = Container(
       margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
