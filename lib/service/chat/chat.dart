@@ -132,17 +132,16 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         return;
       }
       String? title = chatMessage!.title;
+      msg.actualReceiveTime = chatMessage.actualReceiveTime;
+      msg.receiveTime = DateUtil.currentDate();
+      msg.status = MessageStatus.received.name;
       if (title == ChatReceiptType.received.name) {
-        msg.actualReceiveTime = chatMessage.actualReceiveTime;
-        msg.receiveTime = DateUtil.currentDate();
-        msg.status = MessageStatus.received.name;
       } else if (title == ChatReceiptType.read.name) {
         msg.readTime = DateUtil.currentDate();
-        msg.status = MessageStatus.read.name;
       } else if (title == ChatReceiptType.agree.name) {
-        msg.status = MessageStatus.agree.name;
+        msg.title = MessageStatus.agree.name;
       } else if (title == ChatReceiptType.reject.name) {
-        msg.status = MessageStatus.reject.name;
+        msg.title = MessageStatus.reject.name;
       } else if (title == ChatReceiptType.deleted.name) {
         msg.deleteTime = chatMessage.deleteTime;
         msg.status = MessageStatus.deleted.name;

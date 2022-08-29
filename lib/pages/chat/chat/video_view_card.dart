@@ -58,6 +58,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
         height: size.height,
       );
       videoViews.add(videoView);
+      break;
     }
     return SingleChildScrollView(
       padding: const EdgeInsets.all(2.0),
