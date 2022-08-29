@@ -35,12 +35,10 @@ class PeerConnectionsController with ChangeNotifier {
         pcs = {};
         _peerConnections[peerId] = pcs;
       }
-      AdvancedPeerConnection? old = pcs[clientId];
-      if (old == null) {
-        pcs[clientId] = peerConnection;
-        logger.i(
-            'AdvancedPeerConnection peerId:peerId clientId:$clientId added in PeerConnectionsController');
-      }
+      pcs[clientId] = peerConnection;
+      logger.i(
+          'AdvancedPeerConnection peerId:peerId clientId:$clientId added in PeerConnectionsController');
+
       notifyListeners();
     }
   }
