@@ -23,7 +23,6 @@ class _VideoViewCardState extends State<VideoViewCard> {
   initState() {
     super.initState();
     peerConnectionsController.addListener(_update);
-    render.initialize();
   }
 
   _update() {
@@ -50,7 +49,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
     return Size(width, height);
   }
 
-  Widget _buildVideoView(BuildContext context) {
+  Future<Widget> _buildVideoView(BuildContext context) async {
     AdvancedPeerConnection advancedPeerConnection =
         peerConnectionsController.get();
     Map<String, MediaStream> streams =
@@ -58,6 +57,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
     if (streams.isEmpty) {
       return Container();
     }
+    await render.initialize();
     render.srcObject = streams.values.last;
     var contain = FutureBuilder(
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
@@ -107,7 +107,15 @@ class _VideoViewCardState extends State<VideoViewCard> {
 
   @override
   Widget build(BuildContext context) {
-    return _buildVideoView(context);
+    return FutureBuilder(
+        future: _buildVideoView(context),
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.hasData) {
+            return snapshot.data;
+          } else {
+            return Container();
+          }
+        });
   }
 
   @override
