@@ -580,7 +580,7 @@ class PeerConnectionPool {
   onAddTrack(WebrtcEvent event) async {
     logger
         .i('peerId: ${event.peerId} clientId:${event.clientId} is onAddTrack');
-    peerConnectionsController.add(event.peerId, clientId: event.clientId);
+    //peerConnectionsController.add(event.peerId, clientId: event.clientId);
   }
 
   onRemoveTrack(WebrtcEvent event) async {
