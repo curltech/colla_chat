@@ -129,8 +129,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       ChatMessage? msg = await findByMessageId(messageId!);
       if (msg == null) {
         logger.e('chatReceipt message has no chatMessage with same messageId');
+        return;
       }
-      String? title = msg!.title;
+      String? title = chatMessage!.title;
       if (title == ChatReceiptType.received.name) {
         msg.actualReceiveTime = chatMessage.actualReceiveTime;
         msg.receiveTime = DateUtil.currentDate();
