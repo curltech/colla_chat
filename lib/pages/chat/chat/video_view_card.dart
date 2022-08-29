@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../../plugin/logger.dart';
+import '../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../transport/webrtc/peer_video_render.dart';
 import 'controller/peer_connections_controller.dart';
 
@@ -47,16 +48,19 @@ class _VideoViewCardState extends State<VideoViewCard> {
   }
 
   Widget _buildVideoView(BuildContext context) {
-    Map<String, PeerVideoRender> renders =
-        peerConnectionsController.videoRenders();
-    var render = renders.values.last;
+    AdvancedPeerConnection advancedPeerConnection =
+        peerConnectionsController.get();
+    var stream = advancedPeerConnection.basePeerConnection.streams.values.last;
+    RTCVideoRenderer render = RTCVideoRenderer();
+    render.initialize();
+    render.srcObject = stream;
     var contain = Container(
       margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
       width: 320.0,
       height: 240.0,
       decoration: const BoxDecoration(color: Colors.black),
       //远端视频渲染
-      child: RTCVideoView(render.renderer!),
+      child: RTCVideoView(render),
     );
 
     return contain;

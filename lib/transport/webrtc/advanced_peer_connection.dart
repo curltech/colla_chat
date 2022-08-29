@@ -203,7 +203,7 @@ class AdvancedPeerConnection {
 
   onAddStream(MediaStream stream) async {
     logger.i('peerId: $peerId clientId:$clientId is onAddStream');
-    await addStream(stream);
+    //await addStream(stream);
     await peerConnectionPool
         .onAddStream(WebrtcEvent(peerId, clientId: clientId, data: stream));
   }
