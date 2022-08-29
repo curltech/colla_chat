@@ -1,6 +1,7 @@
 import 'package:colla_chat/pages/chat/chat/video_view_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../../plugin/logger.dart';
 import '../../../transport/webrtc/peer_video_render.dart';
@@ -45,6 +46,22 @@ class _VideoViewCardState extends State<VideoViewCard> {
     return Size(width, height);
   }
 
+  Widget _buildVideoView(BuildContext context) {
+    Map<String, PeerVideoRender> renders =
+        peerConnectionsController.videoRenders();
+    var render = renders.values.last;
+    var contain = Container(
+      margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+      width: 320.0,
+      height: 240.0,
+      decoration: const BoxDecoration(color: Colors.black),
+      //远端视频渲染
+      child: RTCVideoView(render.renderer!),
+    );
+
+    return contain;
+  }
+
   Widget _buildVideoViews(BuildContext context) {
     Map<String, PeerVideoRender> renders =
         peerConnectionsController.videoRenders();
@@ -74,7 +91,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
 
   @override
   Widget build(BuildContext context) {
-    return _buildVideoViews(context);
+    return _buildVideoView(context);
   }
 
   @override
