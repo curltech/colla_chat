@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../transport/webrtc/peer_video_render.dart';
+import 'controller/peer_connections_controller.dart';
 
 ///单个视频窗口
 class VideoViewWidget extends StatefulWidget {
@@ -20,6 +21,11 @@ class _VideoViewWidgetState extends State<VideoViewWidget> {
   @override
   initState() {
     super.initState();
+    peerConnectionsController.addListener(_update);
+  }
+
+  _update() {
+    setState(() {});
   }
 
   ///单个视频窗口
@@ -33,5 +39,11 @@ class _VideoViewWidgetState extends State<VideoViewWidget> {
   @override
   Widget build(BuildContext context) {
     return _buildVideoView(context);
+  }
+
+  @override
+  void dispose() {
+    peerConnectionsController.removeListener(_update);
+    super.dispose();
   }
 }
