@@ -146,6 +146,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   late final String peerId;
   late final String name;
   late final String? clientId;
+  bool initStatus = false;
 
   @override
   void initState() {
@@ -155,28 +156,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     peerConnectionsController.addListener(_update);
     var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
-
-    ChatSummary? chatSummary = chatMessageController.chatSummary;
-    if (chatSummary != null) {
-      peerId = chatSummary.peerId!;
-      name = chatSummary.name!;
-      clientId = chatSummary.clientId;
-      AdvancedPeerConnection? advancedPeerConnection =
-          peerConnectionPool.getOne(peerId, clientId: clientId);
-      if (advancedPeerConnection == null) {
-        List<PeerVideoRender> renders = localMediaController.getVideoRenders();
-        peerConnectionPool
-            .create(peerId, localRenders: renders)
-            .then((AdvancedPeerConnection? advancedPeerConnection) {
-          if (advancedPeerConnection != null) {
-            peerConnectionsController.add(peerId,
-                clientId: advancedPeerConnection.clientId);
-          }
-        });
-      }
-    } else {
-      logger.e('chatSummary is null');
-    }
+    init();
 
     ///滚到指定的位置
     // widget.scrollController.animateTo(offset,
@@ -185,6 +165,29 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
 
   _update() {
     setState(() {});
+  }
+
+  init() async {
+    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    if (chatSummary != null) {
+      peerId = chatSummary.peerId!;
+      name = chatSummary.name!;
+      clientId = chatSummary.clientId;
+      AdvancedPeerConnection? advancedPeerConnection =
+          peerConnectionPool.getOne(peerId, clientId: clientId);
+      if (advancedPeerConnection == null) {
+        await localMediaController.createVideoRender(userMedia: true);
+        List<PeerVideoRender> renders = localMediaController.getVideoRenders();
+        advancedPeerConnection =
+            await peerConnectionPool.create(peerId, localRenders: renders);
+        if (advancedPeerConnection != null) {
+          peerConnectionsController.add(peerId,
+              clientId: advancedPeerConnection.clientId);
+        }
+      }
+    } else {
+      logger.e('chatSummary is null');
+    }
   }
 
   void _onScroll() {
