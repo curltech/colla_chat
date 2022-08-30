@@ -267,7 +267,7 @@ class BasePeerConnection {
     RTCPeerConnection peerConnection = this.peerConnection!;
     if (localStreams.isNotEmpty) {
       for (var localStream in localStreams) {
-        _addLocalStream(localStream);
+        await _addLocalStream(localStream);
       }
     }
 
