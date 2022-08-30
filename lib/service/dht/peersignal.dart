@@ -79,7 +79,7 @@ class PeerSignalService extends GeneralBaseService<PeerSignal> {
       var signal = WebrtcSignal(SignalType.sdp.name, sdp: remoteSdp);
       peerSignal.title = SignalSource.remote.name;
       peerSignal.content = JsonUtil.toJsonString(signal);
-      modify(peerSignal);
+      await modify(peerSignal);
     }
     var localSdp = advancedPeerConnection.basePeerConnection.localSdp;
     if (localSdp != null) {
@@ -88,7 +88,7 @@ class PeerSignalService extends GeneralBaseService<PeerSignal> {
       var signal = WebrtcSignal(SignalType.sdp.name, sdp: localSdp);
       peerSignal.title = SignalSource.local.name;
       peerSignal.content = JsonUtil.toJsonString(signal);
-      modify(peerSignal);
+      await modify(peerSignal);
     }
     var localCandidates =
         advancedPeerConnection.basePeerConnection.localCandidates;
@@ -99,7 +99,7 @@ class PeerSignalService extends GeneralBaseService<PeerSignal> {
           WebrtcSignal(SignalType.candidate.name, candidates: localCandidates);
       peerSignal.title = SignalSource.local.name;
       peerSignal.content = JsonUtil.toJsonString(signal);
-      modify(peerSignal);
+      await modify(peerSignal);
     }
     var remoteCandidates =
         advancedPeerConnection.basePeerConnection.remoteCandidates;
@@ -109,7 +109,7 @@ class PeerSignalService extends GeneralBaseService<PeerSignal> {
           WebrtcSignal(SignalType.candidate.name, candidates: remoteCandidates);
       peerSignal.title = SignalSource.remote.name;
       peerSignal.content = JsonUtil.toJsonString(signal);
-      modify(peerSignal);
+      await modify(peerSignal);
     }
   }
 }
