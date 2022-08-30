@@ -62,10 +62,10 @@ class PeerSignalService extends GeneralBaseService<PeerSignal> {
         clientId: peerSignal.clientId, signalType: peerSignal.signalType);
     if (old == null) {
       peerSignal.id = null;
-      insert(peerSignal);
+      await insert(peerSignal);
     } else {
       peerSignal.id = old.id;
-      update(peerSignal);
+      await update(peerSignal);
     }
   }
 
