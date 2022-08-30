@@ -21,6 +21,7 @@ import 'dht/myselfpeer.dart';
 import 'dht/peerclient.dart';
 import 'dht/peerendpoint.dart';
 import 'dht/peerprofile.dart';
+import 'dht/peersignal.dart';
 import 'general_base.dart';
 import 'p2p/security_context.dart';
 
@@ -40,6 +41,7 @@ class ServiceLocator {
     services['stockAccountService'] = stockAccountService;
     services['chainAppService'] = chainAppService;
     services['peerProfileService'] = peerProfileService;
+    services['peerSignalService'] = peerSignalService;
     services['peerEndpointService'] = peerEndpointService;
     services['peerClientService'] = peerClientService;
     services['myselfPeerService'] = myselfPeerService;

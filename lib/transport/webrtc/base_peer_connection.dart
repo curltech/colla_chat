@@ -8,14 +8,21 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import '../../crypto/cryptography.dart';
 import '../../provider/app_data_provider.dart';
 
-enum SignalType { renegotiate, transceiverRequest, candidate, sdp }
+enum SignalType {
+  renegotiate,
+  transceiverRequest,
+  candidate,
+  sdp,
+  offer,
+  answer
+}
 
 class WebrtcSignal {
   late String signalType;
   bool? renegotiate; //是否需要重新协商
   Map<String, dynamic>? transceiverRequest; //收发器请求
-  //ice candidate信息，ice服务器的地址
-  RTCIceCandidate? candidate;
+  //ice candidate信息
+  List<RTCIceCandidate>? candidates;
 
   // sdp信息，peer的信息
   RTCSessionDescription? sdp;
@@ -24,7 +31,7 @@ class WebrtcSignal {
   WebrtcSignal(this.signalType,
       {this.renegotiate,
       this.transceiverRequest,
-      this.candidate,
+      this.candidates,
       this.sdp,
       this.extension});
 
@@ -32,10 +39,14 @@ class WebrtcSignal {
     signalType = json['signalType'];
     renegotiate = json['renegotiate'];
     transceiverRequest = json['transceiverRequest'];
-    Map<String, dynamic>? iceCandidate = json['candidate'];
-    if (iceCandidate != null) {
-      candidate = RTCIceCandidate(iceCandidate['candidate'],
-          iceCandidate['sdpMid'], iceCandidate['sdpMLineIndex']);
+    List<dynamic>? iceCandidates = json['candidates'];
+    if (iceCandidates != null) {
+      candidates = [];
+      for (var iceCandidate in iceCandidates) {
+        var candidate = RTCIceCandidate(iceCandidate['candidate'],
+            iceCandidate['sdpMid'], iceCandidate['sdpMLineIndex']);
+        candidates!.add(candidate);
+      }
     }
     Map<String, dynamic>? sessionDescription = json['sdp'];
     if (sessionDescription != null) {
@@ -59,9 +70,13 @@ class WebrtcSignal {
     if (sdp != null) {
       json['sdp'] = sdp.toMap();
     }
-    var candidate = this.candidate;
-    if (candidate != null) {
-      json['candidate'] = candidate.toMap();
+    var candidates = this.candidates;
+    if (candidates != null) {
+      List<dynamic> iceCandidates = [];
+      for (var candidate in candidates) {
+        iceCandidates.add(candidate.toMap());
+      }
+      json['candidates'] = iceCandidates;
     }
     var extension = this.extension;
     if (extension != null) {
@@ -181,12 +196,12 @@ class BasePeerConnection {
   RTCSessionDescription? remoteSdp;
 
   //本地产生的candidate
-  RTCIceCandidate? localCandidate;
+  List<RTCIceCandidate> localCandidates = [];
 
   //远程传入的candidate信息，可能先于offer或者answer到来，缓存起来
   //对主叫方来说，等待answer到来以后统一处理
   //对被叫方来说，等待offer到来以后统一处理
-  Map<String, RTCIceCandidate> remoteCandidates = {};
+  List<RTCIceCandidate> remoteCandidates = [];
 
   //主动发送数据的通道
   RTCDataChannel? dataChannel;
@@ -356,7 +371,7 @@ class BasePeerConnection {
     if (initiator) {
       peerConnection.setLocalDescription(localSdp!);
       peerConnection.setRemoteDescription(remoteSdp!);
-      for (var candidate in remoteCandidates.values) {
+      for (var candidate in remoteCandidates) {
         await addIceCandidate(candidate);
       }
     } else {}
@@ -451,8 +466,14 @@ class BasePeerConnection {
 
   ///onIceCandidate事件表示本地candidate准备好，可以发送IceCandidate到远端
   onIceCandidate(RTCIceCandidate candidate) {
-    localCandidate = candidate;
-    //logger.i('onIceCandidate event:${candidate.toMap()}');
+    ///如果注册了iceCandidate事件，则直接执行事件
+    var handler = handlers[WebrtcEventType.iceCandidate];
+    if (handler != null) {
+      handler(candidate);
+      return;
+    }
+
+    localCandidates.add(candidate);
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -463,7 +484,7 @@ class BasePeerConnection {
       emit(
           WebrtcEventType.signal,
           WebrtcSignal(SignalType.candidate.name,
-              candidate: candidate, extension: extension));
+              candidates: [candidate], extension: extension));
     } else if (candidate.candidate == null && !iceCompleted) {
       iceCompleted = true;
       logger.i('onIceCandidate event，iceComplete true');
@@ -582,7 +603,6 @@ class BasePeerConnection {
       return;
     }
 
-    //logger.i('start sendOffer');
     var sdp = await peerConnection.getLocalDescription();
     sdp ??= offer;
     emit(WebrtcEventType.signal,
@@ -599,7 +619,7 @@ class BasePeerConnection {
     }
     String signalType = webrtcSignal.signalType;
     //logger.i('onSignal signalType:$signalType');
-    var candidate = webrtcSignal.candidate;
+    var candidates = webrtcSignal.candidates;
     var sdp = webrtcSignal.sdp;
     //被要求重新协商，则发起协商
     if (signalType == SignalType.renegotiate.name &&
@@ -615,16 +635,16 @@ class BasePeerConnection {
       //     init: data.transceiverRequest.init);
     }
     //如果是候选信息
-    else if (signalType == SignalType.candidate.name && candidate != null) {
+    else if (signalType == SignalType.candidate.name && candidates != null) {
       //logger.i('onSignal candidate:${candidate.candidate}');
+      remoteCandidates.addAll(candidates);
       RTCSessionDescription? remoteDescription =
           await peerConnection.getRemoteDescription();
       //如果远程描述已经设置，加候选，否则，加入候选清单
       if (remoteDescription != null && remoteDescription.type != null) {
-        await addIceCandidate(candidate);
-      } else {
-        //logger.i('remoteDescription null,save candidate');
-        remoteCandidates[candidate.candidate ?? ''] = candidate;
+        for (var candidate in candidates) {
+          await addIceCandidate(candidate);
+        }
       }
     }
     //如果sdp信息，则设置远程描述，并处理所有的候选清单中候选服务器
@@ -642,10 +662,10 @@ class BasePeerConnection {
         logger.e('PeerConnectionStatus closed');
         return;
       }
-      for (var candidate in remoteCandidates.values) {
+      logger.i('remoteCandidates length:${remoteCandidates.length}');
+      for (var candidate in remoteCandidates) {
         await addIceCandidate(candidate);
       }
-      remoteCandidates = {};
     }
     //如果什么都不是，报错
     else {
@@ -752,24 +772,24 @@ class BasePeerConnection {
     }
     status == PeerConnectionStatus.negotiating;
     String signalType = webrtcSignal.signalType;
-    var candidate = webrtcSignal.candidate;
+    var candidates = webrtcSignal.candidates;
     var sdp = webrtcSignal.sdp;
     //如果是候选信息
-    if (signalType == SignalType.candidate.name && candidate != null) {
-      logger.i('onSignal candidate:${candidate.candidate}');
+    if (signalType == SignalType.candidate.name && candidates != null) {
+      remoteCandidates.addAll(candidates);
       if (peerConnection != null) {
         RTCSessionDescription? remoteDescription =
             await peerConnection.getRemoteDescription();
         //如果远程描述已经设置，加候选，否则，加入候选清单
         if (remoteDescription != null && remoteDescription.type != null) {
-          await addIceCandidate(candidate);
+          for (var candidate in candidates) {
+            await addIceCandidate(candidate);
+          }
         } else {
           logger.i('remoteDescription is null,save candidate');
-          remoteCandidates[candidate.candidate ?? ''] = candidate;
         }
       } else {
         logger.i('peerConnection is null,save candidate');
-        remoteCandidates[candidate.candidate ?? ''] = candidate;
       }
     }
     //如果sdp信息，则设置远程描述，并处理所有的候选清单中候选服务器
@@ -795,10 +815,10 @@ class BasePeerConnection {
         if (remoteDescription != null && remoteDescription.type == 'offer') {
           await _createAnswer();
         }
-        for (var candidate in remoteCandidates.values) {
+        logger.i('remoteCandidates length:${remoteCandidates.length}');
+        for (var candidate in remoteCandidates) {
           await addIceCandidate(candidate);
         }
-        remoteCandidates = {};
       } else {
         logger.e('peerConnection is null');
       }
@@ -1107,10 +1127,10 @@ class BasePeerConnection {
   }
 
   /// 调用外部事件注册方法
-  emit(WebrtcEventType name, dynamic event) async {
+  emit(WebrtcEventType name, dynamic event) {
     var handler = handlers[name];
     if (handler != null) {
-      await handler(event);
+      handler(event);
     }
   }
 

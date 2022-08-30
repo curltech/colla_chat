@@ -5,6 +5,7 @@ import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/service/dht/peersignal.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
@@ -145,10 +146,7 @@ class AdvancedPeerConnection {
     });
 
     //触发basePeerConnection的connect事件，就是调用peerConnectionPool对应的signal方法
-    basePeerConnection.on(WebrtcEventType.connected, (data) async {
-      await peerConnectionPool
-          .onConnected(WebrtcEvent(peerId, clientId: clientId, data: data));
-    });
+    basePeerConnection.on(WebrtcEventType.connected, onConnected);
 
     basePeerConnection.on(WebrtcEventType.status, (data) async {
       await peerConnectionPool
@@ -332,6 +330,12 @@ class AdvancedPeerConnection {
 
   bool get connected {
     return basePeerConnection.status == PeerConnectionStatus.connected;
+  }
+
+  onConnected(dynamic data) async {
+    await peerSignalService.modifySignal(this);
+    await peerConnectionPool
+        .onConnected(WebrtcEvent(peerId, clientId: clientId, data: data));
   }
 
   ///收到数据，带解密功能，取最后一位整数，表示解密选项，得到何种解密方式，然后解密
