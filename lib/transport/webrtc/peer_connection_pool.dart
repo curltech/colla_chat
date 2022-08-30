@@ -479,11 +479,11 @@ class PeerConnectionPool {
         if (advancedPeerConnection.basePeerConnection.initiator) {}
         if (advancedPeerConnection.basePeerConnection.status ==
             PeerConnectionStatus.created) {
-          await localMediaController.createVideoRender(displayMedia: true);
-          List<PeerVideoRender> videoRenders =
-              localMediaController.getVideoRenders();
+          // await localMediaController.createVideoRender(displayMedia: true);
+          // List<PeerVideoRender> videoRenders =
+          //     localMediaController.getVideoRenders();
           var result = await advancedPeerConnection.init(
-              iceServers: iceServers, localRenders: videoRenders);
+              iceServers: iceServers);
           if (!result) {
             logger.e('webrtcPeer.init fail');
             return null;
