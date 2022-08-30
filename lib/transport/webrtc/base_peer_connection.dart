@@ -276,8 +276,8 @@ class BasePeerConnection {
         (RTCIceConnectionState state) => {onIceConnectionState(state)};
     peerConnection.onIceGatheringState =
         (RTCIceGatheringState state) => {onIceGatheringState(state)};
-    peerConnection.onConnectionState =
-        (RTCPeerConnectionState state) => {onConnectionState(state)};
+    // peerConnection.onConnectionState =
+    //     (RTCPeerConnectionState state) => {onConnectionState(state)};
     peerConnection.onSignalingState =
         (RTCSignalingState state) => {onSignalingState(state)};
     peerConnection.onIceCandidate =
@@ -341,8 +341,8 @@ class BasePeerConnection {
   }
 
   set status(PeerConnectionStatus status) {
-    emit(WebrtcEventType.status, {'oldStatus': _status, 'newStatus': status});
     _status = status;
+    emit(WebrtcEventType.status, {'oldStatus': _status, 'newStatus': status});
   }
 
   /// 重连方法
@@ -357,7 +357,7 @@ class BasePeerConnection {
       peerConnection.setLocalDescription(localSdp!);
       peerConnection.setRemoteDescription(remoteSdp!);
       for (var candidate in remoteCandidates.values) {
-        addIceCandidate(candidate);
+        await addIceCandidate(candidate);
       }
     } else {}
   }
@@ -380,8 +380,8 @@ class BasePeerConnection {
   ///连接状态事件
   onConnectionState(RTCPeerConnectionState state) {
     RTCPeerConnection peerConnection = this.peerConnection!;
-    logger.i(
-        'connectionState:${peerConnection.connectionState},onConnectionState event:${state.name}');
+    // logger.i(
+    //     'connectionState:${peerConnection.connectionState},onConnectionState event:${state.name}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -403,8 +403,8 @@ class BasePeerConnection {
   ///ice连接状态事件
   onIceConnectionState(RTCIceConnectionState state) {
     RTCPeerConnection peerConnection = this.peerConnection!;
-    logger.i(
-        'iceConnectionState:${peerConnection.iceConnectionState},onIceConnectionState event:${state.name}');
+    // logger.i(
+    //     'iceConnectionState:${peerConnection.iceConnectionState},onIceConnectionState event:${state.name}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -621,7 +621,7 @@ class BasePeerConnection {
           await peerConnection.getRemoteDescription();
       //如果远程描述已经设置，加候选，否则，加入候选清单
       if (remoteDescription != null && remoteDescription.type != null) {
-        addIceCandidate(candidate);
+        await addIceCandidate(candidate);
       } else {
         //logger.i('remoteDescription null,save candidate');
         remoteCandidates[candidate.candidate ?? ''] = candidate;
@@ -643,7 +643,7 @@ class BasePeerConnection {
         return;
       }
       for (var candidate in remoteCandidates.values) {
-        addIceCandidate(candidate);
+        await addIceCandidate(candidate);
       }
       remoteCandidates = {};
     }
@@ -762,7 +762,7 @@ class BasePeerConnection {
             await peerConnection.getRemoteDescription();
         //如果远程描述已经设置，加候选，否则，加入候选清单
         if (remoteDescription != null && remoteDescription.type != null) {
-          addIceCandidate(candidate);
+          await addIceCandidate(candidate);
         } else {
           logger.i('remoteDescription is null,save candidate');
           remoteCandidates[candidate.candidate ?? ''] = candidate;
@@ -796,7 +796,7 @@ class BasePeerConnection {
           await _createAnswer();
         }
         for (var candidate in remoteCandidates.values) {
-          addIceCandidate(candidate);
+          await addIceCandidate(candidate);
         }
         remoteCandidates = {};
       } else {
@@ -832,7 +832,6 @@ class BasePeerConnection {
 
   ///增加本地流到本地集合
   _addStream(MediaStream stream) {
-    logger.i('_addStream ${stream.id}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -851,7 +850,6 @@ class BasePeerConnection {
 
   ///主动创建新的MediaStream，从连接中增加本地流，只能在init方法中调用
   Future<void> _addLocalStream(MediaStream stream) async {
-    logger.i('_addLocalStream ${stream.id}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -860,6 +858,7 @@ class BasePeerConnection {
       _addStream(stream);
       RTCPeerConnection peerConnection = this.peerConnection!;
       await peerConnection.addStream(stream);
+      logger.i('_addLocalStream ${stream.id}');
     } catch (e) {
       logger.e('peer connection addStream failure, $e');
     }
@@ -879,7 +878,6 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    logger.i('_addTrack stream:${stream.id}, track:${track.id}');
     String streamId = stream.id;
     String? trackId = track.id;
     if (trackId == null) {
@@ -895,6 +893,7 @@ class BasePeerConnection {
       tracks[streamId] = streamTracks;
     }
     streamTracks[trackId] = track;
+    logger.i('_addTrack stream:${stream.id}, track:${track.id}');
   }
 
   /// 把轨道加入到流中，其目的是为了把本地流轨道加入本地集合，只能通过init方法调用_addStream方法，再调用本方法
@@ -1108,10 +1107,10 @@ class BasePeerConnection {
   }
 
   /// 调用外部事件注册方法
-  emit(WebrtcEventType name, dynamic event) {
+  emit(WebrtcEventType name, dynamic event) async {
     var handler = handlers[name];
     if (handler != null) {
-      handler(event);
+      await handler(event);
     }
   }
 
@@ -1126,9 +1125,9 @@ class BasePeerConnection {
 
   ///为连接加上候选的服务器
   addIceCandidate(RTCIceCandidate iceCandidate) async {
-    logger.i('addIceCandidate: ${iceCandidate.candidate}');
     RTCPeerConnection peerConnection = this.peerConnection!;
     await peerConnection.addCandidate(iceCandidate);
+    logger.i('addIceCandidate: ${iceCandidate.candidate}');
   }
 
   /// 发送二进制消息 text/binary data to the remote peer.

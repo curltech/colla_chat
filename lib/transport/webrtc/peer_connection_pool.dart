@@ -537,13 +537,13 @@ class PeerConnectionPool {
     Map<String, PeerConnectionStatus> data = event.data;
     PeerConnectionStatus? oldStatus = data['oldStatus'];
     PeerConnectionStatus? newStatus = data['newStatus'];
-    logger.i(
-        'peerId: ${event.peerId} clientId:${event.clientId} status from ${oldStatus!.name} to ${newStatus!.name} changed');
+    // logger.i(
+    //     'peerId: ${event.peerId} clientId:${event.clientId} status from ${oldStatus!.name} to ${newStatus!.name} changed');
     peerConnectionPoolController.onStatus(event);
   }
 
   onConnected(WebrtcEvent event) async {
-    logger.i('peerId: ${event.peerId} clientId:${event.clientId} is connected');
+    // logger.i('peerId: ${event.peerId} clientId:${event.clientId} is connected');
     globalChatMessageController.sendPreKeyBundle(event.peerId,
         clientId: event.clientId);
     peerConnectionPoolController.onConnected(event);
