@@ -6,7 +6,9 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
+import '../../../../entity/dht/peersignal.dart';
 import '../../../../plugin/logger.dart';
+import '../../../../service/dht/peersignal.dart';
 import '../../../../tool/util.dart';
 import '../../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../../transport/webrtc/base_peer_connection.dart';
@@ -157,20 +159,24 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
   }
 
   //本地Candidate数据回调
-  _onLocalCandidate(RTCIceCandidate candidate) {
+  _onLocalCandidate(RTCIceCandidate candidate) async {
     var signal =
         WebrtcSignal(SignalType.candidate.name, candidates: [candidate]);
     _localCandidateSignal = JsonUtil.toJsonString(signal);
     logger.w('_localCandidateSignal: $_localCandidateSignal');
     //本地连接设置远端sdp信息
-    if (_remoteCandidateSignal != null) {
-      var map = JsonUtil.toJson(_remoteCandidateSignal);
+    String peerId = 'Gi46PD7Gfc43HvNPX3xszbtJsXriC4Ct3qk4CkKzvkMi';
+    //String peerId='9AeL4FqoUf7zWpyo4PAczuE6jbsP4sPEac1evxRAbk75';
+    PeerSignal? peerSignal = await peerSignalService.findOneByPeerId(peerId,
+        signalType: SignalType.sdp.name);
+    if (peerSignal != null) {
+      var map = JsonUtil.toJson(peerSignal.content);
       WebrtcSignal signal = WebrtcSignal.fromJson(map);
       for (var candidate in signal.candidates!) {
-        _localConnection!.peerConnection!.addCandidate(candidate);
+        await _localConnection!.peerConnection!.addCandidate(candidate);
       }
     } else {
-      logger.e('_remoteCandidateSignal is null');
+      logger.e('peerSignal is null');
     }
   }
 
@@ -214,12 +220,16 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
       //本地连接设置本地sdp信息
       _localConnection!.peerConnection!.setLocalDescription(sdp);
       //本地连接设置远端sdp信息
-      if (_remoteSdpSignal != null) {
-        var map = JsonUtil.toJson(_remoteSdpSignal);
+      String peerId = 'Gi46PD7Gfc43HvNPX3xszbtJsXriC4Ct3qk4CkKzvkMi';
+      //String peerId='9AeL4FqoUf7zWpyo4PAczuE6jbsP4sPEac1evxRAbk75';
+      PeerSignal? peerSignal = await peerSignalService.findOneByPeerId(peerId,
+          signalType: SignalType.sdp.name);
+      if (peerSignal != null) {
+        var map = JsonUtil.toJson(peerSignal.content);
         WebrtcSignal signal = WebrtcSignal.fromJson(map);
         _localConnection!.peerConnection!.setRemoteDescription(signal.sdp!);
       } else {
-        logger.e('_remoteSdpSignal is null');
+        logger.e('peerSignal is null');
       }
     } catch (e) {
       logger.e(e.toString());
