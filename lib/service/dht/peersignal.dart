@@ -24,7 +24,7 @@ class PeerSignalService extends GeneralBaseService<PeerSignal> {
   }
 
   Future<List<PeerSignal>> findByPeerId(String peerId,
-      {String? clientId, String? signalType}) async {
+      {String? clientId, String? signalType, String? title}) async {
     var where = 'peerId = ?';
     var whereArgs = [peerId];
     if (clientId != null) {
@@ -34,6 +34,10 @@ class PeerSignalService extends GeneralBaseService<PeerSignal> {
     if (signalType != null) {
       where = '$where and signalType =?';
       whereArgs.add(signalType);
+    }
+    if (title != null) {
+      where = '$where and title =?';
+      whereArgs.add(title);
     }
     var peers = await find(where: where, whereArgs: whereArgs);
 
@@ -41,7 +45,7 @@ class PeerSignalService extends GeneralBaseService<PeerSignal> {
   }
 
   Future<PeerSignal?> findOneByPeerId(String peerId,
-      {String? clientId, String? signalType}) async {
+      {String? clientId, String? signalType, String? title}) async {
     var where = 'peerId = ?';
     var whereArgs = [peerId];
     if (clientId != null) {
@@ -51,6 +55,10 @@ class PeerSignalService extends GeneralBaseService<PeerSignal> {
     if (signalType != null) {
       where = '$where and signalType =?';
       whereArgs.add(signalType);
+    }
+    if (title != null) {
+      where = '$where and title =?';
+      whereArgs.add(title);
     }
     var peer = await findOne(where: where, whereArgs: whereArgs);
 
@@ -75,7 +83,7 @@ class PeerSignalService extends GeneralBaseService<PeerSignal> {
     advancedPeerConnection.basePeerConnection.initiator;
     var remoteSdp = advancedPeerConnection.basePeerConnection.remoteSdp;
     if (remoteSdp != null) {
-      var peerSignal = PeerSignal(peerId, clientId!, remoteSdp.type!);
+      var peerSignal = PeerSignal(peerId, clientId!, SignalType.sdp.name);
       var signal = WebrtcSignal(SignalType.sdp.name, sdp: remoteSdp);
       peerSignal.title = SignalSource.remote.name;
       peerSignal.content = JsonUtil.toJsonString(signal);
@@ -84,7 +92,7 @@ class PeerSignalService extends GeneralBaseService<PeerSignal> {
     var localSdp = advancedPeerConnection.basePeerConnection.localSdp;
     if (localSdp != null) {
       var peerSignal =
-          PeerSignal(myself.peerId!, myself.clientId!, localSdp.type!);
+          PeerSignal(myself.peerId!, myself.clientId!, SignalType.sdp.name);
       var signal = WebrtcSignal(SignalType.sdp.name, sdp: localSdp);
       peerSignal.title = SignalSource.local.name;
       peerSignal.content = JsonUtil.toJsonString(signal);
