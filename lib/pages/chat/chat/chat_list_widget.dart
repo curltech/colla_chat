@@ -15,6 +15,7 @@ import '../../../widgets/common/widget_mixin.dart';
 import '../../../widgets/data_bind/data_group_listview.dart';
 import '../../../widgets/data_bind/data_listtile.dart';
 import 'chat_message_widget.dart';
+import 'controller/local_media_controller.dart';
 
 ///好友的汇总控制器，每当消息汇总表的数据有变化时更新控制器
 final DataListController<ChatSummary> linkmanChatSummaryController =
@@ -145,6 +146,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
 
       ///更新消息控制器的当前消息汇总，从而确定拥有消息的好友或者群
       chatMessageController.chatSummary = current;
+      localMediaController.createVideoRender(userMedia: true);
     }
   }
 

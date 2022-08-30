@@ -42,8 +42,6 @@ class PeerConnectionsController with ChangeNotifier {
       pcs[clientId] = peerConnection;
       logger.i(
           'AdvancedPeerConnection peerId:peerId clientId:$clientId added in PeerConnectionsController');
-
-      notifyListeners();
     }
   }
 

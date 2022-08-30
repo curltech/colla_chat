@@ -11,17 +11,20 @@ import 'package:flutter/material.dart';
 
 import '../../../entity/chat/chat.dart';
 import '../../../l10n/localization.dart';
+import '../../../provider/app_data_provider.dart';
 import '../../../provider/data_list_controller.dart';
 import '../../../provider/index_widget_provider.dart';
 import '../../../tool/util.dart';
 import '../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../transport/webrtc/peer_connection_pool.dart';
+import '../../../transport/webrtc/peer_video_render.dart';
 import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/common/widget_mixin.dart';
 import '../me/webrtc/peer_connection_controller.dart';
 import 'chat_message_input.dart';
 import 'chat_message_item.dart';
 import 'controller/local_media_controller.dart';
+import 'controller/peer_connections_controller.dart';
 
 ///好友或者群的消息控制器
 class ChatMessageController extends DataMoreController<ChatMessage> {
@@ -149,6 +152,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     super.initState();
     chatMessageController.addListener(_update);
     peerConnectionPoolController.addListener(_update);
+    peerConnectionsController.addListener(_update);
     var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
 
@@ -160,7 +164,15 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
       AdvancedPeerConnection? advancedPeerConnection =
           peerConnectionPool.getOne(peerId, clientId: clientId);
       if (advancedPeerConnection == null) {
-        peerConnectionPool.create(peerId);
+        List<PeerVideoRender> renders = localMediaController.getVideoRenders();
+        peerConnectionPool
+            .create(peerId, localRenders: renders)
+            .then((AdvancedPeerConnection? advancedPeerConnection) {
+          if (advancedPeerConnection != null) {
+            peerConnectionsController.add(peerId,
+                clientId: advancedPeerConnection.clientId);
+          }
+        });
       }
     } else {
       logger.e('chatSummary is null');
@@ -314,7 +326,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   }
 
   ///创建消息显示面板，包含消息的输入框
-  Widget _buildListView(BuildContext context) {
+  Widget _buildTextView(BuildContext context) {
     return Column(children: <Widget>[
       Flexible(
         //使用列表渲染消息
@@ -338,6 +350,27 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     ]);
   }
 
+  Widget _buildVideoView(BuildContext context) {
+    Map<String, PeerVideoRender> renders =
+        peerConnectionsController.videoRenders();
+    logger.i('peerConnectionsController videoRenders length:${renders.length}');
+    double totalWidth = appDataProvider.mobileSize.width;
+    double totalHeight = appDataProvider.mobileSize.height;
+    var height = totalHeight / 2;
+    var width = totalWidth;
+    List<Widget> videoViews = [];
+    for (var render in renders.values) {
+      Widget videoView =
+          render.createVideoView(mirror: true, height: height, width: width);
+      videoViews.add(videoView);
+    }
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(2.0),
+      controller: ScrollController(),
+      child: Wrap(runSpacing: 2.0, spacing: 2.0, children: videoViews),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     PeerConnectionStatus status = PeerConnectionStatus.none;
@@ -354,7 +387,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
             AppLocalizations.t(status.name) +
             ')'),
         withLeading: widget.withLeading,
-        child: _buildListView(context));
+        child: _buildVideoView(context));
     return appBarView;
   }
 
@@ -363,6 +396,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     chatMessageController.removeListener(_update);
     widget.scrollController.removeListener(_onScroll);
     peerConnectionPoolController.removeListener(_update);
+    peerConnectionsController.removeListener(_update);
     textEditingController.dispose();
     super.dispose();
   }

@@ -479,8 +479,9 @@ class PeerConnectionPool {
         if (advancedPeerConnection.basePeerConnection.initiator) {}
         if (advancedPeerConnection.basePeerConnection.status ==
             PeerConnectionStatus.created) {
+          await localMediaController.createVideoRender(displayMedia: true);
           List<PeerVideoRender> videoRenders =
-              localMediaController.videoRenders.values.toList();
+              localMediaController.getVideoRenders();
           var result = await advancedPeerConnection.init(
               iceServers: iceServers, localRenders: videoRenders);
           if (!result) {
@@ -564,6 +565,7 @@ class PeerConnectionPool {
     logger
         .i('peerId: ${event.peerId} clientId:${event.clientId} is onAddStream');
     peerConnectionsController.add(event.peerId, clientId: event.clientId);
+    peerConnectionsController.modify(event.peerId, clientId: event.clientId);
   }
 
   onRemoveStream(WebrtcEvent event) async {
