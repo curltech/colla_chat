@@ -592,6 +592,7 @@ class BasePeerConnection {
         await peerConnection.createOffer(sdpConstraints);
     await peerConnection.setLocalDescription(offer);
     logger.i('createOffer and setLocalDescription offer successfully');
+    localSdp = offer;
     await _sendOffer(offer);
   }
 
@@ -737,6 +738,7 @@ class BasePeerConnection {
     }
     answer = await peerConnection.createAnswer(sdpConstraints);
     logger.i('create local sdp answer:${answer.type}, and setLocalDescription');
+    localSdp = answer;
     await peerConnection.setLocalDescription(answer);
     logger
         .i('setLocalDescription local sdp answer:${answer.type} successfully');

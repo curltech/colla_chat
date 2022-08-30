@@ -8,6 +8,8 @@ import '../../tool/util.dart';
 import '../../transport/webrtc/advanced_peer_connection.dart';
 import '../general_base.dart';
 
+enum SignalSource { local, remote }
+
 class PeerSignalService extends GeneralBaseService<PeerSignal> {
   Map<String, Map<String, PeerProfile>> peerProfiles = {};
 
@@ -75,6 +77,7 @@ class PeerSignalService extends GeneralBaseService<PeerSignal> {
     if (remoteSdp != null) {
       var peerSignal = PeerSignal(peerId, clientId!, remoteSdp.type!);
       var signal = WebrtcSignal(SignalType.sdp.name, sdp: remoteSdp);
+      peerSignal.title = SignalSource.remote.name;
       peerSignal.content = JsonUtil.toJsonString(signal);
       modify(peerSignal);
     }
@@ -83,6 +86,7 @@ class PeerSignalService extends GeneralBaseService<PeerSignal> {
       var peerSignal =
           PeerSignal(myself.peerId!, myself.clientId!, localSdp.type!);
       var signal = WebrtcSignal(SignalType.sdp.name, sdp: localSdp);
+      peerSignal.title = SignalSource.local.name;
       peerSignal.content = JsonUtil.toJsonString(signal);
       modify(peerSignal);
     }
@@ -91,14 +95,20 @@ class PeerSignalService extends GeneralBaseService<PeerSignal> {
     if (localCandidates.isNotEmpty) {
       var peerSignal = PeerSignal(
           myself.peerId!, myself.clientId!, SignalType.candidate.name);
-      peerSignal.content = JsonUtil.toJsonString(localCandidates);
+      var signal =
+          WebrtcSignal(SignalType.candidate.name, candidates: localCandidates);
+      peerSignal.title = SignalSource.local.name;
+      peerSignal.content = JsonUtil.toJsonString(signal);
       modify(peerSignal);
     }
     var remoteCandidates =
         advancedPeerConnection.basePeerConnection.remoteCandidates;
     if (remoteCandidates.isNotEmpty) {
       var peerSignal = PeerSignal(peerId, clientId!, SignalType.candidate.name);
-      peerSignal.content = JsonUtil.toJsonString(remoteCandidates);
+      var signal =
+          WebrtcSignal(SignalType.candidate.name, candidates: remoteCandidates);
+      peerSignal.title = SignalSource.remote.name;
+      peerSignal.content = JsonUtil.toJsonString(signal);
       modify(peerSignal);
     }
   }
