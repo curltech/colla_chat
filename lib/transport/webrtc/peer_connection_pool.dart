@@ -8,6 +8,7 @@ import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:synchronized/synchronized.dart';
 
 import '../../entity/chat/chat.dart';
 import '../../entity/p2p/chain_message.dart';
@@ -368,13 +369,21 @@ class PeerConnectionPool {
     }
   }
 
+  var lock = Lock(reentrant: true);
+
+  onSignal(ChainMessage chainMessage) async {
+    await lock.synchronized(() async {
+      _onSignal(chainMessage);
+    });
+  }
+
   /// 接收到信号服务器发来的signal的处理,没有完成，要仔细考虑多终端的情况
   /// 如果发来的是answer,寻找主叫的peerId,必须找到，否则报错，找到后检查clientId
   /// 如果发来的是offer,检查peerId，没找到创建一个新的被叫，如果找到，检查clientId
   /// @param peerId
   /// @param connectSessionId
   /// @param data
-  onSignal(ChainMessage chainMessage) async {
+  _onSignal(ChainMessage chainMessage) async {
     String? peerId = chainMessage.srcPeerId;
     String? connectPeerId = chainMessage.srcConnectPeerId;
     String? connectSessionId = chainMessage.srcConnectSessionId;
