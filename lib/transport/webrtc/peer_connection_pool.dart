@@ -373,7 +373,7 @@ class PeerConnectionPool {
 
   onSignal(ChainMessage chainMessage) async {
     await lock.synchronized(() async {
-      _onSignal(chainMessage);
+      await _onSignal(chainMessage);
     });
   }
 
