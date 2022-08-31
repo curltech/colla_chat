@@ -1,9 +1,7 @@
 import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
-import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/chat.dart';
-import 'package:colla_chat/service/dht/peersignal.dart';
 import 'package:colla_chat/tool/util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
@@ -382,7 +380,7 @@ class PeerConnectionPool {
     String? connectSessionId = chainMessage.srcConnectSessionId;
     WebrtcSignal signal = chainMessage.payload;
     var signalType = signal.signalType;
-    //logger.i('receive signal type: $signalType from webrtcPeer: $peerId');
+    logger.i('receive signal type: $signalType from webrtcPeer: $peerId');
     String? clientId = chainMessage.srcClientId;
     String? name;
     List<Map<String, String>>? iceServers;
@@ -435,8 +433,7 @@ class PeerConnectionPool {
     // peerId的连接存在，而且已经连接，报错
     if (advancedPeerConnection != null) {
       if (advancedPeerConnection.connected) {
-        logger.e('peerId:$peerId clientId:$clientId is connected');
-        return;
+        logger.w('peerId:$peerId clientId:$clientId is connected');
       }
     }
 
@@ -461,38 +458,35 @@ class PeerConnectionPool {
     }
     if (signalType == SignalType.candidate.name ||
         (signalType == SignalType.sdp.name && signal.sdp!.type == 'offer')) {
-      advancedPeerConnection ??= AdvancedPeerConnection(peerId, false,
-          clientId: clientId, name: name, room: room);
-      advancedPeerConnection.connectPeerId = connectPeerId;
-      advancedPeerConnection.connectSessionId = connectSessionId;
-      //新建的被叫连接放入池中
-
-      peerConnections ??= {};
-      peerConnections[clientId] = advancedPeerConnection;
-      this.peerConnections.put(peerId, peerConnections);
-      peerConnectionPoolController.onCreated(WebrtcEvent(peerId,
-          clientId: clientId, data: advancedPeerConnection));
-
-      ///收到对方的offer，自己应该是被叫
-      if ((signalType == SignalType.sdp.name && signal.sdp!.type == 'offer')) {
-        //如果自己是主叫，比较peerId，如果自己的较大，则自己继续作为主叫，忽略offer信号
-        //否则自己将作为被叫，接收offer信号
-        if (advancedPeerConnection.basePeerConnection.initiator) {}
-        if (advancedPeerConnection.basePeerConnection.status ==
-            PeerConnectionStatus.created) {
-          // await localMediaController.createVideoRender(displayMedia: true);
-          // List<PeerVideoRender> videoRenders =
-          //     localMediaController.getVideoRenders();
-          var result = await advancedPeerConnection.init(
-              iceServers: iceServers);
-          if (!result) {
-            logger.e('webrtcPeer.init fail');
-            return null;
+      if (advancedPeerConnection == null) {
+        advancedPeerConnection = AdvancedPeerConnection(peerId, false,
+            clientId: clientId, name: name, room: room);
+        advancedPeerConnection.connectPeerId = connectPeerId;
+        advancedPeerConnection.connectSessionId = connectSessionId;
+        // await localMediaController.createVideoRender(displayMedia: true);
+        // List<PeerVideoRender> videoRenders =
+        //     localMediaController.getVideoRenders();
+        var result = await advancedPeerConnection.init(iceServers: iceServers);
+        if (!result) {
+          logger.e('webrtcPeer.init fail');
+          return null;
+        }
+        //新建的被叫连接放入池中
+        peerConnections ??= {};
+        peerConnections[clientId] = advancedPeerConnection;
+        this.peerConnections.put(peerId, peerConnections);
+        peerConnectionPoolController.onCreated(WebrtcEvent(peerId,
+            clientId: clientId, data: advancedPeerConnection));
+      } else {
+        ///收到对方的offer，自己应该是被叫
+        if (signalType == SignalType.sdp.name && signal.sdp!.type == 'offer') {
+          if (advancedPeerConnection.basePeerConnection.initiator) {
+            //如果自己是主叫，比较peerId，如果自己的较大，则自己继续作为主叫，忽略offer信号
+            //否则自己将作为被叫，接收offer信号
           }
         }
       }
     }
-
     if (advancedPeerConnection != null) {
       await advancedPeerConnection.onSignal(signal);
     }

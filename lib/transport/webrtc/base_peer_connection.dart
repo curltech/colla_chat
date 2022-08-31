@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/tool/util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
@@ -639,19 +640,21 @@ class BasePeerConnection {
     else if (signalType == SignalType.candidate.name && candidates != null) {
       //logger.i('onSignal candidate:${candidate.candidate}');
       remoteCandidates.addAll(candidates);
+      logger.i('remoteCandidates length:${remoteCandidates.length}');
+      for (var candidate in candidates) {
+        await addIceCandidate(candidate);
+      }
       RTCSessionDescription? remoteDescription =
           await peerConnection.getRemoteDescription();
       //如果远程描述已经设置，加候选，否则，加入候选清单
-      if (remoteDescription != null && remoteDescription.type != null) {
-        for (var candidate in candidates) {
-          await addIceCandidate(candidate);
-        }
-      }
+      if (remoteDescription != null && remoteDescription.type != null) {}
     }
     //如果sdp信息，则设置远程描述，并处理所有的候选清单中候选服务器
     //对主叫节点来说，sdp应该是answer
     else if (signalType == SignalType.sdp.name && sdp != null) {
-      logger.i('onSignal sdp answer:${sdp.type}');
+      if (sdp.type != 'answer') {
+        logger.e('onSignal sdp type is not answer:${sdp.type}');
+      }
       RTCSessionDescription? remoteDescription =
           await peerConnection.getRemoteDescription();
       if (remoteDescription != null) {
@@ -659,14 +662,6 @@ class BasePeerConnection {
       }
       remoteSdp = sdp;
       await peerConnection.setRemoteDescription(sdp);
-      if (status == PeerConnectionStatus.closed) {
-        logger.e('PeerConnectionStatus closed');
-        return;
-      }
-      logger.i('remoteCandidates length:${remoteCandidates.length}');
-      for (var candidate in remoteCandidates) {
-        await addIceCandidate(candidate);
-      }
     }
     //如果什么都不是，报错
     else {
@@ -742,11 +737,6 @@ class BasePeerConnection {
     await peerConnection.setLocalDescription(answer);
     logger
         .i('setLocalDescription local sdp answer:${answer.type} successfully');
-
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
-    }
     await _sendAnswer(answer);
   }
 
@@ -767,7 +757,7 @@ class BasePeerConnection {
 
   ///作为被叫，从信号服务器传回来远程的webrtcSignal信息，从signalAction回调
   _onAnswerSignal(WebrtcSignal webrtcSignal) async {
-    RTCPeerConnection? peerConnection = this.peerConnection;
+    RTCPeerConnection peerConnection = this.peerConnection!;
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -779,50 +769,33 @@ class BasePeerConnection {
     //如果是候选信息
     if (signalType == SignalType.candidate.name && candidates != null) {
       remoteCandidates.addAll(candidates);
-      if (peerConnection != null) {
-        RTCSessionDescription? remoteDescription =
-            await peerConnection.getRemoteDescription();
-        //如果远程描述已经设置，加候选，否则，加入候选清单
-        if (remoteDescription != null && remoteDescription.type != null) {
-          for (var candidate in candidates) {
-            await addIceCandidate(candidate);
-          }
-        } else {
-          logger.i('remoteDescription is null,save candidate');
-        }
-      } else {
-        logger.i('peerConnection is null,save candidate');
+      logger.i('remoteCandidates length:${remoteCandidates.length}');
+      for (var candidate in candidates) {
+        await addIceCandidate(candidate);
       }
     }
-    //如果sdp信息，则设置远程描述，并处理所有的候选清单中候选服务器
+    //如果sdp信息，则设置远程描述
     else if (signalType == SignalType.sdp.name && sdp != null) {
-      logger.i('onSignal sdp offer:${sdp.type}');
+      if (sdp.type != 'offer') {
+        logger.e('onSignal sdp is not offer:${sdp.type}');
+      }
       remoteSdp = sdp;
-      if (peerConnection != null) {
-        logger.i('start setRemoteDescription sdp offer:${sdp.type}');
-        RTCSessionDescription? remoteDescription =
-            await peerConnection.getRemoteDescription();
-        if (remoteDescription != null) {
-          logger.e(
-              'RemoteDescription sdp offer is exist:${remoteDescription.type}');
-        }
-        await peerConnection.setRemoteDescription(sdp);
-        logger.i('setRemoteDescription sdp offer:${sdp.type} successfully');
-        if (status == PeerConnectionStatus.closed) {
-          logger.e('PeerConnectionStatus closed');
-          return;
-        }
-        //如果远程描述是offer请求，则创建answer
-        remoteDescription = await peerConnection.getRemoteDescription();
-        if (remoteDescription != null && remoteDescription.type == 'offer') {
-          await _createAnswer();
-        }
-        logger.i('remoteCandidates length:${remoteCandidates.length}');
-        for (var candidate in remoteCandidates) {
-          await addIceCandidate(candidate);
-        }
+      logger.i('start setRemoteDescription sdp offer:${sdp.type}');
+      RTCSessionDescription? remoteDescription =
+          await peerConnection.getRemoteDescription();
+      if (remoteDescription != null) {
+        logger.e(
+            'RemoteDescription sdp offer is exist:${remoteDescription.type}');
+      }
+      await peerConnection.setRemoteDescription(sdp);
+      logger.i('setRemoteDescription sdp offer:${sdp.type} successfully');
+      //如果远程描述是offer请求，则创建answer
+      remoteDescription = await peerConnection.getRemoteDescription();
+      if (remoteDescription != null && remoteDescription.type == 'offer') {
+        await _createAnswer();
       } else {
-        logger.e('peerConnection is null');
+        logger
+            .e('RemoteDescription sdp is not offer:${remoteDescription!.type}');
       }
     }
     //如果什么都不是，报错
@@ -1149,7 +1122,9 @@ class BasePeerConnection {
   addIceCandidate(RTCIceCandidate iceCandidate) async {
     RTCPeerConnection peerConnection = this.peerConnection!;
     await peerConnection.addCandidate(iceCandidate);
-    logger.i('addIceCandidate: ${iceCandidate.candidate}');
+    var map = iceCandidate.toMap();
+    var jsonStr = JsonUtil.toJsonString(map);
+    logger.i('addIceCandidate: $jsonStr');
   }
 
   /// 发送二进制消息 text/binary data to the remote peer.

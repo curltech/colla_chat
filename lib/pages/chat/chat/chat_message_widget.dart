@@ -390,7 +390,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
             AppLocalizations.t(status.name) +
             ')'),
         withLeading: widget.withLeading,
-        child: _buildTextView(context));
+        child: _buildVideoView(context));
     return appBarView;
   }
 
