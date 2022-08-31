@@ -468,6 +468,7 @@ class PeerConnectionPool {
     if (signalType == SignalType.candidate.name ||
         (signalType == SignalType.sdp.name && signal.sdp!.type == 'offer')) {
       if (advancedPeerConnection == null) {
+        logger.i('advancedPeerConnection is null,create new one');
         advancedPeerConnection = AdvancedPeerConnection(peerId, false,
             clientId: clientId, name: name, room: room);
         advancedPeerConnection.connectPeerId = connectPeerId;
