@@ -374,6 +374,10 @@ class PeerConnectionPool {
 
   onSignal(ChainMessage chainMessage) async {
     await lock.synchronized(() async {
+      if (chainMessage.srcPeerId == null) {
+        logger.e('chainMessage.srcPeerId is null');
+        return;
+      }
       String peerId = chainMessage.srcPeerId!;
       String? clientId = chainMessage.srcClientId;
       WebrtcSignal signal = chainMessage.payload;
@@ -417,10 +421,6 @@ class PeerConnectionPool {
       }
       iceServers = extension.iceServers;
       room = extension.room;
-    }
-    if (peerId == null) {
-      logger.e('peerId is null');
-      return;
     }
     if (clientId == null) {
       logger.e('clientId is null');
