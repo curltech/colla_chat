@@ -14,6 +14,7 @@ import '../../entity/chat/chat.dart';
 import '../../entity/p2p/chain_message.dart';
 import '../../entity/p2p/security_context.dart';
 import '../../p2p/chain/action/signal.dart';
+import '../../pages/chat/chat/controller/local_media_controller.dart';
 import '../../pages/chat/chat/controller/peer_connections_controller.dart';
 import '../../pages/chat/index/global_chat_message_controller.dart';
 import '../../pages/chat/me/webrtc/peer_connection_controller.dart';
@@ -473,10 +474,11 @@ class PeerConnectionPool {
             clientId: clientId, name: name, room: room);
         advancedPeerConnection.connectPeerId = connectPeerId;
         advancedPeerConnection.connectSessionId = connectSessionId;
-        // await localMediaController.createVideoRender(displayMedia: true);
-        // List<PeerVideoRender> videoRenders =
-        //     localMediaController.getVideoRenders();
-        var result = await advancedPeerConnection.init(iceServers: iceServers);
+        await localMediaController.createVideoRender(displayMedia: true);
+        List<PeerVideoRender> videoRenders =
+            localMediaController.getVideoRenders();
+        var result = await advancedPeerConnection.init(
+            iceServers: iceServers, localRenders: videoRenders);
         if (!result) {
           logger.e('webrtcPeer.init fail');
           return null;
