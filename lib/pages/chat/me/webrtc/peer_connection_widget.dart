@@ -6,10 +6,6 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-import '../../../../entity/dht/peersignal.dart';
-import '../../../../plugin/logger.dart';
-import '../../../../service/dht/peersignal.dart';
-import '../../../../tool/util.dart';
 import '../../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../../transport/webrtc/base_peer_connection.dart';
 import '../../../../widgets/common/widget_mixin.dart';
@@ -41,31 +37,20 @@ class PeerConnectionWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
-  bool initiator = true;
-
   //本地媒体流
   MediaStream? _localStream;
+
+  //远端媒体流
+  MediaStream? _remoteStream;
 
   //本地连接
   BasePeerConnection? _localConnection;
 
+  //远端连接
+  BasePeerConnection? _remoteConnection;
+
   //本地视频渲染对象
   final _localRenderer = RTCVideoRenderer();
-
-  //本地candidate signal json
-  String? _localCandidateSignal;
-
-  //远程candidate signal json
-  String? _remoteCandidateSignal;
-
-  //本地sdp signal json
-  String? _localSdpSignal;
-
-  //远端sdp signal json
-  String? _remoteSdpSignal;
-
-  //远端媒体流
-  MediaStream? _remoteStream;
 
   //远端视频渲染对象
   final _remoteRenderer = RTCVideoRenderer();
@@ -146,12 +131,17 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
 
   //本地Ice连接状态
   _onLocalIceConnectionState(RTCIceConnectionState state) {
-    logger.i(state);
+    print(state);
+  }
+
+  //远端Ice连接状态
+  _onRemoteIceConnectionState(RTCIceConnectionState state) {
+    print(state);
   }
 
   //远端流添加成功回调
   _onRemoteAddStream(MediaStream stream) {
-    logger.i('Remote addStream: ${stream.id}');
+    print('Remote addStream: ' + stream.id);
     //得到远端媒体流
     _remoteStream = stream;
     //将远端视频渲染对象与媒体流绑定
@@ -159,80 +149,71 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
   }
 
   //本地Candidate数据回调
-  _onLocalCandidate(RTCIceCandidate candidate) async {
-    var signal =
-        WebrtcSignal(SignalType.candidate.name, candidates: [candidate]);
-    _localCandidateSignal = JsonUtil.toJsonString(signal);
-    logger.w('_localCandidateSignal: $_localCandidateSignal');
-    //本地连接设置远端sdp信息
-    String peerId = 'Gi46PD7Gfc43HvNPX3xszbtJsXriC4Ct3qk4CkKzvkMi';
-    //String peerId='9AeL4FqoUf7zWpyo4PAczuE6jbsP4sPEac1evxRAbk75';
-    PeerSignal? peerSignal = await peerSignalService.findOneByPeerId(peerId,
-        signalType: SignalType.sdp.name);
-    if (peerSignal != null) {
-      var map = JsonUtil.toJson(peerSignal.content);
-      WebrtcSignal signal = WebrtcSignal.fromJson(map);
-      for (var candidate in signal.candidates!) {
-        await _localConnection!.peerConnection!.addCandidate(candidate);
-      }
-    } else {
-      logger.e('peerSignal is null');
-    }
+  _onLocalCandidate(RTCIceCandidate candidate) {
+    print('LocalCandidate: ' + candidate.candidate!);
+    //将本地Candidate添加至远端连接
+    _remoteConnection!.addIceCandidate(candidate);
+  }
+
+  //远端Candidate数据回调
+  _onRemoteCandidate(RTCIceCandidate candidate) {
+    print('RemoteCandidate: ' + candidate.candidate!);
+    //将远端Candidate添加至本地连接
+    _localConnection!.addIceCandidate(candidate);
   }
 
   _open() async {
     //如果本地与远端连接创建则返回
-    if (_localConnection != null) return;
+    if (_localConnection != null || _remoteConnection != null) return;
 
     try {
       //根据媒体约束获取本地媒体流
-      _localStream =
-          await navigator.mediaDevices.getUserMedia(mediaConstraints);
+      _localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
       //将本地媒体流与本地视频对象绑定
       _localRenderer.srcObject = _localStream;
 
       //创建本地连接对象
-      _localConnection = BasePeerConnection(initiator: initiator);
+      _localConnection = BasePeerConnection(initiator: true);
       var extension =
           SignalExtension('', '', iceServers: configuration['iceServers']!);
       await _localConnection!
           .init(extension: extension, localStreams: [_localStream!]);
-      //监听获取到远端视频流事件
-      _localConnection!.on(WebrtcEventType.stream, _onRemoteAddStream);
       //添加本地Candidate事件监听
       _localConnection!.on(WebrtcEventType.iceCandidate, _onLocalCandidate);
       //添加本地Ice连接状态事件监听
       _localConnection!
           .on(WebrtcEventType.iceConnectionState, _onLocalIceConnectionState);
 
+      //创建远端连接对象
+      _remoteConnection = BasePeerConnection(initiator: false);
+      await _remoteConnection!.init(extension: extension);
+      //监听获取到远端视频流事件
+      _remoteConnection!.on(WebrtcEventType.stream, _onRemoteAddStream);
+      //添加远端Candidate事件监听
+      _remoteConnection!.on(WebrtcEventType.iceCandidate, _onRemoteCandidate);
+      //添加远端Ice连接状态事件监听
+      _remoteConnection!
+          .on(WebrtcEventType.iceConnectionState, _onRemoteIceConnectionState);
+
       //本地连接创建提议Offer
-      RTCSessionDescription sdp;
-      if (initiator) {
-        sdp = await _localConnection!.peerConnection!
-            .createOffer(sdp_constraints);
-      } else {
-        sdp = await _localConnection!.peerConnection!
-            .createAnswer(sdp_constraints);
-      }
-      var signal = WebrtcSignal(SignalType.sdp.name, sdp: sdp);
-      _localSdpSignal = JsonUtil.toJsonString(signal);
-      logger.w('_localSdpSignal: $_localSdpSignal');
+      RTCSessionDescription offer =
+          await _localConnection!.peerConnection!.createOffer(sdp_constraints);
+      print("offer:" + offer.sdp!);
       //本地连接设置本地sdp信息
-      _localConnection!.peerConnection!.setLocalDescription(sdp);
+      _localConnection!.peerConnection!.setLocalDescription(offer);
+      //远端连接设置远端sdp信息
+      _remoteConnection!.peerConnection!.setRemoteDescription(offer);
+
+      //远端连接创建应答Answer
+      RTCSessionDescription answer = await _remoteConnection!.peerConnection!
+          .createAnswer(sdp_constraints);
+      print("answer:" + answer.sdp!);
+      //远端连接设置本地sdp信息
+      _remoteConnection!.peerConnection!.setLocalDescription(answer);
       //本地连接设置远端sdp信息
-      String peerId = 'Gi46PD7Gfc43HvNPX3xszbtJsXriC4Ct3qk4CkKzvkMi';
-      //String peerId='9AeL4FqoUf7zWpyo4PAczuE6jbsP4sPEac1evxRAbk75';
-      PeerSignal? peerSignal = await peerSignalService.findOneByPeerId(peerId,
-          signalType: SignalType.sdp.name);
-      if (peerSignal != null) {
-        var map = JsonUtil.toJson(peerSignal.content);
-        WebrtcSignal signal = WebrtcSignal.fromJson(map);
-        _localConnection!.peerConnection!.setRemoteDescription(signal.sdp!);
-      } else {
-        logger.e('peerSignal is null');
-      }
+      _localConnection!.peerConnection!.setRemoteDescription(answer);
     } catch (e) {
-      logger.e(e.toString());
+      print(e.toString());
     }
     if (!mounted) return;
 
@@ -251,14 +232,18 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
       await _remoteStream!.dispose();
       //关闭本地连接
       await _localConnection!.close();
+      //关闭远端连接
+      await _remoteConnection!.close();
       //将本地连接置为空
       _localConnection = null;
+      //将远端连接置为空
+      _remoteConnection = null;
       //将本地视频源置为空
       _localRenderer.srcObject = null;
       //将远端视频源置为空
       _remoteRenderer.srcObject = null;
     } catch (e) {
-      logger.e(e.toString());
+      print(e.toString());
     }
     //设置连接状态为false
     setState(() {
