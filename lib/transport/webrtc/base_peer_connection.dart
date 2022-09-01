@@ -183,13 +183,6 @@ class BasePeerConnection {
   //数据通道的状态是否打开
   bool dataChannelOpen = false;
 
-  //是否第一次协商
-  bool firstNegotiation = true;
-
-  //连接双方要协商turn的地址和端口，也就是candidate协商过程是否完成
-  //这个过程在offer，answer协商之后
-  bool iceCompleted = false;
-
   //本地的sdp，
   RTCSessionDescription? localSdp;
 
@@ -209,9 +202,6 @@ class BasePeerConnection {
 
   //是否需要主动建立数据通道
   bool needDataChannel = false;
-
-  //数据通道的标签
-  late String dataChannelLabel;
 
   //本地媒体流渲染器数组，在init方法中传入
   //Map<String, MediaStream> localStreams = {};
@@ -316,7 +306,8 @@ class BasePeerConnection {
       //是否由用户代理或应用程序协商频道
       dataChannelDict.negotiated = false;
       //创建发送数据通道
-      dataChannelLabel = await cryptoGraphy.getRandomAsciiString(length: 20);
+      var dataChannelLabel =
+          await cryptoGraphy.getRandomAsciiString(length: 20);
       dataChannel = await peerConnection.createDataChannel(
           dataChannelLabel, dataChannelDict);
 
@@ -486,10 +477,6 @@ class BasePeerConnection {
           WebrtcEventType.signal,
           WebrtcSignal(SignalType.candidate.name,
               candidates: [candidate], extension: extension));
-    } else if (candidate.candidate == null && !iceCompleted) {
-      iceCompleted = true;
-      logger.i('onIceCandidate event，iceComplete true');
-      emit(WebrtcEventType.iceCompleted, '');
     }
   }
 
@@ -571,7 +558,6 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    firstNegotiation = false;
     if (status == PeerConnectionStatus.negotiating) {
       logger.e('PeerConnectionStatus already negotiating');
       return;
@@ -701,12 +687,6 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    //被叫不能在第一次的时候主动发起协议过程
-    if (firstNegotiation) {
-      firstNegotiation = false;
-      return;
-    }
-    firstNegotiation = false;
     if (status == PeerConnectionStatus.negotiating) {
       logger.e('already negotiating');
       return;
