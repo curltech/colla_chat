@@ -209,10 +209,9 @@ class BasePeerConnection {
   //远程媒体流渲染器数组，在onAddStream,onAddTrack等的回调方法中得到
   Map<String, MediaStream> streams = {};
 
-  Map<String, Map<String, MediaStreamTrack>> tracks = {};
-
   //媒体流的轨道，流和发送者之间的关系
-  Map<String, Map<String, RTCRtpSender>> trackSenders = {};
+  // Map<String, Map<String, MediaStreamTrack>> tracks = {};
+  // Map<String, Map<String, RTCRtpSender>> trackSenders = {};
 
   //外部使用时注册的回调方法，也就是注册事件
   //WebrtcEvent定义了事件的名称
@@ -862,12 +861,12 @@ class BasePeerConnection {
     if (!streams.containsKey(streamId)) {
       streams[streamId] = stream;
     }
-    var streamTracks = tracks[streamId];
-    if (streamTracks == null) {
-      streamTracks = {};
-      tracks[streamId] = streamTracks;
-    }
-    streamTracks[trackId] = track;
+    // var streamTracks = tracks[streamId];
+    // if (streamTracks == null) {
+    //   streamTracks = {};
+    //   tracks[streamId] = streamTracks;
+    // }
+    // streamTracks[trackId] = track;
     logger.i('_addTrack stream:${stream.id}, track:${track.id}');
   }
 
@@ -885,14 +884,14 @@ class BasePeerConnection {
     _addTrack(stream, track);
 
     RTCPeerConnection peerConnection = this.peerConnection!;
-    var streamSenders = trackSenders[trackId!];
-    if (streamSenders == null) {
-      streamSenders = {};
-      trackSenders[trackId] = streamSenders;
-    }
+    // var streamSenders = trackSenders[trackId!];
+    // if (streamSenders == null) {
+    //   streamSenders = {};
+    //   trackSenders[trackId] = streamSenders;
+    // }
     try {
       var streamSender = await peerConnection.addTrack(track, stream);
-      streamSenders[streamId] = streamSender;
+      //streamSenders[streamId] = streamSender;
     } catch (e) {
       logger.e('peer connection addTrack failure, $e');
     }
@@ -914,24 +913,24 @@ class BasePeerConnection {
     var oldTrackId = oldTrack.id;
     var newTrackId = newTrack.id;
 
-    var streamTracks = tracks[streamId];
-    if (streamTracks == null) {
-      streamTracks = {};
-      tracks[streamId] = streamTracks;
-    }
-    streamTracks.remove(oldTrackId);
-    streamTracks[newTrackId!] = newTrack;
+    // var streamTracks = tracks[streamId];
+    // if (streamTracks == null) {
+    //   streamTracks = {};
+    //   tracks[streamId] = streamTracks;
+    // }
+    // streamTracks.remove(oldTrackId);
+    // streamTracks[newTrackId!] = newTrack;
 
-    var streamSenders = trackSenders[oldTrackId];
-    if (streamSenders != null) {
-      RTCRtpSender? sender = streamSenders[streamId];
-      if (sender == null) {
-        logger.e('Cannot replace track that was never added.');
-      } else {
-        trackSenders[newTrackId!] = streamSenders;
-        await sender.replaceTrack(newTrack);
-      }
-    }
+    // var streamSenders = trackSenders[oldTrackId];
+    // if (streamSenders != null) {
+    //   RTCRtpSender? sender = streamSenders[streamId];
+    //   if (sender == null) {
+    //     logger.e('Cannot replace track that was never added.');
+    //   } else {
+    //     trackSenders[newTrackId!] = streamSenders;
+    //     await sender.replaceTrack(newTrack);
+    //   }
+    // }
   }
 
   _removeTrack(MediaStream stream, MediaStreamTrack track) async {
@@ -943,15 +942,15 @@ class BasePeerConnection {
     var streamId = stream.id;
     var trackId = track.id;
 
-    var streamTracks = tracks[streamId];
-    if (streamTracks == null) {
-      streamTracks = {};
-      tracks[streamId] = streamTracks;
-    }
-    streamTracks.remove(trackId);
-    if (streamTracks.isEmpty) {
-      tracks.remove(streamId);
-    }
+    // var streamTracks = tracks[streamId];
+    // if (streamTracks == null) {
+    //   streamTracks = {};
+    //   tracks[streamId] = streamTracks;
+    // }
+    // streamTracks.remove(trackId);
+    // if (streamTracks.isEmpty) {
+    //   tracks.remove(streamId);
+    // }
   }
 
   /// 主动从连接中移除一个轨道，然后会激活onRemoveTrack
@@ -966,24 +965,24 @@ class BasePeerConnection {
     var streamId = stream.id;
     var trackId = track.id;
 
-    var streamSenders = trackSenders[trackId];
-    if (streamSenders != null) {
-      RTCRtpSender? sender = streamSenders[streamId];
-      if (sender == null) {
-        logger.e('Cannot remove track that was never added.');
-      } else {
-        try {
-          RTCPeerConnection? peerConnection = this.peerConnection;
-          if (peerConnection != null) {
-            await peerConnection.removeTrack(sender);
-          }
-          _removeTrack(stream, track);
-        } catch (err) {
-          logger.e('removeTrack err $err');
-          close();
-        }
-      }
-    }
+    // var streamSenders = trackSenders[trackId];
+    // if (streamSenders != null) {
+    //   RTCRtpSender? sender = streamSenders[streamId];
+    //   if (sender == null) {
+    //     logger.e('Cannot remove track that was never added.');
+    //   } else {
+    //     try {
+    //       RTCPeerConnection? peerConnection = this.peerConnection;
+    //       if (peerConnection != null) {
+    //         await peerConnection.removeTrack(sender);
+    //       }
+    //       _removeTrack(stream, track);
+    //     } catch (err) {
+    //       logger.e('removeTrack err $err');
+    //       close();
+    //     }
+    //   }
+    // }
   }
 
   /// 主动从连接中移除流，然后会激活onRemoveStream
@@ -1128,7 +1127,7 @@ class BasePeerConnection {
       return;
     }
     streams = {};
-    trackSenders = {};
+    //trackSenders = {};
     final dataChannel = this.dataChannel;
     if (dataChannel != null) {
       try {
