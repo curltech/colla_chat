@@ -86,8 +86,6 @@ class AdvancedPeerConnection {
   String peerId;
   String? clientId;
   String? name;
-  String? connectPeerId;
-  String? connectSessionId;
   Room? room;
 
   //远程媒体流渲染器数组，在onAddStream,onAddTrack等的回调方法中得到
@@ -377,7 +375,7 @@ class AdvancedPeerConnection {
       }
     } else {
       logger.e(
-          'send failed , peerId:$peerId;connectPeer:$connectPeerId session:$connectSessionId webrtc connection state is not connected');
+          'send failed , peerId:$peerId clientId:$clientId webrtc connection state is not connected');
       return;
     }
   }

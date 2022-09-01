@@ -201,7 +201,7 @@ class BasePeerConnection {
   RTCDataChannel? dataChannel;
 
   //是否需要主动建立数据通道
-  bool needDataChannel = false;
+  bool needDataChannel = true;
 
   //本地媒体流渲染器数组，在init方法中传入
   //Map<String, MediaStream> localStreams = {};
@@ -573,7 +573,10 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    //logger.i('start createOffer');
+    var localDescription = await peerConnection.getLocalDescription();
+    if (localDescription != null) {
+      logger.w('LocalDescription sdp offer is exist:${localDescription.type}');
+    }
     RTCSessionDescription offer =
         await peerConnection.createOffer(sdpConstraints);
     await peerConnection.setLocalDescription(offer);
@@ -612,7 +615,7 @@ class BasePeerConnection {
     if (signalType == SignalType.renegotiate.name &&
         webrtcSignal.renegotiate != null) {
       logger.i('onSignal renegotiate');
-      //negotiate();
+      negotiate();
     }
     //被要求收发，则加收发器
     else if (webrtcSignal.transceiverRequest != null) {
@@ -629,12 +632,8 @@ class BasePeerConnection {
       for (var candidate in candidates) {
         await addIceCandidate(candidate);
       }
-      RTCSessionDescription? remoteDescription =
-          await peerConnection.getRemoteDescription();
-      //如果远程描述已经设置，加候选，否则，加入候选清单
-      if (remoteDescription != null && remoteDescription.type != null) {}
     }
-    //如果sdp信息，则设置远程描述，并处理所有的候选清单中候选服务器
+    //如果sdp信息，则设置远程描述
     //对主叫节点来说，sdp应该是answer
     else if (signalType == SignalType.sdp.name && sdp != null) {
       if (sdp.type != 'answer') {
@@ -643,7 +642,7 @@ class BasePeerConnection {
       RTCSessionDescription? remoteDescription =
           await peerConnection.getRemoteDescription();
       if (remoteDescription != null) {
-        logger.e('remoteDescription is exist');
+        logger.w('remoteDescription is exist');
       }
       remoteSdp = sdp;
       await peerConnection.setRemoteDescription(sdp);
@@ -688,6 +687,10 @@ class BasePeerConnection {
     }
     if (status == PeerConnectionStatus.negotiating) {
       logger.e('already negotiating');
+      return;
+    }
+    if (status != PeerConnectionStatus.connected) {
+      logger.e('answer renegotiate only connected');
       return;
     }
     //被叫发送重新协商的请求
@@ -763,7 +766,7 @@ class BasePeerConnection {
       RTCSessionDescription? remoteDescription =
           await peerConnection.getRemoteDescription();
       if (remoteDescription != null) {
-        logger.e(
+        logger.w(
             'RemoteDescription sdp offer is exist:${remoteDescription.type}');
       }
       await peerConnection.setRemoteDescription(sdp);

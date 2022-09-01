@@ -1,8 +1,8 @@
-import 'dart:convert';
 import 'dart:core';
 
 import 'package:uuid/uuid.dart';
 
+import '../../crypto/util.dart';
 import '../../entity/dht/myself.dart';
 import '../../entity/p2p/chain_message.dart';
 import '../../provider/app_data_provider.dart';
@@ -120,7 +120,7 @@ abstract class BaseAction {
     var jsonStr = JsonUtil.toJsonString(data);
 
     /// 把负载变成utf8的二进制的数组，方便计数和进一步的处理
-    List<int> payload = utf8.encode(jsonStr);
+    List<int> payload = CryptoUtil.stringToUtf8(jsonStr);
     chainMessage.payload = payload;
     if (payload.length < compressLimit) {
       chainMessage.needCompress = false;

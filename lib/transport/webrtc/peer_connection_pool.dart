@@ -1,4 +1,5 @@
 import 'package:colla_chat/crypto/signalprotocol.dart';
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/chat.dart';
@@ -14,7 +15,6 @@ import '../../entity/chat/chat.dart';
 import '../../entity/p2p/chain_message.dart';
 import '../../entity/p2p/security_context.dart';
 import '../../p2p/chain/action/signal.dart';
-import '../../pages/chat/chat/controller/local_media_controller.dart';
 import '../../pages/chat/chat/controller/peer_connections_controller.dart';
 import '../../pages/chat/index/global_chat_message_controller.dart';
 import '../../pages/chat/me/webrtc/peer_connection_controller.dart';
@@ -374,7 +374,16 @@ class PeerConnectionPool {
 
   onSignal(ChainMessage chainMessage) async {
     await lock.synchronized(() async {
-      await _onSignal(chainMessage);
+      String peerId = chainMessage.srcPeerId!;
+      String? clientId = chainMessage.srcClientId;
+      WebrtcSignal signal = chainMessage.payload;
+      await _onWebrtcSignal(peerId, signal, clientId: clientId);
+    });
+  }
+
+  onWebrtcSignal(String peerId, WebrtcSignal signal, {String? clientId}) async {
+    await lock.synchronized(() async {
+      await _onWebrtcSignal(peerId, signal, clientId: clientId);
     });
   }
 
@@ -384,14 +393,10 @@ class PeerConnectionPool {
   /// @param peerId
   /// @param connectSessionId
   /// @param data
-  _onSignal(ChainMessage chainMessage) async {
-    String? peerId = chainMessage.srcPeerId;
-    String? connectPeerId = chainMessage.srcConnectPeerId;
-    String? connectSessionId = chainMessage.srcConnectSessionId;
-    WebrtcSignal signal = chainMessage.payload;
+  _onWebrtcSignal(String peerId, WebrtcSignal signal,
+      {String? clientId}) async {
     var signalType = signal.signalType;
     logger.i('receive signal type: $signalType from webrtcPeer: $peerId');
-    String? clientId = chainMessage.srcClientId;
     String? name;
     List<Map<String, String>>? iceServers;
     Room? room;
@@ -443,7 +448,7 @@ class PeerConnectionPool {
     // peerId的连接存在，而且已经连接，报错
     if (advancedPeerConnection != null) {
       if (advancedPeerConnection.connected) {
-        logger.w('peerId:$peerId clientId:$clientId is connected');
+        logger.w('peerId:$peerId clientId:$clientId is connected, renegotiate');
       }
     }
 
@@ -472,13 +477,7 @@ class PeerConnectionPool {
         logger.i('advancedPeerConnection is null,create new one');
         advancedPeerConnection = AdvancedPeerConnection(peerId, false,
             clientId: clientId, name: name, room: room);
-        advancedPeerConnection.connectPeerId = connectPeerId;
-        advancedPeerConnection.connectSessionId = connectSessionId;
-        await localMediaController.createVideoRender(displayMedia: true);
-        List<PeerVideoRender> videoRenders =
-            localMediaController.getVideoRenders();
-        var result = await advancedPeerConnection.init(
-            iceServers: iceServers, localRenders: videoRenders);
+        var result = await advancedPeerConnection.init(iceServers: iceServers);
         if (!result) {
           logger.e('webrtcPeer.init fail');
           return null;
@@ -651,12 +650,26 @@ class PeerConnectionPool {
     try {
       var peerId = evt.peerId;
       var clientId = evt.clientId;
-      var result =
-          await signalAction.signal(evt.data, peerId, targetClientId: clientId);
-      if (result == 'ERROR') {
-        logger.e('signal err:$result');
+      AdvancedPeerConnection? advancedPeerConnection =
+          getOne(peerId, clientId: clientId);
+      if (advancedPeerConnection != null && advancedPeerConnection.connected) {
+        var jsonStr = JsonUtil.toJsonString(evt.data);
+        var data = CryptoUtil.stringToUtf8(jsonStr);
+        ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+            peerId,
+            data: data,
+            clientId: clientId,
+            subMessageType: ChatSubMessageType.signal);
+        await chatMessageService.send(chatMessage);
+        logger.i('sent signal by webrtc peerId:$peerId, clientId:$clientId');
+      } else {
+        var result = await signalAction.signal(evt.data, peerId,
+            targetClientId: clientId);
+        if (result == 'ERROR') {
+          logger.e('signal err:$result');
+        }
+        return result;
       }
-      return result;
     } catch (err) {
       logger.e('signal err:$err');
     }

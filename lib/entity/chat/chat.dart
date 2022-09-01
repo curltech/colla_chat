@@ -69,6 +69,7 @@ enum ChatSubMessageType {
   deleteChat,
   chatReceipt, // 接收回复
   groupFile,
+  signal, //webrtc signal消息，一般用于重新协商的情况
   preKeyBundle, //signal加解密
 }
 

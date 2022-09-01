@@ -167,17 +167,11 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
     if (_localConnection != null || _remoteConnection != null) return;
 
     try {
-      //根据媒体约束获取本地媒体流
-      _localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
-      //将本地媒体流与本地视频对象绑定
-      _localRenderer.srcObject = _localStream;
-
       //创建本地连接对象
       _localConnection = BasePeerConnection(initiator: true);
       var extension =
           SignalExtension('', '', iceServers: configuration['iceServers']!);
-      await _localConnection!
-          .init(extension: extension, localStreams: [_localStream!]);
+      await _localConnection!.init(extension: extension);
       //添加本地Candidate事件监听
       _localConnection!.on(WebrtcEventType.iceCandidate, _onLocalCandidate);
       //添加本地Ice连接状态事件监听
@@ -195,23 +189,7 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
       _remoteConnection!
           .on(WebrtcEventType.iceConnectionState, _onRemoteIceConnectionState);
 
-      //本地连接创建提议Offer
-      RTCSessionDescription offer =
-          await _localConnection!.peerConnection!.createOffer(sdp_constraints);
-      print("offer:" + offer.sdp!);
-      //本地连接设置本地sdp信息
-      _localConnection!.peerConnection!.setLocalDescription(offer);
-      //远端连接设置远端sdp信息
-      _remoteConnection!.peerConnection!.setRemoteDescription(offer);
-
-      //远端连接创建应答Answer
-      RTCSessionDescription answer = await _remoteConnection!.peerConnection!
-          .createAnswer(sdp_constraints);
-      print("answer:" + answer.sdp!);
-      //远端连接设置本地sdp信息
-      _remoteConnection!.peerConnection!.setLocalDescription(answer);
-      //本地连接设置远端sdp信息
-      _localConnection!.peerConnection!.setRemoteDescription(answer);
+      await _negotiate();
     } catch (e) {
       print(e.toString());
     }
@@ -221,6 +199,41 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
     setState(() {
       _isConnected = true;
     });
+  }
+
+  _negotiate() async {
+    RTCSessionDescription? sdp =
+        await _localConnection!.peerConnection!.getLocalDescription();
+    if (sdp != null) {
+      print("_localConnection getLocalDescription exist");
+    }
+    //本地连接创建提议Offer
+    RTCSessionDescription offer =
+        await _localConnection!.peerConnection!.createOffer(sdp_constraints);
+    if (sdp != null && sdp.sdp != offer.sdp) {
+      print("_localConnection getLocalDescription changed");
+    }
+    print("offer:" + offer.sdp!);
+    //本地连接设置本地sdp信息
+    _localConnection!.peerConnection!.setLocalDescription(offer);
+    //远端连接设置远端sdp信息
+    _remoteConnection!.peerConnection!.setRemoteDescription(offer);
+
+    sdp = await _remoteConnection!.peerConnection!.getLocalDescription();
+    if (sdp != null) {
+      print("_remoteConnection getLocalDescription exist");
+    }
+    //远端连接创建应答Answer
+    RTCSessionDescription answer =
+        await _remoteConnection!.peerConnection!.createAnswer(sdp_constraints);
+    if (sdp != null && sdp.sdp != answer.sdp) {
+      print("_remoteConnection getLocalDescription changed");
+    }
+    print("answer:" + answer.sdp!);
+    //远端连接设置本地sdp信息
+    _remoteConnection!.peerConnection!.setLocalDescription(answer);
+    //本地连接设置远端sdp信息
+    _localConnection!.peerConnection!.setRemoteDescription(answer);
   }
 
   //关闭处理
@@ -298,10 +311,33 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
     );
   }
 
+  _addStream() async {
+    //根据媒体约束获取本地媒体流
+    _localStream = await navigator.mediaDevices.getUserMedia(mediaConstraints);
+    //将本地媒体流与本地视频对象绑定
+    _localRenderer.srcObject = _localStream;
+    await _localConnection!.peerConnection!.addStream(_localStream!);
+    await _negotiate();
+    setState(() {});
+  }
+
   Widget _buildIconButton(BuildContext context) {
-    return IconButton(
+    List<Widget> buttons = [];
+    Widget add = IconButton(
       onPressed: _isConnected ? _close : _open,
       icon: Icon(_isConnected ? Icons.close : Icons.add),
+    );
+    buttons.add(add);
+    Widget addStream = IconButton(
+      onPressed: () {
+        _addStream();
+      },
+      icon: const Icon(Icons.add_circle),
+    );
+    buttons.add(addStream);
+
+    return Row(
+      children: buttons,
     );
   }
 
