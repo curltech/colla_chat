@@ -208,7 +208,7 @@ class BasePeerConnection {
   RTCDataChannel? dataChannel;
 
   //是否需要主动建立数据通道
-  bool needDataChannel = true;
+  bool needDataChannel = false;
 
   //数据通道的标签
   late String dataChannelLabel;
