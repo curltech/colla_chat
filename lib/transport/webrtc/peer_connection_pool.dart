@@ -241,7 +241,7 @@ class PeerConnectionPool {
       logger.e('webrtcPeer.init fail');
       return null;
     }
-    peerConnection.basePeerConnection.negotiate();
+    peerConnection.negotiate();
     //clientId没有值的时候以''代替
     clientId = clientId ?? '';
     var peerConnections = this.peerConnections.get(peerId);

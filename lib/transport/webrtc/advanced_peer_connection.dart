@@ -193,6 +193,10 @@ class AdvancedPeerConnection {
     return result;
   }
 
+  negotiate() async {
+    await basePeerConnection.negotiate();
+  }
+
   PeerConnectionStatus get status {
     return basePeerConnection.status;
   }
