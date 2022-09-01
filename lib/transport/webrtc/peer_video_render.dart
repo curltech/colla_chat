@@ -47,15 +47,18 @@ class PeerVideoRender {
       {String? clientId,
       String? name,
       MediaStream? stream,
-      bool userMedia = false,
+      bool videoMedia = false,
+      bool audioMedia = false,
       bool displayMedia = false}) async {
     PeerVideoRender render =
         PeerVideoRender(peerId, clientId: clientId, name: name);
-    if (stream == null && !userMedia && !displayMedia) {
-      userMedia = true;
+    if (stream == null && !videoMedia && !displayMedia && !audioMedia) {
+      videoMedia = true;
     }
-    if (userMedia) {
-      await render.createUserMedia();
+    if (videoMedia) {
+      await render.createVideoMedia();
+    } else if (audioMedia) {
+      await render.createAudioMedia();
     } else if (displayMedia) {
       await render.createDisplayMedia();
     } else if (stream != null) {
@@ -67,7 +70,7 @@ class PeerVideoRender {
   }
 
   ///获取本机视频流
-  Future<void> createUserMedia(
+  Future<void> createVideoMedia(
       {bool audio = true,
       int minWidth = 640,
       int minHeight = 480,

@@ -80,13 +80,15 @@ class LocalMediaController with ChangeNotifier {
 
   Future<PeerVideoRender> createVideoRender(
       {MediaStream? stream,
-      bool userMedia = false,
+      bool videoMedia = false,
+      bool audioMedia = false,
       bool displayMedia = false}) async {
     PeerVideoRender render = await PeerVideoRender.from(myself.peerId!,
         clientId: myself.clientId,
         name: myself.myselfPeer!.name,
         stream: stream,
-        userMedia: userMedia,
+        videoMedia: videoMedia,
+        audioMedia: audioMedia,
         displayMedia: displayMedia);
     await render.bindRTCVideoRender();
     videoRenders[render.id!] = render;

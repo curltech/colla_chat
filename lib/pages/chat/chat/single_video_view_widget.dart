@@ -4,20 +4,20 @@ import '../../../transport/webrtc/peer_video_render.dart';
 import 'controller/peer_connections_controller.dart';
 
 ///单个视频窗口
-class VideoViewWidget extends StatefulWidget {
+class SingleVideoViewWidget extends StatefulWidget {
   final PeerVideoRender render;
   final double? height;
   final double? width;
 
-  const VideoViewWidget(
+  const SingleVideoViewWidget(
       {Key? key, required this.render, this.height, this.width})
       : super(key: key);
 
   @override
-  State createState() => _VideoViewWidgetState();
+  State createState() => _SingleVideoViewWidgetState();
 }
 
-class _VideoViewWidgetState extends State<VideoViewWidget> {
+class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   @override
   initState() {
     super.initState();
@@ -29,7 +29,7 @@ class _VideoViewWidgetState extends State<VideoViewWidget> {
   }
 
   ///单个视频窗口
-  Widget _buildVideoView(BuildContext context) {
+  Widget _buildSingleVideoView(BuildContext context) {
     Widget videoView = widget.render.createVideoView(
         mirror: true, height: widget.height, width: widget.width);
 
@@ -38,7 +38,7 @@ class _VideoViewWidgetState extends State<VideoViewWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return _buildVideoView(context);
+    return _buildSingleVideoView(context);
   }
 
   @override

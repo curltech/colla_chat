@@ -2,33 +2,23 @@ import 'dart:async';
 
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
-import 'package:colla_chat/pages/chat/chat/video_chat_widget.dart';
-import 'package:colla_chat/pages/chat/chat/video_dialout_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/chat.dart';
-import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:flutter/material.dart';
 
 import '../../../entity/chat/chat.dart';
-import '../../../l10n/localization.dart';
-import '../../../provider/app_data_provider.dart';
 import '../../../provider/data_list_controller.dart';
-import '../../../provider/index_widget_provider.dart';
-import '../../../tool/util.dart';
-import '../../../transport/webrtc/advanced_peer_connection.dart';
-import '../../../transport/webrtc/peer_connection_pool.dart';
-import '../../../transport/webrtc/peer_video_render.dart';
-import '../../../widgets/common/app_bar_view.dart';
-import '../../../widgets/common/widget_mixin.dart';
 import '../me/webrtc/peer_connection_controller.dart';
 import 'chat_message_input.dart';
 import 'chat_message_item.dart';
-import 'controller/local_media_controller.dart';
 import 'controller/peer_connections_controller.dart';
 
 ///好友或者群的消息控制器
 class ChatMessageController extends DataMoreController<ChatMessage> {
   ChatSummary? _chatSummary;
+
+  //聊天界面的显示组件编号，0表示文本聊天界面，1表示视频通话拨出界面，2表示视频通话界面
+  int _index = 0;
 
   ChatSummary? get chatSummary {
     return _chatSummary;
@@ -38,6 +28,17 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     _chatSummary = chatSummary;
     clear();
     previous(limit: defaultLimit);
+  }
+
+  int get index {
+    return _index;
+  }
+
+  set index(int index) {
+    if (_index != index) {
+      _index = index;
+      notifyListeners();
+    }
   }
 
   modify(String peerId, {String? clientId}) {
@@ -101,7 +102,7 @@ final ChatMessageController chatMessageController = ChatMessageController();
 
 /// 消息发送和接受展示的界面组件
 /// 此界面展示特定的目标对象的收到的消息，并且可以发送消息
-class ChatMessageWidget extends StatefulWidget with TileDataMixin {
+class ChatMessageWidget extends StatefulWidget {
   final ScrollController scrollController = ScrollController();
   final Function()? onScrollMax;
   final Function()? onScrollMin;
@@ -115,27 +116,12 @@ class ChatMessageWidget extends StatefulWidget with TileDataMixin {
       this.onScrollMin,
       this.onRefresh,
       this.notificationPredicate})
-      : super(key: key) {
-    indexWidgetProvider.define(VideoDialOutWidget());
-    indexWidgetProvider.define(VideoChatWidget());
-  }
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
     return _ChatMessageWidgetState();
   }
-
-  @override
-  bool get withLeading => true;
-
-  @override
-  String get routeName => 'chat_message';
-
-  @override
-  Icon get icon => const Icon(Icons.chat);
-
-  @override
-  String get title => 'ChatMessage';
 }
 
 class _ChatMessageWidgetState extends State<ChatMessageWidget>
@@ -173,18 +159,6 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
       peerId = chatSummary.peerId!;
       name = chatSummary.name!;
       clientId = chatSummary.clientId;
-      AdvancedPeerConnection? advancedPeerConnection =
-          peerConnectionPool.getOne(peerId, clientId: clientId);
-      if (advancedPeerConnection == null) {
-        await localMediaController.createVideoRender(userMedia: true);
-        List<PeerVideoRender> renders = localMediaController.getVideoRenders();
-        advancedPeerConnection =
-            await peerConnectionPool.create(peerId, localRenders: renders);
-        if (advancedPeerConnection != null) {
-          peerConnectionsController.add(peerId,
-              clientId: advancedPeerConnection.clientId);
-        }
-      }
     } else {
       logger.e('chatSummary is null');
     }
@@ -240,7 +214,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   }
 
   ///发送文本消息,发送命令消息
-  Future<ChatMessage> send(
+  Future<ChatMessage> _send(
       {String? message,
       ContentType contentType = ContentType.text,
       ChatSubMessageType subMessageType = ChatSubMessageType.chat}) async {
@@ -253,10 +227,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
         data: data, contentType: contentType, subMessageType: subMessageType);
     //修改消息控制器
     chatMessageController.insert(0, chatMessage);
-    //发送消息
-    String json = JsonUtil.toJsonString(chatMessage);
-    data = CryptoUtil.stringToUtf8(json);
-    await peerConnectionPool.send(peerId, data);
+    await chatMessageService.send(chatMessage);
 
     return chatMessage;
   }
@@ -273,37 +244,21 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   }
 
   actionVideoChat() async {
-    AdvancedPeerConnection? advancedPeerConnection =
-        peerConnectionPool.getOne(peerId, clientId: clientId);
-    if (advancedPeerConnection != null) {
-      if (advancedPeerConnection.status == PeerConnectionStatus.connected) {
-        //发送视频通话请求
-        ChatMessage chatMessage =
-            await send(subMessageType: ChatSubMessageType.videoChat);
-        localMediaController.chatMessage = chatMessage;
-        //打开拨号窗口
-        indexWidgetProvider.push('video_dialout');
-      } else {
-        logger.e(
-            'PeerConnection peerId:$peerId,client:$clientId status is not connected, status:${advancedPeerConnection.status}');
-      }
-    } else {
-      logger.e('PeerConnection peerId:$peerId,client:$clientId is not exist');
-    }
+    chatMessageController.index = 1;
   }
 
   ///发送消息的输入框和按钮，三个按钮，一个输入框，单独一个类
   ///另外还有各种消息的选择菜单，emoji各一个类
-  Widget _buildTextMessageInputWidget(BuildContext context) {
+  Widget _buildMessageInputWidget(BuildContext context) {
     return ChatMessageInputWidget(
       textEditingController: textEditingController,
-      onSend: send,
+      onSend: _send,
       onAction: action,
     );
   }
 
   ///创建每一条消息
-  Widget messageItem(BuildContext context, int index) {
+  Widget _buildMessageItem(BuildContext context, int index) {
     List<ChatMessage> messages = chatMessageController.data;
     ChatMessage item = messages[index];
     // 创建消息动画控制器
@@ -329,7 +284,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   }
 
   ///创建消息显示面板，包含消息的输入框
-  Widget _buildTextView(BuildContext context) {
+  Widget _buildChatMessageWidget(BuildContext context) {
     return Column(children: <Widget>[
       Flexible(
         //使用列表渲染消息
@@ -341,7 +296,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
               padding: const EdgeInsets.all(8.0),
               reverse: true,
               //消息组件渲染
-              itemBuilder: messageItem,
+              itemBuilder: _buildMessageItem,
               //消息条目数
               itemCount: chatMessageController.data.length,
             )),
@@ -349,49 +304,17 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
       const Divider(
         height: 1.0,
       ),
-      _buildTextMessageInputWidget(context),
+      _buildMessageInputWidget(context),
     ]);
-  }
-
-  Widget _buildVideoView(BuildContext context) {
-    Map<String, PeerVideoRender> renders =
-        peerConnectionsController.videoRenders();
-    logger.i('peerConnectionsController videoRenders length:${renders.length}');
-    double totalWidth = appDataProvider.mobileSize.width;
-    double totalHeight = appDataProvider.mobileSize.height;
-    var height = totalHeight / 2;
-    var width = totalWidth;
-    List<Widget> videoViews = [];
-    for (var render in renders.values) {
-      Widget videoView =
-          render.createVideoView(mirror: true, height: height, width: width);
-      videoViews.add(videoView);
-    }
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(2.0),
-      controller: ScrollController(),
-      child: Wrap(runSpacing: 2.0, spacing: 2.0, children: videoViews),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
-    PeerConnectionStatus status = PeerConnectionStatus.none;
-    var peerConnection = peerConnectionPool.getOne(peerId);
-    if (peerConnection != null) {
-      status = peerConnection.status;
-    }
-
     ///获取最新的消息
     chatMessageController.latest();
-    var appBarView = AppBarView(
-        title: Text(AppLocalizations.t(name) +
-            '(' +
-            AppLocalizations.t(status.name) +
-            ')'),
-        withLeading: widget.withLeading,
-        child: _buildVideoView(context));
-    return appBarView;
+    var chatMessageWidget = _buildChatMessageWidget(context);
+
+    return chatMessageWidget;
   }
 
   @override

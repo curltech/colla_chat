@@ -14,6 +14,7 @@ import '../../../widgets/common/keep_alive_wrapper.dart';
 import '../../../widgets/common/widget_mixin.dart';
 import '../../../widgets/data_bind/data_group_listview.dart';
 import '../../../widgets/data_bind/data_listtile.dart';
+import 'chat_message_view.dart';
 import 'chat_message_widget.dart';
 import 'controller/local_media_controller.dart';
 
@@ -30,7 +31,7 @@ final DataListController<ChatSummary> groupChatSummaryController =
 class ChatListWidget extends StatefulWidget with TileDataMixin {
   final GroupDataListController groupDataListController =
       GroupDataListController();
-  final ChatMessageWidget chatMessageWidget = ChatMessageWidget();
+  final ChatMessageView chatMessageView = ChatMessageView();
 
   ChatListWidget({Key? key}) : super(key: key) {
     chatSummaryService
@@ -74,7 +75,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
 
     var indexWidgetProvider =
         Provider.of<IndexWidgetProvider>(context, listen: false);
-    indexWidgetProvider.define(widget.chatMessageWidget);
+    indexWidgetProvider.define(widget.chatMessageView);
   }
 
   _update() {

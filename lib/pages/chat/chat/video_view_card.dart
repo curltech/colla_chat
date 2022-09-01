@@ -1,10 +1,9 @@
-import 'package:colla_chat/pages/chat/chat/video_view_widget.dart';
+import 'package:colla_chat/pages/chat/chat/single_video_view_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../../plugin/logger.dart';
-import '../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../transport/webrtc/peer_video_render.dart';
 import 'controller/peer_connections_controller.dart';
 
@@ -49,43 +48,14 @@ class _VideoViewCardState extends State<VideoViewCard> {
     return Size(width, height);
   }
 
-  Future<Widget> _buildVideoView(BuildContext context) async {
-    AdvancedPeerConnection advancedPeerConnection =
-        peerConnectionsController.get();
-    Map<String, MediaStream> streams =
-        advancedPeerConnection.basePeerConnection.streams;
-    logger.i('peerConnectionsController videoRenders length:${streams.length}');
-    if (streams.isEmpty) {
-      return Container();
-    }
-    await render.initialize();
-    render.srcObject = streams.values.last;
-    var contain = Container(
-      margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-      width: 320.0,
-      height: 240.0,
-      decoration: const BoxDecoration(color: Colors.black),
-      //远端视频渲染
-      child: RTCVideoView(render),
-    );
-
-    return contain;
-  }
-
   Widget _buildVideoViews(BuildContext context) {
     Map<String, PeerVideoRender> renders =
         peerConnectionsController.videoRenders();
     logger.i('peerConnectionsController videoRenders length:${renders.length}');
     Size size = _calculateSize(renders.length);
     List<Widget> videoViews = [];
-    // Widget videoView = VideoViewWidget(
-    //   render: renders.values.last,
-    //   width: size.width,
-    //   height: size.height,
-    // );
-    // videoViews.add(videoView);
     for (var render in renders.values) {
-      Widget videoView = VideoViewWidget(
+      Widget videoView = SingleVideoViewWidget(
         render: render,
         width: size.width,
         height: size.height,
