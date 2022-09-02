@@ -32,7 +32,6 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   ///单个视频窗口
   Widget _buildSingleVideoView(BuildContext context) {
     Widget videoView = widget.render.createVideoView(
-        mirror: true,
         height: widget.height,
         width: widget.width,
         color: widget.color);

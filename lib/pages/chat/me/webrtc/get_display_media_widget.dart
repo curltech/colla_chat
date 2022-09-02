@@ -109,7 +109,7 @@ class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             decoration: const BoxDecoration(color: Colors.black),
-            child: peerVideoRenderer.createVideoView(mirror: true),
+            child: peerVideoRenderer.createVideoView(),
           ),
         );
       },

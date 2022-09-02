@@ -29,18 +29,18 @@ class _VideoViewCardState extends State<VideoViewCard> {
   }
 
   Size _calculateSize(double totalWidth, double totalHeight, int count) {
-    var height = totalHeight - 4;
+    var height = totalHeight - 6;
     var width = totalWidth - 4;
     if (count <= 4) {
-      height = totalHeight / count;
+      height = height / count;
     } else if (count <= 8) {
-      width = totalWidth / 2;
-      height = totalHeight / count / 2;
+      width = width / 2;
+      height = height / count / 2;
     } else if (count <= 12) {
-      width = totalWidth / count / 3;
+      width = width / count / 3;
     } else {
-      width = totalWidth / count / 4;
-      height = totalHeight / 4;
+      width = width / count / 4;
+      height = height / 4;
     }
 
     return Size(width, height);
@@ -54,10 +54,10 @@ class _VideoViewCardState extends State<VideoViewCard> {
     List<Widget> videoViews = [];
     for (var render in renders.values) {
       Widget videoView = SingleVideoViewWidget(
-        render: render,
-        width: size.width,
-        height: size.height,
-      );
+          render: render,
+          width: size.width,
+          height: size.height,
+          color: widget.color);
       videoViews.add(videoView);
     }
     return SingleChildScrollView(

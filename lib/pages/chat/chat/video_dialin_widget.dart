@@ -15,7 +15,9 @@ class VideoDialInWidget extends StatelessWidget {
   ///视频通话的消息请求
   final ChatMessage chatMessage;
 
-  const VideoDialInWidget({Key? key, required this.chatMessage})
+  final Function(String data)? onTap;
+
+  const VideoDialInWidget({Key? key, required this.chatMessage, this.onTap})
       : super(key: key);
 
   _sendReceipt(ChatReceiptType receiptType) async {
@@ -59,7 +61,9 @@ class VideoDialInWidget extends StatelessWidget {
             WidgetUtil.buildCircleButton(
                 onPressed: () {
                   _sendReceipt(ChatReceiptType.reject);
-                  Navigator.pop(context, ChatReceiptType.reject);
+                  if (onTap != null) {
+                    onTap!(ChatReceiptType.reject.name);
+                  }
                 },
                 child:
                     const Icon(color: Colors.white, size: 16, Icons.call_end),
@@ -67,7 +71,9 @@ class VideoDialInWidget extends StatelessWidget {
             WidgetUtil.buildCircleButton(
                 onPressed: () {
                   _sendReceipt(ChatReceiptType.agree);
-                  Navigator.pop(context, ChatReceiptType.agree);
+                  if (onTap != null) {
+                    onTap!(ChatReceiptType.agree.name);
+                  }
                 },
                 child:
                     const Icon(color: Colors.white, size: 16, Icons.video_call),

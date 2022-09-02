@@ -7,6 +7,7 @@ import '../../../entity/chat/chat.dart';
 import '../../../plugin/logger.dart';
 import '../../../provider/app_data_provider.dart';
 import '../../../widgets/style/platform_widget_factory.dart';
+import '../chat/chat_message_item.dart';
 import '../login/loading.dart';
 import 'bottom_bar.dart';
 import 'global_chat_message_controller.dart';
@@ -25,10 +26,55 @@ class IndexView extends StatefulWidget {
 
 class _IndexViewState extends State<IndexView>
     with SingleTickerProviderStateMixin {
+  OverlayEntry? videoChatOverlayEntry;
+  OverlayEntry? chatMessageOverlayEntry;
+
   @override
   void initState() {
     super.initState();
     globalChatMessageController.addListener(_update);
+  }
+
+  _closeVideoChatOverlayEntry() {
+    if (videoChatOverlayEntry != null) {
+      videoChatOverlayEntry!.remove();
+      videoChatOverlayEntry = null;
+    }
+  }
+
+  _showVideoChatMessage(BuildContext context) {
+    videoChatOverlayEntry = OverlayEntry(
+        maintainState: true,
+        builder: (context) {
+          return Align(
+            alignment: Alignment.topRight,
+            child: _buildVideoDialIn(context),
+          );
+        });
+    Overlay.of(context)!.insert(videoChatOverlayEntry!);
+  }
+
+  _closeChatMessageOverlayEntry() {
+    if (chatMessageOverlayEntry != null) {
+      chatMessageOverlayEntry!.remove();
+      chatMessageOverlayEntry = null;
+    }
+  }
+
+  _showChatMessage(BuildContext context, ChatMessage chatMessage) {
+    chatMessageOverlayEntry = OverlayEntry(
+        maintainState: true,
+        builder: (context) {
+          return Align(
+            alignment: Alignment.topLeft,
+            child: ChatMessageItem(chatMessage: chatMessage),
+          );
+        });
+    Overlay.of(context)!.insert(chatMessageOverlayEntry!);
+    //延时，移除 OverlayEntry
+    Future.delayed(const Duration(seconds: 10)).then((value) {
+      _closeChatMessageOverlayEntry();
+    });
   }
 
   _update() async {
@@ -36,18 +82,21 @@ class _IndexViewState extends State<IndexView>
     if (chatMessage != null) {
       //视频通话请求消息
       if (chatMessage.subMessageType == ChatSubMessageType.videoChat.name) {
-        ChatReceiptType? chatReceiptType =
-            await showModalBottomSheet<ChatReceiptType>(
-                context: context, builder: _buildVideoDialIn);
-        if (chatReceiptType == ChatReceiptType.agree) {
-          //同意，发出本地流
-          logger.i('ChatReceiptType agree');
-        } else if (chatReceiptType == null ||
-            chatReceiptType == ChatReceiptType.reject) {
-          //拒绝，关闭对话框
-          logger.i('ChatReceiptType reject');
-        }
+        _showVideoChatMessage(context);
+      } else {
+        _showChatMessage(context, chatMessage);
       }
+    }
+  }
+
+  _onTap(String data) {
+    _closeVideoChatOverlayEntry();
+    if (data == ChatReceiptType.agree.name) {
+      //同意，发出本地流
+      logger.i('ChatReceiptType agree');
+    } else if (data == ChatReceiptType.reject.name) {
+      //拒绝，关闭对话框
+      logger.i('ChatReceiptType reject');
     }
   }
 
@@ -55,7 +104,10 @@ class _IndexViewState extends State<IndexView>
     ChatMessage? chatMessage = globalChatMessageController.chatMessage;
     if (chatMessage != null) {
       globalChatMessageController.chatMessage;
-      return VideoDialInWidget(chatMessage: chatMessage);
+      return VideoDialInWidget(
+        chatMessage: chatMessage,
+        onTap: _onTap,
+      );
     }
     return Container();
   }

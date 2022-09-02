@@ -230,6 +230,7 @@ class PeerVideoRender {
     Color? color,
     Widget? child,
   }) {
+    color = color ?? Colors.black;
     child ??= emptyVideoView;
     Widget container = Center(
       child: Container(

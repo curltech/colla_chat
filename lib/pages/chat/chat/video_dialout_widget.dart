@@ -1,6 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/peer_connections_controller.dart';
 import 'package:colla_chat/pages/chat/chat/video_view_card.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/widgets/common/blank_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -55,6 +56,8 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   late final String peerId;
   String? name;
   String? clientId;
+  double opacity = 0.5;
+  OverlayEntry? overlayEntry;
 
   @override
   void initState() {
@@ -100,6 +103,34 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
         }
       }
     }
+  }
+
+  _closeOverlayEntry() {
+    if (overlayEntry != null) {
+      overlayEntry!.remove();
+      overlayEntry = null;
+      chatMessageController.index = 1;
+    }
+  }
+
+  _minimize(BuildContext context) {
+    overlayEntry = OverlayEntry(
+        maintainState: true,
+        builder: (context) {
+          return Align(
+            alignment: Alignment.topRight,
+            child: WidgetUtil.buildCircleButton(
+                padding: const EdgeInsets.all(15.0),
+                backgroundColor: appDataProvider.themeData!.colorScheme.primary,
+                onPressed: () {
+                  _closeOverlayEntry();
+                },
+                child: const Icon(
+                    size: 32, color: Colors.white, Icons.zoom_out_map)),
+          );
+        });
+    Overlay.of(context)!.insert(overlayEntry!);
+    chatMessageController.index = 0;
   }
 
   _open(
@@ -158,6 +189,15 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
     return const BlankWidget();
   }
 
+  _opacity() {
+    if (opacity == 1) {
+      opacity = 0.5;
+    } else {
+      opacity = 1;
+    }
+    setState(() {});
+  }
+
   Future<void> _onAction(int index, String name) async {
     switch (index) {
       case 0:
@@ -175,6 +215,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
       case 4:
         break;
       case 5:
+        _opacity();
         break;
       case 6:
         break;
@@ -205,7 +246,9 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
           child: Row(
             children: [
               InkWell(
-                onTap: () {},
+                onTap: () {
+                  _minimize(context);
+                },
                 child: const Icon(Icons.zoom_in_map, size: 32),
               ),
               const SizedBox(
@@ -247,7 +290,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
 
   Widget _build(BuildContext context) {
     return Stack(children: [
-      _buildVideoViewCard(context),
+      Opacity(opacity: opacity, child: _buildVideoViewCard(context)),
       _buildDialOutView(context),
     ]);
   }

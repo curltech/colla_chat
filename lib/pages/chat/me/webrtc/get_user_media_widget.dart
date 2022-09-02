@@ -136,7 +136,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   }
 
   Widget _buildVideoView(BuildContext context) {
-    return render!.createVideoView(mirror: true);
+    return render!.createVideoView();
   }
 
   List<Widget>? _buildActions(BuildContext context) {
