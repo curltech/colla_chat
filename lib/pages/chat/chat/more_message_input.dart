@@ -87,7 +87,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     }
   }
 
-  _buildActionCard(BuildContext context) {
+  Widget _buildActionCard(BuildContext context) {
     return Container(
       margin: const EdgeInsets.all(0.0),
       padding: const EdgeInsets.only(bottom: 0.0),

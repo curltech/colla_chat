@@ -6,9 +6,15 @@ import '../../../../entity/dht/myself.dart';
 import '../../../../plugin/logger.dart';
 import '../../../../transport/webrtc/peer_video_render.dart';
 
+abstract class VideoRenderController with ChangeNotifier {
+  Map<String, PeerVideoRender> videoRenders({String? peerId, String? clientId});
+
+  close({String? id});
+}
+
 ///本地媒体通话控制器，内部数据为视频通话的请求消息，和回执消息
 ///如果本地的render存在，在创建peerconnection的时候将加入
-class LocalMediaController with ChangeNotifier {
+class LocalMediaController extends VideoRenderController {
   //媒体请求消息，对发起方来说是自己生成的(receiverPeerId)，对接受方来说是收到的(senderPeerId)
   ChatMessage? _chatMessage;
 
@@ -17,7 +23,7 @@ class LocalMediaController with ChangeNotifier {
 
   bool? initiator;
 
-  Map<String, PeerVideoRender> videoRenders = {};
+  Map<String, PeerVideoRender> _videoRenders = {};
 
   ChatMessage? get chatMessage {
     return _chatMessage;
@@ -91,30 +97,33 @@ class LocalMediaController with ChangeNotifier {
         audioMedia: audioMedia,
         displayMedia: displayMedia);
     await render.bindRTCVideoRender();
-    videoRenders[render.id!] = render;
+    _videoRenders[render.id!] = render;
     notifyListeners();
 
     return render;
   }
 
-  List<PeerVideoRender> getVideoRenders() {
-    return videoRenders.values.toList();
+  @override
+  Map<String, PeerVideoRender> videoRenders(
+      {String? peerId, String? clientId}) {
+    return _videoRenders;
   }
 
-  hangup({String? id}) {
+  @override
+  close({String? id}) {
     _chatMessage = null;
     _chatReceipt = null;
     initiator = null;
     if (id == null) {
-      for (var videoRender in videoRenders.values) {
+      for (var videoRender in _videoRenders.values) {
         videoRender.dispose();
       }
-      videoRenders.clear();
+      _videoRenders.clear();
     } else {
-      var videoRender = videoRenders[id];
+      var videoRender = _videoRenders[id];
       if (videoRender != null) {
         videoRender.dispose();
-        videoRenders.remove(id);
+        _videoRenders.remove(id);
       }
     }
     notifyListeners();

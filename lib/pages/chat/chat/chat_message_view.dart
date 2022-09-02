@@ -9,6 +9,7 @@ import '../../../l10n/localization.dart';
 import '../../../transport/webrtc/peer_connection_pool.dart';
 import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/common/widget_mixin.dart';
+import '../me/webrtc/peer_connection_controller.dart';
 import 'chat_message_widget.dart';
 
 /// 聊天界面，包括文本聊天，视频通话呼叫，视频通话三个组件
@@ -44,6 +45,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
   void initState() {
     super.initState();
     chatMessageController.addListener(_update);
+    peerConnectionPoolController.addListener(_update);
     init();
   }
 
@@ -103,6 +105,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
   @override
   void dispose() {
     chatMessageController.removeListener(_update);
+    peerConnectionPoolController.removeListener(_update);
     chatMessageController.index = 0;
     super.dispose();
   }

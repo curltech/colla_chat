@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import '../../../entity/chat/chat.dart';
 import '../../../plugin/logger.dart';
 import '../../../service/chat/chat.dart';
+import '../../../widgets/common/simple_widget.dart';
 import 'controller/peer_connections_controller.dart';
 
 ///视频通话拨入的对话框
@@ -30,7 +31,7 @@ class VideoDialInWidget extends StatelessWidget {
         await peerConnectionPool.create(
           peerId,
           clientId: clientId,
-          localRenders: localMediaController.videoRenders.values.toList(),
+          localRenders: localMediaController.videoRenders().values.toList(),
         );
         peerConnectionsController.add(peerId, clientId: clientId);
         indexWidgetProvider.push('video_chat');
@@ -40,36 +41,37 @@ class VideoDialInWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    return Container(
+        padding: const EdgeInsets.all(15.0),
         width: 180,
         height: 80,
         child: Column(children: [
-          Row(
-            children: [
-              const ImageWidget(image: ''),
-              Column(children: const [Text('胡劲松'), Text('邀请你进行视频通话')])
-            ],
-          ),
           Row(children: [
-            IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.cameraswitch),
-                color: Colors.grey),
-            const Text('切换语音通话'),
-            IconButton(
+            const ImageWidget(image: ''),
+            Column(children: const [
+              Text(
+                '胡劲松',
+                style: TextStyle(fontSize: 16),
+              ),
+              Text('邀请你进行视频通话', style: TextStyle(fontSize: 12)),
+            ]),
+            Expanded(child: Container()),
+            WidgetUtil.buildCircleButton(
                 onPressed: () {
                   _sendReceipt(ChatReceiptType.reject);
                   Navigator.pop(context, ChatReceiptType.reject);
                 },
-                icon: const Icon(Icons.clear),
-                color: Colors.red),
-            IconButton(
+                child:
+                    const Icon(color: Colors.white, size: 16, Icons.call_end),
+                backgroundColor: Colors.red),
+            WidgetUtil.buildCircleButton(
                 onPressed: () {
                   _sendReceipt(ChatReceiptType.agree);
                   Navigator.pop(context, ChatReceiptType.agree);
                 },
-                icon: const Icon(Icons.video_call),
-                color: Colors.green)
+                child:
+                    const Icon(color: Colors.white, size: 16, Icons.video_call),
+                backgroundColor: Colors.green)
           ])
         ]));
   }

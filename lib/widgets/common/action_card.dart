@@ -1,4 +1,5 @@
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 
@@ -18,37 +19,20 @@ class ActionCard extends StatelessWidget {
     return Container(
       padding: EdgeInsets.only(top: top, bottom: 5.0),
       width: (appDataProvider.mobileSize.width - 70) / 4,
-      child: Column(
-        children: <Widget>[
-          Container(
-            width: 50,
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.all(
-                Radius.circular(5.0),
-              ),
-            ),
-            child: IconButton(
-              onPressed: () {
-                if (onPressed != null) {
-                  onPressed!(index, tileData.title);
-                } else if (tileData.onTap != null) {
-                  tileData.onTap!(index, tileData.title);
-                }
-              },
-              padding: const EdgeInsets.all(5.0),
-              color: appDataProvider.themeData!.colorScheme.primary,
-              icon: tileData.icon!,
-            ),
-          ),
-          const SizedBox(height: 10.0 / 2),
-          Text(
-            tileData.title ?? '',
-            style: const TextStyle(
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
+      child: WidgetUtil.buildIconTextButton(
+          padding: const EdgeInsets.all(5.0),
+          iconColor: appDataProvider.themeData!.colorScheme.primary,
+          iconSize: 32,
+          onPressed: () {
+            if (onPressed != null) {
+              onPressed!(index, tileData.title);
+            } else if (tileData.onTap != null) {
+              tileData.onTap!(index, tileData.title);
+            }
+          },
+          text: tileData.title ?? '',
+          textColor: Colors.black,
+          icon: tileData.icon!),
     );
   }
 

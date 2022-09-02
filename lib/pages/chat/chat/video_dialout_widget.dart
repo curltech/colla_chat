@@ -1,5 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/peer_connections_controller.dart';
+import 'package:colla_chat/pages/chat/chat/video_view_card.dart';
+import 'package:colla_chat/widgets/common/blank_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
@@ -9,8 +11,10 @@ import '../../../service/chat/chat.dart';
 import '../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../transport/webrtc/base_peer_connection.dart';
 import '../../../transport/webrtc/peer_connection_pool.dart';
-import '../../../transport/webrtc/peer_video_render.dart';
+import '../../../widgets/common/action_card.dart';
 import '../../../widgets/common/image_widget.dart';
+import '../../../widgets/common/simple_widget.dart';
+import '../../../widgets/data_bind/data_listtile.dart';
 import 'chat_message_widget.dart';
 import 'controller/local_media_controller.dart';
 
@@ -23,6 +27,17 @@ import 'controller/local_media_controller.dart';
 ///6.发起方收到回执，如果是拒绝回执，关闭拨出窗口
 ///7.接收方等待远程视频流到来，显示
 ///8.如果发起方在接收回执到来前，自己主动终止请求，执行挂断操作，设置挂断标志，对远程流不予接受
+
+final List<TileData> actionTileData = [
+  TileData(title: '视频通话', icon: const Icon(Icons.video_call)),
+  TileData(title: '音频通话', icon: const Icon(Icons.multitrack_audio_outlined)),
+  TileData(title: '屏幕共享', icon: const Icon(Icons.screen_share)),
+  TileData(title: '媒体播放', icon: const Icon(Icons.video_file)),
+  TileData(title: '镜头切换', icon: const Icon(Icons.cameraswitch)),
+  TileData(title: '显示背景', icon: const Icon(Icons.photo_camera_back)),
+  TileData(title: '麦克风开关', icon: const Icon(Icons.mic_rounded)),
+  TileData(title: '扬声器开关', icon: const Icon(Icons.speaker_phone)),
+];
 
 ///视频通话拨出的窗口
 class VideoDialOutWidget extends StatefulWidget {
@@ -41,7 +56,6 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   String? name;
   String? clientId;
   bool isOpen = false;
-  PeerVideoRender? render;
 
   @override
   void initState() {
@@ -76,8 +90,11 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
             peerConnectionsController.add(peerId, clientId: clientId);
             chatMessageController.index = 2;
           } else if (title == ChatReceiptType.reject.name) {
-            if (render != null) {
-              localMediaController.hangup(id: render!.id);
+            var videoRenders = localMediaController.videoRenders();
+            if (videoRenders.isNotEmpty) {
+              for (var videoRender in videoRenders.values) {
+                localMediaController.close(id: videoRender.id);
+              }
             }
             chatMessageController.index = 0;
           }
@@ -99,7 +116,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null &&
         advancedPeerConnection.status == PeerConnectionStatus.connected) {
-      render = await localMediaController.createVideoRender(
+      await localMediaController.createVideoRender(
           stream: stream,
           videoMedia: videoMedia,
           audioMedia: audioMedia,
@@ -129,72 +146,120 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   }
 
   _close() {
-    localMediaController.hangup(id: render!.id);
+    localMediaController.close();
     isOpen = false;
     setState(() {});
   }
 
-  Future<Widget> _buildVideoView() async {
+  Widget _buildVideoViewCard(BuildContext context) {
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null &&
         advancedPeerConnection.status == PeerConnectionStatus.connected) {
-      Widget? videoView = render!.createVideoView(mirror: true);
-      return videoView;
+      return VideoViewCard(
+        controller: localMediaController,
+      );
     }
+    return const BlankWidget();
+  }
 
-    return Container();
+  Future<void> _onAction(int index, String name) async {
+    switch (index) {
+      case 0:
+        _open(videoMedia: true);
+        break;
+      case 1:
+        _open(audioMedia: true);
+        break;
+      case 2:
+        _open(displayMedia: true);
+        break;
+      case 3:
+        _open();
+        break;
+      case 4:
+        break;
+      case 5:
+        break;
+      case 6:
+        break;
+      case 7:
+        break;
+      default:
+        break;
+    }
+  }
+
+  Widget _buildActionCard(BuildContext context) {
+    double height = 180;
+    return Container(
+      margin: const EdgeInsets.all(0.0),
+      padding: const EdgeInsets.only(bottom: 0.0),
+      child: ActionCard(
+        actions: actionTileData,
+        height: height,
+        onPressed: _onAction,
+      ),
+    );
+  }
+
+  Widget _buildDialOutView(BuildContext context) {
+    return Column(children: [
+      Container(
+          padding: const EdgeInsets.all(15.0),
+          child: Row(
+            children: [
+              InkWell(
+                onTap: () {},
+                child: const Icon(Icons.zoom_in_map, size: 32),
+              ),
+              const SizedBox(
+                width: 25,
+              ),
+              Text(AppLocalizations.t('Waiting accept inviting...'),
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(fontSize: 16, color: Colors.black)),
+            ],
+          )),
+      Expanded(
+          child: Center(
+              child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+            const ImageWidget(image: ''),
+            Text(name ?? ''),
+          ]))),
+      _buildActionCard(context),
+      Center(
+          child: Container(
+        padding: const EdgeInsets.all(15.0),
+        child: WidgetUtil.buildCircleButton(
+          onPressed: () {
+            _close();
+          },
+          elevation: 2.0,
+          backgroundColor: Colors.red,
+          padding: const EdgeInsets.all(15.0),
+          child: const Icon(
+            Icons.call_end,
+            size: 48.0,
+            color: Colors.white,
+          ),
+        ),
+      )),
+    ]);
+  }
+
+  Widget _build(BuildContext context) {
+    return Stack(children: [
+      _buildVideoViewCard(context),
+      _buildDialOutView(context),
+    ]);
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(children: [
-      FutureBuilder(
-        future: _buildVideoView(),
-        builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
-          if (snapshot.hasData) {
-            return snapshot.data!;
-          } else {
-            return Center(child: Text(AppLocalizations.t('No video data')));
-          }
-        },
-      ),
-      Column(children: [
-        Row(
-          children: [
-            const ImageWidget(image: ''),
-            Column(children: [
-              Text(name ?? ''),
-              Text(AppLocalizations.t('Invite you video chat...'))
-            ])
-          ],
-        ),
-        const Expanded(child: Center()),
-        Row(children: [
-          IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.cameraswitch),
-              color: Colors.grey),
-          Text(AppLocalizations.t('Switch to audio chat')),
-          IconButton(
-              onPressed: () {},
-              icon: const Icon(Icons.clear),
-              color: Colors.red),
-          IconButton(
-              onPressed: () {
-                _open();
-              },
-              icon: const Icon(Icons.video_call),
-              color: Colors.green)
-        ]),
-        IconButton(
-            onPressed: () {
-              _close();
-            },
-            icon: const Icon(Icons.call_end),
-            color: Colors.red),
-      ])
-    ]);
+    return _build(context);
   }
 
   @override

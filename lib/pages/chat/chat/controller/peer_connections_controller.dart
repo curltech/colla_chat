@@ -1,12 +1,12 @@
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
-import 'package:flutter/material.dart';
 
 import '../../../../plugin/logger.dart';
 import '../../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../../transport/webrtc/peer_video_render.dart';
+import 'local_media_controller.dart';
 
 ///一组webrtc连接，这些连接与自己正在视频通话，此控制器用于通知视频通话界面的刷新
-class PeerConnectionsController with ChangeNotifier {
+class PeerConnectionsController extends VideoRenderController {
   ///对方的队列，每一个peerId的元素是一个列表，具有相同的peerId和不同的clientId
   final Map<String, Map<String, AdvancedPeerConnection>> _peerConnections = {};
   String? _roomId;
@@ -64,10 +64,10 @@ class PeerConnectionsController with ChangeNotifier {
     _peerConnections.clear();
   }
 
+  @override
   Map<String, PeerVideoRender> videoRenders(
       {String? peerId, String? clientId}) {
     Map<String, PeerVideoRender> allVideoRenders = {};
-    //allVideoRenders.addAll(localMediaController.videoRenders);
     List<AdvancedPeerConnection> peerConnections = [];
     if (peerId != null) {
       var pcs = _peerConnections[peerId];
@@ -98,6 +98,9 @@ class PeerConnectionsController with ChangeNotifier {
 
     return allVideoRenders;
   }
+
+  @override
+  close({String? id}) {}
 }
 
 final PeerConnectionsController peerConnectionsController =

@@ -1,27 +1,26 @@
 import 'package:colla_chat/pages/chat/chat/single_video_view_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../../plugin/logger.dart';
 import '../../../transport/webrtc/peer_video_render.dart';
-import 'controller/peer_connections_controller.dart';
+import 'controller/local_media_controller.dart';
 
 ///多个视频窗口的排列
 class VideoViewCard extends StatefulWidget {
-  const VideoViewCard({Key? key}) : super(key: key);
+  final VideoRenderController controller;
+
+  const VideoViewCard({Key? key, required this.controller}) : super(key: key);
 
   @override
   State createState() => _VideoViewCardState();
 }
 
 class _VideoViewCardState extends State<VideoViewCard> {
-  RTCVideoRenderer render = RTCVideoRenderer();
-
   @override
   initState() {
     super.initState();
-    peerConnectionsController.addListener(_update);
+    widget.controller.addListener(_update);
   }
 
   _update() {
@@ -49,9 +48,8 @@ class _VideoViewCardState extends State<VideoViewCard> {
   }
 
   Widget _buildVideoViews(BuildContext context) {
-    Map<String, PeerVideoRender> renders =
-        peerConnectionsController.videoRenders();
-    logger.i('peerConnectionsController videoRenders length:${renders.length}');
+    Map<String, PeerVideoRender> renders = widget.controller.videoRenders();
+    logger.i('VideoRenderController videoRenders length:${renders.length}');
     Size size = _calculateSize(renders.length);
     List<Widget> videoViews = [];
     for (var render in renders.values) {
@@ -76,7 +74,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
 
   @override
   void dispose() {
-    peerConnectionsController.removeListener(_update);
+    widget.controller.removeListener(_update);
     super.dispose();
   }
 }
