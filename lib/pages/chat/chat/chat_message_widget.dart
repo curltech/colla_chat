@@ -8,6 +8,8 @@ import 'package:flutter/material.dart';
 
 import '../../../entity/chat/chat.dart';
 import '../../../provider/data_list_controller.dart';
+import '../../../transport/webrtc/advanced_peer_connection.dart';
+import '../../../transport/webrtc/peer_connection_pool.dart';
 import '../me/webrtc/peer_connection_controller.dart';
 import 'chat_message_input.dart';
 import 'chat_message_item.dart';
@@ -159,6 +161,11 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
       peerId = chatSummary.peerId!;
       name = chatSummary.name!;
       clientId = chatSummary.clientId;
+      AdvancedPeerConnection? advancedPeerConnection =
+          peerConnectionPool.getOne(peerId, clientId: clientId);
+      if (advancedPeerConnection == null) {
+        peerConnectionPool.create(peerId);
+      }
     } else {
       logger.e('chatSummary is null');
     }
