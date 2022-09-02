@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../../../entity/chat/chat.dart';
-import '../../../entity/chat/chat.dart';
 import '../../../plugin/logger.dart';
 import '../../../service/chat/chat.dart';
 import '../../../transport/webrtc/advanced_peer_connection.dart';
@@ -48,11 +47,17 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   void initState() {
     super.initState();
     localMediaController.addListener(_receive);
-    ChatMessage? chatMessage = localMediaController.chatMessage;
-    if (chatMessage != null) {
-      peerId = chatMessage.receiverPeerId!;
-      name = chatMessage.receiverName;
-      clientId = chatMessage.receiverClientId;
+    _init();
+  }
+
+  _init() async {
+    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    if (chatSummary != null) {
+      peerId = chatSummary.peerId!;
+      name = chatSummary.name!;
+      clientId = chatSummary.clientId;
+    } else {
+      logger.e('chatSummary is null');
     }
   }
 
@@ -78,17 +83,6 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
           }
         }
       }
-    }
-  }
-
-  init() async {
-    ChatSummary? chatSummary = chatMessageController.chatSummary;
-    if (chatSummary != null) {
-      peerId = chatSummary.peerId!;
-      name = chatSummary.name!;
-      clientId = chatSummary.clientId;
-    } else {
-      logger.e('chatSummary is null');
     }
   }
 

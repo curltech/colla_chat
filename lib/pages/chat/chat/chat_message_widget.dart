@@ -144,7 +144,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     peerConnectionsController.addListener(_update);
     var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
-    init();
+    _init();
 
     ///滚到指定的位置
     // widget.scrollController.animateTo(offset,
@@ -155,7 +155,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     setState(() {});
   }
 
-  init() async {
+  _init() async {
     ChatSummary? chatSummary = chatMessageController.chatSummary;
     if (chatSummary != null) {
       peerId = chatSummary.peerId!;
