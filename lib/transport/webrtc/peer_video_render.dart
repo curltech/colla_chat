@@ -8,6 +8,7 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:path_provider/path_provider.dart';
 
+import '../../pages/chat/me/webrtc/screen_select_dialog.dart';
 import '../../platform.dart';
 
 final emptyVideoView = Center(
@@ -115,10 +116,16 @@ class PeerVideoRender {
         return;
       }
     }
+    if (selectedSource == null) {
+      var sources = await ScreenSelectUtil.getSources();
+      if (sources.isNotEmpty) {
+        selectedSource = sources[0];
+      }
+    }
     dynamic video = selectedSource == null
         ? true
         : {
-            'deviceId': {'exact': selectedSource!.id},
+            'deviceId': {'exact': selectedSource.id},
             'mandatory': {'frameRate': 30.0}
           };
     Map<String, dynamic> mediaConstraints = <String, dynamic>{
@@ -220,7 +227,7 @@ class PeerVideoRender {
   Widget _createVideoViewContainer({
     double? width,
     double? height,
-    Color color = Colors.black,
+    Color? color,
     Widget? child,
   }) {
     child ??= emptyVideoView;
@@ -246,7 +253,7 @@ class PeerVideoRender {
     bool fitScreen = false,
     double? width,
     double? height,
-    Color color = Colors.black,
+    Color? color,
   }) {
     RTCVideoView? videoView;
     var renderer = this.renderer;
@@ -255,7 +262,7 @@ class PeerVideoRender {
           objectFit: objectFit, mirror: mirror, filterQuality: filterQuality);
     }
     Widget container = _createVideoViewContainer(
-        width: width, height: height, child: videoView);
+        width: width, height: height, color: color, child: videoView);
     if (!fitScreen) {
       return container;
     }

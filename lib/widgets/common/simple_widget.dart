@@ -18,7 +18,7 @@ class WidgetUtil {
           const CircleBorder(),
         ),
       ),
-      onPressed: () {},
+      onPressed: onPressed,
       child: child,
     );
   }

@@ -41,9 +41,9 @@ final List<TileData> actionTileData = [
 
 ///视频通话拨出的窗口
 class VideoDialOutWidget extends StatefulWidget {
-  const VideoDialOutWidget({
-    Key? key,
-  }) : super(key: key);
+  final Color? color;
+
+  const VideoDialOutWidget({Key? key, this.color}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -55,7 +55,6 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   late final String peerId;
   String? name;
   String? clientId;
-  bool isOpen = false;
 
   @override
   void initState() {
@@ -108,10 +107,6 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
       bool videoMedia = false,
       bool audioMedia = false,
       bool displayMedia = false}) async {
-    if (isOpen) {
-      setState(() {});
-      return;
-    }
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null &&
@@ -126,7 +121,6 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
       } else {
         await _send();
       }
-      isOpen = true;
       setState(() {});
     }
   }
@@ -147,7 +141,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
 
   _close() {
     localMediaController.close();
-    isOpen = false;
+    chatMessageController.index = 0;
     setState(() {});
   }
 
@@ -158,6 +152,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
         advancedPeerConnection.status == PeerConnectionStatus.connected) {
       return VideoViewCard(
         controller: localMediaController,
+        color: widget.color,
       );
     }
     return const BlankWidget();

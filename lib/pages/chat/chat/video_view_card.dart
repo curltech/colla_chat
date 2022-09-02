@@ -8,8 +8,10 @@ import 'controller/local_media_controller.dart';
 ///多个视频窗口的排列
 class VideoViewCard extends StatefulWidget {
   final VideoRenderController controller;
+  final Color? color;
 
-  const VideoViewCard({Key? key, required this.controller}) : super(key: key);
+  const VideoViewCard({Key? key, required this.controller, this.color})
+      : super(key: key);
 
   @override
   State createState() => _VideoViewCardState();
@@ -27,8 +29,8 @@ class _VideoViewCardState extends State<VideoViewCard> {
   }
 
   Size _calculateSize(double totalWidth, double totalHeight, int count) {
-    var height = totalHeight;
-    var width = totalWidth;
+    var height = totalHeight - 4;
+    var width = totalWidth - 4;
     if (count <= 4) {
       height = totalHeight / count;
     } else if (count <= 8) {

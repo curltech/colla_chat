@@ -8,9 +8,10 @@ class SingleVideoViewWidget extends StatefulWidget {
   final PeerVideoRender render;
   final double? height;
   final double? width;
+  final Color? color;
 
   const SingleVideoViewWidget(
-      {Key? key, required this.render, this.height, this.width})
+      {Key? key, required this.render, this.height, this.width, this.color})
       : super(key: key);
 
   @override
@@ -31,7 +32,10 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   ///单个视频窗口
   Widget _buildSingleVideoView(BuildContext context) {
     Widget videoView = widget.render.createVideoView(
-        mirror: true, height: widget.height, width: widget.width);
+        mirror: true,
+        height: widget.height,
+        width: widget.width,
+        color: widget.color);
 
     return videoView;
   }

@@ -2,7 +2,6 @@ import 'dart:core';
 
 import 'package:colla_chat/pages/chat/me/webrtc/screen_select_dialog.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
