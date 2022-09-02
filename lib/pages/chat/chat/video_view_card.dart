@@ -1,5 +1,4 @@
 import 'package:colla_chat/pages/chat/chat/single_video_view_widget.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
 
 import '../../../plugin/logger.dart';
@@ -27,9 +26,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
     setState(() {});
   }
 
-  Size _calculateSize(int count) {
-    double totalWidth = appDataProvider.mobileSize.width;
-    double totalHeight = appDataProvider.mobileSize.height;
+  Size _calculateSize(double totalWidth, double totalHeight, int count) {
     var height = totalHeight;
     var width = totalWidth;
     if (count <= 4) {
@@ -47,10 +44,11 @@ class _VideoViewCardState extends State<VideoViewCard> {
     return Size(width, height);
   }
 
-  Widget _buildVideoViews(BuildContext context) {
+  Widget _buildVideoViews(BuildContext context, BoxConstraints constraints) {
     Map<String, PeerVideoRender> renders = widget.controller.videoRenders();
     logger.i('VideoRenderController videoRenders length:${renders.length}');
-    Size size = _calculateSize(renders.length);
+    Size size = _calculateSize(
+        constraints.maxWidth, constraints.maxHeight, renders.length);
     List<Widget> videoViews = [];
     for (var render in renders.values) {
       Widget videoView = SingleVideoViewWidget(
@@ -69,7 +67,10 @@ class _VideoViewCardState extends State<VideoViewCard> {
 
   @override
   Widget build(BuildContext context) {
-    return _buildVideoViews(context);
+    return LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+      return _buildVideoViews(context, constraints);
+    });
   }
 
   @override
