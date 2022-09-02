@@ -31,19 +31,12 @@ class MoreItemCard extends StatelessWidget {
                 Radius.circular(10.0),
               ),
             ),
-            child: FlatButton(
+            child: TextButton(
               onPressed: () {
                 if (onPressed != null) {
                   onPressed!();
                 }
               },
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(
-                  Radius.circular(10.0),
-                ),
-              ),
-              padding: EdgeInsets.all(0),
-              color: Colors.white,
               child: Container(
                 width: 50.0,
                 child: Image.asset(icon, fit: BoxFit.cover),

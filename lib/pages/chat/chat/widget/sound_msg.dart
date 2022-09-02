@@ -153,8 +153,7 @@ class _SoundMsgState extends State<SoundMsg> with TickerProviderStateMixin {
       Container(
         width: 100.0,
         padding: EdgeInsets.only(right: 10.0),
-        child: FlatButton(
-          padding: EdgeInsets.only(left: 18.0, right: 4.0),
+        child: TextButton(
           child: Row(
             mainAxisAlignment:
                 isSelf ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -171,10 +170,6 @@ class _SoundMsgState extends State<SoundMsg> with TickerProviderStateMixin {
               Spacer()
             ],
           ),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
-          color: widget.model.receiverPeerId != myself.peerId
-              ? Color(0xff98E165)
-              : Colors.white,
           onPressed: () {
             if (StringUtil.isNotEmpty(urls)) {
               playNew(urls);

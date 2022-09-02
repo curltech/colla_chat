@@ -271,10 +271,8 @@ class _ShootPageState extends State<ShootPage> with WidgetsBindingObserver {
                   margin: EdgeInsets.only(top: 10.0),
                   width: 60.0,
                   height: 25.0,
-                  child: FlatButton(
+                  child: TextButton(
                     onPressed: () {},
-                    color: Colors.white,
-                    padding: EdgeInsets.all(0),
                     child: Text(
                       '发送',
                       style: TextStyle(fontSize: 11.0),

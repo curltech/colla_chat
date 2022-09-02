@@ -17,9 +17,7 @@ class LaunchGroupItem extends StatelessWidget {
         ),
       ),
       alignment: Alignment.centerLeft,
-      child: FlatButton(
-        color: Colors.white,
-        padding: EdgeInsets.symmetric(vertical: 15.0),
+      child: TextButton(
         onPressed: () {
           if (item == '选择一个群') {
             //routePush(GroupSelectPage());

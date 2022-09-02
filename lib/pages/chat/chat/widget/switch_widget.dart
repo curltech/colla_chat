@@ -27,9 +27,7 @@ class _SwitchWidgetState extends State<SwitchWidget> {
   Widget build(BuildContext context) {
     return Column(
       children: <Widget>[
-        FlatButton(
-          padding: EdgeInsets.symmetric(vertical: 4.0, horizontal: 20.0),
-          color: Colors.white,
+        TextButton(
           onPressed: () {
             valueCan = !valueCan;
             setState(() {});

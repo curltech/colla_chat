@@ -16,11 +16,7 @@ class _SoundItemContainerState extends State<SoundItemContainer> {
     return Container(
         width: 100.0,
         padding: EdgeInsets.only(right: 10.0),
-        child: RaisedButton(
-          padding: EdgeInsets.only(left: 8.0, right: 4.0),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-          color: Colors.blueAccent,
+        child: TextButton(
           onPressed: widget.onPressed ?? () {},
           child: Row(
             mainAxisAlignment: MainAxisAlignment.end,
