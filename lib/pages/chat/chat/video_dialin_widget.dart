@@ -1,3 +1,4 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
@@ -60,42 +61,40 @@ class VideoDialInWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-        padding: const EdgeInsets.all(15.0),
-        width: 180,
-        height: 80,
-        child: Column(children: [
-          Row(children: [
-            const ImageWidget(image: ''),
-            Column(children: const [
-              Text(
-                '胡劲松',
-                style: TextStyle(fontSize: 16),
-              ),
-              Text('邀请你进行视频通话', style: TextStyle(fontSize: 12)),
-            ]),
-            Expanded(child: Container()),
-            WidgetUtil.buildCircleButton(
-                onPressed: () {
-                  _sendReceipt(ChatReceiptType.reject);
-                  if (onTap != null) {
-                    onTap!(chatMessage, ChatReceiptType.reject);
-                  }
-                },
-                child:
-                    const Icon(color: Colors.white, size: 16, Icons.call_end),
-                backgroundColor: Colors.red),
-            WidgetUtil.buildCircleButton(
-                onPressed: () {
-                  _sendReceipt(ChatReceiptType.agree);
-                  if (onTap != null) {
-                    onTap!(chatMessage, ChatReceiptType.agree);
-                  }
-                },
-                child:
-                    const Icon(color: Colors.white, size: 16, Icons.video_call),
-                backgroundColor: Colors.green)
-          ])
-        ]));
+    var name = chatMessage.senderName;
+    name = name ?? '';
+    return Card(
+        margin: EdgeInsets.zero,
+        elevation: 0,
+        color: Colors.black.withAlpha(128),
+        child: ListTile(
+            leading: const ImageWidget(image: ''),
+            title: Text(name),
+            subtitle: Text(AppLocalizations.t('Inviting you video chat')),
+            trailing: SizedBox(
+              width: 120,
+              child: Row(children: [
+                WidgetUtil.buildCircleButton(
+                    onPressed: () {
+                      _sendReceipt(ChatReceiptType.reject);
+                      if (onTap != null) {
+                        onTap!(chatMessage, ChatReceiptType.reject);
+                      }
+                    },
+                    child: const Icon(
+                        color: Colors.white, size: 16, Icons.call_end),
+                    backgroundColor: Colors.red),
+                WidgetUtil.buildCircleButton(
+                    onPressed: () {
+                      _sendReceipt(ChatReceiptType.agree);
+                      if (onTap != null) {
+                        onTap!(chatMessage, ChatReceiptType.agree);
+                      }
+                    },
+                    child: const Icon(
+                        color: Colors.white, size: 16, Icons.video_call),
+                    backgroundColor: Colors.green)
+              ]),
+            )));
   }
 }

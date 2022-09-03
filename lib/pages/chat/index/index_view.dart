@@ -3,12 +3,12 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../crypto/util.dart';
 import '../../../entity/chat/chat.dart';
 import '../../../plugin/logger.dart';
 import '../../../provider/app_data_provider.dart';
+import '../../../widgets/common/image_widget.dart';
 import '../../../widgets/style/platform_widget_factory.dart';
-import '../chat/chat_message_item.dart';
-import '../chat/chat_message_widget.dart';
 import '../login/loading.dart';
 import 'bottom_bar.dart';
 import 'global_chat_message_controller.dart';
@@ -48,7 +48,7 @@ class _IndexViewState extends State<IndexView>
         maintainState: true,
         builder: (context) {
           return Align(
-            alignment: Alignment.topRight,
+            alignment: Alignment.topLeft,
             child: _buildVideoDialIn(context, chatMessage),
           );
         });
@@ -63,13 +63,37 @@ class _IndexViewState extends State<IndexView>
   }
 
   _showChatMessage(BuildContext context, ChatMessage chatMessage) {
+    String? content = chatMessage.content;
+    if (content != null) {
+      var raw = CryptoUtil.decodeBase64(content);
+      content = CryptoUtil.utf8ToString(raw);
+    } else {
+      content = '';
+    }
+    String? title = chatMessage.title;
+    if (title != null) {
+      var raw = CryptoUtil.decodeBase64(title);
+      title = CryptoUtil.utf8ToString(raw);
+    } else {
+      title = '';
+    }
     chatMessageOverlayEntry = OverlayEntry(
         maintainState: true,
         builder: (context) {
+          var name = chatMessage.senderName;
+          name = name ?? '';
           return Align(
-            alignment: Alignment.topLeft,
-            child: ChatMessageItem(chatMessage: chatMessage),
-          );
+              alignment: Alignment.topLeft,
+              child: Card(
+                  margin: EdgeInsets.zero,
+                  elevation: 0,
+                  color: Colors.black.withAlpha(128),
+                  child: ListTile(
+                    leading: const ImageWidget(image: ''),
+                    title: Text(name),
+                    subtitle: Text(title!),
+                    trailing: Text(content!),
+                  )));
         });
     Overlay.of(context)!.insert(chatMessageOverlayEntry!);
     //延时，移除 OverlayEntry
