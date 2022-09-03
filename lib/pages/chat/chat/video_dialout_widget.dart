@@ -80,7 +80,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
 
   ///收到回执
   _receive() async {
-    ChatMessage? chatReceipt = localMediaController.chatReceipt;
+    ChatMessage? chatReceipt = videoChatReceiptController.chatReceipt;
     if (chatReceipt != null) {
       String? status = chatReceipt.status;
       String? subMessageType = chatReceipt.subMessageType;
@@ -179,7 +179,6 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
         contentType: ContentType.chat, subMessageType: subMessageType);
     //修改消息控制器
     chatMessageController.insert(0, chatMessage);
-    localMediaController.chatMessage = chatMessage;
     await chatMessageService.send(chatMessage);
 
     return chatMessage;

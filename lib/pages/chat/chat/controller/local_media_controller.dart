@@ -14,76 +14,9 @@ abstract class VideoRenderController with ChangeNotifier {
 
 ///本地媒体通话控制器，内部数据为视频通话的请求消息，和回执消息
 class LocalMediaController extends VideoRenderController {
-  //媒体请求消息，对发起方来说是自己生成的(receiverPeerId)，对接受方来说是收到的(senderPeerId)
-  ChatMessage? _chatMessage;
-
-  //媒体回执消息，对发起方来说是是收到的(senderPeerId)，对接受方来说是自己根据_chatMessage生成的(receiverPeerId)
-  ChatMessage? _chatReceipt;
-
-  bool? initiator;
-
   PeerVideoRender? _videoRender;
 
   final Map<String, PeerVideoRender> _videoRenders = {};
-
-  ChatMessage? get chatMessage {
-    return _chatMessage;
-  }
-
-  set chatMessage(ChatMessage? chatMessage) {
-    _chatMessage = chatMessage;
-    logger.i('request chatVideo chatMessage');
-    notifyListeners();
-  }
-
-  ChatMessage? get chatReceipt {
-    return _chatReceipt;
-  }
-
-  set chatReceipt(ChatMessage? chatReceipt) {
-    logger.i('received chatVideo chatReceipt');
-    _chatReceipt = chatReceipt;
-    notifyListeners();
-  }
-
-  String? get peerId {
-    bool? initiator = this.initiator;
-    ChatMessage? chatMessage = _chatMessage;
-    if (initiator == null || chatMessage == null) {
-      return null;
-    }
-    if (initiator) {
-      return chatMessage.receiverPeerId;
-    } else {
-      return chatMessage.senderPeerId;
-    }
-  }
-
-  String? get clientId {
-    bool? initiator = this.initiator;
-    ChatMessage? chatMessage = _chatMessage;
-    if (initiator == null || chatMessage == null) {
-      return null;
-    }
-    if (initiator) {
-      return chatMessage.receiverClientId;
-    } else {
-      return chatMessage.senderClientId;
-    }
-  }
-
-  String? get name {
-    bool? initiator = this.initiator;
-    ChatMessage? chatMessage = _chatMessage;
-    if (initiator == null || chatMessage == null) {
-      return null;
-    }
-    if (initiator) {
-      return chatMessage.receiverName;
-    } else {
-      return chatMessage.senderName;
-    }
-  }
 
   Future<PeerVideoRender> createVideoRender(
       {MediaStream? stream,
@@ -127,9 +60,6 @@ class LocalMediaController extends VideoRenderController {
 
   @override
   close({String? id}) {
-    _chatMessage = null;
-    _chatReceipt = null;
-    initiator = null;
     if (id == null) {
       for (var videoRender in _videoRenders.values) {
         videoRender.dispose();
@@ -151,3 +81,61 @@ class LocalMediaController extends VideoRenderController {
 }
 
 final LocalMediaController localMediaController = LocalMediaController();
+
+///视频通话的请求消息，和回执消息控制器
+class VideoChatReceiptController with ChangeNotifier {
+  //媒体回执消息，对发起方来说是是收到的(senderPeerId)，对接受方来说是自己根据_chatMessage生成的(receiverPeerId)
+  ChatMessage? _chatReceipt;
+
+  ChatMessage? get chatReceipt {
+    return _chatReceipt;
+  }
+
+  set chatReceipt(ChatMessage? chatReceipt) {
+    logger.i('received chatVideo chatReceipt');
+    _chatReceipt = chatReceipt;
+    notifyListeners();
+  }
+
+  String? get peerId {
+    ChatMessage? chatMessage = _chatReceipt;
+    if (chatMessage == null) {
+      return null;
+    }
+    String? direct = chatMessage.direct;
+    if (direct == ChatDirect.send.name) {
+      return chatMessage.receiverPeerId;
+    } else {
+      return chatMessage.senderPeerId;
+    }
+  }
+
+  String? get clientId {
+    ChatMessage? chatMessage = _chatReceipt;
+    if (chatMessage == null) {
+      return null;
+    }
+    String? direct = chatMessage.direct;
+    if (direct == ChatDirect.send.name) {
+      return chatMessage.receiverClientId;
+    } else {
+      return chatMessage.senderClientId;
+    }
+  }
+
+  String? get name {
+    ChatMessage? chatMessage = _chatReceipt;
+    if (chatMessage == null) {
+      return null;
+    }
+    String? direct = chatMessage.direct;
+    if (direct == ChatDirect.send.name) {
+      return chatMessage.receiverName;
+    } else {
+      return chatMessage.senderName;
+    }
+  }
+}
+
+final VideoChatReceiptController videoChatReceiptController =
+    VideoChatReceiptController();

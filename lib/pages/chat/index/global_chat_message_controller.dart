@@ -42,10 +42,10 @@ class GlobalChatMessageController with ChangeNotifier {
         case ChatSubMessageType.chatReceipt:
           if (chatMessage.status == ChatReceiptType.agree.name) {
             //收到视频通话邀请同意回执，发出本地流，关闭拨号窗口VideoDialOutWidget，显示视频通话窗口VideoChatWidget
-            localMediaController.chatReceipt = chatMessage;
+            videoChatReceiptController.chatReceipt = chatMessage;
           } else if (chatMessage.status == ChatReceiptType.reject.name) {
             //收到视频通话邀请拒绝回执，关闭本地流，关闭拨号窗口VideoDialOutWidget
-            localMediaController.chatReceipt = chatMessage;
+            videoChatReceiptController.chatReceipt = chatMessage;
           }
           break;
         case ChatSubMessageType.preKeyBundle:
