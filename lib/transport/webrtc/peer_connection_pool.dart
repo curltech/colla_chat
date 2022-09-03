@@ -410,9 +410,6 @@ class PeerConnectionPool {
       advancedPeerConnection = AdvancedPeerConnection(peerId, false,
           clientId: clientId, name: name, room: room);
       await put(peerId, advancedPeerConnection, clientId: clientId);
-      logger.i(
-          'advancedPeerConnection ${advancedPeerConnection.basePeerConnection.id} created ');
-
       peerConnectionPoolController.onCreated(WebrtcEvent(peerId,
           clientId: clientId, data: advancedPeerConnection));
     }
