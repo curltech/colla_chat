@@ -63,7 +63,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   @override
   void initState() {
     super.initState();
-    localMediaController.addListener(_receive);
+    localMediaController.addListener(_receivedReceipt);
     _init();
   }
 
@@ -79,7 +79,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   }
 
   ///收到回执
-  _receive() async {
+  _receivedReceipt() async {
     ChatMessage? chatReceipt = videoChatReceiptController.chatReceipt;
     if (chatReceipt != null) {
       String? status = chatReceipt.status;
@@ -316,7 +316,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
 
   @override
   void dispose() {
-    localMediaController.removeListener(_receive);
+    localMediaController.removeListener(_receivedReceipt);
     super.dispose();
   }
 }
