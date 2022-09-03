@@ -118,6 +118,7 @@ class GlobalChatMessageController with ChangeNotifier {
     var json = signalSessionPool.signalKeyPair.preKeyBundleToJson(preKeyBundle);
     ChatMessage chatMessage = await chatMessageService.buildChatMessage(peerId,
         clientId: clientId,
+        messageType: ChatMessageType.system,
         subMessageType: ChatSubMessageType.preKeyBundle,
         data: CryptoUtil.stringToUtf8(json));
     await chatMessageService.send(chatMessage,

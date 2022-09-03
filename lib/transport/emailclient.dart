@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:enough_mail/discover.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_html/enough_mail_html.dart';
@@ -68,7 +67,7 @@ class EmailMessageUtil {
     ChatMessage chatMessage = ChatMessage(myself.peerId ?? '');
     chatMessage.id = message.guid;
     chatMessage.messageId = message.uid.toString();
-    chatMessage.messageType = MessageType.email.name;
+    chatMessage.messageType = ChatMessageType.email.name;
     chatMessage.title = message.decodeSubject();
     var from = message.from;
     if (from != null && from.isNotEmpty) {

@@ -101,7 +101,7 @@ class DataBuilder {
       chatMessage.content = 'message content$i';
       chatMessage.contentType = ContentType.text.name;
       chatMessage.messageId = await cryptoGraphy.getRandomAsciiString();
-      chatMessage.messageType = MessageType.chat.name;
+      chatMessage.messageType = ChatMessageType.chat.name;
       if (i % 2 == 0) {
         chatMessage.direct = ChatDirect.send.name;
         if (i % 3 == 0) {

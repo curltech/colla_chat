@@ -659,6 +659,7 @@ class PeerConnectionPool {
             peerId,
             data: data,
             clientId: clientId,
+            messageType: ChatMessageType.system,
             subMessageType: ChatSubMessageType.signal);
         await chatMessageService.send(chatMessage);
         logger.i('sent signal by webrtc peerId:$peerId, clientId:$clientId');

@@ -395,7 +395,7 @@ class MailDataProvider with ChangeNotifier {
         var chatMessage = EmailMessageUtil.convertToChatMessage(mimeMessage);
         chatMessage.subMessageType = currentMailboxName;
         chatMessage.senderAddress = email;
-        chatMessage.actualReceiveTime = DateUtil.currentDate();
+        chatMessage.receiveTime = DateUtil.currentDate();
         var old = await chatMessageService.get(mimeMessage.guid!);
         if (old == null) {
           await chatMessageService.insert(chatMessage);
@@ -432,7 +432,8 @@ class MailDataProvider with ChangeNotifier {
     var currentChatMessagePage = this.currentChatMessagePage;
     if (currentChatMessagePage == null) {
       chatMessageService
-          .findByMessageType(MessageType.email.name, email, currentMailboxName)
+          .findByMessageType(
+              ChatMessageType.email.name, email, currentMailboxName)
           .then((chatMessagePage) {
         currentChatMessagePage = chatMessagePage;
         this.currentChatMessagePage = chatMessagePage;
@@ -444,7 +445,8 @@ class MailDataProvider with ChangeNotifier {
     } else {
       var offset = currentChatMessagePage.next();
       chatMessageService
-          .findByMessageType(MessageType.email.name, email, currentMailboxName,
+          .findByMessageType(
+              ChatMessageType.email.name, email, currentMailboxName,
               offset: offset)
           .then((chatMessagePage) {
         if (currentChatMessagePage != null) {

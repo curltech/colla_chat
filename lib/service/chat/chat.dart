@@ -71,13 +71,13 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     if (messageType != null) {
       where = '$where and messageType=?';
       whereArgs.add(messageType);
+    } else {
+      where = '$where and messageType!=?';
+      whereArgs.add(ChatMessageType.system.name);
     }
     if (subMessageType != null) {
       where = '$where and subMessageType=?';
       whereArgs.add(subMessageType);
-    } else {
-      where = '$where and subMessageType!=?';
-      whereArgs.add(ChatSubMessageType.preKeyBundle.name);
     }
     return find(
         where: where,
@@ -102,13 +102,13 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     if (messageType != null) {
       where = '$where and messageType=?';
       whereArgs.add(messageType);
+    } else {
+      where = '$where and messageType!=?';
+      whereArgs.add(ChatMessageType.system.name);
     }
     if (subMessageType != null) {
       where = '$where and subMessageType=?';
       whereArgs.add(subMessageType);
-    } else {
-      where = '$where and subMessageType!=?';
-      whereArgs.add(ChatSubMessageType.preKeyBundle.name);
     }
     if (id != null) {
       where = '$where and id>?';
@@ -120,7 +120,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
 
   Future<void> receiveChatMessage(ChatMessage chatMessage) async {
     String? subMessageType = chatMessage.subMessageType;
-    //回执
+    //收到回执，更新原消息
     if (subMessageType == ChatSubMessageType.chatReceipt.name) {
       String? messageId = chatMessage.messageId;
       if (messageId == null) {
@@ -131,28 +131,17 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         logger.e('chatReceipt message has no chatMessage with same messageId');
         return;
       }
-      String? title = chatMessage!.title;
-      msg.actualReceiveTime = chatMessage.actualReceiveTime;
-      msg.receiveTime = DateUtil.currentDate();
-      msg.status = MessageStatus.received.name;
-      if (title == ChatReceiptType.received.name) {
-      } else if (title == ChatReceiptType.read.name) {
-        msg.readTime = DateUtil.currentDate();
-      } else if (title == ChatReceiptType.agree.name) {
-        msg.title = MessageStatus.agree.name;
-      } else if (title == ChatReceiptType.reject.name) {
-        msg.title = MessageStatus.reject.name;
-      } else if (title == ChatReceiptType.deleted.name) {
-        msg.deleteTime = chatMessage.deleteTime;
-        msg.status = MessageStatus.deleted.name;
-      }
+      msg.receiptTime = chatMessage.receiptTime;
+      msg.receiveTime = chatMessage.receiveTime;
+      msg.status = chatMessage.status;
+      msg.readTime = chatMessage.readTime;
+      msg.deleteTime = chatMessage.deleteTime;
       await update(msg);
       await chatSummaryService.upsertByChatMessage(msg);
     } else {
-      //一般消息
+      //收到一般消息，保存
       chatMessage.direct = ChatDirect.receive.name;
       chatMessage.receiveTime = DateUtil.currentDate();
-      chatMessage.actualReceiveTime = DateUtil.currentDate();
       chatMessage.status = MessageStatus.received.name;
       chatMessage.id = null;
       await insert(chatMessage);
@@ -160,9 +149,22 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     }
   }
 
-  //创建回执，subMessageType为chatReceipt，title为
+  //创建回执，subMessageType为chatReceipt
   Future<ChatMessage?> buildChatReceipt(
       ChatMessage chatMessage, ChatReceiptType receiptType) async {
+    chatMessage.receiptTime = DateUtil.currentDate();
+    if (receiptType == ChatReceiptType.read) {
+      chatMessage.readTime = DateUtil.currentDate();
+    } else if (receiptType == ChatReceiptType.agree) {
+      chatMessage.status = MessageStatus.agree.name;
+    } else if (receiptType == ChatReceiptType.reject) {
+      chatMessage.status = MessageStatus.reject.name;
+    } else if (receiptType == ChatReceiptType.deleted) {
+      chatMessage.deleteTime = chatMessage.deleteTime;
+      chatMessage.status = MessageStatus.deleted.name;
+    }
+    await update(chatMessage);
+
     ChatMessage msg = ChatMessage(myself.peerId!);
     msg.messageId = chatMessage.messageId;
     msg.messageType = chatMessage.messageType;
@@ -190,22 +192,11 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       }
     }
     msg.receiverName = senderName;
-    if (receiptType == ChatReceiptType.received) {
-      msg.actualReceiveTime = DateUtil.currentDate();
-      msg.receiveTime = DateUtil.currentDate();
-      msg.title = ChatReceiptType.received.name;
-    } else if (receiptType == ChatReceiptType.read) {
-      msg.readTime = DateUtil.currentDate();
-      msg.title = ChatReceiptType.read.name;
-    } else if (receiptType == ChatReceiptType.agree) {
-      msg.title = ChatReceiptType.agree.name;
-    } else if (receiptType == ChatReceiptType.reject) {
-      msg.title = ChatReceiptType.reject.name;
-    } else if (receiptType == ChatReceiptType.deleted) {
-      msg.deleteTime = chatMessage.deleteTime;
-      msg.title = ChatReceiptType.deleted.name;
-    }
-    await insert(msg);
+    msg.receiptTime = chatMessage.receiptTime;
+    msg.receiveTime = chatMessage.receiveTime;
+    msg.status = chatMessage.status;
+    msg.readTime = chatMessage.readTime;
+    msg.deleteTime = chatMessage.deleteTime;
 
     return msg;
   }
@@ -215,7 +206,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String peerId, {
     List<int>? data,
     String? clientId,
-    MessageType messageType = MessageType.chat,
+    ChatMessageType messageType = ChatMessageType.chat,
     ChatSubMessageType subMessageType = ChatSubMessageType.chat,
     ContentType contentType = ContentType.text,
     String? name,
@@ -273,7 +264,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   Future<List<ChatMessage>> buildGroupChatMessage(
     String groupPeerId, {
     List<int>? data,
-    MessageType messageType = MessageType.chat,
+    ChatMessageType messageType = ChatMessageType.chat,
     ChatSubMessageType subMessageType = ChatSubMessageType.chat,
     ContentType contentType = ContentType.text,
     String? title,
@@ -496,7 +487,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
 
   ///新的ChatMessage来了，更新ChatSummary
   upsertByChatMessage(ChatMessage chatMessage) async {
-    if (chatMessage.subMessageType == ChatSubMessageType.preKeyBundle.name) {
+    if (chatMessage.messageType == ChatMessageType.system.name) {
       return;
     }
     var groupPeerId = chatMessage.groupPeerId;

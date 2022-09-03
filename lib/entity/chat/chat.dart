@@ -31,12 +31,8 @@ enum ContentType {
   busy
 }
 
-// 消息类型（messageType）
-enum MessageType {
-  email,
-  chat,
-  sms,
-}
+// 消息类型（messageType）,system消息不在聊天界面显示
+enum ChatMessageType { email, chat, system }
 
 enum ChatSubMessageType {
   addLinkman, // 新增联系人请求
@@ -69,6 +65,7 @@ enum ChatSubMessageType {
   deleteChat,
   chatReceipt, // 接收回复
   groupFile,
+  //system消息
   signal, //webrtc signal消息，一般用于重新协商的情况
   preKeyBundle, //signal加解密
 }
@@ -96,7 +93,7 @@ enum PartyType { linkman, group, peerClient, contact, channel, room }
 
 enum ChatDirect { receive, send }
 
-enum TransportType { websocket, webrtc, mail, sms }
+enum TransportType { websocket, webrtc, email, sms }
 
 // 消息，泛指一切社交复合文档，最简单的是一句话，最复杂可以是非常复杂的混合文本，图片，视频的文档
 class ChatMessage extends StatusEntity {
@@ -127,8 +124,7 @@ class ChatMessage extends StatusEntity {
   String? groupName;
   String? receiverAddress;
   String? receiveTime; // 接收时间
-  String?
-      actualReceiveTime; // 实际接收时间 1.发送端发送消息时receiveTime=createDate，actualReceiveTime=null；2.根据actualReceiveTime是否为null判断是否需要重发，收到接受回执时更新actualReceiveTime；3.聊天区按receiveTime排序，查找聊天内容按createDate排序
+  String? receiptTime; // 发送回执时间
   String? readTime; // 阅读时间
   String? title; // 消息标题
   String? thumbBody; // 预览内容（适用需预览的content，如笔记、转发聊天）
@@ -179,7 +175,7 @@ class ChatMessage extends StatusEntity {
         senderType = json['senderType'],
         sendTime = json['sendTime'],
         receiveTime = json['receiveTime'],
-        actualReceiveTime = json['actualReceiveTime'],
+        receiptTime = json['receiptTime'],
         readTime = json['readTime'],
         title = json['title'],
         thumbBody = json['thumbBody'],
@@ -233,7 +229,7 @@ class ChatMessage extends StatusEntity {
       'senderAddress': senderAddress,
       'sendTime': sendTime,
       'receiveTime': receiveTime,
-      'actualReceiveTime': actualReceiveTime,
+      'receiptTime': receiptTime,
       'readTime': readTime,
       'title': title,
       'thumbBody': thumbBody,
