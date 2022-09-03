@@ -115,7 +115,7 @@ class _IndexViewState extends State<IndexView>
           ChatSubMessageType.audioChat.name) {
         _showVideoChatMessage(context, chatMessage);
       } else {
-        _showChatMessage(context, chatMessage);
+        //_showChatMessage(context, chatMessage);
       }
     }
   }
