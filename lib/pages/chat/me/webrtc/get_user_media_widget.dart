@@ -136,7 +136,12 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   }
 
   Widget _buildVideoView(BuildContext context) {
-    return render!.createVideoView();
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+    return render!.createVideoView(
+      width: width,
+      height: height,
+    );
   }
 
   List<Widget>? _buildActions(BuildContext context) {

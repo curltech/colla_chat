@@ -6,12 +6,16 @@ import 'controller/peer_connections_controller.dart';
 ///单个视频窗口
 class SingleVideoViewWidget extends StatefulWidget {
   final PeerVideoRender render;
-  final double? height;
-  final double? width;
+  final double height;
+  final double width;
   final Color? color;
 
   const SingleVideoViewWidget(
-      {Key? key, required this.render, this.height, this.width, this.color})
+      {Key? key,
+      required this.render,
+      required this.height,
+      required this.width,
+      this.color})
       : super(key: key);
 
   @override
@@ -32,9 +36,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   ///单个视频窗口
   Widget _buildSingleVideoView(BuildContext context) {
     Widget videoView = widget.render.createVideoView(
-        height: widget.height,
-        width: widget.width,
-        color: widget.color);
+        height: widget.height, width: widget.width, color: widget.color);
 
     return videoView;
   }

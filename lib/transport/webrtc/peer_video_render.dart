@@ -225,8 +225,8 @@ class PeerVideoRender {
   }
 
   Widget _createVideoViewContainer({
-    double? width,
-    double? height,
+    required double width,
+    required double height,
     Color? color,
     Widget? child,
   }) {
@@ -252,8 +252,8 @@ class PeerVideoRender {
     bool mirror = false,
     FilterQuality filterQuality = FilterQuality.low,
     bool fitScreen = false,
-    double? width,
-    double? height,
+    required double width,
+    required double height,
     Color? color,
   }) {
     RTCVideoView? videoView;
@@ -270,8 +270,8 @@ class PeerVideoRender {
     //用屏幕尺寸
     return OrientationBuilder(
       builder: (context, orientation) {
-        width = width ?? MediaQuery.of(context).size.width;
-        height = height ?? MediaQuery.of(context).size.height;
+        var width = MediaQuery.of(context).size.width;
+        var height = MediaQuery.of(context).size.height;
         container = _createVideoViewContainer(
             width: width, height: height, child: videoView);
         return container;

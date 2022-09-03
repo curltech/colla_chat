@@ -101,15 +101,20 @@ class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
   }
 
   Widget _buildVideoView(BuildContext context) {
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
     return OrientationBuilder(
       builder: (context, orientation) {
         return Center(
           child: Container(
             margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-            width: MediaQuery.of(context).size.width,
-            height: MediaQuery.of(context).size.height,
+            width: width,
+            height: height,
             decoration: const BoxDecoration(color: Colors.black),
-            child: peerVideoRenderer.createVideoView(),
+            child: peerVideoRenderer.createVideoView(
+              width: width,
+              height: height,
+            ),
           ),
         );
       },
