@@ -561,7 +561,7 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus already negotiating');
       return;
     }
-    //logger.i('Start negotiate');
+    logger.w('Start negotiate');
     status == PeerConnectionStatus.negotiating;
     await _createOffer();
   }
@@ -694,7 +694,7 @@ class BasePeerConnection {
       return;
     }
     //被叫发送重新协商的请求
-    logger.i('send signal renegotiate from slave');
+    logger.w('send signal renegotiate');
     emit(WebrtcEventType.signal,
         WebrtcSignal('renegotiate', renegotiate: true, extension: extension));
     status == PeerConnectionStatus.negotiating;

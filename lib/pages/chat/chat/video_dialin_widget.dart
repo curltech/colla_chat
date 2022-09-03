@@ -29,10 +29,10 @@ class VideoDialInWidget extends StatelessWidget {
     ChatMessage? chatReceipt =
         await chatMessageService.buildChatReceipt(chatMessage, receiptType);
     if (chatReceipt != null) {
+      logger.w('sent videoChat chatReceipt ${receiptType.name}');
       await chatMessageService.send(chatReceipt);
       videoChatReceiptController.chatReceipt = chatReceipt;
       String? subMessageType = chatMessage.subMessageType;
-      logger.i('sent videoChat chatReceipt ${receiptType.name}');
       if (receiptType == ChatReceiptType.agree) {
         var peerId = chatReceipt.receiverPeerId!;
         var clientId = chatReceipt.receiverClientId!;
@@ -52,7 +52,7 @@ class VideoDialInWidget extends StatelessWidget {
         if (advancedPeerConnection != null) {
           await advancedPeerConnection.addRender(render);
           peerConnectionsController.add(peerId, clientId: clientId);
-          indexWidgetProvider.push('video_chat');
+          indexWidgetProvider.push('chat_message');
           chatMessageController.index = 2;
         }
       }
@@ -69,8 +69,8 @@ class VideoDialInWidget extends StatelessWidget {
         color: Colors.black.withAlpha(128),
         child: ListTile(
             leading: const ImageWidget(image: ''),
-            title: Text(name),
-            subtitle: Text(AppLocalizations.t('Inviting you video chat')),
+            title: Text(name, style: const TextStyle(color: Colors.white)),
+            subtitle: Text(AppLocalizations.t('Inviting you video chat'), style: const TextStyle(color: Colors.white)),
             trailing: SizedBox(
               width: 120,
               child: Row(children: [

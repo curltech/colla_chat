@@ -90,9 +90,12 @@ class _IndexViewState extends State<IndexView>
                   color: Colors.black.withAlpha(128),
                   child: ListTile(
                     leading: const ImageWidget(image: ''),
-                    title: Text(name),
-                    subtitle: Text(title!),
-                    trailing: Text(content!),
+                    title:
+                        Text(name, style: const TextStyle(color: Colors.white)),
+                    subtitle: Text(title!,
+                        style: const TextStyle(color: Colors.white)),
+                    trailing: Text(content!,
+                        style: const TextStyle(color: Colors.white)),
                   )));
         });
     Overlay.of(context)!.insert(chatMessageOverlayEntry!);

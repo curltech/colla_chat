@@ -85,7 +85,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
       String? status = chatReceipt.status;
       String? subMessageType = chatReceipt.subMessageType;
       if (subMessageType != null) {
-        logger.i('received videoChat chatReceipt status: $status');
+        logger.w('received videoChat chatReceipt status: $status');
         if (subMessageType == ChatSubMessageType.chatReceipt.name) {
           if (status == ChatReceiptType.agree.name) {
             var peerId = chatReceipt.senderPeerId!;
