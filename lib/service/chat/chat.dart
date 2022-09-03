@@ -206,6 +206,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String peerId, {
     List<int>? data,
     String? clientId,
+    TransportType transportType = TransportType.webrtc,
     ChatMessageType messageType = ChatMessageType.chat,
     ChatSubMessageType subMessageType = ChatSubMessageType.chat,
     ContentType contentType = ContentType.text,
@@ -252,7 +253,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       chatMessage.content = CryptoUtil.encodeBase64(data);
       chatMessage.contentType = contentType.name;
     }
-    status = MessageStatus.sent.name;
+    chatMessage.status = status ?? MessageStatus.sent.name;
+    chatMessage.transportType = transportType.name;
 
     await insert(chatMessage);
     await chatSummaryService.upsertByChatMessage(chatMessage);
