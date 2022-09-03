@@ -42,7 +42,7 @@ class VideoDialInWidget extends StatelessWidget {
               await localMediaController.createVideoRender(audioMedia: true);
         }
         render = render ??
-            await localMediaController.createVideoRender(videoMedia: true);
+            await localMediaController.createVideoRender(displayMedia: true);
 
         AdvancedPeerConnection? advancedPeerConnection =
             peerConnectionPool.getOne(
