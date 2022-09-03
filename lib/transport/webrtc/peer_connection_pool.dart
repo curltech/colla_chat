@@ -364,7 +364,7 @@ class PeerConnectionPool {
             var start = peerConnection.basePeerConnection.start;
             var now = DateTime.now().millisecondsSinceEpoch;
             var gap = now - start!;
-            var limit = const Duration(minutes: 10);
+            var limit = const Duration(seconds: 20);
             if (gap > limit.inMilliseconds) {
               removedClientIds.add(peerConnection.clientId!);
               logger.e(

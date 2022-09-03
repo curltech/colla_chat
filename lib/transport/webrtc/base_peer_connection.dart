@@ -153,19 +153,20 @@ enum WebrtcEventType {
   dataChannelState,
 }
 
+enum NegotiateStatus {
+  none,
+  negotiating, //协商过程中
+  negotiated,
+}
+
 enum PeerConnectionStatus {
   none,
   created,
   init,
   reconnecting,
-  negotiating, //协商过程中
-  negotiated,
   failed,
   connected, //连接是否完全建立，即协商过程结束
   closed, //是否关闭连接完成
-  //激活和失活状态是连接被关闭，但是保存了sdp和candidate信息的情况下，快速恢复连接的操作，省去了协商过程
-  active,
-  inactive,
 }
 
 /// 基础的PeerConnection，实现建立连接和sdp协商
@@ -179,32 +180,16 @@ class BasePeerConnection {
   //webrtc连接，在失活状态下为空，init后不为空
   RTCPeerConnection? peerConnection;
   PeerConnectionStatus _status = PeerConnectionStatus.created;
+  NegotiateStatus _negotiateStatus = NegotiateStatus.none;
 
   //数据通道的状态是否打开
   bool dataChannelOpen = false;
-
-  //本地的sdp，
-  RTCSessionDescription? localSdp;
-
-  //远程传来的sdp，
-  RTCSessionDescription? remoteSdp;
-
-  //本地产生的candidate
-  List<RTCIceCandidate> localCandidates = [];
-
-  //远程传入的candidate信息，可能先于offer或者answer到来，缓存起来
-  //对主叫方来说，等待answer到来以后统一处理
-  //对被叫方来说，等待offer到来以后统一处理
-  List<RTCIceCandidate> remoteCandidates = [];
 
   //主动发送数据的通道
   RTCDataChannel? dataChannel;
 
   //是否需要主动建立数据通道
   bool needDataChannel = true;
-
-  //本地媒体流渲染器数组，在init方法中传入
-  //Map<String, MediaStream> localStreams = {};
 
   //远程媒体流渲染器数组，在onAddStream,onAddTrack等的回调方法中得到
   Map<String, MediaStream> streams = {};
@@ -237,7 +222,7 @@ class BasePeerConnection {
   int? start;
   int? end;
 
-  int heartTimes = 3000; // 心跳间隔(毫秒)
+  int delayTimes = 20;
   int reconnectTimes = 1;
 
   BasePeerConnection({required this.initiator}) {
@@ -347,25 +332,18 @@ class BasePeerConnection {
   }
 
   set status(PeerConnectionStatus status) {
-    _status = status;
     emit(WebrtcEventType.status, {'oldStatus': _status, 'newStatus': status});
+    _status = status;
   }
 
-  /// 重连方法
-  Future<void> reconnect({List<MediaStream> localStreams = const []}) async {
+  NegotiateStatus get negotiateStatus {
+    return _negotiateStatus;
+  }
+
+  set negotiateStatus(NegotiateStatus negotiateStatus) {
     logger.i(
-        'webrtc peerId:${extension!.peerId},clientId:${extension!.clientId} reconnecting');
-    await close();
-    await init(extension: extension!, localStreams: localStreams);
-    status = PeerConnectionStatus.reconnecting;
-    var peerConnection = this.peerConnection!;
-    if (initiator) {
-      peerConnection.setLocalDescription(localSdp!);
-      peerConnection.setRemoteDescription(remoteSdp!);
-      for (var candidate in remoteCandidates) {
-        await addIceCandidate(candidate);
-      }
-    } else {}
+        'negotiateStatus from oldStatus: $_negotiateStatus, newStatus: $negotiateStatus');
+    _negotiateStatus = negotiateStatus;
   }
 
   void connected() {
@@ -450,7 +428,7 @@ class BasePeerConnection {
       return;
     }
     if (state == RTCSignalingState.RTCSignalingStateStable) {
-      status = PeerConnectionStatus.negotiated;
+      negotiateStatus = NegotiateStatus.negotiated;
     }
     emit(WebrtcEventType.signalingState, state);
   }
@@ -464,7 +442,6 @@ class BasePeerConnection {
       return;
     }
 
-    localCandidates.add(candidate);
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -528,6 +505,17 @@ class BasePeerConnection {
     } else {
       await _negotiateAnswer();
     }
+    //延时关闭
+    Future.delayed(Duration(seconds: delayTimes)).then((value) {
+      if (status != PeerConnectionStatus.connected) {
+        logger.w('delayed $delayTimes second cannot connected, will be closed');
+        close();
+        if (reconnectTimes > 0) {
+          reconnectTimes--;
+          negotiate();
+        }
+      }
+    });
   }
 
   ///外部在收到信号的时候调用
@@ -557,12 +545,12 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    if (status == PeerConnectionStatus.negotiating) {
+    if (negotiateStatus == NegotiateStatus.negotiating) {
       logger.e('PeerConnectionStatus already negotiating');
       return;
     }
     logger.w('Start negotiate');
-    status == PeerConnectionStatus.negotiating;
+    negotiateStatus = NegotiateStatus.negotiating;
     await _createOffer();
   }
 
@@ -581,7 +569,6 @@ class BasePeerConnection {
         await peerConnection.createOffer(sdpConstraints);
     await peerConnection.setLocalDescription(offer);
     logger.i('createOffer and setLocalDescription offer successfully');
-    localSdp = offer;
     await _sendOffer(offer);
   }
 
@@ -627,8 +614,6 @@ class BasePeerConnection {
     //如果是候选信息
     else if (signalType == SignalType.candidate.name && candidates != null) {
       //logger.i('onSignal candidate:${candidate.candidate}');
-      remoteCandidates.addAll(candidates);
-      logger.i('remoteCandidates length:${remoteCandidates.length}');
       for (var candidate in candidates) {
         await addIceCandidate(candidate);
       }
@@ -644,7 +629,6 @@ class BasePeerConnection {
       if (remoteDescription != null) {
         logger.w('remoteDescription is exist');
       }
-      remoteSdp = sdp;
       await peerConnection.setRemoteDescription(sdp);
     }
     //如果什么都不是，报错
@@ -685,7 +669,7 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    if (status == PeerConnectionStatus.negotiating) {
+    if (negotiateStatus == NegotiateStatus.negotiating) {
       logger.e('already negotiating');
       return;
     }
@@ -697,7 +681,7 @@ class BasePeerConnection {
     logger.w('send signal renegotiate');
     emit(WebrtcEventType.signal,
         WebrtcSignal('renegotiate', renegotiate: true, extension: extension));
-    status == PeerConnectionStatus.negotiating;
+    negotiateStatus = NegotiateStatus.negotiating;
   }
 
   ///作为被叫，创建answer，发生在被叫方，将answer回到主叫方
@@ -715,7 +699,6 @@ class BasePeerConnection {
     }
     answer = await peerConnection.createAnswer(sdpConstraints);
     logger.i('create local sdp answer:${answer.type}, and setLocalDescription');
-    localSdp = answer;
     await peerConnection.setLocalDescription(answer);
     logger
         .i('setLocalDescription local sdp answer:${answer.type} successfully');
@@ -744,14 +727,12 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    status == PeerConnectionStatus.negotiating;
+    negotiateStatus = NegotiateStatus.negotiating;
     String signalType = webrtcSignal.signalType;
     var candidates = webrtcSignal.candidates;
     var sdp = webrtcSignal.sdp;
     //如果是候选信息
     if (signalType == SignalType.candidate.name && candidates != null) {
-      remoteCandidates.addAll(candidates);
-      logger.i('remoteCandidates length:${remoteCandidates.length}');
       for (var candidate in candidates) {
         await addIceCandidate(candidate);
       }
@@ -761,7 +742,6 @@ class BasePeerConnection {
       if (sdp.type != 'offer') {
         logger.e('onSignal sdp is not offer:${sdp.type}');
       }
-      remoteSdp = sdp;
       logger.i('start setRemoteDescription sdp offer:${sdp.type}');
       RTCSessionDescription? remoteDescription =
           await peerConnection.getRemoteDescription();
@@ -1168,6 +1148,7 @@ class BasePeerConnection {
       peerConnection.onDataChannel = null;
     }
     status = PeerConnectionStatus.closed;
+    negotiateStatus = NegotiateStatus.none;
     logger.i('PeerConnectionStatus closed');
 
     // if (reconnectTimes > 0) {

@@ -5,7 +5,6 @@ import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/service/dht/peersignal.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
@@ -197,8 +196,16 @@ class AdvancedPeerConnection {
     await basePeerConnection.negotiate();
   }
 
+  bool get dataChannelOpen {
+    return basePeerConnection.dataChannelOpen;
+  }
+
   PeerConnectionStatus get status {
     return basePeerConnection.status;
+  }
+
+  NegotiateStatus get negotiateStatus {
+    return basePeerConnection.negotiateStatus;
   }
 
   onAddStream(MediaStream stream) async {
@@ -373,7 +380,6 @@ class AdvancedPeerConnection {
   }
 
   onConnected(dynamic data) async {
-    await peerSignalService.modifySignal(this);
     await peerConnectionPool
         .onConnected(WebrtcEvent(peerId, clientId: clientId, data: data));
   }

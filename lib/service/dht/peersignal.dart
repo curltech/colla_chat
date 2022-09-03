@@ -76,50 +76,6 @@ class PeerSignalService extends GeneralBaseService<PeerSignal> {
       await update(peerSignal);
     }
   }
-
-  modifySignal(AdvancedPeerConnection advancedPeerConnection) async {
-    var peerId = advancedPeerConnection.peerId;
-    var clientId = advancedPeerConnection.clientId;
-    advancedPeerConnection.basePeerConnection.initiator;
-    var remoteSdp = advancedPeerConnection.basePeerConnection.remoteSdp;
-    if (remoteSdp != null) {
-      var peerSignal = PeerSignal(peerId, clientId!, SignalType.sdp.name);
-      var signal = WebrtcSignal(SignalType.sdp.name, sdp: remoteSdp);
-      peerSignal.title = SignalSource.remote.name;
-      peerSignal.content = JsonUtil.toJsonString(signal);
-      await modify(peerSignal);
-    }
-    var localSdp = advancedPeerConnection.basePeerConnection.localSdp;
-    if (localSdp != null) {
-      var peerSignal =
-          PeerSignal(myself.peerId!, myself.clientId!, SignalType.sdp.name);
-      var signal = WebrtcSignal(SignalType.sdp.name, sdp: localSdp);
-      peerSignal.title = SignalSource.local.name;
-      peerSignal.content = JsonUtil.toJsonString(signal);
-      await modify(peerSignal);
-    }
-    var localCandidates =
-        advancedPeerConnection.basePeerConnection.localCandidates;
-    if (localCandidates.isNotEmpty) {
-      var peerSignal = PeerSignal(
-          myself.peerId!, myself.clientId!, SignalType.candidate.name);
-      var signal =
-          WebrtcSignal(SignalType.candidate.name, candidates: localCandidates);
-      peerSignal.title = SignalSource.local.name;
-      peerSignal.content = JsonUtil.toJsonString(signal);
-      await modify(peerSignal);
-    }
-    var remoteCandidates =
-        advancedPeerConnection.basePeerConnection.remoteCandidates;
-    if (remoteCandidates.isNotEmpty) {
-      var peerSignal = PeerSignal(peerId, clientId!, SignalType.candidate.name);
-      var signal =
-          WebrtcSignal(SignalType.candidate.name, candidates: remoteCandidates);
-      peerSignal.title = SignalSource.remote.name;
-      peerSignal.content = JsonUtil.toJsonString(signal);
-      await modify(peerSignal);
-    }
-  }
 }
 
 final peerSignalService = PeerSignalService(
