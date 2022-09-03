@@ -1,4 +1,5 @@
 import 'package:colla_chat/pages/chat/chat/single_video_view_widget.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
 
 import '../../../plugin/logger.dart';
@@ -49,8 +50,16 @@ class _VideoViewCardState extends State<VideoViewCard> {
   Widget _buildVideoViews(BuildContext context, BoxConstraints constraints) {
     Map<String, PeerVideoRender> renders = widget.controller.videoRenders();
     logger.i('VideoRenderController videoRenders length:${renders.length}');
-    Size size = _calculateSize(
-        constraints.maxWidth, constraints.maxHeight, renders.length);
+    var maxHeight = constraints.maxHeight;
+    if (maxHeight == 0 || maxHeight == double.infinity) {
+      maxHeight =
+          appDataProvider.mobileSize.height - appDataProvider.toolbarHeight;
+    }
+    var maxWidth = constraints.maxWidth;
+    if (maxWidth == 0 || maxWidth == double.infinity) {
+      maxWidth = appDataProvider.mobileSize.width;
+    }
+    Size size = _calculateSize(maxWidth, maxHeight, renders.length);
     List<Widget> videoViews = [];
     for (var render in renders.values) {
       Widget videoView = SingleVideoViewWidget(
