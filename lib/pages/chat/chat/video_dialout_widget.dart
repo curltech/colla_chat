@@ -63,7 +63,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   @override
   void initState() {
     super.initState();
-    localMediaController.addListener(_receivedReceipt);
+    videoChatReceiptController.addListener(_receivedReceipt);
     _init();
   }
 
@@ -107,12 +107,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
               chatMessageController.index = 2;
             }
           } else if (status == ChatReceiptType.reject.name) {
-            var videoRenders = localMediaController.videoRenders();
-            if (videoRenders.isNotEmpty) {
-              for (var videoRender in videoRenders.values) {
-                localMediaController.close(id: videoRender.id);
-              }
-            }
+            localMediaController.close();
             chatMessageController.index = 0;
           }
         }
@@ -316,7 +311,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
 
   @override
   void dispose() {
-    localMediaController.removeListener(_receivedReceipt);
+    videoChatReceiptController.removeListener(_receivedReceipt);
     super.dispose();
   }
 }

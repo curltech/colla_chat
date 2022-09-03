@@ -141,8 +141,6 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   void initState() {
     super.initState();
     chatMessageController.addListener(_update);
-    peerConnectionPoolController.addListener(_update);
-    peerConnectionsController.addListener(_update);
     var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
     _init();
@@ -329,8 +327,6 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   void dispose() {
     chatMessageController.removeListener(_update);
     widget.scrollController.removeListener(_onScroll);
-    peerConnectionPoolController.removeListener(_update);
-    peerConnectionsController.removeListener(_update);
     textEditingController.dispose();
     super.dispose();
   }
