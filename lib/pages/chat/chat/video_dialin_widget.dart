@@ -50,6 +50,11 @@ class VideoDialInWidget extends StatelessWidget {
           clientId: clientId,
         );
         if (advancedPeerConnection != null) {
+          ChatSummary? chatSummary =
+              await chatSummaryService.findCachedOneByPeerId(peerId);
+          if (chatSummary != null) {
+            chatMessageController.chatSummary = chatSummary;
+          }
           await advancedPeerConnection.addRender(render);
           peerConnectionsController.add(peerId, clientId: clientId);
           indexWidgetProvider.push('chat_message');
@@ -70,7 +75,8 @@ class VideoDialInWidget extends StatelessWidget {
         child: ListTile(
             leading: const ImageWidget(image: ''),
             title: Text(name, style: const TextStyle(color: Colors.white)),
-            subtitle: Text(AppLocalizations.t('Inviting you video chat'), style: const TextStyle(color: Colors.white)),
+            subtitle: Text(AppLocalizations.t('Inviting you video chat'),
+                style: const TextStyle(color: Colors.white)),
             trailing: SizedBox(
               width: 120,
               child: Row(children: [

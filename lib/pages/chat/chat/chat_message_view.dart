@@ -37,19 +37,19 @@ class ChatMessageView extends StatefulWidget with TileDataMixin {
 }
 
 class _ChatMessageViewState extends State<ChatMessageView> {
-  late final String peerId;
-  late final String name;
-  late final String? clientId;
+  String? peerId;
+  String? name;
+  String? clientId;
 
   @override
   void initState() {
     super.initState();
     chatMessageController.addListener(_update);
     peerConnectionPoolController.addListener(_update);
-    init();
+    _init();
   }
 
-  init() {
+  _init() {
     ChatSummary? chatSummary = chatMessageController.chatSummary;
     if (chatSummary != null) {
       peerId = chatSummary.peerId!;
@@ -80,9 +80,11 @@ class _ChatMessageViewState extends State<ChatMessageView> {
   @override
   Widget build(BuildContext context) {
     PeerConnectionStatus status = PeerConnectionStatus.none;
-    var peerConnection = peerConnectionPool.getOne(peerId);
-    if (peerConnection != null) {
-      status = peerConnection.status;
+    if (peerId != null) {
+      var peerConnection = peerConnectionPool.getOne(peerId!);
+      if (peerConnection != null) {
+        status = peerConnection.status;
+      }
     }
 
     var children = [
@@ -90,8 +92,9 @@ class _ChatMessageViewState extends State<ChatMessageView> {
       _buildDialOutWidget(context),
       _buildVideoChatWidget(context),
     ];
+    name = name ?? '';
     var appBarView = AppBarView(
-        title: Text(AppLocalizations.t(name) +
+        title: Text(AppLocalizations.t(name!) +
             '(' +
             AppLocalizations.t(status.name) +
             ')'),

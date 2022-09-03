@@ -101,13 +101,13 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
               for (var render in videoRenders.values) {
                 await advancedPeerConnection.addRender(render);
               }
-              advancedPeerConnection.negotiate();
-              peerConnectionsController.clear();
-              peerConnectionsController.add(peerId, clientId: clientId);
+              await advancedPeerConnection.negotiate();
+              await peerConnectionsController.clear();
+              await peerConnectionsController.add(peerId, clientId: clientId);
               chatMessageController.index = 2;
             }
           } else if (status == ChatReceiptType.reject.name) {
-            localMediaController.close();
+            await localMediaController.close();
             chatMessageController.index = 0;
           }
         }

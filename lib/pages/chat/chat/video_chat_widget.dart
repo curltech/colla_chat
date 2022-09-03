@@ -1,6 +1,5 @@
 import 'package:colla_chat/pages/chat/chat/controller/peer_connections_controller.dart';
 import 'package:colla_chat/pages/chat/chat/video_view_card.dart';
-import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:flutter/material.dart';
 
 ///视频通话窗口，显示多个小视频窗口，每个小窗口代表一个对方，其中一个是自己
@@ -30,11 +29,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return AppBarView(
-        withLeading: true,
-        child: Stack(children: [
-          _buildVideoViewCard(context),
-        ]));
+    return _buildVideoViewCard(context);
   }
 
   @override
