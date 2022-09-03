@@ -410,7 +410,10 @@ class PeerConnectionPool {
       advancedPeerConnection = AdvancedPeerConnection(peerId, false,
           clientId: clientId, name: name, room: room);
       await put(peerId, advancedPeerConnection, clientId: clientId);
-      await peerConnectionPoolController.onCreated(WebrtcEvent(peerId,
+      logger.i(
+          'advancedPeerConnection ${advancedPeerConnection.basePeerConnection.id} created ');
+
+      peerConnectionPoolController.onCreated(WebrtcEvent(peerId,
           clientId: clientId, data: advancedPeerConnection));
     }
 
@@ -509,7 +512,8 @@ class PeerConnectionPool {
           logger.e('webrtcPeer.init fail');
           return null;
         }
-        logger.i('advancedPeerConnection init completed');
+        logger.i(
+            'advancedPeerConnection ${advancedPeerConnection.basePeerConnection.id} init completed');
       }
 
       ///收到对方的offer，自己应该是被叫
