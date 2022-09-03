@@ -239,25 +239,34 @@ class AdvancedPeerConnection {
   }
 
   ///把渲染器加入到渲染器集合
-  _addRender(PeerVideoRender render) async {
+  bool _addRender(PeerVideoRender render) {
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
-      return;
+      return false;
     }
     var streamId = render.id;
     if (streamId != null) {
+      if (videoRenders.containsKey(streamId)) {
+        return false;
+      }
       videoRenders[streamId] = render;
       logger.i(
           'AdvancedPeerConnection peerId:$peerId _addRender $streamId, videoRenders length:${videoRenders.length}');
+      return true;
     }
+    return false;
   }
 
-  addRender(PeerVideoRender render) async {
-    _addRender(render);
-    var stream = render.mediaStream;
-    if (stream != null) {
-      basePeerConnection.addStream(stream);
+  Future<bool> addRender(PeerVideoRender render) async {
+    bool success = _addRender(render);
+    if (success) {
+      var stream = render.mediaStream;
+      if (stream != null) {
+        success = await basePeerConnection.addStream(stream);
+        return success;
+      }
     }
+    return false;
   }
 
   ///把渲染器从渲染器集合删除，并关闭
@@ -296,12 +305,16 @@ class AdvancedPeerConnection {
   Future<PeerVideoRender> _addStream(MediaStream stream) async {
     String streamId = stream.id;
     if (videoRenders.containsKey(streamId)) {
-      logger.e('stream:$streamId exist in videoRenders, be replaced');
+      logger.e('stream:$streamId exist in videoRenders, be return');
+      PeerVideoRender? render = videoRenders[streamId];
+      if (render != null) {
+        return render;
+      }
     }
     PeerVideoRender render = await PeerVideoRender.from(peerId,
         clientId: clientId, name: name, stream: stream);
     await render.bindRTCVideoRender();
-    await _addRender(render);
+    _addRender(render);
 
     return render;
   }
@@ -309,7 +322,11 @@ class AdvancedPeerConnection {
   Future<PeerVideoRender> addStream(MediaStream stream) async {
     String streamId = stream.id;
     if (videoRenders.containsKey(streamId)) {
-      logger.e('stream:$streamId exist in videoRenders, be replaced');
+      logger.e('stream:$streamId exist in videoRenders, be return');
+      PeerVideoRender? render = videoRenders[streamId];
+      if (render != null) {
+        return render;
+      }
     }
     PeerVideoRender render = await PeerVideoRender.from(peerId,
         clientId: clientId, name: name, stream: stream);

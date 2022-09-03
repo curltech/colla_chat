@@ -808,14 +808,14 @@ class BasePeerConnection {
   }
 
   ///增加本地流到本地集合
-  _addStream(MediaStream stream) {
+  bool _addStream(MediaStream stream) {
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
-      return;
+      return false;
     }
     var id = stream.id;
     if (streams.containsKey(id)) {
-      return;
+      return false;
     }
     streams[id] = stream;
     logger.i('BasePeerConnection _addStream:$id');
@@ -823,19 +823,23 @@ class BasePeerConnection {
     for (var track in tracks) {
       _addTrack(stream, track);
     }
+    return true;
   }
 
   ///主动创建新的MediaStream，从连接中增加本地流，只能在init方法中调用
-  Future<void> addStream(MediaStream stream) async {
+  Future<bool> addStream(MediaStream stream) async {
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
-      return;
+      return false;
     }
     try {
-      _addStream(stream);
-      RTCPeerConnection peerConnection = this.peerConnection!;
-      await peerConnection.addStream(stream);
-      logger.i('_addLocalStream ${stream.id}');
+      bool success = _addStream(stream);
+      if (success) {
+        RTCPeerConnection peerConnection = this.peerConnection!;
+        await peerConnection.addStream(stream);
+        logger.i('_addLocalStream ${stream.id}');
+        return true;
+      }
     } catch (e) {
       logger.e('peer connection addStream failure, $e');
     }
@@ -845,6 +849,8 @@ class BasePeerConnection {
     // for (var track in tracks) {
     //   _addLocalTrack(stream, track);
     // }
+
+    return false;
   }
 
   /// 把轨道加入到流中，其目的是为了把加入远程流的本地集合，连接没有操作

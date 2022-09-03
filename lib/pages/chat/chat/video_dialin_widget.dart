@@ -10,6 +10,7 @@ import '../../../service/chat/chat.dart';
 import '../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../transport/webrtc/peer_video_render.dart';
 import '../../../widgets/common/simple_widget.dart';
+import 'chat_message_widget.dart';
 import 'controller/peer_connections_controller.dart';
 
 ///视频通话拨入的对话框
@@ -51,6 +52,7 @@ class VideoDialInWidget extends StatelessWidget {
           await advancedPeerConnection.addRender(render);
           peerConnectionsController.add(peerId, clientId: clientId);
           indexWidgetProvider.push('video_chat');
+          chatMessageController.index = 2;
         }
       }
     }
