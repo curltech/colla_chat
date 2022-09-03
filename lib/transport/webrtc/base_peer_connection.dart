@@ -524,18 +524,18 @@ class BasePeerConnection {
   ///被叫不能在第一次的时候主动发起协议过程，主叫或者被叫不在第一次的时候可以发起协商过程
   negotiate() async {
     if (initiator) {
-      _negotiateOffer();
+      await _negotiateOffer();
     } else {
-      _negotiateAnswer();
+      await _negotiateAnswer();
     }
   }
 
   ///外部在收到信号的时候调用
   onSignal(WebrtcSignal webrtcSignal) async {
     if (initiator) {
-      _onOfferSignal(webrtcSignal);
+      await _onOfferSignal(webrtcSignal);
     } else {
-      _onAnswerSignal(webrtcSignal);
+      await _onAnswerSignal(webrtcSignal);
     }
   }
 

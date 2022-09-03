@@ -364,8 +364,8 @@ class AdvancedPeerConnection {
     await basePeerConnection.replaceTrack(stream, oldTrack, newTrack);
   }
 
-  onSignal(WebrtcSignal signal) {
-    basePeerConnection.onSignal(signal);
+  onSignal(WebrtcSignal signal) async {
+    await basePeerConnection.onSignal(signal);
   }
 
   bool get connected {

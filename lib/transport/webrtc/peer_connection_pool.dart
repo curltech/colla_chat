@@ -486,7 +486,7 @@ class PeerConnectionPool {
         peerConnections ??= {};
         peerConnections[clientId] = advancedPeerConnection;
         this.peerConnections.put(peerId, peerConnections);
-        peerConnectionPoolController.onCreated(WebrtcEvent(peerId,
+        await peerConnectionPoolController.onCreated(WebrtcEvent(peerId,
             clientId: clientId, data: advancedPeerConnection));
       } else {
         ///收到对方的offer，自己应该是被叫
