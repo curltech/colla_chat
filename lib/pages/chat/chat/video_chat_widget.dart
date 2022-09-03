@@ -41,7 +41,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     if (overlayEntry != null) {
       overlayEntry!.remove();
       overlayEntry = null;
-      chatMessageController.index = 1;
+      chatMessageController.index = 2;
     }
   }
 
@@ -92,7 +92,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
 
   Widget _buildActionCard(BuildContext context) {
     double height = 100;
-    return Container(
+    Widget actionCard = Container(
       margin: const EdgeInsets.all(0.0),
       padding: const EdgeInsets.only(bottom: 0.0),
       child: ActionCard(
@@ -101,23 +101,12 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
         onPressed: _onAction,
       ),
     );
-  }
-
-  Widget _buildVideoChatView(BuildContext context) {
     return Column(children: [
-      Card(
-          margin: EdgeInsets.zero,
-          elevation: 0,
-          color: Colors.black.withAlpha(128),
-          child: Row(
-            children: [
-              InkWell(
-                onTap: () {
-                  _minimize(context);
-                },
-                child: const Icon(Icons.zoom_in_map, size: 16),
-              ),
-              WidgetUtil.buildCircleButton(
+      actionCard,
+      Center(
+          child: Container(
+              padding: const EdgeInsets.all(15.0),
+              child: WidgetUtil.buildCircleButton(
                   onPressed: () {
                     _close();
                   },
@@ -128,7 +117,25 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
                     Icons.call_end,
                     size: 16.0,
                     color: Colors.white,
-                  )),
+                  )))),
+    ]);
+  }
+
+  Widget _buildVideoChatView(BuildContext context) {
+    return Column(children: [
+      Container(
+          padding: const EdgeInsets.all(5.0),
+          margin: EdgeInsets.zero,
+          //elevation: 0,
+          color: Colors.black.withAlpha(128),
+          child: Row(
+            children: [
+              InkWell(
+                onTap: () {
+                  _minimize(context);
+                },
+                child: const Icon(Icons.zoom_in_map, size: 24),
+              ),
               Align(
                 alignment: Alignment.centerRight,
                 child: InkWell(
@@ -137,7 +144,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
                       actionVisible = true;
                     });
                   },
-                  child: const Icon(Icons.add_circle, size: 16),
+                  child: const Icon(Icons.add_circle, size: 24),
                 ),
               ),
             ],
@@ -154,7 +161,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
           visible: actionVisible,
           child: Align(
               alignment: Alignment.bottomCenter,
-              child: _buildActionCard(context)))
+              child: Card(child: _buildActionCard(context))))
     ]);
   }
 
