@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 import '../../../entity/chat/chat.dart';
 import '../../../plugin/logger.dart';
 import '../../../service/chat/chat.dart';
+import '../../../transport/webrtc/advanced_peer_connection.dart';
+import '../../../transport/webrtc/peer_video_render.dart';
 import '../../../widgets/common/simple_widget.dart';
 import 'controller/peer_connections_controller.dart';
 
@@ -15,7 +17,8 @@ class VideoDialInWidget extends StatelessWidget {
   ///视频通话的消息请求
   final ChatMessage chatMessage;
 
-  final Function(String data)? onTap;
+  final Function(ChatMessage chatMessage, ChatReceiptType chatReceiptType)?
+      onTap;
 
   const VideoDialInWidget({Key? key, required this.chatMessage, this.onTap})
       : super(key: key);
@@ -25,18 +28,29 @@ class VideoDialInWidget extends StatelessWidget {
         await chatMessageService.buildChatReceipt(chatMessage, receiptType);
     if (chatReceipt != null) {
       await chatMessageService.send(chatReceipt);
+      String? subMessageType = chatMessage.subMessageType;
       logger.i('sent videoChat chatReceipt ${receiptType.name}');
       if (receiptType == ChatReceiptType.agree) {
         var peerId = chatReceipt.receiverPeerId!;
         var clientId = chatReceipt.receiverClientId!;
-        await localMediaController.createVideoRender(displayMedia: true);
-        await peerConnectionPool.create(
+        PeerVideoRender? render;
+        if (subMessageType == ChatSubMessageType.audioChat.name) {
+          render =
+              await localMediaController.createVideoRender(audioMedia: true);
+        }
+        render = render ??
+            await localMediaController.createVideoRender(videoMedia: true);
+
+        AdvancedPeerConnection? advancedPeerConnection =
+            peerConnectionPool.getOne(
           peerId,
           clientId: clientId,
-          localRenders: localMediaController.videoRenders().values.toList(),
         );
-        peerConnectionsController.add(peerId, clientId: clientId);
-        indexWidgetProvider.push('video_chat');
+        if (advancedPeerConnection != null) {
+          await advancedPeerConnection.addRender(render);
+          peerConnectionsController.add(peerId, clientId: clientId);
+          indexWidgetProvider.push('video_chat');
+        }
       }
     }
   }
@@ -62,7 +76,7 @@ class VideoDialInWidget extends StatelessWidget {
                 onPressed: () {
                   _sendReceipt(ChatReceiptType.reject);
                   if (onTap != null) {
-                    onTap!(ChatReceiptType.reject.name);
+                    onTap!(chatMessage, ChatReceiptType.reject);
                   }
                 },
                 child:
@@ -72,7 +86,7 @@ class VideoDialInWidget extends StatelessWidget {
                 onPressed: () {
                   _sendReceipt(ChatReceiptType.agree);
                   if (onTap != null) {
-                    onTap!(ChatReceiptType.agree.name);
+                    onTap!(chatMessage, ChatReceiptType.agree);
                   }
                 },
                 child:

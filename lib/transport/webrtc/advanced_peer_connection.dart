@@ -203,7 +203,7 @@ class AdvancedPeerConnection {
 
   onAddStream(MediaStream stream) async {
     logger.i('peerId: $peerId clientId:$clientId is onAddStream');
-    await addStream(stream);
+    await _addStream(stream);
     await peerConnectionPool
         .onAddStream(WebrtcEvent(peerId, clientId: clientId, data: stream));
   }
@@ -252,6 +252,14 @@ class AdvancedPeerConnection {
     }
   }
 
+  addRender(PeerVideoRender render) async {
+    _addRender(render);
+    var stream = render.mediaStream;
+    if (stream != null) {
+      basePeerConnection.addStream(stream);
+    }
+  }
+
   ///把渲染器从渲染器集合删除，并关闭
   _removeRender(PeerVideoRender render) async {
     logger.i('_removeRender ${render.id}');
@@ -285,7 +293,7 @@ class AdvancedPeerConnection {
   }
 
   ///生成流的渲染器，然后加入到渲染器集合
-  Future<PeerVideoRender> addStream(MediaStream stream) async {
+  Future<PeerVideoRender> _addStream(MediaStream stream) async {
     String streamId = stream.id;
     if (videoRenders.containsKey(streamId)) {
       logger.e('stream:$streamId exist in videoRenders, be replaced');
@@ -294,6 +302,19 @@ class AdvancedPeerConnection {
         clientId: clientId, name: name, stream: stream);
     await render.bindRTCVideoRender();
     await _addRender(render);
+
+    return render;
+  }
+
+  Future<PeerVideoRender> addStream(MediaStream stream) async {
+    String streamId = stream.id;
+    if (videoRenders.containsKey(streamId)) {
+      logger.e('stream:$streamId exist in videoRenders, be replaced');
+    }
+    PeerVideoRender render = await PeerVideoRender.from(peerId,
+        clientId: clientId, name: name, stream: stream);
+    await render.bindRTCVideoRender();
+    await addRender(render);
 
     return render;
   }

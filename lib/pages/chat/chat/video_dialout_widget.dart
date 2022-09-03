@@ -12,6 +12,7 @@ import '../../../service/chat/chat.dart';
 import '../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../transport/webrtc/base_peer_connection.dart';
 import '../../../transport/webrtc/peer_connection_pool.dart';
+import '../../../transport/webrtc/peer_video_render.dart';
 import '../../../widgets/common/action_card.dart';
 import '../../../widgets/common/image_widget.dart';
 import '../../../widgets/common/simple_widget.dart';
@@ -77,21 +78,35 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
     }
   }
 
-  _receive() {
+  ///收到回执
+  _receive() async {
     ChatMessage? chatReceipt = localMediaController.chatReceipt;
     if (chatReceipt != null) {
-      String? title = chatReceipt.title;
+      String? status = chatReceipt.status;
       String? subMessageType = chatReceipt.subMessageType;
       if (subMessageType != null) {
-        logger.i('received videoChat chatReceipt $title');
+        logger.i('received videoChat chatReceipt status: $status');
         if (subMessageType == ChatSubMessageType.chatReceipt.name) {
-          if (title == ChatReceiptType.agree.name) {
+          if (status == ChatReceiptType.agree.name) {
             var peerId = chatReceipt.senderPeerId!;
             var clientId = chatReceipt.senderClientId!;
-            peerConnectionsController.clear();
-            peerConnectionsController.add(peerId, clientId: clientId);
-            chatMessageController.index = 2;
-          } else if (title == ChatReceiptType.reject.name) {
+            AdvancedPeerConnection? advancedPeerConnection =
+                peerConnectionPool.getOne(
+              peerId,
+              clientId: clientId,
+            );
+            if (advancedPeerConnection != null) {
+              Map<String, PeerVideoRender> videoRenders =
+                  localMediaController.videoRenders();
+              for (var render in videoRenders.values) {
+                await advancedPeerConnection.addRender(render);
+              }
+              advancedPeerConnection.negotiate();
+              peerConnectionsController.clear();
+              peerConnectionsController.add(peerId, clientId: clientId);
+              chatMessageController.index = 2;
+            }
+          } else if (status == ChatReceiptType.reject.name) {
             var videoRenders = localMediaController.videoRenders();
             if (videoRenders.isNotEmpty) {
               for (var videoRender in videoRenders.values) {

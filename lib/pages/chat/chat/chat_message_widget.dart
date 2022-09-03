@@ -15,7 +15,7 @@ import 'chat_message_input.dart';
 import 'chat_message_item.dart';
 import 'controller/peer_connections_controller.dart';
 
-///好友或者群的消息控制器
+///好友或者群的消息控制器，包含某个连接的所有消息
 class ChatMessageController extends DataMoreController<ChatMessage> {
   ChatSummary? _chatSummary;
 
@@ -100,6 +100,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   }
 }
 
+///好友或者群的消息控制器，包含某个连接的所有消息
 final ChatMessageController chatMessageController = ChatMessageController();
 
 /// 消息发送和接受展示的界面组件

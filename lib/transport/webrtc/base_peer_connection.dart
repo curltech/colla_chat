@@ -272,7 +272,7 @@ class BasePeerConnection {
     RTCPeerConnection peerConnection = this.peerConnection!;
     if (localStreams.isNotEmpty) {
       for (var localStream in localStreams) {
-        await _addLocalStream(localStream);
+        await addStream(localStream);
       }
     }
 
@@ -826,7 +826,7 @@ class BasePeerConnection {
   }
 
   ///主动创建新的MediaStream，从连接中增加本地流，只能在init方法中调用
-  Future<void> _addLocalStream(MediaStream stream) async {
+  Future<void> addStream(MediaStream stream) async {
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -876,7 +876,7 @@ class BasePeerConnection {
   /// 把轨道加入到流中，其目的是为了把本地流轨道加入本地集合，只能通过init方法调用_addStream方法，再调用本方法
   /// @param {MediaStreamTrack} track
   /// @param {MediaStream} stream
-  _addLocalTrack(MediaStream stream, MediaStreamTrack track) async {
+  addTrack(MediaStream stream, MediaStreamTrack track) async {
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;

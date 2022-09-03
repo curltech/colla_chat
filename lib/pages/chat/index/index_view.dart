@@ -8,6 +8,7 @@ import '../../../plugin/logger.dart';
 import '../../../provider/app_data_provider.dart';
 import '../../../widgets/style/platform_widget_factory.dart';
 import '../chat/chat_message_item.dart';
+import '../chat/chat_message_widget.dart';
 import '../login/loading.dart';
 import 'bottom_bar.dart';
 import 'global_chat_message_controller.dart';
@@ -42,13 +43,13 @@ class _IndexViewState extends State<IndexView>
     }
   }
 
-  _showVideoChatMessage(BuildContext context) {
+  _showVideoChatMessage(BuildContext context, ChatMessage chatMessage) {
     videoChatOverlayEntry = OverlayEntry(
         maintainState: true,
         builder: (context) {
           return Align(
             alignment: Alignment.topRight,
-            child: _buildVideoDialIn(context),
+            child: _buildVideoDialIn(context, chatMessage),
           );
         });
     Overlay.of(context)!.insert(videoChatOverlayEntry!);
@@ -82,34 +83,32 @@ class _IndexViewState extends State<IndexView>
     if (chatMessage != null) {
       //视频通话请求消息
       if (chatMessage.subMessageType == ChatSubMessageType.videoChat.name) {
-        _showVideoChatMessage(context);
+        _showVideoChatMessage(context, chatMessage);
+      } else if (chatMessage.subMessageType ==
+          ChatSubMessageType.audioChat.name) {
+        _showVideoChatMessage(context, chatMessage);
       } else {
         _showChatMessage(context, chatMessage);
       }
     }
   }
 
-  _onTap(String data) {
+  _onTap(ChatMessage chatMessage, ChatReceiptType chatReceiptType) {
     _closeVideoChatOverlayEntry();
-    if (data == ChatReceiptType.agree.name) {
+    if (chatReceiptType == ChatReceiptType.agree) {
       //同意，发出本地流
       logger.i('ChatReceiptType agree');
-    } else if (data == ChatReceiptType.reject.name) {
+    } else if (chatReceiptType == ChatReceiptType.reject) {
       //拒绝，关闭对话框
       logger.i('ChatReceiptType reject');
     }
   }
 
-  Widget _buildVideoDialIn(BuildContext context) {
-    ChatMessage? chatMessage = globalChatMessageController.chatMessage;
-    if (chatMessage != null) {
-      globalChatMessageController.chatMessage;
-      return VideoDialInWidget(
-        chatMessage: chatMessage,
-        onTap: _onTap,
-      );
-    }
-    return Container();
+  Widget _buildVideoDialIn(BuildContext context, ChatMessage chatMessage) {
+    return VideoDialInWidget(
+      chatMessage: chatMessage,
+      onTap: _onTap,
+    );
   }
 
   Widget _createScaffold(

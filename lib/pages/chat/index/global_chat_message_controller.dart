@@ -40,10 +40,10 @@ class GlobalChatMessageController with ChangeNotifier {
         case ChatSubMessageType.videoChat:
           break;
         case ChatSubMessageType.chatReceipt:
-          if (chatMessage.title == ChatReceiptType.agree.name) {
+          if (chatMessage.status == ChatReceiptType.agree.name) {
             //收到视频通话邀请同意回执，发出本地流，关闭拨号窗口VideoDialOutWidget，显示视频通话窗口VideoChatWidget
             localMediaController.chatReceipt = chatMessage;
-          } else if (chatMessage.title == ChatReceiptType.reject.name) {
+          } else if (chatMessage.status == ChatReceiptType.reject.name) {
             //收到视频通话邀请拒绝回执，关闭本地流，关闭拨号窗口VideoDialOutWidget
             localMediaController.chatReceipt = chatMessage;
           }
@@ -59,7 +59,7 @@ class GlobalChatMessageController with ChangeNotifier {
         default:
           break;
       }
-      if (chatMessage.subMessageType != ChatSubMessageType.preKeyBundle.name) {
+      if (chatMessage.messageType != ChatMessageType.system.name) {
         chatMessageController.modify(peerId, clientId: clientId);
       }
     }
@@ -127,5 +127,6 @@ class GlobalChatMessageController with ChangeNotifier {
   }
 }
 
+///收到的最新消息
 final GlobalChatMessageController globalChatMessageController =
     GlobalChatMessageController();

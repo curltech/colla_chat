@@ -13,7 +13,6 @@ abstract class VideoRenderController with ChangeNotifier {
 }
 
 ///本地媒体通话控制器，内部数据为视频通话的请求消息，和回执消息
-///如果本地的render存在，在创建peerconnection的时候将加入
 class LocalMediaController extends VideoRenderController {
   //媒体请求消息，对发起方来说是自己生成的(receiverPeerId)，对接受方来说是收到的(senderPeerId)
   ChatMessage? _chatMessage;
@@ -23,7 +22,9 @@ class LocalMediaController extends VideoRenderController {
 
   bool? initiator;
 
-  Map<String, PeerVideoRender> _videoRenders = {};
+  PeerVideoRender? _videoRender;
+
+  final Map<String, PeerVideoRender> _videoRenders = {};
 
   ChatMessage? get chatMessage {
     return _chatMessage;
@@ -89,6 +90,18 @@ class LocalMediaController extends VideoRenderController {
       bool videoMedia = false,
       bool audioMedia = false,
       bool displayMedia = false}) async {
+    if (_videoRender != null) {
+      if (videoMedia || audioMedia) {
+        return _videoRender!;
+      }
+    }
+    if (stream != null) {
+      var streamId = stream.id;
+      var videoRender = _videoRenders[streamId];
+      if (videoRender != null) {
+        return videoRender;
+      }
+    }
     PeerVideoRender render = await PeerVideoRender.from(myself.peerId!,
         clientId: myself.clientId,
         name: myself.myselfPeer!.name,
@@ -96,6 +109,9 @@ class LocalMediaController extends VideoRenderController {
         videoMedia: videoMedia,
         audioMedia: audioMedia,
         displayMedia: displayMedia);
+    if (audioMedia || videoMedia) {
+      _videoRender = render;
+    }
     await render.bindRTCVideoRender();
     _videoRenders[render.id!] = render;
     notifyListeners();
@@ -119,11 +135,15 @@ class LocalMediaController extends VideoRenderController {
         videoRender.dispose();
       }
       _videoRenders.clear();
+      _videoRender = null;
     } else {
       var videoRender = _videoRenders[id];
       if (videoRender != null) {
         videoRender.dispose();
         _videoRenders.remove(id);
+        if (_videoRender != null && _videoRender!.id == id) {
+          _videoRender = null;
+        }
       }
     }
     notifyListeners();
