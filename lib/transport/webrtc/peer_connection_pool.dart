@@ -386,23 +386,22 @@ class PeerConnectionPool {
   var lock = Lock(reentrant: true);
 
   ///如果不存在，创建被叫
-  Future<AdvancedPeerConnection> createIfNotExist(String peerId,
+  Future<AdvancedPeerConnection?> createIfNotExist(String peerId,
       {String? clientId,
       String? name,
       Room? room,
       List<Map<String, String>>? iceServers}) async {
-    return await lock.synchronized<AdvancedPeerConnection>(() async {
+    return await lock.synchronized<AdvancedPeerConnection?>(() async {
       return await _createIfNotExist(peerId,
-          clientId: clientId, name: name, room: room);
+          clientId: clientId, name: name, room: room, iceServers: iceServers);
     });
   }
 
-  Future<AdvancedPeerConnection> _createIfNotExist(
-    String peerId, {
-    String? clientId,
-    String? name,
-    Room? room,
-  }) async {
+  Future<AdvancedPeerConnection?> _createIfNotExist(String peerId,
+      {String? clientId,
+      String? name,
+      Room? room,
+      List<Map<String, String>>? iceServers}) async {
     AdvancedPeerConnection? advancedPeerConnection =
         getOne(peerId, clientId: clientId);
     if (advancedPeerConnection == null) {
@@ -412,6 +411,13 @@ class PeerConnectionPool {
       await put(peerId, advancedPeerConnection, clientId: clientId);
       peerConnectionPoolController.onCreated(WebrtcEvent(peerId,
           clientId: clientId, data: advancedPeerConnection));
+      var result = await advancedPeerConnection.init(iceServers: iceServers);
+      if (!result) {
+        logger.e('webrtcPeer.init fail');
+        return null;
+      }
+      logger.i(
+          'advancedPeerConnection ${advancedPeerConnection.basePeerConnection.id} init completed');
     }
 
     return advancedPeerConnection;
@@ -503,14 +509,9 @@ class PeerConnectionPool {
         (signalType == SignalType.sdp.name && signal.sdp!.type == 'offer')) {
       advancedPeerConnection = await createIfNotExist(peerId,
           clientId: clientId, name: name, room: room, iceServers: iceServers);
-      if (advancedPeerConnection.status == PeerConnectionStatus.created) {
-        var result = await advancedPeerConnection.init(iceServers: iceServers);
-        if (!result) {
-          logger.e('webrtcPeer.init fail');
-          return null;
-        }
-        logger.i(
-            'advancedPeerConnection ${advancedPeerConnection.basePeerConnection.id} init completed');
+      if (advancedPeerConnection == null) {
+        logger.e('createIfNotExist fail');
+        return null;
       }
 
       ///收到对方的offer，自己应该是被叫
