@@ -19,10 +19,19 @@ class VideoDialInWidget extends StatelessWidget {
   ///视频通话的消息请求
   final ChatMessage chatMessage;
 
+  final bool displayMedia;
+
+  final bool videoMedia;
+
   final Function(ChatMessage chatMessage, ChatReceiptType chatReceiptType)?
       onTap;
 
-  const VideoDialInWidget({Key? key, required this.chatMessage, this.onTap})
+  const VideoDialInWidget(
+      {Key? key,
+      this.displayMedia = true,
+      this.videoMedia = false,
+      required this.chatMessage,
+      this.onTap})
       : super(key: key);
 
   _sendReceipt(ChatReceiptType receiptType) async {
@@ -36,13 +45,23 @@ class VideoDialInWidget extends StatelessWidget {
       if (receiptType == ChatReceiptType.agree) {
         var peerId = chatReceipt.receiverPeerId!;
         var clientId = chatReceipt.receiverClientId!;
-        PeerVideoRender? render;
+        List<PeerVideoRender> renders = [];
         if (subMessageType == ChatSubMessageType.audioChat.name) {
-          render =
+          var render =
               await localMediaController.createVideoRender(audioMedia: true);
+          renders.add(render);
+        } else {
+          if (videoMedia) {
+            var render =
+                await localMediaController.createVideoRender(videoMedia: true);
+            renders.add(render);
+          }
+          if (displayMedia) {
+            var render = await localMediaController.createVideoRender(
+                displayMedia: true);
+            renders.add(render);
+          }
         }
-        render = render ??
-            await localMediaController.createVideoRender(displayMedia: true);
 
         AdvancedPeerConnection? advancedPeerConnection =
             peerConnectionPool.getOne(
@@ -55,7 +74,11 @@ class VideoDialInWidget extends StatelessWidget {
           if (chatSummary != null) {
             chatMessageController.chatSummary = chatSummary;
           }
-          await advancedPeerConnection.addRender(render);
+          if (renders.isNotEmpty) {
+            for (var render in renders) {
+              await advancedPeerConnection.addRender(render);
+            }
+          }
           peerConnectionsController.add(peerId, clientId: clientId);
           indexWidgetProvider.push('chat_message');
           chatMessageController.index = 2;
