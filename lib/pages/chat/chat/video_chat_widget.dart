@@ -136,20 +136,18 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
                 },
                 child: const Icon(Icons.zoom_in_map, size: 24),
               ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: InkWell(
-                  onTap: () {
-                    setState(() {
-                      actionVisible = true;
-                    });
-                  },
-                  child: const Icon(Icons.add_circle, size: 24),
-                ),
+              const Spacer(),
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    actionVisible = true;
+                  });
+                },
+                child: const Icon(Icons.add_circle, size: 24),
               ),
             ],
           )),
-      _buildVideoViewCard(context),
+      Expanded(child: _buildVideoViewCard(context)),
     ]);
   }
 

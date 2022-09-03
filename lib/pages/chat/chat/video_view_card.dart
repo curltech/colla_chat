@@ -30,7 +30,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
   }
 
   Size _calculateSize(double totalWidth, double totalHeight, int count) {
-    var height = totalHeight - 120;
+    var height = totalHeight - 8;
     var width = totalWidth - 4;
     if (count <= 4) {
       height = height / count;
@@ -52,8 +52,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
     logger.i('VideoRenderController videoRenders length:${renders.length}');
     var maxHeight = constraints.maxHeight;
     if (maxHeight == 0 || maxHeight == double.infinity) {
-      maxHeight =
-          appDataProvider.mobileSize.height ;
+      maxHeight = appDataProvider.mobileSize.height;
     }
     var maxWidth = constraints.maxWidth;
     if (maxWidth == 0 || maxWidth == double.infinity) {
