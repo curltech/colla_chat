@@ -53,6 +53,10 @@ class _IndexViewState extends State<IndexView>
           );
         });
     Overlay.of(context)!.insert(videoChatOverlayEntry!);
+    //延时，移除 OverlayEntry
+    Future.delayed(const Duration(seconds: 20)).then((value) {
+      _closeVideoChatOverlayEntry();
+    });
   }
 
   _closeChatMessageOverlayEntry() {
