@@ -31,7 +31,7 @@ class VideoDialInWidget extends StatelessWidget {
     if (chatReceipt != null) {
       logger.w('sent videoChat chatReceipt ${receiptType.name}');
       await chatMessageService.send(chatReceipt);
-      videoChatReceiptController.chatReceipt = chatReceipt;
+      videoChatReceiptController.setChatReceipt(chatReceipt, ChatDirect.send);
       String? subMessageType = chatMessage.subMessageType;
       if (receiptType == ChatReceiptType.agree) {
         var peerId = chatReceipt.receiverPeerId!;

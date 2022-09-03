@@ -9,6 +9,7 @@ import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
+import 'package:synchronized/extension.dart';
 import 'package:synchronized/synchronized.dart';
 
 import '../../entity/chat/chat.dart';
@@ -384,7 +385,7 @@ class PeerConnectionPool {
     }
   }
 
-  var lock = Lock(reentrant: true);
+  //var lock = Lock(reentrant: true);
 
   ///如果不存在，创建被叫
   Future<AdvancedPeerConnection?> createIfNotExist(String peerId,
@@ -392,7 +393,7 @@ class PeerConnectionPool {
       String? name,
       Room? room,
       List<Map<String, String>>? iceServers}) async {
-    return await lock.synchronized<AdvancedPeerConnection?>(() async {
+    return await synchronized(() async {
       return await _createIfNotExist(peerId,
           clientId: clientId, name: name, room: room, iceServers: iceServers);
     });

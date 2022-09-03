@@ -87,12 +87,19 @@ class VideoChatReceiptController with ChangeNotifier {
   //媒体回执消息，对发起方来说是是收到的(senderPeerId)，对接受方来说是自己根据_chatMessage生成的(receiverPeerId)
   ChatMessage? _chatReceipt;
 
+  ChatDirect? _direct;
+
   ChatMessage? get chatReceipt {
     return _chatReceipt;
   }
 
-  set chatReceipt(ChatMessage? chatReceipt) {
-    logger.i('received chatVideo chatReceipt');
+  ChatDirect? get direct {
+    return _direct;
+  }
+
+  setChatReceipt(ChatMessage? chatReceipt, ChatDirect direct) {
+    logger.i('${direct.name} chatVideo chatReceipt');
+    _direct = direct;
     _chatReceipt = chatReceipt;
     notifyListeners();
   }

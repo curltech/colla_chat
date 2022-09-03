@@ -81,7 +81,8 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   ///收到回执
   _receivedReceipt() async {
     ChatMessage? chatReceipt = videoChatReceiptController.chatReceipt;
-    if (chatReceipt != null) {
+    ChatDirect? direct = videoChatReceiptController.direct;
+    if (chatReceipt != null && direct != null && direct == ChatDirect.receive) {
       String? status = chatReceipt.status;
       String? subMessageType = chatReceipt.subMessageType;
       if (subMessageType != null) {
