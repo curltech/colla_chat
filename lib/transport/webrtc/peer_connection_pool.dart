@@ -227,7 +227,7 @@ class PeerConnectionPool {
     peerConnections = peerConnections ?? {};
     AdvancedPeerConnection? old = peerConnections[clientId];
     if (old != null) {
-      await old.close();
+      logger.w('old peerId:$peerId clientId:$clientId is exist!');
     }
     peerConnections[clientId] = advancedPeerConnection;
 
@@ -311,6 +311,7 @@ class PeerConnectionPool {
       for (var entry in removePeerConnections.entries) {
         if (clientId == null || clientId == entry.value.clientId) {
           await entry.value.close();
+          logger.i('peerId:$peerId clientId:$clientId is closed!');
         }
       }
       return true;
