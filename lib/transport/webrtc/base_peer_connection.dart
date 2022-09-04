@@ -565,11 +565,15 @@ class BasePeerConnection {
     if (localDescription != null) {
       logger.w('LocalDescription sdp offer is exist:${localDescription.type}');
     }
-    RTCSessionDescription offer =
-        await peerConnection.createOffer(sdpConstraints);
-    await peerConnection.setLocalDescription(offer);
-    logger.i('createOffer and setLocalDescription offer successfully');
-    await _sendOffer(offer);
+    try {
+      RTCSessionDescription offer =
+          await peerConnection.createOffer(sdpConstraints);
+      await peerConnection.setLocalDescription(offer);
+      logger.i('createOffer and setLocalDescription offer successfully');
+      await _sendOffer(offer);
+    } catch (e) {
+      logger.e('createOffer,setLocalDescription and sendOffer failure:$e');
+    }
   }
 
   ///作为主叫，调用外部方法发送offer
@@ -695,13 +699,17 @@ class BasePeerConnection {
     logger.i('start createAnswer');
     RTCSessionDescription? answer = await peerConnection.getLocalDescription();
     if (answer != null) {
-      logger.e('getLocalDescription local sdp answer is exist:${answer.type}');
+      logger.w('getLocalDescription local sdp answer is exist:${answer.type}');
     }
     answer = await peerConnection.createAnswer(sdpConstraints);
     logger.i('create local sdp answer:${answer.type}, and setLocalDescription');
-    await peerConnection.setLocalDescription(answer);
-    logger
-        .i('setLocalDescription local sdp answer:${answer.type} successfully');
+    try {
+      await peerConnection.setLocalDescription(answer);
+      logger.i(
+          'setLocalDescription local sdp answer:${answer.type} successfully');
+    } catch (e) {
+      logger.e('createAnswer failure:$e');
+    }
     await _sendAnswer(answer);
   }
 

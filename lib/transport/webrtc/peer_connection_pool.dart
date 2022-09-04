@@ -10,7 +10,6 @@ import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:synchronized/extension.dart';
-import 'package:synchronized/synchronized.dart';
 
 import '../../entity/chat/chat.dart';
 import '../../entity/p2p/chain_message.dart';
@@ -538,6 +537,7 @@ class PeerConnectionPool {
     List<AdvancedPeerConnection>? peerConnections = get(peerId);
     if (peerConnections != null && peerConnections.isNotEmpty) {
       List<Future<void>> ps = [];
+      logger.w('send signal:${peerConnections.length}');
       for (var peerConnection in peerConnections) {
         if (clientId == null || peerConnection.clientId == clientId) {
           Future<void> p =
@@ -689,7 +689,8 @@ class PeerConnectionPool {
             messageType: ChatMessageType.system,
             subMessageType: ChatSubMessageType.signal);
         await chatMessageService.send(chatMessage);
-        logger.i('sent signal by webrtc peerId:$peerId, clientId:$clientId');
+        logger.w(
+            'sent signal chatMessage by webrtc peerId:$peerId, clientId:$clientId, signal:$jsonStr');
       } else {
         var result = await signalAction.signal(evt.data, peerId,
             targetClientId: clientId);
