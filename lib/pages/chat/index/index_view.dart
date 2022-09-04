@@ -1,12 +1,15 @@
 import 'package:colla_chat/pages/chat/chat/video_dialin_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../crypto/util.dart';
 import '../../../entity/chat/chat.dart';
 import '../../../provider/app_data_provider.dart';
 import '../../../widgets/common/image_widget.dart';
+import '../../../widgets/special_text/custom_special_text_span_builder.dart';
 import '../../../widgets/style/platform_widget_factory.dart';
 import '../login/loading.dart';
 import 'bottom_bar.dart';
@@ -28,6 +31,8 @@ class _IndexViewState extends State<IndexView>
     with SingleTickerProviderStateMixin {
   bool videoChatVisible = false;
   bool chatMessageVisible = false;
+  final CustomSpecialTextSpanBuilder customSpecialTextSpanBuilder =
+      CustomSpecialTextSpanBuilder();
 
   @override
   void initState() {
@@ -78,22 +83,50 @@ class _IndexViewState extends State<IndexView>
         } else {
           title = '';
         }
-
         var name = chatMessage.senderName;
         name = name ?? '';
-
-        card = Card(
-            margin: EdgeInsets.zero,
-            elevation: 0,
+        card = Container(
+            height: 80,
+            padding: const EdgeInsets.all(5.0),
             color: Colors.black.withOpacity(0.5),
-            child: ListTile(
-              leading: const ImageWidget(image: ''),
-              title: Text(name, style: const TextStyle(color: Colors.white)),
-              subtitle:
-                  Text(title!, style: const TextStyle(color: Colors.white)),
-              trailing:
-                  Text(content!, style: const TextStyle(color: Colors.white)),
-            ));
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Row(children: [
+                const ImageWidget(image: ''),
+                const SizedBox(
+                  width: 15.0,
+                ),
+                Text(name, style: const TextStyle(color: Colors.white)),
+                const SizedBox(
+                  width: 15.0,
+                ),
+                Text(title!, style: const TextStyle(color: Colors.white)),
+              ]),
+              const SizedBox(
+                height: 15.0,
+              ),
+              ExtendedText(
+                content,
+                style: const TextStyle(
+                  color: Colors.white,
+                  //fontSize: 16.0,
+                ),
+                specialTextSpanBuilder: customSpecialTextSpanBuilder,
+                onSpecialTextTap: (dynamic value) {
+                  if (value.toString().startsWith('\$')) {
+                    launchUrl(Uri(
+                        scheme: 'https',
+                        host: 'github.com',
+                        path: 'fluttercandies'));
+                  } else if (value.toString().startsWith('@')) {
+                    launchUrl(Uri(
+                      scheme: 'mailto',
+                      path: 'zmtzawqlp@live.com',
+                    ));
+                  }
+                },
+              ),
+            ]));
 
         //延时
         Future.delayed(const Duration(seconds: 10)).then((value) {
