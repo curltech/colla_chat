@@ -103,7 +103,7 @@ class GlobalChatMessageController with ChangeNotifier {
   ///收到webrtc signal消息
   _receiveSignal(ChatMessage chatMessage, String content) async {
     String peerId = chatMessage.senderPeerId!;
-    String? clientId = chatMessage.senderClientId;
+    String clientId = chatMessage.senderClientId!;
     if (chatMessage.subMessageType == ChatSubMessageType.signal.name) {
       WebrtcSignal webrtcSignal =
           WebrtcSignal.fromJson(JsonUtil.toJson(content));
@@ -113,7 +113,7 @@ class GlobalChatMessageController with ChangeNotifier {
   }
 
   ///发送PreKeyBundle
-  sendPreKeyBundle(String peerId, {String? clientId}) async {
+  sendPreKeyBundle(String peerId, {required String clientId}) async {
     return;
     PreKeyBundle preKeyBundle =
         signalSessionPool.signalKeyPair.getPreKeyBundle();

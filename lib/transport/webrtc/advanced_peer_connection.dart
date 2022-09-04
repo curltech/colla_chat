@@ -17,12 +17,12 @@ import '../../tool/util.dart';
 class SignalExtension {
   late String peerId;
   late String clientId;
-  String? name;
+  late String name;
   Room? room;
   List<Map<String, String>>? iceServers;
 
   SignalExtension(this.peerId, this.clientId,
-      {this.name, this.room, this.iceServers});
+      {required this.name, this.room, this.iceServers});
 
   SignalExtension.fromJson(Map json) {
     peerId = json['peerId'];
@@ -69,11 +69,14 @@ class SignalExtension {
 
 class WebrtcEvent {
   String peerId;
-  String? clientId;
+  String clientId;
   dynamic data;
 
-  WebrtcEvent(this.peerId, {this.clientId, this.data});
+  WebrtcEvent(this.peerId, {required this.clientId, this.data});
 }
+
+const String unknownClientId = 'unknownClientId';
+const String unknownName = 'unknownName';
 
 ///基础的PeerConnection之上加入了业务的编号，peerId和clientId，自动进行信号的协商
 class AdvancedPeerConnection {
@@ -83,15 +86,15 @@ class AdvancedPeerConnection {
   //主叫创建的时候，一般clientId为空，需要在后面填写
   //作为被叫的时候，clientId是有值的
   String peerId;
-  String? clientId;
-  String? name;
+  String clientId;
+  String name;
   Room? room;
 
   //远程媒体流渲染器数组，在onAddStream,onAddTrack等的回调方法中得到
   Map<String, PeerVideoRender> videoRenders = {};
 
   AdvancedPeerConnection(this.peerId, bool initiator,
-      {this.clientId, this.name, this.room}) {
+      {this.clientId = unknownClientId, this.name = unknownName, this.room}) {
     logger.w(
         'advancedPeerConnection peerId:$peerId, clientId:$clientId, initiator:$initiator create');
     if (initiator) {

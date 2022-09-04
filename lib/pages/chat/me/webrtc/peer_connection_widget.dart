@@ -169,8 +169,8 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
     try {
       //创建本地连接对象
       _localConnection = BasePeerConnection(initiator: true);
-      var extension =
-          SignalExtension('', '', iceServers: configuration['iceServers']!);
+      var extension = SignalExtension('', '',
+          name: '', iceServers: configuration['iceServers']!);
       await _localConnection!.init(extension: extension);
       //添加本地Candidate事件监听
       _localConnection!.on(WebrtcEventType.iceCandidate, _onLocalCandidate);

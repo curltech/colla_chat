@@ -15,11 +15,10 @@ class PeerConnectionsController extends VideoRenderController {
     return _peerConnections.values.first.values.first;
   }
 
-  modify(String peerId, {String? clientId}) {
+  modify(String peerId, {required String clientId}) {
     AdvancedPeerConnection? peerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (peerConnection != null) {
-      clientId = clientId ?? '';
       var pcs = _peerConnections[peerId];
       if (pcs != null) {
         if (pcs.containsKey(clientId)) {
@@ -29,11 +28,10 @@ class PeerConnectionsController extends VideoRenderController {
     }
   }
 
-  add(String peerId, {String? clientId}) {
+  add(String peerId, {required String clientId}) {
     AdvancedPeerConnection? peerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (peerConnection != null) {
-      clientId = clientId ?? '';
       var pcs = _peerConnections[peerId];
       if (pcs == null) {
         pcs = {};
