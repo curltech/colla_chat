@@ -92,6 +92,8 @@ class AdvancedPeerConnection {
 
   AdvancedPeerConnection(this.peerId, bool initiator,
       {this.clientId, this.name, this.room}) {
+    logger.w(
+        'advancedPeerConnection peerId:$peerId, clientId:$clientId, initiator:$initiator create');
     if (initiator) {
       final basePeerConnection = BasePeerConnection(initiator: true);
       this.basePeerConnection = basePeerConnection;

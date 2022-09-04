@@ -633,7 +633,11 @@ class BasePeerConnection {
       if (remoteDescription != null) {
         logger.w('remoteDescription is exist');
       }
-      await peerConnection.setRemoteDescription(sdp);
+      try {
+        await peerConnection.setRemoteDescription(sdp);
+      } catch (e) {
+        logger.e('setRemoteDescription failure:$e');
+      }
     }
     //如果什么都不是，报错
     else {
