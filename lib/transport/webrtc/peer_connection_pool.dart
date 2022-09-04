@@ -444,7 +444,7 @@ class PeerConnectionPool {
   /// @param data
   onWebrtcSignal(String peerId, WebrtcSignal signal, {String? clientId}) async {
     var signalType = signal.signalType;
-    logger.i('receive signal type: $signalType from webrtcPeer: $peerId');
+    logger.w('receive signal type: $signalType from webrtcPeer: $peerId');
     String? name;
     List<Map<String, String>>? iceServers;
     Room? room;
@@ -542,6 +542,7 @@ class PeerConnectionPool {
         if (clientId == null || peerConnection.clientId == clientId) {
           Future<void> p =
               peerConnection.send(data, cryptoOption: cryptoOption);
+          logger.w('send signal');
           ps.add(p);
         }
       }
