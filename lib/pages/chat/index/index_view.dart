@@ -41,17 +41,16 @@ class _IndexViewState extends State<IndexView>
       videoChatOverlayEntry!.remove();
       videoChatOverlayEntry = null;
     }
+    setState(() {});
   }
 
   _showVideoChatMessage(BuildContext context, ChatMessage chatMessage) {
-    videoChatOverlayEntry = OverlayEntry(
-        maintainState: true,
-        builder: (context) {
-          return Align(
-            alignment: Alignment.topLeft,
-            child: _buildVideoDialIn(context, chatMessage),
-          );
-        });
+    videoChatOverlayEntry = OverlayEntry(builder: (context) {
+      return Align(
+        alignment: Alignment.topLeft,
+        child: _buildVideoDialIn(context, chatMessage),
+      );
+    });
     Overlay.of(context)!.insert(videoChatOverlayEntry!);
     //延时，移除 OverlayEntry
     Future.delayed(const Duration(seconds: 20)).then((value) {
