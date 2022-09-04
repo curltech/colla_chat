@@ -91,7 +91,7 @@ class _IndexViewState extends State<IndexView>
               child: Card(
                   margin: EdgeInsets.zero,
                   elevation: 0,
-                  color: Colors.black.withAlpha(128),
+                  color: Colors.black.withOpacity(0.5),
                   child: ListTile(
                     leading: const ImageWidget(image: ''),
                     title:

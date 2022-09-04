@@ -123,11 +123,10 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
 
   Widget _buildVideoChatView(BuildContext context) {
     return Column(children: [
-      Container(
-          padding: const EdgeInsets.all(5.0),
-          margin: EdgeInsets.zero,
-          //elevation: 0,
-          color: Colors.black.withAlpha(128),
+      Card(
+          margin: const EdgeInsets.all(5.0),
+          elevation: 0,
+          color: Colors.black.withOpacity(0.5),
           child: Row(
             children: [
               InkWell(
