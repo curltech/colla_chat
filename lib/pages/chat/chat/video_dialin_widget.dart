@@ -94,7 +94,7 @@ class VideoDialInWidget extends StatelessWidget {
     return Card(
         margin: EdgeInsets.zero,
         elevation: 0,
-        color: Colors.black.withAlpha(128),
+        color: Colors.black.withOpacity(0.5),
         child: ListTile(
             leading: const ImageWidget(image: ''),
             title: Text(name, style: const TextStyle(color: Colors.white)),

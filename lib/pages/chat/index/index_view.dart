@@ -41,7 +41,7 @@ class _IndexViewState extends State<IndexView>
       videoChatOverlayEntry!.remove();
       videoChatOverlayEntry = null;
     }
-    setState(() {});
+    Overlay.of(context)!.setState(() {});
   }
 
   _showVideoChatMessage(BuildContext context, ChatMessage chatMessage) {

@@ -121,31 +121,28 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
 
   Widget _buildVideoChatView(BuildContext context) {
     return Column(children: [
-      Card(
-          margin: const EdgeInsets.all(0),
-          elevation: 0,
+      Container(
+          padding: const EdgeInsets.all(5.0),
           color: Colors.black.withOpacity(0.5),
-          child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Row(
-                children: [
-                  InkWell(
-                    onTap: () {
-                      _minimize(context);
-                    },
-                    child: const Icon(Icons.zoom_in_map, size: 24),
-                  ),
-                  const Spacer(),
-                  InkWell(
-                    onTap: () {
-                      setState(() {
-                        actionVisible = true;
-                      });
-                    },
-                    child: const Icon(Icons.add_circle, size: 24),
-                  ),
-                ],
-              ))),
+          child: Row(
+            children: [
+              InkWell(
+                onTap: () {
+                  _minimize(context);
+                },
+                child: const Icon(Icons.zoom_in_map, size: 24),
+              ),
+              const Spacer(),
+              InkWell(
+                onTap: () {
+                  setState(() {
+                    actionVisible = !actionVisible;
+                  });
+                },
+                child: const Icon(Icons.add_circle, size: 24),
+              ),
+            ],
+          )),
       Expanded(child: _buildVideoViewCard(context)),
     ]);
   }
@@ -156,9 +153,14 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
       _buildVideoChatView(context),
       Visibility(
           visible: actionVisible,
-          child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Card(child: _buildActionCard(context))))
+          child: Column(children: [
+            const Spacer(),
+            Card(
+                margin: EdgeInsets.zero,
+                elevation: 0,
+                color: Colors.black.withOpacity(0.5),
+                child: _buildActionCard(context)),
+          ]))
     ]);
   }
 
