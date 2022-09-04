@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 
 import '../../../crypto/util.dart';
 import '../../../entity/chat/chat.dart';
-import '../../../plugin/logger.dart';
 import '../../../provider/app_data_provider.dart';
 import '../../../widgets/common/image_widget.dart';
 import '../../../widgets/style/platform_widget_factory.dart';
@@ -27,8 +26,8 @@ class IndexView extends StatefulWidget {
 
 class _IndexViewState extends State<IndexView>
     with SingleTickerProviderStateMixin {
-  OverlayEntry? videoChatOverlayEntry;
-  OverlayEntry? chatMessageOverlayEntry;
+  bool videoChatVisible = false;
+  bool chatMessageVisible = false;
 
   @override
   void initState() {
@@ -36,107 +35,109 @@ class _IndexViewState extends State<IndexView>
     globalChatMessageController.addListener(_update);
   }
 
-  _closeVideoChatOverlayEntry() {
-    if (videoChatOverlayEntry != null) {
-      videoChatOverlayEntry!.remove();
-      videoChatOverlayEntry = null;
-    }
-  }
-
-  _showVideoChatMessage(BuildContext context, ChatMessage chatMessage) {
-    videoChatOverlayEntry = OverlayEntry(builder: (context) {
-      return Align(
-        alignment: Alignment.topLeft,
-        child: _buildVideoDialIn(context, chatMessage),
-      );
-    });
-    Overlay.of(context)!.insert(videoChatOverlayEntry!);
-    //延时，移除 OverlayEntry
-    Future.delayed(const Duration(seconds: 20)).then((value) {
-      _closeVideoChatOverlayEntry();
-    });
-  }
-
-  _closeChatMessageOverlayEntry() {
-    if (chatMessageOverlayEntry != null) {
-      chatMessageOverlayEntry!.remove();
-      chatMessageOverlayEntry = null;
-    }
-  }
-
-  _showChatMessage(BuildContext context, ChatMessage chatMessage) {
-    String? content = chatMessage.content;
-    if (content != null) {
-      var raw = CryptoUtil.decodeBase64(content);
-      content = CryptoUtil.utf8ToString(raw);
-    } else {
-      content = '';
-    }
-    String? title = chatMessage.title;
-    if (title != null) {
-      var raw = CryptoUtil.decodeBase64(title);
-      title = CryptoUtil.utf8ToString(raw);
-    } else {
-      title = '';
-    }
-    chatMessageOverlayEntry = OverlayEntry(
-        builder: (context) {
-          var name = chatMessage.senderName;
-          name = name ?? '';
-          return Align(
-              alignment: Alignment.topLeft,
-              child: Card(
-                  margin: EdgeInsets.zero,
-                  elevation: 0,
-                  color: Colors.black.withOpacity(0.5),
-                  child: ListTile(
-                    leading: const ImageWidget(image: ''),
-                    title:
-                        Text(name, style: const TextStyle(color: Colors.white)),
-                    subtitle: Text(title!,
-                        style: const TextStyle(color: Colors.white)),
-                    trailing: Text(content!,
-                        style: const TextStyle(color: Colors.white)),
-                  )));
+  _buildVideoChatMessage(BuildContext context) {
+    Widget videoDialIn = Container();
+    if (videoChatVisible) {
+      ChatMessage? chatMessage = globalChatMessageController.chatMessage;
+      if (chatMessage != null) {
+        //视频通话请求消息
+        if (chatMessage.subMessageType == ChatSubMessageType.videoChat.name) {
+          videoDialIn = _buildVideoDialIn(context, chatMessage);
+        } else if (chatMessage.subMessageType ==
+            ChatSubMessageType.audioChat.name) {
+          videoDialIn = _buildVideoDialIn(context, chatMessage);
+        }
+      }
+      //延时，移除 OverlayEntry
+      Future.delayed(const Duration(seconds: 20)).then((value) {
+        setState(() {
+          videoChatVisible = false;
         });
-    Overlay.of(context)!.insert(chatMessageOverlayEntry!);
-    //延时，移除 OverlayEntry
-    Future.delayed(const Duration(seconds: 10)).then((value) {
-      _closeChatMessageOverlayEntry();
-    });
+      });
+    }
+    return Visibility(visible: videoChatVisible, child: videoDialIn);
+  }
+
+  _buildChatMessage(BuildContext context) {
+    Widget card = Container();
+    if (chatMessageVisible) {
+      ChatMessage? chatMessage = globalChatMessageController.chatMessage;
+      if (chatMessage != null &&
+          chatMessage.subMessageType == ChatSubMessageType.chat.name) {
+        String? content = chatMessage.content;
+        if (content != null) {
+          var raw = CryptoUtil.decodeBase64(content);
+          content = CryptoUtil.utf8ToString(raw);
+        } else {
+          content = '';
+        }
+        String? title = chatMessage.title;
+        if (title != null) {
+          var raw = CryptoUtil.decodeBase64(title);
+          title = CryptoUtil.utf8ToString(raw);
+        } else {
+          title = '';
+        }
+
+        var name = chatMessage.senderName;
+        name = name ?? '';
+
+        card = Card(
+            margin: EdgeInsets.zero,
+            elevation: 0,
+            color: Colors.black.withOpacity(0.5),
+            child: ListTile(
+              leading: const ImageWidget(image: ''),
+              title: Text(name, style: const TextStyle(color: Colors.white)),
+              subtitle:
+                  Text(title!, style: const TextStyle(color: Colors.white)),
+              trailing:
+                  Text(content!, style: const TextStyle(color: Colors.white)),
+            ));
+
+        //延时
+        Future.delayed(const Duration(seconds: 10)).then((value) {
+          setState(() {
+            chatMessageVisible = false;
+          });
+        });
+      }
+    }
+    return Visibility(
+        visible: chatMessageVisible,
+        child: Align(alignment: Alignment.topLeft, child: card));
   }
 
   _update() async {
     ChatMessage? chatMessage = globalChatMessageController.chatMessage;
     if (chatMessage != null) {
-      //视频通话请求消息
-      if (chatMessage.subMessageType == ChatSubMessageType.videoChat.name) {
-        _showVideoChatMessage(context, chatMessage);
+      if (chatMessage.subMessageType == ChatSubMessageType.chat.name) {
+        setState(() {
+          chatMessageVisible = true;
+        });
       } else if (chatMessage.subMessageType ==
-          ChatSubMessageType.audioChat.name) {
-        _showVideoChatMessage(context, chatMessage);
-      } else {
-        _showChatMessage(context, chatMessage);
+              ChatSubMessageType.videoChat.name ||
+          chatMessage.subMessageType == ChatSubMessageType.audioChat.name) {
+        setState(() {
+          videoChatVisible = true;
+        });
       }
     }
   }
 
   _onTap(ChatMessage chatMessage, ChatReceiptType chatReceiptType) {
-    _closeVideoChatOverlayEntry();
-    if (chatReceiptType == ChatReceiptType.agree) {
-      //同意，发出本地流
-      logger.i('ChatReceiptType agree');
-    } else if (chatReceiptType == ChatReceiptType.reject) {
-      //拒绝，关闭对话框
-      logger.i('ChatReceiptType reject');
-    }
+    setState(() {
+      videoChatVisible = false;
+    });
   }
 
   Widget _buildVideoDialIn(BuildContext context, ChatMessage chatMessage) {
-    return VideoDialInWidget(
+    Widget videoDialInWidget;
+    videoDialInWidget = VideoDialInWidget(
       chatMessage: chatMessage,
       onTap: _onTap,
     );
+    return Align(alignment: Alignment.topLeft, child: videoDialInWidget);
   }
 
   Widget _createScaffold(
@@ -157,7 +158,9 @@ class _IndexViewState extends State<IndexView>
               child: platformWidgetFactory.buildSizedBox(
                   child: indexWidget,
                   height: appDataProvider.mobileSize.height,
-                  width: appDataProvider.mobileSize.width))
+                  width: appDataProvider.mobileSize.width)),
+          _buildChatMessage(context),
+          _buildVideoChatMessage(context)
         ])),
         //endDrawer: endDrawer,
         bottomNavigationBar: bottomNavigationBar);
