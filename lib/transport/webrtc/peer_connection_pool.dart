@@ -292,7 +292,7 @@ class PeerConnectionPool {
           removePeerConnections[advancedPeerConnection.clientId] =
               advancedPeerConnection;
         }
-        logger.i('remove peerConnection peerId:$peerId,clientId:clientId');
+        logger.i('remove peerConnection peerId:$peerId,clientId:$clientId');
       }
       if (peerConnections.isEmpty) {
         this.peerConnections.remove(peerId);
