@@ -10,10 +10,8 @@ import '../../../entity/chat/chat.dart';
 import '../../../provider/data_list_controller.dart';
 import '../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../transport/webrtc/peer_connection_pool.dart';
-import '../me/webrtc/peer_connection_controller.dart';
 import 'chat_message_input.dart';
 import 'chat_message_item.dart';
-import 'controller/peer_connections_controller.dart';
 
 ///好友或者群的消息控制器，包含某个连接的所有消息
 class ChatMessageController extends DataMoreController<ChatMessage> {
@@ -27,8 +25,14 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   }
 
   set chatSummary(ChatSummary? chatSummary) {
-    _chatSummary = chatSummary;
-    clear();
+    if (_chatSummary != null &&
+        chatSummary != null &&
+        _chatSummary!.id == chatSummary.id) {
+    } else {
+      _chatSummary = chatSummary;
+      _index = 0;
+      clear();
+    }
     previous(limit: defaultLimit);
   }
 

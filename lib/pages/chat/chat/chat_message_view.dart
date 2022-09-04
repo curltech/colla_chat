@@ -109,7 +109,6 @@ class _ChatMessageViewState extends State<ChatMessageView> {
   void dispose() {
     chatMessageController.removeListener(_update);
     peerConnectionPoolController.removeListener(_update);
-    chatMessageController.index = 0;
     super.dispose();
   }
 }
