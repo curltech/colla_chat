@@ -46,21 +46,19 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   }
 
   _minimize(BuildContext context) {
-    overlayEntry = OverlayEntry(
-        maintainState: true,
-        builder: (context) {
-          return Align(
-            alignment: Alignment.topRight,
-            child: WidgetUtil.buildCircleButton(
-                padding: const EdgeInsets.all(15.0),
-                backgroundColor: appDataProvider.themeData!.colorScheme.primary,
-                onPressed: () {
-                  _closeOverlayEntry();
-                },
-                child: const Icon(
-                    size: 32, color: Colors.white, Icons.zoom_out_map)),
-          );
-        });
+    overlayEntry = OverlayEntry(builder: (context) {
+      return Align(
+        alignment: Alignment.topRight,
+        child: WidgetUtil.buildCircleButton(
+            padding: const EdgeInsets.all(15.0),
+            backgroundColor: appDataProvider.themeData!.colorScheme.primary,
+            onPressed: () {
+              _closeOverlayEntry();
+            },
+            child:
+                const Icon(size: 32, color: Colors.white, Icons.zoom_out_map)),
+      );
+    });
     Overlay.of(context)!.insert(overlayEntry!);
     chatMessageController.index = 0;
   }
@@ -124,28 +122,30 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   Widget _buildVideoChatView(BuildContext context) {
     return Column(children: [
       Card(
-          margin: const EdgeInsets.all(5.0),
+          margin: const EdgeInsets.all(0),
           elevation: 0,
           color: Colors.black.withOpacity(0.5),
-          child: Row(
-            children: [
-              InkWell(
-                onTap: () {
-                  _minimize(context);
-                },
-                child: const Icon(Icons.zoom_in_map, size: 24),
-              ),
-              const Spacer(),
-              InkWell(
-                onTap: () {
-                  setState(() {
-                    actionVisible = true;
-                  });
-                },
-                child: const Icon(Icons.add_circle, size: 24),
-              ),
-            ],
-          )),
+          child: Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: Row(
+                children: [
+                  InkWell(
+                    onTap: () {
+                      _minimize(context);
+                    },
+                    child: const Icon(Icons.zoom_in_map, size: 24),
+                  ),
+                  const Spacer(),
+                  InkWell(
+                    onTap: () {
+                      setState(() {
+                        actionVisible = true;
+                      });
+                    },
+                    child: const Icon(Icons.add_circle, size: 24),
+                  ),
+                ],
+              ))),
       Expanded(child: _buildVideoViewCard(context)),
     ]);
   }

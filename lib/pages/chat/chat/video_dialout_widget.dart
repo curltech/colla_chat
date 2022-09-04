@@ -126,7 +126,6 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
 
   _minimize(BuildContext context) {
     overlayEntry = OverlayEntry(
-        maintainState: true,
         builder: (context) {
           return Align(
             alignment: Alignment.topRight,

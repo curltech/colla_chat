@@ -81,7 +81,6 @@ class _IndexViewState extends State<IndexView>
       title = '';
     }
     chatMessageOverlayEntry = OverlayEntry(
-        maintainState: true,
         builder: (context) {
           var name = chatMessage.senderName;
           name = name ?? '';
