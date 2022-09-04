@@ -69,9 +69,9 @@ class _VideoViewCardState extends State<VideoViewCard> {
       videoViews.add(videoView);
     }
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(2.0),
+      padding: const EdgeInsets.all(0),
       controller: ScrollController(),
-      child: Wrap(runSpacing: 2.0, spacing: 2.0, children: videoViews),
+      child: Wrap(runSpacing: 0, spacing: 0, children: videoViews),
     );
   }
 
