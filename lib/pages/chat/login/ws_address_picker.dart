@@ -1,10 +1,11 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_awesome_select/flutter_awesome_select.dart';
 import 'package:provider/provider.dart';
 
-import '../../constant/address.dart';
-import '../../l10n/localization.dart';
-import '../../provider/app_data_provider.dart';
+import '../../../constant/address.dart';
+import '../../../l10n/localization.dart';
+import '../../../provider/app_data_provider.dart';
+import '../../../widgets/data_bind/data_select.dart';
 
 class WsAddressPicker extends StatefulWidget {
   const WsAddressPicker({Key? key}) : super(key: key);
@@ -46,31 +47,25 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
     Provider.of<AppDataProvider>(context).themeData;
     Provider.of<AppDataProvider>(context).brightness;
     var instance = AppLocalizations.instance;
-    List<S2Choice<String>> items = [];
-    for (var nodeAddressOption in nodeAddressOptions.values) {
-      var label = instance.text(nodeAddressOption.name);
-      var item = S2Choice<String>(value: nodeAddressOption.name, title: label);
-      items.add(item);
+    List<Option> items = [];
+    for (var entry in nodeAddressOptions.entries) {
+      items.add(Option(entry.key, entry.key));
     }
     return Column(children: <Widget>[
-      SmartSelect<String>.single(
-        modalType: S2ModalType.bottomSheet,
-        placeholder: instance.text('Please select address'),
-        title: instance.text('Address'),
-        selectedValue: _name,
-        choiceItems: items,
-        onChange: (dynamic state) {
+      DataSelect(
+        hint: 'Please select address',
+        label: 'Address',
+        initValue: _name,
+        items: items,
+        onChanged: (String? value) {
           setState(() {
-            String value = state.value;
-            _name = value;
-            if (value != '') {
+            if (value != null) {
+              _name = value;
               var nodeAddress = nodeAddressOptions[value];
               var appParams = AppDataProvider.instance;
               if (nodeAddress != null) {
                 var wsConnectAddress = nodeAddress.wsConnectAddress;
-                if (wsConnectAddress == null) {
-                  wsConnectAddress = '';
-                }
+                wsConnectAddress ??= '';
                 _wsConnectAddressController.text = wsConnectAddress;
                 appParams.defaultNodeAddress = nodeAddress;
               }

@@ -1,10 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../constant/base.dart';
 import '../../l10n/localization.dart';
 import 'form_input_widget.dart';
 
@@ -469,19 +469,29 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     if (options != null && options.isNotEmpty) {
       for (var i = 0; i < options.length; ++i) {
         var option = options[i];
-        var item = DropdownMenuItem(
+        var item = DropdownMenuItem<String>(
           value: option.value,
           child: Text(option.label),
         );
         children.add(item);
       }
     }
-    var dropdownButton = DropdownButton<String>(
-      items: children,
-      onChanged: (String? value) {
-        widget.controller.value = value;
-      },
-    );
+    var dropdownButton = Row(children: [
+      Text(AppLocalizations.t(columnFieldDef.label)),
+      const Spacer(),
+      DropdownButton<String>(
+        dropdownColor: Colors.grey.withOpacity(0.7),
+        underline: Container(),
+        hint: Text(AppLocalizations.t(columnFieldDef.hintText ?? '')),
+        elevation: 0,
+        value: widget.controller.value,
+        items: children,
+        onChanged: (String? value) {
+          widget.controller.value = value;
+          setState(() {});
+        },
+      )
+    ]);
 
     return dropdownButton;
   }

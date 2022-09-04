@@ -1,4 +1,3 @@
-import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -8,11 +7,6 @@ import '../../../service/dht/myselfpeer.dart';
 import '../../../tool/util.dart';
 import '../../../widgets/data_bind/column_field_widget.dart';
 import '../../../widgets/data_bind/form_input_widget.dart';
-
-const String skipLoginName = 'skipLogin';
-const String lastLoginName = 'lastLogin';
-const String credentialName = 'credential';
-const String passwordName = 'password';
 
 /// 远程登录组件，一个card下的录入框和按钮组合
 class P2pLoginWidget extends StatefulWidget {
@@ -45,22 +39,19 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
     _skipLogin();
   }
 
+  ///获取最后一次登录的用户名
   _lastLogin() async {
-    String? lastLoginStr = await localSecurityStorage.get(lastLoginName);
-    if (StringUtil.isNotEmpty(lastLoginStr)) {
-      Map<String, dynamic> skipLogin = JsonUtil.toJson(lastLoginStr);
-      String? credential = skipLogin[credentialName];
-      if (StringUtil.isNotEmpty(credential)) {
-        ColumnFieldDef credential = p2pLoginInputFieldDef[0];
-        credential.initValue = credential;
-      }
+    String? credential = await myselfPeerService.lastCredentialName();
+    if (StringUtil.isNotEmpty(credential)) {
+      ColumnFieldDef credential = p2pLoginInputFieldDef[0];
+      credential.initValue = credential;
     }
   }
 
+  ///获取最后一次登录的用户名和密码，如果都存在，快捷登录
   _skipLogin() async {
-    String? skipLoginStr = await localSecurityStorage.get(skipLoginName);
-    if (StringUtil.isNotEmpty(skipLoginStr)) {
-      Map<String, dynamic> skipLogin = JsonUtil.toJson(skipLoginStr);
+    Map<String, dynamic>? skipLogin = await myselfPeerService.credential();
+    if (skipLogin != null) {
       String? credential = skipLogin[credentialName];
       String? password = skipLogin[passwordName];
       if (StringUtil.isNotEmpty(credential) &&
@@ -89,13 +80,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
     String password = values[passwordName];
     myselfPeerService.login(credential, password).then((bool loginStatus) {
       if (loginStatus) {
-        //最后一次成功登录的用户名
-        String lastLogin = JsonUtil.toJsonString({credentialName: credential});
-        localSecurityStorage.save(lastLoginName, lastLogin);
-        //记录最后成功登录的用户名和密码
-        String skipLogin = JsonUtil.toJsonString(
-            {credentialName: credential, passwordName: password});
-        localSecurityStorage.save(skipLoginName, skipLogin);
+        myselfPeerService.saveCredential(credential, password);
         Application.router
             .navigateTo(context, Application.index, replace: true);
       } else {

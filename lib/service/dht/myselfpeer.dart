@@ -19,8 +19,14 @@ import '../../entity/p2p/chain_message.dart';
 import '../../p2p/chain/action/connect.dart';
 import '../../p2p/chain/baseaction.dart';
 import '../../platform.dart';
+import '../../plugin/security_storage.dart';
 import '../../tool/util.dart';
 import 'base.dart';
+
+const String skipLoginName = 'skipLogin';
+const String lastLoginName = 'lastLogin';
+const String credentialName = 'credential';
+const String passwordName = 'password';
 
 class MyselfPeerService extends PeerEntityService<MyselfPeer> {
   MyselfPeerService(
@@ -133,6 +139,44 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     return true;
   }
 
+  ///获取最后一次登录的用户名
+  Future<String?> lastCredentialName() async {
+    String? lastLoginStr = await localSecurityStorage.get(lastLoginName);
+    if (StringUtil.isNotEmpty(lastLoginStr)) {
+      Map<String, dynamic> skipLogin = JsonUtil.toJson(lastLoginStr);
+      String? credential = skipLogin[credentialName];
+      return credential;
+    }
+    return null;
+  }
+
+  ///获取最后一次登录的用户名和密码，如果都存在，快捷登录
+  Future<Map<String, dynamic>?> credential() async {
+    String? skipLoginStr = await localSecurityStorage.get(skipLoginName);
+    if (StringUtil.isNotEmpty(skipLoginStr)) {
+      Map<String, dynamic> skipLogin = JsonUtil.toJson(skipLoginStr);
+      return skipLogin;
+    }
+
+    return null;
+  }
+
+  ///获取最后一次登录的用户名和密码，如果都存在，快捷登录
+  Future<void> removeCredential() async {
+    await localSecurityStorage.remove(skipLoginName);
+    await localSecurityStorage.remove(lastLoginName);
+  }
+
+  Future<void> saveCredential(String credential, String password) async {
+    //最后一次成功登录的用户名
+    String lastLogin = JsonUtil.toJsonString({credentialName: credential});
+    await localSecurityStorage.save(lastLoginName, lastLogin);
+    //记录最后成功登录的用户名和密码
+    String skipLogin = JsonUtil.toJsonString(
+        {credentialName: credential, passwordName: password});
+    await localSecurityStorage.save(skipLoginName, skipLogin);
+  }
+
   /// 登录，验证本地账户，连接p2p服务节点，注册成功
   Future<bool> login(String credential, String password) async {
     ///本地查找账户
@@ -211,6 +255,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
 
   ///登出成功后执行
   Future<void> postLogout() async {
+    await removeCredential();
     peerConnectionPool.clear();
     signalSessionPool.clear();
   }
