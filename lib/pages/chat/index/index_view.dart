@@ -41,7 +41,6 @@ class _IndexViewState extends State<IndexView>
       videoChatOverlayEntry!.remove();
       videoChatOverlayEntry = null;
     }
-    Overlay.of(context)!.setState(() {});
   }
 
   _showVideoChatMessage(BuildContext context, ChatMessage chatMessage) {
@@ -117,7 +116,7 @@ class _IndexViewState extends State<IndexView>
           ChatSubMessageType.audioChat.name) {
         _showVideoChatMessage(context, chatMessage);
       } else {
-        //_showChatMessage(context, chatMessage);
+        _showChatMessage(context, chatMessage);
       }
     }
   }
