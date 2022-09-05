@@ -123,12 +123,13 @@ dependencies:
   filesystem_picker: ^2.0.1
   file_picker: ^4.6.0
   wechat_assets_picker: ^7.3.2 #微信图库
+  flutter_slidable: ^2.0.0
   #安全加密
   cryptography: ^2.0.5 #ecc,aes
   #在macos上不能使用，error: cannot call value of non-function type 'FlutterBinaryMessenger'
   #cryptography_flutter: ^2.0.2
   bs58: ^1.0.2
-  webcrypto: ^0.5.2
+  webcrypto: ^0.5.3
   pinenacl: ^0.3.4
   encrypt: ^5.0.1 #aes
   openpgp: ^3.2.8 #rsa,sha
