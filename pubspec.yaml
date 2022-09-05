@@ -125,7 +125,8 @@ dependencies:
   wechat_assets_picker: ^7.3.2 #微信图库
   #安全加密
   cryptography: ^2.0.5 #ecc,aes
-  #cryptography_flutter: ^2.0.2 #macos，error: cannot call value of non-function type 'FlutterBinaryMessenger'
+  #在macos上不能使用，error: cannot call value of non-function type 'FlutterBinaryMessenger'
+  cryptography_flutter: ^2.0.2
   bs58: ^1.0.2
   webcrypto: ^0.5.2
   pinenacl: ^0.3.4
@@ -148,6 +149,8 @@ dependencies:
   share_plus: ^4.0.4
   date_format: ^2.0.6
   classic_logger: any
+  logger: ^1.1.0
+  logging: ^1.0.2
   cross_file: any
   qr_flutter: ^4.0.0
   #barcode_widget: ^2.0.2
@@ -158,7 +161,8 @@ dependencies:
   # 多媒体
   #flutter_audio_waveforms: any
   photo_view: ^0.14.0 #图片显示
-  #flutter_sound: ^9.2.12 #音频处理 ios:Undefined symbol: ___gxx_personality_v0,ld: symbol(s) not found for architecture x86_64
+  #音频处理 ios:Undefined symbol: ___gxx_personality_v0,ld: symbol(s) not found for architecture x86_64
+  #flutter_sound: ^9.2.12
   audioplayers: ^1.0.1 #音频处理
   video_player: ^2.1.1 #视频播放
   flick_video_player: any
@@ -175,6 +179,7 @@ dependencies:
   enough_mail: ^2.1.0
   enough_media: ^2.2.0
   enough_mail_html: ^2.0.0
+  #在ios下会引发启动崩溃
 #  enough_mail_flutter: ^2.0.0 #ios崩溃
 dependency_overrides:
   photo_view: ^0.14.0

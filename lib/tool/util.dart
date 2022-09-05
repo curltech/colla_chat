@@ -9,7 +9,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
-import 'package:connectivity/connectivity.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +18,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:mobile_number/mobile_number.dart';
-import 'package:mobile_scanner/mobile_scanner.dart' as mobile_scanner;
+//#macos有问题
+//import 'package:mobile_scanner/mobile_scanner.dart' as mobile_scanner;
 import 'package:network_info_plus/network_info_plus.dart';
 import 'package:package_info/package_info.dart';
 import 'package:path_provider/path_provider.dart';
@@ -1237,20 +1238,21 @@ class QrcodeUtil {
     return result;
   }
 
-  static Future<String?> mobileScan() async {
-    mobile_scanner.MobileScannerController cameraController =
-        mobile_scanner.MobileScannerController();
-    Future<String?> result = Future(() {
-      mobile_scanner.MobileScanner(
-          allowDuplicates: false,
-          controller: cameraController,
-          onDetect: (barcode, args) {
-            return barcode.rawValue;
-          });
-    });
-
-    return result;
-  }
+  ///macos有问题
+  // static Future<String?> mobileScan() async {
+  //   mobile_scanner.MobileScannerController cameraController =
+  //       mobile_scanner.MobileScannerController();
+  //   Future<String?> result = Future(() {
+  //     mobile_scanner.MobileScanner(
+  //         allowDuplicates: false,
+  //         controller: cameraController,
+  //         onDetect: (barcode, args) {
+  //           return barcode.rawValue;
+  //         });
+  //   });
+  //
+  //   return result;
+  // }
 
   static Widget generate(String value) {
     return SfBarcodeGenerator(
