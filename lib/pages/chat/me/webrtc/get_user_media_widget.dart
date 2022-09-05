@@ -59,7 +59,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
         await render!.enumerateDevices();
       }
     } catch (e) {
-      logger.e(e.toString());
+      logger.e('$e');
     }
     if (!mounted) return;
 
@@ -75,23 +75,32 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
         _inCalling = false;
       });
     } catch (e) {
-      logger.e(e.toString());
+      logger.e('$e');
     }
   }
 
   void _startRecording() async {
-    render!.startRecording();
-    setState(() {});
+    if (render != null) {
+      render!.startRecording();
+      setState(() {});
+    }
   }
 
   void _stopRecording() async {
-    render!.stopRecording();
-    setState(() {});
+    if (render != null) {
+      render!.stopRecording();
+      setState(() {});
+    }
   }
 
   void _toggleTorch() async {
+    if (render != null) {
+      return;
+    }
+
     if (render!.mediaStream == null) {
-      throw 'Stream is not initialized';
+      logger.e('Stream is not initialized');
+      return;
     }
 
     final videoTrack = render!.mediaStream!
@@ -109,6 +118,9 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   }
 
   void _toggleCamera() async {
+    if (render != null) {
+      return;
+    }
     if (render!.mediaStream == null) {
       throw 'Stream is not initialized';
     }
@@ -116,6 +128,9 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   }
 
   void _captureFrame() async {
+    if (render != null) {
+      return;
+    }
     if (render!.mediaStream == null) {
       throw 'Stream is not initialized';
     }
@@ -137,21 +152,20 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   }
 
   Widget _buildVideoView(BuildContext context) {
-    var width = MediaQuery.of(context).size.width;
-    var height = MediaQuery.of(context).size.height;
-    if (render!=null) {
-      return render!.createVideoView(
-        width: width,
-        height: height,
-      );
-    }else{
+    if (render == null) {
       return Container();
     }
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
+    return render!.createVideoView(
+      width: width,
+      height: height,
+    );
   }
 
   List<Widget>? _buildActions(BuildContext context) {
     List<MediaDeviceInfo>? mediaDevicesList;
-    if (render!=null) {
+    if (render != null) {
       mediaDevicesList = render!.mediaDevicesList;
     }
     return _inCalling

@@ -1,6 +1,7 @@
 import 'dart:core';
 import 'dart:io' as io;
 
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -44,37 +45,47 @@ class PlatformParams {
           instance.linux = io.Platform.isLinux;
           instance.macos = io.Platform.isMacOS;
           instance.windows = io.Platform.isWindows;
-          var locales = io.Platform.localeName.split('_');
-          //instance.locale = Locale(locales[0], locales[1]);
-          instance.localHostname = io.Platform.localHostname;
-          instance.operatingSystem = io.Platform.operatingSystem;
-          instance.operatingSystemVersion = io.Platform.operatingSystemVersion;
-          instance.version = io.Platform.version;
-          if (io.Platform.isAndroid) {
-            instance.deviceData = instance
-                ._readAndroidBuildData(await deviceInfoPlugin.androidInfo);
-          } else if (io.Platform.isIOS) {
-            instance.deviceData =
-                instance._readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
-          }else if (io.Platform.isLinux) {
-            instance.deviceData =
-                instance._readLinuxDeviceInfo(await deviceInfoPlugin.linuxInfo);
-          } else if (io.Platform.isMacOS) {
-            instance.deviceData =
-                instance._readMacOsDeviceInfo(await deviceInfoPlugin.macOsInfo);
-          } else if (io.Platform.isWindows) {
-            instance.deviceData = instance
-                ._readWindowsDeviceInfo(await deviceInfoPlugin.windowsInfo);
-          }
         } else {
-          //instance.web = true;
+          instance.web = true;
         }
       } catch (e) {
-        //instance.web = true;
+        logger.e('init:$e');
+        instance.web = true;
       }
-      if (instance.web) {
-        instance.deviceData =
-            instance._readWebBrowserInfo(await deviceInfoPlugin.webBrowserInfo);
+
+      try {
+        var locales = io.Platform.localeName.split('_');
+        if (locales.length == 2) {
+          instance.locale = Locale(locales[0], locales[1]);
+        }
+        if (locales.length == 1) {
+          instance.locale = Locale(locales[0]);
+        }
+        instance.localHostname = io.Platform.localHostname;
+        instance.operatingSystem = io.Platform.operatingSystem;
+        instance.operatingSystemVersion = io.Platform.operatingSystemVersion;
+        instance.version = io.Platform.version;
+        if (instance.android) {
+          instance.deviceData = instance
+              ._readAndroidBuildData(await deviceInfoPlugin.androidInfo);
+        } else if (instance.ios) {
+          instance.deviceData =
+              instance._readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
+        } else if (instance.linux) {
+          instance.deviceData =
+              instance._readLinuxDeviceInfo(await deviceInfoPlugin.linuxInfo);
+        } else if (instance.macos) {
+          instance.deviceData =
+              instance._readMacOsDeviceInfo(await deviceInfoPlugin.macOsInfo);
+        } else if (instance.windows) {
+          instance.deviceData = instance
+              ._readWindowsDeviceInfo(await deviceInfoPlugin.windowsInfo);
+        } else if (instance.web) {
+          instance.deviceData = instance
+              ._readWebBrowserInfo(await deviceInfoPlugin.webBrowserInfo);
+        }
+      } catch (e) {
+        logger.e('init:$e');
       }
       initStatus = true;
     }

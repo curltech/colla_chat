@@ -7,6 +7,7 @@ import 'package:cryptography/cryptography.dart';
 
 class CryptoGraphy {
   CryptoGraphy() {
+    ///目前在macos上不能使用，其功能是加速快加密的速度
     //FlutterCryptography.enable();
   }
 
