@@ -3,11 +3,11 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
 import 'package:cryptography/cryptography.dart';
-import 'package:cryptography_flutter/cryptography_flutter.dart';
+//import 'package:cryptography_flutter/cryptography_flutter.dart';
 
 class CryptoGraphy {
   CryptoGraphy() {
-    FlutterCryptography.enable();
+    //FlutterCryptography.enable();
   }
 
   /// 对消息进行hash处理，输入消息可以为字符串或者uintarray，

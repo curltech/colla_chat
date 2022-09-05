@@ -5,6 +5,7 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../../../l10n/localization.dart';
 import '../../../../transport/webrtc/peer_video_render.dart';
@@ -138,14 +139,21 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   Widget _buildVideoView(BuildContext context) {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
-    return render!.createVideoView(
-      width: width,
-      height: height,
-    );
+    if (render!=null) {
+      return render!.createVideoView(
+        width: width,
+        height: height,
+      );
+    }else{
+      return Container();
+    }
   }
 
   List<Widget>? _buildActions(BuildContext context) {
-    var mediaDevicesList = render!.mediaDevicesList;
+    List<MediaDeviceInfo>? mediaDevicesList;
+    if (render!=null) {
+      mediaDevicesList = render!.mediaDevicesList;
+    }
     return _inCalling
         ? <Widget>[
             IconButton(

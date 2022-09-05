@@ -45,7 +45,7 @@ class PlatformParams {
           instance.macos = io.Platform.isMacOS;
           instance.windows = io.Platform.isWindows;
           var locales = io.Platform.localeName.split('_');
-          instance.locale = Locale(locales[0], locales[1]);
+          //instance.locale = Locale(locales[0], locales[1]);
           instance.localHostname = io.Platform.localHostname;
           instance.operatingSystem = io.Platform.operatingSystem;
           instance.operatingSystemVersion = io.Platform.operatingSystemVersion;
@@ -56,6 +56,7 @@ class PlatformParams {
           } else if (io.Platform.isIOS) {
             instance.deviceData =
                 instance._readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
+          }else if (io.Platform.isLinux) {
             instance.deviceData =
                 instance._readLinuxDeviceInfo(await deviceInfoPlugin.linuxInfo);
           } else if (io.Platform.isMacOS) {
@@ -66,10 +67,10 @@ class PlatformParams {
                 ._readWindowsDeviceInfo(await deviceInfoPlugin.windowsInfo);
           }
         } else {
-          instance.web = true;
+          //instance.web = true;
         }
       } catch (e) {
-        instance.web = true;
+        //instance.web = true;
       }
       if (instance.web) {
         instance.deviceData =

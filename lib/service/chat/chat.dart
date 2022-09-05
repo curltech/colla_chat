@@ -334,7 +334,7 @@ final chatMessageService = ChatMessageService(
       'createDate',
       'sendTime',
       'receiveTime',
-      'actualReceiveTime',
+      'receiptTime',
       'title',
     ],
     fields: ServiceLocator.buildFields(ChatMessage(''), []));
