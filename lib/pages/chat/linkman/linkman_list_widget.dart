@@ -18,26 +18,26 @@ import 'p2p_linkman_add_widget.dart';
 
 final List<TileData> headTileData = [
   TileData(
-      icon: Icon(Icons.network_cell,
+      prefix: Icon(Icons.network_cell,
           color: appDataProvider.themeData?.colorScheme.primary),
       title: 'P2pLinkmanAdd',
       routeName: 'p2p_linkman_add'),
   TileData(
-      icon: Icon(Icons.qr_code,
+      prefix: Icon(Icons.qr_code,
           color: appDataProvider.themeData?.colorScheme.primary),
       title: 'QrcodeScanAdd',
       routeName: 'qr_code_add'),
   TileData(
-      icon: Icon(Icons.contact_phone,
+      prefix: Icon(Icons.contact_phone,
           color: appDataProvider.themeData?.colorScheme.primary),
       title: 'ContactAdd',
       routeName: 'contact_add'),
   TileData(
-      icon: Icon(Icons.request_quote,
+      prefix: Icon(Icons.request_quote,
           color: appDataProvider.themeData?.colorScheme.primary),
       title: 'LinkmanRequest'),
   TileData(
-      icon: Icon(Icons.tag_faces,
+      prefix: Icon(Icons.tag_faces,
           color: appDataProvider.themeData?.colorScheme.primary),
       title: 'Tag'),
 ];
@@ -147,7 +147,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
         var title = linkman.name ?? '';
         var subtitle = linkman.peerId ?? '';
         TileData tile = TileData(
-            avatar: linkman.avatar,
+            prefix: linkman.avatar,
             title: title,
             subtitle: subtitle,
             routeName: 'linkman_show');
@@ -164,7 +164,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
         var title = group.name ?? '';
         var subtitle = group.peerId ?? '';
         TileData tile = TileData(
-            avatar: group.avatar,
+            prefix: group.avatar,
             title: title,
             subtitle: subtitle,
             routeName: 'group_show');

@@ -98,7 +98,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
           child: defaultImage,
         );
         TileData tile = TileData(
-            icon: badge,
+            prefix: badge,
             title: title,
             subtitle: subtitle,
             routeName: 'chat_message');
@@ -122,7 +122,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
           child: defaultImage,
         );
         TileData tile = TileData(
-            icon: badge,
+            prefix: badge,
             title: title,
             subtitle: subtitle,
             routeName: 'chat_message');

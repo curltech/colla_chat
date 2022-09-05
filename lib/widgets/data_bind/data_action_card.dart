@@ -3,12 +3,12 @@ import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 
-class ActionCard extends StatelessWidget {
+class DataActionCard extends StatelessWidget {
   final List<TileData> actions;
   final double? height;
   final Function(int index, String title)? onPressed;
 
-  const ActionCard(
+  const DataActionCard(
       {Key? key, required this.actions, this.onPressed, this.height})
       : super(key: key);
 
@@ -32,7 +32,7 @@ class ActionCard extends StatelessWidget {
           },
           text: tileData.title ?? '',
           textColor: Colors.black,
-          icon: tileData.icon!),
+          icon: tileData.prefix),
     );
   }
 

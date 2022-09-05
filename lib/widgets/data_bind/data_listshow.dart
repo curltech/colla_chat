@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../l10n/localization.dart';
 import '../common/image_widget.dart';
 
+///多个字段显示
 class DataListShow extends StatelessWidget {
   final Map<String, dynamic> values;
   final String? avatar;

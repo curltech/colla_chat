@@ -8,11 +8,11 @@ import '../../../widgets/data_bind/data_listview.dart';
 
 final List<TileData> mockTileData = [
   TileData(
-      icon: const Icon(Icons.collections),
+      prefix: const Icon(Icons.collections),
       title: '李志群',
       routeName: '/chat/collection'),
   TileData(
-      icon: const Icon(Icons.settings),
+      prefix: const Icon(Icons.settings),
       title: '胡百水',
       routeName: '/chat/setting'),
 ];

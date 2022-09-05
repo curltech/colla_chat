@@ -3,16 +3,16 @@ import 'package:colla_chat/pages/chat/chat/video_view_card.dart';
 import 'package:flutter/material.dart';
 
 import '../../../provider/app_data_provider.dart';
-import '../../../widgets/common/action_card.dart';
+import '../../../widgets/data_bind/data_action_card.dart';
 import '../../../widgets/common/simple_widget.dart';
 import '../../../widgets/data_bind/data_listtile.dart';
 import 'chat_message_widget.dart';
 import 'controller/local_media_controller.dart';
 
 final List<TileData> actionTileData = [
-  TileData(title: '镜头切换', icon: const Icon(Icons.cameraswitch)),
-  TileData(title: '麦克风开关', icon: const Icon(Icons.mic_rounded)),
-  TileData(title: '扬声器开关', icon: const Icon(Icons.speaker_phone)),
+  TileData(title: '镜头切换', prefix: const Icon(Icons.cameraswitch)),
+  TileData(title: '麦克风开关', prefix: const Icon(Icons.mic_rounded)),
+  TileData(title: '扬声器开关', prefix: const Icon(Icons.speaker_phone)),
 ];
 
 ///视频通话窗口，显示多个小视频窗口，每个小窗口代表一个对方，其中一个是自己
@@ -93,7 +93,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     Widget actionCard = Container(
       margin: const EdgeInsets.all(0.0),
       padding: const EdgeInsets.only(bottom: 0.0),
-      child: ActionCard(
+      child: DataActionCard(
         actions: actionTileData,
         height: height,
         onPressed: _onAction,

@@ -10,23 +10,23 @@ import '../../../../widgets/data_bind/data_listview.dart';
 
 final List<TileData> settingTileData = [
   TileData(
-      icon: Icon(Icons.security,
+      prefix: Icon(Icons.security,
           color: appDataProvider.themeData?.colorScheme.primary),
       title: 'Security'),
   TileData(
-      icon: Icon(Icons.privacy_tip,
+      prefix: Icon(Icons.privacy_tip,
           color: appDataProvider.themeData?.colorScheme.primary),
       title: 'Privacy'),
   TileData(
-      icon: Icon(Icons.generating_tokens,
+      prefix: Icon(Icons.generating_tokens,
           color: appDataProvider.themeData?.colorScheme.primary),
       title: 'General'),
   TileData(
-      icon: Icon(Icons.high_quality,
+      prefix: Icon(Icons.high_quality,
           color: appDataProvider.themeData?.colorScheme.primary),
       title: 'Advanced'),
   TileData(
-      icon: Icon(Icons.usb,
+      prefix: Icon(Icons.usb,
           color: appDataProvider.themeData?.colorScheme.primary),
       title: 'About'),
 ];

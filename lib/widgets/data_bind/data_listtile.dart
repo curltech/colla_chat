@@ -4,6 +4,7 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 
 import '../../provider/data_list_controller.dart';
@@ -13,11 +14,8 @@ enum RouteStyle { workspace, navigator }
 
 /// 通用列表项的数据模型
 class TileData {
-  //图标Widget
-  final Widget? icon;
-
-  //头像字节或者assets路径
-  final String? avatar;
+  //可以是Widget，String，IconData
+  final dynamic prefix;
 
   //标题
   final String title;
@@ -28,9 +26,11 @@ class TileData {
   //缺省行为，为空的时候，是打上选择标志，颜色变化
   Function(int index, String title)? onTap;
 
+  List<TileData>? slideActions;
+  List<TileData>? endSlideActions;
+
   TileData(
-      {this.icon,
-      this.avatar,
+      {this.prefix,
       required this.title,
       this.subtitle,
       this.suffix,
@@ -39,7 +39,7 @@ class TileData {
 
   static TileData of(TileDataMixin mixin) {
     return TileData(
-        title: mixin.title, routeName: mixin.routeName, icon: mixin.icon);
+        title: mixin.title, routeName: mixin.routeName, prefix: mixin.icon);
   }
 
   static List<TileData> from(List<TileDataMixin> mixins) {
@@ -67,6 +67,30 @@ class TileData {
 
   @override
   int get hashCode => title.hashCode;
+
+  Widget? getPrefixWidget() {
+    Widget? leading;
+    if (prefix != null) {
+      if (prefix is Widget) {
+        leading = prefix;
+      } else if (prefix is String) {
+        if (prefix.startsWith('assets/')) {
+          leading = Image.asset(
+            prefix,
+            width: 32,
+            height: 32,
+            fit: BoxFit.fill,
+          );
+        } else {
+          leading = Image.memory(Uint8List.fromList(prefix.codeUnits));
+        }
+      } else if (prefix is IconData) {
+        leading = Icon(prefix);
+      }
+    }
+
+    return leading;
+  }
 }
 
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
@@ -97,22 +121,7 @@ class DataListTile extends StatelessWidget {
 
   Widget _buildListTile(BuildContext context) {
     ///前导组件，一般是自定义图标或者图像
-    Widget? leading;
-    final avatar = tileData.avatar;
-    if (tileData.icon != null) {
-      leading = tileData.icon;
-    } else if (avatar != null) {
-      if (avatar.startsWith('assets/')) {
-        leading = Image.asset(
-          avatar,
-          width: 32,
-          height: 32,
-          fit: BoxFit.fill,
-        );
-      } else {
-        leading = Image.memory(Uint8List.fromList(avatar.codeUnits));
-      }
-    }
+    Widget? leading = tileData.getPrefixWidget();
 
     ///尾部组件数组，首先加入suffix自定义组件或者文本
     List<Widget>? trailing = <Widget>[];
@@ -188,18 +197,61 @@ class DataListTile extends StatelessWidget {
     return listTile;
   }
 
+  ActionPane _buildActionPane(
+      BuildContext context, List<TileData>? slideActions) {
+    List<SlidableAction> slidableActions = [];
+    if (tileData.slideActions != null) {
+      int i = 0;
+      for (var slideAction in tileData.slideActions!) {
+        SlidableAction slidableAction = SlidableAction(
+          onPressed: (context) {
+            if (slideAction.onTap != null) {
+              slideAction.onTap!(i, slideAction.title);
+            }
+          },
+          backgroundColor: appDataProvider.themeData!.colorScheme.primary,
+          foregroundColor: Colors.white,
+          icon: slideAction.prefix,
+          label: slideAction.title,
+        );
+        slidableActions.add(slidableAction);
+      }
+    }
+    ActionPane actionPane = ActionPane(
+      motion: const ScrollMotion(),
+      dismissible: DismissiblePane(onDismissed: () {}),
+      children: slidableActions,
+    );
+
+    return actionPane;
+  }
+
+  Widget _buildSlideActionListTile(BuildContext context) {
+    if (tileData.slideActions == null && tileData.endSlideActions == null) {
+      return _buildListTile(context);
+    }
+
+    ActionPane? startActionPane;
+    if (tileData.slideActions == null && tileData.slideActions!.isNotEmpty) {
+      startActionPane = _buildActionPane(context, tileData.slideActions);
+    }
+    ActionPane? endActionPane;
+    if (tileData.endSlideActions == null &&
+        tileData.endSlideActions!.isNotEmpty) {
+      endActionPane = _buildActionPane(context, tileData.slideActions);
+    }
+
+    Slidable slidable = Slidable(
+      startActionPane: startActionPane,
+      endActionPane: endActionPane,
+      child: _buildListTile(context),
+    );
+
+    return slidable;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-        margin: const EdgeInsets.only(top: 5.0),
-        child: Column(children: <Widget>[
-          _buildListTile(context),
-          const Padding(
-            padding: EdgeInsets.only(left: 5.0, right: 5.0),
-            child: Divider(
-              height: 0.5,
-            ),
-          ),
-        ]));
+    return _buildSlideActionListTile(context);
   }
 }

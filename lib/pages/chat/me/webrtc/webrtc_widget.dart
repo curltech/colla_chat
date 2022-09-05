@@ -15,26 +15,26 @@ import 'get_user_media_widget.dart';
 
 final List<TileData> webrtcTileData = [
   TileData(
-      icon: Icon(Icons.video_call,
+      prefix: Icon(Icons.video_call,
           color: appDataProvider.themeData?.colorScheme.primary),
       title: 'GetUserMedia',
       routeName: 'get_user_media'),
   TileData(
-      icon: Icon(Icons.screen_rotation,
+      prefix: Icon(Icons.screen_rotation,
           color: appDataProvider.themeData?.colorScheme.primary),
       title: 'GetDisplayMedia',
       routeName: 'get_display_media'),
   TileData(
-      icon: Icon(Icons.generating_tokens,
+      prefix: Icon(Icons.generating_tokens,
           color: appDataProvider.themeData?.colorScheme.primary),
       title: 'LoopBack'),
   TileData(
-      icon: Icon(Icons.data_array,
+      prefix: Icon(Icons.data_array,
           color: appDataProvider.themeData?.colorScheme.primary),
       title: 'DataChannel',
       routeName: 'data_channel'),
   TileData(
-      icon: Icon(Icons.video_call,
+      prefix: Icon(Icons.video_call,
           color: appDataProvider.themeData?.colorScheme.primary),
       title: 'PeerConnection',
       routeName: 'peer_connection'),

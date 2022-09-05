@@ -97,6 +97,20 @@ class _DataListViewState extends State<DataListView> {
     }
   }
 
+  Widget _buildListTile(BuildContext context, DataListTile dataListTile) {
+    return Container(
+        margin: const EdgeInsets.only(top: 5.0),
+        child: Column(children: <Widget>[
+          dataListTile,
+          const Padding(
+            padding: EdgeInsets.only(left: 5.0, right: 5.0),
+            child: Divider(
+              height: 0.5,
+            ),
+          ),
+        ]));
+  }
+
   Widget _buildGroup(BuildContext context) {
     Widget groupWidget = RefreshIndicator(
         onRefresh: _onRefresh,
@@ -110,12 +124,14 @@ class _DataListViewState extends State<DataListView> {
             itemBuilder: (BuildContext context, int index) {
               TileData tile = widget.controller.get(index);
 
-              DataListTile tileWidget = DataListTile(
-                dataListViewController: widget.controller,
-                tileData: tile,
-                index: index,
-                onTap: _onTap,
-              );
+              Widget tileWidget = _buildListTile(
+                  context,
+                  DataListTile(
+                    dataListViewController: widget.controller,
+                    tileData: tile,
+                    index: index,
+                    onTap: _onTap,
+                  ));
 
               return tileWidget;
             }));

@@ -97,7 +97,7 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
       if (mailAddresses.isNotEmpty) {
         for (var mailAddress in mailAddresses) {
           TileData key =
-              TileData(title: mailAddress.email, icon: const Icon(Icons.email));
+              TileData(title: mailAddress.email, prefix: const Icon(Icons.email));
           List<enough_mail.Mailbox?>? mailboxes =
               mailAddressProvider.getMailboxes(mailAddress.email);
           if (mailboxes != null && mailboxes.isNotEmpty) {
@@ -113,7 +113,7 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
                   icon = _createIcon(mailbox.name);
                 }
                 TileData tile = TileData(
-                    title: mailbox.name, icon: icon, routeName: 'mails');
+                    title: mailbox.name, prefix: icon, routeName: 'mails');
                 tiles.add(tile);
               }
             }

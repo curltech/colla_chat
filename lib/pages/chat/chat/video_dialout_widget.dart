@@ -13,7 +13,7 @@ import '../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../transport/webrtc/base_peer_connection.dart';
 import '../../../transport/webrtc/peer_connection_pool.dart';
 import '../../../transport/webrtc/peer_video_render.dart';
-import '../../../widgets/common/action_card.dart';
+import '../../../widgets/data_bind/data_action_card.dart';
 import '../../../widgets/common/image_widget.dart';
 import '../../../widgets/common/simple_widget.dart';
 import '../../../widgets/data_bind/data_listtile.dart';
@@ -31,14 +31,14 @@ import 'controller/local_media_controller.dart';
 ///8.如果发起方在接收回执到来前，自己主动终止请求，执行挂断操作，设置挂断标志，对远程流不予接受
 
 final List<TileData> actionTileData = [
-  TileData(title: '视频通话', icon: const Icon(Icons.video_call)),
-  TileData(title: '音频通话', icon: const Icon(Icons.multitrack_audio_outlined)),
-  TileData(title: '屏幕共享', icon: const Icon(Icons.screen_share)),
-  TileData(title: '媒体播放', icon: const Icon(Icons.video_file)),
-  TileData(title: '镜头切换', icon: const Icon(Icons.cameraswitch)),
-  TileData(title: '显示背景', icon: const Icon(Icons.photo_camera_back)),
-  TileData(title: '麦克风开关', icon: const Icon(Icons.mic_rounded)),
-  TileData(title: '扬声器开关', icon: const Icon(Icons.speaker_phone)),
+  TileData(title: '视频通话', prefix: const Icon(Icons.video_call)),
+  TileData(title: '音频通话', prefix: const Icon(Icons.multitrack_audio_outlined)),
+  TileData(title: '屏幕共享', prefix: const Icon(Icons.screen_share)),
+  TileData(title: '媒体播放', prefix: const Icon(Icons.video_file)),
+  TileData(title: '镜头切换', prefix: const Icon(Icons.cameraswitch)),
+  TileData(title: '显示背景', prefix: const Icon(Icons.photo_camera_back)),
+  TileData(title: '麦克风开关', prefix: const Icon(Icons.mic_rounded)),
+  TileData(title: '扬声器开关', prefix: const Icon(Icons.speaker_phone)),
 ];
 
 ///视频通话拨出的窗口
@@ -240,7 +240,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
     return Container(
       margin: const EdgeInsets.all(0.0),
       padding: const EdgeInsets.only(bottom: 0.0),
-      child: ActionCard(
+      child: DataActionCard(
         actions: actionTileData,
         height: height,
         onPressed: _onAction,

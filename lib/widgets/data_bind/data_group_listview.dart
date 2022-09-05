@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 
 import '../../provider/data_list_controller.dart';
@@ -107,13 +105,7 @@ class _GroupDataListViewState extends State<GroupDataListView> {
     if (dataListController == null) {
       return null;
     }
-    Widget? leading;
-    final avatar = tile.avatar;
-    if (tile.icon != null) {
-      leading = tile.icon;
-    } else if (avatar != null) {
-      leading = Image.memory(Uint8List.fromList(avatar.codeUnits));
-    }
+    Widget? leading = tile.getPrefixWidget();
     List<Widget>? trailing = <Widget>[];
     var suffix = tile.suffix;
     if (suffix != null) {
