@@ -5,7 +5,6 @@ import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/pages/chat/chat/widget/sound_msg_entity.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_sound/flutter_sound.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import '../../../../tool/util.dart';
@@ -27,7 +26,9 @@ class _SoundMsgState extends State<SoundMsg> with TickerProviderStateMixin {
 
   late AnimationController controller;
   late Animation animation;
-  late FlutterSound flutterSound;
+
+  //音频处理 ios:Undefined symbol: ___gxx_personality_v0,ld: symbol(s) not found for architecture x86_64
+  //late FlutterSound flutterSound;
 
   //AudioPlayer audioPlayer = AudioPlayer();
 
@@ -41,7 +42,7 @@ class _SoundMsgState extends State<SoundMsg> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    flutterSound = FlutterSound();
+    //flutterSound = FlutterSound();
     // flutterSound.setSubscriptionDuration(0.01);
     // flutterSound.setDbPeakLevelUpdate(0.8);
     // flutterSound.setDbLevelEnabled(true);

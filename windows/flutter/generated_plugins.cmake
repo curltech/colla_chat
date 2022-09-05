@@ -9,7 +9,6 @@ list(APPEND FLUTTER_PLUGIN_LIST
   flutter_secure_storage_windows
   flutter_webrtc
   geolocator_windows
-  livekit_client
   local_auth_windows
   network_info_plus_windows
   openpgp

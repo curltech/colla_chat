@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:colla_chat/pages/chat/chat/widget/voice_dialog.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_sound/flutter_sound.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 import '../../../../provider/app_data_provider.dart';
@@ -36,12 +35,13 @@ class _ChatVoiceWidgetState extends State<ChatVoice> {
   ///默认隐藏状态
   bool voiceState = true;
   OverlayEntry? overlayEntry;
-  late FlutterSound flutterSound;
+
+  //late FlutterSound flutterSound;
 
   @override
   void initState() {
     super.initState();
-    flutterSound = FlutterSound();
+    //flutterSound = FlutterSound();
     // flutterSound.setSubscriptionDuration(0.01);
     // flutterSound.setDbPeakLevelUpdate(0.8);
     // flutterSound.setDbLevelEnabled(true);

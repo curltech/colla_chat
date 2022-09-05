@@ -1,6 +1,5 @@
 import 'package:enough_mail/codecs.dart';
 import 'package:enough_mail/highlevel.dart';
-import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -51,11 +50,14 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     }
     Widget mimeMessageViewer;
     if (PlatformParams.instance.android || PlatformParams.instance.ios) {
-      mimeMessageViewer = MimeMessageViewer(
-        mimeMessage: mimeMessage,
-        blockExternalImages: false,
-        mailtoDelegate: handleMailto,
-      );
+      mimeMessageViewer = Container();
+
+      ///在ios下会引发启动崩溃
+      // mimeMessageViewer = MimeMessageViewer(
+      //   mimeMessage: mimeMessage,
+      //   blockExternalImages: false,
+      //   mailtoDelegate: handleMailto,
+      // );
     } else {
       mimeMessageViewer = const Center(child: Text('Not support'));
     }
@@ -69,16 +71,20 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     return null;
   }
 
-  Widget buildViewerForMessage(MimeMessage mimeMessage, MailClient mailClient) {
+  Widget? buildViewerForMessage(
+      MimeMessage mimeMessage, MailClient mailClient) {
     mailClient.fetchMessages(fetchPreference: FetchPreference.envelope);
-    return MimeMessageDownloader(
-      mimeMessage: mimeMessage,
-      mailClient: mailClient,
-      onDownloaded: onMessageDownloaded,
-      blockExternalImages: false,
-      markAsSeen: true,
-      mailtoDelegate: handleMailto,
-    );
+
+    ///在ios下会引发启动崩溃
+    return null;
+    //   MimeMessageDownloader(
+    //   mimeMessage: mimeMessage,
+    //   mailClient: mailClient,
+    //   onDownloaded: onMessageDownloaded,
+    //   blockExternalImages: false,
+    //   markAsSeen: true,
+    //   mailtoDelegate: handleMailto,
+    // );
   }
 
   void onMessageDownloaded(MimeMessage mimeMessage) {
@@ -89,8 +95,8 @@ class _MailContentWidgetState extends State<MailContentWidget> {
   Widget _build(BuildContext context) {
     return Consumer<MailDataProvider>(
         builder: (context, mailAddressProvider, child) {
-      var mimeMessageViewer =
-          _buildMimeMessageViewer(context, mailAddressProvider);
+      Widget mimeMessageViewer = Container();
+      mimeMessageViewer = _buildMimeMessageViewer(context, mailAddressProvider);
       return mimeMessageViewer;
     });
   }
