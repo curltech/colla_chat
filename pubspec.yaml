@@ -1,5 +1,5 @@
 name: colla_chat
-description: A CollaChat Flutter project.
+description: colla_chat Flutter project.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -12,13 +12,15 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # build by specifying --build-name and --build-number, respectively.
 # In Android, build-name is used as versionName while build-number used as versionCode.
 # Read more about Android versioning at https://developer.android.com/studio/publish/versioning
-# In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
+# In iOS, build-name is used as CFBundleShortVersionString while build-number is used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
+# In Windows, build-name is used as the major, minor, and patch parts
+# of the product and file versions while build-number is used as the build suffix.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.17.0 <3.0.0"
+  sdk: '>=2.18.0 <3.0.0'
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -33,15 +35,13 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.2
-  # 获取系统信息和操作
+  # 系统功能，获取系统信息和操作，需要调用插件才能完成
   flutter_background: ^1.1.0
-  device_info: ^2.0.3
   path_provider: ^2.0.11
   image_picker: ^0.8.5+3 #选取图库
   url_launcher: ^6.1.2 #打开系统浏览器
   package_info: ^2.0.2 #获取包信息
-  open_file: ^3.2.1 #打开文件
+  open_file: ^3.2.1 #打开文件, 和最新device_info有版本冲突
   camera: ^0.9.8+1 #调用相机
   orientation: ^1.2.0 # 控制屏幕旋转
   geolocator: ^8.2.1
@@ -52,57 +52,24 @@ dependencies:
   sensors_plus: ^1.3.1
   battery_plus: ^2.1.3
   flutter_contacts: ^1.1.4
-  #contacts_service: ^0.4.6
+  connectivity_plus: ^2.3.0
   # 存储
   shared_preferences: ^2.0.10
   flutter_secure_storage: ^5.0.2
-  sqflite: ^2.0.2+1
-  sqflite_common_ffi: ^2.1.1
   sqlite3: ^1.7.1
   sqlite3_flutter_libs: ^0.5.7
   idb_shim: ^2.0.1
-  idb_sqflite: ^1.1.0
-  #floor: ^1.2.0
-  # 网络功能
+  #网络
+  flutter_webrtc: ^0.9.5
+  dart_webrtc: ^1.0.5
+  #flutter_web_auth: ^0.4.0  #macos有问题
   dio: ^4.0.6
   dio_http2_adapter: ^2.0.0
   web_socket_channel: ^2.2.0
   cached_network_image: ^3.0.0
-  connectivity: ^3.0.6 #网络连接
-  connectivity_plus: ^2.3.0
-  flutter_web_auth: ^0.4.0
-  enough_mail: ^2.1.0
-  enough_media: ^2.2.0
-  enough_mail_html: ^2.0.0
-  enough_mail_flutter: ^2.0.0
-  xml: ^6.0.1
   telephony: 0.2.0
-  # 加密安全
-  cryptography: ^2.0.5 #ecc,aes
-  cryptography_flutter: ^2.0.2
-  bs58: ^1.0.2
-  webcrypto: ^0.5.2
-  pinenacl: ^0.3.4
-  encrypt: ^5.0.1 #aes
-  openpgp: ^3.2.8 #rsa,sha
-  libsignal_protocol_dart: ^0.5.6
-  crypto: ^3.0.1 #sha
-  archive: any
-  uuid: 3.0.6
-  local_auth: any
-  #standard_message_codec: any
-  # 辅助开发工具
-  synchronized: ^3.0.0+2
-  flutter_smart_dialog: any
-  pdfx: <2.0.1+3
-  json_annotation: ^4.3.0
-  permission_handler: ^10.0.0 #权限处理1
-  provider: ^6.0.1 #状态管理
-  flutter_local_notifications: ^9.5.3+1
-  share_plus: ^4.0.4
-  date_format: ^2.0.6
-  classic_logger: any
-  #flutter_easylogger: any
+  #界面
+  cupertino_icons: ^1.0.2
   country_pickers: ^2.0.0
   country_picker: ^2.0.15
   #international_phone_input: ^1.0.4
@@ -123,7 +90,6 @@ dependencies:
   #flutter-international-phone-input:
   intl_phone_field: ^3.1.0
   mobile_number: ^1.0.4
-  # 界面样式和组件
   badges: ^2.0.3
   extended_list: any
   glassmorphism: ^3.0.0
@@ -153,52 +119,66 @@ dependencies:
   #flutter_bloc: ^6.1.0
   #flutter_swiper: 1.1.6 # Flutter 轮播图 https://github.com/best-flutter/flutter_swiper
   flutter_screenutil: ^5.5.3 # Flutter 屏幕适配 https://github.com/OpenFlutter/flutter_screenutil
-  # webrtc
-  flutter_webrtc: ^0.9.4
-  dart_webrtc: ^1.0.5
-  livekit_client: ^1.0.0
   flex_color_picker: ^2.4.0
+  filesystem_picker: ^2.0.1
+  file_picker: ^4.6.0
+  wechat_assets_picker: ^7.3.2 #微信图库
+  #安全加密
+  cryptography: ^2.0.5 #ecc,aes
+  #cryptography_flutter: ^2.0.2 #macos，error: cannot call value of non-function type 'FlutterBinaryMessenger'
+  bs58: ^1.0.2
+  webcrypto: ^0.5.2
+  pinenacl: ^0.3.4
+  encrypt: ^5.0.1 #aes
+  openpgp: ^3.2.8 #rsa,sha
+  libsignal_protocol_dart: ^0.5.6
+  crypto: ^3.0.1 #sha
+  archive: any
+  uuid: 3.0.6
+  local_auth: any
+  #基本开发工具
+  xml: ^6.0.1
+  synchronized: ^3.0.0+2
+  flutter_smart_dialog: any
+  pdfx: <2.0.1+3
+  json_annotation: ^4.3.0
+  permission_handler: ^10.0.0 #权限处理1
+  provider: ^6.0.1 #状态管理
+  flutter_local_notifications: ^9.5.3+1
+  share_plus: ^4.0.4
+  date_format: ^2.0.6
+  classic_logger: any
+  cross_file: any
+  qr_flutter: ^4.0.0
+  #barcode_widget: ^2.0.2
+  barcode_scan2: ^4.2.1
+  #mobile_scanner: ^2.0.0  #macos有问题
+  lpinyin: ^2.0.3 #拼音
+  intl: ^0.17.0
   # 多媒体
   #flutter_audio_waveforms: any
   photo_view: ^0.14.0 #图片显示
-  flutter_sound: ^9.2.12 #音频处理
+  #flutter_sound: ^9.2.12 #音频处理 ios:Undefined symbol: ___gxx_personality_v0,ld: symbol(s) not found for architecture x86_64
   audioplayers: ^1.0.1 #音频处理
   video_player: ^2.1.1 #视频播放
   flick_video_player: any
   flutter_image_compress: ^1.1.0 #图片压缩1
   video_thumbnail: ^0.5.2
   syncfusion_flutter_barcodes: any
-  qr_flutter: ^4.0.0
-  #barcode_widget: ^2.0.2
-  barcode_scan2: ^4.2.1
-  mobile_scanner: ^2.0.0
   image_gallery_saver: ^1.7.1
   extended_image: ^6.0.1
   extended_image_library: ^3.3.0
-  cross_file: any
-  filesystem_picker: ^2.0.1
-  file_picker: ^4.6.0
+  #应用
   flutter_quill: ^5.0.3
   #visual_editor: any
   universal_html: ^2.0.8
-  #本地化
-  lpinyin: ^2.0.3 #拼音
-  wechat_assets_picker: ^7.3.2 #微信图库
-  intl: ^0.17.0
-  #intl_translation: any
-  #intl_translation_format: any
-  flutter_localizations:
-    sdk: flutter
-  # 参考学习
-  #stream_chat_flutter: ^4.0.0
-  #stream_chat_flutter_core: ^4.1.0
-  #stream_chat: ^4.1.0
-  #stream_chat_persistence: ^4.1.0
-  #stream_chat_localizations: ^3.1.0
+  enough_mail: ^2.1.0
+  enough_media: ^2.2.0
+  enough_mail_html: ^2.0.0
+#  enough_mail_flutter: ^2.0.0 #ios崩溃
 dependency_overrides:
   photo_view: ^0.14.0
   device_info_plus: ^4.0.0
-  #qr: ^3.0.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -209,8 +189,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
-  #analyzer: ^4.1.0
-  #floor_generator: ^1.2.0
+  analyzer: ^4.1.0
   build_runner: ^2.1.10
 
 # For information on the generic Dart part of this file, see the
