@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../provider/index_widget_provider.dart';
 import '../channel/channel_widget.dart';
 import '../chat/chat_list_widget.dart';
-import '../linkman/linkman/linkman_list_widget.dart';
+import '../linkman/linkman_list_widget.dart';
 import '../me/me_widget.dart';
 
 ///主工作区，是PageView

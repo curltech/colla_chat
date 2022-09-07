@@ -351,7 +351,7 @@ class PeerVideoRender {
   /// 开始记录视频流到文件
   void startRecording({String? filePath}) async {
     if (mediaStream == null) throw 'Stream is not initialized';
-    if (PlatformParams.instance.ios) {
+    if (platformParams.ios) {
       logger.e('Recording is not available on iOS');
       return;
     }

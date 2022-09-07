@@ -8,7 +8,6 @@ import '../../platform.dart';
 import '../../provider/app_data_provider.dart';
 
 Future<CommonDatabase> openSqlite3({String name = 'colla_chat.db'}) async {
-  var platformParams = PlatformParams.instance;
   if (!platformParams.web) {
     /// 除了web之外的创建打开数据库的方式
     final dbFolder = await getApplicationDocumentsDirectory();

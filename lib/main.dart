@@ -59,7 +59,7 @@ void main(List<String> args) {
   ServiceLocator.init().then((value) {
     HttpOverrides.global = PlatformHttpOverrides();
     runApp(MultiProvider(providers: [
-      ChangeNotifierProvider(create: (context) => AppDataProvider.instance),
+      ChangeNotifierProvider(create: (context) => appDataProvider),
     ], child: const CollaChatApp()));
   });
 }

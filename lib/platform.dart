@@ -8,9 +8,6 @@ import 'package:flutter/foundation.dart';
 
 /// 平台的参数，包括平台的硬件和系统软件特征，是只读的数据
 class PlatformParams {
-  static PlatformParams instance = PlatformParams();
-  static bool initStatus = false;
-
   ///在loading页面创建的时候初始化,包含屏幕大小，系统字体，语言，黑暗明亮模式等信息
   late MediaQueryData mediaQueryData;
 
@@ -31,65 +28,55 @@ class PlatformParams {
 
   late Map<String, dynamic> deviceData;
 
-  static Future<PlatformParams> init() async {
-    if (!initStatus) {
-      final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-      try {
-        if (io.Platform.isAndroid ||
-            io.Platform.isIOS ||
-            io.Platform.isWindows ||
-            io.Platform.isMacOS ||
-            io.Platform.isLinux) {
-          instance.ios = io.Platform.isIOS;
-          instance.android = io.Platform.isAndroid;
-          instance.linux = io.Platform.isLinux;
-          instance.macos = io.Platform.isMacOS;
-          instance.windows = io.Platform.isWindows;
-        } else {
-          instance.web = true;
-        }
-      } catch (e) {
-        logger.e('init:$e');
-        instance.web = true;
+  Future<void> init() async {
+    final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+    try {
+      if (io.Platform.isAndroid ||
+          io.Platform.isIOS ||
+          io.Platform.isWindows ||
+          io.Platform.isMacOS ||
+          io.Platform.isLinux) {
+        ios = io.Platform.isIOS;
+        android = io.Platform.isAndroid;
+        linux = io.Platform.isLinux;
+        macos = io.Platform.isMacOS;
+        windows = io.Platform.isWindows;
+      } else {
+        web = true;
       }
-
-      try {
-        var locales = io.Platform.localeName.split('_');
-        if (locales.length == 2) {
-          instance.locale = Locale(locales[0], locales[1]);
-        }
-        if (locales.length == 1) {
-          instance.locale = Locale(locales[0]);
-        }
-        instance.localHostname = io.Platform.localHostname;
-        instance.operatingSystem = io.Platform.operatingSystem;
-        instance.operatingSystemVersion = io.Platform.operatingSystemVersion;
-        instance.version = io.Platform.version;
-        if (instance.android) {
-          instance.deviceData = instance
-              ._readAndroidBuildData(await deviceInfoPlugin.androidInfo);
-        } else if (instance.ios) {
-          instance.deviceData =
-              instance._readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
-        } else if (instance.linux) {
-          instance.deviceData =
-              instance._readLinuxDeviceInfo(await deviceInfoPlugin.linuxInfo);
-        } else if (instance.macos) {
-          instance.deviceData =
-              instance._readMacOsDeviceInfo(await deviceInfoPlugin.macOsInfo);
-        } else if (instance.windows) {
-          instance.deviceData = instance
-              ._readWindowsDeviceInfo(await deviceInfoPlugin.windowsInfo);
-        } else if (instance.web) {
-          instance.deviceData = instance
-              ._readWebBrowserInfo(await deviceInfoPlugin.webBrowserInfo);
-        }
-      } catch (e) {
-        logger.e('init:$e');
-      }
-      initStatus = true;
+    } catch (e) {
+      logger.e('init:$e');
+      web = true;
     }
-    return instance;
+
+    try {
+      var locales = io.Platform.localeName.split('_');
+      if (locales.length == 2) {
+        locale = Locale(locales[0], locales[1]);
+      }
+      if (locales.length == 1) {
+        locale = Locale(locales[0]);
+      }
+      localHostname = io.Platform.localHostname;
+      operatingSystem = io.Platform.operatingSystem;
+      operatingSystemVersion = io.Platform.operatingSystemVersion;
+      version = io.Platform.version;
+      if (android) {
+        deviceData = _readAndroidBuildData(await deviceInfoPlugin.androidInfo);
+      } else if (ios) {
+        deviceData = _readIosDeviceInfo(await deviceInfoPlugin.iosInfo);
+      } else if (linux) {
+        deviceData = _readLinuxDeviceInfo(await deviceInfoPlugin.linuxInfo);
+      } else if (macos) {
+        deviceData = _readMacOsDeviceInfo(await deviceInfoPlugin.macOsInfo);
+      } else if (windows) {
+        deviceData = _readWindowsDeviceInfo(await deviceInfoPlugin.windowsInfo);
+      } else if (web) {
+        deviceData = _readWebBrowserInfo(await deviceInfoPlugin.webBrowserInfo);
+      }
+    } catch (e) {
+      logger.e('init:$e');
+    }
   }
 
   Map<String, dynamic> _readAndroidBuildData(AndroidDeviceInfo build) {
@@ -160,9 +147,9 @@ class PlatformParams {
     var language = data.language;
     if (language != null) {
       var locales = language.split('-');
-      instance.locale = Locale(locales[0], locales[1]);
+      locale = Locale(locales[0], locales[1]);
     }
-    instance.operatingSystem = data.platform;
+    operatingSystem = data.platform;
     return <String, dynamic>{
       'browserName': describeEnum(data.browserName),
       'appCodeName': data.appCodeName,
@@ -205,3 +192,5 @@ class PlatformParams {
     };
   }
 }
+
+final PlatformParams platformParams = PlatformParams();

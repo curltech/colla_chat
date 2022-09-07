@@ -25,7 +25,7 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
   @override
   void initState() {
     super.initState();
-    var defaultNodeAddress = AppDataProvider.instance.defaultNodeAddress;
+    var defaultNodeAddress = appDataProvider.defaultNodeAddress;
     var wsConnectAddress = defaultNodeAddress.wsConnectAddress;
     if (wsConnectAddress != null) {
       _wsConnectAddress = wsConnectAddress;
@@ -62,12 +62,11 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
             if (value != null) {
               _name = value;
               var nodeAddress = nodeAddressOptions[value];
-              var appParams = AppDataProvider.instance;
               if (nodeAddress != null) {
                 var wsConnectAddress = nodeAddress.wsConnectAddress;
                 wsConnectAddress ??= '';
                 _wsConnectAddressController.text = wsConnectAddress;
-                appParams.defaultNodeAddress = nodeAddress;
+                appDataProvider.defaultNodeAddress = nodeAddress;
               }
               _visibility = true;
             } else {
@@ -93,8 +92,7 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
                 onChanged: (String val) {
                   var nodeAddress = NodeAddress(NodeAddress.defaultName,
                       wsConnectAddress: val);
-                  var appParams = AppDataProvider.instance;
-                  appParams.defaultNodeAddress = nodeAddress;
+                  appDataProvider.defaultNodeAddress = nodeAddress;
                 },
                 onFieldSubmitted: (String val) {},
               )),

@@ -76,8 +76,7 @@ class HttpClientPool {
   /// 初始化连接池，设置缺省httpclient，返回连接池
   static HttpClientPool get instance {
     if (!initStatus) {
-      var appParams = AppDataProvider.instance;
-      var nodeAddress = appParams.nodeAddress;
+      var nodeAddress = appDataProvider.nodeAddress;
       if (nodeAddress.isNotEmpty) {
         for (var address in nodeAddress.entries) {
           var name = address.key;

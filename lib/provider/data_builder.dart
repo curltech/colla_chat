@@ -15,7 +15,7 @@ import '../service/dht/peerclient.dart';
 class DataBuilder {
   static build() async {
     List<Linkman> linkmen = [];
-    var deviceData = PlatformParams.instance.deviceData;
+    var deviceData = platformParams.deviceData;
     var clientDevice = JsonUtil.toJsonString(deviceData);
     var hash = await cryptoGraphy.hash(clientDevice.codeUnits);
     var clientId = CryptoUtil.encodeBase58(hash);

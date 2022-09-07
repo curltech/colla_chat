@@ -181,8 +181,7 @@ class WebsocketPool {
   /// 初始化连接池，设置缺省websocketclient，返回连接池
   static Future<WebsocketPool> get instance async {
     if (!initStatus) {
-      var appParams = AppDataProvider.instance;
-      var nodeAddress = appParams.nodeAddress;
+      var nodeAddress = appDataProvider.nodeAddress;
       if (nodeAddress.isNotEmpty) {
         NodeAddress? defaultNodeAddress = nodeAddress[NodeAddress.defaultName];
         if (defaultNodeAddress != null) {

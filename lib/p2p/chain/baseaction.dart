@@ -97,23 +97,22 @@ abstract class BaseAction {
       String? targetPeerId,
       String? targetClientId}) async {
     ChainMessage chainMessage = ChainMessage();
-    var appParams = AppDataProvider.instance;
     if (connectAddress == null) {
-      if (appParams.nodeAddress.isNotEmpty) {
-        connectAddress = appParams.defaultNodeAddress.wsConnectAddress;
-        connectAddress ??= appParams.defaultNodeAddress.httpConnectAddress;
+      if (appDataProvider.nodeAddress.isNotEmpty) {
+        connectAddress = appDataProvider.defaultNodeAddress.wsConnectAddress;
+        connectAddress ??= appDataProvider.defaultNodeAddress.httpConnectAddress;
       }
     }
     chainMessage.connectAddress = connectAddress;
     if (connectPeerId == null) {
-      if (appParams.nodeAddress.isNotEmpty) {
-        connectPeerId = appParams.defaultNodeAddress.connectPeerId;
+      if (appDataProvider.nodeAddress.isNotEmpty) {
+        connectPeerId = appDataProvider.defaultNodeAddress.connectPeerId;
       }
     }
     chainMessage.connectPeerId = connectPeerId;
 
-    if (topic == null && appParams.topics.isNotEmpty) {
-      topic ??= appParams.topics[0];
+    if (topic == null && appDataProvider.topics.isNotEmpty) {
+      topic ??= appDataProvider.topics[0];
     }
     chainMessage.topic = topic;
     //把负载变成字符串格式

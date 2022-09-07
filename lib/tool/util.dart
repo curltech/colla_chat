@@ -464,7 +464,6 @@ class NetworkInfoUtil {
   }
 
   static Future<String?> getWifiIp() async {
-    var platformParams = await PlatformParams.instance;
     if (!platformParams.web) {
       var info = getWifiInfo();
       var wifiIp = await info.getWifiIP(); // 192.168.1.43

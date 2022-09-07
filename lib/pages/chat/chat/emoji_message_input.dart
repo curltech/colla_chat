@@ -74,7 +74,7 @@ class _EmojiMessageInputWidgetState extends State<EmojiMessageInputWidget> {
             },
             config: Config(
                 columns: 10,
-                emojiSizeMax: 24 * (PlatformParams.instance.ios ? 1.30 : 1.0),
+                emojiSizeMax: 24 * (platformParams.ios ? 1.30 : 1.0),
                 verticalSpacing: 0,
                 horizontalSpacing: 0,
                 gridPadding: EdgeInsets.zero,

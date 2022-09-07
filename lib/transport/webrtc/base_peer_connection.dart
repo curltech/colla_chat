@@ -241,7 +241,6 @@ class BasePeerConnection {
     this.extension = extension;
     try {
       var iceServers = extension.iceServers;
-      var appDataProvider = AppDataProvider.instance;
       iceServers = iceServers ?? appDataProvider.defaultNodeAddress.iceServers;
       extension.iceServers = iceServers;
       var configuration = {'iceServers': iceServers};

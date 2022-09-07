@@ -49,7 +49,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
       mimeMessage = MimeMessage();
     }
     Widget mimeMessageViewer;
-    if (PlatformParams.instance.android || PlatformParams.instance.ios) {
+    if (platformParams.android || platformParams.ios) {
       mimeMessageViewer = Container();
 
       ///在ios下会引发启动崩溃

@@ -1,24 +1,25 @@
+import 'package:colla_chat/pages/chat/linkman/group/group_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_show_widget.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../../entity/base.dart';
-import '../../../../../l10n/localization.dart';
-import '../../../../../provider/app_data_provider.dart';
-import '../../../../../provider/data_list_controller.dart';
-import '../../../../../provider/index_widget_provider.dart';
-import '../../../../../widgets/common/widget_mixin.dart';
-import '../../../../../widgets/data_bind/data_listtile.dart';
-import '../../../../entity/chat/contact.dart';
-import '../../../../service/chat/contact.dart';
-import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/data_bind/data_group_listview.dart';
-import '../../../../widgets/data_bind/data_listview.dart';
-import '../group/group_show_widget.dart';
-import 'p2p_linkman_add_widget.dart';
+import '../../../../entity/base.dart';
+import '../../../../l10n/localization.dart';
+import '../../../../provider/app_data_provider.dart';
+import '../../../../provider/data_list_controller.dart';
+import '../../../../provider/index_widget_provider.dart';
+import '../../../../widgets/common/widget_mixin.dart';
+import '../../../../widgets/data_bind/data_listtile.dart';
+import '../../../entity/chat/contact.dart';
+import '../../../service/chat/contact.dart';
+import '../../../widgets/common/app_bar_view.dart';
+import '../../../widgets/data_bind/data_group_listview.dart';
+import '../../../widgets/data_bind/data_listview.dart';
+import 'group/group_show_widget.dart';
+import 'linkman/p2p_linkman_add_widget.dart';
 
 final List<TileData> headTileData = [
   TileData(
-      prefix: Icon(Icons.network_cell,
+      prefix: Icon(Icons.person_add,
           color: appDataProvider.themeData?.colorScheme.primary),
       title: 'P2pLinkmanAdd',
       routeName: 'p2p_linkman_add'),
@@ -33,13 +34,15 @@ final List<TileData> headTileData = [
       title: 'ContactAdd',
       routeName: 'contact_add'),
   TileData(
-      prefix: Icon(Icons.request_quote,
+      prefix: Icon(Icons.contact_mail,
           color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'LinkmanRequest'),
+      title: 'LinkmanRequest',
+      routeName: 'linkman_request'),
   TileData(
-      prefix: Icon(Icons.tag_faces,
+      prefix: Icon(Icons.group_add,
           color: appDataProvider.themeData?.colorScheme.primary),
-      title: 'Tag'),
+      title: 'GroupAdd',
+      routeName: 'group_add'),
 ];
 
 //联系人页面，带有回退回调函数
@@ -54,6 +57,7 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
   late final LinkmanShowWidget linkmanShowWidget;
   late final GroupShowWidget groupShowWidget;
   late final P2pLinkmanAddWidget p2pLinkmanAddWidget;
+  late final GroupAddWidget groupAddWidget;
 
   LinkmanListWidget({Key? key}) : super(key: key) {
     linkmanService.find().then((List<Linkman> linkmen) {
@@ -92,6 +96,9 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
 
     p2pLinkmanAddWidget = P2pLinkmanAddWidget();
     indexWidgetProvider.define(p2pLinkmanAddWidget);
+
+    groupAddWidget = GroupAddWidget();
+    indexWidgetProvider.define(groupAddWidget);
   }
 
   @override

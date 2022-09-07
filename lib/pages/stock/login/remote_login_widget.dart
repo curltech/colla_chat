@@ -113,8 +113,7 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
   }
 
   Future<void> _login() async {
-    AppDataProvider appParams = await AppDataProvider.instance;
-    await appParams.saveAppParams();
+    await appDataProvider.saveAppParams();
     var current = await stockUser.login('/user/Login', {
       'credential_': _credential,
       'password_': _password,

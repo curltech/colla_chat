@@ -118,9 +118,6 @@ class NodeAddress {
 /// 本应用的参数状态管理器，与操作系统系统和硬件无关，需要保存到本地的存储中
 /// 在系统启动的对象初始化从本地存储中加载
 class AppDataProvider with ChangeNotifier {
-  static AppDataProvider instance = AppDataProvider();
-  static bool initStatus = false;
-
   /// 可选的连接地址，比如http、ws、libp2p、turn
   Map<String, NodeAddress> nodeAddress = nodeAddressOptions;
   var topics = <String>[]; //订阅的主题
@@ -134,7 +131,7 @@ class AppDataProvider with ChangeNotifier {
   MaterialColor? _seedColor = Colors.cyan;
   String _fontFamily = '';
   String _brightness = 'light'; //or dark / system
-  ThemeData? _themeData;
+  ThemeData _themeData = ThemeData();
 
   //屏幕宽高
   double _keyboardHeight = 270.0;
@@ -147,20 +144,17 @@ class AppDataProvider with ChangeNotifier {
   AppDataProvider();
 
   ///初始化一些参数
-  static Future<AppDataProvider> init() async {
-    if (!initStatus) {
-      Object? json = await localSecurityStorage.get('AppParams');
-      if (json != null) {
-        Map<dynamic, dynamic> jsonObject = JsonUtil.toJson(json as String);
-        instance = AppDataProvider.fromJson(jsonObject as Map<String, dynamic>);
-      }
-      initStatus = true;
+  Future<void> init() async {
+    Object? json = await localSecurityStorage.get('AppParams');
+    if (json != null) {
+      Map<dynamic, dynamic> jsonObject = JsonUtil.toJson(json as String);
     }
-    return instance;
+    _buildThemeData();
+    notifyListeners();
   }
 
   ///序列化和反序列化操作
-  AppDataProvider.fromJson(Map<String, dynamic> json);
+  AppDataProvider.fromJson(Map<String, dynamic> json) {}
 
   Map<String, dynamic> toJson() => {};
 
@@ -182,10 +176,7 @@ class AppDataProvider with ChangeNotifier {
   }
 
   /// theme操作
-  ThemeData? get themeData {
-    if (_themeData == null) {
-      _buildThemeData();
-    }
+  ThemeData get themeData {
     return _themeData;
   }
 

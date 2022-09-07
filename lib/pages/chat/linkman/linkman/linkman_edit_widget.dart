@@ -42,7 +42,7 @@ class LinkmanEditWidget extends StatefulWidget with TileDataMixin {
   State<StatefulWidget> createState() => _LinkmanEditWidgetState();
 
   @override
-  String get routeName => 'peer_endpoint_edit';
+  String get routeName => 'linkman_edit';
 
   @override
   bool get withLeading => true;

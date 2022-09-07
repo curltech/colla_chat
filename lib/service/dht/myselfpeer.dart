@@ -83,7 +83,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     if (peer != null) {
       throw 'SameNameAccountExists';
     }
-    var deviceData = PlatformParams.instance.deviceData;
+    var deviceData = platformParams.deviceData;
     var clientDevice = JsonUtil.toJsonString(deviceData);
     var hash = await cryptoGraphy.hash(clientDevice.codeUnits);
     var clientId = CryptoUtil.encodeBase58(hash);
@@ -119,11 +119,9 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     peerProfile.creditScore = 300;
     peerProfile.mobileVerified = 'N';
     peerProfile.visibilitySetting = 'YYYYYY';
-    var platformParams = PlatformParams.instance;
     peerProfile.clientDevice = clientDevice;
-    var appParams = AppDataProvider.instance;
-    peerProfile.locale = appParams.locale;
-    peerProfile.brightness = appParams.brightness;
+    peerProfile.locale = appDataProvider.locale;
+    peerProfile.brightness = appDataProvider.brightness;
     peerProfile.primaryColor = '#19B7C7';
     peerProfile.secondaryColor = '#117EED';
     peerProfile.udpSwitch = false;

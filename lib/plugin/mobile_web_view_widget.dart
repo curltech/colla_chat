@@ -36,7 +36,7 @@ class _MobileWebViewWidgetState extends State<MobileWebViewWidget> {
   @override
   void initState() {
     super.initState();
-    if (PlatformParams.instance.android) {
+    if (platformParams.android) {
       WebView.platform = SurfaceAndroidWebView();
     }
   }

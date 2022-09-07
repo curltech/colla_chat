@@ -74,8 +74,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
   }
 
   _login(Map<String, dynamic> values) {
-    AppDataProvider appParams = AppDataProvider.instance;
-    appParams.saveAppParams();
+    appDataProvider.saveAppParams();
     String credential = values[credentialName];
     String password = values[passwordName];
     myselfPeerService.login(credential, password).then((bool loginStatus) {
