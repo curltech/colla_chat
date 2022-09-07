@@ -1,3 +1,4 @@
+import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:flutter/material.dart';
 
 import '../base.dart';
@@ -67,7 +68,7 @@ abstract class Party extends StatusEntity {
   Party(this.ownerPeerId, this.peerId, this.name) : super();
 
   Party.fromJson(Map json)
-      : ownerPeerId = json['ownerPeerId'],
+      : ownerPeerId = json['ownerPeerId'] ?? myself.peerId,
         peerId = json['peerId'],
         name = json['name'],
         alias = json['alias'],
@@ -255,6 +256,13 @@ class Group extends Party {
   String? pyDescription; // 组描述拼音
   String? myAlias; // 我在本群的昵称
   String? groupOwnerPeerId; // 群主peerId
+  String? peerPrivateKey;
+  String? privateKey;
+
+  String? signalPublicKey;
+
+  String? signalPrivateKey;
+
   List<Linkman> members = [];
 
   Group(String ownerPeerId, String peerId, String name)
@@ -267,6 +275,10 @@ class Group extends Party {
         pyDescription = json['pyDescription'],
         myAlias = json['myAlias'],
         groupOwnerPeerId = json['groupOwnerPeerId'],
+        peerPrivateKey = json['peerPrivateKey'],
+        privateKey = json['privateKey'],
+        signalPublicKey = json['signalPublicKey'],
+        signalPrivateKey = json['signalPrivateKey'],
         super.fromJson(json);
 
   @override
@@ -279,6 +291,10 @@ class Group extends Party {
       'pyDescription': pyDescription,
       'myAlias': myAlias,
       'groupOwnerPeerId': groupOwnerPeerId,
+      'peerPrivateKey': peerPrivateKey,
+      'privateKey': privateKey,
+      'signalPublicKey': signalPublicKey,
+      'signalPrivateKey': signalPrivateKey,
     });
     return json;
   }

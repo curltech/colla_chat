@@ -7,10 +7,11 @@ import '../../tool/util.dart';
 import 'column_field_widget.dart';
 
 class FormInputController with ChangeNotifier {
+  final List<ColumnFieldDef> columnFieldDefs;
   final Map<String, ColumnFieldController> controllers = {};
   EntityState? state;
 
-  FormInputController({this.state});
+  FormInputController(this.columnFieldDefs, {this.state});
 
   setController(String name, ColumnFieldController controller) {
     controllers[name] = controller;
@@ -19,6 +20,30 @@ class FormInputController with ChangeNotifier {
   clear() {
     for (var controller in controllers.values) {
       controller.clear();
+    }
+  }
+
+  _adjustValues(Map<String, dynamic> values) {
+    for (var columnFieldDef in columnFieldDefs) {
+      String name = columnFieldDef.name;
+      if (values.containsKey(name)) {
+        DataType dataType = columnFieldDef.dataType;
+        dynamic value = values[name];
+        if (value == null) {
+          continue;
+        }
+        if (value is String && dataType == DataType.string) {
+          continue;
+        }
+        if (value is String && dataType != DataType.string) {
+          var v = StringUtil.toObject(value, dataType);
+          if (v == null) {
+            values.remove(name);
+          } else {
+            values[name] = v;
+          }
+        }
+      }
     }
   }
 
@@ -46,6 +71,8 @@ class FormInputController with ChangeNotifier {
     if (state != null) {
       values['state'] = state;
     }
+    _adjustValues(values);
+
     return values;
   }
 
@@ -86,22 +113,22 @@ class FormInputController with ChangeNotifier {
 }
 
 class FormInputWidget extends StatelessWidget {
-  //格式定义
-  final List<ColumnFieldDef> columnFieldDefs;
   final Map<String, dynamic>? initValues;
-  final FormInputController controller = FormInputController();
+  late final FormInputController controller;
+
   final Function(Map<String, dynamic>) onOk;
   final MainAxisAlignment mainAxisAlignment;
   final double spacing;
 
   FormInputWidget(
       {Key? key,
-      required this.columnFieldDefs,
+      required List<ColumnFieldDef> columnFieldDefs,
       this.initValues,
       required this.onOk,
       this.mainAxisAlignment = MainAxisAlignment.start,
       this.spacing = 0.0})
       : super(key: key) {
+    controller = FormInputController(columnFieldDefs);
     if (initValues != null) {
       var state = initValues!['state'];
       if (state != null) {
@@ -110,34 +137,10 @@ class FormInputWidget extends StatelessWidget {
     }
   }
 
-  _adjustValues(Map<String, dynamic> values) {
-    for (var columnFieldDef in columnFieldDefs) {
-      String name = columnFieldDef.name;
-      if (values.containsKey(name)) {
-        DataType dataType = columnFieldDef.dataType;
-        dynamic value = values[name];
-        if (value == null) {
-          continue;
-        }
-        if (value is String && dataType == DataType.string) {
-          continue;
-        }
-        if (value is String && dataType != DataType.string) {
-          var v = StringUtil.toObject(value, dataType);
-          if (v == null) {
-            values.remove(name);
-          } else {
-            values[name] = v;
-          }
-        }
-      }
-    }
-  }
-
   Widget _build(BuildContext context) {
     FormInputController controller = Provider.of<FormInputController>(context);
     List<Widget> children = [];
-    for (var columnFieldDef in columnFieldDefs) {
+    for (var columnFieldDef in controller.columnFieldDefs) {
       children.add(SizedBox(
         height: spacing,
       ));
@@ -163,7 +166,6 @@ class FormInputWidget extends StatelessWidget {
           child: Text(AppLocalizations.t('Ok')),
           onPressed: () {
             var values = controller.getValues();
-            _adjustValues(values);
             onOk(values);
           },
         ),

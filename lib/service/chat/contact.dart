@@ -1,6 +1,9 @@
+import 'package:colla_chat/crypto/cryptography.dart';
+import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/servicelocator.dart';
+import 'package:cryptography/cryptography.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as flutter_contacts;
 
 import '../../entity/chat/contact.dart';
@@ -198,6 +201,52 @@ class GroupService extends PartyService<Group> {
     }
     return group;
   }
+
+  Future<Group> create(String name, {String? alias, String? myAlias}) async {
+    var old = await findOneByName(name);
+    if (old != null) {
+      throw 'SameNameGroupNameExists';
+    }
+    var group = Group(myself.peerId!, '', name);
+    group.status = EntityStatus.effective.name;
+
+    ///group peerId对应的密钥对
+    SimpleKeyPair peerPrivateKey = await cryptoGraphy.generateKeyPair();
+    SimplePublicKey peerPublicKey = await peerPrivateKey.extractPublicKey();
+    group.peerPrivateKey =
+        await cryptoGraphy.export(peerPrivateKey, myself.password!.codeUnits);
+    group.peerPublicKey = await cryptoGraphy.exportPublicKey(peerPrivateKey);
+    group.peerId = group.peerPublicKey!;
+
+    ///加密对应的密钥对x25519
+    SimpleKeyPair keyPair =
+        await cryptoGraphy.generateKeyPair(keyPairType: KeyPairType.x25519);
+    SimplePublicKey publicKey = await keyPair.extractPublicKey();
+    group.privateKey =
+        await cryptoGraphy.export(keyPair, myself.password!.codeUnits);
+    group.publicKey = await cryptoGraphy.exportPublicKey(keyPair);
+
+    return group;
+  }
+
+  Future<Group?> modify(Group group) async {
+    Group? old = await findOneByPeerId(group.peerId);
+    if (old != null) {
+      group.id = old.id;
+    }
+    upsert(group);
+    List<Linkman> members = group.members;
+    if (members.isNotEmpty) {
+      for (var member in members) {
+        GroupMember groupMember = GroupMember(myself.peerId!);
+        groupMember.memberPeerId = member.peerId;
+        groupMember.groupId = group.peerId;
+        groupMember.memberAlias = member.alias;
+        groupMemberService.modify(groupMember);
+      }
+    }
+    return group;
+  }
 }
 
 final groupService = GroupService(
@@ -233,6 +282,13 @@ class GroupMemberService extends GeneralBaseService<GroupMember> {
     return groupMembers;
   }
 
+  Future<GroupMember?> findOneByGroupId(
+      String groupId, String memberPeerId) async {
+    String where = 'groupId=? and memberPeerId=?';
+    List<Object> whereArgs = [groupId, memberPeerId];
+    return await findOne(where: where, whereArgs: whereArgs);
+  }
+
   Future<List<Linkman>> findLinkmen(List<GroupMember> groupMembers) async {
     List<Linkman> linkmen = [];
     if (groupMembers.isNotEmpty) {
@@ -247,6 +303,15 @@ class GroupMemberService extends GeneralBaseService<GroupMember> {
       }
     }
     return linkmen;
+  }
+
+  Future<void> modify(GroupMember groupMember) async {
+    GroupMember? old =
+        await findOneByGroupId(groupMember.groupId!, groupMember.memberPeerId!);
+    if (old != null) {
+      groupMember.id = old.id;
+    }
+    upsert(groupMember);
   }
 }
 

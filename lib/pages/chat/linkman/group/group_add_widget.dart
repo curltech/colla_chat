@@ -1,4 +1,5 @@
 import 'package:colla_chat/entity/chat/contact.dart';
+import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
@@ -75,21 +76,27 @@ class _GroupAddWidgetState extends State<GroupAddWidget> {
   }
 
   Widget _buildFormInputWidget(BuildContext context) {
-    var initValues = widget.controller.getInitValue(groupColumnFieldDefs);
     var formInputWidget = FormInputWidget(
       onOk: (Map<String, dynamic> values) {
         _onOk(values);
       },
       columnFieldDefs: groupColumnFieldDefs,
-      initValues: initValues,
     );
 
     return formInputWidget;
   }
 
-  _onOk(Map<String, dynamic> values) {
+  _onOk(Map<String, dynamic> values) async {
     Group group = Group.fromJson(values);
-    groupService.upsert(group).then((count) {});
+    await groupService.modify(group);
+
+    String groupId = group.peerId;
+    for (var selectedLinkmanId in selectedLinkmen) {
+      GroupMember groupMember = GroupMember(myself.peerId!);
+      groupMember.groupId = groupId;
+      groupMember.memberPeerId = selectedLinkmanId;
+      groupMemberService.modify(groupMember);
+    }
   }
 
   Widget _buildSelect(BuildContext context) {
@@ -108,6 +115,24 @@ class _GroupAddWidgetState extends State<GroupAddWidget> {
       onChange: (selected) => setState(() => selectedLinkmen = selected.value),
       choiceItems: choiceItems,
       modalType: S2ModalType.bottomSheet,
+      modalConfig: S2ModalConfig(
+        type: S2ModalType.bottomSheet,
+        useFilter: false,
+        style: S2ModalStyle(
+          backgroundColor: Colors.grey.withOpacity(0.5),
+        ),
+        headerStyle: S2ModalHeaderStyle(
+          elevation: 0,
+          centerTitle: false,
+          backgroundColor: appDataProvider.themeData.colorScheme.primary,
+          textStyle: const TextStyle(color: Colors.white),
+        ),
+      ),
+      choiceStyle: S2ChoiceStyle(
+        opacity: 0.5,
+        elevation: 0,
+        color: appDataProvider.themeData.colorScheme.primary,
+      ),
       tileBuilder: (context, state) {
         return S2Tile.fromState(
           state,
@@ -119,13 +144,14 @@ class _GroupAddWidgetState extends State<GroupAddWidget> {
               return Text(state.selected.title![i]);
             },
             chipOnDelete: (i) {
-              setState((){});
+              setState(() {
+                selectedLinkmen.removeAt(i);
+              });
             },
-            chipColor:appDataProvider.themeData.colorScheme.primary,
+            chipColor: appDataProvider.themeData.colorScheme.primary,
           ),
         );
       },
-
     );
   }
 
