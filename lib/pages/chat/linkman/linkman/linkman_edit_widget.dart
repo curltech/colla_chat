@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 
-import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/common/widget_mixin.dart';
-import '../../../../widgets/data_bind/column_field_widget.dart';
-import '../../../../widgets/data_bind/form_input_widget.dart';
-import '../../../entity/chat/contact.dart';
-import '../../../l10n/localization.dart';
-import '../../../provider/data_list_controller.dart';
-import '../../../service/chat/contact.dart';
+import '../../../../../widgets/common/app_bar_view.dart';
+import '../../../../../widgets/common/widget_mixin.dart';
+import '../../../../../widgets/data_bind/column_field_widget.dart';
+import '../../../../../widgets/data_bind/form_input_widget.dart';
+import '../../../../entity/chat/contact.dart';
+import '../../../../l10n/localization.dart';
+import '../../../../provider/data_list_controller.dart';
+import '../../../../service/chat/contact.dart';
 
 final List<ColumnFieldDef> linkmanColumnFieldDefs = [
   ColumnFieldDef(

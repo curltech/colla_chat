@@ -1,6 +1,6 @@
+import 'package:colla_chat/widgets/data_bind/data_listshow.dart';
 import 'package:flutter/material.dart';
 
-import '../../../widgets/data_bind/data_listshow.dart';
 
 class LinkmanInfoCard extends StatelessWidget {
   final Map<String, dynamic> values;

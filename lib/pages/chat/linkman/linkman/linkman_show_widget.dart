@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/common/widget_mixin.dart';
-import '../../../entity/chat/contact.dart';
-import '../../../l10n/localization.dart';
-import '../../../provider/data_list_controller.dart';
+import '../../../../../widgets/common/app_bar_view.dart';
+import '../../../../../widgets/common/widget_mixin.dart';
+import '../../../../entity/chat/contact.dart';
+import '../../../../l10n/localization.dart';
+import '../../../../provider/data_list_controller.dart';
 import 'linkman_info_card.dart';
 
 final List<String> linkmanFields = [

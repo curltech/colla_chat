@@ -1,19 +1,19 @@
+import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/p2p/chain/action/findclient.dart';
+import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/service/dht/peerclient.dart';
+import 'package:colla_chat/tool/util.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
+import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
-import '../../../entity/dht/peerclient.dart';
-import '../../../l10n/localization.dart';
-import '../../../p2p/chain/baseaction.dart';
-import '../../../provider/data_list_controller.dart';
-import '../../../service/chat/contact.dart';
-import '../../../service/dht/peerclient.dart';
-import '../../../tool/util.dart';
-import '../../../widgets/common/app_bar_view.dart';
-import '../../../widgets/common/widget_mixin.dart';
-import '../../../widgets/data_bind/data_listview.dart';
 
 ///p2p网络节点搜索增加
 class P2pLinkmanAddWidget extends StatefulWidget with TileDataMixin {
