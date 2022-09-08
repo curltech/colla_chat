@@ -2,8 +2,10 @@ import 'dart:async';
 
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/chat.dart';
+import 'package:colla_chat/service/chat/contact.dart';
 import 'package:flutter/material.dart';
 
 import '../../../entity/chat/chat.dart';
@@ -157,6 +159,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   late final String peerId;
   late final String name;
   late final String? clientId;
+  late final String? partyType;
   bool initStatus = false;
 
   @override
@@ -182,10 +185,26 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
       peerId = chatSummary.peerId!;
       name = chatSummary.name!;
       clientId = chatSummary.clientId;
-      AdvancedPeerConnection? advancedPeerConnection =
-          peerConnectionPool.getOne(peerId, clientId: clientId);
-      if (advancedPeerConnection == null) {
-        peerConnectionPool.create(peerId);
+      partyType = chatSummary.partyType;
+      if (partyType == PartyType.linkman.name) {
+        AdvancedPeerConnection? advancedPeerConnection =
+            peerConnectionPool.getOne(peerId, clientId: clientId);
+        if (advancedPeerConnection == null) {
+          peerConnectionPool.create(peerId);
+        }
+      } else if (partyType == PartyType.group.name) {
+        List<GroupMember> groupMembers =
+            await groupMemberService.findByGroupId(peerId);
+        for (var groupMember in groupMembers) {
+          String? memberPeerId = groupMember.memberPeerId;
+          if (memberPeerId != null) {
+            AdvancedPeerConnection? advancedPeerConnection =
+                peerConnectionPool.getOne(memberPeerId);
+            if (advancedPeerConnection == null) {
+              peerConnectionPool.create(memberPeerId);
+            }
+          }
+        }
       }
     } else {
       logger.e('chatSummary is null');

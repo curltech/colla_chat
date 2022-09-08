@@ -220,22 +220,21 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   //未填写的字段：transportType,senderAddress,receiverAddress,receiveTime,actualReceiveTime,readTime,destroyTime
-  Future<ChatMessage> buildChatMessage(
-    String peerId, {
-    List<int>? data,
-    String? clientId,
-    TransportType transportType = TransportType.webrtc,
-    ChatMessageType messageType = ChatMessageType.chat,
-    ChatSubMessageType subMessageType = ChatSubMessageType.chat,
-    ContentType contentType = ContentType.text,
-    String? name,
-    String? groupPeerId,
-    String? groupName,
-    String? title,
-    List<int>? thumbBody,
-    List<int>? thumbnail,
-    String? status,
-  }) async {
+  Future<ChatMessage> buildChatMessage(String receiverPeerId,
+      {List<int>? data,
+      String? clientId,
+      TransportType transportType = TransportType.webrtc,
+      ChatMessageType messageType = ChatMessageType.chat,
+      ChatSubMessageType subMessageType = ChatSubMessageType.chat,
+      ContentType contentType = ContentType.text,
+      String? name,
+      String? groupPeerId,
+      String? groupName,
+      String? title,
+      List<int>? thumbBody,
+      List<int>? thumbnail,
+      String? status,
+      bool store = true}) async {
     ChatMessage chatMessage = ChatMessage(myself.peerId!);
     var uuid = const Uuid();
     chatMessage.messageId = uuid.v4();
@@ -247,10 +246,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.senderType = PartyType.linkman.name;
     chatMessage.senderName = myself.myselfPeer!.name;
     chatMessage.sendTime = DateUtil.currentDate();
-    chatMessage.receiverPeerId = peerId;
+    chatMessage.receiverPeerId = receiverPeerId;
     if (clientId == null) {
       PeerClient? peerClient =
-          await peerClientService.findCachedOneByPeerId(peerId);
+          await peerClientService.findCachedOneByPeerId(receiverPeerId);
       if (peerClient != null) {
         clientId = peerClient.clientId;
         name = peerClient.name;
@@ -274,8 +273,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.status = status ?? MessageStatus.sent.name;
     chatMessage.transportType = transportType.name;
 
-    await insert(chatMessage);
-    await chatSummaryService.upsertByChatMessage(chatMessage);
+    if (store) {
+      await insert(chatMessage);
+      await chatSummaryService.upsertByChatMessage(chatMessage);
+    }
 
     return chatMessage;
   }
@@ -302,21 +303,33 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       for (var linkman in linkmen) {
         var peerId = linkman.peerId;
         var name = linkman.name;
-        ChatMessage chatMessage = await buildChatMessage(
-          peerId,
-          data: data,
-          messageType: messageType,
-          subMessageType: subMessageType,
-          contentType: contentType,
-          name: name,
-          groupPeerId: groupPeerId,
-          groupName: groupName,
-          title: title,
-          thumbBody: thumbBody,
-          thumbnail: thumbnail,
-        );
+        ChatMessage chatMessage = await buildChatMessage(peerId,
+            data: data,
+            messageType: messageType,
+            subMessageType: subMessageType,
+            contentType: contentType,
+            name: name,
+            groupPeerId: groupPeerId,
+            groupName: groupName,
+            title: title,
+            thumbBody: thumbBody,
+            thumbnail: thumbnail,
+            store: false);
         chatMessages.add(chatMessage);
       }
+      await buildChatMessage(
+        groupPeerId,
+        data: data,
+        messageType: messageType,
+        subMessageType: subMessageType,
+        contentType: contentType,
+        name: groupName,
+        groupPeerId: groupPeerId,
+        groupName: groupName,
+        title: title,
+        thumbBody: thumbBody,
+        thumbnail: thumbnail,
+      );
     }
     return chatMessages;
   }
