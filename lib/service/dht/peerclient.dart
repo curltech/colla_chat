@@ -27,7 +27,7 @@ class PeerClientService extends PeerEntityService<PeerClient> {
       SimplePublicKey? simplePublicKey = publicKeys[peerId];
       if (simplePublicKey == null) {
         simplePublicKey = await cryptoGraphy
-            .importPublicKey(peerClient.publicKey, type: KeyPairType.x25519);
+            .importPublicKey(peerClient.publicKey!, type: KeyPairType.x25519);
         publicKeys[peerId] = simplePublicKey;
       }
       return simplePublicKey;
@@ -107,4 +107,4 @@ class PeerClientService extends PeerEntityService<PeerClient> {
 final peerClientService = PeerClientService(
     tableName: "blc_peerclient",
     indexFields: ['peerId', 'name', 'mobile'],
-    fields: ServiceLocator.buildFields(PeerClient('', '', ''), []));
+    fields: ServiceLocator.buildFields(PeerClient('', '', '', ''), []));

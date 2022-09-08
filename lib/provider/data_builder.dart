@@ -20,13 +20,13 @@ class DataBuilder {
     var hash = await cryptoGraphy.hash(clientDevice.codeUnits);
     var clientId = CryptoUtil.encodeBase58(hash);
     for (var i = 0; i < 20; ++i) {
-      PeerClient peerClient = PeerClient(myself.peerId ?? '', '', clientId);
+      PeerClient peerClient = PeerClient(myself.peerId ?? '', '', clientId, '');
 
       ///peerId对应的密钥对
       SimpleKeyPair peerPrivateKey = await cryptoGraphy.generateKeyPair();
       peerClient.peerPublicKey =
           await cryptoGraphy.exportPublicKey(peerPrivateKey);
-      peerClient.peerId = peerClient.peerPublicKey;
+      peerClient.peerId = peerClient.peerPublicKey!;
 
       ///加密对应的密钥对x25519
       SimpleKeyPair keyPair =
@@ -37,7 +37,7 @@ class DataBuilder {
 
       if (i % 3 == 0) {
         Linkman linkman =
-            Linkman(myself.peerId ?? '', peerClient.peerId!, peerClient.name);
+            Linkman(myself.peerId ?? '', peerClient.peerId, peerClient.name);
         await linkmanService.insert(linkman);
         linkmen.add(linkman);
 

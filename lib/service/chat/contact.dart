@@ -148,28 +148,6 @@ final partyTagService = PartyTagService(
     indexFields: ['ownerPeerId', 'createDate', 'tag', 'partyPeerId'],
     fields: ServiceLocator.buildFields(PartyTag(''), []));
 
-class PartyRequestService extends GeneralBaseService<PartyRequest> {
-  PartyRequestService(
-      {required super.tableName,
-      required super.fields,
-      required super.indexFields}) {
-    post = (Map map) {
-      return PartyRequest.fromJson(map);
-    };
-  }
-}
-
-final partyRequestService = PartyRequestService(
-    tableName: "chat_partyrequest",
-    indexFields: [
-      'ownerPeerId',
-      'createDate',
-      'targetPeerId',
-      'targetType',
-      'status',
-    ],
-    fields: ServiceLocator.buildFields(PartyRequest('', '', ''), []));
-
 class GroupService extends PartyService<Group> {
   Map<String, Group> groups = {};
 
@@ -414,7 +392,7 @@ class ContactService extends PartyService<Contact> {
           peerContact.status = linkman.status;
           peerContact.publicKey = linkman.publicKey;
           peerContact.avatar = linkman.avatar;
-          peerContact.isLinkman = true;
+          peerContact.linkman = true;
 
           return peerContact;
         }

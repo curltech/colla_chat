@@ -17,11 +17,11 @@ class ConnectAction extends BaseAction {
   Future<ChainMessage?> connect(PeerClient peerClient) async {
     if (StringUtil.isNotEmpty(peerClient.mobile)) {
       peerClient.mobile = CryptoUtil.encodeBase64(
-          await cryptoGraphy.hash(peerClient.mobile.codeUnits));
+          await cryptoGraphy.hash(peerClient.mobile!.codeUnits));
     }
     if (StringUtil.isNotEmpty(peerClient.email)) {
       peerClient.email = CryptoUtil.encodeBase64(
-          await cryptoGraphy.hash(peerClient.email.codeUnits));
+          await cryptoGraphy.hash(peerClient.email!.codeUnits));
     }
     ChainMessage chainMessage = await prepareSend(peerClient);
     chainMessage.payloadType = PayloadType.peerClient.name;

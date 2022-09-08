@@ -88,7 +88,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
       if (subMessageType != null) {
         logger.w('received videoChat chatReceipt status: $status');
         if (subMessageType == ChatSubMessageType.chatReceipt.name) {
-          if (status == ChatReceiptType.agree.name) {
+          if (status == MessageStatus.accepted.name) {
             var peerId = chatReceipt.senderPeerId!;
             var clientId = chatReceipt.senderClientId!;
             AdvancedPeerConnection? advancedPeerConnection =
@@ -107,7 +107,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
               await peerConnectionsController.add(peerId, clientId: clientId);
               chatMessageController.index = 2;
             }
-          } else if (status == ChatReceiptType.reject.name) {
+          } else if (status == MessageStatus.rejected.name) {
             await localMediaController.close();
             chatMessageController.index = 0;
           }

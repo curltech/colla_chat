@@ -151,15 +151,15 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
 
   //创建回执，subMessageType为chatReceipt
   Future<ChatMessage?> buildChatReceipt(
-      ChatMessage chatMessage, ChatReceiptType receiptType) async {
+      ChatMessage chatMessage, MessageStatus receiptType) async {
     chatMessage.receiptTime = DateUtil.currentDate();
-    if (receiptType == ChatReceiptType.read) {
+    if (receiptType == MessageStatus.read) {
       chatMessage.readTime = DateUtil.currentDate();
-    } else if (receiptType == ChatReceiptType.agree) {
-      chatMessage.status = MessageStatus.agree.name;
-    } else if (receiptType == ChatReceiptType.reject) {
-      chatMessage.status = MessageStatus.reject.name;
-    } else if (receiptType == ChatReceiptType.deleted) {
+    } else if (receiptType == MessageStatus.accepted) {
+      chatMessage.status = MessageStatus.accepted.name;
+    } else if (receiptType == MessageStatus.rejected) {
+      chatMessage.status = MessageStatus.rejected.name;
+    } else if (receiptType == MessageStatus.deleted) {
       chatMessage.deleteTime = chatMessage.deleteTime;
       chatMessage.status = MessageStatus.deleted.name;
     }

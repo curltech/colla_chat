@@ -1,7 +1,7 @@
-import 'base.dart';
+import 'package:colla_chat/entity/dht/peerclient.dart';
 
-/// 本节点实体
-class MyselfPeer extends PeerEntity {
+/// 本节点实体，存储私钥
+class MyselfPeer extends PeerClient {
   String loginName = '';
   String peerPrivateKey = '';
   String privateKey = '';
@@ -24,11 +24,9 @@ class MyselfPeer extends PeerEntity {
   String? newCertPassword;
   String? certContent;
 
-  String clientId;
-  String? deviceToken;
-
-  MyselfPeer(String ownerPeerId, String peerId, this.clientId)
-      : super(ownerPeerId, peerId);
+  MyselfPeer(String ownerPeerId, String peerId, String clientId, String name,
+      this.loginName)
+      : super(ownerPeerId, peerId, clientId, name);
 
   MyselfPeer.fromJson(Map json)
       : loginName = json['loginName'],
@@ -44,16 +42,12 @@ class MyselfPeer extends PeerEntity {
         oldCertPassword = json['oldCertPassword'],
         newCertPassword = json['newCertPassword'],
         certContent = json['certContent'],
-        clientId = json['clientId'] ?? '',
-        deviceToken = json['deviceToken'],
         super.fromJson(json);
 
   @override
   Map<String, dynamic> toJson() {
     var json = super.toJson();
     json.addAll({
-      'clientId': clientId,
-      'deviceToken': deviceToken,
       'loginName': loginName,
       'peerPrivateKey': peerPrivateKey,
       'privateKey': privateKey,

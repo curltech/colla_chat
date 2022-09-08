@@ -30,9 +30,7 @@ class PeerProfile extends StatusEntity {
   String? discoveryAddress;
   String? lastFindNodeTime;
 
-  // 用户头像（base64字符串）
-  String? avatar;
-  Widget? avatarImage;
+
   String? mobileVerified;
 
   // 可见性YYYYYY (peerId, mobileNumber, groupChat, qrCode, contactCard, name）
@@ -54,7 +52,6 @@ class PeerProfile extends StatusEntity {
         clientDevice = json['clientDevice'],
         clientType = json['clientType'],
         locale = json['locale'],
-        avatar = json['avatar'],
         userId = json['userId'],
         username = json['username'],
         primaryColor = json['primaryColor'],
@@ -103,7 +100,6 @@ class PeerProfile extends StatusEntity {
       'clientDevice': clientDevice,
       'clientType': clientType,
       'locale': locale,
-      'avatar': avatar,
       'userId': userId,
       'username': username,
       'primaryColor': primaryColor,

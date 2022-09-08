@@ -107,7 +107,7 @@ class PeerClientListWidget extends StatefulWidget with TileDataMixin {
     rightWidgets = [
       IconButton(
           onPressed: () {
-            var current = PeerClient(myself.peerId ?? '', '', '');
+            var current = PeerClient(myself.peerId ?? '', '', '','');
             current.state = EntityState.insert;
             controller.add(current);
           },

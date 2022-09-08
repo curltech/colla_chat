@@ -48,7 +48,6 @@ class ServiceLocator {
     services['linkmanService'] = linkmanService;
     services['tagService'] = tagService;
     services['partyTagService'] = partyTagService;
-    services['partyRequestService'] = partyRequestService;
     services['groupService'] = groupService;
     services['groupMemberService'] = groupMemberService;
     services['contactService'] = contactService;

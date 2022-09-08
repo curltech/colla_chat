@@ -32,7 +32,13 @@ enum ContentType {
 }
 
 // 消息类型（messageType）,system消息不在聊天界面显示
-enum ChatMessageType { email, chat, system }
+enum ChatMessageType {
+  email,
+  //聊天消息，在聊天界面上显示的消息
+  chat,
+  //系统消息，不在聊天界面上显示的消息
+  system
+}
 
 enum ChatSubMessageType {
   addLinkman, // 新增联系人请求
@@ -58,8 +64,8 @@ enum ChatSubMessageType {
   removeGroupMember, // 删除群聊成员请求
   removeGroupMemberReceipt, // 删除群聊成员请求接收回复
   // 聊天
-  chatSystem, // 系统预定义聊天消息，如群聊动态通知
   chat, // 联系人发送聊天消息
+  chatSystem, // 系统预定义聊天消息，如群聊动态通知
   videoChat,
   audioChat,
   deleteChat,
@@ -72,20 +78,14 @@ enum ChatSubMessageType {
 
 enum MessageStatus {
   unsent, //未发送成功
+  send, //发了，不知是否成功
   sent, //发送成功
   received, //已接收
   read, //已读
-  agree,
-  reject,
+  accepted,
+  rejected,
+  ignored,
   deleted, //删除
-}
-
-enum ChatReceiptType {
-  received,
-  read,
-  agree,
-  reject,
-  deleted,
 }
 
 ///好友，群，潜在，联系人，频道，房间

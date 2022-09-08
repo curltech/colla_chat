@@ -23,7 +23,7 @@ class VideoDialInWidget extends StatelessWidget {
 
   final bool videoMedia;
 
-  final Function(ChatMessage chatMessage, ChatReceiptType chatReceiptType)?
+  final Function(ChatMessage chatMessage, MessageStatus chatReceiptType)?
       onTap;
 
   const VideoDialInWidget(
@@ -34,7 +34,7 @@ class VideoDialInWidget extends StatelessWidget {
       this.onTap})
       : super(key: key);
 
-  _sendReceipt(ChatReceiptType receiptType) async {
+  _sendReceipt(MessageStatus receiptType) async {
     ChatMessage? chatReceipt =
         await chatMessageService.buildChatReceipt(chatMessage, receiptType);
     if (chatReceipt != null) {
@@ -42,7 +42,7 @@ class VideoDialInWidget extends StatelessWidget {
       await chatMessageService.send(chatReceipt);
       videoChatReceiptController.setChatReceipt(chatReceipt, ChatDirect.send);
       String? subMessageType = chatMessage.subMessageType;
-      if (receiptType == ChatReceiptType.agree) {
+      if (receiptType == MessageStatus.accepted) {
         var peerId = chatReceipt.receiverPeerId!;
         var clientId = chatReceipt.receiverClientId!;
         List<PeerVideoRender> renders = [];
@@ -105,9 +105,9 @@ class VideoDialInWidget extends StatelessWidget {
               child: Row(children: [
                 WidgetUtil.buildCircleButton(
                     onPressed: () {
-                      _sendReceipt(ChatReceiptType.reject);
+                      _sendReceipt(MessageStatus.rejected);
                       if (onTap != null) {
-                        onTap!(chatMessage, ChatReceiptType.reject);
+                        onTap!(chatMessage, MessageStatus.rejected);
                       }
                     },
                     child: const Icon(
@@ -115,9 +115,9 @@ class VideoDialInWidget extends StatelessWidget {
                     backgroundColor: Colors.red),
                 WidgetUtil.buildCircleButton(
                     onPressed: () {
-                      _sendReceipt(ChatReceiptType.agree);
+                      _sendReceipt(MessageStatus.accepted);
                       if (onTap != null) {
-                        onTap!(chatMessage, ChatReceiptType.agree);
+                        onTap!(chatMessage, MessageStatus.accepted);
                       }
                     },
                     child: const Icon(

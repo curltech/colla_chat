@@ -10,7 +10,8 @@ class PeerEndpoint extends PeerEntity {
   String? libp2pConnectAddress;
   String? iceServers;
 
-  PeerEndpoint(String ownerPeerId, String peerId) : super(ownerPeerId, peerId);
+  PeerEndpoint(String ownerPeerId, String peerId, String name)
+      : super(ownerPeerId, peerId, name);
 
   PeerEndpoint.fromJson(Map json)
       : endpointType = json['endpointType'],

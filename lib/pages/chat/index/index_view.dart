@@ -158,7 +158,7 @@ class _IndexViewState extends State<IndexView>
     }
   }
 
-  _onTap(ChatMessage chatMessage, ChatReceiptType chatReceiptType) {
+  _onTap(ChatMessage chatMessage, MessageStatus chatReceiptType) {
     setState(() {
       videoChatVisible = false;
     });

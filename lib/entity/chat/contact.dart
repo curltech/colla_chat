@@ -1,5 +1,4 @@
-import 'package:colla_chat/entity/dht/myself.dart';
-import 'package:flutter/material.dart';
+import 'package:colla_chat/entity/dht/base.dart';
 
 import '../base.dart';
 
@@ -30,17 +29,9 @@ enum GroupStatus {
 }
 
 //当事方，联系人，群，手机联系人（潜在联系人）的共同父类
-abstract class Party extends StatusEntity {
-  String ownerPeerId; // 区分属主
-  String peerId; // peerId,事实上的单个属主的主键
-  String name; // 用户名
+abstract class PeerParty extends PeerEntity {
   String? alias; // 别名
   String? pyName; // 用户名拼音
-  String? mobile; // 手机号
-  String? email; // 手机号
-  String? avatar; // 头像
-  String? publicKey; // 公钥
-  String? peerPublicKey; // 公钥
   String? givenName; // 备注名
   String? pyGivenName; // 备注名拼音
   String? sourceType; // 来源，包括：Search&Add（搜索添加）, AcceptRequest（接受请求）…
@@ -55,29 +46,19 @@ abstract class Party extends StatusEntity {
   bool myselfRecallTimeLimit = false;
   bool myselfRecallAlert = false;
 
-  // 非持久化属性
-  String? activeStatus; //: 活动状态，包括：Up（连接）, Down（未连接）
   bool downloadSwitch = true; //: 自动下载文件开关
   bool udpSwitch = false; //: 启用UDP开关
   String? groupChats; // 关联群聊列表
   String? tag; //: 标签
   String? pyTag; //: 标签拼音
   List<Tag> tags = [];
-  Widget? avatarImage;
 
-  Party(this.ownerPeerId, this.peerId, this.name) : super();
+  PeerParty(String ownerPeerId, String peerId, String name)
+      : super(ownerPeerId, peerId, name);
 
-  Party.fromJson(Map json)
-      : ownerPeerId = json['ownerPeerId'] ?? myself.peerId,
-        peerId = json['peerId'],
-        name = json['name'],
-        alias = json['alias'],
+  PeerParty.fromJson(Map json)
+      : alias = json['alias'],
         pyName = json['pyName'],
-        mobile = json['mobile'],
-        email = json['email'],
-        avatar = json['avatar'],
-        publicKey = json['publicKey'],
-        peerPublicKey = json['peerPublicKey'],
         givenName = json['givenName'],
         pyGivenName = json['pyGivenName'],
         sourceType = json['sourceType'],
@@ -90,7 +71,6 @@ abstract class Party extends StatusEntity {
             json['blackedMe'] == true || json['blackedMe'] == 1 ? true : false,
         droppedMe =
             json['droppedMe'] == true || json['droppedMe'] == 1 ? true : false,
-        activeStatus = json['activeStatus'],
         recallTimeLimit =
             json['recallTimeLimit'] == true || json['recallTimeLimit'] == 1
                 ? true
@@ -112,16 +92,8 @@ abstract class Party extends StatusEntity {
   Map<String, dynamic> toJson() {
     var json = super.toJson();
     json.addAll({
-      'ownerPeerId': ownerPeerId,
-      'peerId': peerId,
-      'name': name,
       'alias': alias,
       'pyName': pyName,
-      'mobile': mobile,
-      'email': email,
-      'avatar': avatar,
-      'publicKey': publicKey,
-      'peerPublicKey': peerPublicKey,
       'givenName': givenName,
       'pyGivenName': pyGivenName,
       'sourceType': sourceType,
@@ -131,7 +103,6 @@ abstract class Party extends StatusEntity {
       'top': top,
       'blackedMe': blackedMe,
       'droppedMe': droppedMe,
-      'activeStatus': activeStatus,
       'recallTimeLimit': recallTimeLimit,
       'recallAlert': recallAlert,
       'myselfRecallTimeLimit': myselfRecallTimeLimit,
@@ -141,8 +112,9 @@ abstract class Party extends StatusEntity {
   }
 }
 
-// 联系人，或者叫好友，发起请求通过后才能成为联系人
-class Linkman extends Party {
+/// 好友，PeerClient的一部分，在发起请求通过后PeerClient成为Linkman
+/// 意味可以进行普通的文本，语音和视频通话
+class Linkman extends PeerParty {
   Linkman(String ownerPeerId, String peerId, String name)
       : super(ownerPeerId, peerId, name);
 
@@ -206,49 +178,8 @@ class PartyTag extends BaseEntity {
   }
 }
 
-// 联系人请求是消息的一种，这里记录了消息的内容字段经过标准化的数据，
-// 本表的数据经过json格式序列化后成为消息表中的content字段的内容
-class PartyRequest extends Party {
-  String? requestType; // 请求类型，加好友，入群，订阅频道
-  // 状态，包括：Sent/Received/Accepted/Expired/Ignored（已发送/已接收/已同意/已过期/已忽略）
-  String? messageId; // 邀请信息
-  String? targetPeerId; // 要加入的好友的peerId
-  String? targetType; // 类型
-  String? groupDescription; // 群公告
-  String? myAlias; // 发送人在本群的昵称
-  String? content; // 消息数据（群成员列表）
-
-  PartyRequest(String ownerPeerId, String peerId, String name)
-      : super(ownerPeerId, peerId, name);
-
-  PartyRequest.fromJson(Map json)
-      : requestType = json['requestType'],
-        groupDescription = json['groupDescription'],
-        myAlias = json['myAlias'],
-        messageId = json['messageId'],
-        targetPeerId = json['targetPeerId'],
-        targetType = json['targetType'],
-        content = json['content'],
-        super.fromJson(json);
-
-  @override
-  Map<String, dynamic> toJson() {
-    var json = super.toJson();
-    json.addAll({
-      'requestType': requestType,
-      'groupDescription': groupDescription,
-      'myAlias': myAlias,
-      'messageId': messageId,
-      'targetPeerId': targetPeerId,
-      'targetType': targetType,
-      'content': content,
-    });
-    return json;
-  }
-}
-
 // 组（群聊/频道）
-class Group extends Party {
+class Group extends PeerParty {
   String? groupCategory; // 组类别，包括：Chat（群聊）, Channel（频道）
   String?
       groupType; // 组类型，包括：Private（私有，群聊群主才能添加成员，频道外部不可见）, Public（公有，群聊非群主也能添加成员，频道外部可见）
@@ -306,7 +237,7 @@ enum MemberType { owner, admin, member }
 class GroupMember extends StatusEntity {
   String ownerPeerId; // 区分本地不同peerClient属主
   String? groupId; // 外键（对应group-groupId）
-  String? memberPeerId; // 外键（对应linkman-peerId）
+  String? memberPeerId; // 外键（对应peerclient-peerId）
   String? memberAlias; // 成员别名
   String?
       memberType; // 成员类型，包括：Owner（创建者/群主，默认管理员）, Member（一般成员）,…可能的扩充：Admin（管理员）, Subscriber（订阅者）
@@ -335,19 +266,17 @@ class GroupMember extends StatusEntity {
 }
 
 /// 手机联系人,从移动设备中读取出来的
-class Contact extends Party {
+class Contact extends PeerParty {
   String? formattedName;
-  String? trustLevel;
-  bool isLinkman = false;
+  bool linkman = false;
 
   Contact(String ownerPeerId, String peerId, String name)
       : super(ownerPeerId, peerId, name);
 
   Contact.fromJson(Map json)
       : formattedName = json['formattedName'],
-        trustLevel = json['trustLevel'],
-        isLinkman =
-            json['isLinkman'] == true || json['isLinkman'] == 1 ? true : false,
+        linkman =
+            json['linkman'] == true || json['linkman'] == 1 ? true : false,
         super.fromJson(json);
 
   @override
@@ -356,7 +285,7 @@ class Contact extends Party {
     json.addAll({
       'formattedName': formattedName,
       'trustLevel': trustLevel,
-      'isLinkman': isLinkman,
+      'linkman': linkman,
     });
     return json;
   }

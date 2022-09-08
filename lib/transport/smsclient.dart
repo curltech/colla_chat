@@ -185,7 +185,7 @@ class SmsClientPool {
       bool result = await securityContextService.encrypt(securityContext);
       if (result) {
         data = CryptoUtil.concat(securityContext.payload, [cryptOptionIndex]);
-        return await smsClient.send(mobile, CryptoUtil.encodeBase64(data));
+        return await smsClient.send(mobile!, CryptoUtil.encodeBase64(data));
       }
     }
   }

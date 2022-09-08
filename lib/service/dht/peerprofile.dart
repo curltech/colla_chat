@@ -1,7 +1,6 @@
 import 'package:colla_chat/service/servicelocator.dart';
 
 import '../../entity/dht/peerprofile.dart';
-import '../../widgets/common/image_widget.dart';
 import 'base.dart';
 
 class PeerProfileService extends PeerEntityService<PeerProfile> {
@@ -49,15 +48,6 @@ class PeerProfileService extends PeerEntityService<PeerProfile> {
     if (peerProfiles_.isNotEmpty) {
       for (var peerProfile_ in peerProfiles_) {
         String clientId_ = peerProfile_.clientId;
-        String? avatar = peerProfile_.avatar;
-        if (avatar != null) {
-          var avatarImage = ImageWidget(
-            image: avatar,
-            height: 32,
-            width: 32,
-          );
-          peerProfile_.avatarImage = avatarImage;
-        }
         if (!peerProfiles.containsKey(peerId)) {
           peerProfiles[peerId] = {};
         }

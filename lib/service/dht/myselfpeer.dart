@@ -87,23 +87,19 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     var clientDevice = JsonUtil.toJsonString(deviceData);
     var hash = await cryptoGraphy.hash(clientDevice.codeUnits);
     var clientId = CryptoUtil.encodeBase58(hash);
-    var myselfPeer = MyselfPeer('', '', clientId);
+    var myselfPeer = MyselfPeer('', '', clientId, name, loginName);
     myselfPeer.status = EntityStatus.effective.name;
     myselfPeer.mobile = mobile;
     myselfPeer.email = email;
-    myselfPeer.name = name;
-    myselfPeer.loginName = loginName;
     myselfPeer.address = await NetworkInfoUtil.getWifiIp();
     await myselfService.createMyself(myselfPeer, password);
 
     var currentDate = DateUtil.currentDate();
     myselfPeer.createDate = currentDate;
     myselfPeer.updateDate = currentDate;
-    myselfPeer.lastUpdateTime = currentDate;
     myselfPeer.startDate = currentDate;
     myselfPeer.endDate = '9999-12-31T11:59:59.999Z';
     myselfPeer.statusDate = currentDate;
-    myselfPeer.version = 0;
     await upsert(myselfPeer);
     myself.myselfPeer = myselfPeer;
 
@@ -196,7 +192,6 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       var peerClient = PeerClient.fromJson(json);
       peerClient.activeStatus = ActiveStatus.Up.name;
       peerClient.clientId = myselfPeer.clientId;
-      peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
       var response = await connectAction.connect(peerClient);
       if (response != null) {
         logger.i('connect successfully');
@@ -233,8 +228,6 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
           var peerClient = PeerClient.fromJson(json);
           peerClient.activeStatus = ActiveStatus.Down.name;
           peerClient.clientId = myselfPeer.clientId;
-          peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
-          peerClient.expireDate = DateTime.now().millisecondsSinceEpoch;
           ChainMessage? chainMessage = await connectAction.connect(peerClient);
 
           result = true;
@@ -270,4 +263,4 @@ final myselfPeerService = MyselfPeerService(
       'status',
       'updateDate'
     ],
-    fields: ServiceLocator.buildFields(MyselfPeer('', '', ''), []));
+    fields: ServiceLocator.buildFields(MyselfPeer('', '', '', '', ''), []));

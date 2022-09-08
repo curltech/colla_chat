@@ -18,7 +18,7 @@ class MyselfService {
         await cryptoGraphy.export(peerPrivateKey, password.codeUnits);
     myselfPeer.peerPublicKey =
         await cryptoGraphy.exportPublicKey(peerPrivateKey);
-    myselfPeer.peerId = myselfPeer.peerPublicKey;
+    myselfPeer.peerId = myselfPeer.peerPublicKey!;
 
     ///加密对应的密钥对x25519
     SimpleKeyPair keyPair =
@@ -41,9 +41,9 @@ class MyselfService {
   Future<bool> login(MyselfPeer myselfPeer, String password) async {
     //解开身份公钥和加密公钥
     SimplePublicKey publicKey = await cryptoGraphy
-        .importPublicKey(myselfPeer.publicKey, type: KeyPairType.x25519);
+        .importPublicKey(myselfPeer.publicKey!, type: KeyPairType.x25519);
     SimplePublicKey peerPublicKey =
-        await cryptoGraphy.importPublicKey(myselfPeer.peerPublicKey);
+        await cryptoGraphy.importPublicKey(myselfPeer.peerPublicKey!);
     //解开身份密钥对和加密密钥对
     SimpleKeyPair privateKey = await cryptoGraphy.import(
         myselfPeer.privateKey, password.codeUnits, publicKey,
@@ -77,12 +77,13 @@ class MyselfService {
     var peerProfile = await peerProfileService.findOneByPeerId(peerId);
     if (peerProfile != null) {
       myself.peerProfile = peerProfile;
-      String? avatar = peerProfile.avatar;
+      String? avatar = myselfPeer.avatar;
       var avatarImage = ImageWidget(
         image: avatar,
         height: 32,
         width: 32,
       );
+      myselfPeer.avatarImage = avatarImage;
       myself.avatarImage = avatarImage;
     }
 
