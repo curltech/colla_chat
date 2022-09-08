@@ -220,24 +220,30 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   //未填写的字段：transportType,senderAddress,receiverAddress,receiveTime,actualReceiveTime,readTime,destroyTime
-  Future<ChatMessage> buildChatMessage(String receiverPeerId,
-      {List<int>? data,
-      String? clientId,
-      TransportType transportType = TransportType.webrtc,
-      ChatMessageType messageType = ChatMessageType.chat,
-      ChatSubMessageType subMessageType = ChatSubMessageType.chat,
-      ContentType contentType = ContentType.text,
-      String? name,
-      String? groupPeerId,
-      String? groupName,
-      String? title,
-      List<int>? thumbBody,
-      List<int>? thumbnail,
-      String? status,
-      bool store = true}) async {
+  Future<ChatMessage> buildChatMessage(
+    String receiverPeerId, {
+    List<int>? data,
+    String? clientId,
+    String? messageId,
+    TransportType transportType = TransportType.webrtc,
+    ChatMessageType messageType = ChatMessageType.chat,
+    ChatSubMessageType subMessageType = ChatSubMessageType.chat,
+    ContentType contentType = ContentType.text,
+    PartyType receiverType = PartyType.linkman,
+    String? name,
+    String? groupPeerId,
+    String? groupName,
+    String? title,
+    List<int>? thumbBody,
+    List<int>? thumbnail,
+    String? status,
+  }) async {
     ChatMessage chatMessage = ChatMessage(myself.peerId!);
-    var uuid = const Uuid();
-    chatMessage.messageId = uuid.v4();
+    if (messageId == null) {
+      var uuid = const Uuid();
+      messageId = uuid.v4();
+    }
+    chatMessage.messageId = messageId;
     chatMessage.messageType = messageType.name;
     chatMessage.subMessageType = subMessageType.name;
     chatMessage.direct = ChatDirect.send.name; //对自己而言，消息是属于发送或者接受
@@ -255,7 +261,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         name = peerClient.name;
       }
     }
-    chatMessage.receiverType = PartyType.linkman.name;
+    chatMessage.receiverType = receiverType.name;
     chatMessage.receiverClientId = clientId;
     chatMessage.receiverName = name;
     chatMessage.groupPeerId = groupPeerId;
@@ -273,10 +279,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.status = status ?? MessageStatus.sent.name;
     chatMessage.transportType = transportType.name;
 
-    if (store) {
-      await insert(chatMessage);
-      await chatSummaryService.upsertByChatMessage(chatMessage);
-    }
+    await insert(chatMessage);
+    await chatSummaryService.upsertByChatMessage(chatMessage);
 
     return chatMessage;
   }
@@ -296,33 +300,13 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     Group? group = await groupService.findCachedOneByPeerId(groupPeerId);
     if (group != null) {
       var groupName = group.name;
-      List<GroupMember> groupMembers =
-          await groupMemberService.findByGroupId(groupPeerId);
-      List<Linkman> linkmen =
-          await groupMemberService.findLinkmen(groupMembers);
-      for (var linkman in linkmen) {
-        var peerId = linkman.peerId;
-        var name = linkman.name;
-        ChatMessage chatMessage = await buildChatMessage(peerId,
-            data: data,
-            messageType: messageType,
-            subMessageType: subMessageType,
-            contentType: contentType,
-            name: name,
-            groupPeerId: groupPeerId,
-            groupName: groupName,
-            title: title,
-            thumbBody: thumbBody,
-            thumbnail: thumbnail,
-            store: false);
-        chatMessages.add(chatMessage);
-      }
-      await buildChatMessage(
+      var groupChatMessage = await buildChatMessage(
         groupPeerId,
         data: data,
         messageType: messageType,
         subMessageType: subMessageType,
         contentType: contentType,
+        receiverType: PartyType.group,
         name: groupName,
         groupPeerId: groupPeerId,
         groupName: groupName,
@@ -330,6 +314,26 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         thumbBody: thumbBody,
         thumbnail: thumbnail,
       );
+      var messageId = groupChatMessage.messageId;
+      List<GroupMember> groupMembers =
+          await groupMemberService.findByGroupId(groupPeerId);
+      List<Linkman> linkmen =
+          await groupMemberService.findLinkmen(groupMembers);
+      for (var linkman in linkmen) {
+        var peerId = linkman.peerId;
+        var name = linkman.name;
+        ChatMessage chatMessage = await buildChatMessage(
+          peerId,
+          messageId: messageId,
+          messageType: messageType,
+          subMessageType: subMessageType,
+          contentType: contentType,
+          name: name,
+          groupPeerId: groupPeerId,
+          groupName: groupName,
+        );
+        chatMessages.add(chatMessage);
+      }
     }
     return chatMessages;
   }

@@ -81,6 +81,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
             peerId: _chatSummary!.peerId!, offset: data.length, limit: limit);
       } else if (_chatSummary!.partyType == PartyType.group.name) {
         chatMessages = await chatMessageService.findByPeerId(
+            peerId: _chatSummary!.peerId!,
             groupPeerId: _chatSummary!.peerId!,
             offset: data.length,
             limit: limit);
@@ -114,7 +115,10 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
             peerId: _chatSummary!.peerId!, id: id, limit: limit);
       } else if (_chatSummary!.partyType == PartyType.group.name) {
         chatMessages = await chatMessageService.findByGreaterId(
-            groupPeerId: _chatSummary!.peerId!, id: id, limit: limit);
+            peerId: _chatSummary!.peerId!,
+            groupPeerId: _chatSummary!.peerId!,
+            id: id,
+            limit: limit);
       }
       if (chatMessages != null && chatMessages.isNotEmpty) {
         data.insertAll(0, chatMessages);
@@ -284,22 +288,13 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     }
     if (partyType == PartyType.group.name) {
       //保存群消息
-      chatMessage = await chatMessageService.buildChatMessage(peerId,
-          data: data,
-          name: name,
-          clientId: clientId,
-          groupPeerId: peerId,
-          groupName: name,
-          contentType: contentType,
-          subMessageType: subMessageType);
-      //修改消息控制器
-      chatMessageController.insert(0, chatMessage);
-      //保存消息
       List<ChatMessage> chatMessages =
           await chatMessageService.buildGroupChatMessage(peerId,
               data: data,
               contentType: contentType,
               subMessageType: subMessageType);
+      //修改消息控制器
+      //chatMessageController.insert(0, chatMessage);
       if (chatMessages.isNotEmpty) {
         for (var chatMessage in chatMessages) {
           await chatMessageService.send(chatMessage);
