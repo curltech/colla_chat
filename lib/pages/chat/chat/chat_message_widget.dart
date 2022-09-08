@@ -269,14 +269,44 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     if (message != null) {
       data = CryptoUtil.stringToUtf8(message);
     }
-    //保存消息
-    ChatMessage chatMessage = await chatMessageService.buildChatMessage(peerId,
-        data: data, contentType: contentType, subMessageType: subMessageType);
-    //修改消息控制器
-    chatMessageController.insert(0, chatMessage);
-    await chatMessageService.send(chatMessage);
-
-    return chatMessage;
+    ChatMessage? chatMessage;
+    if (partyType == PartyType.linkman.name) {
+      //保存消息
+      chatMessage = await chatMessageService.buildChatMessage(peerId,
+          data: data,
+          name: name,
+          clientId: clientId,
+          contentType: contentType,
+          subMessageType: subMessageType);
+      //修改消息控制器
+      chatMessageController.insert(0, chatMessage);
+      await chatMessageService.send(chatMessage);
+    }
+    if (partyType == PartyType.group.name) {
+      //保存群消息
+      chatMessage = await chatMessageService.buildChatMessage(peerId,
+          data: data,
+          name: name,
+          clientId: clientId,
+          groupPeerId: peerId,
+          groupName: name,
+          contentType: contentType,
+          subMessageType: subMessageType);
+      //修改消息控制器
+      chatMessageController.insert(0, chatMessage);
+      //保存消息
+      List<ChatMessage> chatMessages =
+          await chatMessageService.buildGroupChatMessage(peerId,
+              data: data,
+              contentType: contentType,
+              subMessageType: subMessageType);
+      if (chatMessages.isNotEmpty) {
+        for (var chatMessage in chatMessages) {
+          await chatMessageService.send(chatMessage);
+        }
+      }
+    }
+    return chatMessage!;
   }
 
   ///发送其他消息命令

@@ -13,6 +13,7 @@ import '../me/webrtc/peer_connection_controller.dart';
 import 'chat_message_widget.dart';
 
 /// 聊天界面，包括文本聊天，视频通话呼叫，视频通话三个组件
+/// 支持群聊
 class ChatMessageView extends StatefulWidget with TileDataMixin {
   ChatMessageView({
     Key? key,
@@ -37,8 +38,12 @@ class ChatMessageView extends StatefulWidget with TileDataMixin {
 }
 
 class _ChatMessageViewState extends State<ChatMessageView> {
+  //linkman或者group的peerId
   String? peerId;
   String? name;
+  String? partyType;
+
+  //linkman才有值
   String? clientId;
 
   @override
@@ -55,6 +60,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
       peerId = chatSummary.peerId!;
       name = chatSummary.name!;
       clientId = chatSummary.clientId;
+      partyType = chatSummary.partyType;
     } else {
       logger.e('chatSummary is null');
     }
@@ -79,11 +85,14 @@ class _ChatMessageViewState extends State<ChatMessageView> {
 
   @override
   Widget build(BuildContext context) {
-    PeerConnectionStatus status = PeerConnectionStatus.none;
-    if (peerId != null) {
-      var peerConnection = peerConnectionPool.getOne(peerId!);
-      if (peerConnection != null) {
-        status = peerConnection.status;
+    PeerConnectionStatus? status;
+    if (partyType == PartyType.linkman.name) {
+      status = PeerConnectionStatus.none;
+      if (peerId != null) {
+        var peerConnection = peerConnectionPool.getOne(peerId!);
+        if (peerConnection != null) {
+          status = peerConnection.status;
+        }
       }
     }
 
@@ -93,11 +102,12 @@ class _ChatMessageViewState extends State<ChatMessageView> {
       _buildVideoChatWidget(context),
     ];
     name = name ?? '';
+    String title = AppLocalizations.t(name!);
+    if (partyType == PartyType.linkman.name) {
+      title = '$title(${AppLocalizations.t(status!.name)})';
+    }
     var appBarView = AppBarView(
-        title: Text(AppLocalizations.t(name!) +
-            '(' +
-            AppLocalizations.t(status.name) +
-            ')'),
+        title: Text(title),
         withLeading: widget.withLeading,
         child: IndexedStack(
             index: chatMessageController.index, children: children));
