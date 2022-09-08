@@ -72,10 +72,20 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       clear();
       return;
     }
-    List<ChatMessage> chatMessages = await chatMessageService
-        .findByPeerId(_chatSummary!.peerId!, offset: data.length, limit: limit);
-    if (chatMessages.isNotEmpty) {
-      addAll(chatMessages);
+    List<ChatMessage>? chatMessages;
+    if (_chatSummary != null) {
+      if (_chatSummary!.partyType == PartyType.linkman.name) {
+        chatMessages = await chatMessageService.findByPeerId(
+            peerId: _chatSummary!.peerId!, offset: data.length, limit: limit);
+      } else if (_chatSummary!.partyType == PartyType.group.name) {
+        chatMessages = await chatMessageService.findByPeerId(
+            groupPeerId: _chatSummary!.peerId!,
+            offset: data.length,
+            limit: limit);
+      }
+      if (chatMessages != null && chatMessages.isNotEmpty) {
+        addAll(chatMessages);
+      }
     }
   }
 
@@ -95,11 +105,19 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     if (data.isNotEmpty) {
       id = data[0].id;
     }
-    List<ChatMessage> chatMessages = await chatMessageService
-        .findByGreaterId(_chatSummary!.peerId!, id: id, limit: limit);
-    if (chatMessages.isNotEmpty) {
-      data.insertAll(0, chatMessages);
-      notifyListeners();
+    List<ChatMessage>? chatMessages;
+    if (_chatSummary != null) {
+      if (_chatSummary!.partyType == PartyType.linkman.name) {
+        chatMessages = await chatMessageService.findByGreaterId(
+            peerId: _chatSummary!.peerId!, id: id, limit: limit);
+      } else if (_chatSummary!.partyType == PartyType.group.name) {
+        chatMessages = await chatMessageService.findByGreaterId(
+            groupPeerId: _chatSummary!.peerId!, id: id, limit: limit);
+      }
+      if (chatMessages != null && chatMessages.isNotEmpty) {
+        data.insertAll(0, chatMessages);
+        notifyListeners();
+      }
     }
   }
 }

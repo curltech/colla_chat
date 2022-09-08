@@ -194,7 +194,7 @@ class Group extends PeerParty {
 
   String? signalPrivateKey;
 
-  List<Linkman> members = [];
+  List<PeerParty> members = [];
 
   Group(String ownerPeerId, String peerId, String name)
       : super(ownerPeerId, peerId, name);
@@ -239,6 +239,7 @@ class GroupMember extends StatusEntity {
   String? groupId; // 外键（对应group-groupId）
   String? memberPeerId; // 外键（对应peerclient-peerId）
   String? memberAlias; // 成员别名
+  String? creatorPeerId;
   String?
       memberType; // 成员类型，包括：Owner（创建者/群主，默认管理员）, Member（一般成员）,…可能的扩充：Admin（管理员）, Subscriber（订阅者）
   GroupMember(this.ownerPeerId);

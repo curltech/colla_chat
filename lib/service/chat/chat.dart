@@ -56,14 +56,25 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return page;
   }
 
-  Future<List<ChatMessage>> findByPeerId(String peerId,
-      {String? direct,
+  Future<List<ChatMessage>> findByPeerId(
+      {String? peerId,
+      String? groupPeerId,
+      String? direct,
       String? messageType,
       String? subMessageType,
       int? offset,
       int? limit}) async {
-    String where = '(senderPeerId=? or receiverPeerId=?)';
-    List<Object> whereArgs = [peerId, peerId];
+    String where = '1=1';
+    List<Object> whereArgs = [];
+    if (peerId != null) {
+      where = '$where and (senderPeerId=? or receiverPeerId=?)';
+      whereArgs.add(peerId);
+      whereArgs.add(peerId);
+    }
+    if (groupPeerId != null) {
+      where = '$where and groupPeerId=?';
+      whereArgs.add(groupPeerId);
+    }
     if (direct != null) {
       where = '$where and direct=?';
       whereArgs.add(direct);
@@ -87,17 +98,24 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         limit: limit);
   }
 
-  Future<List<ChatMessage>> findByGreaterId(String peerId,
-      {String? direct,
+  Future<List<ChatMessage>> findByGreaterId(
+      {String? peerId,
+      String? groupPeerId,
+      String? direct,
       String? messageType,
       String? subMessageType,
       int? id,
       int? limit}) async {
-    String where = '(senderPeerId=? or receiverPeerId=?)';
-    List<Object> whereArgs = [peerId, peerId];
-    if (direct != null) {
-      where = '$where and direct=?';
-      whereArgs.add(direct);
+    String where = '1=1';
+    List<Object> whereArgs = [];
+    if (peerId != null) {
+      where = '$where and (senderPeerId=? or receiverPeerId=?)';
+      whereArgs.add(peerId);
+      whereArgs.add(peerId);
+    }
+    if (groupPeerId != null) {
+      where = '$where and groupPeerId=?';
+      whereArgs.add(groupPeerId);
     }
     if (messageType != null) {
       where = '$where and messageType=?';
@@ -475,7 +493,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
     if (chatSummary == null) {
       chatSummary = ChatSummary(myself.peerId!);
       chatSummary.peerId = group.peerId;
-      chatSummary.partyType = PartyType.linkman.name;
+      chatSummary.partyType = PartyType.group.name;
       chatSummary.name = group.name;
       chatSummary.avatar = group.avatar;
       await insert(chatSummary);

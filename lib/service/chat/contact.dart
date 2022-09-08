@@ -88,20 +88,19 @@ class LinkmanService extends PartyService<Linkman> {
   Future<void> addLinkman(PeerClient peerClient) async {
     Linkman? linkman = await findCachedOneByPeerId(peerClient.peerId);
     if (linkman == null) {
-      linkman = Linkman(myself.peerId!, peerClient.peerId, peerClient.name);
-      linkman.status = LinkmanStatus.request.name;
-      linkman.peerPublicKey = peerClient.peerPublicKey;
-      linkman.publicKey = peerClient.publicKey;
+      linkman = Linkman.fromJson(peerClient.toJson());
       await insert(linkman);
       linkmen[linkman.peerId] = linkman;
       await chatSummaryService.upsertByLinkman(linkman);
     } else {
-      linkman.name = peerClient.name;
-      linkman.peerPublicKey = peerClient.peerPublicKey;
-      linkman.publicKey = peerClient.publicKey;
+      var id = linkman.id;
+      linkman = Linkman.fromJson(peerClient.toJson());
+      linkman.id = id;
       await update(linkman);
+      linkmen[linkman.peerId] = linkman;
       await chatSummaryService.upsertByLinkman(linkman);
     }
+    await peerClientService.update({'id': peerClient.id, 'linkman': true});
   }
 }
 
@@ -180,12 +179,11 @@ class GroupService extends PartyService<Group> {
     return group;
   }
 
-  Future<Group> create(String name, {String? alias, String? myAlias}) async {
-    var old = await findOneByName(name);
+  Future<Group> createGroup(Group group) async {
+    var old = await findOneByName(group.name);
     if (old != null) {
-      throw 'SameNameGroupNameExists';
+      return old;
     }
-    var group = Group(myself.peerId!, '', name);
     group.status = EntityStatus.effective.name;
 
     ///group peerId对应的密钥对
@@ -211,9 +209,12 @@ class GroupService extends PartyService<Group> {
     Group? old = await findOneByPeerId(group.peerId);
     if (old != null) {
       group.id = old.id;
+      group.createDate = old.createDate;
     }
-    upsert(group);
-    List<Linkman> members = group.members;
+    await upsert(group);
+    groups[group.peerId];
+    await chatSummaryService.upsertByGroup(group);
+    List<PeerParty> members = group.members;
     if (members.isNotEmpty) {
       for (var member in members) {
         GroupMember groupMember = GroupMember(myself.peerId!);
@@ -288,6 +289,7 @@ class GroupMemberService extends GeneralBaseService<GroupMember> {
         await findOneByGroupId(groupMember.groupId!, groupMember.memberPeerId!);
     if (old != null) {
       groupMember.id = old.id;
+      groupMember.createDate = old.createDate;
     }
     upsert(groupMember);
   }

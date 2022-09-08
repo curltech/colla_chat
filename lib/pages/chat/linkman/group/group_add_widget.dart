@@ -88,14 +88,22 @@ class _GroupAddWidgetState extends State<GroupAddWidget> {
 
   _onOk(Map<String, dynamic> values) async {
     Group group = Group.fromJson(values);
+    group.ownerPeerId = myself.peerId!;
+    group = await groupService.createGroup(group);
     await groupService.modify(group);
 
     String groupId = group.peerId;
     for (var selectedLinkmanId in selectedLinkmen) {
-      GroupMember groupMember = GroupMember(myself.peerId!);
-      groupMember.groupId = groupId;
-      groupMember.memberPeerId = selectedLinkmanId;
-      groupMemberService.modify(groupMember);
+      Linkman? linkman =
+          await linkmanService.findCachedOneByPeerId(selectedLinkmanId);
+      if (linkman != null) {
+        GroupMember groupMember = GroupMember(myself.peerId!);
+        groupMember.groupId = groupId;
+        groupMember.memberPeerId = selectedLinkmanId;
+        groupMember.memberType = MemberType.member.name;
+        groupMember.memberAlias = linkman.alias ?? linkman.name;
+        groupMemberService.modify(groupMember);
+      }
     }
   }
 
