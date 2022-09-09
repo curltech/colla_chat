@@ -32,7 +32,7 @@ class GetDisplayMediaWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
-  PeerVideoRender peerVideoRenderer = PeerVideoRender('');
+  PeerVideoRender peerVideoRenderer = PeerVideoRender();
   bool _inCalling = false;
   DesktopCapturerSource? selectedSource;
 

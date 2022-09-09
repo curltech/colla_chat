@@ -13,7 +13,6 @@ import '../../../transport/webrtc/peer_connection_pool.dart';
 import '../../../widgets/common/image_widget.dart';
 import '../../../widgets/common/simple_widget.dart';
 import '../../../widgets/data_bind/data_action_card.dart';
-import '../../../widgets/data_bind/data_listtile.dart';
 import 'chat_message_widget.dart';
 import 'controller/local_media_controller.dart';
 
@@ -27,15 +26,15 @@ import 'controller/local_media_controller.dart';
 ///7.接收方等待远程视频流到来，显示
 ///8.如果发起方在接收回执到来前，自己主动终止请求，执行挂断操作，设置挂断标志，对远程流不予接受
 
-final List<TileData> actionTileData = [
-  TileData(title: '视频通话', prefix: const Icon(Icons.video_call)),
-  TileData(title: '音频通话', prefix: const Icon(Icons.multitrack_audio_outlined)),
-  TileData(title: '屏幕共享', prefix: const Icon(Icons.screen_share)),
-  TileData(title: '媒体播放', prefix: const Icon(Icons.video_file)),
-  TileData(title: '镜头切换', prefix: const Icon(Icons.cameraswitch)),
-  TileData(title: '显示背景', prefix: const Icon(Icons.photo_camera_back)),
-  TileData(title: '麦克风开关', prefix: const Icon(Icons.mic_rounded)),
-  TileData(title: '扬声器开关', prefix: const Icon(Icons.speaker_phone)),
+final List<ActionData> actionData = [
+  ActionData(label: '视频通话', icon: const Icon(Icons.video_call)),
+  ActionData(label: '音频通话', icon: const Icon(Icons.multitrack_audio_outlined)),
+  ActionData(label: '屏幕共享', icon: const Icon(Icons.screen_share)),
+  ActionData(label: '媒体播放', icon: const Icon(Icons.video_file)),
+  ActionData(label: '镜头切换', icon: const Icon(Icons.cameraswitch)),
+  ActionData(label: '显示背景', icon: const Icon(Icons.photo_camera_back)),
+  ActionData(label: '麦克风开关', icon: const Icon(Icons.mic_rounded)),
+  ActionData(label: '扬声器开关', icon: const Icon(Icons.speaker_phone)),
 ];
 
 ///视频通话拨出的窗口
@@ -153,10 +152,17 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   }
 
   Widget _buildVideoViewCard(BuildContext context) {
-    AdvancedPeerConnection? advancedPeerConnection =
-        peerConnectionPool.getOne(peerId, clientId: clientId);
-    if (advancedPeerConnection != null &&
-        advancedPeerConnection.status == PeerConnectionStatus.connected) {
+    if (partyType == PartyType.linkman.name) {
+      AdvancedPeerConnection? advancedPeerConnection =
+          peerConnectionPool.getOne(peerId, clientId: clientId);
+      if (advancedPeerConnection != null &&
+          advancedPeerConnection.status == PeerConnectionStatus.connected) {
+        return VideoViewCard(
+          controller: localMediaController,
+          color: widget.color,
+        );
+      }
+    } else if (partyType == PartyType.group.name) {
       return VideoViewCard(
         controller: localMediaController,
         color: widget.color,
@@ -208,7 +214,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
       margin: const EdgeInsets.all(0.0),
       padding: const EdgeInsets.only(bottom: 0.0),
       child: DataActionCard(
-        actions: actionTileData,
+        actions: actionData,
         height: height,
         onPressed: _onAction,
       ),

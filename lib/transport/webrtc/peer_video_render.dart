@@ -18,16 +18,18 @@ final emptyVideoView = Center(
 /// 简单包装webrtc视频流的渲染器，可以构造本地视频流或者传入的视频流
 /// 视频流绑定渲染器，并创建展示视图
 class PeerVideoRender {
-  String peerId;
-  String? clientId;
-  String? name;
   String? id;
   MediaStream? mediaStream;
   RTCVideoRenderer? renderer;
   MediaRecorder? mediaRecorder;
   List<MediaDeviceInfo>? mediaDevicesList;
 
-  PeerVideoRender(this.peerId, {this.clientId, this.name, this.mediaStream}) {
+  //业务相关的数据
+  String? peerId;
+  String? name;
+  String? clientId;
+
+  PeerVideoRender({this.mediaStream}) {
     if (mediaStream != null) {
       id = mediaStream!.id;
     }
@@ -51,8 +53,7 @@ class PeerVideoRender {
       bool videoMedia = false,
       bool audioMedia = false,
       bool displayMedia = false}) async {
-    PeerVideoRender render =
-        PeerVideoRender(peerId, clientId: clientId, name: name);
+    PeerVideoRender render = PeerVideoRender();
     if (stream == null && !videoMedia && !displayMedia && !audioMedia) {
       videoMedia = true;
     }
@@ -201,6 +202,13 @@ class PeerVideoRender {
     return null;
   }
 
+  String? get ownerTag {
+    if (mediaStream != null) {
+      return mediaStream!.ownerTag;
+    }
+    return null;
+  }
+
   dispose() async {
     var mediaStream = this.mediaStream;
     if (mediaStream != null) {
@@ -305,7 +313,7 @@ class PeerVideoRender {
   }
 
   /// 对视频流的第一个音频轨道切换音频播放设备，对手机来说就是耳机还是喇叭
-  void switchSpeaker(bool enable) async {
+  Future<void> switchSpeaker(bool enable) async {
     var mediaStream = this.mediaStream;
     if (mediaStream != null) {
       var tracks = mediaStream.getAudioTracks();

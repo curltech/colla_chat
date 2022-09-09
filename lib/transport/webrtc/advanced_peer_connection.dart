@@ -261,6 +261,9 @@ class AdvancedPeerConnection {
       if (videoRenders.containsKey(streamId)) {
         return false;
       }
+      render.peerId = peerId;
+      render.name = name;
+      render.clientId = clientId;
       videoRenders[streamId] = render;
       logger.i(
           'AdvancedPeerConnection peerId:$peerId _addRender $streamId, videoRenders length:${videoRenders.length}');

@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -10,15 +9,15 @@ import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 import '../../../widgets/data_bind/data_action_card.dart';
 
-final List<TileData> actionTileData = [
-  TileData(title: '相册', prefix: const Icon(Icons.photo_album)),
-  TileData(title: '拍摄', prefix: const Icon(Icons.camera)),
-  TileData(title: '视频通话', prefix: const Icon(Icons.video_call)),
-  TileData(title: '位置', prefix: const Icon(Icons.location_city)),
-  TileData(title: '名片', prefix: const Icon(Icons.card_membership)),
-  TileData(title: '文件', prefix: const Icon(Icons.file_open)),
-  TileData(title: '语音', prefix: const Icon(Icons.voice_chat)),
-  TileData(title: '收藏', prefix: const Icon(Icons.favorite)),
+final List<ActionData> actionData = [
+  ActionData(label: '相册', icon: const Icon(Icons.photo_album)),
+  ActionData(label: '拍摄', icon: const Icon(Icons.camera)),
+  ActionData(label: '视频通话', icon: const Icon(Icons.video_call)),
+  ActionData(label: '位置', icon: const Icon(Icons.location_city)),
+  ActionData(label: '名片', icon: const Icon(Icons.card_membership)),
+  ActionData(label: '文件', icon: const Icon(Icons.file_open)),
+  ActionData(label: '语音', icon: const Icon(Icons.voice_chat)),
+  ActionData(label: '收藏', icon: const Icon(Icons.favorite)),
 ];
 
 ///非文本的其他多种格式输入面板，包括照片等
@@ -44,8 +43,6 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         break;
     }
   }
-
-
 
   _actionAlbum(int index, String name) async {
     if (name == '相册') {
@@ -92,7 +89,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       margin: const EdgeInsets.all(0.0),
       padding: const EdgeInsets.only(bottom: 0.0),
       child: DataActionCard(
-        actions: actionTileData,
+        actions: actionData,
         height: widget.height,
         onPressed: widget.onAction,
       ),

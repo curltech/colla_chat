@@ -3,17 +3,9 @@ import 'package:colla_chat/pages/chat/chat/video_view_card.dart';
 import 'package:flutter/material.dart';
 
 import '../../../provider/app_data_provider.dart';
-import '../../../widgets/data_bind/data_action_card.dart';
 import '../../../widgets/common/simple_widget.dart';
-import '../../../widgets/data_bind/data_listtile.dart';
 import 'chat_message_widget.dart';
 import 'controller/local_media_controller.dart';
-
-final List<TileData> actionTileData = [
-  TileData(title: '镜头切换', prefix: const Icon(Icons.cameraswitch)),
-  TileData(title: '麦克风开关', prefix: const Icon(Icons.mic_rounded)),
-  TileData(title: '扬声器开关', prefix: const Icon(Icons.speaker_phone)),
-];
 
 ///视频通话窗口，显示多个小视频窗口，每个小窗口代表一个对方，其中一个是自己
 ///以及各种功能按钮
@@ -75,50 +67,6 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     );
   }
 
-  Future<void> _onAction(int index, String name) async {
-    switch (index) {
-      case 0:
-        break;
-      case 1:
-        break;
-      case 2:
-        break;
-      default:
-        break;
-    }
-  }
-
-  Widget _buildActionCard(BuildContext context) {
-    double height = 100;
-    Widget actionCard = Container(
-      margin: const EdgeInsets.all(0.0),
-      padding: const EdgeInsets.only(bottom: 0.0),
-      child: DataActionCard(
-        actions: actionTileData,
-        height: height,
-        onPressed: _onAction,
-      ),
-    );
-    return Column(children: [
-      actionCard,
-      Center(
-          child: Container(
-              padding: const EdgeInsets.all(15.0),
-              child: WidgetUtil.buildCircleButton(
-                  onPressed: () {
-                    _close();
-                  },
-                  elevation: 2.0,
-                  backgroundColor: Colors.red,
-                  padding: const EdgeInsets.all(15.0),
-                  child: const Icon(
-                    Icons.call_end,
-                    size: 16.0,
-                    color: Colors.white,
-                  )))),
-    ]);
-  }
-
   Widget _buildVideoChatView(BuildContext context) {
     return Column(children: [
       Container(
@@ -151,16 +99,6 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   Widget build(BuildContext context) {
     return Stack(children: [
       _buildVideoChatView(context),
-      Visibility(
-          visible: actionVisible,
-          child: Column(children: [
-            const Spacer(),
-            Card(
-                margin: EdgeInsets.zero,
-                elevation: 0,
-                color: Colors.black.withOpacity(0.5),
-                child: _buildActionCard(context)),
-          ]))
     ]);
   }
 

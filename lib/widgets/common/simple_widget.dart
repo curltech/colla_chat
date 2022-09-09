@@ -59,4 +59,39 @@ class WidgetUtil {
       ],
     );
   }
+
+  static buildInkWell({
+    Key? key,
+    required void Function()? onPressed,
+    Color? iconColor,
+    double? iconSize,
+    EdgeInsetsGeometry padding = EdgeInsets.zero,
+    required String text,
+    Color? textColor,
+    required Widget icon,
+  }) {
+    return Column(
+      children: <Widget>[
+        Container(
+          padding: padding,
+          decoration: const BoxDecoration(
+            borderRadius: BorderRadius.all(
+              Radius.circular(5.0),
+            ),
+          ),
+          child: InkWell(
+            onTap: onPressed,
+            child: icon,
+          ),
+        ),
+        const SizedBox(height: 5.0),
+        Text(
+          text,
+          style: TextStyle(
+            color: textColor,
+          ),
+        ),
+      ],
+    );
+  }
 }
