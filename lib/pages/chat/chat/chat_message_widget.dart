@@ -81,7 +81,6 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
             peerId: _chatSummary!.peerId!, offset: data.length, limit: limit);
       } else if (_chatSummary!.partyType == PartyType.group.name) {
         chatMessages = await chatMessageService.findByPeerId(
-            peerId: _chatSummary!.peerId!,
             groupPeerId: _chatSummary!.peerId!,
             offset: data.length,
             limit: limit);
@@ -115,7 +114,6 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
             peerId: _chatSummary!.peerId!, id: id, limit: limit);
       } else if (_chatSummary!.partyType == PartyType.group.name) {
         chatMessages = await chatMessageService.findByGreaterId(
-            peerId: _chatSummary!.peerId!,
             groupPeerId: _chatSummary!.peerId!,
             id: id,
             limit: limit);
