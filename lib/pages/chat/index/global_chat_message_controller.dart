@@ -62,7 +62,12 @@ class GlobalChatMessageController with ChangeNotifier {
           break;
       }
       if (chatMessage.messageType != ChatMessageType.system.name) {
-        chatMessageController.modify(peerId, clientId: clientId);
+        String? groupPeerId = chatMessage.groupPeerId;
+        if (groupPeerId == null) {
+          chatMessageController.modify(peerId, clientId: clientId);
+        } else {
+          chatMessageController.modify(groupPeerId);
+        }
       }
     }
     notifyListeners();

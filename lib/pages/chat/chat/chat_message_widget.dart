@@ -149,9 +149,8 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
           clientId: clientId,
           contentType: contentType,
           subMessageType: subMessageType);
-      //修改消息控制器
-      chatMessageController.insert(0, chatMessage);
       await chatMessageService.send(chatMessage);
+      notifyListeners();
     } else if (partyType == PartyType.group.name) {
       //保存群消息
       List<ChatMessage> chatMessages =
@@ -159,13 +158,12 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
               data: data,
               contentType: contentType,
               subMessageType: subMessageType);
-      //修改消息控制器
-      chatMessageController.insert(0, chatMessages[0]);
       if (chatMessages.isNotEmpty) {
         for (var chatMessage in chatMessages.sublist(1)) {
           await chatMessageService.send(chatMessage);
         }
       }
+      notifyListeners();
     }
     return chatMessage!;
   }
