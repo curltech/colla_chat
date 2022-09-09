@@ -56,8 +56,10 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   }
 
   Widget _createPopupContent() {
+    var height=MediaQuery.of(context).size.height-56;
+    var width=MediaQuery.of(context).size.width;
     Widget videoView = widget.render.createVideoView(
-        height: widget.height, width: widget.width, color: widget.color);
+        height: height, width: width, color: widget.color);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: ClipRRect(
