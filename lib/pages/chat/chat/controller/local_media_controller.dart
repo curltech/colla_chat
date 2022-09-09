@@ -51,6 +51,9 @@ class LocalMediaController extends VideoRenderController {
     }
     await render.bindRTCVideoRender();
     _videoRenders[render.id!] = render;
+    render.peerId = myself.peerId;
+    render.name = myself.name;
+    render.clientId = myself.clientId;
     notifyListeners();
 
     return render;
@@ -184,7 +187,8 @@ class VideoChatReceiptController with ChangeNotifier {
         }
         //本地视频render加入后，发起重新协商
         await advancedPeerConnection.negotiate();
-        await peerConnectionsController.addPeerConnection(peerId, clientId: clientId);
+        await peerConnectionsController.addPeerConnection(peerId,
+            clientId: clientId);
         chatMessageController.index = 2;
       }
     } else if (status == MessageStatus.rejected.name) {

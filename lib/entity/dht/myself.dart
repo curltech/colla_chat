@@ -10,6 +10,7 @@ import 'myselfpeer.dart';
 /// 可以随时获取本节点的信息
 class Myself {
   String? peerId;
+  String? name;
   String? clientId;
 
   // peer是ed25519,英语身份认证

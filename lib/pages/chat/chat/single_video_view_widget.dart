@@ -1,6 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/util.dart';
+import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 
@@ -63,25 +63,26 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(16.0),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           children: [
-            _buildTitle(),
-            videoView,
-            _buildActionCard(context),
+            _buildAppBar(),
+            Stack(children: [videoView, _buildActionCard(context)]),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildTitle() {
-    return Container(
-      padding: const EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
-      width: double.infinity,
-      color: appDataProvider.themeData.colorScheme.primary,
-      child: Text(widget.render.name ?? '',
-          style: const TextStyle(color: Colors.white)),
-    );
+  Widget _buildAppBar() {
+    var title = widget.render.name ?? '';
+    var ownerTag = widget.render.ownerTag ?? '';
+    title = '$title($ownerTag)';
+    return AppBarWidget.build(context, title: Text(title), rightWidgets: [
+      InkWell(
+          onTap: () {
+            _popupDialog?.remove();
+          },
+          child: const Icon(Icons.close))
+    ]);
   }
 
   Future<void> _onAction(int index, String name) async {
@@ -107,15 +108,20 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   }
 
   Widget _buildActionCard(BuildContext context) {
-    double height = 50;
-    Widget actionCard = Container(
-      margin: const EdgeInsets.all(0.0),
-      padding: const EdgeInsets.only(bottom: 0.0),
-      child: DataActionCard(
-        actions: actionData,
+    double height = 80;
+    Widget actionCard = Card(
+      elevation:0,
+      child: Center(
+          child: Container(
         height: height,
-        onPressed: _onAction,
-      ),
+        margin: const EdgeInsets.all(0.0),
+        padding: const EdgeInsets.only(bottom: 0.0),
+        child: DataActionCard(
+          actions: actionData,
+          height: height,
+          onPressed: _onAction,
+        ),
+      )),
     );
     return actionCard;
   }
@@ -133,7 +139,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
           Overlay.of(context)?.insert(_popupDialog);
         },
         // remove the OverlayEntry from Overlay, so it would be hidden
-        onLongPressEnd: (details) => _popupDialog?.remove(),
+        //onLongPressEnd: (details) => _popupDialog?.remove(),
 
         onTap: () {
           DialogUtil.info(context, content: AppLocalizations.t(''));
