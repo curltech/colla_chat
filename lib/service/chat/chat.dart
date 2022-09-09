@@ -338,6 +338,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           groupPeerId: groupPeerId,
           groupName: groupName,
         );
+        chatMessage.title = groupChatMessage.title;
+        chatMessage.content = groupChatMessage.content;
+        chatMessage.thumbBody = groupChatMessage.thumbBody;
+        chatMessage.thumbnail = groupChatMessage.thumbnail;
         chatMessages.add(chatMessage);
       }
     }
