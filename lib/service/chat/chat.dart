@@ -320,6 +320,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         thumbBody: thumbBody,
         thumbnail: thumbnail,
       );
+      chatMessages.add(groupChatMessage);
       var messageId = groupChatMessage.messageId;
       List<GroupMember> groupMembers =
           await groupMemberService.findByGroupId(groupPeerId);

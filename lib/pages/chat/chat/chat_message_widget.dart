@@ -114,9 +114,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
             peerId: _chatSummary!.peerId!, id: id, limit: limit);
       } else if (_chatSummary!.partyType == PartyType.group.name) {
         chatMessages = await chatMessageService.findByGreaterId(
-            groupPeerId: _chatSummary!.peerId!,
-            id: id,
-            limit: limit);
+            groupPeerId: _chatSummary!.peerId!, id: id, limit: limit);
       }
       if (chatMessages != null && chatMessages.isNotEmpty) {
         data.insertAll(0, chatMessages);
@@ -162,9 +160,9 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
               contentType: contentType,
               subMessageType: subMessageType);
       //修改消息控制器
-      //chatMessageController.insert(0, chatMessage);
+      chatMessageController.insert(0, chatMessages[0]);
       if (chatMessages.isNotEmpty) {
-        for (var chatMessage in chatMessages) {
+        for (var chatMessage in chatMessages.sublist(1)) {
           await chatMessageService.send(chatMessage);
         }
       }
