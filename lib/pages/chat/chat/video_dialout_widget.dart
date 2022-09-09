@@ -51,9 +51,10 @@ class VideoDialOutWidget extends StatefulWidget {
 }
 
 class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
-  late final String peerId;
-  String? name;
+  late String peerId;
+  late String name;
   String? clientId;
+  late String partyType;
   double opacity = 0.5;
   OverlayEntry? overlayEntry;
 
@@ -69,6 +70,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
       peerId = chatSummary.peerId!;
       name = chatSummary.name!;
       clientId = chatSummary.clientId;
+      partyType = chatSummary.partyType!;
     } else {
       logger.e('chatSummary is null');
     }
@@ -105,10 +107,24 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
       bool videoMedia = false,
       bool audioMedia = false,
       bool displayMedia = false}) async {
-    AdvancedPeerConnection? advancedPeerConnection =
-        peerConnectionPool.getOne(peerId, clientId: clientId);
-    if (advancedPeerConnection != null &&
-        advancedPeerConnection.status == PeerConnectionStatus.connected) {
+    if (partyType == PartyType.linkman.name) {
+      AdvancedPeerConnection? advancedPeerConnection =
+          peerConnectionPool.getOne(peerId, clientId: clientId);
+      if (advancedPeerConnection != null &&
+          advancedPeerConnection.status == PeerConnectionStatus.connected) {
+        await localMediaController.createVideoRender(
+            stream: stream,
+            videoMedia: videoMedia,
+            audioMedia: audioMedia,
+            displayMedia: displayMedia);
+        if (audioMedia) {
+          await _send(subMessageType: ChatSubMessageType.audioChat);
+        } else {
+          await _send();
+        }
+        setState(() {});
+      }
+    } else if (partyType == PartyType.group.name) {
       await localMediaController.createVideoRender(
           stream: stream,
           videoMedia: videoMedia,

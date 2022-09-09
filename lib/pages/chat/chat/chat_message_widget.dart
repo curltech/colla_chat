@@ -201,10 +201,10 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   ///扩展文本输入框的控制器
   final TextEditingController textEditingController = TextEditingController();
   FocusNode textFocusNode = FocusNode();
-  late final String peerId;
-  late final String name;
-  late final String? clientId;
-  late final String? partyType;
+  late String peerId;
+  late String name;
+  String? clientId;
+  late String partyType;
   bool initStatus = false;
 
   @override
@@ -230,7 +230,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
       peerId = chatSummary.peerId!;
       name = chatSummary.name!;
       clientId = chatSummary.clientId;
-      partyType = chatSummary.partyType;
+      partyType = chatSummary.partyType!;
       if (partyType == PartyType.linkman.name) {
         AdvancedPeerConnection? advancedPeerConnection =
             peerConnectionPool.getOne(peerId, clientId: clientId);
