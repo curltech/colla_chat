@@ -159,6 +159,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
               contentType: contentType,
               subMessageType: subMessageType);
       if (chatMessages.isNotEmpty) {
+        chatMessage = chatMessages[0];
         for (var chatMessage in chatMessages.sublist(1)) {
           await chatMessageService.send(chatMessage);
         }
