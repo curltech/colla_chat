@@ -30,5 +30,5 @@ class PeerEndpointService extends PeerEntityService<PeerEndpoint> {
 
 final peerEndpointService = PeerEndpointService(
     tableName: "blc_peerendpoint",
-    fields: ServiceLocator.buildFields(PeerEndpoint('', '', ''), []),
+    fields: ServiceLocator.buildFields(PeerEndpoint('', ''), []),
     indexFields: ['ownerPeerId', 'priority', 'address']);

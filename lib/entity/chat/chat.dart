@@ -97,7 +97,6 @@ enum TransportType { websocket, webrtc, email, sms }
 
 // 消息，泛指一切社交复合文档，最简单的是一句话，最复杂可以是非常复杂的混合文本，图片，视频的文档
 class ChatMessage extends StatusEntity {
-  String ownerPeerId; // 区分本地不同peerClient属主
   String? transportType; // 包括：websocket,webrtc,mail,sms
   String? messageId; // 消息的唯一id标识
   String messageType = ''; // 消息类型（对应channel消息类型）
@@ -152,11 +151,10 @@ class ChatMessage extends StatusEntity {
   //本消息是合并消息
   List<ChatMessage> messages = [];
 
-  ChatMessage(this.ownerPeerId);
+  ChatMessage();
 
   ChatMessage.fromJson(Map json)
-      : ownerPeerId = json['ownerPeerId'],
-        receiverType = json['receiverType'],
+      : receiverType = json['receiverType'],
         transportType = json['transportType'],
         direct = json['direct'],
         receiverPeerId = json['receiverPeerId'],
@@ -209,7 +207,6 @@ class ChatMessage extends StatusEntity {
   Map<String, dynamic> toJson() {
     var json = super.toJson();
     json.addAll({
-      'ownerPeerId': ownerPeerId,
       'transportType': transportType,
       'direct': direct,
       'receiverType': receiverType,
@@ -254,15 +251,13 @@ class ChatMessage extends StatusEntity {
 }
 
 class MergedMessage extends BaseEntity {
-  String? ownerPeerId;
   String? messageId;
   String? mergedMessageId;
 
   MergedMessage();
 
   MergedMessage.fromJson(Map json)
-      : ownerPeerId = json['ownerPeerId'],
-        messageId = json['messageId'],
+      : messageId = json['messageId'],
         mergedMessageId = json['mergedMessageId'],
         super.fromJson(json);
 
@@ -270,7 +265,6 @@ class MergedMessage extends BaseEntity {
   Map<String, dynamic> toJson() {
     var json = super.toJson();
     json.addAll({
-      'ownerPeerId': ownerPeerId,
       'messageId': messageId,
       'mergedMessageId': mergedMessageId,
     });
@@ -280,7 +274,6 @@ class MergedMessage extends BaseEntity {
 
 // 附件（单聊/群聊/频道/收藏）
 class MessageAttachment extends BaseEntity {
-  String? ownerPeerId; // 区分本地不同peerClient属主
   String? messageId; // 消息的唯一id标识
   String? targetPeerId; // 外键（对应targetPeerId）
   String?
@@ -295,8 +288,7 @@ class MessageAttachment extends BaseEntity {
   MessageAttachment();
 
   MessageAttachment.fromJson(Map json)
-      : ownerPeerId = json['ownerPeerId'],
-        messageId = json['messageId'],
+      : messageId = json['messageId'],
         targetPeerId = json['targetPeerId'],
         content = json['content'],
         contentType = json['contentType'],
@@ -315,7 +307,6 @@ class MessageAttachment extends BaseEntity {
   Map<String, dynamic> toJson() {
     var json = super.toJson();
     json.addAll({
-      'ownerPeerId': ownerPeerId,
       'messageId': messageId,
       'targetPeerId': targetPeerId,
       'content': content,
@@ -332,7 +323,6 @@ class MessageAttachment extends BaseEntity {
 
 // 发送接收记录（群聊联系人请求/群聊/频道）
 class Receive extends BaseEntity {
-  String? ownerPeerId; // 区分本地不同peerClient属主
   String? targetType; // 外键（对应message-targetType、对群聊联系人请求为LinkmanRequest）
   String? targetPeerId; // 外键（对应message-targetPeerId、对群聊联系人请求为空）
   String? messageType; // 外键（对应message-messageType、linkmanRequest-requestType）
@@ -343,8 +333,7 @@ class Receive extends BaseEntity {
   Receive();
 
   Receive.fromJson(Map json)
-      : ownerPeerId = json['ownerPeerId'],
-        targetType = json['targetType'],
+      : targetType = json['targetType'],
         targetPeerId = json['targetPeerId'],
         messageType = json['messageType'],
         messageId = json['messageId'],
@@ -357,7 +346,6 @@ class Receive extends BaseEntity {
   Map<String, dynamic> toJson() {
     var json = super.toJson();
     json.addAll({
-      'ownerPeerId': ownerPeerId,
       'targetType': targetType,
       'targetPeerId': targetPeerId,
       'messageType': messageType,
@@ -373,7 +361,6 @@ class Receive extends BaseEntity {
 /// party的最新消息汇总
 /// 每次有新消息到达，则更新，每个party一条记录
 class ChatSummary extends BaseEntity {
-  String ownerPeerId; // 区分属主
   String? peerId; // 接收者或者发送者的联系人或群
   String? clientId; // 接收者或者发送者的联系人或群
   String? partyType; // 接收者或者发送者类型
@@ -392,11 +379,10 @@ class ChatSummary extends BaseEntity {
   String? payloadHash;
   String? payloadKey;
 
-  ChatSummary(this.ownerPeerId);
+  ChatSummary();
 
   ChatSummary.fromJson(Map json)
-      : ownerPeerId = json['ownerPeerId'],
-        peerId = json['peerId'],
+      : peerId = json['peerId'],
         clientId = json['clientId'],
         partyType = json['partyType'],
         messageId = json['messageId'],
@@ -419,7 +405,6 @@ class ChatSummary extends BaseEntity {
   Map<String, dynamic> toJson() {
     var json = super.toJson();
     json.addAll({
-      'ownerPeerId': ownerPeerId,
       'peerId': peerId,
       'clientId': clientId,
       'partyType': partyType,

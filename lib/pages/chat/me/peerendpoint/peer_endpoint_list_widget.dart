@@ -32,7 +32,7 @@ class PeerEndpointController extends DataListController<PeerEndpoint> {
       } else {
         for (var entry in nodeAddressOptions.entries) {
           var nodeAddressOption = entry.value;
-          var peerEndpoint = PeerEndpoint(myself.peerId ?? '', '', '');
+          var peerEndpoint = PeerEndpoint( '', '');
           peerEndpoint.peerId = nodeAddressOption.connectPeerId!;
           peerEndpoint.name = entry.key;
           peerEndpoint.wsConnectAddress = nodeAddressOption.wsConnectAddress;
@@ -66,7 +66,7 @@ class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
     rightWidgets = [
       IconButton(
           onPressed: () {
-            var current = PeerEndpoint(myself.peerId ?? '', '', '');
+            var current = PeerEndpoint( '', '');
             current.state = EntityState.insert;
             controller.add(current);
           },

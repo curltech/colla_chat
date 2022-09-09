@@ -47,7 +47,7 @@ class ContactView extends StatelessWidget {
               avatar: _contact.avatar!,
               title: _contact.name,
               identifier: _contact.peerId!,
-              groupTitle: _contact.ownerPeerId,
+              groupTitle: _contact.ownerPeerId??'',
               isLine: _isBorder,
               type: type!,
               cancel: (v) {
@@ -65,7 +65,7 @@ class ContactView extends StatelessWidget {
                 avatar: _contact.avatar!,
                 title: _contact.name,
                 identifier: _contact.peerId!,
-                groupTitle: _contact.ownerPeerId,
+                groupTitle: _contact.ownerPeerId??'',
                 isLine: false,
                 type: type!,
                 cancel: (v) {

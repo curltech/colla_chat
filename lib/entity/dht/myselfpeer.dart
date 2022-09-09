@@ -24,9 +24,9 @@ class MyselfPeer extends PeerClient {
   String? newCertPassword;
   String? certContent;
 
-  MyselfPeer(String ownerPeerId, String peerId, String clientId, String name,
+  MyselfPeer( String peerId, String clientId, String name,
       this.loginName)
-      : super(ownerPeerId, peerId, clientId, name);
+      : super(peerId, clientId, name);
 
   MyselfPeer.fromJson(Map json)
       : loginName = json['loginName'],

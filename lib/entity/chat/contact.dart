@@ -53,8 +53,7 @@ abstract class PeerParty extends PeerEntity {
   String? pyTag; //: 标签拼音
   List<Tag> tags = [];
 
-  PeerParty(String ownerPeerId, String peerId, String name)
-      : super(ownerPeerId, peerId, name);
+  PeerParty(String peerId, String name) : super(peerId, name);
 
   PeerParty.fromJson(Map json)
       : alias = json['alias'],
@@ -115,8 +114,7 @@ abstract class PeerParty extends PeerEntity {
 /// 好友，PeerClient的一部分，在发起请求通过后PeerClient成为Linkman
 /// 意味可以进行普通的文本，语音和视频通话
 class Linkman extends PeerParty {
-  Linkman(String ownerPeerId, String peerId, String name)
-      : super(ownerPeerId, peerId, name);
+  Linkman(String peerId, String name) : super(peerId, name);
 
   Linkman.fromJson(Map json) : super.fromJson(json);
 
@@ -130,13 +128,11 @@ class Linkman extends PeerParty {
 
 // 联系人标签
 class Tag extends BaseEntity {
-  String ownerPeerId; // 区分本地不同peerClient属主
   String? tag; // 标签名称
-  Tag(this.ownerPeerId);
+  Tag();
 
   Tag.fromJson(Map json)
-      : ownerPeerId = json['ownerPeerId'],
-        tag = json['tag'],
+      : tag = json['tag'],
         super.fromJson(json);
 
   @override
@@ -152,15 +148,13 @@ class Tag extends BaseEntity {
 
 // 联系人标签关系
 class PartyTag extends BaseEntity {
-  String ownerPeerId; // 区分本地不同peerClient属主
   String? tag; // 标签
   String? partyPeerId; // party peerId
   String? partyType; // party type:linkman,group,channel,contact
-  PartyTag(this.ownerPeerId);
+  PartyTag();
 
   PartyTag.fromJson(Map json)
-      : ownerPeerId = json['ownerPeerId'],
-        tag = json['tag'],
+      : tag = json['tag'],
         partyPeerId = json['partyPeerId'],
         partyType = json['partyType'],
         super.fromJson(json);
@@ -169,7 +163,6 @@ class PartyTag extends BaseEntity {
   Map<String, dynamic> toJson() {
     var json = super.toJson();
     json.addAll({
-      'ownerPeerId': ownerPeerId,
       'tag': tag,
       'partyPeerId': partyPeerId,
       'partyType': partyType,
@@ -196,8 +189,7 @@ class Group extends PeerParty {
 
   List<PeerParty> members = [];
 
-  Group(String ownerPeerId, String peerId, String name)
-      : super(ownerPeerId, peerId, name);
+  Group(String peerId, String name) : super(peerId, name);
 
   Group.fromJson(Map json)
       : groupCategory = json['groupCategory'],
@@ -235,18 +227,16 @@ enum MemberType { owner, admin, member }
 
 // 组成员
 class GroupMember extends StatusEntity {
-  String ownerPeerId; // 区分本地不同peerClient属主
   String? groupId; // 外键（对应group-groupId）
   String? memberPeerId; // 外键（对应peerclient-peerId）
   String? memberAlias; // 成员别名
   String? creatorPeerId;
   String?
       memberType; // 成员类型，包括：Owner（创建者/群主，默认管理员）, Member（一般成员）,…可能的扩充：Admin（管理员）, Subscriber（订阅者）
-  GroupMember(this.ownerPeerId);
+  GroupMember();
 
   GroupMember.fromJson(Map json)
-      : ownerPeerId = json['ownerPeerId'],
-        groupId = json['groupId'],
+      : groupId = json['groupId'],
         memberPeerId = json['memberPeerId'],
         memberAlias = json['memberAlias'],
         memberType = json['memberType'],
@@ -256,7 +246,6 @@ class GroupMember extends StatusEntity {
   Map<String, dynamic> toJson() {
     var json = super.toJson();
     json.addAll({
-      'ownerPeerId': ownerPeerId,
       'groupId': groupId,
       'memberPeerId': memberPeerId,
       'memberAlias': memberAlias,
@@ -271,8 +260,7 @@ class Contact extends PeerParty {
   String? formattedName;
   bool linkman = false;
 
-  Contact(String ownerPeerId, String peerId, String name)
-      : super(ownerPeerId, peerId, name);
+  Contact(String peerId, String name) : super(peerId, name);
 
   Contact.fromJson(Map json)
       : formattedName = json['formattedName'],

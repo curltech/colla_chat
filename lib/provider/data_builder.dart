@@ -20,7 +20,7 @@ class DataBuilder {
     var hash = await cryptoGraphy.hash(clientDevice.codeUnits);
     var clientId = CryptoUtil.encodeBase58(hash);
     for (var i = 0; i < 20; ++i) {
-      PeerClient peerClient = PeerClient(myself.peerId ?? '', '', clientId, '');
+      PeerClient peerClient = PeerClient( '', clientId, '');
 
       ///peerId对应的密钥对
       SimpleKeyPair peerPrivateKey = await cryptoGraphy.generateKeyPair();
@@ -37,11 +37,11 @@ class DataBuilder {
 
       if (i % 3 == 0) {
         Linkman linkman =
-            Linkman(myself.peerId ?? '', peerClient.peerId, peerClient.name);
+            Linkman( peerClient.peerId, peerClient.name);
         await linkmanService.insert(linkman);
         linkmen.add(linkman);
 
-        ChatSummary chatSummary = ChatSummary(myself.peerId ?? '');
+        ChatSummary chatSummary = ChatSummary();
         chatSummary.peerId = linkman.peerId;
         chatSummary.name = linkman.name;
         chatSummary.partyType = PartyType.linkman.name;
@@ -62,13 +62,13 @@ class DataBuilder {
           await cryptoGraphy.generateKeyPair(keyPairType: KeyPairType.x25519);
       var publicKey = await cryptoGraphy.exportPublicKey(keyPair);
       var name = 'Group$i';
-      Group group = Group(myself.peerId ?? '', peerId, name);
+      Group group = Group( peerId, name);
       group.publicKey = publicKey;
       group.peerPublicKey = peerPublicKey;
       await groupService.insert(group);
       groups.add(group);
 
-      ChatSummary chatSummary = ChatSummary(myself.peerId ?? '');
+      ChatSummary chatSummary = ChatSummary();
       chatSummary.peerId = group.peerId;
       chatSummary.name = group.name;
       chatSummary.partyType = PartyType.group.name;
@@ -76,7 +76,7 @@ class DataBuilder {
 
       for (var j = 0; j < 3; ++j) {
         ///每个群分别有3，4，5个成员
-        GroupMember groupMember = GroupMember(myself.peerId ?? '');
+        GroupMember groupMember = GroupMember();
         groupMember.groupId = group.peerId;
         groupMember.memberPeerId = linkmen[i + j].peerId;
         if (j == 0) {
@@ -87,7 +87,7 @@ class DataBuilder {
         await groupMemberService.insert(groupMember);
       }
 
-      GroupMember groupMember = GroupMember(myself.peerId ?? '');
+      GroupMember groupMember = GroupMember();
       groupMember.groupId = group.peerId;
       groupMember.memberPeerId = myself.peerId;
       groupMember.memberType = MemberType.member.name;
@@ -96,7 +96,7 @@ class DataBuilder {
 
     /// 100条消息
     for (var i = 0; i < 100; ++i) {
-      ChatMessage chatMessage = ChatMessage(myself.peerId ?? '');
+      ChatMessage chatMessage = ChatMessage();
       chatMessage.title = 'title$i';
       chatMessage.content = 'message content$i';
       chatMessage.contentType = ContentType.text.name;

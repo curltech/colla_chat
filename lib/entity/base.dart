@@ -29,6 +29,7 @@ abstract class BaseEntity {
   int? id;
   String? createDate;
   String? updateDate;
+  String? ownerPeerId; // 区分属主
   String? entityId;
   EntityState? state;
 
@@ -37,10 +38,15 @@ abstract class BaseEntity {
   BaseEntity.fromJson(Map json)
       : id = json['id'] == '' ? null : json['id'],
         createDate = json['createDate'],
-        updateDate = json['updateDate'];
+        updateDate = json['updateDate'],
+        ownerPeerId = json['ownerPeerId'];
 
-  Map<String, dynamic> toJson() =>
-      {'id': id, 'createDate': createDate, 'updateDate': updateDate};
+  Map<String, dynamic> toJson() => {
+        'id': id,
+        'createDate': createDate,
+        'updateDate': updateDate,
+        'ownerPeerId': ownerPeerId
+      };
 }
 
 abstract class StatusEntity extends BaseEntity {

@@ -14,8 +14,8 @@ class PeerClient extends PeerEntity {
   String? connectSessionId;
   PeerProfile? peerProfile;
 
-  PeerClient(String ownerPeerId, String peerId, this.clientId, String name)
-      : super(ownerPeerId, peerId, name);
+  PeerClient( String peerId, this.clientId, String name)
+      : super( peerId, name);
 
   PeerClient.fromJson(Map json)
       : clientId = json['clientId'] ?? '',

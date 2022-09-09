@@ -9,9 +9,6 @@ enum ActiveStatus { Up, Down }
 /// PeerEntity代表具有peerId，peerPublicKey，publicKey的实体
 /// 通过peerId和address表明自己的位置，包含有ed25519和x25519两个公钥
 abstract class PeerEntity extends StatusEntity {
-  //信息的拥有者的peerId
-  String ownerPeerId;
-
   // ed25519的公钥,表明身份,用于人，设备，如果是libp2p节点直接使用libp2p的id
   String peerId;
   String name;
@@ -43,11 +40,10 @@ abstract class PeerEntity extends StatusEntity {
   //不存储数据库
   Widget? avatarImage;
 
-  PeerEntity(this.ownerPeerId, this.peerId, this.name);
+  PeerEntity(this.peerId, this.name);
 
   PeerEntity.fromJson(Map json)
-      : ownerPeerId = json['ownerPeerId'] ?? '',
-        peerId = json['peerId'],
+      : peerId = json['peerId'],
         name = json['name'] ?? '',
         peerPublicKey = json['peerPublicKey'] ?? '',
         publicKey = json['publicKey'] ?? '',
@@ -71,7 +67,6 @@ abstract class PeerEntity extends StatusEntity {
   Map<String, dynamic> toJson() {
     var json = super.toJson();
     json.addAll({
-      'ownerPeerId': ownerPeerId,
       'peerId': peerId,
       'name': name,
       'peerPublicKey': peerPublicKey,

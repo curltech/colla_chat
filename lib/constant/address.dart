@@ -65,7 +65,6 @@ final Map<String, NodeAddress> nodeAddressOptions = {
 /// 地址选择框的选项
 final Map<String, MailAddress> mailAddressOptions = {
   'hujs@colla.cc': MailAddress(
-    ownerPeerId: '',
     email: 'hujs@colla.cc',
     name: 'hujs',
     domain: 'colla.cc',
@@ -75,7 +74,6 @@ final Map<String, MailAddress> mailAddressOptions = {
     smtpServerHost: 'smtphz.qiye.163.com',
   ),
   'hujs@curltech.io': MailAddress(
-      ownerPeerId: '',
       email: 'hujs@curltech.io',
       name: 'hujs',
       domain: 'curltech.io',
@@ -84,7 +82,6 @@ final Map<String, MailAddress> mailAddressOptions = {
       popServerHost: 'pophz.qiye.163.com',
       smtpServerHost: 'smtphz.qiye.163.com'),
   '13609619603@163.com': MailAddress(
-      ownerPeerId: '',
       email: '13609619603@163.com',
       name: 'hujs',
       domain: '163.com',
@@ -93,7 +90,6 @@ final Map<String, MailAddress> mailAddressOptions = {
       popServerHost: 'pop.163.com',
       smtpServerHost: 'smtp.163.com'),
   'hujs06@163.com': MailAddress(
-      ownerPeerId: '',
       email: 'hujs06@163.com',
       name: 'hujs',
       domain: '163.com',

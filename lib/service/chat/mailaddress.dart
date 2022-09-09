@@ -41,4 +41,4 @@ final mailAddressService = MailAddressService(
     tableName: "chat_mailaddress",
     indexFields: ['ownerPeerId', 'email', 'name'],
     fields: ServiceLocator.buildFields(
-        MailAddress(ownerPeerId: '', name: '', email: '@'), []));
+        MailAddress( name: '', email: '@'), []));

@@ -97,7 +97,7 @@ class _GroupAddWidgetState extends State<GroupAddWidget> {
       Linkman? linkman =
           await linkmanService.findCachedOneByPeerId(selectedLinkmanId);
       if (linkman != null) {
-        GroupMember groupMember = GroupMember(myself.peerId!);
+        GroupMember groupMember = GroupMember();
         groupMember.groupId = groupId;
         groupMember.memberPeerId = selectedLinkmanId;
         groupMember.memberType = MemberType.member.name;

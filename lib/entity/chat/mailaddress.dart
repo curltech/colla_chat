@@ -2,7 +2,6 @@ import '../base.dart';
 
 /// 邮件地址
 class MailAddress extends BaseEntity {
-  String ownerPeerId;
   String name;
   String email;
   String? username;
@@ -23,8 +22,7 @@ class MailAddress extends BaseEntity {
   bool isDefault = false;
 
   MailAddress(
-      {required this.ownerPeerId,
-      required this.name,
+      {required this.name,
       required this.email,
       this.username,
       this.domain,
@@ -41,8 +39,7 @@ class MailAddress extends BaseEntity {
   }
 
   MailAddress.fromJson(Map json)
-      : ownerPeerId = json['ownerPeerId'],
-        name = json['name'],
+      : name = json['name'],
         username = json['username'],
         password = json['password'],
         domain = json['domain'],

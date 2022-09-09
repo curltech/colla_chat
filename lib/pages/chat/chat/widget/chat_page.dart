@@ -118,7 +118,7 @@ class _ChatPageState extends State<ChatPage> {
 
   _handleSubmittedData(String text) async {
     _textController.clear();
-    chatData.insert(0, ChatMessage(myself.peerId ?? ''));
+    chatData.insert(0, ChatMessage());
     //await sendTextMsg('${widget?.id ?? widget.title}', widget.type, text);
   }
 

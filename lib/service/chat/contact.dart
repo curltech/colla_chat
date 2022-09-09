@@ -113,7 +113,7 @@ final linkmanService = LinkmanService(
       'peerId',
       'mobile',
     ],
-    fields: ServiceLocator.buildFields(Linkman('', '', ''), []));
+    fields: ServiceLocator.buildFields(Linkman( '', ''), []));
 
 class TagService extends GeneralBaseService<Tag> {
   TagService(
@@ -129,7 +129,7 @@ class TagService extends GeneralBaseService<Tag> {
 final tagService = TagService(
     tableName: "chat_tag",
     indexFields: ['ownerPeerId', 'createDate', 'tag'],
-    fields: ServiceLocator.buildFields(Tag(''), []));
+    fields: ServiceLocator.buildFields(Tag(), []));
 
 class PartyTagService extends GeneralBaseService<PartyTag> {
   PartyTagService(
@@ -145,7 +145,7 @@ class PartyTagService extends GeneralBaseService<PartyTag> {
 final partyTagService = PartyTagService(
     tableName: "chat_partytag",
     indexFields: ['ownerPeerId', 'createDate', 'tag', 'partyPeerId'],
-    fields: ServiceLocator.buildFields(PartyTag(''), []));
+    fields: ServiceLocator.buildFields(PartyTag(), []));
 
 class GroupService extends PartyService<Group> {
   Map<String, Group> groups = {};
@@ -217,7 +217,7 @@ class GroupService extends PartyService<Group> {
     List<PeerParty> members = group.members;
     if (members.isNotEmpty) {
       for (var member in members) {
-        GroupMember groupMember = GroupMember(myself.peerId!);
+        GroupMember groupMember = GroupMember();
         groupMember.memberPeerId = member.peerId;
         groupMember.groupId = group.peerId;
         groupMember.memberAlias = member.alias;
@@ -240,7 +240,7 @@ final groupService = GroupService(
       'groupCategory',
       'groupType'
     ],
-    fields: ServiceLocator.buildFields(Group('', '', ''), []));
+    fields: ServiceLocator.buildFields(Group('', ''), []));
 
 class GroupMemberService extends GeneralBaseService<GroupMember> {
   GroupMemberService(
@@ -304,7 +304,7 @@ final groupMemberService = GroupMemberService(
       'memberPeerId',
       'memberType'
     ],
-    fields: ServiceLocator.buildFields(GroupMember(''), []));
+    fields: ServiceLocator.buildFields(GroupMember(), []));
 
 class ContactService extends PartyService<Contact> {
   ContactService(
@@ -330,7 +330,7 @@ class ContactService extends PartyService<Contact> {
     if (contacts.isNotEmpty) {
       for (var contact in contacts) {
         Contact peerContact =
-            Contact('', '', contact.name.last + contact.name.first);
+            Contact( '', contact.name.last + contact.name.first);
         if (contact.name != null) {
           peerContact.formattedName = contact.name.toString();
           //peerContact.pyFormattedName = pinyinUtil.getPinyin(peerContact.formattedName);
@@ -427,4 +427,4 @@ class ContactService extends PartyService<Contact> {
 final contactService = ContactService(
     tableName: "chat_contact",
     indexFields: ['peerId', 'mobile', 'formattedName', 'name'],
-    fields: ServiceLocator.buildFields(Contact('', '', ''), []));
+    fields: ServiceLocator.buildFields(Contact('', ''), []));

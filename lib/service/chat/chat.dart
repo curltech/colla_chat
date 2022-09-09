@@ -183,7 +183,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     }
     await update(chatMessage);
 
-    ChatMessage msg = ChatMessage(myself.peerId!);
+    ChatMessage msg = ChatMessage();
     msg.messageId = chatMessage.messageId;
     msg.messageType = chatMessage.messageType;
     msg.subMessageType = ChatSubMessageType.chatReceipt.name;
@@ -238,7 +238,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     List<int>? thumbnail,
     String? status,
   }) async {
-    ChatMessage chatMessage = ChatMessage(myself.peerId!);
+    ChatMessage chatMessage = ChatMessage();
     if (messageId == null) {
       var uuid = const Uuid();
       messageId = uuid.v4();
@@ -372,7 +372,7 @@ final chatMessageService = ChatMessageService(
       'receiptTime',
       'title',
     ],
-    fields: ServiceLocator.buildFields(ChatMessage(''), []));
+    fields: ServiceLocator.buildFields(ChatMessage(), []));
 
 class MergedMessageService extends GeneralBaseService<MergedMessage> {
   MergedMessageService(
@@ -491,7 +491,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
   upsertByLinkman(Linkman linkman) async {
     ChatSummary? chatSummary = await findCachedOneByPeerId(linkman.peerId);
     if (chatSummary == null) {
-      chatSummary = ChatSummary(myself.peerId!);
+      chatSummary = ChatSummary();
       chatSummary.peerId = linkman.peerId;
       chatSummary.partyType = PartyType.linkman.name;
       chatSummary.name = linkman.name;
@@ -508,7 +508,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
   upsertByGroup(Group group) async {
     ChatSummary? chatSummary = await findCachedOneByPeerId(group.peerId);
     if (chatSummary == null) {
-      chatSummary = ChatSummary(myself.peerId!);
+      chatSummary = ChatSummary();
       chatSummary.peerId = group.peerId;
       chatSummary.partyType = PartyType.group.name;
       chatSummary.name = group.name;
@@ -536,7 +536,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
     if (groupPeerId != null) {
       chatSummary = await findCachedOneByPeerId(groupPeerId);
       if (chatSummary == null) {
-        chatSummary = ChatSummary(myself.peerId!);
+        chatSummary = ChatSummary();
         chatSummary.peerId = groupPeerId;
         chatSummary.partyType = PartyType.group.name;
         chatSummary.sendReceiveTime = chatMessage.sendTime;
@@ -550,7 +550,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       if (senderPeerId != null && senderPeerId != myself.peerId) {
         chatSummary = await findCachedOneByPeerId(senderPeerId);
         if (chatSummary == null) {
-          chatSummary = ChatSummary(myself.peerId!);
+          chatSummary = ChatSummary();
           chatSummary.peerId = senderPeerId;
           chatSummary.clientId = senderClientId;
           chatSummary.partyType = PartyType.linkman.name;
@@ -565,7 +565,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       } else if (receiverPeerId != null && receiverPeerId != myself.peerId) {
         chatSummary = await findCachedOneByPeerId(receiverPeerId);
         if (chatSummary == null) {
-          chatSummary = ChatSummary(myself.peerId!);
+          chatSummary = ChatSummary();
           chatSummary.peerId = receiverPeerId;
           chatSummary.clientId = receiverClientId;
           chatSummary.partyType = PartyType.linkman.name;
@@ -602,4 +602,4 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
 final chatSummaryService = ChatSummaryService(
     tableName: "chat_summary",
     indexFields: ['ownerPeerId', 'peerId', 'partyType', 'sendReceiveTime'],
-    fields: ServiceLocator.buildFields(ChatSummary(''), []));
+    fields: ServiceLocator.buildFields(ChatSummary(), []));

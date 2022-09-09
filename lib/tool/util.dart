@@ -6,6 +6,7 @@ import 'dart:ui' as ui;
 
 import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
@@ -418,12 +419,15 @@ class EntityUtil {
 
   static createTimestamp(dynamic entity) {
     var currentDate = DateUtil.currentDate();
+    var owerPeerId=myself.peerId;
     if (entity is Map) {
       entity['createDate'] = currentDate;
       entity['updateDate'] = currentDate;
+      entity['owerPeerId'] = owerPeerId;
     } else {
       entity.createDate = currentDate;
       entity.updateDate = currentDate;
+      entity.owerPeerId = owerPeerId;
     }
   }
 
