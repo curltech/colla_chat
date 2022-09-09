@@ -126,6 +126,53 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       }
     }
   }
+
+  ///发送文本消息,发送命令消息目标可以是linkman，也可以是群，取决于当前chatSummary
+  Future<ChatMessage?> send(
+      {String? message,
+      ContentType contentType = ContentType.text,
+      ChatSubMessageType subMessageType = ChatSubMessageType.chat}) async {
+    if (_chatSummary == null) {
+      return null;
+    }
+    String peerId = _chatSummary!.peerId!;
+    String name = _chatSummary!.name!;
+    String? clientId = _chatSummary!.clientId;
+    String partyType = _chatSummary!.partyType!;
+
+    List<int>? data;
+    if (message != null) {
+      data = CryptoUtil.stringToUtf8(message);
+    }
+    ChatMessage? chatMessage;
+    if (partyType == PartyType.linkman.name) {
+      //保存消息
+      chatMessage = await chatMessageService.buildChatMessage(peerId,
+          data: data,
+          name: name,
+          clientId: clientId,
+          contentType: contentType,
+          subMessageType: subMessageType);
+      //修改消息控制器
+      chatMessageController.insert(0, chatMessage);
+      await chatMessageService.send(chatMessage);
+    } else if (partyType == PartyType.group.name) {
+      //保存群消息
+      List<ChatMessage> chatMessages =
+          await chatMessageService.buildGroupChatMessage(peerId,
+              data: data,
+              contentType: contentType,
+              subMessageType: subMessageType);
+      //修改消息控制器
+      //chatMessageController.insert(0, chatMessage);
+      if (chatMessages.isNotEmpty) {
+        for (var chatMessage in chatMessages) {
+          await chatMessageService.send(chatMessage);
+        }
+      }
+    }
+    return chatMessage!;
+  }
 }
 
 ///好友或者群的消息控制器，包含某个连接的所有消息
@@ -264,46 +311,6 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
             curve: Curves.easeIn));
   }
 
-  ///发送文本消息,发送命令消息
-  Future<ChatMessage> _send(
-      {String? message,
-      ContentType contentType = ContentType.text,
-      ChatSubMessageType subMessageType = ChatSubMessageType.chat}) async {
-    List<int>? data;
-    if (message != null) {
-      data = CryptoUtil.stringToUtf8(message);
-    }
-    ChatMessage? chatMessage;
-    if (partyType == PartyType.linkman.name) {
-      //保存消息
-      chatMessage = await chatMessageService.buildChatMessage(peerId,
-          data: data,
-          name: name,
-          clientId: clientId,
-          contentType: contentType,
-          subMessageType: subMessageType);
-      //修改消息控制器
-      chatMessageController.insert(0, chatMessage);
-      await chatMessageService.send(chatMessage);
-    }
-    if (partyType == PartyType.group.name) {
-      //保存群消息
-      List<ChatMessage> chatMessages =
-          await chatMessageService.buildGroupChatMessage(peerId,
-              data: data,
-              contentType: contentType,
-              subMessageType: subMessageType);
-      //修改消息控制器
-      //chatMessageController.insert(0, chatMessage);
-      if (chatMessages.isNotEmpty) {
-        for (var chatMessage in chatMessages) {
-          await chatMessageService.send(chatMessage);
-        }
-      }
-    }
-    return chatMessage!;
-  }
-
   ///发送其他消息命令
   Future<void> action(int index, String name) async {
     switch (name) {
@@ -317,6 +324,17 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
 
   actionVideoChat() async {
     chatMessageController.index = 1;
+  }
+
+  Future<ChatMessage?> _send({
+    String? message,
+    ContentType contentType = ContentType.text,
+    ChatSubMessageType subMessageType = ChatSubMessageType.chat,
+  }) {
+    return chatMessageController.send(
+        message: message,
+        contentType: contentType,
+        subMessageType: subMessageType);
   }
 
   ///发送消息的输入框和按钮，三个按钮，一个输入框，单独一个类

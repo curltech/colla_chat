@@ -594,7 +594,7 @@ class PeerConnectionPool {
   onAddStream(WebrtcEvent event) async {
     logger
         .i('peerId: ${event.peerId} clientId:${event.clientId} is onAddStream');
-    peerConnectionsController.add(event.peerId, clientId: event.clientId);
+    peerConnectionsController.addPeerConnection(event.peerId, clientId: event.clientId);
     peerConnectionsController.modify(event.peerId, clientId: event.clientId);
   }
 

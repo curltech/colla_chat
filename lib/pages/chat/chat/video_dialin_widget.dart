@@ -79,7 +79,7 @@ class VideoDialInWidget extends StatelessWidget {
               await advancedPeerConnection.addRender(render);
             }
           }
-          peerConnectionsController.add(peerId, clientId: clientId);
+          peerConnectionsController.addPeerConnection(peerId, clientId: clientId);
           indexWidgetProvider.push('chat_message');
           chatMessageController.index = 2;
         }

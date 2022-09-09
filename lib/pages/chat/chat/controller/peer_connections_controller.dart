@@ -28,7 +28,8 @@ class PeerConnectionsController extends VideoRenderController {
     }
   }
 
-  add(String peerId, {required String clientId}) {
+  //将连接加入控制器，此连接将与自己展开视频通话
+  addPeerConnection(String peerId, {required String clientId}) {
     AdvancedPeerConnection? peerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (peerConnection != null) {
@@ -43,6 +44,7 @@ class PeerConnectionsController extends VideoRenderController {
     }
   }
 
+  //将连接移出控制器，视频通话关闭
   remove(String peerId, {String? clientId}) {
     var pcs = _peerConnections[peerId];
     if (pcs != null) {
@@ -62,6 +64,7 @@ class PeerConnectionsController extends VideoRenderController {
     _peerConnections.clear();
   }
 
+  //获取所有的连接的render，用于展示视频通话窗口
   @override
   Map<String, PeerVideoRender> videoRenders(
       {String? peerId, String? clientId}) {

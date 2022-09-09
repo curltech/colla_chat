@@ -51,7 +51,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
         alignment: Alignment.topRight,
         child: WidgetUtil.buildCircleButton(
             padding: const EdgeInsets.all(15.0),
-            backgroundColor: appDataProvider.themeData!.colorScheme.primary,
+            backgroundColor: appDataProvider.themeData.colorScheme.primary,
             onPressed: () {
               _closeOverlayEntry();
             },

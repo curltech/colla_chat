@@ -1,5 +1,4 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/chat/controller/peer_connections_controller.dart';
 import 'package:colla_chat/pages/chat/chat/video_view_card.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/widgets/common/blank_widget.dart';
@@ -8,14 +7,12 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../../../entity/chat/chat.dart';
 import '../../../plugin/logger.dart';
-import '../../../service/chat/chat.dart';
 import '../../../transport/webrtc/advanced_peer_connection.dart';
 import '../../../transport/webrtc/base_peer_connection.dart';
 import '../../../transport/webrtc/peer_connection_pool.dart';
-import '../../../transport/webrtc/peer_video_render.dart';
-import '../../../widgets/data_bind/data_action_card.dart';
 import '../../../widgets/common/image_widget.dart';
 import '../../../widgets/common/simple_widget.dart';
+import '../../../widgets/data_bind/data_action_card.dart';
 import '../../../widgets/data_bind/data_listtile.dart';
 import 'chat_message_widget.dart';
 import 'controller/local_media_controller.dart';
@@ -63,7 +60,6 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   @override
   void initState() {
     super.initState();
-    videoChatReceiptController.addListener(_receivedReceipt);
     _init();
   }
 
@@ -78,44 +74,6 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
     }
   }
 
-  ///收到回执
-  _receivedReceipt() async {
-    ChatMessage? chatReceipt = videoChatReceiptController.chatReceipt;
-    ChatDirect? direct = videoChatReceiptController.direct;
-    if (chatReceipt != null && direct != null && direct == ChatDirect.receive) {
-      String? status = chatReceipt.status;
-      String? subMessageType = chatReceipt.subMessageType;
-      if (subMessageType != null) {
-        logger.w('received videoChat chatReceipt status: $status');
-        if (subMessageType == ChatSubMessageType.chatReceipt.name) {
-          if (status == MessageStatus.accepted.name) {
-            var peerId = chatReceipt.senderPeerId!;
-            var clientId = chatReceipt.senderClientId!;
-            AdvancedPeerConnection? advancedPeerConnection =
-                peerConnectionPool.getOne(
-              peerId,
-              clientId: clientId,
-            );
-            if (advancedPeerConnection != null) {
-              Map<String, PeerVideoRender> videoRenders =
-                  localMediaController.videoRenders();
-              for (var render in videoRenders.values) {
-                await advancedPeerConnection.addRender(render);
-              }
-              await advancedPeerConnection.negotiate();
-              await peerConnectionsController.clear();
-              await peerConnectionsController.add(peerId, clientId: clientId);
-              chatMessageController.index = 2;
-            }
-          } else if (status == MessageStatus.rejected.name) {
-            await localMediaController.close();
-            chatMessageController.index = 0;
-          }
-        }
-      }
-    }
-  }
-
   _closeOverlayEntry() {
     if (overlayEntry != null) {
       overlayEntry!.remove();
@@ -125,20 +83,19 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   }
 
   _minimize(BuildContext context) {
-    overlayEntry = OverlayEntry(
-        builder: (context) {
-          return Align(
-            alignment: Alignment.topRight,
-            child: WidgetUtil.buildCircleButton(
-                padding: const EdgeInsets.all(15.0),
-                backgroundColor: appDataProvider.themeData!.colorScheme.primary,
-                onPressed: () {
-                  _closeOverlayEntry();
-                },
-                child: const Icon(
-                    size: 32, color: Colors.white, Icons.zoom_out_map)),
-          );
-        });
+    overlayEntry = OverlayEntry(builder: (context) {
+      return Align(
+        alignment: Alignment.topRight,
+        child: WidgetUtil.buildCircleButton(
+            padding: const EdgeInsets.all(15.0),
+            backgroundColor: appDataProvider.themeData!.colorScheme.primary,
+            onPressed: () {
+              _closeOverlayEntry();
+            },
+            child:
+                const Icon(size: 32, color: Colors.white, Icons.zoom_out_map)),
+      );
+    });
     Overlay.of(context)!.insert(overlayEntry!);
     chatMessageController.index = 0;
   }
@@ -167,16 +124,10 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   }
 
   ///发送视频通话消息
-  Future<ChatMessage> _send(
+  Future<ChatMessage?> _send(
       {ChatSubMessageType subMessageType =
           ChatSubMessageType.videoChat}) async {
-    ChatMessage chatMessage = await chatMessageService.buildChatMessage(peerId,
-        contentType: ContentType.chat, subMessageType: subMessageType);
-    //修改消息控制器
-    chatMessageController.insert(0, chatMessage);
-    await chatMessageService.send(chatMessage);
-
-    return chatMessage;
+    return chatMessageController.send(subMessageType: subMessageType);
   }
 
   _close() {
@@ -311,7 +262,6 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
 
   @override
   void dispose() {
-    videoChatReceiptController.removeListener(_receivedReceipt);
     super.dispose();
   }
 }
