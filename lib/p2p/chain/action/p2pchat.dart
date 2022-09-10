@@ -1,7 +1,7 @@
 import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/tool/json_util.dart';
 
 import '../../../entity/p2p/chain_message.dart';
-import '../../../tool/util.dart';
 import '../baseaction.dart';
 
 /// 在chain目录下的采用自定义protocol "/chain"的方式自己实现的功能

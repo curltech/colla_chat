@@ -162,8 +162,10 @@ dependencies:
   # 多媒体
   #flutter_audio_waveforms: any
   photo_view: ^0.14.0 #图片显示
-  #音频处理 ios:Undefined symbol: ___gxx_personality_v0,ld: symbol(s) not found for architecture x86_64
-  #flutter_sound: ^9.2.12
+  #音频处理 ios:Just add those 2 flags in XCode > Build Settings > Other Linker Flags :
+  #-lc++
+  #-lstd++
+  flutter_sound: ^9.2.12
   audioplayers: ^1.0.1 #音频处理
   video_player: ^2.1.1 #视频播放
   flick_video_player: any

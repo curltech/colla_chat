@@ -4,7 +4,7 @@ import 'package:colla_chat/p2p/chain/action/connect.dart';
 import 'package:colla_chat/p2p/chain/action/ionsignal.dart';
 import 'package:colla_chat/p2p/chain/action/p2pchat.dart';
 import 'package:colla_chat/service/stock/account.dart';
-import 'package:colla_chat/tool/util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 
 import '../entity/p2p/security_context.dart';
 import '../p2p/chain/action/chat.dart';

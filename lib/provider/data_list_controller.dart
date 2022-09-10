@@ -1,8 +1,8 @@
 import 'package:colla_chat/entity/base.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:flutter/material.dart';
 
 import '../datastore/datastore.dart';
-import '../tool/util.dart';
 import '../widgets/data_bind/column_field_widget.dart';
 
 ///基础的数组数据控制器

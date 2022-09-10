@@ -3,12 +3,12 @@ import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/servicelocator.dart';
+import 'package:colla_chat/tool/contact_util.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as flutter_contacts;
 
 import '../../entity/chat/contact.dart';
 import '../../entity/dht/peerclient.dart';
-import '../../tool/util.dart';
 import '../../widgets/common/image_widget.dart';
 import '../dht/peerclient.dart';
 import '../general_base.dart';
@@ -113,7 +113,7 @@ final linkmanService = LinkmanService(
       'peerId',
       'mobile',
     ],
-    fields: ServiceLocator.buildFields(Linkman( '', ''), []));
+    fields: ServiceLocator.buildFields(Linkman('', ''), []));
 
 class TagService extends GeneralBaseService<Tag> {
   TagService(
@@ -330,7 +330,7 @@ class ContactService extends PartyService<Contact> {
     if (contacts.isNotEmpty) {
       for (var contact in contacts) {
         Contact peerContact =
-            Contact( '', contact.name.last + contact.name.first);
+            Contact('', contact.name.last + contact.name.first);
         if (contact.name != null) {
           peerContact.formattedName = contact.name.toString();
           //peerContact.pyFormattedName = pinyinUtil.getPinyin(peerContact.formattedName);

@@ -1,7 +1,7 @@
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/tool/json_util.dart';
 
 import '../../../entity/p2p/chain_message.dart';
-import '../../../tool/util.dart';
 import '../baseaction.dart';
 
 /**

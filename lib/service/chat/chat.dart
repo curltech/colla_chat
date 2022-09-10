@@ -3,7 +3,8 @@ import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
-import 'package:colla_chat/tool/util.dart';
+import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../constant/base.dart';

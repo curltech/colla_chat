@@ -16,7 +16,6 @@ import '../../../widgets/data_bind/data_group_listview.dart';
 import '../../../widgets/data_bind/data_listtile.dart';
 import 'chat_message_view.dart';
 import 'chat_message_widget.dart';
-import 'controller/local_media_controller.dart';
 
 ///好友的汇总控制器，每当消息汇总表的数据有变化时更新控制器
 final DataListController<ChatSummary> linkmanChatSummaryController =

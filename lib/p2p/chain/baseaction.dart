@@ -1,12 +1,12 @@
 import 'dart:core';
 
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../crypto/util.dart';
 import '../../entity/dht/myself.dart';
 import '../../entity/p2p/chain_message.dart';
 import '../../provider/app_data_provider.dart';
-import '../../tool/util.dart';
 import 'chainmessagehandler.dart';
 
 enum PayloadType {
@@ -100,7 +100,8 @@ abstract class BaseAction {
     if (connectAddress == null) {
       if (appDataProvider.nodeAddress.isNotEmpty) {
         connectAddress = appDataProvider.defaultNodeAddress.wsConnectAddress;
-        connectAddress ??= appDataProvider.defaultNodeAddress.httpConnectAddress;
+        connectAddress ??=
+            appDataProvider.defaultNodeAddress.httpConnectAddress;
       }
     }
     chainMessage.connectAddress = connectAddress;

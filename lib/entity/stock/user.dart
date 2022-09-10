@@ -1,5 +1,7 @@
+import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/type_util.dart';
+
 import '../../service/stock/account.dart';
-import '../../tool/util.dart';
 import '../../transport/webclient.dart';
 import 'account.dart';
 

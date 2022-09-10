@@ -1,8 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:openpgp/openpgp.dart' as flutter_openpgp;
-
-import '../tool/util.dart';
 
 typedef FlutterOpenPGP = flutter_openpgp.OpenPGP;
 

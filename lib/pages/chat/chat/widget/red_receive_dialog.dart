@@ -1,5 +1,5 @@
 import 'package:colla_chat/provider/app_data_provider.dart';
-import 'package:colla_chat/tool/util.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 

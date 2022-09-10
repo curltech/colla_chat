@@ -3,10 +3,10 @@ import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:flutter/material.dart';
 
 import '../../../entity/chat/chat.dart';
-import '../../../tool/util.dart';
 import 'action_message.dart';
 import 'extended_text_message.dart';
 

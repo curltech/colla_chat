@@ -1,4 +1,4 @@
-import '../tool/util.dart';
+import 'package:colla_chat/tool/string_util.dart';
 
 class Sql {
   late String clause;

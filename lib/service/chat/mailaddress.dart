@@ -40,5 +40,4 @@ class MailAddressService extends GeneralBaseService<MailAddress> {
 final mailAddressService = MailAddressService(
     tableName: "chat_mailaddress",
     indexFields: ['ownerPeerId', 'email', 'name'],
-    fields: ServiceLocator.buildFields(
-        MailAddress( name: '', email: '@'), []));
+    fields: ServiceLocator.buildFields(MailAddress(name: '', email: '@'), []));

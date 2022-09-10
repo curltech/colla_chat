@@ -1,4 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:flutter/material.dart';
 import 'package:pluto_grid/pluto_grid.dart';
 //import 'package:pluto_grid_export/pluto_grid_export.dart' as pluto_grid_export;
@@ -7,7 +8,6 @@ import 'package:provider/provider.dart';
 import '../../provider/app_data_provider.dart';
 import '../../provider/data_list_controller.dart';
 import '../../provider/index_widget_provider.dart';
-import '../../tool/util.dart';
 import 'column_field_widget.dart';
 
 ///PlutoGrid，一个功能非常强大的表格实现

@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/tool/util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 

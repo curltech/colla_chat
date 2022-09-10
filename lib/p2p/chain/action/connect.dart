@@ -1,6 +1,6 @@
 import 'package:colla_chat/entity/dht/peerendpoint.dart';
-import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/tool/util.dart';
+import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
 
 import '../../../crypto/cryptography.dart';
 import '../../../crypto/util.dart';

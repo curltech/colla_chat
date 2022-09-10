@@ -23,8 +23,7 @@ class VideoDialInWidget extends StatelessWidget {
 
   final bool videoMedia;
 
-  final Function(ChatMessage chatMessage, MessageStatus chatReceiptType)?
-      onTap;
+  final Function(ChatMessage chatMessage, MessageStatus chatReceiptType)? onTap;
 
   const VideoDialInWidget(
       {Key? key,
@@ -79,7 +78,8 @@ class VideoDialInWidget extends StatelessWidget {
               await advancedPeerConnection.addRender(render);
             }
           }
-          peerConnectionsController.addPeerConnection(peerId, clientId: clientId);
+          peerConnectionsController.addPeerConnection(peerId,
+              clientId: clientId);
           indexWidgetProvider.push('chat_message');
           chatMessageController.index = 2;
         }

@@ -4,8 +4,9 @@ import 'dart:convert';
 import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/tool/util.dart';
+import 'package:colla_chat/tool/entity_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/type_util.dart';
 import 'package:sqlite3/common.dart';
 
 import './condition_import/unsupport.dart'

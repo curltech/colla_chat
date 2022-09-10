@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../datastore/datastore.dart';
 import '../../../../entity/base.dart';
-import '../../../../entity/dht/myself.dart';
 import '../../../../entity/dht/peerclient.dart';
 import '../../../../l10n/localization.dart';
 import '../../../../provider/data_list_controller.dart';
@@ -107,7 +106,7 @@ class PeerClientListWidget extends StatefulWidget with TileDataMixin {
     rightWidgets = [
       IconButton(
           onPressed: () {
-            var current = PeerClient('', '','');
+            var current = PeerClient('', '', '');
             current.state = EntityState.insert;
             controller.add(current);
           },

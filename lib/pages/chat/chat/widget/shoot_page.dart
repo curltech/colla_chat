@@ -3,7 +3,7 @@ import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/tool/util.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';

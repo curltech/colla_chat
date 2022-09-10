@@ -1,6 +1,7 @@
 import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
-import 'package:colla_chat/tool/util.dart';
+import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:cryptography/cryptography.dart';
 
 import '../crypto/util.dart';
@@ -20,7 +21,7 @@ class DataBuilder {
     var hash = await cryptoGraphy.hash(clientDevice.codeUnits);
     var clientId = CryptoUtil.encodeBase58(hash);
     for (var i = 0; i < 20; ++i) {
-      PeerClient peerClient = PeerClient( '', clientId, '');
+      PeerClient peerClient = PeerClient('', clientId, '');
 
       ///peerId对应的密钥对
       SimpleKeyPair peerPrivateKey = await cryptoGraphy.generateKeyPair();
@@ -36,8 +37,7 @@ class DataBuilder {
       peerClientService.insert(peerClient);
 
       if (i % 3 == 0) {
-        Linkman linkman =
-            Linkman( peerClient.peerId, peerClient.name);
+        Linkman linkman = Linkman(peerClient.peerId, peerClient.name);
         await linkmanService.insert(linkman);
         linkmen.add(linkman);
 
@@ -62,7 +62,7 @@ class DataBuilder {
           await cryptoGraphy.generateKeyPair(keyPairType: KeyPairType.x25519);
       var publicKey = await cryptoGraphy.exportPublicKey(keyPair);
       var name = 'Group$i';
-      Group group = Group( peerId, name);
+      Group group = Group(peerId, name);
       group.publicKey = publicKey;
       group.peerPublicKey = peerPublicKey;
       await groupService.insert(group);

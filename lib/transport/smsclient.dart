@@ -1,6 +1,6 @@
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
-import 'package:colla_chat/tool/util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:telephony/telephony.dart';
 

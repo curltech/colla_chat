@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 import '../base.dart';
 
 /// 节点的附属信息，包括个性化的配置
@@ -29,7 +27,6 @@ class PeerProfile extends StatusEntity {
   /// 主发现地址，表示可信的，可以推荐你的peer地址
   String? discoveryAddress;
   String? lastFindNodeTime;
-
 
   String? mobileVerified;
 

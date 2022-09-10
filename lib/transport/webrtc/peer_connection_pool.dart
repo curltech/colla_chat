@@ -3,7 +3,7 @@ import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/chat.dart';
-import 'package:colla_chat/tool/util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
@@ -594,7 +594,8 @@ class PeerConnectionPool {
   onAddStream(WebrtcEvent event) async {
     logger
         .i('peerId: ${event.peerId} clientId:${event.clientId} is onAddStream');
-    peerConnectionsController.addPeerConnection(event.peerId, clientId: event.clientId);
+    peerConnectionsController.addPeerConnection(event.peerId,
+        clientId: event.clientId);
     peerConnectionsController.modify(event.peerId, clientId: event.clientId);
   }
 
@@ -621,7 +622,8 @@ class PeerConnectionPool {
     peerConnectionsController.modify(event.peerId, clientId: event.clientId);
   }
 
-  removeStream(String peerId, MediaStream stream, {required String clientId}) async {
+  removeStream(String peerId, MediaStream stream,
+      {required String clientId}) async {
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null) {

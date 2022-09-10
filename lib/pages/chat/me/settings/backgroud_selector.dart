@@ -1,7 +1,7 @@
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../tool/util.dart';
 import '../../login/loading.dart';
 
 ///从assets目录下背景图片选择器

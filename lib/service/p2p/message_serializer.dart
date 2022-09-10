@@ -1,4 +1,4 @@
-import 'package:colla_chat/tool/util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 
 import '../../crypto/util.dart';
 

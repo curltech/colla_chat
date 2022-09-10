@@ -1,7 +1,8 @@
+import 'package:colla_chat/tool/entity_util.dart';
+
 import '../constant/base.dart';
 import '../datastore/datastore.dart';
 import '../entity/base.dart';
-import '../tool/util.dart';
 
 /// 范型化本地sqlite3的通用访问类，所有的表访问服务都是这个类的实例
 abstract class BaseService {

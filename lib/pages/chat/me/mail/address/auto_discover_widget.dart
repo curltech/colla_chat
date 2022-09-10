@@ -1,10 +1,11 @@
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:enough_mail/discover.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../l10n/localization.dart';
 import '../../../../../service/chat/mailaddress.dart';
-import '../../../../../tool/util.dart';
 import '../../../../../transport/emailclient.dart';
 
 /// 自动邮件发现组件，一个card下的录入框和按钮组合

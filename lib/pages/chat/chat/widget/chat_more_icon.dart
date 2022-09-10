@@ -1,6 +1,6 @@
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../tool/util.dart';
 import 'commom_button.dart';
 
 class ChatMoreIcon extends StatelessWidget {

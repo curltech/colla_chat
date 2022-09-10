@@ -5,6 +5,11 @@ import 'package:colla_chat/service/dht/myself.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/service/servicelocator.dart';
+import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/network_connectivity.dart';
+import 'package:colla_chat/tool/phone_number_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 
 import '../../crypto/signalprotocol.dart';
@@ -20,7 +25,6 @@ import '../../p2p/chain/action/connect.dart';
 import '../../p2p/chain/baseaction.dart';
 import '../../platform.dart';
 import '../../plugin/security_storage.dart';
-import '../../tool/util.dart';
 import 'base.dart';
 
 const String skipLoginName = 'skipLogin';
@@ -87,7 +91,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     var clientDevice = JsonUtil.toJsonString(deviceData);
     var hash = await cryptoGraphy.hash(clientDevice.codeUnits);
     var clientId = CryptoUtil.encodeBase58(hash);
-    var myselfPeer = MyselfPeer( '', clientId, name, loginName);
+    var myselfPeer = MyselfPeer('', clientId, name, loginName);
     myselfPeer.status = EntityStatus.effective.name;
     myselfPeer.mobile = mobile;
     myselfPeer.email = email;

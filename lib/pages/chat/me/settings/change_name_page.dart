@@ -1,8 +1,9 @@
+import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../l10n/localization.dart';
-import '../../../../tool/util.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../chat/widget/main_input.dart';
 import '../../chat/widget/tip_verify_Input.dart';

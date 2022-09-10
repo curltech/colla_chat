@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 
 import '../../provider/data_list_controller.dart';
 import '../../provider/index_widget_provider.dart';
-import '../../tool/util.dart';
+import '../../tool/json_util.dart';
 import 'column_field_widget.dart';
 
 class DataTable2Widget<T> extends StatefulWidget {

@@ -4,7 +4,7 @@ import 'package:syncfusion_flutter_datagrid/datagrid.dart';
 
 import '../../provider/app_data_provider.dart';
 import '../../provider/data_list_controller.dart';
-import '../../tool/util.dart';
+import '../../tool/json_util.dart';
 import 'column_field_widget.dart';
 
 ///Syncfusion DataGrid

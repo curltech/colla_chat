@@ -96,8 +96,8 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
       var mailAddresses = mailAddressProvider.mailAddresses;
       if (mailAddresses.isNotEmpty) {
         for (var mailAddress in mailAddresses) {
-          TileData key =
-              TileData(title: mailAddress.email, prefix: const Icon(Icons.email));
+          TileData key = TileData(
+              title: mailAddress.email, prefix: const Icon(Icons.email));
           List<enough_mail.Mailbox?>? mailboxes =
               mailAddressProvider.getMailboxes(mailAddress.email);
           if (mailboxes != null && mailboxes.isNotEmpty) {

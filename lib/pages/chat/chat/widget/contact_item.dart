@@ -124,7 +124,7 @@ class ContactItemState extends State<ContactItem> {
     ];
 
     /// 列表项主体部分
-    Widget button = TextButton (
+    Widget button = TextButton(
       onPressed: () {
         if (widget.type == ClickType.select) {
           setState(() => isSelect = !isSelect);

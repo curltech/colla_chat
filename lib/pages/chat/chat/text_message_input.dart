@@ -1,7 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:flutter/material.dart';
 
-import '../../../tool/util.dart';
 import 'extended_text_message_input.dart';
 
 ///发送文本消息的输入框和按钮，

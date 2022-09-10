@@ -1,8 +1,9 @@
 import 'package:colla_chat/pages/chat/chat/widget/ui.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../provider/app_data_provider.dart';
-import '../../../../tool/util.dart';
 import '../../../../widgets/common/image_widget.dart';
 
 ///联系人详情页面

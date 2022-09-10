@@ -1,11 +1,7 @@
-import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/entity/dht/peersignal.dart';
 import 'package:colla_chat/service/servicelocator.dart';
-import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 
 import '../../entity/dht/peerprofile.dart';
-import '../../entity/dht/peersignal.dart';
-import '../../tool/util.dart';
-import '../../transport/webrtc/advanced_peer_connection.dart';
 import '../general_base.dart';
 
 enum SignalSource { local, remote }

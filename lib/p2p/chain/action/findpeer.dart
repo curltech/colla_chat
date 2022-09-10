@@ -1,6 +1,7 @@
+import 'package:colla_chat/tool/json_util.dart';
+
 import '../../../entity/dht/peerendpoint.dart';
 import '../../../entity/p2p/chain_message.dart';
-import '../../../tool/util.dart';
 import '../baseaction.dart';
 
 /// 根据目标peerpoint的peerid搜索

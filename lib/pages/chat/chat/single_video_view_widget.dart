@@ -1,5 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/tool/util.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
@@ -56,10 +56,10 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   }
 
   Widget _createPopupContent() {
-    var height=MediaQuery.of(context).size.height-56;
-    var width=MediaQuery.of(context).size.width;
-    Widget videoView = widget.render.createVideoView(
-        height: height, width: width, color: widget.color);
+    var height = MediaQuery.of(context).size.height - 56;
+    var width = MediaQuery.of(context).size.width;
+    Widget videoView = widget.render
+        .createVideoView(height: height, width: width, color: widget.color);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: ClipRRect(
@@ -112,7 +112,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   Widget _buildActionCard(BuildContext context) {
     double height = 80;
     Widget actionCard = Card(
-      elevation:0,
+      elevation: 0,
       child: Center(
           child: Container(
         height: height,

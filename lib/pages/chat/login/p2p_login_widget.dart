@@ -1,10 +1,11 @@
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/service/dht/myselfpeer.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../routers/routes.dart';
-import '../../../service/dht/myselfpeer.dart';
-import '../../../tool/util.dart';
 import '../../../widgets/data_bind/column_field_widget.dart';
 import '../../../widgets/data_bind/form_input_widget.dart';
 

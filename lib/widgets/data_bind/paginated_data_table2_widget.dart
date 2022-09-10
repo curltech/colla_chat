@@ -1,5 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -7,7 +8,6 @@ import 'package:provider/provider.dart';
 import '../../provider/app_data_provider.dart';
 import '../../provider/data_list_controller.dart';
 import '../../provider/index_widget_provider.dart';
-import '../../tool/util.dart';
 import '../data_bind/column_field_widget.dart';
 
 ///系统提供的分页表格只能用于静态展示，不能进行增加删除等操作

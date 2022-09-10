@@ -1,4 +1,5 @@
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:dio/dio.dart';
 
 import '../../crypto/util.dart';
@@ -7,7 +8,6 @@ import '../../entity/p2p/chain_message.dart';
 import '../../entity/p2p/security_context.dart';
 import '../../service/p2p/message_serializer.dart';
 import '../../service/p2p/security_context.dart';
-import '../../tool/util.dart';
 import '../../transport/httpclient.dart';
 import '../../transport/websocket.dart';
 

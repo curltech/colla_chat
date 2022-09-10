@@ -5,6 +5,7 @@ import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
@@ -12,7 +13,6 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../../service/p2p/security_context.dart';
 import '../../service/servicelocator.dart';
-import '../../tool/util.dart';
 
 class SignalExtension {
   late String peerId;
