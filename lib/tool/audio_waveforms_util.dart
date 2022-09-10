@@ -58,6 +58,7 @@ class AudioWaveformsUtil {
     Clip clipBehavior = Clip.none,
   }) async {
     PlayerController playerController = PlayerController();
+    await playerController.preparePlayer('');
     await playerController.startPlayer();
     await playerController.pausePlayer();
     await playerController.stopPlayer();
