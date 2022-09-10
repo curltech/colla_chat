@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/qrcode_util.dart';
 import 'package:colla_chat/tool/share_util.dart';

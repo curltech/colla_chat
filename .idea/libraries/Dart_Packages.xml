@@ -72,6 +72,13 @@
             </list>
           </value>
         </entry>
+        <entry key="audio_session">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/audio_session-0.1.10/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="audioplayers">
           <value>
             <list>
@@ -779,10 +786,17 @@
             </list>
           </value>
         </entry>
+        <entry key="file_saver">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/file_saver-0.1.1/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="filesystem_picker">
           <value>
             <list>
-              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/filesystem_picker-2.0.1/lib" />
+              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/filesystem_picker-3.1.0/lib" />
             </list>
           </value>
         </entry>
@@ -1371,6 +1385,27 @@
           <value>
             <list>
               <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/json_annotation-4.6.0/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="just_audio">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/just_audio-0.9.28/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="just_audio_platform_interface">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/just_audio_platform_interface-4.2.0/lib" />
+            </list>
+          </value>
+        </entry>
+        <entry key="just_audio_web">
+          <value>
+            <list>
+              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/just_audio_web-0.4.7/lib" />
             </list>
           </value>
         </entry>
@@ -2584,6 +2619,7 @@
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/args-2.3.1/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/asn1lib-1.1.0/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/async-2.9.0/lib" />
+      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/audio_session-0.1.10/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/audioplayers-1.0.1/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/audioplayers_android-1.0.1/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/audioplayers_darwin-1.0.1/lib" />
@@ -2685,7 +2721,8 @@
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/ffi-2.0.1/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/file-6.1.4/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/file_picker-4.6.1/lib" />
-      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/filesystem_picker-2.0.1/lib" />
+      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/file_saver-0.1.1/lib" />
+      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/filesystem_picker-3.1.0/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/fixnum-1.0.1/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/fl_chart-0.50.6/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/flat_buffers-2.0.5/lib" />
@@ -2766,6 +2803,9 @@
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/io-1.0.3/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/js-0.6.4/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/json_annotation-4.6.0/lib" />
+      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/just_audio-0.9.28/lib" />
+      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/just_audio_platform_interface-4.2.0/lib" />
+      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/just_audio_web-0.4.7/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/libsignal_protocol_dart-0.5.6/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/linked_scroll_controller-0.2.0/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/lints-2.0.0/lib" />

@@ -6,6 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_windows
   battery_plus_windows
   connectivity_plus_windows
+  file_saver
   flutter_secure_storage_windows
   flutter_webrtc
   geolocator_windows

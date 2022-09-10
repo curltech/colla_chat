@@ -1,11 +1,9 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
-import 'package:path_provider/path_provider.dart';
 
 class PackageInfoUtil {
   Future<PackageInfo> getPackageInfo() async {
@@ -32,17 +30,6 @@ class TraceUtil {
     Duration diff = t.difference(start);
     logger.i('$msg, trace end:${t.toIso8601String()}, interval $diff');
     return diff;
-  }
-}
-
-class FileUtil {
-  static Future<File> writeFile(Uint8List bytes, String name) async {
-    final document = await getApplicationDocumentsDirectory();
-    final dir = Directory(document.path + name);
-    final imageFile = File(dir.path);
-    await imageFile.writeAsBytes(bytes);
-
-    return imageFile;
   }
 }
 
