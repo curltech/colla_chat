@@ -5,7 +5,7 @@ import 'package:local_auth/local_auth.dart';
 class LocalAuthUtil {
   static final LocalAuthentication auth = LocalAuthentication();
 
-  static Future<void> authenticate({
+  static Future<bool> authenticate({
     required String localizedReason,
     bool useErrorDialogs = true,
     bool stickyAuth = false,
@@ -26,6 +26,8 @@ class LocalAuthUtil {
     } on PlatformException catch (e) {
       logger.e('local authenticate failure:$e');
     }
+
+    return authenticated;
   }
 
   static Future<List<BiometricType>> getAvailableBiometrics() async {
