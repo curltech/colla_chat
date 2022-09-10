@@ -42,7 +42,7 @@ dependencies:
   url_launcher: ^6.1.2 #打开系统浏览器
   package_info: ^2.0.2 #获取包信息
   open_file: ^3.2.1 #打开文件, 和最新device_info有版本冲突
-  camera: ^0.9.8+1 #调用相机
+  camera: ^0.9.6 #调用相机
   orientation: ^1.2.0 # 控制屏幕旋转
   geolocator: ^8.2.1
   package_info_plus: ^1.4.2
@@ -122,7 +122,8 @@ dependencies:
   flex_color_picker: ^2.4.0
   file_picker: ^4.6.0
   filesystem_picker: ^3.0.0
-  wechat_assets_picker: ^7.3.2 #微信图库
+  wechat_assets_picker: ^8.0.2 #微信图库
+  wechat_camera_picker:	^3.5.0+1
   flutter_slidable: ^2.0.0
   #安全加密
   cryptography: ^2.0.5 #ecc,aes
@@ -175,8 +176,9 @@ dependencies:
   video_thumbnail: ^0.5.2
   syncfusion_flutter_barcodes: any
   image_gallery_saver: ^1.7.1
-  extended_image: ^6.0.1
+  extended_image: ^6.3.0
   extended_image_library: ^3.3.0
+
   #应用
   flutter_quill: ^5.0.3
   #visual_editor: any
