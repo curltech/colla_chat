@@ -28,36 +28,9 @@ class _VideoViewCardState extends State<VideoViewCard> {
     setState(() {});
   }
 
-  Size _calculateSize(double totalWidth, double totalHeight, int count) {
-    var height = totalHeight - 8;
-    var width = totalWidth - 4;
-    if (count <= 4) {
-      height = height / count;
-    } else if (count <= 8) {
-      width = width / 2;
-      height = height / count / 2;
-    } else if (count <= 12) {
-      width = width / count / 3;
-    } else {
-      width = width / count / 4;
-      height = height / 4;
-    }
-
-    return Size(width, height);
-  }
-
   Widget _buildVideoViews(BuildContext context, BoxConstraints constraints) {
     Map<String, PeerVideoRender> renders = widget.controller.videoRenders();
     logger.i('VideoRenderController videoRenders length:${renders.length}');
-    // var maxHeight = constraints.maxHeight;
-    // if (maxHeight == 0 || maxHeight == double.infinity) {
-    //   maxHeight = appDataProvider.mobileSize.height;
-    // }
-    // var maxWidth = constraints.maxWidth;
-    // if (maxWidth == 0 || maxWidth == double.infinity) {
-    //   maxWidth = appDataProvider.mobileSize.width;
-    // }
-    //Size size = _calculateSize(maxWidth, maxHeight, renders.length);
     List<Widget> videoViews = [];
     for (var render in renders.values) {
       Widget videoView = SingleVideoViewWidget(
@@ -78,7 +51,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
             //横轴间距
             crossAxisSpacing: 5.0,
             //子组件宽高长度比例
-            childAspectRatio: 1.0),
+            childAspectRatio: 9 / 16),
         itemBuilder: (BuildContext context, int index) {
           //Widget Function(BuildContext context, int index)
           return videoViews[index];

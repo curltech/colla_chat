@@ -11,7 +11,7 @@ import '../../../../transport/webrtc/peer_video_render.dart';
 import '../chat_message_widget.dart';
 
 abstract class VideoRenderController with ChangeNotifier {
-  int _crossAxisCount = 1;
+  int _crossAxisCount = 2;
 
   Map<String, PeerVideoRender> videoRenders({String? peerId, String? clientId});
 
