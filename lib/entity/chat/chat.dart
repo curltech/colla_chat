@@ -11,6 +11,7 @@ enum ContentType {
   file,
   audio,
   video,
+  display,
   card,
   note,
   channel,
@@ -67,7 +68,6 @@ enum ChatSubMessageType {
   chat, // 联系人发送聊天消息
   chatSystem, // 系统预定义聊天消息，如群聊动态通知
   videoChat,
-  audioChat,
   deleteChat,
   chatReceipt, // 接收回复
   groupFile,

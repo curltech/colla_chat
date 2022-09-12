@@ -23,9 +23,10 @@ class GlobalChatMessageController with ChangeNotifier {
   }
 
   ///跟踪影响全局的消息到来，对不同类型的消息进行分派
-  set chatMessage(ChatMessage? chatMessage) {
+  receiveChatMessage(ChatMessage? chatMessage) async {
     _chatMessage = chatMessage;
     if (chatMessage != null) {
+      String messageId = chatMessage.messageId!;
       String peerId = chatMessage.senderPeerId!;
       String? clientId = chatMessage.senderClientId;
       String? title = chatMessage.title;
@@ -41,20 +42,28 @@ class GlobalChatMessageController with ChangeNotifier {
         case ChatSubMessageType.videoChat:
           break;
         case ChatSubMessageType.chatReceipt:
-          if (chatMessage.status == MessageStatus.accepted.name) {
-            //收到视频通话邀请同意回执，发出本地流，关闭拨号窗口VideoDialOutWidget，显示视频通话窗口VideoChatWidget
-            videoChatReceiptController.setChatReceipt(
-                chatMessage, ChatDirect.receive);
-          } else if (chatMessage.status == MessageStatus.rejected.name) {
-            //收到视频通话邀请拒绝回执，关闭本地流，关闭拨号窗口VideoDialOutWidget
-            videoChatReceiptController.setChatReceipt(
-                chatMessage, ChatDirect.receive);
+          ChatMessage? originMessage =
+              await chatMessageService.findByMessageId(messageId);
+          if (originMessage == null) {
+            logger.e('messageId:$messageId original chatMessage is not exist');
+            return;
+          }
+          String? originMessageType = originMessage.messageType;
+          String? originSubMessageType = originMessage.subMessageType;
+          if (originSubMessageType==ChatSubMessageType.videoChat.name) {
+            if (chatMessage.status == MessageStatus.accepted.name) {
+              //收到视频通话邀请同意回执，发出本地流，关闭拨号窗口VideoDialOutWidget，显示视频通话窗口VideoChatWidget
+              videoChatReceiptController.setChatReceipt(
+                  chatMessage, ChatDirect.receive);
+            } else if (chatMessage.status == MessageStatus.rejected.name) {
+              //收到视频通话邀请拒绝回执，关闭本地流，关闭拨号窗口VideoDialOutWidget
+              videoChatReceiptController.setChatReceipt(
+                  chatMessage, ChatDirect.receive);
+            }
           }
           break;
         case ChatSubMessageType.preKeyBundle:
           _receivePreKeyBundle(chatMessage, content!);
-          break;
-        case ChatSubMessageType.audioChat:
           break;
         case ChatSubMessageType.signal:
           _receiveSignal(chatMessage, content!);

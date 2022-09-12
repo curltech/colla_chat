@@ -1,5 +1,4 @@
 import 'package:colla_chat/pages/chat/chat/single_video_view_widget.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
 
 import '../../../plugin/logger.dart';
@@ -50,29 +49,40 @@ class _VideoViewCardState extends State<VideoViewCard> {
   Widget _buildVideoViews(BuildContext context, BoxConstraints constraints) {
     Map<String, PeerVideoRender> renders = widget.controller.videoRenders();
     logger.i('VideoRenderController videoRenders length:${renders.length}');
-    var maxHeight = constraints.maxHeight;
-    if (maxHeight == 0 || maxHeight == double.infinity) {
-      maxHeight = appDataProvider.mobileSize.height;
-    }
-    var maxWidth = constraints.maxWidth;
-    if (maxWidth == 0 || maxWidth == double.infinity) {
-      maxWidth = appDataProvider.mobileSize.width;
-    }
-    Size size = _calculateSize(maxWidth, maxHeight, renders.length);
+    // var maxHeight = constraints.maxHeight;
+    // if (maxHeight == 0 || maxHeight == double.infinity) {
+    //   maxHeight = appDataProvider.mobileSize.height;
+    // }
+    // var maxWidth = constraints.maxWidth;
+    // if (maxWidth == 0 || maxWidth == double.infinity) {
+    //   maxWidth = appDataProvider.mobileSize.width;
+    // }
+    //Size size = _calculateSize(maxWidth, maxHeight, renders.length);
     List<Widget> videoViews = [];
     for (var render in renders.values) {
       Widget videoView = SingleVideoViewWidget(
           render: render,
-          width: size.width,
-          height: size.height,
+          // width: size.width,
+          // height: size.height,
           color: widget.color);
       videoViews.add(videoView);
     }
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(0),
-      controller: ScrollController(),
-      child: Wrap(runSpacing: 0, spacing: 0, children: videoViews),
-    );
+    return GridView.builder(
+        itemCount: videoViews.length,
+        //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            //横轴元素个数
+            crossAxisCount: widget.controller.crossAxisCount,
+            //纵轴间距
+            mainAxisSpacing: 5.0,
+            //横轴间距
+            crossAxisSpacing: 5.0,
+            //子组件宽高长度比例
+            childAspectRatio: 1.0),
+        itemBuilder: (BuildContext context, int index) {
+          //Widget Function(BuildContext context, int index)
+          return videoViews[index];
+        });
   }
 
   @override

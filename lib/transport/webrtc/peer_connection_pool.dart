@@ -560,7 +560,7 @@ class PeerConnectionPool {
 
     ///保存消息
     await chatMessageService.receiveChatMessage(chatMessage);
-    globalChatMessageController.chatMessage = chatMessage;
+    await globalChatMessageController.receiveChatMessage(chatMessage);
   }
 
   onStatus(WebrtcEvent event) async {

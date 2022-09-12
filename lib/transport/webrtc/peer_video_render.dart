@@ -233,22 +233,27 @@ class PeerVideoRender {
   }
 
   Widget _createVideoViewContainer({
-    required double width,
-    required double height,
+    double? width,
+    double? height,
     Color? color,
     Widget? child,
   }) {
     color = color ?? Colors.black.withOpacity(0.5);
     child ??= emptyVideoView;
-    Widget container = Center(
-      child: Container(
-        margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-        width: width,
-        height: height,
-        decoration: BoxDecoration(color: color),
-        child: child,
-      ),
-    );
+    Widget container = LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+      height = height ?? constraints.maxHeight;
+      width = width ?? constraints.maxWidth;
+      return Center(
+        child: Container(
+          margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+          width: width,
+          height: height,
+          decoration: BoxDecoration(color: color),
+          child: child,
+        ),
+      );
+    });
 
     return container;
   }
@@ -260,8 +265,8 @@ class PeerVideoRender {
     bool mirror = false,
     FilterQuality filterQuality = FilterQuality.low,
     bool fitScreen = false,
-    required double width,
-    required double height,
+    double? width,
+    double? height,
     Color? color,
   }) {
     RTCVideoView? videoView;
@@ -275,11 +280,12 @@ class PeerVideoRender {
     if (!fitScreen) {
       return container;
     }
+
     //用屏幕尺寸
     return OrientationBuilder(
       builder: (context, orientation) {
-        var width = MediaQuery.of(context).size.width;
-        var height = MediaQuery.of(context).size.height;
+        width = MediaQuery.of(context).size.width;
+        height = MediaQuery.of(context).size.height;
         container = _createVideoViewContainer(
             width: width, height: height, child: videoView);
         return container;

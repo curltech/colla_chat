@@ -117,9 +117,11 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
             audioMedia: audioMedia,
             displayMedia: displayMedia);
         if (audioMedia) {
-          await _send(subMessageType: ChatSubMessageType.audioChat);
+          await _send(title: ContentType.audio.name);
+        } else if (displayMedia) {
+          await _send(title: ContentType.display.name);
         } else {
-          await _send();
+          await _send(title: ContentType.video.name);
         }
         setState(() {});
       }
@@ -130,19 +132,20 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
           audioMedia: audioMedia,
           displayMedia: displayMedia);
       if (audioMedia) {
-        await _send(subMessageType: ChatSubMessageType.audioChat);
+        await _send(title: ContentType.audio.name);
+      } else if (displayMedia) {
+        await _send(title: ContentType.display.name);
       } else {
-        await _send();
+        await _send(title: ContentType.video.name);
       }
       setState(() {});
     }
   }
 
   ///发送视频通话消息
-  Future<ChatMessage?> _send(
-      {ChatSubMessageType subMessageType =
-          ChatSubMessageType.videoChat}) async {
-    return chatMessageController.send(subMessageType: subMessageType);
+  Future<ChatMessage?> _send({required String title}) async {
+    return chatMessageController.send(
+        title: title, subMessageType: ChatSubMessageType.videoChat);
   }
 
   _close() {

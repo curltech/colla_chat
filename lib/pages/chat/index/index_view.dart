@@ -48,9 +48,6 @@ class _IndexViewState extends State<IndexView>
         //视频通话请求消息
         if (chatMessage.subMessageType == ChatSubMessageType.videoChat.name) {
           videoDialIn = _buildVideoDialIn(context, chatMessage);
-        } else if (chatMessage.subMessageType ==
-            ChatSubMessageType.audioChat.name) {
-          videoDialIn = _buildVideoDialIn(context, chatMessage);
         }
       }
       //延时，移除 OverlayEntry
@@ -149,8 +146,7 @@ class _IndexViewState extends State<IndexView>
           chatMessageVisible = true;
         });
       } else if (chatMessage.subMessageType ==
-              ChatSubMessageType.videoChat.name ||
-          chatMessage.subMessageType == ChatSubMessageType.audioChat.name) {
+          ChatSubMessageType.videoChat.name) {
         setState(() {
           videoChatVisible = true;
         });

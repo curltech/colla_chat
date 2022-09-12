@@ -125,7 +125,8 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
 
   ///发送文本消息,发送命令消息目标可以是linkman，也可以是群，取决于当前chatSummary
   Future<ChatMessage?> send(
-      {String? message,
+      {String? title,
+      String? message,
       ContentType contentType = ContentType.text,
       ChatSubMessageType subMessageType = ChatSubMessageType.chat}) async {
     if (_chatSummary == null) {
@@ -144,6 +145,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     if (partyType == PartyType.linkman.name) {
       //保存消息
       chatMessage = await chatMessageService.buildChatMessage(peerId,
+          title: title,
           data: data,
           name: name,
           clientId: clientId,

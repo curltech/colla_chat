@@ -18,15 +18,15 @@ final List<ActionData> actionData = [
 ///单个视频窗口，长按出现更大的窗口，带有操作按钮
 class SingleVideoViewWidget extends StatefulWidget {
   final PeerVideoRender render;
-  final double height;
-  final double width;
+  final double? height;
+  final double? width;
   final Color? color;
 
   const SingleVideoViewWidget({
     Key? key,
     required this.render,
-    required this.height,
-    required this.width,
+    this.height,
+    this.width,
     this.color,
   }) : super(key: key);
 

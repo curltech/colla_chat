@@ -45,7 +45,9 @@ class VideoDialInWidget extends StatelessWidget {
         var peerId = chatReceipt.receiverPeerId!;
         var clientId = chatReceipt.receiverClientId!;
         List<PeerVideoRender> renders = [];
-        if (subMessageType == ChatSubMessageType.audioChat.name) {
+        //根据title来判断是请求音频还是视频
+        String? title = chatMessage.title;
+        if (title == ContentType.audio.name) {
           var render =
               await localMediaController.createVideoRender(audioMedia: true);
           renders.add(render);
