@@ -506,6 +506,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummary = ChatSummary();
       chatSummary.peerId = linkman.peerId;
       chatSummary.partyType = PartyType.linkman.name;
+      chatSummary.subPartyType = linkman.linkmanType;
       chatSummary.name = linkman.name;
       chatSummary.avatar = linkman.avatar;
       await insert(chatSummary);
@@ -523,6 +524,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummary = ChatSummary();
       chatSummary.peerId = group.peerId;
       chatSummary.partyType = PartyType.group.name;
+      chatSummary.subPartyType = group.groupType;
       chatSummary.name = group.name;
       chatSummary.avatar = group.avatar;
       await insert(chatSummary);

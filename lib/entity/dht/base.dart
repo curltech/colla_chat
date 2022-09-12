@@ -1,3 +1,4 @@
+import 'package:colla_chat/entity/dht/peerprofile.dart';
 import 'package:flutter/material.dart';
 
 import '../base.dart';
@@ -39,6 +40,7 @@ abstract class PeerEntity extends StatusEntity {
 
   //不存储数据库
   Widget? avatarImage;
+  PeerProfile? peerProfile;
 
   PeerEntity(this.peerId, this.name);
 

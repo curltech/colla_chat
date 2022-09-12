@@ -95,7 +95,7 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
                 icon: const Icon(Icons.add),
                 onPressed: () {
                   logger.i('add peerClient:$subtitle as linkman');
-                  linkmanService.addLinkman(peerClient);
+                  linkmanService.storeByPeerClient(peerClient);
                 },
               ));
           tiles.add(tile);

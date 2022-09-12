@@ -111,17 +111,27 @@ abstract class PeerParty extends PeerEntity {
   }
 }
 
-/// 好友，PeerClient的一部分，在发起请求通过后PeerClient成为Linkman
+enum LinkmanType { friend, normal }
+
+/// 联系人，和设备绑定登录成为PeerClient，可能时好友（friend）或者普通联系人
 /// 意味可以进行普通的文本，语音和视频通话
 class Linkman extends PeerParty {
+  //用于区分是否是好友，只有好友才能直接聊天
+  //非好友的消息需要特别的界面进行处理，非好友的发布的文章也不能直接看到
+  String? linkmanType;
+
   Linkman(String peerId, String name) : super(peerId, name);
 
-  Linkman.fromJson(Map json) : super.fromJson(json);
+  Linkman.fromJson(Map json)
+      : linkmanType = json['linkmanType'],
+        super.fromJson(json);
 
   @override
   Map<String, dynamic> toJson() {
     var json = super.toJson();
-    json.addAll({});
+    json.addAll({
+      'linkmanType': linkmanType,
+    });
     return json;
   }
 }

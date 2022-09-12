@@ -1,5 +1,6 @@
 import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:cryptography/cryptography.dart';
@@ -101,6 +102,7 @@ class PeerClientService extends PeerEntityService<PeerClient> {
       peerClients[peerId] = {};
     }
     peerClients[peerId]![clientId] = peerClient;
+    linkmanService.storeByPeerClient(peerClient);
   }
 }
 

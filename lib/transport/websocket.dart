@@ -7,8 +7,8 @@ import 'package:colla_chat/transport/webclient.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import './condition_import/unsupport.dart'
-if (dart.library.html) './condition_import/web.dart'
-if (dart.library.io) './condition_import/desktop.dart' as websocket_connect;
+    if (dart.library.html) './condition_import/web.dart'
+    if (dart.library.io) './condition_import/desktop.dart' as websocket_connect;
 import '../p2p/chain/chainmessagehandler.dart';
 
 enum SocketStatus {
@@ -27,6 +27,7 @@ class Websocket implements IWebClient {
   Map<String, dynamic> headers = {};
   Timer? heartBeat; // 心跳定时器
   int heartTimes = 3000; // 心跳间隔(毫秒)
+  int reconnectTimes = 5;
   Function()? onConnected;
 
   Websocket(String addr) {
@@ -160,7 +161,6 @@ class Websocket implements IWebClient {
 
   /// 重连机制
   Future<void> reconnect() async {
-    int reconnectTimes = 5;
     Timer.periodic(Duration(milliseconds: heartTimes), (timer) async {
       if (reconnectTimes <= 0 || status == SocketStatus.connected) {
         timer.cancel();
@@ -168,7 +168,7 @@ class Websocket implements IWebClient {
       }
       reconnectTimes--;
       status = SocketStatus.reconnecting;
-      logger.i('wss address:$address websocket reconnecting');
+      logger.i('wss address:$address $reconnectTimes websocket reconnecting');
       await connect();
     });
   }

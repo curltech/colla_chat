@@ -13,8 +13,8 @@ import '../../widgets/common/image_widget.dart';
 import '../dht/peerclient.dart';
 import '../general_base.dart';
 
-abstract class PartyService<T> extends GeneralBaseService<T> {
-  PartyService(
+abstract class PeerPartyService<T> extends GeneralBaseService<T> {
+  PeerPartyService(
       {required super.tableName,
       required super.fields,
       required super.indexFields});
@@ -34,9 +34,15 @@ abstract class PartyService<T> extends GeneralBaseService<T> {
 
     return peer;
   }
+
+  Future<int> deleteByPeerId(String peerId) async {
+    var count = await delete({'peerId': peerId});
+
+    return count;
+  }
 }
 
-class LinkmanService extends PartyService<Linkman> {
+class LinkmanService extends PeerPartyService<Linkman> {
   Map<String, Linkman> linkmen = {};
 
   LinkmanService(
@@ -84,23 +90,42 @@ class LinkmanService extends PartyService<Linkman> {
   ///而采用webrtc时，直接是chatmessage，content里面是实际的信息
   Future<void> requestLinkman(Linkman linkman) async {}
 
-  ///把peerclient加入自己的好友
-  Future<void> addLinkman(PeerClient peerClient) async {
-    Linkman? linkman = await findCachedOneByPeerId(peerClient.peerId);
-    if (linkman == null) {
-      linkman = Linkman.fromJson(peerClient.toJson());
+  Future<void> store(Linkman linkman) async {
+    Linkman? old = await findCachedOneByPeerId(linkman.peerId);
+    if (old == null) {
       await insert(linkman);
       linkmen[linkman.peerId] = linkman;
       await chatSummaryService.upsertByLinkman(linkman);
     } else {
-      var id = linkman.id;
-      linkman = Linkman.fromJson(peerClient.toJson());
-      linkman.id = id;
+      linkman.id = old.id;
       await update(linkman);
       linkmen[linkman.peerId] = linkman;
       await chatSummaryService.upsertByLinkman(linkman);
     }
-    await peerClientService.update({'id': peerClient.id, 'linkman': true});
+  }
+
+  ///通过peerclient增加或者修改
+  Future<void> storeByPeerClient(PeerClient peerClient,
+      {LinkmanType? linkmanType}) async {
+    Linkman? linkman = await findCachedOneByPeerId(peerClient.peerId);
+    if (linkman == null) {
+      linkman = Linkman.fromJson(peerClient.toJson());
+      if (linkmanType != null) {
+        linkman.linkmanType = linkmanType.name;
+      }
+      await insert(linkman);
+      linkmen[linkman.peerId] = linkman;
+      await chatSummaryService.upsertByLinkman(linkman);
+    } else {
+      linkman.name = peerClient.name;
+      linkman.lastConnectTime = peerClient.lastAccessTime;
+      if (linkmanType != null) {
+        linkman.linkmanType = linkmanType.name;
+      }
+      await update(linkman);
+      linkmen[linkman.peerId] = linkman;
+      await chatSummaryService.upsertByLinkman(linkman);
+    }
   }
 }
 
@@ -147,7 +172,7 @@ final partyTagService = PartyTagService(
     indexFields: ['ownerPeerId', 'createDate', 'tag', 'partyPeerId'],
     fields: ServiceLocator.buildFields(PartyTag(), []));
 
-class GroupService extends PartyService<Group> {
+class GroupService extends PeerPartyService<Group> {
   Map<String, Group> groups = {};
 
   GroupService(
@@ -306,7 +331,7 @@ final groupMemberService = GroupMemberService(
     ],
     fields: ServiceLocator.buildFields(GroupMember(), []));
 
-class ContactService extends PartyService<Contact> {
+class ContactService extends PeerPartyService<Contact> {
   ContactService(
       {required super.tableName,
       required super.fields,

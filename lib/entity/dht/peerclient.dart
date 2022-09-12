@@ -1,26 +1,23 @@
-import 'package:colla_chat/entity/dht/peerprofile.dart';
-
 import 'base.dart';
 
-///联系人，能够连接节点服务器的客户
+///联系人（Linkman）能够连接节点服务器的客户
+///在表中同peerId的peerclient根据clientId的不同，有多条记录
+///代表一个联系人（Linkman）通过多个机器设备登录
+///这些数据的来源都是查询节点服务器
 class PeerClient extends PeerEntity {
-  String clientId;
-  String? deviceToken;
-  bool linkman = false;
+  String clientId; //peerClient的唯一编码
+  String? deviceDesc; //设备的唯一描述
 
   // 客户连接到节点的位置
   String? connectPeerId;
   String? connectAddress;
   String? connectSessionId;
-  PeerProfile? peerProfile;
 
   PeerClient(String peerId, this.clientId, String name) : super(peerId, name);
 
   PeerClient.fromJson(Map json)
       : clientId = json['clientId'] ?? '',
-        deviceToken = json['deviceToken'],
-        linkman =
-            json['linkman'] == true || json['linkman'] == 1 ? true : false,
+        deviceDesc = json['deviceDesc'],
         connectPeerId = json['connectPeerId'],
         connectAddress = json['connectAddress'],
         connectSessionId = json['connectSessionId'],
@@ -31,8 +28,7 @@ class PeerClient extends PeerEntity {
     var json = super.toJson();
     json.addAll({
       'clientId': clientId,
-      'deviceToken': deviceToken,
-      'linkman': linkman,
+      'deviceDesc': deviceDesc,
       'connectPeerId': connectPeerId,
       'connectAddress': connectAddress,
       'connectSessionId': connectSessionId,
