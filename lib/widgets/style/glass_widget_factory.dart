@@ -7,8 +7,8 @@ final defaultLinearGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      appDataProvider.themeData!.colorScheme.primary.withOpacity(0.1),
-      appDataProvider.themeData!.colorScheme.primary.withOpacity(0.05),
+      appDataProvider.themeData.colorScheme.primary.withOpacity(0.1),
+      appDataProvider.themeData.colorScheme.primary.withOpacity(0.05),
     ],
     stops: const [
       0.1,
@@ -18,8 +18,8 @@ final defaultBorderGradient = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
   colors: [
-    appDataProvider.themeData!.colorScheme.primary.withOpacity(0.5),
-    appDataProvider.themeData!.colorScheme.primary.withOpacity(0.5),
+    appDataProvider.themeData.colorScheme.primary.withOpacity(0.5),
+    appDataProvider.themeData.colorScheme.primary.withOpacity(0.5),
   ],
 );
 

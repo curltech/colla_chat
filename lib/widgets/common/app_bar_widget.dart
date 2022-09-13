@@ -1,3 +1,4 @@
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -99,7 +100,8 @@ class AppBarWidget {
         item = PopupMenuItem<int>(
             value: i,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: rows,
             ));
         onPressed.add(rightAction.onPressed);
@@ -107,6 +109,7 @@ class AppBarWidget {
         ++i;
       }
       popMenuButton = PopupMenuButton<int>(
+        color: Colors.grey.withOpacity(0.5),
         itemBuilder: (BuildContext context) {
           return items;
         },

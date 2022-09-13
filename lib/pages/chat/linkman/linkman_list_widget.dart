@@ -1,5 +1,6 @@
 import 'package:colla_chat/pages/chat/linkman/group/group_add_widget.dart';
-import 'package:colla_chat/pages/chat/linkman/linkman/linkman_show_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman/linkman_info_widget.dart';
+import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../entity/base.dart';
@@ -13,49 +14,57 @@ import '../../../entity/chat/contact.dart';
 import '../../../service/chat/contact.dart';
 import '../../../widgets/common/app_bar_view.dart';
 import '../../../widgets/data_bind/data_group_listview.dart';
-import '../../../widgets/data_bind/data_listview.dart';
-import 'group/group_show_widget.dart';
+import 'group/group_info_widget.dart';
 import 'linkman/p2p_linkman_add_widget.dart';
 
-final List<TileData> headTileData = [
-  TileData(
-      prefix: Icon(Icons.person_add,
-          color: appDataProvider.themeData?.colorScheme.primary),
+final List<AppBarPopupMenu> appBarPopupMenus = [
+  AppBarPopupMenu(
+      icon: Icon(Icons.person_add,
+          color: appDataProvider.themeData.colorScheme.primary),
       title: 'P2pLinkmanAdd',
-      routeName: 'p2p_linkman_add'),
-  TileData(
-      prefix: Icon(Icons.qr_code,
-          color: appDataProvider.themeData?.colorScheme.primary),
+      onPressed: () {
+        indexWidgetProvider.push('p2p_linkman_add');
+      }),
+  AppBarPopupMenu(
+      icon: Icon(Icons.qr_code,
+          color: appDataProvider.themeData.colorScheme.primary),
       title: 'QrcodeScanAdd',
-      routeName: 'qr_code_add'),
-  TileData(
-      prefix: Icon(Icons.contact_phone,
-          color: appDataProvider.themeData?.colorScheme.primary),
+      onPressed: () {
+        indexWidgetProvider.push('qr_code_add');
+      }),
+  AppBarPopupMenu(
+      icon: Icon(Icons.contact_phone,
+          color: appDataProvider.themeData.colorScheme.primary),
       title: 'ContactAdd',
-      routeName: 'contact_add'),
-  TileData(
-      prefix: Icon(Icons.contact_mail,
-          color: appDataProvider.themeData?.colorScheme.primary),
+      onPressed: () {
+        indexWidgetProvider.push('contact_add');
+      }),
+  AppBarPopupMenu(
+      icon: Icon(Icons.contact_mail,
+          color: appDataProvider.themeData.colorScheme.primary),
       title: 'LinkmanRequest',
-      routeName: 'linkman_request'),
-  TileData(
-      prefix: Icon(Icons.group_add,
-          color: appDataProvider.themeData?.colorScheme.primary),
+      onPressed: () {
+        indexWidgetProvider.push('linkman_request');
+      }),
+  AppBarPopupMenu(
+      icon: Icon(Icons.group_add,
+          color: appDataProvider.themeData.colorScheme.primary),
       title: 'GroupAdd',
-      routeName: 'group_add'),
+      onPressed: () {
+        indexWidgetProvider.push('group_add');
+      }),
 ];
 
 //联系人页面，带有回退回调函数
 class LinkmanListWidget extends StatefulWidget with TileDataMixin {
-  final DataListView headDataListView = DataListView(tileData: headTileData);
   final DataListController<Linkman> linkmanController =
       DataListController<Linkman>();
   final DataListController<Group> groupController = DataListController<Group>();
   final GroupDataListController groupDataListController =
       GroupDataListController();
   late final List<Widget> rightWidgets;
-  late final LinkmanShowWidget linkmanShowWidget;
-  late final GroupShowWidget groupShowWidget;
+  late final LinkmanInfoWidget linkmanShowWidget;
+  late final GroupInfoWidget groupShowWidget;
   late final P2pLinkmanAddWidget p2pLinkmanAddWidget;
   late final GroupAddWidget groupAddWidget;
 
@@ -71,7 +80,7 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
       }
     });
 
-    linkmanShowWidget = LinkmanShowWidget(controller: linkmanController);
+    linkmanShowWidget = LinkmanInfoWidget(controller: linkmanController);
     indexWidgetProvider.define(linkmanShowWidget);
     rightWidgets = [
       IconButton(
@@ -91,7 +100,7 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
           tooltip: AppLocalizations.t('Delete')),
     ];
 
-    groupShowWidget = GroupShowWidget(controller: groupController);
+    groupShowWidget = GroupInfoWidget(controller: groupController);
     indexWidgetProvider.define(groupShowWidget);
 
     p2pLinkmanAddWidget = P2pLinkmanAddWidget();
@@ -157,7 +166,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
             prefix: linkman.avatar,
             title: title,
             subtitle: subtitle,
-            routeName: 'linkman_show');
+            routeName: 'linkman_info');
         tiles.add(tile);
       }
     }
@@ -174,7 +183,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
             prefix: group.avatar,
             title: title,
             subtitle: subtitle,
-            routeName: 'group_show');
+            routeName: 'group_info');
         tiles.add(tile);
       }
     }
@@ -202,9 +211,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
     );
     return AppBarView(
         title: Text(AppLocalizations.t(widget.title)),
+        rightPopupMenus: appBarPopupMenus,
         child: Column(children: [
           _buildSearchTextField(context),
-          widget.headDataListView,
           Expanded(child: groupDataListView)
         ]));
   }
