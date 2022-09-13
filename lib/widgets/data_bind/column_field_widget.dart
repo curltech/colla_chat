@@ -76,7 +76,7 @@ class ColumnFieldDef {
       this.textInputType = TextInputType.text,
       this.suffixIcon,
       this.cancel = false,
-      this.maxLines = 1,
+      this.maxLines = 4,
       this.readOnly = false,
       this.options,
       this.formatter,
@@ -275,7 +275,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
       const SizedBox(
         width: 15.0,
       ),
-      Text(value, textAlign: TextAlign.center)
+      Expanded(child: Text(value, textAlign: TextAlign.start))
     ]);
   }
 
@@ -312,6 +312,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
       controller: controller,
       keyboardType: columnFieldDef.textInputType,
       maxLines: columnFieldDef.maxLines,
+      minLines: 1,
       readOnly: columnFieldDef.readOnly,
       decoration: InputDecoration(
           labelText: AppLocalizations.t(columnFieldDef.label),

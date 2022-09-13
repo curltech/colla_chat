@@ -1,5 +1,4 @@
 import 'package:colla_chat/entity/chat/contact.dart';
-import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
@@ -13,18 +12,16 @@ import 'package:flutter_awesome_select/flutter_awesome_select.dart';
 
 final List<ColumnFieldDef> groupColumnFieldDefs = [
   ColumnFieldDef(
-      name: 'id',
-      label: 'id',
-      dataType: DataType.int,
+      name: 'peerId',
+      label: 'peerId',
+      inputType: InputType.label,
       prefixIcon: const Icon(Icons.perm_identity)),
   ColumnFieldDef(
       name: 'name', label: 'name', prefixIcon: const Icon(Icons.person)),
   ColumnFieldDef(
-      name: 'peerId',
-      label: 'peerId',
+      name: 'alias',
+      label: 'alias',
       prefixIcon: const Icon(Icons.perm_identity)),
-  ColumnFieldDef(
-      name: 'alias', label: 'alias', prefixIcon: const Icon(Icons.person_pin)),
   ColumnFieldDef(
       name: 'myAlias',
       label: 'myAlias',
@@ -37,18 +34,20 @@ final List<ColumnFieldDef> groupColumnFieldDefs = [
 
 ///增加群
 class GroupEditWidget extends StatefulWidget with TileDataMixin {
-  final DataListController<Linkman> controller = DataListController<Linkman>();
+  final DataListController<Group> controller;
+  final DataListController<Linkman> linkmenController =
+      DataListController<Linkman>();
 
-  GroupEditWidget({Key? key}) : super(key: key);
+  GroupEditWidget({Key? key, required this.controller}) : super(key: key);
 
   @override
   Icon get icon => const Icon(Icons.person_add);
 
   @override
-  String get routeName => 'group_add';
+  String get routeName => 'group_edit';
 
   @override
-  String get title => 'GroupAdd';
+  String get title => 'GroupEdit';
 
   @override
   bool get withLeading => true;
@@ -59,14 +58,17 @@ class GroupEditWidget extends StatefulWidget with TileDataMixin {
 
 class _GroupEditWidgetState extends State<GroupEditWidget> {
   List<String> selectedLinkmen = [];
+  Group? group;
 
   @override
   initState() {
     super.initState();
     widget.controller.addListener(_update);
+    widget.linkmenController.addListener(_update);
+    group = widget.controller.current;
     linkmanService.findAll().then((List<Linkman> linkmen) {
       if (linkmen.isNotEmpty) {
-        widget.controller.addAll(linkmen);
+        widget.linkmenController.addAll(linkmen);
       }
     });
   }
@@ -76,23 +78,34 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
   }
 
   Widget _buildFormInputWidget(BuildContext context) {
-    var formInputWidget = FormInputWidget(
-      onOk: (Map<String, dynamic> values) {
-        _onOk(values);
-      },
-      columnFieldDefs: groupColumnFieldDefs,
-    );
+    Map<String, dynamic>? initValues =
+        widget.controller.getInitValue(groupColumnFieldDefs);
+
+    var formInputWidget = Container(
+        padding: const EdgeInsets.all(15.0),
+        child: FormInputWidget(
+          onOk: (Map<String, dynamic> values) {
+            _onOk(values);
+          },
+          columnFieldDefs: groupColumnFieldDefs,
+          initValues: initValues,
+        ));
 
     return formInputWidget;
   }
 
   _onOk(Map<String, dynamic> values) async {
-    Group group = Group.fromJson(values);
-    group.ownerPeerId = myself.peerId!;
-    group = await groupService.createGroup(group);
-    await groupService.store(group);
+    Group currentGroup = Group.fromJson(values);
+    if (group != null) {
+      group!.alias = currentGroup.alias;
+      group!.mobile = currentGroup.mobile;
+      group!.email = currentGroup.email;
+    } else {
+      group = await groupService.createGroup(currentGroup);
+    }
+    await groupService.store(group!);
 
-    String groupId = group.peerId;
+    String groupId = group!.peerId;
     for (var selectedLinkmanId in selectedLinkmen) {
       Linkman? linkman =
           await linkmanService.findCachedOneByPeerId(selectedLinkmanId);
@@ -108,7 +121,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
   }
 
   Widget _buildSelect(BuildContext context) {
-    List<Linkman> linkmen = widget.controller.data;
+    List<Linkman> linkmen = widget.linkmenController.data;
     List<S2Choice<String>> choiceItems = [];
     for (Linkman linkman in linkmen) {
       S2Choice<String> item =
@@ -187,6 +200,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
   @override
   void dispose() {
     widget.controller.removeListener(_update);
+    widget.linkmenController.removeListener(_update);
     super.dispose();
   }
 }

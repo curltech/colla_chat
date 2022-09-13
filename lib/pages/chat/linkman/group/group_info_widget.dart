@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/widgets/common/image_widget.dart';
@@ -13,6 +14,7 @@ import '../../../../../widgets/common/widget_mixin.dart';
 import '../../../../entity/chat/contact.dart';
 import '../../../../l10n/localization.dart';
 import '../../../../provider/data_list_controller.dart';
+import 'group_edit_widget.dart';
 
 final List<String> groupFields = [
   'name',
@@ -30,8 +32,12 @@ final List<String> groupFields = [
 //群信息页面
 class GroupInfoWidget extends StatefulWidget with TileDataMixin {
   final DataListController<Group> controller;
+  late final GroupEditWidget groupEditWidget;
 
-  const GroupInfoWidget({Key? key, required this.controller}) : super(key: key);
+   GroupInfoWidget({Key? key, required this.controller}) : super(key: key){
+    groupEditWidget = GroupEditWidget(controller: controller);
+    indexWidgetProvider.define(groupEditWidget);
+  }
 
   @override
   State<StatefulWidget> createState() => _GroupInfoWidgetState();
