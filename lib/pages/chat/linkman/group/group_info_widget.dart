@@ -2,7 +2,6 @@ import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
-import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/widgets/common/image_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -34,7 +33,7 @@ class GroupInfoWidget extends StatefulWidget with TileDataMixin {
   final DataListController<Group> controller;
   late final GroupEditWidget groupEditWidget;
 
-   GroupInfoWidget({Key? key, required this.controller}) : super(key: key){
+  GroupInfoWidget({Key? key, required this.controller}) : super(key: key) {
     groupEditWidget = GroupEditWidget(controller: controller);
     indexWidgetProvider.define(groupEditWidget);
   }
@@ -114,41 +113,6 @@ class _GroupInfoWidgetState extends State<GroupInfoWidget> {
     return listView;
   }
 
-
-  _addFriend(Group group, {String? tip}) async {
-    await groupService
-        .update({'id': group.id, 'status': LinkmanStatus.friend.name});
-    ChatMessage chatMessage = await chatMessageService.buildChatMessage(
-        group.peerId,
-        subMessageType: ChatSubMessageType.addLinkman,
-        title: tip);
-    await chatMessageService.send(chatMessage);
-  }
-
-  Widget _buildAddFriendTextField(BuildContext context) {
-    var controller = TextEditingController();
-    var addFriendTextField = Container(
-        padding: const EdgeInsets.all(10.0),
-        child: TextFormField(
-            autofocus: true,
-            controller: controller,
-            keyboardType: TextInputType.text,
-            decoration: InputDecoration(
-              fillColor: Colors.black.withOpacity(0.1),
-              filled: true,
-              border: InputBorder.none,
-              labelText: AppLocalizations.t('Add Friend'),
-              suffixIcon: IconButton(
-                onPressed: () {
-                  _addFriend(widget.controller.current!, tip: controller.text);
-                },
-                icon: const Icon(Icons.person_add),
-              ),
-            )));
-
-    return addFriendTextField;
-  }
-
   Widget _buildActionCard(BuildContext context) {
     Group? group = widget.controller.current;
     List<Widget> actionWidgets = [];
@@ -160,8 +124,6 @@ class _GroupInfoWidgetState extends State<GroupInfoWidget> {
           ActionData(
               label: 'Remove friend', icon: const Icon(Icons.person_remove)),
         );
-      } else {
-        actionWidgets.add(_buildAddFriendTextField(context));
       }
       if (group.status == LinkmanStatus.blacklist.name) {
         actionData.add(

@@ -41,7 +41,7 @@ class GroupEditWidget extends StatefulWidget with TileDataMixin {
   GroupEditWidget({Key? key, required this.controller}) : super(key: key);
 
   @override
-  Icon get icon => const Icon(Icons.person_add);
+  Icon get icon => const Icon(Icons.group_add);
 
   @override
   String get routeName => 'group_edit';
