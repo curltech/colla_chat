@@ -1,4 +1,4 @@
-import 'package:colla_chat/pages/chat/linkman/group/group_add_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/group/group_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_info_widget.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:flutter/material.dart';
@@ -66,7 +66,7 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
   late final LinkmanInfoWidget linkmanShowWidget;
   late final GroupInfoWidget groupShowWidget;
   late final P2pLinkmanAddWidget p2pLinkmanAddWidget;
-  late final GroupAddWidget groupAddWidget;
+  late final GroupEditWidget groupAddWidget;
 
   LinkmanListWidget({Key? key}) : super(key: key) {
     linkmanShowWidget = LinkmanInfoWidget(controller: linkmanController);
@@ -95,7 +95,7 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
     p2pLinkmanAddWidget = P2pLinkmanAddWidget();
     indexWidgetProvider.define(p2pLinkmanAddWidget);
 
-    groupAddWidget = GroupAddWidget();
+    groupAddWidget = GroupEditWidget();
     indexWidgetProvider.define(groupAddWidget);
   }
 

@@ -36,10 +36,10 @@ final List<ColumnFieldDef> groupColumnFieldDefs = [
 ];
 
 ///增加群
-class GroupAddWidget extends StatefulWidget with TileDataMixin {
+class GroupEditWidget extends StatefulWidget with TileDataMixin {
   final DataListController<Linkman> controller = DataListController<Linkman>();
 
-  GroupAddWidget({Key? key}) : super(key: key);
+  GroupEditWidget({Key? key}) : super(key: key);
 
   @override
   Icon get icon => const Icon(Icons.person_add);
@@ -54,10 +54,10 @@ class GroupAddWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  State<StatefulWidget> createState() => _GroupAddWidgetState();
+  State<StatefulWidget> createState() => _GroupEditWidgetState();
 }
 
-class _GroupAddWidgetState extends State<GroupAddWidget> {
+class _GroupEditWidgetState extends State<GroupEditWidget> {
   List<String> selectedLinkmen = [];
 
   @override

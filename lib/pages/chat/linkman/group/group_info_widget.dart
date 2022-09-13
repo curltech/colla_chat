@@ -1,4 +1,11 @@
+import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
+import 'package:colla_chat/service/chat/chat.dart';
+import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/widgets/common/image_widget.dart';
+import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
+import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../widgets/common/app_bar_view.dart';
@@ -55,122 +62,144 @@ class _GroupInfoWidgetState extends State<GroupInfoWidget> {
 
   Widget _buildGroupInfo(BuildContext context) {
     Group? group = widget.controller.current;
-    var listTile = ListTile(
-      leading: ImageWidget(
-        image: group!.avatar,
-        width: 32.0,
-        height: 32.0,
-      ),
-      title: Text(group.name),
-      subtitle: Text(group.peerId),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: () {
-        //indexWidgetProvider.push('personal_info', context: context);
-      },
+    List<TileData> tileData = [];
+    if (group != null) {
+      var tile = TileData(
+        title: group.name,
+        subtitle: group.peerId,
+        isThreeLine: true,
+        prefix: ImageWidget(
+          image: group.avatar,
+          width: 32.0,
+          height: 32.0,
+        ),
+        routeName: 'group_edit',
+      );
+      tileData.add(tile);
+    }
+    return DataListView(
+      tileData: tileData,
     );
-    return listTile;
   }
 
-  Widget _buildGroupButton(BuildContext context) {
-    var buttonStyle = ButtonStyle(
-      backgroundColor: MaterialStateProperty.all(Colors.grey.withOpacity(0.5)),
-      shape: MaterialStateProperty.all(
-        RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-      ),
-      padding: MaterialStateProperty.all(
-          const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0)),
-      minimumSize: MaterialStateProperty.all(const Size(300, 0)),
-      maximumSize: MaterialStateProperty.all(const Size(375.0, 36.0)),
+  Widget _buildListTile(BuildContext context) {
+    Group? group = widget.controller.current;
+    List<TileData> tileData = [
+      TileData(
+          title: 'Chat',
+          prefix: const Icon(Icons.chat),
+          routeName: 'chat_message',
+          onTap: (int index, String title) async {
+            ChatSummary? chatSummary =
+                await chatSummaryService.findOneByPeerId(group!.peerId);
+            if (chatSummary != null) {
+              chatMessageController.chatSummary = chatSummary;
+            }
+          }),
+      TileData(
+          title: 'Group Member',
+          prefix: const Icon(Icons.group_add),
+          routeName: 'group_member',
+          onTap: (int index, String title) async {}),
+    ];
+    var listView = DataListView(
+      tileData: tileData,
     );
-    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      SizedBox(
-        height: 15,
-      ),
-      TextButton(
-          style: buttonStyle,
-          onPressed: () {
-            //Add members
-          },
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text('Add members'),
-            SizedBox(
-              width: 10,
-            ),
-            Icon(Icons.group_add)
-          ])),
-      SizedBox(
-        height: 15,
-      ),
-      TextButton(
-          style: buttonStyle,
-          onPressed: () {
-            //Dismiss group
-          },
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text('Dismiss group'),
-            SizedBox(
-              width: 10,
-            ),
-            Icon(Icons.delete_forever)
-          ])),
-      SizedBox(
-        height: 15,
-      ),
-      TextButton(
-          style: buttonStyle,
-          onPressed: () {
-            //Quit group
-          },
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text('Quit group'),
-            SizedBox(
-              width: 10,
-            ),
-            Icon(Icons.exit_to_app)
-          ])),
-      SizedBox(
-        height: 15,
-      ),
-      TextButton(
-          style: buttonStyle,
-          onPressed: () {
-            //send message
-          },
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text('Chat'),
-            SizedBox(
-              width: 10,
-            ),
-            Icon(Icons.chat)
-          ])),
-      SizedBox(
-        height: 15,
-      ),
-      TextButton(
-          style: buttonStyle,
-          onPressed: () {
-            //send video
-          },
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text('Video chat'),
-            SizedBox(
-              width: 10,
-            ),
-            Icon(Icons.video_call)
-          ])),
-    ]);
+    return listView;
+  }
+
+
+  _addFriend(Group group, {String? tip}) async {
+    await groupService
+        .update({'id': group.id, 'status': LinkmanStatus.friend.name});
+    ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+        group.peerId,
+        subMessageType: ChatSubMessageType.addLinkman,
+        title: tip);
+    await chatMessageService.send(chatMessage);
+  }
+
+  Widget _buildAddFriendTextField(BuildContext context) {
+    var controller = TextEditingController();
+    var addFriendTextField = Container(
+        padding: const EdgeInsets.all(10.0),
+        child: TextFormField(
+            autofocus: true,
+            controller: controller,
+            keyboardType: TextInputType.text,
+            decoration: InputDecoration(
+              fillColor: Colors.black.withOpacity(0.1),
+              filled: true,
+              border: InputBorder.none,
+              labelText: AppLocalizations.t('Add Friend'),
+              suffixIcon: IconButton(
+                onPressed: () {
+                  _addFriend(widget.controller.current!, tip: controller.text);
+                },
+                icon: const Icon(Icons.person_add),
+              ),
+            )));
+
+    return addFriendTextField;
+  }
+
+  Widget _buildActionCard(BuildContext context) {
+    Group? group = widget.controller.current;
+    List<Widget> actionWidgets = [];
+    double height = 180;
+    final List<ActionData> actionData = [];
+    if (group != null) {
+      if (group.status == LinkmanStatus.friend.name) {
+        actionData.add(
+          ActionData(
+              label: 'Remove friend', icon: const Icon(Icons.person_remove)),
+        );
+      } else {
+        actionWidgets.add(_buildAddFriendTextField(context));
+      }
+      if (group.status == LinkmanStatus.blacklist.name) {
+        actionData.add(
+          ActionData(
+              label: 'Remove blacklist',
+              icon: const Icon(Icons.person_outlined)),
+        );
+      } else {
+        actionData.add(ActionData(
+            label: 'Add blacklist', icon: const Icon(Icons.person_off)));
+      }
+      if (group.status == LinkmanStatus.blacklist.name) {
+        actionData.add(
+          ActionData(
+              label: 'Remove subscript', icon: const Icon(Icons.unsubscribe)),
+        );
+      } else {
+        actionData.add(ActionData(
+            label: 'Add subscript', icon: const Icon(Icons.subscriptions)));
+      }
+    }
+    actionWidgets.add(DataActionCard(
+      actions: actionData,
+      height: height,
+      crossAxisCount: 3,
+    ));
+    return Container(
+      margin: const EdgeInsets.all(0.0),
+      padding: const EdgeInsets.only(bottom: 0.0),
+      child: Column(children: actionWidgets),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    var groupInfoCard = Column(
-        children: [_buildGroupInfo(context), _buildGroupButton(context)]);
+    var linkmanInfoCard = Column(children: [
+      _buildGroupInfo(context),
+      _buildListTile(context),
+      _buildActionCard(context)
+    ]);
     var appBarView = AppBarView(
         title: Text(AppLocalizations.t(widget.title)),
         withLeading: widget.withLeading,
-        child: groupInfoCard);
+        child: linkmanInfoCard);
     return appBarView;
   }
 

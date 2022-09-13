@@ -1,3 +1,4 @@
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../widgets/common/app_bar_view.dart';
@@ -6,7 +7,6 @@ import '../../../../../widgets/data_bind/column_field_widget.dart';
 import '../../../../../widgets/data_bind/form_input_widget.dart';
 import '../../../../entity/chat/contact.dart';
 import '../../../../l10n/localization.dart';
-import '../../../../provider/data_list_controller.dart';
 import '../../../../service/chat/contact.dart';
 
 final List<ColumnFieldDef> linkmanColumnFieldDefs = [
@@ -32,11 +32,11 @@ final List<ColumnFieldDef> linkmanColumnFieldDefs = [
       prefixIcon: const Icon(Icons.mobile_friendly)),
 ];
 
-//邮件内容组件
+//联系人编辑组件
 class LinkmanEditWidget extends StatefulWidget with TileDataMixin {
-  final DataListController<Linkman> controller;
+  final Linkman? linkman;
 
-  LinkmanEditWidget({Key? key, required this.controller}) : super(key: key);
+  LinkmanEditWidget({Key? key, this.linkman}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _LinkmanEditWidgetState();
@@ -58,15 +58,19 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
   @override
   initState() {
     super.initState();
-    widget.controller.addListener(_update);
-  }
-
-  _update() {
-    setState(() {});
   }
 
   Widget _buildFormInputWidget(BuildContext context) {
-    var initValues = widget.controller.getInitValue(linkmanColumnFieldDefs);
+    Map<String, dynamic> initValues = {};
+    if (widget.linkman != null) {
+      var values = JsonUtil.toJson(widget.linkman);
+      for (var linkmanColumnFieldDef in linkmanColumnFieldDefs) {
+        var value = values[linkmanColumnFieldDef.name];
+        if (value != null) {
+          initValues[linkmanColumnFieldDef.name] = value;
+        }
+      }
+    }
     var formInputWidget = FormInputWidget(
       onOk: (Map<String, dynamic> values) {
         _onOk(values);
@@ -78,11 +82,9 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     return formInputWidget;
   }
 
-  _onOk(Map<String, dynamic> values) {
+  _onOk(Map<String, dynamic> values) async {
     Linkman currentLinkman = Linkman.fromJson(values);
-    linkmanService.upsert(currentLinkman).then((count) {
-      widget.controller.update(currentLinkman);
-    });
+    await linkmanService.upsert(currentLinkman);
   }
 
   @override
@@ -96,7 +98,6 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
 
   @override
   void dispose() {
-    widget.controller.removeListener(_update);
     super.dispose();
   }
 }

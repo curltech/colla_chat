@@ -50,64 +50,44 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
 
   Widget _buildLinkmanInfo(BuildContext context) {
     Linkman? linkman = widget.controller.current;
-    var listTile = ListTile(
-      leading: ImageWidget(
-        image: linkman!.avatar,
-        width: 32.0,
-        height: 32.0,
-      ),
-      title: Text(linkman.name),
-      subtitle: Text(linkman.peerId),
-      trailing: const Icon(Icons.chevron_right),
-      onTap: () {
-        //indexWidgetProvider.push('personal_info', context: context);
-      },
+    List<TileData> tileData = [];
+    if (linkman != null) {
+      var tile = TileData(
+        title: linkman.name,
+        subtitle: linkman.peerId,
+        isThreeLine: true,
+        prefix: ImageWidget(
+          image: linkman.avatar,
+          width: 32.0,
+          height: 32.0,
+        ),
+        routeName: 'linkman_edit',
+      );
+      tileData.add(tile);
+    }
+    return DataListView(
+      tileData: tileData,
     );
-    return listTile;
   }
 
   Widget _buildListTile(BuildContext context) {
     Linkman? linkman = widget.controller.current;
-    List<TileData> tileData = [
-      TileData(
-          title: 'Chat',
-          prefix: const Icon(Icons.chat),
-          routeName: 'chat_message',
-          onTap: (int index, String title) async {
-            ChatSummary? chatSummary =
-                await chatSummaryService.findOneByPeerId(linkman!.peerId);
-            if (chatSummary != null) {
-              chatMessageController.chatSummary = chatSummary;
-            }
-          }),
-    ];
-    var listView = DataListView(
+    List<TileData> tileData = [];
+    var tile = TileData(
+        title: 'Chat',
+        prefix: const Icon(Icons.chat),
+        routeName: 'chat_message',
+        onTap: (int index, String title) async {
+          ChatSummary? chatSummary =
+              await chatSummaryService.findOneByPeerId(linkman!.peerId);
+          if (chatSummary != null) {
+            chatMessageController.chatSummary = chatSummary;
+          }
+        });
+    tileData.add(tile);
+    return DataListView(
       tileData: tileData,
     );
-    return listView;
-  }
-
-  Future<void> _onAction(int index, String name, {String? value}) async {
-    switch (index) {
-      case 0:
-        break;
-      case 1:
-        break;
-      case 2:
-        break;
-      case 3:
-        break;
-      case 4:
-        break;
-      case 5:
-        break;
-      case 6:
-        break;
-      case 7:
-        break;
-      default:
-        break;
-    }
   }
 
   _addFriend(Linkman linkman, {String? tip}) async {
@@ -181,7 +161,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
     actionWidgets.add(DataActionCard(
       actions: actionData,
       height: height,
-      onPressed: _onAction, crossAxisCount: 3,
+      crossAxisCount: 3,
     ));
     return Container(
       margin: const EdgeInsets.all(0.0),
