@@ -1,4 +1,3 @@
-import 'package:colla_chat/pages/chat/linkman/group/group_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_info_widget.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:flutter/material.dart';
@@ -55,7 +54,7 @@ final List<AppBarPopupMenu> appBarPopupMenus = [
       }),
 ];
 
-//联系人页面，带有回退回调函数
+//联系人查询页面，带有回退回调函数
 class LinkmanListWidget extends StatefulWidget with TileDataMixin {
   final DataListController<Linkman> linkmanController =
       DataListController<Linkman>();
@@ -63,14 +62,13 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
   final GroupDataListController groupDataListController =
       GroupDataListController();
   late final List<Widget> rightWidgets;
-  late final LinkmanInfoWidget linkmanShowWidget;
-  late final GroupInfoWidget groupShowWidget;
+  late final LinkmanInfoWidget linkmanInfoWidget;
+  late final GroupInfoWidget groupInfoWidget;
   late final P2pLinkmanAddWidget p2pLinkmanAddWidget;
-  late final GroupEditWidget groupAddWidget;
 
   LinkmanListWidget({Key? key}) : super(key: key) {
-    linkmanShowWidget = LinkmanInfoWidget(controller: linkmanController);
-    indexWidgetProvider.define(linkmanShowWidget);
+    linkmanInfoWidget = LinkmanInfoWidget(controller: linkmanController);
+    indexWidgetProvider.define(linkmanInfoWidget);
     rightWidgets = [
       IconButton(
           onPressed: () {},
@@ -89,14 +87,11 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
           tooltip: AppLocalizations.t('Delete')),
     ];
 
-    groupShowWidget = GroupInfoWidget(controller: groupController);
-    indexWidgetProvider.define(groupShowWidget);
+    groupInfoWidget = GroupInfoWidget(controller: groupController);
+    indexWidgetProvider.define(groupInfoWidget);
 
     p2pLinkmanAddWidget = P2pLinkmanAddWidget();
     indexWidgetProvider.define(p2pLinkmanAddWidget);
-
-    groupAddWidget = GroupEditWidget();
-    indexWidgetProvider.define(groupAddWidget);
   }
 
   @override

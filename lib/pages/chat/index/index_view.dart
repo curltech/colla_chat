@@ -18,8 +18,9 @@ import 'index_widget.dart';
 
 class IndexView extends StatefulWidget {
   final String title;
+  final indexWidget = IndexWidget();
 
-  const IndexView({Key? key, required this.title}) : super(key: key);
+  IndexView({Key? key, required this.title}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -171,7 +172,6 @@ class _IndexViewState extends State<IndexView>
 
   Widget _createScaffold(
       BuildContext context, IndexWidgetProvider indexWidgetProvider) {
-    var indexWidget = IndexWidget();
     var bottomNavigationBar = Offstage(
         offstage: !indexWidgetProvider.bottomBarVisible,
         child: const BottomBar());
@@ -185,7 +185,7 @@ class _IndexViewState extends State<IndexView>
           ),
           Center(
               child: platformWidgetFactory.buildSizedBox(
-                  child: indexWidget,
+                  child: widget.indexWidget,
                   height: appDataProvider.mobileSize.height,
                   width: appDataProvider.mobileSize.width)),
           _buildChatMessage(context),

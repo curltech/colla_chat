@@ -177,7 +177,10 @@ class FormInputWidget extends StatelessWidget {
         )
       ]),
     ));
-    return Column(mainAxisAlignment: mainAxisAlignment, children: children);
+    return Column(
+        mainAxisAlignment: mainAxisAlignment,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: children);
   }
 
   @override

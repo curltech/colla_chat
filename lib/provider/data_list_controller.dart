@@ -7,6 +7,7 @@ import '../widgets/data_bind/column_field_widget.dart';
 
 ///基础的数组数据控制器
 class DataListController<T> with ChangeNotifier {
+  String? key;
   List<T> data = <T>[];
   int _currentIndex = -1;
 

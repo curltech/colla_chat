@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/widgets/common/image_widget.dart';
@@ -13,13 +14,17 @@ import '../../../../../widgets/common/widget_mixin.dart';
 import '../../../../entity/chat/contact.dart';
 import '../../../../l10n/localization.dart';
 import '../../../../provider/data_list_controller.dart';
+import 'linkman_edit_widget.dart';
 
 //联系人信息页面
 class LinkmanInfoWidget extends StatefulWidget with TileDataMixin {
   final DataListController<Linkman> controller;
+  late final LinkmanEditWidget linkmanEditWidget;
 
-  const LinkmanInfoWidget({Key? key, required this.controller})
-      : super(key: key);
+  LinkmanInfoWidget({Key? key, required this.controller}) : super(key: key) {
+    linkmanEditWidget = LinkmanEditWidget(controller: controller);
+    indexWidgetProvider.define(linkmanEditWidget);
+  }
 
   @override
   State<StatefulWidget> createState() => _LinkmanInfoWidgetState();

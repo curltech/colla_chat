@@ -266,7 +266,17 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     final label = widget.columnFieldDef.label;
     dynamic value = _getInitValue(context);
 
-    return Text(AppLocalizations.t(label) + ':' + value);
+    return Row(children: [
+      _buildIcon()!,
+      const SizedBox(
+        width: 15.0,
+      ),
+      Text(AppLocalizations.t(label) + ':'),
+      const SizedBox(
+        width: 15.0,
+      ),
+      Text(value, textAlign: TextAlign.center)
+    ]);
   }
 
   Widget _buildTextFormField(BuildContext context) {
@@ -655,6 +665,9 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     } else if (mode == ColumnFieldMode.edit) {
       var inputType = widget.columnFieldDef.inputType;
       switch (inputType) {
+        case InputType.label:
+          columnFieldWidget = _buildShowLabel(context);
+          break;
         case InputType.text:
           columnFieldWidget = _buildTextFormField(context);
           break;
