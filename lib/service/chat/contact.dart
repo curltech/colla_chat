@@ -55,7 +55,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
   }
 
   Future<List<Linkman>> search(String key) async {
-    var where = 'peerId=? or mobile=? or name=? or pyName=? or mail=?';
+    var where = 'peerId=? or mobile=? or name=? or pyName=? or email=?';
     var whereArgs = [key, key, key, key, key];
     var linkmen = await find(
       where: where,
@@ -106,12 +106,12 @@ class LinkmanService extends PeerPartyService<Linkman> {
 
   ///通过peerclient增加或者修改
   Future<void> storeByPeerClient(PeerClient peerClient,
-      {LinkmanType? linkmanType}) async {
+      {LinkmanStatus? linkmanStatus}) async {
     Linkman? linkman = await findCachedOneByPeerId(peerClient.peerId);
     if (linkman == null) {
       linkman = Linkman.fromJson(peerClient.toJson());
-      if (linkmanType != null) {
-        linkman.linkmanType = linkmanType.name;
+      if (linkmanStatus != null) {
+        linkman.status = linkmanStatus.name;
       }
       await insert(linkman);
       linkmen[linkman.peerId] = linkman;
@@ -119,8 +119,8 @@ class LinkmanService extends PeerPartyService<Linkman> {
     } else {
       linkman.name = peerClient.name;
       linkman.lastConnectTime = peerClient.lastAccessTime;
-      if (linkmanType != null) {
-        linkman.linkmanType = linkmanType.name;
+      if (linkmanStatus != null) {
+        linkman.status = linkmanStatus.name;
       }
       await update(linkman);
       linkmen[linkman.peerId] = linkman;
@@ -230,7 +230,7 @@ class GroupService extends PeerPartyService<Group> {
     return group;
   }
 
-  Future<Group?> modify(Group group) async {
+  Future<Group?> store(Group group) async {
     Group? old = await findOneByPeerId(group.peerId);
     if (old != null) {
       group.id = old.id;
@@ -250,6 +250,17 @@ class GroupService extends PeerPartyService<Group> {
       }
     }
     return group;
+  }
+
+  Future<List<Group>> search(String key) async {
+    var where = 'peerId=? or mobile=? or name=? or myAlias=? or email=?';
+    var whereArgs = [key, key, key, key, key];
+    var groups = await find(
+      where: where,
+      whereArgs: whereArgs,
+      orderBy: 'pyName',
+    );
+    return groups;
   }
 }
 

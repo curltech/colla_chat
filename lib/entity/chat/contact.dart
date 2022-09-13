@@ -17,12 +17,6 @@ enum RequestType {
 
 enum RequestStatus { sent, received, accepted, expired, ignored }
 
-enum LinkmanStatus {
-  blacked, // 已加入黑名单
-  effective, // 已成为好友
-  request // 已发送好友请求
-}
-
 enum GroupStatus {
   effective, // 有效
   disbanded // 已解散
@@ -111,27 +105,31 @@ abstract class PeerParty extends PeerEntity {
   }
 }
 
-enum LinkmanType { friend, normal }
+enum LinkmanStatus {
+  friend, //好友
+  stranger, //陌生人
+  blacklist, //黑名单
+  subscript //订阅
+}
 
 /// 联系人，和设备绑定登录成为PeerClient，可能时好友（friend）或者普通联系人
 /// 意味可以进行普通的文本，语音和视频通话
 class Linkman extends PeerParty {
   //用于区分是否是好友，只有好友才能直接聊天
   //非好友的消息需要特别的界面进行处理，非好友的发布的文章也不能直接看到
-  String? linkmanType;
+  //我在对方的状态
+  String? myStatus;
 
   Linkman(String peerId, String name) : super(peerId, name);
 
   Linkman.fromJson(Map json)
-      : linkmanType = json['linkmanType'],
+      : myStatus = json['myStatus'],
         super.fromJson(json);
 
   @override
   Map<String, dynamic> toJson() {
     var json = super.toJson();
-    json.addAll({
-      'linkmanType': linkmanType,
-    });
+    json.addAll({'myStatus': myStatus});
     return json;
   }
 }

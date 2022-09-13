@@ -309,7 +309,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   }
 
   ///发送其他消息命令
-  Future<void> action(int index, String name) async {
+  Future<void> action(int index, String name,{String? value}) async {
     switch (name) {
       case '视频通话':
         await actionVideoChat();

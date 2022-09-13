@@ -49,7 +49,7 @@ class WidgetUtil {
             icon: icon,
           ),
         ),
-        const SizedBox(height: 5.0),
+        const SizedBox(height: 3.0),
         Text(
           text,
           style: TextStyle(
@@ -84,7 +84,7 @@ class WidgetUtil {
             child: icon,
           ),
         ),
-        const SizedBox(height: 5.0),
+        const SizedBox(height: 3.0),
         Text(
           text,
           style: TextStyle(

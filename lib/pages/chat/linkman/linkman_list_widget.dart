@@ -69,17 +69,6 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
   late final GroupAddWidget groupAddWidget;
 
   LinkmanListWidget({Key? key}) : super(key: key) {
-    linkmanService.find().then((List<Linkman> linkmen) {
-      if (linkmen.isNotEmpty) {
-        linkmanController.addAll(linkmen);
-      }
-    });
-    groupService.find().then((List<Group> groups) {
-      if (groups.isNotEmpty) {
-        groupController.addAll(groups);
-      }
-    });
-
     linkmanShowWidget = LinkmanInfoWidget(controller: linkmanController);
     indexWidgetProvider.define(linkmanShowWidget);
     rightWidgets = [
@@ -139,18 +128,33 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
     setState(() {});
   }
 
+  _search(String key) async {
+    List<Linkman> linkmen = await linkmanService.search(key);
+    widget.linkmanController.replaceAll(linkmen);
+    List<Group> groups = await groupService.search(key);
+    widget.groupController.replaceAll(groups);
+  }
+
   _buildSearchTextField(BuildContext context) {
     var controller = TextEditingController();
-    var searchTextField = TextFormField(
-        controller: controller,
-        keyboardType: TextInputType.text,
-        decoration: InputDecoration(
-          labelText: AppLocalizations.t('Search'),
-          suffixIcon: IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.search),
-          ),
-        ));
+    var searchTextField = Container(
+        padding: const EdgeInsets.all(10.0),
+        child: TextFormField(
+            autofocus: true,
+            controller: controller,
+            keyboardType: TextInputType.text,
+            decoration: InputDecoration(
+              fillColor: Colors.black.withOpacity(0.1),
+              filled: true,
+              border: InputBorder.none,
+              labelText: AppLocalizations.t('Search'),
+              suffixIcon: IconButton(
+                onPressed: () {
+                  _search(controller.text);
+                },
+                icon: const Icon(Icons.search),
+              ),
+            )));
 
     return searchTextField;
   }
@@ -205,10 +209,12 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
   @override
   Widget build(BuildContext context) {
     _buildGroupDataListController();
-    var groupDataListView = GroupDataListView(
-      onTap: _onTap,
-      controller: widget.groupDataListController,
-    );
+    var groupDataListView = Container(
+        padding: const EdgeInsets.all(10.0),
+        child: GroupDataListView(
+          onTap: _onTap,
+          controller: widget.groupDataListController,
+        ));
     return AppBarView(
         title: Text(AppLocalizations.t(widget.title)),
         rightPopupMenus: appBarPopupMenus,

@@ -23,7 +23,7 @@ final List<ActionData> actionData = [
 ///非文本的其他多种格式输入面板，包括照片等
 class MoreMessageInput extends StatefulWidget {
   final double height;
-  final Future<void> Function(int index, String name) onAction;
+  final Future<void> Function(int index, String name, {String? value}) onAction;
 
   const MoreMessageInput({Key? key, this.height = 0.0, required this.onAction})
       : super(key: key);
@@ -92,6 +92,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         actions: actionData,
         height: widget.height,
         onPressed: widget.onAction,
+        crossAxisCount: 4,
       ),
     );
   }

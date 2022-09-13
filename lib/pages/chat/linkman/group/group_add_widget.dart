@@ -90,7 +90,7 @@ class _GroupAddWidgetState extends State<GroupAddWidget> {
     Group group = Group.fromJson(values);
     group.ownerPeerId = myself.peerId!;
     group = await groupService.createGroup(group);
-    await groupService.modify(group);
+    await groupService.store(group);
 
     String groupId = group.peerId;
     for (var selectedLinkmanId in selectedLinkmen) {

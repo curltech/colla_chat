@@ -1,5 +1,11 @@
-import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
+import 'package:colla_chat/service/chat/chat.dart';
+import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/widgets/common/image_widget.dart';
+import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
+import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../widgets/common/app_bar_view.dart';
@@ -60,73 +66,137 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
     return listTile;
   }
 
-  Widget _buildLinkmanButton(BuildContext context) {
-    var buttonStyle = ButtonStyle(
-      backgroundColor: MaterialStateProperty.all(
-          Colors.grey.withOpacity(0.5)),
-      shape: MaterialStateProperty.all(
-        RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-      ),
-      padding: MaterialStateProperty.all(
-          const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0)),
-      minimumSize: MaterialStateProperty.all(const Size(300, 0)),
-      maximumSize: MaterialStateProperty.all(const Size(375.0, 36.0)),
+  Widget _buildListTile(BuildContext context) {
+    Linkman? linkman = widget.controller.current;
+    List<TileData> tileData = [
+      TileData(
+          title: 'Chat',
+          prefix: const Icon(Icons.chat),
+          routeName: 'chat_message',
+          onTap: (int index, String title) async {
+            ChatSummary? chatSummary =
+                await chatSummaryService.findOneByPeerId(linkman!.peerId);
+            if (chatSummary != null) {
+              chatMessageController.chatSummary = chatSummary;
+            }
+          }),
+    ];
+    var listView = DataListView(
+      tileData: tileData,
     );
-    return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      SizedBox(
-        height: 15,
-      ),
-      TextButton(
-          style: buttonStyle,
-          onPressed: () {
-            //add friend
-          },
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text('Add friend'),
-            SizedBox(
-              width: 10,
-            ),
-            Icon(Icons.person_pin)
-          ])),
-      SizedBox(
-        height: 15,
-      ),
-      TextButton(
-          style: buttonStyle,
-          onPressed: () {
-            //send message
-          },
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text('Chat'),
-            SizedBox(
-              width: 10,
-            ),
-            Icon(Icons.chat)
-          ])),
-      SizedBox(
-        height: 15,
-      ),
-      TextButton(
-          style: buttonStyle,
-          onPressed: () {
-            //send video
-          },
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text('Video chat'),
-            SizedBox(
-              width: 10,
-            ),
-            Icon(Icons.video_call)
-          ])),
-    ]);
+    return listView;
+  }
+
+  Future<void> _onAction(int index, String name, {String? value}) async {
+    switch (index) {
+      case 0:
+        break;
+      case 1:
+        break;
+      case 2:
+        break;
+      case 3:
+        break;
+      case 4:
+        break;
+      case 5:
+        break;
+      case 6:
+        break;
+      case 7:
+        break;
+      default:
+        break;
+    }
+  }
+
+  _addFriend(Linkman linkman, {String? tip}) async {
+    await linkmanService
+        .update({'id': linkman.id, 'status': LinkmanStatus.friend.name});
+    ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+        linkman.peerId,
+        subMessageType: ChatSubMessageType.addLinkman,
+        title: tip);
+    await chatMessageService.send(chatMessage);
+  }
+
+  Widget _buildAddFriendTextField(BuildContext context) {
+    var controller = TextEditingController();
+    var addFriendTextField = Container(
+        padding: const EdgeInsets.all(10.0),
+        child: TextFormField(
+            autofocus: true,
+            controller: controller,
+            keyboardType: TextInputType.text,
+            decoration: InputDecoration(
+              fillColor: Colors.black.withOpacity(0.1),
+              filled: true,
+              border: InputBorder.none,
+              labelText: AppLocalizations.t('Add Friend'),
+              suffixIcon: IconButton(
+                onPressed: () {
+                  _addFriend(widget.controller.current!, tip: controller.text);
+                },
+                icon: const Icon(Icons.person_add),
+              ),
+            )));
+
+    return addFriendTextField;
+  }
+
+  Widget _buildActionCard(BuildContext context) {
+    Linkman? linkman = widget.controller.current;
+    List<Widget> actionWidgets = [];
+    double height = 180;
+    final List<ActionData> actionData = [];
+    if (linkman != null) {
+      if (linkman.status == LinkmanStatus.friend.name) {
+        actionData.add(
+          ActionData(
+              label: 'Remove friend', icon: const Icon(Icons.person_remove)),
+        );
+      } else {
+        actionWidgets.add(_buildAddFriendTextField(context));
+      }
+      if (linkman.status == LinkmanStatus.blacklist.name) {
+        actionData.add(
+          ActionData(
+              label: 'Remove blacklist',
+              icon: const Icon(Icons.person_outlined)),
+        );
+      } else {
+        actionData.add(ActionData(
+            label: 'Add blacklist', icon: const Icon(Icons.person_off)));
+      }
+      if (linkman.status == LinkmanStatus.blacklist.name) {
+        actionData.add(
+          ActionData(
+              label: 'Remove subscript', icon: const Icon(Icons.unsubscribe)),
+        );
+      } else {
+        actionData.add(ActionData(
+            label: 'Add subscript', icon: const Icon(Icons.subscriptions)));
+      }
+    }
+    actionWidgets.add(DataActionCard(
+      actions: actionData,
+      height: height,
+      onPressed: _onAction, crossAxisCount: 3,
+    ));
+    return Container(
+      margin: const EdgeInsets.all(0.0),
+      padding: const EdgeInsets.only(bottom: 0.0),
+      child: Column(children: actionWidgets),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    var linkmanInfoCard = Column(
-        children: [_buildLinkmanInfo(context), _buildLinkmanButton(context)]);
+    var linkmanInfoCard = Column(children: [
+      _buildLinkmanInfo(context),
+      _buildListTile(context),
+      _buildActionCard(context)
+    ]);
     var appBarView = AppBarView(
         title: Text(AppLocalizations.t(widget.title)),
         withLeading: widget.withLeading,

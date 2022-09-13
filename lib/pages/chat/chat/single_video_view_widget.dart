@@ -87,7 +87,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
     ]);
   }
 
-  Future<void> _onAction(int index, String name) async {
+  Future<void> _onAction(int index, String name,{String? value}) async {
     switch (index) {
       case 0:
         await widget.render.switchCamera();
@@ -121,7 +121,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         child: DataActionCard(
           actions: actionData,
           height: height,
-          onPressed: _onAction,
+          onPressed: _onAction, crossAxisCount: 4,
         ),
       )),
     );

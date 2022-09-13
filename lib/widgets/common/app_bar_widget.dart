@@ -96,11 +96,12 @@ class AppBarWidget {
         if (iconWidget != null) {
           rows.add(iconWidget);
         }
+        rows.add(SizedBox(width: 25,));
         rows.add(textWidget);
         item = PopupMenuItem<int>(
             value: i,
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: rows,
             ));

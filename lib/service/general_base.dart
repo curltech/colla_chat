@@ -174,7 +174,7 @@ abstract class GeneralBaseService<T> {
   ///payloadKey：null，直接ecc加密
   ///‘’，产生新的对称密钥并返回
   ///有值，用于加密,secretKey有值，用于加密
-  Future<Map<String, dynamic>> encrypt(T entity,
+  Future<Map<String, dynamic>> encrypt(dynamic entity,
       {bool needCompress = true,
       bool needEncrypt = true,
       bool needSign = false,

@@ -183,7 +183,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
     setState(() {});
   }
 
-  Future<void> _onAction(int index, String name) async {
+  Future<void> _onAction(int index, String name,{String? value}) async {
     switch (index) {
       case 0:
         _open(videoMedia: true);
@@ -219,7 +219,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
       child: DataActionCard(
         actions: actionData,
         height: height,
-        onPressed: _onAction,
+        onPressed: _onAction, crossAxisCount: 4,
       ),
     );
   }

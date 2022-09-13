@@ -19,7 +19,7 @@ class ChatMessageInputWidget extends StatefulWidget {
   final Future<void> Function(
       {String? message, ChatSubMessageType subMessageType}) onSend;
 
-  final Future<void> Function(int index, String name) onAction;
+  final Future<void> Function(int index, String name,{String? value}) onAction;
 
   const ChatMessageInputWidget(
       {Key? key,
