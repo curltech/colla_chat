@@ -2,6 +2,7 @@ import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/qrcode_widget.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
+import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -45,18 +46,9 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
   }
 
   Widget _buildLogout(BuildContext context) {
-    ButtonStyle style= ButtonStyle(
-      backgroundColor: MaterialStateProperty.all(Colors.grey),
-      shape: MaterialStateProperty.all(
-        RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-      ),
-      padding: MaterialStateProperty.all(
-          const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0)),
-      minimumSize: MaterialStateProperty.all(const Size(50, 0)),
-      maximumSize: MaterialStateProperty.all(const Size(375.0, 36.0)),
-    );
+    ButtonStyle style =
+        WidgetUtil().buildButtonStyle(maximumSize: const Size(375.0, 36.0));
+
     var indexWidgetProvider =
         Provider.of<IndexWidgetProvider>(context, listen: false);
     return TextButton(

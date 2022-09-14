@@ -94,4 +94,26 @@ class WidgetUtil {
       ],
     );
   }
+
+  ButtonStyle buildButtonStyle(
+      {Color backgroundColor = Colors.grey,
+      double borderRadius = 8.0,
+      EdgeInsets padding =
+          const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
+      Size minimumSize = const Size(50, 0),
+      Size maximumSize = const Size(90.0, 36.0)}) {
+    ButtonStyle style = ButtonStyle(
+      backgroundColor: MaterialStateProperty.all(backgroundColor),
+      shape: MaterialStateProperty.all(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(borderRadius),
+        ),
+      ),
+      padding: MaterialStateProperty.all(padding),
+      minimumSize: MaterialStateProperty.all(minimumSize),
+      maximumSize: MaterialStateProperty.all(maximumSize),
+    );
+
+    return style;
+  }
 }

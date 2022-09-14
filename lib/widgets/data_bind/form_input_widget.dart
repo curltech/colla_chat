@@ -1,5 +1,6 @@
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -160,18 +161,7 @@ class FormInputWidget extends StatelessWidget {
     children.add(const SizedBox(
       height: 30.0,
     ));
-    ButtonStyle style = ButtonStyle(
-      backgroundColor: MaterialStateProperty.all(Colors.grey),
-      shape: MaterialStateProperty.all(
-        RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-      ),
-      padding: MaterialStateProperty.all(
-          const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0)),
-      minimumSize: MaterialStateProperty.all(const Size(50, 0)),
-      maximumSize: MaterialStateProperty.all(const Size(90.0, 36.0)),
-    );
+    ButtonStyle style = WidgetUtil().buildButtonStyle();
     children.add(Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15.0),
       child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
@@ -200,8 +190,7 @@ class FormInputWidget extends StatelessWidget {
             const SizedBox(
               width: 5,
             ),
-            const Icon(Icons.clear,
-                color: Colors.red)
+            const Icon(Icons.clear, color: Colors.red)
           ]),
           onPressed: () {
             controller.clear();
