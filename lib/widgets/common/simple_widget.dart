@@ -43,13 +43,16 @@ class WidgetUtil {
               Radius.circular(5.0),
             ),
           ),
-          child: IconButton(
-              onPressed: onPressed,
-              padding: padding,
-              color: iconColor,
-              iconSize: iconSize,
-              icon: icon,
-              tooltip: tooltip != null ? AppLocalizations.t(tooltip) : ''),
+          child: Material(
+              color: Colors.transparent,
+              shape: const CircleBorder(),
+              child: IconButton(
+                  onPressed: onPressed,
+                  padding: padding,
+                  color: iconColor,
+                  iconSize: iconSize,
+                  icon: icon,
+                  tooltip: tooltip != null ? AppLocalizations.t(tooltip) : '')),
         ),
         const SizedBox(height: 3.0),
         Text(
@@ -70,6 +73,7 @@ class WidgetUtil {
     EdgeInsetsGeometry padding = EdgeInsets.zero,
     required String text,
     Color? textColor,
+    Color? backgroundColor,
     required Widget icon,
   }) {
     return Column(
@@ -81,10 +85,12 @@ class WidgetUtil {
               Radius.circular(5.0),
             ),
           ),
-          child: InkWell(
-            onTap: onPressed,
-            child: icon,
-          ),
+          child: Ink(
+              color: backgroundColor,
+              child: InkWell(
+                onTap: onPressed,
+                child: icon,
+              )),
         ),
         const SizedBox(height: 3.0),
         Text(
