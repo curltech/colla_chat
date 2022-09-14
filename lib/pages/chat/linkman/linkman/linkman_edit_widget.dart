@@ -35,7 +35,7 @@ final List<ColumnFieldDef> linkmanColumnFieldDefs = [
       prefixIcon: const Icon(Icons.mobile_friendly)),
 ];
 
-//联系人编辑组件
+//联系人编辑组件，加减联系人好友，黑名单，订阅，改变联系人的名称
 class LinkmanEditWidget extends StatefulWidget with TileDataMixin {
   final DataListController<Linkman> controller;
 

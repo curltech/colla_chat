@@ -106,10 +106,10 @@ abstract class PeerParty extends PeerEntity {
 }
 
 enum LinkmanStatus {
+  none, //陌生人
   friend, //好友
-  stranger, //陌生人
   blacklist, //黑名单
-  subscript //订阅
+  subscript, //订阅
 }
 
 /// 联系人，和设备绑定登录成为PeerClient，可能时好友（friend）或者普通联系人
@@ -120,16 +120,20 @@ class Linkman extends PeerParty {
   //我在对方的状态
   String? myStatus;
 
+  //订阅状态
+  String? subscriptStatus;
+
   Linkman(String peerId, String name) : super(peerId, name);
 
   Linkman.fromJson(Map json)
       : myStatus = json['myStatus'],
+        subscriptStatus = json['subscriptStatus'],
         super.fromJson(json);
 
   @override
   Map<String, dynamic> toJson() {
     var json = super.toJson();
-    json.addAll({'myStatus': myStatus});
+    json.addAll({'myStatus': myStatus, 'subscriptStatus': subscriptStatus});
     return json;
   }
 }

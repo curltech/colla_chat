@@ -17,6 +17,10 @@ final List<ColumnFieldDef> groupColumnFieldDefs = [
       inputType: InputType.label,
       prefixIcon: const Icon(Icons.perm_identity)),
   ColumnFieldDef(
+      name: 'groupOwnerPeerId',
+      label: 'groupOwnerPeerId',
+      prefixIcon: const Icon(Icons.accessibility)),
+  ColumnFieldDef(
       name: 'name', label: 'name', prefixIcon: const Icon(Icons.person)),
   ColumnFieldDef(
       name: 'alias',
@@ -32,7 +36,7 @@ final List<ColumnFieldDef> groupColumnFieldDefs = [
       prefixIcon: const Icon(Icons.note)),
 ];
 
-///增加群
+///群的编辑界面，改变群拥有者，增减群成员，改变群的名称
 class GroupEditWidget extends StatefulWidget with TileDataMixin {
   final DataListController<Group> controller;
   final DataListController<Linkman> linkmenController =
@@ -57,7 +61,7 @@ class GroupEditWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _GroupEditWidgetState extends State<GroupEditWidget> {
-  List<String> selectedLinkmen = [];
+  List<String> groupMembers = [];
   Group? group;
 
   @override
@@ -66,17 +70,29 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     widget.controller.addListener(_update);
     widget.linkmenController.addListener(_update);
     group = widget.controller.current;
-    linkmanService.findAll().then((List<Linkman> linkmen) {
-      if (linkmen.isNotEmpty) {
-        widget.linkmenController.addAll(linkmen);
+    _init();
+  }
+
+  _init() async {
+    List<Linkman> linkmen = await linkmanService.findAll();
+    if (linkmen.isNotEmpty) {
+      widget.linkmenController.addAll(linkmen);
+    }
+    groupMembers.clear();
+    List<GroupMember> members =
+        await groupMemberService.findByGroupId(group!.peerId);
+    if (members.isNotEmpty) {
+      for (GroupMember member in members) {
+        groupMembers.add(member.memberPeerId!);
       }
-    });
+    }
   }
 
   _update() {
     setState(() {});
   }
 
+  //群信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
     Map<String, dynamic>? initValues =
         widget.controller.getInitValue(groupColumnFieldDefs);
@@ -94,6 +110,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     return formInputWidget;
   }
 
+  //修改提交
   _onOk(Map<String, dynamic> values) async {
     Group currentGroup = Group.fromJson(values);
     if (group != null) {
@@ -106,7 +123,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     await groupService.store(group!);
 
     String groupId = group!.peerId;
-    for (var selectedLinkmanId in selectedLinkmen) {
+    for (var selectedLinkmanId in groupMembers) {
       Linkman? linkman =
           await linkmanService.findCachedOneByPeerId(selectedLinkmanId);
       if (linkman != null) {
@@ -120,7 +137,8 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     }
   }
 
-  Widget _buildSelect(BuildContext context) {
+  //群成员显示和编辑界面
+  Widget _buildGroupMembersWidget(BuildContext context) {
     List<Linkman> linkmen = widget.linkmenController.data;
     List<S2Choice<String>> choiceItems = [];
     for (Linkman linkman in linkmen) {
@@ -132,8 +150,8 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     return SmartSelect<String>.multiple(
       title: 'Linkmen',
       placeholder: 'Select one or more linkman',
-      selectedValue: selectedLinkmen,
-      onChange: (selected) => setState(() => selectedLinkmen = selected.value),
+      selectedValue: groupMembers,
+      onChange: (selected) => setState(() => groupMembers = selected.value),
       choiceItems: choiceItems,
       modalType: S2ModalType.bottomSheet,
       modalConfig: S2ModalConfig(
@@ -166,7 +184,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
             },
             chipOnDelete: (i) {
               setState(() {
-                selectedLinkmen.removeAt(i);
+                groupMembers.removeAt(i);
               });
             },
             chipColor: appDataProvider.themeData.colorScheme.primary,
@@ -176,14 +194,14 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     );
   }
 
-  Widget _buildGroupAdd(BuildContext context) {
+  Widget _buildGroupEdit(BuildContext context) {
     return Column(
       children: [
-        _buildFormInputWidget(context),
+        _buildGroupMembersWidget(context),
         const SizedBox(
           height: 5,
         ),
-        _buildSelect(context)
+        _buildFormInputWidget(context),
       ],
     );
   }
@@ -193,7 +211,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     var appBarView = AppBarView(
         title: Text(AppLocalizations.t(widget.title)),
         withLeading: widget.withLeading,
-        child: _buildGroupAdd(context));
+        child: _buildGroupEdit(context));
     return appBarView;
   }
 

@@ -2,6 +2,7 @@ import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
+import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/widgets/common/image_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -55,26 +56,50 @@ class GroupInfoWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _GroupInfoWidgetState extends State<GroupInfoWidget> {
+  Group? group;
+
   @override
   initState() {
     super.initState();
     widget.controller.addListener(_update);
+    group = widget.controller.current;
   }
 
   _update() {
     setState(() {});
   }
 
-  Widget _buildGroupInfo(BuildContext context) {
-    Group? group = widget.controller.current;
+  _dismissGroup() async {
+    if (group == null) {
+      return;
+    }
+    await groupMemberService.delete({
+      'groupId': group!.id,
+    });
+    await groupService.delete({
+      'groupId': group!.id,
+    });
+    await chatMessageService.delete({
+      'receiverPeerId': group!.id,
+    });
+    await chatMessageService.delete({
+      'senderPeerId': group!.id,
+    });
+    await chatSummaryService.delete({
+      'peerId': group!.id,
+    });
+  }
+
+  //显示群基本信息
+  Widget _buildGroupInfoWidget(BuildContext context) {
     List<TileData> tileData = [];
     if (group != null) {
       var tile = TileData(
-        title: group.name,
-        subtitle: group.peerId,
+        title: group!.name,
+        subtitle: group!.peerId,
         isThreeLine: true,
         prefix: ImageWidget(
-          image: group.avatar,
+          image: group!.avatar,
           width: 32.0,
           height: 32.0,
         ),
@@ -87,8 +112,8 @@ class _GroupInfoWidgetState extends State<GroupInfoWidget> {
     );
   }
 
-  Widget _buildListTile(BuildContext context) {
-    Group? group = widget.controller.current;
+  //转向群发界面
+  Widget _buildChatMessageWidget(BuildContext context) {
     List<TileData> tileData = [
       TileData(
           title: 'Chat',
@@ -101,11 +126,6 @@ class _GroupInfoWidgetState extends State<GroupInfoWidget> {
               chatMessageController.chatSummary = chatSummary;
             }
           }),
-      TileData(
-          title: 'Group Member',
-          prefix: const Icon(Icons.group_add),
-          routeName: 'group_member',
-          onTap: (int index, String title) async {}),
     ];
     var listView = DataListView(
       tileData: tileData,
@@ -114,36 +134,18 @@ class _GroupInfoWidgetState extends State<GroupInfoWidget> {
   }
 
   Widget _buildActionCard(BuildContext context) {
-    Group? group = widget.controller.current;
     List<Widget> actionWidgets = [];
     double height = 180;
     final List<ActionData> actionData = [];
     if (group != null) {
-      if (group.status == LinkmanStatus.friend.name) {
-        actionData.add(
-          ActionData(
-              label: 'Remove friend', icon: const Icon(Icons.person_remove)),
-        );
-      }
-      if (group.status == LinkmanStatus.blacklist.name) {
-        actionData.add(
-          ActionData(
-              label: 'Remove blacklist',
-              icon: const Icon(Icons.person_outlined)),
-        );
-      } else {
-        actionData.add(ActionData(
-            label: 'Add blacklist', icon: const Icon(Icons.person_off)));
-      }
-      if (group.status == LinkmanStatus.blacklist.name) {
-        actionData.add(
-          ActionData(
-              label: 'Remove subscript', icon: const Icon(Icons.unsubscribe)),
-        );
-      } else {
-        actionData.add(ActionData(
-            label: 'Add subscript', icon: const Icon(Icons.subscriptions)));
-      }
+      actionData.add(
+        ActionData(
+            label: 'Dismiss group',
+            icon: const Icon(Icons.group_off),
+            onTap: (int index, String label, {String? value}) {
+              _dismissGroup();
+            }),
+      );
     }
     actionWidgets.add(DataActionCard(
       actions: actionData,
@@ -160,8 +162,8 @@ class _GroupInfoWidgetState extends State<GroupInfoWidget> {
   @override
   Widget build(BuildContext context) {
     var linkmanInfoCard = Column(children: [
-      _buildGroupInfo(context),
-      _buildListTile(context),
+      _buildGroupInfoWidget(context),
+      _buildChatMessageWidget(context),
       _buildActionCard(context)
     ]);
     var appBarView = AppBarView(

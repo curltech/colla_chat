@@ -43,26 +43,28 @@ class LinkmanInfoWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
+  Linkman? linkman;
+
   @override
   initState() {
     super.initState();
     widget.controller.addListener(_update);
+    linkman = widget.controller.current;
   }
 
   _update() {
     setState(() {});
   }
 
-  Widget _buildLinkmanInfo(BuildContext context) {
-    Linkman? linkman = widget.controller.current;
+  Widget _buildLinkmanInfoWidget(BuildContext context) {
     List<TileData> tileData = [];
     if (linkman != null) {
       var tile = TileData(
-        title: linkman.name,
-        subtitle: linkman.peerId,
+        title: linkman!.name,
+        subtitle: linkman!.peerId,
         isThreeLine: true,
         prefix: ImageWidget(
-          image: linkman.avatar,
+          image: linkman!.avatar,
           width: 32.0,
           height: 32.0,
         ),
@@ -75,8 +77,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
     );
   }
 
-  Widget _buildListTile(BuildContext context) {
-    Linkman? linkman = widget.controller.current;
+  Widget _buildChatMessageWidget(BuildContext context) {
     List<TileData> tileData = [];
     var tile = TileData(
         title: 'Chat',
@@ -95,14 +96,23 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
     );
   }
 
-  _addFriend(Linkman linkman, {String? tip}) async {
+  _changeFriend({String? tip}) async {
     await linkmanService
-        .update({'id': linkman.id, 'status': LinkmanStatus.friend.name});
+        .update({'id': linkman!.id, 'status': LinkmanStatus.friend.name});
     ChatMessage chatMessage = await chatMessageService.buildChatMessage(
-        linkman.peerId,
+        linkman!.peerId,
         subMessageType: ChatSubMessageType.addLinkman,
         title: tip);
     await chatMessageService.send(chatMessage);
+  }
+
+  _changeStatus(LinkmanStatus status) async {
+    await linkmanService.update({'id': linkman!.id, 'status': status.name});
+  }
+
+  _changeSubscriptStatus(LinkmanStatus status) async {
+    await linkmanService
+        .update({'id': linkman!.id, 'subscriptStatus': status.name});
   }
 
   Widget _buildAddFriendTextField(BuildContext context) {
@@ -120,7 +130,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
               labelText: AppLocalizations.t('Add Friend'),
               suffixIcon: IconButton(
                 onPressed: () {
-                  _addFriend(widget.controller.current!, tip: controller.text);
+                  _changeFriend(tip: controller.text);
                 },
                 icon: const Icon(Icons.person_add),
               ),
@@ -138,7 +148,11 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
       if (linkman.status == LinkmanStatus.friend.name) {
         actionData.add(
           ActionData(
-              label: 'Remove friend', icon: const Icon(Icons.person_remove)),
+              label: 'Remove friend',
+              icon: const Icon(Icons.person_remove),
+              onTap: (int index, String label, {String? value}) {
+                _changeStatus(LinkmanStatus.none);
+              }),
         );
       } else {
         actionWidgets.add(_buildAddFriendTextField(context));
@@ -147,20 +161,35 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
         actionData.add(
           ActionData(
               label: 'Remove blacklist',
-              icon: const Icon(Icons.person_outlined)),
+              icon: const Icon(Icons.person_outlined),
+              onTap: (int index, String label, {String? value}) {
+                _changeStatus(LinkmanStatus.none);
+              }),
         );
       } else {
         actionData.add(ActionData(
-            label: 'Add blacklist', icon: const Icon(Icons.person_off)));
+            label: 'Add blacklist',
+            icon: const Icon(Icons.person_off),
+            onTap: (int index, String label, {String? value}) {
+              _changeStatus(LinkmanStatus.blacklist);
+            }));
       }
       if (linkman.status == LinkmanStatus.blacklist.name) {
         actionData.add(
           ActionData(
-              label: 'Remove subscript', icon: const Icon(Icons.unsubscribe)),
+              label: 'Remove subscript',
+              icon: const Icon(Icons.unsubscribe),
+              onTap: (int index, String label, {String? value}) {
+                _changeSubscriptStatus(LinkmanStatus.none);
+              }),
         );
       } else {
         actionData.add(ActionData(
-            label: 'Add subscript', icon: const Icon(Icons.subscriptions)));
+            label: 'Add subscript',
+            icon: const Icon(Icons.subscriptions),
+            onTap: (int index, String label, {String? value}) {
+              _changeSubscriptStatus(LinkmanStatus.subscript);
+            }));
       }
     }
     actionWidgets.add(DataActionCard(
@@ -178,8 +207,8 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
   @override
   Widget build(BuildContext context) {
     var linkmanInfoCard = Column(children: [
-      _buildLinkmanInfo(context),
-      _buildListTile(context),
+      _buildLinkmanInfoWidget(context),
+      _buildChatMessageWidget(context),
       _buildActionCard(context)
     ]);
     var appBarView = AppBarView(
