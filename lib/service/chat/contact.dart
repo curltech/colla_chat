@@ -246,7 +246,7 @@ class GroupService extends PeerPartyService<Group> {
         groupMember.memberPeerId = member.peerId;
         groupMember.groupId = group.peerId;
         groupMember.memberAlias = member.alias;
-        groupMemberService.modify(groupMember);
+        groupMemberService.store(groupMember);
       }
     }
     return group;
@@ -320,7 +320,7 @@ class GroupMemberService extends GeneralBaseService<GroupMember> {
     return linkmen;
   }
 
-  Future<void> modify(GroupMember groupMember) async {
+  Future<void> store(GroupMember groupMember) async {
     GroupMember? old =
         await findOneByGroupId(groupMember.groupId!, groupMember.memberPeerId!);
     if (old != null) {

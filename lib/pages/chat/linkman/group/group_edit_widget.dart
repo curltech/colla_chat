@@ -76,14 +76,16 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
   _init() async {
     List<Linkman> linkmen = await linkmanService.findAll();
     if (linkmen.isNotEmpty) {
-      widget.linkmenController.addAll(linkmen);
+      widget.linkmenController.replaceAll(linkmen);
     }
-    groupMembers.clear();
-    List<GroupMember> members =
-        await groupMemberService.findByGroupId(group!.peerId);
-    if (members.isNotEmpty) {
-      for (GroupMember member in members) {
-        groupMembers.add(member.memberPeerId!);
+    if (group != null) {
+      groupMembers.clear();
+      List<GroupMember> members =
+          await groupMemberService.findByGroupId(group!.peerId);
+      if (members.isNotEmpty) {
+        for (GroupMember member in members) {
+          groupMembers.add(member.memberPeerId!);
+        }
       }
     }
   }
@@ -97,15 +99,16 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     Map<String, dynamic>? initValues =
         widget.controller.getInitValue(groupColumnFieldDefs);
 
-    var formInputWidget = Container(
-        padding: const EdgeInsets.all(15.0),
-        child: FormInputWidget(
-          onOk: (Map<String, dynamic> values) {
-            _onOk(values);
-          },
-          columnFieldDefs: groupColumnFieldDefs,
-          initValues: initValues,
-        ));
+    var formInputWidget = SingleChildScrollView(
+        child: Container(
+            padding: const EdgeInsets.all(15.0),
+            child: FormInputWidget(
+              onOk: (Map<String, dynamic> values) {
+                _onOk(values);
+              },
+              columnFieldDefs: groupColumnFieldDefs,
+              initValues: initValues,
+            )));
 
     return formInputWidget;
   }
@@ -117,22 +120,42 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
       group!.alias = currentGroup.alias;
       group!.mobile = currentGroup.mobile;
       group!.email = currentGroup.email;
+      group!.groupOwnerPeerId = currentGroup.groupOwnerPeerId;
     } else {
       group = await groupService.createGroup(currentGroup);
     }
     await groupService.store(group!);
 
     String groupId = group!.peerId;
-    for (var selectedLinkmanId in groupMembers) {
-      Linkman? linkman =
-          await linkmanService.findCachedOneByPeerId(selectedLinkmanId);
-      if (linkman != null) {
-        GroupMember groupMember = GroupMember();
-        groupMember.groupId = groupId;
-        groupMember.memberPeerId = selectedLinkmanId;
-        groupMember.memberType = MemberType.member.name;
-        groupMember.memberAlias = linkman.alias ?? linkman.name;
-        groupMemberService.modify(groupMember);
+    List<GroupMember> members =
+        await groupMemberService.findByGroupId(group!.peerId);
+    Map<String, GroupMember> oldMembers = {};
+    if (members.isNotEmpty) {
+      for (GroupMember member in members) {
+        oldMembers[member.memberPeerId!] = member;
+      }
+    }
+    for (var groupMemberId in groupMembers) {
+      var member = oldMembers[groupMemberId];
+      if (member == null) {
+        Linkman? linkman =
+            await linkmanService.findCachedOneByPeerId(groupMemberId);
+        if (linkman != null) {
+          GroupMember groupMember = GroupMember();
+          groupMember.groupId = groupId;
+          groupMember.memberPeerId = groupMemberId;
+          groupMember.memberType = MemberType.member.name;
+          groupMember.memberAlias = linkman.alias ?? linkman.name;
+          groupMemberService.store(groupMember);
+        }
+      } else {
+        oldMembers.remove(groupMemberId);
+      }
+    }
+    if (oldMembers.isNotEmpty) {
+      for (GroupMember member in oldMembers.values) {
+        oldMembers[member.memberPeerId!] = member;
+        groupMemberService.delete({'id': member.id});
       }
     }
   }
@@ -151,7 +174,9 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
       title: 'Linkmen',
       placeholder: 'Select one or more linkman',
       selectedValue: groupMembers,
-      onChange: (selected) => setState(() => groupMembers = selected.value),
+      onChange: (selected) => setState(() {
+        groupMembers = selected.value;
+      }),
       choiceItems: choiceItems,
       modalType: S2ModalType.bottomSheet,
       modalConfig: S2ModalConfig(
@@ -170,6 +195,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
       choiceStyle: S2ChoiceStyle(
         opacity: 0.5,
         elevation: 0,
+        //titleStyle: const TextStyle(color: Colors.white),
         color: appDataProvider.themeData.colorScheme.primary,
       ),
       tileBuilder: (context, state) {
@@ -201,7 +227,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
         const SizedBox(
           height: 5,
         ),
-        _buildFormInputWidget(context),
+        Expanded(child: _buildFormInputWidget(context)),
       ],
     );
   }
