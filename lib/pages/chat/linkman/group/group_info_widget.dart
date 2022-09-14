@@ -51,7 +51,7 @@ class GroupInfoWidget extends StatefulWidget with TileDataMixin {
   Icon get icon => const Icon(Icons.desktop_windows);
 
   @override
-  String get title => 'GroupInfo';
+  String get title => 'Group Info';
 }
 
 class _GroupInfoWidgetState extends State<GroupInfoWidget> {

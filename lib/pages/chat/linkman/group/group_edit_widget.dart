@@ -43,7 +43,7 @@ class GroupEditWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'group_edit';
 
   @override
-  String get title => 'GroupEdit';
+  String get title => 'Group Edit';
 
   @override
   bool get withLeading => true;
@@ -279,7 +279,9 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
               return Text(state.selected.title![i]);
             },
             chipOnDelete: (i) {
-              setState(() {});
+              setState(() {
+                group!.groupOwnerPeerId = null;
+              });
             },
             chipColor: appDataProvider.themeData.colorScheme.primary,
           ),

@@ -52,7 +52,7 @@ class LinkmanEditWidget extends StatefulWidget with TileDataMixin {
   Icon get icon => const Icon(Icons.person_add);
 
   @override
-  String get title => 'LinkmanEdit';
+  String get title => 'Linkman Edit';
 }
 
 class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
