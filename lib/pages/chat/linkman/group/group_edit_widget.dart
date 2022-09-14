@@ -17,10 +17,6 @@ final List<ColumnFieldDef> groupColumnFieldDefs = [
       inputType: InputType.label,
       prefixIcon: const Icon(Icons.perm_identity)),
   ColumnFieldDef(
-      name: 'groupOwnerPeerId',
-      label: 'groupOwnerPeerId',
-      prefixIcon: const Icon(Icons.accessibility)),
-  ColumnFieldDef(
       name: 'name', label: 'name', prefixIcon: const Icon(Icons.person)),
   ColumnFieldDef(
       name: 'alias',
@@ -30,10 +26,6 @@ final List<ColumnFieldDef> groupColumnFieldDefs = [
       name: 'myAlias',
       label: 'myAlias',
       prefixIcon: const Icon(Icons.person_pin)),
-  ColumnFieldDef(
-      name: 'description',
-      label: 'description',
-      prefixIcon: const Icon(Icons.note)),
 ];
 
 ///群的编辑界面，改变群拥有者，增减群成员，改变群的名称
@@ -62,6 +54,7 @@ class GroupEditWidget extends StatefulWidget with TileDataMixin {
 
 class _GroupEditWidgetState extends State<GroupEditWidget> {
   List<String> groupMembers = [];
+  List<S2Choice<String>> groupOwnerChoices = [];
   Group? group;
 
   @override
@@ -87,6 +80,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
           groupMembers.add(member.memberPeerId!);
         }
       }
+      _buildGroupOwnerChoices();
     }
   }
 
@@ -220,10 +214,80 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     );
   }
 
+  _buildGroupOwnerChoices() async {
+    for (String groupMemberId in groupMembers) {
+      Linkman? linkman =
+          await linkmanService.findCachedOneByPeerId(groupMemberId);
+      if (linkman != null) {
+        S2Choice<String> item =
+            S2Choice<String>(value: linkman.peerId, title: linkman.name);
+        groupOwnerChoices.add(item);
+      }
+    }
+  }
+
+  //群主选择界面
+  Widget _buildGroupOwnerWidget(BuildContext context) {
+    return SmartSelect<String>.single(
+      title: 'GroupOwnerPeer',
+      placeholder: 'Select one linkman',
+      selectedValue: group!.groupOwnerPeerId!,
+      onChange: (selected) => setState(() {
+        group!.groupOwnerPeerId = selected.value;
+        _buildGroupOwnerChoices();
+      }),
+      choiceItems: groupOwnerChoices,
+      modalType: S2ModalType.bottomSheet,
+      modalConfig: S2ModalConfig(
+        type: S2ModalType.bottomSheet,
+        useFilter: false,
+        style: S2ModalStyle(
+          backgroundColor: Colors.grey.withOpacity(0.5),
+        ),
+        headerStyle: S2ModalHeaderStyle(
+          elevation: 0,
+          centerTitle: false,
+          backgroundColor: appDataProvider.themeData.colorScheme.primary,
+          textStyle: const TextStyle(color: Colors.white),
+        ),
+      ),
+      choiceStyle: S2ChoiceStyle(
+        opacity: 0.5,
+        elevation: 0,
+        //titleStyle: const TextStyle(color: Colors.white),
+        color: appDataProvider.themeData.colorScheme.primary,
+      ),
+      tileBuilder: (context, state) {
+        return S2Tile.fromState(
+          state,
+          isTwoLine: true,
+          leading: const Icon(Icons.person_add_alt),
+          body: S2TileChips(
+            chipLength: state.selected.length,
+            chipLabelBuilder: (context, i) {
+              return Text(state.selected.title![i]);
+            },
+            chipOnDelete: (i) {
+              setState(() {
+                groupMembers.removeAt(i);
+                groupOwnerChoices.removeAt(i);
+              });
+            },
+            chipColor: appDataProvider.themeData.colorScheme.primary,
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildGroupEdit(BuildContext context) {
     return Column(
       children: [
         _buildGroupMembersWidget(context),
+        const SizedBox(
+          height: 5,
+        ),
+        _buildGroupOwnerWidget(context),
         const SizedBox(
           height: 5,
         ),
