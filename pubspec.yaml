@@ -83,7 +83,7 @@ dependencies:
   animated_bottom_navigation_bar: ^0.3.2
   fluro: ^2.0.3
   flutter_multi_formatter: ^2.5.1
-  flutter_awesome_select: ^6.3.0
+  flutter_awesome_select: ^6.5.0
   phone_number: ^0.12.0+2
   #sim_info: ^0.1.3
   phone_form_field: ^6.1.0

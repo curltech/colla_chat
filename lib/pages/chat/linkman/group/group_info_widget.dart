@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
@@ -13,7 +14,6 @@ import '../../../../../widgets/common/app_bar_view.dart';
 import '../../../../../widgets/common/widget_mixin.dart';
 import '../../../../entity/chat/contact.dart';
 import '../../../../l10n/localization.dart';
-import '../../../../provider/data_list_controller.dart';
 import 'group_edit_widget.dart';
 
 final List<String> groupFields = [
@@ -31,11 +31,10 @@ final List<String> groupFields = [
 
 //群信息页面
 class GroupInfoWidget extends StatefulWidget with TileDataMixin {
-  final DataListController<Group> controller;
   late final GroupEditWidget groupEditWidget;
 
-  GroupInfoWidget({Key? key, required this.controller}) : super(key: key) {
-    groupEditWidget = GroupEditWidget(controller: controller);
+  GroupInfoWidget({Key? key}) : super(key: key) {
+    groupEditWidget = GroupEditWidget();
     indexWidgetProvider.define(groupEditWidget);
   }
 
@@ -61,8 +60,8 @@ class _GroupInfoWidgetState extends State<GroupInfoWidget> {
   @override
   initState() {
     super.initState();
-    widget.controller.addListener(_update);
-    group = widget.controller.current;
+    groupController.addListener(_update);
+    group = groupController.current;
   }
 
   _update() {
@@ -175,7 +174,7 @@ class _GroupInfoWidgetState extends State<GroupInfoWidget> {
 
   @override
   void dispose() {
-    widget.controller.removeListener(_update);
+    groupController.removeListener(_update);
     super.dispose();
   }
 }

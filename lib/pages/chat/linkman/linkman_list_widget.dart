@@ -54,11 +54,12 @@ final List<AppBarPopupMenu> appBarPopupMenus = [
       }),
 ];
 
+final DataListController<Linkman> linkmanController =
+    DataListController<Linkman>();
+final DataListController<Group> groupController = DataListController<Group>();
+
 //联系人查询页面，带有回退回调函数
 class LinkmanListWidget extends StatefulWidget with TileDataMixin {
-  final DataListController<Linkman> linkmanController =
-      DataListController<Linkman>();
-  final DataListController<Group> groupController = DataListController<Group>();
   final GroupDataListController groupDataListController =
       GroupDataListController();
   late final List<Widget> rightWidgets;
@@ -67,7 +68,7 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
   late final P2pLinkmanAddWidget p2pLinkmanAddWidget;
 
   LinkmanListWidget({Key? key}) : super(key: key) {
-    linkmanInfoWidget = LinkmanInfoWidget(controller: linkmanController);
+    linkmanInfoWidget = LinkmanInfoWidget();
     indexWidgetProvider.define(linkmanInfoWidget);
     rightWidgets = [
       IconButton(
@@ -87,7 +88,7 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
           tooltip: AppLocalizations.t('Delete')),
     ];
 
-    groupInfoWidget = GroupInfoWidget(controller: groupController);
+    groupInfoWidget = GroupInfoWidget();
     indexWidgetProvider.define(groupInfoWidget);
 
     p2pLinkmanAddWidget = P2pLinkmanAddWidget();
@@ -114,8 +115,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
   @override
   initState() {
     super.initState();
-    widget.linkmanController.addListener(_update);
-    widget.groupController.addListener(_update);
+    linkmanController.addListener(_update);
+    groupController.addListener(_update);
     _buildGroupDataListController();
   }
 
@@ -125,9 +126,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
 
   _search(String key) async {
     List<Linkman> linkmen = await linkmanService.search(key);
-    widget.linkmanController.replaceAll(linkmen);
+    linkmanController.replaceAll(linkmen);
     List<Group> groups = await groupService.search(key);
-    widget.groupController.replaceAll(groups);
+    groupController.replaceAll(groups);
   }
 
   _buildSearchTextField(BuildContext context) {
@@ -155,7 +156,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
   }
 
   _buildGroupDataListController() {
-    var linkmen = widget.linkmanController.data;
+    var linkmen = linkmanController.data;
     List<TileData> tiles = [];
     if (linkmen.isNotEmpty) {
       for (var linkman in linkmen) {
@@ -172,7 +173,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
     var keyTile = TileData(title: 'Linkman');
     widget.groupDataListController.add(keyTile, tiles);
 
-    var groups = widget.groupController.data;
+    var groups = groupController.data;
     tiles = [];
     if (groups.isNotEmpty) {
       for (var group in groups) {
@@ -193,10 +194,10 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
   _onTap(int index, String title, {TileData? group}) {
     if (group != null) {
       if (group.title == 'Linkman') {
-        widget.linkmanController.currentIndex = index;
+        linkmanController.currentIndex = index;
       }
       if (group.title == 'Group') {
-        widget.groupController.currentIndex = index;
+        groupController.currentIndex = index;
       }
     }
   }
@@ -221,8 +222,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
 
   @override
   void dispose() {
-    widget.linkmanController.removeListener(_update);
-    widget.groupController.removeListener(_update);
+    linkmanController.removeListener(_update);
+    groupController.removeListener(_update);
     super.dispose();
   }
 }

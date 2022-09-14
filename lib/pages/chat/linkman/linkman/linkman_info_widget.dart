@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
@@ -13,16 +14,14 @@ import '../../../../../widgets/common/app_bar_view.dart';
 import '../../../../../widgets/common/widget_mixin.dart';
 import '../../../../entity/chat/contact.dart';
 import '../../../../l10n/localization.dart';
-import '../../../../provider/data_list_controller.dart';
 import 'linkman_edit_widget.dart';
 
 //联系人信息页面
 class LinkmanInfoWidget extends StatefulWidget with TileDataMixin {
-  final DataListController<Linkman> controller;
   late final LinkmanEditWidget linkmanEditWidget;
 
-  LinkmanInfoWidget({Key? key, required this.controller}) : super(key: key) {
-    linkmanEditWidget = LinkmanEditWidget(controller: controller);
+  LinkmanInfoWidget({Key? key}) : super(key: key) {
+    linkmanEditWidget = LinkmanEditWidget();
     indexWidgetProvider.define(linkmanEditWidget);
   }
 
@@ -48,8 +47,8 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
   @override
   initState() {
     super.initState();
-    widget.controller.addListener(_update);
-    linkman = widget.controller.current;
+    linkmanController.addListener(_update);
+    linkman = linkmanController.current;
   }
 
   _update() {
@@ -140,12 +139,11 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
   }
 
   Widget _buildActionCard(BuildContext context) {
-    Linkman? linkman = widget.controller.current;
     List<Widget> actionWidgets = [];
     double height = 180;
     final List<ActionData> actionData = [];
     if (linkman != null) {
-      if (linkman.status == LinkmanStatus.friend.name) {
+      if (linkman!.status == LinkmanStatus.friend.name) {
         actionData.add(
           ActionData(
               label: 'Remove friend',
@@ -157,7 +155,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
       } else {
         actionWidgets.add(_buildAddFriendTextField(context));
       }
-      if (linkman.status == LinkmanStatus.blacklist.name) {
+      if (linkman!.status == LinkmanStatus.blacklist.name) {
         actionData.add(
           ActionData(
               label: 'Remove blacklist',
@@ -174,7 +172,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
               _changeStatus(LinkmanStatus.blacklist);
             }));
       }
-      if (linkman.status == LinkmanStatus.blacklist.name) {
+      if (linkman!.status == LinkmanStatus.blacklist.name) {
         actionData.add(
           ActionData(
               label: 'Remove subscript',
@@ -220,7 +218,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
 
   @override
   void dispose() {
-    widget.controller.removeListener(_update);
+    linkmanController.removeListener(_update);
     super.dispose();
   }
 }

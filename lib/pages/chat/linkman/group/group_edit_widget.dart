@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/contact.dart';
@@ -30,11 +31,10 @@ final List<ColumnFieldDef> groupColumnFieldDefs = [
 
 ///群的编辑界面，改变群拥有者，增减群成员，改变群的名称
 class GroupEditWidget extends StatefulWidget with TileDataMixin {
-  final DataListController<Group> controller;
   final DataListController<Linkman> linkmenController =
       DataListController<Linkman>();
 
-  GroupEditWidget({Key? key, required this.controller}) : super(key: key);
+  GroupEditWidget({Key? key}) : super(key: key);
 
   @override
   Icon get icon => const Icon(Icons.group_add);
@@ -60,9 +60,9 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
   @override
   initState() {
     super.initState();
-    widget.controller.addListener(_update);
+    groupController.addListener(_update);
     widget.linkmenController.addListener(_update);
-    group = widget.controller.current;
+    group = groupController.current;
     _init();
   }
 
@@ -80,7 +80,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
           groupMembers.add(member.memberPeerId!);
         }
       }
-      _buildGroupOwnerChoices();
+      await _buildGroupOwnerChoices();
     }
   }
 
@@ -91,7 +91,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
   //群信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
     Map<String, dynamic>? initValues =
-        widget.controller.getInitValue(groupColumnFieldDefs);
+    groupController.getInitValue(groupColumnFieldDefs);
 
     var formInputWidget = SingleChildScrollView(
         child: Container(
@@ -170,6 +170,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
       selectedValue: groupMembers,
       onChange: (selected) => setState(() {
         groupMembers = selected.value;
+        _buildGroupOwnerChoices();
       }),
       choiceItems: choiceItems,
       modalType: S2ModalType.bottomSheet,
@@ -205,6 +206,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
             chipOnDelete: (i) {
               setState(() {
                 groupMembers.removeAt(i);
+                _buildGroupOwnerChoices();
               });
             },
             chipColor: appDataProvider.themeData.colorScheme.primary,
@@ -214,27 +216,36 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
     );
   }
 
+  //groupMembers变化后重新更新groupOwnerChoices
   _buildGroupOwnerChoices() async {
-    for (String groupMemberId in groupMembers) {
-      Linkman? linkman =
-          await linkmanService.findCachedOneByPeerId(groupMemberId);
-      if (linkman != null) {
-        S2Choice<String> item =
-            S2Choice<String>(value: linkman.peerId, title: linkman.name);
-        groupOwnerChoices.add(item);
+    groupOwnerChoices.clear();
+    if (groupMembers.isNotEmpty) {
+      for (String groupMemberId in groupMembers) {
+        Linkman? linkman =
+            await linkmanService.findCachedOneByPeerId(groupMemberId);
+        if (linkman != null) {
+          S2Choice<String> item =
+              S2Choice<String>(value: linkman.peerId, title: linkman.name);
+          groupOwnerChoices.add(item);
+        }
       }
     }
   }
 
   //群主选择界面
   Widget _buildGroupOwnerWidget(BuildContext context) {
+    String selectedValue = '';
+    if (group != null && group!.groupOwnerPeerId != null) {
+      selectedValue = group!.groupOwnerPeerId!;
+    }
     return SmartSelect<String>.single(
       title: 'GroupOwnerPeer',
       placeholder: 'Select one linkman',
-      selectedValue: group!.groupOwnerPeerId!,
+      selectedValue: selectedValue,
       onChange: (selected) => setState(() {
-        group!.groupOwnerPeerId = selected.value;
-        _buildGroupOwnerChoices();
+        if (group != null) {
+          group!.groupOwnerPeerId = selected.value;
+        }
       }),
       choiceItems: groupOwnerChoices,
       modalType: S2ModalType.bottomSheet,
@@ -269,8 +280,9 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
             },
             chipOnDelete: (i) {
               setState(() {
-                groupMembers.removeAt(i);
-                groupOwnerChoices.removeAt(i);
+                if (i < groupOwnerChoices.length) {
+                  groupOwnerChoices.removeAt(i);
+                }
               });
             },
             chipColor: appDataProvider.themeData.colorScheme.primary,
@@ -307,7 +319,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
 
   @override
   void dispose() {
-    widget.controller.removeListener(_update);
+    groupController.removeListener(_update);
     widget.linkmenController.removeListener(_update);
     super.dispose();
   }

@@ -1,4 +1,4 @@
-import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../../widgets/common/app_bar_view.dart';
@@ -37,9 +37,7 @@ final List<ColumnFieldDef> linkmanColumnFieldDefs = [
 
 //联系人编辑组件，加减联系人好友，黑名单，订阅，改变联系人的名称
 class LinkmanEditWidget extends StatefulWidget with TileDataMixin {
-  final DataListController<Linkman> controller;
-
-  LinkmanEditWidget({Key? key, required this.controller}) : super(key: key);
+  LinkmanEditWidget({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _LinkmanEditWidgetState();
@@ -63,8 +61,8 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
   @override
   initState() {
     super.initState();
-    linkman = widget.controller.current;
-    widget.controller.addListener(_update);
+    linkman = linkmanController.current;
+    linkmanController.addListener(_update);
   }
 
   _update() {
@@ -73,7 +71,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
 
   Widget _buildFormInputWidget(BuildContext context) {
     Map<String, dynamic>? initValues =
-        widget.controller.getInitValue(linkmanColumnFieldDefs);
+        linkmanController.getInitValue(linkmanColumnFieldDefs);
 
     var formInputWidget = Container(
         padding: const EdgeInsets.all(15.0),
@@ -107,7 +105,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
 
   @override
   void dispose() {
-    widget.controller.removeListener(_update);
+    linkmanController.removeListener(_update);
     super.dispose();
   }
 }
