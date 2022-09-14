@@ -1,3 +1,4 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:flutter/material.dart';
 
 class WidgetUtil {
@@ -30,6 +31,7 @@ class WidgetUtil {
     double? iconSize,
     EdgeInsetsGeometry padding = EdgeInsets.zero,
     required String text,
+    String? tooltip,
     Color? textColor,
     required Widget icon,
   }) {
@@ -42,12 +44,12 @@ class WidgetUtil {
             ),
           ),
           child: IconButton(
-            onPressed: onPressed,
-            padding: padding,
-            color: iconColor,
-            iconSize: iconSize,
-            icon: icon,
-          ),
+              onPressed: onPressed,
+              padding: padding,
+              color: iconColor,
+              iconSize: iconSize,
+              icon: icon,
+              tooltip: tooltip != null ? AppLocalizations.t(tooltip) : ''),
         ),
         const SizedBox(height: 3.0),
         Text(

@@ -18,6 +18,7 @@ class ActionData {
   final ActionType actionType;
   Widget icon;
   Widget? disableIcon;
+  String? tooltip;
   dynamic initValue;
 
   //是否在enable和disable之间切换
@@ -30,6 +31,7 @@ class ActionData {
       this.initValue,
       required this.icon,
       this.disableIcon,
+      this.tooltip,
       this.switchEnable = false,
       this.onTap});
 }
@@ -67,6 +69,7 @@ class DataActionCard extends StatelessWidget {
           }
         },
         text: actionData.label,
+        tooltip: actionData.tooltip,
         textColor: Colors.black,
         icon: actionData.icon);
   }

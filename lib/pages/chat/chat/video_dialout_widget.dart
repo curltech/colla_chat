@@ -27,14 +27,26 @@ import 'controller/local_media_controller.dart';
 ///8.如果发起方在接收回执到来前，自己主动终止请求，执行挂断操作，设置挂断标志，对远程流不予接受
 
 final List<ActionData> actionData = [
-  ActionData(label: '视频通话', icon: const Icon(Icons.video_call)),
-  ActionData(label: '音频通话', icon: const Icon(Icons.multitrack_audio_outlined)),
-  ActionData(label: '屏幕共享', icon: const Icon(Icons.screen_share)),
-  ActionData(label: '媒体播放', icon: const Icon(Icons.video_file)),
-  ActionData(label: '镜头切换', icon: const Icon(Icons.cameraswitch)),
-  ActionData(label: '显示背景', icon: const Icon(Icons.photo_camera_back)),
-  ActionData(label: '麦克风开关', icon: const Icon(Icons.mic_rounded)),
-  ActionData(label: '扬声器开关', icon: const Icon(Icons.speaker_phone)),
+  ActionData(
+      label: '视频通话', tooltip: '视频通话', icon: const Icon(Icons.video_call)),
+  ActionData(
+      label: '音频通话',
+      tooltip: '音频通话',
+      icon: const Icon(Icons.multitrack_audio_outlined)),
+  ActionData(
+      label: '屏幕共享', tooltip: '屏幕共享', icon: const Icon(Icons.screen_share)),
+  ActionData(
+      label: '媒体播放', tooltip: '媒体播放', icon: const Icon(Icons.video_file)),
+  ActionData(
+      label: '镜头切换', tooltip: '镜头切换', icon: const Icon(Icons.cameraswitch)),
+  ActionData(
+      label: '显示背景',
+      tooltip: '显示背景',
+      icon: const Icon(Icons.photo_camera_back)),
+  ActionData(
+      label: '麦克风开关', tooltip: '麦克风开关', icon: const Icon(Icons.mic_rounded)),
+  ActionData(
+      label: '扬声器开关', tooltip: '扬声器开关', icon: const Icon(Icons.speaker_phone)),
 ];
 
 ///视频通话拨出的窗口
@@ -183,7 +195,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
     setState(() {});
   }
 
-  Future<void> _onAction(int index, String name,{String? value}) async {
+  Future<void> _onAction(int index, String name, {String? value}) async {
     switch (index) {
       case 0:
         _open(videoMedia: true);
@@ -219,7 +231,8 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
       child: DataActionCard(
         actions: actionData,
         height: height,
-        onPressed: _onAction, crossAxisCount: 4,
+        onPressed: _onAction,
+        crossAxisCount: 4,
       ),
     );
   }
