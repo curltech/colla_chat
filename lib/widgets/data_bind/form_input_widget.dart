@@ -1,3 +1,4 @@
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -159,18 +160,49 @@ class FormInputWidget extends StatelessWidget {
     children.add(const SizedBox(
       height: 30.0,
     ));
+    ButtonStyle style = ButtonStyle(
+      backgroundColor: MaterialStateProperty.all(Colors.grey),
+      shape: MaterialStateProperty.all(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+      ),
+      padding: MaterialStateProperty.all(
+          const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0)),
+      minimumSize: MaterialStateProperty.all(const Size(50, 0)),
+      maximumSize: MaterialStateProperty.all(const Size(90.0, 36.0)),
+    );
     children.add(Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15.0),
       child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
         TextButton(
-          child: Text(AppLocalizations.t('Ok')),
+          style: style,
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Text(AppLocalizations.t('OK')),
+            const SizedBox(
+              width: 5,
+            ),
+            Icon(Icons.check,
+                color: appDataProvider.themeData.colorScheme.primary)
+          ]),
           onPressed: () {
             var values = controller.getValues();
             onOk(values);
           },
         ),
+        const SizedBox(
+          width: 15,
+        ),
         TextButton(
-          child: Text(AppLocalizations.t('Reset')),
+          style: style,
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Text(AppLocalizations.t('Reset')),
+            const SizedBox(
+              width: 5,
+            ),
+            const Icon(Icons.clear,
+                color: Colors.red)
+          ]),
           onPressed: () {
             controller.clear();
           },

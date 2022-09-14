@@ -45,21 +45,22 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
   }
 
   Widget _buildLogout(BuildContext context) {
+    ButtonStyle style= ButtonStyle(
+      backgroundColor: MaterialStateProperty.all(Colors.grey),
+      shape: MaterialStateProperty.all(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+      ),
+      padding: MaterialStateProperty.all(
+          const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0)),
+      minimumSize: MaterialStateProperty.all(const Size(50, 0)),
+      maximumSize: MaterialStateProperty.all(const Size(375.0, 36.0)),
+    );
     var indexWidgetProvider =
         Provider.of<IndexWidgetProvider>(context, listen: false);
     return TextButton(
-        style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all(Colors.grey),
-          shape: MaterialStateProperty.all(
-            RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8.0),
-            ),
-          ),
-          padding: MaterialStateProperty.all(
-              const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0)),
-          minimumSize: MaterialStateProperty.all(const Size(300, 0)),
-          maximumSize: MaterialStateProperty.all(const Size(375.0, 36.0)),
-        ),
+        style: style,
         onPressed: () {
           myselfPeerService.logout();
           indexWidgetProvider.pop(context: context);

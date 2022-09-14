@@ -35,7 +35,7 @@ class LinkmanInfoWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  Icon get icon => const Icon(Icons.desktop_windows);
+  Icon get icon => const Icon(Icons.person);
 
   @override
   String get title => 'Linkman Info';
