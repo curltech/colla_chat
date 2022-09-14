@@ -91,7 +91,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
   //群信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
     Map<String, dynamic>? initValues =
-    groupController.getInitValue(groupColumnFieldDefs);
+        groupController.getInitValue(groupColumnFieldDefs);
 
     var formInputWidget = SingleChildScrollView(
         child: Container(
@@ -279,11 +279,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
               return Text(state.selected.title![i]);
             },
             chipOnDelete: (i) {
-              setState(() {
-                if (i < groupOwnerChoices.length) {
-                  groupOwnerChoices.removeAt(i);
-                }
-              });
+              setState(() {});
             },
             chipColor: appDataProvider.themeData.colorScheme.primary,
           ),
