@@ -108,7 +108,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
   }
 
   ///通过peerclient增加或者修改
-  Future<void> storeByPeerClient(PeerClient peerClient,
+  Future<Linkman> storeByPeerClient(PeerClient peerClient,
       {LinkmanStatus? linkmanStatus}) async {
     Linkman? linkman = await findCachedOneByPeerId(peerClient.peerId);
     if (linkman == null) {
@@ -129,6 +129,8 @@ class LinkmanService extends PeerPartyService<Linkman> {
       linkmen[linkman.peerId] = linkman;
       await chatSummaryService.upsertByLinkman(linkman);
     }
+
+    return linkman;
   }
 
   addFriend(Linkman linkman, String title) async {

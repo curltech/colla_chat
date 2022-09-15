@@ -1,3 +1,4 @@
+import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -93,9 +94,12 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
               suffix: IconButton(
                 iconSize: 24.0,
                 icon: const Icon(Icons.add),
-                onPressed: () {
+                onPressed: () async {
                   logger.i('add peerClient:$subtitle as linkman');
-                  linkmanService.storeByPeerClient(peerClient);
+                  Linkman linkman =
+                      await linkmanService.storeByPeerClient(peerClient);
+                  await linkmanService.update(
+                      {'id': linkman.id, 'status': LinkmanStatus.friend.name});
                 },
               ));
           tiles.add(tile);
