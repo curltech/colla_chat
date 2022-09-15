@@ -1,9 +1,12 @@
 import 'package:colla_chat/crypto/cryptography.dart';
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/base.dart';
+import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/contact_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as flutter_contacts;
 
@@ -127,6 +130,18 @@ class LinkmanService extends PeerPartyService<Linkman> {
       await chatSummaryService.upsertByLinkman(linkman);
     }
   }
+
+  addFriend(Linkman linkman, String title) async {
+    // 加好友会发送自己的信息，回执将收到对方的信息
+    String json = JsonUtil.toJsonString(myself.myselfPeer);
+    List<int> data = CryptoUtil.stringToUtf8(json);
+    ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+        linkman.peerId,
+        data: data,
+        subMessageType: ChatSubMessageType.addFriend,
+        title: title);
+    await chatMessageService.send(chatMessage);
+  }
 }
 
 final linkmanService = LinkmanService(
@@ -239,7 +254,7 @@ class GroupService extends PeerPartyService<Group> {
     await upsert(group);
     groups[group.peerId];
     await chatSummaryService.upsertByGroup(group);
-    List<PeerParty> members = group.members;
+    List<PeerParty> members = group.memberPeers;
     if (members.isNotEmpty) {
       for (var member in members) {
         GroupMember groupMember = GroupMember();
@@ -261,6 +276,101 @@ class GroupService extends PeerPartyService<Group> {
       orderBy: 'pyName',
     );
     return groups;
+  }
+
+  addGroup(Group group) async {
+    String json = JsonUtil.toJsonString(group);
+    List<int> data = CryptoUtil.stringToUtf8(json);
+    List<ChatMessage> chatMessages =
+        await chatMessageService.buildGroupChatMessage(
+      group.peerId,
+      data: data,
+      subMessageType: ChatSubMessageType.addGroup,
+    );
+    for (var chatMessage in chatMessages) {
+      await chatMessageService.send(chatMessage);
+    }
+  }
+
+  modifyGroup(Group group) async {
+    String json = JsonUtil.toJsonString(group);
+    List<int> data = CryptoUtil.stringToUtf8(json);
+    List<ChatMessage> chatMessages =
+        await chatMessageService.buildGroupChatMessage(
+      group.peerId,
+      data: data,
+      subMessageType: ChatSubMessageType.modifyGroup,
+    );
+    for (var chatMessage in chatMessages) {
+      await chatMessageService.send(chatMessage);
+    }
+  }
+
+  dismissGroup(Group group) async {
+    await groupMemberService.delete({
+      'groupId': group.id,
+    });
+    await groupService.delete({
+      'groupId': group.id,
+    });
+    await chatMessageService.delete({
+      'receiverPeerId': group.id,
+    });
+    await chatMessageService.delete({
+      'senderPeerId': group.id,
+    });
+    await chatSummaryService.delete({
+      'peerId': group.id,
+    });
+    List<ChatMessage> chatMessages =
+        await chatMessageService.buildGroupChatMessage(
+      group.peerId,
+      title: group.peerId,
+      subMessageType: ChatSubMessageType.dismissGroup,
+    );
+    for (var chatMessage in chatMessages) {
+      await chatMessageService.send(chatMessage);
+    }
+  }
+
+  addGroupMember(String groupId, List<GroupMember> groupMembers) async {
+    String json = JsonUtil.toJsonString(groupMembers);
+    List<int> data = CryptoUtil.stringToUtf8(json);
+    List<ChatMessage> chatMessages =
+        await chatMessageService.buildGroupChatMessage(
+      groupId,
+      data: data,
+      subMessageType: ChatSubMessageType.addGroupMember,
+    );
+    for (var chatMessage in chatMessages) {
+      await chatMessageService.send(chatMessage);
+    }
+  }
+
+  removeGroupMember(String groupId, List<GroupMember> groupMembers) async {
+    String json = JsonUtil.toJsonString(groupMembers);
+    List<int> data = CryptoUtil.stringToUtf8(json);
+    List<ChatMessage> chatMessages =
+        await chatMessageService.buildGroupChatMessage(
+      groupId,
+      data: data,
+      subMessageType: ChatSubMessageType.removeGroupMember,
+    );
+    for (var chatMessage in chatMessages) {
+      await chatMessageService.send(chatMessage);
+    }
+  }
+
+  groupFile(String groupId, List<int> data) async {
+    List<ChatMessage> chatMessages =
+        await chatMessageService.buildGroupChatMessage(
+      groupId,
+      data: data,
+      subMessageType: ChatSubMessageType.groupFile,
+    );
+    for (var chatMessage in chatMessages) {
+      await chatMessageService.send(chatMessage);
+    }
   }
 }
 

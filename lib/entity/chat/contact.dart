@@ -199,7 +199,9 @@ class Group extends PeerParty {
 
   String? signalPrivateKey;
 
-  List<PeerParty> members = [];
+  List<PeerParty> memberPeers = [];
+
+  List<GroupMember> groupMembers = [];
 
   Group(String peerId, String name) : super(peerId, name);
 

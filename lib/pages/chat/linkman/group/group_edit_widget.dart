@@ -114,9 +114,14 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
       group!.alias = currentGroup.alias;
       group!.mobile = currentGroup.mobile;
       group!.email = currentGroup.email;
-      group!.groupOwnerPeerId = currentGroup.groupOwnerPeerId;
+      if (group!.groupOwnerPeerId != currentGroup.groupOwnerPeerId) {
+        group!.groupOwnerPeerId = currentGroup.groupOwnerPeerId;
+      }
+      await groupService.modifyGroup(group!);
     } else {
+      // 加群
       group = await groupService.createGroup(currentGroup);
+      await groupService.addGroup(group!);
     }
     await groupService.store(group!);
 
@@ -129,6 +134,7 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
         oldMembers[member.memberPeerId!] = member;
       }
     }
+    List<GroupMember> newMembers = [];
     for (var groupMemberId in groupMembers) {
       var member = oldMembers[groupMemberId];
       if (member == null) {
@@ -141,12 +147,15 @@ class _GroupEditWidgetState extends State<GroupEditWidget> {
           groupMember.memberType = MemberType.member.name;
           groupMember.memberAlias = linkman.alias ?? linkman.name;
           groupMemberService.store(groupMember);
+          newMembers.add(groupMember);
         }
       } else {
         oldMembers.remove(groupMemberId);
       }
     }
+    await groupService.addGroupMember(groupId, newMembers);
     if (oldMembers.isNotEmpty) {
+      await groupService.removeGroupMember(groupId, oldMembers.values.toList());
       for (GroupMember member in oldMembers.values) {
         oldMembers[member.memberPeerId!] = member;
         groupMemberService.delete({'id': member.id});

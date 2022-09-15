@@ -72,21 +72,7 @@ class _GroupInfoWidgetState extends State<GroupInfoWidget> {
     if (group == null) {
       return;
     }
-    await groupMemberService.delete({
-      'groupId': group!.id,
-    });
-    await groupService.delete({
-      'groupId': group!.id,
-    });
-    await chatMessageService.delete({
-      'receiverPeerId': group!.id,
-    });
-    await chatMessageService.delete({
-      'senderPeerId': group!.id,
-    });
-    await chatSummaryService.delete({
-      'peerId': group!.id,
-    });
+    groupService.dismissGroup(group!);
   }
 
   //显示群基本信息

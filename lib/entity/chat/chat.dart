@@ -1,9 +1,5 @@
 import '../base.dart';
 
-/// 聊天的定义
-
-var period = 300; //5m
-
 enum ContentType {
   rich, // 根据场景包含类型不同，如非系统类型、可搜索类型等
   image,
@@ -42,36 +38,19 @@ enum ChatMessageType {
 }
 
 enum ChatSubMessageType {
-  addLinkman, // 新增联系人请求
-  addLinkmanReply, // 新增联系人请求的回复
-  syncLinkmanInfo, // 联系人基本信息同步
-  removeLinkman, // 从好友中删除
-  removeLinkmanReceipt, // 删除好友通知回复
-  blackLinkman, // 加入黑名单
-  blackLinkmanReceipt, // 加入黑名单通知回复
-  unblackLinkman, // 从黑名单中移除
-  unblackLinkmanReceipt, // 移除黑名单通知回复
-  // 联系人请求
-  addGroup, // 新增群聊请求
-  addGroupReceipt, // 新增群聊请求接收回复
-  dismissGroup, // 解散群聊请求
-  dismissGroupReceipt, // 解散群聊请求接收回复
-  modifyGroup, // 修改群聊请求
-  modifyGroupReceipt, // 修改群聊请求接收回复
-  modifyGroupOwner, // 修改群主请求
-  modifyGroupOwnerReceipt, // 修改群主请求接收回复
-  addGroupMember, // 新增群聊成员请求
-  addGroupMemberReceipt, // 新增群聊成员请求接收回复
-  removeGroupMember, // 删除群聊成员请求
-  removeGroupMemberReceipt, // 删除群聊成员请求接收回复
-  // 聊天
+  addFriend, // 加好友请求
+  addGroup, // 新建群聊
+  dismissGroup, // 解散群聊
+  modifyGroup, // 修改群信息
+  addGroupMember, // 新增群聊成员
+  removeGroupMember, // 删除群聊成员
   chat, // 联系人发送聊天消息
   chatSystem, // 系统预定义聊天消息，如群聊动态通知
-  videoChat,
-  deleteChat,
-  chatReceipt, // 接收回复
-  groupFile,
-  //system消息
+  videoChat, // 视频聊天
+  deleteChat, // 删除聊天
+  chatReceipt, // 聊天回复
+  groupFile, // 群文件
+  // 以下system消息，不在聊天界面显示
   signal, //webrtc signal消息，一般用于重新协商的情况
   preKeyBundle, //signal加解密
 }
@@ -130,7 +109,7 @@ class ChatMessage extends StatusEntity {
   String? thumbnail; // 预览缩略图（base64图片，适用需预览的content，如笔记、联系人名片）
   String? content; // 消息内容
   String? contentType;
-  String? deleteTime;
+  int? deleteTime = 0; // 阅读后的删除时间，秒数，0表示不删除
   bool needCompress = true;
   bool needEncrypt = true;
   bool needReceipt = false;

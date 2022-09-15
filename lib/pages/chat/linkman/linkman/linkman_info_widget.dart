@@ -96,13 +96,11 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
   }
 
   _changeFriend({String? tip}) async {
+    linkman!.status = LinkmanStatus.friend.name;
     await linkmanService
         .update({'id': linkman!.id, 'status': LinkmanStatus.friend.name});
-    ChatMessage chatMessage = await chatMessageService.buildChatMessage(
-        linkman!.peerId,
-        subMessageType: ChatSubMessageType.addLinkman,
-        title: tip);
-    await chatMessageService.send(chatMessage);
+    // 加好友会发送自己的信息，回执将收到对方的信息
+    await linkmanService.addFriend(linkman!, tip!);
   }
 
   _changeStatus(LinkmanStatus status) async {
