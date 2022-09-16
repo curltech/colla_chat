@@ -126,7 +126,7 @@ class ChatMessageItem extends StatelessWidget {
               Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text('${chatMessage.id}'),
+                    Text('${chatMessage.id}:${chatMessage.senderName}'),
                     buildMessageContainer(context,
                         content: content,
                         contentType: contentType,
@@ -163,7 +163,7 @@ class ChatMessageItem extends StatelessWidget {
               Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text('${chatMessage.id}'),
+                    Text('${chatMessage.id}:${chatMessage.receiverName}'),
                     buildMessageContainer(context,
                         content: content,
                         contentType: contentType,
