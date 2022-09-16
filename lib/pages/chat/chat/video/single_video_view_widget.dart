@@ -4,8 +4,8 @@ import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 
-import '../../../transport/webrtc/peer_video_render.dart';
-import 'controller/peer_connections_controller.dart';
+import '../../../../transport/webrtc/peer_video_render.dart';
+import '../controller/peer_connections_controller.dart';
 
 final List<ActionData> actionData = [
   ActionData(label: '镜头切换', icon: const Icon(Icons.cameraswitch)),

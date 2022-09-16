@@ -1,4 +1,4 @@
-import 'package:colla_chat/pages/chat/chat/video_dialin_widget.dart';
+import 'package:colla_chat/pages/chat/chat/video/video_dialin_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';

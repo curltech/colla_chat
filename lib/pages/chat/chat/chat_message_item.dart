@@ -7,8 +7,8 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:flutter/material.dart';
 
 import '../../../entity/chat/chat.dart';
-import 'action_message.dart';
-import 'extended_text_message.dart';
+import 'message/action_message.dart';
+import 'message/extended_text_message.dart';
 
 /// 每条消息展示组件，我接收的消息展示在左边，我发送的消息展示在右边
 class ChatMessageItem extends StatelessWidget {

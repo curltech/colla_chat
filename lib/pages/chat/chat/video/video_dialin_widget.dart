@@ -1,18 +1,18 @@
+import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
 import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
+import 'package:colla_chat/pages/chat/chat/controller/peer_connections_controller.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/service/chat/chat.dart';
+import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
+import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/widgets/common/image_widget.dart';
+import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:flutter/material.dart';
 
-import '../../../entity/chat/chat.dart';
-import '../../../plugin/logger.dart';
-import '../../../service/chat/chat.dart';
-import '../../../transport/webrtc/advanced_peer_connection.dart';
-import '../../../transport/webrtc/peer_video_render.dart';
-import '../../../widgets/common/simple_widget.dart';
-import 'chat_message_widget.dart';
-import 'controller/peer_connections_controller.dart';
 
 ///视频通话拨入的对话框
 class VideoDialInWidget extends StatelessWidget {

@@ -1,5 +1,5 @@
-import 'package:colla_chat/pages/chat/chat/video_chat_widget.dart';
-import 'package:colla_chat/pages/chat/chat/video_dialout_widget.dart';
+import 'package:colla_chat/pages/chat/chat/video/video_chat_widget.dart';
+import 'package:colla_chat/pages/chat/chat/video/video_dialout_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:flutter/material.dart';

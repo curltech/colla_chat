@@ -1,20 +1,20 @@
+import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/chat/video_view_card.dart';
+import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
+import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
+import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/widgets/common/blank_widget.dart';
+import 'package:colla_chat/widgets/common/image_widget.dart';
+import 'package:colla_chat/widgets/common/simple_widget.dart';
+import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-import '../../../../entity/chat/chat.dart';
-import '../../../plugin/logger.dart';
-import '../../../transport/webrtc/advanced_peer_connection.dart';
-import '../../../transport/webrtc/base_peer_connection.dart';
-import '../../../transport/webrtc/peer_connection_pool.dart';
-import '../../../widgets/common/image_widget.dart';
-import '../../../widgets/common/simple_widget.dart';
-import '../../../widgets/data_bind/data_action_card.dart';
-import 'chat_message_widget.dart';
-import 'controller/local_media_controller.dart';
 
 ///视频通话的流程
 ///1.发起方发起视频通话请求，激活拨出窗口；
