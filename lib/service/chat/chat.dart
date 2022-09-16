@@ -143,6 +143,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         where: where, whereArgs: whereArgs, orderBy: 'id desc', limit: limit);
   }
 
+  ///接受到普通消息或者回执
   Future<void> receiveChatMessage(ChatMessage chatMessage) async {
     String? subMessageType = chatMessage.subMessageType;
     //收到回执，更新原消息
@@ -156,6 +157,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         logger.e('chatReceipt message has no chatMessage with same messageId');
         return;
       }
+      msg.receiptContent = chatMessage.content;
       msg.receiptTime = chatMessage.receiptTime;
       msg.receiveTime = chatMessage.receiveTime;
       msg.status = chatMessage.status;
@@ -174,9 +176,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     }
   }
 
-  //创建回执，subMessageType为chatReceipt
+  ///接受到普通消息，创建回执，subMessageType为chatReceipt
   Future<ChatMessage?> buildChatReceipt(
-      ChatMessage chatMessage, MessageStatus receiptType) async {
+      ChatMessage chatMessage, MessageStatus receiptType,
+      {List<int>? receiptContent}) async {
     chatMessage.receiptTime = DateUtil.currentDate();
     if (receiptType == MessageStatus.read) {
       chatMessage.readTime = DateUtil.currentDate();
@@ -202,7 +205,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     msg.sendTime = DateUtil.currentDate();
     msg.receiverPeerId = chatMessage.senderPeerId;
     msg.receiverClientId = chatMessage.senderClientId;
-    msg.receiverType = chatMessage.subMessageType;
+    msg.receiverType = chatMessage.senderType;
+    msg.title = chatMessage.subMessageType;
     String? receiverPeerId = chatMessage.senderPeerId;
     if (receiverPeerId == null) {
       logger.e('receiverPeerId is null');
@@ -211,7 +215,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String? senderName = chatMessage.senderName;
     if (senderName == null) {
       PeerClient? peerClient =
-          await peerClientService.findCachedOneByPeerId(receiverPeerId!);
+          await peerClientService.findCachedOneByPeerId(receiverPeerId);
       if (peerClient != null) {
         senderName = peerClient.name;
       }
@@ -222,6 +226,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     msg.status = chatMessage.status;
     msg.readTime = chatMessage.readTime;
     msg.deleteTime = chatMessage.deleteTime;
+    if (receiptContent != null) {
+      msg.receiptContent = CryptoUtil.encodeBase64(receiptContent);
+    }
 
     return msg;
   }
@@ -241,7 +248,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String? groupPeerId,
     String? groupName,
     String? title,
-    List<int>? thumbBody,
+    List<int>? receiptContent,
     List<int>? thumbnail,
     String? status,
   }) async {
@@ -273,8 +280,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.receiverName = name;
     chatMessage.groupPeerId = groupPeerId;
     chatMessage.groupName = groupName;
-    if (thumbBody != null) {
-      chatMessage.thumbBody = CryptoUtil.encodeBase64(thumbBody);
+    if (receiptContent != null) {
+      chatMessage.receiptContent = CryptoUtil.encodeBase64(receiptContent);
     }
     if (thumbnail != null) {
       chatMessage.thumbnail = CryptoUtil.encodeBase64(thumbnail);
@@ -300,7 +307,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     ChatSubMessageType subMessageType = ChatSubMessageType.chat,
     ContentType contentType = ContentType.text,
     String? title,
-    List<int>? thumbBody,
+    List<int>? receiptContent,
     List<int>? thumbnail,
   }) async {
     List<ChatMessage> chatMessages = [];
@@ -318,7 +325,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         groupPeerId: groupPeerId,
         groupName: groupName,
         title: title,
-        thumbBody: thumbBody,
+        receiptContent: receiptContent,
         thumbnail: thumbnail,
       );
       chatMessages.add(groupChatMessage);
@@ -342,7 +349,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         );
         chatMessage.title = groupChatMessage.title;
         chatMessage.content = groupChatMessage.content;
-        chatMessage.thumbBody = groupChatMessage.thumbBody;
+        chatMessage.receiptContent = groupChatMessage.receiptContent;
         chatMessage.thumbnail = groupChatMessage.thumbnail;
         chatMessages.add(chatMessage);
       }
@@ -598,7 +605,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummary.messageType = chatMessage.messageType;
       chatSummary.subMessageType = chatMessage.subMessageType;
       chatSummary.title = chatMessage.title;
-      chatSummary.thumbBody = chatMessage.thumbBody;
+      chatSummary.receiptContent = chatMessage.receiptContent;
       chatSummary.thumbnail = chatMessage.thumbnail;
       chatSummary.content = chatMessage.content;
       chatSummary.contentType = chatMessage.contentType;

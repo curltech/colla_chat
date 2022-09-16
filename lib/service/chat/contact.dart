@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/base.dart';
@@ -143,6 +145,24 @@ class LinkmanService extends PeerPartyService<Linkman> {
         subMessageType: ChatSubMessageType.addFriend,
         title: title);
     await chatMessageService.send(chatMessage);
+  }
+
+  receiveAddFriend(ChatMessage chatMessage, MessageStatus receiptType) async {
+    String json = JsonUtil.toJsonString(myself.myselfPeer);
+    ChatMessage? chatReceipt =
+        await chatMessageService.buildChatReceipt(chatMessage, receiptType);
+    if (receiptType == MessageStatus.accepted) {
+      chatReceipt!.content = json;
+    }
+    await chatMessageService.send(chatReceipt!);
+  }
+
+  receiveAddFriendReceipt(ChatMessage chatReceipt) async {
+    Uint8List data = CryptoUtil.decodeBase64(chatReceipt.content!);
+    String json = CryptoUtil.utf8ToString(data);
+    Map<String, dynamic> map = JsonUtil.toJson(json);
+    PeerClient peerClient = PeerClient.fromJson(map);
+    await linkmanService.storeByPeerClient(peerClient);
   }
 }
 
@@ -294,6 +314,30 @@ class GroupService extends PeerPartyService<Group> {
     }
   }
 
+  receiveAddGroup(ChatMessage chatMessage) async {
+    Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
+    String json = CryptoUtil.utf8ToString(data);
+    Map<String, dynamic> map = JsonUtil.toJson(json);
+    Group group = Group.fromJson(map);
+    groupService.store(group);
+    ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
+        chatMessage, MessageStatus.accepted);
+
+    await chatMessageService.send(chatReceipt!);
+  }
+
+  receiveAddGroupReceipt(ChatMessage chatMessage) async {
+    Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
+    String json = CryptoUtil.utf8ToString(data);
+    Map<String, dynamic> map = JsonUtil.toJson(json);
+    Group group = Group.fromJson(map);
+    groupService.store(group);
+    ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
+        chatMessage, MessageStatus.accepted);
+
+    await chatMessageService.send(chatReceipt!);
+  }
+
   modifyGroup(Group group) async {
     String json = JsonUtil.toJsonString(group);
     List<int> data = CryptoUtil.stringToUtf8(json);
@@ -306,6 +350,30 @@ class GroupService extends PeerPartyService<Group> {
     for (var chatMessage in chatMessages) {
       await chatMessageService.send(chatMessage);
     }
+  }
+
+  receiveModifyGroup(ChatMessage chatMessage) async {
+    Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
+    String json = CryptoUtil.utf8ToString(data);
+    Map<String, dynamic> map = JsonUtil.toJson(json);
+    Group group = Group.fromJson(map);
+    groupService.store(group);
+    ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
+        chatMessage, MessageStatus.accepted);
+
+    await chatMessageService.send(chatReceipt!);
+  }
+
+  receiveModifyGroupReceipt(ChatMessage chatMessage) async {
+    Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
+    String json = CryptoUtil.utf8ToString(data);
+    Map<String, dynamic> map = JsonUtil.toJson(json);
+    Group group = Group.fromJson(map);
+    groupService.store(group);
+    ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
+        chatMessage, MessageStatus.accepted);
+
+    await chatMessageService.send(chatReceipt!);
   }
 
   dismissGroup(Group group) async {
@@ -335,6 +403,32 @@ class GroupService extends PeerPartyService<Group> {
     }
   }
 
+  receiveDismissGroup(ChatMessage chatMessage) async {
+    Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
+    String json = CryptoUtil.utf8ToString(data);
+    Map<String, dynamic> map = JsonUtil.toJson(json);
+    Group group = Group.fromJson(map);
+    await groupMemberService.delete({
+      'groupId': group.id,
+    });
+    await groupService.delete({
+      'groupId': group.id,
+    });
+    await chatMessageService.delete({
+      'receiverPeerId': group.id,
+    });
+    await chatMessageService.delete({
+      'senderPeerId': group.id,
+    });
+    await chatSummaryService.delete({
+      'peerId': group.id,
+    });
+    ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
+        chatMessage, MessageStatus.accepted);
+
+    await chatMessageService.send(chatReceipt!);
+  }
+
   addGroupMember(String groupId, List<GroupMember> groupMembers) async {
     String json = JsonUtil.toJsonString(groupMembers);
     List<int> data = CryptoUtil.stringToUtf8(json);
@@ -347,6 +441,40 @@ class GroupService extends PeerPartyService<Group> {
     for (var chatMessage in chatMessages) {
       await chatMessageService.send(chatMessage);
     }
+  }
+
+  receiveAddGroupMember(ChatMessage chatMessage) async {
+    Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
+    String json = CryptoUtil.utf8ToString(data);
+    List<Map<String, dynamic>> maps = JsonUtil.toJson(json);
+    List<GroupMember> groupMembers = [];
+    for (var map in maps) {
+      GroupMember groupMember = GroupMember.fromJson(map);
+      groupMembers.add(groupMember);
+      groupMemberService.store(groupMember);
+    }
+
+    ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
+        chatMessage, MessageStatus.accepted);
+
+    await chatMessageService.send(chatReceipt!);
+  }
+
+  receiveAddGroupMemberReceipt(ChatMessage chatMessage) async {
+    Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
+    String json = CryptoUtil.utf8ToString(data);
+    List<Map<String, dynamic>> maps = JsonUtil.toJson(json);
+    List<GroupMember> groupMembers = [];
+    for (var map in maps) {
+      GroupMember groupMember = GroupMember.fromJson(map);
+      groupMembers.add(groupMember);
+      groupMemberService.store(groupMember);
+    }
+
+    ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
+        chatMessage, MessageStatus.accepted);
+
+    await chatMessageService.send(chatReceipt!);
   }
 
   removeGroupMember(String groupId, List<GroupMember> groupMembers) async {
@@ -363,6 +491,46 @@ class GroupService extends PeerPartyService<Group> {
     }
   }
 
+  receiveRemoveGroupMember(ChatMessage chatMessage) async {
+    Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
+    String json = CryptoUtil.utf8ToString(data);
+    List<Map<String, dynamic>> maps = JsonUtil.toJson(json);
+    List<GroupMember> groupMembers = [];
+    for (var map in maps) {
+      GroupMember groupMember = GroupMember.fromJson(map);
+      groupMembers.add(groupMember);
+      groupMemberService.delete({
+        'memberPeerId': groupMember.memberPeerId,
+        'groupId': groupMember.groupId
+      });
+    }
+
+    ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
+        chatMessage, MessageStatus.accepted);
+
+    await chatMessageService.send(chatReceipt!);
+  }
+
+  receiveRemoveGroupMemberReceipt(ChatMessage chatMessage) async {
+    Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
+    String json = CryptoUtil.utf8ToString(data);
+    List<Map<String, dynamic>> maps = JsonUtil.toJson(json);
+    List<GroupMember> groupMembers = [];
+    for (var map in maps) {
+      GroupMember groupMember = GroupMember.fromJson(map);
+      groupMembers.add(groupMember);
+      groupMemberService.delete({
+        'memberPeerId': groupMember.memberPeerId,
+        'groupId': groupMember.groupId
+      });
+    }
+
+    ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
+        chatMessage, MessageStatus.accepted);
+
+    await chatMessageService.send(chatReceipt!);
+  }
+
   groupFile(String groupId, List<int> data) async {
     List<ChatMessage> chatMessages =
         await chatMessageService.buildGroupChatMessage(
@@ -373,6 +541,23 @@ class GroupService extends PeerPartyService<Group> {
     for (var chatMessage in chatMessages) {
       await chatMessageService.send(chatMessage);
     }
+  }
+
+  receiveGroupFile(ChatMessage chatMessage) async {
+    Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
+    String json = CryptoUtil.utf8ToString(data);
+    List<Map<String, dynamic>> maps = JsonUtil.toJson(json);
+    List<GroupMember> groupMembers = [];
+    for (var map in maps) {
+      GroupMember groupMember = GroupMember.fromJson(map);
+      groupMembers.add(groupMember);
+      groupMemberService.store(groupMember);
+    }
+
+    ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
+        chatMessage, MessageStatus.accepted);
+
+    await chatMessageService.send(chatReceipt!);
   }
 }
 
