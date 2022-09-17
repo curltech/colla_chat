@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:flutter/material.dart';
 
 import 'extended_text_message_input.dart';
@@ -31,7 +34,10 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   bool voiceVisible = true;
   bool sendVisible = false;
   bool moreVisible = false;
-  bool keyboardVisible = false;
+  bool voiceRecording = false;
+  String voiceRecordText = 'Press recording';
+  Timer? voiceRecordTimer;
+  int timerSecond = 0;
 
   @override
   void initState() {
@@ -49,10 +55,31 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
     );
   }
 
-  Widget _buildTextButton(context) {
+  Widget _buildVoiceRecordButton(context) {
     return TextButton(
-      child: Text(AppLocalizations.t('Press recording')),
-      onPressed: () {},
+      style: WidgetUtil.buildButtonStyle(),
+      child: Text(AppLocalizations.t(voiceRecordText)),
+      onPressed: () {
+        voiceRecording = !voiceRecording;
+        if (voiceRecording) {
+          timerSecond = 0;
+          voiceRecordTimer =
+              Timer.periodic(const Duration(seconds: 1), (timer) {
+            voiceRecordText = Duration(seconds: timerSecond++).toString();
+            setState(() {});
+          });
+          voiceRecordText = '';
+
+        } else {
+          if (voiceRecordTimer != null) {
+            voiceRecordTimer!.cancel();
+            voiceRecordTimer = null;
+            voiceRecordText = 'Press recording';
+            timerSecond = 0;
+            setState(() {});
+          }
+        }
+      },
     );
   }
 
@@ -67,57 +94,27 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
         margin:
             EdgeInsets.symmetric(horizontal: iconInset, vertical: iconInset),
         child: Row(children: <Widget>[
-          Visibility(
-              visible: voiceVisible,
-              child: Container(
-                margin: EdgeInsets.symmetric(
-                    horizontal: iconInset, vertical: iconInset),
-                child: InkWell(
-                  child: const Icon(Icons.record_voice_over),
-                  onTap: () {
-                    setState(() {
-                      voiceVisible = false;
-                    });
-                  },
-                ),
-                // child: IconButton(
-                //   icon: const Icon(Icons.record_voice_over),
-                //   onPressed: () {
-                //     setState(() {
-                //       voiceVisible = false;
-                //     });
-                //   },
-                // ),
-              )),
-          Visibility(
-              visible: !voiceVisible,
-              child: Container(
-                margin: EdgeInsets.symmetric(
-                    horizontal: iconInset, vertical: iconInset),
-                child: InkWell(
-                  child: const Icon(Icons.keyboard),
-                  onTap: () {
-                    setState(() {
-                      voiceVisible = true;
-                    });
-                  },
-                ),
-                // child: IconButton(
-                //   icon: const Icon(Icons.keyboard),
-                //   onPressed: () {
-                //     setState(() {
-                //       voiceVisible = true;
-                //     });
-                //   },
-                // ),
-              )),
+          Container(
+            margin: EdgeInsets.symmetric(
+                horizontal: iconInset, vertical: iconInset),
+            child: InkWell(
+              child: voiceVisible
+                  ? const Icon(Icons.record_voice_over)
+                  : const Icon(Icons.keyboard),
+              onTap: () {
+                setState(() {
+                  voiceVisible = !voiceVisible;
+                });
+              },
+            ),
+          ),
           Expanded(
               child: Container(
                   margin: EdgeInsets.symmetric(
                       horizontal: iconInset, vertical: iconInset),
                   child: voiceVisible
                       ? _buildExtendedTextField(context)
-                      : _buildTextButton(context))),
+                      : _buildVoiceRecordButton(context))),
           Container(
             margin: EdgeInsets.symmetric(
                 horizontal: iconInset, vertical: iconInset),
@@ -129,17 +126,6 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
                 }
               },
             ),
-            // child: IconButton(
-            //   iconSize: 24,
-            //   padding: EdgeInsets.zero,
-            //   alignment: Alignment.centerRight,
-            //   icon: const Icon(Icons.emoji_emotions),
-            //   onPressed: () {
-            //     if (widget.onEmojiPressed != null) {
-            //       widget.onEmojiPressed!();
-            //     }
-            //   },
-            // ),
           ),
           Visibility(
               visible: !_hasValue(),
@@ -154,14 +140,6 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
                     }
                   },
                 ),
-                // child: IconButton(
-                //   icon: const Icon(Icons.add_circle),
-                //   onPressed: () {
-                //     if (widget.onMorePressed != null) {
-                //       widget.onMorePressed!();
-                //     }
-                //   },
-                // ),
               )),
           Visibility(
               visible: _hasValue(),
@@ -177,15 +155,6 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
                     }
                   },
                 ),
-                // child: IconButton(
-                //   icon: const Icon(Icons.send),
-                //   onPressed: () {
-                //     if (widget.onSendPressed != null) {
-                //       widget.onSendPressed!();
-                //       widget.textEditingController.clear();
-                //     }
-                //   },
-                // ),
               ))
         ]));
   }

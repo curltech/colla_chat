@@ -34,10 +34,10 @@ class GlobalChatMessageController with ChangeNotifier {
       if (content != null) {
         content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content));
       }
-      ChatSubMessageType subMessageType = StringUtil.enumFromString(
+      ChatSubMessageType? subMessageType = StringUtil.enumFromString(
           ChatSubMessageType.values, chatMessage.subMessageType!);
       logger.i(
-          'chatMessage subMessageType:${subMessageType.name} title:$title content:$content');
+          'chatMessage subMessageType:${subMessageType!.name} title:$title content:$content');
       switch (subMessageType) {
         case ChatSubMessageType.videoChat:
           break;
@@ -50,7 +50,7 @@ class GlobalChatMessageController with ChangeNotifier {
           }
           String? originMessageType = originMessage.messageType;
           String? originSubMessageType = originMessage.subMessageType;
-          if (originSubMessageType==ChatSubMessageType.videoChat.name) {
+          if (originSubMessageType == ChatSubMessageType.videoChat.name) {
             if (chatMessage.status == MessageStatus.accepted.name) {
               //收到视频通话邀请同意回执，发出本地流，关闭拨号窗口VideoDialOutWidget，显示视频通话窗口VideoChatWidget
               videoChatReceiptController.setChatReceipt(

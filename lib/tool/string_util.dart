@@ -1,3 +1,4 @@
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 
 class StringUtil {
@@ -72,8 +73,14 @@ class StringUtil {
   }
 
   ///string转枚举类型
-  static T enumFromString<T>(Iterable<T> values, String value) {
-    return values
-        .firstWhere((type) => type.toString().split('.').last == value);
+  static T? enumFromString<T>(Iterable<T> values, String value) {
+    try {
+      return values
+          .firstWhere((type) => type.toString().split('.').last == value);
+    } catch (e) {
+      logger.e('enum exception:$e');
+    }
+
+    return null;
   }
 }

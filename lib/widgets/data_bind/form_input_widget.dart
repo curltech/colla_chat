@@ -161,7 +161,7 @@ class FormInputWidget extends StatelessWidget {
     children.add(const SizedBox(
       height: 30.0,
     ));
-    ButtonStyle style = WidgetUtil().buildButtonStyle();
+    ButtonStyle style = WidgetUtil.buildButtonStyle();
     children.add(Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15.0),
       child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [

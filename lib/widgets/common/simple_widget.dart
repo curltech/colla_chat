@@ -103,7 +103,7 @@ class WidgetUtil {
     );
   }
 
-  ButtonStyle buildButtonStyle(
+  static ButtonStyle buildButtonStyle(
       {Color backgroundColor = Colors.grey,
       double borderRadius = 8.0,
       EdgeInsets padding =

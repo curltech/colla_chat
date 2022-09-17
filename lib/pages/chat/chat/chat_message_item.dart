@@ -105,16 +105,18 @@ class ChatMessageItem extends StatelessWidget {
       var raw = CryptoUtil.decodeBase64(content);
       content = CryptoUtil.utf8ToString(raw);
     }
-    ContentType contentType = ContentType.text;
+    ContentType? contentType;
     if (chatMessage.contentType != null) {
       contentType = StringUtil.enumFromString(
           ContentType.values, chatMessage.contentType!);
     }
-    ChatSubMessageType subMessageType = ChatSubMessageType.chat;
+    contentType = contentType ?? ContentType.text;
+    ChatSubMessageType? subMessageType;
     if (chatMessage.subMessageType != null) {
       subMessageType = StringUtil.enumFromString(
           ChatSubMessageType.values, chatMessage.subMessageType!);
     }
+    subMessageType = subMessageType ?? ChatSubMessageType.chat;
     return Container(
         margin: const EdgeInsets.symmetric(vertical: 3.0),
         child: Row(
@@ -142,12 +144,12 @@ class ChatMessageItem extends StatelessWidget {
       var raw = CryptoUtil.decodeBase64(content);
       content = CryptoUtil.utf8ToString(raw);
     }
-    ContentType contentType = ContentType.text;
+    ContentType? contentType = ContentType.text;
     if (chatMessage.contentType != null) {
       contentType = StringUtil.enumFromString(
           ContentType.values, chatMessage.contentType!);
     }
-    ChatSubMessageType subMessageType = ChatSubMessageType.chat;
+    ChatSubMessageType? subMessageType = ChatSubMessageType.chat;
     if (chatMessage.subMessageType != null) {
       subMessageType = StringUtil.enumFromString(
           ChatSubMessageType.values, chatMessage.subMessageType!);
@@ -166,8 +168,8 @@ class ChatMessageItem extends StatelessWidget {
                     Text('${chatMessage.id}:${chatMessage.receiverName}'),
                     buildMessageContainer(context,
                         content: content,
-                        contentType: contentType,
-                        subMessageType: subMessageType)
+                        contentType: contentType!,
+                        subMessageType: subMessageType!)
                   ]),
               Container(
                   margin: const EdgeInsets.only(left: 0.0),

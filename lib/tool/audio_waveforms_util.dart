@@ -1,9 +1,10 @@
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:flutter/material.dart';
 
-///Flutter AudioWaveforms
+///生成语音的波形界面
 class AudioWaveformsUtil {
-  static buildAudioWaveforms({
+  ///录音，同时生成波形界面
+  static Future<Widget> buildAudioWaveforms({
     Key? key,
     required Size size,
     required RecorderController recorderController,
@@ -42,7 +43,8 @@ class AudioWaveformsUtil {
     );
   }
 
-  static buildAudioFileWaveforms({
+  ///播放音频文件，并产生波形界面
+  static Future<Widget> buildAudioFileWaveforms({
     Key? key,
     required Size size,
     required PlayerController playerController,
@@ -80,12 +82,12 @@ class AudioWaveformsUtil {
       margin: margin,
       decoration: decoration,
       backgroundColor: backgroundColor,
-      playerWaveStyle:playerWaveStyle,
-      enableSeekGesture:enableSeekGesture,
-      animationDuration:animationDuration,
-      animationCurve:animationCurve,
-      density:density,
-      clipBehavior:clipBehavior,
+      playerWaveStyle: playerWaveStyle,
+      enableSeekGesture: enableSeekGesture,
+      animationDuration: animationDuration,
+      animationCurve: animationCurve,
+      density: density,
+      clipBehavior: clipBehavior,
       playerController: playerController,
     );
   }
