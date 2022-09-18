@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:file_saver/file_saver.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
@@ -83,7 +84,7 @@ class FileUtil {
 
     if (result != null) {
       if (allowMultiple) {
-        List<PlatformFile> platformFiles = result.files;
+        //List<PlatformFile> platformFiles = result.files;
         for (var path in result.paths) {
           File file = File(path!);
           files.add(file);
@@ -92,8 +93,6 @@ class FileUtil {
         File file = File(result.files.single.path!);
         files.add(file);
       }
-    } else {
-      // User canceled the picker
     }
 
     return files;
@@ -108,10 +107,6 @@ class FileUtil {
         dialogTitle: dialogTitle,
         lockParentWindow: lockParentWindow,
         initialDirectory: initialDirectory);
-
-    if (selectedDirectory == null) {
-      // User canceled the picker
-    }
 
     return selectedDirectory;
   }
@@ -132,10 +127,6 @@ class FileUtil {
         type: type,
         allowedExtensions: allowedExtensions,
         lockParentWindow: lockParentWindow);
-
-    if (outputFile == null) {
-      // User canceled the picker
-    }
 
     return outputFile;
   }
@@ -160,7 +151,7 @@ class FileUtil {
     return await FileSaver.instance.saveAs(name, bytes, ext, mimeType);
   }
 
-  Future<String?> open({
+  static Future<String?> open({
     required BuildContext context,
     required Directory rootDirectory,
     String? rootName,
@@ -180,7 +171,7 @@ class FileUtil {
     List<FilesystemPickerContextAction> contextActions = const [],
   }) async {
     String? path = await FilesystemPicker.open(
-      title: 'Open file',
+      title: AppLocalizations.t('Open file'),
       context: context,
       rootDirectory: rootDirectory,
       fsType: fsType,
@@ -197,5 +188,55 @@ class FileUtil {
     );
 
     return path;
+  }
+
+  static FilesystemPickerTheme buildFilesystemPickerTheme({
+    bool inherit = true,
+    Color? backgroundColor,
+    FilesystemPickerTopBarThemeData? topBar,
+    TextStyle? messageTextStyle,
+    FilesystemPickerFileListThemeData? fileList,
+    FilesystemPickerActionThemeData? pickerAction,
+    FilesystemPickerContextActionsThemeData? contextActions,
+  }) {
+    //FilesystemPickerAutoSystemTheme();
+    //FilesystemPickerNewFolderContextAction();
+    FilesystemPickerTheme theme = FilesystemPickerTheme(
+      inherit: inherit,
+      backgroundColor: backgroundColor,
+      topBar: topBar,
+      messageTextStyle: messageTextStyle,
+      fileList: fileList,
+      pickerAction: pickerAction,
+      contextActions: contextActions,
+    );
+
+    return theme;
+  }
+
+  static FilesystemPickerTopBarThemeData buildFilesystemPickerTopBarThemeData({
+    Color? foregroundColor,
+    Color? backgroundColor,
+    double? elevation,
+    Color? shadowColor,
+    ShapeBorder? shape,
+    IconThemeData? iconTheme,
+    TextStyle? titleTextStyle,
+    SystemUiOverlayStyle? systemOverlayStyle,
+    BreadcrumbsThemeData? breadcrumbsTheme,
+  }) {
+    FilesystemPickerTopBarThemeData theme = FilesystemPickerTopBarThemeData(
+      foregroundColor: foregroundColor,
+      backgroundColor: backgroundColor,
+      elevation: elevation,
+      shadowColor: shadowColor,
+      shape: shape,
+      iconTheme: iconTheme,
+      titleTextStyle: titleTextStyle,
+      systemOverlayStyle: systemOverlayStyle,
+      breadcrumbsTheme: breadcrumbsTheme,
+    );
+
+    return theme;
   }
 }

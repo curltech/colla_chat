@@ -1,7 +1,9 @@
 import 'dart:io';
 
 import 'package:camera/camera.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/tool/asset_util.dart';
+import 'package:colla_chat/tool/camera_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
@@ -68,40 +70,22 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   _actionAlbum(int index, String name) async {
     if (name == '相册') {
-      var pickerConfig = AssetPickerConfig(
-        maxAssets: 9,
-        pageSize: 320,
-        pathThumbnailSize: const ThumbnailSize(80, 80),
-        gridCount: 4,
-        selectedAssets: assets,
-        themeColor: Colors.green,
+      final List<AssetEntity>? result = await AssetUtil.pickAssets(
+        context,
       );
-      final List<AssetEntity>? result =
-          await AssetPicker.pickAssets(context, pickerConfig: pickerConfig);
-
-      result?.forEach((AssetEntity element) async {
-        //   sendImageMsg(widget.id, widget.type, file: await element.file
-        //     //   callback: (v) {
-        //     // if (v == null) return;
-        //     //Notice.send(WeChatActions.msg(), v ?? '');
-        //   // });
-        //   // element.file;
-        // );
-      });
+      if (result != null && result.isNotEmpty) {
+        List<Map<String, dynamic>> maps = await AssetUtil.toJsons(result);
+        String json = JsonUtil.toJsonString(maps);
+      }
     }
   }
 
   _actionPhoto(int index, String name) async {
     if (name == '拍摄') {
-      try {
-        List<CameraDescription> cameras;
-
-        WidgetsFlutterBinding.ensureInitialized();
-        cameras = await availableCameras();
-
-        //routePush(ShootPage(cameras));
-      } on CameraException catch (e) {
-        logger.e(e.code, e.description);
+      AssetEntity? entry = await CameraUtil.pickFromCamera(context);
+      if (entry != null) {
+        Map<String, dynamic> map = await AssetUtil.toJson(entry);
+        String json = JsonUtil.toJsonString(map);
       }
     }
   }

@@ -3,7 +3,7 @@ import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
 ///wechat_camera_picker
 class CameraUtil {
-  static pickFromCamera(
+  static Future<AssetEntity?> pickFromCamera(
     BuildContext context, {
     CameraPickerConfig pickerConfig = const CameraPickerConfig(),
     CameraPickerState Function()? createPickerState,
@@ -17,5 +17,24 @@ class CameraUtil {
         useRootNavigator: useRootNavigator,
         pageRouteBuilder: pageRouteBuilder,
         locale: locale);
+
+    return entity;
+  }
+
+  static Future<CameraPreview?> buildCameraPreview({
+    Key? key,
+    Widget? child,
+  }) async {
+    WidgetsFlutterBinding.ensureInitialized();
+    List<CameraDescription> cameras = await availableCameras();
+    CameraController controller =
+        CameraController(cameras[0], ResolutionPreset.max);
+    await controller.initialize();
+
+    return CameraPreview(
+      controller,
+      key: key,
+      child: child,
+    );
   }
 }

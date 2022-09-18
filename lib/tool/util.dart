@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/services.dart';
@@ -59,10 +60,3 @@ class StandardMessageCodecUtil {
   }
 }
 
-class XFileUtil {
-  static XFile open(String filename) {
-    final file = XFile(filename);
-
-    return file;
-  }
-}
