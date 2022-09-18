@@ -18,7 +18,6 @@ enum AudioMedia {
   buffer,
   asset,
   stream,
-  remoteExampleFile,
 }
 
 ///音频状态
@@ -30,39 +29,14 @@ enum AudioState {
   isRecordingPaused,
 }
 
-///声音的记录
-class PlatformSoundRecorder {
-  Codec codec = Codec.opusWebM;
-  AudioMedia media = AudioMedia.stream;
-  FlutterSoundRecorder recorder = FlutterSoundRecorder();
+class AudioUtil {
+  static bool initStatus = false;
 
-  StreamSubscription? recorderSubscription;
-  StreamSubscription? recordingDataSubscription;
-
-  StreamController<Food>? recordingDataController;
-  IOSink? sink;
-
-  bool encoderSupported = false;
-  bool decoderSupported = false;
-
-  PlatformSoundRecorder();
-
-  init() async {
-    await recorder.setSubscriptionDuration(const Duration(milliseconds: 10));
-    await initializeDateFormatting();
-    if (!platformParams.web) {
-      var status = await Permission.microphone.request();
-      if (status != PermissionStatus.granted) {
-        throw RecordingPermissionException('Microphone permission not granted');
-      }
+  ///初始化全局音频会话，设置参数
+  static initAudioSession() async {
+    if (initStatus) {
+      return;
     }
-    await recorder.openRecorder();
-    encoderSupported = await recorder.isEncoderSupported(codec);
-
-    if (!await recorder.isEncoderSupported(codec) && platformParams.web) {
-      codec = Codec.opusWebM;
-    }
-
     final session = await AudioSession.instance;
     await session.configure(AudioSessionConfiguration(
       avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
@@ -81,6 +55,51 @@ class PlatformSoundRecorder {
       androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
       androidWillPauseWhenDucked: true,
     ));
+    initStatus = true;
+  }
+}
+
+///声音的记录
+class PlatformSoundRecorder {
+  //缺省录音编码
+  Codec codec;
+
+  //AudioMedia media = AudioMedia.stream;
+  FlutterSoundRecorder recorder = FlutterSoundRecorder();
+
+  //录音流数据的监听器
+  StreamSubscription? recorderSubscription;
+  StreamSubscription? recordingDataSubscription;
+
+  //录音数据控制器
+  StreamController<Food>? recordingDataController;
+
+  IOSink? sink;
+
+  bool encoderSupported = false;
+
+  PlatformSoundRecorder({this.codec = Codec.opusWebM});
+
+  //初始化录音器
+  init() async {
+    //录音器的监听频率
+    await recorder.setSubscriptionDuration(const Duration(milliseconds: 10));
+    await initializeDateFormatting();
+    //申请麦克风权限
+    if (!platformParams.web) {
+      var status = await Permission.microphone.request();
+      if (status != PermissionStatus.granted) {
+        throw RecordingPermissionException('Microphone permission not granted');
+      }
+    }
+    recordingDataController = StreamController<Food>();
+    await recorder.openRecorder();
+    encoderSupported = await recorder.isEncoderSupported(codec);
+
+    if (!encoderSupported && platformParams.web) {
+      codec = Codec.opusWebM;
+    }
+    await AudioUtil.initAudioSession();
   }
 
   void cancelRecorderSubscriptions() {
@@ -110,40 +129,31 @@ class PlatformSoundRecorder {
     }
   }
 
+  Future<IOSink?> createTemporarySink() async {
+    var dir = await getTemporaryDirectory();
+    var path = '${dir.path}/flutter_sound${ext[codec.index]}';
+    if (!platformParams.web) {
+      var outputFile = File(path);
+      if (outputFile.existsSync()) {
+        await outputFile.delete();
+      }
+      sink = outputFile.openWrite();
+    } else {
+      path = '_flutter_sound${ext[codec.index]}';
+    }
+    return sink;
+  }
+
+  ///开始录音，path为带路径的文件或者不带路径的文件名（临时目录），表示写入文件
+  ///否则写入控制器的流
   void startRecorder({
-    AudioMedia? audioMedia,
-    String? path,
+    String? filename,
   }) async {
     try {
-      // Request Microphone permission if needed
-      if (!platformParams.web) {
-        var status = await Permission.microphone.request();
-        if (status != PermissionStatus.granted) {
-          throw RecordingPermissionException(
-              'Microphone permission not granted');
-        }
-      }
-      if (path == null) {
-        if (!platformParams.web) {
-          var tempDir = await getTemporaryDirectory();
-          path = '${tempDir.path}/flutter_sound${ext[codec.index]}';
-        } else {
-          path = '_flutter_sound${ext[codec.index]}';
-        }
-      }
-
-      if (audioMedia == AudioMedia.stream) {
-        assert(codec == Codec.pcm16);
-        if (!platformParams.web) {
-          var outputFile = File(path);
-          if (outputFile.existsSync()) {
-            await outputFile.delete();
-          }
-          sink = outputFile.openWrite();
-        } else {
-          sink = null; // TODO
-        }
-        recordingDataController = StreamController<Food>();
+      if (filename == null) {
+        //录音数据写入流
+        sink = await createTemporarySink();
+        recordingDataController == StreamController<Food>();
         recordingDataSubscription =
             recordingDataController!.stream.listen((buffer) {
           if (buffer is FoodData) {
@@ -154,11 +164,12 @@ class PlatformSoundRecorder {
           toStream: recordingDataController!.sink,
           codec: codec,
           numChannels: 1,
-          sampleRate: 44000, //tSAMPLERATE,
+          sampleRate: 44000,
         );
       } else {
+        //录音数据写入指定文件
         await recorder.startRecorder(
-          toFile: path,
+          toFile: filename,
           codec: codec,
           bitRate: 8000,
           numChannels: 1,
@@ -167,7 +178,8 @@ class PlatformSoundRecorder {
       }
       logger.d('startRecorder');
 
-      recorderSubscription = recorder.onProgress!.listen((e) {
+      recorderSubscription =
+          recorder.onProgress!.listen((RecordingDisposition e) {
         var date = DateTime.fromMillisecondsSinceEpoch(
             e.duration.inMilliseconds,
             isUtc: true);
@@ -205,13 +217,6 @@ class PlatformSoundRecorder {
     }
   }
 
-  void Function()? onPauseResumeRecorderPressed() {
-    if (recorder.isPaused || recorder.isRecording) {
-      return pauseResumeRecorder;
-    }
-    return null;
-  }
-
   void startStopRecorder() {
     if (recorder.isRecording || recorder.isPaused) {
       stopRecorder();
@@ -219,61 +224,24 @@ class PlatformSoundRecorder {
       startRecorder();
     }
   }
-
-  void Function()? onStartRecorderPressed() {
-    // Disable the button if the selected codec is not supported
-    if (!encoderSupported!) return null;
-    if (media == AudioMedia.stream && codec != Codec.pcm16) return null;
-    return startStopRecorder;
-  }
 }
 
 ///音频的播放
 class PlatformSoundPlayer {
-  Codec codec = Codec.opusWebM;
-  AudioMedia media = AudioMedia.stream;
+  Codec codec;
   FlutterSoundPlayer player = FlutterSoundPlayer();
-
   StreamSubscription? playerSubscription;
-
-  IOSink? sink;
-
-  bool encoderSupported = false;
   bool decoderSupported = false;
 
-  PlatformSoundPlayer();
+  //流模式播放的缓冲池
+  Uint8List buffer = Uint8List(4096);
+
+  PlatformSoundPlayer({this.codec = Codec.opusWebM});
 
   init() async {
-    await player.closePlayer();
-    await player.openPlayer();
     await player.setSubscriptionDuration(const Duration(milliseconds: 10));
-    await initializeDateFormatting();
-    if (!platformParams.web) {
-      var status = await Permission.microphone.request();
-      if (status != PermissionStatus.granted) {
-        throw RecordingPermissionException('Microphone permission not granted');
-      }
-    }
     decoderSupported = await player.isDecoderSupported(codec);
-
-    final session = await AudioSession.instance;
-    await session.configure(AudioSessionConfiguration(
-      avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
-      avAudioSessionCategoryOptions:
-          AVAudioSessionCategoryOptions.allowBluetooth |
-              AVAudioSessionCategoryOptions.defaultToSpeaker,
-      avAudioSessionMode: AVAudioSessionMode.spokenAudio,
-      avAudioSessionRouteSharingPolicy:
-          AVAudioSessionRouteSharingPolicy.defaultPolicy,
-      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
-      androidAudioAttributes: const AndroidAudioAttributes(
-        contentType: AndroidAudioContentType.speech,
-        flags: AndroidAudioFlags.none,
-        usage: AndroidAudioUsage.voiceCommunication,
-      ),
-      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
-      androidWillPauseWhenDucked: true,
-    ));
+    await AudioUtil.initAudioSession();
   }
 
   void cancelPlayerSubscriptions() {
@@ -291,27 +259,61 @@ class PlatformSoundPlayer {
     }
   }
 
-  Future<void> startPlayer({Uint8List? data, String? filename}) async {
+  final int blockSize = 4096;
+
+  //用于流模式播放音频数据，写入数据到缓冲池，外部调用的时候可以循环写入
+  Future<void> writeBuffer(Uint8List data) async {
+    var lnData = 0;
+    var totalLength = data.length;
+    while (totalLength > 0 && !player.isStopped) {
+      var bsize = totalLength > blockSize ? blockSize : totalLength;
+      await player.feedFromStream(data.sublist(lnData, lnData + bsize));
+      lnData += bsize;
+      totalLength -= bsize;
+    }
+  }
+
+  //播放，数据来源有文件，资产文件，流以及麦克风的回放
+  //如果文件名是asset开头，表示是资产文件，采用fromDataBuffer播放
+  //否则采用文件方式播放
+  //如果data不为空，采用fromDataBuffer播放
+  //如果bufferFn
+  Future<void> startPlayer({
+    String? filename,
+    Uint8List? data,
+  }) async {
     try {
       if (filename != null) {
-        await player.startPlayer(
-            fromURI: filename,
-            codec: codec,
-            sampleRate: 44000,
-            whenFinished: () {
-              player.logger.d('Play finished');
-            });
-      } else if (data != null) {
-        if (codec == Codec.pcm16) {
-          data = await flutterSoundHelper.pcmToWaveBuffer(
-            inputBuffer: data,
-            numChannels: 1,
-            sampleRate: (codec == Codec.pcm16 && media == AudioMedia.asset)
-                ? 48000
-                : 8000,
-          );
-          codec = Codec.pcm16WAV;
+        if (filename.startsWith('assets/')) {
+          var pos = filename.lastIndexOf('.');
+          var ext = filename.substring(pos);
+          if (ext.toLowerCase() == 'wav') {
+            codec = Codec.pcm16WAV;
+          }
+          data = (await rootBundle.load(filename)).buffer.asUint8List();
+          if (codec == Codec.pcm16) {
+            // data = FlutterSoundHelper().waveToPCMBuffer(
+            //   inputBuffer: data,
+            // );
+            //add wav header
+            data = await flutterSoundHelper.pcmToWaveBuffer(
+              inputBuffer: data,
+              numChannels: 1,
+              sampleRate: (codec == Codec.pcm16) ? 48000 : 8000,
+            );
+            codec = Codec.pcm16WAV;
+          }
+        } else {
+          await player.startPlayer(
+              fromURI: filename,
+              codec: codec,
+              sampleRate: 44000,
+              whenFinished: () {
+                player.logger.d('Play finished');
+              });
         }
+      }
+      if (data != null) {
         await player.startPlayer(
             fromDataBuffer: data,
             sampleRate: 8000,
@@ -322,12 +324,13 @@ class PlatformSoundPlayer {
       } else {
         //stream
         await player.startPlayerFromStream(
-          codec: Codec.pcm16, //_codec,
+          codec: Codec.pcm16,
           numChannels: 1,
-          sampleRate: 44000, //tSAMPLERATE,
+          sampleRate: 44000,
         );
-        await player.feedFromStream(data!);
+        await writeBuffer(buffer);
       }
+      //await player.startPlayerFromMic();
     } on Exception catch (err) {
       logger.e('error: $err');
     }
@@ -359,7 +362,6 @@ class PlatformSoundPlayer {
   }
 
   Future<void> seekToPlayer(int milliSecs) async {
-    //playerModule.logger.d('-->seekToPlayer');
     try {
       if (player.isPlaying) {
         await player.seekToPlayer(Duration(milliseconds: milliSecs));
@@ -369,10 +371,17 @@ class PlatformSoundPlayer {
     }
   }
 
-  void Function()? onPauseResumePlayerPressed() {
-    if (player.isPaused || player.isPlaying) {
-      return pauseResumePlayer;
-    }
-    return null;
+  Future<void> setSpeed(double speed) async {
+    speed = speed > 1.0 ? 1.0 : speed;
+    await player.setSpeed(
+      speed,
+    );
+  }
+
+  Future<void> setVolume(double volume) async {
+    volume = volume > 1.0 ? 1.0 : volume;
+    await player.setVolume(
+      volume,
+    );
   }
 }
