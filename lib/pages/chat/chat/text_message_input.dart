@@ -47,6 +47,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   void initState() {
     super.initState();
     widget.textEditingController.addListener(_update);
+    soundRecorder.init();
   }
 
   _update() {
