@@ -153,7 +153,7 @@ class PlatformSoundRecorder {
       if (filename == null) {
         //录音数据写入流
         sink = await createTemporarySink();
-        recordingDataController == StreamController<Food>();
+        recordingDataController = StreamController<Food>();
         recordingDataSubscription =
             recordingDataController!.stream.listen((buffer) {
           if (buffer is FoodData) {
