@@ -9,17 +9,32 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 class FileUtil {
-  static Future<File> writeFile(Uint8List bytes, String name) async {
-    final document = await getApplicationDocumentsDirectory();
-    final dir = Directory(document.path + name);
-    final imageFile = File(dir.path);
-    await imageFile.writeAsBytes(bytes);
+  static Future<String> writeFile(Uint8List bytes, String filename) async {
+    if (!filename.contains('/')) {
+      final dir = await getApplicationDocumentsDirectory();
+      filename = '${dir.path}/$filename';
+    }
+    final file = File(filename);
+    await file.writeAsBytes(bytes);
+    await file.exists();
 
-    return imageFile;
+    return filename;
+  }
+
+  static Future<String> writeTempFile(Uint8List bytes, String filename) async {
+    if (!filename.contains('/')) {
+      final dir = await getTemporaryDirectory();
+      filename = '${dir.path}/$filename';
+    }
+    final file = File(filename);
+    await file.writeAsBytes(bytes);
+    await file.exists();
+
+    return filename;
   }
 
   static Future<Uint8List> readFile(String filename) async {
-    if (filename.startsWith('asset')) {
+    if (filename.startsWith('assets/')) {
       return await _readAssetData(filename);
     } else {
       return await _readFileBytes(filename);

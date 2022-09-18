@@ -10,7 +10,6 @@ import 'package:flutter/material.dart';
 
 import '../../../../entity/dht/myself.dart';
 import '../../../../l10n/localization.dart';
-import '../../../../tool/util.dart';
 import '../../../../widgets/common/app_bar_view.dart';
 import '../../../../widgets/common/image_widget.dart';
 import '../../chat/widget/ui.dart';
@@ -102,7 +101,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
       case 2:
         Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
         var path = await FileUtil.writeFile(bytes, peerId);
-        ShareUtil.shareFiles([path.path]);
+        ShareUtil.shareFiles([path]);
         break;
       case 3:
         setState(() {
