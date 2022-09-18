@@ -146,7 +146,7 @@ class PlatformSoundRecorder {
 
   ///开始录音，path为带路径的文件或者不带路径的文件名（临时目录），表示写入文件
   ///否则写入控制器的流
-  void startRecorder({
+  Future<void> startRecorder({
     String? filename,
   }) async {
     try {
@@ -193,7 +193,7 @@ class PlatformSoundRecorder {
     }
   }
 
-  void stopRecorder() async {
+  Future<void> stopRecorder() async {
     try {
       await recorder.stopRecorder();
       recorder.logger.d('stopRecorder');
@@ -204,7 +204,7 @@ class PlatformSoundRecorder {
     }
   }
 
-  void pauseResumeRecorder() async {
+  Future<void> pauseResumeRecorder() async {
     try {
       if (recorder.isPaused) {
         await recorder.resumeRecorder();
@@ -217,11 +217,11 @@ class PlatformSoundRecorder {
     }
   }
 
-  void startStopRecorder() {
+  Future<void> startStopRecorder() async {
     if (recorder.isRecording || recorder.isPaused) {
-      stopRecorder();
+      await stopRecorder();
     } else {
-      startRecorder();
+      await startRecorder();
     }
   }
 }
@@ -349,7 +349,7 @@ class PlatformSoundPlayer {
     }
   }
 
-  void pauseResumePlayer() async {
+  Future<void> pauseResumePlayer() async {
     try {
       if (player.isPlaying) {
         await player.pausePlayer();

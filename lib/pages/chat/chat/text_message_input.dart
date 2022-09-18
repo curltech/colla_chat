@@ -1,9 +1,11 @@
 import 'dart:async';
 
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/tool/platform_sound.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_sound/flutter_sound.dart';
 
 import 'extended_text_message_input.dart';
 
@@ -38,6 +40,8 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   String voiceRecordText = 'Press recording';
   Timer? voiceRecordTimer;
   int timerSecond = 0;
+  PlatformSoundRecorder soundRecorder =
+      PlatformSoundRecorder(codec: Codec.pcm16WAV);
 
   @override
   void initState() {
@@ -59,23 +63,26 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
     return TextButton(
       style: WidgetUtil.buildButtonStyle(),
       child: Text(AppLocalizations.t(voiceRecordText)),
-      onPressed: () {
+      onPressed: () async {
         voiceRecording = !voiceRecording;
         if (voiceRecording) {
           timerSecond = 0;
           voiceRecordTimer =
               Timer.periodic(const Duration(seconds: 1), (timer) {
-            voiceRecordText = Duration(seconds: timerSecond++).toString();
+            var timerDuration = Duration(seconds: timerSecond++);
+            voiceRecordText =
+                '${timerDuration.inHours}:${timerDuration.inMinutes}:${timerDuration.inSeconds}';
             setState(() {});
           });
+          await soundRecorder.startRecorder();
           voiceRecordText = '';
-
         } else {
           if (voiceRecordTimer != null) {
             voiceRecordTimer!.cancel();
             voiceRecordTimer = null;
             voiceRecordText = 'Press recording';
             timerSecond = 0;
+            await soundRecorder.stopRecorder();
             setState(() {});
           }
         }
