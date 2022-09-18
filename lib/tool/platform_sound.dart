@@ -83,6 +83,7 @@ class PlatformSoundRecorder {
   //初始化录音器
   init() async {
     //录音器的监听频率
+    await recorder.openRecorder();
     await recorder.setSubscriptionDuration(const Duration(milliseconds: 10));
     await initializeDateFormatting();
     //申请麦克风权限
@@ -93,7 +94,7 @@ class PlatformSoundRecorder {
       }
     }
     recordingDataController = StreamController<Food>();
-    await recorder.openRecorder();
+
     encoderSupported = await recorder.isEncoderSupported(codec);
 
     if (!encoderSupported && platformParams.web) {

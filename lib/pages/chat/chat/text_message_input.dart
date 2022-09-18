@@ -47,7 +47,6 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   void initState() {
     super.initState();
     widget.textEditingController.addListener(_update);
-    soundRecorder.init();
   }
 
   _update() {
@@ -75,6 +74,8 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
                 '${timerDuration.inHours}:${timerDuration.inMinutes}:${timerDuration.inSeconds}';
             setState(() {});
           });
+
+          await soundRecorder.init();
           await soundRecorder.startRecorder();
           voiceRecordText = '';
         } else {
