@@ -64,9 +64,9 @@ class ChatMessageItem extends StatelessWidget {
       {String? content,
       ContentType contentType = ContentType.text,
       ChatSubMessageType subMessageType = ChatSubMessageType.chat}) {
-    return SizedBox(
-        //height: 50,
-        width: 260,
+    return Container(
+        constraints: const BoxConstraints(
+            minWidth: 0, maxWidth: 260, minHeight: 0, maxHeight: 56),
         child: Bubble(
           elevation: 0.0,
           stick: true,

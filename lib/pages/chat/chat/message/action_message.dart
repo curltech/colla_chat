@@ -21,19 +21,19 @@ class ActionMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return InkWell(
-        onTap: () {},
-        child: Row(children: [
-          Expanded(
-            child: ExtendedText(
-              content,
-              style: TextStyle(
-                color: isMyself ? Colors.white : Colors.black,
-                //fontSize: 16.0,
+            onTap: () {},
+            child: Row(children: [
+              Expanded(
+                child: ExtendedText(
+                  content,
+                  style: TextStyle(
+                    color: isMyself ? Colors.white : Colors.black,
+                    //fontSize: 16.0,
+                  ),
+                  specialTextSpanBuilder: customSpecialTextSpanBuilder,
+                ),
               ),
-              specialTextSpanBuilder: customSpecialTextSpanBuilder,
-            ),
-          ),
-          icon
-        ]));
+              icon
+            ]));
   }
 }
