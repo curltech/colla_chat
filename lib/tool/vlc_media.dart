@@ -270,10 +270,14 @@ class VlcMediaRecorder {
   VlcMediaRecorder();
 
   start({
-    required int id,
-    required Media media,
+    int id = 0,
+    required String filename,
     required File savingFile,
   }) {
+    if (record != null) {
+      dispose();
+    }
+    Media media = VlcMedia.media(filename);
     record = Record.create(
       id: id,
       media: media,
@@ -283,7 +287,10 @@ class VlcMediaRecorder {
   }
 
   dispose() {
-    record!.dispose();
+    if (record != null) {
+      record!.dispose();
+      record = null;
+    }
   }
 }
 

@@ -14,20 +14,14 @@ class PlatformAudioPlayer {
     player.setReleaseMode(releaseMode);
   }
 
-  setSource(Source source) async {
-    await player.setSource(source);
-  }
-
-  setAssetSource(String filename) async {
-    await player.setSource(AssetSource(filename));
-  }
-
-  setSourceUrl(String url) async {
-    await player.setSourceUrl(url);
-  }
-
-  setSourceDeviceFile(String filename) async {
-    await player.setSource(DeviceFileSource(filename));
+  setSource(String filename) async {
+    if (filename.startsWith('assets/')) {
+      await player.setSource(AssetSource(filename));
+    } else if (filename.startsWith('http')) {
+      await player.setSourceUrl(filename);
+    } else {
+      await player.setSource(DeviceFileSource(filename));
+    }
   }
 
   setSourceBytes(Uint8List data) async {
@@ -39,7 +33,7 @@ class PlatformAudioPlayer {
     final result = await FilePicker.platform.pickFiles();
     final path = result?.files.single.path;
     if (path != null) {
-      setSource(DeviceFileSource(path));
+      setSource(path);
     }
   }
 
@@ -59,7 +53,7 @@ class PlatformAudioPlayer {
     await player.resume();
   }
 
-  release() async {
+  dispose() async {
     await player.release();
   }
 
