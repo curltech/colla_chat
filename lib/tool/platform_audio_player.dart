@@ -3,13 +3,15 @@ import 'dart:typed_data';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:file_picker/file_picker.dart';
 
+
+///音频播放器，Android, iOS, Linux, macOS, Windows, and web.
 class PlatformAudioPlayer {
   late AudioPlayer player;
 
   PlatformAudioPlayer(
       {required String url, ReleaseMode releaseMode = ReleaseMode.stop}) {
     player = AudioPlayer();
-    player.setReleaseMode(ReleaseMode.stop);
+    player.setReleaseMode(releaseMode);
   }
 
   setSource(Source source) async {

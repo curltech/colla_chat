@@ -31,7 +31,7 @@ class PersonalInfoWidget extends StatefulWidget with TileDataMixin {
   Icon get icon => const Icon(Icons.personal_video);
 
   @override
-  String get title => 'PersonalInfo';
+  String get title => 'Personal Info';
 }
 
 class _PersonalInfoWidgetState extends State<PersonalInfoWidget>

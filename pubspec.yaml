@@ -167,12 +167,16 @@ dependencies:
   #-lc++
   #-lstd++
   flutter_sound: ^9.2.13
-  just_audio: ^0.9.11
   audio_session: ^0.1.6
   audioplayers: ^1.0.1 #音频处理
   audio_waveforms: ^0.1.5
   video_player: ^2.1.1 #视频播放
   flick_video_player: any
+  dart_vlc: ^0.2.1
+  record: ^4.1.1
+  just_audio: ^0.9.25
+  just_audio_windows: ^0.1.0
+  just_audio_mpv: ^0.1.4
   flutter_image_compress: ^1.1.0 #图片压缩1
   video_thumbnail: ^0.5.2
   syncfusion_flutter_barcodes: any
