@@ -1,3 +1,4 @@
+import 'package:bubble/bubble.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
@@ -57,6 +58,28 @@ class ChatMessageItem extends StatelessWidget {
       );
     }
     return null;
+  }
+
+  Widget buildMessageBubble(BuildContext context,
+      {String? content,
+      ContentType contentType = ContentType.text,
+      ChatSubMessageType subMessageType = ChatSubMessageType.chat}) {
+    return SizedBox(
+        //height: 50,
+        width: 260,
+        child: Bubble(
+          elevation: 0.0,
+          stick: true,
+          margin: const BubbleEdges.only(top: 1),
+          nip: isMyself ? BubbleNip.rightTop : BubbleNip.leftTop,
+          color: isMyself
+              ? appDataProvider.themeData!.colorScheme.primary
+              : Colors.white,
+          child: buildMessageBody(context,
+              content: content,
+              contentType: contentType,
+              subMessageType: subMessageType),
+        ));
   }
 
   ///消息容器，内包消息体
@@ -129,7 +152,7 @@ class ChatMessageItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text('${chatMessage.id}:${chatMessage.senderName}'),
-                    buildMessageContainer(context,
+                    buildMessageBubble(context,
                         content: content,
                         contentType: contentType,
                         subMessageType: subMessageType)
@@ -163,10 +186,11 @@ class ChatMessageItem extends StatelessWidget {
                 child: Container(),
               ),
               Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
                     Text('${chatMessage.id}:${chatMessage.receiverName}'),
-                    buildMessageContainer(context,
+                    buildMessageBubble(context,
                         content: content,
                         contentType: contentType!,
                         subMessageType: subMessageType!)

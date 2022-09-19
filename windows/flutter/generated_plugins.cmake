@@ -10,6 +10,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   file_saver
   flutter_native_view
   flutter_secure_storage_windows
+  flutter_tts
   flutter_webrtc
   geolocator_windows
   just_audio_windows
