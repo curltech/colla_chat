@@ -43,8 +43,8 @@ class FileUtil {
   }
 
   static Future<Uint8List> _readFileBytes(String filename) async {
-    Uri uri = Uri.parse(filename);
-    File file = File.fromUri(uri);
+   // Uri uri = Uri.parse(filename);
+    File file = File(filename);
     Uint8List bytes;
     bytes = await file.readAsBytes();
 

@@ -59,7 +59,7 @@ class AudioUtil {
   }
 }
 
-///声音的记录
+///声音的记录器，仅支持移动设备
 class PlatformSoundRecorder {
   //缺省录音编码
   Codec codec;

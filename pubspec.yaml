@@ -69,6 +69,7 @@ dependencies:
   cached_network_image: ^3.0.0
   telephony: 0.2.0
   #界面
+  bubble: ^1.2.1
   cupertino_icons: ^1.0.2
   country_pickers: ^2.0.0
   country_picker: ^2.0.15
@@ -169,6 +170,7 @@ dependencies:
   flutter_sound: ^9.2.13
   audio_session: ^0.1.6
   audioplayers: ^1.0.1 #音频处理
+  flutter_audio_recorder2: any
   audio_waveforms: ^0.1.5
   video_player: ^2.1.1 #视频播放
   flick_video_player: any
@@ -177,6 +179,10 @@ dependencies:
   just_audio: ^0.9.25
   just_audio_windows: ^0.1.0
   just_audio_mpv: ^0.1.4
+  just_waveform: any
+  audio_service: any
+  just_audio_background: any
+  flutter_tts: ^3.5.3
   flutter_image_compress: ^1.1.0 #图片压缩1
   video_thumbnail: ^0.5.2
   syncfusion_flutter_barcodes: any
