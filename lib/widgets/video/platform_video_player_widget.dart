@@ -1,8 +1,10 @@
 import 'dart:typed_data';
 
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/video/platform_flick_video_player.dart';
 import 'package:colla_chat/widgets/video/platform_vlc_video_player.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 abstract class AbstractVideoPlayerController {
@@ -45,6 +47,27 @@ abstract class AbstractVideoPlayerController {
   jumpToIndex(int index);
 
   move(int initialIndex, int finalIndex);
+
+  sourceFilePicker({
+    String? dialogTitle,
+    String? initialDirectory,
+    FileType type = FileType.video,
+    List<String>? allowedExtensions,
+    dynamic Function(FilePickerStatus)? onFileLoading,
+    bool allowCompression = true,
+    bool allowMultiple = true,
+    bool withData = false,
+    bool withReadStream = false,
+    bool lockParentWindow = false,
+  }) async {
+    final filenames =
+        await FileUtil.pickFiles(allowMultiple: allowMultiple, type: type);
+    if (filenames.isNotEmpty) {
+      for (var filename in filenames) {
+        add(filename: filename);
+      }
+    }
+  }
 
   buildVideoWidget({
     Key? key,

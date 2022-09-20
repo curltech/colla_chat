@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/audio/platform_audio_player.dart';
 import 'package:file_picker/file_picker.dart';
 
@@ -69,13 +70,7 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
         player.onPlayerStateChanged.listen((state) {});
   }
 
-  sourceFilePicker() async {
-    final result = await FilePicker.platform.pickFiles();
-    final filename = result?.files.single.path;
-    if (filename != null) {
-      add(filename: filename);
-    }
-  }
+
 
   set current(Source? current) {
     _current = current;
@@ -214,7 +209,6 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
     // TODO: implement remove
     throw UnimplementedError();
   }
-
 
   @override
   setShuffleModeEnabled(bool enabled) {

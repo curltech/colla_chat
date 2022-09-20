@@ -43,7 +43,7 @@ class FileUtil {
   }
 
   static Future<Uint8List> _readFileBytes(String filename) async {
-   // Uri uri = Uri.parse(filename);
+    // Uri uri = Uri.parse(filename);
     File file = File(filename);
     Uint8List bytes;
     bytes = await file.readAsBytes();
@@ -56,7 +56,7 @@ class FileUtil {
     return asset.buffer.asUint8List();
   }
 
-  static Future<List<File>?> pickFiles({
+  static Future<List<String>> pickFiles({
     String? dialogTitle,
     String? initialDirectory,
     FileType type = FileType.any,
@@ -68,7 +68,7 @@ class FileUtil {
     bool withReadStream = false,
     bool lockParentWindow = false,
   }) async {
-    List<File> files = [];
+    List<String> filenames = [];
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       dialogTitle: dialogTitle,
       initialDirectory: initialDirectory,
@@ -83,19 +83,12 @@ class FileUtil {
     );
 
     if (result != null) {
-      if (allowMultiple) {
-        //List<PlatformFile> platformFiles = result.files;
-        for (var path in result.paths) {
-          File file = File(path!);
-          files.add(file);
-        }
-      } else {
-        File file = File(result.files.single.path!);
-        files.add(file);
+      for (var path in result.paths) {
+        filenames.add(path!);
       }
     }
 
-    return files;
+    return filenames;
   }
 
   static Future<String?> directoryPathPicker({

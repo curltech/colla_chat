@@ -8,6 +8,7 @@ import 'package:colla_chat/widgets/audio/blue_fire_audio_player.dart';
 import 'package:colla_chat/widgets/audio/blue_fire_audio_player_widget.dart';
 import 'package:colla_chat/widgets/audio/just_audio_player.dart';
 import 'package:colla_chat/widgets/audio/just_audio_player_widget.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:just_waveform/just_waveform.dart';
 import 'package:path/path.dart' as p;
@@ -52,6 +53,27 @@ abstract class AbstractAudioPlayerController {
   insert(int index, {String? filename, Uint8List? data});
 
   remove(int index);
+
+  sourceFilePicker({
+    String? dialogTitle,
+    String? initialDirectory,
+    FileType type = FileType.audio,
+    List<String>? allowedExtensions,
+    dynamic Function(FilePickerStatus)? onFileLoading,
+    bool allowCompression = true,
+    bool allowMultiple = true,
+    bool withData = false,
+    bool withReadStream = false,
+    bool lockParentWindow = false,
+  }) async {
+    final filenames =
+        await FileUtil.pickFiles(allowMultiple: allowMultiple, type: type);
+    if (filenames.isNotEmpty) {
+      for (var filename in filenames) {
+        add(filename: filename);
+      }
+    }
+  }
 
   ///异步产生波形图形组件
   Future<StreamBuilder<WaveformProgress>> buildWaveformProgress(
