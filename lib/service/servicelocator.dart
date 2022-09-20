@@ -5,6 +5,7 @@ import 'package:colla_chat/p2p/chain/action/ionsignal.dart';
 import 'package:colla_chat/p2p/chain/action/p2pchat.dart';
 import 'package:colla_chat/service/stock/account.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:dart_vlc/dart_vlc.dart';
 
 import '../entity/p2p/security_context.dart';
 import '../p2p/chain/action/chat.dart';
@@ -38,6 +39,7 @@ class ServiceLocator {
   static Future<void> init() async {
     platformParams.init();
     appDataProvider.init();
+    await DartVLC.initialize(useFlutterNativeView: true);
     services['stockAccountService'] = stockAccountService;
     services['chainAppService'] = chainAppService;
     services['peerProfileService'] = peerProfileService;
