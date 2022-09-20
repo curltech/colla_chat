@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/video/platform_video_player_widget.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flick_video_player/src/utils/web_key_bindings.dart';
@@ -11,15 +12,22 @@ import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 class FlickMediaSource {
-  static FlickManager media(String filename) {
+  static Future<FlickManager> media({String? filename, Uint8List? data}) async {
     FlickManager flickManager;
-    if (filename.startsWith('assets/')) {
-      flickManager = FlickManager(
-          videoPlayerController: VideoPlayerController.asset(filename));
-    } else if (filename.startsWith('http')) {
-      flickManager = FlickManager(
-          videoPlayerController: VideoPlayerController.network(filename));
+    if (filename != null) {
+      if (filename.startsWith('assets/')) {
+        flickManager = FlickManager(
+            videoPlayerController: VideoPlayerController.asset(filename));
+      } else if (filename.startsWith('http')) {
+        flickManager = FlickManager(
+            videoPlayerController: VideoPlayerController.network(filename));
+      } else {
+        flickManager = FlickManager(
+            videoPlayerController: VideoPlayerController.file(File(filename)));
+      }
     } else {
+      data = data ?? Uint8List.fromList([]);
+      filename = await FileUtil.writeTempFile(data, '');
       flickManager = FlickManager(
           videoPlayerController: VideoPlayerController.file(File(filename)));
     }
@@ -27,10 +35,10 @@ class FlickMediaSource {
     return flickManager;
   }
 
-  static List<FlickManager> playlist(List<String> filenames) {
+  static Future<List<FlickManager>> playlist(List<String> filenames) async {
     List<FlickManager> flickManagers = [];
     for (var filename in filenames) {
-      flickManagers.add(media(filename));
+      flickManagers.add(await media(filename: filename));
     }
 
     return flickManagers;
@@ -46,6 +54,7 @@ class FlickVideoPlayerController extends AbstractVideoPlayerController {
 
   FlickVideoPlayerController();
 
+  @override
   open({bool autoStart = false}) {}
 
   _play() {
@@ -59,26 +68,32 @@ class FlickVideoPlayerController extends AbstractVideoPlayerController {
   }
 
   ///基本的视频控制功能
+  @override
   play() {
     _activeManager?.flickControlManager?.play();
   }
 
+  @override
   seek(Duration duration) {
     _activeManager?.flickControlManager?.seekTo(duration);
   }
 
+  @override
   pause() {
     _activeManager?.flickControlManager?.pause();
   }
 
+  @override
   playOrPause() {
     _activeManager?.flickControlManager?.togglePlay();
   }
 
+  @override
   stop() {
     _activeManager?.flickControlManager?.pause();
   }
 
+  @override
   setVolume(double volume) {
     _activeManager?.flickControlManager?.setVolume(volume);
   }
@@ -87,23 +102,28 @@ class FlickVideoPlayerController extends AbstractVideoPlayerController {
     _activeManager?.flickControlManager?.toggleMute();
   }
 
+  @override
   setRate(double rate) {
     _activeManager?.flickControlManager?.setPlaybackSpeed(rate);
   }
 
+  @override
   takeSnapshot(
     String filename,
     int width,
     int height,
   ) {}
 
+  @override
   dispose() {
     _activeManager!.dispose();
   }
 
   ///下面是播放列表的功能
-  add(String filename) {
-    FlickManager flickManager = FlickMediaSource.media(filename);
+  @override
+  add({String? filename, Uint8List? data}) async {
+    FlickManager flickManager =
+        await FlickMediaSource.media(filename: filename, data: data);
     _flickManagers.add(flickManager);
     _activeManager = flickManager;
     if (_isMute) {
@@ -116,6 +136,7 @@ class FlickVideoPlayerController extends AbstractVideoPlayerController {
     }
   }
 
+  @override
   remove(int index) {
     if (index >= 0 && index < _flickManagers.length) {
       FlickManager flickManager = _flickManagers[index];
@@ -127,32 +148,39 @@ class FlickVideoPlayerController extends AbstractVideoPlayerController {
     }
   }
 
-  insert(int index, String filename) {
-    FlickManager flickManager = FlickMediaSource.media(filename);
+  @override
+  insert(int index, {String? filename, Uint8List? data}) async {
+    FlickManager flickManager =
+        await FlickMediaSource.media(filename: filename, data: data);
     _flickManagers.insert(index, flickManager);
     _activeManager = flickManager;
   }
 
+  @override
   next() {
     int index = _flickManagers.indexOf(_activeManager!);
     _activeManager = _flickManagers[index + 1];
   }
 
+  @override
   previous() {
     int index = _flickManagers.indexOf(_activeManager!);
     _activeManager = _flickManagers[index - 1];
   }
 
+  @override
   jumpToIndex(int index) {
     _activeManager = _flickManagers[index - 1];
   }
 
+  @override
   move(int initialIndex, int finalIndex) {
     var flickManager = _flickManagers[initialIndex];
     _flickManagers[initialIndex] = _flickManagers[finalIndex];
     _flickManagers[finalIndex] = flickManager;
   }
 
+  @override
   buildVideoWidget({
     Key? key,
     double? width,

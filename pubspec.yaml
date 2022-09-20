@@ -170,13 +170,13 @@ dependencies:
   flutter_sound: ^9.2.13
   audio_session: ^0.1.6
   audioplayers: ^1.0.1 #音频处理
-  flutter_audio_recorder2: any
+  another_audio_recorder: ^1.0.1
   audio_waveforms: ^0.1.5
   video_player_web: ^2.0.12
   flick_video_player: any
   video_player: ^2.4.7
   dart_vlc: ^0.2.1
-  record: ^4.1.1
+  record: ^4.4.0
   just_audio: ^0.9.25
   just_audio_windows: ^0.1.0
   just_audio_mpv: ^0.1.4

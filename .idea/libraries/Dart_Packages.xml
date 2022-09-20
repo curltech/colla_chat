@@ -44,6 +44,13 @@
             </list>
           </value>
         </entry>
+        <entry key="another_audio_recorder">
+          <value>
+            <list>
+              <option value="$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/another_audio_recorder-1.0.1/lib" />
+            </list>
+          </value>
+        </entry>
         <entry key="archive">
           <value>
             <list>
@@ -933,13 +940,6 @@
             </list>
           </value>
         </entry>
-        <entry key="flutter_audio_recorder2">
-          <value>
-            <list>
-              <option value="$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/flutter_audio_recorder2-0.0.2/lib" />
-            </list>
-          </value>
-        </entry>
         <entry key="flutter_awesome_select">
           <value>
             <list>
@@ -1167,7 +1167,7 @@
         <entry key="flutter_smart_dialog">
           <value>
             <list>
-              <option value="$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/flutter_smart_dialog-4.5.5+2/lib" />
+              <option value="$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/flutter_smart_dialog-4.5.5+3/lib" />
             </list>
           </value>
         </entry>
@@ -2196,7 +2196,7 @@
         <entry key="share_plus">
           <value>
             <list>
-              <option value="$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/share_plus-4.2.0/lib" />
+              <option value="$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/share_plus-4.3.0/lib" />
             </list>
           </value>
         </entry>
@@ -2797,6 +2797,7 @@
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/analyzer-4.7.0/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/animated_bottom_navigation_bar-0.3.3/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/animated_text_kit-4.2.2/lib" />
+      <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/another_audio_recorder-1.0.1/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/archive-3.3.1/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/args-2.3.1/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/asn1lib-1.1.1/lib" />
@@ -2923,7 +2924,6 @@
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/fluent_ui-3.12.0/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/fluro-2.0.3/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/flushbar-1.10.4/lib" />
-      <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/flutter_audio_recorder2-0.0.2/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/flutter_awesome_select-6.5.0/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/flutter_background-1.1.0/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/flutter_blurhash-0.7.0/lib" />
@@ -2955,7 +2955,7 @@
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/flutter_secure_storage_web-1.0.2/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/flutter_secure_storage_windows-1.1.2/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/flutter_slidable-2.0.0/lib" />
-      <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/flutter_smart_dialog-4.5.5+2/lib" />
+      <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/flutter_smart_dialog-4.5.5+3/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/flutter_sound-9.2.13/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/flutter_sound_platform_interface-9.2.13/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/flutter_sound_web-9.2.13/lib" />
@@ -3100,7 +3100,7 @@
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/sensors_plus-1.3.4+1/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/sensors_plus_platform_interface-1.1.1/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/sensors_plus_web-1.1.1/lib" />
-      <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/share_plus-4.2.0/lib" />
+      <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/share_plus-4.3.0/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/share_plus_linux-3.0.0/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/share_plus_macos-3.0.1/lib" />
       <root url="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.flutter-io.cn/share_plus_platform_interface-3.0.3/lib" />

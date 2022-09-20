@@ -1,30 +1,38 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/video/platform_video_player_widget.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
 
 class VlcMediaSource {
-  static Media media(String filename) {
+  static Future<Media> media({String? filename, Uint8List? data}) async {
     Media media;
-    if (filename.startsWith('assets/')) {
-      media = Media.asset(filename);
-    } else if (filename.startsWith('http')) {
-      media = Media.network(filename);
+    if (filename != null) {
+      if (filename.startsWith('assets/')) {
+        media = Media.asset(filename);
+      } else if (filename.startsWith('http')) {
+        media = Media.network(filename);
+      } else {
+        media = Media.file(File(filename));
+      }
     } else {
+      data = data ?? Uint8List.fromList([]);
+      filename = await FileUtil.writeTempFile(data, '');
       media = Media.file(File(filename));
     }
 
     return media;
   }
 
-  static Playlist playlist(List<String> filenames) {
+  static Future<Playlist> playlist(List<String> filenames) async {
     List<Media> medias = [];
     for (var filename in filenames) {
-      medias.add(media(filename));
+      medias.add(await media(filename: filename));
     }
     final playlist = Playlist(
       medias: medias,
@@ -36,9 +44,9 @@ class VlcMediaSource {
 
 ///基于vlc实现的媒体播放器和记录器，可以截取视频文件的图片作为缩略图
 ///支持除macos外的平台，linux需要VLC & libVLC installed.
-class VlcVideoPlayerController extends AbstractVideoPlayerController{
+class VlcVideoPlayerController extends AbstractVideoPlayerController {
   late Player player;
-  Playlist playlist = VlcMediaSource.playlist([]);
+  Playlist playlist = Playlist(medias: []);
   CurrentState current = CurrentState();
   PositionState position = PositionState();
   PlaybackState playback = PlaybackState();
@@ -87,6 +95,7 @@ class VlcVideoPlayerController extends AbstractVideoPlayerController{
     open();
   }
 
+  @override
   open({bool autoStart = false}) {
     player.open(
       playlist,
@@ -95,34 +104,42 @@ class VlcVideoPlayerController extends AbstractVideoPlayerController{
   }
 
   ///基本的视频控制功能
+  @override
   play() {
     player.play();
   }
 
+  @override
   seek(Duration duration) {
     player.seek(duration);
   }
 
+  @override
   pause() {
     player.pause();
   }
 
+  @override
   playOrPause() {
     player.playOrPause();
   }
 
+  @override
   stop() {
     player.stop();
   }
 
+  @override
   setVolume(double volume) {
     player.setVolume(volume);
   }
 
+  @override
   setRate(double rate) {
     player.setRate(rate);
   }
 
+  @override
   takeSnapshot(
     String filename,
     int width,
@@ -132,41 +149,50 @@ class VlcVideoPlayerController extends AbstractVideoPlayerController{
     player.takeSnapshot(file, width, height);
   }
 
+  @override
   dispose() {
     player.dispose();
   }
 
   ///下面是播放列表的功能
-  add(String filename) {
-    Media media = VlcMediaSource.media(filename);
+  @override
+  add({String? filename, Uint8List? data}) async {
+    Media media = await VlcMediaSource.media(filename: filename, data: data);
     player.add(media);
   }
 
+  @override
   remove(int index) {
     player.remove(index);
   }
 
-  insert(int index, String filename) {
-    Media media = VlcMediaSource.media(filename);
+  @override
+  insert(int index, {String? filename, Uint8List? data}) async {
+    Media media = await VlcMediaSource.media(filename: filename, data: data);
     player.insert(index, media);
   }
 
+  @override
   next() {
     player.next();
   }
 
+  @override
   previous() {
     player.previous();
   }
 
+  @override
   jumpToIndex(int index) {
     player.jumpToIndex(index);
   }
 
+  @override
   move(int initialIndex, int finalIndex) {
     player.move(initialIndex, finalIndex);
   }
 
+  @override
   buildVideoWidget({
     Key? key,
     int? playerId,
@@ -315,11 +341,11 @@ class VlcMediaRecorder {
     int id = 0,
     required String filename,
     required File savingFile,
-  }) {
+  }) async {
     if (record != null) {
       dispose();
     }
-    Media media = VlcMediaSource.media(filename);
+    Media media = await VlcMediaSource.media(filename: filename);
     record = Record.create(
       id: id,
       media: media,
@@ -345,7 +371,8 @@ class PlatformVlcVideoPlayerWidget extends StatefulWidget {
   State createState() => _PlatformVlcVideoPlayerWidgetState();
 }
 
-class _PlatformVlcVideoPlayerWidgetState extends State<PlatformVlcVideoPlayerWidget> {
+class _PlatformVlcVideoPlayerWidgetState
+    extends State<PlatformVlcVideoPlayerWidget> {
   MediaType mediaType = MediaType.file;
   CurrentState current = CurrentState();
   PositionState position = PositionState();

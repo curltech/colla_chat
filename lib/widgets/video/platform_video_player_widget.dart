@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/video/platform_flick_video_player.dart';
 import 'package:colla_chat/widgets/video/platform_vlc_video_player.dart';
@@ -30,11 +32,11 @@ abstract class AbstractVideoPlayerController {
   dispose();
 
   ///下面是播放列表的功能
-  add(String filename);
+  add({String? filename, Uint8List? data});
 
   remove(int index);
 
-  insert(int index, String filename);
+  insert(int index, {String? filename, Uint8List? data});
 
   next();
 
@@ -76,7 +78,7 @@ class PlatformVideoPlayerController extends AbstractVideoPlayerController {
   late AbstractVideoPlayerController controller;
 
   PlatformVideoPlayerController() {
-    if (platformParams.web || platformParams.web || platformParams.web) {
+    if (platformParams.ios || platformParams.android || platformParams.web) {
       controller = FlickVideoPlayerController();
     } else {
       controller = VlcVideoPlayerController();
@@ -88,8 +90,8 @@ class PlatformVideoPlayerController extends AbstractVideoPlayerController {
   }
 
   @override
-  add(String filename) {
-    controller.add(filename);
+  add({String? filename, Uint8List? data}) {
+    controller.add(filename: filename, data: data);
   }
 
   @override
@@ -126,8 +128,8 @@ class PlatformVideoPlayerController extends AbstractVideoPlayerController {
   }
 
   @override
-  insert(int index, String filename) {
-    controller.insert(index, filename);
+  insert(int index, {String? filename, Uint8List? data}) {
+    controller.insert(index, filename: filename, data: data);
   }
 
   @override
@@ -227,7 +229,7 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
   Widget build(BuildContext context) {
     PlatformVideoPlayerController platformVideoPlayerController =
         PlatformVideoPlayerController();
-    if (platformParams.web || platformParams.web || platformParams.web) {
+    if (platformParams.ios || platformParams.android || platformParams.web) {
       var player = PlatformFlickVideoPlayerWidget(
           controller: platformVideoPlayerController.controller
               as FlickVideoPlayerController);
