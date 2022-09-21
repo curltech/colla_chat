@@ -49,7 +49,7 @@ class _PlatformAudioRecorderWidgetState
       withLeading: true,
       child: PlatformAudioRecorder(
         controller: widget.controller,
-        onStop: (String path) {},
+        onStop: (String filename) {},
       ),
     );
   }

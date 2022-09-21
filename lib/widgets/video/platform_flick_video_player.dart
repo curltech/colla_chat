@@ -246,17 +246,18 @@ class FlickVideoPlayerController extends AbstractVideoPlayerController {
 
 ///采用flick-video-player实现的视频播放器，用于移动设备和web
 class PlatformFlickVideoPlayer extends StatefulWidget {
-  final FlickVideoPlayerController controller;
+  late final FlickVideoPlayerController controller;
 
-  const PlatformFlickVideoPlayer({Key? key, required this.controller})
-      : super(key: key);
+  PlatformFlickVideoPlayer({Key? key, FlickVideoPlayerController? controller})
+      : super(key: key) {
+    controller = controller ?? FlickVideoPlayerController();
+  }
 
   @override
   State createState() => _PlatformFlickVideoPlayerState();
 }
 
-class _PlatformFlickVideoPlayerState
-    extends State<PlatformFlickVideoPlayer> {
+class _PlatformFlickVideoPlayerState extends State<PlatformFlickVideoPlayer> {
   @override
   void initState() {
     super.initState();

@@ -228,10 +228,12 @@ class PlatformVideoPlayerController extends AbstractVideoPlayerController {
 
 ///平台标准的video-player的实现，移动采用flick，桌面采用vlc
 class PlatformVideoPlayer extends StatefulWidget {
-  final PlatformVideoPlayerController controller;
+  late final PlatformVideoPlayerController controller;
 
-  const PlatformVideoPlayer({Key? key, required this.controller})
-      : super(key: key);
+  PlatformVideoPlayer({Key? key, PlatformVideoPlayerController? controller})
+      : super(key: key) {
+    controller = controller ?? PlatformVideoPlayerController();
+  }
 
   @override
   State createState() => _PlatformVideoPlayerState();

@@ -1,16 +1,16 @@
+import 'package:colla_chat/widgets/audio/platform_audio_player.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/video/platform_video_player.dart';
 import 'package:flutter/material.dart';
 
 ///平台标准的video-player的实现，移动采用flick，桌面采用vlc
 class PlatformAudioPlayerWidget extends StatefulWidget with TileDataMixin {
-  late final PlatformVideoPlayerController controller;
+  late final PlatformAudioPlayerController controller;
 
   PlatformAudioPlayerWidget(
-      {Key? key, PlatformVideoPlayerController? controller})
+      {Key? key, PlatformAudioPlayerController? controller})
       : super(key: key) {
-    controller = controller ?? PlatformVideoPlayerController();
+    controller = controller ?? PlatformAudioPlayerController();
   }
 
   @override
@@ -43,9 +43,9 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-      title: const Text('Video Player'),
+      title: const Text('Audio Player'),
       withLeading: true,
-      child: PlatformVideoPlayer(
+      child: PlatformAudioPlayer(
         controller: widget.controller,
       ),
     );

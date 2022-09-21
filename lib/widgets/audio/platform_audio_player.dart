@@ -4,10 +4,10 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/audio/blue_fire_audio_player_controller.dart';
 import 'package:colla_chat/widgets/audio/blue_fire_audio_player.dart';
-import 'package:colla_chat/widgets/audio/just_audio_player_controller.dart';
+import 'package:colla_chat/widgets/audio/blue_fire_audio_player_controller.dart';
 import 'package:colla_chat/widgets/audio/just_audio_player.dart';
+import 'package:colla_chat/widgets/audio/just_audio_player_controller.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:just_waveform/just_waveform.dart';
@@ -324,10 +324,12 @@ class PlatformAudioPlayerController extends AbstractAudioPlayerController {
 
 ///平台标准的audio-player的实现，
 class PlatformAudioPlayer extends StatefulWidget {
-  final PlatformAudioPlayerController controller;
+  late final PlatformAudioPlayerController controller;
 
-  const PlatformAudioPlayer({Key? key, required this.controller})
-      : super(key: key);
+  PlatformAudioPlayer({Key? key, PlatformAudioPlayerController? controller})
+      : super(key: key) {
+    controller = controller ?? PlatformAudioPlayerController();
+  }
 
   @override
   State createState() => _PlatformAudioPlayerState();

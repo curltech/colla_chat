@@ -363,16 +363,18 @@ class VlcMediaRecorder {
 }
 
 class PlatformVlcVideoPlayer extends StatefulWidget {
-  final VlcVideoPlayerController controller;
+  late final VlcVideoPlayerController controller;
 
-  const PlatformVlcVideoPlayer({super.key, required this.controller});
+  PlatformVlcVideoPlayer({Key? key, VlcVideoPlayerController? controller})
+      : super(key: key) {
+    controller = controller ?? VlcVideoPlayerController();
+  }
 
   @override
   State createState() => _PlatformVlcVideoPlayerState();
 }
 
-class _PlatformVlcVideoPlayerState
-    extends State<PlatformVlcVideoPlayer> {
+class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
   MediaType mediaType = MediaType.file;
   CurrentState current = CurrentState();
   PositionState position = PositionState();

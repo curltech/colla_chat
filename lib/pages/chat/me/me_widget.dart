@@ -4,6 +4,7 @@ import 'package:colla_chat/pages/chat/me/settings/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/webrtc_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/widgets/audio/platform_audio_player_widget.dart';
 import 'package:colla_chat/widgets/video/platform_video_player_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -32,7 +33,10 @@ class MeWidget extends StatelessWidget with TileDataMixin {
       PeerEndpointListWidget();
   final PeerClientListWidget peerClientListWidget = PeerClientListWidget();
   final WebrtcWidget webrtcWidget = WebrtcWidget();
-  final PlatformVideoPlayerWidget videoPlayerWidget = PlatformVideoPlayerWidget();
+  final PlatformVideoPlayerWidget videoPlayerWidget =
+      PlatformVideoPlayerWidget();
+  final PlatformAudioPlayerWidget audioPlayerWidget =
+      PlatformAudioPlayerWidget();
 
   late final Widget child;
 
@@ -50,6 +54,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(peerClientListWidget);
     indexWidgetProvider.define(webrtcWidget);
     indexWidgetProvider.define(videoPlayerWidget);
+    indexWidgetProvider.define(audioPlayerWidget);
 
     List<TileDataMixin> mixins = [
       collectionWidget,
@@ -59,10 +64,11 @@ class MeWidget extends StatelessWidget with TileDataMixin {
       peerEndpointListWidget,
       peerClientListWidget,
       webrtcWidget,
-      videoPlayerWidget
+      videoPlayerWidget,
+      audioPlayerWidget
     ];
     final List<TileData> meTileData = TileData.from(mixins);
-    child = DataListView(tileData: meTileData);
+    child = Expanded(child: DataListView(tileData: meTileData));
   }
 
   @override
