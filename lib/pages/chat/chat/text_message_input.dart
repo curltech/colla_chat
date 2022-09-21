@@ -5,7 +5,7 @@ import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/widgets/audio/audio_waveforms_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/audio/just_audio_player.dart';
+import 'package:colla_chat/widgets/audio/just_audio_player_controller.dart';
 import 'package:colla_chat/widgets/audio/platform_sound.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';

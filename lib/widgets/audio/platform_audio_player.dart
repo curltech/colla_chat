@@ -4,10 +4,10 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/widgets/audio/blue_fire_audio_player_controller.dart';
 import 'package:colla_chat/widgets/audio/blue_fire_audio_player.dart';
-import 'package:colla_chat/widgets/audio/blue_fire_audio_player_widget.dart';
+import 'package:colla_chat/widgets/audio/just_audio_player_controller.dart';
 import 'package:colla_chat/widgets/audio/just_audio_player.dart';
-import 'package:colla_chat/widgets/audio/just_audio_player_widget.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:just_waveform/just_waveform.dart';
@@ -323,17 +323,17 @@ class PlatformAudioPlayerController extends AbstractAudioPlayerController {
 }
 
 ///平台标准的audio-player的实现，
-class PlatformAudioPlayerWidget extends StatefulWidget {
+class PlatformAudioPlayer extends StatefulWidget {
   final PlatformAudioPlayerController controller;
 
-  const PlatformAudioPlayerWidget({Key? key, required this.controller})
+  const PlatformAudioPlayer({Key? key, required this.controller})
       : super(key: key);
 
   @override
-  State createState() => _PlatformAudioPlayerWidgetState();
+  State createState() => _PlatformAudioPlayerState();
 }
 
-class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
+class _PlatformAudioPlayerState extends State<PlatformAudioPlayer> {
   @override
   void initState() {
     super.initState();
@@ -349,12 +349,12 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
     PlatformAudioPlayerController platformAudioPlayerController =
         PlatformAudioPlayerController();
     if (platformParams.ios || platformParams.android || platformParams.web) {
-      var player = JustAudioPlayerWidget(
+      var player = JustAudioPlayer(
           controller: platformAudioPlayerController.controller
               as JustAudioPlayerController);
       return player;
     } else {
-      var player = BlueFireAudioPlayerWidget(
+      var player = BlueFireAudioPlayer(
         controller: platformAudioPlayerController.controller
             as BlueFireAudioPlayerController,
       );

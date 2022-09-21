@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/video/platform_video_player_widget.dart';
+import 'package:colla_chat/widgets/video/platform_video_player.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flick_video_player/src/utils/web_key_bindings.dart';
 import 'package:flutter/material.dart';
@@ -245,18 +245,18 @@ class FlickVideoPlayerController extends AbstractVideoPlayerController {
 }
 
 ///采用flick-video-player实现的视频播放器，用于移动设备和web
-class PlatformFlickVideoPlayerWidget extends StatefulWidget {
+class PlatformFlickVideoPlayer extends StatefulWidget {
   final FlickVideoPlayerController controller;
 
-  const PlatformFlickVideoPlayerWidget({Key? key, required this.controller})
+  const PlatformFlickVideoPlayer({Key? key, required this.controller})
       : super(key: key);
 
   @override
-  State createState() => _PlatformFlickVideoPlayerWidgetState();
+  State createState() => _PlatformFlickVideoPlayerState();
 }
 
-class _PlatformFlickVideoPlayerWidgetState
-    extends State<PlatformFlickVideoPlayerWidget> {
+class _PlatformFlickVideoPlayerState
+    extends State<PlatformFlickVideoPlayer> {
   @override
   void initState() {
     super.initState();

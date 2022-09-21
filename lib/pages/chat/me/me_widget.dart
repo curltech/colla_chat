@@ -4,7 +4,7 @@ import 'package:colla_chat/pages/chat/me/settings/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/webrtc_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/widgets/video/platform_video_player.dart';
+import 'package:colla_chat/widgets/video/platform_video_player_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../../../l10n/localization.dart';
@@ -32,7 +32,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
       PeerEndpointListWidget();
   final PeerClientListWidget peerClientListWidget = PeerClientListWidget();
   final WebrtcWidget webrtcWidget = WebrtcWidget();
-  final PlatformVideoPlayer videoPlayerWidget = PlatformVideoPlayer();
+  final PlatformVideoPlayerWidget videoPlayerWidget = PlatformVideoPlayerWidget();
 
   late final Widget child;
 

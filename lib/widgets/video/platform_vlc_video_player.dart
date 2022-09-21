@@ -5,7 +5,7 @@ import 'dart:ui' as ui;
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/video/platform_video_player_widget.dart';
+import 'package:colla_chat/widgets/video/platform_video_player.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
 
@@ -362,17 +362,17 @@ class VlcMediaRecorder {
   }
 }
 
-class PlatformVlcVideoPlayerWidget extends StatefulWidget {
+class PlatformVlcVideoPlayer extends StatefulWidget {
   final VlcVideoPlayerController controller;
 
-  const PlatformVlcVideoPlayerWidget({super.key, required this.controller});
+  const PlatformVlcVideoPlayer({super.key, required this.controller});
 
   @override
-  State createState() => _PlatformVlcVideoPlayerWidgetState();
+  State createState() => _PlatformVlcVideoPlayerState();
 }
 
-class _PlatformVlcVideoPlayerWidgetState
-    extends State<PlatformVlcVideoPlayerWidget> {
+class _PlatformVlcVideoPlayerState
+    extends State<PlatformVlcVideoPlayer> {
   MediaType mediaType = MediaType.file;
   CurrentState current = CurrentState();
   PositionState position = PositionState();
