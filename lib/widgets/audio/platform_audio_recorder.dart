@@ -246,9 +246,7 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
 
   Future<void> _start() async {
     try {
-      if (await widget.controller.hasPermission()) {
-        await widget.controller.start();
-      }
+      await widget.controller.start();
     } catch (e) {
       logger.e(e);
     }
@@ -289,7 +287,7 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
       style: WidgetUtil.buildButtonStyle(),
       child: Text(controlText),
       onPressed: () async {
-        await _start();
+        await _action();
       },
       onLongPress: () async {
         await _stop();

@@ -1,12 +1,12 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:another_audio_recorder/another_audio_recorder.dart';
-import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/audio/platform_audio_recorder.dart';
+import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -106,9 +106,10 @@ class AnotherAudioRecorderController extends AbstractAudioRecorderController {
 
 class PlatformAnotherAudioRecorder extends StatefulWidget {
   late final AnotherAudioRecorderController controller;
+  final void Function(String path)? onStop;
 
   PlatformAnotherAudioRecorder(
-      {AnotherAudioRecorderController? controller, super.key}) {
+      {AnotherAudioRecorderController? controller, super.key, this.onStop}) {
     controller = controller ?? AnotherAudioRecorderController();
   }
 
@@ -118,37 +119,33 @@ class PlatformAnotherAudioRecorder extends StatefulWidget {
 
 class _PlatformAnotherAudioRecorderState
     extends State<PlatformAnotherAudioRecorder> {
+  String controlText = '';
+
   @override
   void initState() {
     super.initState();
+    widget.controller.addListener(_update);
     _init();
+  }
+
+  _update() {
+    setState(() {
+      if (widget.controller.status == RecorderStatus.recording) {
+        controlText = widget.controller.durationText;
+        controlText = '$controlText  ${AppLocalizations.t('pause')}';
+      } else if (widget.controller.status == RecorderStatus.none ||
+          widget.controller.status == RecorderStatus.stop) {
+        controlText = AppLocalizations.t('start');
+      } else if (widget.controller.status == RecorderStatus.pause) {
+        controlText = AppLocalizations.t('resume');
+      }
+    });
   }
 
   _init() async {
     try {
-      if (await AnotherAudioRecorder.hasPermissions) {
-        String customPath = '/another_audio_recorder_';
-        Directory appDocDirectory;
-//        io.Directory appDocDirectory = await getApplicationDocumentsDirectory();
-        if (platformParams.ios) {
-          appDocDirectory = await getApplicationDocumentsDirectory();
-        } else {
-          appDocDirectory = (await getExternalStorageDirectory())!;
-        }
-
-        // can add extension like ".mp4" ".wav" ".m4a" ".aac"
-        customPath = appDocDirectory.path +
-            customPath +
-            DateTime.now().millisecondsSinceEpoch.toString();
-
-        // .wav <---> AudioFormat.WAV
-        // .mp4 .m4a .aac <---> AudioFormat.AAC
-        // AudioFormat is optional, if given value, will overwrite path extension when there is conflicts.
+      if (await widget.controller.hasPermission()) {
         await widget.controller.start();
-        // after initialization
-        var current = widget.controller?.current;
-        print(current);
-        // should be "Initialized", if all working fine
         setState(() {});
       } else {
         DialogUtil.error(context, content: "You must accept permissions");
@@ -161,140 +158,62 @@ class _PlatformAnotherAudioRecorderState
   _start() async {
     try {
       await widget.controller?.start();
-      var recording = widget.controller?.current;
-      setState(() {});
-
-      const tick = Duration(milliseconds: 50);
-      Timer.periodic(tick, (Timer t) async {
-        if (widget.controller?.status == RecordingStatus.Stopped) {
-          t.cancel();
-        }
-
-        var current = widget.controller?.current;
-        // print(current.status);
-        setState(() {});
-      });
     } catch (e) {
-      print(e);
+      logger.e(e);
     }
   }
 
   _resume() async {
     await widget.controller?.resume();
-    setState(() {});
   }
 
   _pause() async {
     await widget.controller?.pause();
-    setState(() {});
   }
 
   _stop() async {
-    var filename = await widget.controller?.stop();
-    logger.i("Stop recording: $filename");
-    setState(() {});
+    if (widget.controller.status == RecorderStatus.recording ||
+        widget.controller.status == RecorderStatus.pause) {
+      final path = await widget.controller.stop();
+
+      if (path != null) {
+        widget.onStop!(path);
+      }
+    }
   }
 
-  Widget _buildText() {
-    var text = "";
-    switch (widget.controller?.status) {
-      case RecorderStatus.none:
-        {
-          text = 'Start';
-          break;
-        }
-      case RecorderStatus.recording:
-        {
-          text = 'Pause';
-          break;
-        }
-      case RecorderStatus.pause:
-        {
-          text = 'Resume';
-          break;
-        }
-      case RecorderStatus.stop:
-        {
-          text = 'Init';
-          break;
-        }
-      default:
-        break;
+  Future<void> _action() async {
+    if (widget.controller.status == RecorderStatus.recording) {
+      await _pause();
+    } else if (widget.controller.status == RecorderStatus.none ||
+        widget.controller.status == RecorderStatus.stop) {
+      await _start();
+    } else if (widget.controller.status == RecorderStatus.pause) {
+      await _resume();
     }
-    return Text(text, style: TextStyle(color: Colors.white));
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_update);
+    super.dispose();
+  }
+
+  Widget _buildRecorderWidget(BuildContext context) {
+    return TextButton(
+      style: WidgetUtil.buildButtonStyle(),
+      child: Text(controlText),
+      onPressed: () async {
+        await _action();
+      },
+      onLongPress: () async {
+        await _stop();
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: TextButton(
-                      onPressed: () async {
-                        var status = widget.controller.status;
-                        switch (status) {
-                          case RecorderStatus.none:
-                            {
-                              _start();
-                              break;
-                            }
-                          case RecorderStatus.recording:
-                            {
-                              _pause();
-                              break;
-                            }
-                          case RecorderStatus.pause:
-                            {
-                              _resume();
-                              break;
-                            }
-                          case RecorderStatus.stop:
-                            {
-                              _init();
-                              break;
-                            }
-                          default:
-                            break;
-                        }
-                      },
-                      child: _buildText(),
-                    ),
-                  ),
-                  TextButton(
-                    onPressed: widget.controller.status != RecordingStatus.Unset
-                        ? _stop
-                        : null,
-                    child:
-                        new Text("Stop", style: TextStyle(color: Colors.white)),
-                  ),
-                  SizedBox(
-                    width: 8,
-                  ),
-                ],
-              ),
-              new Text("Status : ${widget.controller.status}"),
-              new Text(
-                  'Avg Power: ${widget.controller.current?.metering?.averagePower}'),
-              new Text(
-                  'Peak Power: ${widget.controller.current?.metering?.peakPower}'),
-              new Text(
-                  "File path of the record: ${widget.controller.current?.path}"),
-              new Text("Format: ${widget.controller.current?.audioFormat}"),
-              new Text(
-                  "isMeteringEnabled: ${widget.controller.current?.metering?.isMeteringEnabled}"),
-              new Text("Extension : ${widget.controller.current?.extension}"),
-              new Text(
-                  "Audio recording duration : ${widget.controller.current?.duration.toString()}")
-            ]),
-      ),
-    );
+    return _buildRecorderWidget(context);
   }
 }
