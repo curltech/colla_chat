@@ -367,7 +367,7 @@ class PlatformVlcVideoPlayer extends StatefulWidget {
 
   PlatformVlcVideoPlayer({Key? key, VlcVideoPlayerController? controller})
       : super(key: key) {
-    controller = controller ?? VlcVideoPlayerController();
+    this.controller = controller ?? VlcVideoPlayerController();
   }
 
   @override

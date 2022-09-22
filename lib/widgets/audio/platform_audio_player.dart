@@ -328,7 +328,7 @@ class PlatformAudioPlayer extends StatefulWidget {
 
   PlatformAudioPlayer({Key? key, PlatformAudioPlayerController? controller})
       : super(key: key) {
-    controller = controller ?? PlatformAudioPlayerController();
+    this.controller = controller ?? PlatformAudioPlayerController();
   }
 
   @override

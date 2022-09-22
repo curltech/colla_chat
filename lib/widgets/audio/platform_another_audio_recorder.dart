@@ -1,20 +1,15 @@
 import 'dart:async';
 
 import 'package:another_audio_recorder/another_audio_recorder.dart';
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/date_util.dart';
-import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/audio/platform_audio_recorder.dart';
-import 'package:colla_chat/widgets/common/simple_widget.dart';
-import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 
 ///仅支持移动设备
 class AnotherAudioRecorderController extends AbstractAudioRecorderController {
   AnotherAudioRecorder? recorder;
   Recording? _current;
-  RecordingStatus _status = RecordingStatus.Unset;
 
   AnotherAudioRecorderController();
 
@@ -25,19 +20,14 @@ class AnotherAudioRecorderController extends AbstractAudioRecorderController {
     return hasPermission;
   }
 
-  @override
-  RecorderStatus get status {
-    if (_status == RecordingStatus.Recording) {
-      return RecorderStatus.recording;
+  set state(RecordingStatus state) {
+    if (state == RecordingStatus.Recording) {
+      status = RecorderStatus.recording;
+    } else if (state == RecordingStatus.Paused) {
+      status = RecorderStatus.pause;
+    } else {
+      status = RecorderStatus.stop;
     }
-    if (_status == RecordingStatus.Paused) {
-      return RecorderStatus.pause;
-    }
-    if (_status == RecordingStatus.Stopped) {
-      return RecorderStatus.stop;
-    }
-
-    return RecorderStatus.none;
   }
 
   @override
@@ -55,11 +45,13 @@ class AnotherAudioRecorderController extends AbstractAudioRecorderController {
         recorder = AnotherAudioRecorder(filename,
             audioFormat: audioFormat, sampleRate: sampleRate);
         await recorder!.initialized;
+        //设置开始的计时提示
+        duration = 0;
         await recorder!.start();
         await super.start();
       }
       _current = recorder!.recording;
-      _status = _current!.status!;
+      status = RecorderStatus.recording;
     } catch (e) {
       logger.e('recorder start $e');
     }
@@ -67,28 +59,37 @@ class AnotherAudioRecorderController extends AbstractAudioRecorderController {
 
   @override
   Future<String?> stop() async {
-    _current = await recorder!.stop();
-    _current = recorder!.recording;
-    _status = _current!.status!;
+    if (status == RecorderStatus.recording || status == RecorderStatus.pause) {
+      _current = await recorder!.stop();
+      _current = recorder!.recording;
 
-    var filename = _current!.path;
-    await super.stop();
+      var filename = _current!.path;
+      logger.i('audio recorder filename:$filename');
+      this.filename = filename;
+      await super.stop();
+      status = RecorderStatus.stop;
 
-    return filename;
+      return filename;
+    }
+    return null;
   }
 
   @override
   Future<void> pause() async {
-    await recorder!.pause();
-    _current = recorder!.recording;
-    _status = _current!.status!;
+    if (status == RecorderStatus.recording) {
+      await recorder!.pause();
+      _current = recorder!.recording;
+      status = RecorderStatus.pause;
+    }
   }
 
   @override
   Future<void> resume() async {
-    await recorder!.resume();
-    _current = recorder!.recording;
-    _status = _current!.status!;
+    if (status == RecorderStatus.pause) {
+      await recorder!.resume();
+      _current = recorder!.recording;
+      status = RecorderStatus.recording;
+    }
   }
 
   Recording? get current {
@@ -97,123 +98,12 @@ class AnotherAudioRecorderController extends AbstractAudioRecorderController {
 
   @override
   dispose() async {
-    await recorder!.stop();
-    _current = recorder!.recording;
-    _status = _current!.status!;
+    if (recorder != null) {
+      await recorder!.stop();
+      _current = null;
+      recorder = null;
+      status = RecorderStatus.stop;
+    }
     super.dispose();
-  }
-}
-
-class PlatformAnotherAudioRecorder extends StatefulWidget {
-  late final AnotherAudioRecorderController controller;
-  final void Function(String path)? onStop;
-
-  PlatformAnotherAudioRecorder(
-      {AnotherAudioRecorderController? controller, super.key, this.onStop}) {
-    controller = controller ?? AnotherAudioRecorderController();
-  }
-
-  @override
-  State<StatefulWidget> createState() => _PlatformAnotherAudioRecorderState();
-}
-
-class _PlatformAnotherAudioRecorderState
-    extends State<PlatformAnotherAudioRecorder> {
-  String controlText = '';
-
-  @override
-  void initState() {
-    super.initState();
-    widget.controller.addListener(_update);
-    _init();
-  }
-
-  _update() {
-    setState(() {
-      if (widget.controller.status == RecorderStatus.recording) {
-        controlText = widget.controller.durationText;
-        controlText = '$controlText  ${AppLocalizations.t('pause')}';
-      } else if (widget.controller.status == RecorderStatus.none ||
-          widget.controller.status == RecorderStatus.stop) {
-        controlText = AppLocalizations.t('start');
-      } else if (widget.controller.status == RecorderStatus.pause) {
-        controlText = AppLocalizations.t('resume');
-      }
-    });
-  }
-
-  _init() async {
-    try {
-      if (await widget.controller.hasPermission()) {
-        await widget.controller.start();
-        setState(() {});
-      } else {
-        DialogUtil.error(context, content: "You must accept permissions");
-      }
-    } catch (e) {
-      logger.e(e);
-    }
-  }
-
-  _start() async {
-    try {
-      await widget.controller?.start();
-    } catch (e) {
-      logger.e(e);
-    }
-  }
-
-  _resume() async {
-    await widget.controller?.resume();
-  }
-
-  _pause() async {
-    await widget.controller?.pause();
-  }
-
-  _stop() async {
-    if (widget.controller.status == RecorderStatus.recording ||
-        widget.controller.status == RecorderStatus.pause) {
-      final path = await widget.controller.stop();
-
-      if (path != null) {
-        widget.onStop!(path);
-      }
-    }
-  }
-
-  Future<void> _action() async {
-    if (widget.controller.status == RecorderStatus.recording) {
-      await _pause();
-    } else if (widget.controller.status == RecorderStatus.none ||
-        widget.controller.status == RecorderStatus.stop) {
-      await _start();
-    } else if (widget.controller.status == RecorderStatus.pause) {
-      await _resume();
-    }
-  }
-
-  @override
-  void dispose() {
-    widget.controller.removeListener(_update);
-    super.dispose();
-  }
-
-  Widget _buildRecorderWidget(BuildContext context) {
-    return TextButton(
-      style: WidgetUtil.buildButtonStyle(),
-      child: Text(controlText),
-      onPressed: () async {
-        await _action();
-      },
-      onLongPress: () async {
-        await _stop();
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _buildRecorderWidget(context);
   }
 }

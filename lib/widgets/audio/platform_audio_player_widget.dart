@@ -10,7 +10,7 @@ class PlatformAudioPlayerWidget extends StatefulWidget with TileDataMixin {
   PlatformAudioPlayerWidget(
       {Key? key, PlatformAudioPlayerController? controller})
       : super(key: key) {
-    controller = controller ?? PlatformAudioPlayerController();
+    this.controller = controller ?? PlatformAudioPlayerController();
   }
 
   @override

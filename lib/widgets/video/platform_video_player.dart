@@ -232,7 +232,7 @@ class PlatformVideoPlayer extends StatefulWidget {
 
   PlatformVideoPlayer({Key? key, PlatformVideoPlayerController? controller})
       : super(key: key) {
-    controller = controller ?? PlatformVideoPlayerController();
+    this.controller = controller ?? PlatformVideoPlayerController();
   }
 
   @override

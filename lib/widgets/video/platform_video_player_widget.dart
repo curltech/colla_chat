@@ -10,7 +10,7 @@ class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
   PlatformVideoPlayerWidget(
       {Key? key, PlatformVideoPlayerController? controller})
       : super(key: key) {
-    controller = controller ?? PlatformVideoPlayerController();
+    this.controller = controller ?? PlatformVideoPlayerController();
   }
 
   @override

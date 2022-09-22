@@ -11,7 +11,7 @@ class BlueFireAudioPlayer extends StatefulWidget {
     Key? key,
     BlueFireAudioPlayerController? controller,
   }) : super(key: key) {
-    controller = controller ?? BlueFireAudioPlayerController();
+    this.controller = controller ?? BlueFireAudioPlayerController();
   }
 
   @override

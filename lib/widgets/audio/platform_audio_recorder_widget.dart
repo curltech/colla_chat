@@ -1,17 +1,26 @@
+import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/widgets/audio/platform_another_audio_recorder.dart';
 import 'package:colla_chat/widgets/audio/platform_audio_recorder.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 ///平台标准的video-player的实现，移动采用flick，桌面采用vlc
 class PlatformAudioRecorderWidget extends StatefulWidget with TileDataMixin {
-  late final PlatformAudioRecorderController controller;
+  late final AbstractAudioRecorderController controller;
 
   PlatformAudioRecorderWidget(
-      {Key? key, PlatformAudioRecorderController? controller})
+      {Key? key, AbstractAudioRecorderController? controller})
       : super(key: key) {
-    controller = controller ?? PlatformAudioRecorderController();
+    if (controller == null) {
+      if (platformParams.ios || platformParams.android || platformParams.web) {
+        this.controller = AnotherAudioRecorderController();
+      } else {
+        this.controller = PlatformAudioRecorderController();
+      }
+    } else {
+      this.controller = controller;
+    }
   }
 
   @override

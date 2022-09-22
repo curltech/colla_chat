@@ -250,7 +250,7 @@ class PlatformFlickVideoPlayer extends StatefulWidget {
 
   PlatformFlickVideoPlayer({Key? key, FlickVideoPlayerController? controller})
       : super(key: key) {
-    controller = controller ?? FlickVideoPlayerController();
+    this.controller = controller ?? FlickVideoPlayerController();
   }
 
   @override

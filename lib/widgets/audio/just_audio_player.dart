@@ -16,7 +16,7 @@ class JustAudioPlayer extends StatefulWidget {
     Key? key,
     JustAudioPlayerController? controller,
   }) : super(key: key) {
-    controller = controller ?? JustAudioPlayerController();
+    this.controller = controller ?? JustAudioPlayerController();
   }
 
   @override

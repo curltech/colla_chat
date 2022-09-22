@@ -1,31 +1,39 @@
 import 'dart:async';
 
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/widgets/audio/platform_another_audio_recorder.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
 
-enum RecorderStatus { none, pause, recording, stop }
+enum RecorderStatus { pause, recording, stop }
 
 enum RecorderAudioFormat { wav, mp3 }
 
 ///支持多种设备，windows测试通过
 ///Android, iOS, Linux, macOS, Windows, and web.
 abstract class AbstractAudioRecorderController with ChangeNotifier {
-  String? _filename;
+  String? filename;
+  RecorderStatus _status = RecorderStatus.stop;
   Timer? _timer;
-  int _duration = 0;
+  int _duration = -1;
   String _durationText = '';
 
   Future<bool> hasPermission();
 
-  RecorderStatus get status;
+  RecorderStatus get status {
+    return _status;
+  }
 
-  String? get filename {
-    return _filename;
+  set status(RecorderStatus status) {
+    if (_status != status) {
+      _status = status;
+      notifyListeners();
+    }
   }
 
   Future<void> start({String? filename}) async {
@@ -34,7 +42,7 @@ abstract class AbstractAudioRecorderController with ChangeNotifier {
       var name = DateUtil.currentDate();
       filename = '${dir.path}/$name.mp3';
     }
-    _filename = filename;
+    this.filename = filename;
     startTimer();
   }
 
@@ -59,8 +67,7 @@ abstract class AbstractAudioRecorderController with ChangeNotifier {
 
     _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
       if (status == RecorderStatus.recording) {
-        _duration++;
-        _changeDurationText();
+        duration = duration + 1;
         notifyListeners();
       }
     });
@@ -70,7 +77,7 @@ abstract class AbstractAudioRecorderController with ChangeNotifier {
     if (_timer != null) {
       _timer?.cancel();
       _timer = null;
-      _duration = 0;
+      duration = 0;
     }
   }
 
@@ -78,38 +85,57 @@ abstract class AbstractAudioRecorderController with ChangeNotifier {
     return _duration;
   }
 
+  set duration(int duration) {
+    if (_duration != duration) {
+      _duration = duration;
+      _changeDurationText();
+    }
+  }
+
   String get durationText {
     return _durationText;
   }
 
   _changeDurationText() {
-    if (status == RecorderStatus.recording) {
-      var duration = Duration(seconds: _duration);
-      var durationText =
-          '${duration.inHours}:${duration.inMinutes}:${duration.inSeconds}';
+    var duration = Duration(seconds: _duration);
+    var durationText = duration.toString();
+    var pos = durationText.lastIndexOf('.');
+    durationText = durationText.substring(0, pos);
+    //'${duration.inHours}:${duration.inMinutes}:${duration.inSeconds}';
 
-      _durationText = durationText;
-    }
+    _durationText = durationText;
   }
 }
 
 ///支持多种设备，windows测试通过
 ///Android, iOS, Linux, macOS, Windows, and web.
 class PlatformAudioRecorderController extends AbstractAudioRecorderController {
-  final recorder = Record();
+  late final Record recorder;
+
   StreamSubscription<RecordState>? stateSubscription;
   StreamSubscription<Amplitude>? amplitudeSubscription;
   Amplitude? _amplitude;
-  RecordState _status = RecordState.stop;
+
+  //RecordState _state = RecordState.stop;
 
   PlatformAudioRecorderController() {
-    stateSubscription = recorder.onStateChanged().listen((recordState) {
-      _status = recordState;
-    });
+    recorder = Record();
+    try {
+      stateSubscription ??= recorder.onStateChanged().listen((recordState) {
+        state = recordState;
+      });
 
-    amplitudeSubscription = recorder
-        .onAmplitudeChanged(const Duration(milliseconds: 300))
-        .listen((amp) => _amplitude = amp);
+      amplitudeSubscription ??= recorder
+          .onAmplitudeChanged(const Duration(milliseconds: 300))
+          .listen((amp) {
+        _amplitude = amp;
+        notifyListeners();
+      });
+    } catch (e) {
+      logger.e(e);
+    }
+    //设置开始的计时提示
+    duration = 0;
   }
 
   Amplitude? get amplitude {
@@ -121,19 +147,14 @@ class PlatformAudioRecorderController extends AbstractAudioRecorderController {
     return await recorder.hasPermission();
   }
 
-  @override
-  RecorderStatus get status {
-    if (_status == RecordState.record) {
-      return RecorderStatus.recording;
+  set state(RecordState state) {
+    if (state == RecordState.record) {
+      status = RecorderStatus.recording;
+    } else if (state == RecordState.pause) {
+      status = RecorderStatus.pause;
+    } else {
+      status = RecorderStatus.stop;
     }
-    if (_status == RecordState.pause) {
-      return RecorderStatus.pause;
-    }
-    if (_status == RecordState.stop) {
-      return RecorderStatus.stop;
-    }
-
-    return RecorderStatus.none;
   }
 
   Future<bool> isEncoderSupported(
@@ -159,6 +180,7 @@ class PlatformAudioRecorderController extends AbstractAudioRecorderController {
             numChannels: numChannels,
             device: device);
         await super.start(filename: filename);
+        status = RecorderStatus.recording;
       }
     } catch (e) {
       logger.e('recorder start $e');
@@ -167,43 +189,67 @@ class PlatformAudioRecorderController extends AbstractAudioRecorderController {
 
   @override
   Future<String?> stop() async {
-    if (!await recorder.isRecording()) {
-      return null;
+    if (status == RecorderStatus.recording || status == RecorderStatus.pause) {
+      String? filename = await recorder.stop();
+      logger.i('audio recorder filename:$filename');
+      this.filename = filename;
+      await super.stop();
+      status = RecorderStatus.stop;
+
+      return filename;
     }
-
-    String? filename = await recorder.stop();
-    _filename = filename;
-    await super.stop();
-
-    return filename;
+    return null;
   }
 
   @override
   Future<void> pause() async {
-    await recorder.pause();
+    if (status == RecorderStatus.recording) {
+      await recorder.pause();
+      status = RecorderStatus.pause;
+    }
   }
 
   @override
   Future<void> resume() async {
-    await recorder.resume();
+    if (status == RecorderStatus.pause) {
+      await recorder.resume();
+      status = RecorderStatus.recording;
+    }
   }
 
   @override
   dispose() async {
     super.dispose();
     await recorder.dispose();
+    status = RecorderStatus.stop;
+    if (stateSubscription != null) {
+      stateSubscription!.cancel();
+      stateSubscription = null;
+    }
+    if (amplitudeSubscription != null) {
+      amplitudeSubscription!.cancel();
+      amplitudeSubscription = null;
+    }
   }
 }
 
 ///采用record实现的音频记录器组件
 class PlatformAudioRecorder extends StatefulWidget {
-  late final PlatformAudioRecorderController controller;
-  final void Function(String path)? onStop;
+  late final AbstractAudioRecorderController controller;
+  final void Function(String filename)? onStop;
 
   PlatformAudioRecorder(
-      {Key? key, PlatformAudioRecorderController? controller, this.onStop})
+      {Key? key, AbstractAudioRecorderController? controller, this.onStop})
       : super(key: key) {
-    controller = controller ?? PlatformAudioRecorderController();
+    if (controller == null) {
+      if (platformParams.ios || platformParams.android || platformParams.web) {
+        this.controller = AnotherAudioRecorderController();
+      } else {
+        this.controller = PlatformAudioRecorderController();
+      }
+    } else {
+      this.controller = controller;
+    }
   }
 
   @override
@@ -211,7 +257,7 @@ class PlatformAudioRecorder extends StatefulWidget {
 }
 
 class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
-  String controlText = '';
+  late String controlText;
 
   @override
   void initState() {
@@ -220,24 +266,13 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
   }
 
   _update() {
-    setState(() {
-      if (widget.controller.status == RecorderStatus.recording) {
-        controlText = widget.controller.durationText;
-        controlText = '$controlText  ${AppLocalizations.t('pause')}';
-      } else if (widget.controller.status == RecorderStatus.none ||
-          widget.controller.status == RecorderStatus.stop) {
-        controlText = AppLocalizations.t('start');
-      } else if (widget.controller.status == RecorderStatus.pause) {
-        controlText = AppLocalizations.t('resume');
-      }
-    });
+    setState(() {});
   }
 
   Future<void> _action() async {
     if (widget.controller.status == RecorderStatus.recording) {
       await _pause();
-    } else if (widget.controller.status == RecorderStatus.none ||
-        widget.controller.status == RecorderStatus.stop) {
+    } else if (widget.controller.status == RecorderStatus.stop) {
       await _start();
     } else if (widget.controller.status == RecorderStatus.pause) {
       await _resume();
@@ -255,10 +290,10 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
   Future<void> _stop() async {
     if (widget.controller.status == RecorderStatus.recording ||
         widget.controller.status == RecorderStatus.pause) {
-      final path = await widget.controller.stop();
+      final filename = await widget.controller.stop();
 
-      if (path != null) {
-        widget.onStop!(path);
+      if (filename != null) {
+        widget.onStop!(filename);
       }
     }
   }
@@ -283,15 +318,33 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
   }
 
   Widget _buildRecorderWidget(BuildContext context) {
-    return TextButton(
-      style: WidgetUtil.buildButtonStyle(),
-      child: Text(controlText),
-      onPressed: () async {
-        await _action();
-      },
-      onLongPress: () async {
-        await _stop();
-      },
-    );
+    var controlText = AppLocalizations.t(widget.controller.durationText);
+    Icon icon;
+    if (widget.controller.status == RecorderStatus.recording) {
+      icon = const Icon(Icons.pause);
+    } else {
+      icon = const Icon(Icons.play_arrow);
+    }
+    return Column(children: [
+      const Spacer(),
+      TextButton(
+        style: WidgetUtil.buildButtonStyle(
+          maximumSize: const Size(150.0, 36.0),
+        ),
+        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          icon,
+          const SizedBox(
+            width: 15,
+          ),
+          Text(controlText),
+        ]),
+        onPressed: () async {
+          await _action();
+        },
+        onLongPress: () async {
+          await _stop();
+        },
+      )
+    ]);
   }
 }
