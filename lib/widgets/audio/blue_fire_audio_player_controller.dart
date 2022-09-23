@@ -37,7 +37,7 @@ class BlueFireAudioSource {
 class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
   late AudioPlayer player;
   List<Source> playlist = [];
-  Source? _current;
+  int? _currentIndex;
   Duration? duration;
   Duration? position;
 
@@ -68,18 +68,21 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
         player.onPlayerStateChanged.listen((state) {});
   }
 
-
-
-  set current(Source? current) {
-    _current = current;
-    if (current != null) {
-      player.setSource(current);
+  @override
+  setCurrentIndex(int? index) async {
+    _currentIndex = index;
+    if (_currentIndex != null) {
+      Source? source = playlist[_currentIndex!];
+      await player.setSource(source);
     }
   }
 
   @override
   play() async {
-    await player.play(_current!);
+    if (_currentIndex != null) {
+      var source = playlist[_currentIndex!];
+      await player.play(source);
+    }
   }
 
   @override
@@ -107,13 +110,25 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
     return await player.getDuration();
   }
 
-  Future<Duration?> getCurrentPosition() async {
+  @override
+  Future<Duration?> getPosition() async {
     return await player.getCurrentPosition();
   }
 
   @override
+  Future<Duration?> getBufferedPosition() async {
+    return null;
+  }
+
+  @override
   seek(Duration? position, {int? index}) async {
+    await setCurrentIndex(index);
     await player.seek(position!);
+  }
+
+  @override
+  double getVolume() {
+    return 1;
   }
 
   @override
@@ -122,8 +137,13 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
   }
 
   @override
-  setRate(double rate) async {
-    await player.setPlaybackRate(rate); // half speed
+  double getSpeed() {
+    return 1;
+  }
+
+  @override
+  setSpeed(double speed) async {
+    await player.setPlaybackRate(speed); // half speed
   }
 
   setPlayerMode(PlayerMode playerMode) async {
@@ -139,6 +159,7 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
     Source audioSource =
         BlueFireAudioSource.audioSource(filename: filename, data: data);
     playlist.add(audioSource);
+    await setCurrentIndex(playlist.length);
     await player.setSource(audioSource);
   }
 
@@ -191,12 +212,6 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
   }
 
   @override
-  open({bool preload = true, int? initialIndex, Duration? initialPosition}) {
-    // TODO: implement open
-    throw UnimplementedError();
-  }
-
-  @override
   previous() {
     // TODO: implement previous
     throw UnimplementedError();
@@ -207,6 +222,9 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
     // TODO: implement remove
     throw UnimplementedError();
   }
+
+  @override
+  move(int initialIndex, int finalIndex) {}
 
   @override
   setShuffleModeEnabled(bool enabled) {

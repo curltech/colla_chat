@@ -7,21 +7,10 @@ import 'package:flutter/material.dart';
 
 ///平台标准的video-player的实现，移动采用flick，桌面采用vlc
 class PlatformAudioRecorderWidget extends StatefulWidget with TileDataMixin {
-  late final AbstractAudioRecorderController controller;
 
   PlatformAudioRecorderWidget(
       {Key? key, AbstractAudioRecorderController? controller})
-      : super(key: key) {
-    if (controller == null) {
-      if (platformParams.ios || platformParams.android || platformParams.web) {
-        this.controller = AnotherAudioRecorderController();
-      } else {
-        this.controller = PlatformAudioRecorderController();
-      }
-    } else {
-      this.controller = controller;
-    }
-  }
+      : super(key: key);
 
   @override
   State createState() => _PlatformAudioRecorderWidgetState();
@@ -57,7 +46,6 @@ class _PlatformAudioRecorderWidgetState
       title: const Text('Audio Recorder'),
       withLeading: true,
       child: PlatformAudioRecorder(
-        controller: widget.controller,
         onStop: (String filename) {},
       ),
     );

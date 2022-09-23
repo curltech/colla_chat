@@ -15,12 +15,8 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
 
-abstract class AbstractAudioPlayerController {
-  open({
-    bool preload = true,
-    int? initialIndex,
-    Duration? initialPosition,
-  });
+abstract class AbstractAudioPlayerController with ChangeNotifier{
+  setCurrentIndex(int? index);
 
   play();
 
@@ -42,17 +38,27 @@ abstract class AbstractAudioPlayerController {
 
   Future<Duration?> getDuration();
 
+  Future<Duration?> getPosition();
+
+  Future<Duration?> getBufferedPosition();
+
   int? currentIndex();
+
+  double getVolume();
 
   setVolume(double volume);
 
-  setRate(double rate);
+  double getSpeed();
+
+  setSpeed(double speed);
 
   add({String? filename, Uint8List? data});
 
   insert(int index, {String? filename, Uint8List? data});
 
   remove(int index);
+
+  move(int initialIndex, int finalIndex);
 
   sourceFilePicker({
     String? dialogTitle,
@@ -221,114 +227,22 @@ class AudioWaveformPainter extends CustomPainter {
   }
 }
 
-class PlatformAudioPlayerController extends AbstractAudioPlayerController {
-  late AbstractAudioPlayerController controller;
-
-  PlatformAudioPlayerController() {
-    if (platformParams.ios || platformParams.android || platformParams.web) {
-      controller = JustAudioPlayerController();
-    } else {
-      controller = BlueFireAudioPlayerController();
-    }
-  }
-
-  @override
-  open({
-    bool preload = true,
-    int? initialIndex,
-    Duration? initialPosition,
-  }) async {
-    await controller.open();
-  }
-
-  @override
-  play() async {
-    await controller.play();
-  }
-
-  @override
-  pause() async {
-    await controller.pause();
-  }
-
-  @override
-  stop() async {
-    await controller.stop();
-  }
-
-  @override
-  resume() async {
-    await controller.play();
-  }
-
-  @override
-  dispose() async {
-    await controller.dispose();
-  }
-
-  @override
-  next() async {
-    await controller.next();
-  }
-
-  @override
-  previous() async {
-    await controller.previous();
-  }
-
-  @override
-  seek(Duration? position, {int? index}) async {
-    await controller.seek(position, index: index);
-  }
-
-  @override
-  setShuffleModeEnabled(bool enabled) async {
-    await controller.setShuffleModeEnabled(enabled);
-  }
-
-  @override
-  Future<Duration?> getDuration() {
-    return controller.getDuration();
-  }
-
-  @override
-  int? currentIndex() {
-    return controller.currentIndex();
-  }
-
-  @override
-  setVolume(double volume) async {
-    await controller.setVolume(volume);
-  }
-
-  @override
-  setRate(double rate) async {
-    await controller.setRate(rate);
-  }
-
-  @override
-  add({String? filename, Uint8List? data}) async {
-    await controller.add(filename: filename, data: data);
-  }
-
-  @override
-  insert(int index, {String? filename, Uint8List? data}) async {
-    await controller.insert(index, filename: filename, data: data);
-  }
-
-  @override
-  remove(int index) async {
-    await controller.remove(index);
-  }
-}
-
 ///平台标准的audio-player的实现，
 class PlatformAudioPlayer extends StatefulWidget {
-  late final PlatformAudioPlayerController controller;
+  late final AbstractAudioPlayerController controller;
 
-  PlatformAudioPlayer({Key? key, PlatformAudioPlayerController? controller})
+  PlatformAudioPlayer({Key? key, AbstractAudioPlayerController? controller})
       : super(key: key) {
-    this.controller = controller ?? PlatformAudioPlayerController();
+    if (platformParams.ios ||
+        platformParams.android ||
+        platformParams.web ||
+        platformParams.windows ||
+        platformParams.macos ||
+        platformParams.linux) {
+      this.controller = JustAudioPlayerController();
+    } else {
+      this.controller = BlueFireAudioPlayerController();
+    }
   }
 
   @override
@@ -348,17 +262,13 @@ class _PlatformAudioPlayerState extends State<PlatformAudioPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    PlatformAudioPlayerController platformAudioPlayerController =
-        PlatformAudioPlayerController();
-    if (platformParams.ios || platformParams.android || platformParams.web) {
+    if (widget.controller is JustAudioPlayerController) {
       var player = JustAudioPlayer(
-          controller: platformAudioPlayerController.controller
-              as JustAudioPlayerController);
+          controller: widget.controller as JustAudioPlayerController);
       return player;
     } else {
       var player = BlueFireAudioPlayer(
-        controller: platformAudioPlayerController.controller
-            as BlueFireAudioPlayerController,
+        controller: widget.controller as BlueFireAudioPlayerController,
       );
       return player;
     }

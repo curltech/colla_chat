@@ -242,10 +242,15 @@ class PlatformAudioRecorder extends StatefulWidget {
       {Key? key, AbstractAudioRecorderController? controller, this.onStop})
       : super(key: key) {
     if (controller == null) {
-      if (platformParams.ios || platformParams.android || platformParams.web) {
-        this.controller = AnotherAudioRecorderController();
-      } else {
+      if (platformParams.ios ||
+          platformParams.android ||
+          platformParams.web ||
+          platformParams.windows ||
+          platformParams.macos ||
+          platformParams.linux) {
         this.controller = PlatformAudioRecorderController();
+      } else {
+        this.controller = AnotherAudioRecorderController();
       }
     } else {
       this.controller = controller;

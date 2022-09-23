@@ -5,13 +5,7 @@ import 'package:flutter/material.dart';
 
 ///平台标准的video-player的实现，移动采用flick，桌面采用vlc
 class PlatformAudioPlayerWidget extends StatefulWidget with TileDataMixin {
-  late final PlatformAudioPlayerController controller;
-
-  PlatformAudioPlayerWidget(
-      {Key? key, PlatformAudioPlayerController? controller})
-      : super(key: key) {
-    this.controller = controller ?? PlatformAudioPlayerController();
-  }
+  const PlatformAudioPlayerWidget({super.key});
 
   @override
   State createState() => _PlatformAudioPlayerWidgetState();
@@ -45,9 +39,7 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
     return AppBarView(
       title: const Text('Audio Player'),
       withLeading: true,
-      child: PlatformAudioPlayer(
-        controller: widget.controller,
-      ),
+      child: PlatformAudioPlayer(),
     );
   }
 }

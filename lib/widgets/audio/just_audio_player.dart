@@ -4,18 +4,17 @@ import 'dart:math';
 import 'package:audio_session/audio_session.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/audio/just_audio_player_controller.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:rxdart/rxdart.dart';
 
 class JustAudioPlayer extends StatefulWidget {
   late final JustAudioPlayerController controller;
+  final bool simple;
 
-  JustAudioPlayer({
-    Key? key,
-    JustAudioPlayerController? controller,
-  }) : super(key: key) {
+  JustAudioPlayer(
+      {Key? key, JustAudioPlayerController? controller, this.simple = false})
+      : super(key: key) {
     this.controller = controller ?? JustAudioPlayerController();
   }
 
@@ -25,33 +24,34 @@ class JustAudioPlayer extends StatefulWidget {
 
 class JustAudioPlayerState extends State<JustAudioPlayer>
     with WidgetsBindingObserver {
-  late final StreamSubscription _subscription;
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+      statusBarColor: Colors.black,
+    ));
     _init();
   }
 
   Future<void> _init() async {
-    // Inform the operating system of our app's audio attributes etc.
-    // We pick a reasonable default for an app that plays speech.
+    widget.controller.addListener(_update);
     final session = await AudioSession.instance;
     await session.configure(const AudioSessionConfiguration.music());
-    // Listen to errors during playback.
-    _subscription = widget.controller.player.playbackEventStream.listen(
-      (_) {},
-      onError: (Object e, StackTrace stackTrace) {
-        logger.e('A stream error occurred: $e');
-      },
-    );
+    widget.controller.player.playbackEventStream.listen((event) {},
+        onError: (Object e, StackTrace stackTrace) {
+      logger.e('A stream error occurred: $e');
+    });
+  }
+
+  _update() {
+    setState(() {});
   }
 
   @override
   void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    _subscription.cancel();
+    WidgetsBinding.instance!.removeObserver(this);
+    widget.controller.removeListener(_update);
     super.dispose();
   }
 
@@ -65,354 +65,471 @@ class JustAudioPlayerState extends State<JustAudioPlayer>
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
+  Widget _buildSimpleControllerPanel(BuildContext context) {
+    return Center(
+        child: Row(
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        // Display play/pause button and volume/speed sliders.
+        JustAudioPlayerControllerPanel(widget.controller),
+        _buildPlayerSlider(context),
+      ],
+    ));
+  }
 
-    return SizedBox.fromSize(
-      size: size,
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          const Spacer(flex: 2),
+  Widget _buildPlayerSlider(BuildContext context) {
+    return StreamBuilder<PositionData>(
+      stream: widget.controller.positionDataStream,
+      builder: (context, snapshot) {
+        final positionData = snapshot.data;
+        return MediaPlayerSlider(
+          duration: positionData?.duration ?? Duration.zero,
+          position: positionData?.position ?? Duration.zero,
+          bufferedPosition: positionData?.bufferedPosition ?? Duration.zero,
+          onChangeEnd: widget.controller.seek,
+        );
+      },
+    );
+  }
 
-          //Seek bar
-          SizedBox(
-            width: size.width,
-            height: 250,
-            child: SeekBar(controller: widget.controller),
-          ),
-
-          const Spacer(),
-
-          //Controll Buttons
-          ControlButtons(controller: widget.controller),
-
-          const Spacer(),
-
-          //Exit button
-          InkWell(
-            child: Icon(Icons.clear),
-            onTap: () async {},
-          ),
-          const Spacer(flex: 3),
-        ],
+  Widget _buildPlaylist(BuildContext context) {
+    var playlist = widget.controller.playlist;
+    var filenames = widget.controller.filenames;
+    return Card(
+      elevation: 2.0,
+      margin: const EdgeInsets.all(4.0),
+      child: Container(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(left: 16.0, top: 16.0),
+              alignment: Alignment.topLeft,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Ink(
+                    child: InkWell(
+                      child: const Icon(Icons.add),
+                      onTap: () async {
+                        // List<String> filenames = await FileUtil.pickFiles();
+                        // for (var filename in filenames) {
+                        //   await widget.controller.add(filename: filename);
+                        // }
+                        var filename =
+                            'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3';
+                        widget.controller.player.setAudioSource(
+                            AudioSource.uri(Uri.parse(filename)));
+                      },
+                    ),
+                  )
+                ],
+              ),
+            ),
+            Container(
+              height: 250.0,
+              child: ReorderableListView(
+                shrinkWrap: true,
+                onReorder: (int initialIndex, int finalIndex) async {
+                  if (finalIndex > playlist.length) {
+                    finalIndex = playlist.length;
+                  }
+                  if (initialIndex < finalIndex) finalIndex--;
+                  widget.controller.move(initialIndex, finalIndex);
+                },
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                children: List.generate(
+                  playlist.length,
+                  (int index) {
+                    return ListTile(
+                      key: Key(index.toString()),
+                      leading: Text(
+                        index.toString(),
+                        style: const TextStyle(fontSize: 14.0),
+                      ),
+                      title: Text(
+                        filenames[index],
+                        style: const TextStyle(fontSize: 14.0),
+                      ),
+                    );
+                  },
+                  growable: true,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
-}
 
-class ControlButtons extends StatefulWidget {
-  const ControlButtons({super.key, required this.controller});
-
-  final JustAudioPlayerController controller;
-
-  @override
-  State<ControlButtons> createState() => _ControlButtonsState();
-}
-
-class _ControlButtonsState extends State<ControlButtons> {
-  static Set<double> allowedSpeeds = {.25, .5, .75, 1.0, 1.25, 1.5, 1.75, 2.0};
-
-  int currentSpeedIndex = 3;
-
-  Widget _buildMainButton(
-      PlayerState? state, ProcessingState? processingState) {
-    if (state == null ||
-        processingState == null ||
-        processingState == ProcessingState.loading ||
-        processingState == ProcessingState.buffering) {
-      return const SizedBox(
-        width: 86,
-        height: 112,
-        child: Align(
-          alignment: Alignment(0, -.55),
-          child: SizedBox(
-            width: 50,
-            height: 50,
-            child: CircularProgressIndicator(
-              color: Colors.blue,
-            ),
-          ),
-        ),
-      );
-    }
-
-    IconData icon = Icons.replay;
-    String label = "replay";
-    Alignment? alignment;
-    Function onTap = () => widget.controller.seek(null);
-
-    if (!state.playing) {
-      icon = CupertinoIcons.play_arrow_solid;
-      alignment = const Alignment(.2, 0);
-      label = "play";
-      onTap = () => widget.controller.play();
-    } else if (processingState != ProcessingState.completed) {
-      icon = CupertinoIcons.pause_solid;
-      label = "pause";
-      onTap = () => widget.controller.pause();
-    }
-
-    return InkWell(
-      child: Icon(icon),
-      onTap: () => onTap(),
+  Widget _buildComplexControllerPanel(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        _buildPlaylist(context),
+        _buildPlayerSlider(context),
+        // Display play/pause button and volume/speed sliders.
+        JustAudioPlayerControllerPanel(widget.controller, simple: false),
+      ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder(
-        stream: widget.controller.player.playerStateStream,
+    if (widget.simple) {
+      return _buildSimpleControllerPanel(context);
+    }
+    return _buildComplexControllerPanel(context);
+  }
+}
+
+/// Displays the play/pause/stop button and volume/speed sliders.
+class JustAudioPlayerControllerPanel extends StatelessWidget {
+  final JustAudioPlayerController controller;
+  final bool simple;
+
+  const JustAudioPlayerControllerPanel(this.controller,
+      {Key? key, this.simple = true})
+      : super(key: key);
+
+  void showSliderDialog({
+    required BuildContext context,
+    required String title,
+    required int divisions,
+    required double min,
+    required double max,
+    String suffix = '',
+    required double value,
+    required Stream<double> stream,
+    required ValueChanged<double> onChanged,
+  }) {
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(title, textAlign: TextAlign.center),
+        content: StreamBuilder<double>(
+          stream: stream,
+          builder: (context, snapshot) => SizedBox(
+            height: 100.0,
+            child: Column(
+              children: [
+                Text('${snapshot.data?.toStringAsFixed(1)}$suffix',
+                    style: const TextStyle(
+                        fontFamily: 'Fixed',
+                        fontWeight: FontWeight.bold,
+                        fontSize: 24.0)),
+                RotatedBox(
+                    quarterTurns: 0,
+                    child: Slider(
+                      divisions: divisions,
+                      min: min,
+                      max: max,
+                      value: snapshot.data ?? value,
+                      onChanged: onChanged,
+                    )),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (simple) {
+      return _buildSimpleControlPanel();
+    }
+    return _buildComplexControlPanel(context);
+  }
+
+  Row _buildSimpleControlPanel() {
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          StreamBuilder<double>(
+            stream: controller.player.volumeStream,
+            builder: (context, snapshot) {
+              var label = '${snapshot.data?.toStringAsFixed(1)}';
+              return _buildVolumeButton(context, label: label);
+            },
+          ),
+          StreamBuilder<PlayerState>(
+              stream: controller.player.playerStateStream,
+              builder: (context, snapshot) {
+                final playerState = snapshot.data;
+                final processingState = playerState?.processingState;
+                final playing = playerState?.playing;
+                List<Widget> widgets = [];
+                if (processingState == ProcessingState.loading ||
+                    processingState == ProcessingState.buffering) {
+                  widgets.add(Container(
+                    margin: const EdgeInsets.all(8.0),
+                    width: 24.0,
+                    height: 24.0,
+                    child: const CircularProgressIndicator(),
+                  ));
+                } else {
+                  if (playing != true) {
+                    widgets.add(Ink(
+                        child: InkWell(
+                      onTap: controller.play,
+                      child: const Icon(Icons.play_arrow_rounded, size: 36),
+                    )));
+                  } else if (processingState != ProcessingState.completed) {
+                    widgets.add(Ink(
+                        child: InkWell(
+                      onTap: controller.pause,
+                      child: const Icon(Icons.pause, size: 36),
+                    )));
+                  } else {
+                    widgets.add(Ink(
+                        child: InkWell(
+                      child: const Icon(Icons.replay, size: 36),
+                      onTap: () => controller.seek(Duration.zero),
+                    )));
+                  }
+                }
+                return Row(
+                  children: widgets,
+                );
+              }),
+        ]);
+  }
+
+  Widget _buildVolumeButton(BuildContext context, {String? label}) {
+    return Ink(
+        child: InkWell(
+      child: Row(children: [
+        const Icon(Icons.volume_up_rounded, size: 24),
+        Text(label ?? '')
+      ]),
+      onTap: () {
+        showSliderDialog(
+          context: context,
+          title: "Adjust volume",
+          divisions: 10,
+          min: 0.0,
+          max: 1.0,
+          value: controller.getVolume(),
+          stream: controller.player.volumeStream,
+          onChanged: controller.setVolume,
+        );
+      },
+    ));
+  }
+
+  Widget _buildSpeedButton(BuildContext context, {String? label}) {
+    return Ink(
+        child: InkWell(
+      child: Row(children: [
+        const Icon(Icons.speed_rounded, size: 24),
+        Text(label ?? '')
+      ]),
+      onTap: () {
+        showSliderDialog(
+          context: context,
+          title: "Adjust speed",
+          divisions: 10,
+          min: 0.5,
+          max: 1.5,
+          value: controller.getSpeed(),
+          stream: controller.player.speedStream,
+          onChanged: controller.setSpeed,
+        );
+      },
+    ));
+  }
+
+  Widget _buildComplexControlPanel(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        StreamBuilder<double>(
+          stream: controller.player.volumeStream,
+          builder: (context, snapshot) {
+            var label = '${snapshot.data?.toStringAsFixed(1)}';
+            return _buildVolumeButton(context, label: label);
+          },
+        ),
+        const SizedBox(
+          width: 50,
+        ),
+        _buildComplexPlayPanel(),
+        const SizedBox(
+          width: 50,
+        ),
+        StreamBuilder<double>(
+          stream: controller.player.speedStream,
+          builder: (context, snapshot) {
+            var label = '${snapshot.data?.toStringAsFixed(1)}';
+            return _buildSpeedButton(context, label: label);
+          },
+        ),
+      ],
+    );
+  }
+
+  StreamBuilder<PlayerState> _buildComplexPlayPanel() {
+    return StreamBuilder<PlayerState>(
+        stream: controller.player.playerStateStream,
         builder: (context, snapshot) {
           final playerState = snapshot.data;
           final processingState = playerState?.processingState;
+          final playing = playerState?.playing;
+          List<Widget> widgets = [];
+          if (processingState == ProcessingState.loading ||
+              processingState == ProcessingState.buffering) {
+            widgets.add(Container(
+              margin: const EdgeInsets.all(8.0),
+              width: 24.0,
+              height: 24.0,
+              child: const CircularProgressIndicator(),
+            ));
+          } else {
+            widgets.add(Ink(
+                child: InkWell(
+              onTap: controller.stop,
+              child: const Icon(Icons.stop_rounded, size: 36),
+            )));
 
+            widgets.add(Ink(
+                child: InkWell(
+              onTap: controller.previous,
+              child: const Icon(Icons.skip_previous_rounded, size: 36),
+            )));
+            if (playing != true) {
+              widgets.add(Ink(
+                  child: InkWell(
+                onTap: controller.play,
+                child: const Icon(Icons.play_arrow_rounded, size: 36),
+              )));
+            } else if (processingState != ProcessingState.completed) {
+              widgets.add(Ink(
+                  child: InkWell(
+                onTap: controller.pause,
+                child: const Icon(Icons.pause, size: 36),
+              )));
+            } else {
+              widgets.add(Ink(
+                  child: InkWell(
+                child: const Icon(Icons.replay, size: 36),
+                onTap: () => controller.seek(Duration.zero),
+              )));
+            }
+            widgets.add(Ink(
+                child: InkWell(
+              onTap: controller.next,
+              child: const Icon(Icons.skip_next_rounded, size: 36),
+            )));
+          }
           return Row(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              const Spacer(flex: 2),
-
-              //Decrease speed
-              InkWell(
-                child: Icon(CupertinoIcons.backward_end_fill),
-                onTap: () {
-                  if (currentSpeedIndex > 0) {
-                    currentSpeedIndex--;
-                    widget.controller.setRate(
-                      allowedSpeeds.elementAt(currentSpeedIndex),
-                    );
-                  }
-                },
-              ),
-
-              const Spacer(),
-
-              //play/pause button
-              _buildMainButton(playerState, processingState),
-
-              const Spacer(),
-
-              //Save Button
-              InkWell(
-                child: Icon(CupertinoIcons.checkmark_alt),
-                onTap: () => widget.controller.stop(),
-              ),
-
-              const Spacer(),
-
-              //Increase speed
-              InkWell(
-                child: Icon(CupertinoIcons.forward_end_fill),
-                onTap: () {
-                  if (currentSpeedIndex < allowedSpeeds.length - 1) {
-                    currentSpeedIndex++;
-                    widget.controller.setRate(
-                      allowedSpeeds.elementAt(currentSpeedIndex),
-                    );
-                    print(allowedSpeeds.elementAt(currentSpeedIndex));
-                  }
-                },
-              ),
-              const Spacer(flex: 2),
-            ],
+            children: widgets,
           );
         });
   }
 }
 
-class SeekBar extends StatefulWidget {
-  final JustAudioPlayerController controller;
+class MediaPlayerSlider extends StatefulWidget {
+  final Duration duration;
+  final Duration position;
+  final Duration bufferedPosition;
   final ValueChanged<Duration>? onChanged;
+  final ValueChanged<Duration>? onChangeEnd;
 
-  const SeekBar({Key? key, required this.controller, this.onChanged})
-      : super(key: key);
+  const MediaPlayerSlider({
+    Key? key,
+    required this.duration,
+    required this.position,
+    required this.bufferedPosition,
+    this.onChanged,
+    this.onChangeEnd,
+  }) : super(key: key);
 
   @override
-  SeekBarState createState() => SeekBarState();
+  MediaPlayerSliderState createState() => MediaPlayerSliderState();
 }
 
-class SeekBarState extends State<SeekBar> {
+class MediaPlayerSliderState extends State<MediaPlayerSlider> {
   double? _dragValue;
-  late SliderThemeData sliderThemeData;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    sliderThemeData = SliderTheme.of(context).copyWith(
-      trackHeight: 4.0,
-      inactiveTrackColor: Colors.grey,
-      activeTrackColor: Colors.blue,
-      thumbColor: Colors.blue,
-    );
   }
-
-  /// Collects the data useful for displaying in a seek bar, using a handy
-  /// feature of rx_dart to combine the 3 streams of interest into one.
-  Stream<PositionData> get _positionDataStream =>
-      Rx.combineLatest3<Duration, Duration, Duration?, PositionData>(
-          widget.controller.player.positionStream,
-          widget.controller.player.bufferedPositionStream,
-          widget.controller.player.durationStream,
-          (position, bufferedPosition, duration) => PositionData(
-              position, bufferedPosition, duration ?? Duration.zero));
 
   @override
   Widget build(BuildContext context) {
-    return StreamBuilder<PositionData>(
-        stream: _positionDataStream,
-        builder: (context, snapshot) {
-          final positionData = snapshot.data;
+    var sliderThemeData = SliderTheme.of(context).copyWith(
+        trackShape: null,
+        //轨道的形状
+        trackHeight: 2,
+        //trackHeight：滑轨的高度
 
-          final duration = positionData?.duration ?? Duration.zero;
-          final position = positionData?.position ?? Duration.zero;
-          final bufferedPosition =
-              positionData?.bufferedPosition ?? Duration.zero;
+        //activeTrackColor: Colors.blue,
+        //已滑过轨道的颜色
+        //inactiveTrackColor: Colors.greenAccent,
+        //未滑过轨道的颜色
 
-          return Stack(
-            alignment: Alignment.bottomCenter,
-            children: [
-              //Slider to show the buffered data.
-              SizedBox(
-                height: 70,
-                child: SliderTheme(
-                  data: sliderThemeData.copyWith(
-                    trackHeight: 4,
-                    thumbShape: SliderComponentShape.noThumb,
-                    trackShape: const _CustomSliderTrackShape(),
-                    activeTrackColor: Colors.blue,
-                  ),
-                  child: ExcludeSemantics(
-                    child: Slider(
-                      min: 0.0,
-                      max: duration.inMilliseconds.toDouble(),
-                      value: min(bufferedPosition.inMilliseconds.toDouble(),
-                          duration.inMilliseconds.toDouble()),
-                      onChanged: (value) {
-                        setState(() {
-                          _dragValue = value;
-                        });
-                        if (widget.onChanged != null) {
-                          widget.onChanged!(
-                              Duration(milliseconds: value.round()));
-                        }
-                      },
-                      onChangeEnd: (value) {
-                        widget.controller
-                            .seek(Duration(milliseconds: value.round()));
-                        _dragValue = null;
-                      },
-                    ),
-                  ),
-                ),
-              ),
+        //thumbColor: Colors.red,
+        //滑块中心的颜色（小圆头的颜色）
+        //overlayColor: Colors.greenAccent,
+        //滑块边缘的颜色
 
-              //Slider with the current position of the audio
-              SizedBox(
-                height: 70,
-                child: SliderTheme(
-                  data: sliderThemeData.copyWith(
-                    inactiveTrackColor: Colors.transparent,
-                  ),
-                  child: Slider(
-                    min: 0.0,
-                    max: duration.inMilliseconds.toDouble(),
-                    value: min(_dragValue ?? position.inMilliseconds.toDouble(),
-                        duration.inMilliseconds.toDouble()),
-                    onChanged: (value) {
-                      setState(() {
-                        _dragValue = value;
-                      });
-                      if (widget.onChanged != null) {
-                        widget
-                            .onChanged!(Duration(milliseconds: value.round()));
-                      }
-                    },
-                    onChangeEnd: (value) {
-                      widget.controller
-                          .seek(Duration(milliseconds: value.round()));
-
-                      _dragValue = null;
-                    },
-                  ),
-                ),
-              ),
-
-              //Righ timer
-              Positioned(
-                right: 24.0,
-                bottom: 0.0,
-                child: Text(
-                  RegExp(r'((^0*[1-9]\d*:)?\d{2}:\d{2})\.\d+$')
-                          .firstMatch("$duration")
-                          ?.group(1) ??
-                      '$duration',
-                  style: Theme.of(context).textTheme.caption!.copyWith(
-                        color: Colors.blue,
-                        fontSize: 18,
-                      ),
-                ),
-              ),
-
-              //Left timer
-              Positioned(
-                left: 24.0,
-                bottom: 0.0,
-                child: Text(
-                  RegExp(r'((^0*[1-9]\d*:)?\d{2}:\d{2})\.\d+$')
-                          .firstMatch("$position")
-                          ?.group(1) ??
-                      '$position',
-                  style: Theme.of(context).textTheme.caption!.copyWith(
-                        color: Colors.blue,
-                        fontSize: 18,
-                      ),
-                ),
-              ),
-            ],
-          );
-        });
-  }
-}
-
-/// Uses the [RoundedRectSliderTrackShape] as a base class to paint the SliderTrackShape.
-/// The only difference is that [RoundedRectSliderTrackShape] uses an additional height of 2 pixels
-/// for the active track shape and with this class we don't.
-class _CustomSliderTrackShape extends RoundedRectSliderTrackShape {
-  /// Create a slider track that draws two rectangles with rounded outer edges.
-  const _CustomSliderTrackShape();
-
-  @override
-  void paint(
-    PaintingContext context,
-    Offset offset, {
-    required RenderBox parentBox,
-    required SliderThemeData sliderTheme,
-    required Animation<double> enableAnimation,
-    required TextDirection textDirection,
-    required Offset thumbCenter,
-    bool isDiscrete = false,
-    bool isEnabled = false,
-    double additionalActiveTrackHeight = 0,
-  }) {
-    super.paint(
-      context,
-      offset,
-      parentBox: parentBox,
-      sliderTheme: sliderTheme,
-      enableAnimation: enableAnimation,
-      textDirection: textDirection,
-      thumbCenter: thumbCenter,
-      additionalActiveTrackHeight: 0,
+        thumbShape: const RoundSliderThumbShape(
+          //可继承SliderComponentShape自定义形状
+          disabledThumbRadius: 15, //禁用时滑块大小
+          enabledThumbRadius: 6, //滑块大小
+        ),
+        overlayShape: const RoundSliderOverlayShape(
+          //可继承SliderComponentShape自定义形状
+          overlayRadius: 14, //滑块外圈大小
+        ));
+    return Row(
+      children: [
+        Expanded(child: SliderTheme(
+          data: sliderThemeData,
+          child: Slider(
+            min: 0.0,
+            max: widget.duration.inMilliseconds.toDouble(),
+            value: min(_dragValue ?? widget.position.inMilliseconds.toDouble(),
+                widget.duration.inMilliseconds.toDouble()),
+            onChanged: (value) {
+              setState(() {
+                _dragValue = value;
+              });
+              if (widget.onChanged != null) {
+                widget.onChanged!(Duration(milliseconds: value.round()));
+              }
+            },
+            onChangeEnd: (value) {
+              if (widget.onChangeEnd != null) {
+                widget.onChangeEnd!(Duration(milliseconds: value.round()));
+              }
+              _dragValue = null;
+            },
+          ),
+        )),
+        Text(
+          '${getDurationText(widget.position)}/${getDurationText(widget.duration)}',
+          style: const TextStyle(),
+        ),
+        const SizedBox(width: 15,)
+      ],
     );
   }
-}
 
-class PositionData {
-  final Duration position;
-  final Duration bufferedPosition;
-  final Duration duration;
+  String getDurationText(Duration duration) {
+    return RegExp(r'((^0*[1-9]\d*:)?\d{2}:\d{2})\.\d+$')
+            .firstMatch("$duration")
+            ?.group(1) ??
+        '$duration';
+  }
 
-  PositionData(this.position, this.bufferedPosition, this.duration);
+  Duration get _remaining => widget.duration - widget.position;
 }
