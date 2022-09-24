@@ -5,9 +5,11 @@ import 'dart:ui' as ui;
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/video/platform_video_player.dart';
+import 'package:colla_chat/widgets/audio/platform_audio_player.dart';
+import 'package:colla_chat/widgets/common/media_player_slider.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
+import 'package:rxdart/rxdart.dart';
 
 class VlcMediaSource {
   static Future<Media> media({String? filename, Uint8List? data}) async {
@@ -44,14 +46,18 @@ class VlcMediaSource {
 
 ///基于vlc实现的媒体播放器和记录器，可以截取视频文件的图片作为缩略图
 ///支持除macos外的平台，linux需要VLC & libVLC installed.
-class VlcVideoPlayerController extends AbstractVideoPlayerController {
+class VlcVideoPlayerController extends AbstractMediaPlayerController {
   late Player player;
-  Playlist playlist = Playlist(medias: []);
-  CurrentState current = CurrentState();
-  PositionState position = PositionState();
-  PlaybackState playback = PlaybackState();
-  GeneralState general = GeneralState();
-  VideoDimensions videoDimensions = const VideoDimensions(0, 0);
+  final Playlist playlist = Playlist(medias: []);
+  CurrentState? currentState;
+  PositionState? positionState;
+
+  PlaybackState? playbackState;
+
+  GeneralState? generalState;
+
+  VideoDimensions? videoDimensions;
+
   double bufferingProgress = 0.0;
   List<Media> medias = <Media>[];
   List<Device> devices = Devices.all;
@@ -69,34 +75,39 @@ class VlcVideoPlayerController extends AbstractVideoPlayerController {
         videoDimensions: videoDimensions,
         commandlineArguments: commandlineArguments,
         bool: bool);
-    player.currentStream.listen((current) {
-      this.current = current;
+    player.currentStream.listen((currentState) {
+      this.currentState = currentState;
+      logger.i('libvlc currentState:$currentState');
     });
-    player.positionStream.listen((position) {
-      this.position = position;
+    player.positionStream.listen((positionState) {
+      this.positionState = positionState;
+      logger.i('libvlc positionState:$positionState');
     });
-    player.playbackStream.listen((playback) {
-      this.playback = playback;
+    player.playbackStream.listen((playbackState) {
+      this.playbackState = playbackState;
+      logger.i('libvlc playbackState:$playbackState');
     });
-    player.generalStream.listen((general) {
-      this.general = general;
+    player.generalStream.listen((generalState) {
+      this.generalState = generalState;
+      logger.i('libvlc generalState:$generalState');
     });
     player.videoDimensionsStream.listen((videoDimensions) {
       this.videoDimensions = videoDimensions;
+      logger.i('libvlc videoDimensions:$videoDimensions');
     });
     player.bufferingProgressStream.listen(
       (bufferingProgress) {
         this.bufferingProgress = bufferingProgress;
+        logger.i('libvlc bufferingProgress:$bufferingProgress');
       },
     );
     player.errorStream.listen((event) {
-      logger.e('libvlc error.');
+      logger.e('libvlc error:$event');
     });
-    open();
+    _open();
   }
 
-  @override
-  open({bool autoStart = false}) {
+  _open({bool autoStart = false}) {
     player.open(
       playlist,
       autoStart: autoStart,
@@ -110,18 +121,13 @@ class VlcVideoPlayerController extends AbstractVideoPlayerController {
   }
 
   @override
-  seek(Duration duration) {
-    player.seek(duration);
-  }
-
-  @override
   pause() {
     player.pause();
   }
 
   @override
-  playOrPause() {
-    player.playOrPause();
+  resume() {
+    player.play();
   }
 
   @override
@@ -130,28 +136,28 @@ class VlcVideoPlayerController extends AbstractVideoPlayerController {
   }
 
   @override
+  seek(Duration position, {int? index}) {
+    player.seek(position);
+  }
+
+  @override
   setVolume(double volume) {
     player.setVolume(volume);
   }
 
   @override
-  setRate(double rate) {
-    player.setRate(rate);
+  setSpeed(double speed) {
+    player.setRate(speed);
   }
 
   @override
-  takeSnapshot(
-    String filename,
-    int width,
-    int height,
-  ) {
-    var file = File(filename);
-    player.takeSnapshot(file, width, height);
+  double getSpeed() {
+    return player.general.rate;
   }
 
   @override
-  dispose() {
-    player.dispose();
+  double getVolume() {
+    return player.general.volume;
   }
 
   ///下面是播放列表的功能
@@ -183,8 +189,15 @@ class VlcVideoPlayerController extends AbstractVideoPlayerController {
   }
 
   @override
-  jumpToIndex(int index) {
-    player.jumpToIndex(index);
+  int? currentIndex() {
+    return player.current.index;
+  }
+
+  @override
+  setCurrentIndex(int? index) {
+    if (index != null) {
+      player.jumpToIndex(index);
+    }
   }
 
   @override
@@ -193,6 +206,57 @@ class VlcVideoPlayerController extends AbstractVideoPlayerController {
   }
 
   @override
+  Future<Duration?> getBufferedPosition() {
+    double progress = player.bufferingProgress;
+
+    return Future<Duration?>.value(Duration(milliseconds: progress.toInt()));
+  }
+
+  @override
+  Future<Duration?> getDuration() {
+    return Future<Duration?>.value(player.position.duration);
+  }
+
+  @override
+  Future<Duration?> getPosition() {
+    return Future<Duration?>.value(player.position.position);
+  }
+
+  @override
+  setShuffleModeEnabled(bool enabled) {
+    throw UnimplementedError();
+  }
+
+  @override
+  dispose() {
+    super.dispose();
+    player.dispose();
+  }
+
+  ///以下是视频播放器特有的方法
+  takeSnapshot(
+    String filename,
+    int width,
+    int height,
+  ) {
+    var file = File(filename);
+    player.takeSnapshot(file, width, height);
+  }
+
+  Stream<PositionData> get positionDataStream {
+    return Rx.combineLatest3<PositionState, double, GeneralState, PositionData>(
+        player.positionStream,
+        player.bufferingProgressStream,
+        player.generalStream, (positionState, bufferingProgress, generalState) {
+      Duration position = positionState.position!;
+      Duration bufferedPosition =
+          Duration(milliseconds: bufferingProgress.toInt());
+      Duration duration = positionState.duration!;
+      return PositionData(
+          position, bufferedPosition, duration ?? Duration.zero);
+    });
+  }
+
   buildVideoWidget({
     Key? key,
     int? playerId,
@@ -364,8 +428,10 @@ class VlcMediaRecorder {
 
 class PlatformVlcVideoPlayer extends StatefulWidget {
   late final VlcVideoPlayerController controller;
+  final bool simple;
 
-  PlatformVlcVideoPlayer({Key? key, VlcVideoPlayerController? controller})
+  PlatformVlcVideoPlayer(
+      {Key? key, VlcVideoPlayerController? controller, this.simple = false})
       : super(key: key) {
     this.controller = controller ?? VlcVideoPlayerController();
   }
@@ -375,19 +441,6 @@ class PlatformVlcVideoPlayer extends StatefulWidget {
 }
 
 class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
-  MediaType mediaType = MediaType.file;
-  CurrentState current = CurrentState();
-  PositionState position = PositionState();
-  PlaybackState playback = PlaybackState();
-  GeneralState general = GeneralState();
-  VideoDimensions videoDimensions = const VideoDimensions(0, 0);
-  List<Media> medias = <Media>[];
-  List<Device> devices = <Device>[];
-  TextEditingController controller = TextEditingController();
-  TextEditingController metasController = TextEditingController();
-  double bufferingProgress = 0.0;
-  Media? metasMedia;
-
   @override
   void initState() {
     super.initState();
@@ -425,167 +478,256 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
     return isPhone;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    bool isTablet = _isTablet();
-    bool isPhone = _isPhone();
-    return _buildVideoView(isPhone);
+  ///简单播放控制面板，包含音量，简单播放按钮，
+  Row _buildSimpleControlPanel(BuildContext buildContext) {
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          StreamBuilder<GeneralState>(
+            stream: widget.controller.player.generalStream,
+            builder: (context, snapshot) {
+              var label = '${snapshot.data?.volume.toStringAsFixed(1)}';
+              return _buildVolumeButton(context, label: label);
+            },
+          ),
+          StreamBuilder<PlaybackState>(
+              stream: widget.controller.player.playbackStream,
+              builder: (context, snapshot) {
+                PlaybackState? playerState = snapshot.data;
+                List<Widget> widgets = [];
+                if (!playerState!.isCompleted && !playerState.isPlaying) {
+                  widgets.add(Container(
+                    margin: const EdgeInsets.all(8.0),
+                    width: 24.0,
+                    height: 24.0,
+                    child: const CircularProgressIndicator(),
+                  ));
+                } else {
+                  if (!playerState!.isPlaying) {
+                    widgets.add(Ink(
+                        child: InkWell(
+                      onTap: widget.controller.play,
+                      child: const Icon(Icons.play_arrow_rounded, size: 36),
+                    )));
+                  } else if (!playerState!.isCompleted) {
+                    widgets.add(Ink(
+                        child: InkWell(
+                      onTap: widget.controller.pause,
+                      child: const Icon(Icons.pause, size: 36),
+                    )));
+                  } else {
+                    widgets.add(Ink(
+                        child: InkWell(
+                      child: const Icon(Icons.replay, size: 36),
+                      onTap: () => widget.controller.seek(Duration.zero),
+                    )));
+                  }
+                }
+                return Row(
+                  children: widgets,
+                );
+              }),
+        ]);
   }
 
-  Card _buildDeviceCard() {
-    return Card(
-      elevation: 2.0,
-      margin: const EdgeInsets.all(4.0),
-      child: Container(
-        margin: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
-                Text('Playback devices.'),
-                Divider(
-                  height: 12.0,
-                  color: Colors.transparent,
-                ),
-                Divider(
-                  height: 12.0,
-                ),
-              ] +
-              devices
-                  .map(
-                    (device) => ListTile(
-                      title: Text(
-                        device.name,
-                        style: const TextStyle(
-                          fontSize: 14.0,
-                        ),
-                      ),
-                      subtitle: Text(
-                        device.id,
-                        style: const TextStyle(
-                          fontSize: 14.0,
-                        ),
-                      ),
-                      onTap: () => widget.controller.player.setDevice(device),
-                    ),
-                  )
-                  .toList(),
+  ///音量按钮
+  Widget _buildVolumeButton(BuildContext context, {String? label}) {
+    return Ink(
+        child: InkWell(
+      child: Row(children: [
+        const Icon(Icons.volume_up_rounded, size: 24),
+        Text(label ?? '')
+      ]),
+      onTap: () {
+        MediaPlayerSliderUtil.showSliderDialog(
+          context: context,
+          title: "Adjust volume",
+          divisions: 10,
+          min: 0.0,
+          max: 1.0,
+          value: widget.controller.getVolume(),
+          stream: widget.controller.player.generalStream,
+          onChanged: widget.controller.setVolume,
+        );
+      },
+    ));
+  }
+
+  ///速度按钮
+  Widget _buildSpeedButton(BuildContext context, {String? label}) {
+    return Ink(
+        child: InkWell(
+      child: Row(children: [
+        const Icon(Icons.speed_rounded, size: 24),
+        Text(label ?? '')
+      ]),
+      onTap: () {
+        MediaPlayerSliderUtil.showSliderDialog(
+          context: context,
+          title: "Adjust speed",
+          divisions: 10,
+          min: 0.5,
+          max: 1.5,
+          value: widget.controller.getSpeed(),
+          stream: widget.controller.player.generalStream,
+          onChanged: widget.controller.setSpeed,
+        );
+      },
+    ));
+  }
+
+  Widget _buildComplexControlPanel(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        StreamBuilder<GeneralState>(
+          stream: widget.controller.player.generalStream,
+          builder: (context, snapshot) {
+            var label = '${snapshot.data?.volume.toStringAsFixed(1)}';
+            return _buildVolumeButton(context, label: label);
+          },
         ),
-      ),
+        const SizedBox(
+          width: 50,
+        ),
+        _buildComplexPlayPanel(),
+        const SizedBox(
+          width: 50,
+        ),
+        StreamBuilder<GeneralState>(
+          stream: widget.controller.player.generalStream,
+          builder: (context, snapshot) {
+            var label = '${snapshot.data?.rate.toStringAsFixed(1)}';
+            return _buildSpeedButton(context, label: label);
+          },
+        ),
+      ],
     );
   }
 
-  Card _buildEventCard() {
+  ///复杂播放按钮面板
+  StreamBuilder<PlaybackState> _buildComplexPlayPanel() {
+    return StreamBuilder<PlaybackState>(
+        stream: widget.controller.player.playbackStream,
+        builder: (context, snapshot) {
+          PlaybackState? playerState = snapshot.data;
+          List<Widget> widgets = [];
+          if (!playerState!.isCompleted && !playerState.isPlaying) {
+            widgets.add(Container(
+              margin: const EdgeInsets.all(8.0),
+              width: 24.0,
+              height: 24.0,
+              child: const CircularProgressIndicator(),
+            ));
+          } else {
+            widgets.add(Ink(
+                child: InkWell(
+              onTap: widget.controller.stop,
+              child: const Icon(Icons.stop_rounded, size: 36),
+            )));
+
+            widgets.add(Ink(
+                child: InkWell(
+              onTap: widget.controller.previous,
+              child: const Icon(Icons.skip_previous_rounded, size: 36),
+            )));
+            if (playerState.isPlaying) {
+              widgets.add(Ink(
+                  child: InkWell(
+                onTap: widget.controller.play,
+                child: const Icon(Icons.play_arrow_rounded, size: 36),
+              )));
+            } else if (!playerState!.isCompleted) {
+              widgets.add(Ink(
+                  child: InkWell(
+                onTap: widget.controller.pause,
+                child: const Icon(Icons.pause, size: 36),
+              )));
+            } else {
+              widgets.add(Ink(
+                  child: InkWell(
+                child: const Icon(Icons.replay, size: 36),
+                onTap: () => widget.controller.seek(Duration.zero),
+              )));
+            }
+            widgets.add(Ink(
+                child: InkWell(
+              onTap: widget.controller.next,
+              child: const Icon(Icons.skip_next_rounded, size: 36),
+            )));
+          }
+          return Row(
+            children: widgets,
+          );
+        });
+  }
+
+  ///播放列表
+  Widget _buildPlaylist(BuildContext context) {
+    Playlist playlist = widget.controller.playlist;
     return Card(
       elevation: 2.0,
       margin: const EdgeInsets.all(4.0),
       child: Container(
-        margin: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text('Playback event listeners.'),
-            const Divider(
-              height: 12.0,
-              color: Colors.transparent,
-            ),
-            const Divider(
-              height: 12.0,
-            ),
-            const Text('Playback position.'),
-            const Divider(
-              height: 8.0,
-              color: Colors.transparent,
-            ),
-            Slider(
-              min: 0,
-              max: position.duration?.inMilliseconds.toDouble() ?? 1.0,
-              value: position.position?.inMilliseconds.toDouble() ?? 0.0,
-              onChanged: (double position) => widget.controller.seek(
-                Duration(
-                  milliseconds: position.toInt(),
-                ),
+            Container(
+              margin: const EdgeInsets.only(left: 16.0, top: 16.0),
+              alignment: Alignment.topLeft,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Ink(
+                    child: InkWell(
+                      child: const Icon(Icons.add),
+                      onTap: () async {
+                        List<String> filenames = await FileUtil.pickFiles();
+                        for (var filename in filenames) {
+                          await widget.controller.add(filename: filename);
+                        }
+                        // var filename =
+                        //     'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3';
+                        // widget.controller.player.setAudioSource(
+                        //     AudioSource.uri(Uri.parse(filename)));
+                      },
+                    ),
+                  )
+                ],
               ),
             ),
-            const Text('Event streams.'),
-            const Divider(
-              height: 8.0,
-              color: Colors.transparent,
-            ),
-            Table(
-              children: [
-                TableRow(
-                  children: [
-                    const Text('player.general.volume'),
-                    Text('${general.volume}')
-                  ],
+            Container(
+              height: 250.0,
+              child: ReorderableListView(
+                shrinkWrap: true,
+                onReorder: (int initialIndex, int finalIndex) async {
+                  if (finalIndex > playlist.medias.length) {
+                    finalIndex = playlist.medias.length;
+                  }
+                  if (initialIndex < finalIndex) finalIndex--;
+                  widget.controller.move(initialIndex, finalIndex);
+                },
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                children: List.generate(
+                  playlist.medias.length,
+                  (int index) {
+                    return ListTile(
+                      key: Key(index.toString()),
+                      leading: Text(
+                        index.toString(),
+                        style: const TextStyle(fontSize: 14.0),
+                      ),
+                      title: Text(
+                        playlist.medias[index].resource,
+                        style: const TextStyle(fontSize: 14.0),
+                      ),
+                    );
+                  },
+                  growable: true,
                 ),
-                TableRow(
-                  children: [
-                    const Text('player.general.rate'),
-                    Text('${general.rate}')
-                  ],
-                ),
-                TableRow(
-                  children: [
-                    const Text('player.position.position'),
-                    Text('${position.position}')
-                  ],
-                ),
-                TableRow(
-                  children: [
-                    const Text('player.position.duration'),
-                    Text('${position.duration}')
-                  ],
-                ),
-                TableRow(
-                  children: [
-                    const Text('player.playback.isCompleted'),
-                    Text('${playback.isCompleted}')
-                  ],
-                ),
-                TableRow(
-                  children: [
-                    const Text('player.playback.isPlaying'),
-                    Text('${playback.isPlaying}')
-                  ],
-                ),
-                TableRow(
-                  children: [
-                    const Text('player.playback.isSeekable'),
-                    Text('${playback.isSeekable}')
-                  ],
-                ),
-                TableRow(
-                  children: [
-                    const Text('player.current.index'),
-                    Text('${current.index}')
-                  ],
-                ),
-                TableRow(
-                  children: [
-                    const Text('player.current.media'),
-                    Text('${current.media}')
-                  ],
-                ),
-                TableRow(
-                  children: [
-                    const Text('player.current.medias'),
-                    Text('${current.medias}')
-                  ],
-                ),
-                TableRow(
-                  children: [
-                    const Text('player.videoDimensions'),
-                    Text('${videoDimensions}')
-                  ],
-                ),
-                TableRow(
-                  children: [
-                    const Text('player.bufferingProgress'),
-                    Text('$bufferingProgress')
-                  ],
-                ),
-              ],
+              ),
             ),
           ],
         ),
@@ -593,183 +735,57 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
     );
   }
 
-  Card _buildPlaylistCard() {
-    return Card(
-      elevation: 2.0,
-      margin: const EdgeInsets.all(4.0),
-      child: Container(
-        margin: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-                const Text('Playlist creation.'),
-                const Divider(
-                  height: 8.0,
-                  color: Colors.transparent,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: _buildMediaPath(),
-                    ),
-                    _buildMediaTypeSelector(),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10.0),
-                      child: _buildPlaylistButton(),
-                    ),
-                  ],
-                ),
-                const Divider(
-                  height: 12.0,
-                ),
-                const Divider(
-                  height: 8.0,
-                  color: Colors.transparent,
-                ),
-                const Text('Playlist'),
-              ] +
-              medias
-                  .map(
-                    (media) => ListTile(
-                      title: Text(
-                        media.resource,
-                        style: const TextStyle(
-                          fontSize: 14.0,
-                        ),
-                      ),
-                      subtitle: Text(
-                        media.mediaType.toString(),
-                        style: const TextStyle(
-                          fontSize: 14.0,
-                        ),
-                      ),
-                    ),
-                  )
-                  .toList() +
-              <Widget>[
-                const Divider(
-                  height: 8.0,
-                  color: Colors.transparent,
-                ),
-                Row(
-                  children: [
-                    ElevatedButton(
-                      onPressed: () => setState(
-                        () {
-                          widget.controller.open();
-                        },
-                      ),
-                      child: const Text(
-                        'Open into Player',
-                        style: TextStyle(
-                          fontSize: 14.0,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12.0),
-                    ElevatedButton(
-                      onPressed: () {
-                        setState(() => medias.clear());
-                      },
-                      child: const Text(
-                        'Clear the list',
-                        style: TextStyle(
-                          fontSize: 14.0,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-        ),
-      ),
-    );
-  }
-
-  ElevatedButton _buildPlaylistButton() {
-    return ElevatedButton(
-      onPressed: () {
-        if (mediaType == MediaType.file) {
-          medias.add(
-            Media.file(
-              File(
-                controller.text.replaceAll('"', ''),
-              ),
-            ),
-          );
-        } else if (mediaType == MediaType.network) {
-          medias.add(
-            Media.network(
-              controller.text,
-            ),
-          );
-        }
-        setState(() {});
+  ///播放进度条
+  Widget _buildPlayerSlider(BuildContext context) {
+    return StreamBuilder<PositionData>(
+      stream: widget.controller.positionDataStream,
+      builder: (context, snapshot) {
+        final positionData = snapshot.data;
+        return MediaPlayerSlider(
+          duration: positionData?.duration ?? Duration.zero,
+          position: positionData?.position ?? Duration.zero,
+          bufferedPosition: positionData?.bufferedPosition ?? Duration.zero,
+          onChangeEnd: widget.controller.seek,
+        );
       },
-      child: const Text(
-        'Add to Playlist',
-        style: TextStyle(
-          fontSize: 14.0,
-        ),
-      ),
     );
   }
 
-  TextField _buildMediaPath() {
-    return TextField(
-      controller: controller,
-      cursorWidth: 1.0,
-      autofocus: true,
-      style: const TextStyle(
-        fontSize: 14.0,
-      ),
-      decoration: const InputDecoration.collapsed(
-        hintStyle: TextStyle(
-          fontSize: 14.0,
-        ),
-        hintText: 'Enter Media path.',
-      ),
+  ///复杂控制器按钮面板，包含音量，速度和播放按钮
+  Widget _buildComplexControllerPanel(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        _buildPlaylist(context),
+        _buildPlayerSlider(context),
+        // Display play/pause button and volume/speed sliders.
+        _buildComplexControlPanel(context),
+      ],
     );
   }
 
-  Container _buildMediaTypeSelector() {
-    return Container(
-      width: 152.0,
-      child: DropdownButton<MediaType>(
-        value: mediaType,
-        onChanged: (mediaType) => setState(() => this.mediaType = mediaType!),
-        items: [
-          DropdownMenuItem<MediaType>(
-            value: MediaType.file,
-            child: Text(
-              MediaType.file.toString(),
-              style: const TextStyle(
-                fontSize: 14.0,
-              ),
-            ),
-          ),
-          DropdownMenuItem<MediaType>(
-            value: MediaType.network,
-            child: Text(
-              MediaType.network.toString(),
-              style: const TextStyle(
-                fontSize: 14.0,
-              ),
-            ),
-          ),
-          DropdownMenuItem<MediaType>(
-            value: MediaType.asset,
-            child: Text(
-              MediaType.asset.toString(),
-              style: const TextStyle(
-                fontSize: 14.0,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
+  @override
+  Widget build(BuildContext context) {
+    bool isTablet = _isTablet();
+    bool isPhone = _isPhone();
+    if (widget.simple) {
+      return _buildSimpleControllerPanel(context);
+    }
+    return _buildComplexControllerPanel(context);
+  }
+
+  ///简单控制器面板，包含简单播放面板和进度条
+  Widget _buildSimpleControllerPanel(BuildContext context) {
+    return Center(
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            _buildSimpleControlPanel(context),
+            _buildPlayerSlider(context),
+          ],
+        ));
   }
 
   Row _buildVideoView(bool isPhone) {
@@ -796,200 +812,6 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
                 showControls: true,
               ),
       ],
-    );
-  }
-
-  ///视频操控面板，各种操控按钮组成
-  Widget _controls(BuildContext context, bool isPhone) {
-    return Card(
-      elevation: 2.0,
-      margin: const EdgeInsets.all(4.0),
-      child: Container(
-        margin: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text('Playback controls.'),
-            const Divider(
-              height: 8.0,
-              color: Colors.transparent,
-            ),
-            Row(
-              children: [
-                ElevatedButton(
-                  onPressed: () => widget.controller.play(),
-                  child: const Text(
-                    'play',
-                    style: TextStyle(
-                      fontSize: 14.0,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12.0),
-                ElevatedButton(
-                  onPressed: () => widget.controller.pause(),
-                  child: const Text(
-                    'pause',
-                    style: TextStyle(
-                      fontSize: 14.0,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12.0),
-                ElevatedButton(
-                  onPressed: () => widget.controller.playOrPause(),
-                  child: const Text(
-                    'playOrPause',
-                    style: TextStyle(
-                      fontSize: 14.0,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12.0),
-              ],
-            ),
-            const SizedBox(
-              height: 8.0,
-            ),
-            Row(
-              children: [
-                ElevatedButton(
-                  onPressed: () => widget.controller.stop(),
-                  child: const Text(
-                    'stop',
-                    style: TextStyle(
-                      fontSize: 14.0,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12.0),
-                ElevatedButton(
-                  onPressed: () => widget.controller.next(),
-                  child: const Text(
-                    'next',
-                    style: TextStyle(
-                      fontSize: 14.0,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12.0),
-                ElevatedButton(
-                  onPressed: () => widget.controller.previous(),
-                  child: const Text(
-                    'previous',
-                    style: TextStyle(
-                      fontSize: 14.0,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const Divider(
-              height: 12.0,
-              color: Colors.transparent,
-            ),
-            const Divider(
-              height: 12.0,
-            ),
-            const Text('Volume control.'),
-            const Divider(
-              height: 8.0,
-              color: Colors.transparent,
-            ),
-            Slider(
-              min: 0.0,
-              max: 1.0,
-              value: widget.controller.player.general.volume,
-              onChanged: (volume) {
-                widget.controller.setVolume(volume);
-                setState(() {});
-              },
-            ),
-            const Text('Playback rate control.'),
-            const Divider(
-              height: 8.0,
-              color: Colors.transparent,
-            ),
-            Slider(
-              min: 0.5,
-              max: 1.5,
-              value: widget.controller.general.rate,
-              onChanged: (rate) {
-                widget.controller.setRate(rate);
-                setState(() {});
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  ///播放列表，使用拖拽排序列表组件
-  Widget _playlist(BuildContext context) {
-    return Card(
-      elevation: 2.0,
-      margin: const EdgeInsets.all(4.0),
-      child: Container(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              margin: const EdgeInsets.only(left: 16.0, top: 16.0),
-              alignment: Alignment.topLeft,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text('Playlist manipulation.'),
-                  Divider(
-                    height: 12.0,
-                    color: Colors.transparent,
-                  ),
-                  Divider(
-                    height: 12.0,
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              height: 456.0,
-              child: ReorderableListView(
-                shrinkWrap: true,
-                onReorder: (int initialIndex, int finalIndex) async {
-                  if (finalIndex > current.medias.length) {
-                    finalIndex = current.medias.length;
-                  }
-                  if (initialIndex < finalIndex) finalIndex--;
-
-                  widget.controller.move(initialIndex, finalIndex);
-                  setState(() {});
-                },
-                scrollDirection: Axis.vertical,
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                children: List.generate(
-                  current.medias.length,
-                  (int index) => ListTile(
-                    key: Key(index.toString()),
-                    leading: Text(
-                      index.toString(),
-                      style: const TextStyle(fontSize: 14.0),
-                    ),
-                    title: Text(
-                      current.medias[index].resource,
-                      style: const TextStyle(fontSize: 14.0),
-                    ),
-                    subtitle: Text(
-                      current.medias[index].mediaType.toString(),
-                      style: const TextStyle(fontSize: 14.0),
-                    ),
-                  ),
-                  growable: true,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:audio_session/audio_session.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -67,19 +66,20 @@ class JustAudioPlayerState extends State<JustAudioPlayer>
     }
   }
 
+  ///简单控制器面板，包含简单播放面板和进度条
   Widget _buildSimpleControllerPanel(BuildContext context) {
     return Center(
         child: Row(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        // Display play/pause button and volume/speed sliders.
-        JustAudioPlayerControllerPanel(widget.controller),
+        _buildSimpleControlPanel(context),
         _buildPlayerSlider(context),
       ],
     ));
   }
 
+  ///播放进度条
   Widget _buildPlayerSlider(BuildContext context) {
     return StreamBuilder<PositionData>(
       stream: widget.controller.positionDataStream,
@@ -95,6 +95,7 @@ class JustAudioPlayerState extends State<JustAudioPlayer>
     );
   }
 
+  ///播放列表
   Widget _buildPlaylist(BuildContext context) {
     var playlist = widget.controller.playlist;
     var filenames = widget.controller.filenames;
@@ -166,6 +167,7 @@ class JustAudioPlayerState extends State<JustAudioPlayer>
     );
   }
 
+  ///复杂控制器面板，包含播放列表，进度条和复杂播放面板
   Widget _buildComplexControllerPanel(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -174,7 +176,7 @@ class JustAudioPlayerState extends State<JustAudioPlayer>
         _buildPlaylist(context),
         _buildPlayerSlider(context),
         // Display play/pause button and volume/speed sliders.
-        JustAudioPlayerControllerPanel(widget.controller, simple: false),
+        _buildComplexControlPanel(context),
       ],
     );
   }
@@ -186,83 +188,23 @@ class JustAudioPlayerState extends State<JustAudioPlayer>
     }
     return _buildComplexControllerPanel(context);
   }
-}
 
-/// Displays the play/pause/stop button and volume/speed sliders.
-class JustAudioPlayerControllerPanel extends StatelessWidget {
-  final JustAudioPlayerController controller;
-  final bool simple;
-
-  const JustAudioPlayerControllerPanel(this.controller,
-      {Key? key, this.simple = true})
-      : super(key: key);
-
-  void showSliderDialog({
-    required BuildContext context,
-    required String title,
-    required int divisions,
-    required double min,
-    required double max,
-    String suffix = '',
-    required double value,
-    required Stream<double> stream,
-    required ValueChanged<double> onChanged,
-  }) {
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title, textAlign: TextAlign.center),
-        content: StreamBuilder<double>(
-          stream: stream,
-          builder: (context, snapshot) => SizedBox(
-            height: 100.0,
-            child: Column(
-              children: [
-                Text('${snapshot.data?.toStringAsFixed(1)}$suffix',
-                    style: const TextStyle(
-                        fontFamily: 'Fixed',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24.0)),
-                RotatedBox(
-                    quarterTurns: 0,
-                    child: Slider(
-                      divisions: divisions,
-                      min: min,
-                      max: max,
-                      value: snapshot.data ?? value,
-                      onChanged: onChanged,
-                    )),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (simple) {
-      return _buildSimpleControlPanel();
-    }
-    return _buildComplexControlPanel(context);
-  }
-
-  Row _buildSimpleControlPanel() {
+  ///简单播放控制面板，包含音量，简单播放按钮，
+  Row _buildSimpleControlPanel(BuildContext context) {
     return Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
           StreamBuilder<double>(
-            stream: controller.player.volumeStream,
+            stream: widget.controller.player.volumeStream,
             builder: (context, snapshot) {
               var label = '${snapshot.data?.toStringAsFixed(1)}';
               return _buildVolumeButton(context, label: label);
             },
           ),
           StreamBuilder<PlayerState>(
-              stream: controller.player.playerStateStream,
+              stream: widget.controller.player.playerStateStream,
               builder: (context, snapshot) {
                 final playerState = snapshot.data;
                 final processingState = playerState?.processingState;
@@ -280,20 +222,20 @@ class JustAudioPlayerControllerPanel extends StatelessWidget {
                   if (playing != true) {
                     widgets.add(Ink(
                         child: InkWell(
-                      onTap: controller.play,
+                      onTap: widget.controller.play,
                       child: const Icon(Icons.play_arrow_rounded, size: 36),
                     )));
                   } else if (processingState != ProcessingState.completed) {
                     widgets.add(Ink(
                         child: InkWell(
-                      onTap: controller.pause,
+                      onTap: widget.controller.pause,
                       child: const Icon(Icons.pause, size: 36),
                     )));
                   } else {
                     widgets.add(Ink(
                         child: InkWell(
                       child: const Icon(Icons.replay, size: 36),
-                      onTap: () => controller.seek(Duration.zero),
+                      onTap: () => widget.controller.seek(Duration.zero),
                     )));
                   }
                 }
@@ -304,6 +246,7 @@ class JustAudioPlayerControllerPanel extends StatelessWidget {
         ]);
   }
 
+  ///音量控制按钮
   Widget _buildVolumeButton(BuildContext context, {String? label}) {
     return Ink(
         child: InkWell(
@@ -312,20 +255,21 @@ class JustAudioPlayerControllerPanel extends StatelessWidget {
         Text(label ?? '')
       ]),
       onTap: () {
-        showSliderDialog(
+        MediaPlayerSliderUtil.showSliderDialog(
           context: context,
           title: "Adjust volume",
           divisions: 10,
           min: 0.0,
           max: 1.0,
-          value: controller.getVolume(),
-          stream: controller.player.volumeStream,
-          onChanged: controller.setVolume,
+          value: widget.controller.getVolume(),
+          stream: widget.controller.player.volumeStream,
+          onChanged: widget.controller.setVolume,
         );
       },
     ));
   }
 
+  ///速度控制按钮
   Widget _buildSpeedButton(BuildContext context, {String? label}) {
     return Ink(
         child: InkWell(
@@ -334,26 +278,27 @@ class JustAudioPlayerControllerPanel extends StatelessWidget {
         Text(label ?? '')
       ]),
       onTap: () {
-        showSliderDialog(
+        MediaPlayerSliderUtil.showSliderDialog(
           context: context,
           title: "Adjust speed",
           divisions: 10,
           min: 0.5,
           max: 1.5,
-          value: controller.getSpeed(),
-          stream: controller.player.speedStream,
-          onChanged: controller.setSpeed,
+          value: widget.controller.getSpeed(),
+          stream: widget.controller.player.speedStream,
+          onChanged: widget.controller.setSpeed,
         );
       },
     ));
   }
 
+  ///复杂控制器按钮面板，包含音量，速度和播放按钮
   Widget _buildComplexControlPanel(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
         StreamBuilder<double>(
-          stream: controller.player.volumeStream,
+          stream: widget.controller.player.volumeStream,
           builder: (context, snapshot) {
             var label = '${snapshot.data?.toStringAsFixed(1)}';
             return _buildVolumeButton(context, label: label);
@@ -367,7 +312,7 @@ class JustAudioPlayerControllerPanel extends StatelessWidget {
           width: 50,
         ),
         StreamBuilder<double>(
-          stream: controller.player.speedStream,
+          stream: widget.controller.player.speedStream,
           builder: (context, snapshot) {
             var label = '${snapshot.data?.toStringAsFixed(1)}';
             return _buildSpeedButton(context, label: label);
@@ -377,9 +322,10 @@ class JustAudioPlayerControllerPanel extends StatelessWidget {
     );
   }
 
+  ///复杂播放按钮面板，包含复杂播放按钮
   StreamBuilder<PlayerState> _buildComplexPlayPanel() {
     return StreamBuilder<PlayerState>(
-        stream: controller.player.playerStateStream,
+        stream: widget.controller.player.playerStateStream,
         builder: (context, snapshot) {
           final playerState = snapshot.data;
           final processingState = playerState?.processingState;
@@ -396,37 +342,37 @@ class JustAudioPlayerControllerPanel extends StatelessWidget {
           } else {
             widgets.add(Ink(
                 child: InkWell(
-              onTap: controller.stop,
+              onTap: widget.controller.stop,
               child: const Icon(Icons.stop_rounded, size: 36),
             )));
 
             widgets.add(Ink(
                 child: InkWell(
-              onTap: controller.previous,
+              onTap: widget.controller.previous,
               child: const Icon(Icons.skip_previous_rounded, size: 36),
             )));
             if (playing != true) {
               widgets.add(Ink(
                   child: InkWell(
-                onTap: controller.play,
+                onTap: widget.controller.play,
                 child: const Icon(Icons.play_arrow_rounded, size: 36),
               )));
             } else if (processingState != ProcessingState.completed) {
               widgets.add(Ink(
                   child: InkWell(
-                onTap: controller.pause,
+                onTap: widget.controller.pause,
                 child: const Icon(Icons.pause, size: 36),
               )));
             } else {
               widgets.add(Ink(
                   child: InkWell(
                 child: const Icon(Icons.replay, size: 36),
-                onTap: () => controller.seek(Duration.zero),
+                onTap: () => widget.controller.seek(Duration.zero),
               )));
             }
             widgets.add(Ink(
                 child: InkWell(
-              onTap: controller.next,
+              onTap: widget.controller.next,
               child: const Icon(Icons.skip_next_rounded, size: 36),
             )));
           }
@@ -436,4 +382,3 @@ class JustAudioPlayerControllerPanel extends StatelessWidget {
         });
   }
 }
-

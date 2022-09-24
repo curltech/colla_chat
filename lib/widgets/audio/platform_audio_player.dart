@@ -15,7 +15,7 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
 
-abstract class AbstractAudioPlayerController with ChangeNotifier{
+abstract class AbstractMediaPlayerController with ChangeNotifier{
   setCurrentIndex(int? index);
 
   play();
@@ -26,13 +26,14 @@ abstract class AbstractAudioPlayerController with ChangeNotifier{
 
   resume();
 
+  @override
   dispose();
 
   next();
 
   previous();
 
-  seek(Duration? position, {int? index});
+  seek(Duration position, {int? index});
 
   setShuffleModeEnabled(bool enabled);
 
@@ -229,9 +230,9 @@ class AudioWaveformPainter extends CustomPainter {
 
 ///平台标准的audio-player的实现，
 class PlatformAudioPlayer extends StatefulWidget {
-  late final AbstractAudioPlayerController controller;
+  late final AbstractMediaPlayerController controller;
 
-  PlatformAudioPlayer({Key? key, AbstractAudioPlayerController? controller})
+  PlatformAudioPlayer({Key? key, AbstractMediaPlayerController? controller})
       : super(key: key) {
     if (platformParams.ios ||
         platformParams.android ||

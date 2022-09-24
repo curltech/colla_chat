@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/audio/platform_audio_player.dart';
+import 'package:colla_chat/widgets/common/media_player_slider.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:record/record.dart';
 import 'package:rxdart/rxdart.dart';
@@ -48,17 +49,11 @@ class JustAudioSource {
   }
 }
 
-class PositionData {
-  final Duration position;
-  final Duration bufferedPosition;
-  final Duration duration;
 
-  PositionData(this.position, this.bufferedPosition, this.duration);
-}
 
 ///JustAudio音频播放器，Android, iOS, Linux, macOS, Windows, and web.
 ///还可以产生音频播放的波形图形组件
-class JustAudioPlayerController extends AbstractAudioPlayerController {
+class JustAudioPlayerController extends AbstractMediaPlayerController {
   late AudioPlayer player;
   List<AudioSource> playlist = [];
   List<String> filenames = [];

@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/video/platform_video_player.dart';
+import 'package:colla_chat/widgets/audio/platform_audio_player.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flick_video_player/src/utils/web_key_bindings.dart';
 import 'package:flutter/material.dart';
@@ -45,69 +45,55 @@ class FlickMediaSource {
   }
 }
 
-///基于flick实现的媒体播放器和记录器，可以截取视频文件的图片作为缩略图
-///支持除macos外的平台，linux需要VLC & libVLC installed.
-class FlickVideoPlayerController extends AbstractVideoPlayerController {
+///基于flick实现的媒体播放器和记录器，
+class FlickVideoPlayerController extends AbstractMediaPlayerController {
   final List<FlickManager> _flickManagers = [];
-  FlickManager? _activeManager;
-  bool _isMute = false;
+  int? _currentIndex;
 
   FlickVideoPlayerController();
 
-  @override
-  open({bool autoStart = false}) {}
+  _open({bool autoStart = false}) {}
 
-  _play() {
-    if (_isMute) {
-      _activeManager?.flickControlManager?.mute();
-    } else {
-      _activeManager?.flickControlManager?.unmute();
+  FlickManager? get current {
+    if (_currentIndex != null &&
+        _currentIndex! >= 0 &&
+        _currentIndex! < _flickManagers.length) {
+      return _flickManagers[_currentIndex!];
     }
-
-    _activeManager?.flickControlManager?.play();
+    return null;
   }
 
   ///基本的视频控制功能
   @override
   play() {
-    _activeManager?.flickControlManager?.play();
+    current?.flickControlManager?.play();
   }
 
   @override
-  seek(Duration duration) {
-    _activeManager?.flickControlManager?.seekTo(duration);
+  seek(Duration position, {int? index}) {
+    current?.flickControlManager?.seekTo(position);
   }
 
   @override
   pause() {
-    _activeManager?.flickControlManager?.pause();
-  }
-
-  @override
-  playOrPause() {
-    _activeManager?.flickControlManager?.togglePlay();
+    current?.flickControlManager?.pause();
   }
 
   @override
   stop() {
-    _activeManager?.flickControlManager?.pause();
+    current?.flickControlManager?.pause();
   }
 
   @override
   setVolume(double volume) {
-    _activeManager?.flickControlManager?.setVolume(volume);
-  }
-
-  toggleMute() {
-    _activeManager?.flickControlManager?.toggleMute();
+    current?.flickControlManager?.setVolume(volume);
   }
 
   @override
-  setRate(double rate) {
-    _activeManager?.flickControlManager?.setPlaybackSpeed(rate);
+  setSpeed(double speed) {
+    current?.flickControlManager?.setPlaybackSpeed(speed);
   }
 
-  @override
   takeSnapshot(
     String filename,
     int width,
@@ -116,7 +102,8 @@ class FlickVideoPlayerController extends AbstractVideoPlayerController {
 
   @override
   dispose() {
-    _activeManager!.dispose();
+    super.dispose();
+    current!.dispose();
   }
 
   ///下面是播放列表的功能
@@ -125,24 +112,14 @@ class FlickVideoPlayerController extends AbstractVideoPlayerController {
     FlickManager flickManager =
         await FlickMediaSource.media(filename: filename, data: data);
     _flickManagers.add(flickManager);
-    _activeManager = flickManager;
-    if (_isMute) {
-      flickManager.flickControlManager?.mute();
-    } else {
-      flickManager.flickControlManager?.unmute();
-    }
-    if (_flickManagers.length == 1) {
-      play();
-    }
+    _currentIndex = _flickManagers.length - 1;
+    play();
   }
 
   @override
   remove(int index) {
     if (index >= 0 && index < _flickManagers.length) {
       FlickManager flickManager = _flickManagers[index];
-      if (_activeManager == flickManager) {
-        _activeManager = null;
-      }
       flickManager.dispose();
       _flickManagers.removeAt(index);
     }
@@ -153,24 +130,21 @@ class FlickVideoPlayerController extends AbstractVideoPlayerController {
     FlickManager flickManager =
         await FlickMediaSource.media(filename: filename, data: data);
     _flickManagers.insert(index, flickManager);
-    _activeManager = flickManager;
   }
 
   @override
   next() {
-    int index = _flickManagers.indexOf(_activeManager!);
-    _activeManager = _flickManagers[index + 1];
+    _currentIndex = _currentIndex! + 1;
   }
 
   @override
   previous() {
-    int index = _flickManagers.indexOf(_activeManager!);
-    _activeManager = _flickManagers[index - 1];
+    _currentIndex = _currentIndex! - 1;
   }
 
   @override
-  jumpToIndex(int index) {
-    _activeManager = _flickManagers[index - 1];
+  setCurrentIndex(int? index) {
+    _currentIndex = index;
   }
 
   @override
@@ -180,7 +154,6 @@ class FlickVideoPlayerController extends AbstractVideoPlayerController {
     _flickManagers[finalIndex] = flickManager;
   }
 
-  @override
   buildVideoWidget({
     Key? key,
     double? width,
@@ -242,6 +215,53 @@ class FlickVideoPlayerController extends AbstractVideoPlayerController {
       webKeyDownHandler: webKeyDownHandler,
     );
   }
+
+  @override
+  int? currentIndex() {
+    return _currentIndex;
+  }
+
+  @override
+  Future<Duration?> getBufferedPosition() {
+    // TODO: implement getBufferedPosition
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Duration?> getDuration() {
+    // TODO: implement getDuration
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Duration?> getPosition() {
+    // TODO: implement getPosition
+    throw UnimplementedError();
+  }
+
+  @override
+  double getSpeed() {
+    // TODO: implement getSpeed
+    throw UnimplementedError();
+  }
+
+  @override
+  double getVolume() {
+    // TODO: implement getVolume
+    throw UnimplementedError();
+  }
+
+  @override
+  resume() {
+    // TODO: implement resume
+    throw UnimplementedError();
+  }
+
+  @override
+  setShuffleModeEnabled(bool enabled) {
+    // TODO: implement setShuffleModeEnabled
+    throw UnimplementedError();
+  }
 }
 
 ///采用flick-video-player实现的视频播放器，用于移动设备和web
@@ -271,7 +291,7 @@ class _PlatformFlickVideoPlayerState extends State<PlatformFlickVideoPlayer> {
   @override
   Widget build(BuildContext context) {
     return VisibilityDetector(
-      key: ObjectKey(widget.controller._activeManager),
+      key: ObjectKey(widget.controller.current),
       onVisibilityChanged: (visiblityInfo) {
         if (visiblityInfo.visibleFraction > 0.9) {
           widget.controller.play();
@@ -279,7 +299,7 @@ class _PlatformFlickVideoPlayerState extends State<PlatformFlickVideoPlayer> {
       },
       child: Container(
         child: FlickVideoPlayer(
-          flickManager: widget.controller._activeManager!,
+          flickManager: widget.controller.current!,
           flickVideoWithControls: FlickVideoWithControls(
             playerLoadingFallback: Positioned.fill(
               child: Stack(
@@ -304,7 +324,7 @@ class _PlatformFlickVideoPlayerState extends State<PlatformFlickVideoPlayer> {
             ),
             controls: FeedPlayerPortraitControls(
               flickMultiManager: widget.controller,
-              flickManager: widget.controller._activeManager,
+              flickManager: widget.controller.current,
             ),
           ),
           flickVideoWithControlsFullscreen: FlickVideoWithControls(
@@ -357,7 +377,7 @@ class FeedPlayerPortraitControls extends StatelessWidget {
           Expanded(
             child: FlickToggleSoundAction(
               toggleMute: () {
-                flickMultiManager?.toggleMute();
+                flickManager?.flickControlManager?.toggleMute();
                 displayManager.handleShowPlayerControls();
               },
               child: const FlickSeekVideoAction(
@@ -378,7 +398,8 @@ class FeedPlayerPortraitControls extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: FlickSoundToggle(
-                    toggleMute: () => flickMultiManager?.toggleMute(),
+                    toggleMute: () =>
+                        flickManager?.flickControlManager?.toggleMute(),
                     color: Colors.white,
                   ),
                 ),

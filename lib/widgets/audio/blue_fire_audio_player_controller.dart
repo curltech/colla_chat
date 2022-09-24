@@ -34,7 +34,7 @@ class BlueFireAudioSource {
 }
 
 ///音频播放器，Android, iOS, Linux, macOS, Windows, and web.
-class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
+class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
   late AudioPlayer player;
   List<Source> playlist = [];
   int? _currentIndex;
