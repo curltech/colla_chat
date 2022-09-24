@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:audio_session/audio_session.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/widgets/audio/audio_service.dart';
 import 'package:colla_chat/widgets/audio/just_audio_player_controller.dart';
 import 'package:colla_chat/widgets/common/media_player_slider.dart';
 import 'package:flutter/material.dart';
@@ -37,10 +37,10 @@ class JustAudioPlayerState extends State<JustAudioPlayer>
 
   Future<void> _init() async {
     widget.controller.addListener(_update);
-    final session = await AudioSession.instance;
-    await session.configure(const AudioSessionConfiguration.music());
-    widget.controller.player.playbackEventStream.listen((event) {},
-        onError: (Object e, StackTrace stackTrace) {
+    AudioSessionUtil.initMusic();
+    widget.controller.player.playbackEventStream.listen((PlaybackEvent event) {
+      logger.i('A stream PlaybackEvent occurred: ${event.toString()}');
+    }, onError: (Object e, StackTrace stackTrace) {
       logger.e('A stream error occurred: $e');
     });
   }

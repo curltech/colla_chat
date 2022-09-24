@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:audio_session/audio_session.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/widgets/audio/audio_service.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -29,35 +30,7 @@ enum AudioState {
   isRecordingPaused,
 }
 
-class AudioUtil {
-  static bool initStatus = false;
 
-  ///初始化全局音频会话，设置参数
-  static initAudioSession() async {
-    if (initStatus) {
-      return;
-    }
-    final session = await AudioSession.instance;
-    await session.configure(AudioSessionConfiguration(
-      avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
-      avAudioSessionCategoryOptions:
-          AVAudioSessionCategoryOptions.allowBluetooth |
-              AVAudioSessionCategoryOptions.defaultToSpeaker,
-      avAudioSessionMode: AVAudioSessionMode.spokenAudio,
-      avAudioSessionRouteSharingPolicy:
-          AVAudioSessionRouteSharingPolicy.defaultPolicy,
-      avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
-      androidAudioAttributes: const AndroidAudioAttributes(
-        contentType: AndroidAudioContentType.speech,
-        flags: AndroidAudioFlags.none,
-        usage: AndroidAudioUsage.voiceCommunication,
-      ),
-      androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
-      androidWillPauseWhenDucked: true,
-    ));
-    initStatus = true;
-  }
-}
 
 ///声音的记录器，仅支持移动设备
 class PlatformSoundRecorder {
@@ -100,7 +73,7 @@ class PlatformSoundRecorder {
     if (!encoderSupported && platformParams.web) {
       codec = Codec.opusWebM;
     }
-    await AudioUtil.initAudioSession();
+    await AudioSessionUtil.initCustom();
   }
 
   void cancelRecorderSubscriptions() {
@@ -242,7 +215,7 @@ class PlatformSoundPlayer {
   init() async {
     await player.setSubscriptionDuration(const Duration(milliseconds: 10));
     decoderSupported = await player.isDecoderSupported(codec);
-    await AudioUtil.initAudioSession();
+    await AudioSessionUtil.initCustom();
   }
 
   void cancelPlayerSubscriptions() {

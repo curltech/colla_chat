@@ -182,8 +182,9 @@ dependencies:
   just_audio_mpv: ^0.1.4
   just_waveform: any
   audio_service: any
-  just_audio_background: any
+  just_audio_background: ^0.0.1-beta.7
   flutter_tts: ^3.5.3
+  speech_to_text: any
   flutter_image_compress: ^1.1.0 #图片压缩1
   video_thumbnail: ^0.5.2
   syncfusion_flutter_barcodes: any
