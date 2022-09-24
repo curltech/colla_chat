@@ -13,7 +13,13 @@ class JustAudioSource {
       {String? filename, Uint8List? data}) async {
     AudioSource audioSource;
     if (filename != null) {
-      audioSource = AudioSource.uri(Uri.parse(filename));
+      if (filename.startsWith('assets/')) {
+        audioSource = AudioSource.uri(Uri.parse(filename));
+      } else if (filename.startsWith('http')) {
+        audioSource = AudioSource.uri(Uri.parse(filename));
+      } else {
+        audioSource = AudioSource.uri(Uri.file(filename));
+      }
     } else {
       data = data ?? Uint8List.fromList([]);
       filename = await FileUtil.writeTempFile(data, '');

@@ -3,7 +3,9 @@ import 'dart:math';
 
 import 'package:audio_session/audio_session.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/audio/just_audio_player_controller.dart';
+import 'package:colla_chat/widgets/common/media_player_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
@@ -113,14 +115,14 @@ class JustAudioPlayerState extends State<JustAudioPlayer>
                     child: InkWell(
                       child: const Icon(Icons.add),
                       onTap: () async {
-                        // List<String> filenames = await FileUtil.pickFiles();
-                        // for (var filename in filenames) {
-                        //   await widget.controller.add(filename: filename);
-                        // }
-                        var filename =
-                            'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3';
-                        widget.controller.player.setAudioSource(
-                            AudioSource.uri(Uri.parse(filename)));
+                        List<String> filenames = await FileUtil.pickFiles();
+                        for (var filename in filenames) {
+                          await widget.controller.add(filename: filename);
+                        }
+                        // var filename =
+                        //     'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3';
+                        // widget.controller.player.setAudioSource(
+                        //     AudioSource.uri(Uri.parse(filename)));
                       },
                     ),
                   )
@@ -435,101 +437,3 @@ class JustAudioPlayerControllerPanel extends StatelessWidget {
   }
 }
 
-class MediaPlayerSlider extends StatefulWidget {
-  final Duration duration;
-  final Duration position;
-  final Duration bufferedPosition;
-  final ValueChanged<Duration>? onChanged;
-  final ValueChanged<Duration>? onChangeEnd;
-
-  const MediaPlayerSlider({
-    Key? key,
-    required this.duration,
-    required this.position,
-    required this.bufferedPosition,
-    this.onChanged,
-    this.onChangeEnd,
-  }) : super(key: key);
-
-  @override
-  MediaPlayerSliderState createState() => MediaPlayerSliderState();
-}
-
-class MediaPlayerSliderState extends State<MediaPlayerSlider> {
-  double? _dragValue;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    var sliderThemeData = SliderTheme.of(context).copyWith(
-        trackShape: null,
-        //轨道的形状
-        trackHeight: 2,
-        //trackHeight：滑轨的高度
-
-        //activeTrackColor: Colors.blue,
-        //已滑过轨道的颜色
-        //inactiveTrackColor: Colors.greenAccent,
-        //未滑过轨道的颜色
-
-        //thumbColor: Colors.red,
-        //滑块中心的颜色（小圆头的颜色）
-        //overlayColor: Colors.greenAccent,
-        //滑块边缘的颜色
-
-        thumbShape: const RoundSliderThumbShape(
-          //可继承SliderComponentShape自定义形状
-          disabledThumbRadius: 15, //禁用时滑块大小
-          enabledThumbRadius: 6, //滑块大小
-        ),
-        overlayShape: const RoundSliderOverlayShape(
-          //可继承SliderComponentShape自定义形状
-          overlayRadius: 14, //滑块外圈大小
-        ));
-    return Row(
-      children: [
-        Expanded(child: SliderTheme(
-          data: sliderThemeData,
-          child: Slider(
-            min: 0.0,
-            max: widget.duration.inMilliseconds.toDouble(),
-            value: min(_dragValue ?? widget.position.inMilliseconds.toDouble(),
-                widget.duration.inMilliseconds.toDouble()),
-            onChanged: (value) {
-              setState(() {
-                _dragValue = value;
-              });
-              if (widget.onChanged != null) {
-                widget.onChanged!(Duration(milliseconds: value.round()));
-              }
-            },
-            onChangeEnd: (value) {
-              if (widget.onChangeEnd != null) {
-                widget.onChangeEnd!(Duration(milliseconds: value.round()));
-              }
-              _dragValue = null;
-            },
-          ),
-        )),
-        Text(
-          '${getDurationText(widget.position)}/${getDurationText(widget.duration)}',
-          style: const TextStyle(),
-        ),
-        const SizedBox(width: 15,)
-      ],
-    );
-  }
-
-  String getDurationText(Duration duration) {
-    return RegExp(r'((^0*[1-9]\d*:)?\d{2}:\d{2})\.\d+$')
-            .firstMatch("$duration")
-            ?.group(1) ??
-        '$duration';
-  }
-
-  Duration get _remaining => widget.duration - widget.position;
-}
