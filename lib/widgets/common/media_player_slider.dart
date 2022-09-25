@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
 
 class PositionData {
@@ -28,27 +29,39 @@ class MediaPlayerSliderUtil {
         title: Text(title, textAlign: TextAlign.center),
         content: StreamBuilder<dynamic>(
           stream: stream,
-          builder: (context, snapshot) => SizedBox(
-            height: 100.0,
-            child: Column(
-              children: [
-                Text('${snapshot.data?.toStringAsFixed(1)}$suffix',
-                    style: const TextStyle(
-                        fontFamily: 'Fixed',
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24.0)),
-                RotatedBox(
-                    quarterTurns: 0,
-                    child: Slider(
-                      divisions: divisions,
-                      min: min,
-                      max: max,
-                      value: snapshot.data ?? value,
-                      onChanged: onChanged,
-                    )),
-              ],
-            ),
-          ),
+          builder: (context, snapshot) {
+            var label = '1.0';
+            if (snapshot.data != null) {
+              var data = snapshot.data;
+              if (data is GeneralState) {
+                GeneralState generalState = data;
+                label = '${generalState.volume.toStringAsFixed(1)}$suffix';
+              } else if (data is double) {
+                label = '${data.toStringAsFixed(1)}$suffix';
+              }
+            }
+            return SizedBox(
+              height: 100.0,
+              child: Column(
+                children: [
+                  Text(label,
+                      style: const TextStyle(
+                          fontFamily: 'Fixed',
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24.0)),
+                  RotatedBox(
+                      quarterTurns: 0,
+                      child: Slider(
+                        divisions: divisions,
+                        min: min,
+                        max: max,
+                        value: value,
+                        onChanged: onChanged,
+                      )),
+                ],
+              ),
+            );
+          },
         ),
       ),
     );

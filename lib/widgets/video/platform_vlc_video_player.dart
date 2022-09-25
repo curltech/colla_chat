@@ -388,7 +388,7 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
     Color fillColor = Colors.black,
   }) {
     if (platformParams.windows) {
-      return _buildNativeVideoWidget(
+      return _buildVideoWidget(
         key: key,
         player: player,
         width: width,
@@ -663,7 +663,10 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
         StreamBuilder<GeneralState>(
           stream: widget.controller.player.generalStream,
           builder: (context, snapshot) {
-            var label = '${snapshot.data?.volume.toStringAsFixed(1)}';
+            var label = '1.0';
+            if (snapshot.data != null) {
+              label = '${snapshot.data?.volume.toStringAsFixed(1)}';
+            }
             return _buildVolumeButton(context, label: label);
           },
         ),
@@ -677,7 +680,10 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
         StreamBuilder<GeneralState>(
           stream: widget.controller.player.generalStream,
           builder: (context, snapshot) {
-            var label = '${snapshot.data?.rate.toStringAsFixed(1)}';
+            var label = '1.0';
+            if (snapshot.data != null) {
+              label = '${snapshot.data?.rate.toStringAsFixed(1)}';
+            }
             return _buildSpeedButton(context, label: label);
           },
         ),
@@ -802,14 +808,14 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
 
   ///播放进度条
   Widget _buildPlayerSlider(BuildContext context) {
-    return StreamBuilder<PositionData>(
-      stream: widget.controller.positionDataStream,
+    return StreamBuilder<PositionState>(
+      stream: widget.controller.player.positionStream,
       builder: (context, snapshot) {
-        final positionData = snapshot.data;
+        PositionState? positionData = snapshot.data;
         return MediaPlayerSlider(
           duration: positionData?.duration ?? Duration.zero,
           position: positionData?.position ?? Duration.zero,
-          bufferedPosition: positionData?.bufferedPosition ?? Duration.zero,
+          bufferedPosition: Duration.zero,
           onChangeEnd: widget.controller.seek,
         );
       },
@@ -870,10 +876,12 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
           height: height,
           decoration: BoxDecoration(color: color),
           child: widget.controller.buildVideoWidget(
-              player: widget.controller.player,
-              height: height,
-              width: width,
-              fit: BoxFit.contain),
+            player: widget.controller.player,
+            height: height,
+            width: width,
+            fit: BoxFit.cover,
+            showControls: true,
+          ),
         ),
       );
     });
