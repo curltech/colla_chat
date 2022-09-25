@@ -9,6 +9,7 @@ import 'package:colla_chat/widgets/audio/platform_audio_player.dart';
 import 'package:colla_chat/widgets/common/media_player_slider.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:rxdart/rxdart.dart';
 
 class VlcMediaSource {
@@ -81,11 +82,11 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
     });
     player.positionStream.listen((positionState) {
       this.positionState = positionState;
-      logger.i('libvlc positionState:$positionState');
+      //logger.i('libvlc positionState:$positionState');
     });
     player.playbackStream.listen((playbackState) {
       this.playbackState = playbackState;
-      logger.i('libvlc playbackState:$playbackState');
+      //logger.i('libvlc playbackState:$playbackState');
     });
     player.generalStream.listen((generalState) {
       this.generalState = generalState;
@@ -98,7 +99,7 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
     player.bufferingProgressStream.listen(
       (bufferingProgress) {
         this.bufferingProgress = bufferingProgress;
-        logger.i('libvlc bufferingProgress:$bufferingProgress');
+        //logger.i('libvlc bufferingProgress:$bufferingProgress');
       },
     );
     player.errorStream.listen((event) {
@@ -257,7 +258,7 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
     });
   }
 
-  buildVideoWidget({
+  Video _buildVideoWidget({
     Key? key,
     int? playerId,
     Player? player,
@@ -312,7 +313,7 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
     );
   }
 
-  NativeVideo buildNativeVideoWidget({
+  NativeVideo _buildNativeVideoWidget({
     Key? key,
     Player? player,
     double? width,
@@ -359,6 +360,62 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
       progressBarTextStyle: progressBarTextStyle,
       filterQuality: filterQuality,
     );
+  }
+
+  Widget buildVideoWidget({
+    Key? key,
+    Player? player,
+    double? width,
+    double? height,
+    BoxFit fit = BoxFit.contain,
+    AlignmentGeometry alignment = Alignment.center,
+    double scale = 1.0,
+    bool showControls = true,
+    Color? progressBarActiveColor,
+    Color? progressBarInactiveColor = Colors.white24,
+    Color? progressBarThumbColor,
+    Color? progressBarThumbGlowColor = const Color.fromRGBO(0, 161, 214, .2),
+    Color? volumeActiveColor,
+    Color? volumeInactiveColor = Colors.grey,
+    Color volumeBackgroundColor = const Color(0xff424242),
+    Color? volumeThumbColor,
+    double? progressBarThumbRadius = 10.0,
+    double? progressBarThumbGlowRadius = 15.0,
+    bool showTimeLeft = false,
+    TextStyle progressBarTextStyle = const TextStyle(),
+    FilterQuality filterQuality = FilterQuality.low,
+    bool showFullscreenButton = false,
+    Color fillColor = Colors.black,
+  }) {
+    if (platformParams.windows) {
+      return _buildNativeVideoWidget(
+        key: key,
+        player: player,
+        width: width,
+        height: height,
+        fit: fit,
+        alignment: alignment,
+        scale: scale,
+        showControls: showControls,
+        progressBarActiveColor: progressBarActiveColor,
+        progressBarInactiveColor: progressBarInactiveColor,
+        progressBarThumbColor: progressBarThumbColor,
+        progressBarThumbGlowColor: progressBarThumbGlowColor,
+        volumeActiveColor: volumeActiveColor,
+        volumeInactiveColor: volumeInactiveColor,
+        volumeBackgroundColor: volumeBackgroundColor,
+        volumeThumbColor: volumeThumbColor,
+        progressBarThumbRadius: progressBarThumbRadius,
+        progressBarThumbGlowRadius: progressBarThumbGlowRadius,
+        showTimeLeft: showTimeLeft,
+        progressBarTextStyle: progressBarTextStyle,
+        filterQuality: filterQuality,
+        // showFullscreenButton: showFullscreenButton,
+        // fillColor: fillColor,
+      );
+    } else {
+      return _buildVideoWidget();
+    }
   }
 
   setEqualizer({double? band, double? preAmp, double? amp}) {
@@ -441,6 +498,8 @@ class PlatformVlcVideoPlayer extends StatefulWidget {
 }
 
 class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
+  bool playlistVisible = false;
+
   @override
   void initState() {
     super.initState();
@@ -511,7 +570,7 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
                       onTap: widget.controller.play,
                       child: const Icon(Icons.play_arrow_rounded, size: 36),
                     )));
-                  } else if (!playerState!.isCompleted) {
+                  } else if (!playerState.isCompleted) {
                     widgets.add(Ink(
                         child: InkWell(
                       onTap: widget.controller.pause,
@@ -530,6 +589,21 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
                 );
               }),
         ]);
+  }
+
+  ///显示播放列表按钮
+  Widget _buildPlaylistVisibleButton(BuildContext context) {
+    return Ink(
+        child: InkWell(
+      child: playlistVisible
+          ? const Icon(Icons.visibility_off_rounded, size: 24)
+          : const Icon(Icons.visibility_rounded, size: 24),
+      onTap: () {
+        setState(() {
+          playlistVisible = !playlistVisible;
+        });
+      },
+    ));
   }
 
   ///音量按钮
@@ -582,6 +656,10 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
+        _buildPlaylistVisibleButton(context),
+        const SizedBox(
+          width: 25,
+        ),
         StreamBuilder<GeneralState>(
           stream: widget.controller.player.generalStream,
           builder: (context, snapshot) {
@@ -590,11 +668,11 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
           },
         ),
         const SizedBox(
-          width: 50,
+          width: 25,
         ),
         _buildComplexPlayPanel(),
         const SizedBox(
-          width: 50,
+          width: 25,
         ),
         StreamBuilder<GeneralState>(
           stream: widget.controller.player.generalStream,
@@ -614,50 +692,40 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
         builder: (context, snapshot) {
           PlaybackState? playerState = snapshot.data;
           List<Widget> widgets = [];
-          if (!playerState!.isCompleted && !playerState.isPlaying) {
-            widgets.add(Container(
-              margin: const EdgeInsets.all(8.0),
-              width: 24.0,
-              height: 24.0,
-              child: const CircularProgressIndicator(),
-            ));
+          widgets.add(Ink(
+              child: InkWell(
+            onTap: widget.controller.stop,
+            child: const Icon(Icons.stop_rounded, size: 36),
+          )));
+          widgets.add(Ink(
+              child: InkWell(
+            onTap: widget.controller.previous,
+            child: const Icon(Icons.skip_previous_rounded, size: 36),
+          )));
+          if (playerState == null || !playerState.isPlaying) {
+            widgets.add(Ink(
+                child: InkWell(
+              onTap: widget.controller.play,
+              child: const Icon(Icons.play_arrow_rounded, size: 36),
+            )));
+          } else if (playerState.isPlaying) {
+            widgets.add(Ink(
+                child: InkWell(
+              onTap: widget.controller.pause,
+              child: const Icon(Icons.pause, size: 36),
+            )));
           } else {
             widgets.add(Ink(
                 child: InkWell(
-              onTap: widget.controller.stop,
-              child: const Icon(Icons.stop_rounded, size: 36),
-            )));
-
-            widgets.add(Ink(
-                child: InkWell(
-              onTap: widget.controller.previous,
-              child: const Icon(Icons.skip_previous_rounded, size: 36),
-            )));
-            if (playerState.isPlaying) {
-              widgets.add(Ink(
-                  child: InkWell(
-                onTap: widget.controller.play,
-                child: const Icon(Icons.play_arrow_rounded, size: 36),
-              )));
-            } else if (!playerState!.isCompleted) {
-              widgets.add(Ink(
-                  child: InkWell(
-                onTap: widget.controller.pause,
-                child: const Icon(Icons.pause, size: 36),
-              )));
-            } else {
-              widgets.add(Ink(
-                  child: InkWell(
-                child: const Icon(Icons.replay, size: 36),
-                onTap: () => widget.controller.seek(Duration.zero),
-              )));
-            }
-            widgets.add(Ink(
-                child: InkWell(
-              onTap: widget.controller.next,
-              child: const Icon(Icons.skip_next_rounded, size: 36),
+              child: const Icon(Icons.replay_rounded, size: 24),
+              onTap: () => widget.controller.seek(Duration.zero),
             )));
           }
+          widgets.add(Ink(
+              child: InkWell(
+            onTap: widget.controller.next,
+            child: const Icon(Icons.skip_next_rounded, size: 36),
+          )));
           return Row(
             children: widgets,
           );
@@ -667,10 +735,10 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
   ///播放列表
   Widget _buildPlaylist(BuildContext context) {
     Playlist playlist = widget.controller.playlist;
-    return Card(
-      elevation: 2.0,
-      margin: const EdgeInsets.all(4.0),
-      child: Container(
+    return Column(children: [
+      Card(
+        color: Colors.white.withOpacity(0.5),
+        elevation: 0,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -688,18 +756,14 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
                         for (var filename in filenames) {
                           await widget.controller.add(filename: filename);
                         }
-                        // var filename =
-                        //     'https://s3.amazonaws.com/scifri-episodes/scifri20181123-episode.mp3';
-                        // widget.controller.player.setAudioSource(
-                        //     AudioSource.uri(Uri.parse(filename)));
                       },
                     ),
                   )
                 ],
               ),
             ),
-            Container(
-              height: 250.0,
+            SizedBox(
+              height: 150.0,
               child: ReorderableListView(
                 shrinkWrap: true,
                 onReorder: (int initialIndex, int finalIndex) async {
@@ -732,7 +796,8 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
           ],
         ),
       ),
-    );
+      const Spacer(),
+    ]);
   }
 
   ///播放进度条
@@ -757,9 +822,7 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        _buildPlaylist(context),
         _buildPlayerSlider(context),
-        // Display play/pause button and volume/speed sliders.
         _buildComplexControlPanel(context),
       ],
     );
@@ -769,49 +832,51 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
   Widget build(BuildContext context) {
     bool isTablet = _isTablet();
     bool isPhone = _isPhone();
+    Widget controllerPanel;
     if (widget.simple) {
-      return _buildSimpleControllerPanel(context);
+      controllerPanel = _buildSimpleControllerPanel(context);
+    } else {
+      controllerPanel = _buildComplexControllerPanel(context);
     }
-    return _buildComplexControllerPanel(context);
+    return Stack(children: [
+      Column(children: [Expanded(child: _buildVideoView()), controllerPanel]),
+      Visibility(visible: playlistVisible, child: _buildPlaylist(context))
+    ]);
   }
 
   ///简单控制器面板，包含简单播放面板和进度条
   Widget _buildSimpleControllerPanel(BuildContext context) {
     return Center(
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            _buildSimpleControlPanel(context),
-            _buildPlayerSlider(context),
-          ],
-        ));
+      mainAxisAlignment: MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        _buildSimpleControlPanel(context),
+        _buildPlayerSlider(context),
+      ],
+    ));
   }
 
-  Row _buildVideoView(bool isPhone) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Platform.isWindows
-            ? NativeVideo(
-                player: widget.controller.player,
-                width: isPhone ? 320 : 640,
-                height: isPhone ? 180 : 360,
-                volumeThumbColor: Colors.blue,
-                volumeActiveColor: Colors.blue,
-                showControls: true,
-              )
-            : Video(
-                player: widget.controller.player,
-                width: isPhone ? 320 : 640,
-                height: isPhone ? 180 : 360,
-                volumeThumbColor: Colors.blue,
-                volumeActiveColor: Colors.blue,
-                showControls: true,
-              ),
-      ],
-    );
+  Widget _buildVideoView({Color? color, double? height, double? width}) {
+    color = color ?? Colors.black.withOpacity(1);
+    Widget container = LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+      height = height ?? constraints.maxHeight;
+      width = width ?? constraints.maxWidth;
+      return Center(
+        child: Container(
+          margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+          width: width,
+          height: height,
+          decoration: BoxDecoration(color: color),
+          child: widget.controller.buildVideoWidget(
+              player: widget.controller.player,
+              height: height,
+              width: width,
+              fit: BoxFit.contain),
+        ),
+      );
+    });
+    return container;
   }
 }
