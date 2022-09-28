@@ -211,13 +211,8 @@ class JustAudioPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  int? currentIndex() {
-    return _currentIndex;
-  }
-
-  @override
-  double getVolume() {
-    return player.volume;
+  Future<double> getVolume() {
+    return Future.value(player.volume);
   }
 
   @override
@@ -226,8 +221,8 @@ class JustAudioPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  double getSpeed() {
-    return player.speed;
+  Future<double> getSpeed() {
+    return Future.value(player.speed);
   }
 
   @override

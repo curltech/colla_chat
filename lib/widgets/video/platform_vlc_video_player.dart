@@ -152,13 +152,13 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  double getSpeed() {
-    return player.general.rate;
+  Future<double> getSpeed() {
+    return Future.value(player.general.rate);
   }
 
   @override
-  double getVolume() {
-    return player.general.volume;
+  Future<double> getVolume() async {
+    return Future.value(player.general.volume);
   }
 
   ///下面是播放列表的功能
@@ -182,15 +182,17 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
   @override
   next() {
     player.next();
+    super.next();
   }
 
   @override
   previous() {
     player.previous();
+    super.previous();
   }
 
   @override
-  int? currentIndex() {
+  int? get currentIndex {
     return player.current.index;
   }
 
@@ -199,6 +201,7 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
     if (index != null) {
       player.jumpToIndex(index);
     }
+    super.setCurrentIndex(index);
   }
 
   @override
@@ -694,7 +697,6 @@ class PlatformVlcControllerPanel extends StatefulWidget {
 
 class _PlatformVlcControllerPanelState
     extends State<PlatformVlcControllerPanel> {
-
   @override
   void initState() {
     super.initState();
@@ -767,48 +769,56 @@ class _PlatformVlcControllerPanelState
 
   ///音量按钮
   Widget _buildVolumeButton(BuildContext context, {String? label}) {
-    return Ink(
-        child: InkWell(
-      child: Row(children: [
-        const Icon(Icons.volume_up_rounded, size: 24),
-        Text(label ?? '')
-      ]),
-      onTap: () {
-        MediaPlayerSliderUtil.showSliderDialog(
-          context: context,
-          title: "Adjust volume",
-          divisions: 10,
-          min: 0.0,
-          max: 1.0,
-          value: widget.controller.getVolume(),
-          stream: widget.controller.player.generalStream,
-          onChanged: widget.controller.setVolume,
-        );
-      },
-    ));
+    return FutureBuilder<double>(
+        future: widget.controller.getVolume(),
+        builder: (context, snapshot) {
+          return Ink(
+              child: InkWell(
+            child: Row(children: [
+              const Icon(Icons.volume_up_rounded, size: 24),
+              Text(label ?? '')
+            ]),
+            onTap: () {
+              MediaPlayerSliderUtil.showSliderDialog(
+                context: context,
+                title: "Adjust volume",
+                divisions: 10,
+                min: 0.0,
+                max: 1.0,
+                value: snapshot.data!,
+                stream: widget.controller.player.generalStream,
+                onChanged: widget.controller.setVolume,
+              );
+            },
+          ));
+        });
   }
 
   ///速度按钮
   Widget _buildSpeedButton(BuildContext context, {String? label}) {
-    return Ink(
-        child: InkWell(
-      child: Row(children: [
-        const Icon(Icons.speed_rounded, size: 24),
-        Text(label ?? '')
-      ]),
-      onTap: () {
-        MediaPlayerSliderUtil.showSliderDialog(
-          context: context,
-          title: "Adjust speed",
-          divisions: 10,
-          min: 0.5,
-          max: 1.5,
-          value: widget.controller.getSpeed(),
-          stream: widget.controller.player.generalStream,
-          onChanged: widget.controller.setSpeed,
-        );
-      },
-    ));
+    return FutureBuilder<double>(
+        future: widget.controller.getVolume(),
+        builder: (context, snapshot) {
+          return Ink(
+              child: InkWell(
+            child: Row(children: [
+              const Icon(Icons.speed_rounded, size: 24),
+              Text(label ?? '')
+            ]),
+            onTap: () {
+              MediaPlayerSliderUtil.showSliderDialog(
+                context: context,
+                title: "Adjust speed",
+                divisions: 10,
+                min: 0.5,
+                max: 1.5,
+                value: snapshot.data!,
+                stream: widget.controller.player.generalStream,
+                onChanged: widget.controller.setSpeed,
+              );
+            },
+          ));
+        });
   }
 
   Widget _buildComplexControlPanel(BuildContext context) {

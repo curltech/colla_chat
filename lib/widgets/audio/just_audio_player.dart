@@ -199,8 +199,7 @@ class JustAudioPlayerState extends State<JustAudioPlayer>
           StreamBuilder<double>(
             stream: widget.controller.player.volumeStream,
             builder: (context, snapshot) {
-              var label = '${snapshot.data?.toStringAsFixed(1)}';
-              return _buildVolumeButton(context, label: label);
+              return _buildVolumeButton(context);
             },
           ),
           StreamBuilder<PlayerState>(
@@ -246,50 +245,58 @@ class JustAudioPlayerState extends State<JustAudioPlayer>
         ]);
   }
 
-  ///音量控制按钮
-  Widget _buildVolumeButton(BuildContext context, {String? label}) {
-    return Ink(
-        child: InkWell(
-      child: Row(children: [
-        const Icon(Icons.volume_up_rounded, size: 24),
-        Text(label ?? '')
-      ]),
-      onTap: () {
-        MediaPlayerSliderUtil.showSliderDialog(
-          context: context,
-          title: "Adjust volume",
-          divisions: 10,
-          min: 0.0,
-          max: 1.0,
-          value: widget.controller.getVolume(),
-          stream: widget.controller.player.volumeStream,
-          onChanged: widget.controller.setVolume,
-        );
-      },
-    ));
+  ///音量按钮
+  Widget _buildVolumeButton(BuildContext context) {
+    return FutureBuilder<double>(
+        future: widget.controller.getVolume(),
+        builder: (context, snapshot) {
+          var label = snapshot.data!.toStringAsFixed(1);
+          return Ink(
+              child: InkWell(
+            child: Row(children: [
+              const Icon(Icons.volume_up_rounded, size: 24),
+              Text(label ?? '')
+            ]),
+            onTap: () {
+              MediaPlayerSliderUtil.showSliderDialog(
+                context: context,
+                title: "Adjust volume",
+                divisions: 10,
+                min: 0.0,
+                max: 1.0,
+                value: snapshot.data!,
+                onChanged: widget.controller.setVolume,
+              );
+            },
+          ));
+        });
   }
 
-  ///速度控制按钮
-  Widget _buildSpeedButton(BuildContext context, {String? label}) {
-    return Ink(
-        child: InkWell(
-      child: Row(children: [
-        const Icon(Icons.speed_rounded, size: 24),
-        Text(label ?? '')
-      ]),
-      onTap: () {
-        MediaPlayerSliderUtil.showSliderDialog(
-          context: context,
-          title: "Adjust speed",
-          divisions: 10,
-          min: 0.5,
-          max: 1.5,
-          value: widget.controller.getSpeed(),
-          stream: widget.controller.player.speedStream,
-          onChanged: widget.controller.setSpeed,
-        );
-      },
-    ));
+  ///速度按钮
+  Widget _buildSpeedButton(BuildContext context) {
+    return FutureBuilder<double>(
+        future: widget.controller.getVolume(),
+        builder: (context, snapshot) {
+          var label = snapshot.data!.toStringAsFixed(1);
+          return Ink(
+              child: InkWell(
+            child: Row(children: [
+              const Icon(Icons.speed_rounded, size: 24),
+              Text(label ?? '')
+            ]),
+            onTap: () {
+              MediaPlayerSliderUtil.showSliderDialog(
+                context: context,
+                title: "Adjust speed",
+                divisions: 10,
+                min: 0.5,
+                max: 1.5,
+                value: snapshot.data!,
+                onChanged: widget.controller.setSpeed,
+              );
+            },
+          ));
+        });
   }
 
   ///复杂控制器按钮面板，包含音量，速度和播放按钮
@@ -300,8 +307,7 @@ class JustAudioPlayerState extends State<JustAudioPlayer>
         StreamBuilder<double>(
           stream: widget.controller.player.volumeStream,
           builder: (context, snapshot) {
-            var label = '${snapshot.data?.toStringAsFixed(1)}';
-            return _buildVolumeButton(context, label: label);
+            return _buildVolumeButton(context);
           },
         ),
         const SizedBox(
@@ -314,8 +320,7 @@ class JustAudioPlayerState extends State<JustAudioPlayer>
         StreamBuilder<double>(
           stream: widget.controller.player.speedStream,
           builder: (context, snapshot) {
-            var label = '${snapshot.data?.toStringAsFixed(1)}';
-            return _buildSpeedButton(context, label: label);
+            return _buildSpeedButton(context);
           },
         ),
       ],

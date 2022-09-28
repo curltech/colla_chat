@@ -1,77 +1,60 @@
-import 'dart:io';
-
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/audio/platform_audio_player.dart';
 import 'package:colla_chat/widgets/common/media_player_slider.dart';
-import 'package:flick_video_player/flick_video_player.dart';
-import 'package:flick_video_player/src/utils/web_key_bindings.dart';
+import 'package:fijkplayer/fijkplayer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:universal_html/html.dart' as html;
-import 'package:video_player/video_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-class FlickMediaSource {
-  static Future<VideoPlayerController> media(
-      {String? filename, Uint8List? data}) async {
-    VideoPlayerController videoPlayerController;
-    if (filename != null) {
-      if (filename.startsWith('assets/')) {
-        videoPlayerController = VideoPlayerController.asset(filename);
-      } else if (filename.startsWith('http')) {
-        videoPlayerController = VideoPlayerController.network(filename);
-      } else {
-        videoPlayerController = VideoPlayerController.file(File(filename));
-      }
-    } else {
-      data = data ?? Uint8List.fromList([]);
-      filename = await FileUtil.writeTempFile(data, '');
-      videoPlayerController = VideoPlayerController.file(File(filename));
-    }
-    await videoPlayerController.initialize();
-
-    return videoPlayerController;
+class FijkMediaSource {
+  static Future<String> media({String? filename, Uint8List? data}) async {
+    return Future.value(filename);
   }
 
-  static Future<List<VideoPlayerController>> playlist(
-      List<String> filenames) async {
-    List<VideoPlayerController> playlist = [];
+  static Future<List<String>> playlist(List<String> filenames) async {
+    List<String> dataSources = [];
     for (var filename in filenames) {
-      playlist.add(await media(filename: filename));
+      dataSources.add(await media(filename: filename));
     }
 
-    return playlist;
+    return dataSources;
   }
 }
 
-///基于flick实现的媒体播放器和记录器，
-class FlickVideoPlayerController extends AbstractMediaPlayerController {
-  List<VideoPlayerController> playlist = [];
+///基于fijk实现的媒体播放器和记录器，
+class FijkVideoPlayerController extends AbstractMediaPlayerController {
+  List<String> dataSources = [];
+  final FijkPlayer player = FijkPlayer();
   int? _currentIndex;
-  FlickManager? _flickManager;
+  double volume = 1.0;
+  double speed = 1.0;
 
-  FlickVideoPlayerController();
+  FijkVideoPlayerController();
 
   _open({bool autoStart = false}) {}
 
-  VideoPlayerController? get current {
+  String? get current {
     if (_currentIndex != null &&
         _currentIndex! >= 0 &&
-        _currentIndex! < playlist.length) {
-      return playlist[_currentIndex!];
+        _currentIndex! < dataSources.length) {
+      return dataSources[_currentIndex!];
     }
     return null;
   }
 
   @override
   PlayerStatus get status {
-    VideoPlayerValue value = current!.value;
-    if (value.isPlaying) {
+    FijkState state = player.state;
+    if (state == FijkState.started) {
       return PlayerStatus.playing;
-    } else if (value.isBuffering) {
+    }
+    if (player.isBuffering) {
       return PlayerStatus.buffering;
-    } else if (value.isInitialized) {
+    }
+    if (state == FijkState.completed) {
+      return PlayerStatus.completed;
+    }
+    if (state == FijkState.initialized) {
       return PlayerStatus.init;
     }
 
@@ -81,231 +64,164 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
   ///基本的视频控制功能
   @override
   play() {
-    if (current != null) {
-      _flickManager = FlickManager(videoPlayerController: current!);
-      _flickManager!.flickControlManager?.play();
+    var dataSource = player.dataSource;
+    if (dataSource == null && current != null) {
+      player.setDataSource(current!);
     }
+    player.start();
   }
 
   @override
   seek(Duration position, {int? index}) {
-    if (_flickManager != null) {
-      _flickManager?.flickControlManager?.seekTo(position);
-    }
+    player.seekTo(position.inMicroseconds);
   }
 
   @override
   pause() {
-    if (_flickManager != null) {
-      _flickManager?.flickControlManager?.pause();
-    }
+    player.pause();
   }
 
   @override
   resume() {
-    if (_flickManager != null) {
-      _flickManager?.flickControlManager?.play();
-    }
+    player.start();
   }
 
   @override
   stop() {
-    if (_flickManager != null) {
-      _flickManager?.flickControlManager?.pause();
-    }
+    player.stop();
   }
 
   @override
-  Future<Duration?> getBufferedPosition() async {
-    if (_flickManager != null) {
-      return Future.value(_flickManager
-          ?.flickVideoManager?.videoPlayerValue?.buffered[0].start);
-    }
-    return null;
+  Future<Duration?> getBufferedPosition() {
+    return Future.value(player.bufferPos);
   }
 
   @override
-  Future<Duration?> getDuration() async {
-    if (_flickManager != null) {
-      return Future.value(
-          _flickManager?.flickVideoManager?.videoPlayerValue?.duration);
-    }
-    return null;
+  Future<Duration?> getDuration() {
+    return Future.value(player.value.duration);
   }
 
   @override
-  Future<Duration?> getPosition() async {
-    if (_flickManager != null) {
-      return Future.value(
-          _flickManager?.flickVideoManager?.videoPlayerValue?.position);
-    }
-    return null;
+  Future<Duration?> getPosition() {
+    return Future.value(player.currentPos);
   }
 
   @override
   Future<double> getSpeed() {
-    double speed = 1.0;
-    if (_flickManager != null) {
-      speed = _flickManager!.flickVideoManager!.videoPlayerValue!.playbackSpeed;
-    }
     return Future.value(speed);
   }
 
   @override
   Future<double> getVolume() {
-    double volume = 1.0;
-    if (_flickManager != null) {
-      volume = _flickManager!.flickVideoManager!.videoPlayerValue!.volume;
-    }
     return Future.value(volume);
   }
 
   @override
   setVolume(double volume) {
-    if (_flickManager != null) {
-      _flickManager?.flickControlManager?.setVolume(volume);
-    }
+    player.setVolume(volume);
+    this.volume = volume;
   }
 
   @override
   setSpeed(double speed) {
-    if (_flickManager != null) {
-      _flickManager?.flickControlManager?.setPlaybackSpeed(speed);
-    }
+    player.setSpeed(speed);
+    this.speed = speed;
   }
 
-  takeSnapshot(
+  Future<Uint8List> takeSnapshot(
     String filename,
     int width,
     int height,
-  ) {}
+  ) async {
+    return await player.takeSnapShot();
+  }
 
   @override
   dispose() {
     super.dispose();
-    if (_flickManager != null) {
-      _flickManager!.dispose();
-      _flickManager = null;
-    }
+    player.dispose();
   }
 
   ///下面是播放列表的功能
   @override
   add({String? filename, Uint8List? data}) async {
-    VideoPlayerController controller =
-        await FlickMediaSource.media(filename: filename, data: data);
-    playlist.add(controller);
-    _currentIndex = playlist.length - 1;
+    String dataSource =
+        await FijkMediaSource.media(filename: filename, data: data);
+    dataSources.add(dataSource);
+    _currentIndex = dataSources.length - 1;
     play();
   }
 
   @override
   remove(int index) {
-    if (index >= 0 && index < playlist.length) {
-      VideoPlayerController controller = playlist.removeAt(index);
-      controller.dispose();
+    if (index >= 0 && index < dataSources.length) {
+      dataSources.removeAt(index);
     }
   }
 
   @override
   insert(int index, {String? filename, Uint8List? data}) async {
-    VideoPlayerController controller =
-        await FlickMediaSource.media(filename: filename, data: data);
-    playlist.insert(index, controller);
+    String dataSource =
+        await FijkMediaSource.media(filename: filename, data: data);
+    dataSources.insert(index, dataSource);
   }
 
   @override
   move(int initialIndex, int finalIndex) {
-    VideoPlayerController controller = playlist[initialIndex];
-    playlist[initialIndex] = playlist[finalIndex];
-    playlist[finalIndex] = controller;
+    String dataSource = dataSources[initialIndex];
+    dataSources[initialIndex] = dataSources[finalIndex];
+    dataSources[finalIndex] = dataSource;
   }
 
-  buildVideoWidget({
-    Key? key,
+  Widget buildVideoWidget({
     double? width,
     double? height,
-    BoxFit fit = BoxFit.contain,
-    AlignmentGeometry alignment = Alignment.center,
-    double scale = 1.0,
-    bool showControls = true,
-    Color? progressBarActiveColor,
-    Color? progressBarInactiveColor = Colors.white24,
-    Color? progressBarThumbColor,
-    Color? progressBarThumbGlowColor = const Color.fromRGBO(0, 161, 214, .2),
-    Color? volumeActiveColor,
-    Color? volumeInactiveColor = Colors.grey,
-    Color volumeBackgroundColor = const Color(0xff424242),
-    Color? volumeThumbColor,
-    double? progressBarThumbRadius = 10.0,
-    double? progressBarThumbGlowRadius = 15.0,
-    bool showTimeLeft = false,
-    TextStyle progressBarTextStyle = const TextStyle(),
-    FilterQuality filterQuality = FilterQuality.low,
-    bool showFullscreenButton = false,
-    Color fillColor = Colors.black,
-  }) {}
-
-  _buildVideoWidget({
-    Key? key,
-    Widget flickVideoWithControls =
-        const FlickVideoWithControls(controls: FlickPortraitControls()),
-    Widget? flickVideoWithControlsFullscreen,
-    List<SystemUiOverlay> systemUIOverlay = SystemUiOverlay.values,
-    List<SystemUiOverlay> systemUIOverlayFullscreen = const [],
-    List<DeviceOrientation> preferredDeviceOrientation = const [
-      DeviceOrientation.portraitUp,
-      DeviceOrientation.portraitDown
-    ],
-    List<DeviceOrientation> preferredDeviceOrientationFullscreen = const [
-      DeviceOrientation.landscapeLeft,
-      DeviceOrientation.landscapeRight
-    ],
-    bool wakelockEnabled = true,
-    bool wakelockEnabledFullscreen = true,
-    dynamic Function(html.KeyboardEvent, FlickManager) webKeyDownHandler =
-        flickDefaultWebKeyDownHandler,
+    FijkFit fit = FijkFit.contain,
+    FijkFit fsFit = FijkFit.contain,
+    Widget Function(FijkPlayer, FijkData, BuildContext, Size, Rect)
+        panelBuilder = defaultFijkPanelBuilder,
+    Color color = const Color(0xFF607D8B),
+    ImageProvider<Object>? cover,
+    bool fs = true,
+    void Function(FijkData)? onDispose,
   }) {
-    return FlickVideoPlayer(
-      key: key,
-      flickManager: _flickManager!,
-      flickVideoWithControls: flickVideoWithControls,
-      flickVideoWithControlsFullscreen: flickVideoWithControlsFullscreen,
-      systemUIOverlay: systemUIOverlay,
-      systemUIOverlayFullscreen: systemUIOverlayFullscreen,
-      preferredDeviceOrientation: preferredDeviceOrientation,
-      preferredDeviceOrientationFullscreen:
-          preferredDeviceOrientationFullscreen,
-      wakelockEnabled: wakelockEnabled,
-      wakelockEnabledFullscreen: wakelockEnabledFullscreen,
-      webKeyDownHandler: webKeyDownHandler,
-    );
+    return FijkView(
+        player: player,
+        width: width,
+        height: height,
+        fit: fit,
+        fsFit: fsFit,
+        panelBuilder: panelBuilder,
+        color: color,
+        cover: cover,
+        fs: fs,
+        onDispose: onDispose);
   }
 
   @override
   setShuffleModeEnabled(bool enabled) {}
 }
 
-///采用flick-video-player实现的视频播放器，用于移动设备和web，内部实现采用video_player
-class PlatformFlickVideoPlayer extends StatefulWidget {
-  late final FlickVideoPlayerController controller;
+///采用Fijk-video-player实现的视频播放器，用于移动设备和web，内部实现采用video_player
+class PlatformFijkVideoPlayer extends StatefulWidget {
+  late final FijkVideoPlayerController controller;
   final bool simple;
   final bool showControls;
 
-  PlatformFlickVideoPlayer(
+  PlatformFijkVideoPlayer(
       {Key? key,
-      FlickVideoPlayerController? controller,
+      FijkVideoPlayerController? controller,
       this.simple = false,
       this.showControls = true})
       : super(key: key) {
-    this.controller = controller ?? FlickVideoPlayerController();
+    this.controller = controller ?? FijkVideoPlayerController();
   }
 
   @override
-  State createState() => _PlatformFlickVideoPlayerState();
+  State createState() => _PlatformFijkVideoPlayerState();
 }
 
-class _PlatformFlickVideoPlayerState extends State<PlatformFlickVideoPlayer> {
+class _PlatformFijkVideoPlayerState extends State<PlatformFijkVideoPlayer> {
   bool playlistVisible = false;
 
   @override
@@ -318,7 +234,7 @@ class _PlatformFlickVideoPlayerState extends State<PlatformFlickVideoPlayer> {
     super.dispose();
   }
 
-  Widget _buildFlickVideoPlayer(BuildContext context) {
+  Widget _buildFijkVideoPlayer(BuildContext context) {
     return VisibilityDetector(
       key: ObjectKey(widget.controller.current),
       onVisibilityChanged: (visiblityInfo) {
@@ -326,44 +242,8 @@ class _PlatformFlickVideoPlayerState extends State<PlatformFlickVideoPlayer> {
           widget.controller.play();
         }
       },
-      child: FlickVideoPlayer(
-        flickManager: widget.controller._flickManager!,
-        flickVideoWithControls: FlickVideoWithControls(
-          playerLoadingFallback: Positioned.fill(
-            child: Stack(
-              children: <Widget>[
-                Positioned.fill(
-                  child: Container(),
-                ),
-                const Positioned(
-                  right: 10,
-                  top: 10,
-                  child: SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      backgroundColor: Colors.white,
-                      strokeWidth: 4,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          controls: FeedPlayerPortraitControls(
-            flickMultiManager: widget.controller,
-            flickManager: widget.controller._flickManager,
-          ),
-        ),
-        flickVideoWithControlsFullscreen: FlickVideoWithControls(
-          playerLoadingFallback: Container(),
-          controls: const FlickLandscapeControls(),
-          iconThemeData: const IconThemeData(
-            size: 40,
-            color: Colors.white,
-          ),
-          textStyle: const TextStyle(fontSize: 16, color: Colors.white),
-        ),
+      child: FijkView(
+        player: widget.controller.player,
       ),
     );
   }
@@ -380,7 +260,7 @@ class _PlatformFlickVideoPlayerState extends State<PlatformFlickVideoPlayer> {
           width: width,
           height: height,
           decoration: BoxDecoration(color: color),
-          child: _buildFlickVideoPlayer(context),
+          child: _buildFijkVideoPlayer(context),
         ),
       );
     });
@@ -404,7 +284,7 @@ class _PlatformFlickVideoPlayerState extends State<PlatformFlickVideoPlayer> {
 
   ///播放列表
   Widget _buildPlaylist(BuildContext context) {
-    List<VideoPlayerController> playlist = widget.controller.playlist;
+    List<String> playlist = widget.controller.dataSources;
     return Column(children: [
       Card(
         color: Colors.white.withOpacity(0.5),
@@ -454,7 +334,7 @@ class _PlatformFlickVideoPlayerState extends State<PlatformFlickVideoPlayer> {
                         style: const TextStyle(fontSize: 14.0),
                       ),
                       title: Text(
-                        playlist[index].dataSource.toString(),
+                        playlist[index].toString(),
                         style: const TextStyle(fontSize: 14.0),
                       ),
                     );
@@ -475,7 +355,7 @@ class _PlatformFlickVideoPlayerState extends State<PlatformFlickVideoPlayer> {
     List<Widget> controls = [];
     controls.add(Expanded(child: _buildVideoView()));
     if (!widget.showControls) {
-      Widget controllerPanel = PlatformFlickControllerPanel(
+      Widget controllerPanel = PlatformFijkControllerPanel(
         controller: widget.controller,
         simple: widget.simple,
       );
@@ -489,24 +369,24 @@ class _PlatformFlickVideoPlayerState extends State<PlatformFlickVideoPlayer> {
 }
 
 ///视频播放器的控制面板
-class PlatformFlickControllerPanel extends StatefulWidget {
-  late final FlickVideoPlayerController controller;
+class PlatformFijkControllerPanel extends StatefulWidget {
+  late final FijkVideoPlayerController controller;
   final bool simple;
 
-  PlatformFlickControllerPanel({
+  PlatformFijkControllerPanel({
     Key? key,
-    FlickVideoPlayerController? controller,
+    FijkVideoPlayerController? controller,
     this.simple = false,
   }) : super(key: key) {
-    this.controller = controller ?? FlickVideoPlayerController();
+    this.controller = controller ?? FijkVideoPlayerController();
   }
 
   @override
-  State createState() => _PlatformFlickControllerPanelState();
+  State createState() => _PlatformFijkControllerPanelState();
 }
 
-class _PlatformFlickControllerPanelState
-    extends State<PlatformFlickControllerPanel> {
+class _PlatformFijkControllerPanelState
+    extends State<PlatformFijkControllerPanel> {
   @override
   void initState() {
     super.initState();
@@ -723,76 +603,5 @@ class _PlatformFlickControllerPanelState
         _buildPlayerSlider(context),
       ],
     ));
-  }
-}
-
-class FeedPlayerPortraitControls extends StatelessWidget {
-  const FeedPlayerPortraitControls(
-      {Key? key, this.flickMultiManager, this.flickManager})
-      : super(key: key);
-
-  final FlickVideoPlayerController? flickMultiManager;
-  final FlickManager? flickManager;
-
-  @override
-  Widget build(BuildContext context) {
-    FlickDisplayManager displayManager =
-        Provider.of<FlickDisplayManager>(context);
-    return Container(
-      color: Colors.transparent,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: <Widget>[
-          FlickAutoHideChild(
-            showIfVideoNotInitialized: false,
-            child: Align(
-              alignment: Alignment.topRight,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
-                decoration: BoxDecoration(
-                  color: Colors.black38,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const FlickLeftDuration(),
-              ),
-            ),
-          ),
-          Expanded(
-            child: FlickToggleSoundAction(
-              toggleMute: () {
-                flickManager?.flickControlManager?.toggleMute();
-                displayManager.handleShowPlayerControls();
-              },
-              child: const FlickSeekVideoAction(
-                child: Center(child: FlickVideoBuffer()),
-              ),
-            ),
-          ),
-          FlickAutoHideChild(
-            autoHide: true,
-            showIfVideoNotInitialized: false,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: <Widget>[
-                Container(
-                  padding: const EdgeInsets.all(2),
-                  decoration: BoxDecoration(
-                    color: Colors.black38,
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: FlickSoundToggle(
-                    toggleMute: () =>
-                        flickManager?.flickControlManager?.toggleMute(),
-                    color: Colors.white,
-                  ),
-                ),
-                // FlickFullScreenToggle(),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
   }
 }

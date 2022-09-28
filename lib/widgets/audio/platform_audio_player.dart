@@ -15,16 +15,60 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
 
-enum PlayerStatus { init,buffering, pause, playing, stop, completed }
+enum PlayerStatus { init, buffering, pause, playing, stop, completed }
 
 enum PlayerMediaFormat {
   wav,
   mp3,
   mp4,
+  mov,
+}
+
+enum MediaSourceType {
+  asset,
+  file,
+  network,
+  recorded,
+}
+
+class MediaSource {
+  final String name;
+  final String path;
+  final MediaSourceType type;
+
+  MediaSource({
+    required this.name,
+    required this.path,
+    required this.type,
+  });
 }
 
 abstract class AbstractMediaPlayerController with ChangeNotifier {
+  int? _currentIndex;
   PlayerStatus _status = PlayerStatus.init;
+
+  int? get currentIndex {
+    return _currentIndex;
+  }
+
+  setCurrentIndex(int? index) {
+    if (index != _currentIndex) {
+      _currentIndex = index;
+      notifyListeners();
+    }
+  }
+
+  next() {
+    if (_currentIndex != null) {
+      setCurrentIndex(_currentIndex! + 1);
+    }
+  }
+
+  previous() {
+    if (_currentIndex != null) {
+      setCurrentIndex(_currentIndex! - 1);
+    }
+  }
 
   PlayerStatus get status {
     return _status;
@@ -37,8 +81,6 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     }
   }
 
-  setCurrentIndex(int? index);
-
   play();
 
   pause();
@@ -50,10 +92,6 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   @override
   dispose();
 
-  next();
-
-  previous();
-
   seek(Duration position, {int? index});
 
   setShuffleModeEnabled(bool enabled);
@@ -64,13 +102,11 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
 
   Future<Duration?> getBufferedPosition();
 
-  int? currentIndex();
-
-  double getVolume();
+  Future<double> getVolume();
 
   setVolume(double volume);
 
-  double getSpeed();
+  Future<double> getSpeed();
 
   setSpeed(double speed);
 

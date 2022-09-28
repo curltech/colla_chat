@@ -127,8 +127,8 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  double getVolume() {
-    return 1;
+  Future<double> getVolume() {
+    return Future.value(1);
   }
 
   @override
@@ -137,8 +137,8 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  double getSpeed() {
-    return 1;
+  Future<double> getSpeed() {
+    return Future.value(1);
   }
 
   @override
@@ -191,12 +191,6 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
     player.onDurationChanged.listen((Duration duration) {
       fn(duration);
     });
-  }
-
-  @override
-  int? currentIndex() {
-    // TODO: implement currentIndex
-    throw UnimplementedError();
   }
 
   @override
