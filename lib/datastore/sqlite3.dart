@@ -36,7 +36,7 @@ class Sqlite3 extends DataStore {
   open({String name = dbname}) async {
     db = await sqlite3_open.openSqlite3(name: name);
     //开发调试阶段，每次都重建数据库表
-    //db.userVersion = 0;
+    db.userVersion = 0;
     await init(db);
     if (platformParams.web) {
     } else {}

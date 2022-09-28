@@ -11,10 +11,7 @@ class PlatformVideoPlayer extends StatefulWidget {
   PlatformVideoPlayer({Key? key, AbstractMediaPlayerController? controller})
       : super(key: key) {
     if (controller == null) {
-      if (platformParams.ios ||
-          platformParams.android ||
-          platformParams.web ||
-          platformParams.windows ||
+      if (platformParams.windows ||
           platformParams.macos ||
           platformParams.linux) {
         this.controller = VlcVideoPlayerController();

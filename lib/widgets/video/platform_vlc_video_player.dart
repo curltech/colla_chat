@@ -46,7 +46,7 @@ class VlcMediaSource {
 }
 
 ///基于vlc实现的媒体播放器和记录器，可以截取视频文件的图片作为缩略图
-///支持除macos外的平台，linux需要VLC & libVLC installed.
+///支持Windows & Linux，linux需要VLC & libVLC installed.
 class VlcVideoPlayerController extends AbstractMediaPlayerController {
   late Player player;
   final Playlist playlist = Playlist(medias: []);
@@ -485,10 +485,18 @@ class VlcMediaRecorder {
 
 class PlatformVlcVideoPlayer extends StatefulWidget {
   late final VlcVideoPlayerController controller;
+
+  ///是否显示内置控件
+  final bool showControls;
+
+  ///如果是外置控件，是否显示简洁版
   final bool simple;
 
   PlatformVlcVideoPlayer(
-      {Key? key, VlcVideoPlayerController? controller, this.simple = false})
+      {Key? key,
+      VlcVideoPlayerController? controller,
+      this.simple = false,
+      this.showControls = true})
       : super(key: key) {
     this.controller = controller ?? VlcVideoPlayerController();
   }
@@ -535,6 +543,172 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
     }
 
     return isPhone;
+  }
+
+  ///显示播放列表按钮
+  Widget _buildPlaylistVisibleButton(BuildContext context) {
+    return Ink(
+        child: InkWell(
+      child: playlistVisible
+          ? const Icon(Icons.visibility_off_rounded, size: 24)
+          : const Icon(Icons.visibility_rounded, size: 24),
+      onTap: () {
+        setState(() {
+          playlistVisible = !playlistVisible;
+        });
+      },
+    ));
+  }
+
+  Widget _buildVideoView({Color? color, double? height, double? width}) {
+    color = color ?? Colors.black.withOpacity(1);
+    Widget container = LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+      height = height ?? constraints.maxHeight;
+      width = width ?? constraints.maxWidth;
+      return Center(
+        child: Container(
+          margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+          width: width,
+          height: height,
+          decoration: BoxDecoration(color: color),
+          child: widget.controller.buildVideoWidget(
+            player: widget.controller.player,
+            height: height,
+            width: width,
+            fit: BoxFit.cover,
+            showControls: widget.showControls,
+          ),
+        ),
+      );
+    });
+    return container;
+  }
+
+  ///播放列表
+  Widget _buildPlaylist(BuildContext context) {
+    Playlist playlist = widget.controller.playlist;
+    return Column(children: [
+      Card(
+        color: Colors.white.withOpacity(0.5),
+        elevation: 0,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(left: 16.0, top: 16.0),
+              alignment: Alignment.topLeft,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Ink(
+                    child: InkWell(
+                      child: const Icon(Icons.add),
+                      onTap: () async {
+                        List<String> filenames = await FileUtil.pickFiles();
+                        for (var filename in filenames) {
+                          await widget.controller.add(filename: filename);
+                        }
+                      },
+                    ),
+                  )
+                ],
+              ),
+            ),
+            SizedBox(
+              height: 150.0,
+              child: ReorderableListView(
+                shrinkWrap: true,
+                onReorder: (int initialIndex, int finalIndex) async {
+                  if (finalIndex > playlist.medias.length) {
+                    finalIndex = playlist.medias.length;
+                  }
+                  if (initialIndex < finalIndex) finalIndex--;
+                  widget.controller.move(initialIndex, finalIndex);
+                },
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                children: List.generate(
+                  playlist.medias.length,
+                  (int index) {
+                    return ListTile(
+                      key: Key(index.toString()),
+                      leading: Text(
+                        index.toString(),
+                        style: const TextStyle(fontSize: 14.0),
+                      ),
+                      title: Text(
+                        playlist.medias[index].resource,
+                        style: const TextStyle(fontSize: 14.0),
+                      ),
+                    );
+                  },
+                  growable: true,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+      const Spacer(),
+    ]);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    bool isTablet = _isTablet();
+    bool isPhone = _isPhone();
+    List<Widget> controls = [];
+    controls.add(Expanded(child: _buildVideoView()));
+    if (!widget.showControls) {
+      Widget controllerPanel = PlatformVlcControllerPanel(
+        controller: widget.controller,
+        simple: widget.simple,
+      );
+      controls.add(controllerPanel);
+    }
+    return Stack(children: [
+      Column(children: controls),
+      Visibility(visible: playlistVisible, child: _buildPlaylist(context))
+    ]);
+  }
+}
+
+///视频播放器的控制面板
+class PlatformVlcControllerPanel extends StatefulWidget {
+  late final VlcVideoPlayerController controller;
+
+  ///如果是外置控件，是否显示简洁版
+  final bool simple;
+
+  PlatformVlcControllerPanel({
+    Key? key,
+    VlcVideoPlayerController? controller,
+    this.simple = false,
+  }) : super(key: key) {
+    this.controller = controller ?? VlcVideoPlayerController();
+  }
+
+  @override
+  State createState() => _PlatformVlcControllerPanelState();
+}
+
+class _PlatformVlcControllerPanelState
+    extends State<PlatformVlcControllerPanel> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Widget controllerPanel;
+    if (widget.simple) {
+      controllerPanel = _buildSimpleControllerPanel(context);
+    } else {
+      controllerPanel = _buildComplexControllerPanel(context);
+    }
+    return controllerPanel;
   }
 
   ///简单播放控制面板，包含音量，简单播放按钮，
@@ -591,21 +765,6 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
         ]);
   }
 
-  ///显示播放列表按钮
-  Widget _buildPlaylistVisibleButton(BuildContext context) {
-    return Ink(
-        child: InkWell(
-      child: playlistVisible
-          ? const Icon(Icons.visibility_off_rounded, size: 24)
-          : const Icon(Icons.visibility_rounded, size: 24),
-      onTap: () {
-        setState(() {
-          playlistVisible = !playlistVisible;
-        });
-      },
-    ));
-  }
-
   ///音量按钮
   Widget _buildVolumeButton(BuildContext context, {String? label}) {
     return Ink(
@@ -656,10 +815,6 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        _buildPlaylistVisibleButton(context),
-        const SizedBox(
-          width: 25,
-        ),
         StreamBuilder<GeneralState>(
           stream: widget.controller.player.generalStream,
           builder: (context, snapshot) {
@@ -738,74 +893,6 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
         });
   }
 
-  ///播放列表
-  Widget _buildPlaylist(BuildContext context) {
-    Playlist playlist = widget.controller.playlist;
-    return Column(children: [
-      Card(
-        color: Colors.white.withOpacity(0.5),
-        elevation: 0,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              margin: const EdgeInsets.only(left: 16.0, top: 16.0),
-              alignment: Alignment.topLeft,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Ink(
-                    child: InkWell(
-                      child: const Icon(Icons.add),
-                      onTap: () async {
-                        List<String> filenames = await FileUtil.pickFiles();
-                        for (var filename in filenames) {
-                          await widget.controller.add(filename: filename);
-                        }
-                      },
-                    ),
-                  )
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 150.0,
-              child: ReorderableListView(
-                shrinkWrap: true,
-                onReorder: (int initialIndex, int finalIndex) async {
-                  if (finalIndex > playlist.medias.length) {
-                    finalIndex = playlist.medias.length;
-                  }
-                  if (initialIndex < finalIndex) finalIndex--;
-                  widget.controller.move(initialIndex, finalIndex);
-                },
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                children: List.generate(
-                  playlist.medias.length,
-                  (int index) {
-                    return ListTile(
-                      key: Key(index.toString()),
-                      leading: Text(
-                        index.toString(),
-                        style: const TextStyle(fontSize: 14.0),
-                      ),
-                      title: Text(
-                        playlist.medias[index].resource,
-                        style: const TextStyle(fontSize: 14.0),
-                      ),
-                    );
-                  },
-                  growable: true,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-      const Spacer(),
-    ]);
-  }
-
   ///播放进度条
   Widget _buildPlayerSlider(BuildContext context) {
     return StreamBuilder<PositionState>(
@@ -834,22 +921,6 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    bool isTablet = _isTablet();
-    bool isPhone = _isPhone();
-    Widget controllerPanel;
-    if (widget.simple) {
-      controllerPanel = _buildSimpleControllerPanel(context);
-    } else {
-      controllerPanel = _buildComplexControllerPanel(context);
-    }
-    return Stack(children: [
-      Column(children: [Expanded(child: _buildVideoView()), controllerPanel]),
-      Visibility(visible: playlistVisible, child: _buildPlaylist(context))
-    ]);
-  }
-
   ///简单控制器面板，包含简单播放面板和进度条
   Widget _buildSimpleControllerPanel(BuildContext context) {
     return Center(
@@ -861,30 +932,5 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
         _buildPlayerSlider(context),
       ],
     ));
-  }
-
-  Widget _buildVideoView({Color? color, double? height, double? width}) {
-    color = color ?? Colors.black.withOpacity(1);
-    Widget container = LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-      height = height ?? constraints.maxHeight;
-      width = width ?? constraints.maxWidth;
-      return Center(
-        child: Container(
-          margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-          width: width,
-          height: height,
-          decoration: BoxDecoration(color: color),
-          child: widget.controller.buildVideoWidget(
-            player: widget.controller.player,
-            height: height,
-            width: width,
-            fit: BoxFit.cover,
-            showControls: true,
-          ),
-        ),
-      );
-    });
-    return container;
   }
 }

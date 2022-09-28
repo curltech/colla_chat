@@ -20,7 +20,7 @@ class MediaPlayerSliderUtil {
     required double max,
     String suffix = '',
     required double value,
-    required Stream<dynamic> stream,
+    Stream<dynamic>? stream,
     required ValueChanged<double> onChanged,
   }) {
     showDialog<void>(

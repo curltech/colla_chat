@@ -15,7 +15,28 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
 
-abstract class AbstractMediaPlayerController with ChangeNotifier{
+enum PlayerStatus { init,buffering, pause, playing, stop, completed }
+
+enum PlayerMediaFormat {
+  wav,
+  mp3,
+  mp4,
+}
+
+abstract class AbstractMediaPlayerController with ChangeNotifier {
+  PlayerStatus _status = PlayerStatus.init;
+
+  PlayerStatus get status {
+    return _status;
+  }
+
+  set status(PlayerStatus status) {
+    if (_status != status) {
+      _status = status;
+      notifyListeners();
+    }
+  }
+
   setCurrentIndex(int? index);
 
   play();
