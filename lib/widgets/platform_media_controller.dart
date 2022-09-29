@@ -279,6 +279,8 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
 
   resume();
 
+  close();
+
   @override
   dispose();
 

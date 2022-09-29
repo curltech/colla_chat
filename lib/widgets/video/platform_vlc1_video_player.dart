@@ -9,41 +9,45 @@ import 'package:flutter_vlc_player/flutter_vlc_player.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 class Vlc1MediaSource {
-  static Future<String> media({String? filename, Uint8List? data}) async {
-    if (filename == null) {
+  static Future<VlcPlayerController> media(
+      {String? filename, Uint8List? data}) async {
+    VlcPlayerController vlcPlayerController;
+    if (filename != null) {
+      if (filename.startsWith('assets/')) {
+        vlcPlayerController = VlcPlayerController.asset(filename);
+      } else if (filename.startsWith('http')) {
+        vlcPlayerController = VlcPlayerController.network(filename);
+      } else {
+        vlcPlayerController = VlcPlayerController.file(File(filename));
+      }
+      await vlcPlayerController!.initialize();
+    } else {
       data = data ?? Uint8List.fromList([]);
       filename = await FileUtil.writeTempFile(data, '');
+      vlcPlayerController = VlcPlayerController.file(File(filename));
+      await vlcPlayerController!.initialize();
     }
 
-    return Future.value(filename);
+    return Future.value(vlcPlayerController);
   }
 
-  static Future<List<String>> playlist(List<String> filenames) async {
-    List<String> playlist = [];
-    for (var filename in filenames) {
-      playlist.add(await media(filename: filename));
-    }
-
-    return playlist;
+  static Future<VlcPlayerController> fromMediaSource(
+      MediaSource mediaSource) async {
+    return await media(filename: mediaSource.filename);
   }
 }
 
 ///基于chewie实现的媒体播放器和记录器，
 class Vlc1VideoPlayerController extends AbstractMediaPlayerController {
-  List<String> playlist = [];
-  VlcPlayerController? _videoPlayerController;
+  VlcPlayerController? vlcPlayerController;
 
   Vlc1VideoPlayerController();
 
   _open({bool autoStart = false}) async {}
 
-  VlcPlayerController? get current {
-    return _videoPlayerController;
-  }
-
   @override
   PlayerStatus get status {
-    VlcPlayerValue value = current!.value;
+    VlcPlayerValue value = vlcPlayerController!.value;
     if (value.isPlaying) {
       return PlayerStatus.playing;
     } else if (value.isBuffering) {
@@ -55,60 +59,48 @@ class Vlc1VideoPlayerController extends AbstractMediaPlayerController {
     return PlayerStatus.stop;
   }
 
-  _buildVideoPlayerController(String filename) async {
-    if (_videoPlayerController == null) {
-      if (filename.startsWith('assets/')) {
-        _videoPlayerController = VlcPlayerController.asset(filename);
-      } else if (filename.startsWith('http')) {
-        _videoPlayerController = VlcPlayerController.network(filename);
-      } else {
-        _videoPlayerController = VlcPlayerController.file(File(filename));
-      }
-      await _videoPlayerController!.initialize();
-    } else if (_videoPlayerController!.dataSource != filename) {
-      if (filename.startsWith('assets/')) {
-        await _videoPlayerController!.setMediaFromAsset(filename);
-      } else if (filename.startsWith('http')) {
-        await _videoPlayerController!.setMediaFromNetwork(filename);
-      } else {
-        await _videoPlayerController!.setMediaFromFile(File(filename));
-      }
+  @override
+  setCurrentIndex(int? index) async {
+    super.setCurrentIndex(index);
+    if (currentMediaSource != null) {
+      vlcPlayerController =
+          await Vlc1MediaSource.fromMediaSource(currentMediaSource!);
     }
   }
 
   ///基本的视频控制功能
   @override
   play() {
-    if (current != null) {
-      current!.play();
+    if (vlcPlayerController != null) {
+      vlcPlayerController!.play();
     }
   }
 
   @override
   seek(Duration position, {int? index}) {
-    if (current != null) {
-      current!.seekTo(position);
+    if (vlcPlayerController != null) {
+      vlcPlayerController!.seekTo(position);
     }
   }
 
   @override
   pause() {
-    if (current != null) {
-      current!.pause();
+    if (vlcPlayerController != null) {
+      vlcPlayerController!.pause();
     }
   }
 
   @override
   resume() {
-    if (current != null) {
-      current!.play();
+    if (vlcPlayerController != null) {
+      vlcPlayerController!.play();
     }
   }
 
   @override
   stop() {
-    if (current != null) {
-      current!.pause();
+    if (vlcPlayerController != null) {
+      vlcPlayerController!.pause();
     }
   }
 
@@ -119,34 +111,34 @@ class Vlc1VideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   Future<Duration?> getDuration() {
-    return current!.getDuration();
+    return vlcPlayerController!.getDuration();
   }
 
   @override
   Future<Duration?> getPosition() {
-    return current!.getPosition();
+    return vlcPlayerController!.getPosition();
   }
 
   @override
   Future<double> getSpeed() async {
-    var speed = await current!.getPlaybackSpeed();
+    var speed = await vlcPlayerController!.getPlaybackSpeed();
     return speed ?? 1.0;
   }
 
   @override
   Future<double> getVolume() async {
-    var volume = await current!.getVolume();
+    var volume = await vlcPlayerController!.getVolume();
     return double.parse('$volume');
   }
 
   @override
   setVolume(double volume) {
-    current!.setVolume(volume.toInt());
+    vlcPlayerController!.setVolume(volume.toInt());
   }
 
   @override
   setSpeed(double speed) {
-    current!.setPlaybackSpeed(speed);
+    vlcPlayerController!.setPlaybackSpeed(speed);
   }
 
   Future<Uint8List> takeSnapshot(
@@ -160,40 +152,7 @@ class Vlc1VideoPlayerController extends AbstractMediaPlayerController {
   @override
   dispose() {
     super.dispose();
-    current!.dispose();
-  }
-
-  ///下面是播放列表的功能
-  @override
-  add({String? filename, Uint8List? data}) async {
-    String dataSource =
-        await Vlc1MediaSource.media(filename: filename, data: data);
-    playlist.add(dataSource);
-    setCurrentIndex(playlist.length - 1);
-    await _buildVideoPlayerController(dataSource);
-    play();
-  }
-
-  @override
-  remove(int index) {
-    if (index >= 0 && index < playlist.length) {
-      playlist.removeAt(index);
-      previous();
-    }
-  }
-
-  @override
-  insert(int index, {String? filename, Uint8List? data}) async {
-    String dataSource =
-        await Vlc1MediaSource.media(filename: filename, data: data);
-    playlist.insert(index, dataSource);
-  }
-
-  @override
-  move(int initialIndex, int finalIndex) {
-    String dataSource = playlist[initialIndex];
-    playlist[initialIndex] = playlist[finalIndex];
-    playlist[finalIndex] = dataSource;
+    close();
   }
 
   Widget buildVideoWidget({
@@ -204,7 +163,7 @@ class Vlc1VideoPlayerController extends AbstractMediaPlayerController {
   }) {
     return VlcPlayer(
       key: key,
-      controller: current!,
+      controller: vlcPlayerController!,
       aspectRatio: aspectRatio,
       placeholder: placeholder,
       virtualDisplay: virtualDisplay,
@@ -213,6 +172,14 @@ class Vlc1VideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   setShuffleModeEnabled(bool enabled) {}
+
+  @override
+  close() {
+    if (vlcPlayerController != null) {
+      vlcPlayerController!.dispose();
+      vlcPlayerController = null;
+    }
+  }
 }
 
 ///采用Fijk-video-player实现的视频播放器，用于移动设备和web，内部实现采用video_player
@@ -249,14 +216,14 @@ class _PlatformVlc1VideoPlayerState extends State<PlatformVlc1VideoPlayer> {
 
   Widget _buildVlc1VideoPlayer(BuildContext context) {
     return VisibilityDetector(
-      key: ObjectKey(widget.controller.current),
+      key: ObjectKey(widget.controller.vlcPlayerController),
       onVisibilityChanged: (visiblityInfo) {
         if (visiblityInfo.visibleFraction > 0.9) {
           widget.controller.play();
         }
       },
       child: VlcPlayer(
-        controller: widget.controller.current!,
+        controller: widget.controller.vlcPlayerController!,
         aspectRatio: 16 / 9,
       ),
     );
@@ -298,7 +265,7 @@ class _PlatformVlc1VideoPlayerState extends State<PlatformVlc1VideoPlayer> {
 
   ///播放列表
   Widget _buildPlaylist(BuildContext context) {
-    List<String> playlist = widget.controller.playlist;
+    List<MediaSource> playlist = widget.controller.playlist;
     return Column(children: [
       Card(
         color: Colors.white.withOpacity(0.5),

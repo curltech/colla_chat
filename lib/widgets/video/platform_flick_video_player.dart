@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/audio/platform_audio_player.dart';
 import 'package:colla_chat/widgets/common/media_player_slider.dart';
 import 'package:colla_chat/widgets/platform_media_controller.dart';
 import 'package:flick_video_player/flick_video_player.dart';
@@ -35,39 +34,24 @@ class FlickMediaSource {
     return videoPlayerController;
   }
 
-  static Future<List<VideoPlayerController>> playlist(
-      List<String> filenames) async {
-    List<VideoPlayerController> playlist = [];
-    for (var filename in filenames) {
-      playlist.add(await media(filename: filename));
-    }
-
-    return playlist;
+  static Future<VideoPlayerController> fromMediaSource(
+      MediaSource mediaSource) async {
+    return await media(filename: mediaSource.filename);
   }
 }
 
 ///基于flick实现的媒体播放器和记录器，
 class FlickVideoPlayerController extends AbstractMediaPlayerController {
-  List<VideoPlayerController> playlist = [];
-  int? _currentIndex;
+  VideoPlayerController? videoPlayerController;
   FlickManager? _flickManager;
 
   FlickVideoPlayerController();
 
   _open({bool autoStart = false}) {}
 
-  VideoPlayerController? get current {
-    if (_currentIndex != null &&
-        _currentIndex! >= 0 &&
-        _currentIndex! < playlist.length) {
-      return playlist[_currentIndex!];
-    }
-    return null;
-  }
-
   @override
   PlayerStatus get status {
-    VideoPlayerValue value = current!.value;
+    VideoPlayerValue value = videoPlayerController!.value;
     if (value.isPlaying) {
       return PlayerStatus.playing;
     } else if (value.isBuffering) {
@@ -79,11 +63,21 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
     return PlayerStatus.stop;
   }
 
+  @override
+  setCurrentIndex(int? index) async {
+    super.setCurrentIndex(index);
+    if (currentMediaSource != null) {
+      videoPlayerController =
+          await FlickMediaSource.fromMediaSource(currentMediaSource!);
+      _flickManager =
+          FlickManager(videoPlayerController: videoPlayerController!);
+    }
+  }
+
   ///基本的视频控制功能
   @override
   play() {
-    if (current != null) {
-      _flickManager = FlickManager(videoPlayerController: current!);
+    if (_flickManager != null) {
       _flickManager!.flickControlManager?.play();
     }
   }
@@ -184,42 +178,7 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
   @override
   dispose() {
     super.dispose();
-    if (_flickManager != null) {
-      _flickManager!.dispose();
-      _flickManager = null;
-    }
-  }
-
-  ///下面是播放列表的功能
-  @override
-  add({String? filename, Uint8List? data}) async {
-    VideoPlayerController controller =
-        await FlickMediaSource.media(filename: filename, data: data);
-    playlist.add(controller);
-    _currentIndex = playlist.length - 1;
-    play();
-  }
-
-  @override
-  remove(int index) {
-    if (index >= 0 && index < playlist.length) {
-      VideoPlayerController controller = playlist.removeAt(index);
-      controller.dispose();
-    }
-  }
-
-  @override
-  insert(int index, {String? filename, Uint8List? data}) async {
-    VideoPlayerController controller =
-        await FlickMediaSource.media(filename: filename, data: data);
-    playlist.insert(index, controller);
-  }
-
-  @override
-  move(int initialIndex, int finalIndex) {
-    VideoPlayerController controller = playlist[initialIndex];
-    playlist[initialIndex] = playlist[finalIndex];
-    playlist[finalIndex] = controller;
+    close();
   }
 
   buildVideoWidget({
@@ -285,6 +244,16 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   setShuffleModeEnabled(bool enabled) {}
+
+  @override
+  close() {
+    if (_flickManager != null) {
+      _flickManager!.dispose();
+      videoPlayerController!.dispose();
+      videoPlayerController = null;
+      _flickManager = null;
+    }
+  }
 }
 
 ///采用flick-video-player实现的视频播放器，用于移动设备和web，内部实现采用video_player
@@ -321,7 +290,7 @@ class _PlatformFlickVideoPlayerState extends State<PlatformFlickVideoPlayer> {
 
   Widget _buildFlickVideoPlayer(BuildContext context) {
     return VisibilityDetector(
-      key: ObjectKey(widget.controller.current),
+      key: ObjectKey(widget.controller.videoPlayerController),
       onVisibilityChanged: (visiblityInfo) {
         if (visiblityInfo.visibleFraction > 0.9) {
           widget.controller.play();
@@ -405,7 +374,7 @@ class _PlatformFlickVideoPlayerState extends State<PlatformFlickVideoPlayer> {
 
   ///播放列表
   Widget _buildPlaylist(BuildContext context) {
-    List<VideoPlayerController> playlist = widget.controller.playlist;
+    List<MediaSource> playlist = widget.controller.playlist;
     return Column(children: [
       Card(
         color: Colors.white.withOpacity(0.5),
@@ -455,7 +424,7 @@ class _PlatformFlickVideoPlayerState extends State<PlatformFlickVideoPlayer> {
                         style: const TextStyle(fontSize: 14.0),
                       ),
                       title: Text(
-                        playlist[index].dataSource.toString(),
+                        playlist[index].filename.toString(),
                         style: const TextStyle(fontSize: 14.0),
                       ),
                     );
@@ -571,22 +540,22 @@ class _PlatformFlickControllerPanelState
           var label = snapshot.data!.toStringAsFixed(1);
           return Ink(
               child: InkWell(
-                child: Row(children: [
-                  const Icon(Icons.volume_up_rounded, size: 24),
-                  Text(label ?? '')
-                ]),
-                onTap: () {
-                  MediaPlayerSliderUtil.showSliderDialog(
-                    context: context,
-                    title: "Adjust volume",
-                    divisions: 10,
-                    min: 0.0,
-                    max: 1.0,
-                    value: snapshot.data!,
-                    onChanged: widget.controller.setVolume,
-                  );
-                },
-              ));
+            child: Row(children: [
+              const Icon(Icons.volume_up_rounded, size: 24),
+              Text(label ?? '')
+            ]),
+            onTap: () {
+              MediaPlayerSliderUtil.showSliderDialog(
+                context: context,
+                title: "Adjust volume",
+                divisions: 10,
+                min: 0.0,
+                max: 1.0,
+                value: snapshot.data!,
+                onChanged: widget.controller.setVolume,
+              );
+            },
+          ));
         });
   }
 
@@ -598,22 +567,22 @@ class _PlatformFlickControllerPanelState
           var label = snapshot.data!.toStringAsFixed(1);
           return Ink(
               child: InkWell(
-                child: Row(children: [
-                  const Icon(Icons.speed_rounded, size: 24),
-                  Text(label ?? '')
-                ]),
-                onTap: () {
-                  MediaPlayerSliderUtil.showSliderDialog(
-                    context: context,
-                    title: "Adjust speed",
-                    divisions: 10,
-                    min: 0.5,
-                    max: 1.5,
-                    value: snapshot.data!,
-                    onChanged: widget.controller.setSpeed,
-                  );
-                },
-              ));
+            child: Row(children: [
+              const Icon(Icons.speed_rounded, size: 24),
+              Text(label ?? '')
+            ]),
+            onTap: () {
+              MediaPlayerSliderUtil.showSliderDialog(
+                context: context,
+                title: "Adjust speed",
+                divisions: 10,
+                min: 0.5,
+                max: 1.5,
+                value: snapshot.data!,
+                onChanged: widget.controller.setSpeed,
+              );
+            },
+          ));
         });
   }
 

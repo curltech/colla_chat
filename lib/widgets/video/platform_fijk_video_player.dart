@@ -1,5 +1,4 @@
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/audio/platform_audio_player.dart';
 import 'package:colla_chat/widgets/common/media_player_slider.dart';
 import 'package:colla_chat/widgets/platform_media_controller.dart';
 import 'package:fijkplayer/fijkplayer.dart';
@@ -7,24 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-class FijkMediaSource {
-  static Future<String> media({String? filename, Uint8List? data}) async {
-    return Future.value(filename);
-  }
-
-  static Future<List<String>> playlist(List<String> filenames) async {
-    List<String> dataSources = [];
-    for (var filename in filenames) {
-      dataSources.add(await media(filename: filename));
-    }
-
-    return dataSources;
-  }
-}
-
 ///基于fijk实现的媒体播放器和记录器，
 class FijkVideoPlayerController extends AbstractMediaPlayerController {
-  List<String> dataSources = [];
   final FijkPlayer player = FijkPlayer();
   double volume = 1.0;
   double speed = 1.0;
@@ -32,16 +15,6 @@ class FijkVideoPlayerController extends AbstractMediaPlayerController {
   FijkVideoPlayerController();
 
   _open({bool autoStart = false}) {}
-
-  String? get current {
-    var currentIndex = this.currentIndex;
-    if (currentIndex != null &&
-        currentIndex! >= 0 &&
-        currentIndex! < dataSources.length) {
-      return dataSources[currentIndex!];
-    }
-    return null;
-  }
 
   @override
   PlayerStatus get status {
@@ -66,8 +39,8 @@ class FijkVideoPlayerController extends AbstractMediaPlayerController {
   @override
   play() {
     var dataSource = player.dataSource;
-    if (dataSource == null && current != null) {
-      player.setDataSource(current!);
+    if (dataSource == null && currentMediaSource != null) {
+      player.setDataSource(currentMediaSource!.filename);
     }
     player.start();
   }
@@ -143,37 +116,6 @@ class FijkVideoPlayerController extends AbstractMediaPlayerController {
     player.dispose();
   }
 
-  ///下面是播放列表的功能
-  @override
-  add({String? filename, Uint8List? data}) async {
-    String dataSource =
-        await FijkMediaSource.media(filename: filename, data: data);
-    dataSources.add(dataSource);
-    setCurrentIndex(dataSources.length - 1);
-    play();
-  }
-
-  @override
-  remove(int index) {
-    if (index >= 0 && index < dataSources.length) {
-      dataSources.removeAt(index);
-    }
-  }
-
-  @override
-  insert(int index, {String? filename, Uint8List? data}) async {
-    String dataSource =
-        await FijkMediaSource.media(filename: filename, data: data);
-    dataSources.insert(index, dataSource);
-  }
-
-  @override
-  move(int initialIndex, int finalIndex) {
-    String dataSource = dataSources[initialIndex];
-    dataSources[initialIndex] = dataSources[finalIndex];
-    dataSources[finalIndex] = dataSource;
-  }
-
   Widget buildVideoWidget({
     double? width,
     double? height,
@@ -201,6 +143,10 @@ class FijkVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   setShuffleModeEnabled(bool enabled) {}
+
+  @override
+  close() {
+  }
 }
 
 ///采用Fijk-video-player实现的视频播放器，用于移动设备和web，内部实现采用video_player
@@ -237,7 +183,7 @@ class _PlatformFijkVideoPlayerState extends State<PlatformFijkVideoPlayer> {
 
   Widget _buildFijkVideoPlayer(BuildContext context) {
     return VisibilityDetector(
-      key: ObjectKey(widget.controller.current),
+      key: ObjectKey(widget.controller.currentMediaSource),
       onVisibilityChanged: (visiblityInfo) {
         if (visiblityInfo.visibleFraction > 0.9) {
           widget.controller.play();
@@ -285,7 +231,7 @@ class _PlatformFijkVideoPlayerState extends State<PlatformFijkVideoPlayer> {
 
   ///播放列表
   Widget _buildPlaylist(BuildContext context) {
-    List<String> playlist = widget.controller.dataSources;
+    List<MediaSource> playlist = widget.controller.playlist;
     return Column(children: [
       Card(
         color: Colors.white.withOpacity(0.5),

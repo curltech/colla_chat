@@ -459,6 +459,9 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
     broadcast.dispose();
     return broadcast;
   }
+
+  @override
+  close() {}
 }
 
 class VlcMediaRecorder {

@@ -31,38 +31,32 @@ class ChewieMediaSource {
     return videoPlayerController;
   }
 
-  static Future<List<VideoPlayerController>> playlist(
-      List<String> filenames) async {
-    List<VideoPlayerController> playlist = [];
-    for (var filename in filenames) {
-      playlist.add(await media(filename: filename));
-    }
-
-    return playlist;
+  static Future<VideoPlayerController> fromMediaSource(
+      MediaSource mediaSource) async {
+    return await media(filename: mediaSource.filename);
   }
 }
 
 ///基于chewie实现的媒体播放器和记录器，
 class ChewieVideoPlayerController extends AbstractMediaPlayerController {
-  List<VideoPlayerController> controllers = [];
+  VideoPlayerController? videoPlayerController;
 
   ChewieVideoPlayerController();
 
   _open({bool autoStart = false}) async {}
 
-  VideoPlayerController? get current {
-    var currentIndex = this.currentIndex;
-    if (currentIndex != null &&
-        currentIndex! >= 0 &&
-        currentIndex! < playlist.length) {
-      return controllers[currentIndex!];
+  @override
+  setCurrentIndex(int? index) async {
+    super.setCurrentIndex(index);
+    if (currentMediaSource != null) {
+      videoPlayerController =
+          await ChewieMediaSource.fromMediaSource(currentMediaSource!);
     }
-    return null;
   }
 
   @override
   PlayerStatus get status {
-    VideoPlayerValue value = current!.value;
+    VideoPlayerValue value = videoPlayerController!.value;
     if (value.isPlaying) {
       return PlayerStatus.playing;
     } else if (value.isBuffering) {
@@ -77,76 +71,76 @@ class ChewieVideoPlayerController extends AbstractMediaPlayerController {
   ///基本的视频控制功能
   @override
   play() {
-    if (current != null) {
-      current!.play();
+    if (videoPlayerController != null) {
+      videoPlayerController!.play();
     }
   }
 
   @override
   seek(Duration position, {int? index}) {
-    if (current != null) {
-      current!.seekTo(position);
+    if (videoPlayerController != null) {
+      videoPlayerController!.seekTo(position);
     }
   }
 
   @override
   pause() {
-    if (current != null) {
-      current!.pause();
+    if (videoPlayerController != null) {
+      videoPlayerController!.pause();
     }
   }
 
   @override
   resume() {
-    if (current != null) {
-      current!.play();
+    if (videoPlayerController != null) {
+      videoPlayerController!.play();
     }
   }
 
   @override
   stop() {
-    if (current != null) {
-      current!.pause();
+    if (videoPlayerController != null) {
+      videoPlayerController!.pause();
     }
   }
 
   @override
   Future<Duration?> getBufferedPosition() {
-    VideoPlayerValue value = current!.value;
+    VideoPlayerValue value = videoPlayerController!.value;
     return Future.value(value.buffered[0].start);
   }
 
   @override
   Future<Duration?> getDuration() {
-    VideoPlayerValue value = current!.value;
+    VideoPlayerValue value = videoPlayerController!.value;
     return Future.value(value.duration);
   }
 
   @override
   Future<Duration?> getPosition() {
-    return current!.position;
+    return videoPlayerController!.position;
   }
 
   @override
   Future<double> getSpeed() {
-    VideoPlayerValue value = current!.value;
+    VideoPlayerValue value = videoPlayerController!.value;
     return Future.value(value.playbackSpeed);
   }
 
   @override
   Future<double> getVolume() {
-    VideoPlayerValue value = current!.value;
+    VideoPlayerValue value = videoPlayerController!.value;
     return Future.value(value.volume);
   }
 
   @override
   setVolume(double volume) {
-    current!.setVolume(volume);
+    videoPlayerController!.setVolume(volume);
   }
 
   @override
   setSpeed(double speed) {
-    current!.setPlaybackSpeed(speed);
+    videoPlayerController!.setPlaybackSpeed(speed);
   }
 
   Future<Uint8List> takeSnapshot(
@@ -160,43 +154,7 @@ class ChewieVideoPlayerController extends AbstractMediaPlayerController {
   @override
   dispose() {
     super.dispose();
-    current!.dispose();
-  }
-
-  ///下面是播放列表的功能
-  @override
-  add({String? filename, Uint8List? data}) async {
-    super.add(filename: filename, data: data);
-    VideoPlayerController controller =
-        await ChewieMediaSource.media(filename: filename, data: data);
-    controllers.add(controller);
-    setCurrentIndex(playlist.length - 1);
-    play();
-  }
-
-  @override
-  remove(int index) {
-    super.remove(index);
-    if (index >= 0 && index < playlist.length) {
-      VideoPlayerController controller = controllers.removeAt(index);
-      controller.dispose();
-    }
-  }
-
-  @override
-  insert(int index, {String? filename, Uint8List? data}) async {
-    super.insert(index, filename: filename, data: data);
-    VideoPlayerController controller =
-        await ChewieMediaSource.media(filename: filename, data: data);
-    controllers.insert(index, controller);
-  }
-
-  @override
-  move(int initialIndex, int finalIndex) {
-    super.move(initialIndex, finalIndex);
-    VideoPlayerController controller = controllers[initialIndex];
-    controllers[initialIndex] = controllers[finalIndex];
-    controllers[finalIndex] = controller;
+    close();
   }
 
   Widget buildVideoWidget({
@@ -252,7 +210,7 @@ class ChewieVideoPlayerController extends AbstractMediaPlayerController {
     Duration hideControlsTimer = ChewieController.defaultHideControlsTimer,
   }) {
     final chewieController = ChewieController(
-      videoPlayerController: current!,
+      videoPlayerController: videoPlayerController!,
       autoPlay: autoPlay,
       looping: looping,
     );
@@ -263,6 +221,14 @@ class ChewieVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   setShuffleModeEnabled(bool enabled) {}
+
+  @override
+  close() {
+    if (videoPlayerController != null) {
+      videoPlayerController!.dispose();
+      videoPlayerController = null;
+    }
+  }
 }
 
 ///采用Fijk-video-player实现的视频播放器，用于移动设备和web，内部实现采用video_player
@@ -299,12 +265,12 @@ class _PlatformChewieVideoPlayerState extends State<PlatformChewieVideoPlayer> {
 
   Widget _buildChewieVideoPlayer(BuildContext context) {
     ChewieController chewieController = ChewieController(
-      videoPlayerController: widget.controller.current!,
+      videoPlayerController: widget.controller.videoPlayerController!,
       autoPlay: true,
       looping: true,
     );
     return VisibilityDetector(
-      key: ObjectKey(widget.controller.current),
+      key: ObjectKey(widget.controller.videoPlayerController),
       onVisibilityChanged: (visiblityInfo) {
         if (visiblityInfo.visibleFraction > 0.9) {
           widget.controller.play();
@@ -352,7 +318,7 @@ class _PlatformChewieVideoPlayerState extends State<PlatformChewieVideoPlayer> {
 
   ///播放列表
   Widget _buildPlaylist(BuildContext context) {
-    List<VideoPlayerController> controllers = widget.controller.controllers;
+    List<MediaSource> playlist = widget.controller.playlist;
     return Column(children: [
       Card(
         color: Colors.white.withOpacity(0.5),
@@ -385,15 +351,15 @@ class _PlatformChewieVideoPlayerState extends State<PlatformChewieVideoPlayer> {
               child: ReorderableListView(
                 shrinkWrap: true,
                 onReorder: (int initialIndex, int finalIndex) async {
-                  if (finalIndex > controllers.length) {
-                    finalIndex = controllers.length;
+                  if (finalIndex > playlist.length) {
+                    finalIndex = playlist.length;
                   }
                   if (initialIndex < finalIndex) finalIndex--;
                   widget.controller.move(initialIndex, finalIndex);
                 },
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 children: List.generate(
-                  controllers.length,
+                  playlist.length,
                   (int index) {
                     return ListTile(
                       key: Key(index.toString()),
@@ -402,7 +368,7 @@ class _PlatformChewieVideoPlayerState extends State<PlatformChewieVideoPlayer> {
                         style: const TextStyle(fontSize: 14.0),
                       ),
                       title: Text(
-                        controllers[index].dataSource.toString(),
+                        playlist[index].filename.toString(),
                         style: const TextStyle(fontSize: 14.0),
                       ),
                     );

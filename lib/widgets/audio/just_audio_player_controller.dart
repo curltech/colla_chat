@@ -221,6 +221,9 @@ class JustAudioPlayerController extends AbstractMediaPlayerController {
         (position, bufferedPosition, duration) => PositionData(
             position, bufferedPosition, duration ?? Duration.zero));
   }
+
+  @override
+  close() {}
 }
 
 ///支持多种设备，windows测试通过
