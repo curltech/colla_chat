@@ -5,11 +5,11 @@ import 'dart:ui' as ui;
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/audio/platform_audio_player.dart';
 import 'package:colla_chat/widgets/common/media_player_slider.dart';
+import 'package:colla_chat/widgets/platform_media_controller.dart';
+import 'package:colla_chat/widgets/platform_media_controller.dart' as platform;
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:rxdart/rxdart.dart';
 
 class VlcMediaSource {
@@ -32,10 +32,11 @@ class VlcMediaSource {
     return media;
   }
 
-  static Future<Playlist> playlist(List<String> filenames) async {
+  static Future<Playlist> fromMediaSource(
+      List<platform.MediaSource> mediaSources) async {
     List<Media> medias = [];
-    for (var filename in filenames) {
-      medias.add(await media(filename: filename));
+    for (var mediaSource in mediaSources) {
+      medias.add(await media(filename: mediaSource.filename));
     }
     final playlist = Playlist(
       medias: medias,
@@ -49,7 +50,6 @@ class VlcMediaSource {
 ///支持Windows & Linux，linux需要VLC & libVLC installed.
 class VlcVideoPlayerController extends AbstractMediaPlayerController {
   late Player player;
-  final Playlist playlist = Playlist(medias: []);
   CurrentState? currentState;
   PositionState? positionState;
 
@@ -108,9 +108,10 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
     _open();
   }
 
-  _open({bool autoStart = false}) {
+  _open({bool autoStart = false}) async {
+    Playlist list = await VlcMediaSource.fromMediaSource(playlist);
     player.open(
-      playlist,
+      list,
       autoStart: autoStart,
     );
   }
@@ -161,20 +162,31 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
     return Future.value(player.general.volume);
   }
 
+  @override
+  setCurrentIndex(int? index) async {
+    super.setCurrentIndex(index);
+    if (currentIndex != null) {
+      player.jumpToIndex(currentIndex!);
+    }
+  }
+
   ///下面是播放列表的功能
   @override
   add({String? filename, Uint8List? data}) async {
+    super.add(filename: filename, data: data);
     Media media = await VlcMediaSource.media(filename: filename, data: data);
     player.add(media);
   }
 
   @override
   remove(int index) {
+    super.remove(index);
     player.remove(index);
   }
 
   @override
   insert(int index, {String? filename, Uint8List? data}) async {
+    super.insert(index, filename: filename, data: data);
     Media media = await VlcMediaSource.media(filename: filename, data: data);
     player.insert(index, media);
   }
@@ -197,16 +209,9 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  setCurrentIndex(int? index) {
-    if (index != null) {
-      player.jumpToIndex(index);
-    }
-    super.setCurrentIndex(index);
-  }
-
-  @override
   move(int initialIndex, int finalIndex) {
     player.move(initialIndex, finalIndex);
+    super.move(initialIndex, finalIndex);
   }
 
   @override
@@ -590,7 +595,7 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
 
   ///播放列表
   Widget _buildPlaylist(BuildContext context) {
-    Playlist playlist = widget.controller.playlist;
+    List<platform.MediaSource> playlist = widget.controller.playlist;
     return Column(children: [
       Card(
         color: Colors.white.withOpacity(0.5),
@@ -623,15 +628,15 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
               child: ReorderableListView(
                 shrinkWrap: true,
                 onReorder: (int initialIndex, int finalIndex) async {
-                  if (finalIndex > playlist.medias.length) {
-                    finalIndex = playlist.medias.length;
+                  if (finalIndex > playlist.length) {
+                    finalIndex = playlist.length;
                   }
                   if (initialIndex < finalIndex) finalIndex--;
                   widget.controller.move(initialIndex, finalIndex);
                 },
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 children: List.generate(
-                  playlist.medias.length,
+                  playlist.length,
                   (int index) {
                     return ListTile(
                       key: Key(index.toString()),
@@ -640,7 +645,7 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
                         style: const TextStyle(fontSize: 14.0),
                       ),
                       title: Text(
-                        playlist.medias[index].resource,
+                        playlist[index].filename,
                         style: const TextStyle(fontSize: 14.0),
                       ),
                     );

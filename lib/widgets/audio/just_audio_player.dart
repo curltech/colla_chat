@@ -98,7 +98,6 @@ class JustAudioPlayerState extends State<JustAudioPlayer>
   ///播放列表
   Widget _buildPlaylist(BuildContext context) {
     var playlist = widget.controller.playlist;
-    var filenames = widget.controller.filenames;
     return Card(
       elevation: 2.0,
       margin: const EdgeInsets.all(4.0),
@@ -152,7 +151,7 @@ class JustAudioPlayerState extends State<JustAudioPlayer>
                         style: const TextStyle(fontSize: 14.0),
                       ),
                       title: Text(
-                        filenames[index],
+                        playlist[index].filename,
                         style: const TextStyle(fontSize: 14.0),
                       ),
                     );

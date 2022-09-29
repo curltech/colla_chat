@@ -1,8 +1,8 @@
 import 'dart:io';
 
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/audio/platform_audio_player.dart';
 import 'package:colla_chat/widgets/common/media_player_slider.dart';
+import 'package:colla_chat/widgets/platform_media_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vlc_player/flutter_vlc_player.dart';
@@ -32,8 +32,6 @@ class Vlc1MediaSource {
 class Vlc1VideoPlayerController extends AbstractMediaPlayerController {
   List<String> playlist = [];
   VlcPlayerController? _videoPlayerController;
-
-  int? _currentIndex;
 
   Vlc1VideoPlayerController();
 
@@ -171,7 +169,7 @@ class Vlc1VideoPlayerController extends AbstractMediaPlayerController {
     String dataSource =
         await Vlc1MediaSource.media(filename: filename, data: data);
     playlist.add(dataSource);
-    _currentIndex = playlist.length - 1;
+    setCurrentIndex(playlist.length - 1);
     await _buildVideoPlayerController(dataSource);
     play();
   }

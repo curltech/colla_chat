@@ -3,8 +3,8 @@ import 'dart:typed_data';
 import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/audio/platform_audio_player.dart';
 import 'package:colla_chat/widgets/common/media_player_slider.dart';
+import 'package:colla_chat/widgets/platform_media_controller.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:record/record.dart';
@@ -49,22 +49,17 @@ class JustAudioSource {
     return audioSource;
   }
 
-  static Future<ConcatenatingAudioSource> playlist(
-      List<String> filenames) async {
-    List<AudioSource> audioSources = [];
-    for (var filename in filenames) {
-      audioSources.add(await audioSource(filename: filename));
-    }
-    final playlist = ConcatenatingAudioSource(
-      // Start loading next item just before reaching it
-      useLazyPreparation: true,
-      // Customise the shuffle algorithm
-      shuffleOrder: DefaultShuffleOrder(),
-      // Specify the playlist items
-      children: audioSources,
+  static Future<AudioSource> fromMediaSource(MediaSource mediaSource,
+      {String? id, String? album, String? title, String? artUri}) async {
+    AudioSource source = await audioSource(
+      filename: mediaSource.filename,
+      id: id,
+      album: album,
+      title: title,
+      artUri: artUri,
     );
 
-    return playlist;
+    return source;
   }
 }
 
@@ -72,9 +67,6 @@ class JustAudioSource {
 ///还可以产生音频播放的波形图形组件
 class JustAudioPlayerController extends AbstractMediaPlayerController {
   late AudioPlayer player;
-  List<AudioSource> playlist = [];
-  List<String> filenames = [];
-  int? _currentIndex;
 
   ///当前版本还不支持windows
   // ConcatenatingAudioSource playlist = ConcatenatingAudioSource(
@@ -108,20 +100,25 @@ class JustAudioPlayerController extends AbstractMediaPlayerController {
     });
   }
 
+  ///设置当前的通用MediaSource，并转换成特定实现的媒体源，并进行设置
   @override
   setCurrentIndex(int? index) async {
-    _currentIndex = index;
-    if (_currentIndex != null) {
-      AudioSource? source = playlist[_currentIndex!];
-      var audioSource = player.audioSource;
-      if (audioSource != source) {
-        try {
-          await player.setAudioSource(
-            source,
-          );
-          notifyListeners();
-        } catch (e) {
-          logger.e('$e');
+    super.setCurrentIndex(index);
+    if (currentIndex != null) {
+      MediaSource? currentMediaSource = this.currentMediaSource;
+      if (currentMediaSource != null) {
+        AudioSource source =
+            await JustAudioSource.fromMediaSource(currentMediaSource);
+        var audioSource = player.audioSource;
+        if (audioSource != source) {
+          try {
+            await player.setAudioSource(
+              source,
+            );
+            notifyListeners();
+          } catch (e) {
+            logger.e('$e');
+          }
         }
       }
     }
@@ -154,22 +151,6 @@ class JustAudioPlayerController extends AbstractMediaPlayerController {
   dispose() async {
     super.dispose();
     await player.dispose();
-  }
-
-  @override
-  next() async {
-    if (_currentIndex != null && _currentIndex! < playlist.length) {
-      setCurrentIndex(_currentIndex! + 1);
-    }
-    //await player.seekToNext();
-  }
-
-  @override
-  previous() async {
-    if (_currentIndex != null && _currentIndex! > 0) {
-      setCurrentIndex(_currentIndex! - 1);
-    }
-    //await player.seekToPrevious();
   }
 
   @override
@@ -228,47 +209,6 @@ class JustAudioPlayerController extends AbstractMediaPlayerController {
   @override
   setSpeed(double speed) async {
     await player.setSpeed(speed);
-  }
-
-  @override
-  add({String? filename, Uint8List? data}) async {
-    if (filename != null && filenames.contains(filename)) {
-      return;
-    }
-    AudioSource audioSource =
-        await JustAudioSource.audioSource(filename: filename, data: data);
-    playlist.add(audioSource);
-    if (filename != null) {
-      filenames.add(filename);
-    } else {
-      filenames.add(audioSource.toString());
-    }
-    await setCurrentIndex(playlist.length - 1);
-  }
-
-  @override
-  insert(int index, {String? filename, Uint8List? data}) async {
-    AudioSource audioSource =
-        await JustAudioSource.audioSource(filename: filename, data: data);
-    playlist.insert(index, audioSource);
-    await setCurrentIndex(index);
-  }
-
-  @override
-  remove(int index) async {
-    playlist.removeAt(index);
-    if (index == 0) {
-      await setCurrentIndex(index);
-    } else {
-      await setCurrentIndex(index - 1);
-    }
-  }
-
-  @override
-  move(int initialIndex, int finalIndex) {
-    var audioSource = playlist[initialIndex];
-    playlist[initialIndex] = playlist[finalIndex];
-    playlist[finalIndex] = audioSource;
   }
 
   /// Collects the data useful for displaying in a seek bar, using a handy

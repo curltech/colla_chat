@@ -3,109 +3,11 @@ import 'dart:async';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/widgets/audio/platform_another_audio_recorder.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
+import 'package:colla_chat/widgets/platform_media_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
-
-enum RecorderStatus { pause, recording, stop }
-
-enum RecorderAudioFormat { wav, mp3 }
-
-///支持多种设备，windows测试通过
-///Android, iOS, Linux, macOS, Windows, and web.
-abstract class AbstractAudioRecorderController with ChangeNotifier {
-  String? filename;
-  RecorderStatus _status = RecorderStatus.stop;
-  Timer? _timer;
-  int _duration = -1;
-  String _durationText = '';
-
-  Future<bool> hasPermission();
-
-  RecorderStatus get status {
-    return _status;
-  }
-
-  set status(RecorderStatus status) {
-    if (_status != status) {
-      _status = status;
-      notifyListeners();
-    }
-  }
-
-  Future<void> start({String? filename}) async {
-    if (filename == null) {
-      final dir = await getTemporaryDirectory();
-      var name = DateUtil.currentDate();
-      filename = '${dir.path}/$name.mp3';
-    }
-    this.filename = filename;
-    startTimer();
-  }
-
-  Future<String?> stop() async {
-    cancelTimer();
-
-    return null;
-  }
-
-  Future<void> pause();
-
-  Future<void> resume();
-
-  @override
-  dispose() {
-    super.dispose();
-    cancelTimer();
-  }
-
-  void startTimer() {
-    cancelTimer();
-
-    _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
-      if (status == RecorderStatus.recording) {
-        duration = duration + 1;
-        notifyListeners();
-      }
-    });
-  }
-
-  void cancelTimer() {
-    if (_timer != null) {
-      _timer?.cancel();
-      _timer = null;
-      duration = 0;
-    }
-  }
-
-  int get duration {
-    return _duration;
-  }
-
-  set duration(int duration) {
-    if (_duration != duration) {
-      _duration = duration;
-      _changeDurationText();
-    }
-  }
-
-  String get durationText {
-    return _durationText;
-  }
-
-  _changeDurationText() {
-    var duration = Duration(seconds: _duration);
-    var durationText = duration.toString();
-    var pos = durationText.lastIndexOf('.');
-    durationText = durationText.substring(0, pos);
-    //'${duration.inHours}:${duration.inMinutes}:${duration.inSeconds}';
-
-    _durationText = durationText;
-  }
-}
 
 ///支持多种设备，windows测试通过
 ///Android, iOS, Linux, macOS, Windows, and web.

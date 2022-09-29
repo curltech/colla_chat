@@ -4,6 +4,7 @@ import 'package:another_audio_recorder/another_audio_recorder.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/widgets/audio/platform_audio_recorder.dart';
+import 'package:colla_chat/widgets/platform_media_controller.dart';
 import 'package:path_provider/path_provider.dart';
 
 ///仅支持移动设备

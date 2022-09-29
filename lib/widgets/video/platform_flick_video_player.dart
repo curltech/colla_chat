@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/audio/platform_audio_player.dart';
 import 'package:colla_chat/widgets/common/media_player_slider.dart';
+import 'package:colla_chat/widgets/platform_media_controller.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flick_video_player/src/utils/web_key_bindings.dart';
 import 'package:flutter/material.dart';

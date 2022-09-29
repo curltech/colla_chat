@@ -1,5 +1,6 @@
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/audio/platform_audio_player.dart';
+import 'package:colla_chat/widgets/platform_media_controller.dart';
 import 'package:colla_chat/widgets/video/platform_flick_video_player.dart';
 import 'package:colla_chat/widgets/video/platform_vlc_video_player.dart';
 import 'package:flutter/material.dart';

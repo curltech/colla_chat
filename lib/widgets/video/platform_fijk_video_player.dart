@@ -1,6 +1,7 @@
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/audio/platform_audio_player.dart';
 import 'package:colla_chat/widgets/common/media_player_slider.dart';
+import 'package:colla_chat/widgets/platform_media_controller.dart';
 import 'package:fijkplayer/fijkplayer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,7 +26,6 @@ class FijkMediaSource {
 class FijkVideoPlayerController extends AbstractMediaPlayerController {
   List<String> dataSources = [];
   final FijkPlayer player = FijkPlayer();
-  int? _currentIndex;
   double volume = 1.0;
   double speed = 1.0;
 
@@ -34,10 +34,11 @@ class FijkVideoPlayerController extends AbstractMediaPlayerController {
   _open({bool autoStart = false}) {}
 
   String? get current {
-    if (_currentIndex != null &&
-        _currentIndex! >= 0 &&
-        _currentIndex! < dataSources.length) {
-      return dataSources[_currentIndex!];
+    var currentIndex = this.currentIndex;
+    if (currentIndex != null &&
+        currentIndex! >= 0 &&
+        currentIndex! < dataSources.length) {
+      return dataSources[currentIndex!];
     }
     return null;
   }
@@ -148,7 +149,7 @@ class FijkVideoPlayerController extends AbstractMediaPlayerController {
     String dataSource =
         await FijkMediaSource.media(filename: filename, data: data);
     dataSources.add(dataSource);
-    _currentIndex = dataSources.length - 1;
+    setCurrentIndex(dataSources.length - 1);
     play();
   }
 
@@ -450,22 +451,22 @@ class _PlatformFijkControllerPanelState
           var label = snapshot.data!.toStringAsFixed(1);
           return Ink(
               child: InkWell(
-                child: Row(children: [
-                  const Icon(Icons.volume_up_rounded, size: 24),
-                  Text(label ?? '')
-                ]),
-                onTap: () {
-                  MediaPlayerSliderUtil.showSliderDialog(
-                    context: context,
-                    title: "Adjust volume",
-                    divisions: 10,
-                    min: 0.0,
-                    max: 1.0,
-                    value: snapshot.data!,
-                    onChanged: widget.controller.setVolume,
-                  );
-                },
-              ));
+            child: Row(children: [
+              const Icon(Icons.volume_up_rounded, size: 24),
+              Text(label ?? '')
+            ]),
+            onTap: () {
+              MediaPlayerSliderUtil.showSliderDialog(
+                context: context,
+                title: "Adjust volume",
+                divisions: 10,
+                min: 0.0,
+                max: 1.0,
+                value: snapshot.data!,
+                onChanged: widget.controller.setVolume,
+              );
+            },
+          ));
         });
   }
 
@@ -477,22 +478,22 @@ class _PlatformFijkControllerPanelState
           var label = snapshot.data!.toStringAsFixed(1);
           return Ink(
               child: InkWell(
-                child: Row(children: [
-                  const Icon(Icons.speed_rounded, size: 24),
-                  Text(label ?? '')
-                ]),
-                onTap: () {
-                  MediaPlayerSliderUtil.showSliderDialog(
-                    context: context,
-                    title: "Adjust speed",
-                    divisions: 10,
-                    min: 0.5,
-                    max: 1.5,
-                    value: snapshot.data!,
-                    onChanged: widget.controller.setSpeed,
-                  );
-                },
-              ));
+            child: Row(children: [
+              const Icon(Icons.speed_rounded, size: 24),
+              Text(label ?? '')
+            ]),
+            onTap: () {
+              MediaPlayerSliderUtil.showSliderDialog(
+                context: context,
+                title: "Adjust speed",
+                divisions: 10,
+                min: 0.5,
+                max: 1.5,
+                value: snapshot.data!,
+                onChanged: widget.controller.setSpeed,
+              );
+            },
+          ));
         });
   }
 

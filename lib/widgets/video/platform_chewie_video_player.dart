@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:chewie/chewie.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/audio/platform_audio_player.dart';
 import 'package:colla_chat/widgets/common/media_player_slider.dart';
+import 'package:colla_chat/widgets/platform_media_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
@@ -44,19 +44,18 @@ class ChewieMediaSource {
 
 ///基于chewie实现的媒体播放器和记录器，
 class ChewieVideoPlayerController extends AbstractMediaPlayerController {
-  List<VideoPlayerController> playlist = [];
-
-  int? _currentIndex;
+  List<VideoPlayerController> controllers = [];
 
   ChewieVideoPlayerController();
 
   _open({bool autoStart = false}) async {}
 
   VideoPlayerController? get current {
-    if (_currentIndex != null &&
-        _currentIndex! >= 0 &&
-        _currentIndex! < playlist.length) {
-      return playlist[_currentIndex!];
+    var currentIndex = this.currentIndex;
+    if (currentIndex != null &&
+        currentIndex! >= 0 &&
+        currentIndex! < playlist.length) {
+      return controllers[currentIndex!];
     }
     return null;
   }
@@ -167,33 +166,37 @@ class ChewieVideoPlayerController extends AbstractMediaPlayerController {
   ///下面是播放列表的功能
   @override
   add({String? filename, Uint8List? data}) async {
+    super.add(filename: filename, data: data);
     VideoPlayerController controller =
         await ChewieMediaSource.media(filename: filename, data: data);
-    playlist.add(controller);
-    _currentIndex = playlist.length - 1;
+    controllers.add(controller);
+    setCurrentIndex(playlist.length - 1);
     play();
   }
 
   @override
   remove(int index) {
+    super.remove(index);
     if (index >= 0 && index < playlist.length) {
-      VideoPlayerController controller = playlist.removeAt(index);
+      VideoPlayerController controller = controllers.removeAt(index);
       controller.dispose();
     }
   }
 
   @override
   insert(int index, {String? filename, Uint8List? data}) async {
+    super.insert(index, filename: filename, data: data);
     VideoPlayerController controller =
         await ChewieMediaSource.media(filename: filename, data: data);
-    playlist.insert(index, controller);
+    controllers.insert(index, controller);
   }
 
   @override
   move(int initialIndex, int finalIndex) {
-    VideoPlayerController controller = playlist[initialIndex];
-    playlist[initialIndex] = playlist[finalIndex];
-    playlist[finalIndex] = controller;
+    super.move(initialIndex, finalIndex);
+    VideoPlayerController controller = controllers[initialIndex];
+    controllers[initialIndex] = controllers[finalIndex];
+    controllers[finalIndex] = controller;
   }
 
   Widget buildVideoWidget({
@@ -349,7 +352,7 @@ class _PlatformChewieVideoPlayerState extends State<PlatformChewieVideoPlayer> {
 
   ///播放列表
   Widget _buildPlaylist(BuildContext context) {
-    List<VideoPlayerController> playlist = widget.controller.playlist;
+    List<VideoPlayerController> controllers = widget.controller.controllers;
     return Column(children: [
       Card(
         color: Colors.white.withOpacity(0.5),
@@ -382,15 +385,15 @@ class _PlatformChewieVideoPlayerState extends State<PlatformChewieVideoPlayer> {
               child: ReorderableListView(
                 shrinkWrap: true,
                 onReorder: (int initialIndex, int finalIndex) async {
-                  if (finalIndex > playlist.length) {
-                    finalIndex = playlist.length;
+                  if (finalIndex > controllers.length) {
+                    finalIndex = controllers.length;
                   }
                   if (initialIndex < finalIndex) finalIndex--;
                   widget.controller.move(initialIndex, finalIndex);
                 },
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 children: List.generate(
-                  playlist.length,
+                  controllers.length,
                   (int index) {
                     return ListTile(
                       key: Key(index.toString()),
@@ -399,7 +402,7 @@ class _PlatformChewieVideoPlayerState extends State<PlatformChewieVideoPlayer> {
                         style: const TextStyle(fontSize: 14.0),
                       ),
                       title: Text(
-                        playlist[index].dataSource.toString(),
+                        controllers[index].dataSource.toString(),
                         style: const TextStyle(fontSize: 14.0),
                       ),
                     );

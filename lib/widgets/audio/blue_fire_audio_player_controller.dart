@@ -2,7 +2,8 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:audioplayers/audioplayers.dart';
-import 'package:colla_chat/widgets/audio/platform_audio_player.dart';
+import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/widgets/platform_media_controller.dart';
 
 class BlueFireAudioSource {
   static Source audioSource({String? filename, Uint8List? data}) {
@@ -23,21 +24,14 @@ class BlueFireAudioSource {
     return source;
   }
 
-  static List<Source> playlist(List<String> filenames) {
-    List<Source> playlist = [];
-    for (var filename in filenames) {
-      playlist.add(audioSource(filename: filename));
-    }
-
-    return playlist;
+  static Source fromMediaSource(MediaSource mediaSource) {
+    return audioSource(filename: mediaSource.filename);
   }
 }
 
 ///音频播放器，Android, iOS, Linux, macOS, Windows, and web.
 class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
   late AudioPlayer player;
-  List<Source> playlist = [];
-  int? _currentIndex;
   Duration? duration;
   Duration? position;
 
@@ -69,19 +63,18 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  setCurrentIndex(int? index) async {
-    _currentIndex = index;
-    if (_currentIndex != null) {
-      Source? source = playlist[_currentIndex!];
-      await player.setSource(source);
-    }
-  }
-
-  @override
   play() async {
-    if (_currentIndex != null) {
-      var source = playlist[_currentIndex!];
-      await player.play(source);
+    if (currentIndex != null) {
+      MediaSource? currentMediaSource = this.currentMediaSource;
+      if (currentMediaSource != null) {
+        Source source = BlueFireAudioSource.fromMediaSource(currentMediaSource);
+        try {
+          await player.play(source);
+          notifyListeners();
+        } catch (e) {
+          logger.e('$e');
+        }
+      }
     }
   }
 
@@ -102,6 +95,7 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
 
   @override
   dispose() async {
+    super.dispose();
     await player.release();
   }
 
@@ -154,15 +148,6 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
     await player.setReleaseMode(releaseMode); // half speed
   }
 
-  @override
-  add({String? filename, Uint8List? data}) async {
-    Source audioSource =
-        BlueFireAudioSource.audioSource(filename: filename, data: data);
-    playlist.add(audioSource);
-    await setCurrentIndex(playlist.length);
-    await player.setSource(audioSource);
-  }
-
   PlayerState get state {
     return player.state;
   }
@@ -194,35 +179,7 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  insert(int index, {String? filename, Uint8List? data}) {
-    // TODO: implement insert
-    throw UnimplementedError();
-  }
-
-  @override
-  next() {
-    // TODO: implement next
-    throw UnimplementedError();
-  }
-
-  @override
-  previous() {
-    // TODO: implement previous
-    throw UnimplementedError();
-  }
-
-  @override
-  remove(int index) {
-    // TODO: implement remove
-    throw UnimplementedError();
-  }
-
-  @override
-  move(int initialIndex, int finalIndex) {}
-
-  @override
   setShuffleModeEnabled(bool enabled) {
-    // TODO: implement setShuffleModeEnabled
     throw UnimplementedError();
   }
 }
