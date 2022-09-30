@@ -1,31 +1,29 @@
+import 'package:colla_chat/widgets/media/audio/platform_audio_player.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/video/platform_video_player.dart';
 import 'package:flutter/material.dart';
 
 ///平台标准的video-player的实现，移动采用flick，桌面采用vlc
-class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
-  PlatformVideoPlayerWidget({
-    Key? key,
-  }) : super(key: key);
+class PlatformAudioPlayerWidget extends StatefulWidget with TileDataMixin {
+  const PlatformAudioPlayerWidget({super.key});
 
   @override
-  State createState() => _PlatformVideoPlayerWidgetState();
+  State createState() => _PlatformAudioPlayerWidgetState();
 
   @override
-  String get routeName => 'video_player';
+  String get routeName => 'audio_player';
 
   @override
-  Icon get icon => const Icon(Icons.videocam);
+  Icon get icon => const Icon(Icons.audiotrack);
 
   @override
-  String get title => 'Video Player';
+  String get title => 'Audio Player';
 
   @override
   bool get withLeading => true;
 }
 
-class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
+class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
   @override
   void initState() {
     super.initState();
@@ -39,9 +37,9 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-      title: const Text('Video Player'),
+      title: const Text('Audio Player'),
       withLeading: true,
-      child: PlatformVideoPlayer(),
+      child: PlatformAudioPlayer(),
     );
   }
 }

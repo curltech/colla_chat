@@ -3,7 +3,9 @@ import 'dart:typed_data';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/widgets/platform_media_controller.dart';
+import 'package:colla_chat/widgets/media/platform_media_controller.dart';
+import 'package:flutter/src/widgets/framework.dart';
+import 'package:flutter/widgets.dart';
 
 class BlueFireAudioSource {
   static Source audioSource({String? filename, Uint8List? data}) {
@@ -185,4 +187,9 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
 
   @override
   close() {}
+
+  @override
+  Widget buildMediaView() {
+    return Container();
+  }
 }

@@ -11,61 +11,7 @@ class PositionData {
 }
 
 class MediaPlayerSliderUtil {
-  static void showSliderDialog({
-    required BuildContext context,
-    required String title,
-    required int divisions,
-    required double min,
-    required double max,
-    String suffix = '',
-    required double value,
-    Stream<dynamic>? stream,
-    required ValueChanged<double> onChanged,
-  }) {
-    showDialog<void>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text(title, textAlign: TextAlign.center),
-        content: StreamBuilder<dynamic>(
-          stream: stream,
-          builder: (context, snapshot) {
-            var label = '1.0';
-            if (snapshot.data != null) {
-              var data = snapshot.data;
-              // if (data is GeneralState) {
-              //   GeneralState generalState = data;
-              //   label = '${generalState.volume.toStringAsFixed(1)}$suffix';
-              // }
-              if (data is double) {
-                label = '${data.toStringAsFixed(1)}$suffix';
-              }
-            }
-            return SizedBox(
-              height: 100.0,
-              child: Column(
-                children: [
-                  Text(label,
-                      style: const TextStyle(
-                          fontFamily: 'Fixed',
-                          fontWeight: FontWeight.bold,
-                          fontSize: 24.0)),
-                  RotatedBox(
-                      quarterTurns: 0,
-                      child: Slider(
-                        divisions: divisions,
-                        min: min,
-                        max: max,
-                        value: value,
-                        onChanged: onChanged,
-                      )),
-                ],
-              ),
-            );
-          },
-        ),
-      ),
-    );
-  }
+
 }
 
 class MediaPlayerSlider extends StatefulWidget {

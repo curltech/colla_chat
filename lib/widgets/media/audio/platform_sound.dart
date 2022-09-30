@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'package:audio_session/audio_session.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/widgets/audio/audio_service.dart';
+import 'package:colla_chat/widgets/media/audio/audio_service.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:intl/date_symbol_data_local.dart';

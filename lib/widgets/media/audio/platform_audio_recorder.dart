@@ -3,9 +3,8 @@ import 'dart:async';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/widgets/audio/platform_another_audio_recorder.dart';
-import 'package:colla_chat/widgets/common/simple_widget.dart';
-import 'package:colla_chat/widgets/platform_media_controller.dart';
+import 'package:colla_chat/widgets/media/audio/platform_another_audio_recorder.dart';
+import 'package:colla_chat/widgets/media/platform_media_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:record/record.dart';
 
@@ -139,9 +138,15 @@ class PlatformAudioRecorderController extends AbstractAudioRecorderController {
 class PlatformAudioRecorder extends StatefulWidget {
   late final AbstractAudioRecorderController controller;
   final void Function(String filename)? onStop;
+  final double width;
+  final double height;
 
   PlatformAudioRecorder(
-      {Key? key, AbstractAudioRecorderController? controller, this.onStop})
+      {Key? key,
+      AbstractAudioRecorderController? controller,
+      this.width = 150,
+      this.height = 48,
+      this.onStop})
       : super(key: key) {
     if (controller == null) {
       if (platformParams.ios ||
@@ -226,32 +231,52 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
 
   Widget _buildRecorderWidget(BuildContext context) {
     var controlText = AppLocalizations.t(widget.controller.durationText);
-    Icon icon;
+    Icon playIcon;
     if (widget.controller.status == RecorderStatus.recording) {
-      icon = const Icon(Icons.pause);
+      playIcon = const Icon(Icons.pause, size: 32);
     } else {
-      icon = const Icon(Icons.play_arrow);
+      playIcon = const Icon(Icons.play_arrow, size: 32);
     }
-    return Column(children: [
-      const Spacer(),
-      TextButton(
-        style: WidgetUtil.buildButtonStyle(
-          maximumSize: const Size(150.0, 36.0),
+    List<Widget> controls = [];
+    if (widget.controller.status == RecorderStatus.recording ||
+        widget.controller.status == RecorderStatus.pause) {
+      controls.add(
+        InkWell(
+          child: const Icon(Icons.stop, size: 32),
+          onTap: () async {
+            await _stop();
+          },
         ),
-        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          icon,
-          const SizedBox(
-            width: 15,
-          ),
-          Text(controlText),
-        ]),
-        onPressed: () async {
+      );
+      controls.add(
+        const SizedBox(
+          width: 15,
+        ),
+      );
+    }
+    controls.add(
+      InkWell(
+        child: playIcon,
+        onTap: () async {
           await _action();
         },
-        onLongPress: () async {
-          await _stop();
-        },
-      )
-    ]);
+      ),
+    );
+    controls.add(
+      const SizedBox(
+        width: 15,
+      ),
+    );
+    controls.add(
+      Text(controlText),
+    );
+    var container = Container(
+      width: widget.width,
+      height: widget.height,
+      color: Colors.grey,
+      child:
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: controls),
+    );
+    return Column(children: [const Spacer(), container]);
   }
 }

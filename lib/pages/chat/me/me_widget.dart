@@ -4,9 +4,9 @@ import 'package:colla_chat/pages/chat/me/settings/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/webrtc_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/widgets/audio/platform_audio_player_widget.dart';
-import 'package:colla_chat/widgets/audio/platform_audio_recorder_widget.dart';
-import 'package:colla_chat/widgets/video/platform_video_player_widget.dart';
+import 'package:colla_chat/widgets/media/audio/platform_audio_player_widget.dart';
+import 'package:colla_chat/widgets/media/audio/platform_audio_recorder_widget.dart';
+import 'package:colla_chat/widgets/media/video/platform_video_player_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../../../l10n/localization.dart';

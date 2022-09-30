@@ -1,13 +1,14 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'dart:ui' as ui;
 
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/common/media_player_slider.dart';
-import 'package:colla_chat/widgets/platform_media_controller.dart';
-import 'package:colla_chat/widgets/platform_media_controller.dart' as platform;
+import 'package:colla_chat/widgets/media/platform_media_controller.dart';
+import 'package:colla_chat/widgets/media/platform_media_controller.dart'
+    as platform;
+import 'package:colla_chat/widgets/media/platform_media_widget.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
@@ -370,7 +371,8 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
     );
   }
 
-  Widget buildVideoWidget({
+  @override
+  Widget buildMediaView({
     Key? key,
     Player? player,
     double? width,
@@ -524,152 +526,12 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
     super.initState();
   }
 
-  _isTablet() {
-    bool isTablet = false;
-    final double devicePixelRatio = ui.window.devicePixelRatio;
-    final double width = ui.window.physicalSize.width;
-    final double height = ui.window.physicalSize.height;
-    if (devicePixelRatio < 2 && (width >= 1000 || height >= 1000)) {
-      isTablet = true;
-    } else if (devicePixelRatio == 2 && (width >= 1920 || height >= 1920)) {
-      isTablet = true;
-    } else {
-      isTablet = false;
-    }
-
-    return isTablet;
-  }
-
-  _isPhone() {
-    bool isPhone = false;
-    final double devicePixelRatio = ui.window.devicePixelRatio;
-    final double width = ui.window.physicalSize.width;
-    final double height = ui.window.physicalSize.height;
-    if (devicePixelRatio < 2 && (width >= 1000 || height >= 1000)) {
-      isPhone = false;
-    } else if (devicePixelRatio == 2 && (width >= 1920 || height >= 1920)) {
-      isPhone = false;
-    } else {
-      isPhone = true;
-    }
-
-    return isPhone;
-  }
-
-  ///显示播放列表按钮
-  Widget _buildPlaylistVisibleButton(BuildContext context) {
-    return Ink(
-        child: InkWell(
-      child: playlistVisible
-          ? const Icon(Icons.visibility_off_rounded, size: 24)
-          : const Icon(Icons.visibility_rounded, size: 24),
-      onTap: () {
-        setState(() {
-          playlistVisible = !playlistVisible;
-        });
-      },
-    ));
-  }
-
-  Widget _buildVideoView({Color? color, double? height, double? width}) {
-    color = color ?? Colors.black.withOpacity(1);
-    Widget container = LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-      height = height ?? constraints.maxHeight;
-      width = width ?? constraints.maxWidth;
-      return Center(
-        child: Container(
-          margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-          width: width,
-          height: height,
-          decoration: BoxDecoration(color: color),
-          child: widget.controller.buildVideoWidget(
-            player: widget.controller.player,
-            height: height,
-            width: width,
-            fit: BoxFit.cover,
-            showControls: widget.showControls,
-          ),
-        ),
-      );
-    });
-    return container;
-  }
-
-  ///播放列表
-  Widget _buildPlaylist(BuildContext context) {
-    List<platform.MediaSource> playlist = widget.controller.playlist;
-    return Column(children: [
-      Card(
-        color: Colors.white.withOpacity(0.5),
-        elevation: 0,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              margin: const EdgeInsets.only(left: 16.0, top: 16.0),
-              alignment: Alignment.topLeft,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Ink(
-                    child: InkWell(
-                      child: const Icon(Icons.add),
-                      onTap: () async {
-                        List<String> filenames = await FileUtil.pickFiles();
-                        for (var filename in filenames) {
-                          await widget.controller.add(filename: filename);
-                        }
-                      },
-                    ),
-                  )
-                ],
-              ),
-            ),
-            SizedBox(
-              height: 150.0,
-              child: ReorderableListView(
-                shrinkWrap: true,
-                onReorder: (int initialIndex, int finalIndex) async {
-                  if (finalIndex > playlist.length) {
-                    finalIndex = playlist.length;
-                  }
-                  if (initialIndex < finalIndex) finalIndex--;
-                  widget.controller.move(initialIndex, finalIndex);
-                },
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                children: List.generate(
-                  playlist.length,
-                  (int index) {
-                    return ListTile(
-                      key: Key(index.toString()),
-                      leading: Text(
-                        index.toString(),
-                        style: const TextStyle(fontSize: 14.0),
-                      ),
-                      title: Text(
-                        playlist[index].filename,
-                        style: const TextStyle(fontSize: 14.0),
-                      ),
-                    );
-                  },
-                  growable: true,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-      const Spacer(),
-    ]);
-  }
-
   @override
   Widget build(BuildContext context) {
-    bool isTablet = _isTablet();
-    bool isPhone = _isPhone();
     List<Widget> controls = [];
-    controls.add(Expanded(child: _buildVideoView()));
+    controls.add(Expanded(
+        child:
+            PlatformMediaPlayer.buildMediaView(controller: widget.controller)));
     if (!widget.showControls) {
       Widget controllerPanel = PlatformVlcControllerPanel(
         controller: widget.controller,
@@ -679,7 +541,9 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
     }
     return Stack(children: [
       Column(children: controls),
-      Visibility(visible: playlistVisible, child: _buildPlaylist(context))
+      Visibility(
+          visible: playlistVisible,
+          child: PlatformMediaPlayer.buildPlaylist(context, widget.controller))
     ]);
   }
 }
@@ -722,7 +586,7 @@ class _PlatformVlcControllerPanelState
   }
 
   ///简单播放控制面板，包含音量，简单播放按钮，
-  Row _buildSimpleControlPanel(BuildContext buildContext) {
+  Widget _buildSimpleControlPanel(BuildContext buildContext) {
     return Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -731,8 +595,8 @@ class _PlatformVlcControllerPanelState
           StreamBuilder<GeneralState>(
             stream: widget.controller.player.generalStream,
             builder: (context, snapshot) {
-              var label = '${snapshot.data?.volume.toStringAsFixed(1)}';
-              return _buildVolumeButton(context, label: label);
+              return PlatformMediaPlayer.buildVolumeButton(
+                  context, widget.controller);
             },
           ),
           StreamBuilder<PlaybackState>(
@@ -775,60 +639,6 @@ class _PlatformVlcControllerPanelState
         ]);
   }
 
-  ///音量按钮
-  Widget _buildVolumeButton(BuildContext context, {String? label}) {
-    return FutureBuilder<double>(
-        future: widget.controller.getVolume(),
-        builder: (context, snapshot) {
-          return Ink(
-              child: InkWell(
-            child: Row(children: [
-              const Icon(Icons.volume_up_rounded, size: 24),
-              Text(label ?? '')
-            ]),
-            onTap: () {
-              MediaPlayerSliderUtil.showSliderDialog(
-                context: context,
-                title: "Adjust volume",
-                divisions: 10,
-                min: 0.0,
-                max: 1.0,
-                value: snapshot.data!,
-                stream: widget.controller.player.generalStream,
-                onChanged: widget.controller.setVolume,
-              );
-            },
-          ));
-        });
-  }
-
-  ///速度按钮
-  Widget _buildSpeedButton(BuildContext context, {String? label}) {
-    return FutureBuilder<double>(
-        future: widget.controller.getVolume(),
-        builder: (context, snapshot) {
-          return Ink(
-              child: InkWell(
-            child: Row(children: [
-              const Icon(Icons.speed_rounded, size: 24),
-              Text(label ?? '')
-            ]),
-            onTap: () {
-              MediaPlayerSliderUtil.showSliderDialog(
-                context: context,
-                title: "Adjust speed",
-                divisions: 10,
-                min: 0.5,
-                max: 1.5,
-                value: snapshot.data!,
-                stream: widget.controller.player.generalStream,
-                onChanged: widget.controller.setSpeed,
-              );
-            },
-          ));
-        });
-  }
-
   Widget _buildComplexControlPanel(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
@@ -836,11 +646,8 @@ class _PlatformVlcControllerPanelState
         StreamBuilder<GeneralState>(
           stream: widget.controller.player.generalStream,
           builder: (context, snapshot) {
-            var label = '1.0';
-            if (snapshot.data != null) {
-              label = '${snapshot.data?.volume.toStringAsFixed(1)}';
-            }
-            return _buildVolumeButton(context, label: label);
+            return PlatformMediaPlayer.buildVolumeButton(
+                context, widget.controller);
           },
         ),
         const SizedBox(
@@ -853,11 +660,8 @@ class _PlatformVlcControllerPanelState
         StreamBuilder<GeneralState>(
           stream: widget.controller.player.generalStream,
           builder: (context, snapshot) {
-            var label = '1.0';
-            if (snapshot.data != null) {
-              label = '${snapshot.data?.rate.toStringAsFixed(1)}';
-            }
-            return _buildSpeedButton(context, label: label);
+            return PlatformMediaPlayer.buildSpeedButton(
+                context, widget.controller);
           },
         ),
       ],
@@ -869,45 +673,8 @@ class _PlatformVlcControllerPanelState
     return StreamBuilder<PlaybackState>(
         stream: widget.controller.player.playbackStream,
         builder: (context, snapshot) {
-          PlaybackState? playerState = snapshot.data;
-          List<Widget> widgets = [];
-          widgets.add(Ink(
-              child: InkWell(
-            onTap: widget.controller.stop,
-            child: const Icon(Icons.stop_rounded, size: 36),
-          )));
-          widgets.add(Ink(
-              child: InkWell(
-            onTap: widget.controller.previous,
-            child: const Icon(Icons.skip_previous_rounded, size: 36),
-          )));
-          if (playerState == null || !playerState.isPlaying) {
-            widgets.add(Ink(
-                child: InkWell(
-              onTap: widget.controller.play,
-              child: const Icon(Icons.play_arrow_rounded, size: 36),
-            )));
-          } else if (playerState.isPlaying) {
-            widgets.add(Ink(
-                child: InkWell(
-              onTap: widget.controller.pause,
-              child: const Icon(Icons.pause, size: 36),
-            )));
-          } else {
-            widgets.add(Ink(
-                child: InkWell(
-              child: const Icon(Icons.replay_rounded, size: 24),
-              onTap: () => widget.controller.seek(Duration.zero),
-            )));
-          }
-          widgets.add(Ink(
-              child: InkWell(
-            onTap: widget.controller.next,
-            child: const Icon(Icons.skip_next_rounded, size: 36),
-          )));
-          return Row(
-            children: widgets,
-          );
+          return PlatformMediaPlayer.buildComplexPlayPanel(
+              context, widget.controller);
         });
   }
 

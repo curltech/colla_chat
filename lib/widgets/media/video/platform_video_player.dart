@@ -1,8 +1,9 @@
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/widgets/platform_media_controller.dart';
-import 'package:colla_chat/widgets/video/platform_flick_video_player.dart';
+import 'package:colla_chat/widgets/media/platform_media_controller.dart';
+import 'package:colla_chat/widgets/media/platform_media_widget.dart';
+import 'package:colla_chat/widgets/media/video/platform_flick_video_player.dart';
+import 'package:colla_chat/widgets/media/video/windows_vlc_video_player.dart';
 
-import 'package:colla_chat/widgets/video/windows_vlc_video_player.dart';
 //import 'package:colla_chat/widgets/video/platform_vlc_video_player.dart';
 import 'package:flutter/material.dart';
 
@@ -46,8 +47,8 @@ class _PlatformVideoPlayerState extends State<PlatformVideoPlayer> {
       );
       return player;
     } else {
-      var player = PlatformFlickVideoPlayer(
-          controller: widget.controller as FlickVideoPlayerController);
+      var player =
+          PlatformMediaPlayer.buildMediaPlayer(context, widget.controller);
       return player;
     }
   }

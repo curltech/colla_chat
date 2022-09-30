@@ -186,8 +186,18 @@ abstract class AbstractAudioRecorderController with ChangeNotifier {
 
 abstract class AbstractMediaPlayerController with ChangeNotifier {
   List<MediaSource> playlist = [];
+  bool _playlistVisible = false;
   int? _currentIndex;
   PlayerStatus _status = PlayerStatus.init;
+
+  bool get playlistVisible {
+    return _playlistVisible;
+  }
+
+  set playlistVisible(bool playlistVisible) {
+    _playlistVisible = playlistVisible;
+    notifyListeners();
+  }
 
   int? get currentIndex {
     return _currentIndex;
@@ -323,6 +333,8 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
       }
     }
   }
+
+  Widget buildMediaView();
 
   ///异步产生波形图形组件
   Future<StreamBuilder<WaveformProgress>> buildWaveformProgress(

@@ -4,7 +4,9 @@ import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/common/media_player_slider.dart';
-import 'package:colla_chat/widgets/platform_media_controller.dart';
+import 'package:colla_chat/widgets/media/platform_media_controller.dart';
+import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/src/widgets/framework.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:record/record.dart';
@@ -192,7 +194,7 @@ class JustAudioPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  Future<double> getVolume() {
+  Future<double> getVolume() async {
     return Future.value(player.volume);
   }
 
@@ -202,7 +204,7 @@ class JustAudioPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  Future<double> getSpeed() {
+  Future<double> getSpeed() async {
     return Future.value(player.speed);
   }
 
@@ -224,6 +226,11 @@ class JustAudioPlayerController extends AbstractMediaPlayerController {
 
   @override
   close() {}
+
+  @override
+  Widget buildMediaView() {
+    return Container();
+  }
 }
 
 ///支持多种设备，windows测试通过
