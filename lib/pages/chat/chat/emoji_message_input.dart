@@ -11,7 +11,7 @@ class EmojiMessageInputWidget extends StatefulWidget {
   final Function(String text)? onTap;
   final double height;
 
-  EmojiMessageInputWidget({
+  const EmojiMessageInputWidget({
     Key? key,
     required this.onTap,
     this.height = 0,
@@ -67,7 +67,7 @@ class _EmojiMessageInputWidgetState extends State<EmojiMessageInputWidget> {
         height: widget.height,
         child: EmojiPicker(
             textEditingController: TextEditingController(),
-            onEmojiSelected: (Category category, Emoji emoji) {
+            onEmojiSelected: (Category? category, Emoji emoji) {
               if (widget.onTap != null) {
                 widget.onTap!(emoji.emoji);
               }
@@ -83,7 +83,6 @@ class _EmojiMessageInputWidgetState extends State<EmojiMessageInputWidget> {
                 indicatorColor: primary,
                 iconColor: Colors.grey,
                 iconColorSelected: primary,
-                progressIndicatorColor: primary,
                 backspaceColor: primary,
                 skinToneDialogBgColor: Colors.white.withOpacity(0.0),
                 skinToneIndicatorColor: Colors.grey,

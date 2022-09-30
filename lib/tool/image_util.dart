@@ -102,12 +102,13 @@ class ImageUtil {
         cropAspectRatio: 1);
   }
 
-  buildExtendedImage(File file) {
-    return ExtendedImage.file(
-      file,
-      width: 600,
-      height: 400,
-      fit: BoxFit.fill,
-    );
-  }
+  ///web编译失败
+  // buildExtendedImage(File file) {
+  //   return ExtendedImage.file(
+  //     file,
+  //     width: 600,
+  //     height: 400,
+  //     fit: BoxFit.fill,
+  //   );
+  // }
 }

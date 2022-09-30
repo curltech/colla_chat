@@ -195,6 +195,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
 
   ///设置当前的通用MediaSource，子类转换成特定实现的媒体源，并进行设置
   setCurrentIndex(int? index) {
+    close();
     if (index != _currentIndex) {
       _currentIndex = index;
     }

@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
 
 class PositionData {
@@ -33,10 +32,11 @@ class MediaPlayerSliderUtil {
             var label = '1.0';
             if (snapshot.data != null) {
               var data = snapshot.data;
-              if (data is GeneralState) {
-                GeneralState generalState = data;
-                label = '${generalState.volume.toStringAsFixed(1)}$suffix';
-              } else if (data is double) {
+              // if (data is GeneralState) {
+              //   GeneralState generalState = data;
+              //   label = '${generalState.volume.toStringAsFixed(1)}$suffix';
+              // }
+              if (data is double) {
                 label = '${data.toStringAsFixed(1)}$suffix';
               }
             }
