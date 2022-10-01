@@ -20,6 +20,7 @@ enum PlayerStatus { init, buffering, pause, playing, stop, completed }
 enum MediaFormat {
   wav,
   mp3,
+  m4a,
   mp4,
   mov,
 }
@@ -50,7 +51,7 @@ class PlatformMediaSource {
     if (filename != null) {
       if (mediaFormat == null) {
         int pos = filename.lastIndexOf('.');
-        String extension = filename.substring(pos);
+        String extension = filename.substring(pos + 1);
         mediaFormat = StringUtil.enumFromString(MediaFormat.values, extension);
       }
       if (filename.startsWith('assets/')) {
@@ -186,7 +187,9 @@ abstract class AbstractAudioRecorderController with ChangeNotifier {
 
 abstract class AbstractMediaPlayerController with ChangeNotifier {
   List<MediaSource> playlist = [];
-  bool _playlistVisible = false;
+  bool _playlistVisible = true;
+  bool _speedSlideVisible = false;
+  bool _volumeSlideVisible = false;
   int? _currentIndex;
   PlayerStatus _status = PlayerStatus.init;
 
@@ -196,6 +199,30 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
 
   set playlistVisible(bool playlistVisible) {
     _playlistVisible = playlistVisible;
+    notifyListeners();
+  }
+
+  bool get volumeSlideVisible {
+    return _volumeSlideVisible;
+  }
+
+  set volumeSlideVisible(bool volumeSlideVisible) {
+    _volumeSlideVisible = volumeSlideVisible;
+    if (_volumeSlideVisible) {
+      _speedSlideVisible = false;
+    }
+    notifyListeners();
+  }
+
+  bool get speedSlideVisible {
+    return _speedSlideVisible;
+  }
+
+  set speedSlideVisible(bool speedSlideVisible) {
+    _speedSlideVisible = speedSlideVisible;
+    if (_speedSlideVisible) {
+      _volumeSlideVisible = false;
+    }
     notifyListeners();
   }
 
@@ -209,6 +236,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     if (index != _currentIndex) {
       _currentIndex = index;
     }
+    notifyListeners();
   }
 
   MediaSource? get currentMediaSource {

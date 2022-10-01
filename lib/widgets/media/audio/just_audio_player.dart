@@ -20,10 +20,10 @@ class JustAudioPlayer extends StatefulWidget {
   }
 
   @override
-  JustAudioPlayerState createState() => JustAudioPlayerState();
+  State createState() => _JustAudioPlayerState();
 }
 
-class JustAudioPlayerState extends State<JustAudioPlayer>
+class _JustAudioPlayerState extends State<JustAudioPlayer>
     with WidgetsBindingObserver {
   @override
   void initState() {
@@ -54,16 +54,6 @@ class JustAudioPlayerState extends State<JustAudioPlayer>
     WidgetsBinding.instance!.removeObserver(this);
     widget.controller.removeListener(_update);
     super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.paused) {
-      // Release the player's resources when not in use. We use "stop" so that
-      // if the app resumes later, it will still remember what position to
-      // resume from.
-      widget.controller.stop();
-    }
   }
 
   ///简单控制器面板，包含简单播放面板和进度条
@@ -101,7 +91,7 @@ class JustAudioPlayerState extends State<JustAudioPlayer>
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        PlatformMediaPlayer.buildPlaylist(context, widget.controller),
+        PlatformMediaPlayerWidget.buildPlaylist(context, widget.controller),
         _buildPlayerSlider(context),
         // Display play/pause button and volume/speed sliders.
         _buildComplexControlPanel(context),
@@ -118,7 +108,7 @@ class JustAudioPlayerState extends State<JustAudioPlayer>
   }
 
   ///简单播放控制面板，包含音量，简单播放按钮，
-  Row _buildSimpleControlPanel(BuildContext context) {
+  Widget _buildSimpleControlPanel(BuildContext context) {
     return Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -127,7 +117,7 @@ class JustAudioPlayerState extends State<JustAudioPlayer>
           StreamBuilder<double>(
             stream: widget.controller.player.volumeStream,
             builder: (context, snapshot) {
-              return PlatformMediaPlayer.buildVolumeButton(
+              return PlatformMediaPlayerWidget.buildVolumeButton(
                   context, widget.controller);
             },
           ),
@@ -145,7 +135,7 @@ class JustAudioPlayerState extends State<JustAudioPlayer>
                     child: const CircularProgressIndicator(),
                   );
                 } else {
-                  return PlatformMediaPlayer.buildSimpleControlPanel(
+                  return PlatformMediaPlayerWidget.buildSimpleControlPanel(
                       context, widget.controller);
                 }
               }),
@@ -160,7 +150,7 @@ class JustAudioPlayerState extends State<JustAudioPlayer>
         StreamBuilder<double>(
           stream: widget.controller.player.volumeStream,
           builder: (context, snapshot) {
-            return PlatformMediaPlayer.buildVolumeButton(
+            return PlatformMediaPlayerWidget.buildVolumeButton(
                 context, widget.controller);
           },
         ),
@@ -174,7 +164,7 @@ class JustAudioPlayerState extends State<JustAudioPlayer>
         StreamBuilder<double>(
           stream: widget.controller.player.speedStream,
           builder: (context, snapshot) {
-            return PlatformMediaPlayer.buildSpeedButton(
+            return PlatformMediaPlayerWidget.buildSpeedButton(
                 context, widget.controller);
           },
         ),
@@ -198,7 +188,7 @@ class JustAudioPlayerState extends State<JustAudioPlayer>
               child: const CircularProgressIndicator(),
             );
           } else {
-            return PlatformMediaPlayer.buildComplexPlayPanel(
+            return PlatformMediaPlayerWidget.buildComplexPlayPanel(
                 context, widget.controller);
           }
         });

@@ -1,43 +1,52 @@
-import 'dart:ui' as ui;
-
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/common/media_player_slider.dart';
 import 'package:colla_chat/widgets/media/platform_media_controller.dart';
+import 'package:colla_chat/widgets/media/platform_media_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-class PlatformMediaPlayerWidget {
-  static SliderThemeData buildSliderTheme(BuildContext context) {
-    return SliderTheme.of(context).copyWith(
-        trackShape: null,
-        //轨道的形状
-        trackHeight: 2,
-        //trackHeight：滑轨的高度
+class PlatformMediaPlayer extends StatefulWidget {
+  final AbstractMediaPlayerController controller;
+  final bool simple;
+  final bool showControls;
+  final Color? color;
+  final double? height;
+  final double? width;
 
-        //activeTrackColor: Colors.blue,
-        //已滑过轨道的颜色
-        //inactiveTrackColor: Colors.greenAccent,
-        //未滑过轨道的颜色
+  const PlatformMediaPlayer(
+      {Key? key,
+      this.simple = false,
+      required this.controller,
+      this.showControls = true,
+      this.color,
+      this.width,
+      this.height})
+      : super(key: key);
 
-        //thumbColor: Colors.red,
-        //滑块中心的颜色（小圆头的颜色）
-        //overlayColor: Colors.greenAccent,
-        //滑块边缘的颜色
+  @override
+  State createState() => _PlatformMediaPlayerState();
+}
 
-        thumbShape: const RoundSliderThumbShape(
-          //可继承SliderComponentShape自定义形状
-          disabledThumbRadius: 15, //禁用时滑块大小
-          enabledThumbRadius: 6, //滑块大小
-        ),
-        overlayShape: const RoundSliderOverlayShape(
-          //可继承SliderComponentShape自定义形状
-          overlayRadius: 14, //滑块外圈大小
-        ));
+class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_update);
+  }
+
+  _update() {
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_update);
+    super.dispose();
   }
 
   ///显示播放列表按钮
-  static Widget buildPlaylistVisibleButton(
-      BuildContext context, AbstractMediaPlayerController controller) {
+  Widget _buildPlaylistVisibleButton(BuildContext context) {
+    AbstractMediaPlayerController controller = widget.controller;
     return Ink(
         child: InkWell(
       child: controller.playlistVisible
@@ -51,8 +60,8 @@ class PlatformMediaPlayerWidget {
   }
 
   ///播放列表
-  static Widget buildPlaylist(
-      BuildContext context, AbstractMediaPlayerController controller) {
+  Widget _buildPlaylist(BuildContext context) {
+    AbstractMediaPlayerController controller = widget.controller;
     List<MediaSource> playlist = controller.playlist;
     return Column(children: [
       Card(
@@ -119,7 +128,7 @@ class PlatformMediaPlayerWidget {
     ]);
   }
 
-  static Widget buildMediaView(
+  Widget _buildMediaView(
       {required AbstractMediaPlayerController controller,
       Color? color,
       double? height,
@@ -142,7 +151,7 @@ class PlatformMediaPlayerWidget {
     return container;
   }
 
-  static Widget buildSliderWidget({
+  Widget _buildSliderWidget({
     required BuildContext context,
     required int divisions,
     required double min,
@@ -150,7 +159,7 @@ class PlatformMediaPlayerWidget {
     required double value,
     required ValueChanged<double> onChanged,
   }) {
-    var sliderThemeData = buildSliderTheme(context);
+    var sliderThemeData = PlatformMediaPlayerWidget.buildSliderTheme(context);
     return SizedBox(
       width: 100.0,
       child: RotatedBox(
@@ -168,8 +177,8 @@ class PlatformMediaPlayerWidget {
   }
 
   ///音量按钮
-  static Widget buildVolumeButton(
-      BuildContext context, AbstractMediaPlayerController controller) {
+  Widget _buildVolumeButton(BuildContext context) {
+    AbstractMediaPlayerController controller = widget.controller;
     return FutureBuilder<double>(
         future: controller.getVolume(),
         builder: (context, snapshot) {
@@ -188,7 +197,7 @@ class PlatformMediaPlayerWidget {
             Text(snapshot.data!.toStringAsFixed(1)),
             Visibility(
                 visible: controller.volumeSlideVisible,
-                child: buildSliderWidget(
+                child: _buildSliderWidget(
                   context: context,
                   divisions: 10,
                   min: 0.0,
@@ -201,8 +210,8 @@ class PlatformMediaPlayerWidget {
   }
 
   ///速度按钮
-  static Widget buildSpeedButton(
-      BuildContext context, AbstractMediaPlayerController controller) {
+  Widget _buildSpeedButton(BuildContext context) {
+    AbstractMediaPlayerController controller = widget.controller;
     return FutureBuilder<double>(
         future: controller.getSpeed(),
         builder: (context, snapshot) {
@@ -221,7 +230,7 @@ class PlatformMediaPlayerWidget {
             Text(snapshot.data!.toStringAsFixed(1)),
             Visibility(
                 visible: controller.speedSlideVisible,
-                child: buildSliderWidget(
+                child: _buildSliderWidget(
                   context: context,
                   divisions: 10,
                   min: 0.5,
@@ -234,8 +243,8 @@ class PlatformMediaPlayerWidget {
   }
 
   ///简单播放控制面板，包含音量，简单播放按钮，
-  static Widget buildSimpleControlPanel(
-      BuildContext context, AbstractMediaPlayerController controller) {
+  Widget _buildSimpleControlPanel(BuildContext context) {
+    AbstractMediaPlayerController controller = widget.controller;
     PlayerStatus status = controller.status;
     List<Widget> widgets = [];
 
@@ -265,32 +274,31 @@ class PlatformMediaPlayerWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
         children: [
-          buildVolumeButton(context, controller),
+          _buildVolumeButton(context),
           Row(children: widgets),
         ]);
   }
 
-  static Widget buildComplexControlPanel(
-      BuildContext context, AbstractMediaPlayerController controller) {
+  Widget _buildComplexControlPanel(BuildContext context) {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        buildVolumeButton(context, controller),
+        _buildVolumeButton(context),
         // const SizedBox(
         //   width: 25,
         // ),
-        buildComplexPlayPanel(context, controller),
+        _buildComplexPlayPanel(context),
         // const SizedBox(
         //   width: 25,
         // ),
-        buildSpeedButton(context, controller),
+        _buildSpeedButton(context),
       ],
     );
   }
 
   ///复杂播放按钮面板
-  static Widget buildComplexPlayPanel(
-      BuildContext context, AbstractMediaPlayerController controller) {
+  Widget _buildComplexPlayPanel(BuildContext context) {
+    AbstractMediaPlayerController controller = widget.controller;
     PlayerStatus status = controller.status;
     List<Widget> widgets = [];
     widgets.add(Ink(
@@ -335,8 +343,8 @@ class PlatformMediaPlayerWidget {
     );
   }
 
-  static Future<PositionData> getPositionState(
-      BuildContext context, AbstractMediaPlayerController controller) async {
+  Future<PositionData> _getPositionState(BuildContext context) async {
+    AbstractMediaPlayerController controller = widget.controller;
     var duration = await controller.getDuration();
     duration = duration ?? Duration.zero;
     var position = await controller.getPosition();
@@ -345,16 +353,16 @@ class PlatformMediaPlayerWidget {
   }
 
   ///播放进度条
-  static Widget buildPlayerSlider(
-      BuildContext context, AbstractMediaPlayerController controller) {
+  Widget _buildPlayerSlider(BuildContext context) {
+    AbstractMediaPlayerController controller = widget.controller;
     return FutureBuilder<PositionData>(
-      future: getPositionState(context, controller),
+      future: _getPositionState(context),
       builder: (context, snapshot) {
         PositionData? positionData = snapshot.data;
         if (positionData != null) {
           return MediaPlayerSlider(
-            duration: positionData!.duration,
-            position: positionData!.position,
+            duration: positionData.duration,
+            position: positionData.position,
             bufferedPosition: positionData.bufferedPosition,
             onChangeEnd: controller.seek,
           );
@@ -365,7 +373,7 @@ class PlatformMediaPlayerWidget {
     );
   }
 
-  static Container _buildProgressIndicator() {
+  Container _buildProgressIndicator() {
     return Container(
       margin: const EdgeInsets.all(8.0),
       width: 24.0,
@@ -375,41 +383,32 @@ class PlatformMediaPlayerWidget {
   }
 
   ///复杂控制器按钮面板，包含音量，速度和播放按钮
-  static Widget buildComplexControllerPanel(
-      BuildContext context, AbstractMediaPlayerController controller) {
+  Widget _buildComplexControllerPanel(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        buildPlayerSlider(context, controller),
-        buildComplexControlPanel(context, controller),
+        _buildPlayerSlider(context),
+        _buildComplexControlPanel(context),
       ],
     );
   }
 
   ///简单控制器面板，包含简单播放面板和进度条
-  static Widget buildSimpleControllerPanel(
-      BuildContext context, AbstractMediaPlayerController controller) {
+  Widget _buildSimpleControllerPanel(BuildContext context) {
     return Center(
         child: Row(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        buildSimpleControlPanel(context, controller),
-        buildPlayerSlider(context, controller),
+        _buildSimpleControlPanel(context),
+        _buildPlayerSlider(context),
       ],
     ));
   }
 
-  static Widget buildMediaPlayer(
-    BuildContext context,
-    AbstractMediaPlayerController controller, {
-    bool simple = false,
-    bool showControls = true,
-    Color? color,
-    double? height,
-    double? width,
-  }) {
+  Widget _buildMediaPlayer(BuildContext context) {
+    AbstractMediaPlayerController controller = widget.controller;
     List<Widget> controls = [];
     var view = VisibilityDetector(
       key: ObjectKey(controller),
@@ -418,58 +417,31 @@ class PlatformMediaPlayerWidget {
           controller.play();
         }
       },
-      child: buildMediaView(
-          controller: controller, color: color, width: width, height: height),
+      child: _buildMediaView(
+          controller: controller,
+          color: widget.color,
+          width: widget.width,
+          height: widget.height),
     );
     controls.add(Expanded(child: view));
-    if (!showControls) {
+    if (!widget.showControls) {
       Widget controllerPanel;
-      if (simple) {
-        controllerPanel =
-            PlatformMediaPlayerWidget.buildSimpleControllerPanel(context, controller);
+      if (widget.simple) {
+        controllerPanel = _buildSimpleControllerPanel(context);
       } else {
-        controllerPanel = PlatformMediaPlayerWidget.buildComplexControllerPanel(
-            context, controller);
+        controllerPanel = _buildComplexControllerPanel(context);
       }
       controls.add(controllerPanel);
     }
     return Stack(children: [
       Column(children: controls),
       Visibility(
-          visible: controller.playlistVisible,
-          child: PlatformMediaPlayerWidget.buildPlaylist(context, controller))
+          visible: controller.playlistVisible, child: _buildPlaylist(context))
     ]);
   }
 
-  static bool isTablet() {
-    bool isTablet = false;
-    final double devicePixelRatio = ui.window.devicePixelRatio;
-    final double width = ui.window.physicalSize.width;
-    final double height = ui.window.physicalSize.height;
-    if (devicePixelRatio < 2 && (width >= 1000 || height >= 1000)) {
-      isTablet = true;
-    } else if (devicePixelRatio == 2 && (width >= 1920 || height >= 1920)) {
-      isTablet = true;
-    } else {
-      isTablet = false;
-    }
-
-    return isTablet;
-  }
-
-  static bool isPhone() {
-    bool isPhone = false;
-    final double devicePixelRatio = ui.window.devicePixelRatio;
-    final double width = ui.window.physicalSize.width;
-    final double height = ui.window.physicalSize.height;
-    if (devicePixelRatio < 2 && (width >= 1000 || height >= 1000)) {
-      isPhone = false;
-    } else if (devicePixelRatio == 2 && (width >= 1920 || height >= 1920)) {
-      isPhone = false;
-    } else {
-      isPhone = true;
-    }
-
-    return isPhone;
+  @override
+  Widget build(BuildContext context) {
+    return _buildMediaPlayer(context);
   }
 }

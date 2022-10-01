@@ -3,7 +3,7 @@ import 'package:colla_chat/widgets/media/audio/blue_fire_audio_player_controller
 import 'package:colla_chat/widgets/media/audio/just_audio_player.dart';
 import 'package:colla_chat/widgets/media/audio/just_audio_player_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_controller.dart';
-import 'package:colla_chat/widgets/media/platform_media_widget.dart';
+import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:flutter/material.dart';
 
 ///平台标准的audio-player的实现，
@@ -32,10 +32,16 @@ class _PlatformAudioPlayerState extends State<PlatformAudioPlayer> {
   @override
   void initState() {
     super.initState();
+    widget.controller.addListener(_update);
+  }
+
+  _update() {
+    setState(() {});
   }
 
   @override
   void dispose() {
+    widget.controller.removeListener(_update);
     super.dispose();
   }
 
@@ -46,8 +52,8 @@ class _PlatformAudioPlayerState extends State<PlatformAudioPlayer> {
           controller: widget.controller as JustAudioPlayerController);
       return player;
     } else {
-      var player = PlatformMediaPlayer.buildMediaPlayer(
-          context, widget.controller);
+      var player = PlatformMediaPlayer(
+          controller: widget.controller, showControls: false);
       return player;
     }
   }

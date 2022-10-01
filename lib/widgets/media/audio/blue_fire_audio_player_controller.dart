@@ -36,6 +36,8 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
   late AudioPlayer player;
   Duration? duration;
   Duration? position;
+  double volume = 1.0;
+  double speed = 1.0;
 
   StreamSubscription? _durationSubscription;
   StreamSubscription? _positionSubscription;
@@ -49,11 +51,12 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
 
   void _initStreams() {
     _durationSubscription = player.onDurationChanged.listen((duration) {
-      duration = duration;
+      this.duration = duration;
     });
 
-    _positionSubscription = player.onPositionChanged.listen((p) {
-      position = p;
+    _positionSubscription = player.onPositionChanged.listen((position) {
+      this.position = position;
+      notifyListeners();
     });
 
     _playerCompleteSubscription = player.onPlayerComplete.listen((event) {
@@ -61,7 +64,32 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
     });
 
     _playerStateChangeSubscription =
-        player.onPlayerStateChanged.listen((state) {});
+        player.onPlayerStateChanged.listen((state) {
+      if (state == PlayerState.completed) {
+        status = PlayerStatus.completed;
+      } else if (state == PlayerState.playing) {
+        status = PlayerStatus.playing;
+      } else if (state == PlayerState.paused) {
+        status = PlayerStatus.pause;
+      } else if (state == PlayerState.stopped) {
+        status = PlayerStatus.stop;
+      }
+    });
+  }
+
+  @override
+  PlayerStatus get status {
+    PlayerState state = player.state;
+    if (state == PlayerState.completed) {
+      return PlayerStatus.completed;
+    } else if (state == PlayerState.playing) {
+      return PlayerStatus.playing;
+    } else if (state == PlayerState.paused) {
+      return PlayerStatus.pause;
+    } else if (state == PlayerState.stopped) {
+      return PlayerStatus.stop;
+    }
+    return super.status;
   }
 
   @override
@@ -72,6 +100,8 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
         Source source = BlueFireAudioSource.fromMediaSource(currentMediaSource);
         try {
           await player.play(source);
+          playlistVisible = false;
+          status = PlayerStatus.playing;
           notifyListeners();
         } catch (e) {
           logger.e('$e');
@@ -83,22 +113,30 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
   @override
   pause() async {
     await player.pause();
+    status = PlayerStatus.pause;
+    notifyListeners();
   }
 
   @override
   stop() async {
     await player.stop();
+    status = PlayerStatus.stop;
+    playlistVisible = true;
   }
 
   @override
   resume() async {
     await player.resume();
+    status = PlayerStatus.playing;
+    notifyListeners();
   }
 
   @override
   dispose() async {
     super.dispose();
     await player.release();
+    status = PlayerStatus.init;
+    playlistVisible = true;
   }
 
   @override
@@ -123,23 +161,31 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  Future<double> getVolume() {
-    return Future.value(1);
+  Future<double> getVolume() async {
+    return Future.value(volume);
   }
 
   @override
   setVolume(double volume) async {
     await player.setVolume(volume);
+    if (volume != this.volume) {
+      this.volume = volume;
+      notifyListeners();
+    }
   }
 
   @override
-  Future<double> getSpeed() {
-    return Future.value(1);
+  Future<double> getSpeed() async {
+    return Future.value(speed);
   }
 
   @override
   setSpeed(double speed) async {
-    await player.setPlaybackRate(speed); // half speed
+    await player.setPlaybackRate(speed);
+    if (speed != this.speed) {
+      this.speed = speed;
+      notifyListeners();
+    }
   }
 
   setPlayerMode(PlayerMode playerMode) async {
@@ -148,10 +194,6 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
 
   setReleaseMode(ReleaseMode releaseMode) async {
     await player.setReleaseMode(releaseMode); // half speed
-  }
-
-  PlayerState get state {
-    return player.state;
   }
 
   setGlobalAudioContext(AudioContext ctx) async {

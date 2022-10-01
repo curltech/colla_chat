@@ -531,7 +531,7 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
     List<Widget> controls = [];
     controls.add(Expanded(
         child:
-            PlatformMediaPlayer.buildMediaView(controller: widget.controller)));
+            PlatformMediaPlayerWidget.buildMediaView(controller: widget.controller)));
     if (!widget.showControls) {
       Widget controllerPanel = PlatformVlcControllerPanel(
         controller: widget.controller,
@@ -543,7 +543,7 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
       Column(children: controls),
       Visibility(
           visible: playlistVisible,
-          child: PlatformMediaPlayer.buildPlaylist(context, widget.controller))
+          child: PlatformMediaPlayerWidget.buildPlaylist(context, widget.controller))
     ]);
   }
 }
@@ -595,7 +595,7 @@ class _PlatformVlcControllerPanelState
           StreamBuilder<GeneralState>(
             stream: widget.controller.player.generalStream,
             builder: (context, snapshot) {
-              return PlatformMediaPlayer.buildVolumeButton(
+              return PlatformMediaPlayerWidget.buildVolumeButton(
                   context, widget.controller);
             },
           ),
@@ -646,7 +646,7 @@ class _PlatformVlcControllerPanelState
         StreamBuilder<GeneralState>(
           stream: widget.controller.player.generalStream,
           builder: (context, snapshot) {
-            return PlatformMediaPlayer.buildVolumeButton(
+            return PlatformMediaPlayerWidget.buildVolumeButton(
                 context, widget.controller);
           },
         ),
@@ -660,7 +660,7 @@ class _PlatformVlcControllerPanelState
         StreamBuilder<GeneralState>(
           stream: widget.controller.player.generalStream,
           builder: (context, snapshot) {
-            return PlatformMediaPlayer.buildSpeedButton(
+            return PlatformMediaPlayerWidget.buildSpeedButton(
                 context, widget.controller);
           },
         ),
@@ -673,7 +673,7 @@ class _PlatformVlcControllerPanelState
     return StreamBuilder<PlaybackState>(
         stream: widget.controller.player.playbackStream,
         builder: (context, snapshot) {
-          return PlatformMediaPlayer.buildComplexPlayPanel(
+          return PlatformMediaPlayerWidget.buildComplexPlayPanel(
               context, widget.controller);
         });
   }

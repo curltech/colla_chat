@@ -8,11 +8,9 @@
       <module name="android.audio_waveforms" target="17" />
       <module name="android.audioplayers_android" target="17" />
       <module name="android.barcode_scan2" target="17" />
-      <module name="android.battery_plus" target="17" />
       <module name="android.camera_android" target="17" />
       <module name="android.connectivity_plus" target="17" />
       <module name="android.device_info_plus" target="17" />
-      <module name="android.emoji_picker_flutter" target="17" />
       <module name="android.file_picker" target="17" />
       <module name="android.file_saver" target="17" />
       <module name="android.flutter_background" target="17" />
@@ -32,7 +30,6 @@
       <module name="android.image_picker_android" target="17" />
       <module name="android.just_audio" target="17" />
       <module name="android.just_waveform" target="17" />
-      <module name="android.local_auth_android" target="17" />
       <module name="android.mobile_number" target="17" />
       <module name="android.network_info_plus" target="17" />
       <module name="android.onesignal_flutter" target="17" />
@@ -59,7 +56,10 @@
       <module name="android.video_thumbnail" target="17" />
       <module name="android.wakelock" target="17" />
       <module name="android.webcrypto" target="17" />
-      <module name="android.webview_flutter_android" target="17" />
+      <module name="com.fintasys.emoji_picker_flutter.android.emoji_picker_flutter" target="17" />
+      <module name="dev.fluttercommunity.plus.battery.android.battery_plus" target="17" />
+      <module name="io.flutter.plugins.localauth.android.local_auth_android" target="17" />
+      <module name="io.flutter.plugins.webviewflutter.android.webview_flutter_android" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>

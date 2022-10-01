@@ -32,10 +32,16 @@ class _PlatformVideoPlayerState extends State<PlatformVideoPlayer> {
   @override
   void initState() {
     super.initState();
+    widget.controller.addListener(_update);
+  }
+
+  _update() {
+    setState(() {});
   }
 
   @override
   void dispose() {
+    widget.controller.removeListener(_update);
     super.dispose();
   }
 
@@ -48,7 +54,7 @@ class _PlatformVideoPlayerState extends State<PlatformVideoPlayer> {
       return player;
     } else {
       var player =
-          PlatformMediaPlayer.buildMediaPlayer(context, widget.controller);
+          PlatformMediaPlayerWidget.buildMediaPlayer(context, widget.controller);
       return player;
     }
   }

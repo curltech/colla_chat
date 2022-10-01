@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:colla_chat/widgets/media/platform_media_widget.dart';
 import 'package:flutter/material.dart';
 
 class PositionData {
@@ -10,9 +11,7 @@ class PositionData {
   PositionData(this.position, this.bufferedPosition, this.duration);
 }
 
-class MediaPlayerSliderUtil {
-
-}
+class MediaPlayerSliderUtil {}
 
 class MediaPlayerSlider extends StatefulWidget {
   final Duration duration;
@@ -44,31 +43,7 @@ class MediaPlayerSliderState extends State<MediaPlayerSlider> {
 
   @override
   Widget build(BuildContext context) {
-    var sliderThemeData = SliderTheme.of(context).copyWith(
-        trackShape: null,
-        //轨道的形状
-        trackHeight: 2,
-        //trackHeight：滑轨的高度
-
-        //activeTrackColor: Colors.blue,
-        //已滑过轨道的颜色
-        //inactiveTrackColor: Colors.greenAccent,
-        //未滑过轨道的颜色
-
-        //thumbColor: Colors.red,
-        //滑块中心的颜色（小圆头的颜色）
-        //overlayColor: Colors.greenAccent,
-        //滑块边缘的颜色
-
-        thumbShape: const RoundSliderThumbShape(
-          //可继承SliderComponentShape自定义形状
-          disabledThumbRadius: 15, //禁用时滑块大小
-          enabledThumbRadius: 6, //滑块大小
-        ),
-        overlayShape: const RoundSliderOverlayShape(
-          //可继承SliderComponentShape自定义形状
-          overlayRadius: 14, //滑块外圈大小
-        ));
+    var sliderThemeData = PlatformMediaPlayerWidget.buildSliderTheme(context);
     return Row(
       children: [
         const SizedBox(
