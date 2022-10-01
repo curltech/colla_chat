@@ -91,7 +91,7 @@ class _JustAudioPlayerState extends State<JustAudioPlayer>
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        PlatformMediaPlayerWidget.buildPlaylist(context, widget.controller),
+        PlatformMediaPlayerUtil.buildPlaylist(context, widget.controller),
         _buildPlayerSlider(context),
         // Display play/pause button and volume/speed sliders.
         _buildComplexControlPanel(context),
@@ -117,7 +117,7 @@ class _JustAudioPlayerState extends State<JustAudioPlayer>
           StreamBuilder<double>(
             stream: widget.controller.player.volumeStream,
             builder: (context, snapshot) {
-              return PlatformMediaPlayerWidget.buildVolumeButton(
+              return PlatformMediaPlayerUtil.buildVolumeButton(
                   context, widget.controller);
             },
           ),
@@ -135,7 +135,7 @@ class _JustAudioPlayerState extends State<JustAudioPlayer>
                     child: const CircularProgressIndicator(),
                   );
                 } else {
-                  return PlatformMediaPlayerWidget.buildSimpleControlPanel(
+                  return PlatformMediaPlayerUtil.buildSimpleControlPanel(
                       context, widget.controller);
                 }
               }),
@@ -150,7 +150,7 @@ class _JustAudioPlayerState extends State<JustAudioPlayer>
         StreamBuilder<double>(
           stream: widget.controller.player.volumeStream,
           builder: (context, snapshot) {
-            return PlatformMediaPlayerWidget.buildVolumeButton(
+            return PlatformMediaPlayerUtil.buildVolumeButton(
                 context, widget.controller);
           },
         ),
@@ -164,7 +164,7 @@ class _JustAudioPlayerState extends State<JustAudioPlayer>
         StreamBuilder<double>(
           stream: widget.controller.player.speedStream,
           builder: (context, snapshot) {
-            return PlatformMediaPlayerWidget.buildSpeedButton(
+            return PlatformMediaPlayerUtil.buildSpeedButton(
                 context, widget.controller);
           },
         ),
@@ -188,7 +188,7 @@ class _JustAudioPlayerState extends State<JustAudioPlayer>
               child: const CircularProgressIndicator(),
             );
           } else {
-            return PlatformMediaPlayerWidget.buildComplexPlayPanel(
+            return PlatformMediaPlayerUtil.buildComplexPlayPanel(
                 context, widget.controller);
           }
         });

@@ -1,10 +1,8 @@
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/media/platform_media_controller.dart';
-import 'package:colla_chat/widgets/media/platform_media_widget.dart';
+import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:colla_chat/widgets/media/video/platform_flick_video_player.dart';
 import 'package:colla_chat/widgets/media/video/windows_vlc_video_player.dart';
-
-//import 'package:colla_chat/widgets/video/platform_vlc_video_player.dart';
 import 'package:flutter/material.dart';
 
 ///平台标准的video-player的实现，移动采用flick，桌面采用vlc
@@ -53,8 +51,7 @@ class _PlatformVideoPlayerState extends State<PlatformVideoPlayer> {
       );
       return player;
     } else {
-      var player =
-          PlatformMediaPlayerWidget.buildMediaPlayer(context, widget.controller);
+      var player = PlatformMediaPlayer(controller: widget.controller);
       return player;
     }
   }

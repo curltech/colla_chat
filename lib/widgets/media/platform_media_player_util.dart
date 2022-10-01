@@ -6,7 +6,7 @@ import 'package:colla_chat/widgets/media/platform_media_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-class PlatformMediaPlayerWidget {
+class PlatformMediaPlayerUtil {
   ///显示播放列表按钮
   static Widget buildPlaylistVisibleButton(
       BuildContext context, AbstractMediaPlayerController controller) {
@@ -397,10 +397,10 @@ class PlatformMediaPlayerWidget {
     if (!showControls) {
       Widget controllerPanel;
       if (simple) {
-        controllerPanel = PlatformMediaPlayerWidget.buildSimpleControllerPanel(
+        controllerPanel = PlatformMediaPlayerUtil.buildSimpleControllerPanel(
             context, controller);
       } else {
-        controllerPanel = PlatformMediaPlayerWidget.buildComplexControllerPanel(
+        controllerPanel = PlatformMediaPlayerUtil.buildComplexControllerPanel(
             context, controller);
       }
       controls.add(controllerPanel);
@@ -409,7 +409,7 @@ class PlatformMediaPlayerWidget {
       Column(children: controls),
       Visibility(
           visible: controller.playlistVisible,
-          child: PlatformMediaPlayerWidget.buildPlaylist(context, controller))
+          child: PlatformMediaPlayerUtil.buildPlaylist(context, controller))
     ]);
   }
 
