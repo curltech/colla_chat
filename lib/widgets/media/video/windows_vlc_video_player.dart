@@ -519,8 +519,6 @@ class PlatformVlcVideoPlayer extends StatefulWidget {
 }
 
 class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
-  bool playlistVisible = false;
-
   @override
   void initState() {
     super.initState();
@@ -542,7 +540,7 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
     return Stack(children: [
       Column(children: controls),
       Visibility(
-          visible: playlistVisible,
+          visible: widget.controller.playlistVisible,
           child:
               PlatformMediaPlayerUtil.buildPlaylist(context, widget.controller))
     ]);
