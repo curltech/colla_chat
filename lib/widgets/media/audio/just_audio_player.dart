@@ -1,10 +1,10 @@
 import 'dart:async';
 
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/widgets/media/media_player_slider.dart';
 import 'package:colla_chat/widgets/media/audio/audio_service.dart';
 import 'package:colla_chat/widgets/media/audio/just_audio_player_controller.dart';
-import 'package:colla_chat/widgets/media/platform_media_widget.dart';
+import 'package:colla_chat/widgets/media/media_player_slider.dart';
+import 'package:colla_chat/widgets/media/platform_media_player_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';

@@ -8,7 +8,7 @@ import 'package:colla_chat/widgets/media/media_player_slider.dart';
 import 'package:colla_chat/widgets/media/platform_media_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_controller.dart'
     as platform;
-import 'package:colla_chat/widgets/media/platform_media_widget.dart';
+import 'package:colla_chat/widgets/media/platform_media_player_util.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
@@ -530,8 +530,8 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
   Widget build(BuildContext context) {
     List<Widget> controls = [];
     controls.add(Expanded(
-        child:
-            PlatformMediaPlayerUtil.buildMediaView(controller: widget.controller)));
+        child: PlatformMediaPlayerUtil.buildMediaView(
+            controller: widget.controller)));
     if (!widget.showControls) {
       Widget controllerPanel = PlatformVlcControllerPanel(
         controller: widget.controller,
@@ -543,7 +543,8 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
       Column(children: controls),
       Visibility(
           visible: playlistVisible,
-          child: PlatformMediaPlayerUtil.buildPlaylist(context, widget.controller))
+          child:
+              PlatformMediaPlayerUtil.buildPlaylist(context, widget.controller))
     ]);
   }
 }
