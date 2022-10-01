@@ -1,7 +1,6 @@
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/common/media_player_slider.dart';
+import 'package:colla_chat/widgets/media/media_player_slider.dart';
 import 'package:colla_chat/widgets/media/platform_media_controller.dart';
-import 'package:colla_chat/widgets/media/platform_media_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -159,7 +158,7 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
     required double value,
     required ValueChanged<double> onChanged,
   }) {
-    var sliderThemeData = PlatformMediaPlayerWidget.buildSliderTheme(context);
+    var sliderThemeData = MediaPlayerSliderUtil.buildSliderTheme(context);
     return SizedBox(
       width: 100.0,
       child: RotatedBox(

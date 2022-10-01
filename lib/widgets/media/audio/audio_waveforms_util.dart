@@ -1,6 +1,6 @@
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/widgets/common/media_player_slider.dart';
+import 'package:colla_chat/widgets/media/media_player_slider.dart';
 import 'package:flutter/material.dart';
 
 ///生成语音的波形界面

@@ -4,7 +4,7 @@ import 'dart:typed_data';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/common/media_player_slider.dart';
+import 'package:colla_chat/widgets/media/media_player_slider.dart';
 import 'package:colla_chat/widgets/media/platform_media_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_controller.dart'
     as platform;

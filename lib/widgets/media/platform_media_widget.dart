@@ -1,40 +1,12 @@
 import 'dart:ui' as ui;
 
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/common/media_player_slider.dart';
+import 'package:colla_chat/widgets/media/media_player_slider.dart';
 import 'package:colla_chat/widgets/media/platform_media_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 class PlatformMediaPlayerWidget {
-  static SliderThemeData buildSliderTheme(BuildContext context) {
-    return SliderTheme.of(context).copyWith(
-        trackShape: null,
-        //轨道的形状
-        trackHeight: 2,
-        //trackHeight：滑轨的高度
-
-        //activeTrackColor: Colors.blue,
-        //已滑过轨道的颜色
-        //inactiveTrackColor: Colors.greenAccent,
-        //未滑过轨道的颜色
-
-        //thumbColor: Colors.red,
-        //滑块中心的颜色（小圆头的颜色）
-        //overlayColor: Colors.greenAccent,
-        //滑块边缘的颜色
-
-        thumbShape: const RoundSliderThumbShape(
-          //可继承SliderComponentShape自定义形状
-          disabledThumbRadius: 15, //禁用时滑块大小
-          enabledThumbRadius: 6, //滑块大小
-        ),
-        overlayShape: const RoundSliderOverlayShape(
-          //可继承SliderComponentShape自定义形状
-          overlayRadius: 14, //滑块外圈大小
-        ));
-  }
-
   ///显示播放列表按钮
   static Widget buildPlaylistVisibleButton(
       BuildContext context, AbstractMediaPlayerController controller) {
@@ -150,7 +122,7 @@ class PlatformMediaPlayerWidget {
     required double value,
     required ValueChanged<double> onChanged,
   }) {
-    var sliderThemeData = buildSliderTheme(context);
+    var sliderThemeData = MediaPlayerSliderUtil.buildSliderTheme(context);
     return SizedBox(
       width: 100.0,
       child: RotatedBox(
@@ -425,8 +397,8 @@ class PlatformMediaPlayerWidget {
     if (!showControls) {
       Widget controllerPanel;
       if (simple) {
-        controllerPanel =
-            PlatformMediaPlayerWidget.buildSimpleControllerPanel(context, controller);
+        controllerPanel = PlatformMediaPlayerWidget.buildSimpleControllerPanel(
+            context, controller);
       } else {
         controllerPanel = PlatformMediaPlayerWidget.buildComplexControllerPanel(
             context, controller);
