@@ -49,8 +49,8 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
     return Ink(
         child: InkWell(
       child: controller.playlistVisible
-          ? const Icon(Icons.visibility_off_rounded, size: 24)
-          : const Icon(Icons.visibility_rounded, size: 24),
+          ? const Icon(Icons.visibility_off, size: 24)
+          : const Icon(Icons.visibility, size: 24),
       onTap: () {
         var playlistVisible = controller.playlistVisible;
         controller.playlistVisible = !playlistVisible;
@@ -187,7 +187,7 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
           return Row(children: [
             Ink(
                 child: InkWell(
-              child: const Icon(Icons.volume_up_rounded, size: 24),
+              child: const Icon(Icons.volume_up, size: 24),
               onTap: () {
                 var volumeSlideVisible = controller.volumeSlideVisible;
                 controller.volumeSlideVisible = !volumeSlideVisible;
@@ -220,7 +220,7 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
           return Row(children: [
             Ink(
                 child: InkWell(
-              child: const Icon(Icons.speed_rounded, size: 24),
+              child: const Icon(Icons.speed, size: 24),
               onTap: () {
                 var speedSlideVisible = controller.speedSlideVisible;
                 controller.speedSlideVisible = !speedSlideVisible;
@@ -253,7 +253,7 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
       widgets.add(Ink(
           child: InkWell(
         onTap: controller.play,
-        child: const Icon(Icons.play_arrow_rounded, size: 36),
+        child: const Icon(Icons.play_arrow, size: 36),
       )));
     } else if (status == PlayerStatus.playing) {
       widgets.add(Ink(
@@ -303,12 +303,12 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
     widgets.add(Ink(
         child: InkWell(
       onTap: controller.stop,
-      child: const Icon(Icons.stop_rounded, size: 36),
+      child: const Icon(Icons.stop, size: 36),
     )));
     widgets.add(Ink(
         child: InkWell(
       onTap: controller.previous,
-      child: const Icon(Icons.skip_previous_rounded, size: 36),
+      child: const Icon(Icons.skip_previous, size: 36),
     )));
     if (status == PlayerStatus.init ||
         status == PlayerStatus.pause ||
@@ -317,7 +317,7 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
       widgets.add(Ink(
           child: InkWell(
         onTap: controller.play,
-        child: const Icon(Icons.play_arrow_rounded, size: 36),
+        child: const Icon(Icons.play_arrow, size: 36),
       )));
     } else if (status == PlayerStatus.playing) {
       widgets.add(Ink(
@@ -328,14 +328,14 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
     } else if (status == PlayerStatus.completed) {
       widgets.add(Ink(
           child: InkWell(
-        child: const Icon(Icons.replay_rounded, size: 24),
+        child: const Icon(Icons.replay, size: 24),
         onTap: () => controller.seek(Duration.zero),
       )));
     }
     widgets.add(Ink(
         child: InkWell(
       onTap: controller.next,
-      child: const Icon(Icons.skip_next_rounded, size: 36),
+      child: const Icon(Icons.skip_next, size: 36),
     )));
     return Row(
       children: widgets,
