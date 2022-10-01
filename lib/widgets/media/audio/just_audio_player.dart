@@ -93,18 +93,9 @@ class _JustAudioPlayerState extends State<JustAudioPlayer>
       children: [
         PlatformMediaPlayerUtil.buildPlaylist(context, widget.controller),
         _buildPlayerSlider(context),
-        // Display play/pause button and volume/speed sliders.
         _buildComplexControlPanel(context),
       ],
     );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (widget.simple) {
-      return _buildSimpleControllerPanel(context);
-    }
-    return _buildComplexControllerPanel(context);
   }
 
   ///简单播放控制面板，包含音量，简单播放按钮，
@@ -128,12 +119,7 @@ class _JustAudioPlayerState extends State<JustAudioPlayer>
                 final processingState = playerState?.processingState;
                 if (processingState == ProcessingState.loading ||
                     processingState == ProcessingState.buffering) {
-                  return Container(
-                    margin: const EdgeInsets.all(8.0),
-                    width: 24.0,
-                    height: 24.0,
-                    child: const CircularProgressIndicator(),
-                  );
+                  return PlatformMediaPlayerUtil.buildProgressIndicator();
                 } else {
                   return PlatformMediaPlayerUtil.buildSimpleControlPanel(
                       context, widget.controller);
@@ -154,13 +140,13 @@ class _JustAudioPlayerState extends State<JustAudioPlayer>
                 context, widget.controller);
           },
         ),
-        const SizedBox(
-          width: 50,
-        ),
+        // const SizedBox(
+        //   width: 50,
+        // ),
         _buildComplexPlayPanel(),
-        const SizedBox(
-          width: 50,
-        ),
+        // const SizedBox(
+        //   width: 50,
+        // ),
         StreamBuilder<double>(
           stream: widget.controller.player.speedStream,
           builder: (context, snapshot) {
@@ -181,16 +167,19 @@ class _JustAudioPlayerState extends State<JustAudioPlayer>
           final processingState = playerState?.processingState;
           if (processingState == ProcessingState.loading ||
               processingState == ProcessingState.buffering) {
-            return Container(
-              margin: const EdgeInsets.all(8.0),
-              width: 24.0,
-              height: 24.0,
-              child: const CircularProgressIndicator(),
-            );
+            return PlatformMediaPlayerUtil.buildProgressIndicator();
           } else {
             return PlatformMediaPlayerUtil.buildComplexPlayPanel(
                 context, widget.controller);
           }
         });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.simple) {
+      return _buildSimpleControllerPanel(context);
+    }
+    return _buildComplexControllerPanel(context);
   }
 }

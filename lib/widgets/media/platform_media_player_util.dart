@@ -146,7 +146,7 @@ class PlatformMediaPlayerUtil {
         future: controller.getVolume(),
         builder: (context, snapshot) {
           if (snapshot.data == null) {
-            return _buildProgressIndicator();
+            return buildProgressIndicator();
           }
           return Row(children: [
             Ink(
@@ -179,7 +179,7 @@ class PlatformMediaPlayerUtil {
         future: controller.getSpeed(),
         builder: (context, snapshot) {
           if (snapshot.data == null) {
-            return _buildProgressIndicator();
+            return buildProgressIndicator();
           }
           return Row(children: [
             Ink(
@@ -331,13 +331,13 @@ class PlatformMediaPlayerUtil {
             onChangeEnd: controller.seek,
           );
         } else {
-          return _buildProgressIndicator();
+          return buildProgressIndicator();
         }
       },
     );
   }
 
-  static Container _buildProgressIndicator() {
+  static Container buildProgressIndicator() {
     return Container(
       margin: const EdgeInsets.all(8.0),
       width: 24.0,
