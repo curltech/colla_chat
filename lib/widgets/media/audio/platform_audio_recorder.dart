@@ -277,6 +277,6 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
       child:
           Row(mainAxisAlignment: MainAxisAlignment.center, children: controls),
     );
-    return Column(children: [const Spacer(), container]);
+    return container;
   }
 }

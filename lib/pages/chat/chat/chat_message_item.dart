@@ -33,17 +33,45 @@ class ChatMessageItem extends StatelessWidget {
 
   ///消息体：扩展文本，图像，声音，视频，页面，复合文本，文件，名片，位置，收藏等种类
   ///每种消息体一个类
-  Widget? buildMessageBody(BuildContext context,
-      {String? content,
-      ContentType contentType = ContentType.text,
-      ChatSubMessageType subMessageType = ChatSubMessageType.chat}) {
+  Widget? _buildMessageBody(BuildContext context) {
+    ContentType? contentType;
+    if (chatMessage.contentType != null) {
+      contentType = StringUtil.enumFromString(
+          ContentType.values, chatMessage.contentType!);
+    }
+    contentType = contentType ?? ContentType.text;
+    ChatSubMessageType? subMessageType;
+    if (chatMessage.subMessageType != null) {
+      subMessageType = StringUtil.enumFromString(
+          ChatSubMessageType.values, chatMessage.subMessageType!);
+    }
+    subMessageType = subMessageType ?? ChatSubMessageType.chat;
+    String? title = chatMessage.title;
+    String? content = chatMessage.content;
+    List<int>? data;
+    if (content != null) {
+      data = CryptoUtil.decodeBase64(content);
+    }
+
     if (subMessageType == ChatSubMessageType.chat) {
       if (contentType == ContentType.text) {
+        if (data != null) {
+          content = CryptoUtil.utf8ToString(data);
+        } else {
+          content = '';
+        }
         return ExtendedTextMessage(
           isMyself: isMyself,
-          content: content ?? '',
+          content: content,
         );
       }
+      if (contentType == ContentType.audio) {}
+      if (contentType == ContentType.video) {}
+      if (contentType == ContentType.file) {}
+      if (contentType == ContentType.image) {}
+      if (contentType == ContentType.card) {}
+      if (contentType == ContentType.rich) {}
+      if (contentType == ContentType.link) {}
     }
     if (subMessageType == ChatSubMessageType.videoChat) {
       Color color = appDataProvider.themeData!.colorScheme.primary;
@@ -60,10 +88,8 @@ class ChatMessageItem extends StatelessWidget {
     return null;
   }
 
-  Widget buildMessageBubble(BuildContext context,
-      {String? content,
-      ContentType contentType = ContentType.text,
-      ChatSubMessageType subMessageType = ChatSubMessageType.chat}) {
+  ///气泡消息容器，内包消息体
+  Widget _buildMessageBubble(BuildContext context) {
     return Container(
         constraints: const BoxConstraints(
             minWidth: 0, maxWidth: 260, minHeight: 0, maxHeight: 56),
@@ -73,20 +99,14 @@ class ChatMessageItem extends StatelessWidget {
           margin: const BubbleEdges.only(top: 1),
           nip: isMyself ? BubbleNip.rightTop : BubbleNip.leftTop,
           color: isMyself
-              ? appDataProvider.themeData!.colorScheme.primary
+              ? appDataProvider.themeData.colorScheme.primary
               : Colors.white,
-          child: buildMessageBody(context,
-              content: content,
-              contentType: contentType,
-              subMessageType: subMessageType),
+          child: _buildMessageBody(context),
         ));
   }
 
-  ///消息容器，内包消息体
-  Row buildMessageContainer(BuildContext context,
-      {String? content,
-      ContentType contentType = ContentType.text,
-      ChatSubMessageType subMessageType = ChatSubMessageType.chat}) {
+  ///矩形消息容器，内包消息体
+  Widget _buildMessageContainer(BuildContext context) {
     double lrEdgeInsets = 15.0;
     double tbEdgeInsets = 10.0;
 
@@ -100,7 +120,7 @@ class ChatMessageItem extends StatelessWidget {
           constraints: const BoxConstraints(maxWidth: 300.0),
           decoration: BoxDecoration(
             color: isMyself
-                ? appDataProvider.themeData!.colorScheme.primary
+                ? appDataProvider.themeData.colorScheme.primary
                 : Colors.white,
             borderRadius: BorderRadius.only(
               bottomLeft: const Radius.circular(8.0),
@@ -112,10 +132,7 @@ class ChatMessageItem extends StatelessWidget {
           ),
           margin: EdgeInsets.only(
               right: isMyself ? 5.0 : 0, left: isMyself ? 0 : 5.0),
-          child: buildMessageBody(context,
-              content: content,
-              contentType: contentType,
-              subMessageType: subMessageType),
+          child: _buildMessageBody(context),
         )
       ], // aligns the chatitem to right end
     );
@@ -123,23 +140,6 @@ class ChatMessageItem extends StatelessWidget {
 
   ///其他人的消息，从左到右，头像，时间，名称，消息容器
   Widget _buildOther(BuildContext context) {
-    String? content = chatMessage.content;
-    if (content != null) {
-      var raw = CryptoUtil.decodeBase64(content);
-      content = CryptoUtil.utf8ToString(raw);
-    }
-    ContentType? contentType;
-    if (chatMessage.contentType != null) {
-      contentType = StringUtil.enumFromString(
-          ContentType.values, chatMessage.contentType!);
-    }
-    contentType = contentType ?? ContentType.text;
-    ChatSubMessageType? subMessageType;
-    if (chatMessage.subMessageType != null) {
-      subMessageType = StringUtil.enumFromString(
-          ChatSubMessageType.values, chatMessage.subMessageType!);
-    }
-    subMessageType = subMessageType ?? ChatSubMessageType.chat;
     return Container(
         margin: const EdgeInsets.symmetric(vertical: 3.0),
         child: Row(
@@ -152,31 +152,13 @@ class ChatMessageItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
                     Text('${chatMessage.id}:${chatMessage.senderName}'),
-                    buildMessageBubble(context,
-                        content: content,
-                        contentType: contentType,
-                        subMessageType: subMessageType)
+                    _buildMessageBubble(context)
                   ]),
             ]));
   }
 
   ///我的消息，从右到左，头像，时间，名称，消息容器
   Widget _buildMe(BuildContext context) {
-    String? content = chatMessage.content;
-    if (content != null) {
-      var raw = CryptoUtil.decodeBase64(content);
-      content = CryptoUtil.utf8ToString(raw);
-    }
-    ContentType? contentType = ContentType.text;
-    if (chatMessage.contentType != null) {
-      contentType = StringUtil.enumFromString(
-          ContentType.values, chatMessage.contentType!);
-    }
-    ChatSubMessageType? subMessageType = ChatSubMessageType.chat;
-    if (chatMessage.subMessageType != null) {
-      subMessageType = StringUtil.enumFromString(
-          ChatSubMessageType.values, chatMessage.subMessageType!);
-    }
     return Container(
         margin: const EdgeInsets.symmetric(vertical: 3.0),
         child: Row(
@@ -190,10 +172,7 @@ class ChatMessageItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: <Widget>[
                     Text('${chatMessage.id}:${chatMessage.receiverName}'),
-                    buildMessageBubble(context,
-                        content: content,
-                        contentType: contentType!,
-                        subMessageType: subMessageType!)
+                    _buildMessageBubble(context)
                   ]),
               Container(
                   margin: const EdgeInsets.only(left: 0.0),
