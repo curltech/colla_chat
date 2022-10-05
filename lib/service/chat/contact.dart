@@ -9,6 +9,7 @@ import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/contact_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as flutter_contacts;
 
@@ -60,6 +61,9 @@ class LinkmanService extends PeerPartyService<Linkman> {
   }
 
   Future<List<Linkman>> search(String key) async {
+    if (StringUtil.isEmpty(key)) {
+      return await findAll();
+    }
     var where = 'peerId=? or mobile=? or name=? or pyName=? or email=?';
     var whereArgs = [key, key, key, key, key];
     var linkmen = await find(
@@ -290,6 +294,9 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   Future<List<Group>> search(String key) async {
+    if (StringUtil.isEmpty(key)) {
+      return await findAll();
+    }
     var where = 'peerId=? or mobile=? or name=? or myAlias=? or email=?';
     var whereArgs = [key, key, key, key, key];
     var groups = await find(
