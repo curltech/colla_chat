@@ -9,7 +9,6 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
-import 'package:record/record.dart';
 import 'package:rxdart/rxdart.dart';
 
 ///采用just_audio和record实现的音频的播放和记录，适用于多个平台
@@ -230,58 +229,5 @@ class JustAudioPlayerController extends AbstractMediaPlayerController {
   @override
   Widget buildMediaView() {
     return Container();
-  }
-}
-
-///支持多种设备，windows测试通过
-///Android, iOS, Linux, macOS, Windows, and web.
-class JustAudioRecorderController {
-  final recorder = Record();
-
-  Future<void> start({
-    String? path,
-    AudioEncoder encoder = AudioEncoder.aacLc,
-    int bitRate = 128000,
-    int samplingRate = 44100,
-    int numChannels = 2,
-    InputDevice? device,
-  }) async {
-    try {
-      if (await recorder.hasPermission()) {
-        final isSupported = await recorder.isEncoderSupported(
-          AudioEncoder.aacLc,
-        );
-
-        await recorder.start(
-            path: path,
-            encoder: encoder,
-            bitRate: bitRate,
-            samplingRate: samplingRate,
-            numChannels: numChannels,
-            device: device);
-      }
-    } catch (e) {
-      logger.e('recorder start $e');
-    }
-  }
-
-  Future<String?> stop() async {
-    if (!await recorder.isRecording()) {
-      return null;
-    }
-
-    return await recorder.stop();
-  }
-
-  Future<void> pause() async {
-    await recorder.pause();
-  }
-
-  Future<void> resume() async {
-    await recorder.resume();
-  }
-
-  dispose() async {
-    await recorder.dispose();
   }
 }

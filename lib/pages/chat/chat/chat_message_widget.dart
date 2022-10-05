@@ -124,9 +124,26 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   }
 
   ///发送文本消息,发送命令消息目标可以是linkman，也可以是群，取决于当前chatSummary
-  Future<ChatMessage?> send(
+  Future<ChatMessage?> sendText(
       {String? title,
       String? message,
+      ContentType contentType = ContentType.text,
+      ChatSubMessageType subMessageType = ChatSubMessageType.chat}) async {
+    List<int>? data;
+    if (message != null) {
+      data = CryptoUtil.stringToUtf8(message);
+    }
+    return await send(
+        title: title,
+        data: data,
+        contentType: contentType,
+        subMessageType: subMessageType);
+  }
+
+  ///发送文本消息,发送命令消息目标可以是linkman，也可以是群，取决于当前chatSummary
+  Future<ChatMessage?> send(
+      {String? title,
+      List<int>? data,
       ContentType contentType = ContentType.text,
       ChatSubMessageType subMessageType = ChatSubMessageType.chat}) async {
     if (_chatSummary == null) {
@@ -137,10 +154,6 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     String? clientId = _chatSummary!.clientId;
     String partyType = _chatSummary!.partyType!;
 
-    List<int>? data;
-    if (message != null) {
-      data = CryptoUtil.stringToUtf8(message);
-    }
     ChatMessage? chatMessage;
     if (partyType == PartyType.linkman.name) {
       //保存消息
@@ -323,23 +336,12 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     chatMessageController.index = 1;
   }
 
-  Future<ChatMessage?> _send({
-    String? message,
-    ContentType contentType = ContentType.text,
-    ChatSubMessageType subMessageType = ChatSubMessageType.chat,
-  }) {
-    return chatMessageController.send(
-        message: message,
-        contentType: contentType,
-        subMessageType: subMessageType);
-  }
-
   ///发送消息的输入框和按钮，三个按钮，一个输入框，单独一个类
   ///另外还有各种消息的选择菜单，emoji各一个类
   Widget _buildMessageInputWidget(BuildContext context) {
     return ChatMessageInputWidget(
       textEditingController: textEditingController,
-      onSend: _send,
+      onSend: chatMessageController.sendText,
       onAction: action,
     );
   }

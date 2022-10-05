@@ -12,6 +12,7 @@ import 'package:colla_chat/widgets/media/platform_media_player_util.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class VlcMediaSource {
   static Future<Media> media({String? filename, Uint8List? data}) async {
@@ -505,11 +506,22 @@ class PlatformVlcVideoPlayer extends StatefulWidget {
   ///如果是外置控件，是否显示简洁版
   final bool simple;
 
+  //是否显示播放列表和媒体视图
+  final bool showPlayerList;
+
+  final Color? color;
+  final double? height;
+  final double? width;
+
   PlatformVlcVideoPlayer(
       {Key? key,
       VlcVideoPlayerController? controller,
       this.simple = false,
-      this.showControls = true})
+      this.showControls = true,
+      this.showPlayerList = true,
+      this.color,
+      this.width,
+      this.height})
       : super(key: key) {
     this.controller = controller ?? VlcVideoPlayerController();
   }
@@ -526,10 +538,29 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
 
   @override
   Widget build(BuildContext context) {
+    AbstractMediaPlayerController controller = widget.controller;
     List<Widget> controls = [];
-    controls.add(Expanded(
-        child: PlatformMediaPlayerUtil.buildMediaView(
-            controller: widget.controller)));
+    if (widget.showPlayerList) {
+      var view = VisibilityDetector(
+          key: ObjectKey(controller),
+          onVisibilityChanged: (visiblityInfo) {
+            if (visiblityInfo.visibleFraction > 0.9) {
+              controller.play();
+            }
+          },
+          child: Stack(children: [
+            PlatformMediaPlayerUtil.buildMediaView(
+                controller: controller,
+                color: widget.color,
+                width: widget.width,
+                height: widget.height),
+            Visibility(
+              visible: controller.playlistVisible,
+              child: PlatformMediaPlayerUtil.buildPlaylist(context, controller),
+            )
+          ]));
+      controls.add(Expanded(child: view));
+    }
     if (!widget.showControls) {
       Widget controllerPanel = PlatformVlcControllerPanel(
         controller: widget.controller,
@@ -537,13 +568,7 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
       );
       controls.add(controllerPanel);
     }
-    return Stack(children: [
-      Column(children: controls),
-      Visibility(
-          visible: widget.controller.playlistVisible,
-          child:
-              PlatformMediaPlayerUtil.buildPlaylist(context, widget.controller))
-    ]);
+    return Column(children: controls);
   }
 }
 

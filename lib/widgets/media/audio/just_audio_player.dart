@@ -11,10 +11,18 @@ import 'package:just_audio/just_audio.dart';
 
 class JustAudioPlayer extends StatefulWidget {
   late final JustAudioPlayerController controller;
+
+  //自定义简单控制器模式
   final bool simple;
 
+  //是否显示播放列表
+  final bool showPlayerList;
+
   JustAudioPlayer(
-      {Key? key, JustAudioPlayerController? controller, this.simple = false})
+      {Key? key,
+      JustAudioPlayerController? controller,
+      this.simple = false,
+      this.showPlayerList = true})
       : super(key: key) {
     this.controller = controller ?? JustAudioPlayerController();
   }

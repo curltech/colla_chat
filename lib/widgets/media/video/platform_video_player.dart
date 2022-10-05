@@ -9,7 +9,28 @@ import 'package:flutter/material.dart';
 class PlatformVideoPlayer extends StatefulWidget {
   late final AbstractMediaPlayerController controller;
 
-  PlatformVideoPlayer({Key? key, AbstractMediaPlayerController? controller})
+  //自定义简单控制器模式
+  final bool simple;
+
+  //是否显示原生的控制器
+  final bool showControls;
+
+  //是否显示播放列表和媒体视图
+  final bool showPlayerList;
+
+  final Color? color;
+  final double? height;
+  final double? width;
+
+  PlatformVideoPlayer(
+      {Key? key,
+      AbstractMediaPlayerController? controller,
+      this.simple = false,
+      this.showControls = true,
+      this.showPlayerList = true,
+      this.color,
+      this.width,
+      this.height})
       : super(key: key) {
     if (controller == null) {
       if (platformParams.windows ||
@@ -48,10 +69,18 @@ class _PlatformVideoPlayerState extends State<PlatformVideoPlayer> {
     if (widget.controller is VlcVideoPlayerController) {
       var player = PlatformVlcVideoPlayer(
         controller: widget.controller as VlcVideoPlayerController,
+        simple: widget.simple,
+        showControls: widget.showControls,
+        showPlayerList: widget.showPlayerList,
       );
       return player;
     } else {
-      var player = PlatformMediaPlayer(controller: widget.controller);
+      var player = PlatformMediaPlayer(
+        controller: widget.controller,
+        simple: widget.simple,
+        showControls: widget.showControls,
+        showPlayerList: widget.showPlayerList,
+      );
       return player;
     }
   }

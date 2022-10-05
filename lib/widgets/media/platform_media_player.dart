@@ -6,8 +6,15 @@ import 'package:visibility_detector/visibility_detector.dart';
 
 class PlatformMediaPlayer extends StatefulWidget {
   final AbstractMediaPlayerController controller;
+
+  //自定义简单控制器模式
   final bool simple;
+
+  //是否显示原生的控制器
   final bool showControls;
+
+  //是否显示播放列表和媒体视图
+  final bool showPlayerList;
   final Color? color;
   final double? height;
   final double? width;
@@ -17,6 +24,7 @@ class PlatformMediaPlayer extends StatefulWidget {
       this.simple = false,
       required this.controller,
       this.showControls = true,
+      this.showPlayerList = true,
       this.color,
       this.width,
       this.height})
@@ -409,20 +417,27 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
   Widget _buildMediaPlayer(BuildContext context) {
     AbstractMediaPlayerController controller = widget.controller;
     List<Widget> controls = [];
-    var view = VisibilityDetector(
-      key: ObjectKey(controller),
-      onVisibilityChanged: (visiblityInfo) {
-        if (visiblityInfo.visibleFraction > 0.9) {
-          controller.play();
-        }
-      },
-      child: _buildMediaView(
-          controller: controller,
-          color: widget.color,
-          width: widget.width,
-          height: widget.height),
-    );
-    controls.add(Expanded(child: view));
+    if (widget.showPlayerList) {
+      var view = VisibilityDetector(
+          key: ObjectKey(controller),
+          onVisibilityChanged: (visiblityInfo) {
+            if (visiblityInfo.visibleFraction > 0.9) {
+              controller.play();
+            }
+          },
+          child: Stack(children: [
+            _buildMediaView(
+                controller: controller,
+                color: widget.color,
+                width: widget.width,
+                height: widget.height),
+            Visibility(
+              visible: controller.playlistVisible,
+              child: _buildPlaylist(context),
+            )
+          ]));
+      controls.add(Expanded(child: view));
+    }
     if (!widget.showControls) {
       Widget controllerPanel;
       if (widget.simple) {
@@ -432,11 +447,7 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
       }
       controls.add(controllerPanel);
     }
-    return Stack(children: [
-      Column(children: controls),
-      Visibility(
-          visible: controller.playlistVisible, child: _buildPlaylist(context))
-    ]);
+    return Column(children: controls);
   }
 
   @override

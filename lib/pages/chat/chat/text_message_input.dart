@@ -1,17 +1,12 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:audio_waveforms/audio_waveforms.dart';
-import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/widgets/media/audio/audio_waveforms_util.dart';
+import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/media/audio/just_audio_player_controller.dart';
-import 'package:colla_chat/widgets/media/audio/platform_sound.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/widgets/common/simple_widget.dart';
+import 'package:colla_chat/widgets/media/audio/platform_audio_recorder.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_sound/flutter_sound.dart';
-import 'package:path_provider/path_provider.dart';
 
 import 'extended_text_message_input.dart';
 
@@ -43,13 +38,6 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   bool sendVisible = false;
   bool moreVisible = false;
   bool voiceRecording = false;
-  String voiceRecordText = 'Press recording';
-  Timer? voiceRecordTimer;
-  int timerSecond = 0;
-  PlatformSoundRecorder soundRecorder =
-      PlatformSoundRecorder(codec: Codec.pcm16WAV);
-  RecorderController recorderController = RecorderController();
-  JustAudioRecorderController justAudioRecorder = JustAudioRecorderController();
 
   @override
   void initState() {
@@ -61,136 +49,25 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
     setState(() {});
   }
 
+  _onStop(String filename) async {
+    if (StringUtil.isNotEmpty(filename)) {
+      Uint8List data = await FileUtil.readFile(filename);
+      chatMessageController.send(
+          data: data,
+          contentType: ContentType.audio,
+          subMessageType: ChatSubMessageType.chat);
+    }
+  }
+
   Widget _buildExtendedTextField(context) {
     return ExtendedTextMessageInputWidget(
       textEditingController: widget.textEditingController,
     );
   }
 
-  ///录音和停止录音的切换，采用flutter_sound组件
-  _switchVoiceRecording() async {
-    voiceRecording = !voiceRecording;
-    if (voiceRecording) {
-      //开始录音
-      timerSecond = 0;
-      //开始计时
-      voiceRecordTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        var timerDuration = Duration(seconds: timerSecond++);
-        voiceRecordText =
-            '${timerDuration.inHours}:${timerDuration.inMinutes}:${timerDuration.inSeconds}';
-        setState(() {});
-      });
-      //开始录音
-      await soundRecorder.init();
-      final dir = await getTemporaryDirectory();
-      String filename = '${dir.path}/1.wav';
-      await soundRecorder.startRecorder(filename: filename);
-    } else {
-      //停止计时和录音
-      if (voiceRecordTimer != null) {
-        voiceRecordTimer!.cancel();
-        voiceRecordTimer = null;
-        voiceRecordText = 'Press recording';
-        timerSecond = 0;
-        await soundRecorder.stopRecorder();
-        setState(() {});
-      }
-    }
-  }
-
-  AudioWaveforms _buildAudioWaveforms(BuildContext context) {
-    AudioWaveforms audioWaveforms = AudioWaveformsUtil.buildAudioWaveforms(
-        size: const Size(0, 0), recorderController: recorderController);
-
-    return audioWaveforms;
-  }
-
-  ///录音和停止录音的切换，采用AudioWaveforms组件
-  _switchAudioWaveforms() async {
-    voiceRecording = !voiceRecording;
-    if (voiceRecording) {
-      //开始录音
-      timerSecond = 0;
-      //开始计时
-      voiceRecordTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        var timerDuration = Duration(seconds: timerSecond++);
-        voiceRecordText =
-            '${timerDuration.inHours}:${timerDuration.inMinutes}:${timerDuration.inSeconds}';
-        setState(() {});
-      });
-      //开始录音
-      final dir = await getTemporaryDirectory();
-      String filename = '${dir.path}/1.wav';
-      await recorderController.record(filename);
-    } else {
-      //停止计时和录音
-      if (voiceRecordTimer != null) {
-        voiceRecordTimer!.cancel();
-        voiceRecordTimer = null;
-        voiceRecordText = 'Press recording';
-        timerSecond = 0;
-        String? filename = await recorderController.stop();
-        if (filename != null) {
-          Uint8List data = await FileUtil.readFile(filename);
-
-          ///后面可以生成消息并发送
-        }
-        setState(() {});
-      }
-    }
-  }
-
-  ///录音和停止录音的切换，采用Record组件
-  _switchAudioRecord() async {
-    voiceRecording = !voiceRecording;
-    if (voiceRecording) {
-      //开始录音
-      timerSecond = 0;
-      //开始计时
-      voiceRecordTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        var timerDuration = Duration(seconds: timerSecond++);
-        voiceRecordText =
-            '${timerDuration.inHours}:${timerDuration.inMinutes}:${timerDuration.inSeconds}';
-        setState(() {});
-      });
-      //开始录音
-      final dir = await getTemporaryDirectory();
-      String filename = '${dir.path}/1.mp3';
-      await justAudioRecorder.start(path: filename);
-    } else {
-      //停止计时和录音
-      if (voiceRecordTimer != null) {
-        voiceRecordTimer!.cancel();
-        voiceRecordTimer = null;
-        voiceRecordText = 'Press recording';
-        timerSecond = 0;
-        String? filename = await justAudioRecorder.stop();
-        if (filename != null) {
-          Uint8List data = await FileUtil.readFile(filename);
-
-          ///后面可以生成消息并发送
-        }
-        setState(() {});
-      }
-    }
-  }
-
-  AudioFileWaveforms _buildAudioFileWaveforms(BuildContext context) {
-    PlayerController playerController = PlayerController();
-    AudioFileWaveforms audioFileWaveforms =
-        AudioWaveformsUtil.buildAudioFileWaveforms(
-            size: const Size(0, 0), playerController: playerController);
-
-    return audioFileWaveforms;
-  }
-
   Widget _buildVoiceRecordButton(context) {
-    return TextButton(
-      style: WidgetUtil.buildButtonStyle(),
-      child: Text(AppLocalizations.t(voiceRecordText)),
-      onPressed: () async {
-        await _switchAudioWaveforms();
-      },
+    return PlatformAudioRecorder(
+      onStop: _onStop,
     );
   }
 

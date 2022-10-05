@@ -10,7 +10,17 @@ import 'package:flutter/material.dart';
 class PlatformAudioPlayer extends StatefulWidget {
   late final AbstractMediaPlayerController controller;
 
-  PlatformAudioPlayer({Key? key, AbstractMediaPlayerController? controller})
+  //自定义简单控制器模式
+  final bool simple;
+
+  //是否显示播放列表
+  final bool showPlayerList;
+
+  PlatformAudioPlayer(
+      {Key? key,
+      AbstractMediaPlayerController? controller,
+      this.simple = false,
+      this.showPlayerList = true})
       : super(key: key) {
     if (platformParams.ios ||
         platformParams.android ||
@@ -49,11 +59,16 @@ class _PlatformAudioPlayerState extends State<PlatformAudioPlayer> {
   Widget build(BuildContext context) {
     if (widget.controller is JustAudioPlayerController) {
       var player = JustAudioPlayer(
-          controller: widget.controller as JustAudioPlayerController);
+          controller: widget.controller as JustAudioPlayerController,
+          simple: widget.simple,
+          showPlayerList: widget.showPlayerList);
       return player;
     } else {
       var player = PlatformMediaPlayer(
-          controller: widget.controller, showControls: false);
+          controller: widget.controller,
+          showControls: false,
+          simple: widget.simple,
+          showPlayerList: widget.showPlayerList);
       return player;
     }
   }
