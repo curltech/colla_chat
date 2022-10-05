@@ -55,7 +55,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
   }
 
   Future<MyselfPeer?> findOneByLogin(String credential) async {
-    var where = '(peerId=? or mobile=? or name=? or email=?) and status=?';
+    var where = '(peerId=? or mobile=? or loginName=? or email=?) and status=?';
     var whereArgs = [
       credential,
       credential,
