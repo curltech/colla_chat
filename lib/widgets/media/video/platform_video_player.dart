@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/media/platform_media_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
@@ -21,6 +23,8 @@ class PlatformVideoPlayer extends StatefulWidget {
   final Color? color;
   final double? height;
   final double? width;
+  final String? filename;
+  final Uint8List? data;
 
   PlatformVideoPlayer(
       {Key? key,
@@ -30,7 +34,9 @@ class PlatformVideoPlayer extends StatefulWidget {
       this.showPlayerList = true,
       this.color,
       this.width,
-      this.height})
+      this.height,
+      this.filename,
+      this.data})
       : super(key: key) {
     if (controller == null) {
       if (platformParams.windows ||
@@ -52,6 +58,9 @@ class _PlatformVideoPlayerState extends State<PlatformVideoPlayer> {
   void initState() {
     super.initState();
     widget.controller.addListener(_update);
+    if (widget.filename != null || widget.data != null) {
+      widget.controller.add(filename: widget.filename, data: widget.data);
+    }
   }
 
   _update() {

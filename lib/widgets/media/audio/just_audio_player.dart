@@ -17,12 +17,16 @@ class JustAudioPlayer extends StatefulWidget {
 
   //是否显示播放列表
   final bool showPlayerList;
+  final String? filename;
+  final Uint8List? data;
 
   JustAudioPlayer(
       {Key? key,
       JustAudioPlayerController? controller,
       this.simple = false,
-      this.showPlayerList = true})
+      this.showPlayerList = true,
+      this.filename,
+      this.data})
       : super(key: key) {
     this.controller = controller ?? JustAudioPlayerController();
   }
@@ -51,6 +55,9 @@ class _JustAudioPlayerState extends State<JustAudioPlayer>
     }, onError: (Object e, StackTrace stackTrace) {
       logger.e('A stream error occurred: $e');
     });
+    if (widget.filename != null || widget.data != null) {
+      widget.controller.add(filename: widget.filename, data: widget.data);
+    }
   }
 
   _update() {

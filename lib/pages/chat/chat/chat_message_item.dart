@@ -5,6 +5,7 @@ import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/widgets/media/video/platform_video_player.dart';
 import 'package:flutter/material.dart';
 
 import '../../../entity/chat/chat.dart';
@@ -65,7 +66,10 @@ class ChatMessageItem extends StatelessWidget {
           content: content,
         );
       }
-      if (contentType == ContentType.audio) {}
+      if (contentType == ContentType.audio) {
+        return PlatformVideoPlayer(
+            simple: true, showControls: false, showPlayerList: false);
+      }
       if (contentType == ContentType.video) {}
       if (contentType == ContentType.file) {}
       if (contentType == ContentType.image) {}

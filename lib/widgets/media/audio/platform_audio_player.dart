@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/media/audio/blue_fire_audio_player_controller.dart';
 import 'package:colla_chat/widgets/media/audio/just_audio_player.dart';
@@ -15,12 +17,16 @@ class PlatformAudioPlayer extends StatefulWidget {
 
   //是否显示播放列表
   final bool showPlayerList;
+  final String? filename;
+  final Uint8List? data;
 
   PlatformAudioPlayer(
       {Key? key,
       AbstractMediaPlayerController? controller,
       this.simple = false,
-      this.showPlayerList = true})
+      this.showPlayerList = true,
+      this.filename,
+      this.data})
       : super(key: key) {
     if (platformParams.ios ||
         platformParams.android ||
@@ -43,6 +49,9 @@ class _PlatformAudioPlayerState extends State<PlatformAudioPlayer> {
   void initState() {
     super.initState();
     widget.controller.addListener(_update);
+    if (widget.filename != null || widget.data != null) {
+      widget.controller.add(filename: widget.filename, data: widget.data);
+    }
   }
 
   _update() {

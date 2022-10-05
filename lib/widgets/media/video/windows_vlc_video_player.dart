@@ -512,6 +512,8 @@ class PlatformVlcVideoPlayer extends StatefulWidget {
   final Color? color;
   final double? height;
   final double? width;
+  final String? filename;
+  final Uint8List? data;
 
   PlatformVlcVideoPlayer(
       {Key? key,
@@ -521,7 +523,9 @@ class PlatformVlcVideoPlayer extends StatefulWidget {
       this.showPlayerList = true,
       this.color,
       this.width,
-      this.height})
+      this.height,
+      this.filename,
+      this.data})
       : super(key: key) {
     this.controller = controller ?? VlcVideoPlayerController();
   }
@@ -534,6 +538,20 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
   @override
   void initState() {
     super.initState();
+    widget.controller.addListener(_update);
+    if (widget.filename != null || widget.data != null) {
+      widget.controller.add(filename: widget.filename, data: widget.data);
+    }
+  }
+
+  _update() {
+    setState(() {});
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_update);
+    super.dispose();
   }
 
   @override

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/media/media_player_slider.dart';
 import 'package:colla_chat/widgets/media/platform_media_controller.dart';
@@ -18,6 +20,8 @@ class PlatformMediaPlayer extends StatefulWidget {
   final Color? color;
   final double? height;
   final double? width;
+  final String? filename;
+  final Uint8List? data;
 
   const PlatformMediaPlayer(
       {Key? key,
@@ -27,7 +31,9 @@ class PlatformMediaPlayer extends StatefulWidget {
       this.showPlayerList = true,
       this.color,
       this.width,
-      this.height})
+      this.height,
+      this.filename,
+      this.data})
       : super(key: key);
 
   @override
@@ -39,6 +45,9 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
   void initState() {
     super.initState();
     widget.controller.addListener(_update);
+    if (widget.filename != null || widget.data != null) {
+      widget.controller.add(filename: widget.filename, data: widget.data);
+    }
   }
 
   _update() {
