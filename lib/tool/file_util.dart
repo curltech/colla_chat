@@ -10,7 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:path_provider/path_provider.dart';
 
 class FileUtil {
-  static Future<String> writeFile(Uint8List bytes, String filename) async {
+  static Future<String> writeFile(List<int> bytes, String filename) async {
     if (!filename.contains('/')) {
       final dir = await getApplicationDocumentsDirectory();
       filename = '${dir.path}/$filename';
@@ -22,7 +22,7 @@ class FileUtil {
     return filename;
   }
 
-  static Future<String> writeTempFile(Uint8List bytes, String filename) async {
+  static Future<String> writeTempFile(List<int> bytes, String filename) async {
     if (!filename.contains('/')) {
       final dir = await getTemporaryDirectory();
       filename = '${dir.path}/$filename';
@@ -34,7 +34,7 @@ class FileUtil {
     return filename;
   }
 
-  static Future<Uint8List> readFile(String filename) async {
+  static Future<List<int>> readFile(String filename) async {
     if (filename.startsWith('assets/')) {
       return await _readAssetData(filename);
     } else {
@@ -42,7 +42,7 @@ class FileUtil {
     }
   }
 
-  static Future<Uint8List> _readFileBytes(String filename) async {
+  static Future<List<int>> _readFileBytes(String filename) async {
     // Uri uri = Uri.parse(filename);
     File file = File(filename);
     Uint8List bytes;
@@ -51,7 +51,7 @@ class FileUtil {
     return bytes;
   }
 
-  static Future<Uint8List> _readAssetData(String filename) async {
+  static Future<List<int>> _readAssetData(String filename) async {
     var asset = await rootBundle.load(filename);
     return asset.buffer.asUint8List();
   }

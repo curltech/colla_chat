@@ -46,7 +46,7 @@ class MediaSource {
 
 class PlatformMediaSource {
   static Future<MediaSource> media(
-      {String? filename, Uint8List? data, MediaFormat? mediaFormat}) async {
+      {String? filename, List<int>? data, MediaFormat? mediaFormat}) async {
     MediaSource mediaSource;
     if (filename != null) {
       if (mediaFormat == null) {
@@ -269,7 +269,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     }
   }
 
-  add({String? filename, Uint8List? data}) async {
+  add({String? filename, List<int>? data}) async {
     for (var mediaSource in playlist) {
       var name = mediaSource.filename;
       if (name == filename) {
@@ -282,7 +282,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     await setCurrentIndex(playlist.length - 1);
   }
 
-  insert(int index, {String? filename, Uint8List? data}) async {
+  insert(int index, {String? filename, List<int>? data}) async {
     for (var mediaSource in playlist) {
       var name = mediaSource.filename;
       if (name == filename) {

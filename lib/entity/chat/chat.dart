@@ -109,6 +109,7 @@ class ChatMessage extends StatusEntity {
   String? content; // 消息内容
   String? receiptContent; // 回执的内容
   String? contentType;
+  String? mimeType;
   int? deleteTime = 0; // 阅读后的删除时间，秒数，0表示不删除
   bool needCompress = true;
   bool needEncrypt = true;
@@ -159,6 +160,7 @@ class ChatMessage extends StatusEntity {
         thumbnail = json['thumbnail'],
         content = json['content'],
         contentType = json['contentType'],
+        mimeType = json['mimeType'],
         deleteTime = json['deleteTime'],
         payloadHash = json['payloadHash'],
         payloadSignature = json['payloadSignature'],
@@ -212,6 +214,7 @@ class ChatMessage extends StatusEntity {
       'thumbnail': thumbnail,
       'content': content,
       'contentType': contentType,
+      'mimeType': mimeType,
       'deleteTime': deleteTime,
       'payloadHash': payloadHash,
       'payloadSignature': payloadSignature,

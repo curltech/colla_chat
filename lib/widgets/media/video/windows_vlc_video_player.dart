@@ -15,7 +15,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
 class VlcMediaSource {
-  static Future<Media> media({String? filename, Uint8List? data}) async {
+  static Future<Media> media({String? filename, List<int>? data}) async {
     Media media;
     if (filename != null) {
       if (filename.startsWith('assets/')) {
@@ -174,7 +174,7 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
 
   ///下面是播放列表的功能
   @override
-  add({String? filename, Uint8List? data}) async {
+  add({String? filename, List<int>? data}) async {
     super.add(filename: filename, data: data);
     Media media = await VlcMediaSource.media(filename: filename, data: data);
     player.add(media);
@@ -187,7 +187,7 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  insert(int index, {String? filename, Uint8List? data}) async {
+  insert(int index, {String? filename, List<int>? data}) async {
     super.insert(index, filename: filename, data: data);
     Media media = await VlcMediaSource.media(filename: filename, data: data);
     player.insert(index, media);

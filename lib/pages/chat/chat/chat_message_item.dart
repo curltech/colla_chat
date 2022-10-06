@@ -2,10 +2,11 @@ import 'package:bubble/bubble.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/pages/chat/chat/message/audio_message.dart';
+import 'package:colla_chat/pages/chat/chat/message/video_message.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/widgets/media/video/platform_video_player.dart';
 import 'package:flutter/material.dart';
 
 import '../../../entity/chat/chat.dart';
@@ -67,10 +68,19 @@ class ChatMessageItem extends StatelessWidget {
         );
       }
       if (contentType == ContentType.audio) {
-        return PlatformVideoPlayer(
-            simple: true, showControls: false, showPlayerList: false);
+        return AudioMessage(
+          data: data!,
+          isMyself: isMyself,
+        );
       }
-      if (contentType == ContentType.video) {}
+      if (contentType == ContentType.video) {
+        String? thumbnail = chatMessage.thumbnail;
+        return VideoMessage(
+          data: data!,
+          isMyself: isMyself,
+          thumbnail: thumbnail,
+        );
+      }
       if (contentType == ContentType.file) {}
       if (contentType == ContentType.image) {}
       if (contentType == ContentType.card) {}
@@ -78,15 +88,9 @@ class ChatMessageItem extends StatelessWidget {
       if (contentType == ContentType.link) {}
     }
     if (subMessageType == ChatSubMessageType.videoChat) {
-      Color color = appDataProvider.themeData!.colorScheme.primary;
-
       return ActionMessage(
         isMyself: isMyself,
-        content: content ?? '视频通话邀请',
-        icon: Icon(
-          Icons.video_call,
-          color: isMyself ? Colors.white : color,
-        ),
+        subMessageType: subMessageType,
       );
     }
     return null;

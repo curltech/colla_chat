@@ -21,7 +21,7 @@ class PlatformMediaPlayer extends StatefulWidget {
   final double? height;
   final double? width;
   final String? filename;
-  final Uint8List? data;
+  final List<int>? data;
 
   const PlatformMediaPlayer(
       {Key? key,

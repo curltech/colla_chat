@@ -18,7 +18,7 @@ class PlatformAudioPlayer extends StatefulWidget {
   //是否显示播放列表
   final bool showPlayerList;
   final String? filename;
-  final Uint8List? data;
+  final List<int>? data;
 
   PlatformAudioPlayer(
       {Key? key,

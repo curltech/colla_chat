@@ -51,7 +51,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
 
   _onStop(String filename) async {
     if (StringUtil.isNotEmpty(filename)) {
-      Uint8List data = await FileUtil.readFile(filename);
+      List<int> data = await FileUtil.readFile(filename);
       chatMessageController.send(
           data: data,
           contentType: ContentType.audio,

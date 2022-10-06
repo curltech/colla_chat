@@ -24,7 +24,7 @@ class PlatformVideoPlayer extends StatefulWidget {
   final double? height;
   final double? width;
   final String? filename;
-  final Uint8List? data;
+  final List<int>? data;
 
   PlatformVideoPlayer(
       {Key? key,

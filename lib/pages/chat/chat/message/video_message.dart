@@ -1,26 +1,19 @@
-import 'package:colla_chat/widgets/common/image_widget.dart';
+import 'package:colla_chat/widgets/media/video/platform_video_player.dart';
 import 'package:flutter/material.dart';
 
 ///消息体：视频消息
 class VideoMessage extends StatelessWidget {
-  final String thumbnail;
-  final String content;
+  final String? thumbnail;
+  final List<int> data;
   final bool isMyself;
 
   const VideoMessage(
-      {Key? key,
-      required this.content,
-      required this.isMyself,
-      required this.thumbnail})
+      {Key? key, required this.data, required this.isMyself, this.thumbnail})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {},
-      child: ImageWidget(
-        image: thumbnail,
-      ),
-    );
+    return PlatformVideoPlayer(
+        simple: true, showControls: true, showPlayerList: false, data: data);
   }
 }
