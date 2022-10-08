@@ -28,6 +28,8 @@ enum ContentType {
   busy
 }
 
+enum MimeType { jpg, png, csv, xls, ppt, pdf }
+
 // 消息类型（messageType）,system消息不在聊天界面显示
 enum ChatMessageType {
   email,

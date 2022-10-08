@@ -3,12 +3,15 @@ import 'package:flutter/material.dart';
 
 ///消息体：图片消息
 class ImageMessage extends StatelessWidget {
-  final String thumbnail;
-  final String? content;
+  final String mimeType;
+  final String image;
   final bool isMyself;
 
   const ImageMessage(
-      {Key? key, this.content, required this.isMyself, required this.thumbnail})
+      {Key? key,
+      required this.image,
+      required this.isMyself,
+      required this.mimeType})
       : super(key: key);
 
   @override
@@ -16,7 +19,7 @@ class ImageMessage extends StatelessWidget {
     return InkWell(
       onTap: () {},
       child: ImageWidget(
-        image: thumbnail,
+        image: image,
       ),
     );
   }

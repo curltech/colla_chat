@@ -128,6 +128,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       {String? title,
       String? message,
       ContentType contentType = ContentType.text,
+      MimeType? mimeType,
       ChatSubMessageType subMessageType = ChatSubMessageType.chat}) async {
     List<int>? data;
     if (message != null) {
@@ -137,6 +138,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         title: title,
         data: data,
         contentType: contentType,
+        mimeType: mimeType,
         subMessageType: subMessageType);
   }
 
@@ -145,6 +147,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       {String? title,
       List<int>? data,
       ContentType contentType = ContentType.text,
+      MimeType? mimeType,
       ChatSubMessageType subMessageType = ChatSubMessageType.chat}) async {
     if (_chatSummary == null) {
       return null;
@@ -163,6 +166,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
           name: name,
           clientId: clientId,
           contentType: contentType,
+          mimeType: mimeType,
           subMessageType: subMessageType);
       await chatMessageService.send(chatMessage);
       notifyListeners();
@@ -172,6 +176,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
           await chatMessageService.buildGroupChatMessage(peerId,
               data: data,
               contentType: contentType,
+              mimeType: mimeType,
               subMessageType: subMessageType);
       if (chatMessages.isNotEmpty) {
         chatMessage = chatMessages[0];
@@ -321,28 +326,12 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
             curve: Curves.easeIn));
   }
 
-  ///发送其他消息命令
-  Future<void> action(int index, String name, {String? value}) async {
-    switch (name) {
-      case '视频通话':
-        await actionVideoChat();
-        break;
-      default:
-        break;
-    }
-  }
-
-  actionVideoChat() async {
-    chatMessageController.index = 1;
-  }
-
   ///发送消息的输入框和按钮，三个按钮，一个输入框，单独一个类
   ///另外还有各种消息的选择菜单，emoji各一个类
   Widget _buildMessageInputWidget(BuildContext context) {
     return ChatMessageInputWidget(
       textEditingController: textEditingController,
       onSend: chatMessageController.sendText,
-      onAction: action,
     );
   }
 

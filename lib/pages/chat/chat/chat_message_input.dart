@@ -17,15 +17,16 @@ class ChatMessageInputWidget extends StatefulWidget {
   final TextEditingController textEditingController;
 
   final Future<void> Function(
-      {String? message, ChatSubMessageType subMessageType}) onSend;
+      {String? message, ChatSubMessageType subMessageType})? onSend;
 
-  final Future<void> Function(int index, String name,{String? value}) onAction;
+  final Future<void> Function(int index, String name, {String? value})?
+      onAction;
 
   const ChatMessageInputWidget(
       {Key? key,
       required this.textEditingController,
-      required this.onSend,
-      required this.onAction})
+      this.onSend,
+      this.onAction})
       : super(key: key);
 
   @override
@@ -48,7 +49,9 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
   }
 
   Future<void> onSendPressed() async {
-    widget.onSend(message: widget.textEditingController.text);
+    if (widget.onSend != null) {
+      widget.onSend!(message: widget.textEditingController.text);
+    }
   }
 
   void onEmojiPressed() {

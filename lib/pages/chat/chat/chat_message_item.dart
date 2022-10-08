@@ -3,6 +3,11 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/pages/chat/chat/message/audio_message.dart';
+import 'package:colla_chat/pages/chat/chat/message/file_message.dart';
+import 'package:colla_chat/pages/chat/chat/message/image_message.dart';
+import 'package:colla_chat/pages/chat/chat/message/name_card_message.dart';
+import 'package:colla_chat/pages/chat/chat/message/rich_text_message.dart';
+import 'package:colla_chat/pages/chat/chat/message/url_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/video_message.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/chat/contact.dart';
@@ -81,11 +86,43 @@ class ChatMessageItem extends StatelessWidget {
           thumbnail: thumbnail,
         );
       }
-      if (contentType == ContentType.file) {}
-      if (contentType == ContentType.image) {}
-      if (contentType == ContentType.card) {}
-      if (contentType == ContentType.rich) {}
-      if (contentType == ContentType.link) {}
+      if (contentType == ContentType.file) {
+        String title = chatMessage.title!;
+        String mimeType = chatMessage.mimeType!;
+        return FileMessage(
+          data: data!,
+          isMyself: isMyself,
+          title: title!,
+          mimeType: mimeType,
+        );
+      }
+      if (contentType == ContentType.image) {
+        String title = chatMessage.title!;
+        String mimeType = chatMessage.mimeType!;
+        return ImageMessage(
+          image: content!,
+          isMyself: isMyself,
+          mimeType: mimeType,
+        );
+      }
+      if (contentType == ContentType.card) {
+        return NameCardMessage(
+          content: content!,
+          isMyself: isMyself,
+        );
+      }
+      if (contentType == ContentType.rich) {
+        return RichTextMessage(
+          content: content!,
+          isMyself: isMyself,
+        );
+      }
+      if (contentType == ContentType.link) {
+        return UrlMessage(
+          url: title!,
+          isMyself: isMyself,
+        );
+      }
     }
     if (subMessageType == ChatSubMessageType.videoChat) {
       return ActionMessage(
