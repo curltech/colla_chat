@@ -73,29 +73,29 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         _onActionPicture();
         break;
       case 'video chat':
-        _onVideoChatAction();
+        _onActionVideoChat();
         break;
       case 'location':
-        _onLocationAction();
+        _onActionLocation();
         break;
       case 'name card':
-        _onNameCardAction();
+        _onActionNameCard();
         break;
       case 'file':
-        _onFileAction();
+        _onActionFile();
         break;
       case 'voice':
-        _onVoiceAction();
+        _onActionVoice();
         break;
       case 'collection':
-        _onCollectionAction();
+        _onActionCollection();
         break;
       default:
         break;
     }
   }
 
-  _onVideoChatAction() {
+  _onActionVideoChat() {
     chatMessageController.index = 1;
   }
 
@@ -117,15 +117,15 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     }
   }
 
-  void _onLocationAction() {}
+  void _onActionLocation() {}
 
-  Future<void> _onNameCardAction() async {
+  Future<void> _onActionNameCard() async {
     String content = JsonUtil.toJsonString(myself.myselfPeer);
     await chatMessageController.sendText(
         message: content, contentType: ContentType.card);
   }
 
-  Future<void> _onFileAction() async {
+  Future<void> _onActionFile() async {
     List<String> filenames = await FileUtil.pickFiles();
     if (filenames.isNotEmpty) {
       List<int> data = await FileUtil.readFile(filenames[0]);
@@ -134,9 +134,9 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     }
   }
 
-  void _onVoiceAction() {}
+  void _onActionVoice() {}
 
-  void _onCollectionAction() {}
+  void _onActionCollection() {}
 
   Widget _buildActionCard(BuildContext context) {
     return Container(
