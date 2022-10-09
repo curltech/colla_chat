@@ -584,7 +584,7 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
         controller: widget.controller,
         simple: widget.simple,
       );
-      controls.add(controllerPanel);
+      controls.add(Expanded(child: controllerPanel));
     }
     return Column(children: controls);
   }
@@ -645,34 +645,28 @@ class _PlatformVlcControllerPanelState
               stream: widget.controller.player.playbackStream,
               builder: (context, snapshot) {
                 PlaybackState? playerState = snapshot.data;
+                if (playerState == null) {
+                  return PlatformMediaPlayerUtil.buildProgressIndicator();
+                }
                 List<Widget> widgets = [];
-                if (!playerState!.isCompleted && !playerState.isPlaying) {
-                  widgets.add(Container(
-                    margin: const EdgeInsets.all(8.0),
-                    width: 24.0,
-                    height: 24.0,
-                    child: const CircularProgressIndicator(),
-                  ));
+                if (!playerState.isPlaying) {
+                  widgets.add(Ink(
+                      child: InkWell(
+                    onTap: widget.controller.play,
+                    child: const Icon(Icons.play_arrow_rounded, size: 36),
+                  )));
+                } else if (!playerState.isCompleted) {
+                  widgets.add(Ink(
+                      child: InkWell(
+                    onTap: widget.controller.pause,
+                    child: const Icon(Icons.pause, size: 36),
+                  )));
                 } else {
-                  if (!playerState!.isPlaying) {
-                    widgets.add(Ink(
-                        child: InkWell(
-                      onTap: widget.controller.play,
-                      child: const Icon(Icons.play_arrow_rounded, size: 36),
-                    )));
-                  } else if (!playerState.isCompleted) {
-                    widgets.add(Ink(
-                        child: InkWell(
-                      onTap: widget.controller.pause,
-                      child: const Icon(Icons.pause, size: 36),
-                    )));
-                  } else {
-                    widgets.add(Ink(
-                        child: InkWell(
-                      child: const Icon(Icons.replay, size: 36),
-                      onTap: () => widget.controller.seek(Duration.zero),
-                    )));
-                  }
+                  widgets.add(Ink(
+                      child: InkWell(
+                    child: const Icon(Icons.replay, size: 36),
+                    onTap: () => widget.controller.seek(Duration.zero),
+                  )));
                 }
                 return Row(
                   children: widgets,

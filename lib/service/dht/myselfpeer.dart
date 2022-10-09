@@ -68,6 +68,15 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     return peer;
   }
 
+  Future<MyselfPeer?> findOneByLoginName(String loginName) async {
+    var where = 'loginName = ?';
+    var whereArgs = [loginName];
+
+    var peer = await findOne(where: where, whereArgs: whereArgs);
+
+    return peer;
+  }
+
   /// 注册新的p2p账户
   Future<bool> register(String name, String loginName, String password,
       {String? code, String? mobile, String? email}) async {
@@ -86,6 +95,10 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     var peer = await findOneByName(name);
     if (peer != null) {
       throw 'SameNameAccountExists';
+    }
+    peer = await findOneByName(loginName);
+    if (peer != null) {
+      throw 'SameLoginNameAccountExists';
     }
     var deviceData = platformParams.deviceData;
     var clientDevice = JsonUtil.toJsonString(deviceData);
