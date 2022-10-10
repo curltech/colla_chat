@@ -584,30 +584,28 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
   Widget build(BuildContext context) {
     AbstractMediaPlayerController controller = widget.controller;
     List<Widget> controls = [];
-    if (widget.showPlaylist) {
-      var view = VisibilityDetector(
-          key: ObjectKey(controller),
-          onVisibilityChanged: (visiblityInfo) {
-            if (visiblityInfo.visibleFraction > 0.9) {
-              controller.play();
-            }
-          },
-          child: Stack(children: [
-            Visibility(
-                visible: widget.showMediaView,
-                child: PlatformMediaPlayerUtil.buildMediaView(
-                    controller: controller,
-                    color: widget.color,
-                    width: widget.width,
-                    height: widget.height,
-                    showControls: widget.showControls)),
-            Visibility(
-              visible: widget.showPlaylist && controller.playlistVisible,
-              child: PlatformMediaPlayerUtil.buildPlaylist(context, controller),
-            )
-          ]));
-      controls.add(Expanded(child: view));
-    }
+    var view = VisibilityDetector(
+        key: ObjectKey(controller),
+        onVisibilityChanged: (visiblityInfo) {
+          if (visiblityInfo.visibleFraction > 0.9) {
+            controller.play();
+          }
+        },
+        child: Stack(children: [
+          Visibility(
+              visible: widget.showMediaView,
+              child: PlatformMediaPlayerUtil.buildMediaView(
+                  controller: controller,
+                  color: widget.color,
+                  width: widget.width,
+                  height: widget.height,
+                  showControls: widget.showControls)),
+          Visibility(
+            visible: widget.showPlaylist && controller.playlistVisible,
+            child: PlatformMediaPlayerUtil.buildPlaylist(context, controller),
+          )
+        ]));
+    controls.add(Expanded(child: view));
     if (!widget.showControls) {
       Widget controllerPanel = PlatformVlcControllerPanel(
         controller: widget.controller,
