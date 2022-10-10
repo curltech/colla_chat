@@ -38,10 +38,16 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
+    String filename = 'C:\\Users\\hujs\\AppData\\Local\\Temp\\1d819cab.m4a';
     return AppBarView(
       title: const Text('Video Player'),
       withLeading: true,
-      child: PlatformVideoPlayer(),
+      child: PlatformVideoPlayer(
+        simple: true,
+        showControls: false,
+        showPlayerList: true,
+        filename: filename,
+      ),
     );
   }
 }

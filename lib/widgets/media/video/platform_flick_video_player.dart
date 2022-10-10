@@ -182,6 +182,12 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
   @override
   Widget buildMediaView({
     Key? key,
+    double? width,
+    double? height,
+    BoxFit fit = BoxFit.contain,
+    AlignmentGeometry alignment = Alignment.center,
+    double scale = 1.0,
+    bool showControls = true,
     Widget flickVideoWithControls =
         const FlickVideoWithControls(controls: FlickPortraitControls()),
     Widget? flickVideoWithControlsFullscreen,

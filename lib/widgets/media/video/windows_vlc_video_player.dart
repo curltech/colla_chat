@@ -425,7 +425,31 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
         // fillColor: fillColor,
       );
     } else {
-      return _buildVideoWidget();
+      return _buildVideoWidget(
+        key: key,
+        player: player,
+        width: width,
+        height: height,
+        fit: fit,
+        alignment: alignment,
+        scale: scale,
+        showControls: showControls,
+        progressBarActiveColor: progressBarActiveColor,
+        progressBarInactiveColor: progressBarInactiveColor,
+        progressBarThumbColor: progressBarThumbColor,
+        progressBarThumbGlowColor: progressBarThumbGlowColor,
+        volumeActiveColor: volumeActiveColor,
+        volumeInactiveColor: volumeInactiveColor,
+        volumeBackgroundColor: volumeBackgroundColor,
+        volumeThumbColor: volumeThumbColor,
+        progressBarThumbRadius: progressBarThumbRadius,
+        progressBarThumbGlowRadius: progressBarThumbGlowRadius,
+        showTimeLeft: showTimeLeft,
+        progressBarTextStyle: progressBarTextStyle,
+        filterQuality: filterQuality,
+        // showFullscreenButton: showFullscreenButton,
+        // fillColor: fillColor,
+      );
     }
   }
 
@@ -507,7 +531,8 @@ class PlatformVlcVideoPlayer extends StatefulWidget {
   final bool simple;
 
   //是否显示播放列表和媒体视图
-  final bool showPlayerList;
+  final bool showPlaylist;
+  final bool showMediaView;
 
   final Color? color;
   final double? height;
@@ -520,7 +545,8 @@ class PlatformVlcVideoPlayer extends StatefulWidget {
       VlcVideoPlayerController? controller,
       this.simple = false,
       this.showControls = true,
-      this.showPlayerList = true,
+      this.showPlaylist = true,
+      this.showMediaView = true,
       this.color,
       this.width,
       this.height,
@@ -558,7 +584,7 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
   Widget build(BuildContext context) {
     AbstractMediaPlayerController controller = widget.controller;
     List<Widget> controls = [];
-    if (widget.showPlayerList) {
+    if (widget.showPlaylist) {
       var view = VisibilityDetector(
           key: ObjectKey(controller),
           onVisibilityChanged: (visiblityInfo) {
@@ -567,13 +593,16 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
             }
           },
           child: Stack(children: [
-            PlatformMediaPlayerUtil.buildMediaView(
-                controller: controller,
-                color: widget.color,
-                width: widget.width,
-                height: widget.height),
             Visibility(
-              visible: controller.playlistVisible,
+                visible: widget.showMediaView,
+                child: PlatformMediaPlayerUtil.buildMediaView(
+                    controller: controller,
+                    color: widget.color,
+                    width: widget.width,
+                    height: widget.height,
+                    showControls: widget.showControls)),
+            Visibility(
+              visible: widget.showPlaylist && controller.playlistVisible,
               child: PlatformMediaPlayerUtil.buildPlaylist(context, controller),
             )
           ]));
@@ -750,7 +779,7 @@ class _PlatformVlcControllerPanelState
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         _buildSimpleControlPanel(context),
-        _buildPlayerSlider(context),
+        Expanded(child: _buildPlayerSlider(context)),
       ],
     ));
   }

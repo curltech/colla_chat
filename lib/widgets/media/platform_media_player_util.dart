@@ -4,24 +4,8 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/media/media_player_slider.dart';
 import 'package:colla_chat/widgets/media/platform_media_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 
 class PlatformMediaPlayerUtil {
-  ///显示播放列表按钮
-  static Widget buildPlaylistVisibleButton(
-      BuildContext context, AbstractMediaPlayerController controller) {
-    return Ink(
-        child: InkWell(
-      child: controller.playlistVisible
-          ? const Icon(Icons.visibility_off, size: 24)
-          : const Icon(Icons.visibility, size: 24),
-      onTap: () {
-        var playlistVisible = controller.playlistVisible;
-        controller.playlistVisible = !playlistVisible;
-      },
-    ));
-  }
-
   ///播放列表
   static Widget buildPlaylist(
       BuildContext context, AbstractMediaPlayerController controller) {
@@ -95,7 +79,8 @@ class PlatformMediaPlayerUtil {
       {required AbstractMediaPlayerController controller,
       Color? color,
       double? height,
-      double? width}) {
+      double? width,
+      bool showControls = true}) {
     color = color ?? Colors.black.withOpacity(1);
     Widget container = LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
@@ -107,7 +92,7 @@ class PlatformMediaPlayerUtil {
           width: width,
           height: height,
           decoration: BoxDecoration(color: color),
-          child: controller.buildMediaView(),
+          child: controller.buildMediaView(showControls: showControls),
         ),
       );
     });
@@ -378,18 +363,15 @@ class PlatformMediaPlayerUtil {
     AbstractMediaPlayerController controller, {
     bool simple = false,
     bool showControls = true,
+    bool showPlaylist = true,
+    bool showMediaView = true,
     Color? color,
     double? height,
     double? width,
   }) {
     List<Widget> controls = [];
-    var view = VisibilityDetector(
-      key: ObjectKey(controller),
-      onVisibilityChanged: (visiblityInfo) {
-        if (visiblityInfo.visibleFraction > 0.9) {
-          controller.play();
-        }
-      },
+    var view = Visibility(
+      visible: showPlaylist,
       child: buildMediaView(
           controller: controller, color: color, width: width, height: height),
     );
@@ -408,7 +390,7 @@ class PlatformMediaPlayerUtil {
     return Stack(children: [
       Column(children: controls),
       Visibility(
-          visible: controller.playlistVisible,
+          visible: showPlaylist,
           child: PlatformMediaPlayerUtil.buildPlaylist(context, controller))
     ]);
   }

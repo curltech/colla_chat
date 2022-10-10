@@ -362,7 +362,14 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     }
   }
 
-  Widget buildMediaView();
+  Widget buildMediaView({
+    double? width,
+    double? height,
+    BoxFit fit = BoxFit.contain,
+    AlignmentGeometry alignment = Alignment.center,
+    double scale = 1.0,
+    bool showControls = true,
+  });
 
   ///异步产生波形图形组件
   Future<StreamBuilder<WaveformProgress>> buildWaveformProgress(

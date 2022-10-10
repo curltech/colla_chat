@@ -155,7 +155,15 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  Widget buildMediaView() {
+  Widget buildMediaView({
+    Key? key,
+    double? width,
+    double? height,
+    BoxFit fit = BoxFit.contain,
+    AlignmentGeometry alignment = Alignment.center,
+    double scale = 1.0,
+    bool showControls = true,
+  }) {
     return VideoPlayer(
       videoPlayerController!,
     );

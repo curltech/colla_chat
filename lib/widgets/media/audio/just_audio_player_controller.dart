@@ -227,7 +227,14 @@ class JustAudioPlayerController extends AbstractMediaPlayerController {
   close() {}
 
   @override
-  Widget buildMediaView() {
+  Widget buildMediaView({
+    double? width,
+    double? height,
+    BoxFit fit = BoxFit.contain,
+    AlignmentGeometry alignment = Alignment.center,
+    double scale = 1.0,
+    bool showControls = true,
+  }) {
     return Container();
   }
 }

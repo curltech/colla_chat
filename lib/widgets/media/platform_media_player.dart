@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/media/media_player_slider.dart';
 import 'package:colla_chat/widgets/media/platform_media_controller.dart';
@@ -16,7 +14,8 @@ class PlatformMediaPlayer extends StatefulWidget {
   final bool showControls;
 
   //是否显示播放列表和媒体视图
-  final bool showPlayerList;
+  final bool showPlaylist;
+  final bool showMediaView;
   final Color? color;
   final double? height;
   final double? width;
@@ -28,7 +27,8 @@ class PlatformMediaPlayer extends StatefulWidget {
       this.simple = false,
       required this.controller,
       this.showControls = true,
-      this.showPlayerList = true,
+      this.showPlaylist = true,
+      this.showMediaView = true,
       this.color,
       this.width,
       this.height,
@@ -58,21 +58,6 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
   void dispose() {
     widget.controller.removeListener(_update);
     super.dispose();
-  }
-
-  ///显示播放列表按钮
-  Widget _buildPlaylistVisibleButton(BuildContext context) {
-    AbstractMediaPlayerController controller = widget.controller;
-    return Ink(
-        child: InkWell(
-      child: controller.playlistVisible
-          ? const Icon(Icons.visibility_off, size: 24)
-          : const Icon(Icons.visibility, size: 24),
-      onTap: () {
-        var playlistVisible = controller.playlistVisible;
-        controller.playlistVisible = !playlistVisible;
-      },
-    ));
   }
 
   ///播放列表
@@ -426,7 +411,7 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
   Widget _buildMediaPlayer(BuildContext context) {
     AbstractMediaPlayerController controller = widget.controller;
     List<Widget> controls = [];
-    if (widget.showPlayerList) {
+    if (widget.showPlaylist) {
       var view = VisibilityDetector(
           key: ObjectKey(controller),
           onVisibilityChanged: (visiblityInfo) {
@@ -435,13 +420,15 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
             }
           },
           child: Stack(children: [
-            _buildMediaView(
-                controller: controller,
-                color: widget.color,
-                width: widget.width,
-                height: widget.height),
             Visibility(
-              visible: controller.playlistVisible,
+                visible: widget.showMediaView,
+                child: _buildMediaView(
+                    controller: controller,
+                    color: widget.color,
+                    width: widget.width,
+                    height: widget.height)),
+            Visibility(
+              visible: widget.showPlaylist,
               child: _buildPlaylist(context),
             )
           ]));

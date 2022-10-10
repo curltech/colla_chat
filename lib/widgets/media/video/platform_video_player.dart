@@ -80,7 +80,7 @@ class _PlatformVideoPlayerState extends State<PlatformVideoPlayer> {
         controller: widget.controller as VlcVideoPlayerController,
         simple: widget.simple,
         showControls: widget.showControls,
-        showPlayerList: widget.showPlayerList,
+        showPlaylist: widget.showPlayerList,
       );
       return player;
     } else {
@@ -88,7 +88,7 @@ class _PlatformVideoPlayerState extends State<PlatformVideoPlayer> {
         controller: widget.controller,
         simple: widget.simple,
         showControls: widget.showControls,
-        showPlayerList: widget.showPlayerList,
+        showPlaylist: widget.showPlayerList,
       );
       return player;
     }

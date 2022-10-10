@@ -115,9 +115,14 @@ class FijkVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   Widget buildMediaView({
+    Key? key,
     double? width,
     double? height,
-    FijkFit fit = FijkFit.contain,
+    BoxFit fit = BoxFit.contain,
+    AlignmentGeometry alignment = Alignment.center,
+    double scale = 1.0,
+    bool showControls = true,
+    //FijkFit fit = FijkFit.contain,
     FijkFit fsFit = FijkFit.contain,
     Widget Function(FijkPlayer, FijkData, BuildContext, Size, Rect)
         panelBuilder = defaultFijkPanelBuilder,
@@ -130,7 +135,7 @@ class FijkVideoPlayerController extends AbstractMediaPlayerController {
         player: player,
         width: width,
         height: height,
-        fit: fit,
+        fit: FijkFit.contain,
         fsFit: fsFit,
         panelBuilder: panelBuilder,
         color: color,

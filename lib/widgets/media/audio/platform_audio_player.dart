@@ -77,7 +77,7 @@ class _PlatformAudioPlayerState extends State<PlatformAudioPlayer> {
           controller: widget.controller,
           showControls: false,
           simple: widget.simple,
-          showPlayerList: widget.showPlayerList);
+          showPlaylist: widget.showPlayerList);
       return player;
     }
   }
