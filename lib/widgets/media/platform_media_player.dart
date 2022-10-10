@@ -8,7 +8,8 @@ class PlatformMediaPlayer extends StatefulWidget {
   final AbstractMediaPlayerController controller;
 
   //自定义简单控制器模式
-  final bool simple;
+  final bool showVolume;
+  final bool showSpeed;
 
   //是否显示原生的控制器
   final bool showControls;
@@ -24,7 +25,8 @@ class PlatformMediaPlayer extends StatefulWidget {
 
   const PlatformMediaPlayer(
       {Key? key,
-      this.simple = false,
+      this.showVolume = true,
+      this.showSpeed = false,
       required this.controller,
       this.showControls = true,
       this.showPlaylist = true,
@@ -436,7 +438,7 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
     }
     if (!widget.showControls) {
       Widget controllerPanel;
-      if (widget.simple) {
+      if (widget.showPlaylist) {
         controllerPanel = _buildSimpleControllerPanel(context);
       } else {
         controllerPanel = _buildComplexControllerPanel(context);

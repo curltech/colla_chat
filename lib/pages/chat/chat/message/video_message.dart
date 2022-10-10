@@ -14,6 +14,6 @@ class VideoMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PlatformVideoPlayer(
-        simple: true, showControls: true, showPlayerList: false, data: data);
+        showControls: true, showPlaylist: false, data: data);
   }
 }

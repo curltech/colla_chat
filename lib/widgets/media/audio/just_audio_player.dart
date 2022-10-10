@@ -13,7 +13,8 @@ class JustAudioPlayer extends StatefulWidget {
   late final JustAudioPlayerController controller;
 
   //自定义简单控制器模式
-  final bool simple;
+  final bool showVolume;
+  final bool showSpeed;
 
   //是否显示播放列表
   final bool showPlayerList;
@@ -23,7 +24,8 @@ class JustAudioPlayer extends StatefulWidget {
   JustAudioPlayer(
       {Key? key,
       JustAudioPlayerController? controller,
-      this.simple = false,
+      this.showVolume = true,
+      this.showSpeed = false,
       this.showPlayerList = true,
       this.filename,
       this.data})
@@ -192,7 +194,7 @@ class _JustAudioPlayerState extends State<JustAudioPlayer>
 
   @override
   Widget build(BuildContext context) {
-    if (widget.simple) {
+    if (widget.showPlayerList) {
       return _buildSimpleControllerPanel(context);
     }
     return _buildComplexControllerPanel(context);

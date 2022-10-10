@@ -88,6 +88,12 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
     });
     player.playbackStream.listen((playbackState) {
       this.playbackState = playbackState;
+      if (this.playbackState != null && this.playbackState!.isCompleted) {
+        playlistVisible = true;
+      }
+      if (this.playbackState != null && this.playbackState!.isPlaying) {
+        playlistVisible = false;
+      }
       //logger.i('libvlc playbackState:$playbackState');
     });
     player.generalStream.listen((generalState) {
@@ -528,7 +534,8 @@ class PlatformVlcVideoPlayer extends StatefulWidget {
   final bool showControls;
 
   ///如果是外置控件，是否显示简洁版
-  final bool simple;
+  final bool showVolume;
+  final bool showSpeed;
 
   //是否显示播放列表和媒体视图
   final bool showPlaylist;
@@ -543,7 +550,8 @@ class PlatformVlcVideoPlayer extends StatefulWidget {
   PlatformVlcVideoPlayer(
       {Key? key,
       VlcVideoPlayerController? controller,
-      this.simple = false,
+      this.showVolume = true,
+      this.showSpeed = false,
       this.showControls = true,
       this.showPlaylist = true,
       this.showMediaView = true,
@@ -583,37 +591,42 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
   @override
   Widget build(BuildContext context) {
     AbstractMediaPlayerController controller = widget.controller;
-    List<Widget> controls = [];
-    var view = VisibilityDetector(
-        key: ObjectKey(controller),
-        onVisibilityChanged: (visiblityInfo) {
-          if (visiblityInfo.visibleFraction > 0.9) {
-            controller.play();
-          }
-        },
-        child: Stack(children: [
-          Visibility(
-              visible: widget.showMediaView,
-              child: PlatformMediaPlayerUtil.buildMediaView(
-                  controller: controller,
-                  color: widget.color,
-                  width: widget.width,
-                  height: widget.height,
-                  showControls: widget.showControls)),
-          Visibility(
-            visible: widget.showPlaylist && controller.playlistVisible,
-            child: PlatformMediaPlayerUtil.buildPlaylist(context, controller),
-          )
-        ]));
-    controls.add(Expanded(child: view));
+    List<Widget> columns = [];
+    List<Widget> rows = [];
+    if (widget.showMediaView) {
+      rows.add(PlatformMediaPlayerUtil.buildMediaView(
+          controller: controller,
+          color: widget.color,
+          width: widget.width,
+          height: widget.height,
+          showControls: widget.showControls));
+    }
+    if (widget.showPlaylist) {
+      rows.add(Visibility(
+          visible: controller.playlistVisible,
+          child: PlatformMediaPlayerUtil.buildPlaylist(context, controller)));
+    }
+    if (rows.isNotEmpty) {
+      var view = VisibilityDetector(
+          key: ObjectKey(controller),
+          onVisibilityChanged: (visiblityInfo) {
+            if (visiblityInfo.visibleFraction > 0.9) {
+              controller.play();
+            }
+          },
+          child: Stack(children: rows));
+      columns.add(Expanded(child: view));
+    }
     if (!widget.showControls) {
       Widget controllerPanel = PlatformVlcControllerPanel(
         controller: widget.controller,
-        simple: widget.simple,
+        showVolume: widget.showVolume,
+        showSpeed: widget.showSpeed,
+        showPlaylist: widget.showPlaylist,
       );
-      controls.add(Expanded(child: controllerPanel));
+      columns.add(Expanded(child: controllerPanel));
     }
-    return Column(children: controls);
+    return Column(children: columns);
   }
 }
 
@@ -622,12 +635,16 @@ class PlatformVlcControllerPanel extends StatefulWidget {
   late final VlcVideoPlayerController controller;
 
   ///如果是外置控件，是否显示简洁版
-  final bool simple;
+  final bool showVolume;
+  final bool showSpeed;
+  final bool showPlaylist;
 
   PlatformVlcControllerPanel({
     Key? key,
     VlcVideoPlayerController? controller,
-    this.simple = false,
+    this.showVolume = true,
+    this.showSpeed = false,
+    this.showPlaylist = true,
   }) : super(key: key) {
     this.controller = controller ?? VlcVideoPlayerController();
   }
@@ -645,100 +662,88 @@ class _PlatformVlcControllerPanelState
 
   @override
   Widget build(BuildContext context) {
-    Widget controllerPanel;
-    if (widget.simple) {
-      controllerPanel = _buildSimpleControllerPanel(context);
-    } else {
-      controllerPanel = _buildComplexControllerPanel(context);
-    }
+    Widget controllerPanel = _buildControllerPanel(context);
+
     return controllerPanel;
   }
 
   ///简单播放控制面板，包含音量，简单播放按钮，
-  Widget _buildSimpleControlPanel(BuildContext buildContext) {
+  Widget _buildControlPanel(BuildContext buildContext) {
+    List<Widget> rows = [];
+    if (widget.showPlaylist) {
+      rows.add(PlatformMediaPlayerUtil.buildPlaylistVisibleButton(
+          context, widget.controller));
+    }
+    if (widget.showVolume) {
+      rows.add(StreamBuilder<GeneralState>(
+        stream: widget.controller.player.generalStream,
+        builder: (context, snapshot) {
+          return PlatformMediaPlayerUtil.buildVolumeButton(
+              context, widget.controller);
+        },
+      ));
+    }
+    rows.add(StreamBuilder<PlaybackState>(
+        stream: widget.controller.player.playbackStream,
+        builder: (context, snapshot) {
+          PlaybackState? playerState = snapshot.data;
+          List<Widget> playbacks = [];
+          playbacks.add(Ink(
+              child: InkWell(
+            onTap: widget.controller.stop,
+            child: const Icon(Icons.stop, size: 36),
+          )));
+          if (widget.showPlaylist) {
+            playbacks.add(Ink(
+                child: InkWell(
+              onTap: widget.controller.previous,
+              child: const Icon(Icons.skip_previous, size: 36),
+            )));
+          }
+          if (playerState == null || !playerState.isPlaying) {
+            playbacks.add(Ink(
+                child: InkWell(
+              onTap: widget.controller.play,
+              child: const Icon(Icons.play_arrow_rounded, size: 36),
+            )));
+          } else if (!playerState.isCompleted) {
+            playbacks.add(Ink(
+                child: InkWell(
+              onTap: widget.controller.pause,
+              child: const Icon(Icons.pause, size: 36),
+            )));
+          } else {
+            playbacks.add(Ink(
+                child: InkWell(
+              child: const Icon(Icons.replay, size: 36),
+              onTap: () => widget.controller.seek(Duration.zero),
+            )));
+          }
+          if (widget.showPlaylist) {
+            playbacks.add(Ink(
+                child: InkWell(
+              onTap: widget.controller.next,
+              child: const Icon(Icons.skip_next, size: 36),
+            )));
+          }
+          return Row(
+            children: playbacks,
+          );
+        }));
+    if (widget.showSpeed) {
+      rows.add(StreamBuilder<GeneralState>(
+        stream: widget.controller.player.generalStream,
+        builder: (context, snapshot) {
+          return PlatformMediaPlayerUtil.buildSpeedButton(
+              context, widget.controller);
+        },
+      ));
+    }
     return Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
-        children: [
-          StreamBuilder<GeneralState>(
-            stream: widget.controller.player.generalStream,
-            builder: (context, snapshot) {
-              return PlatformMediaPlayerUtil.buildVolumeButton(
-                  context, widget.controller);
-            },
-          ),
-          StreamBuilder<PlaybackState>(
-              stream: widget.controller.player.playbackStream,
-              builder: (context, snapshot) {
-                PlaybackState? playerState = snapshot.data;
-                if (playerState == null) {
-                  return PlatformMediaPlayerUtil.buildProgressIndicator();
-                }
-                List<Widget> widgets = [];
-                if (!playerState.isPlaying) {
-                  widgets.add(Ink(
-                      child: InkWell(
-                    onTap: widget.controller.play,
-                    child: const Icon(Icons.play_arrow_rounded, size: 36),
-                  )));
-                } else if (!playerState.isCompleted) {
-                  widgets.add(Ink(
-                      child: InkWell(
-                    onTap: widget.controller.pause,
-                    child: const Icon(Icons.pause, size: 36),
-                  )));
-                } else {
-                  widgets.add(Ink(
-                      child: InkWell(
-                    child: const Icon(Icons.replay, size: 36),
-                    onTap: () => widget.controller.seek(Duration.zero),
-                  )));
-                }
-                return Row(
-                  children: widgets,
-                );
-              }),
-        ]);
-  }
-
-  Widget _buildComplexControlPanel(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        StreamBuilder<GeneralState>(
-          stream: widget.controller.player.generalStream,
-          builder: (context, snapshot) {
-            return PlatformMediaPlayerUtil.buildVolumeButton(
-                context, widget.controller);
-          },
-        ),
-        const SizedBox(
-          width: 25,
-        ),
-        _buildComplexPlayPanel(),
-        const SizedBox(
-          width: 25,
-        ),
-        StreamBuilder<GeneralState>(
-          stream: widget.controller.player.generalStream,
-          builder: (context, snapshot) {
-            return PlatformMediaPlayerUtil.buildSpeedButton(
-                context, widget.controller);
-          },
-        ),
-      ],
-    );
-  }
-
-  ///复杂播放按钮面板
-  StreamBuilder<PlaybackState> _buildComplexPlayPanel() {
-    return StreamBuilder<PlaybackState>(
-        stream: widget.controller.player.playbackStream,
-        builder: (context, snapshot) {
-          return PlatformMediaPlayerUtil.buildComplexPlayPanel(
-              context, widget.controller);
-        });
+        children: rows);
   }
 
   ///播放进度条
@@ -758,27 +763,14 @@ class _PlatformVlcControllerPanelState
   }
 
   ///复杂控制器按钮面板，包含音量，速度和播放按钮
-  Widget _buildComplexControllerPanel(BuildContext context) {
+  Widget _buildControllerPanel(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         _buildPlayerSlider(context),
-        _buildComplexControlPanel(context),
+        _buildControlPanel(context),
       ],
     );
-  }
-
-  ///简单控制器面板，包含简单播放面板和进度条
-  Widget _buildSimpleControllerPanel(BuildContext context) {
-    return Center(
-        child: Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        _buildSimpleControlPanel(context),
-        Expanded(child: _buildPlayerSlider(context)),
-      ],
-    ));
   }
 }

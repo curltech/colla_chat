@@ -30,12 +30,12 @@ class MediaPlayerSliderUtil {
 
         thumbShape: const RoundSliderThumbShape(
           //可继承SliderComponentShape自定义形状
-          disabledThumbRadius: 15, //禁用时滑块大小
+          disabledThumbRadius: 6, //禁用时滑块大小
           enabledThumbRadius: 6, //滑块大小
         ),
         overlayShape: const RoundSliderOverlayShape(
           //可继承SliderComponentShape自定义形状
-          overlayRadius: 14, //滑块外圈大小
+          overlayRadius: 10, //滑块外圈大小
         ));
   }
 }

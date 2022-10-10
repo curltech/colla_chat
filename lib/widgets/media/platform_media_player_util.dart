@@ -6,6 +6,21 @@ import 'package:colla_chat/widgets/media/platform_media_controller.dart';
 import 'package:flutter/material.dart';
 
 class PlatformMediaPlayerUtil {
+  ///显示播放列表按钮
+  static Widget buildPlaylistVisibleButton(
+      BuildContext context, AbstractMediaPlayerController controller) {
+    return Ink(
+        child: InkWell(
+      child: controller.playlistVisible
+          ? const Icon(Icons.visibility_off, size: 24)
+          : const Icon(Icons.visibility, size: 24),
+      onTap: () {
+        var playlistVisible = controller.playlistVisible;
+        controller.playlistVisible = !playlistVisible;
+      },
+    ));
+  }
+
   ///播放列表
   static Widget buildPlaylist(
       BuildContext context, AbstractMediaPlayerController controller) {

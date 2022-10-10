@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/media/platform_media_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
@@ -12,13 +10,15 @@ class PlatformVideoPlayer extends StatefulWidget {
   late final AbstractMediaPlayerController controller;
 
   //自定义简单控制器模式
-  final bool simple;
+  final bool showVolume;
+  final bool showSpeed;
 
   //是否显示原生的控制器
   final bool showControls;
 
   //是否显示播放列表和媒体视图
-  final bool showPlayerList;
+  final bool showPlaylist;
+  final bool showMediaView;
 
   final Color? color;
   final double? height;
@@ -29,9 +29,11 @@ class PlatformVideoPlayer extends StatefulWidget {
   PlatformVideoPlayer(
       {Key? key,
       AbstractMediaPlayerController? controller,
-      this.simple = false,
+      this.showVolume = true,
+      this.showSpeed = false,
       this.showControls = true,
-      this.showPlayerList = true,
+      this.showPlaylist = true,
+      this.showMediaView = true,
       this.color,
       this.width,
       this.height,
@@ -78,17 +80,21 @@ class _PlatformVideoPlayerState extends State<PlatformVideoPlayer> {
     if (widget.controller is VlcVideoPlayerController) {
       var player = PlatformVlcVideoPlayer(
         controller: widget.controller as VlcVideoPlayerController,
-        simple: widget.simple,
+        showVolume: widget.showVolume,
+        showSpeed: widget.showSpeed,
         showControls: widget.showControls,
-        showPlaylist: widget.showPlayerList,
+        showPlaylist: widget.showPlaylist,
+        showMediaView: widget.showMediaView,
       );
       return player;
     } else {
       var player = PlatformMediaPlayer(
         controller: widget.controller,
-        simple: widget.simple,
+        showVolume: widget.showVolume,
+        showSpeed: widget.showSpeed,
         showControls: widget.showControls,
-        showPlaylist: widget.showPlayerList,
+        showPlaylist: widget.showPlaylist,
+        showMediaView: widget.showMediaView,
       );
       return player;
     }

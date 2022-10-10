@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/media/audio/blue_fire_audio_player_controller.dart';
 import 'package:colla_chat/widgets/media/audio/just_audio_player.dart';
@@ -13,7 +11,8 @@ class PlatformAudioPlayer extends StatefulWidget {
   late final AbstractMediaPlayerController controller;
 
   //自定义简单控制器模式
-  final bool simple;
+  final bool showVolume;
+  final bool showSpeed;
 
   //是否显示播放列表
   final bool showPlayerList;
@@ -23,7 +22,8 @@ class PlatformAudioPlayer extends StatefulWidget {
   PlatformAudioPlayer(
       {Key? key,
       AbstractMediaPlayerController? controller,
-      this.simple = false,
+      this.showVolume = true,
+      this.showSpeed = false,
       this.showPlayerList = true,
       this.filename,
       this.data})
@@ -69,14 +69,12 @@ class _PlatformAudioPlayerState extends State<PlatformAudioPlayer> {
     if (widget.controller is JustAudioPlayerController) {
       var player = JustAudioPlayer(
           controller: widget.controller as JustAudioPlayerController,
-          simple: widget.simple,
           showPlayerList: widget.showPlayerList);
       return player;
     } else {
       var player = PlatformMediaPlayer(
           controller: widget.controller,
           showControls: false,
-          simple: widget.simple,
           showPlaylist: widget.showPlayerList);
       return player;
     }
