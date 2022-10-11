@@ -11,7 +11,7 @@ class VlcMediaSource {
       {String? filename, Uint8List? data}) async {
     VlcPlayerController vlcPlayerController;
     if (filename != null) {
-      if (filename.startsWith('assets/')) {
+      if (filename.startsWith('assets')) {
         vlcPlayerController = VlcPlayerController.asset(filename);
       } else if (filename.startsWith('http')) {
         vlcPlayerController = VlcPlayerController.network(filename);
@@ -22,8 +22,8 @@ class VlcMediaSource {
     } else {
       data = data ?? Uint8List.fromList([]);
       filename = await FileUtil.writeTempFile(data);
-      vlcPlayerController = VlcPlayerController.file(File(filename));
-      await vlcPlayerController!.initialize();
+      vlcPlayerController = VlcPlayerController.file(File(filename!));
+      await vlcPlayerController.initialize();
     }
 
     return Future.value(vlcPlayerController);

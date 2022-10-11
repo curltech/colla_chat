@@ -8,13 +8,15 @@ import 'package:file_saver/file_saver.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
+import 'package:uuid/uuid.dart';
 
 class FileUtil {
   static Future<String> writeFile(List<int> bytes, String filename) async {
-    if (!filename.contains('/')) {
+    if (!filename.contains(p.separator)) {
       final dir = await getApplicationDocumentsDirectory();
-      filename = '${dir.path}/$filename';
+      filename = p.join(dir.path, filename);
     }
     final file = File(filename);
     await file.writeAsBytes(bytes);
@@ -23,25 +25,29 @@ class FileUtil {
     return filename;
   }
 
-  static Future<String> writeTempFile(List<int> bytes,
+  static Future<String?> writeTempFile(List<int> bytes,
       {String? filename}) async {
     if (StringUtil.isEmpty(filename)) {
       final dir = await getTemporaryDirectory();
-      var current = DateTime.now().millisecondsSinceEpoch;
-      filename = '${dir.path}/$current';
-    } else if (!filename!.contains('/')) {
+      var uuid = const Uuid();
+      var name = uuid.v4();
+      filename = p.join(dir.path, name);
+    } else if (!filename!.contains(p.separator)) {
       final dir = await getTemporaryDirectory();
-      filename = '${dir.path}/$filename';
+      filename = p.join(dir.path, filename);
     }
     final file = File(filename);
     await file.writeAsBytes(bytes);
-    await file.exists();
+    bool exist = await file.exists();
+    if (!exist) {
+      return null;
+    }
 
     return filename;
   }
 
   static Future<List<int>> readFile(String filename) async {
-    if (filename.startsWith('assets/')) {
+    if (filename.startsWith('assets')) {
       return await _readAssetData(filename);
     } else {
       return await _readFileBytes(filename);

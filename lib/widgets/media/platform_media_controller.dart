@@ -74,7 +74,7 @@ class PlatformMediaSource {
       data = data ?? Uint8List.fromList([]);
       filename = await FileUtil.writeTempFile(data);
       mediaSource = MediaSource(
-          filename: filename,
+          filename: filename!,
           mediaSourceType: MediaSourceType.buffer,
           mediaFormat: mediaFormat);
     }
@@ -347,7 +347,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
 
   setSpeed(double speed);
 
-  sourceFilePicker({
+  Future<List<MediaSource>> sourceFilePicker({
     String? dialogTitle,
     String? initialDirectory,
     FileType type = FileType.audio,
@@ -359,13 +359,19 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     bool withReadStream = false,
     bool lockParentWindow = false,
   }) async {
+    List<MediaSource> mediaSources = [];
     final filenames =
         await FileUtil.pickFiles(allowMultiple: allowMultiple, type: type);
     if (filenames.isNotEmpty) {
       for (var filename in filenames) {
-        add(filename: filename);
+        MediaSource? mediaSource = await add(filename: filename);
+        if (mediaSource != null) {
+          mediaSources.add(mediaSource);
+        }
       }
     }
+
+    return mediaSources;
   }
 
   Widget buildMediaView({

@@ -28,7 +28,7 @@ class VlcMediaSource {
     } else {
       data = data ?? Uint8List.fromList([]);
       filename = await FileUtil.writeTempFile(data);
-      media = Media.file(File(filename));
+      media = Media.file(File(filename!));
     }
 
     return media;

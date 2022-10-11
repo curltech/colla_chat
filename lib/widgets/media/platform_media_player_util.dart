@@ -1,6 +1,5 @@
 import 'dart:ui' as ui;
 
-import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/media/media_player_slider.dart';
 import 'package:colla_chat/widgets/media/platform_media_controller.dart';
 import 'package:flutter/material.dart';
@@ -43,10 +42,7 @@ class PlatformMediaPlayerUtil {
                     child: InkWell(
                       child: const Icon(Icons.add),
                       onTap: () async {
-                        List<String> filenames = await FileUtil.pickFiles();
-                        for (var filename in filenames) {
-                          await controller.add(filename: filename);
-                        }
+                        await controller.sourceFilePicker();
                       },
                     ),
                   )
