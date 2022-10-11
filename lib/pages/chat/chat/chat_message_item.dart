@@ -137,7 +137,7 @@ class ChatMessageItem extends StatelessWidget {
   Widget _buildMessageBubble(BuildContext context) {
     return Container(
         constraints: const BoxConstraints(
-            minWidth: 0, maxWidth: 260, minHeight: 0, maxHeight: 56),
+            minWidth: 0, maxWidth: 300),
         child: Bubble(
           elevation: 0.0,
           stick: true,

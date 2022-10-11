@@ -21,6 +21,6 @@ class AudioMessage extends StatelessWidget {
         showVolume: true,
         showSpeed: false,
         data: data);
-    return Card(child: videoPlayer);
+    return SizedBox(height: 80, child: Card(child:videoPlayer));
   }
 }
