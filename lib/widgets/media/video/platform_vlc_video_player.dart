@@ -21,7 +21,7 @@ class VlcMediaSource {
       await vlcPlayerController!.initialize();
     } else {
       data = data ?? Uint8List.fromList([]);
-      filename = await FileUtil.writeTempFile(data, '');
+      filename = await FileUtil.writeTempFile(data);
       vlcPlayerController = VlcPlayerController.file(File(filename));
       await vlcPlayerController!.initialize();
     }

@@ -72,7 +72,7 @@ class PlatformMediaSource {
       }
     } else {
       data = data ?? Uint8List.fromList([]);
-      filename = await FileUtil.writeTempFile(data, '');
+      filename = await FileUtil.writeTempFile(data);
       mediaSource = MediaSource(
           filename: filename,
           mediaSourceType: MediaSourceType.buffer,
@@ -270,30 +270,35 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     }
   }
 
-  add({String? filename, List<int>? data}) async {
+  Future<MediaSource?> add({String? filename, List<int>? data}) async {
     for (var mediaSource in playlist) {
       var name = mediaSource.filename;
       if (name == filename) {
-        return;
+        return null;
       }
     }
     MediaSource mediaSource =
         await PlatformMediaSource.media(filename: filename, data: data);
     playlist.add(mediaSource);
     await setCurrentIndex(playlist.length - 1);
+
+    return mediaSource;
   }
 
-  insert(int index, {String? filename, List<int>? data}) async {
+  Future<MediaSource?> insert(int index,
+      {String? filename, List<int>? data}) async {
     for (var mediaSource in playlist) {
       var name = mediaSource.filename;
       if (name == filename) {
-        return;
+        return null;
       }
     }
     MediaSource mediaSource =
         await PlatformMediaSource.media(filename: filename, data: data);
     playlist.insert(index, mediaSource);
     await setCurrentIndex(index);
+
+    return mediaSource;
   }
 
   remove(int index) async {

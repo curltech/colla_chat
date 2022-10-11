@@ -9,6 +9,7 @@ import 'package:colla_chat/pages/chat/chat/message/name_card_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/rich_text_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/url_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/video_message.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/string_util.dart';
@@ -58,6 +59,7 @@ class ChatMessageItem extends StatelessWidget {
     List<int>? data;
     if (content != null) {
       data = CryptoUtil.decodeBase64(content);
+      logger.i('chatMessage content data length: ${data.length}');
     }
 
     if (subMessageType == ChatSubMessageType.chat) {
@@ -136,8 +138,7 @@ class ChatMessageItem extends StatelessWidget {
   ///气泡消息容器，内包消息体
   Widget _buildMessageBubble(BuildContext context) {
     return Container(
-        constraints: const BoxConstraints(
-            minWidth: 0, maxWidth: 300),
+        constraints: const BoxConstraints(minWidth: 0, maxWidth: 300),
         child: Bubble(
           elevation: 0.0,
           stick: true,

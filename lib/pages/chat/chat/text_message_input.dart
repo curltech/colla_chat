@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/media/audio/platform_audio_recorder.dart';
@@ -52,7 +52,8 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   _onStop(String filename) async {
     if (StringUtil.isNotEmpty(filename)) {
       List<int> data = await FileUtil.readFile(filename);
-      chatMessageController.send(
+      logger.i('read file: $filename length: ${data.length}');
+      await chatMessageController.send(
           data: data,
           contentType: ContentType.audio,
           subMessageType: ChatSubMessageType.chat);

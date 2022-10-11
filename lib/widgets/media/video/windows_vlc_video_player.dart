@@ -5,9 +5,9 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/media/media_player_slider.dart';
-import 'package:colla_chat/widgets/media/platform_media_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_controller.dart'
     as platform;
+import 'package:colla_chat/widgets/media/platform_media_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_player_util.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
@@ -27,7 +27,7 @@ class VlcMediaSource {
       }
     } else {
       data = data ?? Uint8List.fromList([]);
-      filename = await FileUtil.writeTempFile(data, '');
+      filename = await FileUtil.writeTempFile(data);
       media = Media.file(File(filename));
     }
 
@@ -181,10 +181,15 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
 
   ///下面是播放列表的功能
   @override
-  add({String? filename, List<int>? data}) async {
-    super.add(filename: filename, data: data);
-    Media media = await VlcMediaSource.media(filename: filename, data: data);
-    player.add(media);
+  Future<platform.MediaSource?> add({String? filename, List<int>? data}) async {
+    platform.MediaSource? mediaSource =
+        await super.add(filename: filename, data: data);
+    if (mediaSource != null) {
+      Media media = await VlcMediaSource.media(filename: mediaSource.filename);
+      player.add(media);
+    }
+
+    return mediaSource;
   }
 
   @override
@@ -194,10 +199,15 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  insert(int index, {String? filename, List<int>? data}) async {
-    super.insert(index, filename: filename, data: data);
-    Media media = await VlcMediaSource.media(filename: filename, data: data);
-    player.insert(index, media);
+  Future<platform.MediaSource?> insert(int index,
+      {String? filename, List<int>? data}) async {
+    platform.MediaSource? mediaSource =
+        await super.insert(index, filename: filename, data: data);
+    if (mediaSource != null) {
+      Media media = await VlcMediaSource.media(filename: mediaSource.filename);
+      player.insert(index, media);
+    }
+    return mediaSource;
   }
 
   @override

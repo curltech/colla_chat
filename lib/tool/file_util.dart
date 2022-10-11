@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:file_saver/file_saver.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
@@ -22,8 +23,13 @@ class FileUtil {
     return filename;
   }
 
-  static Future<String> writeTempFile(List<int> bytes, String filename) async {
-    if (!filename.contains('/')) {
+  static Future<String> writeTempFile(List<int> bytes,
+      {String? filename}) async {
+    if (StringUtil.isEmpty(filename)) {
+      final dir = await getTemporaryDirectory();
+      var current = DateTime.now().millisecondsSinceEpoch;
+      filename = '${dir.path}/$current';
+    } else if (!filename!.contains('/')) {
       final dir = await getTemporaryDirectory();
       filename = '${dir.path}/$filename';
     }

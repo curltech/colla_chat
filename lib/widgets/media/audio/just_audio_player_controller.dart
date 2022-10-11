@@ -43,7 +43,7 @@ class JustAudioSource {
       }
     } else {
       data = data ?? Uint8List.fromList([]);
-      filename = await FileUtil.writeTempFile(data, '');
+      filename = await FileUtil.writeTempFile(data);
       audioSource = AudioSource.uri(Uri.parse(filename), tag: tag);
     }
 

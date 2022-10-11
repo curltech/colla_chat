@@ -21,7 +21,7 @@ class ChewieMediaSource {
       }
     } else {
       data = data ?? Uint8List.fromList([]);
-      filename = await FileUtil.writeTempFile(data, '');
+      filename = await FileUtil.writeTempFile(data);
       videoPlayerController = VideoPlayerController.file(File(filename));
     }
     await videoPlayerController.initialize();
