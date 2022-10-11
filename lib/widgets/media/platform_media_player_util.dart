@@ -4,6 +4,7 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/media/media_player_slider.dart';
 import 'package:colla_chat/widgets/media/platform_media_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class PlatformMediaPlayerUtil {
   ///显示播放列表按钮
@@ -148,16 +149,19 @@ class PlatformMediaPlayerUtil {
           if (snapshot.data == null) {
             return buildProgressIndicator();
           }
+          double volume = snapshot.data!;
           return Row(children: [
             Ink(
                 child: InkWell(
-              child: const Icon(Icons.volume_up, size: 24),
+              child: volume == 0.0
+                  ? const Icon(Icons.volume_off, size: 24)
+                  : const Icon(Icons.volume_up, size: 24),
               onTap: () {
                 var volumeSlideVisible = controller.volumeSlideVisible;
                 controller.volumeSlideVisible = !volumeSlideVisible;
               },
             )),
-            Text(snapshot.data!.toStringAsFixed(1)),
+            Text(volume.toStringAsFixed(1)),
             Visibility(
                 visible: controller.volumeSlideVisible,
                 child: buildSliderWidget(
@@ -165,7 +169,7 @@ class PlatformMediaPlayerUtil {
                   divisions: 10,
                   min: 0.0,
                   max: 1.0,
-                  value: snapshot.data!,
+                  value: volume,
                   onChanged: controller.setVolume,
                 )),
           ]);
@@ -205,105 +209,79 @@ class PlatformMediaPlayerUtil {
         });
   }
 
-  ///简单播放控制面板，包含音量，简单播放按钮，
-  static Widget buildSimpleControlPanel(
-      BuildContext context, AbstractMediaPlayerController controller) {
+  static Widget buildControlPanel(
+    BuildContext context,
+    AbstractMediaPlayerController controller, {
+    bool showPlaylist = true,
+    bool showVolume = true,
+    bool showSpeed = false,
+  }) {
     PlayerStatus status = controller.status;
-    List<Widget> widgets = [];
-
-    if (status == PlayerStatus.init ||
-        status == PlayerStatus.pause ||
-        status == PlayerStatus.stop) {
-      widgets.add(Ink(
-          child: InkWell(
-        onTap: controller.play,
-        child: const Icon(Icons.play_arrow, size: 36),
-      )));
-    } else if (status == PlayerStatus.playing) {
-      widgets.add(Ink(
-          child: InkWell(
-        onTap: controller.pause,
-        child: const Icon(Icons.pause, size: 36),
-      )));
-    } else if (status == PlayerStatus.completed) {
-      widgets.add(Ink(
-          child: InkWell(
-        child: const Icon(Icons.replay, size: 36),
-        onTap: () => controller.seek(Duration.zero),
-      )));
+    List<Widget> rows = [];
+    if (showPlaylist) {
+      rows.add(PlatformMediaPlayerUtil.buildPlaylistVisibleButton(
+          context, controller));
+    }
+    if (showVolume) {
+      rows.add(PlatformMediaPlayerUtil.buildVolumeButton(context, controller));
+    }
+    rows.add(buildPlayback(context, controller, status, showPlaylist));
+    if (showSpeed) {
+      rows.add(PlatformMediaPlayerUtil.buildSpeedButton(context, controller));
     }
     return Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.min,
-        children: [
-          buildVolumeButton(context, controller),
-          Row(children: widgets),
-        ]);
+        children: rows);
   }
 
-  static Widget buildComplexControlPanel(
-      BuildContext context, AbstractMediaPlayerController controller) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        buildVolumeButton(context, controller),
-        // const SizedBox(
-        //   width: 25,
-        // ),
-        buildComplexPlayPanel(context, controller),
-        // const SizedBox(
-        //   width: 25,
-        // ),
-        buildSpeedButton(context, controller),
-      ],
-    );
-  }
-
-  ///复杂播放按钮面板
-  static Widget buildComplexPlayPanel(
-      BuildContext context, AbstractMediaPlayerController controller) {
-    PlayerStatus status = controller.status;
-    List<Widget> widgets = [];
-    widgets.add(Ink(
+  static Widget buildPlayback(
+      BuildContext context,
+      AbstractMediaPlayerController controller,
+      PlayerStatus status,
+      bool showPlaylist) {
+    List<Widget> playbacks = [];
+    playbacks.add(Ink(
         child: InkWell(
       onTap: controller.stop,
-      child: const Icon(Icons.stop, size: 36),
+      child: const Icon(Icons.stop, size: 24),
     )));
-    widgets.add(Ink(
-        child: InkWell(
-      onTap: controller.previous,
-      child: const Icon(Icons.skip_previous, size: 36),
-    )));
-    if (status == PlayerStatus.init ||
-        status == PlayerStatus.pause ||
-        status == PlayerStatus.stop ||
-        status == PlayerStatus.completed) {
-      widgets.add(Ink(
+    if (showPlaylist) {
+      playbacks.add(Ink(
+          child: InkWell(
+        onTap: controller.previous,
+        child: const Icon(Icons.skip_previous, size: 24),
+      )));
+    }
+    if (status != PlayerStatus.playing) {
+      playbacks.add(Ink(
           child: InkWell(
         onTap: controller.play,
-        child: const Icon(Icons.play_arrow, size: 36),
+        child: const Icon(Icons.play_arrow_rounded, size: 24),
       )));
-    } else if (status == PlayerStatus.playing) {
-      widgets.add(Ink(
+    } else if (status != PlayerStatus.completed) {
+      playbacks.add(Ink(
           child: InkWell(
         onTap: controller.pause,
-        child: const Icon(Icons.pause, size: 36),
+        child: const Icon(Icons.pause, size: 24),
       )));
-    } else if (status == PlayerStatus.completed) {
-      widgets.add(Ink(
+    } else {
+      playbacks.add(Ink(
           child: InkWell(
         child: const Icon(Icons.replay, size: 24),
         onTap: () => controller.seek(Duration.zero),
       )));
     }
-    widgets.add(Ink(
-        child: InkWell(
-      onTap: controller.next,
-      child: const Icon(Icons.skip_next, size: 36),
-    )));
+    if (showPlaylist) {
+      playbacks.add(Ink(
+          child: InkWell(
+        onTap: controller.next,
+        child: const Icon(Icons.skip_next, size: 24),
+      )));
+    }
     return Row(
-      children: widgets,
+      children: playbacks,
     );
   }
 
@@ -347,67 +325,75 @@ class PlatformMediaPlayerUtil {
   }
 
   ///复杂控制器按钮面板，包含音量，速度和播放按钮
-  static Widget buildComplexControllerPanel(
-      BuildContext context, AbstractMediaPlayerController controller) {
+  static Widget buildControllerPanel(
+    BuildContext context,
+    AbstractMediaPlayerController controller, {
+    bool showPlaylist = true,
+    bool showVolume = true,
+    bool showSpeed = false,
+  }) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         buildPlayerSlider(context, controller),
-        buildComplexControlPanel(context, controller),
+        buildControlPanel(context, controller,
+            showPlaylist: showPlaylist,
+            showVolume: showVolume,
+            showSpeed: showSpeed),
       ],
     );
-  }
-
-  ///简单控制器面板，包含简单播放面板和进度条
-  static Widget buildSimpleControllerPanel(
-      BuildContext context, AbstractMediaPlayerController controller) {
-    return Center(
-        child: Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        buildSimpleControlPanel(context, controller),
-        buildPlayerSlider(context, controller),
-      ],
-    ));
   }
 
   static Widget buildMediaPlayer(
     BuildContext context,
     AbstractMediaPlayerController controller, {
-    bool simple = false,
     bool showControls = true,
     bool showPlaylist = true,
     bool showMediaView = true,
+    bool showVolume = true,
+    bool showSpeed = false,
     Color? color,
     double? height,
     double? width,
   }) {
-    List<Widget> controls = [];
-    var view = Visibility(
-      visible: showPlaylist,
-      child: buildMediaView(
-          controller: controller, color: color, width: width, height: height),
-    );
-    controls.add(Expanded(child: view));
-    if (!showControls) {
-      Widget controllerPanel;
-      if (simple) {
-        controllerPanel = PlatformMediaPlayerUtil.buildSimpleControllerPanel(
-            context, controller);
-      } else {
-        controllerPanel = PlatformMediaPlayerUtil.buildComplexControllerPanel(
-            context, controller);
-      }
-      controls.add(controllerPanel);
+    List<Widget> columns = [];
+    List<Widget> rows = [];
+    if (showMediaView) {
+      rows.add(PlatformMediaPlayerUtil.buildMediaView(
+          controller: controller,
+          color: color,
+          width: width,
+          height: height,
+          showControls: showControls));
     }
-    return Stack(children: [
-      Column(children: controls),
-      Visibility(
-          visible: showPlaylist,
-          child: PlatformMediaPlayerUtil.buildPlaylist(context, controller))
-    ]);
+    if (showPlaylist) {
+      rows.add(Visibility(
+          visible: controller.playlistVisible,
+          child: PlatformMediaPlayerUtil.buildPlaylist(context, controller)));
+    }
+    if (rows.isNotEmpty) {
+      var view = VisibilityDetector(
+          key: ObjectKey(controller),
+          onVisibilityChanged: (visiblityInfo) {
+            if (visiblityInfo.visibleFraction > 0.9 && controller.autoPlay) {
+              controller.play();
+            }
+          },
+          child: Stack(children: rows));
+      columns.add(Expanded(child: view));
+    }
+    if (!showControls) {
+      Widget controllerPanel = buildControllerPanel(
+        context,
+        controller,
+        showVolume: showVolume,
+        showSpeed: showSpeed,
+        showPlaylist: showPlaylist,
+      );
+      columns.add(Expanded(child: controllerPanel));
+    }
+    return Column(children: columns);
   }
 
   static bool isTablet() {

@@ -190,6 +190,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   bool _playlistVisible = true;
   bool _speedSlideVisible = false;
   bool _volumeSlideVisible = false;
+  bool autoPlay = false;
   int? _currentIndex;
   PlayerStatus _status = PlayerStatus.init;
 

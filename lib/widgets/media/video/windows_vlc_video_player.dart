@@ -143,6 +143,7 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
   @override
   stop() {
     player.stop();
+    playlistVisible = true;
   }
 
   @override
@@ -545,7 +546,7 @@ class PlatformVlcVideoPlayer extends StatefulWidget {
   final double? height;
   final double? width;
   final String? filename;
-  final Uint8List? data;
+  final List<int>? data;
 
   PlatformVlcVideoPlayer(
       {Key? key,
@@ -610,7 +611,7 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
       var view = VisibilityDetector(
           key: ObjectKey(controller),
           onVisibilityChanged: (visiblityInfo) {
-            if (visiblityInfo.visibleFraction > 0.9) {
+            if (visiblityInfo.visibleFraction > 0.9 && controller.autoPlay) {
               controller.play();
             }
           },
@@ -687,48 +688,20 @@ class _PlatformVlcControllerPanelState
         stream: widget.controller.player.playbackStream,
         builder: (context, snapshot) {
           PlaybackState? playerState = snapshot.data;
-          List<Widget> playbacks = [];
-          playbacks.add(Ink(
-              child: InkWell(
-            onTap: widget.controller.stop,
-            child: const Icon(Icons.stop, size: 36),
-          )));
-          if (widget.showPlaylist) {
-            playbacks.add(Ink(
-                child: InkWell(
-              onTap: widget.controller.previous,
-              child: const Icon(Icons.skip_previous, size: 36),
-            )));
-          }
-          if (playerState == null || !playerState.isPlaying) {
-            playbacks.add(Ink(
-                child: InkWell(
-              onTap: widget.controller.play,
-              child: const Icon(Icons.play_arrow_rounded, size: 36),
-            )));
-          } else if (!playerState.isCompleted) {
-            playbacks.add(Ink(
-                child: InkWell(
-              onTap: widget.controller.pause,
-              child: const Icon(Icons.pause, size: 36),
-            )));
+          PlayerStatus status;
+          if (playerState == null) {
+            status = PlayerStatus.init;
+          } else if (playerState.isPlaying) {
+            status = PlayerStatus.playing;
+          } else if (playerState.isCompleted) {
+            status = PlayerStatus.completed;
           } else {
-            playbacks.add(Ink(
-                child: InkWell(
-              child: const Icon(Icons.replay, size: 36),
-              onTap: () => widget.controller.seek(Duration.zero),
-            )));
+            status = widget.controller.status;
           }
-          if (widget.showPlaylist) {
-            playbacks.add(Ink(
-                child: InkWell(
-              onTap: widget.controller.next,
-              child: const Icon(Icons.skip_next, size: 36),
-            )));
-          }
-          return Row(
-            children: playbacks,
-          );
+          Widget playback = PlatformMediaPlayerUtil.buildPlayback(
+              context, widget.controller, status, widget.showPlaylist);
+
+          return playback;
         }));
     if (widget.showSpeed) {
       rows.add(StreamBuilder<GeneralState>(

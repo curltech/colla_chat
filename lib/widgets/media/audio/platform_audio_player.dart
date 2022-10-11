@@ -15,7 +15,8 @@ class PlatformAudioPlayer extends StatefulWidget {
   final bool showSpeed;
 
   //是否显示播放列表
-  final bool showPlayerList;
+  final bool showPlaylist;
+  final bool showMediaView;
   final String? filename;
   final List<int>? data;
 
@@ -24,7 +25,8 @@ class PlatformAudioPlayer extends StatefulWidget {
       AbstractMediaPlayerController? controller,
       this.showVolume = true,
       this.showSpeed = false,
-      this.showPlayerList = true,
+      this.showPlaylist = true,
+      this.showMediaView = false,
       this.filename,
       this.data})
       : super(key: key) {
@@ -68,14 +70,26 @@ class _PlatformAudioPlayerState extends State<PlatformAudioPlayer> {
   Widget build(BuildContext context) {
     if (widget.controller is JustAudioPlayerController) {
       var player = JustAudioPlayer(
-          controller: widget.controller as JustAudioPlayerController,
-          showPlayerList: widget.showPlayerList);
+        controller: widget.controller as JustAudioPlayerController,
+        showVolume: widget.showVolume,
+        showSpeed: widget.showSpeed,
+        showPlaylist: widget.showPlaylist,
+        showMediaView: widget.showMediaView,
+        filename: widget.filename,
+        data: widget.data,
+      );
       return player;
     } else {
       var player = PlatformMediaPlayer(
-          controller: widget.controller,
-          showControls: false,
-          showPlaylist: widget.showPlayerList);
+        controller: widget.controller,
+        showControls: false,
+        showVolume: widget.showVolume,
+        showSpeed: widget.showSpeed,
+        showPlaylist: widget.showPlaylist,
+        showMediaView: widget.showMediaView,
+        filename: widget.filename,
+        data: widget.data,
+      );
       return player;
     }
   }

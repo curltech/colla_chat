@@ -4,10 +4,12 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/media/audio/audio_service.dart';
 import 'package:colla_chat/widgets/media/audio/just_audio_player_controller.dart';
 import 'package:colla_chat/widgets/media/media_player_slider.dart';
+import 'package:colla_chat/widgets/media/platform_media_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_player_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 class JustAudioPlayer extends StatefulWidget {
   late final JustAudioPlayerController controller;
@@ -17,7 +19,10 @@ class JustAudioPlayer extends StatefulWidget {
   final bool showSpeed;
 
   //是否显示播放列表
-  final bool showPlayerList;
+  final bool showPlaylist;
+
+  //是否显示音频波形界面
+  final bool showMediaView;
   final String? filename;
   final List<int>? data;
 
@@ -26,7 +31,8 @@ class JustAudioPlayer extends StatefulWidget {
       JustAudioPlayerController? controller,
       this.showVolume = true,
       this.showSpeed = false,
-      this.showPlayerList = true,
+      this.showPlaylist = true,
+      this.showMediaView = false,
       this.filename,
       this.data})
       : super(key: key) {
@@ -73,17 +79,126 @@ class _JustAudioPlayerState extends State<JustAudioPlayer>
     super.dispose();
   }
 
-  ///简单控制器面板，包含简单播放面板和进度条
-  Widget _buildSimpleControllerPanel(BuildContext context) {
-    return Center(
-        child: Row(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        _buildSimpleControlPanel(context),
-        _buildPlayerSlider(context),
-      ],
-    ));
+  @override
+  Widget build(BuildContext context) {
+    AbstractMediaPlayerController controller = widget.controller;
+    List<Widget> columns = [];
+    List<Widget> rows = [];
+    if (widget.showMediaView) {}
+    if (widget.showPlaylist) {
+      rows.add(Visibility(
+          visible: controller.playlistVisible,
+          child: PlatformMediaPlayerUtil.buildPlaylist(context, controller)));
+    }
+    if (rows.isNotEmpty) {
+      var view = VisibilityDetector(
+          key: ObjectKey(controller),
+          onVisibilityChanged: (visiblityInfo) {
+            if (visiblityInfo.visibleFraction > 0.9 && controller.autoPlay) {
+              controller.play();
+            }
+          },
+          child: Stack(children: rows));
+      columns.add(Expanded(child: view));
+    }
+    Widget controllerPanel = PlatformJustAudioControllerPanel(
+      controller: widget.controller,
+      showVolume: widget.showVolume,
+      showSpeed: widget.showSpeed,
+      showPlaylist: widget.showPlaylist,
+    );
+    columns.add(Expanded(child: controllerPanel));
+    return Column(children: columns);
+  }
+}
+
+///视频播放器的控制面板
+class PlatformJustAudioControllerPanel extends StatefulWidget {
+  late final JustAudioPlayerController controller;
+
+  ///如果是外置控件，是否显示简洁版
+  final bool showVolume;
+  final bool showSpeed;
+  final bool showPlaylist;
+
+  PlatformJustAudioControllerPanel({
+    Key? key,
+    JustAudioPlayerController? controller,
+    this.showVolume = true,
+    this.showSpeed = false,
+    this.showPlaylist = true,
+  }) : super(key: key) {
+    this.controller = controller ?? JustAudioPlayerController();
+  }
+
+  @override
+  State createState() => _PlatformJustAudioControllerPanelState();
+}
+
+class _PlatformJustAudioControllerPanelState
+    extends State<PlatformJustAudioControllerPanel> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Widget controllerPanel = _buildControllerPanel(context);
+
+    return controllerPanel;
+  }
+
+  ///简单播放控制面板，包含音量，简单播放按钮，
+  Widget _buildControlPanel(BuildContext buildContext) {
+    List<Widget> rows = [];
+    if (widget.showPlaylist) {
+      rows.add(PlatformMediaPlayerUtil.buildPlaylistVisibleButton(
+          context, widget.controller));
+    }
+    if (widget.showVolume) {
+      rows.add(StreamBuilder<double>(
+        stream: widget.controller.player.volumeStream,
+        builder: (context, snapshot) {
+          return PlatformMediaPlayerUtil.buildVolumeButton(
+              context, widget.controller);
+        },
+      ));
+    }
+    rows.add(StreamBuilder<PlayerState>(
+        stream: widget.controller.player.playerStateStream,
+        builder: (context, snapshot) {
+          final playerState = snapshot.data;
+          final processingState = playerState?.processingState;
+          PlayerStatus status;
+          if (playerState == null) {
+            status = PlayerStatus.init;
+          } else if (playerState.playing) {
+            status = PlayerStatus.playing;
+          } else if (processingState == ProcessingState.completed) {
+            status = PlayerStatus.completed;
+          } else {
+            status = widget.controller.status;
+          }
+          Widget playback = PlatformMediaPlayerUtil.buildPlayback(
+              context, widget.controller, status, widget.showPlaylist);
+
+          return playback;
+        }));
+    if (widget.showSpeed) {
+      rows.add(StreamBuilder<double>(
+        stream: widget.controller.player.speedStream,
+        builder: (context, snapshot) {
+          return PlatformMediaPlayerUtil.buildSpeedButton(
+              context, widget.controller);
+        },
+      ));
+    }
+    return Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: rows);
   }
 
   ///播放进度条
@@ -102,101 +217,15 @@ class _JustAudioPlayerState extends State<JustAudioPlayer>
     );
   }
 
-  ///复杂控制器面板，包含播放列表，进度条和复杂播放面板
-  Widget _buildComplexControllerPanel(BuildContext context) {
+  ///复杂控制器按钮面板，包含音量，速度和播放按钮
+  Widget _buildControllerPanel(BuildContext context) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
-        PlatformMediaPlayerUtil.buildPlaylist(context, widget.controller),
         _buildPlayerSlider(context),
-        _buildComplexControlPanel(context),
+        _buildControlPanel(context),
       ],
     );
-  }
-
-  ///简单播放控制面板，包含音量，简单播放按钮，
-  Widget _buildSimpleControlPanel(BuildContext context) {
-    return Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          StreamBuilder<double>(
-            stream: widget.controller.player.volumeStream,
-            builder: (context, snapshot) {
-              return PlatformMediaPlayerUtil.buildVolumeButton(
-                  context, widget.controller);
-            },
-          ),
-          StreamBuilder<PlayerState>(
-              stream: widget.controller.player.playerStateStream,
-              builder: (context, snapshot) {
-                final playerState = snapshot.data;
-                final processingState = playerState?.processingState;
-                if (processingState == ProcessingState.loading ||
-                    processingState == ProcessingState.buffering) {
-                  return PlatformMediaPlayerUtil.buildProgressIndicator();
-                } else {
-                  return PlatformMediaPlayerUtil.buildSimpleControlPanel(
-                      context, widget.controller);
-                }
-              }),
-        ]);
-  }
-
-  ///复杂控制器按钮面板，包含音量，速度和播放按钮
-  Widget _buildComplexControlPanel(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        StreamBuilder<double>(
-          stream: widget.controller.player.volumeStream,
-          builder: (context, snapshot) {
-            return PlatformMediaPlayerUtil.buildVolumeButton(
-                context, widget.controller);
-          },
-        ),
-        // const SizedBox(
-        //   width: 50,
-        // ),
-        _buildComplexPlayPanel(),
-        // const SizedBox(
-        //   width: 50,
-        // ),
-        StreamBuilder<double>(
-          stream: widget.controller.player.speedStream,
-          builder: (context, snapshot) {
-            return PlatformMediaPlayerUtil.buildSpeedButton(
-                context, widget.controller);
-          },
-        ),
-      ],
-    );
-  }
-
-  ///复杂播放按钮面板，包含复杂播放按钮
-  StreamBuilder<PlayerState> _buildComplexPlayPanel() {
-    return StreamBuilder<PlayerState>(
-        stream: widget.controller.player.playerStateStream,
-        builder: (context, snapshot) {
-          final playerState = snapshot.data;
-          final processingState = playerState?.processingState;
-          if (processingState == ProcessingState.loading ||
-              processingState == ProcessingState.buffering) {
-            return PlatformMediaPlayerUtil.buildProgressIndicator();
-          } else {
-            return PlatformMediaPlayerUtil.buildComplexPlayPanel(
-                context, widget.controller);
-          }
-        });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (widget.showPlayerList) {
-      return _buildSimpleControllerPanel(context);
-    }
-    return _buildComplexControllerPanel(context);
   }
 }
