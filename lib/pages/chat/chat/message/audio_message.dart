@@ -14,7 +14,13 @@ class AudioMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformVideoPlayer(
-        showControls: false, showPlaylist: false, data: data);
+    var videoPlayer = PlatformVideoPlayer(
+        showControls: false,
+        showPlaylist: false,
+        showMediaView: false,
+        showVolume: true,
+        showSpeed: false,
+        data: data);
+    return Card(child: videoPlayer);
   }
 }
