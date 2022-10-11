@@ -289,7 +289,6 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     }
     if (data != null) {
       chatMessage.content = CryptoUtil.encodeBase64(data);
-      logger.i('chatMessage content base64: ${chatMessage.content}');
       chatMessage.contentType = contentType.name;
       chatMessage.mimeType = mimeType?.name;
     }

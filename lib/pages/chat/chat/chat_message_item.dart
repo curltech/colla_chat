@@ -54,6 +54,7 @@ class ChatMessageItem extends StatelessWidget {
           ChatSubMessageType.values, chatMessage.subMessageType!);
     }
     subMessageType = subMessageType ?? ChatSubMessageType.chat;
+    int? id = chatMessage.id;
     String? title = chatMessage.title;
     String? content = chatMessage.content;
     List<int>? data;
@@ -76,6 +77,7 @@ class ChatMessageItem extends StatelessWidget {
       }
       if (contentType == ContentType.audio) {
         return AudioMessage(
+          id: id!,
           data: data!,
           isMyself: isMyself,
         );
@@ -83,6 +85,7 @@ class ChatMessageItem extends StatelessWidget {
       if (contentType == ContentType.video) {
         String? thumbnail = chatMessage.thumbnail;
         return VideoMessage(
+          id: id!,
           data: data!,
           isMyself: isMyself,
           thumbnail: thumbnail,

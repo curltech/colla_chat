@@ -43,6 +43,7 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
       title: const Text('Video Player'),
       withLeading: true,
       child: PlatformVideoPlayer(
+        id: 0,
         showControls: false,
         showVolume: true,
         showSpeed: true,

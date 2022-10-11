@@ -541,6 +541,8 @@ class VlcMediaRecorder {
 class PlatformVlcVideoPlayer extends StatefulWidget {
   late final VlcVideoPlayerController controller;
 
+  final int id;
+
   ///是否显示内置控件
   final bool showControls;
 
@@ -561,6 +563,7 @@ class PlatformVlcVideoPlayer extends StatefulWidget {
   PlatformVlcVideoPlayer(
       {Key? key,
       VlcVideoPlayerController? controller,
+      required this.id,
       this.showVolume = true,
       this.showSpeed = false,
       this.showControls = true,
@@ -572,7 +575,7 @@ class PlatformVlcVideoPlayer extends StatefulWidget {
       this.filename,
       this.data})
       : super(key: key) {
-    this.controller = controller ?? VlcVideoPlayerController();
+    this.controller = controller ?? VlcVideoPlayerController(id: id);
   }
 
   @override

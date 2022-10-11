@@ -3,11 +3,13 @@ import 'package:flutter/material.dart';
 
 ///消息体：声音消息
 class AudioMessage extends StatelessWidget {
+  final int id;
   final List<int> data;
   final bool isMyself;
 
   const AudioMessage({
     Key? key,
+    required this.id,
     required this.data,
     required this.isMyself,
   }) : super(key: key);
@@ -15,6 +17,7 @@ class AudioMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var videoPlayer = PlatformVideoPlayer(
+        id: id,
         showControls: false,
         showPlaylist: false,
         showMediaView: false,
