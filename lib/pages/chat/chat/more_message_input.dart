@@ -2,6 +2,7 @@ import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/camera_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
@@ -11,15 +12,15 @@ import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 import '../../../widgets/data_bind/data_action_card.dart';
 
-final List<ActionData> actionData = [
-  ActionData(
-      label: 'album',
-      tooltip: 'photo album',
-      icon: const Icon(Icons.photo_album)),
+final List<ActionData> defaultActionData = [
   ActionData(
       label: 'picture',
       tooltip: 'take picture',
       icon: const Icon(Icons.camera)),
+  ActionData(
+      label: 'voice',
+      tooltip: 'record voice',
+      icon: const Icon(Icons.voice_chat)),
   ActionData(
     label: 'video chat',
     tooltip: 'invite video chat',
@@ -38,13 +39,9 @@ final List<ActionData> actionData = [
       tooltip: 'pick and send file',
       icon: const Icon(Icons.file_open)),
   ActionData(
-      label: 'voice',
-      tooltip: 'record voice',
-      icon: const Icon(Icons.voice_chat)),
-  ActionData(
       label: 'collection',
       tooltip: 'collection',
-      icon: const Icon(Icons.favorite)),
+      icon: const Icon(Icons.collections)),
 ];
 
 ///非文本的其他多种格式输入面板，包括照片等
@@ -61,6 +58,21 @@ class MoreMessageInput extends StatefulWidget {
 }
 
 class _MoreMessageInputState extends State<MoreMessageInput> {
+  List<ActionData> actionData = [];
+
+  @override
+  initState() {
+    super.initState();
+    var albumActionData = ActionData(
+        label: 'album',
+        tooltip: 'photo album',
+        icon: const Icon(Icons.photo_album));
+    if (platformParams.ios || platformParams.android || platformParams.macos) {
+      actionData.add(albumActionData);
+    }
+    actionData.addAll(defaultActionData);
+  }
+
   _onAction(int index, String name, {String? value}) async {
     if (widget.onAction != null) {
       widget.onAction!(index, name, value: value);

@@ -26,6 +26,7 @@ class FileMessage extends StatelessWidget {
           mimetype: mimeType,
           color: appDataProvider.themeData.colorScheme.primary,
           size: 36,
+          isOutlined: true,
         ),
         title: Text(title),
         subtitle: Text(mimeType),
