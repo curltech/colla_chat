@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
@@ -17,14 +18,6 @@ enum RecorderStatus { pause, recording, stop }
 
 enum PlayerStatus { init, buffering, pause, playing, stop, completed }
 
-enum MediaFormat {
-  wav,
-  mp3,
-  m4a,
-  mp4,
-  mov,
-}
-
 enum MediaSourceType {
   asset,
   file,
@@ -34,7 +27,7 @@ enum MediaSourceType {
 
 class MediaSource {
   final String filename;
-  final MediaFormat? mediaFormat;
+  final MimeType? mediaFormat;
   final MediaSourceType mediaSourceType;
 
   MediaSource({
@@ -46,15 +39,15 @@ class MediaSource {
 
 class PlatformMediaSource {
   static Future<MediaSource> media(
-      {String? filename, List<int>? data, MediaFormat? mediaFormat}) async {
+      {String? filename, List<int>? data, MimeType? mediaFormat}) async {
     MediaSource mediaSource;
     if (filename != null) {
       if (mediaFormat == null) {
         int pos = filename.lastIndexOf('.');
         String extension = filename.substring(pos + 1);
-        mediaFormat = StringUtil.enumFromString(MediaFormat.values, extension);
+        mediaFormat = StringUtil.enumFromString(MimeType.values, extension);
       }
-      if (filename.startsWith('assets/')) {
+      if (filename.startsWith('assets')) {
         mediaSource = MediaSource(
             filename: filename,
             mediaSourceType: MediaSourceType.asset,
@@ -72,7 +65,8 @@ class PlatformMediaSource {
       }
     } else {
       data = data ?? Uint8List.fromList([]);
-      filename = await FileUtil.writeTempFile(data);
+      filename =
+          await FileUtil.writeTempFile(data, extension: mediaFormat?.name);
       mediaSource = MediaSource(
           filename: filename!,
           mediaSourceType: MediaSourceType.buffer,

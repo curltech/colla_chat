@@ -10,6 +10,7 @@ import 'package:record/record.dart';
 
 ///支持多种设备，windows测试通过
 ///Android, iOS, Linux, macOS, Windows, and web.
+///在各种平台都支持的格式是m4a
 class PlatformAudioRecorderController extends AbstractAudioRecorderController {
   late final Record recorder;
 

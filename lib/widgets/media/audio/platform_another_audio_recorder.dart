@@ -6,7 +6,7 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/widgets/media/platform_media_controller.dart';
 import 'package:path_provider/path_provider.dart';
 
-///仅支持移动设备
+///仅支持移动设备，aac,wav两种格式
 class AnotherAudioRecorderController extends AbstractAudioRecorderController {
   AnotherAudioRecorder? recorder;
   Recording? _current;

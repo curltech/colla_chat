@@ -34,7 +34,7 @@ class JustAudioSource {
           : null, //Uri.parse('https://example.com/albumart.jpg'),
     );
     if (filename != null) {
-      if (filename.startsWith('assets/')) {
+      if (filename.startsWith('assets')) {
         audioSource = AudioSource.uri(Uri.parse(filename), tag: tag);
       } else if (filename.startsWith('http')) {
         audioSource = AudioSource.uri(Uri.parse(filename), tag: tag);

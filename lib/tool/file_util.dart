@@ -8,6 +8,7 @@ import 'package:file_saver/file_saver.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
@@ -26,15 +27,23 @@ class FileUtil {
   }
 
   static Future<String?> writeTempFile(List<int> bytes,
-      {String? filename}) async {
+      {String? filename, String? extension}) async {
     if (StringUtil.isEmpty(filename)) {
       final dir = await getTemporaryDirectory();
       var uuid = const Uuid();
       var name = uuid.v4();
-      filename = p.join(dir.path, name);
+      if (extension != null) {
+        filename = p.join(dir.path, '$name.$extension');
+      } else {
+        filename = p.join(dir.path, name);
+      }
     } else if (!filename!.contains(p.separator)) {
       final dir = await getTemporaryDirectory();
-      filename = p.join(dir.path, filename);
+      if (extension != null) {
+        filename = p.join(dir.path, '$filename.$extension');
+      } else {
+        filename = p.join(dir.path, filename);
+      }
     }
     final file = File(filename);
     await file.writeAsBytes(bytes);
@@ -243,5 +252,13 @@ class FileUtil {
     );
 
     return theme;
+  }
+
+  static String? mimeType(String filename) {
+    return lookupMimeType(filename);
+  }
+
+  static String extensionFromMime(String mime) {
+    return extensionFromMime(mime);
   }
 }

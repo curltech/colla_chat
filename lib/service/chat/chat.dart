@@ -243,7 +243,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     ChatMessageType messageType = ChatMessageType.chat,
     ChatSubMessageType subMessageType = ChatSubMessageType.chat,
     ContentType contentType = ContentType.text,
-    MimeType? mimeType,
+    String? mimeType,
     PartyType receiverType = PartyType.linkman,
     String? name,
     String? groupPeerId,
@@ -290,7 +290,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     if (data != null) {
       chatMessage.content = CryptoUtil.encodeBase64(data);
       chatMessage.contentType = contentType.name;
-      chatMessage.mimeType = mimeType?.name;
+      chatMessage.mimeType = mimeType;
     }
     chatMessage.status = status ?? MessageStatus.sent.name;
     chatMessage.transportType = transportType.name;
@@ -308,7 +308,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     ChatMessageType messageType = ChatMessageType.chat,
     ChatSubMessageType subMessageType = ChatSubMessageType.chat,
     ContentType contentType = ContentType.text,
-    MimeType? mimeType,
+    String? mimeType,
     String? title,
     List<int>? receiptContent,
     List<int>? thumbnail,
