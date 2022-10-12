@@ -75,12 +75,6 @@ class _IndexViewState extends State<IndexView>
           content = '';
         }
         String? title = chatMessage.title;
-        if (title != null) {
-          var raw = CryptoUtil.decodeBase64(title);
-          title = CryptoUtil.utf8ToString(raw);
-        } else {
-          title = '';
-        }
         var name = chatMessage.senderName;
         name = name ?? '';
         card = Container(
