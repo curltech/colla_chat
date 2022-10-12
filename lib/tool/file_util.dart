@@ -266,4 +266,9 @@ class FileUtil {
     int pos = filename.lastIndexOf('.');
     return filename.substring(pos + 1);
   }
+
+  static String filename(String filename) {
+    int pos = filename.lastIndexOf(p.separator);
+    return filename.substring(pos + 1);
+  }
 }

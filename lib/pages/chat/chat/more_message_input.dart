@@ -146,7 +146,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       List<int> data = await FileUtil.readFile(filenames[0]);
       String? mimeType = FileUtil.mimeType(filenames[0]);
       await chatMessageController.send(
-          title: filenames[0],
+          title: FileUtil.filename(filenames[0]),
           data: data,
           contentType: ContentType.file,
           mimeType: mimeType);
