@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/camera_util.dart';
@@ -121,6 +122,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   Future<void> _onActionNameCard() async {
     String content = JsonUtil.toJsonString(myself.myselfPeer);
+    PeerClient peerClient = PeerClient.fromJson(JsonUtil.toJson(content));
+    content = JsonUtil.toJsonString(peerClient);
     await chatMessageController.sendText(
         message: content, contentType: ContentType.card);
   }
@@ -131,7 +134,10 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       List<int> data = await FileUtil.readFile(filenames[0]);
       String? mimeType = FileUtil.mimeType(filenames[0]);
       await chatMessageController.send(
-          data: data, contentType: ContentType.file, mimeType: mimeType);
+          title: filenames[0],
+          data: data,
+          contentType: ContentType.file,
+          mimeType: mimeType);
     }
   }
 

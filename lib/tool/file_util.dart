@@ -261,4 +261,9 @@ class FileUtil {
   static String extensionFromMime(String mime) {
     return extensionFromMime(mime);
   }
+
+  static String extension(String filename) {
+    int pos = filename.lastIndexOf('.');
+    return filename.substring(pos + 1);
+  }
 }

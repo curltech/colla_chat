@@ -111,6 +111,9 @@ class ChatMessageItem extends StatelessWidget {
         );
       }
       if (contentType == ContentType.card) {
+        if (data != null) {
+          content = CryptoUtil.utf8ToString(data);
+        }
         return NameCardMessage(
           content: content!,
           isMyself: isMyself,

@@ -1,4 +1,6 @@
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:mimecon/mimecon.dart';
 
 ///消息体：文件消息
 class FileMessage extends StatelessWidget {
@@ -17,9 +19,18 @@ class FileMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(
-      title,
-      softWrap: true,
+    var tile = InkWell(
+      onTap: () {},
+      child: ListTile(
+        leading: Mimecon(
+          mimetype: mimeType,
+          color: appDataProvider.themeData.colorScheme.primary,
+          size: 36,
+        ),
+        title: Text(title),
+        subtitle: Text(mimeType),
+      ),
     );
+    return SizedBox(height: 90, child: Card(elevation: 0, child: tile));
   }
 }

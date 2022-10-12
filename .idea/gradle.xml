@@ -15,12 +15,12 @@
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/audio_service-0.18.7/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/audio_session-0.1.10/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/audio_waveforms-0.1.5+1/android" />
-            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/audioplayers_android-1.1.0/android" />
+            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/audioplayers_android-1.1.1/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/barcode_scan2-4.2.1/android" />
-            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/battery_plus-2.2.0/android" />
+            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/battery_plus-2.2.2/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/camera_android-0.9.8+3/android" />
-            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/connectivity_plus-2.3.7/android" />
-            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/device_info_plus-4.1.2/android" />
+            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/connectivity_plus-2.3.9/android" />
+            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/device_info_plus-4.1.3/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/emoji_picker_flutter-1.4.0/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/fijkplayer-0.10.1/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/file_picker-4.6.1/android" />
@@ -29,14 +29,14 @@
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/flutter_contacts-1.1.5/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/flutter_image_compress-1.1.3/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/flutter_inappwebview_quill-5.4.6/android" />
-            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/flutter_keyboard_visibility-5.3.0/android" />
+            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/flutter_keyboard_visibility-5.4.0/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/flutter_local_notifications-9.9.1/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/flutter_plugin_android_lifecycle-2.0.7/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/flutter_secure_storage-5.1.2/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/flutter_sound-9.2.13/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/flutter_tts-3.5.3/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/flutter_vlc_player-7.1.5/android" />
-            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/flutter_webrtc-0.9.7/android" />
+            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/flutter_webrtc-0.9.9+hotfix.1/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/gallery_saver-2.3.2/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/geolocator_android-3.2.1/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/image_gallery_saver-1.7.1/android" />
@@ -45,7 +45,7 @@
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/just_waveform-0.0.3/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/local_auth_android-1.0.13/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/mobile_number-1.0.4/android" />
-            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/network_info_plus-2.2.0/android" />
+            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/network_info_plus-2.3.2/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/onesignal_flutter-3.4.1/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/open_file-3.2.1/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/openpgp-3.4.3/android" />
@@ -54,15 +54,15 @@
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/package_info_plus-1.4.3+1/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/path_provider_android-2.0.20/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/pdfx-2.0.1+2/android" />
-            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/permission_handler_android-10.0.0/android" />
+            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/permission_handler_android-10.1.0/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/phone_number-0.12.0+2/android" />
-            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/photo_manager-2.3.0/android" />
-            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/record-4.4.0/android" />
-            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/sensors_plus-1.4.0/android" />
-            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/share_plus-4.4.0/android" />
+            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/photo_manager-2.4.0/android" />
+            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/record-4.4.1/android" />
+            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/sensors_plus-1.4.1/android" />
+            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/share_plus-4.5.3/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/shared_preferences_android-2.0.13/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/speech_to_text-6.0.0/android" />
-            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/sqflite-2.1.0/android" />
+            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/sqflite-2.1.0+1/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/sqlite3_flutter_libs-0.5.10/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/telephony-0.2.0/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/url_launcher_android-6.0.19/android" />
@@ -70,7 +70,7 @@
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/video_thumbnail-0.5.3/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/wakelock-0.6.2/android" />
             <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/webcrypto-0.5.3/android" />
-            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/webview_flutter_android-2.10.3/android" />
+            <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/webview_flutter_android-2.10.4/android" />
           </set>
         </option>
       </GradleProjectSettings>

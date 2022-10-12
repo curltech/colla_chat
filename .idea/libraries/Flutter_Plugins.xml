@@ -42,7 +42,6 @@
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/fijkplayer-0.10.1" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/geolocator-8.2.1" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/package_info_plus-1.4.3+1" />
-      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/camera-0.9.8+1" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/package_info-2.0.2" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/flutter_local_notifications-9.9.1" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/network_info_plus_windows-1.0.2" />
@@ -57,7 +56,6 @@
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/audio_service-0.18.7" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/url_launcher_windows-3.0.1" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/audio_waveforms-0.1.5+1" />
-      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/camera_android-0.9.8+3" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/device_info_plus_windows-4.1.0" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/flutter_secure_storage-5.1.2" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/local_auth_windows-1.0.4" />
@@ -67,7 +65,6 @@
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/geolocator_apple-2.2.2" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/network_info_plus_linux-1.1.2" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/network_info_plus_web-1.0.1" />
-      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/camera_web-0.2.1+6" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/onesignal_flutter-3.4.1" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/toast-0.3.0" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/shared_preferences-2.0.15" />
@@ -142,6 +139,11 @@
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/package_info_plus_web-1.0.6" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/share_plus-4.5.3" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/sqflite-2.1.0+1" />
+      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/camera-0.10.0+3" />
+      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/images_picker-1.2.11" />
+      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/camera_web-0.3.0+1" />
+      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/camera_windows-0.2.1+2" />
+      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/camera_android-0.10.0+3" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
