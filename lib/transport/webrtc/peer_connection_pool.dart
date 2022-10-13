@@ -534,12 +534,12 @@ class PeerConnectionPool {
     List<AdvancedPeerConnection>? peerConnections = get(peerId);
     if (peerConnections != null && peerConnections.isNotEmpty) {
       List<Future<void>> ps = [];
-      logger.w('send signal:${peerConnections.length}');
+      //logger.w('send signal:${peerConnections.length}');
       for (var peerConnection in peerConnections) {
         if (clientId == null || peerConnection.clientId == clientId) {
           Future<void> p =
               peerConnection.send(data, cryptoOption: cryptoOption);
-          logger.w('send signal');
+          //logger.w('send signal');
           ps.add(p);
         }
       }

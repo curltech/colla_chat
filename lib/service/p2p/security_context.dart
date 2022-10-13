@@ -217,7 +217,7 @@ class CryptographySecurityContextService extends SecurityContextService {
         data = await cryptoGraphy.eccEncrypt(data,
             remotePublicKey: targetPublicKey);
       }
-      logger.i('call cryptoGraphy encrypt');
+      //logger.i('call cryptoGraphy encrypt');
     }
 
     // 设置数据的hash，base64
