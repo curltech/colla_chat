@@ -68,9 +68,12 @@ class _IndexViewState extends State<IndexView>
       if (chatMessage != null &&
           chatMessage.subMessageType == ChatSubMessageType.chat.name) {
         String? content = chatMessage.content;
+        String? contentType = chatMessage.contentType;
         if (content != null) {
           var raw = CryptoUtil.decodeBase64(content);
-          content = CryptoUtil.utf8ToString(raw);
+          if (contentType == null || contentType == ContentType.text.name) {
+            content = CryptoUtil.utf8ToString(raw);
+          }
         } else {
           content = '';
         }
