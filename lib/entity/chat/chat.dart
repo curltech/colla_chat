@@ -12,7 +12,6 @@ enum ContentType {
   note,
   channel,
   article,
-  chat,
   link,
   voice,
   position,

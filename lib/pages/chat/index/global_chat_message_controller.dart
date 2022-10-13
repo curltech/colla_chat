@@ -31,13 +31,16 @@ class GlobalChatMessageController with ChangeNotifier {
       String? clientId = chatMessage.senderClientId;
       String? title = chatMessage.title;
       String? content = chatMessage.content;
-      if (content != null) {
-        content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content));
-      }
+      // String? contentType = chatMessage.contentType;
+      // if (content != null) {
+      //   if (contentType == null || contentType == ContentType.text.name) {
+      //     content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content));
+      //   }
+      // }
       ChatSubMessageType? subMessageType = StringUtil.enumFromString(
           ChatSubMessageType.values, chatMessage.subMessageType!);
-      logger.i(
-          'chatMessage subMessageType:${subMessageType!.name} title:$title content:$content');
+      logger
+          .i('chatMessage subMessageType:${subMessageType!.name} title:$title');
       switch (subMessageType) {
         case ChatSubMessageType.videoChat:
           break;
@@ -63,10 +66,12 @@ class GlobalChatMessageController with ChangeNotifier {
           }
           break;
         case ChatSubMessageType.preKeyBundle:
-          _receivePreKeyBundle(chatMessage, content!);
+          content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content!));
+          _receivePreKeyBundle(chatMessage, content);
           break;
         case ChatSubMessageType.signal:
-          _receiveSignal(chatMessage, content!);
+          content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content!));
+          _receiveSignal(chatMessage, content);
           break;
         default:
           break;
