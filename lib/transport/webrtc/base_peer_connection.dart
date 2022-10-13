@@ -489,10 +489,12 @@ class BasePeerConnection {
     }
     if (message.isBinary) {
       var data = message.binary;
+      logger.i('webrtc binary onMessage length: ${data.length}');
       emit(WebrtcEventType.message, data);
     } else {
       logger.i('onMessage event:${message.text}');
       var data = message.text;
+      logger.i('webrtc text onMessage length: ${data.length}');
       emit(WebrtcEventType.message, data.codeUnits);
     }
   }
@@ -1112,6 +1114,7 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed, cannot send');
       return;
     }
+    logger.i('webrtc send message length: ${message.length}');
     final dataChannel = this.dataChannel;
     if (dataChannel != null) {
       var dataChannelMessage =
