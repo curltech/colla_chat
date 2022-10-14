@@ -171,7 +171,6 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       msg.readTime = chatMessage.readTime;
       msg.deleteTime = chatMessage.deleteTime;
       await store(msg);
-      await chatSummaryService.upsertByChatMessage(msg);
     } else {
       //收到一般消息，保存
       chatMessage.direct = ChatDirect.receive.name;
@@ -179,7 +178,6 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       chatMessage.status = MessageStatus.received.name;
       chatMessage.id = null;
       await store(chatMessage);
-      await chatSummaryService.upsertByChatMessage(chatMessage);
     }
   }
 
@@ -198,7 +196,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       chatMessage.deleteTime = chatMessage.deleteTime;
       chatMessage.status = MessageStatus.deleted.name;
     }
-    await store(chatMessage);
+    await store(chatMessage, updateSummary: false);
 
     ChatMessage msg = ChatMessage();
     msg.messageId = chatMessage.messageId;
@@ -304,8 +302,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.transportType = transportType.name;
 
     chatMessage.id = null;
-    await store(chatMessage);
-    await chatSummaryService.upsertByChatMessage(chatMessage);
+    //await store(chatMessage);
 
     return chatMessage;
   }
@@ -381,9 +378,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       await peerConnectionPool.send(peerId, Uint8List.fromList(data),
           clientId: clientId, cryptoOption: cryptoOption);
     }
+    await chatMessageService.store(chatMessage);
   }
 
-  store(ChatMessage chatMessage) async {
+  store(ChatMessage chatMessage, {bool updateSummary = true}) async {
     int? id = chatMessage.id;
     String? content = chatMessage.content;
     String? contentType = chatMessage.contentType;
@@ -413,6 +411,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         await messageAttachmentService.store(
             chatMessage.id!, messageId, content!, EntityState.update);
       }
+    }
+    if (updateSummary) {
+      await chatSummaryService.upsertByChatMessage(chatMessage);
     }
   }
 }

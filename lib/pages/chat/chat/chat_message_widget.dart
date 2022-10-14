@@ -182,6 +182,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         chatMessage = chatMessages[0];
         for (var chatMessage in chatMessages.sublist(1)) {
           await chatMessageService.send(chatMessage);
+          await chatMessageService.store(chatMessage);
         }
       }
       notifyListeners();
