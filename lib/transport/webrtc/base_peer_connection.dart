@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:colla_chat/plugin/logger.dart';
@@ -476,26 +477,6 @@ class BasePeerConnection {
     if (state == RTCDataChannelState.RTCDataChannelClosed) {
       logger.i('data channel close');
       close();
-    }
-  }
-
-  /// 被叫方的数据传输事件
-  /// webrtc的数据通道发来的消息可以是ChainMessage，
-  /// 也可以是简单的非ChainMessage，比如最简单的文本或者复合文档，也就是ChatMessage
-  onMessage(RTCDataChannelMessage message) {
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
-    }
-    if (message.isBinary) {
-      var data = message.binary;
-      logger.i('webrtc binary onMessage length: ${data.length}');
-      emit(WebrtcEventType.message, data);
-    } else {
-      logger.i('onMessage event:${message.text}');
-      var data = message.text;
-      logger.i('webrtc text onMessage length: ${data.length}');
-      emit(WebrtcEventType.message, data.codeUnits);
     }
   }
 
@@ -1109,7 +1090,31 @@ class BasePeerConnection {
   }
 
   /// 发送二进制消息 text/binary data to the remote peer.
+  int sliceSize = 16 * 1024;
+
   Future<void> send(List<int> message) async {
+    int total = message.length;
+    int remainder = total % sliceSize;
+    int sliceCount = total ~/ sliceSize;
+    if (remainder > 0) {
+      sliceCount++;
+    }
+    for (int i = 0; i < sliceCount; ++i) {
+      List<int> data = Uint8List(3);
+      var random = Random.secure();
+      data[0] = random.nextInt(1 << 32);
+      data[1] = sliceCount;
+      data[2] = i;
+      if (i + sliceSize < total) {
+        data.addAll(message.sublist(i, i + sliceSize));
+      } else {
+        data.addAll(message.sublist(i));
+      }
+      _send(data);
+    }
+  }
+
+  Future<void> _send(List<int> message) async {
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed, cannot send');
       return;
@@ -1120,6 +1125,54 @@ class BasePeerConnection {
       var dataChannelMessage =
           RTCDataChannelMessage.fromBinary(Uint8List.fromList(message));
       return await dataChannel.send(dataChannelMessage);
+    }
+  }
+
+  /// 被叫方的数据传输事件
+  /// webrtc的数据通道发来的消息可以是ChainMessage，
+  /// 也可以是简单的非ChainMessage，比如最简单的文本或者复合文档，也就是ChatMessage
+  Map<int, List<int>> sliceBuffer = {};
+  int sliceBufferId = 0;
+
+  onMessage(RTCDataChannelMessage message) {
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return;
+    }
+    if (message.isBinary) {
+      var data = message.binary;
+      int id = data[0];
+      if (id != sliceBufferId) {
+        sliceBufferId = id;
+        sliceBuffer.clear();
+      }
+      int sliceCount = data[1];
+      int i = data[2];
+      if (sliceCount == 1) {
+        logger.i('webrtc binary onMessage length: ${data.length}');
+        emit(WebrtcEventType.message, data.sublist(3));
+      } else {
+        List<int>? sliceData = sliceBuffer[i];
+        if (sliceData == null) {
+          sliceBuffer[i] = data;
+        }
+        int sliceBufferSize = sliceBuffer.length;
+        if (sliceBufferSize == sliceCount) {
+          List<int> slices = [];
+          for (int j = 0; j < sliceBufferSize; ++j) {
+            sliceData = sliceBuffer[j];
+            if (sliceData != null) {
+              slices.addAll(sliceData.sublist(3));
+            }
+          }
+          emit(WebrtcEventType.message, slices);
+        }
+      }
+    } else {
+      logger.i('onMessage event:${message.text}');
+      var data = message.text;
+      logger.i('webrtc text onMessage length: ${data.length}');
+      emit(WebrtcEventType.message, data.codeUnits);
     }
   }
 
