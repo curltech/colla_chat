@@ -1,10 +1,9 @@
 import 'dart:async';
-import 'dart:math';
 import 'dart:typed_data';
 
-import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/message_slice.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
@@ -1090,31 +1089,14 @@ class BasePeerConnection {
     logger.i('addIceCandidate: $jsonStr');
   }
 
-  /// 发送二进制消息 text/binary data to the remote peer.
-  int sliceSize = 16 * 1024;
+  ///消息分片处理器
+  MessageSlice messageSlice = MessageSlice();
 
+  /// 发送二进制消息 text/binary data to the remote peer.
   Future<void> send(List<int> message) async {
-    int total = message.length;
-    int remainder = total % sliceSize;
-    int sliceCount = total ~/ sliceSize;
-    if (remainder > 0) {
-      sliceCount++;
-    }
-    var random = Random.secure();
-    int randomNum = random.nextInt(1 << 32);
-    for (int i = 0; i < sliceCount; ++i) {
-      List<int> data = Uint8List(3);
-      data[0] = randomNum;
-      data[1] = sliceCount;
-      data[2] = i;
-      int start = i * sliceSize;
-      int end = (i + 1) * sliceSize;
-      if (end < total) {
-        data = CryptoUtil.concat(data, message.sublist(start, end));
-      } else {
-        data = CryptoUtil.concat(data, message.sublist(start));
-      }
-      await _send(data);
+    Map<int, List<int>> slices = messageSlice.slice(message);
+    for (var slice in slices.values) {
+      await _send(slice);
     }
   }
 
@@ -1145,38 +1127,20 @@ class BasePeerConnection {
     }
     if (message.isBinary) {
       var data = message.binary;
-      int id = data[0];
-      if (id != sliceBufferId) {
-        sliceBufferId = id;
-        sliceBuffer.clear();
-      }
-      int sliceCount = data[1];
-      int i = data[2];
-      if (sliceCount == 1) {
-        logger.i('webrtc binary onMessage length: ${data.length}');
-        emit(WebrtcEventType.message, data.sublist(3));
-      } else {
-        List<int>? sliceData = sliceBuffer[i];
-        if (sliceData == null) {
-          sliceBuffer[i] = data;
-        }
-        int sliceBufferSize = sliceBuffer.length;
-        if (sliceBufferSize == sliceCount) {
-          List<int> slices = [];
-          for (int j = 0; j < sliceBufferSize; ++j) {
-            sliceData = sliceBuffer[j];
-            if (sliceData != null) {
-              slices = CryptoUtil.concat(slices, sliceData.sublist(3));
-            }
-          }
-          emit(WebrtcEventType.message, slices);
-        }
+      List<int>? slices = messageSlice.merge(data);
+
+      if (slices != null) {
+        logger.i('webrtc binary onMessage length: ${slices.length}');
+        emit(WebrtcEventType.message, slices);
       }
     } else {
-      logger.i('onMessage event:${message.text}');
-      var data = message.text;
-      logger.i('webrtc text onMessage length: ${data.length}');
-      emit(WebrtcEventType.message, data.codeUnits);
+      var data = message.text.codeUnits;
+      List<int>? slices = messageSlice.merge(data);
+
+      if (slices != null) {
+        logger.i('webrtc text onMessage length: ${slices.length}');
+        emit(WebrtcEventType.message, slices);
+      }
     }
   }
 
