@@ -21,7 +21,11 @@ class MessageSlice {
     int randomNum = random.nextInt(1 << 32);
     Map<int, List<int>> slices = {};
     for (int i = 0; i < sliceCount; ++i) {
-      List<int> data = [randomNum, sliceCount, i];
+      Uint8List prefix = Uint8List(12);
+      prefix.buffer.asUint32List(0, 1)[0] = randomNum;
+      prefix.buffer.asUint32List(4, 1)[0] = sliceCount;
+      prefix.buffer.asUint32List(8, 1)[0] = i;
+      List<int> data = prefix.toList();
       int start = i * sliceSize;
       int end = (i + 1) * sliceSize;
       if (end < total) {
@@ -36,17 +40,27 @@ class MessageSlice {
   }
 
   List<int>? merge(List<int> data) {
-    int id = data[0];
+    Uint8List prefix = Uint8List.fromList(data.sublist(0, 12));
+    int id = data[0] +
+        data[1] * 256 +
+        data[2] * 256 * 256 +
+        data[3] * 256 * 256 * 256;
     if (id != sliceBufferId) {
       sliceBufferId = id;
       sliceBuffer = {};
     }
-    int sliceCount = data[1];
-    int i = data[2];
+    int sliceCount = data[4] +
+        data[5] * 256 +
+        data[6] * 256 * 256 +
+        data[7] * 256 * 256 * 256;
+    int i = data[8] +
+        data[9] * 256 +
+        data[10] * 256 * 256 +
+        data[11] * 256 * 256 * 256;
     if (sliceCount == 1) {
       sliceBufferId = 0;
       sliceBuffer = {};
-      return data.sublist(3);
+      return data.sublist(12);
     } else {
       List<int>? sliceData = sliceBuffer[i];
       if (sliceData == null) {
@@ -58,7 +72,7 @@ class MessageSlice {
         for (int j = 0; j < sliceBufferSize; ++j) {
           sliceData = sliceBuffer[j];
           if (sliceData != null) {
-            slices = CryptoUtil.concat(slices, sliceData.sublist(3));
+            slices = CryptoUtil.concat(slices, sliceData.sublist(12));
           }
         }
         sliceBufferId = 0;
