@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
@@ -370,7 +372,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     if (peerId != null) {
       String json = JsonUtil.toJsonString(chatMessage);
       var data = CryptoUtil.stringToUtf8(json);
-      await peerConnectionPool.send(peerId, data,
+      await peerConnectionPool.send(peerId, Uint8List.fromList(data),
           clientId: clientId, cryptoOption: cryptoOption);
     }
   }

@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
@@ -528,7 +530,7 @@ class PeerConnectionPool {
   /// 向peer发送信息，如果是多个，遍历发送
   /// @param peerId
   /// @param data
-  Future<void> send(String peerId, List<int> data,
+  Future<void> send(String peerId, Uint8List data,
       {String? clientId,
       CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     List<AdvancedPeerConnection>? peerConnections = get(peerId);
