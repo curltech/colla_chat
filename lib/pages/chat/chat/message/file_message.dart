@@ -6,12 +6,12 @@ import 'package:mimecon/mimecon.dart';
 class FileMessage extends StatelessWidget {
   final String title;
   final String mimeType;
-  final List<int> data;
+  final String messageId;
   final bool isMyself;
 
   const FileMessage(
       {Key? key,
-      required this.data,
+      required this.messageId,
       required this.isMyself,
       required this.title,
       required this.mimeType})

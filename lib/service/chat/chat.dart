@@ -1,12 +1,17 @@
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/entity/base.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../constant/base.dart';
@@ -165,7 +170,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       msg.status = chatMessage.status;
       msg.readTime = chatMessage.readTime;
       msg.deleteTime = chatMessage.deleteTime;
-      await update(msg);
+      await store(msg);
       await chatSummaryService.upsertByChatMessage(msg);
     } else {
       //收到一般消息，保存
@@ -173,7 +178,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       chatMessage.receiveTime = DateUtil.currentDate();
       chatMessage.status = MessageStatus.received.name;
       chatMessage.id = null;
-      await insert(chatMessage);
+      await store(chatMessage);
       await chatSummaryService.upsertByChatMessage(chatMessage);
     }
   }
@@ -193,7 +198,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       chatMessage.deleteTime = chatMessage.deleteTime;
       chatMessage.status = MessageStatus.deleted.name;
     }
-    await update(chatMessage);
+    await store(chatMessage);
 
     ChatMessage msg = ChatMessage();
     msg.messageId = chatMessage.messageId;
@@ -298,7 +303,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.status = status ?? MessageStatus.sent.name;
     chatMessage.transportType = transportType.name;
 
-    await insert(chatMessage);
+    chatMessage.id = null;
+    await store(chatMessage);
     await chatSummaryService.upsertByChatMessage(chatMessage);
 
     return chatMessage;
@@ -376,6 +382,39 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           clientId: clientId, cryptoOption: cryptoOption);
     }
   }
+
+  store(ChatMessage chatMessage) async {
+    int? id = chatMessage.id;
+    String? content = chatMessage.content;
+    String? contentType = chatMessage.contentType;
+    String? mimeType = chatMessage.mimeType;
+    String? messageId;
+    if (content != null) {
+      if (contentType != null &&
+          (contentType == ContentType.file.name ||
+              contentType == ContentType.image.name ||
+              contentType == ContentType.video.name ||
+              contentType == ContentType.audio.name ||
+              contentType == ContentType.rich.name)) {
+        chatMessage.content = null;
+        messageId = chatMessage.messageId;
+      }
+    }
+    if (id == null) {
+      await insert(chatMessage);
+    } else {
+      await update(chatMessage);
+    }
+    if (messageId != null) {
+      if (id == null) {
+        await messageAttachmentService.store(
+            chatMessage.id!, messageId, content!, EntityState.insert);
+      } else {
+        await messageAttachmentService.store(
+            chatMessage.id!, messageId, content!, EntityState.update);
+      }
+    }
+  }
 }
 
 final chatMessageService = ChatMessageService(
@@ -418,19 +457,58 @@ final mergedMessageService = MergedMessageService(
     fields: ServiceLocator.buildFields(MergedMessage(), []));
 
 class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
-  MessageAttachmentService(
-      {required super.tableName,
-      required super.fields,
-      required super.indexFields}) {
+  MessageAttachmentService({
+    required super.tableName,
+    required super.fields,
+    required super.indexFields,
+    super.encryptFields = const ['content'],
+  }) {
     post = (Map map) {
       return MessageAttachment.fromJson(map);
     };
+  }
+
+  Future<String?> findContent(String messageId) async {
+    if (!platformParams.web) {
+      final contentPath = await getApplicationDocumentsDirectory();
+      String filename = p.join(contentPath.path, 'content', messageId);
+      var data = await FileUtil.readFile(filename);
+      return CryptoUtil.encodeBase64(data);
+    } else {
+      MessageAttachment? attachment =
+          await findOne(where: 'messageId=?', whereArgs: [messageId]);
+      if (attachment != null) {
+        return attachment.content;
+      }
+    }
+    return null;
+  }
+
+  Future<void> store(
+      int id, String messageId, String content, EntityState state) async {
+    if (!platformParams.web) {
+      final contentPath = await getApplicationDocumentsDirectory();
+      String filename = p.join(contentPath.path, 'content', messageId);
+      var data = CryptoUtil.decodeBase64(content);
+      await FileUtil.writeFile(data, filename);
+      logger.i('message attachment writeFile filename:$filename');
+    } else {
+      MessageAttachment attachment = MessageAttachment();
+      attachment.id = id;
+      attachment.messageId = messageId;
+      attachment.content = content;
+      if (state == EntityState.insert) {
+        await messageAttachmentService.insert(attachment);
+      } else if (state == EntityState.update) {
+        await messageAttachmentService.update(attachment);
+      }
+    }
   }
 }
 
 final messageAttachmentService = MessageAttachmentService(
     tableName: "chat_messageattachment",
-    indexFields: ['ownerPeerId', 'messageId', 'createDate', 'targetPeerId'],
+    indexFields: ['ownerPeerId', 'messageId', 'createDate'],
     fields: ServiceLocator.buildFields(MessageAttachment(), []));
 
 class ReceiveService extends GeneralBaseService<Receive> {

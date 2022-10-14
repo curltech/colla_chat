@@ -54,6 +54,7 @@ class ChatMessageItem extends StatelessWidget {
     }
     subMessageType = subMessageType ?? ChatSubMessageType.chat;
     int? id = chatMessage.id;
+    String? messageId = chatMessage.messageId;
     String? title = chatMessage.title;
     String? content = chatMessage.content;
     List<int>? data;
@@ -94,9 +95,9 @@ class ChatMessageItem extends StatelessWidget {
         String title = chatMessage.title!;
         String mimeType = chatMessage.mimeType!;
         return FileMessage(
-          data: data!,
+          messageId: messageId!,
           isMyself: isMyself,
-          title: title!,
+          title: title,
           mimeType: mimeType,
         );
       }

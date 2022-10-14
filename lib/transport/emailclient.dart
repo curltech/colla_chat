@@ -86,7 +86,6 @@ class EmailMessageUtil {
       for (enough_mail.MimePart part in message.allPartsFlat) {
         MessageAttachment attach = MessageAttachment();
         attach.content = part.decodeContentText();
-        attach.contentType = part.mediaType.text;
         chatMessage.attaches.add(attach);
       }
     }
