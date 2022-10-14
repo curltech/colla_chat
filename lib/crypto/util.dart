@@ -62,13 +62,6 @@ class CryptoUtil {
   }
 
   static List<int> concat(List<int> src, List<int> target) {
-    // var n = src.length + target.length;
-    // final result = List.filled(n, 0, growable: false);
-    // var i = 0;
-    // result.setAll(i, src);
-    // i += src.length;
-    // result.setAll(i, target);
-
     var builder = BytesBuilder();
     builder.add(src);
     builder.add(target);
