@@ -19,9 +19,12 @@ class FileUtil {
       final dir = await getApplicationDocumentsDirectory();
       filename = p.join(dir.path, filename);
     }
-    final file = File(filename);
-    await file.writeAsBytes(bytes);
-    await file.exists();
+    var file = File(filename);
+    bool exist = await file.exists();
+    if (!exist) {
+      file = await file.create(recursive: true);
+    }
+    await file.writeAsBytes(bytes, flush: true);
 
     return filename;
   }
