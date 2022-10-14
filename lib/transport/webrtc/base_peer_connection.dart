@@ -1099,10 +1099,11 @@ class BasePeerConnection {
     if (remainder > 0) {
       sliceCount++;
     }
+    var random = Random.secure();
+    int randomNum = random.nextInt(1 << 32);
     for (int i = 0; i < sliceCount; ++i) {
       List<int> data = Uint8List(3);
-      var random = Random.secure();
-      data[0] = random.nextInt(1 << 32);
+      data[0] = randomNum;
       data[1] = sliceCount;
       data[2] = i;
       if (i + sliceSize < total) {
