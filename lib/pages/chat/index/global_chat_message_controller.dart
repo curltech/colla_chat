@@ -143,7 +143,7 @@ class GlobalChatMessageController with ChangeNotifier {
         messageType: ChatMessageType.system,
         subMessageType: ChatSubMessageType.preKeyBundle,
         data: CryptoUtil.stringToUtf8(json));
-    await chatMessageService.send(chatMessage,
+    await chatMessageService.sendAndStore(chatMessage,
         cryptoOption: CryptoOption.cryptography);
     logger.i('peerId: $peerId clientId:$clientId sent PreKeyBundle');
   }

@@ -368,7 +368,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return chatMessages;
   }
 
-  send(ChatMessage chatMessage,
+  sendAndStore(ChatMessage chatMessage,
       {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     var peerId = chatMessage.receiverPeerId;
     var clientId = chatMessage.receiverClientId;

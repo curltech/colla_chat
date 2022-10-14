@@ -148,7 +148,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
         data: data,
         subMessageType: ChatSubMessageType.addFriend,
         title: title);
-    await chatMessageService.send(chatMessage);
+    await chatMessageService.sendAndStore(chatMessage);
   }
 
   receiveAddFriend(ChatMessage chatMessage, MessageStatus receiptType) async {
@@ -158,7 +158,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
     if (receiptType == MessageStatus.accepted) {
       chatReceipt!.content = json;
     }
-    await chatMessageService.send(chatReceipt!);
+    await chatMessageService.sendAndStore(chatReceipt!);
   }
 
   receiveAddFriendReceipt(ChatMessage chatReceipt) async {
@@ -317,7 +317,7 @@ class GroupService extends PeerPartyService<Group> {
       subMessageType: ChatSubMessageType.addGroup,
     );
     for (var chatMessage in chatMessages) {
-      await chatMessageService.send(chatMessage);
+      await chatMessageService.sendAndStore(chatMessage);
     }
   }
 
@@ -330,7 +330,7 @@ class GroupService extends PeerPartyService<Group> {
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
 
-    await chatMessageService.send(chatReceipt!);
+    await chatMessageService.sendAndStore(chatReceipt!);
   }
 
   receiveAddGroupReceipt(ChatMessage chatMessage) async {
@@ -342,7 +342,7 @@ class GroupService extends PeerPartyService<Group> {
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
 
-    await chatMessageService.send(chatReceipt!);
+    await chatMessageService.sendAndStore(chatReceipt!);
   }
 
   modifyGroup(Group group) async {
@@ -355,7 +355,7 @@ class GroupService extends PeerPartyService<Group> {
       subMessageType: ChatSubMessageType.modifyGroup,
     );
     for (var chatMessage in chatMessages) {
-      await chatMessageService.send(chatMessage);
+      await chatMessageService.sendAndStore(chatMessage);
     }
   }
 
@@ -368,7 +368,7 @@ class GroupService extends PeerPartyService<Group> {
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
 
-    await chatMessageService.send(chatReceipt!);
+    await chatMessageService.sendAndStore(chatReceipt!);
   }
 
   receiveModifyGroupReceipt(ChatMessage chatMessage) async {
@@ -380,7 +380,7 @@ class GroupService extends PeerPartyService<Group> {
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
 
-    await chatMessageService.send(chatReceipt!);
+    await chatMessageService.sendAndStore(chatReceipt!);
   }
 
   dismissGroup(Group group) async {
@@ -406,7 +406,7 @@ class GroupService extends PeerPartyService<Group> {
       subMessageType: ChatSubMessageType.dismissGroup,
     );
     for (var chatMessage in chatMessages) {
-      await chatMessageService.send(chatMessage);
+      await chatMessageService.sendAndStore(chatMessage);
     }
   }
 
@@ -433,7 +433,7 @@ class GroupService extends PeerPartyService<Group> {
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
 
-    await chatMessageService.send(chatReceipt!);
+    await chatMessageService.sendAndStore(chatReceipt!);
   }
 
   addGroupMember(String groupId, List<GroupMember> groupMembers) async {
@@ -446,7 +446,7 @@ class GroupService extends PeerPartyService<Group> {
       subMessageType: ChatSubMessageType.addGroupMember,
     );
     for (var chatMessage in chatMessages) {
-      await chatMessageService.send(chatMessage);
+      await chatMessageService.sendAndStore(chatMessage);
     }
   }
 
@@ -464,7 +464,7 @@ class GroupService extends PeerPartyService<Group> {
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
 
-    await chatMessageService.send(chatReceipt!);
+    await chatMessageService.sendAndStore(chatReceipt!);
   }
 
   receiveAddGroupMemberReceipt(ChatMessage chatMessage) async {
@@ -481,7 +481,7 @@ class GroupService extends PeerPartyService<Group> {
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
 
-    await chatMessageService.send(chatReceipt!);
+    await chatMessageService.sendAndStore(chatReceipt!);
   }
 
   removeGroupMember(String groupId, List<GroupMember> groupMembers) async {
@@ -494,7 +494,7 @@ class GroupService extends PeerPartyService<Group> {
       subMessageType: ChatSubMessageType.removeGroupMember,
     );
     for (var chatMessage in chatMessages) {
-      await chatMessageService.send(chatMessage);
+      await chatMessageService.sendAndStore(chatMessage);
     }
   }
 
@@ -515,7 +515,7 @@ class GroupService extends PeerPartyService<Group> {
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
 
-    await chatMessageService.send(chatReceipt!);
+    await chatMessageService.sendAndStore(chatReceipt!);
   }
 
   receiveRemoveGroupMemberReceipt(ChatMessage chatMessage) async {
@@ -535,7 +535,7 @@ class GroupService extends PeerPartyService<Group> {
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
 
-    await chatMessageService.send(chatReceipt!);
+    await chatMessageService.sendAndStore(chatReceipt!);
   }
 
   groupFile(String groupId, List<int> data) async {
@@ -546,7 +546,7 @@ class GroupService extends PeerPartyService<Group> {
       subMessageType: ChatSubMessageType.groupFile,
     );
     for (var chatMessage in chatMessages) {
-      await chatMessageService.send(chatMessage);
+      await chatMessageService.sendAndStore(chatMessage);
     }
   }
 
@@ -564,7 +564,7 @@ class GroupService extends PeerPartyService<Group> {
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
 
-    await chatMessageService.send(chatReceipt!);
+    await chatMessageService.sendAndStore(chatReceipt!);
   }
 }
 
