@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
@@ -1109,9 +1110,9 @@ class BasePeerConnection {
       int start = i * sliceSize;
       int end = (i + 1) * sliceSize;
       if (end < total) {
-        data.addAll(message.sublist(start, end));
+        data = CryptoUtil.concat(data, message.sublist(start, end));
       } else {
-        data.addAll(message.sublist(start));
+        data = CryptoUtil.concat(data, message.sublist(start));
       }
       await _send(data);
     }
@@ -1165,7 +1166,7 @@ class BasePeerConnection {
           for (int j = 0; j < sliceBufferSize; ++j) {
             sliceData = sliceBuffer[j];
             if (sliceData != null) {
-              slices.addAll(sliceData.sublist(3));
+              slices = CryptoUtil.concat(slices, sliceData.sublist(3));
             }
           }
           emit(WebrtcEventType.message, slices);
