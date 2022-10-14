@@ -393,7 +393,7 @@ class AdvancedPeerConnection {
   }
 
   ///收到数据，带解密功能，取最后一位整数，表示解密选项，得到何种解密方式，然后解密
-  onMessage(Uint8List data) async {
+  onMessage(List<int> data) async {
     logger.i('${DateTime.now().toUtc()}:got a message from peer');
     int cryptOption = data[data.length - 1];
     SecurityContextService? securityContextService =
@@ -412,7 +412,7 @@ class AdvancedPeerConnection {
   }
 
   ///发送数据，带加密选项
-  Future<void> send(Uint8List data,
+  Future<void> send(List<int> data,
       {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     if (connected) {
       int cryptOptionIndex = cryptoOption.index;

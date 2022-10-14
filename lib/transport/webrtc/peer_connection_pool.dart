@@ -530,7 +530,7 @@ class PeerConnectionPool {
   /// 向peer发送信息，如果是多个，遍历发送
   /// @param peerId
   /// @param data
-  Future<void> send(String peerId, Uint8List data,
+  Future<void> send(String peerId, List<int> data,
       {String? clientId,
       CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     List<AdvancedPeerConnection>? peerConnections = get(peerId);

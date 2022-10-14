@@ -1093,14 +1093,14 @@ class BasePeerConnection {
   MessageSlice messageSlice = MessageSlice();
 
   /// 发送二进制消息 text/binary data to the remote peer.
-  Future<void> send(Uint8List message) async {
-    Map<int, Uint8List> slices = messageSlice.slice(message);
+  Future<void> send(List<int> message) async {
+    Map<int, List<int>> slices = messageSlice.slice(message);
     for (var slice in slices.values) {
       await _send(slice);
     }
   }
 
-  Future<void> _send(Uint8List message) async {
+  Future<void> _send(List<int> message) async {
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed, cannot send');
       return;
@@ -1108,7 +1108,8 @@ class BasePeerConnection {
     logger.i('webrtc send message length: ${message.length}');
     final dataChannel = this.dataChannel;
     if (dataChannel != null) {
-      var dataChannelMessage = RTCDataChannelMessage.fromBinary(message);
+      var dataChannelMessage =
+          RTCDataChannelMessage.fromBinary(Uint8List.fromList(message));
       return await dataChannel.send(dataChannelMessage);
     }
   }
@@ -1124,7 +1125,7 @@ class BasePeerConnection {
     }
     if (message.isBinary) {
       var data = message.binary;
-      Uint8List? slices = messageSlice.merge(data);
+      List<int>? slices = messageSlice.merge(data);
 
       if (slices != null) {
         logger.i('webrtc binary onMessage length: ${slices.length}');
@@ -1132,7 +1133,7 @@ class BasePeerConnection {
       }
     } else {
       var data = message.text.codeUnits;
-      Uint8List? slices = messageSlice.merge(Uint8List.fromList(data));
+      List<int>? slices = messageSlice.merge(data);
 
       if (slices != null) {
         logger.i('webrtc text onMessage length: ${slices.length}');
