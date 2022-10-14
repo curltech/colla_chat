@@ -188,7 +188,7 @@ class CryptoGraphy {
   /// 结合x25519密钥交换和aes进行ecc加解密,里面涉及的密钥对是x25519协议
   /// ecc加密是采用公钥加密，私钥解密，
   /// 加密后结果的前32位是本地公钥，后面是密文
-  Future<Uint8List> eccEncrypt(List<int> message,
+  Future<List<int>> eccEncrypt(List<int> message,
       {String? base64PublicKey, PublicKey? remotePublicKey}) async {
     if (remotePublicKey == null) {
       if (base64PublicKey != null) {

@@ -61,9 +61,9 @@ class CryptoUtil {
     return msg;
   }
 
-  static Uint8List concat(List<int> src, List<int> target) {
+  static List<int> concat(List<int> src, List<int> target) {
     var n = src.length + target.length;
-    final result = Uint8List(n);
+    final result = List.filled(n, 0, growable: false);
     var i = 0;
     result.setAll(i, src);
     i += src.length;
