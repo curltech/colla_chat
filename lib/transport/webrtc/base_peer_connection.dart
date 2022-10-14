@@ -1106,12 +1106,14 @@ class BasePeerConnection {
       data[0] = randomNum;
       data[1] = sliceCount;
       data[2] = i;
-      if (i + sliceSize < total) {
-        data.addAll(message.sublist(i, i + sliceSize));
+      int start = i * sliceSize;
+      int end = (i + 1) * sliceSize;
+      if (end < total) {
+        data.addAll(message.sublist(start, end));
       } else {
-        data.addAll(message.sublist(i));
+        data.addAll(message.sublist(start));
       }
-      _send(data);
+      await _send(data);
     }
   }
 
