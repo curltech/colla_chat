@@ -73,11 +73,14 @@ class _IndexViewState extends State<IndexView>
           var raw = CryptoUtil.decodeBase64(content);
           if (contentType == null || contentType == ContentType.text.name) {
             content = CryptoUtil.utf8ToString(raw);
+          } else {
+            content = '';
           }
         } else {
           content = '';
         }
         String? title = chatMessage.title;
+        title = title ?? '';
         var name = chatMessage.senderName;
         name = name ?? '';
         card = Container(

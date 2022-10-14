@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/plugin/logger.dart';
 
 const int sliceSize = 16 * 1024;
 
@@ -69,12 +70,15 @@ class MessageSlice {
       int sliceBufferSize = sliceBuffer.length;
       if (sliceBufferSize == sliceCount) {
         List<int> slices = [];
+        var start = DateTime.now().millisecondsSinceEpoch;
         for (int j = 0; j < sliceBufferSize; ++j) {
           sliceData = sliceBuffer[j];
           if (sliceData != null) {
             slices = CryptoUtil.concat(slices, sliceData.sublist(12));
           }
         }
+        var end = DateTime.now().millisecondsSinceEpoch;
+        logger.i('merge size:$sliceBufferSize time:${end - start}');
         sliceBufferId = 0;
         sliceBuffer = {};
         return slices;
