@@ -1,18 +1,16 @@
 import 'dart:typed_data';
 
+import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/qrcode_util.dart';
 import 'package:colla_chat/tool/share_util.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
+import 'package:colla_chat/widgets/common/image_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../entity/dht/myself.dart';
-import '../../../../l10n/localization.dart';
-import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/common/image_widget.dart';
-import '../../chat/widget/ui.dart';
 
 class QrcodeWidget extends StatefulWidget with TileDataMixin {
   final List<AppBarPopupMenu> menus = [
@@ -77,7 +75,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
             padding: const EdgeInsets.all(10.0),
             child: qrImage,
           )),
-      Space(height: 2.0),
+      const Spacer(),
       const Text('扫一扫上面的二维码图案，加我为好友'),
     ];
     return AppBarView(

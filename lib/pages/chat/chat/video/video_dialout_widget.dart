@@ -1,6 +1,6 @@
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
+import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -14,7 +14,6 @@ import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-
 
 ///视频通话的流程
 ///1.发起方发起视频通话请求，激活拨出窗口；
@@ -91,7 +90,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
     if (overlayEntry != null) {
       overlayEntry!.remove();
       overlayEntry = null;
-      chatMessageController.index = 1;
+      chatMessageController.viewIndex = 1;
     }
   }
 
@@ -110,7 +109,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
       );
     });
     Overlay.of(context)!.insert(overlayEntry!);
-    chatMessageController.index = 0;
+    chatMessageController.viewIndex = 0;
   }
 
   _open(
@@ -162,7 +161,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
 
   _close() {
     localMediaController.close();
-    chatMessageController.index = 0;
+    chatMessageController.viewIndex = 0;
     setState(() {});
   }
 

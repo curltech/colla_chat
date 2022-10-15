@@ -1,6 +1,6 @@
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
+import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/peer_connections_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -12,7 +12,6 @@ import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/widgets/common/image_widget.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:flutter/material.dart';
-
 
 ///视频通话拨入的对话框
 class VideoDialInWidget extends StatelessWidget {
@@ -83,7 +82,7 @@ class VideoDialInWidget extends StatelessWidget {
           peerConnectionsController.addPeerConnection(peerId,
               clientId: clientId);
           indexWidgetProvider.push('chat_message');
-          chatMessageController.index = 2;
+          chatMessageController.viewIndex = 2;
         }
       }
     }

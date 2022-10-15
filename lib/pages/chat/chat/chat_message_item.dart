@@ -1,6 +1,7 @@
 import 'package:bubble/bubble.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/pages/chat/chat/message/audio_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/file_message.dart';
@@ -14,7 +15,6 @@ import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:flutter/material.dart';
 
-import '../../../entity/chat/chat.dart';
 import 'message/action_message.dart';
 import 'message/extended_text_message.dart';
 
@@ -56,6 +56,7 @@ class ChatMessageItem extends StatelessWidget {
     int? id = chatMessage.id;
     String? messageId = chatMessage.messageId;
     String? title = chatMessage.title;
+    title = title ?? '';
     String? content = chatMessage.content;
     List<int>? data;
     if (content != null) {
@@ -92,8 +93,31 @@ class ChatMessageItem extends StatelessWidget {
         );
       }
       if (contentType == ContentType.file) {
-        String title = chatMessage.title!;
-        String mimeType = chatMessage.mimeType!;
+        String? thumbnail = chatMessage.thumbnail;
+        String? mimeType = chatMessage.mimeType;
+        mimeType = mimeType ?? 'text/plain';
+        if (mimeType.startsWith('image')) {
+          return ImageMessage(
+            messageId: messageId!,
+            image: thumbnail,
+            isMyself: isMyself,
+            mimeType: mimeType,
+          );
+        } else if (mimeType.startsWith('audio')) {
+          return AudioMessage(
+            id: id!,
+            messageId: messageId!,
+            isMyself: isMyself,
+          );
+        } else if (mimeType.startsWith('video')) {
+          String? thumbnail = chatMessage.thumbnail;
+          return VideoMessage(
+            id: id!,
+            messageId: messageId!,
+            isMyself: isMyself,
+            thumbnail: thumbnail,
+          );
+        }
         return FileMessage(
           messageId: messageId!,
           isMyself: isMyself,
@@ -102,11 +126,11 @@ class ChatMessageItem extends StatelessWidget {
         );
       }
       if (contentType == ContentType.image) {
-        String thumbnail = chatMessage.thumbnail!;
+        String? thumbnail = chatMessage.thumbnail;
         String mimeType = chatMessage.mimeType!;
         return ImageMessage(
           messageId: messageId!,
-          image: thumbnail!,
+          image: thumbnail,
           isMyself: isMyself,
           mimeType: mimeType,
         );

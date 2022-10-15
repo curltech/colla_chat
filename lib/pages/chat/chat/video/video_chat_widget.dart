@@ -1,12 +1,10 @@
-import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
+import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/peer_connections_controller.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
-
 import 'package:flutter/material.dart';
-
 
 ///视频通话窗口，显示多个小视频窗口，每个小窗口代表一个对方，其中一个是自己
 ///以及各种功能按钮
@@ -34,7 +32,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     if (overlayEntry != null) {
       overlayEntry!.remove();
       overlayEntry = null;
-      chatMessageController.index = 2;
+      chatMessageController.viewIndex = 2;
     }
   }
 
@@ -53,12 +51,12 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
       );
     });
     Overlay.of(context)!.insert(overlayEntry!);
-    chatMessageController.index = 0;
+    chatMessageController.viewIndex = 0;
   }
 
   _close() {
     localMediaController.close();
-    chatMessageController.index = 0;
+    chatMessageController.viewIndex = 0;
     setState(() {});
   }
 

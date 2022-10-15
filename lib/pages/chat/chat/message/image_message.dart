@@ -1,16 +1,17 @@
+import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/widgets/common/image_widget.dart';
 import 'package:flutter/material.dart';
 
 ///消息体：图片消息
 class ImageMessage extends StatelessWidget {
-  final String image;
+  final String? image;
   final String mimeType;
   final String messageId;
   final bool isMyself;
 
   const ImageMessage(
       {Key? key,
-      required this.image,
+      this.image,
       required this.messageId,
       required this.isMyself,
       required this.mimeType})
@@ -18,11 +19,20 @@ class ImageMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {},
-      child: ImageWidget(
-        image: image,
-      ),
-    );
+    var imageWidget = FutureBuilder(
+        future: messageAttachmentService.getFilename(messageId),
+        builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
+          var filename = snapshot.data;
+          if (filename == null) {
+            return Container();
+          }
+          return InkWell(
+            onTap: () {},
+            child: ImageWidget(
+              image: filename,
+            ),
+          );
+        });
+    return imageWidget;
   }
 }

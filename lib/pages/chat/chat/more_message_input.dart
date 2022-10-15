@@ -1,7 +1,7 @@
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
-import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
+import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/camera_util.dart';
@@ -109,7 +109,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   }
 
   _onActionVideoChat() {
-    chatMessageController.index = 1;
+    chatMessageController.viewIndex = 1;
   }
 
   _onActionAlbum() async {

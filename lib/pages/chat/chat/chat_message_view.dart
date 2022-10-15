@@ -1,3 +1,5 @@
+import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/full_screen_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_chat_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_dialout_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -12,7 +14,7 @@ import '../../../widgets/common/widget_mixin.dart';
 import '../me/webrtc/peer_connection_controller.dart';
 import 'chat_message_widget.dart';
 
-/// 聊天界面，包括文本聊天，视频通话呼叫，视频通话三个组件
+/// 聊天界面，包括文本聊天，视频通话呼叫，视频通话，全屏展示四个组件
 /// 支持群聊
 class ChatMessageView extends StatefulWidget with TileDataMixin {
   ChatMessageView({
@@ -83,6 +85,10 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     return const VideoChatWidget();
   }
 
+  Widget _buildFullScreenWidget(BuildContext context) {
+    return const FullScreenWidget();
+  }
+
   @override
   Widget build(BuildContext context) {
     PeerConnectionStatus? status;
@@ -100,6 +106,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
       _buildChatMessageWidget(context),
       _buildDialOutWidget(context),
       _buildVideoChatWidget(context),
+      _buildFullScreenWidget(context),
     ];
     name = name ?? '';
     String title = AppLocalizations.t(name!);
@@ -110,7 +117,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
         title: Text(title),
         withLeading: widget.withLeading,
         child: IndexedStack(
-            index: chatMessageController.index, children: children));
+            index: chatMessageController.viewIndex, children: children));
 
     return appBarView;
   }

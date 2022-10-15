@@ -2,8 +2,6 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../chat/widget/ui.dart';
-
 ///通过选择相册或者拍照选择背景图
 class BackgroundPicker extends StatelessWidget {
   const BackgroundPicker({Key? key}) : super(key: key);
@@ -31,7 +29,7 @@ class BackgroundPicker extends StatelessWidget {
               onTap: () {
                 _openGallery(source: ImageSource.camera);
               }),
-          Space(height: 15),
+          const Spacer(),
           SizedBox(),
         ],
       ),

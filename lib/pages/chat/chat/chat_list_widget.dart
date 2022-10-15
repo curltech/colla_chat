@@ -1,5 +1,6 @@
 import 'package:badges/badges.dart';
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,7 +16,6 @@ import '../../../widgets/common/widget_mixin.dart';
 import '../../../widgets/data_bind/data_group_listview.dart';
 import '../../../widgets/data_bind/data_listtile.dart';
 import 'chat_message_view.dart';
-import 'chat_message_widget.dart';
 
 ///好友的汇总控制器，每当消息汇总表的数据有变化时更新控制器
 final DataListController<ChatSummary> linkmanChatSummaryController =
