@@ -3,13 +3,15 @@ import 'package:flutter/material.dart';
 
 ///消息体：图片消息
 class ImageMessage extends StatelessWidget {
-  final String mimeType;
   final String image;
+  final String mimeType;
+  final String messageId;
   final bool isMyself;
 
   const ImageMessage(
       {Key? key,
       required this.image,
+      required this.messageId,
       required this.isMyself,
       required this.mimeType})
       : super(key: key);

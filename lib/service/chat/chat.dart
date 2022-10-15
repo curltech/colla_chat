@@ -458,23 +458,50 @@ final mergedMessageService = MergedMessageService(
     fields: ServiceLocator.buildFields(MergedMessage(), []));
 
 class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
+  late String contentPath;
+
   MessageAttachmentService({
     required super.tableName,
     required super.fields,
     required super.indexFields,
     super.encryptFields = const ['content'],
   }) {
+    getApplicationDocumentsDirectory().then((contentPath) {
+      this.contentPath = p.join(contentPath.path, 'content');
+    });
     post = (Map map) {
       return MessageAttachment.fromJson(map);
     };
   }
 
+  ///获取附件的文件名称，或者在content路径下，或者在临时目录下
+  Future<String?> getFilename(String messageId) async {
+    String? filename;
+    if (!platformParams.web) {
+      filename = p.join(contentPath, messageId);
+    } else {
+      MessageAttachment? attachment =
+          await findOne(where: 'messageId=?', whereArgs: [messageId]);
+      if (attachment != null) {
+        var content = attachment.content;
+        if (content != null) {
+          filename = await FileUtil.writeTempFile(
+              CryptoUtil.decodeBase64(content),
+              filename: messageId);
+        }
+      }
+    }
+
+    return filename;
+  }
+
   Future<String?> findContent(String messageId) async {
     if (!platformParams.web) {
-      final contentPath = await getApplicationDocumentsDirectory();
-      String filename = p.join(contentPath.path, 'content', messageId);
-      var data = await FileUtil.readFile(filename);
-      return CryptoUtil.encodeBase64(data);
+      final filename = await getFilename(messageId);
+      if (filename != null) {
+        var data = await FileUtil.readFile(filename);
+        return CryptoUtil.encodeBase64(data);
+      }
     } else {
       MessageAttachment? attachment =
           await findOne(where: 'messageId=?', whereArgs: [messageId]);
@@ -488,11 +515,12 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
   Future<void> store(
       int id, String messageId, String content, EntityState state) async {
     if (!platformParams.web) {
-      final contentPath = await getApplicationDocumentsDirectory();
-      String filename = p.join(contentPath.path, 'content', messageId);
+      final filename = await getFilename(messageId);
       var data = CryptoUtil.decodeBase64(content);
-      await FileUtil.writeFile(data, filename);
-      logger.i('message attachment writeFile filename:$filename');
+      if (filename != null) {
+        await FileUtil.writeFile(data, filename);
+        logger.i('message attachment writeFile filename:$filename');
+      }
     } else {
       MessageAttachment attachment = MessageAttachment();
       attachment.id = id;

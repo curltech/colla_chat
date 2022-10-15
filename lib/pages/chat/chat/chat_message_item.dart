@@ -78,7 +78,7 @@ class ChatMessageItem extends StatelessWidget {
       if (contentType == ContentType.audio) {
         return AudioMessage(
           id: id!,
-          data: data!,
+          messageId: messageId!,
           isMyself: isMyself,
         );
       }
@@ -86,7 +86,7 @@ class ChatMessageItem extends StatelessWidget {
         String? thumbnail = chatMessage.thumbnail;
         return VideoMessage(
           id: id!,
-          data: data!,
+          messageId: messageId!,
           isMyself: isMyself,
           thumbnail: thumbnail,
         );
@@ -102,10 +102,11 @@ class ChatMessageItem extends StatelessWidget {
         );
       }
       if (contentType == ContentType.image) {
-        String title = chatMessage.title!;
+        String thumbnail = chatMessage.thumbnail!;
         String mimeType = chatMessage.mimeType!;
         return ImageMessage(
-          image: content!,
+          messageId: messageId!,
+          image: thumbnail!,
           isMyself: isMyself,
           mimeType: mimeType,
         );
@@ -121,7 +122,7 @@ class ChatMessageItem extends StatelessWidget {
       }
       if (contentType == ContentType.rich) {
         return RichTextMessage(
-          content: content!,
+          messageId: messageId!,
           isMyself: isMyself,
         );
       }
