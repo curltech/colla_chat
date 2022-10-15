@@ -164,7 +164,7 @@ class ChatMessageItem extends StatelessWidget {
     );
   }
 
-  StatelessWidget _buildFileMessageWidget(BuildContext context) {
+  Widget _buildFileMessageWidget(BuildContext context) {
     String? messageId = chatMessage.messageId;
     String? title = chatMessage.title;
     String? mimeType = chatMessage.mimeType;
