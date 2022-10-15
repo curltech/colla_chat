@@ -173,6 +173,7 @@ dependencies:
   #mobile_scanner: ^2.0.0  #macos有问题
   lpinyin: ^2.0.3 #拼音
   intl: ^0.17.0
+
   # 多媒体
   #flutter_audio_waveforms: any
   photo_view: ^0.14.0 #图片显示
@@ -206,6 +207,7 @@ dependencies:
   image_gallery_saver: ^1.7.1
   extended_image: ^6.3.0
   extended_image_library: ^3.3.0
+  image: ^3.2.0
 
   #应用
   flutter_quill: ^5.0.3

@@ -1,10 +1,11 @@
-import 'dart:io';
+import 'dart:io' as io;
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:image/image.dart' as platform_image;
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 
 ///image_gallery_saver,extended_image
@@ -102,13 +103,34 @@ class ImageUtil {
         cropAspectRatio: 1);
   }
 
-  ///web编译失败
-  // buildExtendedImage(File file) {
-  //   return ExtendedImage.file(
-  //     file,
-  //     width: 600,
-  //     height: 400,
-  //     fit: BoxFit.fill,
-  //   );
-  // }
+  static platform_image.Image? read(String filename) {
+    var imageBytes = io.File(filename).readAsBytesSync();
+    platform_image.Image? image = platform_image.decodeImage(imageBytes);
+
+    return image;
+  }
+
+  static platform_image.Image thumbnail(
+    platform_image.Image image, {
+    int? width,
+    int? height,
+  }) {
+    platform_image.Image thumbnail =
+        platform_image.copyResize(image, width: width, height: height);
+    platform_image.encodePng(thumbnail);
+
+    return thumbnail;
+  }
+
+  static List<int> encodePng(platform_image.Image image, {int level = 6}) {
+    return platform_image.encodePng(image, level: level);
+  }
+
+  static List<int> encodeJpg(platform_image.Image image, {int quality = 100}) {
+    return platform_image.encodeJpg(image, quality: quality);
+  }
+
+  static platform_image.Image? decodeImage(List<int> data) {
+    return platform_image.decodeImage(data);
+  }
 }
