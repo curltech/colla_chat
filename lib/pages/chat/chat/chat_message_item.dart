@@ -53,117 +53,135 @@ class ChatMessageItem extends StatelessWidget {
           ChatSubMessageType.values, chatMessage.subMessageType!);
     }
     subMessageType = subMessageType ?? ChatSubMessageType.chat;
-    int? id = chatMessage.id;
-    String? messageId = chatMessage.messageId;
-    String? title = chatMessage.title;
-    title = title ?? '';
+    if (subMessageType == ChatSubMessageType.chat) {
+      switch (contentType) {
+        case ContentType.text:
+          return _buildExtendedTextMessageWidget(context);
+        case ContentType.audio:
+          return _buildAudioMessageWidget(context);
+        case ContentType.video:
+          return _buildVideoMessageWidget(context);
+        case ContentType.file:
+          return _buildFileMessageWidget(context);
+        case ContentType.image:
+          return _buildImageMessageWidget(context);
+        case ContentType.card:
+          return _buildNameCardMessageWidget(context);
+        case ContentType.rich:
+          return _buildRichTextMessageWidget(context);
+        case ContentType.link:
+          return _buildUrlMessageWidget(context);
+        default:
+          break;
+      }
+    } else if (subMessageType == ChatSubMessageType.videoChat) {
+      return _buildActionMessageWidget(context, subMessageType);
+    }
+    return null;
+  }
+
+  ExtendedTextMessage _buildExtendedTextMessageWidget(BuildContext context) {
     String? content = chatMessage.content;
     List<int>? data;
     if (content != null) {
       data = CryptoUtil.decodeBase64(content);
-      //logger.i('chatMessage content data length: ${data.length}');
+      content = CryptoUtil.utf8ToString(data);
     }
+    return ExtendedTextMessage(
+      isMyself: isMyself,
+      content: content!,
+    );
+  }
 
-    if (subMessageType == ChatSubMessageType.chat) {
-      if (contentType == ContentType.text) {
-        if (data != null) {
-          content = CryptoUtil.utf8ToString(data);
-        } else {
-          content = '';
-        }
-        return ExtendedTextMessage(
-          isMyself: isMyself,
-          content: content,
-        );
-      }
-      if (contentType == ContentType.audio) {
-        return AudioMessage(
-          id: id!,
-          messageId: messageId!,
-          isMyself: isMyself,
-        );
-      }
-      if (contentType == ContentType.video) {
-        String? thumbnail = chatMessage.thumbnail;
-        return VideoMessage(
-          id: id!,
-          messageId: messageId!,
-          isMyself: isMyself,
-          thumbnail: thumbnail,
-        );
-      }
-      if (contentType == ContentType.file) {
-        String? thumbnail = chatMessage.thumbnail;
-        String? mimeType = chatMessage.mimeType;
-        mimeType = mimeType ?? 'text/plain';
-        if (mimeType.startsWith('image')) {
-          return ImageMessage(
-            messageId: messageId!,
-            image: thumbnail,
-            isMyself: isMyself,
-            mimeType: mimeType,
-          );
-        } else if (mimeType.startsWith('audio')) {
-          return AudioMessage(
-            id: id!,
-            messageId: messageId!,
-            isMyself: isMyself,
-          );
-        } else if (mimeType.startsWith('video')) {
-          String? thumbnail = chatMessage.thumbnail;
-          return VideoMessage(
-            id: id!,
-            messageId: messageId!,
-            isMyself: isMyself,
-            thumbnail: thumbnail,
-          );
-        }
-        return FileMessage(
-          messageId: messageId!,
-          isMyself: isMyself,
-          title: title,
-          mimeType: mimeType,
-        );
-      }
-      if (contentType == ContentType.image) {
-        String? thumbnail = chatMessage.thumbnail;
-        String mimeType = chatMessage.mimeType!;
-        return ImageMessage(
-          messageId: messageId!,
-          image: thumbnail,
-          isMyself: isMyself,
-          mimeType: mimeType,
-        );
-      }
-      if (contentType == ContentType.card) {
-        if (data != null) {
-          content = CryptoUtil.utf8ToString(data);
-        }
-        return NameCardMessage(
-          content: content!,
-          isMyself: isMyself,
-        );
-      }
-      if (contentType == ContentType.rich) {
-        return RichTextMessage(
-          messageId: messageId!,
-          isMyself: isMyself,
-        );
-      }
-      if (contentType == ContentType.link) {
-        return UrlMessage(
-          url: title!,
-          isMyself: isMyself,
-        );
-      }
+  ActionMessage _buildActionMessageWidget(
+      BuildContext context, ChatSubMessageType subMessageType) {
+    return ActionMessage(
+      isMyself: isMyself,
+      subMessageType: subMessageType,
+    );
+  }
+
+  UrlMessage _buildUrlMessageWidget(BuildContext context) {
+    String? title = chatMessage.title;
+    return UrlMessage(
+      url: title!,
+      isMyself: isMyself,
+    );
+  }
+
+  RichTextMessage _buildRichTextMessageWidget(BuildContext context) {
+    String? messageId = chatMessage.messageId;
+    return RichTextMessage(
+      messageId: messageId!,
+      isMyself: isMyself,
+    );
+  }
+
+  NameCardMessage _buildNameCardMessageWidget(BuildContext context) {
+    String? content = chatMessage.content;
+    List<int>? data;
+    if (content != null) {
+      data = CryptoUtil.decodeBase64(content);
+      content = CryptoUtil.utf8ToString(data);
     }
-    if (subMessageType == ChatSubMessageType.videoChat) {
-      return ActionMessage(
-        isMyself: isMyself,
-        subMessageType: subMessageType,
-      );
+    return NameCardMessage(
+      content: content!,
+      isMyself: isMyself,
+    );
+  }
+
+  ImageMessage _buildImageMessageWidget(BuildContext context) {
+    String? messageId = chatMessage.messageId;
+    String? thumbnail = chatMessage.thumbnail;
+    String mimeType = chatMessage.mimeType!;
+    return ImageMessage(
+      messageId: messageId!,
+      image: thumbnail,
+      isMyself: isMyself,
+      mimeType: mimeType,
+    );
+  }
+
+  VideoMessage _buildVideoMessageWidget(BuildContext context) {
+    int? id = chatMessage.id;
+    String? messageId = chatMessage.messageId;
+    String? thumbnail = chatMessage.thumbnail;
+    return VideoMessage(
+      id: id!,
+      messageId: messageId!,
+      isMyself: isMyself,
+      thumbnail: thumbnail,
+    );
+  }
+
+  AudioMessage _buildAudioMessageWidget(BuildContext context) {
+    int? id = chatMessage.id;
+    String? messageId = chatMessage.messageId;
+    return AudioMessage(
+      id: id!,
+      messageId: messageId!,
+      isMyself: isMyself,
+    );
+  }
+
+  StatelessWidget _buildFileMessageWidget(BuildContext context) {
+    String? messageId = chatMessage.messageId;
+    String? title = chatMessage.title;
+    String? mimeType = chatMessage.mimeType;
+    mimeType = mimeType ?? 'text/plain';
+    if (mimeType.startsWith('image')) {
+      return _buildImageMessageWidget(context);
+    } else if (mimeType.startsWith('audio')) {
+      return _buildAudioMessageWidget(context);
+    } else if (mimeType.startsWith('video')) {
+      return _buildVideoMessageWidget(context);
     }
-    return null;
+    return FileMessage(
+      messageId: messageId!,
+      isMyself: isMyself,
+      title: title!,
+      mimeType: mimeType,
+    );
   }
 
   ///气泡消息容器，内包消息体
