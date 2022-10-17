@@ -1,11 +1,14 @@
 import 'dart:io' as io;
+import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_luban/flutter_luban.dart';
 import 'package:image/image.dart' as platform_image;
+import 'package:image_cropping/image_cropping.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 
 ///image_gallery_saver,extended_image
@@ -98,7 +101,7 @@ class ImageUtil {
   }) {
     return EditorConfig(
         maxScale: 8.0,
-        cropRectPadding: EdgeInsets.all(20.0),
+        cropRectPadding: const EdgeInsets.all(20.0),
         hitTestSize: 20.0,
         cropAspectRatio: 1);
   }
@@ -132,5 +135,76 @@ class ImageUtil {
 
   static platform_image.Image? decodeImage(List<int> data) {
     return platform_image.decodeImage(data);
+  }
+
+  static compress({
+    required String filename,
+    String? path,
+    CompressMode mode = CompressMode.AUTO,
+    int quality = 80,
+    int step = 6,
+    bool autoRatio = true,
+  }) async {
+    File? imageFile = File(filename);
+    CompressObject compressObject = CompressObject(
+        imageFile: imageFile,
+        //image
+        path: path,
+        //compress to path
+        quality: quality,
+        //first compress quality, default 80
+        step: step,
+        //compress quality step, The bigger the fast, Smaller is more accurate, default 6
+        mode: CompressMode.LARGE2SMALL,
+        autoRatio: autoRatio //default AUTO
+        );
+    var name = await Luban.compressImage(compressObject);
+
+    return name;
+  }
+
+  static Future<dynamic> cropImage({
+    required BuildContext context,
+    required Uint8List imageBytes,
+    required dynamic Function(dynamic) onImageDoneListener,
+    void Function()? onImageStartLoading,
+    void Function()? onImageEndLoading,
+    CropAspectRatio? selectedImageRatio,
+    bool visibleOtherAspectRatios = true,
+    double squareBorderWidth = 2,
+    List<CropAspectRatio>? customAspectRatios,
+    Color squareCircleColor = Colors.orange,
+    double squareCircleSize = 30,
+    Color defaultTextColor = Colors.black,
+    Color selectedTextColor = Colors.orange,
+    Color colorForWhiteSpace = Colors.white,
+    int encodingQuality = 100,
+    String? workerPath,
+    bool isConstrain = true,
+    bool makeDarkerOutside = true,
+    EdgeInsets? imageEdgeInsets = const EdgeInsets.all(10),
+    bool rootNavigator = false,
+    OutputImageFormat outputImageFormat = OutputImageFormat.jpg,
+    Key? key,
+  }) async {
+    final croppedBytes = await ImageCropping.cropImage(
+      context: context,
+      imageBytes: imageBytes,
+      onImageStartLoading: onImageStartLoading,
+      onImageEndLoading: onImageEndLoading,
+      onImageDoneListener: onImageDoneListener,
+      selectedImageRatio: CropAspectRatio.fromRation(ImageRatio.RATIO_1_1),
+      visibleOtherAspectRatios: true,
+      squareBorderWidth: 2,
+      squareCircleColor: Colors.black,
+      defaultTextColor: Colors.orange,
+      selectedTextColor: Colors.black,
+      colorForWhiteSpace: Colors.grey,
+      encodingQuality: 80,
+      outputImageFormat: OutputImageFormat.jpg,
+      workerPath: 'crop_worker.js',
+    );
+
+    return croppedBytes;
   }
 }

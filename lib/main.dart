@@ -2,16 +2,20 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:colla_chat/pages/chat/login/p2p_login.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/servicelocator.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_background/flutter_background.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart' as inapp;
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
+import 'package:window_manager/window_manager.dart';
 
 import 'l10n/localization.dart';
 
@@ -46,7 +50,7 @@ Future<bool> startForegroundService() async {
   return FlutterBackground.enableBackgroundExecution();
 }
 
-void main(List<String> args) {
+void main(List<String> args) async {
   //logger.i(args.toString());
   //初始化服务类
   // 也初始化了Provider管理的全局状态数据
@@ -56,6 +60,10 @@ void main(List<String> args) {
   //         Provider(create: (context) => AppProfile()),
   //       ],
   WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+    await inapp.InAppWebViewController.setWebContentsDebuggingEnabled(true);
+  }
   ServiceLocator.init().then((value) {
     HttpOverrides.global = PlatformHttpOverrides();
     runApp(MultiProvider(providers: [

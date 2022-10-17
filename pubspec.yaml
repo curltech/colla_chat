@@ -39,7 +39,7 @@ dependencies:
   flutter_background: ^1.1.0
   path_provider: ^2.0.11
   image_picker: ^0.8.5+3 #选取图库
-  url_launcher: ^6.1.2 #打开系统浏览器
+  url_launcher: ^6.1.6 #打开系统浏览器
   package_info: ^2.0.2 #获取包信息
   open_file: ^3.2.1 #打开文件, 和最新device_info有版本冲突
   camera: ^0.10.0+3 #调用相机
@@ -104,6 +104,7 @@ dependencies:
   badges: ^2.0.3
   extended_list: any
   glassmorphism: ^3.0.0
+  glass_kit: ^2.0.1
   #flui: 0.9.2
   syncfusion_flutter_datagrid: ^20.2.36
   pluto_grid: ^4.0.1
@@ -156,7 +157,9 @@ dependencies:
   mime: ^1.0.2
   synchronized: ^3.0.0+2
   flutter_smart_dialog: any
-  pdfx: <2.0.1+3
+  pdfx: ^2.3.0
+  #pdf: ^3.8.3
+  syncfusion_flutter_pdfviewer: ^20.3.49
   json_annotation: ^4.3.0
   permission_handler: ^10.0.0 #权限处理1
   provider: ^6.0.1 #状态管理
@@ -173,6 +176,9 @@ dependencies:
   #mobile_scanner: ^2.0.0  #macos有问题
   lpinyin: ^2.0.3 #拼音
   intl: ^0.17.0
+  window_manager: any
+  webview_windows: ^0.2.2
+  flutter_inappwebview: ^6.0.0-beta.2
 
   # 多媒体
   #flutter_audio_waveforms: any
@@ -208,6 +214,8 @@ dependencies:
   extended_image: ^6.3.0
   extended_image_library: ^3.3.0
   image: ^3.2.0
+  flutter_luban: ^0.1.13
+  image_cropping: ^0.0.13
 
   #应用
   flutter_quill: ^5.0.3
