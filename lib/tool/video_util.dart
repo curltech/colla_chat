@@ -2,8 +2,8 @@ import 'dart:typed_data';
 
 import 'package:video_thumbnail/video_thumbnail.dart';
 
-class VideoThumbnailUtil {
-  static Future<Uint8List?> toData({
+class VideoUtil {
+  static Future<Uint8List?> thumbnailData({
     required String videoFile,
     Map<String, String>? headers,
     ImageFormat imageFormat = ImageFormat.PNG,
@@ -26,7 +26,7 @@ class VideoThumbnailUtil {
     return data;
   }
 
-  static Future<String?> toFile({
+  static Future<String?> thumbnailFile({
     required String videoFile,
     Map<String, String>? headers,
     String? thumbnailPath,
