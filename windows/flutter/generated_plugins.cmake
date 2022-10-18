@@ -6,7 +6,7 @@ list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_windows
   battery_plus_windows
   camera_windows
-  connectivity_plus_windows
+  connectivity_plus
   dart_vlc
   emoji_picker_flutter
   file_saver

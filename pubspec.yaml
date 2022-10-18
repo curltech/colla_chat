@@ -50,7 +50,7 @@ dependencies:
   screenshot: ^1.2.3
   images_picker: ^1.2.11
   orientation: ^1.2.0 # 控制屏幕旋转
-  geolocator: ^8.2.1
+  geolocator: ^9.0.2
   package_info_plus: ^1.4.2
   device_info_plus: ^4.1.2
   network_info_plus: ^2.1.3
@@ -58,7 +58,8 @@ dependencies:
   sensors_plus: ^1.3.1
   battery_plus: ^2.1.3
   flutter_contacts: ^1.1.4
-  connectivity_plus: ^2.3.0
+  connectivity_plus: ^3.0.0
+  flutter_nearby_connections: ^1.1.1
   mimecon: ^0.0.2
 
   # 存储

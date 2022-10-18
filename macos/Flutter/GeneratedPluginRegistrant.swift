@@ -9,7 +9,7 @@ import audio_service
 import audio_session
 import audioplayers_darwin
 import battery_plus_macos
-import connectivity_plus_macos
+import connectivity_plus
 import dart_vlc
 import device_info_plus_macos
 import emoji_picker_flutter

@@ -9,7 +9,7 @@
 #include <audioplayers_windows/audioplayers_windows_plugin.h>
 #include <battery_plus_windows/battery_plus_windows_plugin.h>
 #include <camera_windows/camera_windows.h>
-#include <connectivity_plus_windows/connectivity_plus_windows_plugin.h>
+#include <connectivity_plus/connectivity_plus_windows_plugin.h>
 #include <dart_vlc/dart_vlc_plugin.h>
 #include <emoji_picker_flutter/emoji_picker_flutter_plugin_c_api.h>
 #include <file_saver/file_saver_plugin.h>

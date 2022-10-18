@@ -47,5 +47,14 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+
+    <key>NSBonjourServices</key>
+    <array>
+        <string>_mpconn._tcp</string>
+    </array>
+    <key>UIRequiresPersistentWiFi</key>
+    <true/>
+    <key>NSBluetoothAlwaysUsageDescription</key>
+    <string>mpconn</string>
 </dict>
 </plist>

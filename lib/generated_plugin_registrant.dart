@@ -9,7 +9,6 @@
 import 'package:audioplayers_web/audioplayers_web.dart';
 import 'package:battery_plus_web/battery_plus_web.dart';
 import 'package:camera_web/camera_web.dart';
-import 'package:connectivity_plus_web/connectivity_plus_web.dart';
 import 'package:device_info_plus_web/device_info_plus_web.dart';
 import 'package:file_picker/_internal/file_picker_web.dart';
 import 'package:flutter_keyboard_visibility_web/flutter_keyboard_visibility_web.dart';
@@ -35,7 +34,6 @@ void registerPlugins(Registrar registrar) {
   AudioplayersPlugin.registerWith(registrar);
   BatteryPlusPlugin.registerWith(registrar);
   CameraPlugin.registerWith(registrar);
-  ConnectivityPlusPlugin.registerWith(registrar);
   DeviceInfoPlusPlugin.registerWith(registrar);
   FilePickerWeb.registerWith(registrar);
   FlutterKeyboardVisibilityPlugin.registerWith(registrar);
