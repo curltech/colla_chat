@@ -184,20 +184,6 @@
             </list>
           </value>
         </entry>
-        <entry key="barcode">
-          <value>
-            <list>
-              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/barcode-2.2.3/lib" />
-            </list>
-          </value>
-        </entry>
-        <entry key="barcode_image">
-          <value>
-            <list>
-              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/barcode_image-2.0.2/lib" />
-            </list>
-          </value>
-        </entry>
         <entry key="barcode_scan2">
           <value>
             <list>
@@ -2004,13 +1990,6 @@
             </list>
           </value>
         </entry>
-        <entry key="pdf">
-          <value>
-            <list>
-              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/pdf-3.8.3/lib" />
-            </list>
-          </value>
-        </entry>
         <entry key="pdfx">
           <value>
             <list>
@@ -2543,66 +2522,17 @@
             </list>
           </value>
         </entry>
-        <entry key="syncfusion_flutter_barcodes">
-          <value>
-            <list>
-              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_flutter_barcodes-20.3.49/lib" />
-            </list>
-          </value>
-        </entry>
         <entry key="syncfusion_flutter_core">
           <value>
             <list>
-              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_flutter_core-20.3.49/lib" />
+              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_flutter_core-20.3.50/lib" />
             </list>
           </value>
         </entry>
         <entry key="syncfusion_flutter_datagrid">
           <value>
             <list>
-              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_flutter_datagrid-20.3.49/lib" />
-            </list>
-          </value>
-        </entry>
-        <entry key="syncfusion_flutter_pdf">
-          <value>
-            <list>
-              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_flutter_pdf-20.3.49/lib" />
-            </list>
-          </value>
-        </entry>
-        <entry key="syncfusion_flutter_pdfviewer">
-          <value>
-            <list>
-              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_flutter_pdfviewer-20.3.49/lib" />
-            </list>
-          </value>
-        </entry>
-        <entry key="syncfusion_pdfviewer_macos">
-          <value>
-            <list>
-              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_pdfviewer_macos-20.3.49/lib" />
-            </list>
-          </value>
-        </entry>
-        <entry key="syncfusion_pdfviewer_platform_interface">
-          <value>
-            <list>
-              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_pdfviewer_platform_interface-20.3.49/lib" />
-            </list>
-          </value>
-        </entry>
-        <entry key="syncfusion_pdfviewer_web">
-          <value>
-            <list>
-              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_pdfviewer_web-20.3.49/lib" />
-            </list>
-          </value>
-        </entry>
-        <entry key="syncfusion_pdfviewer_windows">
-          <value>
-            <list>
-              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_pdfviewer_windows-20.3.49/lib" />
+              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_flutter_datagrid-20.3.50/lib" />
             </list>
           </value>
         </entry>
@@ -2914,13 +2844,6 @@
             </list>
           </value>
         </entry>
-        <entry key="webview_windows">
-          <value>
-            <list>
-              <option value="$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/webview_windows-0.2.2/lib" />
-            </list>
-          </value>
-        </entry>
         <entry key="wechat_assets_picker">
           <value>
             <list>
@@ -3014,8 +2937,6 @@
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/audioplayers_windows-1.1.0/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/azlistview-2.0.0/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/badges-2.0.3/lib" />
-      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/barcode-2.2.3/lib" />
-      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/barcode_image-2.0.2/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/barcode_scan2-4.2.1/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/base58check-2.0.0/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/base_x-2.0.0/lib" />
@@ -3270,7 +3191,6 @@
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/path_provider_macos-2.0.6/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/path_provider_platform_interface-2.0.5/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/path_provider_windows-2.1.3/lib" />
-      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/pdf-3.8.3/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/pdfx-2.3.0/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/pedantic-1.11.1/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/permission_handler-10.1.0/lib" />
@@ -3345,15 +3265,8 @@
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/stream_transform-2.0.1/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/string_scanner-1.1.1/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/string_validator-0.3.0/lib" />
-      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_flutter_barcodes-20.3.49/lib" />
-      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_flutter_core-20.3.49/lib" />
-      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_flutter_datagrid-20.3.49/lib" />
-      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_flutter_pdf-20.3.49/lib" />
-      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_flutter_pdfviewer-20.3.49/lib" />
-      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_pdfviewer_macos-20.3.49/lib" />
-      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_pdfviewer_platform_interface-20.3.49/lib" />
-      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_pdfviewer_web-20.3.49/lib" />
-      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_pdfviewer_windows-20.3.49/lib" />
+      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_flutter_core-20.3.50/lib" />
+      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/syncfusion_flutter_datagrid-20.3.50/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/synchronized-3.0.0+3/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/telephony-0.2.0/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/term_glyph-1.2.1/lib" />
@@ -3398,7 +3311,6 @@
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/webview_flutter_android-2.10.4/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/webview_flutter_platform_interface-1.9.5/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/webview_flutter_wkwebview-2.9.5/lib" />
-      <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/webview_windows-0.2.2/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/wechat_assets_picker-8.1.3/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/wechat_camera_picker-3.6.1/lib" />
       <root url="file://$PROJECT_DIR$/../../flutter/.pub-cache/hosted/pub.flutter-io.cn/win32-2.7.0/lib" />

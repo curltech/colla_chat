@@ -8,7 +8,6 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 
 class QrcodeUtil {
   ///qr.flutter创建二维码，适用于多个平台
@@ -162,13 +161,4 @@ class QrcodeUtil {
   //
   //   return result;
   // }
-
-  ///需要商业许可
-  static Widget generate(String value) {
-    return SfBarcodeGenerator(
-      value: value,
-      symbology: QRCode(),
-      showValue: true,
-    );
-  }
 }

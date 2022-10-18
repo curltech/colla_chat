@@ -36,7 +36,6 @@ import shared_preferences_macos
 import speech_to_text_macos
 import sqflite
 import sqlite3_flutter_libs
-import syncfusion_pdfviewer_macos
 import url_launcher_macos
 import wakelock_macos
 import window_manager
@@ -73,7 +72,6 @@ func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   SpeechToTextMacosPlugin.register(with: registry.registrar(forPlugin: "SpeechToTextMacosPlugin"))
   SqflitePlugin.register(with: registry.registrar(forPlugin: "SqflitePlugin"))
   Sqlite3FlutterLibsPlugin.register(with: registry.registrar(forPlugin: "Sqlite3FlutterLibsPlugin"))
-  SyncfusionFlutterPdfViewerPlugin.register(with: registry.registrar(forPlugin: "SyncfusionFlutterPdfViewerPlugin"))
   UrlLauncherPlugin.register(with: registry.registrar(forPlugin: "UrlLauncherPlugin"))
   WakelockMacosPlugin.register(with: registry.registrar(forPlugin: "WakelockMacosPlugin"))
   WindowManagerPlugin.register(with: registry.registrar(forPlugin: "WindowManagerPlugin"))
