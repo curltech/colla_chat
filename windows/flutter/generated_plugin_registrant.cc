@@ -11,6 +11,7 @@
 #include <camera_windows/camera_windows.h>
 #include <connectivity_plus_windows/connectivity_plus_windows_plugin.h>
 #include <dart_vlc/dart_vlc_plugin.h>
+#include <emoji_picker_flutter/emoji_picker_flutter_plugin_c_api.h>
 #include <file_saver/file_saver_plugin.h>
 #include <flutter_native_view/flutter_native_view_plugin.h>
 #include <flutter_secure_storage_windows/flutter_secure_storage_windows_plugin.h>
@@ -26,7 +27,9 @@
 #include <record_windows/record_windows_plugin_c_api.h>
 #include <screen_retriever/screen_retriever_plugin.h>
 #include <sqlite3_flutter_libs/sqlite3_flutter_libs_plugin.h>
+#include <syncfusion_pdfviewer_windows/syncfusion_pdfviewer_windows_plugin.h>
 #include <url_launcher_windows/url_launcher_windows.h>
+#include <webview_windows/webview_windows_plugin.h>
 #include <window_manager/window_manager_plugin.h>
 
 void RegisterPlugins(flutter::PluginRegistry* registry) {
@@ -40,6 +43,8 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("ConnectivityPlusWindowsPlugin"));
   DartVlcPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("DartVlcPlugin"));
+  EmojiPickerFlutterPluginCApiRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("EmojiPickerFlutterPluginCApi"));
   FileSaverPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("FileSaverPlugin"));
   FlutterNativeViewPluginRegisterWithRegistrar(
@@ -70,8 +75,12 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("ScreenRetrieverPlugin"));
   Sqlite3FlutterLibsPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("Sqlite3FlutterLibsPlugin"));
+  SyncfusionPdfviewerWindowsPluginRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("SyncfusionPdfviewerWindowsPlugin"));
   UrlLauncherWindowsRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("UrlLauncherWindows"));
+  WebviewWindowsPluginRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("WebviewWindowsPlugin"));
   WindowManagerPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("WindowManagerPlugin"));
 }

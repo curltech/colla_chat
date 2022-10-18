@@ -11,10 +11,10 @@ class WindowsWebView extends StatefulWidget {
   const WindowsWebView({super.key});
 
   @override
-  State<WindowsWebView> createState() => _WindowsWebView();
+  State<WindowsWebView> createState() => _WindowsWebViewState();
 }
 
-class _WindowsWebView extends State<WindowsWebView> {
+class _WindowsWebViewState extends State<WindowsWebView> {
   final _controller = WebviewController();
   final _textController = TextEditingController();
   final List<StreamSubscription> _subscriptions = [];

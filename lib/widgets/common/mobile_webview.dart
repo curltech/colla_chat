@@ -8,10 +8,10 @@ class MobileWebView extends StatefulWidget {
   const MobileWebView({super.key, required this.initialUrl});
 
   @override
-  State createState() => MobileWebViewState();
+  State createState() => _MobileWebViewState();
 }
 
-class MobileWebViewState extends State<MobileWebView> {
+class _MobileWebViewState extends State<MobileWebView> {
   @override
   void initState() {
     super.initState();

@@ -158,7 +158,7 @@ dependencies:
   synchronized: ^3.0.0+2
   flutter_smart_dialog: any
   pdfx: ^2.3.0
-  #pdf: ^3.8.3
+  pdf: ^3.8.3
   syncfusion_flutter_pdfviewer: ^20.3.49
   json_annotation: ^4.3.0
   permission_handler: ^10.0.0 #权限处理1
@@ -170,7 +170,12 @@ dependencies:
   logger: ^1.1.0
   #logging: ^1.0.2
   cross_file: any
-  qr_flutter: ^4.0.0
+  qr_flutter:
+    git:
+      url: https://github.com/theyakka/qr.flutter.git
+  qr: ^3.0.1
+  #barcode: ^2.2.3
+  #barcode_image: ^2.0.2
   #barcode_widget: ^2.0.2
   barcode_scan2: ^4.2.1
   #mobile_scanner: ^2.0.0  #macos有问题
@@ -209,7 +214,7 @@ dependencies:
   speech_to_text: any
   flutter_image_compress: ^1.1.0 #图片压缩1
   video_thumbnail: ^0.5.2
-  syncfusion_flutter_barcodes: any
+  syncfusion_flutter_barcodes: ^20.3.49
   image_gallery_saver: ^1.7.1
   extended_image: ^6.3.0
   extended_image_library: ^3.3.0

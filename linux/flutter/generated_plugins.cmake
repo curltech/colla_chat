@@ -5,6 +5,7 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_linux
   dart_vlc
+  emoji_picker_flutter
   file_saver
   flutter_secure_storage_linux
   openpgp

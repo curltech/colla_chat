@@ -11,28 +11,32 @@ import 'package:qr_flutter/qr_flutter.dart';
 import 'package:syncfusion_flutter_barcodes/barcodes.dart';
 
 class QrcodeUtil {
-  static QrImage create(String data, {double size = 320, String? embed}) {
+  ///qr.flutter创建二维码，适用于多个平台
+  static QrImageView create(
+    String data, {
+    double size = 320,
+    String? embed,
+    ImageProvider<Object>? embeddedImage,
+    QrEmbeddedImageStyle? embeddedImageStyle,
+  }) {
     Uint8List? bytes;
-    if (embed != null && ImageUtil.isBase64Img(embed)) {
+    if (embeddedImage == null &&
+        (embed != null && ImageUtil.isBase64Img(embed))) {
       int pos = embed.indexOf(',');
       bytes = CryptoUtil.decodeBase64(embed.substring(pos));
+      embeddedImage = MemoryImage(bytes);
     }
+    embeddedImageStyle ??= QrEmbeddedImageStyle(
+      size: const Size(80, 80),
+    );
 
-    // 新版本的写法
-    // final qrCode = QrCode(4, QrErrorCorrectLevel.L)..addData(data);
-    // final qrImage = QrImage(qrCode);
-    //
-    // return qrImage;
-
-    return QrImage(
+    return QrImageView(
       data: data,
       version: QrVersions.auto,
       size: size,
       gapless: false,
-      embeddedImage: bytes != null ? MemoryImage(bytes) : null,
-      embeddedImageStyle: QrEmbeddedImageStyle(
-        size: const Size(80, 80),
-      ),
+      embeddedImage: embeddedImage,
+      embeddedImageStyle: embeddedImageStyle,
     );
   }
 
@@ -119,6 +123,7 @@ class QrcodeUtil {
   //   return widget;
   // }
 
+  ///使用barcode_scan2扫描二维码的功能，仅支持移动设备
   static Future<ScanResult> scan(
       {List<BarcodeFormat> restrictFormat = const [],
       int useCamera = -1,
@@ -158,6 +163,7 @@ class QrcodeUtil {
   //   return result;
   // }
 
+  ///需要商业许可
   static Widget generate(String value) {
     return SfBarcodeGenerator(
       value: value,

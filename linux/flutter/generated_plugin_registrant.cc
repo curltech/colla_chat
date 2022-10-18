@@ -8,6 +8,7 @@
 
 #include <audioplayers_linux/audioplayers_linux_plugin.h>
 #include <dart_vlc/dart_vlc_plugin.h>
+#include <emoji_picker_flutter/emoji_picker_flutter_plugin.h>
 #include <file_saver/file_saver_plugin.h>
 #include <flutter_secure_storage_linux/flutter_secure_storage_linux_plugin.h>
 #include <openpgp/openpgp_plugin.h>
@@ -25,6 +26,9 @@ void fl_register_plugins(FlPluginRegistry* registry) {
   g_autoptr(FlPluginRegistrar) dart_vlc_registrar =
       fl_plugin_registry_get_registrar_for_plugin(registry, "DartVlcPlugin");
   dart_vlc_plugin_register_with_registrar(dart_vlc_registrar);
+  g_autoptr(FlPluginRegistrar) emoji_picker_flutter_registrar =
+      fl_plugin_registry_get_registrar_for_plugin(registry, "EmojiPickerFlutterPlugin");
+  emoji_picker_flutter_plugin_register_with_registrar(emoji_picker_flutter_registrar);
   g_autoptr(FlPluginRegistrar) file_saver_registrar =
       fl_plugin_registry_get_registrar_for_plugin(registry, "FileSaverPlugin");
   file_saver_plugin_register_with_registrar(file_saver_registrar);
