@@ -70,7 +70,7 @@ dependencies:
   idb_shim: ^2.0.1
 
   #网络
-  flutter_webrtc: ^0.9.5
+  flutter_webrtc: ^0.9.11
   dart_webrtc: ^1.0.5
   #flutter_web_auth: ^0.4.0  #macos有问题
   dio: ^4.0.6
@@ -236,6 +236,8 @@ dependency_overrides:
   photo_view: ^0.14.0
   device_info_plus: ^4.1.2
   ffi: ^2.0.1
+  flutter_ion: ^1.0.0
+  flutter_webrtc: ^0.9.11
 dev_dependencies:
   flutter_test:
     sdk: flutter
