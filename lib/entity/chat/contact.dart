@@ -2,26 +2,6 @@ import 'package:colla_chat/entity/dht/base.dart';
 
 import '../base.dart';
 
-enum RequestType {
-  addLinkman,
-  dropLinkman,
-  blackLinkman,
-  unblackLinkman,
-  addGroup,
-  disbandGroup,
-  modifyGroup,
-  modifyGroupOwner,
-  addGroupMember,
-  removeGroupMember
-}
-
-enum RequestStatus { sent, received, accepted, expired, ignored }
-
-enum GroupStatus {
-  effective, // 有效
-  disbanded // 已解散
-}
-
 //当事方，联系人，群，手机联系人（潜在联系人）的共同父类
 abstract class PeerParty extends PeerEntity {
   String? alias; // 别名
@@ -112,7 +92,7 @@ enum LinkmanStatus {
   subscript, //订阅
 }
 
-/// 联系人，和设备绑定登录成为PeerClient，可能时好友（friend）或者普通联系人
+/// 联系人，和设备绑定登录成为PeerClient，可能是好友（friend）或者普通联系人
 /// 意味可以进行普通的文本，语音和视频通话
 class Linkman extends PeerParty {
   //用于区分是否是好友，只有好友才能直接聊天
