@@ -1,3 +1,4 @@
+import 'package:colla_chat/pages/chat/linkman/group/group_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_info_widget.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,7 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
   late final LinkmanInfoWidget linkmanInfoWidget;
   late final GroupInfoWidget groupInfoWidget;
   late final LinkmanAddWidget linkmanAddWidget;
+  late final GroupAddWidget groupAddWidget;
 
   LinkmanListWidget({Key? key}) : super(key: key) {
     linkmanInfoWidget = LinkmanInfoWidget();
@@ -34,6 +36,9 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
 
     linkmanAddWidget = LinkmanAddWidget();
     indexWidgetProvider.define(linkmanAddWidget);
+
+    groupAddWidget = GroupAddWidget();
+    indexWidgetProvider.define(groupAddWidget);
   }
 
   @override
@@ -153,7 +158,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
           icon: const Icon(Icons.person_add),
           tooltip: AppLocalizations.t('Add linkman')),
       IconButton(
-          onPressed: () {},
+          onPressed: () {
+            indexWidgetProvider.push('group_add');
+          },
           icon: const Icon(Icons.group_add),
           tooltip: AppLocalizations.t('Add group')),
     ];

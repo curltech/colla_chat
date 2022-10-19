@@ -1,7 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/linkman/linkman/contact_linkman_add_widget.dart';
-import 'package:colla_chat/pages/chat/linkman/linkman/p2p_linkman_add_widget.dart';
-import 'package:colla_chat/pages/chat/linkman/linkman/qrcode_linkman_add_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/group/linkman_group_add_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/group/nearby_group_add_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -11,22 +10,17 @@ import 'package:flutter/material.dart';
 
 //增加群页面，列出了所有的增加群的路由
 class GroupAddWidget extends StatelessWidget with TileDataMixin {
-  final P2pLinkmanAddWidget p2pLinkmanAddWidget = P2pLinkmanAddWidget();
-  final QrcodeLinkmanAddWidget qrcodeLinkmanAddWidget =
-      QrcodeLinkmanAddWidget();
-  final ContactLinkmanAddWidget contactLinkmanAddWidget =
-      ContactLinkmanAddWidget();
+  final LinkmanGroupAddWidget linkmanGroupAddWidget = LinkmanGroupAddWidget();
+  final NearbyGroupAddWidget nearbyGroupAddWidget = NearbyGroupAddWidget();
 
   late final Widget child;
 
   GroupAddWidget({Key? key}) : super(key: key) {
-    indexWidgetProvider.define(p2pLinkmanAddWidget);
-    indexWidgetProvider.define(qrcodeLinkmanAddWidget);
-    indexWidgetProvider.define(contactLinkmanAddWidget);
+    indexWidgetProvider.define(linkmanGroupAddWidget);
+    indexWidgetProvider.define(nearbyGroupAddWidget);
     List<TileDataMixin> mixins = [
-      p2pLinkmanAddWidget,
-      qrcodeLinkmanAddWidget,
-      contactLinkmanAddWidget,
+      linkmanGroupAddWidget,
+      nearbyGroupAddWidget,
     ];
     final List<TileData> linkmanAddTileData = TileData.from(mixins);
     child = Expanded(child: DataListView(tileData: linkmanAddTileData));
