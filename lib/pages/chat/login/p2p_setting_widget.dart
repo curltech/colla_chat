@@ -15,6 +15,16 @@ class P2pSettingWidget extends StatefulWidget {
 
 class _P2pSettingWidgetState extends State<P2pSettingWidget> {
   @override
+  void initState() {
+    super.initState();
+    appDataProvider.addListener(_update);
+  }
+
+  _update() {
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
     var padding = const EdgeInsets.symmetric(horizontal: 15.0);
     return Column(
@@ -54,5 +64,11 @@ class _P2pSettingWidgetState extends State<P2pSettingWidget> {
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    appDataProvider.removeListener(_update);
+    super.dispose();
   }
 }
