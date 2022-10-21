@@ -15,13 +15,13 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
-///选择linkman建群
-class LinkmanGroupAddWidget extends StatefulWidget with TileDataMixin {
+///面对面建群
+class FaceGroupAddWidget extends StatefulWidget with TileDataMixin {
   final DataListController<TileData> controller =
       DataListController<TileData>();
   late final DataListView dataListView;
 
-  LinkmanGroupAddWidget({Key? key}) : super(key: key) {
+  FaceGroupAddWidget({Key? key}) : super(key: key) {
     dataListView = DataListView(
       controller: controller,
     );
@@ -31,19 +31,19 @@ class LinkmanGroupAddWidget extends StatefulWidget with TileDataMixin {
   Icon get icon => const Icon(Icons.person_add);
 
   @override
-  String get routeName => 'linkman_group_add';
+  String get routeName => 'face_group_add';
 
   @override
-  String get title => 'LinkmanGroupAdd';
+  String get title => 'FaceGroupAdd';
 
   @override
   bool get withLeading => true;
 
   @override
-  State<StatefulWidget> createState() => _LinkmanGroupAddWidgetState();
+  State<StatefulWidget> createState() => _FaceGroupAddWidgetState();
 }
 
-class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
+class _FaceGroupAddWidgetState extends State<FaceGroupAddWidget> {
   var controller = TextEditingController();
 
   @override

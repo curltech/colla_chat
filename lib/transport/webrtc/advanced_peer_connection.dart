@@ -1,82 +1,16 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/service/p2p/security_context.dart';
+import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-
-import '../../service/p2p/security_context.dart';
-import '../../service/servicelocator.dart';
-
-class SignalExtension {
-  late String peerId;
-  late String clientId;
-  late String name;
-  Room? room;
-  List<Map<String, String>>? iceServers;
-
-  SignalExtension(this.peerId, this.clientId,
-      {required this.name, this.room, this.iceServers});
-
-  SignalExtension.fromJson(Map json) {
-    peerId = json['peerId'];
-    clientId = json['clientId'];
-    name = json['name'];
-    Map<String, dynamic>? room = json['room'];
-    if (room != null) {
-      this.room = Room(room['roomId'],
-          id: room['id'],
-          type: room['type'],
-          action: room['action'],
-          identity: room['identity']);
-    }
-    var iceServers = json['iceServers'];
-    if (iceServers != null) {
-      if (iceServers is List && iceServers.isNotEmpty) {
-        if (this.iceServers == null) {
-          this.iceServers = [];
-        }
-        for (var iceServer in iceServers) {
-          for (var entry in (iceServer as Map).entries) {
-            this.iceServers!.add({entry.key: entry.value});
-          }
-        }
-      }
-    }
-  }
-
-  Map<String, dynamic> toJson() {
-    Map<String, dynamic> json = {};
-    json.addAll({
-      'peerId': peerId,
-      'clientId': clientId,
-      'name': name,
-      'iceServers': iceServers,
-    });
-    var room = this.room;
-    if (room != null) {
-      json['room'] = room.toJson();
-    }
-    return json;
-  }
-}
-
-class WebrtcEvent {
-  String peerId;
-  String clientId;
-  dynamic data;
-
-  WebrtcEvent(this.peerId, {required this.clientId, this.data});
-}
-
-const String unknownClientId = 'unknownClientId';
-const String unknownName = 'unknownName';
 
 ///基础的PeerConnection之上加入了业务的编号，peerId和clientId，自动进行信号的协商
 class AdvancedPeerConnection {
@@ -97,16 +31,11 @@ class AdvancedPeerConnection {
       {this.clientId = unknownClientId, this.name = unknownName, this.room}) {
     logger.w(
         'advancedPeerConnection peerId:$peerId, clientId:$clientId, initiator:$initiator create');
-    if (initiator) {
-      final basePeerConnection = BasePeerConnection(initiator: true);
-      this.basePeerConnection = basePeerConnection;
-    } else {
-      if (StringUtil.isEmpty(clientId)) {
-        logger.e('SlavePeerConnection clientId must be value');
-      }
-      final basePeerConnection = BasePeerConnection(initiator: false);
-      this.basePeerConnection = basePeerConnection;
+    if (StringUtil.isEmpty(clientId)) {
+      logger.e('SlavePeerConnection clientId must be value');
     }
+    final basePeerConnection = BasePeerConnection(initiator: initiator);
+    this.basePeerConnection = basePeerConnection;
   }
 
   Future<bool> init(
@@ -144,7 +73,7 @@ class AdvancedPeerConnection {
     //触发basePeerConnection的signal事件，就是调用peerConnectionPool对应的signal方法
     basePeerConnection.on(WebrtcEventType.signal, (WebrtcSignal signal) async {
       await peerConnectionPool
-          .signal(WebrtcEvent(peerId, clientId: clientId, data: signal));
+          .signal(WebrtcEvent(peerId, clientId: clientId,name:name, data: signal));
     });
 
     //触发basePeerConnection的connect事件，就是调用peerConnectionPool对应的signal方法
@@ -152,12 +81,12 @@ class AdvancedPeerConnection {
 
     basePeerConnection.on(WebrtcEventType.status, (data) async {
       await peerConnectionPool
-          .onStatus(WebrtcEvent(peerId, clientId: clientId, data: data));
+          .onStatus(WebrtcEvent(peerId, clientId: clientId,name:name, data: data));
     });
 
     basePeerConnection.on(WebrtcEventType.closed, (data) async {
       await peerConnectionPool
-          .onClosed(WebrtcEvent(peerId, clientId: clientId, data: data));
+          .onClosed(WebrtcEvent(peerId, clientId: clientId,name:name, data: data));
     });
 
     //收到数据，带解密功能，取最后一位整数，表示解密选项，得到何种解密方式，然后解密
@@ -191,7 +120,7 @@ class AdvancedPeerConnection {
 
     basePeerConnection.on(WebrtcEventType.error, (err) async {
       await peerConnectionPool
-          .onError(WebrtcEvent(peerId, clientId: clientId, data: err));
+          .onError(WebrtcEvent(peerId, clientId: clientId,name:name, data: err));
     });
 
     return result;
@@ -217,20 +146,20 @@ class AdvancedPeerConnection {
     logger.i('peerId: $peerId clientId:$clientId is onAddStream');
     await _addStream(stream);
     await peerConnectionPool
-        .onAddStream(WebrtcEvent(peerId, clientId: clientId, data: stream));
+        .onAddStream(WebrtcEvent(peerId, clientId: clientId,name:name, data: stream));
   }
 
   onRemoveStream(MediaStream stream) async {
     logger.i('peerId: $peerId clientId:$clientId is onRemoveStream');
     await _removeStream(stream);
     await peerConnectionPool
-        .onRemoveStream(WebrtcEvent(peerId, clientId: clientId, data: stream));
+        .onRemoveStream(WebrtcEvent(peerId, clientId: clientId,name:name, data: stream));
   }
 
   onTrack(RTCTrackEvent event) async {
     logger.i('peerId: $peerId clientId:$clientId is onTrack');
     await peerConnectionPool
-        .onTrack(WebrtcEvent(peerId, clientId: clientId, data: event));
+        .onTrack(WebrtcEvent(peerId, clientId: clientId,name:name, data: event));
   }
 
   onAddTrack(dynamic data) async {
@@ -241,13 +170,13 @@ class AdvancedPeerConnection {
     //   _addStream(stream);
     // }
     await peerConnectionPool
-        .onAddTrack(WebrtcEvent(peerId, clientId: clientId, data: data));
+        .onAddTrack(WebrtcEvent(peerId, clientId: clientId,name:name, data: data));
   }
 
   onRemoveTrack(dynamic data) async {
     logger.i('peerId: $peerId clientId:$clientId is onRemoveTrack');
     await peerConnectionPool
-        .onRemoveTrack(WebrtcEvent(peerId, clientId: clientId, data: data));
+        .onRemoveTrack(WebrtcEvent(peerId, clientId: clientId,name:name, data: data));
   }
 
   ///把渲染器加入到渲染器集合
@@ -389,7 +318,7 @@ class AdvancedPeerConnection {
 
   onConnected(dynamic data) async {
     await peerConnectionPool
-        .onConnected(WebrtcEvent(peerId, clientId: clientId, data: data));
+        .onConnected(WebrtcEvent(peerId, clientId: clientId,name:name, data: data));
   }
 
   ///收到数据，带解密功能，取最后一位整数，表示解密选项，得到何种解密方式，然后解密
@@ -407,7 +336,7 @@ class AdvancedPeerConnection {
     bool result = await securityContextService.decrypt(securityContext);
     if (result) {
       await peerConnectionPool.onMessage(WebrtcEvent(peerId,
-          clientId: clientId, data: securityContext.payload));
+          clientId: clientId,name:name, data: securityContext.payload));
     }
   }
 

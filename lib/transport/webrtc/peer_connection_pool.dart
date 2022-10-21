@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
@@ -260,8 +258,8 @@ class PeerConnectionPool {
     //创建新的主叫方
     peerConnection =
         AdvancedPeerConnection(peerId, true, clientId: clientId, room: room);
-    peerConnectionPoolController.onCreated(
-        WebrtcEvent(peerId, clientId: clientId, data: peerConnection));
+    peerConnectionPoolController.onCreated(WebrtcEvent(peerId,
+        clientId: clientId, name: name, data: peerConnection));
     bool result = await peerConnection.init(
         iceServers: iceServers, localRenders: localRenders);
     if (!result) {
@@ -413,7 +411,7 @@ class PeerConnectionPool {
           clientId: clientId, name: name, room: room);
       await put(peerId, advancedPeerConnection, clientId: clientId);
       peerConnectionPoolController.onCreated(WebrtcEvent(peerId,
-          clientId: clientId, data: advancedPeerConnection));
+          clientId: clientId, name: name, data: advancedPeerConnection));
       var result = await advancedPeerConnection.init(iceServers: iceServers);
       if (!result) {
         logger.e('webrtcPeer.init fail');

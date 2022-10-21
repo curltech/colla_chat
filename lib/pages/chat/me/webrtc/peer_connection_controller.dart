@@ -1,6 +1,6 @@
+import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../transport/webrtc/advanced_peer_connection.dart';
 
 ///webrtc连接池控制器，用于跟踪连接的状态变化
 class PeerConnectionPoolController with ChangeNotifier {

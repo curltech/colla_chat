@@ -1,14 +1,77 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/message_slice.dart';
-import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-import '../../crypto/cryptography.dart';
-import '../../provider/app_data_provider.dart';
+class SignalExtension {
+  late String peerId;
+  late String clientId;
+  late String name;
+  Room? room;
+  List<Map<String, String>>? iceServers;
+
+  SignalExtension(this.peerId, this.clientId,
+      {required this.name, this.room, this.iceServers});
+
+  SignalExtension.fromJson(Map json) {
+    peerId = json['peerId'];
+    clientId = json['clientId'];
+    name = json['name'];
+    Map<String, dynamic>? room = json['room'];
+    if (room != null) {
+      this.room = Room(room['roomId'],
+          id: room['id'],
+          type: room['type'],
+          action: room['action'],
+          identity: room['identity']);
+    }
+    var iceServers = json['iceServers'];
+    if (iceServers != null) {
+      if (iceServers is List && iceServers.isNotEmpty) {
+        if (this.iceServers == null) {
+          this.iceServers = [];
+        }
+        for (var iceServer in iceServers) {
+          for (var entry in (iceServer as Map).entries) {
+            this.iceServers!.add({entry.key: entry.value});
+          }
+        }
+      }
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    Map<String, dynamic> json = {};
+    json.addAll({
+      'peerId': peerId,
+      'clientId': clientId,
+      'name': name,
+      'iceServers': iceServers,
+    });
+    var room = this.room;
+    if (room != null) {
+      json['room'] = room.toJson();
+    }
+    return json;
+  }
+}
+
+class WebrtcEvent {
+  String peerId;
+  String clientId;
+  String name;
+  dynamic data;
+
+  WebrtcEvent(this.peerId, {required this.clientId,required this.name, this.data});
+}
+
+const String unknownClientId = 'unknownClientId';
+const String unknownName = 'unknownName';
 
 enum SignalType {
   renegotiate,
@@ -201,7 +264,7 @@ class BasePeerConnection {
 
   //外部使用时注册的回调方法，也就是注册事件
   //WebrtcEvent定义了事件的名称
-  Map<WebrtcEventType, Function> handlers = {};
+  Map<WebrtcEventType, Function> events = {};
 
   //signal扩展属性，由外部传入，这个属性用于传递定制的属性
   //一般包括自己的iceServer，room，peerId，clientId，name
@@ -275,7 +338,7 @@ class BasePeerConnection {
     peerConnection.onRenegotiationNeeded = () => {onRenegotiationNeeded()};
 
     ///3.建立发送数据通道和接受数据通道
-    if (needDataChannel) {
+    if (initiator && needDataChannel) {
       var dataChannelDict = RTCDataChannelInit();
       //创建RTCDataChannel对象时设置的通道的唯一id
       dataChannelDict.id = 1;
@@ -436,7 +499,7 @@ class BasePeerConnection {
   ///onIceCandidate事件表示本地candidate准备好，可以发送IceCandidate到远端
   onIceCandidate(RTCIceCandidate candidate) {
     ///如果注册了iceCandidate事件，则直接执行事件
-    var handler = handlers[WebrtcEventType.iceCandidate];
+    var handler = events[WebrtcEventType.iceCandidate];
     if (handler != null) {
       handler(candidate);
       return;
@@ -487,6 +550,7 @@ class BasePeerConnection {
     } else {
       await _negotiateAnswer();
     }
+
     //延时关闭
     Future.delayed(Duration(seconds: delayTimes)).then((value) {
       if (status != PeerConnectionStatus.connected) {
@@ -498,27 +562,6 @@ class BasePeerConnection {
         }
       }
     });
-  }
-
-  ///外部在收到信号的时候调用
-  onSignal(WebrtcSignal webrtcSignal) async {
-    if (initiator) {
-      await _onOfferSignal(webrtcSignal);
-    } else {
-      await _onAnswerSignal(webrtcSignal);
-    }
-  }
-
-  addTransceiver({
-    required MediaStreamTrack track,
-    required RTCRtpMediaType kind,
-    required RTCRtpTransceiverInit init,
-  }) {
-    if (initiator) {
-      _addOfferTransceiver(track: track, kind: kind, init: init);
-    } else {
-      _addAnswerTransceiver(track: track, kind: kind, init: init);
-    }
   }
 
   ///作为主叫，发起协商过程createOffer
@@ -627,31 +670,6 @@ class BasePeerConnection {
     }
   }
 
-  /// 作为主叫，为连接加上收发器
-  /// @param {String} kind
-  /// @param {Object} init
-  _addOfferTransceiver({
-    required MediaStreamTrack track,
-    required RTCRtpMediaType kind,
-    required RTCRtpTransceiverInit init,
-  }) async {
-    RTCPeerConnection peerConnection = this.peerConnection!;
-    logger.i('addTransceiver');
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
-    }
-
-    //直接加上收发器，并开始协商
-    try {
-      await peerConnection.addTransceiver(track: track, kind: kind, init: init);
-      //negotiate();
-    } catch (err) {
-      logger.e(err);
-      close();
-    }
-  }
-
   ///作为被叫，协商时发送再协商信号给主叫，要求重新发起协商
   _negotiateAnswer() async {
     logger.i('Negotiation start, requesting negotiation from slave');
@@ -757,6 +775,52 @@ class BasePeerConnection {
     //如果什么都不是，报错
     else {
       logger.e('signal called with invalid signal data');
+    }
+  }
+
+  ///外部在收到信号的时候调用
+  onSignal(WebrtcSignal webrtcSignal) async {
+    if (initiator) {
+      await _onOfferSignal(webrtcSignal);
+    } else {
+      await _onAnswerSignal(webrtcSignal);
+    }
+  }
+
+  /// 作为主叫，为连接加上收发器
+  /// @param {String} kind
+  /// @param {Object} init
+  _addOfferTransceiver({
+    required MediaStreamTrack track,
+    required RTCRtpMediaType kind,
+    required RTCRtpTransceiverInit init,
+  }) async {
+    RTCPeerConnection peerConnection = this.peerConnection!;
+    logger.i('addTransceiver');
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return;
+    }
+
+    //直接加上收发器，并开始协商
+    try {
+      await peerConnection.addTransceiver(track: track, kind: kind, init: init);
+      //negotiate();
+    } catch (err) {
+      logger.e(err);
+      close();
+    }
+  }
+
+  addTransceiver({
+    required MediaStreamTrack track,
+    required RTCRtpMediaType kind,
+    required RTCRtpTransceiverInit init,
+  }) {
+    if (initiator) {
+      _addOfferTransceiver(track: track, kind: kind, init: init);
+    } else {
+      _addAnswerTransceiver(track: track, kind: kind, init: init);
     }
   }
 
@@ -1057,17 +1121,17 @@ class BasePeerConnection {
   /// 所以调用此方法会覆盖peerConnectionPool的处理
   on(WebrtcEventType name, Function? fn) {
     if (fn != null) {
-      handlers[name] = fn;
+      events[name] = fn;
     } else {
-      handlers.remove(name);
+      events.remove(name);
     }
   }
 
   /// 调用外部事件注册方法
-  emit(WebrtcEventType name, dynamic event) {
-    var handler = handlers[name];
-    if (handler != null) {
-      handler(event);
+  emit(WebrtcEventType name, dynamic webrtcEvent) {
+    var event = events[name];
+    if (event != null) {
+      event(webrtcEvent);
     }
   }
 
