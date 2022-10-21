@@ -32,20 +32,11 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
     }
     _wsConnectAddressController =
         TextEditingController(text: _wsConnectAddress);
-    // 初始化子项集合
-    _wsConnectAddressController.addListener(() {});
-
-    var name = defaultNodeAddress.name;
-    if (name != null) {
-      _name = name;
-    }
+    _name = defaultNodeAddress.name;
   }
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<AppDataProvider>(context).locale;
-    Provider.of<AppDataProvider>(context).themeData;
-    Provider.of<AppDataProvider>(context).brightness;
     var instance = AppLocalizations.instance;
     List<Option> items = [];
     for (var entry in nodeAddressOptions.entries) {
