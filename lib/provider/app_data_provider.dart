@@ -140,6 +140,7 @@ class AppDataProvider with ChangeNotifier {
   double bottomBarHeight = kBottomNavigationBarHeight;
   double toolbarHeight = kToolbarHeight;
   String sqlite3Path = '';
+  NodeAddress? _defaultNodeAddress;
 
   AppDataProvider();
 
@@ -311,15 +312,14 @@ class AppDataProvider with ChangeNotifier {
 
   /// 缺省连接地址
   NodeAddress get defaultNodeAddress {
-    var d = nodeAddress[NodeAddress.defaultName];
-    if (d == null) {
-      throw 'NoDefaultNodeAddress';
-    }
-    return d;
+    _defaultNodeAddress ??= nodeAddress[NodeAddress.defaultName];
+
+    return _defaultNodeAddress!;
   }
 
   set defaultNodeAddress(NodeAddress address) {
-    nodeAddress[NodeAddress.defaultName] = address;
+    _defaultNodeAddress = address;
+    notifyListeners();
   }
 
   saveAppParams() async {

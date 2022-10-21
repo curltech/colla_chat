@@ -3,7 +3,7 @@ import '../provider/app_data_provider.dart';
 
 /// 地址选择框的选项
 final Map<String, NodeAddress> nodeAddressOptions = {
-  'default': NodeAddress('localhost',
+  'default': NodeAddress('default',
       wsConnectAddress: 'wss://localhost:9090/websocket',
       httpConnectAddress: 'https://localhost:9090',
       connectPeerId: '12D3KooWGHzEzdyaet3Qk4mSVHcvXUh6CJTX8tCus9ZmrMXpi6HV',
