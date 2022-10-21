@@ -37,6 +37,7 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   # 系统功能，获取系统信息和操作，需要调用插件才能完成
   flutter_background: ^1.1.0
+  flutter_background_service: ^2.4.5
   path_provider: ^2.0.11
   image_picker: ^0.8.5+3 #选取图库
   url_launcher: ^6.1.6 #打开系统浏览器
@@ -93,6 +94,7 @@ dependencies:
   flutter_emoji: ^2.2.1+1
   emoji_picker_flutter: ^1.3.1
   animated_bottom_navigation_bar: ^0.3.2
+  flutter_animate: ^1.0.0
   fluro: ^2.0.3
   flutter_multi_formatter: ^2.5.1
   flutter_awesome_select: ^6.5.0
@@ -119,7 +121,6 @@ dependencies:
   extended_text_field: ^10.1.0 #文字表情混入
   extended_text_library: ^9.1.0 #Flutter2.5用这个,,其他可注释
   azlistview: ^2.0.0 #特殊列表滑动
-  webview_flutter: ^3.0.4 #web显示
   # flutter_echarts: ^2.3.0
   fluent_ui: ^3.12.0
   macos_ui: ^1.4.1
@@ -156,6 +157,8 @@ dependencies:
   #基本开发工具
   xml: ^6.0.1
   mime: ^1.0.2
+  flutter_keyboard_visibility: ^5.4.0
+  keyboard_actions: ^4.1.0
   synchronized: ^3.0.0+2
   flutter_smart_dialog: any
   pdfx: ^2.3.0
@@ -166,6 +169,7 @@ dependencies:
   provider: ^6.0.1 #状态管理
   flutter_local_notifications: ^9.5.3+1
   share_plus: ^4.0.4
+  receive_sharing_intent: ^1.4.5
   date_format: ^2.0.6
   classic_logger: any
   logger: ^1.1.0
@@ -186,6 +190,8 @@ dependencies:
   #有特殊安装要求，否则编译出错
   #webview_windows: ^0.2.2
   flutter_inappwebview: ^6.0.0-beta.2
+  flutter_webview_pro: ^3.0.1+4
+  webview_flutter: ^3.0.4 #web显示
 
   # 多媒体
   #flutter_audio_waveforms: any
