@@ -15,13 +15,13 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
-///p2p网络节点搜索增加
-class P2pLinkmanAddWidget extends StatefulWidget with TileDataMixin {
+///附近的人加联系人
+class NearbyLinkmanAddWidget extends StatefulWidget with TileDataMixin {
   final DataListController<TileData> controller =
       DataListController<TileData>();
   late final DataListView dataListView;
 
-  P2pLinkmanAddWidget({Key? key}) : super(key: key) {
+  NearbyLinkmanAddWidget({Key? key}) : super(key: key) {
     dataListView = DataListView(
       controller: controller,
     );
@@ -31,19 +31,19 @@ class P2pLinkmanAddWidget extends StatefulWidget with TileDataMixin {
   Icon get icon => const Icon(Icons.person_add);
 
   @override
-  String get routeName => 'p2p_linkman_add';
+  String get routeName => 'nearby_linkman_add';
 
   @override
-  String get title => 'P2pLinmkmanAdd';
+  String get title => 'NearbyLinkmanAdd';
 
   @override
   bool get withLeading => true;
 
   @override
-  State<StatefulWidget> createState() => _P2pLinkmanAddWidgetState();
+  State<StatefulWidget> createState() => _NearbyLinkmanAddWidgetState();
 }
 
-class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
+class _NearbyLinkmanAddWidgetState extends State<NearbyLinkmanAddWidget> {
   var controller = TextEditingController();
 
   @override
@@ -71,9 +71,7 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
           ),
         ));
 
-    return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0),
-        child: searchTextField);
+    return searchTextField;
   }
 
   Future<void> _responsePeerClients(ChainMessage chainMessage) async {
@@ -88,8 +86,8 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
       List<TileData> tiles = [];
       if (peerClients.isNotEmpty) {
         for (var peerClient in peerClients) {
-          var title = peerClient.name;
-          var subtitle = peerClient.peerId;
+          var title = peerClient.name ?? '';
+          var subtitle = peerClient.peerId ?? '';
           TileData tile = TileData(
               title: title,
               subtitle: subtitle,

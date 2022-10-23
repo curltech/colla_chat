@@ -1,4 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/linkman/group/face_group_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/group/linkman_group_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/group/nearby_group_add_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -12,15 +13,18 @@ import 'package:flutter/material.dart';
 class GroupAddWidget extends StatelessWidget with TileDataMixin {
   final LinkmanGroupAddWidget linkmanGroupAddWidget = LinkmanGroupAddWidget();
   final NearbyGroupAddWidget nearbyGroupAddWidget = NearbyGroupAddWidget();
+  final FaceGroupAddWidget faceGroupAddWidget = FaceGroupAddWidget();
 
   late final Widget child;
 
   GroupAddWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(linkmanGroupAddWidget);
     indexWidgetProvider.define(nearbyGroupAddWidget);
+    indexWidgetProvider.define(faceGroupAddWidget);
     List<TileDataMixin> mixins = [
       linkmanGroupAddWidget,
       nearbyGroupAddWidget,
+      faceGroupAddWidget,
     ];
     final List<TileData> linkmanAddTileData = TileData.from(mixins);
     child = Expanded(child: DataListView(tileData: linkmanAddTileData));

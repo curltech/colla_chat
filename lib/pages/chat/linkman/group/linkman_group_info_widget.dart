@@ -1,20 +1,20 @@
 import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/entity/chat/contact.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/linkman/group/linkman_group_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/image_widget.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../../widgets/common/app_bar_view.dart';
-import '../../../../../widgets/common/widget_mixin.dart';
-import '../../../../entity/chat/contact.dart';
-import '../../../../l10n/localization.dart';
-import 'group_edit_widget.dart';
 
 final List<String> groupFields = [
   'name',
@@ -30,19 +30,19 @@ final List<String> groupFields = [
 ];
 
 //群信息页面
-class GroupInfoWidget extends StatefulWidget with TileDataMixin {
-  late final GroupEditWidget groupEditWidget;
+class LinkmanGroupInfoWidget extends StatefulWidget with TileDataMixin {
+  late final LinkmanGroupEditWidget linkmanGroupEditWidget;
 
-  GroupInfoWidget({Key? key}) : super(key: key) {
-    groupEditWidget = GroupEditWidget();
-    indexWidgetProvider.define(groupEditWidget);
+  LinkmanGroupInfoWidget({Key? key}) : super(key: key) {
+    linkmanGroupEditWidget = LinkmanGroupEditWidget();
+    indexWidgetProvider.define(linkmanGroupEditWidget);
   }
 
   @override
-  State<StatefulWidget> createState() => _GroupInfoWidgetState();
+  State<StatefulWidget> createState() => _LinkmanGroupInfoWidgetState();
 
   @override
-  String get routeName => 'group_info';
+  String get routeName => 'linkman_group_info';
 
   @override
   bool get withLeading => true;
@@ -51,10 +51,10 @@ class GroupInfoWidget extends StatefulWidget with TileDataMixin {
   Icon get icon => const Icon(Icons.group);
 
   @override
-  String get title => 'Group Info';
+  String get title => 'LinkmanGroupInfo';
 }
 
-class _GroupInfoWidgetState extends State<GroupInfoWidget> {
+class _LinkmanGroupInfoWidgetState extends State<LinkmanGroupInfoWidget> {
   Group? group;
 
   @override

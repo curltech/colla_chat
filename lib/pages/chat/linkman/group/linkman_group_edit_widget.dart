@@ -30,29 +30,29 @@ final List<ColumnFieldDef> groupColumnFieldDefs = [
 ];
 
 ///群的编辑界面，改变群拥有者，增减群成员，改变群的名称
-class GroupEditWidget extends StatefulWidget with TileDataMixin {
+class LinkmanGroupEditWidget extends StatefulWidget with TileDataMixin {
   final DataListController<Linkman> linkmenController =
       DataListController<Linkman>();
 
-  GroupEditWidget({Key? key}) : super(key: key);
+  LinkmanGroupEditWidget({Key? key}) : super(key: key);
 
   @override
-  Icon get icon => const Icon(Icons.group_add);
+  Icon get icon => const Icon(Icons.groups_sharp);
 
   @override
-  String get routeName => 'group_edit';
+  String get routeName => 'linkman_group_edit';
 
   @override
-  String get title => 'Group Edit';
+  String get title => 'LinkmanGroupEdit';
 
   @override
   bool get withLeading => true;
 
   @override
-  State<StatefulWidget> createState() => _GroupEditWidgetState();
+  State<StatefulWidget> createState() => _LinkmanGroupEditWidgetState();
 }
 
-class _GroupEditWidgetState extends State<GroupEditWidget> {
+class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
   List<String> groupMembers = [];
   List<S2Choice<String>> groupOwnerChoices = [];
   Group? group;
