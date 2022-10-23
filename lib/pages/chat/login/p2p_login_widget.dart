@@ -2,8 +2,8 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/widgets/common/image_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import '../../../routers/routes.dart';
 import '../../../widgets/data_bind/column_field_widget.dart';
@@ -64,14 +64,26 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Provider.of<AppDataProvider>(context);
-    return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0),
-        child: FormInputWidget(
-          mainAxisAlignment: MainAxisAlignment.center,
-          onOk: _login,
-          columnFieldDefs: p2pLoginInputFieldDef,
-        ));
+    return Column(children: [
+      const SizedBox(
+        height: 50,
+      ),
+      const ImageWidget(
+        image: 'assets/images/colla.png',
+        height: 128,
+        width: 128,
+      ),
+      const SizedBox(
+        height: 50,
+      ),
+      Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+          child: FormInputWidget(
+            mainAxisAlignment: MainAxisAlignment.center,
+            onOk: _login,
+            columnFieldDefs: p2pLoginInputFieldDef,
+          ))
+    ]);
   }
 
   _login(Map<String, dynamic> values) {
