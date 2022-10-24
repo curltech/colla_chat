@@ -166,8 +166,10 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
 
   //修改提交
   _onOk(Map<String, dynamic> values) async {
-    Group currentGroup = Group.fromJson(values);
-    if (group != null) {
+    var peerId = values['peerId'];
+    var name = values['name'];
+    if (peerId != null) {
+      Group currentGroup = Group.fromJson(values);
       group!.alias = currentGroup.alias;
       group!.mobile = currentGroup.mobile;
       group!.email = currentGroup.email;
@@ -177,7 +179,7 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
       await groupService.modifyGroup(group!);
     } else {
       // 加群
-      group = await groupService.createGroup(currentGroup);
+      group = await groupService.createGroup(name);
       await groupService.addGroup(group!);
     }
     await groupService.store(group!);

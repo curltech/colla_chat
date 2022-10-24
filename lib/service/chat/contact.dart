@@ -245,20 +245,23 @@ class GroupService extends PeerPartyService<Group> {
     return group;
   }
 
-  Future<Group> createGroup(Group group) async {
-    var old = await findOneByName(group.name);
+  Future<Group> createGroup(String name) async {
+    var old = await findOneByName(name);
     if (old != null) {
       return old;
     }
-    group.status = EntityStatus.effective.name;
 
     ///group peerId对应的密钥对
     SimpleKeyPair peerPrivateKey = await cryptoGraphy.generateKeyPair();
     SimplePublicKey peerPublicKey = await peerPrivateKey.extractPublicKey();
+    var peerId = await cryptoGraphy.exportPublicKey(peerPrivateKey);
+    var group = Group(peerId, name);
     group.peerPrivateKey =
         await cryptoGraphy.export(peerPrivateKey, myself.password!.codeUnits);
-    group.peerPublicKey = await cryptoGraphy.exportPublicKey(peerPrivateKey);
-    group.peerId = group.peerPublicKey!;
+    group.peerPublicKey = peerId;
+    group.peerId = peerId;
+
+    group.status = EntityStatus.effective.name;
 
     ///加密对应的密钥对x25519
     SimpleKeyPair keyPair =
