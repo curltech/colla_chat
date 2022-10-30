@@ -57,9 +57,9 @@ class _InAppWebviewState extends State<InAppWebview> {
                 controller: urlController,
                 keyboardType: TextInputType.url,
                 onSubmitted: (value) {
-                  var url = Uri.parse(value);
+                  var url = WebUri(value);
                   if (url.scheme.isEmpty) {
-                    url = Uri.parse("https://www.google.com/search?q=" + value);
+                    url = WebUri("https://www.google.com/search?q=$value");
                   }
                   webViewController?.loadUrl(urlRequest: URLRequest(url: url));
                 },
@@ -71,7 +71,7 @@ class _InAppWebviewState extends State<InAppWebview> {
                     InAppWebView(
                       key: webViewKey,
                       initialUrlRequest:
-                      URLRequest(url: Uri.parse("https://inappwebview.dev/")),
+                      URLRequest(url: WebUri("https://inappwebview.dev/")),
                       initialSettings: settings,
                       pullToRefreshController: pullToRefreshController,
                       onWebViewCreated: (controller) {
