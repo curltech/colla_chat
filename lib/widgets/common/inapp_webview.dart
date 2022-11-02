@@ -22,6 +22,18 @@ class _InAppWebviewState extends State<InAppWebview> {
       iframeAllowFullscreen: true
   );
 
+  // InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
+  //     crossPlatform: InAppWebViewOptions(
+  //       useShouldOverrideUrlLoading: true,
+  //       mediaPlaybackRequiresUserGesture: false,
+  //     ),
+  //     android: AndroidInAppWebViewOptions(
+  //       useHybridComposition: true,
+  //     ),
+  //     ios: IOSInAppWebViewOptions(
+  //       allowsInlineMediaPlayback: true,
+  //     ));
+
   PullToRefreshController? pullToRefreshController;
   String url = "";
   double progress = 0;
@@ -44,6 +56,20 @@ class _InAppWebviewState extends State<InAppWebview> {
         }
       },
     );
+
+    // pullToRefreshController = PullToRefreshController(
+    //   options: PullToRefreshOptions(
+    //     color: Colors.blue,
+    //   ),
+    //   onRefresh: () async {
+    //     if (defaultTargetPlatform == TargetPlatform.android) {
+    //       webViewController?.reload();
+    //     } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+    //       webViewController?.loadUrl(
+    //           urlRequest: URLRequest(url: await webViewController?.getUrl()));
+    //     }
+    //   },
+    // );
   }
 
   @override
@@ -73,6 +99,7 @@ class _InAppWebviewState extends State<InAppWebview> {
                       initialUrlRequest:
                       URLRequest(url: WebUri("https://inappwebview.dev/")),
                       initialSettings: settings,
+                      // initialOptions: options,
                       pullToRefreshController: pullToRefreshController,
                       onWebViewCreated: (controller) {
                         webViewController = controller;
@@ -88,6 +115,11 @@ class _InAppWebviewState extends State<InAppWebview> {
                             resources: request.resources,
                             action: PermissionResponseAction.GRANT);
                       },
+                      // androidOnPermissionRequest: (controller, origin, resources) async {
+                      //   return PermissionRequestResponse(
+                      //       resources: resources,
+                      //       action: PermissionRequestResponseAction.GRANT);
+                      // },
                       shouldOverrideUrlLoading:
                           (controller, navigationAction) async {
                         var uri = navigationAction.request.url!;
@@ -120,7 +152,10 @@ class _InAppWebviewState extends State<InAppWebview> {
                           urlController.text = this.url;
                         });
                       },
-                      onReceivedError: (controller, request, error) {
+                      // onReceivedError: (controller, request, error) {
+                  //   pullToRefreshController?.endRefreshing();
+                  // },
+                  onLoadError: (controller, url, code, message) {
                         pullToRefreshController?.endRefreshing();
                       },
                       onProgressChanged: (controller, progress) {

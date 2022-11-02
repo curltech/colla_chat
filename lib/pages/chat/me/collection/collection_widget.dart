@@ -11,6 +11,7 @@ import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:tuple/tuple.dart';
+import 'package:visual_editor/toolbar/models/media-picker.type.dart';
 
 import '../../../../l10n/localization.dart';
 import '../../../../widgets/common/app_bar_view.dart';
@@ -140,15 +141,16 @@ class CollectionWidgetState extends State<CollectionWidget>
                 null),
             sizeSmall: const TextStyle(fontSize: 9),
           ),
-          embedBuilder: defaultEmbedBuilderWeb);
+          //embedBuilder: defaultEmbedBuilderWeb
+      );
     }
     var toolbar = QuillToolbar.basic(
       controller: _controller!,
       // provide a callback to enable picking images from device.
       // if omit, "image" button only allows adding images from url.
       // same goes for videos.
-      onImagePickCallback: _onImagePickCallback,
-      onVideoPickCallback: _onVideoPickCallback,
+      // onImagePickCallback: _onImagePickCallback,
+      // onVideoPickCallback: _onVideoPickCallback,
       // uncomment to provide a custom "pick from" dialog.
       // mediaPickSettingSelector: _selectMediaPickSetting,
       showAlignmentButtons: true,
@@ -156,16 +158,16 @@ class CollectionWidgetState extends State<CollectionWidget>
     if (kIsWeb) {
       toolbar = QuillToolbar.basic(
         controller: _controller!,
-        onImagePickCallback: _onImagePickCallback,
-        webImagePickImpl: _webImagePickImpl,
+        // onImagePickCallback: _onImagePickCallback,
+        // webImagePickImpl: _webImagePickImpl,
         showAlignmentButtons: true,
       );
     }
     if (_isDesktop()) {
       toolbar = QuillToolbar.basic(
         controller: _controller!,
-        onImagePickCallback: _onImagePickCallback,
-        filePickImpl: openFileSystemPickerForDesktop,
+        // onImagePickCallback: _onImagePickCallback,
+        // filePickImpl: openFileSystemPickerForDesktop,
         showAlignmentButtons: true,
       );
     }
@@ -245,28 +247,28 @@ class CollectionWidgetState extends State<CollectionWidget>
   }
 
   // ignore: unused_element
-  Future<MediaPickSetting?> _selectMediaPickSetting(BuildContext context) =>
-      showDialog<MediaPickSetting>(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          contentPadding: EdgeInsets.zero,
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextButton.icon(
-                icon: const Icon(Icons.collections),
-                label: const Text('Gallery'),
-                onPressed: () => Navigator.pop(ctx, MediaPickSetting.Gallery),
-              ),
-              TextButton.icon(
-                icon: const Icon(Icons.link),
-                label: const Text('Link'),
-                onPressed: () => Navigator.pop(ctx, MediaPickSetting.Link),
-              )
-            ],
-          ),
-        ),
-      );
+  // Future<MediaPickSetting?> _selectMediaPickSetting(BuildContext context) =>
+  //     showDialog<MediaPickSetting>(
+  //       context: context,
+  //       builder: (ctx) => AlertDialog(
+  //         contentPadding: EdgeInsets.zero,
+  //         content: Column(
+  //           mainAxisSize: MainAxisSize.min,
+  //           children: [
+  //             TextButton.icon(
+  //               icon: const Icon(Icons.collections),
+  //               label: const Text('Gallery'),
+  //               onPressed: () => Navigator.pop(ctx, MediaPickSetting.Gallery),
+  //             ),
+  //             TextButton.icon(
+  //               icon: const Icon(Icons.link),
+  //               label: const Text('Link'),
+  //               onPressed: () => Navigator.pop(ctx, MediaPickSetting.Link),
+  //             )
+  //           ],
+  //         ),
+  //       ),
+  //     );
 
   @override
   bool get wantKeepAlive => true;

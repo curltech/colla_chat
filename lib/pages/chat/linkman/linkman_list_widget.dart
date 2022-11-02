@@ -129,7 +129,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
             prefix: group.avatar,
             title: title,
             subtitle: subtitle,
-            routeName: 'group_info');
+            routeName: 'linkman_group_edit');
         tiles.add(tile);
       }
     }

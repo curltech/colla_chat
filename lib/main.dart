@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:colla_chat/pages/chat/login/p2p_login.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/routers/routes.dart';
@@ -59,9 +60,13 @@ void main(List<String> args) async {
   //         Provider(create: (context) => AppProfile()),
   //       ],
   WidgetsFlutterBinding.ensureInitialized();
-  await windowManager.ensureInitialized();
+  if (platformParams.windows || platformParams.macos || platformParams.linux) {
+    await windowManager.ensureInitialized();
+  }
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
     await inapp.InAppWebViewController.setWebContentsDebuggingEnabled(true);
+    // await inapp.AndroidInAppWebViewController.setWebContentsDebuggingEnabled(
+    //     true);
   }
   ServiceLocator.init().then((value) {
     HttpOverrides.global = PlatformHttpOverrides();
