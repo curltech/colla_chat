@@ -1,42 +1,42 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/routers/routes.dart';
+import 'package:colla_chat/service/dht/myselfpeer.dart';
+import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
-
-import '../../../l10n/localization.dart';
-import '../../../routers/routes.dart';
-import '../../../service/dht/myselfpeer.dart';
-import '../../../widgets/data_bind/column_field_widget.dart';
+import 'package:intl_phone_field/phone_number.dart';
 
 final List<ColumnFieldDef> p2pRegisterInputFieldDef = [
   ColumnFieldDef(
       name: 'name',
-      label: 'name',
+      label: 'Name',
       prefixIcon: const Icon(Icons.person),
       initValue: '胡劲松'),
   ColumnFieldDef(
       name: 'loginName',
-      label: 'loginName',
+      label: 'LoginName',
       prefixIcon: const Icon(Icons.mobile_friendly),
       initValue: '13609619603'),
   ColumnFieldDef(
       name: 'email',
-      label: 'email',
+      label: 'Email',
       prefixIcon: const Icon(Icons.email),
       initValue: 'hujs@colla.cc',
       textInputType: TextInputType.emailAddress),
   ColumnFieldDef(
       name: 'plainPassword',
-      label: 'plainPassword',
+      label: 'PlainPassword',
       inputType: InputType.password,
       initValue: '123456',
-      prefixIcon: const Icon(Icons.lock)),
+      prefixIcon: const Icon(Icons.password)),
   ColumnFieldDef(
       name: 'confirmPassword',
-      label: 'confirmPassword',
+      label: 'ConfirmPassword',
       inputType: InputType.password,
       initValue: '123456',
-      prefixIcon: const Icon(Icons.lock))
+      prefixIcon: const Icon(Icons.confirmation_num))
 ];
 
 /// 用户注册组件，一个card下的录入框和按钮组合
@@ -64,9 +64,9 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
             decoration: InputDecoration(
               labelText: AppLocalizations.t('Mobile'),
             ),
-            onChanged: (phone) {
+            onChanged: (PhoneNumber phoneNumber) {
               setState(() {
-                _mobile = phone.completeNumber;
+                _mobile = phoneNumber.completeNumber;
               });
             },
             onCountryChanged: (country) {
@@ -74,12 +74,14 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
                 _countryCode = country.name;
               });
             },
+            disableLengthCheck: true,
           ),
         ),
         Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
             child: FormInputWidget(
               onOk: _onOk,
+              okLabel: 'Register',
               columnFieldDefs: p2pRegisterInputFieldDef,
             )),
       ],

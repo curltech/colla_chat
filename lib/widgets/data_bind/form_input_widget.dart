@@ -119,6 +119,8 @@ class FormInputWidget extends StatelessWidget {
   late final FormInputController controller;
 
   final Function(Map<String, dynamic>) onOk;
+  String okLabel;
+  String resetLabel;
   final MainAxisAlignment mainAxisAlignment;
   final double spacing;
 
@@ -127,6 +129,8 @@ class FormInputWidget extends StatelessWidget {
       required List<ColumnFieldDef> columnFieldDefs,
       this.initValues,
       required this.onOk,
+      this.okLabel = 'Ok',
+      this.resetLabel = 'Reset',
       this.mainAxisAlignment = MainAxisAlignment.start,
       this.spacing = 0.0})
       : super(key: key) {
@@ -168,7 +172,7 @@ class FormInputWidget extends StatelessWidget {
         TextButton(
           style: style,
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text(AppLocalizations.t('OK')),
+            Text(AppLocalizations.t(okLabel)),
             const SizedBox(
               width: 5,
             ),
@@ -186,7 +190,7 @@ class FormInputWidget extends StatelessWidget {
         TextButton(
           style: style,
           child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text(AppLocalizations.t('Reset')),
+            Text(AppLocalizations.t(resetLabel)),
             const SizedBox(
               width: 5,
             ),

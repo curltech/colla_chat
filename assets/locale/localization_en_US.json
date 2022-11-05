@@ -23,7 +23,7 @@
     "Password": "Password",
     "Mobile": "Mobile",
     "Email": "Email",
-    "Credentia(Mobile/Email/LoginName)": "Credentia(Mobile/Email/LoginName)",
+    "Credential(Mobile/Email/LoginName)": "Credentia(Mobile/Email/LoginName)",
     "LoginName": "LoginName",
     "Confirm Password": "Confirm Password",
     "localhost": "localhost"

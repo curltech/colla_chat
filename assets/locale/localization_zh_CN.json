@@ -17,14 +17,18 @@
     "Dark": "暗",
     "Login": "登录",
     "Register": "注册",
-    "Reset": "重置",
+    "Ok": "确认",
+    "Reset": "清空",
     "Setting": "设置",
+    "Name": "名称",
     "Username": "用户",
     "Password": "密码",
     "Mobile": "手机",
     "Email": "邮件",
-    "Credentia(Mobile/Email/LoginName)": "凭证(手机/邮件/登录名)",
+    "Credential(Mobile/Email/LoginName)": "凭证(手机/邮件/登录名)",
     "LoginName": "登录名",
     "Confirm Password": "验证密码",
-    "localhost": "localhost"
+    "localhost": "本机",
+    "PlainPassword": "密码",
+    "ConfirmPassword": "验证密码"
 }

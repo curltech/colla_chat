@@ -205,10 +205,13 @@ class ColumnFieldWidget extends StatefulWidget {
 }
 
 class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
+  dynamic initValue;
+
   @override
   initState() {
     super.initState();
     widget.controller.addListener(_update);
+    initValue = _getInitValue(context);
   }
 
   _update() {
@@ -264,7 +267,6 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     formInputController.setController(
         widget.columnFieldDef.name, widget.controller);
     final label = widget.columnFieldDef.label;
-    dynamic value = _getInitValue(context);
 
     return Row(children: [
       _buildIcon()!,
@@ -275,7 +277,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
       const SizedBox(
         width: 15.0,
       ),
-      Expanded(child: Text(value, textAlign: TextAlign.start))
+      Expanded(child: Text(initValue, textAlign: TextAlign.start))
     ]);
   }
 
@@ -283,11 +285,10 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     FormInputController formInputController =
         Provider.of<FormInputController>(context);
     var controller = TextEditingController();
-    var value = _getInitValue(context);
     controller.value = TextEditingValue(
-        text: value,
+        text: initValue,
         selection: TextSelection.fromPosition(TextPosition(
-            offset: value.length, affinity: TextAffinity.downstream)));
+            offset: initValue.length, affinity: TextAffinity.downstream)));
     widget.controller.controller = controller;
     var columnFieldDef = widget.columnFieldDef;
     formInputController.setController(columnFieldDef.name, widget.controller);
@@ -331,11 +332,10 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     bool? pwdShow = widget.controller.flag;
     pwdShow ??= false;
     var controller = TextEditingController();
-    var value = _getInitValue(context);
     controller.value = TextEditingValue(
-        text: value,
+        text: initValue,
         selection: TextSelection.fromPosition(TextPosition(
-            offset: value.length, affinity: TextAffinity.downstream)));
+            offset: initValue.length, affinity: TextAffinity.downstream)));
     widget.controller.controller = controller;
     var columnFieldDef = widget.columnFieldDef;
     formInputController.setController(columnFieldDef.name, widget.controller);
@@ -358,8 +358,9 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
           labelText: AppLocalizations.t(columnFieldDef.label),
           prefixIcon: _buildIcon(),
           suffixIcon: IconButton(
-            icon: Icon(pwdShow ? Icons.visibility : Icons.visibility_off),
+            icon: Icon(pwdShow ? Icons.visibility_off : Icons.visibility),
             onPressed: () {
+              initValue = controller.value.text;
               widget.controller.flag = !pwdShow!;
             },
           ),

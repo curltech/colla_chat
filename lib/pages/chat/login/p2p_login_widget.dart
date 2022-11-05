@@ -1,13 +1,13 @@
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/image_widget.dart';
+import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-import '../../../routers/routes.dart';
-import '../../../widgets/data_bind/column_field_widget.dart';
-import '../../../widgets/data_bind/form_input_widget.dart';
 
 /// 远程登录组件，一个card下的录入框和按钮组合
 class P2pLoginWidget extends StatefulWidget {
@@ -21,15 +21,15 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
   final List<ColumnFieldDef> p2pLoginInputFieldDef = [
     ColumnFieldDef(
       name: 'credential',
-      label: 'Credentia(Mobile/Email/LoginName)',
+      label: 'Credential(Mobile/Email/LoginName)',
       prefixIcon: const Icon(Icons.person),
       cancel: true,
     ),
     ColumnFieldDef(
       name: 'password',
-      label: 'password',
+      label: 'Password',
       inputType: InputType.password,
-      prefixIcon: const Icon(Icons.lock),
+      prefixIcon: const Icon(Icons.password),
     ),
   ];
 
@@ -81,6 +81,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
           child: FormInputWidget(
             mainAxisAlignment: MainAxisAlignment.center,
             onOk: _login,
+            okLabel: 'Login',
             columnFieldDefs: p2pLoginInputFieldDef,
           ))
     ]);
