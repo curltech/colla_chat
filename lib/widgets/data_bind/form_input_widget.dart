@@ -1,12 +1,12 @@
+import 'package:colla_chat/entity/base.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
+import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../entity/base.dart';
-import '../../l10n/localization.dart';
-import 'column_field_widget.dart';
 
 class FormInputController with ChangeNotifier {
   final List<ColumnFieldDef> columnFieldDefs;

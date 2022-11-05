@@ -109,7 +109,7 @@ class WidgetUtil {
       EdgeInsets padding =
           const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
       Size minimumSize = const Size(50, 46.0),
-      Size maximumSize = const Size(90.0, 56.0)}) {
+      Size maximumSize = const Size(120.0, 56.0)}) {
     ButtonStyle style = ButtonStyle(
       backgroundColor: MaterialStateProperty.all(backgroundColor),
       shape: MaterialStateProperty.all(

@@ -1,9 +1,9 @@
-import 'package:colla_chat/constant/brightness.dart';
+import 'package:colla_chat/pages/chat/login/brightness_picker.dart';
+import 'package:colla_chat/pages/chat/login/locale_picker.dart';
+import 'package:colla_chat/pages/chat/login/ws_address_picker.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
 
-import '../../../widgets/data_bind/data_select.dart';
-import 'ws_address_picker.dart';
 
 /// 地址语言选择设置组件，一个card下的录入框和按钮组合
 class P2pSettingWidget extends StatefulWidget {
@@ -34,15 +34,7 @@ class _P2pSettingWidgetState extends State<P2pSettingWidget> {
         const SizedBox(height: 30.0),
         Padding(
           padding: padding,
-          child: DataSelect(
-              label: 'Locale',
-              hint: 'Please select locale',
-              items: localeOptions,
-              onChanged: (String? value) {
-                if (value != null) {
-                  appDataProvider.locale = value;
-                }
-              }),
+          child: const LocalePicker(),
         ),
         const SizedBox(height: 10.0),
         Padding(
@@ -52,15 +44,7 @@ class _P2pSettingWidgetState extends State<P2pSettingWidget> {
         const SizedBox(height: 10.0),
         Padding(
           padding: padding,
-          child: DataSelect(
-              label: 'Brightness',
-              hint: 'Please select brightness',
-              items: brightnessOptions,
-              onChanged: (String? value) {
-                if (value != null) {
-                  appDataProvider.brightness = value;
-                }
-              }),
+          child: const BrightnessPicker(),
         ),
       ],
     );

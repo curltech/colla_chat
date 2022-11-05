@@ -1,12 +1,12 @@
 import 'dart:convert';
 
+import 'package:colla_chat/constant/address.dart';
+import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../constant/address.dart';
-import '../constant/base.dart';
-import '../plugin/security_storage.dart';
 
 /// 不同语言版本的下拉选择框的选项
 final localeOptions = [

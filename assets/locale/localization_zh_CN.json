@@ -1,8 +1,8 @@
 {
     "Welcome to CollaChat": "欢迎使用CollaChat",
-    "Please select brightness": "请选择亮度",
-    "Please select address": "请选择地址",
-    "Please select language": "请选择语言",
+    "Select one brightness": "选择亮度",
+    "Select one address": "选择地址",
+    "Select one language": "选择语言",
     "Brightness": "亮度",
     "Address": "地址",
     "Language": "语言",
@@ -27,8 +27,11 @@
     "Email": "邮件",
     "Credential(Mobile/Email/LoginName)": "凭证(手机/邮件/登录名)",
     "LoginName": "登录名",
-    "Confirm Password": "验证密码",
+    "ConfirmPassword": "验证密码",
     "localhost": "本机",
     "PlainPassword": "密码",
-    "ConfirmPassword": "验证密码"
+    "Locale": "语言",
+    "Select one locale": "选择国别",
+    "default": "缺省",
+    "Select one address": "选择地址"
 }
