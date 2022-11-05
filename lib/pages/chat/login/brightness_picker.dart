@@ -29,13 +29,14 @@ class _BrightnessPickerState extends State<BrightnessPicker> {
     List<S2Choice<String>>? brightnessChoices = [];
     for (var brightnessOption in brightnessOptions) {
       S2Choice<String> item = S2Choice<String>(
-          value: brightnessOption.value, title: brightnessOption.label);
+          value: brightnessOption.value,
+          title: AppLocalizations.t(brightnessOption.label));
       brightnessChoices.add(item);
     }
     return SmartSelect<String>.single(
       title: AppLocalizations.t('Brightness'),
       placeholder: AppLocalizations.t('Select one brightness'),
-      selectedValue: appDataProvider.locale,
+      selectedValue: appDataProvider.brightness,
       onChange: (selected) {
         String value = selected.value;
         appDataProvider.brightness = value;
