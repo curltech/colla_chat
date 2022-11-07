@@ -28,13 +28,13 @@ class ContactLinkmanAddWidget extends StatefulWidget with TileDataMixin {
   }
 
   @override
-  Icon get icon => const Icon(Icons.person_add);
+  Icon get icon => const Icon(Icons.contact_phone);
 
   @override
   String get routeName => 'contact_linkman_add';
 
   @override
-  String get title => 'ContactLinmkmanAdd';
+  String get title => 'Contact add linkman';
 
   @override
   bool get withLeading => true;

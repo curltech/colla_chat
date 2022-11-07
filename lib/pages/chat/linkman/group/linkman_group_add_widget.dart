@@ -27,7 +27,7 @@ class LinkmanGroupAddWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'linkman_group_add';
 
   @override
-  String get title => 'LinkmanGroupAdd';
+  String get title => 'Linkman add group';
 
   @override
   bool get withLeading => true;

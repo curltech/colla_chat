@@ -60,9 +60,9 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(audioRecorderWidget);
     List<TileDataMixin> mixins = [
       collectionWidget,
+      settingWidget,
       addressAddWidget,
       mailAddressWidget,
-      settingWidget,
       peerEndpointListWidget,
       peerClientListWidget,
       webrtcWidget,

@@ -1,8 +1,9 @@
+import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/login/loading.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flutter/material.dart';
 
-import '../../login/loading.dart';
 
 ///从assets目录下背景图片选择器
 class BackgroudSelector extends StatelessWidget {
@@ -20,7 +21,7 @@ class BackgroudSelector extends StatelessWidget {
           fit: BoxFit.fill,
         ),
       ),
-      onTap: () => DialogUtil.showToast('敬请期待'),
+      onTap: () => DialogUtil.showToast(AppLocalizations.t('Please waiting')),
     );
   }
 

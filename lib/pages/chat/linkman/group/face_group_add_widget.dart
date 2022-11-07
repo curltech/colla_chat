@@ -34,7 +34,7 @@ class FaceGroupAddWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'face_group_add';
 
   @override
-  String get title => 'FaceGroupAdd';
+  String get title => 'Face add group';
 
   @override
   bool get withLeading => true;

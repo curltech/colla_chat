@@ -154,7 +154,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
           onPressed: () {
             indexWidgetProvider.push('linkman_add');
           },
-          icon: const Icon(Icons.person_add),
+          icon: const Icon(Icons.person_add_alt),
           tooltip: AppLocalizations.t('Add linkman')),
       IconButton(
           onPressed: () {

@@ -11,13 +11,13 @@ class QrcodeLinkmanAddWidget extends StatefulWidget with TileDataMixin {
   QrcodeLinkmanAddWidget({Key? key}) : super(key: key);
 
   @override
-  Icon get icon => const Icon(Icons.person_add);
+  Icon get icon => const Icon(Icons.qr_code);
 
   @override
   String get routeName => 'qrcode_linkman_add';
 
   @override
-  String get title => 'QrcodeLinmkmanAdd';
+  String get title => 'Qrcode add linkman';
 
   @override
   bool get withLeading => true;

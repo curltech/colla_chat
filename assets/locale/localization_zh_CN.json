@@ -67,5 +67,23 @@
     "None login": "未登录",
     "Scan qrcode, add linkman": "扫描二维码，加联系人",
 
-    "Security": "安全"
+    "General": "通用",
+    "Advanced": "高级",
+    "Security": "安全",
+    "Privacy": "私有",
+    "About": "关于",
+
+    "Please waiting": "敬请期待",
+    "Select background image": "选择背景图",
+    "Select from album": "从照片中选择",
+    "Take a photo": "拍照",
+
+    "PeerId/Mobile/Email/Name": "身份码/手机/邮件/名称",
+    "P2p add linkman": "定位器加联系人",
+    "Contact add linkman": "通讯录加联系人",
+    "Qrcode add linkman": "二维码加联系人",
+    "Nearby add linkman": "附近的人加联系人",
+    "Face add group": "面对面建群",
+    "Nearby add group": "附近的人加群",
+    "Linkman add group": "联系人加群"
 }

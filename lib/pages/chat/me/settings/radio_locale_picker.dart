@@ -1,7 +1,7 @@
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../provider/app_data_provider.dart';
 
 class RadioLocalePicker extends StatelessWidget {
   const RadioLocalePicker({Key? key}) : super(key: key);

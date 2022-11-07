@@ -28,13 +28,13 @@ class P2pLinkmanAddWidget extends StatefulWidget with TileDataMixin {
   }
 
   @override
-  Icon get icon => const Icon(Icons.person_add);
+  Icon get icon => const Icon(Icons.add_link);
 
   @override
   String get routeName => 'p2p_linkman_add';
 
   @override
-  String get title => 'P2pLinmkmanAdd';
+  String get title => 'P2p add linkman';
 
   @override
   bool get withLeading => true;

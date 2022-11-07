@@ -28,13 +28,13 @@ class NearbyLinkmanAddWidget extends StatefulWidget with TileDataMixin {
   }
 
   @override
-  Icon get icon => const Icon(Icons.person_add);
+  Icon get icon => const Icon(Icons.location_city);
 
   @override
   String get routeName => 'nearby_linkman_add';
 
   @override
-  String get title => 'NearbyLinkmanAdd';
+  String get title => 'Nearby add linkman';
 
   @override
   bool get withLeading => true;

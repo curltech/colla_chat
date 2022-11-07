@@ -34,7 +34,7 @@ class NearbyGroupAddWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'nearby_group_add';
 
   @override
-  String get title => 'NearbyGroupAdd';
+  String get title => 'Nearby add group';
 
   @override
   bool get withLeading => true;

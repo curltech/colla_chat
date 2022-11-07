@@ -1,3 +1,4 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -13,19 +14,19 @@ class BackgroundPicker extends StatelessWidget {
       body: Column(
         children: <Widget>[
           ListTile(
-            title: Text('选择背景图'),
+            title: Text(AppLocalizations.t('Select backgroud image')),
             onTap: () {
               //routePush(SelectBgPage());
             },
           ),
           ListTile(
-            title: Text('从手机相册选择'),
+            title: Text(AppLocalizations.t('Select from album')),
             onTap: () {
               _openGallery();
             },
           ),
           ListTile(
-              title: Text('拍一张'),
+              title: Text(AppLocalizations.t('Take a photo')),
               onTap: () {
                 _openGallery(source: ImageSource.camera);
               }),

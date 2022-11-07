@@ -40,12 +40,12 @@ class GroupAddWidget extends StatelessWidget with TileDataMixin {
   Icon get icon => const Icon(Icons.person);
 
   @override
-  String get title => 'Group Add';
+  String get title => 'Add group';
 
   @override
   Widget build(BuildContext context) {
     var me = AppBarView(
-        title: Text(AppLocalizations.t('Group Add')),
+        title: Text(AppLocalizations.t(title)),
         withLeading: true,
         child: Column(children: [child]));
     return me;
