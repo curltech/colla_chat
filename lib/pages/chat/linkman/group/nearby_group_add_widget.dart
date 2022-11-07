@@ -28,7 +28,7 @@ class NearbyGroupAddWidget extends StatefulWidget with TileDataMixin {
   }
 
   @override
-  Icon get icon => const Icon(Icons.person_add);
+  Icon get icon => const Icon(Icons.near_me);
 
   @override
   String get routeName => 'nearby_group_add';

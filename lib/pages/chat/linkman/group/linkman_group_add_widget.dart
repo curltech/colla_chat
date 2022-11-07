@@ -21,7 +21,7 @@ class LinkmanGroupAddWidget extends StatefulWidget with TileDataMixin {
   LinkmanGroupAddWidget({Key? key}) : super(key: key);
 
   @override
-  Icon get icon => const Icon(Icons.person_add);
+  Icon get icon => const Icon(Icons.person);
 
   @override
   String get routeName => 'linkman_group_add';
