@@ -1,3 +1,4 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/widgets/media/audio/platform_audio_player.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -17,7 +18,7 @@ class PlatformAudioPlayerWidget extends StatefulWidget with TileDataMixin {
   Icon get icon => const Icon(Icons.audiotrack);
 
   @override
-  String get title => 'Audio Player';
+  String get title => 'AudioPlayer';
 
   @override
   bool get withLeading => true;
@@ -37,7 +38,7 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-      title: const Text('Audio Player'),
+      title: Text(AppLocalizations.t('AudioPlayer')),
       withLeading: true,
       child: PlatformAudioPlayer(),
     );

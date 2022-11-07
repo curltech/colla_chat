@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -24,7 +25,7 @@ class TileData {
   final String? routeName;
 
   //是否缩小
-  final bool dense;
+  bool dense;
 
   final bool isThreeLine;
 
@@ -46,7 +47,9 @@ class TileData {
 
   static TileData of(TileDataMixin mixin) {
     return TileData(
-        title: mixin.title, routeName: mixin.routeName, prefix: mixin.icon);
+        title: AppLocalizations.t(mixin.title),
+        routeName: mixin.routeName,
+        prefix: mixin.icon);
   }
 
   static List<TileData> from(List<TileDataMixin> mixins) {

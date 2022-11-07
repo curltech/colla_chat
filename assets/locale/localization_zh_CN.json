@@ -33,5 +33,23 @@
     "Locale": "语言",
     "Select one locale": "选择国别",
     "default": "缺省",
-    "Select one address": "选择地址"
+    "Select one address": "选择地址",
+    "Chat": "聊天",
+    "Linkman": "联系人",
+    "Channel": "频道",
+    "Me": "我",
+    "Group": "群",
+    "Search": "搜索",
+    "Add group": "加群",
+    "Add linkman": "加联系人",
+
+    "Collections": "收藏",
+    "Setting": "设置",
+    "PeerEndpoint": "定位器节点",
+    "PeerClient": "客户节点",
+    "MailAddress": "邮箱地址",
+    "MailAddressAdd": "加邮箱地址",
+    "VideoPlayer": "视频播放器",
+    "AudioPlayer": "音频播放器",
+    "AudioRecorder": "录音器"
 }

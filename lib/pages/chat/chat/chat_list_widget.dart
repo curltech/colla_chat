@@ -1,21 +1,21 @@
 import 'package:badges/badges.dart';
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/chat/chat_message_view.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
+import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/service/chat/chat.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../entity/chat/chat.dart';
-import '../../../l10n/localization.dart';
-import '../../../provider/data_list_controller.dart';
-import '../../../provider/index_widget_provider.dart';
-import '../../../service/chat/chat.dart';
-import '../../../widgets/common/app_bar_view.dart';
-import '../../../widgets/common/keep_alive_wrapper.dart';
-import '../../../widgets/common/widget_mixin.dart';
-import '../../../widgets/data_bind/data_group_listview.dart';
-import '../../../widgets/data_bind/data_listtile.dart';
-import 'chat_message_view.dart';
 
 ///好友的汇总控制器，每当消息汇总表的数据有变化时更新控制器
 final DataListController<ChatSummary> linkmanChatSummaryController =
@@ -104,7 +104,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         tiles.add(tile);
       }
     }
-    tileData[TileData(title: 'Linkman')] = tiles;
+    tileData[TileData(title: AppLocalizations.t('Linkman'))] = tiles;
     widget.groupDataListController.addAll(tileData: tileData);
 
     var groups = groupChatSummaryController.data;
@@ -128,7 +128,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         tiles.add(tile);
       }
     }
-    tileData[TileData(title: 'Group')] = tiles;
+    tileData[TileData(title: AppLocalizations.t('Group'))] = tiles;
     widget.groupDataListController.addAll(tileData: tileData);
   }
 

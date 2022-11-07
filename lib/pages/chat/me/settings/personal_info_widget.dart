@@ -47,7 +47,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
 
   Widget _buildLogout(BuildContext context) {
     ButtonStyle style =
-        WidgetUtil.buildButtonStyle(maximumSize: const Size(375.0, 36.0));
+        WidgetUtil.buildButtonStyle(maximumSize: const Size(375.0, 56.0));
 
     var indexWidgetProvider =
         Provider.of<IndexWidgetProvider>(context, listen: false);

@@ -95,7 +95,7 @@ class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'peer_endpoint';
 
   @override
-  Icon get icon => const Icon(Icons.desktop_windows);
+  Icon get icon => const Icon(Icons.device_hub);
 
   @override
   String get title => 'PeerEndpoint';

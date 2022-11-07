@@ -1,13 +1,13 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/routers/navigator_util.dart';
+import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/widgets/common/blank_widget.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 
-import '../l10n/localization.dart';
-import '../routers/navigator_util.dart';
-import '../routers/routes.dart';
-import '../widgets/common/widget_mixin.dart';
-import 'app_data_provider.dart';
 
 class ViewStack<T> {
   T? _head;
@@ -348,7 +348,7 @@ class IndexWidgetProvider with ChangeNotifier {
 
   Color? getIconColor(int index) {
     if (index == currentMainIndex) {
-      return appDataProvider.themeData?.colorScheme.primary;
+      return appDataProvider.themeData.colorScheme.primary;
     } else {
       return Colors.grey;
     }
@@ -356,10 +356,10 @@ class IndexWidgetProvider with ChangeNotifier {
 
   String getLabel(int index) {
     var widgetLabels = {
-      'chat': AppLocalizations.instance.text('Chat'),
-      'linkman': AppLocalizations.instance.text('Linkman'),
-      'channel': AppLocalizations.instance.text('Channel'),
-      'me': AppLocalizations.instance.text('Me'),
+      'chat': AppLocalizations.t('Chat'),
+      'linkman': AppLocalizations.t('Linkman'),
+      'channel': AppLocalizations.t('Channel'),
+      'me': AppLocalizations.t('Me'),
     };
     String name = mainViews[index];
     String? label = widgetLabels[name];

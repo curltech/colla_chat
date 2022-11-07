@@ -13,7 +13,6 @@ import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 
-
 final DataListController<Linkman> linkmanController =
     DataListController<Linkman>();
 final DataListController<Group> groupController = DataListController<Group>();
@@ -116,7 +115,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
         tiles.add(tile);
       }
     }
-    var keyTile = TileData(title: 'Linkman');
+    var keyTile = TileData(title: AppLocalizations.t('Linkman'));
     widget.groupDataListController.add(keyTile, tiles);
 
     var groups = groupController.data;
@@ -133,16 +132,16 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
         tiles.add(tile);
       }
     }
-    keyTile = TileData(title: 'Group');
+    keyTile = TileData(title: AppLocalizations.t('Group'));
     widget.groupDataListController.add(keyTile, tiles);
   }
 
   _onTap(int index, String title, {TileData? group}) {
     if (group != null) {
-      if (group.title == 'Linkman') {
+      if (group.title == AppLocalizations.t('Linkman')) {
         linkmanController.currentIndex = index;
       }
-      if (group.title == 'Group') {
+      if (group.title == AppLocalizations.t('Group')) {
         groupController.currentIndex = index;
       }
     }

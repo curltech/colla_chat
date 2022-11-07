@@ -1,3 +1,4 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/widgets/media/audio/platform_audio_recorder.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -17,10 +18,10 @@ class PlatformAudioRecorderWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'audio_recorder';
 
   @override
-  Icon get icon => const Icon(Icons.audiotrack);
+  Icon get icon => const Icon(Icons.record_voice_over);
 
   @override
-  String get title => 'Audio Recorder';
+  String get title => 'AudioRecorder';
 
   @override
   bool get withLeading => true;
@@ -41,7 +42,7 @@ class _PlatformAudioRecorderWidgetState
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-      title: const Text('Audio Recorder'),
+      title: Text(AppLocalizations.t('AudioRecorder')),
       withLeading: true,
       child: PlatformAudioRecorder(
         onStop: (String filename) {},

@@ -1,24 +1,23 @@
+import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/me/collection/collection_widget.dart';
+import 'package:colla_chat/pages/chat/me/mail/address/address_add.dart';
+import 'package:colla_chat/pages/chat/me/mail/mail_address_widget.dart';
+import 'package:colla_chat/pages/chat/me/mail/mail_list_widget.dart';
+import 'package:colla_chat/pages/chat/me/me_head_widget.dart';
 import 'package:colla_chat/pages/chat/me/peerclient/peer_client_list_widget.dart';
 import 'package:colla_chat/pages/chat/me/peerendpoint/peer_endpoint_list_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/webrtc_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
+import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/media/audio/platform_audio_player_widget.dart';
 import 'package:colla_chat/widgets/media/audio/platform_audio_recorder_widget.dart';
 import 'package:colla_chat/widgets/media/video/platform_video_player_widget.dart';
 import 'package:flutter/material.dart';
-
-import '../../../l10n/localization.dart';
-import '../../../widgets/common/app_bar_view.dart';
-import '../../../widgets/common/widget_mixin.dart';
-import '../../../widgets/data_bind/data_listtile.dart';
-import '../../../widgets/data_bind/data_listview.dart';
-import 'collection/collection_widget.dart';
-import 'mail/address/address_add.dart';
-import 'mail/mail_address_widget.dart';
-import 'mail/mail_list_widget.dart';
-import 'me_head_widget.dart';
 
 //我的页面，带有路由回调函数
 class MeWidget extends StatelessWidget with TileDataMixin {
@@ -37,7 +36,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   final PlatformVideoPlayerWidget videoPlayerWidget =
       PlatformVideoPlayerWidget();
   final PlatformAudioPlayerWidget audioPlayerWidget =
-      PlatformAudioPlayerWidget();
+      const PlatformAudioPlayerWidget();
   final PlatformAudioRecorderWidget audioRecorderWidget =
       PlatformAudioRecorderWidget();
 
@@ -72,6 +71,9 @@ class MeWidget extends StatelessWidget with TileDataMixin {
       audioRecorderWidget
     ];
     final List<TileData> meTileData = TileData.from(mixins);
+    for (var tile in meTileData) {
+      tile.dense = true;
+    }
     child = Expanded(child: DataListView(tileData: meTileData));
   }
 
