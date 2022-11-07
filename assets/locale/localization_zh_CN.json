@@ -79,11 +79,11 @@
     "Take a photo": "拍照",
 
     "PeerId/Mobile/Email/Name": "身份码/手机/邮件/名称",
-    "P2p add linkman": "定位器加联系人",
-    "Contact add linkman": "通讯录加联系人",
-    "Qrcode add linkman": "二维码加联系人",
-    "Nearby add linkman": "附近的人加联系人",
-    "Face add group": "面对面建群",
-    "Nearby add group": "附近的人加群",
-    "Linkman add group": "联系人加群"
+    "P2p add linkman": "定位器",
+    "Contact add linkman": "通讯录",
+    "Qrcode add linkman": "二维码",
+    "Nearby add linkman": "附近的人",
+    "Face add group": "面对面",
+    "Nearby add group": "附近的人",
+    "Linkman add group": "联系人"
 }
