@@ -1,4 +1,4 @@
-import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -91,12 +91,12 @@ class AppBarWidget {
         PopupMenuItem<int> item;
         Widget? iconWidget = rightAction.icon;
         String text = rightAction.title ?? '';
-        Widget textWidget = Text(text);
+        Widget textWidget = Text(AppLocalizations.t(text));
         List<Widget> rows = [];
         if (iconWidget != null) {
           rows.add(iconWidget);
         }
-        rows.add(SizedBox(width: 25,));
+        rows.add(const SizedBox(width: 25,));
         rows.add(textWidget);
         item = PopupMenuItem<int>(
             value: i,
@@ -110,7 +110,7 @@ class AppBarWidget {
         ++i;
       }
       popMenuButton = PopupMenuButton<int>(
-        color: Colors.grey.withOpacity(0.5),
+        color: Colors.grey.withOpacity(1),
         itemBuilder: (BuildContext context) {
           return items;
         },

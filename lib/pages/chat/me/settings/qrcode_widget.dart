@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/qrcode_util.dart';
@@ -14,10 +15,22 @@ import 'package:flutter/material.dart';
 
 class QrcodeWidget extends StatefulWidget with TileDataMixin {
   final List<AppBarPopupMenu> menus = [
-    AppBarPopupMenu(title: '保存文件'),
-    AppBarPopupMenu(title: '保存图片'),
-    AppBarPopupMenu(title: '分享'),
-    AppBarPopupMenu(title: '重置二维码')
+    AppBarPopupMenu(
+        title: 'Save to file',
+        icon: Icon(Icons.save,
+            color: appDataProvider.themeData.colorScheme.primary)),
+    AppBarPopupMenu(
+        title: 'Save to image',
+        icon: Icon(Icons.image,
+            color: appDataProvider.themeData.colorScheme.primary)),
+    AppBarPopupMenu(
+        title: 'Share',
+        icon: Icon(Icons.share,
+            color: appDataProvider.themeData.colorScheme.primary)),
+    AppBarPopupMenu(
+        title: 'Reset qrcode',
+        icon: Icon(Icons.lock_reset,
+            color: appDataProvider.themeData.colorScheme.primary))
   ];
 
   QrcodeWidget({Key? key}) : super(key: key);
@@ -39,8 +52,8 @@ class QrcodeWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _QrcodeWidgetState extends State<QrcodeWidget> {
-  String peerId = '未登录';
-  String name = '未登录';
+  String peerId = AppLocalizations.t('Unknown');
+  String name = AppLocalizations.t('None login');
   GlobalKey? globalKey;
   Widget? qrImage;
   String? content;
@@ -76,10 +89,10 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
             child: qrImage,
           )),
       const Spacer(),
-      const Text('扫一扫上面的二维码图案，加我为好友'),
+      Text(AppLocalizations.t('Scan qrcode, add linkman')),
     ];
     return AppBarView(
-      title: Text(AppLocalizations.t('二维码')),
+      title: Text(AppLocalizations.t(widget.title)),
       withLeading: widget.withLeading,
       rightPopupMenus: widget.menus,
       child: Column(children: children),
