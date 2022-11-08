@@ -66,7 +66,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
             ),
             onChanged: (PhoneNumber phoneNumber) {
               setState(() {
-                _mobile = phoneNumber.completeNumber;
+                _mobile = phoneNumber.number;
               });
             },
             onCountryChanged: (country) {
