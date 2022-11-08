@@ -64,6 +64,7 @@ class MyselfService {
     }
 
     myself.myselfPeer = myselfPeer;
+    myself.id = myselfPeer.id;
     myself.peerId = myselfPeer.peerId;
     myself.name = myselfPeer.name;
     myself.clientId = myselfPeer.clientId;

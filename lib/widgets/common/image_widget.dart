@@ -28,52 +28,10 @@ class ImageWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget? imageWidget;
     var image = this.image;
-    if (image != null) {
-      if (ImageUtil.isBase64Img(image)) {
-        int pos = image.indexOf(',');
-        Uint8List bytes = CryptoUtil.decodeBase64(image.substring(pos));
-        imageWidget = Image.memory(bytes, fit: BoxFit.contain);
-      } else if (ImageUtil.isAssetsImg(image)) {
-        imageWidget = Image.asset(
-          image,
-          width: width,
-          height: height,
-          fit: width != null && height != null ? BoxFit.fill : fit,
-        );
-      } else if (File(image).existsSync()) {
-        imageWidget = Image.file(
-          File(image),
-          width: width,
-          height: height,
-          fit: fit,
-        );
-      } else if (ImageUtil.isNetWorkImg(image)) {
-        imageWidget = CachedNetworkImage(
-          imageUrl: image,
-          width: width,
-          height: height,
-          fit: fit,
-          cacheManager: defaultCacheManager,
-        );
-      }
-    }
-    imageWidget ??= defaultImage;
-    // Image.asset(
-    //   defaultIcon,
-    //   width: width,
-    //   height: height!,
-    //   fit: fit,
-    // );
-    if (isRadius) {
-      return ClipRRect(
-        borderRadius: const BorderRadius.all(
-          Radius.circular(4.0),
-        ),
-        child: imageWidget,
-      );
-    }
+    Widget imageWidget = ImageUtil.buildImageWidget(image,
+        width: width, height: height, fit: fit, isRadius: isRadius);
+
     return imageWidget;
   }
 }

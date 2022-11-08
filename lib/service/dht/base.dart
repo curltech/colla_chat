@@ -1,5 +1,6 @@
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/service/general_base.dart';
+import 'package:colla_chat/tool/image_util.dart';
 
 import '../../entity/base.dart';
 
@@ -88,9 +89,11 @@ abstract class PeerEntityService<T> extends PeerLocationService<T> {
     return peer;
   }
 
-  updateAvatar(String peerId, List<int> avatar) async {
+  Future<String> updateAvatar(int id, List<int> avatar) async {
     String data = CryptoUtil.encodeBase64(avatar);
+    data = ImageUtil.base64Img(data);
+    await update({'id': id, 'avatar': data});
 
-    await update({'peerId': peerId, 'avatar': data});
+    return data;
   }
 }

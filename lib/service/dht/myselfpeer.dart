@@ -6,11 +6,13 @@ import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/network_connectivity.dart';
 import 'package:colla_chat/tool/phone_number_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
+import 'package:colla_chat/widgets/common/image_widget.dart';
 
 import '../../crypto/signalprotocol.dart';
 import '../../crypto/util.dart';
@@ -266,6 +268,24 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     await removeCredential();
     peerConnectionPool.clear();
     signalSessionPool.clear();
+  }
+
+  @override
+  Future<String> updateAvatar(int id, List<int> avatar) async {
+    String data = await super.updateAvatar(id, avatar);
+    final myselfPeer = myself.myselfPeer;
+    if (myselfPeer != null) {
+      myselfPeer.avatar = data;
+      var avatarImage = ImageUtil.buildImageWidget(
+        data,
+        height: 32,
+        width: 32,
+      );
+      myselfPeer.avatarImage = avatarImage;
+      myself.avatarImage = avatarImage;
+    }
+
+    return data;
   }
 }
 

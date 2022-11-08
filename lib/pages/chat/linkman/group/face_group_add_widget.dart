@@ -28,7 +28,7 @@ class FaceGroupAddWidget extends StatefulWidget with TileDataMixin {
   }
 
   @override
-  Icon get icon => const Icon(Icons.person_add);
+  Icon get icon => const Icon(Icons.face);
 
   @override
   String get routeName => 'face_group_add';

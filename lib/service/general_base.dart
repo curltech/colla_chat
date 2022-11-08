@@ -25,8 +25,8 @@ abstract class GeneralBaseService<T> {
       required this.indexFields,
       this.encryptFields = const []});
 
-  Future<T?> get(int id) {
-    return findOne(where: 'id=?', whereArgs: [id]);
+  Future<T?> get(int id) async {
+    return await findOne(where: 'id=?', whereArgs: [id]);
   }
 
   Future<T?> findOne(
@@ -59,8 +59,8 @@ abstract class GeneralBaseService<T> {
     return null;
   }
 
-  Future<List<T>> findAll() {
-    return find();
+  Future<List<T>> findAll() async {
+    return await find();
   }
 
   /// 原生的查询
@@ -150,7 +150,7 @@ abstract class GeneralBaseService<T> {
     String? orderBy,
     int? limit,
     int? offset,
-  }) {
+  }) async {
     var where = '1=1';
     List<Object> whereArgs = [];
     for (var key in whereBean.keys) {
@@ -158,7 +158,7 @@ abstract class GeneralBaseService<T> {
       where = '$where and $key=?';
       whereArgs.add(value!);
     }
-    return find(
+    return await find(
       where: where,
       distinct: distinct,
       columns: columns,
@@ -259,15 +259,15 @@ abstract class GeneralBaseService<T> {
   }
 
   /// 删除记录。根据entity的id字段作为条件删除，entity可以是Map
-  Future<int> delete(dynamic entity) {
-    return dataStore.delete(tableName, entity: entity);
+  Future<int> delete(dynamic entity) async {
+    return await dataStore.delete(tableName, entity: entity);
   }
 
   /// 更新记录。根据entity的id字段作为条件，其他字段作为更新的值，entity可以是Map
   Future<int> update(dynamic entity, [dynamic? ignore, dynamic? parent]) async {
     EntityUtil.updateTimestamp(entity);
     Map<String, dynamic> json = await encrypt(entity);
-    return dataStore.update(tableName, json);
+    return await dataStore.update(tableName, json);
   }
 
   /// 批量保存，根据脏标志新增，修改或者删除
@@ -277,16 +277,16 @@ abstract class GeneralBaseService<T> {
       Map<String, dynamic> json = await encrypt(entity);
       operators.add({'table': tableName, 'entity': json});
     }
-    return dataStore.transaction(operators);
+    return await dataStore.transaction(operators);
   }
 
   /// 根据_id是否存在逐条增加或者修改
-  Future<int> upsert(dynamic entity, [dynamic? ignore, dynamic? parent]) {
+  Future<int> upsert(dynamic entity, [dynamic? ignore, dynamic? parent]) async {
     var id = EntityUtil.getId(entity);
     if (id != null) {
-      return update(entity, ignore, parent);
+      return await update(entity, ignore, parent);
     } else {
-      return insert(entity, ignore, parent);
+      return await insert(entity, ignore, parent);
     }
   }
 

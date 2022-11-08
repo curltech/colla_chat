@@ -9,6 +9,7 @@ import 'myselfpeer.dart';
 /// 在登录成功后被初始化
 /// 可以随时获取本节点的信息
 class Myself {
+  int? id;
   String? peerId;
   String? name;
   String? clientId;

@@ -3,6 +3,11 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/transport/httpclient.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -26,6 +31,70 @@ class ImageUtil {
   /// 判断是否Base64图片
   static bool isBase64Img(String img) {
     return img.startsWith('data:image/') && img.contains(';base64,');
+  }
+
+  static String prefixBase64 = 'data:image/*;base64,';
+
+  static String base64Img(String img, {MimeType? type}) {
+    if (type != null) {
+      return prefixBase64.replaceFirst('*', type.name) + img;
+    } else {
+      return prefixBase64 + img;
+    }
+  }
+
+  static Uint8List decodeBase64Img(String img) {
+    int pos = img.indexOf(',');
+    Uint8List bytes = CryptoUtil.decodeBase64(img.substring(pos + 1));
+
+    return bytes;
+  }
+
+  static Widget buildImageWidget(String? image,
+      {double? width,
+      double? height,
+      BoxFit? fit,
+      bool isRadius = true,
+      double radius = 8.0}) {
+    Widget imageWidget = defaultImage;
+    if (image == null) {
+      return imageWidget;
+    }
+    if (ImageUtil.isBase64Img(image)) {
+      Uint8List bytes = ImageUtil.decodeBase64Img(image);
+      imageWidget = Image.memory(bytes, fit: BoxFit.contain);
+    } else if (ImageUtil.isAssetsImg(image)) {
+      imageWidget = Image.asset(
+        image,
+        width: width,
+        height: height,
+        fit: width != null && height != null ? BoxFit.fill : fit,
+      );
+    } else if (File(image).existsSync()) {
+      imageWidget = Image.file(
+        File(image),
+        width: width,
+        height: height,
+        fit: fit,
+      );
+    } else if (ImageUtil.isNetWorkImg(image)) {
+      imageWidget = CachedNetworkImage(
+        imageUrl: image,
+        width: width,
+        height: height,
+        fit: fit,
+        cacheManager: defaultCacheManager,
+      );
+    }
+    if (isRadius) {
+      imageWidget = ClipRRect(
+        borderRadius: BorderRadius.all(
+          Radius.circular(radius),
+        ),
+        child: imageWidget,
+      );
+    }
+    return imageWidget;
   }
 
   static Future<Uint8List> clipImageBytes(GlobalKey globalKey,

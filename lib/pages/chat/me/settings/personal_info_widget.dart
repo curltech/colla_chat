@@ -1,9 +1,12 @@
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/qrcode_widget.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -71,29 +74,38 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
 
   @override
   Widget build(BuildContext context) {
+    int id = 0;
     String name;
     var peerId = myself.peerId;
     if (peerId == null) {
       peerId = '未登录';
       name = '未登录';
     } else {
+      id = myself.id!;
       name = myself.myselfPeer!.name;
     }
     final List<TileData> personalInfoTileData = [
       TileData(
-        title: AppLocalizations.t('Avatar'),
-        suffix: myself.avatarImage,
-        routeName: 'avatar',
-      ),
+          title: AppLocalizations.t('Avatar'),
+          suffix: myself.avatarImage,
+          onTap: (int index, String label, {String? value}) async {
+            if (platformParams.windows) {
+              List<String> filenames =
+                  await FileUtil.pickFiles(type: FileType.image);
+              if (filenames.isNotEmpty) {
+                List<int> avatar = await FileUtil.readFile(filenames[0]);
+                await myselfPeerService.updateAvatar(id, avatar);
+                setState(() {});
+              }
+            }
+          }),
       TileData(
         title: AppLocalizations.t('Name'),
         suffix: name,
-        routeName: 'name',
       ),
       TileData(
         title: AppLocalizations.t('PeerId'),
         subtitle: peerId,
-        routeName: 'peerId',
       ),
       TileData(
         title: AppLocalizations.t('Qrcode'),
