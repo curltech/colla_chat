@@ -96,5 +96,12 @@
   "Remove blacklist": "移除黑名单",
   "Add subscript": "订阅",
   "Remove subscript": "移除订阅",
-  "Update avatar": "更新头像"
+  "Update avatar": "更新头像",
+  "none": "未连接",
+  "created": "创建连接",
+  "init": "初始化连接",
+  "reconnecting": "正在重连",
+  "failed": "连接失败",
+  "connected": "已连接",
+  "closed": "连接关闭"
 }

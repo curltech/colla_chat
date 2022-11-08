@@ -171,18 +171,14 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   @override
   Widget build(BuildContext context) {
     Websocket? websocket = websocketPool.getDefault();
-    Widget light = const Icon(Icons.light_mode, color: Colors.grey);
+    String title = AppLocalizations.t(widget.title);
     if (websocket != null) {
       SocketStatus status = websocket.status;
-      if (status == SocketStatus.connected) {
-        light = const Icon(Icons.light_mode, color: Colors.green);
-      }
+      title = '$title(${AppLocalizations.t(status.name)})';
     }
 
     return AppBarView(
-        title: Text(AppLocalizations.t(widget.title)),
-        rightWidgets: [light],
-        child: _buildGroupDataListView(context));
+        title: Text(title), child: _buildGroupDataListView(context));
   }
 
   @override
