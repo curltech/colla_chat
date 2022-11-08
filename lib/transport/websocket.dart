@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:colla_chat/constant/address.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webclient.dart';
+import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import './condition_import/unsupport.dart'
@@ -28,8 +30,7 @@ class Websocket implements IWebClient {
   Timer? heartBeat; // 心跳定时器
   int heartTimes = 3000; // 心跳间隔(毫秒)
   int reconnectTimes = 5;
-  Function()? onConnected;
-  Function(SocketStatus status)? onStatusChange;
+  Function(Websocket websocket, SocketStatus status)? onStatusChange;
 
   Websocket(String addr) {
     if (!addr.startsWith(prefix)) {
@@ -49,10 +50,8 @@ class Websocket implements IWebClient {
     register('', onData);
     //initHeartBeat();
     status = SocketStatus.connected;
+    reconnectTimes = 5;
     //logger.i('wss address:$address websocket connected');
-    if (onConnected != null) {
-      onConnected!();
-    }
   }
 
   @override
@@ -106,7 +105,7 @@ class Websocket implements IWebClient {
     if (_status != status) {
       _status = status;
       if (onStatusChange != null) {
-        onStatusChange!(status);
+        onStatusChange!(this, status);
       }
     }
   }
@@ -188,58 +187,56 @@ class Websocket implements IWebClient {
   }
 }
 
-class WebsocketPool {
-  static final WebsocketPool _instance = WebsocketPool();
-  static bool initStatus = false;
-
-  /// 初始化连接池，设置缺省websocket client，返回连接池
-  static Future<WebsocketPool> get instance async {
-    if (!initStatus) {
-      var nodeAddress = appDataProvider.nodeAddress;
-      if (nodeAddress.isNotEmpty) {
-        NodeAddress? defaultNodeAddress = nodeAddress[NodeAddress.defaultName];
-        if (defaultNodeAddress != null) {
-          var defaultAddress = defaultNodeAddress.wsConnectAddress;
-          if (defaultAddress != null && defaultAddress.startsWith('ws')) {
-            var websocket = Websocket(defaultAddress);
-            await websocket.connect();
-            if (websocket._status == SocketStatus.connected) {
-              _instance.websockets[defaultAddress] = websocket;
-              _instance._default = websocket;
-            }
-          }
-        }
-      }
-      initStatus = true;
-    }
-    return _instance;
-  }
-
+class WebsocketPool with ChangeNotifier {
   var websockets = <String, Websocket>{};
   Websocket? _default;
 
-  WebsocketPool();
-
-  Future<Websocket?> get({String? address, bool isDefault = false}) async {
-    if (address == null) {
-      return _instance._default;
+  WebsocketPool() {
+    var nodeAddress = appDataProvider.nodeAddress;
+    if (nodeAddress.isNotEmpty) {
+      NodeAddress? defaultNodeAddress = nodeAddress[NodeAddress.defaultName];
+      if (defaultNodeAddress != null) {
+        var defaultAddress = defaultNodeAddress.wsConnectAddress;
+        if (defaultAddress != null && defaultAddress.startsWith('ws')) {
+          var websocket = Websocket(defaultAddress);
+          websocket.connect().then((value) {
+            if (websocket._status == SocketStatus.connected) {
+              websockets[defaultAddress] = websocket;
+              websocket.onStatusChange = onStatusChange;
+              _default = websocket;
+            }
+          });
+        }
+      }
     }
+  }
+
+  onStatusChange(Websocket websocket, SocketStatus status) {
+    notifyListeners();
+  }
+
+  Websocket? getDefault() {
+    return _default;
+  }
+
+  Future<Websocket?> get(String address, {bool isDefault = false}) async {
     Websocket? websocket;
     if (websockets.containsKey(address)) {
       websocket = websockets[address];
     } else {
       if (address.startsWith('ws')) {
         websocket = Websocket(address);
+        websocket.onStatusChange = onStatusChange;
         await websocket.connect();
         if (websocket._status == SocketStatus.connected) {
-          _instance.websockets[address] = websocket;
+          websockets[address] = websocket;
         } else {
           websocket = null;
         }
       }
     }
     if (isDefault && websocket != null) {
-      _instance._default = websocket;
+      _default = websocket;
     }
     return websocket;
   }
@@ -255,4 +252,4 @@ class WebsocketPool {
   }
 }
 
-final websocketPool = WebsocketPool.instance;
+final WebsocketPool websocketPool = WebsocketPool();

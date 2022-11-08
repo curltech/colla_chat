@@ -7,11 +7,13 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_view.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/image_util.dart';
+import 'package:colla_chat/transport/websocket.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -78,6 +80,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     var indexWidgetProvider =
         Provider.of<IndexWidgetProvider>(context, listen: false);
     indexWidgetProvider.define(widget.chatMessageView);
+    websocketPool.addListener(_update);
   }
 
   _update() {
@@ -167,8 +170,18 @@ class _ChatListWidgetState extends State<ChatListWidget> {
 
   @override
   Widget build(BuildContext context) {
+    Websocket? websocket = websocketPool.getDefault();
+    Widget light = const Icon(Icons.light_mode, color: Colors.grey);
+    if (websocket != null) {
+      SocketStatus status = websocket.status;
+      if (status == SocketStatus.connected) {
+        light = const Icon(Icons.light_mode, color: Colors.green);
+      }
+    }
+
     return AppBarView(
         title: Text(AppLocalizations.t(widget.title)),
+        rightWidgets: [light],
         child: _buildGroupDataListView(context));
   }
 
@@ -177,6 +190,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     linkmanChatSummaryController.removeListener(_update);
     groupChatSummaryController.removeListener(_update);
     peerConnectionPoolController.removeListener(_update);
+    websocketPool.removeListener(_update);
     super.dispose();
   }
 }
