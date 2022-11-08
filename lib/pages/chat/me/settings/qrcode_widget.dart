@@ -74,10 +74,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
     globalKey = GlobalKey();
     var children = <Widget>[
       ListTile(
-          leading: ImageUtil.buildImageWidget(
-            width: 32.0,
-            height: 32.0,
-          ),
+          leading: myself.avatarImage,
           title: Text(name),
           subtitle: Text(this.peerId)),
       SizedBox(

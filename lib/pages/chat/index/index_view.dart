@@ -1,5 +1,6 @@
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_dialin_widget.dart';
 import 'package:colla_chat/pages/chat/index/bottom_bar.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
@@ -90,7 +91,7 @@ class _IndexViewState extends State<IndexView>
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Row(children: [
-                ImageUtil.buildImageWidget(image: ''),
+                myself.avatarImage!,
                 const SizedBox(
                   width: 15.0,
                 ),

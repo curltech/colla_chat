@@ -62,7 +62,10 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   }
 
   _update() {
-    setState(() {});
+    setState(() {
+      ///获取最新的消息
+      chatMessageController.latest();
+    });
   }
 
   _init() async {
@@ -208,8 +211,6 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
 
   @override
   Widget build(BuildContext context) {
-    ///获取最新的消息
-    chatMessageController.latest();
     var chatMessageWidget = _buildChatMessageWidget(context);
 
     return chatMessageWidget;

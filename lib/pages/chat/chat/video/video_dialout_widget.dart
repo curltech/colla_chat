@@ -1,11 +1,11 @@
 import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
-import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
@@ -61,10 +61,10 @@ class VideoDialOutWidget extends StatefulWidget {
 }
 
 class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
-  late String peerId;
-  late String name;
+  String? peerId;
+  String? name;
   String? clientId;
-  late String partyType;
+  String partyType = PartyType.linkman.name;
   double opacity = 0.5;
   OverlayEntry? overlayEntry;
 
@@ -119,7 +119,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
       bool displayMedia = false}) async {
     if (partyType == PartyType.linkman.name) {
       AdvancedPeerConnection? advancedPeerConnection =
-          peerConnectionPool.getOne(peerId, clientId: clientId);
+          peerConnectionPool.getOne(peerId!, clientId: clientId);
       if (advancedPeerConnection != null &&
           advancedPeerConnection.status == PeerConnectionStatus.connected) {
         await localMediaController.createVideoRender(
@@ -166,9 +166,12 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   }
 
   Widget _buildVideoViewCard(BuildContext context) {
+    if (peerId == null) {
+      return const BlankWidget();
+    }
     if (partyType == PartyType.linkman.name) {
       AdvancedPeerConnection? advancedPeerConnection =
-          peerConnectionPool.getOne(peerId, clientId: clientId);
+          peerConnectionPool.getOne(peerId!, clientId: clientId);
       if (advancedPeerConnection != null &&
           advancedPeerConnection.status == PeerConnectionStatus.connected) {
         return VideoViewCard(
@@ -261,7 +264,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-            ImageUtil.buildImageWidget(),
+            myself.avatarImage!,
             Text(name ?? ''),
           ]))),
       _buildActionCard(context),
