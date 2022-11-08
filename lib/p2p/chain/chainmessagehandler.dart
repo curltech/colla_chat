@@ -101,9 +101,7 @@ class ChainMessageHandler {
         if (httpClient != null) {
           var data = JsonUtil.toJsonString(msg);
           Response response = await httpClient.send('/receive', data);
-          if (response != null) {
-            result = response.data;
-          }
+          result = response.data;
           success = true;
         }
       }

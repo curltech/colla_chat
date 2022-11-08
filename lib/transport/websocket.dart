@@ -22,13 +22,14 @@ class Websocket implements IWebClient {
   String prefix = 'wss://';
   late String address;
   WebSocketChannel? channel;
-  SocketStatus status = SocketStatus.closed;
+  SocketStatus _status = SocketStatus.closed;
   Duration pingInterval = const Duration(seconds: 30);
   Map<String, dynamic> headers = {};
   Timer? heartBeat; // 心跳定时器
   int heartTimes = 3000; // 心跳间隔(毫秒)
   int reconnectTimes = 5;
   Function()? onConnected;
+  Function(SocketStatus status)? onStatusChange;
 
   Websocket(String addr) {
     if (!addr.startsWith(prefix)) {
@@ -92,9 +93,22 @@ class Websocket implements IWebClient {
   }
 
   onError(err) async {
-    logger.e("wss address:$address websocket onError, ${err}");
+    logger.e("wss address:$address websocket onError, $err");
     status = SocketStatus.failed;
     await reconnect();
+  }
+
+  SocketStatus get status {
+    return _status;
+  }
+
+  set status(SocketStatus status) {
+    if (_status != status) {
+      _status = status;
+      if (onStatusChange != null) {
+        onStatusChange!(status);
+      }
+    }
   }
 
   /// 初始化心跳
@@ -119,12 +133,12 @@ class Websocket implements IWebClient {
   }
 
   sendMsg(dynamic data) {
-    if (channel != null && status == SocketStatus.connected) {
+    if (channel != null && _status == SocketStatus.connected) {
       channel!.sink.add(data);
     } else {
       logger.e('status is not connected');
       reconnect().then((value) {
-        if (channel != null && status == SocketStatus.connected) {
+        if (channel != null && _status == SocketStatus.connected) {
           sendMsg(data);
         }
       });
@@ -144,7 +158,7 @@ class Websocket implements IWebClient {
   }
 
   Future<void> close() async {
-    if (status != SocketStatus.closed) {
+    if (_status != SocketStatus.closed) {
       if (channel != null) {
         try {
           var sink = channel!.sink;
@@ -162,7 +176,7 @@ class Websocket implements IWebClient {
   /// 重连机制
   Future<void> reconnect() async {
     Timer.periodic(Duration(milliseconds: heartTimes), (timer) async {
-      if (reconnectTimes <= 0 || status == SocketStatus.connected) {
+      if (reconnectTimes <= 0 || _status == SocketStatus.connected) {
         timer.cancel();
         return;
       }
@@ -178,7 +192,7 @@ class WebsocketPool {
   static final WebsocketPool _instance = WebsocketPool();
   static bool initStatus = false;
 
-  /// 初始化连接池，设置缺省websocketclient，返回连接池
+  /// 初始化连接池，设置缺省websocket client，返回连接池
   static Future<WebsocketPool> get instance async {
     if (!initStatus) {
       var nodeAddress = appDataProvider.nodeAddress;
@@ -189,7 +203,7 @@ class WebsocketPool {
           if (defaultAddress != null && defaultAddress.startsWith('ws')) {
             var websocket = Websocket(defaultAddress);
             await websocket.connect();
-            if (websocket.status == SocketStatus.connected) {
+            if (websocket._status == SocketStatus.connected) {
               _instance.websockets[defaultAddress] = websocket;
               _instance._default = websocket;
             }
@@ -217,7 +231,7 @@ class WebsocketPool {
       if (address.startsWith('ws')) {
         websocket = Websocket(address);
         await websocket.connect();
-        if (websocket.status == SocketStatus.connected) {
+        if (websocket._status == SocketStatus.connected) {
           _instance.websockets[address] = websocket;
         } else {
           websocket = null;

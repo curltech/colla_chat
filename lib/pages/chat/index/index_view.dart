@@ -8,7 +8,6 @@ import 'package:colla_chat/pages/chat/index/index_widget.dart';
 import 'package:colla_chat/pages/chat/login/loading.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:extended_text/extended_text.dart';
@@ -99,7 +98,7 @@ class _IndexViewState extends State<IndexView>
                 const SizedBox(
                   width: 15.0,
                 ),
-                Text(title!, style: const TextStyle(color: Colors.white)),
+                Text(title, style: const TextStyle(color: Colors.white)),
               ]),
               const SizedBox(
                 height: 15.0,

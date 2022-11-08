@@ -1,6 +1,7 @@
 import 'package:badges/badges.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_view.dart';
@@ -9,6 +10,8 @@ import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart'
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
+import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -16,7 +19,6 @@ import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 
 ///好友的汇总控制器，每当消息汇总表的数据有变化时更新控制器
 final DataListController<ChatSummary> linkmanChatSummaryController =
@@ -82,25 +84,26 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     setState(() {});
   }
 
-  _buildGroupDataListController() {
+  _buildGroupDataListController() async {
     Map<TileData, List<TileData>> tileData = {};
-    var linkmen = linkmanChatSummaryController.data;
+    var linkmenChatSummary = linkmanChatSummaryController.data;
     List<TileData> tiles = [];
-    if (linkmen.isNotEmpty) {
-      for (var linkman in linkmen) {
-        var title = linkman.name ?? '';
-        var subtitle = linkman.peerId ?? '';
-        var unreadNumber = linkman.unreadNumber;
+    if (linkmenChatSummary.isNotEmpty) {
+      for (var chatSummary in linkmenChatSummary) {
+        var title = chatSummary.name ?? '';
+        var peerId = chatSummary.peerId ?? '';
+        var unreadNumber = chatSummary.unreadNumber;
+        Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
         var badge = Badge(
           badgeContent: Text('$unreadNumber'),
           elevation: 0.0,
           padding: const EdgeInsets.all(0.0),
-          child: myself.avatarImage,
+          child: ImageUtil.buildImageWidget(image: linkman!.avatar),
         );
         TileData tile = TileData(
             prefix: badge,
             title: title,
-            subtitle: subtitle,
+            subtitle: peerId,
             routeName: 'chat_message');
         tiles.add(tile);
       }
@@ -108,23 +111,24 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     tileData[TileData(title: AppLocalizations.t('Linkman'))] = tiles;
     widget.groupDataListController.addAll(tileData: tileData);
 
-    var groups = groupChatSummaryController.data;
+    var groupChatSummary = groupChatSummaryController.data;
     tiles = [];
-    if (groups.isNotEmpty) {
-      for (var group in groups) {
-        var title = group.name ?? '';
-        var subtitle = group.peerId ?? '';
-        var unreadNumber = group.unreadNumber;
+    if (groupChatSummary.isNotEmpty) {
+      for (var chatSummary in groupChatSummary) {
+        var title = chatSummary.name ?? '';
+        var peerId = chatSummary.peerId ?? '';
+        var unreadNumber = chatSummary.unreadNumber;
+        Group? group = await groupService.findCachedOneByPeerId(peerId);
         var badge = Badge(
           badgeContent: Text('$unreadNumber'),
           elevation: 0.0,
           padding: const EdgeInsets.all(0.0),
-          child: defaultImage,
+          child: ImageUtil.buildImageWidget(image: group!.avatar),
         );
         TileData tile = TileData(
             prefix: badge,
             title: title,
-            subtitle: subtitle,
+            subtitle: peerId,
             routeName: 'chat_message');
         tiles.add(tile);
       }
@@ -136,11 +140,11 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   _onTap(int index, String title, {TileData? group}) {
     if (group != null) {
       ChatSummary? current;
-      if (group.title == 'Linkman') {
+      if (group.title == AppLocalizations.t('Linkman')) {
         linkmanChatSummaryController.currentIndex = index;
         current = linkmanChatSummaryController.current;
       }
-      if (group.title == 'Group') {
+      if (group.title == AppLocalizations.t('Group')) {
         groupChatSummaryController.currentIndex = index;
         current = groupChatSummaryController.current;
       }
