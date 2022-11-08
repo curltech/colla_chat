@@ -1,8 +1,6 @@
 import 'dart:async';
 
-import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:cross_file/cross_file.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info/package_info.dart';
 

@@ -1,3 +1,4 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
@@ -97,7 +98,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
         Application.router
             .navigateTo(context, Application.index, replace: true);
       } else {
-        DialogUtil.error(context, content: 'login fail');
+        DialogUtil.error(context, content: AppLocalizations.t('Login fail'));
       }
     }).catchError((e) {
       DialogUtil.error(context, content: e.toString());

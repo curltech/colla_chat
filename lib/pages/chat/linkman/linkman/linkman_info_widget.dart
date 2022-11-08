@@ -1,20 +1,24 @@
 import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/entity/chat/contact.dart';
+import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman/linkman_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/service/dht/myselfpeer.dart';
+import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/image_widget.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../../widgets/common/app_bar_view.dart';
-import '../../../../../widgets/common/widget_mixin.dart';
-import '../../../../entity/chat/contact.dart';
-import '../../../../l10n/localization.dart';
-import 'linkman_edit_widget.dart';
 
 //联系人信息页面
 class LinkmanInfoWidget extends StatefulWidget with TileDataMixin {
@@ -38,7 +42,7 @@ class LinkmanInfoWidget extends StatefulWidget with TileDataMixin {
   Icon get icon => const Icon(Icons.person);
 
   @override
-  String get title => 'Linkman Info';
+  String get title => 'Linkman Information';
 }
 
 class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
@@ -79,7 +83,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
   Widget _buildChatMessageWidget(BuildContext context) {
     List<TileData> tileData = [];
     var tile = TileData(
-        title: 'Chat',
+        title: AppLocalizations.t('Chat'),
         prefix: const Icon(Icons.chat),
         routeName: 'chat_message',
         onTap: (int index, String title) async {
@@ -141,10 +145,25 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
     double height = 180;
     final List<ActionData> actionData = [];
     if (linkman != null) {
+      // actionData.add(
+      //   ActionData(
+      //       label: AppLocalizations.t('Update avatar'),
+      //       icon: const Icon(Icons.face),
+      //       onTap: (int index, String label, {String? value}) async {
+      //         if (platformParams.windows) {
+      //           List<String> filenames =
+      //               await FileUtil.pickFiles(type: FileType.image);
+      //           if (filenames.isNotEmpty) {
+      //             List<int> avatar = await FileUtil.readFile(filenames[0]);
+      //             myselfPeerService.updateAvatar(myself.peerId!, avatar);
+      //           }
+      //         }
+      //       }),
+      // );
       if (linkman!.status == LinkmanStatus.friend.name) {
         actionData.add(
           ActionData(
-              label: 'Remove friend',
+              label: AppLocalizations.t('Remove friend'),
               icon: const Icon(Icons.person_remove),
               onTap: (int index, String label, {String? value}) {
                 _changeStatus(LinkmanStatus.none);
@@ -156,7 +175,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
       if (linkman!.status == LinkmanStatus.blacklist.name) {
         actionData.add(
           ActionData(
-              label: 'Remove blacklist',
+              label: AppLocalizations.t('Remove blacklist'),
               icon: const Icon(Icons.person_outlined),
               onTap: (int index, String label, {String? value}) {
                 _changeStatus(LinkmanStatus.none);
@@ -164,7 +183,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
         );
       } else {
         actionData.add(ActionData(
-            label: 'Add blacklist',
+            label: AppLocalizations.t('Add blacklist'),
             icon: const Icon(Icons.person_off),
             onTap: (int index, String label, {String? value}) {
               _changeStatus(LinkmanStatus.blacklist);
@@ -173,7 +192,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
       if (linkman!.status == LinkmanStatus.blacklist.name) {
         actionData.add(
           ActionData(
-              label: 'Remove subscript',
+              label: AppLocalizations.t('Remove subscript'),
               icon: const Icon(Icons.unsubscribe),
               onTap: (int index, String label, {String? value}) {
                 _changeSubscriptStatus(LinkmanStatus.none);
@@ -181,7 +200,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
         );
       } else {
         actionData.add(ActionData(
-            label: 'Add subscript',
+            label: AppLocalizations.t('Add subscript'),
             icon: const Icon(Icons.subscriptions),
             onTap: (int index, String label, {String? value}) {
               _changeSubscriptStatus(LinkmanStatus.subscript);

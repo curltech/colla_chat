@@ -83,7 +83,8 @@ class PeerClientService extends PeerEntityService<PeerClient> {
     return peer;
   }
 
-  store(PeerClient peerClient) async {
+  ///新peerClient的mobile和email是否覆盖旧的
+  store(PeerClient peerClient, {bool mobile = true, bool email = true}) async {
     if (peerClient.peerId == myself.peerId) {
       //logger.e('cannot store myself');
       return;
@@ -92,9 +93,15 @@ class PeerClientService extends PeerEntityService<PeerClient> {
         clientId: peerClient.clientId);
     if (peerClient_ != null) {
       peerClient.id = peerClient_.id;
-      update(peerClient);
+      if (!mobile) {
+        peerClient.mobile = peerClient_.mobile;
+      }
+      if (!email) {
+        peerClient.email = peerClient_.email;
+      }
+      await update(peerClient);
     } else {
-      insert(peerClient);
+      await insert(peerClient);
     }
     var peerId = peerClient.peerId;
     var clientId = peerClient.clientId;
@@ -102,7 +109,7 @@ class PeerClientService extends PeerEntityService<PeerClient> {
       peerClients[peerId] = {};
     }
     peerClients[peerId]![clientId] = peerClient;
-    linkmanService.storeByPeerClient(peerClient);
+    await linkmanService.storeByPeerClient(peerClient);
   }
 }
 

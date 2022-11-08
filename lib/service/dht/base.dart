@@ -1,3 +1,4 @@
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/service/general_base.dart';
 
 import '../../entity/base.dart';
@@ -41,6 +42,12 @@ abstract class PeerLocationService<T> extends GeneralBaseService<T> {
 
     return peer;
   }
+
+  Future<int> deleteByPeerId(String peerId) async {
+    var count = await delete({'peerId': peerId});
+
+    return count;
+  }
 }
 
 abstract class PeerEntityService<T> extends PeerLocationService<T> {
@@ -79,5 +86,11 @@ abstract class PeerEntityService<T> extends PeerLocationService<T> {
     var peer = await findOne(where: where, whereArgs: whereArgs);
 
     return peer;
+  }
+
+  updateAvatar(String peerId, List<int> avatar) async {
+    String data = CryptoUtil.encodeBase64(avatar);
+
+    await update({'peerId': peerId, 'avatar': data});
   }
 }

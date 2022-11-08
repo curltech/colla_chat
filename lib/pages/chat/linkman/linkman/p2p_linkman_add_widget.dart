@@ -8,7 +8,9 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/tool/validator_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -61,6 +63,9 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
     var searchTextField = TextFormField(
         controller: controller,
         keyboardType: TextInputType.text,
+        validator: (value) {
+          return ValidatorUtil.emptyValidator(value);
+        },
         decoration: InputDecoration(
           labelText: AppLocalizations.t('PeerId/Mobile/Email/Name'),
           suffixIcon: IconButton(
@@ -81,7 +86,8 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
       List<PeerClient> peerClients = chainMessage.payload;
       if (peerClients.isNotEmpty) {
         for (var peerClient in peerClients) {
-          peerClientService.store(peerClient);
+          await peerClientService.store(peerClient,
+              mobile: false, email: false);
         }
       }
 
@@ -97,7 +103,10 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
                 iconSize: 24.0,
                 icon: const Icon(Icons.add),
                 onPressed: () async {
-                  logger.i('add peerClient:$subtitle as linkman');
+                  DialogUtil.info(context,
+                      content:
+                          AppLocalizations.t('Add peerClient as linkman:') +
+                              subtitle);
                   Linkman linkman =
                       await linkmanService.storeByPeerClient(peerClient);
                   await linkmanService.update(
@@ -112,16 +121,22 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
   }
 
   Future<void> _search(String key) async {
+    String? error = ValidatorUtil.emptyValidator(key);
+    if (error != null) {
+      DialogUtil.error(context, content: error);
+      return;
+    }
     String email = '';
-    if (key.contains('@')) {
+    error = ValidatorUtil.emailValidator(key);
+    if (error == null) {
       email = key;
     }
     String mobile = '';
-    bool isPhoneNumber = StringUtil.isNumeric(key);
-    if (isPhoneNumber) {
+    error = ValidatorUtil.mobileValidator(key);
+    if (error == null) {
       mobile = key;
     }
-    findClientAction.findClient(key, mobile, email, key);
+    await findClientAction.findClient(key, mobile, email, key);
   }
 
   @override

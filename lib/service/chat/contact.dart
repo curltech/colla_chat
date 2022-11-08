@@ -6,6 +6,7 @@ import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
+import 'package:colla_chat/service/dht/base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/contact_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -19,33 +20,15 @@ import '../../widgets/common/image_widget.dart';
 import '../dht/peerclient.dart';
 import '../general_base.dart';
 
-abstract class PeerPartyService<T> extends GeneralBaseService<T> {
+abstract class PeerPartyService<T> extends PeerEntityService<T> {
   PeerPartyService(
       {required super.tableName,
       required super.fields,
       required super.indexFields});
 
-  Future<T?> findOneByPeerId(String peerId) async {
-    var where = 'peerId = ?';
-    var whereArgs = [peerId];
-    var peer = await findOne(where: where, whereArgs: whereArgs);
 
-    return peer;
-  }
 
-  Future<T?> findOneByName(String name) async {
-    var where = 'name = ?';
-    var whereArgs = [name];
-    var peer = await findOne(where: where, whereArgs: whereArgs);
 
-    return peer;
-  }
-
-  Future<int> deleteByPeerId(String peerId) async {
-    var count = await delete({'peerId': peerId});
-
-    return count;
-  }
 }
 
 class LinkmanService extends PeerPartyService<Linkman> {
