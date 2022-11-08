@@ -3,8 +3,8 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/widgets/common/image_widget.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
@@ -69,7 +69,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
       const SizedBox(
         height: 50,
       ),
-      const ImageWidget(
+       ImageUtil.buildImageWidget(
         image: 'assets/images/colla.png',
         height: 128,
         width: 128,

@@ -1,12 +1,12 @@
+import 'package:colla_chat/crypto/cryptography.dart';
+import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/entity/dht/myselfpeer.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:cryptography/cryptography.dart';
 
-import '../../crypto/cryptography.dart';
-import '../../entity/dht/myself.dart';
-import '../../entity/dht/myselfpeer.dart';
-import '../../widgets/common/image_widget.dart';
 
 class MyselfService {
   ///创建新的myself，创建新的密钥对，设置到当前
@@ -80,8 +80,8 @@ class MyselfService {
     if (peerProfile != null) {
       myself.peerProfile = peerProfile;
       String? avatar = myselfPeer.avatar;
-      var avatarImage = ImageWidget(
-        image: avatar,
+      var avatarImage = ImageUtil.buildImageWidget(
+        image:avatar,
         height: 32,
         width: 32,
       );

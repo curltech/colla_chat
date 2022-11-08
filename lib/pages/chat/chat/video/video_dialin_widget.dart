@@ -6,10 +6,10 @@ import 'package:colla_chat/pages/chat/chat/controller/peer_connections_controlle
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
-import 'package:colla_chat/widgets/common/image_widget.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -97,7 +97,7 @@ class VideoDialInWidget extends StatelessWidget {
         elevation: 0,
         color: Colors.black.withOpacity(0.5),
         child: ListTile(
-            leading: const ImageWidget(image: ''),
+            leading: ImageUtil.buildImageWidget(),
             title: Text(name, style: const TextStyle(color: Colors.white)),
             subtitle: Text(AppLocalizations.t('Inviting you video chat'),
                 style: const TextStyle(color: Colors.white)),

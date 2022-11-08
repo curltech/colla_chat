@@ -5,19 +5,15 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
-import 'package:colla_chat/service/dht/myselfpeer.dart';
-import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/image_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
 //联系人信息页面
@@ -66,7 +62,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
         title: linkman!.name,
         subtitle: linkman!.peerId,
         isThreeLine: true,
-        prefix: ImageWidget(
+        prefix: ImageUtil.buildImageWidget(
           image: linkman!.avatar,
           width: 32.0,
           height: 32.0,

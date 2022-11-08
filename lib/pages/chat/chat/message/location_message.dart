@@ -1,4 +1,5 @@
-import 'package:colla_chat/widgets/common/image_widget.dart';
+
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:flutter/material.dart';
 
 ///消息体：定位消息
@@ -18,8 +19,8 @@ class LocationMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () {},
-      child: ImageWidget(
-        image: thumbnail,
+      child: ImageUtil.buildImageWidget(
+        image:thumbnail,
       ),
     );
   }

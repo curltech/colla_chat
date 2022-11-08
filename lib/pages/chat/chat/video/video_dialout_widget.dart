@@ -5,11 +5,11 @@ import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dar
 import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/widgets/common/blank_widget.dart';
-import 'package:colla_chat/widgets/common/image_widget.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
@@ -261,7 +261,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-            const ImageWidget(image: ''),
+            ImageUtil.buildImageWidget(),
             Text(name ?? ''),
           ]))),
       _buildActionCard(context),

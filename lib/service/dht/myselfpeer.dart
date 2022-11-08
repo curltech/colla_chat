@@ -1,6 +1,20 @@
 import 'package:colla_chat/crypto/cryptography.dart';
+import 'package:colla_chat/crypto/signalprotocol.dart';
+import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/entity/base.dart';
+import 'package:colla_chat/entity/dht/base.dart';
+import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/entity/dht/myselfpeer.dart';
+import 'package:colla_chat/entity/dht/peerclient.dart';
+import 'package:colla_chat/entity/dht/peerprofile.dart';
+import 'package:colla_chat/entity/p2p/chain_message.dart';
+import 'package:colla_chat/p2p/chain/action/connect.dart';
+import 'package:colla_chat/p2p/chain/baseaction.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/service/dht/base.dart';
 import 'package:colla_chat/service/dht/myself.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
@@ -12,22 +26,6 @@ import 'package:colla_chat/tool/network_connectivity.dart';
 import 'package:colla_chat/tool/phone_number_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
-import 'package:colla_chat/widgets/common/image_widget.dart';
-
-import '../../crypto/signalprotocol.dart';
-import '../../crypto/util.dart';
-import '../../entity/base.dart';
-import '../../entity/dht/base.dart';
-import '../../entity/dht/myself.dart';
-import '../../entity/dht/myselfpeer.dart';
-import '../../entity/dht/peerclient.dart';
-import '../../entity/dht/peerprofile.dart';
-import '../../entity/p2p/chain_message.dart';
-import '../../p2p/chain/action/connect.dart';
-import '../../p2p/chain/baseaction.dart';
-import '../../platform.dart';
-import '../../plugin/security_storage.dart';
-import 'base.dart';
 
 const String skipLoginName = 'skipLogin';
 const String lastLoginName = 'lastLogin';
@@ -277,7 +275,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     if (myselfPeer != null) {
       myselfPeer.avatar = data;
       var avatarImage = ImageUtil.buildImageWidget(
-        data,
+        image:data,
         height: 32,
         width: 32,
       );

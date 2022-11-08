@@ -4,21 +4,21 @@ import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/dht/base.dart';
+import 'package:colla_chat/service/dht/peerclient.dart';
+import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/contact_util.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as flutter_contacts;
 
-import '../../entity/chat/contact.dart';
-import '../../entity/dht/peerclient.dart';
-import '../../widgets/common/image_widget.dart';
-import '../dht/peerclient.dart';
-import '../general_base.dart';
 
 abstract class PeerPartyService<T> extends PeerEntityService<T> {
   PeerPartyService(
@@ -65,8 +65,8 @@ class LinkmanService extends PeerPartyService<Linkman> {
     if (linkman != null) {
       String? avatar = linkman.avatar;
       if (avatar != null) {
-        var avatarImage = ImageWidget(
-          image: avatar,
+        var avatarImage = ImageUtil.buildImageWidget(
+          image:avatar,
           height: 32,
           width: 32,
         );
@@ -216,8 +216,8 @@ class GroupService extends PeerPartyService<Group> {
     if (group != null) {
       String? avatar = group.avatar;
       if (avatar != null) {
-        var avatarImage = ImageWidget(
-          image: avatar,
+        var avatarImage = ImageUtil.buildImageWidget(
+          image:avatar,
           height: 32,
           width: 32,
         );
@@ -700,7 +700,7 @@ class ContactService extends PeerPartyService<Contact> {
           pc = await this.refresh(leftPeerContact);
         }
         if (pc != null) {
-          this.insert(leftPeerContact);
+          insert(leftPeerContact);
         }
         peerContacts.add(leftPeerContact);
       }
@@ -737,7 +737,7 @@ class ContactService extends PeerPartyService<Contact> {
       var peerClient =
           await peerClientService.findOneEffectiveByMobile(mobileNumber);
       if (peerClient != null) {
-        peerContact.peerId = peerClient.peerId!;
+        peerContact.peerId = peerClient.peerId;
         peerContact.name = peerClient.name;
         peerContact.status = peerClient.status;
         peerContact.publicKey = peerClient.publicKey;

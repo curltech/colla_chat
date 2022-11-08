@@ -1,5 +1,5 @@
 import 'package:colla_chat/service/chat/chat.dart';
-import 'package:colla_chat/widgets/common/image_widget.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:flutter/material.dart';
 
 ///消息体：图片消息
@@ -28,8 +28,8 @@ class ImageMessage extends StatelessWidget {
           }
           return InkWell(
             onTap: () {},
-            child: ImageWidget(
-              image: filename,
+            child: ImageUtil.buildImageWidget(
+              image:filename,
             ),
           );
         });

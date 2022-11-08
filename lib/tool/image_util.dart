@@ -50,8 +50,9 @@ class ImageUtil {
     return bytes;
   }
 
-  static Widget buildImageWidget(String? image,
-      {double? width,
+  static Widget buildImageWidget(
+      {String? image,
+      double? width,
       double? height,
       BoxFit? fit,
       bool isRadius = true,

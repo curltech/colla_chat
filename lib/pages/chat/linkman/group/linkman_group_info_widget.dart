@@ -7,8 +7,8 @@ import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/image_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -83,7 +83,7 @@ class _LinkmanGroupInfoWidgetState extends State<LinkmanGroupInfoWidget> {
         title: group!.name,
         subtitle: group!.peerId,
         isThreeLine: true,
-        prefix: ImageWidget(
+        prefix: ImageUtil.buildImageWidget(
           image: group!.avatar,
           width: 32.0,
           height: 32.0,

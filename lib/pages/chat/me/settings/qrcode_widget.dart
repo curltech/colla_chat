@@ -9,7 +9,6 @@ import 'package:colla_chat/tool/qrcode_util.dart';
 import 'package:colla_chat/tool/share_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
-import 'package:colla_chat/widgets/common/image_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
@@ -75,7 +74,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
     globalKey = GlobalKey();
     var children = <Widget>[
       ListTile(
-          leading: const ImageWidget(
+          leading: ImageUtil.buildImageWidget(
             width: 32.0,
             height: 32.0,
           ),

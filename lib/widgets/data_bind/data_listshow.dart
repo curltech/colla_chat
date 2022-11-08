@@ -1,7 +1,7 @@
+import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:flutter/material.dart';
 
-import '../../l10n/localization.dart';
-import '../common/image_widget.dart';
 
 ///多个字段显示
 class DataListShow extends StatelessWidget {
@@ -12,8 +12,8 @@ class DataListShow extends StatelessWidget {
   DataListShow({Key? key, required this.values, this.avatar, this.avatarImage})
       : super(key: key) {
     if (avatarImage == null && avatar != null) {
-      avatarImage = ImageWidget(
-        image: avatar,
+      avatarImage = ImageUtil.buildImageWidget(
+        image:avatar,
         width: 32,
         height: 32,
       );
