@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -84,16 +85,7 @@ class TileData {
       if (prefix is Widget) {
         leading = prefix;
       } else if (prefix is String) {
-        if (prefix.startsWith('assets/')) {
-          leading = Image.asset(
-            prefix,
-            width: 32,
-            height: 32,
-            fit: BoxFit.fill,
-          );
-        } else {
-          leading = Image.memory(Uint8List.fromList(prefix.codeUnits));
-        }
+        leading = ImageUtil.buildImageWidget(image:prefix);
       } else if (prefix is IconData) {
         leading = Icon(prefix);
       }

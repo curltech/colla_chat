@@ -7,7 +7,6 @@ import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
 class FormInputController with ChangeNotifier {
   final List<ColumnFieldDef> columnFieldDefs;
   final Map<String, ColumnFieldController> controllers = {};
@@ -144,7 +143,6 @@ class FormInputWidget extends StatelessWidget {
   }
 
   Widget _build(BuildContext context) {
-    FormInputController controller = Provider.of<FormInputController>(context);
     List<Widget> children = [];
     for (var columnFieldDef in controller.columnFieldDefs) {
       children.add(SizedBox(
@@ -155,10 +153,13 @@ class FormInputWidget extends StatelessWidget {
       if (initValues != null) {
         initValue = initValues![name];
       }
+      ColumnFieldController columnFieldController = ColumnFieldController(
+          columnFieldDef,
+          value: initValue,
+          mode: ColumnFieldMode.edit);
+      controller.setController(columnFieldDef.name, columnFieldController);
       Widget columnFieldWidget = ColumnFieldWidget(
-        columnFieldDef: columnFieldDef,
-        initValue: initValue,
-        mode: ColumnFieldMode.edit,
+        controller: columnFieldController,
       );
       children.add(columnFieldWidget);
     }
