@@ -1,9 +1,11 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
 
 class DialogUtil {
   /// loading框
-  static loadingShow(BuildContext context, {String tip = '正在加载，请稍后...'}) {
+  static loadingShow(BuildContext context,
+      {String tip = 'Loading, please waiting...'}) {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -12,9 +14,9 @@ class DialogUtil {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              CircularProgressIndicator(),
+              const CircularProgressIndicator(),
               Padding(
-                padding: EdgeInsets.only(top: 26.0),
+                padding: const EdgeInsets.only(top: 24.0),
                 child: Text(tip),
               )
             ],
@@ -32,7 +34,7 @@ class DialogUtil {
   ///返回为true，代表按的确认
   /// 模态警告
   static Future<bool?> alert(BuildContext context,
-      {Icon? icon, String title = '警告', String content = ''}) {
+      {Icon? icon, String title = 'Warning', String content = ''}) {
     Icon i;
     if (icon == null) {
       i = const Icon(Icons.warning);
@@ -52,13 +54,13 @@ class DialogUtil {
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('取消'),
+              child: Text(AppLocalizations.t('Cancel')),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
-              child: const Text('确认'),
+              child: Text(AppLocalizations.t('Ok')),
             ),
           ],
         );
@@ -68,20 +70,25 @@ class DialogUtil {
 
   /// 模态提示
   static Future<bool?> prompt(BuildContext context,
-      {Icon? icon, String title = '提示', String content = ''}) {
+      {Icon? icon, String title = 'Prompt', String content = ''}) {
     return alert(context,
         title: title, content: content, icon: const Icon(Icons.info));
   }
 
   /// 模态提示错误
   static Future<bool?> fault(BuildContext context,
-      {Icon? icon, String title = '错误', String content = ''}) {
+      {Icon? icon, String title = 'Fault', String content = ''}) {
     return alert(context,
-        title: title, content: content, icon: const Icon(Icons.error));
+        title: title,
+        content: content,
+        icon: const Icon(
+          Icons.error,
+          color: Colors.red,
+        ));
   }
 
   /// 底部延时提示错误
-  static error(BuildContext context, {String content = '错误'}) {
+  static error(BuildContext context, {String content = 'Error'}) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(content),
       backgroundColor: Colors.red,
@@ -89,7 +96,7 @@ class DialogUtil {
   }
 
   /// 底部延时警告
-  static warn(BuildContext context, {String content = '警告'}) {
+  static warn(BuildContext context, {String content = 'Warning'}) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(content),
       backgroundColor: Colors.amber,
@@ -97,7 +104,7 @@ class DialogUtil {
   }
 
   /// 底部延时提示
-  static info(BuildContext context, {String content = '提示'}) {
+  static info(BuildContext context, {String content = 'Information'}) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       content: Text(content),
       backgroundColor: Colors.green,

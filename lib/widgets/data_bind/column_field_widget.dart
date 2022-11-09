@@ -1,12 +1,10 @@
-import 'dart:typed_data';
-
+import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/tool/image_util.dart';
+import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../constant/base.dart';
-import '../../l10n/localization.dart';
-import 'form_input_widget.dart';
 
 ///指定路由样式，不指定则系统判断，系统判断的方法是如果是移动则走全局路由，否则走工作区路由
 enum InputType {
@@ -86,9 +84,11 @@ class ColumnFieldDef {
       this.customWidget});
 }
 
-enum ColumnFieldMode { edit, show, label, custom }
+enum ColumnFieldMode { edit, label, custom }
 
 class ColumnFieldController with ChangeNotifier {
+  final ColumnFieldDef columnFieldDef;
+
   //非文本框的值
   dynamic _value;
   dynamic _flag;
@@ -98,7 +98,7 @@ class ColumnFieldController with ChangeNotifier {
   TextEditingController? _controller;
   late ColumnFieldMode _mode;
 
-  ColumnFieldController(
+  ColumnFieldController(this.columnFieldDef,
       {dynamic value,
       dynamic flag,
       TextEditingController? controller,
@@ -125,12 +125,11 @@ class ColumnFieldController with ChangeNotifier {
         controller.text = value;
         _changed = true;
       }
-    } else {
-      if (_value != value) {
-        _value = value;
-        _changed = true;
-        notifyListeners();
-      }
+    }
+    if (_value != value) {
+      _value = value;
+      _changed = true;
+      notifyListeners();
     }
   }
 
@@ -175,9 +174,13 @@ class ColumnFieldController with ChangeNotifier {
     if (controller != null) {
       controller.clear();
     } else {
-      if (_value != null) {
-        _value = null;
-        notifyListeners();
+      if (mode == ColumnFieldMode.label ||
+          columnFieldDef.inputType == InputType.label) {
+      } else {
+        if (_value != null) {
+          _value = null;
+          notifyListeners();
+        }
       }
     }
   }
@@ -185,18 +188,12 @@ class ColumnFieldController with ChangeNotifier {
 
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
 class ColumnFieldWidget extends StatefulWidget {
-  final ColumnFieldDef columnFieldDef;
-  final dynamic initValue;
-  late final ColumnFieldController controller;
+  final ColumnFieldController controller;
 
-  ColumnFieldWidget(
-      {Key? key,
-      required this.columnFieldDef,
-      this.initValue,
-      ColumnFieldMode mode = ColumnFieldMode.edit})
-      : super(key: key) {
-    controller = ColumnFieldController(mode: mode);
-  }
+  const ColumnFieldWidget({
+    Key? key,
+    required this.controller,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -205,22 +202,21 @@ class ColumnFieldWidget extends StatefulWidget {
 }
 
 class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
-  dynamic initValue;
-
   @override
   initState() {
     super.initState();
     widget.controller.addListener(_update);
-    initValue = _getInitValue(context);
   }
 
   _update() {
     setState(() {});
   }
 
+  //获取初始化值，传入的初始值或者定义的初始值
   dynamic _getInitValue(BuildContext context) {
-    var dataType = widget.columnFieldDef.dataType;
-    dynamic v = widget.initValue ?? widget.columnFieldDef.initValue;
+    var dataType = widget.controller.columnFieldDef.dataType;
+    dynamic v =
+        widget.controller.value ?? widget.controller.columnFieldDef.initValue;
     if (dataType == DataType.set ||
         dataType == DataType.list ||
         dataType == DataType.map) {
@@ -237,38 +233,22 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
   }
 
   Widget? _buildIcon() {
-    Widget? icon;
-    final avatar = widget.columnFieldDef.avatar;
-    if (widget.columnFieldDef.prefixIcon != null) {
-      icon = widget.columnFieldDef.prefixIcon;
-    } else if (avatar != null) {
-      icon = Image.memory(Uint8List.fromList(avatar.codeUnits));
+    Widget? icon = widget.controller.columnFieldDef.prefixIcon;
+    if (icon == null) {
+      final avatar = widget.controller.columnFieldDef.avatar;
+      if (avatar != null) {
+        icon = ImageUtil.buildImageWidget(image: avatar);
+      }
     }
 
     return icon;
   }
 
   Widget _buildLabel(BuildContext context) {
-    FormInputController formInputController =
-        Provider.of<FormInputController>(context);
     widget.controller.controller = null;
-    formInputController.setController(
-        widget.columnFieldDef.name, widget.controller);
-
-    dynamic value = _getInitValue(context);
-
-    return Text(value);
-  }
-
-  Widget _buildShowLabel(BuildContext context) {
-    FormInputController formInputController =
-        Provider.of<FormInputController>(context);
-    widget.controller.controller = null;
-    formInputController.setController(
-        widget.columnFieldDef.name, widget.controller);
-    final label = widget.columnFieldDef.label;
-
-    return Row(children: [
+    final label = widget.controller.columnFieldDef.label;
+    final value = widget.controller.value ?? '';
+    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
       _buildIcon()!,
       const SizedBox(
         width: 15.0,
@@ -277,21 +257,19 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
       const SizedBox(
         width: 15.0,
       ),
-      Expanded(child: Text(initValue, textAlign: TextAlign.start))
+      Expanded(child: Text(value, textAlign: TextAlign.start))
     ]);
   }
 
   Widget _buildTextFormField(BuildContext context) {
-    FormInputController formInputController =
-        Provider.of<FormInputController>(context);
+    final value = widget.controller.value ?? '';
     var controller = TextEditingController();
     controller.value = TextEditingValue(
-        text: initValue,
+        text: value,
         selection: TextSelection.fromPosition(TextPosition(
-            offset: initValue.length, affinity: TextAffinity.downstream)));
+            offset: value.length, affinity: TextAffinity.downstream)));
     widget.controller.controller = controller;
-    var columnFieldDef = widget.columnFieldDef;
-    formInputController.setController(columnFieldDef.name, widget.controller);
+    var columnFieldDef = widget.controller.columnFieldDef;
     var suffixIcon = columnFieldDef.suffixIcon;
     Widget? suffix;
     if (columnFieldDef.cancel) {
@@ -327,18 +305,16 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
   }
 
   Widget _buildPasswordField(BuildContext context) {
-    FormInputController formInputController =
-        Provider.of<FormInputController>(context);
     bool? pwdShow = widget.controller.flag;
     pwdShow ??= false;
+    final value = widget.controller.value ?? '';
     var controller = TextEditingController();
     controller.value = TextEditingValue(
-        text: initValue,
+        text: value,
         selection: TextSelection.fromPosition(TextPosition(
-            offset: initValue.length, affinity: TextAffinity.downstream)));
+            offset: value.length, affinity: TextAffinity.downstream)));
     widget.controller.controller = controller;
-    var columnFieldDef = widget.columnFieldDef;
-    formInputController.setController(columnFieldDef.name, widget.controller);
+    var columnFieldDef = widget.controller.columnFieldDef;
     Widget? suffix;
     if (columnFieldDef.cancel) {
       suffix = controller.text.isNotEmpty
@@ -360,7 +336,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
           suffixIcon: IconButton(
             icon: Icon(pwdShow ? Icons.visibility_off : Icons.visibility),
             onPressed: () {
-              initValue = controller.value.text;
+              widget.controller.value = controller.value.text;
               widget.controller.flag = !pwdShow!;
             },
           ),
@@ -371,11 +347,8 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
   }
 
   Widget _buildRadioField(BuildContext context) {
-    FormInputController formInputController =
-        Provider.of<FormInputController>(context);
     widget.controller.controller = null;
-    var columnFieldDef = widget.columnFieldDef;
-    formInputController.setController(columnFieldDef.name, widget.controller);
+    var columnFieldDef = widget.controller.columnFieldDef;
     var options = columnFieldDef.options;
     List<Widget> children = [];
     if (options != null && options.isNotEmpty) {
@@ -399,11 +372,8 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
   }
 
   Widget _buildCheckboxField(BuildContext context) {
-    FormInputController formInputController =
-        Provider.of<FormInputController>(context);
     widget.controller.controller = null;
-    var columnFieldDef = widget.columnFieldDef;
-    formInputController.setController(columnFieldDef.name, widget.controller);
+    var columnFieldDef = widget.controller.columnFieldDef;
     var options = columnFieldDef.options;
     List<Widget> children = [];
     if (options != null && options.isNotEmpty) {
@@ -435,11 +405,8 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
   }
 
   Widget _buildSwitchField(BuildContext context) {
-    FormInputController formInputController =
-        Provider.of<FormInputController>(context);
     widget.controller.controller = null;
-    var columnFieldDef = widget.columnFieldDef;
-    formInputController.setController(columnFieldDef.name, widget.controller);
+    var columnFieldDef = widget.controller.columnFieldDef;
     var options = columnFieldDef.options;
     List<Widget> children = [];
     if (options != null && options.isNotEmpty) {
@@ -471,11 +438,8 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
   }
 
   Widget _buildDropdownButton(BuildContext context) {
-    FormInputController formInputController =
-        Provider.of<FormInputController>(context);
     widget.controller.controller = null;
-    var columnFieldDef = widget.columnFieldDef;
-    formInputController.setController(columnFieldDef.name, widget.controller);
+    var columnFieldDef = widget.controller.columnFieldDef;
     var options = columnFieldDef.options;
     List<DropdownMenuItem<String>> children = [];
     if (options != null && options.isNotEmpty) {
@@ -509,17 +473,14 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
   }
 
   Widget _buildInputDate(BuildContext context) {
-    FormInputController formInputController =
-        Provider.of<FormInputController>(context);
     var controller = TextEditingController();
-    var value = _getInitValue(context);
+    var value = widget.controller.value ?? '';
     controller.value = TextEditingValue(
         text: value,
         selection: TextSelection.fromPosition(TextPosition(
             offset: value.length, affinity: TextAffinity.downstream)));
     widget.controller.controller = controller;
-    var columnFieldDef = widget.columnFieldDef;
-    formInputController.setController(columnFieldDef.name, widget.controller);
+    var columnFieldDef = widget.controller.columnFieldDef;
     Widget? suffix;
     if (columnFieldDef.cancel) {
       suffix = controller.text.isNotEmpty
@@ -654,7 +615,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     Widget columnFieldWidget;
     var mode = widget.controller.mode;
     if (mode == ColumnFieldMode.custom) {
-      var customWidget = widget.columnFieldDef.customWidget;
+      var customWidget = widget.controller.columnFieldDef.customWidget;
       if (customWidget != null) {
         columnFieldWidget = customWidget;
         return columnFieldWidget;
@@ -662,13 +623,11 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     }
     if (mode == ColumnFieldMode.label) {
       columnFieldWidget = _buildLabel(context);
-    } else if (mode == ColumnFieldMode.show) {
-      columnFieldWidget = _buildLabel(context);
     } else if (mode == ColumnFieldMode.edit) {
-      var inputType = widget.columnFieldDef.inputType;
+      var inputType = widget.controller.columnFieldDef.inputType;
       switch (inputType) {
         case InputType.label:
-          columnFieldWidget = _buildShowLabel(context);
+          columnFieldWidget = _buildLabel(context);
           break;
         case InputType.text:
           columnFieldWidget = _buildTextFormField(context);

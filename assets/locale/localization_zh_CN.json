@@ -103,5 +103,8 @@
   "reconnecting": "正在重连",
   "failed": "连接失败",
   "connected": "已连接",
-  "closed": "连接关闭"
+  "closed": "连接关闭",
+  "Linkman edit": "联系人信息修改",
+  "Connectivity were break down": "网络连接中断",
+  "Connectivity status was changed to:": "网络连接状态："
 }

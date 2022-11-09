@@ -17,26 +17,20 @@ final DataListController<Linkman> linkmanController =
     DataListController<Linkman>();
 final DataListController<Group> groupController = DataListController<Group>();
 
-//联系人和群的查询界面
+///联系人和群的查询界面
 class LinkmanListWidget extends StatefulWidget with TileDataMixin {
+  //linkman和group的数据显示列表
   final GroupDataListController groupDataListController =
       GroupDataListController();
-  late final LinkmanInfoWidget linkmanInfoWidget;
-  late final LinkmanGroupInfoWidget groupInfoWidget;
-  late final LinkmanAddWidget linkmanAddWidget;
-  late final GroupAddWidget groupAddWidget;
+  final LinkmanInfoWidget linkmanInfoWidget = LinkmanInfoWidget();
+  final LinkmanGroupInfoWidget groupInfoWidget = LinkmanGroupInfoWidget();
+  final LinkmanAddWidget linkmanAddWidget = LinkmanAddWidget();
+  final GroupAddWidget groupAddWidget = GroupAddWidget();
 
   LinkmanListWidget({Key? key}) : super(key: key) {
-    linkmanInfoWidget = LinkmanInfoWidget();
     indexWidgetProvider.define(linkmanInfoWidget);
-
-    groupInfoWidget = LinkmanGroupInfoWidget();
     indexWidgetProvider.define(groupInfoWidget);
-
-    linkmanAddWidget = LinkmanAddWidget();
     indexWidgetProvider.define(linkmanAddWidget);
-
-    groupAddWidget = GroupAddWidget();
     indexWidgetProvider.define(groupAddWidget);
   }
 
@@ -62,6 +56,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
     super.initState();
     linkmanController.addListener(_update);
     groupController.addListener(_update);
+    widget.groupDataListController.addListener(_update);
     _buildGroupDataListController();
   }
 
@@ -100,6 +95,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
     return searchTextField;
   }
 
+  //将linkman和group数据转换从列表显示数据
   _buildGroupDataListController() {
     var linkmen = linkmanController.data;
     List<TileData> tiles = [];
@@ -111,6 +107,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
             prefix: linkman.avatar,
             title: title,
             subtitle: subtitle,
+            dense: false,
             routeName: 'linkman_info');
         tiles.add(tile);
       }
@@ -128,6 +125,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
             prefix: group.avatar,
             title: title,
             subtitle: subtitle,
+            dense: false,
             routeName: 'linkman_group_edit');
         tiles.add(tile);
       }
@@ -183,6 +181,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
   void dispose() {
     linkmanController.removeListener(_update);
     groupController.removeListener(_update);
+    widget.groupDataListController.removeListener(_update);
     super.dispose();
   }
 }

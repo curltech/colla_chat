@@ -103,14 +103,17 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
                 iconSize: 24.0,
                 icon: const Icon(Icons.add),
                 onPressed: () async {
-                  DialogUtil.info(context,
-                      content:
-                          AppLocalizations.t('Add peerClient as linkman:') +
-                              subtitle);
                   Linkman linkman =
                       await linkmanService.storeByPeerClient(peerClient);
-                  await linkmanService.update(
-                      {'id': linkman.id, 'status': LinkmanStatus.friend.name});
+                  await linkmanService.update({
+                    'id': linkman.id,
+                    'status': LinkmanStatus.friend.name
+                  }).then((value) {
+                    DialogUtil.info(context,
+                        content:
+                            AppLocalizations.t('Add peerClient as linkman:') +
+                                subtitle);
+                  });
                 },
               ));
           tiles.add(tile);

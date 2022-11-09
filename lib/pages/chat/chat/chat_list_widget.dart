@@ -95,10 +95,12 @@ class _ChatListWidgetState extends State<ChatListWidget> {
 
   _onConnectivityChanged(ConnectivityResult result) {
     if (result == ConnectivityResult.none) {
-      DialogUtil.error(context, content: 'Connectivity were break down');
+      DialogUtil.error(context,
+          content: AppLocalizations.t('Connectivity were break down'));
     } else {
       DialogUtil.info(context,
-          content: 'Connectivity status was changed to:${result.name}');
+          content: AppLocalizations.t('Connectivity status was changed to:') +
+              result.name);
     }
     setState(() {
       _result = result;
@@ -125,7 +127,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
             prefix: badge,
             title: title,
             subtitle: peerId,
-            dense:true,
+            dense: true,
             routeName: 'chat_message');
         tiles.add(tile);
       }
@@ -151,7 +153,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
             prefix: badge,
             title: title,
             subtitle: peerId,
-            dense:true,
+            dense: true,
             routeName: 'chat_message');
         tiles.add(tile);
       }
