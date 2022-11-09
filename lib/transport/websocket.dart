@@ -50,7 +50,6 @@ class Websocket implements IWebClient {
     register('', onData);
     //initHeartBeat();
     status = SocketStatus.connected;
-    reconnectTimes = 5;
     //logger.i('wss address:$address websocket connected');
   }
 
@@ -88,13 +87,13 @@ class Websocket implements IWebClient {
     logger.w(
         "wss address:$address websocket onDone. closeCode:$closeCode;closeReason:$closeReason");
     status = SocketStatus.closed;
-    reconnect();
+    _reconnect();
   }
 
   onError(err) async {
     logger.e("wss address:$address websocket onError, $err");
     status = SocketStatus.failed;
-    await reconnect();
+    await _reconnect();
   }
 
   SocketStatus get status {
@@ -172,8 +171,15 @@ class Websocket implements IWebClient {
     }
   }
 
-  /// 重连机制
   Future<void> reconnect() async {
+    if (_status == SocketStatus.closed || _status == SocketStatus.failed) {
+      reconnectTimes = 5;
+      _reconnect();
+    }
+  }
+
+  /// 重连机制
+  Future<void> _reconnect() async {
     Timer.periodic(Duration(milliseconds: heartTimes), (timer) async {
       if (reconnectTimes <= 0 || _status == SocketStatus.connected) {
         timer.cancel();

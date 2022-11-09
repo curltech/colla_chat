@@ -12,6 +12,8 @@ import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/tool/connectivity_util.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/transport/websocket.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -19,6 +21,7 @@ import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -71,6 +74,8 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _ChatListWidgetState extends State<ChatListWidget> {
+  ConnectivityResult _result = ConnectivityResult.none;
+
   @override
   initState() {
     super.initState();
@@ -81,10 +86,23 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         Provider.of<IndexWidgetProvider>(context, listen: false);
     indexWidgetProvider.define(widget.chatMessageView);
     websocketPool.addListener(_update);
+    ConnectivityUtil.onConnectivityChanged(_onConnectivityChanged);
   }
 
   _update() {
     setState(() {});
+  }
+
+  _onConnectivityChanged(ConnectivityResult result) {
+    if (result == ConnectivityResult.none) {
+      DialogUtil.error(context, content: 'Connectivity were break down');
+    } else {
+      DialogUtil.info(context,
+          content: 'Connectivity status was changed to:${result.name}');
+    }
+    setState(() {
+      _result = result;
+    });
   }
 
   _buildGroupDataListController() async {
@@ -107,6 +125,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
             prefix: badge,
             title: title,
             subtitle: peerId,
+            dense:true,
             routeName: 'chat_message');
         tiles.add(tile);
       }
@@ -132,6 +151,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
             prefix: badge,
             title: title,
             subtitle: peerId,
+            dense:true,
             routeName: 'chat_message');
         tiles.add(tile);
       }
@@ -170,15 +190,42 @@ class _ChatListWidgetState extends State<ChatListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    Websocket? websocket = websocketPool.getDefault();
     String title = AppLocalizations.t(widget.title);
+    List<Widget> rightWidgets = [];
+    var connectivityWidget =
+        Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      const SizedBox(
+        height: 3,
+      ),
+      Text(_result.name, style: const TextStyle(fontSize: 12)),
+      _result == ConnectivityResult.none
+          ? const Icon(Icons.wifi_off, size: 20)
+          : const Icon(Icons.wifi, size: 20),
+    ]);
+    rightWidgets.add(connectivityWidget);
+    rightWidgets.add(const SizedBox(
+      width: 10.0,
+    ));
+    Websocket? websocket = websocketPool.getDefault();
     if (websocket != null) {
       SocketStatus status = websocket.status;
-      title = '$title(${AppLocalizations.t(status.name)})';
+      var wssWidget = InkWell(
+          onTap: () {
+            websocket.reconnect();
+          },
+          child: status == SocketStatus.connected
+              ? const Icon(Icons.cloud_done)
+              : const Icon(Icons.cloud_off));
+      rightWidgets.add(wssWidget);
     }
+    rightWidgets.add(const SizedBox(
+      width: 10.0,
+    ));
 
     return AppBarView(
-        title: Text(title), child: _buildGroupDataListView(context));
+        title: Text(title),
+        rightWidgets: rightWidgets,
+        child: _buildGroupDataListView(context));
   }
 
   @override

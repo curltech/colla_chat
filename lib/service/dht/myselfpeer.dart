@@ -14,6 +14,7 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/service/dht/base.dart';
 import 'package:colla_chat/service/dht/myself.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
@@ -269,8 +270,8 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
   }
 
   @override
-  Future<String> updateAvatar(int id, List<int> avatar) async {
-    String data = await super.updateAvatar(id, avatar);
+  Future<String> updateAvatar(String peerId, List<int> avatar) async {
+    String data = await super.updateAvatar(peerId, avatar);
     final myselfPeer = myself.myselfPeer;
     if (myselfPeer != null) {
       myselfPeer.avatar = data;
@@ -281,6 +282,8 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       );
       myselfPeer.avatarImage = avatarImage;
       myself.avatarImage = avatarImage;
+      await peerClientService.updateAvatar(peerId, avatar);
+      await linkmanService.updateAvatar(peerId, avatar);
     }
 
     return data;

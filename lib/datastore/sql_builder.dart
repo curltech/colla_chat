@@ -150,7 +150,7 @@ class SqlBuilder {
       if (i == 0) {
         query = '${query + key} = ?';
       } else {
-        query = '${'$query, ' + key} = ?';
+        query = '${'$query, $key'} = ?';
       }
       ++i;
     }

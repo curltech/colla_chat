@@ -110,12 +110,19 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     ];
     name = name ?? '';
     String title = AppLocalizations.t(name!);
+    Widget titleWidget = Text(title);
+    List<Widget> rightWidgets = [];
     if (partyType == PartyType.linkman.name) {
-      title = '$title(${AppLocalizations.t(status!.name)})';
+      if (status == PeerConnectionStatus.connected) {
+        rightWidgets.add(const Icon(Icons.wifi));
+      } else {
+        rightWidgets.add(const Icon(Icons.wifi_off));
+      }
     }
     var appBarView = AppBarView(
-        title: Text(title),
+        title: titleWidget,
         withLeading: widget.withLeading,
+        rightWidgets: rightWidgets,
         child: IndexedStack(
             index: chatMessageController.viewIndex, children: children));
 

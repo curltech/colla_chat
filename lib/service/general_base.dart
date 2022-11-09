@@ -247,7 +247,7 @@ abstract class GeneralBaseService<T> {
     return json;
   }
 
-  Future<int> insert(dynamic entity, [dynamic? ignore, dynamic? parent]) async {
+  Future<int> insert(dynamic entity) async {
     EntityUtil.createTimestamp(entity);
     Map<String, dynamic> json = await encrypt(entity);
     int key = await dataStore.insert(tableName, json);
@@ -264,10 +264,15 @@ abstract class GeneralBaseService<T> {
   }
 
   /// 更新记录。根据entity的id字段作为条件，其他字段作为更新的值，entity可以是Map
-  Future<int> update(dynamic entity, [dynamic? ignore, dynamic? parent]) async {
+  Future<int> update(
+    dynamic entity, {
+    String? where,
+    List<Object>? whereArgs,
+  }) async {
     EntityUtil.updateTimestamp(entity);
     Map<String, dynamic> json = await encrypt(entity);
-    return await dataStore.update(tableName, json);
+    return await dataStore.update(tableName, json,
+        where: where, whereArgs: whereArgs);
   }
 
   /// 批量保存，根据脏标志新增，修改或者删除
@@ -281,12 +286,18 @@ abstract class GeneralBaseService<T> {
   }
 
   /// 根据_id是否存在逐条增加或者修改
-  Future<int> upsert(dynamic entity, [dynamic? ignore, dynamic? parent]) async {
+  Future<int> upsert(
+    dynamic entity, {
+    String? where,
+    List<Object>? whereArgs,
+  }) async {
     var id = EntityUtil.getId(entity);
     if (id != null) {
-      return await update(entity, ignore, parent);
+      return await update(entity, where: where, whereArgs: whereArgs);
     } else {
-      return await insert(entity, ignore, parent);
+      return await insert(
+        entity,
+      );
     }
   }
 

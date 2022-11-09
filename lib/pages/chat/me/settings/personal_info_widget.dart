@@ -74,14 +74,12 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
 
   @override
   Widget build(BuildContext context) {
-    int id = 0;
     String name;
     var peerId = myself.peerId;
     if (peerId == null) {
       peerId = '未登录';
       name = '未登录';
     } else {
-      id = myself.id!;
       name = myself.myselfPeer!.name;
     }
     final List<TileData> personalInfoTileData = [
@@ -94,7 +92,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
                   await FileUtil.pickFiles(type: FileType.image);
               if (filenames.isNotEmpty) {
                 List<int> avatar = await FileUtil.readFile(filenames[0]);
-                await myselfPeerService.updateAvatar(id, avatar);
+                await myselfPeerService.updateAvatar(peerId!, avatar);
                 setState(() {});
               }
             }

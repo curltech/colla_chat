@@ -32,16 +32,6 @@ class _IndexWidgetState extends State<IndexWidget>
   @override
   void initState() {
     super.initState();
-    ConnectivityUtil.onConnectivityChanged(_onConnectivityChanged);
-  }
-
-  _onConnectivityChanged(ConnectivityResult result) {
-    if (result == ConnectivityResult.none) {
-      DialogUtil.error(context, content: 'Connectivity were break down');
-    } else {
-      DialogUtil.info(context,
-          content: 'Connectivity status was changed to:${result.name}');
-    }
   }
 
   ///workspace工作区视图
