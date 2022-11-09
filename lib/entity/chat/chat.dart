@@ -334,7 +334,6 @@ class ChatSummary extends StatusEntity {
   String? messageType; // 最新的消息类型
   String? subMessageType; // 最新的消息子类型
   String? name; // 接收者或者发送者联系人或者群的名称
-  String? avatar; //头像
   String? title; // 标题
   String? receiptContent; // 回执内容
   String? thumbnail; // 预览缩略图（base64图片，适用需预览的content，如笔记、联系人名片）
@@ -355,7 +354,6 @@ class ChatSummary extends StatusEntity {
         messageId = json['messageId'],
         messageType = json['messageType'],
         subMessageType = json['subMessageType'],
-        avatar = json['avatar'],
         name = json['name'],
         title = json['title'],
         receiptContent = json['receiptContent'],
@@ -379,7 +377,6 @@ class ChatSummary extends StatusEntity {
       'messageId': messageId,
       'messageType': messageType,
       'subMessageType': subMessageType,
-      'avatar': avatar,
       'name': name,
       'title': title,
       'receiptContent': receiptContent,

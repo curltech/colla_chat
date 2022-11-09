@@ -3,6 +3,7 @@ import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/service/servicelocator.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:cryptography/cryptography.dart';
 
 import '../../entity/dht/peerclient.dart';
@@ -110,6 +111,23 @@ class PeerClientService extends PeerEntityService<PeerClient> {
     }
     peerClients[peerId]![clientId] = peerClient;
     await linkmanService.storeByPeerClient(peerClient);
+  }
+
+  @override
+  Future<String> updateAvatar(String peerId, List<int> avatar) async {
+    String data = await super.updateAvatar(peerId, avatar);
+    PeerClient? peerClient = await findCachedOneByPeerId(peerId);
+    if (peerClient != null) {
+      peerClient.avatar = data;
+      var avatarImage = ImageUtil.buildImageWidget(
+        image: data,
+        height: 32,
+        width: 32,
+      );
+      peerClient.avatarImage = avatarImage;
+    }
+
+    return data;
   }
 }
 

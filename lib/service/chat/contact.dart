@@ -19,16 +19,11 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as flutter_contacts;
 
-
 abstract class PeerPartyService<T> extends PeerEntityService<T> {
   PeerPartyService(
       {required super.tableName,
       required super.fields,
       required super.indexFields});
-
-
-
-
 }
 
 class LinkmanService extends PeerPartyService<Linkman> {
@@ -66,7 +61,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
       String? avatar = linkman.avatar;
       if (avatar != null) {
         var avatarImage = ImageUtil.buildImageWidget(
-          image:avatar,
+          image: avatar,
           height: 32,
           width: 32,
         );
@@ -151,6 +146,23 @@ class LinkmanService extends PeerPartyService<Linkman> {
     PeerClient peerClient = PeerClient.fromJson(map);
     await linkmanService.storeByPeerClient(peerClient);
   }
+
+  @override
+  Future<String> updateAvatar(String peerId, List<int> avatar) async {
+    String data = await super.updateAvatar(peerId, avatar);
+    Linkman? linkman = await findCachedOneByPeerId(peerId);
+    if (linkman != null) {
+      linkman.avatar = data;
+      var avatarImage = ImageUtil.buildImageWidget(
+        image: data,
+        height: 32,
+        width: 32,
+      );
+      linkman.avatarImage = avatarImage;
+    }
+
+    return data;
+  }
 }
 
 final linkmanService = LinkmanService(
@@ -217,7 +229,7 @@ class GroupService extends PeerPartyService<Group> {
       String? avatar = group.avatar;
       if (avatar != null) {
         var avatarImage = ImageUtil.buildImageWidget(
-          image:avatar,
+          image: avatar,
           height: 32,
           width: 32,
         );

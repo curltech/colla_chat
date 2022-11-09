@@ -86,8 +86,7 @@ class ChainMessageHandler {
       if (!success &&
           connectAddress != null &&
           connectAddress.startsWith('ws')) {
-        var websocketPool = await WebsocketPool.instance;
-        var websocket = await websocketPool.get(address: connectAddress);
+        var websocket = await websocketPool.get(connectAddress);
         if (websocket != null) {
           var data = MessageSerializer.marshal(msg);
           await websocket.sendMsg(data);
@@ -101,9 +100,7 @@ class ChainMessageHandler {
         if (httpClient != null) {
           var data = JsonUtil.toJsonString(msg);
           Response response = await httpClient.send('/receive', data);
-          if (response != null) {
-            result = response.data;
-          }
+          result = response.data;
           success = true;
         }
       }

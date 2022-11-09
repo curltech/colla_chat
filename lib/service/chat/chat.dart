@@ -630,12 +630,10 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummary.partyType = PartyType.linkman.name;
       chatSummary.status = linkman.status;
       chatSummary.name = linkman.name;
-      chatSummary.avatar = linkman.avatar;
       await insert(chatSummary);
       chatSummaries[chatSummary.peerId!] = chatSummary;
     } else {
       chatSummary.name = linkman.name;
-      chatSummary.avatar = linkman.avatar;
       await update(chatSummary);
     }
   }
@@ -648,12 +646,10 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummary.partyType = PartyType.group.name;
       chatSummary.subPartyType = group.groupType;
       chatSummary.name = group.name;
-      chatSummary.avatar = group.avatar;
       await insert(chatSummary);
       chatSummaries[chatSummary.peerId!] = chatSummary;
     } else {
       chatSummary.name = group.name;
-      chatSummary.avatar = group.avatar;
       await update(chatSummary);
     }
   }
@@ -679,7 +675,6 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
         Group? group = await groupService.findCachedOneByPeerId(groupPeerId);
         if (group != null) {
           chatSummary.name = group.name;
-          chatSummary.avatar = group.avatar;
         }
       }
     } else {
@@ -695,7 +690,6 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
               await linkmanService.findCachedOneByPeerId(senderPeerId);
           if (linkman != null) {
             chatSummary.name = linkman.name;
-            chatSummary.avatar = linkman.avatar;
           }
         }
       } else if (receiverPeerId != null && receiverPeerId != myself.peerId) {
@@ -710,7 +704,6 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
               await linkmanService.findCachedOneByPeerId(receiverPeerId);
           if (linkman != null) {
             chatSummary.name = linkman.name;
-            chatSummary.avatar = linkman.avatar;
           }
         }
       }
