@@ -1,16 +1,8 @@
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
-import 'package:colla_chat/entity/dht/peerclient.dart';
-import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/p2p/chain/action/findclient.dart';
-import 'package:colla_chat/p2p/chain/baseaction.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
-import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
-import 'package:colla_chat/service/dht/peerclient.dart';
-import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/nearby_connection.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
