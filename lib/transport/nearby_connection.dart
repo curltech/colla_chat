@@ -1,14 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
 
 enum DeviceType { advertiser, browser }
 
-class NearbyConnectionPool {
+class NearbyConnectionPool with ChangeNotifier {
   final nearbyService = NearbyService();
   final _nearbyConnections = <String, Device>{};
   final _connectedNearbyConnections = <String, Device>{};
@@ -17,20 +19,27 @@ class NearbyConnectionPool {
 
   NearbyConnectionPool();
 
+  Map<String, Device> get nearbyConnections {
+    return _nearbyConnections;
+  }
+
+  Map<String, Device> get connectedNearbyConnections {
+    return _connectedNearbyConnections;
+  }
+
   ///搜索附近的设备
-  void search(DeviceType deviceType) async {
+  Future<dynamic> search(DeviceType deviceType) async {
     String? devInfo;
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     if (platformParams.android) {
       AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
       devInfo = androidInfo.model;
-    }
-    if (platformParams.ios) {
+    } else if (platformParams.ios) {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
       devInfo = iosInfo.localizedModel;
     }
     devInfo = devInfo ?? '';
-    await nearbyService.init(
+    var result = await nearbyService.init(
         serviceType: 'mpconn',
         deviceName: devInfo,
         strategy: Strategy.P2P_CLUSTER,
@@ -69,37 +78,46 @@ class NearbyConnectionPool {
           _connectedNearbyConnections[device.deviceId] = device;
         }
       }
+      notifyListeners();
     });
 
     receivedDataSubscription =
         nearbyService.dataReceivedSubscription(callback: (message) {
       onMessage(message);
     });
+
+    return result;
   }
 
-  invitePeer(Device device) async {
+  FutureOr<dynamic> invitePeer(Device device) async {
     if (device.state == SessionState.notConnected) {
-      await nearbyService.invitePeer(
+      return await nearbyService.invitePeer(
         deviceID: device.deviceId,
         deviceName: device.deviceName,
       );
     }
   }
 
-  disconnectPeer(Device device) async {
+  FutureOr<dynamic> disconnectPeer(Device device) async {
     if (device.state == SessionState.connected) {
-      await nearbyService.disconnectPeer(deviceID: device.deviceId);
+      return await nearbyService.disconnectPeer(deviceID: device.deviceId);
     }
   }
 
-  FutureOr<dynamic> send(String deviceId, String message) {
-    return nearbyService.sendMessage(deviceId, message);
+  FutureOr<dynamic> send(String deviceId, List<int> data) {
+    String message = CryptoUtil.encodeBase64(data);
+    if (_connectedNearbyConnections.containsKey(deviceId)) {
+      return nearbyService.sendMessage(deviceId, message);
+    } else {
+      return false;
+    }
   }
 
   onMessage(dynamic message) {
     logger.i("dataReceivedSubscription: ${jsonEncode(message)}");
   }
 
+  @override
   void dispose() {
     if (subscription != null) {
       subscription!.cancel();
@@ -111,6 +129,7 @@ class NearbyConnectionPool {
     }
     nearbyService.stopBrowsingForPeers();
     nearbyService.stopAdvertisingPeer();
+    super.dispose();
   }
 }
 

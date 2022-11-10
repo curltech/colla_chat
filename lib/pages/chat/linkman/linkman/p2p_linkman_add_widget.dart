@@ -52,7 +52,7 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
   initState() {
     super.initState();
     widget.controller.addListener(_update);
-    findClientAction.registerResponser(_responsePeerClients);
+    findClientAction.registerResponsor(_responsePeerClients);
   }
 
   _update() {
@@ -95,27 +95,35 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
       if (peerClients.isNotEmpty) {
         for (var peerClient in peerClients) {
           var title = peerClient.name;
-          var subtitle = peerClient.peerId;
-          TileData tile = TileData(
-              title: title,
-              subtitle: subtitle,
-              suffix: IconButton(
-                iconSize: 24.0,
-                icon: const Icon(Icons.add),
-                onPressed: () async {
-                  Linkman linkman =
-                      await linkmanService.storeByPeerClient(peerClient);
-                  await linkmanService.update({
-                    'id': linkman.id,
-                    'status': LinkmanStatus.friend.name
-                  }).then((value) {
-                    DialogUtil.info(context,
-                        content:
-                            AppLocalizations.t('Add peerClient as linkman:') +
-                                subtitle);
-                  });
-                },
-              ));
+          var peerId = peerClient.peerId;
+          Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+          bool isStranger = false;
+          if (linkman != null &&
+              linkman.status == LinkmanStatus.stranger.name) {
+            isStranger = true;
+          }
+          Widget suffix = Text(AppLocalizations.t(linkman!.status!));
+          if (isStranger) {
+            suffix = IconButton(
+              iconSize: 24.0,
+              icon: const Icon(Icons.person_add),
+              onPressed: () async {
+                Linkman linkman =
+                    await linkmanService.storeByPeerClient(peerClient);
+                await linkmanService.update({
+                  'id': linkman.id,
+                  'status': LinkmanStatus.friend.name
+                }).then((value) {
+                  DialogUtil.info(context,
+                      content:
+                          AppLocalizations.t('Add peerClient as linkman:') +
+                              peerId);
+                });
+              },
+            );
+          }
+          TileData tile =
+              TileData(title: title, subtitle: peerId, suffix: suffix);
           tiles.add(tile);
         }
       }
@@ -155,6 +163,7 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
   void dispose() {
     widget.controller.removeListener(_update);
     controller.dispose();
+    findClientAction.unregisterResponsor(_responsePeerClients);
     super.dispose();
   }
 }

@@ -130,24 +130,27 @@ class Websocket implements IWebClient {
     }
   }
 
-  sendMsg(dynamic data) {
+  FutureOr<bool> sendMsg(dynamic data) async {
     if (channel != null && _status == SocketStatus.connected) {
       channel!.sink.add(data);
+      return true;
     } else {
       logger.e('status is not connected');
-      reconnect().then((value) {
-        if (channel != null && _status == SocketStatus.connected) {
-          sendMsg(data);
-        }
-      });
+      await reconnect();
+      if (channel != null && _status == SocketStatus.connected) {
+        return sendMsg(data);
+      } else {
+        return false;
+      }
     }
   }
 
   @override
-  send(String url, dynamic data) {
+  FutureOr<bool> send(String url, dynamic data) async {
     var message = {url: url, data: data};
     var json = JsonUtil.toJsonString(message);
-    sendMsg(json);
+
+    return sendMsg(json);
   }
 
   @override

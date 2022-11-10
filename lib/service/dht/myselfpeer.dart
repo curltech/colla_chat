@@ -41,7 +41,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     post = (Map map) {
       return MyselfPeer.fromJson(map);
     };
-    connectAction.registerResponser(_connectResponse);
+    connectAction.registerResponsor(_connectResponse);
   }
 
   Future<void> _connectResponse(ChainMessage chainMessage) async {

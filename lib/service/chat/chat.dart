@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/base.dart';
+import 'package:colla_chat/p2p/chain/action/p2pchat.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
@@ -10,6 +11,8 @@ import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/transport/nearby_connection.dart';
+import 'package:colla_chat/transport/websocket.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
@@ -368,17 +371,32 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return chatMessages;
   }
 
-  sendAndStore(ChatMessage chatMessage,
+  Future<ChatMessage> sendAndStore(ChatMessage chatMessage,
       {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     var peerId = chatMessage.receiverPeerId;
     var clientId = chatMessage.receiverClientId;
     if (peerId != null) {
       String json = JsonUtil.toJsonString(chatMessage);
       var data = CryptoUtil.stringToUtf8(json);
-      await peerConnectionPool.send(peerId, Uint8List.fromList(data),
-          clientId: clientId, cryptoOption: cryptoOption);
+      var transportType = chatMessage.transportType;
+      if (transportType == TransportType.webrtc.name) {
+        bool success = await peerConnectionPool.send(
+            peerId, Uint8List.fromList(data),
+            clientId: clientId, cryptoOption: cryptoOption);
+        if (!success) {
+          chatMessage.transportType = TransportType.websocket.name;
+        }
+      }
+      if (transportType == TransportType.nearby.name) {
+        nearbyConnectionPool.send(chatMessage.receiverPeerId!, data);
+      }
+      if (transportType == TransportType.websocket.name) {
+        p2pChatAction.chat(Uint8List.fromList(data), peerId);
+      }
     }
     await chatMessageService.store(chatMessage);
+
+    return chatMessage;
   }
 
   store(ChatMessage chatMessage, {bool updateSummary = true}) async {

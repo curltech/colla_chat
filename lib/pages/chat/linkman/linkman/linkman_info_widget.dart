@@ -95,21 +95,24 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
     );
   }
 
-  _changeFriend({String? tip}) async {
-    linkman!.status = LinkmanStatus.friend.name;
-    await linkmanService
-        .update({'id': linkman!.id, 'status': LinkmanStatus.friend.name});
+  _addFriend({String? tip}) async {
+    await _changeStatus(LinkmanStatus.friend);
     // 加好友会发送自己的信息，回执将收到对方的信息
-    await linkmanService.addFriend(linkman!, tip!);
+    await linkmanService.addFriend(linkman!.peerId, tip!);
   }
 
   _changeStatus(LinkmanStatus status) async {
-    await linkmanService.update({'id': linkman!.id, 'status': status.name});
+    int id = linkman!.id!;
+    await linkmanService.update({'id': id, 'status': status.name});
+    linkman = await linkmanService.findOne(where: 'id=?', whereArgs: [id]);
+    linkmanController.current = linkman;
   }
 
   _changeSubscriptStatus(LinkmanStatus status) async {
-    await linkmanService
-        .update({'id': linkman!.id, 'subscriptStatus': status.name});
+    int id = linkman!.id!;
+    await linkmanService.update({'id': id, 'subscriptStatus': status.name});
+    linkman = await linkmanService.findOne(where: 'id=?', whereArgs: [id]);
+    linkmanController.current = linkman;
   }
 
   Widget _buildAddFriendTextField(BuildContext context) {
@@ -127,7 +130,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
               labelText: AppLocalizations.t('Add Friend'),
               suffixIcon: IconButton(
                 onPressed: () {
-                  _changeFriend(tip: controller.text);
+                  _addFriend(tip: controller.text);
                 },
                 icon: const Icon(Icons.person_add),
               ),
@@ -141,28 +144,13 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
     double height = 180;
     final List<ActionData> actionData = [];
     if (linkman != null) {
-      // actionData.add(
-      //   ActionData(
-      //       label: AppLocalizations.t('Update avatar'),
-      //       icon: const Icon(Icons.face),
-      //       onTap: (int index, String label, {String? value}) async {
-      //         if (platformParams.windows) {
-      //           List<String> filenames =
-      //               await FileUtil.pickFiles(type: FileType.image);
-      //           if (filenames.isNotEmpty) {
-      //             List<int> avatar = await FileUtil.readFile(filenames[0]);
-      //             myselfPeerService.updateAvatar(myself.peerId!, avatar);
-      //           }
-      //         }
-      //       }),
-      // );
       if (linkman!.status == LinkmanStatus.friend.name) {
         actionData.add(
           ActionData(
               label: AppLocalizations.t('Remove friend'),
               icon: const Icon(Icons.person_remove),
               onTap: (int index, String label, {String? value}) {
-                _changeStatus(LinkmanStatus.none);
+                _changeStatus(LinkmanStatus.stranger);
               }),
         );
       } else {
@@ -174,7 +162,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
               label: AppLocalizations.t('Remove blacklist'),
               icon: const Icon(Icons.person_outlined),
               onTap: (int index, String label, {String? value}) {
-                _changeStatus(LinkmanStatus.none);
+                _changeStatus(LinkmanStatus.stranger);
               }),
         );
       } else {
@@ -191,7 +179,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
               label: AppLocalizations.t('Remove subscript'),
               icon: const Icon(Icons.unsubscribe),
               onTap: (int index, String label, {String? value}) {
-                _changeSubscriptStatus(LinkmanStatus.none);
+                _changeSubscriptStatus(LinkmanStatus.stranger);
               }),
         );
       } else {
@@ -206,7 +194,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
     actionWidgets.add(DataActionCard(
       actions: actionData,
       height: height,
-      crossAxisCount: 3,
+      crossAxisCount: 4,
     ));
     return Container(
       margin: const EdgeInsets.all(0.0),

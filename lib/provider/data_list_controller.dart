@@ -33,6 +33,13 @@ class DataListController<T> with ChangeNotifier {
     return null;
   }
 
+  set current(T? element) {
+    if (_currentIndex > -1 && element != null) {
+      data[_currentIndex] = element;
+      notifyListeners();
+    }
+  }
+
   int get currentIndex {
     return _currentIndex;
   }

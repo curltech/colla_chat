@@ -73,7 +73,7 @@ abstract class BaseAction {
   late MsgType msgType;
   List<dynamic Function(ChainMessage)> receivers = [];
 
-  List<Future<void> Function(ChainMessage)> responsers = [];
+  List<Future<void> Function(ChainMessage)> responsors = [];
 
   BaseAction(this.msgType) {
     chainMessageDispatch.registerChainMessageHandler(
@@ -85,8 +85,16 @@ abstract class BaseAction {
     receivers.add(receiver);
   }
 
-  void registerResponser(Future<void> Function(ChainMessage) responser) {
-    responsers.add(responser);
+  void registerResponsor(Future<void> Function(ChainMessage) responsor) {
+    responsors.add(responsor);
+  }
+
+  void unregisterReceiver(dynamic Function(ChainMessage) receiver) {
+    receivers.remove(receiver);
+  }
+
+  void unregisterResponsor(Future<void> Function(ChainMessage) responsor) {
+    responsors.remove(responsor);
   }
 
   ///发送前的预处理，设置消息的初始值
@@ -199,10 +207,10 @@ abstract class BaseAction {
   /// 缺省的行为是调用注册的返回处理器
   /// 子类可以覆盖这个方法，或者注册自己的返回处理器
   Future<void> response(ChainMessage chainMessage) async {
-    if (responsers.isNotEmpty) {
+    if (responsors.isNotEmpty) {
       await transferPayload(chainMessage);
-      for (var responser in responsers) {
-        responser(chainMessage);
+      for (var responsor in responsors) {
+        responsor(chainMessage);
       }
     }
     return;

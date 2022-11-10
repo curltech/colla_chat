@@ -50,7 +50,7 @@ class _FaceGroupAddWidgetState extends State<FaceGroupAddWidget> {
   initState() {
     super.initState();
     widget.controller.addListener(_update);
-    findClientAction.registerResponser(_responsePeerClients);
+    findClientAction.registerResponsor(_responsePeerClients);
   }
 
   _update() {
