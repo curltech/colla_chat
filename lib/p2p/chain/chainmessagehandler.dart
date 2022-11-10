@@ -89,8 +89,7 @@ class ChainMessageHandler {
         var websocket = await websocketPool.get(connectAddress);
         if (websocket != null) {
           var data = MessageSerializer.marshal(msg);
-          await websocket.sendMsg(data);
-          success = true;
+          success = await websocket.sendMsg(data);
         }
       }
       if (!success &&

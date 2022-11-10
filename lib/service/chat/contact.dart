@@ -119,36 +119,45 @@ class LinkmanService extends PeerPartyService<Linkman> {
     return linkman;
   }
 
-  addFriend(Linkman linkman, String title) async {
+  ///发出加好友的请求
+  Future<ChatMessage> addFriend(
+    String peerId,
+    String title, {
+    TransportType transportType = TransportType.webrtc,
+  }) async {
     // 加好友会发送自己的信息，回执将收到对方的信息
     String json = JsonUtil.toJsonString(myself.myselfPeer);
     List<int> data = CryptoUtil.stringToUtf8(json);
-    ChatMessage chatMessage = await chatMessageService.buildChatMessage(
-        linkman.peerId,
+    ChatMessage chatMessage = await chatMessageService.buildChatMessage(peerId,
         data: data,
         subMessageType: ChatSubMessageType.addFriend,
+        transportType: transportType,
         title: title);
-    await chatMessageService.sendAndStore(chatMessage);
+    return await chatMessageService.sendAndStore(chatMessage);
   }
 
-  receiveAddFriend(ChatMessage chatMessage, MessageStatus receiptType) async {
+  ///接收到加好友的请求，发送回执
+  Future<ChatMessage> receiveAddFriend(
+      ChatMessage chatMessage, MessageStatus receiptType) async {
     String json = JsonUtil.toJsonString(myself.myselfPeer);
     ChatMessage? chatReceipt =
         await chatMessageService.buildChatReceipt(chatMessage, receiptType);
     if (receiptType == MessageStatus.accepted) {
       chatReceipt!.content = json;
     }
-    await chatMessageService.sendAndStore(chatReceipt!);
+    return await chatMessageService.sendAndStore(chatReceipt!);
   }
 
-  receiveAddFriendReceipt(ChatMessage chatReceipt) async {
+  ///接收到加好友的回执
+  Future<Linkman> receiveAddFriendReceipt(ChatMessage chatReceipt) async {
     Uint8List data = CryptoUtil.decodeBase64(chatReceipt.content!);
     String json = CryptoUtil.utf8ToString(data);
     Map<String, dynamic> map = JsonUtil.toJson(json);
     PeerClient peerClient = PeerClient.fromJson(map);
-    await linkmanService.storeByPeerClient(peerClient);
+    return await linkmanService.storeByPeerClient(peerClient);
   }
 
+  ///更新头像
   @override
   Future<String> updateAvatar(String peerId, List<int> avatar) async {
     String data = await super.updateAvatar(peerId, avatar);

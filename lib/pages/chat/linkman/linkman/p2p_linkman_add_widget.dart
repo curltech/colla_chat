@@ -97,15 +97,16 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
           var title = peerClient.name;
           var peerId = peerClient.peerId;
           Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
-          bool isFriend = false;
-          if (linkman != null && linkman.status == LinkmanStatus.friend.name) {
-            isFriend = true;
+          bool isStranger = false;
+          if (linkman != null &&
+              linkman.status == LinkmanStatus.stranger.name) {
+            isStranger = true;
           }
-          Widget suffix = Text(AppLocalizations.t('friend'));
-          if (!isFriend) {
+          Widget suffix = Text(AppLocalizations.t(linkman!.status!));
+          if (isStranger) {
             suffix = IconButton(
               iconSize: 24.0,
-              icon: const Icon(Icons.add),
+              icon: const Icon(Icons.person_add),
               onPressed: () async {
                 Linkman linkman =
                     await linkmanService.storeByPeerClient(peerClient);

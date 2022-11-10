@@ -1,3 +1,4 @@
+import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
@@ -6,9 +7,11 @@ import 'package:colla_chat/p2p/chain/action/findclient.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/transport/nearby_connection.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -50,76 +53,53 @@ class _NearbyLinkmanAddWidgetState extends State<NearbyLinkmanAddWidget> {
   initState() {
     super.initState();
     widget.controller.addListener(_update);
-    findClientAction.registerResponsor(_responsePeerClients);
+    nearbyConnectionPool.addListener(_update);
+    nearbyConnectionPool.search(DeviceType.advertiser);
   }
 
   _update() {
     setState(() {});
   }
 
-  _buildSearchTextField(BuildContext context) {
-    var searchTextField = TextFormField(
-        controller: controller,
-        keyboardType: TextInputType.text,
-        decoration: InputDecoration(
-          labelText: AppLocalizations.t('PeerId/Mobile/Email/Name'),
-          suffixIcon: IconButton(
-            onPressed: () {
-              _search(controller.text);
+  _changeStatus(Linkman linkman, LinkmanStatus status) async {
+    int id = linkman.id!;
+    await linkmanService.update({'id': id, 'status': status.name});
+  }
+
+  Future<void> _transferTiles(BuildContext context) async {
+    List<TileData> tiles = [];
+    if (nearbyConnectionPool.nearbyConnections.isNotEmpty) {
+      for (var device in nearbyConnectionPool.nearbyConnections.values) {
+        var title = device.deviceName ?? '';
+        var subtitle = device.deviceId ?? '';
+        var connected = nearbyConnectionPool.connectedNearbyConnections
+            .containsKey(device.deviceId);
+        Widget suffix;
+        if (connected) {
+          suffix = IconButton(
+            iconSize: 24.0,
+            icon: const Icon(Icons.person_add),
+            onPressed: () async {
+              // 加好友会发送自己的信息，回执将收到对方的信息
+              await linkmanService.addFriend(subtitle, '',
+                  transportType: TransportType.nearby);
             },
-            icon: const Icon(Icons.search),
-          ),
-        ));
-
-    return searchTextField;
-  }
-
-  Future<void> _responsePeerClients(ChainMessage chainMessage) async {
-    if (chainMessage.payloadType == PayloadType.peerClients.name) {
-      List<PeerClient> peerClients = chainMessage.payload;
-      if (peerClients.isNotEmpty) {
-        for (var peerClient in peerClients) {
-          peerClientService.store(peerClient);
+          );
+        } else {
+          suffix = IconButton(
+            iconSize: 24.0,
+            icon: const Icon(Icons.bluetooth_connected),
+            onPressed: () async {
+              await nearbyConnectionPool.invitePeer(device);
+            },
+          );
         }
+        TileData tile =
+            TileData(title: title, subtitle: subtitle, suffix: suffix);
+        tiles.add(tile);
       }
-
-      List<TileData> tiles = [];
-      if (peerClients.isNotEmpty) {
-        for (var peerClient in peerClients) {
-          var title = peerClient.name ?? '';
-          var subtitle = peerClient.peerId ?? '';
-          TileData tile = TileData(
-              title: title,
-              subtitle: subtitle,
-              suffix: IconButton(
-                iconSize: 24.0,
-                icon: const Icon(Icons.add),
-                onPressed: () async {
-                  logger.i('add peerClient:$subtitle as linkman');
-                  Linkman linkman =
-                      await linkmanService.storeByPeerClient(peerClient);
-                  await linkmanService.update(
-                      {'id': linkman.id, 'status': LinkmanStatus.friend.name});
-                },
-              ));
-          tiles.add(tile);
-        }
-      }
-      widget.controller.replaceAll(tiles);
     }
-  }
-
-  Future<void> _search(String key) async {
-    String email = '';
-    if (key.contains('@')) {
-      email = key;
-    }
-    String mobile = '';
-    bool isPhoneNumber = StringUtil.isNumeric(key);
-    if (isPhoneNumber) {
-      mobile = key;
-    }
-    findClientAction.findClient(key, mobile, email, key);
+    widget.controller.replaceAll(tiles);
   }
 
   @override
@@ -127,13 +107,13 @@ class _NearbyLinkmanAddWidgetState extends State<NearbyLinkmanAddWidget> {
     return AppBarView(
         withLeading: true,
         title: Text(AppLocalizations.t(widget.title)),
-        child: Column(
-            children: [_buildSearchTextField(context), widget.dataListView]));
+        child: Column(children: [widget.dataListView]));
   }
 
   @override
   void dispose() {
     widget.controller.removeListener(_update);
+    nearbyConnectionPool.removeListener(_update);
     controller.dispose();
     super.dispose();
   }

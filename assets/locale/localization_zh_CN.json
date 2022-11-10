@@ -106,5 +106,9 @@
   "closed": "连接关闭",
   "Linkman edit": "联系人信息修改",
   "Connectivity were break down": "网络连接中断",
-  "Connectivity status was changed to:": "网络连接状态："
+  "Connectivity status was changed to:": "网络连接状态：",
+  "friend": "好友",
+  "stranger": "陌生人",
+  "blacklist": "黑名单",
+  "subscript": "订阅"
 }

@@ -98,7 +98,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
   _addFriend({String? tip}) async {
     await _changeStatus(LinkmanStatus.friend);
     // 加好友会发送自己的信息，回执将收到对方的信息
-    await linkmanService.addFriend(linkman!, tip!);
+    await linkmanService.addFriend(linkman!.peerId, tip!);
   }
 
   _changeStatus(LinkmanStatus status) async {
@@ -150,7 +150,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
               label: AppLocalizations.t('Remove friend'),
               icon: const Icon(Icons.person_remove),
               onTap: (int index, String label, {String? value}) {
-                _changeStatus(LinkmanStatus.none);
+                _changeStatus(LinkmanStatus.stranger);
               }),
         );
       } else {
@@ -162,7 +162,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
               label: AppLocalizations.t('Remove blacklist'),
               icon: const Icon(Icons.person_outlined),
               onTap: (int index, String label, {String? value}) {
-                _changeStatus(LinkmanStatus.none);
+                _changeStatus(LinkmanStatus.stranger);
               }),
         );
       } else {
@@ -179,7 +179,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
               label: AppLocalizations.t('Remove subscript'),
               icon: const Icon(Icons.unsubscribe),
               onTap: (int index, String label, {String? value}) {
-                _changeSubscriptStatus(LinkmanStatus.none);
+                _changeSubscriptStatus(LinkmanStatus.stranger);
               }),
         );
       } else {

@@ -86,13 +86,15 @@ abstract class PeerParty extends PeerEntity {
 }
 
 enum LinkmanStatus {
-  none, //陌生人
+  none,
+  stranger, //陌生人
   friend, //好友
   blacklist, //黑名单
   subscript, //订阅
 }
 
 /// 联系人，和设备绑定登录成为PeerClient，可能是好友（friend）或者普通联系人
+/// 一个linkman对应多个peerclient
 /// 意味可以进行普通的文本，语音和视频通话
 class Linkman extends PeerParty {
   //用于区分是否是好友，只有好友才能直接聊天

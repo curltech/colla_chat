@@ -80,14 +80,15 @@ enum PartyType { linkman, group, peerClient, contact, channel, room }
 
 enum ChatDirect { receive, send }
 
-enum TransportType { websocket, webrtc, email, sms }
+enum TransportType { websocket, webrtc, email, sms, nearby }
 
 // 消息，泛指一切社交复合文档，最简单的是一句话，最复杂可以是非常复杂的混合文本，图片，视频的文档
 class ChatMessage extends StatusEntity {
-  String? transportType; // 包括：websocket,webrtc,mail,sms
+  String transportType =
+      TransportType.webrtc.name; // 包括：websocket,webrtc,mail,sms
   String? messageId; // 消息的唯一id标识
-  String messageType = ''; // 消息类型（对应channel消息类型）
-  String? subMessageType;
+  String messageType = ChatMessageType.chat.name; // 消息类型（对应channel消息类型）
+  String subMessageType = ChatSubMessageType.chat.name;
   String? direct; //对自己而言，消息是属于发送或者接受
 
   ///当发送者向群，自己作为群成员或者我发消息，填写发送者的信息
@@ -143,7 +144,7 @@ class ChatMessage extends StatusEntity {
 
   ChatMessage.fromJson(Map json)
       : receiverType = json['receiverType'],
-        transportType = json['transportType'],
+        transportType = json['transportType'] ?? TransportType.webrtc.name,
         direct = json['direct'],
         receiverPeerId = json['receiverPeerId'],
         receiverClientId = json['receiverClientId'],
@@ -152,8 +153,8 @@ class ChatMessage extends StatusEntity {
         groupName = json['groupName'],
         receiverAddress = json['receiverAddress'],
         messageId = json['messageId'],
-        messageType = json['messageType'],
-        subMessageType = json['subMessageType'],
+        messageType = json['messageType'] ?? ChatMessageType.chat.name,
+        subMessageType = json['subMessageType'] ?? ChatSubMessageType.chat.name,
         senderPeerId = json['senderPeerId'],
         senderClientId = json['senderClientId'],
         senderName = json['senderName'],
