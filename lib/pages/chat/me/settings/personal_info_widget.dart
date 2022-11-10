@@ -3,12 +3,14 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/qrcode_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
+import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 import '../../../../provider/index_widget_provider.dart';
 import '../../../../routers/routes.dart';
@@ -87,15 +89,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
           title: AppLocalizations.t('Avatar'),
           suffix: myself.avatarImage,
           onTap: (int index, String label, {String? value}) async {
-            if (platformParams.windows) {
-              List<String> filenames =
-                  await FileUtil.pickFiles(type: FileType.image);
-              if (filenames.isNotEmpty) {
-                List<int> avatar = await FileUtil.readFile(filenames[0]);
-                await myselfPeerService.updateAvatar(peerId!, avatar);
-                setState(() {});
-              }
-            }
+            await _pickAvatar(peerId, context);
           }),
       TileData(
         title: AppLocalizations.t('Name'),
@@ -123,5 +117,26 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
     );
 
     return personalInfo;
+  }
+
+  Future<void> _pickAvatar(String? peerId, BuildContext context) async {
+    if (platformParams.desktop) {
+      List<String> filenames =
+          await FileUtil.pickFiles(type: FileType.image);
+      if (filenames.isNotEmpty) {
+        List<int> avatar = await FileUtil.readFile(filenames[0]);
+        await myselfPeerService.updateAvatar(peerId!, avatar);
+        setState(() {});
+      }
+    } else if (platformParams.mobile) {
+      List<AssetEntity>? assets = await AssetUtil.pickAssets(context);
+      if (assets != null && assets.isNotEmpty) {
+        List<int>? avatar = await assets[0].originBytes;
+        if (avatar != null) {
+          await myselfPeerService.updateAvatar(peerId!, avatar);
+          setState(() {});
+        }
+      }
+    }
   }
 }

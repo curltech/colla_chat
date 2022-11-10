@@ -7,6 +7,8 @@ import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
+import 'package:colla_chat/entity/p2p/chain_message.dart';
+import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/dht/base.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
@@ -659,86 +661,71 @@ class ContactService extends PeerPartyService<Contact> {
   }
 
   /// 获取手机电话本的数据填充peerContacts数组，校验是否好友，是否存在peerId
-  /// @param {*} peerContacts
-  /// @param {*} linkmans
-  fillPeerContact(List<dynamic> peerContacts, List<Linkman> linkmans) async {
-    List<flutter_contacts.Contact> contacts = await ContactUtil.getContacts();
+  Future<List<Contact>> syncContact() async {
+    List<flutter_contacts.Contact> mobileContacts =
+        await ContactUtil.getContacts();
     // 把通讯录的数据规整化，包含手机号和名称，然后根据手机号建立索引
-    var peerContactMap = Map();
-    if (contacts.isNotEmpty) {
-      for (var contact in contacts) {
-        Contact peerContact =
-            Contact('', contact.name.last + contact.name.first);
-        if (contact.name != null) {
-          peerContact.formattedName = contact.name.toString();
-          //peerContact.pyFormattedName = pinyinUtil.getPinyin(peerContact.formattedName);
-        }
-        if (contact.phones != null && contact.phones.isNotEmpty) {
-          for (var phoneNumber in contact.phones) {
+    var mobileContactMap = {};
+    if (mobileContacts.isNotEmpty) {
+      for (var mobileContact in mobileContacts) {
+        Contact contact =
+            Contact('', mobileContact.name.last + mobileContact.name.first);
+        contact.formattedName = contact.name.toString();
+        //contact.pyFormattedName = pinyinUtil.getPinyin(contact.formattedName);
+        if (mobileContact.phones.isNotEmpty) {
+          for (var phoneNumber in mobileContact.phones) {
             if (phoneNumber.isPrimary) {
-              peerContact.mobile = phoneNumber.normalizedNumber;
+              contact.mobile = phoneNumber.normalizedNumber;
               break;
             }
           }
-          if (peerContact.mobile == null) {
-            var mobile = contact.phones[0].normalizedNumber;
-            peerContact.mobile = await formatMobile(mobile);
+          if (contact.mobile == null) {
+            var mobile = mobileContact.phones[0].normalizedNumber;
+            contact.mobile = await formatMobile(mobile);
           }
         }
-        peerContactMap[peerContact.mobile] = peerContact;
+        mobileContactMap[contact.mobile] = contact;
       }
     }
     // 遍历本地库的记录，根据手机号检查索引
-    List<Map> pContacts = await findAll() as List<Map>;
-    if (pContacts.isNotEmpty) {
-      for (var pContact in pContacts) {
+    List<Contact> lastContacts = [];
+    List<Contact> contacts = await findAll();
+    if (contacts.isNotEmpty) {
+      for (var contact in contacts) {
         // 如果通讯录中存在，将本地匹配记录放入结果集
-        var peerContact = peerContactMap[pContact['mobile']];
-        if (peerContact) {
-          peerContacts.add(pContact);
-          peerContactMap.remove(pContact['mobile']);
+        var mobile = contact.mobile;
+        var mobileContact = mobileContactMap[mobile];
+        if (mobileContact != null) {
+          mobileContactMap.remove(mobile);
+          lastContacts.add(contact);
         } else {
           // 如果通讯录不存在，则本地库删除
-          this.delete(pContact);
+          await delete(contact);
         }
       }
     }
     // 通讯录中剩余的记录，新增的记录将被检查好友记录和服务器记录，然后插入本地库并加入结果集
-    var leftPeerContacts = peerContactMap.values;
-    if (leftPeerContacts != null) {
-      for (var leftPeerContact in leftPeerContacts) {
-        var pc = this.updateByLinkman(leftPeerContact, linkmans);
-        if (pc == null) {
-          pc = await this.refresh(leftPeerContact);
-        }
-        if (pc != null) {
-          insert(leftPeerContact);
-        }
-        peerContacts.add(leftPeerContact);
-      }
+    var leftContacts = mobileContactMap.values;
+    for (var leftContact in leftContacts) {
+      await insert(leftContact);
+      lastContacts.add(leftContact);
     }
+
+    return lastContacts;
   }
 
-  Contact? updateByLinkman(Contact peerContact, List<Linkman> linkmans) {
-    if (linkmans.isNotEmpty) {
-      for (var linkman in linkmans) {
-        if (linkman.mobile == peerContact.mobile) {
-          peerContact.peerId = linkman.peerId;
-          peerContact.name = linkman.name;
-          peerContact.pyName = linkman.pyName;
-          peerContact.givenName = linkman.givenName;
-          peerContact.pyGivenName = linkman.pyGivenName;
-          peerContact.locked = linkman.locked;
-          peerContact.status = linkman.status;
-          peerContact.publicKey = linkman.publicKey;
-          peerContact.avatar = linkman.avatar;
-          peerContact.linkman = true;
-
-          return peerContact;
-        }
-      }
+  Future<List<Contact>> search(String key) async {
+    if (StringUtil.isEmpty(key)) {
+      return await findAll();
     }
-    return null;
+    var where = 'peerId=? or mobile=? or name=? or pyName=? or email=?';
+    var whereArgs = [key, key, key, key, key];
+    var contacts = await find(
+      where: where,
+      whereArgs: whereArgs,
+      orderBy: 'pyName',
+    );
+    return contacts;
   }
 
   // 从服务器端获取是否有peerClient

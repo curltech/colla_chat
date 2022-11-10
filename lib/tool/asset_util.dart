@@ -34,7 +34,7 @@ class AssetUtil {
   }
 
   /// AssetEntityImage
-  static buildAssetEntityImage(
+  static Image buildAssetEntityImage(
     AssetEntity entity, {
     bool isOriginal = true,
     ThumbnailSize? thumbnailSize = const ThumbnailSize.square(200),

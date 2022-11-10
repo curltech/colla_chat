@@ -191,6 +191,14 @@ class PlatformParams {
       'systemMemoryInMegabytes': data.systemMemoryInMegabytes,
     };
   }
+
+  bool get desktop {
+    return windows || macos || linux;
+  }
+
+  bool get mobile {
+    return ios || android;
+  }
 }
 
 final PlatformParams platformParams = PlatformParams();
