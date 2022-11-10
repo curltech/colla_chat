@@ -63,7 +63,8 @@ class ImageUtil {
     }
     if (ImageUtil.isBase64Img(image)) {
       Uint8List bytes = ImageUtil.decodeBase64Img(image);
-      imageWidget = Image.memory(bytes, fit: BoxFit.contain);
+      imageWidget = Image.memory(bytes,
+          width: width, height: height, fit: BoxFit.contain);
     } else if (ImageUtil.isAssetsImg(image)) {
       imageWidget = Image.asset(
         image,
