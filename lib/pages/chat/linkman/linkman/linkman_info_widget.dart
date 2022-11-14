@@ -38,7 +38,7 @@ class LinkmanInfoWidget extends StatefulWidget with TileDataMixin {
   Icon get icon => const Icon(Icons.person);
 
   @override
-  String get title => 'Linkman Information';
+  String get title => 'Linkman information';
 }
 
 class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
@@ -127,7 +127,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
               fillColor: Colors.black.withOpacity(0.1),
               filled: true,
               border: InputBorder.none,
-              labelText: AppLocalizations.t('Add Friend'),
+              labelText: AppLocalizations.t('Add friend'),
               suffixIcon: IconButton(
                 onPressed: () {
                   _addFriend(tip: controller.text);

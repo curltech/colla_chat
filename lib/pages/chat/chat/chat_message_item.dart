@@ -48,11 +48,8 @@ class ChatMessageItem extends StatelessWidget {
     }
     contentType = contentType ?? ContentType.text;
     ChatSubMessageType? subMessageType;
-    if (chatMessage.subMessageType != null) {
-      subMessageType = StringUtil.enumFromString(
-          ChatSubMessageType.values, chatMessage.subMessageType!);
-    }
-    subMessageType = subMessageType ?? ChatSubMessageType.chat;
+    subMessageType = StringUtil.enumFromString(
+        ChatSubMessageType.values, chatMessage.subMessageType!);
     if (subMessageType == ChatSubMessageType.chat) {
       switch (contentType) {
         case ContentType.text:
@@ -75,7 +72,9 @@ class ChatMessageItem extends StatelessWidget {
           break;
       }
     } else if (subMessageType == ChatSubMessageType.videoChat) {
-      return _buildActionMessageWidget(context, subMessageType);
+      return _buildActionMessageWidget(context, subMessageType!);
+    } else if (subMessageType == ChatSubMessageType.addFriend) {
+      return _buildActionMessageWidget(context, subMessageType!);
     }
     return null;
   }
