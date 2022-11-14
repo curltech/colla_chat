@@ -1198,7 +1198,6 @@ class BasePeerConnection {
   /// 被叫方的数据传输事件
   /// webrtc的数据通道发来的消息可以是ChainMessage，
   /// 也可以是简单的非ChainMessage，比如最简单的文本或者复合文档，也就是ChatMessage
-
   onMessage(RTCDataChannelMessage message) {
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
