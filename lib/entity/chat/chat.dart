@@ -47,13 +47,14 @@ enum ChatMessageType {
 
 enum ChatSubMessageType {
   addFriend, // 加好友请求
+  modifyFriend, //修改好友信息，比如头像，名称
   addGroup, // 新建群聊
   dismissGroup, // 解散群聊
   modifyGroup, // 修改群信息
   addGroupMember, // 新增群聊成员
   removeGroupMember, // 删除群聊成员
   chat, // 联系人发送聊天消息
-  chatSystem, // 系统预定义聊天消息，如群聊动态通知
+  predefine, // 系统预定义聊天消息，如群聊动态通知
   videoChat, // 视频聊天
   deleteChat, // 删除聊天
   chatReceipt, // 聊天回复

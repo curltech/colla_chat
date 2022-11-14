@@ -1,4 +1,5 @@
 import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
@@ -36,6 +37,28 @@ class ActionMessage extends StatelessWidget {
             ),
             Icon(
               Icons.video_call,
+              color: isMyself ? Colors.white : color,
+            )
+          ]));
+    }
+    if (subMessageType == ChatSubMessageType.addFriend) {
+      Color color = appDataProvider.themeData.colorScheme.primary;
+
+      return InkWell(
+          onTap: () {},
+          child: Row(children: [
+            Expanded(
+              child: ExtendedText(
+                AppLocalizations.t('Add friend'),
+                style: TextStyle(
+                  color: isMyself ? Colors.white : Colors.black,
+                  //fontSize: 16.0,
+                ),
+                specialTextSpanBuilder: customSpecialTextSpanBuilder,
+              ),
+            ),
+            Icon(
+              Icons.person_add,
               color: isMyself ? Colors.white : color,
             )
           ]));

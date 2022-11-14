@@ -2,8 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/service/chat/chat.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_nearby_connections/flutter_nearby_connections.dart';
@@ -113,8 +117,14 @@ class NearbyConnectionPool with ChangeNotifier {
     }
   }
 
-  onMessage(dynamic message) {
-    logger.i("dataReceivedSubscription: ${jsonEncode(message)}");
+  onMessage(dynamic message) async {
+    logger.i("dataReceivedSubscription: $message");
+    Map<String, dynamic> json = JsonUtil.toJson(message);
+    ChatMessage chatMessage = ChatMessage.fromJson(json);
+
+    ///保存消息
+    await chatMessageService.receiveChatMessage(chatMessage);
+    await globalChatMessageController.receiveChatMessage(chatMessage);
   }
 
   @override

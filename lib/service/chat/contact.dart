@@ -8,6 +8,7 @@ import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
+import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/dht/base.dart';
@@ -120,11 +121,9 @@ class LinkmanService extends PeerPartyService<Linkman> {
   }
 
   ///发出加好友的请求
-  Future<ChatMessage> addFriend(
-    String peerId,
-    String title, {
-    TransportType transportType = TransportType.webrtc,
-  }) async {
+  Future<ChatMessage> addFriend(String peerId, String title,
+      {TransportType transportType = TransportType.webrtc,
+      CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     // 加好友会发送自己的信息，回执将收到对方的信息
     String json = JsonUtil.toJsonString(myself.myselfPeer);
     List<int> data = CryptoUtil.stringToUtf8(json);
@@ -133,7 +132,8 @@ class LinkmanService extends PeerPartyService<Linkman> {
         subMessageType: ChatSubMessageType.addFriend,
         transportType: transportType,
         title: title);
-    return await chatMessageService.sendAndStore(chatMessage);
+    return await chatMessageService.sendAndStore(chatMessage,
+        cryptoOption: cryptoOption);
   }
 
   ///接收到加好友的请求，发送回执
@@ -155,6 +155,34 @@ class LinkmanService extends PeerPartyService<Linkman> {
     Map<String, dynamic> map = JsonUtil.toJson(json);
     PeerClient peerClient = PeerClient.fromJson(map);
     return await linkmanService.storeByPeerClient(peerClient);
+  }
+
+  ///发出更新好友信息的请求
+  Future<ChatMessage> modifyFriend(String peerId, String title,
+      {TransportType transportType = TransportType.webrtc,
+      CryptoOption cryptoOption = CryptoOption.cryptography}) async {
+    // 加好友会发送自己的信息，回执将收到对方的信息
+    String json = JsonUtil.toJsonString(myself.myselfPeer);
+    List<int> data = CryptoUtil.stringToUtf8(json);
+    ChatMessage chatMessage = await chatMessageService.buildChatMessage(peerId,
+        data: data,
+        subMessageType: ChatSubMessageType.modifyFriend,
+        transportType: transportType,
+        title: title);
+    return await chatMessageService.sendAndStore(chatMessage,
+        cryptoOption: cryptoOption);
+  }
+
+  ///接收到更新好友信息的请求
+  Future<ChatMessage> receiveModifyFriend(
+      ChatMessage chatMessage, MessageStatus receiptType) async {
+    String json = JsonUtil.toJsonString(myself.myselfPeer);
+    ChatMessage? chatReceipt =
+        await chatMessageService.buildChatReceipt(chatMessage, receiptType);
+    if (receiptType == MessageStatus.accepted) {
+      chatReceipt!.content = json;
+    }
+    return await chatMessageService.sendAndStore(chatReceipt!);
   }
 
   ///更新头像

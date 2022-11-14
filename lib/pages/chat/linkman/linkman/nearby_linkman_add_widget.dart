@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
+import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/contact.dart';
@@ -73,8 +74,10 @@ class _NearbyLinkmanAddWidgetState extends State<NearbyLinkmanAddWidget> {
             icon: const Icon(Icons.person_add),
             onPressed: () async {
               // 加好友会发送自己的信息，回执将收到对方的信息
+              // 没有对方的peerId和公钥，不加密
               await linkmanService.addFriend(subtitle, '',
-                  transportType: TransportType.nearby);
+                  transportType: TransportType.nearby,
+                  cryptoOption: CryptoOption.none);
             },
           );
         } else {
