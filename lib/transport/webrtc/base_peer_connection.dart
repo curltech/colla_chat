@@ -67,7 +67,8 @@ class WebrtcEvent {
   String name;
   dynamic data;
 
-  WebrtcEvent(this.peerId, {required this.clientId,required this.name, this.data});
+  WebrtcEvent(this.peerId,
+      {required this.clientId, required this.name, this.data});
 }
 
 const String unknownClientId = 'unknownClientId';
@@ -1157,25 +1158,32 @@ class BasePeerConnection {
   MessageSlice messageSlice = MessageSlice();
 
   /// 发送二进制消息 text/binary data to the remote peer.
-  Future<void> send(List<int> message) async {
+  Future<bool> send(List<int> message) async {
     Map<int, List<int>> slices = messageSlice.slice(message);
+    bool success = false;
     for (var slice in slices.values) {
-      await _send(slice);
+      success = await _send(slice);
+      if (!success) {
+        return false;
+      }
     }
+    return true;
   }
 
-  Future<void> _send(List<int> message) async {
+  Future<bool> _send(List<int> message) async {
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed, cannot send');
-      return;
+      return false;
     }
     logger.i('webrtc send message length: ${message.length}');
     final dataChannel = this.dataChannel;
     if (dataChannel != null) {
       var dataChannelMessage =
           RTCDataChannelMessage.fromBinary(Uint8List.fromList(message));
-      return await dataChannel.send(dataChannelMessage);
+      await dataChannel.send(dataChannelMessage);
+      return true;
     }
+    return false;
   }
 
   /// 被叫方的数据传输事件
