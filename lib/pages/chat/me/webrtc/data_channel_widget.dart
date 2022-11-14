@@ -190,7 +190,7 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-      title: AppLocalizations.t(widget.title),
+      title: Text(AppLocalizations.t(widget.title)),
       withLeading: widget.withLeading,
       rightWidgets: [_buildIconButton(context)],
       child: _buildBody(context),
