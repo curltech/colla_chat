@@ -118,6 +118,9 @@ class _ChatMessageViewState extends State<ChatMessageView> {
       } else {
         rightWidgets.add(const Icon(Icons.wifi_off));
       }
+      rightWidgets.add(const SizedBox(
+        width: 15,
+      ));
     }
     var appBarView = AppBarView(
         title: titleWidget,

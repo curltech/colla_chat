@@ -575,6 +575,8 @@ class PeerConnectionPool {
 
   onConnected(WebrtcEvent event) async {
     // logger.i('peerId: ${event.peerId} clientId:${event.clientId} is connected');
+    globalChatMessageController.sendModifyFriend(event.peerId,
+        clientId: event.clientId);
     globalChatMessageController.sendPreKeyBundle(event.peerId,
         clientId: event.clientId);
     peerConnectionPoolController.onConnected(event);
