@@ -183,11 +183,10 @@ class LinkmanService extends PeerPartyService<Linkman> {
   }
 
   ///接收到更新好友信息的请求
-  Future<ChatMessage> receiveModifyFriend(
-      ChatMessage chatMessage, String content) async {
+  receiveModifyFriend(ChatMessage chatMessage, String content) async {
     Map<String, dynamic> map = JsonUtil.toJson(content);
     PeerClient peerClient = PeerClient.fromJson(map);
-    return await peerClientService.store(peerClient);
+    await peerClientService.store(peerClient);
   }
 
   refresh(String peerId) {
