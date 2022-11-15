@@ -111,21 +111,29 @@ class PeerClientService extends PeerEntityService<PeerClient> {
     }
     peerClients[peerId]![clientId] = peerClient;
     await linkmanService.storeByPeerClient(peerClient);
+    await refresh(peerId, clientId: clientId);
   }
 
-  @override
-  Future<String> updateAvatar(String peerId, List<int> avatar) async {
-    String data = await super.updateAvatar(peerId, avatar);
-    PeerClient? peerClient = await findCachedOneByPeerId(peerId);
-    if (peerClient != null) {
-      peerClient.avatar = data;
+  Future<PeerClient?> refresh(String peerId, {String? clientId}) async {
+    peerClients.remove(peerId);
+    PeerClient? peerClient =
+        await findCachedOneByPeerId(peerId, clientId: clientId);
+    if (peerClient != null && peerClient.avatar != null) {
       var avatarImage = ImageUtil.buildImageWidget(
-        image: data,
+        image: peerClient.avatar,
         height: 32,
         width: 32,
       );
       peerClient.avatarImage = avatarImage;
     }
+
+    return peerClient;
+  }
+
+  @override
+  Future<String> updateAvatar(String peerId, List<int> avatar) async {
+    String data = await super.updateAvatar(peerId, avatar);
+    await refresh(peerId);
 
     return data;
   }
