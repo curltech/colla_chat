@@ -8,30 +8,27 @@ import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-
 final List<ColumnFieldDef> linkmanColumnFieldDefs = [
   ColumnFieldDef(
       name: 'peerId',
-      label: 'peerId',
+      label: 'PeerId',
       inputType: InputType.label,
       prefixIcon: const Icon(Icons.perm_identity)),
   ColumnFieldDef(
       name: 'name',
-      label: 'name',
+      label: 'Name',
       inputType: InputType.label,
       prefixIcon: const Icon(Icons.person)),
   ColumnFieldDef(
-      name: 'alias',
-      label: 'alias',
-      prefixIcon: const Icon(Icons.person_pin)),
+      name: 'alias', label: 'Alias', prefixIcon: const Icon(Icons.person_pin)),
   ColumnFieldDef(
       name: 'email',
-      label: 'email',
+      label: 'Email',
       prefixIcon: const Icon(Icons.email),
       textInputType: TextInputType.emailAddress),
   ColumnFieldDef(
       name: 'mobile',
-      label: 'mobile',
+      label: 'Mobile',
       prefixIcon: const Icon(Icons.mobile_friendly)),
 ];
 

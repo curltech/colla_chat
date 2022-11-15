@@ -2,22 +2,21 @@ import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/qrcode_widget.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
-import '../../../../provider/index_widget_provider.dart';
-import '../../../../routers/routes.dart';
-import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/common/widget_mixin.dart';
-import '../../../../widgets/data_bind/data_group_listview.dart';
-import '../../../../widgets/data_bind/data_listtile.dart';
 
 class PersonalInfoWidget extends StatefulWidget with TileDataMixin {
   const PersonalInfoWidget({Key? key}) : super(key: key);
