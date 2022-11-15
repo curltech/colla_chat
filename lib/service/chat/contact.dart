@@ -162,7 +162,9 @@ class LinkmanService extends PeerPartyService<Linkman> {
       {String? clientId,
       CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     // 加好友会发送自己的信息，回执将收到对方的信息
-    String json = JsonUtil.toJsonString(myself.myselfPeer);
+    Map<String, dynamic> map = JsonUtil.toJson(myself.myselfPeer);
+    PeerClient peerClient = PeerClient.fromJson(map);
+    String json = JsonUtil.toJsonString(peerClient);
     List<int> data = CryptoUtil.stringToUtf8(json);
     ChatMessage chatMessage = await chatMessageService.buildChatMessage(
       peerId,
@@ -177,8 +179,8 @@ class LinkmanService extends PeerPartyService<Linkman> {
   ///接收到更新好友信息的请求
   Future<ChatMessage> receiveModifyFriend(
       ChatMessage chatMessage, String content) async {
-    Map<String, dynamic> json = JsonUtil.toJson(content);
-    PeerClient peerClient = PeerClient.fromJson(json);
+    Map<String, dynamic> map = JsonUtil.toJson(content);
+    PeerClient peerClient = PeerClient.fromJson(map);
     return await peerClientService.store(peerClient);
   }
 
