@@ -246,14 +246,15 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
 
   Widget _buildLabel(BuildContext context) {
     widget.controller.controller = null;
-    final label = widget.controller.columnFieldDef.label;
+    String label = widget.controller.columnFieldDef.label;
+    label = AppLocalizations.t(label) + ':';
     final value = widget.controller.value ?? '';
     return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
       _buildIcon()!,
       const SizedBox(
         width: 15.0,
       ),
-      Text(AppLocalizations.t(label) + ':'),
+      Text(label),
       const SizedBox(
         width: 15.0,
       ),
@@ -287,6 +288,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
         suffix = null;
       }
     }
+    String label = AppLocalizations.t(columnFieldDef.label);
     var textFormField = TextFormField(
       controller: controller,
       keyboardType: columnFieldDef.textInputType,
@@ -294,7 +296,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
       minLines: 1,
       readOnly: columnFieldDef.readOnly,
       decoration: InputDecoration(
-          labelText: AppLocalizations.t(columnFieldDef.label),
+          labelText: label,
           prefixIcon: _buildIcon(),
           suffixIcon: suffixIcon,
           suffix: suffix,

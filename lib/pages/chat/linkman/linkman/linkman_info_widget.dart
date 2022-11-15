@@ -1,6 +1,5 @@
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
-import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_edit_widget.dart';
@@ -48,7 +47,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
   initState() {
     super.initState();
     linkmanController.addListener(_update);
-    linkman = linkmanController.current;
+    linkman ??= linkmanController.current;
   }
 
   _update() {

@@ -2,22 +2,23 @@ import 'package:bubble/bubble.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
-import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/pages/chat/chat/message/action_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/audio_message.dart';
+import 'package:colla_chat/pages/chat/chat/message/extended_text_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/file_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/image_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/name_card_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/rich_text_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/url_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/video_message.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:flutter/material.dart';
 
-import 'message/action_message.dart';
-import 'message/extended_text_message.dart';
 
 /// 每条消息展示组件，我接收的消息展示在左边，我发送的消息展示在右边
 class ChatMessageItem extends StatelessWidget {
@@ -258,25 +259,29 @@ class ChatMessageItem extends StatelessWidget {
 
   ///我的消息，从右到左，头像，时间，名称，消息容器
   Widget _buildMe(BuildContext context) {
-    return Container(
-        margin: const EdgeInsets.symmetric(vertical: 3.0),
-        child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Expanded(
-                child: Container(),
-              ),
-              Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.end,
+    return FutureBuilder(
+        future: _getImageWidget(context),
+        builder: (BuildContext context, AsyncSnapshot<Widget?> image) {
+          return Container(
+              margin: const EdgeInsets.symmetric(vertical: 3.0),
+              child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text('${chatMessage.id}:${chatMessage.receiverName}'),
-                    _buildMessageBubble(context)
-                  ]),
-              Container(
-                  margin: const EdgeInsets.only(left: 0.0),
-                  child: myself.avatarImage)
-            ]));
+                    Expanded(
+                      child: Container(),
+                    ),
+                    Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          Text('${chatMessage.id}:${chatMessage.receiverName}'),
+                          _buildMessageBubble(context)
+                        ]),
+                    Container(
+                        margin: const EdgeInsets.only(left: 0.0),
+                        child: image.data)
+                  ]));
+        });
   }
 
   Future<Widget?> _getImageWidget(BuildContext context) async {
@@ -285,12 +290,21 @@ class ChatMessageItem extends StatelessWidget {
     var peerId = myself.peerId;
     if (direct == ChatDirect.send.name &&
         (senderPeerId == null || senderPeerId == peerId)) {
-      return myself.avatarImage;
+      return InkWell(
+          onTap: () {
+            indexWidgetProvider.push('personal_info');
+          },
+          child: myself.avatarImage);
     }
     if (senderPeerId != null) {
       var linkman = await linkmanService.findCachedOneByPeerId(senderPeerId);
       if (linkman != null) {
-        return linkman.avatarImage;
+        return InkWell(
+            onTap: () {
+              linkmanController.replaceAll([linkman]);
+              indexWidgetProvider.push('linkman_info');
+            },
+            child: linkman.avatarImage);
       }
     }
 
