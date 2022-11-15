@@ -111,10 +111,13 @@ class LinkmanService extends PeerPartyService<Linkman> {
       await chatSummaryService.upsertByLinkman(linkman);
     } else {
       int? id = linkman.id;
+      String? status = linkman.status;
       linkman = Linkman.fromJson(map);
       linkman.id = id;
       if (linkmanStatus != null) {
         linkman.status = linkmanStatus.name;
+      } else {
+        linkman.status = status;
       }
       await update(linkman);
       linkmen[peerId] = linkman;

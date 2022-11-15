@@ -2,6 +2,7 @@ import 'package:bubble/bubble.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/pages/chat/chat/message/audio_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/file_message.dart';
@@ -234,21 +235,25 @@ class ChatMessageItem extends StatelessWidget {
 
   ///其他人的消息，从左到右，头像，时间，名称，消息容器
   Widget _buildOther(BuildContext context) {
-    return Container(
-        margin: const EdgeInsets.symmetric(vertical: 3.0),
-        child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Container(
-                  margin: const EdgeInsets.only(right: 0.0),
-                  child: defaultImage),
-              Column(
+    return FutureBuilder(
+        future: _getImageWidget(context),
+        builder: (BuildContext context, AsyncSnapshot<Widget?> image) {
+          return Container(
+              margin: const EdgeInsets.symmetric(vertical: 3.0),
+              child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text('${chatMessage.id}:${chatMessage.senderName}'),
-                    _buildMessageBubble(context)
-                  ]),
-            ]));
+                    Container(
+                        margin: const EdgeInsets.only(right: 0.0),
+                        child: image.data),
+                    Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text('${chatMessage.id}:${chatMessage.senderName}'),
+                          _buildMessageBubble(context)
+                        ]),
+                  ]));
+        });
   }
 
   ///我的消息，从右到左，头像，时间，名称，消息容器
@@ -274,7 +279,7 @@ class ChatMessageItem extends StatelessWidget {
             ]));
   }
 
-  Future<Widget?> _getImageWidget() async {
+  Future<Widget?> _getImageWidget(BuildContext context) async {
     var direct = chatMessage.direct;
     var senderPeerId = chatMessage.senderPeerId;
     var peerId = myself.peerId;
