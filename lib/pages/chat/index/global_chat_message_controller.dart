@@ -1,5 +1,6 @@
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
+import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
@@ -64,6 +65,10 @@ class GlobalChatMessageController with ChangeNotifier {
                   chatMessage, ChatDirect.receive);
             }
           }
+          break;
+        case ChatSubMessageType.modifyFriend:
+          content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content!));
+          linkmanService.receiveModifyFriend(chatMessage, content);
           break;
         case ChatSubMessageType.preKeyBundle:
           content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content!));
@@ -130,6 +135,10 @@ class GlobalChatMessageController with ChangeNotifier {
       await peerConnectionPool.onWebrtcSignal(peerId, webrtcSignal,
           clientId: clientId);
     }
+  }
+
+  sendModifyFriend(String peerId, {String? clientId}) async {
+    linkmanService.modifyFriend(peerId, clientId: clientId);
   }
 
   ///发送PreKeyBundle

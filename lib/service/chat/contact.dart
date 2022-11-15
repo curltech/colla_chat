@@ -158,31 +158,28 @@ class LinkmanService extends PeerPartyService<Linkman> {
   }
 
   ///发出更新好友信息的请求
-  Future<ChatMessage> modifyFriend(String peerId, String title,
-      {TransportType transportType = TransportType.webrtc,
+  Future<ChatMessage> modifyFriend(String peerId,
+      {String? clientId,
       CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     // 加好友会发送自己的信息，回执将收到对方的信息
     String json = JsonUtil.toJsonString(myself.myselfPeer);
     List<int> data = CryptoUtil.stringToUtf8(json);
-    ChatMessage chatMessage = await chatMessageService.buildChatMessage(peerId,
-        data: data,
-        subMessageType: ChatSubMessageType.modifyFriend,
-        transportType: transportType,
-        title: title);
+    ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+      peerId,
+      clientId: clientId,
+      data: data,
+      subMessageType: ChatSubMessageType.modifyFriend,
+    );
     return await chatMessageService.sendAndStore(chatMessage,
         cryptoOption: cryptoOption);
   }
 
   ///接收到更新好友信息的请求
   Future<ChatMessage> receiveModifyFriend(
-      ChatMessage chatMessage, MessageStatus receiptType) async {
-    String json = JsonUtil.toJsonString(myself.myselfPeer);
-    ChatMessage? chatReceipt =
-        await chatMessageService.buildChatReceipt(chatMessage, receiptType);
-    if (receiptType == MessageStatus.accepted) {
-      chatReceipt!.content = json;
-    }
-    return await chatMessageService.sendAndStore(chatReceipt!);
+      ChatMessage chatMessage, String content) async {
+    Map<String, dynamic> json = JsonUtil.toJson(content);
+    PeerClient peerClient = PeerClient.fromJson(json);
+    return await peerClientService.store(peerClient);
   }
 
   ///更新头像
