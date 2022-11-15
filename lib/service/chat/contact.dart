@@ -92,30 +92,35 @@ class LinkmanService extends PeerPartyService<Linkman> {
       linkmen[linkman.peerId] = linkman;
       await chatSummaryService.upsertByLinkman(linkman);
     }
+    await refresh(linkman.peerId);
   }
 
   ///通过peerclient增加或者修改
   Future<Linkman> storeByPeerClient(PeerClient peerClient,
       {LinkmanStatus? linkmanStatus}) async {
-    Linkman? linkman = await findCachedOneByPeerId(peerClient.peerId);
+    String peerId = peerClient.peerId;
+    Linkman? linkman = await findCachedOneByPeerId(peerId);
+    Map<String, dynamic> map = peerClient.toJson();
     if (linkman == null) {
-      linkman = Linkman.fromJson(peerClient.toJson());
+      linkman = Linkman.fromJson(map);
       if (linkmanStatus != null) {
         linkman.status = linkmanStatus.name;
       }
       await insert(linkman);
-      linkmen[linkman.peerId] = linkman;
+      linkmen.remove(peerId);
       await chatSummaryService.upsertByLinkman(linkman);
     } else {
-      linkman.name = peerClient.name;
-      linkman.lastConnectTime = peerClient.lastAccessTime;
+      int? id = linkman.id;
+      linkman = Linkman.fromJson(map);
+      linkman.id = id;
       if (linkmanStatus != null) {
         linkman.status = linkmanStatus.name;
       }
       await update(linkman);
-      linkmen[linkman.peerId] = linkman;
+      linkmen[peerId] = linkman;
       await chatSummaryService.upsertByLinkman(linkman);
     }
+    await refresh(peerId);
 
     return linkman;
   }
@@ -184,20 +189,26 @@ class LinkmanService extends PeerPartyService<Linkman> {
     return await peerClientService.store(peerClient);
   }
 
-  ///更新头像
-  @override
-  Future<String> updateAvatar(String peerId, List<int> avatar) async {
-    String data = await super.updateAvatar(peerId, avatar);
+  Future<Linkman?> refresh(String peerId) async {
+    linkmen.remove(peerId);
     Linkman? linkman = await findCachedOneByPeerId(peerId);
-    if (linkman != null) {
-      linkman.avatar = data;
+    if (linkman != null && linkman.avatar != null) {
       var avatarImage = ImageUtil.buildImageWidget(
-        image: data,
+        image: linkman.avatar,
         height: 32,
         width: 32,
       );
       linkman.avatarImage = avatarImage;
     }
+
+    return linkman;
+  }
+
+  ///更新头像
+  @override
+  Future<String> updateAvatar(String peerId, List<int> avatar) async {
+    String data = await super.updateAvatar(peerId, avatar);
+    await refresh(peerId);
 
     return data;
   }
