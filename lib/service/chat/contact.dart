@@ -190,26 +190,15 @@ class LinkmanService extends PeerPartyService<Linkman> {
     return await peerClientService.store(peerClient);
   }
 
-  Future<Linkman?> refresh(String peerId) async {
+  refresh(String peerId) {
     linkmen.remove(peerId);
-    Linkman? linkman = await findCachedOneByPeerId(peerId);
-    if (linkman != null && linkman.avatar != null) {
-      var avatarImage = ImageUtil.buildImageWidget(
-        image: linkman.avatar,
-        height: 32,
-        width: 32,
-      );
-      linkman.avatarImage = avatarImage;
-    }
-
-    return linkman;
   }
 
   ///更新头像
   @override
   Future<String> updateAvatar(String peerId, List<int> avatar) async {
     String data = await super.updateAvatar(peerId, avatar);
-    await refresh(peerId);
+    refresh(peerId);
 
     return data;
   }
