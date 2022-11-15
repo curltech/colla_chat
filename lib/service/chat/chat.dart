@@ -253,7 +253,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     ContentType contentType = ContentType.text,
     String? mimeType,
     PartyType receiverType = PartyType.linkman,
-    String? name,
+    String? receiverName,
     String? groupPeerId,
     String? groupName,
     String? title,
@@ -276,17 +276,17 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.senderName = myself.myselfPeer!.name;
     chatMessage.sendTime = DateUtil.currentDate();
     chatMessage.receiverPeerId = receiverPeerId;
-    if (clientId == null) {
+    if (receiverName == null) {
       PeerClient? peerClient =
           await peerClientService.findCachedOneByPeerId(receiverPeerId);
       if (peerClient != null) {
         clientId = peerClient.clientId;
-        name = peerClient.name;
+        receiverName = peerClient.name;
       }
     }
     chatMessage.receiverType = receiverType.name;
     chatMessage.receiverClientId = clientId;
-    chatMessage.receiverName = name;
+    chatMessage.receiverName = receiverName;
     chatMessage.groupPeerId = groupPeerId;
     chatMessage.groupName = groupName;
     chatMessage.title = title;
@@ -334,7 +334,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         contentType: contentType,
         mimeType: mimeType,
         receiverType: PartyType.group,
-        name: groupName,
+        receiverName: groupName,
         groupPeerId: groupPeerId,
         groupName: groupName,
         title: title,
@@ -349,7 +349,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           await groupMemberService.findLinkmen(groupMembers);
       for (var linkman in linkmen) {
         var peerId = linkman.peerId;
-        var name = linkman.name;
+        var receiverName = linkman.name;
         ChatMessage chatMessage = await buildChatMessage(
           peerId,
           messageId: messageId,
@@ -357,7 +357,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           subMessageType: subMessageType,
           contentType: contentType,
           mimeType: mimeType,
-          name: name,
+          receiverName: receiverName,
           groupPeerId: groupPeerId,
           groupName: groupName,
         );

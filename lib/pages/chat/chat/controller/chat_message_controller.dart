@@ -143,7 +143,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       return null;
     }
     String peerId = _chatSummary!.peerId!;
-    String name = _chatSummary!.name!;
+    String receiverName = _chatSummary!.name!;
     String? clientId = _chatSummary!.clientId;
     String partyType = _chatSummary!.partyType!;
 
@@ -153,7 +153,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       chatMessage = await chatMessageService.buildChatMessage(peerId,
           title: title,
           data: data,
-          name: name,
+          receiverName: receiverName,
           clientId: clientId,
           contentType: contentType,
           mimeType: mimeType,
