@@ -176,6 +176,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
       peerId,
       clientId: clientId,
       data: data,
+      messageType: ChatMessageType.system,
       subMessageType: ChatSubMessageType.modifyFriend,
     );
     return await chatMessageService.sendAndStore(chatMessage,
