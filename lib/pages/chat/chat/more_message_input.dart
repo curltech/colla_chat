@@ -6,41 +6,42 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/camera_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
-
-import '../../../widgets/data_bind/data_action_card.dart';
 
 final List<ActionData> defaultActionData = [
   ActionData(
-      label: 'picture',
-      tooltip: 'take picture',
+      label: 'Picture',
+      tooltip: 'Take a picture',
       icon: const Icon(Icons.camera)),
   ActionData(
-      label: 'voice',
-      tooltip: 'record voice',
+      label: 'Voice',
+      tooltip: 'Record voice',
       icon: const Icon(Icons.voice_chat)),
   ActionData(
-    label: 'video chat',
-    tooltip: 'invite video chat',
+    label: 'Video chat',
+    tooltip: 'Invite video chat',
     icon: const Icon(Icons.video_call),
   ),
   ActionData(
-      label: 'location',
-      tooltip: 'geographical position',
+      label: 'Location',
+      tooltip: 'Geographical position',
       icon: const Icon(Icons.location_city)),
   ActionData(
-      label: 'name card',
-      tooltip: 'share name card',
+      label: 'Name card',
+      tooltip: 'Share name card',
       icon: const Icon(Icons.card_membership)),
   ActionData(
-      label: 'file',
-      tooltip: 'pick and send file',
+      label: 'File',
+      tooltip: 'Pick and send file',
       icon: const Icon(Icons.file_open)),
   ActionData(
-      label: 'collection',
-      tooltip: 'collection',
+      label: 'Collection',
+      tooltip: 'Collection',
       icon: const Icon(Icons.collections)),
 ];
 
@@ -64,8 +65,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   initState() {
     super.initState();
     var albumActionData = ActionData(
-        label: 'album',
-        tooltip: 'photo album',
+        label: 'Album',
+        tooltip: 'Photo album',
         icon: const Icon(Icons.photo_album));
     if (platformParams.ios || platformParams.android || platformParams.macos) {
       actionData.add(albumActionData);
@@ -79,28 +80,28 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       return;
     }
     switch (name) {
-      case 'album':
+      case 'Album':
         _onActionAlbum();
         break;
-      case 'picture':
+      case 'Picture':
         _onActionPicture();
         break;
-      case 'video chat':
+      case 'Video chat':
         _onActionVideoChat();
         break;
-      case 'location':
+      case 'Location':
         _onActionLocation();
         break;
-      case 'name card':
+      case 'Name card':
         _onActionNameCard();
         break;
-      case 'file':
+      case 'File':
         _onActionFile();
         break;
-      case 'voice':
+      case 'Voice':
         _onActionVoice();
         break;
-      case 'collection':
+      case 'Collection':
         _onActionCollection();
         break;
       default:
@@ -108,30 +109,44 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     }
   }
 
+  ///视频通话
   _onActionVideoChat() {
     chatMessageController.viewIndex = 1;
   }
 
+  ///相册
   _onActionAlbum() async {
     final List<AssetEntity>? result = await AssetUtil.pickAssets(
       context,
     );
     if (result != null && result.isNotEmpty) {
       List<Map<String, dynamic>> maps = await AssetUtil.toJsons(result);
-      String json = JsonUtil.toJsonString(maps);
+      String content = JsonUtil.toJsonString(maps);
+      await chatMessageController.sendText(
+          message: content, contentType: ContentType.image);
     }
   }
 
+  ///拍照
   _onActionPicture() async {
     AssetEntity? entry = await CameraUtil.pickFromCamera(context);
     if (entry != null) {
       Map<String, dynamic> map = await AssetUtil.toJson(entry);
-      String json = JsonUtil.toJsonString(map);
+      String content = JsonUtil.toJsonString(map);
+      await chatMessageController.sendText(
+          message: content, contentType: ContentType.image);
     }
   }
 
-  void _onActionLocation() {}
+  ///位置
+  void _onActionLocation() async {
+    Position position = await GeolocatorUtil.currentPosition();
+    String content = JsonUtil.toJsonString(position);
+    await chatMessageController.sendText(
+        message: content, contentType: ContentType.location);
+  }
 
+  ///名片
   Future<void> _onActionNameCard() async {
     String content = JsonUtil.toJsonString(myself.myselfPeer);
     PeerClient peerClient = PeerClient.fromJson(JsonUtil.toJson(content));
@@ -140,6 +155,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         message: content, contentType: ContentType.card);
   }
 
+  ///文件
   Future<void> _onActionFile() async {
     List<String> filenames = await FileUtil.pickFiles();
     if (filenames.isNotEmpty) {
@@ -155,6 +171,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   void _onActionVoice() {}
 
+  ///收藏
   void _onActionCollection() {}
 
   Widget _buildActionCard(BuildContext context) {

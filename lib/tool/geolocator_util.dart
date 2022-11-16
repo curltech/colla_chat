@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 
 class GeolocatorUtil {
-  Future<Position?> checkPermission() async {
+  static Future<Position?> checkPermission() async {
     bool serviceEnabled;
     LocationPermission permission;
 
@@ -39,7 +39,7 @@ class GeolocatorUtil {
     return null;
   }
 
-  Future<Position> currentPosition({
+  static Future<Position> currentPosition({
     LocationAccuracy desiredAccuracy = LocationAccuracy.best,
     bool forceAndroidLocationManager = false,
     Duration? timeLimit,
@@ -54,7 +54,7 @@ class GeolocatorUtil {
     return permission;
   }
 
-  Future<Position?> lastKnownPosition(
+  static Future<Position?> lastKnownPosition(
       {bool forceAndroidLocationManager = false}) async {
     var permission = await checkPermission();
     if (permission == null) {
@@ -65,7 +65,7 @@ class GeolocatorUtil {
     return permission;
   }
 
-  StreamSubscription<Position> positionStream() {
+  static StreamSubscription<Position> positionStream() {
     late LocationSettings locationSettings;
 
     if (defaultTargetPlatform == TargetPlatform.android) {

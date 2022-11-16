@@ -1,19 +1,19 @@
+import 'package:colla_chat/crypto/signalprotocol.dart';
+import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
+import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 
-import '../../../crypto/signalprotocol.dart';
-import '../../../crypto/util.dart';
-import '../../../entity/chat/chat.dart';
-import '../../../entity/p2p/security_context.dart';
-import '../../../plugin/logger.dart';
-import '../../../service/chat/chat.dart';
-import '../../../transport/webrtc/base_peer_connection.dart';
 
 ///跟踪影响全局的消息到来，对不同类型的消息进行分派
 class GlobalChatMessageController with ChangeNotifier {
@@ -39,7 +39,7 @@ class GlobalChatMessageController with ChangeNotifier {
       //   }
       // }
       ChatSubMessageType? subMessageType = StringUtil.enumFromString(
-          ChatSubMessageType.values, chatMessage.subMessageType!);
+          ChatSubMessageType.values, chatMessage.subMessageType);
       logger
           .i('chatMessage subMessageType:${subMessageType!.name} title:$title');
       switch (subMessageType) {

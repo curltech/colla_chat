@@ -58,6 +58,8 @@ class DataActionCard extends StatelessWidget {
 
   Widget _buildIconTextButton(
       BuildContext context, ActionData actionData, int index) {
+    var label = AppLocalizations.t(actionData.label);
+    var tooltip = AppLocalizations.t(actionData.tooltip ?? '');
     return WidgetUtil.buildIconTextButton(
         iconColor: appDataProvider.themeData.colorScheme.primary,
         iconSize: 32,
@@ -68,14 +70,16 @@ class DataActionCard extends StatelessWidget {
             actionData.onTap!(index, actionData.label);
           }
         },
-        text: actionData.label,
-        tooltip: actionData.tooltip,
+        text: label,
+        tooltip: tooltip,
         textColor: Colors.black,
         icon: actionData.icon);
   }
 
   Widget _buildTextFieldButton(
       BuildContext context, ActionData actionData, int index) {
+    var label = AppLocalizations.t(actionData.label);
+    var tooltip = AppLocalizations.t(actionData.tooltip ?? '');
     var controller = TextEditingController();
     var addFriendTextField = Container(
         padding: const EdgeInsets.all(10.0),
@@ -87,7 +91,7 @@ class DataActionCard extends StatelessWidget {
               fillColor: Colors.black.withOpacity(0.1),
               filled: true,
               border: InputBorder.none,
-              labelText: AppLocalizations.t(actionData.label),
+              labelText: label,
               suffixIcon: IconButton(
                 onPressed: () {
                   if (onPressed != null) {
@@ -105,6 +109,8 @@ class DataActionCard extends StatelessWidget {
   }
 
   Widget _buildInkWell(BuildContext context, ActionData actionData, int index) {
+    var label = AppLocalizations.t(actionData.label);
+    var tooltip = AppLocalizations.t(actionData.tooltip ?? '');
     return WidgetUtil.buildInkWell(
         padding: const EdgeInsets.all(5.0),
         iconColor: appDataProvider.themeData.colorScheme.primary,
@@ -116,13 +122,15 @@ class DataActionCard extends StatelessWidget {
             actionData.onTap!(index, actionData.label);
           }
         },
-        text: actionData.label,
+        text: label,
         textColor: Colors.black,
         icon: actionData.icon);
   }
 
   Widget _buildCircleButton(
       BuildContext context, ActionData actionData, int index) {
+    var label = AppLocalizations.t(actionData.label);
+    var tooltip = AppLocalizations.t(actionData.tooltip ?? '');
     return Column(
       children: <Widget>[
         Container(
@@ -144,7 +152,7 @@ class DataActionCard extends StatelessWidget {
         ),
         const SizedBox(height: 5.0),
         Text(
-          actionData.label,
+          label,
           style: const TextStyle(
             color: Colors.black,
           ),
