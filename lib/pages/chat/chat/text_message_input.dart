@@ -2,13 +2,13 @@ import 'dart:async';
 
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/extended_text_message_input.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/media/audio/platform_audio_recorder.dart';
 import 'package:flutter/material.dart';
 
-import 'extended_text_message_input.dart';
 
 ///发送文本消息的输入框和按钮，
 ///包括声音按钮，扩展文本输入框，emoji按钮，其他多种格式输入按钮和发送按钮

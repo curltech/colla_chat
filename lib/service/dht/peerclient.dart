@@ -1,14 +1,14 @@
 import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/entity/dht/peerclient.dart';
+import 'package:colla_chat/entity/dht/peerprofile.dart';
 import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/service/dht/base.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:cryptography/cryptography.dart';
 
-import '../../entity/dht/peerclient.dart';
-import '../../entity/dht/peerprofile.dart';
-import 'base.dart';
 
 class PeerClientService extends PeerEntityService<PeerClient> {
   var peerClients = <String, Map<String, PeerClient>>{};
@@ -61,7 +61,7 @@ class PeerClientService extends PeerEntityService<PeerClient> {
         if (!peerClients.containsKey(peerId)) {
           peerClients[peerId] = {};
         }
-        peerClients[peerId]![clientId_ ?? ''] = peerClient_;
+        peerClients[peerId]![clientId_] = peerClient_;
         if (clientId == null || clientId == clientId_) {
           peerClient = peerClient_;
         }
