@@ -8,11 +8,11 @@ import '../../../../transport/webrtc/peer_video_render.dart';
 import '../controller/peer_connections_controller.dart';
 
 final List<ActionData> actionData = [
-  ActionData(label: '镜头切换', icon: const Icon(Icons.cameraswitch)),
-  ActionData(label: '麦克风开关', icon: const Icon(Icons.mic_rounded)),
-  ActionData(label: '扬声器开关', icon: const Icon(Icons.speaker_phone)),
-  ActionData(label: '减少音量', icon: const Icon(Icons.volume_down)),
-  ActionData(label: '增大音量', icon: const Icon(Icons.volume_up)),
+  ActionData(label: 'Camera switch', icon: const Icon(Icons.cameraswitch)),
+  ActionData(label: 'Microphone switch', icon: const Icon(Icons.mic_rounded)),
+  ActionData(label: 'Speaker switch', icon: const Icon(Icons.speaker_phone)),
+  ActionData(label: 'Decrease volume', icon: const Icon(Icons.volume_down)),
+  ActionData(label: 'Increase volume', icon: const Icon(Icons.volume_up)),
 ];
 
 ///单个视频窗口，长按出现更大的窗口，带有操作按钮
@@ -49,15 +49,22 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
 
   OverlayEntry _createPopupDialog() {
     return OverlayEntry(
-      builder: (context) => AnimatedContain(
-        child: _createPopupContent(),
-      ),
+      builder: (context) =>
+          AnimatedContain(
+            child: _createPopupContent(),
+          ),
     );
   }
 
   Widget _createPopupContent() {
-    var height = MediaQuery.of(context).size.height - 56;
-    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery
+        .of(context)
+        .size
+        .height - 56;
+    var width = MediaQuery
+        .of(context)
+        .size
+        .width;
     Widget videoView = widget.render
         .createVideoView(height: height, width: width, color: widget.color);
     return Container(
@@ -87,7 +94,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
     ]);
   }
 
-  Future<void> _onAction(int index, String name,{String? value}) async {
+  Future<void> _onAction(int index, String name, {String? value}) async {
     switch (index) {
       case 0:
         await widget.render.switchCamera();
@@ -115,15 +122,15 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
       elevation: 0,
       child: Center(
           child: Container(
-        height: height,
-        margin: const EdgeInsets.all(0.0),
-        padding: const EdgeInsets.only(bottom: 0.0),
-        child: DataActionCard(
-          actions: actionData,
-          height: height,
-          onPressed: _onAction, crossAxisCount: 4,
-        ),
-      )),
+            height: height,
+            margin: const EdgeInsets.all(0.0),
+            padding: const EdgeInsets.only(bottom: 0.0),
+            child: DataActionCard(
+              actions: actionData,
+              height: height,
+              onPressed: _onAction, crossAxisCount: 4,
+            ),
+          )),
     );
     return actionCard;
   }
@@ -134,20 +141,21 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         height: widget.height, width: widget.width, color: widget.color);
     Widget singleVideoView = Builder(
       // use Builder here in order to show the snakbar
-      builder: (context) => GestureDetector(
-        // keep the OverlayEntry instance, and insert it into Overlay
-        onLongPress: () {
-          _popupDialog = _createPopupDialog();
-          Overlay.of(context)?.insert(_popupDialog);
-        },
-        // remove the OverlayEntry from Overlay, so it would be hidden
-        //onLongPressEnd: (details) => _popupDialog?.remove(),
+      builder: (context) =>
+          GestureDetector(
+            // keep the OverlayEntry instance, and insert it into Overlay
+            onLongPress: () {
+              _popupDialog = _createPopupDialog();
+              Overlay.of(context)?.insert(_popupDialog);
+            },
+            // remove the OverlayEntry from Overlay, so it would be hidden
+            //onLongPressEnd: (details) => _popupDialog?.remove(),
 
-        onTap: () {
-          DialogUtil.info(context, content: AppLocalizations.t(''));
-        },
-        child: videoView,
-      ),
+            onTap: () {
+              DialogUtil.info(context, content: AppLocalizations.t(''));
+            },
+            child: videoView,
+          ),
     );
 
     return singleVideoView;

@@ -130,11 +130,14 @@
   "Audio chat": "音频聊天",
   "Screen share": "屏幕共享",
   "Media play": "媒体播放",
-  "Camera switch": "摄像头切换",
+  "Camera switch": "镜头切换",
   "Show background": "显示背景",
   "Microphone": "麦克风",
   "Microphone switch": "麦克风切换",
   "Speaker": "扬声器",
   "Speaker switch": "扬声器切换",
-  "Waiting accept inviting...": "等待接受邀请..."
+  "Decrease volume": "减少音量",
+  "Increase volume": "增大音量",
+  "Waiting accept inviting...": "等待接受邀请...",
+  "Inviting you video chat": "邀请视频通话"
 }
