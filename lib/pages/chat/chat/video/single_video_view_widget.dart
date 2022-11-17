@@ -1,11 +1,11 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/chat/controller/peer_connections_controller.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../transport/webrtc/peer_video_render.dart';
-import '../controller/peer_connections_controller.dart';
 
 final List<ActionData> actionData = [
   ActionData(label: 'Camera switch', icon: const Icon(Icons.cameraswitch)),

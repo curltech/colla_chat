@@ -3,7 +3,6 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/routers/navigator_util.dart';
 import 'package:colla_chat/routers/routes.dart';
-import 'package:colla_chat/widgets/common/blank_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
@@ -134,8 +133,8 @@ class IndexWidgetProvider with ChangeNotifier {
     //初始化主视图，确定好主视图的位置
     for (var i = 0; i < mainViews.length; ++i) {
       String name = mainViews[i];
-      allViews[name] = blankWidget;
-      views.add(blankWidget);
+      allViews[name] = Container();
+      views.add(Container());
       viewPositions[name] = i;
     }
   }

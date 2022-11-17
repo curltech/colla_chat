@@ -9,7 +9,6 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
-import 'package:colla_chat/widgets/common/blank_widget.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
@@ -179,7 +178,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
 
   Widget _buildVideoViewCard(BuildContext context) {
     if (peerId == null) {
-      return const BlankWidget();
+      return Container();
     }
     if (partyType == PartyType.linkman.name) {
       AdvancedPeerConnection? advancedPeerConnection =
@@ -197,7 +196,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
         color: widget.color,
       );
     }
-    return const BlankWidget();
+    return Container();
   }
 
   _opacity() {
