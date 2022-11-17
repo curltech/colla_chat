@@ -1,9 +1,9 @@
+import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
+import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
+import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 
-import '../../../../plugin/logger.dart';
-import '../../../../transport/webrtc/advanced_peer_connection.dart';
-import '../../../../transport/webrtc/peer_video_render.dart';
-import 'local_media_controller.dart';
 
 ///一组webrtc连接，这些连接与自己正在视频通话，此控制器用于通知视频通话界面的刷新
 class PeerConnectionsController extends VideoRenderController {

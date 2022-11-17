@@ -1,14 +1,13 @@
+import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/peer_connections_controller.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
+import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-
-import '../../../../entity/chat/chat.dart';
-import '../../../../entity/dht/myself.dart';
-import '../../../../plugin/logger.dart';
-import '../../../../transport/webrtc/peer_video_render.dart';
 
 abstract class VideoRenderController with ChangeNotifier {
   int _crossAxisCount = 2;
@@ -203,11 +202,11 @@ class VideoChatReceiptController with ChangeNotifier {
         await advancedPeerConnection.negotiate();
         await peerConnectionsController.addPeerConnection(peerId,
             clientId: clientId);
-        chatMessageController.viewIndex = 2;
+        chatMessageController.chatView = ChatView.video;
       }
     } else if (status == MessageStatus.rejected.name) {
       await localMediaController.close();
-      chatMessageController.viewIndex = 0;
+      chatMessageController.chatView = ChatView.text;
     }
   }
 }

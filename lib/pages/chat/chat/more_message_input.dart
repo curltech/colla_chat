@@ -111,7 +111,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   ///视频通话
   _onActionVideoChat() {
-    chatMessageController.viewIndex = 1;
+    chatMessageController.chatView = ChatView.dial;
   }
 
   ///相册

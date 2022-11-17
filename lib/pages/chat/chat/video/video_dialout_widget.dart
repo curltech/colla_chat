@@ -27,25 +27,37 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 final List<ActionData> actionData = [
   ActionData(
-      label: '视频通话', tooltip: '视频通话', icon: const Icon(Icons.video_call)),
+      label: 'Video chat',
+      tooltip: 'Video chat',
+      icon: const Icon(Icons.video_call)),
   ActionData(
-      label: '音频通话',
-      tooltip: '音频通话',
+      label: 'Audio chat',
+      tooltip: 'Audio chat',
       icon: const Icon(Icons.multitrack_audio_outlined)),
   ActionData(
-      label: '屏幕共享', tooltip: '屏幕共享', icon: const Icon(Icons.screen_share)),
+      label: 'Screen share',
+      tooltip: 'Screen share',
+      icon: const Icon(Icons.screen_share)),
   ActionData(
-      label: '媒体播放', tooltip: '媒体播放', icon: const Icon(Icons.video_file)),
+      label: 'Media play',
+      tooltip: 'Media play',
+      icon: const Icon(Icons.video_file)),
   ActionData(
-      label: '镜头切换', tooltip: '镜头切换', icon: const Icon(Icons.cameraswitch)),
+      label: 'Camera switch',
+      tooltip: 'Camera switch',
+      icon: const Icon(Icons.cameraswitch)),
   ActionData(
-      label: '显示背景',
-      tooltip: '显示背景',
+      label: 'Show background',
+      tooltip: 'Show background',
       icon: const Icon(Icons.photo_camera_back)),
   ActionData(
-      label: '麦克风开关', tooltip: '麦克风开关', icon: const Icon(Icons.mic_rounded)),
+      label: 'Microphone',
+      tooltip: 'Microphone switch',
+      icon: const Icon(Icons.mic_rounded)),
   ActionData(
-      label: '扬声器开关', tooltip: '扬声器开关', icon: const Icon(Icons.speaker_phone)),
+      label: 'Speaker',
+      tooltip: 'Speaker switch',
+      icon: const Icon(Icons.speaker_phone)),
 ];
 
 ///视频通话拨出的窗口
@@ -90,7 +102,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
     if (overlayEntry != null) {
       overlayEntry!.remove();
       overlayEntry = null;
-      chatMessageController.viewIndex = 1;
+      chatMessageController.chatView = ChatView.dial;
     }
   }
 
@@ -109,7 +121,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
       );
     });
     Overlay.of(context)!.insert(overlayEntry!);
-    chatMessageController.viewIndex = 0;
+    chatMessageController.chatView = ChatView.text;
   }
 
   _open(
@@ -161,7 +173,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
 
   _close() {
     localMediaController.close();
-    chatMessageController.viewIndex = 0;
+    chatMessageController.chatView = ChatView.text;
     setState(() {});
   }
 
