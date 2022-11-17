@@ -8,9 +8,9 @@ import '../../../../transport/webrtc/peer_video_render.dart';
 import '../controller/peer_connections_controller.dart';
 
 final List<ActionData> actionData = [
-  ActionData(label: '镜头切换', icon: const Icon(Icons.cameraswitch)),
-  ActionData(label: '麦克风开关', icon: const Icon(Icons.mic_rounded)),
-  ActionData(label: '扬声器开关', icon: const Icon(Icons.speaker_phone)),
+  ActionData(label: 'Camera switch', icon: const Icon(Icons.cameraswitch)),
+  ActionData(label: 'Microphone switch', icon: const Icon(Icons.mic_rounded)),
+  ActionData(label: 'Speaker switch', icon: const Icon(Icons.speaker_phone)),
   ActionData(label: '减少音量', icon: const Icon(Icons.volume_down)),
   ActionData(label: '增大音量', icon: const Icon(Icons.volume_up)),
 ];
