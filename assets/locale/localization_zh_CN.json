@@ -126,5 +126,14 @@
   "Pick and send file": "选择发送文件",
   "Collection": "收藏",
   "Album": "相册",
-  "Photo album": "相册"
+  "Photo album": "相册",
+  "Audio chat": "音频聊天",
+  "Screen share": "屏幕共享",
+  "Media play": "媒体播放",
+  "Camera switch": "摄像头切换",
+  "Show background": "显示背景",
+  "Microphone": "麦克风",
+  "Microphone switch": "麦克风切换",
+  "Speaker": "扬声器",
+  "Speaker switch": "扬声器切换"
 }

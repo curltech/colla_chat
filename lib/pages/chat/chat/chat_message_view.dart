@@ -1,18 +1,17 @@
+import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/full_screen_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_chat_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_dialout_widget.dart';
+import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
-
-import '../../../entity/chat/chat.dart';
-import '../../../l10n/localization.dart';
-import '../../../transport/webrtc/peer_connection_pool.dart';
-import '../../../widgets/common/app_bar_view.dart';
-import '../../../widgets/common/widget_mixin.dart';
-import '../me/webrtc/peer_connection_controller.dart';
-import 'chat_message_widget.dart';
 
 /// 聊天界面，包括文本聊天，视频通话呼叫，视频通话，全屏展示四个组件
 /// 支持群聊
@@ -127,7 +126,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
         withLeading: widget.withLeading,
         rightWidgets: rightWidgets,
         child: IndexedStack(
-            index: chatMessageController.viewIndex, children: children));
+            index: chatMessageController.chatView.index, children: children));
 
     return appBarView;
   }

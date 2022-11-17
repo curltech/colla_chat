@@ -32,7 +32,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     if (overlayEntry != null) {
       overlayEntry!.remove();
       overlayEntry = null;
-      chatMessageController.viewIndex = 2;
+      chatMessageController.chatView = ChatView.video;
     }
   }
 
@@ -51,12 +51,12 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
       );
     });
     Overlay.of(context)!.insert(overlayEntry!);
-    chatMessageController.viewIndex = 0;
+    chatMessageController.chatView = ChatView.text;
   }
 
   _close() {
     localMediaController.close();
-    chatMessageController.viewIndex = 0;
+    chatMessageController.chatView = ChatView.text;
     setState(() {});
   }
 

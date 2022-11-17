@@ -4,13 +4,15 @@ import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 
+enum ChatView { text, dial, video, full }
+
 ///好友或者群的消息控制器，包含某个连接的所有消息
 class ChatMessageController extends DataMoreController<ChatMessage> {
   ChatSummary? _chatSummary;
 
   ///聊天界面的显示组件编号，0表示文本聊天界面，1表示视频通话拨出界面，2表示视频通话界面
   ///3表示全屏界面，可以前后浏览消息
-  int _viewIndex = 0;
+  ChatView _chatView = ChatView.text;
 
   ChatSummary? get chatSummary {
     return _chatSummary;
@@ -22,19 +24,19 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         _chatSummary!.id == chatSummary.id) {
     } else {
       _chatSummary = chatSummary;
-      _viewIndex = 0;
+      _chatView = ChatView.text;
       clear();
     }
     previous(limit: defaultLimit);
   }
 
-  int get viewIndex {
-    return _viewIndex;
+  ChatView get chatView {
+    return _chatView;
   }
 
-  set viewIndex(int viewIndex) {
-    if (_viewIndex != viewIndex) {
-      _viewIndex = viewIndex;
+  set chatView(ChatView chatView) {
+    if (_chatView != chatView) {
+      _chatView = chatView;
       notifyListeners();
     }
   }

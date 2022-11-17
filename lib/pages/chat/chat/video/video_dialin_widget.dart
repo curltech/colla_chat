@@ -7,7 +7,6 @@ import 'package:colla_chat/pages/chat/chat/controller/peer_connections_controlle
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
-import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
@@ -83,7 +82,7 @@ class VideoDialInWidget extends StatelessWidget {
           peerConnectionsController.addPeerConnection(peerId,
               clientId: clientId);
           indexWidgetProvider.push('chat_message');
-          chatMessageController.viewIndex = 2;
+          chatMessageController.chatView = ChatView.video;
         }
       }
     }
