@@ -25,7 +25,6 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
-
 class ChatMessageService extends GeneralBaseService<ChatMessage> {
   ChatMessageService({
     required super.tableName,
@@ -529,6 +528,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
     return null;
   }
 
+  ///把内容写入文件，或者附件记录
   Future<void> store(
       int id, String messageId, String content, EntityState state) async {
     if (!platformParams.web) {

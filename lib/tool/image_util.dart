@@ -54,7 +54,7 @@ class ImageUtil {
       {String? image,
       double? width,
       double? height,
-      BoxFit? fit,
+      BoxFit? fit = BoxFit.contain,
       bool isRadius = true,
       double radius = 8.0}) {
     Widget imageWidget = defaultImage;
@@ -63,14 +63,13 @@ class ImageUtil {
     }
     if (ImageUtil.isBase64Img(image)) {
       Uint8List bytes = ImageUtil.decodeBase64Img(image);
-      imageWidget = Image.memory(bytes,
-          width: width, height: height, fit: BoxFit.contain);
+      imageWidget = Image.memory(bytes, width: width, height: height, fit: fit);
     } else if (ImageUtil.isAssetsImg(image)) {
       imageWidget = Image.asset(
         image,
         width: width,
         height: height,
-        fit: width != null && height != null ? BoxFit.fill : fit,
+        fit: fit,
       );
     } else if (File(image).existsSync()) {
       imageWidget = Image.file(

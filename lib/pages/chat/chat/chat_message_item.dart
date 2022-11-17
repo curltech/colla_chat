@@ -1,188 +1,23 @@
 import 'package:bubble/bubble.dart';
 import 'package:colla_chat/constant/base.dart';
-import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
-import 'package:colla_chat/pages/chat/chat/message/action_message.dart';
-import 'package:colla_chat/pages/chat/chat/message/audio_message.dart';
-import 'package:colla_chat/pages/chat/chat/message/extended_text_message.dart';
-import 'package:colla_chat/pages/chat/chat/message/file_message.dart';
-import 'package:colla_chat/pages/chat/chat/message/image_message.dart';
-import 'package:colla_chat/pages/chat/chat/message/name_card_message.dart';
-import 'package:colla_chat/pages/chat/chat/message/rich_text_message.dart';
-import 'package:colla_chat/pages/chat/chat/message/url_message.dart';
-import 'package:colla_chat/pages/chat/chat/message/video_message.dart';
+import 'package:colla_chat/pages/chat/chat/message/message_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/contact.dart';
-import 'package:colla_chat/tool/string_util.dart';
 import 'package:flutter/material.dart';
-
 
 /// 每条消息展示组件，我接收的消息展示在左边，我发送的消息展示在右边
 class ChatMessageItem extends StatelessWidget {
   final ChatMessage chatMessage;
   late final bool isMyself;
+  late final MessageWidget messageWidget;
 
   ChatMessageItem({Key? key, required this.chatMessage}) : super(key: key) {
-    isMyself = _isMyself();
-  }
-
-  bool _isMyself() {
-    var direct = chatMessage.direct;
-    var senderPeerId = chatMessage.senderPeerId;
-    var peerId = myself.peerId;
-    if (direct == ChatDirect.send.name &&
-        (senderPeerId == null || senderPeerId == peerId)) {
-      return true;
-    }
-    return false;
-  }
-
-  ///消息体：扩展文本，图像，声音，视频，页面，复合文本，文件，名片，位置，收藏等种类
-  ///每种消息体一个类
-  Widget? _buildMessageBody(BuildContext context) {
-    ContentType? contentType;
-    if (chatMessage.contentType != null) {
-      contentType = StringUtil.enumFromString(
-          ContentType.values, chatMessage.contentType!);
-    }
-    contentType = contentType ?? ContentType.text;
-    ChatSubMessageType? subMessageType;
-    subMessageType = StringUtil.enumFromString(
-        ChatSubMessageType.values, chatMessage.subMessageType!);
-    if (subMessageType == ChatSubMessageType.chat) {
-      switch (contentType) {
-        case ContentType.text:
-          return _buildExtendedTextMessageWidget(context);
-        case ContentType.audio:
-          return _buildAudioMessageWidget(context);
-        case ContentType.video:
-          return _buildVideoMessageWidget(context);
-        case ContentType.file:
-          return _buildFileMessageWidget(context);
-        case ContentType.image:
-          return _buildImageMessageWidget(context);
-        case ContentType.card:
-          return _buildNameCardMessageWidget(context);
-        case ContentType.rich:
-          return _buildRichTextMessageWidget(context);
-        case ContentType.link:
-          return _buildUrlMessageWidget(context);
-        default:
-          break;
-      }
-    } else if (subMessageType == ChatSubMessageType.videoChat) {
-      return _buildActionMessageWidget(context, subMessageType!);
-    } else if (subMessageType == ChatSubMessageType.addFriend) {
-      return _buildActionMessageWidget(context, subMessageType!);
-    }
-    return null;
-  }
-
-  ExtendedTextMessage _buildExtendedTextMessageWidget(BuildContext context) {
-    String? content = chatMessage.content;
-    List<int>? data;
-    if (content != null) {
-      data = CryptoUtil.decodeBase64(content);
-      content = CryptoUtil.utf8ToString(data);
-    }
-    return ExtendedTextMessage(
-      isMyself: isMyself,
-      content: content!,
-    );
-  }
-
-  ActionMessage _buildActionMessageWidget(
-      BuildContext context, ChatSubMessageType subMessageType) {
-    return ActionMessage(
-      isMyself: isMyself,
-      subMessageType: subMessageType,
-    );
-  }
-
-  UrlMessage _buildUrlMessageWidget(BuildContext context) {
-    String? title = chatMessage.title;
-    return UrlMessage(
-      url: title!,
-      isMyself: isMyself,
-    );
-  }
-
-  RichTextMessage _buildRichTextMessageWidget(BuildContext context) {
-    String? messageId = chatMessage.messageId;
-    return RichTextMessage(
-      messageId: messageId!,
-      isMyself: isMyself,
-    );
-  }
-
-  NameCardMessage _buildNameCardMessageWidget(BuildContext context) {
-    String? content = chatMessage.content;
-    List<int>? data;
-    if (content != null) {
-      data = CryptoUtil.decodeBase64(content);
-      content = CryptoUtil.utf8ToString(data);
-    }
-    return NameCardMessage(
-      content: content!,
-      isMyself: isMyself,
-    );
-  }
-
-  ImageMessage _buildImageMessageWidget(BuildContext context) {
-    String? messageId = chatMessage.messageId;
-    String? thumbnail = chatMessage.thumbnail;
-    String mimeType = chatMessage.mimeType!;
-    return ImageMessage(
-      messageId: messageId!,
-      image: thumbnail,
-      isMyself: isMyself,
-      mimeType: mimeType,
-    );
-  }
-
-  VideoMessage _buildVideoMessageWidget(BuildContext context) {
-    int? id = chatMessage.id;
-    String? messageId = chatMessage.messageId;
-    String? thumbnail = chatMessage.thumbnail;
-    return VideoMessage(
-      id: id!,
-      messageId: messageId!,
-      isMyself: isMyself,
-      thumbnail: thumbnail,
-    );
-  }
-
-  AudioMessage _buildAudioMessageWidget(BuildContext context) {
-    int? id = chatMessage.id;
-    String? messageId = chatMessage.messageId;
-    return AudioMessage(
-      id: id!,
-      messageId: messageId!,
-      isMyself: isMyself,
-    );
-  }
-
-  Widget _buildFileMessageWidget(BuildContext context) {
-    String? messageId = chatMessage.messageId;
-    String? title = chatMessage.title;
-    String? mimeType = chatMessage.mimeType;
-    mimeType = mimeType ?? 'text/plain';
-    if (mimeType.startsWith('image')) {
-      return _buildImageMessageWidget(context);
-    } else if (mimeType.startsWith('audio')) {
-      return _buildAudioMessageWidget(context);
-    } else if (mimeType.startsWith('video')) {
-      return _buildVideoMessageWidget(context);
-    }
-    return FileMessage(
-      messageId: messageId!,
-      isMyself: isMyself,
-      title: title!,
-      mimeType: mimeType,
-    );
+    messageWidget = MessageWidget(chatMessage);
+    isMyself = messageWidget.isMyself;
   }
 
   ///气泡消息容器，内包消息体
@@ -197,7 +32,7 @@ class ChatMessageItem extends StatelessWidget {
           color: isMyself
               ? appDataProvider.themeData.colorScheme.primary
               : Colors.white,
-          child: _buildMessageBody(context),
+          child: messageWidget.buildMessageBody(context),
         ));
   }
 
@@ -228,7 +63,7 @@ class ChatMessageItem extends StatelessWidget {
           ),
           margin: EdgeInsets.only(
               right: isMyself ? 5.0 : 0, left: isMyself ? 0 : 5.0),
-          child: _buildMessageBody(context),
+          child: messageWidget.buildMessageBody(context),
         )
       ], // aligns the chatitem to right end
     );
@@ -313,8 +148,7 @@ class ChatMessageItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    bool isMe = _isMyself();
-    if (isMe) {
+    if (isMyself) {
       return _buildMe(context);
     }
     return _buildOther(context);

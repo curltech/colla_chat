@@ -30,6 +30,8 @@ class ImageMessage extends StatelessWidget {
             onTap: () {},
             child: ImageUtil.buildImageWidget(
               image:filename,
+              width: 64,
+              height: 64
             ),
           );
         });
