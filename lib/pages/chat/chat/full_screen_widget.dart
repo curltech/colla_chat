@@ -14,10 +14,15 @@ class FullScreenWidget extends StatefulWidget {
 }
 
 class _FullScreenWidgetState extends State<FullScreenWidget> {
+  late PageController _pageController;
+
   @override
   void initState() {
     super.initState();
     chatMessageController.addListener(_update);
+    _pageController = PageController(
+      initialPage: 0,
+    );
   }
 
   _update() {
@@ -25,19 +30,16 @@ class _FullScreenWidgetState extends State<FullScreenWidget> {
   }
 
   Widget _buildFullScreenWidget(BuildContext context, Widget child) {
-    IndexWidgetProvider indexWidgetProvider =
-        Provider.of<IndexWidgetProvider>(context);
-    return Stack(
-      children: [
-        GestureDetector(
-          onTap: () {},
-          child: Center(
-              child: Container(
-            color: Colors.black,
-            child: child,
-          )),
-        ),
-      ],
+    return PageView.builder(
+      controller: _pageController,
+      onPageChanged: (int index) {},
+      itemBuilder: (BuildContext ctx, int index) {
+        return Center(
+            child: Container(
+          color: Colors.black,
+          child: child,
+        ));
+      },
     );
   }
 
