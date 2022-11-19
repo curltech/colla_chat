@@ -8,14 +8,18 @@ class ImageMessage extends StatelessWidget {
   final String mimeType;
   final String messageId;
   final bool isMyself;
+  final double? width;
+  final double? height;
 
-  const ImageMessage(
-      {Key? key,
-      this.image,
-      required this.messageId,
-      required this.isMyself,
-      required this.mimeType})
-      : super(key: key);
+  const ImageMessage({
+    Key? key,
+    this.image,
+    required this.messageId,
+    required this.isMyself,
+    required this.mimeType,
+    this.width,
+    this.height,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -26,13 +30,10 @@ class ImageMessage extends StatelessWidget {
           if (filename == null) {
             return Container();
           }
-          return InkWell(
-            onTap: () {},
-            child: ImageUtil.buildImageWidget(
-              image:filename,
-              width: 64,
-              height: 64
-            ),
+          return ImageUtil.buildImageWidget(
+            image: filename,
+            width: width,
+            height: height,
           );
         });
     return imageWidget;

@@ -1,14 +1,10 @@
-import 'package:colla_chat/tool/connectivity_util.dart';
-import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:colla_chat/pages/chat/channel/channel_widget.dart';
+import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
+import 'package:colla_chat/pages/chat/me/me_widget.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../../provider/index_widget_provider.dart';
-import '../channel/channel_widget.dart';
-import '../chat/chat_list_widget.dart';
-import '../linkman/linkman_list_widget.dart';
-import '../me/me_widget.dart';
 
 ///主工作区，是PageView
 class IndexWidget extends StatefulWidget {

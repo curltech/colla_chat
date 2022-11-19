@@ -84,7 +84,6 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     var indexWidgetProvider =
         Provider.of<IndexWidgetProvider>(context, listen: false);
     indexWidgetProvider.define(widget.chatMessageView);
-    indexWidgetProvider.define(widget.fullScreenWidget);
     websocketPool.addListener(_update);
     ConnectivityUtil.onConnectivityChanged(_onConnectivityChanged);
   }

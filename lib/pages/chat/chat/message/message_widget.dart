@@ -1,6 +1,7 @@
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/message/action_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/audio_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/extended_text_message.dart';
@@ -15,9 +16,12 @@ import 'package:flutter/material.dart';
 
 class MessageWidget {
   final ChatMessage chatMessage;
+  final int index;
   bool? _isMyself;
 
-  MessageWidget(this.chatMessage);
+  MessageWidget(this.chatMessage, this.index) {
+    chatMessageController.chatView;
+  }
 
   bool get isMyself {
     if (_isMyself != null) {
@@ -47,33 +51,51 @@ class MessageWidget {
     ChatSubMessageType? subMessageType;
     subMessageType = StringUtil.enumFromString(
         ChatSubMessageType.values, chatMessage.subMessageType!);
+    Widget body;
     if (subMessageType == ChatSubMessageType.chat) {
       switch (contentType) {
         case ContentType.text:
-          return buildExtendedTextMessageWidget(context);
+          body = buildExtendedTextMessageWidget(context);
+          break;
         case ContentType.audio:
-          return buildAudioMessageWidget(context);
+          body = buildAudioMessageWidget(context);
+          break;
         case ContentType.video:
-          return buildVideoMessageWidget(context);
+          body = buildVideoMessageWidget(context);
+          break;
         case ContentType.file:
-          return buildFileMessageWidget(context);
+          body = buildFileMessageWidget(context);
+          break;
         case ContentType.image:
-          return buildImageMessageWidget(context);
+          body = buildImageMessageWidget(context);
+          break;
         case ContentType.card:
-          return buildNameCardMessageWidget(context);
+          body = buildNameCardMessageWidget(context);
+          break;
         case ContentType.rich:
-          return buildRichTextMessageWidget(context);
+          body = buildRichTextMessageWidget(context);
+          break;
         case ContentType.link:
-          return buildUrlMessageWidget(context);
+          body = buildUrlMessageWidget(context);
+          break;
         default:
+          body = Container();
           break;
       }
     } else if (subMessageType == ChatSubMessageType.videoChat) {
-      return buildActionMessageWidget(context, subMessageType!);
+      body = buildActionMessageWidget(context, subMessageType!);
     } else if (subMessageType == ChatSubMessageType.addFriend) {
-      return buildActionMessageWidget(context, subMessageType!);
+      body = buildActionMessageWidget(context, subMessageType!);
+    } else {
+      body = Container();
     }
-    return null;
+    body = InkWell(
+        onTap: () {
+          chatMessageController.currentIndex = index;
+          chatMessageController.chatView = ChatView.full;
+        },
+        child: body);
+    return body;
   }
 
   ExtendedTextMessage buildExtendedTextMessageWidget(BuildContext context) {
@@ -130,11 +152,19 @@ class MessageWidget {
     String? messageId = chatMessage.messageId;
     String? thumbnail = chatMessage.thumbnail;
     String mimeType = chatMessage.mimeType!;
+    double? width;
+    double? height;
+    if (chatMessageController.chatView == ChatView.text) {
+      width = 64;
+      height = 64;
+    }
     return ImageMessage(
       messageId: messageId!,
       image: thumbnail,
       isMyself: isMyself,
       mimeType: mimeType,
+      width: width,
+      height: height,
     );
   }
 
