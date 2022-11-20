@@ -4,7 +4,6 @@ import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_view.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/chat/full_screen_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -37,7 +36,6 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
   final GroupDataListController groupDataListController =
       GroupDataListController();
   final ChatMessageView chatMessageView = ChatMessageView();
-  final FullScreenWidget fullScreenWidget = const FullScreenWidget();
 
   ChatListWidget({Key? key}) : super(key: key) {
     chatSummaryService
@@ -84,7 +82,6 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     var indexWidgetProvider =
         Provider.of<IndexWidgetProvider>(context, listen: false);
     indexWidgetProvider.define(widget.chatMessageView);
-    indexWidgetProvider.define(widget.fullScreenWidget);
     websocketPool.addListener(_update);
     ConnectivityUtil.onConnectivityChanged(_onConnectivityChanged);
   }

@@ -132,6 +132,7 @@ dependencies:
   material_design_icons_flutter: ^5.0.6295
   #flutter_bloc: ^6.1.0
   #flutter_swiper: 1.1.6 # Flutter 轮播图 https://github.com/best-flutter/flutter_swiper
+  flutter_swiper_null_safety: any
   flutter_screenutil: ^5.5.3 # Flutter 屏幕适配 https://github.com/OpenFlutter/flutter_screenutil
   flex_color_picker: ^2.4.0
   file_picker: ^4.6.0
@@ -230,6 +231,8 @@ dependencies:
   image_cropping: ^0.0.13
 
   #应用
+  power_file_view: ^1.0.0
+  open_document: any
   i18n_extension: ^5.0.1
   flutter_quill: ^6.1.2
   visual_editor:

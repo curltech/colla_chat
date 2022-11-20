@@ -12,11 +12,14 @@ import 'package:flutter/material.dart';
 /// 每条消息展示组件，我接收的消息展示在左边，我发送的消息展示在右边
 class ChatMessageItem extends StatelessWidget {
   final ChatMessage chatMessage;
+  final int index;
+
   late final bool isMyself;
   late final MessageWidget messageWidget;
 
-  ChatMessageItem({Key? key, required this.chatMessage}) : super(key: key) {
-    messageWidget = MessageWidget(chatMessage);
+  ChatMessageItem({Key? key, required this.chatMessage, required this.index})
+      : super(key: key) {
+    messageWidget = MessageWidget(chatMessage,index);
     isMyself = messageWidget.isMyself;
   }
 
@@ -43,7 +46,7 @@ class ChatMessageItem extends StatelessWidget {
 
     return Row(
       mainAxisAlignment:
-          isMyself ? MainAxisAlignment.end : MainAxisAlignment.start,
+      isMyself ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: <Widget>[
         Container(
           padding: EdgeInsets.fromLTRB(

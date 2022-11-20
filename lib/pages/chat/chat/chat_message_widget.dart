@@ -42,6 +42,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   ///扩展文本输入框的控制器
   final TextEditingController textEditingController = TextEditingController();
   FocusNode textFocusNode = FocusNode();
+  late final AnimationController animateController;
   late String peerId;
   late String name;
   String? clientId;
@@ -54,6 +55,8 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     chatMessageController.addListener(_update);
     var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
+    animateController = AnimationController(
+        vsync: this, duration: const Duration(milliseconds: 500));
     _init();
 
     ///滚到指定的位置
@@ -163,18 +166,18 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     List<ChatMessage> messages = chatMessageController.data;
     ChatMessage item = messages[index];
     // 创建消息动画控制器
-    var animate = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 500));
-    Widget chatMessageItem = ChatMessageItem(chatMessage: item);
+
+    Widget chatMessageItem = ChatMessageItem(chatMessage: item, index: index);
 
     // index=0执行动画，对最新的消息执行动画
     if (index == 0) {
       // 开始动画
-      animate.forward();
+      animateController.forward();
       // 大小变化动画组件
       return SizeTransition(
         // 指定非线性动画类型
-        sizeFactor: CurvedAnimation(parent: animate, curve: Curves.easeInOut),
+        sizeFactor:
+            CurvedAnimation(parent: animateController, curve: Curves.easeInOut),
         axisAlignment: 0.0,
         // 指定为当前消息组件
         child: chatMessageItem,
@@ -221,6 +224,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     chatMessageController.removeListener(_update);
     widget.scrollController.removeListener(_onScroll);
     textEditingController.dispose();
+    animateController.dispose();
     super.dispose();
   }
 }
