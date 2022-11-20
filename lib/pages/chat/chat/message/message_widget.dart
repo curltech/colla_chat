@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:typed_data';
+
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
@@ -11,6 +14,9 @@ import 'package:colla_chat/pages/chat/chat/message/name_card_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/rich_text_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/url_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/video_message.dart';
+import 'package:colla_chat/service/chat/chat.dart';
+import 'package:colla_chat/tool/document_util.dart';
+import 'package:colla_chat/tool/pdf_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:flutter/material.dart';
 
@@ -41,7 +47,7 @@ class MessageWidget {
 
   ///消息体：扩展文本，图像，声音，视频，页面，复合文本，文件，名片，位置，收藏等种类
   ///每种消息体一个类
-  Widget? buildMessageBody(BuildContext context) {
+  Future<Widget> buildMessageBody(BuildContext context) async {
     ContentType? contentType;
     if (chatMessage.contentType != null) {
       contentType = StringUtil.enumFromString(
@@ -64,7 +70,7 @@ class MessageWidget {
           body = buildVideoMessageWidget(context);
           break;
         case ContentType.file:
-          body = buildFileMessageWidget(context);
+          body = await buildFileMessageWidget(context);
           break;
         case ContentType.image:
           body = buildImageMessageWidget(context);
@@ -190,17 +196,28 @@ class MessageWidget {
     );
   }
 
-  Widget buildFileMessageWidget(BuildContext context) {
+  Future<Widget> buildFileMessageWidget(BuildContext context) async {
     String? messageId = chatMessage.messageId;
     String? title = chatMessage.title;
     String? mimeType = chatMessage.mimeType;
     mimeType = mimeType ?? 'text/plain';
     if (mimeType.startsWith('image')) {
       return buildImageMessageWidget(context);
+    } else if (mimeType.contains('pdf')) {
+      if (chatMessageController.chatView == ChatView.full) {
+        return buildPdfMessageWidget(context);
+      }
     } else if (mimeType.startsWith('audio')) {
       return buildAudioMessageWidget(context);
     } else if (mimeType.startsWith('video')) {
       return buildVideoMessageWidget(context);
+    } else if (mimeType.contains('docx') ||
+        mimeType.contains('doc') ||
+        mimeType.contains('xlsx') ||
+        mimeType.contains('xls') ||
+        mimeType.contains('pptx') ||
+        mimeType.contains('ppt')) {
+      return await buildOfficeMessageWidget(context);
     }
     return FileMessage(
       messageId: messageId!,
@@ -208,5 +225,28 @@ class MessageWidget {
       title: title!,
       mimeType: mimeType,
     );
+  }
+
+  Widget buildPdfMessageWidget(BuildContext context) {
+    String? content = chatMessage.content;
+    if (content != null) {
+      Uint8List data = CryptoUtil.decodeBase64(content);
+      if (chatMessageController.chatView == ChatView.full) {
+        return PdfUtil.buildPdfView(data: Future.value(data));
+      }
+    }
+    return Container();
+  }
+
+  Future<Widget> buildOfficeMessageWidget(BuildContext context) async {
+    String? messageId = chatMessage.messageId;
+    if (messageId != null) {
+      String? filename = await messageAttachmentService.getFilename(messageId);
+
+      if (filename != null && chatMessageController.chatView == ChatView.full) {
+        return DocumentUtil.buildFileReaderView(filePath: filename);
+      }
+    }
+    return Container();
   }
 }
