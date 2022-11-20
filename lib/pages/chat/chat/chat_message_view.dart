@@ -120,6 +120,16 @@ class _ChatMessageViewState extends State<ChatMessageView> {
       rightWidgets.add(const SizedBox(
         width: 15,
       ));
+      if (chatMessageController.chatView == ChatView.full) {
+        rightWidgets.add(InkWell(
+            onTap: () {
+              chatMessageController.chatView = ChatView.text;
+            },
+            child: const Icon(Icons.assignment_return)));
+        rightWidgets.add(const SizedBox(
+          width: 15,
+        ));
+      }
     }
     var appBarView = AppBarView(
         title: titleWidget,

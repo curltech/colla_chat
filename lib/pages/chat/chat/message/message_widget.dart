@@ -211,13 +211,15 @@ class MessageWidget {
       return buildAudioMessageWidget(context);
     } else if (mimeType.startsWith('video')) {
       return buildVideoMessageWidget(context);
-    } else if (mimeType.contains('docx') ||
+    } else if (mimeType == 'application/msword' ||
         mimeType.contains('doc') ||
         mimeType.contains('xlsx') ||
         mimeType.contains('xls') ||
         mimeType.contains('pptx') ||
         mimeType.contains('ppt')) {
-      return await buildOfficeMessageWidget(context);
+      if (chatMessageController.chatView == ChatView.full) {
+        return await buildOfficeMessageWidget(context);
+      }
     }
     return FileMessage(
       messageId: messageId!,
@@ -227,12 +229,12 @@ class MessageWidget {
     );
   }
 
-  Widget buildPdfMessageWidget(BuildContext context) {
-    String? content = chatMessage.content;
-    if (content != null) {
-      Uint8List data = CryptoUtil.decodeBase64(content);
-      if (chatMessageController.chatView == ChatView.full) {
-        return PdfUtil.buildPdfView(data: Future.value(data));
+  Future<Widget> buildPdfMessageWidget(BuildContext context) async {
+    String? messageId = chatMessage.messageId;
+    if (messageId != null) {
+      String? filename = await messageAttachmentService.getFilename(messageId);
+      if (filename != null && chatMessageController.chatView == ChatView.full) {
+        return PdfUtil.buildPdfView(filename: filename);
       }
     }
     return Container();
@@ -242,7 +244,6 @@ class MessageWidget {
     String? messageId = chatMessage.messageId;
     if (messageId != null) {
       String? filename = await messageAttachmentService.getFilename(messageId);
-
       if (filename != null && chatMessageController.chatView == ChatView.full) {
         return DocumentUtil.buildFileReaderView(filePath: filename);
       }
