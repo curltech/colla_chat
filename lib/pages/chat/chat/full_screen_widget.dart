@@ -2,7 +2,6 @@ import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/message/message_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_swiper_null_safety/flutter_swiper_null_safety.dart';
 
 class FullScreenWidget extends StatefulWidget {
   const FullScreenWidget({Key? key}) : super(key: key);
@@ -14,17 +13,18 @@ class FullScreenWidget extends StatefulWidget {
 }
 
 class _FullScreenWidgetState extends State<FullScreenWidget> {
-  late PageController _swiperControl;
+  PageController pageController = PageController();
 
   @override
   void initState() {
     super.initState();
     chatMessageController.addListener(_update);
-    _swiperControl = PageController();
   }
 
   _update() {
-    setState(() {});
+    setState(() {
+      pageController.jumpToPage(chatMessageController.currentIndex);
+    });
   }
 
   Widget _buildMessageWidget(BuildContext context, int index) {
@@ -51,13 +51,12 @@ class _FullScreenWidgetState extends State<FullScreenWidget> {
             ));
           },
           itemCount: chatMessageController.length,
-          controller: _swiperControl,
+          controller: pageController,
         ));
   }
 
   @override
   Widget build(BuildContext context) {
-    //_swiperControl.jumpToPage(chatMessageController.currentIndex);
     return _buildFullScreenWidget(context);
   }
 
