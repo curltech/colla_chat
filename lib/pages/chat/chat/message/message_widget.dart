@@ -203,7 +203,7 @@ class MessageWidget {
     mimeType = mimeType ?? 'text/plain';
     if (mimeType.startsWith('image')) {
       return buildImageMessageWidget(context);
-    } else if (mimeType.contains('pdf')) {
+    } else if (mimeType == 'application/pdf') {
       if (chatMessageController.chatView == ChatView.full) {
         return buildPdfMessageWidget(context);
       }
@@ -212,11 +212,8 @@ class MessageWidget {
     } else if (mimeType.startsWith('video')) {
       return buildVideoMessageWidget(context);
     } else if (mimeType == 'application/msword' ||
-        mimeType.contains('doc') ||
-        mimeType.contains('xlsx') ||
-        mimeType.contains('xls') ||
-        mimeType.contains('pptx') ||
-        mimeType.contains('ppt')) {
+        mimeType == 'application/msexcel' ||
+        mimeType == 'application/msppt') {
       if (chatMessageController.chatView == ChatView.full) {
         return await buildOfficeMessageWidget(context);
       }
