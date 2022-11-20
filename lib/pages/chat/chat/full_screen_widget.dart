@@ -38,27 +38,23 @@ class _FullScreenWidgetState extends State<FullScreenWidget> {
 
   Widget _buildFullScreenWidget(BuildContext context) {
     return GestureDetector(
-        onTap: () {
-          chatMessageController.chatView = ChatView.text;
-        },
         child: PageView.builder(
-          itemBuilder: (BuildContext context, int index) {
-            return Center(
-                child: Container(
-              //color: Colors.black,
-              child: FutureBuilder(
-                future: _buildMessageWidget(context, index),
-                builder:
-                    (BuildContext context, AsyncSnapshot<Widget> snapshot) {
-                  Widget widget = snapshot.data ?? Container();
-                  return widget;
-                },
-              ),
-            ));
-          },
-          itemCount: chatMessageController.length,
-          controller: pageController,
+      itemBuilder: (BuildContext context, int index) {
+        return Center(
+            child: Container(
+          //color: Colors.black,
+          child: FutureBuilder(
+            future: _buildMessageWidget(context, index),
+            builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+              Widget widget = snapshot.data ?? Container();
+              return widget;
+            },
+          ),
         ));
+      },
+      itemCount: chatMessageController.length,
+      controller: pageController,
+    ));
   }
 
   @override
