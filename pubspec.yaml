@@ -163,6 +163,7 @@ dependencies:
   synchronized: ^3.0.0+2
   flutter_smart_dialog: any
   pdfx: ^2.3.0
+  pdf_flutter: ^1.1.4
   pdf: ^3.8.3
   #syncfusion_flutter_pdfviewer: ^20.3.49
   json_annotation: ^4.3.0
@@ -231,8 +232,7 @@ dependencies:
   image_cropping: ^0.0.13
 
   #应用
-  power_file_view: ^1.0.0
-  open_document: any
+  flutter_filereader: 3.0.0
   i18n_extension: ^5.0.1
   flutter_quill: ^6.1.2
   visual_editor:

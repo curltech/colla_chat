@@ -27,12 +27,11 @@ class _FullScreenWidgetState extends State<FullScreenWidget> {
     });
   }
 
-  Widget _buildMessageWidget(BuildContext context, int index) {
+  Future<Widget> _buildMessageWidget(BuildContext context, int index) async {
     ChatMessage chatMessage = chatMessageController.data[index];
-    Widget? child;
+    Widget child;
     MessageWidget messageWidget = MessageWidget(chatMessage, index);
-    child = messageWidget.buildMessageBody(context);
-    child = child ?? Container();
+    child = await messageWidget.buildMessageBody(context);
 
     return child;
   }
@@ -47,7 +46,14 @@ class _FullScreenWidgetState extends State<FullScreenWidget> {
             return Center(
                 child: Container(
               //color: Colors.black,
-              child: _buildMessageWidget(context, index),
+              child: FutureBuilder(
+                future: _buildMessageWidget(context, index),
+                builder:
+                    (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+                  Widget widget = snapshot.data ?? Container();
+                  return widget;
+                },
+              ),
             ));
           },
           itemCount: chatMessageController.length,
