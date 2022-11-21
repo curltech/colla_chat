@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:badges/badges.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
@@ -72,6 +74,7 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
 
 class _ChatListWidgetState extends State<ChatListWidget> {
   ConnectivityResult _result = ConnectivityResult.none;
+  late StreamSubscription<ConnectivityResult> subscription;
 
   @override
   initState() {
@@ -83,7 +86,8 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         Provider.of<IndexWidgetProvider>(context, listen: false);
     indexWidgetProvider.define(widget.chatMessageView);
     websocketPool.addListener(_update);
-    ConnectivityUtil.onConnectivityChanged(_onConnectivityChanged);
+    subscription =
+        ConnectivityUtil.onConnectivityChanged(_onConnectivityChanged);
   }
 
   _update() {
@@ -237,5 +241,6 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     peerConnectionPoolController.removeListener(_update);
     websocketPool.removeListener(_update);
     super.dispose();
+    ConnectivityUtil.cancel(subscription);
   }
 }
