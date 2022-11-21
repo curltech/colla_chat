@@ -19,4 +19,9 @@ class ConnectivityUtil {
 
     return subscription;
   }
+
+  static Future<void> cancel(
+      StreamSubscription<ConnectivityResult> subscription) async {
+    await subscription.cancel();
+  }
 }
