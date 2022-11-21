@@ -2,7 +2,14 @@ import 'dart:async';
 
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:map_launcher/map_launcher.dart' as map_launcher;
+import 'package:platform_maps_flutter/platform_maps_flutter.dart'
+    as platform_map;
 
 class GeolocatorUtil {
   static Future<Position?> checkPermission() async {
@@ -108,5 +115,178 @@ class GeolocatorUtil {
     });
 
     return positionStream;
+  }
+
+  ///计算地图距离
+  static double distance(LatLng x, LatLng y) {
+    const Distance distance = Distance();
+    final double meter = distance(x, y);
+
+    return meter;
+  }
+
+  static LatLng offset(LatLng x) {
+    const Distance distance = Distance();
+    final num distanceInMeter = (6378 * pi / 4).round();
+    final p = distance.offset(x, distanceInMeter, 180);
+    // LatLng(latitude:-45.219848, longitude:0.0)
+    logger.i(p.round());
+    // 45° 13' 11.45" S, 0° 0' 0.00" O
+    logger.i(p.toSexagesimal());
+
+    return p;
+  }
+
+  static Path<LatLng> smoothPath(Iterable<LatLng> coordinates) {
+    // zigzag is a list of coordinates
+    final Path path = Path.from(coordinates);
+
+    // Result is below
+    final Path steps = path.equalize(8, smoothPath: true);
+
+    return steps;
+  }
+
+  ///Leaflet地图
+  static FlutterMap buildFlutterMap(LatLng center, double zoom) {
+    return FlutterMap(
+      mapController: MapController(),
+      options: MapOptions(
+        center: center,
+        zoom: zoom,
+      ),
+      nonRotatedChildren: [
+        AttributionWidget.defaultWidget(
+          source: 'OpenStreetMap contributors',
+          onSourceTapped: null,
+        ),
+      ],
+      children: [
+        TileLayer(
+          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+          userAgentPackageName: 'com.example.app',
+        ),
+      ],
+    );
+  }
+
+  ///获取安装的地图软件列表
+  static Future<List<map_launcher.AvailableMap>> installedMaps() async {
+    final availableMaps = await map_launcher.MapLauncher.installedMaps;
+
+    return availableMaps;
+  }
+
+  ///根据地图和位置调用安装的地图软件
+  static Future<void> showMarker(
+      map_launcher.AvailableMap map, map_launcher.Coords coords,
+      {required String title}) async {
+    await map.showMarker(
+      coords: coords,
+      title: title,
+    );
+  }
+
+  ///是否安装了地图类型
+  static Future<bool?> isMapAvailable(map_launcher.MapType mapType) async {
+    return await map_launcher.MapLauncher.isMapAvailable(mapType);
+  }
+
+  ///根据地图的类型调用安装的地图软件
+  static Future<void> mapLauncher(
+      map_launcher.MapType mapType, map_launcher.Coords coords,
+      {required String title, String? description}) async {
+    await map_launcher.MapLauncher.showMarker(
+      mapType: mapType,
+      coords: coords,
+      title: title,
+      description: description,
+    );
+  }
+
+  ///构建地图Widget
+  static platform_map.PlatformMap buildPlatformMap(
+      {required platform_map.LatLng target, double zoom = 0}) {
+    return platform_map.PlatformMap(
+      initialCameraPosition: platform_map.CameraPosition(
+        target: target,
+        zoom: zoom,
+      ),
+      markers: <platform_map.Marker>{
+        platform_map.Marker(
+          markerId: platform_map.MarkerId('marker_1'),
+          position: const platform_map.LatLng(47.6, 8.8796),
+          consumeTapEvents: true,
+          infoWindow: const platform_map.InfoWindow(
+            title: 'PlatformMarker',
+            snippet: "Hi I'm a Platform Marker",
+          ),
+          onTap: () {
+            logger.i("Marker tapped");
+          },
+        ),
+      },
+      myLocationEnabled: true,
+      myLocationButtonEnabled: true,
+      onTap: (location) => logger.i('onTap: $location'),
+      onCameraMove: (cameraUpdate) => logger.i('onCameraMove: $cameraUpdate'),
+      compassEnabled: true,
+      onMapCreated: (controller) {
+        Future.delayed(const Duration(seconds: 2)).then(
+          (_) {
+            controller.animateCamera(
+              platform_map.CameraUpdate.newCameraPosition(
+                const platform_map.CameraPosition(
+                  bearing: 270.0,
+                  target: platform_map.LatLng(51.5160895, -0.1294527),
+                  tilt: 30.0,
+                  zoom: 18,
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  ///当前位置的地图
+  Widget buildCurrentLocationLayer({
+    Key? key,
+    LocationMarkerStyle style = const LocationMarkerStyle(),
+    Stream<LocationMarkerPosition>? positionStream,
+    Stream<LocationMarkerHeading>? headingStream,
+    Stream<double?>? centerCurrentLocationStream,
+    Stream<void>? turnHeadingUpLocationStream,
+    CenterOnLocationUpdate centerOnLocationUpdate =
+        CenterOnLocationUpdate.never,
+    TurnOnHeadingUpdate turnOnHeadingUpdate = TurnOnHeadingUpdate.never,
+    Duration centerAnimationDuration = const Duration(milliseconds: 200),
+    Curve centerAnimationCurve = Curves.fastOutSlowIn,
+    Duration turnAnimationDuration = const Duration(milliseconds: 200),
+    Curve turnAnimationCurve = Curves.easeInOut,
+    Duration moveAnimationDuration = const Duration(milliseconds: 200),
+    Curve moveAnimationCurve = Curves.fastOutSlowIn,
+    Duration rotateAnimationDuration = const Duration(milliseconds: 200),
+    Curve rotateAnimationCurve = Curves.easeInOut,
+  }) {
+    return CurrentLocationLayer(
+      key: key,
+      style: style,
+      positionStream: positionStream,
+      headingStream: headingStream,
+      centerCurrentLocationStream: centerCurrentLocationStream,
+      turnHeadingUpLocationStream: turnHeadingUpLocationStream,
+      centerOnLocationUpdate: centerOnLocationUpdate,
+      turnOnHeadingUpdate: turnOnHeadingUpdate,
+      centerAnimationDuration: centerAnimationDuration,
+      centerAnimationCurve: centerAnimationCurve,
+      turnAnimationDuration: turnAnimationDuration,
+      turnAnimationCurve: turnAnimationCurve,
+      moveAnimationDuration: moveAnimationDuration,
+      moveAnimationCurve: moveAnimationCurve,
+      rotateAnimationDuration: rotateAnimationDuration,
+      rotateAnimationCurve: rotateAnimationCurve,
+    );
   }
 }
