@@ -1,15 +1,12 @@
-import 'dart:typed_data';
-
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
-
-import '../../provider/data_list_controller.dart';
 
 ///指定路由样式，不指定则系统判断，系统判断的方法是如果是移动则走全局路由，否则走工作区路由
 enum RouteStyle { workspace, navigator }
@@ -85,7 +82,7 @@ class TileData {
       if (prefix is Widget) {
         leading = prefix;
       } else if (prefix is String) {
-        leading = ImageUtil.buildImageWidget(image:prefix);
+        leading = ImageUtil.buildImageWidget(image: prefix);
       } else if (prefix is IconData) {
         leading = Icon(prefix);
       }
@@ -136,7 +133,7 @@ class DataListTile extends StatelessWidget {
     ///然后，如果路由名称存在，加入路由图标
     if (tileData.routeName != null) {
       trailing.add(Icon(Icons.chevron_right,
-          color: appDataProvider.themeData?.colorScheme.primary));
+          color: appDataProvider.themeData.colorScheme.primary));
     }
 
     ///横向排列尾部的组件
@@ -204,7 +201,7 @@ class DataListTile extends StatelessWidget {
               slideAction.onTap!(i, slideAction.title);
             }
           },
-          backgroundColor: appDataProvider.themeData!.colorScheme.primary,
+          backgroundColor: appDataProvider.themeData.colorScheme.primary,
           foregroundColor: Colors.white,
           icon: slideAction.prefix,
           label: slideAction.title,

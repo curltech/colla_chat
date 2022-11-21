@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
@@ -8,7 +9,7 @@ import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:cryptography/cryptography.dart';
-
+import 'package:flutter/material.dart';
 
 class PeerClientService extends PeerEntityService<PeerClient> {
   var peerClients = <String, Map<String, PeerClient>>{};
@@ -76,6 +77,15 @@ class PeerClientService extends PeerEntityService<PeerClient> {
       peerClient.avatarImage = avatarImage;
     }
     return peerClient;
+  }
+
+  Future<Widget> findAvatarImageWidget(String peerId) async {
+    Widget image = defaultImage;
+    var peerClient = await findCachedOneByPeerId(peerId);
+    if (peerClient != null && peerClient.avatarImage != null) {
+      image = peerClient.avatarImage!;
+    }
+    return image;
   }
 
   Future<PeerClient?> findOneByClientId(String peerId,

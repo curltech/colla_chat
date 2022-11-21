@@ -135,9 +135,10 @@ dependencies:
   flutter_swiper_null_safety: any
   flutter_screenutil: ^5.5.3 # Flutter 屏幕适配 https://github.com/OpenFlutter/flutter_screenutil
   flex_color_picker: ^2.4.0
-  file_picker: ^4.6.0
-  filesystem_picker: ^3.0.0
+  file_picker: ^5.2.2
+  filesystem_picker: ^3.1.0
   wechat_assets_picker: ^8.0.2 #微信图库
+  full_picker: ^1.1.5
   flutter_slidable: ^2.0.0
 
   #安全加密
