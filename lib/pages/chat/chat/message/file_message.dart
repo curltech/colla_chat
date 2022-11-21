@@ -19,19 +19,24 @@ class FileMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var tile = InkWell(
-      onTap: () {},
-      child: ListTile(
-        leading: Mimecon(
-          mimetype: mimeType,
-          color: appDataProvider.themeData.colorScheme.primary,
-          size: 36,
-          isOutlined: true,
-        ),
-        title: Text(title),
-        subtitle: Text(mimeType),
+    var tile = ListTile(
+      leading: Mimecon(
+        mimetype: mimeType,
+        color: appDataProvider.themeData.colorScheme.primary,
+        size: 36,
+        isOutlined: true,
       ),
+      title: Text(title),
+      subtitle: Text(mimeType),
+      isThreeLine: true,
+      dense: true,
+      horizontalTitleGap: 0,
+      minVerticalPadding: 0,
+      contentPadding: EdgeInsets.zero,
     );
-    return SizedBox(height: 90, child: Card(elevation: 0, child: tile));
+    return Card(
+        elevation: 0,
+        child:
+            tile); //SizedBox(height: 90, child: Card(elevation: 0, child: tile));
   }
 }

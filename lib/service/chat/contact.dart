@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/base.dart';
@@ -18,6 +19,7 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:cryptography/cryptography.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as flutter_contacts;
 
 abstract class PeerPartyService<T> extends PeerEntityService<T> {
@@ -71,6 +73,15 @@ class LinkmanService extends PeerPartyService<Linkman> {
       linkmen[peerId] = linkman;
     }
     return linkman;
+  }
+
+  Future<Widget> findAvatarImageWidget(String peerId) async {
+    Widget image = defaultImage;
+    var linkman = await findCachedOneByPeerId(peerId);
+    if (linkman != null && linkman.avatarImage != null) {
+      image = linkman.avatarImage!;
+    }
+    return image;
   }
 
   ///发出linkman邀请，把自己的详细的信息发出，当邀请被同意后，就会收到对方详细的信息

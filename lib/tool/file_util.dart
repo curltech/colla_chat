@@ -8,6 +8,7 @@ import 'package:file_saver/file_saver.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:full_picker/full_picker.dart';
 import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
@@ -273,5 +274,63 @@ class FileUtil {
   static String filename(String filename) {
     int pos = filename.lastIndexOf(p.separator);
     return filename.substring(pos + 1);
+  }
+
+  static void fullPicker({
+    required BuildContext context,
+    bool image = true,
+    bool video = false,
+    bool file = false,
+    bool voiceRecorder = false,
+    bool imageCamera = false,
+    bool videoCamera = false,
+    String prefixName = "File",
+    bool videoCompressor = false,
+    bool imageCropper = false,
+    bool multiFile = false,
+    void Function(List<String?>)? onSelectedFilenames,
+    void Function(List<Uint8List?>)? onSelectedBytes,
+    void Function(int)? onError,
+  }) {
+    Language language = Language.copy(
+      camera: AppLocalizations.t('camera'),
+      selectFile: AppLocalizations.t('selectFile'),
+      file: AppLocalizations.t('file'),
+      voiceRecorder: AppLocalizations.t('voiceRecorder'),
+      gallery: AppLocalizations.t('gallery'),
+      cropper: AppLocalizations.t('cropper'),
+      onCompressing: AppLocalizations.t('onCompressing'),
+      tapForPhotoHoldForVideo: AppLocalizations.t('tapForPhotoHoldForVideo'),
+      cameraNotFound: AppLocalizations.t('cameraNotFound'),
+      noVoiceRecorded: AppLocalizations.t('noVoiceRecorded'),
+      denyAccessPermission: AppLocalizations.t('denyAccessPermission'),
+    );
+    FullPicker(
+      context: context,
+      language: language,
+      prefixName: prefixName,
+      file: file,
+      image: image,
+      video: video,
+      videoCamera: videoCamera,
+      imageCamera: imageCamera,
+      voiceRecorder: voiceRecorder,
+      videoCompressor: videoCompressor,
+      imageCropper: imageCropper,
+      multiFile: multiFile,
+      onError: (int error) {
+        if (onError != null) {
+          onError(error);
+        }
+      },
+      onSelected: (OutputFile file) {
+        if (onSelectedFilenames != null) {
+          onSelectedFilenames(file.name);
+        }
+        if (onSelectedBytes != null) {
+          onSelectedBytes(file.bytes);
+        }
+      },
+    );
   }
 }

@@ -139,5 +139,6 @@
   "Decrease volume": "减少音量",
   "Increase volume": "增大音量",
   "Waiting accept inviting...": "等待接受邀请...",
-  "Inviting you video chat": "邀请视频通话"
+  "Inviting you video chat": "邀请视频通话",
+  "No Webrtc PeerConnection": "Webrtc连接不存在"
 }

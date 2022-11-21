@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
@@ -7,6 +8,7 @@ import 'package:colla_chat/pages/chat/chat/video/video_chat_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_dialout_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -110,6 +112,19 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     name = name ?? '';
     String title = AppLocalizations.t(name!);
     Widget titleWidget = Text(title);
+    //     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+    //   Text(title),
+    //   const SizedBox(
+    //     width: 15,
+    //   ),
+    //   FutureBuilder(
+    //     future: _getImageWidget(context),
+    //     builder: (BuildContext context, AsyncSnapshot<Widget?> snapshot) {
+    //       Widget widget = snapshot.data ?? Container();
+    //       return widget;
+    //     },
+    //   ),
+    // ]);
     List<Widget> rightWidgets = [];
     if (partyType == PartyType.linkman.name) {
       if (status == PeerConnectionStatus.connected) {
@@ -120,7 +135,9 @@ class _ChatMessageViewState extends State<ChatMessageView> {
       rightWidgets.add(const SizedBox(
         width: 15,
       ));
-      if (chatMessageController.chatView == ChatView.full) {
+      if (chatMessageController.chatView == ChatView.full ||
+          chatMessageController.chatView == ChatView.video ||
+          chatMessageController.chatView == ChatView.dial) {
         rightWidgets.add(InkWell(
             onTap: () {
               chatMessageController.chatView = ChatView.text;

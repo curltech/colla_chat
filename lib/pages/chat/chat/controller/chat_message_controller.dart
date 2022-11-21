@@ -160,7 +160,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
           contentType: contentType,
           mimeType: mimeType,
           subMessageType: subMessageType);
-      await chatMessageService.sendAndStore(chatMessage);
+      chatMessage = await chatMessageService.sendAndStore(chatMessage);
       notifyListeners();
     } else if (partyType == PartyType.group.name) {
       //保存群消息
@@ -173,7 +173,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       if (chatMessages.isNotEmpty) {
         chatMessage = chatMessages[0];
         for (var chatMessage in chatMessages.sublist(1)) {
-          await chatMessageService.sendAndStore(chatMessage);
+          chatMessage = await chatMessageService.sendAndStore(chatMessage);
           await chatMessageService.store(chatMessage);
         }
       }

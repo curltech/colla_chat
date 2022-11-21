@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
@@ -16,6 +15,7 @@ import 'package:colla_chat/pages/chat/chat/message/url_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/video_message.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/tool/document_util.dart';
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/pdf_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:flutter/material.dart';
@@ -56,7 +56,7 @@ class MessageWidget {
     contentType = contentType ?? ContentType.text;
     ChatSubMessageType? subMessageType;
     subMessageType = StringUtil.enumFromString(
-        ChatSubMessageType.values, chatMessage.subMessageType!);
+        ChatSubMessageType.values, chatMessage.subMessageType);
     Widget body;
     if (subMessageType == ChatSubMessageType.chat) {
       switch (contentType) {
@@ -199,6 +199,10 @@ class MessageWidget {
   Future<Widget> buildFileMessageWidget(BuildContext context) async {
     String? messageId = chatMessage.messageId;
     String? title = chatMessage.title;
+    String? extension;
+    if (title != null) {
+      extension = FileUtil.extension(title);
+    }
     String? mimeType = chatMessage.mimeType;
     mimeType = mimeType ?? 'text/plain';
     if (mimeType.startsWith('image')) {
@@ -211,9 +215,12 @@ class MessageWidget {
       return buildAudioMessageWidget(context);
     } else if (mimeType.startsWith('video')) {
       return buildVideoMessageWidget(context);
-    } else if (mimeType == 'application/msword' ||
-        mimeType == 'application/msexcel' ||
-        mimeType == 'application/msppt') {
+    } else if (extension == 'docx' ||
+        extension == 'doc' ||
+        extension == 'xlsx' ||
+        extension == 'xls' ||
+        extension == 'pptx' ||
+        extension == 'ppt') {
       if (chatMessageController.chatView == ChatView.full) {
         return await buildOfficeMessageWidget(context);
       }

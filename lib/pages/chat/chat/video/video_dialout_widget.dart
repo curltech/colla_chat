@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -6,6 +7,8 @@ import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dar
 import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
@@ -111,7 +114,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
         alignment: Alignment.topRight,
         child: WidgetUtil.buildCircleButton(
             padding: const EdgeInsets.all(15.0),
-            backgroundColor: appDataProvider.themeData!.colorScheme.primary,
+            backgroundColor: appDataProvider.themeData.colorScheme.primary,
             onPressed: () {
               _closeOverlayEntry();
             },
@@ -146,6 +149,9 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
           await _send(title: ContentType.video.name);
         }
         setState(() {});
+      } else {
+        DialogUtil.error(context,
+            content: AppLocalizations.t('No Webrtc PeerConnection'));
       }
     } else if (partyType == PartyType.group.name) {
       await localMediaController.createVideoRender(
@@ -275,7 +281,13 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-            myself.avatarImage!,
+            FutureBuilder(
+              future: linkmanService.findAvatarImageWidget(peerId!),
+              builder: (BuildContext context, AsyncSnapshot<Widget?> snapshot) {
+                Widget widget = snapshot.data ?? Container();
+                return widget;
+              },
+            ),
             Text(name ?? ''),
           ]))),
       _buildActionCard(context),
