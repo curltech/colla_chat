@@ -5,7 +5,7 @@ class UrlUtil {
   ///适用于各种平台
   Future<bool> launch(
     String url, {
-    LaunchMode mode = LaunchMode.inAppWebView,
+    LaunchMode mode = LaunchMode.platformDefault,
     WebViewConfiguration webViewConfiguration = const WebViewConfiguration(),
     String? webOnlyWindowName,
   }) async {
