@@ -243,7 +243,20 @@ dependencies:
   enough_media: ^2.2.0
   enough_mail_html: ^2.0.0
   #在ios下会引发启动崩溃
-#  enough_mail_flutter: ^2.0.0 #ios崩溃
+  #enough_mail_flutter: ^2.0.0 #ios崩溃
+  flutter_map: ^3.0.0
+  latlong2: ^0.8.1
+  backdrop: ^0.8.1 #Use BackdropScaffold instead of the standard Scaffold in your app
+  sliding_up_panel: ^2.0.0+1
+  material_floating_search_bar: ^0.3.7
+  google_maps_flutter: ^2.2.1
+  #google_map_location_picker: ^4.1.7
+  map_launcher: ^2.4.0 #Map Launcher is a flutter plugin to find available maps installed on a device and launch them
+  flutter_svg: any
+  apple_maps_flutter: ^1.2.0
+  platform_maps_flutter: ^1.0.2
+  flutter_map_location_marker: ^5.0.0+1
+  maps_launcher: ^2.0.1
 dependency_overrides:
   photo_view: ^0.14.0
   device_info_plus: ^4.1.2
@@ -253,6 +266,8 @@ dependency_overrides:
   i18n_extension: ^5.0.1
   youtube_player_flutter: ^8.1.1
   flutter_inappwebview: ^6.0.0-beta.12
+  provider: ^6.0.1
+  geolocator: ^9.0.2
 dev_dependencies:
   flutter_test:
     sdk: flutter

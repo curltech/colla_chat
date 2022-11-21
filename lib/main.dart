@@ -65,8 +65,6 @@ void main(List<String> args) async {
   }
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
     await inapp.InAppWebViewController.setWebContentsDebuggingEnabled(true);
-    // await inapp.AndroidInAppWebViewController.setWebContentsDebuggingEnabled(
-    //     true);
   }
   ServiceLocator.init().then((value) {
     HttpOverrides.global = PlatformHttpOverrides();
