@@ -14,6 +14,8 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   ///3表示全屏界面，可以前后浏览消息
   ChatView _chatView = ChatView.text;
 
+  int _deleteTime = 0;
+
   ChatSummary? get chatSummary {
     return _chatSummary;
   }
@@ -38,6 +40,16 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     if (_chatView != chatView) {
       _chatView = chatView;
       notifyListeners();
+    }
+  }
+
+  int get deleteTime {
+    return _deleteTime;
+  }
+
+  set deleteTime(int deleteTime) {
+    if (_deleteTime != deleteTime) {
+      _deleteTime = deleteTime;
     }
   }
 
