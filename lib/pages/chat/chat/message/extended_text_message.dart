@@ -1,8 +1,9 @@
+import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/url_util.dart';
+import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
+import 'package:colla_chat/widgets/special_text/link_text.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
-
-import '../../../../widgets/special_text/custom_special_text_span_builder.dart';
 
 ///消息体：扩展文本
 class ExtendedTextMessage extends StatelessWidget {
@@ -24,14 +25,32 @@ class ExtendedTextMessage extends StatelessWidget {
       ),
       specialTextSpanBuilder: customSpecialTextSpanBuilder,
       onSpecialTextTap: (dynamic value) {
-        if (value.toString().startsWith('\$')) {
-          launchUrl(
-              Uri(scheme: 'https', host: 'github.com', path: 'fluttercandies'));
-        } else if (value.toString().startsWith('@')) {
-          launchUrl(Uri(
-            scheme: 'mailto',
-            path: 'zmtzawqlp@live.com',
-          ));
+        String val = value.toString();
+        if (val.startsWith(LinkText.flag) && val.endsWith(LinkText.flag)) {
+          val = val.substring(1, val.length - 1);
+          bool valid = value.startsWith('http://') ||
+              value.startsWith('https://') ||
+              value.startsWith('mailto:') ||
+              value.startsWith('tel:') ||
+              value.startsWith('sms:') ||
+              value.startsWith('file:');
+          if (!valid) {
+            final int index = value.indexOf('@');
+            final int index1 = value.indexOf('.');
+            valid = index > 0 && index1 > index;
+            if (valid) {
+              val = 'mailto:$val';
+            }
+          }
+          try {
+            UrlUtil.launch(val).then((bool success) {
+              if (!success) {
+                DialogUtil.error(context, content: 'URI launch fail');
+              }
+            });
+          } catch (e) {
+            DialogUtil.error(context, content: 'URI launch fail');
+          }
         }
       },
     );

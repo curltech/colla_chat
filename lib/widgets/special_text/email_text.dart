@@ -3,6 +3,7 @@ import 'dart:ui' as ui show PlaceholderAlignment;
 import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/material.dart';
 
+///空格开头，空格结尾的特殊字符串
 class EmailText extends SpecialText {
   EmailText(TextStyle textStyle, SpecialTextGestureTapCallback? onTap,
       {this.start, this.controller, this.context, required String startFlag})
@@ -91,11 +92,11 @@ class EmailText extends SpecialText {
                                 text: controller!.text.replaceRange(
                                     start!,
                                     start! + text.length,
-                                    textEditingController.text + ' '),
+                                    '${textEditingController.text} '),
                                 selection: TextSelection.fromPosition(
                                     TextPosition(
                                         offset: start! +
-                                            (textEditingController.text + ' ')
+                                            ('${textEditingController.text} ')
                                                 .length)));
 
                             Navigator.pop(context!);
