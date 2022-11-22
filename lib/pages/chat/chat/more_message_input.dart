@@ -3,25 +3,27 @@ import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/camera_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
+import 'package:colla_chat/widgets/media/media_player_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 final List<ActionData> defaultActionData = [
   ActionData(
+      label: 'DeleteTime',
+      tooltip: 'Delete time',
+      icon: const Icon(Icons.timer)),
+  ActionData(
       label: 'Picture',
       tooltip: 'Take a picture',
       icon: const Icon(Icons.camera)),
-  ActionData(
-      label: 'Voice',
-      tooltip: 'Record voice',
-      icon: const Icon(Icons.voice_chat)),
   ActionData(
     label: 'Video chat',
     tooltip: 'Invite video chat',
@@ -80,6 +82,9 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       return;
     }
     switch (name) {
+      case 'DeleteTime':
+        _onActionDeleteTime();
+        break;
       case 'Album':
         _onActionAlbum();
         break;
@@ -107,6 +112,40 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       default:
         break;
     }
+  }
+
+  ///阅后删除时间
+  _onActionDeleteTime() async {
+    int? deleteTime = await showMenu<int>(
+        context: context,
+        color: Colors.grey.withOpacity(0.8),
+        initialValue: chatMessageController.deleteTime,
+        items: [
+          _popupMenuItem(0),
+          _popupMenuItem(30),
+          _popupMenuItem(60),
+        ],
+        position: const RelativeRect.fromLTRB(0, 0, 0, 0));
+    deleteTime = deleteTime ?? 0;
+    chatMessageController.deleteTime = deleteTime;
+  }
+
+  PopupMenuItem<int> _popupMenuItem(int deleteTime) {
+    TextStyle style =
+        TextStyle(color: appDataProvider.themeData.colorScheme.primary);
+    return PopupMenuItem(
+        value: deleteTime,
+        child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+          Text(
+            '${deleteTime}s',
+            style:
+                chatMessageController.deleteTime == deleteTime ? style : null,
+          ),
+          const Spacer(),
+          chatMessageController.deleteTime == deleteTime
+              ? const Icon(Icons.check)
+              : Container()
+        ]));
   }
 
   ///视频通话

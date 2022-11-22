@@ -3,6 +3,59 @@ import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
 
 class DialogUtil {
+  static Future<T?> popMenu<T>({
+    required BuildContext context,
+    required RelativeRect position,
+    required List<PopupMenuEntry<T>> items,
+    T? initialValue,
+    double? elevation,
+    String? semanticLabel,
+    ShapeBorder? shape,
+    Color? color,
+    bool useRootNavigator = false,
+    BoxConstraints? constraints,
+  }) async {
+    return await showMenu<T>(
+        context: context,
+        position: position,
+        initialValue: initialValue,
+        items: items);
+  }
+
+  static Future<T?> popDialog<T>({
+    required BuildContext context,
+    required Widget Function(BuildContext) builder,
+    bool barrierDismissible = true,
+    Color? barrierColor = Colors.black54,
+    String? barrierLabel,
+    bool useSafeArea = true,
+    bool useRootNavigator = true,
+    RouteSettings? routeSettings,
+    Offset? anchorPoint,
+  }) async {
+    return await showDialog<T>(context: context, builder: builder);
+  }
+
+  static Future<T?> popSimpleDialog<T>({
+    required BuildContext context,
+    required Widget Function(BuildContext) builder,
+    required String title,
+    bool barrierDismissible = true,
+    Color? barrierColor = Colors.black54,
+    String? barrierLabel,
+    bool useSafeArea = true,
+    bool useRootNavigator = true,
+    RouteSettings? routeSettings,
+    Offset? anchorPoint,
+  }) async {
+    return await showDialog<T>(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+              title: Text(title), children: const [SimpleDialogOption()]);
+        });
+  }
+
   /// loading框
   static loadingShow(BuildContext context,
       {String tip = 'Loading, please waiting...'}) {
