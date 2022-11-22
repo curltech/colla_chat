@@ -10,7 +10,9 @@ import 'package:colla_chat/pages/chat/me/settings/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/webrtc_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/tool/url_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/inapp_webview_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -39,6 +41,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
       const PlatformAudioPlayerWidget();
   final PlatformAudioRecorderWidget audioRecorderWidget =
       PlatformAudioRecorderWidget();
+  final InAppWebViewWidget inAppWebViewWidget = const InAppWebViewWidget();
 
   late final Widget child;
 
@@ -58,6 +61,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(videoPlayerWidget);
     indexWidgetProvider.define(audioPlayerWidget);
     indexWidgetProvider.define(audioRecorderWidget);
+    indexWidgetProvider.define(inAppWebViewWidget);
     List<TileDataMixin> mixins = [
       collectionWidget,
       settingWidget,
@@ -68,12 +72,16 @@ class MeWidget extends StatelessWidget with TileDataMixin {
       webrtcWidget,
       videoPlayerWidget,
       audioPlayerWidget,
-      audioRecorderWidget
+      audioRecorderWidget,
+      inAppWebViewWidget
     ];
     final List<TileData> meTileData = TileData.from(mixins);
     for (var tile in meTileData) {
       tile.dense = true;
     }
+    meTileData.last.onTap = (int index, String title) {
+      UrlUtil.launch('http://bing.com');
+    };
     child = Expanded(child: DataListView(tileData: meTileData));
   }
 

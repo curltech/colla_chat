@@ -2,6 +2,7 @@ import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
+///@开头，空格结尾的特殊字符串
 class AtText extends SpecialText {
   AtText(TextStyle? textStyle, SpecialTextGestureTapCallback? onTap,
       {this.showAtBackground = false, this.start})
@@ -48,15 +49,3 @@ class AtText extends SpecialText {
               }));
   }
 }
-
-List<String> atList = <String>[
-  '@Nevermore ',
-  '@Dota2 ',
-  '@Biglao ',
-  '@艾莉亚·史塔克 ',
-  '@丹妮莉丝 ',
-  '@HandPulledNoodles ',
-  '@Zmtzawqlp ',
-  '@FaDeKongJian ',
-  '@CaiJingLongDaLao ',
-];

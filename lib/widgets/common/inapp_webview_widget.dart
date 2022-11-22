@@ -87,20 +87,21 @@ class _InAppWebViewWidgetState extends State<InAppWebViewWidget> {
   Widget build(BuildContext context) {
     urlController.text = inAppWebViewUrlController.url;
     return AppBarView(
+        withLeading: true,
         child: Column(children: <Widget>[
-      buildTextField(),
-      Expanded(
-        child: Stack(
-          children: [
-            buildInAppWebView(),
-            progress < 1.0
-                ? LinearProgressIndicator(value: progress)
-                : Container(),
-          ],
-        ),
-      ),
-      buildButtonBar(),
-    ]));
+          buildTextField(),
+          Expanded(
+            child: Stack(
+              children: [
+                buildInAppWebView(),
+                progress < 1.0
+                    ? LinearProgressIndicator(value: progress)
+                    : Container(),
+              ],
+            ),
+          ),
+          buildButtonBar(),
+        ]));
   }
 
   TextField buildTextField() {

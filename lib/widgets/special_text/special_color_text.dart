@@ -2,11 +2,12 @@ import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
-class DollarText extends SpecialText {
-  DollarText(TextStyle? textStyle, SpecialTextGestureTapCallback? onTap,
+///~开头，~结尾的特殊字符串，特殊颜色标记
+class SpecialColorText extends SpecialText {
+  SpecialColorText(TextStyle? textStyle, SpecialTextGestureTapCallback? onTap,
       {this.start})
       : super(flag, flag, textStyle, onTap: onTap);
-  static const String flag = '\$';
+  static const String flag = '~';
   final int? start;
 
   @override
@@ -20,7 +21,7 @@ class DollarText extends SpecialText {
 
         ///caret can move into special text
         deleteAll: true,
-        style: textStyle?.copyWith(color: Colors.orange),
+        style: textStyle?.copyWith(color: Colors.yellow),
         recognizer: TapGestureRecognizer()
           ..onTap = () {
             if (onTap != null) {
@@ -29,16 +30,3 @@ class DollarText extends SpecialText {
           });
   }
 }
-
-List<String> dollarList = <String>[
-  '\$Dota2\$',
-  '\$Dota2 Ti9\$',
-  '\$CN dota best dota\$',
-  '\$Flutter\$',
-  '\$CN dev best dev\$',
-  '\$UWP\$',
-  '\$Nevermore\$',
-  '\$FlutterCandies\$',
-  '\$ExtendedImage\$',
-  '\$ExtendedText\$',
-];
