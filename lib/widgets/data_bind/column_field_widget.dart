@@ -1,10 +1,8 @@
-import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/image_util.dart';
-import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
+import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 ///指定路由样式，不指定则系统判断，系统判断的方法是如果是移动则走全局路由，否则走工作区路由
 enum InputType {

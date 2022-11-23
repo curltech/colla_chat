@@ -134,7 +134,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
     widget.groupDataListController.add(keyTile, tiles);
   }
 
-  _onTap(int index, String title, {TileData? group}) {
+  _onTap(int index, String title, {String? subtitle, TileData? group}) {
     if (group != null) {
       if (group.title == AppLocalizations.t('Linkman')) {
         linkmanController.currentIndex = index;

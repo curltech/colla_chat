@@ -17,7 +17,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
-
 class PersonalInfoWidget extends StatefulWidget with TileDataMixin {
   const PersonalInfoWidget({Key? key}) : super(key: key);
 
@@ -87,7 +86,11 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
       TileData(
           title: AppLocalizations.t('Avatar'),
           suffix: myself.avatarImage,
-          onTap: (int index, String label, {String? value}) async {
+          onTap: (
+            int index,
+            String label, {
+            String? subtitle,
+          }) async {
             await _pickAvatar(peerId, context);
           }),
       TileData(
@@ -120,8 +123,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
 
   Future<void> _pickAvatar(String? peerId, BuildContext context) async {
     if (platformParams.desktop) {
-      List<String> filenames =
-          await FileUtil.pickFiles(type: FileType.image);
+      List<String> filenames = await FileUtil.pickFiles(type: FileType.image);
       if (filenames.isNotEmpty) {
         List<int> avatar = await FileUtil.readFile(filenames[0]);
         await myselfPeerService.updateAvatar(peerId!, avatar);

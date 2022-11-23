@@ -40,7 +40,7 @@ class _MailListWidgetState extends State<MailListWidget> {
     dataListView = _build(context);
   }
 
-  _onTap(int index, String title, {TileData? group}) {
+  _onTap(int index, String title, {String? subtitle,TileData? group}) {
     logger.w('index: $index, title: $title,onTap MailListWidget');
   }
 

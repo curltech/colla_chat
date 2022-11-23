@@ -1,59 +1,113 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
 
 class DialogUtil {
-  static Future<T?> popMenu<T>({
+  ///利用Option产生的SelectDialog
+  static Future<T?> showSelectDialog<T>({
     required BuildContext context,
-    required RelativeRect position,
-    required List<PopupMenuEntry<T>> items,
-    T? initialValue,
-    double? elevation,
-    String? semanticLabel,
-    ShapeBorder? shape,
-    Color? color,
-    bool useRootNavigator = false,
-    BoxConstraints? constraints,
-  }) async {
-    return await showMenu<T>(
-        context: context,
-        position: position,
-        initialValue: initialValue,
-        items: items);
-  }
-
-  static Future<T?> popDialog<T>({
-    required BuildContext context,
-    required Widget Function(BuildContext) builder,
-    bool barrierDismissible = true,
-    Color? barrierColor = Colors.black54,
-    String? barrierLabel,
-    bool useSafeArea = true,
-    bool useRootNavigator = true,
-    RouteSettings? routeSettings,
-    Offset? anchorPoint,
-  }) async {
-    return await showDialog<T>(context: context, builder: builder);
-  }
-
-  static Future<T?> popSimpleDialog<T>({
-    required BuildContext context,
-    required Widget Function(BuildContext) builder,
     required String title,
-    bool barrierDismissible = true,
-    Color? barrierColor = Colors.black54,
-    String? barrierLabel,
-    bool useSafeArea = true,
-    bool useRootNavigator = true,
-    RouteSettings? routeSettings,
-    Offset? anchorPoint,
+    required List<Option> items,
   }) async {
-    return await showDialog<T>(
+    AppBar appBar = AppBar(
+      title: Text(title),
+      automaticallyImplyLeading: false,
+      elevation: 0,
+    );
+    List<SimpleDialogOption> options = [];
+    for (var item in items) {
+      SimpleDialogOption option = _simpleDialogOption(
+          context: context,
+          label: item.label,
+          value: item.value,
+          checked: item.checked);
+      options.add(option);
+    }
+    T? value = await showDialog<T>(
+      context: context,
+      builder: (BuildContext context) {
+        return SimpleDialog(
+          title: appBar,
+          titlePadding: const EdgeInsets.fromLTRB(0, 0, 0, 0.0),
+          children: options,
+        );
+      },
+    );
+
+    return value;
+  }
+
+  static SimpleDialogOption _simpleDialogOption<T>({
+    required BuildContext context,
+    required String label,
+    required T value,
+    required bool checked,
+  }) {
+    TextStyle style =
+        TextStyle(color: appDataProvider.themeData.colorScheme.primary);
+    return SimpleDialogOption(
+        onPressed: () {
+          Navigator.pop(context, value);
+        },
+        child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+          Text(
+            label,
+            style: checked ? style : null,
+          ),
+          const Spacer(),
+          checked ? const Icon(Icons.check) : Container()
+        ]));
+  }
+
+  ///利用Option产生的SelectMenu
+  static Future<T?> showSelectMenu<T>({
+    required BuildContext context,
+    required String title,
+    required List<Option> items,
+  }) async {
+    List<PopupMenuEntry<T>> options = [];
+    T? initialValue;
+    for (var item in items) {
+      PopupMenuEntry<T> option = _popupMenuEntry<T>(
+          context: context,
+          label: item.label,
+          value: item.value,
+          checked: item.checked);
+      options.add(option);
+      if (item.checked) {
+        initialValue = item.value;
+      }
+    }
+    T? value = await showMenu<T>(
         context: context,
-        builder: (BuildContext context) {
-          return SimpleDialog(
-              title: Text(title), children: const [SimpleDialogOption()]);
-        });
+        color: Colors.grey.withOpacity(0.8),
+        position: const RelativeRect.fromLTRB(0, 0, 0, 0),
+        initialValue: initialValue,
+        items: options);
+
+    return value;
+  }
+
+  static PopupMenuEntry<T> _popupMenuEntry<T>({
+    required BuildContext context,
+    required String label,
+    required T value,
+    required bool checked,
+  }) {
+    TextStyle style =
+        TextStyle(color: appDataProvider.themeData.colorScheme.primary);
+    return PopupMenuItem(
+        value: value,
+        child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+          Text(
+            label,
+            style: checked ? style : null,
+          ),
+          const Spacer(),
+          checked ? const Icon(Icons.check) : Container()
+        ]));
   }
 
   /// loading框

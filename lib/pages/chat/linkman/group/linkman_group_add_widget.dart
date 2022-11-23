@@ -2,16 +2,16 @@ import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/group/linkman_group_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
+import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_awesome_select/flutter_awesome_select.dart';
 
 ///选择linkman建群
 class LinkmanGroupAddWidget extends StatefulWidget with TileDataMixin {
@@ -39,7 +39,7 @@ class LinkmanGroupAddWidget extends StatefulWidget with TileDataMixin {
 class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
   TextEditingController controller = TextEditingController();
   List<String> groupMembers = [];
-  List<S2Choice<String>> groupOwnerChoices = [];
+  List<Option<String>> groupOwnerChoices = [];
   Group? group;
 
   @override
@@ -78,9 +78,16 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
       for (String groupMemberId in groupMembers) {
         Linkman? linkman =
             await linkmanService.findCachedOneByPeerId(groupMemberId);
+        bool checked = false;
         if (linkman != null) {
-          S2Choice<String> item =
-              S2Choice<String>(value: linkman.peerId, title: linkman.name);
+          if (group != null && group!.groupOwnerPeerId != null) {
+            String peerId = group!.groupOwnerPeerId!;
+            if (linkman.peerId == peerId) {
+              checked = true;
+            }
+          }
+          Option<String> item =
+              Option<String>(linkman.name, linkman.peerId, checked: checked);
           groupOwnerChoices.add(item);
         }
       }
@@ -89,59 +96,21 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
 
   //群主选择界面
   Widget _buildGroupOwnerWidget(BuildContext context) {
-    String selectedValue = '';
-    if (group != null && group!.groupOwnerPeerId != null) {
-      selectedValue = group!.groupOwnerPeerId!;
-    }
-    return SmartSelect<String>.single(
+    return SmartSelectUtil.single<String>(
       title: 'GroupOwnerPeer',
       placeholder: 'Select one linkman',
-      selectedValue: selectedValue,
       onChange: (selected) => setState(() {
         if (group != null) {
-          group!.groupOwnerPeerId = selected.value;
+          group!.groupOwnerPeerId = selected;
         }
       }),
-      choiceItems: groupOwnerChoices,
-      modalType: S2ModalType.bottomSheet,
-      modalConfig: S2ModalConfig(
-        type: S2ModalType.bottomSheet,
-        useFilter: false,
-        style: S2ModalStyle(
-          backgroundColor: Colors.grey.withOpacity(0.5),
-        ),
-        headerStyle: S2ModalHeaderStyle(
-          elevation: 0,
-          centerTitle: false,
-          backgroundColor: appDataProvider.themeData.colorScheme.primary,
-          textStyle: const TextStyle(color: Colors.white),
-        ),
-      ),
-      choiceStyle: S2ChoiceStyle(
-        opacity: 0.5,
-        elevation: 0,
-        //titleStyle: const TextStyle(color: Colors.white),
-        color: appDataProvider.themeData.colorScheme.primary,
-      ),
-      tileBuilder: (context, state) {
-        return S2Tile.fromState(
-          state,
-          isTwoLine: true,
-          leading: const Icon(Icons.person_add_alt),
-          body: S2TileChips(
-            chipLength: state.selected.length,
-            chipLabelBuilder: (context, i) {
-              return Text(state.selected.title![i]);
-            },
-            chipOnDelete: (i) {
-              setState(() {
-                group!.groupOwnerPeerId = null;
-              });
-            },
-            chipColor: appDataProvider.themeData.colorScheme.primary,
-          ),
-        );
+      items: groupOwnerChoices,
+      chipOnDelete: (i) {
+        setState(() {
+          group!.groupOwnerPeerId = null;
+        });
       },
+      selectedValue: '',
     );
   }
 
@@ -225,61 +194,25 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
   //群成员显示和编辑界面
   Widget _buildGroupMembersWidget(BuildContext context) {
     List<Linkman> linkmen = widget.linkmenController.data;
-    List<S2Choice<String>> choiceItems = [];
+    List<Option<String>> choiceItems = [];
     for (Linkman linkman in linkmen) {
-      S2Choice<String> item =
-          S2Choice<String>(value: linkman.peerId, title: linkman.name);
+      bool checked = groupMembers.contains(linkman.peerId);
+      Option<String> item =
+          Option<String>(linkman.name, linkman.peerId, checked: checked);
       choiceItems.add(item);
     }
 
-    return SmartSelect<String>.multiple(
+    return SmartSelectUtil.multiple<String>(
       title: 'Linkmen',
       placeholder: 'Select one or more linkman',
-      selectedValue: groupMembers,
-      onChange: (selected) => setState(() {
-        groupMembers = selected.value;
+      onChange: (selected) {
+        groupMembers = selected;
         _buildGroupOwnerChoices();
-      }),
-      choiceItems: choiceItems,
-      modalType: S2ModalType.bottomSheet,
-      modalConfig: S2ModalConfig(
-        type: S2ModalType.bottomSheet,
-        useFilter: false,
-        style: S2ModalStyle(
-          backgroundColor: Colors.grey.withOpacity(0.5),
-        ),
-        headerStyle: S2ModalHeaderStyle(
-          elevation: 0,
-          centerTitle: false,
-          backgroundColor: appDataProvider.themeData.colorScheme.primary,
-          textStyle: const TextStyle(color: Colors.white),
-        ),
-      ),
-      choiceStyle: S2ChoiceStyle(
-        opacity: 0.5,
-        elevation: 0,
-        //titleStyle: const TextStyle(color: Colors.white),
-        color: appDataProvider.themeData.colorScheme.primary,
-      ),
-      tileBuilder: (context, state) {
-        return S2Tile.fromState(
-          state,
-          isTwoLine: true,
-          leading: const Icon(Icons.person_add_alt),
-          body: S2TileChips(
-            chipLength: state.selected.length,
-            chipLabelBuilder: (context, i) {
-              return Text(state.selected.title![i]);
-            },
-            chipOnDelete: (i) {
-              setState(() {
-                groupMembers.removeAt(i);
-                _buildGroupOwnerChoices();
-              });
-            },
-            chipColor: appDataProvider.themeData.colorScheme.primary,
-          ),
-        );
+      },
+      items: choiceItems,
+      chipOnDelete: (i) {
+        groupMembers.removeAt(i);
+        _buildGroupOwnerChoices();
       },
     );
   }
