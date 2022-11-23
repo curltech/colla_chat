@@ -82,7 +82,7 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
     return icon;
   }
 
-  _onTap(int index, String title, {TileData? group}) {
+  _onTap(int index, String title, {String? subtitle,TileData? group}) {
     logger.w('index: $index, title: $title,onTap MailListWidget');
     var mailAddressProvider =
         Provider.of<MailDataProvider>(context, listen: false);

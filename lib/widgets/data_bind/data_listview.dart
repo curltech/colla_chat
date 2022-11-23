@@ -1,8 +1,7 @@
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
-
-import '../../provider/data_list_controller.dart';
-import 'data_listtile.dart';
 
 ///根据构造函数传入的数据列表，构造内容与空间匹配的ListView列表视图
 ///利用DataListViewController修改数据，然后重新执行ListView.build
@@ -17,6 +16,7 @@ class DataListView extends StatefulWidget {
   final Function(
     int index,
     String title, {
+    String? subtitle,
     TileData? group,
   })? onTap;
 
@@ -90,10 +90,10 @@ class _DataListViewState extends State<DataListView> {
     }
   }
 
-  _onTap(int index, String title) {
+  _onTap(int index, String title, {String? subtitle}) {
     var onTap = widget.onTap;
     if (onTap != null) {
-      onTap(index, title, group: widget.group);
+      onTap(index, title, subtitle: subtitle, group: widget.group);
     }
   }
 

@@ -15,7 +15,6 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
-
 final List<String> groupFields = [
   'name',
   'peerId',
@@ -104,7 +103,7 @@ class _LinkmanGroupInfoWidgetState extends State<LinkmanGroupInfoWidget> {
           title: 'Chat',
           prefix: const Icon(Icons.chat),
           routeName: 'chat_message',
-          onTap: (int index, String title) async {
+          onTap: (int index, String title, {String? subtitle}) async {
             ChatSummary? chatSummary =
                 await chatSummaryService.findOneByPeerId(group!.peerId);
             if (chatSummary != null) {

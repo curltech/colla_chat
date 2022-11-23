@@ -1,13 +1,5 @@
 import 'package:flutter/widgets.dart';
 
-class Option {
-  String label;
-  String value;
-  String? hint;
-
-  Option(this.label, this.value, {this.hint});
-}
-
 const int defaultLimit = 10;
 const int defaultOffset = 0;
 

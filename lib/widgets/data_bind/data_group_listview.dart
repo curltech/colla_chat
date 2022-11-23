@@ -1,8 +1,7 @@
+import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
+import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
-
-import '../../provider/data_list_controller.dart';
-import 'data_listtile.dart';
-import 'data_listview.dart';
 
 class GroupDataListController with ChangeNotifier {
   final Map<TileData, DataListController<TileData>> controllers = {};
@@ -60,7 +59,8 @@ class GroupDataListController with ChangeNotifier {
 
 class GroupDataListView extends StatefulWidget {
   late final GroupDataListController controller;
-  final Function(int index, String title, {TileData? group})? onTap;
+  final Function(int index, String title, {String? subtitle, TileData? group})?
+      onTap;
 
   GroupDataListView(
       {Key? key,
@@ -92,11 +92,11 @@ class _GroupDataListViewState extends State<GroupDataListView> {
     setState(() {});
   }
 
-  _onTap(int index, String title, {TileData? group}) {
+  _onTap(int index, String title, {String? subtitle, TileData? group}) {
     //logger.w('index: $index, title: $title,onTap GroupDataListView');
     var onTap = widget.onTap;
     if (onTap != null) {
-      onTap(index, title, group: group);
+      onTap(index, title, subtitle: subtitle, group: group);
     }
   }
 

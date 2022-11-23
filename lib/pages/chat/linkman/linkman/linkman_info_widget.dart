@@ -81,7 +81,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
         title: AppLocalizations.t('Chat'),
         prefix: const Icon(Icons.chat),
         routeName: 'chat_message',
-        onTap: (int index, String title) async {
+        onTap: (int index, String title,{String? subtitle,}) async {
           ChatSummary? chatSummary =
               await chatSummaryService.findOneByPeerId(linkman!.peerId);
           if (chatSummary != null) {

@@ -127,7 +127,7 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
     return tiles;
   }
 
-  _onTap(int index, String title, {TileData? group}) {
+  _onTap(int index, String title, {String? subtitle,TileData? group}) {
     widget.controller.currentIndex = index;
   }
 

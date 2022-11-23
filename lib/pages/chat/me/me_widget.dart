@@ -79,7 +79,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     for (var tile in meTileData) {
       tile.dense = true;
     }
-    meTileData.last.onTap = (int index, String title) {
+    meTileData.last.onTap = (int index, String title,{String? subtitle,}) {
       UrlUtil.launch('http://bing.com');
     };
     child = Expanded(child: DataListView(tileData: meTileData));

@@ -28,7 +28,7 @@ class TileData {
   final bool isThreeLine;
 
   //缺省行为，为空的时候，是打上选择标志，颜色变化
-  Function(int index, String title)? onTap;
+  Function(int index, String title, {String? subtitle})? onTap;
 
   List<TileData>? slideActions;
   List<TileData>? endSlideActions;
@@ -101,7 +101,7 @@ class DataListTile extends StatelessWidget {
   ///如果定义了点击回调函数，序号为参数进行回调
   ///回调函数有两个，一个构造函数传入的成员变量，用于处理高亮显示
   ///二是数据项里面定义的，用于自定义的后续任务
-  final Function(int index, String title)? onTap;
+  final Function(int index, String title, {String? subtitle})? onTap;
 
   const DataListTile(
       {Key? key,
@@ -170,11 +170,11 @@ class DataListTile extends StatelessWidget {
         dataListViewController.currentIndex = index;
         var fn = onTap;
         if (fn != null) {
-          fn(index, tileData.title);
+          fn(index, tileData.title, subtitle: tileData.subtitle);
         }
         fn = tileData.onTap;
         if (fn != null) {
-          fn(index, tileData.title);
+          fn(index, tileData.title, subtitle: tileData.subtitle);
         }
 
         ///如果路由名称存在，点击会调用路由

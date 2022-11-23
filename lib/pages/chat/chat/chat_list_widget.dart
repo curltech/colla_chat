@@ -166,7 +166,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     widget.groupDataListController.addAll(tileData: tileData);
   }
 
-  _onTap(int index, String title, {TileData? group}) {
+  _onTap(int index, String title, {String? subtitle, TileData? group}) {
     if (group != null) {
       ChatSummary? current;
       if (group.title == AppLocalizations.t('Linkman')) {

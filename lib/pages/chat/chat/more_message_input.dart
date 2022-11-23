@@ -6,9 +6,11 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/camera_util.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/media/media_player_slider.dart';
 import 'package:flutter/material.dart';
@@ -116,36 +118,27 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   ///阅后删除时间
   _onActionDeleteTime() async {
-    int? deleteTime = await showMenu<int>(
+    int? deleteTime = await DialogUtil.showSelectDialog<int>(
         context: context,
-        color: Colors.grey.withOpacity(0.8),
-        initialValue: chatMessageController.deleteTime,
+        title: 'Please select deleteTime',
         items: [
-          _popupMenuItem(0),
-          _popupMenuItem(30),
-          _popupMenuItem(60),
-        ],
-        position: const RelativeRect.fromLTRB(0, 0, 0, 0));
+          _buildOption(0),
+          _buildOption(15),
+          _buildOption(30),
+          _buildOption(300),
+          _buildOption(600),
+          _buildOption(1800),
+        ]);
     deleteTime = deleteTime ?? 0;
     chatMessageController.deleteTime = deleteTime;
   }
 
-  PopupMenuItem<int> _popupMenuItem(int deleteTime) {
-    TextStyle style =
-        TextStyle(color: appDataProvider.themeData.colorScheme.primary);
-    return PopupMenuItem(
-        value: deleteTime,
-        child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          Text(
-            '${deleteTime}s',
-            style:
-                chatMessageController.deleteTime == deleteTime ? style : null,
-          ),
-          const Spacer(),
-          chatMessageController.deleteTime == deleteTime
-              ? const Icon(Icons.check)
-              : Container()
-        ]));
+  Option _buildOption(int deleteTime) {
+    return Option(
+      '${deleteTime}s',
+      deleteTime,
+      checked: chatMessageController.deleteTime == deleteTime,
+    );
   }
 
   ///视频通话
