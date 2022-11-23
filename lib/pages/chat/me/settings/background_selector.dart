@@ -4,12 +4,11 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flutter/material.dart';
 
-
 ///从assets目录下背景图片选择器
-class BackgroudSelector extends StatelessWidget {
-  const BackgroudSelector({Key? key}) : super(key: key);
+class BackgroundSelector extends StatelessWidget {
+  const BackgroundSelector({Key? key}) : super(key: key);
 
-  Widget buildBackgroud(String item) {
+  Widget buildBackground(String item) {
     double size = (appDataProvider.size.width - 30) / 3;
     return InkWell(
       child: ClipRRect(
@@ -34,7 +33,9 @@ class BackgroudSelector extends StatelessWidget {
         child: Wrap(
           runSpacing: 10.0,
           spacing: 10.0,
-          children: darkBackgroudImages.map(buildBackgroud).toList(),
+          children: loadingBackgroundImage.darkBackgroudImages
+              .map(buildBackground)
+              .toList(),
         ),
       ),
     );

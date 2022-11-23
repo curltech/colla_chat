@@ -11,11 +11,6 @@ class DialogUtil {
     required String title,
     required List<Option> items,
   }) async {
-    AppBar appBar = AppBar(
-      title: Text(title),
-      automaticallyImplyLeading: false,
-      elevation: 0,
-    );
     List<SimpleDialogOption> options = [];
     for (var item in items) {
       SimpleDialogOption option = _simpleDialogOption(
@@ -25,12 +20,11 @@ class DialogUtil {
           checked: item.checked);
       options.add(option);
     }
-    T? value = await showDialog<T>(
+    T? value = await show<T>(
       context: context,
+      title: title,
       builder: (BuildContext context) {
         return SimpleDialog(
-          title: appBar,
-          titlePadding: const EdgeInsets.fromLTRB(0, 0, 0, 0.0),
           children: options,
         );
       },
@@ -108,6 +102,48 @@ class DialogUtil {
           const Spacer(),
           checked ? const Icon(Icons.check) : Container()
         ]));
+  }
+
+  ///带标题的对话框
+  static Future<T?> show<T>({
+    required BuildContext context,
+    required Widget Function(BuildContext) builder,
+    String? title,
+    bool barrierDismissible = true,
+    Color? barrierColor = Colors.black54,
+    String? barrierLabel,
+    bool useSafeArea = true,
+    bool useRootNavigator = true,
+    RouteSettings? routeSettings,
+    Offset? anchorPoint,
+  }) async {
+    Widget child = builder(context);
+    if (title != null) {
+      AppBar appBar = AppBar(
+        title: Text(title),
+        automaticallyImplyLeading: false,
+        elevation: 0,
+      );
+      child = Column(children: [
+        appBar,
+        Expanded(child: child),
+      ]);
+    }
+    T? value = await showDialog<T>(
+      context: context,
+      builder: (BuildContext context) {
+        return child;
+      },
+      barrierDismissible: barrierDismissible,
+      barrierColor: barrierColor,
+      barrierLabel: barrierLabel,
+      useSafeArea: useSafeArea,
+      useRootNavigator: useRootNavigator,
+      routeSettings: routeSettings,
+      anchorPoint: anchorPoint,
+    );
+
+    return value;
   }
 
   /// loading框
