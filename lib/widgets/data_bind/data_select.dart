@@ -1,11 +1,16 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_awesome_select/flutter_awesome_select.dart';
+import 'package:multi_select_flutter/bottom_sheet/multi_select_bottom_sheet.dart';
+import 'package:multi_select_flutter/chip_display/multi_select_chip_display.dart';
+import 'package:multi_select_flutter/dialog/mult_select_dialog.dart';
+import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
+import 'package:multi_select_flutter/util/multi_select_item.dart';
+import 'package:multi_select_flutter/util/multi_select_list_type.dart';
 
 ///利用Option产生的DropdownButton
 class DataDropdownButton<T> extends StatefulWidget {
@@ -127,7 +132,17 @@ class SmartSelectUtil {
       required T selectedValue, //没有checked的时候设置
       required Function(T?) onChange,
       S2ModalType modalType = S2ModalType.popupDialog,
+      bool isTwoLine = true,
+      bool selected = false,
+      bool dense = false,
+      bool hideValue = false,
       Widget? leading,
+      bool modalFilter = false,
+      bool modalFilterAuto = false,
+      Widget Function(BuildContext, S2SingleState<T>)? modalHeaderBuilder,
+      Widget Function(BuildContext, S2SingleState<T>)? modalFooterBuilder,
+      Widget Function(BuildContext, S2SingleState<T>)? modalFilterBuilder,
+      Widget Function(BuildContext, S2SingleState<T>)? modalFilterToggleBuilder,
       Function(int)? chipOnDelete}) {
     List<S2Choice<T>> options = [];
     T? value;
@@ -146,7 +161,10 @@ class SmartSelectUtil {
       tileBuilder = (context, state) {
         return S2Tile.fromState(
           state,
-          isTwoLine: true,
+          isTwoLine: isTwoLine,
+          selected: selected,
+          dense: dense,
+          hideValue: hideValue,
           leading: leading,
           body: S2TileChips(
             chipLength: state.selected.length,
@@ -170,26 +188,31 @@ class SmartSelectUtil {
         onChange(selected.value);
       },
       choiceItems: options,
-      modalType: modalType,
       modalConfig: S2ModalConfig(
         type: modalType,
-        useFilter: false,
+        useFilter: modalFilter,
+        filterAuto: modalFilterAuto,
         style: S2ModalStyle(
           backgroundColor: Colors.grey.withOpacity(0.5),
         ),
-        headerStyle: S2ModalHeaderStyle(
+        headerStyle: const S2ModalHeaderStyle(
           elevation: 0,
           centerTitle: false,
-          backgroundColor: appDataProvider.themeData.colorScheme.primary,
-          textStyle: const TextStyle(color: Colors.white),
+          // backgroundColor: appDataProvider.themeData.colorScheme.primary,
+          // textStyle: const TextStyle(color: Colors.white),
+          // iconTheme: const IconThemeData(color: Colors.white),
         ),
       ),
       choiceStyle: S2ChoiceStyle(
         opacity: 0.5,
         elevation: 0,
-        //titleStyle: const TextStyle(color: Colors.white),
+        titleStyle: const TextStyle(color: Colors.white),
         color: appDataProvider.themeData.colorScheme.primary,
       ),
+      modalHeaderBuilder: modalHeaderBuilder,
+      modalFooterBuilder: modalFooterBuilder,
+      modalFilterBuilder: modalFilterBuilder,
+      modalFilterToggleBuilder: modalFilterToggleBuilder,
       tileBuilder: tileBuilder,
     );
   }
@@ -201,7 +224,18 @@ class SmartSelectUtil {
       required String placeholder,
       required Function(List<T>) onChange,
       S2ModalType modalType = S2ModalType.popupDialog,
+      bool isTwoLine = true,
+      bool selected = false,
+      bool dense = false,
+      bool hideValue = false,
       Widget? leading,
+      bool modalFilter = false,
+      bool modalFilterAuto = false,
+      Widget Function(BuildContext, S2MultiState<T>)? modalHeaderBuilder,
+      Widget Function(BuildContext, S2MultiState<T>)? modalFooterBuilder,
+      Widget Function(BuildContext, S2MultiState<T>)? modalFilterBuilder,
+      Widget Function(BuildContext, S2MultiState<T>)? modalFilterToggleBuilder,
+      Future<bool> Function(S2MultiState<T>)? onModalWillOpen,
       Function(int)? chipOnDelete}) {
     List<T> selectedValue = [];
     List<S2Choice<T>> options = [];
@@ -218,7 +252,10 @@ class SmartSelectUtil {
       tileBuilder = (context, state) {
         return S2Tile.fromState(
           state,
-          isTwoLine: true,
+          isTwoLine: isTwoLine,
+          selected: selected,
+          dense: dense,
+          hideValue: hideValue,
           leading: leading,
           body: S2TileChips(
             chipLength: state.selected.length,
@@ -241,27 +278,239 @@ class SmartSelectUtil {
         onChange(selected.value);
       },
       choiceItems: options,
-      modalType: modalType,
       modalConfig: S2ModalConfig(
         type: modalType,
-        useFilter: false,
+        useFilter: modalFilter,
+        filterAuto: modalFilterAuto,
         style: S2ModalStyle(
-          backgroundColor: Colors.grey.withOpacity(0.5),
+          backgroundColor: Colors.grey.withOpacity(0.8),
         ),
-        headerStyle: S2ModalHeaderStyle(
+        headerStyle: const S2ModalHeaderStyle(
           elevation: 0,
           centerTitle: false,
-          backgroundColor: appDataProvider.themeData.colorScheme.primary,
-          textStyle: const TextStyle(color: Colors.white),
+          //backgroundColor: appDataProvider.themeData.colorScheme.primary,
+          // textStyle: const TextStyle(color: Colors.white),
+          // iconTheme: const IconThemeData(color: Colors.white),
         ),
       ),
       choiceStyle: S2ChoiceStyle(
         opacity: 0.5,
         elevation: 0,
-        //titleStyle: const TextStyle(color: Colors.white),
+        titleStyle: const TextStyle(color: Colors.white),
         color: appDataProvider.themeData.colorScheme.primary,
       ),
+      modalHeaderBuilder: modalHeaderBuilder,
+      modalFooterBuilder: modalFooterBuilder,
+      modalFilterBuilder: modalFilterBuilder,
+      modalFilterToggleBuilder: modalFilterToggleBuilder,
+      onModalWillOpen: onModalWillOpen,
       tileBuilder: tileBuilder,
+    );
+  }
+}
+
+class MultiSelectUtil {
+  static MultiSelectDialogField<T> buildMultiSelectDialogField<T>({
+    required List<Option<T>> items,
+    required void Function(List<T>) onConfirm,
+    String? title,
+    Text? buttonText,
+    Icon? buttonIcon,
+    MultiSelectListType? listType,
+    BoxDecoration? decoration,
+    void Function(List<T>)? onSelectionChanged,
+    MultiSelectChipDisplay<T>? chipDisplay,
+    bool searchable = false,
+    Text? confirmText,
+    Text? cancelText,
+    Color? barrierColor,
+    Color? selectedColor,
+    String? searchHint,
+    double? dialogHeight,
+    double? dialogWidth,
+    Color Function(T?)? colorator,
+    Color? backgroundColor,
+    Color? unselectedColor,
+    Icon? searchIcon,
+    Icon? closeSearchIcon,
+    TextStyle? itemsTextStyle,
+    TextStyle? searchTextStyle,
+    TextStyle? searchHintStyle,
+    TextStyle? selectedItemsTextStyle,
+    bool separateSelectedItems = false,
+    Color? checkColor,
+    void Function(List<T>?)? onSaved,
+    String? Function(List<T>?)? validator,
+    AutovalidateMode autovalidateMode = AutovalidateMode.disabled,
+    GlobalKey<FormFieldState<dynamic>>? key,
+  }) {
+    List<T> selectedValue = [];
+    List<MultiSelectItem<T>> options = [];
+    for (Option<T> item in items) {
+      MultiSelectItem<T> option =
+          MultiSelectItem<T>(item.value, AppLocalizations.t(item.label));
+      options.add(option);
+      if (item.checked) {
+        selectedValue.add(item.value);
+      }
+    }
+    return MultiSelectDialogField<T>(
+      items: options,
+      onConfirm: onConfirm,
+      initialValue: selectedValue,
+      title: Text(AppLocalizations.t(title ?? '')),
+      buttonText: buttonText,
+      buttonIcon: buttonIcon,
+      listType: listType,
+      decoration: decoration,
+      onSelectionChanged: onSelectionChanged,
+      chipDisplay: chipDisplay,
+      searchable: searchable,
+      confirmText: confirmText,
+      cancelText: cancelText,
+      barrierColor: barrierColor,
+      selectedColor: appDataProvider.themeData.colorScheme.primary,
+      searchHint: searchHint,
+      dialogHeight: dialogHeight,
+      dialogWidth: dialogWidth,
+      colorator: colorator,
+      backgroundColor: Colors.grey.withOpacity(0.8),
+      unselectedColor: unselectedColor,
+      searchIcon: searchIcon,
+      closeSearchIcon: closeSearchIcon,
+      itemsTextStyle: itemsTextStyle,
+      searchTextStyle: searchTextStyle,
+      searchHintStyle: searchHintStyle,
+      selectedItemsTextStyle: selectedItemsTextStyle,
+      separateSelectedItems: separateSelectedItems,
+      checkColor: checkColor,
+      onSaved: onSaved,
+      validator: validator,
+      autovalidateMode: autovalidateMode,
+      key: key,
+    );
+  }
+
+  static MultiSelectDialog<T> buildMultiSelectDialog<T>({
+    required List<Option<T>> items,
+    String? title,
+    void Function(List<T>)? onSelectionChanged,
+    void Function(List<T>)? onConfirm,
+    MultiSelectListType? listType,
+    bool searchable = false,
+    Text? confirmText,
+    Text? cancelText,
+    Color? selectedColor,
+    String? searchHint,
+    double? height,
+    double? width,
+    Color? Function(T)? colorator,
+    Color? backgroundColor,
+    Color? unselectedColor,
+    Icon? searchIcon,
+    Icon? closeSearchIcon,
+    TextStyle? itemsTextStyle,
+    TextStyle? searchHintStyle,
+    TextStyle? searchTextStyle,
+    TextStyle? selectedItemsTextStyle,
+    bool separateSelectedItems = false,
+    Color? checkColor,
+  }) {
+    List<T> selectedValue = [];
+    List<MultiSelectItem<T>> options = [];
+    for (Option<T> item in items) {
+      MultiSelectItem<T> option =
+          MultiSelectItem<T>(item.value, AppLocalizations.t(item.label));
+      options.add(option);
+      if (item.checked) {
+        selectedValue.add(item.value);
+      }
+    }
+    return MultiSelectDialog<T>(
+      items: options,
+      onConfirm: onConfirm,
+      initialValue: selectedValue,
+      title: Text(AppLocalizations.t(title ?? '')),
+      listType: listType,
+      onSelectionChanged: onSelectionChanged,
+      searchable: searchable,
+      confirmText: confirmText,
+      cancelText: cancelText,
+      selectedColor: selectedColor,
+      searchHint: searchHint,
+      height: height,
+      width: width,
+      colorator: colorator,
+      backgroundColor: backgroundColor,
+      unselectedColor: unselectedColor,
+      searchIcon: searchIcon,
+      closeSearchIcon: closeSearchIcon,
+      itemsTextStyle: itemsTextStyle,
+      searchTextStyle: searchTextStyle,
+      searchHintStyle: searchHintStyle,
+      selectedItemsTextStyle: selectedItemsTextStyle,
+      separateSelectedItems: separateSelectedItems,
+      checkColor: checkColor,
+    );
+  }
+
+  static MultiSelectBottomSheet<T> buildMultiSelectBottomSheet<T>({
+    required List<Option<T>> items,
+    String? title,
+    void Function(List<T>)? onSelectionChanged,
+    void Function(List<T>)? onConfirm,
+    MultiSelectListType? listType,
+    Text? cancelText,
+    Text? confirmText,
+    bool searchable = false,
+    Color? selectedColor,
+    double? initialChildSize,
+    double? minChildSize,
+    double? maxChildSize,
+    Color? Function(T)? colorator,
+    Color? unselectedColor,
+    Icon? searchIcon,
+    Icon? closeSearchIcon,
+    TextStyle? itemsTextStyle,
+    TextStyle? searchTextStyle,
+    String? searchHint,
+    TextStyle? searchHintStyle,
+    TextStyle? selectedItemsTextStyle,
+    bool separateSelectedItems = false,
+    Color? checkColor,
+  }) {
+    List<T> selectedValue = [];
+    List<MultiSelectItem<T>> options = [];
+    for (Option<T> item in items) {
+      MultiSelectItem<T> option =
+          MultiSelectItem<T>(item.value, AppLocalizations.t(item.label));
+      options.add(option);
+      if (item.checked) {
+        selectedValue.add(item.value);
+      }
+    }
+    return MultiSelectBottomSheet<T>(
+      items: options,
+      onConfirm: onConfirm,
+      initialValue: selectedValue,
+      title: Text(AppLocalizations.t(title ?? '')),
+      listType: listType,
+      onSelectionChanged: onSelectionChanged,
+      searchable: searchable,
+      confirmText: confirmText,
+      cancelText: cancelText,
+      selectedColor: selectedColor,
+      searchHint: searchHint,
+      colorator: colorator,
+      unselectedColor: unselectedColor,
+      searchIcon: searchIcon,
+      closeSearchIcon: closeSearchIcon,
+      itemsTextStyle: itemsTextStyle,
+      searchTextStyle: searchTextStyle,
+      searchHintStyle: searchHintStyle,
+      selectedItemsTextStyle: selectedItemsTextStyle,
+      separateSelectedItems: separateSelectedItems,
+      checkColor: checkColor,
     );
   }
 }

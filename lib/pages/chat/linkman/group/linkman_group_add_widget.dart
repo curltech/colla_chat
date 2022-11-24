@@ -2,6 +2,8 @@ import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/group/linkman_group_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman_search_widget.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/string_util.dart';
@@ -12,6 +14,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_awesome_select/flutter_awesome_select.dart';
 
 ///选择linkman建群
 class LinkmanGroupAddWidget extends StatefulWidget with TileDataMixin {
@@ -193,28 +196,14 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
 
   //群成员显示和编辑界面
   Widget _buildGroupMembersWidget(BuildContext context) {
-    List<Linkman> linkmen = widget.linkmenController.data;
-    List<Option<String>> choiceItems = [];
-    for (Linkman linkman in linkmen) {
-      bool checked = groupMembers.contains(linkman.peerId);
-      Option<String> item =
-          Option<String>(linkman.name, linkman.peerId, checked: checked);
-      choiceItems.add(item);
-    }
-
-    return SmartSelectUtil.multiple<String>(
-      title: 'Linkmen',
-      placeholder: 'Select one or more linkman',
-      onChange: (selected) {
-        groupMembers = selected;
-        _buildGroupOwnerChoices();
+    var selector = LinkmanSearchWidget(
+      onSelected: (List<String> selected) {
+        logger.i(selected);
       },
-      items: choiceItems,
-      chipOnDelete: (i) {
-        groupMembers.removeAt(i);
-        _buildGroupOwnerChoices();
-      },
+      selected: [],
     );
+
+    return selector;
   }
 
   Widget _buildGroupEdit(BuildContext context) {
@@ -231,55 +220,6 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
         Expanded(child: _buildFormInputWidget(context)),
       ],
     );
-  }
-
-  _buildSearchTextField(BuildContext context) {
-    var searchTextField = TextFormField(
-        controller: controller,
-        keyboardType: TextInputType.text,
-        decoration: InputDecoration(
-          labelText: AppLocalizations.t('PeerId/Mobile/Email/Name'),
-          suffixIcon: IconButton(
-            onPressed: () {
-              _search(controller.text);
-            },
-            icon: const Icon(Icons.search),
-          ),
-        ));
-
-    return searchTextField;
-  }
-
-  Future<void> _responsePeerClients(List<Linkman> linkmen) async {
-    List<TileData> tiles = [];
-    if (linkmen.isNotEmpty) {
-      for (var linkman in linkmen) {
-        var title = linkman.name;
-        var subtitle = linkman.peerId;
-        TileData tile = TileData(
-            title: title,
-            subtitle: subtitle,
-            suffix: IconButton(
-              iconSize: 24.0,
-              icon: const Icon(Icons.add),
-              onPressed: () async {},
-            ));
-        tiles.add(tile);
-      }
-    }
-  }
-
-  Future<void> _search(String key) async {
-    String email = '';
-    if (key.contains('@')) {
-      email = key;
-    }
-    String mobile = '';
-    bool isPhoneNumber = StringUtil.isNumeric(key);
-    if (isPhoneNumber) {
-      mobile = key;
-    }
-    List<Linkman> linkmen = await linkmanService.findAll();
   }
 
   @override
