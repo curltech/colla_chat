@@ -96,7 +96,7 @@ class DialogUtil {
         value: value,
         child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
           Text(
-            label,
+            AppLocalizations.t(label),
             style: checked ? style : null,
           ),
           const Spacer(),
@@ -120,7 +120,7 @@ class DialogUtil {
     Widget child = builder(context);
     if (title != null) {
       AppBar appBar = AppBar(
-        title: Text(title),
+        title: Text(AppLocalizations.t(title)),
         automaticallyImplyLeading: false,
         elevation: 0,
       );
@@ -160,7 +160,7 @@ class DialogUtil {
               const CircularProgressIndicator(),
               Padding(
                 padding: const EdgeInsets.only(top: 24.0),
-                child: Text(tip),
+                child: Text(AppLocalizations.t(tip)),
               )
             ],
           ),
@@ -191,7 +191,7 @@ class DialogUtil {
         return AlertDialog(
           title: Row(children: <Widget>[
             i,
-            Text(title),
+            Text(AppLocalizations.t(title)),
           ]),
           content: Text(content),
           actions: <Widget>[
@@ -233,7 +233,7 @@ class DialogUtil {
   /// 底部延时提示错误
   static error(BuildContext context, {String content = 'Error'}) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(content),
+      content: Text(AppLocalizations.t(content)),
       backgroundColor: Colors.red,
     ));
   }
@@ -241,7 +241,7 @@ class DialogUtil {
   /// 底部延时警告
   static warn(BuildContext context, {String content = 'Warning'}) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(content),
+      content: Text(AppLocalizations.t(content)),
       backgroundColor: Colors.amber,
     ));
   }
@@ -249,7 +249,7 @@ class DialogUtil {
   /// 底部延时提示
   static info(BuildContext context, {String content = 'Information'}) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(content),
+      content: Text(AppLocalizations.t(content)),
       backgroundColor: Colors.green,
     ));
   }
@@ -269,6 +269,6 @@ class DialogUtil {
   }
 
   static showToast(String msg, {int duration = 1, int gravity = 0}) {
-    Toast.show(msg, duration: duration, gravity: gravity);
+    Toast.show(AppLocalizations.t(msg), duration: duration, gravity: gravity);
   }
 }

@@ -6,15 +6,12 @@ import 'package:colla_chat/pages/chat/linkman/linkman_search_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/contact.dart';
-import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
-import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_awesome_select/flutter_awesome_select.dart';
 
 ///选择linkman建群
 class LinkmanGroupAddWidget extends StatefulWidget with TileDataMixin {
@@ -197,6 +194,7 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
   //群成员显示和编辑界面
   Widget _buildGroupMembersWidget(BuildContext context) {
     var selector = LinkmanSearchWidget(
+      selectType: SelectType.multiselect,
       onSelected: (List<String> selected) {
         logger.i(selected);
       },

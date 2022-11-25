@@ -247,6 +247,7 @@ class SmartSelectUtil {
         selectedValue.add(item.value);
       }
     }
+    var primary = appDataProvider.themeData.colorScheme.primary;
     Widget Function(BuildContext context, S2MultiState<T> state)? tileBuilder;
     if (chipOnDelete != null) {
       tileBuilder = (context, state) {
@@ -271,7 +272,7 @@ class SmartSelectUtil {
       };
     }
     return SmartSelect<T>.multiple(
-      title: AppLocalizations.t(title),
+      title: AppLocalizations.t(title ?? ''),
       placeholder: AppLocalizations.t(placeholder),
       selectedValue: selectedValue,
       onChange: (selected) {
@@ -297,7 +298,7 @@ class SmartSelectUtil {
         opacity: 0.5,
         elevation: 0,
         titleStyle: const TextStyle(color: Colors.white),
-        color: appDataProvider.themeData.colorScheme.primary,
+        color: primary,
       ),
       modalHeaderBuilder: modalHeaderBuilder,
       modalFooterBuilder: modalFooterBuilder,
@@ -314,7 +315,7 @@ class MultiSelectUtil {
     required List<Option<T>> items,
     required void Function(List<T>) onConfirm,
     String? title,
-    Text? buttonText,
+    String? buttonText,
     Icon? buttonIcon,
     MultiSelectListType? listType,
     BoxDecoration? decoration,
@@ -354,22 +355,27 @@ class MultiSelectUtil {
         selectedValue.add(item.value);
       }
     }
+    Color primary = appDataProvider.themeData.colorScheme.primary;
     return MultiSelectDialogField<T>(
       items: options,
       onConfirm: onConfirm,
       initialValue: selectedValue,
-      title: Text(AppLocalizations.t(title ?? '')),
-      buttonText: buttonText,
+      title: Text(AppLocalizations.t(title ?? ''),
+          style: TextStyle(color: primary)),
+      buttonText: Text(AppLocalizations.t(buttonText ?? ''),
+          style: TextStyle(color: primary)),
       buttonIcon: buttonIcon,
       listType: listType,
       decoration: decoration,
       onSelectionChanged: onSelectionChanged,
       chipDisplay: chipDisplay,
       searchable: searchable,
-      confirmText: confirmText,
-      cancelText: cancelText,
+      confirmText:
+          Text(AppLocalizations.t('Confirm'), style: TextStyle(color: primary)),
+      cancelText:
+          Text(AppLocalizations.t('Cancel'), style: TextStyle(color: primary)),
       barrierColor: barrierColor,
-      selectedColor: appDataProvider.themeData.colorScheme.primary,
+      selectedColor: primary,
       searchHint: searchHint,
       dialogHeight: dialogHeight,
       dialogWidth: dialogWidth,
@@ -426,22 +432,26 @@ class MultiSelectUtil {
         selectedValue.add(item.value);
       }
     }
+    Color primary = appDataProvider.themeData.colorScheme.primary;
     return MultiSelectDialog<T>(
       items: options,
       onConfirm: onConfirm,
       initialValue: selectedValue,
-      title: Text(AppLocalizations.t(title ?? '')),
+      title: Text(AppLocalizations.t(title ?? ''),
+          style: TextStyle(color: primary)),
       listType: listType,
       onSelectionChanged: onSelectionChanged,
       searchable: searchable,
-      confirmText: confirmText,
-      cancelText: cancelText,
-      selectedColor: selectedColor,
+      confirmText:
+          Text(AppLocalizations.t('Confirm'), style: TextStyle(color: primary)),
+      cancelText:
+          Text(AppLocalizations.t('Cancel'), style: TextStyle(color: primary)),
+      selectedColor: primary,
       searchHint: searchHint,
       height: height,
       width: width,
       colorator: colorator,
-      backgroundColor: backgroundColor,
+      backgroundColor: Colors.grey.withOpacity(0.8),
       unselectedColor: unselectedColor,
       searchIcon: searchIcon,
       closeSearchIcon: closeSearchIcon,

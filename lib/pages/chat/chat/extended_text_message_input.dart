@@ -1,8 +1,12 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman_search_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/special_text/custom_extended_text_selection_controls.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
 import 'package:extended_text_field/extended_text_field.dart';
@@ -132,6 +136,17 @@ class _ExtendedTextMessageInputWidgetState
             composing: TextRange.empty);
   }
 
+  _onSelected(List<String> selected) async {
+    if (selected.isNotEmpty) {
+      Linkman? linkman =
+          await linkmanService.findCachedOneByPeerId(selected[0]);
+      if (linkman != null) {
+        widget.textEditingController.text =
+            widget.textEditingController.text + linkman.name;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     //FocusScope.of(context).autofocus(_focusNode);
@@ -164,6 +179,19 @@ class _ExtendedTextMessageInputWidgetState
       onTap: () => setState(() {
         if (focusNode.hasFocus) {}
       }),
+      onChanged: (String value) {
+        if (value == '@') {
+          DialogUtil.show(
+              context: context,
+              title: 'Select one linkman',
+              builder: (BuildContext context) {
+                return LinkmanSearchWidget(
+                    onSelected: _onSelected,
+                    selected: [],
+                    selectType: SelectType.multidialog);
+              });
+        }
+      },
       //onChanged: onChanged,
       decoration: InputDecoration(
         hintText: AppLocalizations.t('Please input message'),

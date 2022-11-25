@@ -1,33 +1,29 @@
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/linkman/group/group_add_widget.dart';
-import 'package:colla_chat/pages/chat/linkman/group/linkman_group_info_widget.dart';
-import 'package:colla_chat/pages/chat/linkman/linkman/linkman_add_widget.dart';
-import 'package:colla_chat/pages/chat/linkman/linkman/linkman_info_widget.dart';
-import 'package:colla_chat/provider/data_list_controller.dart';
-import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/contact.dart';
-import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
+import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_awesome_select/flutter_awesome_select.dart';
 
-import '../../../widgets/data_bind/base.dart';
+enum SelectType { smartselect, multiselect, multidialog, listview }
 
 ///联系人的查询界面
 class LinkmanSearchWidget extends StatefulWidget {
-  //linkman的数据显示列表
-  final DataListController<Linkman> linkmanController =
-      DataListController<Linkman>();
-  final Function(List<String>) onSelected;
+  final Function(List<String>) onSelected; //获取返回的选择
   final List<String> selected;
+  final bool searchable; //是否有搜索字段
+  final SelectType
+      selectType; //查询界面的类型，multi界面无搜索字段，dialog和listview可以包括在showDialog中
 
-  LinkmanSearchWidget(
-      {Key? key, required this.onSelected, required this.selected})
+  const LinkmanSearchWidget(
+      {Key? key,
+      required this.onSelected,
+      required this.selected,
+      this.searchable = true,
+      this.selectType = SelectType.smartselect})
       : super(key: key);
 
   @override
@@ -37,22 +33,19 @@ class LinkmanSearchWidget extends StatefulWidget {
 class _LinkmanSearchWidgetState extends State<LinkmanSearchWidget> {
   TextEditingController textController = TextEditingController();
   List<String> selected = [];
+  List<Linkman> linkmen = [];
 
   @override
   initState() {
     super.initState();
-    widget.linkmanController.addListener(_update);
     selected.addAll(widget.selected);
   }
 
-  _update() {
-    setState(() {});
-  }
+  Future<List<Linkman>> _search() async {
+    linkmen = await linkmanService.search(textController.text);
+    logger.i('search complete');
 
-  Future<void> _search(String key) async {
-    List<Linkman> linkmen = await linkmanService.search(key);
-    widget.linkmanController.replaceAll(linkmen);
-    setState(() {});
+    return linkmen;
   }
 
   Widget _buildSearchTextField(BuildContext context) {
@@ -61,13 +54,14 @@ class _LinkmanSearchWidgetState extends State<LinkmanSearchWidget> {
       controller: textController,
       keyboardType: TextInputType.text,
       decoration: InputDecoration(
-        fillColor: Colors.black.withOpacity(0.1),
+        fillColor: Colors.white.withOpacity(0.5),
         filled: true,
         border: InputBorder.none,
-        labelText: AppLocalizations.t('Search'),
+        labelText: AppLocalizations.t('Search linkman'),
         suffixIcon: IconButton(
           onPressed: () async {
-            await _search(textController.text);
+            await _search();
+            setState(() {});
           },
           icon: const Icon(Icons.search),
         ),
@@ -77,70 +71,100 @@ class _LinkmanSearchWidgetState extends State<LinkmanSearchWidget> {
     return searchTextField;
   }
 
-  //群成员显示和编辑界面
-  Widget _buildSmartSelectWidget(BuildContext context) {
-    List<Linkman> linkmen = widget.linkmanController.data;
-    List<Option<String>> choiceItems = [];
+  List<Option<String>> _buildOptions() {
+    List<Option<String>> options = [];
     for (Linkman linkman in linkmen) {
       bool checked = selected.contains(linkman.peerId);
       Option<String> item =
           Option<String>(linkman.name, linkman.peerId, checked: checked);
-      choiceItems.add(item);
+      options.add(item);
     }
-    var selector = SmartSelectUtil.multiple<String>(
-      title: 'Linkman',
-      placeholder: 'Select more linkmen',
-      leading: SizedBox(
-        width: 240,
-        child: _buildSearchTextField(context),
-      ),
-      onChange: (selected) {
-        this.selected = selected;
-        widget.onSelected(selected);
-      },
-      items: choiceItems,
-      modalFilter: true,
-      modalFilterAuto: true,
-      chipOnDelete: (i) {
-        selected.removeAt(i);
-        widget.onSelected(selected);
-        setState(() {});
-      },
-    );
+
+    return options;
+  }
+
+  //群成员显示和编辑界面
+  Widget _buildSmartSelectWidget(BuildContext context) {
+    var selector = FutureBuilder(
+        future: _search(),
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          var options = _buildOptions();
+          return SmartSelectUtil.multiple<String>(
+            title: 'Linkman',
+            placeholder: 'Select more linkmen',
+            leading: widget.searchable
+                ? SizedBox(
+                    width: 200,
+                    child: _buildSearchTextField(context),
+                  )
+                : null,
+            onChange: (selected) {
+              this.selected = selected;
+              widget.onSelected(selected);
+            },
+            items: options,
+            modalFilter: true,
+            modalFilterAuto: true,
+            chipOnDelete: (i) {
+              selected.removeAt(i);
+              widget.onSelected(selected);
+              setState(() {});
+            },
+          );
+        });
 
     return selector;
   }
 
   Widget _buildMultiSelectWidget(BuildContext context) {
-    List<Linkman> linkmen = widget.linkmanController.data;
-    List<Option<String>> choiceItems = [];
-    for (Linkman linkman in linkmen) {
-      bool checked = selected.contains(linkman.peerId);
-      Option<String> item =
-          Option<String>(linkman.name, linkman.peerId, checked: checked);
-      choiceItems.add(item);
-    }
-    var selector = MultiSelectUtil.buildMultiSelectDialogField<String>(
-      title: 'Linkman',
-      buttonText: const Text('Linkman'),
-      onConfirm: (selected) {
-        this.selected = selected;
-        widget.onSelected(selected);
-      },
-      items: choiceItems,
-    );
-    Widget leading = SizedBox(
-      child: _buildSearchTextField(context),
-    );
+    var selector = FutureBuilder(
+        future: _search(),
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          var options = _buildOptions();
+          return MultiSelectUtil.buildMultiSelectDialogField<String>(
+            title: 'Linkman',
+            buttonText: 'Linkman',
+            onConfirm: (selected) {
+              this.selected = selected;
+              widget.onSelected(selected);
+            },
+            items: options,
+          );
+        });
 
     return Padding(
         padding: const EdgeInsets.all(10),
-        child: Column(children: [leading, selector]));
+        child: Column(children: [_buildSearchTextField(context), selector]));
+  }
+
+  Widget _buildMultiSelectDialog(BuildContext context) {
+    var selector = FutureBuilder(
+        future: _search(),
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          var hasData = snapshot.hasData;
+          if (hasData) {
+            return MultiSelectUtil.buildMultiSelectDialog<String>(
+              title: 'Linkman',
+              onConfirm: (selected) {
+                this.selected = selected;
+                widget.onSelected(selected);
+              },
+              items: _buildOptions(),
+            );
+          } else {
+            return Container();
+          }
+        });
+    return Padding(
+        padding: const EdgeInsets.all(10),
+        child: Column(children: [
+          _buildSearchTextField(context),
+          Expanded(child: selector)
+        ]));
   }
 
   //将linkman数据转换从列表显示数据
   List<TileData> _buildTileData() {
-    var linkmen = widget.linkmanController.data;
     List<TileData> tiles = [];
     if (linkmen.isNotEmpty) {
       for (var linkman in linkmen) {
@@ -159,31 +183,50 @@ class _LinkmanSearchWidgetState extends State<LinkmanSearchWidget> {
   }
 
   _onTap(int index, String title, {String? subtitle, TileData? group}) {
-    widget.linkmanController.currentIndex = index;
-    widget.onSelected([widget.linkmanController.current!.peerId]);
+    widget.onSelected([subtitle!]);
   }
 
   Widget _buildDataListView(BuildContext context) {
-    var dataListView = Container(
+    var dataListView = FutureBuilder(
+        future: _search(),
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          return DataListView(
+            tileData: _buildTileData(),
+            onTap: _onTap,
+          );
+        });
+    return Container(
         padding: const EdgeInsets.all(10.0),
-        child: DataListView(
-          tileData: _buildTileData(),
-          onTap: _onTap,
-        ));
-    return Column(children: [
-      _buildSearchTextField(context),
-      Expanded(child: dataListView)
-    ]);
+        child: Column(children: [
+          widget.searchable ? _buildSearchTextField(context) : Container(),
+          Expanded(child: dataListView)
+        ]));
   }
 
   @override
   Widget build(BuildContext context) {
-    return _buildMultiSelectWidget(context);
+    Widget selector;
+    switch (widget.selectType) {
+      case SelectType.smartselect:
+        selector = _buildSmartSelectWidget(context);
+        break;
+      case SelectType.multiselect:
+        selector = _buildMultiSelectWidget(context);
+        break;
+      case SelectType.multidialog:
+        selector = _buildMultiSelectDialog(context);
+        break;
+      case SelectType.listview:
+        selector = _buildDataListView(context);
+        break;
+      default:
+        selector = _buildSmartSelectWidget(context);
+    }
+    return selector;
   }
 
   @override
   void dispose() {
-    widget.linkmanController.removeListener(_update);
     textController.dispose();
     super.dispose();
   }
