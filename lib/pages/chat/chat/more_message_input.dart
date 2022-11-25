@@ -1,9 +1,12 @@
 import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman_search_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/camera_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -120,7 +123,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   _onActionDeleteTime() async {
     int? deleteTime = await DialogUtil.showSelectDialog<int>(
         context: context,
-        title: 'Please select deleteTime',
+        title: 'Select deleteTime',
         items: [
           _buildOption(0),
           _buildOption(15),
@@ -180,11 +183,25 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   ///名片
   Future<void> _onActionNameCard() async {
-    String content = JsonUtil.toJsonString(myself.myselfPeer);
-    PeerClient peerClient = PeerClient.fromJson(JsonUtil.toJson(content));
-    content = JsonUtil.toJsonString(peerClient);
-    await chatMessageController.sendText(
-        message: content, contentType: ContentType.card);
+    DialogUtil.show(
+        context: context,
+        title: 'Select one linkman',
+        builder: (BuildContext context) {
+          return LinkmanSearchWidget(
+              onSelected: (List<String> selected) async {
+                if (selected.isNotEmpty) {
+                  Linkman? linkman =
+                      await linkmanService.findCachedOneByPeerId(selected[0]);
+                  if (linkman != null) {
+                    String content = JsonUtil.toJsonString(linkman);
+                    await chatMessageController.sendText(
+                        message: content, contentType: ContentType.card);
+                  }
+                }
+              },
+              selected: [],
+              selectType: SelectType.multidialog);
+        });
   }
 
   ///文件

@@ -14,18 +14,18 @@ import 'package:flutter_awesome_select/flutter_awesome_select.dart';
 final List<ColumnFieldDef> groupColumnFieldDefs = [
   ColumnFieldDef(
       name: 'peerId',
-      label: 'peerId',
+      label: 'PeerId',
       inputType: InputType.label,
       prefixIcon: const Icon(Icons.perm_identity)),
   ColumnFieldDef(
-      name: 'name', label: 'name', prefixIcon: const Icon(Icons.person)),
+      name: 'name', label: 'Name', prefixIcon: const Icon(Icons.person)),
   ColumnFieldDef(
       name: 'alias',
-      label: 'alias',
+      label: 'Alias',
       prefixIcon: const Icon(Icons.perm_identity)),
   ColumnFieldDef(
       name: 'myAlias',
-      label: 'myAlias',
+      label: 'MyAlias',
       prefixIcon: const Icon(Icons.person_pin)),
 ];
 
