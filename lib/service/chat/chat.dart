@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:colla_chat/constant/base.dart';
@@ -19,6 +20,7 @@ import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/nearby_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:path/path.dart' as p;
@@ -26,6 +28,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
 class ChatMessageService extends GeneralBaseService<ChatMessage> {
+  Timer? timer;
+
   ChatMessageService({
     required super.tableName,
     required super.fields,
@@ -35,6 +39,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     post = (Map map) {
       return ChatMessage.fromJson(map);
     };
+    // timer = Timer.periodic(const Duration(seconds: 60), (timer) async {
+    //   deleteTimeout();
+    // });
   }
 
   Future<ChatMessage?> findByMessageId(String messageId) async {
@@ -169,13 +176,13 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       msg.receiptTime = chatMessage.receiptTime;
       msg.receiveTime = chatMessage.receiveTime;
       msg.status = chatMessage.status;
-      msg.readTime = chatMessage.readTime;
       msg.deleteTime = chatMessage.deleteTime;
       await store(msg);
     } else {
       //收到一般消息，保存
       chatMessage.direct = ChatDirect.receive.name;
       chatMessage.receiveTime = DateUtil.currentDate();
+      chatMessage.readTime = null;
       chatMessage.status = MessageStatus.received.name;
       chatMessage.id = null;
       await store(chatMessage);
@@ -258,6 +265,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     List<int>? receiptContent,
     List<int>? thumbnail,
     String? status,
+    int deleteTime = 0,
   }) async {
     ChatMessage chatMessage = ChatMessage();
     if (messageId == null) {
@@ -272,7 +280,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.senderClientId = myself.clientId;
     chatMessage.senderType = PartyType.linkman.name;
     chatMessage.senderName = myself.myselfPeer!.name;
-    chatMessage.sendTime = DateUtil.currentDate();
+    var current = DateUtil.currentDate();
+    chatMessage.sendTime = current;
+    chatMessage.readTime = current;
     chatMessage.receiverPeerId = receiverPeerId;
     if (receiverName == null) {
       PeerClient? peerClient =
@@ -301,9 +311,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     }
     chatMessage.status = status ?? MessageStatus.sent.name;
     chatMessage.transportType = transportType.name;
+    chatMessage.deleteTime = deleteTime;
 
     chatMessage.id = null;
-    //await store(chatMessage);
 
     return chatMessage;
   }
@@ -319,26 +329,26 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String? title,
     List<int>? receiptContent,
     List<int>? thumbnail,
+    int deleteTime = 0,
   }) async {
     List<ChatMessage> chatMessages = [];
     Group? group = await groupService.findCachedOneByPeerId(groupPeerId);
     if (group != null) {
       var groupName = group.name;
-      var groupChatMessage = await buildChatMessage(
-        groupPeerId,
-        data: data,
-        messageType: messageType,
-        subMessageType: subMessageType,
-        contentType: contentType,
-        mimeType: mimeType,
-        receiverType: PartyType.group,
-        receiverName: groupName,
-        groupPeerId: groupPeerId,
-        groupName: groupName,
-        title: title,
-        receiptContent: receiptContent,
-        thumbnail: thumbnail,
-      );
+      var groupChatMessage = await buildChatMessage(groupPeerId,
+          data: data,
+          messageType: messageType,
+          subMessageType: subMessageType,
+          contentType: contentType,
+          mimeType: mimeType,
+          receiverType: PartyType.group,
+          receiverName: groupName,
+          groupPeerId: groupPeerId,
+          groupName: groupName,
+          title: title,
+          receiptContent: receiptContent,
+          thumbnail: thumbnail,
+          deleteTime: deleteTime);
       chatMessages.add(groupChatMessage);
       var messageId = groupChatMessage.messageId;
       List<GroupMember> groupMembers =
@@ -348,17 +358,16 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       for (var linkman in linkmen) {
         var peerId = linkman.peerId;
         var receiverName = linkman.name;
-        ChatMessage chatMessage = await buildChatMessage(
-          peerId,
-          messageId: messageId,
-          messageType: messageType,
-          subMessageType: subMessageType,
-          contentType: contentType,
-          mimeType: mimeType,
-          receiverName: receiverName,
-          groupPeerId: groupPeerId,
-          groupName: groupName,
-        );
+        ChatMessage chatMessage = await buildChatMessage(peerId,
+            messageId: messageId,
+            messageType: messageType,
+            subMessageType: subMessageType,
+            contentType: contentType,
+            mimeType: mimeType,
+            receiverName: receiverName,
+            groupPeerId: groupPeerId,
+            groupName: groupName,
+            deleteTime: deleteTime);
         chatMessage.title = groupChatMessage.title;
         chatMessage.content = groupChatMessage.content;
         chatMessage.receiptContent = groupChatMessage.receiptContent;
@@ -432,6 +441,35 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       await chatSummaryService.upsertByChatMessage(chatMessage);
     }
   }
+
+  deleteTimeout() async {
+    //所有已读且有销毁时间的记录
+    String where = 'deleteTime>0 and readTime is not null';
+    List<Object> whereArgs = [];
+    var chatMessages = await find(
+      where: where,
+      whereArgs: whereArgs,
+    );
+    if (chatMessages.isEmpty) {
+      return;
+    }
+    for (var chatMessage in chatMessages) {
+      var deleteTime = chatMessage.deleteTime;
+      if (deleteTime == 0) {
+        continue;
+      }
+      var readTimeStr = chatMessage.readTime;
+      if (StringUtil.isNotEmpty(readTimeStr)) {
+        var readTime = DateUtil.toDateTime(readTimeStr!);
+        DateTime now = DateTime.now();
+        Duration duration = now.difference(readTime);
+        int leftDeleteTime = deleteTime - duration.inSeconds;
+        if (leftDeleteTime <= 0) {
+          chatMessageService.delete(chatMessage);
+        }
+      }
+    }
+  }
 }
 
 final chatMessageService = ChatMessageService(
@@ -453,6 +491,8 @@ final chatMessageService = ChatMessageService(
       'sendTime',
       'receiveTime',
       'receiptTime',
+      'readTime',
+      'deleteTime',
       'title',
     ],
     fields: ServiceLocator.buildFields(ChatMessage(), []));

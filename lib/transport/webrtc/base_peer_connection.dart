@@ -186,9 +186,9 @@ class Room {
 //sdp约束
 final Map<String, dynamic> sdpConstraints = {
   "mandatory": {
-    //不接收语音数据
+    //接收语音数据
     "OfferToReceiveAudio": true,
-    //不接收视频数据
+    //接收视频数据
     "OfferToReceiveVideo": true,
   },
   "optional": [],

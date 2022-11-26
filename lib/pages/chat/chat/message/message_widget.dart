@@ -20,8 +20,10 @@ import 'package:colla_chat/tool/pdf_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:flutter/material.dart';
 
+///每种消息的显示组件
 class MessageWidget {
   final ChatMessage chatMessage;
+
   final int index;
   bool? _isMyself;
 
@@ -112,6 +114,7 @@ class MessageWidget {
       content = CryptoUtil.utf8ToString(data);
     }
     return ExtendedTextMessage(
+      key: GlobalKey(),
       isMyself: isMyself,
       content: content!,
     );
@@ -120,6 +123,7 @@ class MessageWidget {
   ActionMessage buildActionMessageWidget(
       BuildContext context, ChatSubMessageType subMessageType) {
     return ActionMessage(
+      key: GlobalKey(),
       isMyself: isMyself,
       subMessageType: subMessageType,
     );
@@ -128,6 +132,7 @@ class MessageWidget {
   UrlMessage buildUrlMessageWidget(BuildContext context) {
     String? title = chatMessage.title;
     return UrlMessage(
+      key: GlobalKey(),
       url: title!,
       isMyself: isMyself,
     );
@@ -136,6 +141,7 @@ class MessageWidget {
   RichTextMessage buildRichTextMessageWidget(BuildContext context) {
     String? messageId = chatMessage.messageId;
     return RichTextMessage(
+      key: GlobalKey(),
       messageId: messageId!,
       isMyself: isMyself,
     );
@@ -149,6 +155,7 @@ class MessageWidget {
       content = CryptoUtil.utf8ToString(data);
     }
     return NameCardMessage(
+      key: GlobalKey(),
       content: content!,
       isMyself: isMyself,
     );
@@ -165,6 +172,7 @@ class MessageWidget {
       height = 64;
     }
     return ImageMessage(
+      key: GlobalKey(),
       messageId: messageId!,
       image: thumbnail,
       isMyself: isMyself,
@@ -179,6 +187,7 @@ class MessageWidget {
     String? messageId = chatMessage.messageId;
     String? thumbnail = chatMessage.thumbnail;
     return VideoMessage(
+      key: GlobalKey(),
       id: id!,
       messageId: messageId!,
       isMyself: isMyself,
@@ -190,6 +199,7 @@ class MessageWidget {
     int? id = chatMessage.id;
     String? messageId = chatMessage.messageId;
     return AudioMessage(
+      key: GlobalKey(),
       id: id!,
       messageId: messageId!,
       isMyself: isMyself,
@@ -226,6 +236,7 @@ class MessageWidget {
       }
     }
     return FileMessage(
+      key: GlobalKey(),
       messageId: messageId!,
       isMyself: isMyself,
       title: title!,

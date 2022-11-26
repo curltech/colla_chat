@@ -70,8 +70,8 @@ enum MessageStatus {
   sent, //发送成功
   received, //已接收
   read, //已读
-  accepted,
-  rejected,
+  accepted, //同意
+  rejected, //拒绝
   ignored,
   deleted, //删除
 }
@@ -120,7 +120,7 @@ class ChatMessage extends StatusEntity {
   String? receiptContent; // 回执的内容
   String? contentType;
   String? mimeType;
-  int? deleteTime = 0; // 阅读后的删除时间，秒数，0表示不删除
+  int deleteTime = 0; // 阅读后的删除时间，秒数，0表示不删除
   bool needCompress = true;
   bool needEncrypt = true;
   bool needReceipt = false;

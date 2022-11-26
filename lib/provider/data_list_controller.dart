@@ -1,4 +1,5 @@
 import 'package:colla_chat/entity/base.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:flutter/material.dart';
 
@@ -84,7 +85,13 @@ class DataListController<T> with ChangeNotifier {
     index = index ?? _currentIndex;
     if (index >= 0 && index < data.length) {
       data.removeAt(index);
-      _currentIndex = index - 1;
+      if (data.isEmpty) {
+        _currentIndex = -1;
+      } else if (index == 0) {
+        _currentIndex = 0;
+      } else {
+        _currentIndex = index - 1;
+      }
       notifyListeners();
     }
   }
