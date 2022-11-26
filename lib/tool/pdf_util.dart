@@ -43,17 +43,20 @@ class PdfUtil {
     return pdfController;
   }
 
-  static Widget buildPdfView({String? filename, FutureOr<Uint8List>? data}) {
+  static Widget buildPdfView(
+      {Key? key, String? filename, FutureOr<Uint8List>? data}) {
     BasePdfController? pdfController =
         buildPdfController(filename: filename, data: data);
     Widget? view;
     if (pdfController != null) {
       if (pdfController is PdfControllerPinch) {
         view = PdfViewPinch(
+          key: key,
           controller: pdfController,
         );
       } else if (pdfController is PdfController) {
         view = PdfView(
+          key: key,
           controller: pdfController,
         );
       }
@@ -63,14 +66,17 @@ class PdfUtil {
     return view;
   }
 
-  static Widget buildPdfWidget(BasePdfController pdfController) {
+  static Widget buildPdfWidget(
+      {Key? key, required BasePdfController pdfController}) {
     Widget? view;
     if (pdfController is PdfControllerPinch) {
       view = PdfViewPinch(
+        key: key,
         controller: pdfController,
       );
     } else if (pdfController is PdfController) {
       view = PdfView(
+        key: key,
         controller: pdfController,
       );
     }

@@ -1,17 +1,16 @@
 import 'dart:async';
 
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
+import 'package:colla_chat/pages/chat/chat/chat_message_input.dart';
+import 'package:colla_chat/pages/chat/chat/chat_message_item.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:flutter/material.dart';
-
-import '../../../entity/chat/chat.dart';
-import '../../../transport/webrtc/advanced_peer_connection.dart';
-import '../../../transport/webrtc/peer_connection_pool.dart';
-import 'chat_message_input.dart';
-import 'chat_message_item.dart';
 
 /// 消息发送和接受展示的界面组件
 /// 此界面展示特定的目标对象的收到的消息，并且可以发送消息
@@ -165,9 +164,8 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   Widget _buildMessageItem(BuildContext context, int index) {
     List<ChatMessage> messages = chatMessageController.data;
     ChatMessage item = messages[index];
-    // 创建消息动画控制器
-
-    Widget chatMessageItem = ChatMessageItem(chatMessage: item, index: index);
+    Widget chatMessageItem =
+        ChatMessageItem(key: UniqueKey(), chatMessage: item, index: index);
 
     // index=0执行动画，对最新的消息执行动画
     if (index == 0) {

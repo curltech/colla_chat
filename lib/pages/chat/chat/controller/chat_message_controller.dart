@@ -147,6 +147,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   }
 
   ///发送文本消息,发送命令消息目标可以是linkman，也可以是群，取决于当前chatSummary
+  ///先通过网络发送消息，然后保存在本地数据库
   Future<ChatMessage?> send(
       {String? title,
       List<int>? data,
@@ -164,24 +165,31 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     ChatMessage? chatMessage;
     if (partyType == PartyType.linkman.name) {
       //保存消息
-      chatMessage = await chatMessageService.buildChatMessage(peerId,
-          title: title,
-          data: data,
-          receiverName: receiverName,
-          clientId: clientId,
-          contentType: contentType,
-          mimeType: mimeType,
-          subMessageType: subMessageType);
+      chatMessage = await chatMessageService.buildChatMessage(
+        peerId,
+        title: title,
+        data: data,
+        receiverName: receiverName,
+        clientId: clientId,
+        contentType: contentType,
+        mimeType: mimeType,
+        subMessageType: subMessageType,
+        deleteTime: _deleteTime,
+      );
       chatMessage = await chatMessageService.sendAndStore(chatMessage);
+      _deleteTime = 0;
       notifyListeners();
     } else if (partyType == PartyType.group.name) {
       //保存群消息
       List<ChatMessage> chatMessages =
-          await chatMessageService.buildGroupChatMessage(peerId,
-              data: data,
-              contentType: contentType,
-              mimeType: mimeType,
-              subMessageType: subMessageType);
+          await chatMessageService.buildGroupChatMessage(
+        peerId,
+        data: data,
+        contentType: contentType,
+        mimeType: mimeType,
+        subMessageType: subMessageType,
+        deleteTime: _deleteTime,
+      );
       if (chatMessages.isNotEmpty) {
         chatMessage = chatMessages[0];
         for (var chatMessage in chatMessages.sublist(1)) {
@@ -189,6 +197,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
           await chatMessageService.store(chatMessage);
         }
       }
+      _deleteTime = 0;
       notifyListeners();
     }
     return chatMessage!;

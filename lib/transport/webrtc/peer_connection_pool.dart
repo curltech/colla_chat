@@ -18,7 +18,6 @@ import 'package:cryptography/cryptography.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:synchronized/extension.dart';
 
-
 ///一个队列，按照被使用的新旧排序，当元素超过最大数量的时候，溢出最旧的元素
 class LruQueue<T> {
   int _maxLength = 200;
@@ -533,23 +532,31 @@ class PeerConnectionPool {
       CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     List<AdvancedPeerConnection>? peerConnections = get(peerId);
     if (peerConnections != null && peerConnections.isNotEmpty) {
-      List<Future<void>> ps = [];
+      List<Future<bool>> ps = [];
       //logger.w('send signal:${peerConnections.length}');
       for (var peerConnection in peerConnections) {
-        if (clientId == null || peerConnection.clientId == clientId) {
-          Future<void> p =
-              peerConnection.send(data, cryptoOption: cryptoOption);
-          //logger.w('send signal');
-          ps.add(p);
+        if (peerConnection.status == PeerConnectionStatus.connected) {
+          if (clientId == null || peerConnection.clientId == clientId) {
+            Future<bool> p =
+                peerConnection.send(data, cryptoOption: cryptoOption);
+            //logger.w('send signal');
+            ps.add(p);
+          }
         }
       }
-      await Future.wait(ps);
+      List<bool> results = await Future.wait(ps);
+      if (results.isNotEmpty) {
+        for (var result in results) {
+          if (result) {
+            return true;
+          }
+        }
+      }
     } else {
       logger.e(
           'PeerConnection:$peerId,clientId;$clientId is not exist, cannot send');
-      return false;
     }
-    return true;
+    return false;
   }
 
   ///收到发来的ChainMessage消息，进行后续的action处理

@@ -5,7 +5,6 @@ import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_search_widget.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/camera_util.dart';
@@ -15,7 +14,6 @@ import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
-import 'package:colla_chat/widgets/media/media_player_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
@@ -24,7 +22,7 @@ final List<ActionData> defaultActionData = [
   ActionData(
       label: 'DeleteTime',
       tooltip: 'Delete time',
-      icon: const Icon(Icons.timer)),
+      icon: const Icon(Icons.timer_sharp)),
   ActionData(
       label: 'Picture',
       tooltip: 'Take a picture',

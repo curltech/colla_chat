@@ -42,12 +42,12 @@ class _FullScreenWidgetState extends State<FullScreenWidget> {
       itemBuilder: (BuildContext context, int index) {
         return Center(
             child: FutureBuilder(
-              future: _buildMessageWidget(context, index),
-              builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
-                Widget widget = snapshot.data ?? Container();
-                return widget;
-              },
-            ));
+          future: _buildMessageWidget(context, index),
+          builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+            Widget widget = snapshot.data ?? Container();
+            return widget;
+          },
+        ));
       },
       itemCount: chatMessageController.length,
       controller: pageController,

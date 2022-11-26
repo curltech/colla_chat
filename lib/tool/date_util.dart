@@ -1,9 +1,11 @@
 class DateUtil {
+  ///获取当前时间的ISO字符串
   static String currentDate() {
     var currentDate = DateTime.now().toUtc().toIso8601String();
     return currentDate;
   }
 
+  ///将时间字符串格式化成易读的文字
   static formatChinese(String strDate) {
     DateTime t = DateTime.parse(strDate).toLocal();
     strDate = t.toIso8601String();
@@ -47,9 +49,9 @@ class DateUtil {
 
   static const String full = "yyyy-MM-dd HH:mm:ss";
 
-  static String formatDateV(DateTime dateTime,
+  ///将时间格式化成字符串
+  static String formatDate(DateTime dateTime,
       {bool isUtc = true, String format = full}) {
-    if (dateTime == null) return "";
     format = format ?? full;
     if (format.contains("yy")) {
       String year = dateTime.year.toString();
@@ -82,5 +84,9 @@ class DateUtil {
       }
     }
     return format;
+  }
+
+  static DateTime toDateTime(String formattedString) {
+    return DateTime.parse(formattedString);
   }
 }
