@@ -39,6 +39,7 @@ Future<void> setCert() async {
       .setTrustedCertificatesBytes(data.buffer.asUint8List());
 }
 
+///启动背景服务
 Future<bool> startForegroundService() async {
   const androidConfig = FlutterBackgroundAndroidConfig(
     notificationTitle: 'CollaChat',
@@ -52,6 +53,7 @@ Future<bool> startForegroundService() async {
   return FlutterBackground.enableBackgroundExecution();
 }
 
+///应用主函数，使用runApp加载主应用Widget
 void main(List<String> args) async {
   //logger.i(args.toString());
   //初始化服务类
@@ -70,6 +72,8 @@ void main(List<String> args) async {
   }
   ServiceLocator.init().then((value) {
     HttpOverrides.global = PlatformHttpOverrides();
+
+    ///加载主应用组件
     runApp(MultiProvider(providers: [
       ChangeNotifierProvider(create: (context) => appDataProvider),
     ], child: const CollaChatApp()));

@@ -147,5 +147,15 @@
   "MyAlias": "我的别名",
   "Search linkman": "搜索联系人",
   "Confirm": "确认",
-  "Cancel": "撤销"
+  "Cancel": "撤销",
+  "Resolution": "分辨率",
+  "Size": "尺寸",
+  "Exposure Mode": "曝光模式",
+  "Resetting exposure point": "重置曝光点",
+  "Auto": "自动",
+  "Locked": "锁定",
+  "Reset Offset": "重置偏移",
+  "Exposure Offset": "曝光偏移",
+  "Focus Mode": "对焦模式",
+  "Resetting focus point": "重置对焦点"
 }

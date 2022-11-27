@@ -1,3 +1,4 @@
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:wechat_camera_picker/wechat_camera_picker.dart';
 
@@ -21,15 +22,32 @@ class CameraUtil {
     return entity;
   }
 
-  static Future<CameraPreview?> buildCameraPreview({
+  Future<CameraPreview> buildCameraPreview({
     Key? key,
+    int cameraIndex = 0,
+    CameraDescription? description,
+    ResolutionPreset resolutionPreset = ResolutionPreset.max,
+    bool enableAudio = true,
+    ImageFormatGroup? imageFormatGroup,
     Widget? child,
   }) async {
-    WidgetsFlutterBinding.ensureInitialized();
     List<CameraDescription> cameras = await availableCameras();
     CameraController controller =
-        CameraController(cameras[0], ResolutionPreset.max);
-    await controller.initialize();
+        CameraController(cameras[cameraIndex], resolutionPreset);
+    try {
+      await controller.initialize();
+    } catch (e) {
+      if (e is CameraException) {
+        switch (e.code) {
+          case 'CameraAccessDenied':
+            logger.e('User denied camera access.');
+            break;
+          default:
+            logger.e('Handle other errors.');
+            break;
+        }
+      }
+    }
 
     return CameraPreview(
       controller,
