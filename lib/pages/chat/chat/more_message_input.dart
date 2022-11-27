@@ -1,13 +1,11 @@
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
-import 'package:colla_chat/entity/dht/myself.dart';
-import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_search_widget.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/mobile_camera_widget.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/asset_util.dart';
-import 'package:colla_chat/tool/camera_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
@@ -162,13 +160,18 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   ///拍照
   _onActionPicture() async {
-    AssetEntity? entry = await CameraUtil.pickFromCamera(context);
-    if (entry != null) {
-      Map<String, dynamic> map = await AssetUtil.toJson(entry);
-      String content = JsonUtil.toJsonString(map);
-      await chatMessageController.sendText(
-          message: content, contentType: ContentType.image);
-    }
+    // AssetEntity? entry = await CameraUtil.pickFromCamera(context);
+    // if (entry != null) {
+    //   Map<String, dynamic> map = await AssetUtil.toJson(entry);
+    //   String content = JsonUtil.toJsonString(map);
+    //   await chatMessageController.sendText(
+    //       message: content, contentType: ContentType.image);
+    // }
+    DialogUtil.show(
+        context: context,
+        builder: (BuildContext context) {
+          return const MobileCameraWidget();
+        });
   }
 
   ///位置
