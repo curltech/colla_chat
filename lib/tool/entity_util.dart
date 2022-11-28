@@ -49,6 +49,23 @@ class EntityUtil {
   }
 
   static removeNull(Map map) {
-    map.removeWhere((key, value) => value == null);
+    List<String> keys = [];
+    for (var entry in map.entries) {
+      String key = entry.key;
+      var value = entry.value;
+      if (value == null) {
+        keys.add(key);
+      } else {
+        if (value is num) {
+          if (value.isNaN || value.isInfinite) {
+            keys.add(key);
+          }
+        }
+      }
+    }
+
+    for (var key in keys) {
+      map.remove(key);
+    }
   }
 }
