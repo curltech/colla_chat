@@ -267,6 +267,7 @@ dependencies:
   platform_maps_flutter: ^1.0.2
   flutter_map_location_marker: ^5.0.0+1
   maps_launcher: ^2.0.1
+  location_picker_flutter_map: ^1.1.5
 dependency_overrides:
   photo_view: ^0.14.0
   device_info_plus: ^4.1.2

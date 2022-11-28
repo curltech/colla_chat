@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/message/action_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/audio_message.dart';
@@ -14,12 +15,18 @@ import 'package:colla_chat/pages/chat/chat/message/name_card_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/rich_text_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/url_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/video_message.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/tool/document_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/geolocator_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/pdf_util.dart';
+import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 
 ///每种消息的显示组件
 class MessageWidget {
@@ -105,6 +112,7 @@ class MessageWidget {
         onTap: () {
           chatMessageController.currentIndex = index;
           chatMessageController.chatView = ChatView.full;
+          openLocationMap(context);
         },
         child: body);
     return body;
@@ -179,6 +187,51 @@ class MessageWidget {
       isMyself: isMyself,
       thumbnail: thumbnail,
     );
+  }
+
+  openLocationMap(BuildContext context) {
+    String? content = chatMessage.content;
+    if (content == null) {
+      return;
+    }
+    List<int>? data;
+    data = CryptoUtil.decodeBase64(content);
+    content = CryptoUtil.utf8ToString(data);
+    Map<String, dynamic> map = JsonUtil.toJson(content);
+    Position position = Position.fromMap(map);
+    var latitude = position.latitude; //纬度
+    var longitude = position.longitude; //经度
+    if (platformParams.desktop) {
+      SmartDialogUtil.show(
+          context: context,
+          title: AppLocalizations.t('Location map'),
+          builder: (BuildContext context) {
+            return GeolocatorUtil.buildLocationPicker(
+                latitude: latitude,
+                longitude: longitude,
+                onPicked: (PickedData data) {});
+          });
+      // GeolocatorUtil.launchCoordinates(latitude, longitude);
+    } else {
+      SmartDialogUtil.show(
+          context: context,
+          title: AppLocalizations.t('Location map'),
+          builder: (BuildContext context) {
+            return GeolocatorUtil.buildPlatformMap(
+                latitude: latitude, longitude: longitude);
+          });
+      // DialogUtil.show(
+      //     context: context,
+      //     builder: (BuildContext context) {
+      //       return GeolocatorUtil.buildPlatformMap(
+      //         latitude: latitude,
+      //         longitude: longitude,
+      //       );
+      //     });
+      // GeolocatorUtil.launchCoordinates(latitude, longitude);
+      // GeolocatorUtil.mapLauncher(
+      //     latitude: latitude, longitude: longitude, title: '');
+    }
   }
 
   ImageMessage buildImageMessageWidget(BuildContext context) {

@@ -121,7 +121,6 @@ class DialogUtil {
     if (title != null) {
       AppBar appBar = AppBar(
         title: Text(AppLocalizations.t(title)),
-        automaticallyImplyLeading: false,
         elevation: 0,
       );
       child = Column(children: [

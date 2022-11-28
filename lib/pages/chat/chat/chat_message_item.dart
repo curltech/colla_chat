@@ -108,10 +108,13 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
     Widget body = FutureBuilder(
       future: widget.messageWidget.buildMessageBody(context),
       builder: (BuildContext context, AsyncSnapshot<Widget?> snapshot) {
-        Widget? widget = snapshot.data;
-        widget = widget ?? Container();
-
-        return widget;
+        if (snapshot.hasData) {
+          Widget? widget = snapshot.data;
+          if (widget != null) {
+            return widget;
+          }
+        }
+        return Container();
       },
     );
 
@@ -161,10 +164,13 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
             child: FutureBuilder(
               future: widget.messageWidget.buildMessageBody(context),
               builder: (BuildContext context, AsyncSnapshot<Widget?> snapshot) {
-                Widget? widget = snapshot.data;
-                widget = widget ?? Container();
-
-                return widget;
+                if (snapshot.hasData) {
+                  Widget? widget = snapshot.data;
+                  if (widget != null) {
+                    return widget;
+                  }
+                }
+                return Container();
               },
             ))
       ], // aligns the chatitem to right end

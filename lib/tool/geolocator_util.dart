@@ -1,13 +1,16 @@
 import 'dart:async';
 
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 import 'package:map_launcher/map_launcher.dart' as map_launcher;
+import 'package:map_launcher/map_launcher.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 import 'package:platform_maps_flutter/platform_maps_flutter.dart'
     as platform_map;
 
@@ -147,37 +150,14 @@ class GeolocatorUtil {
     return steps;
   }
 
-  ///Leaflet地图
-  static FlutterMap buildFlutterMap(LatLng center, double zoom) {
-    return FlutterMap(
-      mapController: MapController(),
-      options: MapOptions(
-        center: center,
-        zoom: zoom,
-      ),
-      nonRotatedChildren: [
-        AttributionWidget.defaultWidget(
-          source: 'OpenStreetMap contributors',
-          onSourceTapped: null,
-        ),
-      ],
-      children: [
-        TileLayer(
-          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-          userAgentPackageName: 'com.example.app',
-        ),
-      ],
-    );
-  }
-
-  ///获取安装的地图软件列表
+  ///获取安装的地图软件列表,android/ios,调用安装的地图应用
   static Future<List<map_launcher.AvailableMap>> installedMaps() async {
     final availableMaps = await map_launcher.MapLauncher.installedMaps;
 
     return availableMaps;
   }
 
-  ///根据地图和位置调用安装的地图软件
+  ///根据地图和位置调用安装的地图软件,android/ios,调用安装的地图应用
   static Future<void> showMarker(
       map_launcher.AvailableMap map, map_launcher.Coords coords,
       {required String title}) async {
@@ -187,26 +167,39 @@ class GeolocatorUtil {
     );
   }
 
-  ///是否安装了地图类型
+  ///是否安装了地图类型,android/ios,调用安装的地图应用
   static Future<bool?> isMapAvailable(map_launcher.MapType mapType) async {
     return await map_launcher.MapLauncher.isMapAvailable(mapType);
   }
 
-  ///根据地图的类型调用安装的地图软件
+  ///根据地图的类型调用安装的地图软件,android/ios,调用安装的地图应用
   static Future<void> mapLauncher(
-      map_launcher.MapType mapType, map_launcher.Coords coords,
-      {required String title, String? description}) async {
-    await map_launcher.MapLauncher.showMarker(
-      mapType: mapType,
-      coords: coords,
-      title: title,
-      description: description,
-    );
+      {map_launcher.MapType? mapType,
+      required double latitude,
+      required double longitude,
+      required String title,
+      String? description}) async {
+    var coords = map_launcher.Coords(latitude, longitude);
+    if (mapType == null) {
+      List<AvailableMap> availableMap = await installedMaps();
+      if (availableMap.isNotEmpty) {
+        mapType = availableMap.first.mapType;
+      }
+    }
+    if (mapType != null) {
+      await map_launcher.MapLauncher.showMarker(
+        mapType: mapType,
+        coords: coords,
+        title: title,
+        description: description,
+      );
+    }
   }
 
-  ///构建地图Widget
+  ///构建地图Widget,Android/iOS
   static platform_map.PlatformMap buildPlatformMap(
-      {required platform_map.LatLng target, double zoom = 0}) {
+      {required double latitude, required double longitude, double zoom = 0}) {
+    var target = platform_map.LatLng(latitude, longitude);
     return platform_map.PlatformMap(
       initialCameraPosition: platform_map.CameraPosition(
         target: target,
@@ -215,7 +208,7 @@ class GeolocatorUtil {
       markers: <platform_map.Marker>{
         platform_map.Marker(
           markerId: platform_map.MarkerId('marker_1'),
-          position: const platform_map.LatLng(47.6, 8.8796),
+          position: target,
           consumeTapEvents: true,
           infoWindow: const platform_map.InfoWindow(
             title: 'PlatformMarker',
@@ -250,43 +243,93 @@ class GeolocatorUtil {
     );
   }
 
-  ///当前位置的地图
-  Widget buildCurrentLocationLayer({
+  /// url地图
+  static Future<bool> launchQuery(String query) async {
+    return await MapsLauncher.launchQuery(query);
+  }
+
+  /// url地图
+  static Future<bool> launchCoordinates(
+    double latitude,
+    double longitude, [
+    String? label,
+  ]) async {
+    return await MapsLauncher.launchCoordinates(latitude, longitude, label);
+  }
+
+  /// 使用Open Street Map，需要翻墙
+  static FlutterLocationPicker buildLocationPicker({
     Key? key,
-    LocationMarkerStyle style = const LocationMarkerStyle(),
-    Stream<LocationMarkerPosition>? positionStream,
-    Stream<LocationMarkerHeading>? headingStream,
-    Stream<double?>? centerCurrentLocationStream,
-    Stream<void>? turnHeadingUpLocationStream,
-    CenterOnLocationUpdate centerOnLocationUpdate =
-        CenterOnLocationUpdate.never,
-    TurnOnHeadingUpdate turnOnHeadingUpdate = TurnOnHeadingUpdate.never,
-    Duration centerAnimationDuration = const Duration(milliseconds: 200),
-    Curve centerAnimationCurve = Curves.fastOutSlowIn,
-    Duration turnAnimationDuration = const Duration(milliseconds: 200),
-    Curve turnAnimationCurve = Curves.easeInOut,
-    Duration moveAnimationDuration = const Duration(milliseconds: 200),
-    Curve moveAnimationCurve = Curves.fastOutSlowIn,
-    Duration rotateAnimationDuration = const Duration(milliseconds: 200),
-    Curve rotateAnimationCurve = Curves.easeInOut,
+    double? latitude,
+    double? longitude,
+    required void Function(PickedData) onPicked,
+    void Function(Exception)? onError,
+    double stepZoom = 1,
+    double initZoom = 17,
+    double minZoomLevel = 2,
+    double maxZoomLevel = 18.4,
+    String urlTemplate = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    String mapLanguage = 'en',
+    String selectLocationButtonText = 'Set Current Location',
+    Duration mapAnimationDuration = const Duration(milliseconds: 2000),
+    bool trackMyPosition = false,
+    bool showZoomController = true,
+    bool showLocationController = true,
+    bool showSelectLocationButton = true,
+    ButtonStyle? selectLocationButtonStyle,
+    Color? selectLocationTextColor,
+    bool showSearchBar = true,
+    Color? searchBarBackgroundColor,
+    Color? searchBarTextColor,
+    String searchBarHintText = 'Search location',
+    Color? searchBarHintColor,
+    Color? mapLoadingBackgroundColor,
+    Color? locationButtonBackgroundColor,
+    Color? zoomButtonsBackgroundColor,
+    Color? zoomButtonsColor,
+    Color? locationButtonsColor,
+    Color markerIconColor = Colors.red,
+    IconData markerIcon = Icons.location_pin,
+    Widget? loadingWidget,
   }) {
-    return CurrentLocationLayer(
+    LatLong? latLong;
+    if (latitude != null && longitude != null) {
+      latLong = LatLong(latitude, longitude);
+    }
+    selectLocationButtonText = AppLocalizations.t(selectLocationButtonText);
+    searchBarHintText = AppLocalizations.t(searchBarHintText);
+    return FlutterLocationPicker(
+      initPosition: latLong,
       key: key,
-      style: style,
-      positionStream: positionStream,
-      headingStream: headingStream,
-      centerCurrentLocationStream: centerCurrentLocationStream,
-      turnHeadingUpLocationStream: turnHeadingUpLocationStream,
-      centerOnLocationUpdate: centerOnLocationUpdate,
-      turnOnHeadingUpdate: turnOnHeadingUpdate,
-      centerAnimationDuration: centerAnimationDuration,
-      centerAnimationCurve: centerAnimationCurve,
-      turnAnimationDuration: turnAnimationDuration,
-      turnAnimationCurve: turnAnimationCurve,
-      moveAnimationDuration: moveAnimationDuration,
-      moveAnimationCurve: moveAnimationCurve,
-      rotateAnimationDuration: rotateAnimationDuration,
-      rotateAnimationCurve: rotateAnimationCurve,
+      onPicked: onPicked,
+      onError: onError,
+      stepZoom: stepZoom,
+      initZoom: initZoom,
+      minZoomLevel: minZoomLevel,
+      maxZoomLevel: maxZoomLevel,
+      urlTemplate: urlTemplate,
+      mapLanguage: mapLanguage,
+      selectLocationButtonText: selectLocationButtonText,
+      mapAnimationDuration: mapAnimationDuration,
+      trackMyPosition: trackMyPosition,
+      showZoomController: showZoomController,
+      showLocationController: showLocationController,
+      showSelectLocationButton: showSelectLocationButton,
+      selectLocationButtonStyle: selectLocationButtonStyle,
+      selectLocationTextColor: selectLocationTextColor,
+      showSearchBar: showSearchBar,
+      searchBarBackgroundColor: searchBarBackgroundColor,
+      searchBarTextColor: searchBarTextColor,
+      searchBarHintText: searchBarHintText,
+      searchBarHintColor: searchBarHintColor,
+      mapLoadingBackgroundColor: mapLoadingBackgroundColor,
+      locationButtonBackgroundColor: locationButtonBackgroundColor,
+      zoomButtonsBackgroundColor: zoomButtonsBackgroundColor,
+      zoomButtonsColor: zoomButtonsColor,
+      locationButtonsColor: locationButtonsColor,
+      markerIconColor: markerIconColor,
+      markerIcon: markerIcon,
+      loadingWidget: loadingWidget,
     );
   }
 }
