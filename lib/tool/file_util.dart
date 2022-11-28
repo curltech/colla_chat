@@ -61,7 +61,7 @@ class FileUtil {
     return filename;
   }
 
-  static Future<List<int>> readFile(String filename) async {
+  static Future<Uint8List> readFile(String filename) async {
     if (filename.startsWith('assets')) {
       return await _readAssetData(filename);
     } else {
@@ -69,7 +69,7 @@ class FileUtil {
     }
   }
 
-  static Future<List<int>> _readFileBytes(String filename) async {
+  static Future<Uint8List> _readFileBytes(String filename) async {
     // Uri uri = Uri.parse(filename);
     File file = File(filename);
     Uint8List bytes;
@@ -78,7 +78,7 @@ class FileUtil {
     return bytes;
   }
 
-  static Future<List<int>> _readAssetData(String filename) async {
+  static Future<Uint8List> _readAssetData(String filename) async {
     var asset = await rootBundle.load(filename);
     return asset.buffer.asUint8List();
   }
@@ -111,7 +111,8 @@ class FileUtil {
 
     if (result != null) {
       for (var file in result.files) {
-        XFile xfile = XFile.fromData(file.bytes!,
+        Uint8List data = await FileUtil.readFile(file.path!);
+        XFile xfile = XFile.fromData(data,
             mimeType: file.extension,
             name: file.name,
             length: file.size,
