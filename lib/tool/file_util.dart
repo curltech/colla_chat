@@ -1,8 +1,10 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:file_saver/file_saver.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
@@ -81,7 +83,7 @@ class FileUtil {
     return asset.buffer.asUint8List();
   }
 
-  static Future<List<String>> pickFiles({
+  static Future<List<XFile>> pickFiles({
     String? dialogTitle,
     String? initialDirectory,
     FileType type = FileType.any,
@@ -93,7 +95,7 @@ class FileUtil {
     bool withReadStream = false,
     bool lockParentWindow = false,
   }) async {
-    List<String> filenames = [];
+    List<XFile> xfiles = [];
     FilePickerResult? result = await FilePicker.platform.pickFiles(
       dialogTitle: dialogTitle,
       initialDirectory: initialDirectory,
@@ -108,12 +110,17 @@ class FileUtil {
     );
 
     if (result != null) {
-      for (var path in result.paths) {
-        filenames.add(path!);
+      for (var file in result.files) {
+        XFile xfile = XFile.fromData(file.bytes!,
+            mimeType: file.extension,
+            name: file.name,
+            length: file.size,
+            path: file.path);
+        xfiles.add(xfile);
       }
     }
 
-    return filenames;
+    return xfiles;
   }
 
   static Future<String?> directoryPathPicker({
@@ -332,5 +339,41 @@ class FileUtil {
         }
       },
     );
+  }
+
+  static Future<Map<String, dynamic>> toJson(XFile file) async {
+    Map<String, dynamic> json = {};
+    json['path'] = file.path;
+    json['name'] = file.name;
+    json['mimeType'] = file.mimeType;
+    json['length'] = file.length();
+    json['lastModified'] = file.lastModified();
+    var content = await file.readAsBytes();
+    var base64Content = CryptoUtil.encodeBase64(content);
+    json['content'] = base64Content;
+
+    return json;
+  }
+
+  static Future<XFile> fromJson(Map<String, dynamic> json) async {
+    var base64Content = json['content'];
+    var content = CryptoUtil.decodeBase64(base64Content);
+    var name = json['name'];
+    var mimeType = json['mimeType'];
+    final dir = await getTemporaryDirectory();
+    if (name == null) {
+      var uuid = const Uuid();
+      name = '${uuid.v4()}.$mimeType';
+    }
+    String path = p.join(dir.path, name);
+    XFile file = XFile.fromData(content,
+        mimeType: json['mimeType'],
+        name: json['name'],
+        length: json['length'],
+        lastModified: json['lastModified'],
+        path: json['path']);
+    file.saveTo(path);
+
+    return file;
   }
 }

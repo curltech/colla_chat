@@ -1090,7 +1090,6 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
     await videoController?.dispose();
     if (mounted) {
       setState(() {
-        mediaFile = null;
         videoController = vController;
       });
     }

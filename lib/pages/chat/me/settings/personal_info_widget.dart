@@ -12,6 +12,7 @@ import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
+import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -123,9 +124,9 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
 
   Future<void> _pickAvatar(String? peerId, BuildContext context) async {
     if (platformParams.desktop) {
-      List<String> filenames = await FileUtil.pickFiles(type: FileType.image);
-      if (filenames.isNotEmpty) {
-        List<int> avatar = await FileUtil.readFile(filenames[0]);
+      List<XFile> xfiles = await FileUtil.pickFiles(type: FileType.image);
+      if (xfiles.isNotEmpty) {
+        List<int> avatar = await xfiles[0].readAsBytes();
         await myselfPeerService.updateAvatar(peerId!, avatar);
         setState(() {});
       }
