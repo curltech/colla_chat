@@ -26,15 +26,29 @@ class ImageMessage extends StatelessWidget {
     var imageWidget = FutureBuilder(
         future: messageAttachmentService.getFilename(messageId),
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-          var filename = snapshot.data;
-          if (filename == null) {
-            return Container();
+          if (image != null) {
+            return ImageUtil.buildImageWidget(
+              image: image,
+              width: width,
+              height: height,
+            );
           }
-          return ImageUtil.buildImageWidget(
-            image: filename,
-            width: width,
-            height: height,
-          );
+          if (snapshot.hasData) {
+            var filename = snapshot.data;
+            if (filename == null) {
+              return Container();
+            }
+            return ImageUtil.buildImageWidget(
+              image: filename,
+              width: width,
+              height: height,
+            );
+          } else {
+            return ImageUtil.buildImageWidget(
+              width: width,
+              height: height,
+            );
+          }
         });
     return imageWidget;
   }

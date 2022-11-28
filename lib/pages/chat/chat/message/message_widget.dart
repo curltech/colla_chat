@@ -9,6 +9,7 @@ import 'package:colla_chat/pages/chat/chat/message/audio_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/extended_text_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/file_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/image_message.dart';
+import 'package:colla_chat/pages/chat/chat/message/location_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/name_card_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/rich_text_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/url_message.dart';
@@ -86,6 +87,9 @@ class MessageWidget {
         case ContentType.link:
           body = buildUrlMessageWidget(context);
           break;
+        case ContentType.location:
+          body = buildLocationMessageWidget(context);
+          break;
         default:
           body = Container();
           break;
@@ -158,6 +162,22 @@ class MessageWidget {
       key: GlobalKey(),
       content: content!,
       isMyself: isMyself,
+    );
+  }
+
+  LocationMessage buildLocationMessageWidget(BuildContext context) {
+    String? content = chatMessage.content;
+    List<int>? data;
+    if (content != null) {
+      data = CryptoUtil.decodeBase64(content);
+      content = CryptoUtil.utf8ToString(data);
+    }
+    String? thumbnail = chatMessage.thumbnail;
+    return LocationMessage(
+      key: GlobalKey(),
+      content: content!,
+      isMyself: isMyself,
+      thumbnail: thumbnail,
     );
   }
 

@@ -7,6 +7,7 @@ import 'package:colla_chat/plugin/mobile_camera_widget.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -34,7 +35,7 @@ final List<ActionData> defaultActionData = [
   ActionData(
       label: 'Location',
       tooltip: 'Geographical position',
-      icon: const Icon(Icons.location_city)),
+      icon: const Icon(Icons.location_on)),
   ActionData(
       label: 'Name card',
       tooltip: 'Share name card',
@@ -194,7 +195,10 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   ///位置
   void _onActionLocation() async {
     Position position = await GeolocatorUtil.currentPosition();
-    String content = JsonUtil.toJsonString(position);
+    Map<String, dynamic> map = position.toJson();
+    EntityUtil.removeNull(map);
+    JsonUtil.toJsonString(map);
+    String content = JsonUtil.toJsonString(map);
     await chatMessageController.sendText(
         message: content, contentType: ContentType.location);
   }
