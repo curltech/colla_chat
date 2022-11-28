@@ -12,6 +12,7 @@ import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
+import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
@@ -160,18 +161,34 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   ///拍照
   _onActionPicture() async {
-    // AssetEntity? entry = await CameraUtil.pickFromCamera(context);
-    // if (entry != null) {
-    //   Map<String, dynamic> map = await AssetUtil.toJson(entry);
-    //   String content = JsonUtil.toJsonString(map);
-    //   await chatMessageController.sendText(
-    //       message: content, contentType: ContentType.image);
-    // }
-    DialogUtil.show(
+    XFile? mediaFile;
+    var f = await DialogUtil.show(
         context: context,
         builder: (BuildContext context) {
-          return const MobileCameraWidget();
+          return MobileCameraWidget(
+            onFile: (XFile file) {
+              mediaFile = file;
+            },
+          );
         });
+    if (mediaFile != null) {
+      List<int> data = await mediaFile!.readAsBytes();
+      String name = mediaFile!.name;
+      String mimeType = FileUtil.extension(name);
+      if (mediaFile!.mimeType != null) {
+        mimeType = mediaFile!.mimeType!;
+      }
+      ContentType contentType = ContentType.image;
+      if (mimeType.endsWith('mp4')) {
+        contentType = ContentType.video;
+        mimeType = MimeType.mp4.name;
+      }
+      await chatMessageController.send(
+          title: name,
+          data: data,
+          contentType: contentType,
+          mimeType: mimeType);
+    }
   }
 
   ///位置
@@ -207,12 +224,13 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   ///文件
   Future<void> _onActionFile() async {
-    List<String> filenames = await FileUtil.pickFiles();
-    if (filenames.isNotEmpty) {
-      List<int> data = await FileUtil.readFile(filenames[0]);
-      String? mimeType = FileUtil.mimeType(filenames[0]);
+    List<XFile> xfiles = await FileUtil.pickFiles();
+    if (xfiles.isNotEmpty) {
+      XFile xfile = xfiles[0];
+      List<int> data = await xfile.readAsBytes();
+      String? mimeType = FileUtil.mimeType(xfile.mimeType!);
       await chatMessageController.send(
-          title: FileUtil.filename(filenames[0]),
+          title: FileUtil.filename(xfile.path),
           data: data,
           contentType: ContentType.file,
           mimeType: mimeType);
