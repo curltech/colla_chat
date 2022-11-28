@@ -41,8 +41,13 @@ class SmartDialogUtil {
     if (title != null) {
       AppBar appBar = AppBar(
         title: Text(title),
-        automaticallyImplyLeading: false,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () {
+            SmartDialog.dismiss();
+          },
+        ),
       );
       child = Column(children: [
         appBar,
