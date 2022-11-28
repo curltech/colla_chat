@@ -199,7 +199,7 @@ class GeolocatorUtil {
   ///构建地图Widget,Android/iOS
   static platform_map.PlatformMap buildPlatformMap(
       {required double latitude, required double longitude, double zoom = 0}) {
-    var target = platform_map.LatLng(latitude, longitude);
+    platform_map.LatLng target = platform_map.LatLng(latitude, longitude);
     return platform_map.PlatformMap(
       initialCameraPosition: platform_map.CameraPosition(
         target: target,
@@ -229,9 +229,9 @@ class GeolocatorUtil {
           (_) {
             controller.animateCamera(
               platform_map.CameraUpdate.newCameraPosition(
-                const platform_map.CameraPosition(
+                platform_map.CameraPosition(
                   bearing: 270.0,
-                  target: platform_map.LatLng(51.5160895, -0.1294527),
+                  target: target,
                   tilt: 30.0,
                   zoom: 18,
                 ),
