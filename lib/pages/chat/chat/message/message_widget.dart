@@ -198,9 +198,9 @@ class MessageWidget {
     data = CryptoUtil.decodeBase64(content);
     content = CryptoUtil.utf8ToString(data);
     Map<String, dynamic> map = JsonUtil.toJson(content);
-    Position position = Position.fromMap(map);
-    var latitude = position.latitude; //纬度
-    var longitude = position.longitude; //经度
+    LocationPosition locationPosition = LocationPosition.fromJson(map);
+    var latitude = locationPosition.latitude; //纬度
+    var longitude = locationPosition.longitude; //经度
     if (platformParams.desktop) {
       SmartDialogUtil.show(
           context: context,

@@ -24,15 +24,16 @@ class LocationMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> map = JsonUtil.toJson(content);
-    Position position = Position.fromMap(map);
-    var latitude = position.latitude; //纬度
-    var longitude = position.longitude; //经度
-    var altitude = position.altitude; //高度
-    var speed = position.speed; //速度
-    var speedAccuracy = position.speedAccuracy; //速度精度
-    var accuracy = position.accuracy; //精度
-    var floor = position.floor; //精度
-    var heading = position.heading; //
+    LocationPosition locationPosition = LocationPosition.fromJson(map);
+    var latitude = locationPosition.latitude; //纬度
+    var longitude = locationPosition.longitude; //经度
+    var altitude = locationPosition.altitude; //高度
+    var speed = locationPosition.speed; //速度
+    var speedAccuracy = locationPosition.speedAccuracy; //速度精度
+    var accuracy = locationPosition.accuracy; //精度
+    var floor = locationPosition.floor; //精度
+    var heading = locationPosition.heading; //
+    var address = locationPosition.address; //
     Widget headingWidget = Icon(
       Icons.location_on,
       color: appDataProvider.themeData.colorScheme.primary,
@@ -40,32 +41,30 @@ class LocationMessage extends StatelessWidget {
     if (thumbnail != null) {
       headingWidget = ImageUtil.buildImageWidget(image: thumbnail);
     }
-    double height;
     Widget tile;
     if (chatMessageController.chatView == ChatView.full) {
-      height = 190;
       tile = InkWell(
+          child: Center(
         child: ListTile(
           leading: headingWidget,
-          title: Text(
-              '${AppLocalizations.t('Longitude')}:$longitude\n${AppLocalizations.t('Latitude')}:$latitude\n${AppLocalizations.t('Altitude')}:$altitude\n${AppLocalizations.t('Accuracy')}:$accuracy'),
           subtitle: Text(
-              '${AppLocalizations.t('Speed')}:$speed\n${AppLocalizations.t('SpeedAccuracy')}:$speedAccuracy\n${AppLocalizations.t('Heading')}:$heading\n${AppLocalizations.t('Floor')}:$floor'),
+              '${AppLocalizations.t('Longitude')}:$longitude\n${AppLocalizations.t('Latitude')}:$latitude\n${AppLocalizations.t('Altitude')}:$altitude\n${AppLocalizations.t('Accuracy')}:$accuracy'),
+          title: Text('${AppLocalizations.t('Address')}:$address'),
           isThreeLine: true,
         ),
-      );
+      ));
     } else {
-      height = 130;
       tile = InkWell(
+          child: Center(
         child: ListTile(
           leading: headingWidget,
-          title: Text(
-              '${AppLocalizations.t('Longitude')}:$longitude\n${AppLocalizations.t('Latitude')}:$latitude'),
-          subtitle: Text('${AppLocalizations.t('Altitude')}:$altitude'),
-          isThreeLine: true,
+          title: address != null
+              ? Text('${AppLocalizations.t('Address')}:$address')
+              : Text(
+                  '${AppLocalizations.t('Longitude')}:$longitude\n${AppLocalizations.t('Latitude')}:$latitude'),
         ),
-      );
+      ));
     }
-    return SizedBox(height: height, child: Card(elevation: 0, child: tile));
+    return Card(elevation: 0, child: tile);
   }
 }

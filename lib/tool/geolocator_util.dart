@@ -6,13 +6,67 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:latlong2/latlong.dart' as latlong2;
 import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 import 'package:map_launcher/map_launcher.dart' as map_launcher;
 import 'package:map_launcher/map_launcher.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:platform_maps_flutter/platform_maps_flutter.dart'
     as platform_map;
+import 'package:platform_maps_flutter/platform_maps_flutter.dart';
+
+class LocationPosition {
+  double latitude;
+  double longitude;
+  double? altitude;
+  double? accuracy;
+  double? heading;
+  int? floor;
+  double? speed;
+  double? speedAccuracy;
+  bool? isMocked;
+  String? address;
+  Map<String, dynamic>? addressData;
+
+  LocationPosition({
+    required this.longitude,
+    required this.latitude,
+    this.accuracy,
+    this.altitude,
+    this.heading,
+    this.speed,
+    this.speedAccuracy,
+    this.address,
+    this.addressData,
+    this.floor,
+    this.isMocked = false,
+  });
+
+  LocationPosition.fromJson(Map<String, dynamic> json)
+      : latitude = json['latitude'],
+        longitude = json['longitude'],
+        altitude = json['altitude'] ?? 0.0,
+        accuracy = json['accuracy'] ?? 0.0,
+        heading = json['heading'] ?? 0.0,
+        floor = json['floor'],
+        speed = json['speed'] ?? 0.0,
+        speedAccuracy = json['speed_accuracy'] ?? 0.0,
+        isMocked = json['is_mocked'] ?? false,
+        address = json['address'];
+
+  Map<String, dynamic> toJson() => {
+        'longitude': longitude,
+        'latitude': latitude,
+        'accuracy': accuracy,
+        'altitude': altitude,
+        'floor': floor,
+        'heading': heading,
+        'speed': speed,
+        'speed_accuracy': speedAccuracy,
+        'is_mocked': isMocked,
+        'address': address,
+      };
+}
 
 class GeolocatorUtil {
   static Future<Position?> checkPermission() async {
@@ -121,16 +175,16 @@ class GeolocatorUtil {
   }
 
   ///计算地图距离
-  static double distance(LatLng x, LatLng y) {
-    const Distance distance = Distance();
+  static double distance(latlong2.LatLng x, latlong2.LatLng y) {
+    const latlong2.Distance distance = latlong2.Distance();
     final double meter = distance(x, y);
 
     return meter;
   }
 
-  static LatLng offset(LatLng x) {
-    const Distance distance = Distance();
-    final num distanceInMeter = (6378 * pi / 4).round();
+  static latlong2.LatLng offset(latlong2.LatLng x) {
+    const latlong2.Distance distance = latlong2.Distance();
+    final num distanceInMeter = (6378 * latlong2.pi / 4).round();
     final p = distance.offset(x, distanceInMeter, 180);
     // LatLng(latitude:-45.219848, longitude:0.0)
     logger.i(p.round());
@@ -140,12 +194,13 @@ class GeolocatorUtil {
     return p;
   }
 
-  static Path<LatLng> smoothPath(Iterable<LatLng> coordinates) {
+  static latlong2.Path<latlong2.LatLng> smoothPath(
+      Iterable<latlong2.LatLng> coordinates) {
     // zigzag is a list of coordinates
-    final Path path = Path.from(coordinates);
+    final latlong2.Path path = latlong2.Path.from(coordinates);
 
     // Result is below
-    final Path steps = path.equalize(8, smoothPath: true);
+    final latlong2.Path steps = path.equalize(8, smoothPath: true);
 
     return steps;
   }
@@ -198,31 +253,36 @@ class GeolocatorUtil {
 
   ///构建地图Widget,Android/iOS
   static platform_map.PlatformMap buildPlatformMap(
-      {required double latitude, required double longitude, double zoom = 0}) {
+      {Key? key,
+      required double latitude,
+      required double longitude,
+      double zoom = 0,
+      void Function(platform_map.LatLng)? onTap,
+      void Function()? onMarkerTap,
+      void Function(CameraPosition)? onCameraMove}) {
     platform_map.LatLng target = platform_map.LatLng(latitude, longitude);
     return platform_map.PlatformMap(
+      key: key,
       initialCameraPosition: platform_map.CameraPosition(
         target: target,
         zoom: zoom,
       ),
       markers: <platform_map.Marker>{
         platform_map.Marker(
-          markerId: platform_map.MarkerId('marker_1'),
+          markerId: platform_map.MarkerId(AppLocalizations.t('marker_1')),
           position: target,
           consumeTapEvents: true,
-          infoWindow: const platform_map.InfoWindow(
-            title: 'PlatformMarker',
-            snippet: "Hi I'm a Platform Marker",
+          infoWindow: platform_map.InfoWindow(
+            title: AppLocalizations.t('PlatformMarker'),
+            snippet: AppLocalizations.t("Hi I'm a Platform Marker"),
           ),
-          onTap: () {
-            logger.i("Marker tapped");
-          },
+          onTap: onMarkerTap,
         ),
       },
       myLocationEnabled: true,
       myLocationButtonEnabled: true,
-      onTap: (location) => logger.i('onTap: $location'),
-      onCameraMove: (cameraUpdate) => logger.i('onCameraMove: $cameraUpdate'),
+      onTap: onTap,
+      onCameraMove: onCameraMove,
       compassEnabled: true,
       onMapCreated: (controller) {
         Future.delayed(const Duration(seconds: 2)).then(
