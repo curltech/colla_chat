@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_search_widget.dart';
 import 'package:colla_chat/platform.dart';
@@ -11,11 +12,13 @@ import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 final List<ActionData> defaultActionData = [
@@ -195,7 +198,44 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   ///位置
   void _onActionLocation() async {
     Position position = await GeolocatorUtil.currentPosition();
-    Map<String, dynamic> map = position.toJson();
+    double latitude = position.latitude;
+    double longitude = position.longitude;
+    String? address;
+    await SmartDialogUtil.show(
+        context: context,
+        title: AppLocalizations.t('Location map'),
+        builder: (BuildContext context) {
+          return GeolocatorUtil.buildLocationPicker(
+              latitude: latitude,
+              longitude: longitude,
+              onPicked: (PickedData data) {
+                longitude = data.latLong.longitude;
+                latitude = data.latLong.latitude;
+                address = data.address;
+              });
+        });
+    // await SmartDialogUtil.show(
+    //     context: context,
+    //     title: AppLocalizations.t('Location map'),
+    //     builder: (BuildContext context) {
+    //       return GeolocatorUtil.buildPlatformMap(
+    //         latitude: latitude,
+    //         longitude: longitude,
+    //         onTap: (latLng) {
+    //           longitude = latLng.longitude;
+    //           latitude = latLng.latitude;
+    //         },
+    //       );
+    //     });
+    LocationPosition locationPosition;
+    if (address != null) {
+      locationPosition = LocationPosition(
+          longitude: longitude, latitude: latitude, address: address);
+    } else {
+      var json = position.toJson();
+      locationPosition = LocationPosition.fromJson(json);
+    }
+    Map<String, dynamic> map = locationPosition.toJson();
     EntityUtil.removeNull(map);
     JsonUtil.toJsonString(map);
     String content = JsonUtil.toJsonString(map);

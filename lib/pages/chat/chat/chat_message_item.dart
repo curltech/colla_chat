@@ -65,8 +65,6 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
 
   _buildDeleteTimer() async {
     var deleteTime = widget.chatMessage.deleteTime;
-    logger.i(
-        '_buildDeleteTimer chatMessage id: ${widget.chatMessage.id}, deleteTime:$deleteTime');
     if (deleteTime == 0) {
       return;
     }
