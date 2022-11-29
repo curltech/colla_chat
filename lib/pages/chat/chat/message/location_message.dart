@@ -45,23 +45,43 @@ class LocationMessage extends StatelessWidget {
     if (chatMessageController.chatView == ChatView.full) {
       tile = InkWell(
           child: Center(
-        child: ListTile(
-          leading: headingWidget,
-          subtitle: Text(
-              '${AppLocalizations.t('Longitude')}:$longitude\n${AppLocalizations.t('Latitude')}:$latitude\n${AppLocalizations.t('Altitude')}:$altitude\n${AppLocalizations.t('Accuracy')}:$accuracy'),
-          title: Text('${AppLocalizations.t('Address')}:$address'),
-          isThreeLine: true,
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Row(children: [
+            headingWidget,
+            const SizedBox(
+              width: 5,
+            ),
+            Expanded(
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                  Text(
+                      '${AppLocalizations.t('Longitude')}:$longitude\n${AppLocalizations.t('Latitude')}:$latitude'),
+                  Text('${AppLocalizations.t('Address')}:$address')
+                ])),
+          ]),
         ),
       ));
     } else {
       tile = InkWell(
           child: Center(
-        child: ListTile(
-          leading: headingWidget,
-          title: address != null
-              ? Text('${AppLocalizations.t('Address')}:$address')
-              : Text(
-                  '${AppLocalizations.t('Longitude')}:$longitude\n${AppLocalizations.t('Latitude')}:$latitude'),
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Row(children: [
+            headingWidget,
+            const SizedBox(
+              width: 5,
+            ),
+            Expanded(
+              child: address != null
+                  ? Text('${AppLocalizations.t('Address')}:$address',
+                      softWrap: true)
+                  : Text(
+                      '${AppLocalizations.t('Longitude')}:$longitude\n${AppLocalizations.t('Latitude')}:$latitude'),
+            ),
+          ]),
         ),
       ));
     }
