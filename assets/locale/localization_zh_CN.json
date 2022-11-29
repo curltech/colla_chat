@@ -160,5 +160,7 @@
   "Resetting focus point": "重置对焦点",
   "Set Current Location": "设置当前位置",
   "Search location": "搜索位置",
-  "Location map": "位置地图"
+  "Location map": "位置地图",
+  "Longitude": "经度",
+  "Latitude": "纬度"
 }
