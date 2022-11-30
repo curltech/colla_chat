@@ -408,7 +408,7 @@ class GeolocatorUtil {
     double minZoomLevel = 2,
     double maxZoomLevel = 18.4,
     String urlTemplate = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-    String mapLanguage = 'en',
+    String mapLanguage = 'cn',
     String selectLocationButtonText = 'Set Current Location',
     Duration mapAnimationDuration = const Duration(milliseconds: 2000),
     bool trackMyPosition = false,
