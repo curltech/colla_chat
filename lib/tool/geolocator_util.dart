@@ -1,19 +1,18 @@
 import 'dart:async';
 
+import 'package:apple_maps_flutter/apple_maps_flutter.dart' as apple_maps;
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart' as google_maps;
 import 'package:latlong2/latlong.dart' as latlong2;
 import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 import 'package:map_launcher/map_launcher.dart' as map_launcher;
-import 'package:map_launcher/map_launcher.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:platform_maps_flutter/platform_maps_flutter.dart'
     as platform_map;
-import 'package:platform_maps_flutter/platform_maps_flutter.dart';
 
 class LocationPosition {
   double latitude;
@@ -205,6 +204,20 @@ class GeolocatorUtil {
     return steps;
   }
 
+  /// url地图
+  static Future<bool> launchQuery(String query) async {
+    return await MapsLauncher.launchQuery(query);
+  }
+
+  /// url地图
+  static Future<bool> launchCoordinates(
+    double latitude,
+    double longitude, [
+    String? label,
+  ]) async {
+    return await MapsLauncher.launchCoordinates(latitude, longitude, label);
+  }
+
   ///获取安装的地图软件列表,android/ios,调用安装的地图应用
   static Future<List<map_launcher.AvailableMap>> installedMaps() async {
     final availableMaps = await map_launcher.MapLauncher.installedMaps;
@@ -236,7 +249,7 @@ class GeolocatorUtil {
       String? description}) async {
     var coords = map_launcher.Coords(latitude, longitude);
     if (mapType == null) {
-      List<AvailableMap> availableMap = await installedMaps();
+      List<map_launcher.AvailableMap> availableMap = await installedMaps();
       if (availableMap.isNotEmpty) {
         mapType = availableMap.first.mapType;
       }
@@ -251,7 +264,7 @@ class GeolocatorUtil {
     }
   }
 
-  ///构建地图Widget,Android/iOS
+  ///构建地图Widget,Android/iOS,platform_maps_flutter
   static platform_map.PlatformMap buildPlatformMap(
       {Key? key,
       required double latitude,
@@ -259,7 +272,7 @@ class GeolocatorUtil {
       double zoom = 0,
       void Function(platform_map.LatLng)? onTap,
       void Function()? onMarkerTap,
-      void Function(CameraPosition)? onCameraMove}) {
+      void Function(platform_map.CameraPosition)? onCameraMove}) {
     platform_map.LatLng target = platform_map.LatLng(latitude, longitude);
     return platform_map.PlatformMap(
       key: key,
@@ -303,21 +316,87 @@ class GeolocatorUtil {
     );
   }
 
-  /// url地图
-  static Future<bool> launchQuery(String query) async {
-    return await MapsLauncher.launchQuery(query);
+  // static MapWidget buildMapWidget({
+  //   Key? key,
+  //   required double latitude,
+  //   required double longitude,
+  //   String? query,
+  //   double bearing = 0, //方向
+  //   double tilt = 0, //角度
+  //   double zoom = 0,
+  // }) {
+  //   // Set default adapter
+  //   MapAdapter.defaultInstance = const MapAdapter.platformSpecific(
+  //     ios: AppleMapsNativeAdapter(),
+  //     otherwise: BingMapsIframeAdapter(),
+  //   );
+  //
+  //   // Construct a map widget
+  //   return MapWidget(
+  //     location: MapLocation(
+  //       query: query,
+  //     ),
+  //     markers: {
+  //       MapMarker(
+  //         query: query,
+  //       ),
+  //     },
+  //   );
+  // }
+
+  /// 需要price key
+  static google_maps.GoogleMap buildGoogleMap({
+    Key? key,
+    required double latitude,
+    required double longitude,
+    double bearing = 0, //方向
+    double tilt = 0, //角度
+    double zoom = 0,
+  }) {
+    Completer<google_maps.GoogleMapController> controllerCompleter =
+        Completer();
+    google_maps.CameraPosition cameraPosition = google_maps.CameraPosition(
+        bearing: bearing,
+        target: google_maps.LatLng(longitude, latitude),
+        tilt: tilt,
+        zoom: zoom);
+
+    return google_maps.GoogleMap(
+      key: key,
+      mapType: google_maps.MapType.hybrid,
+      initialCameraPosition: cameraPosition,
+      onMapCreated: (google_maps.GoogleMapController controller) {
+        controllerCompleter.complete(controller);
+      },
+    );
   }
 
-  /// url地图
-  static Future<bool> launchCoordinates(
-    double latitude,
-    double longitude, [
-    String? label,
-  ]) async {
-    return await MapsLauncher.launchCoordinates(latitude, longitude, label);
+  static apple_maps.AppleMap buildAppleMap({
+    Key? key,
+    required double latitude,
+    required double longitude,
+    double bearing = 0, //方向
+    double tilt = 0, //角度
+    double zoom = 0,
+  }) {
+    Completer<apple_maps.AppleMapController> controllerCompleter = Completer();
+    apple_maps.CameraPosition cameraPosition = apple_maps.CameraPosition(
+        heading: bearing,
+        target: apple_maps.LatLng(longitude, latitude),
+        pitch: tilt,
+        zoom: zoom);
+
+    return apple_maps.AppleMap(
+      key: key,
+      mapType: apple_maps.MapType.hybrid,
+      initialCameraPosition: cameraPosition,
+      onMapCreated: (apple_maps.AppleMapController controller) {
+        controllerCompleter.complete(controller);
+      },
+    );
   }
 
-  /// 使用Open Street Map，需要翻墙
+  /// 使用Open Street Map，需要翻墙，支持所有的平台
   static FlutterLocationPicker buildLocationPicker({
     Key? key,
     double? latitude,

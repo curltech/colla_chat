@@ -268,6 +268,8 @@ dependencies:
   flutter_map_location_marker: ^5.0.0+1
   maps_launcher: ^2.0.1
   location_picker_flutter_map: ^1.1.5
+  #maps: ^0.5.0
+  #google_map_location_picker: ^4.1.7
 dependency_overrides:
   photo_view: ^0.14.0
   device_info_plus: ^4.1.2
@@ -279,6 +281,8 @@ dependency_overrides:
   flutter_inappwebview: ^6.0.0-beta.12
   provider: ^6.0.1
   geolocator: ^9.0.2
+  apple_maps_flutter: ^1.2.0
+  webview_flutter: ^3.0.4
 dev_dependencies:
   flutter_test:
     sdk: flutter
