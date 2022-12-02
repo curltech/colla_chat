@@ -37,7 +37,8 @@ class WidgetUtil {
   }) {
     return Column(
       children: <Widget>[
-        Container(
+        Expanded(
+            child: Container(
           decoration: const BoxDecoration(
             borderRadius: BorderRadius.all(
               Radius.circular(5.0),
@@ -53,7 +54,7 @@ class WidgetUtil {
                   iconSize: iconSize,
                   icon: icon,
                   tooltip: tooltip != null ? AppLocalizations.t(tooltip) : '')),
-        ),
+        )),
         const SizedBox(height: 3.0),
         Text(
           text,
@@ -78,7 +79,8 @@ class WidgetUtil {
   }) {
     return Column(
       children: <Widget>[
-        Container(
+        Expanded(
+            child: Container(
           padding: padding,
           decoration: const BoxDecoration(
             borderRadius: BorderRadius.all(
@@ -91,7 +93,7 @@ class WidgetUtil {
                 onTap: onPressed,
                 child: icon,
               )),
-        ),
+        )),
         const SizedBox(height: 3.0),
         Text(
           text,

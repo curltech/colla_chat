@@ -142,7 +142,8 @@ dependencies:
   full_picker: ^1.1.5
   flutter_slidable: ^2.0.0
   flutter_drawing_board: ^0.3.1
-  popup_menu: ^1.0.5
+  custom_pop_up_menu: ^1.2.4
+  #popup_menu: ^1.0.5
   star_menu: ^3.1.0+1
   flutter_floating_bottom_bar: ^1.1.0
   focused_menu: ^1.0.5
