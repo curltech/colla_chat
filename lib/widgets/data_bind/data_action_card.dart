@@ -38,23 +38,27 @@ class ActionData {
 
 class DataActionCard extends StatelessWidget {
   final List<ActionData> actions;
-  final double? height;
+  final double height;
+  final double? width;
   final int crossAxisCount;
   final double mainAxisSpacing;
   final double crossAxisSpacing;
   final double childAspectRatio;
+  final double size;
   final Function(int index, String label, {String? value})? onPressed;
 
-  const DataActionCard(
-      {Key? key,
-      required this.actions,
-      this.onPressed,
-      this.height,
-      required this.crossAxisCount,
-      this.mainAxisSpacing = 5.0,
-      this.crossAxisSpacing = 5.0,
-      this.childAspectRatio = 4 / 3})
-      : super(key: key);
+  const DataActionCard({
+    Key? key,
+    required this.actions,
+    this.onPressed,
+    required this.height,
+    this.crossAxisCount = 4,
+    this.mainAxisSpacing = 5.0,
+    this.crossAxisSpacing = 5.0,
+    this.childAspectRatio = 4 / 3,
+    this.size = 32,
+    this.width,
+  }) : super(key: key);
 
   Widget _buildIconTextButton(
       BuildContext context, ActionData actionData, int index) {
@@ -62,7 +66,7 @@ class DataActionCard extends StatelessWidget {
     var tooltip = AppLocalizations.t(actionData.tooltip ?? '');
     return WidgetUtil.buildIconTextButton(
         iconColor: appDataProvider.themeData.colorScheme.primary,
-        iconSize: 32,
+        iconSize: size,
         onPressed: () {
           if (onPressed != null) {
             onPressed!(index, actionData.label);
@@ -114,7 +118,7 @@ class DataActionCard extends StatelessWidget {
     return WidgetUtil.buildInkWell(
         padding: const EdgeInsets.all(5.0),
         iconColor: appDataProvider.themeData.colorScheme.primary,
-        iconSize: 32,
+        iconSize: size,
         onPressed: () {
           if (onPressed != null) {
             onPressed!(index, actionData.label);
@@ -133,7 +137,8 @@ class DataActionCard extends StatelessWidget {
     var tooltip = AppLocalizations.t(actionData.tooltip ?? '');
     return Column(
       children: <Widget>[
-        Container(
+        Expanded(
+            child: Container(
           decoration: const BoxDecoration(
             borderRadius: BorderRadius.all(
               Radius.circular(5.0),
@@ -149,7 +154,7 @@ class DataActionCard extends StatelessWidget {
                 }
               },
               child: actionData.icon),
-        ),
+        )),
         const SizedBox(height: 5.0),
         Text(
           label,
@@ -183,6 +188,7 @@ class DataActionCard extends StatelessWidget {
     });
     return Container(
         height: height,
+        width: width,
         margin: const EdgeInsets.all(5.0),
         padding: const EdgeInsets.all(5.0),
         child: GridView.builder(

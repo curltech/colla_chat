@@ -21,12 +21,43 @@ import 'package:colla_chat/tool/document_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/tool/pdf_util.dart';
 import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
+
+final List<ActionData> messagePopActionData = [
+  ActionData(
+      label: 'Delete',
+      tooltip: 'Delete message',
+      icon: const Icon(Icons.delete)),
+  ActionData(
+      label: 'Cancel',
+      tooltip: 'Cancel message',
+      icon: const Icon(Icons.cancel)),
+  ActionData(
+    label: 'Refer',
+    tooltip: 'Refer message',
+    icon: const Icon(Icons.format_quote),
+  ),
+  ActionData(
+    label: 'Copy',
+    tooltip: 'Copy message',
+    icon: const Icon(Icons.copy),
+  ),
+  ActionData(
+      label: 'Forward',
+      tooltip: 'Forward message',
+      icon: const Icon(Icons.forward)),
+  ActionData(
+      label: 'Collect',
+      tooltip: 'Collect message',
+      icon: const Icon(Icons.collections)),
+];
 
 ///每种消息的显示组件
 class MessageWidget {
@@ -115,7 +146,40 @@ class MessageWidget {
           openLocationMap(context);
         },
         child: body);
+    body = MenuUtil.buildPopupMenu(
+        child: body,
+        menuBuilder: () {
+          return Card(
+              child: DataActionCard(
+                  onPressed: _onMessagePopAction,
+                  crossAxisCount: 4,
+                  actions: messagePopActionData,
+                  height: 140,
+                  width: 320,
+                  size: 20));
+        },
+        pressType: PressType.longPress);
+
     return body;
+  }
+
+  _onMessagePopAction(int index, String label, {String? value}) {
+    switch (label) {
+      case 'Delete':
+        //chatMessageController.delete();
+        break;
+      case 'Cancel':
+        break;
+      case 'Copy':
+        break;
+      case 'Forward':
+        break;
+      case 'Collect':
+        break;
+      case 'Refer':
+        break;
+      default:
+    }
   }
 
   ExtendedTextMessage buildExtendedTextMessageWidget(BuildContext context) {
@@ -189,6 +253,7 @@ class MessageWidget {
     );
   }
 
+  ///打开地图
   openLocationMap(BuildContext context) {
     String? content = chatMessage.content;
     if (content == null) {
