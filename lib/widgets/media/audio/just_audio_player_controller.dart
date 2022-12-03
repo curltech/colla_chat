@@ -4,7 +4,7 @@ import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/media/media_player_slider.dart';
-import 'package:colla_chat/widgets/media/platform_media_controller.dart';
+import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:just_audio/just_audio.dart';
@@ -50,7 +50,7 @@ class JustAudioSource {
     return audioSource;
   }
 
-  static Future<AudioSource> fromMediaSource(MediaSource mediaSource,
+  static Future<AudioSource> fromMediaSource(PlatformMediaSource mediaSource,
       {String? id, String? album, String? title, String? artUri}) async {
     AudioSource source = await audioSource(
       filename: mediaSource.filename,
@@ -106,7 +106,7 @@ class JustAudioPlayerController extends AbstractMediaPlayerController {
   setCurrentIndex(int? index) async {
     super.setCurrentIndex(index);
     if (currentIndex != null) {
-      MediaSource? currentMediaSource = this.currentMediaSource;
+      PlatformMediaSource? currentMediaSource = this.currentMediaSource;
       if (currentMediaSource != null) {
         AudioSource source =
             await JustAudioSource.fromMediaSource(currentMediaSource);

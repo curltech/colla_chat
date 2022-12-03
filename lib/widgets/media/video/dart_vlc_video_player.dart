@@ -5,16 +5,16 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/media/media_player_slider.dart';
-import 'package:colla_chat/widgets/media/platform_media_controller.dart'
+import 'package:colla_chat/widgets/media/abstract_media_controller.dart'
     as platform;
-import 'package:colla_chat/widgets/media/platform_media_controller.dart';
+import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_player_util.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-class VlcMediaSource {
+class DartVlcMediaSource {
   static Future<Media> media({String? filename, List<int>? data}) async {
     Media media;
     if (filename != null) {
@@ -35,7 +35,7 @@ class VlcMediaSource {
   }
 
   static Future<Playlist> fromMediaSource(
-      List<platform.MediaSource> mediaSources) async {
+      List<platform.PlatformMediaSource> mediaSources) async {
     List<Media> medias = [];
     for (var mediaSource in mediaSources) {
       medias.add(await media(filename: mediaSource.filename));
@@ -48,9 +48,9 @@ class VlcMediaSource {
   }
 }
 
-///基于vlc实现的媒体播放器和记录器，可以截取视频文件的图片作为缩略图
+///基于dart_vlc实现的媒体播放器和记录器，可以截取视频文件的图片作为缩略图
 ///支持Windows & Linux，linux需要VLC & libVLC installed.
-class VlcVideoPlayerController extends AbstractMediaPlayerController {
+class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
   late Player player;
   CurrentState? currentState;
   PositionState? positionState;
@@ -65,7 +65,7 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
   List<Media> medias = <Media>[];
   List<Device> devices = Devices.all;
 
-  VlcVideoPlayerController({
+  DartVlcVideoPlayerController({
     int id = 0,
     bool registerTexture = true,
     VideoDimensions? videoDimensions,
@@ -117,7 +117,7 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   _open({bool autoStart = false}) async {
-    Playlist list = await VlcMediaSource.fromMediaSource(playlist);
+    Playlist list = await DartVlcMediaSource.fromMediaSource(playlist);
     player.open(
       list,
       autoStart: autoStart,
@@ -181,11 +181,11 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
 
   ///下面是播放列表的功能
   @override
-  Future<platform.MediaSource?> add({String? filename, List<int>? data}) async {
-    platform.MediaSource? mediaSource =
+  Future<platform.PlatformMediaSource?> add({String? filename, List<int>? data}) async {
+    platform.PlatformMediaSource? mediaSource =
         await super.add(filename: filename, data: data);
     if (mediaSource != null) {
-      Media media = await VlcMediaSource.media(filename: mediaSource.filename);
+      Media media = await DartVlcMediaSource.media(filename: mediaSource.filename);
       player.add(media);
     }
 
@@ -199,12 +199,12 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  Future<platform.MediaSource?> insert(int index,
+  Future<platform.PlatformMediaSource?> insert(int index,
       {String? filename, List<int>? data}) async {
-    platform.MediaSource? mediaSource =
+    platform.PlatformMediaSource? mediaSource =
         await super.insert(index, filename: filename, data: data);
     if (mediaSource != null) {
-      Media media = await VlcMediaSource.media(filename: mediaSource.filename);
+      Media media = await DartVlcMediaSource.media(filename: mediaSource.filename);
       player.insert(index, media);
     }
     return mediaSource;
@@ -508,10 +508,10 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
   close() {}
 }
 
-class VlcMediaRecorder {
+class DartVlcMediaRecorder {
   Record? record;
 
-  VlcMediaRecorder();
+  DartVlcMediaRecorder();
 
   start({
     int id = 0,
@@ -521,7 +521,7 @@ class VlcMediaRecorder {
     if (record != null) {
       dispose();
     }
-    Media media = await VlcMediaSource.media(filename: filename);
+    Media media = await DartVlcMediaSource.media(filename: filename);
     record = Record.create(
       id: id,
       media: media,
@@ -538,8 +538,8 @@ class VlcMediaRecorder {
   }
 }
 
-class PlatformVlcVideoPlayer extends StatefulWidget {
-  late final VlcVideoPlayerController controller;
+class DartVlcVideoPlayer extends StatefulWidget {
+  late final DartVlcVideoPlayerController controller;
 
   final int id;
 
@@ -560,9 +560,9 @@ class PlatformVlcVideoPlayer extends StatefulWidget {
   final String? filename;
   final List<int>? data;
 
-  PlatformVlcVideoPlayer(
+  DartVlcVideoPlayer(
       {Key? key,
-      VlcVideoPlayerController? controller,
+      DartVlcVideoPlayerController? controller,
       required this.id,
       this.showVolume = true,
       this.showSpeed = false,
@@ -575,14 +575,14 @@ class PlatformVlcVideoPlayer extends StatefulWidget {
       this.filename,
       this.data})
       : super(key: key) {
-    this.controller = controller ?? VlcVideoPlayerController(id: id);
+    this.controller = controller ?? DartVlcVideoPlayerController(id: id);
   }
 
   @override
-  State createState() => _PlatformVlcVideoPlayerState();
+  State createState() => _DartVlcVideoPlayerState();
 }
 
-class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
+class _DartVlcVideoPlayerState extends State<DartVlcVideoPlayer> {
   @override
   void initState() {
     super.initState();
@@ -632,7 +632,7 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
       columns.add(Expanded(child: view));
     }
     if (!widget.showControls) {
-      Widget controllerPanel = PlatformVlcControllerPanel(
+      Widget controllerPanel = DartVlcControllerPanel(
         controller: widget.controller,
         showVolume: widget.showVolume,
         showSpeed: widget.showSpeed,
@@ -645,30 +645,30 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
 }
 
 ///视频播放器的控制面板
-class PlatformVlcControllerPanel extends StatefulWidget {
-  late final VlcVideoPlayerController controller;
+class DartVlcControllerPanel extends StatefulWidget {
+  late final DartVlcVideoPlayerController controller;
 
   ///如果是外置控件，是否显示简洁版
   final bool showVolume;
   final bool showSpeed;
   final bool showPlaylist;
 
-  PlatformVlcControllerPanel({
+  DartVlcControllerPanel({
     Key? key,
-    VlcVideoPlayerController? controller,
+    DartVlcVideoPlayerController? controller,
     this.showVolume = true,
     this.showSpeed = false,
     this.showPlaylist = true,
   }) : super(key: key) {
-    this.controller = controller ?? VlcVideoPlayerController();
+    this.controller = controller ?? DartVlcVideoPlayerController();
   }
 
   @override
-  State createState() => _PlatformVlcControllerPanelState();
+  State createState() => _DartVlcControllerPanelState();
 }
 
-class _PlatformVlcControllerPanelState
-    extends State<PlatformVlcControllerPanel> {
+class _DartVlcControllerPanelState
+    extends State<DartVlcControllerPanel> {
   @override
   void initState() {
     super.initState();

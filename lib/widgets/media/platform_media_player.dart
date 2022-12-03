@@ -1,9 +1,29 @@
-import 'package:colla_chat/widgets/media/platform_media_controller.dart';
+import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_player_util.dart';
+import 'package:colla_chat/widgets/media/video/chewie_video_player.dart';
+import 'package:colla_chat/widgets/media/video/dart_vlc_video_player.dart';
+import 'package:colla_chat/widgets/media/video/fijk_video_player.dart';
+import 'package:colla_chat/widgets/media/video/flick_video_player.dart';
+import 'package:colla_chat/widgets/media/video/flutter_vlc_video_player.dart';
+import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
 import 'package:flutter/material.dart';
 
+enum MediaPlayerType {
+  chewie,
+  dart_vlc,
+  flutter_vlc,
+  flick,
+  fijk,
+  origin,
+  appinio,
+  just,
+  bluefire,
+  another,
+}
+
+///平台的媒体播放器组件
 class PlatformMediaPlayer extends StatefulWidget {
-  final AbstractMediaPlayerController controller;
+  final MediaPlayerType mediaPlayerType;
 
   //自定义简单控制器模式
   final bool showVolume;
@@ -23,9 +43,9 @@ class PlatformMediaPlayer extends StatefulWidget {
 
   const PlatformMediaPlayer(
       {Key? key,
+      required this.mediaPlayerType,
       this.showVolume = true,
       this.showSpeed = false,
-      required this.controller,
       this.showControls = true,
       this.showPlaylist = true,
       this.showMediaView = true,
@@ -41,12 +61,15 @@ class PlatformMediaPlayer extends StatefulWidget {
 }
 
 class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
+  late AbstractMediaPlayerController controller;
+
   @override
   void initState() {
     super.initState();
-    widget.controller.addListener(_update);
+    _updateMediaPlayerType();
+    controller.addListener(_update);
     if (widget.filename != null || widget.data != null) {
-      widget.controller.add(filename: widget.filename, data: widget.data);
+      controller.add(filename: widget.filename, data: widget.data);
     }
   }
 
@@ -54,9 +77,34 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
     setState(() {});
   }
 
+  _updateMediaPlayerType() {
+    switch (widget.mediaPlayerType) {
+      case MediaPlayerType.dart_vlc:
+        controller = DartVlcVideoPlayerController();
+        break;
+      case MediaPlayerType.flick:
+        controller = FlickVideoPlayerController();
+        break;
+      case MediaPlayerType.chewie:
+        controller = ChewieVideoPlayerController();
+        break;
+      case MediaPlayerType.fijk:
+        controller = FijkVideoPlayerController();
+        break;
+      case MediaPlayerType.origin:
+        controller = OriginVideoPlayerController();
+        break;
+      case MediaPlayerType.flutter_vlc:
+        controller = FlutterVlcVideoPlayerController();
+        break;
+      default:
+        break;
+    }
+  }
+
   @override
   void dispose() {
-    widget.controller.removeListener(_update);
+    controller.removeListener(_update);
     super.dispose();
   }
 
@@ -64,7 +112,7 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
   Widget build(BuildContext context) {
     return PlatformMediaPlayerUtil.buildMediaPlayer(
       context,
-      widget.controller,
+      controller,
       showControls: widget.showControls,
       showPlaylist: widget.showPlaylist,
       showMediaView: widget.showMediaView,

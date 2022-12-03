@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/media/platform_media_controller.dart';
+import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flick_video_player/src/utils/web_key_bindings.dart';
 import 'package:flutter/material.dart';
@@ -33,7 +33,7 @@ class FlickMediaSource {
   }
 
   static Future<VideoPlayerController> fromMediaSource(
-      MediaSource mediaSource) async {
+      PlatformMediaSource mediaSource) async {
     return await media(filename: mediaSource.filename);
   }
 }

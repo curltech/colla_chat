@@ -18,6 +18,7 @@ enum RecorderStatus { pause, recording, stop }
 
 enum PlayerStatus { init, buffering, pause, playing, stop, completed }
 
+///媒体源的类型
 enum MediaSourceType {
   asset,
   file,
@@ -25,22 +26,21 @@ enum MediaSourceType {
   buffer,
 }
 
-class MediaSource {
+///平台定义的媒体源
+class PlatformMediaSource {
   final String filename;
   final MimeType? mediaFormat;
   final MediaSourceType mediaSourceType;
 
-  MediaSource({
+  PlatformMediaSource({
     required this.filename,
     this.mediaFormat,
     required this.mediaSourceType,
   });
-}
 
-class PlatformMediaSource {
-  static Future<MediaSource> media(
+  static Future<PlatformMediaSource> media(
       {String? filename, List<int>? data, MimeType? mediaFormat}) async {
-    MediaSource mediaSource;
+    PlatformMediaSource mediaSource;
     if (filename != null) {
       if (mediaFormat == null) {
         int pos = filename.lastIndexOf('.');
@@ -48,17 +48,17 @@ class PlatformMediaSource {
         mediaFormat = StringUtil.enumFromString(MimeType.values, extension);
       }
       if (filename.startsWith('assets')) {
-        mediaSource = MediaSource(
+        mediaSource = PlatformMediaSource(
             filename: filename,
             mediaSourceType: MediaSourceType.asset,
             mediaFormat: mediaFormat);
       } else if (filename.startsWith('http')) {
-        mediaSource = MediaSource(
+        mediaSource = PlatformMediaSource(
             filename: filename,
             mediaSourceType: MediaSourceType.network,
             mediaFormat: mediaFormat);
       } else {
-        mediaSource = MediaSource(
+        mediaSource = PlatformMediaSource(
             filename: filename,
             mediaSourceType: MediaSourceType.file,
             mediaFormat: mediaFormat);
@@ -67,7 +67,7 @@ class PlatformMediaSource {
       data = data ?? Uint8List.fromList([]);
       filename =
           await FileUtil.writeTempFile(data, extension: mediaFormat?.name);
-      mediaSource = MediaSource(
+      mediaSource = PlatformMediaSource(
           filename: filename!,
           mediaSourceType: MediaSourceType.buffer,
           mediaFormat: mediaFormat);
@@ -76,8 +76,9 @@ class PlatformMediaSource {
     return mediaSource;
   }
 
-  static Future<List<MediaSource>> playlist(List<String> filenames) async {
-    List<MediaSource> playlist = [];
+  static Future<List<PlatformMediaSource>> playlist(
+      List<String> filenames) async {
+    List<PlatformMediaSource> playlist = [];
     for (var filename in filenames) {
       playlist.add(await media(filename: filename));
     }
@@ -86,6 +87,7 @@ class PlatformMediaSource {
   }
 }
 
+///定义音频录音控制器的接口
 ///支持多种设备，windows测试通过
 ///Android, iOS, Linux, macOS, Windows, and web.
 abstract class AbstractAudioRecorderController with ChangeNotifier {
@@ -179,8 +181,9 @@ abstract class AbstractAudioRecorderController with ChangeNotifier {
   }
 }
 
+///定义通用媒体播放控制器的接口，包含音频和视频
 abstract class AbstractMediaPlayerController with ChangeNotifier {
-  List<MediaSource> playlist = [];
+  List<PlatformMediaSource> playlist = [];
   bool _playlistVisible = true;
   bool _speedSlideVisible = false;
   bool _volumeSlideVisible = false;
@@ -234,7 +237,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     notifyListeners();
   }
 
-  MediaSource? get currentMediaSource {
+  PlatformMediaSource? get currentMediaSource {
     if (_currentIndex != null) {
       return playlist[_currentIndex!];
     }
@@ -264,14 +267,14 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     }
   }
 
-  Future<MediaSource?> add({String? filename, List<int>? data}) async {
+  Future<PlatformMediaSource?> add({String? filename, List<int>? data}) async {
     for (var mediaSource in playlist) {
       var name = mediaSource.filename;
       if (name == filename) {
         return null;
       }
     }
-    MediaSource mediaSource =
+    PlatformMediaSource mediaSource =
         await PlatformMediaSource.media(filename: filename, data: data);
     playlist.add(mediaSource);
     await setCurrentIndex(playlist.length - 1);
@@ -279,7 +282,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     return mediaSource;
   }
 
-  Future<MediaSource?> insert(int index,
+  Future<PlatformMediaSource?> insert(int index,
       {String? filename, List<int>? data}) async {
     for (var mediaSource in playlist) {
       var name = mediaSource.filename;
@@ -287,7 +290,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
         return null;
       }
     }
-    MediaSource mediaSource =
+    PlatformMediaSource mediaSource =
         await PlatformMediaSource.media(filename: filename, data: data);
     playlist.insert(index, mediaSource);
     await setCurrentIndex(index);
@@ -341,7 +344,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
 
   setSpeed(double speed);
 
-  Future<List<MediaSource>> sourceFilePicker({
+  Future<List<PlatformMediaSource>> sourceFilePicker({
     String? dialogTitle,
     String? initialDirectory,
     FileType type = FileType.audio,
@@ -353,12 +356,12 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     bool withReadStream = false,
     bool lockParentWindow = false,
   }) async {
-    List<MediaSource> mediaSources = [];
+    List<PlatformMediaSource> mediaSources = [];
     final xfiles =
         await FileUtil.pickFiles(allowMultiple: allowMultiple, type: type);
     if (xfiles.isNotEmpty) {
       for (var xfile in xfiles) {
-        MediaSource? mediaSource = await add(filename: xfile.path);
+        PlatformMediaSource? mediaSource = await add(filename: xfile.path);
         if (mediaSource != null) {
           mediaSources.add(mediaSource);
         }

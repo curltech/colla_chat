@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/media/platform_media_controller.dart';
+import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vlc_player/flutter_vlc_player.dart';
 
-class VlcMediaSource {
+class FlutterVlcMediaSource {
   static Future<VlcPlayerController> media(
       {String? filename, Uint8List? data}) async {
     VlcPlayerController vlcPlayerController;
@@ -30,16 +30,16 @@ class VlcMediaSource {
   }
 
   static Future<VlcPlayerController> fromMediaSource(
-      MediaSource mediaSource) async {
+      PlatformMediaSource mediaSource) async {
     return await media(filename: mediaSource.filename);
   }
 }
 
-///基于flutter vlc实现的媒体播放器和记录器，
-class VlcVideoPlayerController extends AbstractMediaPlayerController {
+///基于flutter vlc实现的媒体播放器和记录器，只支持mobile
+class FlutterVlcVideoPlayerController extends AbstractMediaPlayerController {
   VlcPlayerController? vlcPlayerController;
 
-  VlcVideoPlayerController() {
+  FlutterVlcVideoPlayerController() {
     vlcPlayerController = VlcPlayerController.asset('assets/medias/alert.mp3');
   }
 
@@ -64,7 +64,7 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
     super.setCurrentIndex(index);
     if (currentMediaSource != null) {
       vlcPlayerController =
-          await VlcMediaSource.fromMediaSource(currentMediaSource!);
+          await FlutterVlcMediaSource.fromMediaSource(currentMediaSource!);
     }
   }
 

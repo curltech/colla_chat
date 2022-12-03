@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/widgets/media/platform_media_controller.dart';
+import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
 
 ///仅支持移动设备，aac,wav两种格式
 class WaveformsAudioRecorderController extends AbstractAudioRecorderController {
