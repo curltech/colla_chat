@@ -7,6 +7,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/message/action_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/audio_message.dart';
+import 'package:colla_chat/pages/chat/chat/message/cancel_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/extended_text_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/file_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/image_message.dart';
@@ -136,6 +137,8 @@ class MessageWidget {
       body = buildActionMessageWidget(context, subMessageType!);
     } else if (subMessageType == ChatSubMessageType.addFriend) {
       body = buildActionMessageWidget(context, subMessageType!);
+    } else if (subMessageType == ChatSubMessageType.cancel) {
+      body = buildCancelMessageWidget(context, chatMessage.content!);
     } else {
       body = Container();
     }
@@ -149,7 +152,6 @@ class MessageWidget {
     body = MenuUtil.buildPopupMenu(
         child: body,
         menuBuilder: () {
-          chatMessageController.currentIndex = index;
           return Card(
               child: DataActionCard(
                   onPressed: _onMessagePopAction,
@@ -165,18 +167,20 @@ class MessageWidget {
   }
 
   _onMessagePopAction(int index, String label, {String? value}) async {
-    String? messageId = chatMessage.messageId;
     switch (label) {
       case 'Delete':
-        chatMessageController.delete();
+        await chatMessageService.delete(entity: chatMessage);
+        chatMessageController.delete(index: this.index);
         break;
       case 'Cancel':
+        String? messageId = chatMessage.messageId;
         if (messageId != null) {
           await chatMessageController.sendText(
             message: messageId,
-            contentType: ContentType.action,
             subMessageType: ChatSubMessageType.cancel,
           );
+          await chatMessageService.delete(entity: chatMessage);
+          chatMessageController.delete(index: this.index);
         }
         break;
       case 'Copy':
@@ -211,6 +215,14 @@ class MessageWidget {
       key: GlobalKey(),
       isMyself: isMyself,
       subMessageType: subMessageType,
+    );
+  }
+
+  CancelMessage buildCancelMessageWidget(BuildContext context, String content) {
+    return CancelMessage(
+      key: GlobalKey(),
+      isMyself: isMyself,
+      content: content,
     );
   }
 

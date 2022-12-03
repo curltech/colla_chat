@@ -133,6 +133,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       String? message,
       ContentType contentType = ContentType.text,
       String? mimeType,
+      ChatMessageType messageType = ChatMessageType.chat,
       ChatSubMessageType subMessageType = ChatSubMessageType.chat}) async {
     List<int>? data;
     if (message != null) {
@@ -143,6 +144,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         data: data,
         contentType: contentType,
         mimeType: mimeType,
+        messageType: messageType,
         subMessageType: subMessageType);
   }
 
@@ -153,6 +155,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       List<int>? data,
       ContentType contentType = ContentType.text,
       String? mimeType,
+      ChatMessageType messageType = ChatMessageType.chat,
       ChatSubMessageType subMessageType = ChatSubMessageType.chat}) async {
     if (_chatSummary == null) {
       return null;
@@ -173,6 +176,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         clientId: clientId,
         contentType: contentType,
         mimeType: mimeType,
+        messageType: messageType,
         subMessageType: subMessageType,
         deleteTime: _deleteTime,
       );

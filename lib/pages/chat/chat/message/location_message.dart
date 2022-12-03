@@ -43,8 +43,7 @@ class LocationMessage extends StatelessWidget {
     }
     Widget tile;
     if (chatMessageController.chatView == ChatView.full) {
-      tile = InkWell(
-          child: Center(
+      tile = Center(
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Row(children: [
@@ -63,10 +62,9 @@ class LocationMessage extends StatelessWidget {
                 ])),
           ]),
         ),
-      ));
+      );
     } else {
-      tile = InkWell(
-          child: Center(
+      tile =  Center(
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Row(children: [
@@ -83,7 +81,7 @@ class LocationMessage extends StatelessWidget {
             ),
           ]),
         ),
-      ));
+      );
     }
     return Card(elevation: 0, child: tile);
   }
