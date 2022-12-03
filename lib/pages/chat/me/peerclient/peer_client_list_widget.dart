@@ -1,19 +1,19 @@
+import 'package:colla_chat/datastore/datastore.dart';
+import 'package:colla_chat/entity/base.dart';
+import 'package:colla_chat/entity/dht/peerclient.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/peerclient/peer_client_edit_widget.dart';
 import 'package:colla_chat/pages/chat/me/peerclient/peer_client_show_widget.dart';
+import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/service/dht/peerclient.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/pluto_data_grid_widget.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../datastore/datastore.dart';
-import '../../../../entity/base.dart';
-import '../../../../entity/dht/peerclient.dart';
-import '../../../../l10n/localization.dart';
-import '../../../../provider/data_list_controller.dart';
-import '../../../../provider/index_widget_provider.dart';
-import '../../../../service/dht/peerclient.dart';
-import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/common/widget_mixin.dart';
-import '../../../../widgets/data_bind/data_listtile.dart';
 
 class PeerClientDataPageController extends DataPageController<PeerClient> {
   PeerClientDataPageController() : super();
@@ -117,7 +117,7 @@ class PeerClientListWidget extends StatefulWidget with TileDataMixin {
             var current = controller.current;
             if (current != null) {
               current.state = EntityState.delete;
-              peerClientService.delete(current);
+              peerClientService.delete(entity:current);
               controller.delete();
             }
           },

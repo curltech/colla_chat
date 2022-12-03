@@ -84,7 +84,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
             if (this.timer != null) {
               this.timer!.cancel();
               this.timer = null;
-              await chatMessageService.delete(widget.chatMessage);
+              await chatMessageService.delete(entity:widget.chatMessage);
               chatMessageController.delete(index: widget.index);
               logger.w(
                   'Timer.periodic delete chatMessage id: ${widget.chatMessage.id}, leftDeleteTime:$leftDeleteTime');
@@ -93,7 +93,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
           setState(() {});
         });
       } else {
-        await chatMessageService.delete(widget.chatMessage);
+        await chatMessageService.delete(entity:widget.chatMessage);
         chatMessageController.delete(index: widget.index);
         logger.w(
             '_buildDeleteTimer delete chatMessage id: ${widget.chatMessage.id}, leftDeleteTime:$leftDeleteTime');
