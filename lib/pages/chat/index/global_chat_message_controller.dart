@@ -14,7 +14,6 @@ import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 
-
 ///跟踪影响全局的消息到来，对不同类型的消息进行分派
 class GlobalChatMessageController with ChangeNotifier {
   ChatMessage? _chatMessage;
@@ -69,6 +68,13 @@ class GlobalChatMessageController with ChangeNotifier {
         case ChatSubMessageType.modifyFriend:
           content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content!));
           linkmanService.receiveModifyFriend(chatMessage, content);
+          break;
+        case ChatSubMessageType.cancel:
+          String? messageId = content;
+          if (messageId != null) {
+            chatMessageService
+                .delete(where: 'messageId=?', whereArgs: [messageId]);
+          }
           break;
         case ChatSubMessageType.preKeyBundle:
           content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content!));

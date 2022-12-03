@@ -12,6 +12,7 @@ enum ContentType {
   channel,
   link,
   location,
+  action,
 }
 
 enum MimeType {
@@ -56,7 +57,8 @@ enum ChatSubMessageType {
   chat, // 联系人发送聊天消息
   predefine, // 系统预定义聊天消息，如群聊动态通知
   videoChat, // 视频聊天
-  deleteChat, // 删除聊天
+  cancel, // 撤销聊天消息
+  delete, // 删除聊天消息
   chatReceipt, // 聊天回复
   groupFile, // 群文件
   // 以下system消息，不在聊天界面显示

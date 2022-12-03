@@ -123,9 +123,9 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
 
     // 初始化profile
     String? peerId = myselfPeer.peerId;
-    var profile = await peerProfileService.findOneByPeerId(peerId!);
+    var profile = await peerProfileService.findOneByPeerId(peerId);
     if (profile != null) {
-      await peerProfileService.delete(profile);
+      await peerProfileService.delete(entity:profile);
     }
     var peerProfile = PeerProfile(peerId, myselfPeer.clientId);
     peerProfile.peerId = peerId;

@@ -160,7 +160,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
       await groupService.removeGroupMember(groupId, oldMembers.values.toList());
       for (GroupMember member in oldMembers.values) {
         oldMembers[member.memberPeerId!] = member;
-        groupMemberService.delete({'id': member.id});
+        groupMemberService.delete(entity:{'id': member.id});
       }
     }
   }

@@ -149,6 +149,7 @@ class MessageWidget {
     body = MenuUtil.buildPopupMenu(
         child: body,
         menuBuilder: () {
+          chatMessageController.currentIndex = index;
           return Card(
               child: DataActionCard(
                   onPressed: _onMessagePopAction,
@@ -163,12 +164,20 @@ class MessageWidget {
     return body;
   }
 
-  _onMessagePopAction(int index, String label, {String? value}) {
+  _onMessagePopAction(int index, String label, {String? value}) async {
+    String? messageId = chatMessage.messageId;
     switch (label) {
       case 'Delete':
-        //chatMessageController.delete();
+        chatMessageController.delete();
         break;
       case 'Cancel':
+        if (messageId != null) {
+          await chatMessageController.sendText(
+            message: messageId,
+            contentType: ContentType.action,
+            subMessageType: ChatSubMessageType.cancel,
+          );
+        }
         break;
       case 'Copy':
         break;
