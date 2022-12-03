@@ -162,5 +162,16 @@
   "Search location": "搜索位置",
   "Location map": "位置地图",
   "Longitude": "经度",
-  "Latitude": "纬度"
+  "Latitude": "纬度",
+  "Delete": "删除",
+  "Delete message": "删除消息",
+  "Cancel message": "撤销消息",
+  "Refer": "引用",
+  "Refer message": "引用消息",
+  "Copy": "复制",
+  "Copy message": "复制消息",
+  "Forward": "转发",
+  "Forward message": "转发消息",
+  "Collect": "收藏",
+  "Collect message": "收藏消息"
 }
