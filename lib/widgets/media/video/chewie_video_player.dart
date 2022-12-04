@@ -2,7 +2,8 @@ import 'dart:io';
 
 import 'package:chewie/chewie.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/media/platform_media_controller.dart';
+import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
@@ -30,7 +31,7 @@ class ChewieMediaSource {
   }
 
   static Future<VideoPlayerController> fromMediaSource(
-      MediaSource mediaSource) async {
+      PlatformMediaSource mediaSource) async {
     return await media(filename: mediaSource.filename);
   }
 }
@@ -182,5 +183,32 @@ class ChewieVideoPlayerController extends AbstractMediaPlayerController {
       videoPlayerController!.dispose();
       videoPlayerController = null;
     }
+  }
+
+  @override
+  Future<List<PlatformMediaSource>> sourceFilePicker({
+    String? dialogTitle,
+    String? initialDirectory,
+    FileType type = FileType.audio,
+    List<String>? allowedExtensions,
+    dynamic Function(FilePickerStatus)? onFileLoading,
+    bool allowCompression = true,
+    bool allowMultiple = true,
+    bool withData = false,
+    bool withReadStream = false,
+    bool lockParentWindow = false,
+  }) async {
+    return super.sourceFilePicker(
+      dialogTitle: dialogTitle,
+      initialDirectory: initialDirectory,
+      type: FileType.video,
+      allowedExtensions: allowedExtensions,
+      onFileLoading: onFileLoading,
+      allowCompression: allowCompression,
+      allowMultiple: allowMultiple,
+      withData: withData,
+      withReadStream: withReadStream,
+      lockParentWindow: lockParentWindow,
+    );
   }
 }

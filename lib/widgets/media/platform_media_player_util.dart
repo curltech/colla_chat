@@ -1,7 +1,7 @@
 import 'dart:ui' as ui;
 
 import 'package:colla_chat/widgets/media/media_player_slider.dart';
-import 'package:colla_chat/widgets/media/platform_media_controller.dart';
+import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
@@ -24,7 +24,7 @@ class PlatformMediaPlayerUtil {
   ///播放列表
   static Widget buildPlaylist(
       BuildContext context, AbstractMediaPlayerController controller) {
-    List<MediaSource> playlist = controller.playlist;
+    List<PlatformMediaSource> playlist = controller.playlist;
     return Column(children: [
       Card(
         color: Colors.white.withOpacity(0.5),

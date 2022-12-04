@@ -1,12 +1,13 @@
 import 'dart:io';
 
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/media/platform_media_controller.dart';
+import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_vlc_player/flutter_vlc_player.dart';
 
-class VlcMediaSource {
+class FlutterVlcMediaSource {
   static Future<VlcPlayerController> media(
       {String? filename, Uint8List? data}) async {
     VlcPlayerController vlcPlayerController;
@@ -30,16 +31,16 @@ class VlcMediaSource {
   }
 
   static Future<VlcPlayerController> fromMediaSource(
-      MediaSource mediaSource) async {
+      PlatformMediaSource mediaSource) async {
     return await media(filename: mediaSource.filename);
   }
 }
 
-///基于flutter vlc实现的媒体播放器和记录器，
-class VlcVideoPlayerController extends AbstractMediaPlayerController {
+///基于flutter vlc实现的媒体播放器和记录器，只支持mobile
+class FlutterVlcVideoPlayerController extends AbstractMediaPlayerController {
   VlcPlayerController? vlcPlayerController;
 
-  VlcVideoPlayerController() {
+  FlutterVlcVideoPlayerController() {
     vlcPlayerController = VlcPlayerController.asset('assets/medias/alert.mp3');
   }
 
@@ -64,7 +65,7 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
     super.setCurrentIndex(index);
     if (currentMediaSource != null) {
       vlcPlayerController =
-          await VlcMediaSource.fromMediaSource(currentMediaSource!);
+          await FlutterVlcMediaSource.fromMediaSource(currentMediaSource!);
     }
   }
 
@@ -186,5 +187,32 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
       vlcPlayerController!.dispose();
       vlcPlayerController = null;
     }
+  }
+
+  @override
+  Future<List<PlatformMediaSource>> sourceFilePicker({
+    String? dialogTitle,
+    String? initialDirectory,
+    FileType type = FileType.audio,
+    List<String>? allowedExtensions,
+    dynamic Function(FilePickerStatus)? onFileLoading,
+    bool allowCompression = true,
+    bool allowMultiple = true,
+    bool withData = false,
+    bool withReadStream = false,
+    bool lockParentWindow = false,
+  }) async {
+    return super.sourceFilePicker(
+      dialogTitle: dialogTitle,
+      initialDirectory: initialDirectory,
+      type: FileType.video,
+      allowedExtensions: allowedExtensions,
+      onFileLoading: onFileLoading,
+      allowCompression: allowCompression,
+      allowMultiple: allowMultiple,
+      withData: withData,
+      withReadStream: withReadStream,
+      lockParentWindow: lockParentWindow,
+    );
   }
 }

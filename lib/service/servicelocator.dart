@@ -37,9 +37,8 @@ class ServiceLocator {
 
   ///初始化并注册服务类，在应用启动后调用
   static Future<void> init() async {
-    platformParams.init();
-    appDataProvider.init();
-    await DartVLC.initialize(useFlutterNativeView: true);
+    await platformParams.init();
+    await appDataProvider.init();
     services['stockAccountService'] = stockAccountService;
     services['chainAppService'] = chainAppService;
     services['peerProfileService'] = peerProfileService;

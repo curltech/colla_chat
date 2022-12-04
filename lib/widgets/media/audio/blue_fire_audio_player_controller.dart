@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/widgets/media/platform_media_controller.dart';
+import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/widgets.dart';
 
@@ -26,7 +26,7 @@ class BlueFireAudioSource {
     return source;
   }
 
-  static Source fromMediaSource(MediaSource mediaSource) {
+  static Source fromMediaSource(PlatformMediaSource mediaSource) {
     return audioSource(filename: mediaSource.filename);
   }
 }
@@ -95,7 +95,7 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
   @override
   play() async {
     if (currentIndex != null) {
-      MediaSource? currentMediaSource = this.currentMediaSource;
+      PlatformMediaSource? currentMediaSource = this.currentMediaSource;
       if (currentMediaSource != null) {
         Source source = BlueFireAudioSource.fromMediaSource(currentMediaSource);
         try {

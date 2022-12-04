@@ -1,20 +1,20 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/media/media_player_slider.dart';
-import 'package:colla_chat/widgets/media/platform_media_controller.dart'
+import 'package:colla_chat/widgets/media/abstract_media_controller.dart'
     as platform;
-import 'package:colla_chat/widgets/media/platform_media_controller.dart';
+import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_player_util.dart';
 import 'package:dart_vlc/dart_vlc.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-class VlcMediaSource {
+class DartVlcMediaSource {
   static Future<Media> media({String? filename, List<int>? data}) async {
     Media media;
     if (filename != null) {
@@ -35,7 +35,7 @@ class VlcMediaSource {
   }
 
   static Future<Playlist> fromMediaSource(
-      List<platform.MediaSource> mediaSources) async {
+      List<platform.PlatformMediaSource> mediaSources) async {
     List<Media> medias = [];
     for (var mediaSource in mediaSources) {
       medias.add(await media(filename: mediaSource.filename));
@@ -48,36 +48,32 @@ class VlcMediaSource {
   }
 }
 
-///基于vlc实现的媒体播放器和记录器，可以截取视频文件的图片作为缩略图
+///基于dart_vlc实现的媒体播放器和记录器，可以截取视频文件的图片作为缩略图
 ///支持Windows & Linux，linux需要VLC & libVLC installed.
-class VlcVideoPlayerController extends AbstractMediaPlayerController {
+class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
   late Player player;
   CurrentState? currentState;
   PositionState? positionState;
-
   PlaybackState? playbackState;
-
   GeneralState? generalState;
-
   VideoDimensions? videoDimensions;
-
   double bufferingProgress = 0.0;
-  List<Media> medias = <Media>[];
-  List<Device> devices = Devices.all;
+  List<Device> devices = [];
 
-  VlcVideoPlayerController({
+  DartVlcVideoPlayerController({
     int id = 0,
     bool registerTexture = true,
-    VideoDimensions? videoDimensions,
+    VideoDimensions? videoDimensions = const VideoDimensions(640, 360),
     List<String>? commandlineArguments,
     dynamic bool = false,
   }) {
+    DartVLC.initialize();
+    devices = Devices.all;
     player = Player(
-        id: id,
-        registerTexture: !platformParams.windows,
-        videoDimensions: videoDimensions,
-        commandlineArguments: commandlineArguments,
-        bool: bool);
+      id: id,
+      videoDimensions: videoDimensions,
+      commandlineArguments: commandlineArguments,
+    );
     player.currentStream.listen((currentState) {
       this.currentState = currentState;
       logger.i('libvlc currentState:$currentState');
@@ -117,7 +113,7 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   _open({bool autoStart = false}) async {
-    Playlist list = await VlcMediaSource.fromMediaSource(playlist);
+    Playlist list = await DartVlcMediaSource.fromMediaSource(playlist);
     player.open(
       list,
       autoStart: autoStart,
@@ -181,11 +177,13 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
 
   ///下面是播放列表的功能
   @override
-  Future<platform.MediaSource?> add({String? filename, List<int>? data}) async {
-    platform.MediaSource? mediaSource =
+  Future<platform.PlatformMediaSource?> add(
+      {String? filename, List<int>? data}) async {
+    platform.PlatformMediaSource? mediaSource =
         await super.add(filename: filename, data: data);
     if (mediaSource != null) {
-      Media media = await VlcMediaSource.media(filename: mediaSource.filename);
+      Media media =
+          await DartVlcMediaSource.media(filename: mediaSource.filename);
       player.add(media);
     }
 
@@ -199,12 +197,13 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  Future<platform.MediaSource?> insert(int index,
+  Future<platform.PlatformMediaSource?> insert(int index,
       {String? filename, List<int>? data}) async {
-    platform.MediaSource? mediaSource =
+    platform.PlatformMediaSource? mediaSource =
         await super.insert(index, filename: filename, data: data);
     if (mediaSource != null) {
-      Media media = await VlcMediaSource.media(filename: mediaSource.filename);
+      Media media =
+          await DartVlcMediaSource.media(filename: mediaSource.filename);
       player.insert(index, media);
     }
     return mediaSource;
@@ -285,110 +284,6 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
     });
   }
 
-  Video _buildVideoWidget({
-    Key? key,
-    int? playerId,
-    Player? player,
-    double? width,
-    double? height,
-    BoxFit fit = BoxFit.contain,
-    AlignmentGeometry alignment = Alignment.center,
-    double scale = 1.0,
-    bool showControls = true,
-    Color? progressBarActiveColor,
-    Color? progressBarInactiveColor = Colors.white24,
-    Color? progressBarThumbColor,
-    Color? progressBarThumbGlowColor = const Color.fromRGBO(0, 161, 214, .2),
-    Color? volumeActiveColor,
-    Color? volumeInactiveColor = Colors.grey,
-    Color volumeBackgroundColor = const Color(0xff424242),
-    Color? volumeThumbColor,
-    double? progressBarThumbRadius = 10.0,
-    double? progressBarThumbGlowRadius = 15.0,
-    bool showTimeLeft = false,
-    TextStyle progressBarTextStyle = const TextStyle(),
-    FilterQuality filterQuality = FilterQuality.low,
-    bool showFullscreenButton = false,
-    Color fillColor = Colors.black,
-  }) {
-    player = player ?? this.player;
-    return Video(
-      key: key,
-      playerId: playerId,
-      player: player,
-      width: width,
-      height: height,
-      fit: fit,
-      alignment: alignment,
-      scale: scale,
-      showControls: showControls,
-      progressBarActiveColor: progressBarActiveColor,
-      progressBarInactiveColor: progressBarInactiveColor,
-      progressBarThumbColor: progressBarThumbColor,
-      progressBarThumbGlowColor: progressBarThumbGlowColor,
-      volumeActiveColor: volumeActiveColor,
-      volumeInactiveColor: volumeInactiveColor,
-      volumeBackgroundColor: volumeBackgroundColor,
-      volumeThumbColor: volumeThumbColor,
-      progressBarThumbRadius: progressBarThumbRadius,
-      progressBarThumbGlowRadius: progressBarThumbGlowRadius,
-      showTimeLeft: showTimeLeft,
-      progressBarTextStyle: progressBarTextStyle,
-      filterQuality: filterQuality,
-      showFullscreenButton: showFullscreenButton,
-      fillColor: fillColor,
-    );
-  }
-
-  NativeVideo _buildNativeVideoWidget({
-    Key? key,
-    Player? player,
-    double? width,
-    double? height,
-    BoxFit fit = BoxFit.contain,
-    AlignmentGeometry alignment = Alignment.center,
-    double scale = 1.0,
-    bool showControls = true,
-    Color? progressBarActiveColor,
-    Color? progressBarInactiveColor = Colors.white24,
-    Color? progressBarThumbColor,
-    Color? progressBarThumbGlowColor = const Color.fromRGBO(0, 161, 214, .2),
-    Color? volumeActiveColor,
-    Color? volumeInactiveColor = Colors.grey,
-    Color volumeBackgroundColor = const Color(0xff424242),
-    Color? volumeThumbColor,
-    double? progressBarThumbRadius = 10.0,
-    double? progressBarThumbGlowRadius = 15.0,
-    bool showTimeLeft = false,
-    TextStyle progressBarTextStyle = const TextStyle(),
-    FilterQuality filterQuality = FilterQuality.low,
-  }) {
-    player = player ?? this.player;
-    return NativeVideo(
-      key: key,
-      player: player,
-      width: width,
-      height: height,
-      fit: fit,
-      alignment: alignment,
-      scale: scale,
-      showControls: showControls,
-      progressBarActiveColor: progressBarActiveColor,
-      progressBarInactiveColor: progressBarInactiveColor,
-      progressBarThumbColor: progressBarThumbColor,
-      progressBarThumbGlowColor: progressBarThumbGlowColor,
-      volumeActiveColor: volumeActiveColor,
-      volumeInactiveColor: volumeInactiveColor,
-      volumeBackgroundColor: volumeBackgroundColor,
-      volumeThumbColor: volumeThumbColor,
-      progressBarThumbRadius: progressBarThumbRadius,
-      progressBarThumbGlowRadius: progressBarThumbGlowRadius,
-      showTimeLeft: showTimeLeft,
-      progressBarTextStyle: progressBarTextStyle,
-      filterQuality: filterQuality,
-    );
-  }
-
   @override
   Widget buildMediaView({
     Key? key,
@@ -412,62 +307,33 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
     bool showTimeLeft = false,
     TextStyle progressBarTextStyle = const TextStyle(),
     FilterQuality filterQuality = FilterQuality.low,
-    bool showFullscreenButton = false,
     Color fillColor = Colors.black,
   }) {
-    if (platformParams.windows) {
-      return _buildVideoWidget(
-        key: key,
-        player: player,
-        width: width,
-        height: height,
-        fit: fit,
-        alignment: alignment,
-        scale: scale,
-        showControls: showControls,
-        progressBarActiveColor: progressBarActiveColor,
-        progressBarInactiveColor: progressBarInactiveColor,
-        progressBarThumbColor: progressBarThumbColor,
-        progressBarThumbGlowColor: progressBarThumbGlowColor,
-        volumeActiveColor: volumeActiveColor,
-        volumeInactiveColor: volumeInactiveColor,
-        volumeBackgroundColor: volumeBackgroundColor,
-        volumeThumbColor: volumeThumbColor,
-        progressBarThumbRadius: progressBarThumbRadius,
-        progressBarThumbGlowRadius: progressBarThumbGlowRadius,
-        showTimeLeft: showTimeLeft,
-        progressBarTextStyle: progressBarTextStyle,
-        filterQuality: filterQuality,
-        // showFullscreenButton: showFullscreenButton,
-        // fillColor: fillColor,
-      );
-    } else {
-      return _buildVideoWidget(
-        key: key,
-        player: player,
-        width: width,
-        height: height,
-        fit: fit,
-        alignment: alignment,
-        scale: scale,
-        showControls: showControls,
-        progressBarActiveColor: progressBarActiveColor,
-        progressBarInactiveColor: progressBarInactiveColor,
-        progressBarThumbColor: progressBarThumbColor,
-        progressBarThumbGlowColor: progressBarThumbGlowColor,
-        volumeActiveColor: volumeActiveColor,
-        volumeInactiveColor: volumeInactiveColor,
-        volumeBackgroundColor: volumeBackgroundColor,
-        volumeThumbColor: volumeThumbColor,
-        progressBarThumbRadius: progressBarThumbRadius,
-        progressBarThumbGlowRadius: progressBarThumbGlowRadius,
-        showTimeLeft: showTimeLeft,
-        progressBarTextStyle: progressBarTextStyle,
-        filterQuality: filterQuality,
-        // showFullscreenButton: showFullscreenButton,
-        // fillColor: fillColor,
-      );
-    }
+    player = player ?? this.player;
+    return Video(
+      key: key,
+      player: player,
+      width: width,
+      height: height,
+      fit: fit,
+      alignment: alignment,
+      scale: scale,
+      showControls: showControls,
+      progressBarActiveColor: progressBarActiveColor,
+      progressBarInactiveColor: progressBarInactiveColor,
+      progressBarThumbColor: progressBarThumbColor,
+      progressBarThumbGlowColor: progressBarThumbGlowColor,
+      volumeActiveColor: volumeActiveColor,
+      volumeInactiveColor: volumeInactiveColor,
+      volumeBackgroundColor: volumeBackgroundColor,
+      volumeThumbColor: volumeThumbColor,
+      progressBarThumbRadius: progressBarThumbRadius,
+      progressBarThumbGlowRadius: progressBarThumbGlowRadius,
+      showTimeLeft: showTimeLeft,
+      progressBarTextStyle: progressBarTextStyle,
+      filterQuality: filterQuality,
+      fillColor: fillColor,
+    );
   }
 
   setEqualizer({double? band, double? preAmp, double? amp}) {
@@ -506,12 +372,45 @@ class VlcVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   close() {}
+
+  @override
+  Future<List<PlatformMediaSource>> sourceFilePicker({
+    String? dialogTitle,
+    String? initialDirectory,
+    FileType type = FileType.audio,
+    List<String>? allowedExtensions,
+    dynamic Function(FilePickerStatus)? onFileLoading,
+    bool allowCompression = true,
+    bool allowMultiple = true,
+    bool withData = false,
+    bool withReadStream = false,
+    bool lockParentWindow = false,
+  }) async {
+    List<PlatformMediaSource> sources = await super.sourceFilePicker(
+      dialogTitle: dialogTitle,
+      initialDirectory: initialDirectory,
+      type: FileType.video,
+      allowedExtensions: allowedExtensions,
+      onFileLoading: onFileLoading,
+      allowCompression: allowCompression,
+      allowMultiple: allowMultiple,
+      withData: withData,
+      withReadStream: withReadStream,
+      lockParentWindow: lockParentWindow,
+    );
+    for (var source in sources) {
+      Media media = await DartVlcMediaSource.media(filename: source.filename);
+      player.add(media);
+    }
+
+    return sources;
+  }
 }
 
-class VlcMediaRecorder {
+class DartVlcMediaRecorder {
   Record? record;
 
-  VlcMediaRecorder();
+  DartVlcMediaRecorder();
 
   start({
     int id = 0,
@@ -521,7 +420,7 @@ class VlcMediaRecorder {
     if (record != null) {
       dispose();
     }
-    Media media = await VlcMediaSource.media(filename: filename);
+    Media media = await DartVlcMediaSource.media(filename: filename);
     record = Record.create(
       id: id,
       media: media,
@@ -538,8 +437,8 @@ class VlcMediaRecorder {
   }
 }
 
-class PlatformVlcVideoPlayer extends StatefulWidget {
-  late final VlcVideoPlayerController controller;
+class DartVlcVideoPlayer extends StatefulWidget {
+  late final DartVlcVideoPlayerController controller;
 
   final int id;
 
@@ -560,9 +459,9 @@ class PlatformVlcVideoPlayer extends StatefulWidget {
   final String? filename;
   final List<int>? data;
 
-  PlatformVlcVideoPlayer(
+  DartVlcVideoPlayer(
       {Key? key,
-      VlcVideoPlayerController? controller,
+      DartVlcVideoPlayerController? controller,
       required this.id,
       this.showVolume = true,
       this.showSpeed = false,
@@ -575,14 +474,14 @@ class PlatformVlcVideoPlayer extends StatefulWidget {
       this.filename,
       this.data})
       : super(key: key) {
-    this.controller = controller ?? VlcVideoPlayerController(id: id);
+    this.controller = controller ?? DartVlcVideoPlayerController(id: id);
   }
 
   @override
-  State createState() => _PlatformVlcVideoPlayerState();
+  State createState() => _DartVlcVideoPlayerState();
 }
 
-class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
+class _DartVlcVideoPlayerState extends State<DartVlcVideoPlayer> {
   @override
   void initState() {
     super.initState();
@@ -632,7 +531,7 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
       columns.add(Expanded(child: view));
     }
     if (!widget.showControls) {
-      Widget controllerPanel = PlatformVlcControllerPanel(
+      Widget controllerPanel = DartVlcControllerPanel(
         controller: widget.controller,
         showVolume: widget.showVolume,
         showSpeed: widget.showSpeed,
@@ -645,30 +544,29 @@ class _PlatformVlcVideoPlayerState extends State<PlatformVlcVideoPlayer> {
 }
 
 ///视频播放器的控制面板
-class PlatformVlcControllerPanel extends StatefulWidget {
-  late final VlcVideoPlayerController controller;
+class DartVlcControllerPanel extends StatefulWidget {
+  late final DartVlcVideoPlayerController controller;
 
   ///如果是外置控件，是否显示简洁版
   final bool showVolume;
   final bool showSpeed;
   final bool showPlaylist;
 
-  PlatformVlcControllerPanel({
+  DartVlcControllerPanel({
     Key? key,
-    VlcVideoPlayerController? controller,
+    DartVlcVideoPlayerController? controller,
     this.showVolume = true,
     this.showSpeed = false,
     this.showPlaylist = true,
   }) : super(key: key) {
-    this.controller = controller ?? VlcVideoPlayerController();
+    this.controller = controller ?? DartVlcVideoPlayerController();
   }
 
   @override
-  State createState() => _PlatformVlcControllerPanelState();
+  State createState() => _DartVlcControllerPanelState();
 }
 
-class _PlatformVlcControllerPanelState
-    extends State<PlatformVlcControllerPanel> {
+class _DartVlcControllerPanelState extends State<DartVlcControllerPanel> {
   @override
   void initState() {
     super.initState();

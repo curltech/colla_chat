@@ -1,10 +1,12 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/media/video/platform_video_player.dart';
+import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:flutter/material.dart';
 
-///平台标准的video-player的实现，移动采用flick，桌面采用vlc
+///平台标准的video_player的实现，移动采用flick，桌面采用vlc
 class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
   PlatformVideoPlayerWidget({
     Key? key,
@@ -27,6 +29,8 @@ class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
+  MediaPlayerType? mediaPlayerType;
+
   @override
   void initState() {
     super.initState();
@@ -37,20 +41,39 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
     super.dispose();
   }
 
+  List<AppBarPopupMenu>? _buildRightPopupMenus() {
+    List<AppBarPopupMenu> menus = [];
+    for (var type in MediaPlayerType.values) {
+      AppBarPopupMenu menu = AppBarPopupMenu(
+          title: type.name,
+          onPressed: () {
+            setState(() {
+              mediaPlayerType = type;
+              logger.i('mediaPlayerType:$type');
+            });
+          });
+      menus.add(menu);
+    }
+    return menus;
+  }
+
   @override
   Widget build(BuildContext context) {
     //String filename = 'C:\\Users\\hujs\\AppData\\Local\\Temp\\1d819cab.m4a';
     return AppBarView(
       title: Text(AppLocalizations.t('VideoPlayer')),
       withLeading: true,
-      child: PlatformVideoPlayer(
-        id: 0,
-        showControls: false,
-        showVolume: true,
-        showSpeed: true,
-        showPlaylist: true,
-        showMediaView: true,
-      ),
+      rightPopupMenus: _buildRightPopupMenus(),
+      child: mediaPlayerType != null
+          ? PlatformMediaPlayer(
+              showControls: false,
+              showVolume: true,
+              showSpeed: true,
+              showPlaylist: true,
+              showMediaView: true,
+              mediaPlayerType: mediaPlayerType!,
+            )
+          : const Center(child: Text('Please select a MediaPlayerType!')),
     );
   }
 }
