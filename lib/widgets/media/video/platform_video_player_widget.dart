@@ -68,7 +68,7 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
           ? PlatformMediaPlayer(
               showControls: false,
               showVolume: true,
-              showSpeed: true,
+              showSpeed: false,
               showPlaylist: true,
               showMediaView: true,
               mediaPlayerType: mediaPlayerType!,

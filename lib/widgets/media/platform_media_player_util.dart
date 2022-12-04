@@ -12,8 +12,8 @@ class PlatformMediaPlayerUtil {
     return Ink(
         child: InkWell(
       child: controller.playlistVisible
-          ? const Icon(Icons.visibility_off, size: 24)
-          : const Icon(Icons.visibility, size: 24),
+          ? const Icon(Icons.playlist_add_check, size: 24)
+          : const Icon(Icons.playlist_remove, size: 24),
       onTap: () {
         var playlistVisible = controller.playlistVisible;
         controller.playlistVisible = !playlistVisible;
@@ -35,16 +35,20 @@ class PlatformMediaPlayerUtil {
             Container(
               margin: const EdgeInsets.only(left: 16.0, top: 16.0),
               alignment: Alignment.topLeft,
-              child: Column(
+              child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Ink(
-                    child: InkWell(
-                      child: const Icon(Icons.add),
-                      onTap: () async {
-                        await controller.sourceFilePicker();
-                      },
-                    ),
+                  InkWell(
+                    child: const Icon(Icons.add),
+                    onTap: () async {
+                      await controller.sourceFilePicker();
+                    },
+                  ),
+                  InkWell(
+                    child: const Icon(Icons.remove),
+                    onTap: () async {
+                      //await controller.remove(index);
+                    },
                   )
                 ],
               ),
@@ -152,9 +156,15 @@ class PlatformMediaPlayerUtil {
               child: volume == 0.0
                   ? const Icon(Icons.volume_off, size: 24)
                   : const Icon(Icons.volume_up, size: 24),
-              onTap: () {
-                var volumeSlideVisible = controller.volumeSlideVisible;
-                controller.volumeSlideVisible = !volumeSlideVisible;
+              onTap: () async {
+                // var volumeSlideVisible = controller.volumeSlideVisible;
+                // controller.volumeSlideVisible = !volumeSlideVisible;
+                var volume = await controller.getVolume();
+                if (volume > 0) {
+                  controller.setVolume(0);
+                } else {
+                  controller.setVolume(1);
+                }
               },
             )),
             Text(volume.toStringAsFixed(1)),
@@ -205,6 +215,7 @@ class PlatformMediaPlayerUtil {
         });
   }
 
+  ///播放列表显示，音量，速度和播放按钮
   static Widget buildControlPanel(
     BuildContext context,
     AbstractMediaPlayerController controller, {
@@ -214,14 +225,19 @@ class PlatformMediaPlayerUtil {
   }) {
     PlayerStatus status = controller.status;
     List<Widget> rows = [];
+    //显示播放列表按钮
     if (showPlaylist) {
       rows.add(PlatformMediaPlayerUtil.buildPlaylistVisibleButton(
           context, controller));
     }
+    //播放按钮
+    rows.add(buildPlaybackButton(context, controller, status, showPlaylist));
+
+    //音量调整按钮
     if (showVolume) {
       rows.add(PlatformMediaPlayerUtil.buildVolumeButton(context, controller));
     }
-    rows.add(buildPlayback(context, controller, status, showPlaylist));
+    //速度调整按钮
     if (showSpeed) {
       rows.add(PlatformMediaPlayerUtil.buildSpeedButton(context, controller));
     }
@@ -232,7 +248,8 @@ class PlatformMediaPlayerUtil {
         children: rows);
   }
 
-  static Widget buildPlayback(
+  ///播放按钮，停止，上一个，播放，暂停，下一个
+  static Widget buildPlaybackButton(
       BuildContext context,
       AbstractMediaPlayerController controller,
       PlayerStatus status,
@@ -254,18 +271,18 @@ class PlatformMediaPlayerUtil {
       playbacks.add(Ink(
           child: InkWell(
         onTap: controller.play,
-        child: const Icon(Icons.play_arrow_rounded, size: 24),
+        child: const Icon(Icons.play_arrow, size: 36),
       )));
     } else if (status != PlayerStatus.completed) {
       playbacks.add(Ink(
           child: InkWell(
         onTap: controller.pause,
-        child: const Icon(Icons.pause, size: 24),
+        child: const Icon(Icons.pause, size: 36),
       )));
     } else {
       playbacks.add(Ink(
           child: InkWell(
-        child: const Icon(Icons.replay, size: 24),
+        child: const Icon(Icons.replay, size: 36),
         onTap: () => controller.seek(Duration.zero),
       )));
     }
@@ -281,6 +298,7 @@ class PlatformMediaPlayerUtil {
     );
   }
 
+  ///从控制器获取进度数据，getDuration和getPosition
   static Future<PositionData> getPositionState(
       BuildContext context, AbstractMediaPlayerController controller) async {
     var duration = await controller.getDuration();
@@ -290,7 +308,7 @@ class PlatformMediaPlayerUtil {
     return PositionData(position, Duration.zero, duration);
   }
 
-  ///播放进度条
+  ///播放进度指示条
   static Widget buildPlayerSlider(
       BuildContext context, AbstractMediaPlayerController controller) {
     return FutureBuilder<PositionData>(
@@ -320,7 +338,8 @@ class PlatformMediaPlayerUtil {
     );
   }
 
-  ///复杂控制器按钮面板，包含音量，速度和播放按钮
+  ///定制的复杂控制器按钮面板，包含进度，播放列表显示，音量，速度和播放按钮
+  ///显示为两行，第一行为进度指示
   static Widget buildControllerPanel(
     BuildContext context,
     AbstractMediaPlayerController controller, {
@@ -341,9 +360,11 @@ class PlatformMediaPlayerUtil {
     );
   }
 
+  /// 构建媒体播放器组件
   static Widget buildMediaPlayer(
     BuildContext context,
     AbstractMediaPlayerController controller, {
+    Key? key,
     bool showControls = true,
     bool showPlaylist = true,
     bool showMediaView = true,
@@ -355,6 +376,8 @@ class PlatformMediaPlayerUtil {
   }) {
     List<Widget> columns = [];
     List<Widget> rows = [];
+
+    // 媒体视图，一般视频才有
     if (showMediaView) {
       rows.add(PlatformMediaPlayerUtil.buildMediaView(
           controller: controller,
@@ -363,11 +386,13 @@ class PlatformMediaPlayerUtil {
           height: height,
           showControls: showControls));
     }
+    // 播放列表
     if (showPlaylist) {
       rows.add(Visibility(
           visible: controller.playlistVisible,
           child: PlatformMediaPlayerUtil.buildPlaylist(context, controller)));
     }
+    // 媒体视图和播放列表显示在同样位置，在第一行
     if (rows.isNotEmpty) {
       var view = VisibilityDetector(
           key: ObjectKey(controller),
@@ -379,6 +404,7 @@ class PlatformMediaPlayerUtil {
           child: Stack(children: rows));
       columns.add(Expanded(child: view));
     }
+    // 定制的媒体控制器
     if (!showControls) {
       Widget controllerPanel = buildControllerPanel(
         context,
@@ -389,7 +415,7 @@ class PlatformMediaPlayerUtil {
       );
       columns.add(Expanded(child: controllerPanel));
     }
-    return Column(children: columns);
+    return Column(key: key, children: columns);
   }
 
   static bool isTablet() {

@@ -6,6 +6,7 @@ import 'package:colla_chat/widgets/media/video/fijk_video_player.dart';
 import 'package:colla_chat/widgets/media/video/flick_video_player.dart';
 import 'package:colla_chat/widgets/media/video/flutter_vlc_video_player.dart';
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
+import 'package:colla_chat/widgets/media/video/webview_video_player.dart';
 import 'package:flutter/material.dart';
 
 enum MediaPlayerType {
@@ -16,6 +17,7 @@ enum MediaPlayerType {
   fijk,
   origin,
   appinio,
+  webview,
   just,
   bluefire,
   another,
@@ -97,6 +99,9 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
       case MediaPlayerType.flutter_vlc:
         controller = FlutterVlcVideoPlayerController();
         break;
+      case MediaPlayerType.webview:
+        controller = WebviewVideoPlayerController();
+        break;
       default:
         break;
     }
@@ -105,6 +110,7 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
   @override
   void dispose() {
     controller.removeListener(_update);
+    controller.dispose();
     super.dispose();
   }
 

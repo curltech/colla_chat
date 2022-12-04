@@ -291,7 +291,7 @@ dependency_overrides:
   geolocator: ^9.0.2
   apple_maps_flutter: ^1.2.0
   webview_flutter: ^3.0.4
-  webview_win_floating: ^1.0.0 #webView for Windows
+  webview_win_floating: ^1.0.0 #webView for
   sprintf: ^7.0.0
 dev_dependencies:
   flutter_test:

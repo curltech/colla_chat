@@ -1,6 +1,5 @@
 import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
 import 'package:fijkplayer/fijkplayer.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -151,30 +150,4 @@ class FijkVideoPlayerController extends AbstractMediaPlayerController {
   @override
   close() {}
 
-  @override
-  Future<List<PlatformMediaSource>> sourceFilePicker({
-    String? dialogTitle,
-    String? initialDirectory,
-    FileType type = FileType.audio,
-    List<String>? allowedExtensions,
-    dynamic Function(FilePickerStatus)? onFileLoading,
-    bool allowCompression = true,
-    bool allowMultiple = true,
-    bool withData = false,
-    bool withReadStream = false,
-    bool lockParentWindow = false,
-  }) async {
-    return super.sourceFilePicker(
-      dialogTitle: dialogTitle,
-      initialDirectory: initialDirectory,
-      type: FileType.video,
-      allowedExtensions: allowedExtensions,
-      onFileLoading: onFileLoading,
-      allowCompression: allowCompression,
-      allowMultiple: allowMultiple,
-      withData: withData,
-      withReadStream: withReadStream,
-      lockParentWindow: lockParentWindow,
-    );
-  }
 }

@@ -9,7 +9,6 @@ import 'package:colla_chat/widgets/media/abstract_media_controller.dart'
 import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_player_util.dart';
 import 'package:dart_vlc/dart_vlc.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:visibility_detector/visibility_detector.dart';
@@ -76,34 +75,39 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
     );
     player.currentStream.listen((currentState) {
       this.currentState = currentState;
-      logger.i('libvlc currentState:$currentState');
+      notifyListeners();
     });
     player.positionStream.listen((positionState) {
       this.positionState = positionState;
-      //logger.i('libvlc positionState:$positionState');
+      notifyListeners();
     });
     player.playbackStream.listen((playbackState) {
       this.playbackState = playbackState;
+      if (playbackState.isPlaying) {
+        status = PlayerStatus.playing;
+      } else if (playbackState.isCompleted) {
+        status = PlayerStatus.completed;
+      }
       if (this.playbackState != null && this.playbackState!.isCompleted) {
         playlistVisible = true;
       }
       if (this.playbackState != null && this.playbackState!.isPlaying) {
         playlistVisible = false;
       }
-      //logger.i('libvlc playbackState:$playbackState');
+      notifyListeners();
     });
     player.generalStream.listen((generalState) {
       this.generalState = generalState;
-      logger.i('libvlc generalState:$generalState');
+      notifyListeners();
     });
     player.videoDimensionsStream.listen((videoDimensions) {
       this.videoDimensions = videoDimensions;
-      logger.i('libvlc videoDimensions:$videoDimensions');
+      notifyListeners();
     });
     player.bufferingProgressStream.listen(
       (bufferingProgress) {
         this.bufferingProgress = bufferingProgress;
-        //logger.i('libvlc bufferingProgress:$bufferingProgress');
+        notifyListeners();
       },
     );
     player.errorStream.listen((event) {
@@ -129,6 +133,7 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
   @override
   pause() {
     player.pause();
+    status = PlayerStatus.pause;
   }
 
   @override
@@ -222,11 +227,6 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  int? get currentIndex {
-    return player.current.index;
-  }
-
-  @override
   move(int initialIndex, int finalIndex) {
     player.move(initialIndex, finalIndex);
     super.move(initialIndex, finalIndex);
@@ -257,7 +257,7 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
   @override
   dispose() {
     super.dispose();
-    player.dispose();
+    close();
   }
 
   ///以下是视频播放器特有的方法
@@ -371,39 +371,8 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  close() {}
-
-  @override
-  Future<List<PlatformMediaSource>> sourceFilePicker({
-    String? dialogTitle,
-    String? initialDirectory,
-    FileType type = FileType.audio,
-    List<String>? allowedExtensions,
-    dynamic Function(FilePickerStatus)? onFileLoading,
-    bool allowCompression = true,
-    bool allowMultiple = true,
-    bool withData = false,
-    bool withReadStream = false,
-    bool lockParentWindow = false,
-  }) async {
-    List<PlatformMediaSource> sources = await super.sourceFilePicker(
-      dialogTitle: dialogTitle,
-      initialDirectory: initialDirectory,
-      type: FileType.video,
-      allowedExtensions: allowedExtensions,
-      onFileLoading: onFileLoading,
-      allowCompression: allowCompression,
-      allowMultiple: allowMultiple,
-      withData: withData,
-      withReadStream: withReadStream,
-      lockParentWindow: lockParentWindow,
-    );
-    for (var source in sources) {
-      Media media = await DartVlcMediaSource.media(filename: source.filename);
-      player.add(media);
-    }
-
-    return sources;
+  close() {
+    player.dispose();
   }
 }
 
@@ -609,7 +578,7 @@ class _DartVlcControllerPanelState extends State<DartVlcControllerPanel> {
           } else {
             status = widget.controller.status;
           }
-          Widget playback = PlatformMediaPlayerUtil.buildPlayback(
+          Widget playback = PlatformMediaPlayerUtil.buildPlaybackButton(
               context, widget.controller, status, widget.showPlaylist);
 
           return playback;
