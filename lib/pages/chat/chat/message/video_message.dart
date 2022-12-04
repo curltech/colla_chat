@@ -30,7 +30,7 @@ class VideoMessage extends StatelessWidget {
             showControls: true,
             showPlaylist: false,
             filename: filename,
-            mediaPlayerType: MediaPlayerType.chewie,
+            mediaPlayerType: MediaPlayerType.flick,
           );
         });
     return SizedBox(height: 80, child: Card(elevation: 0, child: videoPlayer));

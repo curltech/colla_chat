@@ -1,22 +1,13 @@
 import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_player_util.dart';
-import 'package:colla_chat/widgets/media/video/chewie_video_player.dart';
 import 'package:colla_chat/widgets/media/video/dart_vlc_video_player.dart';
-import 'package:colla_chat/widgets/media/video/fijk_video_player.dart';
 import 'package:colla_chat/widgets/media/video/flick_video_player.dart';
-import 'package:colla_chat/widgets/media/video/flutter_vlc_video_player.dart';
-import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
 import 'package:colla_chat/widgets/media/video/webview_video_player.dart';
 import 'package:flutter/material.dart';
 
 enum MediaPlayerType {
-  chewie,
   dart_vlc,
-  flutter_vlc,
   flick,
-  fijk,
-  origin,
-  appinio,
   webview,
   just,
   bluefire,
@@ -87,18 +78,7 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
       case MediaPlayerType.flick:
         controller = FlickVideoPlayerController();
         break;
-      case MediaPlayerType.chewie:
-        controller = ChewieVideoPlayerController();
-        break;
-      case MediaPlayerType.fijk:
-        controller = FijkVideoPlayerController();
-        break;
-      case MediaPlayerType.origin:
-        controller = OriginVideoPlayerController();
-        break;
-      case MediaPlayerType.flutter_vlc:
-        controller = FlutterVlcVideoPlayerController();
-        break;
+
       case MediaPlayerType.webview:
         controller = WebviewVideoPlayerController();
         break;
