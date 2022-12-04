@@ -180,7 +180,7 @@ class _PlatformJustAudioControllerPanelState
           } else {
             status = widget.controller.status;
           }
-          Widget playback = PlatformMediaPlayerUtil.buildPlayback(
+          Widget playback = PlatformMediaPlayerUtil.buildPlaybackButton(
               context, widget.controller, status, widget.showPlaylist);
 
           return playback;

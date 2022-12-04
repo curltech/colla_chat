@@ -1,19 +1,16 @@
 import 'dart:io';
-
+import 'package:universal_html/html.dart' as html;
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flick_video_player/src/utils/web_key_bindings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:universal_html/html.dart' as html;
 import 'package:video_player/video_player.dart';
 
 class FlickMediaSource {
-  static Future<VideoPlayerController> media(
-      {String? filename, Uint8List? data}) async {
+  static Future<FlickManager> media({String? filename, Uint8List? data}) async {
     VideoPlayerController videoPlayerController;
     if (filename != null) {
       if (filename.startsWith('assets/')) {
@@ -30,89 +27,96 @@ class FlickMediaSource {
     }
     await videoPlayerController.initialize();
 
-    return videoPlayerController;
+    return FlickManager(
+      videoPlayerController: videoPlayerController,
+      autoPlay: false,
+    );
   }
 
-  static Future<VideoPlayerController> fromMediaSource(
-      PlatformMediaSource mediaSource) async {
-    return await media(filename: mediaSource.filename);
+  static Future<List<FlickManager>> fromMediaSource(
+      List<PlatformMediaSource> mediaSources) async {
+    List<FlickManager> flickManagers = [];
+    for (var mediaSource in mediaSources) {
+      flickManagers.add(await media(filename: mediaSource.filename));
+    }
+
+    return flickManagers;
   }
 }
 
 ///基于flick实现的媒体播放器和记录器，
 class FlickVideoPlayerController extends AbstractMediaPlayerController {
-  VideoPlayerController? videoPlayerController;
-  FlickManager? _flickManager;
+  List<FlickManager> flickManagers = [];
 
   FlickVideoPlayerController();
 
-  _open({bool autoStart = false}) {}
-
-  @override
-  PlayerStatus get status {
-    VideoPlayerValue value = videoPlayerController!.value;
-    if (value.isPlaying) {
-      return PlayerStatus.playing;
-    } else if (value.isBuffering) {
-      return PlayerStatus.buffering;
-    } else if (value.isInitialized) {
-      return PlayerStatus.init;
+  FlickManager? get currentFlickManager {
+    if (currentIndex >= 0 && currentIndex < flickManagers.length) {
+      return flickManagers[currentIndex];
     }
-
-    return PlayerStatus.stop;
+    return null;
   }
 
   @override
-  setCurrentIndex(int? index) async {
-    super.setCurrentIndex(index);
-    if (currentMediaSource != null) {
-      videoPlayerController =
-          await FlickMediaSource.fromMediaSource(currentMediaSource!);
-      _flickManager =
-          FlickManager(videoPlayerController: videoPlayerController!);
+  PlayerStatus get status {
+    if (currentFlickManager != null) {
+      var flickVideoManager = currentFlickManager!.flickVideoManager;
+      if (flickVideoManager != null) {
+        if (flickVideoManager.isPlaying) {
+          return PlayerStatus.playing;
+        } else if (flickVideoManager.isBuffering) {
+          return PlayerStatus.buffering;
+        } else if (flickVideoManager.isVideoInitialized) {
+          return PlayerStatus.init;
+        } else if (flickVideoManager.isVideoEnded) {
+          return PlayerStatus.completed;
+        }
+      }
     }
+
+    return PlayerStatus.init;
   }
 
   ///基本的视频控制功能
   @override
   play() {
-    if (_flickManager != null) {
-      _flickManager!.flickControlManager?.play();
+    if (currentFlickManager != null) {
+      currentFlickManager?.flickControlManager?.play();
     }
   }
 
   @override
   seek(Duration position, {int? index}) {
-    if (_flickManager != null) {
-      _flickManager?.flickControlManager?.seekTo(position);
+    if (currentFlickManager != null) {
+      currentFlickManager?.flickControlManager?.seekTo(position);
     }
   }
 
   @override
   pause() {
-    if (_flickManager != null) {
-      _flickManager?.flickControlManager?.pause();
+    if (currentFlickManager != null) {
+      currentFlickManager?.flickControlManager?.pause();
     }
   }
 
   @override
   resume() {
-    if (_flickManager != null) {
-      _flickManager?.flickControlManager?.play();
+    if (currentFlickManager != null) {
+      currentFlickManager?.flickControlManager?.play();
     }
   }
 
   @override
   stop() {
-    if (_flickManager != null) {
-      _flickManager?.flickControlManager?.pause();
+    if (currentFlickManager != null) {
+      currentFlickManager?.flickControlManager?.pause();
     }
   }
 
   @override
   Future<Duration?> getBufferedPosition() async {
-    if (_flickManager != null) {
-      return Future.value(_flickManager
+    if (currentFlickManager != null) {
+      return Future.value(currentFlickManager
           ?.flickVideoManager?.videoPlayerValue?.buffered[0].start);
     }
     return null;
@@ -120,18 +124,18 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   Future<Duration?> getDuration() async {
-    if (_flickManager != null) {
+    if (currentFlickManager != null) {
       return Future.value(
-          _flickManager?.flickVideoManager?.videoPlayerValue?.duration);
+          currentFlickManager?.flickVideoManager?.videoPlayerValue?.duration);
     }
     return null;
   }
 
   @override
   Future<Duration?> getPosition() async {
-    if (_flickManager != null) {
+    if (currentFlickManager != null) {
       return Future.value(
-          _flickManager?.flickVideoManager?.videoPlayerValue?.position);
+          currentFlickManager?.flickVideoManager?.videoPlayerValue?.position);
     }
     return null;
   }
@@ -139,8 +143,9 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
   @override
   Future<double> getSpeed() {
     double speed = 1.0;
-    if (_flickManager != null) {
-      speed = _flickManager!.flickVideoManager!.videoPlayerValue!.playbackSpeed;
+    if (currentFlickManager != null) {
+      speed = currentFlickManager!
+          .flickVideoManager!.videoPlayerValue!.playbackSpeed;
     }
     return Future.value(speed);
   }
@@ -148,24 +153,82 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
   @override
   Future<double> getVolume() {
     double volume = 1.0;
-    if (_flickManager != null) {
-      volume = _flickManager!.flickVideoManager!.videoPlayerValue!.volume;
+    if (currentFlickManager != null) {
+      volume = currentFlickManager!.flickVideoManager!.videoPlayerValue!.volume;
     }
     return Future.value(volume);
   }
 
   @override
   setVolume(double volume) {
-    if (_flickManager != null) {
-      _flickManager?.flickControlManager?.setVolume(volume);
+    if (currentFlickManager != null) {
+      currentFlickManager?.flickControlManager?.setVolume(volume);
     }
   }
 
   @override
   setSpeed(double speed) {
-    if (_flickManager != null) {
-      _flickManager?.flickControlManager?.setPlaybackSpeed(speed);
+    if (currentFlickManager != null) {
+      currentFlickManager?.flickControlManager?.setPlaybackSpeed(speed);
     }
+  }
+
+  ///下面是播放列表的功能
+  @override
+  Future<PlatformMediaSource?> add({String? filename, List<int>? data}) async {
+    PlatformMediaSource? mediaSource =
+        await super.add(filename: filename, data: data);
+    if (mediaSource != null) {
+      FlickManager flickManager =
+          await FlickMediaSource.media(filename: mediaSource.filename);
+      flickManagers.add(flickManager);
+      if (currentIndex == -1) {
+        setCurrentIndex(flickManagers.length - 1);
+      }
+    }
+
+    return mediaSource;
+  }
+
+  @override
+  remove(int index) {
+    super.remove(index);
+    if (index >= 0 && index < playlist.length) {
+      FlickManager flickManager = flickManagers[index];
+      flickManagers.removeAt(index);
+      flickManager.dispose();
+    }
+  }
+
+  @override
+  Future<PlatformMediaSource?> insert(int index,
+      {String? filename, List<int>? data}) async {
+    PlatformMediaSource? mediaSource =
+        await super.insert(index, filename: filename, data: data);
+    if (mediaSource != null) {
+      FlickManager flickManager =
+          await FlickMediaSource.media(filename: mediaSource.filename);
+      flickManagers.insert(index, flickManager);
+
+      if (currentIndex == -1) {
+        setCurrentIndex(index);
+      }
+    }
+    return mediaSource;
+  }
+
+  @override
+  next() {
+    stop();
+    super.next();
+    play();
+  }
+
+  @override
+  previous() {
+    stop();
+    super.previous();
+    play();
   }
 
   takeSnapshot(
@@ -182,7 +245,6 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   Widget buildMediaView({
-    Key? key,
     double? width,
     double? height,
     BoxFit fit = BoxFit.contain,
@@ -207,44 +269,21 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
     dynamic Function(html.KeyboardEvent, FlickManager) webKeyDownHandler =
         flickDefaultWebKeyDownHandler,
   }) {
+    if (currentFlickManager == null) {
+      return const Center(child: Text('Please select a MediaPlayerType!'));
+    }
     var flickVideoPlayer = FlickVideoPlayer(
-      flickManager: _flickManager!,
-      flickVideoWithControls: FlickVideoWithControls(
-        playerLoadingFallback: Positioned.fill(
-          child: Stack(
-            children: <Widget>[
-              Positioned.fill(
-                child: Container(),
-              ),
-              const Positioned(
-                right: 10,
-                top: 10,
-                child: SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    backgroundColor: Colors.white,
-                    strokeWidth: 4,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        controls: FeedPlayerPortraitControls(
-          flickMultiManager: this,
-          flickManager: _flickManager,
-        ),
-      ),
-      flickVideoWithControlsFullscreen: FlickVideoWithControls(
-        playerLoadingFallback: Container(),
-        controls: const FlickLandscapeControls(),
-        iconThemeData: const IconThemeData(
-          size: 40,
-          color: Colors.white,
-        ),
-        textStyle: const TextStyle(fontSize: 16, color: Colors.white),
-      ),
+      flickManager: currentFlickManager!,
+      flickVideoWithControls: flickVideoWithControls,
+      flickVideoWithControlsFullscreen: flickVideoWithControlsFullscreen,
+      systemUIOverlay: systemUIOverlay,
+      systemUIOverlayFullscreen: systemUIOverlayFullscreen,
+      preferredDeviceOrientation: preferredDeviceOrientation,
+      preferredDeviceOrientationFullscreen:
+          preferredDeviceOrientationFullscreen,
+      wakelockEnabled: wakelockEnabled,
+      wakelockEnabledFullscreen: wakelockEnabledFullscreen,
+      webKeyDownHandler: webKeyDownHandler,
     );
     return flickVideoPlayer;
   }
@@ -254,39 +293,10 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   close() {
-    if (_flickManager != null) {
-      _flickManager!.dispose();
-      videoPlayerController!.dispose();
-      videoPlayerController = null;
-      _flickManager = null;
+    for (var flickManager in flickManagers) {
+      flickManager.dispose();
     }
-  }
-
-  @override
-  Future<List<PlatformMediaSource>> sourceFilePicker({
-    String? dialogTitle,
-    String? initialDirectory,
-    FileType type = FileType.audio,
-    List<String>? allowedExtensions,
-    dynamic Function(FilePickerStatus)? onFileLoading,
-    bool allowCompression = true,
-    bool allowMultiple = true,
-    bool withData = false,
-    bool withReadStream = false,
-    bool lockParentWindow = false,
-  }) async {
-    return super.sourceFilePicker(
-      dialogTitle: dialogTitle,
-      initialDirectory: initialDirectory,
-      type: FileType.video,
-      allowedExtensions: allowedExtensions,
-      onFileLoading: onFileLoading,
-      allowCompression: allowCompression,
-      allowMultiple: allowMultiple,
-      withData: withData,
-      withReadStream: withReadStream,
-      lockParentWindow: lockParentWindow,
-    );
+    flickManagers = [];
   }
 }
 

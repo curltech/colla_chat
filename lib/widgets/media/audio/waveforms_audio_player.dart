@@ -178,7 +178,7 @@ class _WaveformsAudioControllerPanelState
       rows.add(PlatformMediaPlayerUtil.buildVolumeButton(
           context, widget.controller));
     }
-    rows.add(PlatformMediaPlayerUtil.buildPlayback(context, widget.controller,
+    rows.add(PlatformMediaPlayerUtil.buildPlaybackButton(context, widget.controller,
         widget.controller.status, widget.showPlaylist));
 
     return Row(

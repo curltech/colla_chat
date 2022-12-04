@@ -189,30 +189,4 @@ class FlutterVlcVideoPlayerController extends AbstractMediaPlayerController {
     }
   }
 
-  @override
-  Future<List<PlatformMediaSource>> sourceFilePicker({
-    String? dialogTitle,
-    String? initialDirectory,
-    FileType type = FileType.audio,
-    List<String>? allowedExtensions,
-    dynamic Function(FilePickerStatus)? onFileLoading,
-    bool allowCompression = true,
-    bool allowMultiple = true,
-    bool withData = false,
-    bool withReadStream = false,
-    bool lockParentWindow = false,
-  }) async {
-    return super.sourceFilePicker(
-      dialogTitle: dialogTitle,
-      initialDirectory: initialDirectory,
-      type: FileType.video,
-      allowedExtensions: allowedExtensions,
-      onFileLoading: onFileLoading,
-      allowCompression: allowCompression,
-      allowMultiple: allowMultiple,
-      withData: withData,
-      withReadStream: withReadStream,
-      lockParentWindow: lockParentWindow,
-    );
-  }
 }

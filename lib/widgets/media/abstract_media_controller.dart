@@ -92,10 +92,11 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   List<PlatformMediaSource> playlist = [];
   bool _playlistVisible = true;
   bool _speedSlideVisible = false;
-  bool _volumeSlideVisible = false;
+  bool _volumeSlideVisible = true;
   bool autoPlay = false;
-  int? _currentIndex;
+  int _currentIndex = -1;
   PlayerStatus _status = PlayerStatus.init;
+  FileType fileType = FileType.video;
 
   bool get playlistVisible {
     return _playlistVisible;
@@ -130,35 +131,36 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     notifyListeners();
   }
 
-  int? get currentIndex {
+  int get currentIndex {
     return _currentIndex;
   }
 
   ///设置当前的通用MediaSource，子类转换成特定实现的媒体源，并进行设置
   setCurrentIndex(int? index) {
-    close();
-    if (index != _currentIndex) {
+    if (index != null && index >= -1 && index < playlist.length) {
       _currentIndex = index;
+      notifyListeners();
     }
-    notifyListeners();
   }
 
   PlatformMediaSource? get currentMediaSource {
-    if (_currentIndex != null) {
-      return playlist[_currentIndex!];
+    if (_currentIndex >= 0 && currentIndex < playlist.length) {
+      return playlist[_currentIndex];
     }
     return null;
   }
 
   next() {
-    if (_currentIndex != null) {
-      setCurrentIndex(_currentIndex! + 1);
+    if (_currentIndex >= 0 && _currentIndex! < playlist.length - 1) {
+      _currentIndex = _currentIndex + 1;
+      notifyListeners();
     }
   }
 
   previous() {
-    if (_currentIndex != null) {
-      setCurrentIndex(_currentIndex! - 1);
+    if (_currentIndex > 0) {
+      _currentIndex = _currentIndex! - 1;
+      notifyListeners();
     }
   }
 
@@ -205,11 +207,13 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   }
 
   remove(int index) async {
-    playlist.removeAt(index);
-    if (index == 0) {
-      await setCurrentIndex(index);
-    } else {
-      await setCurrentIndex(index - 1);
+    if (index >= 0 && index < playlist.length) {
+      playlist.removeAt(index);
+      if (index == 0) {
+        await setCurrentIndex(index);
+      } else {
+        await setCurrentIndex(index - 1);
+      }
     }
   }
 
@@ -253,7 +257,6 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   Future<List<PlatformMediaSource>> sourceFilePicker({
     String? dialogTitle,
     String? initialDirectory,
-    FileType type = FileType.audio,
     List<String>? allowedExtensions,
     dynamic Function(FilePickerStatus)? onFileLoading,
     bool allowCompression = true,
@@ -264,7 +267,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   }) async {
     List<PlatformMediaSource> mediaSources = [];
     final xfiles =
-        await FileUtil.pickFiles(allowMultiple: allowMultiple, type: type);
+        await FileUtil.pickFiles(allowMultiple: allowMultiple, type: fileType);
     if (xfiles.isNotEmpty) {
       for (var xfile in xfiles) {
         PlatformMediaSource? mediaSource = await add(filename: xfile.path);

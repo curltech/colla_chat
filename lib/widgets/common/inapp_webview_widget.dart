@@ -22,6 +22,7 @@ class InAppWebViewUrlController with ChangeNotifier {
 InAppWebViewUrlController inAppWebViewUrlController =
     InAppWebViewUrlController();
 
+/// 不支持Windows和linux
 class InAppWebViewWidget extends StatefulWidget with TileDataMixin {
   const InAppWebViewWidget({super.key});
 
