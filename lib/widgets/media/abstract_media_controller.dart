@@ -87,100 +87,6 @@ class PlatformMediaSource {
   }
 }
 
-///定义音频录音控制器的接口
-///支持多种设备，windows测试通过
-///Android, iOS, Linux, macOS, Windows, and web.
-abstract class AbstractAudioRecorderController with ChangeNotifier {
-  String? filename;
-  RecorderStatus _status = RecorderStatus.stop;
-  Timer? _timer;
-  int _duration = -1;
-  String _durationText = '';
-
-  Future<bool> hasPermission();
-
-  RecorderStatus get status {
-    return _status;
-  }
-
-  set status(RecorderStatus status) {
-    if (_status != status) {
-      _status = status;
-      notifyListeners();
-    }
-  }
-
-  Future<void> start({String? filename}) async {
-    if (filename == null) {
-      final dir = await getTemporaryDirectory();
-      var name = DateUtil.currentDate();
-      filename = '${dir.path}/$name.mp3';
-    }
-    this.filename = filename;
-    startTimer();
-  }
-
-  Future<String?> stop() async {
-    cancelTimer();
-
-    return null;
-  }
-
-  Future<void> pause();
-
-  Future<void> resume();
-
-  @override
-  dispose() {
-    super.dispose();
-    cancelTimer();
-  }
-
-  void startTimer() {
-    cancelTimer();
-
-    _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
-      if (status == RecorderStatus.recording) {
-        duration = duration + 1;
-        notifyListeners();
-      }
-    });
-  }
-
-  void cancelTimer() {
-    if (_timer != null) {
-      _timer?.cancel();
-      _timer = null;
-      duration = 0;
-    }
-  }
-
-  int get duration {
-    return _duration;
-  }
-
-  set duration(int duration) {
-    if (_duration != duration) {
-      _duration = duration;
-      _changeDurationText();
-    }
-  }
-
-  String get durationText {
-    return _durationText;
-  }
-
-  _changeDurationText() {
-    var duration = Duration(seconds: _duration);
-    var durationText = duration.toString();
-    var pos = durationText.lastIndexOf('.');
-    durationText = durationText.substring(0, pos);
-    //'${duration.inHours}:${duration.inMinutes}:${duration.inSeconds}';
-
-    _durationText = durationText;
-  }
-}
-
 ///定义通用媒体播放控制器的接口，包含音频和视频
 abstract class AbstractMediaPlayerController with ChangeNotifier {
   List<PlatformMediaSource> playlist = [];
@@ -523,5 +429,99 @@ class AudioWaveformPainter extends CustomPainter {
       final y = 128 + (scale * s).clamp(-128.0, 127.0).toDouble();
       return height - 1 - y * height / 256;
     }
+  }
+}
+
+///定义音频录音控制器的接口
+///支持多种设备，windows测试通过
+///Android, iOS, Linux, macOS, Windows, and web.
+abstract class AbstractAudioRecorderController with ChangeNotifier {
+  String? filename;
+  RecorderStatus _status = RecorderStatus.stop;
+  Timer? _timer;
+  int _duration = -1;
+  String _durationText = '';
+
+  Future<bool> hasPermission();
+
+  RecorderStatus get status {
+    return _status;
+  }
+
+  set status(RecorderStatus status) {
+    if (_status != status) {
+      _status = status;
+      notifyListeners();
+    }
+  }
+
+  Future<void> start({String? filename}) async {
+    if (filename == null) {
+      final dir = await getTemporaryDirectory();
+      var name = DateUtil.currentDate();
+      filename = '${dir.path}/$name.mp3';
+    }
+    this.filename = filename;
+    startTimer();
+  }
+
+  Future<String?> stop() async {
+    cancelTimer();
+
+    return null;
+  }
+
+  Future<void> pause();
+
+  Future<void> resume();
+
+  @override
+  dispose() {
+    super.dispose();
+    cancelTimer();
+  }
+
+  void startTimer() {
+    cancelTimer();
+
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
+      if (status == RecorderStatus.recording) {
+        duration = duration + 1;
+        notifyListeners();
+      }
+    });
+  }
+
+  void cancelTimer() {
+    if (_timer != null) {
+      _timer?.cancel();
+      _timer = null;
+      duration = 0;
+    }
+  }
+
+  int get duration {
+    return _duration;
+  }
+
+  set duration(int duration) {
+    if (_duration != duration) {
+      _duration = duration;
+      _changeDurationText();
+    }
+  }
+
+  String get durationText {
+    return _durationText;
+  }
+
+  _changeDurationText() {
+    var duration = Duration(seconds: _duration);
+    var durationText = duration.toString();
+    var pos = durationText.lastIndexOf('.');
+    durationText = durationText.substring(0, pos);
+    //'${duration.inHours}:${duration.inMinutes}:${duration.inSeconds}';
+
+    _durationText = durationText;
   }
 }

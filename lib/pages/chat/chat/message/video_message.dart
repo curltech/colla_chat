@@ -1,5 +1,5 @@
 import 'package:colla_chat/service/chat/chat.dart';
-import 'package:colla_chat/widgets/media/video/platform_video_player.dart';
+import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:flutter/material.dart';
 
 ///消息体：视频消息
@@ -26,11 +26,12 @@ class VideoMessage extends StatelessWidget {
           if (filename == null) {
             return Container();
           }
-          return PlatformVideoPlayer(
-              id: id,
-              showControls: true,
-              showPlaylist: false,
-              filename: filename);
+          return PlatformMediaPlayer(
+            showControls: true,
+            showPlaylist: false,
+            filename: filename,
+            mediaPlayerType: MediaPlayerType.chewie,
+          );
         });
     return SizedBox(height: 80, child: Card(elevation: 0, child: videoPlayer));
   }

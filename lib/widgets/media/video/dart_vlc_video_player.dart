@@ -1,7 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/media/media_player_slider.dart';
@@ -10,6 +9,7 @@ import 'package:colla_chat/widgets/media/abstract_media_controller.dart'
 import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_player_util.dart';
 import 'package:dart_vlc/dart_vlc.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:visibility_detector/visibility_detector.dart';
@@ -54,30 +54,26 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
   late Player player;
   CurrentState? currentState;
   PositionState? positionState;
-
   PlaybackState? playbackState;
-
   GeneralState? generalState;
-
   VideoDimensions? videoDimensions;
-
   double bufferingProgress = 0.0;
-  List<Media> medias = <Media>[];
-  List<Device> devices = Devices.all;
+  List<Device> devices = [];
 
   DartVlcVideoPlayerController({
     int id = 0,
     bool registerTexture = true,
-    VideoDimensions? videoDimensions,
+    VideoDimensions? videoDimensions = const VideoDimensions(640, 360),
     List<String>? commandlineArguments,
     dynamic bool = false,
   }) {
+    DartVLC.initialize();
+    devices = Devices.all;
     player = Player(
-        id: id,
-        registerTexture: !platformParams.windows,
-        videoDimensions: videoDimensions,
-        commandlineArguments: commandlineArguments,
-        bool: bool);
+      id: id,
+      videoDimensions: videoDimensions,
+      commandlineArguments: commandlineArguments,
+    );
     player.currentStream.listen((currentState) {
       this.currentState = currentState;
       logger.i('libvlc currentState:$currentState');
@@ -181,11 +177,13 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
 
   ///下面是播放列表的功能
   @override
-  Future<platform.PlatformMediaSource?> add({String? filename, List<int>? data}) async {
+  Future<platform.PlatformMediaSource?> add(
+      {String? filename, List<int>? data}) async {
     platform.PlatformMediaSource? mediaSource =
         await super.add(filename: filename, data: data);
     if (mediaSource != null) {
-      Media media = await DartVlcMediaSource.media(filename: mediaSource.filename);
+      Media media =
+          await DartVlcMediaSource.media(filename: mediaSource.filename);
       player.add(media);
     }
 
@@ -204,7 +202,8 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
     platform.PlatformMediaSource? mediaSource =
         await super.insert(index, filename: filename, data: data);
     if (mediaSource != null) {
-      Media media = await DartVlcMediaSource.media(filename: mediaSource.filename);
+      Media media =
+          await DartVlcMediaSource.media(filename: mediaSource.filename);
       player.insert(index, media);
     }
     return mediaSource;
@@ -285,110 +284,6 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
     });
   }
 
-  Video _buildVideoWidget({
-    Key? key,
-    int? playerId,
-    Player? player,
-    double? width,
-    double? height,
-    BoxFit fit = BoxFit.contain,
-    AlignmentGeometry alignment = Alignment.center,
-    double scale = 1.0,
-    bool showControls = true,
-    Color? progressBarActiveColor,
-    Color? progressBarInactiveColor = Colors.white24,
-    Color? progressBarThumbColor,
-    Color? progressBarThumbGlowColor = const Color.fromRGBO(0, 161, 214, .2),
-    Color? volumeActiveColor,
-    Color? volumeInactiveColor = Colors.grey,
-    Color volumeBackgroundColor = const Color(0xff424242),
-    Color? volumeThumbColor,
-    double? progressBarThumbRadius = 10.0,
-    double? progressBarThumbGlowRadius = 15.0,
-    bool showTimeLeft = false,
-    TextStyle progressBarTextStyle = const TextStyle(),
-    FilterQuality filterQuality = FilterQuality.low,
-    bool showFullscreenButton = false,
-    Color fillColor = Colors.black,
-  }) {
-    player = player ?? this.player;
-    return Video(
-      key: key,
-      playerId: playerId,
-      player: player,
-      width: width,
-      height: height,
-      fit: fit,
-      alignment: alignment,
-      scale: scale,
-      showControls: showControls,
-      progressBarActiveColor: progressBarActiveColor,
-      progressBarInactiveColor: progressBarInactiveColor,
-      progressBarThumbColor: progressBarThumbColor,
-      progressBarThumbGlowColor: progressBarThumbGlowColor,
-      volumeActiveColor: volumeActiveColor,
-      volumeInactiveColor: volumeInactiveColor,
-      volumeBackgroundColor: volumeBackgroundColor,
-      volumeThumbColor: volumeThumbColor,
-      progressBarThumbRadius: progressBarThumbRadius,
-      progressBarThumbGlowRadius: progressBarThumbGlowRadius,
-      showTimeLeft: showTimeLeft,
-      progressBarTextStyle: progressBarTextStyle,
-      filterQuality: filterQuality,
-      showFullscreenButton: showFullscreenButton,
-      fillColor: fillColor,
-    );
-  }
-
-  NativeVideo _buildNativeVideoWidget({
-    Key? key,
-    Player? player,
-    double? width,
-    double? height,
-    BoxFit fit = BoxFit.contain,
-    AlignmentGeometry alignment = Alignment.center,
-    double scale = 1.0,
-    bool showControls = true,
-    Color? progressBarActiveColor,
-    Color? progressBarInactiveColor = Colors.white24,
-    Color? progressBarThumbColor,
-    Color? progressBarThumbGlowColor = const Color.fromRGBO(0, 161, 214, .2),
-    Color? volumeActiveColor,
-    Color? volumeInactiveColor = Colors.grey,
-    Color volumeBackgroundColor = const Color(0xff424242),
-    Color? volumeThumbColor,
-    double? progressBarThumbRadius = 10.0,
-    double? progressBarThumbGlowRadius = 15.0,
-    bool showTimeLeft = false,
-    TextStyle progressBarTextStyle = const TextStyle(),
-    FilterQuality filterQuality = FilterQuality.low,
-  }) {
-    player = player ?? this.player;
-    return NativeVideo(
-      key: key,
-      player: player,
-      width: width,
-      height: height,
-      fit: fit,
-      alignment: alignment,
-      scale: scale,
-      showControls: showControls,
-      progressBarActiveColor: progressBarActiveColor,
-      progressBarInactiveColor: progressBarInactiveColor,
-      progressBarThumbColor: progressBarThumbColor,
-      progressBarThumbGlowColor: progressBarThumbGlowColor,
-      volumeActiveColor: volumeActiveColor,
-      volumeInactiveColor: volumeInactiveColor,
-      volumeBackgroundColor: volumeBackgroundColor,
-      volumeThumbColor: volumeThumbColor,
-      progressBarThumbRadius: progressBarThumbRadius,
-      progressBarThumbGlowRadius: progressBarThumbGlowRadius,
-      showTimeLeft: showTimeLeft,
-      progressBarTextStyle: progressBarTextStyle,
-      filterQuality: filterQuality,
-    );
-  }
-
   @override
   Widget buildMediaView({
     Key? key,
@@ -412,62 +307,33 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
     bool showTimeLeft = false,
     TextStyle progressBarTextStyle = const TextStyle(),
     FilterQuality filterQuality = FilterQuality.low,
-    bool showFullscreenButton = false,
     Color fillColor = Colors.black,
   }) {
-    if (platformParams.windows) {
-      return _buildVideoWidget(
-        key: key,
-        player: player,
-        width: width,
-        height: height,
-        fit: fit,
-        alignment: alignment,
-        scale: scale,
-        showControls: showControls,
-        progressBarActiveColor: progressBarActiveColor,
-        progressBarInactiveColor: progressBarInactiveColor,
-        progressBarThumbColor: progressBarThumbColor,
-        progressBarThumbGlowColor: progressBarThumbGlowColor,
-        volumeActiveColor: volumeActiveColor,
-        volumeInactiveColor: volumeInactiveColor,
-        volumeBackgroundColor: volumeBackgroundColor,
-        volumeThumbColor: volumeThumbColor,
-        progressBarThumbRadius: progressBarThumbRadius,
-        progressBarThumbGlowRadius: progressBarThumbGlowRadius,
-        showTimeLeft: showTimeLeft,
-        progressBarTextStyle: progressBarTextStyle,
-        filterQuality: filterQuality,
-        // showFullscreenButton: showFullscreenButton,
-        // fillColor: fillColor,
-      );
-    } else {
-      return _buildVideoWidget(
-        key: key,
-        player: player,
-        width: width,
-        height: height,
-        fit: fit,
-        alignment: alignment,
-        scale: scale,
-        showControls: showControls,
-        progressBarActiveColor: progressBarActiveColor,
-        progressBarInactiveColor: progressBarInactiveColor,
-        progressBarThumbColor: progressBarThumbColor,
-        progressBarThumbGlowColor: progressBarThumbGlowColor,
-        volumeActiveColor: volumeActiveColor,
-        volumeInactiveColor: volumeInactiveColor,
-        volumeBackgroundColor: volumeBackgroundColor,
-        volumeThumbColor: volumeThumbColor,
-        progressBarThumbRadius: progressBarThumbRadius,
-        progressBarThumbGlowRadius: progressBarThumbGlowRadius,
-        showTimeLeft: showTimeLeft,
-        progressBarTextStyle: progressBarTextStyle,
-        filterQuality: filterQuality,
-        // showFullscreenButton: showFullscreenButton,
-        // fillColor: fillColor,
-      );
-    }
+    player = player ?? this.player;
+    return Video(
+      key: key,
+      player: player,
+      width: width,
+      height: height,
+      fit: fit,
+      alignment: alignment,
+      scale: scale,
+      showControls: showControls,
+      progressBarActiveColor: progressBarActiveColor,
+      progressBarInactiveColor: progressBarInactiveColor,
+      progressBarThumbColor: progressBarThumbColor,
+      progressBarThumbGlowColor: progressBarThumbGlowColor,
+      volumeActiveColor: volumeActiveColor,
+      volumeInactiveColor: volumeInactiveColor,
+      volumeBackgroundColor: volumeBackgroundColor,
+      volumeThumbColor: volumeThumbColor,
+      progressBarThumbRadius: progressBarThumbRadius,
+      progressBarThumbGlowRadius: progressBarThumbGlowRadius,
+      showTimeLeft: showTimeLeft,
+      progressBarTextStyle: progressBarTextStyle,
+      filterQuality: filterQuality,
+      fillColor: fillColor,
+    );
   }
 
   setEqualizer({double? band, double? preAmp, double? amp}) {
@@ -506,6 +372,39 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   close() {}
+
+  @override
+  Future<List<PlatformMediaSource>> sourceFilePicker({
+    String? dialogTitle,
+    String? initialDirectory,
+    FileType type = FileType.audio,
+    List<String>? allowedExtensions,
+    dynamic Function(FilePickerStatus)? onFileLoading,
+    bool allowCompression = true,
+    bool allowMultiple = true,
+    bool withData = false,
+    bool withReadStream = false,
+    bool lockParentWindow = false,
+  }) async {
+    List<PlatformMediaSource> sources = await super.sourceFilePicker(
+      dialogTitle: dialogTitle,
+      initialDirectory: initialDirectory,
+      type: FileType.video,
+      allowedExtensions: allowedExtensions,
+      onFileLoading: onFileLoading,
+      allowCompression: allowCompression,
+      allowMultiple: allowMultiple,
+      withData: withData,
+      withReadStream: withReadStream,
+      lockParentWindow: lockParentWindow,
+    );
+    for (var source in sources) {
+      Media media = await DartVlcMediaSource.media(filename: source.filename);
+      player.add(media);
+    }
+
+    return sources;
+  }
 }
 
 class DartVlcMediaRecorder {
@@ -667,8 +566,7 @@ class DartVlcControllerPanel extends StatefulWidget {
   State createState() => _DartVlcControllerPanelState();
 }
 
-class _DartVlcControllerPanelState
-    extends State<DartVlcControllerPanel> {
+class _DartVlcControllerPanelState extends State<DartVlcControllerPanel> {
   @override
   void initState() {
     super.initState();

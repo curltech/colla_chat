@@ -226,7 +226,7 @@ dependencies:
   video_player_win: ^1.1.0
   video_player_macos: ^1.0.6
   video_player_control_panel: ^1.0.6
-  dart_vlc: ^0.2.1
+  dart_vlc: ^0.4.0
   chewie: ^1.3.6 #video_player的封装
   better_player: ^0.0.83 #chewie的封装
   fijkplayer: ^0.10.1 #mobile
