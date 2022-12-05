@@ -1,80 +1,76 @@
+import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/platform_webview.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart' as inapp;
+import 'package:webview_flutter/platform_interface.dart';
+import 'package:webview_flutter/webview_flutter.dart' as webview;
 import 'package:url_launcher/url_launcher.dart';
 
-class InAppWebViewUrlController with ChangeNotifier {
-  String _url = '';
+import 'package:webview_win_floating/webview.dart';
 
-  String get url {
-    return _url;
+///
+class PlatformWebViewWidget extends StatefulWidget with TileDataMixin {
+  PlatformWebViewWidget({super.key}) {
+    if (platformParams.windows) {
+      webview.WebView.platform = WindowsWebViewPlugin();
+    }
+
+    if (platformParams.android) {
+      webview.WebView.platform = webview.AndroidWebView();
+    }
   }
-
-  set url(String url) {
-    _url = url;
-    notifyListeners();
-  }
-}
-
-InAppWebViewUrlController inAppWebViewUrlController =
-    InAppWebViewUrlController();
-
-/// 不支持Windows和linux
-class InAppWebViewWidget extends StatefulWidget with TileDataMixin {
-  const InAppWebViewWidget({super.key});
 
   @override
-  State createState() => _InAppWebViewWidgetState();
+  State createState() => _PlatformWebViewWidgetState();
 
   @override
   bool get withLeading => true;
 
   @override
-  String get routeName => 'inapp_webview';
+  String get routeName => 'webview';
 
   @override
   Icon get icon => const Icon(Icons.person);
 
   @override
-  String get title => 'InApp Webview';
+  String get title => 'Webview';
 }
 
-class _InAppWebViewWidgetState extends State<InAppWebViewWidget> {
-  final GlobalKey webViewKey = GlobalKey();
-  InAppWebViewController? webViewController;
-  InAppWebViewSettings settings = InAppWebViewSettings(
+class _PlatformWebViewWidgetState extends State<PlatformWebViewWidget> {
+  String initialUrl = 'https://bing.com/';
+  PlatformWebViewController? webViewController;
+  inapp.InAppWebViewSettings settings = inapp.InAppWebViewSettings(
       useShouldOverrideUrlLoading: true,
       mediaPlaybackRequiresUserGesture: false,
       allowsInlineMediaPlayback: true,
       iframeAllow: "camera; microphone",
       iframeAllowFullscreen: true);
 
-  PullToRefreshController? pullToRefreshController;
+  inapp.PullToRefreshController? pullToRefreshController;
 
-  //String url = "";
   double progress = 0;
   final urlController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    inAppWebViewUrlController.addListener(_update);
     pullToRefreshController = kIsWeb
         ? null
-        : PullToRefreshController(
-            settings: PullToRefreshSettings(
+        : inapp.PullToRefreshController(
+            settings: inapp.PullToRefreshSettings(
               color: Colors.blue,
             ),
             onRefresh: () async {
               if (defaultTargetPlatform == TargetPlatform.android) {
                 webViewController?.reload();
               } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-                webViewController?.loadUrl(
-                    urlRequest:
-                        URLRequest(url: await webViewController?.getUrl()));
+                String? url = await webViewController?.getUrl();
+                webViewController?.load(url);
               }
             },
           );
@@ -86,15 +82,15 @@ class _InAppWebViewWidgetState extends State<InAppWebViewWidget> {
 
   @override
   Widget build(BuildContext context) {
-    urlController.text = inAppWebViewUrlController.url;
     return AppBarView(
+        title: Text(AppLocalizations.t(widget.title)),
         withLeading: true,
         child: Column(children: <Widget>[
           buildTextField(),
           Expanded(
             child: Stack(
               children: [
-                buildInAppWebView(),
+                buildWebView(),
                 progress < 1.0
                     ? LinearProgressIndicator(value: progress)
                     : Container(),
@@ -107,36 +103,52 @@ class _InAppWebViewWidgetState extends State<InAppWebViewWidget> {
 
   TextField buildTextField() {
     return TextField(
-      decoration: const InputDecoration(prefixIcon: Icon(Icons.search)),
+      decoration: const InputDecoration(prefixIcon: Icon(Icons.http)),
       controller: urlController,
       keyboardType: TextInputType.url,
       onSubmitted: (value) {
-        var url = WebUri(value);
+        var url = inapp.WebUri(value);
         if (url.scheme.isEmpty) {
-          url = WebUri("https://www.google.com/search?q=$value");
+          url = inapp.WebUri(initialUrl);
         }
-        webViewController?.loadUrl(urlRequest: URLRequest(url: url));
+        webViewController?.load(url.toString());
       },
     );
   }
 
-  InAppWebView buildInAppWebView() {
-    return InAppWebView(
-      key: webViewKey,
-      initialUrlRequest: URLRequest(url: WebUri("https://inappwebview.dev/")),
+  _onWebViewCreated(dynamic controller) {
+    webViewController = PlatformWebViewController.from(controller);
+  }
+
+  Widget buildWebView() {
+    if (platformParams.windows || platformParams.mobile || platformParams.web) {
+      return webview.WebView(
+        backgroundColor: Colors.black,
+        initialUrl: initialUrl,
+        javascriptMode: webview.JavascriptMode.unrestricted,
+        onWebViewCreated: _onWebViewCreated,
+        gestureNavigationEnabled: true,
+        allowsInlineMediaPlayback: true,
+        initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
+      );
+    } else {
+      return buildInAppWebView();
+    }
+  }
+
+  Widget buildInAppWebView() {
+    return inapp.InAppWebView(
+      initialUrlRequest: inapp.URLRequest(url: inapp.WebUri(initialUrl)),
       initialSettings: settings,
       pullToRefreshController: pullToRefreshController,
-      onWebViewCreated: (controller) {
-        webViewController = controller;
-      },
+      onWebViewCreated: _onWebViewCreated,
       onLoadStart: (controller, url) {
-        inAppWebViewUrlController.url = url.toString();
-        urlController.text = inAppWebViewUrlController.url;
+        urlController.text = url.toString();
       },
       onPermissionRequest: (controller, request) async {
-        return PermissionResponse(
+        return inapp.PermissionResponse(
             resources: request.resources,
-            action: PermissionResponseAction.GRANT);
+            action: inapp.PermissionResponseAction.GRANT);
       },
       shouldOverrideUrlLoading: (controller, navigationAction) async {
         var uri = navigationAction.request.url!;
@@ -148,16 +160,15 @@ class _InAppWebViewWidgetState extends State<InAppWebViewWidget> {
               uri,
             );
             // and cancel the request
-            return NavigationActionPolicy.CANCEL;
+            return inapp.NavigationActionPolicy.CANCEL;
           }
         }
 
-        return NavigationActionPolicy.ALLOW;
+        return inapp.NavigationActionPolicy.ALLOW;
       },
       onLoadStop: (controller, url) async {
         pullToRefreshController?.endRefreshing();
-        inAppWebViewUrlController.url = url.toString();
-        urlController.text = inAppWebViewUrlController.url;
+        urlController.text = url.toString();
       },
       onReceivedError: (controller, request, error) {
         pullToRefreshController?.endRefreshing();
@@ -168,12 +179,10 @@ class _InAppWebViewWidgetState extends State<InAppWebViewWidget> {
         }
         setState(() {
           this.progress = progress / 100;
-          urlController.text = inAppWebViewUrlController.url;
         });
       },
       onUpdateVisitedHistory: (controller, url, androidIsReload) {
-        inAppWebViewUrlController.url = url.toString();
-        urlController.text = inAppWebViewUrlController.url;
+        urlController.text = url.toString();
       },
       onConsoleMessage: (controller, consoleMessage) {
         logger.i(consoleMessage);
@@ -185,20 +194,20 @@ class _InAppWebViewWidgetState extends State<InAppWebViewWidget> {
     return ButtonBar(
       alignment: MainAxisAlignment.center,
       children: <Widget>[
-        ElevatedButton(
-          child: const Icon(Icons.arrow_back),
+        IconButton(
+          icon: const Icon(Icons.arrow_back),
           onPressed: () {
             webViewController?.goBack();
           },
         ),
-        ElevatedButton(
-          child: const Icon(Icons.arrow_forward),
+        IconButton(
+          icon: const Icon(Icons.arrow_forward),
           onPressed: () {
             webViewController?.goForward();
           },
         ),
-        ElevatedButton(
-          child: const Icon(Icons.refresh),
+        IconButton(
+          icon: const Icon(Icons.refresh),
           onPressed: () {
             webViewController?.reload();
           },
@@ -209,7 +218,6 @@ class _InAppWebViewWidgetState extends State<InAppWebViewWidget> {
 
   @override
   void dispose() {
-    inAppWebViewUrlController.removeListener(_update);
     super.dispose();
   }
 }

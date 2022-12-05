@@ -83,6 +83,9 @@ dependencies:
   #界面
   bubble: ^1.2.1
   cupertino_icons: ^1.0.2
+  icons_plus: ^3.0.0
+  fluttericon: ^2.0.0
+  flutter_animated_icons: ^1.0.1
   country_pickers: ^2.0.0
   country_picker: ^2.0.15
   #international_phone_input: ^1.0.4
@@ -136,6 +139,7 @@ dependencies:
   flutter_swiper_null_safety: any
   flutter_screenutil: ^5.5.3 # Flutter 屏幕适配 https://github.com/OpenFlutter/flutter_screenutil
   flex_color_picker: ^2.4.0
+  flex_color_scheme: ^6.1.1
   file_picker: ^5.2.2
   filesystem_picker: ^3.1.0
   wechat_assets_picker: ^8.0.2 #微信图库
@@ -178,7 +182,8 @@ dependencies:
   json_annotation: ^4.3.0
   permission_handler: ^10.0.0 #权限处理1
   provider: ^6.0.1 #状态管理
-  flutter_local_notifications: ^9.5.3+1
+  flutter_local_notifications: ^12.0.4
+  awesome_notifications: ^0.7.4+1
   pull_to_refresh_notification: ^2.3.0
   share_plus: ^4.0.4
   receive_sharing_intent: ^1.4.5
@@ -253,7 +258,7 @@ dependencies:
   #应用
   flutter_filereader: 3.0.0
   i18n_extension: ^5.0.1
-  flutter_quill: ^6.1.2
+  flutter_quill: ^6.1.6
   visual_editor:
     git: https://github.com/visual-space/visual-editor.git
   universal_html: ^2.0.8
