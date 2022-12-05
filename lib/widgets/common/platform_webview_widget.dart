@@ -106,12 +106,12 @@ class _PlatformWebViewWidgetState extends State<PlatformWebViewWidget> {
       decoration: const InputDecoration(prefixIcon: Icon(Icons.http)),
       controller: urlController,
       keyboardType: TextInputType.url,
-      onSubmitted: (value) {
-        var url = inapp.WebUri(value);
-        if (url.scheme.isEmpty) {
-          url = inapp.WebUri(initialUrl);
+      onEditingComplete: () {
+        String url = urlController.text;
+        if (!url.startsWith('http')) {
+          url = 'https://$url';
         }
-        webViewController?.load(url.toString());
+        webViewController?.load(url);
       },
     );
   }
