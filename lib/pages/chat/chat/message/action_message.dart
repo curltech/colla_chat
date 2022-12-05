@@ -8,7 +8,7 @@ import '../../../../widgets/special_text/custom_special_text_span_builder.dart';
 
 ///消息体：命令消息，由固定文本和icon组成
 class ActionMessage extends StatelessWidget {
-  final ChatSubMessageType subMessageType;
+  final ChatMessageSubType subMessageType;
   final bool isMyself;
   final CustomSpecialTextSpanBuilder customSpecialTextSpanBuilder =
       CustomSpecialTextSpanBuilder();
@@ -19,7 +19,7 @@ class ActionMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (subMessageType == ChatSubMessageType.videoChat) {
+    if (subMessageType == ChatMessageSubType.videoChat) {
       Color color = appDataProvider.themeData.colorScheme.primary;
 
       return InkWell(
@@ -41,7 +41,7 @@ class ActionMessage extends StatelessWidget {
             )
           ]));
     }
-    if (subMessageType == ChatSubMessageType.addFriend) {
+    if (subMessageType == ChatMessageSubType.addFriend) {
       Color color = appDataProvider.themeData.colorScheme.primary;
 
       return InkWell(

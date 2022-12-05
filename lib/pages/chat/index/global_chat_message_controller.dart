@@ -37,14 +37,14 @@ class GlobalChatMessageController with ChangeNotifier {
       //     content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content));
       //   }
       // }
-      ChatSubMessageType? subMessageType = StringUtil.enumFromString(
-          ChatSubMessageType.values, chatMessage.subMessageType);
+      ChatMessageSubType? subMessageType = StringUtil.enumFromString(
+          ChatMessageSubType.values, chatMessage.subMessageType);
       logger
           .i('chatMessage subMessageType:${subMessageType!.name} title:$title');
       switch (subMessageType) {
-        case ChatSubMessageType.videoChat:
+        case ChatMessageSubType.videoChat:
           break;
-        case ChatSubMessageType.chatReceipt:
+        case ChatMessageSubType.chatReceipt:
           ChatMessage? originMessage =
               await chatMessageService.findByMessageId(messageId);
           if (originMessage == null) {
@@ -53,7 +53,7 @@ class GlobalChatMessageController with ChangeNotifier {
           }
           String? originMessageType = originMessage.messageType;
           String? originSubMessageType = originMessage.subMessageType;
-          if (originSubMessageType == ChatSubMessageType.videoChat.name) {
+          if (originSubMessageType == ChatMessageSubType.videoChat.name) {
             if (chatMessage.status == MessageStatus.accepted.name) {
               //收到视频通话邀请同意回执，发出本地流，关闭拨号窗口VideoDialOutWidget，显示视频通话窗口VideoChatWidget
               videoChatReceiptController.setChatReceipt(
@@ -65,22 +65,22 @@ class GlobalChatMessageController with ChangeNotifier {
             }
           }
           break;
-        case ChatSubMessageType.modifyFriend:
+        case ChatMessageSubType.modifyFriend:
           content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content!));
           linkmanService.receiveModifyFriend(chatMessage, content);
           break;
-        case ChatSubMessageType.cancel:
+        case ChatMessageSubType.cancel:
           String? messageId = content;
           if (messageId != null) {
             chatMessageService
                 .delete(where: 'messageId=?', whereArgs: [messageId]);
           }
           break;
-        case ChatSubMessageType.preKeyBundle:
+        case ChatMessageSubType.preKeyBundle:
           content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content!));
           _receivePreKeyBundle(chatMessage, content);
           break;
-        case ChatSubMessageType.signal:
+        case ChatMessageSubType.signal:
           content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content!));
           _receiveSignal(chatMessage, content);
           break;
@@ -103,7 +103,7 @@ class GlobalChatMessageController with ChangeNotifier {
   _receivePreKeyBundle(ChatMessage chatMessage, String content) async {
     String peerId = chatMessage.senderPeerId!;
     String? clientId = chatMessage.senderClientId;
-    if (chatMessage.subMessageType == ChatSubMessageType.preKeyBundle.name) {
+    if (chatMessage.subMessageType == ChatMessageSubType.preKeyBundle.name) {
       PreKeyBundle? retrievedPreKeyBundle =
           signalSessionPool.signalKeyPair.preKeyBundleFromJson(content);
       if (retrievedPreKeyBundle != null) {
@@ -135,7 +135,7 @@ class GlobalChatMessageController with ChangeNotifier {
   _receiveSignal(ChatMessage chatMessage, String content) async {
     String peerId = chatMessage.senderPeerId!;
     String clientId = chatMessage.senderClientId!;
-    if (chatMessage.subMessageType == ChatSubMessageType.signal.name) {
+    if (chatMessage.subMessageType == ChatMessageSubType.signal.name) {
       WebrtcSignal webrtcSignal =
           WebrtcSignal.fromJson(JsonUtil.toJson(content));
       await peerConnectionPool.onWebrtcSignal(peerId, webrtcSignal,
@@ -156,7 +156,7 @@ class GlobalChatMessageController with ChangeNotifier {
     ChatMessage chatMessage = await chatMessageService.buildChatMessage(peerId,
         clientId: clientId,
         messageType: ChatMessageType.system,
-        subMessageType: ChatSubMessageType.preKeyBundle,
+        subMessageType: ChatMessageSubType.preKeyBundle,
         data: CryptoUtil.stringToUtf8(json));
     await chatMessageService.sendAndStore(chatMessage,
         cryptoOption: CryptoOption.cryptography);

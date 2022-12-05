@@ -17,6 +17,7 @@ import 'package:colla_chat/pages/chat/chat/message/rich_text_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/url_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/video_message.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/tool/document_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
@@ -96,11 +97,11 @@ class MessageWidget {
           ContentType.values, chatMessage.contentType!);
     }
     contentType = contentType ?? ContentType.text;
-    ChatSubMessageType? subMessageType;
+    ChatMessageSubType? subMessageType;
     subMessageType = StringUtil.enumFromString(
-        ChatSubMessageType.values, chatMessage.subMessageType);
+        ChatMessageSubType.values, chatMessage.subMessageType);
     Widget body;
-    if (subMessageType == ChatSubMessageType.chat) {
+    if (subMessageType == ChatMessageSubType.chat) {
       switch (contentType) {
         case ContentType.text:
           body = buildExtendedTextMessageWidget(context);
@@ -133,11 +134,11 @@ class MessageWidget {
           body = Container();
           break;
       }
-    } else if (subMessageType == ChatSubMessageType.videoChat) {
+    } else if (subMessageType == ChatMessageSubType.videoChat) {
       body = buildActionMessageWidget(context, subMessageType!);
-    } else if (subMessageType == ChatSubMessageType.addFriend) {
+    } else if (subMessageType == ChatMessageSubType.addFriend) {
       body = buildActionMessageWidget(context, subMessageType!);
-    } else if (subMessageType == ChatSubMessageType.cancel) {
+    } else if (subMessageType == ChatMessageSubType.cancel) {
       body = buildCancelMessageWidget(context, chatMessage.content!);
     } else {
       body = Container();
@@ -177,7 +178,7 @@ class MessageWidget {
         if (messageId != null) {
           await chatMessageController.sendText(
             message: messageId,
-            subMessageType: ChatSubMessageType.cancel,
+            subMessageType: ChatMessageSubType.cancel,
           );
           await chatMessageService.delete(entity: chatMessage);
           chatMessageController.delete(index: this.index);
@@ -190,6 +191,8 @@ class MessageWidget {
       case 'Collect':
         break;
       case 'Refer':
+        String? messageId = chatMessage.messageId;
+        chatMessageController.parentMessageId = messageId;
         break;
       default:
     }
@@ -210,7 +213,7 @@ class MessageWidget {
   }
 
   ActionMessage buildActionMessageWidget(
-      BuildContext context, ChatSubMessageType subMessageType) {
+      BuildContext context, ChatMessageSubType subMessageType) {
     return ActionMessage(
       key: GlobalKey(),
       isMyself: isMyself,
@@ -423,5 +426,74 @@ class MessageWidget {
       }
     }
     return Container();
+  }
+
+  /// 缺省是编辑模式，用于输入，会出现一个cancel按钮，parentMessageId为空，
+  /// 会对chatMessageController.parentMessageId进行处理
+  /// 当处于只读模式时，用于显示，parentMessageId不允许为空
+  static Widget buildParentChatMessageWidget({
+    bool readOnly = false,
+    String? parentMessageId,
+  }) {
+    int maxLength = 30;
+    if (!readOnly) {
+      parentMessageId = chatMessageController.parentMessageId;
+    }
+    if (parentMessageId == null) {
+      return Container();
+    }
+    return FutureBuilder(
+      future: chatMessageService.findByMessageId(parentMessageId),
+      builder: (BuildContext context, AsyncSnapshot<ChatMessage?> snapshot) {
+        if (snapshot.hasData) {
+          ChatMessage? chatMessage = snapshot.data;
+          if (chatMessage != null) {
+            var senderName = chatMessage.senderName ?? '';
+            var subMessageType = chatMessage.subMessageType;
+            var contentType = chatMessage.contentType;
+            String data = '$senderName: ';
+            if (subMessageType == ChatMessageSubType.chat.name &&
+                contentType == ContentType.text.name) {
+              var title = chatMessage.title;
+              var content = chatMessage.content ?? '';
+              content = chatMessageService.decodeText(content);
+              if (title != null) {
+                data = data + title;
+              } else {
+                var length = content.length;
+                length = length > maxLength ? maxLength : length;
+                data = '$data${content.substring(0, length)}...';
+              }
+            } else {
+              data = data + AppLocalizations.t(contentType!);
+            }
+            return Card(
+                elevation: 0,
+                margin: EdgeInsets.zero,
+                color: Colors.grey.withOpacity(0.2),
+                child: Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    child: Row(children: [
+                      Expanded(child: Text(data)),
+                      readOnly
+                          ? Container()
+                          : InkWell(
+                              child: Icon(
+                                //size: 16,
+                                Icons.cancel,
+                                color: appDataProvider
+                                    .themeData.colorScheme.primary,
+                              ),
+                              onTap: () {
+                                chatMessageController.parentMessageId = null;
+                              },
+                            )
+                    ])));
+          }
+        }
+        return Container();
+      },
+    );
   }
 }

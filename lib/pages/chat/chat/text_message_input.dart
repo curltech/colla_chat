@@ -1,14 +1,19 @@
 import 'dart:async';
 
+import 'package:colla_chat/crypto/cryptography.dart';
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/extended_text_message_input.dart';
+import 'package:colla_chat/pages/chat/chat/message/message_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/media/audio/platform_audio_recorder.dart';
 import 'package:flutter/material.dart';
-
 
 ///发送文本消息的输入框和按钮，
 ///包括声音按钮，扩展文本输入框，emoji按钮，其他多种格式输入按钮和发送按钮
@@ -43,6 +48,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   void initState() {
     super.initState();
     widget.textEditingController.addListener(_update);
+    chatMessageController.addListener(_update);
   }
 
   _update() {
@@ -58,7 +64,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
           data: data,
           contentType: ContentType.audio,
           mimeType: mimeType,
-          subMessageType: ChatSubMessageType.chat);
+          subMessageType: ChatMessageSubType.chat);
     }
   }
 
@@ -99,13 +105,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
               },
             ),
           ),
-          Expanded(
-              child: Container(
-                  margin: EdgeInsets.symmetric(
-                      horizontal: iconInset, vertical: iconInset),
-                  child: voiceVisible
-                      ? _buildExtendedTextField(context)
-                      : _buildVoiceRecordButton(context))),
+          Expanded(child: _buildMessageInputWidget(context)),
           Container(
             margin: EdgeInsets.symmetric(
                 horizontal: iconInset, vertical: iconInset),
@@ -150,6 +150,20 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
         ]));
   }
 
+  Widget _buildMessageInputWidget(BuildContext context) {
+    return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 2.0, vertical: 2.0),
+        child: Column(children: [
+          voiceVisible
+              ? _buildExtendedTextField(context)
+              : _buildVoiceRecordButton(context),
+          const SizedBox(
+            height: 2,
+          ),
+          MessageWidget.buildParentChatMessageWidget()
+        ]));
+  }
+
   @override
   Widget build(BuildContext context) {
     return _buildTextMessageInput(context);
@@ -158,6 +172,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   @override
   void dispose() {
     widget.textEditingController.removeListener(_update);
+    chatMessageController.removeListener(_update);
     super.dispose();
   }
 }

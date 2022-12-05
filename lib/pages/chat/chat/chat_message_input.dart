@@ -1,13 +1,14 @@
 import 'dart:async';
 
 import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/emoji_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/more_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/text_message_input.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/service/chat/chat.dart';
 import 'package:flutter/material.dart';
-
 
 ///聊天消息的输入组件，
 ///第一行：包括声音按钮，扩展文本输入框，emoji按钮，其他多种格式输入按钮和发送按钮
@@ -17,7 +18,7 @@ class ChatMessageInputWidget extends StatefulWidget {
   final TextEditingController textEditingController;
 
   final Future<void> Function(
-      {String? message, ChatSubMessageType subMessageType})? onSend;
+      {String? message, ChatMessageSubType subMessageType})? onSend;
 
   final Future<void> Function(int index, String name, {String? value})?
       onAction;
@@ -115,10 +116,13 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
     _insertText(text);
   }
 
+
+
   Widget _buildChatMessageInput(BuildContext context) {
     double height = this.height > appDataProvider.keyboardHeight
         ? this.height
         : appDataProvider.keyboardHeight;
+
     return Column(children: [
       TextMessageInputWidget(
         textEditingController: widget.textEditingController,
@@ -126,6 +130,7 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
         onMorePressed: onMorePressed,
         onSendPressed: onSendPressed,
       ),
+
       Visibility(
           visible: emojiVisible,
           child: EmojiMessageInputWidget(
@@ -149,5 +154,10 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
       keyboardVisible = true;
     }
     return _buildChatMessageInput(context);
+  }
+
+  @override
+  dispose() {
+    super.dispose();
   }
 }

@@ -158,11 +158,27 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         where: where, whereArgs: whereArgs, orderBy: 'id desc', limit: limit);
   }
 
+  String decodeText(String content) {
+    if (StringUtil.isNotEmpty(content)) {
+      content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content));
+    }
+
+    return content;
+  }
+
+  String encodeText(String content) {
+    if (StringUtil.isNotEmpty(content)) {
+      content = CryptoUtil.encodeBase64(CryptoUtil.stringToUtf8(content));
+    }
+
+    return content;
+  }
+
   ///接受到普通消息或者回执
   Future<void> receiveChatMessage(ChatMessage chatMessage) async {
     String? subMessageType = chatMessage.subMessageType;
     //收到回执，更新原消息
-    if (subMessageType == ChatSubMessageType.chatReceipt.name) {
+    if (subMessageType == ChatMessageSubType.chatReceipt.name) {
       String? messageId = chatMessage.messageId;
       if (messageId == null) {
         logger.e('chatReceipt message must have messageId');
@@ -209,7 +225,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     ChatMessage msg = ChatMessage();
     msg.messageId = chatMessage.messageId;
     msg.messageType = chatMessage.messageType;
-    msg.subMessageType = ChatSubMessageType.chatReceipt.name;
+    msg.subMessageType = ChatMessageSubType.chatReceipt.name;
     msg.direct = ChatDirect.send.name;
     msg.senderPeerId = myself.peerId!;
     msg.senderClientId = myself.clientId;
@@ -254,7 +270,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String? messageId,
     TransportType transportType = TransportType.webrtc,
     ChatMessageType messageType = ChatMessageType.chat,
-    ChatSubMessageType subMessageType = ChatSubMessageType.chat,
+    ChatMessageSubType subMessageType = ChatMessageSubType.chat,
     ContentType contentType = ContentType.text,
     String? mimeType,
     PartyType receiverType = PartyType.linkman,
@@ -266,6 +282,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     List<int>? thumbnail,
     String? status,
     int deleteTime = 0,
+    String? parentMessageId,
   }) async {
     ChatMessage chatMessage = ChatMessage();
     if (messageId == null) {
@@ -312,6 +329,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.status = status ?? MessageStatus.sent.name;
     chatMessage.transportType = transportType.name;
     chatMessage.deleteTime = deleteTime;
+    chatMessage.parentMessageId = parentMessageId;
 
     chatMessage.id = null;
 
@@ -323,13 +341,14 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String groupPeerId, {
     List<int>? data,
     ChatMessageType messageType = ChatMessageType.chat,
-    ChatSubMessageType subMessageType = ChatSubMessageType.chat,
+    ChatMessageSubType subMessageType = ChatMessageSubType.chat,
     ContentType contentType = ContentType.text,
     String? mimeType,
     String? title,
     List<int>? receiptContent,
     List<int>? thumbnail,
     int deleteTime = 0,
+    String? parentMessageId,
   }) async {
     List<ChatMessage> chatMessages = [];
     Group? group = await groupService.findCachedOneByPeerId(groupPeerId);
@@ -348,7 +367,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           title: title,
           receiptContent: receiptContent,
           thumbnail: thumbnail,
-          deleteTime: deleteTime);
+          deleteTime: deleteTime,
+          parentMessageId: parentMessageId);
       chatMessages.add(groupChatMessage);
       var messageId = groupChatMessage.messageId;
       List<GroupMember> groupMembers =
@@ -358,16 +378,19 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       for (var linkman in linkmen) {
         var peerId = linkman.peerId;
         var receiverName = linkman.name;
-        ChatMessage chatMessage = await buildChatMessage(peerId,
-            messageId: messageId,
-            messageType: messageType,
-            subMessageType: subMessageType,
-            contentType: contentType,
-            mimeType: mimeType,
-            receiverName: receiverName,
-            groupPeerId: groupPeerId,
-            groupName: groupName,
-            deleteTime: deleteTime);
+        ChatMessage chatMessage = await buildChatMessage(
+          peerId,
+          messageId: messageId,
+          messageType: messageType,
+          subMessageType: subMessageType,
+          contentType: contentType,
+          mimeType: mimeType,
+          receiverName: receiverName,
+          groupPeerId: groupPeerId,
+          groupName: groupName,
+          deleteTime: deleteTime,
+          parentMessageId: parentMessageId,
+        );
         chatMessage.title = groupChatMessage.title;
         chatMessage.content = groupChatMessage.content;
         chatMessage.receiptContent = groupChatMessage.receiptContent;

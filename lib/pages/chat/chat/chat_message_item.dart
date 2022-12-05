@@ -84,7 +84,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
             if (this.timer != null) {
               this.timer!.cancel();
               this.timer = null;
-              await chatMessageService.delete(entity:widget.chatMessage);
+              await chatMessageService.delete(entity: widget.chatMessage);
               chatMessageController.delete(index: widget.index);
               logger.w(
                   'Timer.periodic delete chatMessage id: ${widget.chatMessage.id}, leftDeleteTime:$leftDeleteTime');
@@ -93,7 +93,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
           setState(() {});
         });
       } else {
-        await chatMessageService.delete(entity:widget.chatMessage);
+        await chatMessageService.delete(entity: widget.chatMessage);
         chatMessageController.delete(index: widget.index);
         logger.w(
             '_buildDeleteTimer delete chatMessage id: ${widget.chatMessage.id}, leftDeleteTime:$leftDeleteTime');
@@ -118,15 +118,23 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
 
     return Container(
         constraints: const BoxConstraints(minWidth: 0, maxWidth: 300),
-        child: Bubble(
-            elevation: 0.0,
-            stick: true,
-            margin: const BubbleEdges.only(top: 1),
-            nip: widget.isMyself ? BubbleNip.rightTop : BubbleNip.leftTop,
-            color: widget.isMyself
-                ? appDataProvider.themeData.colorScheme.primary
-                : Colors.white,
-            child: body));
+        child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+          Bubble(
+              elevation: 0.0,
+              stick: true,
+              margin: const BubbleEdges.only(top: 1),
+              nip: widget.isMyself ? BubbleNip.rightTop : BubbleNip.leftTop,
+              color: widget.isMyself
+                  ? appDataProvider.themeData.colorScheme.primary
+                  : Colors.white,
+              child: body),
+          const SizedBox(
+            height: 2,
+          ),
+          MessageWidget.buildParentChatMessageWidget(
+              readOnly: true,
+              parentMessageId: widget.chatMessage.parentMessageId),
+        ]));
   }
 
   ///矩形消息容器，内包消息体
@@ -159,18 +167,28 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
             margin: EdgeInsets.only(
                 right: widget.isMyself ? 5.0 : 0,
                 left: widget.isMyself ? 0 : 5.0),
-            child: FutureBuilder(
-              future: widget.messageWidget.buildMessageBody(context),
-              builder: (BuildContext context, AsyncSnapshot<Widget?> snapshot) {
-                if (snapshot.hasData) {
-                  Widget? widget = snapshot.data;
-                  if (widget != null) {
-                    return widget;
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              FutureBuilder(
+                future: widget.messageWidget.buildMessageBody(context),
+                builder:
+                    (BuildContext context, AsyncSnapshot<Widget?> snapshot) {
+                  if (snapshot.hasData) {
+                    Widget? widget = snapshot.data;
+                    if (widget != null) {
+                      return widget;
+                    }
                   }
-                }
-                return Container();
-              },
-            ))
+                  return Container();
+                },
+              ),
+              const SizedBox(
+                height: 2,
+              ),
+              MessageWidget.buildParentChatMessageWidget(
+                  readOnly: true,
+                  parentMessageId: widget.chatMessage.parentMessageId),
+            ]))
       ], // aligns the chatitem to right end
     );
   }
@@ -205,7 +223,13 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
                   )),
               Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[title, _buildMessageBubble(context)]),
+                  children: <Widget>[
+                    title,
+                    _buildMessageBubble(context),
+                    MessageWidget.buildParentChatMessageWidget(
+                        readOnly: true,
+                        parentMessageId: widget.chatMessage.parentMessageId),
+                  ]),
             ]));
   }
 
@@ -233,7 +257,10 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
               Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.end,
-                  children: <Widget>[title, _buildMessageBubble(context)]),
+                  children: <Widget>[
+                    title,
+                    _buildMessageBubble(context),
+                  ]),
               Container(
                   margin: const EdgeInsets.only(left: 0.0),
                   child: FutureBuilder(
