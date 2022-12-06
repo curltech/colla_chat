@@ -171,7 +171,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
   ///发送视频通话消息
   Future<ChatMessage?> _send({required String title}) async {
     return chatMessageController.send(
-        title: title, subMessageType: ChatSubMessageType.videoChat);
+        title: title, subMessageType: ChatMessageSubType.videoChat);
   }
 
   _close() {

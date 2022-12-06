@@ -179,7 +179,7 @@ class VideoChatReceiptController with ChangeNotifier {
       return;
     }
     logger.w('received videoChat chatReceipt status: $status');
-    if (subMessageType != ChatSubMessageType.chatReceipt.name) {
+    if (subMessageType != ChatMessageSubType.chatReceipt.name) {
       return;
     }
     //接受通话请求

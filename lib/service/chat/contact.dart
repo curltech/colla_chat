@@ -146,7 +146,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
     List<int> data = CryptoUtil.stringToUtf8(json);
     ChatMessage chatMessage = await chatMessageService.buildChatMessage(peerId,
         data: data,
-        subMessageType: ChatSubMessageType.addFriend,
+        subMessageType: ChatMessageSubType.addFriend,
         transportType: transportType,
         title: title);
     return await chatMessageService.sendAndStore(chatMessage,
@@ -188,7 +188,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
       clientId: clientId,
       data: data,
       messageType: ChatMessageType.system,
-      subMessageType: ChatSubMessageType.modifyFriend,
+      subMessageType: ChatMessageSubType.modifyFriend,
     );
     return await chatMessageService.sendAndStore(chatMessage,
         cryptoOption: cryptoOption);
@@ -362,7 +362,7 @@ class GroupService extends PeerPartyService<Group> {
         await chatMessageService.buildGroupChatMessage(
       group.peerId,
       data: data,
-      subMessageType: ChatSubMessageType.addGroup,
+      subMessageType: ChatMessageSubType.addGroup,
     );
     for (var chatMessage in chatMessages) {
       await chatMessageService.sendAndStore(chatMessage);
@@ -400,7 +400,7 @@ class GroupService extends PeerPartyService<Group> {
         await chatMessageService.buildGroupChatMessage(
       group.peerId,
       data: data,
-      subMessageType: ChatSubMessageType.modifyGroup,
+      subMessageType: ChatMessageSubType.modifyGroup,
     );
     for (var chatMessage in chatMessages) {
       await chatMessageService.sendAndStore(chatMessage);
@@ -451,7 +451,7 @@ class GroupService extends PeerPartyService<Group> {
         await chatMessageService.buildGroupChatMessage(
       group.peerId,
       title: group.peerId,
-      subMessageType: ChatSubMessageType.dismissGroup,
+      subMessageType: ChatMessageSubType.dismissGroup,
     );
     for (var chatMessage in chatMessages) {
       await chatMessageService.sendAndStore(chatMessage);
@@ -491,7 +491,7 @@ class GroupService extends PeerPartyService<Group> {
         await chatMessageService.buildGroupChatMessage(
       groupId,
       data: data,
-      subMessageType: ChatSubMessageType.addGroupMember,
+      subMessageType: ChatMessageSubType.addGroupMember,
     );
     for (var chatMessage in chatMessages) {
       await chatMessageService.sendAndStore(chatMessage);
@@ -539,7 +539,7 @@ class GroupService extends PeerPartyService<Group> {
         await chatMessageService.buildGroupChatMessage(
       groupId,
       data: data,
-      subMessageType: ChatSubMessageType.removeGroupMember,
+      subMessageType: ChatMessageSubType.removeGroupMember,
     );
     for (var chatMessage in chatMessages) {
       await chatMessageService.sendAndStore(chatMessage);
@@ -591,7 +591,7 @@ class GroupService extends PeerPartyService<Group> {
         await chatMessageService.buildGroupChatMessage(
       groupId,
       data: data,
-      subMessageType: ChatSubMessageType.groupFile,
+      subMessageType: ChatMessageSubType.groupFile,
     );
     for (var chatMessage in chatMessages) {
       await chatMessageService.sendAndStore(chatMessage);

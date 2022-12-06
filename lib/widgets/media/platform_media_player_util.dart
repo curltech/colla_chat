@@ -12,8 +12,8 @@ class PlatformMediaPlayerUtil {
     return Ink(
         child: InkWell(
       child: controller.playlistVisible
-          ? const Icon(Icons.playlist_add_check, size: 24)
-          : const Icon(Icons.playlist_remove, size: 24),
+          ? const Icon(Icons.playlist_remove, size: 24)
+          : const Icon(Icons.playlist_add_check, size: 24),
       onTap: () {
         var playlistVisible = controller.playlistVisible;
         controller.playlistVisible = !playlistVisible;
@@ -222,6 +222,8 @@ class PlatformMediaPlayerUtil {
     bool showPlaylist = true,
     bool showVolume = true,
     bool showSpeed = false,
+    bool showPause = true,
+    bool showStop = true,
   }) {
     PlayerStatus status = controller.status;
     List<Widget> rows = [];
@@ -231,7 +233,8 @@ class PlatformMediaPlayerUtil {
           context, controller));
     }
     //播放按钮
-    rows.add(buildPlaybackButton(context, controller, status, showPlaylist));
+    rows.add(buildPlaybackButton(context, controller, status, showPlaylist,
+        showPause: showPause, showStop: showStop));
 
     //音量调整按钮
     if (showVolume) {
@@ -250,16 +253,21 @@ class PlatformMediaPlayerUtil {
 
   ///播放按钮，停止，上一个，播放，暂停，下一个
   static Widget buildPlaybackButton(
-      BuildContext context,
-      AbstractMediaPlayerController controller,
-      PlayerStatus status,
-      bool showPlaylist) {
+    BuildContext context,
+    AbstractMediaPlayerController controller,
+    PlayerStatus status,
+    bool showPlaylist, {
+    bool showPause = true,
+    bool showStop = true,
+  }) {
     List<Widget> playbacks = [];
-    playbacks.add(Ink(
-        child: InkWell(
-      onTap: controller.stop,
-      child: const Icon(Icons.stop, size: 24),
-    )));
+    if (showStop) {
+      playbacks.add(Ink(
+          child: InkWell(
+        onTap: controller.stop,
+        child: const Icon(Icons.stop, size: 24),
+      )));
+    }
     if (showPlaylist) {
       playbacks.add(Ink(
           child: InkWell(
@@ -274,11 +282,13 @@ class PlatformMediaPlayerUtil {
         child: const Icon(Icons.play_arrow, size: 36),
       )));
     } else if (status != PlayerStatus.completed) {
-      playbacks.add(Ink(
-          child: InkWell(
-        onTap: controller.pause,
-        child: const Icon(Icons.pause, size: 36),
-      )));
+      if (showPause) {
+        playbacks.add(Ink(
+            child: InkWell(
+          onTap: controller.pause,
+          child: const Icon(Icons.pause, size: 36),
+        )));
+      }
     } else {
       playbacks.add(Ink(
           child: InkWell(
@@ -346,6 +356,8 @@ class PlatformMediaPlayerUtil {
     bool showPlaylist = true,
     bool showVolume = true,
     bool showSpeed = false,
+    bool showPause = true,
+    bool showStop = true,
   }) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -355,7 +367,9 @@ class PlatformMediaPlayerUtil {
         buildControlPanel(context, controller,
             showPlaylist: showPlaylist,
             showVolume: showVolume,
-            showSpeed: showSpeed),
+            showSpeed: showSpeed,
+            showStop: showStop,
+            showPause: showPause),
       ],
     );
   }
@@ -370,6 +384,8 @@ class PlatformMediaPlayerUtil {
     bool showMediaView = true,
     bool showVolume = true,
     bool showSpeed = false,
+    bool showPause = true,
+    bool showStop = true,
     Color? color,
     double? height,
     double? width,
@@ -379,12 +395,15 @@ class PlatformMediaPlayerUtil {
 
     // 媒体视图，一般视频才有
     if (showMediaView) {
-      rows.add(PlatformMediaPlayerUtil.buildMediaView(
-          controller: controller,
-          color: color,
-          width: width,
-          height: height,
-          showControls: showControls));
+      Widget mediaView = Visibility(
+          visible: !controller.playlistVisible,
+          child: PlatformMediaPlayerUtil.buildMediaView(
+              controller: controller,
+              color: color,
+              width: width,
+              height: height,
+              showControls: showControls));
+      rows.add(mediaView);
     }
     // 播放列表
     if (showPlaylist) {
@@ -411,6 +430,8 @@ class PlatformMediaPlayerUtil {
         controller,
         showVolume: showVolume,
         showSpeed: showSpeed,
+        showPause: showPause,
+        showStop: showStop,
         showPlaylist: showPlaylist,
       );
       columns.add(Expanded(child: controllerPanel));

@@ -47,7 +47,7 @@ class _IndexViewState extends State<IndexView>
       ChatMessage? chatMessage = globalChatMessageController.chatMessage;
       if (chatMessage != null) {
         //视频通话请求消息
-        if (chatMessage.subMessageType == ChatSubMessageType.videoChat.name) {
+        if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
           videoDialIn = _buildVideoDialIn(context, chatMessage);
         }
       }
@@ -66,7 +66,7 @@ class _IndexViewState extends State<IndexView>
     if (chatMessageVisible) {
       ChatMessage? chatMessage = globalChatMessageController.chatMessage;
       if (chatMessage != null &&
-          chatMessage.subMessageType == ChatSubMessageType.chat.name) {
+          chatMessage.subMessageType == ChatMessageSubType.chat.name) {
         String? content = chatMessage.content;
         String? contentType = chatMessage.contentType;
         if (content != null) {
@@ -142,12 +142,12 @@ class _IndexViewState extends State<IndexView>
   _update() async {
     ChatMessage? chatMessage = globalChatMessageController.chatMessage;
     if (chatMessage != null) {
-      if (chatMessage.subMessageType == ChatSubMessageType.chat.name) {
+      if (chatMessage.subMessageType == ChatMessageSubType.chat.name) {
         setState(() {
           chatMessageVisible = true;
         });
       } else if (chatMessage.subMessageType ==
-          ChatSubMessageType.videoChat.name) {
+          ChatMessageSubType.videoChat.name) {
         setState(() {
           videoChatVisible = true;
         });

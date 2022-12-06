@@ -55,10 +55,18 @@ class PlatformMediaPlayer extends StatefulWidget {
 
 class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
   late AbstractMediaPlayerController controller;
+  late bool showSpeed;
+  late bool showVolume;
+  late bool showPause;
+  late bool showStop;
 
   @override
   void initState() {
     super.initState();
+    showSpeed = widget.showSpeed;
+    showVolume = widget.showVolume;
+    showPause = true;
+    showStop = true;
     _updateMediaPlayerType();
     controller.addListener(_update);
     if (widget.filename != null || widget.data != null) {
@@ -78,9 +86,12 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
       case MediaPlayerType.flick:
         controller = FlickVideoPlayerController();
         break;
-
       case MediaPlayerType.webview:
-        controller = WebviewVideoPlayerController();
+        showSpeed = false;
+        showVolume = false;
+        showPause = false;
+        showStop = true;
+        controller = WebViewVideoPlayerController();
         break;
       default:
         break;
@@ -102,8 +113,10 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
       showControls: widget.showControls,
       showPlaylist: widget.showPlaylist,
       showMediaView: widget.showMediaView,
-      showVolume: widget.showVolume,
-      showSpeed: widget.showSpeed,
+      showVolume: showVolume,
+      showSpeed: showSpeed,
+      showPause: showPause,
+      showStop: showStop,
       color: widget.color,
       height: widget.height,
       width: widget.width,

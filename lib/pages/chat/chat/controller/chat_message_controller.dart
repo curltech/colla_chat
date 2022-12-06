@@ -15,6 +15,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   ChatView _chatView = ChatView.text;
 
   int _deleteTime = 0;
+  String? _parentMessageId;
 
   ChatSummary? get chatSummary {
     return _chatSummary;
@@ -50,6 +51,17 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   set deleteTime(int deleteTime) {
     if (_deleteTime != deleteTime) {
       _deleteTime = deleteTime;
+    }
+  }
+
+  String? get parentMessageId {
+    return _parentMessageId;
+  }
+
+  set parentMessageId(String? parentMessageId) {
+    if (_parentMessageId != parentMessageId) {
+      _parentMessageId = parentMessageId;
+      notifyListeners();
     }
   }
 
@@ -134,7 +146,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       ContentType contentType = ContentType.text,
       String? mimeType,
       ChatMessageType messageType = ChatMessageType.chat,
-      ChatSubMessageType subMessageType = ChatSubMessageType.chat}) async {
+      ChatMessageSubType subMessageType = ChatMessageSubType.chat}) async {
     List<int>? data;
     if (message != null) {
       data = CryptoUtil.stringToUtf8(message);
@@ -156,7 +168,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       ContentType contentType = ContentType.text,
       String? mimeType,
       ChatMessageType messageType = ChatMessageType.chat,
-      ChatSubMessageType subMessageType = ChatSubMessageType.chat}) async {
+      ChatMessageSubType subMessageType = ChatMessageSubType.chat}) async {
     if (_chatSummary == null) {
       return null;
     }
@@ -179,9 +191,11 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         messageType: messageType,
         subMessageType: subMessageType,
         deleteTime: _deleteTime,
+        parentMessageId: _parentMessageId,
       );
       chatMessage = await chatMessageService.sendAndStore(chatMessage);
       _deleteTime = 0;
+      _parentMessageId = null;
       notifyListeners();
     } else if (partyType == PartyType.group.name) {
       //保存群消息

@@ -1,32 +1,21 @@
-import 'dart:io';
-import 'package:colla_chat/widgets/common/mobile_webview.dart';
-import 'package:universal_html/html.dart' as html;
-import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/widgets/common/platform_webview.dart';
 import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
-import 'package:flick_video_player/flick_video_player.dart';
-import 'package:flick_video_player/src/utils/web_key_bindings.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:video_player/video_player.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 
-///基于flick实现的媒体播放器和记录器，
-class WebviewVideoPlayerController extends AbstractMediaPlayerController {
-  WebViewController? controller;
+///基于WebView实现的媒体播放器和记录器，
+class WebViewVideoPlayerController extends AbstractMediaPlayerController {
+  PlatformWebViewController? controller;
 
-  WebviewVideoPlayerController();
+  WebViewVideoPlayerController();
 
   @override
   next() {
-    stop();
     super.next();
     play();
   }
 
   @override
   previous() {
-    stop();
     super.previous();
     play();
   }
@@ -43,26 +32,7 @@ class WebviewVideoPlayerController extends AbstractMediaPlayerController {
     close();
   }
 
-  @override
-  Widget buildMediaView({
-    double? width,
-    double? height,
-    BoxFit fit = BoxFit.contain,
-    AlignmentGeometry alignment = Alignment.center,
-    double scale = 1.0,
-    bool showControls = true,
-  }) {
-    if (currentMediaSource == null) {
-      return const Center(child: Text('Please select a MediaPlayerType!'));
-    }
-    var mobileWebView = MobileWebView(
-      initialUrl: currentMediaSource!.filename,
-      onWebViewCreated: _onWebViewCreated,
-    );
-    return mobileWebView;
-  }
-
-  void _onWebViewCreated(WebViewController controller) {
+  void _onWebViewCreated(PlatformWebViewController controller) {
     this.controller = controller;
   }
 
@@ -128,7 +98,8 @@ class WebviewVideoPlayerController extends AbstractMediaPlayerController {
   @override
   play() {
     if (controller != null && currentMediaSource != null) {
-      controller!.loadFile(currentMediaSource!.filename);
+      controller!.load(currentMediaSource!.filename);
+      status = PlayerStatus.playing;
     }
   }
 
@@ -139,5 +110,29 @@ class WebviewVideoPlayerController extends AbstractMediaPlayerController {
   seek(Duration position, {int? index}) {}
 
   @override
-  stop() {}
+  stop() {
+    if (controller != null && currentMediaSource != null) {
+      controller!.load('');
+      status = PlayerStatus.stop;
+    }
+  }
+
+  @override
+  Widget buildMediaView({
+    double? width,
+    double? height,
+    BoxFit fit = BoxFit.contain,
+    AlignmentGeometry alignment = Alignment.center,
+    double scale = 1.0,
+    bool showControls = true,
+  }) {
+    if (currentMediaSource == null) {
+      return const Center(child: Text('Please select a MediaPlayerType!'));
+    }
+    var platformWebView = PlatformWebView(
+      initialUrl: currentMediaSource!.filename,
+      onWebViewCreated: _onWebViewCreated,
+    );
+    return platformWebView;
+  }
 }

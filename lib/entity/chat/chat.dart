@@ -46,7 +46,7 @@ enum ChatMessageType {
   system
 }
 
-enum ChatSubMessageType {
+enum ChatMessageSubType {
   addFriend, // 加好友请求
   modifyFriend, //修改好友信息，比如头像，名称
   addGroup, // 新建群聊
@@ -91,7 +91,7 @@ class ChatMessage extends StatusEntity {
       TransportType.webrtc.name; // 包括：websocket,webrtc,mail,sms
   String? messageId; // 消息的唯一id标识
   String messageType = ChatMessageType.chat.name; // 消息类型（对应channel消息类型）
-  String subMessageType = ChatSubMessageType.chat.name;
+  String subMessageType = ChatMessageSubType.chat.name;
   String? direct; //对自己而言，消息是属于发送或者接受
 
   ///当发送者向群，自己作为群成员或者我发消息，填写发送者的信息
@@ -123,6 +123,7 @@ class ChatMessage extends StatusEntity {
   String? contentType;
   String? mimeType;
   int deleteTime = 0; // 阅读后的删除时间，秒数，0表示不删除
+  String? parentMessageId; //引用的消息编号
   bool needCompress = true;
   bool needEncrypt = true;
   bool needReceipt = false;
@@ -157,7 +158,7 @@ class ChatMessage extends StatusEntity {
         receiverAddress = json['receiverAddress'],
         messageId = json['messageId'],
         messageType = json['messageType'] ?? ChatMessageType.chat.name,
-        subMessageType = json['subMessageType'] ?? ChatSubMessageType.chat.name,
+        subMessageType = json['subMessageType'] ?? ChatMessageSubType.chat.name,
         senderPeerId = json['senderPeerId'],
         senderClientId = json['senderClientId'],
         senderName = json['senderName'],
@@ -174,6 +175,7 @@ class ChatMessage extends StatusEntity {
         contentType = json['contentType'],
         mimeType = json['mimeType'],
         deleteTime = json['deleteTime'],
+        parentMessageId = json['parentMessageId'],
         payloadHash = json['payloadHash'],
         payloadSignature = json['payloadSignature'],
         primaryPeerId = json['primaryPeerId'],
@@ -228,6 +230,7 @@ class ChatMessage extends StatusEntity {
       'contentType': contentType,
       'mimeType': mimeType,
       'deleteTime': deleteTime,
+      'parentMessageId': parentMessageId,
       'payloadHash': payloadHash,
       'payloadSignature': payloadSignature,
       'primaryPeerId': primaryPeerId,
