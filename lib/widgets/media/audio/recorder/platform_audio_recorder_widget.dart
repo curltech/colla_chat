@@ -1,9 +1,17 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
 import 'package:flutter/material.dart';
+
+enum MediaRecorderType {
+  record,
+  another,
+  waveform,
+}
 
 ///平台标准的video-player的实现，移动采用flick，桌面采用vlc
 class PlatformAudioRecorderWidget extends StatefulWidget with TileDataMixin {
@@ -29,6 +37,8 @@ class PlatformAudioRecorderWidget extends StatefulWidget with TileDataMixin {
 
 class _PlatformAudioRecorderWidgetState
     extends State<PlatformAudioRecorderWidget> {
+  MediaRecorderType? mediaRecorderType;
+
   @override
   void initState() {
     super.initState();
@@ -39,13 +49,33 @@ class _PlatformAudioRecorderWidgetState
     super.dispose();
   }
 
+  List<AppBarPopupMenu>? _buildRightPopupMenus() {
+    List<AppBarPopupMenu> menus = [];
+    for (var type in MediaRecorderType.values) {
+      AppBarPopupMenu menu = AppBarPopupMenu(
+          title: type.name,
+          onPressed: () {
+            setState(() {
+              mediaRecorderType = type;
+              logger.i('mediaRecorderType:$type');
+            });
+          });
+      menus.add(menu);
+    }
+    return menus;
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppBarView(
       title: Text(AppLocalizations.t('AudioRecorder')),
       withLeading: true,
+      rightPopupMenus: _buildRightPopupMenus(),
       child: PlatformAudioRecorder(
-        onStop: (String filename) {},
+        onStop: (String filename) {
+          logger.i('recorder audio filename:$filename');
+        },
+        mediaRecorderType: mediaRecorderType,
       ),
     );
   }

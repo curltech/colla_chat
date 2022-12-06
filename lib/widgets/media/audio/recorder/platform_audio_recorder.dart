@@ -1,164 +1,39 @@
 import 'dart:async';
 
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/widgets/media/audio/recorder/platform_another_audio_recorder.dart';
+import 'package:colla_chat/widgets/media/audio/recorder/another_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
+import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder_widget.dart';
+import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
+import 'package:colla_chat/widgets/media/audio/recorder/waveforms_audio_recorder.dart';
 import 'package:flutter/material.dart';
-import 'package:record/record.dart';
 
-///支持多种设备，windows测试通过
-///Android, iOS, Linux, macOS, Windows, and web.
-///在各种平台都支持的格式是m4a
-class PlatformAudioRecorderController extends AbstractAudioRecorderController {
-  late final Record recorder;
-
-  StreamSubscription<RecordState>? stateSubscription;
-  StreamSubscription<Amplitude>? amplitudeSubscription;
-  Amplitude? _amplitude;
-
-  //RecordState _state = RecordState.stop;
-
-  PlatformAudioRecorderController() {
-    recorder = Record();
-    try {
-      stateSubscription ??= recorder.onStateChanged().listen((recordState) {
-        state = recordState;
-      });
-
-      amplitudeSubscription ??= recorder
-          .onAmplitudeChanged(const Duration(milliseconds: 300))
-          .listen((amp) {
-        _amplitude = amp;
-        notifyListeners();
-      });
-    } catch (e) {
-      logger.e(e);
-    }
-    //设置开始的计时提示
-    duration = 0;
-  }
-
-  Amplitude? get amplitude {
-    return _amplitude;
-  }
-
-  @override
-  Future<bool> hasPermission() async {
-    return await recorder.hasPermission();
-  }
-
-  set state(RecordState state) {
-    if (state == RecordState.record) {
-      status = RecorderStatus.recording;
-    } else if (state == RecordState.pause) {
-      status = RecorderStatus.pause;
-    } else {
-      status = RecorderStatus.stop;
-    }
-  }
-
-  Future<bool> isEncoderSupported(
-      {AudioEncoder codec = AudioEncoder.aacLc}) async {
-    return await recorder.isEncoderSupported(codec);
-  }
-
-  @override
-  Future<void> start({String? filename}) async {
-    AudioEncoder encoder = AudioEncoder.aacLc;
-    int bitRate = 128000;
-    int samplingRate = 44100;
-    int numChannels = 2;
-    InputDevice? device;
-
-    try {
-      if (await recorder.hasPermission()) {
-        await recorder.start(
-            path: filename,
-            encoder: encoder,
-            bitRate: bitRate,
-            samplingRate: samplingRate,
-            numChannels: numChannels,
-            device: device);
-        await super.start(filename: filename);
-        status = RecorderStatus.recording;
-      }
-    } catch (e) {
-      logger.e('recorder start $e');
-    }
-  }
-
-  @override
-  Future<String?> stop() async {
-    if (status == RecorderStatus.recording || status == RecorderStatus.pause) {
-      String? filename = await recorder.stop();
-      logger.i('audio recorder filename:$filename');
-      this.filename = filename;
-      await super.stop();
-      status = RecorderStatus.stop;
-
-      return filename;
-    }
-    return null;
-  }
-
-  @override
-  Future<void> pause() async {
-    if (status == RecorderStatus.recording) {
-      await recorder.pause();
-      status = RecorderStatus.pause;
-    }
-  }
-
-  @override
-  Future<void> resume() async {
-    if (status == RecorderStatus.pause) {
-      await recorder.resume();
-      status = RecorderStatus.recording;
-    }
-  }
-
-  @override
-  dispose() async {
-    super.dispose();
-    await recorder.dispose();
-    status = RecorderStatus.stop;
-    if (stateSubscription != null) {
-      stateSubscription!.cancel();
-      stateSubscription = null;
-    }
-    if (amplitudeSubscription != null) {
-      amplitudeSubscription!.cancel();
-      amplitudeSubscription = null;
-    }
-  }
-}
-
-///采用record实现的音频记录器组件
+///采用record和another实现的音频记录器组件
 class PlatformAudioRecorder extends StatefulWidget {
+  final MediaRecorderType? mediaRecorderType;
   late final AbstractAudioRecorderController controller;
   final void Function(String filename)? onStop;
   final double width;
   final double height;
 
-  PlatformAudioRecorder(
-      {Key? key,
-      AbstractAudioRecorderController? controller,
-      this.width = 150,
-      this.height = 48,
-      this.onStop})
-      : super(key: key) {
+  PlatformAudioRecorder({
+    Key? key,
+    AbstractAudioRecorderController? controller,
+    this.width = 150,
+    this.height = 48,
+    this.onStop,
+    this.mediaRecorderType = MediaRecorderType.record,
+  }) : super(key: key) {
     if (controller == null) {
-      if (platformParams.ios ||
-          platformParams.android ||
-          platformParams.web ||
-          platformParams.windows ||
-          platformParams.macos ||
-          platformParams.linux) {
-        this.controller = PlatformAudioRecorderController();
-      } else {
+      if (mediaRecorderType == MediaRecorderType.record) {
+        this.controller = RecordAudioRecorderController();
+      } else if (mediaRecorderType == MediaRecorderType.another) {
         this.controller = AnotherAudioRecorderController();
+      } else if (mediaRecorderType == MediaRecorderType.waveform) {
+        this.controller = WaveformsAudioRecorderController();
+      } else {
+        this.controller = RecordAudioRecorderController();
       }
     } else {
       this.controller = controller;
@@ -205,7 +80,7 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
         widget.controller.status == RecorderStatus.pause) {
       final filename = await widget.controller.stop();
 
-      if (filename != null) {
+      if (filename != null && widget.onStop != null) {
         widget.onStop!(filename);
       }
     }
@@ -227,6 +102,7 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
   @override
   void dispose() {
     widget.controller.removeListener(_update);
+    widget.controller.dispose();
     super.dispose();
   }
 

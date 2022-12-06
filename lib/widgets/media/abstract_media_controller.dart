@@ -14,8 +14,6 @@ import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:rxdart/rxdart.dart';
 
-enum RecorderStatus { pause, recording, stop }
-
 enum PlayerStatus { init, buffering, pause, playing, stop, completed }
 
 ///媒体源的类型
@@ -435,9 +433,9 @@ class AudioWaveformPainter extends CustomPainter {
   }
 }
 
+enum RecorderStatus { pause, recording, stop }
+
 ///定义音频录音控制器的接口
-///支持多种设备，windows测试通过
-///Android, iOS, Linux, macOS, Windows, and web.
 abstract class AbstractAudioRecorderController with ChangeNotifier {
   String? filename;
   RecorderStatus _status = RecorderStatus.stop;
@@ -458,32 +456,30 @@ abstract class AbstractAudioRecorderController with ChangeNotifier {
     }
   }
 
-  Future<void> start({String? filename}) async {
-    if (filename == null) {
-      final dir = await getTemporaryDirectory();
-      var name = DateUtil.currentDate();
-      filename = '${dir.path}/$name.mp3';
-    }
-    this.filename = filename;
+  /// 开始录音
+  Future<void> start() async {
+    // if (filename == null) {
+    //   final dir = await getTemporaryDirectory();
+    //   var name = DateUtil.currentDate();
+    //   filename = '${dir.path}/$name.ma4';
+    // }
     startTimer();
   }
 
+  /// 停止录音
   Future<String?> stop() async {
     cancelTimer();
 
     return null;
   }
 
+  /// 暂停录音
   Future<void> pause();
 
+  /// 继续录音
   Future<void> resume();
 
-  @override
-  dispose() {
-    super.dispose();
-    cancelTimer();
-  }
-
+  /// 录音开始计时
   void startTimer() {
     cancelTimer();
 
@@ -495,6 +491,7 @@ abstract class AbstractAudioRecorderController with ChangeNotifier {
     });
   }
 
+  /// 停止录音计时
   void cancelTimer() {
     if (_timer != null) {
       _timer?.cancel();
