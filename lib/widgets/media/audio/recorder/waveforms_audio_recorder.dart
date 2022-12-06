@@ -2,9 +2,11 @@ import 'dart:async';
 
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
+import 'package:path_provider/path_provider.dart';
 
-///仅支持移动设备，aac,wav两种格式
+///仅支持移动设备，带有波形图案的录音器，aac,wav两种格式
 class WaveformsAudioRecorderController extends AbstractAudioRecorderController {
   late RecorderController recorderController;
 
@@ -32,12 +34,15 @@ class WaveformsAudioRecorderController extends AbstractAudioRecorderController {
   }
 
   @override
-  Future<void> start({String? filename}) async {
+  Future<void> start() async {
     try {
       bool permission = await hasPermission();
       if (permission) {
-        //设置开始的计时提示
-        duration = 0;
+        if (filename == null) {
+          final dir = await getTemporaryDirectory();
+          var name = DateUtil.currentDate();
+          filename = '${dir.path}/$name.ma4';
+        }
         await recorderController.record(filename);
         await super.start();
       }

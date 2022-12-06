@@ -31,7 +31,7 @@ class AnotherAudioRecorderController extends AbstractAudioRecorderController {
   }
 
   @override
-  Future<void> start({String? filename}) async {
+  Future<void> start() async {
     AudioFormat audioFormat = AudioFormat.AAC;
     int sampleRate = 16000;
     try {
@@ -40,15 +40,13 @@ class AnotherAudioRecorderController extends AbstractAudioRecorderController {
         if (filename == null) {
           final dir = await getTemporaryDirectory();
           var name = DateUtil.currentDate();
-          filename = '${dir.path}/$name.mp3';
+          filename = '${dir.path}/$name.ma4';
         }
-        recorder = AnotherAudioRecorder(filename,
+        recorder = AnotherAudioRecorder(filename!,
             audioFormat: audioFormat, sampleRate: sampleRate);
         await recorder!.initialized;
-        //设置开始的计时提示
-        duration = 0;
-        await recorder!.start();
         await super.start();
+        await recorder!.start();
       }
       _current = recorder!.recording;
       status = RecorderStatus.recording;
@@ -99,10 +97,9 @@ class AnotherAudioRecorderController extends AbstractAudioRecorderController {
   @override
   dispose() async {
     if (recorder != null) {
-      await recorder!.stop();
+      await stop();
       _current = null;
       recorder = null;
-      status = RecorderStatus.stop;
     }
     super.dispose();
   }
