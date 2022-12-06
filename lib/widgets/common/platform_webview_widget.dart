@@ -35,7 +35,7 @@ class PlatformWebViewWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'webview';
 
   @override
-  Icon get icon => const Icon(Icons.person);
+  Icon get icon => const Icon(Icons.web);
 
   @override
   String get title => 'Webview';
@@ -97,23 +97,46 @@ class _PlatformWebViewWidgetState extends State<PlatformWebViewWidget> {
               ],
             ),
           ),
-          buildButtonBar(),
         ]));
   }
 
-  TextField buildTextField() {
-    return TextField(
-      decoration: const InputDecoration(prefixIcon: Icon(Icons.http)),
-      controller: urlController,
-      keyboardType: TextInputType.url,
-      onEditingComplete: () {
-        String url = urlController.text;
-        if (!url.startsWith('http')) {
-          url = 'https://$url';
-        }
-        webViewController?.load(url);
-      },
-    );
+  Widget buildTextField() {
+    return Row(children: [
+      InkWell(
+        child: const Icon(Icons.arrow_back),
+        onTap: () {
+          webViewController?.goBack();
+        },
+      ),
+      InkWell(
+        child: const Icon(Icons.arrow_forward),
+        onTap: () {
+          webViewController?.goForward();
+        },
+      ),
+      InkWell(
+        child: const Icon(Icons.refresh),
+        onTap: () {
+          webViewController?.reload();
+        },
+      ),
+      Expanded(
+          child: TextFormField(
+        autofocus: true,
+        decoration: const InputDecoration(
+          prefixIcon: Icon(Icons.https),
+        ),
+        controller: urlController,
+        keyboardType: TextInputType.url,
+        onEditingComplete: () {
+          String url = urlController.text;
+          if (!url.startsWith('http')) {
+            url = 'https://$url';
+          }
+          webViewController?.load(url);
+        },
+      )),
+    ]);
   }
 
   _onWebViewCreated(dynamic controller) {
@@ -187,32 +210,6 @@ class _PlatformWebViewWidgetState extends State<PlatformWebViewWidget> {
       onConsoleMessage: (controller, consoleMessage) {
         logger.i(consoleMessage);
       },
-    );
-  }
-
-  ButtonBar buildButtonBar() {
-    return ButtonBar(
-      alignment: MainAxisAlignment.center,
-      children: <Widget>[
-        IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            webViewController?.goBack();
-          },
-        ),
-        IconButton(
-          icon: const Icon(Icons.arrow_forward),
-          onPressed: () {
-            webViewController?.goForward();
-          },
-        ),
-        IconButton(
-          icon: const Icon(Icons.refresh),
-          onPressed: () {
-            webViewController?.reload();
-          },
-        ),
-      ],
     );
   }
 

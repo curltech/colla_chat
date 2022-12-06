@@ -395,18 +395,14 @@ class PlatformMediaPlayerUtil {
 
     // 媒体视图，一般视频才有
     if (showMediaView) {
-      var viewHeight = height;
-      var viewWight = width;
-      if (controller.playlistVisible) {
-        viewHeight = 0;
-        viewWight = 0;
-      }
-      Widget mediaView = PlatformMediaPlayerUtil.buildMediaView(
-          controller: controller,
-          color: color,
-          width: viewHeight,
-          height: viewWight,
-          showControls: showControls);
+      Widget mediaView = Visibility(
+          visible: !controller.playlistVisible,
+          child: PlatformMediaPlayerUtil.buildMediaView(
+              controller: controller,
+              color: color,
+              width: width,
+              height: height,
+              showControls: showControls));
       rows.add(mediaView);
     }
     // 播放列表

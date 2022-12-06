@@ -63,18 +63,18 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
       var flickVideoManager = currentFlickManager!.flickVideoManager;
       if (flickVideoManager != null) {
         if (flickVideoManager.isPlaying) {
-          return PlayerStatus.playing;
+          status = PlayerStatus.playing;
         } else if (flickVideoManager.isBuffering) {
-          return PlayerStatus.buffering;
+          status = PlayerStatus.buffering;
         } else if (flickVideoManager.isVideoInitialized) {
-          return PlayerStatus.init;
+          status = PlayerStatus.init;
         } else if (flickVideoManager.isVideoEnded) {
-          return PlayerStatus.completed;
+          status = PlayerStatus.completed;
         }
       }
     }
 
-    return PlayerStatus.init;
+    return super.status;
   }
 
   ///基本的视频控制功能
@@ -82,6 +82,7 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
   play() {
     if (currentFlickManager != null) {
       currentFlickManager?.flickControlManager?.play();
+      status = PlayerStatus.playing;
     }
   }
 
@@ -96,6 +97,7 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
   pause() {
     if (currentFlickManager != null) {
       currentFlickManager?.flickControlManager?.pause();
+      status = PlayerStatus.pause;
     }
   }
 
@@ -103,6 +105,7 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
   resume() {
     if (currentFlickManager != null) {
       currentFlickManager?.flickControlManager?.play();
+      status = PlayerStatus.playing;
     }
   }
 
@@ -110,6 +113,7 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
   stop() {
     if (currentFlickManager != null) {
       currentFlickManager?.flickControlManager?.pause();
+      status = PlayerStatus.stop;
     }
   }
 
