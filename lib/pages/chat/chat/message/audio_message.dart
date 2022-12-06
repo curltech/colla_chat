@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 class AudioMessage extends StatelessWidget {
   final int id;
   final String messageId;
+  final String? title;
   final bool isMyself;
 
   const AudioMessage({
@@ -13,12 +14,13 @@ class AudioMessage extends StatelessWidget {
     required this.id,
     required this.messageId,
     required this.isMyself,
+    this.title,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var videoPlayer = FutureBuilder(
-        future: messageAttachmentService.getFilename(messageId),
+        future: messageAttachmentService.getFilename(messageId,title),
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
           var filename = snapshot.data;
           if (filename == null) {

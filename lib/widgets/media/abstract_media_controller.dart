@@ -90,7 +90,7 @@ class PlatformMediaSource {
 ///定义通用媒体播放控制器的接口，包含音频和视频
 abstract class AbstractMediaPlayerController with ChangeNotifier {
   List<PlatformMediaSource> playlist = [];
-  bool _playlistVisible = true;
+  bool _playlistVisible = false;
   bool _speedSlideVisible = false;
   bool _volumeSlideVisible = true;
   bool autoPlay = false;

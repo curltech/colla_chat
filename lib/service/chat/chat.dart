@@ -429,9 +429,11 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return chatMessage;
   }
 
+  /// 保存消息，对于复杂消息，存储附件
   store(ChatMessage chatMessage, {bool updateSummary = true}) async {
     int? id = chatMessage.id;
     String? content = chatMessage.content;
+    String? title = chatMessage.title;
     String? contentType = chatMessage.contentType;
     String? mimeType = chatMessage.mimeType;
     String? messageId;
@@ -454,10 +456,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     if (messageId != null) {
       if (id == null) {
         await messageAttachmentService.store(
-            chatMessage.id!, messageId, content!, EntityState.insert);
+            chatMessage.id!, messageId, title, content!, EntityState.insert);
       } else {
         await messageAttachmentService.store(
-            chatMessage.id!, messageId, content!, EntityState.update);
+            chatMessage.id!, messageId, title, content!, EntityState.update);
       }
     }
     if (updateSummary) {
@@ -554,19 +556,29 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
   }
 
   ///获取附件的文件名称，或者在content路径下，或者在临时目录下
-  Future<String?> getFilename(String messageId) async {
+  Future<String?> getFilename(String messageId, String? title) async {
     String? filename;
     if (!platformParams.web) {
-      filename = p.join(contentPath, messageId);
+      if (title != null) {
+        filename = p.join(contentPath, title);
+      } else {
+        filename = p.join(contentPath, messageId);
+      }
     } else {
       MessageAttachment? attachment =
           await findOne(where: 'messageId=?', whereArgs: [messageId]);
       if (attachment != null) {
         var content = attachment.content;
         if (content != null) {
-          filename = await FileUtil.writeTempFile(
-              CryptoUtil.decodeBase64(content),
-              filename: messageId);
+          if (title != null) {
+            filename = await FileUtil.writeTempFile(
+                CryptoUtil.decodeBase64(content),
+                filename: title);
+          } else {
+            filename = await FileUtil.writeTempFile(
+                CryptoUtil.decodeBase64(content),
+                filename: messageId);
+          }
         }
       }
     }
@@ -574,9 +586,9 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
     return filename;
   }
 
-  Future<String?> findContent(String messageId) async {
+  Future<String?> findContent(String messageId, String? title) async {
     if (!platformParams.web) {
-      final filename = await getFilename(messageId);
+      final filename = await getFilename(messageId, title);
       if (filename != null) {
         var data = await FileUtil.readFile(filename);
         return CryptoUtil.encodeBase64(data);
@@ -592,10 +604,10 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
   }
 
   ///把内容写入文件，或者附件记录
-  Future<void> store(
-      int id, String messageId, String content, EntityState state) async {
+  Future<void> store(int id, String messageId, String? title, String content,
+      EntityState state) async {
     if (!platformParams.web) {
-      final filename = await getFilename(messageId);
+      final filename = await getFilename(messageId, title);
       var data = CryptoUtil.decodeBase64(content);
       if (filename != null) {
         await FileUtil.writeFile(data, filename);
@@ -605,6 +617,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
       MessageAttachment attachment = MessageAttachment();
       attachment.id = id;
       attachment.messageId = messageId;
+      attachment.title = title;
       attachment.content = content;
       if (state == EntityState.insert) {
         await messageAttachmentService.insert(attachment);

@@ -12,7 +12,7 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/widgets/media/audio/platform_audio_recorder.dart';
+import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
 import 'package:flutter/material.dart';
 
 ///发送文本消息的输入框和按钮，

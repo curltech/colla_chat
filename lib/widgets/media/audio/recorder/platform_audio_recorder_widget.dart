@@ -1,5 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/widgets/media/audio/platform_audio_recorder.dart';
+import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/abstract_media_controller.dart';

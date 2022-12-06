@@ -7,6 +7,7 @@ class VideoMessage extends StatelessWidget {
   final int id;
   final String? thumbnail;
   final String messageId;
+  final String? title;
   final bool isMyself;
 
   const VideoMessage(
@@ -14,25 +15,29 @@ class VideoMessage extends StatelessWidget {
       required this.id,
       required this.messageId,
       required this.isMyself,
-      this.thumbnail})
+      this.thumbnail,
+      this.title})
       : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var videoPlayer = FutureBuilder(
-        future: messageAttachmentService.getFilename(messageId),
+        future: messageAttachmentService.getFilename(messageId, title),
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-          var filename = snapshot.data;
-          if (filename == null) {
-            return Container();
+          if (snapshot.hasData) {
+            var filename = snapshot.data;
+            if (filename == null) {
+              return Container();
+            }
+            return PlatformMediaPlayer(
+              showControls: true,
+              showPlaylist: true,
+              filename: filename,
+              mediaPlayerType: MediaPlayerType.webview,
+            );
           }
-          return PlatformMediaPlayer(
-            showControls: true,
-            showPlaylist: false,
-            filename: filename,
-            mediaPlayerType: MediaPlayerType.flick,
-          );
+          return Container();
         });
-    return SizedBox(height: 80, child: Card(elevation: 0, child: videoPlayer));
+    return videoPlayer;
   }
 }

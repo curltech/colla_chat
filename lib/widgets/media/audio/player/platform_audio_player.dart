@@ -1,8 +1,9 @@
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/widgets/media/audio/blue_fire_audio_player_controller.dart';
-import 'package:colla_chat/widgets/media/audio/just_audio_player.dart';
-import 'package:colla_chat/widgets/media/audio/just_audio_player_controller.dart';
+import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player_controller.dart';
+
 import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
+import 'package:colla_chat/widgets/media/audio/player/just_audio_player.dart';
+import 'package:colla_chat/widgets/media/audio/player/just_audio_player_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:flutter/material.dart';
 

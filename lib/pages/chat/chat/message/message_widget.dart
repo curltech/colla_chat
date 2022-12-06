@@ -240,6 +240,7 @@ class MessageWidget {
 
   RichTextMessage buildRichTextMessageWidget(BuildContext context) {
     String? messageId = chatMessage.messageId;
+    String? title = chatMessage.title;
     return RichTextMessage(
       key: GlobalKey(),
       messageId: messageId!,
@@ -325,6 +326,7 @@ class MessageWidget {
 
   ImageMessage buildImageMessageWidget(BuildContext context) {
     String? messageId = chatMessage.messageId;
+    String? title = chatMessage.title;
     String? thumbnail = chatMessage.thumbnail;
     String mimeType = chatMessage.mimeType!;
     double? width;
@@ -336,6 +338,7 @@ class MessageWidget {
     return ImageMessage(
       key: GlobalKey(),
       messageId: messageId!,
+      title: title,
       image: thumbnail,
       isMyself: isMyself,
       mimeType: mimeType,
@@ -347,11 +350,13 @@ class MessageWidget {
   VideoMessage buildVideoMessageWidget(BuildContext context) {
     int? id = chatMessage.id;
     String? messageId = chatMessage.messageId;
+    String? title = chatMessage.title;
     String? thumbnail = chatMessage.thumbnail;
     return VideoMessage(
       key: GlobalKey(),
       id: id!,
       messageId: messageId!,
+      title: title,
       isMyself: isMyself,
       thumbnail: thumbnail,
     );
@@ -360,10 +365,12 @@ class MessageWidget {
   AudioMessage buildAudioMessageWidget(BuildContext context) {
     int? id = chatMessage.id;
     String? messageId = chatMessage.messageId;
+    String? title = chatMessage.title;
     return AudioMessage(
       key: GlobalKey(),
       id: id!,
       messageId: messageId!,
+      title: title,
       isMyself: isMyself,
     );
   }
@@ -384,9 +391,13 @@ class MessageWidget {
         return buildPdfMessageWidget(context);
       }
     } else if (mimeType.startsWith('audio')) {
-      return buildAudioMessageWidget(context);
+      if (chatMessageController.chatView == ChatView.full) {
+        return buildAudioMessageWidget(context);
+      }
     } else if (mimeType.startsWith('video')) {
-      return buildVideoMessageWidget(context);
+      if (chatMessageController.chatView == ChatView.full) {
+        return buildVideoMessageWidget(context);
+      }
     } else if (extension == 'docx' ||
         extension == 'doc' ||
         extension == 'xlsx' ||
@@ -408,8 +419,10 @@ class MessageWidget {
 
   Future<Widget> buildPdfMessageWidget(BuildContext context) async {
     String? messageId = chatMessage.messageId;
+    String? title = chatMessage.title;
     if (messageId != null) {
-      String? filename = await messageAttachmentService.getFilename(messageId);
+      String? filename =
+          await messageAttachmentService.getFilename(messageId, title);
       if (filename != null && chatMessageController.chatView == ChatView.full) {
         return PdfUtil.buildPdfView(filename: filename);
       }
@@ -419,8 +432,10 @@ class MessageWidget {
 
   Future<Widget> buildOfficeMessageWidget(BuildContext context) async {
     String? messageId = chatMessage.messageId;
+    String? title = chatMessage.title;
     if (messageId != null) {
-      String? filename = await messageAttachmentService.getFilename(messageId);
+      String? filename =
+          await messageAttachmentService.getFilename(messageId, title);
       if (filename != null && chatMessageController.chatView == ChatView.full) {
         return DocumentUtil.buildFileReaderView(filePath: filename);
       }
