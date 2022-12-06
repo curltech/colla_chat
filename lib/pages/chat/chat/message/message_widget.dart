@@ -391,9 +391,7 @@ class MessageWidget {
         return buildPdfMessageWidget(context);
       }
     } else if (mimeType.startsWith('audio')) {
-      if (chatMessageController.chatView == ChatView.full) {
-        return buildAudioMessageWidget(context);
-      }
+      return buildAudioMessageWidget(context);
     } else if (mimeType.startsWith('video')) {
       if (chatMessageController.chatView == ChatView.full) {
         return buildVideoMessageWidget(context);

@@ -19,23 +19,24 @@ class AudioMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var videoPlayer = FutureBuilder(
-        future: messageAttachmentService.getFilename(messageId,title),
+    var audioPlayer = FutureBuilder(
+        future: messageAttachmentService.getFilename(messageId, title),
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-          var filename = snapshot.data;
-          if (filename == null) {
-            return Container();
+          if (snapshot.hasData) {
+            var filename = snapshot.data;
+            if (filename == null) {
+              return Container();
+            }
+            return PlatformMediaPlayer(
+              showControls: false,
+              showPlaylist: false,
+              showMediaView: false,
+              filename: filename,
+              mediaPlayerType: MediaPlayerType.webview,
+            );
           }
-          return PlatformMediaPlayer(
-            showControls: false,
-            showPlaylist: false,
-            showMediaView: false,
-            showVolume: true,
-            showSpeed: false,
-            filename: filename,
-            mediaPlayerType: MediaPlayerType.just,
-          );
+          return Container();
         });
-    return SizedBox(height: 80, child: Card(elevation: 0, child: videoPlayer));
+    return Column(children: [Text(title ?? ''), Expanded(child: audioPlayer)]);
   }
 }
