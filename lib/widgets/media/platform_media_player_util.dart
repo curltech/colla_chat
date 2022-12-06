@@ -416,7 +416,9 @@ class PlatformMediaPlayerUtil {
       var view = VisibilityDetector(
           key: ObjectKey(controller),
           onVisibilityChanged: (visiblityInfo) {
-            if (visiblityInfo.visibleFraction > 0.9 && controller.autoPlay) {
+            if (visiblityInfo.visibleFraction == 0) {
+              controller.pause();
+            } else if (visiblityInfo.visibleFraction > 0.9) {
               controller.play();
             }
           },

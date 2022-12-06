@@ -255,8 +255,6 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
     AlignmentGeometry alignment = Alignment.center,
     double scale = 1.0,
     bool showControls = true,
-    Widget flickVideoWithControls =
-        const FlickVideoWithControls(controls: FlickPortraitControls()),
     Widget? flickVideoWithControlsFullscreen,
     List<SystemUiOverlay> systemUIOverlay = SystemUiOverlay.values,
     List<SystemUiOverlay> systemUIOverlayFullscreen = const [],
@@ -276,6 +274,8 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
     if (currentFlickManager == null) {
       return const Center(child: Text('Please select a MediaPlayerType!'));
     }
+    Widget flickVideoWithControls = FlickVideoWithControls(
+        videoFit: fit, controls: const FlickPortraitControls());
     var flickVideoPlayer = FlickVideoPlayer(
       flickManager: currentFlickManager!,
       flickVideoWithControls: flickVideoWithControls,
@@ -304,8 +304,9 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
   }
 }
 
-class FeedPlayerPortraitControls extends StatelessWidget {
-  const FeedPlayerPortraitControls(
+///肖像控制器
+class FlickPlayerPortraitControls extends StatelessWidget {
+  const FlickPlayerPortraitControls(
       {Key? key, this.flickMultiManager, this.flickManager})
       : super(key: key);
 

@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 ///消息体：富文本
 class RichTextMessage extends StatelessWidget {
   final String messageId;
+  final String? title;
   final bool isMyself;
 
   const RichTextMessage(
-      {Key? key, required this.messageId, required this.isMyself})
+      {Key? key, required this.messageId, required this.isMyself, this.title})
       : super(key: key);
 
   @override
