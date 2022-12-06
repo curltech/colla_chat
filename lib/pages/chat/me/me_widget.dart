@@ -16,8 +16,8 @@ import 'package:colla_chat/widgets/common/platform_webview_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
-import 'package:colla_chat/widgets/media/audio/platform_audio_player_widget.dart';
-import 'package:colla_chat/widgets/media/audio/platform_audio_recorder_widget.dart';
+import 'package:colla_chat/widgets/media/audio/player/platform_audio_player_widget.dart';
+import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder_widget.dart';
 import 'package:colla_chat/widgets/media/video/platform_video_player_widget.dart';
 import 'package:flutter/material.dart';
 

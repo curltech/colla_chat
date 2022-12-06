@@ -1,18 +1,18 @@
 import 'dart:async';
 
+import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/media/audio/audio_service.dart';
-import 'package:colla_chat/widgets/media/audio/just_audio_player_controller.dart';
+import 'package:colla_chat/widgets/media/audio/player/waveforms_audio_player_controller.dart';
 import 'package:colla_chat/widgets/media/media_player_slider.dart';
 import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_player_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:just_audio/just_audio.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 
-class JustAudioPlayer extends StatefulWidget {
-  late final JustAudioPlayerController controller;
+class WaveformsAudioPlayer extends StatefulWidget {
+  late final WaveformsAudioPlayerController controller;
 
   //自定义简单控制器模式
   final bool showVolume;
@@ -26,9 +26,9 @@ class JustAudioPlayer extends StatefulWidget {
   final String? filename;
   final List<int>? data;
 
-  JustAudioPlayer(
+  WaveformsAudioPlayer(
       {Key? key,
-      JustAudioPlayerController? controller,
+      WaveformsAudioPlayerController? controller,
       this.showVolume = true,
       this.showSpeed = false,
       this.showPlaylist = true,
@@ -36,14 +36,14 @@ class JustAudioPlayer extends StatefulWidget {
       this.filename,
       this.data})
       : super(key: key) {
-    this.controller = controller ?? JustAudioPlayerController();
+    this.controller = controller ?? WaveformsAudioPlayerController();
   }
 
   @override
-  State createState() => _JustAudioPlayerState();
+  State createState() => _WaveformsAudioPlayerState();
 }
 
-class _JustAudioPlayerState extends State<JustAudioPlayer>
+class _WaveformsAudioPlayerState extends State<WaveformsAudioPlayer>
     with WidgetsBindingObserver {
   @override
   void initState() {
@@ -58,8 +58,26 @@ class _JustAudioPlayerState extends State<JustAudioPlayer>
   Future<void> _init() async {
     widget.controller.addListener(_update);
     AudioSessionUtil.initMusic();
-    widget.controller.player.playbackEventStream.listen((PlaybackEvent event) {
-      logger.i('A stream PlaybackEvent occurred: ${event.toString()}');
+    widget.controller.playerController.onCurrentDurationChanged.listen(
+        (int position) {
+      logger.i('A stream onCurrentDurationChanged occurred: $position');
+    }, onError: (Object e, StackTrace stackTrace) {
+      logger.e('A stream error occurred: $e');
+    });
+    widget.controller.playerController.onPlayerStateChanged.listen(
+        (playerState) {
+      logger.i('A stream onPlayerStateChanged occurred: ${playerState.name}');
+      if (playerState == PlayerState.initialized) {
+        widget.controller.status = PlayerStatus.init;
+      } else if (playerState == PlayerState.playing) {
+        widget.controller.status = PlayerStatus.playing;
+      } else if (playerState == PlayerState.paused) {
+        widget.controller.status = PlayerStatus.pause;
+      } else if (playerState == PlayerState.stopped) {
+        widget.controller.status = PlayerStatus.stop;
+      } else if (playerState == PlayerState.readingComplete) {
+        widget.controller.status = PlayerStatus.completed;
+      }
     }, onError: (Object e, StackTrace stackTrace) {
       logger.e('A stream error occurred: $e');
     });
@@ -101,7 +119,7 @@ class _JustAudioPlayerState extends State<JustAudioPlayer>
           child: Stack(children: rows));
       columns.add(Expanded(child: view));
     }
-    Widget controllerPanel = PlatformJustAudioControllerPanel(
+    Widget controllerPanel = WaveformsAudioControllerPanel(
       controller: widget.controller,
       showVolume: widget.showVolume,
       showSpeed: widget.showSpeed,
@@ -113,30 +131,30 @@ class _JustAudioPlayerState extends State<JustAudioPlayer>
 }
 
 ///视频播放器的控制面板
-class PlatformJustAudioControllerPanel extends StatefulWidget {
-  late final JustAudioPlayerController controller;
+class WaveformsAudioControllerPanel extends StatefulWidget {
+  late final WaveformsAudioPlayerController controller;
 
   ///如果是外置控件，是否显示简洁版
   final bool showVolume;
   final bool showSpeed;
   final bool showPlaylist;
 
-  PlatformJustAudioControllerPanel({
+  WaveformsAudioControllerPanel({
     Key? key,
-    JustAudioPlayerController? controller,
+    WaveformsAudioPlayerController? controller,
     this.showVolume = true,
     this.showSpeed = false,
     this.showPlaylist = true,
   }) : super(key: key) {
-    this.controller = controller ?? JustAudioPlayerController();
+    this.controller = controller ?? WaveformsAudioPlayerController();
   }
 
   @override
-  State createState() => _PlatformJustAudioControllerPanelState();
+  State createState() => _WaveformsAudioControllerPanelState();
 }
 
-class _PlatformJustAudioControllerPanelState
-    extends State<PlatformJustAudioControllerPanel> {
+class _WaveformsAudioControllerPanelState
+    extends State<WaveformsAudioControllerPanel> {
   @override
   void initState() {
     super.initState();
@@ -157,43 +175,12 @@ class _PlatformJustAudioControllerPanelState
           context, widget.controller));
     }
     if (widget.showVolume) {
-      rows.add(StreamBuilder<double>(
-        stream: widget.controller.player.volumeStream,
-        builder: (context, snapshot) {
-          return PlatformMediaPlayerUtil.buildVolumeButton(
-              context, widget.controller);
-        },
-      ));
+      rows.add(PlatformMediaPlayerUtil.buildVolumeButton(
+          context, widget.controller));
     }
-    rows.add(StreamBuilder<PlayerState>(
-        stream: widget.controller.player.playerStateStream,
-        builder: (context, snapshot) {
-          final playerState = snapshot.data;
-          final processingState = playerState?.processingState;
-          PlayerStatus status;
-          if (playerState == null) {
-            status = PlayerStatus.init;
-          } else if (playerState.playing) {
-            status = PlayerStatus.playing;
-          } else if (processingState == ProcessingState.completed) {
-            status = PlayerStatus.completed;
-          } else {
-            status = widget.controller.status;
-          }
-          Widget playback = PlatformMediaPlayerUtil.buildPlaybackButton(
-              context, widget.controller, status, widget.showPlaylist);
+    rows.add(PlatformMediaPlayerUtil.buildPlaybackButton(context,
+        widget.controller, widget.controller.status, widget.showPlaylist));
 
-          return playback;
-        }));
-    if (widget.showSpeed) {
-      rows.add(StreamBuilder<double>(
-        stream: widget.controller.player.speedStream,
-        builder: (context, snapshot) {
-          return PlatformMediaPlayerUtil.buildSpeedButton(
-              context, widget.controller);
-        },
-      ));
-    }
     return Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -203,14 +190,17 @@ class _PlatformJustAudioControllerPanelState
 
   ///播放进度条
   Widget _buildPlayerSlider(BuildContext context) {
-    return StreamBuilder<PositionData>(
-      stream: widget.controller.positionDataStream,
+    return StreamBuilder<int>(
+      stream: widget.controller.playerController.onCurrentDurationChanged,
       builder: (context, snapshot) {
         final positionData = snapshot.data;
         return MediaPlayerSlider(
-          duration: positionData?.duration ?? Duration.zero,
-          position: positionData?.position ?? Duration.zero,
-          bufferedPosition: positionData?.bufferedPosition ?? Duration.zero,
+          duration: Duration(
+              milliseconds: widget.controller.playerController.maxDuration),
+          position: positionData != 0
+              ? Duration(milliseconds: positionData!)
+              : Duration.zero,
+          bufferedPosition: Duration.zero,
           onChangeEnd: widget.controller.seek,
         );
       },
