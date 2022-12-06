@@ -37,9 +37,6 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  setShuffleModeEnabled(bool enabled) {}
-
-  @override
   close() {
     playlist.clear();
   }
