@@ -94,7 +94,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   bool autoPlay = false;
   int _currentIndex = -1;
   PlayerStatus _status = PlayerStatus.init;
-  FileType fileType = FileType.video;
+  FileType fileType = FileType.media;
 
   bool get playlistVisible {
     return _playlistVisible;
@@ -235,8 +235,6 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   dispose();
 
   seek(Duration position, {int? index});
-
-  setShuffleModeEnabled(bool enabled);
 
   Future<Duration?> getDuration();
 

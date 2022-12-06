@@ -10,8 +10,8 @@ enum MediaPlayerType {
   flick,
   webview,
   just,
-  bluefire,
-  another,
+  audioplayers,
+  waveforms,
 }
 
 ///平台的媒体播放器组件

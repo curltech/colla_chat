@@ -223,11 +223,6 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  setShuffleModeEnabled(bool enabled) {
-    throw UnimplementedError();
-  }
-
-  @override
   close() {}
 
   @override

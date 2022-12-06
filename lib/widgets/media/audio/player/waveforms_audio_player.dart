@@ -1,221 +1,155 @@
-import 'dart:async';
-
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/widgets/media/audio/audio_service.dart';
-import 'package:colla_chat/widgets/media/audio/player/waveforms_audio_player_controller.dart';
-import 'package:colla_chat/widgets/media/media_player_slider.dart';
 import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
-import 'package:colla_chat/widgets/media/platform_media_player_util.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:visibility_detector/visibility_detector.dart';
+import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/src/widgets/framework.dart';
 
-class WaveformsAudioPlayer extends StatefulWidget {
-  late final WaveformsAudioPlayerController controller;
+///WaveformsAudio音频播放器，Android, iOS, Linux, macOS, Windows, and web.
+///还可以产生音频播放的波形图形组件
+class WaveformsAudioPlayerController extends AbstractMediaPlayerController {
+  late PlayerController playerController;
+  double _volume = 1.0;
 
-  //自定义简单控制器模式
-  final bool showVolume;
-  final bool showSpeed;
-
-  //是否显示播放列表
-  final bool showPlaylist;
-
-  //是否显示音频波形界面
-  final bool showMediaView;
-  final String? filename;
-  final List<int>? data;
-
-  WaveformsAudioPlayer(
-      {Key? key,
-      WaveformsAudioPlayerController? controller,
-      this.showVolume = true,
-      this.showSpeed = false,
-      this.showPlaylist = true,
-      this.showMediaView = false,
-      this.filename,
-      this.data})
-      : super(key: key) {
-    this.controller = controller ?? WaveformsAudioPlayerController();
+  WaveformsAudioPlayerController() {
+    playerController = PlayerController();
   }
 
+  ///设置当前的通用MediaSource，并转换成特定实现的媒体源，并进行设置
   @override
-  State createState() => _WaveformsAudioPlayerState();
-}
-
-class _WaveformsAudioPlayerState extends State<WaveformsAudioPlayer>
-    with WidgetsBindingObserver {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.black,
-    ));
-    _init();
-  }
-
-  Future<void> _init() async {
-    widget.controller.addListener(_update);
-    AudioSessionUtil.initMusic();
-    widget.controller.playerController.onCurrentDurationChanged.listen(
-        (int position) {
-      logger.i('A stream onCurrentDurationChanged occurred: $position');
-    }, onError: (Object e, StackTrace stackTrace) {
-      logger.e('A stream error occurred: $e');
-    });
-    widget.controller.playerController.onPlayerStateChanged.listen(
-        (playerState) {
-      logger.i('A stream onPlayerStateChanged occurred: ${playerState.name}');
-      if (playerState == PlayerState.initialized) {
-        widget.controller.status = PlayerStatus.init;
-      } else if (playerState == PlayerState.playing) {
-        widget.controller.status = PlayerStatus.playing;
-      } else if (playerState == PlayerState.paused) {
-        widget.controller.status = PlayerStatus.pause;
-      } else if (playerState == PlayerState.stopped) {
-        widget.controller.status = PlayerStatus.stop;
-      } else if (playerState == PlayerState.readingComplete) {
-        widget.controller.status = PlayerStatus.completed;
+  setCurrentIndex(int? index) async {
+    super.setCurrentIndex(index);
+    if (currentIndex != null) {
+      PlatformMediaSource? currentMediaSource = this.currentMediaSource;
+      if (currentMediaSource != null) {
+        playerController.preparePlayer(currentMediaSource.filename, _volume);
+        notifyListeners();
       }
-    }, onError: (Object e, StackTrace stackTrace) {
-      logger.e('A stream error occurred: $e');
-    });
-    if (widget.filename != null || widget.data != null) {
-      widget.controller.add(filename: widget.filename, data: widget.data);
     }
   }
 
-  _update() {
-    setState(() {});
+  @override
+  play() async {
+    if (currentIndex != null) {
+      await playerController.startPlayer();
+    }
   }
 
   @override
-  void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
-    widget.controller.removeListener(_update);
+  pause() async {
+    await playerController.pausePlayer();
+  }
+
+  @override
+  stop() async {
+    await playerController.stopPlayer();
+  }
+
+  @override
+  resume() async {
+    if (currentIndex != null) {
+      await playerController.startPlayer();
+    }
+  }
+
+  @override
+  dispose() async {
     super.dispose();
+    playerController.dispose();
   }
 
   @override
-  Widget build(BuildContext context) {
-    AbstractMediaPlayerController controller = widget.controller;
-    List<Widget> columns = [];
-    List<Widget> rows = [];
-    if (widget.showMediaView) {}
-    if (widget.showPlaylist) {
-      rows.add(Visibility(
-          visible: controller.playlistVisible,
-          child: PlatformMediaPlayerUtil.buildPlaylist(context, controller)));
+  seek(Duration? position, {int? index}) async {
+    if (index != null) {
+      setCurrentIndex(index!);
     }
-    if (rows.isNotEmpty) {
-      var view = VisibilityDetector(
-          key: ObjectKey(controller),
-          onVisibilityChanged: (visiblityInfo) {
-            if (visiblityInfo.visibleFraction > 0.9 && controller.autoPlay) {
-              controller.play();
-            }
-          },
-          child: Stack(children: rows));
-      columns.add(Expanded(child: view));
+    if (position != null) {
+      try {
+        await playerController.seekTo(position.inMilliseconds);
+      } catch (e) {
+        logger.e('seek failure:$e');
+      }
     }
-    Widget controllerPanel = WaveformsAudioControllerPanel(
-      controller: widget.controller,
-      showVolume: widget.showVolume,
-      showSpeed: widget.showSpeed,
-      showPlaylist: widget.showPlaylist,
-    );
-    columns.add(Expanded(child: controllerPanel));
-    return Column(children: columns);
   }
-}
 
-///视频播放器的控制面板
-class WaveformsAudioControllerPanel extends StatefulWidget {
-  late final WaveformsAudioPlayerController controller;
+  @override
+  Future<Duration?> getDuration() async {
+    int milliseconds = await playerController.getDuration(DurationType.max);
 
-  ///如果是外置控件，是否显示简洁版
-  final bool showVolume;
-  final bool showSpeed;
-  final bool showPlaylist;
+    return Duration(milliseconds: milliseconds);
+  }
 
-  WaveformsAudioControllerPanel({
+  @override
+  Future<Duration?> getPosition() async {
+    int milliseconds = await playerController.getDuration(DurationType.current);
+
+    return Duration(milliseconds: milliseconds);
+  }
+
+  @override
+  Future<Duration?> getBufferedPosition() async {
+    return Future.value(const Duration(milliseconds: 0));
+  }
+
+  @override
+  Future<double> getVolume() async {
+    return Future.value(_volume);
+  }
+
+  @override
+  setVolume(double volume) async {
+    if (_volume != volume) {
+      bool success = await playerController.setVolume(volume);
+      if (success) {
+        _volume = volume;
+      }
+    }
+  }
+
+  @override
+  Future<double> getSpeed() async {
+    return Future.value(1.0);
+  }
+
+  @override
+  setSpeed(double speed) async {}
+
+  @override
+  close() {}
+
+  @override
+  Widget buildMediaView({
     Key? key,
-    WaveformsAudioPlayerController? controller,
-    this.showVolume = true,
-    this.showSpeed = false,
-    this.showPlaylist = true,
-  }) : super(key: key) {
-    this.controller = controller ?? WaveformsAudioPlayerController();
-  }
-
-  @override
-  State createState() => _WaveformsAudioControllerPanelState();
-}
-
-class _WaveformsAudioControllerPanelState
-    extends State<WaveformsAudioControllerPanel> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Widget controllerPanel = _buildControllerPanel(context);
-
-    return controllerPanel;
-  }
-
-  ///简单播放控制面板，包含音量，简单播放按钮，
-  Widget _buildControlPanel(BuildContext buildContext) {
-    List<Widget> rows = [];
-    if (widget.showPlaylist) {
-      rows.add(PlatformMediaPlayerUtil.buildPlaylistVisibleButton(
-          context, widget.controller));
-    }
-    if (widget.showVolume) {
-      rows.add(PlatformMediaPlayerUtil.buildVolumeButton(
-          context, widget.controller));
-    }
-    rows.add(PlatformMediaPlayerUtil.buildPlaybackButton(context,
-        widget.controller, widget.controller.status, widget.showPlaylist));
-
-    return Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: rows);
-  }
-
-  ///播放进度条
-  Widget _buildPlayerSlider(BuildContext context) {
-    return StreamBuilder<int>(
-      stream: widget.controller.playerController.onCurrentDurationChanged,
-      builder: (context, snapshot) {
-        final positionData = snapshot.data;
-        return MediaPlayerSlider(
-          duration: Duration(
-              milliseconds: widget.controller.playerController.maxDuration),
-          position: positionData != 0
-              ? Duration(milliseconds: positionData!)
-              : Duration.zero,
-          bufferedPosition: Duration.zero,
-          onChangeEnd: widget.controller.seek,
-        );
-      },
-    );
-  }
-
-  ///复杂控制器按钮面板，包含音量，速度和播放按钮
-  Widget _buildControllerPanel(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        _buildPlayerSlider(context),
-        _buildControlPanel(context),
-      ],
+    double? width,
+    double? height,
+    BoxFit fit = BoxFit.contain,
+    AlignmentGeometry alignment = Alignment.center,
+    double scale = 1.0,
+    bool showControls = true,
+    PlayerWaveStyle playerWaveStyle = const PlayerWaveStyle(),
+    bool enableSeekGesture = true,
+    EdgeInsets? padding,
+    EdgeInsets? margin,
+    BoxDecoration? decoration,
+    Color? backgroundColor,
+    Duration animationDuration = const Duration(milliseconds: 500),
+    Curve animationCurve = Curves.ease,
+    double density = 2,
+    Clip clipBehavior = Clip.none,
+  }) {
+    return AudioFileWaveforms(
+      key: key,
+      size: Size(width!, height!),
+      padding: padding,
+      margin: margin,
+      decoration: decoration,
+      backgroundColor: backgroundColor,
+      playerWaveStyle: playerWaveStyle,
+      enableSeekGesture: enableSeekGesture,
+      animationDuration: animationDuration,
+      animationCurve: animationCurve,
+      density: density,
+      clipBehavior: clipBehavior,
+      playerController: playerController,
     );
   }
 }

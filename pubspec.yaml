@@ -236,9 +236,9 @@ dependencies:
   better_player: ^0.0.83 #chewie的封装
   fijkplayer: ^0.10.1 #mobile
   flutter_vlc_player: ^7.1.5 #video_player的替代，mobile
-  record: ^4.4.0
-  just_audio: ^0.9.25
-  just_audio_windows: ^0.1.0
+  record: ^4.4.3
+  just_audio: ^0.9.30
+  just_audio_windows: ^0.2.0
   just_audio_mpv: ^0.1.4
   just_waveform: any
   audio_service: any
