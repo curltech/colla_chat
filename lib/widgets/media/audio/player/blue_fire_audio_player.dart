@@ -223,15 +223,11 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  setShuffleModeEnabled(bool enabled) {
-    throw UnimplementedError();
-  }
-
-  @override
   close() {}
 
   @override
   Widget buildMediaView({
+    Key? key,
     double? width,
     double? height,
     BoxFit fit = BoxFit.contain,
@@ -239,6 +235,7 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
     double scale = 1.0,
     bool showControls = true,
   }) {
+    key ??= UniqueKey();
     return Container();
   }
 }

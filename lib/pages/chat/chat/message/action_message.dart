@@ -28,6 +28,7 @@ class ActionMessage extends StatelessWidget {
             Expanded(
               child: ExtendedText(
                 '视频通话邀请',
+                key: UniqueKey(),
                 style: TextStyle(
                   color: isMyself ? Colors.white : Colors.black,
                   //fontSize: 16.0,
@@ -50,6 +51,7 @@ class ActionMessage extends StatelessWidget {
             Expanded(
               child: ExtendedText(
                 AppLocalizations.t('Add friend'),
+                key: UniqueKey(),
                 style: TextStyle(
                   color: isMyself ? Colors.white : Colors.black,
                   //fontSize: 16.0,

@@ -67,6 +67,7 @@ class ImageUtil {
     } else if (ImageUtil.isAssetsImg(image)) {
       imageWidget = Image.asset(
         image,
+        key: UniqueKey(),
         width: width,
         height: height,
         fit: fit,
@@ -74,6 +75,7 @@ class ImageUtil {
     } else if (File(image).existsSync()) {
       imageWidget = Image.file(
         File(image),
+        key: UniqueKey(),
         width: width,
         height: height,
         fit: fit,
@@ -81,6 +83,7 @@ class ImageUtil {
     } else if (ImageUtil.isNetWorkImg(image)) {
       imageWidget = CachedNetworkImage(
         imageUrl: image,
+        key: UniqueKey(),
         width: width,
         height: height,
         fit: fit,

@@ -1,231 +1,237 @@
-import 'dart:async';
+import 'dart:typed_data';
 
+import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/widgets/media/audio/audio_service.dart';
-import 'package:colla_chat/widgets/media/audio/player/just_audio_player_controller.dart';
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/media/media_player_slider.dart';
 import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
-import 'package:colla_chat/widgets/media/platform_media_player_util.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/src/widgets/framework.dart';
 import 'package:just_audio/just_audio.dart';
-import 'package:visibility_detector/visibility_detector.dart';
+import 'package:just_audio_background/just_audio_background.dart';
+import 'package:rxdart/rxdart.dart';
 
-class JustAudioPlayer extends StatefulWidget {
-  late final JustAudioPlayerController controller;
+///采用just_audio和record实现的音频的播放和记录，适用于Android, iOS, Linux, macOS, Windows, and web.
+class JustAudioSource {
+  static Future<AudioSource> audioSource(
+      {String? filename,
+      Uint8List? data,
+      String? id,
+      String? album,
+      String? title,
+      String? artUri}) async {
+    AudioSource audioSource;
+    id = id ?? await cryptoGraphy.getRandomAsciiString();
+    title = title ?? await cryptoGraphy.getRandomAsciiString();
+    var tag = MediaItem(
+      // Specify a unique ID for each media item:
+      id: id,
+      // Metadata to display in the notification:
+      album: album, //"Album name",
+      title: title, //"Song name",
+      artUri: artUri != null
+          ? Uri.parse(artUri)
+          : null, //Uri.parse('https://example.com/albumart.jpg'),
+    );
+    if (filename != null) {
+      if (filename.startsWith('assets')) {
+        audioSource = AudioSource.uri(Uri.parse(filename), tag: tag);
+      } else if (filename.startsWith('http')) {
+        audioSource = AudioSource.uri(Uri.parse(filename), tag: tag);
+      } else {
+        audioSource = AudioSource.uri(Uri.file(filename), tag: tag);
+      }
+    } else {
+      data = data ?? Uint8List.fromList([]);
+      filename = await FileUtil.writeTempFile(data);
+      audioSource = AudioSource.uri(Uri.parse(filename!), tag: tag);
+    }
 
-  //自定义简单控制器模式
-  final bool showVolume;
-  final bool showSpeed;
-
-  //是否显示播放列表
-  final bool showPlaylist;
-
-  //是否显示音频波形界面
-  final bool showMediaView;
-  final String? filename;
-  final List<int>? data;
-
-  JustAudioPlayer(
-      {Key? key,
-      JustAudioPlayerController? controller,
-      this.showVolume = true,
-      this.showSpeed = false,
-      this.showPlaylist = true,
-      this.showMediaView = false,
-      this.filename,
-      this.data})
-      : super(key: key) {
-    this.controller = controller ?? JustAudioPlayerController();
+    return audioSource;
   }
 
-  @override
-  State createState() => _JustAudioPlayerState();
+  static Future<AudioSource> fromMediaSource(PlatformMediaSource mediaSource,
+      {String? id, String? album, String? title, String? artUri}) async {
+    AudioSource source = await audioSource(
+      filename: mediaSource.filename,
+      id: id,
+      album: album,
+      title: title,
+      artUri: artUri,
+    );
+
+    return source;
+  }
 }
 
-class _JustAudioPlayerState extends State<JustAudioPlayer>
-    with WidgetsBindingObserver {
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.black,
-    ));
-    _init();
-  }
+///JustAudio音频播放器，Android, iOS, Linux, macOS, Windows, and web.
+///还可以产生音频播放的波形图形组件
+class JustAudioPlayerController extends AbstractMediaPlayerController {
+  late AudioPlayer player;
 
-  Future<void> _init() async {
-    widget.controller.addListener(_update);
-    AudioSessionUtil.initMusic();
-    widget.controller.player.playbackEventStream.listen((PlaybackEvent event) {
-      logger.i('A stream PlaybackEvent occurred: ${event.toString()}');
-    }, onError: (Object e, StackTrace stackTrace) {
-      logger.e('A stream error occurred: $e');
+  ///当前版本还不支持windows
+  // ConcatenatingAudioSource playlist = ConcatenatingAudioSource(
+  //   // Start loading next item just before reaching it
+  //   useLazyPreparation: true,
+  //   // Customise the shuffle algorithm
+  //   shuffleOrder: DefaultShuffleOrder(),
+  //   // Specify the playlist items
+  //   children: [],
+  // );
+
+  JustAudioPlayerController({
+    String? userAgent,
+    bool handleInterruptions = true,
+    bool androidApplyAudioAttributes = true,
+    bool handleAudioSessionActivation = true,
+    AudioLoadConfiguration? audioLoadConfiguration,
+    AudioPipeline? audioPipeline,
+    bool androidOffloadSchedulingEnabled = false,
+  }) {
+    player = AudioPlayer(
+        userAgent: userAgent,
+        handleInterruptions: handleInterruptions,
+        androidApplyAudioAttributes: androidApplyAudioAttributes,
+        handleAudioSessionActivation: handleAudioSessionActivation,
+        audioLoadConfiguration: audioLoadConfiguration,
+        audioPipeline: audioPipeline,
+        androidOffloadSchedulingEnabled: androidOffloadSchedulingEnabled);
+    player.playerStateStream.listen((state) {
+      logger.i('player state:${state.processingState.name}');
     });
-    if (widget.filename != null || widget.data != null) {
-      widget.controller.add(filename: widget.filename, data: widget.data);
-    }
   }
 
-  _update() {
-    setState(() {});
-  }
-
+  ///设置当前的通用MediaSource，并转换成特定实现的媒体源，并进行设置
   @override
-  void dispose() {
-    WidgetsBinding.instance!.removeObserver(this);
-    widget.controller.removeListener(_update);
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    AbstractMediaPlayerController controller = widget.controller;
-    List<Widget> columns = [];
-    List<Widget> rows = [];
-    if (widget.showMediaView) {}
-    if (widget.showPlaylist) {
-      rows.add(Visibility(
-          visible: controller.playlistVisible,
-          child: PlatformMediaPlayerUtil.buildPlaylist(context, controller)));
-    }
-    if (rows.isNotEmpty) {
-      var view = VisibilityDetector(
-          key: ObjectKey(controller),
-          onVisibilityChanged: (visiblityInfo) {
-            if (visiblityInfo.visibleFraction > 0.9 && controller.autoPlay) {
-              controller.play();
-            }
-          },
-          child: Stack(children: rows));
-      columns.add(Expanded(child: view));
-    }
-    Widget controllerPanel = PlatformJustAudioControllerPanel(
-      controller: widget.controller,
-      showVolume: widget.showVolume,
-      showSpeed: widget.showSpeed,
-      showPlaylist: widget.showPlaylist,
-    );
-    columns.add(Expanded(child: controllerPanel));
-    return Column(children: columns);
-  }
-}
-
-///视频播放器的控制面板
-class PlatformJustAudioControllerPanel extends StatefulWidget {
-  late final JustAudioPlayerController controller;
-
-  ///如果是外置控件，是否显示简洁版
-  final bool showVolume;
-  final bool showSpeed;
-  final bool showPlaylist;
-
-  PlatformJustAudioControllerPanel({
-    Key? key,
-    JustAudioPlayerController? controller,
-    this.showVolume = true,
-    this.showSpeed = false,
-    this.showPlaylist = true,
-  }) : super(key: key) {
-    this.controller = controller ?? JustAudioPlayerController();
-  }
-
-  @override
-  State createState() => _PlatformJustAudioControllerPanelState();
-}
-
-class _PlatformJustAudioControllerPanelState
-    extends State<PlatformJustAudioControllerPanel> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    Widget controllerPanel = _buildControllerPanel(context);
-
-    return controllerPanel;
-  }
-
-  ///简单播放控制面板，包含音量，简单播放按钮，
-  Widget _buildControlPanel(BuildContext buildContext) {
-    List<Widget> rows = [];
-    if (widget.showPlaylist) {
-      rows.add(PlatformMediaPlayerUtil.buildPlaylistVisibleButton(
-          context, widget.controller));
-    }
-    if (widget.showVolume) {
-      rows.add(StreamBuilder<double>(
-        stream: widget.controller.player.volumeStream,
-        builder: (context, snapshot) {
-          return PlatformMediaPlayerUtil.buildVolumeButton(
-              context, widget.controller);
-        },
-      ));
-    }
-    rows.add(StreamBuilder<PlayerState>(
-        stream: widget.controller.player.playerStateStream,
-        builder: (context, snapshot) {
-          final playerState = snapshot.data;
-          final processingState = playerState?.processingState;
-          PlayerStatus status;
-          if (playerState == null) {
-            status = PlayerStatus.init;
-          } else if (playerState.playing) {
-            status = PlayerStatus.playing;
-          } else if (processingState == ProcessingState.completed) {
-            status = PlayerStatus.completed;
-          } else {
-            status = widget.controller.status;
+  setCurrentIndex(int? index) async {
+    super.setCurrentIndex(index);
+    if (currentIndex != null) {
+      PlatformMediaSource? currentMediaSource = this.currentMediaSource;
+      if (currentMediaSource != null) {
+        AudioSource source =
+            await JustAudioSource.fromMediaSource(currentMediaSource);
+        var audioSource = player.audioSource;
+        if (audioSource != source) {
+          try {
+            await player.setAudioSource(
+              source,
+            );
+            notifyListeners();
+          } catch (e) {
+            logger.e('$e');
           }
-          Widget playback = PlatformMediaPlayerUtil.buildPlaybackButton(
-              context, widget.controller, status, widget.showPlaylist);
-
-          return playback;
-        }));
-    if (widget.showSpeed) {
-      rows.add(StreamBuilder<double>(
-        stream: widget.controller.player.speedStream,
-        builder: (context, snapshot) {
-          return PlatformMediaPlayerUtil.buildSpeedButton(
-              context, widget.controller);
-        },
-      ));
+        }
+      }
     }
-    return Row(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: rows);
   }
 
-  ///播放进度条
-  Widget _buildPlayerSlider(BuildContext context) {
-    return StreamBuilder<PositionData>(
-      stream: widget.controller.positionDataStream,
-      builder: (context, snapshot) {
-        final positionData = snapshot.data;
-        return MediaPlayerSlider(
-          duration: positionData?.duration ?? Duration.zero,
-          position: positionData?.position ?? Duration.zero,
-          bufferedPosition: positionData?.bufferedPosition ?? Duration.zero,
-          onChangeEnd: widget.controller.seek,
-        );
-      },
-    );
+  @override
+  play() async {
+    var audioSource = player.audioSource;
+    if (audioSource != null) {
+      await player.play();
+    }
   }
 
-  ///复杂控制器按钮面板，包含音量，速度和播放按钮
-  Widget _buildControllerPanel(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        _buildPlayerSlider(context),
-        _buildControlPanel(context),
-      ],
-    );
+  @override
+  pause() async {
+    await player.pause();
+  }
+
+  @override
+  stop() async {
+    await player.stop();
+  }
+
+  @override
+  resume() async {
+    await player.play();
+  }
+
+  @override
+  dispose() async {
+    super.dispose();
+    await player.dispose();
+  }
+
+  @override
+  seek(Duration? position, {int? index}) async {
+    if (index != null) {
+      setCurrentIndex(index!);
+    }
+    if (position != null) {
+      try {
+        await player.seek(position, index: index);
+      } catch (e) {
+        logger.e('seek failure:$e');
+      }
+    }
+  }
+
+  setLoopMode(LoopMode mode) async {
+    await player.setLoopMode(mode);
+  }
+
+  @override
+  Future<Duration?> getDuration() async {
+    return player.duration;
+  }
+
+  @override
+  Future<Duration?> getPosition() async {
+    return player.position;
+  }
+
+  @override
+  Future<Duration?> getBufferedPosition() async {
+    return player.bufferedPosition;
+  }
+
+  @override
+  Future<double> getVolume() async {
+    return Future.value(player.volume);
+  }
+
+  @override
+  setVolume(double volume) async {
+    await player.setVolume(volume);
+  }
+
+  @override
+  Future<double> getSpeed() async {
+    return Future.value(player.speed);
+  }
+
+  @override
+  setSpeed(double speed) async {
+    await player.setSpeed(speed);
+  }
+
+  /// Collects the data useful for displaying in a seek bar, using a handy
+  /// feature of rx_dart to combine the 3 streams of interest into one.
+  Stream<PositionData> get positionDataStream {
+    return Rx.combineLatest3<Duration, Duration, Duration?, PositionData>(
+        player.positionStream,
+        player.bufferedPositionStream,
+        player.durationStream,
+        (position, bufferedPosition, duration) => PositionData(
+            position, bufferedPosition, duration ?? Duration.zero));
+  }
+
+  @override
+  close() {}
+
+  @override
+  Widget buildMediaView({
+    Key? key,
+    double? width,
+    double? height,
+    BoxFit fit = BoxFit.contain,
+    AlignmentGeometry alignment = Alignment.center,
+    double scale = 1.0,
+    bool showControls = true,
+  }) {
+    key ??= UniqueKey();
+    return Container();
   }
 }

@@ -7,6 +7,7 @@ import 'package:colla_chat/pages/chat/chat/video/video_chat_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_dialout_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -16,9 +17,13 @@ import 'package:flutter/material.dart';
 /// 聊天界面，包括文本聊天，视频通话呼叫，视频通话，全屏展示四个组件
 /// 支持群聊
 class ChatMessageView extends StatefulWidget with TileDataMixin {
+  final FullScreenWidget fullScreenWidget = const FullScreenWidget();
+
   ChatMessageView({
     Key? key,
-  }) : super(key: key);
+  }) : super(key: key) {
+    indexWidgetProvider.define(fullScreenWidget);
+  }
 
   @override
   State<StatefulWidget> createState() {
@@ -84,10 +89,6 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     return const VideoChatWidget();
   }
 
-  Widget _buildFullScreenWidget(BuildContext context) {
-    return const FullScreenWidget();
-  }
-
   @override
   Widget build(BuildContext context) {
     PeerConnectionStatus? status;
@@ -105,7 +106,6 @@ class _ChatMessageViewState extends State<ChatMessageView> {
       _buildChatMessageWidget(context),
       _buildDialOutWidget(context),
       _buildVideoChatWidget(context),
-      _buildFullScreenWidget(context),
     ];
     name = name ?? '';
     String title = AppLocalizations.t(name!);
@@ -133,18 +133,6 @@ class _ChatMessageViewState extends State<ChatMessageView> {
       rightWidgets.add(const SizedBox(
         width: 15,
       ));
-      if (chatMessageController.chatView == ChatView.full ||
-          chatMessageController.chatView == ChatView.video ||
-          chatMessageController.chatView == ChatView.dial) {
-        rightWidgets.add(InkWell(
-            onTap: () {
-              chatMessageController.chatView = ChatView.text;
-            },
-            child: const Icon(Icons.assignment_return)));
-        rightWidgets.add(const SizedBox(
-          width: 15,
-        ));
-      }
     }
     var appBarView = AppBarView(
         title: titleWidget,

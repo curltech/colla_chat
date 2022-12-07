@@ -18,6 +18,7 @@ class ExtendedTextMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ExtendedText(
+      key: UniqueKey(),
       content,
       style: TextStyle(
         color: isMyself ? Colors.white : Colors.black,

@@ -1,10 +1,12 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/media/audio/player/platform_audio_player.dart';
+import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:flutter/material.dart';
 
-///平台标准的video-player的实现，移动采用flick，桌面采用vlc
+///平台标准的AudioPlayer的实现，支持标准的audioplayers，just_audio和webview
 class PlatformAudioPlayerWidget extends StatefulWidget with TileDataMixin {
   const PlatformAudioPlayerWidget({super.key});
 
@@ -25,6 +27,8 @@ class PlatformAudioPlayerWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
+  MediaPlayerType? mediaPlayerType;
+
   @override
   void initState() {
     super.initState();
@@ -35,12 +39,37 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
     super.dispose();
   }
 
+  List<AppBarPopupMenu>? _buildRightPopupMenus() {
+    List<AppBarPopupMenu> menus = [];
+    for (var type in MediaPlayerType.values) {
+      AppBarPopupMenu menu = AppBarPopupMenu(
+          title: type.name,
+          onPressed: () {
+            setState(() {
+              mediaPlayerType = type;
+              logger.i('mediaPlayerType:$type');
+            });
+          });
+      menus.add(menu);
+    }
+    return menus;
+  }
+
   @override
   Widget build(BuildContext context) {
+    String filename = 'C:\\document\\iceland_compressed.mp4';
     return AppBarView(
-      title: Text(AppLocalizations.t('AudioPlayer')),
+      title: Text(AppLocalizations.t(widget.title)),
       withLeading: true,
-      child: PlatformAudioPlayer(),
+      rightPopupMenus: _buildRightPopupMenus(),
+      child: mediaPlayerType != null
+          ? PlatformMediaPlayer(
+              key: GlobalKey(),
+              showControls: false,
+              showPlaylist: false,
+              mediaPlayerType: mediaPlayerType!,
+              filename: filename)
+          : const Center(child: Text('Please select a MediaPlayerType!')),
     );
   }
 }

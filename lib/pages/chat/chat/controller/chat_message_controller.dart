@@ -4,7 +4,7 @@ import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 
-enum ChatView { text, dial, video, full }
+enum ChatView { text, dial, video }
 
 ///好友或者群的消息控制器，包含某个连接的所有消息
 class ChatMessageController extends DataMoreController<ChatMessage> {

@@ -37,9 +37,6 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  setShuffleModeEnabled(bool enabled) {}
-
-  @override
   close() {
     playlist.clear();
   }
@@ -119,6 +116,7 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   Widget buildMediaView({
+    Key? key,
     double? width,
     double? height,
     BoxFit fit = BoxFit.contain,
@@ -129,7 +127,9 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
     if (currentMediaSource == null) {
       return const Center(child: Text('Please select a MediaPlayerType!'));
     }
+    key ??= UniqueKey();
     var platformWebView = PlatformWebView(
+      key: key,
       initialUrl: currentMediaSource!.filename,
       onWebViewCreated: _onWebViewCreated,
     );

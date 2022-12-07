@@ -249,6 +249,7 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   Widget buildMediaView({
+    Key? key,
     double? width,
     double? height,
     BoxFit fit = BoxFit.contain,
@@ -276,7 +277,9 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
     }
     Widget flickVideoWithControls = FlickVideoWithControls(
         videoFit: fit, controls: const FlickPortraitControls());
+    key ??= UniqueKey();
     var flickVideoPlayer = FlickVideoPlayer(
+      key: key,
       flickManager: currentFlickManager!,
       flickVideoWithControls: flickVideoWithControls,
       flickVideoWithControlsFullscreen: flickVideoWithControlsFullscreen,
@@ -291,9 +294,6 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
     );
     return flickVideoPlayer;
   }
-
-  @override
-  setShuffleModeEnabled(bool enabled) {}
 
   @override
   close() {

@@ -61,7 +61,7 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
   Widget build(BuildContext context) {
     String filename = 'C:\\document\\iceland_compressed.mp4';
     return AppBarView(
-      title: Text(AppLocalizations.t('VideoPlayer')),
+      title: Text(AppLocalizations.t(widget.title)),
       withLeading: true,
       rightPopupMenus: _buildRightPopupMenus(),
       child: mediaPlayerType != null
