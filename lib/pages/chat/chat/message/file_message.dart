@@ -28,7 +28,7 @@ class FileMessage extends StatelessWidget {
       ),
       title: Text(title),
       subtitle: Text(mimeType),
-      isThreeLine: true,
+      isThreeLine: false,
       dense: true,
       horizontalTitleGap: 0,
       minVerticalPadding: 0,
