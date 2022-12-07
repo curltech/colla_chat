@@ -99,16 +99,26 @@ class PlatformMediaPlayerUtil {
       double? width,
       bool showControls = true}) {
     color = color ?? Colors.black.withOpacity(1);
-    Widget container = Container(
-      margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-      width: width,
-      height: height,
-      decoration: BoxDecoration(color: color),
-      child: Center(
-        child: controller.buildMediaView(key: key, showControls: showControls),
-      ),
-    );
-    return container;
+    // Widget container = LayoutBuilder(
+    //     builder: (BuildContext context, BoxConstraints constraints) {
+    //   if (!constraints.maxHeight.isInfinite) {
+    //     height = height ?? constraints.maxHeight;
+    //   }
+    //   if (!constraints.maxWidth.isInfinite) {
+    //     width = width ?? constraints.maxWidth;
+    //   }
+      return Container(
+        margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+        width: width,
+        height: height,
+        decoration: BoxDecoration(color: color),
+        child: Center(
+          child: controller.buildMediaView(showControls: showControls),
+        ),
+      );
+    //});
+    //
+    // return container;
   }
 
   static Widget buildSliderWidget({

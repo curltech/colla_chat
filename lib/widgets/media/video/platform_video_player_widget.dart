@@ -67,7 +67,7 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
       child: mediaPlayerType != null
           ? PlatformMediaPlayer(
               showControls: true,
-              showPlaylist: false,
+              showPlaylist: true,
               mediaPlayerType: mediaPlayerType!,
               filename: filename)
           : const Center(child: Text('Please select a MediaPlayerType!')),

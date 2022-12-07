@@ -142,26 +142,28 @@ class MessageWidget {
     } else {
       body = Container();
     }
-    body = InkWell(
-        onTap: () {
-          chatMessageController.currentIndex = index;
-          indexWidgetProvider.push('full_screen');
-          openLocationMap(context);
-        },
-        child: body);
-    body = MenuUtil.buildPopupMenu(
-        child: body,
-        menuBuilder: () {
-          return Card(
-              child: DataActionCard(
-                  onPressed: _onMessagePopAction,
-                  crossAxisCount: 4,
-                  actions: messagePopActionData,
-                  height: 140,
-                  width: 320,
-                  size: 20));
-        },
-        pressType: PressType.longPress);
+    if (!fullScreen) {
+      body = InkWell(
+          onTap: () {
+            chatMessageController.currentIndex = index;
+            indexWidgetProvider.push('full_screen');
+            openLocationMap(context);
+          },
+          child: body);
+      body = MenuUtil.buildPopupMenu(
+          child: body,
+          menuBuilder: () {
+            return Card(
+                child: DataActionCard(
+                    onPressed: _onMessagePopAction,
+                    crossAxisCount: 4,
+                    actions: messagePopActionData,
+                    height: 140,
+                    width: 320,
+                    size: 20));
+          },
+          pressType: PressType.longPress);
+    }
 
     return body;
   }
