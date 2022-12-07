@@ -167,6 +167,7 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
   setVolume(double volume) {
     if (currentFlickManager != null) {
       currentFlickManager?.flickControlManager?.setVolume(volume);
+      notifyListeners();
     }
   }
 
@@ -174,6 +175,7 @@ class FlickVideoPlayerController extends AbstractMediaPlayerController {
   setSpeed(double speed) {
     if (currentFlickManager != null) {
       currentFlickManager?.flickControlManager?.setPlaybackSpeed(speed);
+      notifyListeners();
     }
   }
 

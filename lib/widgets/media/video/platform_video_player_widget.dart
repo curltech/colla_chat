@@ -59,7 +59,7 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    String filename = 'C:\\document\\iceland_compressed.mp4';
+    String filename = 'C:\\Users\\hujs\\Documents\\content\\2d20a19.m4a';
     return AppBarView(
       title: Text(AppLocalizations.t(widget.title)),
       withLeading: true,

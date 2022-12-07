@@ -107,15 +107,15 @@ class PlatformMediaPlayerUtil {
     //   if (!constraints.maxWidth.isInfinite) {
     //     width = width ?? constraints.maxWidth;
     //   }
-      return Container(
-        margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-        width: width,
-        height: height,
-        decoration: BoxDecoration(color: color),
-        child: Center(
-          child: controller.buildMediaView(showControls: showControls),
-        ),
-      );
+    return Container(
+      margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+      width: width,
+      height: height,
+      decoration: BoxDecoration(color: color),
+      child: Center(
+        child: controller.buildMediaView(showControls: showControls),
+      ),
+    );
     //});
     //
     // return container;
@@ -146,7 +146,7 @@ class PlatformMediaPlayerUtil {
     );
   }
 
-  ///音量按钮
+  ///音量按钮，要改成Stateful，setVolume做到自己刷新
   static Widget buildVolumeButton(
       BuildContext context, AbstractMediaPlayerController controller) {
     return FutureBuilder<double>(

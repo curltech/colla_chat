@@ -94,7 +94,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   bool autoPlay = false;
   int _currentIndex = -1;
   PlayerStatus _status = PlayerStatus.init;
-  FileType fileType = FileType.media;
+  FileType fileType = FileType.any;
 
   bool get playlistVisible {
     return _playlistVisible;

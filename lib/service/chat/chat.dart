@@ -323,9 +323,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     }
     if (data != null) {
       chatMessage.content = CryptoUtil.encodeBase64(data);
-      chatMessage.contentType = contentType.name;
-      chatMessage.mimeType = mimeType;
     }
+    chatMessage.contentType = contentType.name;
+    chatMessage.mimeType = mimeType;
     chatMessage.status = status ?? MessageStatus.sent.name;
     chatMessage.transportType = transportType.name;
     chatMessage.deleteTime = deleteTime;
@@ -431,9 +431,17 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
 
   Future<ChatMessage?> forward(ChatMessage chatMessage, String peerId,
       {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
+    String? title = chatMessage.title;
+    String? messageId = chatMessage.messageId;
+    String? content = chatMessage.content;
     List<int>? data;
-    if (chatMessage.content != null) {
-      data = CryptoUtil.stringToUtf8(chatMessage.content!);
+    if (content != null) {
+      data = CryptoUtil.stringToUtf8(content);
+    } else {
+      content = await messageAttachmentService.findContent(messageId!, title);
+      if (content != null) {
+        data = CryptoUtil.decodeBase64(content);
+      }
     }
     ChatMessageType? messageType = StringUtil.enumFromString(
         ChatMessageType.values, chatMessage.messageType);
@@ -459,7 +467,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         contentType: contentType!,
         mimeType: chatMessage.mimeType,
         receiverName: linkman.name,
-        title: chatMessage.title,
+        title: title,
         receiptContent: receiptContent,
         thumbnail: thumbnail,
       );
@@ -474,7 +482,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           subMessageType: subMessageType!,
           contentType: contentType!,
           mimeType: chatMessage.mimeType,
-          title: chatMessage.title,
+          title: title,
           receiptContent: receiptContent,
           thumbnail: thumbnail,
         );
@@ -625,7 +633,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
     String? filename;
     if (!platformParams.web) {
       if (title != null) {
-        filename = p.join(contentPath, title);
+        filename = p.join(contentPath, '${messageId}_$title');
       } else {
         filename = p.join(contentPath, messageId);
       }
@@ -638,7 +646,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
           if (title != null) {
             filename = await FileUtil.writeTempFile(
                 CryptoUtil.decodeBase64(content),
-                filename: title);
+                filename: '${messageId}_$title');
           } else {
             filename = await FileUtil.writeTempFile(
                 CryptoUtil.decodeBase64(content),
