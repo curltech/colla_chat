@@ -236,6 +236,9 @@ class SmartSelectUtil {
       Widget Function(BuildContext, S2MultiState<T>)? modalFilterBuilder,
       Widget Function(BuildContext, S2MultiState<T>)? modalFilterToggleBuilder,
       Future<bool> Function(S2MultiState<T>)? onModalWillOpen,
+      Widget Function(BuildContext, S2MultiState<T>, S2Choice<T>)?
+          choiceBuilder,
+      Future<List<S2Choice<T>>> Function(S2ChoiceLoaderInfo<T>)? choiceLoader,
       Function(int)? chipOnDelete}) {
     List<T> selectedValue = [];
     List<S2Choice<T>> options = [];
@@ -304,6 +307,8 @@ class SmartSelectUtil {
       modalFooterBuilder: modalFooterBuilder,
       modalFilterBuilder: modalFilterBuilder,
       modalFilterToggleBuilder: modalFilterToggleBuilder,
+      choiceBuilder: choiceBuilder,
+      choiceLoader: choiceLoader,
       onModalWillOpen: onModalWillOpen,
       tileBuilder: tileBuilder,
     );
@@ -451,7 +456,7 @@ class MultiSelectUtil {
       height: height,
       width: width,
       colorator: colorator,
-      backgroundColor: Colors.grey.withOpacity(0.8),
+      backgroundColor: Colors.white.withOpacity(0.7),
       unselectedColor: unselectedColor,
       searchIcon: searchIcon,
       closeSearchIcon: closeSearchIcon,

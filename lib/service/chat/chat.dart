@@ -429,6 +429,71 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return chatMessage;
   }
 
+  Future<ChatMessage?> forward(ChatMessage chatMessage, String peerId,
+      {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
+    List<int>? data;
+    if (chatMessage.content != null) {
+      data = CryptoUtil.stringToUtf8(chatMessage.content!);
+    }
+    ChatMessageType? messageType = StringUtil.enumFromString(
+        ChatMessageType.values, chatMessage.messageType);
+    ChatMessageSubType? subMessageType = StringUtil.enumFromString(
+        ChatMessageSubType.values, chatMessage.subMessageType);
+    ContentType? contentType =
+        StringUtil.enumFromString(ContentType.values, chatMessage.contentType);
+    List<int>? receiptContent;
+    if (chatMessage.receiptContent != null) {
+      receiptContent = CryptoUtil.stringToUtf8(chatMessage.receiptContent!);
+    }
+    List<int>? thumbnail;
+    if (chatMessage.thumbnail != null) {
+      thumbnail = CryptoUtil.stringToUtf8(chatMessage.thumbnail!);
+    }
+    Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+    if (linkman != null) {
+      ChatMessage? message = await buildChatMessage(
+        peerId,
+        data: data,
+        messageType: messageType!,
+        subMessageType: subMessageType!,
+        contentType: contentType!,
+        mimeType: chatMessage.mimeType,
+        receiverName: linkman.name,
+        title: chatMessage.title,
+        receiptContent: receiptContent,
+        thumbnail: thumbnail,
+      );
+      return await sendAndStore(message, cryptoOption: cryptoOption);
+    } else {
+      Group? group = await groupService.findCachedOneByPeerId(peerId);
+      if (group != null) {
+        List<ChatMessage> messages = await buildGroupChatMessage(
+          peerId,
+          data: data,
+          messageType: messageType!,
+          subMessageType: subMessageType!,
+          contentType: contentType!,
+          mimeType: chatMessage.mimeType,
+          title: chatMessage.title,
+          receiptContent: receiptContent,
+          thumbnail: thumbnail,
+        );
+        ChatMessage? msg;
+        int i = 0;
+        for (var message in messages) {
+          if (i == 0) {
+            msg = await sendAndStore(message, cryptoOption: cryptoOption);
+          } else {
+            await sendAndStore(message, cryptoOption: cryptoOption);
+          }
+          i++;
+        }
+        return msg;
+      }
+    }
+    return null;
+  }
+
   /// 保存消息，对于复杂消息，存储附件
   store(ChatMessage chatMessage, {bool updateSummary = true}) async {
     int? id = chatMessage.id;
