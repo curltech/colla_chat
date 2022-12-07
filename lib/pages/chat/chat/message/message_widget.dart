@@ -18,6 +18,7 @@ import 'package:colla_chat/pages/chat/chat/message/url_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/video_message.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/tool/document_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
@@ -64,13 +65,11 @@ final List<ActionData> messagePopActionData = [
 ///每种消息的显示组件
 class MessageWidget {
   final ChatMessage chatMessage;
-
+  final bool fullScreen;
   final int index;
   bool? _isMyself;
 
-  MessageWidget(this.chatMessage, this.index) {
-    chatMessageController.chatView;
-  }
+  MessageWidget(this.chatMessage, this.index, {this.fullScreen = false});
 
   bool get isMyself {
     if (_isMyself != null) {
@@ -146,7 +145,7 @@ class MessageWidget {
     body = InkWell(
         onTap: () {
           chatMessageController.currentIndex = index;
-          chatMessageController.chatView = ChatView.full;
+          indexWidgetProvider.push('full_screen');
           openLocationMap(context);
         },
         child: body);
@@ -206,7 +205,7 @@ class MessageWidget {
       content = CryptoUtil.utf8ToString(data);
     }
     return ExtendedTextMessage(
-      key: GlobalKey(),
+      key: UniqueKey(),
       isMyself: isMyself,
       content: content!,
     );
@@ -215,7 +214,7 @@ class MessageWidget {
   ActionMessage buildActionMessageWidget(
       BuildContext context, ChatMessageSubType subMessageType) {
     return ActionMessage(
-      key: GlobalKey(),
+      key: UniqueKey(),
       isMyself: isMyself,
       subMessageType: subMessageType,
     );
@@ -223,7 +222,7 @@ class MessageWidget {
 
   CancelMessage buildCancelMessageWidget(BuildContext context, String content) {
     return CancelMessage(
-      key: GlobalKey(),
+      key: UniqueKey(),
       isMyself: isMyself,
       content: content,
     );
@@ -232,7 +231,7 @@ class MessageWidget {
   UrlMessage buildUrlMessageWidget(BuildContext context) {
     String? title = chatMessage.title;
     return UrlMessage(
-      key: GlobalKey(),
+      key: UniqueKey(),
       url: title!,
       isMyself: isMyself,
     );
@@ -242,7 +241,7 @@ class MessageWidget {
     String? messageId = chatMessage.messageId;
     String? title = chatMessage.title;
     return RichTextMessage(
-      key: GlobalKey(),
+      key: UniqueKey(),
       messageId: messageId!,
       isMyself: isMyself,
     );
@@ -256,7 +255,7 @@ class MessageWidget {
       content = CryptoUtil.utf8ToString(data);
     }
     return NameCardMessage(
-      key: GlobalKey(),
+      key: UniqueKey(),
       content: content!,
       isMyself: isMyself,
     );
@@ -271,10 +270,11 @@ class MessageWidget {
     }
     String? thumbnail = chatMessage.thumbnail;
     return LocationMessage(
-      key: GlobalKey(),
+      key: UniqueKey(),
       content: content!,
       isMyself: isMyself,
       thumbnail: thumbnail,
+      fullScreen: fullScreen,
     );
   }
 
@@ -336,7 +336,7 @@ class MessageWidget {
       height = 64;
     }
     return ImageMessage(
-      key: GlobalKey(),
+      key: UniqueKey(),
       messageId: messageId!,
       title: title,
       image: thumbnail,
@@ -353,7 +353,7 @@ class MessageWidget {
     String? title = chatMessage.title;
     String? thumbnail = chatMessage.thumbnail;
     return VideoMessage(
-      key: GlobalKey(),
+      key: UniqueKey(),
       id: id!,
       messageId: messageId!,
       title: title,
@@ -367,7 +367,7 @@ class MessageWidget {
     String? messageId = chatMessage.messageId;
     String? title = chatMessage.title;
     return AudioMessage(
-      key: GlobalKey(),
+      key: UniqueKey(),
       id: id!,
       messageId: messageId!,
       title: title,
@@ -387,13 +387,15 @@ class MessageWidget {
     if (mimeType.startsWith('image')) {
       return buildImageMessageWidget(context);
     } else if (mimeType == 'application/pdf') {
-      if (chatMessageController.chatView == ChatView.full) {
+      if (fullScreen) {
         return buildPdfMessageWidget(context);
       }
     } else if (mimeType.startsWith('audio')) {
-      return buildAudioMessageWidget(context);
+      if (fullScreen) {
+        return buildAudioMessageWidget(context);
+      }
     } else if (mimeType.startsWith('video')) {
-      if (chatMessageController.chatView == ChatView.full) {
+      if (fullScreen) {
         return buildVideoMessageWidget(context);
       }
     } else if (extension == 'docx' ||
@@ -402,12 +404,12 @@ class MessageWidget {
         extension == 'xls' ||
         extension == 'pptx' ||
         extension == 'ppt') {
-      if (chatMessageController.chatView == ChatView.full) {
+      if (fullScreen) {
         return await buildOfficeMessageWidget(context);
       }
     }
     return FileMessage(
-      key: GlobalKey(),
+      key: UniqueKey(),
       messageId: messageId!,
       isMyself: isMyself,
       title: title!,
@@ -421,8 +423,8 @@ class MessageWidget {
     if (messageId != null) {
       String? filename =
           await messageAttachmentService.getFilename(messageId, title);
-      if (filename != null && chatMessageController.chatView == ChatView.full) {
-        return PdfUtil.buildPdfView(filename: filename);
+      if (filename != null && fullScreen) {
+        return PdfUtil.buildPdfView(key: UniqueKey(), filename: filename);
       }
     }
     return Container();
@@ -434,8 +436,9 @@ class MessageWidget {
     if (messageId != null) {
       String? filename =
           await messageAttachmentService.getFilename(messageId, title);
-      if (filename != null && chatMessageController.chatView == ChatView.full) {
-        return DocumentUtil.buildFileReaderView(filePath: filename);
+      if (filename != null && fullScreen) {
+        return DocumentUtil.buildFileReaderView(
+            key: UniqueKey(), filePath: filename);
       }
     }
     return Container();

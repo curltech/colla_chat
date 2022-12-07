@@ -136,6 +136,7 @@ class WaveformsAudioPlayerController extends AbstractMediaPlayerController {
     double density = 2,
     Clip clipBehavior = Clip.none,
   }) {
+    key ??= UniqueKey();
     return AudioFileWaveforms(
       key: key,
       size: Size(width!, height!),

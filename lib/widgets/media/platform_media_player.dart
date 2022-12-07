@@ -27,7 +27,6 @@ class PlatformMediaPlayer extends StatefulWidget {
 
   //是否显示播放列表和媒体视图
   final bool showPlaylist;
-  final bool showMediaView;
   final Color? color;
   final double? height;
   final double? width;
@@ -41,7 +40,6 @@ class PlatformMediaPlayer extends StatefulWidget {
       this.showSpeed = false,
       this.showControls = true,
       this.showPlaylist = true,
-      this.showMediaView = true,
       this.color,
       this.width,
       this.height,
@@ -110,9 +108,9 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
     return PlatformMediaPlayerUtil.buildMediaPlayer(
       context,
       controller,
+      key: UniqueKey(),
       showControls: widget.showControls,
       showPlaylist: widget.showPlaylist,
-      showMediaView: widget.showMediaView,
       showVolume: showVolume,
       showSpeed: showSpeed,
       showPause: showPause,

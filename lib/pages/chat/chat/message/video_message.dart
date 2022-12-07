@@ -30,9 +30,9 @@ class VideoMessage extends StatelessWidget {
               return Container();
             }
             return PlatformMediaPlayer(
+              key: UniqueKey(),
               showControls: false,
               showPlaylist: false,
-              showMediaView: true,
               filename: filename,
               mediaPlayerType: MediaPlayerType.webview,
             );

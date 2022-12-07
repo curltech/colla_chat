@@ -64,6 +64,7 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
       rightPopupMenus: _buildRightPopupMenus(),
       child: mediaPlayerType != null
           ? PlatformMediaPlayer(
+              key: GlobalKey(),
               showControls: false,
               showPlaylist: false,
               mediaPlayerType: mediaPlayerType!,

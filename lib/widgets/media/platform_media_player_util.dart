@@ -92,26 +92,22 @@ class PlatformMediaPlayerUtil {
   }
 
   static Widget buildMediaView(
-      {required AbstractMediaPlayerController controller,
+      {Key? key,
+      required AbstractMediaPlayerController controller,
       Color? color,
       double? height,
       double? width,
       bool showControls = true}) {
     color = color ?? Colors.black.withOpacity(1);
-    Widget container = LayoutBuilder(
-        builder: (BuildContext context, BoxConstraints constraints) {
-      height = height ?? constraints.maxHeight;
-      width = width ?? constraints.maxWidth;
-      return Center(
-        child: Container(
-          margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
-          width: width,
-          height: height,
-          decoration: BoxDecoration(color: color),
-          child: controller.buildMediaView(showControls: showControls),
-        ),
-      );
-    });
+    Widget container = Container(
+      margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
+      width: width,
+      height: height,
+      decoration: BoxDecoration(color: color),
+      child: Center(
+        child: controller.buildMediaView(key: key, showControls: showControls),
+      ),
+    );
     return container;
   }
 
@@ -381,7 +377,6 @@ class PlatformMediaPlayerUtil {
     Key? key,
     bool showControls = true,
     bool showPlaylist = true,
-    bool showMediaView = true,
     bool showVolume = true,
     bool showSpeed = false,
     bool showPause = true,
@@ -390,43 +385,37 @@ class PlatformMediaPlayerUtil {
     double? height,
     double? width,
   }) {
-    List<Widget> columns = [];
-    List<Widget> rows = [];
-
-    // 媒体视图，一般视频才有
-    if (showMediaView) {
-      Widget mediaView = Visibility(
-          visible: !controller.playlistVisible,
-          child: PlatformMediaPlayerUtil.buildMediaView(
-              controller: controller,
-              color: color,
-              width: width,
-              height: height,
-              showControls: showControls));
-      rows.add(mediaView);
-    }
+    // 媒体视图，
+    Widget mediaView = PlatformMediaPlayerUtil.buildMediaView(
+        key: key,
+        controller: controller,
+        color: color,
+        width: width,
+        height: height,
+        showControls: showControls);
     // 播放列表
     if (showPlaylist) {
-      rows.add(Visibility(
+      mediaView =
+          Visibility(visible: !controller.playlistVisible, child: mediaView);
+      Widget playlistWidget = Visibility(
           visible: controller.playlistVisible,
-          child: PlatformMediaPlayerUtil.buildPlaylist(context, controller)));
+          child: PlatformMediaPlayerUtil.buildPlaylist(context, controller));
+      mediaView = Stack(children: [mediaView, playlistWidget]);
     }
-    // 媒体视图和播放列表显示在同样位置，在第一行
-    if (rows.isNotEmpty) {
-      var view = VisibilityDetector(
-          key: ObjectKey(controller),
-          onVisibilityChanged: (visiblityInfo) {
-            if (visiblityInfo.visibleFraction == 0) {
-              controller.pause();
-            } else if (visiblityInfo.visibleFraction > 0.9) {
-              controller.play();
-            }
-          },
-          child: Stack(children: rows));
-      columns.add(Expanded(child: view));
-    }
+    mediaView = VisibilityDetector(
+      key: ObjectKey(controller),
+      onVisibilityChanged: (visiblityInfo) {
+        if (visiblityInfo.visibleFraction == 0) {
+          controller.pause();
+        } else if (visiblityInfo.visibleFraction > 0.9) {
+          controller.play();
+        }
+      },
+      child: mediaView,
+    );
+
     // 定制的媒体控制器
-    if (!showControls) {
+    if (showControls) {
       Widget controllerPanel = buildControllerPanel(
         context,
         controller,
@@ -436,9 +425,10 @@ class PlatformMediaPlayerUtil {
         showStop: showStop,
         showPlaylist: showPlaylist,
       );
-      columns.add(Expanded(child: controllerPanel));
+      return Column(
+          key: key, children: [Expanded(child: mediaView), controllerPanel]);
     }
-    return Column(key: key, children: columns);
+    return mediaView;
   }
 
   static bool isTablet() {

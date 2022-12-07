@@ -277,6 +277,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   }
 
   Widget buildMediaView({
+    Key? key,
     double? width,
     double? height,
     BoxFit fit = BoxFit.contain,

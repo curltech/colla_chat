@@ -147,6 +147,7 @@ class _PlatformWebViewState extends State<PlatformWebView> {
     Widget webviewWidget;
     if (platformParams.windows || platformParams.mobile || platformParams.web) {
       webviewWidget = webview.WebView(
+        key: UniqueKey(),
         backgroundColor: Colors.black,
         initialUrl: widget.initialUrl,
         javascriptMode: webview.JavascriptMode.unrestricted,
@@ -157,6 +158,7 @@ class _PlatformWebViewState extends State<PlatformWebView> {
       );
     } else {
       webviewWidget = inapp.InAppWebView(
+        key: UniqueKey(),
         initialUrlRequest: widget.initialUrl != null
             ? inapp.URLRequest(url: inapp.WebUri(widget.initialUrl!))
             : null,

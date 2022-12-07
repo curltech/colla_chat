@@ -28,15 +28,16 @@ class AudioMessage extends StatelessWidget {
               return Container();
             }
             return PlatformMediaPlayer(
+              key: UniqueKey(),
               showControls: false,
               showPlaylist: false,
-              showMediaView: true,
               filename: filename,
               mediaPlayerType: MediaPlayerType.webview,
+              height: 80,
             );
           }
           return Container();
         });
-    return Column(children: [Text(title ?? ''), Expanded(child: audioPlayer)]);
+    return audioPlayer;
   }
 }
