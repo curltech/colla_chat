@@ -2,7 +2,7 @@ import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/group/linkman_group_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
-import 'package:colla_chat/pages/chat/linkman/linkman_search_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/contact.dart';
@@ -193,8 +193,8 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
 
   //群成员显示和编辑界面
   Widget _buildGroupMembersWidget(BuildContext context) {
-    var selector = LinkmanSearchWidget(
-      selectType: SelectType.multiselect,
+    var selector = LinkmanGroupSearchWidget(
+      selectType: SelectType.smartselect,
       onSelected: (List<String> selected) {
         logger.i(selected);
       },

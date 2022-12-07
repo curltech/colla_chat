@@ -99,16 +99,26 @@ class PlatformMediaPlayerUtil {
       double? width,
       bool showControls = true}) {
     color = color ?? Colors.black.withOpacity(1);
-    Widget container = Container(
+    // Widget container = LayoutBuilder(
+    //     builder: (BuildContext context, BoxConstraints constraints) {
+    //   if (!constraints.maxHeight.isInfinite) {
+    //     height = height ?? constraints.maxHeight;
+    //   }
+    //   if (!constraints.maxWidth.isInfinite) {
+    //     width = width ?? constraints.maxWidth;
+    //   }
+    return Container(
       margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
       width: width,
       height: height,
       decoration: BoxDecoration(color: color),
       child: Center(
-        child: controller.buildMediaView(key: key, showControls: showControls),
+        child: controller.buildMediaView(showControls: showControls),
       ),
     );
-    return container;
+    //});
+    //
+    // return container;
   }
 
   static Widget buildSliderWidget({
@@ -136,7 +146,7 @@ class PlatformMediaPlayerUtil {
     );
   }
 
-  ///音量按钮
+  ///音量按钮，要改成Stateful，setVolume做到自己刷新
   static Widget buildVolumeButton(
       BuildContext context, AbstractMediaPlayerController controller) {
     return FutureBuilder<double>(

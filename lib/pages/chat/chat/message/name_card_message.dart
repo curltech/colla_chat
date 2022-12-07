@@ -29,6 +29,6 @@ class NameCardMessage extends StatelessWidget {
         subtitle: Text(peerId),
       ),
     );
-    return SizedBox(height: 100, child: Card(elevation: 0, child: tile));
+    return Card(elevation: 0, child: tile);
   }
 }

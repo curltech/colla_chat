@@ -73,7 +73,10 @@ class StringUtil {
   }
 
   ///string转枚举类型
-  static T? enumFromString<T>(Iterable<T> values, String value) {
+  static T? enumFromString<T>(Iterable<T> values, String? value) {
+    if (value == null) {
+      return null;
+    }
     try {
       return values
           .firstWhere((type) => type.toString().split('.').last == value);

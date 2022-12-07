@@ -33,7 +33,6 @@ class AudioMessage extends StatelessWidget {
               showPlaylist: false,
               filename: filename,
               mediaPlayerType: MediaPlayerType.webview,
-              height: 80,
             );
           }
           return Container();

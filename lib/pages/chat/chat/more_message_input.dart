@@ -2,7 +2,7 @@ import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/linkman/linkman_search_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/mobile_camera_widget.dart';
 import 'package:colla_chat/service/chat/contact.dart';
@@ -204,7 +204,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     await SmartDialogUtil.show(
         context: context,
         title: AppLocalizations.t('Location map'),
-        builder: (BuildContext context) {
+        builder: (BuildContext? context) {
           return GeolocatorUtil.buildLocationPicker(
               latitude: latitude,
               longitude: longitude,
@@ -249,7 +249,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         context: context,
         title: 'Select one linkman',
         builder: (BuildContext context) {
-          return LinkmanSearchWidget(
+          return LinkmanGroupSearchWidget(
               onSelected: (List<String> selected) async {
                 if (selected.isNotEmpty) {
                   Linkman? linkman =

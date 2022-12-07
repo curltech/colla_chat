@@ -9,9 +9,9 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 class SmartDialogUtil {
   ///带标题的对话框
   static Future<T?> show<T>({
-    required BuildContext context,
+    BuildContext? context,
     String? title,
-    required Widget Function(BuildContext) builder,
+    required Widget Function(BuildContext?) builder,
     SmartDialogController? controller,
     AlignmentGeometry? alignment,
     bool? clickMaskDismiss,
@@ -325,8 +325,8 @@ class SmartDialogUtil {
 
   /// 底部弹出半屏对话框，内部调用Navigator.of(context).pop(result)关闭
   /// result返回
-  static Future<T?> popModalBottomSheet<T>(BuildContext context,
-      {required Widget Function(BuildContext) builder}) {
+  static Future<T?> popModalBottomSheet<T>(BuildContext? context,
+      {required Widget Function(BuildContext?) builder}) {
     return show(
       alignment: Alignment.bottomCenter,
       builder: builder,
@@ -335,8 +335,8 @@ class SmartDialogUtil {
   }
 
   /// 底部弹出全屏，返回的controller可以关闭
-  static Future<T?> popBottomSheet<T>(BuildContext context,
-      {required Widget Function(BuildContext) builder}) {
+  static Future<T?> popBottomSheet<T>(BuildContext? context,
+      {required Widget Function(BuildContext?) builder}) {
     return show(
       alignment: Alignment.bottomCenter,
       builder: builder,

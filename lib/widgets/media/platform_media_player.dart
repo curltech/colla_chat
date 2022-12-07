@@ -1,4 +1,7 @@
 import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
+import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
+import 'package:colla_chat/widgets/media/audio/player/just_audio_player.dart';
+import 'package:colla_chat/widgets/media/audio/player/waveforms_audio_player.dart';
 import 'package:colla_chat/widgets/media/platform_media_player_util.dart';
 import 'package:colla_chat/widgets/media/video/dart_vlc_video_player.dart';
 import 'package:colla_chat/widgets/media/video/flick_video_player.dart';
@@ -83,6 +86,15 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
         break;
       case MediaPlayerType.flick:
         controller = FlickVideoPlayerController();
+        break;
+      case MediaPlayerType.just:
+        controller = JustAudioPlayerController();
+        break;
+      case MediaPlayerType.audioplayers:
+        controller = BlueFireAudioPlayerController();
+        break;
+      case MediaPlayerType.waveforms:
+        controller = WaveformsAudioPlayerController();
         break;
       case MediaPlayerType.webview:
         showSpeed = false;

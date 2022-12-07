@@ -127,6 +127,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
               color: widget.isMyself
                   ? appDataProvider.themeData.colorScheme.primary
                   : Colors.white,
+              padding:const BubbleEdges.all(0),
               child: body),
           const SizedBox(
             height: 2,

@@ -16,10 +16,13 @@ import 'package:colla_chat/pages/chat/chat/message/name_card_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/rich_text_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/url_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/video_message.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/document_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
@@ -31,6 +34,7 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 
 final List<ActionData> messagePopActionData = [
@@ -142,31 +146,41 @@ class MessageWidget {
     } else {
       body = Container();
     }
-    body = InkWell(
-        onTap: () {
-          chatMessageController.currentIndex = index;
-          indexWidgetProvider.push('full_screen');
-          openLocationMap(context);
-        },
-        child: body);
-    body = MenuUtil.buildPopupMenu(
-        child: body,
-        menuBuilder: () {
-          return Card(
-              child: DataActionCard(
-                  onPressed: _onMessagePopAction,
-                  crossAxisCount: 4,
-                  actions: messagePopActionData,
-                  height: 140,
-                  width: 320,
-                  size: 20));
-        },
-        pressType: PressType.longPress);
+    if (!fullScreen) {
+      body = InkWell(
+          onTap: () {
+            chatMessageController.currentIndex = index;
+            indexWidgetProvider.push('full_screen');
+            openLocationMap(context);
+          },
+          child: body);
+
+      ///长按弹出式菜单
+      CustomPopupMenuController menuController = CustomPopupMenuController();
+      body = MenuUtil.buildPopupMenu(
+          child: body,
+          controller: menuController,
+          menuBuilder: () {
+            return Card(
+                child: DataActionCard(
+                    onPressed: (int index, String label, {String? value}) {
+                      menuController.hideMenu();
+                      _onMessagePopAction(context, index, label, value: value);
+                    },
+                    crossAxisCount: 4,
+                    actions: messagePopActionData,
+                    height: 140,
+                    width: 320,
+                    size: 20));
+          },
+          pressType: PressType.longPress);
+    }
 
     return body;
   }
 
-  _onMessagePopAction(int index, String label, {String? value}) async {
+  _onMessagePopAction(BuildContext context, int index, String label,
+      {String? value}) async {
     switch (label) {
       case 'Delete':
         await chatMessageService.delete(entity: chatMessage);
@@ -186,6 +200,21 @@ class MessageWidget {
       case 'Copy':
         break;
       case 'Forward':
+        List<String> selects = [];
+        await DialogUtil.show(
+            builder: (BuildContext context) {
+              return LinkmanGroupSearchWidget(
+                selectType: SelectType.multidialog,
+                onSelected: (List<String> selected) {
+                  selects = selected;
+                },
+                selected: const [],
+              );
+            },
+            context: context);
+        for (var selected in selects) {
+          await chatMessageService.forward(chatMessage, selected);
+        }
         break;
       case 'Collect':
         break;
@@ -295,7 +324,7 @@ class MessageWidget {
       SmartDialogUtil.show(
           context: context,
           title: AppLocalizations.t('Location map'),
-          builder: (BuildContext context) {
+          builder: (BuildContext? context) {
             return GeolocatorUtil.buildLocationPicker(
                 latitude: latitude,
                 longitude: longitude,
@@ -306,7 +335,7 @@ class MessageWidget {
       SmartDialogUtil.show(
           context: context,
           title: AppLocalizations.t('Location map'),
-          builder: (BuildContext context) {
+          builder: (BuildContext? context) {
             return GeolocatorUtil.buildPlatformMap(
                 latitude: latitude, longitude: longitude);
           });

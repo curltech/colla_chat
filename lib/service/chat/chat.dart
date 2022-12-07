@@ -323,9 +323,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     }
     if (data != null) {
       chatMessage.content = CryptoUtil.encodeBase64(data);
-      chatMessage.contentType = contentType.name;
-      chatMessage.mimeType = mimeType;
     }
+    chatMessage.contentType = contentType.name;
+    chatMessage.mimeType = mimeType;
     chatMessage.status = status ?? MessageStatus.sent.name;
     chatMessage.transportType = transportType.name;
     chatMessage.deleteTime = deleteTime;
@@ -427,6 +427,79 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     await chatMessageService.store(chatMessage);
 
     return chatMessage;
+  }
+
+  Future<ChatMessage?> forward(ChatMessage chatMessage, String peerId,
+      {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
+    String? title = chatMessage.title;
+    String? messageId = chatMessage.messageId;
+    String? content = chatMessage.content;
+    List<int>? data;
+    if (content != null) {
+      data = CryptoUtil.stringToUtf8(content);
+    } else {
+      content = await messageAttachmentService.findContent(messageId!, title);
+      if (content != null) {
+        data = CryptoUtil.decodeBase64(content);
+      }
+    }
+    ChatMessageType? messageType = StringUtil.enumFromString(
+        ChatMessageType.values, chatMessage.messageType);
+    ChatMessageSubType? subMessageType = StringUtil.enumFromString(
+        ChatMessageSubType.values, chatMessage.subMessageType);
+    ContentType? contentType =
+        StringUtil.enumFromString(ContentType.values, chatMessage.contentType);
+    List<int>? receiptContent;
+    if (chatMessage.receiptContent != null) {
+      receiptContent = CryptoUtil.stringToUtf8(chatMessage.receiptContent!);
+    }
+    List<int>? thumbnail;
+    if (chatMessage.thumbnail != null) {
+      thumbnail = CryptoUtil.stringToUtf8(chatMessage.thumbnail!);
+    }
+    Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+    if (linkman != null) {
+      ChatMessage? message = await buildChatMessage(
+        peerId,
+        data: data,
+        messageType: messageType!,
+        subMessageType: subMessageType!,
+        contentType: contentType!,
+        mimeType: chatMessage.mimeType,
+        receiverName: linkman.name,
+        title: title,
+        receiptContent: receiptContent,
+        thumbnail: thumbnail,
+      );
+      return await sendAndStore(message, cryptoOption: cryptoOption);
+    } else {
+      Group? group = await groupService.findCachedOneByPeerId(peerId);
+      if (group != null) {
+        List<ChatMessage> messages = await buildGroupChatMessage(
+          peerId,
+          data: data,
+          messageType: messageType!,
+          subMessageType: subMessageType!,
+          contentType: contentType!,
+          mimeType: chatMessage.mimeType,
+          title: title,
+          receiptContent: receiptContent,
+          thumbnail: thumbnail,
+        );
+        ChatMessage? msg;
+        int i = 0;
+        for (var message in messages) {
+          if (i == 0) {
+            msg = await sendAndStore(message, cryptoOption: cryptoOption);
+          } else {
+            await sendAndStore(message, cryptoOption: cryptoOption);
+          }
+          i++;
+        }
+        return msg;
+      }
+    }
+    return null;
   }
 
   /// 保存消息，对于复杂消息，存储附件
@@ -560,7 +633,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
     String? filename;
     if (!platformParams.web) {
       if (title != null) {
-        filename = p.join(contentPath, title);
+        filename = p.join(contentPath, '${messageId}_$title');
       } else {
         filename = p.join(contentPath, messageId);
       }
@@ -573,7 +646,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
           if (title != null) {
             filename = await FileUtil.writeTempFile(
                 CryptoUtil.decodeBase64(content),
-                filename: title);
+                filename: '${messageId}_$title');
           } else {
             filename = await FileUtil.writeTempFile(
                 CryptoUtil.decodeBase64(content),

@@ -168,7 +168,7 @@ class MenuUtil {
     void Function(bool)? menuOnChange,
     bool enablePassEvent = true,
   }) {
-    return CustomPopupMenu(
+    CustomPopupMenu menu= CustomPopupMenu(
       menuBuilder: menuBuilder,
       pressType: pressType,
       controller: controller,
@@ -183,5 +183,6 @@ class MenuUtil {
       enablePassEvent: enablePassEvent,
       child: child,
     );
+    return menu;
   }
 }

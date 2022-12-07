@@ -8,44 +8,70 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
 
-enum SelectType { smartselect, multiselect, multidialog, listview }
+enum SelectType {
+  smartselect, //多选字段
+  multiselect, //多选字段
+  multidialog, //多选对话框
+  listview, //单选对话框
+}
 
-///联系人的查询界面
-class LinkmanSearchWidget extends StatefulWidget {
+///联系人和群的查询界面
+class LinkmanGroupSearchWidget extends StatefulWidget {
   final Function(List<String>) onSelected; //获取返回的选择
   final List<String> selected;
   final bool searchable; //是否有搜索字段
   final SelectType
       selectType; //查询界面的类型，multi界面无搜索字段，dialog和listview可以包括在showDialog中
+  final bool includeLinkman;
+  final bool includeGroup;
 
-  const LinkmanSearchWidget(
+  const LinkmanGroupSearchWidget(
       {Key? key,
       required this.onSelected,
       required this.selected,
       this.searchable = true,
-      this.selectType = SelectType.smartselect})
+      this.selectType = SelectType.smartselect,
+      this.includeLinkman = true,
+      this.includeGroup = true})
       : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _LinkmanSearchWidgetState();
+  State<StatefulWidget> createState() => _LinkmanGroupSearchWidgetState();
 }
 
-class _LinkmanSearchWidgetState extends State<LinkmanSearchWidget> {
+class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
   TextEditingController textController = TextEditingController();
   List<String> selected = [];
   List<Linkman> linkmen = [];
+  List<Group> groups = [];
+  String title = '';
+  String placeholder = '';
 
   @override
   initState() {
     super.initState();
     selected.addAll(widget.selected);
+    if (widget.includeLinkman && widget.includeGroup) {
+      title = 'Linkman and group';
+      placeholder = 'linkmen and groups';
+    } else if (widget.includeLinkman) {
+      title = 'Linkman';
+      placeholder = 'linkmen ';
+    } else if (widget.includeGroup) {
+      title = 'Group';
+      placeholder = 'groups';
+    }
   }
 
-  Future<List<Linkman>> _search() async {
-    linkmen = await linkmanService.search(textController.text);
+  Future<bool> _search() async {
+    if (widget.includeLinkman) {
+      linkmen = await linkmanService.search(textController.text);
+    }
+    if (widget.includeGroup) {
+      groups = await groupService.search(textController.text);
+    }
     logger.i('search complete');
-
-    return linkmen;
+    return true;
   }
 
   Widget _buildSearchTextField(BuildContext context) {
@@ -57,7 +83,7 @@ class _LinkmanSearchWidgetState extends State<LinkmanSearchWidget> {
         fillColor: Colors.white.withOpacity(0.5),
         filled: true,
         border: InputBorder.none,
-        labelText: AppLocalizations.t('Search linkman'),
+        labelText: AppLocalizations.t('Search $title'),
         suffixIcon: IconButton(
           onPressed: () async {
             await _search();
@@ -73,28 +99,38 @@ class _LinkmanSearchWidgetState extends State<LinkmanSearchWidget> {
 
   List<Option<String>> _buildOptions() {
     List<Option<String>> options = [];
-    for (Linkman linkman in linkmen) {
-      bool checked = selected.contains(linkman.peerId);
-      Option<String> item =
-          Option<String>(linkman.name, linkman.peerId, checked: checked);
-      options.add(item);
+    if (widget.includeLinkman) {
+      for (Linkman linkman in linkmen) {
+        bool checked = selected.contains(linkman.peerId);
+        Option<String> item =
+            Option<String>(linkman.name, linkman.peerId, checked: checked);
+        options.add(item);
+      }
+    }
+    if (widget.includeGroup) {
+      for (Group group in groups) {
+        bool checked = selected.contains(group.peerId);
+        Option<String> item =
+            Option<String>(group.name, group.peerId, checked: checked);
+        options.add(item);
+      }
     }
 
     return options;
   }
 
-  //群成员显示和编辑界面
+  /// 一个搜索字段和一个多选字段的组合，选择项通过传入的回调方法返回
   Widget _buildSmartSelectWidget(BuildContext context) {
     var selector = FutureBuilder(
         future: _search(),
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           var options = _buildOptions();
           return SmartSelectUtil.multiple<String>(
-            title: 'Linkman',
-            placeholder: 'Select more linkmen',
+            title: '',
+            placeholder: '',
             leading: widget.searchable
                 ? SizedBox(
-                    width: 200,
+                    width: 300,
                     child: _buildSearchTextField(context),
                   )
                 : null,
@@ -116,14 +152,15 @@ class _LinkmanSearchWidgetState extends State<LinkmanSearchWidget> {
     return selector;
   }
 
+  /// 一个搜索字段和一个多选字段的组合，选择项通过传入的回调方法返回
   Widget _buildMultiSelectWidget(BuildContext context) {
     var selector = FutureBuilder(
         future: _search(),
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
           var options = _buildOptions();
           return MultiSelectUtil.buildMultiSelectDialogField<String>(
-            title: 'Linkman',
-            buttonText: 'Linkman',
+            title: title,
+            buttonText: title,
             onConfirm: (selected) {
               this.selected = selected;
               widget.onSelected(selected);
@@ -137,6 +174,7 @@ class _LinkmanSearchWidgetState extends State<LinkmanSearchWidget> {
         child: Column(children: [_buildSearchTextField(context), selector]));
   }
 
+  /// 一个搜索字段和一个多选字段的组合，对话框的形式，使用时外部用对话框包裹
   Widget _buildMultiSelectDialog(BuildContext context) {
     var selector = FutureBuilder(
         future: _search(),
@@ -144,7 +182,7 @@ class _LinkmanSearchWidgetState extends State<LinkmanSearchWidget> {
           var hasData = snapshot.hasData;
           if (hasData) {
             return MultiSelectUtil.buildMultiSelectDialog<String>(
-              title: 'Linkman',
+              title: title,
               onConfirm: (selected) {
                 this.selected = selected;
                 widget.onSelected(selected);
@@ -186,6 +224,7 @@ class _LinkmanSearchWidgetState extends State<LinkmanSearchWidget> {
     widget.onSelected([subtitle!]);
   }
 
+  /// 一个搜索字段和一个单选选字段的组合，对话框的形式，使用时外部用对话框包裹
   Widget _buildDataListView(BuildContext context) {
     var dataListView = FutureBuilder(
         future: _search(),

@@ -57,14 +57,14 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    String filename = 'C:\\document\\iceland_compressed.mp4';
+    String filename = 'C:\\Users\\hujs\\Documents\\content\\2d20a19.m4a';
     return AppBarView(
       title: Text(AppLocalizations.t(widget.title)),
       withLeading: true,
       rightPopupMenus: _buildRightPopupMenus(),
       child: mediaPlayerType != null
           ? PlatformMediaPlayer(
-              key: GlobalKey(),
+              key: UniqueKey(),
               showControls: false,
               showPlaylist: false,
               mediaPlayerType: mediaPlayerType!,

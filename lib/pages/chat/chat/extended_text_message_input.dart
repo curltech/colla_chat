@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/linkman/linkman_search_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -185,7 +185,7 @@ class _ExtendedTextMessageInputWidgetState
               context: context,
               title: 'Select one linkman',
               builder: (BuildContext context) {
-                return LinkmanSearchWidget(
+                return LinkmanGroupSearchWidget(
                     onSelected: _onSelected,
                     selected: [],
                     selectType: SelectType.multidialog);
