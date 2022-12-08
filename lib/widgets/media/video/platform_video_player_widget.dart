@@ -5,7 +5,6 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
-import 'package:colla_chat/widgets/media/video/video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player_win/video_player_win_plugin.dart';
 
@@ -76,7 +75,6 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
               mediaPlayerType: mediaPlayerType!,
               filename: filename)
           : const Center(child: Text('Please select a MediaPlayerType!')),
-      // child:const VideoPlayer(),
     );
   }
 }

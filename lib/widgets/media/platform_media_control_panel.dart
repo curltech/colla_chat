@@ -12,6 +12,57 @@ import 'package:sprintf/sprintf.dart';
 
 import 'package:video_player/video_player.dart';
 
+SliderThemeData buildSliderTheme(BuildContext context) {
+  return SliderTheme.of(context).copyWith(
+      trackShape: null,
+      //轨道的形状
+      trackHeight: 2,
+      //trackHeight：滑轨的高度
+
+      //activeTrackColor: Colors.blue,
+      //已滑过轨道的颜色
+      //inactiveTrackColor: Colors.greenAccent,
+      //未滑过轨道的颜色
+
+      //thumbColor: Colors.red,
+      //滑块中心的颜色（小圆头的颜色）
+      //overlayColor: Colors.greenAccent,
+      //滑块边缘的颜色
+
+      thumbShape: const RoundSliderThumbShape(
+        //可继承SliderComponentShape自定义形状
+        disabledThumbRadius: 6, //禁用时滑块大小
+        enabledThumbRadius: 6, //滑块大小
+      ),
+      overlayShape: const RoundSliderOverlayShape(
+        //可继承SliderComponentShape自定义形状
+        overlayRadius: 10, //滑块外圈大小
+      ));
+}
+
+Widget buildSlider(
+  BuildContext context, {
+  required double value,
+  required void Function(double)? onChanged,
+  double min = 0.0,
+  double max = 1.0,
+  int? divisions,
+  void Function(double)? onChangeStart,
+  void Function(double)? onChangeEnd,
+}) {
+  return SliderTheme(
+    data: buildSliderTheme(context),
+    child: Slider(
+      min: min,
+      max: max,
+      value: value,
+      onChanged: onChanged,
+      onChangeStart: onChangeStart,
+      onChangeEnd: onChangeEnd,
+    ),
+  );
+}
+
 class PlatformMediaControlPanel extends StatefulWidget {
   final AbstractAudioPlayerController controller;
   final bool showFullscreenButton; // not shown in web
