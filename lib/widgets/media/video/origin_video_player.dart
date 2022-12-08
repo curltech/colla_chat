@@ -9,32 +9,33 @@ import 'package:video_player/video_player.dart';
 import 'package:video_player_control_panel/video_player_control_panel.dart';
 
 class OriginMediaSource {
-  static FutureOr<VideoPlayerController> media(
-      {String? filename, Uint8List? data}) async {
+  static Future<VideoPlayerController?> media(
+      {required String filename}) async {
     VideoPlayerController videoPlayerController;
-    if (filename != null) {
-      if (filename.startsWith('assets/')) {
-        videoPlayerController = VideoPlayerController.asset(filename);
-      } else if (filename.startsWith('http')) {
-        videoPlayerController = VideoPlayerController.network(filename);
-      } else {
-        videoPlayerController = VideoPlayerController.file(File(filename));
-      }
+    if (filename.startsWith('assets/')) {
+      videoPlayerController = VideoPlayerController.asset(filename);
+    } else if (filename.startsWith('http')) {
+      videoPlayerController = VideoPlayerController.network(filename);
     } else {
-      data = data ?? Uint8List.fromList([]);
-      filename = await FileUtil.writeTempFile(data);
-      videoPlayerController = VideoPlayerController.file(File(filename!));
+      videoPlayerController = VideoPlayerController.file(File(filename));
     }
     await videoPlayerController.initialize();
+    if (!videoPlayerController.value.isInitialized) {
+      logger.e("controller.initialize() failed");
+      return null;
+    }
 
     return videoPlayerController;
   }
 
-  static FutureOr<List<VideoPlayerController>> fromMediaSource(
+  static Future<List<VideoPlayerController>> fromMediaSource(
       List<PlatformMediaSource> mediaSources) async {
     List<VideoPlayerController> videoPlayerControllers = [];
     for (var mediaSource in mediaSources) {
-      videoPlayerControllers.add(await media(filename: mediaSource.filename));
+      var videoPlayerController = await media(filename: mediaSource.filename);
+      if (videoPlayerController != null) {
+        videoPlayerControllers.add(videoPlayerController);
+      }
     }
 
     return videoPlayerControllers;
@@ -47,47 +48,24 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
 
   OriginVideoPlayerController();
 
-  FutureOr<VideoPlayerController?> get controller async {
-    if (_controller == null &&
-        currentIndex > -1 &&
-        currentIndex < playlist.length) {
-      PlatformMediaSource mediaSource = playlist[currentIndex];
-      _controller =
-          await OriginMediaSource.media(filename: mediaSource.filename);
-    }
-    if (_controller == null || !_controller!.value.isInitialized) {
-      logger.e("controller.initialize() failed");
-      return null;
-    }
+  VideoPlayerController? get controller {
     return _controller;
   }
 
   @override
-  previous() async {
-    if (currentIndex <= 0) {
-      return;
+  setCurrentIndex(int index) async {
+    if (index >= -1 && index < playlist.length && currentIndex != index) {
+      PlatformMediaSource mediaSource = playlist[index];
+      var controller =
+          await OriginMediaSource.media(filename: mediaSource.filename);
+      if (controller != null) {
+        close();
+        await setCurrentIndex(index);
+        _controller = controller;
+        notifyListeners();
+        controller.play();
+      }
     }
-    close();
-    super.previous();
-    notifyListeners();
-    var controller = await this.controller;
-    controller?.play();
-  }
-
-  @override
-  next() async {
-    if (currentIndex == -1 || currentIndex >= playlist.length - 1) {
-      return;
-    }
-    close();
-    super.next();
-    notifyListeners();
-    var controller = await this.controller;
-    controller?.play();
-  }
-
-  Future<VideoPlayerController?> getController() async {
-    return await controller;
   }
 
   @override
@@ -97,36 +75,27 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     bool showFullscreenButton = true,
     bool showVolumeButton = true,
   }) {
-    Widget player = FutureBuilder<VideoPlayerController?>(
-        future: getController(),
-        builder: (BuildContext context,
-            AsyncSnapshot<VideoPlayerController?> snapshot) {
-          if (snapshot.hasData) {
-            VideoPlayerController? controller = snapshot.data;
-            if (controller != null) {
-              return JkVideoControlPanel(
-                key: key,
-                controller,
-                showClosedCaptionButton: showClosedCaptionButton,
-                showFullscreenButton: showFullscreenButton,
-                showVolumeButton: showVolumeButton,
-                onPrevClicked: (currentIndex <= 0)
+    Widget player = controller != null
+        ? JkVideoControlPanel(
+            key: key,
+            controller!,
+            showClosedCaptionButton: showClosedCaptionButton,
+            showFullscreenButton: showFullscreenButton,
+            showVolumeButton: showVolumeButton,
+            onPrevClicked: (currentIndex <= 0)
+                ? null
+                : () {
+                    previous();
+                  },
+            onNextClicked:
+                (currentIndex == -1 || currentIndex >= playlist.length - 1)
                     ? null
                     : () {
-                        previous();
+                        next();
                       },
-                onNextClicked:
-                    (currentIndex == -1 || currentIndex >= playlist.length - 1)
-                        ? null
-                        : () {
-                            next();
-                          },
-                onPlayEnded: next,
-              );
-            }
-          }
-          return const Center(child: Text('Please select a media file!'));
-        });
+            onPlayEnded: next,
+          )
+        : const Center(child: Text('Please select a media file!'));
 
     return player;
   }

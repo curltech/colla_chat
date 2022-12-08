@@ -1,27 +1,30 @@
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
+import 'package:colla_chat/widgets/media/audio/abstract_audio_player_controller.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/src/widgets/framework.dart';
 
 ///WaveformsAudio音频播放器，Android, iOS, Linux, macOS, Windows, and web.
 ///还可以产生音频播放的波形图形组件
-class WaveformsAudioPlayerController extends AbstractMediaPlayerController {
+class WaveformsAudioPlayerController extends AbstractAudioPlayerController {
   late PlayerController playerController;
   double _volume = 1.0;
 
   WaveformsAudioPlayerController() {
     playerController = PlayerController();
+    playerController.onCurrentDurationChanged.listen((event) {});
+    playerController.onPlayerStateChanged.listen((state) {});
   }
 
   ///设置当前的通用MediaSource，并转换成特定实现的媒体源，并进行设置
   @override
-  setCurrentIndex(int? index) async {
+  setCurrentIndex(int index) async {
     super.setCurrentIndex(index);
-    if (currentIndex != null) {
+    if (currentIndex >= 0) {
       PlatformMediaSource? currentMediaSource = this.currentMediaSource;
       if (currentMediaSource != null) {
-        playerController.preparePlayer(currentMediaSource.filename, _volume);
+        playerController..preparePlayer(currentMediaSource.filename, _volume);
         notifyListeners();
       }
     }
@@ -29,7 +32,7 @@ class WaveformsAudioPlayerController extends AbstractMediaPlayerController {
 
   @override
   play() async {
-    if (currentIndex != null) {
+    if (currentIndex >= 0) {
       await playerController.startPlayer();
     }
   }
@@ -58,7 +61,7 @@ class WaveformsAudioPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  seek(Duration? position, {int? index}) async {
+  seek(Duration position, {int? index}) async {
     if (index != null) {
       setCurrentIndex(index!);
     }

@@ -6,8 +6,8 @@ import 'package:flutter/material.dart';
 class FlickVideoPlayerController extends OriginVideoPlayerController {
   FlickVideoPlayerController();
 
-  Future<FlickManager?> _getFlickManager() async {
-    var controller = await this.controller;
+  FlickManager? _buildFlickManager() {
+    var controller = this.controller;
     if (controller == null) {
       return null;
     }
@@ -29,22 +29,14 @@ class FlickVideoPlayerController extends OriginVideoPlayerController {
   }) {
     Widget flickVideoWithControls = const FlickVideoWithControls(
         videoFit: BoxFit.contain, controls: FlickPortraitControls());
-
-    Widget player = FutureBuilder<FlickManager?>(
-        future: _getFlickManager(),
-        builder: (BuildContext context, AsyncSnapshot<FlickManager?> snapshot) {
-          if (snapshot.hasData) {
-            FlickManager? flickManager = snapshot.data;
-            if (flickManager != null) {
-              return FlickVideoPlayer(
-                key: key,
-                flickManager: flickManager!,
-                flickVideoWithControls: flickVideoWithControls,
-              );
-            }
-          }
-          return const Center(child: Text('Please select a media file!'));
-        });
+    FlickManager? flickManager = _buildFlickManager();
+    Widget player = flickManager != null
+        ? FlickVideoPlayer(
+            key: key,
+            flickManager: flickManager,
+            flickVideoWithControls: flickVideoWithControls,
+          )
+        : const Center(child: Text('Please select a media file!'));
 
     return player;
   }

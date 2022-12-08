@@ -16,8 +16,8 @@ import 'package:video_player/video_player.dart';
 class ChewieVideoPlayerController extends OriginVideoPlayerController {
   ChewieVideoPlayerController();
 
-  Future<ChewieController?> _getChewieController() async {
-    var controller = await this.controller;
+  ChewieController? _buildChewieController() {
+    var controller = this.controller;
     if (controller == null) {
       return null;
     }
@@ -44,7 +44,7 @@ class ChewieVideoPlayerController extends OriginVideoPlayerController {
         bufferedColor: Colors.lightGreen,
       ),
       placeholder: Container(
-        color: Colors.grey,
+        color: Colors.black,
       ),
       autoInitialize: true,
     );
@@ -59,21 +59,13 @@ class ChewieVideoPlayerController extends OriginVideoPlayerController {
     bool showFullscreenButton = true,
     bool showVolumeButton = true,
   }) {
-    Widget player = FutureBuilder<ChewieController?>(
-        future: _getChewieController(),
-        builder:
-            (BuildContext context, AsyncSnapshot<ChewieController?> snapshot) {
-          if (snapshot.hasData) {
-            ChewieController? chewieController = snapshot.data;
-            if (chewieController != null) {
-              return Chewie(
-                key: key,
-                controller: chewieController,
-              );
-            }
-          }
-          return const Center(child: Text('Please select a media file!'));
-        });
+    ChewieController? chewieController = _buildChewieController();
+    Widget player = chewieController != null
+        ? Chewie(
+            key: key,
+            controller: chewieController,
+          )
+        : const Center(child: Text('Please select a media file!'));
 
     return player;
   }

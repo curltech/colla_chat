@@ -12,30 +12,24 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 class DartVlcMediaSource {
-  static FutureOr<Media> media({String? filename, List<int>? data}) async {
+  static Media media({required String filename}) {
     Media media;
-    if (filename != null) {
-      if (filename.startsWith('assets/')) {
-        media = Media.asset(filename);
-      } else if (filename.startsWith('http')) {
-        media = Media.network(filename);
-      } else {
-        media = Media.file(File(filename));
-      }
+    if (filename.startsWith('assets/')) {
+      media = Media.asset(filename);
+    } else if (filename.startsWith('http')) {
+      media = Media.network(filename);
     } else {
-      data = data ?? Uint8List.fromList([]);
-      filename = await FileUtil.writeTempFile(data);
-      media = Media.file(File(filename!));
+      media = Media.file(File(filename));
     }
 
     return media;
   }
 
-  static FutureOr<Playlist> fromMediaSource(
-      List<platform.PlatformMediaSource> mediaSources) async {
+  static Playlist fromMediaSource(
+      List<platform.PlatformMediaSource> mediaSources) {
     List<Media> medias = [];
     for (var mediaSource in mediaSources) {
-      medias.add(await media(filename: mediaSource.filename));
+      medias.add(media(filename: mediaSource.filename));
     }
     final playlist = Playlist(
       medias: medias,
@@ -105,8 +99,8 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
     _open();
   }
 
-  _open({bool autoStart = false}) async {
-    Playlist list = await DartVlcMediaSource.fromMediaSource(playlist);
+  _open({bool autoStart = false}) {
+    Playlist list = DartVlcMediaSource.fromMediaSource(playlist);
     player.open(
       list,
       autoStart: autoStart,
@@ -114,22 +108,21 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  setCurrentIndex(int? index) async {
-    super.setCurrentIndex(index);
-    if (currentIndex >= 0 && currentIndex < playlist.length) {
-      player.jumpToIndex(currentIndex!);
+  setCurrentIndex(int index) async {
+    if (index >= -1 && index < playlist.length && currentIndex != index) {
+      super.setCurrentIndex(index);
+      notifyListeners();
+      player.jumpToIndex(currentIndex);
     }
   }
 
   ///下面是播放列表的功能
   @override
-  Future<platform.PlatformMediaSource?> add(
-      {String? filename, List<int>? data}) async {
+  Future<platform.PlatformMediaSource?> add({required String filename}) async {
     platform.PlatformMediaSource? mediaSource =
-        await super.add(filename: filename, data: data);
+        await super.add(filename: filename);
     if (mediaSource != null) {
-      Media media =
-      await DartVlcMediaSource.media(filename: mediaSource.filename);
+      Media media = DartVlcMediaSource.media(filename: mediaSource.filename);
       player.add(media);
     }
 
@@ -144,12 +137,11 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   Future<platform.PlatformMediaSource?> insert(int index,
-      {String? filename, List<int>? data}) async {
+      {required String filename}) async {
     platform.PlatformMediaSource? mediaSource =
-        await super.insert(index, filename: filename, data: data);
+        await super.insert(index, filename: filename);
     if (mediaSource != null) {
-      Media media =
-          await DartVlcMediaSource.media(filename: mediaSource.filename);
+      Media media = DartVlcMediaSource.media(filename: mediaSource.filename);
       player.insert(index, media);
     }
     return mediaSource;
@@ -184,11 +176,6 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
       key: key,
       player: player,
     );
-  }
-
-  @override
-  close() {
-    player.dispose();
   }
 
   ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频

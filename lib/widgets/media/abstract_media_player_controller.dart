@@ -29,49 +29,50 @@ class PlatformMediaSource {
     required this.mediaSourceType,
   });
 
-  static FutureOr<PlatformMediaSource> media(
-      {String? filename, List<int>? data, MimeType? mediaFormat}) async {
+  static FutureOr<PlatformMediaSource?> mediaStream(
+      {required Uint8List data, required MimeType mediaFormat}) async {
+    String? filename =
+        await FileUtil.writeTempFile(data, extension: mediaFormat.name);
+    PlatformMediaSource? mediaSource = PlatformMediaSource(
+        filename: filename!,
+        mediaSourceType: MediaSourceType.buffer,
+        mediaFormat: mediaFormat);
+
+    return mediaSource;
+  }
+
+  static PlatformMediaSource media(
+      {required String filename, MimeType? mediaFormat}) {
     PlatformMediaSource mediaSource;
-    if (filename != null) {
-      if (mediaFormat == null) {
-        int pos = filename.lastIndexOf('.');
-        String extension = filename.substring(pos + 1);
-        mediaFormat = StringUtil.enumFromString(MimeType.values, extension);
-      }
-      if (filename.startsWith('assets')) {
-        mediaSource = PlatformMediaSource(
-            filename: filename,
-            mediaSourceType: MediaSourceType.asset,
-            mediaFormat: mediaFormat);
-      } else if (filename.startsWith('http')) {
-        mediaSource = PlatformMediaSource(
-            filename: filename,
-            mediaSourceType: MediaSourceType.network,
-            mediaFormat: mediaFormat);
-      } else {
-        mediaSource = PlatformMediaSource(
-            filename: filename,
-            mediaSourceType: MediaSourceType.file,
-            mediaFormat: mediaFormat);
-      }
-    } else {
-      data = data ?? Uint8List.fromList([]);
-      filename =
-          await FileUtil.writeTempFile(data, extension: mediaFormat?.name);
+    if (mediaFormat == null) {
+      int pos = filename.lastIndexOf('.');
+      String extension = filename.substring(pos + 1);
+      mediaFormat = StringUtil.enumFromString(MimeType.values, extension);
+    }
+    if (filename.startsWith('assets')) {
       mediaSource = PlatformMediaSource(
-          filename: filename!,
-          mediaSourceType: MediaSourceType.buffer,
+          filename: filename,
+          mediaSourceType: MediaSourceType.asset,
+          mediaFormat: mediaFormat);
+    } else if (filename.startsWith('http')) {
+      mediaSource = PlatformMediaSource(
+          filename: filename,
+          mediaSourceType: MediaSourceType.network,
+          mediaFormat: mediaFormat);
+    } else {
+      mediaSource = PlatformMediaSource(
+          filename: filename,
+          mediaSourceType: MediaSourceType.file,
           mediaFormat: mediaFormat);
     }
 
     return mediaSource;
   }
 
-  static FutureOr<List<PlatformMediaSource>> playlist(
-      List<String> filenames) async {
+  static List<PlatformMediaSource> playlist(List<String> filenames) {
     List<PlatformMediaSource> playlist = [];
     for (var filename in filenames) {
-      playlist.add(await media(filename: filename));
+      playlist.add(media(filename: filename));
     }
 
     return playlist;
@@ -109,17 +110,9 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     return _currentIndex;
   }
 
-  set currentIndex(int? index) {
-    if (index != null && index >= -1 && index < playlist.length) {
+  setCurrentIndex(int index) async {
+    if (index >= -1 && index < playlist.length && _currentIndex != index) {
       _currentIndex = index;
-    }
-  }
-
-  ///设置当前的通用MediaSource，子类转换成特定实现的媒体源，并进行设置
-  setCurrentIndex(int? index) {
-    if (index != null && index >= -1 && index < playlist.length) {
-      _currentIndex = index;
-      notifyListeners();
     }
   }
 
@@ -130,19 +123,21 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     return null;
   }
 
-  previous() {
-    if (_currentIndex > 0) {
-      _currentIndex = _currentIndex - 1;
+  previous() async {
+    if (currentIndex <= 0) {
+      return;
     }
+    await setCurrentIndex(_currentIndex - 1);
   }
 
-  next() {
-    if (_currentIndex >= 0 && _currentIndex! < playlist.length - 1) {
-      _currentIndex = _currentIndex + 1;
+  next() async {
+    if (currentIndex == -1 || currentIndex >= playlist.length - 1) {
+      return;
     }
+    await setCurrentIndex(_currentIndex + 1);
   }
 
-  Future<PlatformMediaSource?> add({String? filename, List<int>? data}) async {
+  Future<PlatformMediaSource?> add({required String filename}) async {
     for (var mediaSource in playlist) {
       var name = mediaSource.filename;
       if (name == filename) {
@@ -150,7 +145,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
       }
     }
     PlatformMediaSource mediaSource =
-        await PlatformMediaSource.media(filename: filename, data: data);
+        PlatformMediaSource.media(filename: filename);
     playlist.add(mediaSource);
     await setCurrentIndex(playlist.length - 1);
 
@@ -158,7 +153,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   }
 
   Future<PlatformMediaSource?> insert(int index,
-      {String? filename, List<int>? data}) async {
+      {required String filename}) async {
     for (var mediaSource in playlist) {
       var name = mediaSource.filename;
       if (name == filename) {
@@ -166,7 +161,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
       }
     }
     PlatformMediaSource mediaSource =
-        await PlatformMediaSource.media(filename: filename, data: data);
+        PlatformMediaSource.media(filename: filename);
     playlist.insert(index, mediaSource);
     await setCurrentIndex(index);
 

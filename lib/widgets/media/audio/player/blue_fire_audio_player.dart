@@ -2,25 +2,30 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
+import 'package:colla_chat/widgets/media/audio/abstract_audio_player_controller.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/widgets.dart';
+import 'package:video_player/video_player.dart';
 
 class BlueFireAudioSource {
-  static Source audioSource({String? filename, Uint8List? data}) {
+  static Source mediaStream(
+      {required Uint8List data, required MimeType mediaFormat}) {
+    Source source = BytesSource(data);
+
+    return source;
+  }
+
+  static Source audioSource({required String filename}) {
     Source source;
-    if (filename != null) {
-      if (filename.startsWith('assets/')) {
-        source = AssetSource(filename);
-      } else if (filename.startsWith('http')) {
-        source = UrlSource(filename);
-      } else {
-        source = DeviceFileSource(filename);
-      }
+    if (filename.startsWith('assets/')) {
+      source = AssetSource(filename);
+    } else if (filename.startsWith('http')) {
+      source = UrlSource(filename);
     } else {
-      data = data ?? Uint8List.fromList([]);
-      source = BytesSource(data);
+      source = DeviceFileSource(filename);
     }
 
     return source;
@@ -32,13 +37,8 @@ class BlueFireAudioSource {
 }
 
 ///音频播放器，Android, iOS, Linux, macOS, Windows, and web.
-class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
+class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
   late AudioPlayer player;
-  Duration? duration;
-  Duration? position;
-  double volume = 1.0;
-  double speed = 1.0;
-  PlayerStatus _status = PlayerStatus.init;
 
   StreamSubscription? _durationSubscription;
   StreamSubscription? _positionSubscription;
@@ -52,45 +52,55 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
 
   void _initStreams() {
     _durationSubscription = player.onDurationChanged.listen((duration) {
-      this.duration = duration;
+      value = VideoPlayerValue(duration: duration);
     });
 
     _positionSubscription = player.onPositionChanged.listen((position) {
-      this.position = position;
-      notifyListeners();
+      value = VideoPlayerValue(duration: value.duration, position: position);
     });
 
     _playerCompleteSubscription = player.onPlayerComplete.listen((event) {
-      position = Duration.zero;
+      value = VideoPlayerValue(
+        duration: value.duration,
+      );
     });
 
     _playerStateChangeSubscription =
         player.onPlayerStateChanged.listen((state) {
       if (state == PlayerState.completed) {
-        _status = PlayerStatus.completed;
+        value = VideoPlayerValue(
+          duration: value.duration,
+          isPlaying: false,
+        );
       } else if (state == PlayerState.playing) {
-        _status = PlayerStatus.playing;
+        value = VideoPlayerValue(
+          duration: value.duration,
+          isPlaying: true,
+        );
       } else if (state == PlayerState.paused) {
-        _status = PlayerStatus.pause;
+        value = VideoPlayerValue(
+          duration: value.duration,
+          isPlaying: false,
+        );
       } else if (state == PlayerState.stopped) {
-        _status = PlayerStatus.stop;
+        value = VideoPlayerValue(
+          duration: value.duration,
+          isPlaying: false,
+        );
       }
     });
   }
 
-  PlayerStatus get status {
-    return _status;
-  }
-
+  ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频
+  @override
   play() async {
-    if (currentIndex != null) {
+    if (currentIndex >= 0 && currentIndex < playlist.length) {
       PlatformMediaSource? currentMediaSource = this.currentMediaSource;
       if (currentMediaSource != null) {
         Source source = BlueFireAudioSource.fromMediaSource(currentMediaSource);
         try {
           await player.play(source);
           playlistVisible = false;
-          _status = PlayerStatus.playing;
           notifyListeners();
         } catch (e) {
           logger.e('$e');
@@ -99,30 +109,28 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
     }
   }
 
+  @override
   pause() async {
     await player.pause();
-    _status = PlayerStatus.pause;
-    notifyListeners();
-  }
-
-  stop() async {
-    await player.stop();
-    _status = PlayerStatus.stop;
-    playlistVisible = true;
-  }
-
-  resume() async {
-    await player.resume();
-    _status = PlayerStatus.playing;
     notifyListeners();
   }
 
   @override
-  close() async {
-    super.dispose();
-    await player.release();
-    _status = PlayerStatus.init;
+  stop() async {
+    await player.stop();
     playlistVisible = true;
+  }
+
+  @override
+  resume() async {
+    await player.resume();
+    notifyListeners();
+  }
+
+  @override
+  dispose() async {
+    await player.release();
+    super.dispose();
   }
 
   Future<Duration?> getDuration() async {
@@ -137,33 +145,32 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
     return null;
   }
 
-  seek(Duration? position, {int? index}) async {
-    await setCurrentIndex(index);
-    await player.seek(position!);
+  @override
+  seek(Duration position, {int? index}) async {
+    await setCurrentIndex(index!);
+    await player.seek(position);
   }
 
+  @override
   Future<double> getVolume() async {
-    return Future.value(volume);
+    return Future.value(value.volume);
   }
 
+  @override
   setVolume(double volume) async {
     await player.setVolume(volume);
-    if (volume != this.volume) {
-      this.volume = volume;
-      notifyListeners();
-    }
+    await super.setVolume(volume);
   }
 
+  @override
   Future<double> getSpeed() async {
-    return Future.value(speed);
+    return Future.value(value.playbackSpeed);
   }
 
+  @override
   setSpeed(double speed) async {
     await player.setPlaybackRate(speed);
-    if (speed != this.speed) {
-      this.speed = speed;
-      notifyListeners();
-    }
+    await super.setSpeed(speed);
   }
 
   setPlayerMode(PlayerMode playerMode) async {

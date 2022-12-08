@@ -4,6 +4,7 @@ import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
+import 'package:colla_chat/widgets/media/audio/abstract_audio_player_controller.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:just_audio/just_audio.dart';
@@ -12,16 +13,15 @@ import 'package:rxdart/rxdart.dart';
 
 ///采用just_audio和record实现的音频的播放和记录，适用于Android, iOS, Linux, macOS, Windows, and web.
 class JustAudioSource {
-  static Future<AudioSource> audioSource(
-      {String? filename,
-      Uint8List? data,
+  static AudioSource audioSource(
+      {required String filename,
       String? id,
       String? album,
       String? title,
-      String? artUri}) async {
+      String? artUri}) {
     AudioSource audioSource;
-    id = id ?? await cryptoGraphy.getRandomAsciiString();
-    title = title ?? await cryptoGraphy.getRandomAsciiString();
+    id = id ?? '';
+    title = title ?? '';
     var tag = MediaItem(
       // Specify a unique ID for each media item:
       id: id,
@@ -32,26 +32,20 @@ class JustAudioSource {
           ? Uri.parse(artUri)
           : null, //Uri.parse('https://example.com/albumart.jpg'),
     );
-    if (filename != null) {
-      if (filename.startsWith('assets')) {
-        audioSource = AudioSource.uri(Uri.parse(filename), tag: tag);
-      } else if (filename.startsWith('http')) {
-        audioSource = AudioSource.uri(Uri.parse(filename), tag: tag);
-      } else {
-        audioSource = AudioSource.uri(Uri.file(filename), tag: tag);
-      }
+    if (filename.startsWith('assets')) {
+      audioSource = AudioSource.uri(Uri.parse(filename), tag: tag);
+    } else if (filename.startsWith('http')) {
+      audioSource = AudioSource.uri(Uri.parse(filename), tag: tag);
     } else {
-      data = data ?? Uint8List.fromList([]);
-      filename = await FileUtil.writeTempFile(data);
-      audioSource = AudioSource.uri(Uri.parse(filename!), tag: tag);
+      audioSource = AudioSource.uri(Uri.file(filename), tag: tag);
     }
 
     return audioSource;
   }
 
-  static Future<AudioSource> fromMediaSource(PlatformMediaSource mediaSource,
-      {String? id, String? album, String? title, String? artUri}) async {
-    AudioSource source = await audioSource(
+  static AudioSource fromMediaSource(PlatformMediaSource mediaSource,
+      {String? id, String? album, String? title, String? artUri}) {
+    AudioSource source = audioSource(
       filename: mediaSource.filename,
       id: id,
       album: album,
@@ -65,7 +59,7 @@ class JustAudioSource {
 
 ///JustAudio音频播放器，Android, iOS, Linux, macOS, Windows, and web.
 ///还可以产生音频播放的波形图形组件
-class JustAudioPlayerController extends AbstractMediaPlayerController {
+class JustAudioPlayerController extends AbstractAudioPlayerController {
   late AudioPlayer player;
 
   ///当前版本还不支持windows
@@ -98,17 +92,38 @@ class JustAudioPlayerController extends AbstractMediaPlayerController {
     player.playerStateStream.listen((state) {
       logger.i('player state:${state.processingState.name}');
     });
+    player.bufferedPositionStream.listen((duration) {
+      logger.i('player state:$duration');
+    });
+    player.androidAudioSessionIdStream.listen((duration) {
+      logger.i('player state:$duration');
+    });
+    player.createPositionStream().listen((duration) {
+      logger.i('player state:$duration');
+    });
+    player.currentIndexStream.listen((duration) {
+      logger.i('player state:$duration');
+    });
+    player.durationStream.listen((duration) {
+      logger.i('player state:$duration');
+    });
+    player.playbackEventStream.listen((duration) {
+      logger.i('player state:$duration');
+    });
+    player.processingStateStream.listen((duration) {
+      logger.i('player state:$duration');
+    });
   }
 
   ///设置当前的通用MediaSource，并转换成特定实现的媒体源，并进行设置
   @override
-  setCurrentIndex(int? index) async {
+  setCurrentIndex(int index) async {
     super.setCurrentIndex(index);
     if (currentIndex >= 0 && currentIndex < playlist.length) {
       PlatformMediaSource? currentMediaSource = this.currentMediaSource;
       if (currentMediaSource != null) {
         AudioSource source =
-            await JustAudioSource.fromMediaSource(currentMediaSource);
+            JustAudioSource.fromMediaSource(currentMediaSource);
         var audioSource = player.audioSource;
         if (audioSource != source) {
           try {

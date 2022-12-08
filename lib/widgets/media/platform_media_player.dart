@@ -63,13 +63,14 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
   void initState() {
     super.initState();
     _updateMediaPlayerType();
-    if (widget.filename != null || widget.data != null) {
-      controller
-          .add(filename: widget.filename, data: widget.data)
-          .then((value) {
-        setState(() {});
-      });
+    controller.addListener(_update);
+    if (widget.filename != null) {
+      controller.add(filename: widget.filename!);
     }
+  }
+
+  _update() {
+    setState(() {});
   }
 
   _updateMediaPlayerType() {
@@ -105,6 +106,7 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
 
   @override
   void dispose() {
+    controller.removeListener(_update);
     controller.dispose();
     super.dispose();
   }
