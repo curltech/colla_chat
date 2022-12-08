@@ -1,20 +1,18 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/media/media_player_slider.dart';
-import 'package:colla_chat/widgets/media/abstract_media_controller.dart'
+import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart'
     as platform;
-import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
-import 'package:colla_chat/widgets/media/platform_media_player_util.dart';
+import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:dart_vlc/dart_vlc.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 
 class DartVlcMediaSource {
-  static Future<Media> media({String? filename, List<int>? data}) async {
+  static FutureOr<Media> media({String? filename, List<int>? data}) async {
     Media media;
     if (filename != null) {
       if (filename.startsWith('assets/')) {
@@ -33,7 +31,7 @@ class DartVlcMediaSource {
     return media;
   }
 
-  static Future<Playlist> fromMediaSource(
+  static FutureOr<Playlist> fromMediaSource(
       List<platform.PlatformMediaSource> mediaSources) async {
     List<Media> medias = [];
     for (var mediaSource in mediaSources) {
@@ -75,39 +73,30 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
     );
     player.currentStream.listen((currentState) {
       this.currentState = currentState;
-      notifyListeners();
     });
     player.positionStream.listen((positionState) {
       this.positionState = positionState;
-      notifyListeners();
     });
     player.playbackStream.listen((playbackState) {
       this.playbackState = playbackState;
       if (playbackState.isPlaying) {
-        status = PlayerStatus.playing;
-      } else if (playbackState.isCompleted) {
-        status = PlayerStatus.completed;
-      }
+      } else if (playbackState.isCompleted) {}
       if (this.playbackState != null && this.playbackState!.isCompleted) {
         playlistVisible = true;
       }
       if (this.playbackState != null && this.playbackState!.isPlaying) {
         playlistVisible = false;
       }
-      notifyListeners();
     });
     player.generalStream.listen((generalState) {
       this.generalState = generalState;
-      notifyListeners();
     });
     player.videoDimensionsStream.listen((videoDimensions) {
       this.videoDimensions = videoDimensions;
-      notifyListeners();
     });
     player.bufferingProgressStream.listen(
       (bufferingProgress) {
         this.bufferingProgress = bufferingProgress;
-        notifyListeners();
       },
     );
     player.errorStream.listen((event) {
@@ -124,58 +113,10 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
     );
   }
 
-  ///基本的视频控制功能
-  @override
-  play() {
-    player.play();
-  }
-
-  @override
-  pause() {
-    player.pause();
-    status = PlayerStatus.pause;
-  }
-
-  @override
-  resume() {
-    player.play();
-  }
-
-  @override
-  stop() {
-    player.stop();
-    playlistVisible = true;
-  }
-
-  @override
-  seek(Duration position, {int? index}) {
-    player.seek(position);
-  }
-
-  @override
-  setVolume(double volume) {
-    player.setVolume(volume);
-  }
-
-  @override
-  setSpeed(double speed) {
-    player.setRate(speed);
-  }
-
-  @override
-  Future<double> getSpeed() {
-    return Future.value(player.general.rate);
-  }
-
-  @override
-  Future<double> getVolume() async {
-    return Future.value(player.general.volume);
-  }
-
   @override
   setCurrentIndex(int? index) async {
     super.setCurrentIndex(index);
-    if (currentIndex != null) {
+    if (currentIndex >= 0 && currentIndex < playlist.length) {
       player.jumpToIndex(currentIndex!);
     }
   }
@@ -188,7 +129,7 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
         await super.add(filename: filename, data: data);
     if (mediaSource != null) {
       Media media =
-          await DartVlcMediaSource.media(filename: mediaSource.filename);
+      await DartVlcMediaSource.media(filename: mediaSource.filename);
       player.add(media);
     }
 
@@ -233,31 +174,59 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  Future<Duration?> getBufferedPosition() {
-    double progress = player.bufferingProgress;
-
-    return Future<Duration?>.value(Duration(milliseconds: progress.toInt()));
+  Widget buildMediaPlayer({
+    Key? key,
+    bool showClosedCaptionButton = true,
+    bool showFullscreenButton = true,
+    bool showVolumeButton = true,
+  }) {
+    return Video(
+      key: key,
+      player: player,
+    );
   }
 
   @override
-  Future<Duration?> getDuration() {
-    return Future<Duration?>.value(player.position.duration);
+  close() {
+    player.dispose();
   }
 
-  @override
-  Future<Duration?> getPosition() {
-    return Future<Duration?>.value(player.position.position);
+  ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频
+  play() {
+    player.play();
   }
 
-  @override
-  setShuffleModeEnabled(bool enabled) {
-    throw UnimplementedError();
+  pause() {
+    player.pause();
   }
 
-  @override
-  dispose() {
-    super.dispose();
-    close();
+  resume() {
+    player.play();
+  }
+
+  stop() {
+    player.stop();
+    playlistVisible = true;
+  }
+
+  seek(Duration position, {int? index}) {
+    player.seek(position);
+  }
+
+  Future<double> getSpeed() {
+    return Future.value(player.general.rate);
+  }
+
+  setSpeed(double speed) {
+    player.setRate(speed);
+  }
+
+  Future<double> getVolume() async {
+    return Future.value(player.general.volume);
+  }
+
+  setVolume(double volume) {
+    player.setVolume(volume);
   }
 
   ///以下是视频播放器特有的方法
@@ -282,59 +251,6 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
       return PositionData(
           position, bufferedPosition, duration ?? Duration.zero);
     });
-  }
-
-  @override
-  Widget buildMediaView({
-    Key? key,
-    Player? player,
-    double? width,
-    double? height,
-    BoxFit fit = BoxFit.contain,
-    AlignmentGeometry alignment = Alignment.center,
-    double scale = 1.0,
-    bool showControls = true,
-    Color? progressBarActiveColor,
-    Color? progressBarInactiveColor = Colors.white24,
-    Color? progressBarThumbColor,
-    Color? progressBarThumbGlowColor = const Color.fromRGBO(0, 161, 214, .2),
-    Color? volumeActiveColor,
-    Color? volumeInactiveColor = Colors.grey,
-    Color volumeBackgroundColor = const Color(0xff424242),
-    Color? volumeThumbColor,
-    double? progressBarThumbRadius = 10.0,
-    double? progressBarThumbGlowRadius = 15.0,
-    bool showTimeLeft = false,
-    TextStyle progressBarTextStyle = const TextStyle(),
-    FilterQuality filterQuality = FilterQuality.low,
-    Color fillColor = Colors.black,
-  }) {
-    player = player ?? this.player;
-    key ??= UniqueKey();
-    return Video(
-      key: key,
-      player: player,
-      width: width,
-      height: height,
-      fit: fit,
-      alignment: alignment,
-      scale: scale,
-      showControls: showControls,
-      progressBarActiveColor: progressBarActiveColor,
-      progressBarInactiveColor: progressBarInactiveColor,
-      progressBarThumbColor: progressBarThumbColor,
-      progressBarThumbGlowColor: progressBarThumbGlowColor,
-      volumeActiveColor: volumeActiveColor,
-      volumeInactiveColor: volumeInactiveColor,
-      volumeBackgroundColor: volumeBackgroundColor,
-      volumeThumbColor: volumeThumbColor,
-      progressBarThumbRadius: progressBarThumbRadius,
-      progressBarThumbGlowRadius: progressBarThumbGlowRadius,
-      showTimeLeft: showTimeLeft,
-      progressBarTextStyle: progressBarTextStyle,
-      filterQuality: filterQuality,
-      fillColor: fillColor,
-    );
   }
 
   setEqualizer({double? band, double? preAmp, double? amp}) {
@@ -369,11 +285,6 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
     broadcast.start();
     broadcast.dispose();
     return broadcast;
-  }
-
-  @override
-  close() {
-    player.dispose();
   }
 }
 

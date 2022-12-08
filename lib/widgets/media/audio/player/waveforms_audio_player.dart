@@ -1,6 +1,6 @@
 import 'package:audio_waveforms/audio_waveforms.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
+import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/src/widgets/framework.dart';
 
@@ -117,40 +117,16 @@ class WaveformsAudioPlayerController extends AbstractMediaPlayerController {
   close() {}
 
   @override
-  Widget buildMediaView({
+  Widget buildMediaPlayer({
     Key? key,
-    double? width,
-    double? height,
-    BoxFit fit = BoxFit.contain,
-    AlignmentGeometry alignment = Alignment.center,
-    double scale = 1.0,
-    bool showControls = true,
-    PlayerWaveStyle playerWaveStyle = const PlayerWaveStyle(),
-    bool enableSeekGesture = true,
-    EdgeInsets? padding,
-    EdgeInsets? margin,
-    BoxDecoration? decoration,
-    Color? backgroundColor,
-    Duration animationDuration = const Duration(milliseconds: 500),
-    Curve animationCurve = Curves.ease,
-    double density = 2,
-    Clip clipBehavior = Clip.none,
+    bool showClosedCaptionButton = true,
+    bool showFullscreenButton = true,
+    bool showVolumeButton = true,
   }) {
-    key ??= UniqueKey();
     return AudioFileWaveforms(
       key: key,
-      size: Size(width!, height!),
-      padding: padding,
-      margin: margin,
-      decoration: decoration,
-      backgroundColor: backgroundColor,
-      playerWaveStyle: playerWaveStyle,
-      enableSeekGesture: enableSeekGesture,
-      animationDuration: animationDuration,
-      animationCurve: animationCurve,
-      density: density,
-      clipBehavior: clipBehavior,
       playerController: playerController,
+      size: const Size(0, 0),
     );
   }
 }

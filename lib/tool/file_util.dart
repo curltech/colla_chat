@@ -15,6 +15,8 @@ import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
+import 'package:file_selector_platform_interface/file_selector_platform_interface.dart';
+import 'package:file_selector/file_selector.dart';
 
 class FileUtil {
   static Future<String> writeFile(List<int> bytes, String filename) async {
@@ -122,6 +124,19 @@ class FileUtil {
     }
 
     return xfiles;
+  }
+
+  static Future<List<XFile>> selectFiles({
+    List<String>? allowedExtensions,
+  }) async {
+     XTypeGroup typeGroup = XTypeGroup(
+      extensions: allowedExtensions,
+    );
+    final List<XFile> files = await openFiles(acceptedTypeGroups: <XTypeGroup>[
+      typeGroup,
+    ]);
+
+    return files;
   }
 
   static Future<String?> directoryPathPicker({

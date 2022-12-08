@@ -3,8 +3,7 @@ import 'dart:typed_data';
 import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/media/media_player_slider.dart';
-import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
+import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:just_audio/just_audio.dart';
@@ -105,7 +104,7 @@ class JustAudioPlayerController extends AbstractMediaPlayerController {
   @override
   setCurrentIndex(int? index) async {
     super.setCurrentIndex(index);
-    if (currentIndex != null) {
+    if (currentIndex >= 0 && currentIndex < playlist.length) {
       PlatformMediaSource? currentMediaSource = this.currentMediaSource;
       if (currentMediaSource != null) {
         AudioSource source =
@@ -125,7 +124,6 @@ class JustAudioPlayerController extends AbstractMediaPlayerController {
     }
   }
 
-  @override
   play() async {
     var audioSource = player.audioSource;
     if (audioSource != null) {
@@ -133,28 +131,24 @@ class JustAudioPlayerController extends AbstractMediaPlayerController {
     }
   }
 
-  @override
   pause() async {
     await player.pause();
   }
 
-  @override
   stop() async {
     await player.stop();
   }
 
-  @override
   resume() async {
     await player.play();
   }
 
   @override
   dispose() async {
-    super.dispose();
     await player.dispose();
+    super.dispose();
   }
 
-  @override
   seek(Duration? position, {int? index}) async {
     if (index != null) {
       setCurrentIndex(index!);
@@ -172,37 +166,30 @@ class JustAudioPlayerController extends AbstractMediaPlayerController {
     await player.setLoopMode(mode);
   }
 
-  @override
   Future<Duration?> getDuration() async {
     return player.duration;
   }
 
-  @override
   Future<Duration?> getPosition() async {
     return player.position;
   }
 
-  @override
   Future<Duration?> getBufferedPosition() async {
     return player.bufferedPosition;
   }
 
-  @override
   Future<double> getVolume() async {
     return Future.value(player.volume);
   }
 
-  @override
   setVolume(double volume) async {
     await player.setVolume(volume);
   }
 
-  @override
   Future<double> getSpeed() async {
     return Future.value(player.speed);
   }
 
-  @override
   setSpeed(double speed) async {
     await player.setSpeed(speed);
   }
@@ -219,19 +206,12 @@ class JustAudioPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  close() {}
-
-  @override
-  Widget buildMediaView({
+  Widget buildMediaPlayer({
     Key? key,
-    double? width,
-    double? height,
-    BoxFit fit = BoxFit.contain,
-    AlignmentGeometry alignment = Alignment.center,
-    double scale = 1.0,
-    bool showControls = true,
+    bool showClosedCaptionButton = true,
+    bool showFullscreenButton = true,
+    bool showVolumeButton = true,
   }) {
-    key ??= UniqueKey();
     return Container();
   }
 }

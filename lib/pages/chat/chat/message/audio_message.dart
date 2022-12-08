@@ -29,7 +29,6 @@ class AudioMessage extends StatelessWidget {
             }
             return PlatformMediaPlayer(
               key: UniqueKey(),
-              showControls: false,
               showPlaylist: false,
               filename: filename,
               mediaPlayerType: MediaPlayerType.webview,

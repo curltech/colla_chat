@@ -1,10 +1,13 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
+import 'package:colla_chat/widgets/media/video/video_player.dart';
 import 'package:flutter/material.dart';
+import 'package:video_player_win/video_player_win_plugin.dart';
 
 ///平台标准的video_player的实现，移动采用flick，桌面采用vlc
 class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
@@ -34,6 +37,9 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
   @override
   void initState() {
     super.initState();
+    if (platformParams.windows) {
+      WindowsVideoPlayer.registerWith();
+    }
   }
 
   @override
@@ -59,18 +65,19 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    String filename = 'C:\\Users\\hujs\\Documents\\content\\2d20a19.m4a';
+    String filename = 'C:\\document\\iceland_compressed.mp4';
     return AppBarView(
       title: Text(AppLocalizations.t(widget.title)),
       withLeading: true,
       rightPopupMenus: _buildRightPopupMenus(),
-      child: mediaPlayerType != null
-          ? PlatformMediaPlayer(
-              showControls: true,
-              showPlaylist: true,
-              mediaPlayerType: mediaPlayerType!,
-              filename: filename)
-          : const Center(child: Text('Please select a MediaPlayerType!')),
+      // child: mediaPlayerType != null
+      //     ? PlatformMediaPlayer(
+      //         showControls: false,
+      //         showPlaylist: false,
+      //         mediaPlayerType: mediaPlayerType!,
+      //         filename: filename)
+      //     : const Center(child: Text('Please select a MediaPlayerType!')),
+      child:const VideoPlayer(),
     );
   }
 }
