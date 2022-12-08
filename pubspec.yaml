@@ -225,6 +225,9 @@ dependencies:
   audioplayers_platform_interface: ^2.0.0
   audioplayers_windows: ^1.1.0
   another_audio_recorder: ^1.0.1
+  assets_audio_player: ^3.0.6
+  audiofileplayer: ^2.1.1
+  kplayer_with_audioplayers: ^0.3.3
   record_mp3: ^3.0.0
   audio_waveforms: ^0.1.5
   video_player_web: ^2.0.12
