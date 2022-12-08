@@ -64,7 +64,11 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
     super.initState();
     _updateMediaPlayerType();
     if (widget.filename != null || widget.data != null) {
-      controller.add(filename: widget.filename, data: widget.data);
+      controller
+          .add(filename: widget.filename, data: widget.data)
+          .then((value) {
+        setState(() {});
+      });
     }
   }
 
@@ -124,9 +128,11 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
       },
     );
 
-    Widget player = Visibility(
-        visible: !controller.playlistVisible,
-        child: controller.buildMediaPlayer(key: UniqueKey()));
+    // Widget player = Visibility(
+    //     visible: !controller.playlistVisible,
+    //     child: controller.buildMediaPlayer(key: UniqueKey()));
+
+    Widget player = controller.buildMediaPlayer(key: UniqueKey());
 
     Widget mediaView = Stack(children: [player]);
 

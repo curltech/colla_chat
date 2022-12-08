@@ -55,7 +55,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
       _controller =
           await OriginMediaSource.media(filename: mediaSource.filename);
     }
-    if (!_controller!.value.isInitialized) {
+    if (_controller == null || !_controller!.value.isInitialized) {
       logger.e("controller.initialize() failed");
       return null;
     }

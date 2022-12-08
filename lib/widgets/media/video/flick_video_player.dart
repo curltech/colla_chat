@@ -14,6 +14,7 @@ class FlickVideoPlayerController extends OriginVideoPlayerController {
     FlickManager flickManager = FlickManager(
       videoPlayerController: controller,
       onVideoEnd: next,
+      autoPlay: false,
     );
 
     return flickManager;
@@ -27,7 +28,7 @@ class FlickVideoPlayerController extends OriginVideoPlayerController {
     bool showVolumeButton = true,
   }) {
     Widget flickVideoWithControls = const FlickVideoWithControls(
-        videoFit: BoxFit.cover, controls: FlickPortraitControls());
+        videoFit: BoxFit.contain, controls: FlickPortraitControls());
 
     Widget player = FutureBuilder<FlickManager?>(
         future: _getFlickManager(),

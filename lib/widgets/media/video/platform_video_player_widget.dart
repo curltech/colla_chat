@@ -70,14 +70,13 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
       title: Text(AppLocalizations.t(widget.title)),
       withLeading: true,
       rightPopupMenus: _buildRightPopupMenus(),
-      // child: mediaPlayerType != null
-      //     ? PlatformMediaPlayer(
-      //         showControls: false,
-      //         showPlaylist: false,
-      //         mediaPlayerType: mediaPlayerType!,
-      //         filename: filename)
-      //     : const Center(child: Text('Please select a MediaPlayerType!')),
-      child:const VideoPlayer(),
+      child: mediaPlayerType != null
+          ? PlatformMediaPlayer(
+              showPlaylist: false,
+              mediaPlayerType: mediaPlayerType!,
+              filename: filename)
+          : const Center(child: Text('Please select a MediaPlayerType!')),
+      // child:const VideoPlayer(),
     );
   }
 }
