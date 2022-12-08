@@ -110,7 +110,7 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
   @override
   setCurrentIndex(int index) async {
     if (index >= -1 && index < playlist.length && currentIndex != index) {
-      super.setCurrentIndex(index);
+      await super.setCurrentIndex(index);
       notifyListeners();
       player.jumpToIndex(currentIndex);
     }

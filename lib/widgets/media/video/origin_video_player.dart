@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:video_player/video_player.dart';
 import 'package:video_player_control_panel/video_player_control_panel.dart';
 
@@ -60,7 +58,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
           await OriginMediaSource.media(filename: mediaSource.filename);
       if (controller != null) {
         close();
-        await setCurrentIndex(index);
+        await super.setCurrentIndex(index);
         _controller = controller;
         notifyListeners();
         controller.play();
@@ -110,35 +108,35 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
 
   ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频
   play() async {
-    var controller = await this.controller;
+    var controller = this.controller;
     if (controller != null) {
       controller.play();
     }
   }
 
   pause() async {
-    var controller = await this.controller;
+    var controller = this.controller;
     if (controller != null) {
       controller.pause();
     }
   }
 
   resume() async {
-    var controller = await this.controller;
+    var controller = this.controller;
     if (controller != null) {
       controller.play();
     }
   }
 
   stop() async {
-    var controller = await this.controller;
+    var controller = this.controller;
     if (controller != null) {
       controller.pause();
     }
   }
 
   seek(Duration position, {int? index}) async {
-    var controller = await this.controller;
+    var controller = this.controller;
     if (controller != null) {
       controller.seekTo(position);
     }
@@ -146,7 +144,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
 
   Future<double> getSpeed() async {
     double speed = 1.0;
-    var controller = await this.controller;
+    var controller = this.controller;
     if (controller != null) {
       speed = controller.value.playbackSpeed;
     }
@@ -154,7 +152,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   setSpeed(double speed) async {
-    var controller = await this.controller;
+    var controller = this.controller;
     if (controller != null) {
       controller.setPlaybackSpeed(speed);
     }
@@ -162,7 +160,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
 
   Future<double> getVolume() async {
     double volume = 1.0;
-    var controller = await this.controller;
+    var controller = this.controller;
     if (controller != null) {
       volume = controller.value.volume;
     }
@@ -170,14 +168,14 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   setVolume(double volume) async {
-    var controller = await this.controller;
+    var controller = this.controller;
     if (controller != null) {
       controller.setVolume(volume);
     }
   }
 
-  Future<VideoPlayerValue?> get value async {
-    var controller = await this.controller;
+  VideoPlayerValue? get value {
+    var controller = this.controller;
     if (controller != null) {
       VideoPlayerValue value = controller.value;
 
