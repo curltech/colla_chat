@@ -25,7 +25,7 @@ class ImageMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var imageWidget = FutureBuilder(
-        future: messageAttachmentService.getFilename(messageId,title),
+        future: messageAttachmentService.getTempFilename(messageId,title),
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
           if (image != null) {
             return ImageUtil.buildImageWidget(

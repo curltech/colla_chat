@@ -2,25 +2,30 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
+import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
+import 'package:colla_chat/widgets/media/audio/abstract_audio_player_controller.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/widgets.dart';
+import 'package:video_player/video_player.dart';
 
 class BlueFireAudioSource {
-  static Source audioSource({String? filename, Uint8List? data}) {
+  static Source mediaStream(
+      {required Uint8List data, required MimeType mediaFormat}) {
+    Source source = BytesSource(data);
+
+    return source;
+  }
+
+  static Source audioSource({required String filename}) {
     Source source;
-    if (filename != null) {
-      if (filename.startsWith('assets/')) {
-        source = AssetSource(filename);
-      } else if (filename.startsWith('http')) {
-        source = UrlSource(filename);
-      } else {
-        source = DeviceFileSource(filename);
-      }
+    if (filename.startsWith('assets/')) {
+      source = AssetSource(filename);
+    } else if (filename.startsWith('http')) {
+      source = UrlSource(filename);
     } else {
-      data = data ?? Uint8List.fromList([]);
-      source = BytesSource(data);
+      source = DeviceFileSource(filename);
     }
 
     return source;
@@ -32,12 +37,8 @@ class BlueFireAudioSource {
 }
 
 ///音频播放器，Android, iOS, Linux, macOS, Windows, and web.
-class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
+class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
   late AudioPlayer player;
-  Duration? duration;
-  Duration? position;
-  double volume = 1.0;
-  double speed = 1.0;
 
   StreamSubscription? _durationSubscription;
   StreamSubscription? _positionSubscription;
@@ -51,57 +52,55 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
 
   void _initStreams() {
     _durationSubscription = player.onDurationChanged.listen((duration) {
-      this.duration = duration;
+      value = VideoPlayerValue(duration: duration);
     });
 
     _positionSubscription = player.onPositionChanged.listen((position) {
-      this.position = position;
-      notifyListeners();
+      value = VideoPlayerValue(duration: value.duration, position: position);
     });
 
     _playerCompleteSubscription = player.onPlayerComplete.listen((event) {
-      position = Duration.zero;
+      value = VideoPlayerValue(
+        duration: value.duration,
+      );
     });
 
     _playerStateChangeSubscription =
         player.onPlayerStateChanged.listen((state) {
       if (state == PlayerState.completed) {
-        status = PlayerStatus.completed;
+        value = VideoPlayerValue(
+          duration: value.duration,
+          isPlaying: false,
+        );
       } else if (state == PlayerState.playing) {
-        status = PlayerStatus.playing;
+        value = VideoPlayerValue(
+          duration: value.duration,
+          isPlaying: true,
+        );
       } else if (state == PlayerState.paused) {
-        status = PlayerStatus.pause;
+        value = VideoPlayerValue(
+          duration: value.duration,
+          isPlaying: false,
+        );
       } else if (state == PlayerState.stopped) {
-        status = PlayerStatus.stop;
+        value = VideoPlayerValue(
+          duration: value.duration,
+          isPlaying: false,
+        );
       }
     });
   }
 
-  @override
-  PlayerStatus get status {
-    PlayerState state = player.state;
-    if (state == PlayerState.completed) {
-      return PlayerStatus.completed;
-    } else if (state == PlayerState.playing) {
-      return PlayerStatus.playing;
-    } else if (state == PlayerState.paused) {
-      return PlayerStatus.pause;
-    } else if (state == PlayerState.stopped) {
-      return PlayerStatus.stop;
-    }
-    return super.status;
-  }
-
+  ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频
   @override
   play() async {
-    if (currentIndex != null) {
+    if (currentIndex >= 0 && currentIndex < playlist.length) {
       PlatformMediaSource? currentMediaSource = this.currentMediaSource;
       if (currentMediaSource != null) {
         Source source = BlueFireAudioSource.fromMediaSource(currentMediaSource);
         try {
           await player.play(source);
           playlistVisible = false;
-          status = PlayerStatus.playing;
           notifyListeners();
         } catch (e) {
           logger.e('$e');
@@ -113,79 +112,65 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
   @override
   pause() async {
     await player.pause();
-    status = PlayerStatus.pause;
     notifyListeners();
   }
 
   @override
   stop() async {
     await player.stop();
-    status = PlayerStatus.stop;
     playlistVisible = true;
   }
 
   @override
   resume() async {
     await player.resume();
-    status = PlayerStatus.playing;
     notifyListeners();
   }
 
   @override
   dispose() async {
-    super.dispose();
     await player.release();
-    status = PlayerStatus.init;
-    playlistVisible = true;
+    super.dispose();
   }
 
-  @override
   Future<Duration?> getDuration() async {
     return await player.getDuration();
   }
 
-  @override
   Future<Duration?> getPosition() async {
     return await player.getCurrentPosition();
   }
 
-  @override
   Future<Duration?> getBufferedPosition() async {
     return null;
   }
 
   @override
-  seek(Duration? position, {int? index}) async {
-    await setCurrentIndex(index);
-    await player.seek(position!);
+  seek(Duration position, {int? index}) async {
+    await setCurrentIndex(index!);
+    await player.seek(position);
   }
 
   @override
   Future<double> getVolume() async {
-    return Future.value(volume);
+    return Future.value(value.volume);
   }
 
   @override
   setVolume(double volume) async {
     await player.setVolume(volume);
-    if (volume != this.volume) {
-      this.volume = volume;
-      notifyListeners();
-    }
+    await super.setVolume(volume);
   }
 
   @override
   Future<double> getSpeed() async {
-    return Future.value(speed);
+    return Future.value(value.playbackSpeed);
   }
 
   @override
   setSpeed(double speed) async {
     await player.setPlaybackRate(speed);
-    if (speed != this.speed) {
-      this.speed = speed;
-      notifyListeners();
-    }
+    await super.setSpeed(speed);
   }
 
   setPlayerMode(PlayerMode playerMode) async {
@@ -223,19 +208,12 @@ class BlueFireAudioPlayerController extends AbstractMediaPlayerController {
   }
 
   @override
-  close() {}
-
-  @override
-  Widget buildMediaView({
+  Widget buildMediaPlayer({
     Key? key,
-    double? width,
-    double? height,
-    BoxFit fit = BoxFit.contain,
-    AlignmentGeometry alignment = Alignment.center,
-    double scale = 1.0,
-    bool showControls = true,
+    bool showClosedCaptionButton = true,
+    bool showFullscreenButton = true,
+    bool showVolumeButton = true,
   }) {
-    key ??= UniqueKey();
     return Container();
   }
 }

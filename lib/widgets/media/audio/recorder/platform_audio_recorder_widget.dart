@@ -1,10 +1,10 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
+import 'package:colla_chat/widgets/media/abstract_audio_recorder_controller.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
 import 'package:flutter/material.dart';
 
 enum MediaRecorderType {
@@ -13,7 +13,7 @@ enum MediaRecorderType {
   waveform,
 }
 
-///平台标准的video-player的实现，移动采用flick，桌面采用vlc
+///平台标准的record的实现
 class PlatformAudioRecorderWidget extends StatefulWidget with TileDataMixin {
   PlatformAudioRecorderWidget(
       {Key? key, AbstractAudioRecorderController? controller})
@@ -73,7 +73,7 @@ class _PlatformAudioRecorderWidgetState
       rightPopupMenus: _buildRightPopupMenus(),
       child: PlatformAudioRecorder(
         onStop: (String filename) {
-          logger.i('recorder audio filename:$filename');
+          logger.i('record audio filename:$filename');
         },
         mediaRecorderType: mediaRecorderType,
       ),

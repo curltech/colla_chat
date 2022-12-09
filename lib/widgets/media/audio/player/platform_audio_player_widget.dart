@@ -65,7 +65,6 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
       child: mediaPlayerType != null
           ? PlatformMediaPlayer(
               key: UniqueKey(),
-              showControls: false,
               showPlaylist: false,
               mediaPlayerType: mediaPlayerType!,
               filename: filename)

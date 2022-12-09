@@ -1,15 +1,10 @@
 import 'dart:async';
 
-import 'package:colla_chat/crypto/cryptography.dart';
-import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/extended_text_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/message/message_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
-import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
@@ -57,7 +52,10 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
 
   _onStop(String filename) async {
     if (StringUtil.isNotEmpty(filename)) {
-      List<int> data = await FileUtil.readFile(filename);
+      List<int>? data = await FileUtil.readFile(filename);
+      if (data == null) {
+        return;
+      }
       logger.i('read file: $filename length: ${data.length}');
       String? mimeType = FileUtil.mimeType(filename);
       await chatMessageController.send(

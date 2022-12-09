@@ -1,16 +1,20 @@
-import 'package:colla_chat/widgets/media/abstract_media_controller.dart';
+import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:colla_chat/widgets/media/audio/player/just_audio_player.dart';
 import 'package:colla_chat/widgets/media/audio/player/waveforms_audio_player.dart';
-import 'package:colla_chat/widgets/media/platform_media_player_util.dart';
+import 'package:colla_chat/widgets/media/playlist_widget.dart';
+import 'package:colla_chat/widgets/media/video/chewie_video_player.dart';
 import 'package:colla_chat/widgets/media/video/dart_vlc_video_player.dart';
 import 'package:colla_chat/widgets/media/video/flick_video_player.dart';
+import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
 import 'package:colla_chat/widgets/media/video/webview_video_player.dart';
 import 'package:flutter/material.dart';
 
 enum MediaPlayerType {
   dart_vlc,
   flick,
+  chewie,
+  origin,
   webview,
   just,
   audioplayers,
@@ -20,28 +24,25 @@ enum MediaPlayerType {
 ///平台的媒体播放器组件
 class PlatformMediaPlayer extends StatefulWidget {
   final MediaPlayerType mediaPlayerType;
-
-  //自定义简单控制器模式
-  final bool showVolume;
-  final bool showSpeed;
-
-  //是否显示原生的控制器
-  final bool showControls;
-
-  //是否显示播放列表和媒体视图
+  final bool showClosedCaptionButton;
+  final bool showFullscreenButton;
+  final bool showVolumeButton;
+  final bool showSpeedButton;
   final bool showPlaylist;
   final Color? color;
   final double? height;
   final double? width;
+
   final String? filename;
   final List<int>? data;
 
   const PlatformMediaPlayer(
       {Key? key,
       required this.mediaPlayerType,
-      this.showVolume = true,
-      this.showSpeed = false,
-      this.showControls = true,
+      this.showClosedCaptionButton = true,
+      this.showFullscreenButton = true,
+      this.showVolumeButton = true,
+      this.showSpeedButton = false,
       this.showPlaylist = true,
       this.color,
       this.width,
@@ -56,22 +57,14 @@ class PlatformMediaPlayer extends StatefulWidget {
 
 class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
   late AbstractMediaPlayerController controller;
-  late bool showSpeed;
-  late bool showVolume;
-  late bool showPause;
-  late bool showStop;
 
   @override
   void initState() {
     super.initState();
-    showSpeed = widget.showSpeed;
-    showVolume = widget.showVolume;
-    showPause = true;
-    showStop = true;
     _updateMediaPlayerType();
     controller.addListener(_update);
-    if (widget.filename != null || widget.data != null) {
-      controller.add(filename: widget.filename, data: widget.data);
+    if (widget.filename != null) {
+      controller.add(filename: widget.filename!);
     }
   }
 
@@ -87,6 +80,15 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
       case MediaPlayerType.flick:
         controller = FlickVideoPlayerController();
         break;
+      case MediaPlayerType.origin:
+        controller = OriginVideoPlayerController();
+        break;
+      case MediaPlayerType.chewie:
+        controller = ChewieVideoPlayerController();
+        break;
+      case MediaPlayerType.webview:
+        controller = WebViewVideoPlayerController();
+        break;
       case MediaPlayerType.just:
         controller = JustAudioPlayerController();
         break;
@@ -95,13 +97,6 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
         break;
       case MediaPlayerType.waveforms:
         controller = WaveformsAudioPlayerController();
-        break;
-      case MediaPlayerType.webview:
-        showSpeed = false;
-        showVolume = false;
-        showPause = false;
-        showStop = true;
-        controller = WebViewVideoPlayerController();
         break;
       default:
         break;
@@ -117,19 +112,40 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
 
   @override
   Widget build(BuildContext context) {
-    return PlatformMediaPlayerUtil.buildMediaPlayer(
-      context,
-      controller,
-      key: UniqueKey(),
-      showControls: widget.showControls,
-      showPlaylist: widget.showPlaylist,
-      showVolume: showVolume,
-      showSpeed: showSpeed,
-      showPause: showPause,
-      showStop: showStop,
-      color: widget.color,
-      height: widget.height,
+    return _buildMediaPlayer(context);
+  }
+
+  Widget _buildMediaPlayer(BuildContext context) {
+    Widget mediaView;
+    Widget player = controller.buildMediaPlayer(key: UniqueKey());
+    if (widget.showPlaylist) {
+      ButtonBar buttonBar =
+          ButtonBar(alignment: MainAxisAlignment.start, children: [
+        IconButton(
+          onPressed: () {
+            controller.playlistVisible = true;
+          },
+          icon: const Icon(Icons.arrow_back_outlined, color: Colors.white),
+        )
+      ]);
+      player = Stack(children: [player, buttonBar]);
+
+      Widget playlistWidget = PlaylistWidget(controller: controller);
+      mediaView = IndexedStack(
+          index: controller.playlistVisible ? 1 : 0,
+          children: [player, playlistWidget]);
+    } else {
+      mediaView = player;
+    }
+    Color color = widget.color ?? Colors.black.withOpacity(1);
+    return Container(
+      margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
       width: widget.width,
+      height: widget.height,
+      decoration: BoxDecoration(color: color),
+      child: Center(
+        child: mediaView,
+      ),
     );
   }
 }

@@ -15,6 +15,8 @@ import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
+import 'package:file_selector_platform_interface/file_selector_platform_interface.dart';
+import 'package:file_selector/file_selector.dart';
 
 class FileUtil {
   static Future<String> writeFile(List<int> bytes, String filename) async {
@@ -61,7 +63,7 @@ class FileUtil {
     return filename;
   }
 
-  static Future<Uint8List> readFile(String filename) async {
+  static Future<Uint8List?> readFile(String filename) async {
     if (filename.startsWith('assets')) {
       return await _readAssetData(filename);
     } else {
@@ -69,13 +71,17 @@ class FileUtil {
     }
   }
 
-  static Future<Uint8List> _readFileBytes(String filename) async {
+  static Future<Uint8List?> _readFileBytes(String filename) async {
     // Uri uri = Uri.parse(filename);
     File file = File(filename);
-    Uint8List bytes;
-    bytes = await file.readAsBytes();
+    bool exists = await file.exists();
+    if (exists) {
+      Uint8List bytes;
+      bytes = await file.readAsBytes();
 
-    return bytes;
+      return bytes;
+    }
+    return null;
   }
 
   static Future<Uint8List> _readAssetData(String filename) async {
@@ -111,8 +117,8 @@ class FileUtil {
 
     if (result != null) {
       for (var file in result.files) {
-        Uint8List data = await FileUtil.readFile(file.path!);
-        XFile xfile = XFile.fromData(data,
+        Uint8List? data = await FileUtil.readFile(file.path!);
+        XFile xfile = XFile.fromData(data!,
             mimeType: file.extension,
             name: file.name,
             length: file.size,
@@ -122,6 +128,19 @@ class FileUtil {
     }
 
     return xfiles;
+  }
+
+  static Future<List<XFile>> selectFiles({
+    List<String>? allowedExtensions,
+  }) async {
+    XTypeGroup typeGroup = XTypeGroup(
+      extensions: allowedExtensions,
+    );
+    final List<XFile> files = await openFiles(acceptedTypeGroups: <XTypeGroup>[
+      typeGroup,
+    ]);
+
+    return files;
   }
 
   static Future<String?> directoryPathPicker({

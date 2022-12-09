@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
@@ -18,7 +19,6 @@ import 'package:colla_chat/pages/chat/chat/message/url_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/video_message.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
@@ -34,7 +34,6 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 
 final List<ActionData> messagePopActionData = [
@@ -450,10 +449,12 @@ class MessageWidget {
     String? messageId = chatMessage.messageId;
     String? title = chatMessage.title;
     if (messageId != null) {
-      String? filename =
-          await messageAttachmentService.getFilename(messageId, title);
-      if (filename != null && fullScreen) {
-        return PdfUtil.buildPdfView(key: UniqueKey(), filename: filename);
+      Uint8List? data =
+          await messageAttachmentService.findContent(messageId, title);
+      // String? filename =
+      //     await messageAttachmentService.getTempFilename(messageId, title);
+      if (data != null && fullScreen) {
+        return PdfUtil.buildPdfView(key: UniqueKey(), data: data);
       }
     }
     return Container();
@@ -464,7 +465,7 @@ class MessageWidget {
     String? title = chatMessage.title;
     if (messageId != null) {
       String? filename =
-          await messageAttachmentService.getFilename(messageId, title);
+          await messageAttachmentService.getTempFilename(messageId, title);
       if (filename != null && fullScreen) {
         return DocumentUtil.buildFileReaderView(
             key: UniqueKey(), filePath: filename);

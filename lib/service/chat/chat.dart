@@ -16,6 +16,7 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/service/general_base.dart';
+import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
@@ -438,10 +439,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     if (content != null) {
       data = CryptoUtil.stringToUtf8(content);
     } else {
-      content = await messageAttachmentService.findContent(messageId!, title);
-      if (content != null) {
-        data = CryptoUtil.decodeBase64(content);
-      }
+      data = await messageAttachmentService.findContent(messageId!, title);
     }
     ChatMessageType? messageType = StringUtil.enumFromString(
         ChatMessageType.values, chatMessage.messageType);
@@ -628,7 +626,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
     };
   }
 
-  ///获取附件的文件名称，或者在content路径下，或者在临时目录下
+  ///获取加密的数据在content路径下附件的文件名称，
   Future<String?> getFilename(String messageId, String? title) async {
     String? filename;
     if (!platformParams.web) {
@@ -637,21 +635,38 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
       } else {
         filename = p.join(contentPath, messageId);
       }
+      return filename;
+    }
+
+    return filename;
+  }
+
+  ///获取获取的解密数据在临时目录下附件的文件名称，
+  Future<String?> getTempFilename(String messageId, String? title) async {
+    String? filename;
+    if (title != null) {
+      filename = '${messageId}_$title';
+    } else {
+      filename = messageId;
+    }
+    if (!platformParams.web) {
+      Uint8List? data = await FileUtil.readFile(p.join(contentPath, filename));
+      if (data != null) {
+        data = await decryptContent(data);
+        if (data != null) {
+          filename = await FileUtil.writeTempFile(data, filename: filename);
+          return filename;
+        }
+      }
     } else {
       MessageAttachment? attachment =
           await findOne(where: 'messageId=?', whereArgs: [messageId]);
       if (attachment != null) {
         var content = attachment.content;
         if (content != null) {
-          if (title != null) {
-            filename = await FileUtil.writeTempFile(
-                CryptoUtil.decodeBase64(content),
-                filename: '${messageId}_$title');
-          } else {
-            filename = await FileUtil.writeTempFile(
-                CryptoUtil.decodeBase64(content),
-                filename: messageId);
-          }
+          var data = CryptoUtil.decodeBase64(content);
+          filename = await FileUtil.writeTempFile(data, filename: filename);
+          return filename;
         }
       }
     }
@@ -659,32 +674,74 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
     return filename;
   }
 
-  Future<String?> findContent(String messageId, String? title) async {
+  /// 解密的内容
+  Future<Uint8List?> findContent(String messageId, String? title) async {
     if (!platformParams.web) {
       final filename = await getFilename(messageId, title);
       if (filename != null) {
-        var data = await FileUtil.readFile(filename);
-        return CryptoUtil.encodeBase64(data);
+        Uint8List? data = await FileUtil.readFile(filename);
+        if (data != null) {
+          data = await decryptContent(data);
+          if (data != null) {
+            return data;
+          }
+        }
       }
     } else {
       MessageAttachment? attachment =
           await findOne(where: 'messageId=?', whereArgs: [messageId]);
       if (attachment != null) {
-        return attachment.content;
+        var content = attachment.content;
+        if (content != null) {
+          return CryptoUtil.decodeBase64(content);
+        }
       }
     }
     return null;
   }
 
-  ///把内容写入文件，或者附件记录
+  Future<Uint8List?> encryptContent(
+    Uint8List data,
+  ) async {
+    SecurityContext securityContext = SecurityContext();
+    securityContext.payload = data;
+    var result =
+        await cryptographySecurityContextService.encrypt(securityContext);
+    if (result) {
+      var encrypted = securityContext.payload;
+      return encrypted;
+    }
+
+    return null;
+  }
+
+  Future<Uint8List?> decryptContent(
+    Uint8List data,
+  ) async {
+    SecurityContext securityContext = SecurityContext();
+    securityContext.payload = data;
+    var result =
+        await cryptographySecurityContextService.decrypt(securityContext);
+    if (result) {
+      var decrypted = securityContext.payload;
+      return decrypted;
+    }
+
+    return null;
+  }
+
+  ///把加密的内容写入文件，或者附件记录
   Future<void> store(int id, String messageId, String? title, String content,
       EntityState state) async {
     if (!platformParams.web) {
       final filename = await getFilename(messageId, title);
-      var data = CryptoUtil.decodeBase64(content);
+      Uint8List? data = CryptoUtil.decodeBase64(content);
       if (filename != null) {
-        await FileUtil.writeFile(data, filename);
-        logger.i('message attachment writeFile filename:$filename');
+        data = await encryptContent(data);
+        if (data != null) {
+          await FileUtil.writeFile(data, filename);
+          logger.i('message attachment writeFile filename:$filename');
+        }
       }
     } else {
       MessageAttachment attachment = MessageAttachment();

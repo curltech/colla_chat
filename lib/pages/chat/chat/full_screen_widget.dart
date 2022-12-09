@@ -35,7 +35,9 @@ class _FullScreenWidgetState extends State<FullScreenWidget> {
     super.initState();
     chatMessageController.addListener(_update);
     Future.delayed(const Duration(milliseconds: 100), () {
-      pageController.jumpToPage(chatMessageController.currentIndex);
+      if (pageController.hasClients) {
+        pageController.jumpToPage(chatMessageController.currentIndex);
+      }
     });
   }
 
@@ -55,6 +57,7 @@ class _FullScreenWidgetState extends State<FullScreenWidget> {
 
   Widget _buildFullScreenWidget(BuildContext context) {
     return PageView.builder(
+      controller: pageController,
       itemBuilder: (BuildContext context, int index) {
         return Center(
             child: FutureBuilder(
@@ -66,7 +69,6 @@ class _FullScreenWidgetState extends State<FullScreenWidget> {
         ));
       },
       itemCount: chatMessageController.length,
-      controller: pageController,
     );
   }
 
