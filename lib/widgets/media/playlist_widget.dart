@@ -3,8 +3,9 @@ import 'package:flutter/material.dart';
 
 class PlaylistWidget extends StatefulWidget {
   final AbstractMediaPlayerController controller;
+  final Function(int index, String filename)? onSelected;
 
-  const PlaylistWidget({super.key, required this.controller});
+  const PlaylistWidget({super.key, required this.controller, this.onSelected});
 
   @override
   State createState() => _PlaylistWidgetState();
@@ -90,6 +91,13 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                         playlist[index].filename.toString(),
                         style: const TextStyle(fontSize: 14.0),
                       ),
+                      onTap: () {
+                        widget.controller.playlistVisible = false;
+                        widget.controller.setCurrentIndex(index);
+                        if (widget.onSelected != null) {
+                          widget.onSelected!(index, playlist[index].filename);
+                        }
+                      },
                     );
                   },
                   growable: true,

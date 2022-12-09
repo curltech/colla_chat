@@ -22,7 +22,6 @@ enum MediaPlayerType {
 }
 
 ///平台的媒体播放器组件
-
 class PlatformMediaPlayer extends StatefulWidget {
   final MediaPlayerType mediaPlayerType;
   final bool showClosedCaptionButton;
@@ -117,27 +116,27 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
   }
 
   Widget _buildMediaPlayer(BuildContext context) {
-    Widget playlistWidget = Visibility(
-        visible: controller.playlistVisible,
-        child: PlaylistWidget(controller: controller));
-
-    Widget playlistButton = InkWell(
-      child: controller.playlistVisible
-          ? const Icon(Icons.playlist_remove, size: 24)
-          : const Icon(Icons.playlist_add_check, size: 24),
-      onTap: () {
-        controller.playlistVisible = !controller.playlistVisible;
-      },
-    );
-
-    // Widget player = Visibility(
-    //     visible: !controller.playlistVisible,
-    //     child: controller.buildMediaPlayer(key: UniqueKey()));
-
+    Widget mediaView;
     Widget player = controller.buildMediaPlayer(key: UniqueKey());
+    if (widget.showPlaylist) {
+      ButtonBar buttonBar =
+          ButtonBar(alignment: MainAxisAlignment.start, children: [
+        IconButton(
+          onPressed: () {
+            controller.playlistVisible = true;
+          },
+          icon: const Icon(Icons.arrow_back_outlined, color: Colors.white),
+        )
+      ]);
+      player = Stack(children: [player, buttonBar]);
 
-    Widget mediaView = Stack(children: [player]);
-
+      Widget playlistWidget = PlaylistWidget(controller: controller);
+      mediaView = IndexedStack(
+          index: controller.playlistVisible ? 1 : 0,
+          children: [player, playlistWidget]);
+    } else {
+      mediaView = player;
+    }
     Color color = widget.color ?? Colors.black.withOpacity(1);
     return Container(
       margin: const EdgeInsets.fromLTRB(0.0, 0.0, 0.0, 0.0),
