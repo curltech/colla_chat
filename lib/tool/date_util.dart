@@ -1,3 +1,5 @@
+import 'package:colla_chat/l10n/localization.dart';
+
 class DateUtil {
   ///获取当前时间的ISO字符串
   static String currentDate() {
@@ -6,40 +8,40 @@ class DateUtil {
   }
 
   ///将时间字符串格式化成易读的文字
-  static formatChinese(String strDate) {
+  static String formatEasyRead(String strDate) {
     DateTime t = DateTime.parse(strDate).toLocal();
     strDate = t.toIso8601String();
     int pos = strDate.indexOf('T');
     var strDay = strDate.substring(0, pos);
-    var strTime = strDate.substring(pos);
-    pos = strTime.indexOf('.');
-    strTime = strTime.substring(1, pos);
+    var strTime = strDate.substring(pos + 1);
+    pos = strTime.lastIndexOf(':');
+    strTime = strTime.substring(0, pos);
     DateTime c = DateTime.now().toLocal();
     int diff = c.day - t.day;
     switch (diff) {
       case -3:
-        strDay = '大后天';
+        strDay = AppLocalizations.t('Three days from now');
         break;
       case -2:
-        strDay = '后天';
+        strDay = AppLocalizations.t('Day after tomorrow');
         break;
       case -1:
-        strDay = '明天';
+        strDay = AppLocalizations.t('Tomorrow');
         break;
       case 0:
-        strDay = '今天';
+        strDay = AppLocalizations.t('Today');
         break;
       case 1:
-        strDay = '昨天';
+        strDay = AppLocalizations.t('Yesterday');
         break;
       case 2:
-        strDay = '前天';
+        strDay = AppLocalizations.t('Day before yesterday');
         break;
       case 3:
-        strDay = '大前天';
+        strDay = AppLocalizations.t('Three days ago');
         break;
       case 4:
-        strDay = '四天前';
+        strDay = AppLocalizations.t('Four days ago');
         break;
       default:
         break;
