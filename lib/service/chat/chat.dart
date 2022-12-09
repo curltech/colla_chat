@@ -16,6 +16,7 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/service/general_base.dart';
+import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
@@ -663,8 +664,13 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
     if (!platformParams.web) {
       final filename = await getFilename(messageId, title);
       if (filename != null) {
-        var data = await FileUtil.readFile(filename);
-        return CryptoUtil.encodeBase64(data);
+        Uint8List? data = await FileUtil.readFile(filename);
+        if (data != null) {
+          data = await decryptContent(data);
+          if (data != null) {
+            return CryptoUtil.encodeBase64(data);
+          }
+        }
       }
     } else {
       MessageAttachment? attachment =
@@ -676,15 +682,48 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
     return null;
   }
 
+  Future<Uint8List?> encryptContent(
+    Uint8List data,
+  ) async {
+    SecurityContext securityContext = SecurityContext();
+    securityContext.payload = data;
+    var result =
+        await cryptographySecurityContextService.encrypt(securityContext);
+    if (result) {
+      var encrypted = securityContext.payload;
+      return encrypted;
+    }
+
+    return null;
+  }
+
+  Future<Uint8List?> decryptContent(
+    Uint8List data,
+  ) async {
+    SecurityContext securityContext = SecurityContext();
+    securityContext.payload = data;
+    var result =
+        await cryptographySecurityContextService.decrypt(securityContext);
+    if (result) {
+      var decrypted = securityContext.payload;
+      return decrypted;
+    }
+
+    return null;
+  }
+
   ///把内容写入文件，或者附件记录
   Future<void> store(int id, String messageId, String? title, String content,
       EntityState state) async {
     if (!platformParams.web) {
       final filename = await getFilename(messageId, title);
-      var data = CryptoUtil.decodeBase64(content);
+      Uint8List? data = CryptoUtil.decodeBase64(content);
       if (filename != null) {
-        await FileUtil.writeFile(data, filename);
-        logger.i('message attachment writeFile filename:$filename');
+        data = await encryptContent(data);
+        if (data != null) {
+          await FileUtil.writeFile(data, filename);
+          logger.i('message attachment writeFile filename:$filename');
+        }
       }
     } else {
       MessageAttachment attachment = MessageAttachment();

@@ -35,9 +35,12 @@ Widget buildAudioWaveformPainter(
 }
 
 ///异步产生波形图形组件
-Future<StreamBuilder<WaveformProgress>> buildWaveformProgress(
+Future<StreamBuilder<WaveformProgress>?> buildWaveformProgress(
     String filename) async {
   var data = await FileUtil.readFile(filename);
+  if (data == null) {
+    return null;
+  }
   final progressStream = BehaviorSubject<WaveformProgress>();
   final audioFile =
       File(p.join((await getTemporaryDirectory()).path, 'waveform.mp3'));
