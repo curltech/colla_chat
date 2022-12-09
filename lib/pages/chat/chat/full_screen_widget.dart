@@ -2,9 +2,11 @@ import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/message/message_widget.dart';
+import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
+import 'package:card_swiper/card_swiper.dart';
 
 class FullScreenWidget extends StatefulWidget with TileDataMixin {
   const FullScreenWidget({Key? key}) : super(key: key);
@@ -28,21 +30,17 @@ class FullScreenWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _FullScreenWidgetState extends State<FullScreenWidget> {
-  PageController pageController = PageController();
+  SwiperController swiperController = SwiperController();
+  final index = ValueNotifier<int>(chatMessageController.currentIndex);
 
   @override
   void initState() {
     super.initState();
     chatMessageController.addListener(_update);
-    Future.delayed(const Duration(milliseconds: 100), () {
-      if (pageController.hasClients) {
-        pageController.jumpToPage(chatMessageController.currentIndex);
-      }
-    });
   }
 
   _update() {
-    setState(() {});
+    index.value = chatMessageController.currentIndex;
   }
 
   Future<Widget> _buildMessageWidget(BuildContext context, int index) async {
@@ -55,9 +53,22 @@ class _FullScreenWidgetState extends State<FullScreenWidget> {
     return child;
   }
 
+  Widget _buildTitleWidget() {
+    return ValueListenableBuilder<int>(
+        valueListenable: index,
+        builder: (context, value, child) {
+          ChatMessage? chatMessage = chatMessageController.current;
+          var title = AppLocalizations.t(widget.title);
+          if (chatMessage != null) {
+            title = '${chatMessage.senderName} => ${chatMessage.receiverName}';
+          }
+          return Text(title);
+        });
+  }
+
   Widget _buildFullScreenWidget(BuildContext context) {
-    return PageView.builder(
-      controller: pageController,
+    return Swiper(
+      controller: swiperController,
       itemBuilder: (BuildContext context, int index) {
         return Center(
             child: FutureBuilder(
@@ -69,13 +80,17 @@ class _FullScreenWidgetState extends State<FullScreenWidget> {
         ));
       },
       itemCount: chatMessageController.length,
+      index: chatMessageController.currentIndex,
+      onIndexChanged: (index) {
+        chatMessageController.currentIndex = index;
+      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        title: Text(AppLocalizations.t(widget.title)),
+        title: _buildTitleWidget(),
         withLeading: true,
         child: _buildFullScreenWidget(context));
   }
