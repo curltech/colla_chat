@@ -199,8 +199,11 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
 
   ///其他人的消息，从左到右，头像，时间，名称，消息容器
   Widget _buildOther(BuildContext context) {
-    Widget title =
-        Text('${widget.chatMessage.id}:${widget.chatMessage.senderName}');
+    var sendTime = widget.chatMessage.sendTime;
+    sendTime = sendTime = DateUtil.formatEasyRead(sendTime!);
+    Widget title = Text('${widget.chatMessage.senderName} $sendTime',
+        style: const TextStyle(fontSize: 12));
+    // Text('${widget.chatMessage.id}:${widget.chatMessage.senderName}');
     if (timer != null) {
       title = Row(
         children: [
@@ -225,6 +228,9 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
                       return widget;
                     },
                   )),
+              const SizedBox(
+                width: 5,
+              ),
               Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
@@ -239,8 +245,11 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
 
   ///我的消息，从右到左，头像，时间，名称，消息容器
   Widget _buildMe(BuildContext context) {
-    Widget title =
-        Text('${widget.chatMessage.id}:${widget.chatMessage.receiverName}');
+    var sendTime = widget.chatMessage.sendTime;
+    sendTime = sendTime = DateUtil.formatEasyRead(sendTime!);
+    Widget title = Text('${widget.chatMessage.senderName} $sendTime',
+        style: const TextStyle(fontSize: 12));
+    //Text('${widget.chatMessage.id}:${widget.chatMessage.receiverName}');
     if (timer != null) {
       title = Row(
         children: [
@@ -265,6 +274,9 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
                     title,
                     _buildMessageBubble(context),
                   ]),
+              const SizedBox(
+                width: 5,
+              ),
               Container(
                   margin: const EdgeInsets.only(left: 0.0),
                   child: FutureBuilder(
