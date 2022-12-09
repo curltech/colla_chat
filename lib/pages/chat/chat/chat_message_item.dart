@@ -115,10 +115,13 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
         return Container();
       },
     );
-
+    var crossAxisAlignment = CrossAxisAlignment.start;
+    if (widget.isMyself) {
+      crossAxisAlignment = CrossAxisAlignment.end;
+    }
     return Container(
         constraints: const BoxConstraints(minWidth: 0, maxWidth: 300),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        child: Column(crossAxisAlignment: crossAxisAlignment, children: [
           Bubble(
               elevation: 0.0,
               stick: true,
@@ -127,7 +130,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
               color: widget.isMyself
                   ? appDataProvider.themeData.colorScheme.primary
                   : Colors.white,
-              padding:const BubbleEdges.all(0),
+              padding: const BubbleEdges.all(0),
               child: body),
           const SizedBox(
             height: 2,
