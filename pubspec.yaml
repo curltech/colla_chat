@@ -138,7 +138,8 @@ dependencies:
   material_design_icons_flutter: ^5.0.6295
   #flutter_bloc: ^6.1.0
   #flutter_swiper: 1.1.6 # Flutter 轮播图 https://github.com/best-flutter/flutter_swiper
-  flutter_swiper_null_safety: any
+  #flutter_swiper_null_safety: any
+  card_swiper: ^2.0.4
   flutter_screenutil: ^5.5.3 # Flutter 屏幕适配 https://github.com/OpenFlutter/flutter_screenutil
   flex_color_picker: ^2.4.0
   flex_color_scheme: ^6.1.1
