@@ -64,21 +64,18 @@ class RecordAudioRecorderController extends AbstractAudioRecorderController {
   Future<void> start({String? filename}) async {
     //缺省的音频格式参数
     AudioEncoder encoder = AudioEncoder.aacLc;
-    int bitRate = 128000;
-    int samplingRate = 44100;
-    int numChannels = 2;
-    InputDevice? device;
+    // int bitRate = 128000;
+    // int samplingRate = 44100;
+    // int numChannels = 2;
+    // InputDevice? device;
 
     try {
       if (await recorder.hasPermission()) {
         await super.start();
         await recorder.start(
-            path: this.filename,
-            encoder: encoder,
-            bitRate: bitRate,
-            samplingRate: samplingRate,
-            numChannels: numChannels,
-            device: device);
+          path: this.filename,
+          encoder: encoder,
+        );
         status = RecorderStatus.recording;
       }
     } catch (e) {
@@ -90,7 +87,7 @@ class RecordAudioRecorderController extends AbstractAudioRecorderController {
   Future<String?> stop() async {
     if (status == RecorderStatus.recording || status == RecorderStatus.pause) {
       String? filename = await recorder.stop();
-      logger.i('audio recorder filename:$filename');
+      logger.i('record audio recorder filename:$filename');
       this.filename = filename;
       await super.stop();
       status = RecorderStatus.stop;

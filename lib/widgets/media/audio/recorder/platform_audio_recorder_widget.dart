@@ -13,7 +13,7 @@ enum MediaRecorderType {
   waveform,
 }
 
-///平台标准的video-player的实现，移动采用flick，桌面采用vlc
+///平台标准的record的实现
 class PlatformAudioRecorderWidget extends StatefulWidget with TileDataMixin {
   PlatformAudioRecorderWidget(
       {Key? key, AbstractAudioRecorderController? controller})
@@ -73,7 +73,7 @@ class _PlatformAudioRecorderWidgetState
       rightPopupMenus: _buildRightPopupMenus(),
       child: PlatformAudioRecorder(
         onStop: (String filename) {
-          logger.i('recorder audio filename:$filename');
+          logger.i('record audio filename:$filename');
         },
         mediaRecorderType: mediaRecorderType,
       ),

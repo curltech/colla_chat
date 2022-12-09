@@ -6,7 +6,7 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/widgets/media/abstract_audio_recorder_controller.dart';
 import 'package:path_provider/path_provider.dart';
 
-///仅支持移动设备，aac,wav两种格式
+///仅支持移动设备，aac,wav两种格式，支持mp3
 class AnotherAudioRecorderController extends AbstractAudioRecorderController {
   AnotherAudioRecorder? recorder;
   Recording? _current;
@@ -62,7 +62,7 @@ class AnotherAudioRecorderController extends AbstractAudioRecorderController {
       _current = recorder!.recording;
 
       var filename = _current!.path;
-      logger.i('audio recorder filename:$filename');
+      logger.i('another audio recorder filename:$filename');
       this.filename = filename;
       await super.stop();
       status = RecorderStatus.stop;
