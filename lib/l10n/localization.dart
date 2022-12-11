@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:colla_chat/main.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -72,8 +71,12 @@ class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
 
   @override
   bool isSupported(Locale locale) {
-    return ['zh_CN', 'en_US', 'zh_TW', 'ja_JP', 'ko_KR']
-        .contains(locale.toString());
+    for (var supportedLocale in supportedLocales) {
+      if (supportedLocale.languageCode == locale.languageCode) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @override
