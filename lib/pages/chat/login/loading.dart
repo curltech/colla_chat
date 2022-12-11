@@ -1,7 +1,7 @@
+import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class LoadingBackgroundImage {
   final List<String> darkBackgroudImages = [
@@ -71,7 +71,7 @@ class Loading extends StatefulWidget {
   final String title;
   final bool autoPlay;
 
-  final PageController controller = PageController();
+  final SwiperController controller = SwiperController();
   final animateDuration = const Duration(milliseconds: 500);
 
   Loading({Key? key, required this.title, this.autoPlay = true})
@@ -103,11 +103,9 @@ class _LoadingState extends State<Loading> {
         }
         try {
           if (positive) {
-            widget.controller.nextPage(
-                duration: widget.animateDuration, curve: Curves.easeInOut);
+            widget.controller.next();
           } else {
-            widget.controller.previousPage(
-                duration: widget.animateDuration, curve: Curves.easeInOut);
+            widget.controller.previous();
           }
         } catch (e) {
           logger.e(e);
@@ -127,12 +125,16 @@ class _LoadingState extends State<Loading> {
     if (appDataProvider.brightness == Brightness.dark.name) {
       children = loadingBackgroundImage.darkChildren;
     }
-    return PageView(
+    return Swiper(
       controller: widget.controller,
-      onPageChanged: (int index) {
+      onIndexChanged: (int index) {
         loadingBackgroundImage.currentIndex = index;
       },
-      children: children,
+      itemCount: children.length,
+      itemBuilder: (BuildContext context, int index) {
+        return children[index];
+      },
+      index: 0,
     );
   }
 
