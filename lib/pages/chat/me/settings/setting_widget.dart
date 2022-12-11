@@ -1,11 +1,15 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/login/p2p_login_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/tool/local_auth.dart';
+import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 
 final List<TileData> settingTileData = [
   TileData(
@@ -34,8 +38,30 @@ final List<TileData> settingTileData = [
 class SettingWidget extends StatelessWidget with TileDataMixin {
   ///类变量，不用每次重建
   final DataListView dataListView = DataListView(tileData: settingTileData);
+  final AuthMethod authMethod = AuthMethod.app;
+  bool? loginStatus;
 
   SettingWidget({Key? key}) : super(key: key);
+
+  Future<bool?> authenticate() async {
+    if (loginStatus != null && loginStatus!) {
+      return loginStatus!;
+    }
+    if (authMethod == AuthMethod.local) {
+      loginStatus =
+          await LocalAuthUtil.authenticate(localizedReason: 'Authenticate');
+    } else if (authMethod == AuthMethod.app) {
+      await SmartDialogUtil.show(builder: (BuildContext? context) {
+        P2pLoginWidget p2pLoginWidget =
+            P2pLoginWidget(onAuthenticate: (bool data) {
+          loginStatus = data;
+          SmartDialog.dismiss();
+        });
+        return p2pLoginWidget;
+      });
+    }
+    return loginStatus!;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +69,19 @@ class SettingWidget extends StatelessWidget with TileDataMixin {
         child: AppBarView(
             title: Text(AppLocalizations.t(title)),
             withLeading: withLeading,
-            child: dataListView));
+            child: FutureBuilder<bool?>(
+              future: authenticate(),
+              builder: (BuildContext context, AsyncSnapshot<bool?> snapshot) {
+                if (snapshot.hasData) {
+                  bool? result = snapshot.data;
+                  if (result != null && result) {
+                    return dataListView;
+                  }
+                }
+                return Center(
+                    child: Text(AppLocalizations.t('Authenticate failure')));
+              },
+            )));
     return setting;
   }
 

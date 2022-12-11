@@ -173,5 +173,13 @@
   "Forward": "转发",
   "Forward message": "转发消息",
   "Collect": "收藏",
-  "Collect message": "收藏消息"
+  "Collect message": "收藏消息",
+  "Three days from now": "大后天",
+  "Day after tomorrow": "后天",
+  "Tomorrow": "明天",
+  "Today": "今天",
+  "Yesterday": "昨天",
+  "Day before yesterday": "前天",
+  "Three days ago": "大前天",
+  "Four days ago": "4天前"
 }

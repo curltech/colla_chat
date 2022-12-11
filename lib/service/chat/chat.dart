@@ -627,7 +627,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
   }
 
   ///获取加密的数据在content路径下附件的文件名称，
-  Future<String?> getFilename(String messageId, String? title) async {
+  Future<String?> getEncryptFilename(String messageId, String? title) async {
     String? filename;
     if (!platformParams.web) {
       if (title != null) {
@@ -642,7 +642,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
   }
 
   ///获取获取的解密数据在临时目录下附件的文件名称，
-  Future<String?> getTempFilename(String messageId, String? title) async {
+  Future<String?> getDecryptFilename(String messageId, String? title) async {
     String? filename;
     if (title != null) {
       filename = '${messageId}_$title';
@@ -677,7 +677,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
   /// 解密的内容
   Future<Uint8List?> findContent(String messageId, String? title) async {
     if (!platformParams.web) {
-      final filename = await getFilename(messageId, title);
+      final filename = await getEncryptFilename(messageId, title);
       if (filename != null) {
         Uint8List? data = await FileUtil.readFile(filename);
         if (data != null) {
@@ -734,7 +734,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
   Future<void> store(int id, String messageId, String? title, String content,
       EntityState state) async {
     if (!platformParams.web) {
-      final filename = await getFilename(messageId, title);
+      final filename = await getEncryptFilename(messageId, title);
       Uint8List? data = CryptoUtil.decodeBase64(content);
       if (filename != null) {
         data = await encryptContent(data);

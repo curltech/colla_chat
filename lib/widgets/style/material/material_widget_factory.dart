@@ -1,6 +1,10 @@
 import 'dart:ui';
 
 import 'package:badges/badges.dart';
+import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/routers/routes.dart';
+import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -8,10 +12,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 
-import '../../../l10n/localization.dart';
-import '../../../provider/app_data_provider.dart';
-import '../../../routers/routes.dart';
-import '../platform_widget_factory.dart';
 
 ///Material的部件工厂，这是缺省的部件工厂，其他样式的部件工厂没有类似的部件就使用这里的部件
 ///如果其他样式有新的部件可以在这里添加自定义的部件进行支持
@@ -1446,7 +1446,7 @@ class MaterialWidgetFactory extends WidgetFactory {
   }) {
     onGenerateTitle = onGenerateTitle ??
         (context) {
-          return AppLocalizations.instance.text('Welcome to CollaChat');
+          return AppLocalizations.t('Welcome to CollaChat');
         };
     themeMode = themeMode ?? appDataProvider.themeMode;
     theme = theme ?? appDataProvider.themeData;

@@ -2,6 +2,8 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 
+enum AuthMethod { local, app, none }
+
 class LocalAuthUtil {
   static final LocalAuthentication auth = LocalAuthentication();
 

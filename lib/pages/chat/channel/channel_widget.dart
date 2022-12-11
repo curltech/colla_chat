@@ -1,10 +1,10 @@
+import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
+import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
-import '../../../l10n/localization.dart';
-import '../../../widgets/common/app_bar_view.dart';
-import '../../../widgets/common/widget_mixin.dart';
-import '../../../widgets/data_bind/data_listtile.dart';
-import '../../../widgets/data_bind/data_listview.dart';
 
 final List<TileData> mockTileData = [
   TileData(
@@ -27,7 +27,7 @@ class ChannelWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     var body = DataListView(tileData: channelTileData);
     return AppBarView(
-      title: Text(AppLocalizations.instance.text(title)),
+      title: Text(AppLocalizations.t(title)),
       child: body,
     );
   }

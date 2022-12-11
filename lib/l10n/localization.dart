@@ -1,14 +1,24 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+
+const defaultLocale = Locale('zh', 'CN');
+
+const supportedLocales = [
+  Locale('en', 'US'),
+  Locale('zh', 'TW'),
+  Locale('ja', 'JP'),
+  Locale('ko', 'KR'),
+  Locale('zh', 'CN'),
+];
 
 /// 自己写的，不是gen_l10n创建的，需要从assets目录加载语言包
 /// 使用的方法是：AppLocalizations.instance.text('page_one')
 class AppLocalizations {
-  static AppLocalizations _current =
-      AppLocalizations(const Locale('zh', 'CN'), {});
+  static AppLocalizations? current;
   static final Map<Locale, AppLocalizations> _all = {};
 
   final Map<dynamic, dynamic> _localisedValues;
@@ -16,15 +26,13 @@ class AppLocalizations {
 
   AppLocalizations(this._locale, this._localisedValues);
 
-  static AppLocalizations get instance {
-    return _current;
+  static init() async {
+    for (var supportedLocale in supportedLocales) {
+      await load(supportedLocale);
+    }
   }
 
-  static set instance(AppLocalizations appLocalizations) {
-    _current = appLocalizations;
-  }
-
-  static Future<AppLocalizations> load(Locale locale) async {
+  static Future<AppLocalizations?> load(Locale locale) async {
     Map<Locale, AppLocalizations> all = AppLocalizations._all;
     AppLocalizations? current = all[locale];
     if (current == null) {
@@ -34,9 +42,9 @@ class AppLocalizations {
       current = AppLocalizations(locale, localisedValues);
       all[locale] = current;
     }
-    AppLocalizations.instance = current;
+    AppLocalizations.current = current;
 
-    return AppLocalizations.instance;
+    return AppLocalizations.current;
   }
 
   String text(String key) {
@@ -50,8 +58,11 @@ class AppLocalizations {
     return key;
   }
 
-  static t(String key) {
-    return AppLocalizations.instance.text(key);
+  static String t(String key) {
+    if (AppLocalizations.current == null) {
+      return key;
+    }
+    return AppLocalizations.current!.text(key);
   }
 }
 
@@ -60,15 +71,20 @@ class AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
 
   @override
   bool isSupported(Locale locale) {
-    return ['zh_CN', 'en_US', 'zh_TW', 'ja_JP', 'ko_KR']
-        .contains(locale.toString());
+    for (var supportedLocale in supportedLocales) {
+      if (supportedLocale.languageCode == locale.languageCode) {
+        return true;
+      }
+    }
+    return false;
   }
 
   @override
-  Future<AppLocalizations> load(Locale locale) {
-    //logger.i('will load ${locale.toString()}');
+  Future<AppLocalizations> load(Locale locale) async {
+    logger.i('will load ${locale.toString()}');
+    AppLocalizations? appLocalizations = await AppLocalizations.load(locale);
 
-    return AppLocalizations.load(locale);
+    return appLocalizations!;
   }
 
   @override

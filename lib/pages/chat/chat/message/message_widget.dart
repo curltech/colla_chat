@@ -465,7 +465,7 @@ class MessageWidget {
     String? title = chatMessage.title;
     if (messageId != null) {
       String? filename =
-          await messageAttachmentService.getTempFilename(messageId, title);
+          await messageAttachmentService.getDecryptFilename(messageId, title);
       if (filename != null && fullScreen) {
         return DocumentUtil.buildFileReaderView(
             key: UniqueKey(), filePath: filename);

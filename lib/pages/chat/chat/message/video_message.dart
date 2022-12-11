@@ -22,7 +22,7 @@ class VideoMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var videoPlayer = FutureBuilder(
-        future: messageAttachmentService.getTempFilename(messageId, title),
+        future: messageAttachmentService.getDecryptFilename(messageId, title),
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
           if (snapshot.hasData) {
             var filename = snapshot.data;
