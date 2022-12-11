@@ -1,3 +1,4 @@
+import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
@@ -6,7 +7,6 @@ import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
-
 
 class ViewStack<T> {
   T? _head;
@@ -120,7 +120,7 @@ class IndexWidgetProvider with ChangeNotifier {
 
   //只有副视图才存储出现在堆栈中
   ViewStack<String> stack = ViewStack<String>();
-  PageController? pageController;
+  PageController? controller;
 
   //当前的主视图，左边栏和底部栏的指示，范围0-3
   int _currentMainIndex = 0;
@@ -177,13 +177,13 @@ class IndexWidgetProvider with ChangeNotifier {
     }
     if (index >= 0 && index < mainViews.length) {
       _currentMainIndex = index;
-      var pageController = this.pageController;
-      if (pageController == null) {
-        logger.e('pageController is not exist');
+      var controller = this.controller;
+      if (controller == null) {
+        logger.e('swiperController is not exist');
         return;
       }
-      //pageController.jumpToPage(index);
-      pageController.animateToPage(index,
+      //controller.jumpToPage(index);
+      controller.animateToPage(index,
           duration: animateDuration, curve: Curves.easeInOut);
       notifyListeners();
     }
@@ -235,9 +235,9 @@ class IndexWidgetProvider with ChangeNotifier {
     }
     //桌面工作区模式
     if (!useNavigator || !appDataProvider.mobile) {
-      var pageController = this.pageController;
-      if (pageController == null) {
-        logger.e('pageController is not exist');
+      var controller = this.controller;
+      if (controller == null) {
+        logger.e('swiperController is not exist');
         return;
       }
       //判断要进入的页面是否已在工作区
@@ -252,8 +252,7 @@ class IndexWidgetProvider with ChangeNotifier {
         if (push) {
           stack.pushRepeat(name);
         }
-        // pageController.jumpToPage(index);
-        pageController.animateToPage(index,
+        controller.animateToPage(index,
             duration: animateDuration, curve: Curves.easeInOut);
         notifyListeners();
       } else {
@@ -306,16 +305,15 @@ class IndexWidgetProvider with ChangeNotifier {
   pop({BuildContext? context}) {
     //桌面工作区模式
     if (!useNavigator || !appDataProvider.mobile) {
-      var pageController = this.pageController;
-      if (pageController == null) {
-        logger.e('pageController is not exist');
+      var controller = this.controller;
+      if (controller == null) {
+        logger.e('swiperController is not exist');
         return;
       }
 
       int? index = _pop();
       if (index != null) {
-        // pageController.jumpToPage(index);
-        pageController.animateToPage(index,
+        controller.animateToPage(index,
             duration: animateDuration, curve: Curves.easeInOut);
         notifyListeners();
       }

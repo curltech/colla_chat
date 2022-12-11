@@ -1,3 +1,4 @@
+import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/login/loading.dart';
 import 'package:colla_chat/pages/chat/login/p2p_login_widget.dart';
@@ -13,7 +14,7 @@ class P2pLogin extends StatefulWidget {
   final P2pRegisterWidget p2pRegisterWidget = const P2pRegisterWidget();
   final P2pSettingWidget p2pSettingWidget = const P2pSettingWidget();
   late final List<Widget> _children;
-  late final PageController controller = PageController();
+  late final SwiperController controller = SwiperController();
 
   P2pLogin({Key? key}) : super(key: key) {
     // 初始化子项集合
@@ -35,17 +36,19 @@ class _P2pLoginState extends State<P2pLogin> {
   }
 
   _animateToPage(int index) {
-    widget.controller.animateToPage(index,
-        duration: const Duration(milliseconds: 100), curve: Curves.easeInOut);
+    widget.controller.move(index);
   }
 
   @override
   Widget build(BuildContext context) {
     appDataProvider.changeSize(context);
-    var pageView = PageView(
-      //physics: const NeverScrollableScrollPhysics(),
+    var pageView = Swiper(
       controller: widget.controller,
-      children: widget._children,
+      itemCount: widget._children.length,
+      itemBuilder: (BuildContext context, int index) {
+        return widget._children[index];
+      },
+      index: 0,
     );
     var appBar = AppBar(
       elevation: 0.0,

@@ -10,6 +10,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:synchronized/extension.dart';
 
 final List<TileData> settingTileData = [
   TileData(
@@ -29,60 +30,22 @@ final List<TileData> settingTileData = [
           color: appDataProvider.themeData.colorScheme.primary),
       title: AppLocalizations.t('Privacy')),
   TileData(
-      prefix: Icon(Icons.usb,
-          color: appDataProvider.themeData.colorScheme.primary),
+      prefix:
+          Icon(Icons.usb, color: appDataProvider.themeData.colorScheme.primary),
       title: AppLocalizations.t('About')),
 ];
 
 //设置页面，带有回退回调函数
-class SettingWidget extends StatelessWidget with TileDataMixin {
+class SettingWidget extends StatefulWidget with TileDataMixin {
   ///类变量，不用每次重建
   final DataListView dataListView = DataListView(tileData: settingTileData);
   final AuthMethod authMethod = AuthMethod.app;
-  bool? loginStatus;
 
   SettingWidget({Key? key}) : super(key: key);
 
-  Future<bool?> authenticate() async {
-    if (loginStatus != null && loginStatus!) {
-      return loginStatus!;
-    }
-    if (authMethod == AuthMethod.local) {
-      loginStatus =
-          await LocalAuthUtil.authenticate(localizedReason: 'Authenticate');
-    } else if (authMethod == AuthMethod.app) {
-      await SmartDialogUtil.show(builder: (BuildContext? context) {
-        P2pLoginWidget p2pLoginWidget =
-            P2pLoginWidget(onAuthenticate: (bool data) {
-          loginStatus = data;
-          SmartDialog.dismiss();
-        });
-        return p2pLoginWidget;
-      });
-    }
-    return loginStatus!;
-  }
-
   @override
-  Widget build(BuildContext context) {
-    var setting = KeepAliveWrapper(
-        child: AppBarView(
-            title: Text(AppLocalizations.t(title)),
-            withLeading: withLeading,
-            child: FutureBuilder<bool?>(
-              future: authenticate(),
-              builder: (BuildContext context, AsyncSnapshot<bool?> snapshot) {
-                if (snapshot.hasData) {
-                  bool? result = snapshot.data;
-                  if (result != null && result) {
-                    return dataListView;
-                  }
-                }
-                return Center(
-                    child: Text(AppLocalizations.t('Authenticate failure')));
-              },
-            )));
-    return setting;
+  State<StatefulWidget> createState() {
+    return _SettingWidgetState();
   }
 
   @override
@@ -96,4 +59,54 @@ class SettingWidget extends StatelessWidget with TileDataMixin {
 
   @override
   String get title => 'Setting';
+}
+
+class _SettingWidgetState extends State<SettingWidget> {
+  bool? loginStatus;
+
+  @override
+  void initState() {
+    super.initState();
+    _buildLocalAuthenticate();
+  }
+
+  void _buildLocalAuthenticate() async {
+    if (widget.authMethod == AuthMethod.local) {
+      loginStatus =
+          await LocalAuthUtil.authenticate(localizedReason: 'Authenticate');
+      setState(() {});
+    }
+  }
+
+  Widget _buildAppAuthenticate() {
+    if (widget.authMethod == AuthMethod.app) {
+      P2pLoginWidget p2pLoginWidget =
+          P2pLoginWidget(onAuthenticate: (bool data) {
+        loginStatus = data;
+        setState(() {});
+      });
+      return p2pLoginWidget;
+    }
+    return Container();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var setting = KeepAliveWrapper(
+        child: AppBarView(
+            title: Text(AppLocalizations.t(widget.title)),
+            withLeading: widget.withLeading,
+            child: IndexedStack(
+              index: (loginStatus == null) ? 0 : 1,
+              children: [
+                _buildAppAuthenticate(),
+                (loginStatus != null && loginStatus!)
+                    ? widget.dataListView
+                    : Center(
+                        child:
+                            Text(AppLocalizations.t('Authenticate failure'))),
+              ],
+            )));
+    return setting;
+  }
 }

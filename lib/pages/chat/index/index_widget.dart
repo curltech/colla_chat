@@ -1,3 +1,4 @@
+import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/pages/chat/channel/channel_widget.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
@@ -9,8 +10,8 @@ import 'package:provider/provider.dart';
 ///主工作区，是PageView
 class IndexWidget extends StatefulWidget {
   IndexWidget({Key? key}) : super(key: key) {
-    PageController pageController = PageController();
-    indexWidgetProvider.pageController = pageController;
+    PageController controller = PageController();
+    indexWidgetProvider.controller = controller;
     indexWidgetProvider.define(ChatListWidget());
     indexWidgetProvider.define(LinkmanListWidget());
     indexWidgetProvider.define(ChannelWidget());
@@ -40,7 +41,7 @@ class _IndexWidgetState extends State<IndexWidget>
       }
       return PageView.builder(
         physics: physics,
-        controller: indexWidgetProvider.pageController,
+        controller: indexWidgetProvider.controller,
         onPageChanged: (int index) {
           indexWidgetProvider.currentIndex = index;
         },
