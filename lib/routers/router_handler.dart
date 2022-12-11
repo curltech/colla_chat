@@ -1,9 +1,8 @@
+import 'package:colla_chat/pages/chat/index/index_view.dart';
+import 'package:colla_chat/pages/chat/login/p2p_login.dart';
 import 'package:colla_chat/pages/stock/login/remote_login.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
-
-import '../pages/chat/index/index_view.dart';
-import '../pages/chat/login/p2p_login.dart';
 
 Handler remoteLoginHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
@@ -11,15 +10,17 @@ Handler remoteLoginHandler = Handler(
 });
 
 // p2p登录页面
+final p2pLogin = P2pLogin();
 Handler p2pLoginHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
-  return P2pLogin();
+  return p2pLogin;
 });
 
 // 首页
+final indexView = IndexView(
+  title: '',
+);
 Handler indexHandler = Handler(
     handlerFunc: (BuildContext? context, Map<String, List<String>> params) {
-  return IndexView(
-    title: '',
-  );
+  return indexView;
 });

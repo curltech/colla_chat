@@ -39,7 +39,6 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
   void initState() {
     super.initState();
     _lastLogin();
-    _skipLogin();
   }
 
   ///获取最后一次登录的用户名
@@ -48,19 +47,6 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
     if (StringUtil.isNotEmpty(credential)) {
       ColumnFieldDef credential = p2pLoginInputFieldDef[0];
       credential.initValue = credential;
-    }
-  }
-
-  ///获取最后一次登录的用户名和密码，如果都存在，快捷登录
-  _skipLogin() async {
-    Map<String, dynamic>? skipLogin = await myselfPeerService.credential();
-    if (skipLogin != null) {
-      String? credential = skipLogin[credentialName];
-      String? password = skipLogin[passwordName];
-      if (StringUtil.isNotEmpty(credential) &&
-          StringUtil.isNotEmpty(password)) {
-        _login(skipLogin);
-      }
     }
   }
 

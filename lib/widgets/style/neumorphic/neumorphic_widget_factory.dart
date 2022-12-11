@@ -1,13 +1,12 @@
+import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/routers/routes.dart';
+import 'package:colla_chat/widgets/style/neumorphic/neumorphic_container_widget.dart';
+import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 import 'package:provider/provider.dart';
-
-import '../../../l10n/localization.dart';
-import '../../../provider/app_data_provider.dart';
-import '../../../routers/routes.dart';
-import '../platform_widget_factory.dart';
-import 'neumorphic_container_widget.dart';
 
 class NeumorphicWidgetFactory extends WidgetFactory {
   NeumorphicTheme buildTheme(Widget child) {
@@ -578,7 +577,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
   }) {
     onGenerateTitle = onGenerateTitle ??
         (context) {
-          return AppLocalizations.instance.text('Welcome to CollaChat');
+          return AppLocalizations.t('Welcome to CollaChat');
         };
     themeMode = themeMode ?? neumorphicConstants.themeMode;
     theme = theme ?? neumorphicConstants.themeData;

@@ -166,21 +166,19 @@ class DataListTile extends StatelessWidget {
       trailing: trailingWidget,
       isThreeLine: tileData.isThreeLine,
       dense: tileData.dense,
-      onTap: () {
+      onTap: () async {
         dataListViewController.currentIndex = index;
         var fn = onTap;
         if (fn != null) {
-          fn(index, tileData.title, subtitle: tileData.subtitle);
+          await fn(index, tileData.title, subtitle: tileData.subtitle);
         }
         fn = tileData.onTap;
         if (fn != null) {
-          fn(index, tileData.title, subtitle: tileData.subtitle);
+          await fn(index, tileData.title, subtitle: tileData.subtitle);
         }
 
         ///如果路由名称存在，点击会调用路由
         if (tileData.routeName != null) {
-          var indexWidgetProvider =
-              Provider.of<IndexWidgetProvider>(context, listen: false);
           indexWidgetProvider.push(tileData.routeName!, context: context);
         }
       },

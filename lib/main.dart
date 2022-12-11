@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:colla_chat/pages/chat/login/p2p_login.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/routers/router_handler.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/smart_dialog_util.dart';
@@ -18,8 +19,6 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:window_manager/window_manager.dart';
-
-import 'l10n/localization.dart';
 
 ///全局处理证书问题
 class PlatformHttpOverrides extends HttpOverrides {
@@ -70,19 +69,21 @@ void main(List<String> args) async {
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
     await inapp.InAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
-  ServiceLocator.init().then((value) {
+  ServiceLocator.init().then((bool loginStatus) {
     HttpOverrides.global = PlatformHttpOverrides();
 
     ///加载主应用组件
     runApp(MultiProvider(providers: [
       ChangeNotifierProvider(create: (context) => appDataProvider),
-    ], child: const CollaChatApp()));
+    ], child: CollaChatApp(loginStatus: loginStatus)));
   });
 }
 
 ///应用是一个无态的组件
 class CollaChatApp extends StatelessWidget {
-  const CollaChatApp({Key? key}) : super(key: key);
+  final bool loginStatus;
+
+  const CollaChatApp({Key? key, required this.loginStatus}) : super(key: key);
 
   ///widget 的主要工作是提供一个 build() 方法来描述如何根据其他较低级别的 widgets 来显示自己
   @override
@@ -96,14 +97,14 @@ class CollaChatApp extends StatelessWidget {
             builder: (BuildContext context, appDataProvider, Widget? child) {
           return MaterialApp(
             onGenerateTitle: (context) {
-              return AppLocalizations.instance.text('Welcome to CollaChat');
+              return AppLocalizations.t('Welcome to CollaChat');
             },
             //title: 'Welcome to CollaChat',
             debugShowCheckedModeBanner: false,
             theme: Provider.of<AppDataProvider>(context).themeData,
 
             ///Scaffold 是 Material 库中提供的一个 widget，它提供了默认的导航栏、标题和包含主屏幕 widget 树的 body 属性
-            home: P2pLogin(),
+            home: loginStatus ? indexView : p2pLogin,
             onGenerateRoute: Application.router.generator,
             // 初始化FlutterSmartDialog
             navigatorObservers: [FlutterSmartDialog.observer],
@@ -123,13 +124,7 @@ class CollaChatApp extends StatelessWidget {
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
-            supportedLocales: const [
-              Locale('zh', 'CN'),
-              Locale('en', 'US'),
-              Locale('zh', 'TW'),
-              Locale('ja', 'JP'),
-              Locale('ko', 'KR'),
-            ],
+            supportedLocales: supportedLocales,
             // localeResolutionCallback:
             //     (Locale? locale, Iterable<Locale> supportedLocales) {
             //   if (localeDataProvider.getLocale() != null) {

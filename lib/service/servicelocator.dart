@@ -1,5 +1,6 @@
 import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/p2p/chain/action/connect.dart';
 import 'package:colla_chat/p2p/chain/action/ionsignal.dart';
 import 'package:colla_chat/p2p/chain/action/p2pchat.dart';
@@ -35,8 +36,8 @@ class ServiceLocator {
     return services[serviceName];
   }
 
-  ///初始化并注册服务类，在应用启动后调用
-  static Future<void> init() async {
+  ///初始化并注册服务类，在应用启动后调用，返回值是是否自动登录成功
+  static Future<bool> init() async {
     await platformParams.init();
     await appDataProvider.init();
     services['stockAccountService'] = stockAccountService;
@@ -76,6 +77,10 @@ class ServiceLocator {
         signalSecurityContextService;
 
     await Sqlite3.getInstance();
+    await AppLocalizations.init();
+    bool loginStatus = await myselfPeerService.autoLogin();
+
+    return loginStatus;
   }
 
   /// entity包含所有的字段，假设是字符串类型，fields是需要特别说明的字段，比如不是字符串类型

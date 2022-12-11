@@ -39,25 +39,28 @@ class SettingWidget extends StatelessWidget with TileDataMixin {
   ///类变量，不用每次重建
   final DataListView dataListView = DataListView(tileData: settingTileData);
   final AuthMethod authMethod = AuthMethod.app;
+  bool? loginStatus;
 
   SettingWidget({Key? key}) : super(key: key);
 
-  Future<bool> authenticate() async {
+  Future<bool?> authenticate() async {
+    if (loginStatus != null && loginStatus!) {
+      return loginStatus!;
+    }
     if (authMethod == AuthMethod.local) {
-      return await LocalAuthUtil.authenticate(localizedReason: 'Authenticate');
+      loginStatus =
+          await LocalAuthUtil.authenticate(localizedReason: 'Authenticate');
     } else if (authMethod == AuthMethod.app) {
-      bool result =
-          await SmartDialogUtil.show(builder: (BuildContext? context) {
+      await SmartDialogUtil.show(builder: (BuildContext? context) {
         P2pLoginWidget p2pLoginWidget =
             P2pLoginWidget(onAuthenticate: (bool data) {
-          SmartDialog.dismiss(result: data);
+          loginStatus = data;
+          SmartDialog.dismiss();
         });
         return p2pLoginWidget;
       });
-      return result;
-    } else {
-      return true;
     }
+    return loginStatus!;
   }
 
   @override
@@ -66,9 +69,9 @@ class SettingWidget extends StatelessWidget with TileDataMixin {
         child: AppBarView(
             title: Text(AppLocalizations.t(title)),
             withLeading: withLeading,
-            child: FutureBuilder<bool>(
+            child: FutureBuilder<bool?>(
               future: authenticate(),
-              builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+              builder: (BuildContext context, AsyncSnapshot<bool?> snapshot) {
                 if (snapshot.hasData) {
                   bool? result = snapshot.data;
                   if (result != null && result) {

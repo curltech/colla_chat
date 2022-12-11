@@ -125,7 +125,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     String? peerId = myselfPeer.peerId;
     var profile = await peerProfileService.findOneByPeerId(peerId);
     if (profile != null) {
-      await peerProfileService.delete(entity:profile);
+      await peerProfileService.delete(entity: profile);
     }
     var peerProfile = PeerProfile(peerId, myselfPeer.clientId);
     peerProfile.peerId = peerId;
@@ -187,6 +187,22 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     String skipLogin = JsonUtil.toJsonString(
         {credentialName: credential, passwordName: password});
     await localSecurityStorage.save(skipLoginName, skipLogin);
+  }
+
+  ///获取最后一次登录的用户名和密码，如果都存在，快捷登录
+  Future<bool> autoLogin() async {
+    Map<String, dynamic>? autoLogin = await credential();
+    if (autoLogin != null) {
+      String? credential = autoLogin[credentialName];
+      String? password = autoLogin[passwordName];
+      if (StringUtil.isNotEmpty(credential) &&
+          StringUtil.isNotEmpty(password)) {
+        bool loginStatus = await login(credential!, password!);
+        return loginStatus;
+      }
+    }
+
+    return false;
   }
 
   /// 登录，验证本地账户，连接p2p服务节点，注册成功
@@ -276,7 +292,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     if (myselfPeer != null) {
       myselfPeer.avatar = data;
       var avatarImage = ImageUtil.buildImageWidget(
-        image:data,
+        image: data,
         height: 32,
         width: 32,
       );
