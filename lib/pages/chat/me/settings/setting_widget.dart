@@ -14,23 +14,23 @@ import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 final List<TileData> settingTileData = [
   TileData(
       prefix: Icon(Icons.generating_tokens,
-          color: appDataProvider.themeData?.colorScheme.primary),
+          color: appDataProvider.themeData.colorScheme.primary),
       title: AppLocalizations.t('General')),
   TileData(
       prefix: Icon(Icons.high_quality,
-          color: appDataProvider.themeData?.colorScheme.primary),
+          color: appDataProvider.themeData.colorScheme.primary),
       title: AppLocalizations.t('Advanced')),
   TileData(
       prefix: Icon(Icons.security,
-          color: appDataProvider.themeData?.colorScheme.primary),
+          color: appDataProvider.themeData.colorScheme.primary),
       title: AppLocalizations.t('Security')),
   TileData(
       prefix: Icon(Icons.privacy_tip,
-          color: appDataProvider.themeData?.colorScheme.primary),
+          color: appDataProvider.themeData.colorScheme.primary),
       title: AppLocalizations.t('Privacy')),
   TileData(
       prefix: Icon(Icons.usb,
-          color: appDataProvider.themeData?.colorScheme.primary),
+          color: appDataProvider.themeData.colorScheme.primary),
       title: AppLocalizations.t('About')),
 ];
 

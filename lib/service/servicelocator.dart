@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/main.dart';
 import 'package:colla_chat/p2p/chain/action/connect.dart';
 import 'package:colla_chat/p2p/chain/action/ionsignal.dart';
 import 'package:colla_chat/p2p/chain/action/p2pchat.dart';
@@ -78,6 +81,8 @@ class ServiceLocator {
 
     await Sqlite3.getInstance();
     await AppLocalizations.init();
+    HttpOverrides.global = PlatformHttpOverrides();
+
     bool loginStatus = await myselfPeerService.autoLogin();
 
     return loginStatus;
