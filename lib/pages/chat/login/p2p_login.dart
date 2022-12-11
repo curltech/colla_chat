@@ -1,12 +1,11 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/login/loading.dart';
+import 'package:colla_chat/pages/chat/login/p2p_login_widget.dart';
+import 'package:colla_chat/pages/chat/login/p2p_register_widget.dart';
+import 'package:colla_chat/pages/chat/login/p2p_setting_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:flutter/material.dart';
-
-import '../../../widgets/style/platform_widget_factory.dart';
-import 'loading.dart';
-import 'p2p_login_widget.dart';
-import 'p2p_register_widget.dart';
-import 'p2p_setting_widget.dart';
 
 /// 远程登录页面，一个Scaffold，IndexStack下的远程登录组件，注册组件和配置组件
 class P2pLogin extends StatefulWidget {

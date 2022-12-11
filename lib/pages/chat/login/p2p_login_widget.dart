@@ -9,10 +9,11 @@ import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-
 /// 远程登录组件，一个card下的录入框和按钮组合
 class P2pLoginWidget extends StatefulWidget {
-  const P2pLoginWidget({Key? key}) : super(key: key);
+  final void Function(bool result)? onAuthenticate;
+
+  const P2pLoginWidget({Key? key, this.onAuthenticate}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _P2pLoginWidgetState();
@@ -69,7 +70,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
       const SizedBox(
         height: 50,
       ),
-       ImageUtil.buildImageWidget(
+      ImageUtil.buildImageWidget(
         image: 'assets/images/colla.png',
         height: 128,
         width: 128,
@@ -93,15 +94,23 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
     String credential = values[credentialName];
     String password = values[passwordName];
     myselfPeerService.login(credential, password).then((bool loginStatus) {
-      if (loginStatus) {
-        myselfPeerService.saveCredential(credential, password);
-        Application.router
-            .navigateTo(context, Application.index, replace: true);
+      if (widget.onAuthenticate != null) {
+        widget.onAuthenticate!(loginStatus);
       } else {
-        DialogUtil.error(context, content: AppLocalizations.t('Login fail'));
+        if (loginStatus) {
+          myselfPeerService.saveCredential(credential, password);
+          Application.router
+              .navigateTo(context, Application.index, replace: true);
+        } else {
+          DialogUtil.error(context, content: AppLocalizations.t('Login fail'));
+        }
       }
     }).catchError((e) {
-      DialogUtil.error(context, content: e.toString());
+      if (widget.onAuthenticate != null) {
+        widget.onAuthenticate!(false);
+      } else {
+        DialogUtil.error(context, content: e.toString());
+      }
     });
   }
 }
