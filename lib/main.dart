@@ -70,8 +70,6 @@ void main(List<String> args) async {
     await inapp.InAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
   ServiceLocator.init().then((bool loginStatus) {
-    HttpOverrides.global = PlatformHttpOverrides();
-
     ///加载主应用组件
     runApp(MultiProvider(providers: [
       ChangeNotifierProvider(create: (context) => appDataProvider),
