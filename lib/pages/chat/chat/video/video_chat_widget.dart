@@ -1,13 +1,12 @@
+import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
-import 'package:colla_chat/pages/chat/chat/controller/peer_connections_controller.dart';
-import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
+import 'package:colla_chat/pages/chat/chat/video/local_video_widget.dart';
+import 'package:colla_chat/pages/chat/chat/video/remote_video_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:flutter/material.dart';
 
-///视频通话窗口，显示多个小视频窗口，每个小窗口代表一个对方，其中一个是自己
-///以及各种功能按钮
+///视频通话窗口，分页显示本地视频和远程视频
 class VideoChatWidget extends StatefulWidget {
   const VideoChatWidget({
     Key? key,
@@ -20,7 +19,6 @@ class VideoChatWidget extends StatefulWidget {
 }
 
 class _VideoChatWidgetState extends State<VideoChatWidget> {
-  bool actionVisible = false;
   OverlayEntry? overlayEntry;
 
   @override
@@ -54,51 +52,30 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     chatMessageController.chatView = ChatView.text;
   }
 
-  _close() {
-    localMediaController.close();
-    chatMessageController.chatView = ChatView.text;
-    setState(() {});
-  }
-
-  Widget _buildVideoViewCard(BuildContext context) {
-    return VideoViewCard(
-      controller: peerConnectionsController,
-    );
-  }
-
   Widget _buildVideoChatView(BuildContext context) {
-    return Column(children: [
-      Container(
-          padding: const EdgeInsets.all(5.0),
-          color: Colors.black.withOpacity(0.5),
-          child: Row(
-            children: [
-              InkWell(
-                onTap: () {
-                  _minimize(context);
-                },
-                child: const Icon(Icons.zoom_in_map, size: 24),
-              ),
-              const Spacer(),
-              InkWell(
-                onTap: () {
-                  setState(() {
-                    actionVisible = !actionVisible;
-                  });
-                },
-                child: const Icon(Icons.add_circle, size: 24),
-              ),
-            ],
-          )),
-      Expanded(child: _buildVideoViewCard(context)),
-    ]);
+    return Swiper(
+      controller: SwiperController(),
+      itemCount: 2,
+      index: 0,
+      itemBuilder: (BuildContext context, int index) {
+        Widget view = const LocalVideoWidget();
+        if (index == 1) {
+          view = const RemoteVideoWidget();
+        }
+        return Center(child: view);
+      },
+      // pagination: SwiperPagination(
+      //     builder: DotSwiperPaginationBuilder(
+      //   activeColor: appDataProvider.themeData.colorScheme.primary,
+      //   color: Colors.white,
+      //   activeSize: 15,)
+      // ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Stack(children: [
-      _buildVideoChatView(context),
-    ]);
+    return _buildVideoChatView(context);
   }
 
   @override
