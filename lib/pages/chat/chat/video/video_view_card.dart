@@ -39,7 +39,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
       videoViews.add(videoView);
     }
     return GridView.builder(
-        itemCount: videoViews.length,
+        itemCount: renders.length,
         //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             //横轴元素个数
@@ -49,7 +49,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
             //横轴间距
             crossAxisSpacing: 5.0,
             //子组件宽高长度比例
-            childAspectRatio: 9 / 16),
+            childAspectRatio: 1),
         itemBuilder: (BuildContext context, int index) {
           //Widget Function(BuildContext context, int index)
           return videoViews[index];

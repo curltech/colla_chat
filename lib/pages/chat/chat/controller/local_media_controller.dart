@@ -16,6 +16,9 @@ abstract class VideoRenderController with ChangeNotifier {
 
   //横向几个video
   int get crossAxisCount {
+    if (videoRenders().length == 1) {
+      return 1;
+    }
     return _crossAxisCount;
   }
 

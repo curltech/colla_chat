@@ -3,13 +3,13 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/pages/chat/me/webrtc/screen_select_dialog.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../../pages/chat/me/webrtc/screen_select_dialog.dart';
-import '../../platform.dart';
 
 final emptyVideoView = Center(
   child: defaultImage,

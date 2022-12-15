@@ -4,7 +4,7 @@ import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/full_screen_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_chat_widget.dart';
-import 'package:colla_chat/pages/chat/chat/video/video_dialout_widget.dart';
+import 'package:colla_chat/pages/chat/chat/video/local_video_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -81,10 +81,6 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     return ChatMessageWidget();
   }
 
-  Widget _buildDialOutWidget(BuildContext context) {
-    return const VideoDialOutWidget();
-  }
-
   Widget _buildVideoChatWidget(BuildContext context) {
     return const VideoChatWidget();
   }
@@ -104,7 +100,6 @@ class _ChatMessageViewState extends State<ChatMessageView> {
 
     var children = [
       _buildChatMessageWidget(context),
-      _buildDialOutWidget(context),
       _buildVideoChatWidget(context),
     ];
     name = name ?? '';

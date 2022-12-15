@@ -1,10 +1,11 @@
+import 'dart:async';
+
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
@@ -27,6 +28,10 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 final List<ActionData> actionData = [
   ActionData(
+      label: 'Minimize',
+      tooltip: 'Minimize view',
+      icon: const Icon(Icons.zoom_in_map)),
+  ActionData(
       label: 'Video chat',
       tooltip: 'Video chat',
       icon: const Icon(Icons.video_call)),
@@ -47,10 +52,6 @@ final List<ActionData> actionData = [
       tooltip: 'Camera switch',
       icon: const Icon(Icons.cameraswitch)),
   ActionData(
-      label: 'Show background',
-      tooltip: 'Show background',
-      icon: const Icon(Icons.photo_camera_back)),
-  ActionData(
       label: 'Microphone',
       tooltip: 'Microphone switch',
       icon: const Icon(Icons.mic_rounded)),
@@ -60,25 +61,29 @@ final List<ActionData> actionData = [
       icon: const Icon(Icons.speaker_phone)),
 ];
 
-///视频通话拨出的窗口
-class VideoDialOutWidget extends StatefulWidget {
+///本地视频通话显示和拨出的窗口，显示多个小视频窗口，每个小窗口代表一个对方，其中一个是自己
+///以及各种功能按钮
+class LocalVideoWidget extends StatefulWidget {
   final Color? color;
 
-  const VideoDialOutWidget({Key? key, this.color}) : super(key: key);
+  const LocalVideoWidget({Key? key, this.color}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return _VideoDialOutWidgetState();
+    return _LocalVideoWidgetState();
   }
 }
 
-class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
+class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   String? peerId;
   String? name;
   String? clientId;
   String partyType = PartyType.linkman.name;
-  double opacity = 0.5;
-  OverlayEntry? overlayEntry;
+
+  //final focusNode = FocusNode();
+  ValueNotifier<bool> actionCardVisible =
+      ValueNotifier<bool>(false); // position to false;
+  Timer? _hidePanelTimer;
 
   @override
   void initState() {
@@ -98,31 +103,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
     }
   }
 
-  _closeOverlayEntry() {
-    if (overlayEntry != null) {
-      overlayEntry!.remove();
-      overlayEntry = null;
-      chatMessageController.chatView = ChatView.dial;
-    }
-  }
 
-  _minimize(BuildContext context) {
-    overlayEntry = OverlayEntry(builder: (context) {
-      return Align(
-        alignment: Alignment.topRight,
-        child: WidgetUtil.buildCircleButton(
-            padding: const EdgeInsets.all(15.0),
-            backgroundColor: appDataProvider.themeData.colorScheme.primary,
-            onPressed: () {
-              _closeOverlayEntry();
-            },
-            child:
-                const Icon(size: 32, color: Colors.white, Icons.zoom_out_map)),
-      );
-    });
-    Overlay.of(context)!.insert(overlayEntry!);
-    chatMessageController.chatView = ChatView.text;
-  }
 
   _open(
       {MediaStream? stream,
@@ -180,6 +161,7 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
     setState(() {});
   }
 
+  ///视频视图
   Widget _buildVideoViewCard(BuildContext context) {
     if (peerId == null) {
       return Container();
@@ -200,40 +182,29 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
         color: widget.color,
       );
     }
+    linkmanService.findAvatarImageWidget(peerId!);
     return Container();
   }
 
-  _opacity() {
-    if (opacity == 1) {
-      opacity = 0.5;
-    } else {
-      opacity = 1;
-    }
-    setState(() {});
-  }
-
   Future<void> _onAction(int index, String name, {String? value}) async {
-    switch (index) {
-      case 0:
+    switch (name) {
+      case 'Video chat':
         _open(videoMedia: true);
         break;
-      case 1:
+      case 'Audio chat':
         _open(audioMedia: true);
         break;
-      case 2:
+      case 'Screen share':
         _open(displayMedia: true);
         break;
-      case 3:
+      case 'Media play':
         _open();
         break;
-      case 4:
+      case 'Camera switch':
         break;
-      case 5:
-        _opacity();
+      case 'Microphone':
         break;
-      case 6:
-        break;
-      case 7:
+      case 'Speaker':
         break;
       default:
         break;
@@ -254,75 +225,81 @@ class _VideoDialOutWidgetState extends State<VideoDialOutWidget> {
     );
   }
 
-  Widget _buildDialOutView(BuildContext context) {
+  ///切换显示按钮面板
+  void _toggleActionCard() {
+    if (_hidePanelTimer != null) {
+      _hidePanelTimer?.cancel();
+      actionCardVisible.value = false;
+      _hidePanelTimer = null;
+    } else {
+      actionCardVisible.value = true;
+      _hidePanelTimer?.cancel();
+      _hidePanelTimer = Timer(const Duration(seconds: 15), () {
+        if (!mounted) return;
+        actionCardVisible.value = false;
+        _hidePanelTimer = null;
+      });
+    }
+  }
+
+  ///控制面板
+  Widget _buildControlPanel(BuildContext context) {
     return Column(children: [
-      Container(
-          padding: const EdgeInsets.all(15.0),
-          child: Row(
-            children: [
-              InkWell(
-                onTap: () {
-                  _minimize(context);
-                },
-                child: const Icon(Icons.zoom_in_map, size: 32),
-              ),
-              const SizedBox(
-                width: 25,
-              ),
-              Text(AppLocalizations.t('Waiting accept inviting...'),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(fontSize: 16, color: Colors.black)),
-            ],
-          )),
-      Expanded(
-          child: Center(
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-            FutureBuilder(
-              future: linkmanService.findAvatarImageWidget(peerId!),
-              builder: (BuildContext context, AsyncSnapshot<Widget?> snapshot) {
-                Widget widget = snapshot.data ?? Container();
-                return widget;
-              },
-            ),
-            Text(name ?? ''),
-          ]))),
-      _buildActionCard(context),
-      Center(
-          child: Container(
-        padding: const EdgeInsets.all(15.0),
-        child: WidgetUtil.buildCircleButton(
-          onPressed: () {
-            _close();
-          },
-          elevation: 2.0,
-          backgroundColor: Colors.red,
-          padding: const EdgeInsets.all(15.0),
-          child: const Icon(
-            Icons.call_end,
-            size: 48.0,
-            color: Colors.white,
-          ),
-        ),
-      )),
+      const Spacer(),
+      ValueListenableBuilder<bool>(
+          valueListenable: actionCardVisible,
+          builder: (context, value, child) {
+            return Visibility(
+                visible: actionCardVisible.value,
+                child: Column(children: [
+                  _buildActionCard(context),
+                  Center(
+                      child: Container(
+                    padding: const EdgeInsets.all(15.0),
+                    child: WidgetUtil.buildCircleButton(
+                      onPressed: () {
+                        _close();
+                      },
+                      elevation: 2.0,
+                      backgroundColor: Colors.red,
+                      padding: const EdgeInsets.all(15.0),
+                      child: const Icon(
+                        Icons.call_end,
+                        size: 48.0,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ))
+                ]));
+          })
     ]);
   }
 
-  Widget _build(BuildContext context) {
+  Widget _buildGestureDetector(BuildContext context) {
+    return GestureDetector(
+      child: _buildVideoViewCard(context),
+      onTap: () {
+        _toggleActionCard();
+        //focusNode.requestFocus();
+      },
+    );
+  }
+
+  Widget _buildLocalVideo(BuildContext context) {
     return Stack(children: [
-      Opacity(opacity: opacity, child: _buildVideoViewCard(context)),
-      _buildDialOutView(context),
+      _buildGestureDetector(context),
+      _buildControlPanel(context),
     ]);
   }
 
   @override
   Widget build(BuildContext context) {
-    return _build(context);
+    return _buildLocalVideo(context);
   }
 
   @override
   void dispose() {
+    //focusNode.dispose();
     super.dispose();
   }
 }
