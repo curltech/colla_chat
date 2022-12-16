@@ -100,17 +100,17 @@ class VideoChatReceiptController with ChangeNotifier {
       //与发送者的连接存在，将本地的视频render加入连接中
       if (advancedPeerConnection != null) {
         Map<String, PeerVideoRender> videoRenders =
-            localVideoRenderController.videoRenderController.getVideoRenders();
+            localVideoRenderController.getVideoRenders();
         for (var render in videoRenders.values) {
           await advancedPeerConnection.addLocalRender(render);
         }
         //本地视频render加入后，发起重新协商
         await advancedPeerConnection.negotiate();
-        await peerConnectionsController.add(peerId, clientId: clientId);
+        await peerConnectionsController.addAdvancedPeerConnection(advancedPeerConnection);
         chatMessageController.chatView = ChatView.video;
       }
     } else if (status == MessageStatus.rejected.name) {
-      await localVideoRenderController.videoRenderController.close();
+      await localVideoRenderController.close();
       chatMessageController.chatView = ChatView.text;
     }
   }
