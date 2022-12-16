@@ -18,7 +18,7 @@ class ChatReceiptMessage extends StatelessWidget {
     var status = chatMessage.status;
     var receiverName = chatMessage.receiverName;
     Widget leading = Icon(
-      Icons.receipt,
+      Icons.receipt_long,
       color: appDataProvider.themeData.colorScheme.primary,
     );
     Widget tile = Center(
