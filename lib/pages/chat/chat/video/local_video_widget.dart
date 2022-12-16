@@ -152,15 +152,13 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   _close() async {
-    List<AdvancedPeerConnection> pcs = peerConnectionsController.get(peerId!);
-    if (pcs.isNotEmpty) {
-      for (var pc in pcs) {
-        for (var render in localVideoRenderController
-            .videoRenderController.videoRenders.values) {
-          pc.removeLocalRender(render);
-        }
-        await pc.negotiate();
+    AdvancedPeerConnection? pc =
+        peerConnectionsController.getAdvancedPeerConnection(peerId!, clientId!);
+    if (pc != null) {
+      for (var render in localVideoRenderController.videoRenders.values) {
+        pc.removeLocalRender(render);
       }
+      await pc.negotiate();
     }
     chatMessageController.chatView = ChatView.text;
     setState(() {});
@@ -178,13 +176,12 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           advancedPeerConnection.status == PeerConnectionStatus.connected) {
         return VideoViewCard(
           color: widget.color,
-          videoRenderController:
-              localVideoRenderController.videoRenderController,
+          videoRenderController: localVideoRenderController,
         );
       }
     } else if (partyType == PartyType.group.name) {
       return VideoViewCard(
-        videoRenderController: localVideoRenderController.videoRenderController,
+        videoRenderController: localVideoRenderController,
         color: widget.color,
       );
     }

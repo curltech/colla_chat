@@ -48,13 +48,13 @@ class VideoDialInWidget extends StatelessWidget {
         //根据title来判断是请求音频还是视频
         String? title = chatMessage.title;
         if (title == ContentType.audio.name) {
-          var render =
-              await localVideoRenderController.createVideoRender(audioMedia: true);
+          var render = await localVideoRenderController.createVideoRender(
+              audioMedia: true);
           localRenders.add(render);
         } else {
           if (videoMedia) {
-            var render =
-                await localVideoRenderController.createVideoRender(videoMedia: true);
+            var render = await localVideoRenderController.createVideoRender(
+                videoMedia: true);
             localRenders.add(render);
           }
           if (displayMedia) {
@@ -80,8 +80,8 @@ class VideoDialInWidget extends StatelessWidget {
               await advancedPeerConnection.addLocalRender(render);
             }
           }
-          peerConnectionsController.add(peerId,
-              clientId: clientId);
+          peerConnectionsController
+              .addAdvancedPeerConnection(advancedPeerConnection);
           indexWidgetProvider.push('chat_message');
           chatMessageController.chatView = ChatView.video;
         }

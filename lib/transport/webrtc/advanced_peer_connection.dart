@@ -179,10 +179,8 @@ class AdvancedPeerConnection {
 
   ///把渲染器加入到渲染器集合，并将包含的流加入连接中
   Future<bool> addLocalRender(PeerVideoRender render) async {
-    VideoRenderController videoRenderController =
-        localVideoRenderController.videoRenderController;
     logger.i(
-        'AdvancedPeerConnection peerId:$peerId addLocalRender ${render.mediaStream!.id}, localVideoRenders length:${videoRenderController.videoRenders.length}');
+        'AdvancedPeerConnection peerId:$peerId addLocalRender ${render.mediaStream!.id}, localVideoRenders length:${localVideoRenderController.videoRenders.length}');
 
     bool success = _addLocalRender(render);
     if (success) {
@@ -203,14 +201,12 @@ class AdvancedPeerConnection {
     }
     var streamId = render.id;
     if (streamId != null) {
-      VideoRenderController videoRenderController =
-          localVideoRenderController.videoRenderController;
-      videoRenderController.add(render);
+      localVideoRenderController.add(render);
       render.peerId = peerId;
       render.name = name;
       render.clientId = clientId;
       logger.i(
-          'AdvancedPeerConnection peerId:$peerId _addLocalRender $streamId, localVideoRenders length:${videoRenderController.videoRenders.length}');
+          'AdvancedPeerConnection peerId:$peerId _addLocalRender $streamId, localVideoRenders length:${localVideoRenderController.videoRenders.length}');
       return true;
     }
     return false;
@@ -241,9 +237,7 @@ class AdvancedPeerConnection {
     }
     var streamId = render.id;
     if (streamId != null) {
-      VideoRenderController videoRenderController =
-          localVideoRenderController.videoRenderController;
-      videoRenderController.close(streamId: streamId);
+      localVideoRenderController.close(streamId: streamId);
     }
   }
 
@@ -254,14 +248,12 @@ class AdvancedPeerConnection {
     }
     var streamId = render.id;
     if (streamId != null) {
-      VideoRenderController videoRenderController = peerConnectionsController
-          .videoRenderControllers[basePeerConnection.id]!;
-      videoRenderController.add(render);
+      peerConnectionsController.add(render);
       render.peerId = peerId;
       render.name = name;
       render.clientId = clientId;
       logger.i(
-          'AdvancedPeerConnection peerId:$peerId _addRemoteRender $streamId, remoteVideoRenders length:${videoRenderController.videoRenders.length}');
+          'AdvancedPeerConnection peerId:$peerId _addRemoteRender $streamId, remoteVideoRenders length:${peerConnectionsController.videoRenders.length}');
       return true;
     }
     return false;
@@ -269,13 +261,10 @@ class AdvancedPeerConnection {
 
   Future<PeerVideoRender> _addRemoteStream(MediaStream stream) async {
     String streamId = stream.id;
-    VideoRenderController? videoRenderController =
-        peerConnectionsController.videoRenderControllers[basePeerConnection.id];
-    if (videoRenderController != null) {
-      PeerVideoRender? render = videoRenderController.videoRenders[streamId];
-      if (render != null) {
-        return render;
-      }
+    PeerVideoRender? videoRender =
+        peerConnectionsController.videoRenders[streamId];
+    if (videoRender != null) {
+      return videoRender;
     }
     PeerVideoRender render = await PeerVideoRender.from(peerId,
         clientId: clientId, name: name, stream: stream);
@@ -287,11 +276,7 @@ class AdvancedPeerConnection {
 
   _removeRemoteStream(MediaStream stream) async {
     var streamId = stream.id;
-    VideoRenderController? videoRenderController =
-        peerConnectionsController.videoRenderControllers[basePeerConnection.id];
-    if (videoRenderController != null) {
-      videoRenderController.close(streamId: streamId);
-    }
+    peerConnectionsController.close(streamId: streamId);
   }
 
   removeTrack(MediaStream stream, MediaStreamTrack track) async {

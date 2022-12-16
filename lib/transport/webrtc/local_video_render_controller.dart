@@ -89,27 +89,24 @@ class VideoRenderController with ChangeNotifier {
         }
       }
     }
-    notifyListeners();
   }
 }
 
 ///本地媒体控制器
-class LocalVideoRenderController with ChangeNotifier {
-  VideoRenderController videoRenderController = VideoRenderController();
-
+class LocalVideoRenderController extends VideoRenderController {
   Future<PeerVideoRender> createVideoRender(
       {MediaStream? stream,
       bool videoMedia = false,
       bool audioMedia = false,
       bool displayMedia = false}) async {
-    if (videoRenderController.videoRender != null) {
+    if (videoRender != null) {
       if (videoMedia || audioMedia) {
-        return videoRenderController.videoRender!;
+        return videoRender!;
       }
     }
     if (stream != null) {
       var streamId = stream.id;
-      var videoRender = videoRenderController.videoRenders[streamId];
+      var videoRender = videoRenders[streamId];
       if (videoRender != null) {
         return videoRender;
       }
@@ -122,10 +119,10 @@ class LocalVideoRenderController with ChangeNotifier {
         audioMedia: audioMedia,
         displayMedia: displayMedia);
     if (audioMedia || videoMedia) {
-      videoRenderController.videoRender = render;
+      videoRender = render;
     }
     await render.bindRTCVideoRender();
-    videoRenderController.add(render);
+    add(render);
     render.peerId = myself.peerId;
     render.name = myself.name;
     render.clientId = myself.clientId;

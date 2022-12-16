@@ -604,19 +604,26 @@ class PeerConnectionPool {
   onAddStream(WebrtcEvent event) async {
     logger
         .i('peerId: ${event.peerId} clientId:${event.clientId} is onAddStream');
-    peerConnectionsController.add(event.peerId, clientId: event.clientId);
-    peerConnectionsController.update(event.peerId, clientId: event.clientId);
+    AdvancedPeerConnection? peerConnection =
+        getOne(event.peerId, clientId: event.clientId);
+    if (peerConnection != null) {
+      peerConnectionsController.addAdvancedPeerConnection(peerConnection);
+    }
+    peerConnectionsController.updateAdvancedPeerConnection(
+        event.peerId, event.clientId);
   }
 
   onRemoveStream(WebrtcEvent event) async {
     logger.i(
         'peerId: ${event.peerId} clientId:${event.clientId} is onRemoveStream');
-    peerConnectionsController.update(event.peerId, clientId: event.clientId);
+    peerConnectionsController.updateAdvancedPeerConnection(
+        event.peerId, event.clientId);
   }
 
   onTrack(WebrtcEvent event) async {
     logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onTrack');
-    peerConnectionsController.update(event.peerId, clientId: event.clientId);
+    peerConnectionsController.updateAdvancedPeerConnection(
+        event.peerId, event.clientId);
   }
 
   onAddTrack(WebrtcEvent event) async {
@@ -628,7 +635,8 @@ class PeerConnectionPool {
   onRemoveTrack(WebrtcEvent event) async {
     logger.i(
         'peerId: ${event.peerId} clientId:${event.clientId} is onRemoveTrack');
-    peerConnectionsController.update(event.peerId, clientId: event.clientId);
+    peerConnectionsController.updateAdvancedPeerConnection(
+        event.peerId, event.clientId);
   }
 
   removeTrack(String peerId, MediaStream stream, MediaStreamTrack track,
