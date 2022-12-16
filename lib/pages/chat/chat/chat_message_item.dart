@@ -54,11 +54,23 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
 
   ///更新为已读状态
   Future<void> _buildReadStatus() async {
-    var readTime = widget.chatMessage.readTime;
-    if (readTime == null) {
-      widget.chatMessage.readTime = DateUtil.currentDate();
-      widget.chatMessage.status = MessageStatus.read.name;
-      await chatMessageService.store(widget.chatMessage, updateSummary: false);
+    var status = widget.chatMessage.status;
+    if (status == MessageStatus.unsent.name ||
+        status == MessageStatus.sent.name ||
+        status == MessageStatus.received.name ||
+        status == MessageStatus.send.name) {
+      var readTime = widget.chatMessage.readTime;
+      if (readTime == null) {
+        widget.chatMessage.readTime = DateUtil.currentDate();
+        widget.chatMessage.status = MessageStatus.read.name;
+        await chatMessageService.update(
+            {
+              status: widget.chatMessage.status,
+              readTime: widget.chatMessage.readTime
+            },
+            where: 'id = ?',
+            whereArgs: [widget.chatMessage.id!]);
+      }
     }
   }
 
