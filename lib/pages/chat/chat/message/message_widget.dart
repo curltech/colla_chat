@@ -144,7 +144,7 @@ class MessageWidget {
     } else if (subMessageType == ChatMessageSubType.cancel) {
       body = buildCancelMessageWidget(context, chatMessage.content!);
     } else if (subMessageType == ChatMessageSubType.chatReceipt) {
-      body = buildChatReceiptMessageWidget(context, chatMessage.content!);
+      body = buildChatReceiptMessageWidget(context, chatMessage);
     } else {
       body = Container();
     }
@@ -259,11 +259,12 @@ class MessageWidget {
     );
   }
 
-  ChatReceiptMessage buildChatReceiptMessageWidget(BuildContext context, String content) {
+  ChatReceiptMessage buildChatReceiptMessageWidget(
+      BuildContext context, ChatMessage chatMessage) {
     return ChatReceiptMessage(
       key: UniqueKey(),
       isMyself: isMyself,
-      content: content,
+      chatMessage: chatMessage,
     );
   }
 
