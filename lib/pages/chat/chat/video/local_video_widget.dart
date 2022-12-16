@@ -3,7 +3,9 @@ import 'dart:async';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
+import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
+
+import 'package:colla_chat/transport/webrtc/peer_connections_controller.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/contact.dart';
@@ -109,7 +111,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           peerConnectionPool.getOne(peerId!, clientId: clientId);
       if (advancedPeerConnection != null &&
           advancedPeerConnection.status == PeerConnectionStatus.connected) {
-        await localMediaController.createVideoRender(
+        await localVideoRenderController.createVideoRender(
             stream: stream,
             videoMedia: videoMedia,
             audioMedia: audioMedia,
@@ -127,7 +129,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             content: AppLocalizations.t('No Webrtc PeerConnection'));
       }
     } else if (partyType == PartyType.group.name) {
-      await localMediaController.createVideoRender(
+      await localVideoRenderController.createVideoRender(
           stream: stream,
           videoMedia: videoMedia,
           audioMedia: audioMedia,
@@ -149,8 +151,17 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         title: title, subMessageType: ChatMessageSubType.videoChat);
   }
 
-  _close() {
-    localMediaController.videoRenderController.close();
+  _close() async {
+    List<AdvancedPeerConnection> pcs = peerConnectionsController.get(peerId!);
+    if (pcs.isNotEmpty) {
+      for (var pc in pcs) {
+        for (var render in localVideoRenderController
+            .videoRenderController.videoRenders.values) {
+          pc.removeLocalRender(render);
+        }
+        await pc.negotiate();
+      }
+    }
     chatMessageController.chatView = ChatView.text;
     setState(() {});
   }
@@ -167,12 +178,13 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           advancedPeerConnection.status == PeerConnectionStatus.connected) {
         return VideoViewCard(
           color: widget.color,
-          videoRenderController: localMediaController.videoRenderController,
+          videoRenderController:
+              localVideoRenderController.videoRenderController,
         );
       }
     } else if (partyType == PartyType.group.name) {
       return VideoViewCard(
-        videoRenderController: localMediaController.videoRenderController,
+        videoRenderController: localVideoRenderController.videoRenderController,
         color: widget.color,
       );
     }

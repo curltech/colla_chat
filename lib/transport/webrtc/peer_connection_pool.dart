@@ -5,7 +5,7 @@ import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/p2p/chain/action/signal.dart';
-import 'package:colla_chat/pages/chat/chat/controller/peer_connections_controller.dart';
+import 'package:colla_chat/transport/webrtc/peer_connections_controller.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -604,20 +604,19 @@ class PeerConnectionPool {
   onAddStream(WebrtcEvent event) async {
     logger
         .i('peerId: ${event.peerId} clientId:${event.clientId} is onAddStream');
-    peerConnectionsController.addPeerConnection(event.peerId,
-        clientId: event.clientId);
-    peerConnectionsController.modify(event.peerId, clientId: event.clientId);
+    peerConnectionsController.add(event.peerId, clientId: event.clientId);
+    peerConnectionsController.update(event.peerId, clientId: event.clientId);
   }
 
   onRemoveStream(WebrtcEvent event) async {
     logger.i(
         'peerId: ${event.peerId} clientId:${event.clientId} is onRemoveStream');
-    peerConnectionsController.modify(event.peerId, clientId: event.clientId);
+    peerConnectionsController.update(event.peerId, clientId: event.clientId);
   }
 
   onTrack(WebrtcEvent event) async {
     logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onTrack');
-    peerConnectionsController.modify(event.peerId, clientId: event.clientId);
+    peerConnectionsController.update(event.peerId, clientId: event.clientId);
   }
 
   onAddTrack(WebrtcEvent event) async {
@@ -629,16 +628,7 @@ class PeerConnectionPool {
   onRemoveTrack(WebrtcEvent event) async {
     logger.i(
         'peerId: ${event.peerId} clientId:${event.clientId} is onRemoveTrack');
-    peerConnectionsController.modify(event.peerId, clientId: event.clientId);
-  }
-
-  _removeLocalStream(String peerId, MediaStream stream,
-      {required String clientId}) async {
-    AdvancedPeerConnection? advancedPeerConnection =
-        peerConnectionPool.getOne(peerId, clientId: clientId);
-    if (advancedPeerConnection != null) {
-      await advancedPeerConnection.removeLocalStream(stream);
-    }
+    peerConnectionsController.update(event.peerId, clientId: event.clientId);
   }
 
   removeTrack(String peerId, MediaStream stream, MediaStreamTrack track,
@@ -668,28 +658,6 @@ class PeerConnectionPool {
     }
 
     return PeerConnectionStatus.none;
-  }
-
-  Map<String, PeerVideoRender>? localVideoRenders(String peerId,
-      {required String clientId}) {
-    AdvancedPeerConnection? advancedPeerConnection =
-        peerConnectionPool.getOne(peerId, clientId: clientId);
-    if (advancedPeerConnection != null) {
-      return advancedPeerConnection.localVideoRenders;
-    }
-
-    return null;
-  }
-
-  Map<String, PeerVideoRender>? remoteVideoRenders(String peerId,
-      {required String clientId}) {
-    AdvancedPeerConnection? advancedPeerConnection =
-        peerConnectionPool.getOne(peerId, clientId: clientId);
-    if (advancedPeerConnection != null) {
-      return advancedPeerConnection.remoteVideoRenders;
-    }
-
-    return null;
   }
 
   ///调用signalAction发送signal到信号服务器

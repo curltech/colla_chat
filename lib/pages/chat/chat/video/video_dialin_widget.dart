@@ -2,8 +2,9 @@ import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
-import 'package:colla_chat/pages/chat/chat/controller/peer_connections_controller.dart';
+import 'package:colla_chat/pages/chat/chat/controller/video_chat_receipt_controller.dart';
+import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
+import 'package:colla_chat/transport/webrtc/peer_connections_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
@@ -48,16 +49,16 @@ class VideoDialInWidget extends StatelessWidget {
         String? title = chatMessage.title;
         if (title == ContentType.audio.name) {
           var render =
-              await localMediaController.createVideoRender(audioMedia: true);
+              await localVideoRenderController.createVideoRender(audioMedia: true);
           localRenders.add(render);
         } else {
           if (videoMedia) {
             var render =
-                await localMediaController.createVideoRender(videoMedia: true);
+                await localVideoRenderController.createVideoRender(videoMedia: true);
             localRenders.add(render);
           }
           if (displayMedia) {
-            var render = await localMediaController.createVideoRender(
+            var render = await localVideoRenderController.createVideoRender(
                 displayMedia: true);
             localRenders.add(render);
           }
@@ -79,7 +80,7 @@ class VideoDialInWidget extends StatelessWidget {
               await advancedPeerConnection.addLocalRender(render);
             }
           }
-          peerConnectionsController.addPeerConnection(peerId,
+          peerConnectionsController.add(peerId,
               clientId: clientId);
           indexWidgetProvider.push('chat_message');
           chatMessageController.chatView = ChatView.video;

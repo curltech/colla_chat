@@ -1,5 +1,5 @@
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/chat/controller/peer_connections_controller.dart';
+import 'package:colla_chat/transport/webrtc/peer_connections_controller.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
 import 'package:flutter/material.dart';
 
@@ -32,7 +32,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   Widget _buildVideoViewCard(BuildContext context) {
     return VideoViewCard(
       videoRenderController:
-          peerConnectionsController.remoteVideoRenderController,
+          peerConnectionsController.buildVideoRenderController(),
     );
   }
 

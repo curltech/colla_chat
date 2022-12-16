@@ -1,5 +1,6 @@
-import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
+
 import 'package:colla_chat/pages/chat/chat/video/single_video_view_widget.dart';
+import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:flutter/material.dart';
 
@@ -49,9 +50,9 @@ class _VideoViewCardState extends State<VideoViewCard> {
             //横轴元素个数
             crossAxisCount: crossAxisCount,
             //纵轴间距
-            mainAxisSpacing: 5.0,
+            mainAxisSpacing: 1.0,
             //横轴间距
-            crossAxisSpacing: 5.0,
+            crossAxisSpacing: 1.0,
             //子组件宽高长度比例
             childAspectRatio: 1),
         itemBuilder: (BuildContext context, int index) {

@@ -1,123 +1,12 @@
 import 'package:colla_chat/entity/chat/chat.dart';
-import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/chat/controller/peer_connections_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
+import 'package:colla_chat/transport/webrtc/peer_connections_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
-import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter_webrtc/flutter_webrtc.dart';
-
-class VideoRenderController with ChangeNotifier {
-  PeerVideoRender? _videoRender;
-  final Map<String, PeerVideoRender> videoRenders = {};
-
-  PeerVideoRender? get videoRender {
-    return _videoRender;
-  }
-
-  set videoRender(PeerVideoRender? videoRender) {
-    if (_videoRender != videoRender) {
-      _videoRender = videoRender;
-    }
-  }
-
-  Map<String, PeerVideoRender> getVideoRenders(
-      {String? peerId, String? clientId}) {
-    if (peerId == null && clientId == null) {
-      return this.videoRenders;
-    }
-    Map<String, PeerVideoRender> videoRenders = {};
-    for (var videoRender in this.videoRenders.values) {
-      if (peerId != null && peerId == videoRender.peerId) {
-        if (clientId != null) {
-          if (clientId == videoRender.clientId) {
-            if (videoRender.id != null) {
-              videoRenders[videoRender.id!] = videoRender;
-            }
-          }
-        } else {
-          if (videoRender.id != null) {
-            videoRenders[videoRender.id!] = videoRender;
-          }
-        }
-      }
-    }
-    return videoRenders;
-  }
-
-  put(PeerVideoRender videoRender) {
-    if (videoRender.id != null) {
-      videoRenders[videoRender.id!] = videoRender;
-    }
-  }
-
-
-  close({String? id}) {
-    if (id == null) {
-      for (var videoRender in videoRenders.values) {
-        videoRender.dispose();
-      }
-      videoRenders.clear();
-      _videoRender = null;
-    } else {
-      var videoRender = videoRenders[id];
-      if (videoRender != null) {
-        videoRender.dispose();
-        videoRenders.remove(id);
-        if (_videoRender != null && _videoRender!.id == id) {
-          _videoRender = null;
-        }
-      }
-    }
-    notifyListeners();
-  }
-}
-
-///本地媒体通话控制器，内部数据为视频通话的请求消息，和回执消息
-class LocalMediaController with ChangeNotifier {
-  VideoRenderController videoRenderController = VideoRenderController();
-
-  Future<PeerVideoRender> createVideoRender(
-      {MediaStream? stream,
-      bool videoMedia = false,
-      bool audioMedia = false,
-      bool displayMedia = false}) async {
-    if (videoRenderController.videoRender != null) {
-      if (videoMedia || audioMedia) {
-        return videoRenderController.videoRender!;
-      }
-    }
-    if (stream != null) {
-      var streamId = stream.id;
-      var videoRender = videoRenderController.videoRenders[streamId];
-      if (videoRender != null) {
-        return videoRender;
-      }
-    }
-    PeerVideoRender render = await PeerVideoRender.from(myself.peerId!,
-        clientId: myself.clientId,
-        name: myself.myselfPeer!.name,
-        stream: stream,
-        videoMedia: videoMedia,
-        audioMedia: audioMedia,
-        displayMedia: displayMedia);
-    if (audioMedia || videoMedia) {
-      videoRenderController.videoRender = render;
-    }
-    await render.bindRTCVideoRender();
-    videoRenderController.put(render);
-    render.peerId = myself.peerId;
-    render.name = myself.name;
-    render.clientId = myself.clientId;
-    notifyListeners();
-
-    return render;
-  }
-}
-
-final LocalMediaController localMediaController = LocalMediaController();
+import 'package:flutter/material.dart';
 
 ///视频通话的请求消息，和回执消息控制器
 class VideoChatReceiptController with ChangeNotifier {
@@ -211,18 +100,17 @@ class VideoChatReceiptController with ChangeNotifier {
       //与发送者的连接存在，将本地的视频render加入连接中
       if (advancedPeerConnection != null) {
         Map<String, PeerVideoRender> videoRenders =
-            localMediaController.videoRenderController.getVideoRenders();
+            localVideoRenderController.videoRenderController.getVideoRenders();
         for (var render in videoRenders.values) {
           await advancedPeerConnection.addLocalRender(render);
         }
         //本地视频render加入后，发起重新协商
         await advancedPeerConnection.negotiate();
-        await peerConnectionsController.addPeerConnection(peerId,
-            clientId: clientId);
+        await peerConnectionsController.add(peerId, clientId: clientId);
         chatMessageController.chatView = ChatView.video;
       }
     } else if (status == MessageStatus.rejected.name) {
-      await localMediaController.videoRenderController.close();
+      await localVideoRenderController.videoRenderController.close();
       chatMessageController.chatView = ChatView.text;
     }
   }

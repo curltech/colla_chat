@@ -1,6 +1,6 @@
-import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:flutter/material.dart';
@@ -11,29 +11,49 @@ class PeerConnectionsController with ChangeNotifier {
   final Map<String, Map<String, AdvancedPeerConnection>> _peerConnections = {};
   String? _roomId;
 
-  VideoRenderController localVideoRenderController = VideoRenderController();
+  //key为连接id
+  Map<String, VideoRenderController> videoRenderControllers = {};
 
-  VideoRenderController remoteVideoRenderController = VideoRenderController();
-
-  AdvancedPeerConnection get() {
-    return _peerConnections.values.first.values.first;
+  VideoRenderController buildVideoRenderController() {
+    List<PeerVideoRender> renders = [];
+    for (var videoRenderController in videoRenderControllers.values) {
+      renders.addAll(videoRenderController.videoRenders.values);
+    }
+    return VideoRenderController(videoRenders: renders);
   }
 
-  modify(String peerId, {required String clientId}) {
-    AdvancedPeerConnection? peerConnection =
-        peerConnectionPool.getOne(peerId, clientId: clientId);
-    if (peerConnection != null) {
-      var pcs = _peerConnections[peerId];
+  ///获取连接
+  List<AdvancedPeerConnection> get(String peerId, {String? clientId}) {
+    List<AdvancedPeerConnection> advancedPeerConnections = [];
+    if (_peerConnections.containsKey(peerId)) {
+      Map<String, AdvancedPeerConnection>? pcs = _peerConnections[peerId];
       if (pcs != null) {
-        if (pcs.containsKey(clientId)) {
-          notifyListeners();
+        if (clientId != null) {
+          AdvancedPeerConnection? advancedPeerConnection = pcs[clientId];
+          if (advancedPeerConnection != null) {
+            advancedPeerConnections.add(advancedPeerConnection);
+          }
+        } else {
+          advancedPeerConnections.addAll(pcs.values);
         }
+      }
+    }
+    return advancedPeerConnections;
+  }
+
+  ///连接的流发送变化
+  update(String peerId, {required String clientId}) {
+    var pcs = _peerConnections[peerId];
+    if (pcs != null) {
+      if (pcs.containsKey(clientId)) {
+        //var videoRenders = remoteVideoRenderController.videoRenders;
+        notifyListeners();
       }
     }
   }
 
-  //将连接加入控制器，此连接将与自己展开视频通话
-  addPeerConnection(String peerId, {required String clientId}) {
+  ///将连接加入控制器，此连接将与自己展开视频通话
+  add(String peerId, {required String clientId}) {
     AdvancedPeerConnection? peerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (peerConnection != null) {
@@ -49,7 +69,7 @@ class PeerConnectionsController with ChangeNotifier {
     }
   }
 
-  //将连接移出控制器，视频通话关闭
+  ///将连接移出控制器，视频通话关闭
   remove(String peerId, {String? clientId}) {
     var pcs = _peerConnections[peerId];
     if (pcs != null) {
@@ -71,6 +91,7 @@ class PeerConnectionsController with ChangeNotifier {
     notifyListeners();
   }
 
+  ///清除所有连接
   clear() {
     for (var pcs in _peerConnections.values) {
       for (var pc in pcs.values) {
@@ -81,40 +102,17 @@ class PeerConnectionsController with ChangeNotifier {
   }
 
   void _addPeerConnection(AdvancedPeerConnection advancedPeerConnection) {
-    for (var entry in advancedPeerConnection.localVideoRenders.entries) {
-      String id = entry.key;
-      var render = entry.value;
-      var videoRenders = localVideoRenderController.videoRenders;
-      if (!videoRenders.containsKey(id)) {
-        localVideoRenderController.put(render);
-      }
-    }
-    for (var entry in advancedPeerConnection.remoteVideoRenders.entries) {
-      String id = entry.key;
-      var render = entry.value;
-      var videoRenders = remoteVideoRenderController.videoRenders;
-      if (!videoRenders.containsKey(id)) {
-        remoteVideoRenderController.put(render);
-      }
+    VideoRenderController? videoRenderController =
+        videoRenderControllers[advancedPeerConnection.basePeerConnection.id];
+    if (videoRenderController == null) {
+      videoRenderController = VideoRenderController();
+      videoRenderControllers[advancedPeerConnection.basePeerConnection.id] =
+          videoRenderController;
     }
   }
 
   void _removePeerConnection(AdvancedPeerConnection advancedPeerConnection) {
-    for (var entry in advancedPeerConnection.localVideoRenders.entries) {
-      String id = entry.key;
-      var videoRenders = localVideoRenderController.videoRenders;
-      if (!videoRenders.containsKey(id)) {
-        localVideoRenderController.close(id: id);
-      }
-    }
-    for (var entry in advancedPeerConnection.remoteVideoRenders.entries) {
-      String id = entry.key;
-      var render = entry.value;
-      var videoRenders = remoteVideoRenderController.videoRenders;
-      if (!videoRenders.containsKey(id)) {
-        remoteVideoRenderController.close(id: id);
-      }
-    }
+    videoRenderControllers.remove(advancedPeerConnection.basePeerConnection.id);
   }
 }
 
