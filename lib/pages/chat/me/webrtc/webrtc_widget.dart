@@ -1,17 +1,16 @@
+import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/me/webrtc/data_channel_widget.dart';
+import 'package:colla_chat/pages/chat/me/webrtc/get_display_media_widget.dart';
+import 'package:colla_chat/pages/chat/me/webrtc/get_user_media_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_widget.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
+import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../l10n/localization.dart';
-import '../../../../provider/app_data_provider.dart';
-import '../../../../provider/index_widget_provider.dart';
-import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/common/widget_mixin.dart';
-import '../../../../widgets/data_bind/data_listtile.dart';
-import '../../../../widgets/data_bind/data_listview.dart';
-import 'data_channel_widget.dart';
-import 'get_display_media_widget.dart';
-import 'get_user_media_widget.dart';
 
 final List<TileData> webrtcTileData = [
   TileData(

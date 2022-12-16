@@ -1,15 +1,5 @@
-import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
-import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/geolocator_util.dart';
-import 'package:colla_chat/tool/image_util.dart';
-import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:flutter/material.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 
 ///消息体：回复消息
 class ChatReceiptMessage extends StatelessWidget {
