@@ -1,16 +1,15 @@
 import 'dart:core';
 
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/screen_select_dialog.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/app_bar_widget.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-
-import '../../../../l10n/localization.dart';
-import '../../../../provider/app_data_provider.dart';
-import '../../../../transport/webrtc/peer_video_render.dart';
-import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/common/app_bar_widget.dart';
-import '../../../../widgets/common/widget_mixin.dart';
 
 class GetDisplayMediaWidget extends StatefulWidget with TileDataMixin {
   const GetDisplayMediaWidget({Key? key}) : super(key: key);

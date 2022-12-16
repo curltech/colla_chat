@@ -5,12 +5,12 @@ import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../transport/webrtc/advanced_peer_connection.dart';
-import '../../../../widgets/common/widget_mixin.dart';
 
 /// 连接建立示例
 class DataChannelWidget extends StatefulWidget with TileDataMixin {
