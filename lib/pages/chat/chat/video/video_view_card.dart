@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 
 ///多个视频窗口的排列
 class VideoViewCard extends StatefulWidget {
-  final VideoRenderController controller;
+  final List<PeerVideoRender> videoRenders;
   final Color? color;
 
-  const VideoViewCard({Key? key, required this.controller, this.color})
+  const VideoViewCard({Key? key, required this.videoRenders, this.color})
       : super(key: key);
 
   @override
@@ -16,10 +16,16 @@ class VideoViewCard extends StatefulWidget {
 }
 
 class _VideoViewCardState extends State<VideoViewCard> {
+  late int crossAxisCount;
+
   @override
   initState() {
     super.initState();
-    widget.controller.addListener(_update);
+    if (widget.videoRenders.length == 1) {
+      crossAxisCount = 1;
+    } else {
+      crossAxisCount = 2;
+    }
   }
 
   _update() {
@@ -27,10 +33,9 @@ class _VideoViewCardState extends State<VideoViewCard> {
   }
 
   Widget _buildVideoViews(BuildContext context, BoxConstraints constraints) {
-    Map<String, PeerVideoRender> renders = widget.controller.videoRenders();
     //logger.i('VideoRenderController videoRenders length:${renders.length}');
     List<Widget> videoViews = [];
-    for (var render in renders.values) {
+    for (var render in widget.videoRenders) {
       Widget videoView = SingleVideoViewWidget(
           render: render,
           // width: size.width,
@@ -39,11 +44,11 @@ class _VideoViewCardState extends State<VideoViewCard> {
       videoViews.add(videoView);
     }
     return GridView.builder(
-        itemCount: renders.length,
+        itemCount: widget.videoRenders.length,
         //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             //横轴元素个数
-            crossAxisCount: widget.controller.crossAxisCount,
+            crossAxisCount: crossAxisCount,
             //纵轴间距
             mainAxisSpacing: 5.0,
             //横轴间距
@@ -66,7 +71,6 @@ class _VideoViewCardState extends State<VideoViewCard> {
 
   @override
   void dispose() {
-    widget.controller.removeListener(_update);
     super.dispose();
   }
 }

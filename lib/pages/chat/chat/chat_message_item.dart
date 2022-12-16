@@ -31,7 +31,7 @@ class ChatMessageItem extends StatefulWidget {
   }) : super(key: key) {
     messageWidget = MessageWidget(chatMessage, index);
     isMyself = messageWidget.isMyself;
-    logger.w('ChatMessageItem() chatMessage id: ${chatMessage.id}');
+    //logger.w('ChatMessageItem() chatMessage id: ${chatMessage.id}');
   }
 
   @override
@@ -46,7 +46,6 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
 
   @override
   initState() {
-    logger.i('initState chatMessage id: ${widget.chatMessage.id}');
     super.initState();
     _buildReadStatus().then((value) {
       _buildDeleteTimer();

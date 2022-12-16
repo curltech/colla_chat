@@ -632,12 +632,12 @@ class PeerConnectionPool {
     peerConnectionsController.modify(event.peerId, clientId: event.clientId);
   }
 
-  removeStream(String peerId, MediaStream stream,
+  _removeLocalStream(String peerId, MediaStream stream,
       {required String clientId}) async {
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null) {
-      await advancedPeerConnection.removeStream(stream);
+      await advancedPeerConnection.removeLocalStream(stream);
     }
   }
 
@@ -670,12 +670,23 @@ class PeerConnectionPool {
     return PeerConnectionStatus.none;
   }
 
-  Map<String, PeerVideoRender>? videoRenders(String peerId,
+  Map<String, PeerVideoRender>? localVideoRenders(String peerId,
       {required String clientId}) {
     AdvancedPeerConnection? advancedPeerConnection =
         peerConnectionPool.getOne(peerId, clientId: clientId);
     if (advancedPeerConnection != null) {
-      return advancedPeerConnection.videoRenders;
+      return advancedPeerConnection.localVideoRenders;
+    }
+
+    return null;
+  }
+
+  Map<String, PeerVideoRender>? remoteVideoRenders(String peerId,
+      {required String clientId}) {
+    AdvancedPeerConnection? advancedPeerConnection =
+        peerConnectionPool.getOne(peerId, clientId: clientId);
+    if (advancedPeerConnection != null) {
+      return advancedPeerConnection.remoteVideoRenders;
     }
 
     return null;
@@ -698,8 +709,8 @@ class PeerConnectionPool {
             messageType: ChatMessageType.system,
             subMessageType: ChatMessageSubType.signal);
         await chatMessageService.sendAndStore(chatMessage);
-        logger.w(
-            'sent signal chatMessage by webrtc peerId:$peerId, clientId:$clientId, signal:$jsonStr');
+        // logger.w(
+        //     'sent signal chatMessage by webrtc peerId:$peerId, clientId:$clientId, signal:$jsonStr');
       } else {
         var result = await signalAction.signal(evt.data, peerId,
             targetClientId: clientId);

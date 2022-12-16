@@ -172,13 +172,13 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       if (advancedPeerConnection != null &&
           advancedPeerConnection.status == PeerConnectionStatus.connected) {
         return VideoViewCard(
-          controller: localMediaController,
+          videoRenders: localMediaController.localVideoRenders().values.toList(),
           color: widget.color,
         );
       }
     } else if (partyType == PartyType.group.name) {
       return VideoViewCard(
-        controller: localMediaController,
+        videoRenders: localMediaController.localVideoRenders().values.toList(),
         color: widget.color,
       );
     }
