@@ -1,9 +1,9 @@
 import 'dart:core';
 
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/chat/controller/local_media_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
@@ -50,8 +50,8 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   // Platform messages are asynchronous, so we initialize in an async method.
   void _makeCall() async {
     try {
-      await localMediaController.createVideoRender(videoMedia: true);
-      List<PeerVideoRender> renders = localMediaController
+      await localVideoRenderController.createVideoRender(videoMedia: true);
+      List<PeerVideoRender> renders = localVideoRenderController
           .videoRenderController.videoRenders.values
           .toList();
       if (renders.isNotEmpty) {
@@ -70,7 +70,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
 
   void _hangUp() async {
     try {
-      localMediaController.videoRenderController.close();
+      localVideoRenderController.videoRenderController.close();
       setState(() {
         _inCalling = false;
       });
