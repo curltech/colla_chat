@@ -28,37 +28,33 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 final List<ActionData> actionData = [
   ActionData(
-      label: 'Minimize',
-      tooltip: 'Minimize view',
-      icon: const Icon(Icons.zoom_in_map)),
-  ActionData(
       label: 'Video chat',
       tooltip: 'Video chat',
-      icon: const Icon(Icons.video_call)),
+      icon: const Icon(Icons.video_call, color: Colors.white)),
   ActionData(
       label: 'Audio chat',
       tooltip: 'Audio chat',
-      icon: const Icon(Icons.multitrack_audio_outlined)),
+      icon: const Icon(Icons.multitrack_audio_outlined, color: Colors.white)),
   ActionData(
       label: 'Screen share',
       tooltip: 'Screen share',
-      icon: const Icon(Icons.screen_share)),
+      icon: const Icon(Icons.screen_share, color: Colors.white)),
   ActionData(
       label: 'Media play',
       tooltip: 'Media play',
-      icon: const Icon(Icons.video_file)),
+      icon: const Icon(Icons.video_file, color: Colors.white)),
   ActionData(
       label: 'Camera switch',
       tooltip: 'Camera switch',
-      icon: const Icon(Icons.cameraswitch)),
+      icon: const Icon(Icons.cameraswitch, color: Colors.white)),
   ActionData(
       label: 'Microphone',
       tooltip: 'Microphone switch',
-      icon: const Icon(Icons.mic_rounded)),
+      icon: const Icon(Icons.mic_rounded, color: Colors.white)),
   ActionData(
       label: 'Speaker',
       tooltip: 'Speaker switch',
-      icon: const Icon(Icons.speaker_phone)),
+      icon: const Icon(Icons.speaker_phone, color: Colors.white)),
 ];
 
 ///本地视频通话显示和拨出的窗口，显示多个小视频窗口，每个小窗口代表一个对方，其中一个是自己
@@ -102,8 +98,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       logger.e('chatSummary is null');
     }
   }
-
-
 
   _open(
       {MediaStream? stream,
@@ -156,13 +150,13 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   _close() {
-    localMediaController.close();
+    localMediaController.videoRenderController.close();
     chatMessageController.chatView = ChatView.text;
     setState(() {});
   }
 
   ///视频视图
-  Widget _buildVideoViewCard(BuildContext context) {
+  Widget _buildVideoView(BuildContext context) {
     if (peerId == null) {
       return Container();
     }
@@ -172,13 +166,13 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       if (advancedPeerConnection != null &&
           advancedPeerConnection.status == PeerConnectionStatus.connected) {
         return VideoViewCard(
-          videoRenders: localMediaController.localVideoRenders().values.toList(),
           color: widget.color,
+          videoRenderController: localMediaController.videoRenderController,
         );
       }
     } else if (partyType == PartyType.group.name) {
       return VideoViewCard(
-        videoRenders: localMediaController.localVideoRenders().values.toList(),
+        videoRenderController: localMediaController.videoRenderController,
         color: widget.color,
       );
     }
@@ -221,6 +215,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         height: height,
         onPressed: _onAction,
         crossAxisCount: 4,
+        labelColor: Colors.white,
       ),
     );
   }
@@ -277,8 +272,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   Widget _buildGestureDetector(BuildContext context) {
     return GestureDetector(
-      child: _buildVideoViewCard(context),
-      onTap: () {
+      child: _buildVideoView(context),
+      onLongPress: () {
         _toggleActionCard();
         //focusNode.requestFocus();
       },

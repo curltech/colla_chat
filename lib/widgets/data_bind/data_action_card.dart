@@ -45,6 +45,7 @@ class DataActionCard extends StatelessWidget {
   final double crossAxisSpacing;
   final double childAspectRatio;
   final double size;
+  final Color? labelColor;
   final Function(int index, String label, {String? value})? onPressed;
 
   const DataActionCard({
@@ -57,6 +58,7 @@ class DataActionCard extends StatelessWidget {
     this.crossAxisSpacing = 5.0,
     this.childAspectRatio = 4 / 3,
     this.size = 32,
+    this.labelColor = Colors.black,
     this.width,
   }) : super(key: key);
 
@@ -76,7 +78,7 @@ class DataActionCard extends StatelessWidget {
         },
         text: label,
         tooltip: tooltip,
-        textColor: Colors.black,
+        textColor: labelColor,
         icon: actionData.icon);
   }
 
@@ -127,7 +129,7 @@ class DataActionCard extends StatelessWidget {
           }
         },
         text: label,
-        textColor: Colors.black,
+        textColor: labelColor,
         icon: actionData.icon);
   }
 
@@ -158,8 +160,8 @@ class DataActionCard extends StatelessWidget {
         const SizedBox(height: 5.0),
         Text(
           label,
-          style: const TextStyle(
-            color: Colors.black,
+          style: TextStyle(
+            color: labelColor,
           ),
         ),
       ],

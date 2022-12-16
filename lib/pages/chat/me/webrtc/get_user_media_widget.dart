@@ -51,8 +51,9 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   void _makeCall() async {
     try {
       await localMediaController.createVideoRender(videoMedia: true);
-      List<PeerVideoRender> renders =
-          localMediaController.localVideoRenders().values.toList();
+      List<PeerVideoRender> renders = localMediaController
+          .videoRenderController.videoRenders.values
+          .toList();
       if (renders.isNotEmpty) {
         render = renders[0];
         await render!.enumerateDevices();
@@ -69,7 +70,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
 
   void _hangUp() async {
     try {
-      localMediaController.close();
+      localMediaController.videoRenderController.close();
       setState(() {
         _inCalling = false;
       });

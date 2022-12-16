@@ -9,35 +9,89 @@ import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-abstract class VideoRenderController with ChangeNotifier {
-  Map<String, PeerVideoRender> localVideoRenders(
-      {String? peerId, String? clientId});
+class VideoRenderController with ChangeNotifier {
+  PeerVideoRender? _videoRender;
+  final Map<String, PeerVideoRender> videoRenders = {};
 
-  Map<String, PeerVideoRender> remoteVideoRenders(
-      {String? peerId, String? clientId});
+  PeerVideoRender? get videoRender {
+    return _videoRender;
+  }
 
-  close({String? id});
+  set videoRender(PeerVideoRender? videoRender) {
+    if (_videoRender != videoRender) {
+      _videoRender = videoRender;
+    }
+  }
+
+  Map<String, PeerVideoRender> getVideoRenders(
+      {String? peerId, String? clientId}) {
+    if (peerId == null && clientId == null) {
+      return this.videoRenders;
+    }
+    Map<String, PeerVideoRender> videoRenders = {};
+    for (var videoRender in this.videoRenders.values) {
+      if (peerId != null && peerId == videoRender.peerId) {
+        if (clientId != null) {
+          if (clientId == videoRender.clientId) {
+            if (videoRender.id != null) {
+              videoRenders[videoRender.id!] = videoRender;
+            }
+          }
+        } else {
+          if (videoRender.id != null) {
+            videoRenders[videoRender.id!] = videoRender;
+          }
+        }
+      }
+    }
+    return videoRenders;
+  }
+
+  put(PeerVideoRender videoRender) {
+    if (videoRender.id != null) {
+      videoRenders[videoRender.id!] = videoRender;
+    }
+  }
+
+
+  close({String? id}) {
+    if (id == null) {
+      for (var videoRender in videoRenders.values) {
+        videoRender.dispose();
+      }
+      videoRenders.clear();
+      _videoRender = null;
+    } else {
+      var videoRender = videoRenders[id];
+      if (videoRender != null) {
+        videoRender.dispose();
+        videoRenders.remove(id);
+        if (_videoRender != null && _videoRender!.id == id) {
+          _videoRender = null;
+        }
+      }
+    }
+    notifyListeners();
+  }
 }
 
 ///本地媒体通话控制器，内部数据为视频通话的请求消息，和回执消息
-class LocalMediaController extends VideoRenderController {
-  PeerVideoRender? _videoRender;
-
-  final Map<String, PeerVideoRender> _videoRenders = {};
+class LocalMediaController with ChangeNotifier {
+  VideoRenderController videoRenderController = VideoRenderController();
 
   Future<PeerVideoRender> createVideoRender(
       {MediaStream? stream,
       bool videoMedia = false,
       bool audioMedia = false,
       bool displayMedia = false}) async {
-    if (_videoRender != null) {
+    if (videoRenderController.videoRender != null) {
       if (videoMedia || audioMedia) {
-        return _videoRender!;
+        return videoRenderController.videoRender!;
       }
     }
     if (stream != null) {
       var streamId = stream.id;
-      var videoRender = _videoRenders[streamId];
+      var videoRender = videoRenderController.videoRenders[streamId];
       if (videoRender != null) {
         return videoRender;
       }
@@ -50,49 +104,16 @@ class LocalMediaController extends VideoRenderController {
         audioMedia: audioMedia,
         displayMedia: displayMedia);
     if (audioMedia || videoMedia) {
-      _videoRender = render;
+      videoRenderController.videoRender = render;
     }
     await render.bindRTCVideoRender();
-    _videoRenders[render.id!] = render;
+    videoRenderController.put(render);
     render.peerId = myself.peerId;
     render.name = myself.name;
     render.clientId = myself.clientId;
     notifyListeners();
 
     return render;
-  }
-
-  @override
-  Map<String, PeerVideoRender> localVideoRenders(
-      {String? peerId, String? clientId}) {
-    return _videoRenders;
-  }
-
-  @override
-  Map<String, PeerVideoRender> remoteVideoRenders(
-      {String? peerId, String? clientId}) {
-    return {};
-  }
-
-  @override
-  close({String? id}) {
-    if (id == null) {
-      for (var videoRender in _videoRenders.values) {
-        videoRender.dispose();
-      }
-      _videoRenders.clear();
-      _videoRender = null;
-    } else {
-      var videoRender = _videoRenders[id];
-      if (videoRender != null) {
-        videoRender.dispose();
-        _videoRenders.remove(id);
-        if (_videoRender != null && _videoRender!.id == id) {
-          _videoRender = null;
-        }
-      }
-    }
-    notifyListeners();
   }
 }
 
@@ -190,7 +211,7 @@ class VideoChatReceiptController with ChangeNotifier {
       //与发送者的连接存在，将本地的视频render加入连接中
       if (advancedPeerConnection != null) {
         Map<String, PeerVideoRender> videoRenders =
-            localMediaController.localVideoRenders();
+            localMediaController.videoRenderController.getVideoRenders();
         for (var render in videoRenders.values) {
           await advancedPeerConnection.addLocalRender(render);
         }
@@ -201,7 +222,7 @@ class VideoChatReceiptController with ChangeNotifier {
         chatMessageController.chatView = ChatView.video;
       }
     } else if (status == MessageStatus.rejected.name) {
-      await localMediaController.close();
+      await localMediaController.videoRenderController.close();
       chatMessageController.chatView = ChatView.text;
     }
   }
