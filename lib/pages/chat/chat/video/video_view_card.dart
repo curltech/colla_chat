@@ -5,10 +5,11 @@ import 'package:flutter/material.dart';
 
 ///多个视频窗口的排列
 class VideoViewCard extends StatefulWidget {
-  final List<PeerVideoRender> videoRenders;
+  final VideoRenderController videoRenderController;
   final Color? color;
 
-  const VideoViewCard({Key? key, required this.videoRenders, this.color})
+  const VideoViewCard(
+      {Key? key, required this.videoRenderController, this.color})
       : super(key: key);
 
   @override
@@ -16,16 +17,9 @@ class VideoViewCard extends StatefulWidget {
 }
 
 class _VideoViewCardState extends State<VideoViewCard> {
-  late int crossAxisCount;
-
   @override
   initState() {
     super.initState();
-    if (widget.videoRenders.length == 1) {
-      crossAxisCount = 1;
-    } else {
-      crossAxisCount = 2;
-    }
   }
 
   _update() {
@@ -33,9 +27,14 @@ class _VideoViewCardState extends State<VideoViewCard> {
   }
 
   Widget _buildVideoViews(BuildContext context, BoxConstraints constraints) {
-    //logger.i('VideoRenderController videoRenders length:${renders.length}');
+    List<PeerVideoRender> videoRenders =
+        widget.videoRenderController.videoRenders.values.toList();
+    int crossAxisCount = 1;
+    if (videoRenders.length > 1) {
+      crossAxisCount = 2;
+    }
     List<Widget> videoViews = [];
-    for (var render in widget.videoRenders) {
+    for (var render in videoRenders) {
       Widget videoView = SingleVideoViewWidget(
           render: render,
           // width: size.width,
@@ -44,7 +43,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
       videoViews.add(videoView);
     }
     return GridView.builder(
-        itemCount: widget.videoRenders.length,
+        itemCount: videoRenders.length,
         //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             //横轴元素个数
