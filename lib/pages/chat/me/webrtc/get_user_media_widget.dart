@@ -53,7 +53,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
     try {
       await localMediaController.createVideoRender(videoMedia: true);
       List<PeerVideoRender> renders =
-          localMediaController.videoRenders().values.toList();
+          localMediaController.localVideoRenders().values.toList();
       if (renders.isNotEmpty) {
         render = renders[0];
         await render!.enumerateDevices();

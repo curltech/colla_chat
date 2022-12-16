@@ -43,23 +43,23 @@ class VideoDialInWidget extends StatelessWidget {
       if (receiptType == MessageStatus.accepted) {
         var peerId = chatReceipt.receiverPeerId!;
         var clientId = chatReceipt.receiverClientId!;
-        List<PeerVideoRender> renders = [];
+        List<PeerVideoRender> localRenders = [];
         //根据title来判断是请求音频还是视频
         String? title = chatMessage.title;
         if (title == ContentType.audio.name) {
           var render =
               await localMediaController.createVideoRender(audioMedia: true);
-          renders.add(render);
+          localRenders.add(render);
         } else {
           if (videoMedia) {
             var render =
                 await localMediaController.createVideoRender(videoMedia: true);
-            renders.add(render);
+            localRenders.add(render);
           }
           if (displayMedia) {
             var render = await localMediaController.createVideoRender(
                 displayMedia: true);
-            renders.add(render);
+            localRenders.add(render);
           }
         }
 
@@ -74,9 +74,9 @@ class VideoDialInWidget extends StatelessWidget {
           if (chatSummary != null) {
             chatMessageController.chatSummary = chatSummary;
           }
-          if (renders.isNotEmpty) {
-            for (var render in renders) {
-              await advancedPeerConnection.addRender(render);
+          if (localRenders.isNotEmpty) {
+            for (var render in localRenders) {
+              await advancedPeerConnection.addLocalRender(render);
             }
           }
           peerConnectionsController.addPeerConnection(peerId,

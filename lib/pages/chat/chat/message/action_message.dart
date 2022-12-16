@@ -30,18 +30,18 @@ class ActionMessage extends StatelessWidget {
                   Icons.video_call,
                   color: primary,
                 ),
-                const SizedBox(width: 5,),
-                Expanded(
-                  child: ExtendedText(
+                const SizedBox(
+                  width: 5,
+                ),
+                 Text(
                     AppLocalizations.t('Video chat invitation'),
                     key: UniqueKey(),
                     style: const TextStyle(
                         //color: isMyself ? Colors.white : Colors.black,
                         //fontSize: 16.0,
                         ),
-                    specialTextSpanBuilder: customSpecialTextSpanBuilder,
+                    //specialTextSpanBuilder: customSpecialTextSpanBuilder,
                   ),
-                ),
               ])));
     }
     if (subMessageType == ChatMessageSubType.addFriend) {
@@ -54,16 +54,18 @@ class ActionMessage extends StatelessWidget {
                   Icons.person_add,
                   color: primary,
                 ),
-                const SizedBox(width: 5,),
+                const SizedBox(
+                  width: 5,
+                ),
                 Expanded(
-                  child: ExtendedText(
+                  child: Text(
                     AppLocalizations.t('Add friend'),
                     key: UniqueKey(),
                     style: const TextStyle(
                         //color: isMyself ? Colors.white : Colors.black,
                         //fontSize: 16.0,
                         ),
-                    specialTextSpanBuilder: customSpecialTextSpanBuilder,
+                    //specialTextSpanBuilder: customSpecialTextSpanBuilder,
                   ),
                 ),
               ])));

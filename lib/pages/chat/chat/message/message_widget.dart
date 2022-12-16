@@ -9,6 +9,7 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.da
 import 'package:colla_chat/pages/chat/chat/message/action_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/audio_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/cancel_message.dart';
+import 'package:colla_chat/pages/chat/chat/message/chat_receipt_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/extended_text_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/file_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/image_message.dart';
@@ -142,6 +143,8 @@ class MessageWidget {
       body = buildActionMessageWidget(context, subMessageType!);
     } else if (subMessageType == ChatMessageSubType.cancel) {
       body = buildCancelMessageWidget(context, chatMessage.content!);
+    } else if (subMessageType == ChatMessageSubType.chatReceipt) {
+      body = buildChatReceiptMessageWidget(context, chatMessage.content!);
     } else {
       body = Container();
     }
@@ -250,6 +253,14 @@ class MessageWidget {
 
   CancelMessage buildCancelMessageWidget(BuildContext context, String content) {
     return CancelMessage(
+      key: UniqueKey(),
+      isMyself: isMyself,
+      content: content,
+    );
+  }
+
+  ChatReceiptMessage buildChatReceiptMessageWidget(BuildContext context, String content) {
+    return ChatReceiptMessage(
       key: UniqueKey(),
       isMyself: isMyself,
       content: content,

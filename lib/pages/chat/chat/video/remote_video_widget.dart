@@ -31,7 +31,8 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
 
   Widget _buildVideoViewCard(BuildContext context) {
     return VideoViewCard(
-      controller: peerConnectionsController,
+      videoRenders:
+          peerConnectionsController.remoteVideoRenders().values.toList(),
     );
   }
 

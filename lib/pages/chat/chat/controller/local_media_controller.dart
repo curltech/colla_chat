@@ -10,24 +10,11 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 abstract class VideoRenderController with ChangeNotifier {
-  int _crossAxisCount = 2;
+  Map<String, PeerVideoRender> localVideoRenders(
+      {String? peerId, String? clientId});
 
-  Map<String, PeerVideoRender> videoRenders({String? peerId, String? clientId});
-
-  //横向几个video
-  int get crossAxisCount {
-    if (videoRenders().length == 1) {
-      return 1;
-    }
-    return _crossAxisCount;
-  }
-
-  set crossAxisCount(int crossAxisCount) {
-    if (_crossAxisCount != crossAxisCount) {
-      _crossAxisCount = crossAxisCount;
-      notifyListeners();
-    }
-  }
+  Map<String, PeerVideoRender> remoteVideoRenders(
+      {String? peerId, String? clientId});
 
   close({String? id});
 }
@@ -76,9 +63,15 @@ class LocalMediaController extends VideoRenderController {
   }
 
   @override
-  Map<String, PeerVideoRender> videoRenders(
+  Map<String, PeerVideoRender> localVideoRenders(
       {String? peerId, String? clientId}) {
     return _videoRenders;
+  }
+
+  @override
+  Map<String, PeerVideoRender> remoteVideoRenders(
+      {String? peerId, String? clientId}) {
+    return {};
   }
 
   @override
@@ -197,9 +190,9 @@ class VideoChatReceiptController with ChangeNotifier {
       //与发送者的连接存在，将本地的视频render加入连接中
       if (advancedPeerConnection != null) {
         Map<String, PeerVideoRender> videoRenders =
-            localMediaController.videoRenders();
+            localMediaController.localVideoRenders();
         for (var render in videoRenders.values) {
-          await advancedPeerConnection.addRender(render);
+          await advancedPeerConnection.addLocalRender(render);
         }
         //本地视频render加入后，发起重新协商
         await advancedPeerConnection.negotiate();

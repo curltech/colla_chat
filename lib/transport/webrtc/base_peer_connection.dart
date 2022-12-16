@@ -256,8 +256,11 @@ class BasePeerConnection {
   //是否需要主动建立数据通道
   bool needDataChannel = true;
 
+  //本地媒体流渲染器数组
+  Map<String, MediaStream> localStreams = {};
+
   //远程媒体流渲染器数组，在onAddStream,onAddTrack等的回调方法中得到
-  Map<String, MediaStream> streams = {};
+  Map<String, MediaStream> remoteStreams = {};
 
   //媒体流的轨道，流和发送者之间的关系
   Map<String, Map<String, MediaStreamTrack>> tracks = {};
@@ -321,7 +324,7 @@ class BasePeerConnection {
     RTCPeerConnection peerConnection = this.peerConnection!;
     if (localStreams.isNotEmpty) {
       for (var localStream in localStreams) {
-        await addStream(localStream);
+        await addLocalStream(localStream);
       }
     }
 
@@ -380,20 +383,20 @@ class BasePeerConnection {
 
     /// 4.建立连接的监听轨道到来的监听器，当远方由轨道来的时候执行
     peerConnection.onAddStream = (MediaStream stream) {
-      onAddStream(stream);
+      onAddRemoteStream(stream);
     };
     peerConnection.onRemoveStream = (MediaStream stream) {
-      onRemoveStream(stream);
+      onRemoveRemoteStream(stream);
     };
     peerConnection.onAddTrack = (MediaStream stream, MediaStreamTrack track) {
-      onAddTrack(stream, track);
+      onAddRemoteTrack(stream, track);
     };
     peerConnection.onRemoveTrack =
         (MediaStream stream, MediaStreamTrack track) {
-      onRemoveTrack(stream, track);
+      onRemoveRemoteTrack(stream, track);
     };
     peerConnection.onTrack = (RTCTrackEvent event) {
-      onTrack(event);
+      onRemoteTrack(event);
     };
     status = PeerConnectionStatus.init;
 
@@ -856,40 +859,58 @@ class BasePeerConnection {
   }
 
   ///增加本地流到本地集合
-  bool _addStream(MediaStream stream) {
+  bool _addLocalStream(MediaStream stream) {
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return false;
     }
     var id = stream.id;
-    if (streams.containsKey(id)) {
+    if (localStreams.containsKey(id)) {
       return false;
     }
-    streams[id] = stream;
-    logger.i('BasePeerConnection _addStream:$id');
+    localStreams[id] = stream;
+    logger.i('BasePeerConnection _addLocalStream:$id');
     var tracks = stream.getTracks();
     for (var track in tracks) {
-      _addTrack(stream, track);
+      _addLocalTrack(stream, track);
+    }
+    return true;
+  }
+
+  bool _addRemoteStream(MediaStream stream) {
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return false;
+    }
+    var id = stream.id;
+    if (remoteStreams.containsKey(id)) {
+      return false;
+    }
+    remoteStreams[id] = stream;
+    logger.i('BasePeerConnection _addRemoteStream:$id');
+    var tracks = stream.getTracks();
+    for (var track in tracks) {
+      _addRemoteTrack(stream, track);
     }
     return true;
   }
 
   ///主动创建新的MediaStream，从连接中增加本地流，只能在init方法中调用
-  Future<bool> addStream(MediaStream stream) async {
+  Future<bool> addLocalStream(MediaStream stream) async {
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return false;
     }
     try {
-      bool success = _addStream(stream);
+      bool success = _addLocalStream(stream);
       if (success) {
         RTCPeerConnection peerConnection = this.peerConnection!;
         await peerConnection.addStream(stream);
-        logger.i('_addLocalStream ${stream.id}');
+        logger.i('addLocalStream ${stream.id}');
         return true;
       }
     } catch (e) {
-      logger.e('peer connection addStream failure, $e');
+      logger.e('peer connection addLocalStream failure, $e');
     }
 
     ///以下是另一种做法
@@ -904,7 +925,7 @@ class BasePeerConnection {
   /// 把轨道加入到流中，其目的是为了把加入远程流的本地集合，连接没有操作
   /// @param {MediaStreamTrack} track
   /// @param {MediaStream} stream
-  _addTrack(MediaStream stream, MediaStreamTrack track) {
+  _addRemoteTrack(MediaStream stream, MediaStreamTrack track) {
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -915,8 +936,8 @@ class BasePeerConnection {
       logger.e('stream:$streamId, track:$trackId is null');
       return;
     }
-    if (!streams.containsKey(streamId)) {
-      streams[streamId] = stream;
+    if (!remoteStreams.containsKey(streamId)) {
+      remoteStreams[streamId] = stream;
     }
     var streamTracks = tracks[streamId];
     if (streamTracks == null) {
@@ -924,21 +945,44 @@ class BasePeerConnection {
       tracks[streamId] = streamTracks;
     }
     streamTracks[trackId] = track;
-    logger.i('_addTrack stream:${stream.id}, track:${track.id}');
+    logger.i('_addRemoteTrack stream:${stream.id}, track:${track.id}');
+  }
+
+  _addLocalTrack(MediaStream stream, MediaStreamTrack track) {
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return;
+    }
+    String streamId = stream.id;
+    String? trackId = track.id;
+    if (trackId == null) {
+      logger.e('stream:$streamId, track:$trackId is null');
+      return;
+    }
+    if (!localStreams.containsKey(streamId)) {
+      localStreams[streamId] = stream;
+    }
+    var streamTracks = tracks[streamId];
+    if (streamTracks == null) {
+      streamTracks = {};
+      tracks[streamId] = streamTracks;
+    }
+    streamTracks[trackId] = track;
+    logger.i('_addLocalTrack stream:${stream.id}, track:${track.id}');
   }
 
   /// 把轨道加入到流中，其目的是为了把本地流轨道加入本地集合，只能通过init方法调用_addStream方法，再调用本方法
   /// @param {MediaStreamTrack} track
   /// @param {MediaStream} stream
-  addTrack(MediaStream stream, MediaStreamTrack track) async {
+  addLocalTrack(MediaStream stream, MediaStreamTrack track) async {
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    logger.i('addTrack stream:${stream.id}, track:${track.id}');
+    logger.i('addLocalTrack stream:${stream.id}, track:${track.id}');
     String streamId = stream.id;
     String? trackId = track.id;
-    _addTrack(stream, track);
+    _addLocalTrack(stream, track);
 
     RTCPeerConnection peerConnection = this.peerConnection!;
     var streamSenders = trackSenders[trackId!];
@@ -1044,14 +1088,14 @@ class BasePeerConnection {
 
   /// 主动从连接中移除流，然后会激活onRemoveStream
   /// @param {MediaStream} stream
-  _removeStream(MediaStream stream) async {
-    logger.i('removeStream stream:${stream.id}');
+  _removeLocalStream(MediaStream stream) async {
+    logger.i('_removeLocalStream stream:${stream.id}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
     }
     var id = stream.id;
-    if (streams.containsKey(id)) {
+    if (localStreams.containsKey(id)) {
       RTCPeerConnection? peerConnection = this.peerConnection;
       if (peerConnection != null) {
         await peerConnection.removeStream(stream);
@@ -1065,60 +1109,81 @@ class BasePeerConnection {
 
   /// 主动从连接中移除流，然后会激活onRemoveStream
   /// @param {MediaStream} stream
-  removeStream(MediaStream stream) async {
-    logger.i('removeStream stream:${stream.id}');
+  _removeRemoteStream(MediaStream stream) async {
+    logger.i('_removeRemoteStream stream:${stream.id}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
     }
     var id = stream.id;
-    if (streams.containsKey(id)) {
+    if (remoteStreams.containsKey(id)) {
       RTCPeerConnection? peerConnection = this.peerConnection;
       if (peerConnection != null) {
         await peerConnection.removeStream(stream);
       }
-      _removeStream(stream);
+      var tracks = stream.getTracks();
+      for (var track in tracks) {
+        removeTrack(stream, track);
+      }
+    }
+  }
+
+  /// 主动从连接中移除流，然后会激活onRemoveStream
+  /// @param {MediaStream} stream
+  removeLocalStream(MediaStream stream) async {
+    logger.i('removeLocalStream stream:${stream.id}');
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return;
+    }
+    var id = stream.id;
+    if (localStreams.containsKey(id)) {
+      RTCPeerConnection? peerConnection = this.peerConnection;
+      if (peerConnection != null) {
+        await peerConnection.removeStream(stream);
+      }
+      _removeLocalStream(stream);
     }
   }
 
   ///对远端的连接来说，当有stream或者track到来时触发
   ///什么都不做，由onAddTrack事件处理
-  onAddStream(MediaStream stream) {
-    logger.i('onAddStream stream:${stream.id}');
-    _addStream(stream);
+  onAddRemoteStream(MediaStream stream) {
+    logger.i('onAddRemoteStream stream:${stream.id}');
+    _addRemoteStream(stream);
     emit(WebrtcEventType.stream, stream);
   }
 
-  onRemoveStream(MediaStream stream) {
-    logger.i('onRemoveStream stream:${stream.id}');
-    _removeStream(stream);
+  onRemoveRemoteStream(MediaStream stream) {
+    logger.i('onRemoveRemoteStream stream:${stream.id}');
+    _removeRemoteStream(stream);
     emit(WebrtcEventType.removeStream, stream);
   }
 
   ///对远端的连接来说，当有stream或者track到来时触发
-  onAddTrack(MediaStream stream, MediaStreamTrack track) {
-    logger.i('onAddTrack stream:${stream.id}, track:${track.id}');
-    _addTrack(stream, track);
+  onAddRemoteTrack(MediaStream stream, MediaStreamTrack track) {
+    logger.i('onAddRemoteTrack stream:${stream.id}, track:${track.id}');
+    _addRemoteTrack(stream, track);
     emit(WebrtcEventType.addTrack, {'stream': stream, 'track': track});
   }
 
-  onRemoveTrack(MediaStream stream, MediaStreamTrack track) {
-    logger.i('onRemoveTrack stream:${stream.id}, track:${track.id}');
+  onRemoveRemoteTrack(MediaStream stream, MediaStreamTrack track) {
+    logger.i('onRemoveRemoteTrack stream:${stream.id}, track:${track.id}');
     _removeTrack(stream, track);
     emit(WebrtcEventType.removeTrack, {'stream': stream, 'track': track});
   }
 
   ///连接的监听轨道到来的监听器，当远方由轨道来的时候执行
-  onTrack(RTCTrackEvent event) {
-    logger.i('onTrack event');
+  onRemoteTrack(RTCTrackEvent event) {
+    logger.i('onRemoteTrack event');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
     }
 
     for (var eventStream in event.streams) {
-      logger.i('onTrack event stream:${eventStream.id}');
-      onAddStream(eventStream);
+      logger.i('onRemoteTrack event stream:${eventStream.id}');
+      onAddRemoteStream(eventStream);
       emit(WebrtcEventType.stream, eventStream);
     }
     emit(WebrtcEventType.track, event);
@@ -1228,7 +1293,8 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    streams = {};
+    localStreams.clear();
+    remoteStreams.clear();
     //trackSenders = {};
     final dataChannel = this.dataChannel;
     if (dataChannel != null) {
