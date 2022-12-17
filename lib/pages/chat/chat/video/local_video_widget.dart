@@ -77,15 +77,14 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   String? name;
   String partyType = PartyType.linkman.name;
 
-  //final focusNode = FocusNode();
-  ValueNotifier<bool> actionCardVisible =
-      ValueNotifier<bool>(false); // position to false;
+  ValueNotifier<bool> actionCardVisible = ValueNotifier<bool>(true);
   Timer? _hidePanelTimer;
 
   @override
   void initState() {
     super.initState();
     _init();
+    localVideoRenderController.addListener(_update);
   }
 
   _init() async {
@@ -97,6 +96,10 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     } else {
       logger.e('chatSummary is null');
     }
+  }
+
+  _update() {
+    _toggleActionCard();
   }
 
   _open(
@@ -226,18 +229,23 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   ///切换显示按钮面板
   void _toggleActionCard() {
-    if (_hidePanelTimer != null) {
-      _hidePanelTimer?.cancel();
-      actionCardVisible.value = false;
-      _hidePanelTimer = null;
-    } else {
+    int count = localVideoRenderController.videoRenders.length;
+    if (count == 0) {
       actionCardVisible.value = true;
-      _hidePanelTimer?.cancel();
-      _hidePanelTimer = Timer(const Duration(seconds: 15), () {
-        if (!mounted) return;
+    } else {
+      if (_hidePanelTimer != null) {
+        _hidePanelTimer?.cancel();
         actionCardVisible.value = false;
         _hidePanelTimer = null;
-      });
+      } else {
+        actionCardVisible.value = true;
+        _hidePanelTimer?.cancel();
+        _hidePanelTimer = Timer(const Duration(seconds: 15), () {
+          if (!mounted) return;
+          actionCardVisible.value = false;
+          _hidePanelTimer = null;
+        });
+      }
     }
   }
 
@@ -298,7 +306,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   @override
   void dispose() {
-    //focusNode.dispose();
+    localVideoRenderController.removeListener(_update);
     super.dispose();
   }
 }

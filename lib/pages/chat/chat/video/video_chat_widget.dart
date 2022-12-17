@@ -2,22 +2,15 @@ import 'dart:async';
 
 import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/video/local_video_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/remote_video_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
-
-final List<ActionData> actionData = [
-  ActionData(
-      label: 'Minimize',
-      tooltip: 'Minimize',
-      icon: const Icon(Icons.zoom_in_map, color: Colors.white)),
-];
 
 ///视频通话窗口，分页显示本地视频和远程视频
 class VideoChatWidget extends StatefulWidget with TileDataMixin {
@@ -44,10 +37,6 @@ class VideoChatWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _VideoChatWidgetState extends State<VideoChatWidget> {
-  ValueNotifier<bool> actionCardVisible =
-      ValueNotifier<bool>(false); // position to false;
-  Timer? _hidePanelTimer;
-
   OverlayEntry? overlayEntry;
 
   @override
@@ -59,6 +48,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     if (overlayEntry != null) {
       overlayEntry!.remove();
       overlayEntry = null;
+      indexWidgetProvider.push('video_chat');
     }
   }
 
@@ -77,46 +67,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
       );
     });
     Overlay.of(context)!.insert(overlayEntry!);
-  }
-
-  Future<void> _onAction(int index, String name, {String? value}) async {
-    switch (name) {
-      case 'Minimize':
-        _minimize(context);
-        break;
-      default:
-        break;
-    }
-  }
-
-  Widget _buildActionCard(BuildContext context) {
-    double height = 80;
-    return Container(
-      margin: const EdgeInsets.all(0.0),
-      padding: const EdgeInsets.only(bottom: 0.0),
-      child: DataActionCard(
-        actions: actionData,
-        height: height,
-        onPressed: _onAction,
-        crossAxisCount: 4,
-        labelColor: Colors.white,
-      ),
-    );
-  }
-
-  ///控制面板
-  Widget _buildControlPanel(BuildContext context) {
-    return Column(children: [
-      ValueListenableBuilder<bool>(
-          valueListenable: actionCardVisible,
-          builder: (context, value, child) {
-            return Visibility(
-              visible: actionCardVisible.value,
-              child: _buildActionCard(context),
-            );
-          }),
-      const Spacer(),
-    ]);
+    indexWidgetProvider.pop();
   }
 
   Widget _buildVideoChatView(BuildContext context) {
@@ -140,39 +91,21 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     );
   }
 
-  ///切换显示按钮面板
-  void _toggleActionCard() {
-    if (_hidePanelTimer != null) {
-      _hidePanelTimer?.cancel();
-      actionCardVisible.value = false;
-      _hidePanelTimer = null;
-    } else {
-      actionCardVisible.value = true;
-      _hidePanelTimer?.cancel();
-      _hidePanelTimer = Timer(const Duration(seconds: 15), () {
-        if (!mounted) return;
-        actionCardVisible.value = false;
-        _hidePanelTimer = null;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    Widget gestureDetector = GestureDetector(
-      child: _buildVideoChatView(context),
-      onDoubleTap: () {
-        _toggleActionCard();
-        //focusNode.requestFocus();
-      },
-    );
+    List<Widget> rightWidgets = [
+      IconButton(
+          onPressed: () {
+            _minimize(context);
+          },
+          icon: const Icon(Icons.zoom_in_map)),
+    ];
     return AppBarView(
-        title: Text(AppLocalizations.t(widget.title)),
-        withLeading: true,
-        child: Stack(children: [
-          gestureDetector,
-          _buildControlPanel(context),
-        ]));
+      title: Text(AppLocalizations.t(widget.title)),
+      withLeading: true,
+      rightWidgets: rightWidgets,
+      child: _buildVideoChatView(context),
+    );
   }
 
   @override
