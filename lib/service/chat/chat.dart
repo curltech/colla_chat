@@ -405,15 +405,13 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   Future<ChatMessage> sendAndStore(ChatMessage chatMessage,
       {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     var peerId = chatMessage.receiverPeerId;
-    var clientId = chatMessage.receiverClientId;
     if (peerId != null) {
       String json = JsonUtil.toJsonString(chatMessage);
       var data = CryptoUtil.stringToUtf8(json);
       var transportType = chatMessage.transportType;
       if (transportType == TransportType.webrtc.name) {
-        bool success = await peerConnectionPool.send(
-            peerId, Uint8List.fromList(data),
-            clientId: clientId, cryptoOption: cryptoOption);
+        bool success = await peerConnectionPool
+            .send(peerId, Uint8List.fromList(data), cryptoOption: cryptoOption);
         if (!success) {
           chatMessage.transportType = TransportType.websocket.name;
         }
@@ -906,7 +904,6 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
         if (chatSummary == null) {
           chatSummary = ChatSummary();
           chatSummary.peerId = senderPeerId;
-          chatSummary.clientId = senderClientId;
           chatSummary.partyType = PartyType.linkman.name;
           chatSummary.sendReceiveTime = chatMessage.sendTime;
           Linkman? linkman =
@@ -920,7 +917,6 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
         if (chatSummary == null) {
           chatSummary = ChatSummary();
           chatSummary.peerId = receiverPeerId;
-          chatSummary.clientId = receiverClientId;
           chatSummary.partyType = PartyType.linkman.name;
           chatSummary.sendReceiveTime = chatMessage.sendTime;
           Linkman? linkman =

@@ -90,7 +90,7 @@ class GlobalChatMessageController with ChangeNotifier {
       if (chatMessage.messageType != ChatMessageType.system.name) {
         String? groupPeerId = chatMessage.groupPeerId;
         if (groupPeerId == null) {
-          chatMessageController.modify(peerId, clientId: clientId);
+          chatMessageController.modify(peerId);
         } else {
           chatMessageController.modify(groupPeerId);
         }

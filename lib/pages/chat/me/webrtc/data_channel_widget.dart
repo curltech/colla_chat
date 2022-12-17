@@ -11,7 +11,6 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
-
 /// 连接建立示例
 class DataChannelWidget extends StatefulWidget with TileDataMixin {
   final PeerConnectionPoolController controller = peerConnectionPoolController;
@@ -39,10 +38,10 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
   final TextEditingController peerIdController = TextEditingController();
   final TextEditingController clientIdController = TextEditingController();
   final TextEditingController roomController = TextEditingController();
-  String? message = '';
-  String? peerId = '';
-  String? clientId = '';
-  String? roomId = '';
+  String? message;
+  String peerId = '';
+  String clientId = '';
+  String? roomId;
 
   @override
   initState() {
@@ -66,7 +65,7 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
     AdvancedPeerConnection? advancedPeerConnection;
     if (peerId != null) {
       advancedPeerConnection =
-          peerConnectionPool.getOne(peerId!, clientId: clientId);
+          peerConnectionPool.getOne1(peerId!, clientId: clientId);
 
       return advancedPeerConnection;
     }

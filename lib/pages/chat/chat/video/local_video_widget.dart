@@ -75,7 +75,6 @@ class LocalVideoWidget extends StatefulWidget {
 class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   String? peerId;
   String? name;
-  String? clientId;
   String partyType = PartyType.linkman.name;
 
   //final focusNode = FocusNode();
@@ -94,7 +93,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (chatSummary != null) {
       peerId = chatSummary.peerId!;
       name = chatSummary.name!;
-      clientId = chatSummary.clientId;
       partyType = chatSummary.partyType!;
     } else {
       logger.e('chatSummary is null');
@@ -107,10 +105,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       bool audioMedia = false,
       bool displayMedia = false}) async {
     if (partyType == PartyType.linkman.name) {
-      AdvancedPeerConnection? advancedPeerConnection =
-          peerConnectionPool.getOne(peerId!, clientId: clientId);
-      if (advancedPeerConnection != null &&
-          advancedPeerConnection.status == PeerConnectionStatus.connected) {
+      var status = peerConnectionPool.status(peerId!);
+      if (status == PeerConnectionStatus.connected) {
         await localVideoRenderController.createVideoRender(
             stream: stream,
             videoMedia: videoMedia,
@@ -126,7 +122,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         setState(() {});
       } else {
         DialogUtil.error(context,
-            content: AppLocalizations.t('No Webrtc PeerConnection'));
+            content: AppLocalizations.t('No Webrtc connected PeerConnection'));
       }
     } else if (partyType == PartyType.group.name) {
       await localVideoRenderController.createVideoRender(
@@ -152,13 +148,15 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   _close() async {
-    AdvancedPeerConnection? pc =
-        peerConnectionsController.getAdvancedPeerConnection(peerId!, clientId!);
-    if (pc != null) {
-      for (var render in localVideoRenderController.videoRenders.values) {
-        pc.removeLocalRender(render);
+    List<AdvancedPeerConnection> pcs =
+        peerConnectionsController.getAdvancedPeerConnections(peerId!);
+    if (pcs.isNotEmpty) {
+      for (var pc in pcs) {
+        for (var render in localVideoRenderController.videoRenders.values) {
+          pc.removeLocalRender(render);
+        }
+        await pc.negotiate();
       }
-      await pc.negotiate();
     }
     chatMessageController.chatView = ChatView.text;
     setState(() {});
@@ -170,10 +168,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       return Container();
     }
     if (partyType == PartyType.linkman.name) {
-      AdvancedPeerConnection? advancedPeerConnection =
-          peerConnectionPool.getOne(peerId!, clientId: clientId);
-      if (advancedPeerConnection != null &&
-          advancedPeerConnection.status == PeerConnectionStatus.connected) {
+      var status = peerConnectionPool.status(peerId!);
+      if (status == PeerConnectionStatus.connected) {
         return VideoViewCard(
           color: widget.color,
           videoRenderController: localVideoRenderController,
