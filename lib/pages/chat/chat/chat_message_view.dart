@@ -49,9 +49,6 @@ class _ChatMessageViewState extends State<ChatMessageView> {
   String? name;
   String? partyType;
 
-  //linkman才有值
-  String? clientId;
-
   @override
   void initState() {
     super.initState();
@@ -65,7 +62,6 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     if (chatSummary != null) {
       peerId = chatSummary.peerId!;
       name = chatSummary.name!;
-      clientId = chatSummary.clientId;
       partyType = chatSummary.partyType;
     } else {
       logger.e('chatSummary is null');
@@ -91,9 +87,15 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     if (partyType == PartyType.linkman.name) {
       status = PeerConnectionStatus.none;
       if (peerId != null) {
-        var peerConnection = peerConnectionPool.getOne(peerId!);
-        if (peerConnection != null) {
-          status = peerConnection.status;
+        var peerConnections = peerConnectionPool.get(peerId!);
+        if (peerConnections.isNotEmpty) {
+          //发现一个状态为connected的就设置为connected
+          for (var peerConnection in peerConnections) {
+            status = peerConnection.status;
+            if (status == PeerConnectionStatus.connected) {
+              break;
+            }
+          }
         }
       }
     }

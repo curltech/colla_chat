@@ -336,8 +336,8 @@ class Receive extends BaseEntity {
 /// party的最新消息汇总
 /// 每次有新消息到达，则更新，每个party一条记录
 class ChatSummary extends StatusEntity {
-  String? peerId; // 接收者或者发送者的联系人或群
-  String? clientId; // 接收者或者发送者的联系人或群
+  // 聊天信息汇总没有clientId，每一条汇总对应一个peerId和多个clientId
+  String? peerId; // 接收者或者发送者的联系人或群 //String? clientId;
   String? partyType; // 接收者或者发送者类型
   String? subPartyType; //
   String? messageId; // 最新的消息Id
@@ -358,7 +358,7 @@ class ChatSummary extends StatusEntity {
 
   ChatSummary.fromJson(Map json)
       : peerId = json['peerId'],
-        clientId = json['clientId'],
+        //clientId = json['clientId'],
         partyType = json['partyType'],
         subPartyType = json['subPartyType'],
         messageId = json['messageId'],
@@ -380,8 +380,7 @@ class ChatSummary extends StatusEntity {
   Map<String, dynamic> toJson() {
     var json = super.toJson();
     json.addAll({
-      'peerId': peerId,
-      'clientId': clientId,
+      'peerId': peerId, //'clientId': clientId,
       'partyType': partyType,
       'subPartyType': subPartyType,
       'messageId': messageId,

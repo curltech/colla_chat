@@ -52,6 +52,17 @@ class PeerConnectionsController extends VideoRenderController {
     }
   }
 
+  ///获取连接
+  List<AdvancedPeerConnection> getAdvancedPeerConnections(String peerId) {
+    List<AdvancedPeerConnection> pcs = [];
+    for (var pc in _peerConnections.values) {
+      if (peerId == pc.peerId) {
+        pcs.add(pc);
+      }
+    }
+    return pcs;
+  }
+
   ///获取连接，如果返回null表示不存在
   AdvancedPeerConnection? getAdvancedPeerConnection(
       String peerId, String clientId) {

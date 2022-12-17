@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 
 /// 消息发送和接受展示的界面组件
 /// 此界面展示特定的目标对象的收到的消息，并且可以发送消息
+/// 如果目标有多个clientId的时候，对应多个peerconnection
 class ChatMessageWidget extends StatefulWidget {
   final ScrollController scrollController = ScrollController();
   final Function()? onScrollMax;
@@ -44,7 +45,6 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   late final AnimationController animateController;
   late String peerId;
   late String name;
-  String? clientId;
   late String partyType;
   bool initStatus = false;
 
@@ -75,12 +75,11 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     if (chatSummary != null) {
       peerId = chatSummary.peerId!;
       name = chatSummary.name!;
-      clientId = chatSummary.clientId;
       partyType = chatSummary.partyType!;
       if (partyType == PartyType.linkman.name) {
-        AdvancedPeerConnection? advancedPeerConnection =
-            peerConnectionPool.getOne(peerId, clientId: clientId);
-        if (advancedPeerConnection == null) {
+        List<AdvancedPeerConnection> advancedPeerConnections =
+            peerConnectionPool.get(peerId);
+        if (advancedPeerConnections.isEmpty) {
           peerConnectionPool.create(peerId);
         }
       } else if (partyType == PartyType.group.name) {
@@ -89,9 +88,9 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
         for (var groupMember in groupMembers) {
           String? memberPeerId = groupMember.memberPeerId;
           if (memberPeerId != null) {
-            AdvancedPeerConnection? advancedPeerConnection =
-                peerConnectionPool.getOne(memberPeerId);
-            if (advancedPeerConnection == null) {
+            List<AdvancedPeerConnection> advancedPeerConnections =
+                peerConnectionPool.get(memberPeerId);
+            if (advancedPeerConnections.isEmpty) {
               peerConnectionPool.create(memberPeerId);
             }
           }

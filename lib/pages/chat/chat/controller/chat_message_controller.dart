@@ -65,16 +65,13 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     }
   }
 
-  modify(String peerId, {String? clientId}) {
+  ///接收到新信息
+  modify(String peerId) {
     if (_chatSummary == null) {
       return;
     }
     if (_chatSummary!.peerId == peerId) {
-      if (clientId == null ||
-          _chatSummary!.clientId == null ||
-          _chatSummary!.clientId == clientId) {
-        notifyListeners();
-      }
+      notifyListeners();
     }
   }
 
@@ -174,7 +171,6 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     }
     String peerId = _chatSummary!.peerId!;
     String receiverName = _chatSummary!.name!;
-    String? clientId = _chatSummary!.clientId;
     String partyType = _chatSummary!.partyType!;
 
     ChatMessage? chatMessage;
@@ -185,7 +181,6 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         title: title,
         data: data,
         receiverName: receiverName,
-        clientId: clientId,
         contentType: contentType,
         mimeType: mimeType,
         messageType: messageType,
@@ -212,6 +207,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         chatMessage = chatMessages[0];
         for (var chatMessage in chatMessages.sublist(1)) {
           chatMessage = await chatMessageService.sendAndStore(chatMessage);
+          //用于更新发送的状态，可以只更新status字段
           await chatMessageService.store(chatMessage);
         }
       }

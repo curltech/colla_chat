@@ -93,7 +93,7 @@ class VideoChatReceiptController with ChangeNotifier {
       var peerId = chatReceipt.senderPeerId!;
       var clientId = chatReceipt.senderClientId!;
       AdvancedPeerConnection? advancedPeerConnection =
-          peerConnectionPool.getOne(
+          peerConnectionPool.getOne1(
         peerId,
         clientId: clientId,
       );
@@ -106,8 +106,10 @@ class VideoChatReceiptController with ChangeNotifier {
         }
         //本地视频render加入后，发起重新协商
         await advancedPeerConnection.negotiate();
+
         ///对方同意视频通话则加入到视频连接池中
-        await peerConnectionsController.addAdvancedPeerConnection(advancedPeerConnection);
+        await peerConnectionsController
+            .addAdvancedPeerConnection(advancedPeerConnection);
         chatMessageController.chatView = ChatView.video;
       }
     } else if (status == MessageStatus.rejected.name) {

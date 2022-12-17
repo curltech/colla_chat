@@ -1,10 +1,12 @@
 import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/p2p/chain/action/signal.dart';
+import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/transport/webrtc/peer_connections_controller.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
@@ -189,7 +191,7 @@ class PeerConnectionPool {
 
   /// 获取peerId的webrtc连接，可能是多个
   /// @param peerId
-  List<AdvancedPeerConnection>? get(String peerId) {
+  List<AdvancedPeerConnection> get(String peerId) {
     if (peerConnections.containsKey(peerId)) {
       Map<String, AdvancedPeerConnection>? aps = peerConnections.use(peerId);
       if (aps != null) {
@@ -197,19 +199,14 @@ class PeerConnectionPool {
       }
     }
 
-    return null;
+    return [];
   }
 
-  ///如果clientId为空，则取第一个
-  AdvancedPeerConnection? getOne(String peerId, {String? clientId}) {
+  AdvancedPeerConnection? getOne1(String peerId, {required String clientId}) {
     if (peerConnections.containsKey(peerId)) {
       Map<String, AdvancedPeerConnection>? aps = peerConnections.use(peerId);
       if (aps != null && aps.isNotEmpty) {
-        if (clientId != null) {
-          return aps[clientId];
-        } else {
-          return aps.values.first;
-        }
+        return aps[clientId];
       }
     }
 
@@ -243,12 +240,12 @@ class PeerConnectionPool {
   ///主动方创建，此时clientId有可能不知道，如果已经存在，先关闭删除
   Future<AdvancedPeerConnection?> create(String peerId,
       {String clientId = unknownClientId,
-      String name = unknownName,
       Room? room,
       List<Map<String, String>>? iceServers,
       List<PeerVideoRender> localRenders = const []}) async {
     //如果已经存在，先关闭删除
-    AdvancedPeerConnection? peerConnection = getOne(peerId, clientId: clientId);
+    AdvancedPeerConnection? peerConnection =
+        getOne1(peerId, clientId: clientId);
     if (peerConnection != null) {
       await close(peerId, clientId: clientId);
       logger.i(
@@ -257,6 +254,11 @@ class PeerConnectionPool {
     //创建新的主叫方
     peerConnection =
         AdvancedPeerConnection(peerId, true, clientId: clientId, room: room);
+    String name = unknownName;
+    Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+    if (linkman != null) {
+      name = linkman.name;
+    }
     peerConnectionPoolController.onCreated(WebrtcEvent(peerId,
         clientId: clientId, name: name, data: peerConnection));
     bool result = await peerConnection.init(
@@ -303,12 +305,12 @@ class PeerConnectionPool {
   }
 
   ///主动关闭，从池中移除连接
-  Future<bool> close(String peerId, {String? clientId}) async {
+  Future<bool> close(String peerId, {required String clientId}) async {
     Map<String, AdvancedPeerConnection>? removePeerConnections =
         remove(peerId, clientId: clientId);
     if (removePeerConnections != null && removePeerConnections.isNotEmpty) {
       for (var entry in removePeerConnections.entries) {
-        if (clientId == null || clientId == entry.value.clientId) {
+        if (clientId == entry.value.clientId) {
           await entry.value.close();
           logger.i('peerId:$peerId clientId:$clientId is closed!');
         }
@@ -403,7 +405,7 @@ class PeerConnectionPool {
       Room? room,
       List<Map<String, String>>? iceServers}) async {
     AdvancedPeerConnection? advancedPeerConnection =
-        getOne(peerId, clientId: clientId);
+        getOne1(peerId, clientId: clientId);
     if (advancedPeerConnection == null) {
       logger.i('advancedPeerConnection is null,create new one');
       advancedPeerConnection = AdvancedPeerConnection(peerId, false,
@@ -467,14 +469,14 @@ class PeerConnectionPool {
     ///收到信号，连接已经存在，但是clientId为unknownClientId，表明自己是主叫，建立的时候对方的clientId未知
     ///设置clientId和name
     AdvancedPeerConnection? advancedPeerConnection =
-        getOne(peerId, clientId: unknownClientId);
+        getOne1(peerId, clientId: unknownClientId);
     if (advancedPeerConnection != null) {
       advancedPeerConnection.clientId = clientId;
       advancedPeerConnection.name = name;
       remove(peerId, clientId: unknownClientId);
       await put(peerId, advancedPeerConnection, clientId: clientId);
     }
-    advancedPeerConnection = getOne(peerId, clientId: clientId);
+    advancedPeerConnection = getOne1(peerId, clientId: clientId);
     // peerId的连接存在，而且已经连接，报错
     if (advancedPeerConnection != null) {
       if (advancedPeerConnection.connected) {
@@ -528,20 +530,17 @@ class PeerConnectionPool {
   /// @param peerId
   /// @param data
   Future<bool> send(String peerId, List<int> data,
-      {String? clientId,
-      CryptoOption cryptoOption = CryptoOption.cryptography}) async {
-    List<AdvancedPeerConnection>? peerConnections = get(peerId);
-    if (peerConnections != null && peerConnections.isNotEmpty) {
+      {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
+    List<AdvancedPeerConnection> peerConnections = get(peerId);
+    if (peerConnections.isNotEmpty) {
       List<Future<bool>> ps = [];
       //logger.w('send signal:${peerConnections.length}');
       for (var peerConnection in peerConnections) {
         if (peerConnection.status == PeerConnectionStatus.connected) {
-          if (clientId == null || peerConnection.clientId == clientId) {
-            Future<bool> p =
-                peerConnection.send(data, cryptoOption: cryptoOption);
-            //logger.w('send signal');
-            ps.add(p);
-          }
+          Future<bool> p =
+              peerConnection.send(data, cryptoOption: cryptoOption);
+          //logger.w('send signal');
+          ps.add(p);
         }
       }
       List<bool> results = await Future.wait(ps);
@@ -605,7 +604,7 @@ class PeerConnectionPool {
     logger
         .i('peerId: ${event.peerId} clientId:${event.clientId} is onAddStream');
     AdvancedPeerConnection? peerConnection =
-        getOne(event.peerId, clientId: event.clientId);
+        getOne1(event.peerId, clientId: event.clientId);
     if (peerConnection != null) {
       peerConnectionsController.addAdvancedPeerConnection(peerConnection);
     }
@@ -642,7 +641,7 @@ class PeerConnectionPool {
   removeTrack(String peerId, MediaStream stream, MediaStreamTrack track,
       {required String clientId}) async {
     AdvancedPeerConnection? advancedPeerConnection =
-        peerConnectionPool.getOne(peerId, clientId: clientId);
+        peerConnectionPool.getOne1(peerId, clientId: clientId);
     if (advancedPeerConnection != null) {
       await advancedPeerConnection.removeTrack(stream, track);
     }
@@ -652,20 +651,31 @@ class PeerConnectionPool {
       MediaStreamTrack newTrack,
       {required String clientId}) async {
     AdvancedPeerConnection? advancedPeerConnection =
-        peerConnectionPool.getOne(peerId, clientId: clientId);
+        peerConnectionPool.getOne1(peerId, clientId: clientId);
     if (advancedPeerConnection != null) {
       await advancedPeerConnection.replaceTrack(stream, oldTrack, newTrack);
     }
   }
 
-  PeerConnectionStatus status(String peerId, {required String clientId}) {
-    AdvancedPeerConnection? advancedPeerConnection =
-        peerConnectionPool.getOne(peerId, clientId: clientId);
-    if (advancedPeerConnection != null) {
-      return advancedPeerConnection.status;
+  PeerConnectionStatus status(String peerId, {String? clientId}) {
+    var status = PeerConnectionStatus.none;
+    if (clientId == null) {
+      var advancedPeerConnections = get(peerId);
+      for (var advancedPeerConnection in advancedPeerConnections) {
+        if (advancedPeerConnection.status == PeerConnectionStatus.connected) {
+          status = PeerConnectionStatus.connected;
+          break;
+        }
+      }
+    } else {
+      AdvancedPeerConnection? advancedPeerConnection =
+          peerConnectionPool.getOne1(peerId, clientId: clientId);
+      if (advancedPeerConnection != null) {
+        status = advancedPeerConnection.status;
+      }
     }
 
-    return PeerConnectionStatus.none;
+    return status;
   }
 
   ///调用signalAction发送signal到信号服务器
@@ -674,7 +684,7 @@ class PeerConnectionPool {
       var peerId = evt.peerId;
       var clientId = evt.clientId;
       AdvancedPeerConnection? advancedPeerConnection =
-          getOne(peerId, clientId: clientId);
+          getOne1(peerId, clientId: clientId);
       if (advancedPeerConnection != null && advancedPeerConnection.connected) {
         var jsonStr = JsonUtil.toJsonString(evt.data);
         var data = CryptoUtil.stringToUtf8(jsonStr);
