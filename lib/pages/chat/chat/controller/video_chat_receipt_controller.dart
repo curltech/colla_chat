@@ -110,11 +110,9 @@ class VideoChatReceiptController with ChangeNotifier {
         ///对方同意视频通话则加入到视频连接池中
         await peerConnectionsController
             .addAdvancedPeerConnection(advancedPeerConnection);
-        chatMessageController.chatView = ChatView.video;
       }
     } else if (status == MessageStatus.rejected.name) {
       await localVideoRenderController.close();
-      chatMessageController.chatView = ChatView.text;
     }
   }
 }

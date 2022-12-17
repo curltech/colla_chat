@@ -24,11 +24,6 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
     super.initState();
   }
 
-  _close() {
-    chatMessageController.chatView = ChatView.text;
-    setState(() {});
-  }
-
   Widget _buildVideoViewCard(BuildContext context) {
     return VideoViewCard(
       videoRenderController: peerConnectionsController,

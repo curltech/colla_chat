@@ -158,7 +158,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         await pc.negotiate();
       }
     }
-    chatMessageController.chatView = ChatView.text;
     setState(() {});
   }
 
