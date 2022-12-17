@@ -5,6 +5,7 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.da
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/mobile_camera_widget.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -147,7 +148,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   ///视频通话
   _onActionVideoChat() {
-    chatMessageController.chatView = ChatView.video;
+    indexWidgetProvider.push('video_chat');
   }
 
   ///相册

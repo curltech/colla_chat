@@ -18,11 +18,13 @@ import 'package:flutter/material.dart';
 /// 支持群聊
 class ChatMessageView extends StatefulWidget with TileDataMixin {
   final FullScreenWidget fullScreenWidget = const FullScreenWidget();
+  final VideoChatWidget videoChatWidget = const VideoChatWidget();
 
   ChatMessageView({
     Key? key,
   }) : super(key: key) {
     indexWidgetProvider.define(fullScreenWidget);
+    indexWidgetProvider.define(videoChatWidget);
   }
 
   @override
@@ -77,10 +79,6 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     return ChatMessageWidget();
   }
 
-  Widget _buildVideoChatWidget(BuildContext context) {
-    return const VideoChatWidget();
-  }
-
   @override
   Widget build(BuildContext context) {
     PeerConnectionStatus? status;
@@ -99,11 +97,6 @@ class _ChatMessageViewState extends State<ChatMessageView> {
         }
       }
     }
-
-    var children = [
-      _buildChatMessageWidget(context),
-      _buildVideoChatWidget(context),
-    ];
     name = name ?? '';
     String title = AppLocalizations.t(name!);
     Widget titleWidget = Text(title);
@@ -135,8 +128,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
         title: titleWidget,
         withLeading: widget.withLeading,
         rightWidgets: rightWidgets,
-        child: IndexedStack(
-            index: chatMessageController.chatView.index, children: children));
+        child: _buildChatMessageWidget(context));
 
     return appBarView;
   }

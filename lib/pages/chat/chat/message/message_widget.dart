@@ -369,12 +369,8 @@ class MessageWidget {
     String? title = chatMessage.title;
     String? thumbnail = chatMessage.thumbnail;
     String mimeType = chatMessage.mimeType!;
-    double? width;
-    double? height;
-    if (chatMessageController.chatView == ChatView.text) {
-      width = 64;
-      height = 64;
-    }
+    double width = 64;
+    double height = 64;
     return ImageMessage(
       key: UniqueKey(),
       messageId: messageId!,
