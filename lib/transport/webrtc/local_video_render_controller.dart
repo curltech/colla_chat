@@ -69,6 +69,7 @@ class VideoRenderController with ChangeNotifier {
     var id = videoRender.id;
     if (id != null && !videoRenders.containsKey(id)) {
       videoRenders[id] = videoRender;
+      notifyListeners();
     }
   }
 
@@ -89,6 +90,7 @@ class VideoRenderController with ChangeNotifier {
         }
       }
     }
+    notifyListeners();
   }
 }
 
@@ -122,11 +124,10 @@ class LocalVideoRenderController extends VideoRenderController {
       videoRender = render;
     }
     await render.bindRTCVideoRender();
-    add(render);
     render.peerId = myself.peerId;
     render.name = myself.name;
     render.clientId = myself.clientId;
-    notifyListeners();
+    add(render);
 
     return render;
   }
