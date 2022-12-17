@@ -80,6 +80,8 @@ class VideoDialInWidget extends StatelessWidget {
               await advancedPeerConnection.addLocalRender(render);
             }
           }
+
+          ///同意视频通话则加入到视频连接池中
           peerConnectionsController
               .addAdvancedPeerConnection(advancedPeerConnection);
           indexWidgetProvider.push('chat_message');

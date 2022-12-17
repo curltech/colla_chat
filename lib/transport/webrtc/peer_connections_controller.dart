@@ -52,7 +52,7 @@ class PeerConnectionsController extends VideoRenderController {
     }
   }
 
-  ///获取连接
+  ///获取连接，如果返回null表示不存在
   AdvancedPeerConnection? getAdvancedPeerConnection(
       String peerId, String clientId) {
     return _peerConnections['$peerId:$clientId'];
