@@ -1,18 +1,45 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/transport/webrtc/peer_connections_controller.dart';
-import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
+import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 
-
-final List<ActionData> actionData = [
-  ActionData(label: 'Camera switch', icon: const Icon(Icons.cameraswitch)),
-  ActionData(label: 'Microphone switch', icon: const Icon(Icons.mic_rounded)),
-  ActionData(label: 'Speaker switch', icon: const Icon(Icons.speaker_phone)),
-  ActionData(label: 'Decrease volume', icon: const Icon(Icons.volume_down)),
-  ActionData(label: 'Increase volume', icon: const Icon(Icons.volume_up)),
+final List<ActionData> videoActionData = [
+  ActionData(
+      label: 'Camera switch',
+      actionType: ActionType.inkwell,
+      icon: const Icon(Icons.cameraswitch)),
+  ActionData(
+      label: 'Microphone switch',
+      actionType: ActionType.inkwell,
+      icon: const Icon(Icons.mic_rounded)),
+  ActionData(
+      label: 'Speaker switch',
+      actionType: ActionType.inkwell,
+      icon: const Icon(Icons.speaker_phone)),
+  ActionData(
+      label: 'Volume increase',
+      actionType: ActionType.inkwell,
+      icon: const Icon(Icons.volume_up)),
+  ActionData(
+      label: 'Volume decrease',
+      actionType: ActionType.inkwell,
+      icon: const Icon(Icons.volume_down)),
+  ActionData(
+      label: 'Volume mute',
+      actionType: ActionType.inkwell,
+      icon: const Icon(Icons.volume_mute)),
+  ActionData(
+      label: 'Zoom out',
+      actionType: ActionType.inkwell,
+      icon: const Icon(Icons.zoom_out_map)),
+  ActionData(
+      label: 'Zoom in',
+      actionType: ActionType.inkwell,
+      icon: const Icon(Icons.zoom_in_map)),
 ];
 
 ///单个视频窗口，长按出现更大的窗口，带有操作按钮
@@ -35,6 +62,7 @@ class SingleVideoViewWidget extends StatefulWidget {
 }
 
 class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
+  bool actionVisible = false;
   late OverlayEntry _popupDialog;
 
   @override
@@ -47,123 +75,116 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
     setState(() {});
   }
 
-  OverlayEntry _createPopupDialog() {
+  OverlayEntry _buildPopupDialog() {
     return OverlayEntry(
-      builder: (context) =>
-          AnimatedContain(
-            child: _createPopupContent(),
-          ),
-    );
-  }
-
-  Widget _createPopupContent() {
-    var height = MediaQuery
-        .of(context)
-        .size
-        .height - 56;
-    var width = MediaQuery
-        .of(context)
-        .size
-        .width;
-    Widget videoView = widget.render
-        .createVideoView(height: height, width: width, color: widget.color);
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16.0),
-        child: Column(
-          children: [
-            _buildAppBar(),
-            Stack(children: [videoView, _buildActionCard(context)]),
-          ],
-        ),
+      builder: (context) => AnimatedContain(
+        child: _buildPopupVideoView(),
       ),
     );
   }
 
   Widget _buildAppBar() {
-    var title = widget.render.name ?? '';
-    var ownerTag = widget.render.ownerTag ?? '';
-    title = '$title($ownerTag)';
-    return AppBarWidget.build(context, title: Text(title), rightWidgets: [
-      InkWell(
-          onTap: () {
-            _popupDialog?.remove();
-          },
-          child: const Icon(Icons.close))
-    ]);
+    return _buildActionCard(context);
   }
 
-  Future<void> _onAction(int index, String name, {String? value}) async {
-    switch (index) {
-      case 0:
+  Widget _buildPopupVideoView() {
+    var height = MediaQuery.of(context).size.height;
+    var width = MediaQuery.of(context).size.width;
+    Widget videoView = Stack(children: [
+      widget.render
+          .createVideoView(height: height, width: width, color: widget.color),
+      _buildAppBar(),
+    ]);
+
+    return videoView;
+  }
+
+  Widget _buildActionCard(BuildContext context) {
+    return Visibility(
+        visible: actionVisible,
+        child: Card(
+            child: DataActionCard(
+                onPressed: (int index, String label, {String? value}) {
+                  _onAction(context, index, label, value: value);
+                },
+                showLabel: false,
+                showTooltip: false,
+                crossAxisCount: 4,
+                actions: videoActionData,
+                // height: 120,
+                //width: 320,
+                size: 20)));
+  }
+
+  ///单个视频窗口
+  Widget _buildSingleVideoView(
+      BuildContext context, double? height, double? width) {
+    String name = widget.render.name ?? '';
+    Widget actionWidget = _buildActionCard(context);
+    Widget videoView = widget.render
+        .createVideoView(height: height, width: width, color: widget.color);
+    Widget singleVideoView = Builder(
+      builder: (context) => InkWell(
+        onTap: () {
+          setState(() {
+            actionVisible = !actionVisible;
+          });
+        },
+        child: videoView,
+      ),
+    );
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 0.0),
+      child: Stack(
+        children: [
+          singleVideoView,
+          Text(
+            name,
+            style: const TextStyle(color: Colors.white, fontSize: 16),
+          ),
+          actionWidget,
+        ],
+      ),
+    );
+  }
+
+  Future<void> _onAction(BuildContext context, int index, String name,
+      {String? value}) async {
+    switch (name) {
+      case 'Camera switch':
         await widget.render.switchCamera();
         break;
-      case 1:
+      case 'Microphone switch':
         await widget.render.switchSpeaker(true);
         break;
-      case 2:
+      case 'Speaker switch':
         widget.render.setMute(true);
         break;
-      case 3:
+      case 'Volume increase':
         await widget.render.setVolume(0);
         break;
-      case 4:
+      case 'Volume decrease':
         await widget.render.setVolume(0);
+        break;
+      case 'Volume mute':
+        await widget.render.setVolume(0);
+        break;
+      case 'Zoom out':
+        _popupDialog = _buildPopupDialog();
+        Overlay.of(context)?.insert(_popupDialog);
+        break;
+      case 'Zoom in':
+        _popupDialog.remove();
         break;
       default:
         break;
     }
   }
 
-  Widget _buildActionCard(BuildContext context) {
-    double height = 80;
-    Widget actionCard = Card(
-      elevation: 0,
-      child: Center(
-          child: Container(
-            height: height,
-            margin: const EdgeInsets.all(0.0),
-            padding: const EdgeInsets.only(bottom: 0.0),
-            child: DataActionCard(
-              actions: actionData,
-              height: height,
-              onPressed: _onAction, crossAxisCount: 4,
-            ),
-          )),
-    );
-    return actionCard;
-  }
-
-  ///单个视频窗口
-  Widget _buildSingleVideoView(BuildContext context) {
-    Widget videoView = widget.render.createVideoView(
-        height: widget.height, width: widget.width, color: widget.color);
-    Widget singleVideoView = Builder(
-      // use Builder here in order to show the snakbar
-      builder: (context) =>
-          GestureDetector(
-            // keep the OverlayEntry instance, and insert it into Overlay
-            onLongPress: () {
-              _popupDialog = _createPopupDialog();
-              Overlay.of(context)?.insert(_popupDialog);
-            },
-            // remove the OverlayEntry from Overlay, so it would be hidden
-            //onLongPressEnd: (details) => _popupDialog?.remove(),
-
-            onTap: () {
-              DialogUtil.info(context, content: AppLocalizations.t(''));
-            },
-            child: videoView,
-          ),
-    );
-
-    return singleVideoView;
-  }
-
   @override
   Widget build(BuildContext context) {
-    return _buildSingleVideoView(context);
+    return _buildSingleVideoView(context, widget.height, widget.width);
   }
 
   @override

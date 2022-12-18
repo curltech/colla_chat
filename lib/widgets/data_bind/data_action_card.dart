@@ -38,29 +38,46 @@ class ActionData {
 
 class DataActionCard extends StatelessWidget {
   final List<ActionData> actions;
-  final double height;
-  final double? width;
+  late double? height;
+  late double? width;
   final int crossAxisCount;
   final double mainAxisSpacing;
   final double crossAxisSpacing;
+  late double? mainAxisExtent;
   final double childAspectRatio;
   final double size;
+  final bool showLabel;
   final Color? labelColor;
+  final bool showTooltip;
   final Function(int index, String label, {String? value})? onPressed;
 
-  const DataActionCard({
+  DataActionCard({
     Key? key,
     required this.actions,
     this.onPressed,
-    required this.height,
+    this.height,
     this.crossAxisCount = 4,
     this.mainAxisSpacing = 5.0,
     this.crossAxisSpacing = 5.0,
-    this.childAspectRatio = 4 / 3,
+    this.mainAxisExtent,
+    this.childAspectRatio = 1,
     this.size = 32,
+    this.showLabel = true,
+    this.showTooltip = true,
     this.labelColor = Colors.black,
     this.width,
-  }) : super(key: key);
+  }) : super(key: key) {
+    mainAxisExtent ??= size + (showLabel ? 30 : 10);
+    if (height == null) {
+      var mod = actions.length % crossAxisCount;
+      var lines = actions.length / crossAxisCount;
+      if (mod > 0) {
+        lines++;
+      }
+      height = lines * (mainAxisExtent!) + 10;
+    }
+    width ??= crossAxisCount * (size + 60);
+  }
 
   Widget _buildIconTextButton(
       BuildContext context, ActionData actionData, int index) {
@@ -76,9 +93,9 @@ class DataActionCard extends StatelessWidget {
             actionData.onTap!(index, actionData.label);
           }
         },
-        text: label,
-        tooltip: tooltip,
-        textColor: labelColor,
+        label: showLabel ? label : null,
+        tooltip: showTooltip ? tooltip : null,
+        labelColor: labelColor,
         icon: actionData.icon);
   }
 
@@ -128,8 +145,8 @@ class DataActionCard extends StatelessWidget {
             actionData.onTap!(index, actionData.label);
           }
         },
-        text: label,
-        textColor: labelColor,
+        label: label,
+        labelColor: labelColor,
         icon: actionData.icon);
   }
 
@@ -191,10 +208,12 @@ class DataActionCard extends StatelessWidget {
     return Container(
         height: height,
         width: width,
-        margin: const EdgeInsets.all(5.0),
-        padding: const EdgeInsets.all(5.0),
+        margin: const EdgeInsets.all(2.0),
+        padding: const EdgeInsets.all(2.0),
         child: GridView.builder(
             itemCount: actionWidgets.length,
+            shrinkWrap: true,
+            padding: EdgeInsets.zero,
             //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                 //横轴元素个数
@@ -203,6 +222,7 @@ class DataActionCard extends StatelessWidget {
                 mainAxisSpacing: mainAxisSpacing,
                 //横轴间距
                 crossAxisSpacing: crossAxisSpacing,
+                mainAxisExtent: mainAxisExtent,
                 //子组件宽高长度比例
                 childAspectRatio: childAspectRatio),
             itemBuilder: (BuildContext context, int index) {
