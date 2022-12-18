@@ -10,7 +10,6 @@ import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:path_provider/path_provider.dart';
 
-
 final emptyVideoView = Center(
   child: defaultImage,
 );
@@ -325,6 +324,17 @@ class PeerVideoRender {
       var tracks = mediaStream.getAudioTracks();
       if (tracks.isNotEmpty) {
         tracks[0].enableSpeakerphone(enable);
+        Helper.setSpeakerphoneOn(enable);
+      }
+    }
+  }
+
+  Future<void> setTorch(bool torch) async {
+    var mediaStream = this.mediaStream;
+    if (mediaStream != null) {
+      var tracks = mediaStream.getVideoTracks();
+      if (tracks.isNotEmpty) {
+        tracks[0].setTorch(torch);
       }
     }
   }

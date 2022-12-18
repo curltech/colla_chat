@@ -45,18 +45,6 @@ final List<ActionData> actionData = [
       label: 'Media play',
       tooltip: 'Media play',
       icon: const Icon(Icons.video_file, color: Colors.white)),
-  ActionData(
-      label: 'Camera switch',
-      tooltip: 'Camera switch',
-      icon: const Icon(Icons.cameraswitch, color: Colors.white)),
-  ActionData(
-      label: 'Microphone',
-      tooltip: 'Microphone switch',
-      icon: const Icon(Icons.mic_rounded, color: Colors.white)),
-  ActionData(
-      label: 'Speaker',
-      tooltip: 'Speaker switch',
-      icon: const Icon(Icons.speaker_phone, color: Colors.white)),
 ];
 
 ///本地视频通话显示和拨出的窗口，显示多个小视频窗口，每个小窗口代表一个对方，其中一个是自己
@@ -201,12 +189,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       case 'Media play':
         _open();
         break;
-      case 'Camera switch':
-        break;
-      case 'Microphone':
-        break;
-      case 'Speaker':
-        break;
       default:
         break;
     }
@@ -220,6 +202,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       child: DataActionCard(
         actions: actionData,
         height: height,
+        //width: 320,
         onPressed: _onAction,
         crossAxisCount: 4,
         labelColor: Colors.white,

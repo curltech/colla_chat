@@ -30,39 +30,46 @@ class WidgetUtil {
     Color? iconColor,
     double? iconSize,
     EdgeInsetsGeometry padding = EdgeInsets.zero,
-    required String text,
+    String? label,
     String? tooltip,
-    Color? textColor,
+    Color? labelColor,
     required Widget icon,
   }) {
-    return Column(
-      children: <Widget>[
-        Expanded(
-            child: Container(
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.all(
-              Radius.circular(5.0),
-            ),
-          ),
-          child: Material(
-              color: Colors.transparent,
-              shape: const CircleBorder(),
-              child: IconButton(
-                  onPressed: onPressed,
-                  padding: padding,
-                  color: iconColor,
-                  iconSize: iconSize,
-                  icon: icon,
-                  tooltip: tooltip != null ? AppLocalizations.t(tooltip) : '')),
-        )),
-        const SizedBox(height: 3.0),
-        Text(
-          text,
-          style: TextStyle(
-            color: textColor,
+    List<Widget> children = [
+      Expanded(
+          child: Container(
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(
+            Radius.circular(5.0),
           ),
         ),
-      ],
+        child: Material(
+            color: Colors.transparent,
+            shape: const CircleBorder(),
+            child: IconButton(
+                onPressed: onPressed,
+                padding: padding,
+                color: iconColor,
+                iconSize: iconSize,
+                icon: icon,
+                tooltip: tooltip != null ? AppLocalizations.t(tooltip) : null)),
+      )),
+    ];
+    if (label != null) {
+      children.add(
+        const SizedBox(height: 3.0),
+      );
+      children.add(
+        Text(
+          label,
+          style: TextStyle(
+            color: labelColor,
+          ),
+        ),
+      );
+    }
+    return Column(
+      children: children,
     );
   }
 
@@ -72,36 +79,43 @@ class WidgetUtil {
     Color? iconColor,
     double? iconSize,
     EdgeInsetsGeometry padding = EdgeInsets.zero,
-    required String text,
-    Color? textColor,
+    String? label,
+    Color? labelColor,
     Color? backgroundColor,
     required Widget icon,
   }) {
-    return Column(
-      children: <Widget>[
-        Expanded(
-            child: Container(
-          padding: padding,
-          decoration: const BoxDecoration(
-            borderRadius: BorderRadius.all(
-              Radius.circular(5.0),
-            ),
-          ),
-          child: Ink(
-              color: backgroundColor,
-              child: InkWell(
-                onTap: onPressed,
-                child: icon,
-              )),
-        )),
-        const SizedBox(height: 3.0),
-        Text(
-          text,
-          style: TextStyle(
-            color: textColor,
+    List<Widget> children = [
+      Expanded(
+          child: Container(
+        padding: padding,
+        decoration: const BoxDecoration(
+          borderRadius: BorderRadius.all(
+            Radius.circular(5.0),
           ),
         ),
-      ],
+        child: Ink(
+            color: backgroundColor,
+            child: InkWell(
+              onTap: onPressed,
+              child: icon,
+            )),
+      )),
+    ];
+    if (label != null) {
+      children.add(
+        const SizedBox(height: 3.0),
+      );
+      children.add(
+        Text(
+          label,
+          style: TextStyle(
+            color: labelColor,
+          ),
+        ),
+      );
+    }
+    return Column(
+      children: children,
     );
   }
 
