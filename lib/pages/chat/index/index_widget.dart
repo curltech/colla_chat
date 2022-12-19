@@ -1,4 +1,4 @@
-import 'package:card_swiper/card_swiper.dart';
+
 import 'package:colla_chat/pages/chat/channel/channel_widget.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
