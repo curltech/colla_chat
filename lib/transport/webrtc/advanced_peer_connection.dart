@@ -202,9 +202,6 @@ class AdvancedPeerConnection {
     var streamId = render.id;
     if (streamId != null) {
       localVideoRenderController.add(render);
-      render.peerId = peerId;
-      render.name = name;
-      render.clientId = clientId;
       logger.i(
           'AdvancedPeerConnection peerId:$peerId _addLocalRender $streamId, localVideoRenders length:${localVideoRenderController.videoRenders.length}');
       return true;
