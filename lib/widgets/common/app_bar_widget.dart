@@ -1,4 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -14,7 +15,7 @@ class AppBarPopupMenu {
 ///工作区的顶部栏AppBar，定义了前导组件，比如回退按钮
 ///定义了尾部组件和下拉按钮
 class AppBarWidget {
-  static AppBar build(
+  static AppBar buildAppBar(
     BuildContext context, {
     bool withLeading = false, //是否有缺省的回退按钮
     Function? leadingCallBack, //回退按钮的回调
@@ -52,6 +53,39 @@ class AppBarWidget {
       bottom: bottom,
     );
     return appBar;
+  }
+
+  static Widget buildTitleBar(
+    BuildContext context, {
+    Color? backgroundColor,
+    Widget? title = const Text(''),
+    bool centerTitle = false, //标题是否居中
+    List<Widget>? rightWidgets, //右边的排列组件（按钮）
+    List<AppBarPopupMenu>? rightPopupMenus,
+  }) {
+    backgroundColor =
+        backgroundColor ?? appDataProvider.themeData.colorScheme.primary;
+    var actions = <Widget>[const Spacer()];
+    if (rightWidgets != null && rightWidgets.isNotEmpty) {
+      actions.addAll(rightWidgets);
+    }
+    var action = popMenuButton(context,
+        rightPopupMenus: rightPopupMenus, rightWidgets: rightWidgets);
+    if (action != null) {
+      actions.add(action);
+    }
+    return Container(
+      padding: const EdgeInsets.all(10),
+      color: backgroundColor,
+      child: Stack(
+        children: <Widget>[
+          Align(
+              alignment: centerTitle ? Alignment.center : Alignment.centerLeft,
+              child: title!),
+          Align(alignment: Alignment.topRight, child: Row(children: actions)),
+        ],
+      ),
+    );
   }
 
   static Widget? backButton(BuildContext context,
@@ -96,7 +130,9 @@ class AppBarWidget {
         if (iconWidget != null) {
           rows.add(iconWidget);
         }
-        rows.add(const SizedBox(width: 25,));
+        rows.add(const SizedBox(
+          width: 25,
+        ));
         rows.add(textWidget);
         item = PopupMenuItem<int>(
             value: i,

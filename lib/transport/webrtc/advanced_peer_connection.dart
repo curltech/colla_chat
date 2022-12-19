@@ -266,7 +266,7 @@ class AdvancedPeerConnection {
     if (videoRender != null) {
       return videoRender;
     }
-    PeerVideoRender render = await PeerVideoRender.from(peerId,
+    PeerVideoRender render = await PeerVideoRender.fromMediaStream(peerId,
         clientId: clientId, name: name, stream: stream);
     await render.bindRTCVideoRender();
     _addRemoteRender(render);

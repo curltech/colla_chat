@@ -1,46 +1,7 @@
-import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/transport/webrtc/peer_connections_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
-import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
-import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
-
-final List<ActionData> videoActionData = [
-  ActionData(
-      label: 'Camera switch',
-      actionType: ActionType.inkwell,
-      icon: const Icon(Icons.cameraswitch)),
-  ActionData(
-      label: 'Microphone switch',
-      actionType: ActionType.inkwell,
-      icon: const Icon(Icons.mic_rounded)),
-  ActionData(
-      label: 'Speaker switch',
-      actionType: ActionType.inkwell,
-      icon: const Icon(Icons.speaker_phone)),
-  ActionData(
-      label: 'Volume increase',
-      actionType: ActionType.inkwell,
-      icon: const Icon(Icons.volume_up)),
-  ActionData(
-      label: 'Volume decrease',
-      actionType: ActionType.inkwell,
-      icon: const Icon(Icons.volume_down)),
-  ActionData(
-      label: 'Volume mute',
-      actionType: ActionType.inkwell,
-      icon: const Icon(Icons.volume_mute)),
-  ActionData(
-      label: 'Zoom out',
-      actionType: ActionType.inkwell,
-      icon: const Icon(Icons.zoom_out_map)),
-  ActionData(
-      label: 'Zoom in',
-      actionType: ActionType.inkwell,
-      icon: const Icon(Icons.zoom_in_map)),
-];
 
 ///单个视频窗口，长按出现更大的窗口，带有操作按钮
 class SingleVideoViewWidget extends StatefulWidget {
@@ -63,6 +24,12 @@ class SingleVideoViewWidget extends StatefulWidget {
 
 class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   bool actionVisible = false;
+  bool enableFullScreen = false;
+  bool enableMute = false;
+  bool enableSpeaker = false;
+  bool enableTorch = false;
+  double volume = 1;
+
   late OverlayEntry _popupDialog;
 
   @override
@@ -99,21 +66,93 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
     return videoView;
   }
 
+  List<ActionData> _buildVideoActionData() {
+    List<ActionData> videoActionData = [];
+    videoActionData.add(
+      ActionData(
+          label: 'Camera switch',
+          //actionType: ActionType.inkwell,
+          icon: const Icon(Icons.cameraswitch)),
+    );
+    if (enableSpeaker) {
+      videoActionData.add(
+        ActionData(
+            label: 'Microphone switch',
+            // actionType: ActionType.inkwell,
+            icon: const Icon(Icons.mic_rounded)),
+      );
+    } else {
+      videoActionData.add(
+        ActionData(
+            label: 'Speaker switch',
+            // actionType: ActionType.inkwell,
+            icon: const Icon(Icons.speaker_phone)),
+      );
+    }
+    if (volume < 1) {
+      videoActionData.add(
+        ActionData(
+            label: 'Volume increase',
+            // actionType: ActionType.inkwell,
+            icon: const Icon(Icons.volume_up)),
+      );
+    }
+    if (volume > 0) {
+      videoActionData.add(
+        ActionData(
+            label: 'Volume mute',
+            // actionType: ActionType.inkwell,
+            icon: const Icon(Icons.volume_mute)),
+      );
+    }
+    if (volume > 0) {
+      videoActionData.add(
+        ActionData(
+            label: 'Volume decrease',
+            // actionType: ActionType.inkwell,
+            icon: const Icon(Icons.volume_down)),
+      );
+    }
+    if (enableFullScreen) {
+      videoActionData.add(
+        ActionData(
+            label: 'Zoom in',
+            // actionType: ActionType.inkwell,
+            icon: const Icon(Icons.zoom_in_map)),
+      );
+    } else {
+      videoActionData.add(
+        ActionData(
+            label: 'Zoom out',
+            // actionType: ActionType.inkwell,
+            icon: const Icon(Icons.zoom_out_map)),
+      );
+    }
+    videoActionData.add(
+      ActionData(
+          label: 'Close',
+          // actionType: ActionType.inkwell,
+          icon: const Icon(Icons.close)),
+    );
+    return videoActionData;
+  }
+
   Widget _buildActionCard(BuildContext context) {
     return Visibility(
         visible: actionVisible,
-        child: Card(
-            child: DataActionCard(
-                onPressed: (int index, String label, {String? value}) {
-                  _onAction(context, index, label, value: value);
-                },
-                showLabel: false,
-                showTooltip: false,
-                crossAxisCount: 4,
-                actions: videoActionData,
-                // height: 120,
-                //width: 320,
-                size: 20)));
+        child: Center(
+            child: Card(
+                child: DataActionCard(
+                    onPressed: (int index, String label, {String? value}) {
+                      _onAction(context, index, label, value: value);
+                    },
+                    showLabel: false,
+                    showTooltip: false,
+                    crossAxisCount: 4,
+                    actions: _buildVideoActionData(),
+                    // height: 120,
+                    //width: 320,
+                    size: 20))));
   }
 
   ///单个视频窗口
@@ -154,28 +193,55 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
     switch (name) {
       case 'Camera switch':
         await widget.render.switchCamera();
+        setState(() {});
         break;
       case 'Microphone switch':
-        await widget.render.switchSpeaker(true);
+        enableSpeaker = false;
+        await widget.render.switchSpeaker(enableSpeaker);
+        setState(() {});
         break;
       case 'Speaker switch':
-        widget.render.setMute(true);
+        enableSpeaker = true;
+        await widget.render.switchSpeaker(enableSpeaker);
+        setState(() {});
         break;
       case 'Volume increase':
-        await widget.render.setVolume(0);
+        volume = volume + 0.1;
+        volume = volume > 1 ? 1 : volume;
+        enableMute = false;
+        setState(() {});
+        await widget.render.setVolume(volume);
         break;
       case 'Volume decrease':
-        await widget.render.setVolume(0);
+        volume = volume - 0.1;
+        volume = volume < 0 ? 0 : volume;
+        enableMute = volume <= 0 ? true : false;
+        setState(() {});
+        await widget.render.setVolume(volume);
         break;
       case 'Volume mute':
-        await widget.render.setVolume(0);
+        enableMute = !enableMute;
+        if (enableMute) {
+          volume = 0;
+        } else {
+          volume = 1;
+        }
+        setState(() {
+          widget.render.setMute(enableMute);
+        });
         break;
       case 'Zoom out':
         _popupDialog = _buildPopupDialog();
         Overlay.of(context)?.insert(_popupDialog);
+        setState(() {
+          enableFullScreen = true;
+        });
         break;
       case 'Zoom in':
         _popupDialog.remove();
+        setState(() {
+          enableFullScreen = false;
+        });
         break;
       default:
         break;

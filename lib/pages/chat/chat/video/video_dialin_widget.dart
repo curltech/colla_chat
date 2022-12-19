@@ -19,15 +19,13 @@ class VideoDialInWidget extends StatelessWidget {
   ///视频通话的消息请求
   final ChatMessage chatMessage;
 
-  final bool displayMedia;
-
+  //缺省用视频还是屏幕媒体
   final bool videoMedia;
 
   final Function(ChatMessage chatMessage, MessageStatus chatReceiptType)? onTap;
 
   const VideoDialInWidget(
       {Key? key,
-      this.displayMedia = true,
       this.videoMedia = false,
       required this.chatMessage,
       this.onTap})
@@ -48,18 +46,17 @@ class VideoDialInWidget extends StatelessWidget {
         //根据title来判断是请求音频还是视频
         String? title = chatMessage.title;
         if (title == ContentType.audio.name) {
-          var render = await localVideoRenderController.createVideoRender(
-              audioMedia: true);
+          var render =
+              await localVideoRenderController.createAudioMediaRender();
           localRenders.add(render);
         } else {
           if (videoMedia) {
-            var render = await localVideoRenderController.createVideoRender(
-                videoMedia: true);
+            var render =
+                await localVideoRenderController.createVideoMediaRender();
             localRenders.add(render);
-          }
-          if (displayMedia) {
-            var render = await localVideoRenderController.createVideoRender(
-                displayMedia: true);
+          } else {
+            var render =
+                await localVideoRenderController.createDisplayMediaRender();
             localRenders.add(render);
           }
         }
