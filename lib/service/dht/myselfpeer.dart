@@ -222,14 +222,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       }
 
       ///2.连接篇p2p的节点，把自己的信息注册上去
-      var json = JsonUtil.toJson(myselfPeer);
-      var peerClient = PeerClient.fromJson(json);
-      peerClient.activeStatus = ActiveStatus.Up.name;
-      peerClient.clientId = myselfPeer.clientId;
-      var response = await connectAction.connect(peerClient);
-      if (response != null) {
-        logger.i('connect successfully');
-      }
+      await registerPeerClient();
       await postLogin();
       return true;
     } else {
@@ -237,6 +230,20 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     }
 
     return false;
+  }
+
+  Future<void> registerPeerClient() async {
+    if (myself.myselfPeer != null) {
+      MyselfPeer myselfPeer = myself.myselfPeer!;
+      var json = JsonUtil.toJson(myselfPeer);
+      var peerClient = PeerClient.fromJson(json);
+      peerClient.activeStatus = ActiveStatus.Up.name;
+      peerClient.clientId = myselfPeer.clientId;
+      var response = await connectAction.connect(peerClient);
+      if (response != null) {
+        logger.i('register peerClient connect successfully');
+      }
+    }
   }
 
   ///登录成功后执行

@@ -4,7 +4,7 @@ import 'package:colla_chat/transport/websocket.dart';
 import 'httpclient.dart';
 
 abstract class IWebClient {
-  register(String name, Function func);
+  Function()? postConnected;
 
   dynamic send(String url, dynamic data);
 
@@ -32,13 +32,6 @@ class WebClient extends IWebClient {
         HttpClientPool httpClientPool = HttpClientPool.instance;
         _httpDefault = httpClientPool.setDefalutHttpClient(address);
       }
-    }
-  }
-
-  @override
-  register(String name, Function func) {
-    if (_wsDefault != null) {
-      _wsDefault?.register(name, func);
     }
   }
 
