@@ -43,10 +43,6 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   final TextEditingController textEditingController = TextEditingController();
   FocusNode textFocusNode = FocusNode();
   late final AnimationController animateController;
-  late String peerId;
-  late String name;
-  late String partyType;
-  bool initStatus = false;
 
   @override
   void initState() {
@@ -56,7 +52,6 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     scrollController.addListener(_onScroll);
     animateController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 500));
-    _init();
 
     ///滚到指定的位置
     // widget.scrollController.animateTo(offset,
@@ -68,37 +63,6 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
       ///获取最新的消息
       chatMessageController.latest();
     });
-  }
-
-  _init() async {
-    ChatSummary? chatSummary = chatMessageController.chatSummary;
-    if (chatSummary != null) {
-      peerId = chatSummary.peerId!;
-      name = chatSummary.name!;
-      partyType = chatSummary.partyType!;
-      if (partyType == PartyType.linkman.name) {
-        List<AdvancedPeerConnection> advancedPeerConnections =
-            peerConnectionPool.get(peerId);
-        if (advancedPeerConnections.isEmpty) {
-          peerConnectionPool.create(peerId);
-        }
-      } else if (partyType == PartyType.group.name) {
-        List<GroupMember> groupMembers =
-            await groupMemberService.findByGroupId(peerId);
-        for (var groupMember in groupMembers) {
-          String? memberPeerId = groupMember.memberPeerId;
-          if (memberPeerId != null) {
-            List<AdvancedPeerConnection> advancedPeerConnections =
-                peerConnectionPool.get(memberPeerId);
-            if (advancedPeerConnections.isEmpty) {
-              peerConnectionPool.create(memberPeerId);
-            }
-          }
-        }
-      }
-    } else {
-      logger.e('chatSummary is null');
-    }
   }
 
   void _onScroll() {

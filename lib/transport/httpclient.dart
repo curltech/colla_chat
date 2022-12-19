@@ -1,12 +1,12 @@
 import 'dart:io';
 
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
-import '../provider/app_data_provider.dart';
 
 class DioHttpClient implements IWebClient {
   final Dio _client = Dio();
@@ -62,7 +62,7 @@ class DioHttpClient implements IWebClient {
   }
 
   @override
-  register(String name, Function func) {}
+  Function()? postConnected;
 }
 
 class HttpClientPool {

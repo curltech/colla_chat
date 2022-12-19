@@ -1,16 +1,15 @@
+import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/entity/dht/peerclient.dart';
+import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
+import 'package:colla_chat/service/p2p/security_context.dart';
+import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:telephony/telephony.dart';
-
-import '../crypto/util.dart';
-import '../entity/chat/chat.dart';
-import '../entity/dht/peerclient.dart';
-import '../entity/p2p/security_context.dart';
-import '../service/chat/chat.dart';
-import '../service/p2p/security_context.dart';
-import '../service/servicelocator.dart';
 
 onBackgroundMessage(SmsMessage message) async {
   smsClientPool.onMessage(message);
@@ -49,14 +48,11 @@ class MobileState {
 }
 
 ///短信访问客户端
-class SmsClient implements IWebClient {
+class SmsClient extends IWebClient {
   final Telephony telephony = Telephony.backgroundInstance;
   SmsSendStatusListener? listener;
 
-  SmsClient();
-
-  @override
-  register(String name, Function func) {
+  SmsClient() {
     listener = (SendStatus status) {
       logger.i(status);
     };
@@ -67,6 +63,9 @@ class SmsClient implements IWebClient {
         },
         onBackgroundMessage: onBackgroundMessage);
   }
+
+  @override
+  register(String name, Function func) {}
 
   sendMsg(String message, String mobile, {bool defaultApp = false}) async {
     var result = telephony.sendSms(

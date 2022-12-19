@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:colla_chat/constant/address.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:flutter/material.dart';
@@ -14,13 +15,14 @@ import './condition_import/unsupport.dart'
 import '../p2p/chain/chainmessagehandler.dart';
 
 enum SocketStatus {
+  created,
   connected, // 已连接
   failed, // 失败
   closed, // 连接关闭
   reconnecting,
 }
 
-class Websocket implements IWebClient {
+class Websocket extends IWebClient {
   String prefix = 'wss://';
   late String address;
   WebSocketChannel? channel;
@@ -32,11 +34,11 @@ class Websocket implements IWebClient {
   int reconnectTimes = 5;
   Function(Websocket websocket, SocketStatus status)? onStatusChange;
 
-  Websocket(String addr) {
-    if (!addr.startsWith(prefix)) {
+  Websocket(this.address, Function() postConnected) {
+    if (!address.startsWith(prefix)) {
       throw 'error wss address prefix';
     }
-    address = addr;
+    this.postConnected = postConnected;
   }
 
   Future<void> connect() async {
@@ -47,28 +49,29 @@ class Websocket implements IWebClient {
       logger.e('wss address:$address connect failure');
       return;
     }
-    register('', onData);
-    //initHeartBeat();
-    status = SocketStatus.connected;
+    channel!.stream.listen((dynamic data) {
+      onData(data);
+    }, onError: onError, onDone: onDone, cancelOnError: false);
+    status = SocketStatus.created;
     //logger.i('wss address:$address websocket connected');
-  }
-
-  @override
-  register(String name, Function func) {
-    if (channel != null) {
-      // 监听消息，如果有消息到来，就打印出来
-      channel!.stream.listen((dynamic data) {
-        func(data);
-      }, onError: onError, onDone: onDone, cancelOnError: false);
-    }
+    // Future.delayed(const Duration(milliseconds: 500), () {
+    //   if (postConnected != null && status == SocketStatus.connected) {
+    //     postConnected!();
+    //   }
+    // });
   }
 
   onData(dynamic data) async {
+    if (status != SocketStatus.connected) {
+      status = SocketStatus.connected;
+      if (postConnected != null) {
+        postConnected!();
+      }
+    }
     var msg = String.fromCharCodes(data);
     if (msg == 'heartbeat') {
       //logger.i('wss address:$address receive heartbeat message');
     } else {
-      //logger.w(msg);
       var response = await chainMessageHandler.receiveRaw(data, '', '');
       if (response != null) {
         sendMsg(response);
@@ -207,7 +210,8 @@ class WebsocketPool with ChangeNotifier {
       if (defaultNodeAddress != null) {
         var defaultAddress = defaultNodeAddress.wsConnectAddress;
         if (defaultAddress != null && defaultAddress.startsWith('ws')) {
-          var websocket = Websocket(defaultAddress);
+          var websocket =
+              Websocket(defaultAddress, myselfPeerService.registerPeerClient);
           websocket.connect().then((value) {
             if (websocket._status == SocketStatus.connected) {
               websockets[defaultAddress] = websocket;
@@ -234,7 +238,7 @@ class WebsocketPool with ChangeNotifier {
       websocket = websockets[address];
     } else {
       if (address.startsWith('ws')) {
-        websocket = Websocket(address);
+        websocket = Websocket(address, myselfPeerService.registerPeerClient);
         websocket.onStatusChange = onStatusChange;
         await websocket.connect();
         if (websocket._status == SocketStatus.connected) {
