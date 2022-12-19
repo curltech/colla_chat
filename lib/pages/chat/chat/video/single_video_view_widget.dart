@@ -70,12 +70,14 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
 
   List<ActionData> _buildVideoActionData() {
     List<ActionData> videoActionData = [];
-    videoActionData.add(
-      ActionData(
-          label: 'Camera switch',
-          //actionType: ActionType.inkwell,
-          icon: const Icon(Icons.cameraswitch)),
-    );
+    if (localVideoRenderController.videoChatRender != null) {
+      videoActionData.add(
+        ActionData(
+            label: 'Camera switch',
+            //actionType: ActionType.inkwell,
+            icon: const Icon(Icons.cameraswitch)),
+      );
+    }
     if (enableSpeaker) {
       videoActionData.add(
         ActionData(
@@ -183,16 +185,19 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
     var primary = appDataProvider.themeData.colorScheme.primary;
     return Container(
       decoration: selected
-          ? BoxDecoration(border: Border.all(width: 2, color: primary))
+          ? BoxDecoration(border: Border.all(width: 1, color: Colors.yellow))
           : null,
       padding: const EdgeInsets.symmetric(horizontal: 0.0),
       child: Stack(
         children: [
           singleVideoView,
-          Text(
-            name,
-            style: const TextStyle(color: Colors.white, fontSize: 16),
-          ),
+          Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
+              child: Text(
+                name,
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              )),
           actionWidget,
         ],
       ),
