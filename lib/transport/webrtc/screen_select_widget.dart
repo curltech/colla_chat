@@ -7,7 +7,7 @@ import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-import '../../pages/chat/me/webrtc/condition_import/unsupport.dart'
+import '../webrtc/condition_import/unsupport.dart'
     if (dart.library.html) './condition_import/web.dart'
     if (dart.library.io) './condition_import/desktop.dart' as display_capture;
 
