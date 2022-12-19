@@ -211,7 +211,7 @@ class WebsocketPool with ChangeNotifier {
         var defaultAddress = defaultNodeAddress.wsConnectAddress;
         if (defaultAddress != null && defaultAddress.startsWith('ws')) {
           var websocket =
-              Websocket(defaultAddress, myselfPeerService.registerPeerClient);
+              Websocket(defaultAddress, myselfPeerService.connect);
           websocket.connect().then((value) {
             if (websocket._status == SocketStatus.connected) {
               websockets[defaultAddress] = websocket;
@@ -238,7 +238,7 @@ class WebsocketPool with ChangeNotifier {
       websocket = websockets[address];
     } else {
       if (address.startsWith('ws')) {
-        websocket = Websocket(address, myselfPeerService.registerPeerClient);
+        websocket = Websocket(address, myselfPeerService.connect);
         websocket.onStatusChange = onStatusChange;
         await websocket.connect();
         if (websocket._status == SocketStatus.connected) {

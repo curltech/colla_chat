@@ -222,7 +222,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       }
 
       ///2.连接篇p2p的节点，把自己的信息注册上去
-      await registerPeerClient();
+      await connect();
       await postLogin();
       return true;
     } else {
@@ -232,7 +232,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     return false;
   }
 
-  Future<void> registerPeerClient() async {
+  Future<void> connect() async {
     if (myself.myselfPeer != null) {
       MyselfPeer myselfPeer = myself.myselfPeer!;
       var json = JsonUtil.toJson(myselfPeer);
