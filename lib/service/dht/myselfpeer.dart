@@ -241,7 +241,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       peerClient.clientId = myselfPeer.clientId;
       var response = await connectAction.connect(peerClient);
       if (response != null) {
-        logger.i('register peerClient connect successfully');
+        logger.i('connect successfully');
       }
     }
   }
