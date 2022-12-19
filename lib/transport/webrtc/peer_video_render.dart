@@ -3,9 +3,9 @@ import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:colla_chat/constant/base.dart';
-import 'package:colla_chat/pages/chat/me/webrtc/screen_select_dialog.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:path_provider/path_provider.dart';
@@ -45,27 +45,78 @@ class PeerVideoRender {
     }
   }
 
-  static Future<PeerVideoRender> from(String peerId,
-      {String? clientId,
-      String? name,
-      MediaStream? stream,
-      bool videoMedia = false,
-      bool audioMedia = false,
-      bool displayMedia = false}) async {
+  static Future<PeerVideoRender> fromVideoMedia(
+    String peerId, {
+    String? clientId,
+    String? name,
+    bool audio = true,
+    int minWidth = 640,
+    int minHeight = 480,
+    int minFrameRate = 30,
+  }) async {
     PeerVideoRender render = PeerVideoRender();
-    if (stream == null && !videoMedia && !displayMedia && !audioMedia) {
-      videoMedia = true;
-    }
-    if (videoMedia) {
-      await render.createVideoMedia();
-    } else if (audioMedia) {
-      await render.createAudioMedia();
-    } else if (displayMedia) {
-      await render.createDisplayMedia();
-    } else if (stream != null) {
-      render.mediaStream = stream;
-      render.id = stream.id;
-    }
+    render.peerId = peerId;
+    render.clientId = clientId;
+    render.name = name;
+    await render.createVideoMedia(
+      audio: audio,
+      minWidth: minWidth,
+      minHeight: minHeight,
+      minFrameRate: minFrameRate,
+    );
+    await render.bindRTCVideoRender();
+
+    return render;
+  }
+
+  static Future<PeerVideoRender> fromAudioMedia(
+    String peerId, {
+    String? clientId,
+    String? name,
+  }) async {
+    PeerVideoRender render = PeerVideoRender();
+    render.peerId = peerId;
+    render.clientId = clientId;
+    render.name = name;
+    await render.createAudioMedia();
+    await render.bindRTCVideoRender();
+
+    return render;
+  }
+
+  static Future<PeerVideoRender> fromDisplayMedia(
+    String peerId, {
+    String? clientId,
+    String? name,
+    DesktopCapturerSource? selectedSource,
+    bool audio = false,
+  }) async {
+    PeerVideoRender render = PeerVideoRender();
+    render.peerId = peerId;
+    render.clientId = clientId;
+    render.name = name;
+    await render.createDisplayMedia(
+      selectedSource: selectedSource,
+      audio: audio,
+    );
+    await render.bindRTCVideoRender();
+
+    return render;
+  }
+
+  static Future<PeerVideoRender> fromMediaStream(
+    String peerId, {
+    required MediaStream stream,
+    String? clientId,
+    String? name,
+  }) async {
+    PeerVideoRender render = PeerVideoRender();
+    render.peerId = peerId;
+    render.clientId = clientId;
+    render.name = name;
+    render.mediaStream = stream;
+    render.id = stream.id;
+    await render.bindRTCVideoRender();
 
     return render;
   }

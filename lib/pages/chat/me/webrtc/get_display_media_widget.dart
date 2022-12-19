@@ -1,10 +1,10 @@
 import 'dart:core';
 
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/me/webrtc/screen_select_dialog.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
+import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -61,19 +61,19 @@ class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
           selectedSource: selectedSource);
       await peerVideoRenderer.enumerateDevices();
       await peerVideoRenderer.bindRTCVideoRender();
-      var stream =
-          await navigator.mediaDevices.getDisplayMedia(<String, dynamic>{
-        'video': selectedSource == null
-            ? true
-            : {
-                'deviceId': {'exact': selectedSource!.id},
-                'mandatory': {'frameRate': 30.0}
-              }
-      });
-      stream.getVideoTracks()[0].onEnded = () {
-        logger.i(
-            'By adding a listener on onEnded you can: 1) catch stop video sharing on Web');
-      };
+      // var stream =
+      //     await navigator.mediaDevices.getDisplayMedia(<String, dynamic>{
+      //   'video': selectedSource == null
+      //       ? true
+      //       : {
+      //           'deviceId': {'exact': selectedSource!.id},
+      //           'mandatory': {'frameRate': 30.0}
+      //         }
+      // });
+      // stream.getVideoTracks()[0].onEnded = () {
+      //   logger.i(
+      //       'By adding a listener on onEnded you can: 1) catch stop video sharing on Web');
+      // };
     } catch (e) {
       logger.e(e.toString());
     }

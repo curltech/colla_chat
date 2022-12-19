@@ -4,8 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 ///媒体控制器，内部是PeerVideoRender的集合
+///视频和音频的总共只能有一个，屏幕共享和媒体播放可以有多个
 class VideoRenderController with ChangeNotifier {
+  //当前选择的render
   PeerVideoRender? _videoRender;
+
   final Map<String, PeerVideoRender> videoRenders = {};
 
   VideoRenderController({List<PeerVideoRender> videoRenders = const []}) {
@@ -96,37 +99,91 @@ class VideoRenderController with ChangeNotifier {
 
 ///本地媒体控制器
 class LocalVideoRenderController extends VideoRenderController {
-  Future<PeerVideoRender> createVideoRender(
-      {MediaStream? stream,
-      bool videoMedia = false,
-      bool audioMedia = false,
-      bool displayMedia = false}) async {
-    if (videoRender != null) {
-      if (videoMedia || audioMedia) {
-        return videoRender!;
-      }
+  //视频和音频的render
+  PeerVideoRender? _videoChatRender;
+
+  PeerVideoRender? get videoChatRender {
+    return _videoChatRender;
+  }
+
+  set videoChatRender(PeerVideoRender? videoRender) {
+    if (_videoChatRender != _videoChatRender) {
+      _videoChatRender = _videoChatRender;
     }
-    if (stream != null) {
-      var streamId = stream.id;
-      var videoRender = videoRenders[streamId];
-      if (videoRender != null) {
-        return videoRender;
-      }
+  }
+
+  ///创建本地的Video render
+  Future<PeerVideoRender> createVideoMediaRender({
+    bool audio = true,
+    int minWidth = 640,
+    int minHeight = 480,
+    int minFrameRate = 30,
+  }) async {
+    if (_videoChatRender != null) {
+      return _videoChatRender!;
     }
-    PeerVideoRender render = await PeerVideoRender.from(myself.peerId!,
+    PeerVideoRender render = await PeerVideoRender.fromVideoMedia(
+      myself.peerId!,
+      clientId: myself.clientId,
+      name: myself.myselfPeer!.name,
+      audio: audio,
+      minWidth: minWidth,
+      minHeight: minHeight,
+      minFrameRate: minFrameRate,
+    );
+    _videoChatRender = render;
+    add(render);
+
+    return render;
+  }
+
+  ///创建本地的Audio render
+  Future<PeerVideoRender> createAudioMediaRender() async {
+    if (_videoChatRender != null) {
+      return _videoChatRender!;
+    }
+    PeerVideoRender render = await PeerVideoRender.fromAudioMedia(
+      myself.peerId!,
+      clientId: myself.clientId,
+      name: myself.myselfPeer!.name,
+    );
+    _videoChatRender = render;
+    add(render);
+
+    return render;
+  }
+
+  ///创建本地的Display render
+  Future<PeerVideoRender> createDisplayMediaRender({
+    DesktopCapturerSource? selectedSource,
+    bool audio = false,
+  }) async {
+    PeerVideoRender render = await PeerVideoRender.fromDisplayMedia(
+        myself.peerId!,
         clientId: myself.clientId,
         name: myself.myselfPeer!.name,
-        stream: stream,
-        videoMedia: videoMedia,
-        audioMedia: audioMedia,
-        displayMedia: displayMedia);
-    if (audioMedia || videoMedia) {
-      videoRender = render;
+        selectedSource: selectedSource,
+        audio: audio);
+    add(render);
+
+    return render;
+  }
+
+  ///创建本地的Stream render
+  Future<PeerVideoRender> createMediaStreamRender(
+    MediaStream stream,
+  ) async {
+    var streamId = stream.id;
+    var videoRender = videoRenders[streamId];
+    if (videoRender != null) {
+      return videoRender;
     }
-    await render.bindRTCVideoRender();
-    render.peerId = myself.peerId;
-    render.name = myself.name;
-    render.clientId = myself.clientId;
+    PeerVideoRender render = await PeerVideoRender.fromMediaStream(
+      myself.peerId!,
+      clientId: myself.clientId,
+      name: myself.myselfPeer!.name,
+      stream: stream,
+    );
     add(render);
 
     return render;

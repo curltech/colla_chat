@@ -13,6 +13,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
+import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
@@ -90,44 +91,88 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     _toggleActionCard();
   }
 
-  _open(
-      {MediaStream? stream,
-      bool videoMedia = false,
-      bool audioMedia = false,
-      bool displayMedia = false}) async {
+  _openVideoMedia() async {
+    var status = peerConnectionPool.status(peerId!);
     if (partyType == PartyType.linkman.name) {
-      var status = peerConnectionPool.status(peerId!);
       if (status == PeerConnectionStatus.connected) {
-        await localVideoRenderController.createVideoRender(
-            stream: stream,
-            videoMedia: videoMedia,
-            audioMedia: audioMedia,
-            displayMedia: displayMedia);
-        if (audioMedia) {
-          await _send(title: ContentType.audio.name);
-        } else if (displayMedia) {
-          await _send(title: ContentType.display.name);
-        } else {
-          await _send(title: ContentType.video.name);
-        }
+        await localVideoRenderController.createVideoMediaRender();
+        await _send(title: ContentType.video.name);
         setState(() {});
       } else {
         DialogUtil.error(context,
             content: AppLocalizations.t('No Webrtc connected PeerConnection'));
       }
     } else if (partyType == PartyType.group.name) {
-      await localVideoRenderController.createVideoRender(
-          stream: stream,
-          videoMedia: videoMedia,
-          audioMedia: audioMedia,
-          displayMedia: displayMedia);
-      if (audioMedia) {
+      await localVideoRenderController.createVideoMediaRender();
+      await _send(title: ContentType.video.name);
+      setState(() {});
+    }
+  }
+
+  _openAudioMedia() async {
+    var status = peerConnectionPool.status(peerId!);
+    if (partyType == PartyType.linkman.name) {
+      if (status == PeerConnectionStatus.connected) {
+        await localVideoRenderController.createAudioMediaRender();
         await _send(title: ContentType.audio.name);
-      } else if (displayMedia) {
-        await _send(title: ContentType.display.name);
+        setState(() {});
       } else {
-        await _send(title: ContentType.video.name);
+        DialogUtil.error(context,
+            content: AppLocalizations.t('No Webrtc connected PeerConnection'));
       }
+    } else if (partyType == PartyType.group.name) {
+      await localVideoRenderController.createAudioMediaRender();
+      await _send(title: ContentType.audio.name);
+      setState(() {});
+    }
+  }
+
+  _openDisplayMedia() async {
+    var status = peerConnectionPool.status(peerId!);
+    if (partyType == PartyType.linkman.name) {
+      if (status == PeerConnectionStatus.connected) {
+        final source = await showDialog<DesktopCapturerSource>(
+          context: context,
+          builder: (context) => ScreenSelectDialog(),
+        );
+        if (source != null) {
+          await localVideoRenderController.createDisplayMediaRender(
+              selectedSource: source);
+          await _send(title: ContentType.display.name);
+          setState(() {});
+        }
+      } else {
+        DialogUtil.error(context,
+            content: AppLocalizations.t('No Webrtc connected PeerConnection'));
+      }
+    } else if (partyType == PartyType.group.name) {
+      final source = await showDialog<DesktopCapturerSource>(
+        context: context,
+        builder: (context) => ScreenSelectDialog(),
+      );
+      if (source != null) {
+        await localVideoRenderController.createDisplayMediaRender(
+            selectedSource: source);
+        await _send(title: ContentType.display.name);
+        setState(() {});
+      }
+    }
+  }
+
+  _openMediaStream(MediaStream stream) async {
+    var status = peerConnectionPool.status(peerId!);
+    if (partyType == PartyType.linkman.name) {
+      if (status == PeerConnectionStatus.connected) {
+        await localVideoRenderController.createMediaStreamRender(stream);
+        await _send(title: ContentType.video.name);
+        setState(() {});
+      } else {
+        DialogUtil.error(context,
+            content: AppLocalizations.t('No Webrtc connected PeerConnection'));
+      }
+    } else if (partyType == PartyType.group.name) {
+      await localVideoRenderController.createMediaStreamRender(stream);
+      await _send(title: ContentType.video.name);
       setState(() {});
     }
   }
@@ -178,16 +223,16 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   Future<void> _onAction(int index, String name, {String? value}) async {
     switch (name) {
       case 'Video chat':
-        _open(videoMedia: true);
+        _openVideoMedia();
         break;
       case 'Audio chat':
-        _open(audioMedia: true);
+        _openAudioMedia();
         break;
       case 'Screen share':
-        _open(displayMedia: true);
+        _openDisplayMedia();
         break;
       case 'Media play':
-        _open();
+        //_openMediaStream(stream);
         break;
       default:
         break;
@@ -195,7 +240,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   Widget _buildActionCard(BuildContext context) {
-    double height = 180;
+    double height = 70;
     return Container(
       margin: const EdgeInsets.all(0.0),
       padding: const EdgeInsets.only(bottom: 0.0),
@@ -245,7 +290,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                   _buildActionCard(context),
                   Center(
                       child: Container(
-                    padding: const EdgeInsets.all(15.0),
+                    padding: const EdgeInsets.all(25.0),
                     child: WidgetUtil.buildCircleButton(
                       onPressed: () {
                         _close();
@@ -259,7 +304,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                         color: Colors.white,
                       ),
                     ),
-                  ))
+                  )),
                 ]));
           })
     ]);

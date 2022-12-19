@@ -38,7 +38,7 @@ class AppBarView extends StatelessWidget {
     return Consumer<IndexWidgetProvider>(
         builder: (context, indexWidgetProvider, child) {
       return Column(children: [
-        AppBarWidget.build(
+        AppBarWidget.buildAppBar(
           context,
           withLeading: withLeading,
           leadingCallBack: leadingCallBack,
