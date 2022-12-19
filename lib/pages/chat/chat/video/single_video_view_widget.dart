@@ -1,3 +1,5 @@
+import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_connections_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -167,13 +169,22 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         onTap: () {
           setState(() {
             actionVisible = !actionVisible;
+            localVideoRenderController.videoRender = widget.render;
           });
         },
         child: videoView,
       ),
     );
-
+    var selected = false;
+    if (widget.render.id != null &&
+        localVideoRenderController.videoRender != null) {
+      selected = widget.render.id == localVideoRenderController.videoRender!.id;
+    }
+    var primary = appDataProvider.themeData.colorScheme.primary;
     return Container(
+      decoration: selected
+          ? BoxDecoration(border: Border.all(width: 2, color: primary))
+          : null,
       padding: const EdgeInsets.symmetric(horizontal: 0.0),
       child: Stack(
         children: [

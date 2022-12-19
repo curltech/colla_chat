@@ -29,25 +29,6 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 ///7.接收方等待远程视频流到来，显示
 ///8.如果发起方在接收回执到来前，自己主动终止请求，执行挂断操作，设置挂断标志，对远程流不予接受
 
-final List<ActionData> actionData = [
-  ActionData(
-      label: 'Video chat',
-      tooltip: 'Video chat',
-      icon: const Icon(Icons.video_call, color: Colors.white)),
-  ActionData(
-      label: 'Audio chat',
-      tooltip: 'Audio chat',
-      icon: const Icon(Icons.multitrack_audio_outlined, color: Colors.white)),
-  ActionData(
-      label: 'Screen share',
-      tooltip: 'Screen share',
-      icon: const Icon(Icons.screen_share, color: Colors.white)),
-  ActionData(
-      label: 'Media play',
-      tooltip: 'Media play',
-      icon: const Icon(Icons.video_file, color: Colors.white)),
-];
-
 ///本地视频通话显示和拨出的窗口，显示多个小视频窗口，每个小窗口代表一个对方，其中一个是自己
 ///以及各种功能按钮
 class LocalVideoWidget extends StatefulWidget {
@@ -89,6 +70,39 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   _update() {
     _toggleActionCard();
+  }
+
+  List<ActionData> _buildActionData() {
+    List<ActionData> actionData = [];
+    if (localVideoRenderController.videoChatRender == null) {
+      actionData.add(
+        ActionData(
+            label: 'Video chat',
+            tooltip: 'Video chat',
+            icon: const Icon(Icons.video_call, color: Colors.white)),
+      );
+      actionData.add(
+        ActionData(
+            label: 'Audio chat',
+            tooltip: 'Audio chat',
+            icon: const Icon(Icons.multitrack_audio_outlined,
+                color: Colors.white)),
+      );
+    }
+    actionData.add(
+      ActionData(
+          label: 'Screen share',
+          tooltip: 'Screen share',
+          icon: const Icon(Icons.screen_share, color: Colors.white)),
+    );
+    // actionData.add(
+    //   ActionData(
+    //       label: 'Media play',
+    //       tooltip: 'Media play',
+    //       icon: const Icon(Icons.video_file, color: Colors.white)),
+    // );
+
+    return actionData;
   }
 
   _openVideoMedia() async {
@@ -245,7 +259,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       margin: const EdgeInsets.all(0.0),
       padding: const EdgeInsets.only(bottom: 0.0),
       child: DataActionCard(
-        actions: actionData,
+        actions: _buildActionData(),
         height: height,
         //width: 320,
         onPressed: _onAction,
