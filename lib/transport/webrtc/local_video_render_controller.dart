@@ -76,6 +76,7 @@ class VideoRenderController with ChangeNotifier {
     }
   }
 
+  ///关闭streamId的流或者关闭控制器所有的流
   close({String? streamId}) {
     if (streamId == null) {
       for (var videoRender in videoRenders.values) {
@@ -187,6 +188,18 @@ class LocalVideoRenderController extends VideoRenderController {
     add(render);
 
     return render;
+  }
+
+  @override
+  close({String? streamId}) {
+    if (streamId == null) {
+      _videoChatRender = null;
+    } else {
+      if (_videoChatRender != null && streamId == _videoChatRender!.id) {
+        _videoChatRender = null;
+      }
+    }
+    super.close(streamId: streamId);
   }
 }
 

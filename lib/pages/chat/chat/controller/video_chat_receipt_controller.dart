@@ -1,11 +1,13 @@
 import 'package:colla_chat/entity/chat/chat.dart';
-import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/service/chat/chat.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
-import 'package:colla_chat/transport/webrtc/peer_connections_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
+import 'package:colla_chat/transport/webrtc/video_room_controller.dart';
 import 'package:flutter/material.dart';
 
 ///视频通话的请求消息，和回执消息控制器
@@ -81,9 +83,6 @@ class VideoChatReceiptController with ChangeNotifier {
     }
     String? status = chatReceipt.status;
     String? subMessageType = chatReceipt.subMessageType;
-    if (subMessageType == null) {
-      return;
-    }
     logger.w('received videoChat chatReceipt status: $status');
     if (subMessageType != ChatMessageSubType.chatReceipt.name) {
       return;
@@ -108,8 +107,27 @@ class VideoChatReceiptController with ChangeNotifier {
         await advancedPeerConnection.negotiate();
 
         ///对方同意视频通话则加入到视频连接池中
-        await peerConnectionsController
-            .addAdvancedPeerConnection(advancedPeerConnection);
+        Room? room = advancedPeerConnection.room;
+        if (room == null) {
+          String messageId = chatReceipt.messageId!;
+          var chatMessage = await chatMessageService.findByMessageId(messageId);
+          if (chatMessage == null) {
+            return;
+          }
+          String? content = chatMessage.content;
+          //无房间
+          if (content == null) {
+            room = Room(advancedPeerConnection.peerId);
+          } else {
+            Map map = JsonUtil.toJson(content);
+            room = Room.fromJson(map);
+          }
+          advancedPeerConnection.room = room;
+        }
+        VideoRoomController videoRoomController =
+            videoRoomPool.createRoomController(room);
+        videoRoomPool.roomId = room.roomId;
+        videoRoomController.addAdvancedPeerConnection(advancedPeerConnection);
       }
     } else if (status == MessageStatus.rejected.name) {
       await localVideoRenderController.close();

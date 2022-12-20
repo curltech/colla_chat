@@ -25,7 +25,6 @@ class SignalExtension {
     Map<String, dynamic>? room = json['room'];
     if (room != null) {
       this.room = Room(room['roomId'],
-          id: room['id'],
           type: room['type'],
           action: room['action'],
           identity: room['identity']);
@@ -154,30 +153,30 @@ class WebrtcSignal {
 
 ///加入的房间号
 class Room {
-  String? id;
+  String? roomId;
   String? type;
   String? action;
-  String? roomId;
   String? identity;
+  List<String>? participants; //允许的参与者
 
-  Room(this.roomId, {this.id, this.type, this.action, this.identity});
+  Room(this.roomId, {this.type, this.action, this.identity, this.participants});
 
   Room.fromJson(Map json) {
-    id = json['id'];
     roomId = json['roomId'];
     type = json['type'];
     action = json['action'];
     identity = json['identity'];
+    participants = json['participants'];
   }
 
   Map<String, dynamic> toJson() {
     Map<String, dynamic> json = {};
     json.addAll({
-      'id': id,
       'roomId': roomId,
       'type': type,
       'action': action,
       'identity': identity,
+      'participants': participants,
     });
     return json;
   }

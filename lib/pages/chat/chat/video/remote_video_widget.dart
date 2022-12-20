@@ -1,13 +1,15 @@
-import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
-import 'package:colla_chat/transport/webrtc/peer_connections_controller.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
+import 'package:colla_chat/transport/webrtc/video_room_controller.dart';
 import 'package:flutter/material.dart';
 
 ///远程视频通话窗口，显示多个小视频窗口，每个小窗口代表一个对方，其中一个是自己
 ///以及各种功能按钮
 class RemoteVideoWidget extends StatefulWidget {
+  final String roomId;
+
   const RemoteVideoWidget({
     Key? key,
+    required this.roomId,
   }) : super(key: key);
 
   @override
@@ -25,8 +27,13 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   }
 
   Widget _buildVideoViewCard(BuildContext context) {
+    VideoRoomController? videoRoomController =
+        videoRoomPool.getVideoRoomController(widget.roomId);
+    if (videoRoomController == null) {
+      return Container();
+    }
     return VideoViewCard(
-      videoRenderController: peerConnectionsController,
+      videoRenderController: videoRoomController,
     );
   }
 
@@ -44,7 +51,6 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
                     actionVisible = !actionVisible;
                   });
                 },
-                child: const Icon(Icons.add_circle, size: 24),
               ),
             ],
           )),

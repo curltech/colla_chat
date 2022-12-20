@@ -7,7 +7,6 @@ import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/p2p/chain/action/signal.dart';
 import 'package:colla_chat/service/chat/contact.dart';
-import 'package:colla_chat/transport/webrtc/peer_connections_controller.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -603,26 +602,15 @@ class PeerConnectionPool {
   onAddStream(WebrtcEvent event) async {
     logger
         .i('peerId: ${event.peerId} clientId:${event.clientId} is onAddStream');
-    AdvancedPeerConnection? peerConnection =
-        getOne1(event.peerId, clientId: event.clientId);
-    if (peerConnection != null) {
-      peerConnectionsController.addAdvancedPeerConnection(peerConnection);
-    }
-    peerConnectionsController.updateAdvancedPeerConnection(
-        event.peerId, event.clientId);
   }
 
   onRemoveStream(WebrtcEvent event) async {
     logger.i(
         'peerId: ${event.peerId} clientId:${event.clientId} is onRemoveStream');
-    peerConnectionsController.updateAdvancedPeerConnection(
-        event.peerId, event.clientId);
   }
 
   onTrack(WebrtcEvent event) async {
     logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onTrack');
-    peerConnectionsController.updateAdvancedPeerConnection(
-        event.peerId, event.clientId);
   }
 
   onAddTrack(WebrtcEvent event) async {
@@ -634,8 +622,6 @@ class PeerConnectionPool {
   onRemoveTrack(WebrtcEvent event) async {
     logger.i(
         'peerId: ${event.peerId} clientId:${event.clientId} is onRemoveTrack');
-    peerConnectionsController.updateAdvancedPeerConnection(
-        event.peerId, event.clientId);
   }
 
   removeTrack(String peerId, MediaStream stream, MediaStreamTrack track,

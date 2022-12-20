@@ -3,14 +3,16 @@ import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_receipt_controller.dart';
+import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
-import 'package:colla_chat/transport/webrtc/peer_connections_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
+import 'package:colla_chat/transport/webrtc/video_room_controller.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -79,8 +81,22 @@ class VideoDialInWidget extends StatelessWidget {
           }
 
           ///同意视频通话则加入到视频连接池中
-          peerConnectionsController
-              .addAdvancedPeerConnection(advancedPeerConnection);
+          Room? room = advancedPeerConnection.room;
+          if (room == null) {
+            String? content = chatMessage.content;
+            //无房间
+            if (content == null) {
+              room = Room(advancedPeerConnection.peerId);
+            } else {
+              Map map = JsonUtil.toJson(content);
+              room = Room.fromJson(map);
+            }
+            advancedPeerConnection.room = room;
+          }
+          VideoRoomController videoRoomController =
+              videoRoomPool.createRoomController(room);
+          videoRoomPool.roomId = room.roomId;
+          videoRoomController.addAdvancedPeerConnection(advancedPeerConnection);
           indexWidgetProvider.push('chat_message');
           indexWidgetProvider.push('video_chat');
         }
