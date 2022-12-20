@@ -4,6 +4,8 @@ import 'package:colla_chat/pages/chat/chat/video/local_video_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/remote_video_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/video_room_controller.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -39,7 +41,10 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   @override
   void initState() {
     super.initState();
+    videoRoomPool.addListener(_update);
   }
+
+  _update() {}
 
   _closeOverlayEntry() {
     if (overlayEntry != null) {
@@ -68,6 +73,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   }
 
   Widget _buildVideoChatView(BuildContext context) {
+    var roomId = videoRoomPool.roomId;
     return Swiper(
       controller: SwiperController(),
       itemCount: 2,
@@ -75,7 +81,10 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
       itemBuilder: (BuildContext context, int index) {
         Widget view = const LocalVideoWidget();
         if (index == 1) {
-          view = const RemoteVideoWidget();
+          view = Container();
+          if (roomId != null) {
+            view = RemoteVideoWidget(roomId: roomId);
+          }
         }
         return Center(child: view);
       },
@@ -107,6 +116,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
 
   @override
   void dispose() {
+    videoRoomPool.removeListener(_update);
     super.dispose();
   }
 }

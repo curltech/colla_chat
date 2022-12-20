@@ -10,8 +10,8 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
-import 'package:colla_chat/transport/webrtc/peer_connections_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
+import 'package:colla_chat/transport/webrtc/video_room_controller.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 ///基础的PeerConnection之上加入了业务的编号，peerId和clientId，自动进行信号的协商
@@ -24,6 +24,9 @@ class AdvancedPeerConnection {
   String peerId;
   String clientId;
   String name;
+
+  //如果本连接有视频或者音频，则room不为空，单聊的roomId是对方的peerId:clientId
+  //群聊，会议的roomId是发起和接受聊天请求时由发起者创建，并随着聊天请求传输到被发起方
   Room? room;
 
   AdvancedPeerConnection(this.peerId, bool initiator,
@@ -142,9 +145,38 @@ class AdvancedPeerConnection {
 
   onAddRemoteStream(MediaStream stream) async {
     logger.i('peerId: $peerId clientId:$clientId is onAddRemoteStream');
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return;
+    }
     await _addRemoteStream(stream);
     await peerConnectionPool.onAddStream(
         WebrtcEvent(peerId, clientId: clientId, name: name, data: stream));
+  }
+
+  Future<PeerVideoRender?> _addRemoteStream(MediaStream stream) async {
+    if (room == null || room!.roomId == null) {
+      logger.e('room is not exist');
+      return null;
+    }
+    String roomId = room!.roomId!;
+    VideoRoomController? videoRoomController =
+        videoRoomPool.getVideoRoomController(roomId);
+    if (videoRoomController == null) {
+      logger.e('videoRoomController:$roomId is not exist');
+      return null;
+    }
+
+    String streamId = stream.id;
+    PeerVideoRender? videoRender = videoRoomController.videoRenders[streamId];
+    if (videoRender != null) {
+      return videoRender;
+    }
+    PeerVideoRender render = await PeerVideoRender.fromMediaStream(peerId,
+        clientId: clientId, name: name, stream: stream);
+    videoRoomController.add(render);
+
+    return render;
   }
 
   onRemoveRemoteStream(MediaStream stream) async {
@@ -152,6 +184,23 @@ class AdvancedPeerConnection {
     await _removeRemoteStream(stream);
     await peerConnectionPool.onRemoveStream(
         WebrtcEvent(peerId, clientId: clientId, name: name, data: stream));
+  }
+
+  _removeRemoteStream(MediaStream stream) async {
+    if (room == null || room!.roomId == null) {
+      logger.e('room is not exist');
+      return null;
+    }
+    String roomId = room!.roomId!;
+    VideoRoomController? videoRoomController =
+        videoRoomPool.getVideoRoomController(roomId);
+    if (videoRoomController == null) {
+      logger.e('videoRoomController:$roomId is not exist');
+      return null;
+    }
+
+    var streamId = stream.id;
+    videoRoomController.close(streamId: streamId);
   }
 
   onRemoteTrack(RTCTrackEvent event) async {
@@ -162,11 +211,6 @@ class AdvancedPeerConnection {
 
   onAddRemoteTrack(dynamic data) async {
     logger.i('peerId: $peerId clientId:$clientId is onAddRemoteTrack');
-    // MediaStream stream = data['stream'];
-    // String streamId = stream.id;
-    // if (!videoRenders.containsKey(streamId)) {
-    //   _addStream(stream);
-    // }
     await peerConnectionPool.onAddTrack(
         WebrtcEvent(peerId, clientId: clientId, name: name, data: data));
   }
@@ -236,44 +280,6 @@ class AdvancedPeerConnection {
     if (streamId != null) {
       localVideoRenderController.close(streamId: streamId);
     }
-  }
-
-  bool _addRemoteRender(PeerVideoRender render) {
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return false;
-    }
-    var streamId = render.id;
-    if (streamId != null) {
-      peerConnectionsController.add(render);
-      render.peerId = peerId;
-      render.name = name;
-      render.clientId = clientId;
-      logger.i(
-          'AdvancedPeerConnection peerId:$peerId _addRemoteRender $streamId, remoteVideoRenders length:${peerConnectionsController.videoRenders.length}');
-      return true;
-    }
-    return false;
-  }
-
-  Future<PeerVideoRender> _addRemoteStream(MediaStream stream) async {
-    String streamId = stream.id;
-    PeerVideoRender? videoRender =
-        peerConnectionsController.videoRenders[streamId];
-    if (videoRender != null) {
-      return videoRender;
-    }
-    PeerVideoRender render = await PeerVideoRender.fromMediaStream(peerId,
-        clientId: clientId, name: name, stream: stream);
-    await render.bindRTCVideoRender();
-    _addRemoteRender(render);
-
-    return render;
-  }
-
-  _removeRemoteStream(MediaStream stream) async {
-    var streamId = stream.id;
-    peerConnectionsController.close(streamId: streamId);
   }
 
   removeTrack(MediaStream stream, MediaStreamTrack track) async {

@@ -3,14 +3,12 @@ import 'dart:async';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
-
-import 'package:colla_chat/transport/webrtc/peer_connections_controller.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
@@ -105,12 +103,17 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     return actionData;
   }
 
+  ///弹出界面，选择参与者，返回房间
+  Future<Room> _buildRoom() async {
+    return Room('');
+  }
+
   _openVideoMedia() async {
     var status = peerConnectionPool.status(peerId!);
     if (partyType == PartyType.linkman.name) {
       if (status == PeerConnectionStatus.connected) {
         await localVideoRenderController.createVideoMediaRender();
-        await _send(title: ContentType.video.name);
+        await _sendLinkman(title: ContentType.video.name);
         setState(() {});
       } else {
         DialogUtil.error(context,
@@ -118,7 +121,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       }
     } else if (partyType == PartyType.group.name) {
       await localVideoRenderController.createVideoMediaRender();
-      await _send(title: ContentType.video.name);
+      Room room = await _buildRoom();
+      await _sendGroup(title: ContentType.video.name, room: room);
       setState(() {});
     }
   }
@@ -128,7 +132,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (partyType == PartyType.linkman.name) {
       if (status == PeerConnectionStatus.connected) {
         await localVideoRenderController.createAudioMediaRender();
-        await _send(title: ContentType.audio.name);
+        await _sendLinkman(title: ContentType.audio.name);
         setState(() {});
       } else {
         DialogUtil.error(context,
@@ -136,7 +140,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       }
     } else if (partyType == PartyType.group.name) {
       await localVideoRenderController.createAudioMediaRender();
-      await _send(title: ContentType.audio.name);
+      Room room = await _buildRoom();
+      await _sendGroup(title: ContentType.audio.name, room: room);
       setState(() {});
     }
   }
@@ -152,7 +157,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         if (source != null) {
           await localVideoRenderController.createDisplayMediaRender(
               selectedSource: source);
-          await _send(title: ContentType.display.name);
+          await _sendLinkman(title: ContentType.display.name);
           setState(() {});
         }
       } else {
@@ -167,7 +172,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       if (source != null) {
         await localVideoRenderController.createDisplayMediaRender(
             selectedSource: source);
-        await _send(title: ContentType.display.name);
+        Room room = await _buildRoom();
+        await _sendGroup(title: ContentType.display.name, room: room);
         setState(() {});
       }
     }
@@ -178,7 +184,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (partyType == PartyType.linkman.name) {
       if (status == PeerConnectionStatus.connected) {
         await localVideoRenderController.createMediaStreamRender(stream);
-        await _send(title: ContentType.video.name);
+        await _sendLinkman(title: ContentType.video.name);
         setState(() {});
       } else {
         DialogUtil.error(context,
@@ -186,29 +192,30 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       }
     } else if (partyType == PartyType.group.name) {
       await localVideoRenderController.createMediaStreamRender(stream);
-      await _send(title: ContentType.video.name);
+      Room room = await _buildRoom();
+      await _sendGroup(title: ContentType.video.name, room: room);
       setState(() {});
     }
   }
 
-  ///发送视频通话消息
-  Future<ChatMessage?> _send({required String title}) async {
+  ///发送linkman视频通邀请话消息,此时消息无data
+  Future<ChatMessage?> _sendLinkman({required String title}) async {
     return chatMessageController.send(
         title: title, subMessageType: ChatMessageSubType.videoChat);
   }
 
+  ///发送group视频通邀请话消息,此时消息必须有data,包含Room信息
+  Future<ChatMessage?> _sendGroup(
+      {required String title, required Room room}) async {
+    String json = JsonUtil.toJsonString(room);
+    return chatMessageController.sendText(
+        title: title,
+        message: json,
+        subMessageType: ChatMessageSubType.videoChat);
+  }
+
   _close() async {
-    List<AdvancedPeerConnection> pcs =
-        peerConnectionsController.getAdvancedPeerConnections(peerId!);
-    if (pcs.isNotEmpty) {
-      for (var pc in pcs) {
-        for (var render in localVideoRenderController.videoRenders.values) {
-          pc.removeLocalRender(render);
-        }
-        await pc.negotiate();
-      }
-    }
-    setState(() {});
+    localVideoRenderController.close();
   }
 
   ///视频视图
