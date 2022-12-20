@@ -65,8 +65,8 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
         widget.chatMessage.status = MessageStatus.read.name;
         await chatMessageService.update(
             {
-              status: widget.chatMessage.status,
-              readTime: widget.chatMessage.readTime
+              'status': widget.chatMessage.status,
+              'readTime': widget.chatMessage.readTime
             },
             where: 'id = ?',
             whereArgs: [widget.chatMessage.id!]);
