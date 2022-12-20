@@ -79,6 +79,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   @override
   initState() {
     super.initState();
+    _reconnect();
     linkmanChatSummaryController.addListener(_update);
     groupChatSummaryController.addListener(_update);
 
@@ -88,6 +89,14 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     websocketPool.addListener(_update);
     subscription =
         ConnectivityUtil.onConnectivityChanged(_onConnectivityChanged);
+  }
+
+  ///如果没有缺省的websocket，尝试重连
+  _reconnect() async {
+    Websocket? websocket = websocketPool.getDefault();
+    if (websocket == null) {
+      await websocketPool.connect();
+    }
   }
 
   _update() {
@@ -212,18 +221,29 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     rightWidgets.add(const SizedBox(
       width: 10.0,
     ));
+
     Websocket? websocket = websocketPool.getDefault();
+    SocketStatus status = SocketStatus.closed;
     if (websocket != null) {
-      SocketStatus status = websocket.status;
-      var wssWidget = InkWell(
-          onTap: () {
-            websocket.reconnect();
-          },
-          child: status == SocketStatus.connected
-              ? const Icon(Icons.cloud_done)
-              : const Icon(Icons.cloud_off));
-      rightWidgets.add(wssWidget);
+      status = websocket.status;
     }
+    var wssWidget = InkWell(
+        onTap: status != SocketStatus.connected
+            ? () async {
+                //缺省的websocket如果不存在，尝试重连
+                Websocket? websocket = websocketPool.getDefault();
+                if (websocket == null) {
+                  await _reconnect();
+                } else {
+                  //缺省的websocket如果存在，尝试重连
+                  await websocket.reconnect();
+                }
+              }
+            : null,
+        child: status == SocketStatus.connected
+            ? const Icon(Icons.cloud_done)
+            : const Icon(Icons.cloud_off));
+    rightWidgets.add(wssWidget);
     rightWidgets.add(const SizedBox(
       width: 10.0,
     ));

@@ -15,7 +15,6 @@ import './condition_import/unsupport.dart'
 import '../p2p/chain/chainmessagehandler.dart';
 
 enum SocketStatus {
-  created,
   connected, // 已连接
   failed, // 失败
   closed, // 连接关闭
@@ -52,8 +51,11 @@ class Websocket extends IWebClient {
     channel!.stream.listen((dynamic data) {
       onData(data);
     }, onError: onError, onDone: onDone, cancelOnError: false);
-    status = SocketStatus.created;
-    //logger.i('wss address:$address websocket connected');
+    status = SocketStatus.connected;
+    if (postConnected != null) {
+      postConnected!();
+    }
+    logger.i('wss address:$address websocket connected');
     // Future.delayed(const Duration(milliseconds: 500), () {
     //   if (postConnected != null && status == SocketStatus.connected) {
     //     postConnected!();
@@ -62,12 +64,6 @@ class Websocket extends IWebClient {
   }
 
   onData(dynamic data) async {
-    if (status != SocketStatus.connected) {
-      status = SocketStatus.connected;
-      if (postConnected != null) {
-        postConnected!();
-      }
-    }
     var msg = String.fromCharCodes(data);
     if (msg == 'heartbeat') {
       //logger.i('wss address:$address receive heartbeat message');
@@ -204,28 +200,32 @@ class WebsocketPool with ChangeNotifier {
   Websocket? _default;
 
   WebsocketPool() {
+    connect();
+  }
+
+  onStatusChange(Websocket websocket, SocketStatus status) {
+    notifyListeners();
+  }
+
+  ///初始化websocket的连接，尝试连接缺省socket
+  Future<Websocket?> connect() async {
     var nodeAddress = appDataProvider.nodeAddress;
     if (nodeAddress.isNotEmpty) {
       NodeAddress? defaultNodeAddress = nodeAddress[NodeAddress.defaultName];
       if (defaultNodeAddress != null) {
         var defaultAddress = defaultNodeAddress.wsConnectAddress;
         if (defaultAddress != null && defaultAddress.startsWith('ws')) {
-          var websocket =
-              Websocket(defaultAddress, myselfPeerService.connect);
-          websocket.connect().then((value) {
-            if (websocket._status == SocketStatus.connected) {
-              websockets[defaultAddress] = websocket;
-              websocket.onStatusChange = onStatusChange;
-              _default = websocket;
-            }
-          });
+          var websocket = Websocket(defaultAddress, myselfPeerService.connect);
+          await websocket.connect();
+          if (websocket._status == SocketStatus.connected) {
+            websockets[defaultAddress] = websocket;
+            websocket.onStatusChange = onStatusChange;
+            _default = websocket;
+          }
         }
       }
     }
-  }
-
-  onStatusChange(Websocket websocket, SocketStatus status) {
-    notifyListeners();
+    return _default;
   }
 
   Websocket? getDefault() {
