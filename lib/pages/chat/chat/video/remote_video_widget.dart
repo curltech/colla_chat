@@ -51,6 +51,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
                     actionVisible = !actionVisible;
                   });
                 },
+                child: const Icon(Icons.cabin),
               ),
             ],
           )),
