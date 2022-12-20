@@ -127,8 +127,9 @@ class VideoRoomController extends VideoRenderController {
         }
         controller.close();
       }
+      advancedPeerConnection.room = null;
+      notifyListeners();
     }
-    notifyListeners();
   }
 }
 
