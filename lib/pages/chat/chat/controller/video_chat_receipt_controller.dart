@@ -117,7 +117,8 @@ class VideoChatReceiptController with ChangeNotifier {
           String? content = chatMessage.content;
           //无房间
           if (content == null) {
-            room = Room(advancedPeerConnection.peerId);
+            room = Room(
+                '${advancedPeerConnection.peerId}:${advancedPeerConnection.clientId}');
           } else {
             Map map = JsonUtil.toJson(content);
             room = Room.fromJson(map);
