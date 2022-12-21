@@ -125,7 +125,8 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       ContentType contentType = ContentType.text,
       String? mimeType,
       ChatMessageType messageType = ChatMessageType.chat,
-      ChatMessageSubType subMessageType = ChatMessageSubType.chat}) async {
+      ChatMessageSubType subMessageType = ChatMessageSubType.chat,
+      List<String>? peerIds}) async {
     List<int>? data;
     if (message != null) {
       data = CryptoUtil.stringToUtf8(message);
@@ -136,7 +137,8 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         contentType: contentType,
         mimeType: mimeType,
         messageType: messageType,
-        subMessageType: subMessageType);
+        subMessageType: subMessageType,
+        peerIds: peerIds);
   }
 
   ///发送文本消息,发送命令消息目标可以是linkman，也可以是群，取决于当前chatSummary
@@ -147,22 +149,27 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       ContentType contentType = ContentType.text,
       String? mimeType,
       ChatMessageType messageType = ChatMessageType.chat,
-      ChatMessageSubType subMessageType = ChatMessageSubType.chat}) async {
+      ChatMessageSubType subMessageType = ChatMessageSubType.chat,
+      List<String>? peerIds}) async {
+    String partyType = PartyType.linkman.name;
+    peerIds ??= [];
+    String? peerId;
     if (_chatSummary == null) {
       return null;
+    } else {
+      peerId = _chatSummary!.peerId!;
+      partyType = _chatSummary!.partyType!;
+      if (partyType == PartyType.linkman.name) {
+        peerIds.add(peerId);
+      }
     }
-    String peerId = _chatSummary!.peerId!;
-    String receiverName = _chatSummary!.name!;
-    String partyType = _chatSummary!.partyType!;
-
     ChatMessage? chatMessage;
-    if (partyType == PartyType.linkman.name) {
+    for (var peerId in peerIds) {
       //保存消息
       chatMessage = await chatMessageService.buildChatMessage(
         peerId,
         title: title,
         data: data,
-        receiverName: receiverName,
         contentType: contentType,
         mimeType: mimeType,
         messageType: messageType,
@@ -174,7 +181,8 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       _deleteTime = 0;
       _parentMessageId = null;
       notifyListeners();
-    } else if (partyType == PartyType.group.name) {
+    }
+    if (partyType == PartyType.group.name) {
       //保存群消息
       List<ChatMessage> chatMessages =
           await chatMessageService.buildGroupChatMessage(

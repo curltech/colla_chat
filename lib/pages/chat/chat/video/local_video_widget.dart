@@ -4,6 +4,7 @@ import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -12,6 +13,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
+import 'package:colla_chat/transport/webrtc/video_room_controller.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
@@ -108,40 +110,53 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     return Room('');
   }
 
-  _openVideoMedia() async {
+  _openVideoMedia({bool video = true}) async {
     var status = peerConnectionPool.status(peerId!);
     if (partyType == PartyType.linkman.name) {
+      ///还需要检查本连接是否已经在room中，如果在，不需要发送邀请，增加完render，重新协商就可以了
       if (status == PeerConnectionStatus.connected) {
+        var videoChatRender = localVideoRenderController.videoChatRender;
+        if (videoChatRender == null) {
+          if (video) {
+            await localVideoRenderController.createVideoMediaRender();
+          } else {
+            await localVideoRenderController.createAudioMediaRender();
+          }
+          var videoRoomController = videoRoomPool.videoRoomController;
+          bool connected = false;
+          if (videoRoomController != null) {
+            List<AdvancedPeerConnection> pcs =
+                videoRoomController.getAdvancedPeerConnections(peerId!);
+            if (pcs.isNotEmpty) {
+              for (var pc in pcs) {
+                connected = true;
+                pc.negotiate();
+              }
+            }
+          }
+          if (!connected) {
+            if (video) {
+              await _sendLinkman(title: ContentType.video.name);
+            } else {
+              await _sendLinkman(title: ContentType.audio.name);
+            }
+            setState(() {});
+          }
+        }
+      } else {
+        DialogUtil.error(context,
+            content: AppLocalizations.t('No Webrtc connected PeerConnection'));
+      }
+    } else if (partyType == PartyType.group.name) {
+      if (video) {
         await localVideoRenderController.createVideoMediaRender();
-        await _sendLinkman(title: ContentType.video.name);
-        setState(() {});
+        Room room = await _buildRoom();
+        await _sendGroup(title: ContentType.video.name, room: room);
       } else {
-        DialogUtil.error(context,
-            content: AppLocalizations.t('No Webrtc connected PeerConnection'));
-      }
-    } else if (partyType == PartyType.group.name) {
-      await localVideoRenderController.createVideoMediaRender();
-      Room room = await _buildRoom();
-      await _sendGroup(title: ContentType.video.name, room: room);
-      setState(() {});
-    }
-  }
-
-  _openAudioMedia() async {
-    var status = peerConnectionPool.status(peerId!);
-    if (partyType == PartyType.linkman.name) {
-      if (status == PeerConnectionStatus.connected) {
         await localVideoRenderController.createAudioMediaRender();
-        await _sendLinkman(title: ContentType.audio.name);
-        setState(() {});
-      } else {
-        DialogUtil.error(context,
-            content: AppLocalizations.t('No Webrtc connected PeerConnection'));
+        Room room = await _buildRoom();
+        await _sendGroup(title: ContentType.audio.name, room: room);
       }
-    } else if (partyType == PartyType.group.name) {
-      await localVideoRenderController.createAudioMediaRender();
-      Room room = await _buildRoom();
-      await _sendGroup(title: ContentType.audio.name, room: room);
       setState(() {});
     }
   }
@@ -205,13 +220,15 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   ///发送group视频通邀请话消息,此时消息必须有data,包含Room信息
+  ///需要群发给room里面的参与者，而不是group的所有成员
   Future<ChatMessage?> _sendGroup(
       {required String title, required Room room}) async {
     String json = JsonUtil.toJsonString(room);
     return chatMessageController.sendText(
         title: title,
         message: json,
-        subMessageType: ChatMessageSubType.videoChat);
+        subMessageType: ChatMessageSubType.videoChat,
+        peerIds: room.participants);
   }
 
   _close() async {
@@ -247,7 +264,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         _openVideoMedia();
         break;
       case 'Audio chat':
-        _openAudioMedia();
+        _openVideoMedia(video: false);
         break;
       case 'Screen share':
         _openDisplayMedia();

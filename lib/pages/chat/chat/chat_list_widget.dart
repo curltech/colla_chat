@@ -73,7 +73,10 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _ChatListWidgetState extends State<ChatListWidget> {
-  ConnectivityResult _result = ConnectivityResult.none;
+  final ValueNotifier<ConnectivityResult> _connectivityResult =
+      ValueNotifier<ConnectivityResult>(ConnectivityResult.none);
+  final ValueNotifier<SocketStatus> _socketStatus =
+      ValueNotifier<SocketStatus>(SocketStatus.closed);
   late StreamSubscription<ConnectivityResult> subscription;
 
   @override
@@ -100,7 +103,20 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   }
 
   _update() {
-    setState(() {});
+    Websocket? websocket = websocketPool.getDefault();
+    if (websocket != null) {
+      _socketStatus.value = websocket.status;
+    } else {
+      _socketStatus.value = SocketStatus.closed;
+    }
+    if (_socketStatus.value == SocketStatus.connected) {
+      DialogUtil.info(context,
+          content: AppLocalizations.t('Websocket status was changed to:') +
+              _socketStatus.value.name);
+    } else {
+      DialogUtil.error(context,
+          content: AppLocalizations.t('Websocket were break down'));
+    }
   }
 
   _onConnectivityChanged(ConnectivityResult result) {
@@ -112,9 +128,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
           content: AppLocalizations.t('Connectivity status was changed to:') +
               result.name);
     }
-    setState(() {
-      _result = result;
-    });
+    _connectivityResult.value = result;
   }
 
   _buildGroupDataListController() async {
@@ -207,42 +221,45 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   Widget build(BuildContext context) {
     String title = AppLocalizations.t(widget.title);
     List<Widget> rightWidgets = [];
-    var connectivityWidget =
-        Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      const SizedBox(
-        height: 3,
-      ),
-      Text(_result.name, style: const TextStyle(fontSize: 12)),
-      _result == ConnectivityResult.none
-          ? const Icon(Icons.wifi_off, size: 20)
-          : const Icon(Icons.wifi, size: 20),
-    ]);
+    var connectivityWidget = ValueListenableBuilder(
+        valueListenable: _connectivityResult,
+        builder: (context, value, child) {
+          return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            const SizedBox(
+              height: 3,
+            ),
+            Text(_connectivityResult.value.name,
+                style: const TextStyle(fontSize: 12)),
+            _connectivityResult.value == ConnectivityResult.none
+                ? const Icon(Icons.wifi_off, size: 20)
+                : const Icon(Icons.wifi, size: 20),
+          ]);
+        });
     rightWidgets.add(connectivityWidget);
     rightWidgets.add(const SizedBox(
       width: 10.0,
     ));
 
-    Websocket? websocket = websocketPool.getDefault();
-    SocketStatus status = SocketStatus.closed;
-    if (websocket != null) {
-      status = websocket.status;
-    }
-    var wssWidget = InkWell(
-        onTap: status != SocketStatus.connected
-            ? () async {
-                //缺省的websocket如果不存在，尝试重连
-                Websocket? websocket = websocketPool.getDefault();
-                if (websocket == null) {
-                  await _reconnect();
-                } else {
-                  //缺省的websocket如果存在，尝试重连
-                  await websocket.reconnect();
-                }
-              }
-            : null,
-        child: status == SocketStatus.connected
-            ? const Icon(Icons.cloud_done)
-            : const Icon(Icons.cloud_off));
+    var wssWidget = ValueListenableBuilder(
+        valueListenable: _socketStatus,
+        builder: (context, value, child) {
+          return InkWell(
+              onTap: _socketStatus.value != SocketStatus.connected
+                  ? () async {
+                      //缺省的websocket如果不存在，尝试重连
+                      Websocket? websocket = websocketPool.getDefault();
+                      if (websocket == null) {
+                        await _reconnect();
+                      } else {
+                        //缺省的websocket如果存在，尝试重连
+                        await websocket.reconnect();
+                      }
+                    }
+                  : null,
+              child: _socketStatus.value == SocketStatus.connected
+                  ? const Icon(Icons.cloud_done)
+                  : const Icon(Icons.cloud_off));
+        });
     rightWidgets.add(wssWidget);
     rightWidgets.add(const SizedBox(
       width: 10.0,

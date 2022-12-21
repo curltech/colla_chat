@@ -10,6 +10,7 @@ import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart'
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
@@ -53,12 +54,14 @@ class _ChatMessageViewState extends State<ChatMessageView> {
   late String peerId;
   late String name;
   late String partyType;
+  final ValueNotifier<PeerConnectionStatus> _peerConnectionStatus =
+      ValueNotifier<PeerConnectionStatus>(PeerConnectionStatus.none);
 
   @override
   void initState() {
     super.initState();
     chatMessageController.addListener(_update);
-    peerConnectionPoolController.addListener(_update);
+    peerConnectionPoolController.addListener(_updatePeerConnectionStatus);
     _createPeerConnection();
   }
 
@@ -98,12 +101,10 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     setState(() {});
   }
 
-  @override
-  Widget build(BuildContext context) {
-    PeerConnectionStatus? status;
+  _updatePeerConnectionStatus() {
+    PeerConnectionStatus status = PeerConnectionStatus.none;
     if (partyType == PartyType.linkman.name) {
-      status = PeerConnectionStatus.none;
-      var peerConnections = peerConnectionPool.get(peerId!);
+      var peerConnections = peerConnectionPool.get(peerId);
       if (peerConnections.isNotEmpty) {
         //发现一个状态为connected的就设置为connected
         for (var peerConnection in peerConnections) {
@@ -114,6 +115,19 @@ class _ChatMessageViewState extends State<ChatMessageView> {
         }
       }
     }
+    _peerConnectionStatus.value = status;
+    if (_peerConnectionStatus.value == PeerConnectionStatus.connected) {
+      DialogUtil.info(context,
+          content: AppLocalizations.t('PeerConnection status was changed to:') +
+              _peerConnectionStatus.value.name);
+    } else {
+      DialogUtil.error(context,
+          content: AppLocalizations.t('PeerConnection were break down'));
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     String title = AppLocalizations.t(name);
     Widget titleWidget = Text(title);
     //     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -131,15 +145,20 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     // ]);
     List<Widget> rightWidgets = [];
     if (partyType == PartyType.linkman.name) {
-      if (status == PeerConnectionStatus.connected) {
-        rightWidgets.add(const Icon(Icons.wifi));
-      } else {
-        rightWidgets.add(InkWell(
-            onTap: () {
-              _createPeerConnection();
-            },
-            child: const Icon(Icons.wifi_off)));
-      }
+      var peerConnectionStatusWidget = ValueListenableBuilder(
+          valueListenable: _peerConnectionStatus,
+          builder: (context, value, child) {
+            Widget widget = const Icon(Icons.wifi);
+            if (_peerConnectionStatus.value != PeerConnectionStatus.connected) {
+              widget = InkWell(
+                  onTap: () {
+                    _createPeerConnection();
+                  },
+                  child: const Icon(Icons.wifi_off));
+            }
+            return widget;
+          });
+      rightWidgets.add(peerConnectionStatusWidget);
       rightWidgets.add(const SizedBox(
         width: 15,
       ));
@@ -156,7 +175,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
   @override
   void dispose() {
     chatMessageController.removeListener(_update);
-    peerConnectionPoolController.removeListener(_update);
+    peerConnectionPoolController.removeListener(_updatePeerConnectionStatus);
     super.dispose();
   }
 }
