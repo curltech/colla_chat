@@ -320,7 +320,7 @@ class MessageWidget {
   }
 
   ///打开地图
-  openLocationMap(BuildContext context) {
+  openLocationMap(BuildContext context) async {
     String? content = chatMessage.content;
     if (content == null) {
       return;
@@ -333,7 +333,7 @@ class MessageWidget {
     var latitude = locationPosition.latitude; //纬度
     var longitude = locationPosition.longitude; //经度
     if (platformParams.desktop) {
-      SmartDialogUtil.show(
+      await SmartDialogUtil.show(
           context: context,
           title: AppBarWidget.buildTitleBar(
               title: Text(AppLocalizations.t('Location map'))),
@@ -345,7 +345,7 @@ class MessageWidget {
           });
       // GeolocatorUtil.launchCoordinates(latitude, longitude);
     } else {
-      SmartDialogUtil.show(
+      await SmartDialogUtil.show(
           context: context,
           title: AppBarWidget.buildTitleBar(
               title: Text(AppLocalizations.t('Location map'))),

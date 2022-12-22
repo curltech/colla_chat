@@ -151,36 +151,33 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       ChatMessageType messageType = ChatMessageType.chat,
       ChatMessageSubType subMessageType = ChatMessageSubType.chat,
       List<String>? peerIds}) async {
-    String partyType = PartyType.linkman.name;
-    peerIds ??= [];
-    String? peerId;
     if (_chatSummary == null) {
       return null;
-    } else {
-      peerId = _chatSummary!.peerId!;
-      partyType = _chatSummary!.partyType!;
-      if (partyType == PartyType.linkman.name) {
-        peerIds.add(peerId);
-      }
     }
+    String peerId = _chatSummary!.peerId!;
+    String partyType = _chatSummary!.partyType!;
     ChatMessage? chatMessage;
-    for (var peerId in peerIds) {
-      //保存消息
-      chatMessage = await chatMessageService.buildChatMessage(
-        peerId,
-        title: title,
-        data: data,
-        contentType: contentType,
-        mimeType: mimeType,
-        messageType: messageType,
-        subMessageType: subMessageType,
-        deleteTime: _deleteTime,
-        parentMessageId: _parentMessageId,
-      );
-      chatMessage = await chatMessageService.sendAndStore(chatMessage);
-      _deleteTime = 0;
-      _parentMessageId = null;
-      notifyListeners();
+    if (partyType == PartyType.linkman.name) {
+      peerIds ??= [];
+      peerIds.add(peerId);
+      for (var peerId in peerIds) {
+        //保存消息
+        chatMessage = await chatMessageService.buildChatMessage(
+          peerId,
+          title: title,
+          data: data,
+          contentType: contentType,
+          mimeType: mimeType,
+          messageType: messageType,
+          subMessageType: subMessageType,
+          deleteTime: _deleteTime,
+          parentMessageId: _parentMessageId,
+        );
+        chatMessage = await chatMessageService.sendAndStore(chatMessage);
+        _deleteTime = 0;
+        _parentMessageId = null;
+        notifyListeners();
+      }
     }
     if (partyType == PartyType.group.name) {
       //保存群消息
@@ -192,6 +189,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         mimeType: mimeType,
         subMessageType: subMessageType,
         deleteTime: _deleteTime,
+        peerIds: peerIds,
       );
       if (chatMessages.isNotEmpty) {
         chatMessage = chatMessages[0];

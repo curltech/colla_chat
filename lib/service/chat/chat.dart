@@ -350,6 +350,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     List<int>? thumbnail,
     int deleteTime = 0,
     String? parentMessageId,
+    List<String>? peerIds,
   }) async {
     List<ChatMessage> chatMessages = [];
     Group? group = await groupService.findCachedOneByPeerId(groupPeerId);
@@ -378,6 +379,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           await groupMemberService.findLinkmen(groupMembers);
       for (var linkman in linkmen) {
         var peerId = linkman.peerId;
+        if (peerIds != null && !peerIds.contains(peerId)) {
+          continue;
+        }
         var receiverName = linkman.name;
         ChatMessage chatMessage = await buildChatMessage(
           peerId,

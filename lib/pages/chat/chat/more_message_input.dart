@@ -249,7 +249,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   ///名片
   Future<void> _onActionNameCard() async {
-    DialogUtil.show(
+    await DialogUtil.show(
         context: context,
         title:
             AppBarWidget.buildTitleBar(title: const Text('Select one linkman')),

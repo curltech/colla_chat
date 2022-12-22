@@ -1,8 +1,12 @@
 import 'dart:async';
+import 'dart:math';
 
+import 'package:colla_chat/crypto/cryptography.dart';
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/linkman/group_linkman_widget.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
@@ -108,7 +112,22 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   ///弹出界面，选择参与者，返回房间
   Future<Room> _buildRoom() async {
-    return Room('');
+    List<String> participants = [];
+    await DialogUtil.show(
+        context: context,
+        builder: (BuildContext context) {
+          return GroupLinkmanWidget(
+            onSelected: (List<String> peerIds) {
+              participants = peerIds;
+              Navigator.pop(context, participants);
+            },
+            selected: [],
+            peerId: peerId!,
+          );
+        });
+    var random = Random.secure();
+    int num = random.nextInt(1 << 32);
+    return Room('$name$num', participants: participants);
   }
 
   _openVideoMedia({bool video = true}) async {
