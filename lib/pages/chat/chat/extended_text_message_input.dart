@@ -182,9 +182,9 @@ class _ExtendedTextMessageInputWidgetState
       onTap: () => setState(() {
         if (focusNode.hasFocus) {}
       }),
-      onChanged: (String value) {
+      onChanged: (String value) async {
         if (value == '@') {
-          DialogUtil.show(
+          await DialogUtil.show(
               context: context,
               builder: (BuildContext context) {
                 return Dialog(
