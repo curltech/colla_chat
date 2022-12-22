@@ -14,6 +14,7 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/smart_dialog_util.dart';
+import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:cross_file/cross_file.dart';
@@ -125,7 +126,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   _onActionDeleteTime() async {
     int? deleteTime = await DialogUtil.showSelectDialog<int>(
         context: context,
-        title: 'Select deleteTime',
+        title:
+            AppBarWidget.buildTitleBar(title: const Text('Select deleteTime')),
         items: [
           _buildOption(0),
           _buildOption(15),
@@ -204,7 +206,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     String? address;
     await SmartDialogUtil.show(
         context: context,
-        title: AppLocalizations.t('Location map'),
+        title: AppBarWidget.buildTitleBar(
+            title: Text(AppLocalizations.t('Location map'))),
         builder: (BuildContext? context) {
           return GeolocatorUtil.buildLocationPicker(
               latitude: latitude,
@@ -248,7 +251,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   Future<void> _onActionNameCard() async {
     DialogUtil.show(
         context: context,
-        title: 'Select one linkman',
+        title:
+            AppBarWidget.buildTitleBar(title: const Text('Select one linkman')),
         builder: (BuildContext context) {
           return LinkmanGroupSearchWidget(
               onSelected: (List<String> selected) async {

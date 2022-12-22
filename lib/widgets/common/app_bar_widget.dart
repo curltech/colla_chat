@@ -34,7 +34,7 @@ class AppBarWidget {
     }
 
     ///然后加上右边的下拉组件
-    var action = popMenuButton(context,
+    var action = popMenuButton(
         rightPopupMenus: rightPopupMenus, rightWidgets: rightWidgets);
     if (action != null) {
       actions.add(action);
@@ -55,8 +55,7 @@ class AppBarWidget {
     return appBar;
   }
 
-  static Widget buildTitleBar(
-    BuildContext context, {
+  static Widget buildTitleBar({
     Color? backgroundColor,
     Widget? title = const Text(''),
     bool centerTitle = false, //标题是否居中
@@ -69,7 +68,7 @@ class AppBarWidget {
     if (rightWidgets != null && rightWidgets.isNotEmpty) {
       actions.addAll(rightWidgets);
     }
-    var action = popMenuButton(context,
+    var action = popMenuButton(
         rightPopupMenus: rightPopupMenus, rightWidgets: rightWidgets);
     if (action != null) {
       actions.add(action);
@@ -109,8 +108,7 @@ class AppBarWidget {
     return leadingButton;
   }
 
-  static PopupMenuButton<int>? popMenuButton(
-    BuildContext context, {
+  static PopupMenuButton<int>? popMenuButton({
     List<AppBarPopupMenu>? rightPopupMenus,
     List<Widget>? rightWidgets,
   }) {

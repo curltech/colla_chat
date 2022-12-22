@@ -4,6 +4,7 @@ import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
@@ -165,9 +166,9 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     var status = peerConnectionPool.status(peerId!);
     if (partyType == PartyType.linkman.name) {
       if (status == PeerConnectionStatus.connected) {
-        final source = await showDialog<DesktopCapturerSource>(
+        final source = await DialogUtil.show<DesktopCapturerSource>(
           context: context,
-          builder: (context) => ScreenSelectDialog(),
+          builder: (context) => Dialog(child: ScreenSelectDialog()),
         );
         if (source != null) {
           await localVideoRenderController.createDisplayMediaRender(

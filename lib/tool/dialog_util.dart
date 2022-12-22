@@ -8,7 +8,7 @@ class DialogUtil {
   ///利用Option产生的SelectDialog
   static Future<T?> showSelectDialog<T>({
     required BuildContext context,
-    required String title,
+    required Widget? title,
     required List<Option> items,
   }) async {
     List<SimpleDialogOption> options = [];
@@ -58,7 +58,6 @@ class DialogUtil {
   ///利用Option产生的SelectMenu
   static Future<T?> showSelectMenu<T>({
     required BuildContext context,
-    required String title,
     required List<Option> items,
   }) async {
     List<PopupMenuEntry<T>> options = [];
@@ -108,7 +107,7 @@ class DialogUtil {
   static Future<T?> show<T>({
     required BuildContext context,
     required Widget Function(BuildContext) builder,
-    String? title,
+    Widget? title,
     bool barrierDismissible = true,
     Color? barrierColor = Colors.black54,
     String? barrierLabel,
@@ -119,12 +118,8 @@ class DialogUtil {
   }) async {
     Widget child = builder(context);
     if (title != null) {
-      AppBar appBar = AppBar(
-        title: Text(AppLocalizations.t(title)),
-        elevation: 0,
-      );
       child = Column(children: [
-        appBar,
+        title,
         Expanded(child: child),
       ]);
     }

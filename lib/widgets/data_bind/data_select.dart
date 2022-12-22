@@ -319,7 +319,7 @@ class MultiSelectUtil {
   static MultiSelectDialogField<T> buildMultiSelectDialogField<T>({
     required List<Option<T>> items,
     required void Function(List<T>) onConfirm,
-    String? title,
+    Widget? title,
     String? buttonText,
     Icon? buttonIcon,
     MultiSelectListType? listType,
@@ -365,8 +365,7 @@ class MultiSelectUtil {
       items: options,
       onConfirm: onConfirm,
       initialValue: selectedValue,
-      title: Text(AppLocalizations.t(title ?? ''),
-          style: TextStyle(color: primary)),
+      title: title,
       buttonText: Text(AppLocalizations.t(buttonText ?? ''),
           style: TextStyle(color: primary)),
       buttonIcon: buttonIcon,
@@ -402,9 +401,9 @@ class MultiSelectUtil {
     );
   }
 
-  static MultiSelectDialog<T> buildMultiSelectDialog<T>({
+  static Widget buildMultiSelectDialog<T>({
     required List<Option<T>> items,
-    String? title,
+    Widget? title,
     void Function(List<T>)? onSelectionChanged,
     void Function(List<T>)? onConfirm,
     MultiSelectListType? listType,
@@ -438,12 +437,11 @@ class MultiSelectUtil {
       }
     }
     Color primary = appDataProvider.themeData.colorScheme.primary;
-    return MultiSelectDialog<T>(
+    Widget dialog = MultiSelectDialog<T>(
       items: options,
       onConfirm: onConfirm,
       initialValue: selectedValue,
-      title: Text(AppLocalizations.t(title ?? ''),
-          style: TextStyle(color: primary)),
+      title: title,
       listType: listType,
       onSelectionChanged: onSelectionChanged,
       searchable: searchable,
@@ -456,7 +454,7 @@ class MultiSelectUtil {
       height: height,
       width: width,
       colorator: colorator,
-      backgroundColor: Colors.white.withOpacity(0.7),
+      backgroundColor: Colors.white,
       unselectedColor: unselectedColor,
       searchIcon: searchIcon,
       closeSearchIcon: closeSearchIcon,
@@ -467,11 +465,13 @@ class MultiSelectUtil {
       separateSelectedItems: separateSelectedItems,
       checkColor: checkColor,
     );
+
+    return dialog;
   }
 
   static MultiSelectBottomSheet<T> buildMultiSelectBottomSheet<T>({
     required List<Option<T>> items,
-    String? title,
+    Widget? title,
     void Function(List<T>)? onSelectionChanged,
     void Function(List<T>)? onConfirm,
     MultiSelectListType? listType,
@@ -508,7 +508,7 @@ class MultiSelectUtil {
       items: options,
       onConfirm: onConfirm,
       initialValue: selectedValue,
-      title: Text(AppLocalizations.t(title ?? '')),
+      title: title,
       listType: listType,
       onSelectionChanged: onSelectionChanged,
       searchable: searchable,
