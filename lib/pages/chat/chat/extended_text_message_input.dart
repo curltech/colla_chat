@@ -136,15 +136,18 @@ class _ExtendedTextMessageInputWidgetState
             composing: TextRange.empty);
   }
 
-  _onSelected(List<String> selected) async {
+  _onSelected(List<String> selected) {
     if (selected.isNotEmpty) {
-      Linkman? linkman =
-          await linkmanService.findCachedOneByPeerId(selected[0]);
-      if (linkman != null) {
-        widget.textEditingController.text =
-            widget.textEditingController.text + linkman.name;
-      }
+      linkmanService
+          .findCachedOneByPeerId(selected[0])
+          .then((Linkman? linkman) {
+        if (linkman != null) {
+          widget.textEditingController.text =
+              widget.textEditingController.text + linkman.name;
+        }
+      });
     }
+    Navigator.pop(context, selected);
   }
 
   @override
@@ -183,12 +186,12 @@ class _ExtendedTextMessageInputWidgetState
         if (value == '@') {
           DialogUtil.show(
               context: context,
-              title: 'Select one linkman',
               builder: (BuildContext context) {
-                return LinkmanGroupSearchWidget(
-                    onSelected: _onSelected,
-                    selected: [],
-                    selectType: SelectType.multidialog);
+                return Dialog(
+                    child: LinkmanGroupSearchWidget(
+                        onSelected: _onSelected,
+                        selected: [],
+                        selectType: SelectType.listview));
               });
         }
       },

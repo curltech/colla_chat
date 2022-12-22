@@ -10,7 +10,7 @@ class SmartDialogUtil {
   ///带标题的对话框
   static Future<T?> show<T>({
     BuildContext? context,
-    String? title,
+    Widget? title,
     required Widget Function(BuildContext?) builder,
     SmartDialogController? controller,
     AlignmentGeometry? alignment,
@@ -39,18 +39,8 @@ class SmartDialogUtil {
   }) async {
     Widget child = builder(context);
     if (title != null) {
-      AppBar appBar = AppBar(
-        title: Text(title),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            SmartDialog.dismiss();
-          },
-        ),
-      );
       child = Column(children: [
-        appBar,
+        title,
         Expanded(child: child),
       ]);
     }

@@ -1,7 +1,9 @@
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -80,7 +82,7 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
       controller: textController,
       keyboardType: TextInputType.text,
       decoration: InputDecoration(
-        fillColor: Colors.white.withOpacity(0.5),
+        fillColor: Colors.black.withOpacity(0.1),
         filled: true,
         border: InputBorder.none,
         labelText: AppLocalizations.t('Search $title'),
@@ -124,6 +126,9 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
     var selector = FutureBuilder(
         future: _search(),
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (!snapshot.hasData) {
+            return Container();
+          }
           var options = _buildOptions();
           return SmartSelectUtil.multiple<String>(
             title: '',
@@ -157,9 +162,22 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
     var selector = FutureBuilder(
         future: _search(),
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (!snapshot.hasData) {
+            return Container();
+          }
           var options = _buildOptions();
           return MultiSelectUtil.buildMultiSelectDialogField<String>(
-            title: title,
+            title: Column(children: [
+              AppBarWidget.buildTitleBar(
+                  title: Text(
+                AppLocalizations.t(title),
+                style: const TextStyle(fontSize: 16, color: Colors.white),
+              )),
+              const SizedBox(
+                height: 10,
+              ),
+              _buildSearchTextField(context),
+            ]),
             buttonText: title,
             onConfirm: (selected) {
               this.selected = selected;
@@ -179,26 +197,29 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
     var selector = FutureBuilder(
         future: _search(),
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
-          var hasData = snapshot.hasData;
-          if (hasData) {
-            return MultiSelectUtil.buildMultiSelectDialog<String>(
-              title: title,
-              onConfirm: (selected) {
-                this.selected = selected;
-                widget.onSelected(selected);
-              },
-              items: _buildOptions(),
-            );
-          } else {
+          if (!snapshot.hasData) {
             return Container();
           }
+          return MultiSelectUtil.buildMultiSelectDialog<String>(
+            title: Column(children: [
+              AppBarWidget.buildTitleBar(
+                  title: Text(
+                AppLocalizations.t(title),
+                style: const TextStyle(fontSize: 16, color: Colors.white),
+              )),
+              const SizedBox(
+                height: 10,
+              ),
+              _buildSearchTextField(context),
+            ]),
+            onConfirm: (selected) {
+              this.selected = selected;
+              widget.onSelected(selected);
+            },
+            items: _buildOptions(),
+          );
         });
-    return Padding(
-        padding: const EdgeInsets.all(10),
-        child: Column(children: [
-          _buildSearchTextField(context),
-          Expanded(child: selector)
-        ]));
+    return selector;
   }
 
   //将linkman数据转换从列表显示数据
@@ -229,6 +250,9 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
     var dataListView = FutureBuilder(
         future: _search(),
         builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (!snapshot.hasData) {
+            return Container();
+          }
           return DataListView(
             tileData: _buildTileData(),
             onTap: _onTap,

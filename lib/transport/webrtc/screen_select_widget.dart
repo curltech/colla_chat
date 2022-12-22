@@ -5,6 +5,7 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 import '../webrtc/condition_import/unsupport.dart'
@@ -29,9 +30,13 @@ class ScreenSelectUtil {
   }
 }
 
+enum DialogStyle { dialog, smart }
+
 ///屏幕共享源的选择界面，包裹在showDialog中
-class ScreenSelectDialog extends Dialog {
-  ScreenSelectDialog({super.key}) {
+class ScreenSelectDialog extends StatelessWidget {
+  final DialogStyle dialogStyle;
+
+  ScreenSelectDialog({super.key, this.dialogStyle = DialogStyle.dialog}) {
     Future.delayed(const Duration(milliseconds: 100), () {
       _getSources();
     });
@@ -63,7 +68,12 @@ class ScreenSelectDialog extends Dialog {
     for (var element in _subscriptions) {
       element.cancel();
     }
-    Navigator.pop<DesktopCapturerSource>(context, _selectedSource);
+    if (dialogStyle == DialogStyle.dialog) {
+      Navigator.pop<DesktopCapturerSource>(context, _selectedSource);
+    }
+    if (dialogStyle == DialogStyle.smart) {
+      SmartDialog.dismiss(result: _selectedSource);
+    }
   }
 
   void _cancel(context) async {
@@ -71,7 +81,12 @@ class ScreenSelectDialog extends Dialog {
     for (var element in _subscriptions) {
       element.cancel();
     }
-    Navigator.pop<DesktopCapturerSource>(context, null);
+    if (dialogStyle == DialogStyle.dialog) {
+      Navigator.pop<DesktopCapturerSource>(context, null);
+    }
+    if (dialogStyle == DialogStyle.smart) {
+      SmartDialog.dismiss();
+    }
   }
 
   Future<void> _getSources() async {
@@ -97,7 +112,7 @@ class ScreenSelectDialog extends Dialog {
   }
 
   Widget _buildTitle(BuildContext context) {
-    return AppBarWidget.buildTitleBar(context,
+    return AppBarWidget.buildTitleBar(
         title: Text(
           AppLocalizations.t('Choose what to share'),
           style: const TextStyle(fontSize: 16, color: Colors.white),
@@ -228,8 +243,8 @@ class ScreenSelectDialog extends Dialog {
 
   @override
   Widget build(BuildContext context) {
-    var width = MediaQuery.of(context).size.width * 0.8;
-    var height = MediaQuery.of(context).size.height * 0.8;
+    var width = MediaQuery.of(context).size.width;
+    var height = MediaQuery.of(context).size.height;
     return Material(
       type: MaterialType.transparency,
       child: Center(

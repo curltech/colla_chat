@@ -6,7 +6,6 @@ import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_view.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
@@ -89,7 +88,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     var indexWidgetProvider =
         Provider.of<IndexWidgetProvider>(context, listen: false);
     indexWidgetProvider.define(widget.chatMessageView);
-    websocketPool.addListener(_update);
+    websocketPool.addListener(_updateWebsocket);
     subscription =
         ConnectivityUtil.onConnectivityChanged(_onConnectivityChanged);
   }
@@ -103,6 +102,10 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   }
 
   _update() {
+    setState(() {});
+  }
+
+  _updateWebsocket() {
     Websocket? websocket = websocketPool.getDefault();
     if (websocket != null) {
       _socketStatus.value = websocket.status;
@@ -275,8 +278,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   void dispose() {
     linkmanChatSummaryController.removeListener(_update);
     groupChatSummaryController.removeListener(_update);
-    peerConnectionPoolController.removeListener(_update);
-    websocketPool.removeListener(_update);
+    websocketPool.removeListener(_updateWebsocket);
     super.dispose();
     ConnectivityUtil.cancel(subscription);
   }
