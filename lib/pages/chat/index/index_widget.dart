@@ -1,5 +1,4 @@
-
-import 'package:colla_chat/pages/chat/channel/channel_widget.dart';
+import 'package:colla_chat/pages/chat/channel/channel_list_widget.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/pages/chat/me/me_widget.dart';
@@ -14,7 +13,7 @@ class IndexWidget extends StatefulWidget {
     indexWidgetProvider.controller = controller;
     indexWidgetProvider.define(ChatListWidget());
     indexWidgetProvider.define(LinkmanListWidget());
-    indexWidgetProvider.define(ChannelWidget());
+    indexWidgetProvider.define(ChannelListWidget());
     indexWidgetProvider.define(MeWidget());
   }
 
