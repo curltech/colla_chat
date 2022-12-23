@@ -126,9 +126,9 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   ///创建每一条消息
   Widget _buildMessageItem(BuildContext context, int index) {
     List<ChatMessage> messages = chatMessageController.data;
-    ChatMessage item = messages[index];
+    ChatMessage chatMessage = messages[index];
     Widget chatMessageItem =
-        ChatMessageItem(key: UniqueKey(), chatMessage: item, index: index);
+        ChatMessageItem(key: UniqueKey(), chatMessage: chatMessage, index: index);
 
     // index=0执行动画，对最新的消息执行动画
     if (index == 0) {

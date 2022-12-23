@@ -2,29 +2,30 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/richtext/quill_richtext_widget.dart';
+import 'package:colla_chat/widgets/richtext/visual_richtext_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class CollectionItemWidget extends StatefulWidget with TileDataMixin {
-  CollectionItemWidget({Key? key}) : super(key: key);
+class ChannelItemWidget extends StatefulWidget with TileDataMixin {
+  ChannelItemWidget({Key? key}) : super(key: key);
 
   @override
-  State createState() => _CollectionItemWidgetState();
+  State createState() => _ChannelItemWidgetState();
 
   @override
-  String get routeName => 'collection_item';
+  String get routeName => 'channel_item';
 
   @override
   bool get withLeading => true;
 
   @override
-  Icon get icon => const Icon(Icons.collections);
+  Icon get icon => const Icon(Icons.wifi_channel);
 
   @override
-  String get title => 'Collection Item';
+  String get title => 'Channel Item';
 }
 
-class _CollectionItemWidgetState extends State<CollectionItemWidget> {
+class _ChannelItemWidgetState extends State<ChannelItemWidget> {
   @override
   void dispose() {
     super.dispose();
@@ -42,7 +43,7 @@ class _CollectionItemWidgetState extends State<CollectionItemWidget> {
       title: Text(
         AppLocalizations.t(widget.title),
       ),
-      child: const QuillRichTextWidget(),
+      child: const VisualRichTextWidget(),
     );
   }
 }

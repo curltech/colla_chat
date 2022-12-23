@@ -326,6 +326,13 @@ class FileUtil {
       voiceRecorder: AppLocalizations.t('voiceRecorder'),
       gallery: AppLocalizations.t('gallery'),
       cropper: AppLocalizations.t('cropper'),
+      url: AppLocalizations.t('url'),
+      enterURL: AppLocalizations.t('enterURL'),
+      ok: AppLocalizations.t('ok'),
+      cancel: AppLocalizations.t('cancel'),
+      on: AppLocalizations.t('on'),
+      off: AppLocalizations.t('off'),
+      auto: AppLocalizations.t('auto'),
       onCompressing: AppLocalizations.t('onCompressing'),
       tapForPhotoHoldForVideo: AppLocalizations.t('tapForPhotoHoldForVideo'),
       cameraNotFound: AppLocalizations.t('cameraNotFound'),
@@ -350,7 +357,7 @@ class FileUtil {
           onError(error);
         }
       },
-      onSelected: (OutputFile file) {
+      onSelected: (FullPickerOutput file) {
         if (onSelectedFilenames != null) {
           onSelectedFilenames(file.name);
         }

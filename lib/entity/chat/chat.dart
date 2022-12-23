@@ -43,7 +43,11 @@ enum ChatMessageType {
   //聊天消息，在聊天界面上显示的消息
   chat,
   //系统消息，不在聊天界面上显示的消息
-  system
+  system,
+  //频道消息，就是自己发表的文章或者自己收藏的文章，不在聊天界面上显示的消息
+  channel,
+  //收藏消息，就是自己收藏的文章，经过发布可以成为channel类型，不在聊天界面上显示的消息
+  collection,
 }
 
 enum ChatMessageSubType {
@@ -61,6 +65,8 @@ enum ChatMessageSubType {
   delete, // 删除聊天消息
   chatReceipt, // 聊天回复
   groupFile, // 群文件
+  getChannel, //请求获取最新的频道文章
+  sendChannel, //发送最新的频道文章
   // 以下system消息，不在聊天界面显示
   signal, //webrtc signal消息，一般用于重新协商的情况
   preKeyBundle, //signal加解密

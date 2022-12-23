@@ -1,4 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/me/collection/collection_list_widget.dart';
 import 'package:colla_chat/pages/chat/me/collection/collection_widget.dart';
 import 'package:colla_chat/pages/chat/me/mail/address/address_add.dart';
 import 'package:colla_chat/pages/chat/me/mail/mail_address_widget.dart';
@@ -22,7 +23,7 @@ import 'package:flutter/material.dart';
 
 //我的页面，带有路由回调函数
 class MeWidget extends StatelessWidget with TileDataMixin {
-  final CollectionWidget collectionWidget = CollectionWidget();
+  final CollectionListWidget collectionListWidget = CollectionListWidget();
   final SettingWidget settingWidget = SettingWidget();
   final PersonalInfoWidget personalInfoWidget = const PersonalInfoWidget();
   final AddressAddWidget addressAddWidget = const AddressAddWidget();
@@ -62,7 +63,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(audioRecorderWidget);
     indexWidgetProvider.define(webViewWidget);
     List<TileDataMixin> mixins = [
-      collectionWidget,
+      collectionListWidget,
       settingWidget,
       addressAddWidget,
       mailAddressWidget,
