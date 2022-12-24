@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
+import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
@@ -9,7 +10,9 @@ import 'package:colla_chat/pages/chat/chat/video/local_video_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
@@ -63,6 +66,25 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     chatMessageController.addListener(_update);
     peerConnectionPoolController.addListener(_updatePeerConnectionStatus);
     _createPeerConnection();
+    _buildReadStatus();
+  }
+
+  ///更新为已读状态
+  Future<void> _buildReadStatus() async {
+    await chatMessageService.update(
+        {'status': MessageStatus.read.name, 'readTime': DateUtil.currentDate()},
+        where:
+            'senderPeerId = ? and receiverPeerId = ? and readTime is null and (status=? or status=? or status=? or status=?)',
+        whereArgs: [
+          peerId,
+          myself.peerId!,
+          MessageStatus.unsent.name,
+          MessageStatus.sent.name,
+          MessageStatus.received.name,
+          MessageStatus.send.name
+        ]);
+    await chatSummaryService.update({'unreadNumber': 0},
+        where: 'peerId=?', whereArgs: [peerId]);
   }
 
   ///初始化，webrtc如果没有连接，尝试连接

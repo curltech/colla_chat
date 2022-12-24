@@ -1,10 +1,5 @@
-import 'dart:async';
-
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:flutter/services.dart';
-import 'package:package_info/package_info.dart';
 
 class ValidatorUtil {
   static String? emptyValidator(String? value) {
@@ -23,10 +18,10 @@ class ValidatorUtil {
     }
     int length = value == null ? 0 : value.length;
     if (minLength != null && length < minLength) {
-      return AppLocalizations.t('Length must more than ') + '$minLength';
+      return '${AppLocalizations.t('Length must more than ')}$minLength';
     }
     if (maxLength != null && length > maxLength) {
-      return AppLocalizations.t('Length must less than ') + '$maxLength';
+      return '${AppLocalizations.t('Length must less than ')}$maxLength';
     }
     return null;
   }

@@ -9,7 +9,6 @@ import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 
-
 /// 本地sqlite3的通用访问类，所有的表访问服务都是这个类的实例
 abstract class GeneralBaseService<T> {
   final String tableName;
@@ -271,10 +270,11 @@ abstract class GeneralBaseService<T> {
     String? where,
     List<Object>? whereArgs,
   }) async {
-    EntityUtil.updateTimestamp(entity);
+    //EntityUtil.updateTimestamp(entity);
     Map<String, dynamic> json = await encrypt(entity);
-    return await dataStore.update(tableName, json,
+    int result = await dataStore.update(tableName, json,
         where: where, whereArgs: whereArgs);
+    return result;
   }
 
   /// 批量保存，根据脏标志新增，修改或者删除

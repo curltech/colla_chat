@@ -66,9 +66,13 @@ void main(List<String> args) async {
   if (platformParams.windows || platformParams.macos || platformParams.linux) {
     await windowManager.ensureInitialized();
   }
-  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
-    await inapp.InAppWebViewController.setWebContentsDebuggingEnabled(true);
+  if (Platform.isAndroid) {
+    await inapp.AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
+  ///6.x.x
+  // if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+  //   await inapp.InAppWebViewController.setWebContentsDebuggingEnabled(true);
+  // }
   ServiceLocator.init().then((bool loginStatus) {
     ///加载主应用组件
     runApp(MultiProvider(providers: [

@@ -1,20 +1,36 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/channel/channel_item_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
 //频道的页面
 class ChannelListWidget extends StatefulWidget with TileDataMixin {
+  final DataMoreController<ChatMessage> dataMoreController;
   final Future<void> Function()? onRefresh;
   final Function()? onScrollMax;
   final Function()? onScrollMin;
   final ScrollController scrollController = ScrollController();
+  late final ChannelItemWidget channelItemWidget;
 
   ChannelListWidget(
-      {Key? key, this.onRefresh, this.onScrollMax, this.onScrollMin})
-      : super(key: key);
+      {Key? key,
+      this.onRefresh,
+      this.onScrollMax,
+      this.onScrollMin,
+      required this.dataMoreController})
+      : super(key: key) {
+    channelItemWidget = ChannelItemWidget(
+      dataMoreController: dataMoreController,
+    );
+    indexWidgetProvider.define(channelItemWidget);
+  }
 
   @override
   State createState() => _ChannelListWidgetState();
@@ -23,13 +39,13 @@ class ChannelListWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  String get routeName => 'channel_list';
+  String get routeName => 'channel';
 
   @override
   Icon get icon => const Icon(Icons.wifi_channel);
 
   @override
-  String get title => 'Channel List';
+  String get title => 'Channel';
 }
 
 class _ChannelListWidgetState extends State<ChannelListWidget>
@@ -41,7 +57,7 @@ class _ChannelListWidgetState extends State<ChannelListWidget>
   @override
   void initState() {
     super.initState();
-    channelChatMessageController.addListener(_update);
+    widget.dataMoreController.addListener(_update);
     var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
     animateController = AnimationController(
@@ -50,7 +66,7 @@ class _ChannelListWidgetState extends State<ChannelListWidget>
 
   _update() {
     setState(() {
-      channelChatMessageController.latest();
+      widget.dataMoreController.latest();
     });
   }
 
@@ -86,9 +102,13 @@ class _ChannelListWidgetState extends State<ChannelListWidget>
 
   ///创建每一条消息
   Widget _buildMessageItem(BuildContext context, int index) {
-    List<ChatMessage> messages = channelChatMessageController.data;
-    ChatMessage chatMessage = messages[index];
-    Widget chatMessageItem = ListTile(title: Text(chatMessage.title!));
+    List<ChatMessage> chatMessages = widget.dataMoreController.data;
+    ChatMessage chatMessage = chatMessages[index];
+    Widget chatMessageItem = ListTile(
+        title: Text(chatMessage.title!),
+        onTap: () {
+          widget.dataMoreController.current = chatMessage;
+        });
 
     // index=0执行动画，对最新的消息执行动画
     if (index == 0) {
@@ -123,7 +143,7 @@ class _ChannelListWidgetState extends State<ChannelListWidget>
               //消息组件渲染
               itemBuilder: _buildMessageItem,
               //消息条目数
-              itemCount: channelChatMessageController.data.length,
+              itemCount: widget.dataMoreController.data.length,
             )),
       ),
     ]);
@@ -132,13 +152,26 @@ class _ChannelListWidgetState extends State<ChannelListWidget>
   @override
   Widget build(BuildContext context) {
     var chatMessageWidget = _buildChatMessageWidget(context);
-
-    return chatMessageWidget;
+    List<Widget>? rightWidgets = [
+      IconButton(
+          onPressed: () {
+            widget.dataMoreController.current = null;
+            indexWidgetProvider.push('channel_item');
+          },
+          icon: const Icon(Icons.note_add)),
+    ];
+    return AppBarView(
+        centerTitle: true,
+        title: Text(
+          AppLocalizations.t(widget.title),
+        ),
+        rightWidgets: rightWidgets,
+        child: chatMessageWidget);
   }
 
   @override
   void dispose() {
-    channelChatMessageController.removeListener(_update);
+    widget.dataMoreController.removeListener(_update);
     widget.scrollController.removeListener(_onScroll);
     animateController.dispose();
     super.dispose();

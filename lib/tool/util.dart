@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:flutter/services.dart';
-import 'package:package_info/package_info.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class PackageInfoUtil {
   Future<PackageInfo> getPackageInfo() async {
@@ -57,4 +57,3 @@ class StandardMessageCodecUtil {
     return o;
   }
 }
-
