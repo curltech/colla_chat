@@ -67,6 +67,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     peerConnectionPoolController.addListener(_updatePeerConnectionStatus);
     _createPeerConnection();
     _buildReadStatus();
+    _initPeerConnectionStatus();
   }
 
   ///更新为已读状态
@@ -123,7 +124,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     setState(() {});
   }
 
-  _updatePeerConnectionStatus() {
+  _initPeerConnectionStatus() {
     PeerConnectionStatus status = PeerConnectionStatus.none;
     if (partyType == PartyType.linkman.name) {
       var peerConnections = peerConnectionPool.get(peerId);
@@ -138,6 +139,9 @@ class _ChatMessageViewState extends State<ChatMessageView> {
       }
     }
     _peerConnectionStatus.value = status;
+  }
+
+  _updatePeerConnectionStatus() {
     if (_peerConnectionStatus.value == PeerConnectionStatus.connected) {
       DialogUtil.info(context,
           content: AppLocalizations.t('PeerConnection status was changed to:') +
