@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -20,10 +19,12 @@ enum _SelectionType {
 }
 
 class QuillRichTextWidget extends StatefulWidget {
-  final ChatMessage? chatMessage;
+  final String? content;
   final bool readOnly;
+  final Function(Document doc)? onStore;
 
-  const QuillRichTextWidget({Key? key, this.chatMessage, this.readOnly = false})
+  const QuillRichTextWidget(
+      {Key? key, this.readOnly = false, this.content, this.onStore})
       : super(key: key);
 
   @override
@@ -50,8 +51,8 @@ class _QuillRichTextWidgetState extends State<QuillRichTextWidget> {
   }
 
   Future<void> _load() async {
-    if (widget.chatMessage != null) {
-      var content = JsonUtil.toJson(widget.chatMessage!.content);
+    if (widget.content != null) {
+      var content = JsonUtil.toJson(widget.content);
       _controller = QuillController(
           document: Document.fromJson(content),
           selection: const TextSelection.collapsed(offset: 0));
