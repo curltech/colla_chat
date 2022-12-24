@@ -7,10 +7,10 @@ import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/richtext/visual_richtext_widget.dart';
+import 'package:colla_chat/widgets/richtext/quill_richtext_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:visual_editor/documents/models/document.model.dart';
+import 'package:flutter_quill/flutter_quill.dart' as quill;
 
 class ChannelItemWidget extends StatefulWidget with TileDataMixin {
   final DataMoreController<ChatMessage> dataMoreController;
@@ -35,7 +35,7 @@ class ChannelItemWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _ChannelItemWidgetState extends State<ChannelItemWidget> {
-  DocumentM? document;
+  quill.Document? document;
 
   @override
   void dispose() {
@@ -68,7 +68,7 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
     await chatMessageService.store(chatMessage, updateSummary: false);
   }
 
-  _onStore(DocumentM doc) {
+  _onStore(quill.Document doc) {
     document = doc;
   }
 
@@ -88,7 +88,7 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
         AppLocalizations.t(widget.title),
       ),
       rightWidgets: rightWidgets,
-      child: VisualRichTextWidget(
+      child: QuillRichTextWidget(
         content: widget.dataMoreController.current?.content,
         onStore: _onStore,
       ),
