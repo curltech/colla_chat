@@ -15,7 +15,7 @@ class PhoneNumberUtil {
 
   static Future<bool> validate(String phoneNumberStr, String regionCode) async {
     bool isValidate = await phone_number.PhoneNumberUtil()
-        .validate(phoneNumberStr, regionCode);
+        .validate(phoneNumberStr, regionCode: regionCode);
 
     return isValidate;
   }
@@ -45,7 +45,7 @@ class PhoneNumberUtil {
   static String formatMobile344(String mobile) {
     if (StringUtil.isEmpty(mobile)) return '';
     mobile =
-        mobile.replaceAllMapped(new RegExp(r"(^\d{3}|\d{4}\B)"), (Match match) {
+        mobile.replaceAllMapped(RegExp(r"(^\d{3}|\d{4}\B)"), (Match match) {
       return '${match.group(0)} ';
     });
     if (mobile.endsWith(' ')) {
@@ -61,27 +61,27 @@ class PhoneNumberUtil {
 
   static phone_numbers_parser.PhoneNumber fromNational(
       phone_numbers_parser.IsoCode isoCode, String phoneNumber) {
-    return phone_numbers_parser.PhoneNumber.fromNational(isoCode, phoneNumber);
+    return phone_numbers_parser.PhoneNumber.parse(
+      phoneNumber,
+      callerCountry: isoCode,
+    );
   }
 
   static phone_numbers_parser.PhoneNumber fromIsoCode(
       phone_numbers_parser.IsoCode isoCode, String phoneNumber) {
-    return phone_numbers_parser.PhoneNumber.fromNational(isoCode, phoneNumber);
+    return phone_numbers_parser.PhoneNumber.parse(
+      phoneNumber,
+      callerCountry: isoCode,
+    );
   }
 
   static phone_numbers_parser.PhoneNumber fromRaw(String phoneNumber) {
-    return phone_numbers_parser.PhoneNumber.fromRaw(phoneNumber);
-  }
-
-  static phone_numbers_parser.PhoneNumber fromCountryCode(
-      String countryCode, String phoneNumber) {
-    return phone_numbers_parser.PhoneNumber.fromCountryCode(
-        countryCode, phoneNumber);
+    return phone_numbers_parser.PhoneNumber.parse(phoneNumber);
   }
 
   static isValid(phone_numbers_parser.PhoneNumber phoneNumber,
       phone_numbers_parser.PhoneNumberType type) {
-    return phoneNumber.validate(type: type);
+    return phoneNumber.isValid(type: type);
   }
 
   static formatNsn(phone_numbers_parser.PhoneNumber phoneNumber) {

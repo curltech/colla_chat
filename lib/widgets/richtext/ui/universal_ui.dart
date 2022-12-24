@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 import 'package:universal_html/html.dart' as html;
-import 'package:youtube_player_flutter_quill/youtube_player_flutter_quill.dart';
 
 import 'responsive_widget.dart';
 import 'fake_ui.dart' if (dart.library.html) 'real_ui.dart' as ui_instance;
@@ -72,12 +71,12 @@ class VideoEmbedBuilderWeb implements EmbedBuilder {
   Widget build(BuildContext context, QuillController controller, Embed node,
       bool readOnly) {
     var videoUrl = node.value.data;
-    if (videoUrl.contains('youtube.com') || videoUrl.contains('youtu.be')) {
-      final youtubeID = YoutubePlayer.convertUrlToId(videoUrl);
-      if (youtubeID != null) {
-        videoUrl = 'https://www.youtube.com/embed/$youtubeID';
-      }
-    }
+    // if (videoUrl.contains('youtube.com') || videoUrl.contains('youtu.be')) {
+    //   final youtubeID = YoutubePlayer.convertUrlToId(videoUrl);
+    //   if (youtubeID != null) {
+    //     videoUrl = 'https://www.youtube.com/embed/$youtubeID';
+    //   }
+    // }
 
     UniversalUI().platformViewRegistry.registerViewFactory(
         videoUrl,

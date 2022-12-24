@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
@@ -244,28 +243,26 @@ class _QuillRichTextWidgetState extends State<QuillRichTextWidget> {
       );
     }
 
-    return SafeArea(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: <Widget>[
-          Expanded(
-            flex: 15,
-            child: Container(
-              color: Colors.white,
-              padding: const EdgeInsets.only(left: 16, right: 16),
-              child: quillEditor,
-            ),
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: <Widget>[
+        Expanded(
+          flex: 15,
+          child: Container(
+            color: Colors.white,
+            padding: const EdgeInsets.only(left: 16, right: 16),
+            child: quillEditor,
           ),
-          kIsWeb
-              ? Expanded(
-                  child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-                  child: toolbar,
-                ))
-              : Container(child: toolbar)
-        ],
-      ),
+        ),
+        kIsWeb
+            ? Expanded(
+                child: Container(
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                child: toolbar,
+              ))
+            : Container(child: toolbar)
+      ],
     );
   }
 
@@ -392,7 +389,7 @@ class NotesBlockEmbed extends CustomBlockEmbed {
   static const String noteType = 'notes';
 
   static NotesBlockEmbed fromDocument(Document document) =>
-      NotesBlockEmbed(jsonEncode(document.toDelta().toJson()));
+      NotesBlockEmbed(JsonUtil.toJson(document.toDelta().toJson()));
 
-  Document get document => Document.fromJson(jsonDecode(data));
+  Document get document => Document.fromJson(JsonUtil.toJson(data));
 }

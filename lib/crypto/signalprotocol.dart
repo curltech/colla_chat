@@ -86,8 +86,8 @@ class SignalKeyPair {
     Map<String, dynamic> map = {};
     map['registrationId'] = preKeyBundle.getRegistrationId();
     map['deviceId'] = preKeyBundle.getDeviceId();
-    ECPublicKey preKey = preKeyBundle.getPreKey();
-    map['preKey'] = CryptoUtil.encodeBase64(preKey.serialize());
+    ECPublicKey? preKey = preKeyBundle.getPreKey();
+    map['preKey'] = CryptoUtil.encodeBase64(preKey!.serialize());
     map['preKeyId'] = preKeyBundle.getPreKeyId();
     ECPublicKey? signedPreKey = preKeyBundle.getSignedPreKey();
     if (signedPreKey != null) {

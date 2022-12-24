@@ -44,12 +44,24 @@ class PlatformWebViewWidget extends StatefulWidget with TileDataMixin {
 class _PlatformWebViewWidgetState extends State<PlatformWebViewWidget> {
   String initialUrl = 'https://bing.com/';
   PlatformWebViewController? webViewController;
-  inapp.InAppWebViewSettings settings = inapp.InAppWebViewSettings(
-      useShouldOverrideUrlLoading: true,
-      mediaPlaybackRequiresUserGesture: false,
-      allowsInlineMediaPlayback: true,
-      iframeAllow: "camera; microphone",
-      iframeAllowFullscreen: true);
+  inapp.InAppWebViewGroupOptions options = inapp.InAppWebViewGroupOptions(
+      crossPlatform: inapp.InAppWebViewOptions(
+        useShouldOverrideUrlLoading: true,
+        mediaPlaybackRequiresUserGesture: false,
+      ),
+      android: inapp.AndroidInAppWebViewOptions(
+        useHybridComposition: true,
+      ),
+      ios: inapp.IOSInAppWebViewOptions(
+        allowsInlineMediaPlayback: true,
+      ));
+
+  // inapp.InAppWebViewSettings settings = inapp.InAppWebViewSettings(
+  //     useShouldOverrideUrlLoading: true,
+  //     mediaPlaybackRequiresUserGesture: false,
+  //     allowsInlineMediaPlayback: true,
+  //     iframeAllow: "camera; microphone",
+  //     iframeAllowFullscreen: true);
 
   inapp.PullToRefreshController? pullToRefreshController;
 
@@ -62,7 +74,7 @@ class _PlatformWebViewWidgetState extends State<PlatformWebViewWidget> {
     pullToRefreshController = kIsWeb
         ? null
         : inapp.PullToRefreshController(
-            settings: inapp.PullToRefreshSettings(
+            options: inapp.PullToRefreshOptions(
               color: Colors.blue,
             ),
             onRefresh: () async {
@@ -139,78 +151,8 @@ class _PlatformWebViewWidgetState extends State<PlatformWebViewWidget> {
     ]);
   }
 
-  _onWebViewCreated(dynamic controller) {
-    webViewController = PlatformWebViewController.from(controller);
-  }
-
   Widget buildWebView() {
-    if (platformParams.windows || platformParams.mobile || platformParams.web) {
-      return webview.WebView(
-        backgroundColor: Colors.black,
-        initialUrl: initialUrl,
-        javascriptMode: webview.JavascriptMode.unrestricted,
-        onWebViewCreated: _onWebViewCreated,
-        gestureNavigationEnabled: true,
-        allowsInlineMediaPlayback: true,
-        initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
-      );
-    } else {
-      return buildInAppWebView();
-    }
-  }
-
-  Widget buildInAppWebView() {
-    return inapp.InAppWebView(
-      initialUrlRequest: inapp.URLRequest(url: inapp.WebUri(initialUrl)),
-      initialSettings: settings,
-      pullToRefreshController: pullToRefreshController,
-      onWebViewCreated: _onWebViewCreated,
-      onLoadStart: (controller, url) {
-        urlController.text = url.toString();
-      },
-      onPermissionRequest: (controller, request) async {
-        return inapp.PermissionResponse(
-            resources: request.resources,
-            action: inapp.PermissionResponseAction.GRANT);
-      },
-      shouldOverrideUrlLoading: (controller, navigationAction) async {
-        var uri = navigationAction.request.url!;
-        if (!["http", "https", "file", "chrome", "data", "javascript", "about"]
-            .contains(uri.scheme)) {
-          if (await canLaunchUrl(uri)) {
-            // Launch the App
-            await launchUrl(
-              uri,
-            );
-            // and cancel the request
-            return inapp.NavigationActionPolicy.CANCEL;
-          }
-        }
-
-        return inapp.NavigationActionPolicy.ALLOW;
-      },
-      onLoadStop: (controller, url) async {
-        pullToRefreshController?.endRefreshing();
-        urlController.text = url.toString();
-      },
-      onReceivedError: (controller, request, error) {
-        pullToRefreshController?.endRefreshing();
-      },
-      onProgressChanged: (controller, progress) {
-        if (progress == 100) {
-          pullToRefreshController?.endRefreshing();
-        }
-        setState(() {
-          this.progress = progress / 100;
-        });
-      },
-      onUpdateVisitedHistory: (controller, url, androidIsReload) {
-        urlController.text = url.toString();
-      },
-      onConsoleMessage: (controller, consoleMessage) {
-        logger.i(consoleMessage);
-      },
-    );
+    return PlatformWebView();
   }
 
   @override

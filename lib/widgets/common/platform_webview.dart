@@ -2,6 +2,7 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart' as inapp;
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:webview_flutter/platform_interface.dart';
 import 'package:webview_flutter/webview_flutter.dart' as webview;
 import 'package:webview_win_floating/webview.dart';
@@ -47,10 +48,10 @@ class PlatformWebViewController with ChangeNotifier {
       }
     } else if (filename.startsWith('http')) {
       if (webViewController != null) {
-        await webViewController!.loadUrl(filename);
+        await webViewController!.loadFile(filename);
       } else if (inAppWebViewController != null) {
         inapp.URLRequest urlRequest =
-            inapp.URLRequest(url: inapp.WebUri(filename));
+            inapp.URLRequest(url: Uri.parse(filename));
         await inAppWebViewController!.loadUrl(urlRequest: urlRequest);
       }
     } else {
@@ -58,7 +59,7 @@ class PlatformWebViewController with ChangeNotifier {
         await webViewController!.loadFile(filename);
       } else if (inAppWebViewController != null) {
         inapp.URLRequest urlRequest =
-            inapp.URLRequest(url: inapp.WebUri('file:$filename'));
+            inapp.URLRequest(url: Uri.parse('file:$filename'));
         await inAppWebViewController!.loadUrl(urlRequest: urlRequest);
       }
     }
@@ -92,7 +93,7 @@ class PlatformWebViewController with ChangeNotifier {
     if (webViewController != null) {
       return await webViewController!.currentUrl();
     } else if (inAppWebViewController != null) {
-      inapp.WebUri? webUri = await inAppWebViewController!.getUrl();
+      Uri? webUri = await inAppWebViewController!.getUrl();
       return webUri.toString();
     }
     return null;
@@ -120,14 +121,28 @@ class PlatformWebView extends StatefulWidget {
 }
 
 class _PlatformWebViewState extends State<PlatformWebView> {
-  inapp.InAppWebViewSettings settings = inapp.InAppWebViewSettings(
-      useShouldOverrideUrlLoading: true,
-      mediaPlaybackRequiresUserGesture: false,
-      allowsInlineMediaPlayback: true,
-      iframeAllow: "camera; microphone",
-      iframeAllowFullscreen: true);
+  inapp.InAppWebViewGroupOptions options = inapp.InAppWebViewGroupOptions(
+      crossPlatform: inapp.InAppWebViewOptions(
+        useShouldOverrideUrlLoading: true,
+        mediaPlaybackRequiresUserGesture: false,
+      ),
+      android: inapp.AndroidInAppWebViewOptions(
+        useHybridComposition: true,
+      ),
+      ios: inapp.IOSInAppWebViewOptions(
+        allowsInlineMediaPlayback: true,
+      ));
+
+  ///6.x.x
+  // inapp.InAppWebViewSettings settings = inapp.InAppWebViewSettings(
+  //     useShouldOverrideUrlLoading: true,
+  //     mediaPlaybackRequiresUserGesture: false,
+  //     allowsInlineMediaPlayback: true,
+  //     iframeAllow: "camera; microphone",
+  //     iframeAllowFullscreen: true);
 
   PlatformWebViewController webViewController = PlatformWebViewController();
+  late PullToRefreshController pullToRefreshController;
 
   @override
   void initState() {
@@ -160,15 +175,32 @@ class _PlatformWebViewState extends State<PlatformWebView> {
       webviewWidget = inapp.InAppWebView(
         key: UniqueKey(),
         initialUrlRequest: widget.initialUrl != null
-            ? inapp.URLRequest(url: inapp.WebUri(widget.initialUrl!))
+            ? inapp.URLRequest(url: Uri.parse(widget.initialUrl!))
             : null,
-        initialSettings: settings,
+        initialOptions: options,
+        // initialSettings: settings,
         onWebViewCreated: _onWebViewCreated,
-        onPermissionRequest: (controller, request) async {
-          return inapp.PermissionResponse(
-              resources: request.resources,
-              action: inapp.PermissionResponseAction.GRANT);
+        pullToRefreshController: pullToRefreshController,
+        onLoadStart: (controller, url) {},
+        androidOnPermissionRequest: (controller, origin, resources) async {
+          return PermissionRequestResponse(
+              resources: resources,
+              action: PermissionRequestResponseAction.GRANT);
         },
+        shouldOverrideUrlLoading: (controller, navigationAction) async {},
+        onLoadStop: (controller, url) async {
+          pullToRefreshController.endRefreshing();
+        },
+        onLoadError: (controller, url, code, message) {
+          pullToRefreshController.endRefreshing();
+        },
+        onProgressChanged: (controller, progress) {
+          if (progress == 100) {
+            pullToRefreshController.endRefreshing();
+          }
+        },
+        onUpdateVisitedHistory: (controller, url, androidIsReload) {},
+        onConsoleMessage: (controller, consoleMessage) {},
       );
     }
 

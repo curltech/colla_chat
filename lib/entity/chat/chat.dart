@@ -65,8 +65,10 @@ enum ChatMessageSubType {
   delete, // 删除聊天消息
   chatReceipt, // 聊天回复
   groupFile, // 群文件
+  channel,
   getChannel, //请求获取最新的频道文章
   sendChannel, //发送最新的频道文章
+  collection,
   // 以下system消息，不在聊天界面显示
   signal, //webrtc signal消息，一般用于重新协商的情况
   preKeyBundle, //signal加解密
