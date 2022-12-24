@@ -91,6 +91,10 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     websocketPool.addListener(_updateWebsocket);
     subscription =
         ConnectivityUtil.onConnectivityChanged(_onConnectivityChanged);
+    Websocket? websocket = websocketPool.getDefault();
+    if (websocket != null) {
+      _socketStatus.value = websocket.status;
+    }
   }
 
   ///如果没有缺省的websocket，尝试重连
