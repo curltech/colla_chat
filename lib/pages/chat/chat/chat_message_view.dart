@@ -142,6 +142,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
   }
 
   _updatePeerConnectionStatus() {
+    _initPeerConnectionStatus();
     if (_peerConnectionStatus.value == PeerConnectionStatus.connected) {
       DialogUtil.info(context,
           content: AppLocalizations.t('PeerConnection status was changed to:') +
