@@ -1,5 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/richtext/quill_util.dart';
 import 'package:flutter/material.dart';
@@ -40,10 +41,16 @@ class _VisualRichTextWidgetState extends State<VisualRichTextWidget> {
   Widget build(BuildContext context) {
     List<Widget> children = [];
     if (_controller != null) {
-      children.add(_buildEditor());
       if (!widget.readOnly) {
-        children.add(_buildToolbar());
+        children.add(Container(
+            padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
+            child: _buildToolbar()));
       }
+      children.add(Expanded(
+          flex: 15,
+          child: Container(
+              padding: const EdgeInsets.only(left: 5, right: 5),
+              child: _buildEditor())));
     } else {
       children.add(Center(
         child: Text(
@@ -54,30 +61,28 @@ class _VisualRichTextWidgetState extends State<VisualRichTextWidget> {
         ),
       ));
     }
-    var child = Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: children,
-    );
-    return child;
+    var richTextWidget = Container(
+        color: Colors.white,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: children,
+        ));
+
+    return richTextWidget;
   }
 
   Widget _buildEditor() {
-    return Flexible(
-      child: Container(
-        color: Colors.white,
-        padding: const EdgeInsets.only(
-          left: 16,
-          right: 16,
-        ),
-        child: VisualEditor(
-          controller: _controller!,
-          scrollController: _scrollController,
-          focusNode: _focusNode,
-          config: EditorConfigM(
-            readOnly: widget.readOnly,
-            placeholder: AppLocalizations.t('Enter text'),
-          ),
-        ),
+    return VisualEditor(
+      controller: _controller!,
+      scrollController: _scrollController,
+      focusNode: _focusNode,
+      config: EditorConfigM(
+        readOnly: widget.readOnly,
+        autoFocus: true,
+        expands: true,
+        padding: EdgeInsets.zero,
+        placeholder: AppLocalizations.t(''),
+        locale: appDataProvider.getLocale(),
       ),
     );
   }
@@ -85,16 +90,19 @@ class _VisualRichTextWidgetState extends State<VisualRichTextWidget> {
   Widget _buildToolbar() {
     return EditorToolbar.basic(
       controller: _controller!,
+      toolbarIconSize: 18,
+      toolbarIconAlignment: WrapAlignment.start,
       onImagePickCallback: QuillUtil.onImagePickCallback,
-      onVideoPickCallback:
-          platformParams.web ? QuillUtil.onVideoPickCallback : null,
-      filePickImpl: platformParams.desktop
-          ? QuillUtil.openFileSystemPicker
-          : null,
+      onVideoPickCallback: QuillUtil.onVideoPickCallback,
+      filePickImpl: QuillUtil.openFileSystemPicker,
       webImagePickImpl: QuillUtil.webImagePickImpl,
       mediaPickSettingSelector: QuillUtil.selectMediaPickSettingE,
       showAlignmentButtons: true,
-      multiRowsDisplay: false,
+      showSmallButton: true,
+      multiRowsDisplay: true,
+      showDirection: true,
+      showMarkers: true,
+      locale: appDataProvider.getLocale(),
     );
   }
 
