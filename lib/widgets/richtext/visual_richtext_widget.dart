@@ -89,7 +89,7 @@ class _VisualRichTextWidgetState extends State<VisualRichTextWidget> {
       onVideoPickCallback:
           platformParams.web ? QuillUtil.onVideoPickCallback : null,
       filePickImpl: platformParams.desktop
-          ? QuillUtil.openFileSystemPickerForDesktop
+          ? QuillUtil.openFileSystemPicker
           : null,
       webImagePickImpl: QuillUtil.webImagePickImpl,
       mediaPickSettingSelector: QuillUtil.selectMediaPickSettingE,

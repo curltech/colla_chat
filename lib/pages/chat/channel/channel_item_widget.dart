@@ -82,7 +82,7 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
           icon: const Icon(Icons.save)),
     ];
     return AppBarView(
-      centerTitle: false,
+      centerTitle: true,
       withLeading: true,
       title: Text(
         AppLocalizations.t(widget.title),
