@@ -1,9 +1,8 @@
 import 'dart:async';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/richtext/quill_util.dart';
-import 'package:colla_chat/widgets/richtext/ui/universal_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -70,7 +69,7 @@ class _QuillRichTextWidgetState extends State<QuillRichTextWidget> {
       return Center(child: Text(AppLocalizations.t('Loading...')));
     }
 
-    return _buildEditor(context);
+    return _buildRichTextWidget(context);
   }
 
   bool _onTripleClickSelection() {
@@ -143,11 +142,11 @@ class _QuillRichTextWidgetState extends State<QuillRichTextWidget> {
         scrollController: ScrollController(),
         scrollable: true,
         focusNode: _focusNode,
-        autoFocus: false,
+        autoFocus: true,
         readOnly: _readOnly,
-        placeholder: AppLocalizations.t('Add content'),
+        placeholder: AppLocalizations.t(''),
         enableSelectionToolbar: isMobile(),
-        expands: false,
+        expands: true,
         padding: EdgeInsets.zero,
         onImagePaste: QuillUtil.onImagePaste,
         onTapUp: (details, p1) {
@@ -170,101 +169,60 @@ class _QuillRichTextWidgetState extends State<QuillRichTextWidget> {
           ...FlutterQuillEmbeds.builders(),
           NotesEmbedBuilder(addEditNote: _addEditNote)
         ],
+        locale: appDataProvider.getLocale(),
       ),
     );
-    if (platformParams.web) {
-      quillEditor = MouseRegion(
-        cursor: SystemMouseCursors.text,
-        child: QuillEditor(
-          controller: _controller!,
-          scrollController: ScrollController(),
-          scrollable: true,
-          focusNode: _focusNode,
-          autoFocus: false,
-          readOnly: false,
-          placeholder: AppLocalizations.t('Add content'),
-          expands: false,
-          padding: EdgeInsets.zero,
-          onTapUp: (details, p1) {
-            return _onTripleClickSelection();
-          },
-          customStyles: DefaultStyles(
-            h1: DefaultTextBlockStyle(
-                const TextStyle(
-                  fontSize: 32,
-                  color: Colors.black,
-                  height: 1.15,
-                  fontWeight: FontWeight.w300,
-                ),
-                const Tuple2(16, 0),
-                const Tuple2(0, 0),
-                null),
-            sizeSmall: const TextStyle(fontSize: 9),
-          ),
-          embedBuilders: defaultEmbedBuildersWeb,
-        ),
-      );
-    }
+    return quillEditor;
+  }
+
+  Widget _buildToolbar(BuildContext context) {
     var toolbar = QuillToolbar.basic(
       controller: _controller!,
+      toolbarIconSize: 18,
+      toolbarIconAlignment: WrapAlignment.start,
       embedButtons: FlutterQuillEmbeds.buttons(
+        showFormulaButton: true,
         // provide a callback to enable picking images from device.
         // if omit, "image" button only allows adding images from url.
         // same goes for videos.
         onImagePickCallback: QuillUtil.onImagePickCallback,
         onVideoPickCallback: QuillUtil.onVideoPickCallback,
+        filePickImpl: QuillUtil.pickFiles,
         // uncomment to provide a custom "pick from" dialog.
-        // mediaPickSettingSelector: _selectMediaPickSetting,
+        mediaPickSettingSelector: QuillUtil.selectMediaPickSetting,
         // uncomment to provide a custom "pick from" dialog.
-        // cameraPickSettingSelector: _selectCameraPickSetting,
+        cameraPickSettingSelector: QuillUtil.selectCameraPickSetting,
       ),
       showAlignmentButtons: true,
+      showSmallButton: true,
+      showDirection: true,
       afterButtonPressed: _focusNode.requestFocus,
+      locale: appDataProvider.getLocale(),
     );
-    if (platformParams.web) {
-      toolbar = QuillToolbar.basic(
-        controller: _controller!,
-        embedButtons: FlutterQuillEmbeds.buttons(
-          onImagePickCallback: QuillUtil.onImagePickCallback,
-          webImagePickImpl: QuillUtil.webImagePickImpl,
-        ),
-        showAlignmentButtons: true,
-        afterButtonPressed: _focusNode.requestFocus,
-      );
-    }
-    if (platformParams.desktop) {
-      toolbar = QuillToolbar.basic(
-        controller: _controller!,
-        embedButtons: FlutterQuillEmbeds.buttons(
-          onImagePickCallback: QuillUtil.onImagePickCallback,
-          filePickImpl: QuillUtil.openFileSystemPickerForDesktop,
-        ),
-        showAlignmentButtons: true,
-        afterButtonPressed: _focusNode.requestFocus,
-      );
-    }
+    return toolbar;
+  }
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        Expanded(
-          flex: 15,
-          child: Container(
-            color: Colors.white,
-            padding: const EdgeInsets.only(left: 16, right: 16),
-            child: quillEditor,
-          ),
-        ),
-        kIsWeb
-            ? Expanded(
-                child: Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-                child: toolbar,
-              ))
-            : Container(child: toolbar)
-      ],
-    );
+  Widget _buildRichTextWidget(BuildContext context) {
+    var toolbar = _buildToolbar(context);
+    var quillEditor = _buildEditor(context);
+    return Container(
+        color: Colors.white,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Container(
+              padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 2),
+              child: toolbar,
+            ),
+            Expanded(
+              flex: 15,
+              child: Container(
+                padding: const EdgeInsets.only(left: 5, right: 5),
+                child: quillEditor,
+              ),
+            ),
+          ],
+        ));
   }
 
   Widget _buildMenuBar(BuildContext context) {
