@@ -134,7 +134,7 @@ class AppDataProvider with ChangeNotifier {
 
   //屏幕宽高
   double _keyboardHeight = 270.0;
-  Size _mobileSize = Size(412.0, 869.0);
+  final Size _mobileSize = Size(412.0, 869.0);
   Size _size = const Size(0.0, 0.0);
   double bottomBarHeight = kBottomNavigationBarHeight;
   double toolbarHeight = kToolbarHeight;

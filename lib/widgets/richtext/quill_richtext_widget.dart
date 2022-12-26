@@ -61,6 +61,12 @@ class _QuillRichTextWidgetState extends State<QuillRichTextWidget> {
           document: Document.fromJson(content),
           selection: const TextSelection.collapsed(offset: 0));
     }
+    _controller!.changes
+        .listen((Tuple3<Delta, Delta, ChangeSource> deltaChange) {
+      if (widget.onStore != null) {
+        widget.onStore!(_controller!.document);
+      }
+    });
   }
 
   @override
