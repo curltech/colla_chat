@@ -76,8 +76,8 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
   Widget build(BuildContext context) {
     List<Widget>? rightWidgets = [
       IconButton(
-          onPressed: () {
-            _store();
+          onPressed: () async {
+            await _store();
           },
           icon: const Icon(Icons.save)),
     ];
