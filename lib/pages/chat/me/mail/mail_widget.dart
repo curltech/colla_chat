@@ -1,4 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/me/mail/address/address_add.dart';
+import 'package:colla_chat/pages/chat/me/mail/mail_address_widget.dart';
+import 'package:colla_chat/pages/chat/me/mail/mail_list_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/data_channel_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/get_display_media_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/get_user_media_widget.dart';
@@ -12,24 +15,19 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
-//webrtc页面
-class WebrtcWidget extends StatelessWidget with TileDataMixin {
+//mail页面
+class MailWidget extends StatelessWidget with TileDataMixin {
   late final Widget child;
 
-  WebrtcWidget({Key? key}) : super(key: key) {
-    GetUserMediaWidget getUserMediaWidget = const GetUserMediaWidget();
-    indexWidgetProvider.define(getUserMediaWidget);
-    GetDisplayMediaWidget getDisplayMediaWidget = const GetDisplayMediaWidget();
-    indexWidgetProvider.define(getDisplayMediaWidget);
-    DataChannelWidget dataChannelWidget = DataChannelWidget();
-    indexWidgetProvider.define(dataChannelWidget);
-    PeerConnectionWidget peerConnectionWidget = PeerConnectionWidget();
-    indexWidgetProvider.define(peerConnectionWidget);
+  MailWidget({Key? key}) : super(key: key) {
+    AddressAddWidget addressAddWidget = const AddressAddWidget();
+    // MailView mailView = MailView();
+    MailAddressWidget mailAddressWidget = const MailAddressWidget();
+    MailListWidget mailListWidget = const MailListWidget();
     List<TileDataMixin> mixins = [
-      getUserMediaWidget,
-      getDisplayMediaWidget,
-      dataChannelWidget,
-      peerConnectionWidget,
+      addressAddWidget,
+      mailAddressWidget,
+      mailListWidget,
     ];
     final List<TileData> meTileData = TileData.from(mixins);
     for (var tile in meTileData) {
@@ -52,11 +50,11 @@ class WebrtcWidget extends StatelessWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  String get routeName => 'webrtc';
+  String get routeName => 'mail';
 
   @override
-  Icon get icon => const Icon(Icons.video_call);
+  Icon get icon => const Icon(Icons.email);
 
   @override
-  String get title => 'Webrtc';
+  String get title => 'Mail';
 }

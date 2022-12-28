@@ -2,15 +2,12 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/login/p2p_login_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/local_auth.dart';
-import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:synchronized/extension.dart';
 
 final List<TileData> settingTileData = [
   TileData(

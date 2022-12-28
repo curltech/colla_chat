@@ -1,20 +1,18 @@
 import 'package:colla_chat/pages/chat/me/settings/general/brightness_picker.dart';
-
-import 'package:colla_chat/pages/chat/login/ws_address_picker.dart';
+import 'package:colla_chat/pages/chat/me/settings/general/color_picker.dart';
 import 'package:colla_chat/pages/chat/me/settings/general/locale_picker.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
 
-
-/// 地址语言选择设置组件，一个card下的录入框和按钮组合
-class P2pSettingWidget extends StatefulWidget {
-  const P2pSettingWidget({Key? key}) : super(key: key);
+/// 一般设置组件，包括颜色，亮度，语言
+class GeneralSettingWidget extends StatefulWidget {
+  const GeneralSettingWidget({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _P2pSettingWidgetState();
+  State<StatefulWidget> createState() => _GeneralSettingWidgetState();
 }
 
-class _P2pSettingWidgetState extends State<P2pSettingWidget> {
+class _GeneralSettingWidgetState extends State<GeneralSettingWidget> {
   @override
   void initState() {
     super.initState();
@@ -40,7 +38,7 @@ class _P2pSettingWidgetState extends State<P2pSettingWidget> {
         const SizedBox(height: 10.0),
         Padding(
           padding: padding,
-          child: const WsAddressPicker(),
+          child: const ColorPicker(),
         ),
         const SizedBox(height: 10.0),
         Padding(

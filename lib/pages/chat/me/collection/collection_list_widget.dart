@@ -1,11 +1,12 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
-import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.dart';
+
+import 'package:colla_chat/pages/chat/me/collection/collection_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
-//频道的页面
+//收藏的页面
 class CollectionListWidget extends StatefulWidget with TileDataMixin {
   final Future<void> Function()? onRefresh;
   final Function()? onScrollMax;
@@ -23,13 +24,13 @@ class CollectionListWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  String get routeName => 'collection_list';
+  String get routeName => 'collection';
 
   @override
-  Icon get icon => const Icon(Icons.wifi_channel);
+  Icon get icon => const Icon(Icons.collections);
 
   @override
-  String get title => 'Collection List';
+  String get title => 'Collection';
 }
 
 class _CollectionListWidgetState extends State<CollectionListWidget>
@@ -41,7 +42,7 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
   @override
   void initState() {
     super.initState();
-    channelChatMessageController.addListener(_update);
+    collectionChatMessageController.addListener(_update);
     var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
     animateController = AnimationController(
@@ -50,7 +51,7 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
 
   _update() {
     setState(() {
-      channelChatMessageController.latest();
+      collectionChatMessageController.latest();
     });
   }
 
@@ -78,7 +79,7 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
   Future<void> _onRefresh() async {
     ///下拉刷新数据的地方，比如从数据库取更多数据
     logger.i('RefreshIndicator onRefresh');
-    channelChatMessageController.previous(limit: defaultLimit);
+    collectionChatMessageController.previous(limit: defaultLimit);
     if (widget.onRefresh != null) {
       await widget.onRefresh!();
     }
@@ -86,7 +87,7 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
 
   ///创建每一条消息
   Widget _buildMessageItem(BuildContext context, int index) {
-    List<ChatMessage> messages = channelChatMessageController.data;
+    List<ChatMessage> messages = collectionChatMessageController.data;
     ChatMessage chatMessage = messages[index];
     Widget chatMessageItem = ListTile(title: Text(chatMessage.title!));
 
@@ -98,7 +99,7 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
       return SizeTransition(
         // 指定非线性动画类型
         sizeFactor:
-            CurvedAnimation(parent: animateController, curve: Curves.easeInOut),
+        CurvedAnimation(parent: animateController, curve: Curves.easeInOut),
         axisAlignment: 0.0,
         // 指定为当前消息组件
         child: chatMessageItem,
@@ -123,7 +124,7 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
               //消息组件渲染
               itemBuilder: _buildMessageItem,
               //消息条目数
-              itemCount: channelChatMessageController.data.length,
+              itemCount: collectionChatMessageController.data.length,
             )),
       ),
     ]);
@@ -138,7 +139,7 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
 
   @override
   void dispose() {
-    channelChatMessageController.removeListener(_update);
+    collectionChatMessageController.removeListener(_update);
     widget.scrollController.removeListener(_onScroll);
     animateController.dispose();
     super.dispose();
