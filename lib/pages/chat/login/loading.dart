@@ -87,6 +87,7 @@ class _LoadingState extends State<Loading> {
   @override
   void initState() {
     super.initState();
+    appDataProvider.addListener(_update);
     int count = loadingBackgroundImage.lightBackgroudImages.length;
     if (appDataProvider.brightness == Brightness.dark.name) {
       count = loadingBackgroundImage.darkBackgroudImages.length;
@@ -116,6 +117,10 @@ class _LoadingState extends State<Loading> {
     }
   }
 
+  _update() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> children = [];
@@ -140,6 +145,7 @@ class _LoadingState extends State<Loading> {
 
   @override
   void dispose() {
+    appDataProvider.removeListener(_update);
     super.dispose();
   }
 }
