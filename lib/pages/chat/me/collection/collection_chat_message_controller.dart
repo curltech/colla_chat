@@ -5,7 +5,7 @@ import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 
-///频道消息的消息控制器
+///收藏消息的消息控制器
 class CollectionChatMessageController extends DataMoreController<ChatMessage> {
   String? _parentMessageId;
 
@@ -54,5 +54,5 @@ class CollectionChatMessageController extends DataMoreController<ChatMessage> {
 }
 
 ///好友或者群的消息控制器，包含某个连接的所有消息
-final CollectionChatMessageController channelChatMessageController =
+final CollectionChatMessageController collectionChatMessageController =
     CollectionChatMessageController();

@@ -127,7 +127,7 @@ class AppDataProvider with ChangeNotifier {
   ///locale和Theme属性
   String _locale = 'zh_CN';
   MaterialColor? _primarySwatch = Colors.cyan;
-  MaterialColor? _seedColor = Colors.cyan;
+  Color _seedColor = Colors.cyan;
   String _fontFamily = '';
   String _brightness = 'light'; //or dark / system
   ThemeData _themeData = ThemeData();
@@ -190,16 +190,8 @@ class AppDataProvider with ChangeNotifier {
     Brightness brightness =
         Brightness.values.firstWhere((element) => element.name == _brightness);
     ColorScheme colorScheme;
-    if (_seedColor != null) {
-      colorScheme = ColorScheme.fromSeed(
-          seedColor: _seedColor ?? Colors.cyan, brightness: brightness);
-    } else if (_primarySwatch != null) {
-      colorScheme = ColorScheme.fromSwatch(
-          primarySwatch: _primarySwatch ?? Colors.cyan, brightness: brightness);
-    } else {
-      colorScheme =
-          ColorScheme.fromSeed(seedColor: Colors.cyan, brightness: brightness);
-    }
+    colorScheme =
+        ColorScheme.fromSeed(seedColor: _seedColor, brightness: brightness);
     TextTheme textTheme;
     if (_fontFamily != '') {
       textTheme = GoogleFonts.getTextTheme(_fontFamily);
@@ -217,11 +209,11 @@ class AppDataProvider with ChangeNotifier {
     );
   }
 
-  MaterialColor? get seedColor {
+  Color get seedColor {
     return _seedColor;
   }
 
-  set seedColor(MaterialColor? color) {
+  set seedColor(Color color) {
     _seedColor = color;
     _primarySwatch = null;
     _buildThemeData();
@@ -233,7 +225,6 @@ class AppDataProvider with ChangeNotifier {
   }
 
   set primarySwatch(MaterialColor? color) {
-    _seedColor = null;
     _primarySwatch = color;
     _buildThemeData();
     notifyListeners();

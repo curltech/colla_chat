@@ -3,7 +3,9 @@ import 'package:colla_chat/pages/chat/me/collection/collection_list_widget.dart'
 import 'package:colla_chat/pages/chat/me/mail/address/address_add.dart';
 import 'package:colla_chat/pages/chat/me/mail/mail_address_widget.dart';
 import 'package:colla_chat/pages/chat/me/mail/mail_list_widget.dart';
+import 'package:colla_chat/pages/chat/me/mail/mail_widget.dart';
 import 'package:colla_chat/pages/chat/me/me_head_widget.dart';
+import 'package:colla_chat/pages/chat/me/media/media_widget.dart';
 import 'package:colla_chat/pages/chat/me/peerclient/peer_client_list_widget.dart';
 import 'package:colla_chat/pages/chat/me/peerendpoint/peer_endpoint_list_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/personal_info_widget.dart';
@@ -15,63 +17,45 @@ import 'package:colla_chat/pages/chat/me/platform_webview_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
-import 'package:colla_chat/widgets/media/audio/player/platform_audio_player_widget.dart';
-import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder_widget.dart';
-import 'package:colla_chat/widgets/media/video/platform_video_player_widget.dart';
+import 'package:colla_chat/pages/chat/me/media/platform_audio_player_widget.dart';
+import 'package:colla_chat/pages/chat/me/media/platform_audio_recorder_widget.dart';
+import 'package:colla_chat/pages/chat/me/media/platform_video_player_widget.dart';
 import 'package:flutter/material.dart';
 
 //我的页面，带有路由回调函数
 class MeWidget extends StatelessWidget with TileDataMixin {
+  final PersonalInfoWidget personalInfoWidget = const PersonalInfoWidget();
   final CollectionListWidget collectionListWidget = CollectionListWidget();
   final SettingWidget settingWidget = SettingWidget();
-  final PersonalInfoWidget personalInfoWidget = const PersonalInfoWidget();
-  final AddressAddWidget addressAddWidget = const AddressAddWidget();
+  final MailWidget mailWidget = MailWidget();
 
-  // MailView mailView = MailView();
-  final MailAddressWidget mailAddressWidget = const MailAddressWidget();
-  final MailListWidget mailListWidget = const MailListWidget();
   final PeerEndpointListWidget peerEndpointListWidget =
       PeerEndpointListWidget();
   final PeerClientListWidget peerClientListWidget = PeerClientListWidget();
   final WebrtcWidget webrtcWidget = WebrtcWidget();
-  final PlatformVideoPlayerWidget videoPlayerWidget =
-      PlatformVideoPlayerWidget();
-  final PlatformAudioPlayerWidget audioPlayerWidget =
-      const PlatformAudioPlayerWidget();
-  final PlatformAudioRecorderWidget audioRecorderWidget =
-      PlatformAudioRecorderWidget();
+  final MediaWidget mediaWidget = MediaWidget();
   final PlatformWebViewWidget webViewWidget = PlatformWebViewWidget();
 
   late final Widget child;
 
   MeWidget({Key? key}) : super(key: key) {
-    //logger.w('me init');
-    //indexWidgetProvider.define(collectionWidget);
+    indexWidgetProvider.define(collectionListWidget);
     indexWidgetProvider.define(settingWidget);
     indexWidgetProvider.define(personalInfoWidget);
-    indexWidgetProvider.define(addressAddWidget);
-
-    // indexWidgetProvider.define(mailView);
-    indexWidgetProvider.define(mailAddressWidget);
-    indexWidgetProvider.define(mailListWidget);
+    indexWidgetProvider.define(mailWidget);
     indexWidgetProvider.define(peerEndpointListWidget);
     indexWidgetProvider.define(peerClientListWidget);
     indexWidgetProvider.define(webrtcWidget);
-    indexWidgetProvider.define(videoPlayerWidget);
-    indexWidgetProvider.define(audioPlayerWidget);
-    indexWidgetProvider.define(audioRecorderWidget);
     indexWidgetProvider.define(webViewWidget);
+    indexWidgetProvider.define(mediaWidget);
     List<TileDataMixin> mixins = [
-      collectionListWidget,
       settingWidget,
-      addressAddWidget,
-      mailAddressWidget,
+      collectionListWidget,
+      mailWidget,
       peerEndpointListWidget,
       peerClientListWidget,
       webrtcWidget,
-      videoPlayerWidget,
-      audioPlayerWidget,
-      audioRecorderWidget,
+      mediaWidget,
       webViewWidget
     ];
     final List<TileData> meTileData = TileData.from(mixins);
