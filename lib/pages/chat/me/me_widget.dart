@@ -1,13 +1,11 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/collection/collection_list_widget.dart';
-import 'package:colla_chat/pages/chat/me/mail/address/address_add.dart';
-import 'package:colla_chat/pages/chat/me/mail/mail_address_widget.dart';
-import 'package:colla_chat/pages/chat/me/mail/mail_list_widget.dart';
+
 import 'package:colla_chat/pages/chat/me/mail/mail_widget.dart';
 import 'package:colla_chat/pages/chat/me/me_head_widget.dart';
 import 'package:colla_chat/pages/chat/me/media/media_widget.dart';
-import 'package:colla_chat/pages/chat/me/peerclient/peer_client_list_widget.dart';
-import 'package:colla_chat/pages/chat/me/peerendpoint/peer_endpoint_list_widget.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/peerclient/peer_client_list_widget.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_list_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/personal_info_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/webrtc_widget.dart';
@@ -17,9 +15,6 @@ import 'package:colla_chat/pages/chat/me/platform_webview_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
-import 'package:colla_chat/pages/chat/me/media/platform_audio_player_widget.dart';
-import 'package:colla_chat/pages/chat/me/media/platform_audio_recorder_widget.dart';
-import 'package:colla_chat/pages/chat/me/media/platform_video_player_widget.dart';
 import 'package:flutter/material.dart';
 
 //我的页面，带有路由回调函数
