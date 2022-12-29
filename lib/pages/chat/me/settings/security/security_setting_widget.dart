@@ -7,27 +7,27 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
-/// 一般设置组件，包括颜色，亮度，语言
-class GeneralSettingWidget extends StatefulWidget with TileDataMixin {
-  const GeneralSettingWidget({Key? key}) : super(key: key);
+/// 安全设置组件，包括修改密码，登录选项，加密选项
+class SecuritySettingWidget extends StatefulWidget with TileDataMixin {
+  const SecuritySettingWidget({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _GeneralSettingWidgetState();
+  State<StatefulWidget> createState() => _SecuritySettingWidgetState();
 
   @override
   bool get withLeading => true;
 
   @override
-  String get routeName => 'general_setting';
+  String get routeName => 'security_setting';
 
   @override
-  Icon get icon => const Icon(Icons.settings_applications);
+  Icon get icon => const Icon(Icons.security);
 
   @override
-  String get title => 'General Setting';
+  String get title => 'Security Setting';
 }
 
-class _GeneralSettingWidgetState extends State<GeneralSettingWidget> {
+class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
   @override
   void initState() {
     super.initState();

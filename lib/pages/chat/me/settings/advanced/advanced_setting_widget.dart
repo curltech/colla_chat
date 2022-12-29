@@ -7,27 +7,27 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
-/// 一般设置组件，包括颜色，亮度，语言
-class GeneralSettingWidget extends StatefulWidget with TileDataMixin {
-  const GeneralSettingWidget({Key? key}) : super(key: key);
+/// 高级设置组件，包括定位器配置
+class AdvancedSettingWidget extends StatefulWidget with TileDataMixin {
+  const AdvancedSettingWidget({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _GeneralSettingWidgetState();
+  State<StatefulWidget> createState() => _AdvancedSettingWidgetState();
 
   @override
   bool get withLeading => true;
 
   @override
-  String get routeName => 'general_setting';
+  String get routeName => 'advanced_setting';
 
   @override
-  Icon get icon => const Icon(Icons.settings_applications);
+  Icon get icon => const Icon(Icons.settings_suggest);
 
   @override
-  String get title => 'General Setting';
+  String get title => 'Advanced Setting';
 }
 
-class _GeneralSettingWidgetState extends State<GeneralSettingWidget> {
+class _AdvancedSettingWidgetState extends State<AdvancedSettingWidget> {
   @override
   void initState() {
     super.initState();

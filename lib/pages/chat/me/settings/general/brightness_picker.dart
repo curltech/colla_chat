@@ -43,7 +43,7 @@ class _BrightnessPickerState extends State<BrightnessPicker> {
         }
       },
       items: brightnessChoices,
-      selectedValue: '',
+      selectedValue: appDataProvider.brightness,
     );
   }
 

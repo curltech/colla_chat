@@ -1,3 +1,4 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flex_color_picker/flex_color_picker.dart' as flex;
 import 'package:flutter/material.dart';
@@ -25,26 +26,26 @@ class _ColorPickerState extends State<ColorPicker> {
   Future<bool> colorPickerDialog() async {
     ThemeData themeData = appDataProvider.themeData;
     return flex.ColorPicker(
-      color: appDataProvider.seedColor!,
+      color: appDataProvider.seedColor,
       onColorChanged: (Color color) {
         appDataProvider.seedColor = color;
       },
-      width: 40,
-      height: 40,
+      width: 32,
+      height: 32,
       borderRadius: 4,
       spacing: 5,
       runSpacing: 5,
       wheelDiameter: 155,
       heading: Text(
-        'Select color',
+        AppLocalizations.t('Select color'),
         style: themeData.textTheme.titleMedium,
       ),
       subheading: Text(
-        'Select color shade',
+        AppLocalizations.t('Select color shade'),
         style: themeData.textTheme.titleMedium,
       ),
       wheelSubheading: Text(
-        'Selected color and its shades',
+        AppLocalizations.t('Selected color and its shades'),
         style: themeData.textTheme.titleMedium,
       ),
       showMaterialName: true,
@@ -77,16 +78,20 @@ class _ColorPickerState extends State<ColorPicker> {
   //群主选择界面
   Widget _buildColorPicker(BuildContext context) {
     Widget indicator = flex.ColorIndicator(
-      width: 44,
-      height: 44,
+      width: 32,
+      height: 32,
       borderRadius: 4,
-      color: appDataProvider.seedColor!,
+      color: appDataProvider.seedColor,
       onSelectFocus: false,
       onSelect: () async {
         if (!(await colorPickerDialog())) {}
       },
     );
-    return Row(children: [indicator]);
+    return Row(children: [
+      Text(AppLocalizations.t('Seed color')),
+      const Spacer(),
+      indicator
+    ]);
   }
 
   @override

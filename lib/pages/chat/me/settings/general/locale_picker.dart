@@ -42,7 +42,7 @@ class _LocalePickerState extends State<LocalePicker> {
         }
       },
       items: localeChoices,
-      selectedValue: '',
+      selectedValue: appDataProvider.locale,
     );
   }
 

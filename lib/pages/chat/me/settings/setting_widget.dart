@@ -1,6 +1,10 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/login/p2p_login_widget.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/advanced_setting_widget.dart';
+import 'package:colla_chat/pages/chat/me/settings/general/general_setting_widget.dart';
+import 'package:colla_chat/pages/chat/me/settings/privacy/privacy_setting_widget.dart';
+import 'package:colla_chat/pages/chat/me/settings/security/security_setting_widget.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/local_auth.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
@@ -9,36 +13,36 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
-final List<TileData> settingTileData = [
-  TileData(
-      prefix: Icon(Icons.generating_tokens,
-          color: appDataProvider.themeData.colorScheme.primary),
-      title: AppLocalizations.t('General')),
-  TileData(
-      prefix: Icon(Icons.high_quality,
-          color: appDataProvider.themeData.colorScheme.primary),
-      title: AppLocalizations.t('Advanced')),
-  TileData(
-      prefix: Icon(Icons.security,
-          color: appDataProvider.themeData.colorScheme.primary),
-      title: AppLocalizations.t('Security')),
-  TileData(
-      prefix: Icon(Icons.privacy_tip,
-          color: appDataProvider.themeData.colorScheme.primary),
-      title: AppLocalizations.t('Privacy')),
-  TileData(
-      prefix:
-          Icon(Icons.usb, color: appDataProvider.themeData.colorScheme.primary),
-      title: AppLocalizations.t('About')),
-];
-
 //设置页面，带有回退回调函数
 class SettingWidget extends StatefulWidget with TileDataMixin {
-  ///类变量，不用每次重建
-  final DataListView dataListView = DataListView(tileData: settingTileData);
+  final GeneralSettingWidget generalSettingWidget =
+      const GeneralSettingWidget();
+  final AdvancedSettingWidget advancedSettingWidget =
+      const AdvancedSettingWidget();
+  final PrivacySettingWidget privacySettingWidget =
+      const PrivacySettingWidget();
+  final SecuritySettingWidget securitySettingWidget =
+      const SecuritySettingWidget();
   final AuthMethod authMethod = AuthMethod.app;
+  late final Widget child;
 
-  SettingWidget({Key? key}) : super(key: key);
+  SettingWidget({Key? key}) : super(key: key) {
+    indexWidgetProvider.define(generalSettingWidget);
+    indexWidgetProvider.define(advancedSettingWidget);
+    indexWidgetProvider.define(privacySettingWidget);
+    indexWidgetProvider.define(securitySettingWidget);
+    List<TileDataMixin> mixins = [
+      generalSettingWidget,
+      advancedSettingWidget,
+      privacySettingWidget,
+      securitySettingWidget
+    ];
+    final List<TileData> meTileData = TileData.from(mixins);
+    for (var tile in meTileData) {
+      tile.dense = true;
+    }
+    child = Expanded(child: DataListView(tileData: meTileData));
+  }
 
   @override
   State<StatefulWidget> createState() {
@@ -98,7 +102,7 @@ class _SettingWidgetState extends State<SettingWidget> {
               children: [
                 _buildAppAuthenticate(),
                 (loginStatus != null && loginStatus!)
-                    ? widget.dataListView
+                    ? widget.child
                     : Center(
                         child:
                             Text(AppLocalizations.t('Authenticate failure'))),
