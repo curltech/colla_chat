@@ -1,15 +1,17 @@
+
+
+
+import 'package:colla_chat/entity/dht/peerendpoint.dart';
+import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_list_widget.dart';
+import 'package:colla_chat/service/dht/peerendpoint.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../entity/dht/peerclient.dart';
-import '../../../../l10n/localization.dart';
-import '../../../../provider/data_list_controller.dart';
-import '../../../../service/dht/peerclient.dart';
-import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/common/widget_mixin.dart';
-import '../../../../widgets/data_bind/column_field_widget.dart';
-import '../../../../widgets/data_bind/form_input_widget.dart';
-
-final List<ColumnFieldDef> peerClientColumnFieldDefs = [
+final List<ColumnFieldDef> peerEndpointColumnFieldDefs = [
   ColumnFieldDef(
       name: 'id',
       label: 'id',
@@ -33,16 +35,17 @@ final List<ColumnFieldDef> peerClientColumnFieldDefs = [
 ];
 
 //邮件内容组件
-class PeerClientEditWidget extends StatefulWidget with TileDataMixin {
-  final DataPageController<PeerClient> controller;
+class PeerEndpointEditWidget extends StatefulWidget with TileDataMixin {
+  final PeerEndpointController controller;
 
-  PeerClientEditWidget({Key? key, required this.controller}) : super(key: key);
-
-  @override
-  State<StatefulWidget> createState() => _PeerClientEditWidgetState();
+  PeerEndpointEditWidget({Key? key, required this.controller})
+      : super(key: key);
 
   @override
-  String get routeName => 'peer_client_edit';
+  State<StatefulWidget> createState() => _PeerEndpointEditWidgetState();
+
+  @override
+  String get routeName => 'peer_endpoint_edit';
 
   @override
   bool get withLeading => true;
@@ -51,10 +54,10 @@ class PeerClientEditWidget extends StatefulWidget with TileDataMixin {
   Icon get icon => const Icon(Icons.desktop_windows);
 
   @override
-  String get title => 'PeerClientEdit';
+  String get title => 'PeerEndpointEdit';
 }
 
-class _PeerClientEditWidgetState extends State<PeerClientEditWidget> {
+class _PeerEndpointEditWidgetState extends State<PeerEndpointEditWidget> {
   @override
   initState() {
     super.initState();
@@ -66,12 +69,13 @@ class _PeerClientEditWidgetState extends State<PeerClientEditWidget> {
   }
 
   Widget _buildFormInputWidget(BuildContext context) {
-    var initValues = widget.controller.getInitValue(peerClientColumnFieldDefs);
+    var initValues =
+        widget.controller.getInitValue(peerEndpointColumnFieldDefs);
     var formInputWidget = FormInputWidget(
       onOk: (Map<String, dynamic> values) {
         _onOk(values);
       },
-      columnFieldDefs: peerClientColumnFieldDefs,
+      columnFieldDefs: peerEndpointColumnFieldDefs,
       initValues: initValues,
     );
 
@@ -79,9 +83,9 @@ class _PeerClientEditWidgetState extends State<PeerClientEditWidget> {
   }
 
   _onOk(Map<String, dynamic> values) {
-    PeerClient currentPeerClient = PeerClient.fromJson(values);
-    peerClientService.upsert(currentPeerClient).then((count) {
-      widget.controller.update(currentPeerClient);
+    PeerEndpoint currentPeerEndpoint = PeerEndpoint.fromJson(values);
+    peerEndpointService.upsert(currentPeerEndpoint).then((count) {
+      widget.controller.update(currentPeerEndpoint);
     });
   }
 
