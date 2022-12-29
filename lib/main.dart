@@ -9,6 +9,7 @@ import 'package:colla_chat/routers/router_handler.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/smart_dialog_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -67,8 +68,10 @@ void main(List<String> args) async {
     await windowManager.ensureInitialized();
   }
   if (Platform.isAndroid) {
-    await inapp.AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+    await inapp.AndroidInAppWebViewController.setWebContentsDebuggingEnabled(
+        true);
   }
+
   ///6.x.x
   // if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
   //   await inapp.InAppWebViewController.setWebContentsDebuggingEnabled(true);
@@ -103,7 +106,8 @@ class CollaChatApp extends StatelessWidget {
             },
             //title: 'Welcome to CollaChat',
             debugShowCheckedModeBanner: false,
-            theme: Provider.of<AppDataProvider>(context).themeData,
+            theme: appDataProvider.themeData,
+            darkTheme: appDataProvider.themeData,
 
             ///Scaffold 是 Material 库中提供的一个 widget，它提供了默认的导航栏、标题和包含主屏幕 widget 树的 body 属性
             home: loginStatus ? indexView : p2pLogin,
@@ -118,7 +122,8 @@ class CollaChatApp extends StatelessWidget {
               loadingBuilder: (String msg) =>
                   SmartDialogUtil.defaultLoadingWidget(),
             ),
-
+            themeMode: StringUtil.enumFromString(
+                ThemeMode.values, appDataProvider.brightness),
             // AppLocalizations.localizationsDelegates,
             localizationsDelegates: const [
               AppLocalizationsDelegate(),
@@ -144,7 +149,7 @@ class CollaChatApp extends StatelessWidget {
             //     return _locale;
             //   }
             // },
-            locale: Provider.of<AppDataProvider>(context).getLocale(),
+            locale: appDataProvider.getLocale(),
           );
         }));
   }

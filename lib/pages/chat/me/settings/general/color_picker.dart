@@ -84,13 +84,19 @@ class _ColorPickerState extends State<ColorPicker> {
       color: appDataProvider.seedColor,
       onSelectFocus: false,
       onSelect: () async {
-        if (!(await colorPickerDialog())) {}
+        Color seedColor = appDataProvider.seedColor;
+        if (!(await colorPickerDialog())) {
+          appDataProvider.seedColor = seedColor;
+        }
       },
     );
     return Row(children: [
       Text(AppLocalizations.t('Seed color')),
       const Spacer(),
-      indicator
+      indicator,
+      const SizedBox(
+        width: 30,
+      ),
     ]);
   }
 

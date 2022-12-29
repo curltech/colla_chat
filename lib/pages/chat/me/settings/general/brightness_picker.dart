@@ -47,9 +47,43 @@ class _BrightnessPickerState extends State<BrightnessPicker> {
     );
   }
 
+  Widget _buildToggleWidget(BuildContext context) {
+    final List<bool> isSelected = <bool>[
+      appDataProvider.brightness == ThemeMode.light.name,
+      appDataProvider.brightness == ThemeMode.system.name,
+      appDataProvider.brightness == ThemeMode.dark.name,
+    ];
+    var toggleWidget = ToggleButtons(
+      isSelected: isSelected,
+      onPressed: (int newIndex) {
+        if (newIndex == 0) {
+          appDataProvider.brightness = ThemeMode.light.name;
+        } else if (newIndex == 1) {
+          appDataProvider.brightness = ThemeMode.system.name;
+        } else {
+          appDataProvider.brightness = ThemeMode.dark.name;
+        }
+      },
+      children: const <Widget>[
+        Icon(Icons.wb_sunny),
+        Icon(Icons.phone_iphone),
+        Icon(Icons.bedtime),
+      ],
+    );
+
+    return Row(children: [
+      Text(AppLocalizations.t('Brightness')),
+      const Spacer(),
+      toggleWidget,
+      const SizedBox(
+        width: 30,
+      )
+    ]);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return _buildSelectWidget(context);
+    return _buildToggleWidget(context);
   }
 
   @override
