@@ -95,7 +95,7 @@ class _ColorPickerState extends State<ColorPicker> {
       const Spacer(),
       indicator,
       const SizedBox(
-        width: 30,
+        width: 10,
       ),
     ]);
   }

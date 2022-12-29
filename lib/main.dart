@@ -107,7 +107,7 @@ class CollaChatApp extends StatelessWidget {
             //title: 'Welcome to CollaChat',
             debugShowCheckedModeBanner: false,
             theme: appDataProvider.themeData,
-            darkTheme: appDataProvider.themeData,
+            //darkTheme: appDataProvider.themeData,
 
             ///Scaffold 是 Material 库中提供的一个 widget，它提供了默认的导航栏、标题和包含主屏幕 widget 树的 body 属性
             home: loginStatus ? indexView : p2pLogin,

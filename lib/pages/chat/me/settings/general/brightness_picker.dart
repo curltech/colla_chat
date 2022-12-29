@@ -76,7 +76,7 @@ class _BrightnessPickerState extends State<BrightnessPicker> {
       const Spacer(),
       toggleWidget,
       const SizedBox(
-        width: 30,
+        width: 10,
       )
     ]);
   }
