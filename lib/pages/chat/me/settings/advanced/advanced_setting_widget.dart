@@ -1,15 +1,38 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/peerclient/peer_client_list_widget.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_list_widget.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/ws_address_picker.dart';
 import 'package:colla_chat/pages/chat/me/settings/general/brightness_picker.dart';
 import 'package:colla_chat/pages/chat/me/settings/general/color_picker.dart';
 import 'package:colla_chat/pages/chat/me/settings/general/locale_picker.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
+import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
 /// 高级设置组件，包括定位器配置
 class AdvancedSettingWidget extends StatefulWidget with TileDataMixin {
-  const AdvancedSettingWidget({Key? key}) : super(key: key);
+  final PeerEndpointListWidget peerEndpointListWidget =
+      PeerEndpointListWidget();
+  final PeerClientListWidget peerClientListWidget = PeerClientListWidget();
+  late final Widget child;
+
+  AdvancedSettingWidget({Key? key}) : super(key: key) {
+    indexWidgetProvider.define(peerEndpointListWidget);
+    indexWidgetProvider.define(peerClientListWidget);
+    List<TileDataMixin> mixins = [
+      peerEndpointListWidget,
+      peerClientListWidget,
+    ];
+    final List<TileData> meTileData = TileData.from(mixins);
+    for (var tile in meTileData) {
+      tile.dense = true;
+    }
+    child = Expanded(child: DataListView(tileData: meTileData));
+  }
 
   @override
   State<StatefulWidget> createState() => _AdvancedSettingWidgetState();
@@ -47,18 +70,10 @@ class _AdvancedSettingWidgetState extends State<AdvancedSettingWidget> {
         const SizedBox(height: 30.0),
         Padding(
           padding: padding,
-          child: const LocalePicker(),
+          child: const WsAddressPicker(),
         ),
         const SizedBox(height: 10.0),
-        Padding(
-          padding: padding,
-          child: const ColorPicker(),
-        ),
-        const SizedBox(height: 10.0),
-        Padding(
-          padding: padding,
-          child: const BrightnessPicker(),
-        ),
+        widget.child
       ],
     );
   }

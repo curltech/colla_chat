@@ -1,6 +1,3 @@
-
-
-
 import 'package:colla_chat/entity/dht/peerendpoint.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_list_widget.dart';
@@ -24,14 +21,23 @@ final List<ColumnFieldDef> peerEndpointColumnFieldDefs = [
       label: 'peerId',
       prefixIcon: const Icon(Icons.perm_identity)),
   ColumnFieldDef(
-      name: 'email',
-      label: 'email',
-      prefixIcon: const Icon(Icons.email),
-      textInputType: TextInputType.emailAddress),
+    name: 'wsConnectAddress',
+    label: 'wsConnectAddress',
+    prefixIcon: const Icon(Icons.web),
+  ),
   ColumnFieldDef(
-      name: 'mobile',
-      label: 'mobile',
-      prefixIcon: const Icon(Icons.mobile_friendly)),
+      name: 'httpConnectAddress',
+      label: 'httpConnectAddress',
+      prefixIcon: const Icon(Icons.http)),
+  ColumnFieldDef(
+    name: 'libp2pConnectAddress',
+    label: 'libp2pConnectAddress',
+    prefixIcon: const Icon(Icons.device_hub),
+  ),
+  ColumnFieldDef(
+      name: 'iceServers',
+      label: 'iceServers',
+      prefixIcon: const Icon(Icons.record_voice_over)),
 ];
 
 //邮件内容组件
@@ -79,7 +85,14 @@ class _PeerEndpointEditWidgetState extends State<PeerEndpointEditWidget> {
       initValues: initValues,
     );
 
-    return formInputWidget;
+    return ListView(children: <Widget>[
+      Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
+          child: formInputWidget),
+      const SizedBox(
+        height: 20.0,
+      )
+    ]);
   }
 
   _onOk(Map<String, dynamic> values) {

@@ -122,8 +122,8 @@ class CollaChatApp extends StatelessWidget {
               loadingBuilder: (String msg) =>
                   SmartDialogUtil.defaultLoadingWidget(),
             ),
-            themeMode: StringUtil.enumFromString(
-                ThemeMode.values, appDataProvider.brightness),
+            // themeMode: StringUtil.enumFromString(
+            //     ThemeMode.values, appDataProvider.brightness),
             // AppLocalizations.localizationsDelegates,
             localizationsDelegates: const [
               AppLocalizationsDelegate(),

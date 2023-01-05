@@ -18,7 +18,7 @@ class SettingWidget extends StatefulWidget with TileDataMixin {
   final GeneralSettingWidget generalSettingWidget =
       const GeneralSettingWidget();
   final AdvancedSettingWidget advancedSettingWidget =
-      const AdvancedSettingWidget();
+       AdvancedSettingWidget();
   final PrivacySettingWidget privacySettingWidget =
       const PrivacySettingWidget();
   final SecuritySettingWidget securitySettingWidget =
