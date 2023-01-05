@@ -7,7 +7,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
-/// 安全设置组件，包括修改密码，登录选项，加密选项
+/// 安全设置组件，包括修改密码，登录选项（免登录设置），加密选项（加密算法，signal）
 class SecuritySettingWidget extends StatefulWidget with TileDataMixin {
   const SecuritySettingWidget({Key? key}) : super(key: key);
 

@@ -261,7 +261,9 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
   }
 
   Widget _buildTextFormField(BuildContext context) {
-    final value = widget.controller.value ?? '';
+    final value = widget.controller.value == null
+        ? ''
+        : widget.controller.value.toString();
     var controller = TextEditingController();
     controller.value = TextEditingValue(
         text: value,
