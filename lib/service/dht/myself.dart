@@ -7,7 +7,6 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:cryptography/cryptography.dart';
 
-
 class MyselfService {
   ///创建新的myself，创建新的密钥对，设置到当前
   createMyself(MyselfPeer myselfPeer, String password) async {
@@ -34,6 +33,19 @@ class MyselfService {
     myself.peerPublicKey = peerPublicKey;
     myself.privateKey = keyPair;
     myself.publicKey = publicKey;
+  }
+
+  updateMyselfPassword(MyselfPeer myselfPeer, String password) async {
+    ///peerId对应的密钥对
+    SimpleKeyPair? peerPrivateKey = myself.peerPrivateKey;
+    myselfPeer.peerPrivateKey =
+        await cryptoGraphy.export(peerPrivateKey!, password.codeUnits);
+
+    ///加密对应的密钥对x25519
+    SimpleKeyPair? keyPair = myself.privateKey;
+    myselfPeer.privateKey =
+        await cryptoGraphy.export(keyPair!, password.codeUnits);
+    myself.password = password;
   }
 
   /// 获取自己节点的记录，并解开私钥，设置当前myself
@@ -81,7 +93,7 @@ class MyselfService {
       myself.peerProfile = peerProfile;
       String? avatar = myselfPeer.avatar;
       var avatarImage = ImageUtil.buildImageWidget(
-        image:avatar,
+        image: avatar,
         height: 32,
         width: 32,
       );

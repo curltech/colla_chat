@@ -17,12 +17,10 @@ import 'package:flutter/material.dart';
 class SettingWidget extends StatefulWidget with TileDataMixin {
   final GeneralSettingWidget generalSettingWidget =
       const GeneralSettingWidget();
-  final AdvancedSettingWidget advancedSettingWidget =
-       AdvancedSettingWidget();
+  final AdvancedSettingWidget advancedSettingWidget = AdvancedSettingWidget();
   final PrivacySettingWidget privacySettingWidget =
       const PrivacySettingWidget();
-  final SecuritySettingWidget securitySettingWidget =
-      const SecuritySettingWidget();
+  final SecuritySettingWidget securitySettingWidget = SecuritySettingWidget();
   final AuthMethod authMethod = AuthMethod.app;
   late final Widget child;
 
