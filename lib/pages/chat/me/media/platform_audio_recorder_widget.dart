@@ -68,16 +68,20 @@ class _PlatformAudioRecorderWidgetState
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-      title: Text(AppLocalizations.t('AudioRecorder')),
-      withLeading: true,
-      rightPopupMenus: _buildRightPopupMenus(),
-      child: PlatformAudioRecorder(
-        height: 80,
-        onStop: (String filename) {
-          logger.i('record audio filename:$filename');
-        },
-        mediaRecorderType: mediaRecorderType,
-      ),
-    );
+        title: Text(AppLocalizations.t('AudioRecorder')),
+        withLeading: true,
+        rightPopupMenus: _buildRightPopupMenus(),
+        child: Column(
+          children: [
+            const Spacer(),
+            PlatformAudioRecorder(
+              onStop: (String filename) {
+                logger.i('record audio filename:$filename');
+              },
+              mediaRecorderType: mediaRecorderType,
+            ),
+            const Spacer(),
+          ],
+        ));
   }
 }
