@@ -17,7 +17,7 @@ import 'package:flutter/material.dart';
 
 //mail页面
 class MailWidget extends StatelessWidget with TileDataMixin {
-  late final Widget child;
+  late final List<TileData> mailTileData;
 
   MailWidget({Key? key}) : super(key: key) {
     AddressAddWidget addressAddWidget = const AddressAddWidget();
@@ -29,15 +29,15 @@ class MailWidget extends StatelessWidget with TileDataMixin {
       mailAddressWidget,
       mailListWidget,
     ];
-    final List<TileData> meTileData = TileData.from(mixins);
-    for (var tile in meTileData) {
+    mailTileData = TileData.from(mixins);
+    for (var tile in mailTileData) {
       tile.dense = true;
     }
-    child = Expanded(child: DataListView(tileData: meTileData));
   }
 
   @override
   Widget build(BuildContext context) {
+    Widget child = DataListView(tileData: mailTileData);
     var webrtc = KeepAliveWrapper(
         child: AppBarView(
             title: Text(AppLocalizations.t(title)),

@@ -35,7 +35,7 @@ class WebrtcWidget extends StatelessWidget with TileDataMixin {
     for (var tile in meTileData) {
       tile.dense = true;
     }
-    child = Expanded(child: DataListView(tileData: meTileData));
+    child = DataListView(tileData: meTileData);
   }
 
   @override

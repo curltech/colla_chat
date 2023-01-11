@@ -20,7 +20,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
   final NearbyLinkmanAddWidget nearbyLinkmanAddWidget =
       NearbyLinkmanAddWidget();
 
-  late final Widget child;
+  late final List<TileData> linkmanAddTileData;
 
   LinkmanAddWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(p2pLinkmanAddWidget);
@@ -33,8 +33,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
       contactLinkmanAddWidget,
       nearbyLinkmanAddWidget
     ];
-    final List<TileData> linkmanAddTileData = TileData.from(mixins);
-    child = Expanded(child: DataListView(tileData: linkmanAddTileData));
+    linkmanAddTileData = TileData.from(mixins);
   }
 
   @override
@@ -51,10 +50,11 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
+    Widget child = DataListView(tileData: linkmanAddTileData);
     var me = AppBarView(
         title: Text(AppLocalizations.t(title)),
         withLeading: true,
-        child: Column(children: [child]));
+        child: child);
     return me;
   }
 }

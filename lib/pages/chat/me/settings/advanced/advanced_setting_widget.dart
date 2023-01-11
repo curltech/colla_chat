@@ -18,7 +18,7 @@ class AdvancedSettingWidget extends StatefulWidget with TileDataMixin {
   final PeerEndpointListWidget peerEndpointListWidget =
       PeerEndpointListWidget();
   final PeerClientListWidget peerClientListWidget = PeerClientListWidget();
-  late final Widget child;
+  late final List<TileData> advancedSettingTileData;
 
   AdvancedSettingWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(peerEndpointListWidget);
@@ -27,11 +27,10 @@ class AdvancedSettingWidget extends StatefulWidget with TileDataMixin {
       peerEndpointListWidget,
       peerClientListWidget,
     ];
-    final List<TileData> meTileData = TileData.from(mixins);
-    for (var tile in meTileData) {
+    advancedSettingTileData = TileData.from(mixins);
+    for (var tile in advancedSettingTileData) {
       tile.dense = true;
     }
-    child = Expanded(child: DataListView(tileData: meTileData));
   }
 
   @override
@@ -62,6 +61,7 @@ class _AdvancedSettingWidgetState extends State<AdvancedSettingWidget> {
   }
 
   Widget _buildSettingWidget(BuildContext context) {
+    Widget child = DataListView(tileData: widget.advancedSettingTileData);
     var padding = const EdgeInsets.symmetric(horizontal: 15.0);
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
@@ -73,7 +73,7 @@ class _AdvancedSettingWidgetState extends State<AdvancedSettingWidget> {
           child: const WsAddressPicker(),
         ),
         const SizedBox(height: 10.0),
-        widget.child
+        child
       ],
     );
   }

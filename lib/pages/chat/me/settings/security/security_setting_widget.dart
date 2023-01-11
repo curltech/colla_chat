@@ -2,14 +2,30 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/general/brightness_picker.dart';
 import 'package:colla_chat/pages/chat/me/settings/general/color_picker.dart';
 import 'package:colla_chat/pages/chat/me/settings/general/locale_picker.dart';
+import 'package:colla_chat/pages/chat/me/settings/security/password_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
+import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
 /// 安全设置组件，包括修改密码，登录选项（免登录设置），加密选项（加密算法，signal）
 class SecuritySettingWidget extends StatefulWidget with TileDataMixin {
-  const SecuritySettingWidget({Key? key}) : super(key: key);
+  final PasswordWidget passwordWidget = const PasswordWidget();
+  late final List<TileData> securitySettingTileData;
+
+  SecuritySettingWidget({Key? key}) : super(key: key) {
+    indexWidgetProvider.define(passwordWidget);
+    List<TileDataMixin> mixins = [
+      passwordWidget,
+    ];
+    securitySettingTileData = TileData.from(mixins);
+    for (var tile in securitySettingTileData) {
+      tile.dense = true;
+    }
+  }
 
   @override
   State<StatefulWidget> createState() => _SecuritySettingWidgetState();
@@ -39,26 +55,13 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
   }
 
   Widget _buildSettingWidget(BuildContext context) {
+    Widget child = DataListView(tileData: widget.securitySettingTileData);
     var padding = const EdgeInsets.symmetric(horizontal: 15.0);
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        const SizedBox(height: 30.0),
-        Padding(
-          padding: padding,
-          child: const LocalePicker(),
-        ),
-        const SizedBox(height: 10.0),
-        Padding(
-          padding: padding,
-          child: const ColorPicker(),
-        ),
-        const SizedBox(height: 10.0),
-        Padding(
-          padding: padding,
-          child: const BrightnessPicker(),
-        ),
+        child,
       ],
     );
   }
