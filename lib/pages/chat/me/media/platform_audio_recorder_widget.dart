@@ -72,6 +72,7 @@ class _PlatformAudioRecorderWidgetState
       withLeading: true,
       rightPopupMenus: _buildRightPopupMenus(),
       child: PlatformAudioRecorder(
+        height: 80,
         onStop: (String filename) {
           logger.i('record audio filename:$filename');
         },

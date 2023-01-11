@@ -14,18 +14,17 @@ import 'package:flutter/material.dart';
 /// 安全设置组件，包括修改密码，登录选项（免登录设置），加密选项（加密算法，signal）
 class SecuritySettingWidget extends StatefulWidget with TileDataMixin {
   final PasswordWidget passwordWidget = const PasswordWidget();
-  late final Widget child;
+  late final List<TileData> securitySettingTileData;
 
   SecuritySettingWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(passwordWidget);
     List<TileDataMixin> mixins = [
       passwordWidget,
     ];
-    final List<TileData> meTileData = TileData.from(mixins);
-    for (var tile in meTileData) {
+    securitySettingTileData = TileData.from(mixins);
+    for (var tile in securitySettingTileData) {
       tile.dense = true;
     }
-    child = Expanded(child: DataListView(tileData: meTileData));
   }
 
   @override
@@ -56,12 +55,13 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
   }
 
   Widget _buildSettingWidget(BuildContext context) {
+    Widget child = DataListView(tileData: widget.securitySettingTileData);
     var padding = const EdgeInsets.symmetric(horizontal: 15.0);
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        widget.child,
+        child,
       ],
     );
   }

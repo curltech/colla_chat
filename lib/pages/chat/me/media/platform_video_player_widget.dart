@@ -65,16 +65,20 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
   @override
   Widget build(BuildContext context) {
     String filename = 'C:\\document\\iceland_compressed.mp4';
+    List<AppBarPopupMenu>? rightPopupMenus = _buildRightPopupMenus();
+    Widget child =
+        const Center(child: Text('Please select a MediaPlayerType!'));
+    if (mediaPlayerType != null) {
+      child = PlatformMediaPlayer(
+          showPlaylist: true,
+          mediaPlayerType: mediaPlayerType!,
+          filename: filename);
+    }
     return AppBarView(
       title: Text(AppLocalizations.t(widget.title)),
       withLeading: true,
-      rightPopupMenus: _buildRightPopupMenus(),
-      child: mediaPlayerType != null
-          ? PlatformMediaPlayer(
-              showPlaylist: true,
-              mediaPlayerType: mediaPlayerType!,
-              filename: filename)
-          : const Center(child: Text('Please select a MediaPlayerType!')),
+      rightPopupMenus: rightPopupMenus,
+      child: child,
       // child:const VideoPlayer(),
     );
   }

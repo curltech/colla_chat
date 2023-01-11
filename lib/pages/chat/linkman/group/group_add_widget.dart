@@ -15,7 +15,7 @@ class GroupAddWidget extends StatelessWidget with TileDataMixin {
   final NearbyGroupAddWidget nearbyGroupAddWidget = NearbyGroupAddWidget();
   final FaceGroupAddWidget faceGroupAddWidget = FaceGroupAddWidget();
 
-  late final Widget child;
+  late final List<TileData> linkmanAddTileData;
 
   GroupAddWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(linkmanGroupAddWidget);
@@ -26,8 +26,7 @@ class GroupAddWidget extends StatelessWidget with TileDataMixin {
       nearbyGroupAddWidget,
       faceGroupAddWidget,
     ];
-    final List<TileData> linkmanAddTileData = TileData.from(mixins);
-    child = Expanded(child: DataListView(tileData: linkmanAddTileData));
+    linkmanAddTileData = TileData.from(mixins);
   }
 
   @override
@@ -44,10 +43,11 @@ class GroupAddWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
+    Widget child = DataListView(tileData: linkmanAddTileData);
     var me = AppBarView(
         title: Text(AppLocalizations.t(title)),
         withLeading: true,
-        child: Column(children: [child]));
+        child: child);
     return me;
   }
 }

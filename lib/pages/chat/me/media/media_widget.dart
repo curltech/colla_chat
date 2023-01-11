@@ -21,7 +21,7 @@ class MediaWidget extends StatelessWidget with TileDataMixin {
       const PlatformAudioPlayerWidget();
   final PlatformAudioRecorderWidget audioRecorderWidget =
       PlatformAudioRecorderWidget();
-  late final Widget child;
+  late final List<TileData> mediaTileData;
 
   MediaWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(videoPlayerWidget);
@@ -32,11 +32,10 @@ class MediaWidget extends StatelessWidget with TileDataMixin {
       audioPlayerWidget,
       audioRecorderWidget,
     ];
-    final List<TileData> meTileData = TileData.from(mixins);
-    for (var tile in meTileData) {
+    mediaTileData = TileData.from(mixins);
+    for (var tile in mediaTileData) {
       tile.dense = true;
     }
-    child = Expanded(child: DataListView(tileData: meTileData));
   }
 
   @override
@@ -53,6 +52,7 @@ class MediaWidget extends StatelessWidget with TileDataMixin {
 
   @override
   Widget build(BuildContext context) {
+    Widget child = DataListView(tileData: mediaTileData);
     var me = AppBarView(
         withLeading: true,
         title: Text(AppLocalizations.t(title)),
