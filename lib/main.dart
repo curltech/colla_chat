@@ -9,7 +9,8 @@ import 'package:colla_chat/routers/router_handler.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/smart_dialog_util.dart';
-import 'package:colla_chat/tool/string_util.dart';
+import 'package:webview_flutter/webview_flutter.dart' as webview;
+import 'package:webview_win_floating/webview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -64,19 +65,25 @@ void main(List<String> args) async {
   //         Provider(create: (context) => AppProfile()),
   //       ],
   WidgetsFlutterBinding.ensureInitialized();
-  if (platformParams.windows || platformParams.macos || platformParams.linux) {
-    await windowManager.ensureInitialized();
-  }
-  if (Platform.isAndroid) {
-    await inapp.AndroidInAppWebViewController.setWebContentsDebuggingEnabled(
-        true);
-  }
 
   ///6.x.x
   // if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
   //   await inapp.InAppWebViewController.setWebContentsDebuggingEnabled(true);
   // }
   ServiceLocator.init().then((bool loginStatus) {
+    if (platformParams.windows) {
+      webview.WebView.platform = WindowsWebViewPlugin();
+    }
+    if (platformParams.android) {
+      webview.WebView.platform = webview.AndroidWebView();
+      inapp.AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+    }
+    if (platformParams.windows ||
+        platformParams.macos ||
+        platformParams.linux) {
+      windowManager.ensureInitialized();
+    }
+
     ///加载主应用组件
     runApp(MultiProvider(providers: [
       ChangeNotifierProvider(create: (context) => appDataProvider),
