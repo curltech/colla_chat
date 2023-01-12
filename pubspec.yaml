@@ -267,9 +267,9 @@ dependencies:
   i18n_extension: ^6.0.0
   html_editor_enhanced: ^2.5.0
   flutter_quill: ^6.1.7
-    #git: https://github.com/singerdmx/flutter-quill.git
+  #git: https://github.com/singerdmx/flutter-quill.git
   flutter_quill_extensions: ^0.1.0
-    #git: https://github.com/singerdmx/flutter-quill.git/flutter_quill_extensions
+  #git: https://github.com/singerdmx/flutter-quill.git/flutter_quill_extensions
   visual_editor:
     git: https://github.com/visual-space/visual-editor.git
   #youtube_player_flutter_quill: ^8.2.2
@@ -312,7 +312,8 @@ dependency_overrides:
   #webview_flutter_wkwebview: ^3.0.1
   #webview_flutter_web: ^0.1.0+4
   #webview_flutter_platform_interface: ^2.0.0
-  webview_win_floating: ^1.0.4 #webView for
+  webview_win_floating: 1.0.3 #webView for
+    #git: https://github.com/jakky1/webview_win_floating.git
   sprintf: ^7.0.0
   flex_color_picker: ^3.0.0
   permission_handler: ^10.2.0

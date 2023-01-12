@@ -9,7 +9,6 @@ import 'package:colla_chat/p2p/chain/action/ionsignal.dart';
 import 'package:colla_chat/p2p/chain/action/p2pchat.dart';
 import 'package:colla_chat/service/stock/account.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:dart_vlc/dart_vlc.dart';
 
 import '../entity/p2p/security_context.dart';
 import '../p2p/chain/action/chat.dart';
@@ -43,6 +42,7 @@ class ServiceLocator {
   static Future<bool> init() async {
     await platformParams.init();
     await appDataProvider.init();
+    HttpOverrides.global = PlatformHttpOverrides();
     services['stockAccountService'] = stockAccountService;
     services['chainAppService'] = chainAppService;
     services['peerProfileService'] = peerProfileService;
@@ -81,7 +81,6 @@ class ServiceLocator {
 
     await Sqlite3.getInstance();
     await AppLocalizations.init();
-    HttpOverrides.global = PlatformHttpOverrides();
 
     bool loginStatus = await myselfPeerService.autoLogin();
 

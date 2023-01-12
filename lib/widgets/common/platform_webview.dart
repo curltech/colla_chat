@@ -1,11 +1,10 @@
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart' as inapp;
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:webview_flutter/platform_interface.dart';
 import 'package:webview_flutter/webview_flutter.dart' as webview;
-import 'package:webview_win_floating/webview.dart';
 
 class PlatformWebViewController with ChangeNotifier {
   inapp.InAppWebViewController? inAppWebViewController;
@@ -14,20 +13,21 @@ class PlatformWebViewController with ChangeNotifier {
   PlatformWebViewController(
       {this.webViewController, this.inAppWebViewController});
 
-  static from(dynamic controller) {
-    PlatformWebViewController webViewController = PlatformWebViewController();
+  static PlatformWebViewController from(dynamic controller) {
+    PlatformWebViewController platformWebViewController =
+        PlatformWebViewController();
     if (controller is webview.WebViewController) {
-      webViewController.webViewController = controller;
-      webViewController.inAppWebViewController = null;
+      platformWebViewController.webViewController = controller;
+      platformWebViewController.inAppWebViewController = null;
     } else if (controller is inapp.InAppWebViewController) {
-      webViewController.webViewController = null;
-      webViewController.inAppWebViewController = controller;
+      platformWebViewController.webViewController = null;
+      platformWebViewController.inAppWebViewController = controller;
     } else {
-      webViewController.webViewController = null;
-      webViewController.inAppWebViewController = null;
+      platformWebViewController.webViewController = null;
+      platformWebViewController.inAppWebViewController = null;
     }
 
-    return webViewController;
+    return platformWebViewController;
   }
 
   load(String? filename) async {
@@ -48,7 +48,7 @@ class PlatformWebViewController with ChangeNotifier {
       }
     } else if (filename.startsWith('http')) {
       if (webViewController != null) {
-        await webViewController!.loadFile(filename);
+        await webViewController!.loadUrl(filename);
       } else if (inAppWebViewController != null) {
         inapp.URLRequest urlRequest =
             inapp.URLRequest(url: Uri.parse(filename));
@@ -103,18 +103,9 @@ class PlatformWebViewController with ChangeNotifier {
 /// 平台Webview，打开一个内部的浏览器窗口，可以用来观看网页，音频，视频文件，office文件
 class PlatformWebView extends StatefulWidget {
   final String? initialUrl;
-  final void Function(PlatformWebViewController webViewController)?
-      onWebViewCreated;
+  final void Function(PlatformWebViewController controller)? onWebViewCreated;
 
-  PlatformWebView({super.key, this.initialUrl, this.onWebViewCreated}) {
-    if (platformParams.windows) {
-      webview.WebView.platform = WindowsWebViewPlugin();
-    }
-
-    if (platformParams.android) {
-      webview.WebView.platform = webview.AndroidWebView();
-    }
-  }
+  const PlatformWebView({super.key, this.initialUrl, this.onWebViewCreated});
 
   @override
   State createState() => _PlatformWebViewState();
@@ -141,8 +132,9 @@ class _PlatformWebViewState extends State<PlatformWebView> {
   //     iframeAllow: "camera; microphone",
   //     iframeAllowFullscreen: true);
 
-  PlatformWebViewController webViewController = PlatformWebViewController();
-  late PullToRefreshController pullToRefreshController;
+  inapp.PullToRefreshController pullToRefreshController =
+      inapp.PullToRefreshController();
+  PlatformWebViewController? webViewController;
 
   @override
   void initState() {
@@ -151,9 +143,8 @@ class _PlatformWebViewState extends State<PlatformWebView> {
 
   _onWebViewCreated(dynamic controller) {
     webViewController = PlatformWebViewController.from(controller);
-
     if (widget.onWebViewCreated != null) {
-      widget.onWebViewCreated!(webViewController);
+      widget.onWebViewCreated!(webViewController!);
     }
   }
 
@@ -167,6 +158,9 @@ class _PlatformWebViewState extends State<PlatformWebView> {
         initialUrl: widget.initialUrl,
         javascriptMode: webview.JavascriptMode.unrestricted,
         onWebViewCreated: _onWebViewCreated,
+        onPageStarted: (url) => logger.i("onPageStarted: $url"),
+        onPageFinished: (url) => logger.i("onPageFinished"),
+        onWebResourceError: (error) => logger.i("error: ${error.failingUrl}"),
         gestureNavigationEnabled: true,
         allowsInlineMediaPlayback: true,
         initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
@@ -183,9 +177,9 @@ class _PlatformWebViewState extends State<PlatformWebView> {
         pullToRefreshController: pullToRefreshController,
         onLoadStart: (controller, url) {},
         androidOnPermissionRequest: (controller, origin, resources) async {
-          return PermissionRequestResponse(
+          return inapp.PermissionRequestResponse(
               resources: resources,
-              action: PermissionRequestResponseAction.GRANT);
+              action: inapp.PermissionRequestResponseAction.GRANT);
         },
         shouldOverrideUrlLoading: (controller, navigationAction) async {},
         onLoadStop: (controller, url) async {
