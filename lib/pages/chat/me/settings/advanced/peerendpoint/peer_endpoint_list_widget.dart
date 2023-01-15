@@ -16,7 +16,6 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
-
 class PeerEndpointController extends DataListController<PeerEndpoint> {
   PeerEndpointController() {
     init();
@@ -26,6 +25,7 @@ class PeerEndpointController extends DataListController<PeerEndpoint> {
     peerEndpointService
         .findAllPeerEndpoint()
         .then((List<PeerEndpoint> peerEndpoints) {
+      clear();
       if (peerEndpoints.isNotEmpty) {
         addAll(peerEndpoints);
       } else {
@@ -63,6 +63,12 @@ class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
     indexWidgetProvider.define(peerEndpointShowWidget);
     indexWidgetProvider.define(peerEndpointEditWidget);
     rightWidgets = [
+      IconButton(
+          onPressed: () {
+            controller.init();
+          },
+          icon: const Icon(Icons.refresh),
+          tooltip: AppLocalizations.t('Refresh')),
       IconButton(
           onPressed: () {
             var current = PeerEndpoint('', '');
@@ -112,7 +118,8 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
     setState(() {});
   }
 
-  List<TileData> _convert(List<PeerEndpoint> peerEndpoints) {
+  List<TileData> _convert() {
+    var peerEndpoints = widget.controller.data;
     List<TileData> tiles = [];
     if (peerEndpoints.isNotEmpty) {
       for (var peerEndpoint in peerEndpoints) {
@@ -120,6 +127,25 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
         var subtitle = peerEndpoint.peerId ?? '';
         TileData tile = TileData(
             title: title, subtitle: subtitle, routeName: 'peer_endpoint_edit');
+        List<TileData> slideActions = [];
+        TileData deleteSlideAction = TileData(
+            title: 'Delete',
+            prefix: Icons.delete,
+            onTap: (int index, String label, {String? subtitle}) async {
+              widget.controller.currentIndex = index;
+              await peerEndpointService.delete(entity: peerEndpoint);
+              widget.controller.delete();
+            });
+        TileData editSlideAction = TileData(
+            title: 'Edit',
+            prefix: Icons.edit,
+            onTap: (int index, String label, {String? subtitle}) async {
+              widget.controller.currentIndex = index;
+              indexWidgetProvider.push('peer_endpoint_edit');
+            });
+        slideActions.add(deleteSlideAction);
+        slideActions.add(editSlideAction);
+        tile.slideActions = slideActions;
         tiles.add(tile);
       }
     }
@@ -127,14 +153,13 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
     return tiles;
   }
 
-  _onTap(int index, String title, {String? subtitle,TileData? group}) {
+  _onTap(int index, String title, {String? subtitle, TileData? group}) {
     widget.controller.currentIndex = index;
   }
 
   @override
   Widget build(BuildContext context) {
-    var peerEndpoints = widget.controller.data;
-    var tiles = _convert(peerEndpoints);
+    var tiles = _convert();
     var currentIndex = widget.controller.currentIndex;
     var dataListView = KeepAliveWrapper(
         child: DataListView(
@@ -150,7 +175,6 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
 
   @override
   void dispose() {
-    logger.w('PeerEndpointListWidget dispose');
     widget.controller.removeListener(_update);
     super.dispose();
   }

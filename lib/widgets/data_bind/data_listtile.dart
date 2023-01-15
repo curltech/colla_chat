@@ -191,18 +191,18 @@ class DataListTile extends StatelessWidget {
       BuildContext context, List<TileData>? slideActions) {
     List<SlidableAction> slidableActions = [];
     if (tileData.slideActions != null) {
-      int i = 0;
       for (var slideAction in tileData.slideActions!) {
         SlidableAction slidableAction = SlidableAction(
           onPressed: (context) {
             if (slideAction.onTap != null) {
-              slideAction.onTap!(i, slideAction.title);
+              slideAction.onTap!(index, tileData.title,
+                  subtitle: slideAction.title);
             }
           },
-          backgroundColor: appDataProvider.themeData.colorScheme.primary,
-          foregroundColor: Colors.white,
+          backgroundColor: Colors.white.withOpacity(0),
+          foregroundColor: appDataProvider.themeData.colorScheme.primary,
           icon: slideAction.prefix,
-          label: slideAction.title,
+          label: AppLocalizations.t(slideAction.title),
         );
         slidableActions.add(slidableAction);
       }
@@ -222,16 +222,17 @@ class DataListTile extends StatelessWidget {
     }
 
     ActionPane? startActionPane;
-    if (tileData.slideActions == null && tileData.slideActions!.isNotEmpty) {
+    if (tileData.slideActions != null && tileData.slideActions!.isNotEmpty) {
       startActionPane = _buildActionPane(context, tileData.slideActions);
     }
     ActionPane? endActionPane;
-    if (tileData.endSlideActions == null &&
+    if (tileData.endSlideActions != null &&
         tileData.endSlideActions!.isNotEmpty) {
       endActionPane = _buildActionPane(context, tileData.slideActions);
     }
 
     Slidable slidable = Slidable(
+      key: UniqueKey(),
       startActionPane: startActionPane,
       endActionPane: endActionPane,
       child: _buildListTile(context),
