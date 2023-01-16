@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/cryptography.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_list_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -302,7 +303,9 @@ class BasePeerConnection {
     this.extension = extension;
     try {
       var iceServers = extension.iceServers;
-      iceServers = iceServers ?? appDataProvider.defaultNodeAddress.iceServers;
+      if (iceServers == null && peerEndpointController.data.isNotEmpty) {
+        iceServers = JsonUtil.toJson(peerEndpointController.data[0].iceServers);
+      }
       extension.iceServers = iceServers;
       var configuration = {'iceServers': iceServers};
       //1.创建连接

@@ -1,12 +1,12 @@
-import '../entity/chat/mailaddress.dart';
-import '../provider/app_data_provider.dart';
+import 'package:colla_chat/entity/chat/mailaddress.dart';
+import 'package:colla_chat/entity/dht/peerendpoint.dart';
 
-/// 地址选择框的选项
-final Map<String, NodeAddress> nodeAddressOptions = {
-  'default': NodeAddress('default',
+/// 配置文件的定位器
+final Map<String, PeerEndpoint> nodeAddressOptions = {
+  'default': PeerEndpoint('default',
       wsConnectAddress: 'wss://localhost:9090/websocket',
       httpConnectAddress: 'https://localhost:9090',
-      connectPeerId: '12D3KooWJvWPnHcYPEG3oPwDcobfc2wzWJsgKV7fj5LC7qx15ihS',
+      peerId: '12D3KooWJvWPnHcYPEG3oPwDcobfc2wzWJsgKV7fj5LC7qx15ihS',
       libp2pConnectAddress:
           '/ip4/127.0.0.1/tcp/5720/wss/p2p/12D3KooWJvWPnHcYPEG3oPwDcobfc2wzWJsgKV7fj5LC7qx15ihS',
       iceServers: [
@@ -18,10 +18,10 @@ final Map<String, NodeAddress> nodeAddressOptions = {
         //   'url': 'turn:localhost:3478',
         // }
       ]),
-  'China-Shenzhen': NodeAddress('China-Shenzhen',
+  'China-Shenzhen': PeerEndpoint('China-Shenzhen',
       wsConnectAddress: 'wss://sz.curltech.com.cn:9090/websocket',
       httpConnectAddress: 'https://sz.curltech.com.cn:9090',
-      connectPeerId: '12D3KooWFbyAYotJ3VtuDwCt1pkGdxGVxiW8PfiXsZ1NMqe1cKxJ',
+      peerId: '12D3KooWFbyAYotJ3VtuDwCt1pkGdxGVxiW8PfiXsZ1NMqe1cKxJ',
       libp2pConnectAddress:
           '/dns4/sz.curltech.com.cn/tcp/5720/wss/p2p/12D3KooWFbyAYotJ3VtuDwCt1pkGdxGVxiW8PfiXsZ1NMqe1cKxJ',
       iceServers: [
@@ -32,10 +32,10 @@ final Map<String, NodeAddress> nodeAddressOptions = {
           'urls': 'turn:sz.curltech.com.cn:3478',
         }
       ]),
-  'China-Hangzhou': NodeAddress('China-Hangzhou',
+  'China-Hangzhou': PeerEndpoint('China-Hangzhou',
       wsConnectAddress: 'wss://hz.curltech.com.cn:9090/websocket',
       httpConnectAddress: 'https://hz.curltech.com.cn:9090',
-      connectPeerId: '12D3KooWDTYWJ7bHXJFcEwq1NBJ2majgRjrY2xHjoMzSedkS3jgN',
+      peerId: '12D3KooWDTYWJ7bHXJFcEwq1NBJ2majgRjrY2xHjoMzSedkS3jgN',
       libp2pConnectAddress:
           '/dns4/hz.curltech.com.cn/tcp/5720/wss/p2p/12D3KooWDTYWJ7bHXJFcEwq1NBJ2majgRjrY2xHjoMzSedkS3jgN',
       iceServers: [
@@ -46,10 +46,10 @@ final Map<String, NodeAddress> nodeAddressOptions = {
           'urls': 'turn:hz.curltech.com.cn:3478',
         }
       ]),
-  'South Korea': NodeAddress('South Korea',
+  'South Korea': PeerEndpoint('South Korea',
       wsConnectAddress: 'wss://kr.curltech.cc:9090/websocket',
       httpConnectAddress: 'https://kr.curltech.cc:9090',
-      connectPeerId: '12D3KooWJk2AP2JcawJgScGPqtHXMaDwYUDBxNMjyGEEwPH3ghrD',
+      peerId: '12D3KooWJk2AP2JcawJgScGPqtHXMaDwYUDBxNMjyGEEwPH3ghrD',
       libp2pConnectAddress:
           '/dns4/kr.curltech.cc/tcp/5720/wss/p2p/12D3KooWJk2AP2JcawJgScGPqtHXMaDwYUDBxNMjyGEEwPH3ghrD',
       iceServers: [

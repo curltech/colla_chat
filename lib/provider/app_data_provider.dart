@@ -16,109 +16,9 @@ final localeOptions = [
   Option('한국어', 'ko_KR')
 ];
 
-class NodeAddress {
-  static const defaultName = 'default';
-  String name;
-  String? httpConnectAddress; //https服务器
-  String? wsConnectAddress; //wss服务器
-  String? libp2pConnectAddress; //libp2p服务器
-  //ice服务器
-  List<Map<String, String>>? iceServers;
-  String? username;
-  String? credential;
-
-  // libp2p的链协议号码
-  String? chainProtocolId;
-
-  // 目标的libp2p节点的peerId
-  String? connectPeerId;
-
-  NodeAddress(this.name,
-      {this.httpConnectAddress,
-      this.wsConnectAddress,
-      this.libp2pConnectAddress,
-      this.iceServers,
-      this.username,
-      this.credential,
-      this.connectPeerId,
-      this.chainProtocolId}) {
-    setIceServers();
-  }
-
-  NodeAddress.fromJson(Map json)
-      : name = json['name'],
-        httpConnectAddress = json['httpConnectAddress'],
-        wsConnectAddress = json['wsConnectAddress'],
-        libp2pConnectAddress = json['libp2pConnectAddress'],
-        iceServers = json['iceServers'],
-        username = json['username'],
-        credential = json['credential'],
-        connectPeerId = json['connectPeerId'],
-        chainProtocolId = json['chainProtocolId'];
-
-  Map<String, dynamic> toJson() {
-    Map<String, dynamic> json = {};
-    json.addAll({
-      'name': name,
-      'httpConnectAddress': httpConnectAddress,
-      'wsConnectAddress': wsConnectAddress,
-      'libp2pConnectAddress': libp2pConnectAddress,
-      'iceServers': iceServers,
-      'username': username,
-      'credential': credential,
-      'connectPeerId': connectPeerId,
-      'chainProtocolId': chainProtocolId,
-    });
-    return json;
-  }
-
-  setIceServers() {
-    var ices = iceServers;
-    if (ices != null && ices.isNotEmpty) {
-      for (var iceServer in ices) {
-        if (username != null) {
-          iceServer['username'] = username!;
-        }
-        if (credential != null) {
-          iceServer['credential'] = credential!;
-        }
-      }
-    }
-  }
-
-  void validate(NodeAddress address) {
-    if (address.name == '') {
-      throw 'NameFormatError';
-    }
-    var wsConnectAddress = address.wsConnectAddress;
-    if (wsConnectAddress != null) {
-      if (!wsConnectAddress.startsWith('wss') &&
-          !wsConnectAddress.startsWith('ws')) {
-        throw 'WsConnectAddressFormatError';
-      }
-    }
-    var httpConnectAddress = address.httpConnectAddress;
-    if (httpConnectAddress != null) {
-      if (!httpConnectAddress.startsWith('https') &&
-          !httpConnectAddress.startsWith('http')) {
-        throw 'HttpConnectAddressFormatError';
-      }
-    }
-    var libp2pConnectAddress = address.libp2pConnectAddress;
-    if (libp2pConnectAddress != null) {
-      if (!libp2pConnectAddress.startsWith('/dns') &&
-          !libp2pConnectAddress.startsWith('/ip')) {
-        throw 'Libp2pConnectAddressFormatError';
-      }
-    }
-  }
-}
-
 /// 本应用的参数状态管理器，与操作系统系统和硬件无关，需要保存到本地的存储中
 /// 在系统启动的对象初始化从本地存储中加载
 class AppDataProvider with ChangeNotifier {
-  /// 可选的连接地址，比如http、ws、libp2p、turn
-  Map<String, NodeAddress> nodeAddress = nodeAddressOptions;
   var topics = <String>[]; //订阅的主题
   // 本机作为libp2p节点的监听地址
   var listenerAddress = <String>[];
@@ -139,7 +39,6 @@ class AppDataProvider with ChangeNotifier {
   double bottomBarHeight = kBottomNavigationBarHeight;
   double toolbarHeight = kToolbarHeight;
   String sqlite3Path = '';
-  NodeAddress? _defaultNodeAddress;
 
   AppDataProvider();
 
@@ -293,23 +192,6 @@ class AppDataProvider with ChangeNotifier {
       _keyboardHeight = keyboardHeight;
       //logger.i('keyboardHeight changed:$_keyboardHeight');
     }
-  }
-
-  setConnectAddress(NodeAddress address) {
-    address.validate(address);
-    nodeAddress[address.name] = address;
-  }
-
-  /// 缺省连接地址
-  NodeAddress get defaultNodeAddress {
-    _defaultNodeAddress ??= nodeAddress[NodeAddress.defaultName];
-
-    return _defaultNodeAddress!;
-  }
-
-  set defaultNodeAddress(NodeAddress address) {
-    _defaultNodeAddress = address;
-    notifyListeners();
   }
 
   saveAppParams() async {
