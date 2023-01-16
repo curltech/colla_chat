@@ -58,7 +58,7 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
           var peerEndpoints = peerEndpointController.data;
           int i = 0;
           for (var peerEndpoint in peerEndpoints) {
-            if (peerEndpoint.name == _peerId) {
+            if (peerEndpoint.peerId == _peerId) {
               var wsConnectAddress = peerEndpoint.wsConnectAddress;
               wsConnectAddress ??= '';
               _wsConnectAddressController.text = wsConnectAddress;
