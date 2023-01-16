@@ -108,14 +108,14 @@ abstract class BaseAction {
     ChainMessage chainMessage = ChainMessage();
     if (connectAddress == null) {
       if (peerEndpointController.data.isNotEmpty) {
-        connectAddress = peerEndpointController.data[0].wsConnectAddress;
-        connectAddress ??= peerEndpointController.data[0].httpConnectAddress;
+        connectAddress = peerEndpointController.defaultPeerEndpoint!.wsConnectAddress;
+        connectAddress ??= peerEndpointController.defaultPeerEndpoint!.httpConnectAddress;
       }
     }
     chainMessage.connectAddress = connectAddress;
     if (connectPeerId == null) {
       if (peerEndpointController.data.isNotEmpty) {
-        connectPeerId = peerEndpointController.data[0].peerId;
+        connectPeerId = peerEndpointController.defaultPeerEndpoint!.peerId;
       }
     }
     chainMessage.connectPeerId = connectPeerId;

@@ -4,11 +4,9 @@ import 'package:colla_chat/entity/dht/peerendpoint.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_edit_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_show_widget.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/dht/peerendpoint.dart';
-import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -18,8 +16,28 @@ import 'package:flutter/material.dart';
 
 // 定位器，初始化后按照优先级排序
 class PeerEndpointController extends DataListController<PeerEndpoint> {
+  int _defaultIndex = 0;
+
   PeerEndpointController() {
     init();
+  }
+
+  PeerEndpoint? get defaultPeerEndpoint {
+    if (_defaultIndex > -1) {
+      return data[_defaultIndex];
+    }
+    return null;
+  }
+
+  int? get defaultIndex {
+    return _defaultIndex;
+  }
+
+  set defaultIndex(int? defaultIndex) {
+    if (defaultIndex != null && defaultIndex > -1) {
+      _defaultIndex = defaultIndex;
+      notifyListeners();
+    }
   }
 
   init() {

@@ -5,7 +5,7 @@ import 'base.dart';
 class PeerEndpoint extends PeerEntity {
   String? endpointType;
   String? discoveryAddress;
-  int priority = 0;
+  int priority = 1;
   String? lastConnectTime;
   String? wsConnectAddress;
   String? httpConnectAddress;

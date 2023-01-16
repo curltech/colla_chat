@@ -21,6 +21,10 @@ final List<ColumnFieldDef> peerEndpointColumnFieldDefs = [
       label: 'peerId',
       prefixIcon: const Icon(Icons.perm_identity)),
   ColumnFieldDef(
+      name: 'priority',
+      label: 'priority',
+      prefixIcon: const Icon(Icons.low_priority)),
+  ColumnFieldDef(
     name: 'wsConnectAddress',
     label: 'wsConnectAddress',
     prefixIcon: const Icon(Icons.web),

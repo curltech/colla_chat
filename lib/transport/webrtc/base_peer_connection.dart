@@ -303,8 +303,8 @@ class BasePeerConnection {
     this.extension = extension;
     try {
       var iceServers = extension.iceServers;
-      if (iceServers == null && peerEndpointController.data.isNotEmpty) {
-        iceServers = JsonUtil.toJson(peerEndpointController.data[0].iceServers);
+      if (iceServers == null && peerEndpointController.defaultPeerEndpoint!=null) {
+        iceServers = JsonUtil.toJson(peerEndpointController.defaultPeerEndpoint!.iceServers);
       }
       extension.iceServers = iceServers;
       var configuration = {'iceServers': iceServers};

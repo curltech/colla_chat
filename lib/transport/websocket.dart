@@ -211,17 +211,23 @@ class WebsocketPool with ChangeNotifier {
 
   ///初始化websocket的连接，尝试连接缺省socket
   Future<Websocket?> connect() async {
-    var peerEndpoints = peerEndpointController.data;
-    if (peerEndpoints.isNotEmpty) {
-      PeerEndpoint defaultPeerEndpoint = peerEndpoints[0];
+    var defaultPeerEndpoint = peerEndpointController.defaultPeerEndpoint;
+    if (defaultPeerEndpoint != null) {
       var defaultAddress = defaultPeerEndpoint.wsConnectAddress;
-      if (defaultAddress != null && defaultAddress.startsWith('ws')) {
-        var websocket = Websocket(defaultAddress, myselfPeerService.connect);
-        await websocket.connect();
-        if (websocket._status == SocketStatus.connected) {
-          websockets[defaultAddress] = websocket;
-          websocket.onStatusChange = onStatusChange;
-          _default = websocket;
+      Websocket? websocket;
+      if (websockets.containsKey(defaultAddress)) {
+        websocket = websockets[defaultAddress];
+        _default = websocket;
+        await websocket!.reconnect();
+      } else {
+        if (defaultAddress != null && defaultAddress.startsWith('ws')) {
+          websocket = Websocket(defaultAddress, myselfPeerService.connect);
+          await websocket.connect();
+          if (websocket._status == SocketStatus.connected) {
+            websockets[defaultAddress] = websocket;
+            websocket.onStatusChange = onStatusChange;
+            _default = websocket;
+          }
         }
       }
     }
