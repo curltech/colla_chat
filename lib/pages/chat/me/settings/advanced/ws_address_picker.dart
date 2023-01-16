@@ -81,7 +81,7 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
       _buildSelectWidget(context),
       const SizedBox(height: 10.0),
       Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+          padding: const EdgeInsets.symmetric(horizontal: 5.0),
           child: TextFormField(
             controller: _wsConnectAddressController,
             keyboardType: TextInputType.text,
