@@ -1,5 +1,6 @@
 import 'dart:core';
 
+import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_list_widget.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:uuid/uuid.dart';
 
@@ -106,16 +107,15 @@ abstract class BaseAction {
       String? targetClientId}) async {
     ChainMessage chainMessage = ChainMessage();
     if (connectAddress == null) {
-      if (appDataProvider.nodeAddress.isNotEmpty) {
-        connectAddress = appDataProvider.defaultNodeAddress.wsConnectAddress;
-        connectAddress ??=
-            appDataProvider.defaultNodeAddress.httpConnectAddress;
+      if (peerEndpointController.data.isNotEmpty) {
+        connectAddress = peerEndpointController.data[0].wsConnectAddress;
+        connectAddress ??= peerEndpointController.data[0].httpConnectAddress;
       }
     }
     chainMessage.connectAddress = connectAddress;
     if (connectPeerId == null) {
-      if (appDataProvider.nodeAddress.isNotEmpty) {
-        connectPeerId = appDataProvider.defaultNodeAddress.connectPeerId;
+      if (peerEndpointController.data.isNotEmpty) {
+        connectPeerId = peerEndpointController.data[0].peerId;
       }
     }
     chainMessage.connectPeerId = connectPeerId;

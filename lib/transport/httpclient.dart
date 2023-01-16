@@ -1,12 +1,12 @@
 import 'dart:io';
 
+import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_list_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-
 
 class DioHttpClient implements IWebClient {
   final Dio _client = Dio();
@@ -76,19 +76,20 @@ class HttpClientPool {
   /// 初始化连接池，设置缺省httpclient，返回连接池
   static HttpClientPool get instance {
     if (!initStatus) {
-      var nodeAddress = appDataProvider.nodeAddress;
-      if (nodeAddress.isNotEmpty) {
-        for (var address in nodeAddress.entries) {
-          var name = address.key;
-          var httpConnectAddress = address.value.httpConnectAddress;
+      var peerEndpoints = peerEndpointController.data;
+      if (peerEndpoints.isNotEmpty) {
+        int i = 0;
+        for (var peerEndpoint in peerEndpoints) {
+          var httpConnectAddress = peerEndpoint.httpConnectAddress;
           if (httpConnectAddress != null &&
               httpConnectAddress.startsWith('http')) {
             var httpClient = DioHttpClient(httpConnectAddress);
             _instance._httpClients[httpConnectAddress] = httpClient;
-            if (name == NodeAddress.defaultName) {
+            if (i == 0) {
               _instance._default = httpClient;
             }
           }
+          ++i;
         }
       }
       initStatus = true;

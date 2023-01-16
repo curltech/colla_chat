@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:colla_chat/constant/address.dart';
+import 'package:colla_chat/entity/dht/peerendpoint.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_list_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
@@ -209,19 +211,17 @@ class WebsocketPool with ChangeNotifier {
 
   ///初始化websocket的连接，尝试连接缺省socket
   Future<Websocket?> connect() async {
-    var nodeAddress = appDataProvider.nodeAddress;
-    if (nodeAddress.isNotEmpty) {
-      NodeAddress? defaultNodeAddress = nodeAddress[NodeAddress.defaultName];
-      if (defaultNodeAddress != null) {
-        var defaultAddress = defaultNodeAddress.wsConnectAddress;
-        if (defaultAddress != null && defaultAddress.startsWith('ws')) {
-          var websocket = Websocket(defaultAddress, myselfPeerService.connect);
-          await websocket.connect();
-          if (websocket._status == SocketStatus.connected) {
-            websockets[defaultAddress] = websocket;
-            websocket.onStatusChange = onStatusChange;
-            _default = websocket;
-          }
+    var peerEndpoints = peerEndpointController.data;
+    if (peerEndpoints.isNotEmpty) {
+      PeerEndpoint defaultPeerEndpoint = peerEndpoints[0];
+      var defaultAddress = defaultPeerEndpoint.wsConnectAddress;
+      if (defaultAddress != null && defaultAddress.startsWith('ws')) {
+        var websocket = Websocket(defaultAddress, myselfPeerService.connect);
+        await websocket.connect();
+        if (websocket._status == SocketStatus.connected) {
+          websockets[defaultAddress] = websocket;
+          websocket.onStatusChange = onStatusChange;
+          _default = websocket;
         }
       }
     }

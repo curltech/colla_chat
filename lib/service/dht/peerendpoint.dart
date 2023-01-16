@@ -13,7 +13,7 @@ class PeerEndpointService extends PeerEntityService<PeerEndpoint> {
   }
 
   Future<List<PeerEndpoint>> findAllPeerEndpoint() async {
-    var peerEndpoints = await find();
+    var peerEndpoints = await find(orderBy: 'priority');
     return peerEndpoints;
   }
 
@@ -30,5 +30,5 @@ class PeerEndpointService extends PeerEntityService<PeerEndpoint> {
 
 final peerEndpointService = PeerEndpointService(
     tableName: "blc_peerendpoint",
-    fields: ServiceLocator.buildFields(PeerEndpoint('', ''), []),
+    fields: ServiceLocator.buildFields(PeerEndpoint('', peerId: ''), []),
     indexFields: ['ownerPeerId', 'priority', 'address']);

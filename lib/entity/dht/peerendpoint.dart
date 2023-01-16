@@ -1,21 +1,33 @@
+import 'package:colla_chat/tool/json_util.dart';
+
 import 'base.dart';
 
 class PeerEndpoint extends PeerEntity {
   String? endpointType;
   String? discoveryAddress;
-  String? priority;
+  int priority = 0;
   String? lastConnectTime;
   String? wsConnectAddress;
   String? httpConnectAddress;
   String? libp2pConnectAddress;
   String? iceServers;
 
-  PeerEndpoint(String peerId, String name) : super(peerId, name);
+  PeerEndpoint(String name,
+      {required String peerId,
+      String? wsConnectAddress,
+      String? httpConnectAddress,
+      String? libp2pConnectAddress,
+      List<Map<String, String>>? iceServers})
+      : super(name, peerId) {
+    if (iceServers != null) {
+      this.iceServers = JsonUtil.toJsonString(iceServers);
+    }
+  }
 
   PeerEndpoint.fromJson(Map json)
       : endpointType = json['endpointType'],
         discoveryAddress = json['discoveryAddress'],
-        priority = json['priority'],
+        priority = json['priority'] ?? 0,
         lastConnectTime = json['lastConnectTime'],
         wsConnectAddress = json['wsConnectAddress'],
         httpConnectAddress = json['httpConnectAddress'],
@@ -37,5 +49,32 @@ class PeerEndpoint extends PeerEntity {
       'iceServers': iceServers,
     });
     return json;
+  }
+
+  void validate() {
+    if (name == '') {
+      throw 'NameFormatError';
+    }
+    var wsConnectAddress = this.wsConnectAddress;
+    if (wsConnectAddress != null) {
+      if (!wsConnectAddress.startsWith('wss') &&
+          !wsConnectAddress.startsWith('ws')) {
+        throw 'WsConnectAddressFormatError';
+      }
+    }
+    var httpConnectAddress = this.httpConnectAddress;
+    if (httpConnectAddress != null) {
+      if (!httpConnectAddress.startsWith('https') &&
+          !httpConnectAddress.startsWith('http')) {
+        throw 'HttpConnectAddressFormatError';
+      }
+    }
+    var libp2pConnectAddress = this.libp2pConnectAddress;
+    if (libp2pConnectAddress != null) {
+      if (!libp2pConnectAddress.startsWith('/dns') &&
+          !libp2pConnectAddress.startsWith('/ip')) {
+        throw 'Libp2pConnectAddressFormatError';
+      }
+    }
   }
 }
