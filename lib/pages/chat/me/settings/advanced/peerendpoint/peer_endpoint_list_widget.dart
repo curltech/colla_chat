@@ -88,6 +88,17 @@ class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
           },
           icon: const Icon(Icons.add),
           tooltip: AppLocalizations.t('Add')),
+      IconButton(
+          onPressed: () {
+            var current = peerEndpointController.current;
+            if (current != null) {
+              current.state = EntityState.delete;
+              peerEndpointService.delete(entity: current);
+              peerEndpointController.delete();
+            }
+          },
+          icon: const Icon(Icons.remove),
+          tooltip: AppLocalizations.t('Delete')),
     ];
   }
 
@@ -130,21 +141,21 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(
             title: 'Delete',
-            prefix: Icons.delete,
+            prefix: Icons.remove,
             onTap: (int index, String label, {String? subtitle}) async {
               peerEndpointController.currentIndex = index;
               await peerEndpointService.delete(entity: peerEndpoint);
               peerEndpointController.delete();
             });
         slideActions.add(deleteSlideAction);
-        // TileData editSlideAction = TileData(
-        //     title: 'Edit',
-        //     prefix: Icons.edit,
-        //     onTap: (int index, String label, {String? subtitle}) async {
-        //       peerEndpointController.currentIndex = index;
-        //       indexWidgetProvider.push('peer_endpoint_edit');
-        //     });
-        // slideActions.add(editSlideAction);
+        TileData editSlideAction = TileData(
+            title: 'Edit',
+            prefix: Icons.edit,
+            onTap: (int index, String label, {String? subtitle}) async {
+              peerEndpointController.currentIndex = index;
+              indexWidgetProvider.push('peer_endpoint_edit');
+            });
+        slideActions.add(editSlideAction);
         tile.slideActions = slideActions;
         tiles.add(tile);
       }

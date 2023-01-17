@@ -110,8 +110,26 @@ class PeerClientListWidget extends StatefulWidget with TileDataMixin {
           onPressed: () {
             peerClientDataPageController.first();
           },
-          icon: const Icon(Icons.refresh),
-          tooltip: AppLocalizations.t('Refresh')),
+          icon: const Icon(Icons.first_page),
+          tooltip: AppLocalizations.t('First')),
+      IconButton(
+          onPressed: () {
+            peerClientDataPageController.previous();
+          },
+          icon: const Icon(Icons.navigate_before),
+          tooltip: AppLocalizations.t('Previous')),
+      IconButton(
+          onPressed: () {
+            peerClientDataPageController.next();
+          },
+          icon: const Icon(Icons.navigate_next),
+          tooltip: AppLocalizations.t('Next')),
+      IconButton(
+          onPressed: () {
+            peerClientDataPageController.last();
+          },
+          icon: const Icon(Icons.last_page),
+          tooltip: AppLocalizations.t('Last')),
       IconButton(
           onPressed: () {
             var current = PeerClient('', '', '');
@@ -129,7 +147,7 @@ class PeerClientListWidget extends StatefulWidget with TileDataMixin {
               peerClientDataPageController.delete();
             }
           },
-          icon: const Icon(Icons.delete),
+          icon: const Icon(Icons.remove),
           tooltip: AppLocalizations.t('Delete')),
     ];
   }
@@ -176,21 +194,21 @@ class _PeerClientListWidgetState extends State<PeerClientListWidget> {
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(
             title: 'Delete',
-            prefix: Icons.delete,
+            prefix: Icons.remove,
             onTap: (int index, String label, {String? subtitle}) async {
               peerClientDataPageController.currentIndex = index;
               await peerClientService.delete(entity: peerClient);
               peerClientDataPageController.delete();
             });
         slideActions.add(deleteSlideAction);
-        // TileData editSlideAction = TileData(
-        //     title: 'Edit',
-        //     prefix: Icons.edit,
-        //     onTap: (int index, String label, {String? subtitle}) async {
-        //       peerClientDataPageController.currentIndex = index;
-        //       indexWidgetProvider.push('peer_client_edit');
-        //     });
-        // slideActions.add(editSlideAction);
+        TileData editSlideAction = TileData(
+            title: 'Edit',
+            prefix: Icons.edit,
+            onTap: (int index, String label, {String? subtitle}) async {
+              peerClientDataPageController.currentIndex = index;
+              indexWidgetProvider.push('peer_client_edit');
+            });
+        slideActions.add(editSlideAction);
         tile.slideActions = slideActions;
         tiles.add(tile);
       }
