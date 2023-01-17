@@ -175,13 +175,14 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
     var dataListView = KeepAliveWrapper(
         child: DataListView(
             onTap: _onTap, tileData: tiles, currentIndex: currentIndex));
-    var peerendpointWidget = AppBarView(
+    var peerEndpointWidget = AppBarView(
       title: Text(AppLocalizations.t(widget.title)),
       withLeading: widget.withLeading,
       rightWidgets: widget.rightWidgets,
       child: dataListView,
     );
-    return peerendpointWidget;
+
+    return peerEndpointWidget;
   }
 
   @override

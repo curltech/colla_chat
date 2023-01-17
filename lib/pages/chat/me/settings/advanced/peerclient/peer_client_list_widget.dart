@@ -11,9 +11,9 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
+import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/pluto_data_grid_widget.dart';
 import 'package:flutter/material.dart';
-
 
 class PeerClientDataPageController extends DataPageController<PeerClient> {
   PeerClientDataPageController() : super();
@@ -89,17 +89,20 @@ class PeerClientDataPageController extends DataPageController<PeerClient> {
   }
 }
 
+final DataPageController<PeerClient> peerClientDataPageController =
+    PeerClientDataPageController();
+
 //设置页面，带有回退回调函数
 class PeerClientListWidget extends StatefulWidget with TileDataMixin {
-  final DataPageController<PeerClient> controller =
-      PeerClientDataPageController();
   late final List<Widget> rightWidgets;
   late final PeerClientShowWidget peerClientShowWidget;
   late final PeerClientEditWidget peerClientEditWidget;
 
   PeerClientListWidget({Key? key}) : super(key: key) {
-    peerClientShowWidget = PeerClientShowWidget(controller: controller);
-    peerClientEditWidget = PeerClientEditWidget(controller: controller);
+    peerClientShowWidget =
+        PeerClientShowWidget(controller: peerClientDataPageController);
+    peerClientEditWidget =
+        PeerClientEditWidget(controller: peerClientDataPageController);
     indexWidgetProvider.define(peerClientShowWidget);
     indexWidgetProvider.define(peerClientEditWidget);
 
@@ -108,17 +111,17 @@ class PeerClientListWidget extends StatefulWidget with TileDataMixin {
           onPressed: () {
             var current = PeerClient('', '', '');
             current.state = EntityState.insert;
-            controller.add(current);
+            peerClientDataPageController.add(current);
           },
           icon: const Icon(Icons.add),
           tooltip: AppLocalizations.t('Add')),
       IconButton(
           onPressed: () {
-            var current = controller.current;
+            var current = peerClientDataPageController.current;
             if (current != null) {
               current.state = EntityState.delete;
-              peerClientService.delete(entity:current);
-              controller.delete();
+              peerClientService.delete(entity: current);
+              peerClientDataPageController.delete();
             }
           },
           icon: const Icon(Icons.delete),
@@ -146,21 +149,25 @@ class _PeerClientListWidgetState extends State<PeerClientListWidget> {
   @override
   initState() {
     super.initState();
-    widget.controller.addListener(_update);
+    peerClientDataPageController.addListener(_update);
   }
 
   _update() {
     setState(() {});
   }
 
-  List<TileData> _convert(List<PeerClient> peerClients) {
+  List<TileData> _convert() {
+    List<PeerClient> peerClients = peerClientDataPageController.pagination.data;
     List<TileData> tiles = [];
     if (peerClients.isNotEmpty) {
       for (var peerClient in peerClients) {
         var title = peerClient.name ?? '';
         var subtitle = peerClient.peerId ?? '';
         TileData tile = TileData(
-            title: title, subtitle: subtitle, routeName: 'peer_client_edit');
+            prefix: peerClient.avatarImage,
+            title: title,
+            subtitle: subtitle,
+            routeName: 'peer_client_edit');
         tiles.add(tile);
       }
     }
@@ -168,31 +175,30 @@ class _PeerClientListWidgetState extends State<PeerClientListWidget> {
     return tiles;
   }
 
-  _onTap(int index, String title, {TileData? group}) {
-    widget.controller.setCurrentIndex(index);
+  _onTap(int index, String title, {String? subtitle, TileData? group}) {
+    peerClientDataPageController.setCurrentIndex(index);
   }
 
   @override
   Widget build(BuildContext context) {
-    KeepAliveWrapper<PlutoDataGridWidget> dataTableView = KeepAliveWrapper(
-        child: PlutoDataGridWidget<PeerClient>(
-      columnDefs: peerClientColumnFieldDefs,
-      controller: widget.controller,
-      routeName: 'peer_client_edit',
-    ));
+    var tiles = _convert();
+    var currentIndex = peerClientDataPageController.currentIndex;
+    var dataListView = KeepAliveWrapper(
+        child: DataListView(
+            onTap: _onTap, tileData: tiles, currentIndex: currentIndex));
 
-    var peerclientWidget = KeepAliveWrapper(
-        child: AppBarView(
-            title: Text(AppLocalizations.t(widget.title)),
-            withLeading: widget.withLeading,
-            rightWidgets: widget.rightWidgets,
-            child: dataTableView));
-    return peerclientWidget;
+    var peerClientWidget = AppBarView(
+        title: Text(AppLocalizations.t(widget.title)),
+        withLeading: widget.withLeading,
+        rightWidgets: widget.rightWidgets,
+        child: dataListView);
+
+    return peerClientWidget;
   }
 
   @override
   void dispose() {
-    widget.controller.removeListener(_update);
+    peerClientDataPageController.removeListener(_update);
     super.dispose();
   }
 }

@@ -30,6 +30,10 @@ final List<ColumnFieldDef> peerClientColumnFieldDefs = [
       name: 'mobile',
       label: 'mobile',
       prefixIcon: const Icon(Icons.mobile_friendly)),
+  ColumnFieldDef(
+      name: 'status',
+      label: 'status',
+      prefixIcon: const Icon(Icons.thermostat)),
 ];
 
 //邮件内容组件

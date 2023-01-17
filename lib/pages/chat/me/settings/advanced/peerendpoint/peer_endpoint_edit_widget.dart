@@ -42,6 +42,10 @@ final List<ColumnFieldDef> peerEndpointColumnFieldDefs = [
       name: 'iceServers',
       label: 'iceServers',
       prefixIcon: const Icon(Icons.record_voice_over)),
+  ColumnFieldDef(
+      name: 'status',
+      label: 'status',
+      prefixIcon: const Icon(Icons.thermostat)),
 ];
 
 //邮件内容组件
