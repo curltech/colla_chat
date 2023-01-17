@@ -88,17 +88,6 @@ class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
           },
           icon: const Icon(Icons.add),
           tooltip: AppLocalizations.t('Add')),
-      IconButton(
-          onPressed: () {
-            var current = peerEndpointController.current;
-            if (current != null) {
-              current.state = EntityState.delete;
-              peerEndpointService.delete(entity: current);
-              peerEndpointController.delete();
-            }
-          },
-          icon: const Icon(Icons.delete),
-          tooltip: AppLocalizations.t('Delete')),
     ];
   }
 
@@ -129,7 +118,7 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
     setState(() {});
   }
 
-  List<TileData> _convert() {
+  List<TileData> _convertTileData() {
     var peerEndpoints = peerEndpointController.data;
     List<TileData> tiles = [];
     if (peerEndpoints.isNotEmpty) {
@@ -147,15 +136,15 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
               await peerEndpointService.delete(entity: peerEndpoint);
               peerEndpointController.delete();
             });
-        TileData editSlideAction = TileData(
-            title: 'Edit',
-            prefix: Icons.edit,
-            onTap: (int index, String label, {String? subtitle}) async {
-              peerEndpointController.currentIndex = index;
-              indexWidgetProvider.push('peer_endpoint_edit');
-            });
         slideActions.add(deleteSlideAction);
-        slideActions.add(editSlideAction);
+        // TileData editSlideAction = TileData(
+        //     title: 'Edit',
+        //     prefix: Icons.edit,
+        //     onTap: (int index, String label, {String? subtitle}) async {
+        //       peerEndpointController.currentIndex = index;
+        //       indexWidgetProvider.push('peer_endpoint_edit');
+        //     });
+        // slideActions.add(editSlideAction);
         tile.slideActions = slideActions;
         tiles.add(tile);
       }
@@ -170,7 +159,7 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var tiles = _convert();
+    var tiles = _convertTileData();
     var currentIndex = peerEndpointController.currentIndex;
     var dataListView = KeepAliveWrapper(
         child: DataListView(

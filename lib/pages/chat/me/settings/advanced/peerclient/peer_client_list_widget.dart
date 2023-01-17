@@ -12,7 +12,6 @@ import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
-import 'package:colla_chat/widgets/data_bind/pluto_data_grid_widget.dart';
 import 'package:flutter/material.dart';
 
 class PeerClientDataPageController extends DataPageController<PeerClient> {
@@ -23,7 +22,7 @@ class PeerClientDataPageController extends DataPageController<PeerClient> {
         await peerClientService.findPage(limit: limit, offset: offset);
     pagination = page;
     if (page.data.isNotEmpty) {
-      setCurrentIndex(0, listen: false);
+      currentIndex = 0;
     }
     notifyListeners();
     return page;
@@ -109,6 +108,12 @@ class PeerClientListWidget extends StatefulWidget with TileDataMixin {
     rightWidgets = [
       IconButton(
           onPressed: () {
+            peerClientDataPageController.first();
+          },
+          icon: const Icon(Icons.refresh),
+          tooltip: AppLocalizations.t('Refresh')),
+      IconButton(
+          onPressed: () {
             var current = PeerClient('', '', '');
             current.state = EntityState.insert;
             peerClientDataPageController.add(current);
@@ -156,7 +161,7 @@ class _PeerClientListWidgetState extends State<PeerClientListWidget> {
     setState(() {});
   }
 
-  List<TileData> _convert() {
+  List<TileData> _convertTileData() {
     List<PeerClient> peerClients = peerClientDataPageController.pagination.data;
     List<TileData> tiles = [];
     if (peerClients.isNotEmpty) {
@@ -168,6 +173,25 @@ class _PeerClientListWidgetState extends State<PeerClientListWidget> {
             title: title,
             subtitle: subtitle,
             routeName: 'peer_client_edit');
+        List<TileData> slideActions = [];
+        TileData deleteSlideAction = TileData(
+            title: 'Delete',
+            prefix: Icons.delete,
+            onTap: (int index, String label, {String? subtitle}) async {
+              peerClientDataPageController.currentIndex = index;
+              await peerClientService.delete(entity: peerClient);
+              peerClientDataPageController.delete();
+            });
+        slideActions.add(deleteSlideAction);
+        // TileData editSlideAction = TileData(
+        //     title: 'Edit',
+        //     prefix: Icons.edit,
+        //     onTap: (int index, String label, {String? subtitle}) async {
+        //       peerClientDataPageController.currentIndex = index;
+        //       indexWidgetProvider.push('peer_client_edit');
+        //     });
+        // slideActions.add(editSlideAction);
+        tile.slideActions = slideActions;
         tiles.add(tile);
       }
     }
@@ -176,12 +200,12 @@ class _PeerClientListWidgetState extends State<PeerClientListWidget> {
   }
 
   _onTap(int index, String title, {String? subtitle, TileData? group}) {
-    peerClientDataPageController.setCurrentIndex(index);
+    peerClientDataPageController.currentIndex = index;
   }
 
   @override
   Widget build(BuildContext context) {
-    var tiles = _convert();
+    var tiles = _convertTileData();
     var currentIndex = peerClientDataPageController.currentIndex;
     var dataListView = KeepAliveWrapper(
         child: DataListView(
