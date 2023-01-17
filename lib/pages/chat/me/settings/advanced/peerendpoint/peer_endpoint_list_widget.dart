@@ -4,11 +4,9 @@ import 'package:colla_chat/entity/dht/peerendpoint.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_edit_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_show_widget.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/dht/peerendpoint.dart';
-import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -18,8 +16,28 @@ import 'package:flutter/material.dart';
 
 // 定位器，初始化后按照优先级排序
 class PeerEndpointController extends DataListController<PeerEndpoint> {
+  int _defaultIndex = 0;
+
   PeerEndpointController() {
     init();
+  }
+
+  PeerEndpoint? get defaultPeerEndpoint {
+    if (_defaultIndex > -1) {
+      return data[_defaultIndex];
+    }
+    return null;
+  }
+
+  int? get defaultIndex {
+    return _defaultIndex;
+  }
+
+  set defaultIndex(int? defaultIndex) {
+    if (defaultIndex != null && defaultIndex > -1) {
+      _defaultIndex = defaultIndex;
+      notifyListeners();
+    }
   }
 
   init() {
@@ -79,7 +97,7 @@ class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
               peerEndpointController.delete();
             }
           },
-          icon: const Icon(Icons.delete),
+          icon: const Icon(Icons.remove),
           tooltip: AppLocalizations.t('Delete')),
     ];
   }
@@ -111,7 +129,7 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
     setState(() {});
   }
 
-  List<TileData> _convert() {
+  List<TileData> _convertTileData() {
     var peerEndpoints = peerEndpointController.data;
     List<TileData> tiles = [];
     if (peerEndpoints.isNotEmpty) {
@@ -123,12 +141,13 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(
             title: 'Delete',
-            prefix: Icons.delete,
+            prefix: Icons.remove,
             onTap: (int index, String label, {String? subtitle}) async {
               peerEndpointController.currentIndex = index;
               await peerEndpointService.delete(entity: peerEndpoint);
               peerEndpointController.delete();
             });
+        slideActions.add(deleteSlideAction);
         TileData editSlideAction = TileData(
             title: 'Edit',
             prefix: Icons.edit,
@@ -136,7 +155,6 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
               peerEndpointController.currentIndex = index;
               indexWidgetProvider.push('peer_endpoint_edit');
             });
-        slideActions.add(deleteSlideAction);
         slideActions.add(editSlideAction);
         tile.slideActions = slideActions;
         tiles.add(tile);
@@ -152,18 +170,19 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var tiles = _convert();
+    var tiles = _convertTileData();
     var currentIndex = peerEndpointController.currentIndex;
     var dataListView = KeepAliveWrapper(
         child: DataListView(
             onTap: _onTap, tileData: tiles, currentIndex: currentIndex));
-    var peerendpointWidget = AppBarView(
+    var peerEndpointWidget = AppBarView(
       title: Text(AppLocalizations.t(widget.title)),
       withLeading: widget.withLeading,
       rightWidgets: widget.rightWidgets,
       child: dataListView,
     );
-    return peerendpointWidget;
+
+    return peerEndpointWidget;
   }
 
   @override

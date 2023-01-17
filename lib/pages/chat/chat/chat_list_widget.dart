@@ -39,6 +39,7 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
   final ChatMessageView chatMessageView = ChatMessageView();
 
   ChatListWidget({Key? key}) : super(key: key) {
+    Websocket? websocket = websocketPool.getDefault();
     chatSummaryService
         .findByPartyType(PartyType.linkman.name)
         .then((List<ChatSummary> chatSummary) {
@@ -260,6 +261,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                       } else {
                         //缺省的websocket如果存在，尝试重连
                         await websocket.reconnect();
+                        _updateWebsocket();
                       }
                     }
                   : null,

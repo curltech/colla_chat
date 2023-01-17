@@ -21,6 +21,10 @@ final List<ColumnFieldDef> peerEndpointColumnFieldDefs = [
       label: 'peerId',
       prefixIcon: const Icon(Icons.perm_identity)),
   ColumnFieldDef(
+      name: 'priority',
+      label: 'priority',
+      prefixIcon: const Icon(Icons.low_priority)),
+  ColumnFieldDef(
     name: 'wsConnectAddress',
     label: 'wsConnectAddress',
     prefixIcon: const Icon(Icons.web),
@@ -38,6 +42,10 @@ final List<ColumnFieldDef> peerEndpointColumnFieldDefs = [
       name: 'iceServers',
       label: 'iceServers',
       prefixIcon: const Icon(Icons.record_voice_over)),
+  ColumnFieldDef(
+      name: 'status',
+      label: 'status',
+      prefixIcon: const Icon(Icons.thermostat)),
 ];
 
 //邮件内容组件

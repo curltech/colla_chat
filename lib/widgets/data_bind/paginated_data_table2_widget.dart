@@ -1,14 +1,13 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../provider/app_data_provider.dart';
-import '../../provider/data_list_controller.dart';
-import '../../provider/index_widget_provider.dart';
-import '../data_bind/column_field_widget.dart';
 
 ///系统提供的分页表格只能用于静态展示，不能进行增加删除等操作
 ///因为其计算记录的方法很粗糙，某页发生增删时不适用，自己实现新的会更好
@@ -145,7 +144,7 @@ class DataPageSource<T> extends DataTableSource {
       var value = dataMap[columnDef.name];
       value = value ?? '';
       var dataCell = DataCell(Text(value.toString()), onTap: () {
-        widget.controller.setCurrentIndex(index);
+        widget.controller.currentIndex = index;
         var fn = widget.onTap;
         if (fn != null) {
           fn(index);

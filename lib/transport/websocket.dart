@@ -1,11 +1,13 @@
 import 'dart:async';
 
 import 'package:colla_chat/constant/address.dart';
+import 'package:colla_chat/entity/dht/base.dart';
 import 'package:colla_chat/entity/dht/peerendpoint.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_list_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
+import 'package:colla_chat/service/dht/peerendpoint.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:flutter/material.dart';
@@ -105,6 +107,8 @@ class Websocket extends IWebClient {
     if (_status != status) {
       _status = status;
       if (onStatusChange != null) {
+        // peerEndpointService.update({'status': ActiveStatus.Up.name},
+        //     where: 'wsConnectAddress=?', whereArgs: [address]);
         onStatusChange!(this, status);
       }
     }
@@ -211,17 +215,23 @@ class WebsocketPool with ChangeNotifier {
 
   ///初始化websocket的连接，尝试连接缺省socket
   Future<Websocket?> connect() async {
-    var peerEndpoints = peerEndpointController.data;
-    if (peerEndpoints.isNotEmpty) {
-      PeerEndpoint defaultPeerEndpoint = peerEndpoints[0];
+    var defaultPeerEndpoint = peerEndpointController.defaultPeerEndpoint;
+    if (defaultPeerEndpoint != null) {
       var defaultAddress = defaultPeerEndpoint.wsConnectAddress;
-      if (defaultAddress != null && defaultAddress.startsWith('ws')) {
-        var websocket = Websocket(defaultAddress, myselfPeerService.connect);
-        await websocket.connect();
-        if (websocket._status == SocketStatus.connected) {
-          websockets[defaultAddress] = websocket;
-          websocket.onStatusChange = onStatusChange;
-          _default = websocket;
+      Websocket? websocket;
+      if (websockets.containsKey(defaultAddress)) {
+        websocket = websockets[defaultAddress];
+        _default = websocket;
+        await websocket!.reconnect();
+      } else {
+        if (defaultAddress != null && defaultAddress.startsWith('ws')) {
+          websocket = Websocket(defaultAddress, myselfPeerService.connect);
+          await websocket.connect();
+          if (websocket._status == SocketStatus.connected) {
+            websockets[defaultAddress] = websocket;
+            websocket.onStatusChange = onStatusChange;
+            _default = websocket;
+          }
         }
       }
     }

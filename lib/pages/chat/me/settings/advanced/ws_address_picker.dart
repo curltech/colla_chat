@@ -1,7 +1,6 @@
-import 'package:colla_chat/constant/address.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_list_widget.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
+
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
@@ -24,8 +23,8 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
   void initState() {
     super.initState();
     peerEndpointController.addListener(_update);
-    if (peerEndpointController.data.isNotEmpty) {
-      var defaultPeerEndpoint = peerEndpointController.data[0];
+    var defaultPeerEndpoint = peerEndpointController.defaultPeerEndpoint;
+    if (defaultPeerEndpoint != null) {
       var wsConnectAddress = defaultPeerEndpoint.wsConnectAddress;
       if (wsConnectAddress != null) {
         _wsConnectAddress = wsConnectAddress;
@@ -62,8 +61,7 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
               var wsConnectAddress = peerEndpoint.wsConnectAddress;
               wsConnectAddress ??= '';
               _wsConnectAddressController.text = wsConnectAddress;
-              peerEndpointController.delete(index: i);
-              peerEndpointController.insert(0, peerEndpoint);
+              peerEndpointController.defaultIndex = i;
               break;
             }
             ++i;
@@ -91,7 +89,8 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
             ),
             //initialValue: _wsConnectAddress,
             onChanged: (String val) {
-              var defaultPeerEndpoint = peerEndpointController.data[0];
+              var defaultPeerEndpoint =
+                  peerEndpointController.defaultPeerEndpoint!;
               defaultPeerEndpoint.wsConnectAddress = val;
             },
             onFieldSubmitted: (String val) {},
