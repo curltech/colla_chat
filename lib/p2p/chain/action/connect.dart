@@ -1,12 +1,11 @@
+import 'package:colla_chat/crypto/cryptography.dart';
+import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/dht/peerendpoint.dart';
+import 'package:colla_chat/entity/p2p/chain_message.dart';
+import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-
-import '../../../crypto/cryptography.dart';
-import '../../../crypto/util.dart';
-import '../../../entity/dht/peerclient.dart';
-import '../../../entity/p2p/chain_message.dart';
-import '../baseaction.dart';
 
 ///把自己的peerclient信息注册到服务器，表示自己上线
 class ConnectAction extends BaseAction {

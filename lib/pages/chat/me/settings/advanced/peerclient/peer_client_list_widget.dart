@@ -2,9 +2,10 @@ import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/peerclient/peer_client_controller.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerclient/peer_client_edit_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerclient/peer_client_show_widget.dart';
-import 'package:colla_chat/provider/data_list_controller.dart';
+
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -13,83 +14,6 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
-
-class PeerClientDataPageController extends DataPageController<PeerClient> {
-  PeerClientDataPageController() : super();
-
-  Future<Pagination<PeerClient>> _findPage(int offset, int limit) async {
-    Pagination<PeerClient> page =
-        await peerClientService.findPage(limit: limit, offset: offset);
-    pagination = page;
-    if (page.data.isNotEmpty) {
-      currentIndex = 0;
-    }
-    notifyListeners();
-    return page;
-  }
-
-  @override
-  Future<bool> first() async {
-    if (pagination.rowsNumber != -1 && pagination.offset == 0) {
-      return false;
-    }
-    var offset = 0;
-    var limit = pagination.rowsPerPage;
-    await _findPage(offset, limit);
-
-    return true;
-  }
-
-  @override
-  Future<bool> last() async {
-    var limit = this.limit;
-    var offset = pagination.rowsNumber - limit;
-    if (offset < 0) {
-      offset = 0;
-    }
-    if (offset > pagination.rowsNumber) {
-      return false;
-    }
-    await _findPage(offset, limit);
-    return true;
-  }
-
-  @override
-  Future<bool> move(int index) async {
-    if (index >= pagination.rowsNumber) {
-      return false;
-    }
-    var limit = this.limit;
-    var offset = index ~/ limit * limit;
-    await _findPage(offset, limit);
-    return true;
-  }
-
-  @override
-  Future<bool> next() async {
-    var limit = this.limit;
-    var offset = pagination.offset + limit;
-    if (offset > pagination.rowsNumber) {
-      return false;
-    }
-    await _findPage(offset, limit);
-    return true;
-  }
-
-  @override
-  Future<bool> previous() async {
-    var limit = this.limit;
-    var offset = pagination.offset - limit;
-    if (offset < 0) {
-      return false;
-    }
-    await _findPage(offset, limit);
-    return true;
-  }
-}
-
-final DataPageController<PeerClient> peerClientDataPageController =
-    PeerClientDataPageController();
 
 //设置页面，带有回退回调函数
 class PeerClientListWidget extends StatefulWidget with TileDataMixin {
@@ -179,7 +103,7 @@ class _PeerClientListWidgetState extends State<PeerClientListWidget> {
     setState(() {});
   }
 
-  List<TileData> _convertTileData() {
+  List<TileData> _buildTileData() {
     List<PeerClient> peerClients = peerClientDataPageController.pagination.data;
     List<TileData> tiles = [];
     if (peerClients.isNotEmpty) {
@@ -223,7 +147,7 @@ class _PeerClientListWidgetState extends State<PeerClientListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var tiles = _convertTileData();
+    var tiles = _buildTileData();
     var currentIndex = peerClientDataPageController.currentIndex;
     var dataListView = KeepAliveWrapper(
         child: DataListView(
