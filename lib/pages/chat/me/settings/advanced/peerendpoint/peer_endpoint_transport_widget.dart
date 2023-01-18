@@ -55,20 +55,22 @@ class _PeerEndpointTransportWidgetState
   }
 
   Future<Icon> _httpLight() async {
-    Icon httpLight;
-    if (peerEndpoint.httpConnectAddress == null) {
-      httpLight = grey;
-    } else {
+    Icon httpLight = grey;
+    if (peerEndpoint.httpConnectAddress != null) {
       DioHttpClient? dioHttpClient =
           HttpClientPool.instance.get(peerEndpoint.httpConnectAddress!);
       if (dioHttpClient == null) {
         httpLight = grey;
       } else {
-        Response<dynamic> response = await dioHttpClient.get('\\');
-        if (response.statusCode != 200) {
-          httpLight = green;
-        } else {
-          httpLight = red;
+        try {
+          Response<dynamic> response = await dioHttpClient.get('\\');
+          if (response.statusCode != 200) {
+            httpLight = green;
+          } else {
+            httpLight = red;
+          }
+        } catch (e) {
+          return httpLight;
         }
       }
     }
@@ -116,17 +118,17 @@ class _PeerEndpointTransportWidgetState
 
   Future<List<TileData>> _buildTileData() async {
     List<TileData> tiles = [];
+    // TileData tile = TileData(
+    //     prefix: await _httpLight(),
+    //     title: peerEndpoint.httpConnectAddress ?? '');
+    // tiles.add(tile);
     TileData tile = TileData(
-        prefix: await _httpLight(),
-        title: peerEndpoint.httpConnectAddress ?? '');
-    tiles.add(tile);
-    tile = TileData(
         prefix: await _wsLight(), title: peerEndpoint.wsConnectAddress ?? '');
     tiles.add(tile);
-    tile = TileData(
-        prefix: await _libp2pLight(),
-        title: peerEndpoint.libp2pConnectAddress ?? '');
-    tiles.add(tile);
+    // tile = TileData(
+    //     prefix: await _libp2pLight(),
+    //     title: peerEndpoint.libp2pConnectAddress ?? '');
+    // tiles.add(tile);
 
     return tiles;
   }
