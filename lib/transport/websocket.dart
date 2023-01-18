@@ -1,13 +1,8 @@
 import 'dart:async';
-
-import 'package:colla_chat/constant/address.dart';
-import 'package:colla_chat/entity/dht/base.dart';
-import 'package:colla_chat/entity/dht/peerendpoint.dart';
-import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_list_widget.dart';
+import 'package:colla_chat/p2p/chain/chainmessagehandler.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
-import 'package:colla_chat/service/dht/peerendpoint.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:flutter/material.dart';
@@ -16,7 +11,6 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import './condition_import/unsupport.dart'
     if (dart.library.html) './condition_import/web.dart'
     if (dart.library.io) './condition_import/desktop.dart' as websocket_connect;
-import '../p2p/chain/chainmessagehandler.dart';
 
 enum SocketStatus {
   connected, // 已连接

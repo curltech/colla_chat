@@ -1,10 +1,11 @@
-import 'package:colla_chat/constant/address.dart';
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/dht/peerendpoint.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_edit_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_show_widget.dart';
-import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_transport_widget.dart';
+
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/dht/peerendpoint.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -14,65 +15,22 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
-// 定位器，初始化后按照优先级排序
-class PeerEndpointController extends DataListController<PeerEndpoint> {
-  int _defaultIndex = 0;
-
-  PeerEndpointController() {
-    init();
-  }
-
-  PeerEndpoint? get defaultPeerEndpoint {
-    if (_defaultIndex > -1) {
-      return data[_defaultIndex];
-    }
-    return null;
-  }
-
-  int? get defaultIndex {
-    return _defaultIndex;
-  }
-
-  set defaultIndex(int? defaultIndex) {
-    if (defaultIndex != null && defaultIndex > -1) {
-      _defaultIndex = defaultIndex;
-      notifyListeners();
-    }
-  }
-
-  init() {
-    peerEndpointService
-        .findAllPeerEndpoint()
-        .then((List<PeerEndpoint> peerEndpoints) {
-      clear();
-      if (peerEndpoints.isNotEmpty) {
-        addAll(peerEndpoints);
-      } else {
-        for (var peerEndpoint in nodeAddressOptions.values) {
-          peerEndpointService.insert(peerEndpoint);
-          data.add(peerEndpoint);
-        }
-        notifyListeners();
-      }
-    });
-  }
-}
-
-final PeerEndpointController peerEndpointController = PeerEndpointController();
-
-//设置页面，带有回退回调函数
+//定位器列表
 class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
   late final List<Widget> rightWidgets;
   late final PeerEndpointShowWidget peerEndpointShowWidget;
   late final PeerEndpointEditWidget peerEndpointEditWidget;
+  late final PeerEndpointTransportWidget peerEndpointTransportWidget;
 
   PeerEndpointListWidget({Key? key}) : super(key: key) {
     peerEndpointShowWidget =
         PeerEndpointShowWidget(controller: peerEndpointController);
     peerEndpointEditWidget =
         PeerEndpointEditWidget(controller: peerEndpointController);
+    peerEndpointTransportWidget = PeerEndpointTransportWidget();
     indexWidgetProvider.define(peerEndpointShowWidget);
     indexWidgetProvider.define(peerEndpointEditWidget);
+    indexWidgetProvider.define(peerEndpointTransportWidget);
     rightWidgets = [
       IconButton(
           onPressed: () {
@@ -99,6 +57,15 @@ class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
           },
           icon: const Icon(Icons.remove),
           tooltip: AppLocalizations.t('Delete')),
+      IconButton(
+          onPressed: () {
+            var current = peerEndpointController.current;
+            if (current != null) {
+              indexWidgetProvider.push('peer_endpoint_transport');
+            }
+          },
+          icon: const Icon(Icons.light_mode),
+          tooltip: AppLocalizations.t('Status')),
     ];
   }
 
@@ -129,7 +96,7 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
     setState(() {});
   }
 
-  List<TileData> _convertTileData() {
+  List<TileData> _buildTileData() {
     var peerEndpoints = peerEndpointController.data;
     List<TileData> tiles = [];
     if (peerEndpoints.isNotEmpty) {
@@ -170,7 +137,7 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var tiles = _convertTileData();
+    var tiles = _buildTileData();
     var currentIndex = peerEndpointController.currentIndex;
     var dataListView = KeepAliveWrapper(
         child: DataListView(

@@ -2,9 +2,8 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/cryptography.dart';
-import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_list_widget.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/message_slice.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -303,8 +302,10 @@ class BasePeerConnection {
     this.extension = extension;
     try {
       var iceServers = extension.iceServers;
-      if (iceServers == null && peerEndpointController.defaultPeerEndpoint!=null) {
-        iceServers = JsonUtil.toJson(peerEndpointController.defaultPeerEndpoint!.iceServers);
+      if (iceServers == null &&
+          peerEndpointController.defaultPeerEndpoint != null) {
+        iceServers = JsonUtil.toJson(
+            peerEndpointController.defaultPeerEndpoint!.iceServers);
       }
       extension.iceServers = iceServers;
       var configuration = {'iceServers': iceServers};
