@@ -32,16 +32,21 @@ class SignalExtension {
     var iceServers = json['iceServers'];
     if (iceServers != null) {
       if (iceServers is List && iceServers.isNotEmpty) {
-        if (this.iceServers == null) {
-          this.iceServers = [];
-        }
-        for (var iceServer in iceServers) {
-          for (var entry in (iceServer as Map).entries) {
-            this.iceServers!.add({entry.key: entry.value});
-          }
+        this.iceServers = convertIceServers(iceServers);
+      }
+    }
+  }
+
+  static List<Map<String, String>> convertIceServers(List<dynamic> iceServers) {
+    List<Map<String, String>> iss = [];
+    if (iceServers.isNotEmpty) {
+      for (var iceServer in iceServers) {
+        for (var entry in (iceServer as Map).entries) {
+          iss.add({entry.key: entry.value});
         }
       }
     }
+    return iss;
   }
 
   Map<String, dynamic> toJson() {
@@ -301,14 +306,19 @@ class BasePeerConnection {
     id = await cryptoGraphy.getRandomAsciiString(length: 8);
     this.extension = extension;
     try {
-      var iceServers = extension.iceServers;
-      if (iceServers == null &&
-          peerEndpointController.defaultPeerEndpoint != null) {
-        iceServers = JsonUtil.toJson(
-            peerEndpointController.defaultPeerEndpoint!.iceServers);
+      if (extension.iceServers == null) {
+        if (peerEndpointController.defaultPeerEndpoint != null) {
+          var iceServers = JsonUtil.toJson(
+              peerEndpointController.defaultPeerEndpoint!.iceServers);
+          if (iceServers != null &&
+              iceServers is List &&
+              iceServers.isNotEmpty) {
+            extension.iceServers =
+                SignalExtension.convertIceServers(iceServers);
+          }
+        }
       }
-      extension.iceServers = iceServers;
-      var configuration = {'iceServers': iceServers};
+      var configuration = {'iceServers': extension.iceServers};
       //1.创建连接
       this.peerConnection =
           await createPeerConnection(configuration, pcConstraints);
