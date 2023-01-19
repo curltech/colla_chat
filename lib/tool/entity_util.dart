@@ -24,11 +24,15 @@ class EntityUtil {
     if (entity is Map) {
       entity['createDate'] = currentDate;
       entity['updateDate'] = currentDate;
-      entity['ownerPeerId'] = ownerPeerId;
+      if (ownerPeerId != null) {
+        entity['ownerPeerId'] = ownerPeerId;
+      }
     } else {
       entity.createDate = currentDate;
       entity.updateDate = currentDate;
-      entity.ownerPeerId = ownerPeerId;
+      if (ownerPeerId != null) {
+        entity.ownerPeerId = ownerPeerId;
+      }
     }
   }
 

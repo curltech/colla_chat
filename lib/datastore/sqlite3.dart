@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/type_util.dart';
@@ -81,7 +82,7 @@ class Sqlite3 extends DataStore {
       } else {
         db.execute(sql.clause);
       }
-      // logger.i('execute sql:${sql.clause}');
+      logger.i('execute sql:${sql.clause}');
       // logger.i('execute sql params:${sql.params}');
     }
   }
@@ -97,7 +98,7 @@ class Sqlite3 extends DataStore {
     } else {
       db.execute(sql.clause);
     }
-    // logger.i('execute sql:${sql.clause}');
+    logger.i('execute sql:${sql.clause}');
     // logger.i('execute sql params:${sql.params}');
 
     return null;

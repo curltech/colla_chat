@@ -2,6 +2,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/base.dart';
+import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
@@ -24,6 +25,21 @@ abstract class GeneralBaseService<T> {
       required this.indexFields,
       this.encryptFields = const []});
 
+  String? _buildWhere(
+    String? where,
+    List<Object>? whereArgs,
+  ) {
+    if (whereArgs != null && myself.peerId != null) {
+      if (StringUtil.isNotEmpty(where)) {
+        where = '($where) and ownerPeerId=?';
+      } else {
+        where = 'ownerPeerId=?';
+      }
+      whereArgs.add(myself.peerId!);
+    }
+    return where;
+  }
+
   Future<T?> get(int id) async {
     return await findOne(where: 'id=?', whereArgs: [id]);
   }
@@ -38,6 +54,8 @@ abstract class GeneralBaseService<T> {
       String? orderBy,
       int? limit,
       int? offset}) async {
+    whereArgs = whereArgs ?? [];
+    where = _buildWhere(where, whereArgs);
     Map<dynamic, dynamic>? m = await dataStore.findOne(tableName,
         where: where,
         distinct: distinct,
@@ -74,6 +92,8 @@ abstract class GeneralBaseService<T> {
     int? limit,
     int? offset,
   }) async {
+    whereArgs = whereArgs ?? [];
+    where = _buildWhere(where, whereArgs);
     var ms = await dataStore.find(tableName,
         where: where,
         distinct: distinct,
@@ -110,6 +130,8 @@ abstract class GeneralBaseService<T> {
     int limit = defaultLimit,
     int offset = defaultOffset,
   }) async {
+    whereArgs = whereArgs ?? [];
+    where = _buildWhere(where, whereArgs);
     var page = await dataStore.findPage(tableName,
         where: where,
         distinct: distinct,
@@ -260,6 +282,8 @@ abstract class GeneralBaseService<T> {
   /// 删除记录。根据entity的id字段作为条件删除，entity可以是Map
   Future<int> delete(
       {dynamic entity, String? where, List<Object>? whereArgs}) async {
+    whereArgs = whereArgs ?? [];
+    where = _buildWhere(where, whereArgs);
     return await dataStore.delete(tableName,
         entity: entity, where: where, whereArgs: whereArgs);
   }
@@ -271,6 +295,8 @@ abstract class GeneralBaseService<T> {
     List<Object>? whereArgs,
   }) async {
     //EntityUtil.updateTimestamp(entity);
+    whereArgs = whereArgs ?? [];
+    where = _buildWhere(where, whereArgs);
     Map<String, dynamic> json = await encrypt(entity);
     int result = await dataStore.update(tableName, json,
         where: where, whereArgs: whereArgs);

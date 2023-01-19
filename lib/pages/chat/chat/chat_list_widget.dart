@@ -149,6 +149,9 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         var peerId = chatSummary.peerId ?? '';
         var unreadNumber = chatSummary.unreadNumber;
         Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+        if (linkman == null) {
+          continue;
+        }
         var badge = Badge(
           badgeContent: Text('$unreadNumber',
               style: const TextStyle(color: Colors.white)),
@@ -156,7 +159,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
           shape: BadgeShape.square,
           borderRadius: BorderRadius.circular(8),
           padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5.0),
-          child: ImageUtil.buildImageWidget(image: linkman!.avatar),
+          child: ImageUtil.buildImageWidget(image: linkman.avatar),
         );
         TileData tile = TileData(
             prefix: badge,
@@ -167,6 +170,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         tiles.add(tile);
       }
     }
+
     tileData[TileData(title: AppLocalizations.t('Linkman'))] = tiles;
     widget.groupDataListController.addAll(tileData: tileData);
 
@@ -178,6 +182,9 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         var peerId = chatSummary.peerId ?? '';
         var unreadNumber = chatSummary.unreadNumber;
         Group? group = await groupService.findCachedOneByPeerId(peerId);
+        if (group == null) {
+          continue;
+        }
         var badge = Badge(
           badgeContent: Text('$unreadNumber'),
           elevation: 0.0,
