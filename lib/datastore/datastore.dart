@@ -1,6 +1,7 @@
 import 'package:colla_chat/datastore/sql_builder.dart';
 
-import '../constant/base.dart';
+const int defaultLimit = 10;
+const int defaultOffset = 0;
 
 class Pagination<T> {
   int rowsNumber;

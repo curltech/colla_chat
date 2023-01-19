@@ -1,5 +1,5 @@
-import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/chat.dart';

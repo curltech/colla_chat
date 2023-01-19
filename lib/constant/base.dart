@@ -1,8 +1,5 @@
 import 'package:flutter/widgets.dart';
 
-const int defaultLimit = 10;
-const int defaultOffset = 0;
-
 //xs (extra small),
 const xsSize = Size(16, 16);
 //sm (small),

@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_item.dart';

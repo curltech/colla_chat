@@ -1,4 +1,4 @@
-import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 
 import 'package:colla_chat/pages/chat/me/collection/collection_chat_message_controller.dart';
@@ -99,7 +99,7 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
       return SizeTransition(
         // 指定非线性动画类型
         sizeFactor:
-        CurvedAnimation(parent: animateController, curve: Curves.easeInOut),
+            CurvedAnimation(parent: animateController, curve: Curves.easeInOut),
         axisAlignment: 0.0,
         // 指定为当前消息组件
         child: chatMessageItem,
