@@ -45,8 +45,9 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
   _lastLogin() async {
     String? credential = await myselfPeerService.lastCredentialName();
     if (StringUtil.isNotEmpty(credential)) {
-      ColumnFieldDef credential = p2pLoginInputFieldDef[0];
-      credential.initValue = credential;
+      ColumnFieldDef def = p2pLoginInputFieldDef[0];
+      def.initValue = credential;
+      setState(() {});
     }
   }
 
