@@ -28,7 +28,7 @@ import 'package:colla_chat/tool/phone_number_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 
-const String skipLoginName = 'skipLogin';
+const String autoLoginName = 'autoLogin';
 const String lastLoginName = 'lastLogin';
 const String credentialName = 'credential';
 const String passwordName = 'password';
@@ -162,36 +162,41 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     return null;
   }
 
-  ///获取最后一次登录的用户名和密码，如果都存在，快捷登录
-  Future<Map<String, dynamic>?> credential() async {
-    String? skipLoginStr = await localSecurityStorage.get(skipLoginName);
-    if (StringUtil.isNotEmpty(skipLoginStr)) {
-      Map<String, dynamic> skipLogin = JsonUtil.toJson(skipLoginStr);
-      return skipLogin;
+  ///获取自动登录的用户名和密码，如果都存在，自动登录
+  Future<Map<String, dynamic>?> autoCredential() async {
+    String? autoLoginStr = await localSecurityStorage.get(autoLoginName);
+    if (StringUtil.isNotEmpty(autoLoginStr)) {
+      appDataProvider.autoLogin = true;
+      Map<String, dynamic> autoLogin = JsonUtil.toJson(autoLoginStr);
+      return autoLogin;
+    } else {
+      appDataProvider.autoLogin = false;
     }
 
     return null;
   }
 
   ///获取最后一次登录的用户名和密码，如果都存在，快捷登录
-  Future<void> removeCredential() async {
-    await localSecurityStorage.remove(skipLoginName);
-    await localSecurityStorage.remove(lastLoginName);
+  Future<void> removeAutoCredential() async {
+    await localSecurityStorage.remove(autoLoginName);
   }
 
-  Future<void> saveCredential(String credential, String password) async {
-    //最后一次成功登录的用户名
-    String lastLogin = JsonUtil.toJsonString({credentialName: credential});
-    await localSecurityStorage.save(lastLoginName, lastLogin);
+  Future<void> saveAutoCredential(String credential, String password) async {
     //记录最后成功登录的用户名和密码
     String skipLogin = JsonUtil.toJsonString(
         {credentialName: credential, passwordName: password});
-    await localSecurityStorage.save(skipLoginName, skipLogin);
+    await localSecurityStorage.save(autoLoginName, skipLogin);
+  }
+
+  Future<void> saveLastCredentialName(String credential) async {
+    //最后一次成功登录的用户名
+    String lastLogin = JsonUtil.toJsonString({credentialName: credential});
+    await localSecurityStorage.save(lastLoginName, lastLogin);
   }
 
   ///获取最后一次登录的用户名和密码，如果都存在，快捷登录
   Future<bool> autoLogin() async {
-    Map<String, dynamic>? autoLogin = await credential();
+    Map<String, dynamic>? autoLogin = await autoCredential();
     if (autoLogin != null) {
       String? credential = autoLogin[credentialName];
       String? password = autoLogin[passwordName];
@@ -215,6 +220,8 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
         var loginStatus = await myselfService.login(myselfPeer, password);
         if (!loginStatus) {
           return false;
+        } else {
+          await saveLastCredentialName(credential);
         }
       } catch (err) {
         logger.e('login err:$err');
@@ -287,7 +294,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
 
   ///登出成功后执行
   Future<void> postLogout() async {
-    await removeCredential();
+    await removeAutoCredential();
     peerConnectionPool.clear();
     signalSessionPool.clear();
   }

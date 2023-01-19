@@ -84,7 +84,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
         widget.onAuthenticate!(loginStatus);
       } else {
         if (loginStatus) {
-          myselfPeerService.saveCredential(credential, password);
+          myselfPeerService.saveAutoCredential(credential, password);
           Application.router
               .navigateTo(context, Application.index, replace: true);
         } else {

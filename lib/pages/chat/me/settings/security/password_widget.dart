@@ -1,7 +1,5 @@
 import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/dht/myself.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -97,7 +95,7 @@ class _PasswordWidgetState extends State<PasswordWidget> {
         String loginName = myself.myselfPeer!.loginName;
         await myselfService.updateMyselfPassword(
             myself.myselfPeer!, plainPassword);
-        await myselfPeerService.saveCredential(loginName, plainPassword);
+        await myselfPeerService.saveAutoCredential(loginName, plainPassword);
         String peerPrivateKey = myself.myselfPeer!.peerPrivateKey;
         String privateKey = myself.myselfPeer!.privateKey;
         await myselfPeerService.update(

@@ -2,32 +2,31 @@ import 'dart:io';
 
 import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
+import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/main.dart';
+import 'package:colla_chat/p2p/chain/action/chat.dart';
 import 'package:colla_chat/p2p/chain/action/connect.dart';
 import 'package:colla_chat/p2p/chain/action/ionsignal.dart';
 import 'package:colla_chat/p2p/chain/action/p2pchat.dart';
+import 'package:colla_chat/p2p/chain/action/ping.dart';
+import 'package:colla_chat/p2p/chain/action/signal.dart';
+import 'package:colla_chat/p2p/chain/baseaction.dart';
+import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/service/chat/chat.dart';
+import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/service/chat/mailaddress.dart';
+import 'package:colla_chat/service/dht/chainapp.dart';
+import 'package:colla_chat/service/dht/myselfpeer.dart';
+import 'package:colla_chat/service/dht/peerclient.dart';
+import 'package:colla_chat/service/dht/peerendpoint.dart';
+import 'package:colla_chat/service/dht/peerprofile.dart';
+import 'package:colla_chat/service/dht/peersignal.dart';
+import 'package:colla_chat/service/general_base.dart';
+import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/service/stock/account.dart';
 import 'package:colla_chat/tool/json_util.dart';
-
-import '../entity/p2p/security_context.dart';
-import '../p2p/chain/action/chat.dart';
-import '../p2p/chain/action/ping.dart';
-import '../p2p/chain/action/signal.dart';
-import '../p2p/chain/baseaction.dart';
-import '../platform.dart';
-import '../provider/app_data_provider.dart';
-import 'chat/chat.dart';
-import 'chat/contact.dart';
-import 'chat/mailaddress.dart';
-import 'dht/chainapp.dart';
-import 'dht/myselfpeer.dart';
-import 'dht/peerclient.dart';
-import 'dht/peerendpoint.dart';
-import 'dht/peerprofile.dart';
-import 'dht/peersignal.dart';
-import 'general_base.dart';
-import 'p2p/security_context.dart';
 
 class ServiceLocator {
   static Map<String, GeneralBaseService> services = {};
@@ -82,6 +81,12 @@ class ServiceLocator {
     await Sqlite3.getInstance();
     await AppLocalizations.init();
 
+    Map<String, dynamic>? autoLogin = await myselfPeerService.autoCredential();
+    if (autoLogin != null) {
+      appDataProvider.autoLogin = true;
+    } else {
+      appDataProvider.autoLogin = false;
+    }
     bool loginStatus = await myselfPeerService.autoLogin();
 
     return loginStatus;

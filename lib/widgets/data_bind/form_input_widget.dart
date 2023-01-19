@@ -150,7 +150,9 @@ class FormInputWidget extends StatelessWidget {
       ));
       String name = columnFieldDef.name;
       dynamic initValue;
-      if (initValues != null) {
+      if (initValues == null) {
+        initValue = columnFieldDef.initValue;
+      } else {
         initValue = initValues![name];
       }
       ColumnFieldController columnFieldController = ColumnFieldController(

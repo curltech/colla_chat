@@ -1,10 +1,9 @@
+import 'package:colla_chat/entity/dht/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/me/settings/general/brightness_picker.dart';
-import 'package:colla_chat/pages/chat/me/settings/general/color_picker.dart';
-import 'package:colla_chat/pages/chat/me/settings/general/locale_picker.dart';
 import 'package:colla_chat/pages/chat/me/settings/security/password_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -55,14 +54,31 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
   }
 
   Widget _buildSettingWidget(BuildContext context) {
-    Widget child = DataListView(tileData: widget.securitySettingTileData);
-    var padding = const EdgeInsets.symmetric(horizontal: 15.0);
+    Widget securitySettingTile =
+        DataListView(tileData: widget.securitySettingTileData);
+    var autoLoginTile = CheckboxListTile(
+        title: Text(AppLocalizations.t('Auto Login')),
+        dense: true,
+        activeColor: appDataProvider.themeData.colorScheme.primary,
+        value: appDataProvider.autoLogin,
+        onChanged: (bool? autoLogin) async {
+          autoLogin = autoLogin ?? false;
+          if (autoLogin) {
+            if (myself.myselfPeer != null) {
+              var loginName = myself.myselfPeer!.loginName;
+              var password = myself.password;
+              await myselfPeerService.saveAutoCredential(loginName, password!);
+              appDataProvider.autoLogin = true;
+            }
+          } else {
+            await myselfPeerService.removeAutoCredential();
+            appDataProvider.autoLogin = false;
+          }
+        });
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        child,
-      ],
+      children: <Widget>[securitySettingTile, autoLoginTile],
     );
   }
 

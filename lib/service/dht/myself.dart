@@ -18,6 +18,7 @@ class MyselfService {
     myselfPeer.peerPublicKey =
         await cryptoGraphy.exportPublicKey(peerPrivateKey);
     myselfPeer.peerId = myselfPeer.peerPublicKey!;
+    myselfPeer.ownerPeerId = myselfPeer.peerId;
 
     ///加密对应的密钥对x25519
     SimpleKeyPair keyPair =

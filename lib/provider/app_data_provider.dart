@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:colla_chat/constant/address.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
+import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
@@ -191,6 +192,19 @@ class AppDataProvider with ChangeNotifier {
     if (_keyboardHeight != keyboardHeight) {
       _keyboardHeight = keyboardHeight;
       //logger.i('keyboardHeight changed:$_keyboardHeight');
+    }
+  }
+
+  bool _autoLogin = false;
+
+  bool get autoLogin {
+    return _autoLogin;
+  }
+
+  set autoLogin(bool autoLogin) {
+    if (_autoLogin != autoLogin) {
+      _autoLogin = autoLogin;
+      notifyListeners();
     }
   }
 
