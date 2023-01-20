@@ -129,6 +129,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     }
     var peerProfile = PeerProfile(peerId, myselfPeer.clientId);
     peerProfile.peerId = peerId;
+    peerProfile.ownerPeerId = peerId;
     peerProfile.status = EntityStatus.effective.name;
     peerProfile.creditScore = 300;
     peerProfile.mobileVerified = 'N';
