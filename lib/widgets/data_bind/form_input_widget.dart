@@ -142,7 +142,7 @@ class FormInputWidget extends StatelessWidget {
     }
   }
 
-  Widget _build(BuildContext context) {
+  Widget _buildForm(BuildContext context) {
     List<Widget> children = [];
     for (var columnFieldDef in controller.columnFieldDefs) {
       children.add(SizedBox(
@@ -179,8 +179,7 @@ class FormInputWidget extends StatelessWidget {
             const SizedBox(
               width: 5,
             ),
-            Icon(Icons.check,
-                color: myself.primary)
+            Icon(Icons.check, color: myself.primary)
           ]),
           onPressed: () {
             var values = controller.getValues();
@@ -215,7 +214,7 @@ class FormInputWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
         builder: (BuildContext context, Widget? child) {
-      return _build(context);
+      return _buildForm(context);
     }, create: (BuildContext context) {
       return controller;
     });

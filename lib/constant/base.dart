@@ -1,6 +1,18 @@
 import 'package:flutter/widgets.dart';
 
-const double opacity =0.5;
+///background opacity
+const double lgOpacity = 0.2;
+const double mdOpacity = 0.5;
+const double smOpacity = 0.8;
+
+///padding
+const double xlPadding = 30.0;
+const double lgPadding = 15.0;
+const double mdPadding = 10.0;
+const double smPadding = 5.0;
+const double xsPadding = 1.0;
+
+///icon size
 //xs (extra small),
 const xsSize = Size(16, 16);
 //sm (small),

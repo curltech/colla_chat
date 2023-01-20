@@ -1,4 +1,3 @@
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/platform_webview.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';

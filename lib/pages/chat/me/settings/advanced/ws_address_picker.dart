@@ -1,6 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
-import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_list_widget.dart';
 
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
@@ -18,7 +17,8 @@ class WsAddressPicker extends StatefulWidget {
 class _WsAddressPickerState extends State<WsAddressPicker> {
   String _peerId = '';
   String _wsConnectAddress = '';
-  late TextEditingController _wsConnectAddressController;
+  final TextEditingController _wsConnectAddressController =
+      TextEditingController();
 
   @override
   void initState() {
@@ -30,8 +30,7 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
       if (wsConnectAddress != null) {
         _wsConnectAddress = wsConnectAddress;
       }
-      _wsConnectAddressController =
-          TextEditingController(text: _wsConnectAddress);
+      _wsConnectAddressController.text = _wsConnectAddress;
       _peerId = defaultPeerEndpoint.peerId;
     }
   }

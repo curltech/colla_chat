@@ -1,6 +1,5 @@
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/tool/image_util.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 

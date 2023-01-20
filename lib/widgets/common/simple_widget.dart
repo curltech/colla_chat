@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:flutter/material.dart';
 
@@ -120,12 +121,13 @@ class WidgetUtil {
   }
 
   static ButtonStyle buildButtonStyle(
-      {Color backgroundColor = Colors.grey,
+      {Color? backgroundColor,
       double borderRadius = 8.0,
       EdgeInsets padding =
           const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
       Size minimumSize = const Size(50, 46.0),
       Size maximumSize = const Size(120.0, 56.0)}) {
+    backgroundColor = backgroundColor ?? Colors.grey.withOpacity(mdOpacity);
     ButtonStyle style = ButtonStyle(
       backgroundColor: MaterialStateProperty.all(backgroundColor),
       shape: MaterialStateProperty.all(
