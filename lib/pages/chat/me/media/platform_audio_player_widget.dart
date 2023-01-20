@@ -59,7 +59,7 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
   Widget build(BuildContext context) {
     String filename = 'C:\\Users\\hujs\\Documents\\content\\2d20a19.m4a';
     return AppBarView(
-      title: Text(AppLocalizations.t(widget.title)),
+      title: widget.title,
       withLeading: true,
       rightPopupMenus: _buildRightPopupMenus(),
       child: mediaPlayerType != null

@@ -217,7 +217,7 @@ class _TextToSpeechWidgetState extends State<TextToSpeechWidget> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-      title: const Text('TextToSpeech'),
+      title: 'TextToSpeech',
       withLeading: true,
       child: SingleChildScrollView(
         scrollDirection: Axis.vertical,

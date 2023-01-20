@@ -52,7 +52,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     Widget child = DataListView(tileData: linkmanAddTileData);
     var me = AppBarView(
-        title: Text(AppLocalizations.t(title)),
+        title: title,
         withLeading: true,
         child: child);
     return me;

@@ -65,7 +65,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     Widget child = DataListView(tileData: meTileData);
     var me = AppBarView(
-        title: Text(AppLocalizations.t(title)),
+        title: title,
         child: Column(
             children: <Widget>[const MeHeadWidget(), Expanded(child: child)]));
     return me;

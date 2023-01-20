@@ -1,4 +1,3 @@
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_audio_recorder_controller.dart';
@@ -68,7 +67,7 @@ class _PlatformAudioRecorderWidgetState
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        title: Text(AppLocalizations.t('AudioRecorder')),
+        title: widget.title,
         withLeading: true,
         rightPopupMenus: _buildRightPopupMenus(),
         child: Column(

@@ -1,5 +1,6 @@
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 
@@ -48,14 +49,15 @@ class DataListView extends StatefulWidget {
 class _DataListViewState extends State<DataListView> {
   @override
   initState() {
+    super.initState();
     widget.controller.addListener(_update);
+    myself.addListener(_update);
     var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
 
     ///滚到指定的位置
     // widget.scrollController.animateTo(offset,
     //     duration: const Duration(milliseconds: 1000), curve: Curves.ease);
-    super.initState();
   }
 
   _update() {
@@ -148,6 +150,7 @@ class _DataListViewState extends State<DataListView> {
   void dispose() {
     widget.controller.removeListener(_update);
     widget.scrollController.removeListener(_onScroll);
+    myself.removeListener(_update);
     super.dispose();
   }
 }

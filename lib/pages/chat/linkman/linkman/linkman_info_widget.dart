@@ -210,7 +210,7 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
       _buildActionCard(context)
     ]);
     var appBarView = AppBarView(
-        title: Text(AppLocalizations.t(widget.title)),
+        title: widget.title,
         withLeading: widget.withLeading,
         child: linkmanInfoCard);
     return appBarView;

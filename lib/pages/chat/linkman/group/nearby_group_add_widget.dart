@@ -126,7 +126,7 @@ class _NearbyGroupAddWidgetState extends State<NearbyGroupAddWidget> {
   Widget build(BuildContext context) {
     return AppBarView(
         withLeading: true,
-        title: Text(AppLocalizations.t(widget.title)),
+        title: widget.title,
         child: Column(
             children: [_buildSearchTextField(context), widget.dataListView]));
   }

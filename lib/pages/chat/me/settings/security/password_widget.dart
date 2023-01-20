@@ -67,7 +67,7 @@ class _PasswordWidgetState extends State<PasswordWidget> {
   Widget build(BuildContext context) {
     return AppBarView(
         withLeading: true,
-        title: Text(AppLocalizations.t(widget.title)),
+        title: widget.title,
         child: _build(context));
   }
 

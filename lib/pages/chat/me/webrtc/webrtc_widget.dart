@@ -3,7 +3,6 @@ import 'package:colla_chat/pages/chat/me/webrtc/data_channel_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/get_display_media_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/get_user_media_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_widget.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
@@ -42,7 +41,7 @@ class WebrtcWidget extends StatelessWidget with TileDataMixin {
   Widget build(BuildContext context) {
     var webrtc = KeepAliveWrapper(
         child: AppBarView(
-            title: Text(AppLocalizations.t(title)),
+            title: title,
             withLeading: withLeading,
             child: child));
     return webrtc;

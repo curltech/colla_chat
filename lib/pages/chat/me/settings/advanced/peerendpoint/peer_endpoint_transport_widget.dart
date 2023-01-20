@@ -148,7 +148,7 @@ class _PeerEndpointTransportWidgetState
           return Container();
         });
     var peerEndpointWidget = AppBarView(
-      title: Text(AppLocalizations.t(widget.title)),
+      title: widget.title,
       withLeading: widget.withLeading,
       child: dataListView,
     );

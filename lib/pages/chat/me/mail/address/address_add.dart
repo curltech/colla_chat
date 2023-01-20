@@ -1,11 +1,10 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/me/mail/address/auto_discover_widget.dart';
+import 'package:colla_chat/pages/chat/me/mail/address/manual_add_widget.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/app_bar_widget.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
-
-import '../../../../../widgets/common/app_bar_view.dart';
-import '../../../../../widgets/common/app_bar_widget.dart';
-import '../../../../../widgets/common/widget_mixin.dart';
-import 'auto_discover_widget.dart';
-import 'manual_add_widget.dart';
 
 /// 地址增加页面
 class AddressAddWidget extends StatefulWidget with TileDataMixin {
@@ -72,7 +71,7 @@ class _AddressAddWidgetState extends State<AddressAddWidget>
       ),
     ];
     var appBarView = AppBarView(
-        title: Text(AppLocalizations.t('Mail address add')),
+        title: widget.title,
         withLeading: widget.withLeading,
         rightPopupMenus: [
           AppBarPopupMenu(title: AppLocalizations.t('Auto')),

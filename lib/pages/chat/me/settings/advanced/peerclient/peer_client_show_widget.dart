@@ -64,7 +64,7 @@ class _PeerClientShowWidgetState extends State<PeerClientShowWidget> {
   Widget build(BuildContext context) {
     var dataListShow = _buildDataListShow(context);
     var appBarView = AppBarView(
-        title: Text(AppLocalizations.t(widget.title)),
+        title: widget.title,
         withLeading: widget.withLeading,
         child: dataListShow);
     return appBarView;

@@ -85,7 +85,7 @@ class _SpeechToTextWidgetState extends State<SpeechToTextWidget> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-      title: const Text('SpeechToText'),
+      title: 'SpeechToText',
       withLeading: true,
       child: Column(children: [
         HeaderWidget(),

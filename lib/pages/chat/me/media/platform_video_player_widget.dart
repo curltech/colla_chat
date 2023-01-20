@@ -75,7 +75,7 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
           filename: filename);
     }
     return AppBarView(
-      title: Text(AppLocalizations.t(widget.title)),
+      title: widget.title,
       withLeading: true,
       rightPopupMenus: rightPopupMenus,
       child: child,

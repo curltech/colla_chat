@@ -50,7 +50,7 @@ class _PlatformWebViewWidgetState extends State<PlatformWebViewWidget> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-      title: Text(AppLocalizations.t(widget.title)),
+      title: widget.title,
       withLeading: true,
       child: Column(children: <Widget>[
         buildTextField(),

@@ -89,7 +89,7 @@ class _FullScreenWidgetState extends State<FullScreenWidget> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        title: _buildTitleWidget(),
+        titleWidget: _buildTitleWidget(),
         withLeading: true,
         child: _buildFullScreenWidget(context));
   }

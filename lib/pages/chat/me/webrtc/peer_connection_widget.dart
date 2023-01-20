@@ -344,7 +344,7 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-      title: Text(AppLocalizations.t('video call')),
+      title: widget.title,
       withLeading: widget.withLeading,
       rightWidgets: [_buildIconButton(context)],
       child: _buildBody(context),

@@ -51,7 +51,7 @@ class MediaWidget extends StatelessWidget with TileDataMixin {
     Widget child = DataListView(tileData: mediaTileData);
     var media = AppBarView(
         withLeading: true,
-        title: Text(AppLocalizations.t(title)),
+        title: title,
         child: child);
     return media;
   }

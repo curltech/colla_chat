@@ -18,6 +18,7 @@ class _ColorPickerState extends State<ColorPicker> {
   void initState() {
     super.initState();
     appDataProvider.addListener(_update);
+    myself.addListener(_update);
   }
 
   _update() {
@@ -109,6 +110,7 @@ class _ColorPickerState extends State<ColorPicker> {
   @override
   void dispose() {
     appDataProvider.removeListener(_update);
+    myself.removeListener(_update);
     super.dispose();
   }
 }

@@ -82,7 +82,7 @@ class _AdvancedSettingWidgetState extends State<AdvancedSettingWidget> {
   Widget build(BuildContext context) {
     return AppBarView(
         withLeading: true,
-        title: Text(AppLocalizations.t(widget.title)),
+        title: widget.title,
         child: _buildSettingWidget(context));
   }
 

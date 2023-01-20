@@ -1,16 +1,18 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'app_bar_widget.dart';
-
 ///工作区的标准视图，包裹了顶部栏AppBarWidget和一个包裹了child
-class AppBarView extends StatelessWidget {
+class AppBarView extends StatefulWidget {
   final bool withLeading;
 
   //指定回退路由样式，不指定则系统判断
   final Function? leadingCallBack;
-  final Widget? title;
+  final String? title;
+  final Widget? titleWidget;
   final bool centerTitle;
 
   //右边按钮
@@ -26,6 +28,7 @@ class AppBarView extends StatelessWidget {
     this.withLeading = false,
     this.leadingCallBack,
     this.title,
+    this.titleWidget,
     this.centerTitle = true,
     this.rightWidgets,
     this.rightPopupMenus,
@@ -34,22 +37,47 @@ class AppBarView extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  State<StatefulWidget> createState() {
+    return _AppBarViewState();
+  }
+}
+
+class _AppBarViewState extends State<AppBarView> {
+  @override
+  initState() {
+    super.initState();
+    myself.addListener(_update);
+  }
+
+  _update() {
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
+    Widget titleWidget =
+        widget.titleWidget ?? Text(AppLocalizations.t(widget.title ?? ''));
     return Consumer<IndexWidgetProvider>(
         builder: (context, indexWidgetProvider, child) {
       return Column(children: [
         AppBarWidget.buildAppBar(
           context,
-          withLeading: withLeading,
-          leadingCallBack: leadingCallBack,
-          title: title,
-          centerTitle: centerTitle,
-          rightWidgets: rightWidgets,
-          rightPopupMenus: rightPopupMenus,
-          bottom: bottom,
+          withLeading: widget.withLeading,
+          leadingCallBack: widget.leadingCallBack,
+          title: titleWidget,
+          centerTitle: widget.centerTitle,
+          rightWidgets: widget.rightWidgets,
+          rightPopupMenus: widget.rightPopupMenus,
+          bottom: widget.bottom,
         ),
-        Expanded(child: this.child),
+        Expanded(child: widget.child),
       ]);
     });
+  }
+
+  @override
+  void dispose() {
+    myself.removeListener(_update);
+    super.dispose();
   }
 }

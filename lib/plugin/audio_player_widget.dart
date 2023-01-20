@@ -1,11 +1,9 @@
 import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
-
-import '../l10n/localization.dart';
-import '../widgets/common/app_bar_view.dart';
-import '../widgets/common/widget_mixin.dart';
 
 class AudioPlayerWidget extends StatefulWidget with TileDataMixin {
   final AudioPlayer audioPlayer;
@@ -187,7 +185,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
   @override
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
-      title: Text(AppLocalizations.t(widget.title)),
+      title: widget.title,
       withLeading: widget.withLeading,
       child: _buildAudioPlayer(context),
     );

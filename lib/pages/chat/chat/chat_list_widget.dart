@@ -282,7 +282,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     ));
 
     return AppBarView(
-        title: Text(title),
+        title: title,
         rightWidgets: rightWidgets,
         child: _buildGroupDataListView(context));
   }

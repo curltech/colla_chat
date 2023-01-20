@@ -166,7 +166,7 @@ class _ContactLinkmanAddWidgetState extends State<ContactLinkmanAddWidget> {
   Widget build(BuildContext context) {
     return AppBarView(
         withLeading: true,
-        title: Text(AppLocalizations.t(widget.title)),
+        title: widget.title,
         child: Column(
             children: [_buildSearchTextField(context), widget.dataListView]));
   }

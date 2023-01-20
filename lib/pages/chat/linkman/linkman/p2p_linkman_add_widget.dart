@@ -154,7 +154,7 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
   Widget build(BuildContext context) {
     return AppBarView(
         withLeading: true,
-        title: Text(AppLocalizations.t(widget.title)),
+        title: widget.title,
         child: Column(
             children: [_buildSearchTextField(context), widget.dataListView]));
   }

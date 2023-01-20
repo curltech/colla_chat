@@ -44,9 +44,7 @@ class TileData {
 
   static TileData of(TileDataMixin mixin) {
     return TileData(
-        title: AppLocalizations.t(mixin.title),
-        routeName: mixin.routeName,
-        prefix: mixin.icon);
+        title: mixin.title, routeName: mixin.routeName, prefix: mixin.icon);
   }
 
   static List<TileData> from(List<TileDataMixin> mixins) {
@@ -131,8 +129,7 @@ class DataListTile extends StatelessWidget {
 
     ///然后，如果路由名称存在，加入路由图标
     if (tileData.routeName != null) {
-      trailing.add(Icon(Icons.chevron_right,
-          color: myself.primary));
+      trailing.add(Icon(Icons.chevron_right, color: myself.primary));
     }
 
     ///横向排列尾部的组件
@@ -155,7 +152,7 @@ class DataListTile extends StatelessWidget {
       selected: selected,
       leading: leading,
       title: Text(
-        tileData.title,
+        AppLocalizations.t(tileData.title),
       ),
       subtitle: tileData.subtitle != null
           ? Text(

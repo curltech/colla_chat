@@ -133,7 +133,7 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
   @override
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
-        title: Text(AppLocalizations.t(widget.title)),
+        title: widget.title,
         withLeading: widget.withLeading,
         child: mailAddressWidget);
 

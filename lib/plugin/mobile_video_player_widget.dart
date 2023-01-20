@@ -93,7 +93,7 @@ class _MobileVideoPlayerWidgetState extends State<MobileVideoPlayerWidget> {
             Icon(controller.value.isPlaying ? Icons.pause : Icons.play_arrow));
     rightWidgets.add(playBtn);
     var appBarView = AppBarView(
-      title: Text(AppLocalizations.t(widget.title)),
+      title: widget.title,
       withLeading: widget.withLeading,
       rightWidgets: rightWidgets,
       child: FlickVideoPlayer(flickManager: flickManager),

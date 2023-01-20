@@ -132,7 +132,7 @@ class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
   @override
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
-      title: Text(AppLocalizations.t(widget.title)),
+      title: widget.title,
       withLeading: widget.withLeading,
       rightPopupMenus: [_buildAppBarPopupMenu()],
       child: _buildVideoView(context),

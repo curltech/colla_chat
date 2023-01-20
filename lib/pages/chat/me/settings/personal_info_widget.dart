@@ -108,7 +108,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
       ),
     ];
     var personalInfo = AppBarView(
-      title: Text(AppLocalizations.t('Personal Information')),
+      title: widget.title,
       withLeading: widget.withLeading,
       child: Column(children: [
         DataListView(tileData: personalInfoTileData),

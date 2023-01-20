@@ -154,7 +154,7 @@ class _PeerClientListWidgetState extends State<PeerClientListWidget> {
             onTap: _onTap, tileData: tiles, currentIndex: currentIndex));
 
     var peerClientWidget = AppBarView(
-        title: Text(AppLocalizations.t(widget.title)),
+        title: widget.title,
         withLeading: widget.withLeading,
         rightWidgets: widget.rightWidgets,
         child: dataListView);

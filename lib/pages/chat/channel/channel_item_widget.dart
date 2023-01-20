@@ -1,7 +1,6 @@
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -84,9 +83,7 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
     return AppBarView(
       centerTitle: true,
       withLeading: true,
-      title: Text(
-        AppLocalizations.t(widget.title),
-      ),
+      title: widget.title,
       rightWidgets: rightWidgets,
       child: QuillRichTextWidget(
         content: widget.dataMoreController.current?.content,

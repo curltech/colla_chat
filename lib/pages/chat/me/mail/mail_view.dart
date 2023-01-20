@@ -1,14 +1,12 @@
+import 'package:colla_chat/pages/chat/me/mail/mail_address_widget.dart';
+import 'package:colla_chat/pages/chat/me/mail/mail_content_widget.dart';
+import 'package:colla_chat/pages/chat/me/mail/mail_list_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../../../l10n/localization.dart';
-import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/common/widget_mixin.dart';
-import '../../../../widgets/data_bind/data_listtile.dart';
-import 'mail_address_widget.dart';
-import 'mail_content_widget.dart';
-import 'mail_list_widget.dart';
 
 //邮件总体视图，带有回退回调函数
 class MailView extends StatefulWidget with TileDataMixin {
@@ -60,7 +58,7 @@ class _MailViewState extends State<MailView>
       children: children,
     );
     var appBarView = AppBarView(
-        title: Text(AppLocalizations.t('Mail')),
+        title:  widget.title,
         withLeading: widget.withLeading,
         child: row);
 

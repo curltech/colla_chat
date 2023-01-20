@@ -88,7 +88,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
       Text(AppLocalizations.t('Scan qrcode, add linkman')),
     ];
     return AppBarView(
-      title: Text(AppLocalizations.t(widget.title)),
+      title: widget.title,
       withLeading: widget.withLeading,
       rightPopupMenus: widget.menus,
       child: Column(children: children),

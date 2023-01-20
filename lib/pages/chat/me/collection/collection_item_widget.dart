@@ -1,4 +1,3 @@
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/richtext/quill_richtext_widget.dart';
@@ -39,9 +38,7 @@ class _CollectionItemWidgetState extends State<CollectionItemWidget> {
   Widget build(BuildContext context) {
     return AppBarView(
       centerTitle: false,
-      title: Text(
-        AppLocalizations.t(widget.title),
-      ),
+      title: widget.title,
       child: const QuillRichTextWidget(),
     );
   }

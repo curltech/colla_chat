@@ -8,7 +8,6 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
-
 class MobileWebViewWidget extends StatefulWidget with TileDataMixin {
   final String url;
 
@@ -55,7 +54,7 @@ class _MobileWebViewWidgetState extends State<MobileWebViewWidget> {
   @override
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
-      title: Text(AppLocalizations.t(widget.title)),
+      title: widget.title,
       withLeading: widget.withLeading,
       child: WebView(
         initialUrl: widget.url,

@@ -106,7 +106,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
           icon: const Icon(Icons.zoom_in_map)),
     ];
     return AppBarView(
-      title: Text(AppLocalizations.t(widget.title)),
+      title: widget.title,
       withLeading: true,
       rightWidgets: rightWidgets,
       child: _buildVideoChatView(context),

@@ -22,7 +22,7 @@ class SettingWidget extends StatefulWidget with TileDataMixin {
       const PrivacySettingWidget();
   final SecuritySettingWidget securitySettingWidget = SecuritySettingWidget();
   final AuthMethod authMethod = AuthMethod.app;
-  late final Widget child;
+  late final List<TileData> settingTileData;
 
   SettingWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(generalSettingWidget);
@@ -35,11 +35,10 @@ class SettingWidget extends StatefulWidget with TileDataMixin {
       privacySettingWidget,
       securitySettingWidget
     ];
-    final List<TileData> meTileData = TileData.from(mixins);
-    for (var tile in meTileData) {
+    settingTileData = TileData.from(mixins);
+    for (var tile in settingTileData) {
       tile.dense = true;
     }
-    child = DataListView(tileData: meTileData);
   }
 
   @override
@@ -91,16 +90,17 @@ class _SettingWidgetState extends State<SettingWidget> {
 
   @override
   Widget build(BuildContext context) {
+    Widget child = DataListView(tileData: widget.settingTileData);
     var setting = KeepAliveWrapper(
         child: AppBarView(
-            title: Text(AppLocalizations.t(widget.title)),
+            title: widget.title,
             withLeading: widget.withLeading,
             child: IndexedStack(
               index: (loginStatus == null) ? 0 : 1,
               children: [
                 _buildAppAuthenticate(),
                 (loginStatus != null && loginStatus!)
-                    ? widget.child
+                    ? child
                     : Center(
                         child:
                             Text(AppLocalizations.t('Authenticate failure'))),
