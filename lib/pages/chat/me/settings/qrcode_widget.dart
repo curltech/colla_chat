@@ -1,6 +1,6 @@
 import 'dart:typed_data';
 
-import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/file_util.dart';
@@ -17,19 +17,19 @@ class QrcodeWidget extends StatefulWidget with TileDataMixin {
     AppBarPopupMenu(
         title: 'Save to file',
         icon: Icon(Icons.save,
-            color: appDataProvider.themeData.colorScheme.primary)),
+            color: myself.primary)),
     AppBarPopupMenu(
         title: 'Save to image',
         icon: Icon(Icons.image,
-            color: appDataProvider.themeData.colorScheme.primary)),
+            color: myself.primary)),
     AppBarPopupMenu(
         title: 'Share',
         icon: Icon(Icons.share,
-            color: appDataProvider.themeData.colorScheme.primary)),
+            color: myself.primary)),
     AppBarPopupMenu(
         title: 'Reset qrcode',
         icon: Icon(Icons.lock_reset,
-            color: appDataProvider.themeData.colorScheme.primary))
+            color: myself.primary))
   ];
 
   QrcodeWidget({Key? key}) : super(key: key);

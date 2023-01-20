@@ -1,6 +1,5 @@
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -32,7 +31,7 @@ class LocationMessage extends StatelessWidget {
     var address = locationPosition.address; //
     Widget headingWidget = Icon(
       Icons.location_on,
-      color: appDataProvider.themeData.colorScheme.primary,
+      color: myself.primary,
     );
     if (thumbnail != null) {
       headingWidget = ImageUtil.buildImageWidget(image: thumbnail);

@@ -1,5 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
 import 'package:toast/toast.dart';
@@ -40,7 +40,7 @@ class DialogUtil {
     required bool checked,
   }) {
     TextStyle style =
-        TextStyle(color: appDataProvider.themeData.colorScheme.primary);
+        TextStyle(color: myself.primary);
     return SimpleDialogOption(
         onPressed: () {
           Navigator.pop(context, value);
@@ -90,7 +90,7 @@ class DialogUtil {
     required bool checked,
   }) {
     TextStyle style =
-        TextStyle(color: appDataProvider.themeData.colorScheme.primary);
+        TextStyle(color: myself.primary);
     return PopupMenuItem(
         value: value,
         child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [

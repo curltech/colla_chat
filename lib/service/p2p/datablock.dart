@@ -5,7 +5,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/type_util.dart';
 
 import '../../crypto/util.dart';
-import '../../entity/dht/myself.dart';
+import '../../provider/myself.dart';
 import '../../entity/dht/peerclient.dart';
 import '../../entity/p2p/datablock.dart';
 import '../../p2p/chain/action/queryvalue.dart';

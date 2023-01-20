@@ -1,5 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -84,7 +84,7 @@ class DataActionCard extends StatelessWidget {
     var label = AppLocalizations.t(actionData.label);
     var tooltip = AppLocalizations.t(actionData.tooltip ?? '');
     return WidgetUtil.buildIconTextButton(
-        iconColor: appDataProvider.themeData.colorScheme.primary,
+        iconColor: myself.primary,
         iconSize: size,
         onPressed: () {
           if (onPressed != null) {
@@ -136,7 +136,7 @@ class DataActionCard extends StatelessWidget {
     var tooltip = AppLocalizations.t(actionData.tooltip ?? '');
     return WidgetUtil.buildInkWell(
         padding: const EdgeInsets.all(5.0),
-        iconColor: appDataProvider.themeData.colorScheme.primary,
+        iconColor: myself.primary,
         iconSize: size,
         onPressed: () {
           if (onPressed != null) {
@@ -164,7 +164,7 @@ class DataActionCard extends StatelessWidget {
             ),
           ),
           child: WidgetUtil.buildCircleButton(
-              backgroundColor: appDataProvider.themeData.colorScheme.primary,
+              backgroundColor: myself.primary,
               onPressed: () {
                 if (onPressed != null) {
                   onPressed!(index, actionData.label);

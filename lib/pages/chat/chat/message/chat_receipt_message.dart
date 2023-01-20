@@ -1,6 +1,6 @@
 import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
 
 ///消息体：回复消息
@@ -19,7 +19,7 @@ class ChatReceiptMessage extends StatelessWidget {
     var receiverName = chatMessage.receiverName;
     Widget leading = Icon(
       Icons.receipt_long,
-      color: appDataProvider.themeData.colorScheme.primary,
+      color: myself.primary,
     );
     Widget tile = Center(
       child: Padding(

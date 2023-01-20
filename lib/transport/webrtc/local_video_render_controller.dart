@@ -1,4 +1,4 @@
-import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';

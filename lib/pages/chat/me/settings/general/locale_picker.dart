@@ -1,5 +1,5 @@
 import 'package:colla_chat/provider/app_data_provider.dart';
-import 'package:colla_chat/widgets/data_bind/base.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
 
@@ -16,7 +16,7 @@ class _LocalePickerState extends State<LocalePicker> {
   @override
   void initState() {
     super.initState();
-    appDataProvider.addListener(_update);
+    myself.addListener(_update);
   }
 
   _update() {
@@ -25,24 +25,16 @@ class _LocalePickerState extends State<LocalePicker> {
 
   //群主选择界面
   Widget _buildSelectWidget(BuildContext context) {
-    List<Option<String>>? localeChoices = [];
-    for (var localeOption in localeOptions) {
-      Option<String> item = Option<String>(
-        localeOption.label,
-        localeOption.value,
-      );
-      localeChoices.add(item);
-    }
-    return SmartSelectUtil.single<String>(
+    return SmartSelectUtil.single<Locale>(
       title: 'Locale',
       placeholder: 'Select one locale',
       onChange: (selected) {
         if (selected != null) {
-          appDataProvider.locale = selected;
+          myself.locale = selected;
         }
       },
-      items: localeChoices,
-      selectedValue: appDataProvider.locale,
+      items: localeOptions,
+      selectedValue: myself.locale,
     );
   }
 
@@ -53,7 +45,7 @@ class _LocalePickerState extends State<LocalePicker> {
 
   @override
   void dispose() {
-    appDataProvider.removeListener(_update);
+    myself.removeListener(_update);
     super.dispose();
   }
 }

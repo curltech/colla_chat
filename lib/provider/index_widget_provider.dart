@@ -1,4 +1,5 @@
 import 'package:card_swiper/card_swiper.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
@@ -345,7 +346,7 @@ class IndexWidgetProvider with ChangeNotifier {
 
   Color? getIconColor(int index) {
     if (index == currentMainIndex) {
-      return appDataProvider.themeData.colorScheme.primary;
+      return myself.primary;
     } else {
       return Colors.grey;
     }

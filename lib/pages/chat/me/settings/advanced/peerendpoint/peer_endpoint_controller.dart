@@ -12,7 +12,7 @@ class PeerEndpointController extends DataListController<PeerEndpoint> {
   }
 
   PeerEndpoint? get defaultPeerEndpoint {
-    if (_defaultIndex > -1) {
+    if (data.isNotEmpty && _defaultIndex > -1 && _defaultIndex < data.length) {
       return data[_defaultIndex];
     }
     return null;
@@ -23,7 +23,10 @@ class PeerEndpointController extends DataListController<PeerEndpoint> {
   }
 
   set defaultIndex(int? defaultIndex) {
-    if (defaultIndex != null && defaultIndex > -1) {
+    if (data.isNotEmpty &&
+        defaultIndex != null &&
+        defaultIndex > -1 &&
+        defaultIndex < data.length) {
       _defaultIndex = defaultIndex;
       notifyListeners();
     }

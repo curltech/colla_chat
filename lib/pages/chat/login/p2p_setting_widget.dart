@@ -2,7 +2,7 @@ import 'package:colla_chat/pages/chat/me/settings/general/brightness_picker.dart
 
 import 'package:colla_chat/pages/chat/me/settings/advanced/ws_address_picker.dart';
 import 'package:colla_chat/pages/chat/me/settings/general/locale_picker.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:flutter/material.dart';
 
 
@@ -18,7 +18,7 @@ class _P2pSettingWidgetState extends State<P2pSettingWidget> {
   @override
   void initState() {
     super.initState();
-    appDataProvider.addListener(_update);
+    myself.addListener(_update);
   }
 
   _update() {
@@ -53,7 +53,7 @@ class _P2pSettingWidgetState extends State<P2pSettingWidget> {
 
   @override
   void dispose() {
-    appDataProvider.removeListener(_update);
+    myself.removeListener(_update);
     super.dispose();
   }
 }

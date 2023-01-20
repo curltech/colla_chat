@@ -1,4 +1,4 @@
-import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/security/password_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
@@ -59,17 +59,16 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
     var autoLoginTile = CheckboxListTile(
         title: Text(AppLocalizations.t('Auto Login')),
         dense: true,
-        activeColor: appDataProvider.themeData.colorScheme.primary,
+        activeColor: myself.primary,
         value: appDataProvider.autoLogin,
         onChanged: (bool? autoLogin) async {
           autoLogin = autoLogin ?? false;
+          myself.autoLogin = autoLogin;
           if (autoLogin) {
-            if (myself.myselfPeer != null) {
-              var loginName = myself.myselfPeer!.loginName;
-              var password = myself.password;
-              await myselfPeerService.saveAutoCredential(loginName, password!);
-              appDataProvider.autoLogin = true;
-            }
+            var loginName = myself.myselfPeer.loginName;
+            var password = myself.password;
+            await myselfPeerService.saveAutoCredential(loginName, password!);
+            appDataProvider.autoLogin = true;
           } else {
             await myselfPeerService.removeAutoCredential();
             appDataProvider.autoLogin = false;

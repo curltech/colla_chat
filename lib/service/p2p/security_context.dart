@@ -8,7 +8,7 @@ import 'package:cryptography/cryptography.dart';
 
 import '../../crypto/cryptography.dart';
 import '../../crypto/util.dart';
-import '../../entity/dht/myself.dart';
+import '../../provider/myself.dart';
 import '../../entity/p2p/security_context.dart';
 import '../../service/dht/peerclient.dart';
 

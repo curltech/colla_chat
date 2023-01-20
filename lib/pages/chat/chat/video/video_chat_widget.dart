@@ -1,10 +1,9 @@
 import 'package:card_swiper/card_swiper.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/video/local_video_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/remote_video_widget.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/video_room_controller.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
@@ -60,7 +59,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
         alignment: Alignment.topRight,
         child: WidgetUtil.buildCircleButton(
             padding: const EdgeInsets.all(15.0),
-            backgroundColor: appDataProvider.themeData.colorScheme.primary,
+            backgroundColor: myself.primary,
             onPressed: () {
               _closeOverlayEntry();
             },
@@ -90,7 +89,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
       },
       // pagination: SwiperPagination(
       //     builder: DotSwiperPaginationBuilder(
-      //   activeColor: appDataProvider.themeData.colorScheme.primary,
+      //   activeColor: myself.primary,
       //   color: Colors.white,
       //   activeSize: 15,)
       // ),

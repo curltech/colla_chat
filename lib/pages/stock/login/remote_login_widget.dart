@@ -1,9 +1,8 @@
+import 'package:colla_chat/entity/stock/user.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/routers/routes.dart';
 import 'package:flutter/material.dart';
-
-import '../../../entity/stock/user.dart';
-import '../../../l10n/localization.dart';
-import '../../../routers/routes.dart';
 
 /// 远程登录组件，一个card下的录入框和按钮组合
 class RemoteLoginWidget extends StatefulWidget {
@@ -113,7 +112,6 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
   }
 
   Future<void> _login() async {
-    await appDataProvider.saveAppParams();
     var current = await stockUser.login('/user/Login', {
       'credential_': _credential,
       'password_': _password,

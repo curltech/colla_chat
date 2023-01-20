@@ -1,8 +1,8 @@
 import 'dart:core';
 
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -227,7 +227,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
       onPressed: _inCalling ? _hangUp : _makeCall,
       title: _inCalling ? 'Hangup' : 'Call',
       icon: Icon(_inCalling ? Icons.call_end : Icons.phone,
-          color: appDataProvider.themeData!.colorScheme.primary),
+          color: myself.primary),
     );
   }
 

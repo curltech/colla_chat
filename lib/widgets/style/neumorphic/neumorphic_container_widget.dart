@@ -1,6 +1,6 @@
+import 'package:colla_chat/provider/myself.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
-import '../../../provider/app_data_provider.dart';
 
 class NeumorphicConstants {
   NeumorphicShape get shape => NeumorphicShape.concave;
@@ -32,13 +32,13 @@ class NeumorphicConstants {
       color: color);
 
   ThemeMode get themeMode {
-    return appDataProvider.themeMode;
+    return myself.themeMode;
   }
 
   NeumorphicThemeData get darkThemeData {
-    var themeData = appDataProvider.themeData;
-    Color primary = themeData!.colorScheme.primary;
-    Color secondary = themeData!.colorScheme.secondary;
+    var themeData = myself.themeData;
+    Color primary = myself.primary;
+    Color secondary = themeData.colorScheme.secondary;
     return NeumorphicThemeData(
       baseColor: primary,
       accentColor: secondary,
@@ -49,9 +49,9 @@ class NeumorphicConstants {
   }
 
   NeumorphicThemeData get themeData {
-    var themeData = appDataProvider.themeData;
-    Color primary = themeData!.colorScheme.primary;
-    Color secondary = themeData!.colorScheme.secondary;
+    var themeData = myself.themeData;
+    Color primary = themeData.colorScheme.primary;
+    Color secondary = themeData.colorScheme.secondary;
     return NeumorphicThemeData(
       baseColor: primary,
       accentColor: secondary,

@@ -1,6 +1,6 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/cryptography.dart';
-import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/dht/peerprofile.dart';
 import 'package:colla_chat/service/chat/contact.dart';

@@ -9,7 +9,7 @@ class BackgroundSelector extends StatelessWidget {
   const BackgroundSelector({Key? key}) : super(key: key);
 
   Widget buildBackground(String item) {
-    double size = (appDataProvider.size.width - 30) / 3;
+    double size = (appDataProvider.totalSize.width - 30) / 3;
     return InkWell(
       child: ClipRRect(
         borderRadius: const BorderRadius.all(Radius.circular(5)),

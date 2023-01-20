@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -126,7 +126,7 @@ class ScreenSelectDialog extends StatelessWidget {
   }
 
   Widget _buildActionButton(BuildContext context) {
-    var primary = appDataProvider.themeData.colorScheme.primary;
+    var primary = myself.primary;
     return SizedBox(
       width: double.infinity,
       child: ButtonBar(
@@ -197,7 +197,7 @@ class ScreenSelectDialog extends StatelessWidget {
   }
 
   Widget _buildTabBar(BuildContext context) {
-    var primary = appDataProvider.themeData.colorScheme.primary;
+    var primary = myself.primary;
     return TabBar(
         indicatorColor: primary,
         onTap: (value) => Future.delayed(const Duration(milliseconds: 300), () {
@@ -315,7 +315,7 @@ class _ThumbnailWidgetState extends State<ThumbnailWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var primary = appDataProvider.themeData.colorScheme.primary;
+    var primary = myself.primary;
     return Column(
       children: [
         Expanded(

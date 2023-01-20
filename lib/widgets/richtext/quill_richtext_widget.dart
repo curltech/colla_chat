@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/richtext/quill_util.dart';
 import 'package:flutter/foundation.dart';
@@ -175,7 +176,7 @@ class _QuillRichTextWidgetState extends State<QuillRichTextWidget> {
           ...FlutterQuillEmbeds.builders(),
           NotesEmbedBuilder(addEditNote: _addEditNote)
         ],
-        locale: appDataProvider.getLocale(),
+        locale: myself.locale,
       ),
     );
     return quillEditor;
@@ -203,7 +204,7 @@ class _QuillRichTextWidgetState extends State<QuillRichTextWidget> {
       showSmallButton: true,
       showDirection: true,
       afterButtonPressed: _focusNode.requestFocus,
-      locale: appDataProvider.getLocale(),
+      locale: myself.locale,
     );
     return toolbar;
   }

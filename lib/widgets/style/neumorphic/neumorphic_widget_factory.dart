@@ -1,3 +1,4 @@
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/routers/routes.dart';
@@ -10,7 +11,7 @@ import 'package:provider/provider.dart';
 
 class NeumorphicWidgetFactory extends WidgetFactory {
   NeumorphicTheme buildTheme(Widget child) {
-    ThemeMode themeMode = appDataProvider.themeMode;
+    ThemeMode themeMode = myself.themeMode;
     var theme = NeumorphicTheme(
         themeMode: themeMode, //or dark / system
         darkTheme: neumorphicConstants.darkThemeData,
@@ -597,7 +598,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
       Locale('ja', 'JP'),
       Locale('ko', 'KR'),
     ];
-    locale = locale ?? Provider.of<AppDataProvider>(context).getLocale();
+    locale = locale ?? myself.locale;
     return NeumorphicApp(
       key: key,
       title: title,

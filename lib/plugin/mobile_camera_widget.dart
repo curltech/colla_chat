@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
-import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -290,7 +290,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
 
   /// 闪光，曝光，旋转开关的工具按钮，只有移动设备才会显示
   Widget _buildCameraModeWidget() {
-    var primary = appDataProvider.themeData.colorScheme.primary;
+    var primary = myself.primary;
     return Column(
       children: <Widget>[
         Row(
@@ -341,7 +341,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
 
   ///闪光灯按钮
   Widget _buildFlashModeWidget() {
-    var primary = appDataProvider.themeData.colorScheme.primary;
+    var primary = myself.primary;
     return SizeTransition(
       sizeFactor: _flashModeControlRowAnimation,
       child: ClipRect(
@@ -395,7 +395,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
   }
 
   Widget _buildExposureModeWidget() {
-    var primary = appDataProvider.themeData.colorScheme.primary;
+    var primary = myself.primary;
     final ButtonStyle styleAuto = TextButton.styleFrom(
       // TODO(darrenaustin): Migrate to new API once it lands in stable: https://github.com/flutter/flutter/issues/105724
       // ignore: deprecated_member_use
@@ -483,7 +483,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
 
   ///对焦模式按钮
   Widget _buildFocusModeWidget() {
-    var primary = appDataProvider.themeData.colorScheme.primary;
+    var primary = myself.primary;
     final ButtonStyle styleAuto = TextButton.styleFrom(
       // TODO(darrenaustin): Migrate to new API once it lands in stable: https://github.com/flutter/flutter/issues/105724
       // ignore: deprecated_member_use
@@ -545,7 +545,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
   /// 拍照和录像按钮
   Widget _buildCaptureModeWidget() {
     final CameraController? cameraController = controller;
-    var primary = appDataProvider.themeData.colorScheme.primary;
+    var primary = myself.primary;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
@@ -654,7 +654,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
   Widget _buildBackButton() {
     var iconButton = IconButton(
       icon: const Icon(Icons.arrow_back, size: 32),
-      color: appDataProvider.themeData.colorScheme.primary,
+      color: myself.primary,
       onPressed: () {
         _back();
       },
@@ -674,7 +674,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
             if (cameras != null && cameras.length > 1) {
               var iconButton = IconButton(
                 icon: const Icon(Icons.cameraswitch),
-                color: appDataProvider.themeData.colorScheme.primary,
+                color: myself.primary,
                 onPressed:
                     controller != null && controller!.value.isRecordingVideo
                         ? null

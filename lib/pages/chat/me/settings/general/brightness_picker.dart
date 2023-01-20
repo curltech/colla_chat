@@ -1,10 +1,8 @@
-import 'package:colla_chat/constant/brightness.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_awesome_select/flutter_awesome_select.dart';
 
 class BrightnessPicker extends StatefulWidget {
   const BrightnessPicker({Key? key}) : super(key: key);
@@ -19,7 +17,7 @@ class _BrightnessPickerState extends State<BrightnessPicker> {
   @override
   void initState() {
     super.initState();
-    appDataProvider.addListener(_update);
+    myself.addListener(_update);
   }
 
   _update() {
@@ -28,40 +26,40 @@ class _BrightnessPickerState extends State<BrightnessPicker> {
 
   //群主选择界面
   Widget _buildSelectWidget(BuildContext context) {
-    List<Option<String>> brightnessChoices = [];
-    for (var brightnessOption in brightnessOptions) {
-      Option<String> item =
-          Option<String>(brightnessOption.label, brightnessOption.value);
-      brightnessChoices.add(item);
+    List<Option<ThemeMode>> themeModeChoices = [];
+    for (var themeModeOption in ThemeMode.values) {
+      Option<ThemeMode> item =
+          Option<ThemeMode>(themeModeOption.name, themeModeOption);
+      themeModeChoices.add(item);
     }
-    return SmartSelectUtil.single<String>(
+    return SmartSelectUtil.single<ThemeMode>(
       title: 'Brightness',
       placeholder: 'Select one brightness',
       onChange: (selected) {
         if (selected != null) {
-          appDataProvider.brightness = selected;
+          myself.themeMode = selected;
         }
       },
-      items: brightnessChoices,
-      selectedValue: appDataProvider.brightness,
+      items: themeModeChoices,
+      selectedValue: myself.themeMode,
     );
   }
 
   Widget _buildToggleWidget(BuildContext context) {
     final List<bool> isSelected = <bool>[
-      appDataProvider.brightness == ThemeMode.light.name,
-      appDataProvider.brightness == ThemeMode.system.name,
-      appDataProvider.brightness == ThemeMode.dark.name,
+      myself.themeMode == ThemeMode.light,
+      myself.themeMode == ThemeMode.system,
+      myself.themeMode == ThemeMode.dark,
     ];
     var toggleWidget = ToggleButtons(
       isSelected: isSelected,
       onPressed: (int newIndex) {
         if (newIndex == 0) {
-          appDataProvider.brightness = ThemeMode.light.name;
+          myself.themeMode = ThemeMode.light;
         } else if (newIndex == 1) {
-          appDataProvider.brightness = ThemeMode.system.name;
+          myself.themeMode = ThemeMode.system;
         } else {
-          appDataProvider.brightness = ThemeMode.dark.name;
+          myself.themeMode = ThemeMode.dark;
         }
       },
       children: const <Widget>[
@@ -88,7 +86,7 @@ class _BrightnessPickerState extends State<BrightnessPicker> {
 
   @override
   void dispose() {
-    appDataProvider.removeListener(_update);
+    myself.removeListener(_update);
     super.dispose();
   }
 }

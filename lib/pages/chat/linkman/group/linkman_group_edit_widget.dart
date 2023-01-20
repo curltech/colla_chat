@@ -1,7 +1,7 @@
 import 'package:colla_chat/entity/chat/contact.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -194,7 +194,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
         headerStyle: S2ModalHeaderStyle(
           elevation: 0,
           centerTitle: false,
-          backgroundColor: appDataProvider.themeData.colorScheme.primary,
+          backgroundColor: myself.primary,
           textStyle: const TextStyle(color: Colors.white),
         ),
       ),
@@ -202,7 +202,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
         opacity: 0.5,
         elevation: 0,
         //titleStyle: const TextStyle(color: Colors.white),
-        color: appDataProvider.themeData.colorScheme.primary,
+        color: myself.primary,
       ),
       tileBuilder: (context, state) {
         return S2Tile.fromState(
@@ -220,7 +220,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
                 _buildGroupOwnerChoices();
               });
             },
-            chipColor: appDataProvider.themeData.colorScheme.primary,
+            chipColor: myself.primary,
           ),
         );
       },
@@ -269,7 +269,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
         headerStyle: S2ModalHeaderStyle(
           elevation: 0,
           centerTitle: false,
-          backgroundColor: appDataProvider.themeData.colorScheme.primary,
+          backgroundColor: myself.primary,
           textStyle: const TextStyle(color: Colors.white),
         ),
       ),
@@ -277,7 +277,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
         opacity: 0.5,
         elevation: 0,
         //titleStyle: const TextStyle(color: Colors.white),
-        color: appDataProvider.themeData.colorScheme.primary,
+        color: myself.primary,
       ),
       tileBuilder: (context, state) {
         return S2Tile.fromState(
@@ -294,7 +294,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
                 group!.groupOwnerPeerId = null;
               });
             },
-            chipColor: appDataProvider.themeData.colorScheme.primary,
+            chipColor: myself.primary,
           ),
         );
       },

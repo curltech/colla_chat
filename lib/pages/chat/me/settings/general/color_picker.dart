@@ -1,5 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:flex_color_picker/flex_color_picker.dart' as flex;
 import 'package:flutter/material.dart';
 
@@ -24,11 +25,11 @@ class _ColorPickerState extends State<ColorPicker> {
   }
 
   Future<bool> colorPickerDialog() async {
-    ThemeData themeData = appDataProvider.themeData;
+    ThemeData themeData = myself.themeData;
     return flex.ColorPicker(
-      color: appDataProvider.seedColor,
+      color: myself.seedColor,
       onColorChanged: (Color color) {
-        appDataProvider.seedColor = color;
+        myself.seedColor = color;
       },
       width: 32,
       height: 32,
@@ -81,12 +82,12 @@ class _ColorPickerState extends State<ColorPicker> {
       width: 32,
       height: 32,
       borderRadius: 4,
-      color: appDataProvider.seedColor,
+      color: myself.seedColor,
       onSelectFocus: false,
       onSelect: () async {
-        Color seedColor = appDataProvider.seedColor;
+        Color seedColor = myself.seedColor;
         if (!(await colorPickerDialog())) {
-          appDataProvider.seedColor = seedColor;
+          myself.seedColor = seedColor;
         }
       },
     );

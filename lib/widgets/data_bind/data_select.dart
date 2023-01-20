@@ -1,5 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -174,7 +174,7 @@ class SmartSelectUtil {
             chipOnDelete: (i) {
               chipOnDelete(i);
             },
-            chipColor: appDataProvider.themeData.colorScheme.primary,
+            chipColor: myself.primary,
           ),
         );
       };
@@ -198,7 +198,7 @@ class SmartSelectUtil {
         headerStyle: const S2ModalHeaderStyle(
           elevation: 0,
           centerTitle: false,
-          // backgroundColor: appDataProvider.themeData.colorScheme.primary,
+          // backgroundColor: myself.primary,
           // textStyle: const TextStyle(color: Colors.white),
           // iconTheme: const IconThemeData(color: Colors.white),
         ),
@@ -207,7 +207,7 @@ class SmartSelectUtil {
         opacity: 0.5,
         elevation: 0,
         titleStyle: const TextStyle(color: Colors.white),
-        color: appDataProvider.themeData.colorScheme.primary,
+        color: myself.primary,
       ),
       modalHeaderBuilder: modalHeaderBuilder,
       modalFooterBuilder: modalFooterBuilder,
@@ -250,7 +250,7 @@ class SmartSelectUtil {
         selectedValue.add(item.value);
       }
     }
-    var primary = appDataProvider.themeData.colorScheme.primary;
+    var primary = myself.primary;
     Widget Function(BuildContext context, S2MultiState<T> state)? tileBuilder;
     if (chipOnDelete != null) {
       tileBuilder = (context, state) {
@@ -269,7 +269,7 @@ class SmartSelectUtil {
             chipOnDelete: (i) {
               chipOnDelete(i);
             },
-            chipColor: appDataProvider.themeData.colorScheme.primary,
+            chipColor: myself.primary,
           ),
         );
       };
@@ -292,7 +292,7 @@ class SmartSelectUtil {
         headerStyle: const S2ModalHeaderStyle(
           elevation: 0,
           centerTitle: false,
-          //backgroundColor: appDataProvider.themeData.colorScheme.primary,
+          //backgroundColor: myself.primary,
           // textStyle: const TextStyle(color: Colors.white),
           // iconTheme: const IconThemeData(color: Colors.white),
         ),
@@ -360,7 +360,7 @@ class MultiSelectUtil {
         selectedValue.add(item.value);
       }
     }
-    Color primary = appDataProvider.themeData.colorScheme.primary;
+    Color primary = myself.primary;
     return MultiSelectDialogField<T>(
       items: options,
       onConfirm: onConfirm,
@@ -436,7 +436,7 @@ class MultiSelectUtil {
         selectedValue.add(item.value);
       }
     }
-    Color primary = appDataProvider.themeData.colorScheme.primary;
+    Color primary = myself.primary;
     Widget dialog = MultiSelectDialog<T>(
       items: options,
       onConfirm: onConfirm,

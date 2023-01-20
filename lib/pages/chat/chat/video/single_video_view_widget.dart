@@ -1,4 +1,4 @@
-import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -180,7 +180,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         localVideoRenderController.videoRender != null) {
       selected = widget.render.id == localVideoRenderController.videoRender!.id;
     }
-    var primary = appDataProvider.themeData.colorScheme.primary;
+    var primary = myself.primary;
     return Container(
       decoration: selected
           ? BoxDecoration(border: Border.all(width: 1, color: Colors.yellow))

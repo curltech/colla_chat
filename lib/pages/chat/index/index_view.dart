@@ -1,6 +1,6 @@
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
-import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_dialin_widget.dart';
 import 'package:colla_chat/pages/chat/index/bottom_bar.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
@@ -14,7 +14,6 @@ import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
-
 
 class IndexView extends StatefulWidget {
   final String title;
@@ -39,6 +38,8 @@ class _IndexViewState extends State<IndexView>
   void initState() {
     super.initState();
     globalChatMessageController.addListener(_update);
+    myself.addListener(_update);
+    appDataProvider.addListener(_update);
   }
 
   _buildVideoChatMessage(BuildContext context) {
@@ -140,17 +141,19 @@ class _IndexViewState extends State<IndexView>
   }
 
   _update() async {
-    ChatMessage? chatMessage = globalChatMessageController.chatMessage;
-    if (chatMessage != null) {
-      if (chatMessage.subMessageType == ChatMessageSubType.chat.name) {
-        setState(() {
-          chatMessageVisible = true;
-        });
-      } else if (chatMessage.subMessageType ==
-          ChatMessageSubType.videoChat.name) {
-        setState(() {
-          videoChatVisible = true;
-        });
+    if (mounted) {
+      ChatMessage? chatMessage = globalChatMessageController.chatMessage;
+      if (chatMessage != null) {
+        if (chatMessage.subMessageType == ChatMessageSubType.chat.name) {
+          setState(() {
+            chatMessageVisible = true;
+          });
+        } else if (chatMessage.subMessageType ==
+            ChatMessageSubType.videoChat.name) {
+          setState(() {
+            videoChatVisible = true;
+          });
+        }
       }
     }
   }
@@ -186,8 +189,8 @@ class _IndexViewState extends State<IndexView>
           Center(
               child: platformWidgetFactory.buildSizedBox(
                   child: widget.indexWidget,
-                  height: appDataProvider.mobileSize.height,
-                  width: appDataProvider.mobileSize.width)),
+                  height: appDataProvider.actualSize.height,
+                  width: appDataProvider.actualSize.width)),
           _buildChatMessage(context),
           _buildVideoChatMessage(context)
         ])),
@@ -210,6 +213,8 @@ class _IndexViewState extends State<IndexView>
   @override
   void dispose() {
     globalChatMessageController.removeListener(_update);
+    myself.removeListener(_update);
+    appDataProvider.removeListener(_update);
     super.dispose();
   }
 }

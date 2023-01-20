@@ -40,7 +40,6 @@ class ServiceLocator {
   ///初始化并注册服务类，在应用启动后调用，返回值是是否自动登录成功
   static Future<bool> init() async {
     await platformParams.init();
-    await appDataProvider.init();
     HttpOverrides.global = PlatformHttpOverrides();
     services['stockAccountService'] = stockAccountService;
     services['chainAppService'] = chainAppService;

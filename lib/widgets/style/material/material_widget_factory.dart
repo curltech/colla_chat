@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:badges/badges.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/routers/routes.dart';
@@ -1448,9 +1449,9 @@ class MaterialWidgetFactory extends WidgetFactory {
         (context) {
           return AppLocalizations.t('Welcome to CollaChat');
         };
-    themeMode = themeMode ?? appDataProvider.themeMode;
-    theme = theme ?? appDataProvider.themeData;
-    //darkTheme = darkTheme ?? appDataProvider.darkThemeData;
+    themeMode = themeMode ?? myself.themeMode;
+    theme = theme ?? myself.themeData;
+    darkTheme = darkTheme ?? myself.darkThemeData;
     onGenerateRoute = onGenerateRoute ?? Application.router.generator;
     // AppLocalizations.localizationsDelegates,
     localizationsDelegates = const [
@@ -1466,7 +1467,7 @@ class MaterialWidgetFactory extends WidgetFactory {
       Locale('ja', 'JP'),
       Locale('ko', 'KR'),
     ];
-    locale = locale ?? Provider.of<AppDataProvider>(context).getLocale();
+    locale = locale ?? myself.locale;
     return MaterialApp(
       key: key,
       title: title,

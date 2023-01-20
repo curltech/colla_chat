@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:bubble/bubble.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
-import 'package:colla_chat/entity/dht/myself.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/message/message_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
@@ -115,7 +115,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
               margin: const BubbleEdges.only(top: 1),
               nip: widget.isMyself ? BubbleNip.rightTop : BubbleNip.leftTop,
               color: widget.isMyself
-                  ? appDataProvider.themeData.colorScheme.primary
+                  ? myself.primary
                   : Colors.white,
               padding: const BubbleEdges.all(0),
               child: body),
@@ -143,7 +143,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
             constraints: const BoxConstraints(maxWidth: 300.0),
             decoration: BoxDecoration(
               color: widget.isMyself
-                  ? appDataProvider.themeData.colorScheme.primary
+                  ? myself.primary
                   : Colors.white,
               borderRadius: BorderRadius.only(
                 bottomLeft: const Radius.circular(8.0),

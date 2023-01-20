@@ -1,6 +1,6 @@
 import 'package:card_swiper/card_swiper.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
 
 class LoadingBackgroundImage {
@@ -53,11 +53,14 @@ class LoadingBackgroundImage {
     }
   }
 
-  Widget? get currentBackgroundImage {
-    if (appDataProvider.brightness == Brightness.light.name) {
+  Widget? currentBackgroundImage(BuildContext? context) {
+    if (context == null) {
       return loadingBackgroundImage.lightChildren[currentIndex];
     }
-    if (appDataProvider.brightness == Brightness.dark.name) {
+    if (myself.getBrightness(context) == Brightness.light) {
+      return loadingBackgroundImage.lightChildren[currentIndex];
+    }
+    if (myself.getBrightness(context) == Brightness.dark) {
       return loadingBackgroundImage.darkChildren[currentIndex];
     }
 
@@ -87,11 +90,12 @@ class _LoadingState extends State<Loading> {
   @override
   void initState() {
     super.initState();
-    appDataProvider.addListener(_update);
+    myself.addListener(_update);
     int count = loadingBackgroundImage.lightBackgroudImages.length;
-    if (appDataProvider.brightness == Brightness.dark.name) {
-      count = loadingBackgroundImage.darkBackgroudImages.length;
-    }
+    ///在initState中调用context出错
+    // if (myself.getBrightness(context) == Brightness.dark) {
+    //   count = loadingBackgroundImage.darkBackgroudImages.length;
+    // }
 
     if (widget.autoPlay) {
       bool positive = true;
@@ -124,10 +128,10 @@ class _LoadingState extends State<Loading> {
   @override
   Widget build(BuildContext context) {
     List<Widget> children = [];
-    if (appDataProvider.brightness == Brightness.light.name) {
+    if (myself.getBrightness(context) == Brightness.light) {
       children = loadingBackgroundImage.lightChildren;
     }
-    if (appDataProvider.brightness == Brightness.dark.name) {
+    if (myself.getBrightness(context) == Brightness.dark) {
       children = loadingBackgroundImage.darkChildren;
     }
     return Swiper(
@@ -145,7 +149,7 @@ class _LoadingState extends State<Loading> {
 
   @override
   void dispose() {
-    appDataProvider.removeListener(_update);
+    myself.removeListener(_update);
     super.dispose();
   }
 }

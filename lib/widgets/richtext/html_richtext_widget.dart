@@ -1,6 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -31,14 +32,14 @@ class _HtmlRichTextWidgetState extends State<HtmlRichTextWidget> {
       htmlEditorOptions: HtmlEditorOptions(
         hint: AppLocalizations.t('Your text here...'),
         shouldEnsureVisible: true,
-        darkMode: appDataProvider.brightness == Brightness.dark.name,
+        darkMode: myself.getBrightness(context) == Brightness.dark,
         //initialText: "<p>text content initial, if any</p>",
       ),
       htmlToolbarOptions: HtmlToolbarOptions(
         toolbarPosition: ToolbarPosition.aboveEditor,
         //by default
         toolbarType: ToolbarType.nativeScrollable,
-        buttonColor: appDataProvider.themeData.colorScheme.primary,
+        buttonColor: myself.primary,
         //by default
         onButtonPressed:
             (ButtonType type, bool? status, Function? updateStatus) {

@@ -1,4 +1,4 @@
-import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:flutter/material.dart';
 import 'package:mimecon/mimecon.dart';
 
@@ -22,7 +22,7 @@ class FileMessage extends StatelessWidget {
     var tile = ListTile(
       leading: Mimecon(
         mimetype: mimeType,
-        color: appDataProvider.themeData.colorScheme.primary,
+        color: myself.primary,
         size: 36,
         isOutlined: true,
       ),

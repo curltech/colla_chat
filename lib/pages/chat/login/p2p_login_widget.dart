@@ -1,5 +1,4 @@
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -77,7 +76,6 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
   }
 
   _login(Map<String, dynamic> values) {
-    appDataProvider.saveAppParams();
     String credential = values[credentialName];
     String password = values[passwordName];
     myselfPeerService.login(credential, password).then((bool loginStatus) {

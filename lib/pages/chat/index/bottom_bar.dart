@@ -1,3 +1,4 @@
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
@@ -40,10 +41,7 @@ class _BottomBarState extends State<BottomBar> {
               label: indexWidgetProvider.getLabel(3)),
         ],
         currentIndex: indexWidgetProvider.currentMainIndex,
-        selectedItemColor: Provider.of<AppDataProvider>(context)
-            .themeData
-            ?.colorScheme
-            .primary,
+        selectedItemColor: myself.primary,
         unselectedItemColor: Colors.grey,
         selectedFontSize: 14.0,
         unselectedFontSize: 14.0,

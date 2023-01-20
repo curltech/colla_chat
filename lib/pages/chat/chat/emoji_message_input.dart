@@ -1,3 +1,4 @@
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
@@ -62,7 +63,7 @@ class _EmojiMessageInputWidgetState extends State<EmojiMessageInputWidget> {
   }
 
   Widget _buildEmojiPicker(BuildContext context) {
-    Color primary = appDataProvider.themeData!.colorScheme.primary;
+    Color primary = myself.primary;
     return SizedBox(
         height: widget.height,
         child: EmojiPicker(

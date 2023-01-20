@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+
 import '../base.dart';
 
 /// 节点的附属信息，包括个性化的配置
@@ -12,14 +14,15 @@ class PeerProfile extends StatusEntity {
   String? username;
 
   // 个性化配置
-  String? locale;
-  String? primaryColor;
-  String? secondaryColor;
-  String? brightness;
+  String locale = 'zh_CN';
+  int seedColor = Colors.cyan.value;
+  int darkSeedColor = Colors.cyan.value;
+  String themeMode = ThemeMode.system.name;
+  String? fontFamily;
   bool udpSwitch = false;
   bool downloadSwitch = false;
   bool localDataCryptoSwitch = false;
-  bool autoLoginSwitch = false;
+  bool autoLogin = false;
   bool developerOption = false;
   String? logLevel;
   String? lastSyncTime;
@@ -51,9 +54,9 @@ class PeerProfile extends StatusEntity {
         locale = json['locale'],
         userId = json['userId'],
         username = json['username'],
-        primaryColor = json['primaryColor'],
-        secondaryColor = json['secondaryColor'],
-        brightness = json['brightness'],
+        seedColor = json['seedColor'] ?? Colors.cyan.value,
+        darkSeedColor = json['darkSeedColor'] ?? Colors.cyan.value,
+        themeMode = json['themeMode'],
         udpSwitch =
             json['udpSwitch'] == true || json['udpSwitch'] == 1 ? true : false,
         downloadSwitch =
@@ -64,10 +67,8 @@ class PeerProfile extends StatusEntity {
                 json['localDataCryptoSwitch'] == 1
             ? true
             : false,
-        autoLoginSwitch =
-            json['autoLoginSwitch'] == true || json['autoLoginSwitch'] == 1
-                ? true
-                : false,
+        autoLogin =
+            json['autoLogin'] == true || json['autoLogin'] == 1 ? true : false,
         developerOption =
             json['developerOption'] == true || json['developerOption'] == 1
                 ? true
@@ -99,13 +100,13 @@ class PeerProfile extends StatusEntity {
       'locale': locale,
       'userId': userId,
       'username': username,
-      'primaryColor': primaryColor,
-      'secondaryColor': secondaryColor,
-      'brightness': brightness,
+      'seedColor': seedColor,
+      'darkSeedColor': darkSeedColor,
+      'themeMode': themeMode,
       'udpSwitch': udpSwitch,
       'downloadSwitch': downloadSwitch,
       'localDataCryptoSwitch': localDataCryptoSwitch,
-      'autoLoginSwitch': autoLoginSwitch,
+      'autoLogin': autoLogin,
       'developerOption': developerOption,
       'logLevel': logLevel,
       'lastSyncTime': lastSyncTime,

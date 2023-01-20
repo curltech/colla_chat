@@ -1,5 +1,5 @@
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/richtext/quill_util.dart';
@@ -82,7 +82,7 @@ class _VisualRichTextWidgetState extends State<VisualRichTextWidget> {
         expands: true,
         padding: EdgeInsets.zero,
         placeholder: AppLocalizations.t(''),
-        locale: appDataProvider.getLocale(),
+        locale: myself.locale,
       ),
     );
   }
@@ -102,7 +102,7 @@ class _VisualRichTextWidgetState extends State<VisualRichTextWidget> {
       multiRowsDisplay: true,
       showDirection: true,
       showMarkers: true,
-      locale: appDataProvider.getLocale(),
+      locale: myself.locale,
     );
   }
 

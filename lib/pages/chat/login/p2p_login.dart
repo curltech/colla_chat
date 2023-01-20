@@ -5,6 +5,7 @@ import 'package:colla_chat/pages/chat/login/p2p_login_widget.dart';
 import 'package:colla_chat/pages/chat/login/p2p_register_widget.dart';
 import 'package:colla_chat/pages/chat/login/p2p_setting_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:flutter/material.dart';
 
@@ -30,9 +31,19 @@ class P2pLogin extends StatefulWidget {
 }
 
 class _P2pLoginState extends State<P2pLogin> {
+  int index = 0;
+
   @override
   void initState() {
     super.initState();
+    myself.addListener(_update);
+    appDataProvider.addListener(_update);
+  }
+
+  _update() {
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   _animateToPage(int index) {
@@ -48,7 +59,10 @@ class _P2pLoginState extends State<P2pLogin> {
       itemBuilder: (BuildContext context, int index) {
         return widget._children[index];
       },
-      index: 0,
+      onIndexChanged: (int index) {
+        this.index = index;
+      },
+      index: index,
     );
     var appBar = AppBar(
       elevation: 0.0,
@@ -79,8 +93,8 @@ class _P2pLoginState extends State<P2pLogin> {
     );
     var workspace = Center(
         child: platformWidgetFactory.buildSizedBox(
-      height: appDataProvider.mobileSize.height,
-      width: appDataProvider.mobileSize.width,
+      height: appDataProvider.actualSize.height,
+      width: appDataProvider.actualSize.width,
       child: pageView,
     ));
     return Scaffold(
@@ -92,5 +106,12 @@ class _P2pLoginState extends State<P2pLogin> {
           ),
           workspace
         ]));
+  }
+
+  @override
+  void dispose() {
+    myself.removeListener(_update);
+    appDataProvider.removeListener(_update);
+    super.dispose();
   }
 }

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
@@ -104,17 +105,19 @@ class CollaChatApp extends StatelessWidget {
         providers: <SingleChildWidget>[
           ChangeNotifierProvider.value(value: appDataProvider),
           ChangeNotifierProvider.value(value: indexWidgetProvider),
+          ChangeNotifierProvider.value(value: myself),
         ],
-        child: Consumer<AppDataProvider>(
-            builder: (BuildContext context, appDataProvider, Widget? child) {
+        child: Consumer<Myself>(
+            builder: (BuildContext context, myself, Widget? child) {
           return MaterialApp(
             onGenerateTitle: (context) {
               return AppLocalizations.t('Welcome to CollaChat');
             },
             //title: 'Welcome to CollaChat',
             debugShowCheckedModeBanner: false,
-            theme: appDataProvider.themeData,
-            //darkTheme: appDataProvider.themeData,
+            theme: myself.themeData,
+            darkTheme: myself.darkThemeData,
+            themeMode: myself.themeMode,
 
             ///Scaffold 是 Material 库中提供的一个 widget，它提供了默认的导航栏、标题和包含主屏幕 widget 树的 body 属性
             home: loginStatus ? indexView : p2pLogin,
@@ -156,7 +159,7 @@ class CollaChatApp extends StatelessWidget {
             //     return _locale;
             //   }
             // },
-            locale: appDataProvider.getLocale(),
+            locale: myself.locale,
           );
         }));
   }

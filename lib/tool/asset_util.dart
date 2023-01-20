@@ -20,7 +20,7 @@ class AssetUtil {
     //   pathThumbnailSize: const ThumbnailSize(80, 80),
     //   gridCount: 4,
     //   selectedAssets: [],
-    //   themeColor: appDataProvider.themeData.colorScheme.primary,
+    //   themeColor: myself.primary,
     // );
     final List<AssetEntity>? result = await AssetPicker.pickAssets(
       context,
