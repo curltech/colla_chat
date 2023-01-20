@@ -140,6 +140,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   }
 
   _buildGroupDataListController() async {
+    widget.groupDataListController.controllers.clear();
     Map<TileData, List<TileData>> tileData = {};
     var linkmenChatSummary = linkmanChatSummaryController.data;
     List<TileData> tiles = [];
@@ -171,7 +172,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
       }
     }
 
-    tileData[TileData(title: AppLocalizations.t('Linkman'))] = tiles;
+    tileData[TileData(title: 'Linkman')] = tiles;
     widget.groupDataListController.addAll(tileData: tileData);
 
     var groupChatSummary = groupChatSummaryController.data;
@@ -200,18 +201,18 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         tiles.add(tile);
       }
     }
-    tileData[TileData(title: AppLocalizations.t('Group'))] = tiles;
+    tileData[TileData(title: 'Group')] = tiles;
     widget.groupDataListController.addAll(tileData: tileData);
   }
 
   _onTap(int index, String title, {String? subtitle, TileData? group}) {
     if (group != null) {
       ChatSummary? current;
-      if (group.title == AppLocalizations.t('Linkman')) {
+      if (group.title == 'Linkman') {
         linkmanChatSummaryController.currentIndex = index;
         current = linkmanChatSummaryController.current;
       }
-      if (group.title == AppLocalizations.t('Group')) {
+      if (group.title == 'Group') {
         groupChatSummaryController.currentIndex = index;
         current = groupChatSummaryController.current;
       }

@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+const double opacity =0.5;
 //xs (extra small),
 const xsSize = Size(16, 16);
 //sm (small),

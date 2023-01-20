@@ -1,4 +1,6 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
@@ -86,6 +88,7 @@ class _GroupDataListViewState extends State<GroupDataListView> {
   initState() {
     super.initState();
     widget.controller.addListener(_update);
+    myself.addListener(_update);
   }
 
   _update() {
@@ -137,7 +140,7 @@ class _GroupDataListViewState extends State<GroupDataListView> {
       maintainState: true,
       leading: leading,
       title: Text(
-        tile.title,
+        AppLocalizations.t(tile.title),
       ),
       subtitle: tile.subtitle != null
           ? Text(
@@ -176,6 +179,7 @@ class _GroupDataListViewState extends State<GroupDataListView> {
   @override
   void dispose() {
     widget.controller.removeListener(_update);
+    myself.removeListener(_update);
     super.dispose();
   }
 }

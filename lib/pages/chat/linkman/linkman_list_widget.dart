@@ -97,6 +97,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
 
   //将linkman和group数据转换从列表显示数据
   _buildGroupDataListController() {
+    widget.groupDataListController.controllers.clear();
     var linkmen = linkmanController.data;
     List<TileData> tiles = [];
     if (linkmen.isNotEmpty) {

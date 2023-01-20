@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
@@ -193,18 +194,18 @@ class SmartSelectUtil {
         useFilter: modalFilter,
         filterAuto: modalFilterAuto,
         style: S2ModalStyle(
-          backgroundColor: Colors.grey.withOpacity(0.5),
+          backgroundColor: Colors.grey.withOpacity(opacity),
         ),
-        headerStyle: const S2ModalHeaderStyle(
+        headerStyle: S2ModalHeaderStyle(
           elevation: 0,
           centerTitle: false,
-          // backgroundColor: myself.primary,
-          // textStyle: const TextStyle(color: Colors.white),
+          backgroundColor: myself.primary,
+          textStyle: const TextStyle(color: Colors.white),
           // iconTheme: const IconThemeData(color: Colors.white),
         ),
       ),
       choiceStyle: S2ChoiceStyle(
-        opacity: 0.5,
+        opacity: opacity,
         elevation: 0,
         titleStyle: const TextStyle(color: Colors.white),
         color: myself.primary,
