@@ -24,12 +24,32 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 ///好友的汇总控制器，每当消息汇总表的数据有变化时更新控制器
-final DataListController<ChatSummary> linkmanChatSummaryController =
-    DataListController<ChatSummary>();
+class LinkmanChatSummaryController extends DataListController<ChatSummary> {
+  Future<void> refresh() async {
+    List<ChatSummary> chatSummary =
+        await chatSummaryService.findByPartyType(PartyType.linkman.name);
+    if (chatSummary.isNotEmpty) {
+      replaceAll(chatSummary);
+    }
+  }
+}
+
+final LinkmanChatSummaryController linkmanChatSummaryController =
+    LinkmanChatSummaryController();
+
+class GroupChatSummaryController extends DataListController<ChatSummary> {
+  Future<void> refresh() async {
+    List<ChatSummary> chatSummary =
+        await chatSummaryService.findByPartyType(PartyType.group.name);
+    if (chatSummary.isNotEmpty) {
+      replaceAll(chatSummary);
+    }
+  }
+}
 
 ///群的汇总控制器
-final DataListController<ChatSummary> groupChatSummaryController =
-    DataListController<ChatSummary>();
+final GroupChatSummaryController groupChatSummaryController =
+    GroupChatSummaryController();
 
 /// 聊天的主页面，展示可以聊天的目标对象，可以是一个人，或者是一个群
 /// 选择好目标点击进入具体的聊天页面ChatMessage
@@ -39,21 +59,7 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
   final ChatMessageView chatMessageView = ChatMessageView();
 
   ChatListWidget({Key? key}) : super(key: key) {
-    Websocket? websocket = websocketPool.getDefault();
-    chatSummaryService
-        .findByPartyType(PartyType.linkman.name)
-        .then((List<ChatSummary> chatSummary) {
-      if (chatSummary.isNotEmpty) {
-        linkmanChatSummaryController.replaceAll(chatSummary);
-      }
-    });
-    chatSummaryService
-        .findByPartyType(PartyType.group.name)
-        .then((List<ChatSummary> chatSummary) {
-      if (chatSummary.isNotEmpty) {
-        groupChatSummaryController.replaceAll(chatSummary);
-      }
-    });
+    websocketPool.getDefault();
   }
 
   @override
@@ -84,7 +90,9 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     super.initState();
     _reconnect();
     linkmanChatSummaryController.addListener(_update);
+    linkmanChatSummaryController.refresh();
     groupChatSummaryController.addListener(_update);
+    groupChatSummaryController.refresh();
 
     var indexWidgetProvider =
         Provider.of<IndexWidgetProvider>(context, listen: false);
