@@ -115,8 +115,9 @@ class LinkmanService extends PeerPartyService<Linkman> {
       if (linkmanStatus != null) {
         linkman.status = linkmanStatus.name;
       }
+      linkman.id = null;
       await insert(linkman);
-      linkmen.remove(peerId);
+      linkmen[peerId] = linkman;
       await chatSummaryService.upsertByLinkman(linkman);
     } else {
       int? id = linkman.id;
@@ -435,16 +436,16 @@ class GroupService extends PeerPartyService<Group> {
     await groupMemberService.delete(entity: {
       'groupId': group.id,
     });
-    await groupService.delete(entity:{
+    await groupService.delete(entity: {
       'groupId': group.id,
     });
-    await chatMessageService.delete(entity:{
+    await chatMessageService.delete(entity: {
       'receiverPeerId': group.id,
     });
-    await chatMessageService.delete(entity:{
+    await chatMessageService.delete(entity: {
       'senderPeerId': group.id,
     });
-    await chatSummaryService.delete(entity:{
+    await chatSummaryService.delete(entity: {
       'peerId': group.id,
     });
     List<ChatMessage> chatMessages =
@@ -463,19 +464,19 @@ class GroupService extends PeerPartyService<Group> {
     String json = CryptoUtil.utf8ToString(data);
     Map<String, dynamic> map = JsonUtil.toJson(json);
     Group group = Group.fromJson(map);
-    await groupMemberService.delete(entity:{
+    await groupMemberService.delete(entity: {
       'groupId': group.id,
     });
-    await groupService.delete(entity:{
+    await groupService.delete(entity: {
       'groupId': group.id,
     });
-    await chatMessageService.delete(entity:{
+    await chatMessageService.delete(entity: {
       'receiverPeerId': group.id,
     });
-    await chatMessageService.delete(entity:{
+    await chatMessageService.delete(entity: {
       'senderPeerId': group.id,
     });
-    await chatSummaryService.delete(entity:{
+    await chatSummaryService.delete(entity: {
       'peerId': group.id,
     });
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
@@ -554,7 +555,7 @@ class GroupService extends PeerPartyService<Group> {
     for (var map in maps) {
       GroupMember groupMember = GroupMember.fromJson(map);
       groupMembers.add(groupMember);
-      groupMemberService.delete(entity:{
+      groupMemberService.delete(entity: {
         'memberPeerId': groupMember.memberPeerId,
         'groupId': groupMember.groupId
       });
@@ -574,7 +575,7 @@ class GroupService extends PeerPartyService<Group> {
     for (var map in maps) {
       GroupMember groupMember = GroupMember.fromJson(map);
       groupMembers.add(groupMember);
-      groupMemberService.delete(entity:{
+      groupMemberService.delete(entity: {
         'memberPeerId': groupMember.memberPeerId,
         'groupId': groupMember.groupId
       });
@@ -748,7 +749,7 @@ class ContactService extends PeerPartyService<Contact> {
           lastContacts.add(contact);
         } else {
           // 如果通讯录不存在，则本地库删除
-          await delete(entity:contact);
+          await delete(entity: contact);
         }
       }
     }
