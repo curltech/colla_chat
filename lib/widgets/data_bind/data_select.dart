@@ -194,7 +194,7 @@ class SmartSelectUtil {
         useFilter: modalFilter,
         filterAuto: modalFilterAuto,
         style: S2ModalStyle(
-          backgroundColor: Colors.grey.withOpacity(opacity),
+          backgroundColor: Colors.grey.withOpacity(mdOpacity),
         ),
         headerStyle: S2ModalHeaderStyle(
           elevation: 0,
@@ -205,7 +205,7 @@ class SmartSelectUtil {
         ),
       ),
       choiceStyle: S2ChoiceStyle(
-        opacity: opacity,
+        opacity: mdOpacity,
         elevation: 0,
         titleStyle: const TextStyle(color: Colors.white),
         color: myself.primary,
