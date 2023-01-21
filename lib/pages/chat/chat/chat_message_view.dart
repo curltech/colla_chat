@@ -83,8 +83,9 @@ class _ChatMessageViewState extends State<ChatMessageView> {
           MessageStatus.received.name,
           MessageStatus.send.name
         ]);
-    await chatSummaryService.update({'unreadNumber': 0},
-        where: 'peerId=?', whereArgs: [peerId]);
+    Map<String, dynamic> entity = {'unreadNumber': 0};
+    await chatSummaryService
+        .update(entity, where: 'peerId=?', whereArgs: [peerId]);
   }
 
   ///初始化，webrtc如果没有连接，尝试连接
