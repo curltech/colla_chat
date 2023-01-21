@@ -3,7 +3,9 @@ import 'package:colla_chat/entity/dht/peerendpoint.dart';
 
 /// 配置文件的定位器
 final Map<String, PeerEndpoint> nodeAddressOptions = {
-  'default': PeerEndpoint('default',
+  'default': PeerEndpoint(
+      name: 'default',
+      priority: 0,
       wsConnectAddress: 'wss://localhost:9090/websocket',
       httpConnectAddress: 'https://localhost:9090',
       peerId: '12D3KooWJvWPnHcYPEG3oPwDcobfc2wzWJsgKV7fj5LC7qx15ihS',
@@ -18,7 +20,8 @@ final Map<String, PeerEndpoint> nodeAddressOptions = {
         //   'url': 'turn:localhost:3478',
         // }
       ]),
-  'China-Shenzhen': PeerEndpoint('China-Shenzhen',
+  'China-Shenzhen': PeerEndpoint(
+      name: 'China-Shenzhen',
       wsConnectAddress: 'wss://sz.curltech.com.cn:9090/websocket',
       httpConnectAddress: 'https://sz.curltech.com.cn:9090',
       peerId: '12D3KooWFbyAYotJ3VtuDwCt1pkGdxGVxiW8PfiXsZ1NMqe1cKxJ',
@@ -32,7 +35,8 @@ final Map<String, PeerEndpoint> nodeAddressOptions = {
           'urls': 'turn:sz.curltech.com.cn:3478',
         }
       ]),
-  'China-Hangzhou': PeerEndpoint('China-Hangzhou',
+  'China-Hangzhou': PeerEndpoint(
+      name: 'China-Hangzhou',
       wsConnectAddress: 'wss://hz.curltech.com.cn:9090/websocket',
       httpConnectAddress: 'https://hz.curltech.com.cn:9090',
       peerId: '12D3KooWDTYWJ7bHXJFcEwq1NBJ2majgRjrY2xHjoMzSedkS3jgN',
@@ -46,7 +50,8 @@ final Map<String, PeerEndpoint> nodeAddressOptions = {
           'urls': 'turn:hz.curltech.com.cn:3478',
         }
       ]),
-  'South Korea': PeerEndpoint('South Korea',
+  'South Korea': PeerEndpoint(
+      name: 'South Korea',
       wsConnectAddress: 'wss://kr.curltech.cc:9090/websocket',
       httpConnectAddress: 'https://kr.curltech.cc:9090',
       peerId: '12D3KooWJk2AP2JcawJgScGPqtHXMaDwYUDBxNMjyGEEwPH3ghrD',

@@ -40,7 +40,7 @@ class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
           tooltip: AppLocalizations.t('Refresh')),
       IconButton(
           onPressed: () {
-            var current = PeerEndpoint('', peerId: '');
+            var current = PeerEndpoint(name: '', peerId: '');
             current.state = EntityState.insert;
             peerEndpointController.add(current);
           },

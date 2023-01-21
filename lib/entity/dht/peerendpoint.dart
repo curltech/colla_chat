@@ -12,11 +12,13 @@ class PeerEndpoint extends PeerEntity {
   String? libp2pConnectAddress;
   String? iceServers;
 
-  PeerEndpoint(String name,
-      {required String peerId,
-      String? wsConnectAddress,
-      String? httpConnectAddress,
-      String? libp2pConnectAddress,
+  PeerEndpoint(
+      {required String name,
+      required String peerId,
+      this.wsConnectAddress,
+      this.httpConnectAddress,
+      this.libp2pConnectAddress,
+      this.priority = 1,
       List<Map<String, String>>? iceServers})
       : super(peerId, name) {
     if (iceServers != null) {
