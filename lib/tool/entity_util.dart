@@ -38,10 +38,17 @@ class EntityUtil {
 
   static updateTimestamp(dynamic entity) {
     var currentDate = DateUtil.currentDate();
+    var ownerPeerId = myself.peerId;
     if (entity is Map) {
       entity['updateDate'] = currentDate;
+      if (ownerPeerId != null) {
+        entity['ownerPeerId'] = ownerPeerId;
+      }
     } else {
       entity.updateDate = currentDate;
+      if (ownerPeerId != null) {
+        entity.ownerPeerId = ownerPeerId;
+      }
     }
   }
 

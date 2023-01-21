@@ -6,6 +6,7 @@ import 'package:colla_chat/p2p/chain/action/findclient.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -98,11 +99,11 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
           var peerId = peerClient.peerId;
           Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
           bool isStranger = false;
-          if (linkman != null &&
+          if (linkman == null ||
               linkman.status == LinkmanStatus.stranger.name) {
             isStranger = true;
           }
-          Widget suffix = Text(AppLocalizations.t(linkman!.status!));
+          Widget suffix = const Spacer();
           if (isStranger) {
             suffix = IconButton(
               iconSize: 24.0,

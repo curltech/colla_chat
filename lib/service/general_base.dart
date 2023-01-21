@@ -294,7 +294,7 @@ abstract class GeneralBaseService<T> {
     String? where,
     List<Object>? whereArgs,
   }) async {
-    //EntityUtil.updateTimestamp(entity);
+    EntityUtil.updateTimestamp(entity);
     whereArgs = whereArgs ?? [];
     where = _buildWhere(where, whereArgs);
     Map<String, dynamic> json = await encrypt(entity);
