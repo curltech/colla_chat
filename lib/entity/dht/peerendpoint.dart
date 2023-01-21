@@ -18,7 +18,7 @@ class PeerEndpoint extends PeerEntity {
       String? httpConnectAddress,
       String? libp2pConnectAddress,
       List<Map<String, String>>? iceServers})
-      : super(name, peerId) {
+      : super(peerId, name) {
     if (iceServers != null) {
       this.iceServers = JsonUtil.toJsonString(iceServers);
     }
