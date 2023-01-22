@@ -76,7 +76,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
   }
 
   Future<Widget> findAvatarImageWidget(String peerId) async {
-    Widget image = defaultImage;
+    Widget image = mdAppImage;
     var linkman = await findCachedOneByPeerId(peerId);
     if (linkman != null && linkman.avatarImage != null) {
       image = linkman.avatarImage!;

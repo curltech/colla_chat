@@ -114,9 +114,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
               stick: true,
               margin: const BubbleEdges.only(top: 1),
               nip: widget.isMyself ? BubbleNip.rightTop : BubbleNip.leftTop,
-              color: widget.isMyself
-                  ? myself.primary
-                  : Colors.white,
+              color: widget.isMyself ? myself.primary : Colors.white,
               padding: const BubbleEdges.all(0),
               child: body),
           const SizedBox(
@@ -142,9 +140,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
                 lrEdgeInsets, tbEdgeInsets, lrEdgeInsets, tbEdgeInsets),
             constraints: const BoxConstraints(maxWidth: 300.0),
             decoration: BoxDecoration(
-              color: widget.isMyself
-                  ? myself.primary
-                  : Colors.white,
+              color: widget.isMyself ? myself.primary : Colors.white,
               borderRadius: BorderRadius.only(
                 bottomLeft: const Radius.circular(8.0),
                 bottomRight: const Radius.circular(8.0),
@@ -283,25 +279,27 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
     var peerId = myself.peerId;
     if (direct == ChatDirect.send.name &&
         (senderPeerId == null || senderPeerId == peerId)) {
+      Widget avatarImage = myself.avatarImage ?? mdAppImage;
       return InkWell(
           onTap: () {
             indexWidgetProvider.push('personal_info');
           },
-          child: myself.avatarImage);
+          child: avatarImage);
     }
     if (senderPeerId != null) {
       var linkman = await linkmanService.findCachedOneByPeerId(senderPeerId);
       if (linkman != null) {
+        Widget avatarImage = linkman.avatarImage ?? mdAppImage;
         return InkWell(
             onTap: () {
               linkmanController.replaceAll([linkman]);
               indexWidgetProvider.push('linkman_info');
             },
-            child: linkman.avatarImage);
+            child: avatarImage);
       }
     }
 
-    return defaultImage;
+    return mdAppImage;
   }
 
   @override

@@ -57,7 +57,7 @@ class ImageUtil {
       BoxFit? fit = BoxFit.contain,
       bool isRadius = true,
       double radius = 8.0}) {
-    Widget imageWidget = defaultImage;
+    Widget imageWidget = mdAppImage;
     if (image == null) {
       return imageWidget;
     }

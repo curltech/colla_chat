@@ -80,7 +80,7 @@ class PeerClientService extends PeerEntityService<PeerClient> {
   }
 
   Future<Widget> findAvatarImageWidget(String peerId) async {
-    Widget image = defaultImage;
+    Widget image = mdAppImage;
     var peerClient = await findCachedOneByPeerId(peerId);
     if (peerClient != null && peerClient.avatarImage != null) {
       image = peerClient.avatarImage!;

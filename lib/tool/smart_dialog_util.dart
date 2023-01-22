@@ -106,7 +106,7 @@ class SmartDialogUtil {
   Widget buildRotationLoading(
       {required TickerProvider vsync, Widget? rotation, Widget? center}) {
     center = center ?? myself.avatarImage;
-    rotation = rotation ?? defaultImage;
+    rotation = rotation ?? mdAppImage;
     return Stack(alignment: Alignment.center, children: [
       RotationTransition(
         alignment: Alignment.center,

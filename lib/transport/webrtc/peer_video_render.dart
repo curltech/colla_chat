@@ -11,7 +11,7 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:path_provider/path_provider.dart';
 
 final emptyVideoView = Center(
-  child: defaultImage,
+  child: mdAppImage,
 );
 
 /// 简单包装webrtc视频流的渲染器，可以构造本地视频流或者传入的视频流
