@@ -1,4 +1,5 @@
 import 'package:colla_chat/crypto/cryptography.dart';
+import 'package:colla_chat/entity/dht/peerprofile.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/entity/dht/myselfpeer.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -107,6 +108,11 @@ class MyselfService {
 
   bool logout() {
     myself.myselfPeer = MyselfPeer('', '', '', '');
+    myself.peerProfile = PeerProfile('', '');
+    myself.id = null;
+    myself.peerId = null;
+    myself.name = null;
+    myself.clientId = null;
     myself.password = null;
     myself.peerPrivateKey = null;
     myself.peerPublicKey = null;
