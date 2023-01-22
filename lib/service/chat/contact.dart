@@ -6,6 +6,7 @@ import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
@@ -31,6 +32,7 @@ abstract class PeerPartyService<T> extends PeerEntityService<T> {
 
 class LinkmanService extends PeerPartyService<Linkman> {
   Map<String, Linkman> linkmen = {};
+  var publicKeys = <String, SimplePublicKey>{};
 
   LinkmanService(
       {required super.tableName,
@@ -73,6 +75,27 @@ class LinkmanService extends PeerPartyService<Linkman> {
       linkmen[peerId] = linkman;
     }
     return linkman;
+  }
+
+  Future<SimplePublicKey?> getCachedPublicKey(String peerId) async {
+    SimplePublicKey? simplePublicKey;
+    String? publicKey;
+    var linkman = await findCachedOneByPeerId(peerId);
+    if (linkman != null) {
+      simplePublicKey = publicKeys[peerId];
+      publicKey = linkman.publicKey;
+    }
+    if (simplePublicKey == null) {
+      if (publicKey == null) {
+        logger.e('linkman $peerId has no publicKey');
+        return null;
+      }
+      simplePublicKey = await cryptoGraphy.importPublicKey(publicKey,
+          type: KeyPairType.x25519);
+      publicKeys[peerId] = simplePublicKey;
+    }
+
+    return simplePublicKey;
   }
 
   Future<Widget> findAvatarImageWidget(String peerId) async {
