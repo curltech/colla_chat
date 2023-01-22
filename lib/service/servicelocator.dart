@@ -12,7 +12,9 @@ import 'package:colla_chat/p2p/chain/action/p2pchat.dart';
 import 'package:colla_chat/p2p/chain/action/ping.dart';
 import 'package:colla_chat/p2p/chain/action/signal.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
@@ -79,6 +81,11 @@ class ServiceLocator {
 
     await Sqlite3.getInstance();
     await AppLocalizations.init();
+    var defaultPeerEndpoint = peerEndpointController.defaultPeerEndpoint;
+    if (defaultPeerEndpoint != null) {
+      logger.i(
+          'Default PeerEndpoint websocket address:${defaultPeerEndpoint.wsConnectAddress}');
+    }
 
     Map<String, dynamic>? autoLogin = await myselfPeerService.autoCredential();
     if (autoLogin != null) {
@@ -87,6 +94,8 @@ class ServiceLocator {
       appDataProvider.autoLogin = false;
     }
     bool loginStatus = await myselfPeerService.autoLogin();
+    logger.i(
+        'AutoLogin setting:${appDataProvider.autoLogin},AutoLogin status:$loginStatus');
 
     return loginStatus;
   }

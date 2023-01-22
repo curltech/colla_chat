@@ -159,7 +159,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     return null;
   }
 
-  ///获取自动登录的用户名和密码，如果都存在，自动登录
+  ///获取自动登录的用户名和密码
   Future<Map<String, dynamic>?> autoCredential() async {
     String? autoLoginStr = await localSecurityStorage.get(autoLoginName);
     if (StringUtil.isNotEmpty(autoLoginStr)) {
