@@ -159,6 +159,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         var unreadNumber = chatSummary.unreadNumber;
         Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
         if (linkman == null) {
+          chatSummaryService.delete(entity: chatSummary);
           continue;
         }
         var badge = Badge(
@@ -189,6 +190,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
               linkmanChatSummaryController.delete();
             });
         slideActions.add(deleteSlideAction);
+        tile.slideActions = slideActions;
         tiles.add(tile);
       }
     }
@@ -205,6 +207,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         var unreadNumber = chatSummary.unreadNumber;
         Group? group = await groupService.findCachedOneByPeerId(peerId);
         if (group == null) {
+          chatSummaryService.delete(entity: chatSummary);
           continue;
         }
         var badge = Badge(
@@ -232,6 +235,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
               groupChatSummaryController.delete();
             });
         slideActions.add(deleteSlideAction);
+        tile.slideActions = slideActions;
         tiles.add(tile);
       }
     }
