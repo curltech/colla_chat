@@ -237,16 +237,14 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
   }
 
   Future<void> connect() async {
-    if (myself.myselfPeer != null) {
+    if (myself.id != null) {
       MyselfPeer myselfPeer = myself.myselfPeer!;
       var json = JsonUtil.toJson(myselfPeer);
       var peerClient = PeerClient.fromJson(json);
       peerClient.activeStatus = ActiveStatus.Up.name;
       peerClient.clientId = myselfPeer.clientId;
-      var response = await connectAction.connect(peerClient);
-      if (response != null) {
-        logger.i('connect successfully');
-      }
+      await connectAction.connect(peerClient);
+      logger.i('login connect successfully,activeStatus up');
     }
   }
 
@@ -273,7 +271,8 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
           var peerClient = PeerClient.fromJson(json);
           peerClient.activeStatus = ActiveStatus.Down.name;
           peerClient.clientId = myselfPeer.clientId;
-          ChainMessage? chainMessage = await connectAction.connect(peerClient);
+          await connectAction.connect(peerClient);
+          logger.w('logout connect successfully,activeStatus down');
 
           result = true;
         } else {
