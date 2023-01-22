@@ -122,7 +122,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
               await chatSummaryService
                   .delete(where: 'peerId=?', whereArgs: [subtitle!]);
               await chatMessageService.delete(
-                  where: 'receiverPeerId=? or senderPeerId',
+                  where: 'receiverPeerId=? or senderPeerId=?',
                   whereArgs: [subtitle!, subtitle!]);
               linkmanController.delete();
             });

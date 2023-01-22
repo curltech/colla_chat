@@ -46,7 +46,9 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
     if (StringUtil.isNotEmpty(credential)) {
       ColumnFieldDef def = p2pLoginInputFieldDef[0];
       def.initValue = credential;
-      setState(() {});
+      if (mounted) {
+        setState(() {});
+      }
     }
   }
 
