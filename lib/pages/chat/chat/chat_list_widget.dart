@@ -176,6 +176,19 @@ class _ChatListWidgetState extends State<ChatListWidget> {
             subtitle: peerId,
             dense: true,
             routeName: 'chat_message');
+        List<TileData> slideActions = [];
+        TileData deleteSlideAction = TileData(
+            title: 'Delete',
+            prefix: Icons.remove,
+            onTap: (int index, String label, {String? subtitle}) async {
+              linkmanChatSummaryController.currentIndex = index;
+              await chatSummaryService.delete(entity: chatSummary);
+              await chatMessageService.delete(
+                  where: 'receiverPeerId=? or senderPeerId=?',
+                  whereArgs: [peerId, peerId]);
+              linkmanChatSummaryController.delete();
+            });
+        slideActions.add(deleteSlideAction);
         tiles.add(tile);
       }
     }
@@ -206,6 +219,19 @@ class _ChatListWidgetState extends State<ChatListWidget> {
             subtitle: peerId,
             dense: true,
             routeName: 'chat_message');
+        List<TileData> slideActions = [];
+        TileData deleteSlideAction = TileData(
+            title: 'Delete',
+            prefix: Icons.remove,
+            onTap: (int index, String label, {String? subtitle}) async {
+              groupChatSummaryController.currentIndex = index;
+              await chatSummaryService.delete(entity: chatSummary);
+              await chatMessageService.delete(
+                  where: 'receiverPeerId=? or senderPeerId=?',
+                  whereArgs: [peerId, peerId]);
+              groupChatSummaryController.delete();
+            });
+        slideActions.add(deleteSlideAction);
         tiles.add(tile);
       }
     }
