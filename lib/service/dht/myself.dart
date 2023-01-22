@@ -110,7 +110,7 @@ class MyselfService {
     myself.myselfPeer = MyselfPeer('', '', '', '');
     myself.peerProfile = PeerProfile('', '');
     myself.id = null;
-    myself.peerId = null;
+    myself.peerId = null; 
     myself.name = null;
     myself.clientId = null;
     myself.password = null;

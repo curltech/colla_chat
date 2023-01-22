@@ -30,8 +30,10 @@ const defaultAvatarFile = 'assets/images/colla-o1.png';
 const defaultGroupAvatarFile = 'assets/images/colla-o1.png';
 
 ///中等大小的app缺省图像
-final mdAppImage = ImageUtil.buildImageWidget(
-  image: defaultAppIconFile,
+final mdAppImage = Image.asset(
+  defaultAppIconFile,
+  key: UniqueKey(),
   width: mdSize.width,
   height: mdSize.height,
+  fit: BoxFit.fill,
 );
