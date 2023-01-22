@@ -1,11 +1,14 @@
+import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/group/group_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/group/linkman_group_info_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_info_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -108,12 +111,39 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
             prefix: linkman.avatar,
             title: title,
             subtitle: subtitle,
-            dense: false,
             routeName: 'linkman_info');
+        List<TileData> slideActions = [];
+        TileData deleteSlideAction = TileData(
+            title: 'Delete',
+            prefix: Icons.remove,
+            onTap: (int index, String label, {String? subtitle}) async {
+              linkmanController.currentIndex = index;
+              await linkmanService.delete(entity: linkman);
+              await chatSummaryService
+                  .delete(where: 'peerId=?', whereArgs: [subtitle!]);
+              await chatMessageService.delete(
+                  where: 'receiverPeerId=? or senderPeerId',
+                  whereArgs: [subtitle!, subtitle!]);
+              linkmanController.delete();
+            });
+        slideActions.add(deleteSlideAction);
+        TileData chatSlideAction = TileData(
+            title: 'Chat',
+            prefix: Icons.chat,
+            onTap: (int index, String label, {String? subtitle}) async {
+              ChatSummary? chatSummary =
+                  await chatSummaryService.findOneByPeerId(linkman.peerId);
+              if (chatSummary != null) {
+                chatMessageController.chatSummary = chatSummary;
+              }
+              indexWidgetProvider.push('chat_message');
+            });
+        slideActions.add(chatSlideAction);
+        tile.slideActions = slideActions;
         tiles.add(tile);
       }
     }
-    var keyTile = TileData(title: AppLocalizations.t('Linkman'));
+    var keyTile = TileData(title: 'Linkman');
     widget.groupDataListController.add(keyTile, tiles);
 
     var groups = groupController.data;
@@ -126,21 +156,48 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
             prefix: group.avatar,
             title: title,
             subtitle: subtitle,
-            dense: false,
             routeName: 'linkman_group_edit');
+        List<TileData> slideActions = [];
+        TileData deleteSlideAction = TileData(
+            title: 'Delete',
+            prefix: Icons.remove,
+            onTap: (int index, String label, {String? subtitle}) async {
+              groupController.currentIndex = index;
+              await groupService.delete(entity: group);
+              await chatSummaryService
+                  .delete(where: 'peerId=?', whereArgs: [subtitle!]);
+              await chatMessageService.delete(
+                  where: 'receiverPeerId=? or senderPeerId',
+                  whereArgs: [subtitle!, subtitle!]);
+              groupController.delete();
+            });
+        slideActions.add(deleteSlideAction);
+        TileData chatSlideAction = TileData(
+            title: 'Chat',
+            prefix: Icons.chat,
+            onTap: (int index, String label, {String? subtitle}) async {
+              ChatSummary? chatSummary =
+                  await chatSummaryService.findOneByPeerId(group.peerId);
+              if (chatSummary != null) {
+                chatMessageController.chatSummary = chatSummary;
+              }
+              indexWidgetProvider.push('chat_message');
+            });
+        slideActions.add(chatSlideAction);
+        tile.slideActions = slideActions;
         tiles.add(tile);
       }
     }
-    keyTile = TileData(title: AppLocalizations.t('Group'));
+    keyTile = TileData(title: 'Group');
     widget.groupDataListController.add(keyTile, tiles);
   }
 
   _onTap(int index, String title, {String? subtitle, TileData? group}) {
     if (group != null) {
-      if (group.title == AppLocalizations.t('Linkman')) {
+      if (group.title == 'Linkman') {
         linkmanController.currentIndex = index;
       }
-      if (group.title == AppLocalizations.t('Group')) {
+      if (group.title == 'Group') {
         groupController.currentIndex = index;
       }
     }

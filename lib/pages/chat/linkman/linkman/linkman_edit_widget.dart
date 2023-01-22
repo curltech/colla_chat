@@ -1,5 +1,4 @@
 import 'package:colla_chat/entity/chat/contact.dart';
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';

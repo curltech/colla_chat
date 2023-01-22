@@ -1,19 +1,42 @@
-import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
+import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
+
+final List<ColumnFieldDef> linkmanColumnFieldDefs = [
+  ColumnFieldDef(
+      name: 'peerId',
+      label: 'PeerId',
+      inputType: InputType.label,
+      prefixIcon: const Icon(Icons.perm_identity)),
+  ColumnFieldDef(
+      name: 'name',
+      label: 'Name',
+      inputType: InputType.label,
+      prefixIcon: const Icon(Icons.person)),
+  ColumnFieldDef(
+      name: 'alias', label: 'Alias', prefixIcon: const Icon(Icons.person_pin)),
+  ColumnFieldDef(
+      name: 'email',
+      label: 'Email',
+      prefixIcon: const Icon(Icons.email),
+      textInputType: TextInputType.emailAddress),
+  ColumnFieldDef(
+      name: 'mobile',
+      label: 'Mobile',
+      prefixIcon: const Icon(Icons.mobile_friendly)),
+];
 
 //联系人信息页面
 class LinkmanInfoWidget extends StatefulWidget with TileDataMixin {
@@ -54,44 +77,29 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
     setState(() {});
   }
 
-  Widget _buildLinkmanInfoWidget(BuildContext context) {
-    List<TileData> tileData = [];
-    if (linkman != null) {
-      var tile = TileData(
-        title: linkman!.name,
-        subtitle: linkman!.peerId,
-        isThreeLine: true,
-        prefix: ImageUtil.buildImageWidget(
-          image: linkman!.avatar,
-          width: 32.0,
-          height: 32.0,
-        ),
-        routeName: 'linkman_edit',
-      );
-      tileData.add(tile);
-    }
-    return DataListView(
-      tileData: tileData,
-    );
+  Widget _buildFormInputWidget(BuildContext context) {
+    Map<String, dynamic>? initValues =
+        linkmanController.getInitValue(linkmanColumnFieldDefs);
+
+    var formInputWidget = Container(
+        padding: const EdgeInsets.all(15.0),
+        child: FormInputWidget(
+          onOk: (Map<String, dynamic> values) {
+            _onOk(values);
+          },
+          columnFieldDefs: linkmanColumnFieldDefs,
+          initValues: initValues,
+        ));
+
+    return formInputWidget;
   }
 
-  Widget _buildChatMessageWidget(BuildContext context) {
-    List<TileData> tileData = [];
-    var tile = TileData(
-        title: AppLocalizations.t('Chat'),
-        prefix: const Icon(Icons.chat),
-        routeName: 'chat_message',
-        onTap: (int index, String title,{String? subtitle,}) async {
-          ChatSummary? chatSummary =
-              await chatSummaryService.findOneByPeerId(linkman!.peerId);
-          if (chatSummary != null) {
-            chatMessageController.chatSummary = chatSummary;
-          }
-        });
-    tileData.add(tile);
-    return DataListView(
-      tileData: tileData,
-    );
+  _onOk(Map<String, dynamic> values) async {
+    Linkman currentLinkman = Linkman.fromJson(values);
+    linkman!.alias = currentLinkman.alias;
+    linkman!.mobile = currentLinkman.mobile;
+    linkman!.email = currentLinkman.email;
+    await linkmanService.store(linkman!);
   }
 
   _addFriend({String? tip}) async {
@@ -205,9 +213,8 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
   @override
   Widget build(BuildContext context) {
     var linkmanInfoCard = Column(children: [
-      _buildLinkmanInfoWidget(context),
-      _buildChatMessageWidget(context),
-      _buildActionCard(context)
+      _buildActionCard(context),
+      _buildFormInputWidget(context),
     ]);
     var appBarView = AppBarView(
         title: widget.title,
