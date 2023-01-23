@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
@@ -148,6 +150,9 @@ class PeerConnectionPool {
       throw 'myself peerPublicKey is null';
     }
     this.peerPublicKey = peerPublicKey;
+    Timer.periodic(const Duration(seconds: 60), (Timer timer) {
+      clear();
+    });
   }
 
   ///webrtc onMessage接收到链协议消息的处理，收到的数据被转换成ChainMessage消息

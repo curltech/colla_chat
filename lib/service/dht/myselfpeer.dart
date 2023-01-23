@@ -299,18 +299,16 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
   Future<String> updateAvatar(String peerId, List<int> avatar) async {
     String data = await super.updateAvatar(peerId, avatar);
     final myselfPeer = myself.myselfPeer;
-    if (myselfPeer != null) {
-      myselfPeer.avatar = data;
-      var avatarImage = ImageUtil.buildImageWidget(
-        image: data,
-        height: 32,
-        width: 32,
-      );
-      myselfPeer.avatarImage = avatarImage;
-      myself.avatarImage = avatarImage;
-      await peerClientService.updateAvatar(peerId, avatar);
-      await linkmanService.updateAvatar(peerId, avatar);
-    }
+    myselfPeer.avatar = data;
+    var avatarImage = ImageUtil.buildImageWidget(
+      image: data,
+      height: 32,
+      width: 32,
+    );
+    myselfPeer.avatarImage = avatarImage;
+    myself.avatarImage = avatarImage;
+    await peerClientService.updateAvatar(peerId, avatar);
+    await linkmanService.updateAvatar(peerId, avatar);
 
     return data;
   }
