@@ -23,6 +23,7 @@ class Websocket extends IWebClient {
   String prefix = 'wss://';
   late String address;
   WebSocketChannel? channel;
+  String? sessionId;
   SocketStatus _status = SocketStatus.closed;
   Duration pingInterval = const Duration(seconds: 30);
   Map<String, dynamic> headers = {};
@@ -63,8 +64,12 @@ class Websocket extends IWebClient {
 
   onData(dynamic data) async {
     var msg = String.fromCharCodes(data);
-    if (msg == 'heartbeat') {
-      //logger.i('wss address:$address receive heartbeat message');
+    if (msg.startsWith('heartbeat:')) {
+      var sessionId = msg.substring(10);
+      if (this.sessionId != sessionId) {
+        this.sessionId = sessionId;
+        logger.i('wss sessionId has changed:$address:${this.sessionId}');
+      }
     } else {
       var response = await chainMessageHandler.receiveRaw(data, '', '');
       if (response != null) {
