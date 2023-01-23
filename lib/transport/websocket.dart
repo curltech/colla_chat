@@ -68,7 +68,7 @@ class Websocket extends IWebClient {
       var sessionId = msg.substring(10);
       if (this.sessionId != sessionId) {
         this.sessionId = sessionId;
-        logger.i('wss sessionId has changed:$address:${this.sessionId}');
+        logger.w('wss sessionId has changed:$address:${this.sessionId}');
       }
     } else {
       var response = await chainMessageHandler.receiveRaw(data, '', '');
