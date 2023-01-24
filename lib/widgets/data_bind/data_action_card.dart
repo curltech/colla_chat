@@ -70,7 +70,7 @@ class DataActionCard extends StatelessWidget {
     mainAxisExtent ??= size + (showLabel ? 30 : 10);
     if (height == null) {
       var mod = actions.length % crossAxisCount;
-      var lines = actions.length / crossAxisCount;
+      int lines = (actions.length / crossAxisCount).floor();
       if (mod > 0) {
         lines++;
       }

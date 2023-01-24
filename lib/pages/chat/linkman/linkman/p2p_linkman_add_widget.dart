@@ -85,7 +85,8 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
       if (peerClients.isNotEmpty) {
         for (var peerClient in peerClients) {
           var peerId = peerClient.peerId;
-          if (peerId == myself.peerId) {
+          var clientId = peerClient.clientId;
+          if (peerId == myself.peerId && clientId == myself.clientId) {
             continue;
           }
           await peerClientService.store(peerClient,

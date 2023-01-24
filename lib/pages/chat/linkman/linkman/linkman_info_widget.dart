@@ -4,13 +4,10 @@ import 'package:colla_chat/pages/chat/linkman/linkman/linkman_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/contact.dart';
-import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
-import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
-import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -148,7 +145,6 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
 
   Widget _buildActionCard(BuildContext context) {
     List<Widget> actionWidgets = [];
-    double height = 180;
     final List<ActionData> actionData = [];
     if (linkman != null) {
       if (linkman!.status == LinkmanStatus.friend.name) {
@@ -200,7 +196,6 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
     }
     actionWidgets.add(DataActionCard(
       actions: actionData,
-      height: height,
       crossAxisCount: 4,
     ));
     return Container(
@@ -214,7 +209,8 @@ class _LinkmanInfoWidgetState extends State<LinkmanInfoWidget> {
   Widget build(BuildContext context) {
     var linkmanInfoCard = Column(children: [
       _buildActionCard(context),
-      _buildFormInputWidget(context),
+      Expanded(
+          child: SingleChildScrollView(child: _buildFormInputWidget(context))),
     ]);
     var appBarView = AppBarView(
         title: widget.title,

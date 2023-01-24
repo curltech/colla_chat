@@ -44,11 +44,13 @@ class LinkmanService extends PeerPartyService<Linkman> {
   }
 
   Future<List<Linkman>> search(String key) async {
-    if (StringUtil.isEmpty(key)) {
-      return await findAll();
+    var where = 'peerId!=?';
+    var whereArgs = [myself.peerId!];
+    if (StringUtil.isNotEmpty(key)) {
+      where =
+          '$where and (peerId=? or mobile=? or name=? or pyName=? or email=?) and ';
+      whereArgs.addAll([key, key, key, key, key]);
     }
-    var where = 'peerId=? or mobile=? or name=? or pyName=? or email=?';
-    var whereArgs = [key, key, key, key, key];
     var linkmen = await find(
       where: where,
       whereArgs: whereArgs,
@@ -99,7 +101,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
   }
 
   Future<Widget> findAvatarImageWidget(String peerId) async {
-    Widget image = mdAppImage;
+    Widget image = AppImage.mdAppImage;
     var linkman = await findCachedOneByPeerId(peerId);
     if (linkman != null && linkman.avatarImage != null) {
       image = linkman.avatarImage!;
@@ -379,6 +381,7 @@ class GroupService extends PeerPartyService<Group> {
     return groups;
   }
 
+  ///向群成员发送加群的消息
   addGroup(Group group) async {
     String json = JsonUtil.toJsonString(group);
     List<int> data = CryptoUtil.stringToUtf8(json);
@@ -393,6 +396,7 @@ class GroupService extends PeerPartyService<Group> {
     }
   }
 
+  ///接收加群的消息，完成加群，发送回执
   receiveAddGroup(ChatMessage chatMessage) async {
     Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
     String json = CryptoUtil.utf8ToString(data);
@@ -405,6 +409,7 @@ class GroupService extends PeerPartyService<Group> {
     await chatMessageService.sendAndStore(chatReceipt!);
   }
 
+  ///接收加群的回执消息
   receiveAddGroupReceipt(ChatMessage chatMessage) async {
     Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
     String json = CryptoUtil.utf8ToString(data);
@@ -417,6 +422,7 @@ class GroupService extends PeerPartyService<Group> {
     await chatMessageService.sendAndStore(chatReceipt!);
   }
 
+  ///向群成员发送群属性变化的消息
   modifyGroup(Group group) async {
     String json = JsonUtil.toJsonString(group);
     List<int> data = CryptoUtil.stringToUtf8(json);
@@ -431,6 +437,7 @@ class GroupService extends PeerPartyService<Group> {
     }
   }
 
+  ///接收变群的消息，完成变群，发送回执
   receiveModifyGroup(ChatMessage chatMessage) async {
     Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
     String json = CryptoUtil.utf8ToString(data);
@@ -443,6 +450,7 @@ class GroupService extends PeerPartyService<Group> {
     await chatMessageService.sendAndStore(chatReceipt!);
   }
 
+  ///接收变群的回执消息
   receiveModifyGroupReceipt(ChatMessage chatMessage) async {
     Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
     String json = CryptoUtil.utf8ToString(data);
@@ -455,6 +463,7 @@ class GroupService extends PeerPartyService<Group> {
     await chatMessageService.sendAndStore(chatReceipt!);
   }
 
+  ///向群成员发送散群的消息
   dismissGroup(Group group) async {
     await groupMemberService.delete(entity: {
       'groupId': group.id,
@@ -508,6 +517,7 @@ class GroupService extends PeerPartyService<Group> {
     await chatMessageService.sendAndStore(chatReceipt!);
   }
 
+  ///向群成员发送加群成员的消息
   addGroupMember(String groupId, List<GroupMember> groupMembers) async {
     String json = JsonUtil.toJsonString(groupMembers);
     List<int> data = CryptoUtil.stringToUtf8(json);
@@ -556,6 +566,7 @@ class GroupService extends PeerPartyService<Group> {
     await chatMessageService.sendAndStore(chatReceipt!);
   }
 
+  ///向群成员发送删群成员的消息
   removeGroupMember(String groupId, List<GroupMember> groupMembers) async {
     String json = JsonUtil.toJsonString(groupMembers);
     List<int> data = CryptoUtil.stringToUtf8(json);
@@ -610,6 +621,7 @@ class GroupService extends PeerPartyService<Group> {
     await chatMessageService.sendAndStore(chatReceipt!);
   }
 
+  ///向群成员发送群文件的消息
   groupFile(String groupId, List<int> data) async {
     List<ChatMessage> chatMessages =
         await chatMessageService.buildGroupChatMessage(
