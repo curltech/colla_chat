@@ -805,8 +805,8 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
   Future<List<ChatSummary>> findByPartyType(
     String partyType,
   ) async {
-    String where = 'partyType=?';
-    List<Object> whereArgs = [partyType];
+    String where = 'partyType=? and peerId!=?';
+    List<Object> whereArgs = [partyType, myself.peerId!];
     var chatSummary = await find(
       where: where,
       whereArgs: whereArgs,

@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -82,10 +83,12 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
       controller: textController,
       keyboardType: TextInputType.text,
       decoration: InputDecoration(
-        fillColor: Colors.black.withOpacity(0.1),
+        fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
         filled: true,
         border: InputBorder.none,
-        labelText: AppLocalizations.t('Search $title'),
+        labelText: AppLocalizations.t('Search') +
+            AppLocalizations.t(' ') +
+            AppLocalizations.t(title),
         suffixIcon: IconButton(
           onPressed: () async {
             await _search();

@@ -4,13 +4,11 @@ import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/p2p/chain/action/findclient.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/validator_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -86,6 +84,10 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
       peerClients = chainMessage.payload;
       if (peerClients.isNotEmpty) {
         for (var peerClient in peerClients) {
+          var peerId = peerClient.peerId;
+          if (peerId == myself.peerId) {
+            continue;
+          }
           await peerClientService.store(peerClient,
               mobile: false, email: false);
           await linkmanService.storeByPeerClient(peerClient);

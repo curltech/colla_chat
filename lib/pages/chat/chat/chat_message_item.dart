@@ -279,7 +279,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
     var peerId = myself.peerId;
     if (direct == ChatDirect.send.name &&
         (senderPeerId == null || senderPeerId == peerId)) {
-      Widget avatarImage = myself.avatarImage ?? mdAppImage;
+      Widget avatarImage = myself.avatarImage ?? AppImage.mdAppImage;
       return InkWell(
           onTap: () {
             indexWidgetProvider.push('personal_info');
@@ -289,7 +289,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
     if (senderPeerId != null) {
       var linkman = await linkmanService.findCachedOneByPeerId(senderPeerId);
       if (linkman != null) {
-        Widget avatarImage = linkman.avatarImage ?? mdAppImage;
+        Widget avatarImage = linkman.avatarImage ?? AppImage.mdAppImage;
         return InkWell(
             onTap: () {
               linkmanController.replaceAll([linkman]);
@@ -299,7 +299,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
       }
     }
 
-    return mdAppImage;
+    return AppImage.mdAppImage;
   }
 
   @override

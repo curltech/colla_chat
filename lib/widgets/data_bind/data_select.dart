@@ -194,7 +194,7 @@ class SmartSelectUtil {
         useFilter: modalFilter,
         filterAuto: modalFilterAuto,
         style: S2ModalStyle(
-          backgroundColor: Colors.grey.withOpacity(mdOpacity),
+          backgroundColor: Colors.grey.withOpacity(AppOpacity.mdOpacity),
         ),
         headerStyle: S2ModalHeaderStyle(
           elevation: 0,
@@ -205,7 +205,7 @@ class SmartSelectUtil {
         ),
       ),
       choiceStyle: S2ChoiceStyle(
-        opacity: mdOpacity,
+        opacity: AppOpacity.mdOpacity,
         elevation: 0,
         titleStyle: const TextStyle(color: Colors.white),
         color: myself.primary,
@@ -288,18 +288,18 @@ class SmartSelectUtil {
         useFilter: modalFilter,
         filterAuto: modalFilterAuto,
         style: S2ModalStyle(
-          backgroundColor: Colors.grey.withOpacity(0.8),
+          backgroundColor: Colors.grey.withOpacity(AppOpacity.mdOpacity),
         ),
-        headerStyle: const S2ModalHeaderStyle(
+        headerStyle: S2ModalHeaderStyle(
           elevation: 0,
           centerTitle: false,
-          //backgroundColor: myself.primary,
-          // textStyle: const TextStyle(color: Colors.white),
-          // iconTheme: const IconThemeData(color: Colors.white),
+          backgroundColor: myself.primary,
+          textStyle: const TextStyle(color: Colors.white),
+          //iconTheme: const IconThemeData(color: Colors.white),
         ),
       ),
       choiceStyle: S2ChoiceStyle(
-        opacity: 0.5,
+        opacity: AppOpacity.mdOpacity,
         elevation: 0,
         titleStyle: const TextStyle(color: Colors.white),
         color: primary,

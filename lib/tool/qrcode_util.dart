@@ -46,7 +46,7 @@ class QrcodeUtil {
       bytes = CryptoUtil.decodeBase64(embed.substring(pos));
     }
     if (bytes == null) {
-      final byteData = await rootBundle.load(defaultAvatarFile);
+      final byteData = await rootBundle.load(AppImageFile.defaultAvatarFile);
       bytes = byteData.buffer.asUint8List();
     }
 

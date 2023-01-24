@@ -127,7 +127,7 @@ class WidgetUtil {
           const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
       Size minimumSize = const Size(50, 46.0),
       Size maximumSize = const Size(120.0, 56.0)}) {
-    backgroundColor = backgroundColor ?? Colors.grey.withOpacity(mdOpacity);
+    backgroundColor = backgroundColor ?? Colors.grey.withOpacity(AppOpacity.mdOpacity);
     ButtonStyle style = ButtonStyle(
       backgroundColor: MaterialStateProperty.all(backgroundColor),
       shape: MaterialStateProperty.all(

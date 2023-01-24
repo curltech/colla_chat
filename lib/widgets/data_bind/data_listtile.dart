@@ -196,7 +196,7 @@ class DataListTile extends StatelessWidget {
                   subtitle: slideAction.title);
             }
           },
-          backgroundColor: Colors.white.withOpacity(lgOpacity),
+          backgroundColor: Colors.white.withOpacity(AppOpacity.lgOpacity),
           foregroundColor: myself.primary,
           icon: slideAction.prefix,
           label: AppLocalizations.t(slideAction.title),

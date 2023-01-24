@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -92,11 +94,13 @@ class _LoadingState extends State<Loading> {
     super.initState();
     myself.addListener(_update);
     int count = loadingBackgroundImage.lightBackgroudImages.length;
+
     ///在initState中调用context出错
     // if (myself.getBrightness(context) == Brightness.dark) {
     //   count = loadingBackgroundImage.darkBackgroudImages.length;
     // }
-
+    var random = Random.secure();
+    loadingBackgroundImage.currentIndex = random.nextInt(count);
     if (widget.autoPlay) {
       bool positive = true;
       Future.doWhile(() async {
