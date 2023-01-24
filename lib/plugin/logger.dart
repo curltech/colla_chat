@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:classic_logger/classic_logger.dart' as classic_logger;
 import 'package:logger/logger.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 
 class CustomLogger {
   late Logger logger;
@@ -7,16 +11,66 @@ class CustomLogger {
   CustomLogger() {
     logger = Logger(
       printer: PrettyPrinter(printTime: true),
+      output: FileOutput(),
       level: Level.info,
     );
     Logger.level = Level.warning;
   }
+
+  t(dynamic msg) {
+    logger.v(msg);
+  }
+
+  d(dynamic msg) {
+    logger.d(msg);
+  }
+
+  i(dynamic msg) {
+    logger.i(msg);
+  }
+
+  w(dynamic msg) {
+    logger.w(msg);
+  }
+
+  e(dynamic msg) {
+    logger.e(msg);
+  }
+
+  f(dynamic msg) {
+    logger.wtf(msg);
+  }
 }
 
 class FileOutput extends LogOutput {
+  File? file;
+
+  FileOutput() {
+    init();
+  }
+
+  @override
+  init() async {
+    var current = DateTime.now();
+    var filename =
+        'colla_chat-${current.year}-${current.month}-${current.day}.log';
+    final dir = await getApplicationDocumentsDirectory();
+    filename = p.join(dir.path, filename);
+    file = File(filename);
+    bool exist = await file!.exists();
+    if (!exist) {
+      file = await file!.create(recursive: true);
+    }
+  }
+
   @override
   void output(OutputEvent event) {
-    event.lines.forEach(print);
+    if (file != null) {
+      event.lines.forEach(print);
+      IOSink sink = file!.openWrite(mode: FileMode.append);
+      sink.writeln(event.lines);
+      sink.close();
+    }
   }
 }
 
