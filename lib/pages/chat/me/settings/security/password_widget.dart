@@ -66,9 +66,7 @@ class _PasswordWidgetState extends State<PasswordWidget> {
   @override
   Widget build(BuildContext context) {
     return AppBarView(
-        withLeading: true,
-        title: widget.title,
-        child: _build(context));
+        withLeading: true, title: widget.title, child: _build(context));
   }
 
   _onOk(Map<String, dynamic> values) async {
@@ -95,7 +93,9 @@ class _PasswordWidgetState extends State<PasswordWidget> {
         String loginName = myself.myselfPeer!.loginName;
         await myselfService.updateMyselfPassword(
             myself.myselfPeer!, plainPassword);
-        await myselfPeerService.saveAutoCredential(loginName, plainPassword);
+        if (myself.peerProfile.autoLogin) {
+          await myselfPeerService.saveAutoCredential(loginName, plainPassword);
+        }
         String peerPrivateKey = myself.myselfPeer!.peerPrivateKey;
         String privateKey = myself.myselfPeer!.privateKey;
         await myselfPeerService.update(

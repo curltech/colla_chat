@@ -1,4 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -85,7 +86,9 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
         widget.onAuthenticate!(loginStatus);
       } else {
         if (loginStatus) {
-          myselfPeerService.saveAutoCredential(credential, password);
+          if (myself.autoLogin) {
+            myselfPeerService.saveAutoCredential(credential, password);
+          }
           Application.router
               .navigateTo(context, Application.index, replace: true);
         } else {

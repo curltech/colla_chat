@@ -163,11 +163,8 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
   Future<Map<String, dynamic>?> autoCredential() async {
     String? autoLoginStr = await localSecurityStorage.get(autoLoginName);
     if (StringUtil.isNotEmpty(autoLoginStr)) {
-      appDataProvider.autoLogin = true;
       Map<String, dynamic> autoLogin = JsonUtil.toJson(autoLoginStr);
       return autoLogin;
-    } else {
-      appDataProvider.autoLogin = false;
     }
 
     return null;

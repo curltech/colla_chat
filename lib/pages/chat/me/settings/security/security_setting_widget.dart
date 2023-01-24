@@ -4,6 +4,7 @@ import 'package:colla_chat/pages/chat/me/settings/security/password_widget.dart'
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
+import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -63,6 +64,9 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
         value: appDataProvider.autoLogin,
         onChanged: (bool? autoLogin) async {
           autoLogin = autoLogin ?? false;
+          if (myself.autoLogin == autoLogin) {
+            return;
+          }
           myself.autoLogin = autoLogin;
           if (autoLogin) {
             var loginName = myself.myselfPeer.loginName;
