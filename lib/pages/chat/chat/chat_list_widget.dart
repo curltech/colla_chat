@@ -169,7 +169,8 @@ class _ChatListWidgetState extends State<ChatListWidget> {
           shape: BadgeShape.square,
           borderRadius: BorderRadius.circular(8),
           padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5.0),
-          child: ImageUtil.buildImageWidget(image: linkman.avatar),
+          child: ImageUtil.buildImageWidget(
+              image: linkman.avatar, fit: BoxFit.contain),
         );
         TileData tile = TileData(
             prefix: badge,
@@ -214,7 +215,8 @@ class _ChatListWidgetState extends State<ChatListWidget> {
           badgeContent: Text('$unreadNumber'),
           elevation: 0.0,
           padding: const EdgeInsets.all(0.0),
-          child: ImageUtil.buildImageWidget(image: group!.avatar),
+          child: ImageUtil.buildImageWidget(
+              image: group!.avatar, fit: BoxFit.contain),
         );
         TileData tile = TileData(
             prefix: badge,
