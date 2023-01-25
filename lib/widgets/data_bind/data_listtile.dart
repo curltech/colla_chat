@@ -80,7 +80,10 @@ class TileData {
       if (prefix is Widget) {
         leading = prefix;
       } else if (prefix is String) {
-        leading = ImageUtil.buildImageWidget(image: prefix);
+        leading = ImageUtil.buildImageWidget(
+          image: prefix,
+          fit: BoxFit.contain,
+        );
       } else if (prefix is IconData) {
         leading = Icon(prefix);
       }

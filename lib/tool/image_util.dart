@@ -54,14 +54,19 @@ class ImageUtil {
       {String? image,
       double? width,
       double? height,
-      BoxFit? fit = BoxFit.none,
+      BoxFit? fit = BoxFit.contain,
       bool isRadius = true,
       double radius = 8.0}) {
-    Widget imageWidget = AppImage.mdAppImage;
+    Widget imageWidget;
     if (image == null) {
-      return imageWidget;
-    }
-    if (ImageUtil.isBase64Img(image)) {
+      imageWidget = Image.asset(
+        key: UniqueKey(),
+        AppImageFile.mdAppIconFile,
+        width: width,
+        height: height,
+        fit: fit,
+      );
+    } else if (ImageUtil.isBase64Img(image)) {
       Uint8List bytes = ImageUtil.decodeBase64Img(image);
       imageWidget = Image.memory(bytes, width: width, height: height, fit: fit);
     } else if (ImageUtil.isAssetsImg(image)) {
@@ -88,6 +93,14 @@ class ImageUtil {
         height: height,
         fit: fit,
         cacheManager: defaultCacheManager,
+      );
+    } else {
+      imageWidget = Image.asset(
+        key: UniqueKey(),
+        AppImageFile.mdAppIconFile,
+        width: width,
+        height: height,
+        fit: fit,
       );
     }
     if (isRadius) {

@@ -76,10 +76,7 @@ class PeerClientService extends PeerEntityService<PeerClient> {
     }
     if (peerClient != null && peerClient.avatar != null) {
       var avatarImage = ImageUtil.buildImageWidget(
-        image: peerClient.avatar,
-        height: 32,
-        width: 32,
-      );
+          image: peerClient.avatar, height: 32, width: 32, fit: BoxFit.contain);
       peerClient.avatarImage = avatarImage;
     }
     return peerClient;

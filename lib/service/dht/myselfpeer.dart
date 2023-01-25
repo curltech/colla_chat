@@ -315,10 +315,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     final myselfPeer = myself.myselfPeer;
     myselfPeer.avatar = data;
     var avatarImage = ImageUtil.buildImageWidget(
-      image: data,
-      height: 32,
-      width: 32,
-    );
+        image: data, height: 32, width: 32, fit: BoxFit.contain);
     myselfPeer.avatarImage = avatarImage;
     var avatarIcon = ImageIcon(
       AssetImage(

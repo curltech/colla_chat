@@ -98,10 +98,7 @@ class MyselfService {
       String? avatar = myselfPeer.avatar;
       if (avatar != null) {
         var avatarImage = ImageUtil.buildImageWidget(
-          image: avatar,
-          height: 32,
-          width: 32,
-        );
+            image: avatar, height: 32, width: 32, fit: BoxFit.contain);
         myselfPeer.avatarImage = avatarImage;
 
         var avatarIcon = ImageIcon(

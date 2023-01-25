@@ -68,10 +68,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
       String? avatar = linkman.avatar;
       if (avatar != null) {
         var avatarImage = ImageUtil.buildImageWidget(
-          image: avatar,
-          height: 32,
-          width: 32,
-        );
+            image: avatar, height: 32, width: 32, fit: BoxFit.contain);
         linkman.avatarImage = avatarImage;
       }
       linkmen[peerId] = linkman;
@@ -306,10 +303,7 @@ class GroupService extends PeerPartyService<Group> {
       String? avatar = group.avatar;
       if (avatar != null) {
         var avatarImage = ImageUtil.buildImageWidget(
-          image: avatar,
-          height: 32,
-          width: 32,
-        );
+            image: avatar, height: 32, width: 32, fit: BoxFit.contain);
         group.avatarImage = avatarImage;
       }
       groups[peerId] = group;

@@ -3,7 +3,6 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
 class MeHeadWidget extends StatelessWidget {
   const MeHeadWidget({Key? key}) : super(key: key);
 
@@ -12,13 +11,9 @@ class MeHeadWidget extends StatelessWidget {
     String peerId;
     String name;
     var myselfPeer = myself.myselfPeer;
-    if (myselfPeer == null) {
-      peerId = '未登录';
-      name = '未登录';
-    } else {
-      peerId = myselfPeer.peerId;
-      name = myselfPeer.name;
-    }
+
+    peerId = myselfPeer.peerId;
+    name = myselfPeer.name;
     var listTile = ListTile(
       leading: myself.avatarImage,
       title: Text(name),

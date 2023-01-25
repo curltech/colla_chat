@@ -3,9 +3,11 @@ import 'package:flutter/widgets.dart';
 
 ///background opacity
 class AppOpacity {
+  static const double xlOpacity = 0;
   static const double lgOpacity = 0.2;
   static const double mdOpacity = 0.5;
   static const double smOpacity = 0.8;
+  static const double xsOpacity = 1;
 }
 
 ///padding
@@ -65,28 +67,25 @@ class AppIcon {
 }
 
 class AppImage {
-  static final xsAppImage = Image.asset(
-    AppImageFile.xsAppIconFile,
-    key: UniqueKey(),
+  static final xsAppImage = ImageUtil.buildImageWidget(
+    image: AppImageFile.xsAppIconFile,
     width: AppIconSize.xsSize.width,
     height: AppIconSize.xsSize.height,
-    fit: BoxFit.none,
+    fit: BoxFit.contain,
   );
 
-  static final smAppImage = Image.asset(
-    AppImageFile.mdAppIconFile,
-    key: UniqueKey(),
+  static final smAppImage = ImageUtil.buildImageWidget(
+    image: AppImageFile.mdAppIconFile,
     width: AppIconSize.smSize.width,
     height: AppIconSize.smSize.height,
-    fit: BoxFit.none,
+    fit: BoxFit.contain,
   );
 
   ///中等大小的app缺省图像
-  static final mdAppImage = Image.asset(
-    AppImageFile.mdAppIconFile,
-    key: UniqueKey(),
+  static final mdAppImage = ImageUtil.buildImageWidget(
+    image: AppImageFile.mdAppIconFile,
     width: AppIconSize.mdSize.width,
     height: AppIconSize.mdSize.height,
-    fit: BoxFit.none,
+    fit: BoxFit.contain,
   );
 }
