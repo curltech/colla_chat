@@ -64,7 +64,7 @@ class VideoDialInWidget extends StatelessWidget {
         }
 
         AdvancedPeerConnection? advancedPeerConnection =
-            peerConnectionPool.getOne1(
+            peerConnectionPool.getOne(
           peerId,
           clientId: clientId,
         );

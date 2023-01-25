@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -96,10 +97,13 @@ class _ChatMessageViewState extends State<ChatMessageView> {
       name = chatSummary.name!;
       partyType = chatSummary.partyType!;
       if (partyType == PartyType.linkman.name) {
-        List<AdvancedPeerConnection> advancedPeerConnections =
-            peerConnectionPool.get(peerId);
-        if (advancedPeerConnections.isEmpty) {
-          peerConnectionPool.create(peerId);
+        if (peerId != myself.peerId) {
+          logger.w('PeerConnection target $peerId is myself');
+          List<AdvancedPeerConnection> advancedPeerConnections =
+              peerConnectionPool.get(peerId);
+          if (advancedPeerConnections.isEmpty) {
+            peerConnectionPool.create(peerId);
+          }
         }
       } else if (partyType == PartyType.group.name) {
         List<GroupMember> groupMembers =
@@ -157,26 +161,16 @@ class _ChatMessageViewState extends State<ChatMessageView> {
   Widget build(BuildContext context) {
     String title = AppLocalizations.t(name);
     Widget titleWidget = Text(title);
-    //     Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-    //   Text(title),
-    //   const SizedBox(
-    //     width: 15,
-    //   ),
-    //   FutureBuilder(
-    //     future: _getImageWidget(context),
-    //     builder: (BuildContext context, AsyncSnapshot<Widget?> snapshot) {
-    //       Widget widget = snapshot.data ?? Container();
-    //       return widget;
-    //     },
-    //   ),
-    // ]);
     List<Widget> rightWidgets = [];
     if (partyType == PartyType.linkman.name) {
       var peerConnectionStatusWidget = ValueListenableBuilder(
           valueListenable: _peerConnectionStatus,
           builder: (context, value, child) {
             Widget widget = const Icon(Icons.wifi);
-            if (_peerConnectionStatus.value != PeerConnectionStatus.connected) {
+            if (peerId == myself.peerId) {
+              widget = myself.avatarImage ?? AppImage.mdAppImage;
+            } else if (_peerConnectionStatus.value !=
+                PeerConnectionStatus.connected) {
               widget = InkWell(
                   onTap: () {
                     _createPeerConnection();

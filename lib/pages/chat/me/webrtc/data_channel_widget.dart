@@ -65,7 +65,7 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
     AdvancedPeerConnection? advancedPeerConnection;
     if (peerId != null) {
       advancedPeerConnection =
-          peerConnectionPool.getOne1(peerId!, clientId: clientId);
+          peerConnectionPool.getOne(peerId!, clientId: clientId);
 
       return advancedPeerConnection;
     }

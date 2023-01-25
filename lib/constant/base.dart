@@ -35,18 +35,58 @@ class AppIconSize {
 }
 
 class AppImageFile {
-  static const defaultAppIconFile = 'assets/icons/favicon-96x96.png';
+  static const xsAppIconFile = 'assets/icons/favicon-16x16.png';
+  static const mdAppIconFile = 'assets/icons/favicon-32x32.png';
   static const defaultAvatarFile = 'assets/images/colla-o1.png';
   static const defaultGroupAvatarFile = 'assets/images/colla-o1.png';
 }
 
+class AppIcon {
+  static final xsAppIcon = ImageIcon(
+    const AssetImage(
+      AppImageFile.xsAppIconFile,
+    ),
+    size: AppIconSize.xsSize.width,
+  );
+
+  static final smAppIcon = ImageIcon(
+    const AssetImage(
+      AppImageFile.mdAppIconFile,
+    ),
+    size: AppIconSize.smSize.width,
+  );
+
+  static final mdAppIcon = ImageIcon(
+    const AssetImage(
+      AppImageFile.mdAppIconFile,
+    ),
+    size: AppIconSize.mdSize.width,
+  );
+}
+
 class AppImage {
+  static final xsAppImage = Image.asset(
+    AppImageFile.xsAppIconFile,
+    key: UniqueKey(),
+    width: AppIconSize.xsSize.width,
+    height: AppIconSize.xsSize.height,
+    fit: BoxFit.none,
+  );
+
+  static final smAppImage = Image.asset(
+    AppImageFile.mdAppIconFile,
+    key: UniqueKey(),
+    width: AppIconSize.smSize.width,
+    height: AppIconSize.smSize.height,
+    fit: BoxFit.none,
+  );
+
   ///中等大小的app缺省图像
   static final mdAppImage = Image.asset(
-    AppImageFile.defaultAppIconFile,
+    AppImageFile.mdAppIconFile,
     key: UniqueKey(),
     width: AppIconSize.mdSize.width,
     height: AppIconSize.mdSize.height,
-    fit: BoxFit.fill,
+    fit: BoxFit.none,
   );
 }

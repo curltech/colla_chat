@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/crypto/util.dart';
@@ -27,6 +28,7 @@ import 'package:colla_chat/tool/network_connectivity.dart';
 import 'package:colla_chat/tool/phone_number_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
+import 'package:flutter/material.dart';
 
 const String autoLoginName = 'autoLogin';
 const String lastLoginName = 'lastLogin';
@@ -118,7 +120,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     myselfPeer.startDate = currentDate;
     myselfPeer.endDate = '9999-12-31T11:59:59.999Z';
     myselfPeer.statusDate = currentDate;
-    await upsert(myselfPeer);
+    await store(myselfPeer);
     myself.myselfPeer = myselfPeer;
 
     // 初始化profile
@@ -292,6 +294,21 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     signalSessionPool.clear();
   }
 
+  ///保存MyselfPeer，同时保存对应的PeerClient和Linkman
+  Future<void> store(MyselfPeer myself) async {
+    MyselfPeer? myselfPeer =
+        await findOne(where: 'peerId=?', whereArgs: [myself.peerId]);
+    if (myselfPeer == null) {
+      await insert(myself);
+    } else {
+      await update(myself);
+    }
+    var json = JsonUtil.toJson(myself);
+    PeerClient peerClient = PeerClient.fromJson(json);
+    peerClientService.store(peerClient);
+    linkmanService.storeByPeerClient(peerClient);
+  }
+
   @override
   Future<String> updateAvatar(String peerId, List<int> avatar) async {
     String data = await super.updateAvatar(peerId, avatar);
@@ -303,7 +320,13 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       width: 32,
     );
     myselfPeer.avatarImage = avatarImage;
-    myself.avatarImage = avatarImage;
+    var avatarIcon = ImageIcon(
+      AssetImage(
+        data,
+      ),
+      size: AppIconSize.mdSize.width,
+    );
+    myselfPeer.avatarIcon = avatarIcon;
     await peerClientService.updateAvatar(peerId, avatar);
     await linkmanService.updateAvatar(peerId, avatar);
 

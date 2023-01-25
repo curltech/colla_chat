@@ -54,7 +54,7 @@ class ImageUtil {
       {String? image,
       double? width,
       double? height,
-      BoxFit? fit = BoxFit.contain,
+      BoxFit? fit = BoxFit.none,
       bool isRadius = true,
       double radius = 8.0}) {
     Widget imageWidget = AppImage.mdAppImage;

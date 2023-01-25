@@ -44,11 +44,11 @@ class LinkmanService extends PeerPartyService<Linkman> {
   }
 
   Future<List<Linkman>> search(String key) async {
-    var where = 'peerId!=?';
-    var whereArgs = [myself.peerId!];
+    var where = '1=1';
+    List<Object> whereArgs = [];
     if (StringUtil.isNotEmpty(key)) {
       where =
-          '$where and (peerId=? or mobile=? or name=? or pyName=? or email=?) and ';
+          '$where and (peerId=? or mobile=? or name=? or pyName=? or email=?)';
       whereArgs.addAll([key, key, key, key, key]);
     }
     var linkmen = await find(
@@ -117,6 +117,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
   Future<void> store(Linkman linkman) async {
     Linkman? old = await findCachedOneByPeerId(linkman.peerId);
     if (old == null) {
+      linkman.id = null;
       await insert(linkman);
       linkmen[linkman.peerId] = linkman;
       await chatSummaryService.upsertByLinkman(linkman);

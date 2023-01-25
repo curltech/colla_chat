@@ -110,10 +110,6 @@ class PeerClientService extends PeerEntityService<PeerClient> {
 
   ///新peerClient的mobile和email是否覆盖旧的
   store(PeerClient peerClient, {bool mobile = true, bool email = true}) async {
-    if (peerClient.peerId == myself.peerId) {
-      //logger.e('cannot store myself');
-      return;
-    }
     PeerClient? peerClient_ = await findOneByClientId(peerClient.peerId,
         clientId: peerClient.clientId);
     if (peerClient_ != null) {
@@ -126,6 +122,7 @@ class PeerClientService extends PeerEntityService<PeerClient> {
       }
       await update(peerClient);
     } else {
+      peerClient.id = null;
       await insert(peerClient);
     }
     var peerId = peerClient.peerId;

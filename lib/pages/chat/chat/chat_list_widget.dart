@@ -331,7 +331,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     linkmanChatSummaryController.removeListener(_update);
     groupChatSummaryController.removeListener(_update);
     websocketPool.removeListener(_updateWebsocket);
-    super.dispose();
     ConnectivityUtil.cancel(subscription);
+    super.dispose();
   }
 }

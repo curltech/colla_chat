@@ -92,7 +92,7 @@ class VideoChatReceiptController with ChangeNotifier {
       var peerId = chatReceipt.senderPeerId!;
       var clientId = chatReceipt.senderClientId!;
       AdvancedPeerConnection? advancedPeerConnection =
-          peerConnectionPool.getOne1(
+          peerConnectionPool.getOne(
         peerId,
         clientId: clientId,
       );

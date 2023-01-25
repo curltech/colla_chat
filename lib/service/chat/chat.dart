@@ -81,11 +81,15 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       String? subMessageType,
       int? offset,
       int? limit}) async {
+    var myselfPeerId = myself.peerId!;
     String where = '1=1';
     List<Object> whereArgs = [];
     if (peerId != null) {
-      where = '$where and (senderPeerId=? or receiverPeerId=?)';
+      where =
+          '$where and ((senderPeerId=? and receiverPeerId=?) or (senderPeerId=? and receiverPeerId=?))';
       whereArgs.add(peerId);
+      whereArgs.add(myselfPeerId);
+      whereArgs.add(myselfPeerId);
       whereArgs.add(peerId);
     }
     //当通过群peerId查询群消息时，发送的群消息会拆分到个体的消息记录需要排除，否则重复显示
@@ -126,11 +130,15 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       String? subMessageType,
       int? id,
       int? limit}) async {
+    var myselfPeerId = myself.peerId!;
     String where = '1=1';
     List<Object> whereArgs = [];
     if (peerId != null) {
-      where = '$where and (senderPeerId=? or receiverPeerId=?)';
+      where =
+          '$where and ((senderPeerId=? and receiverPeerId=?) or (senderPeerId=? and receiverPeerId=?))';
       whereArgs.add(peerId);
+      whereArgs.add(myselfPeerId);
+      whereArgs.add(myselfPeerId);
       whereArgs.add(peerId);
     }
     //当通过群peerId查询群消息时，发送的群消息会拆分到个体的消息记录需要排除，否则重复显示
@@ -406,10 +414,11 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return chatMessages;
   }
 
+  ///发送消息并保存，如果是发送给自己的消息，只保存不发送
   Future<ChatMessage> sendAndStore(ChatMessage chatMessage,
       {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     var peerId = chatMessage.receiverPeerId;
-    if (peerId != null) {
+    if (peerId != null && peerId != myself.peerId) {
       String json = JsonUtil.toJsonString(chatMessage);
       var data = CryptoUtil.stringToUtf8(json);
       var transportType = chatMessage.transportType;
@@ -805,8 +814,8 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
   Future<List<ChatSummary>> findByPartyType(
     String partyType,
   ) async {
-    String where = 'partyType=? and peerId!=?';
-    List<Object> whereArgs = [partyType, myself.peerId!];
+    String where = 'partyType=?';
+    List<Object> whereArgs = [partyType];
     var chatSummary = await find(
       where: where,
       whereArgs: whereArgs,

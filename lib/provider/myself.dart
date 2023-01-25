@@ -27,7 +27,6 @@ class Myself with ChangeNotifier {
 
   MyselfPeer myselfPeer = MyselfPeer('', '', '', '');
   PeerProfile peerProfile = PeerProfile('', '');
-  Widget? avatarImage;
 
   ///当连接p2p节点成功后设置
   PeerClient? myselfPeerClient;
@@ -44,6 +43,14 @@ class Myself with ChangeNotifier {
   Myself() {
     _buildThemeData();
     _buildDarkThemeData();
+  }
+
+  Widget? get avatarImage {
+    return myselfPeer.avatarImage;
+  }
+
+  Widget? get avatarIcon {
+    return myselfPeer.avatarIcon;
   }
 
   /// locale操作
