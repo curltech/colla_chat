@@ -3,13 +3,13 @@ import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/group/group_add_widget.dart';
-import 'package:colla_chat/pages/chat/linkman/group/linkman_group_info_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_add_widget.dart';
-import 'package:colla_chat/pages/chat/linkman/linkman/linkman_info_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman/linkman_edit_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
@@ -25,14 +25,12 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
   //linkman和group的数据显示列表
   final GroupDataListController groupDataListController =
       GroupDataListController();
-  final LinkmanInfoWidget linkmanInfoWidget = LinkmanInfoWidget();
-  final LinkmanGroupInfoWidget groupInfoWidget = LinkmanGroupInfoWidget();
+  final LinkmanEditWidget linkmanEditWidget = LinkmanEditWidget();
   final LinkmanAddWidget linkmanAddWidget = LinkmanAddWidget();
   final GroupAddWidget groupAddWidget = GroupAddWidget();
 
   LinkmanListWidget({Key? key}) : super(key: key) {
-    indexWidgetProvider.define(linkmanInfoWidget);
-    indexWidgetProvider.define(groupInfoWidget);
+    indexWidgetProvider.define(linkmanEditWidget);
     indexWidgetProvider.define(linkmanAddWidget);
     indexWidgetProvider.define(groupAddWidget);
   }
@@ -111,7 +109,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
             prefix: linkman.avatar,
             title: title,
             subtitle: subtitle,
-            routeName: 'linkman_info');
+            selected: false,
+            routeName: 'linkman_edit');
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(
             title: 'Delete',
@@ -152,10 +151,13 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
       for (var group in groups) {
         var title = group.name;
         var subtitle = group.peerId;
+        group.avatarImage ??= ImageUtil.buildImageWidget(
+            image: group.avatar, width: 32, height: 32);
         TileData tile = TileData(
-            prefix: group.avatar,
+            prefix: group.avatarImage,
             title: title,
             subtitle: subtitle,
+            selected: false,
             routeName: 'linkman_group_edit');
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(
@@ -208,12 +210,14 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
     var rightWidgets = [
       IconButton(
           onPressed: () {
+            linkmanController.currentIndex = -1;
             indexWidgetProvider.push('linkman_add');
           },
           icon: const Icon(Icons.person_add_alt),
           tooltip: AppLocalizations.t('Add linkman')),
       IconButton(
           onPressed: () {
+            groupController.currentIndex = -1;
             indexWidgetProvider.push('group_add');
           },
           icon: const Icon(Icons.group_add),

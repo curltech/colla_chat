@@ -1,4 +1,3 @@
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/contact_linkman_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/nearby_linkman_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/p2p_linkman_add_widget.dart';
@@ -51,10 +50,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     Widget child = DataListView(tileData: linkmanAddTileData);
-    var me = AppBarView(
-        title: title,
-        withLeading: true,
-        child: child);
+    var me = AppBarView(title: title, withLeading: true, child: child);
     return me;
   }
 }

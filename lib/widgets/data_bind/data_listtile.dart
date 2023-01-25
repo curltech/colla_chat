@@ -24,6 +24,7 @@ class TileData {
 
   //是否缩小
   bool dense;
+  bool? selected;
 
   final bool isThreeLine;
 
@@ -40,6 +41,7 @@ class TileData {
       this.suffix,
       this.routeName,
       this.dense = true,
+      this.selected,
       this.isThreeLine = false,
       this.onTap});
 
@@ -147,7 +149,9 @@ class DataListTile extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end, children: trailing));
     }
     bool selected = false;
-    if (dataListViewController.currentIndex == index) {
+    if (tileData.selected == true ||
+        (tileData.selected == null &&
+            dataListViewController.currentIndex == index)) {
       selected = true;
     }
 

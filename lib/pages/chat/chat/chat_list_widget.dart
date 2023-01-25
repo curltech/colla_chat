@@ -177,6 +177,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
             title: title,
             subtitle: peerId,
             dense: true,
+            selected: false,
             routeName: 'chat_message');
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(
@@ -223,6 +224,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
             title: title,
             subtitle: peerId,
             dense: true,
+            selected: false,
             routeName: 'chat_message');
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(

@@ -1,9 +1,13 @@
 import 'package:colla_chat/entity/chat/contact.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
+import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
+import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -31,7 +35,7 @@ final List<ColumnFieldDef> linkmanColumnFieldDefs = [
       prefixIcon: const Icon(Icons.mobile_friendly)),
 ];
 
-//联系人编辑组件，加减联系人好友，黑名单，订阅，改变联系人的名称
+//联系人信息页面
 class LinkmanEditWidget extends StatefulWidget with TileDataMixin {
   LinkmanEditWidget({Key? key}) : super(key: key);
 
@@ -57,8 +61,8 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
   @override
   initState() {
     super.initState();
-    linkman = linkmanController.current;
     linkmanController.addListener(_update);
+    linkman ??= linkmanController.current;
   }
 
   _update() {
@@ -90,12 +94,129 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     await linkmanService.store(linkman!);
   }
 
+  _addFriend({String? tip}) async {
+    await _changeStatus(LinkmanStatus.friend);
+    // 加好友会发送自己的信息，回执将收到对方的信息
+    await linkmanService.addFriend(linkman!.peerId, tip!);
+  }
+
+  _changeStatus(LinkmanStatus status) async {
+    int id = linkman!.id!;
+    await linkmanService.update({'id': id, 'status': status.name});
+    linkman = await linkmanService.findOne(where: 'id=?', whereArgs: [id]);
+    linkmanController.current = linkman;
+  }
+
+  _changeSubscriptStatus(LinkmanStatus status) async {
+    int id = linkman!.id!;
+    await linkmanService.update({'id': id, 'subscriptStatus': status.name});
+    linkman = await linkmanService.findOne(where: 'id=?', whereArgs: [id]);
+    linkmanController.current = linkman;
+  }
+
+  Widget _buildAddFriendTextField(BuildContext context) {
+    var controller = TextEditingController();
+    var addFriendTextField = Container(
+        padding: const EdgeInsets.all(10.0),
+        child: TextFormField(
+            autofocus: true,
+            controller: controller,
+            keyboardType: TextInputType.text,
+            decoration: InputDecoration(
+              fillColor: Colors.black.withOpacity(0.1),
+              filled: true,
+              border: InputBorder.none,
+              labelText: AppLocalizations.t('Add friend'),
+              suffixIcon: IconButton(
+                onPressed: () {
+                  _addFriend(tip: controller.text);
+                },
+                icon: const Icon(Icons.person_add),
+              ),
+            )));
+
+    return addFriendTextField;
+  }
+
+  Widget _buildActionTiles(BuildContext context) {
+    List<TileData> tileData = [];
+    if (linkman != null) {
+      if (linkman!.status == LinkmanStatus.friend.name) {
+        tileData.add(
+          TileData(
+              title: 'Remove friend',
+              prefix: const Icon(Icons.person_remove),
+              onTap: (int index, String title, {String? subtitle}) {
+                _changeStatus(LinkmanStatus.stranger);
+              }),
+        );
+      }
+      if (linkman!.status == LinkmanStatus.blacklist.name) {
+        tileData.add(
+          TileData(
+              title: AppLocalizations.t('Remove blacklist'),
+              prefix: const Icon(Icons.person_outlined),
+              onTap: (int index, String title, {String? subtitle}) {
+                _changeStatus(LinkmanStatus.stranger);
+              }),
+        );
+      } else {
+        tileData.add(TileData(
+            title: AppLocalizations.t('Add blacklist'),
+            prefix: const Icon(Icons.person_off),
+            onTap: (int index, String title, {String? subtitle}) {
+              _changeStatus(LinkmanStatus.blacklist);
+            }));
+      }
+      if (linkman!.status == LinkmanStatus.blacklist.name) {
+        tileData.add(
+          TileData(
+              title: AppLocalizations.t('Remove subscript'),
+              prefix: const Icon(Icons.unsubscribe),
+              onTap: (int index, String title, {String? subtitle}) {
+                _changeSubscriptStatus(LinkmanStatus.stranger);
+              }),
+        );
+      } else {
+        tileData.add(TileData(
+            title: AppLocalizations.t('Add subscript'),
+            prefix: const Icon(Icons.subscriptions),
+            onTap: (int index, String title, {String? subtitle}) {
+              _changeSubscriptStatus(LinkmanStatus.subscript);
+            }));
+      }
+    }
+    var listView = DataListView(
+      tileData: tileData,
+    );
+    return listView;
+  }
+
   @override
   Widget build(BuildContext context) {
+    var actionTiles = [
+      _buildActionTiles(context),
+      const SizedBox(
+        height: 15,
+      ),
+    ];
+    if (linkman != null) {
+      if (linkman!.status != LinkmanStatus.friend.name) {
+        actionTiles.add(_buildAddFriendTextField(context));
+        actionTiles.add(
+          const SizedBox(
+            height: 15,
+          ),
+        );
+      }
+    }
+    actionTiles.add(Expanded(
+        child: SingleChildScrollView(child: _buildFormInputWidget(context))));
+
     var appBarView = AppBarView(
         title: widget.title,
         withLeading: widget.withLeading,
-        child: _buildFormInputWidget(context));
+        child: Column(children: actionTiles));
     return appBarView;
   }
 

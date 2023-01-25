@@ -119,8 +119,9 @@ class DataListController<T> with ChangeNotifier {
 
   int get length => data.length;
 
-  Map<String, dynamic>? getInitValue(List<ColumnFieldDef> inputFieldDefs) {
-    T? current = this.current;
+  Map<String, dynamic>? getInitValue(List<ColumnFieldDef> inputFieldDefs,
+      {T? entity}) {
+    T? current = entity ?? this.current;
     if (current != null) {
       var currentMap = JsonUtil.toJson(current);
       Map<String, dynamic> values = {};

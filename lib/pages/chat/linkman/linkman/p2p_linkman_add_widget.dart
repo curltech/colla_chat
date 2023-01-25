@@ -130,8 +130,8 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
             },
           );
         }
-        TileData tile =
-            TileData(title: title, subtitle: peerId, suffix: suffix);
+        TileData tile = TileData(
+            title: title, subtitle: peerId, suffix: suffix, selected: false);
         tiles.add(tile);
       }
     }
