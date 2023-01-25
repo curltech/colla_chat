@@ -345,9 +345,11 @@ class GroupService extends PeerPartyService<Group> {
     if (old != null) {
       group.id = old.id;
       group.createDate = old.createDate;
+    } else {
+      group.id = null;
     }
     await upsert(group);
-    groups[group.peerId];
+    groups[group.peerId] = group;
     await chatSummaryService.upsertByGroup(group);
     List<PeerParty> members = group.memberPeers;
     if (members.isNotEmpty) {
@@ -397,7 +399,7 @@ class GroupService extends PeerPartyService<Group> {
     String json = CryptoUtil.utf8ToString(data);
     Map<String, dynamic> map = JsonUtil.toJson(json);
     Group group = Group.fromJson(map);
-    groupService.store(group);
+    await groupService.store(group);
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
 
@@ -405,16 +407,12 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   ///接收加群的回执消息
-  receiveAddGroupReceipt(ChatMessage chatMessage) async {
-    Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
+  receiveAddGroupReceipt(ChatMessage chatReceipt) async {
+    Uint8List data = CryptoUtil.decodeBase64(chatReceipt.content!);
     String json = CryptoUtil.utf8ToString(data);
     Map<String, dynamic> map = JsonUtil.toJson(json);
-    Group group = Group.fromJson(map);
-    groupService.store(group);
-    ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
-        chatMessage, MessageStatus.accepted);
 
-    await chatMessageService.sendAndStore(chatReceipt!);
+    await chatMessageService.sendAndStore(chatReceipt);
   }
 
   ///向群成员发送群属性变化的消息
@@ -446,16 +444,12 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   ///接收变群的回执消息
-  receiveModifyGroupReceipt(ChatMessage chatMessage) async {
-    Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
+  receiveModifyGroupReceipt(ChatMessage chatReceipt) async {
+    Uint8List data = CryptoUtil.decodeBase64(chatReceipt.content!);
     String json = CryptoUtil.utf8ToString(data);
     Map<String, dynamic> map = JsonUtil.toJson(json);
-    Group group = Group.fromJson(map);
-    groupService.store(group);
-    ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
-        chatMessage, MessageStatus.accepted);
 
-    await chatMessageService.sendAndStore(chatReceipt!);
+    await chatMessageService.sendAndStore(chatReceipt);
   }
 
   ///向群成员发送散群的消息
@@ -544,8 +538,8 @@ class GroupService extends PeerPartyService<Group> {
     await chatMessageService.sendAndStore(chatReceipt!);
   }
 
-  receiveAddGroupMemberReceipt(ChatMessage chatMessage) async {
-    Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
+  receiveAddGroupMemberReceipt(ChatMessage chatReceipt) async {
+    Uint8List data = CryptoUtil.decodeBase64(chatReceipt.content!);
     String json = CryptoUtil.utf8ToString(data);
     List<Map<String, dynamic>> maps = JsonUtil.toJson(json);
     List<GroupMember> groupMembers = [];
@@ -555,8 +549,6 @@ class GroupService extends PeerPartyService<Group> {
       groupMemberService.store(groupMember);
     }
 
-    ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
-        chatMessage, MessageStatus.accepted);
 
     await chatMessageService.sendAndStore(chatReceipt!);
   }
@@ -596,8 +588,8 @@ class GroupService extends PeerPartyService<Group> {
     await chatMessageService.sendAndStore(chatReceipt!);
   }
 
-  receiveRemoveGroupMemberReceipt(ChatMessage chatMessage) async {
-    Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
+  receiveRemoveGroupMemberReceipt(ChatMessage chatReceipt) async {
+    Uint8List data = CryptoUtil.decodeBase64(chatReceipt.content!);
     String json = CryptoUtil.utf8ToString(data);
     List<Map<String, dynamic>> maps = JsonUtil.toJson(json);
     List<GroupMember> groupMembers = [];
@@ -610,8 +602,6 @@ class GroupService extends PeerPartyService<Group> {
       });
     }
 
-    ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
-        chatMessage, MessageStatus.accepted);
 
     await chatMessageService.sendAndStore(chatReceipt!);
   }

@@ -231,20 +231,20 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     }
     await store(chatMessage, updateSummary: false);
 
-    ChatMessage msg = ChatMessage();
-    msg.messageId = chatMessage.messageId;
-    msg.messageType = chatMessage.messageType;
-    msg.subMessageType = ChatMessageSubType.chatReceipt.name;
-    msg.direct = ChatDirect.send.name;
-    msg.senderPeerId = myself.peerId!;
-    msg.senderClientId = myself.clientId;
-    msg.senderType = PartyType.linkman.name;
-    msg.senderName = myself.myselfPeer!.name;
-    msg.sendTime = DateUtil.currentDate();
-    msg.receiverPeerId = chatMessage.senderPeerId;
-    msg.receiverClientId = chatMessage.senderClientId;
-    msg.receiverType = chatMessage.senderType;
-    msg.title = chatMessage.subMessageType;
+    ChatMessage chatReceipt = ChatMessage();
+    chatReceipt.messageId = chatMessage.messageId;
+    chatReceipt.messageType = chatMessage.messageType;
+    chatReceipt.subMessageType = ChatMessageSubType.chatReceipt.name;
+    chatReceipt.direct = ChatDirect.send.name;
+    chatReceipt.senderPeerId = myself.peerId!;
+    chatReceipt.senderClientId = myself.clientId;
+    chatReceipt.senderType = PartyType.linkman.name;
+    chatReceipt.senderName = myself.myselfPeer!.name;
+    chatReceipt.sendTime = DateUtil.currentDate();
+    chatReceipt.receiverPeerId = chatMessage.senderPeerId;
+    chatReceipt.receiverClientId = chatMessage.senderClientId;
+    chatReceipt.receiverType = chatMessage.senderType;
+    chatReceipt.title = chatMessage.subMessageType;
     String? receiverPeerId = chatMessage.senderPeerId;
     if (receiverPeerId == null) {
       logger.e('receiverPeerId is null');
@@ -258,17 +258,17 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         senderName = peerClient.name;
       }
     }
-    msg.receiverName = senderName;
-    msg.receiptTime = chatMessage.receiptTime;
-    msg.receiveTime = chatMessage.receiveTime;
-    msg.status = chatMessage.status;
-    msg.readTime = chatMessage.readTime;
-    msg.deleteTime = chatMessage.deleteTime;
+    chatReceipt.receiverName = senderName;
+    chatReceipt.receiptTime = chatMessage.receiptTime;
+    chatReceipt.receiveTime = chatMessage.receiveTime;
+    chatReceipt.status = chatMessage.status;
+    chatReceipt.readTime = chatMessage.readTime;
+    chatReceipt.deleteTime = chatMessage.deleteTime;
     if (receiptContent != null) {
-      msg.receiptContent = CryptoUtil.encodeBase64(receiptContent);
+      chatReceipt.receiptContent = CryptoUtil.encodeBase64(receiptContent);
     }
 
-    return msg;
+    return chatReceipt;
   }
 
   //未填写的字段：transportType,senderAddress,receiverAddress,receiveTime,actualReceiveTime,readTime,destroyTime

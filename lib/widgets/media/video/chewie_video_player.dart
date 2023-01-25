@@ -1,16 +1,8 @@
 import 'dart:io';
 import 'package:chewie/chewie.dart';
-import 'package:colla_chat/plugin/logger.dart';
+
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
-import 'package:universal_html/html.dart' as html;
-import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
-import 'package:flick_video_player/flick_video_player.dart';
-import 'package:flick_video_player/src/utils/web_key_bindings.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:provider/provider.dart';
-import 'package:video_player/video_player.dart';
 
 ///基于Chewie实现的媒体播放器和记录器，
 class ChewieVideoPlayerController extends OriginVideoPlayerController {

@@ -182,7 +182,7 @@ class SmartSelectUtil {
     }
 
     return SmartSelect<T>.single(
-      title: AppLocalizations.t(title),
+      title: AppLocalizations.t(title ?? ''),
       placeholder: AppLocalizations.t(placeholder),
       selectedValue: value!,
       onChange: (selected) {
@@ -190,6 +190,7 @@ class SmartSelectUtil {
       },
       choiceItems: options,
       modalConfig: S2ModalConfig(
+        title: AppLocalizations.t(title ?? ''),
         type: modalType,
         useFilter: modalFilter,
         filterAuto: modalFilterAuto,
@@ -276,7 +277,7 @@ class SmartSelectUtil {
       };
     }
     return SmartSelect<T>.multiple(
-      title: AppLocalizations.t(title ?? ''),
+      title: '',
       placeholder: AppLocalizations.t(placeholder),
       selectedValue: selectedValue,
       onChange: (selected) {
@@ -284,6 +285,7 @@ class SmartSelectUtil {
       },
       choiceItems: options,
       modalConfig: S2ModalConfig(
+        title: AppLocalizations.t(title ?? ''),
         type: modalType,
         useFilter: modalFilter,
         filterAuto: modalFilterAuto,

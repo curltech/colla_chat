@@ -134,7 +134,7 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
           }
           var options = _buildOptions();
           return SmartSelectUtil.multiple<String>(
-            title: '',
+            title: title,
             placeholder: '',
             leading: widget.searchable
                 ? SizedBox(
@@ -150,9 +150,10 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
             modalFilter: true,
             modalFilterAuto: true,
             chipOnDelete: (i) {
-              selected.removeAt(i);
-              widget.onSelected(selected);
-              setState(() {});
+              setState(() {
+                selected.removeAt(i);
+                widget.onSelected(selected);
+              });
             },
           );
         });

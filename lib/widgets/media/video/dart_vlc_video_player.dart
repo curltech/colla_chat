@@ -1,9 +1,7 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart'
     as platform;
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
