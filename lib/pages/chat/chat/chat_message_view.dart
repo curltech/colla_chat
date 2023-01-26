@@ -98,7 +98,6 @@ class _ChatMessageViewState extends State<ChatMessageView> {
       partyType = chatSummary.partyType!;
       if (partyType == PartyType.linkman.name) {
         if (peerId != myself.peerId) {
-          logger.w('PeerConnection target $peerId is myself');
           List<AdvancedPeerConnection> advancedPeerConnections =
               peerConnectionPool.get(peerId);
           if (advancedPeerConnections.isEmpty) {
@@ -110,7 +109,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
             await groupMemberService.findByGroupId(peerId);
         for (var groupMember in groupMembers) {
           String? memberPeerId = groupMember.memberPeerId;
-          if (memberPeerId != null) {
+          if (memberPeerId != null && memberPeerId != myself.peerId) {
             List<AdvancedPeerConnection> advancedPeerConnections =
                 peerConnectionPool.get(memberPeerId);
             if (advancedPeerConnections.isEmpty) {
