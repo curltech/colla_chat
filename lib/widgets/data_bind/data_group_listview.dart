@@ -108,7 +108,7 @@ class _GroupDataListViewState extends State<GroupDataListView> {
     if (dataListController == null) {
       return null;
     }
-    Widget? leading = tile.getPrefixWidget();
+    Widget? leading = tile.getPrefixWidget(true);
     List<Widget>? trailing = <Widget>[];
     var suffix = tile.suffix;
     if (suffix != null) {

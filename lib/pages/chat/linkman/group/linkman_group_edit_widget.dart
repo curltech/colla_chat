@@ -93,15 +93,16 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
     }
     if (group.value.id != null) {
       groupOwnerPeerId = group.value.groupOwnerPeerId;
-      groupMembers.value.clear();
+      List<String> groupMembers = [];
       List<GroupMember> members =
           await groupMemberService.findByGroupId(group.value.peerId);
       if (members.isNotEmpty) {
         for (GroupMember member in members) {
-          groupMembers.value.add(member.memberPeerId!);
+          groupMembers.add(member.memberPeerId!);
         }
       }
-      await _buildGroupOwnerChoices(groupMembers.value);
+      this.groupMembers.value = groupMembers;
+      await _buildGroupOwnerChoices(groupMembers);
     }
   }
 

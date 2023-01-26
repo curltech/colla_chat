@@ -142,6 +142,14 @@ class MessageWidget {
       body = buildActionMessageWidget(context, subMessageType!);
     } else if (subMessageType == ChatMessageSubType.addFriend) {
       body = buildActionMessageWidget(context, subMessageType!);
+    } else if (subMessageType == ChatMessageSubType.addGroup) {
+      body = buildActionMessageWidget(context, subMessageType!);
+    } else if (subMessageType == ChatMessageSubType.dismissGroup) {
+      body = buildActionMessageWidget(context, subMessageType!);
+    } else if (subMessageType == ChatMessageSubType.addGroupMember) {
+      body = buildActionMessageWidget(context, subMessageType!);
+    } else if (subMessageType == ChatMessageSubType.removeGroupMember) {
+      body = buildActionMessageWidget(context, subMessageType!);
     } else if (subMessageType == ChatMessageSubType.cancel) {
       body = buildCancelMessageWidget(context, chatMessage.content!);
     } else if (subMessageType == ChatMessageSubType.chatReceipt) {
@@ -245,10 +253,17 @@ class MessageWidget {
 
   ActionMessage buildActionMessageWidget(
       BuildContext context, ChatMessageSubType subMessageType) {
+    String? content = chatMessage.content;
+    List<int>? data;
+    if (content != null) {
+      data = CryptoUtil.decodeBase64(content);
+      content = CryptoUtil.utf8ToString(data);
+    }
     return ActionMessage(
       key: UniqueKey(),
       isMyself: isMyself,
       subMessageType: subMessageType,
+      content: content,
     );
   }
 

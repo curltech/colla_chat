@@ -41,7 +41,7 @@ class TileData {
       this.suffix,
       this.routeName,
       this.dense = true,
-      this.selected,
+      this.selected = false,
       this.isThreeLine = false,
       this.onTap});
 
@@ -76,7 +76,7 @@ class TileData {
   @override
   int get hashCode => title.hashCode;
 
-  Widget? getPrefixWidget() {
+  Widget? getPrefixWidget(bool selected) {
     Widget? leading;
     if (prefix != null) {
       if (prefix is Widget) {
@@ -87,7 +87,11 @@ class TileData {
           fit: BoxFit.contain,
         );
       } else if (prefix is IconData) {
-        leading = Icon(prefix);
+        if (selected) {
+          leading = Icon(prefix, color: myself.primary);
+        } else {
+          leading = Icon(prefix);
+        }
       }
     }
 
@@ -115,8 +119,15 @@ class DataListTile extends StatelessWidget {
       : super(key: key);
 
   Widget _buildListTile(BuildContext context) {
+    bool selected = false;
+    if (tileData.selected == true ||
+        (tileData.selected == null &&
+            dataListViewController.currentIndex == index)) {
+      selected = true;
+    }
+
     ///前导组件，一般是自定义图标或者图像
-    Widget? leading = tileData.getPrefixWidget();
+    Widget? leading = tileData.getPrefixWidget(selected);
 
     ///尾部组件数组，首先加入suffix自定义组件或者文本
     List<Widget>? trailing = <Widget>[];
@@ -147,12 +158,6 @@ class DataListTile extends StatelessWidget {
           width: 300,
           child: Row(
               mainAxisAlignment: MainAxisAlignment.end, children: trailing));
-    }
-    bool selected = false;
-    if (tileData.selected == true ||
-        (tileData.selected == null &&
-            dataListViewController.currentIndex == index)) {
-      selected = true;
     }
 
     ///未来不使用ListTile，因为高度固定，不够灵活

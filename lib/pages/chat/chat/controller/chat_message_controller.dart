@@ -193,10 +193,8 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       );
       if (chatMessages.isNotEmpty) {
         chatMessage = chatMessages[0];
-        for (var chatMessage in chatMessages.sublist(1)) {
+        for (var chatMessage in chatMessages) {
           chatMessage = await chatMessageService.sendAndStore(chatMessage);
-          //用于更新发送的状态，可以只更新status字段
-          await chatMessageService.store(chatMessage);
         }
       }
       _deleteTime = 0;

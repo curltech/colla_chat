@@ -93,11 +93,12 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       whereArgs.add(peerId);
     }
     //当通过群peerId查询群消息时，发送的群消息会拆分到个体的消息记录需要排除，否则重复显示
-    if (groupPeerId != null) {
-      where = '$where and groupPeerId=? and (direct!=? or receiverType!=?)';
+    else if (groupPeerId != null) {
+      where =
+          '$where and groupPeerId=? and receiverType=? and receiverPeerId=?';
       whereArgs.add(groupPeerId);
-      whereArgs.add(ChatDirect.send.name);
       whereArgs.add(PartyType.linkman.name);
+      whereArgs.add(myselfPeerId);
     }
     if (direct != null) {
       where = '$where and direct=?';
@@ -142,11 +143,12 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       whereArgs.add(peerId);
     }
     //当通过群peerId查询群消息时，发送的群消息会拆分到个体的消息记录需要排除，否则重复显示
-    if (groupPeerId != null) {
-      where = '$where and groupPeerId=? and (direct!=? or receiverType!=?)';
+    else if (groupPeerId != null) {
+      where =
+          '$where and groupPeerId=? and receiverType=? and receiverPeerId=?';
       whereArgs.add(groupPeerId);
-      whereArgs.add(ChatDirect.send.name);
       whereArgs.add(PartyType.linkman.name);
+      whereArgs.add(myselfPeerId);
     }
     if (messageType != null) {
       where = '$where and messageType=?';
@@ -414,11 +416,14 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return chatMessages;
   }
 
-  ///发送消息并保存，如果是发送给自己的消息，只保存不发送
+  ///发送消息并保存，如果是发送给自己的消息或者群消息，只保存不发送
   Future<ChatMessage> sendAndStore(ChatMessage chatMessage,
       {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     var peerId = chatMessage.receiverPeerId;
-    if (peerId != null && peerId != myself.peerId) {
+    var receiverType = chatMessage.receiverType;
+    if (peerId != null &&
+        peerId != myself.peerId &&
+        receiverType != PartyType.group.name) {
       String json = JsonUtil.toJsonString(chatMessage);
       var data = CryptoUtil.stringToUtf8(json);
       var transportType = chatMessage.transportType;
@@ -435,12 +440,15 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       if (transportType == TransportType.websocket.name) {
         p2pChatAction.chat(Uint8List.fromList(data), peerId);
       }
+    } else {
+      chatMessage.transportType = TransportType.none.name;
     }
     await chatMessageService.store(chatMessage);
 
     return chatMessage;
   }
 
+  ///转发消息
   Future<ChatMessage?> forward(ChatMessage chatMessage, String peerId,
       {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     String? title = chatMessage.title;

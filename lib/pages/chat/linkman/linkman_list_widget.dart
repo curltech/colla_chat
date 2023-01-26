@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -81,10 +82,10 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
             controller: controller,
             keyboardType: TextInputType.text,
             decoration: InputDecoration(
-              fillColor: Colors.black.withOpacity(0.1),
+              fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
               filled: true,
               border: InputBorder.none,
-              labelText: AppLocalizations.t('Search'),
+              //labelText: AppLocalizations.t('Search'),
               suffixIcon: IconButton(
                 onPressed: () {
                   _search(controller.text);

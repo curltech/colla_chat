@@ -1,4 +1,4 @@
-import '../base.dart';
+import 'package:colla_chat/entity/base.dart';
 
 enum ContentType {
   rich, // 根据场景包含类型不同，如非系统类型、可搜索类型等
@@ -91,7 +91,7 @@ enum PartyType { linkman, group, peerClient, contact, channel, room }
 
 enum ChatDirect { receive, send }
 
-enum TransportType { websocket, webrtc, email, sms, nearby }
+enum TransportType { none, websocket, webrtc, sfu, email, sms, nearby }
 
 // 消息，泛指一切社交复合文档，最简单的是一句话，最复杂可以是非常复杂的混合文本，图片，视频的文档
 class ChatMessage extends StatusEntity {

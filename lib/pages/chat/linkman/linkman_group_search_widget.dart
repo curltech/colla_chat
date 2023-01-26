@@ -44,7 +44,6 @@ class LinkmanGroupSearchWidget extends StatefulWidget {
 
 class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
   TextEditingController textController = TextEditingController();
-  List<String> selected = [];
   List<Linkman> linkmen = [];
   List<Group> groups = [];
   String title = '';
@@ -53,7 +52,6 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
   @override
   initState() {
     super.initState();
-    selected.addAll(widget.selected);
     if (widget.includeLinkman && widget.includeGroup) {
       title = 'Linkman and group';
       placeholder = 'linkmen and groups';
@@ -86,9 +84,9 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
         fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
         filled: true,
         border: InputBorder.none,
-        labelText: AppLocalizations.t('Search') +
-            AppLocalizations.t(' ') +
-            AppLocalizations.t(title),
+        // labelText: AppLocalizations.t('Search') +
+        //     AppLocalizations.t(' ') +
+        //     AppLocalizations.t(title),
         suffixIcon: IconButton(
           onPressed: () async {
             await _search();
@@ -106,7 +104,7 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
     List<Option<String>> options = [];
     if (widget.includeLinkman) {
       for (Linkman linkman in linkmen) {
-        bool checked = selected.contains(linkman.peerId);
+        bool checked = widget.selected.contains(linkman.peerId);
         Option<String> item =
             Option<String>(linkman.name, linkman.peerId, checked: checked);
         options.add(item);
@@ -114,7 +112,7 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
     }
     if (widget.includeGroup) {
       for (Group group in groups) {
-        bool checked = selected.contains(group.peerId);
+        bool checked = widget.selected.contains(group.peerId);
         Option<String> item =
             Option<String>(group.name, group.peerId, checked: checked);
         options.add(item);
@@ -143,7 +141,8 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
                   )
                 : null,
             onChange: (selected) {
-              this.selected = selected;
+              widget.selected.clear();
+              widget.selected.addAll(selected);
               widget.onSelected(selected);
             },
             items: options,
@@ -151,8 +150,8 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
             modalFilterAuto: true,
             chipOnDelete: (i) {
               setState(() {
-                selected.removeAt(i);
-                widget.onSelected(selected);
+                widget.selected.removeAt(i);
+                widget.onSelected(widget.selected);
               });
             },
           );
@@ -184,7 +183,8 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
             ]),
             buttonText: title,
             onConfirm: (selected) {
-              this.selected = selected;
+              widget.selected.clear();
+              widget.selected.addAll(selected);
               widget.onSelected(selected);
             },
             items: options,
@@ -217,7 +217,8 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
               _buildSearchTextField(context),
             ]),
             onConfirm: (selected) {
-              this.selected = selected;
+              widget.selected.clear();
+              widget.selected.addAll(selected);
               widget.onSelected(selected);
             },
             items: _buildOptions(),
