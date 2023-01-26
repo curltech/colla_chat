@@ -110,7 +110,8 @@ class VideoChatReceiptController with ChangeNotifier {
         Room? room = advancedPeerConnection.room;
         if (room == null) {
           String messageId = chatReceipt.messageId!;
-          var chatMessage = await chatMessageService.findByMessageId(messageId);
+          var chatMessage = await chatMessageService.findByMessageId(messageId,
+              receiverPeerId: peerId);
           if (chatMessage == null) {
             return;
           }

@@ -427,15 +427,6 @@ class GroupService extends PeerPartyService<Group> {
     await chatMessageService.sendAndStore(chatReceipt!);
   }
 
-  ///接收加群的回执消息
-  receiveAddGroupReceipt(ChatMessage chatReceipt) async {
-    Uint8List data = CryptoUtil.decodeBase64(chatReceipt.content!);
-    String json = CryptoUtil.utf8ToString(data);
-    Map<String, dynamic> map = JsonUtil.toJson(json);
-
-    await chatMessageService.sendAndStore(chatReceipt);
-  }
-
   ///向群成员发送群属性变化的消息
   modifyGroup(Group group) async {
     String json = JsonUtil.toJsonString(group);
@@ -464,15 +455,6 @@ class GroupService extends PeerPartyService<Group> {
     await chatMessageService.sendAndStore(chatReceipt!);
   }
 
-  ///接收变群的回执消息
-  receiveModifyGroupReceipt(ChatMessage chatReceipt) async {
-    Uint8List data = CryptoUtil.decodeBase64(chatReceipt.content!);
-    String json = CryptoUtil.utf8ToString(data);
-    Map<String, dynamic> map = JsonUtil.toJson(json);
-
-    await chatMessageService.sendAndStore(chatReceipt);
-  }
-
   ///向群成员发送散群的消息
   dismissGroup(Group group) async {
     await groupMemberService.delete(entity: {
@@ -480,9 +462,6 @@ class GroupService extends PeerPartyService<Group> {
     });
     await groupService.delete(entity: {
       'groupId': group.id,
-    });
-    await chatMessageService.delete(entity: {
-      'receiverPeerId': group.id,
     });
     await chatMessageService.delete(entity: {
       'senderPeerId': group.id,
@@ -514,9 +493,6 @@ class GroupService extends PeerPartyService<Group> {
     });
     await chatMessageService.delete(entity: {
       'receiverPeerId': group.id,
-    });
-    await chatMessageService.delete(entity: {
-      'senderPeerId': group.id,
     });
     await chatSummaryService.delete(entity: {
       'peerId': group.id,
@@ -559,20 +535,6 @@ class GroupService extends PeerPartyService<Group> {
     await chatMessageService.sendAndStore(chatReceipt!);
   }
 
-  receiveAddGroupMemberReceipt(ChatMessage chatReceipt) async {
-    Uint8List data = CryptoUtil.decodeBase64(chatReceipt.content!);
-    String json = CryptoUtil.utf8ToString(data);
-    List<Map<String, dynamic>> maps = JsonUtil.toJson(json);
-    List<GroupMember> groupMembers = [];
-    for (var map in maps) {
-      GroupMember groupMember = GroupMember.fromJson(map);
-      groupMembers.add(groupMember);
-      groupMemberService.store(groupMember);
-    }
-
-    await chatMessageService.sendAndStore(chatReceipt!);
-  }
-
   ///向群成员发送删群成员的消息
   removeGroupMember(String groupId, List<GroupMember> groupMembers) async {
     String json = JsonUtil.toJsonString(groupMembers);
@@ -608,23 +570,6 @@ class GroupService extends PeerPartyService<Group> {
     await chatMessageService.sendAndStore(chatReceipt!);
   }
 
-  receiveRemoveGroupMemberReceipt(ChatMessage chatReceipt) async {
-    Uint8List data = CryptoUtil.decodeBase64(chatReceipt.content!);
-    String json = CryptoUtil.utf8ToString(data);
-    List<Map<String, dynamic>> maps = JsonUtil.toJson(json);
-    List<GroupMember> groupMembers = [];
-    for (var map in maps) {
-      GroupMember groupMember = GroupMember.fromJson(map);
-      groupMembers.add(groupMember);
-      groupMemberService.delete(entity: {
-        'memberPeerId': groupMember.memberPeerId,
-        'groupId': groupMember.groupId
-      });
-    }
-
-    await chatMessageService.sendAndStore(chatReceipt!);
-  }
-
   ///向群成员发送群文件的消息
   groupFile(String groupId, List<int> data) async {
     List<ChatMessage> chatMessages =
@@ -642,12 +587,6 @@ class GroupService extends PeerPartyService<Group> {
     Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
     String json = CryptoUtil.utf8ToString(data);
     List<Map<String, dynamic>> maps = JsonUtil.toJson(json);
-    List<GroupMember> groupMembers = [];
-    for (var map in maps) {
-      GroupMember groupMember = GroupMember.fromJson(map);
-      groupMembers.add(groupMember);
-      groupMemberService.store(groupMember);
-    }
 
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);

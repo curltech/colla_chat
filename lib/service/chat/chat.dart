@@ -45,9 +45,18 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     // });
   }
 
-  Future<ChatMessage?> findByMessageId(String messageId) async {
+  Future<ChatMessage?> findByMessageId(String messageId,
+      {String? receiverPeerId, String? senderPeerId}) async {
     String where = 'messageId=?';
     List<Object> whereArgs = [messageId];
+    if (receiverPeerId != null) {
+      where = '$where and receiverPeerId=?';
+      whereArgs.add(receiverPeerId);
+    }
+    if (senderPeerId != null) {
+      where = '$where and senderPeerId=?';
+      whereArgs.add(senderPeerId);
+    }
     return await findOne(
       where: where,
       whereArgs: whereArgs,
@@ -185,7 +194,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return content;
   }
 
-  ///接受到普通消息或者回执
+  ///接受到普通消息或者回执，修改状态并保存
   Future<void> receiveChatMessage(ChatMessage chatMessage) async {
     String? subMessageType = chatMessage.subMessageType;
     //收到回执，更新原消息
@@ -194,17 +203,18 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       if (messageId == null) {
         logger.e('chatReceipt message must have messageId');
       }
-      ChatMessage? msg = await findByMessageId(messageId!);
-      if (msg == null) {
+      ChatMessage? originChatMessage = await findByMessageId(messageId!,
+          receiverPeerId: chatMessage.senderPeerId!);
+      if (originChatMessage == null) {
         logger.e('chatReceipt message has no chatMessage with same messageId');
         return;
       }
-      msg.receiptContent = chatMessage.content;
-      msg.receiptTime = chatMessage.receiptTime;
-      msg.receiveTime = chatMessage.receiveTime;
-      msg.status = chatMessage.status;
-      msg.deleteTime = chatMessage.deleteTime;
-      await store(msg);
+      originChatMessage.receiptContent = chatMessage.content;
+      originChatMessage.receiptTime = chatMessage.receiptTime;
+      originChatMessage.receiveTime = chatMessage.receiveTime;
+      originChatMessage.status = chatMessage.status;
+      originChatMessage.deleteTime = chatMessage.deleteTime;
+      await store(originChatMessage);
     } else {
       //收到一般消息，保存
       chatMessage.direct = ChatDirect.receive.name;

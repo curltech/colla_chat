@@ -258,6 +258,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
     group.mobile = currentGroup.mobile;
     group.email = currentGroup.email;
     group.groupOwnerPeerId = groupOwnerPeerId;
+    //group.groupMembers=[];
     if (group.id == null) {
       await groupService.addGroup(group);
       groupController.add(group);
@@ -290,7 +291,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
           groupMember.memberType = MemberType.member.name;
           groupMember.memberAlias = linkman.alias ?? linkman.name;
           groupMember.status = EntityStatus.effective.name;
-          groupMemberService.store(groupMember);
+          await groupMemberService.store(groupMember);
           newMembers.add(groupMember);
         }
       } else {
@@ -303,7 +304,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
       await groupService.removeGroupMember(groupId, oldMembers.values.toList());
       for (GroupMember member in oldMembers.values) {
         oldMembers[member.memberPeerId!] = member;
-        groupMemberService.delete(entity: {'id': member.id});
+        await groupMemberService.delete(entity: {'id': member.id});
       }
     }
   }

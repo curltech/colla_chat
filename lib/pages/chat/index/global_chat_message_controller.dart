@@ -45,8 +45,10 @@ class GlobalChatMessageController with ChangeNotifier {
         case ChatMessageSubType.videoChat:
           break;
         case ChatMessageSubType.chatReceipt:
-          ChatMessage? originMessage =
-              await chatMessageService.findByMessageId(messageId);
+          //处理视频通话的回执
+          ChatMessage? originMessage = await chatMessageService.findByMessageId(
+              messageId,
+              receiverPeerId: chatMessage.senderPeerId!);
           if (originMessage == null) {
             logger.e('messageId:$messageId original chatMessage is not exist');
             return;
