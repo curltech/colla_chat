@@ -68,9 +68,27 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
 
   _search(String key) async {
     List<Linkman> linkmen = await linkmanService.search(key);
-    linkmanController.replaceAll(linkmen);
+    List<Linkman> ls = [];
+    if (linkmen.isNotEmpty) {
+      for (var linkman in linkmen) {
+        Linkman? l = await linkmanService.findCachedOneByPeerId(linkman.peerId);
+        if (l != null) {
+          ls.add(l);
+        }
+      }
+    }
+    linkmanController.replaceAll(ls);
     List<Group> groups = await groupService.search(key);
-    groupController.replaceAll(groups);
+    List<Group> gs = [];
+    if (groups.isNotEmpty) {
+      for (var group in groups) {
+        Group? g = await groupService.findCachedOneByPeerId(group.peerId);
+        if (g != null) {
+          gs.add(g);
+        }
+      }
+    }
+    groupController.replaceAll(gs);
   }
 
   _buildSearchTextField(BuildContext context) {
@@ -107,7 +125,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
         var title = linkman.name;
         var subtitle = linkman.peerId;
         TileData tile = TileData(
-            prefix: linkman.avatar,
+            prefix: linkman.avatarImage,
             title: title,
             subtitle: subtitle,
             selected: false,
@@ -152,8 +170,6 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
       for (var group in groups) {
         var title = group.name;
         var subtitle = group.peerId;
-        group.avatarImage ??= ImageUtil.buildImageWidget(
-            image: group.avatar, width: 32, height: 32);
         TileData tile = TileData(
             prefix: group.avatarImage,
             title: title,
@@ -171,7 +187,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
                   .delete(where: 'peerId=?', whereArgs: [subtitle!]);
               await chatMessageService.delete(
                   where: 'receiverPeerId=? or senderPeerId',
-                  whereArgs: [subtitle!, subtitle!]);
+                  whereArgs: [subtitle, subtitle]);
               groupController.delete();
             });
         slideActions.add(deleteSlideAction);

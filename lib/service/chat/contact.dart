@@ -19,6 +19,7 @@ import 'package:colla_chat/tool/contact_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/widgets/common/combine_grid_view.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart' as flutter_contacts;
@@ -295,9 +296,9 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   Future<Group?> findCachedOneByPeerId(String peerId) async {
-    if (groups.containsKey(peerId)) {
-      return groups[peerId];
-    }
+    // if (groups.containsKey(peerId)) {
+    //   return groups[peerId];
+    // }
     Group? group = await findOneByPeerId(peerId);
     if (group != null) {
       String? avatar = group.avatar;
@@ -305,6 +306,26 @@ class GroupService extends PeerPartyService<Group> {
         var avatarImage = ImageUtil.buildImageWidget(
             image: avatar, height: 32, width: 32, fit: BoxFit.contain);
         group.avatarImage = avatarImage;
+      } else {
+        List<GroupMember> members =
+            await groupMemberService.findByGroupId(peerId);
+        List<Linkman> linkmen = await groupMemberService.findLinkmen(members);
+        if (linkmen.isNotEmpty) {
+          List<Widget> widgets = [];
+          for (var linkman in linkmen) {
+            if (linkman.avatarImage != null) {
+              widgets.add(linkman.avatarImage!);
+            }
+          }
+          group.avatarImage = CombineGridView(
+            widgets: widgets,
+            width: 32,
+            height: 32,
+            maxCount: 9,
+          );
+        } else {
+          group.avatarImage = AppImage.mdAppImage;
+        }
       }
       groups[peerId] = group;
     }
@@ -549,7 +570,6 @@ class GroupService extends PeerPartyService<Group> {
       groupMemberService.store(groupMember);
     }
 
-
     await chatMessageService.sendAndStore(chatReceipt!);
   }
 
@@ -601,7 +621,6 @@ class GroupService extends PeerPartyService<Group> {
         'groupId': groupMember.groupId
       });
     }
-
 
     await chatMessageService.sendAndStore(chatReceipt!);
   }
