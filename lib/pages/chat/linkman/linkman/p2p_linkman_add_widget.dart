@@ -39,7 +39,6 @@ class P2pLinkmanAddWidget extends StatefulWidget with TileDataMixin {
 
 class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
   var controller = TextEditingController();
-  List<PeerClient> peerClients = [];
   final DataListController<TileData> tileDataController =
       DataListController<TileData>();
   late final DataListView dataListView;
@@ -93,7 +92,7 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
 
   Future<void> _responsePeerClients(ChainMessage chainMessage) async {
     if (chainMessage.payloadType == PayloadType.peerClients.name) {
-      peerClients = chainMessage.payload;
+      List<PeerClient> peerClients = chainMessage.payload;
       if (peerClients.isNotEmpty) {
         for (var peerClient in peerClients) {
           var peerId = peerClient.peerId;
@@ -105,12 +104,12 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
               mobile: false, email: false);
           await linkmanService.storeByPeerClient(peerClient);
         }
-        await _buildTiles();
+        await _buildTiles(peerClients);
       }
     }
   }
 
-  Future<void> _buildTiles() async {
+  Future<void> _buildTiles(List<PeerClient> peerClients) async {
     List<TileData> tiles = [];
     if (peerClients.isNotEmpty) {
       for (var peerClient in peerClients) {
@@ -127,14 +126,14 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
         if (isStranger) {
           suffix = IconButton(
             iconSize: 24.0,
-            icon: const Icon(Icons.person_add),
+            icon: Icon(Icons.person_add, color: myself.primary),
             onPressed: () async {
               await linkmanService
                   .update({'status': LinkmanStatus.friend.name},
                       where: 'peerId=?', whereArgs: [peerClient.peerId])
                   .then((value) {
                 linkman!.status = LinkmanStatus.friend.name;
-                _buildTiles();
+                _buildTiles(peerClients);
                 DialogUtil.info(context,
                     content: AppLocalizations.t('Add peerClient as linkman:') +
                         peerId);
@@ -166,6 +165,7 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
     if (error == null) {
       mobile = key;
     }
+    tileDataController.replaceAll([]);
     await findClientAction.findClient(key, mobile, email, key);
   }
 

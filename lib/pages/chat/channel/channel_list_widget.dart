@@ -157,7 +157,10 @@ class _ChannelListWidgetState extends State<ChannelListWidget>
             widget.dataMoreController.current = null;
             indexWidgetProvider.push('channel_item');
           },
-          icon: const Icon(Icons.note_add)),
+          icon: const Icon(
+            Icons.note_add,
+            color: Colors.white,
+          )),
     ];
     return AppBarView(
         centerTitle: true,

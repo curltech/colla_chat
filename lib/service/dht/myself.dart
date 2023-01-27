@@ -75,7 +75,7 @@ class MyselfService {
     bool pass = await cryptoGraphy.verify(key.codeUnits, signature,
         publicKey: peerPublicKey);
     if (!pass) {
-      logger.e('VerifyNotPass');
+      logger.e('Verify not pass');
       return false;
     }
 
