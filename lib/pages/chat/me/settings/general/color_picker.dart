@@ -28,9 +28,9 @@ class _ColorPickerState extends State<ColorPicker> {
   Future<bool> colorPickerDialog() async {
     ThemeData themeData = myself.themeData;
     return flex.ColorPicker(
-      color: myself.seedColor,
+      color: myself.primaryColor,
       onColorChanged: (Color color) {
-        myself.seedColor = color;
+        myself.primaryColor = color;
       },
       width: 32,
       height: 32,
@@ -83,12 +83,12 @@ class _ColorPickerState extends State<ColorPicker> {
       width: 32,
       height: 32,
       borderRadius: 4,
-      color: myself.seedColor,
+      color: myself.primaryColor,
       onSelectFocus: false,
       onSelect: () async {
-        Color seedColor = myself.seedColor;
+        Color primaryColor = myself.primaryColor;
         if (!(await colorPickerDialog())) {
-          myself.seedColor = seedColor;
+          myself.primaryColor = primaryColor;
         }
       },
     );

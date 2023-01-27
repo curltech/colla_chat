@@ -15,8 +15,10 @@ class PeerProfile extends StatusEntity {
 
   // 个性化配置
   String locale = 'zh_CN';
-  int seedColor = Colors.cyan.value;
-  int darkSeedColor = Colors.cyan.value;
+  int primaryColor = Colors.cyan.value;
+  int darkPrimaryColor = Colors.cyan.value;
+  String? scheme;
+  String? darkScheme;
   String themeMode = ThemeMode.system.name;
   String? fontFamily;
   bool udpSwitch = false;
@@ -54,8 +56,10 @@ class PeerProfile extends StatusEntity {
         locale = json['locale'],
         userId = json['userId'],
         username = json['username'],
-        seedColor = json['seedColor'] ?? Colors.cyan.value,
-        darkSeedColor = json['darkSeedColor'] ?? Colors.cyan.value,
+        primaryColor = json['primaryColor'] ?? Colors.cyan.value,
+        darkPrimaryColor = json['darkPrimaryColor'] ?? Colors.cyan.value,
+        scheme = json['scheme'],
+        darkScheme = json['darkScheme'],
         themeMode = json['themeMode'],
         udpSwitch =
             json['udpSwitch'] == true || json['udpSwitch'] == 1 ? true : false,
@@ -100,8 +104,10 @@ class PeerProfile extends StatusEntity {
       'locale': locale,
       'userId': userId,
       'username': username,
-      'seedColor': seedColor,
-      'darkSeedColor': darkSeedColor,
+      'primaryColor': primaryColor,
+      'darkPrimaryColor': darkPrimaryColor,
+      'scheme': scheme,
+      'darkScheme': darkScheme,
       'themeMode': themeMode,
       'udpSwitch': udpSwitch,
       'downloadSwitch': downloadSwitch,

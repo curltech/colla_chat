@@ -51,7 +51,7 @@ class Myself with ChangeNotifier {
 
   _buildThemeData() {
     FlexSchemeColor lightColor = FlexSchemeColor.from(
-      primary: Color(peerProfile.seedColor),
+      primary: primaryColor,
       brightness: Brightness.light,
     );
     TextTheme textTheme = const TextTheme();
@@ -88,7 +88,7 @@ class Myself with ChangeNotifier {
 
   _buildDarkThemeData() {
     FlexSchemeColor darkColor = FlexSchemeColor.from(
-      primary: seedColor,
+      primary: primaryColor,
       brightness: Brightness.dark,
     );
     TextTheme textTheme = const TextTheme();
@@ -123,15 +123,15 @@ class Myself with ChangeNotifier {
     );
   }
 
-  Color get seedColor {
-    return Color(peerProfile.seedColor);
+  Color get primaryColor {
+    return Color(peerProfile.primaryColor);
   }
 
-  set seedColor(Color color) {
-    if (peerProfile.seedColor != color.value) {
-      peerProfile.seedColor = color.value;
+  set primaryColor(Color color) {
+    if (peerProfile.primaryColor != color.value) {
+      peerProfile.primaryColor = color.value;
       if (peerProfile.id != null) {
-        peerProfileService.update({'seedColor': peerProfile.seedColor},
+        peerProfileService.update({'seedColor': peerProfile.primaryColor},
             where: 'id=?', whereArgs: [peerProfile.id!]);
       }
       _buildThemeData();
@@ -139,15 +139,15 @@ class Myself with ChangeNotifier {
     }
   }
 
-  Color get darkSeedColor {
-    return Color(peerProfile.seedColor);
+  Color get darkPrimaryColor {
+    return Color(peerProfile.darkPrimaryColor);
   }
 
-  set darkSeedColor(Color color) {
-    if (peerProfile.darkSeedColor != color.value) {
-      peerProfile.darkSeedColor = color.value;
+  set darkPrimaryColor(Color color) {
+    if (peerProfile.darkPrimaryColor != color.value) {
+      peerProfile.darkPrimaryColor = color.value;
       if (peerProfile.id != null) {
-        peerProfileService.update({'darkSeedColor': peerProfile.darkSeedColor},
+        peerProfileService.update({'darkSeedColor': peerProfile.darkPrimaryColor},
             where: 'id=?', whereArgs: [peerProfile.id!]);
       }
       _buildDarkThemeData();
