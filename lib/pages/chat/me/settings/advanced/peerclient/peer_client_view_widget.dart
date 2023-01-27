@@ -1,22 +1,21 @@
 import 'package:colla_chat/entity/dht/peerclient.dart';
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/data_listshow.dart';
+import 'package:colla_chat/widgets/data_bind/value_listview.dart';
 import 'package:flutter/material.dart';
 
 final List<String> peerClientFields = ['id', 'name', 'peerId'];
 
 //邮件内容组件
-class PeerClientShowWidget extends StatefulWidget with TileDataMixin {
+class PeerClientViewWidget extends StatefulWidget with TileDataMixin {
   final DataPageController<PeerClient> controller;
 
-  const PeerClientShowWidget({Key? key, required this.controller})
+  const PeerClientViewWidget({Key? key, required this.controller})
       : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _PeerClientShowWidgetState();
+  State<StatefulWidget> createState() => _PeerClientViewWidgetState();
 
   @override
   String get routeName => 'peer_client_show';
@@ -31,7 +30,7 @@ class PeerClientShowWidget extends StatefulWidget with TileDataMixin {
   String get title => 'PeerClientShow';
 }
 
-class _PeerClientShowWidgetState extends State<PeerClientShowWidget> {
+class _PeerClientViewWidgetState extends State<PeerClientViewWidget> {
   @override
   initState() {
     super.initState();
@@ -42,7 +41,7 @@ class _PeerClientShowWidgetState extends State<PeerClientShowWidget> {
     setState(() {});
   }
 
-  Widget _buildDataListShow(BuildContext context) {
+  Widget _buildValueListView(BuildContext context) {
     Map<String, dynamic> values = {};
     PeerClient? currentPeerClient = widget.controller.current;
     if (currentPeerClient != null) {
@@ -54,19 +53,19 @@ class _PeerClientShowWidgetState extends State<PeerClientShowWidget> {
         values[label] = value;
       }
     }
-    Widget dataListShow = ValueListView(
+    Widget valueListView = ValueListView(
       values: values,
     );
-    return dataListShow;
+    return valueListView;
   }
 
   @override
   Widget build(BuildContext context) {
-    var dataListShow = _buildDataListShow(context);
+    var valueListView = _buildValueListView(context);
     var appBarView = AppBarView(
         title: widget.title,
         withLeading: widget.withLeading,
-        child: dataListShow);
+        child: valueListView);
     return appBarView;
   }
 

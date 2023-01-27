@@ -1,10 +1,9 @@
-import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerclient/peer_client_controller.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerclient/peer_client_edit_widget.dart';
-import 'package:colla_chat/pages/chat/me/settings/advanced/peerclient/peer_client_show_widget.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/peerclient/peer_client_view_widget.dart';
 
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
@@ -18,15 +17,15 @@ import 'package:flutter/material.dart';
 //设置页面，带有回退回调函数
 class PeerClientListWidget extends StatefulWidget with TileDataMixin {
   late final List<Widget> rightWidgets;
-  late final PeerClientShowWidget peerClientShowWidget;
+  late final PeerClientViewWidget peerClientViewWidget;
   late final PeerClientEditWidget peerClientEditWidget;
 
   PeerClientListWidget({Key? key}) : super(key: key) {
-    peerClientShowWidget =
-        PeerClientShowWidget(controller: peerClientDataPageController);
+    peerClientViewWidget =
+        PeerClientViewWidget(controller: peerClientDataPageController);
     peerClientEditWidget =
         PeerClientEditWidget(controller: peerClientDataPageController);
-    indexWidgetProvider.define(peerClientShowWidget);
+    indexWidgetProvider.define(peerClientViewWidget);
     indexWidgetProvider.define(peerClientEditWidget);
 
     rightWidgets = [

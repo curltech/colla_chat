@@ -1,4 +1,3 @@
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
@@ -23,12 +22,12 @@ class ValueListView extends StatelessWidget {
       var length = value.length;
       if (length < 30) {
         tiles.add(TileData(
-          title: AppLocalizations.t(key),
+          title: key,
           suffix: value,
         ));
       } else {
         tiles.add(TileData(
-          title: AppLocalizations.t(key),
+          title: key,
           subtitle: value,
         ));
       }

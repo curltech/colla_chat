@@ -18,17 +18,17 @@ import 'package:flutter/material.dart';
 //定位器列表
 class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
   late final List<Widget> rightWidgets;
-  late final PeerEndpointShowWidget peerEndpointShowWidget;
+  late final PeerEndpointViewWidget peerEndpointViewWidget;
   late final PeerEndpointEditWidget peerEndpointEditWidget;
   late final PeerEndpointTransportWidget peerEndpointTransportWidget;
 
   PeerEndpointListWidget({Key? key}) : super(key: key) {
-    peerEndpointShowWidget =
-        PeerEndpointShowWidget(controller: peerEndpointController);
+    peerEndpointViewWidget =
+        PeerEndpointViewWidget(controller: peerEndpointController);
     peerEndpointEditWidget =
         PeerEndpointEditWidget(controller: peerEndpointController);
     peerEndpointTransportWidget = PeerEndpointTransportWidget();
-    indexWidgetProvider.define(peerEndpointShowWidget);
+    indexWidgetProvider.define(peerEndpointViewWidget);
     indexWidgetProvider.define(peerEndpointEditWidget);
     indexWidgetProvider.define(peerEndpointTransportWidget);
     rightWidgets = [
