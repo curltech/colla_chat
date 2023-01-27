@@ -2,6 +2,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
@@ -103,6 +104,8 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
           Application.router
               .navigateTo(context, Application.p2pLogin, replace: true);
         }
+      }).onError((error, stackTrace) {
+        DialogUtil.error(context, content: error.toString());
       });
     } else {
       logger.e('password is not matched');

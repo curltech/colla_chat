@@ -36,6 +36,14 @@ class CustomLogger {
     }
   }
 
+  Logger? get myLogger {
+    return _myLogger;
+  }
+
+  clearMyLogger() {
+    _myLogger = null;
+  }
+
   t(dynamic msg) {
     logger.v(msg);
   }

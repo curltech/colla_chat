@@ -126,6 +126,7 @@ class MyselfService {
     myself.peerPublicKey = null;
     myself.privateKey = null;
     myself.publicKey = null;
+    logger.clearMyLogger();
 
     return true;
   }

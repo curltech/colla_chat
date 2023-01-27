@@ -90,17 +90,17 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
         logger.e(e);
       }
       if (!isPhoneNumberValid) {
-        throw 'InvalidMobileNumber';
+        throw 'Invalid mobile number';
       }
       mobile = await PhoneNumberUtil.format(mobile, code);
     }
     var peer = await findOneByName(name);
     if (peer != null) {
-      throw 'SameNameAccountExists';
+      throw 'Same name account exist';
     }
     peer = await findOneByName(loginName);
     if (peer != null) {
-      throw 'SameLoginNameAccountExists';
+      throw 'Same loginName account exist';
     }
     var deviceData = platformParams.deviceData;
     var clientDevice = JsonUtil.toJsonString(deviceData);
