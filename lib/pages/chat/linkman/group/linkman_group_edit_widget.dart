@@ -106,40 +106,6 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
     }
   }
 
-  //转向群发界面
-  Widget _buildActionTiles(BuildContext context) {
-    List<TileData> tileData = [];
-    if (group.value.id != null) {
-      tileData.add(TileData(
-          title: 'Chat',
-          prefix: const Icon(Icons.chat),
-          routeName: 'chat_message',
-          onTap: (int index, String title, {String? subtitle}) async {
-            ChatSummary? chatSummary =
-                await chatSummaryService.findOneByPeerId(group.value.peerId);
-            if (chatSummary != null) {
-              chatMessageController.chatSummary = chatSummary;
-            }
-          }));
-      tileData.add(
-        TileData(
-            title: 'Dismiss group',
-            prefix: const Icon(Icons.group_off),
-            onTap: (int index, String title, {String? subtitle}) async {
-              _dismissGroup();
-            }),
-      );
-    }
-    var listView = DataListView(
-      tileData: tileData,
-    );
-    return listView;
-  }
-
-  _dismissGroup() async {
-    groupService.dismissGroup(group.value);
-  }
-
   //群成员显示和编辑界面
   Widget _buildGroupMembersWidget(BuildContext context) {
     var selector = ValueListenableBuilder(
@@ -312,10 +278,6 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
   Widget _buildGroupEdit(BuildContext context) {
     return Column(
       children: [
-        _buildActionTiles(context),
-        const SizedBox(
-          height: 15,
-        ),
         _buildGroupMembersWidget(context),
         const SizedBox(
           height: 5,

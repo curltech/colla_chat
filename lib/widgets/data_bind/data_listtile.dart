@@ -199,22 +199,20 @@ class DataListTile extends StatelessWidget {
   ActionPane _buildActionPane(
       BuildContext context, List<TileData>? slideActions) {
     List<SlidableAction> slidableActions = [];
-    if (tileData.slideActions != null) {
-      for (var slideAction in tileData.slideActions!) {
-        SlidableAction slidableAction = SlidableAction(
-          onPressed: (context) {
-            if (slideAction.onTap != null) {
-              slideAction.onTap!(index, tileData.title,
-                  subtitle: slideAction.title);
-            }
-          },
-          backgroundColor: Colors.white.withOpacity(AppOpacity.lgOpacity),
-          foregroundColor: myself.primary,
-          icon: slideAction.prefix,
-          label: AppLocalizations.t(slideAction.title),
-        );
-        slidableActions.add(slidableAction);
-      }
+    for (var slideAction in slideActions!) {
+      SlidableAction slidableAction = SlidableAction(
+        onPressed: (context) {
+          if (slideAction.onTap != null) {
+            slideAction.onTap!(index, tileData.title,
+                subtitle: slideAction.title);
+          }
+        },
+        backgroundColor: Colors.white.withOpacity(AppOpacity.lgOpacity),
+        foregroundColor: myself.primary,
+        icon: slideAction.prefix,
+        label: AppLocalizations.t(slideAction.title),
+      );
+      slidableActions.add(slidableAction);
     }
     ActionPane actionPane = ActionPane(
       motion: const ScrollMotion(),
@@ -237,7 +235,7 @@ class DataListTile extends StatelessWidget {
     ActionPane? endActionPane;
     if (tileData.endSlideActions != null &&
         tileData.endSlideActions!.isNotEmpty) {
-      endActionPane = _buildActionPane(context, tileData.slideActions);
+      endActionPane = _buildActionPane(context, tileData.endSlideActions);
     }
 
     Slidable slidable = Slidable(

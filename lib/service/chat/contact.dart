@@ -140,12 +140,16 @@ class LinkmanService extends PeerPartyService<Linkman> {
         linkman.status = linkmanStatus.name;
       }
       linkman.id = null;
+      linkman.email = null;
+      linkman.mobile = null;
       await insert(linkman);
       linkmen[peerId] = linkman;
       await chatSummaryService.upsertByLinkman(linkman);
     } else {
       int? id = linkman.id;
       String? status = linkman.status;
+      var email = linkman.email;
+      var mobile = linkman.mobile;
       linkman = Linkman.fromJson(map);
       linkman.id = id;
       if (linkmanStatus != null) {
@@ -153,6 +157,8 @@ class LinkmanService extends PeerPartyService<Linkman> {
       } else {
         linkman.status = status;
       }
+      linkman.email = email;
+      linkman.mobile = mobile;
       await update(linkman);
       linkmen[peerId] = linkman;
       await chatSummaryService.upsertByLinkman(linkman);

@@ -595,6 +595,20 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       }
     }
   }
+
+  ///删除linkman的消息
+  deleteByLinkman(String peerId) async {
+    var myselfPeerId = myself.peerId!;
+    await delete(
+        where:
+            'groupPeerId is null and ((senderPeerId=? and receiverPeerId=?) or (senderPeerId=? and receiverPeerId=?))',
+        whereArgs: [peerId, myselfPeerId, myselfPeerId, peerId]);
+  }
+
+  ///删除group的消息
+  deleteByGroup(String peerId) async {
+    await delete(where: 'groupPeerId=?', whereArgs: [peerId]);
+  }
 }
 
 final chatMessageService = ChatMessageService(
@@ -647,9 +661,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
     required super.indexFields,
     super.encryptFields = const ['content'],
   }) {
-    getApplicationDocumentsDirectory().then((contentPath) {
-      this.contentPath = p.join(contentPath.path, 'content');
-    });
+    contentPath = p.join(myself.myPath, 'content');
     post = (Map map) {
       return MessageAttachment.fromJson(map);
     };
@@ -975,6 +987,10 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
         update(chatSummary);
       }
     }
+  }
+
+  deleteChatSummary(String peerId) async {
+    await delete(where: 'peerId=?', whereArgs: [peerId]);
   }
 }
 

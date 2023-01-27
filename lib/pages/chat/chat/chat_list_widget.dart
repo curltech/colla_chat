@@ -8,6 +8,7 @@ import 'package:colla_chat/pages/chat/chat/chat_message_view.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/connectivity_util.dart';
@@ -181,13 +182,11 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(
             title: 'Delete',
-            prefix: Icons.remove,
+            prefix: Icons.bookmark_remove,
             onTap: (int index, String label, {String? subtitle}) async {
               linkmanChatSummaryController.currentIndex = index;
-              await chatSummaryService.delete(entity: chatSummary);
-              await chatMessageService.delete(
-                  where: 'receiverPeerId=? or senderPeerId=?',
-                  whereArgs: [peerId, peerId]);
+              await chatSummaryService.deleteChatSummary(peerId);
+              await chatMessageService.deleteByLinkman(peerId);
               linkmanChatSummaryController.delete();
             });
         slideActions.add(deleteSlideAction);
@@ -212,9 +211,12 @@ class _ChatListWidgetState extends State<ChatListWidget> {
           continue;
         }
         var badge = Badge(
-          badgeContent: Text('$unreadNumber'),
+          badgeContent: Text('$unreadNumber',
+              style: const TextStyle(color: Colors.white)),
           elevation: 0.0,
-          padding: const EdgeInsets.all(0.0),
+          shape: BadgeShape.square,
+          borderRadius: BorderRadius.circular(8),
+          padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5.0),
           child: group.avatarImage,
         );
         TileData tile = TileData(
@@ -227,13 +229,11 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(
             title: 'Delete',
-            prefix: Icons.remove,
+            prefix: Icons.bookmark_remove,
             onTap: (int index, String label, {String? subtitle}) async {
               groupChatSummaryController.currentIndex = index;
-              await chatSummaryService.delete(entity: chatSummary);
-              await chatMessageService.delete(
-                  where: 'receiverPeerId=? or senderPeerId=?',
-                  whereArgs: [peerId, peerId]);
+              await chatSummaryService.deleteChatSummary(peerId);
+              await chatMessageService.deleteByGroup(peerId);
               groupChatSummaryController.delete();
             });
         slideActions.add(deleteSlideAction);

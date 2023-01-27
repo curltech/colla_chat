@@ -115,6 +115,16 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
     return searchTextField;
   }
 
+  _changeStatus(Linkman linkman, LinkmanStatus status) async {
+    int id = linkman.id!;
+    await linkmanService.update({'id': id, 'status': status.name});
+  }
+
+  _changeSubscriptStatus(Linkman linkman, LinkmanStatus status) async {
+    int id = linkman!.id!;
+    await linkmanService.update({'id': id, 'subscriptStatus': status.name});
+  }
+
   //将linkman和group数据转换从列表显示数据
   _buildGroupDataListController() {
     widget.groupDataListController.controllers.clear();
@@ -133,15 +143,12 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(
             title: 'Delete',
-            prefix: Icons.remove,
+            prefix: Icons.person_remove,
             onTap: (int index, String label, {String? subtitle}) async {
               linkmanController.currentIndex = index;
               await linkmanService.delete(entity: linkman);
-              await chatSummaryService
-                  .delete(where: 'peerId=?', whereArgs: [subtitle!]);
-              await chatMessageService.delete(
-                  where: 'receiverPeerId=? or senderPeerId=?',
-                  whereArgs: [subtitle!, subtitle!]);
+              await chatSummaryService.deleteChatSummary(subtitle!);
+              await chatMessageService.deleteByLinkman(subtitle);
               linkmanController.delete();
             });
         slideActions.add(deleteSlideAction);
@@ -158,6 +165,44 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
             });
         slideActions.add(chatSlideAction);
         tile.slideActions = slideActions;
+
+        List<TileData> endSlideActions = [];
+        if (linkman.status == LinkmanStatus.blacklist.name) {
+          endSlideActions.add(
+            TileData(
+                title: 'Remove blacklist',
+                prefix: Icons.person_outlined,
+                onTap: (int index, String title, {String? subtitle}) {
+                  _changeStatus(linkman, LinkmanStatus.stranger);
+                }),
+          );
+        } else {
+          endSlideActions.add(TileData(
+              title: 'Add blacklist',
+              prefix: Icons.person_off,
+              onTap: (int index, String title, {String? subtitle}) {
+                _changeStatus(linkman, LinkmanStatus.blacklist);
+              }));
+        }
+        if (linkman.status == LinkmanStatus.blacklist.name) {
+          endSlideActions.add(
+            TileData(
+                title: 'Remove subscript',
+                prefix: Icons.unsubscribe,
+                onTap: (int index, String title, {String? subtitle}) {
+                  _changeSubscriptStatus(linkman, LinkmanStatus.stranger);
+                }),
+          );
+        } else {
+          endSlideActions.add(TileData(
+              title: 'Add subscript',
+              prefix: Icons.subscriptions,
+              onTap: (int index, String title, {String? subtitle}) {
+                _changeSubscriptStatus(linkman, LinkmanStatus.subscript);
+              }));
+        }
+        tile.endSlideActions = endSlideActions;
+
         tiles.add(tile);
       }
     }
@@ -179,18 +224,25 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(
             title: 'Delete',
-            prefix: Icons.remove,
+            prefix: Icons.group_remove,
             onTap: (int index, String label, {String? subtitle}) async {
               groupController.currentIndex = index;
               await groupService.delete(entity: group);
-              await chatSummaryService
-                  .delete(where: 'peerId=?', whereArgs: [subtitle!]);
-              await chatMessageService.delete(
-                  where: 'receiverPeerId=? or senderPeerId',
-                  whereArgs: [subtitle, subtitle]);
+              await chatSummaryService.deleteChatSummary(subtitle!);
+              await chatMessageService.deleteByGroup(subtitle);
               groupController.delete();
             });
         slideActions.add(deleteSlideAction);
+        TileData dismissSlideAction = TileData(
+            title: 'Dismiss',
+            prefix: Icons.group_off,
+            onTap: (int index, String label, {String? subtitle}) async {
+              groupService.dismissGroup(group);
+            });
+        slideActions.add(dismissSlideAction);
+        tile.slideActions = slideActions;
+
+        List<TileData> endSlideActions = [];
         TileData chatSlideAction = TileData(
             title: 'Chat',
             prefix: Icons.chat,
@@ -202,8 +254,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
               }
               indexWidgetProvider.push('chat_message');
             });
-        slideActions.add(chatSlideAction);
-        tile.slideActions = slideActions;
+        endSlideActions.add(chatSlideAction);
+        tile.endSlideActions = endSlideActions;
+
         tiles.add(tile);
       }
     }

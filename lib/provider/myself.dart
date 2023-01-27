@@ -1,12 +1,15 @@
 import 'package:colla_chat/entity/dht/myselfpeer.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/dht/peerprofile.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/tool/locale_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as p;
 
 /// 单例本节点对象，包含公私钥，本节点配置，密码和过往的节点信息
 /// 在登录成功后被初始化
@@ -43,6 +46,10 @@ class Myself with ChangeNotifier {
   Myself() {
     _buildThemeData();
     _buildDarkThemeData();
+  }
+
+  String get myPath {
+    return p.join(platformParams.path, name ?? '');
   }
 
   Widget? get avatarImage {

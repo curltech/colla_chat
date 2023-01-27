@@ -1,20 +1,39 @@
 import 'dart:io';
 
 import 'package:classic_logger/classic_logger.dart' as classic_logger;
+import 'package:colla_chat/provider/myself.dart';
 import 'package:logger/logger.dart';
 import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
 
 class CustomLogger {
-  late Logger logger;
+  late Logger _logger;
+  Logger? _myLogger;
 
   CustomLogger() {
-    logger = Logger(
+    _logger = Logger(
       printer: PrettyPrinter(printTime: true),
       output: FileOutput(),
       level: Level.info,
     );
     Logger.level = Level.warning;
+  }
+
+  Logger get logger {
+    if (_myLogger != null) {
+      return _myLogger!;
+    }
+    if (myself.id != null) {
+      _myLogger = Logger(
+        printer: PrettyPrinter(printTime: true),
+        output: FileOutput(),
+        level: Level.info,
+      );
+    }
+    if (_myLogger != null) {
+      return _myLogger!;
+    } else {
+      return _logger;
+    }
   }
 
   t(dynamic msg) {
@@ -54,8 +73,7 @@ class FileOutput extends LogOutput {
     var current = DateTime.now();
     var filename =
         'colla_chat-${current.year}-${current.month}-${current.day}.log';
-    final dir = await getApplicationDocumentsDirectory();
-    filename = p.join(dir.path, filename);
+    filename = p.join(myself.myPath, filename);
     file = File(filename);
     bool exist = await file!.exists();
     if (!exist) {
@@ -116,4 +134,4 @@ class ClassicLogger {
   }
 }
 
-final logger = customLogger.logger;
+final logger = customLogger;

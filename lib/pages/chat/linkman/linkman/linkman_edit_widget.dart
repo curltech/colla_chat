@@ -18,10 +18,7 @@ final List<ColumnFieldDef> linkmanColumnFieldDefs = [
       inputType: InputType.label,
       prefixIcon: const Icon(Icons.perm_identity)),
   ColumnFieldDef(
-      name: 'name',
-      label: 'Name',
-      inputType: InputType.label,
-      prefixIcon: const Icon(Icons.person)),
+      name: 'name', label: 'Name', prefixIcon: const Icon(Icons.person)),
   ColumnFieldDef(
       name: 'alias', label: 'Alias', prefixIcon: const Icon(Icons.person_pin)),
   ColumnFieldDef(
@@ -88,6 +85,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
 
   _onOk(Map<String, dynamic> values) async {
     Linkman currentLinkman = Linkman.fromJson(values);
+    linkman!.name = currentLinkman.name;
     linkman!.alias = currentLinkman.alias;
     linkman!.mobile = currentLinkman.mobile;
     linkman!.email = currentLinkman.email;
@@ -151,40 +149,6 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
               }),
         );
       }
-      if (linkman!.status == LinkmanStatus.blacklist.name) {
-        tileData.add(
-          TileData(
-              title: AppLocalizations.t('Remove blacklist'),
-              prefix: const Icon(Icons.person_outlined),
-              onTap: (int index, String title, {String? subtitle}) {
-                _changeStatus(LinkmanStatus.stranger);
-              }),
-        );
-      } else {
-        tileData.add(TileData(
-            title: AppLocalizations.t('Add blacklist'),
-            prefix: const Icon(Icons.person_off),
-            onTap: (int index, String title, {String? subtitle}) {
-              _changeStatus(LinkmanStatus.blacklist);
-            }));
-      }
-      if (linkman!.status == LinkmanStatus.blacklist.name) {
-        tileData.add(
-          TileData(
-              title: AppLocalizations.t('Remove subscript'),
-              prefix: const Icon(Icons.unsubscribe),
-              onTap: (int index, String title, {String? subtitle}) {
-                _changeSubscriptStatus(LinkmanStatus.stranger);
-              }),
-        );
-      } else {
-        tileData.add(TileData(
-            title: AppLocalizations.t('Add subscript'),
-            prefix: const Icon(Icons.subscriptions),
-            onTap: (int index, String title, {String? subtitle}) {
-              _changeSubscriptStatus(LinkmanStatus.subscript);
-            }));
-      }
     }
     var listView = DataListView(
       tileData: tileData,
@@ -194,12 +158,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
 
   @override
   Widget build(BuildContext context) {
-    var actionTiles = [
-      _buildActionTiles(context),
-      const SizedBox(
-        height: 15,
-      ),
-    ];
+    List<Widget> actionTiles = [];
     if (linkman != null) {
       if (linkman!.status != LinkmanStatus.friend.name) {
         actionTiles.add(_buildAddFriendTextField(context));
@@ -210,6 +169,10 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
         );
       }
     }
+    actionTiles.add(_buildActionTiles(context));
+    actionTiles.add(const SizedBox(
+      height: 15,
+    ));
     actionTiles.add(Expanded(
         child: SingleChildScrollView(child: _buildFormInputWidget(context))));
 
