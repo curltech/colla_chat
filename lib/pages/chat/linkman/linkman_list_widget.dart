@@ -1,6 +1,9 @@
+import 'package:barcode_scan2/model/model.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
+import 'package:colla_chat/entity/dht/myselfpeer.dart';
+import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/group/group_add_widget.dart';
@@ -10,6 +13,9 @@ import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/service/dht/peerclient.dart';
+import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/qrcode_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
@@ -293,6 +299,17 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
           },
           icon: const Icon(Icons.group_add),
           tooltip: AppLocalizations.t('Add group')),
+      IconButton(
+          onPressed: () async {
+            ScanResult scanResult = await QrcodeUtil.scan();
+            String content = scanResult.rawContent;
+            var map = JsonUtil.toJson(content);
+            PeerClient peerClient = PeerClient.fromJson(map);
+            await peerClientService.store(peerClient);
+            await linkmanService.storeByPeerClient(peerClient);
+          },
+          icon: const Icon(Icons.qr_code),
+          tooltip: AppLocalizations.t('Qrcode scan')),
     ];
     _buildGroupDataListController();
     var groupDataListView = Container(
