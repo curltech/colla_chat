@@ -78,14 +78,14 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
     String name;
     var peerId = myself.peerId;
     if (peerId == null) {
-      peerId = '未登录';
-      name = '未登录';
+      peerId = '';
+      name = '';
     } else {
-      name = myself.myselfPeer!.name;
+      name = myself.myselfPeer.name;
     }
     final List<TileData> personalInfoTileData = [
       TileData(
-          title: AppLocalizations.t('Avatar'),
+          title: 'Avatar',
           suffix: myself.avatarImage,
           onTap: (
             int index,
@@ -95,27 +95,27 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
             await _pickAvatar(peerId, context);
           }),
       TileData(
-        title: AppLocalizations.t('PeerId'),
+        title: 'PeerId',
         subtitle: peerId,
       ),
       TileData(
-        title: AppLocalizations.t('Name'),
+        title: 'Name',
         suffix: name,
       ),
       TileData(
-        title: AppLocalizations.t('LoginName'),
+        title: 'LoginName',
         suffix: myself.myselfPeer.loginName,
       ),
       TileData(
-        title: AppLocalizations.t('Email'),
+        title: 'Email',
         suffix: myself.myselfPeer.email,
       ),
       TileData(
-        title: AppLocalizations.t('Mobile'),
+        title: 'Mobile',
         suffix: myself.myselfPeer.mobile,
       ),
       TileData(
-        title: AppLocalizations.t('Qrcode'),
+        title: 'Qrcode',
         routeName: 'qrcode',
       ),
     ];
