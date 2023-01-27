@@ -3,7 +3,7 @@ import 'package:colla_chat/entity/dht/peerendpoint.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_edit_widget.dart';
-import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_show_widget.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_view_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_transport_widget.dart';
 
 import 'package:colla_chat/provider/index_widget_provider.dart';

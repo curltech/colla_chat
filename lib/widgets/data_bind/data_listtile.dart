@@ -216,7 +216,7 @@ class DataListTile extends StatelessWidget {
     }
     ActionPane actionPane = ActionPane(
       motion: const ScrollMotion(),
-      dismissible: DismissiblePane(onDismissed: () {}),
+      //dismissible: DismissiblePane(onDismissed: () {}),
       children: slidableActions,
     );
 

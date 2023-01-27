@@ -18,7 +18,7 @@ class PeerClientViewWidget extends StatefulWidget with TileDataMixin {
   State<StatefulWidget> createState() => _PeerClientViewWidgetState();
 
   @override
-  String get routeName => 'peer_client_show';
+  String get routeName => 'peer_client_view';
 
   @override
   bool get withLeading => true;
@@ -27,7 +27,7 @@ class PeerClientViewWidget extends StatefulWidget with TileDataMixin {
   Icon get icon => const Icon(Icons.desktop_windows);
 
   @override
-  String get title => 'PeerClientShow';
+  String get title => 'PeerClientView';
 }
 
 class _PeerClientViewWidgetState extends State<PeerClientViewWidget> {

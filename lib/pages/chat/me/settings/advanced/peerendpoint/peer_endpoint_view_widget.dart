@@ -18,7 +18,7 @@ class PeerEndpointViewWidget extends StatefulWidget with TileDataMixin {
   State<StatefulWidget> createState() => _PeerEndpointViewWidgetState();
 
   @override
-  String get routeName => 'peer_endpoint_show';
+  String get routeName => 'peer_endpoint_view';
 
   @override
   bool get withLeading => true;
@@ -27,7 +27,7 @@ class PeerEndpointViewWidget extends StatefulWidget with TileDataMixin {
   Icon get icon => const Icon(Icons.desktop_windows);
 
   @override
-  String get title => 'PeerEndpointShow';
+  String get title => 'PeerEndpointView';
 }
 
 class _PeerEndpointViewWidgetState extends State<PeerEndpointViewWidget> {
