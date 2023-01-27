@@ -1,10 +1,9 @@
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/security/password_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
-import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -37,7 +36,7 @@ class SecuritySettingWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'security_setting';
 
   @override
-  Icon get icon => const Icon(Icons.security);
+  IconData get iconData => Icons.security;
 
   @override
   String get title => 'Security Setting';

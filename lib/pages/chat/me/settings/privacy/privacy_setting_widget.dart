@@ -1,4 +1,3 @@
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/general/brightness_picker.dart';
 import 'package:colla_chat/pages/chat/me/settings/general/color_picker.dart';
 import 'package:colla_chat/pages/chat/me/settings/general/locale_picker.dart';
@@ -21,7 +20,7 @@ class PrivacySettingWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'privacy_setting';
 
   @override
-  Icon get icon => const Icon(Icons.privacy_tip);
+  IconData get iconData => Icons.privacy_tip;
 
   @override
   String get title => 'Privacy Setting';

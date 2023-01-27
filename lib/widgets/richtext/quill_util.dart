@@ -7,9 +7,9 @@ import 'package:cross_file/cross_file.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill_extensions/embeds/embed_types.dart';
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:visual_editor/toolbar/models/media-pick.enum.dart';
-import 'package:path/path.dart';
 
 class QuillUtil {
   ///打开文件选择器

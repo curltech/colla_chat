@@ -2,7 +2,6 @@ import 'dart:core';
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
@@ -27,7 +26,7 @@ class DataChannelWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'data_channel';
 
   @override
-  Icon get icon => const Icon(Icons.screen_rotation);
+  IconData get iconData => Icons.screen_rotation;
 
   @override
   String get title => 'DataChannel';

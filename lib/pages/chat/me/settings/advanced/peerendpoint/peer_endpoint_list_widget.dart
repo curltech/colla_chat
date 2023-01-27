@@ -3,9 +3,8 @@ import 'package:colla_chat/entity/dht/peerendpoint.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_edit_widget.dart';
-import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_view_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_transport_widget.dart';
-
+import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_view_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/dht/peerendpoint.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -79,7 +78,7 @@ class PeerEndpointListWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'peer_endpoint';
 
   @override
-  Icon get icon => const Icon(Icons.device_hub);
+  IconData get iconData => Icons.device_hub;
 
   @override
   String get title => 'PeerEndpoint';

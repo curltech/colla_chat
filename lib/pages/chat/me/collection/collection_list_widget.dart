@@ -1,6 +1,5 @@
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
-
 import 'package:colla_chat/pages/chat/me/collection/collection_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -27,7 +26,7 @@ class CollectionListWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'collection';
 
   @override
-  Icon get icon => const Icon(Icons.collections);
+  IconData get iconData => Icons.collections;
 
   @override
   String get title => 'Collection';

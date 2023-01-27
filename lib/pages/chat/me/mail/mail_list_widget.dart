@@ -1,15 +1,14 @@
+import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/pages/chat/me/mail/mail_data_provider.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
+import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../entity/chat/chat.dart';
-import '../../../../l10n/localization.dart';
-import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/common/widget_mixin.dart';
-import '../../../../widgets/data_bind/data_listtile.dart';
-import '../../../../widgets/data_bind/data_listview.dart';
-import 'mail_data_provider.dart';
 
 //邮件列表组件，带有回退回调函数
 class MailListWidget extends StatefulWidget with TileDataMixin {
@@ -25,7 +24,7 @@ class MailListWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  Icon get icon => const Icon(Icons.alternate_email);
+  IconData get iconData => Icons.alternate_email;
 
   @override
   String get title => 'Mails';
@@ -40,7 +39,7 @@ class _MailListWidgetState extends State<MailListWidget> {
     dataListView = _build(context);
   }
 
-  _onTap(int index, String title, {String? subtitle,TileData? group}) {
+  _onTap(int index, String title, {String? subtitle, TileData? group}) {
     logger.w('index: $index, title: $title,onTap MailListWidget');
   }
 

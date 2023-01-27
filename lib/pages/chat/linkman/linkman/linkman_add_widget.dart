@@ -37,7 +37,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
   String get routeName => 'linkman_add';
 
   @override
-  Icon get icon => const Icon(Icons.person);
+  IconData get iconData => Icons.person;
 
   @override
   String get title => 'Add linkman';

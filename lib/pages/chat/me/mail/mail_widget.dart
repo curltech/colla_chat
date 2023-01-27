@@ -44,7 +44,7 @@ class MailWidget extends StatelessWidget with TileDataMixin {
   String get routeName => 'mail';
 
   @override
-  Icon get icon => const Icon(Icons.email);
+  IconData get iconData => Icons.email;
 
   @override
   String get title => 'Mail';

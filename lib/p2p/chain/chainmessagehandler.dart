@@ -3,9 +3,9 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:dio/dio.dart';
 
 import '../../crypto/util.dart';
-import '../../provider/myself.dart';
 import '../../entity/p2p/chain_message.dart';
 import '../../entity/p2p/security_context.dart';
+import '../../provider/myself.dart';
 import '../../service/p2p/message_serializer.dart';
 import '../../service/p2p/security_context.dart';
 import '../../transport/httpclient.dart';

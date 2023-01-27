@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -37,7 +37,7 @@ class QrcodeWidget extends StatefulWidget with TileDataMixin {
   State<StatefulWidget> createState() => _QrcodeWidgetState();
 
   @override
-  Icon get icon => const Icon(Icons.qr_code);
+  IconData get iconData => Icons.qr_code;
 
   @override
   String get title => 'Qrcode';

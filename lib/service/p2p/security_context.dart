@@ -8,8 +8,8 @@ import 'package:cryptography/cryptography.dart';
 
 import '../../crypto/cryptography.dart';
 import '../../crypto/util.dart';
-import '../../provider/myself.dart';
 import '../../entity/p2p/security_context.dart';
+import '../../provider/myself.dart';
 import '../../service/dht/peerclient.dart';
 
 abstract class SecurityContextService {

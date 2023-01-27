@@ -24,7 +24,7 @@ class PeerClientViewWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  Icon get icon => const Icon(Icons.desktop_windows);
+  IconData get iconData => Icons.desktop_windows;
 
   @override
   String get title => 'PeerClientView';

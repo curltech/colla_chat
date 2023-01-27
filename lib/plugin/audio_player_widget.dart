@@ -25,7 +25,7 @@ class AudioPlayerWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  Icon get icon => const Icon(Icons.video_call);
+  IconData get iconData => Icons.video_call;
 
   @override
   String get title => 'AudioPlayer';

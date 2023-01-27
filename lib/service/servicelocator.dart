@@ -16,7 +16,6 @@ import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_end
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/service/chat/mailaddress.dart';

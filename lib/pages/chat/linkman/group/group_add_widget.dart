@@ -1,7 +1,6 @@
 import 'package:colla_chat/pages/chat/linkman/group/face_group_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/group/linkman_group_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/group/nearby_group_add_widget.dart';
-import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -37,7 +36,7 @@ class GroupAddWidget extends StatelessWidget with TileDataMixin {
   String get routeName => 'group_add';
 
   @override
-  Icon get icon => const Icon(Icons.person);
+  IconData get iconData => Icons.person;
 
   @override
   String get title => 'Add group';

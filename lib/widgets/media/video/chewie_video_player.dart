@@ -1,6 +1,4 @@
-import 'dart:io';
 import 'package:chewie/chewie.dart';
-
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
 import 'package:flutter/material.dart';
 

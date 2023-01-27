@@ -1,14 +1,13 @@
 import 'dart:core';
 
 import 'package:colla_chat/crypto/util.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/p2p/chain/chainmessagehandler.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:uuid/uuid.dart';
-
 
 enum PayloadType {
   peerClient,
@@ -108,8 +107,10 @@ abstract class BaseAction {
     ChainMessage chainMessage = ChainMessage();
     if (connectAddress == null) {
       if (peerEndpointController.data.isNotEmpty) {
-        connectAddress = peerEndpointController.defaultPeerEndpoint!.wsConnectAddress;
-        connectAddress ??= peerEndpointController.defaultPeerEndpoint!.httpConnectAddress;
+        connectAddress =
+            peerEndpointController.defaultPeerEndpoint!.wsConnectAddress;
+        connectAddress ??=
+            peerEndpointController.defaultPeerEndpoint!.httpConnectAddress;
       }
     }
     chainMessage.connectAddress = connectAddress;

@@ -1,4 +1,3 @@
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/media/platform_audio_player_widget.dart';
 import 'package:colla_chat/pages/chat/me/media/platform_audio_recorder_widget.dart';
 import 'package:colla_chat/pages/chat/me/media/platform_video_player_widget.dart';
@@ -41,7 +40,7 @@ class MediaWidget extends StatelessWidget with TileDataMixin {
   String get routeName => 'media';
 
   @override
-  Icon get icon => const Icon(Icons.perm_media);
+  IconData get iconData => Icons.perm_media;
 
   @override
   String get title => 'Media';
@@ -49,10 +48,7 @@ class MediaWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     Widget child = DataListView(tileData: mediaTileData);
-    var media = AppBarView(
-        withLeading: true,
-        title: title,
-        child: child);
+    var media = AppBarView(withLeading: true, title: title, child: child);
     return media;
   }
 }

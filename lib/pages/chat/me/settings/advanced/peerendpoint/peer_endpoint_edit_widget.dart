@@ -1,7 +1,5 @@
 import 'package:colla_chat/entity/dht/peerendpoint.dart';
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
-import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_list_widget.dart';
 import 'package:colla_chat/service/dht/peerendpoint.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -66,7 +64,7 @@ class PeerEndpointEditWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  Icon get icon => const Icon(Icons.desktop_windows);
+  IconData get iconData => Icons.desktop_windows;
 
   @override
   String get title => 'PeerEndpointEdit';

@@ -6,11 +6,9 @@ import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/p2p/chain/action/findclient.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
-import 'package:colla_chat/tool/contact_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -18,7 +16,6 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_contacts/flutter_contacts.dart' as mobile_contact;
 
 ///Contact增加联系人
 class ContactLinkmanAddWidget extends StatefulWidget with TileDataMixin {
@@ -33,7 +30,7 @@ class ContactLinkmanAddWidget extends StatefulWidget with TileDataMixin {
   }
 
   @override
-  Icon get icon => const Icon(Icons.contact_phone);
+  IconData get iconData => Icons.contact_phone;
 
   @override
   String get routeName => 'contact_linkman_add';

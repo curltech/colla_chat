@@ -24,7 +24,7 @@ class MailView extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  Icon get icon => const Icon(Icons.email);
+  IconData get iconData => Icons.email;
 
   @override
   String get title => 'Mail';
@@ -58,9 +58,7 @@ class _MailViewState extends State<MailView>
       children: children,
     );
     var appBarView = AppBarView(
-        title:  widget.title,
-        withLeading: widget.withLeading,
-        child: row);
+        title: widget.title, withLeading: widget.withLeading, child: row);
 
     return appBarView;
   }

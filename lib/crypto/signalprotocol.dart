@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:libsignal_protocol_dart/libsignal_protocol_dart.dart';
 

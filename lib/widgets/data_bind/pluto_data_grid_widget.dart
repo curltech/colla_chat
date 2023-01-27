@@ -181,7 +181,8 @@ class _PaginatedDataTableState<T> extends State<PlutoDataGridWidget> {
   Widget build(BuildContext context) {
     var dataTableView = _build(context);
     var width = appDataProvider.totalSize.width;
-    var height = appDataProvider.totalSize.height - appDataProvider.toolbarHeight;
+    var height =
+        appDataProvider.totalSize.height - appDataProvider.toolbarHeight;
     var view = SizedBox(width: width, height: height, child: dataTableView);
 
     return view;

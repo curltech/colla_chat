@@ -24,7 +24,7 @@ class NameCardMessage extends StatelessWidget {
     var tile = InkWell(
       onTap: () {},
       child: ListTile(
-        leading: ImageUtil.buildImageWidget(image:avatar),
+        leading: ImageUtil.buildImageWidget(image: avatar),
         title: Text(name),
         subtitle: Text(peerId),
       ),

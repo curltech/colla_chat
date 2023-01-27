@@ -3,8 +3,8 @@ import 'dart:ui';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/xfile_util.dart';
 import 'package:cross_file/cross_file.dart';
-import 'package:share_plus/share_plus.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'package:share_plus/share_plus.dart';
 
 class ShareUtil {
   static Future<ShareResult> share(String text,

@@ -31,7 +31,7 @@ class PlatformWebViewWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'webview';
 
   @override
-  Icon get icon => const Icon(Icons.web);
+  IconData get iconData => Icons.web;
 
   @override
   String get title => 'Webview';

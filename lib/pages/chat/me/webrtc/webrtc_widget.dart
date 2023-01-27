@@ -1,4 +1,3 @@
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/data_channel_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/get_display_media_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/get_user_media_widget.dart';
@@ -40,10 +39,8 @@ class WebrtcWidget extends StatelessWidget with TileDataMixin {
   @override
   Widget build(BuildContext context) {
     var webrtc = KeepAliveWrapper(
-        child: AppBarView(
-            title: title,
-            withLeading: withLeading,
-            child: child));
+        child:
+            AppBarView(title: title, withLeading: withLeading, child: child));
     return webrtc;
   }
 
@@ -54,7 +51,7 @@ class WebrtcWidget extends StatelessWidget with TileDataMixin {
   String get routeName => 'webrtc';
 
   @override
-  Icon get icon => const Icon(Icons.video_call);
+  IconData get iconData => Icons.video_call;
 
   @override
   String get title => 'Webrtc';

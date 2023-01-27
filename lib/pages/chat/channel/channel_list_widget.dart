@@ -41,7 +41,7 @@ class ChannelListWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'channel';
 
   @override
-  Icon get icon => const Icon(Icons.wifi_channel);
+  IconData get iconData => Icons.wifi_channel;
 
   @override
   String get title => 'Channel';

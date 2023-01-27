@@ -2,7 +2,6 @@ import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
-import '../l10n/localization.dart';
 import '../widgets/common/app_bar_view.dart';
 import '../widgets/common/widget_mixin.dart';
 
@@ -19,7 +18,7 @@ class MobileVideoPlayerWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  Icon get icon => const Icon(Icons.video_call);
+  IconData get iconData => Icons.video_call;
 
   @override
   String get title => 'VideoPlayer';

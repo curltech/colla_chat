@@ -1,9 +1,8 @@
 import 'package:card_swiper/card_swiper.dart';
-import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/video/local_video_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/remote_video_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/video_room_controller.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
@@ -28,7 +27,7 @@ class VideoChatWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'video_chat';
 
   @override
-  Icon get icon => const Icon(Icons.video_call);
+  IconData get iconData => Icons.video_call;
 
   @override
   String get title => 'VideoChat';

@@ -1,7 +1,6 @@
 import 'package:colla_chat/entity/chat/chat.dart';
-import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
 import 'package:flutter/material.dart';
 

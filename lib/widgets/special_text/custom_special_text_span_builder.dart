@@ -1,10 +1,8 @@
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/special_text/at_text.dart';
-import 'package:colla_chat/widgets/special_text/special_color_text.dart';
-import 'package:colla_chat/widgets/special_text/email_text.dart';
 import 'package:colla_chat/widgets/special_text/emoji_text.dart';
-import 'package:colla_chat/widgets/special_text/link_text.dart';
 import 'package:colla_chat/widgets/special_text/image_text.dart';
+import 'package:colla_chat/widgets/special_text/link_text.dart';
+import 'package:colla_chat/widgets/special_text/special_color_text.dart';
 import 'package:extended_text_library/extended_text_library.dart';
 import 'package:flutter/material.dart';
 

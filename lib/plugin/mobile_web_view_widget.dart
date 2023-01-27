@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -23,7 +22,7 @@ class MobileWebViewWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  Icon get icon => const Icon(Icons.video_call);
+  IconData get iconData => Icons.video_call;
 
   @override
   String get title => 'MobileWebView';

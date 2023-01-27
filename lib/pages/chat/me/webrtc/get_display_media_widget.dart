@@ -1,8 +1,7 @@
 import 'dart:core';
 
-import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -24,7 +23,7 @@ class GetDisplayMediaWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'get_display_media';
 
   @override
-  Icon get icon => const Icon(Icons.screen_rotation);
+  IconData get iconData => Icons.screen_rotation;
 
   @override
   String get title => 'GetDisplayMedia';

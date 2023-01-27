@@ -1,7 +1,7 @@
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -27,7 +27,7 @@ class ChannelItemWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  Icon get icon => const Icon(Icons.wifi_channel);
+  IconData get iconData => Icons.wifi_channel;
 
   @override
   String get title => 'Channel Item';

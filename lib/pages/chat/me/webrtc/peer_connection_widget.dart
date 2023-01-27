@@ -1,13 +1,11 @@
 import 'dart:core';
 
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-
 
 /// 连接建立示例
 class PeerConnectionWidget extends StatefulWidget with TileDataMixin {
@@ -29,7 +27,7 @@ class PeerConnectionWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'peer_connection';
 
   @override
-  Icon get icon => const Icon(Icons.screen_rotation);
+  IconData get iconData => Icons.screen_rotation;
 
   @override
   String get title => 'PeerConnection';

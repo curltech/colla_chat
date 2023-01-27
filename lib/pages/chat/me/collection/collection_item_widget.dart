@@ -17,7 +17,7 @@ class CollectionItemWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  Icon get icon => const Icon(Icons.collections);
+  IconData get iconData => Icons.collections;
 
   @override
   String get title => 'Collection Item';

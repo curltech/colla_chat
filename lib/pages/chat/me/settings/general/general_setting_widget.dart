@@ -1,4 +1,3 @@
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/general/brightness_picker.dart';
 import 'package:colla_chat/pages/chat/me/settings/general/color_picker.dart';
 import 'package:colla_chat/pages/chat/me/settings/general/locale_picker.dart';
@@ -21,7 +20,7 @@ class GeneralSettingWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'general_setting';
 
   @override
-  Icon get icon => const Icon(Icons.settings_applications);
+  IconData get iconData => Icons.settings_applications;
 
   @override
   String get title => 'General Setting';

@@ -1,8 +1,7 @@
 import 'dart:core';
 
-import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -24,7 +23,7 @@ class GetUserMediaWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'get_user_media';
 
   @override
-  Icon get icon => const Icon(Icons.videocam);
+  IconData get iconData => Icons.videocam;
 
   @override
   String get title => 'GetUserMedia';
@@ -51,9 +50,8 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
   void _makeCall() async {
     try {
       await localVideoRenderController.createVideoMediaRender();
-      List<PeerVideoRender> renders = localVideoRenderController
-          .videoRenders.values
-          .toList();
+      List<PeerVideoRender> renders =
+          localVideoRenderController.videoRenders.values.toList();
       if (renders.isNotEmpty) {
         render = renders[0];
         await render!.enumerateDevices();

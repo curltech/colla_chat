@@ -2,11 +2,10 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';

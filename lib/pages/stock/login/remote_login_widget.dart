@@ -1,6 +1,5 @@
 import 'package:colla_chat/entity/stock/user.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:flutter/material.dart';
 

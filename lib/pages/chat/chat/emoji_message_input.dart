@@ -1,7 +1,6 @@
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
 

@@ -1,6 +1,5 @@
 import 'package:colla_chat/tool/entity_util.dart';
 
-import '../constant/base.dart';
 import '../datastore/datastore.dart';
 import '../entity/base.dart';
 

@@ -8,12 +8,10 @@ import 'package:colla_chat/pages/chat/chat/chat_message_view.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/connectivity_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/transport/websocket.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
@@ -73,7 +71,7 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'chat';
 
   @override
-  Icon get icon => const Icon(Icons.chat);
+  IconData get iconData => Icons.chat;
 
   @override
   String get title => 'Chat';

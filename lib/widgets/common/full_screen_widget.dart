@@ -4,7 +4,6 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-
 class FullScreenWidget extends StatelessWidget with TileDataMixin {
   final Widget child;
 
@@ -17,7 +16,7 @@ class FullScreenWidget extends StatelessWidget with TileDataMixin {
   String get routeName => 'full_screen';
 
   @override
-  Icon get icon => const Icon(Icons.chat);
+  IconData get iconData => Icons.chat;
 
   @override
   String get title => '';

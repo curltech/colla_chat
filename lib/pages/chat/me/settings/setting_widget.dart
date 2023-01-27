@@ -53,7 +53,7 @@ class SettingWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'setting';
 
   @override
-  Icon get icon => const Icon(Icons.settings);
+  IconData get iconData => Icons.settings;
 
   @override
   String get title => 'Setting';

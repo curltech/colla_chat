@@ -1,6 +1,6 @@
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -62,8 +62,7 @@ class AppBarWidget {
     List<Widget>? rightWidgets, //右边的排列组件（按钮）
     List<AppBarPopupMenu>? rightPopupMenus,
   }) {
-    backgroundColor =
-        backgroundColor ?? myself.primary;
+    backgroundColor = backgroundColor ?? myself.primary;
     var actions = <Widget>[const Spacer()];
     if (rightWidgets != null && rightWidgets.isNotEmpty) {
       actions.addAll(rightWidgets);

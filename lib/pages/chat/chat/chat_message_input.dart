@@ -1,13 +1,11 @@
 import 'dart:async';
 
 import 'package:colla_chat/entity/chat/chat.dart';
-import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/emoji_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/more_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/text_message_input.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
-import 'package:colla_chat/service/chat/chat.dart';
 import 'package:flutter/material.dart';
 
 ///聊天消息的输入组件，
@@ -116,8 +114,6 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
     _insertText(text);
   }
 
-
-
   Widget _buildChatMessageInput(BuildContext context) {
     double height = this.height > appDataProvider.keyboardHeight
         ? this.height
@@ -130,7 +126,6 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
         onMorePressed: onMorePressed,
         onSendPressed: onSendPressed,
       ),
-
       Visibility(
           visible: emojiVisible,
           child: EmojiMessageInputWidget(

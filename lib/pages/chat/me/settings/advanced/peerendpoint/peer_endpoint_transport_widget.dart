@@ -1,8 +1,6 @@
 import 'package:colla_chat/entity/dht/peerendpoint.dart';
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/p2p/chain/action/ping.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
-
 import 'package:colla_chat/transport/httpclient.dart';
 import 'package:colla_chat/transport/websocket.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -26,7 +24,7 @@ class PeerEndpointTransportWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'peer_endpoint_transport';
 
   @override
-  Icon get icon => const Icon(Icons.private_connectivity);
+  IconData get iconData => Icons.private_connectivity;
 
   @override
   String get title => 'PeerEndpointTransport';

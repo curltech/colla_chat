@@ -13,7 +13,6 @@ import 'package:sqlite3/common.dart';
 import './condition_import/unsupport.dart'
     if (dart.library.html) './condition_import/web.dart'
     if (dart.library.io) './condition_import/desktop.dart' as sqlite3_open;
-import '../constant/base.dart';
 import '../service/general_base.dart';
 import '../service/servicelocator.dart';
 import 'datastore.dart';

@@ -8,7 +8,6 @@ import 'package:colla_chat/tool/type_util.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
-import '../constant/base.dart';
 import '../entity/base.dart';
 import '../service/general_base.dart';
 import '../service/servicelocator.dart';

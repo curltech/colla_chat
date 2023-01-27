@@ -20,7 +20,7 @@ class AddressAddWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  Icon get icon => const Icon(Icons.contact_mail);
+  IconData get iconData => Icons.contact_mail;
 
   @override
   String get title => 'MailAddressAdd';

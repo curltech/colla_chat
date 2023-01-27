@@ -1,15 +1,13 @@
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/collection/collection_list_widget.dart';
-
 import 'package:colla_chat/pages/chat/me/mail/mail_widget.dart';
 import 'package:colla_chat/pages/chat/me/me_head_widget.dart';
 import 'package:colla_chat/pages/chat/me/media/media_widget.dart';
 import 'package:colla_chat/pages/chat/me/personal_info_widget.dart';
+import 'package:colla_chat/pages/chat/me/platform_webview_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/setting_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/webrtc_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/pages/chat/me/platform_webview_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -57,7 +55,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   String get routeName => 'me';
 
   @override
-  Icon get icon => const Icon(Icons.person);
+  IconData get iconData => Icons.person;
 
   @override
   String get title => 'Me';

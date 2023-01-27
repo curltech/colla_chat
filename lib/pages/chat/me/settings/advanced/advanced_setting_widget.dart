@@ -1,10 +1,6 @@
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerclient/peer_client_list_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_list_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/ws_address_picker.dart';
-import 'package:colla_chat/pages/chat/me/settings/general/brightness_picker.dart';
-import 'package:colla_chat/pages/chat/me/settings/general/color_picker.dart';
-import 'package:colla_chat/pages/chat/me/settings/general/locale_picker.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -43,7 +39,7 @@ class AdvancedSettingWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'advanced_setting';
 
   @override
-  Icon get icon => const Icon(Icons.settings_suggest);
+  IconData get iconData => Icons.settings_suggest;
 
   @override
   String get title => 'Advanced Setting';

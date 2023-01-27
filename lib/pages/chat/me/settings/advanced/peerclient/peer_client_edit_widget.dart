@@ -1,5 +1,4 @@
 import 'package:colla_chat/entity/dht/peerclient.dart';
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -7,7 +6,6 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
-
 
 final List<ColumnFieldDef> peerClientColumnFieldDefs = [
   ColumnFieldDef(
@@ -52,7 +50,7 @@ class PeerClientEditWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  Icon get icon => const Icon(Icons.desktop_windows);
+  IconData get iconData => Icons.desktop_windows;
 
   @override
   String get title => 'PeerClientEdit';

@@ -1,4 +1,6 @@
-import 'dart:io';import 'package:colla_chat/plugin/logger.dart';
+import 'dart:io';
+
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';

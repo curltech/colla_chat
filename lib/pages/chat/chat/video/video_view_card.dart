@@ -1,4 +1,3 @@
-
 import 'package:colla_chat/pages/chat/chat/video/single_video_view_widget.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';

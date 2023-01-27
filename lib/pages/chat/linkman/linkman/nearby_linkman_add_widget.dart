@@ -1,7 +1,6 @@
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/transport/nearby_connection.dart';
@@ -24,7 +23,7 @@ class NearbyLinkmanAddWidget extends StatefulWidget with TileDataMixin {
   }
 
   @override
-  Icon get icon => const Icon(Icons.location_city);
+  IconData get iconData => Icons.location_city;
 
   @override
   String get routeName => 'nearby_linkman_add';

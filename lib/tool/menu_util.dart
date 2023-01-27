@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:floating_action_bubble/floating_action_bubble.dart';
 import 'package:flutter/material.dart';
@@ -168,7 +167,7 @@ class MenuUtil {
     void Function(bool)? menuOnChange,
     bool enablePassEvent = true,
   }) {
-    CustomPopupMenu menu= CustomPopupMenu(
+    CustomPopupMenu menu = CustomPopupMenu(
       menuBuilder: menuBuilder,
       pressType: pressType,
       controller: controller,

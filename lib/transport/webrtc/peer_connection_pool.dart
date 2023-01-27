@@ -4,15 +4,15 @@ import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/p2p/chain/action/signal.dart';
-import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
+import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
@@ -248,8 +248,7 @@ class PeerConnectionPool {
       List<Map<String, String>>? iceServers,
       List<PeerVideoRender> localRenders = const []}) async {
     //如果已经存在，先关闭删除
-    AdvancedPeerConnection? peerConnection =
-        getOne(peerId, clientId: clientId);
+    AdvancedPeerConnection? peerConnection = getOne(peerId, clientId: clientId);
     if (peerConnection != null) {
       await close(peerId, clientId: clientId);
       logger.i(

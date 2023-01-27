@@ -1,14 +1,12 @@
+import 'package:colla_chat/pages/chat/me/mail/mail_data_provider.dart';
+import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/transport/emailclient.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:enough_mail/codecs.dart';
 import 'package:enough_mail/highlevel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../../../l10n/localization.dart';
-import '../../../../platform.dart';
-import '../../../../transport/emailclient.dart';
-import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/common/widget_mixin.dart';
-import 'mail_data_provider.dart';
 
 //邮件内容组件
 class MailContentWidget extends StatefulWidget with TileDataMixin {
@@ -24,7 +22,7 @@ class MailContentWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  Icon get icon => const Icon(Icons.attach_email);
+  IconData get iconData => Icons.attach_email;
 
   @override
   String get title => 'MailContent';

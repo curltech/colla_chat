@@ -1,16 +1,14 @@
 import 'dart:io';
 
-import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/entity/chat/mailaddress.dart' as entity;
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:enough_mail/enough_mail.dart';
 import 'package:enough_mail_html/enough_mail_html.dart';
 import 'package:event_bus/event_bus.dart';
-
-import 'package:colla_chat/entity/chat/mailaddress.dart' as entity;
 
 class EmailMessageUtil {
   /// 创建带附件的消息

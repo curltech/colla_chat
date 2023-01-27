@@ -19,13 +19,14 @@ class ImageMessage extends StatelessWidget {
     required this.isMyself,
     required this.mimeType,
     this.width,
-    this.height, this.title,
+    this.height,
+    this.title,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     var imageWidget = FutureBuilder(
-        future: messageAttachmentService.getDecryptFilename(messageId,title),
+        future: messageAttachmentService.getDecryptFilename(messageId, title),
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
           if (image != null) {
             return ImageUtil.buildImageWidget(

@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:audio_session/audio_session.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/media/audio/audio_service.dart';
@@ -29,8 +28,6 @@ enum AudioState {
   isRecording,
   isRecordingPaused,
 }
-
-
 
 ///声音的记录器，仅支持移动设备
 class PlatformSoundRecorder {

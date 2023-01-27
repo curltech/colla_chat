@@ -1,8 +1,8 @@
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/qrcode_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/asset_util.dart';
@@ -33,7 +33,7 @@ class PersonalInfoWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'personal_info';
 
   @override
-  Icon get icon => const Icon(Icons.personal_video);
+  IconData get iconData => Icons.personal_video;
 
   @override
   String get title => 'Personal Information';

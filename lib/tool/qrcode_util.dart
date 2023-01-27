@@ -147,18 +147,18 @@ class QrcodeUtil {
   }
 
   ///macos有问题
-  // static Future<String?> mobileScan() async {
-  //   mobile_scanner.MobileScannerController cameraController =
-  //       mobile_scanner.MobileScannerController();
-  //   Future<String?> result = Future(() {
-  //     mobile_scanner.MobileScanner(
-  //         allowDuplicates: false,
-  //         controller: cameraController,
-  //         onDetect: (barcode, args) {
-  //           return barcode.rawValue;
-  //         });
-  //   });
-  //
-  //   return result;
-  // }
+// static Future<String?> mobileScan() async {
+//   mobile_scanner.MobileScannerController cameraController =
+//       mobile_scanner.MobileScannerController();
+//   Future<String?> result = Future(() {
+//     mobile_scanner.MobileScanner(
+//         allowDuplicates: false,
+//         controller: cameraController,
+//         onDetect: (barcode, args) {
+//           return barcode.rawValue;
+//         });
+//   });
+//
+//   return result;
+// }
 }

@@ -1,5 +1,5 @@
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/dht/myself.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -42,7 +42,7 @@ class PasswordWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'password';
 
   @override
-  Icon get icon => const Icon(Icons.password);
+  IconData get iconData => Icons.password;
 
   @override
   String get title => 'Password';

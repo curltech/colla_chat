@@ -1,12 +1,8 @@
 import 'package:colla_chat/entity/base.dart';
-import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
-import 'package:colla_chat/service/chat/chat.dart';
-
+import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
@@ -14,9 +10,6 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
-import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
-import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
-import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +36,7 @@ class LinkmanGroupEditWidget extends StatefulWidget with TileDataMixin {
   LinkmanGroupEditWidget({Key? key}) : super(key: key);
 
   @override
-  Icon get icon => const Icon(Icons.person);
+  IconData get iconData => Icons.person;
 
   @override
   String get routeName => 'linkman_group_edit';

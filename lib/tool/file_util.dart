@@ -7,6 +7,8 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:file_saver/file_saver.dart';
+import 'package:file_selector/file_selector.dart';
+import 'package:file_selector_platform_interface/file_selector_platform_interface.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -15,8 +17,6 @@ import 'package:mime/mime.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
-import 'package:file_selector_platform_interface/file_selector_platform_interface.dart';
-import 'package:file_selector/file_selector.dart';
 
 class FileUtil {
   static Future<String> writeFile(List<int> bytes, String filename) async {

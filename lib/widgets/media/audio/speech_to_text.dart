@@ -18,7 +18,7 @@ class SpeechToTextWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'speech_text';
 
   @override
-  Icon get icon => const Icon(Icons.enhance_photo_translate_rounded);
+  IconData get iconData => Icons.enhance_photo_translate_rounded;
 
   @override
   String get title => 'SpeechToText';

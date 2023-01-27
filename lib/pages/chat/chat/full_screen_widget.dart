@@ -22,7 +22,7 @@ class FullScreenWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'full_screen';
 
   @override
-  Icon get icon => const Icon(Icons.fullscreen);
+  IconData get iconData => Icons.fullscreen;
 
   @override
   String get title => 'FullScreen';

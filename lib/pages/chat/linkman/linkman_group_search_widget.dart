@@ -2,7 +2,6 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';

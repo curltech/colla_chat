@@ -6,8 +6,8 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 import 'package:universal_html/html.dart' as html;
 
-import 'responsive_widget.dart';
 import 'fake_ui.dart' if (dart.library.html) 'real_ui.dart' as ui_instance;
+import 'responsive_widget.dart';
 
 class PlatformViewRegistryFix {
   void registerViewFactory(dynamic x, dynamic y) {

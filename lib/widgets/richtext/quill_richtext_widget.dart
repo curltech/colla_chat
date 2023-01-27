@@ -1,16 +1,16 @@
 import 'dart:async';
+
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/richtext/quill_util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_quill/flutter_quill.dart' hide Text;
-import 'package:tuple/tuple.dart';
 import 'package:flutter_quill/extensions.dart';
+import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
+import 'package:tuple/tuple.dart';
 
 enum _SelectionType {
   none,

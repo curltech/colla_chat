@@ -1,13 +1,11 @@
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:provider/provider.dart';
 
 ///只适合桌面和web，样式是windows样式
 class FluentWidgetFactory extends WidgetFactory {

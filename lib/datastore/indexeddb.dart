@@ -6,7 +6,6 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:idb_shim/idb.dart';
 import 'package:idb_shim/idb_browser.dart';
 
-import '../constant/base.dart';
 import '../entity/base.dart';
 import '../service/general_base.dart';
 import '../service/servicelocator.dart';

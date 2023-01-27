@@ -1,4 +1,3 @@
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
@@ -17,7 +16,7 @@ class PlatformAudioPlayerWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'audio_player';
 
   @override
-  Icon get icon => const Icon(Icons.audiotrack);
+  IconData get iconData => Icons.audiotrack;
 
   @override
   String get title => 'AudioPlayer';

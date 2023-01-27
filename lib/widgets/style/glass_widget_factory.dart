@@ -1,4 +1,3 @@
-
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:flutter/material.dart';

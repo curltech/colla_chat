@@ -4,7 +4,6 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerclient/peer_client_controller.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerclient/peer_client_edit_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerclient/peer_client_view_widget.dart';
-
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -85,7 +84,7 @@ class PeerClientListWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'peer_client';
 
   @override
-  Icon get icon => const Icon(Icons.desktop_windows);
+  IconData get iconData => Icons.desktop_windows;
 
   @override
   String get title => 'PeerClient';

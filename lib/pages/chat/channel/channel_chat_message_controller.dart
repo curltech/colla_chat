@@ -1,6 +1,6 @@
 import 'package:colla_chat/entity/chat/chat.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 
 ///频道消息的消息控制器

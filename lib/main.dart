@@ -1,17 +1,15 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/routers/router_handler.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/smart_dialog_util.dart';
-import 'package:webview_flutter/webview_flutter.dart' as webview;
-import 'package:webview_win_floating/webview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,6 +19,8 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
+import 'package:webview_flutter/webview_flutter.dart' as webview;
+import 'package:webview_win_floating/webview.dart';
 import 'package:window_manager/window_manager.dart';
 
 ///全局处理证书问题

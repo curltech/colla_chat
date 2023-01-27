@@ -46,7 +46,7 @@ class ChatMessageView extends StatefulWidget with TileDataMixin {
   String get routeName => 'chat_message';
 
   @override
-  Icon get icon => const Icon(Icons.chat);
+  IconData get iconData => Icons.chat;
 
   @override
   String get title => 'ChatMessage';

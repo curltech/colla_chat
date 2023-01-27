@@ -1,4 +1,3 @@
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -21,7 +20,7 @@ class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'video_player';
 
   @override
-  Icon get icon => const Icon(Icons.videocam);
+  IconData get iconData => Icons.videocam;
 
   @override
   String get title => 'VideoPlayer';

@@ -47,7 +47,7 @@ class TileData {
 
   static TileData of(TileDataMixin mixin) {
     return TileData(
-        title: mixin.title, routeName: mixin.routeName, prefix: mixin.icon);
+        title: mixin.title, routeName: mixin.routeName, prefix: mixin.iconData);
   }
 
   static List<TileData> from(List<TileDataMixin> mixins) {
@@ -90,7 +90,7 @@ class TileData {
         if (selected) {
           leading = Icon(prefix, color: myself.primary);
         } else {
-          leading = Icon(prefix);
+          leading = Icon(prefix, color: myself.themeData.colorScheme.secondary);
         }
       }
     }

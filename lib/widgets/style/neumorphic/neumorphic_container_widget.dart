@@ -1,7 +1,6 @@
 import 'package:colla_chat/provider/myself.dart';
 import 'package:flutter_neumorphic/flutter_neumorphic.dart';
 
-
 class NeumorphicConstants {
   NeumorphicShape get shape => NeumorphicShape.concave;
 

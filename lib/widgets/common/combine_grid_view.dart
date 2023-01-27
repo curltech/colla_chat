@@ -1,8 +1,5 @@
 import 'dart:math';
 
-import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:flutter/material.dart';
 
 ///把多个组件组合在一起显示，比如图片

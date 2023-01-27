@@ -8,7 +8,6 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 
 /// 单例本节点对象，包含公私钥，本节点配置，密码和过往的节点信息
@@ -77,7 +76,13 @@ class Myself with ChangeNotifier {
   }
 
   ThemeData get themeData {
-    return _themeData;
+    if (themeMode == ThemeMode.light) {
+      return _themeData;
+    } else if (themeMode == ThemeMode.dark) {
+      return _darkThemeData;
+    } else {
+      return _themeData;
+    }
   }
 
   ThemeData get darkThemeData {

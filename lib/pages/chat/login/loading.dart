@@ -1,8 +1,8 @@
 import 'dart:math';
 
 import 'package:card_swiper/card_swiper.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:flutter/material.dart';
 
 class LoadingBackgroundImage {

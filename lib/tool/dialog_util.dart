@@ -39,8 +39,7 @@ class DialogUtil {
     required T value,
     required bool checked,
   }) {
-    TextStyle style =
-        TextStyle(color: myself.primary);
+    TextStyle style = TextStyle(color: myself.primary);
     return SimpleDialogOption(
         onPressed: () {
           Navigator.pop(context, value);
@@ -89,8 +88,7 @@ class DialogUtil {
     required T value,
     required bool checked,
   }) {
-    TextStyle style =
-        TextStyle(color: myself.primary);
+    TextStyle style = TextStyle(color: myself.primary);
     return PopupMenuItem(
         value: value,
         child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [

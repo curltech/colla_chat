@@ -1,5 +1,5 @@
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -13,7 +13,11 @@ class LocationMessage extends StatelessWidget {
   final bool fullScreen;
 
   const LocationMessage(
-      {Key? key, required this.content, required this.isMyself, this.thumbnail, required this.fullScreen})
+      {Key? key,
+      required this.content,
+      required this.isMyself,
+      this.thumbnail,
+      required this.fullScreen})
       : super(key: key);
 
   @override
@@ -59,7 +63,7 @@ class LocationMessage extends StatelessWidget {
         ),
       );
     } else {
-      tile =  Center(
+      tile = Center(
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Row(children: [

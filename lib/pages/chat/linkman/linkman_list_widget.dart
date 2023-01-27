@@ -2,7 +2,6 @@ import 'package:barcode_scan2/model/model.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
-import 'package:colla_chat/entity/dht/myselfpeer.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
@@ -51,7 +50,7 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'linkman';
 
   @override
-  Icon get icon => const Icon(Icons.group);
+  IconData get iconData => Icons.group;
 
   @override
   String get title => 'Linkman';

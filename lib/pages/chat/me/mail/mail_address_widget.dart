@@ -1,14 +1,12 @@
 import 'package:colla_chat/pages/chat/me/mail/mail_data_provider.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../../../../l10n/localization.dart';
-import '../../../../widgets/common/app_bar_view.dart';
-import '../../../../widgets/common/widget_mixin.dart';
-import '../../../../widgets/data_bind/data_group_listview.dart';
-import '../../../../widgets/data_bind/data_listtile.dart';
 
 //邮件地址组件，带有回退回调函数
 class MailAddressWidget extends StatefulWidget with TileDataMixin {
@@ -24,7 +22,7 @@ class MailAddressWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  Icon get icon => const Icon(Icons.email);
+  IconData get iconData => Icons.email;
 
   @override
   String get title => 'MailAddress';
@@ -82,7 +80,7 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
     return icon;
   }
 
-  _onTap(int index, String title, {String? subtitle,TileData? group}) {
+  _onTap(int index, String title, {String? subtitle, TileData? group}) {
     logger.w('index: $index, title: $title,onTap MailListWidget');
     var mailAddressProvider =
         Provider.of<MailDataProvider>(context, listen: false);
