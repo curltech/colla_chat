@@ -183,8 +183,8 @@ class _ChatListWidgetState extends State<ChatListWidget> {
             prefix: Icons.bookmark_remove,
             onTap: (int index, String label, {String? subtitle}) async {
               linkmanChatSummaryController.currentIndex = index;
-              await chatSummaryService.deleteChatSummary(peerId);
-              await chatMessageService.deleteByLinkman(peerId);
+              await chatSummaryService.removeChatSummary(peerId);
+              await chatMessageService.removeByLinkman(peerId);
               linkmanChatSummaryController.delete();
             });
         slideActions.add(deleteSlideAction);
@@ -230,8 +230,8 @@ class _ChatListWidgetState extends State<ChatListWidget> {
             prefix: Icons.bookmark_remove,
             onTap: (int index, String label, {String? subtitle}) async {
               groupChatSummaryController.currentIndex = index;
-              await chatSummaryService.deleteChatSummary(peerId);
-              await chatMessageService.deleteByGroup(peerId);
+              await chatSummaryService.removeChatSummary(peerId);
+              await chatMessageService.removeByGroup(peerId);
               groupChatSummaryController.delete();
             });
         slideActions.add(deleteSlideAction);

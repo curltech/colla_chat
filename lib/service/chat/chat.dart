@@ -595,7 +595,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   ///删除linkman的消息
-  deleteByLinkman(String peerId) async {
+  removeByLinkman(String peerId) async {
     var myselfPeerId = myself.peerId!;
     await delete(
         where:
@@ -604,7 +604,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   ///删除group的消息
-  deleteByGroup(String peerId) async {
+  removeByGroup(String peerId) async {
     await delete(where: 'groupPeerId=?', whereArgs: [peerId]);
   }
 }
@@ -794,6 +794,11 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
         await messageAttachmentService.update(attachment);
       }
     }
+  }
+
+  ///删除消息的附件
+  removeByPeerId(String peerId) async {
+    await delete(where: 'groupPeerId=?', whereArgs: [peerId]);
   }
 }
 
@@ -987,7 +992,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
     }
   }
 
-  deleteChatSummary(String peerId) async {
+  removeChatSummary(String peerId) async {
     await delete(where: 'peerId=?', whereArgs: [peerId]);
   }
 }

@@ -463,17 +463,15 @@ class GroupService extends PeerPartyService<Group> {
 
   ///向群成员发送散群的消息
   dismissGroup(Group group) async {
-    await groupMemberService.delete(entity: {
-      'groupId': group.id,
-    });
+    await groupMemberService.removeByGroupPeerId(group.peerId);
     await groupService.delete(entity: {
-      'groupId': group.id,
+      'id': group.id,
     });
     await chatMessageService.delete(entity: {
-      'senderPeerId': group.id,
+      'senderPeerId': group.peerId,
     });
     await chatSummaryService.delete(entity: {
-      'peerId': group.id,
+      'peerId': group.peerId,
     });
     List<ChatMessage> chatMessages =
         await chatMessageService.buildGroupChatMessage(
@@ -492,16 +490,16 @@ class GroupService extends PeerPartyService<Group> {
     Map<String, dynamic> map = JsonUtil.toJson(json);
     Group group = Group.fromJson(map);
     await groupMemberService.delete(entity: {
-      'groupId': group.id,
+      'id': group.id,
     });
     await groupService.delete(entity: {
-      'groupId': group.id,
+      'groupPeerId': group.peerId,
     });
     await chatMessageService.delete(entity: {
-      'receiverPeerId': group.id,
+      'receiverPeerId': group.peerId,
     });
     await chatSummaryService.delete(entity: {
-      'peerId': group.id,
+      'peerId': group.peerId,
     });
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
@@ -599,6 +597,11 @@ class GroupService extends PeerPartyService<Group> {
 
     await chatMessageService.sendAndStore(chatReceipt!);
   }
+
+  ///删除群
+  removeByGroupPeerId(String peerId) async {
+    await delete(where: 'groupPeerId=?', whereArgs: [peerId]);
+  }
 }
 
 final groupService = GroupService(
@@ -665,6 +668,11 @@ class GroupMemberService extends GeneralBaseService<GroupMember> {
       groupMember.createDate = old.createDate;
     }
     upsert(groupMember);
+  }
+
+  ///删除群的组员
+  removeByGroupPeerId(String peerId) async {
+    await delete(where: 'groupId=?', whereArgs: [peerId]);
   }
 }
 

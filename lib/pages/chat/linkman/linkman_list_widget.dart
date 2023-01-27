@@ -153,8 +153,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
             onTap: (int index, String label, {String? subtitle}) async {
               linkmanController.currentIndex = index;
               await linkmanService.delete(entity: linkman);
-              await chatSummaryService.deleteChatSummary(subtitle!);
-              await chatMessageService.deleteByLinkman(subtitle);
+              await chatSummaryService.removeChatSummary(subtitle!);
+              await chatMessageService.removeByLinkman(subtitle);
               linkmanController.delete();
             });
         slideActions.add(deleteSlideAction);
@@ -234,8 +234,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
             onTap: (int index, String label, {String? subtitle}) async {
               groupController.currentIndex = index;
               await groupService.delete(entity: group);
-              await chatSummaryService.deleteChatSummary(subtitle!);
-              await chatMessageService.deleteByGroup(subtitle);
+              await chatSummaryService.removeChatSummary(subtitle!);
+              await chatMessageService.removeByGroup(subtitle);
               groupController.delete();
             });
         slideActions.add(deleteSlideAction);
