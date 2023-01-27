@@ -4,8 +4,9 @@ import 'package:colla_chat/entity/dht/peerprofile.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/tool/locale_util.dart';
-import 'package:colla_chat/tool/string_util.dart';
 import 'package:cryptography/cryptography.dart';
+import 'package:flex_color_scheme/flex_color_scheme.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:path/path.dart' as p;
@@ -39,131 +40,87 @@ class Myself with ChangeNotifier {
   String? signalPublicKey;
   String? signalPrivateKey;
 
-  ThemeData _themeData = ThemeData();
-  ThemeData _darkThemeData = ThemeData();
+  late ThemeData _themeData;
+
+  late ThemeData _darkThemeData;
 
   Myself() {
     _buildThemeData();
     _buildDarkThemeData();
   }
 
-  String get myPath {
-    return p.join(platformParams.path, name ?? '');
-  }
-
-  Widget? get avatarImage {
-    return myselfPeer.avatarImage;
-  }
-
-  Widget? get avatarIcon {
-    return myselfPeer.avatarIcon;
-  }
-
-  /// locale操作
-  Locale get locale {
-    return LocaleUtil.getLocale(peerProfile.locale);
-  }
-
-  set locale(Locale locale) {
-    if (peerProfile.locale != locale.toString()) {
-      peerProfile.locale = locale.toString();
-      if (peerProfile.id != null) {
-        peerProfileService.update({'locale': peerProfile.locale},
-            where: 'id=?', whereArgs: [peerProfile.id!]);
-      }
-      notifyListeners();
-    }
-  }
-
-  ThemeData get themeData {
-    if (themeMode == ThemeMode.light) {
-      return _themeData;
-    } else if (themeMode == ThemeMode.dark) {
-      return _darkThemeData;
-    } else {
-      return _themeData;
-    }
-  }
-
-  ThemeData get darkThemeData {
-    return _darkThemeData;
-  }
-
   _buildThemeData() {
-    ColorScheme colorScheme = ColorScheme.fromSeed(
-        seedColor: Color(peerProfile.seedColor), brightness: Brightness.light);
-    TextTheme textTheme;
-    if (StringUtil.isNotEmpty(peerProfile.fontFamily)) {
-      textTheme = GoogleFonts.getTextTheme(peerProfile.fontFamily!);
-    } else {
-      textTheme = const TextTheme();
-    }
-
-    IconThemeData iconTheme = IconThemeData(color: colorScheme.primary);
-
-    _themeData = ThemeData(
-      colorScheme: colorScheme,
-      textTheme: textTheme,
-      iconTheme: iconTheme,
+    FlexSchemeColor lightColor = FlexSchemeColor.from(
+      primary: Color(peerProfile.seedColor),
       brightness: Brightness.light,
     );
-  }
+    TextTheme textTheme = const TextTheme();
 
-  Color get primary {
-    if (themeMode == ThemeMode.light) {
-      return _themeData.colorScheme.primary;
-    } else if (themeMode == ThemeMode.dark) {
-      return _darkThemeData.colorScheme.primary;
-    } else {
-      return _themeData.colorScheme.primary;
-    }
+    _themeData = FlexThemeData.light(
+      colors: lightColor,
+      //scheme: FlexScheme.blue,
+      swapColors: false,
+      usedColors: 6,
+      lightIsWhite: false,
+      subThemesData: const FlexSubThemesData(defaultRadius: 8),
+      appBarStyle: FlexAppBarStyle.primary,
+      appBarOpacity: 0.9,
+      transparentStatusBar: false,
+      tabBarStyle: FlexTabBarStyle.forAppBar,
+      tooltipsMatchBackground: true,
+      surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
+      blendLevel: 2,
+      appBarElevation: 0.5,
+      //FlexColorScheme.comfortablePlatformDensity
+      visualDensity: VisualDensity.standard,
+      fontFamily: peerProfile.fontFamily ?? GoogleFonts.notoSans().fontFamily,
+      textTheme: textTheme,
+      primaryTextTheme: textTheme,
+      tones: FlexTones.material(Brightness.light),
+      typography: Typography.material2021(
+        platform: defaultTargetPlatform,
+      ),
+      keyColors: const FlexKeyColors(),
+      useMaterial3ErrorColors: true,
+      useMaterial3: true,
+    );
   }
 
   _buildDarkThemeData() {
-    ColorScheme darkColorScheme = ColorScheme.fromSeed(
-        seedColor: Color(peerProfile.seedColor), brightness: Brightness.dark);
-    IconThemeData iconTheme = IconThemeData(color: darkColorScheme.primary);
-    TextTheme textTheme;
-    if (StringUtil.isNotEmpty(peerProfile.fontFamily)) {
-      textTheme = GoogleFonts.getTextTheme(peerProfile.fontFamily!);
-    } else {
-      textTheme = const TextTheme();
-    }
-    _darkThemeData = ThemeData(
-      colorScheme: darkColorScheme,
-      textTheme: textTheme,
-      iconTheme: iconTheme,
+    FlexSchemeColor darkColor = FlexSchemeColor.from(
+      primary: seedColor,
       brightness: Brightness.dark,
     );
-  }
+    TextTheme textTheme = const TextTheme();
 
-  ThemeMode get themeMode {
-    ThemeMode themeMode = ThemeMode.values
-        .firstWhere((element) => element.name == peerProfile.themeMode);
-    return themeMode;
-  }
-
-  set themeMode(ThemeMode themeMode) {
-    if (peerProfile.themeMode != themeMode.name) {
-      peerProfile.themeMode = themeMode.name;
-      if (peerProfile.id != null) {
-        peerProfileService.update({'themeMode': peerProfile.themeMode},
-            where: 'id=?', whereArgs: [peerProfile.id!]);
-      }
-      notifyListeners();
-    }
-  }
-
-  Brightness getBrightness(BuildContext context) {
-    if (themeMode == ThemeMode.system) {
-      return MediaQuery.platformBrightnessOf(context);
-    } else {
-      if (themeMode == ThemeMode.light) {
-        return Brightness.light;
-      } else {
-        return Brightness.dark;
-      }
-    }
+    _darkThemeData = FlexThemeData.dark(
+      colors: darkColor,
+      //scheme: FlexScheme.blue,
+      swapColors: false,
+      usedColors: 6,
+      darkIsTrueBlack: false,
+      subThemesData: const FlexSubThemesData(defaultRadius: 8),
+      appBarStyle: FlexAppBarStyle.background,
+      appBarOpacity: 0.9,
+      transparentStatusBar: false,
+      tabBarStyle: FlexTabBarStyle.forAppBar,
+      tooltipsMatchBackground: true,
+      surfaceMode: FlexSurfaceMode.highSurfaceLowScaffold,
+      blendLevel: 2,
+      appBarElevation: 0.5,
+      //FlexColorScheme.comfortablePlatformDensity
+      visualDensity: VisualDensity.standard,
+      fontFamily: peerProfile.fontFamily ?? GoogleFonts.notoSans().fontFamily,
+      textTheme: textTheme,
+      primaryTextTheme: textTheme,
+      tones: FlexTones.material(Brightness.dark),
+      typography: Typography.material2021(
+        platform: defaultTargetPlatform,
+      ),
+      keyColors: const FlexKeyColors(),
+      useMaterial3ErrorColors: true,
+      useMaterial3: true,
+    );
   }
 
   Color get seedColor {
@@ -211,6 +168,97 @@ class Myself with ChangeNotifier {
       }
       _buildThemeData();
       _buildDarkThemeData();
+      notifyListeners();
+    }
+  }
+
+  ThemeData get themeData {
+    if (themeMode == ThemeMode.light) {
+      return _themeData;
+    } else if (themeMode == ThemeMode.dark) {
+      return _darkThemeData;
+    } else {
+      return _themeData;
+    }
+  }
+
+  ThemeData get darkThemeData {
+    return _darkThemeData;
+  }
+
+  Color get primary {
+    if (themeMode == ThemeMode.light) {
+      return _themeData.colorScheme.primary;
+    } else if (themeMode == ThemeMode.dark) {
+      return _darkThemeData.colorScheme.primary;
+    } else {
+      return _themeData.colorScheme.primary;
+    }
+  }
+
+  Color get secondary {
+    if (themeMode == ThemeMode.light) {
+      return _themeData.colorScheme.secondary;
+    } else if (themeMode == ThemeMode.dark) {
+      return _darkThemeData.colorScheme.secondary;
+    } else {
+      return _themeData.colorScheme.secondary;
+    }
+  }
+
+  ThemeMode get themeMode {
+    ThemeMode themeMode = ThemeMode.values
+        .firstWhere((element) => element.name == peerProfile.themeMode);
+    return themeMode;
+  }
+
+  set themeMode(ThemeMode themeMode) {
+    if (peerProfile.themeMode != themeMode.name) {
+      peerProfile.themeMode = themeMode.name;
+      if (peerProfile.id != null) {
+        peerProfileService.update({'themeMode': peerProfile.themeMode},
+            where: 'id=?', whereArgs: [peerProfile.id!]);
+      }
+      notifyListeners();
+    }
+  }
+
+  Brightness getBrightness(BuildContext context) {
+    if (themeMode == ThemeMode.system) {
+      return MediaQuery.platformBrightnessOf(context);
+    } else {
+      if (themeMode == ThemeMode.light) {
+        return Brightness.light;
+      } else {
+        return Brightness.dark;
+      }
+    }
+  }
+
+  String get myPath {
+    return p.join(platformParams.path, name ?? '');
+  }
+
+  Widget? get avatarImage {
+    return myselfPeer.avatarImage;
+  }
+
+  Widget? get avatarIcon {
+    return myselfPeer.avatarIcon;
+  }
+
+  /// locale操作
+  Locale get locale {
+    return LocaleUtil.getLocale(peerProfile.locale);
+  }
+
+  set locale(Locale locale) {
+    if (peerProfile.locale != locale.toString()) {
+      peerProfile.locale = locale.toString();
+      if (peerProfile.id != null) {
+        peerProfileService.update({'locale': peerProfile.locale},
+            where: 'id=?', whereArgs: [peerProfile.id!]);
+      }
       notifyListeners();
     }
   }

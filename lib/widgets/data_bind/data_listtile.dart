@@ -87,10 +87,11 @@ class TileData {
           fit: BoxFit.contain,
         );
       } else if (prefix is IconData) {
+        // leading = Icon(prefix);
         if (selected) {
           leading = Icon(prefix, color: myself.primary);
         } else {
-          leading = Icon(prefix, color: myself.themeData.colorScheme.secondary);
+          leading = Icon(prefix, color: myself.secondary);
         }
       }
     }
@@ -146,7 +147,7 @@ class DataListTile extends StatelessWidget {
 
     ///然后，如果路由名称存在，加入路由图标
     if (tileData.routeName != null) {
-      trailing.add(Icon(Icons.chevron_right, color: myself.primary));
+      trailing.add(Icon(Icons.chevron_right, color: myself.secondary));
     }
 
     ///横向排列尾部的组件
