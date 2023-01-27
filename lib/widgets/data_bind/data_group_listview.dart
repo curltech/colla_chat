@@ -137,6 +137,8 @@ class _GroupDataListViewState extends State<GroupDataListView> {
 
     ///未来不使用ListTile，因为高度固定，不够灵活
     return ExpansionTile(
+      // tilePadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 15),
+      childrenPadding: const EdgeInsets.all(0),
       maintainState: true,
       leading: leading,
       title: Text(

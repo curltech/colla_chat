@@ -163,6 +163,10 @@ class DataListTile extends StatelessWidget {
 
     ///未来不使用ListTile，因为高度固定，不够灵活
     var listTile = ListTile(
+      //contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+      horizontalTitleGap: 15,
+      minVerticalPadding: 2,
+      minLeadingWidth: 2,
       selected: selected,
       leading: leading,
       title: Text(

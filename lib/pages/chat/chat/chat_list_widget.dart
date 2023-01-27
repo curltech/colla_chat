@@ -161,15 +161,18 @@ class _ChatListWidgetState extends State<ChatListWidget> {
           chatSummaryService.delete(entity: chatSummary);
           continue;
         }
-        var badge = Badge(
-          badgeContent: Text('$unreadNumber',
-              style: const TextStyle(color: Colors.white)),
-          elevation: 0.0,
-          shape: BadgeShape.square,
-          borderRadius: BorderRadius.circular(8),
-          padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5.0),
-          child: linkman.avatarImage,
-        );
+        var badge = linkman.avatarImage;
+        if (unreadNumber > 0) {
+          badge = Badge(
+            badgeContent: Text('$unreadNumber',
+                style: const TextStyle(color: Colors.white)),
+            elevation: 0.0,
+            shape: BadgeShape.square,
+            borderRadius: BorderRadius.circular(8),
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5.0),
+            child: badge,
+          );
+        }
         TileData tile = TileData(
             prefix: badge,
             title: title,
@@ -208,15 +211,18 @@ class _ChatListWidgetState extends State<ChatListWidget> {
           chatSummaryService.delete(entity: chatSummary);
           continue;
         }
-        var badge = Badge(
-          badgeContent: Text('$unreadNumber',
-              style: const TextStyle(color: Colors.white)),
-          elevation: 0.0,
-          shape: BadgeShape.square,
-          borderRadius: BorderRadius.circular(8),
-          padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5.0),
-          child: group.avatarImage,
-        );
+        var badge = group.avatarImage;
+        if (unreadNumber > 0) {
+          badge = Badge(
+            badgeContent: Text('$unreadNumber',
+                style: const TextStyle(color: Colors.white)),
+            elevation: 0.0,
+            shape: BadgeShape.square,
+            borderRadius: BorderRadius.circular(8),
+            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5.0),
+            child: badge,
+          );
+        }
         TileData tile = TileData(
             prefix: badge,
             title: title,

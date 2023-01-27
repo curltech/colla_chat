@@ -304,8 +304,8 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     }
     var json = JsonUtil.toJson(myself);
     PeerClient peerClient = PeerClient.fromJson(json);
-    peerClientService.store(peerClient);
-    linkmanService.storeByPeerClient(peerClient);
+    await peerClientService.store(peerClient);
+    await linkmanService.storeByPeerClient(peerClient);
   }
 
   @override

@@ -321,7 +321,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
     ];
     _buildGroupDataListController();
     var groupDataListView = Container(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
         child: GroupDataListView(
           onTap: _onTap,
           controller: widget.groupDataListController,
