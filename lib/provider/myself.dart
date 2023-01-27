@@ -5,6 +5,7 @@ import 'package:colla_chat/entity/dht/peerprofile.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/tool/locale_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:cryptography/cryptography.dart';
 import 'package:flex_color_scheme/flex_color_scheme.dart';
 import 'package:flutter/foundation.dart';
@@ -51,16 +52,20 @@ class Myself with ChangeNotifier {
   }
 
   _buildThemeData() {
+    FlexScheme? scheme;
+    if (peerProfile.scheme != null) {
+      scheme =
+          StringUtil.enumFromString(FlexScheme.values, peerProfile.scheme!);
+    }
     FlexSchemeColor lightColor = FlexSchemeColor.from(
       primary: primaryColor,
       brightness: Brightness.light,
     );
     TextTheme textTheme = const TextTheme();
-
     _themeData = FlexThemeData.light(
-      colors: lightColor,
-      //scheme: FlexScheme.blue,
-      swapColors: false,
+      colors: scheme == null ? lightColor : null,
+      scheme: scheme,
+      swapColors: true,
       usedColors: 6,
       lightIsWhite: false,
       subThemesData: FlexSubThemesData(
@@ -76,7 +81,7 @@ class Myself with ChangeNotifier {
         inputDecoratorFocusedBorderWidth: 0,
       ),
       appBarStyle: FlexAppBarStyle.primary,
-      appBarOpacity: 0.9,
+      appBarOpacity: 1,
       transparentStatusBar: false,
       tabBarStyle: FlexTabBarStyle.forAppBar,
       tooltipsMatchBackground: true,
@@ -99,6 +104,11 @@ class Myself with ChangeNotifier {
   }
 
   _buildDarkThemeData() {
+    FlexScheme? darkScheme;
+    if (peerProfile.darkScheme != null) {
+      darkScheme =
+          StringUtil.enumFromString(FlexScheme.values, peerProfile.darkScheme!);
+    }
     FlexSchemeColor darkColor = FlexSchemeColor.from(
       primary: primaryColor,
       brightness: Brightness.dark,
@@ -106,14 +116,25 @@ class Myself with ChangeNotifier {
     TextTheme textTheme = const TextTheme();
 
     _darkThemeData = FlexThemeData.dark(
-      colors: darkColor,
-      //scheme: FlexScheme.blue,
-      swapColors: false,
+      colors: darkScheme == null ? darkColor : null,
+      scheme: darkScheme,
+      swapColors: true,
       usedColors: 6,
       darkIsTrueBlack: false,
-      subThemesData: const FlexSubThemesData(defaultRadius: 8),
+      subThemesData: FlexSubThemesData(
+        defaultRadius: 8,
+        inputDecoratorRadius: 2,
+        inputDecoratorSchemeColor: SchemeColor.primary,
+        inputDecoratorIsFilled: false,
+        inputDecoratorFillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
+        inputDecoratorBorderType: FlexInputBorderType.underline,
+        inputDecoratorUnfocusedHasBorder: false,
+        inputDecoratorUnfocusedBorderIsColored: false,
+        inputDecoratorBorderWidth: 0,
+        inputDecoratorFocusedBorderWidth: 0,
+      ),
       appBarStyle: FlexAppBarStyle.background,
-      appBarOpacity: 0.9,
+      appBarOpacity: 1,
       transparentStatusBar: false,
       tabBarStyle: FlexTabBarStyle.forAppBar,
       tooltipsMatchBackground: true,
