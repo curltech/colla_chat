@@ -54,7 +54,7 @@ class _PeerEndpointShowWidgetState extends State<PeerEndpointShowWidget> {
         values[label] = value;
       }
     }
-    Widget dataListShow = DataListShow(
+    Widget dataListShow = ValueListView(
       values: values,
     );
     return dataListShow;

@@ -95,12 +95,24 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
             await _pickAvatar(peerId, context);
           }),
       TileData(
+        title: AppLocalizations.t('PeerId'),
+        subtitle: peerId,
+      ),
+      TileData(
         title: AppLocalizations.t('Name'),
         suffix: name,
       ),
       TileData(
-        title: AppLocalizations.t('PeerId'),
-        subtitle: peerId,
+        title: AppLocalizations.t('LoginName'),
+        suffix: myself.myselfPeer.loginName,
+      ),
+      TileData(
+        title: AppLocalizations.t('Email'),
+        suffix: myself.myselfPeer.email,
+      ),
+      TileData(
+        title: AppLocalizations.t('Mobile'),
+        suffix: myself.myselfPeer.mobile,
       ),
       TileData(
         title: AppLocalizations.t('Qrcode'),
