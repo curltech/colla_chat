@@ -247,7 +247,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
   Widget _buildLabel(BuildContext context) {
     widget.controller.controller = null;
     String label = widget.controller.columnFieldDef.label;
-    label = AppLocalizations.t(label) + ':';
+    label = '${AppLocalizations.t(label)}:';
     final value = widget.controller.value ?? '';
     return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
       _buildIcon()!,
@@ -320,8 +320,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
   }
 
   Widget _buildPasswordField(BuildContext context) {
-    bool? pwdShow = widget.controller.flag;
-    pwdShow ??= false;
+    bool pwdShow = widget.controller.flag ?? false;
     final value = widget.controller.value ?? '';
     var controller = TextEditingController();
     controller.value = TextEditingValue(
@@ -365,8 +364,10 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
               color: myself.primary,
             ),
             onPressed: () {
-              widget.controller.value = controller.value.text;
-              widget.controller.flag = !pwdShow!;
+              setState(() {
+                widget.controller.value = controller.value.text;
+                widget.controller.flag = !pwdShow;
+              });
             },
           ),
           suffix: suffix,

@@ -73,20 +73,20 @@ class _P2pLoginState extends State<P2pLogin> {
             onPressed: () {
               _animateToPage(0);
             },
-            icon: const Icon(Icons.login),
+            icon: const Icon(Icons.login, color: Colors.white),
             tooltip: AppLocalizations.t('Login')),
         IconButton(
           onPressed: () {
             _animateToPage(1);
           },
-          icon: const Icon(Icons.app_registration),
+          icon: const Icon(Icons.app_registration, color: Colors.white),
           tooltip: AppLocalizations.t('Register'),
         ),
         IconButton(
           onPressed: () {
             _animateToPage(2);
           },
-          icon: const Icon(Icons.settings),
+          icon: const Icon(Icons.settings, color: Colors.white),
           tooltip: AppLocalizations.t('Setting'),
         ),
       ],
