@@ -1,5 +1,7 @@
-import '../../../entity/p2p/chain_message.dart';
-import '../baseaction.dart';
+
+
+import 'package:colla_chat/entity/p2p/chain_message.dart';
+import 'package:colla_chat/p2p/chain/baseaction.dart';
 
 ///根据payloadType把数据上传到服务器
 class PutValueAction extends BaseAction {

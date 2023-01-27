@@ -1,8 +1,9 @@
+import 'package:colla_chat/entity/p2p/chain_message.dart';
+import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 
-import '../../../entity/p2p/chain_message.dart';
-import '../baseaction.dart';
+
 
 ///这是webrtc信号服务器的客户端实现，可以发送和接收信号服务器的数据
 class SignalAction extends BaseAction {

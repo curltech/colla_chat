@@ -1,15 +1,15 @@
+import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/entity/p2p/chain_message.dart';
+import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/p2p/message_serializer.dart';
+import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/transport/httpclient.dart';
+import 'package:colla_chat/transport/websocket.dart';
 import 'package:dio/dio.dart';
 
-import '../../crypto/util.dart';
-import '../../entity/p2p/chain_message.dart';
-import '../../entity/p2p/security_context.dart';
-import '../../provider/myself.dart';
-import '../../service/p2p/message_serializer.dart';
-import '../../service/p2p/security_context.dart';
-import '../../transport/httpclient.dart';
-import '../../transport/websocket.dart';
 
 const packetSize = 4 * 1024 * 1024;
 const webRtcPacketSize = 128 * 1024;
