@@ -10,6 +10,7 @@ import 'package:colla_chat/pages/chat/linkman/linkman/linkman_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_edit_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
@@ -109,12 +110,20 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
               fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
               filled: true,
               border: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              errorBorder: InputBorder.none,
+              disabledBorder: InputBorder.none,
+              focusedErrorBorder: InputBorder.none,
               //labelText: AppLocalizations.t('Search'),
               suffixIcon: IconButton(
                 onPressed: () {
                   _search(controller.text);
                 },
-                icon: const Icon(Icons.search),
+                icon: Icon(
+                  Icons.search,
+                  color: myself.primary,
+                ),
               ),
             )));
 
@@ -289,14 +298,14 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
             linkmanController.currentIndex = -1;
             indexWidgetProvider.push('linkman_add');
           },
-          icon: const Icon(Icons.person_add_alt),
+          icon: const Icon(Icons.person_add_alt, color: Colors.white),
           tooltip: AppLocalizations.t('Add linkman')),
       IconButton(
           onPressed: () {
             groupController.currentIndex = -1;
             indexWidgetProvider.push('group_add');
           },
-          icon: const Icon(Icons.group_add),
+          icon: const Icon(Icons.group_add, color: Colors.white),
           tooltip: AppLocalizations.t('Add group')),
       IconButton(
           onPressed: () async {
@@ -307,7 +316,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
             await peerClientService.store(peerClient);
             await linkmanService.storeByPeerClient(peerClient);
           },
-          icon: const Icon(Icons.qr_code),
+          icon: const Icon(Icons.qr_code, color: Colors.white),
           tooltip: AppLocalizations.t('Qrcode scan')),
     ];
     _buildGroupDataListController();

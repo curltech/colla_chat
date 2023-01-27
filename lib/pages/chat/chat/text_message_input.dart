@@ -5,6 +5,7 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.da
 import 'package:colla_chat/pages/chat/chat/extended_text_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/message/message_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
@@ -94,8 +95,8 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
                 horizontal: iconInset, vertical: iconInset),
             child: InkWell(
               child: voiceVisible
-                  ? const Icon(Icons.record_voice_over)
-                  : const Icon(Icons.keyboard),
+                  ? Icon(Icons.record_voice_over, color: myself.primary)
+                  : Icon(Icons.keyboard, color: myself.primary),
               onTap: () {
                 setState(() {
                   voiceVisible = !voiceVisible;
@@ -108,7 +109,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
             margin: EdgeInsets.symmetric(
                 horizontal: iconInset, vertical: iconInset),
             child: InkWell(
-              child: const Icon(Icons.emoji_emotions),
+              child: Icon(Icons.emoji_emotions, color: myself.primary),
               onTap: () {
                 if (widget.onEmojiPressed != null) {
                   widget.onEmojiPressed!();
@@ -122,7 +123,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
                 margin:
                     const EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
                 child: InkWell(
-                  child: const Icon(Icons.add_circle),
+                  child: Icon(Icons.add_circle, color: myself.primary),
                   onTap: () {
                     if (widget.onMorePressed != null) {
                       widget.onMorePressed!();
@@ -136,7 +137,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
                 margin:
                     const EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
                 child: InkWell(
-                  child: const Icon(Icons.send),
+                  child: Icon(Icons.send, color: myself.primary),
                   onTap: () {
                     if (widget.onSendPressed != null) {
                       widget.onSendPressed!();

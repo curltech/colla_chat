@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
@@ -197,11 +198,16 @@ class _ExtendedTextMessageInputWidgetState
       },
       //onChanged: onChanged,
       decoration: InputDecoration(
-        hintText: AppLocalizations.t('Please input message'),
-        //isCollapsed: true,
-        fillColor: Colors.grey.withOpacity(0.3),
+        fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
         filled: true,
         border: InputBorder.none,
+        focusedBorder: InputBorder.none,
+        enabledBorder: InputBorder.none,
+        errorBorder: InputBorder.none,
+        disabledBorder: InputBorder.none,
+        focusedErrorBorder: InputBorder.none,
+        hintText: AppLocalizations.t('Please input message'),
+        //isCollapsed: true,
       ),
       //textDirection: TextDirection.rtl,
     );

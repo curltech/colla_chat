@@ -1,5 +1,7 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
@@ -280,7 +282,10 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
               onPressed: () {
                 controller.clear();
               },
-              icon: const Icon(Icons.cancel))
+              icon: Icon(
+                Icons.cancel,
+                color: myself.primary,
+              ))
           : null;
 
       if (suffixIcon == null) {
@@ -296,6 +301,14 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
       minLines: 1,
       readOnly: columnFieldDef.readOnly,
       decoration: InputDecoration(
+          fillColor: Colors.grey.withOpacity(AppOpacity.xlOpacity),
+          filled: true,
+          border: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          errorBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
+          focusedErrorBorder: InputBorder.none,
           labelText: label,
           prefixIcon: _buildIcon(),
           suffixIcon: suffixIcon,
@@ -325,7 +338,10 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
               onPressed: () {
                 controller.clear();
               },
-              icon: const Icon(Icons.cancel))
+              icon: Icon(
+                Icons.cancel,
+                color: myself.primary,
+              ))
           : null;
     }
     var textFormField = TextFormField(
@@ -333,10 +349,21 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
       keyboardType: columnFieldDef.textInputType,
       obscureText: !pwdShow,
       decoration: InputDecoration(
+          fillColor: Colors.grey.withOpacity(AppOpacity.xlOpacity),
+          filled: true,
+          border: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          errorBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
+          focusedErrorBorder: InputBorder.none,
           labelText: AppLocalizations.t(columnFieldDef.label),
           prefixIcon: _buildIcon(),
           suffixIcon: IconButton(
-            icon: Icon(pwdShow ? Icons.visibility_off : Icons.visibility),
+            icon: Icon(
+              pwdShow ? Icons.visibility_off : Icons.visibility,
+              color: myself.primary,
+            ),
             onPressed: () {
               widget.controller.value = controller.value.text;
               widget.controller.flag = !pwdShow!;

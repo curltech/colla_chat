@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/dht/myselfpeer.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/dht/peerprofile.dart';
@@ -62,7 +63,18 @@ class Myself with ChangeNotifier {
       swapColors: false,
       usedColors: 6,
       lightIsWhite: false,
-      subThemesData: const FlexSubThemesData(defaultRadius: 8),
+      subThemesData: FlexSubThemesData(
+        defaultRadius: 8,
+        inputDecoratorRadius: 2,
+        inputDecoratorSchemeColor: SchemeColor.primary,
+        inputDecoratorIsFilled: false,
+        inputDecoratorFillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
+        inputDecoratorBorderType: FlexInputBorderType.underline,
+        inputDecoratorUnfocusedHasBorder: false,
+        inputDecoratorUnfocusedBorderIsColored: false,
+        inputDecoratorBorderWidth: 0,
+        inputDecoratorFocusedBorderWidth: 0,
+      ),
       appBarStyle: FlexAppBarStyle.primary,
       appBarOpacity: 0.9,
       transparentStatusBar: false,
@@ -131,7 +143,7 @@ class Myself with ChangeNotifier {
     if (peerProfile.primaryColor != color.value) {
       peerProfile.primaryColor = color.value;
       if (peerProfile.id != null) {
-        peerProfileService.update({'seedColor': peerProfile.primaryColor},
+        peerProfileService.update({'primaryColor': peerProfile.primaryColor},
             where: 'id=?', whereArgs: [peerProfile.id!]);
       }
       _buildThemeData();
@@ -147,8 +159,10 @@ class Myself with ChangeNotifier {
     if (peerProfile.darkPrimaryColor != color.value) {
       peerProfile.darkPrimaryColor = color.value;
       if (peerProfile.id != null) {
-        peerProfileService.update({'darkSeedColor': peerProfile.darkPrimaryColor},
-            where: 'id=?', whereArgs: [peerProfile.id!]);
+        peerProfileService.update(
+            {'darkPrimaryColor': peerProfile.darkPrimaryColor},
+            where: 'id=?',
+            whereArgs: [peerProfile.id!]);
       }
       _buildDarkThemeData();
       notifyListeners();

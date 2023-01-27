@@ -1,6 +1,8 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -120,16 +122,25 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
             controller: controller,
             keyboardType: TextInputType.text,
             decoration: InputDecoration(
-              fillColor: Colors.black.withOpacity(0.1),
+              fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
               filled: true,
               border: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              errorBorder: InputBorder.none,
+              disabledBorder: InputBorder.none,
+              focusedErrorBorder: InputBorder.none,
               labelText: AppLocalizations.t('Add friend'),
               suffixIcon: IconButton(
                 onPressed: () {
                   _addFriend(tip: controller.text);
                 },
-                icon: const Icon(Icons.person_add),
+                icon: Icon(
+                  Icons.person_add,
+                  color: myself.primary,
+                ),
               ),
+              suffixIconColor: myself.primary,
             )));
 
     return addFriendTextField;

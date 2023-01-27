@@ -24,14 +24,18 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
     ColumnFieldDef(
       name: 'credential',
       label: 'Credential(Mobile/Email/LoginName)',
-      prefixIcon: const Icon(Icons.person),
+      prefixIcon: Icon(
+        Icons.person,
+      ),
       cancel: true,
     ),
     ColumnFieldDef(
       name: 'password',
       label: 'Password',
       inputType: InputType.password,
-      prefixIcon: const Icon(Icons.password),
+      prefixIcon: Icon(
+        Icons.password,
+      ),
     ),
   ];
 

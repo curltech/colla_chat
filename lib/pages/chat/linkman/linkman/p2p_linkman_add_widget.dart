@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
@@ -65,12 +66,23 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
           return ValidatorUtil.emptyValidator(value);
         },
         decoration: InputDecoration(
+          fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
+          filled: true,
+          border: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          errorBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
+          focusedErrorBorder: InputBorder.none,
           labelText: AppLocalizations.t('PeerId/Mobile/Email/Name'),
           suffixIcon: IconButton(
             onPressed: () {
               _search(controller.text);
             },
-            icon: const Icon(Icons.search),
+            icon: Icon(
+              Icons.search,
+              color: myself.primary,
+            ),
           ),
         ));
 

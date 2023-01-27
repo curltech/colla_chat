@@ -124,11 +124,11 @@ class WidgetUtil {
       {Color? backgroundColor,
       double borderRadius = 8.0,
       EdgeInsets padding =
-          const EdgeInsets.symmetric(horizontal: 15.0, vertical: 15.0),
-      Size minimumSize = const Size(50, 46.0),
-      Size maximumSize = const Size(120.0, 56.0)}) {
+          const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+      Size minimumSize = const Size(50, 40.0),
+      Size maximumSize = const Size(120.0, 48.0)}) {
     backgroundColor =
-        backgroundColor ?? Colors.grey.withOpacity(AppOpacity.mdOpacity);
+        backgroundColor ?? Colors.grey.withOpacity(AppOpacity.lgOpacity);
     ButtonStyle style = ButtonStyle(
       backgroundColor: MaterialStateProperty.all(backgroundColor),
       shape: MaterialStateProperty.all(
