@@ -10,7 +10,6 @@ import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
-import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
@@ -53,6 +52,8 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _LinkmanListWidgetState extends State<LinkmanListWidget> {
+  TextEditingController controller = TextEditingController();
+
   @override
   initState() {
     super.initState();
@@ -60,6 +61,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
     groupController.addListener(_update);
     widget.groupDataListController.addListener(_update);
     _buildGroupDataListController();
+    _search(controller.text);
   }
 
   _update() {
@@ -92,7 +94,6 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
   }
 
   _buildSearchTextField(BuildContext context) {
-    var controller = TextEditingController();
     var searchTextField = Container(
         padding: const EdgeInsets.all(10.0),
         child: TextFormField(
