@@ -1,6 +1,4 @@
-import 'dart:ui';
-
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/routers/routes.dart';
@@ -941,20 +939,20 @@ class MaterialWidgetFactory extends WidgetFactory {
     Color badgeColor = Colors.red,
     double elevation = 2,
     bool toAnimate = true,
-    BadgePosition? position,
-    BadgeShape shape = BadgeShape.circle,
+    badges.BadgePosition? position,
+    badges.BadgeShape shape = badges.BadgeShape.circle,
     EdgeInsetsGeometry padding = const EdgeInsets.all(5.0),
     Duration animationDuration = const Duration(milliseconds: 500),
     BorderRadiusGeometry borderRadius = BorderRadius.zero,
     AlignmentGeometry alignment = Alignment.center,
-    BadgeAnimationType animationType = BadgeAnimationType.slide,
+    badges.BadgeAnimationType animationType = badges.BadgeAnimationType.slide,
     bool showBadge = true,
     bool ignorePointer = false,
     BorderSide borderSide = BorderSide.none,
     StackFit stackFit = StackFit.loose,
     Gradient? gradient,
   }) {
-    return Badge();
+    return badges.Badge();
   }
 
   ///按钮

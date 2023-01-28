@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:badges/badges.dart';
+import 'package:badges/badges.dart' as badges;
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -163,11 +163,11 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         }
         var badge = linkman.avatarImage;
         if (unreadNumber > 0) {
-          badge = Badge(
+          badge = badges.Badge(
             badgeContent: Text('$unreadNumber',
                 style: const TextStyle(color: Colors.white)),
             elevation: 0.0,
-            shape: BadgeShape.square,
+            shape: badges.BadgeShape.square,
             borderRadius: BorderRadius.circular(8),
             padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5.0),
             child: badge,
@@ -213,11 +213,11 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         }
         var badge = group.avatarImage;
         if (unreadNumber > 0) {
-          badge = Badge(
+          badge = badges.Badge(
             badgeContent: Text('$unreadNumber',
                 style: const TextStyle(color: Colors.white)),
             elevation: 0.0,
-            shape: BadgeShape.square,
+            shape: badges.BadgeShape.square,
             borderRadius: BorderRadius.circular(8),
             padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5.0),
             child: badge,
