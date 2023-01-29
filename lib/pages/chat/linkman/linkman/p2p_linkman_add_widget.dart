@@ -5,6 +5,7 @@ import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/p2p/chain/action/findclient.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
+import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/contact.dart';
@@ -105,6 +106,7 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
           await linkmanService.storeByPeerClient(peerClient);
         }
         await _buildTiles(peerClients);
+        linkmanChatSummaryController.refresh();
       }
     }
   }

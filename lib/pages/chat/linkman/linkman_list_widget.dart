@@ -221,7 +221,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
         tiles.add(tile);
       }
     }
-    var keyTile = TileData(title: 'Linkman');
+    var keyTile = TileData(
+        prefix: myself.avatarImage ?? AppImage.mdAppImage, title: 'Linkman');
     widget.groupDataListController.add(keyTile, tiles);
 
     var groups = groupController.data;
@@ -275,7 +276,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
         tiles.add(tile);
       }
     }
-    keyTile = TileData(title: 'Group');
+    keyTile = TileData(
+        prefix: myself.avatarImage ?? AppImage.mdAppImage, title: 'Group');
     widget.groupDataListController.add(keyTile, tiles);
   }
 

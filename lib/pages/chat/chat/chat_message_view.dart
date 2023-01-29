@@ -92,7 +92,12 @@ class _ChatMessageViewState extends State<ChatMessageView> {
         Map<String, dynamic> entity = {'unreadNumber': 0};
         await chatSummaryService
             .update(entity, where: 'peerId=?', whereArgs: [peerId]);
-        linkmanChatSummaryController.refresh();
+        if (chatSummary.partyType == PartyType.linkman.name) {
+          linkmanChatSummaryController.refresh();
+        }
+        if (chatSummary.partyType == PartyType.group.name) {
+          groupChatSummaryController.refresh();
+        }
       }
     }
   }
