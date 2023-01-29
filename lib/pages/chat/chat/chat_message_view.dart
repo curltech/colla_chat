@@ -1,8 +1,8 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/full_screen_widget.dart';
@@ -10,6 +10,7 @@ import 'package:colla_chat/pages/chat/chat/video/video_chat_widget.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/date_util.dart';
@@ -84,9 +85,16 @@ class _ChatMessageViewState extends State<ChatMessageView> {
           MessageStatus.received.name,
           MessageStatus.send.name
         ]);
-    Map<String, dynamic> entity = {'unreadNumber': 0};
-    await chatSummaryService
-        .update(entity, where: 'peerId=?', whereArgs: [peerId]);
+    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    if (chatSummary != null) {
+      if (chatSummary.unreadNumber > 0) {
+        chatSummary.unreadNumber = 0;
+        Map<String, dynamic> entity = {'unreadNumber': 0};
+        await chatSummaryService
+            .update(entity, where: 'peerId=?', whereArgs: [peerId]);
+        linkmanChatSummaryController.refresh();
+      }
+    }
   }
 
   ///初始化，webrtc如果没有连接，尝试连接

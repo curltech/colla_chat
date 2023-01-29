@@ -150,7 +150,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
         var title = linkman.name;
         var subtitle = linkman.peerId;
         TileData tile = TileData(
-            prefix: linkman.avatarImage,
+            prefix: linkman.avatarImage ?? AppImage.mdAppImage,
             title: title,
             subtitle: subtitle,
             selected: false,
@@ -231,7 +231,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
         var title = group.name;
         var subtitle = group.peerId;
         TileData tile = TileData(
-            prefix: group.avatarImage,
+            prefix: group.avatarImage ?? AppImage.mdAppImage,
             title: title,
             subtitle: subtitle,
             selected: false,

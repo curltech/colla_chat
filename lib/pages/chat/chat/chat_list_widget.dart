@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:badges/badges.dart' as badges;
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -161,7 +162,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
           chatSummaryService.delete(entity: chatSummary);
           continue;
         }
-        var badge = linkman.avatarImage;
+        var badge = linkman.avatarImage ?? AppImage.mdAppImage;
         if (unreadNumber > 0) {
           badge = badges.Badge(
             badgeContent: Text('$unreadNumber',
@@ -213,7 +214,7 @@ class _ChatListWidgetState extends State<ChatListWidget> {
           chatSummaryService.delete(entity: chatSummary);
           continue;
         }
-        var badge = group.avatarImage;
+        var badge = group.avatarImage ?? AppImage.mdAppImage;
         if (unreadNumber > 0) {
           badge = badges.Badge(
             badgeContent: Text('$unreadNumber',
