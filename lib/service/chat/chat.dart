@@ -897,6 +897,9 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummary.partyType = PartyType.linkman.name;
       chatSummary.status = linkman.status;
       chatSummary.name = linkman.name;
+      if (myself.id == null) {
+        chatSummary.ownerPeerId = linkman.ownerPeerId;
+      }
       await insert(chatSummary);
       chatSummaries[chatSummary.peerId!] = chatSummary;
     } else {

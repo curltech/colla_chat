@@ -7,7 +7,6 @@
 // ignore_for_file: depend_on_referenced_packages
 
 import 'package:audioplayers_web/audioplayers_web.dart';
-import 'package:battery_plus_web/battery_plus_web.dart';
 import 'package:camera_web/camera_web.dart';
 import 'package:file_picker/_internal/file_picker_web.dart';
 import 'package:flutter_keyboard_visibility_web/flutter_keyboard_visibility_web.dart';
@@ -17,7 +16,6 @@ import 'package:geolocator_web/geolocator_web.dart';
 import 'package:image_picker_for_web/image_picker_for_web.dart';
 import 'package:openpgp/web/openpgp_web.dart';
 import 'package:pdfx/src/renderer/web/pdfx_plugin.dart';
-import 'package:sensors_plus_web/sensors_plus_web.dart';
 import 'package:shared_preferences_web/shared_preferences_web.dart';
 import 'package:toast/toast_web.dart';
 import 'package:url_launcher_web/url_launcher_web.dart';
@@ -28,7 +26,6 @@ import 'package:webcrypto/src/flutter/webcrypto_plugin.dart';
 // ignore: public_member_api_docs
 void registerPlugins(Registrar registrar) {
   AudioplayersPlugin.registerWith(registrar);
-  BatteryPlusPlugin.registerWith(registrar);
   CameraPlugin.registerWith(registrar);
   FilePickerWeb.registerWith(registrar);
   FlutterKeyboardVisibilityPlugin.registerWith(registrar);
@@ -37,7 +34,6 @@ void registerPlugins(Registrar registrar) {
   ImagePickerPlugin.registerWith(registrar);
   OpenpgpPlugin.registerWith(registrar);
   PdfxPlugin.registerWith(registrar);
-  SensorsPlugin.registerWith(registrar);
   SharedPreferencesPlugin.registerWith(registrar);
   ToastWebPlugin.registerWith(registrar);
   UrlLauncherPlugin.registerWith(registrar);

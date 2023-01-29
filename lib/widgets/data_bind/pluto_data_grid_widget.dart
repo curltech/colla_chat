@@ -165,11 +165,14 @@ class _PaginatedDataTableState<T> extends State<PlutoDataGridWidget> {
         // createFooter: (PlutoGridStateManager event) {},
         // rowColorCallback: (PlutoRowColorContext event) {},
         configuration: const PlutoGridConfiguration(
-          enableColumnBorder: false,
-          gridBorderColor: Colors.white,
-          borderColor: Colors.white,
-          activatedBorderColor: Colors.white,
-          inactivatedBorderColor: Colors.white,
+          style: PlutoGridStyleConfig(
+            enableColumnBorderVertical: false,
+            enableColumnBorderHorizontal: false,
+            gridBorderColor: Colors.white,
+            borderColor: Colors.white,
+            activatedBorderColor: Colors.white,
+            inactivatedBorderColor: Colors.white,
+          ),
           localeText: PlutoGridLocaleText.china(),
         ),
         mode: PlutoGridMode.normal);

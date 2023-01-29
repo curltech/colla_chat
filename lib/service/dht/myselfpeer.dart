@@ -139,7 +139,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     peerProfile.udpSwitch = false;
     peerProfile.downloadSwitch = false;
     peerProfile.localDataCryptoSwitch = false;
-    peerProfile.autoLogin = true;
+    peerProfile.autoLogin = false;
     peerProfile.developerOption = false;
     peerProfile.logLevel = 'none';
     peerProfile.lastSyncTime = currentDate;

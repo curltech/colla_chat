@@ -166,10 +166,12 @@ class _ChatListWidgetState extends State<ChatListWidget> {
           badge = badges.Badge(
             badgeContent: Text('$unreadNumber',
                 style: const TextStyle(color: Colors.white)),
-            elevation: 0.0,
-            shape: badges.BadgeShape.square,
-            borderRadius: BorderRadius.circular(8),
-            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5.0),
+            badgeStyle: badges.BadgeStyle(
+              elevation: 0.0,
+              shape: badges.BadgeShape.square,
+              borderRadius: BorderRadius.circular(8),
+              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5.0),
+            ),
             child: badge,
           );
         }
@@ -216,10 +218,12 @@ class _ChatListWidgetState extends State<ChatListWidget> {
           badge = badges.Badge(
             badgeContent: Text('$unreadNumber',
                 style: const TextStyle(color: Colors.white)),
-            elevation: 0.0,
-            shape: badges.BadgeShape.square,
-            borderRadius: BorderRadius.circular(8),
-            padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5.0),
+            badgeStyle: badges.BadgeStyle(
+              elevation: 0.0,
+              shape: badges.BadgeShape.square,
+              borderRadius: BorderRadius.circular(8),
+              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5.0),
+            ),
             child: badge,
           );
         }

@@ -131,7 +131,6 @@ class FluentWidgetFactory extends WidgetFactory {
       textAlignVertical: textAlignVertical,
       autofocus: autofocus,
       readOnly: readOnly,
-      toolbarOptions: toolbarOptions,
       showCursor: showCursor,
       obscuringCharacter: obscuringCharacter = '•',
       obscureText: obscureText,
@@ -235,7 +234,6 @@ class FluentWidgetFactory extends WidgetFactory {
       textAlignVertical: textAlignVertical,
       autofocus: autofocus,
       readOnly: readOnly,
-      toolbarOptions: toolbarOptions,
       showCursor: showCursor,
       obscuringCharacter: obscuringCharacter = '•',
       obscureText: obscureText,
@@ -491,7 +489,7 @@ class FluentWidgetFactory extends WidgetFactory {
     Iterable<LocalizationsDelegate<dynamic>>? localizationsDelegates,
     Locale? Function(List?, Iterable)? localeListResolutionCallback,
     Locale? Function(Locale?, Iterable)? localeResolutionCallback,
-    Iterable<Locale> supportedLocales = defaultSupportedLocales,
+    Iterable<Locale> supportedLocales = FluentLocalizations.supportedLocales,
     bool showPerformanceOverlay = false,
     bool checkerboardRasterCacheImages = false,
     bool checkerboardOffscreenLayers = false,
@@ -625,22 +623,6 @@ class FluentWidgetFactory extends WidgetFactory {
       title: title,
       leading: leading,
       automaticallyImplyLeading: automaticallyImplyLeading,
-    );
-  }
-
-  ///与其他的样式设计不同
-  Widget buildNavigationBody({
-    Key? key,
-    required int index,
-    required List<Widget> children,
-    Widget Function(Widget, Animation)? transitionBuilder,
-    Curve? animationCurve,
-    Duration? animationDuration,
-  }) {
-    return NavigationBody(
-      key: key,
-      index: index,
-      children: children,
     );
   }
 }

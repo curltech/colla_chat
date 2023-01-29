@@ -13,7 +13,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_luban/flutter_luban.dart';
 import 'package:image/image.dart' as platform_image;
-import 'package:image_cropping/image_cropping.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 
 ///image_gallery_saver,extended_image
@@ -219,7 +218,7 @@ class ImageUtil {
     return platform_image.encodeJpg(image, quality: quality);
   }
 
-  static platform_image.Image? decodeImage(List<int> data) {
+  static platform_image.Image? decodeImage(Uint8List data) {
     return platform_image.decodeImage(data);
   }
 
@@ -247,50 +246,5 @@ class ImageUtil {
     var name = await Luban.compressImage(compressObject);
 
     return name;
-  }
-
-  static Future<dynamic> cropImage({
-    required BuildContext context,
-    required Uint8List imageBytes,
-    required dynamic Function(dynamic) onImageDoneListener,
-    void Function()? onImageStartLoading,
-    void Function()? onImageEndLoading,
-    CropAspectRatio? selectedImageRatio,
-    bool visibleOtherAspectRatios = true,
-    double squareBorderWidth = 2,
-    List<CropAspectRatio>? customAspectRatios,
-    Color squareCircleColor = Colors.orange,
-    double squareCircleSize = 30,
-    Color defaultTextColor = Colors.black,
-    Color selectedTextColor = Colors.orange,
-    Color colorForWhiteSpace = Colors.white,
-    int encodingQuality = 100,
-    String? workerPath,
-    bool isConstrain = true,
-    bool makeDarkerOutside = true,
-    EdgeInsets? imageEdgeInsets = const EdgeInsets.all(10),
-    bool rootNavigator = false,
-    OutputImageFormat outputImageFormat = OutputImageFormat.jpg,
-    Key? key,
-  }) async {
-    final croppedBytes = await ImageCropping.cropImage(
-      context: context,
-      imageBytes: imageBytes,
-      onImageStartLoading: onImageStartLoading,
-      onImageEndLoading: onImageEndLoading,
-      onImageDoneListener: onImageDoneListener,
-      selectedImageRatio: CropAspectRatio.fromRation(ImageRatio.RATIO_1_1),
-      visibleOtherAspectRatios: true,
-      squareBorderWidth: 2,
-      squareCircleColor: Colors.black,
-      defaultTextColor: Colors.orange,
-      selectedTextColor: Colors.black,
-      colorForWhiteSpace: Colors.grey,
-      encodingQuality: 80,
-      outputImageFormat: OutputImageFormat.jpg,
-      workerPath: 'crop_worker.js',
-    );
-
-    return croppedBytes;
   }
 }

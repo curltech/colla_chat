@@ -43,7 +43,7 @@ class WaveformsAudioRecorderController extends AbstractAudioRecorderController {
           var name = DateUtil.currentDate();
           filename = '${dir.path}/$name.ma4';
         }
-        await recorderController.record(filename);
+        await recorderController.record(path: filename);
         await super.start();
       }
       status = RecorderStatus.recording;

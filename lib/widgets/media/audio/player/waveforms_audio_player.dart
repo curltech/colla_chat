@@ -24,7 +24,8 @@ class WaveformsAudioPlayerController extends AbstractAudioPlayerController {
     if (currentIndex >= 0) {
       PlatformMediaSource? currentMediaSource = this.currentMediaSource;
       if (currentMediaSource != null) {
-        playerController..preparePlayer(currentMediaSource.filename, _volume);
+        playerController.preparePlayer(
+            path: currentMediaSource.filename, volume: _volume);
         notifyListeners();
       }
     }
