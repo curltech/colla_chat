@@ -439,6 +439,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         bool success = await peerConnectionPool
             .send(peerId, Uint8List.fromList(data), cryptoOption: cryptoOption);
         if (!success) {
+          transportType = TransportType.websocket.name;
           chatMessage.transportType = TransportType.websocket.name;
         }
       }
