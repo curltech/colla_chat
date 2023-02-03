@@ -122,17 +122,23 @@ class _ChatListWidgetState extends State<ChatListWidget> {
   _updateWebsocket() {
     Websocket? websocket = websocketPool.getDefault();
     if (websocket != null) {
-      _socketStatus.value = websocket.status;
+      if (_socketStatus.value != websocket.status) {
+        _socketStatus.value = websocket.status;
+        if (_socketStatus.value == SocketStatus.connected) {
+          DialogUtil.info(context,
+              content: AppLocalizations.t('Websocket status was changed to:') +
+                  _socketStatus.value.name);
+        } else {
+          DialogUtil.error(context,
+              content: AppLocalizations.t('Websocket were break down'));
+        }
+      }
     } else {
-      _socketStatus.value = SocketStatus.closed;
-    }
-    if (_socketStatus.value == SocketStatus.connected) {
-      DialogUtil.info(context,
-          content: AppLocalizations.t('Websocket status was changed to:') +
-              _socketStatus.value.name);
-    } else {
-      DialogUtil.error(context,
-          content: AppLocalizations.t('Websocket were break down'));
+      if (_socketStatus.value != SocketStatus.closed) {
+        _socketStatus.value = SocketStatus.closed;
+        DialogUtil.error(context,
+            content: AppLocalizations.t('Websocket were break down'));
+      }
     }
   }
 
