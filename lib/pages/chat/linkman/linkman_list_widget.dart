@@ -14,6 +14,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/qrcode_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -147,12 +148,12 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
     List<TileData> tiles = [];
     if (linkmen.isNotEmpty) {
       for (var linkman in linkmen) {
-        var title = linkman.name;
-        var subtitle = linkman.peerId;
+        var name = linkman.name;
+        var peerId = linkman.peerId;
         TileData tile = TileData(
             prefix: linkman.avatarImage ?? AppImage.mdAppImage,
-            title: title,
-            subtitle: subtitle,
+            title: name,
+            subtitle: peerId,
             selected: false,
             routeName: 'linkman_edit');
         List<TileData> slideActions = [];
@@ -161,7 +162,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
             prefix: Icons.person_remove,
             onTap: (int index, String label, {String? subtitle}) async {
               linkmanController.currentIndex = index;
-              await linkmanService.delete(entity: linkman);
+              await linkmanService.removeByPeerId(subtitle!);
               await chatSummaryService.removeChatSummary(subtitle!);
               await chatMessageService.removeByLinkman(subtitle);
               linkmanController.delete();
@@ -243,7 +244,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
             prefix: Icons.group_remove,
             onTap: (int index, String label, {String? subtitle}) async {
               groupController.currentIndex = index;
-              await groupService.delete(entity: group);
+              await groupService.removeByGroupPeerId(group.peerId);
+              await groupMemberService.removeByGroupPeerId(group.peerId);
               await chatSummaryService.removeChatSummary(subtitle!);
               await chatMessageService.removeByGroup(subtitle);
               groupController.delete();
@@ -253,7 +255,11 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
             title: 'Dismiss',
             prefix: Icons.group_off,
             onTap: (int index, String label, {String? subtitle}) async {
-              groupService.dismissGroup(group);
+              if (group.ownerPeerId == myself.peerId) {
+                groupService.dismissGroup(group);
+              } else {
+                DialogUtil.error(context, content: 'Must be group owner');
+              }
             });
         slideActions.add(dismissSlideAction);
         tile.slideActions = slideActions;

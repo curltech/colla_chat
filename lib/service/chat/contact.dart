@@ -125,7 +125,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
       linkmen[linkman.peerId] = linkman;
       await chatSummaryService.upsertByLinkman(linkman);
     }
-    await refresh(linkman.peerId);
+    linkmen.remove(linkman.peerId);
   }
 
   ///通过peerclient增加或者修改
@@ -163,7 +163,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
       linkmen[peerId] = linkman;
       await chatSummaryService.upsertByLinkman(linkman);
     }
-    await refresh(peerId);
+    linkmen.remove(linkman.peerId);
 
     return linkman;
   }
@@ -232,7 +232,8 @@ class LinkmanService extends PeerPartyService<Linkman> {
     await peerClientService.store(peerClient);
   }
 
-  refresh(String peerId) {
+  removeByPeerId(String peerId) async {
+    await delete(where: 'peerId=?', whereArgs: [peerId]);
     linkmen.remove(peerId);
   }
 
@@ -240,7 +241,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
   @override
   Future<String> updateAvatar(String peerId, List<int> avatar) async {
     String data = await super.updateAvatar(peerId, avatar);
-    refresh(peerId);
+    await removeByPeerId(peerId);
 
     return data;
   }
@@ -601,6 +602,7 @@ class GroupService extends PeerPartyService<Group> {
   ///删除群
   removeByGroupPeerId(String peerId) async {
     await delete(where: 'groupPeerId=?', whereArgs: [peerId]);
+    groups.remove(peerId);
   }
 }
 

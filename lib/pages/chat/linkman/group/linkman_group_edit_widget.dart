@@ -61,7 +61,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
   ValueNotifier<List<Option<String>>> groupOwnerChoices = ValueNotifier([]);
 
   //当前群
-  late ValueNotifier<Group> group;
+  ValueNotifier<Group> group = ValueNotifier(Group('', ''));
 
   //群主peerId
   String? groupOwnerPeerId;
@@ -70,19 +70,19 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
   initState() {
     groupController.addListener(_update);
     super.initState();
-    _init();
+    _buildGroupData();
   }
 
   _update() {
-    _init();
+    setState(() {});
   }
 
-  _init() async {
+  _buildGroupData() async {
     var current = groupController.current;
     if (current != null) {
-      group = ValueNotifier(current);
+      group.value = current;
     } else {
-      group = ValueNotifier(Group('', ''));
+      group.value = Group('', '');
     }
     if (group.value.id != null) {
       groupOwnerPeerId = group.value.groupOwnerPeerId;
@@ -97,26 +97,6 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
       this.groupMembers.value = groupMembers;
       await _buildGroupOwnerChoices(groupMembers);
     }
-  }
-
-  //群成员显示和编辑界面
-  Widget _buildGroupMembersWidget(BuildContext context) {
-    var selector = ValueListenableBuilder(
-        valueListenable: groupMembers,
-        builder:
-            (BuildContext context, List<String> groupMembers, Widget? child) {
-          return LinkmanGroupSearchWidget(
-            selectType: SelectType.smartselect,
-            onSelected: (List<String> selected) async {
-              this.groupMembers.value = selected;
-              await _buildGroupOwnerChoices(selected);
-            },
-            selected: this.groupMembers.value,
-            includeGroup: false,
-          );
-        });
-
-    return selector;
   }
 
   //更新groupOwnerChoices
@@ -141,6 +121,26 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
       }
     }
     this.groupOwnerChoices.value = groupOwnerChoices;
+  }
+
+  //群成员显示和编辑界面
+  Widget _buildGroupMembersWidget(BuildContext context) {
+    var selector = ValueListenableBuilder(
+        valueListenable: groupMembers,
+        builder:
+            (BuildContext context, List<String> groupMembers, Widget? child) {
+          return LinkmanGroupSearchWidget(
+            selectType: SelectType.smartselect,
+            onSelected: (List<String> selected) async {
+              this.groupMembers.value = selected;
+              await _buildGroupOwnerChoices(selected);
+            },
+            selected: this.groupMembers.value,
+            includeGroup: false,
+          );
+        });
+
+    return selector;
   }
 
   //群主选择界面
@@ -186,7 +186,10 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
                   }
                   return FormInputWidget(
                     onOk: (Map<String, dynamic> values) {
-                      _onOk(values);
+                      _onOk(values).then(() {
+                        DialogUtil.info(context,
+                            content: 'Group opration is completed');
+                      });
                     },
                     columnFieldDefs: groupColumnFieldDefs,
                     initValues: initValues,
@@ -209,26 +212,24 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
           content: AppLocalizations.t('Must has group owner'));
       return;
     }
-    var group = this.group.value.id != null
-        ? this.group.value
-        : await groupService.createGroup(currentGroup.name);
-    group.alias = currentGroup.alias;
-    group.myAlias = currentGroup.myAlias;
-    group.mobile = currentGroup.mobile;
-    group.email = currentGroup.email;
-    group.groupOwnerPeerId = groupOwnerPeerId;
+    var current = groupController.current;
+    current = current ?? await groupService.createGroup(currentGroup.name);
+    current.alias = currentGroup.alias;
+    current.myAlias = currentGroup.myAlias;
+    current.mobile = currentGroup.mobile;
+    current.email = currentGroup.email;
+    current.groupOwnerPeerId = groupOwnerPeerId;
     //group.groupMembers=[];
-    if (group.id == null) {
-      await groupService.addGroup(group);
-      groupController.add(group);
+    if (current.id == null) {
+      await groupService.addGroup(current);
     } else {
-      await groupService.modifyGroup(group);
+      await groupService.modifyGroup(current);
     }
-    await groupService.store(group);
-    this.group.value = group;
-    String groupId = group.peerId;
+    await groupService.store(current);
+    group.value = current;
+    String groupId = current.peerId;
     List<GroupMember> members =
-        await groupMemberService.findByGroupId(group.peerId);
+        await groupMemberService.findByGroupId(current.peerId);
     Map<String, GroupMember> oldMembers = {};
     //所有的现有成员
     if (members.isNotEmpty) {
@@ -265,6 +266,9 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
         oldMembers[member.memberPeerId!] = member;
         await groupMemberService.delete(entity: {'id': member.id});
       }
+    }
+    if (groupController.current == null) {
+      groupController.add(current);
     }
   }
 
