@@ -93,7 +93,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     List<Object> whereArgs = [];
     if (peerId != null) {
       where =
-          '$where and ((senderPeerId=? and receiverPeerId=?) or (senderPeerId=? and receiverPeerId=?))';
+          '$where and groupPeerId is null and ((senderPeerId=? and receiverPeerId=?) or (senderPeerId=? and receiverPeerId=?))';
       whereArgs.add(peerId);
       whereArgs.add(myselfPeerId);
       whereArgs.add(myselfPeerId);
@@ -143,7 +143,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     List<Object> whereArgs = [];
     if (peerId != null) {
       where =
-          '$where and ((senderPeerId=? and receiverPeerId=?) or (senderPeerId=? and receiverPeerId=?))';
+          '$where and groupPeerId is null and ((senderPeerId=? and receiverPeerId=?) or (senderPeerId=? and receiverPeerId=?))';
       whereArgs.add(peerId);
       whereArgs.add(myselfPeerId);
       whereArgs.add(myselfPeerId);
