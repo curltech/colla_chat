@@ -10,6 +10,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:uuid/uuid.dart';
 
 enum PayloadType {
+  chatMessage,
   peerClient,
   peerEndpoint,
   chainApp,

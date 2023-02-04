@@ -5,11 +5,15 @@ import 'package:colla_chat/p2p/chain/baseaction.dart';
 class ChatAction extends BaseAction {
   ChatAction(MsgType msgType) : super(msgType);
 
-  Future<dynamic> chat(dynamic data, String targetPeerId) async {
+  Future<dynamic> chat(dynamic data, String targetPeerId,
+      {String? payloadType}) async {
     ChainMessage chainMessage =
         await prepareSend(data, targetPeerId: targetPeerId);
-    //chainMessage.NeedEncrypt = true
-    //chainMessage.NeedSlice = true
+    chainMessage.needEncrypt = true;
+    chainMessage.needSlice = true;
+    if (payloadType != null) {
+      chainMessage.payloadType = payloadType;
+    }
     ChainMessage? response = await send(chainMessage);
     if (response != null) {
       return response.payload;

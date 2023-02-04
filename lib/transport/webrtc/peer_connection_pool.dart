@@ -6,7 +6,9 @@ import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
+import 'package:colla_chat/p2p/chain/action/chat.dart';
 import 'package:colla_chat/p2p/chain/action/signal.dart';
+import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -135,6 +137,7 @@ class PeerConnectionPool {
 
   PeerConnectionPool() {
     signalAction.registerReceiver(onSignal);
+    chatAction.registerReceiver(onChat);
     var peerId = myself.peerId;
     if (peerId == null) {
       throw 'myself peerId is null';
@@ -526,6 +529,21 @@ class PeerConnectionPool {
     }
     if (advancedPeerConnection != null) {
       await advancedPeerConnection.onSignal(signal);
+    }
+  }
+
+  ///从websocket的ChainMessage方式，chatAction接收到的ChatMessage
+  onChat(ChainMessage chainMessage) async {
+    if (chainMessage.srcPeerId == null) {
+      logger.e('chainMessage.srcPeerId is null');
+      return;
+    }
+    if (chainMessage.payloadType == PayloadType.chatMessage.name) {
+      String peerId = chainMessage.srcPeerId!;
+      String clientId = chainMessage.srcClientId!;
+      WebrtcEvent event = WebrtcEvent(peerId,
+          clientId: clientId, name: '', data: chainMessage.payload);
+      await onMessage(event);
     }
   }
 

@@ -9,7 +9,7 @@ import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/p2p/chain/action/chat.dart';
-import 'package:colla_chat/p2p/chain/action/p2pchat.dart';
+import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -448,7 +448,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         nearbyConnectionPool.send(chatMessage.receiverPeerId!, data);
       }
       if (transportType == TransportType.websocket.name) {
-        chatAction.chat(Uint8List.fromList(data), peerId);
+        chatAction.chat(Uint8List.fromList(data), peerId,
+            payloadType: PayloadType.chatMessage.name);
       }
     } else {
       chatMessage.transportType = TransportType.none.name;
