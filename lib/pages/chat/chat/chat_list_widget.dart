@@ -130,7 +130,8 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                   _socketStatus.value.name);
         } else {
           DialogUtil.error(context,
-              content: AppLocalizations.t('Websocket were break down'));
+              content: AppLocalizations.t('Websocket status was changed to:') +
+                  _socketStatus.value.name);
         }
       }
     } else {
