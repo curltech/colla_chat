@@ -8,7 +8,7 @@ import 'package:mobpush_plugin/mobpush_local_notification.dart';
 import 'package:mobpush_plugin/mobpush_notify_message.dart';
 import 'package:mobpush_plugin/mobpush_plugin.dart';
 
-class MobilePusher {
+class MobilePush {
   String _sdkVersion = 'Unknown';
   String _registrationId = 'Unknown';
 

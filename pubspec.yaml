@@ -298,8 +298,9 @@ dependencies:
   #服务
   flutter_local_notifications: ^13.0.0 #本地通知，不支持windows和web
   #onesignal_flutter: ^3.5.0 #要求OneSignal Account
-  #firebase_messaging: ^14.2.1
+  intercom_flutter: ^7.6.3+1
   #pusher_channels_flutter: ^2.0.1
+  flutter_apns: ^1.6.0
   mobpush_plugin: ^1.2.4 #有容量限制，收费
   xiao_mi_push_plugin: ^2.0.0
   huawei_push: ^6.7.0+300
@@ -336,6 +337,8 @@ dependency_overrides:
   image_cropper: ^3.0.1
   full_picker: ^1.1.5
   collection: ^1.17.0
+  firebase_messaging: ^14.2.1
+  firebase_core: ^2.1.1
 dev_dependencies:
   flutter_test:
     sdk: flutter
