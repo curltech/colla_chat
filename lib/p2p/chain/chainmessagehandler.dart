@@ -10,7 +10,6 @@ import 'package:colla_chat/transport/httpclient.dart';
 import 'package:colla_chat/transport/websocket.dart';
 import 'package:dio/dio.dart';
 
-
 const packetSize = 4 * 1024 * 1024;
 const webRtcPacketSize = 128 * 1024;
 
@@ -102,6 +101,9 @@ class ChainMessageHandler {
           result = response.data;
           success = true;
         }
+      }
+      if (!success) {
+        throw 'send failure';
       }
     } catch (err) {
       logger.e('send message:$err');

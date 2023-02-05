@@ -86,6 +86,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       String? direct,
       String? messageType,
       String? subMessageType,
+      String? status,
       int? offset,
       int? limit}) async {
     var myselfPeerId = myself.peerId!;
@@ -122,6 +123,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       where = '$where and subMessageType=?';
       whereArgs.add(subMessageType);
     }
+    if (status != null) {
+      where = '$where and status=?';
+      whereArgs.add(status);
+    }
     return find(
         where: where,
         whereArgs: whereArgs,
@@ -136,6 +141,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       String? direct,
       String? messageType,
       String? subMessageType,
+      String? status,
       int? id,
       int? limit}) async {
     var myselfPeerId = myself.peerId!;
@@ -167,6 +173,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     if (subMessageType != null) {
       where = '$where and subMessageType=?';
       whereArgs.add(subMessageType);
+    }
+    if (status != null) {
+      where = '$where and status=?';
+      whereArgs.add(status);
     }
     if (id != null) {
       where = '$where and id>?';
@@ -345,7 +355,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     }
     chatMessage.contentType = contentType.name;
     chatMessage.mimeType = mimeType;
-    chatMessage.status = status ?? MessageStatus.sent.name;
+    chatMessage.status = status; // ?? MessageStatus.sent.name;
     chatMessage.transportType = transportType.name;
     chatMessage.deleteTime = deleteTime;
     chatMessage.parentMessageId = parentMessageId;
@@ -425,7 +435,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   ///发送消息并保存，如果是发送给自己的消息或者群消息，只保存不发送
-  Future<ChatMessage> sendAndStore(ChatMessage chatMessage,
+  Future<ChatMessage> send(ChatMessage chatMessage,
       {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     var peerId = chatMessage.receiverPeerId;
     var receiverType = chatMessage.receiverType;
@@ -439,18 +449,37 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         if (!success) {
           transportType = TransportType.websocket.name;
           chatMessage.transportType = TransportType.websocket.name;
+        } else {
+          chatMessage.status = MessageStatus.sent.name;
         }
       }
       if (transportType == TransportType.nearby.name) {
-        nearbyConnectionPool.send(chatMessage.receiverPeerId!, chatMessage);
+        bool success = await nearbyConnectionPool.send(
+            chatMessage.receiverPeerId!, chatMessage);
+        if (success) {
+          chatMessage.status = MessageStatus.sent.name;
+        }
       }
       if (transportType == TransportType.websocket.name) {
-        chatAction.chat(chatMessage, peerId,
-            payloadType: PayloadType.chatMessage.name);
+        try {
+          chatAction.chat(chatMessage, peerId,
+              payloadType: PayloadType.chatMessage.name);
+          chatMessage.status = MessageStatus.sent.name;
+        } catch (err) {
+          chatMessage.status = MessageStatus.unsent.name;
+        }
       }
     } else {
       chatMessage.transportType = TransportType.none.name;
+      chatMessage.status = MessageStatus.sent.name;
     }
+
+    return chatMessage;
+  }
+
+  Future<ChatMessage> sendAndStore(ChatMessage chatMessage,
+      {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
+    await send(chatMessage, cryptoOption: cryptoOption);
     await chatMessageService.store(chatMessage);
 
     return chatMessage;
@@ -562,6 +591,19 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     }
     if (updateSummary) {
       await chatSummaryService.upsertByChatMessage(chatMessage);
+    }
+  }
+
+  resend() async {
+    List<ChatMessage> chatMessages =
+        await findByPeerId(status: MessageStatus.unsent.name);
+    for (var chatMessage in chatMessages) {
+      send(chatMessage).then((ChatMessage value) {
+        if (value.status != MessageStatus.unsent.name) {
+          update({'status': value.status},
+              where: 'id=?', whereArgs: [value.id!]);
+        }
+      });
     }
   }
 
