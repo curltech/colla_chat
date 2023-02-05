@@ -448,7 +448,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         nearbyConnectionPool.send(chatMessage.receiverPeerId!, data);
       }
       if (transportType == TransportType.websocket.name) {
-        chatAction.chat(Uint8List.fromList(data), peerId,
+        chatAction.chat(chatMessage, peerId,
             payloadType: PayloadType.chatMessage.name);
       }
     } else {

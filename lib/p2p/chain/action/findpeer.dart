@@ -20,10 +20,10 @@ class FindPeerAction extends BaseAction {
 
   @override
   Future<void> transferPayload(ChainMessage chainMessage) async {
+    super.transferPayload(chainMessage);
     if (chainMessage.payloadType == PayloadType.peerEndpoints.name) {
       List<PeerEndpoint> peerEndpoints = [];
-      var payload = chainMessage.payload;
-      var jsons = JsonUtil.toJson(payload);
+      var jsons = chainMessage.payload;
       if (jsons is List) {
         for (var json in jsons) {
           var peerEndpoint = PeerEndpoint.fromJson(json);

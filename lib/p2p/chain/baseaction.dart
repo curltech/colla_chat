@@ -99,6 +99,7 @@ abstract class BaseAction {
   }
 
   ///发送前的预处理，设置消息的初始值
+  ///传入数据为对象，先转换成json字符串，然后utf-8格式的List<int>
   Future<ChainMessage> prepareSend(dynamic data,
       {String? connectAddress,
       String? connectPeerId,
@@ -219,5 +220,11 @@ abstract class BaseAction {
   }
 
   ///将消息负载转换成具体类型的消息负载
-  Future<void> transferPayload(ChainMessage chainMessage) async {}
+  ///将List<int>数据还原utf-8字符串，然后转换成对象
+  Future<void> transferPayload(ChainMessage chainMessage) async {
+    var payload = chainMessage.payload;
+    String data = CryptoUtil.utf8ToString(payload);
+    var json = JsonUtil.toJson(data);
+    chainMessage.payload = json;
+  }
 }

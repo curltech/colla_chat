@@ -6,6 +6,7 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/service/servicelocator.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
@@ -304,9 +305,8 @@ class AdvancedPeerConnection {
         WebrtcEvent(peerId, clientId: clientId, name: name, data: data));
   }
 
-  ///收到数据，带解密功能，取最后一位整数，表示解密选项，得到何种解密方式，然后解密
+  ///收到数据，先解密，然后转换成还原utf-8字符串，再将json字符串变成map对象
   onMessage(List<int> data) async {
-    logger.i('${DateTime.now().toUtc()}:got a message from peer');
     int cryptOption = data[data.length - 1];
     SecurityContextService? securityContextService =
         ServiceLocator.securityContextServices[cryptOption];
@@ -318,15 +318,19 @@ class AdvancedPeerConnection {
     securityContext.payload = data.sublist(0, data.length - 1);
     bool result = await securityContextService.decrypt(securityContext);
     if (result) {
-      await peerConnectionPool.onMessage(WebrtcEvent(peerId,
-          clientId: clientId, name: name, data: securityContext.payload));
+      String jsonStr = CryptoUtil.utf8ToString(securityContext.payload);
+      var json = JsonUtil.toJson(jsonStr);
+      await peerConnectionPool.onMessage(
+          WebrtcEvent(peerId, clientId: clientId, name: name, data: json));
     }
   }
 
-  ///发送数据，带加密选项
-  Future<bool> send(List<int> data,
+  ///发送数据，带加密选项，传入数据为对象，先转换成json字符串，然后utf-8，再加密，最后发送
+  Future<bool> send(dynamic obj,
       {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     if (connected) {
+      var jsonStr = JsonUtil.toJsonString(obj);
+      List<int> data = CryptoUtil.stringToUtf8(jsonStr);
       int cryptOptionIndex = cryptoOption.index;
       SecurityContextService? securityContextService =
           ServiceLocator.securityContextServices[cryptOptionIndex];

@@ -4,7 +4,6 @@ import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/dht/peerendpoint.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
-import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 
 ///把自己的peerclient信息注册到服务器，表示自己上线
@@ -34,10 +33,10 @@ class ConnectAction extends BaseAction {
 
   @override
   Future<void> transferPayload(ChainMessage chainMessage) async {
+    super.transferPayload(chainMessage);
     if (chainMessage.payloadType == PayloadType.peerClients.name) {
       List<PeerClient> peerClients = [];
-      var payload = chainMessage.payload;
-      var jsons = JsonUtil.toJson(payload);
+      var jsons = chainMessage.payload;
       if (jsons is List) {
         for (var json in jsons) {
           var peerClient = PeerClient.fromJson(json);
@@ -47,8 +46,7 @@ class ConnectAction extends BaseAction {
       chainMessage.payload = peerClients;
     } else if (chainMessage.payloadType == PayloadType.peerEndpoints.name) {
       List<PeerEndpoint> peerEndpoints = [];
-      var payload = chainMessage.payload;
-      var jsons = JsonUtil.toJson(payload);
+      var jsons = chainMessage.payload;
       if (jsons is List) {
         for (var json in jsons) {
           var peerEndpoint = PeerEndpoint.fromJson(json);

@@ -541,18 +541,15 @@ class PeerConnectionPool {
     if (chainMessage.payloadType == PayloadType.chatMessage.name) {
       String peerId = chainMessage.srcPeerId!;
       String clientId = chainMessage.srcClientId!;
-      List<int> payload = chainMessage.payload;
-      String data = CryptoUtil.utf8ToString(payload);
-      WebrtcEvent event =
-          WebrtcEvent(peerId, clientId: clientId, name: '', data: data);
+      WebrtcEvent event = WebrtcEvent(peerId,
+          clientId: clientId, name: '', data: chainMessage.payload);
       await onMessage(event);
     }
   }
 
   /// 向peer发送信息，如果是多个，遍历发送
-  /// @param peerId
-  /// @param data
-  Future<bool> send(String peerId, List<int> data,
+  /// 发送数据，带加密选项，传入数据为对象，先转换成json字符串，然后utf-8，再加密，最后发送
+  Future<bool> send(String peerId, dynamic data,
       {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     List<AdvancedPeerConnection> peerConnections = get(peerId);
     if (peerConnections.isNotEmpty) {
@@ -581,12 +578,10 @@ class PeerConnectionPool {
     return false;
   }
 
-  ///收到发来的ChainMessage消息，进行后续的action处理
-  ///webrtc的数据通道发来的消息可以是ChainMessage，也可以是简单的非ChainMessage
+  ///收到发来的ChatMessage的payload（map对象），进行后续的action处理
   onMessage(WebrtcEvent event) async {
     logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onMessage');
-    Map<String, dynamic> json = JsonUtil.toJson(event.data);
-    ChatMessage chatMessage = ChatMessage.fromJson(json);
+    ChatMessage chatMessage = ChatMessage.fromJson(event.data);
 
     ///保存消息
     await chatMessageService.receiveChatMessage(chatMessage);
