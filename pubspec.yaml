@@ -91,7 +91,6 @@ dependencies:
   #international_phone_input: ^1.0.4
   phone_numbers_parser: ^7.0.0+1
   font_awesome_flutter: ^10.1.0
-  onesignal_flutter: ^3.3.1
   flushbar: ^1.10.4
   #share: ^0.6.5
   flutter_emoji: ^2.2.1+1
@@ -185,8 +184,6 @@ dependencies:
   json_annotation: ^4.3.0
   permission_handler: ^10.0.0 #权限处理1
   provider: ^6.0.1 #状态管理
-  flutter_local_notifications: ^13.0.0
-  awesome_notifications: ^0.7.4+1
   pull_to_refresh_notification: ^2.3.0
   share_plus: ^6.3.0
   receive_sharing_intent: ^1.4.5
@@ -297,6 +294,18 @@ dependencies:
   location_picker_flutter_map: ^1.1.5
   #maps: ^0.5.0
   #google_map_location_picker: ^4.1.7
+
+  #服务
+  flutter_local_notifications: ^13.0.0 #本地通知，不支持windows和web
+  #onesignal_flutter: ^3.5.0 #要求OneSignal Account
+  #firebase_messaging: ^14.2.1
+  #pusher_channels_flutter: ^2.0.1
+  mobpush_plugin: ^1.2.4 #有容量限制，收费
+  xiao_mi_push_plugin: ^2.0.0
+  huawei_push: ^6.7.0+300
+  # 支持本地和fcm
+  awesome_notifications: ^0.7.4+1
+  awesome_notifications_fcm: ^0.7.4+1
 dependency_overrides:
   photo_view: ^0.14.0
   device_info_plus: ^8.0.0

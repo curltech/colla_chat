@@ -427,8 +427,10 @@ class GeolocatorUtil {
     Color? zoomButtonsBackgroundColor,
     Color? zoomButtonsColor,
     Color? locationButtonsColor,
-    Color markerIconColor = Colors.red,
-    IconData markerIcon = Icons.location_pin,
+    Widget? markerIcon = const Icon(
+      Icons.location_pin,
+      color: Colors.red,
+    ),
     Widget? loadingWidget,
   }) {
     LatLong? latLong;
@@ -466,7 +468,6 @@ class GeolocatorUtil {
       zoomButtonsBackgroundColor: zoomButtonsBackgroundColor,
       zoomButtonsColor: zoomButtonsColor,
       locationButtonsColor: locationButtonsColor,
-      markerIconColor: markerIconColor,
       markerIcon: markerIcon,
       loadingWidget: loadingWidget,
     );
