@@ -541,8 +541,10 @@ class PeerConnectionPool {
     if (chainMessage.payloadType == PayloadType.chatMessage.name) {
       String peerId = chainMessage.srcPeerId!;
       String clientId = chainMessage.srcClientId!;
-      WebrtcEvent event = WebrtcEvent(peerId,
-          clientId: clientId, name: '', data: chainMessage.payload);
+      List<int> payload = chainMessage.payload;
+      String data = CryptoUtil.utf8ToString(payload);
+      WebrtcEvent event =
+          WebrtcEvent(peerId, clientId: clientId, name: '', data: data);
       await onMessage(event);
     }
   }
