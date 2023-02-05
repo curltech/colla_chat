@@ -20,7 +20,6 @@ import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/nearby_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
@@ -433,19 +432,17 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     if (peerId != null &&
         peerId != myself.peerId &&
         receiverType != PartyType.group.name) {
-      String json = JsonUtil.toJsonString(chatMessage);
-      var data = CryptoUtil.stringToUtf8(json);
       var transportType = chatMessage.transportType;
       if (transportType == TransportType.webrtc.name) {
-        bool success = await peerConnectionPool
-            .send(peerId, Uint8List.fromList(data), cryptoOption: cryptoOption);
+        bool success = await peerConnectionPool.send(peerId, chatMessage,
+            cryptoOption: cryptoOption);
         if (!success) {
           transportType = TransportType.websocket.name;
           chatMessage.transportType = TransportType.websocket.name;
         }
       }
       if (transportType == TransportType.nearby.name) {
-        nearbyConnectionPool.send(chatMessage.receiverPeerId!, data);
+        nearbyConnectionPool.send(chatMessage.receiverPeerId!, chatMessage);
       }
       if (transportType == TransportType.websocket.name) {
         chatAction.chat(chatMessage, peerId,

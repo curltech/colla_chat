@@ -107,7 +107,9 @@ class NearbyConnectionPool with ChangeNotifier {
     }
   }
 
-  FutureOr<dynamic> send(String deviceId, List<int> data) {
+  FutureOr<dynamic> send(String deviceId, dynamic obj) {
+    var jsonStr = JsonUtil.toJsonString(obj);
+    List<int> data = CryptoUtil.stringToUtf8(jsonStr);
     String message = CryptoUtil.encodeBase64(data);
     if (_connectedNearbyConnections.containsKey(deviceId)) {
       return nearbyService.sendMessage(deviceId, message);
@@ -117,8 +119,8 @@ class NearbyConnectionPool with ChangeNotifier {
   }
 
   onMessage(dynamic message) async {
-    logger.i("dataReceivedSubscription: $message");
-    Map<String, dynamic> json = JsonUtil.toJson(message);
+    String data = CryptoUtil.utf8ToString(message);
+    var json = JsonUtil.toJson(data);
     ChatMessage chatMessage = ChatMessage.fromJson(json);
 
     ///保存消息
