@@ -427,6 +427,7 @@ class GroupService extends PeerPartyService<Group> {
     String json = CryptoUtil.utf8ToString(data);
     Map<String, dynamic> map = JsonUtil.toJson(json);
     Group group = Group.fromJson(map);
+    group.id = null;
     await groupService.store(group);
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
@@ -455,7 +456,7 @@ class GroupService extends PeerPartyService<Group> {
     String json = CryptoUtil.utf8ToString(data);
     Map<String, dynamic> map = JsonUtil.toJson(json);
     Group group = Group.fromJson(map);
-    groupService.store(group);
+    await groupService.store(group);
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
 
@@ -526,12 +527,11 @@ class GroupService extends PeerPartyService<Group> {
   receiveAddGroupMember(ChatMessage chatMessage) async {
     Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
     String json = CryptoUtil.utf8ToString(data);
-    List<Map<String, dynamic>> maps = JsonUtil.toJson(json);
-    List<GroupMember> groupMembers = [];
+    List<dynamic> maps = JsonUtil.toJson(json);
     for (var map in maps) {
       GroupMember groupMember = GroupMember.fromJson(map);
-      groupMembers.add(groupMember);
-      groupMemberService.store(groupMember);
+      groupMember.id = null;
+      await groupMemberService.store(groupMember);
     }
 
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
@@ -558,12 +558,10 @@ class GroupService extends PeerPartyService<Group> {
   receiveRemoveGroupMember(ChatMessage chatMessage) async {
     Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
     String json = CryptoUtil.utf8ToString(data);
-    List<Map<String, dynamic>> maps = JsonUtil.toJson(json);
-    List<GroupMember> groupMembers = [];
+    List<dynamic> maps = JsonUtil.toJson(json);
     for (var map in maps) {
       GroupMember groupMember = GroupMember.fromJson(map);
-      groupMembers.add(groupMember);
-      groupMemberService.delete(entity: {
+      await groupMemberService.delete(entity: {
         'memberPeerId': groupMember.memberPeerId,
         'groupId': groupMember.groupId
       });
@@ -669,7 +667,7 @@ class GroupMemberService extends GeneralBaseService<GroupMember> {
       groupMember.id = old.id;
       groupMember.createDate = old.createDate;
     }
-    upsert(groupMember);
+    await upsert(groupMember);
   }
 
   ///删除群的组员
