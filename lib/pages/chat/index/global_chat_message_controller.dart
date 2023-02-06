@@ -31,12 +31,6 @@ class GlobalChatMessageController with ChangeNotifier {
       String? clientId = chatMessage.senderClientId;
       String? title = chatMessage.title;
       String? content = chatMessage.content;
-      // String? contentType = chatMessage.contentType;
-      // if (content != null) {
-      //   if (contentType == null || contentType == ContentType.text.name) {
-      //     content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content));
-      //   }
-      // }
       ChatMessageSubType? subMessageType = StringUtil.enumFromString(
           ChatMessageSubType.values, chatMessage.subMessageType);
       logger
@@ -45,7 +39,7 @@ class GlobalChatMessageController with ChangeNotifier {
         case ChatMessageSubType.videoChat:
           break;
         case ChatMessageSubType.chatReceipt:
-          //处理视频通话的回执
+          //处理视频通话消息的回执
           ChatMessage? originMessage = await chatMessageService.findByMessageId(
               messageId,
               receiverPeerId: chatMessage.senderPeerId!);
@@ -67,11 +61,15 @@ class GlobalChatMessageController with ChangeNotifier {
             }
           }
           break;
+        case ChatMessageSubType.addFriend:
+          break;
         case ChatMessageSubType.modifyFriend:
+          //接收到改变好友的消息
           content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content!));
           linkmanService.receiveModifyFriend(chatMessage, content);
           break;
         case ChatMessageSubType.cancel:
+          //接收到删除消息的消息
           String? messageId = content;
           if (messageId != null) {
             chatMessageService
@@ -79,16 +77,37 @@ class GlobalChatMessageController with ChangeNotifier {
           }
           break;
         case ChatMessageSubType.preKeyBundle:
+          //接收到signal协议初始化消息
           content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content!));
           _receivePreKeyBundle(chatMessage, content);
           break;
         case ChatMessageSubType.signal:
+          //接收到webrtc的信号消息
           content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content!));
           _receiveSignal(chatMessage, content);
+          break;
+        case ChatMessageSubType.addGroup:
+          await groupService.receiveAddGroup(chatMessage);
+          break;
+        case ChatMessageSubType.modifyGroup:
+          await groupService.receiveModifyGroup(chatMessage);
+          break;
+        case ChatMessageSubType.dismissGroup:
+          await groupService.receiveDismissGroup(chatMessage);
+          break;
+        case ChatMessageSubType.addGroupMember:
+          await groupService.receiveAddGroupMember(chatMessage);
+          break;
+        case ChatMessageSubType.removeGroupMember:
+          await groupService.receiveRemoveGroupMember(chatMessage);
+          break;
+        case ChatMessageSubType.groupFile:
+          await groupService.receiveGroupFile(chatMessage);
           break;
         default:
           break;
       }
+      //对于接收到的非系统消息，对消息控制器进行刷新
       if (chatMessage.messageType != ChatMessageType.system.name) {
         String? groupPeerId = chatMessage.groupPeerId;
         if (groupPeerId == null) {

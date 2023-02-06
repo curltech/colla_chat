@@ -585,6 +585,7 @@ class PeerConnectionPool {
 
     ///保存消息
     await chatMessageService.receiveChatMessage(chatMessage);
+    ///对消息进行业务处理
     await globalChatMessageController.receiveChatMessage(chatMessage);
   }
 
