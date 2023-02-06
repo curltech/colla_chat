@@ -186,9 +186,9 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
                   }
                   return FormInputWidget(
                     onOk: (Map<String, dynamic> values) {
-                      _onOk(values).then(() {
+                      _onOk(values).then((groupId) {
                         DialogUtil.info(context,
-                            content: 'Group opration is completed');
+                            content: 'Group $groupId operation is completed');
                       });
                     },
                     columnFieldDefs: groupColumnFieldDefs,
@@ -200,17 +200,17 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
   }
 
   //修改提交
-  _onOk(Map<String, dynamic> values) async {
+  Future<String?> _onOk(Map<String, dynamic> values) async {
     Group currentGroup = Group.fromJson(values);
     if (StringUtil.isEmpty(currentGroup.name)) {
       DialogUtil.error(context,
           content: AppLocalizations.t('Must has group name'));
-      return;
+      return null;
     }
     if (StringUtil.isEmpty(groupOwnerPeerId)) {
       DialogUtil.error(context,
           content: AppLocalizations.t('Must has group owner'));
-      return;
+      return null;
     }
     var current = groupController.current;
     current = current ?? await groupService.createGroup(currentGroup.name);
@@ -219,11 +219,9 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
     current.mobile = currentGroup.mobile;
     current.email = currentGroup.email;
     current.groupOwnerPeerId = groupOwnerPeerId;
-    //group.groupMembers=[];
-    if (current.id == null) {
-      await groupService.addGroup(current);
-    } else {
-      await groupService.modifyGroup(current);
+    bool add = true;
+    if (current.id != null) {
+      add = false;
     }
     await groupService.store(current);
     group.value = current;
@@ -258,18 +256,30 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
         oldMembers.remove(groupMemberId);
       }
     }
+    //对所有的成员发送组变更的消息
+    if (add) {
+      await groupService.addGroup(current);
+    } else {
+      await groupService.modifyGroup(current);
+    }
+    //对所有的成员发送组员增加的消息
     await groupService.addGroupMember(groupId, newMembers);
+
     //处理删除的成员
     if (oldMembers.isNotEmpty) {
+      //对所有的成员发送组员删除的消息
       await groupService.removeGroupMember(groupId, oldMembers.values.toList());
       for (GroupMember member in oldMembers.values) {
         oldMembers[member.memberPeerId!] = member;
         await groupMemberService.delete(entity: {'id': member.id});
       }
     }
+
     if (groupController.current == null) {
       groupController.add(current);
     }
+
+    return groupId;
   }
 
   Widget _buildGroupEdit(BuildContext context) {
