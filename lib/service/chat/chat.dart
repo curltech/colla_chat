@@ -582,22 +582,25 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         messageId = chatMessage.messageId;
       }
     }
-    if (id == null) {
-      await insert(chatMessage);
-    } else {
-      await update(chatMessage);
-    }
-    if (messageId != null) {
-      if (id == null) {
-        await messageAttachmentService.store(
-            chatMessage.id!, messageId, title, content!, EntityState.insert);
-      } else {
-        await messageAttachmentService.store(
-            chatMessage.id!, messageId, title, content!, EntityState.update);
+
+    try {
+      await upsert(chatMessage);
+      if (messageId != null) {
+        if (id == null) {
+          await messageAttachmentService.store(
+              chatMessage.id!, messageId, title, content!, EntityState.insert);
+        } else {
+          await messageAttachmentService.store(
+              chatMessage.id!, messageId, title, content!, EntityState.update);
+        }
       }
-    }
-    if (updateSummary) {
-      await chatSummaryService.upsertByChatMessage(chatMessage);
+      if (updateSummary) {
+        await chatSummaryService.upsertByChatMessage(chatMessage);
+      }
+    } catch (err) {
+      logger.e('chatMessage ${chatMessage.messageId} store fail');
+      Future.delayed(const Duration(seconds: 5),
+          store(chatMessage, updateSummary: updateSummary));
     }
   }
 
