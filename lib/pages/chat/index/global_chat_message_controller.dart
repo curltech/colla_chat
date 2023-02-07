@@ -64,9 +64,7 @@ class GlobalChatMessageController with ChangeNotifier {
         case ChatMessageSubType.addFriend:
           break;
         case ChatMessageSubType.modifyFriend:
-          //接收到改变好友的消息
-          content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content!));
-          linkmanService.receiveModifyFriend(chatMessage, content);
+          linkmanService.receiveModifyFriend(chatMessage, content!);
           break;
         case ChatMessageSubType.cancel:
           //接收到删除消息的消息
@@ -78,8 +76,7 @@ class GlobalChatMessageController with ChangeNotifier {
           break;
         case ChatMessageSubType.preKeyBundle:
           //接收到signal协议初始化消息
-          content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content!));
-          _receivePreKeyBundle(chatMessage, content);
+          _receivePreKeyBundle(chatMessage, content!);
           break;
         case ChatMessageSubType.signal:
           //接收到webrtc的信号消息
@@ -154,6 +151,7 @@ class GlobalChatMessageController with ChangeNotifier {
 
   ///收到webrtc signal消息
   _receiveSignal(ChatMessage chatMessage, String content) async {
+    content=chatMessageService.recoverContent(content);
     String peerId = chatMessage.senderPeerId!;
     String clientId = chatMessage.senderClientId!;
     if (chatMessage.subMessageType == ChatMessageSubType.signal.name) {
@@ -178,7 +176,7 @@ class GlobalChatMessageController with ChangeNotifier {
         clientId: clientId,
         messageType: ChatMessageType.system,
         subMessageType: ChatMessageSubType.preKeyBundle,
-        data: CryptoUtil.stringToUtf8(json));
+        content: json);
     await chatMessageService.sendAndStore(chatMessage,
         cryptoOption: CryptoOption.cryptography);
     logger.i('peerId: $peerId clientId:$clientId sent PreKeyBundle');
