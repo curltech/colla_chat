@@ -192,7 +192,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       }
       await chatMessageController.send(
           title: name,
-          data: data,
+          content: data,
           contentType: contentType,
           mimeType: mimeType);
     }
@@ -280,7 +280,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       String? mimeType = FileUtil.mimeType(xfile.mimeType!);
       await chatMessageController.send(
           title: FileUtil.filename(xfile.path),
-          data: data,
+          content: data,
           contentType: ContentType.file,
           mimeType: mimeType);
     }

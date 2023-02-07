@@ -56,7 +56,7 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
     } else {
       chatMessage = await chatMessageService.buildChatMessage(
         myself.peerId!,
-        data: data,
+        content: data,
         title: title,
         thumbnail: CryptoUtil.stringToUtf8(thumbnail),
         messageType: ChatMessageType.channel,

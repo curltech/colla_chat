@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
@@ -238,10 +237,8 @@ class MessageWidget {
 
   ExtendedTextMessage buildExtendedTextMessageWidget(BuildContext context) {
     String? content = chatMessage.content;
-    List<int>? data;
     if (content != null) {
-      data = CryptoUtil.decodeBase64(content);
-      content = CryptoUtil.utf8ToString(data);
+      content = chatMessageService.recoverContent(content);
     }
     return ExtendedTextMessage(
       key: UniqueKey(),
@@ -253,15 +250,14 @@ class MessageWidget {
   ActionMessage buildActionMessageWidget(
       BuildContext context, ChatMessageSubType subMessageType) {
     String? content = chatMessage.content;
-    List<int>? data;
     if (content != null) {
-      data = CryptoUtil.decodeBase64(content);
-      content = CryptoUtil.utf8ToString(data);
+      content = chatMessageService.recoverContent(content);
     }
     return ActionMessage(
       key: UniqueKey(),
       isMyself: isMyself,
       subMessageType: subMessageType,
+      title: chatMessage.title,
       content: content,
     );
   }
@@ -304,10 +300,8 @@ class MessageWidget {
 
   NameCardMessage buildNameCardMessageWidget(BuildContext context) {
     String? content = chatMessage.content;
-    List<int>? data;
     if (content != null) {
-      data = CryptoUtil.decodeBase64(content);
-      content = CryptoUtil.utf8ToString(data);
+      content = chatMessageService.recoverContent(content);
     }
     return NameCardMessage(
       key: UniqueKey(),
@@ -320,8 +314,7 @@ class MessageWidget {
     String? content = chatMessage.content;
     List<int>? data;
     if (content != null) {
-      data = CryptoUtil.decodeBase64(content);
-      content = CryptoUtil.utf8ToString(data);
+      content = chatMessageService.recoverContent(content);
     }
     String? thumbnail = chatMessage.thumbnail;
     return LocationMessage(
@@ -339,9 +332,7 @@ class MessageWidget {
     if (content == null) {
       return;
     }
-    List<int>? data;
-    data = CryptoUtil.decodeBase64(content);
-    content = CryptoUtil.utf8ToString(data);
+    content = chatMessageService.recoverContent(content);
     Map<String, dynamic> map = JsonUtil.toJson(content);
     LocationPosition locationPosition = LocationPosition.fromJson(map);
     var latitude = locationPosition.latitude; //纬度
@@ -527,7 +518,7 @@ class MessageWidget {
                 contentType == ContentType.text.name) {
               var title = chatMessage.title;
               var content = chatMessage.content ?? '';
-              content = chatMessageService.decodeText(content);
+              content = chatMessageService.recoverContent(content);
               if (title != null) {
                 data = data + title;
               } else {

@@ -20,6 +20,7 @@ import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/nearby_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
@@ -186,17 +187,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         where: where, whereArgs: whereArgs, orderBy: 'id desc', limit: limit);
   }
 
-  String decodeText(String content) {
+  String recoverContent(String content) {
     if (StringUtil.isNotEmpty(content)) {
       content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content));
-    }
-
-    return content;
-  }
-
-  String encodeText(String content) {
-    if (StringUtil.isNotEmpty(content)) {
-      content = CryptoUtil.encodeBase64(CryptoUtil.stringToUtf8(content));
     }
 
     return content;
@@ -265,6 +258,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatReceipt.receiverClientId = chatMessage.senderClientId;
     chatReceipt.receiverType = chatMessage.senderType;
     chatReceipt.title = chatMessage.subMessageType;
+    chatReceipt.groupPeerId = chatMessage.groupPeerId;
+    chatReceipt.groupName = chatMessage.groupName;
     String? receiverPeerId = chatMessage.senderPeerId;
     if (receiverPeerId == null) {
       logger.e('receiverPeerId is null');
@@ -291,10 +286,11 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return chatReceipt;
   }
 
+  ///content和receiptContent可以是任意对象，最终会是base64的字符串
   //未填写的字段：transportType,senderAddress,receiverAddress,receiveTime,actualReceiveTime,readTime,destroyTime
   Future<ChatMessage> buildChatMessage(
     String receiverPeerId, {
-    List<int>? data,
+    dynamic content,
     String? clientId,
     String? messageId,
     TransportType transportType = TransportType.webrtc,
@@ -307,7 +303,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String? groupPeerId,
     String? groupName,
     String? title,
-    List<int>? receiptContent,
+    dynamic receiptContent,
     List<int>? thumbnail,
     String? status,
     int deleteTime = 0,
@@ -345,12 +341,31 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.groupName = groupName;
     chatMessage.title = title;
     if (receiptContent != null) {
-      chatMessage.receiptContent = CryptoUtil.encodeBase64(receiptContent);
+      List<int> data;
+      if (receiptContent is List<int>) {
+        data = receiptContent;
+      } else if (receiptContent is String) {
+        data = CryptoUtil.stringToUtf8(receiptContent);
+      } else {
+        var jsonStr = JsonUtil.toJsonString(receiptContent!);
+        data = CryptoUtil.stringToUtf8(jsonStr);
+      }
+      chatMessage.receiptContent = CryptoUtil.encodeBase64(data);
     }
     if (thumbnail != null) {
       chatMessage.thumbnail = CryptoUtil.encodeBase64(thumbnail);
     }
-    if (data != null) {
+
+    if (content != null) {
+      List<int> data;
+      if (content is List<int>) {
+        data = content;
+      } else if (content is String) {
+        data = CryptoUtil.stringToUtf8(content);
+      } else {
+        var jsonStr = JsonUtil.toJsonString(content!);
+        data = CryptoUtil.stringToUtf8(jsonStr);
+      }
       chatMessage.content = CryptoUtil.encodeBase64(data);
     }
     chatMessage.contentType = contentType.name;
@@ -368,13 +383,13 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   //未填写的字段：transportType,senderAddress,receiverAddress,receiveTime,actualReceiveTime,readTime,destroyTime
   Future<List<ChatMessage>> buildGroupChatMessage(
     String groupPeerId, {
-    List<int>? data,
+    dynamic content,
     ChatMessageType messageType = ChatMessageType.chat,
     ChatMessageSubType subMessageType = ChatMessageSubType.chat,
     ContentType contentType = ContentType.text,
     String? mimeType,
     String? title,
-    List<int>? receiptContent,
+    dynamic receiptContent,
     List<int>? thumbnail,
     int deleteTime = 0,
     String? parentMessageId,
@@ -385,7 +400,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     if (group != null) {
       var groupName = group.name;
       var groupChatMessage = await buildChatMessage(groupPeerId,
-          data: data,
+          content: content,
           messageType: messageType,
           subMessageType: subMessageType,
           contentType: contentType,
@@ -490,39 +505,31 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     String? title = chatMessage.title;
     String? messageId = chatMessage.messageId;
-    String? content = chatMessage.content;
-    List<int>? data;
-    if (content != null) {
-      data = CryptoUtil.stringToUtf8(content);
-    } else {
-      data = await messageAttachmentService.findContent(messageId!, title);
-    }
+    dynamic content = chatMessage.content;
+    content ??= await messageAttachmentService.findContent(messageId!, title);
     ChatMessageType? messageType = StringUtil.enumFromString(
         ChatMessageType.values, chatMessage.messageType);
     ChatMessageSubType? subMessageType = StringUtil.enumFromString(
         ChatMessageSubType.values, chatMessage.subMessageType);
     ContentType? contentType =
         StringUtil.enumFromString(ContentType.values, chatMessage.contentType);
-    List<int>? receiptContent;
-    if (chatMessage.receiptContent != null) {
-      receiptContent = CryptoUtil.stringToUtf8(chatMessage.receiptContent!);
-    }
+
     List<int>? thumbnail;
     if (chatMessage.thumbnail != null) {
-      thumbnail = CryptoUtil.stringToUtf8(chatMessage.thumbnail!);
+      thumbnail = CryptoUtil.decodeBase64(chatMessage.thumbnail!);
     }
     Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
     if (linkman != null) {
       ChatMessage? message = await buildChatMessage(
         peerId,
-        data: data,
+        content: content,
         messageType: messageType!,
         subMessageType: subMessageType!,
         contentType: contentType!,
         mimeType: chatMessage.mimeType,
         receiverName: linkman.name,
         title: title,
-        receiptContent: receiptContent,
+        receiptContent: chatMessage.receiptContent,
         thumbnail: thumbnail,
       );
       return await sendAndStore(message, cryptoOption: cryptoOption);
@@ -531,13 +538,13 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       if (group != null) {
         List<ChatMessage> messages = await buildGroupChatMessage(
           peerId,
-          data: data,
+          content: content,
           messageType: messageType!,
           subMessageType: subMessageType!,
           contentType: contentType!,
           mimeType: chatMessage.mimeType,
           title: title,
-          receiptContent: receiptContent,
+          receiptContent: chatMessage.receiptContent,
           thumbnail: thumbnail,
         );
         ChatMessage? msg;

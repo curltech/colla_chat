@@ -6,7 +6,6 @@ import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -121,7 +120,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
           groupOwnerChoices.add(item);
         } else {
           logger.e('Group member $groupMemberId is not linkman');
-          SmartDialogUtil.error(
+          DialogUtil.error(context,
               content: 'Group member $groupMemberId is not linkman');
         }
       }

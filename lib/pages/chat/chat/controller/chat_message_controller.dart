@@ -1,4 +1,3 @@
-import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
@@ -127,13 +126,9 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       ChatMessageType messageType = ChatMessageType.chat,
       ChatMessageSubType subMessageType = ChatMessageSubType.chat,
       List<String>? peerIds}) async {
-    List<int>? data;
-    if (message != null) {
-      data = CryptoUtil.stringToUtf8(message);
-    }
     return await send(
         title: title,
-        data: data,
+        content: message,
         contentType: contentType,
         mimeType: mimeType,
         messageType: messageType,
@@ -145,7 +140,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   ///先通过网络发送消息，然后保存在本地数据库
   Future<ChatMessage?> send(
       {String? title,
-      List<int>? data,
+      dynamic content,
       ContentType contentType = ContentType.text,
       String? mimeType,
       ChatMessageType messageType = ChatMessageType.chat,
@@ -165,7 +160,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         chatMessage = await chatMessageService.buildChatMessage(
           peerId,
           title: title,
-          data: data,
+          content: content,
           contentType: contentType,
           mimeType: mimeType,
           messageType: messageType,
@@ -184,7 +179,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       List<ChatMessage> chatMessages =
           await chatMessageService.buildGroupChatMessage(
         peerId,
-        data: data,
+        content: content,
         contentType: contentType,
         mimeType: mimeType,
         subMessageType: subMessageType,

@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:colla_chat/crypto/signalprotocol.dart';
-import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
@@ -15,7 +14,6 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
-import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
@@ -693,11 +691,9 @@ class PeerConnectionPool {
       AdvancedPeerConnection? advancedPeerConnection =
           getOne(peerId, clientId: clientId);
       if (advancedPeerConnection != null && advancedPeerConnection.connected) {
-        var jsonStr = JsonUtil.toJsonString(evt.data);
-        var data = CryptoUtil.stringToUtf8(jsonStr);
         ChatMessage chatMessage = await chatMessageService.buildChatMessage(
             peerId,
-            data: data,
+            content: evt.data,
             clientId: clientId,
             messageType: ChatMessageType.system,
             subMessageType: ChatMessageSubType.signal);
