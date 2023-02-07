@@ -173,10 +173,8 @@ class LinkmanService extends PeerPartyService<Linkman> {
       {TransportType transportType = TransportType.webrtc,
       CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     // 加好友会发送自己的信息，回执将收到对方的信息
-    String json = JsonUtil.toJsonString(myself.myselfPeer);
-    List<int> data = CryptoUtil.stringToUtf8(json);
     ChatMessage chatMessage = await chatMessageService.buildChatMessage(peerId,
-        data: data,
+        content: myself.myselfPeer,
         subMessageType: ChatMessageSubType.addFriend,
         transportType: transportType,
         title: title);
@@ -212,12 +210,10 @@ class LinkmanService extends PeerPartyService<Linkman> {
     // 加好友会发送自己的信息，回执将收到对方的信息
     Map<String, dynamic> map = JsonUtil.toJson(myself.myselfPeer);
     PeerClient peerClient = PeerClient.fromJson(map);
-    String json = JsonUtil.toJsonString(peerClient);
-    List<int> data = CryptoUtil.stringToUtf8(json);
     ChatMessage chatMessage = await chatMessageService.buildChatMessage(
       peerId,
       clientId: clientId,
-      data: data,
+      content: peerClient,
       messageType: ChatMessageType.system,
       subMessageType: ChatMessageSubType.modifyFriend,
     );
@@ -408,12 +404,10 @@ class GroupService extends PeerPartyService<Group> {
 
   ///向群成员发送加群的消息
   addGroup(Group group) async {
-    String json = JsonUtil.toJsonString(group);
-    List<int> data = CryptoUtil.stringToUtf8(json);
     List<ChatMessage> chatMessages =
         await chatMessageService.buildGroupChatMessage(
       group.peerId,
-      data: data,
+      content: group,
       subMessageType: ChatMessageSubType.addGroup,
     );
     for (var chatMessage in chatMessages) {
@@ -423,8 +417,7 @@ class GroupService extends PeerPartyService<Group> {
 
   ///接收加群的消息，完成加群，发送回执
   receiveAddGroup(ChatMessage chatMessage) async {
-    Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
-    String json = CryptoUtil.utf8ToString(data);
+    String json = chatMessageService.recoverContent(chatMessage.content!);
     Map<String, dynamic> map = JsonUtil.toJson(json);
     Group group = Group.fromJson(map);
     group.id = null;
@@ -437,12 +430,10 @@ class GroupService extends PeerPartyService<Group> {
 
   ///向群成员发送群属性变化的消息
   modifyGroup(Group group) async {
-    String json = JsonUtil.toJsonString(group);
-    List<int> data = CryptoUtil.stringToUtf8(json);
     List<ChatMessage> chatMessages =
         await chatMessageService.buildGroupChatMessage(
       group.peerId,
-      data: data,
+      content: group,
       subMessageType: ChatMessageSubType.modifyGroup,
     );
     for (var chatMessage in chatMessages) {
@@ -452,8 +443,7 @@ class GroupService extends PeerPartyService<Group> {
 
   ///接收变群的消息，完成变群，发送回执
   receiveModifyGroup(ChatMessage chatMessage) async {
-    Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
-    String json = CryptoUtil.utf8ToString(data);
+    String json = chatMessageService.recoverContent(chatMessage.content!);
     Map<String, dynamic> map = JsonUtil.toJson(json);
     Group group = Group.fromJson(map);
     await groupService.store(group);
@@ -467,7 +457,7 @@ class GroupService extends PeerPartyService<Group> {
   dismissGroup(Group group) async {
     await groupMemberService.removeByGroupPeerId(group.peerId);
     await groupService.delete(entity: {
-      'id': group.id,
+      'peerId': group.peerId,
     });
     await chatMessageService.delete(entity: {
       'senderPeerId': group.peerId,
@@ -479,6 +469,7 @@ class GroupService extends PeerPartyService<Group> {
         await chatMessageService.buildGroupChatMessage(
       group.peerId,
       title: group.peerId,
+      content: group.name,
       subMessageType: ChatMessageSubType.dismissGroup,
     );
     for (var chatMessage in chatMessages) {
@@ -487,21 +478,22 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   receiveDismissGroup(ChatMessage chatMessage) async {
-    Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
-    String json = CryptoUtil.utf8ToString(data);
-    Map<String, dynamic> map = JsonUtil.toJson(json);
-    Group group = Group.fromJson(map);
+    String peerId = chatMessage.title!;
+    Group? group = await groupService.findCachedOneByPeerId(peerId);
+    if (group == null) {
+      return;
+    }
     await groupMemberService.delete(entity: {
-      'id': group.id,
+      'peerId': peerId,
     });
     await groupService.delete(entity: {
-      'groupPeerId': group.peerId,
+      'groupPeerId': peerId,
     });
     await chatMessageService.delete(entity: {
-      'receiverPeerId': group.peerId,
+      'receiverPeerId': peerId,
     });
     await chatSummaryService.delete(entity: {
-      'peerId': group.peerId,
+      'peerId': peerId,
     });
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
@@ -511,12 +503,10 @@ class GroupService extends PeerPartyService<Group> {
 
   ///向群成员发送加群成员的消息
   addGroupMember(String groupId, List<GroupMember> groupMembers) async {
-    String json = JsonUtil.toJsonString(groupMembers);
-    List<int> data = CryptoUtil.stringToUtf8(json);
     List<ChatMessage> chatMessages =
         await chatMessageService.buildGroupChatMessage(
       groupId,
-      data: data,
+      content: groupMembers,
       subMessageType: ChatMessageSubType.addGroupMember,
     );
     for (var chatMessage in chatMessages) {
@@ -525,8 +515,7 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   receiveAddGroupMember(ChatMessage chatMessage) async {
-    Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
-    String json = CryptoUtil.utf8ToString(data);
+    String json = chatMessageService.recoverContent(chatMessage.content!);
     List<dynamic> maps = JsonUtil.toJson(json);
     for (var map in maps) {
       GroupMember groupMember = GroupMember.fromJson(map);
@@ -542,12 +531,10 @@ class GroupService extends PeerPartyService<Group> {
 
   ///向群成员发送删群成员的消息
   removeGroupMember(String groupId, List<GroupMember> groupMembers) async {
-    String json = JsonUtil.toJsonString(groupMembers);
-    List<int> data = CryptoUtil.stringToUtf8(json);
     List<ChatMessage> chatMessages =
         await chatMessageService.buildGroupChatMessage(
       groupId,
-      data: data,
+      content: groupMembers,
       subMessageType: ChatMessageSubType.removeGroupMember,
     );
     for (var chatMessage in chatMessages) {
@@ -556,8 +543,7 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   receiveRemoveGroupMember(ChatMessage chatMessage) async {
-    Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
-    String json = CryptoUtil.utf8ToString(data);
+    String json = chatMessageService.recoverContent(chatMessage.content!);
     List<dynamic> maps = JsonUtil.toJson(json);
     for (var map in maps) {
       GroupMember groupMember = GroupMember.fromJson(map);
@@ -578,7 +564,7 @@ class GroupService extends PeerPartyService<Group> {
     List<ChatMessage> chatMessages =
         await chatMessageService.buildGroupChatMessage(
       groupId,
-      data: data,
+      content: data,
       subMessageType: ChatMessageSubType.groupFile,
     );
     for (var chatMessage in chatMessages) {
@@ -588,8 +574,6 @@ class GroupService extends PeerPartyService<Group> {
 
   receiveGroupFile(ChatMessage chatMessage) async {
     Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
-    String json = CryptoUtil.utf8ToString(data);
-    List<Map<String, dynamic>> maps = JsonUtil.toJson(json);
 
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
