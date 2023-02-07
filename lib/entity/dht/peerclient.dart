@@ -6,7 +6,8 @@ import 'base.dart';
 ///这些数据的来源都是查询节点服务器
 class PeerClient extends PeerEntity {
   String clientId; //peerClient的唯一编码
-  String? deviceDesc; //设备的唯一描述
+  String? deviceToken; //设备的远程推送通知的token，唯一确定设备
+  String? deviceDesc; //设备的描述，比如是ios还是android
 
   // 客户连接到节点的位置
   String? connectPeerId;
@@ -17,6 +18,7 @@ class PeerClient extends PeerEntity {
 
   PeerClient.fromJson(Map json)
       : clientId = json['clientId'] ?? '',
+        deviceToken = json['deviceToken'],
         deviceDesc = json['deviceDesc'],
         connectPeerId = json['connectPeerId'],
         connectAddress = json['connectAddress'],
@@ -28,6 +30,7 @@ class PeerClient extends PeerEntity {
     var json = super.toJson();
     json.addAll({
       'clientId': clientId,
+      'deviceToken': deviceToken,
       'deviceDesc': deviceDesc,
       'connectPeerId': connectPeerId,
       'connectAddress': connectAddress,
