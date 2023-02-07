@@ -174,18 +174,22 @@ class ChainMessageHandler {
     //   logger.e('ConnectPeerId equals TargetPeerId && NeedEncrypt is true!');
     // }
     securityContext.payload = payload;
-    bool result =
-        await cryptographySecurityContextService.encrypt(securityContext);
-    if (result) {
-      chainMessage.transportPayload =
-          CryptoUtil.encodeBase64(securityContext.payload);
-      chainMessage.payload = null;
-      chainMessage.payloadSignature = securityContext.payloadSignature;
-      chainMessage.previousPublicKeyPayloadSignature =
-          securityContext.previousPublicKeyPayloadSignature;
-      chainMessage.needCompress = securityContext.needCompress;
-      chainMessage.needEncrypt = securityContext.needEncrypt;
-      chainMessage.payloadKey = securityContext.payloadKey;
+    try {
+      bool result =
+          await cryptographySecurityContextService.encrypt(securityContext);
+      if (result) {
+        chainMessage.transportPayload =
+            CryptoUtil.encodeBase64(securityContext.payload);
+        chainMessage.payload = null;
+        chainMessage.payloadSignature = securityContext.payloadSignature;
+        chainMessage.previousPublicKeyPayloadSignature =
+            securityContext.previousPublicKeyPayloadSignature;
+        chainMessage.needCompress = securityContext.needCompress;
+        chainMessage.needEncrypt = securityContext.needEncrypt;
+        chainMessage.payloadKey = securityContext.payloadKey;
+      }
+    } catch (err) {
+      logger.e('ChainMessage encrypt error:${err.toString()}');
     }
 
     return chainMessage;
@@ -210,16 +214,20 @@ class ChainMessageHandler {
     securityContext.srcPeerId = chainMessage.srcPeerId;
     securityContext.payload =
         CryptoUtil.decodeBase64(chainMessage.transportPayload!);
-    var result =
-        await cryptographySecurityContextService.decrypt(securityContext);
-    if (result) {
-      var payload = securityContext.payload;
-      if (payload != null) {
-        chainMessage.payload = payload;
-        chainMessage.transportPayload = '';
+    try {
+      var result =
+          await cryptographySecurityContextService.decrypt(securityContext);
+      if (result) {
+        var payload = securityContext.payload;
+        if (payload != null) {
+          chainMessage.payload = payload;
+          chainMessage.transportPayload = '';
+        }
       }
+    } catch (err) {
+      logger.e('ChainMessage decrypt error:${err.toString()}');
     }
-    return null;
+    return chainMessage;
   }
 
   ChainMessage error(String msgType, dynamic err) {
