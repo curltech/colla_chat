@@ -114,7 +114,7 @@ class ActionMessage extends StatelessWidget {
               padding: const EdgeInsets.all(5),
               child: Row(children: [
                 Icon(
-                  Icons.group_remove,
+                  Icons.group_off,
                   color: primary,
                 ),
                 const SizedBox(
@@ -133,7 +133,33 @@ class ActionMessage extends StatelessWidget {
                 ),
               ])));
     }
-    if (subMessageType == ChatMessageSubType.modifyGroup) {}
+    if (subMessageType == ChatMessageSubType.modifyGroup) {
+      Group group = Group.fromJson(JsonUtil.toJson(content!));
+      actionWidget = InkWell(
+          onTap: () {},
+          child: Padding(
+              padding: const EdgeInsets.all(5),
+              child: Row(children: [
+                Icon(
+                  Icons.update,
+                  color: primary,
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Expanded(
+                  child: Text(
+                    group.name,
+                    key: UniqueKey(),
+                    style: const TextStyle(
+                      //color: isMyself ? Colors.white : Colors.black,
+                      //fontSize: 16.0,
+                    ),
+                    //specialTextSpanBuilder: customSpecialTextSpanBuilder,
+                  ),
+                ),
+              ])));
+    }
     if (subMessageType == ChatMessageSubType.addGroupMember) {
       List<dynamic> maps = JsonUtil.toJson(content!);
       List<Widget> members = [];
@@ -172,7 +198,44 @@ class ActionMessage extends StatelessWidget {
                 ),
               ])));
     }
-    if (subMessageType == ChatMessageSubType.removeGroupMember) {}
+    if (subMessageType == ChatMessageSubType.removeGroupMember) {
+      List<dynamic> maps = JsonUtil.toJson(content!);
+      List<Widget> members = [];
+      if (maps.isNotEmpty) {
+        for (var map in maps) {
+          GroupMember groupMember = GroupMember.fromJson(map);
+          var member = Text(
+            groupMember.memberAlias!,
+            style: const TextStyle(
+              //color: isMyself ? Colors.white : Colors.black,
+              //fontSize: 16.0,
+            ),
+            //specialTextSpanBuilder: customSpecialTextSpanBuilder,
+          );
+          members.add(member);
+        }
+      }
+
+      actionWidget = InkWell(
+          onTap: () {},
+          child: Padding(
+              padding: const EdgeInsets.all(5),
+              child: Row(children: [
+                Icon(
+                  Icons.group_remove,
+                  color: primary,
+                ),
+                const SizedBox(
+                  width: 5,
+                ),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: members,
+                  ),
+                ),
+              ])));
+    }
 
     return Card(elevation: 0, child: actionWidget);
   }
