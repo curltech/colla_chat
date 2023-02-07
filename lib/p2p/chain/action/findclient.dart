@@ -3,7 +3,6 @@ import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
-import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 
 ///根据目标peerclient的peerid，电话和名称搜索，异步返回

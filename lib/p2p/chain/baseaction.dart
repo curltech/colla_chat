@@ -103,26 +103,40 @@ abstract class BaseAction {
   ///发送前的预处理，设置消息的初始值
   ///传入数据为对象，先转换成json字符串，然后utf-8格式的List<int>
   Future<ChainMessage> prepareSend(dynamic data,
-      {String? connectAddress,
+      {String? targetPeerId,
+      String? connectAddress,
       String? connectPeerId,
       String? topic,
-      String? targetPeerId,
       String? targetClientId}) async {
     ChainMessage chainMessage = ChainMessage();
-    if (connectAddress == null) {
-      if (peerEndpointController.data.isNotEmpty) {
-        connectAddress =
-            peerEndpointController.defaultPeerEndpoint!.wsConnectAddress;
-        connectAddress ??=
-            peerEndpointController.defaultPeerEndpoint!.httpConnectAddress;
-      }
-    }
-    chainMessage.connectAddress = connectAddress;
     if (connectPeerId == null) {
       if (peerEndpointController.data.isNotEmpty) {
         connectPeerId = peerEndpointController.defaultPeerEndpoint!.peerId;
       }
     }
+    targetPeerId ??= connectPeerId;
+    if (targetPeerId != null) {
+      PeerClient? peerClient =
+          await peerClientService.findCachedOneByPeerId(targetPeerId);
+      if (peerClient != null) {
+        chainMessage.targetConnectAddress = peerClient.connectAddress;
+        chainMessage.targetConnectPeerId = peerClient.connectPeerId;
+        chainMessage.targetConnectSessionId = peerClient.connectSessionId;
+        targetClientId ??= peerClient.clientId;
+        connectAddress ??= chainMessage.targetConnectAddress;
+      }
+    }
+    String? defaultConnectAddress;
+    if (peerEndpointController.data.isNotEmpty) {
+      defaultConnectAddress =
+          peerEndpointController.defaultPeerEndpoint!.wsConnectAddress;
+    }
+    chainMessage.targetPeerId = targetPeerId;
+    chainMessage.targetClientId = targetClientId;
+    connectAddress ??= defaultConnectAddress;
+    chainMessage.targetConnectAddress ??= connectAddress;
+    chainMessage.srcConnectAddress = defaultConnectAddress;
+    chainMessage.connectAddress = connectAddress;
     chainMessage.connectPeerId = connectPeerId;
 
     if (topic == null && appDataProvider.topics.isNotEmpty) {
@@ -139,20 +153,6 @@ abstract class BaseAction {
       chainMessage.needCompress = false;
     }
 
-    /// 当targetPeerId不为空的时候才可以进行加密，否则没有对方的公钥
-    /// 所以消息发送给客户端时必须有targetPeerId有客户端的peerId，必须加密
-    if (targetPeerId == null) {
-      chainMessage.needEncrypt = false;
-      targetPeerId = connectPeerId;
-    }
-    chainMessage.targetPeerId = targetPeerId;
-    PeerClient? peerClient =
-        await peerClientService.findCachedOneByPeerId(targetPeerId!);
-    if (peerClient != null) {
-      chainMessage.targetConnectAddress = peerClient.connectAddress;
-      targetClientId ??= peerClient.clientId;
-    }
-    chainMessage.targetClientId = targetClientId;
     chainMessage.payloadType = PayloadType.map.name;
     chainMessage.messageType = msgType.name;
     chainMessage.messageDirect = MsgDirect.Request.name;
