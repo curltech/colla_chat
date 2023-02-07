@@ -230,8 +230,7 @@ class SmartDialogUtil {
 
   /// 返回为true，代表按的确认
   /// 模态警告
-  static Future<bool?> alert(
-    BuildContext context, {
+  static Future<bool?> alert({
     Icon? icon,
     String title = 'Warning',
     String content = '',
@@ -272,14 +271,13 @@ class SmartDialogUtil {
   /// 模态提示
   static Future<bool?> prompt(BuildContext context,
       {Icon? icon, String title = 'Prompt', String content = ''}) {
-    return alert(context,
-        title: title, content: content, icon: const Icon(Icons.info));
+    return alert(title: title, content: content, icon: const Icon(Icons.info));
   }
 
   /// 模态提示错误
   static Future<bool?> fault(BuildContext context,
       {Icon? icon, String title = 'Fault', String content = ''}) {
-    return alert(context,
+    return alert(
         title: title,
         content: content,
         icon: const Icon(
@@ -289,7 +287,7 @@ class SmartDialogUtil {
   }
 
   /// 底部延时提示错误
-  static error(BuildContext context, {String content = 'Error'}) {
+  static error({String content = 'Error'}) {
     showToast(
       content,
       maskColor: Colors.red,
@@ -297,7 +295,7 @@ class SmartDialogUtil {
   }
 
   /// 底部延时警告
-  static warn(BuildContext context, {String content = 'Warning'}) {
+  static warn({String content = 'Warning'}) {
     showToast(
       content,
       maskColor: Colors.amber,
@@ -305,7 +303,7 @@ class SmartDialogUtil {
   }
 
   /// 底部延时提示
-  static info(BuildContext context, {String content = 'Information'}) {
+  static info({String content = 'Information'}) {
     showToast(
       content,
       maskColor: Colors.green,

@@ -583,8 +583,9 @@ class PeerConnectionPool {
     logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onMessage');
     ChatMessage chatMessage = ChatMessage.fromJson(event.data);
 
-    ///保存消息
+    ///保存消息，普通消息直接保存，回执修改原消息状态后保存
     await chatMessageService.receiveChatMessage(chatMessage);
+
     ///对消息进行业务处理
     await globalChatMessageController.receiveChatMessage(chatMessage);
   }

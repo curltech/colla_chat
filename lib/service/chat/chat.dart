@@ -946,7 +946,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummaries[chatSummary.peerId!] = chatSummary;
     } else {
       chatSummary.name = linkman.name;
-      await update(chatSummary);
+      await upsert(chatSummary);
     }
   }
 
@@ -962,7 +962,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummaries[chatSummary.peerId!] = chatSummary;
     } else {
       chatSummary.name = group.name;
-      await update(chatSummary);
+      await upsert(chatSummary);
     }
   }
 
@@ -1028,12 +1028,8 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummary.content = chatMessage.content;
       chatSummary.contentType = chatMessage.contentType;
       chatSummary.unreadNumber = chatSummary.unreadNumber + 1;
-      if (chatSummary.id == null) {
-        insert(chatSummary);
-        chatSummaries[chatSummary.peerId!] = chatSummary;
-      } else {
-        update(chatSummary);
-      }
+      await upsert(chatSummary);
+      chatSummaries[chatSummary.peerId!] = chatSummary;
     }
   }
 
