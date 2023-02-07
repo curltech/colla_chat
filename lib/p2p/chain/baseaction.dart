@@ -1,11 +1,13 @@
 import 'dart:core';
 
 import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/p2p/chain/chainmessagehandler.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:uuid/uuid.dart';
 
@@ -144,7 +146,13 @@ abstract class BaseAction {
       targetPeerId = connectPeerId;
     }
     chainMessage.targetPeerId = targetPeerId;
-    chainMessage.clientId = targetClientId;
+    PeerClient? peerClient =
+        await peerClientService.findCachedOneByPeerId(targetPeerId!);
+    if (peerClient != null) {
+      chainMessage.targetConnectAddress = peerClient.connectAddress;
+      targetClientId ??= peerClient.clientId;
+    }
+    chainMessage.targetClientId = targetClientId;
     chainMessage.payloadType = PayloadType.map.name;
     chainMessage.messageType = msgType.name;
     chainMessage.messageDirect = MsgDirect.Request.name;

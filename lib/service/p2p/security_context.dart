@@ -399,7 +399,7 @@ class SignalSecurityContextService extends SecurityContextService {
 
     // 1.设置签名（本地保存前加密不签名），只有在加密的情况下才设置签名
     var targetPeerId = securityContext.targetPeerId;
-    var clientId = securityContext.clientId;
+    var targetClientId = securityContext.targetClientId;
     var peerId = myself.peerId;
     if (needSign) {
       if (peerId != null) {
@@ -436,13 +436,13 @@ class SignalSecurityContextService extends SecurityContextService {
     //3. 数据加密
     if (needEncrypt) {
       SignalSession? signalSession =
-          signalSessionPool.get(peerId: targetPeerId!, clientId: clientId!);
+          signalSessionPool.get(peerId: targetPeerId!, clientId: targetClientId!);
       if (signalSession != null) {
         data = await signalSession.encrypt(Uint8List.fromList(data));
         logger.i('call signal encrypt');
       } else {
         logger.e(
-            'encrypt signalSession:$targetPeerId,clientId:$clientId is not exist');
+            'encrypt signalSession:$targetPeerId,targetClientId:$targetClientId is not exist');
         return false;
       }
     }
@@ -481,21 +481,21 @@ class SignalSecurityContextService extends SecurityContextService {
     // 1. 解密
     if (needEncrypt) {
       var srcPeerId = securityContext.srcPeerId;
-      var clientId = securityContext.clientId;
+      var targetClientId = securityContext.targetClientId;
       SignalSession? signalSession =
-          signalSessionPool.get(peerId: srcPeerId!, clientId: clientId!);
+          signalSessionPool.get(peerId: srcPeerId!, clientId: targetClientId!);
       if (signalSession != null) {
         try {
           data = await signalSession.decrypt(data);
           logger.i('call signal decrypt');
         } catch (err) {
           logger.e(
-              'signalSession.decrypt signalSession:$srcPeerId,clientId:$clientId error:$err');
+              'signalSession.decrypt signalSession:$srcPeerId,targetClientId:$targetClientId error:$err');
           return false;
         }
       } else {
         logger.e(
-            'decrypt signalSession:$srcPeerId,clientId:$clientId is not exist');
+            'decrypt signalSession:$srcPeerId,targetClientId:$targetClientId is not exist');
         return false;
       }
     }

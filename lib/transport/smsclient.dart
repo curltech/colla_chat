@@ -152,7 +152,7 @@ class SmsClientPool {
         securityContextService ?? noneSecurityContextService;
     SecurityContext securityContext = SecurityContext();
     securityContext.srcPeerId = peerId;
-    securityContext.clientId = clientId;
+    securityContext.targetClientId = clientId;
     securityContext.payload = data.sublist(0, data.length - 1);
     bool result = await securityContextService.decrypt(securityContext);
     if (result) {
@@ -165,7 +165,7 @@ class SmsClientPool {
     }
   }
 
-  Future<void> send(List<int> data, String targetPeerId, String clientId,
+  Future<void> send(List<int> data, String targetPeerId, String targetClientId,
       {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     PeerClient? peerClient =
         await peerClientService.findCachedOneByPeerId(targetPeerId);
@@ -178,7 +178,7 @@ class SmsClientPool {
           securityContextService ?? cryptographySecurityContextService;
       SecurityContext securityContext = SecurityContext();
       securityContext.targetPeerId = targetPeerId;
-      securityContext.clientId = clientId;
+      securityContext.targetClientId = targetClientId;
       //List<int> data = CryptoUtil.stringToUtf8(message);
       securityContext.payload = data;
       bool result = await securityContextService.encrypt(securityContext);

@@ -24,6 +24,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/nearby_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
+import 'package:colla_chat/transport/websocket.dart';
 import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 
@@ -322,6 +323,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.senderClientId = myself.clientId;
     chatMessage.senderType = PartyType.linkman.name;
     chatMessage.senderName = myself.myselfPeer!.name;
+    Websocket? websocket = websocketPool.getDefault();
+    if (websocket != null) {
+      chatMessage.senderAddress = websocket.address;
+    }
     var current = DateUtil.currentDate();
     chatMessage.sendTime = current;
     chatMessage.readTime = current;
@@ -332,6 +337,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       if (peerClient != null) {
         clientId = peerClient.clientId;
         receiverName = peerClient.name;
+        chatMessage.receiverAddress = peerClient.connectAddress;
       }
     }
     chatMessage.receiverType = receiverType.name;
@@ -599,8 +605,6 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       }
     } catch (err) {
       logger.e('chatMessage ${chatMessage.messageId} store fail');
-      Future.delayed(const Duration(seconds: 5),
-          store(chatMessage, updateSummary: updateSummary));
     }
   }
 

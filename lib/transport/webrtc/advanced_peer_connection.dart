@@ -314,7 +314,7 @@ class AdvancedPeerConnection {
         securityContextService ?? noneSecurityContextService;
     SecurityContext securityContext = SecurityContext();
     securityContext.srcPeerId = peerId;
-    securityContext.clientId = clientId;
+    securityContext.targetClientId = clientId;
     securityContext.payload = data.sublist(0, data.length - 1);
     bool result = await securityContextService.decrypt(securityContext);
     if (result) {
@@ -338,7 +338,7 @@ class AdvancedPeerConnection {
           securityContextService ?? cryptographySecurityContextService;
       SecurityContext securityContext = SecurityContext();
       securityContext.targetPeerId = peerId;
-      securityContext.clientId = clientId;
+      securityContext.targetClientId = clientId;
       securityContext.payload = data;
       bool result = await securityContextService.encrypt(securityContext);
       if (result) {

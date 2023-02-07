@@ -9,17 +9,17 @@ class ChainMessage extends SecurityContext {
   /// 如果目标是客户机节点，先找到客户机目前连接的服务器节点，也许就是自己，然后转发
   String? targetConnectPeerId;
   String? targetConnectSessionId;
-  String? clientId;
-  String? targetAddress;
+  String? targetConnectAddress;
 
   /// src字段在发送的时候不填，到接收端自动填充,ConnectSessionId在发送的时候不填，到接收端自动填充
   /// ,第一个连接节点
   String? srcClientId;
   String? srcConnectSessionId;
   String? srcConnectPeerId;
-  String? srcAddress;
+  String? srcConnectAddress;
 
-  ///本次连接的信息
+  ///本次连接的信息,一般与target的值一致
+  ///因为chain message趋向与发送给目标的连接peerendpoint
   String? connectPeerId;
   String? connectAddress;
   String? connectSessionId;
@@ -50,11 +50,10 @@ class ChainMessage extends SecurityContext {
         topic = json['topic'],
         targetConnectPeerId = json['targetConnectPeerId'],
         targetConnectSessionId = json['targetConnectSessionId'],
-        clientId = json['targetClientId'],
-        targetAddress = json['targetAddress'],
+        targetConnectAddress = json['targetAddress'],
         srcConnectSessionId = json['srcConnectSessionId'],
         srcConnectPeerId = json['srcConnectPeerId'],
-        srcAddress = json['srcAddress'],
+        srcConnectAddress = json['srcAddress'],
         srcClientId = json['srcClientId'],
         connectPeerId = json['connectPeerId'],
         connectAddress = json['connectAddress'],
@@ -80,12 +79,11 @@ class ChainMessage extends SecurityContext {
       'topic': topic,
       'targetConnectPeerId': targetConnectPeerId,
       'targetConnectSessionId': targetConnectSessionId,
-      'targetClientId': clientId,
-      'targetAddress': targetAddress,
+      'targetAddress': targetConnectAddress,
       'srcConnectPeerId': srcConnectPeerId,
       'srcConnectSessionId': srcConnectSessionId,
       'srcClientId': srcClientId,
-      'srcAddress': srcAddress,
+      'srcAddress': srcConnectAddress,
       'connectPeerId': connectPeerId,
       'connectAddress': connectAddress,
       'connectSessionId': connectSessionId,

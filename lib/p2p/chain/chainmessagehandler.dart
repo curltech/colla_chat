@@ -31,7 +31,7 @@ class ChainMessageHandler {
     ChainMessage chainMessage = ChainMessage.fromJson(json);
     // 源节点的id和地址
     chainMessage.srcPeerId ??= remotePeerId;
-    chainMessage.srcAddress ??= remoteAddr;
+    chainMessage.srcConnectAddress ??= remoteAddr;
     response = await chainMessageHandler.receive(chainMessage);
 
     ///把响应报文转成原始数据
@@ -69,25 +69,35 @@ class ChainMessageHandler {
   // 2.根据情况处理校验，加密，压缩等
   // 3.建立合适的通道并发送，比如libp2p的Pipe并Write消息流
   // 4.等待即时的返回，校验，解密，解压缩等
-  Future<ChainMessage?> send(ChainMessage msg) async {
+  Future<ChainMessage?> send(ChainMessage chainMessage) async {
     // * 消息的发送方式由二个字段决定
     // * connectPeerId表示采用篇libp2p发送到p2p节点
     // * connectAddress表示采用https，wss发送
     // 消息的发送目标：topic表示发送到主题，targetPeerId表示目标的peerId，可以时服务器节点，也可以是客户端
     /// 目前flutter没有libp2p的客户端，所以connectPeerId总是为空，不支持走libp2p协议
-    var connectPeerId = msg.connectPeerId;
-    var connectAddress = msg.connectAddress;
-    await chainMessageHandler.encrypt(msg);
+    var connectPeerId = chainMessage.connectPeerId;
+    //本PeerClient的连接定位器地址
+    var connectAddress = chainMessage.connectAddress;
+    //目标PeerClient的连接定位器地址
+    var targetAddress = chainMessage.targetConnectAddress;
+    await chainMessageHandler.encrypt(chainMessage);
     //// 发送数据后返回的响应数据
     var success = false;
     dynamic result;
     try {
+      if (!success && targetAddress != null && targetAddress.startsWith('ws')) {
+        var websocket = await websocketPool.get(targetAddress);
+        if (websocket != null) {
+          var data = MessageSerializer.marshal(chainMessage);
+          success = await websocket.sendMsg(data);
+        }
+      }
       if (!success &&
           connectAddress != null &&
           connectAddress.startsWith('ws')) {
         var websocket = await websocketPool.get(connectAddress);
         if (websocket != null) {
-          var data = MessageSerializer.marshal(msg);
+          var data = MessageSerializer.marshal(chainMessage);
           success = await websocket.sendMsg(data);
         }
       }
@@ -96,7 +106,7 @@ class ChainMessageHandler {
           connectAddress.startsWith('http')) {
         var httpClient = HttpClientPool.instance.get(connectAddress);
         if (httpClient != null) {
-          var data = JsonUtil.toJsonString(msg);
+          var data = JsonUtil.toJsonString(chainMessage);
           Response response = await httpClient.send('/receive', data);
           result = response.data;
           success = true;
