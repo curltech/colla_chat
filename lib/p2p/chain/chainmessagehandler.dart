@@ -23,7 +23,7 @@ class ChainMessageHandler {
   }
 
   /// 将接收的原始数据还原成ChainMessage，然后根据消息类型进行分支处理
-  ///    并将处理的结果转换成原始数据，发回去
+  /// 并将处理的结果转换成原始数据，发回去
   Future<List<int>?> receiveRaw(
       List<int> data, String remotePeerId, String remoteAddr) async {
     ChainMessage? response;
@@ -138,7 +138,7 @@ class ChainMessageHandler {
     return null;
   }
 
-  ///   接收报文处理的入口，包括接收请求报文和返回报文，并分配不同的处理方法
+  /// 接收报文处理的入口，包括接收请求报文和返回报文，并分配不同的处理方法
   Future<ChainMessage?> receive(ChainMessage chainMessage) async {
     await chainMessageHandler.decrypt(chainMessage);
     var typ = chainMessage.messageType;
@@ -230,6 +230,8 @@ class ChainMessageHandler {
       var result =
           await cryptographySecurityContextService.decrypt(securityContext);
       if (result) {
+        chainMessage.needCompress = securityContext.needCompress;
+        chainMessage.needEncrypt = securityContext.needEncrypt;
         var payload = securityContext.payload;
         if (payload != null) {
           chainMessage.payload = payload;

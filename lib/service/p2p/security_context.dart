@@ -1,17 +1,18 @@
 import 'dart:typed_data';
 
+import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/crypto/signalprotocol.dart';
+import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:cryptography/cryptography.dart';
 
-import '../../crypto/cryptography.dart';
-import '../../crypto/util.dart';
-import '../../entity/p2p/security_context.dart';
-import '../../provider/myself.dart';
-import '../../service/dht/peerclient.dart';
+const int compressLimit = 2048;
 
 abstract class SecurityContextService {
   Future<bool> encrypt(SecurityContext securityContext);
@@ -169,11 +170,17 @@ class CryptographySecurityContextService extends SecurityContextService {
     }
     //2. 压缩数据
     if (needCompress) {
-      try {
-        data = CryptoUtil.compress(data);
-      } catch (err) {
-        logger.e("compress failure:$err");
-        return false;
+      if (data.length < compressLimit) {
+        securityContext.needCompress = false;
+        needCompress = false;
+      } else {
+        try {
+          data = CryptoUtil.compress(data);
+        } catch (err) {
+          logger.e("compress failure:$err");
+          securityContext.needCompress = false;
+          needCompress = false;
+        }
       }
     }
     //3. 数据加密
@@ -302,7 +309,8 @@ class CryptographySecurityContextService extends SecurityContextService {
         data = CryptoUtil.uncompress(data);
       } catch (err) {
         logger.e("uncompress failure:$err");
-        return false;
+        securityContext.needCompress = false;
+        needCompress = false;
       }
     }
     //3. 消息的数据部分，验证签名
@@ -426,11 +434,17 @@ class SignalSecurityContextService extends SecurityContextService {
 
     //2. 压缩数据
     if (needCompress) {
-      try {
-        data = CryptoUtil.compress(data);
-      } catch (err) {
-        logger.e("compress failure:$err");
-        return false;
+      if (data.length < compressLimit) {
+        securityContext.needCompress = false;
+        needCompress = false;
+      } else {
+        try {
+          data = CryptoUtil.compress(data);
+        } catch (err) {
+          logger.e("compress failure:$err");
+          securityContext.needCompress = false;
+          needCompress = false;
+        }
       }
     }
     //3. 数据加密
@@ -506,7 +520,8 @@ class SignalSecurityContextService extends SecurityContextService {
         data = CryptoUtil.uncompress(data);
       } catch (err) {
         logger.e("uncompress failure:$err");
-        return false;
+        securityContext.needCompress = false;
+        needCompress = false;
       }
     }
     //3. 验证签名

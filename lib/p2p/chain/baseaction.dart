@@ -71,7 +71,6 @@ class NamespacePrefix {
   }
 }
 
-const int compressLimit = 2048;
 
 /// 发送和接受链消息的抽象类
 abstract class BaseAction {
@@ -172,10 +171,6 @@ abstract class BaseAction {
     /// 把负载变成utf8的二进制的数组，方便计数和进一步的处理
     List<int> payload = CryptoUtil.stringToUtf8(jsonStr);
     chainMessage.payload = payload;
-    if (payload.length < compressLimit) {
-      chainMessage.needCompress = false;
-    }
-
     chainMessage.payloadType = PayloadType.map.name;
     chainMessage.messageType = msgType.name;
     chainMessage.messageDirect = MsgDirect.Request.name;
