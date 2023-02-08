@@ -8,7 +8,8 @@ class ChainMessage extends SecurityContext {
   /// 如果目标是服务器节点，直接转发，
   /// 如果目标是客户机节点，先找到客户机目前连接的服务器节点，也许就是自己，然后转发
   String? targetConnectPeerId;
-  String? targetConnectSessionId;
+
+  // String? targetConnectSessionId;
   String? targetConnectAddress;
 
   /// src字段在发送的时候不填，到接收端自动填充,ConnectSessionId在发送的时候不填，到接收端自动填充
@@ -49,7 +50,7 @@ class ChainMessage extends SecurityContext {
       : uuid = json['uuid'] ?? '',
         topic = json['topic'],
         targetConnectPeerId = json['targetConnectPeerId'],
-        targetConnectSessionId = json['targetConnectSessionId'],
+        // targetConnectSessionId = json['targetConnectSessionId'],
         targetConnectAddress = json['targetConnectAddress'],
         srcConnectSessionId = json['srcConnectSessionId'],
         srcConnectPeerId = json['srcConnectPeerId'],
@@ -78,7 +79,7 @@ class ChainMessage extends SecurityContext {
       'uuid': uuid,
       'topic': topic,
       'targetConnectPeerId': targetConnectPeerId,
-      'targetConnectSessionId': targetConnectSessionId,
+      // 'targetConnectSessionId': targetConnectSessionId,
       'targetConnectAddress': targetConnectAddress,
       'srcConnectPeerId': srcConnectPeerId,
       'srcConnectSessionId': srcConnectSessionId,

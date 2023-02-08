@@ -79,14 +79,16 @@ class ChainMessageHandler {
     //本PeerClient的连接定位器地址
     var connectAddress = chainMessage.connectAddress;
     //目标PeerClient的连接定位器地址
-    var targetAddress = chainMessage.targetConnectAddress;
+    var targetConnectAddress = chainMessage.targetConnectAddress;
     await chainMessageHandler.encrypt(chainMessage);
     //// 发送数据后返回的响应数据
     var success = false;
     dynamic result;
     try {
-      if (!success && targetAddress != null && targetAddress.startsWith('ws')) {
-        var websocket = await websocketPool.get(targetAddress);
+      if (!success &&
+          targetConnectAddress != null &&
+          targetConnectAddress.startsWith('ws')) {
+        var websocket = await websocketPool.get(targetConnectAddress);
         if (websocket != null) {
           var data = MessageSerializer.marshal(chainMessage);
           success = await websocket.sendMsg(data);

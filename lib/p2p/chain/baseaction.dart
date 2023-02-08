@@ -119,7 +119,6 @@ abstract class BaseAction {
       if (peerClient != null) {
         chainMessage.targetConnectAddress = peerClient.connectAddress;
         chainMessage.targetConnectPeerId = peerClient.connectPeerId;
-        chainMessage.targetConnectSessionId = peerClient.connectSessionId;
         targetClientId ??= peerClient.clientId;
         //如果没有指定connectPeerId，本次优先采用目标的最近连接节点
         if (connectPeerId == null) {
