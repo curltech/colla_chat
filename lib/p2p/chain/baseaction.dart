@@ -229,7 +229,7 @@ abstract class BaseAction {
     if (chainMessage_ != null && receivers.isNotEmpty) {
       await transferPayload(chainMessage_);
       for (var receiver in receivers) {
-        dynamic responsePayload = receiver(chainMessage_);
+        dynamic responsePayload = await receiver(chainMessage_);
         return chainMessageHandler.response(
             chainMessage.messageType, responsePayload);
       }
