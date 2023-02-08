@@ -604,7 +604,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         await chatSummaryService.upsertByChatMessage(chatMessage);
       }
     } catch (err) {
-      logger.e('chatMessage ${chatMessage.messageId} store fail');
+      logger.e(
+          'chatMessage ${chatMessage.messageId} store fail,${err.toString()}');
     }
   }
 

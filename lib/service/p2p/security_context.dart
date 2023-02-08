@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:cryptography/cryptography.dart';
@@ -179,8 +180,7 @@ class CryptographySecurityContextService extends SecurityContextService {
     if (needEncrypt) {
       SimplePublicKey? targetPublicKey;
       if (targetPeerId != null && peerId != null && targetPeerId != peerId) {
-        targetPublicKey =
-            await peerClientService.getCachedPublicKey(targetPeerId);
+        targetPublicKey = await linkmanService.getCachedPublicKey(targetPeerId);
       } else {
         // 本地保存前加密
         targetPublicKey = myself.publicKey;
@@ -435,8 +435,8 @@ class SignalSecurityContextService extends SecurityContextService {
     }
     //3. 数据加密
     if (needEncrypt) {
-      SignalSession? signalSession =
-          signalSessionPool.get(peerId: targetPeerId!, clientId: targetClientId!);
+      SignalSession? signalSession = signalSessionPool.get(
+          peerId: targetPeerId!, clientId: targetClientId!);
       if (signalSession != null) {
         data = await signalSession.encrypt(Uint8List.fromList(data));
         logger.i('call signal encrypt');
