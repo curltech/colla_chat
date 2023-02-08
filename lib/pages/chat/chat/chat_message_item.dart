@@ -183,7 +183,8 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
   Widget _buildOther(BuildContext context) {
     var sendTime = widget.chatMessage.sendTime;
     sendTime = sendTime = DateUtil.formatEasyRead(sendTime!);
-    Widget title = Text('${widget.chatMessage.senderName} $sendTime',
+    Widget title = Text(
+        '${widget.chatMessage.id}:${widget.chatMessage.senderName} $sendTime',
         style: const TextStyle(fontSize: 12));
     // Text('${widget.chatMessage.id}:${widget.chatMessage.senderName}');
     if (timer != null) {
@@ -229,7 +230,8 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
   Widget _buildMe(BuildContext context) {
     var sendTime = widget.chatMessage.sendTime;
     sendTime = sendTime = DateUtil.formatEasyRead(sendTime!);
-    Widget title = Text('${widget.chatMessage.senderName} $sendTime',
+    Widget title = Text(
+        '${widget.chatMessage.id}:${widget.chatMessage.senderName} $sendTime',
         style: const TextStyle(fontSize: 12));
     //Text('${widget.chatMessage.id}:${widget.chatMessage.receiverName}');
     if (timer != null) {

@@ -2,6 +2,7 @@ import 'dart:core';
 
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
+import 'package:colla_chat/entity/dht/peerendpoint.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/p2p/chain/chainmessagehandler.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
@@ -9,6 +10,7 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/transport/websocket.dart';
 import 'package:uuid/uuid.dart';
 
 enum PayloadType {
@@ -101,20 +103,16 @@ abstract class BaseAction {
   }
 
   ///发送前的预处理，设置消息的初始值
+  ///如果targetPeerId不为空，指的是目标peerclient，否则是直接向connectPeerId的peerendpoint发送信息
   ///传入数据为对象，先转换成json字符串，然后utf-8格式的List<int>
   Future<ChainMessage> prepareSend(dynamic data,
-      {String? targetPeerId,
-      String? connectAddress,
+      {String? connectAddress,
       String? connectPeerId,
+      String? targetPeerId,
       String? topic,
       String? targetClientId}) async {
     ChainMessage chainMessage = ChainMessage();
-    if (connectPeerId == null) {
-      if (peerEndpointController.data.isNotEmpty) {
-        connectPeerId = peerEndpointController.defaultPeerEndpoint!.peerId;
-      }
-    }
-    targetPeerId ??= connectPeerId;
+    //如果指出了目标客户端，则查询目标客户端的信息
     if (targetPeerId != null) {
       PeerClient? peerClient =
           await peerClientService.findCachedOneByPeerId(targetPeerId);
@@ -123,21 +121,47 @@ abstract class BaseAction {
         chainMessage.targetConnectPeerId = peerClient.connectPeerId;
         chainMessage.targetConnectSessionId = peerClient.connectSessionId;
         targetClientId ??= peerClient.clientId;
-        connectAddress ??= chainMessage.targetConnectAddress;
+        //如果没有指定connectPeerId，本次优先采用目标的最近连接节点
+        if (connectPeerId == null) {
+          connectPeerId = peerClient.connectPeerId;
+          connectAddress = peerClient.connectAddress;
+        }
       }
-    }
-    String? defaultConnectAddress;
-    if (peerEndpointController.data.isNotEmpty) {
-      defaultConnectAddress =
-          peerEndpointController.defaultPeerEndpoint!.wsConnectAddress;
+    } else {
+      //消息发给连接节点，websocket协议下不用加密，libp2p自动加密
+      chainMessage.needEncrypt = false;
     }
     chainMessage.targetPeerId = targetPeerId;
     chainMessage.targetClientId = targetClientId;
-    connectAddress ??= defaultConnectAddress;
-    chainMessage.targetConnectAddress ??= connectAddress;
-    chainMessage.srcConnectAddress = defaultConnectAddress;
-    chainMessage.connectAddress = connectAddress;
+
+    //查找本次连接节点，最差是获取缺省的连接节点
+    PeerEndpoint? peerEndpoint = peerEndpointController.find(
+        peerId: connectPeerId, address: connectAddress);
+    if (peerEndpoint != null) {
+      connectPeerId = peerEndpoint.peerId;
+      connectAddress = peerEndpoint.wsConnectAddress;
+    }
     chainMessage.connectPeerId = connectPeerId;
+    chainMessage.connectAddress = connectAddress;
+    if (connectPeerId != null) {
+      Websocket? websocket = await websocketPool.get(connectPeerId);
+      if (websocket != null) {
+        chainMessage.connectSessionId = websocket.sessionId;
+      }
+    }
+
+    //本客户机最近的连接节点的属性，对方回信的时候可以用于连接
+    PeerEndpoint? defaultPeerEndpoint =
+        peerEndpointController.defaultPeerEndpoint;
+    if (defaultPeerEndpoint != null) {
+      chainMessage.srcConnectAddress = defaultPeerEndpoint.wsConnectAddress;
+      chainMessage.srcConnectPeerId = defaultPeerEndpoint.peerId;
+      Websocket? websocket =
+          await websocketPool.get(defaultPeerEndpoint.wsConnectAddress!);
+      if (websocket != null) {
+        chainMessage.srcConnectSessionId = websocket.sessionId;
+      }
+    }
 
     if (topic == null && appDataProvider.topics.isNotEmpty) {
       topic ??= appDataProvider.topics[0];

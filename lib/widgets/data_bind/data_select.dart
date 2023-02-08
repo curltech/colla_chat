@@ -202,7 +202,8 @@ class SmartSelectUtil {
           centerTitle: false,
           backgroundColor: myself.primary,
           textStyle: const TextStyle(color: Colors.white),
-          // iconTheme: const IconThemeData(color: Colors.white),
+          iconTheme: const IconThemeData(color: Colors.white),
+          actionsIconTheme: const IconThemeData(color: Colors.white),
         ),
       ),
       choiceStyle: S2ChoiceStyle(
@@ -297,7 +298,8 @@ class SmartSelectUtil {
           centerTitle: false,
           backgroundColor: myself.primary,
           textStyle: const TextStyle(color: Colors.white),
-          //iconTheme: const IconThemeData(color: Colors.white),
+          iconTheme: const IconThemeData(color: Colors.white),
+          actionsIconTheme: const IconThemeData(color: Colors.white),
         ),
       ),
       choiceStyle: S2ChoiceStyle(

@@ -48,6 +48,24 @@ class PeerEndpointController extends DataListController<PeerEndpoint> {
       }
     });
   }
+
+  PeerEndpoint? find({String? peerId, String? address}) {
+    if (peerId != null) {
+      for (var peerEndpoint in data) {
+        if (peerEndpoint.peerId == peerId) {
+          return peerEndpoint;
+        }
+      }
+    } else if (address != null) {
+      for (var peerEndpoint in data) {
+        if (peerEndpoint.wsConnectAddress == address) {
+          return peerEndpoint;
+        }
+      }
+    }
+
+    return defaultPeerEndpoint;
+  }
 }
 
 final PeerEndpointController peerEndpointController = PeerEndpointController();

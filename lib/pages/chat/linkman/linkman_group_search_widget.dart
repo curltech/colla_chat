@@ -2,6 +2,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
@@ -83,15 +84,20 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
         fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
         filled: true,
         border: InputBorder.none,
-        // labelText: AppLocalizations.t('Search') +
-        //     AppLocalizations.t(' ') +
-        //     AppLocalizations.t(title),
+        focusedBorder: InputBorder.none,
+        enabledBorder: InputBorder.none,
+        errorBorder: InputBorder.none,
+        disabledBorder: InputBorder.none,
+        focusedErrorBorder: InputBorder.none,
         suffixIcon: IconButton(
           onPressed: () async {
             await _search();
             setState(() {});
           },
-          icon: const Icon(Icons.search),
+          icon: Icon(
+            Icons.search,
+            color: myself.primary,
+          ),
         ),
       ),
     );
@@ -145,8 +151,8 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
               widget.onSelected(selected);
             },
             items: options,
-            modalFilter: true,
-            modalFilterAuto: true,
+            modalFilter: false,
+            modalFilterAuto: false,
             chipOnDelete: (i) {
               setState(() {
                 widget.selected.removeAt(i);

@@ -142,6 +142,8 @@ class MessageWidget {
       body = buildActionMessageWidget(context, subMessageType!);
     } else if (subMessageType == ChatMessageSubType.addGroup) {
       body = buildActionMessageWidget(context, subMessageType!);
+    } else if (subMessageType == ChatMessageSubType.modifyGroup) {
+      body = buildActionMessageWidget(context, subMessageType!);
     } else if (subMessageType == ChatMessageSubType.dismissGroup) {
       body = buildActionMessageWidget(context, subMessageType!);
     } else if (subMessageType == ChatMessageSubType.addGroupMember) {

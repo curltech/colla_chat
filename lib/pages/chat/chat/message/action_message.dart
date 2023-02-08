@@ -184,7 +184,7 @@ class ActionMessage extends StatelessWidget {
               padding: const EdgeInsets.all(5),
               child: Row(children: [
                 Icon(
-                  Icons.groups,
+                  Icons.person_add,
                   color: primary,
                 ),
                 const SizedBox(

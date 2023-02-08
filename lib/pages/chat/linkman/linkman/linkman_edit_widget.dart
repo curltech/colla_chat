@@ -1,6 +1,7 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/contact.dart';
@@ -91,6 +92,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     linkman!.mobile = currentLinkman.mobile;
     linkman!.email = currentLinkman.email;
     await linkmanService.store(linkman!);
+    linkmanChatSummaryController.refresh();
   }
 
   _addFriend({String? tip}) async {
