@@ -1,5 +1,4 @@
 import 'package:colla_chat/crypto/signalprotocol.dart';
-import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
@@ -28,7 +27,6 @@ class GlobalChatMessageController with ChangeNotifier {
     if (chatMessage != null) {
       String messageId = chatMessage.messageId!;
       String peerId = chatMessage.senderPeerId!;
-      String? clientId = chatMessage.senderClientId;
       String? title = chatMessage.title;
       String? content = chatMessage.content;
       ChatMessageSubType? subMessageType = StringUtil.enumFromString(
@@ -64,7 +62,7 @@ class GlobalChatMessageController with ChangeNotifier {
         case ChatMessageSubType.addFriend:
           break;
         case ChatMessageSubType.modifyFriend:
-          linkmanService.receiveModifyFriend(chatMessage, content!);
+          linkmanService.receiveModifyFriend(chatMessage);
           break;
         case ChatMessageSubType.cancel:
           //接收到删除消息的消息
@@ -76,12 +74,11 @@ class GlobalChatMessageController with ChangeNotifier {
           break;
         case ChatMessageSubType.preKeyBundle:
           //接收到signal协议初始化消息
-          _receivePreKeyBundle(chatMessage, content!);
+          _receivePreKeyBundle(chatMessage);
           break;
         case ChatMessageSubType.signal:
           //接收到webrtc的信号消息
-          content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content!));
-          _receiveSignal(chatMessage, content);
+          _receiveSignal(chatMessage);
           break;
         case ChatMessageSubType.addGroup:
           await groupService.receiveAddGroup(chatMessage);
@@ -118,7 +115,8 @@ class GlobalChatMessageController with ChangeNotifier {
   }
 
   ///收到signal加密初始化消息
-  _receivePreKeyBundle(ChatMessage chatMessage, String content) async {
+  _receivePreKeyBundle(ChatMessage chatMessage) async {
+    String content = chatMessageService.recoverContent(chatMessage.content!);
     String peerId = chatMessage.senderPeerId!;
     String? clientId = chatMessage.senderClientId;
     if (chatMessage.subMessageType == ChatMessageSubType.preKeyBundle.name) {
@@ -150,13 +148,12 @@ class GlobalChatMessageController with ChangeNotifier {
   }
 
   ///收到webrtc signal消息
-  _receiveSignal(ChatMessage chatMessage, String content) async {
-    content=chatMessageService.recoverContent(content);
+  _receiveSignal(ChatMessage chatMessage) async {
+    var json = chatMessageService.recoverContent(chatMessage.content!);
     String peerId = chatMessage.senderPeerId!;
     String clientId = chatMessage.senderClientId!;
     if (chatMessage.subMessageType == ChatMessageSubType.signal.name) {
-      WebrtcSignal webrtcSignal =
-          WebrtcSignal.fromJson(JsonUtil.toJson(content));
+      WebrtcSignal webrtcSignal = WebrtcSignal.fromJson(JsonUtil.toJson(json));
       await peerConnectionPool.onWebrtcSignal(peerId, webrtcSignal,
           clientId: clientId);
     }
