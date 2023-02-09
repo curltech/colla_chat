@@ -133,7 +133,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
 
     Websocket? websocket = websocketPool.getDefault();
     if (websocket != null) {
-      websocketPool.registerStatusChange(
+      websocketPool.registerStatusChanged(
           websocket.address, _updateWebsocketStatus);
       _socketStatus = ValueNotifier<SocketStatus>(websocket.status);
     } else {
@@ -184,11 +184,13 @@ class _ChatListWidgetState extends State<ChatListWidget>
     if (socketStatus != status) {
       if (_socketStatus.value == SocketStatus.connected) {
         DialogUtil.info(context,
-            content: AppLocalizations.t('Websocket status was changed to:') +
+            content: AppLocalizations.t(
+                    'Websocket $address status was changed to:') +
                 _socketStatus.value.name);
       } else {
         DialogUtil.error(context,
-            content: AppLocalizations.t('Websocket status was changed to:') +
+            content: AppLocalizations.t(
+                    'Websocket $address status was changed to:') +
                 _socketStatus.value.name);
       }
     }
@@ -445,7 +447,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
     groupChatSummaryController.removeListener(_updateGroupChatSummary);
     Websocket? websocket = websocketPool.getDefault();
     if (websocket != null) {
-      websocketPool.unregisterStatusChange(
+      websocketPool.unregisterStatusChanged(
           websocket.address, _updateWebsocketStatus);
     }
     super.dispose();

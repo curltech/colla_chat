@@ -1,6 +1,5 @@
 import 'dart:core';
 
-import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -12,7 +11,6 @@ class PeerConnectionWidget extends StatefulWidget with TileDataMixin {
   final String? peerId;
   final String? clientId;
   final Room? room;
-  final PeerConnectionPoolController controller = peerConnectionPoolController;
 
   PeerConnectionWidget({Key? key, this.room, this.peerId, this.clientId})
       : super(key: key);

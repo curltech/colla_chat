@@ -2,7 +2,6 @@ import 'dart:core';
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
-import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
@@ -12,8 +11,6 @@ import 'package:flutter/material.dart';
 
 /// 连接建立示例
 class DataChannelWidget extends StatefulWidget with TileDataMixin {
-  final PeerConnectionPoolController controller = peerConnectionPoolController;
-
   DataChannelWidget({Key? key}) : super(key: key);
 
   @override
@@ -44,7 +41,6 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
 
   @override
   initState() {
-    widget.controller.addListener(_update);
     peerIdController.text = '53HWCVP2BJX8LZ7BLfKEgQGpisNQXcKBfVLhkMEvZ3Zr';
     clientIdController.text = 'EepCRDBTjwPM4c1Jh34G6qeFRf59NgTDpz2QVapJzdBU';
     super.initState();
@@ -56,18 +52,15 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
 
   @override
   dispose() {
-    widget.controller.removeListener(_update);
     super.dispose();
   }
 
   AdvancedPeerConnection? _getAdvancedPeerConnection() {
     AdvancedPeerConnection? advancedPeerConnection;
-    if (peerId != null) {
-      advancedPeerConnection =
-          peerConnectionPool.getOne(peerId!, clientId: clientId);
+    advancedPeerConnection =
+        peerConnectionPool.getOne(peerId, clientId: clientId);
 
-      return advancedPeerConnection;
-    }
+    return advancedPeerConnection;
     return null;
   }
 

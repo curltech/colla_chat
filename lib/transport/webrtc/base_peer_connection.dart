@@ -65,14 +65,42 @@ class SignalExtension {
   }
 }
 
+///可以注册的事件
+enum WebrtcEventType {
+  created, //创建被叫连接
+  signal, //发送信号
+  onSignal, //接收到信号
+  connected,
+  closed,
+  status, //状态发生变化
+  message, //接收到消息
+  stream,
+  removeStream,
+  track,
+  addTrack,
+  removeTrack,
+  error,
+  iceCandidate,
+  connectionState,
+  iceConnectionState,
+  iceGatheringState,
+  signalingState,
+  iceCompleted,
+  dataChannelState,
+}
+
 class WebrtcEvent {
   String peerId;
   String clientId;
   String name;
+  WebrtcEventType eventType;
   dynamic data;
 
   WebrtcEvent(this.peerId,
-      {required this.clientId, required this.name, this.data});
+      {required this.clientId,
+      required this.name,
+      required this.eventType,
+      this.data});
 }
 
 const String unknownClientId = 'unknownClientId';
@@ -197,30 +225,6 @@ final Map<String, dynamic> sdpConstraints = {
   },
   "optional": [],
 };
-
-///可以注册的事件
-enum WebrtcEventType {
-  created, //创建被叫连接
-  signal, //发送信号
-  onSignal, //接收到信号
-  connected,
-  closed,
-  status, //状态发生变化
-  message, //接收到消息
-  stream,
-  removeStream,
-  track,
-  addTrack,
-  removeTrack,
-  error,
-  iceCandidate,
-  connectionState,
-  iceConnectionState,
-  iceGatheringState,
-  signalingState,
-  iceCompleted,
-  dataChannelState,
-}
 
 enum NegotiateStatus {
   none,
@@ -415,8 +419,10 @@ class BasePeerConnection {
   }
 
   set status(PeerConnectionStatus status) {
-    emit(WebrtcEventType.status, {'oldStatus': _status, 'newStatus': status});
-    _status = status;
+    if (_status != status) {
+      _status = status;
+      emit(WebrtcEventType.status, status);
+    }
   }
 
   NegotiateStatus get negotiateStatus {

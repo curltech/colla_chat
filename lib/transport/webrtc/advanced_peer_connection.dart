@@ -74,21 +74,36 @@ class AdvancedPeerConnection {
     ///所有basePeerConnection的事件都缺省转发到peerConnectionPool相同的处理
     //触发basePeerConnection的signal事件，就是调用peerConnectionPool对应的signal方法
     basePeerConnection.on(WebrtcEventType.signal, (WebrtcSignal signal) async {
-      await peerConnectionPool.signal(
-          WebrtcEvent(peerId, clientId: clientId, name: name, data: signal));
+      await peerConnectionPool.signal(WebrtcEvent(peerId,
+          clientId: clientId,
+          name: name,
+          eventType: WebrtcEventType.signal,
+          data: signal));
     });
 
     //触发basePeerConnection的connect事件，就是调用peerConnectionPool对应的signal方法
-    basePeerConnection.on(WebrtcEventType.connected, onConnected);
+    basePeerConnection.on(WebrtcEventType.connected, (data) async {
+      await peerConnectionPool.onStatusChanged(WebrtcEvent(peerId,
+          clientId: clientId,
+          name: name,
+          eventType: WebrtcEventType.connected,
+          data: data));
+    });
 
     basePeerConnection.on(WebrtcEventType.status, (data) async {
-      await peerConnectionPool.onStatus(
-          WebrtcEvent(peerId, clientId: clientId, name: name, data: data));
+      await peerConnectionPool.onStatusChanged(WebrtcEvent(peerId,
+          clientId: clientId,
+          name: name,
+          eventType: WebrtcEventType.status,
+          data: data));
     });
 
     basePeerConnection.on(WebrtcEventType.closed, (data) async {
-      await peerConnectionPool.onClosed(
-          WebrtcEvent(peerId, clientId: clientId, name: name, data: data));
+      await peerConnectionPool.onClosed(WebrtcEvent(peerId,
+          clientId: clientId,
+          name: name,
+          eventType: WebrtcEventType.closed,
+          data: data));
     });
 
     //收到数据，带解密功能，取最后一位整数，表示解密选项，得到何种解密方式，然后解密
@@ -121,8 +136,11 @@ class AdvancedPeerConnection {
     });
 
     basePeerConnection.on(WebrtcEventType.error, (err) async {
-      await peerConnectionPool.onError(
-          WebrtcEvent(peerId, clientId: clientId, name: name, data: err));
+      await peerConnectionPool.onError(WebrtcEvent(peerId,
+          clientId: clientId,
+          name: name,
+          eventType: WebrtcEventType.error,
+          data: err));
     });
 
     return result;
@@ -151,8 +169,11 @@ class AdvancedPeerConnection {
       return;
     }
     await _addRemoteStream(stream);
-    await peerConnectionPool.onAddStream(
-        WebrtcEvent(peerId, clientId: clientId, name: name, data: stream));
+    await peerConnectionPool.onAddStream(WebrtcEvent(peerId,
+        clientId: clientId,
+        name: name,
+        eventType: WebrtcEventType.stream,
+        data: stream));
   }
 
   Future<PeerVideoRender?> _addRemoteStream(MediaStream stream) async {
@@ -183,8 +204,11 @@ class AdvancedPeerConnection {
   onRemoveRemoteStream(MediaStream stream) async {
     logger.i('peerId: $peerId clientId:$clientId is onRemoveRemoteStream');
     await _removeRemoteStream(stream);
-    await peerConnectionPool.onRemoveStream(
-        WebrtcEvent(peerId, clientId: clientId, name: name, data: stream));
+    await peerConnectionPool.onRemoveStream(WebrtcEvent(peerId,
+        clientId: clientId,
+        name: name,
+        eventType: WebrtcEventType.removeStream,
+        data: stream));
   }
 
   _removeRemoteStream(MediaStream stream) async {
@@ -206,20 +230,29 @@ class AdvancedPeerConnection {
 
   onRemoteTrack(RTCTrackEvent event) async {
     logger.i('peerId: $peerId clientId:$clientId is onRemoteTrack');
-    await peerConnectionPool.onTrack(
-        WebrtcEvent(peerId, clientId: clientId, name: name, data: event));
+    await peerConnectionPool.onTrack(WebrtcEvent(peerId,
+        clientId: clientId,
+        name: name,
+        eventType: WebrtcEventType.track,
+        data: event));
   }
 
   onAddRemoteTrack(dynamic data) async {
     logger.i('peerId: $peerId clientId:$clientId is onAddRemoteTrack');
-    await peerConnectionPool.onAddTrack(
-        WebrtcEvent(peerId, clientId: clientId, name: name, data: data));
+    await peerConnectionPool.onAddTrack(WebrtcEvent(peerId,
+        clientId: clientId,
+        name: name,
+        eventType: WebrtcEventType.addTrack,
+        data: data));
   }
 
   onRemoveRemoteTrack(dynamic data) async {
     logger.i('peerId: $peerId clientId:$clientId is onRemoveRemoteTrack');
-    await peerConnectionPool.onRemoveTrack(
-        WebrtcEvent(peerId, clientId: clientId, name: name, data: data));
+    await peerConnectionPool.onRemoveTrack(WebrtcEvent(peerId,
+        clientId: clientId,
+        name: name,
+        eventType: WebrtcEventType.removeTrack,
+        data: data));
   }
 
   ///把渲染器加入到渲染器集合，并将包含的流加入连接中
@@ -300,11 +333,6 @@ class AdvancedPeerConnection {
     return basePeerConnection.status == PeerConnectionStatus.connected;
   }
 
-  onConnected(dynamic data) async {
-    await peerConnectionPool.onConnected(
-        WebrtcEvent(peerId, clientId: clientId, name: name, data: data));
-  }
-
   ///收到数据，先解密，然后转换成还原utf-8字符串，再将json字符串变成map对象
   onMessage(List<int> data) async {
     int cryptOption = data[data.length - 1];
@@ -320,8 +348,11 @@ class AdvancedPeerConnection {
     if (result) {
       String jsonStr = CryptoUtil.utf8ToString(securityContext.payload);
       var json = JsonUtil.toJson(jsonStr);
-      await peerConnectionPool.onMessage(
-          WebrtcEvent(peerId, clientId: clientId, name: name, data: json));
+      await peerConnectionPool.onMessage(WebrtcEvent(peerId,
+          clientId: clientId,
+          name: name,
+          eventType: WebrtcEventType.message,
+          data: json));
     }
   }
 

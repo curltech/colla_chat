@@ -210,7 +210,7 @@ class WebsocketPool {
     connect();
   }
 
-  registerStatusChange(
+  registerStatusChanged(
       String address, Function(String address, SocketStatus status) fn) {
     List<Function(String address, SocketStatus status)>? fns = fnsm[address];
     if (fns == null) {
@@ -220,7 +220,7 @@ class WebsocketPool {
     fns.add(fn);
   }
 
-  unregisterStatusChange(
+  unregisterStatusChanged(
       String address, Function(String address, SocketStatus status) fn) {
     List<Function(String address, SocketStatus status)>? fns = fnsm[address];
     if (fns == null) {
@@ -232,7 +232,7 @@ class WebsocketPool {
     }
   }
 
-  onStatusChange(Websocket websocket, SocketStatus status) {
+  onStatusChanged(Websocket websocket, SocketStatus status) {
     String address = websocket.address;
     logger.w('websocket $address status changed');
     List<Function(String address, SocketStatus status)>? fns = fnsm[address];
@@ -261,7 +261,7 @@ class WebsocketPool {
           await websocket.connect();
           if (websocket._status == SocketStatus.connected) {
             websockets[defaultAddress] = websocket;
-            websocket.onStatusChange = onStatusChange;
+            websocket.onStatusChange = onStatusChanged;
             _default = websocket;
           }
         }
@@ -288,7 +288,7 @@ class WebsocketPool {
         }
         websocket =
             Websocket(address, myselfPeerService.connect, peerId: peerId);
-        websocket.onStatusChange = onStatusChange;
+        websocket.onStatusChange = onStatusChanged;
         await websocket.connect();
         if (websocket._status == SocketStatus.connected) {
           websockets[address] = websocket;

@@ -9,7 +9,6 @@ import 'package:colla_chat/p2p/chain/action/chat.dart';
 import 'package:colla_chat/p2p/chain/action/signal.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
@@ -133,6 +132,8 @@ class PeerConnectionPool {
 
   Map<String, dynamic> protocolHandlers = {};
 
+  Map<String, List<Function(WebrtcEvent event)>> fnsm = {};
+
   PeerConnectionPool() {
     signalAction.registerReceiver(onSignal);
     chatAction.registerReceiver(onChat);
@@ -190,6 +191,40 @@ class PeerConnectionPool {
         return await func(evt);
       } else {
         logger.e('event:$type is not func');
+      }
+    }
+  }
+
+  registerWebrtcEvent(
+      String peerId, WebrtcEventType eventType, Function(WebrtcEvent) fn) {
+    List<Function(WebrtcEvent)>? fns = fnsm['$peerId:${eventType.name}'];
+    if (fns == null) {
+      fns = [];
+      fnsm['$peerId:${eventType.name}'] = fns;
+    }
+    fns.add(fn);
+  }
+
+  unregisterWebrtcEvent(
+      String peerId, WebrtcEventType eventType, Function(WebrtcEvent) fn) {
+    List<Function(WebrtcEvent)>? fns = fnsm['$peerId:${eventType.name}'];
+    if (fns == null) {
+      return;
+    }
+    fns.remove(fn);
+    if (fns.isEmpty) {
+      fnsm.remove('$peerId:${eventType.name}');
+    }
+  }
+
+  onWebrtcEvent(WebrtcEvent event) {
+    String peerId = event.peerId;
+    WebrtcEventType eventType = event.eventType;
+    logger.w('Webrtc peer connection $peerId webrtcEvent $eventType coming');
+    List<Function(WebrtcEvent)>? fns = fnsm['$peerId:${eventType.name}'];
+    if (fns != null) {
+      for (var fn in fns) {
+        fn(event);
       }
     }
   }
@@ -263,14 +298,17 @@ class PeerConnectionPool {
     if (linkman != null) {
       name = linkman.name;
     }
-    peerConnectionPoolController.onCreated(WebrtcEvent(peerId,
-        clientId: clientId, name: name, data: peerConnection));
     bool result = await peerConnection.init(
         iceServers: iceServers, localRenders: localRenders);
     if (!result) {
       logger.e('webrtcPeer.init fail');
       return null;
     }
+    onWebrtcEvent(WebrtcEvent(peerId,
+        clientId: clientId,
+        name: name,
+        eventType: WebrtcEventType.created,
+        data: peerConnection));
     await peerConnection.negotiate();
     await put(peerId, peerConnection, clientId: clientId);
 
@@ -415,13 +453,16 @@ class PeerConnectionPool {
       advancedPeerConnection = AdvancedPeerConnection(peerId, false,
           clientId: clientId, name: name, room: room);
       await put(peerId, advancedPeerConnection, clientId: clientId);
-      peerConnectionPoolController.onCreated(WebrtcEvent(peerId,
-          clientId: clientId, name: name, data: advancedPeerConnection));
       var result = await advancedPeerConnection.init(iceServers: iceServers);
       if (!result) {
         logger.e('webrtcPeer.init fail');
         return null;
       }
+      onWebrtcEvent(WebrtcEvent(peerId,
+          clientId: clientId,
+          name: name,
+          eventType: WebrtcEventType.created,
+          data: advancedPeerConnection));
       logger.i(
           'advancedPeerConnection ${advancedPeerConnection.basePeerConnection.id} init completed');
     }
@@ -540,7 +581,10 @@ class PeerConnectionPool {
       String peerId = chainMessage.srcPeerId!;
       String clientId = chainMessage.srcClientId!;
       WebrtcEvent event = WebrtcEvent(peerId,
-          clientId: clientId, name: '', data: chainMessage.payload);
+          clientId: clientId,
+          name: '',
+          eventType: WebrtcEventType.message,
+          data: chainMessage.payload);
       await onMessage(event);
     }
   }
@@ -588,13 +632,8 @@ class PeerConnectionPool {
     await globalChatMessageController.receiveChatMessage(chatMessage);
   }
 
-  onStatus(WebrtcEvent event) async {
-    Map<String, PeerConnectionStatus> data = event.data;
-    PeerConnectionStatus? oldStatus = data['oldStatus'];
-    PeerConnectionStatus? newStatus = data['newStatus'];
-    // logger.i(
-    //     'peerId: ${event.peerId} clientId:${event.clientId} status from ${oldStatus!.name} to ${newStatus!.name} changed');
-    peerConnectionPoolController.onStatus(event);
+  onStatusChanged(WebrtcEvent event) async {
+    onWebrtcEvent(event);
   }
 
   onConnected(WebrtcEvent event) async {
@@ -603,44 +642,48 @@ class PeerConnectionPool {
         clientId: event.clientId);
     globalChatMessageController.sendPreKeyBundle(event.peerId,
         clientId: event.clientId);
-    peerConnectionPoolController.onConnected(event);
+    onWebrtcEvent(event);
   }
 
   onClosed(WebrtcEvent event) async {
     logger.i('peerId: ${event.peerId} clientId:${event.clientId} is closed');
     remove(event.peerId, clientId: event.clientId);
-    peerConnectionPoolController.onClosed(event);
+    onWebrtcEvent(event);
     signalSessionPool.close(peerId: event.peerId, clientId: event.clientId);
   }
 
   onError(WebrtcEvent event) async {
     logger.i('peerId: ${event.peerId} clientId:${event.clientId} is error');
-    peerConnectionPoolController.onError(event);
+    onWebrtcEvent(event);
   }
 
   onAddStream(WebrtcEvent event) async {
     logger
         .i('peerId: ${event.peerId} clientId:${event.clientId} is onAddStream');
+    onWebrtcEvent(event);
   }
 
   onRemoveStream(WebrtcEvent event) async {
     logger.i(
         'peerId: ${event.peerId} clientId:${event.clientId} is onRemoveStream');
+    onWebrtcEvent(event);
   }
 
   onTrack(WebrtcEvent event) async {
     logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onTrack');
+    onWebrtcEvent(event);
   }
 
   onAddTrack(WebrtcEvent event) async {
     logger
         .i('peerId: ${event.peerId} clientId:${event.clientId} is onAddTrack');
-    //peerConnectionsController.add(event.peerId, clientId: event.clientId);
+    onWebrtcEvent(event);
   }
 
   onRemoveTrack(WebrtcEvent event) async {
     logger.i(
         'peerId: ${event.peerId} clientId:${event.clientId} is onRemoveTrack');
+    onWebrtcEvent(event);
   }
 
   removeTrack(String peerId, MediaStream stream, MediaStreamTrack track,
@@ -684,7 +727,7 @@ class PeerConnectionPool {
   }
 
   ///调用signalAction发送signal到信号服务器
-  Future<dynamic> signal(WebrtcEvent evt) async {
+  Future<bool> signal(WebrtcEvent evt) async {
     try {
       var peerId = evt.peerId;
       var clientId = evt.clientId;
@@ -701,17 +744,17 @@ class PeerConnectionPool {
         // logger.w(
         //     'sent signal chatMessage by webrtc peerId:$peerId, clientId:$clientId, signal:$jsonStr');
       } else {
-        var result = await signalAction.signal(evt.data, peerId,
+        var success = await signalAction.signal(evt.data, peerId,
             targetClientId: clientId);
-        if (result == 'ERROR') {
-          logger.e('signal err:$result');
+        if (!success) {
+          logger.e('signalAction signal err');
         }
-        return result;
+        return success;
       }
     } catch (err) {
       logger.e('signal err:$err');
     }
-    return null;
+    return false;
   }
 }
 

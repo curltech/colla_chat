@@ -7,7 +7,6 @@ import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/full_screen_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_chat_widget.dart';
-import 'package:colla_chat/pages/chat/me/webrtc/peer_connection_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -58,17 +57,14 @@ class _ChatMessageViewState extends State<ChatMessageView> {
   late String peerId;
   late String name;
   late String partyType;
-  final ValueNotifier<PeerConnectionStatus> _peerConnectionStatus =
+  late ValueNotifier<PeerConnectionStatus> _peerConnectionStatus =
       ValueNotifier<PeerConnectionStatus>(PeerConnectionStatus.none);
 
   @override
   void initState() {
     super.initState();
-    chatMessageController.addListener(_update);
-    peerConnectionPoolController.addListener(_updatePeerConnectionStatus);
     _createPeerConnection();
     _buildReadStatus();
-    _initPeerConnectionStatus();
   }
 
   ///更新为已读状态
@@ -108,13 +104,33 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     if (chatSummary != null) {
       peerId = chatSummary.peerId!;
       name = chatSummary.name!;
+      peerConnectionPool.registerWebrtcEvent(
+          peerId, WebrtcEventType.status, _updatePeerConnectionStatus);
       partyType = chatSummary.partyType!;
       if (partyType == PartyType.linkman.name) {
         if (peerId != myself.peerId) {
           List<AdvancedPeerConnection> advancedPeerConnections =
               peerConnectionPool.get(peerId);
           if (advancedPeerConnections.isEmpty) {
-            peerConnectionPool.create(peerId);
+            AdvancedPeerConnection? advancedPeerConnection =
+                await peerConnectionPool.create(peerId);
+            if (advancedPeerConnection != null) {
+              _peerConnectionStatus = ValueNotifier<PeerConnectionStatus>(
+                  advancedPeerConnection.status);
+            } else {
+              _peerConnectionStatus = ValueNotifier<PeerConnectionStatus>(
+                  PeerConnectionStatus.none);
+            }
+          } else {
+            for (AdvancedPeerConnection advancedPeerConnection
+                in advancedPeerConnections) {
+              _peerConnectionStatus = ValueNotifier<PeerConnectionStatus>(
+                  advancedPeerConnection.status);
+              if (advancedPeerConnection.status ==
+                  PeerConnectionStatus.connected) {
+                break;
+              }
+            }
           }
         }
       } else if (partyType == PartyType.group.name) {
@@ -136,36 +152,20 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     }
   }
 
-  _update() {
-    setState(() {});
-  }
-
-  _initPeerConnectionStatus() {
-    PeerConnectionStatus status = PeerConnectionStatus.none;
-    if (partyType == PartyType.linkman.name) {
-      var peerConnections = peerConnectionPool.get(peerId);
-      if (peerConnections.isNotEmpty) {
-        //发现一个状态为connected的就设置为connected
-        for (var peerConnection in peerConnections) {
-          status = peerConnection.status;
-          if (status == PeerConnectionStatus.connected) {
-            break;
-          }
-        }
+  _updatePeerConnectionStatus(WebrtcEvent event) {
+    PeerConnectionStatus status = event.data;
+    var oldStatus = _peerConnectionStatus.value;
+    if (oldStatus != status) {
+      _peerConnectionStatus.value = status;
+      if (_peerConnectionStatus.value == PeerConnectionStatus.connected) {
+        DialogUtil.info(context,
+            content: AppLocalizations.t(
+                'PeerConnection status was changed from ${oldStatus.name} to ${status.name}'));
+      } else {
+        DialogUtil.error(context,
+            content: AppLocalizations.t(
+                'PeerConnection status was changed from ${oldStatus.name} to ${status.name}'));
       }
-    }
-    _peerConnectionStatus.value = status;
-  }
-
-  _updatePeerConnectionStatus() {
-    _initPeerConnectionStatus();
-    if (_peerConnectionStatus.value == PeerConnectionStatus.connected) {
-      DialogUtil.info(context,
-          content: AppLocalizations.t('PeerConnection status was changed to:') +
-              _peerConnectionStatus.value.name);
-    } else {
-      DialogUtil.error(context,
-          content: AppLocalizations.t('PeerConnection were break down'));
     }
   }
 
@@ -207,8 +207,8 @@ class _ChatMessageViewState extends State<ChatMessageView> {
 
   @override
   void dispose() {
-    chatMessageController.removeListener(_update);
-    peerConnectionPoolController.removeListener(_updatePeerConnectionStatus);
+    peerConnectionPool.unregisterWebrtcEvent(
+        peerId, WebrtcEventType.status, _updatePeerConnectionStatus);
     super.dispose();
   }
 }
