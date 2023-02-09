@@ -12,7 +12,7 @@ class ConnectAction extends BaseAction {
     //logger.i('Action MsgType $msgType');
   }
 
-  Future<ChainMessage?> connect(PeerClient peerClient) async {
+  Future<bool> connect(PeerClient peerClient) async {
     if (StringUtil.isNotEmpty(peerClient.mobile)) {
       peerClient.mobile = CryptoUtil.encodeBase64(
           await cryptoGraphy.hash(peerClient.mobile!.codeUnits));
@@ -27,9 +27,7 @@ class ConnectAction extends BaseAction {
     peerClient.connectPeerId = chainMessage.connectPeerId;
     peerClient.connectAddress = chainMessage.connectAddress;
 
-    ChainMessage? response = await send(chainMessage);
-
-    return response;
+    return await send(chainMessage);
   }
 
   @override

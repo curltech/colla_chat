@@ -429,7 +429,7 @@ class PeerConnectionPool {
     return advancedPeerConnection;
   }
 
-  onSignal(ChainMessage chainMessage) async {
+  Future<void> onSignal(ChainMessage chainMessage) async {
     if (chainMessage.srcPeerId == null) {
       logger.e('chainMessage.srcPeerId is null');
       return;
@@ -531,7 +531,7 @@ class PeerConnectionPool {
   }
 
   ///从websocket的ChainMessage方式，chatAction接收到的ChatMessage
-  onChat(ChainMessage chainMessage) async {
+  Future<void> onChat(ChainMessage chainMessage) async {
     if (chainMessage.srcPeerId == null) {
       logger.e('chainMessage.srcPeerId is null');
       return;

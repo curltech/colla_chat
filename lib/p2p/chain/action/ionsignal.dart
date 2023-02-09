@@ -13,18 +13,12 @@ class IonSignalAction extends BaseAction {
     //ionSfuClientPool.registSignalAction(this);
   }
 
-  Future<dynamic> signal(dynamic data, String targetPeerId) async {
+  Future<bool> signal(dynamic data, String targetPeerId) async {
     ChainMessage? chainMessage =
         await prepareSend(data, targetPeerId: targetPeerId);
     chainMessage.needEncrypt = true;
 
-    ChainMessage? response = await send(chainMessage);
-    if (response != null) {
-      logger.i('IonSignal response:${JsonUtil.toJsonString(response)}');
-      return response.payload;
-    }
-
-    return null;
+    return await send(chainMessage);
   }
 }
 

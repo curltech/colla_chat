@@ -9,7 +9,7 @@ import 'package:colla_chat/tool/string_util.dart';
 class FindClientAction extends BaseAction {
   FindClientAction(MsgType msgType) : super(msgType);
 
-  Future<List<dynamic>?> findClient(
+  Future<bool> findClient(
       String targetPeerId, String mobile, String email, String name) async {
     if (StringUtil.isNotEmpty(mobile)) {
       mobile =
@@ -25,12 +25,7 @@ class FindClientAction extends BaseAction {
       'name': name
     });
 
-    ChainMessage? response = await send(chainMessage);
-    if (response != null) {
-      return response.payload;
-    }
-
-    return null;
+    return await send(chainMessage);
   }
 
   @override

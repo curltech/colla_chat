@@ -7,15 +7,10 @@ import 'package:colla_chat/p2p/chain/baseaction.dart';
 class GetValueAction extends BaseAction {
   GetValueAction(MsgType msgType) : super(msgType);
 
-  Future<dynamic> getValue(String key) async {
+  Future<bool> getValue(String key) async {
     ChainMessage chainMessage = await prepareSend({'key': key});
 
-    ChainMessage? response = await send(chainMessage);
-    if (response != null) {
-      return response.payload;
-    }
-
-    return null;
+    return await send(chainMessage);
   }
 }
 

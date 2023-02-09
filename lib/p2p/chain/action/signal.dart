@@ -7,7 +7,7 @@ class SignalAction extends BaseAction {
   SignalAction(MsgType msgType) : super(msgType);
 
   ///发送webrtc信号
-  Future<dynamic> signal(WebrtcSignal signal, String targetPeerId,
+  Future<bool> signal(WebrtcSignal signal, String targetPeerId,
       {String? targetClientId}) async {
     ChainMessage? chainMessage = await signalAction.prepareSend(signal,
         targetPeerId: targetPeerId, targetClientId: targetClientId);
@@ -15,12 +15,7 @@ class SignalAction extends BaseAction {
     chainMessage.needEncrypt = false;
     chainMessage.needCompress = false;
 
-    ChainMessage? response = await signalAction.send(chainMessage);
-    if (response != null) {
-      return response.payload;
-    }
-
-    return null;
+    return await signalAction.send(chainMessage);
   }
 
   @override

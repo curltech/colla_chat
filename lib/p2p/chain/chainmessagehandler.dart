@@ -1,14 +1,21 @@
 import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/entity/dht/peerclient.dart';
+import 'package:colla_chat/entity/dht/peerendpoint.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
+import 'package:colla_chat/p2p/chain/baseaction.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/service/p2p/message_serializer.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/httpclient.dart';
 import 'package:colla_chat/transport/websocket.dart';
 import 'package:dio/dio.dart';
+import 'package:uuid/uuid.dart';
 
 const packetSize = 4 * 1024 * 1024;
 const webRtcPacketSize = 128 * 1024;
@@ -22,46 +29,108 @@ class ChainMessageHandler {
     // ionSfuClientPool.registProtocolHandler(config.appParams.chainProtocolId, this.receiveRaw);
   }
 
+  ///发送前的预处理，设置消息的初始值
+  ///如果targetPeerId不为空，指的是目标peerclient，否则是直接向connectPeerId的peerendpoint发送信息
+  ///传入数据为对象，先转换成json字符串，然后utf-8格式的List<int>
+  Future<ChainMessage> prepareSend(dynamic data, MsgType msgType,
+      {String? connectAddress,
+      String? connectPeerId,
+      String? targetPeerId,
+      String? topic,
+      String? targetClientId}) async {
+    ChainMessage chainMessage = ChainMessage();
+    //如果指出了目标客户端，则查询目标客户端的信息
+    if (targetPeerId != null) {
+      PeerClient? peerClient =
+          await peerClientService.findCachedOneByPeerId(targetPeerId);
+      if (peerClient != null) {
+        chainMessage.targetConnectAddress = peerClient.connectAddress;
+        chainMessage.targetConnectPeerId = peerClient.connectPeerId;
+        targetClientId ??= peerClient.clientId;
+        //如果没有指定connectPeerId，本次优先采用目标的最近连接节点
+        if (connectPeerId == null) {
+          connectPeerId = peerClient.connectPeerId;
+          connectAddress = peerClient.connectAddress;
+        }
+      }
+    } else {
+      //消息发给连接节点，websocket协议下不用加密，libp2p自动加密
+      chainMessage.needEncrypt = false;
+    }
+    chainMessage.targetPeerId = targetPeerId;
+    chainMessage.targetClientId = targetClientId;
+
+    //查找本次连接节点，最差是获取缺省的连接节点
+    PeerEndpoint? peerEndpoint = peerEndpointController.find(
+        peerId: connectPeerId, address: connectAddress);
+    if (peerEndpoint != null) {
+      connectPeerId = peerEndpoint.peerId;
+      connectAddress = peerEndpoint.wsConnectAddress;
+    }
+    chainMessage.connectPeerId = connectPeerId;
+    chainMessage.connectAddress = connectAddress;
+    if (connectPeerId != null) {
+      Websocket? websocket = await websocketPool.get(connectPeerId);
+      if (websocket != null) {
+        chainMessage.connectSessionId = websocket.sessionId;
+      }
+    }
+
+    //本客户机最近的连接节点的属性，对方回信的时候可以用于连接
+    PeerEndpoint? defaultPeerEndpoint =
+        peerEndpointController.defaultPeerEndpoint;
+    if (defaultPeerEndpoint != null) {
+      chainMessage.srcConnectAddress = defaultPeerEndpoint.wsConnectAddress;
+      chainMessage.srcConnectPeerId = defaultPeerEndpoint.peerId;
+      Websocket? websocket =
+          await websocketPool.get(defaultPeerEndpoint.wsConnectAddress!);
+      if (websocket != null) {
+        chainMessage.srcConnectSessionId = websocket.sessionId;
+      }
+    }
+
+    if (topic == null && appDataProvider.topics.isNotEmpty) {
+      topic ??= appDataProvider.topics[0];
+    }
+    chainMessage.topic = topic;
+    //把负载变成字符串格式
+    var jsonStr = JsonUtil.toJsonString(data);
+
+    /// 把负载变成utf8的二进制的数组，方便计数和进一步的处理
+    List<int> payload = CryptoUtil.stringToUtf8(jsonStr);
+    chainMessage.payload = payload;
+    chainMessage.payloadType = PayloadType.map.name;
+    chainMessage.messageType = msgType.name;
+    chainMessage.messageDirect = MsgDirect.Request.name;
+    var uuid = const Uuid();
+    chainMessage.uuid = uuid.v4();
+    chainMessage.srcPeerId = myself.peerId;
+    chainMessage.srcClientId = myself.clientId;
+
+    return chainMessage;
+  }
+
   /// 将接收的原始数据还原成ChainMessage，然后根据消息类型进行分支处理
   /// 并将处理的结果转换成原始数据，发回去
-  Future<List<int>?> receiveRaw(
-      List<int> data, String remotePeerId, String remoteAddr) async {
-    ChainMessage? response;
+  Future<void> receiveRaw(
+      List<int> data, String? remotePeerId, String? remoteAddr) async {
     var json = JsonUtil.toJson(String.fromCharCodes(data));
     ChainMessage chainMessage = ChainMessage.fromJson(json);
-    // 源节点的id和地址
+    // 源节点的peerid和地址
     chainMessage.srcPeerId ??= remotePeerId;
     chainMessage.srcConnectAddress ??= remoteAddr;
-    response = await chainMessageHandler.receive(chainMessage);
-
-    ///把响应报文转成原始数据
-    if (response != null) {
-      try {
-        await chainMessageHandler.encrypt(response);
-      } catch (err) {
-        response =
-            chainMessageHandler.error(chainMessage.messageType, err.toString());
-      }
-      chainMessageHandler.setResponse(chainMessage, response);
-      List<int> responseData = MessageSerializer.marshal(response);
-
-      return responseData;
-    }
-    return null;
+    await chainMessageHandler.receive(chainMessage);
   }
 
   /// 将返回的原始报文数据转换成chainmessge
   /// @param data
   /// @param remotePeerId
   /// @param remoteAddr
-  Future<ChainMessage?> responseRaw(List<int> data,
+  Future<void> responseRaw(List<int> data,
       {String? remotePeerId, String? remoteAddr}) async {
-    ChainMessage? response;
     var json = JsonUtil.toJson(String.fromCharCodes(data));
     ChainMessage chainMessage = ChainMessage.fromJson(json);
-    response = await chainMessageHandler.receive(chainMessage);
-
-    return response;
+    await chainMessageHandler.receive(chainMessage);
   }
 
   // 发送ChainMessage消息的唯一方法
@@ -69,7 +138,7 @@ class ChainMessageHandler {
   // 2.根据情况处理校验，加密，压缩等
   // 3.建立合适的通道并发送，比如libp2p的Pipe并Write消息流
   // 4.等待即时的返回，校验，解密，解压缩等
-  Future<ChainMessage?> send(ChainMessage chainMessage) async {
+  Future<bool> send(ChainMessage chainMessage) async {
     // * 消息的发送方式由二个字段决定
     // * connectPeerId表示采用篇libp2p发送到p2p节点
     // * connectAddress表示采用https，wss发送
@@ -114,12 +183,8 @@ class ChainMessageHandler {
           success = true;
         }
       }
-      if (!success) {
-        throw 'send failure';
-      }
     } catch (err) {
       logger.e('send message:$err');
-      throw err.toString();
     }
 
     // 把响应数据转换成chainmessage
@@ -127,42 +192,50 @@ class ChainMessageHandler {
       ChainMessage? response;
       if (result is Map) {
         response = ChainMessage.fromJson(result);
-        response = await chainMessageHandler.receive(response);
+        await chainMessageHandler.receive(response);
       } else if (result is List<int>) {
-        response = await chainMessageHandler.responseRaw(result);
+        await chainMessageHandler.responseRaw(result);
       }
-
-      return response;
     }
 
-    return null;
+    return success;
   }
 
   /// 接收报文处理的入口，包括接收请求报文和返回报文，并分配不同的处理方法
-  Future<ChainMessage?> receive(ChainMessage chainMessage) async {
+  Future<void> receive(ChainMessage chainMessage) async {
     await chainMessageHandler.decrypt(chainMessage);
     var typ = chainMessage.messageType;
     var direct = chainMessage.messageDirect;
-    var handlers = chainMessageDispatch.getChainMessageHandler(typ);
-    var sendHandler = handlers['sendHandler'];
-    var receiveHandler = handlers['receiveHandler'];
-    var responseHandler = handlers['responseHandler'];
-    ChainMessage? response;
+    Map<String, Future<void> Function(ChainMessage)> handlers =
+        chainMessageDispatch.getChainMessageHandler(typ);
+    Future<void> Function(ChainMessage)? receiveHandler =
+        handlers['receiveHandler'];
+    Future<void> Function(ChainMessage)? responseHandler =
+        handlers['responseHandler'];
     //分发到对应注册好的处理器，主要是Receive和Response方法
     if (direct == MsgDirect.Request.name) {
-      try {
-        response = await receiveHandler(chainMessage);
-      } catch (err) {
-        logger.e('receiveHandler chainMessage:$err');
-        response = chainMessageHandler.error(typ, err.toString());
-
-        return response;
+      if (receiveHandler != null) {
+        try {
+          await receiveHandler(chainMessage);
+        } catch (err) {
+          logger.e('receiveHandler chainMessage:$err');
+          if (chainMessage.srcPeerId != null) {
+            //chatAction.chat(err.toString(), chainMessage.srcPeerId!);
+          }
+        }
       }
     } else if (direct == MsgDirect.Response.name) {
-      response = await responseHandler(chainMessage);
+      if (responseHandler != null) {
+        try {
+          await responseHandler(chainMessage);
+        } catch (err) {
+          logger.e('responseHandler chainMessage:$err');
+          if (chainMessage.srcPeerId != null) {
+            //chatAction.chat(err.toString(), chainMessage.srcPeerId!);
+          }
+        }
+      }
     }
-
-    return response;
   }
 
   /// 发送消息前负载的加密处理
@@ -244,54 +317,6 @@ class ChainMessageHandler {
     return chainMessage;
   }
 
-  ChainMessage error(String msgType, dynamic err) {
-    var errMessage = ChainMessage();
-    errMessage.payload = MsgType.ERROR.name.codeUnits;
-    errMessage.messageType = msgType;
-    errMessage.tip = err;
-    errMessage.messageDirect = MsgDirect.Response.name;
-
-    return errMessage;
-  }
-
-  ChainMessage response(String msgType, dynamic payload) {
-    var responseMessage = ChainMessage();
-    responseMessage.payload = payload;
-    responseMessage.messageType = msgType;
-    responseMessage.messageDirect = MsgDirect.Response.name;
-
-    return responseMessage;
-  }
-
-  ChainMessage ok(String msgType) {
-    var okMessage = ChainMessage();
-    okMessage.payload = MsgType.OK.name.codeUnits;
-    okMessage.messageType = msgType;
-    okMessage.tip = "OK";
-    okMessage.messageDirect = MsgDirect.Response.name;
-
-    return okMessage;
-  }
-
-  ChainMessage wait(String msgType) {
-    var waitMessage = ChainMessage();
-    waitMessage.payload = MsgType.WAIT.name.codeUnits;
-
-    waitMessage.messageType = msgType;
-
-    waitMessage.tip = "WAIT";
-
-    waitMessage.messageDirect = MsgDirect.Response.name;
-
-    return waitMessage;
-  }
-
-  setResponse(ChainMessage request, ChainMessage response) {
-    response.connectAddress = request.connectAddress;
-    response.connectPeerId = request.connectPeerId;
-    response.topic = request.topic;
-  }
-
   validate(ChainMessage chainMessage) {
     if (chainMessage.connectPeerId == null) {
       throw 'NullConnectPeerId';
@@ -305,10 +330,10 @@ class ChainMessageHandler {
   /// @param chainMessage
   List<ChainMessage> slice(ChainMessage chainMessage) {
     List<int> payload = chainMessage.payload as List<int>;
-    var _packSize = (chainMessage.messageType != MsgType.P2PCHAT.name)
+    var packSize = (chainMessage.messageType != MsgType.P2PCHAT.name)
         ? packetSize
         : webRtcPacketSize;
-    if (!chainMessage.needSlice || payload.length <= _packSize) {
+    if (!chainMessage.needSlice || payload.length <= packSize) {
       return [chainMessage];
     }
 
@@ -316,7 +341,7 @@ class ChainMessageHandler {
     if (chainMessage.srcPeerId != null) {
       return [chainMessage];
     }
-    int sliceSize = payload.length ~/ _packSize;
+    int sliceSize = payload.length ~/ packSize;
     //sliceSize = math.ceil(sliceSize);
     chainMessage.sliceSize = sliceSize;
     List<ChainMessage> slices = [];
@@ -326,9 +351,9 @@ class ChainMessageHandler {
       slice.sliceNumber = i;
       List<int> slicePayload;
       if (i == sliceSize - 1) {
-        slicePayload = payload.sublist(i * _packSize, payload.length);
+        slicePayload = payload.sublist(i * packSize, payload.length);
       } else {
-        slicePayload = payload.sublist(i * _packSize, (i + 1) * _packSize);
+        slicePayload = payload.sublist(i * packSize, (i + 1) * packSize);
       }
       slice.payload = slicePayload;
       slices.add(slice);
@@ -383,10 +408,11 @@ var chainMessageHandler = ChainMessageHandler();
 /// 根据ChainMessage的类型进行分派
 class ChainMessageDispatch {
   //   为每个消息类型注册接收和发送的处理函数，从ChainMessage中解析出消息类型，自动分发到合适的处理函数
+  Map<String, Map<String, Future<void> Function(ChainMessage chainMessage)>>
+      chainMessageHandlers = {};
 
-  Map<String, Map<String, dynamic>> chainMessageHandlers = {};
-
-  Map<String, dynamic> getChainMessageHandler(String msgType) {
+  Map<String, Future<void> Function(ChainMessage chainMessage)>
+      getChainMessageHandler(String msgType) {
     var chainMessageHandler = chainMessageHandlers[msgType];
     if (chainMessageHandler != null) {
       return chainMessageHandler;
@@ -394,10 +420,12 @@ class ChainMessageDispatch {
     throw '';
   }
 
-  registerChainMessageHandler(String msgType, dynamic sendHandler,
-      dynamic receiveHandler, dynamic responseHandler) {
-    Map<String, dynamic> chainMessageHandler = {
-      'sendHandler': sendHandler,
+  registerChainMessageHandler(
+      String msgType,
+      Future<void> Function(ChainMessage chainMessage) receiveHandler,
+      Future<void> Function(ChainMessage chainMessage) responseHandler) {
+    Map<String, Future<void> Function(ChainMessage chainMessage)>
+        chainMessageHandler = {
       'receiveHandler': receiveHandler,
       'responseHandler': responseHandler
     };

@@ -7,17 +7,12 @@ import 'package:colla_chat/p2p/chain/baseaction.dart';
 class PingAction extends BaseAction {
   PingAction(MsgType msgType) : super(msgType);
 
-  Future<dynamic> ping(dynamic data, String targetPeerId) async {
+  Future<bool> ping(dynamic data, String targetPeerId) async {
     ChainMessage chainMessage =
         await prepareSend(data, targetPeerId: targetPeerId);
     //chainMessage.NeedEncrypt = true
 
-    ChainMessage? response = await send(chainMessage);
-    if (response != null) {
-      return response.payload;
-    }
-
-    return null;
+    return await send(chainMessage);
   }
 }
 

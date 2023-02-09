@@ -483,10 +483,10 @@ class DataBlockService extends BaseService {
         conditionBean['receiverPeer'] = true;
       }
     }
-    List? blocks = await queryValueAction.queryValue(conditionBean);
-    if (blocks != null && TypeUtil.isArray(blocks)) {
-      blockMap = DataBlockService.group(blocks as List<DataBlock>);
-    }
+    // List? blocks = await queryValueAction.queryValue(conditionBean);
+    // if (blocks != null && TypeUtil.isArray(blocks)) {
+    //   blockMap = DataBlockService.group(blocks as List<DataBlock>);
+    // }
 
     return blockMap;
   }

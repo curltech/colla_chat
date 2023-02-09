@@ -7,15 +7,10 @@ import 'package:colla_chat/tool/json_util.dart';
 class FindPeerAction extends BaseAction {
   FindPeerAction(MsgType msgType) : super(msgType);
 
-  Future<dynamic> findPeer(String targetPeerId) async {
+  Future<bool> findPeer(String targetPeerId) async {
     ChainMessage? chainMessage = await prepareSend({'peerId': targetPeerId});
 
-    ChainMessage? response = await send(chainMessage);
-    if (response != null) {
-      return response.payload;
-    }
-
-    return null;
+    return await send(chainMessage);
   }
 
   @override

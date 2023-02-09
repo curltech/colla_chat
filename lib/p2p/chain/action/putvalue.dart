@@ -7,20 +7,11 @@ import 'package:colla_chat/p2p/chain/baseaction.dart';
 class PutValueAction extends BaseAction {
   PutValueAction(MsgType msgType) : super(msgType);
 
-  Future<dynamic> putValue(String payloadType, dynamic value) async {
+  Future<bool> putValue(String payloadType, dynamic value) async {
     ChainMessage? chainMessage = await prepareSend(value);
     chainMessage.payloadType = payloadType;
 
-    ChainMessage? response = await send(chainMessage);
-    if (response != null) {
-      if (response.payload == MsgType.ERROR) {
-        return response.tip;
-      } else {
-        return response.payload;
-      }
-    }
-
-    return null;
+    return await send(chainMessage);
   }
 }
 

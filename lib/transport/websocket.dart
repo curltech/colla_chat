@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:colla_chat/entity/dht/peerendpoint.dart';
 import 'package:colla_chat/p2p/chain/chainmessagehandler.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -20,8 +21,10 @@ enum SocketStatus {
   reconnecting,
 }
 
+const String prefix = 'wss://';
+
 class Websocket extends IWebClient {
-  String prefix = 'wss://';
+  String? peerId;
   late String address;
   WebSocketChannel? channel;
   String? sessionId;
@@ -33,7 +36,7 @@ class Websocket extends IWebClient {
   int reconnectTimes = 5;
   Function(Websocket websocket, SocketStatus status)? onStatusChange;
 
-  Websocket(this.address, Function() postConnected) {
+  Websocket(this.address, Function() postConnected, {this.peerId}) {
     if (!address.startsWith(prefix)) {
       throw 'error wss address prefix';
     }
@@ -72,10 +75,7 @@ class Websocket extends IWebClient {
         logger.w('wss sessionId has changed:$address:${this.sessionId}');
       }
     } else {
-      var response = await chainMessageHandler.receiveRaw(data, '', '');
-      if (response != null) {
-        sendMsg(response);
-      }
+      await chainMessageHandler.receiveRaw(data, peerId, address);
     }
   }
 
@@ -218,6 +218,7 @@ class WebsocketPool with ChangeNotifier {
     var defaultPeerEndpoint = peerEndpointController.defaultPeerEndpoint;
     if (defaultPeerEndpoint != null) {
       var defaultAddress = defaultPeerEndpoint.wsConnectAddress;
+      var defaultPeerId = defaultPeerEndpoint.peerId;
       Websocket? websocket;
       if (websockets.containsKey(defaultAddress)) {
         websocket = websockets[defaultAddress];
@@ -225,7 +226,8 @@ class WebsocketPool with ChangeNotifier {
         await websocket!.reconnect();
       } else {
         if (defaultAddress != null && defaultAddress.startsWith('ws')) {
-          websocket = Websocket(defaultAddress, myselfPeerService.connect);
+          websocket = Websocket(defaultAddress, myselfPeerService.connect,
+              peerId: defaultPeerId);
           await websocket.connect();
           if (websocket._status == SocketStatus.connected) {
             websockets[defaultAddress] = websocket;
@@ -248,7 +250,14 @@ class WebsocketPool with ChangeNotifier {
       websocket = websockets[address];
     } else {
       if (address.startsWith('ws')) {
-        websocket = Websocket(address, myselfPeerService.connect);
+        String? peerId;
+        PeerEndpoint? peerEndpoint =
+            peerEndpointController.find(address: address);
+        if (peerEndpoint != null) {
+          peerId = peerEndpoint.peerId;
+        }
+        websocket =
+            Websocket(address, myselfPeerService.connect, peerId: peerId);
         websocket.onStatusChange = onStatusChange;
         await websocket.connect();
         if (websocket._status == SocketStatus.connected) {
