@@ -12,7 +12,8 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:cryptography/cryptography.dart';
 
-const int compressLimit = 2048;
+///0表示不会根据长度来决定是否压缩
+const int compressLimit = 0; //2048;
 
 abstract class SecurityContextService {
   Future<bool> encrypt(SecurityContext securityContext);
