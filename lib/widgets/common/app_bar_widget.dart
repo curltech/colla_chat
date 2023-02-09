@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -143,12 +144,15 @@ class AppBarWidget {
         ++i;
       }
       popMenuButton = PopupMenuButton<int>(
-        color: Colors.grey.withOpacity(1),
+        color: Colors.grey.withOpacity(AppOpacity.smOpacity),
         itemBuilder: (BuildContext context) {
           return items;
         },
-
-        ///调用下拉按钮的回调函数，参数为按钮序号
+        icon: const Icon(
+          Icons.more_vert,
+          color: Colors.white,
+        ),
+        //调用下拉按钮的回调函数，参数为按钮序号
         onSelected: (int index) async {
           var onPress = onPressed[index];
           if (onPress != null) {

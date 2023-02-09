@@ -373,6 +373,13 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
       labelColor: Colors.white,
       padding: const EdgeInsets.all(0.0),
       labelPadding: const EdgeInsets.all(0.0),
+      onTap: (int index) {
+        if (index == 0) {
+          _searchLinkman(_linkmanTextController.text);
+        } else if (index == 1) {
+          _searchGroup(_groupTextController.text);
+        }
+      },
     );
 
     var linkmanView = Column(children: [

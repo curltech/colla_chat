@@ -191,10 +191,14 @@ class ChatMessage extends StatusEntity {
         primaryAddress = json['primaryAddress'],
         payloadKey = json['payloadKey'],
         ephemeralPublicKey = json['ephemeralPublicKey'],
-        needCompress = json['needCompress'] == true || json['needCompress'] == 1
+        needCompress = json['needEncrypt'] == null ||
+                json['needCompress'] == true ||
+                json['needCompress'] == 1
             ? true
             : false,
-        needEncrypt = json['needEncrypt'] == true || json['needEncrypt'] == 1
+        needEncrypt = json['needEncrypt'] == null ||
+                json['needEncrypt'] == true ||
+                json['needEncrypt'] == 1
             ? true
             : false,
         needReceipt = json['needReceipt'] == true || json['needReceipt'] == 1
@@ -357,6 +361,8 @@ class ChatSummary extends StatusEntity {
   String? thumbnail; // 预览缩略图（base64图片，适用需预览的content，如笔记、联系人名片）
   String? content;
   String? contentType;
+  bool needCompress = true;
+  bool needEncrypt = true;
   String? sendReceiveTime; // 发送接收时间
   int unreadNumber = 0;
   String? payloadHash;
@@ -378,6 +384,16 @@ class ChatSummary extends StatusEntity {
         thumbnail = json['thumbnail'],
         content = json['content'],
         contentType = json['contentType'],
+        needCompress = json['needEncrypt'] == null ||
+                json['needCompress'] == true ||
+                json['needCompress'] == 1
+            ? true
+            : false,
+        needEncrypt = json['needEncrypt'] == null ||
+                json['needEncrypt'] == true ||
+                json['needEncrypt'] == 1
+            ? true
+            : false,
         sendReceiveTime = json['sendReceiveTime'],
         unreadNumber = json['unreadNumber'],
         payloadKey = json['payloadKey'],
@@ -400,6 +416,8 @@ class ChatSummary extends StatusEntity {
       'thumbnail': thumbnail,
       'content': content,
       'contentType': contentType,
+      'needCompress': needCompress,
+      'needEncrypt': needEncrypt,
       'sendReceiveTime': sendReceiveTime,
       'unreadNumber': unreadNumber,
       'payloadKey': payloadKey,

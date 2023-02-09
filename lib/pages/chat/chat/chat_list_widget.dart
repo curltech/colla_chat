@@ -345,6 +345,13 @@ class _ChatListWidgetState extends State<ChatListWidget>
       labelColor: Colors.white,
       padding: const EdgeInsets.all(0.0),
       labelPadding: const EdgeInsets.all(0.0),
+      onTap: (int index) {
+        if (index == 0) {
+          linkmanChatSummaryController.refresh();
+        } else if (index == 1) {
+          groupChatSummaryController.refresh();
+        }
+      },
     );
 
     var linkmanView = ValueListenableBuilder(
