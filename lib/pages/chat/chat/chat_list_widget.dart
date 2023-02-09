@@ -18,11 +18,36 @@ import 'package:colla_chat/transport/websocket.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
+import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+class ConnectivityController with ChangeNotifier {
+  late StreamSubscription<ConnectivityResult> subscription;
+  ConnectivityResult connectivityResult = ConnectivityResult.none;
+
+  ConnectivityController() {
+    subscription =
+        ConnectivityUtil.onConnectivityChanged(_onConnectivityChanged);
+  }
+
+  _onConnectivityChanged(ConnectivityResult result) {
+    if (result != connectivityResult) {
+      connectivityResult = result;
+      notifyListeners();
+    }
+  }
+
+  @override
+  void dispose() {
+    ConnectivityUtil.cancel(subscription);
+    super.dispose();
+  }
+}
+
+ConnectivityController connectivityController = ConnectivityController();
 
 ///好友的汇总控制器，每当消息汇总表的数据有变化时更新控制器
 class LinkmanChatSummaryController extends DataListController<ChatSummary> {
@@ -55,8 +80,6 @@ final GroupChatSummaryController groupChatSummaryController =
 /// 聊天的主页面，展示可以聊天的目标对象，可以是一个人，或者是一个群
 /// 选择好目标点击进入具体的聊天页面ChatMessage
 class ChatListWidget extends StatefulWidget with TileDataMixin {
-  final GroupDataListController groupDataListController =
-      GroupDataListController();
   final ChatMessageView chatMessageView = ChatMessageView();
 
   ChatListWidget({Key? key}) : super(key: key) {
@@ -79,32 +102,47 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
   String get title => 'Chat';
 }
 
-class _ChatListWidgetState extends State<ChatListWidget> {
+class _ChatListWidgetState extends State<ChatListWidget>
+    with TickerProviderStateMixin {
   final ValueNotifier<ConnectivityResult> _connectivityResult =
-      ValueNotifier<ConnectivityResult>(ConnectivityResult.none);
-  final ValueNotifier<SocketStatus> _socketStatus =
-      ValueNotifier<SocketStatus>(SocketStatus.closed);
-  late StreamSubscription<ConnectivityResult> subscription;
+      ValueNotifier<ConnectivityResult>(
+          connectivityController.connectivityResult);
+  late ValueNotifier<SocketStatus> _socketStatus;
+
+  final ValueNotifier<List<TileData>> _linkmanTileData =
+      ValueNotifier<List<TileData>>([]);
+  final ValueNotifier<List<TileData>> _groupTileData =
+      ValueNotifier<List<TileData>>([]);
+  final ValueNotifier<int> _currentTab = ValueNotifier<int>(0);
+
+  late TabController _tabController;
 
   @override
   initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(_updateCurrentTab);
     _reconnect();
-    linkmanChatSummaryController.addListener(_update);
+
+    linkmanChatSummaryController.addListener(_updateLinkmanChatSummary);
     linkmanChatSummaryController.refresh();
-    groupChatSummaryController.addListener(_update);
+    groupChatSummaryController.addListener(_updateGroupChatSummary);
     groupChatSummaryController.refresh();
+
+    connectivityController.addListener(_updateConnectivity);
+
+    Websocket? websocket = websocketPool.getDefault();
+    if (websocket != null) {
+      websocketPool.registerStatusChange(
+          websocket.address, _updateWebsocketStatus);
+      _socketStatus = ValueNotifier<SocketStatus>(websocket.status);
+    } else {
+      _socketStatus = ValueNotifier<SocketStatus>(SocketStatus.closed);
+    }
 
     var indexWidgetProvider =
         Provider.of<IndexWidgetProvider>(context, listen: false);
     indexWidgetProvider.define(widget.chatMessageView);
-    websocketPool.addListener(_updateWebsocket);
-    subscription =
-        ConnectivityUtil.onConnectivityChanged(_onConnectivityChanged);
-    Websocket? websocket = websocketPool.getDefault();
-    if (websocket != null) {
-      _socketStatus.value = websocket.status;
-    }
   }
 
   ///如果没有缺省的websocket，尝试重连
@@ -115,35 +153,20 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     }
   }
 
-  _update() {
-    setState(() {});
+  _updateCurrentTab() {
+    _currentTab.value = _tabController.index;
   }
 
-  _updateWebsocket() {
-    Websocket? websocket = websocketPool.getDefault();
-    if (websocket != null) {
-      if (_socketStatus.value != websocket.status) {
-        _socketStatus.value = websocket.status;
-        if (_socketStatus.value == SocketStatus.connected) {
-          DialogUtil.info(context,
-              content: AppLocalizations.t('Websocket status was changed to:') +
-                  _socketStatus.value.name);
-        } else {
-          DialogUtil.error(context,
-              content: AppLocalizations.t('Websocket status was changed to:') +
-                  _socketStatus.value.name);
-        }
-      }
-    } else {
-      if (_socketStatus.value != SocketStatus.closed) {
-        _socketStatus.value = SocketStatus.closed;
-        DialogUtil.error(context,
-            content: AppLocalizations.t('Websocket were break down'));
-      }
-    }
+  _updateLinkmanChatSummary() {
+    _buildLinkmanTileData();
   }
 
-  _onConnectivityChanged(ConnectivityResult result) {
+  _updateGroupChatSummary() {
+    _buildGroupTileData();
+  }
+
+  _updateConnectivity() {
+    var result = connectivityController.connectivityResult;
     if (result == ConnectivityResult.none) {
       DialogUtil.error(context,
           content: AppLocalizations.t('Connectivity were break down'));
@@ -155,9 +178,23 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     _connectivityResult.value = result;
   }
 
-  _buildGroupDataListController() async {
-    widget.groupDataListController.controllers.clear();
-    Map<TileData, List<TileData>> tileData = {};
+  _updateWebsocketStatus(String address, SocketStatus socketStatus) {
+    var status = _socketStatus.value;
+    _socketStatus.value = socketStatus;
+    if (socketStatus != status) {
+      if (_socketStatus.value == SocketStatus.connected) {
+        DialogUtil.info(context,
+            content: AppLocalizations.t('Websocket status was changed to:') +
+                _socketStatus.value.name);
+      } else {
+        DialogUtil.error(context,
+            content: AppLocalizations.t('Websocket status was changed to:') +
+                _socketStatus.value.name);
+      }
+    }
+  }
+
+  _buildLinkmanTileData() async {
     var linkmenChatSummary = linkmanChatSummaryController.data;
     List<TileData> tiles = [];
     if (linkmenChatSummary.isNotEmpty) {
@@ -206,14 +243,12 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         tiles.add(tile);
       }
     }
+    _linkmanTileData.value = tiles;
+  }
 
-    tileData[TileData(
-        prefix: myself.avatarImage ?? AppImage.mdAppImage,
-        title: 'Linkman')] = tiles;
-    widget.groupDataListController.addAll(tileData: tileData);
-
+  _buildGroupTileData() async {
     var groupChatSummary = groupChatSummaryController.data;
-    tiles = [];
+    List<TileData> tiles = [];
     if (groupChatSummary.isNotEmpty) {
       for (var chatSummary in groupChatSummary) {
         var title = chatSummary.name ?? '';
@@ -260,38 +295,85 @@ class _ChatListWidgetState extends State<ChatListWidget> {
         tiles.add(tile);
       }
     }
-    tileData[TileData(
-        prefix: myself.avatarImage ?? AppImage.mdAppImage,
-        title: 'Group')] = tiles;
-    widget.groupDataListController.addAll(tileData: tileData);
+    _groupTileData.value = tiles;
   }
 
-  _onTap(int index, String title, {String? subtitle, TileData? group}) {
-    if (group != null) {
-      ChatSummary? current;
-      if (group.title == 'Linkman') {
-        linkmanChatSummaryController.currentIndex = index;
-        current = linkmanChatSummaryController.current;
-      }
-      if (group.title == 'Group') {
-        groupChatSummaryController.currentIndex = index;
-        current = groupChatSummaryController.current;
-      }
+  _onTapLinkman(int index, String title, {String? subtitle, TileData? group}) {
+    linkmanChatSummaryController.currentIndex = index;
+    ChatSummary? current = linkmanChatSummaryController.current;
 
-      ///更新消息控制器的当前消息汇总，从而确定拥有消息的好友或者群
-      chatMessageController.chatSummary = current;
-    }
+    ///更新消息控制器的当前消息汇总，从而确定拥有消息的好友或者群
+    chatMessageController.chatSummary = current;
   }
 
-  Widget _buildGroupDataListView(BuildContext context) {
-    _buildGroupDataListController();
-    var groupDataListView = KeepAliveWrapper(
-        child: GroupDataListView(
-      onTap: _onTap,
-      controller: widget.groupDataListController,
+  _onTapGroup(int index, String title, {String? subtitle, TileData? group}) {
+    groupChatSummaryController.currentIndex = index;
+    ChatSummary? current = groupChatSummaryController.current;
+
+    ///更新消息控制器的当前消息汇总，从而确定拥有消息的好友或者群
+    chatMessageController.chatSummary = current;
+  }
+
+  Widget _buildChatListView(BuildContext context) {
+    final List<Widget> tabs = <Widget>[
+      ValueListenableBuilder(
+          valueListenable: _currentTab,
+          builder: (context, value, child) {
+            return Tab(
+              icon: Icon(Icons.person,
+                  color: value == 0 ? myself.primary : Colors.white),
+              //text: AppLocalizations.t('Linkman'),
+              iconMargin: const EdgeInsets.all(0.0),
+            );
+          }),
+      ValueListenableBuilder(
+          valueListenable: _currentTab,
+          builder: (context, value, child) {
+            return Tab(
+              icon: Icon(Icons.group,
+                  color: value == 1 ? myself.primary : Colors.white),
+              //text: AppLocalizations.t('Group'),
+              iconMargin: const EdgeInsets.all(0.0),
+            );
+          }),
+    ];
+    final tabBar = TabBar(
+      tabs: tabs,
+      controller: _tabController,
+      isScrollable: false,
+      indicatorColor: myself.primary,
+      labelColor: Colors.white,
+      padding: const EdgeInsets.all(0.0),
+      labelPadding: const EdgeInsets.all(0.0),
+    );
+
+    var linkmanView = ValueListenableBuilder(
+        valueListenable: _linkmanTileData,
+        builder: (context, value, child) {
+          return DataListView(
+            tileData: value,
+            onTap: _onTapLinkman,
+          );
+        });
+
+    var groupView = ValueListenableBuilder(
+        valueListenable: _groupTileData,
+        builder: (context, value, child) {
+          return DataListView(
+            tileData: value,
+            onTap: _onTapGroup,
+          );
+        });
+
+    final tabBarView = KeepAliveWrapper(
+        child: TabBarView(
+      controller: _tabController,
+      children: [linkmanView, groupView],
     ));
 
-    return groupDataListView;
+    return Column(
+      children: [tabBar, Expanded(child: tabBarView)],
+    );
   }
 
   @override
@@ -330,7 +412,6 @@ class _ChatListWidgetState extends State<ChatListWidget> {
                       } else {
                         //缺省的websocket如果存在，尝试重连
                         await websocket.reconnect();
-                        _updateWebsocket();
                       }
                     }
                   : null,
@@ -346,15 +427,20 @@ class _ChatListWidgetState extends State<ChatListWidget> {
     return AppBarView(
         title: title,
         rightWidgets: rightWidgets,
-        child: _buildGroupDataListView(context));
+        child: _buildChatListView(context));
   }
 
   @override
   void dispose() {
-    linkmanChatSummaryController.removeListener(_update);
-    groupChatSummaryController.removeListener(_update);
-    websocketPool.removeListener(_updateWebsocket);
-    ConnectivityUtil.cancel(subscription);
+    _tabController.removeListener(_updateCurrentTab);
+    _tabController.dispose();
+    linkmanChatSummaryController.removeListener(_updateLinkmanChatSummary);
+    groupChatSummaryController.removeListener(_updateGroupChatSummary);
+    Websocket? websocket = websocketPool.getDefault();
+    if (websocket != null) {
+      websocketPool.unregisterStatusChange(
+          websocket.address, _updateWebsocketStatus);
+    }
     super.dispose();
   }
 }

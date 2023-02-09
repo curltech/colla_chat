@@ -7,7 +7,6 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webclient.dart';
-import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import './condition_import/unsupport.dart'
@@ -201,16 +200,47 @@ class Websocket extends IWebClient {
   }
 }
 
-class WebsocketPool with ChangeNotifier {
+class WebsocketPool {
   var websockets = <String, Websocket>{};
   Websocket? _default;
+
+  Map<String, List<Function(String address, SocketStatus status)>> fnsm = {};
 
   WebsocketPool() {
     connect();
   }
 
+  registerStatusChange(
+      String address, Function(String address, SocketStatus status) fn) {
+    List<Function(String address, SocketStatus status)>? fns = fnsm[address];
+    if (fns == null) {
+      fns = [];
+      fnsm[address] = fns;
+    }
+    fns.add(fn);
+  }
+
+  unregisterStatusChange(
+      String address, Function(String address, SocketStatus status) fn) {
+    List<Function(String address, SocketStatus status)>? fns = fnsm[address];
+    if (fns == null) {
+      return;
+    }
+    fns.remove(fn);
+    if (fns.isEmpty) {
+      fnsm.remove(address);
+    }
+  }
+
   onStatusChange(Websocket websocket, SocketStatus status) {
-    notifyListeners();
+    String address = websocket.address;
+    logger.w('websocket $address status changed');
+    List<Function(String address, SocketStatus status)>? fns = fnsm[address];
+    if (fns != null) {
+      for (var fn in fns) {
+        fn(address, status);
+      }
+    }
   }
 
   ///初始化websocket的连接，尝试连接缺省socket

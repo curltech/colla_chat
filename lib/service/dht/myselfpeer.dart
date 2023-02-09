@@ -241,8 +241,10 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       var peerClient = PeerClient.fromJson(json);
       peerClient.activeStatus = ActiveStatus.Up.name;
       peerClient.clientId = myselfPeer.clientId;
-      await connectAction.connect(peerClient);
-      logger.i('login connect successfully,activeStatus up');
+      bool success = await connectAction.connect(peerClient);
+      if (success) {
+        logger.i('login connect successfully,activeStatus up');
+      }
     }
   }
 

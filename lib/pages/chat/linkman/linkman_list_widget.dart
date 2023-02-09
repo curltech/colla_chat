@@ -18,9 +18,10 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/qrcode_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
+import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
 final DataListController<Linkman> linkmanController =
@@ -29,9 +30,6 @@ final DataListController<Group> groupController = DataListController<Group>();
 
 ///联系人和群的查询界面
 class LinkmanListWidget extends StatefulWidget with TileDataMixin {
-  //linkman和group的数据显示列表
-  final GroupDataListController groupDataListController =
-      GroupDataListController();
   final LinkmanEditWidget linkmanEditWidget = LinkmanEditWidget();
   final LinkmanAddWidget linkmanAddWidget = LinkmanAddWidget();
   final GroupAddWidget groupAddWidget = GroupAddWidget();
@@ -58,24 +56,42 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
   String get title => 'Linkman';
 }
 
-class _LinkmanListWidgetState extends State<LinkmanListWidget> {
-  TextEditingController controller = TextEditingController();
+class _LinkmanListWidgetState extends State<LinkmanListWidget>
+    with TickerProviderStateMixin {
+  final TextEditingController _linkmanTextController = TextEditingController();
+  final TextEditingController _groupTextController = TextEditingController();
+  final ValueNotifier<List<TileData>> _linkmanTileData =
+      ValueNotifier<List<TileData>>([]);
+  final ValueNotifier<List<TileData>> _groupTileData =
+      ValueNotifier<List<TileData>>([]);
+  final ValueNotifier<int> _currentTab = ValueNotifier<int>(0);
+
+  late TabController _tabController;
 
   @override
   initState() {
     super.initState();
-    linkmanController.addListener(_update);
-    groupController.addListener(_update);
-    widget.groupDataListController.addListener(_update);
-    _buildGroupDataListController();
-    _search(controller.text);
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(_updateCurrentTab);
+    linkmanController.addListener(_updateLinkman);
+    groupController.addListener(_updateGroup);
+    _searchLinkman(_linkmanTextController.text);
+    _searchGroup(_groupTextController.text);
   }
 
-  _update() {
-    setState(() {});
+  _updateCurrentTab() {
+    _currentTab.value = _tabController.index;
   }
 
-  _search(String key) async {
+  _updateLinkman() {
+    _buildLinkmanTileData();
+  }
+
+  _updateGroup() {
+    _buildGroupTileData();
+  }
+
+  _searchLinkman(String key) async {
     List<Linkman> linkmen = await linkmanService.search(key);
     List<Linkman> ls = [];
     if (linkmen.isNotEmpty) {
@@ -87,6 +103,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
       }
     }
     linkmanController.replaceAll(ls);
+  }
+
+  _searchGroup(String key) async {
     List<Group> groups = await groupService.search(key);
     List<Group> gs = [];
     if (groups.isNotEmpty) {
@@ -100,12 +119,12 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
     groupController.replaceAll(gs);
   }
 
-  _buildSearchTextField(BuildContext context) {
+  _buildLinkmanSearchTextField(BuildContext context) {
     var searchTextField = Container(
         padding: const EdgeInsets.all(10.0),
         child: TextFormField(
             autofocus: true,
-            controller: controller,
+            controller: _linkmanTextController,
             keyboardType: TextInputType.text,
             decoration: InputDecoration(
               fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
@@ -119,7 +138,38 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
               //labelText: AppLocalizations.t('Search'),
               suffixIcon: IconButton(
                 onPressed: () {
-                  _search(controller.text);
+                  _searchLinkman(_linkmanTextController.text);
+                },
+                icon: Icon(
+                  Icons.search,
+                  color: myself.primary,
+                ),
+              ),
+            )));
+
+    return searchTextField;
+  }
+
+  _buildGroupSearchTextField(BuildContext context) {
+    var searchTextField = Container(
+        padding: const EdgeInsets.all(10.0),
+        child: TextFormField(
+            autofocus: true,
+            controller: _groupTextController,
+            keyboardType: TextInputType.text,
+            decoration: InputDecoration(
+              fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
+              filled: true,
+              border: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              errorBorder: InputBorder.none,
+              disabledBorder: InputBorder.none,
+              focusedErrorBorder: InputBorder.none,
+              //labelText: AppLocalizations.t('Search'),
+              suffixIcon: IconButton(
+                onPressed: () {
+                  _searchGroup(_groupTextController.text);
                 },
                 icon: Icon(
                   Icons.search,
@@ -142,8 +192,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
   }
 
   //将linkman和group数据转换从列表显示数据
-  _buildGroupDataListController() {
-    widget.groupDataListController.controllers.clear();
+  _buildLinkmanTileData() {
     var linkmen = linkmanController.data;
     List<TileData> tiles = [];
     if (linkmen.isNotEmpty) {
@@ -222,12 +271,12 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
         tiles.add(tile);
       }
     }
-    var keyTile = TileData(
-        prefix: myself.avatarImage ?? AppImage.mdAppImage, title: 'Linkman');
-    widget.groupDataListController.add(keyTile, tiles);
+    _linkmanTileData.value = tiles;
+  }
 
+  _buildGroupTileData() {
     var groups = groupController.data;
-    tiles = [];
+    List<TileData> tiles = [];
     if (groups.isNotEmpty) {
       for (var group in groups) {
         var title = group.name;
@@ -282,20 +331,85 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
         tiles.add(tile);
       }
     }
-    keyTile = TileData(
-        prefix: myself.avatarImage ?? AppImage.mdAppImage, title: 'Group');
-    widget.groupDataListController.add(keyTile, tiles);
+    _groupTileData.value = tiles;
   }
 
-  _onTap(int index, String title, {String? subtitle, TileData? group}) {
-    if (group != null) {
-      if (group.title == 'Linkman') {
-        linkmanController.currentIndex = index;
-      }
-      if (group.title == 'Group') {
-        groupController.currentIndex = index;
-      }
-    }
+  _onTapLinkman(int index, String title, {String? subtitle, TileData? group}) {
+    linkmanController.currentIndex = index;
+  }
+
+  _onTapGroup(int index, String title, {String? subtitle, TileData? group}) {
+    groupController.currentIndex = index;
+  }
+
+  Widget _buildLinkmanListView(BuildContext context) {
+    final List<Widget> tabs = <Widget>[
+      ValueListenableBuilder(
+          valueListenable: _currentTab,
+          builder: (context, value, child) {
+            return Tab(
+              icon: Icon(Icons.person,
+                  color: value == 0 ? myself.primary : Colors.white),
+              //text: AppLocalizations.t('Linkman'),
+              iconMargin: const EdgeInsets.all(0.0),
+            );
+          }),
+      ValueListenableBuilder(
+          valueListenable: _currentTab,
+          builder: (context, value, child) {
+            return Tab(
+              icon: Icon(Icons.group,
+                  color: value == 1 ? myself.primary : Colors.white),
+              //text: AppLocalizations.t('Group'),
+              iconMargin: const EdgeInsets.all(0.0),
+            );
+          }),
+    ];
+    final tabBar = TabBar(
+      tabs: tabs,
+      controller: _tabController,
+      isScrollable: false,
+      indicatorColor: myself.primary,
+      labelColor: Colors.white,
+      padding: const EdgeInsets.all(0.0),
+      labelPadding: const EdgeInsets.all(0.0),
+    );
+
+    var linkmanView = Column(children: [
+      _buildLinkmanSearchTextField(context),
+      Expanded(
+          child: ValueListenableBuilder(
+              valueListenable: _linkmanTileData,
+              builder: (context, value, child) {
+                return DataListView(
+                  tileData: value,
+                  onTap: _onTapLinkman,
+                );
+              }))
+    ]);
+
+    var groupView = Column(children: [
+      _buildGroupSearchTextField(context),
+      Expanded(
+          child: ValueListenableBuilder(
+              valueListenable: _groupTileData,
+              builder: (context, value, child) {
+                return DataListView(
+                  tileData: value,
+                  onTap: _onTapGroup,
+                );
+              }))
+    ]);
+
+    final tabBarView = KeepAliveWrapper(
+        child: TabBarView(
+      controller: _tabController,
+      children: [linkmanView, groupView],
+    ));
+
+    return Column(
+      children: [tabBar, Expanded(child: tabBarView)],
+    );
   }
 
   @override
@@ -327,27 +441,18 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget> {
           icon: const Icon(Icons.qr_code, color: Colors.white),
           tooltip: AppLocalizations.t('Qrcode scan')),
     ];
-    _buildGroupDataListController();
-    var groupDataListView = Container(
-        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-        child: GroupDataListView(
-          onTap: _onTap,
-          controller: widget.groupDataListController,
-        ));
     return AppBarView(
         title: widget.title,
         rightWidgets: rightWidgets,
-        child: Column(children: [
-          _buildSearchTextField(context),
-          Expanded(child: groupDataListView)
-        ]));
+        child: _buildLinkmanListView(context));
   }
 
   @override
   void dispose() {
-    linkmanController.removeListener(_update);
-    groupController.removeListener(_update);
-    widget.groupDataListController.removeListener(_update);
+    _tabController.removeListener(_updateCurrentTab);
+    _tabController.dispose();
+    linkmanController.removeListener(_updateLinkman);
+    groupController.removeListener(_updateGroup);
     super.dispose();
   }
 }
