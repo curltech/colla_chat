@@ -71,6 +71,12 @@ class LinkmanService extends PeerPartyService<Linkman> {
         var avatarImage = ImageUtil.buildImageWidget(
             image: avatar, height: 32, width: 32, fit: BoxFit.contain);
         linkman.avatarImage = avatarImage;
+      } else {
+        PeerClient? peerClient =
+            await peerClientService.findOneByPeerId(peerId);
+        if (peerClient != null) {
+          linkman.avatarImage = peerClient.avatarImage;
+        }
       }
       linkmen[peerId] = linkman;
     }

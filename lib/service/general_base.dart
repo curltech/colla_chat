@@ -221,6 +221,8 @@ abstract class GeneralBaseService<T> {
                   CryptoUtil.encodeBase64(securityContext.payload);
               json['payloadKey'] = securityContext.payloadKey;
               json['payloadHash'] = securityContext.payloadHash;
+              json['needCompress'] = securityContext.needCompress;
+              json['needEncrypt'] = securityContext.needEncrypt;
             }
           } catch (err) {
             logger.e('SecurityContextService encrypt err:$err');
