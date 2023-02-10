@@ -35,14 +35,14 @@ class ChannelChatMessageController extends DataMoreController<ChatMessage> {
   ///访问数据库获取最新的消息
   @override
   Future<void> latest({int? limit}) async {
-    int? id;
+    String? sendTime;
     if (data.isNotEmpty) {
-      id = data[0].id;
+      sendTime = data[0].sendTime;
     }
     List<ChatMessage>? chatMessages = await chatMessageService.findByGreaterId(
         peerId: myself.peerId!,
         messageType: ChatMessageType.channel.name,
-        id: id,
+        sendTime: sendTime,
         limit: limit);
     if (chatMessages.isNotEmpty) {
       data.insertAll(0, chatMessages);

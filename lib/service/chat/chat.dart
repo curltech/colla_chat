@@ -144,7 +144,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       String? messageType,
       String? subMessageType,
       String? status,
-      int? id,
+      String? sendTime,
       int? limit}) async {
     var myselfPeerId = myself.peerId!;
     String where = '1=1';
@@ -180,9 +180,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       where = '$where and status=?';
       whereArgs.add(status);
     }
-    if (id != null) {
-      where = '$where and id>?';
-      whereArgs.add(id);
+    if (sendTime != null) {
+      where = '$where and sendTime>?';
+      whereArgs.add(sendTime);
     }
     return find(
         where: where,
