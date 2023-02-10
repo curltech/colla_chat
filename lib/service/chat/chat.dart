@@ -708,15 +708,12 @@ final mergedMessageService = MergedMessageService(
     fields: ServiceLocator.buildFields(MergedMessage(), []));
 
 class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
-  late String contentPath;
-
   MessageAttachmentService({
     required super.tableName,
     required super.fields,
     required super.indexFields,
     super.encryptFields = const ['content'],
   }) {
-    contentPath = p.join(myself.myPath, 'content');
     post = (Map map) {
       return MessageAttachment.fromJson(map);
     };
@@ -724,6 +721,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
 
   ///获取加密的数据在content路径下附件的文件名称，
   Future<String?> getEncryptFilename(String messageId, String? title) async {
+    String contentPath = p.join(myself.myPath, 'content');
     String? filename;
     if (!platformParams.web) {
       if (title != null) {
@@ -745,6 +743,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
     } else {
       filename = messageId;
     }
+    String contentPath = p.join(myself.myPath, 'content');
     if (!platformParams.web) {
       Uint8List? data = await FileUtil.readFile(p.join(contentPath, filename));
       if (data != null) {
