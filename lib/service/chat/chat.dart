@@ -132,7 +132,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return find(
         where: where,
         whereArgs: whereArgs,
-        orderBy: 'createDate desc',
+        orderBy: 'sendTime desc',
         offset: offset,
         limit: limit);
   }
@@ -187,7 +187,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return find(
         where: where,
         whereArgs: whereArgs,
-        orderBy: 'createDate desc',
+        orderBy: 'sendTime desc',
         limit: limit);
   }
 
