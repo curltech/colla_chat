@@ -132,7 +132,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return find(
         where: where,
         whereArgs: whereArgs,
-        orderBy: 'id desc',
+        orderBy: 'createDate desc',
         offset: offset,
         limit: limit);
   }
@@ -185,7 +185,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       whereArgs.add(id);
     }
     return find(
-        where: where, whereArgs: whereArgs, orderBy: 'id desc', limit: limit);
+        where: where,
+        whereArgs: whereArgs,
+        orderBy: 'createDate desc',
+        limit: limit);
   }
 
   String recoverContent(String content) {
