@@ -197,7 +197,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   ///接受到普通消息或者回执，修改状态并保存
-  Future<void> receiveChatMessage(ChatMessage chatMessage) async {
+  Future<ChatMessage?> receiveChatMessage(ChatMessage chatMessage) async {
     String? subMessageType = chatMessage.subMessageType;
     //收到回执，更新原消息
     if (subMessageType == ChatMessageSubType.chatReceipt.name) {
@@ -209,7 +209,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           receiverPeerId: chatMessage.senderPeerId!);
       if (originChatMessage == null) {
         logger.e('chatReceipt message has no chatMessage with same messageId');
-        return;
+        return null;
       }
       originChatMessage.receiptContent = chatMessage.content;
       originChatMessage.receiptTime = chatMessage.receiptTime;
@@ -217,6 +217,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       originChatMessage.status = chatMessage.status;
       originChatMessage.deleteTime = chatMessage.deleteTime;
       await store(originChatMessage);
+
+      return originChatMessage;
     } else {
       //收到一般消息，保存
       chatMessage.direct = ChatDirect.receive.name;
@@ -225,6 +227,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       chatMessage.status = MessageStatus.received.name;
       chatMessage.id = null;
       await store(chatMessage);
+
+      return chatMessage;
     }
   }
 

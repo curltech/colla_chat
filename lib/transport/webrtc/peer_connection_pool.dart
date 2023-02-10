@@ -5,9 +5,7 @@ import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
-import 'package:colla_chat/p2p/chain/action/chat.dart';
 import 'package:colla_chat/p2p/chain/action/signal.dart';
-import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -136,7 +134,6 @@ class PeerConnectionPool {
 
   PeerConnectionPool() {
     signalAction.registerReceiver(onSignal);
-    chatAction.registerReceiver(onChat);
     var peerId = myself.peerId;
     if (peerId == null) {
       throw 'myself peerId is null';
@@ -571,24 +568,6 @@ class PeerConnectionPool {
     }
   }
 
-  ///从websocket的ChainMessage方式，chatAction接收到的ChatMessage
-  Future<void> onChat(ChainMessage chainMessage) async {
-    if (chainMessage.srcPeerId == null) {
-      logger.e('chainMessage.srcPeerId is null');
-      return;
-    }
-    if (chainMessage.payloadType == PayloadType.chatMessage.name) {
-      String peerId = chainMessage.srcPeerId!;
-      String clientId = chainMessage.srcClientId!;
-      WebrtcEvent event = WebrtcEvent(peerId,
-          clientId: clientId,
-          name: '',
-          eventType: WebrtcEventType.message,
-          data: chainMessage.payload);
-      await onMessage(event);
-    }
-  }
-
   /// 向peer发送信息，如果是多个，遍历发送
   /// 发送数据，带加密选项，传入数据为对象，先转换成json字符串，然后utf-8，再加密，最后发送
   Future<bool> send(String peerId, dynamic data,
@@ -624,9 +603,6 @@ class PeerConnectionPool {
   onMessage(WebrtcEvent event) async {
     logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onMessage');
     ChatMessage chatMessage = ChatMessage.fromJson(event.data);
-
-    ///保存消息，普通消息直接保存，回执修改原消息状态后保存
-    await chatMessageService.receiveChatMessage(chatMessage);
 
     ///对消息进行业务处理
     await globalChatMessageController.receiveChatMessage(chatMessage);

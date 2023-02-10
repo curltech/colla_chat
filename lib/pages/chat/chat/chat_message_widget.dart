@@ -6,6 +6,7 @@ import 'package:colla_chat/pages/chat/chat/chat_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_item.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:flutter/material.dart';
 
 /// 消息发送和接受展示的界面组件
@@ -18,6 +19,7 @@ class ChatMessageWidget extends StatefulWidget {
   final Future<void> Function()? onRefresh;
   final bool Function(ScrollNotification scrollNotification)?
       notificationPredicate;
+  final chatMessageInputWidget = ChatMessageInputWidget();
 
   ChatMessageWidget(
       {Key? key,
@@ -35,15 +37,15 @@ class ChatMessageWidget extends StatefulWidget {
 
 class _ChatMessageWidgetState extends State<ChatMessageWidget>
     with TickerProviderStateMixin {
-  ///扩展文本输入框的控制器
-  final TextEditingController textEditingController = TextEditingController();
   FocusNode textFocusNode = FocusNode();
   late final AnimationController animateController;
+  final ValueNotifier<List<ChatMessage>> _chatMessages =
+      ValueNotifier<List<ChatMessage>>(chatMessageController.data);
 
   @override
   void initState() {
     super.initState();
-    chatMessageController.addListener(_update);
+    chatMessageController.addListener(_updateChatMessage);
     var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
     animateController = AnimationController(
@@ -54,11 +56,8 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     //     duration: const Duration(milliseconds: 1000), curve: Curves.ease);
   }
 
-  _update() {
-    setState(() {
-      ///获取最新的消息
-      chatMessageController.latest();
-    });
+  _updateChatMessage() {
+    _chatMessages.value = chatMessageController.data;
   }
 
   void _onScroll() {
@@ -110,19 +109,9 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
             curve: Curves.easeIn));
   }
 
-  ///发送消息的输入框和按钮，三个按钮，一个输入框，单独一个类
-  ///另外还有各种消息的选择菜单，emoji各一个类
-  Widget _buildMessageInputWidget(BuildContext context) {
-    return ChatMessageInputWidget(
-      textEditingController: textEditingController,
-      onSend: chatMessageController.sendText,
-    );
-  }
-
   ///创建每一条消息
   Widget _buildMessageItem(BuildContext context, int index) {
-    List<ChatMessage> messages = chatMessageController.data;
-    ChatMessage chatMessage = messages[index];
+    ChatMessage chatMessage = _chatMessages.value[index];
     Widget chatMessageItem = ChatMessageItem(
         key: UniqueKey(), chatMessage: chatMessage, index: index);
 
@@ -150,37 +139,42 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
       Flexible(
         //使用列表渲染消息
         child: RefreshIndicator(
-            onRefresh: _onRefresh,
-            //notificationPredicate: _notificationPredicate,
-            child: ListView.builder(
-              controller: widget.scrollController,
-              padding: const EdgeInsets.all(8.0),
-              reverse: true,
-              //消息组件渲染
-              itemBuilder: _buildMessageItem,
-              //消息条目数
-              itemCount: chatMessageController.data.length,
-            )),
+          onRefresh: _onRefresh,
+          //notificationPredicate: _notificationPredicate,
+          child: ValueListenableBuilder(
+              valueListenable: _chatMessages,
+              builder: (context, value, child) {
+                return ListView.builder(
+                  controller: widget.scrollController,
+                  padding: const EdgeInsets.all(8.0),
+                  reverse: true,
+                  //消息组件渲染
+                  itemBuilder: _buildMessageItem,
+                  //消息条目数
+                  itemCount: _chatMessages.value.length,
+                );
+              }),
+        ),
       ),
       const Divider(
         height: 1.0,
       ),
-      _buildMessageInputWidget(context),
+      widget.chatMessageInputWidget,
     ]);
   }
 
   @override
   Widget build(BuildContext context) {
-    var chatMessageWidget = _buildChatMessageWidget(context);
+    var chatMessageWidget =
+        KeepAliveWrapper(child: _buildChatMessageWidget(context));
 
     return chatMessageWidget;
   }
 
   @override
   void dispose() {
-    chatMessageController.removeListener(_update);
+    chatMessageController.removeListener(_updateChatMessage);
     widget.scrollController.removeListener(_onScroll);
-    textEditingController.dispose();
     animateController.dispose();
     super.dispose();
   }

@@ -5,7 +5,6 @@ import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
@@ -123,8 +122,6 @@ class NearbyConnectionPool with ChangeNotifier {
     var json = JsonUtil.toJson(data);
     ChatMessage chatMessage = ChatMessage.fromJson(json);
 
-    ///保存消息
-    await chatMessageService.receiveChatMessage(chatMessage);
     await globalChatMessageController.receiveChatMessage(chatMessage);
   }
 

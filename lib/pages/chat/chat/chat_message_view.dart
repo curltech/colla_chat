@@ -18,6 +18,7 @@ import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
@@ -26,6 +27,7 @@ import 'package:flutter/material.dart';
 class ChatMessageView extends StatefulWidget with TileDataMixin {
   final FullScreenWidget fullScreenWidget = const FullScreenWidget();
   final VideoChatWidget videoChatWidget = const VideoChatWidget();
+  final ChatMessageWidget chatMessageWidget = ChatMessageWidget();
 
   ChatMessageView({
     Key? key,
@@ -53,12 +55,10 @@ class ChatMessageView extends StatefulWidget with TileDataMixin {
 }
 
 class _ChatMessageViewState extends State<ChatMessageView> {
-  //linkman或者group的peerId
-  late String peerId;
-  late String name;
-  late String partyType;
-  late ValueNotifier<PeerConnectionStatus> _peerConnectionStatus =
+  final ValueNotifier<PeerConnectionStatus> _peerConnectionStatus =
       ValueNotifier<PeerConnectionStatus>(PeerConnectionStatus.none);
+  final ValueNotifier<ChatSummary?> _chatSummary =
+      ValueNotifier<ChatSummary?>(chatMessageController.chatSummary);
 
   @override
   void initState() {
@@ -69,6 +69,12 @@ class _ChatMessageViewState extends State<ChatMessageView> {
 
   ///更新为已读状态
   Future<void> _buildReadStatus() async {
+    var chatSummary = _chatSummary.value;
+    if (chatSummary == null) {
+      logger.e('chatSummary is null');
+      return;
+    }
+    String peerId = chatSummary.peerId!;
     await chatMessageService.update(
         {'status': MessageStatus.read.name, 'readTime': DateUtil.currentDate()},
         where:
@@ -81,74 +87,67 @@ class _ChatMessageViewState extends State<ChatMessageView> {
           MessageStatus.received.name,
           MessageStatus.send.name
         ]);
-    ChatSummary? chatSummary = chatMessageController.chatSummary;
-    if (chatSummary != null) {
-      if (chatSummary.unreadNumber > 0) {
-        chatSummary.unreadNumber = 0;
-        Map<String, dynamic> entity = {'unreadNumber': 0};
-        await chatSummaryService
-            .update(entity, where: 'peerId=?', whereArgs: [peerId]);
-        if (chatSummary.partyType == PartyType.linkman.name) {
-          linkmanChatSummaryController.refresh();
-        }
-        if (chatSummary.partyType == PartyType.group.name) {
-          groupChatSummaryController.refresh();
-        }
+    if (chatSummary.unreadNumber > 0) {
+      chatSummary.unreadNumber = 0;
+      Map<String, dynamic> entity = {'unreadNumber': 0};
+      await chatSummaryService
+          .update(entity, where: 'peerId=?', whereArgs: [peerId]);
+      if (chatSummary.partyType == PartyType.linkman.name) {
+        linkmanChatSummaryController.refresh();
+      }
+      if (chatSummary.partyType == PartyType.group.name) {
+        groupChatSummaryController.refresh();
       }
     }
   }
 
   ///初始化，webrtc如果没有连接，尝试连接
   _createPeerConnection() async {
-    ChatSummary? chatSummary = chatMessageController.chatSummary;
-    if (chatSummary != null) {
-      peerId = chatSummary.peerId!;
-      name = chatSummary.name!;
-      peerConnectionPool.registerWebrtcEvent(
-          peerId, WebrtcEventType.status, _updatePeerConnectionStatus);
-      partyType = chatSummary.partyType!;
-      if (partyType == PartyType.linkman.name) {
-        if (peerId != myself.peerId) {
-          List<AdvancedPeerConnection> advancedPeerConnections =
-              peerConnectionPool.get(peerId);
-          if (advancedPeerConnections.isEmpty) {
-            AdvancedPeerConnection? advancedPeerConnection =
-                await peerConnectionPool.create(peerId);
-            if (advancedPeerConnection != null) {
-              _peerConnectionStatus = ValueNotifier<PeerConnectionStatus>(
-                  advancedPeerConnection.status);
-            } else {
-              _peerConnectionStatus = ValueNotifier<PeerConnectionStatus>(
-                  PeerConnectionStatus.none);
-            }
+    var chatSummary = _chatSummary.value;
+    if (chatSummary == null) {
+      logger.e('chatSummary is null');
+      return;
+    }
+    String peerId = chatSummary.peerId!;
+    String partyType = chatSummary.partyType!;
+    peerConnectionPool.registerWebrtcEvent(
+        peerId, WebrtcEventType.status, _updatePeerConnectionStatus);
+    if (partyType == PartyType.linkman.name) {
+      if (peerId != myself.peerId) {
+        List<AdvancedPeerConnection> advancedPeerConnections =
+            peerConnectionPool.get(peerId);
+        if (advancedPeerConnections.isEmpty) {
+          AdvancedPeerConnection? advancedPeerConnection =
+              await peerConnectionPool.create(peerId);
+          if (advancedPeerConnection != null) {
+            _peerConnectionStatus.value = advancedPeerConnection.status;
           } else {
-            for (AdvancedPeerConnection advancedPeerConnection
-                in advancedPeerConnections) {
-              _peerConnectionStatus = ValueNotifier<PeerConnectionStatus>(
-                  advancedPeerConnection.status);
-              if (advancedPeerConnection.status ==
-                  PeerConnectionStatus.connected) {
-                break;
-              }
-            }
+            _peerConnectionStatus.value = PeerConnectionStatus.none;
           }
-        }
-      } else if (partyType == PartyType.group.name) {
-        List<GroupMember> groupMembers =
-            await groupMemberService.findByGroupId(peerId);
-        for (var groupMember in groupMembers) {
-          String? memberPeerId = groupMember.memberPeerId;
-          if (memberPeerId != null && memberPeerId != myself.peerId) {
-            List<AdvancedPeerConnection> advancedPeerConnections =
-                peerConnectionPool.get(memberPeerId);
-            if (advancedPeerConnections.isEmpty) {
-              peerConnectionPool.create(memberPeerId);
+        } else {
+          for (AdvancedPeerConnection advancedPeerConnection
+              in advancedPeerConnections) {
+            _peerConnectionStatus.value = advancedPeerConnection.status;
+            if (advancedPeerConnection.status ==
+                PeerConnectionStatus.connected) {
+              break;
             }
           }
         }
       }
-    } else {
-      logger.e('chatSummary is null');
+    } else if (partyType == PartyType.group.name) {
+      List<GroupMember> groupMembers =
+          await groupMemberService.findByGroupId(peerId);
+      for (var groupMember in groupMembers) {
+        String? memberPeerId = groupMember.memberPeerId;
+        if (memberPeerId != null && memberPeerId != myself.peerId) {
+          List<AdvancedPeerConnection> advancedPeerConnections =
+              peerConnectionPool.get(memberPeerId);
+          if (advancedPeerConnections.isEmpty) {
+            peerConnectionPool.create(memberPeerId);
+          }
+        }
+      }
     }
   }
 
@@ -171,6 +170,16 @@ class _ChatMessageViewState extends State<ChatMessageView> {
 
   @override
   Widget build(BuildContext context) {
+    var chatSummary = _chatSummary.value;
+    if (chatSummary == null) {
+      return AppBarView(
+          title: AppLocalizations.t('No current PeerId'),
+          withLeading: widget.withLeading,
+          child: Container());
+    }
+    String peerId = chatSummary.peerId!;
+    String name = chatSummary.name!;
+    String partyType = chatSummary.partyType!;
     String title = AppLocalizations.t(name);
     Widget titleWidget = Text(title);
     List<Widget> rightWidgets = [];
@@ -196,19 +205,24 @@ class _ChatMessageViewState extends State<ChatMessageView> {
         width: 15,
       ));
     }
-    var appBarView = AppBarView(
-        titleWidget: titleWidget,
-        withLeading: widget.withLeading,
-        rightWidgets: rightWidgets,
-        child: ChatMessageWidget());
+
+    var appBarView = KeepAliveWrapper(
+        child: AppBarView(
+            titleWidget: titleWidget,
+            withLeading: widget.withLeading,
+            rightWidgets: rightWidgets,
+            child: widget.chatMessageWidget));
 
     return appBarView;
   }
 
   @override
   void dispose() {
-    peerConnectionPool.unregisterWebrtcEvent(
-        peerId, WebrtcEventType.status, _updatePeerConnectionStatus);
+    var chatSummary = _chatSummary.value;
+    if (chatSummary != null) {
+      peerConnectionPool.unregisterWebrtcEvent(chatSummary.peerId!,
+          WebrtcEventType.status, _updatePeerConnectionStatus);
+    }
     super.dispose();
   }
 }

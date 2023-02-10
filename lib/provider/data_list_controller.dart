@@ -102,10 +102,12 @@ class DataListController<T> with ChangeNotifier {
     }
   }
 
-  clear() {
+  clear({bool? notify}) {
     data.clear();
     _currentIndex = -1;
-    notifyListeners();
+    if (notify == null || notify) {
+      notifyListeners();
+    }
   }
 
   replaceAll(List<T> ds) {

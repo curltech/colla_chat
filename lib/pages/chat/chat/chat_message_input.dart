@@ -8,25 +8,21 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:flutter/material.dart';
 
+import 'controller/chat_message_controller.dart';
+
 ///聊天消息的输入组件，
 ///第一行：包括声音按钮，扩展文本输入框，emoji按钮，其他多种格式输入按钮和发送按钮
 ///第二行：emoji面板，其他多种格式输入面板
 class ChatMessageInputWidget extends StatefulWidget {
   ///扩展文本输入框的控制器
-  final TextEditingController textEditingController;
-
+  final TextEditingController textEditingController = TextEditingController();
   final Future<void> Function(
-      {String? message, ChatMessageSubType subMessageType})? onSend;
-
+          {String? message, ChatMessageSubType subMessageType})? onSend =
+      chatMessageController.sendText;
   final Future<void> Function(int index, String name, {String? value})?
       onAction;
 
-  const ChatMessageInputWidget(
-      {Key? key,
-      required this.textEditingController,
-      this.onSend,
-      this.onAction})
-      : super(key: key);
+  ChatMessageInputWidget({Key? key, this.onAction}) : super(key: key);
 
   @override
   State createState() => _ChatMessageInputWidgetState();

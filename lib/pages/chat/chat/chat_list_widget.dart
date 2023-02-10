@@ -22,7 +22,6 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class ConnectivityController with ChangeNotifier {
   late StreamSubscription<ConnectivityResult> subscription;
@@ -80,10 +79,9 @@ final GroupChatSummaryController groupChatSummaryController =
 /// 聊天的主页面，展示可以聊天的目标对象，可以是一个人，或者是一个群
 /// 选择好目标点击进入具体的聊天页面ChatMessage
 class ChatListWidget extends StatefulWidget with TileDataMixin {
-  final ChatMessageView chatMessageView = ChatMessageView();
-
   ChatListWidget({Key? key}) : super(key: key) {
     websocketPool.getDefault();
+    indexWidgetProvider.define(ChatMessageView());
   }
 
   @override
@@ -139,10 +137,6 @@ class _ChatListWidgetState extends State<ChatListWidget>
     } else {
       _socketStatus = ValueNotifier<SocketStatus>(SocketStatus.closed);
     }
-
-    var indexWidgetProvider =
-        Provider.of<IndexWidgetProvider>(context, listen: false);
-    indexWidgetProvider.define(widget.chatMessageView);
   }
 
   ///如果没有缺省的websocket，尝试重连
@@ -374,11 +368,10 @@ class _ChatListWidgetState extends State<ChatListWidget>
           );
         });
 
-    final tabBarView = KeepAliveWrapper(
-        child: TabBarView(
+    final tabBarView = TabBarView(
       controller: _tabController,
       children: [linkmanView, groupView],
-    ));
+    );
 
     return Column(
       children: [tabBar, Expanded(child: tabBarView)],
@@ -433,10 +426,11 @@ class _ChatListWidgetState extends State<ChatListWidget>
       width: 10.0,
     ));
 
-    return AppBarView(
-        title: title,
-        rightWidgets: rightWidgets,
-        child: _buildChatListView(context));
+    return KeepAliveWrapper(
+        child: AppBarView(
+            title: title,
+            rightWidgets: rightWidgets,
+            child: _buildChatListView(context)));
   }
 
   @override

@@ -14,15 +14,16 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     return _chatSummary;
   }
 
+  ///更新chatSummary，清空原数据，查询新数据
   set chatSummary(ChatSummary? chatSummary) {
     if (_chatSummary != null &&
         chatSummary != null &&
         _chatSummary!.id == chatSummary.id) {
     } else {
       _chatSummary = chatSummary;
-      clear();
+      clear(notify: false);
+      previous(limit: defaultLimit);
     }
-    previous(limit: defaultLimit);
   }
 
   int get deleteTime {
@@ -46,26 +47,16 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     }
   }
 
-  ///接收到新信息
-  modify(String peerId) {
-    if (_chatSummary == null) {
-      return;
-    }
-    if (_chatSummary!.peerId == peerId) {
-      notifyListeners();
-    }
-  }
-
-  ///访问数据库获取更老的消息
+  ///访问数据库获取比当前数据更老的消息，如果当前数据为空，从最新的开始
   @override
   Future<void> previous({int? limit}) async {
     var chatSummary = _chatSummary;
     if (chatSummary == null) {
-      clear();
+      clear(notify: false);
       return;
     }
     if (chatSummary.peerId == null) {
-      clear();
+      clear(notify: false);
       return;
     }
     List<ChatMessage>? chatMessages;
@@ -85,16 +76,16 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     }
   }
 
-  ///访问数据库获取最新的消息
+  ///访问数据库获取比当前的最新的消息更新的消息
   @override
   Future<void> latest({int? limit}) async {
     var chatSummary = _chatSummary;
     if (chatSummary == null) {
-      clear();
+      clear(notify: false);
       return;
     }
     if (chatSummary.peerId == null) {
-      clear();
+      clear(notify: false);
       return;
     }
     int? id;
