@@ -162,8 +162,8 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         chatMessage = await chatMessageService.sendAndStore(chatMessage);
         _deleteTime = 0;
         _parentMessageId = null;
-        notifyListeners();
       }
+     notifyListeners();
     }
     if (partyType == PartyType.group.name) {
       //保存群消息
@@ -177,14 +177,19 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         deleteTime: _deleteTime,
         peerIds: peerIds,
       );
-      if (chatMessages.isNotEmpty) {
-        chatMessage = chatMessages[0];
-        for (var chatMessage in chatMessages) {
-          chatMessage = await chatMessageService.sendAndStore(chatMessage);
-        }
-      }
       _deleteTime = 0;
-      notifyListeners();
+      if (chatMessages.isNotEmpty) {
+        int i = 0;
+        for (var chatMessage in chatMessages) {
+          if (i == 0) {
+            chatMessage = await chatMessageService.sendAndStore(chatMessage);
+          } else {
+            await chatMessageService.sendAndStore(chatMessage);
+          }
+          i++;
+        }
+        notifyListeners();
+      }
     }
     return chatMessage!;
   }

@@ -127,7 +127,7 @@ class GlobalChatMessageController with ChangeNotifier {
     }
     //对于接收到的非系统消息，对消息控制器进行刷新
     if (chatMessage.messageType != ChatMessageType.system.name) {
-      chatMessageController.add(chatMessage);
+      chatMessageController.notifyListeners();
     }
     notifyListeners();
   }

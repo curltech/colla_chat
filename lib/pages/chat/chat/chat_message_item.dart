@@ -113,7 +113,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
               stick: true,
               margin: const BubbleEdges.only(top: 1),
               nip: widget.isMyself ? BubbleNip.rightTop : BubbleNip.leftTop,
-              color: widget.isMyself ? myself.primary : Colors.white,
+              color: widget.isMyself ? myself.primary :  Colors.white,
               padding: const BubbleEdges.all(0),
               child: body),
           const SizedBox(

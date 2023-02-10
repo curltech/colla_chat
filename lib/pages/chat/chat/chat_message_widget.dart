@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
-import 'package:colla_chat/pages/chat/chat/chat_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_item.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -19,7 +18,6 @@ class ChatMessageWidget extends StatefulWidget {
   final Future<void> Function()? onRefresh;
   final bool Function(ScrollNotification scrollNotification)?
       notificationPredicate;
-  final chatMessageInputWidget = ChatMessageInputWidget();
 
   ChatMessageWidget(
       {Key? key,
@@ -39,13 +37,11 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     with TickerProviderStateMixin {
   FocusNode textFocusNode = FocusNode();
   late final AnimationController animateController;
-  final ValueNotifier<List<ChatMessage>> _chatMessages =
-      ValueNotifier<List<ChatMessage>>(chatMessageController.data);
 
   @override
   void initState() {
     super.initState();
-    chatMessageController.addListener(_updateChatMessage);
+    chatMessageController.addListener(_update);
     var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
     animateController = AnimationController(
@@ -56,8 +52,10 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     //     duration: const Duration(milliseconds: 1000), curve: Curves.ease);
   }
 
-  _updateChatMessage() {
-    _chatMessages.value = chatMessageController.data;
+  _update() {
+    setState(() {
+      chatMessageController.latest();
+    });
   }
 
   void _onScroll() {
@@ -111,7 +109,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
 
   ///创建每一条消息
   Widget _buildMessageItem(BuildContext context, int index) {
-    ChatMessage chatMessage = _chatMessages.value[index];
+    ChatMessage chatMessage = chatMessageController.data[index];
     Widget chatMessageItem = ChatMessageItem(
         key: UniqueKey(), chatMessage: chatMessage, index: index);
 
@@ -135,32 +133,18 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
 
   ///创建消息显示面板，包含消息的输入框
   Widget _buildChatMessageWidget(BuildContext context) {
-    return Column(children: <Widget>[
-      Flexible(
-        //使用列表渲染消息
-        child: RefreshIndicator(
-          onRefresh: _onRefresh,
-          //notificationPredicate: _notificationPredicate,
-          child: ValueListenableBuilder(
-              valueListenable: _chatMessages,
-              builder: (context, value, child) {
-                return ListView.builder(
-                  controller: widget.scrollController,
-                  padding: const EdgeInsets.all(8.0),
-                  reverse: true,
-                  //消息组件渲染
-                  itemBuilder: _buildMessageItem,
-                  //消息条目数
-                  itemCount: _chatMessages.value.length,
-                );
-              }),
-        ),
-      ),
-      const Divider(
-        height: 1.0,
-      ),
-      widget.chatMessageInputWidget,
-    ]);
+    return RefreshIndicator(
+        onRefresh: _onRefresh,
+        //notificationPredicate: _notificationPredicate,
+        child: ListView.builder(
+          controller: widget.scrollController,
+          padding: const EdgeInsets.all(8.0),
+          reverse: true,
+          //消息组件渲染
+          itemBuilder: _buildMessageItem,
+          //消息条目数
+          itemCount: chatMessageController.data.length,
+        ));
   }
 
   @override
@@ -173,7 +157,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
 
   @override
   void dispose() {
-    chatMessageController.removeListener(_updateChatMessage);
+    chatMessageController.removeListener(_update);
     widget.scrollController.removeListener(_onScroll);
     animateController.dispose();
     super.dispose();

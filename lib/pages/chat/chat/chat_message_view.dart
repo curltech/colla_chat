@@ -3,6 +3,7 @@ import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
+import 'package:colla_chat/pages/chat/chat/chat_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/full_screen_widget.dart';
@@ -28,6 +29,7 @@ class ChatMessageView extends StatefulWidget with TileDataMixin {
   final FullScreenWidget fullScreenWidget = const FullScreenWidget();
   final VideoChatWidget videoChatWidget = const VideoChatWidget();
   final ChatMessageWidget chatMessageWidget = ChatMessageWidget();
+  final chatMessageInputWidget = ChatMessageInputWidget();
 
   ChatMessageView({
     Key? key,
@@ -168,6 +170,20 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     }
   }
 
+  ///创建消息显示面板，包含消息的输入框
+  Widget _buildChatMessageWidget(BuildContext context) {
+    return Column(children: <Widget>[
+      Flexible(
+        //使用列表渲染消息
+        child: widget.chatMessageWidget,
+      ),
+      const Divider(
+        height: 1.0,
+      ),
+      widget.chatMessageInputWidget,
+    ]);
+  }
+
   @override
   Widget build(BuildContext context) {
     var chatSummary = _chatSummary.value;
@@ -211,7 +227,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
             titleWidget: titleWidget,
             withLeading: widget.withLeading,
             rightWidgets: rightWidgets,
-            child: widget.chatMessageWidget));
+            child: _buildChatMessageWidget(context)));
 
     return appBarView;
   }
