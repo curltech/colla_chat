@@ -3,7 +3,7 @@ import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:flutter/material.dart';
 
-///多个视频窗口的排列
+///多个小视频窗口的排列
 class VideoViewCard extends StatefulWidget {
   final VideoRenderController videoRenderController;
   final Color? color;

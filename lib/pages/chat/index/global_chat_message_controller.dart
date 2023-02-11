@@ -74,11 +74,11 @@ class GlobalChatMessageController with ChangeNotifier {
         if (originSubMessageType == ChatMessageSubType.videoChat.name) {
           if (chatMessage.status == MessageStatus.accepted.name) {
             //收到视频通话邀请同意回执，发出本地流，关闭拨号窗口VideoDialOutWidget，显示视频通话窗口VideoChatWidget
-            videoChatReceiptController.setChatReceipt(
+            videoChatReceiptController.receivedChatReceipt(
                 chatMessage, ChatDirect.receive);
           } else if (chatMessage.status == MessageStatus.rejected.name) {
             //收到视频通话邀请拒绝回执，关闭本地流，关闭拨号窗口VideoDialOutWidget
-            videoChatReceiptController.setChatReceipt(
+            videoChatReceiptController.receivedChatReceipt(
                 chatMessage, ChatDirect.receive);
           }
         }

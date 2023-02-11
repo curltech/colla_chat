@@ -10,7 +10,8 @@ import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/transport/webrtc/video_room_controller.dart';
 import 'package:flutter/material.dart';
 
-///视频通话的请求消息，和回执消息控制器
+///视频通话的回执消息控制器
+///接受方根据发起方的消息生成对应的接受或者拒绝或者终止的回执,发起方收到回执进行处理
 class VideoChatReceiptController with ChangeNotifier {
   //媒体回执消息，对发起方来说是是收到的(senderPeerId)，对接受方来说是自己根据_chatMessage生成的(receiverPeerId)
   ChatMessage? _chatReceipt;
@@ -25,12 +26,12 @@ class VideoChatReceiptController with ChangeNotifier {
     return _direct;
   }
 
-  ///设置视频通话请求或者回执，由direct决定是请求还是回执
-  setChatReceipt(ChatMessage? chatReceipt, ChatDirect direct) {
+  ///接受到视频通话回执，一般由globalChatMessageController分发到此
+  receivedChatReceipt(ChatMessage? chatReceipt, ChatDirect direct) {
     logger.i('${direct.name} chatVideo chatReceipt');
     _direct = direct;
     _chatReceipt = chatReceipt;
-    receivedReceipt();
+    _receivedChatReceipt();
     notifyListeners();
   }
 
@@ -74,8 +75,8 @@ class VideoChatReceiptController with ChangeNotifier {
   }
 
   ///收到视频通话的回执，在群通话的情况下，可以收到多次
-  ///每次代表群里面的一个连接
-  receivedReceipt() async {
+  ///根据消息回执是接受拒绝还是终止进行处理
+  _receivedChatReceipt() async {
     ChatMessage? chatReceipt = videoChatReceiptController.chatReceipt;
     ChatDirect? direct = videoChatReceiptController.direct;
     if (chatReceipt == null || direct == null || direct != ChatDirect.receive) {
@@ -126,14 +127,14 @@ class VideoChatReceiptController with ChangeNotifier {
           }
           advancedPeerConnection.room = room;
         }
-        VideoRoomController videoRoomController =
-            videoRoomPool.createRoomController(room);
-        videoRoomPool.roomId = room.roomId;
+        VideoRoomRenderController videoRoomController =
+            videoRoomRenderPool.createRoomController(room);
+        videoRoomRenderPool.roomId = room.roomId;
         videoRoomController.addAdvancedPeerConnection(advancedPeerConnection);
       }
     } else if (status == MessageStatus.rejected.name) {
       await localVideoRenderController.close();
-    }
+    } else if (status == MessageStatus.terminated.name) {}
   }
 }
 

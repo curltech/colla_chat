@@ -16,7 +16,7 @@ import 'package:colla_chat/transport/webrtc/video_room_controller.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:flutter/material.dart';
 
-///视频通话拨入的对话框
+///视频通话拨入的对话框，展示在屏幕顶部
 class VideoDialInWidget extends StatelessWidget {
   ///视频通话的消息请求
   final ChatMessage chatMessage;
@@ -39,7 +39,7 @@ class VideoDialInWidget extends StatelessWidget {
     if (chatReceipt != null) {
       logger.w('sent videoChat chatReceipt ${receiptType.name}');
       await chatMessageService.sendAndStore(chatReceipt);
-      videoChatReceiptController.setChatReceipt(chatReceipt, ChatDirect.send);
+      videoChatReceiptController.receivedChatReceipt(chatReceipt, ChatDirect.send);
       String? subMessageType = chatMessage.subMessageType;
       if (receiptType == MessageStatus.accepted) {
         var peerId = chatReceipt.receiverPeerId!;
@@ -94,9 +94,9 @@ class VideoDialInWidget extends StatelessWidget {
             }
             advancedPeerConnection.room = room;
           }
-          VideoRoomController videoRoomController =
-              videoRoomPool.createRoomController(room);
-          videoRoomPool.roomId = room.roomId;
+          VideoRoomRenderController videoRoomController =
+              videoRoomRenderPool.createRoomController(room);
+          videoRoomRenderPool.roomId = room.roomId;
           videoRoomController.addAdvancedPeerConnection(advancedPeerConnection);
           indexWidgetProvider.push('chat_message');
           indexWidgetProvider.push('video_chat');

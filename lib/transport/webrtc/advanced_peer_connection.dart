@@ -182,8 +182,8 @@ class AdvancedPeerConnection {
       return null;
     }
     String roomId = room!.roomId!;
-    VideoRoomController? videoRoomController =
-        videoRoomPool.getVideoRoomController(roomId);
+    VideoRoomRenderController? videoRoomController =
+        videoRoomRenderPool.getVideoRoomController(roomId);
     if (videoRoomController == null) {
       logger.e('videoRoomController:$roomId is not exist');
       return null;
@@ -217,8 +217,8 @@ class AdvancedPeerConnection {
       return null;
     }
     String roomId = room!.roomId!;
-    VideoRoomController? videoRoomController =
-        videoRoomPool.getVideoRoomController(roomId);
+    VideoRoomRenderController? videoRoomController =
+        videoRoomRenderPool.getVideoRoomController(roomId);
     if (videoRoomController == null) {
       logger.e('videoRoomController:$roomId is not exist');
       return null;

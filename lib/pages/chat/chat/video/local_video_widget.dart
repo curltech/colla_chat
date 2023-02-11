@@ -21,18 +21,20 @@ import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-///视频通话的流程
-///1.发起方发起视频通话请求，激活拨出窗口；
-///2.接收方接收视频通话请求，激活拨入对话框；
-///3.接收方选择接受或者拒绝，如果接受，发送回执，关闭对话框，激活本地视频并加入连接，打开通话窗口
-///4.接收方选择拒绝，发送回执，关闭对话框
-///5.发起方收到回执，如果是接受回执，关闭拨出窗口，激活本地视频并加入连接，打开通话窗口，等待远程视频流到来，显示
-///6.发起方收到回执，如果是拒绝回执，关闭拨出窗口
-///7.接收方等待远程视频流到来，显示
-///8.如果发起方在接收回执到来前，自己主动终止请求，执行挂断操作，设置挂断标志，对远程流不予接受
+///视频通话的流程，适用单个通话和群
+///1.发起方在本地通话窗口发起视频通话请求（缺省会打开本地的视频或者音频，但不会打开屏幕共享），实际是先加入本地流（还没有重新协商），
+///然后一个视频通话的邀请消息发送出去，邀请消息的编号也是房间号，以后通过消息编号可以重新加入
+///2.接收方接收视频通话请求，屏幕顶部激活拨入对话框；
+///3.接收方选择接受或者拒绝，无论接受或者拒绝，先发送回执消息，关闭对话框，
+///如果是接受，激活本地视频或者音频，并加入本地连接，打开本地通话窗口，发起重新协商，打开远程通话窗口，等待远程视频流到来，开始通话
+///4.接收方如果选择拒绝，以后可以通过点击视频通话请求消息重新进入本地通话窗口，然后再次加入视频，
+///5.发起方收到回执，如果是接受回执，关闭本地通话窗口，打开远程通话窗口，等待远程视频流到来，开始通话
+///6.发起方收到回执，如果是拒绝回执，关闭本地通话窗口，回到文本通话窗口
+///7.任何方主动终止请求，发起视频通话终止请求，执行挂断操作，设置挂断标志，关闭本地流和远程流
+///8.任何方接受到视频通话终止请求消息，执行挂断操作，设置挂断标志，关闭本地流和远程流，发起重新协商
 
-///本地视频通话显示和拨出的窗口，显示多个小视频窗口，每个小窗口代表一个对方，其中一个是自己
-///以及各种功能按钮
+///本地视频通话显示和拨出的窗口，显示多个本地视频，音频和屏幕共享的小视频窗口
+///各种功能按钮，可以切换视频和音频，添加屏幕共享视频，此时需要发起重新协商
 class LocalVideoWidget extends StatefulWidget {
   final Color? color;
 
@@ -139,7 +141,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           } else {
             await localVideoRenderController.createAudioMediaRender();
           }
-          var videoRoomController = videoRoomPool.videoRoomController;
+          var videoRoomController = videoRoomRenderPool.videoRoomController;
           bool connected = false;
           if (videoRoomController != null) {
             List<AdvancedPeerConnection> pcs =

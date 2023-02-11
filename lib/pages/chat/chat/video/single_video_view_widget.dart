@@ -4,7 +4,7 @@ import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 
-///单个视频窗口，长按出现更大的窗口，带有操作按钮
+///单个小视频窗口，显示一个视频流的PeerVideoRender，长按出现更大的窗口，带有操作按钮
 class SingleVideoViewWidget extends StatefulWidget {
   final PeerVideoRender render;
   final double? height;

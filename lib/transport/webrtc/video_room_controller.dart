@@ -5,8 +5,8 @@ import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:flutter/material.dart';
 
-///一组webrtc连接，这些连接与自己正在视频通话，此控制器用于通知视频通话界面的刷新
-class VideoRoomController extends VideoRenderController {
+///视频通话的房间，包含一组webrtc连接，这些连接与自己正在视频通话，此控制器用于通知视频通话界面的刷新
+class VideoRoomRenderController extends VideoRenderController {
   ///根据peerId和clientId对应的所有的连接
   final Map<String, AdvancedPeerConnection> _peerConnections = {};
   final Room room;
@@ -14,7 +14,7 @@ class VideoRoomController extends VideoRenderController {
   //根据peerId和clientId的连接所对应的render控制器，每一个render控制器包含多个render
   Map<String, VideoRenderController> videoRenderControllers = {};
 
-  VideoRoomController(this.room);
+  VideoRoomRenderController(this.room);
 
   String _getKey(String peerId, String clientId) {
     var key = '$peerId:$clientId';
@@ -133,12 +133,13 @@ class VideoRoomController extends VideoRenderController {
   }
 }
 
-class VideoRoomPool with ChangeNotifier {
-  Map<String, VideoRoomController> videoRoomControllers = {};
+///所有的视频通话的房间的池，包含多个房间，每个房间的房间号是视频通话邀请的消息号
+class VideoRoomRenderPool with ChangeNotifier {
+  Map<String, VideoRoomRenderController> videoRoomControllers = {};
   Map<String, Room> rooms = {};
   String? _roomId;
 
-  VideoRoomPool();
+  VideoRoomRenderPool();
 
   ///获取当前房间号
   String? get roomId {
@@ -153,7 +154,7 @@ class VideoRoomPool with ChangeNotifier {
   }
 
   ///获取当前房间的控制器
-  VideoRoomController? get videoRoomController {
+  VideoRoomRenderController? get videoRoomController {
     if (_roomId != null) {
       return videoRoomControllers[_roomId];
     }
@@ -168,7 +169,7 @@ class VideoRoomPool with ChangeNotifier {
     return null;
   }
 
-  VideoRoomController? getVideoRoomController(String roomId) {
+  VideoRoomRenderController? getVideoRoomController(String roomId) {
     return videoRoomControllers[roomId];
   }
 
@@ -177,11 +178,12 @@ class VideoRoomPool with ChangeNotifier {
   }
 
   ///创建新的房间，返回其控制器
-  VideoRoomController createRoomController(Room room) {
+  VideoRoomRenderController createRoomController(Room room) {
     String roomId = room.roomId!;
-    VideoRoomController? videoRoomController = videoRoomControllers[roomId];
+    VideoRoomRenderController? videoRoomController =
+        videoRoomControllers[roomId];
     if (videoRoomController == null) {
-      videoRoomController = VideoRoomController(room);
+      videoRoomController = VideoRoomRenderController(room);
       videoRoomControllers[roomId] = videoRoomController;
       rooms[roomId] = room;
     }
@@ -189,7 +191,8 @@ class VideoRoomPool with ChangeNotifier {
   }
 
   closeRoom(String roomId) {
-    VideoRoomController? videoRoomController = videoRoomControllers[roomId];
+    VideoRoomRenderController? videoRoomController =
+        videoRoomControllers[roomId];
     if (videoRoomController != null) {
       videoRoomController.close();
       rooms.remove(roomId);
@@ -200,4 +203,4 @@ class VideoRoomPool with ChangeNotifier {
   }
 }
 
-final VideoRoomPool videoRoomPool = VideoRoomPool();
+final VideoRoomRenderPool videoRoomRenderPool = VideoRoomRenderPool();

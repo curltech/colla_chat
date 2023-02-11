@@ -39,7 +39,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   @override
   void initState() {
     super.initState();
-    videoRoomPool.addListener(_update);
+    videoRoomRenderPool.addListener(_update);
   }
 
   _update() {}
@@ -71,7 +71,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   }
 
   Widget _buildVideoChatView(BuildContext context) {
-    var roomId = videoRoomPool.roomId;
+    var roomId = videoRoomRenderPool.roomId;
     return Swiper(
       controller: SwiperController(),
       itemCount: 2,
@@ -114,7 +114,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
 
   @override
   void dispose() {
-    videoRoomPool.removeListener(_update);
+    videoRoomRenderPool.removeListener(_update);
     super.dispose();
   }
 }
