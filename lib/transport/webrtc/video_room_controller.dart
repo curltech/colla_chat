@@ -135,7 +135,7 @@ class VideoRoomRenderController extends VideoRenderController {
 
 ///所有的视频通话的房间的池，包含多个房间，每个房间的房间号是视频通话邀请的消息号
 class VideoRoomRenderPool with ChangeNotifier {
-  Map<String, VideoRoomRenderController> videoRoomControllers = {};
+  Map<String, VideoRoomRenderController> videoRoomRenderControllers = {};
   Map<String, Room> rooms = {};
   String? _roomId;
 
@@ -154,9 +154,9 @@ class VideoRoomRenderPool with ChangeNotifier {
   }
 
   ///获取当前房间的控制器
-  VideoRoomRenderController? get videoRoomController {
+  VideoRoomRenderController? get videoRoomRenderController {
     if (_roomId != null) {
-      return videoRoomControllers[_roomId];
+      return videoRoomRenderControllers[_roomId];
     }
     return null;
   }
@@ -170,7 +170,7 @@ class VideoRoomRenderPool with ChangeNotifier {
   }
 
   VideoRoomRenderController? getVideoRoomController(String roomId) {
-    return videoRoomControllers[roomId];
+    return videoRoomRenderControllers[roomId];
   }
 
   Room? getRoom(String roomId) {
@@ -181,18 +181,19 @@ class VideoRoomRenderPool with ChangeNotifier {
   VideoRoomRenderController createRoomController(Room room) {
     String roomId = room.roomId!;
     VideoRoomRenderController? videoRoomController =
-        videoRoomControllers[roomId];
+        videoRoomRenderControllers[roomId];
     if (videoRoomController == null) {
       videoRoomController = VideoRoomRenderController(room);
-      videoRoomControllers[roomId] = videoRoomController;
+      videoRoomRenderControllers[roomId] = videoRoomController;
       rooms[roomId] = room;
+      _roomId = room.roomId;
     }
     return videoRoomController;
   }
 
   closeRoom(String roomId) {
     VideoRoomRenderController? videoRoomController =
-        videoRoomControllers[roomId];
+        videoRoomRenderControllers[roomId];
     if (videoRoomController != null) {
       videoRoomController.close();
       rooms.remove(roomId);

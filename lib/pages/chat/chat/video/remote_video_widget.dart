@@ -29,7 +29,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   @override
   void initState() {
     super.initState();
-    var videoRoomController = videoRoomRenderPool.videoRoomController;
+    var videoRoomController = videoRoomRenderPool.videoRoomRenderController;
     if (videoRoomController != null) {
       videoRoomController.addListener(_update);
     }
@@ -69,7 +69,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   }
 
   _close() async {
-    var videoRoomController = videoRoomRenderPool.videoRoomController;
+    var videoRoomController = videoRoomRenderPool.videoRoomRenderController;
     if (videoRoomController != null) {
       videoRoomController.close();
     }
@@ -78,7 +78,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   ///切换显示按钮面板
   void _toggleActionCard() {
     int count = 0;
-    var videoRoomController = videoRoomRenderPool.videoRoomController;
+    var videoRoomController = videoRoomRenderPool.videoRoomRenderController;
     if (videoRoomController != null) {
       count = videoRoomController.videoRenders.length;
     }
@@ -168,7 +168,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
 
   @override
   void dispose() {
-    var videoRoomController = videoRoomRenderPool.videoRoomController;
+    var videoRoomController = videoRoomRenderPool.videoRoomRenderController;
     if (videoRoomController != null) {
       videoRoomController.removeListener(_update);
     }

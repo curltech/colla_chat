@@ -76,6 +76,15 @@ class VideoRenderController with ChangeNotifier {
     }
   }
 
+  remove(PeerVideoRender videoRender) {
+    var id = videoRender.id;
+    if (id != null && videoRenders.containsKey(id)) {
+      videoRender.dispose();
+      videoRenders.remove(id);
+      notifyListeners();
+    }
+  }
+
   ///关闭streamId的流或者关闭控制器所有的流
   close({String? streamId}) {
     if (streamId == null) {
@@ -100,7 +109,7 @@ class VideoRenderController with ChangeNotifier {
 
 ///本地媒体控制器
 class LocalVideoRenderController extends VideoRenderController {
-  //视频和音频的render
+  //本地视频和音频的render，只能是其中一种，可以切换
   PeerVideoRender? _videoChatRender;
 
   PeerVideoRender? get videoChatRender {
@@ -108,9 +117,23 @@ class LocalVideoRenderController extends VideoRenderController {
   }
 
   set videoChatRender(PeerVideoRender? videoRender) {
-    if (_videoChatRender != _videoChatRender) {
-      _videoChatRender = _videoChatRender;
+    if (_videoChatRender != videoRender) {
+      if (_videoChatRender != null) {
+        remove(_videoChatRender!);
+      }
+      if (videoRender != null) {
+        add(videoRender);
+      }
+      _videoChatRender = videoRender;
     }
+  }
+
+  //判断是否有视频
+  bool get video {
+    if (_videoChatRender != null) {
+      return _videoChatRender!.video;
+    }
+    return false;
   }
 
   ///创建本地的Video render
@@ -126,14 +149,13 @@ class LocalVideoRenderController extends VideoRenderController {
     PeerVideoRender render = await PeerVideoRender.fromVideoMedia(
       myself.peerId!,
       clientId: myself.clientId,
-      name: myself.myselfPeer!.name,
+      name: myself.myselfPeer.name,
       audio: audio,
       minWidth: minWidth,
       minHeight: minHeight,
       minFrameRate: minFrameRate,
     );
-    _videoChatRender = render;
-    add(render);
+    videoChatRender = render;
 
     return render;
   }
@@ -146,10 +168,9 @@ class LocalVideoRenderController extends VideoRenderController {
     PeerVideoRender render = await PeerVideoRender.fromAudioMedia(
       myself.peerId!,
       clientId: myself.clientId,
-      name: myself.myselfPeer!.name,
+      name: myself.myselfPeer.name,
     );
-    _videoChatRender = render;
-    add(render);
+    videoChatRender = render;
 
     return render;
   }
@@ -162,7 +183,7 @@ class LocalVideoRenderController extends VideoRenderController {
     PeerVideoRender render = await PeerVideoRender.fromDisplayMedia(
         myself.peerId!,
         clientId: myself.clientId,
-        name: myself.myselfPeer!.name,
+        name: myself.myselfPeer.name,
         selectedSource: selectedSource,
         audio: audio);
     add(render);
@@ -182,7 +203,7 @@ class LocalVideoRenderController extends VideoRenderController {
     PeerVideoRender render = await PeerVideoRender.fromMediaStream(
       myself.peerId!,
       clientId: myself.clientId,
-      name: myself.myselfPeer!.name,
+      name: myself.myselfPeer.name,
       stream: stream,
     );
     add(render);

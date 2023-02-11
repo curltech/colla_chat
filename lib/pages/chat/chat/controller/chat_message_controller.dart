@@ -136,6 +136,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       dynamic content,
       ContentType contentType = ContentType.text,
       String? mimeType,
+      String? messageId,
       ChatMessageType messageType = ChatMessageType.chat,
       ChatMessageSubType subMessageType = ChatMessageSubType.chat,
       List<String>? peerIds}) async {
@@ -156,6 +157,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
           content: content,
           contentType: contentType,
           mimeType: mimeType,
+          messageId: messageId,
           messageType: messageType,
           subMessageType: subMessageType,
           deleteTime: _deleteTime,
@@ -172,6 +174,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       List<ChatMessage> chatMessages =
           await chatMessageService.buildGroupChatMessage(
         peerId,
+        messageId: messageId,
         content: content,
         contentType: contentType,
         mimeType: mimeType,

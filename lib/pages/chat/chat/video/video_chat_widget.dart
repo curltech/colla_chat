@@ -102,7 +102,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
           onPressed: () {
             _minimize(context);
           },
-          icon: const Icon(Icons.zoom_in_map)),
+          icon: const Icon(Icons.zoom_in_map, color: Colors.white)),
     ];
     return AppBarView(
       title: widget.title,

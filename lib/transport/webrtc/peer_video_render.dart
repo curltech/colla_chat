@@ -28,6 +28,9 @@ class PeerVideoRender {
   String? name;
   String? clientId;
 
+  bool audio = false;
+  bool video = false;
+
   PeerVideoRender({this.mediaStream}) {
     if (mediaStream != null) {
       id = mediaStream!.id;
@@ -153,6 +156,8 @@ class PeerVideoRender {
         await navigator.mediaDevices.getUserMedia(mediaConstraints);
     this.mediaStream = mediaStream;
     id = mediaStream.id;
+    this.audio = audio;
+    video = true;
   }
 
   ///获取本机屏幕流
@@ -188,6 +193,8 @@ class PeerVideoRender {
         await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
     this.mediaStream = mediaStream;
     id = mediaStream.id;
+    this.audio = audio;
+    this.video = true;
   }
 
   ///获取本机音频流
@@ -207,6 +214,8 @@ class PeerVideoRender {
         await navigator.mediaDevices.getUserMedia(mediaConstraints);
     this.mediaStream = mediaStream;
     id = mediaStream.id;
+    audio = true;
+    video = false;
   }
 
   //获取本机的设备清单

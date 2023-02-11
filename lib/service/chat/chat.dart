@@ -402,6 +402,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     ContentType contentType = ContentType.text,
     String? mimeType,
     String? title,
+    String? messageId,
     dynamic receiptContent,
     List<int>? thumbnail,
     int deleteTime = 0,
@@ -414,6 +415,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       var groupName = group.name;
       var groupChatMessage = await buildChatMessage(groupPeerId,
           content: content,
+          messageId: messageId,
           messageType: messageType,
           subMessageType: subMessageType,
           contentType: contentType,
@@ -428,7 +430,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           deleteTime: deleteTime,
           parentMessageId: parentMessageId);
       chatMessages.add(groupChatMessage);
-      var messageId = groupChatMessage.messageId;
+      messageId = groupChatMessage.messageId;
       List<GroupMember> groupMembers =
           await groupMemberService.findByGroupId(groupPeerId);
       List<Linkman> linkmen =
