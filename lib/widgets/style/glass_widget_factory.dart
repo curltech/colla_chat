@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:flutter/material.dart';
@@ -7,21 +8,25 @@ final defaultLinearGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      myself.primary.withOpacity(0.1),
-      myself.primary.withOpacity(0.05),
+      myself.primary.withOpacity(AppOpacity.lgOpacity),
+      myself.primary.withOpacity(AppOpacity.xlOpacity),
     ],
     stops: const [
-      0.1,
-      1,
+      AppOpacity.lgOpacity,
+      AppOpacity.xsOpacity,
     ]);
 final defaultBorderGradient = LinearGradient(
   begin: Alignment.topLeft,
   end: Alignment.bottomRight,
   colors: [
-    myself.primary.withOpacity(0.5),
-    myself.primary.withOpacity(0.5),
+    myself.primary.withOpacity(AppOpacity.lgOpacity),
+    myself.primary.withOpacity(AppOpacity.lgOpacity),
   ],
 );
+
+const double blur = 5;
+const double border = 0;
+const double borderRadius = 0;
 
 class GlassWidgetFactory extends WidgetFactory {
   @override
@@ -36,10 +41,10 @@ class GlassWidgetFactory extends WidgetFactory {
     Matrix4? transform,
     required double width,
     required double height,
-    double borderRadius = 0,
+    double borderRadius = borderRadius,
     LinearGradient? linearGradient,
-    double border = 0,
-    double blur = 20,
+    double border = border,
+    double blur = blur,
     LinearGradient? borderGradient,
   }) {
     return GlassmorphicContainer(
@@ -71,10 +76,10 @@ class GlassWidgetFactory extends WidgetFactory {
     BoxConstraints? constraints,
     EdgeInsetsGeometry? margin,
     Matrix4? transform,
-    double borderRadius = 0,
+    double borderRadius = borderRadius,
     LinearGradient? linearGradient,
-    double border = 0,
-    double blur = 20,
+    double border = border,
+    double blur = blur,
     LinearGradient? borderGradient,
     int? flex = 1,
   }) {

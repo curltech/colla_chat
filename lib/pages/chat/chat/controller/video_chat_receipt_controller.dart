@@ -12,27 +12,40 @@ import 'package:flutter/material.dart';
 
 ///视频通话的回执消息控制器
 ///接受方根据发起方的消息生成对应的接受或者拒绝或者终止的回执,发起方收到回执进行处理
-class VideoChatReceiptController with ChangeNotifier {
+class VideoChatMessageController with ChangeNotifier {
   //媒体回执消息，对发起方来说是是收到的(senderPeerId)，对接受方来说是自己根据_chatMessage生成的(receiverPeerId)
+  ChatMessage? _chatMessage;
+
   ChatMessage? _chatReceipt;
 
-  ChatDirect? _direct;
+  final List<ChatMessage> _chatReceipts = [];
+
+  ChatMessage? get chatMessage {
+    return _chatMessage;
+  }
+
+  set chatMessage(ChatMessage? chatMessage) {
+    if (_chatMessage != chatMessage) {
+      _chatMessage = chatMessage;
+    }
+  }
 
   ChatMessage? get chatReceipt {
     return _chatReceipt;
   }
 
-  ChatDirect? get direct {
-    return _direct;
+  List<ChatMessage> get chatChatReceipts {
+    return _chatReceipts;
   }
 
   ///接受到视频通话回执，一般由globalChatMessageController分发到此
-  receivedChatReceipt(ChatMessage? chatReceipt, ChatDirect direct) {
-    logger.i('${direct.name} chatVideo chatReceipt');
-    _direct = direct;
-    _chatReceipt = chatReceipt;
-    _receivedChatReceipt();
-    notifyListeners();
+  receivedChatReceipt(ChatMessage chatReceipt) {
+    if (_chatReceipt != chatReceipt) {
+      _chatReceipt = chatReceipt;
+      _chatReceipts.add(chatReceipt);
+      _receivedChatReceipt();
+      notifyListeners();
+    }
   }
 
   String? get peerId {
@@ -77,21 +90,19 @@ class VideoChatReceiptController with ChangeNotifier {
   ///收到视频通话的回执，在群通话的情况下，可以收到多次
   ///根据消息回执是接受拒绝还是终止进行处理
   _receivedChatReceipt() async {
-    ChatMessage? chatReceipt = videoChatReceiptController.chatReceipt;
-    ChatDirect? direct = videoChatReceiptController.direct;
-    if (chatReceipt == null || direct == null || direct != ChatDirect.receive) {
+    if (_chatReceipt == null) {
       return;
     }
-    String? status = chatReceipt.status;
-    String? subMessageType = chatReceipt.subMessageType;
+    String? status = _chatReceipt!.status;
+    String? subMessageType = _chatReceipt!.subMessageType;
     logger.w('received videoChat chatReceipt status: $status');
     if (subMessageType != ChatMessageSubType.chatReceipt.name) {
       return;
     }
     //接受通话请求
     if (status == MessageStatus.accepted.name) {
-      var peerId = chatReceipt.senderPeerId!;
-      var clientId = chatReceipt.senderClientId!;
+      var peerId = _chatReceipt!.senderPeerId!;
+      var clientId = _chatReceipt!.senderClientId!;
       AdvancedPeerConnection? advancedPeerConnection =
           peerConnectionPool.getOne(
         peerId,
@@ -110,7 +121,7 @@ class VideoChatReceiptController with ChangeNotifier {
         ///对方同意视频通话则加入到视频连接池中
         Room? room = advancedPeerConnection.room;
         if (room == null) {
-          String messageId = chatReceipt.messageId!;
+          String messageId = _chatReceipt!.messageId!;
           var chatMessage = await chatMessageService.findByMessageId(messageId,
               receiverPeerId: peerId);
           if (chatMessage == null) {
@@ -138,5 +149,5 @@ class VideoChatReceiptController with ChangeNotifier {
   }
 }
 
-final VideoChatReceiptController videoChatReceiptController =
-    VideoChatReceiptController();
+final VideoChatMessageController videoChatMessageController =
+    VideoChatMessageController();

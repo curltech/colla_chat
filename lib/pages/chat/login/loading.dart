@@ -6,7 +6,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:flutter/material.dart';
 
 class LoadingBackgroundImage {
-  final List<String> darkBackgroudImages = [
+  final List<String> darkBackgroundImages = [
     'assets/images/bg/login-bg-wd-1.jpg',
     'assets/images/bg/login-bg-wd-2.jpg',
     'assets/images/bg/login-bg-wd-3.jpg',
@@ -18,9 +18,10 @@ class LoadingBackgroundImage {
     'assets/images/bg/login-bg-wd-9.jpg',
     'assets/images/bg/login-bg-wd-10.jpg',
     'assets/images/bg/login-bg-wd-11.jpg',
+    'assets/images/bg/login-bg-wd-12.jpg',
   ];
 
-  final List<String> lightBackgroudImages = [
+  final List<String> lightBackgroundImages = [
     'assets/images/bg/login-bg-wl-1.jpg',
     'assets/images/bg/login-bg-wl-2.jpg',
     'assets/images/bg/login-bg-wl-3.jpg',
@@ -32,6 +33,7 @@ class LoadingBackgroundImage {
     'assets/images/bg/login-bg-wl-9.jpg',
     'assets/images/bg/login-bg-wl-10.jpg',
     'assets/images/bg/login-bg-wl-11.jpg',
+    'assets/images/bg/login-bg-wl-12.jpg',
   ];
 
   final lightChildren = <Widget>[];
@@ -39,16 +41,16 @@ class LoadingBackgroundImage {
   int currentIndex = 0;
 
   LoadingBackgroundImage() {
-    for (int i = 0; i < lightBackgroudImages.length; ++i) {
+    for (int i = 0; i < lightBackgroundImages.length; ++i) {
       var image = Image.asset(
-        lightBackgroudImages[i],
+        lightBackgroundImages[i],
         fit: BoxFit.cover,
       );
       lightChildren.add(image);
     }
-    for (int i = 0; i < darkBackgroudImages.length; ++i) {
+    for (int i = 0; i < darkBackgroundImages.length; ++i) {
       var image = Image.asset(
-        darkBackgroudImages[i],
+        darkBackgroundImages[i],
         fit: BoxFit.cover,
       );
       darkChildren.add(image);
@@ -93,7 +95,7 @@ class _LoadingState extends State<Loading> {
   void initState() {
     super.initState();
     myself.addListener(_update);
-    int count = loadingBackgroundImage.lightBackgroudImages.length;
+    int count = loadingBackgroundImage.lightBackgroundImages.length;
 
     ///在initState中调用context出错
     // if (myself.getBrightness(context) == Brightness.dark) {

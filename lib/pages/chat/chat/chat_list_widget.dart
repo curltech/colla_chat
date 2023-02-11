@@ -337,7 +337,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
       tabs: tabs,
       controller: _tabController,
       isScrollable: false,
-      indicatorColor: myself.primary,
+      indicatorColor: myself.primary.withOpacity(AppOpacity.xlOpacity),
       labelColor: Colors.white,
       padding: const EdgeInsets.all(0.0),
       labelPadding: const EdgeInsets.all(0.0),

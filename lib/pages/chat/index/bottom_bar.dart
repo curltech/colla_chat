@@ -41,6 +41,7 @@ class _BottomBarState extends State<BottomBar> {
         currentIndex: indexWidgetProvider.currentMainIndex,
         selectedItemColor: myself.primary,
         unselectedItemColor: Colors.grey,
+        backgroundColor: Colors.white,
         selectedFontSize: 14.0,
         unselectedFontSize: 14.0,
         showSelectedLabels: true,
