@@ -2,10 +2,14 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/linkman/group_linkman_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/special_text/custom_extended_text_selection_controls.dart';
@@ -151,6 +155,25 @@ class _ExtendedTextMessageInputWidgetState
     Navigator.pop(context, selected);
   }
 
+  _selectGroupLinkman() async {
+    var chatSummary = chatMessageController.chatSummary;
+    if (chatSummary != null) {
+      if (chatSummary.partyType == PartyType.group.name) {
+        var groupPeerId = chatSummary.peerId;
+        await DialogUtil.show(
+            context: context,
+            builder: (BuildContext context) {
+              return GroupLinkmanWidget(
+                selectType: SelectType.listview,
+                onSelected: _onSelected,
+                selected: [],
+                groupPeerId: groupPeerId!,
+              );
+            });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     //FocusScope.of(context).autofocus(_focusNode);
@@ -178,22 +201,14 @@ class _ExtendedTextMessageInputWidgetState
       ),
       controller: widget.textEditingController,
       selectionControls: extendedMaterialTextSelectionControls,
-      focusNode: focusNode,
+      //focusNode: focusNode,
       autofocus: true,
       onTap: () => setState(() {
         if (focusNode.hasFocus) {}
       }),
       onChanged: (String value) async {
         if (value == '@') {
-          await DialogUtil.show(
-              context: context,
-              builder: (BuildContext context) {
-                return Dialog(
-                    child: LinkmanGroupSearchWidget(
-                        onSelected: _onSelected,
-                        selected: [],
-                        selectType: SelectType.listview));
-              });
+          await _selectGroupLinkman();
         }
       },
       //onChanged: onChanged,
@@ -207,6 +222,15 @@ class _ExtendedTextMessageInputWidgetState
         disabledBorder: InputBorder.none,
         focusedErrorBorder: InputBorder.none,
         hintText: AppLocalizations.t('Please input message'),
+        suffixIcon: InkWell(
+          onTap: () {
+            widget.textEditingController.clear();
+          },
+          child: Icon(
+            Icons.clear_rounded,
+            color: myself.primary,
+          ),
+        ),
         //isCollapsed: true,
       ),
       //textDirection: TextDirection.rtl,

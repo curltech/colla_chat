@@ -119,7 +119,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               Navigator.pop(context, participants);
             },
             selected: [],
-            peerId: peerId!,
+            groupPeerId: peerId!,
           );
         });
     var random = Random.secure();

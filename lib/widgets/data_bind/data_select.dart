@@ -13,7 +13,8 @@ import 'package:multi_select_flutter/dialog/multi_select_dialog_field.dart';
 import 'package:multi_select_flutter/util/multi_select_item.dart';
 import 'package:multi_select_flutter/util/multi_select_list_type.dart';
 
-///利用Option产生的DropdownButton
+///利用Option产生的下拉按钮
+///利用回调函数onChanged回传选择的按钮
 class DataDropdownButton<T> extends StatefulWidget {
   final String title;
   final List<Option<T>> items;
@@ -76,12 +77,15 @@ class _DataDropdownButtonState<T> extends State<DataDropdownButton> {
   }
 }
 
-class DataListViewSelect<T> extends StatefulWidget {
+///利用DataListView实现的单选对组件类，可以包装到对话框中
+///利用回调函数onChanged回传选择的值
+class DataListSingleSelect<T> extends StatefulWidget {
   final String title;
   final List<Option<T>> items;
-  final Function(T? value) onChanged;
+  //用泛型T会报错
+  final Function(String? value) onChanged;
 
-  const DataListViewSelect(
+  const DataListSingleSelect(
       {Key? key,
       required this.title,
       required this.items,
@@ -89,10 +93,10 @@ class DataListViewSelect<T> extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _DataListViewSelectState<T>();
+  State<StatefulWidget> createState() => _DataListSingleSelectState<T>();
 }
 
-class _DataListViewSelectState<T> extends State<DataDropdownButton> {
+class _DataListSingleSelectState<T> extends State<DataListSingleSelect> {
   T? value;
 
   @override
@@ -124,6 +128,79 @@ class _DataListViewSelectState<T> extends State<DataDropdownButton> {
   }
 }
 
+///利用DataListView实现的多选对组件类，可以包装到对话框中
+///利用回调函数onChanged回传选择的值
+class DataListMultiSelect<T> extends StatefulWidget {
+  final String title;
+  final List<Option<T>> items;
+  final Function(List<T?> value) onChanged;
+
+  const DataListMultiSelect({
+    Key? key,
+    required this.title,
+    required this.items,
+    required this.onChanged,
+  }) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => _DataListMultiSelectState<T>();
+}
+
+class _DataListMultiSelectState<T> extends State<DataListMultiSelect> {
+  List<T> values = <T>[];
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Widget _buildDataListView(BuildContext context) {
+    List<TileData> tileData = [];
+    for (var item in widget.items) {
+      var label = AppLocalizations.t(item.label);
+      var tile =
+          TileData(title: label, subtitle: item.value, prefix: item.leading);
+      tileData.add(tile);
+    }
+    return ListView.builder(
+        //该属性将决定列表的长度是否仅包裹其内容的长度。
+        // 当 ListView 嵌在一个无限长的容器组件中时， shrinkWrap 必须为true
+        shrinkWrap: true,
+        itemCount: widget.items.length,
+        //physics: const NeverScrollableScrollPhysics(),
+        controller: ScrollController(),
+        itemBuilder: (BuildContext context, int index) {
+          Option option = widget.items[index];
+
+          Widget tileWidget = CheckboxListTile(
+            title: Text(option.label),
+            value: option.value,
+            selected: option.checked,
+            checkColor: myself.primary,
+            onChanged: (bool? value) {
+              if (value != null && value) {
+                values.add(option.value);
+              } else {
+                values.remove(option.value);
+              }
+              widget.onChanged(values);
+            },
+          );
+
+          return tileWidget;
+        });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var dataListView = _buildDataListView(context);
+    return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 15.0),
+        child: dataListView);
+  }
+}
+
+/// 多选对话框字段，这个实现相对比较复杂，样式美观，但是只能用于字段而且错误较多
 class SmartSelectUtil {
   ///smart single select button
   static Widget single<T>(
@@ -320,7 +397,9 @@ class SmartSelectUtil {
   }
 }
 
+/// 多选对话框和多选字段，这个实现相对比较单调
 class MultiSelectUtil {
+  ///多选对话框字段，用于form的字段选择
   static MultiSelectDialogField<T> buildMultiSelectDialogField<T>({
     required List<Option<T>> items,
     required void Function(List<T>) onConfirm,
@@ -406,6 +485,7 @@ class MultiSelectUtil {
     );
   }
 
+  ///多选对话框，用于直接弹出多选对话框
   static Widget buildMultiSelectDialog<T>({
     required List<Option<T>> items,
     Widget? title,
@@ -474,6 +554,7 @@ class MultiSelectUtil {
     return dialog;
   }
 
+  ///多选底部对话框，用于直接弹出底部的多选对话框
   static MultiSelectBottomSheet<T> buildMultiSelectBottomSheet<T>({
     required List<Option<T>> items,
     Widget? title,

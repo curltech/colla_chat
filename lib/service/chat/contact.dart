@@ -45,19 +45,41 @@ class LinkmanService extends PeerPartyService<Linkman> {
   }
 
   Future<List<Linkman>> search(String key) async {
+    var keyword = '%$key%';
     var where = '1=1';
     List<Object> whereArgs = [];
     if (StringUtil.isNotEmpty(key)) {
       where =
-          '$where and (peerId=? or mobile=? or name=? or pyName=? or email=?)';
-      whereArgs.addAll([key, key, key, key, key]);
+          '$where and (peerId=? or mobile like ? or name like ? or pyName like ? or email like ?)';
+      whereArgs.addAll([key, keyword, keyword, keyword, keyword]);
     }
     var linkmen = await find(
       where: where,
       whereArgs: whereArgs,
-      orderBy: 'pyName',
+      orderBy: 'pyName,name',
     );
+    if (linkmen.isNotEmpty) {
+      for (var linkman in linkmen) {
+        await setAvatar(linkman);
+      }
+    }
     return linkmen;
+  }
+
+  Future<void> setAvatar(Linkman linkman) async {
+    var peerId = linkman.peerId;
+    String? avatar = linkman.avatar;
+    if (avatar != null) {
+      var avatarImage = ImageUtil.buildImageWidget(
+          image: avatar, height: 32, width: 32, fit: BoxFit.contain);
+      linkman.avatarImage = avatarImage;
+    } else {
+      PeerClient? peerClient = await peerClientService.findOneByPeerId(peerId);
+      if (peerClient != null) {
+        linkman.avatarImage = peerClient.avatarImage;
+      }
+    }
+    linkmen[peerId] = linkman;
   }
 
   Future<Linkman?> findCachedOneByPeerId(String peerId) async {
@@ -66,19 +88,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
     }
     Linkman? linkman = await findOneByPeerId(peerId);
     if (linkman != null) {
-      String? avatar = linkman.avatar;
-      if (avatar != null) {
-        var avatarImage = ImageUtil.buildImageWidget(
-            image: avatar, height: 32, width: 32, fit: BoxFit.contain);
-        linkman.avatarImage = avatarImage;
-      } else {
-        PeerClient? peerClient =
-            await peerClientService.findOneByPeerId(peerId);
-        if (peerClient != null) {
-          linkman.avatarImage = peerClient.avatarImage;
-        }
-      }
-      linkmen[peerId] = linkman;
+      setAvatar(linkman);
     }
     return linkman;
   }
@@ -309,40 +319,45 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   Future<Group?> findCachedOneByPeerId(String peerId) async {
-    // if (groups.containsKey(peerId)) {
-    //   return groups[peerId];
-    // }
+    if (groups.containsKey(peerId)) {
+      return groups[peerId];
+    }
     Group? group = await findOneByPeerId(peerId);
     if (group != null) {
-      String? avatar = group.avatar;
-      if (avatar != null) {
-        var avatarImage = ImageUtil.buildImageWidget(
-            image: avatar, height: 32, width: 32, fit: BoxFit.contain);
-        group.avatarImage = avatarImage;
-      } else {
-        List<GroupMember> members =
-            await groupMemberService.findByGroupId(peerId);
-        List<Linkman> linkmen = await groupMemberService.findLinkmen(members);
-        if (linkmen.isNotEmpty) {
-          List<Widget> widgets = [];
-          for (var linkman in linkmen) {
-            if (linkman.avatarImage != null) {
-              widgets.add(linkman.avatarImage!);
-            }
-          }
-          group.avatarImage = CombineGridView(
-            widgets: widgets,
-            width: 32,
-            height: 32,
-            maxCount: 9,
-          );
-        } else {
-          group.avatarImage = AppImage.mdAppImage;
-        }
-      }
-      groups[peerId] = group;
+      await setAvatar(group);
     }
     return group;
+  }
+
+  Future<void> setAvatar(Group group) async {
+    String peerId = group.peerId;
+    String? avatar = group.avatar;
+    if (avatar != null) {
+      var avatarImage = ImageUtil.buildImageWidget(
+          image: avatar, height: 32, width: 32, fit: BoxFit.contain);
+      group.avatarImage = avatarImage;
+    } else {
+      List<GroupMember> members =
+          await groupMemberService.findByGroupId(peerId);
+      List<Linkman> linkmen = await groupMemberService.findLinkmen(members);
+      if (linkmen.isNotEmpty) {
+        List<Widget> widgets = [];
+        for (var linkman in linkmen) {
+          if (linkman.avatarImage != null) {
+            widgets.add(linkman.avatarImage!);
+          }
+        }
+        group.avatarImage = CombineGridView(
+          widgets: widgets,
+          width: 32,
+          height: 32,
+          maxCount: 9,
+        );
+      } else {
+        group.avatarImage = AppImage.mdAppImage;
+      }
+    }
+    groups[peerId] = group;
   }
 
   Future<Group> createGroup(String name) async {
@@ -399,16 +414,23 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   Future<List<Group>> search(String key) async {
+    var keyword = '%$key%';
     if (StringUtil.isEmpty(key)) {
       return await findAll();
     }
-    var where = 'peerId=? or mobile=? or name=? or myAlias=? or email=?';
-    var whereArgs = [key, key, key, key, key];
+    var where =
+        'peerId=? or mobile like ? or name like ? or myAlias like ? or email like ?';
+    var whereArgs = [key, keyword, keyword, keyword, keyword];
     var groups = await find(
       where: where,
       whereArgs: whereArgs,
-      orderBy: 'pyName',
+      orderBy: 'pyName,name',
     );
+    if (groups.isNotEmpty) {
+      for (var group in groups) {
+        setAvatar(group);
+      }
+    }
     return groups;
   }
 

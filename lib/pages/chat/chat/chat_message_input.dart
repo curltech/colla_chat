@@ -37,6 +37,7 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
   @override
   void initState() {
     super.initState();
+    widget.textEditingController.clear();
   }
 
   _update() {

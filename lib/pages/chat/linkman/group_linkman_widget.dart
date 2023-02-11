@@ -4,17 +4,16 @@ import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
-import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
 
-///在群中选择联系人
+///在群的成员中选择联系人的多选或者单选对话框
 class GroupLinkmanWidget extends StatelessWidget {
   final Function(List<String>) onSelected; //获取返回的选择
   final List<String> selected;
   final SelectType
       selectType; //查询界面的类型，multi界面无搜索字段，dialog和listview可以包括在showDialog中
-  final String peerId;
+  final String groupPeerId;
   String? title;
 
   GroupLinkmanWidget({
@@ -22,34 +21,63 @@ class GroupLinkmanWidget extends StatelessWidget {
     required this.onSelected,
     required this.selected,
     this.selectType = SelectType.multidialog,
-    required this.peerId,
+    required this.groupPeerId,
     this.title,
   }) : super(key: key);
 
   Future<String?> _findGroupName() async {
-    Group? group = await groupService.findCachedOneByPeerId(peerId);
+    Group? group = await groupService.findCachedOneByPeerId(groupPeerId);
     if (group != null) {
       return group.name;
     }
     return null;
   }
 
+  ///查询群的成员，并生成群成员的选项
   Future<List<Option<String>>> _buildOptions() async {
     title = await _findGroupName();
-    var groupMembers = await groupMemberService.findByGroupId(peerId);
+    var groupMembers = await groupMemberService.findByGroupId(groupPeerId);
     List<Option<String>> options = [];
     for (GroupMember groupMember in groupMembers) {
-      bool checked = selected.contains(groupMember.memberPeerId);
-      Option<String> item = Option<String>(
-          groupMember.memberAlias!, groupMember.memberPeerId!,
-          checked: checked);
-      options.add(item);
+      String? memberPeerId = groupMember.memberPeerId;
+      if (memberPeerId != null) {
+        var avatar = await linkmanService.findAvatarImageWidget(memberPeerId);
+        bool checked = selected.contains(memberPeerId);
+        Option<String> item = Option<String>(
+            groupMember.memberAlias!, memberPeerId,
+            leading: avatar, checked: checked);
+        options.add(item);
+      }
     }
 
     return options;
   }
 
-  /// 一个搜索字段和一个多选字段的组合，对话框的形式，使用时外部用对话框包裹
+  ///将群成员的数据转换从列表显示数据TileData
+  Future<List<TileData>> _buildTileData() async {
+    title = await _findGroupName();
+    List<TileData> tiles = [];
+    var groupMembers = await groupMemberService.findByGroupId(groupPeerId);
+    if (groupMembers.isNotEmpty) {
+      for (var groupMember in groupMembers) {
+        var title = groupMember.memberAlias!;
+        String? memberPeerId = groupMember.memberPeerId;
+        if (memberPeerId != null) {
+          var avatar = await linkmanService.findAvatarImageWidget(memberPeerId);
+          TileData tile = TileData(
+            prefix: avatar,
+            title: title,
+            subtitle: memberPeerId,
+            dense: false,
+          );
+          tiles.add(tile);
+        }
+      }
+    }
+    return tiles;
+  }
+
+  /// 简单多选对话框的形式，内含一个搜索字段和多选，使用时外部用对话框包裹
   Widget _buildMultiSelectDialog(BuildContext context) {
     var selector = FutureBuilder(
         future: _buildOptions(),
@@ -78,48 +106,26 @@ class GroupLinkmanWidget extends StatelessWidget {
     return selector;
   }
 
-  //将linkman数据转换从列表显示数据
-  Future<List<TileData>> _buildTileData() async {
-    title = await _findGroupName();
-    List<TileData> tiles = [];
-    var groupMembers = await groupMemberService.findByGroupId(peerId);
-    if (groupMembers.isNotEmpty) {
-      for (var groupMember in groupMembers) {
-        var title = groupMember.memberAlias!;
-        var subtitle = groupMember.memberPeerId;
-        TileData tile = TileData(
-          //prefix: groupMember.avatar,
-          title: title,
-          subtitle: subtitle,
-          dense: false,
-        );
-        tiles.add(tile);
-      }
-    }
-    return tiles;
-  }
-
-  _onTap(int index, String title, {String? subtitle, TileData? group}) {
-    onSelected([subtitle!]);
-  }
-
-  /// 一个搜索字段和一个单选选字段的组合，对话框的形式，使用时外部用对话框包裹
+  /// DataListSingleSelect的单选对话框，一个搜索字段和单选的组合，使用时外部用对话框包裹
   Widget _buildDataListView(BuildContext context) {
     var dataListView = FutureBuilder(
-        future: _buildTileData(),
-        builder:
-            (BuildContext context, AsyncSnapshot<List<TileData>> snapshot) {
+        future: _buildOptions(),
+        builder: (BuildContext context,
+            AsyncSnapshot<List<Option<String>>> snapshot) {
           var hasData = snapshot.hasData;
           if (!hasData) {
             return Container();
           }
-          List<TileData>? tiles = snapshot.data;
-          if (tiles == null) {
+          List<Option<String>>? options = snapshot.data;
+          if (options == null) {
             return Container();
           }
-          return DataListView(
-            tileData: tiles,
-            onTap: _onTap,
+          return DataListSingleSelect<String>(
+            title: '',
+            items: options,
+            onChanged: (String? value) {
+              onSelected([value!]);
+            },
           );
         });
     return Container(padding: const EdgeInsets.all(10.0), child: dataListView);
