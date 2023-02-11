@@ -222,15 +222,17 @@ class _ExtendedTextMessageInputWidgetState
         disabledBorder: InputBorder.none,
         focusedErrorBorder: InputBorder.none,
         hintText: AppLocalizations.t('Please input message'),
-        suffixIcon: InkWell(
-          onTap: () {
-            widget.textEditingController.clear();
-          },
-          child: Icon(
-            Icons.clear_rounded,
-            color: myself.primary,
-          ),
-        ),
+        suffixIcon: widget.textEditingController.text.isNotEmpty
+            ? InkWell(
+                onTap: () {
+                  widget.textEditingController.clear();
+                },
+                child: Icon(
+                  Icons.clear_rounded,
+                  color: myself.primary,
+                ),
+              )
+            : null,
         //isCollapsed: true,
       ),
       //textDirection: TextDirection.rtl,
