@@ -42,8 +42,11 @@ class _VideoViewCardState extends State<VideoViewCard> {
           color: widget.color);
       videoViews.add(videoView);
     }
+    if (videoViews.isEmpty) {
+      return Container();
+    }
     return GridView.builder(
-        itemCount: videoRenders.length,
+        itemCount: videoViews.length,
         //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
             //横轴元素个数
