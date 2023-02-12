@@ -304,6 +304,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   _close() async {
     localVideoRenderController.close();
+    videoChatMessageController.chatMessage = null;
   }
 
   ///视频视图

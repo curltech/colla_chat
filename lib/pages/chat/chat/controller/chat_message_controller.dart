@@ -147,7 +147,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     String partyType = _chatSummary!.partyType!;
     ChatMessage? chatMessage;
     if (partyType == PartyType.linkman.name) {
-      peerIds ??= [];
+      peerIds = [];
       peerIds.add(peerId);
       for (var peerId in peerIds) {
         //保存消息

@@ -195,7 +195,6 @@
   "Three days ago": "大前天",
   "Four days ago": "4天前",
   "videoChat": "视频通话",
-  "accepted": "已经接受",
   "Video chat": "视频通话",
   "Audio chat": "音频通话",
   "Screen share": "屏幕共享",
@@ -227,5 +226,12 @@
   "old password is not matched": "旧密码不匹配",
   "Select color": "选择颜色",
   "Select color shade": "选择颜色阴影",
-  "Selected color and its shades": "选择颜色和阴影"
+  "Selected color and its shades": "选择颜色和阴影",
+  "unsent": "未发送",
+  "sent": "已发送",
+  "accepted": "接受",
+  "rejected": "拒绝",
+  "received": "接收",
+  "terminated": "终止",
+  "receipt": "回执"
 }

@@ -26,6 +26,13 @@ class ChatReceiptMessage extends StatelessWidget {
         padding: const EdgeInsets.all(10),
         child: Row(children: [
           leading,
+          const SizedBox(
+            width: 10,
+          ),
+          Text(AppLocalizations.t('receipt')),
+          const SizedBox(
+            width: 10,
+          ),
           Text(receiverName!),
           const SizedBox(
             width: 10,

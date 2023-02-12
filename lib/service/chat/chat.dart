@@ -1050,6 +1050,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummary.thumbnail = chatMessage.thumbnail;
       chatSummary.content = chatMessage.content;
       chatSummary.contentType = chatMessage.contentType;
+      chatSummary.sendReceiveTime = chatMessage.sendTime;
       chatSummary.unreadNumber = chatSummary.unreadNumber + 1;
       await upsert(chatSummary);
       chatSummaries[chatSummary.peerId!] = chatSummary;

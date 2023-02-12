@@ -42,7 +42,7 @@ class ActionMessage extends StatelessWidget {
                   width: 5,
                 ),
                 Text(
-                  AppLocalizations.t('Video chat invitation'),
+                  AppLocalizations.t('Invite video chat'),
                   key: UniqueKey(),
                   style: const TextStyle(
                       //color: isMyself ? Colors.white : Colors.black,
