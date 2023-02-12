@@ -49,8 +49,11 @@ class VideoDialInWidget extends StatelessWidget {
             localRender =
                 await localVideoRenderController.createAudioMediaRender();
           } else if (title == ContentType.video.name) {
+            // localRender =
+            //     await localVideoRenderController.createVideoMediaRender();
+            //测试目的，使用屏幕
             localRender =
-                await localVideoRenderController.createVideoMediaRender();
+                await localVideoRenderController.createDisplayMediaRender();
           }
 
           //将本地的render加入webrtc连接
