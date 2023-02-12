@@ -1,4 +1,4 @@
-import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_dialin_widget.dart';
 import 'package:colla_chat/pages/chat/index/bottom_bar.dart';
@@ -8,6 +8,7 @@ import 'package:colla_chat/pages/chat/login/loading.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:extended_text/extended_text.dart';
@@ -39,6 +40,23 @@ class _IndexViewState extends State<IndexView>
     globalChatMessageController.addListener(_updateGlobalChatMessage);
     myself.addListener(_update);
     appDataProvider.addListener(_update);
+  }
+
+  _onTap(ChatMessage chatMessage, MessageStatus chatReceiptType) {
+    videoChatVisible.value = false;
+  }
+
+  Widget _buildVideoDialIn(BuildContext context, ChatMessage chatMessage) {
+    Widget videoDialInWidget = Container(
+        alignment: Alignment.topLeft,
+        width: appDataProvider.totalSize.width,
+        padding: const EdgeInsets.all(5.0),
+        color: Colors.black.withOpacity(AppOpacity.mdOpacity),
+        child: VideoDialInWidget(
+          chatMessage: chatMessage,
+          onTap: _onTap,
+        ));
+    return videoDialInWidget;
   }
 
   _buildVideoChatMessage(BuildContext context) {
@@ -76,14 +94,10 @@ class _IndexViewState extends State<IndexView>
                 chatMessage.subMessageType == ChatMessageSubType.chat.name) {
               String? content = chatMessage.content;
               String? contentType = chatMessage.contentType;
-              if (content != null) {
-                var raw = CryptoUtil.decodeBase64(content);
-                if (contentType == null ||
-                    contentType == ContentType.text.name) {
-                  content = CryptoUtil.utf8ToString(raw);
-                } else {
-                  content = '';
-                }
+              if (content != null &&
+                  (contentType == null ||
+                      contentType == ContentType.text.name)) {
+                content = chatMessageService.recoverContent(content);
               } else {
                 content = '';
               }
@@ -93,8 +107,10 @@ class _IndexViewState extends State<IndexView>
               name = name ?? '';
               banner = Container(
                   height: 80,
+                  width: appDataProvider.totalSize.width,
+                  alignment: Alignment.topLeft,
                   padding: const EdgeInsets.all(5.0),
-                  color: Colors.black.withOpacity(0.5),
+                  color: Colors.black.withOpacity(AppOpacity.mdOpacity),
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -132,9 +148,7 @@ class _IndexViewState extends State<IndexView>
               });
             }
           }
-          return Visibility(
-              visible: value,
-              child: Align(alignment: Alignment.topLeft, child: banner));
+          return Visibility(visible: value, child: banner);
         });
   }
 
@@ -156,18 +170,6 @@ class _IndexViewState extends State<IndexView>
     if (mounted) {
       //setState(() {});
     }
-  }
-
-  _onTap(ChatMessage chatMessage, MessageStatus chatReceiptType) {
-    videoChatVisible.value = false;
-  }
-
-  Widget _buildVideoDialIn(BuildContext context, ChatMessage chatMessage) {
-    Widget videoDialInWidget = VideoDialInWidget(
-      chatMessage: chatMessage,
-      onTap: _onTap,
-    );
-    return Align(alignment: Alignment.topLeft, child: videoDialInWidget);
   }
 
   Widget _createScaffold(

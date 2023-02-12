@@ -88,39 +88,35 @@ class VideoDialInWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     var name = chatMessage.senderName;
     name = name ?? '';
-    return Card(
-        margin: EdgeInsets.zero,
-        elevation: 0,
-        color: Colors.black.withOpacity(0.5),
-        child: ListTile(
-            leading: myself.avatarImage,
-            title: Text(name, style: const TextStyle(color: Colors.white)),
-            subtitle: Text(AppLocalizations.t('Inviting you video chat'),
-                style: const TextStyle(color: Colors.white)),
-            trailing: SizedBox(
-              width: 120,
-              child: Row(children: [
-                WidgetUtil.buildCircleButton(
-                    onPressed: () {
-                      _processVideoChat(MessageStatus.rejected);
-                      if (onTap != null) {
-                        onTap!(chatMessage, MessageStatus.rejected);
-                      }
-                    },
-                    child: const Icon(
-                        color: Colors.white, size: 16, Icons.call_end),
-                    backgroundColor: Colors.red),
-                WidgetUtil.buildCircleButton(
-                    onPressed: () {
-                      _processVideoChat(MessageStatus.accepted);
-                      if (onTap != null) {
-                        onTap!(chatMessage, MessageStatus.accepted);
-                      }
-                    },
-                    child: const Icon(
-                        color: Colors.white, size: 16, Icons.video_call),
-                    backgroundColor: Colors.green)
-              ]),
-            )));
+    return ListTile(
+        leading: myself.avatarImage,
+        title: Text(name, style: const TextStyle(color: Colors.white)),
+        subtitle: Text(AppLocalizations.t('Inviting you video chat'),
+            style: const TextStyle(color: Colors.white)),
+        trailing: SizedBox(
+          width: 130,
+          child: Row(children: [
+            WidgetUtil.buildCircleButton(
+                onPressed: () {
+                  _processVideoChat(MessageStatus.rejected);
+                  if (onTap != null) {
+                    onTap!(chatMessage, MessageStatus.rejected);
+                  }
+                },
+                child:
+                    const Icon(color: Colors.white, size: 16, Icons.call_end),
+                backgroundColor: Colors.red),
+            WidgetUtil.buildCircleButton(
+                onPressed: () {
+                  _processVideoChat(MessageStatus.accepted);
+                  if (onTap != null) {
+                    onTap!(chatMessage, MessageStatus.accepted);
+                  }
+                },
+                child:
+                    const Icon(color: Colors.white, size: 16, Icons.video_call),
+                backgroundColor: Colors.green),
+          ]),
+        ));
   }
 }
