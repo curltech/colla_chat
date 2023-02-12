@@ -1,9 +1,7 @@
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/chat.dart';
-import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
-import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
@@ -15,10 +13,10 @@ import 'package:flutter/material.dart';
 class VideoChatMessageController with ChangeNotifier {
   //媒体回执消息，对发起方来说是是收到的(senderPeerId)，对接受方来说是自己根据_chatMessage生成的(receiverPeerId)
   ChatMessage? _chatMessage;
-
   ChatMessage? _chatReceipt;
-
-  final List<ChatMessage> _chatReceipts = [];
+  final List<ChatMessage> _acceptedChatReceipts = [];
+  final List<ChatMessage> _rejectedChatReceipts = [];
+  final List<ChatMessage> _terminatedChatReceipts = [];
 
   ChatMessage? get chatMessage {
     return _chatMessage;
@@ -34,15 +32,51 @@ class VideoChatMessageController with ChangeNotifier {
     return _chatReceipt;
   }
 
-  List<ChatMessage> get chatChatReceipts {
-    return _chatReceipts;
+  List<ChatMessage> get acceptedChatReceipts {
+    return _acceptedChatReceipts;
+  }
+
+  List<ChatMessage> get rejectedChatReceipts {
+    return _rejectedChatReceipts;
+  }
+
+  List<ChatMessage> get terminatedChatReceipts {
+    return _terminatedChatReceipts;
   }
 
   ///接受到视频通话回执，一般由globalChatMessageController分发到此
-  receivedChatReceipt(ChatMessage chatReceipt) {
+  receivedChatReceipt(ChatMessage chatReceipt) async {
+    //当前的视频通话邀请消息不为空
+    if (_chatMessage != null) {
+      logger.e('chatMessage is null');
+      return;
+    }
+    //当前到来的回执是新的
     if (_chatReceipt != chatReceipt) {
+      String messageId = _chatReceipt!.messageId!;
+      //当前的视频通话邀请消息一致
+      if (_chatMessage!.messageId != chatReceipt.messageId) {
+        logger.e('messageId $messageId is not equal');
+        return;
+      }
+      var chatMessage = await chatMessageService.findByMessageId(messageId,
+          receiverPeerId: peerId);
+      //回执的邀请消息存在
+      if (chatMessage == null) {
+        logger.e('messageId $messageId is not exist');
+        return;
+      }
       _chatReceipt = chatReceipt;
-      _chatReceipts.add(chatReceipt);
+      //把回执消息分类存放
+      if (chatReceipt.status == MessageStatus.accepted.name) {
+        _acceptedChatReceipts.add(chatReceipt);
+      }
+      if (chatReceipt.status == MessageStatus.rejected.name) {
+        _rejectedChatReceipts.add(chatReceipt);
+      }
+      if (chatReceipt.status == MessageStatus.terminated.name) {
+        _terminatedChatReceipts.add(chatReceipt);
+      }
       _receivedChatReceipt();
       notifyListeners();
     }
@@ -99,7 +133,8 @@ class VideoChatMessageController with ChangeNotifier {
     if (subMessageType != ChatMessageSubType.chatReceipt.name) {
       return;
     }
-    //接受通话请求
+    String messageId = _chatReceipt!.messageId!;
+    //接受通话请求的回执，加本地流，重新协商
     if (status == MessageStatus.accepted.name) {
       var peerId = _chatReceipt!.senderPeerId!;
       var clientId = _chatReceipt!.senderClientId!;
@@ -110,6 +145,12 @@ class VideoChatMessageController with ChangeNotifier {
       );
       //与发送者的连接存在，将本地的视频render加入连接中
       if (advancedPeerConnection != null) {
+        VideoRoomRenderController? videoRoomRenderController =
+            videoRoomRenderPool.getVideoRoomRenderController(messageId);
+        if (videoRoomRenderController != null) {
+          videoRoomRenderController
+              .addAdvancedPeerConnection(advancedPeerConnection);
+        }
         Map<String, PeerVideoRender> videoRenders =
             localVideoRenderController.getVideoRenders();
         for (var render in videoRenders.values) {
@@ -117,35 +158,33 @@ class VideoChatMessageController with ChangeNotifier {
         }
         //本地视频render加入后，发起重新协商
         await advancedPeerConnection.negotiate();
-
-        ///对方同意视频通话则加入到视频连接池中
-        Room? room = advancedPeerConnection.room;
-        if (room == null) {
-          String messageId = _chatReceipt!.messageId!;
-          var chatMessage = await chatMessageService.findByMessageId(messageId,
-              receiverPeerId: peerId);
-          if (chatMessage == null) {
-            return;
-          }
-          String? content = chatMessage.content;
-          //无房间
-          if (content == null) {
-            room = Room(
-                '${advancedPeerConnection.peerId}:${advancedPeerConnection.clientId}');
-          } else {
-            Map map = JsonUtil.toJson(content);
-            room = Room.fromJson(map);
-          }
-          advancedPeerConnection.room = room;
-        }
-        VideoRoomRenderController videoRoomController =
-            videoRoomRenderPool.createRoomController(room);
-        videoRoomRenderPool.roomId = room.roomId;
-        videoRoomController.addAdvancedPeerConnection(advancedPeerConnection);
       }
     } else if (status == MessageStatus.rejected.name) {
-      await localVideoRenderController.close();
-    } else if (status == MessageStatus.terminated.name) {}
+    } else if (status == MessageStatus.terminated.name) {
+      var peerId = _chatReceipt!.senderPeerId!;
+      var clientId = _chatReceipt!.senderClientId!;
+      AdvancedPeerConnection? advancedPeerConnection =
+          peerConnectionPool.getOne(
+        peerId,
+        clientId: clientId,
+      );
+      //与发送者的连接存在，将本地的视频render加入连接中
+      if (advancedPeerConnection != null) {
+        VideoRoomRenderController? videoRoomRenderController =
+            videoRoomRenderPool.getVideoRoomRenderController(messageId);
+        if (videoRoomRenderController != null) {
+          videoRoomRenderController
+              .removeAdvancedPeerConnection(advancedPeerConnection);
+        }
+        Map<String, PeerVideoRender> videoRenders =
+            localVideoRenderController.getVideoRenders();
+        for (var render in videoRenders.values) {
+          await advancedPeerConnection.removeLocalRender(render);
+        }
+        //本地视频render加入后，发起重新协商
+        await advancedPeerConnection.negotiate();
+      }
+    }
   }
 }
 

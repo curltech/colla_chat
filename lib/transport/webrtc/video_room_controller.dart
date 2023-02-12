@@ -11,7 +11,7 @@ class VideoRoomRenderController extends VideoRenderController {
   final Map<String, AdvancedPeerConnection> _peerConnections = {};
   final Room room;
 
-  //根据peerId和clientId的连接所对应的render控制器，每一个render控制器包含多个render
+  ///根据peerId和clientId的连接所对应的render控制器，每一个render控制器包含多个render
   Map<String, VideoRenderController> videoRenderControllers = {};
 
   VideoRoomRenderController(this.room);
@@ -169,7 +169,7 @@ class VideoRoomRenderPool with ChangeNotifier {
     return null;
   }
 
-  VideoRoomRenderController? getVideoRoomController(String roomId) {
+  VideoRoomRenderController? getVideoRoomRenderController(String roomId) {
     return videoRoomRenderControllers[roomId];
   }
 
@@ -178,7 +178,7 @@ class VideoRoomRenderPool with ChangeNotifier {
   }
 
   ///创建新的房间，返回其控制器
-  VideoRoomRenderController createRoomController(Room room) {
+  VideoRoomRenderController createVideoRoomRenderController(Room room) {
     String roomId = room.roomId!;
     VideoRoomRenderController? videoRoomController =
         videoRoomRenderControllers[roomId];
@@ -186,16 +186,18 @@ class VideoRoomRenderPool with ChangeNotifier {
       videoRoomController = VideoRoomRenderController(room);
       videoRoomRenderControllers[roomId] = videoRoomController;
       rooms[roomId] = room;
-      _roomId = room.roomId;
+      _roomId = roomId;
+    } else {
+      _roomId = roomId;
     }
     return videoRoomController;
   }
 
   closeRoom(String roomId) {
-    VideoRoomRenderController? videoRoomController =
+    VideoRoomRenderController? videoRoomRenderController =
         videoRoomRenderControllers[roomId];
-    if (videoRoomController != null) {
-      videoRoomController.close();
+    if (videoRoomRenderController != null) {
+      videoRoomRenderController.close();
       rooms.remove(roomId);
     }
     if (roomId == _roomId) {

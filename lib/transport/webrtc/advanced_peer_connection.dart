@@ -183,7 +183,7 @@ class AdvancedPeerConnection {
     }
     String roomId = room!.roomId!;
     VideoRoomRenderController? videoRoomController =
-        videoRoomRenderPool.getVideoRoomController(roomId);
+        videoRoomRenderPool.getVideoRoomRenderController(roomId);
     if (videoRoomController == null) {
       logger.e('videoRoomController:$roomId is not exist');
       return null;
@@ -218,7 +218,7 @@ class AdvancedPeerConnection {
     }
     String roomId = room!.roomId!;
     VideoRoomRenderController? videoRoomController =
-        videoRoomRenderPool.getVideoRoomController(roomId);
+        videoRoomRenderPool.getVideoRoomRenderController(roomId);
     if (videoRoomController == null) {
       logger.e('videoRoomController:$roomId is not exist');
       return null;
@@ -255,34 +255,14 @@ class AdvancedPeerConnection {
         data: data));
   }
 
-  ///把渲染器加入到渲染器集合，并将包含的流加入连接中
+  ///将本地渲染器包含的流加入连接中，在收到接受视频要求的时候调用
   Future<bool> addLocalRender(PeerVideoRender render) async {
     logger.i(
-        'AdvancedPeerConnection peerId:$peerId addLocalRender ${render.mediaStream!.id}, localVideoRenders length:${localVideoRenderController.videoRenders.length}');
-
-    bool success = _addLocalRender(render);
-    if (success) {
-      var stream = render.mediaStream;
-      if (stream != null) {
-        success = await basePeerConnection.addLocalStream(stream);
-        return success;
-      }
-    }
-    return false;
-  }
-
-  ///把渲染器加入到渲染器集合
-  bool _addLocalRender(PeerVideoRender render) {
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return false;
-    }
-    var streamId = render.id;
-    if (streamId != null) {
-      localVideoRenderController.add(render);
-      logger.i(
-          'AdvancedPeerConnection peerId:$peerId _addLocalRender $streamId, localVideoRenders length:${localVideoRenderController.videoRenders.length}');
-      return true;
+        'AdvancedPeerConnection peerId:$peerId addLocalRender ${render.mediaStream!.id}');
+    var stream = render.mediaStream;
+    if (stream != null) {
+      var success = await basePeerConnection.addLocalStream(stream);
+      return success;
     }
     return false;
   }

@@ -1,6 +1,5 @@
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -21,87 +20,64 @@ class VideoDialInWidget extends StatelessWidget {
   ///视频通话的消息请求
   final ChatMessage chatMessage;
 
-  //缺省用视频还是屏幕媒体
-  final bool videoMedia;
-
   final Function(ChatMessage chatMessage, MessageStatus chatReceiptType)? onTap;
 
-  const VideoDialInWidget(
-      {Key? key,
-      this.videoMedia = false,
-      required this.chatMessage,
-      this.onTap})
+  const VideoDialInWidget({Key? key, required this.chatMessage, this.onTap})
       : super(key: key);
 
-  _sendReceipt(MessageStatus receiptType) async {
-    ChatMessage? chatReceipt =
-        await chatMessageService.buildChatReceipt(chatMessage, receiptType);
-    if (chatReceipt != null) {
-      logger.w('sent videoChat chatReceipt ${receiptType.name}');
-      await chatMessageService.sendAndStore(chatReceipt);
-      videoChatMessageController.receivedChatReceipt(chatReceipt);
-      String? subMessageType = chatMessage.subMessageType;
-      if (receiptType == MessageStatus.accepted) {
-        var peerId = chatReceipt.receiverPeerId!;
-        var clientId = chatReceipt.receiverClientId!;
-        List<PeerVideoRender> localRenders = [];
-        //根据title来判断是请求音频还是视频
-        String? title = chatMessage.title;
-        if (title == ContentType.audio.name) {
-          var render =
-              await localVideoRenderController.createAudioMediaRender();
-          localRenders.add(render);
-        } else {
-          if (videoMedia) {
-            var render =
+  ///接受或者拒绝视频通话邀请的处理
+  _processVideoChat(MessageStatus receiptType) async {
+    var groupPeerId = chatMessage.groupPeerId;
+    var messageId = chatMessage.messageId;
+    //linkman视频通话邀请
+    if (groupPeerId == null) {
+      ChatMessage? chatReceipt =
+          await chatMessageService.buildChatReceipt(chatMessage, receiptType);
+      if (chatReceipt != null) {
+        logger.w('sent videoChat chatReceipt ${receiptType.name}');
+        await chatMessageService.sendAndStore(chatReceipt);
+        String? subMessageType = chatMessage.subMessageType;
+        if (receiptType == MessageStatus.accepted) {
+          videoChatMessageController.chatMessage = chatMessage;
+          var peerId = chatReceipt.receiverPeerId!;
+          var clientId = chatReceipt.receiverClientId!;
+          PeerVideoRender? localRender;
+          //根据title来判断是请求音频还是视频，并创建本地视频render
+          String? title = chatMessage.title;
+          if (title == ContentType.audio.name) {
+            localRender =
+                await localVideoRenderController.createAudioMediaRender();
+          } else if (title == ContentType.video.name) {
+            localRender =
                 await localVideoRenderController.createVideoMediaRender();
-            localRenders.add(render);
-          } else {
-            var render =
-                await localVideoRenderController.createDisplayMediaRender();
-            localRenders.add(render);
-          }
-        }
-
-        AdvancedPeerConnection? advancedPeerConnection =
-            peerConnectionPool.getOne(
-          peerId,
-          clientId: clientId,
-        );
-        if (advancedPeerConnection != null) {
-          ChatSummary? chatSummary =
-              await chatSummaryService.findCachedOneByPeerId(peerId);
-          if (chatSummary != null) {
-            chatMessageController.chatSummary = chatSummary;
-          }
-          if (localRenders.isNotEmpty) {
-            for (var render in localRenders) {
-              await advancedPeerConnection.addLocalRender(render);
-            }
           }
 
-          ///同意视频通话则加入到视频连接池中
-          Room? room = advancedPeerConnection.room;
-          if (room == null) {
-            String? content = chatMessage.content;
-            //无房间
-            if (content == null) {
-              room = Room(
-                  '${advancedPeerConnection.peerId}:${advancedPeerConnection.clientId}');
-            } else {
-              Map map = JsonUtil.toJson(content);
-              room = Room.fromJson(map);
-            }
-            advancedPeerConnection.room = room;
+          //将本地的render加入连接
+          AdvancedPeerConnection? advancedPeerConnection =
+              peerConnectionPool.getOne(
+            peerId,
+            clientId: clientId,
+          );
+          if (advancedPeerConnection != null) {
+            await advancedPeerConnection.addLocalRender(localRender!);
+            //创建房间，将连接加入房间
+            List<String> participants = [myself.peerId!, peerId];
+            var room = Room(messageId, participants: participants);
+            //同意视频通话则加入到视频连接池中
+            VideoRoomRenderController videoRoomRenderController =
+                videoRoomRenderPool.createVideoRoomRenderController(room);
+            videoRoomRenderPool.roomId = room.roomId;
+            videoRoomRenderController
+                .addAdvancedPeerConnection(advancedPeerConnection);
+            indexWidgetProvider.push('chat_message');
+            indexWidgetProvider.push('video_chat');
           }
-          VideoRoomRenderController videoRoomController =
-              videoRoomRenderPool.createRoomController(room);
-          videoRoomRenderPool.roomId = room.roomId;
-          videoRoomController.addAdvancedPeerConnection(advancedPeerConnection);
-          indexWidgetProvider.push('chat_message');
-          indexWidgetProvider.push('video_chat');
         }
       }
+    } else {
+      //群视频通话邀请
+      Map json = JsonUtil.toJson(chatMessage.content!);
+      var room = Room.fromJson(json);
     }
   }
 
@@ -123,7 +99,7 @@ class VideoDialInWidget extends StatelessWidget {
               child: Row(children: [
                 WidgetUtil.buildCircleButton(
                     onPressed: () {
-                      _sendReceipt(MessageStatus.rejected);
+                      _processVideoChat(MessageStatus.rejected);
                       if (onTap != null) {
                         onTap!(chatMessage, MessageStatus.rejected);
                       }
@@ -133,7 +109,7 @@ class VideoDialInWidget extends StatelessWidget {
                     backgroundColor: Colors.red),
                 WidgetUtil.buildCircleButton(
                     onPressed: () {
-                      _sendReceipt(MessageStatus.accepted);
+                      _processVideoChat(MessageStatus.accepted);
                       if (onTap != null) {
                         onTap!(chatMessage, MessageStatus.accepted);
                       }

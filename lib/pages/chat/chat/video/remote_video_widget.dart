@@ -145,16 +145,16 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   }
 
   Widget _buildVideoChatView(BuildContext context) {
-    VideoRoomRenderController? videoRoomController =
-        videoRoomRenderPool.getVideoRoomController(widget.roomId);
-    if (videoRoomController == null) {
+    VideoRoomRenderController? videoRoomRenderController =
+        videoRoomRenderPool.getVideoRoomRenderController(widget.roomId);
+    if (videoRoomRenderController == null) {
       return Container();
     }
     return Container(
         padding: const EdgeInsets.all(5.0),
         color: Colors.black.withOpacity(0.5),
         child: VideoViewCard(
-          videoRenderController: videoRoomController,
+          videoRenderController: videoRoomRenderController,
         ));
   }
 
@@ -168,9 +168,9 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
 
   @override
   void dispose() {
-    var videoRoomController = videoRoomRenderPool.videoRoomRenderController;
-    if (videoRoomController != null) {
-      videoRoomController.removeListener(_update);
+    var videoRoomRenderController = videoRoomRenderPool.videoRoomRenderController;
+    if (videoRoomRenderController != null) {
+      videoRoomRenderController.removeListener(_update);
     }
     super.dispose();
   }
