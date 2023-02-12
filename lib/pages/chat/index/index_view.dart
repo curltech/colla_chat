@@ -13,7 +13,6 @@ import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class IndexView extends StatefulWidget {
   final String title;
@@ -29,144 +28,142 @@ class IndexView extends StatefulWidget {
 
 class _IndexViewState extends State<IndexView>
     with SingleTickerProviderStateMixin {
-  bool videoChatVisible = false;
-  bool chatMessageVisible = false;
+  final ValueNotifier<bool> videoChatVisible = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> chatMessageVisible = ValueNotifier<bool>(false);
   final CustomSpecialTextSpanBuilder customSpecialTextSpanBuilder =
       CustomSpecialTextSpanBuilder();
 
   @override
   void initState() {
     super.initState();
-    globalChatMessageController.addListener(_update);
+    globalChatMessageController.addListener(_updateGlobalChatMessage);
     myself.addListener(_update);
     appDataProvider.addListener(_update);
   }
 
   _buildVideoChatMessage(BuildContext context) {
-    Widget videoDialIn = Container();
-    if (videoChatVisible) {
-      ChatMessage? chatMessage = globalChatMessageController.chatMessage;
-      if (chatMessage != null) {
-        //视频通话请求消息
-        if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-          videoDialIn = _buildVideoDialIn(context, chatMessage);
+    return ValueListenableBuilder(
+      valueListenable: videoChatVisible,
+      builder: (BuildContext context, bool value, Widget? child) {
+        Widget videoDialIn = Container();
+        if (value) {
+          ChatMessage? chatMessage = globalChatMessageController.chatMessage;
+          if (chatMessage != null) {
+            //视频通话请求消息
+            if (chatMessage.subMessageType ==
+                ChatMessageSubType.videoChat.name) {
+              videoDialIn = _buildVideoDialIn(context, chatMessage);
+            }
+          }
+          //延时，移除 OverlayEntry
+          Future.delayed(const Duration(seconds: 60)).then((value) {
+            videoChatVisible.value = false;
+          });
         }
-      }
-      //延时，移除 OverlayEntry
-      Future.delayed(const Duration(seconds: 20)).then((value) {
-        setState(() {
-          videoChatVisible = false;
-        });
-      });
-    }
-    return Visibility(visible: videoChatVisible, child: videoDialIn);
+        return Visibility(visible: videoChatVisible.value, child: videoDialIn);
+      },
+    );
   }
 
   _buildChatMessage(BuildContext context) {
-    Widget card = Container();
-    if (chatMessageVisible) {
-      ChatMessage? chatMessage = globalChatMessageController.chatMessage;
-      if (chatMessage != null &&
-          chatMessage.subMessageType == ChatMessageSubType.chat.name) {
-        String? content = chatMessage.content;
-        String? contentType = chatMessage.contentType;
-        if (content != null) {
-          var raw = CryptoUtil.decodeBase64(content);
-          if (contentType == null || contentType == ContentType.text.name) {
-            content = CryptoUtil.utf8ToString(raw);
-          } else {
-            content = '';
-          }
-        } else {
-          content = '';
-        }
-        String? title = chatMessage.title;
-        title = title ?? '';
-        var name = chatMessage.senderName;
-        name = name ?? '';
-        card = Container(
-            height: 80,
-            padding: const EdgeInsets.all(5.0),
-            color: Colors.black.withOpacity(0.5),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: [
-                myself.avatarImage!,
-                const SizedBox(
-                  width: 15.0,
-                ),
-                Text(name, style: const TextStyle(color: Colors.white)),
-                const SizedBox(
-                  width: 15.0,
-                ),
-                Text(title, style: const TextStyle(color: Colors.white)),
-              ]),
-              const SizedBox(
-                height: 15.0,
-              ),
-              ExtendedText(
-                content,
-                style: const TextStyle(
-                  color: Colors.white,
-                  //fontSize: 16.0,
-                ),
-                specialTextSpanBuilder: customSpecialTextSpanBuilder,
-                onSpecialTextTap: (dynamic value) {
-                  if (value.toString().startsWith('\$')) {
-                    launchUrl(Uri(
-                        scheme: 'https',
-                        host: 'github.com',
-                        path: 'fluttercandies'));
-                  } else if (value.toString().startsWith('@')) {
-                    launchUrl(Uri(
-                      scheme: 'mailto',
-                      path: 'zmtzawqlp@live.com',
-                    ));
-                  }
-                },
-              ),
-            ]));
+    return ValueListenableBuilder(
+        valueListenable: chatMessageVisible,
+        builder: (BuildContext context, bool value, Widget? child) {
+          Widget banner = Container();
+          if (value) {
+            ChatMessage? chatMessage = globalChatMessageController.chatMessage;
+            if (chatMessage != null &&
+                chatMessage.subMessageType == ChatMessageSubType.chat.name) {
+              String? content = chatMessage.content;
+              String? contentType = chatMessage.contentType;
+              if (content != null) {
+                var raw = CryptoUtil.decodeBase64(content);
+                if (contentType == null ||
+                    contentType == ContentType.text.name) {
+                  content = CryptoUtil.utf8ToString(raw);
+                } else {
+                  content = '';
+                }
+              } else {
+                content = '';
+              }
+              String? title = chatMessage.title;
+              title = title ?? '';
+              var name = chatMessage.senderName;
+              name = name ?? '';
+              banner = Container(
+                  height: 80,
+                  padding: const EdgeInsets.all(5.0),
+                  color: Colors.black.withOpacity(0.5),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(children: [
+                          myself.avatarImage!,
+                          const SizedBox(
+                            width: 15.0,
+                          ),
+                          Text(name,
+                              style: const TextStyle(color: Colors.white)),
+                          const SizedBox(
+                            width: 15.0,
+                          ),
+                          Text(title,
+                              style: const TextStyle(color: Colors.white)),
+                        ]),
+                        const SizedBox(
+                          height: 15.0,
+                        ),
+                        ExtendedText(
+                          content,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            //fontSize: 16.0,
+                          ),
+                          specialTextSpanBuilder: customSpecialTextSpanBuilder,
+                        ),
+                      ]));
 
-        //延时
-        Future.delayed(const Duration(seconds: 10)).then((value) {
-          setState(() {
-            chatMessageVisible = false;
-          });
+              //延时
+              Future.delayed(const Duration(seconds: 30)).then((value) {
+                setState(() {
+                  chatMessageVisible.value = false;
+                });
+              });
+            }
+          }
+          return Visibility(
+              visible: value,
+              child: Align(alignment: Alignment.topLeft, child: banner));
         });
-      }
-    }
-    return Visibility(
-        visible: chatMessageVisible,
-        child: Align(alignment: Alignment.topLeft, child: card));
   }
 
-  _update() async {
+  _updateGlobalChatMessage() async {
     if (mounted) {
       ChatMessage? chatMessage = globalChatMessageController.chatMessage;
       if (chatMessage != null) {
         if (chatMessage.subMessageType == ChatMessageSubType.chat.name) {
-          setState(() {
-            chatMessageVisible = true;
-          });
+          chatMessageVisible.value = true;
         } else if (chatMessage.subMessageType ==
             ChatMessageSubType.videoChat.name) {
-          setState(() {
-            videoChatVisible = true;
-          });
+          videoChatVisible.value = true;
         }
       }
     }
   }
 
+  _update() async {
+    if (mounted) {
+      //setState(() {});
+    }
+  }
+
   _onTap(ChatMessage chatMessage, MessageStatus chatReceiptType) {
-    setState(() {
-      videoChatVisible = false;
-    });
+    videoChatVisible.value = false;
   }
 
   Widget _buildVideoDialIn(BuildContext context, ChatMessage chatMessage) {
-    Widget videoDialInWidget;
-    videoDialInWidget = VideoDialInWidget(
+    Widget videoDialInWidget = VideoDialInWidget(
       chatMessage: chatMessage,
       onTap: _onTap,
     );
@@ -191,8 +188,10 @@ class _IndexViewState extends State<IndexView>
                   child: widget.indexWidget,
                   height: appDataProvider.actualSize.height,
                   width: appDataProvider.actualSize.width)),
-          _buildChatMessage(context),
-          _buildVideoChatMessage(context)
+          Row(children: [
+            _buildChatMessage(context),
+            _buildVideoChatMessage(context)
+          ]),
         ])),
         //endDrawer: endDrawer,
         bottomNavigationBar: bottomNavigationBar);
@@ -212,7 +211,7 @@ class _IndexViewState extends State<IndexView>
 
   @override
   void dispose() {
-    globalChatMessageController.removeListener(_update);
+    globalChatMessageController.removeListener(_updateGlobalChatMessage);
     myself.removeListener(_update);
     appDataProvider.removeListener(_update);
     super.dispose();

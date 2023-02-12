@@ -1,7 +1,6 @@
 import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
@@ -29,15 +28,17 @@ class VideoDialInWidget extends StatelessWidget {
   _processVideoChat(MessageStatus receiptType) async {
     var groupPeerId = chatMessage.groupPeerId;
     var messageId = chatMessage.messageId;
-    //linkman视频通话邀请
+    //单个联系人视频通话邀请
     if (groupPeerId == null) {
+      //创建回执消息
       ChatMessage? chatReceipt =
           await chatMessageService.buildChatReceipt(chatMessage, receiptType);
       if (chatReceipt != null) {
-        logger.w('sent videoChat chatReceipt ${receiptType.name}');
+        //发送回执
         await chatMessageService.sendAndStore(chatReceipt);
         String? subMessageType = chatMessage.subMessageType;
         if (receiptType == MessageStatus.accepted) {
+          //接受视频邀请，将当前视频邀请消息放入控制器
           videoChatMessageController.chatMessage = chatMessage;
           var peerId = chatReceipt.receiverPeerId!;
           var clientId = chatReceipt.receiverClientId!;
@@ -52,7 +53,7 @@ class VideoDialInWidget extends StatelessWidget {
                 await localVideoRenderController.createVideoMediaRender();
           }
 
-          //将本地的render加入连接
+          //将本地的render加入webrtc连接
           AdvancedPeerConnection? advancedPeerConnection =
               peerConnectionPool.getOne(
             peerId,
@@ -66,7 +67,6 @@ class VideoDialInWidget extends StatelessWidget {
             //同意视频通话则加入到视频连接池中
             VideoRoomRenderController videoRoomRenderController =
                 videoRoomRenderPool.createVideoRoomRenderController(room);
-            videoRoomRenderPool.roomId = room.roomId;
             videoRoomRenderController
                 .addAdvancedPeerConnection(advancedPeerConnection);
             indexWidgetProvider.push('chat_message');
@@ -76,6 +76,9 @@ class VideoDialInWidget extends StatelessWidget {
       }
     } else {
       //群视频通话邀请
+      //除了向发送方外，还需要向房间的各接收人发送回执，
+      //首先检查接收人是否已经存在给自己的回执，不存在或者存在是accepted则发送回执
+      //如果存在，如果是rejected或者terminated，则不发送回执
       Map json = JsonUtil.toJson(chatMessage.content!);
       var room = Room.fromJson(json);
     }

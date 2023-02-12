@@ -14,9 +14,9 @@ class VideoChatMessageController with ChangeNotifier {
   //媒体回执消息，对发起方来说是是收到的(senderPeerId)，对接受方来说是自己根据_chatMessage生成的(receiverPeerId)
   ChatMessage? _chatMessage;
   ChatMessage? _chatReceipt;
-  final List<ChatMessage> _acceptedChatReceipts = [];
-  final List<ChatMessage> _rejectedChatReceipts = [];
-  final List<ChatMessage> _terminatedChatReceipts = [];
+  final Map<String, ChatMessage> _acceptedChatReceipts = {};
+  final Map<String, ChatMessage> _rejectedChatReceipts = {};
+  final Map<String, ChatMessage> _terminatedChatReceipts = {};
 
   ChatMessage? get chatMessage {
     return _chatMessage;
@@ -32,23 +32,30 @@ class VideoChatMessageController with ChangeNotifier {
     return _chatReceipt;
   }
 
-  List<ChatMessage> get acceptedChatReceipts {
-    return _acceptedChatReceipts;
+  String _getKey(String peerId, String clientId) {
+    var key = '$peerId:$clientId';
+    return key;
   }
 
-  List<ChatMessage> get rejectedChatReceipts {
-    return _rejectedChatReceipts;
+  ChatMessage? getAcceptedChatReceipts(String peerId, String clientId) {
+    return _acceptedChatReceipts[_getKey(peerId, clientId)];
   }
 
-  List<ChatMessage> get terminatedChatReceipts {
-    return _terminatedChatReceipts;
+  ChatMessage? getRejectedChatReceipts(String peerId, String clientId) {
+    return _rejectedChatReceipts[_getKey(peerId, clientId)];
+  }
+
+  ChatMessage? getTerminatedChatReceipts(String peerId, String clientId) {
+    return _terminatedChatReceipts[_getKey(peerId, clientId)];
   }
 
   ///接受到视频通话回执，一般由globalChatMessageController分发到此
+  ///在多个接收人的场景下，首先检查自己是否已经发过回执，存在是accepted则继续处理
+  ///如果不存在，则发送自己的决定，如果存在是rejected或者terminated，则不处理
   receivedChatReceipt(ChatMessage chatReceipt) async {
     //当前的视频通话邀请消息不为空
     if (_chatMessage != null) {
-      logger.e('chatMessage is null');
+      logger.e('Video chatMessage is null');
       return;
     }
     //当前到来的回执是新的
@@ -68,14 +75,15 @@ class VideoChatMessageController with ChangeNotifier {
       }
       _chatReceipt = chatReceipt;
       //把回执消息分类存放
+      var key = _getKey(chatReceipt.senderPeerId!, chatReceipt.senderClientId!);
       if (chatReceipt.status == MessageStatus.accepted.name) {
-        _acceptedChatReceipts.add(chatReceipt);
+        _acceptedChatReceipts[key] = chatReceipt;
       }
       if (chatReceipt.status == MessageStatus.rejected.name) {
-        _rejectedChatReceipts.add(chatReceipt);
+        _rejectedChatReceipts[key] = chatReceipt;
       }
       if (chatReceipt.status == MessageStatus.terminated.name) {
-        _terminatedChatReceipts.add(chatReceipt);
+        _terminatedChatReceipts[key] = chatReceipt;
       }
       _receivedChatReceipt();
       notifyListeners();
@@ -121,7 +129,8 @@ class VideoChatMessageController with ChangeNotifier {
     }
   }
 
-  ///收到视频通话的回执，在群通话的情况下，可以收到多次
+  ///收到视频通话的回执的处理，
+  ///在群通话的情况下，可以收到多次，包括多个接收人的回执
   ///根据消息回执是接受拒绝还是终止进行处理
   _receivedChatReceipt() async {
     if (_chatReceipt == null) {

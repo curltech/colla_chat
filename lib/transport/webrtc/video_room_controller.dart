@@ -169,6 +169,7 @@ class VideoRoomRenderPool with ChangeNotifier {
     return null;
   }
 
+  ///根据房间号返回房间控制器，没有则返回null
   VideoRoomRenderController? getVideoRoomRenderController(String roomId) {
     return videoRoomRenderControllers[roomId];
   }
@@ -177,7 +178,7 @@ class VideoRoomRenderPool with ChangeNotifier {
     return rooms[roomId];
   }
 
-  ///创建新的房间，返回其控制器
+  ///创建新的房间，返回其控制器，假如房间号已经存在，直接返回
   VideoRoomRenderController createVideoRoomRenderController(Room room) {
     String roomId = room.roomId!;
     VideoRoomRenderController? videoRoomController =

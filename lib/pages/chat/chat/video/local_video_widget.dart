@@ -190,6 +190,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       //当前视频消息为空，则创建房间，发送视频通话邀请消息
       //由消息的接收方同意后直接重新协商
       var room = await _buildRoom();
+      logger.i('current video chatMessage is null, create room ${room.roomId}');
       if (video) {
         chatMessage = await _sendVideoChatMessage(
             contentType: ContentType.video.name, room: room);
@@ -202,6 +203,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     } else {
       //当前视频消息不为空，则有同意回执的直接重新协商
       var messageId = chatMessage.messageId!;
+      logger.i('current video chatMessage $messageId');
       var videoRoomRenderController =
           videoRoomRenderPool.getVideoRoomRenderController(messageId);
       if (videoRoomRenderController != null) {
@@ -236,8 +238,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       builder: (context) => Dialog(child: ScreenSelectDialog()),
     );
     if (source != null) {
-      await localVideoRenderController
-          .createDisplayMediaRender(selectedSource: source);
+      await localVideoRenderController.createDisplayMediaRender(
+          selectedSource: source);
       var messageId = chatMessage.messageId!;
       var videoRoomRenderController =
           videoRoomRenderPool.getVideoRoomRenderController(messageId);
@@ -287,11 +289,17 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///需要群发给room里面的参与者，而不是group的所有成员
   Future<ChatMessage?> _sendVideoChatMessage(
       {required String contentType, required Room room}) async {
-    return chatMessageController.send(
+    ChatMessage? chatMessage = await chatMessageController.send(
         title: contentType,
         content: room,
+        messageId: room.roomId,
         subMessageType: ChatMessageSubType.videoChat,
         peerIds: room.participants);
+    if (chatMessage != null) {
+      logger.i('send video chatMessage ${chatMessage.messageId}');
+    }
+
+    return chatMessage;
   }
 
   _close() async {
