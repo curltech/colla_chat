@@ -6,6 +6,7 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.da
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
 import 'package:colla_chat/pages/chat/linkman/group_linkman_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
@@ -18,6 +19,7 @@ import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:colla_chat/transport/webrtc/video_room_controller.dart';
+import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
@@ -149,20 +151,36 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///弹出界面，选择参与者，返回房间
   Future<Room> _buildRoom() async {
     List<String> participants = [myself.peerId!];
-    if (groupPeerId == null) {
-      participants.add(peerId!);
+    if (peerId != null) {
+      if (groupPeerId == null) {
+        participants.add(peerId!);
+      } else {
+        await DialogUtil.show(
+            context: context,
+            builder: (BuildContext context) {
+              return GroupLinkmanWidget(
+                onSelected: (List<String> peerIds) {
+                  participants.addAll(peerIds);
+                  Navigator.pop(context, participants);
+                },
+                selected: const <String>[],
+                groupPeerId: peerId!,
+              );
+            });
+      }
     } else {
       await DialogUtil.show(
           context: context,
+          title: AppBarWidget.buildTitleBar(
+              title: Text(AppLocalizations.t('Select one linkman'))),
           builder: (BuildContext context) {
-            return GroupLinkmanWidget(
-              onSelected: (List<String> peerIds) {
-                participants.addAll(peerIds);
-                Navigator.pop(context, participants);
-              },
-              selected: const <String>[],
-              groupPeerId: peerId!,
-            );
+            return LinkmanGroupSearchWidget(
+                onSelected: (List<String> peerIds) async {
+                  participants.addAll(peerIds);
+                  Navigator.pop(context, participants);
+                },
+                selected: const <String>[],
+                selectType: SelectType.multidialog);
           });
     }
     var uuid = const Uuid();
