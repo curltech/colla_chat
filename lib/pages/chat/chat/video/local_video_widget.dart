@@ -167,7 +167,9 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
     var uuid = const Uuid();
     String roomId = uuid.v4();
-    return Room(roomId, participants: participants);
+    room = Room(roomId, participants: participants);
+
+    return room!;
   }
 
   _openVideoMedia({bool video = true}) async {
