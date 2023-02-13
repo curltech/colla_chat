@@ -18,10 +18,13 @@ class _VideoViewCardState extends State<VideoViewCard> {
   @override
   initState() {
     super.initState();
+    widget.videoRenderController.addListener(_update);
   }
 
   _update() {
-    setState(() {});
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   Widget _buildVideoViews(BuildContext context, BoxConstraints constraints) {
@@ -71,6 +74,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
 
   @override
   void dispose() {
+    widget.videoRenderController.removeListener(_update);
     super.dispose();
   }
 }

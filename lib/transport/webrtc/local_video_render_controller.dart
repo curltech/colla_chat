@@ -122,10 +122,12 @@ class LocalVideoRenderController extends VideoRenderController {
       if (_videoChatRender != null) {
         remove(_videoChatRender!);
       }
+      _videoChatRender = videoRender;
       if (videoRender != null) {
         add(videoRender);
+      } else {
+        notifyListeners();
       }
-      _videoChatRender = videoRender;
     }
   }
 

@@ -10,7 +10,6 @@ import 'package:colla_chat/pages/chat/video/video_view_card.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
-import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
@@ -125,30 +124,30 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (localVideoRenderController.videoChatRender == null) {
       actionData.add(
         ActionData(
-            label: 'Video chat',
-            tooltip: 'Video chat',
+            label: 'Video',
+            tooltip: 'Open local video',
             icon: const Icon(Icons.video_call, color: Colors.white)),
       );
       actionData.add(
         ActionData(
-            label: 'Audio chat',
-            tooltip: 'Audio chat',
+            label: 'Audio',
+            tooltip: 'Open local audio',
             icon: const Icon(Icons.multitrack_audio_outlined,
                 color: Colors.white)),
       );
     } else if (localVideoRenderController.video) {
       actionData.add(
         ActionData(
-            label: 'Audio chat',
-            tooltip: 'Audio chat',
+            label: 'Audio',
+            tooltip: 'Open local audio',
             icon: const Icon(Icons.multitrack_audio_outlined,
                 color: Colors.white)),
       );
     } else {
       actionData.add(
         ActionData(
-            label: 'Video chat',
-            tooltip: 'Video chat',
+            label: 'Video',
+            tooltip: 'Open local video',
             icon: const Icon(Icons.video_call, color: Colors.white)),
       );
     }
@@ -156,14 +155,14 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       actionData.add(
         ActionData(
             label: 'Screen share',
-            tooltip: 'Screen share',
+            tooltip: 'Open screen share',
             icon: const Icon(Icons.screen_share, color: Colors.white)),
       );
     }
     // actionData.add(
     //   ActionData(
     //       label: 'Media play',
-    //       tooltip: 'Media play',
+    //       tooltip: 'Open media play',
     //       icon: const Icon(Icons.video_file, color: Colors.white)),
     // );
 
@@ -213,7 +212,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   _openVideoMedia({bool video = true}) async {
-    if (groupPeerId == null) {
+    if (peerId != null) {
       var status = peerConnectionPool.status(peerId!);
       if (status != PeerConnectionStatus.connected) {
         DialogUtil.error(context,
@@ -376,27 +375,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     return chatMessage;
   }
 
-  ///视频视图
-  Widget _buildVideoView(BuildContext context) {
-    if (peerId == null) {
-      return Container();
-    }
-    if (groupPeerId == null) {
-      var status = peerConnectionPool.status(peerId!);
-      if (status == PeerConnectionStatus.connected) {
-        return VideoViewCard(
-          videoRenderController: localVideoRenderController,
-        );
-      }
-    } else {
-      return VideoViewCard(
-        videoRenderController: localVideoRenderController,
-      );
-    }
-    linkmanService.findAvatarImageWidget(peerId!);
-    return Container();
-  }
-
   Future<void> _onAction(int index, String name, {String? value}) async {
     switch (name) {
       case 'Video chat':
@@ -523,7 +501,9 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   Widget _buildGestureDetector(BuildContext context) {
     return GestureDetector(
-      child: _buildVideoView(context),
+      child: VideoViewCard(
+        videoRenderController: localVideoRenderController,
+      ),
       onLongPress: () {
         _toggleActionCard();
         //focusNode.requestFocus();
@@ -531,16 +511,12 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     );
   }
 
-  Widget _buildLocalVideo(BuildContext context) {
+  @override
+  Widget build(BuildContext context) {
     return Stack(children: [
       _buildGestureDetector(context),
       _buildControlPanel(context),
     ]);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _buildLocalVideo(context);
   }
 
   @override
