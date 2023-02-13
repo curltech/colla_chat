@@ -243,7 +243,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   _openDisplayMedia() async {
-    if (groupPeerId == null) {
+    if (peerId != null) {
       var status = peerConnectionPool.status(peerId!);
       if (status != PeerConnectionStatus.connected) {
         DialogUtil.error(context,
@@ -252,11 +252,11 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       }
     }
 
-    ChatMessage? chatMessage = videoChatMessageController.chatMessage;
-    if (chatMessage == null) {
-      DialogUtil.error(context, content: AppLocalizations.t('No room'));
-      return;
-    }
+    // ChatMessage? chatMessage = videoChatMessageController.chatMessage;
+    // if (chatMessage == null) {
+    //   DialogUtil.error(context, content: AppLocalizations.t('No room'));
+    //   return;
+    // }
     final source = await DialogUtil.show<DesktopCapturerSource>(
       context: context,
       builder: (context) => Dialog(child: ScreenSelectDialog()),
@@ -264,18 +264,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (source != null) {
       await localVideoRenderController.createDisplayMediaRender(
           selectedSource: source);
-      var messageId = chatMessage.messageId!;
-      var videoRoomRenderController =
-          videoRoomRenderPool.getVideoRoomRenderController(messageId);
-      if (videoRoomRenderController != null) {
-        List<AdvancedPeerConnection> pcs =
-            videoRoomRenderController.getAdvancedPeerConnections(peerId!);
-        if (pcs.isNotEmpty) {
-          for (var pc in pcs) {
-            pc.negotiate();
-          }
-        }
-      }
     }
   }
 
@@ -377,10 +365,10 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   Future<void> _onAction(int index, String name, {String? value}) async {
     switch (name) {
-      case 'Video chat':
+      case 'Video':
         _openVideoMedia();
         break;
-      case 'Audio chat':
+      case 'Audio':
         _openVideoMedia(video: false);
         break;
       case 'Screen share':
@@ -440,62 +428,60 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           valueListenable: actionCardVisible,
           builder: (context, value, child) {
             return Visibility(
-                visible: actionCardVisible.value,
-                child: Column(children: [
-                  _buildActionCard(context),
-                  Center(
-                    child: Container(
-                      padding: const EdgeInsets.all(25.0),
-                      child: ValueListenableBuilder<CallStatus>(
-                        valueListenable: callStatus,
-                        builder: (BuildContext context, CallStatus value,
-                            Widget? child) {
-                          if (value == CallStatus.calling) {
-                            return WidgetUtil.buildCircleButton(
-                              onPressed: () {
-                                _close();
-                              },
-                              elevation: 2.0,
-                              backgroundColor: Colors.red,
-                              padding: const EdgeInsets.all(15.0),
-                              child: const Icon(
-                                Icons.call_end,
-                                size: 48.0,
-                                color: Colors.white,
-                              ),
-                            );
-                          } else if (value == CallStatus.end) {
-                            return WidgetUtil.buildCircleButton(
-                              onPressed: () {
-                                _call();
-                              },
-                              elevation: 2.0,
-                              backgroundColor: Colors.green,
-                              padding: const EdgeInsets.all(15.0),
-                              child: const Icon(
-                                Icons.call,
-                                size: 48.0,
-                                color: Colors.white,
-                              ),
-                            );
-                          } else {
-                            return WidgetUtil.buildCircleButton(
-                              elevation: 2.0,
-                              backgroundColor: Colors.grey,
-                              padding: const EdgeInsets.all(15.0),
-                              child: const Icon(
-                                Icons.call_end,
-                                size: 48.0,
-                                color: Colors.white,
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                    ),
+              visible: actionCardVisible.value,
+              child: _buildActionCard(context),
+            );
+          }),
+      Center(
+        child: Container(
+          padding: const EdgeInsets.all(25.0),
+          child: ValueListenableBuilder<CallStatus>(
+            valueListenable: callStatus,
+            builder: (BuildContext context, CallStatus value, Widget? child) {
+              if (value == CallStatus.calling) {
+                return WidgetUtil.buildCircleButton(
+                  onPressed: () {
+                    _close();
+                  },
+                  elevation: 2.0,
+                  backgroundColor: Colors.red,
+                  padding: const EdgeInsets.all(15.0),
+                  child: const Icon(
+                    Icons.call_end,
+                    size: 48.0,
+                    color: Colors.white,
                   ),
-                ]));
-          })
+                );
+              } else if (value == CallStatus.end) {
+                return WidgetUtil.buildCircleButton(
+                  onPressed: () {
+                    _call();
+                  },
+                  elevation: 2.0,
+                  backgroundColor: Colors.green,
+                  padding: const EdgeInsets.all(15.0),
+                  child: const Icon(
+                    Icons.call,
+                    size: 48.0,
+                    color: Colors.white,
+                  ),
+                );
+              } else {
+                return WidgetUtil.buildCircleButton(
+                  elevation: 2.0,
+                  backgroundColor: Colors.grey,
+                  padding: const EdgeInsets.all(15.0),
+                  child: const Icon(
+                    Icons.call_end,
+                    size: 48.0,
+                    color: Colors.white,
+                  ),
+                );
+              }
+            },
+          ),
+        ),
+      ),
     ]);
   }
 
