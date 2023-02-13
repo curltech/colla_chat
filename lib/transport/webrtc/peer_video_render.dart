@@ -294,10 +294,9 @@ class PeerVideoRender {
   Widget _createVideoViewContainer({
     double? width,
     double? height,
-    Color? color,
+    Color? color = Colors.black,
     Widget? child,
   }) {
-    color = color ?? Colors.black.withOpacity(1);
     child ??= emptyVideoView;
     Widget container = LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {

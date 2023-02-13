@@ -1,6 +1,6 @@
 import 'package:card_swiper/card_swiper.dart';
-import 'package:colla_chat/pages/chat/chat/video/local_video_widget.dart';
-import 'package:colla_chat/pages/chat/chat/video/remote_video_widget.dart';
+import 'package:colla_chat/pages/chat/video/local_video_widget.dart';
+import 'package:colla_chat/pages/chat/video/remote_video_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/video_room_controller.dart';

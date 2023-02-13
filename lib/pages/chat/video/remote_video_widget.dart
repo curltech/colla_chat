@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
+import 'package:colla_chat/pages/chat/video/video_view_card.dart';
 import 'package:colla_chat/transport/webrtc/video_room_controller.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -168,7 +168,8 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
 
   @override
   void dispose() {
-    var videoRoomRenderController = videoRoomRenderPool.videoRoomRenderController;
+    var videoRoomRenderController =
+        videoRoomRenderPool.videoRoomRenderController;
     if (videoRoomRenderController != null) {
       videoRoomRenderController.removeListener(_update);
     }

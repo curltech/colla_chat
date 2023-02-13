@@ -7,7 +7,7 @@ import 'package:colla_chat/pages/chat/chat/chat_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/full_screen_widget.dart';
-import 'package:colla_chat/pages/chat/chat/video/video_chat_widget.dart';
+import 'package:colla_chat/pages/chat/chat/video_chat_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -29,7 +29,8 @@ class ChatMessageView extends StatefulWidget with TileDataMixin {
   final FullScreenWidget fullScreenWidget = const FullScreenWidget();
   final VideoChatWidget videoChatWidget = const VideoChatWidget();
   final ChatMessageWidget chatMessageWidget = ChatMessageWidget();
-  final chatMessageInputWidget = ChatMessageInputWidget();
+  final ChatMessageInputWidget chatMessageInputWidget =
+      ChatMessageInputWidget();
 
   ChatMessageView({
     Key? key,

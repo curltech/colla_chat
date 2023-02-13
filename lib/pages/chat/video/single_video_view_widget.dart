@@ -9,14 +9,12 @@ class SingleVideoViewWidget extends StatefulWidget {
   final PeerVideoRender render;
   final double? height;
   final double? width;
-  final Color? color;
 
   const SingleVideoViewWidget({
     Key? key,
     required this.render,
     this.height,
     this.width,
-    this.color,
   }) : super(key: key);
 
   @override
@@ -58,8 +56,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
     Widget videoView = Stack(children: [
-      widget.render
-          .createVideoView(height: height, width: width, color: widget.color),
+      widget.render.createVideoView(height: height, width: width),
       _buildAppBar(),
     ]);
 
@@ -162,8 +159,8 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
       BuildContext context, double? height, double? width) {
     String name = widget.render.name ?? '';
     Widget actionWidget = _buildActionCard(context);
-    Widget videoView = widget.render
-        .createVideoView(height: height, width: width, color: widget.color);
+    Widget videoView =
+        widget.render.createVideoView(height: height, width: width);
     Widget singleVideoView = Builder(
       builder: (context) => InkWell(
         onTap: () {

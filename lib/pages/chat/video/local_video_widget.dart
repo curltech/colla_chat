@@ -4,9 +4,9 @@ import 'package:colla_chat/entity/chat/chat.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
 import 'package:colla_chat/pages/chat/linkman/group_linkman_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
+import 'package:colla_chat/pages/chat/video/video_view_card.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
@@ -27,9 +27,14 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:uuid/uuid.dart';
 
 enum CallStatus {
-  none, //没有选定呼叫的目标peerId
   calling, //正在呼叫中
   end, //不在呼叫中
+}
+
+enum VideoMode {
+  linkman, //在单聊的场景下视频通话
+  group, //在群聊的场景下视频通话
+  conferencing, //没有在聊天的场景下的视频通话
 }
 
 ///视频通话的流程，适用单个通话和群
@@ -49,9 +54,10 @@ enum CallStatus {
 ///本地视频通话显示和拨出的窗口，显示多个本地视频，音频和屏幕共享的小视频窗口
 ///各种功能按钮，可以切换视频和音频，添加屏幕共享视频，此时需要发起重新协商
 class LocalVideoWidget extends StatefulWidget {
-  final Color? color;
+  final VideoMode videoMode;
 
-  const LocalVideoWidget({Key? key, this.color}) : super(key: key);
+  const LocalVideoWidget({Key? key, this.videoMode = VideoMode.conferencing})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -73,30 +79,40 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   ValueNotifier<bool> actionCardVisible = ValueNotifier<bool>(true);
   ValueNotifier<CallStatus> callStatus =
-      ValueNotifier<CallStatus>(CallStatus.none);
+      ValueNotifier<CallStatus>(CallStatus.end);
   Timer? _hidePanelTimer;
 
   @override
   void initState() {
     super.initState();
     videoChatMessageController.addListener(_update);
-    _init();
     localVideoRenderController.addListener(_update);
+    _init();
   }
 
   _init() async {
+    if (widget.videoMode == VideoMode.conferencing) {
+      return;
+    }
+    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    if (chatSummary == null) {
+      logger
+          .e('videoMode is ${widget.videoMode.name}, but chatSummary is null');
+      return;
+    }
+    peerId = chatSummary.peerId!;
+    name = chatSummary.name!;
+    var partyType = chatSummary.partyType;
+    if (partyType == PartyType.group.name) {
+      groupPeerId = chatSummary.peerId!;
+    }
+    //当前的视频通话的邀请消息，如果存在，获取房间信息
     ChatMessage? chatMessage = videoChatMessageController.chatMessage;
     if (chatMessage != null) {
-      peerId = chatMessage.receiverPeerId!;
-      name = chatMessage.receiverName!;
-      groupPeerId = chatMessage.groupPeerId;
       String content = chatMessage.content!;
       content = chatMessageService.recoverContent(content);
       Map json = JsonUtil.toJson(content);
       room = Room.fromJson(json);
-      if (peerId != null) {
-        callStatus.value = CallStatus.end;
-      }
     }
   }
 
@@ -157,7 +173,21 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///弹出界面，选择参与者，返回房间
   Future<Room> _buildRoom() async {
     List<String> participants = [myself.peerId!];
-    if (peerId != null) {
+    if (widget.videoMode == VideoMode.conferencing) {
+      await DialogUtil.show(
+          context: context,
+          title: AppBarWidget.buildTitleBar(
+              title: Text(AppLocalizations.t('Select one linkman'))),
+          builder: (BuildContext context) {
+            return LinkmanGroupSearchWidget(
+                onSelected: (List<String> peerIds) async {
+                  participants.addAll(peerIds);
+                  Navigator.pop(context, participants);
+                },
+                selected: const <String>[],
+                selectType: SelectType.multidialog);
+          });
+    } else if (peerId != null) {
       if (groupPeerId == null) {
         participants.add(peerId!);
       } else {
@@ -174,20 +204,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               );
             });
       }
-    } else {
-      await DialogUtil.show(
-          context: context,
-          title: AppBarWidget.buildTitleBar(
-              title: Text(AppLocalizations.t('Select one linkman'))),
-          builder: (BuildContext context) {
-            return LinkmanGroupSearchWidget(
-                onSelected: (List<String> peerIds) async {
-                  participants.addAll(peerIds);
-                  Navigator.pop(context, participants);
-                },
-                selected: const <String>[],
-                selectType: SelectType.multidialog);
-          });
     }
     var uuid = const Uuid();
     String roomId = uuid.v4();
@@ -369,14 +385,12 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       var status = peerConnectionPool.status(peerId!);
       if (status == PeerConnectionStatus.connected) {
         return VideoViewCard(
-          color: widget.color,
           videoRenderController: localVideoRenderController,
         );
       }
     } else {
       return VideoViewCard(
         videoRenderController: localVideoRenderController,
-        color: widget.color,
       );
     }
     linkmanService.findAvatarImageWidget(peerId!);
@@ -492,7 +506,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                               backgroundColor: Colors.grey,
                               padding: const EdgeInsets.all(15.0),
                               child: const Icon(
-                                Icons.call,
+                                Icons.call_end,
                                 size: 48.0,
                                 color: Colors.white,
                               ),
