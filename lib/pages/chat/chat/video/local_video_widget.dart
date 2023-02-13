@@ -60,9 +60,15 @@ class LocalVideoWidget extends StatefulWidget {
 }
 
 class _LocalVideoWidgetState extends State<LocalVideoWidget> {
+  //当前的群编号，说明正在群中聊天
+  String? groupPeerId;
+
+  //当前的联系人编号和名称，说明正在一对一聊天
   String? peerId;
   String? name;
-  String? groupPeerId;
+
+  //当前的通话房间，房间是临时组建的一组联系人，互相聊天和视频通话
+  //如果当前的群存在的话，房间的人在群的联系人中选择，否则在所有的联系人中选择
   Room? room;
 
   ValueNotifier<bool> actionCardVisible = ValueNotifier<bool>(true);
