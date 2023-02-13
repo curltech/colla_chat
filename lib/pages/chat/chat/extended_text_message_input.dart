@@ -166,7 +166,7 @@ class _ExtendedTextMessageInputWidgetState
               return GroupLinkmanWidget(
                 selectType: SelectType.listview,
                 onSelected: _onSelected,
-                selected: [],
+                selected: const <String>[],
                 groupPeerId: groupPeerId!,
               );
             });

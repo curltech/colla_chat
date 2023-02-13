@@ -680,8 +680,8 @@ class MaterialWidgetFactory extends WidgetFactory {
   }) {
     return ToggleButtons(
       key: key,
-      isSelected: [],
-      children: [],
+      isSelected: const <bool>[],
+      children: const <Widget>[],
     );
   }
 
@@ -1074,7 +1074,7 @@ class MaterialWidgetFactory extends WidgetFactory {
   }) {
     return DropdownButton<T>(
       key: key,
-      items: [],
+      items: const <DropdownMenuItem<T>>[],
       onChanged: (Object? value) {},
     );
   }

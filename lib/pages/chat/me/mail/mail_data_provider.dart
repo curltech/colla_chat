@@ -388,7 +388,7 @@ class MailDataProvider with ChangeNotifier {
       var currentChatMessagePage = this.currentChatMessagePage;
       if (currentChatMessagePage == null) {
         currentChatMessagePage = datastore.Pagination(
-            rowsNumber: currentMailbox.messagesExists, data: []);
+            rowsNumber: currentMailbox.messagesExists, data: const <ChatMessage>[]);
         this.currentChatMessagePage = currentChatMessagePage;
       }
       for (var mimeMessage in mimeMessagePage.data) {

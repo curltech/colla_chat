@@ -468,7 +468,7 @@ class MultiSelectUtil {
       dialogHeight: dialogHeight,
       dialogWidth: dialogWidth,
       colorator: colorator,
-      backgroundColor: Colors.grey.withOpacity(0.8),
+      backgroundColor: Colors.grey.withOpacity(AppOpacity.smOpacity),
       unselectedColor: unselectedColor,
       searchIcon: searchIcon,
       closeSearchIcon: closeSearchIcon,

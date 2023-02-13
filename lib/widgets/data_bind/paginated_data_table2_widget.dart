@@ -81,7 +81,7 @@ class _PaginatedDataTableState<T> extends State<PaginatedDataTable2Widget> {
     var sourceData = DataPageSource<T>(widget: widget, context: context);
     int rowsPerPage = widget.controller.pagination.data.length;
     Widget dataTableView = PaginatedDataTable2(
-      actions: [],
+      actions: const <Widget>[],
       rowsPerPage: rowsPerPage,
       initialFirstRowIndex: 0,
       onPageChanged: (i) {

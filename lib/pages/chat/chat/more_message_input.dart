@@ -266,7 +266,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
                   }
                 }
               },
-              selected: [],
+              selected: const <String>[],
               selectType: SelectType.multidialog);
         });
   }

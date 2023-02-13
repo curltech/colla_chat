@@ -17,4 +17,4 @@ class ChainAppService extends GeneralBaseService<ChainApp> {
 final chainAppService = ChainAppService(
     tableName: "blc_chainapp",
     fields: ServiceLocator.buildFields(ChainApp(), []),
-    indexFields: []);
+    indexFields: const <String>[]);

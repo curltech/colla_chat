@@ -160,7 +160,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                 participants.addAll(peerIds);
                 Navigator.pop(context, participants);
               },
-              selected: [],
+              selected: const <String>[],
               groupPeerId: peerId!,
             );
           });
