@@ -8,8 +8,10 @@ import 'package:colla_chat/pages/chat/chat/video/video_view_card.dart';
 import 'package:colla_chat/pages/chat/linkman/group_linkman_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
@@ -21,6 +23,12 @@ import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:uuid/uuid.dart';
+
+enum CallStatus {
+  none, //没有选定呼叫的目标peerId
+  calling, //正在呼叫中
+  end, //不在呼叫中
+}
 
 ///视频通话的流程，适用单个通话和群
 ///1.发起方在本地通话窗口发起视频通话请求（缺省会打开本地的视频或者音频，但不会打开屏幕共享），
@@ -52,9 +60,12 @@ class LocalVideoWidget extends StatefulWidget {
 class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   String? peerId;
   String? name;
-  String partyType = PartyType.linkman.name;
+  String? groupPeerId;
+  Room? room;
 
   ValueNotifier<bool> actionCardVisible = ValueNotifier<bool>(true);
+  ValueNotifier<CallStatus> callStatus =
+      ValueNotifier<CallStatus>(CallStatus.none);
   Timer? _hidePanelTimer;
 
   @override
@@ -66,13 +77,18 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   _init() async {
-    ChatSummary? chatSummary = chatMessageController.chatSummary;
-    if (chatSummary != null) {
-      peerId = chatSummary.peerId!;
-      name = chatSummary.name!;
-      partyType = chatSummary.partyType!;
-    } else {
-      logger.e('chatSummary is null');
+    ChatMessage? chatMessage = videoChatMessageController.chatMessage;
+    if (chatMessage != null) {
+      peerId = chatMessage.receiverPeerId!;
+      name = chatMessage.receiverName!;
+      groupPeerId = chatMessage.groupPeerId;
+      String content = chatMessage.content!;
+      content = chatMessageService.recoverContent(content);
+      Map json = JsonUtil.toJson(content);
+      room = Room.fromJson(json);
+      if (peerId != null) {
+        callStatus.value = CallStatus.end;
+      }
     }
   }
 
@@ -133,9 +149,9 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///弹出界面，选择参与者，返回房间
   Future<Room> _buildRoom() async {
     List<String> participants = [myself.peerId!];
-    if (partyType == PartyType.linkman.name) {
+    if (groupPeerId == null) {
       participants.add(peerId!);
-    } else if (partyType == PartyType.group.name) {
+    } else {
       await DialogUtil.show(
           context: context,
           builder: (BuildContext context) {
@@ -155,8 +171,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   _openVideoMedia({bool video = true}) async {
-    var status = peerConnectionPool.status(peerId!);
-    if (partyType == PartyType.linkman.name) {
+    if (groupPeerId == null) {
+      var status = peerConnectionPool.status(peerId!);
       if (status != PeerConnectionStatus.connected) {
         DialogUtil.error(context,
             content: AppLocalizations.t('No Webrtc connected PeerConnection'));
@@ -183,44 +199,11 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         }
       }
     }
-    videoChatRender = localVideoRenderController.videoChatRender;
-
-    ChatMessage? chatMessage = videoChatMessageController.chatMessage;
-    if (chatMessage == null) {
-      //当前视频消息为空，则创建房间，发送视频通话邀请消息
-      //由消息的接收方同意后直接重新协商
-      var room = await _buildRoom();
-      logger.i('current video chatMessage is null, create room ${room.roomId}');
-      if (video) {
-        chatMessage = await _sendVideoChatMessage(
-            contentType: ContentType.video.name, room: room);
-      } else {
-        chatMessage = await _sendVideoChatMessage(
-            contentType: ContentType.audio.name, room: room);
-      }
-      videoChatMessageController.chatMessage = chatMessage;
-      videoRoomRenderPool.createVideoRoomRenderController(room);
-    } else {
-      //当前视频消息不为空，则有同意回执的直接重新协商
-      var messageId = chatMessage.messageId!;
-      logger.i('current video chatMessage $messageId');
-      var videoRoomRenderController =
-          videoRoomRenderPool.getVideoRoomRenderController(messageId);
-      if (videoRoomRenderController != null) {
-        List<AdvancedPeerConnection> pcs =
-            videoRoomRenderController.getAdvancedPeerConnections(peerId!);
-        if (pcs.isNotEmpty) {
-          for (var pc in pcs) {
-            pc.negotiate();
-          }
-        }
-      }
-    }
   }
 
   _openDisplayMedia() async {
-    var status = peerConnectionPool.status(peerId!);
-    if (partyType == PartyType.linkman.name) {
+    if (groupPeerId == null) {
+      var status = peerConnectionPool.status(peerId!);
       if (status != PeerConnectionStatus.connected) {
         DialogUtil.error(context,
             content: AppLocalizations.t('No Webrtc connected PeerConnection'));
@@ -256,8 +239,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   _openMediaStream(MediaStream stream) async {
-    var status = peerConnectionPool.status(peerId!);
-    if (partyType == PartyType.linkman.name) {
+    if (groupPeerId == null) {
+      var status = peerConnectionPool.status(peerId!);
       if (status != PeerConnectionStatus.connected) {
         DialogUtil.error(context,
             content: AppLocalizations.t('No Webrtc connected PeerConnection'));
@@ -285,6 +268,55 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
   }
 
+  ///呼叫，发送视频通话邀请消息
+  ///如果已有视频通话邀请消息，说明已收到接收方的同意回执，则直接开始重新协商
+  _call() async {
+    var videoChatRender = localVideoRenderController.videoChatRender;
+    if (videoChatRender == null) {
+      await _openVideoMedia(video: true);
+      videoChatRender = localVideoRenderController.videoChatRender;
+    }
+
+    ChatMessage? chatMessage = videoChatMessageController.chatMessage;
+    if (chatMessage == null) {
+      //当前视频消息为空，则创建房间，发送视频通话邀请消息
+      //由消息的接收方同意后直接重新协商
+      var room = await _buildRoom();
+      logger.i('current video chatMessage is null, create room ${room.roomId}');
+      if (videoChatRender!.video) {
+        chatMessage = await _sendVideoChatMessage(
+            contentType: ContentType.video.name, room: room);
+      } else {
+        chatMessage = await _sendVideoChatMessage(
+            contentType: ContentType.audio.name, room: room);
+      }
+      videoChatMessageController.chatMessage = chatMessage;
+      videoRoomRenderPool.createVideoRoomRenderController(room);
+    } else {
+      //当前视频消息不为空，则有同意回执的直接重新协商
+      var messageId = chatMessage.messageId!;
+      logger.i('current video chatMessage $messageId');
+      var videoRoomRenderController =
+          videoRoomRenderPool.getVideoRoomRenderController(messageId);
+      if (videoRoomRenderController != null) {
+        List<AdvancedPeerConnection> pcs =
+            videoRoomRenderController.getAdvancedPeerConnections(peerId!);
+        if (pcs.isNotEmpty) {
+          for (var pc in pcs) {
+            pc.negotiate();
+          }
+        }
+      }
+    }
+    callStatus.value = CallStatus.calling;
+  }
+
+  _close() async {
+    localVideoRenderController.close();
+    videoChatMessageController.chatMessage = null;
+    callStatus.value = CallStatus.end;
+  }
+
   ///发送group视频通邀请话消息,此时消息必须有content,包含Room信息
   ///需要群发给room里面的参与者，而不是group的所有成员
   Future<ChatMessage?> _sendVideoChatMessage(
@@ -302,17 +334,12 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     return chatMessage;
   }
 
-  _close() async {
-    localVideoRenderController.close();
-    videoChatMessageController.chatMessage = null;
-  }
-
   ///视频视图
   Widget _buildVideoView(BuildContext context) {
     if (peerId == null) {
       return Container();
     }
-    if (partyType == PartyType.linkman.name) {
+    if (groupPeerId == null) {
       var status = peerConnectionPool.status(peerId!);
       if (status == PeerConnectionStatus.connected) {
         return VideoViewCard(
@@ -320,7 +347,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           videoRenderController: localVideoRenderController,
         );
       }
-    } else if (partyType == PartyType.group.name) {
+    } else {
       return VideoViewCard(
         videoRenderController: localVideoRenderController,
         color: widget.color,
@@ -399,22 +426,56 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                 child: Column(children: [
                   _buildActionCard(context),
                   Center(
-                      child: Container(
-                    padding: const EdgeInsets.all(25.0),
-                    child: WidgetUtil.buildCircleButton(
-                      onPressed: () {
-                        _close();
-                      },
-                      elevation: 2.0,
-                      backgroundColor: Colors.red,
-                      padding: const EdgeInsets.all(15.0),
-                      child: const Icon(
-                        Icons.call_end,
-                        size: 48.0,
-                        color: Colors.white,
+                    child: Container(
+                      padding: const EdgeInsets.all(25.0),
+                      child: ValueListenableBuilder<CallStatus>(
+                        valueListenable: callStatus,
+                        builder: (BuildContext context, CallStatus value,
+                            Widget? child) {
+                          if (value == CallStatus.calling) {
+                            return WidgetUtil.buildCircleButton(
+                              onPressed: () {
+                                _close();
+                              },
+                              elevation: 2.0,
+                              backgroundColor: Colors.red,
+                              padding: const EdgeInsets.all(15.0),
+                              child: const Icon(
+                                Icons.call_end,
+                                size: 48.0,
+                                color: Colors.white,
+                              ),
+                            );
+                          } else if (value == CallStatus.end) {
+                            return WidgetUtil.buildCircleButton(
+                              onPressed: () {
+                                _call();
+                              },
+                              elevation: 2.0,
+                              backgroundColor: Colors.green,
+                              padding: const EdgeInsets.all(15.0),
+                              child: const Icon(
+                                Icons.call,
+                                size: 48.0,
+                                color: Colors.white,
+                              ),
+                            );
+                          } else {
+                            return WidgetUtil.buildCircleButton(
+                              elevation: 2.0,
+                              backgroundColor: Colors.grey,
+                              padding: const EdgeInsets.all(15.0),
+                              child: const Icon(
+                                Icons.call,
+                                size: 48.0,
+                                color: Colors.white,
+                              ),
+                            );
+                          }
+                        },
                       ),
                     ),
-                  )),
+                  ),
                 ]));
           })
     ]);

@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 class WidgetUtil {
   static buildCircleButton({
     Key? key,
-    required void Function()? onPressed,
+    void Function()? onPressed,
     Color? backgroundColor,
     double elevation = 2.0,
     EdgeInsetsGeometry padding = EdgeInsets.zero,
