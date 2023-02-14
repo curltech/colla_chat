@@ -12,7 +12,6 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
@@ -120,7 +119,9 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   _update() {
-    _buildActionDataAndVisible();
+    if (mounted) {
+      _buildActionDataAndVisible();
+    }
   }
 
   _buildActionDataAndVisible() {
@@ -175,7 +176,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   ///弹出界面，选择参与者，返回房间
-  Future<Room> _buildRoom() async {
+  _buildRoom() async {
     List<String> participants = [myself.peerId!];
     if (widget.videoMode == VideoMode.conferencing) {
       await DialogUtil.show(
@@ -212,17 +213,17 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     var uuid = const Uuid();
     String roomId = uuid.v4();
     room = Room(roomId, participants: participants);
-    SmartDialogUtil.info(
-        content: '${AppLocalizations.t('Create room')} ${room!.roomId}');
-
-    return room!;
+    if (mounted) {
+      DialogUtil.info(context,
+          content: '${AppLocalizations.t('Create room')} ${room!.roomId}');
+    }
   }
 
   _openVideoMedia({bool video = true}) async {
     if (peerId != null) {
       var status = peerConnectionPool.status(peerId!);
       if (status != PeerConnectionStatus.connected) {
-        SmartDialogUtil.error(
+        DialogUtil.error(context,
             content: AppLocalizations.t('No Webrtc connected PeerConnection'));
         return;
       }
@@ -253,7 +254,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (peerId != null) {
       var status = peerConnectionPool.status(peerId!);
       if (status != PeerConnectionStatus.connected) {
-        SmartDialogUtil.error(
+        DialogUtil.error(context,
             content: AppLocalizations.t('No Webrtc connected PeerConnection'));
         return;
       }
@@ -269,10 +270,10 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   _openMediaStream(MediaStream stream) async {
-    if (groupPeerId == null) {
+    if (peerId != null) {
       var status = peerConnectionPool.status(peerId!);
       if (status != PeerConnectionStatus.connected) {
-        SmartDialogUtil.error(
+        DialogUtil.error(context,
             content: AppLocalizations.t('No Webrtc connected PeerConnection'));
         return;
       }
@@ -280,7 +281,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
     ChatMessage? chatMessage = videoChatMessageController.chatMessage;
     if (chatMessage == null) {
-      SmartDialogUtil.error(content: AppLocalizations.t('No room'));
+      DialogUtil.error(context, content: AppLocalizations.t('No room'));
       return;
     }
     await localVideoRenderController.createMediaStreamRender(stream);
@@ -341,7 +342,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     callStatus.value = CallStatus.calling;
   }
 
-  //挂断视频通话，先关闭所有的本地视频，设置当前邀请消息为空，呼叫状态为结束
+  ///挂断视频通话，先关闭所有的本地视频，设置当前邀请消息为空，呼叫状态为结束
   _closeCall() async {
     localVideoRenderController.close();
     videoChatMessageController.chatMessage = null;
@@ -349,7 +350,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     callStatus.value = CallStatus.end;
   }
 
-  //关闭所有的本地视频流
+  ///关闭所有的本地视频流
   _close() async {
     localVideoRenderController.close();
   }
@@ -415,8 +416,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   ///切换显示按钮面板
   void _toggleActionCardVisible() {
-    int count = localVideoRenderController.videoRenders.length;
-    if (count == 0) {
+    bool visible = localVideoRenderController.videoRenders.isEmpty;
+    if (visible) {
       controlPanelVisible.value = true;
     } else {
       if (_hidePanelTimer != null) {
@@ -452,6 +453,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     ]);
   }
 
+  ///创建呼叫按钮
   Widget _buildCallButton() {
     return ValueListenableBuilder<CallStatus>(
         valueListenable: callStatus,
