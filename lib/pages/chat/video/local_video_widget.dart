@@ -389,7 +389,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   Widget _buildActionCard(BuildContext context) {
-    double height = 65;
+    double height = 75;
     return Container(
       margin: const EdgeInsets.all(0.0),
       padding: const EdgeInsets.only(bottom: 0.0),
@@ -495,7 +495,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           List<Widget> children = [
             Container(
               alignment: Alignment.center,
-              padding: const EdgeInsets.all(30.0),
+              padding: const EdgeInsets.all(0.0),
               child: buttonWidget,
             ),
           ];
@@ -504,10 +504,14 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               Align(
                   alignment: Alignment.centerRight,
                   child: Padding(
-                      padding: const EdgeInsets.all(15.0),
+                      padding: const EdgeInsets.all(5.0),
                       child: Text(
                           '${AppLocalizations.t('roomId')}:${room!.roomId!}'))),
             );
+          } else {
+            children.add(const SizedBox(
+              height: 25.0,
+            ));
           }
 
           return Column(children: children);
