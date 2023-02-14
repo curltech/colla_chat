@@ -12,6 +12,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
@@ -211,6 +212,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     var uuid = const Uuid();
     String roomId = uuid.v4();
     room = Room(roomId, participants: participants);
+    SmartDialogUtil.info(
+        content: '${AppLocalizations.t('Create room')} ${room!.roomId}');
 
     return room!;
   }
@@ -219,7 +222,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (peerId != null) {
       var status = peerConnectionPool.status(peerId!);
       if (status != PeerConnectionStatus.connected) {
-        DialogUtil.error(context,
+        SmartDialogUtil.error(
             content: AppLocalizations.t('No Webrtc connected PeerConnection'));
         return;
       }
@@ -250,7 +253,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (peerId != null) {
       var status = peerConnectionPool.status(peerId!);
       if (status != PeerConnectionStatus.connected) {
-        DialogUtil.error(context,
+        SmartDialogUtil.error(
             content: AppLocalizations.t('No Webrtc connected PeerConnection'));
         return;
       }
@@ -269,7 +272,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (groupPeerId == null) {
       var status = peerConnectionPool.status(peerId!);
       if (status != PeerConnectionStatus.connected) {
-        DialogUtil.error(context,
+        SmartDialogUtil.error(
             content: AppLocalizations.t('No Webrtc connected PeerConnection'));
         return;
       }
@@ -277,7 +280,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
     ChatMessage? chatMessage = videoChatMessageController.chatMessage;
     if (chatMessage == null) {
-      DialogUtil.error(context, content: AppLocalizations.t('No room'));
+      SmartDialogUtil.error(content: AppLocalizations.t('No room'));
       return;
     }
     await localVideoRenderController.createMediaStreamRender(stream);
@@ -310,7 +313,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       //当前视频消息为空，则创建房间，发送视频通话邀请消息
       //由消息的接收方同意后直接重新协商
       var room = await _buildRoom();
-      logger.i('current video chatMessage is null, create room ${room.roomId}');
       if (videoChatRender!.video) {
         chatMessage = await _sendVideoChatMessage(
             contentType: ContentType.video.name, room: room);
@@ -339,12 +341,15 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     callStatus.value = CallStatus.calling;
   }
 
+  //挂断视频通话，先关闭所有的本地视频，设置当前邀请消息为空，呼叫状态为结束
   _closeCall() async {
     localVideoRenderController.close();
     videoChatMessageController.chatMessage = null;
+    room = null;
     callStatus.value = CallStatus.end;
   }
 
+  //关闭所有的本地视频流
   _close() async {
     localVideoRenderController.close();
   }
@@ -530,16 +535,14 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               );
             } else {
               var size = MediaQuery.of(context).size;
-              return Container(
+              return SizedBox(
                 width: size.width,
                 height: size.height,
-                //color: Colors.blueGrey,
               );
             }
           }),
       onLongPress: () {
         _toggleActionCardVisible();
-        //focusNode.requestFocus();
       },
     );
     return Stack(children: [
