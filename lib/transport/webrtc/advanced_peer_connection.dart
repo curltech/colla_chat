@@ -12,7 +12,7 @@ import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
-import 'package:colla_chat/transport/webrtc/video_room_controller.dart';
+import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 ///基础的PeerConnection之上加入了业务的编号，peerId和clientId，自动进行信号的协商
@@ -182,8 +182,8 @@ class AdvancedPeerConnection {
       return null;
     }
     String roomId = room!.roomId!;
-    VideoRoomRenderController? videoRoomController =
-        videoRoomRenderPool.getVideoRoomRenderController(roomId);
+    RemoteVideoRenderController? videoRoomController =
+        videoRoomRenderPool.getRemoteVideoRenderController(roomId);
     if (videoRoomController == null) {
       logger.e('videoRoomController:$roomId is not exist');
       return null;
@@ -217,8 +217,8 @@ class AdvancedPeerConnection {
       return null;
     }
     String roomId = room!.roomId!;
-    VideoRoomRenderController? videoRoomController =
-        videoRoomRenderPool.getVideoRoomRenderController(roomId);
+    RemoteVideoRenderController? videoRoomController =
+        videoRoomRenderPool.getRemoteVideoRenderController(roomId);
     if (videoRoomController == null) {
       logger.e('videoRoomController:$roomId is not exist');
       return null;

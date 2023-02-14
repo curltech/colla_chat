@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 ///媒体控制器，内部是PeerVideoRender的集合
-///对一个连接来说，本地的视频和音频的总共只能有一个，屏幕共享和媒体播放可以有多个
-///另外还包含所有的远程视频流的PeerVideoRender
+///LocalVideoRenderController和VideoRoomRenderController是其子类，
+///前者代表本地的视频和音频的总共只能有一个，屏幕共享和媒体播放可以有多个
+///后者代表远程的视频，包含所有的远程视频流的PeerVideoRender
 class VideoRenderController with ChangeNotifier {
   //当前选择的render
   PeerVideoRender? _videoRender;

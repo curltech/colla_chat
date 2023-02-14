@@ -5,7 +5,7 @@ import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
-import 'package:colla_chat/transport/webrtc/video_room_controller.dart';
+import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:flutter/material.dart';
 
 ///视频通话的回执消息控制器
@@ -154,8 +154,8 @@ class VideoChatMessageController with ChangeNotifier {
       );
       //与发送者的连接存在，将本地的视频render加入连接中
       if (advancedPeerConnection != null) {
-        VideoRoomRenderController? videoRoomRenderController =
-            videoRoomRenderPool.getVideoRoomRenderController(messageId);
+        RemoteVideoRenderController? videoRoomRenderController =
+            videoRoomRenderPool.getRemoteVideoRenderController(messageId);
         if (videoRoomRenderController != null) {
           videoRoomRenderController
               .addAdvancedPeerConnection(advancedPeerConnection);
@@ -179,8 +179,8 @@ class VideoChatMessageController with ChangeNotifier {
       );
       //与发送者的连接存在，将本地的视频render加入连接中
       if (advancedPeerConnection != null) {
-        VideoRoomRenderController? videoRoomRenderController =
-            videoRoomRenderPool.getVideoRoomRenderController(messageId);
+        RemoteVideoRenderController? videoRoomRenderController =
+            videoRoomRenderPool.getRemoteVideoRenderController(messageId);
         if (videoRoomRenderController != null) {
           videoRoomRenderController
               .removeAdvancedPeerConnection(advancedPeerConnection);

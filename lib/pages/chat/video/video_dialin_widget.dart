@@ -10,7 +10,7 @@ import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
-import 'package:colla_chat/transport/webrtc/video_room_controller.dart';
+import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -68,8 +68,8 @@ class VideoDialInWidget extends StatelessWidget {
             List<String> participants = [myself.peerId!, peerId];
             var room = Room(messageId, participants: participants);
             //同意视频通话则加入到视频连接池中
-            VideoRoomRenderController videoRoomRenderController =
-                videoRoomRenderPool.createVideoRoomRenderController(room);
+            RemoteVideoRenderController videoRoomRenderController =
+                videoRoomRenderPool.createRemoteVideoRenderController(room);
             videoRoomRenderController
                 .addAdvancedPeerConnection(advancedPeerConnection);
             indexWidgetProvider.push('chat_message');

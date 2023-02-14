@@ -17,7 +17,7 @@ import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
-import 'package:colla_chat/transport/webrtc/video_room_controller.dart';
+import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
@@ -301,7 +301,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     await localVideoRenderController.createMediaStreamRender(stream);
     var messageId = chatMessage.messageId!;
     var videoRoomController =
-        videoRoomRenderPool.getVideoRoomRenderController(messageId);
+        videoRoomRenderPool.getRemoteVideoRenderController(messageId);
     if (videoRoomController != null) {
       List<AdvancedPeerConnection> pcs =
           videoRoomController.getAdvancedPeerConnections(peerId!);
@@ -336,13 +336,13 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             contentType: ContentType.audio.name, room: room);
       }
       videoChatMessageController.chatMessage = chatMessage;
-      videoRoomRenderPool.createVideoRoomRenderController(room);
+      videoRoomRenderPool.createRemoteVideoRenderController(room);
     } else {
       //当前视频消息不为空，则有同意回执的直接重新协商
       var messageId = chatMessage.messageId!;
       logger.i('current video chatMessage $messageId');
       var videoRoomRenderController =
-          videoRoomRenderPool.getVideoRoomRenderController(messageId);
+          videoRoomRenderPool.getRemoteVideoRenderController(messageId);
       if (videoRoomRenderController != null) {
         List<AdvancedPeerConnection> pcs =
             videoRoomRenderController.getAdvancedPeerConnections(peerId!);

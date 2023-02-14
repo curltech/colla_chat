@@ -9,7 +9,7 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/chat.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
-import 'package:colla_chat/transport/webrtc/video_room_controller.dart';
+import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
@@ -43,7 +43,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   Room? room;
 
   //对应的房间中远程视频的存放地
-  VideoRoomRenderController? videoRoomController;
+  RemoteVideoRenderController? videoRoomController;
 
   //控制面板的可见性，包括视频功能按钮和呼叫按钮
   ValueNotifier<bool> controlPanelVisible = ValueNotifier<bool>(true);
@@ -95,7 +95,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
       room = Room.fromJson(json);
       //获取房间对应的远程视频通话的房间视频控制器
       videoRoomController =
-          videoRoomRenderPool.getVideoRoomRenderController(room!.roomId!);
+          videoRoomRenderPool.getRemoteVideoRenderController(room!.roomId!);
     }
   }
 
@@ -134,7 +134,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
 
   _close() async {
     var videoRoomController =
-        videoRoomRenderPool.getVideoRoomRenderController(room!.roomId!);
+        videoRoomRenderPool.getRemoteVideoRenderController(room!.roomId!);
     if (videoRoomController != null) {
       videoRoomController.close();
     }
@@ -143,7 +143,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   ///切换显示按钮面板
   void _toggleActionCard() {
     int count = 0;
-    var videoRoomController = videoRoomRenderPool.videoRoomRenderController;
+    var videoRoomController = videoRoomRenderPool.remoteVideoRenderController;
     if (videoRoomController != null) {
       count = videoRoomController.videoRenders.length;
     }
@@ -210,8 +210,8 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   }
 
   Widget _buildVideoChatView(BuildContext context) {
-    VideoRoomRenderController? videoRoomRenderController =
-        videoRoomRenderPool.getVideoRoomRenderController(room!.roomId!);
+    RemoteVideoRenderController? videoRoomRenderController =
+        videoRoomRenderPool.getRemoteVideoRenderController(room!.roomId!);
     if (videoRoomRenderController == null) {
       return Container();
     }
@@ -234,7 +234,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   @override
   void dispose() {
     var videoRoomRenderController =
-        videoRoomRenderPool.videoRoomRenderController;
+        videoRoomRenderPool.remoteVideoRenderController;
     if (videoRoomRenderController != null) {
       videoRoomRenderController.removeListener(_update);
     }

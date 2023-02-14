@@ -5,16 +5,17 @@ import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:flutter/material.dart';
 
-///视频通话的房间，包含一组webrtc连接，这些连接与自己正在视频通话，此控制器用于通知视频通话界面的刷新
-class VideoRoomRenderController extends VideoRenderController {
-  ///根据peerId和clientId对应的所有的连接
+///视频通话的一个房间内的所有的webrtc连接及其包含的远程视频，
+///这些连接与自己正在视频通话，此控制器用于通知视频通话界面的刷新
+class RemoteVideoRenderController extends VideoRenderController {
+  ///根据peerId和clientId对应的所有的webrtc连接
   final Map<String, AdvancedPeerConnection> _peerConnections = {};
   final Room room;
 
   ///根据peerId和clientId的连接所对应的render控制器，每一个render控制器包含多个render
   Map<String, VideoRenderController> videoRenderControllers = {};
 
-  VideoRoomRenderController(this.room);
+  RemoteVideoRenderController(this.room);
 
   String _getKey(String peerId, String clientId) {
     var key = '$peerId:$clientId';
@@ -135,7 +136,7 @@ class VideoRoomRenderController extends VideoRenderController {
 
 ///所有的视频通话的房间的池，包含多个房间，每个房间的房间号是视频通话邀请的消息号
 class VideoRoomRenderPool with ChangeNotifier {
-  Map<String, VideoRoomRenderController> videoRoomRenderControllers = {};
+  Map<String, RemoteVideoRenderController> remoteVideoRenderControllers = {};
   Map<String, Room> rooms = {};
   String? _roomId;
 
@@ -154,9 +155,9 @@ class VideoRoomRenderPool with ChangeNotifier {
   }
 
   ///获取当前房间的控制器
-  VideoRoomRenderController? get videoRoomRenderController {
+  RemoteVideoRenderController? get remoteVideoRenderController {
     if (_roomId != null) {
-      return videoRoomRenderControllers[_roomId];
+      return remoteVideoRenderControllers[_roomId];
     }
     return null;
   }
@@ -170,8 +171,8 @@ class VideoRoomRenderPool with ChangeNotifier {
   }
 
   ///根据房间号返回房间控制器，没有则返回null
-  VideoRoomRenderController? getVideoRoomRenderController(String roomId) {
-    return videoRoomRenderControllers[roomId];
+  RemoteVideoRenderController? getRemoteVideoRenderController(String roomId) {
+    return remoteVideoRenderControllers[roomId];
   }
 
   Room? getRoom(String roomId) {
@@ -179,26 +180,26 @@ class VideoRoomRenderPool with ChangeNotifier {
   }
 
   ///创建新的房间，返回其控制器，假如房间号已经存在，直接返回
-  VideoRoomRenderController createVideoRoomRenderController(Room room) {
+  RemoteVideoRenderController createRemoteVideoRenderController(Room room) {
     String roomId = room.roomId!;
-    VideoRoomRenderController? videoRoomController =
-        videoRoomRenderControllers[roomId];
-    if (videoRoomController == null) {
-      videoRoomController = VideoRoomRenderController(room);
-      videoRoomRenderControllers[roomId] = videoRoomController;
+    RemoteVideoRenderController? remoteVideoRenderController =
+        remoteVideoRenderControllers[roomId];
+    if (remoteVideoRenderController == null) {
+      remoteVideoRenderController = RemoteVideoRenderController(room);
+      remoteVideoRenderControllers[roomId] = remoteVideoRenderController;
       rooms[roomId] = room;
       _roomId = roomId;
     } else {
       _roomId = roomId;
     }
-    return videoRoomController;
+    return remoteVideoRenderController;
   }
 
   closeRoom(String roomId) {
-    VideoRoomRenderController? videoRoomRenderController =
-        videoRoomRenderControllers[roomId];
-    if (videoRoomRenderController != null) {
-      videoRoomRenderController.close();
+    RemoteVideoRenderController? remoteVideoRenderController =
+        remoteVideoRenderControllers[roomId];
+    if (remoteVideoRenderController != null) {
+      remoteVideoRenderController.close();
       rooms.remove(roomId);
     }
     if (roomId == _roomId) {
