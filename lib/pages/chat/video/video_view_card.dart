@@ -44,7 +44,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
       videoViews.add(videoView);
     }
     if (videoViews.isEmpty) {
-      return const Spacer();
+      return Container();
     }
     return GridView.builder(
         itemCount: videoViews.length,

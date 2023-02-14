@@ -76,7 +76,10 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   //如果当前的群存在的话，房间的人在群的联系人中选择，否则在所有的联系人中选择
   Room? room;
 
-  ValueNotifier<bool> actionCardVisible = ValueNotifier<bool>(true);
+  ValueNotifier<bool> controlPanelVisible = ValueNotifier<bool>(true);
+  ValueNotifier<bool> videoViewVisible = ValueNotifier<bool>(false);
+  ValueNotifier<List<ActionData>> actionData =
+      ValueNotifier<List<ActionData>>([]);
   ValueNotifier<CallStatus> callStatus =
       ValueNotifier<CallStatus>(CallStatus.end);
   Timer? _hidePanelTimer;
@@ -90,6 +93,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   _init() async {
+    _buildActionDataAndVisible();
     if (widget.videoMode == VideoMode.conferencing) {
       return;
     }
@@ -116,39 +120,28 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   _update() {
-    _toggleActionCard();
+    _buildActionDataAndVisible();
   }
 
-  List<ActionData> _buildActionData() {
+  _buildActionDataAndVisible() {
     List<ActionData> actionData = [];
-    if (localVideoRenderController.videoChatRender == null) {
+    if (localVideoRenderController.videoChatRender == null ||
+        !localVideoRenderController.video) {
       actionData.add(
         ActionData(
             label: 'Video',
             tooltip: 'Open local video',
             icon: const Icon(Icons.video_call, color: Colors.white)),
       );
+    }
+    if (localVideoRenderController.videoChatRender == null ||
+        localVideoRenderController.video) {
       actionData.add(
         ActionData(
             label: 'Audio',
             tooltip: 'Open local audio',
             icon: const Icon(Icons.multitrack_audio_outlined,
                 color: Colors.white)),
-      );
-    } else if (localVideoRenderController.video) {
-      actionData.add(
-        ActionData(
-            label: 'Audio',
-            tooltip: 'Open local audio',
-            icon: const Icon(Icons.multitrack_audio_outlined,
-                color: Colors.white)),
-      );
-    } else {
-      actionData.add(
-        ActionData(
-            label: 'Video',
-            tooltip: 'Open local video',
-            icon: const Icon(Icons.video_call, color: Colors.white)),
       );
     }
     if (localVideoRenderController.videoChatRender != null) {
@@ -165,8 +158,20 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     //       tooltip: 'Open media play',
     //       icon: const Icon(Icons.video_file, color: Colors.white)),
     // );
-
-    return actionData;
+    if (localVideoRenderController.videoRenders.isNotEmpty) {
+      videoViewVisible.value = true;
+      actionData.add(
+        ActionData(
+            label: 'Close',
+            tooltip: 'Close all video',
+            icon:
+                const Icon(Icons.closed_caption_disabled, color: Colors.white)),
+      );
+    } else {
+      videoViewVisible.value = false;
+      controlPanelVisible.value = true;
+    }
+    this.actionData.value = actionData;
   }
 
   ///弹出界面，选择参与者，返回房间
@@ -340,10 +345,14 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     callStatus.value = CallStatus.calling;
   }
 
-  _close() async {
+  _closeCall() async {
     localVideoRenderController.close();
     videoChatMessageController.chatMessage = null;
     callStatus.value = CallStatus.end;
+  }
+
+  _close() async {
+    localVideoRenderController.close();
   }
 
   ///发送group视频通邀请话消息,此时消息必须有content,包含Room信息
@@ -377,6 +386,9 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       case 'Media play':
         //_openMediaStream(stream);
         break;
+      case 'Close':
+        _close();
+        break;
       default:
         break;
     }
@@ -387,33 +399,37 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     return Container(
       margin: const EdgeInsets.all(0.0),
       padding: const EdgeInsets.only(bottom: 0.0),
-      child: DataActionCard(
-        actions: _buildActionData(),
-        height: height,
-        //width: 320,
-        onPressed: _onAction,
-        crossAxisCount: 4,
-        labelColor: Colors.white,
-      ),
+      child: ValueListenableBuilder<List<ActionData>>(
+          valueListenable: actionData,
+          builder: (context, value, child) {
+            return DataActionCard(
+              actions: value,
+              height: height,
+              //width: 320,
+              onPressed: _onAction,
+              crossAxisCount: 4,
+              labelColor: Colors.white,
+            );
+          }),
     );
   }
 
   ///切换显示按钮面板
-  void _toggleActionCard() {
+  void _toggleActionCardVisible() {
     int count = localVideoRenderController.videoRenders.length;
     if (count == 0) {
-      actionCardVisible.value = true;
+      controlPanelVisible.value = true;
     } else {
       if (_hidePanelTimer != null) {
         _hidePanelTimer?.cancel();
-        actionCardVisible.value = false;
+        controlPanelVisible.value = false;
         _hidePanelTimer = null;
       } else {
-        actionCardVisible.value = true;
+        controlPanelVisible.value = true;
         _hidePanelTimer?.cancel();
         _hidePanelTimer = Timer(const Duration(seconds: 15), () {
           if (!mounted) return;
-          actionCardVisible.value = false;
+          controlPanelVisible.value = false;
           _hidePanelTimer = null;
         });
       }
@@ -425,82 +441,97 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     return Column(children: [
       const Spacer(),
       ValueListenableBuilder<bool>(
-          valueListenable: actionCardVisible,
+          valueListenable: controlPanelVisible,
           builder: (context, value, child) {
             return Visibility(
-              visible: actionCardVisible.value,
-              child: _buildActionCard(context),
-            );
+                visible: controlPanelVisible.value,
+                child: Column(children: [
+                  _buildActionCard(context),
+                  _buildCallButton(),
+                ]));
           }),
-      Center(
-        child: Container(
-          padding: const EdgeInsets.all(25.0),
-          child: ValueListenableBuilder<CallStatus>(
-            valueListenable: callStatus,
-            builder: (BuildContext context, CallStatus value, Widget? child) {
-              if (value == CallStatus.calling) {
-                return WidgetUtil.buildCircleButton(
-                  onPressed: () {
-                    _close();
-                  },
-                  elevation: 2.0,
-                  backgroundColor: Colors.red,
-                  padding: const EdgeInsets.all(15.0),
-                  child: const Icon(
-                    Icons.call_end,
-                    size: 48.0,
-                    color: Colors.white,
-                  ),
-                );
-              } else if (value == CallStatus.end) {
-                return WidgetUtil.buildCircleButton(
-                  onPressed: () {
-                    _call();
-                  },
-                  elevation: 2.0,
-                  backgroundColor: Colors.green,
-                  padding: const EdgeInsets.all(15.0),
-                  child: const Icon(
-                    Icons.call,
-                    size: 48.0,
-                    color: Colors.white,
-                  ),
-                );
-              } else {
-                return WidgetUtil.buildCircleButton(
-                  elevation: 2.0,
-                  backgroundColor: Colors.grey,
-                  padding: const EdgeInsets.all(15.0),
-                  child: const Icon(
-                    Icons.call_end,
-                    size: 48.0,
-                    color: Colors.white,
-                  ),
-                );
-              }
-            },
-          ),
-        ),
-      ),
     ]);
   }
 
-  Widget _buildGestureDetector(BuildContext context) {
-    return GestureDetector(
-      child: VideoViewCard(
-        videoRenderController: localVideoRenderController,
+  Center _buildCallButton() {
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.all(25.0),
+        child: ValueListenableBuilder<CallStatus>(
+          valueListenable: callStatus,
+          builder: (BuildContext context, CallStatus value, Widget? child) {
+            if (value == CallStatus.calling) {
+              return WidgetUtil.buildCircleButton(
+                onPressed: () {
+                  _closeCall();
+                },
+                elevation: 2.0,
+                backgroundColor: Colors.red,
+                padding: const EdgeInsets.all(15.0),
+                child: const Icon(
+                  Icons.call_end,
+                  size: 48.0,
+                  color: Colors.white,
+                ),
+              );
+            } else if (value == CallStatus.end) {
+              return WidgetUtil.buildCircleButton(
+                onPressed: () {
+                  _call();
+                },
+                elevation: 2.0,
+                backgroundColor: Colors.green,
+                padding: const EdgeInsets.all(15.0),
+                child: const Icon(
+                  Icons.call,
+                  size: 48.0,
+                  color: Colors.white,
+                ),
+              );
+            } else {
+              return WidgetUtil.buildCircleButton(
+                elevation: 2.0,
+                backgroundColor: Colors.grey,
+                padding: const EdgeInsets.all(15.0),
+                child: const Icon(
+                  Icons.call_end,
+                  size: 48.0,
+                  color: Colors.white,
+                ),
+              );
+            }
+          },
+        ),
       ),
-      onLongPress: () {
-        _toggleActionCard();
-        //focusNode.requestFocus();
-      },
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    var videoViewCard = GestureDetector(
+      child: ValueListenableBuilder<bool>(
+          valueListenable: videoViewVisible,
+          builder: (context, value, child) {
+            if (value) {
+              return VideoViewCard(
+                videoRenderController: localVideoRenderController,
+              );
+            } else {
+              var size = MediaQuery.of(context).size;
+              return Container(
+                width: size.width,
+                height: size.height,
+                //color: Colors.blueGrey,
+              );
+            }
+          }),
+      onLongPress: () {
+        _toggleActionCardVisible();
+        //focusNode.requestFocus();
+      },
+    );
     return Stack(children: [
-      _buildGestureDetector(context),
+      videoViewCard,
       _buildControlPanel(context),
     ]);
   }
