@@ -389,7 +389,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   Widget _buildActionCard(BuildContext context) {
-    double height = 75;
+    double height = 80;
     return Container(
       margin: const EdgeInsets.all(0.0),
       padding: const EdgeInsets.only(bottom: 0.0),
