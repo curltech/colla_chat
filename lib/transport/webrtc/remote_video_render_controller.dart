@@ -12,7 +12,7 @@ class RemoteVideoRenderController extends VideoRenderController {
   final Map<String, AdvancedPeerConnection> _peerConnections = {};
   final Room room;
 
-  ///根据peerId和clientId的连接所对应的render控制器，每一个render控制器包含多个render
+  ///根据peerId和clientId的连接所对应的视频render控制器，每一个视频render控制器包含多个视频render
   Map<String, VideoRenderController> videoRenderControllers = {};
 
   RemoteVideoRenderController(this.room);
@@ -22,7 +22,7 @@ class RemoteVideoRenderController extends VideoRenderController {
     return key;
   }
 
-  ///增加render，确保之前连接已经加入
+  ///增加视频render，确保之前连接已经加入
   ///新增的render还要加入到对应的连接的控制器中
   @override
   add(PeerVideoRender videoRender) {
