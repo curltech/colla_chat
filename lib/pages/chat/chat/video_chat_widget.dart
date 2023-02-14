@@ -83,7 +83,9 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
         if (index == 1) {
           view = Container();
           if (roomId != null) {
-            view = RemoteVideoWidget(roomId: roomId);
+            view = const RemoteVideoWidget(
+              videoMode: VideoMode.linkman,
+            );
           }
         }
         return Center(child: view);

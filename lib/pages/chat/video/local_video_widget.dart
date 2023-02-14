@@ -75,18 +75,32 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   //如果当前的群存在的话，房间的人在群的联系人中选择，否则在所有的联系人中选择
   Room? room;
 
+  //控制面板的可见性，包括视频功能按钮和呼叫按钮
   ValueNotifier<bool> controlPanelVisible = ValueNotifier<bool>(true);
+
+  //视频通话窗口的可见性
   ValueNotifier<bool> videoViewVisible = ValueNotifier<bool>(false);
+
+  //视频功能按钮对应的数据
   ValueNotifier<List<ActionData>> actionData =
       ValueNotifier<List<ActionData>>([]);
+
+  //呼叫状态
   ValueNotifier<CallStatus> callStatus =
       ValueNotifier<CallStatus>(CallStatus.end);
-  Timer? _hidePanelTimer;
+
+  //控制面板可见性的计时器
+  Timer? _hideControlPanelTimer;
+
+  //呼叫时间的计时器，如果是在单聊的场景下，对方在时间内未有回执，则自动关闭
+  Timer? _linkmanCallTimer;
 
   @override
   void initState() {
     super.initState();
+    //视频通话的消息存放地
     videoChatMessageController.addListener(_update);
+    //本地视频的存放地
     localVideoRenderController.addListener(_update);
     _init();
   }
@@ -420,17 +434,17 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (visible) {
       controlPanelVisible.value = true;
     } else {
-      if (_hidePanelTimer != null) {
-        _hidePanelTimer?.cancel();
+      if (_hideControlPanelTimer != null) {
+        _hideControlPanelTimer?.cancel();
         controlPanelVisible.value = false;
-        _hidePanelTimer = null;
+        _hideControlPanelTimer = null;
       } else {
         controlPanelVisible.value = true;
-        _hidePanelTimer?.cancel();
-        _hidePanelTimer = Timer(const Duration(seconds: 15), () {
+        _hideControlPanelTimer?.cancel();
+        _hideControlPanelTimer = Timer(const Duration(seconds: 15), () {
           if (!mounted) return;
           controlPanelVisible.value = false;
-          _hidePanelTimer = null;
+          _hideControlPanelTimer = null;
         });
       }
     }

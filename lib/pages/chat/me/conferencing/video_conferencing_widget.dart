@@ -81,7 +81,10 @@ class _VideoConferencingWidgetState extends State<VideoConferencingWidget> {
         if (index == 1) {
           view = Container();
           if (roomId != null) {
-            view = RemoteVideoWidget(key: UniqueKey(), roomId: roomId);
+            view = RemoteVideoWidget(
+              key: UniqueKey(),
+              videoMode: VideoMode.conferencing,
+            );
           }
         }
         return Center(child: view);
