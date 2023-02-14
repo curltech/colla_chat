@@ -1,4 +1,6 @@
 import 'package:card_swiper/card_swiper.dart';
+import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/video/local_video_widget.dart';
 import 'package:colla_chat/pages/chat/video/remote_video_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -9,7 +11,7 @@ import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
-///视频通话窗口，分页显示本地视频和远程视频
+///视频聊天窗口，分页显示本地视频和远程视频
 class VideoChatWidget extends StatefulWidget with TileDataMixin {
   const VideoChatWidget({
     Key? key,
@@ -104,11 +106,18 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
           },
           icon: const Icon(Icons.zoom_in_map, color: Colors.white)),
     ];
+    Widget videoChatView = Container();
+    var name = '';
+    var chatSummary = chatMessageController.chatSummary;
+    if (chatSummary != null) {
+      name = chatSummary.name!;
+      videoChatView = _buildVideoChatView(context);
+    }
     return AppBarView(
-      title: widget.title,
+      title: '${AppLocalizations.t(widget.title)}  $name',
       withLeading: true,
       rightWidgets: rightWidgets,
-      child: _buildVideoChatView(context),
+      child: videoChatView,
     );
   }
 
