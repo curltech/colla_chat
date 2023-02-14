@@ -18,7 +18,6 @@ import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:colla_chat/transport/webrtc/video_room_controller.dart';
-import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
@@ -180,8 +179,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (widget.videoMode == VideoMode.conferencing) {
       await DialogUtil.show(
           context: context,
-          title: AppBarWidget.buildTitleBar(
-              title: Text(AppLocalizations.t('Select one linkman'))),
+          // title: AppBarWidget.buildTitleBar(
+          //     title: Text(AppLocalizations.t('Select one linkman'))),
           builder: (BuildContext context) {
             return LinkmanGroupSearchWidget(
                 onSelected: (List<String> peerIds) async {
@@ -256,12 +255,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         return;
       }
     }
-
-    // ChatMessage? chatMessage = videoChatMessageController.chatMessage;
-    // if (chatMessage == null) {
-    //   DialogUtil.error(context, content: AppLocalizations.t('No room'));
-    //   return;
-    // }
     final source = await DialogUtil.show<DesktopCapturerSource>(
       context: context,
       builder: (context) => Dialog(child: ScreenSelectDialog()),
@@ -305,12 +298,13 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///呼叫，发送视频通话邀请消息
   ///如果已有视频通话邀请消息，说明已收到接收方的同意回执，则直接开始重新协商
   _call() async {
+    //确保本地视频已经被打开
     var videoChatRender = localVideoRenderController.videoChatRender;
     if (videoChatRender == null) {
       await _openVideoMedia(video: true);
       videoChatRender = localVideoRenderController.videoChatRender;
     }
-
+    //检查当前的视频邀请消息是否存在
     ChatMessage? chatMessage = videoChatMessageController.chatMessage;
     if (chatMessage == null) {
       //当前视频消息为空，则创建房间，发送视频通话邀请消息
@@ -395,7 +389,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   Widget _buildActionCard(BuildContext context) {
-    double height = 70;
+    double height = 65;
     return Container(
       margin: const EdgeInsets.all(0.0),
       padding: const EdgeInsets.only(bottom: 0.0),
@@ -453,57 +447,71 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     ]);
   }
 
-  Center _buildCallButton() {
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.all(25.0),
-        child: ValueListenableBuilder<CallStatus>(
-          valueListenable: callStatus,
-          builder: (BuildContext context, CallStatus value, Widget? child) {
-            if (value == CallStatus.calling) {
-              return WidgetUtil.buildCircleButton(
-                onPressed: () {
-                  _closeCall();
-                },
-                elevation: 2.0,
-                backgroundColor: Colors.red,
-                padding: const EdgeInsets.all(15.0),
-                child: const Icon(
-                  Icons.call_end,
-                  size: 48.0,
-                  color: Colors.white,
-                ),
-              );
-            } else if (value == CallStatus.end) {
-              return WidgetUtil.buildCircleButton(
-                onPressed: () {
-                  _call();
-                },
-                elevation: 2.0,
-                backgroundColor: Colors.green,
-                padding: const EdgeInsets.all(15.0),
-                child: const Icon(
-                  Icons.call,
-                  size: 48.0,
-                  color: Colors.white,
-                ),
-              );
-            } else {
-              return WidgetUtil.buildCircleButton(
-                elevation: 2.0,
-                backgroundColor: Colors.grey,
-                padding: const EdgeInsets.all(15.0),
-                child: const Icon(
-                  Icons.call_end,
-                  size: 48.0,
-                  color: Colors.white,
-                ),
-              );
-            }
-          },
-        ),
-      ),
-    );
+  Widget _buildCallButton() {
+    return ValueListenableBuilder<CallStatus>(
+        valueListenable: callStatus,
+        builder: (BuildContext context, CallStatus value, Widget? child) {
+          Widget buttonWidget;
+          if (value == CallStatus.calling) {
+            buttonWidget = WidgetUtil.buildCircleButton(
+              onPressed: () {
+                _closeCall();
+              },
+              elevation: 2.0,
+              backgroundColor: Colors.red,
+              padding: const EdgeInsets.all(15.0),
+              child: const Icon(
+                Icons.call_end,
+                size: 48.0,
+                color: Colors.white,
+              ),
+            );
+          } else if (value == CallStatus.end) {
+            buttonWidget = WidgetUtil.buildCircleButton(
+              onPressed: () {
+                _call();
+              },
+              elevation: 2.0,
+              backgroundColor: Colors.green,
+              padding: const EdgeInsets.all(15.0),
+              child: const Icon(
+                Icons.call,
+                size: 48.0,
+                color: Colors.white,
+              ),
+            );
+          } else {
+            buttonWidget = WidgetUtil.buildCircleButton(
+              elevation: 2.0,
+              backgroundColor: Colors.grey,
+              padding: const EdgeInsets.all(15.0),
+              child: const Icon(
+                Icons.call_end,
+                size: 48.0,
+                color: Colors.white,
+              ),
+            );
+          }
+          List<Widget> children = [
+            Container(
+              alignment: Alignment.center,
+              padding: const EdgeInsets.all(30.0),
+              child: buttonWidget,
+            ),
+          ];
+          if (room != null) {
+            children.add(
+              Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: Text(
+                          '${AppLocalizations.t('roomId')}:${room!.roomId!}'))),
+            );
+          }
+
+          return Column(children: children);
+        });
   }
 
   @override
