@@ -146,9 +146,6 @@ class LocalVideoRenderController extends VideoRenderController {
     int minHeight = 480,
     int minFrameRate = 30,
   }) async {
-    if (_videoChatRender != null) {
-      return _videoChatRender!;
-    }
     PeerVideoRender render = await PeerVideoRender.fromVideoMedia(
       myself.peerId!,
       clientId: myself.clientId,
@@ -165,9 +162,6 @@ class LocalVideoRenderController extends VideoRenderController {
 
   ///创建本地的Audio render
   Future<PeerVideoRender> createAudioMediaRender() async {
-    if (_videoChatRender != null) {
-      return _videoChatRender!;
-    }
     PeerVideoRender render = await PeerVideoRender.fromAudioMedia(
       myself.peerId!,
       clientId: myself.clientId,

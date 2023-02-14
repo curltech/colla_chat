@@ -6,7 +6,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
-import 'package:fluent_ui/fluent_ui.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 import 'package:path_provider/path_provider.dart';
 
@@ -325,13 +325,24 @@ class PeerVideoRender {
     bool fitScreen = false,
     double? width,
     double? height,
-    Color? color,
+    Color? color = Colors.black,
   }) {
-    RTCVideoView? videoView;
+    Widget? videoView;
     var renderer = this.renderer;
     if (renderer != null) {
       videoView = RTCVideoView(renderer,
           objectFit: objectFit, mirror: mirror, filterQuality: filterQuality);
+      if (audio && !video) {
+        videoView = Stack(children: [
+          const Center(
+              child: Icon(
+            Icons.multitrack_audio_outlined,
+            color: Colors.white,
+            size: 60,
+          )),
+          videoView,
+        ]);
+      }
     }
     Widget container = _createVideoViewContainer(
         width: width, height: height, color: color, child: videoView);
