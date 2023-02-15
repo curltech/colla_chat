@@ -1,5 +1,5 @@
 import 'package:colla_chat/crypto/signalprotocol.dart';
-import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/p2p/chain/action/chat.dart';
@@ -7,8 +7,9 @@ import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/service/chat/chat.dart';
-import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/service/chat/group.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
