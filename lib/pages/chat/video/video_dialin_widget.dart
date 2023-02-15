@@ -1,4 +1,5 @@
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -6,7 +7,6 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
-import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
@@ -66,10 +66,11 @@ class VideoDialInWidget extends StatelessWidget {
             await advancedPeerConnection.addLocalRender(localRender!);
             //创建房间，将连接加入房间
             List<String> participants = [myself.peerId!, peerId];
-            var room = Room(messageId, participants: participants);
+            var conference = Conference(messageId!, participants: participants);
             //同意视频通话则加入到视频连接池中
             RemoteVideoRenderController videoRoomRenderController =
-                videoRoomRenderPool.createRemoteVideoRenderController(room);
+                videoRoomRenderPool
+                    .createRemoteVideoRenderController(conference);
             videoRoomRenderController
                 .addAdvancedPeerConnection(advancedPeerConnection);
             indexWidgetProvider.push('chat_message');
@@ -83,7 +84,7 @@ class VideoDialInWidget extends StatelessWidget {
       //首先检查接收人是否已经存在给自己的回执，不存在或者存在是accepted则发送回执
       //如果存在，如果是rejected或者terminated，则不发送回执
       Map json = JsonUtil.toJson(chatMessage.content!);
-      var room = Room.fromJson(json);
+      var conference = Conference.fromJson(json);
     }
   }
 

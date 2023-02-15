@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -28,10 +29,12 @@ class AdvancedPeerConnection {
 
   //如果本连接有视频或者音频，则room不为空，单聊的roomId是对方的peerId:clientId
   //群聊，会议的roomId是发起和接受聊天请求时由发起者创建，并随着聊天请求传输到被发起方
-  Room? room;
+  Conference? conference;
 
   AdvancedPeerConnection(this.peerId, bool initiator,
-      {this.clientId = unknownClientId, this.name = unknownName, this.room}) {
+      {this.clientId = unknownClientId,
+      this.name = unknownName,
+      this.conference}) {
     logger.w(
         'advancedPeerConnection peerId:$peerId, clientId:$clientId, initiator:$initiator create');
     if (StringUtil.isEmpty(clientId)) {
@@ -50,7 +53,7 @@ class AdvancedPeerConnection {
     SignalExtension extension;
     if (myselfPeerId != null && myselfClientId != null) {
       extension = SignalExtension(myselfPeerId, myselfClientId,
-          name: myselfName, room: room, iceServers: iceServers);
+          name: myselfName, conference: conference, iceServers: iceServers);
     } else {
       logger.e('myself peerId or clientId is null');
       return false;
@@ -177,15 +180,15 @@ class AdvancedPeerConnection {
   }
 
   Future<PeerVideoRender?> _addRemoteStream(MediaStream stream) async {
-    if (room == null || room!.roomId == null) {
-      logger.e('room is not exist');
+    if (conference == null || conference!.conferenceId == null) {
+      logger.e('conference is not exist');
       return null;
     }
-    String roomId = room!.roomId!;
+    String conferenceId = conference!.conferenceId!;
     RemoteVideoRenderController? videoRoomController =
-        videoRoomRenderPool.getRemoteVideoRenderController(roomId);
+        videoRoomRenderPool.getRemoteVideoRenderController(conferenceId);
     if (videoRoomController == null) {
-      logger.e('videoRoomController:$roomId is not exist');
+      logger.e('videoRoomController:$conferenceId is not exist');
       return null;
     }
 
@@ -212,15 +215,15 @@ class AdvancedPeerConnection {
   }
 
   _removeRemoteStream(MediaStream stream) async {
-    if (room == null || room!.roomId == null) {
-      logger.e('room is not exist');
+    if (conference == null || conference!.conferenceId == null) {
+      logger.e('conference is not exist');
       return null;
     }
-    String roomId = room!.roomId!;
+    String conferenceId = conference!.conferenceId!;
     RemoteVideoRenderController? videoRoomController =
-        videoRoomRenderPool.getRemoteVideoRenderController(roomId);
+        videoRoomRenderPool.getRemoteVideoRenderController(conferenceId);
     if (videoRoomController == null) {
-      logger.e('videoRoomController:$roomId is not exist');
+      logger.e('videoRoomController:$conferenceId is not exist');
       return null;
     }
 

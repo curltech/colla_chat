@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
+import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/video/local_video_widget.dart';
@@ -9,7 +10,6 @@ import 'package:colla_chat/pages/chat/video/video_view_card.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -41,7 +41,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
 
   //当前的通话房间，房间是临时组建的一组联系人，互相聊天和视频通话
   //如果当前的群存在的话，房间的人在群的联系人中选择，否则在所有的联系人中选择
-  Room? room;
+  Conference? conference;
 
   //对应的房间中远程视频的存放地
   RemoteVideoRenderController? videoRoomController;
@@ -93,10 +93,10 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
       String content = chatMessage.content!;
       content = chatMessageService.recoverContent(content);
       Map json = JsonUtil.toJson(content);
-      room = Room.fromJson(json);
+      conference = Conference.fromJson(json);
       //获取房间对应的远程视频通话的房间视频控制器
-      videoRoomController =
-          videoRoomRenderPool.getRemoteVideoRenderController(room!.roomId!);
+      videoRoomController = videoRoomRenderPool
+          .getRemoteVideoRenderController(conference!.conferenceId!);
     }
   }
 
@@ -134,8 +134,8 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   }
 
   _close() async {
-    var videoRoomController =
-        videoRoomRenderPool.getRemoteVideoRenderController(room!.roomId!);
+    var videoRoomController = videoRoomRenderPool
+        .getRemoteVideoRenderController(conference!.conferenceId!);
     if (videoRoomController != null) {
       videoRoomController.close();
     }
@@ -211,8 +211,8 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   }
 
   Widget _buildVideoChatView(BuildContext context) {
-    RemoteVideoRenderController? videoRoomRenderController =
-        videoRoomRenderPool.getRemoteVideoRenderController(room!.roomId!);
+    RemoteVideoRenderController? videoRoomRenderController = videoRoomRenderPool
+        .getRemoteVideoRenderController(conference!.conferenceId!);
     if (videoRoomRenderController == null) {
       return Container();
     }

@@ -73,7 +73,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   }
 
   Widget _buildVideoChatView(BuildContext context) {
-    var roomId = videoRoomRenderPool.roomId;
+    var roomId = videoRoomRenderPool.conferenceId;
     return Swiper(
       controller: SwiperController(),
       itemCount: 2,

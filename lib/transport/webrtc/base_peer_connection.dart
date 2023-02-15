@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/cryptography.dart';
+import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -12,22 +13,22 @@ class SignalExtension {
   late String peerId;
   late String clientId;
   late String name;
-  Room? room;
+  Conference? conference;
   List<Map<String, String>>? iceServers;
 
   SignalExtension(this.peerId, this.clientId,
-      {required this.name, this.room, this.iceServers});
+      {required this.name, this.conference, this.iceServers});
 
   SignalExtension.fromJson(Map json) {
     peerId = json['peerId'];
     clientId = json['clientId'];
     name = json['name'];
-    Map<String, dynamic>? room = json['room'];
-    if (room != null) {
-      this.room = Room(room['roomId'],
-          type: room['type'],
-          action: room['action'],
-          identity: room['identity']);
+    Map<String, dynamic>? conference = json['conference'];
+    if (conference != null) {
+      this.conference = Conference(conference['conferenceId'],
+          name: conference['name'],
+          peerId: conference['peerId'],
+          identity: conference['identity']);
     }
     var iceServers = json['iceServers'];
     if (iceServers != null) {
@@ -57,9 +58,9 @@ class SignalExtension {
       'name': name,
       'iceServers': iceServers,
     });
-    var room = this.room;
-    if (room != null) {
-      json['room'] = room.toJson();
+    var conference = this.conference;
+    if (conference != null) {
+      json['conference'] = conference.toJson();
     }
     return json;
   }
@@ -180,37 +181,6 @@ class WebrtcSignal {
     if (extension != null) {
       json['extension'] = extension.toJson();
     }
-    return json;
-  }
-}
-
-///加入的房间号
-class Room {
-  String? roomId;
-  String? type;
-  String? action;
-  String? identity;
-  List<String>? participants; //允许的参与者
-
-  Room(this.roomId, {this.type, this.action, this.identity, this.participants});
-
-  Room.fromJson(Map json) {
-    roomId = json['roomId'];
-    type = json['type'];
-    action = json['action'];
-    identity = json['identity'];
-    participants = json['participants'];
-  }
-
-  Map<String, dynamic> toJson() {
-    Map<String, dynamic> json = {};
-    json.addAll({
-      'roomId': roomId,
-      'type': type,
-      'action': action,
-      'identity': identity,
-      'participants': participants,
-    });
     return json;
   }
 }

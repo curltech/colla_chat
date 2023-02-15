@@ -1,8 +1,9 @@
 import 'package:colla_chat/entity/base.dart';
+import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/message_attachment.dart';
 
 class Conference extends StatusEntity {
-  String conferenceId; // 会议编号
+  String conferenceId; // 会议编号，也是房间号，也是邀请消息号
   String? name;
   String? title;
   String? identity;
@@ -19,6 +20,7 @@ class Conference extends StatusEntity {
   bool advance = true; // 参会者可提前加入
   int upperNumber = 300; // 参会人数上限
   List<String> participants; // 参与人的集合
+  ChatMessage? chatMessage;
   List<MessageAttachment> attachments = []; // 会议资料
 
   Conference(this.conferenceId,

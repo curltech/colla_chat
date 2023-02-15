@@ -1,5 +1,7 @@
 import 'dart:core';
 
+import 'package:colla_chat/entity/chat/conference.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -10,9 +12,9 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 class PeerConnectionWidget extends StatefulWidget with TileDataMixin {
   final String? peerId;
   final String? clientId;
-  final Room? room;
+  final Conference? conference;
 
-  PeerConnectionWidget({Key? key, this.room, this.peerId, this.clientId})
+  PeerConnectionWidget({Key? key, this.conference, this.peerId, this.clientId})
       : super(key: key);
 
   @override
@@ -79,7 +81,7 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
   };
 
   //sdp约束
-  final Map<String, dynamic> sdp_constraints = {
+  final Map<String, dynamic> sdpConstraints = {
     "mandatory": {
       //是否接收语音数据
       "OfferToReceiveAudio": true,
@@ -90,7 +92,7 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
   };
 
   //PeerConnection约束
-  final Map<String, dynamic> pc_constraints = {
+  final Map<String, dynamic> pcConstraints = {
     "mandatory": {},
     "optional": [
       //如果要与浏览器互通开启DtlsSrtpKeyAgreement,此处不开启
@@ -126,17 +128,17 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
 
   //本地Ice连接状态
   _onLocalIceConnectionState(RTCIceConnectionState state) {
-    print(state);
+    logger.i(state);
   }
 
   //远端Ice连接状态
   _onRemoteIceConnectionState(RTCIceConnectionState state) {
-    print(state);
+    logger.i(state);
   }
 
   //远端流添加成功回调
   _onRemoteAddStream(MediaStream stream) {
-    print('Remote addStream: ' + stream.id);
+    logger.i('Remote addStream: ${stream.id}');
     //得到远端媒体流
     _remoteStream = stream;
     //将远端视频渲染对象与媒体流绑定
@@ -145,14 +147,14 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
 
   //本地Candidate数据回调
   _onLocalCandidate(RTCIceCandidate candidate) {
-    print('LocalCandidate: ' + candidate.candidate!);
+    logger.i('LocalCandidate: ${candidate.candidate!}');
     //将本地Candidate添加至远端连接
     _remoteConnection!.addIceCandidate(candidate);
   }
 
   //远端Candidate数据回调
   _onRemoteCandidate(RTCIceCandidate candidate) {
-    print('RemoteCandidate: ' + candidate.candidate!);
+    logger.i('RemoteCandidate: ${candidate.candidate!}');
     //将远端Candidate添加至本地连接
     _localConnection!.addIceCandidate(candidate);
   }
@@ -186,7 +188,7 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
 
       await _negotiate();
     } catch (e) {
-      print(e.toString());
+      logger.e(e.toString());
     }
     if (!mounted) return;
 
@@ -200,15 +202,15 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
     RTCSessionDescription? sdp =
         await _localConnection!.peerConnection!.getLocalDescription();
     if (sdp != null) {
-      print("_localConnection getLocalDescription exist");
+      logger.i("_localConnection getLocalDescription exist");
     }
     //本地连接创建提议Offer
     RTCSessionDescription offer =
-        await _localConnection!.peerConnection!.createOffer(sdp_constraints);
+        await _localConnection!.peerConnection!.createOffer(sdpConstraints);
     if (sdp != null && sdp.sdp != offer.sdp) {
-      print("_localConnection getLocalDescription changed");
+      logger.i("_localConnection getLocalDescription changed");
     }
-    print("offer:" + offer.sdp!);
+    logger.i("offer:${offer.sdp!}");
     //本地连接设置本地sdp信息
     _localConnection!.peerConnection!.setLocalDescription(offer);
     //远端连接设置远端sdp信息
@@ -216,15 +218,15 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
 
     sdp = await _remoteConnection!.peerConnection!.getLocalDescription();
     if (sdp != null) {
-      print("_remoteConnection getLocalDescription exist");
+      logger.i("_remoteConnection getLocalDescription exist");
     }
     //远端连接创建应答Answer
     RTCSessionDescription answer =
-        await _remoteConnection!.peerConnection!.createAnswer(sdp_constraints);
+        await _remoteConnection!.peerConnection!.createAnswer(sdpConstraints);
     if (sdp != null && sdp.sdp != answer.sdp) {
-      print("_remoteConnection getLocalDescription changed");
+      logger.i("_remoteConnection getLocalDescription changed");
     }
-    print("answer:" + answer.sdp!);
+    logger.i("answer:${answer.sdp!}");
     //远端连接设置本地sdp信息
     _remoteConnection!.peerConnection!.setLocalDescription(answer);
     //本地连接设置远端sdp信息
@@ -251,7 +253,7 @@ class _PeerConnectionWidgetState extends State<PeerConnectionWidget> {
       //将远端视频源置为空
       _remoteRenderer.srcObject = null;
     } catch (e) {
-      print(e.toString());
+      logger.e(e.toString());
     }
     //设置连接状态为false
     setState(() {

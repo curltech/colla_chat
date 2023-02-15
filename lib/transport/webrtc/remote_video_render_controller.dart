@@ -1,6 +1,6 @@
+import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
-import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:flutter/material.dart';
@@ -10,12 +10,12 @@ import 'package:flutter/material.dart';
 class RemoteVideoRenderController extends VideoRenderController {
   ///根据peerId和clientId对应的所有的webrtc连接
   final Map<String, AdvancedPeerConnection> _peerConnections = {};
-  final Room room;
+  final Conference conference;
 
   ///根据peerId和clientId的连接所对应的视频render控制器，每一个视频render控制器包含多个视频render
   Map<String, VideoRenderController> videoRenderControllers = {};
 
-  RemoteVideoRenderController(this.room);
+  RemoteVideoRenderController(this.conference);
 
   String _getKey(String peerId, String clientId) {
     var key = '$peerId:$clientId';
@@ -128,7 +128,7 @@ class RemoteVideoRenderController extends VideoRenderController {
         }
         controller.close();
       }
-      advancedPeerConnection.room = null;
+      advancedPeerConnection.conference = null;
       notifyListeners();
     }
   }
@@ -137,73 +137,73 @@ class RemoteVideoRenderController extends VideoRenderController {
 ///所有的视频通话的房间的池，包含多个房间，每个房间的房间号是视频通话邀请的消息号
 class VideoRoomRenderPool with ChangeNotifier {
   Map<String, RemoteVideoRenderController> remoteVideoRenderControllers = {};
-  Map<String, Room> rooms = {};
-  String? _roomId;
+  Map<String, Conference> conferences = {};
+  String? _conferenceId;
 
   VideoRoomRenderPool();
 
   ///获取当前房间号
-  String? get roomId {
-    return _roomId;
+  String? get conferenceId {
+    return _conferenceId;
   }
 
   ///设置当前房间号
-  set roomId(String? roomId) {
-    if (_roomId != roomId) {
-      _roomId = roomId;
+  set conferenceId(String? conferenceId) {
+    if (_conferenceId != conferenceId) {
+      _conferenceId = conferenceId;
     }
   }
 
   ///获取当前房间的控制器
   RemoteVideoRenderController? get remoteVideoRenderController {
-    if (_roomId != null) {
-      return remoteVideoRenderControllers[_roomId];
+    if (_conferenceId != null) {
+      return remoteVideoRenderControllers[_conferenceId];
     }
     return null;
   }
 
   ///获取当前房间
-  Room? get room {
-    if (_roomId != null) {
-      return rooms[_roomId];
+  Conference? get conference {
+    if (_conferenceId != null) {
+      return conferences[_conferenceId];
     }
     return null;
   }
 
   ///根据房间号返回房间控制器，没有则返回null
-  RemoteVideoRenderController? getRemoteVideoRenderController(String roomId) {
-    return remoteVideoRenderControllers[roomId];
+  RemoteVideoRenderController? getRemoteVideoRenderController(String conferenceId) {
+    return remoteVideoRenderControllers[conferenceId];
   }
 
-  Room? getRoom(String roomId) {
-    return rooms[roomId];
+  Conference? getConference(String conferenceId) {
+    return conferences[conferenceId];
   }
 
   ///创建新的房间，返回其控制器，假如房间号已经存在，直接返回
-  RemoteVideoRenderController createRemoteVideoRenderController(Room room) {
-    String roomId = room.roomId!;
+  RemoteVideoRenderController createRemoteVideoRenderController(Conference conference) {
+    String conferenceId = conference.conferenceId!;
     RemoteVideoRenderController? remoteVideoRenderController =
-        remoteVideoRenderControllers[roomId];
+        remoteVideoRenderControllers[conferenceId];
     if (remoteVideoRenderController == null) {
-      remoteVideoRenderController = RemoteVideoRenderController(room);
-      remoteVideoRenderControllers[roomId] = remoteVideoRenderController;
-      rooms[roomId] = room;
-      _roomId = roomId;
+      remoteVideoRenderController = RemoteVideoRenderController(conference);
+      remoteVideoRenderControllers[conferenceId] = remoteVideoRenderController;
+      conferences[conferenceId] = conference;
+      _conferenceId = conferenceId;
     } else {
-      _roomId = roomId;
+      _conferenceId = conferenceId;
     }
     return remoteVideoRenderController;
   }
 
-  closeRoom(String roomId) {
+  closeConferenceId(String conferenceId) {
     RemoteVideoRenderController? remoteVideoRenderController =
-        remoteVideoRenderControllers[roomId];
+        remoteVideoRenderControllers[conferenceId];
     if (remoteVideoRenderController != null) {
       remoteVideoRenderController.close();
-      rooms.remove(roomId);
+      conferences.remove(conferenceId);
     }
-    if (roomId == _roomId) {
-      _roomId = null;
+    if (conferenceId == _conferenceId) {
+      _conferenceId = null;
     }
   }
 }

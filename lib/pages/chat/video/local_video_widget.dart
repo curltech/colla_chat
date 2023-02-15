@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
+import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
@@ -74,7 +75,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   //当前的通话房间，房间是临时组建的一组联系人，互相聊天和视频通话
   //如果当前的群存在的话，房间的人在群的联系人中选择，否则在所有的联系人中选择
-  Room? room;
+  Conference? conference;
 
   //控制面板的可见性，包括视频功能按钮和呼叫按钮
   ValueNotifier<bool> controlPanelVisible = ValueNotifier<bool>(true);
@@ -129,7 +130,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       String content = chatMessage.content!;
       content = chatMessageService.recoverContent(content);
       Map json = JsonUtil.toJson(content);
-      room = Room.fromJson(json);
+      conference = Conference.fromJson(json);
     }
   }
 
@@ -191,7 +192,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   ///弹出界面，选择参与者，返回房间
-  _buildRoom() async {
+  _buildConference() async {
     List<String> participants = [myself.peerId!];
     if (widget.videoMode == VideoMode.conferencing) {
       await DialogUtil.show(
@@ -226,11 +227,12 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       }
     }
     var uuid = const Uuid();
-    String roomId = uuid.v4();
-    room = Room(roomId, participants: participants);
+    String conferenceId = uuid.v4();
+    conference = Conference(conferenceId, participants: participants);
     if (mounted) {
       DialogUtil.info(context,
-          content: '${AppLocalizations.t('Create room')} ${room!.roomId}');
+          content:
+              '${AppLocalizations.t('Create room')} ${conference!.conferenceId}');
     }
   }
 
@@ -328,16 +330,16 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (chatMessage == null) {
       //当前视频消息为空，则创建房间，发送视频通话邀请消息
       //由消息的接收方同意后直接重新协商
-      var room = await _buildRoom();
+      var conference = await _buildConference();
       if (videoChatRender!.video) {
         chatMessage = await _sendVideoChatMessage(
-            contentType: ContentType.video.name, room: room);
+            contentType: ContentType.video.name, conference: conference);
       } else {
         chatMessage = await _sendVideoChatMessage(
-            contentType: ContentType.audio.name, room: room);
+            contentType: ContentType.audio.name, conference: conference);
       }
       videoChatMessageController.chatMessage = chatMessage;
-      videoRoomRenderPool.createRemoteVideoRenderController(room);
+      videoRoomRenderPool.createRemoteVideoRenderController(conference);
     } else {
       //当前视频消息不为空，则有同意回执的直接重新协商
       var messageId = chatMessage.messageId!;
@@ -361,7 +363,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   _closeCall() async {
     localVideoRenderController.close();
     videoChatMessageController.chatMessage = null;
-    room = null;
+    conference = null;
     callStatus.value = CallStatus.end;
   }
 
@@ -373,13 +375,13 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///发送group视频通邀请话消息,此时消息必须有content,包含Room信息
   ///需要群发给room里面的参与者，而不是group的所有成员
   Future<ChatMessage?> _sendVideoChatMessage(
-      {required String contentType, required Room room}) async {
+      {required String contentType, required Conference conference}) async {
     ChatMessage? chatMessage = await chatMessageController.send(
         title: contentType,
-        content: room,
-        messageId: room.roomId,
+        content: conference,
+        messageId: conference.conferenceId,
         subMessageType: ChatMessageSubType.videoChat,
-        peerIds: room.participants);
+        peerIds: conference.participants);
     if (chatMessage != null) {
       logger.i('send video chatMessage ${chatMessage.messageId}');
     }
@@ -521,14 +523,14 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               child: buttonWidget,
             ),
           ];
-          if (room != null) {
+          if (conference != null) {
             children.add(
               Align(
                   alignment: Alignment.centerRight,
                   child: Padding(
                       padding: const EdgeInsets.all(5.0),
                       child: Text(
-                          '${AppLocalizations.t('roomId')}:${room!.roomId!}'))),
+                          '${AppLocalizations.t('roomId')}:${conference!.conferenceId!}'))),
             );
           } else {
             children.add(const SizedBox(

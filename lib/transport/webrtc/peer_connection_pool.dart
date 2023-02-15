@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:colla_chat/crypto/signalprotocol.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
@@ -277,7 +278,7 @@ class PeerConnectionPool {
   ///主动方创建，此时clientId有可能不知道，如果已经存在，先关闭删除
   Future<AdvancedPeerConnection?> create(String peerId,
       {String clientId = unknownClientId,
-      Room? room,
+      Conference? conference,
       List<Map<String, String>>? iceServers,
       List<PeerVideoRender> localRenders = const []}) async {
     //如果已经存在，先关闭删除
@@ -288,8 +289,8 @@ class PeerConnectionPool {
           'peerId:$peerId clientId:$clientId is closed and will be re-created!');
     }
     //创建新的主叫方
-    peerConnection =
-        AdvancedPeerConnection(peerId, true, clientId: clientId, room: room);
+    peerConnection = AdvancedPeerConnection(peerId, true,
+        clientId: clientId, conference: conference);
     String name = unknownName;
     Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
     if (linkman != null) {
@@ -430,25 +431,28 @@ class PeerConnectionPool {
   Future<AdvancedPeerConnection?> createIfNotExist(String peerId,
       {required String clientId,
       required String name,
-      Room? room,
+      Conference? conference,
       List<Map<String, String>>? iceServers}) async {
     return await synchronized(() async {
       return await _createIfNotExist(peerId,
-          clientId: clientId, name: name, room: room, iceServers: iceServers);
+          clientId: clientId,
+          name: name,
+          conference: conference,
+          iceServers: iceServers);
     });
   }
 
   Future<AdvancedPeerConnection?> _createIfNotExist(String peerId,
       {required String clientId,
       required String name,
-      Room? room,
+      Conference? conference,
       List<Map<String, String>>? iceServers}) async {
     AdvancedPeerConnection? advancedPeerConnection =
         getOne(peerId, clientId: clientId);
     if (advancedPeerConnection == null) {
       logger.i('advancedPeerConnection is null,create new one');
       advancedPeerConnection = AdvancedPeerConnection(peerId, false,
-          clientId: clientId, name: name, room: room);
+          clientId: clientId, name: name, conference: conference);
       await put(peerId, advancedPeerConnection, clientId: clientId);
       var result = await advancedPeerConnection.init(iceServers: iceServers);
       if (!result) {
@@ -490,7 +494,7 @@ class PeerConnectionPool {
     logger.w('receive signal type: $signalType from webrtcPeer: $peerId');
     String name = unknownName;
     List<Map<String, String>>? iceServers;
-    Room? room;
+    Conference? conference;
     var extension = signal.extension;
     if (extension != null) {
       if (peerId != extension.peerId) {
@@ -505,7 +509,7 @@ class PeerConnectionPool {
       }
       name = extension.name;
       iceServers = extension.iceServers;
-      room = extension.room;
+      conference = extension.conference;
     }
 
     ///收到信号，连接已经存在，但是clientId为unknownClientId，表明自己是主叫，建立的时候对方的clientId未知
@@ -549,7 +553,10 @@ class PeerConnectionPool {
     if (signalType == SignalType.candidate.name ||
         (signalType == SignalType.sdp.name && signal.sdp!.type == 'offer')) {
       advancedPeerConnection = await createIfNotExist(peerId,
-          clientId: clientId, name: name, room: room, iceServers: iceServers);
+          clientId: clientId,
+          name: name,
+          conference: conference,
+          iceServers: iceServers);
       if (advancedPeerConnection == null) {
         logger.e('createIfNotExist fail');
         return null;
