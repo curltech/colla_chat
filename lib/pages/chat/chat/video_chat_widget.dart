@@ -73,7 +73,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   }
 
   Widget _buildVideoChatView(BuildContext context) {
-    var roomId = videoRoomRenderPool.conferenceId;
+    var conferenceId = videoRoomRenderPool.conferenceId;
     return Swiper(
       controller: SwiperController(),
       itemCount: 2,
@@ -82,7 +82,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
         Widget view = const LocalVideoWidget();
         if (index == 1) {
           view = Container();
-          if (roomId != null) {
+          if (conferenceId != null) {
             view = const RemoteVideoWidget(
               videoMode: VideoMode.linkman,
             );
