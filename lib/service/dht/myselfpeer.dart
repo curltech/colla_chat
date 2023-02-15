@@ -14,7 +14,7 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/dht/base.dart';
 import 'package:colla_chat/service/dht/myself.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';

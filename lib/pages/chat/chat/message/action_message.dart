@@ -1,8 +1,9 @@
-import 'package:colla_chat/entity/chat/chat.dart';
-import 'package:colla_chat/entity/chat/contact.dart';
+
+import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/chat/chat.dart';
+import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
 import 'package:flutter/material.dart';

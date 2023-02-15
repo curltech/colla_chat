@@ -1,4 +1,4 @@
-import 'package:colla_chat/service/chat/chat.dart';
+import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:flutter/material.dart';
 

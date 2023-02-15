@@ -1,7 +1,8 @@
 import 'package:colla_chat/datastore/datastore.dart';
-import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
-import 'package:colla_chat/service/chat/chat.dart';
+import 'package:colla_chat/service/chat/chat_message.dart';
 
 ///好友或者群的消息控制器，包含某个连接的所有消息
 class ChatMessageController extends DataMoreController<ChatMessage> {

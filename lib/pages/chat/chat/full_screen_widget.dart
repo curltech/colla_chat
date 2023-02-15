@@ -1,11 +1,11 @@
-import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:card_swiper/card_swiper.dart';
+import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/message/message_widget.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
-import 'package:card_swiper/card_swiper.dart';
 
 class FullScreenWidget extends StatefulWidget with TileDataMixin {
   const FullScreenWidget({Key? key}) : super(key: key);

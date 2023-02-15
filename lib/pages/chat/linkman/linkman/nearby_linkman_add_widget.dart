@@ -1,8 +1,9 @@
-import 'package:colla_chat/entity/chat/chat.dart';
-import 'package:colla_chat/entity/chat/contact.dart';
+
+import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
-import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/transport/nearby_connection.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';

@@ -1,8 +1,9 @@
 import 'dart:io';
 
 import 'package:colla_chat/datastore/datastore.dart';
-import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/mailaddress.dart' as entity;
+import 'package:colla_chat/entity/chat/message_attachment.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;

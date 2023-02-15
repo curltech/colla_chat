@@ -1,5 +1,5 @@
 import 'package:colla_chat/datastore/datastore.dart';
-import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/channel/channel_item_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';

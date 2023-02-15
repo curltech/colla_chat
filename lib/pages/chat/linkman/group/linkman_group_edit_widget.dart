@@ -1,12 +1,14 @@
 import 'package:colla_chat/entity/base.dart';
-import 'package:colla_chat/entity/chat/contact.dart';
+import 'package:colla_chat/entity/chat/group.dart';
+import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/service/chat/group.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -119,8 +121,10 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
           groupOwnerChoices.add(item);
         } else {
           logger.e('Group member $groupMemberId is not linkman');
-          DialogUtil.error(context,
-              content: 'Group member $groupMemberId is not linkman');
+          if (mounted) {
+            DialogUtil.error(context,
+                content: 'Group member $groupMemberId is not linkman');
+          }
         }
       }
     }

@@ -1,4 +1,5 @@
-import 'package:colla_chat/service/chat/chat.dart';
+
+import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:flutter/material.dart';
 

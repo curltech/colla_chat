@@ -1,17 +1,21 @@
 import 'package:colla_chat/crypto/cryptography.dart';
+import 'package:colla_chat/crypto/util.dart';
+import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/chat_summary.dart';
+import 'package:colla_chat/entity/chat/group.dart';
+import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/entity/dht/peerclient.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/service/chat/chat_summary.dart';
+import 'package:colla_chat/service/chat/group.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:cryptography/cryptography.dart';
 
-import '../crypto/util.dart';
-import '../entity/chat/chat.dart';
-import '../entity/chat/contact.dart';
-import '../entity/dht/peerclient.dart';
-import '../platform.dart';
-import '../service/chat/chat.dart';
-import '../service/chat/contact.dart';
-import '../service/dht/peerclient.dart';
 
 class DataBuilder {
   static build() async {

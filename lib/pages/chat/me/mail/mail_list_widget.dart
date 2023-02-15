@@ -1,4 +1,4 @@
-import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/pages/chat/me/mail/mail_data_provider.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -8,7 +8,6 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 
 //邮件列表组件，带有回退回调函数
 class MailListWidget extends StatefulWidget with TileDataMixin {

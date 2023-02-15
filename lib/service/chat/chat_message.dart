@@ -1,31 +1,30 @@
 import 'dart:async';
-import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/base.dart';
-import 'package:colla_chat/entity/chat/chat.dart';
-import 'package:colla_chat/entity/chat/contact.dart';
+import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/group.dart';
+import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/p2p/chain/action/chat.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/chat/contact.dart';
+import 'package:colla_chat/service/chat/chat_summary.dart';
+import 'package:colla_chat/service/chat/group.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/service/general_base.dart';
-import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/date_util.dart';
-import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/nearby_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/websocket.dart';
-import 'package:path/path.dart' as p;
 import 'package:uuid/uuid.dart';
 
 class ChatMessageService extends GeneralBaseService<ChatMessage> {
@@ -716,161 +715,6 @@ final mergedMessageService = MergedMessageService(
     indexFields: ['ownerPeerId', 'mergedMessageId', 'messageId', 'createDate'],
     fields: ServiceLocator.buildFields(MergedMessage(), []));
 
-class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
-  MessageAttachmentService({
-    required super.tableName,
-    required super.fields,
-    required super.indexFields,
-    super.encryptFields = const ['content'],
-  }) {
-    post = (Map map) {
-      return MessageAttachment.fromJson(map);
-    };
-  }
-
-  ///获取加密的数据在content路径下附件的文件名称，
-  Future<String?> getEncryptFilename(String messageId, String? title) async {
-    String contentPath = p.join(myself.myPath, 'content');
-    String? filename;
-    if (!platformParams.web) {
-      if (title != null) {
-        filename = p.join(contentPath, '${messageId}_$title');
-      } else {
-        filename = p.join(contentPath, messageId);
-      }
-      return filename;
-    }
-
-    return filename;
-  }
-
-  ///获取获取的解密数据在临时目录下附件的文件名称，
-  Future<String?> getDecryptFilename(String messageId, String? title) async {
-    String? filename;
-    if (title != null) {
-      filename = '${messageId}_$title';
-    } else {
-      filename = messageId;
-    }
-    String contentPath = p.join(myself.myPath, 'content');
-    if (!platformParams.web) {
-      Uint8List? data = await FileUtil.readFile(p.join(contentPath, filename));
-      if (data != null) {
-        data = await decryptContent(data);
-        if (data != null) {
-          filename = await FileUtil.writeTempFile(data, filename: filename);
-          return filename;
-        }
-      }
-    } else {
-      MessageAttachment? attachment =
-          await findOne(where: 'messageId=?', whereArgs: [messageId]);
-      if (attachment != null) {
-        var content = attachment.content;
-        if (content != null) {
-          var data = CryptoUtil.decodeBase64(content);
-          filename = await FileUtil.writeTempFile(data, filename: filename);
-          return filename;
-        }
-      }
-    }
-
-    return filename;
-  }
-
-  /// 解密的内容
-  Future<Uint8List?> findContent(String messageId, String? title) async {
-    if (!platformParams.web) {
-      final filename = await getEncryptFilename(messageId, title);
-      if (filename != null) {
-        Uint8List? data = await FileUtil.readFile(filename);
-        if (data != null) {
-          data = await decryptContent(data);
-          if (data != null) {
-            return data;
-          }
-        }
-      }
-    } else {
-      MessageAttachment? attachment =
-          await findOne(where: 'messageId=?', whereArgs: [messageId]);
-      if (attachment != null) {
-        var content = attachment.content;
-        if (content != null) {
-          return CryptoUtil.decodeBase64(content);
-        }
-      }
-    }
-    return null;
-  }
-
-  Future<Uint8List?> encryptContent(
-    Uint8List data,
-  ) async {
-    SecurityContext securityContext = SecurityContext();
-    securityContext.payload = data;
-    var result =
-        await cryptographySecurityContextService.encrypt(securityContext);
-    if (result) {
-      var encrypted = securityContext.payload;
-      return encrypted;
-    }
-
-    return null;
-  }
-
-  Future<Uint8List?> decryptContent(
-    Uint8List data,
-  ) async {
-    SecurityContext securityContext = SecurityContext();
-    securityContext.payload = data;
-    var result =
-        await cryptographySecurityContextService.decrypt(securityContext);
-    if (result) {
-      var decrypted = securityContext.payload;
-      return decrypted;
-    }
-
-    return null;
-  }
-
-  ///把加密的内容写入文件，或者附件记录
-  Future<void> store(int id, String messageId, String? title, String content,
-      EntityState state) async {
-    if (!platformParams.web) {
-      final filename = await getEncryptFilename(messageId, title);
-      Uint8List? data = CryptoUtil.decodeBase64(content);
-      if (filename != null) {
-        data = await encryptContent(data);
-        if (data != null) {
-          await FileUtil.writeFile(data, filename);
-          logger.i('message attachment writeFile filename:$filename');
-        }
-      }
-    } else {
-      MessageAttachment attachment = MessageAttachment();
-      attachment.id = id;
-      attachment.messageId = messageId;
-      attachment.title = title;
-      attachment.content = content;
-      if (state == EntityState.insert) {
-        await messageAttachmentService.insert(attachment);
-      } else if (state == EntityState.update) {
-        await messageAttachmentService.update(attachment);
-      }
-    }
-  }
-
-  ///删除消息的附件
-  removeByPeerId(String peerId) async {
-    await delete(where: 'groupPeerId=?', whereArgs: [peerId]);
-  }
-}
-
-final messageAttachmentService = MessageAttachmentService(
-    tableName: "chat_messageattachment",
-    indexFields: ['ownerPeerId', 'messageId', 'createDate'],
-    fields: ServiceLocator.buildFields(MessageAttachment(), []));
 
 class ReceiveService extends GeneralBaseService<Receive> {
   ReceiveService(
@@ -895,174 +739,3 @@ final receiveService = ReceiveService(
     ],
     fields: ServiceLocator.buildFields(Receive(), []));
 
-class ChatSummaryService extends GeneralBaseService<ChatSummary> {
-  Map<String, ChatSummary> chatSummaries = {};
-
-  ChatSummaryService({
-    required super.tableName,
-    required super.fields,
-    required super.indexFields,
-    super.encryptFields = const ['content', 'thumbBody', 'thumbnail', 'title'],
-  }) {
-    post = (Map map) {
-      return ChatSummary.fromJson(map);
-    };
-  }
-
-  Future<List<ChatSummary>> findByPartyType(
-    String partyType,
-  ) async {
-    String where = 'partyType=?';
-    List<Object> whereArgs = [partyType];
-    var chatSummary = await find(
-      where: where,
-      whereArgs: whereArgs,
-      orderBy: 'sendReceiveTime',
-    );
-
-    return chatSummary;
-  }
-
-  Future<ChatSummary?> findByPeerId(
-    String peerId,
-  ) async {
-    String where = 'peerId=?';
-    List<Object> whereArgs = [peerId];
-    var chatSummary = await findOne(
-      where: where,
-      whereArgs: whereArgs,
-    );
-    return chatSummary;
-  }
-
-  Future<ChatSummary?> findOneByPeerId(String peerId) async {
-    var where = 'peerId = ?';
-    var whereArgs = [peerId];
-    var peer = await findOne(where: where, whereArgs: whereArgs);
-
-    return peer;
-  }
-
-  Future<ChatSummary?> findCachedOneByPeerId(String peerId) async {
-    if (chatSummaries.containsKey(peerId)) {
-      return chatSummaries[peerId];
-    }
-    ChatSummary? chatSummary = await findOneByPeerId(peerId);
-    if (chatSummary != null) {
-      chatSummaries[peerId] = chatSummary;
-    }
-    return chatSummary;
-  }
-
-  upsertByLinkman(Linkman linkman) async {
-    ChatSummary? chatSummary = await findCachedOneByPeerId(linkman.peerId);
-    if (chatSummary == null) {
-      chatSummary = ChatSummary();
-      chatSummary.peerId = linkman.peerId;
-      chatSummary.partyType = PartyType.linkman.name;
-      chatSummary.status = linkman.status;
-      chatSummary.name = linkman.name;
-      if (myself.id == null) {
-        chatSummary.ownerPeerId = linkman.ownerPeerId;
-      }
-      await insert(chatSummary);
-      chatSummaries[chatSummary.peerId!] = chatSummary;
-    } else {
-      chatSummary.name = linkman.name;
-      await upsert(chatSummary);
-    }
-  }
-
-  upsertByGroup(Group group) async {
-    ChatSummary? chatSummary = await findCachedOneByPeerId(group.peerId);
-    if (chatSummary == null) {
-      chatSummary = ChatSummary();
-      chatSummary.peerId = group.peerId;
-      chatSummary.partyType = PartyType.group.name;
-      chatSummary.subPartyType = group.groupType;
-      chatSummary.name = group.name;
-      await insert(chatSummary);
-      chatSummaries[chatSummary.peerId!] = chatSummary;
-    } else {
-      chatSummary.name = group.name;
-      await upsert(chatSummary);
-    }
-  }
-
-  ///新的ChatMessage来了，更新ChatSummary
-  upsertByChatMessage(ChatMessage chatMessage) async {
-    if (chatMessage.messageType == ChatMessageType.system.name) {
-      return;
-    }
-    var groupPeerId = chatMessage.groupPeerId;
-    var senderPeerId = chatMessage.senderPeerId;
-    var receiverPeerId = chatMessage.receiverPeerId;
-    var senderClientId = chatMessage.senderClientId;
-    var receiverClientId = chatMessage.receiverClientId;
-    ChatSummary? chatSummary;
-    if (groupPeerId != null) {
-      chatSummary = await findCachedOneByPeerId(groupPeerId);
-      if (chatSummary == null) {
-        chatSummary = ChatSummary();
-        chatSummary.peerId = groupPeerId;
-        chatSummary.partyType = PartyType.group.name;
-        chatSummary.sendReceiveTime = chatMessage.sendTime;
-        Group? group = await groupService.findCachedOneByPeerId(groupPeerId);
-        if (group != null) {
-          chatSummary.name = group.name;
-        }
-      }
-    } else {
-      if (senderPeerId != null && senderPeerId != myself.peerId) {
-        chatSummary = await findCachedOneByPeerId(senderPeerId);
-        if (chatSummary == null) {
-          chatSummary = ChatSummary();
-          chatSummary.peerId = senderPeerId;
-          chatSummary.partyType = PartyType.linkman.name;
-          chatSummary.sendReceiveTime = chatMessage.sendTime;
-          Linkman? linkman =
-              await linkmanService.findCachedOneByPeerId(senderPeerId);
-          if (linkman != null) {
-            chatSummary.name = linkman.name;
-          }
-        }
-      } else if (receiverPeerId != null && receiverPeerId != myself.peerId) {
-        chatSummary = await findCachedOneByPeerId(receiverPeerId);
-        if (chatSummary == null) {
-          chatSummary = ChatSummary();
-          chatSummary.peerId = receiverPeerId;
-          chatSummary.partyType = PartyType.linkman.name;
-          chatSummary.sendReceiveTime = chatMessage.sendTime;
-          Linkman? linkman =
-              await linkmanService.findCachedOneByPeerId(receiverPeerId);
-          if (linkman != null) {
-            chatSummary.name = linkman.name;
-          }
-        }
-      }
-    }
-    if (chatSummary != null) {
-      chatSummary.messageId = chatMessage.messageId;
-      chatSummary.messageType = chatMessage.messageType;
-      chatSummary.subMessageType = chatMessage.subMessageType;
-      chatSummary.title = chatMessage.title;
-      chatSummary.receiptContent = chatMessage.receiptContent;
-      chatSummary.thumbnail = chatMessage.thumbnail;
-      chatSummary.content = chatMessage.content;
-      chatSummary.contentType = chatMessage.contentType;
-      chatSummary.sendReceiveTime = chatMessage.sendTime;
-      chatSummary.unreadNumber = chatSummary.unreadNumber + 1;
-      await upsert(chatSummary);
-      chatSummaries[chatSummary.peerId!] = chatSummary;
-    }
-  }
-
-  removeChatSummary(String peerId) async {
-    await delete(where: 'peerId=?', whereArgs: [peerId]);
-  }
-}
-
-final chatSummaryService = ChatSummaryService(
-    tableName: "chat_summary",
-    indexFields: ['ownerPeerId', 'peerId', 'partyType', 'sendReceiveTime'],
-    fields: ServiceLocator.buildFields(ChatSummary(), []));

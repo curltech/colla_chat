@@ -1,14 +1,13 @@
 import 'package:colla_chat/datastore/datastore.dart' as datastore;
-import 'package:colla_chat/entity/chat/chat.dart';
+import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/mailaddress.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/service/chat/mailaddress.dart';
 import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/transport/emailclient.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:flutter/material.dart';
-
-import '../../../../entity/chat/mailaddress.dart';
-import '../../../../service/chat/chat.dart';
-import '../../../../service/chat/mailaddress.dart';
-import '../../../../transport/emailclient.dart';
 
 /// 邮件数据的状态管理器，每个地址有多个邮箱，每个邮箱包含多个邮件
 class MailDataProvider with ChangeNotifier {
