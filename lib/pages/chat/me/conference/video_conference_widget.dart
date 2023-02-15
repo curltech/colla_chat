@@ -10,14 +10,14 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
 ///视频会议通话窗口，分页显示本地视频和远程视频
-class VideoConferencingWidget extends StatefulWidget with TileDataMixin {
-  const VideoConferencingWidget({
+class VideoConferenceWidget extends StatefulWidget with TileDataMixin {
+  const VideoConferenceWidget({
     Key? key,
   }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return _VideoConferencingWidgetState();
+    return _VideoConferenceWidgetState();
   }
 
   @override
@@ -33,7 +33,7 @@ class VideoConferencingWidget extends StatefulWidget with TileDataMixin {
   String get title => 'VideoConferencing';
 }
 
-class _VideoConferencingWidgetState extends State<VideoConferencingWidget> {
+class _VideoConferenceWidgetState extends State<VideoConferenceWidget> {
   OverlayEntry? overlayEntry;
 
   @override
