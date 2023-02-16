@@ -217,8 +217,10 @@ class MessageWidget {
             builder: (BuildContext context) {
               return LinkmanGroupSearchWidget(
                 selectType: SelectType.multidialog,
-                onSelected: (List<String> selected) {
-                  selects = selected;
+                onSelected: (List<String>? selected) {
+                  if (selected != null) {
+                    selects = selected;
+                  }
                 },
                 selected: const [],
               );

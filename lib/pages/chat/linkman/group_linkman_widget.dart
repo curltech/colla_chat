@@ -1,7 +1,6 @@
-import 'package:colla_chat/entity/chat/contact.dart';
 import 'package:colla_chat/entity/chat/group.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
-import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
@@ -110,7 +109,7 @@ class GroupLinkmanWidget extends StatelessWidget {
   }
 
   /// DataListSingleSelect的单选对话框，一个搜索字段和单选的组合，使用时外部用对话框包裹
-  Widget _buildDataListView(BuildContext context) {
+  Widget _buildDataListSingleSelectView(BuildContext context) {
     var dataListView = FutureBuilder(
         future: _buildOptions(),
         builder: (BuildContext context,
@@ -123,8 +122,14 @@ class GroupLinkmanWidget extends StatelessWidget {
           if (options == null) {
             return Container();
           }
-          return DataListSingleSelect<String>(
-            title: '',
+          return DataListSingleSelect(
+            title: Column(children: [
+              AppBarWidget.buildTitleBar(
+                  title: Text(
+                AppLocalizations.t(title!),
+                style: const TextStyle(fontSize: 16, color: Colors.white),
+              )),
+            ]),
             items: options,
             onChanged: (String? value) {
               onSelected([value!]);
@@ -142,7 +147,7 @@ class GroupLinkmanWidget extends StatelessWidget {
         selector = _buildMultiSelectDialog(context);
         break;
       case SelectType.listview:
-        selector = _buildDataListView(context);
+        selector = _buildDataListSingleSelectView(context);
         break;
       default:
         selector = _buildMultiSelectDialog(context);

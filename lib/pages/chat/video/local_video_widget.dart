@@ -192,20 +192,24 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   ///弹出界面，选择参与者，返回房间
-  _buildConference() async {
+  Future<void> _buildConference() async {
     List<String> participants = [myself.peerId!];
     if (widget.videoMode == VideoMode.conferencing) {
+      List<String> selected = <String>[];
       await DialogUtil.show(
           context: context,
           // title: AppBarWidget.buildTitleBar(
           //     title: Text(AppLocalizations.t('Select one linkman'))),
           builder: (BuildContext context) {
             return LinkmanGroupSearchWidget(
-                onSelected: (List<String> peerIds) async {
-                  participants.addAll(peerIds);
+                onSelected: (List<String>? peerIds) async {
+                  if (peerIds != null) {
+                    participants.addAll(peerIds);
+                  }
                   Navigator.pop(context, participants);
                 },
-                selected: const <String>[],
+                selected: selected,
+                includeGroup: false,
                 selectType: SelectType.multidialog);
           });
     } else if (peerId != null) {
@@ -330,16 +334,16 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (chatMessage == null) {
       //当前视频消息为空，则创建房间，发送视频通话邀请消息
       //由消息的接收方同意后直接重新协商
-      var conference = await _buildConference();
+      await _buildConference();
       if (videoChatRender!.video) {
         chatMessage = await _sendVideoChatMessage(
-            contentType: ContentType.video.name, conference: conference);
+            contentType: ContentType.video.name, conference: conference!);
       } else {
         chatMessage = await _sendVideoChatMessage(
-            contentType: ContentType.audio.name, conference: conference);
+            contentType: ContentType.audio.name, conference: conference!);
       }
       videoChatMessageController.chatMessage = chatMessage;
-      videoRoomRenderPool.createRemoteVideoRenderController(conference);
+      videoRoomRenderPool.createRemoteVideoRenderController(conference!);
     } else {
       //当前视频消息不为空，则有同意回执的直接重新协商
       var messageId = chatMessage.messageId!;

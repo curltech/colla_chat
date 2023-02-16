@@ -1,6 +1,5 @@
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
@@ -169,41 +168,25 @@ class FormInputWidget extends StatelessWidget {
       height: 30.0,
     ));
     ButtonStyle style = WidgetUtil.buildButtonStyle();
-    children.add(Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 15.0),
-      child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+    children.add(
+      ButtonBar(children: [
         TextButton(
           style: style,
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text(AppLocalizations.t(okLabel)),
-            const SizedBox(
-              width: 5,
-            ),
-            Icon(Icons.check, color: myself.primary)
-          ]),
+          child: Text(AppLocalizations.t(resetLabel)),
+          onPressed: () {
+            controller.clear();
+          },
+        ),
+        TextButton(
+          style: style,
+          child: Text(AppLocalizations.t(okLabel)),
           onPressed: () {
             var values = controller.getValues();
             onOk(values);
           },
         ),
-        const SizedBox(
-          width: 15,
-        ),
-        TextButton(
-          style: style,
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Text(AppLocalizations.t(resetLabel)),
-            const SizedBox(
-              width: 5,
-            ),
-            const Icon(Icons.clear, color: Colors.red)
-          ]),
-          onPressed: () {
-            controller.clear();
-          },
-        )
       ]),
-    ));
+    );
     return Column(
         mainAxisAlignment: mainAxisAlignment,
         crossAxisAlignment: CrossAxisAlignment.start,

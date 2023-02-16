@@ -1,4 +1,3 @@
-
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -256,8 +255,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
             AppBarWidget.buildTitleBar(title: const Text('Select one linkman')),
         builder: (BuildContext context) {
           return LinkmanGroupSearchWidget(
-              onSelected: (List<String> selected) async {
-                if (selected.isNotEmpty) {
+              onSelected: (List<String>? selected) async {
+                if (selected != null && selected.isNotEmpty) {
                   Linkman? linkman =
                       await linkmanService.findCachedOneByPeerId(selected[0]);
                   if (linkman != null) {

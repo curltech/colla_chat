@@ -15,10 +15,10 @@ import 'package:multi_select_flutter/util/multi_select_list_type.dart';
 
 ///利用Option产生的下拉按钮
 ///利用回调函数onChanged回传选择的按钮
-class DataDropdownButton<T> extends StatefulWidget {
-  final String title;
-  final List<Option<T>> items;
-  final Function(T? value) onChanged;
+class DataDropdownButton extends StatefulWidget {
+  final Widget title;
+  final List<Option<String>> items;
+  final Function(String? value) onChanged;
 
   const DataDropdownButton(
       {Key? key,
@@ -28,22 +28,23 @@ class DataDropdownButton<T> extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _DataDropdownButtonState<T>();
+  State<StatefulWidget> createState() => _DataDropdownButtonState();
 }
 
-class _DataDropdownButtonState<T> extends State<DataDropdownButton> {
-  T? value;
+class _DataDropdownButtonState extends State<DataDropdownButton> {
+  String? value;
 
   @override
   void initState() {
     super.initState();
   }
 
-  List<DropdownMenuItem<T>> _buildMenuItems(BuildContext context) {
-    List<DropdownMenuItem<T>> menuItems = [];
+  List<DropdownMenuItem<String>> _buildMenuItems(BuildContext context) {
+    List<DropdownMenuItem<String>> menuItems = [];
     for (var item in widget.items) {
       var label = AppLocalizations.t(item.label);
-      var menuItem = DropdownMenuItem<T>(value: item.value, child: Text(label));
+      var menuItem =
+          DropdownMenuItem<String>(value: item.value, child: Text(label));
       if (item.checked) {
         value = item.value;
       }
@@ -58,15 +59,15 @@ class _DataDropdownButtonState<T> extends State<DataDropdownButton> {
     return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 15.0),
         child: Row(children: [
-          Text(AppLocalizations.t(widget.title)),
+          widget.title,
           const Spacer(),
-          DropdownButton<T>(
+          DropdownButton<String>(
             dropdownColor: Colors.grey.withOpacity(0.7),
             underline: Container(),
             elevation: 0,
             value: value,
             items: menuItems,
-            onChanged: (T? value) {
+            onChanged: (String? value) {
               setState(() {
                 this.value = value;
               });
@@ -79,25 +80,22 @@ class _DataDropdownButtonState<T> extends State<DataDropdownButton> {
 
 ///利用DataListView实现的单选对组件类，可以包装到对话框中
 ///利用回调函数onChanged回传选择的值
-class DataListSingleSelect<T> extends StatefulWidget {
-  final String title;
-  final List<Option<T>> items;
-  //用泛型T会报错
+class DataListSingleSelect extends StatefulWidget {
+  final Widget? title;
+  final List<Option<String>> items;
+
   final Function(String? value) onChanged;
 
   const DataListSingleSelect(
-      {Key? key,
-      required this.title,
-      required this.items,
-      required this.onChanged})
+      {Key? key, this.title, required this.items, required this.onChanged})
       : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _DataListSingleSelectState<T>();
+  State<StatefulWidget> createState() => _DataListSingleSelectState();
 }
 
-class _DataListSingleSelectState<T> extends State<DataListSingleSelect> {
-  T? value;
+class _DataListSingleSelectState extends State<DataListSingleSelect> {
+  String? value;
 
   @override
   void initState() {
@@ -122,49 +120,45 @@ class _DataListSingleSelectState<T> extends State<DataListSingleSelect> {
   @override
   Widget build(BuildContext context) {
     var dataListView = _buildDataListView(context);
-    return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0),
-        child: dataListView);
+    List<Widget> children = <Widget>[];
+    if (widget.title != null) {
+      children.add(widget.title!);
+    }
+    children.add(Expanded(child: dataListView));
+    return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 0.0),
+        child: Column(children: children));
   }
 }
 
 ///利用DataListView实现的多选对组件类，可以包装到对话框中
-///利用回调函数onChanged回传选择的值
-class DataListMultiSelect<T> extends StatefulWidget {
-  final String title;
-  final List<Option<T>> items;
-  final Function(List<T?> value) onChanged;
+///利用回调函数onConfirm回传选择的值
+class DataListMultiSelect extends StatefulWidget {
+  final Widget? title;
+  final List<Option<String>> items;
+  final Function(List<String>? value) onConfirm;
 
   const DataListMultiSelect({
     Key? key,
-    required this.title,
+    this.title,
     required this.items,
-    required this.onChanged,
+    required this.onConfirm,
   }) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _DataListMultiSelectState<T>();
+  State<StatefulWidget> createState() => _DataListMultiSelectState();
 }
 
-class _DataListMultiSelectState<T> extends State<DataListMultiSelect> {
-  List<T> values = <T>[];
-
+class _DataListMultiSelectState extends State<DataListMultiSelect> {
   @override
   void initState() {
     super.initState();
   }
 
   Widget _buildDataListView(BuildContext context) {
-    List<TileData> tileData = [];
-    for (var item in widget.items) {
-      var label = AppLocalizations.t(item.label);
-      var tile =
-          TileData(title: label, subtitle: item.value, prefix: item.leading);
-      tileData.add(tile);
-    }
     return ListView.builder(
         //该属性将决定列表的长度是否仅包裹其内容的长度。
-        // 当 ListView 嵌在一个无限长的容器组件中时， shrinkWrap 必须为true
+        //当ListView 嵌在一个无限长的容器组件中时， shrinkWrap 必须为true
         shrinkWrap: true,
         itemCount: widget.items.length,
         //physics: const NeverScrollableScrollPhysics(),
@@ -174,16 +168,12 @@ class _DataListMultiSelectState<T> extends State<DataListMultiSelect> {
 
           Widget tileWidget = CheckboxListTile(
             title: Text(option.label),
-            value: option.value,
-            selected: option.checked,
-            checkColor: myself.primary,
+            secondary: option.leading!,
+            value: option.checked,
             onChanged: (bool? value) {
-              if (value != null && value) {
-                values.add(option.value);
-              } else {
-                values.remove(option.value);
-              }
-              widget.onChanged(values);
+              setState(() {
+                widget.items[index].checked = value!;
+              });
             },
           );
 
@@ -194,9 +184,132 @@ class _DataListMultiSelectState<T> extends State<DataListMultiSelect> {
   @override
   Widget build(BuildContext context) {
     var dataListView = _buildDataListView(context);
-    return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 15.0),
-        child: dataListView);
+    List<Widget> children = <Widget>[];
+    if (widget.title != null) {
+      children.add(widget.title!);
+    }
+    children.add(Expanded(child: dataListView));
+    children.add(ButtonBar(
+      children: [
+        TextButton(
+            onPressed: () {
+              widget.onConfirm(null);
+            },
+            child: Text(AppLocalizations.t('Cancel'))),
+        TextButton(
+            onPressed: () {
+              List<String> selected = <String>[];
+              for (var option in widget.items) {
+                if (option.checked) {
+                  selected.add(option.value);
+                }
+              }
+              widget.onConfirm(selected);
+            },
+            child: Text(AppLocalizations.t('Ok'))),
+      ],
+    ));
+    return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 0.0),
+        child: Column(children: children));
+  }
+}
+
+///利用Chip实现的多选对组件类，可以包装到对话框中
+///利用回调函数onConfirm回传选择的值
+class ChipMultiSelect extends StatefulWidget {
+  final Widget? title;
+  final List<Option<String>> items;
+  final Function(List<String>? value) onConfirm;
+
+  const ChipMultiSelect({
+    Key? key,
+    this.title,
+    required this.items,
+    required this.onConfirm,
+  }) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => _ChipMultiSelectState();
+}
+
+class _ChipMultiSelectState extends State<ChipMultiSelect> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Widget _buildChipView(BuildContext context) {
+    List<FilterChip> chips = [];
+    for (var option in widget.items) {
+      var chip = FilterChip(
+        label: Row(mainAxisSize: MainAxisSize.min, children: [
+          Text(
+            option.label,
+            style:
+                TextStyle(color: option.checked ? Colors.white : Colors.black),
+          ),
+          const SizedBox(
+            width: 10,
+          ),
+          option.leading!,
+        ]),
+        //avatar: option.leading,
+        disabledColor: Colors.white,
+        selectedColor: myself.primary,
+        backgroundColor: Colors.white,
+        showCheckmark: false,
+        checkmarkColor: myself.primary,
+        selected: option.checked,
+        onSelected: (bool value) {
+          setState(() {
+            option.checked = value;
+          });
+        },
+      );
+      chips.add(chip);
+    }
+    return Wrap(
+      spacing: 10,
+      runSpacing: 10,
+      children: chips,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    var chipView = _buildChipView(context);
+    List<Widget> children = <Widget>[];
+    if (widget.title != null) {
+      children.add(widget.title!);
+    }
+    children.add(const SizedBox(
+      height: 15.0,
+    ));
+    children.add(Expanded(child: SingleChildScrollView(child: chipView)));
+    children.add(ButtonBar(
+      children: [
+        TextButton(
+            onPressed: () {
+              widget.onConfirm(null);
+            },
+            child: Text(AppLocalizations.t('Cancel'))),
+        TextButton(
+            onPressed: () {
+              List<String> selected = <String>[];
+              for (var option in widget.items) {
+                if (option.checked) {
+                  selected.add(option.value);
+                }
+              }
+              widget.onConfirm(selected);
+            },
+            child: Text(AppLocalizations.t('Ok'))),
+      ],
+    ));
+    return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 0.0),
+        child: Column(children: children));
   }
 }
 

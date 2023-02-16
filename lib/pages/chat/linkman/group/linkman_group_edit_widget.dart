@@ -139,9 +139,11 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
             (BuildContext context, List<String> groupMembers, Widget? child) {
           return LinkmanGroupSearchWidget(
             selectType: SelectType.smartselect,
-            onSelected: (List<String> selected) async {
-              this.groupMembers.value = selected;
-              await _buildGroupOwnerChoices(selected);
+            onSelected: (List<String>? selected) async {
+              if (selected != null) {
+                this.groupMembers.value = selected;
+                await _buildGroupOwnerChoices(selected);
+              }
             },
             selected: this.groupMembers.value,
             includeGroup: false,
