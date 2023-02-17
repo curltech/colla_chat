@@ -210,7 +210,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                 },
                 selected: selected,
                 includeGroup: false,
-                selectType: SelectType.multidialog);
+                selectType: SelectType.chipMultiSelect);
           });
     } else if (peerId != null) {
       if (groupPeerId == null) {

@@ -11,18 +11,20 @@ import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
 
 enum SelectType {
-  smartselect, //多选字段
-  multiselect, //多选字段
-  multidialog, //多选对话框
-  listview, //单选对话框
+  multiSmartSelectField, //多选字段
+  dataListMultiSelect, //多选对话框
+  chipMultiSelect, //多选对话框
+  singleSelect, //单选对话框
+  multiSelectDialogField, //多选字段
 }
 
 ///联系人和群的查询对话框界面，然后进行单选或者多选
+///包装在对话框中，await DialogUtil.show
 class LinkmanGroupSearchWidget extends StatefulWidget {
   final Function(List<String>?) onSelected; //获取返回的选择
   final List<String> selected;
-  final bool searchable; //是否有搜索字段
-  final SelectType selectType; //查询界面的类型，复杂多选，简单多选，listview，可以包括在showDialog中
+
+  final SelectType selectType;
   final bool includeLinkman;
   final bool includeGroup;
 
@@ -30,8 +32,7 @@ class LinkmanGroupSearchWidget extends StatefulWidget {
       {Key? key,
       required this.onSelected,
       required this.selected,
-      this.searchable = true,
-      this.selectType = SelectType.smartselect,
+      this.selectType = SelectType.multiSmartSelectField,
       this.includeLinkman = true,
       this.includeGroup = true})
       : super(key: key);
@@ -41,14 +42,15 @@ class LinkmanGroupSearchWidget extends StatefulWidget {
 }
 
 class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
-  TextEditingController textController = TextEditingController();
+  final TextEditingController textController = TextEditingController();
+  final OptionController optionController = OptionController();
+
+  final ValueNotifier<List<Option<String>>> options =
+      ValueNotifier<List<Option<String>>>(<Option<String>>[]);
 
   String title = '';
   String placeholder = '';
   String? key;
-
-  ValueNotifier<List<Option<String>>> options =
-      ValueNotifier<List<Option<String>>>([]);
 
   @override
   initState() {
@@ -63,10 +65,15 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
       title = 'Group';
       placeholder = 'groups';
     }
+    optionController.addListener(_update);
     _search();
   }
 
-  Future<List<Option<String>>> _search({String? key}) async {
+  _update() {
+    options.value = optionController.options;
+  }
+
+  Future<void> _search({String? key}) async {
     List<Linkman> linkmen = <Linkman>[];
     List<Group> groups = <Group>[];
     key ??= textController.text;
@@ -78,11 +85,8 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
     if (widget.includeGroup) {
       groups = await groupService.search(key);
     }
-    options.value = _buildOptions(linkmen, groups);
-
-    return options.value;
+    optionController.options = _buildOptions(linkmen, groups);
     //}
-    //return [];
   }
 
   List<Option<String>> _buildOptions(
@@ -104,7 +108,6 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
         options.add(item);
       }
     }
-    setState(() {});
 
     return options;
   }
@@ -148,29 +151,21 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
   }
 
   /// 复杂多选对话框样式，选择项通过传入的回调方法返回
-  Widget _buildSmartSelectWidget(BuildContext context) {
-    var selector = FutureBuilder<List<Option<String>>>(
-      future: _search(),
+  Widget _buildMultiSmartSelectField(BuildContext context) {
+    var selector = ValueListenableBuilder(
+      valueListenable: options,
       builder:
-          (BuildContext context, AsyncSnapshot<List<Option<String>>> snapshot) {
-        if (!snapshot.hasData || snapshot.data == null) {
-          return Container();
-        }
+          (BuildContext context, List<Option<String>> value, Widget? child) {
         return SmartSelectUtil.multiple<String>(
           title: title,
           placeholder: '',
-          leading: widget.searchable
-              ? SizedBox(
-                  width: 300,
-                  child: _buildSearchTextField(context),
-                )
-              : null,
+          leading: const Icon(Icons.person_add),
           onChange: (selected) {
             widget.selected.clear();
             widget.selected.addAll(selected);
             widget.onSelected(selected);
           },
-          items: snapshot.data!,
+          items: value,
           modalFilter: false,
           modalFilterAuto: false,
           chipOnDelete: (i) {
@@ -187,14 +182,11 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
   }
 
   /// 简单多选字段，选择项通过传入的回调方法返回
-  Widget _buildMultiSelectWidget(BuildContext context) {
-    var selector = FutureBuilder<List<Option<String>>>(
-        future: _search(),
-        builder: (BuildContext context,
-            AsyncSnapshot<List<Option<String>>> snapshot) {
-          if (!snapshot.hasData || snapshot.data == null) {
-            return Container();
-          }
+  Widget _buildMultiSelectDialogField(BuildContext context) {
+    var selector = ValueListenableBuilder(
+        valueListenable: options,
+        builder:
+            (BuildContext context, List<Option<String>> value, Widget? child) {
           return MultiSelectUtil.buildMultiSelectDialogField<String>(
             title: Column(children: [
               AppBarWidget.buildTitleBar(
@@ -211,7 +203,7 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
             onConfirm: (selected) {
               widget.onSelected(selected);
             },
-            items: snapshot.data!,
+            items: value,
           );
         });
 
@@ -221,99 +213,90 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
   }
 
   /// 简单多选对话框，使用时外部用对话框包裹
-  Widget _buildMultiSelectDialog(BuildContext context) {
-    var selector = ValueListenableBuilder(
-        valueListenable: options,
-        builder:
-            (BuildContext context, List<Option<String>> value, Widget? child) {
-          var size = MediaQuery.of(context).size;
-          return Center(
-              child: Container(
-                  color: Colors.white,
-                  width: size.width * 0.9,
-                  height: size.height * 0.9,
-                  alignment: Alignment.center,
-                  child: ChipMultiSelect(
-                    title: Column(children: [
-                      AppBarWidget.buildTitleBar(
-                          title: Text(
-                        AppLocalizations.t(title),
-                        style:
-                            const TextStyle(fontSize: 16, color: Colors.white),
-                      )),
-                      const SizedBox(
-                        height: 10,
-                      ),
-                      Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 15.0),
-                          child: _buildSearchTextField(context)),
-                    ]),
-                    onConfirm: (selected) {
-                      widget.onSelected(selected);
-                    },
-                    items: value,
-                  )));
-        });
+  Widget _buildChipMultiSelect(BuildContext context) {
+    var selector = ChipMultiSelect(
+      onConfirm: (selected) {
+        widget.onSelected(selected);
+      },
+      optionController: optionController,
+    );
     return selector;
   }
 
-  _onSelected(String? value) {
-    widget.onSelected([value!]);
+  /// 简单多选对话框，使用时外部用对话框包裹
+  Widget _buildDialogWidget(BuildContext context, Widget child) {
+    var size = MediaQuery.of(context).size;
+    var selector = Center(
+        child: Container(
+      color: Colors.white,
+      width: size.width * 0.9,
+      height: size.height * 0.9,
+      alignment: Alignment.center,
+      child: Column(children: [
+        AppBarWidget.buildTitleBar(
+            title: Text(
+          AppLocalizations.t(title),
+          style: const TextStyle(fontSize: 16, color: Colors.white),
+        )),
+        const SizedBox(
+          height: 10,
+        ),
+        Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            child: _buildSearchTextField(context)),
+        const SizedBox(
+          height: 10,
+        ),
+        Expanded(child: child),
+      ]),
+    ));
+    return selector;
+  }
+
+  Widget _buildDataListMultiSelect(BuildContext context) {
+    return DataListMultiSelect(
+      onConfirm: (selected) {
+        widget.onSelected(selected);
+      },
+      optionController: optionController,
+    );
   }
 
   /// DataListView的单选对话框，使用时外部用对话框包裹
-  Widget _buildDataListView(BuildContext context) {
-    var dataListView = FutureBuilder<List<Option<String>>>(
-        future: _search(),
-        builder: (BuildContext context,
-            AsyncSnapshot<List<Option<String>>> snapshot) {
-          if (!snapshot.hasData || snapshot.data == null) {
-            return Container();
-          }
-          return DataListSingleSelect(
-            title: Column(children: [
-              AppBarWidget.buildTitleBar(
-                  title: Text(
-                AppLocalizations.t(title),
-                style: const TextStyle(fontSize: 16, color: Colors.white),
-              )),
-              const SizedBox(
-                height: 10,
-              ),
-              Padding(
-                  padding: const EdgeInsets.all(5.0),
-                  child: _buildSearchTextField(context)),
-            ]),
-            items: snapshot.data!,
-            onChanged: _onSelected,
-          );
-        });
-    return Container(
-        padding: const EdgeInsets.all(10.0),
-        child: Column(children: [
-          widget.searchable ? _buildSearchTextField(context) : Container(),
-          Expanded(child: dataListView)
-        ]));
+  Widget _buildDataListSingleSelect(BuildContext context) {
+    var dataListView = DataListSingleSelect(
+      optionController: optionController,
+      onChanged: (String? value) {
+        widget.onSelected([value!]);
+      },
+    );
+    return dataListView;
   }
 
   @override
   Widget build(BuildContext context) {
     Widget selector;
     switch (widget.selectType) {
-      case SelectType.smartselect:
-        selector = _buildSmartSelectWidget(context);
+      case SelectType.multiSmartSelectField:
+        selector = _buildMultiSmartSelectField(context);
         break;
-      case SelectType.multiselect:
-        selector = _buildMultiSelectWidget(context);
+      case SelectType.multiSelectDialogField:
+        selector = _buildMultiSelectDialogField(context);
         break;
-      case SelectType.multidialog:
-        selector = _buildMultiSelectDialog(context);
+      case SelectType.dataListMultiSelect:
+        selector =
+            _buildDialogWidget(context, _buildDataListMultiSelect(context));
         break;
-      case SelectType.listview:
-        selector = _buildDataListView(context);
+      case SelectType.chipMultiSelect:
+        selector = _buildDialogWidget(context, _buildChipMultiSelect(context));
+        break;
+      case SelectType.singleSelect:
+        selector =
+            _buildDialogWidget(context, _buildDataListSingleSelect(context));
         break;
       default:
-        selector = _buildSmartSelectWidget(context);
+        selector =
+            _buildDialogWidget(context, _buildDataListMultiSelect(context));
     }
     return selector;
   }
@@ -321,6 +304,7 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
   @override
   void dispose() {
     textController.dispose();
+    optionController.removeListener(_update);
     super.dispose();
   }
 }

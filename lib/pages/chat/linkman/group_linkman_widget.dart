@@ -5,7 +5,6 @@ import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
-import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
 
@@ -13,16 +12,16 @@ import 'package:flutter/material.dart';
 class GroupLinkmanWidget extends StatelessWidget {
   final Function(List<String>) onSelected; //获取返回的选择
   final List<String> selected;
-  final SelectType
-      selectType; //查询界面的类型，multi界面无搜索字段，dialog和listview可以包括在showDialog中
+  final SelectType selectType;
   final String groupPeerId;
   String? title;
+  final OptionController optionController = OptionController();
 
   GroupLinkmanWidget({
     Key? key,
     required this.onSelected,
     required this.selected,
-    this.selectType = SelectType.multidialog,
+    this.selectType = SelectType.chipMultiSelect,
     required this.groupPeerId,
     this.title,
   }) : super(key: key);
@@ -51,36 +50,37 @@ class GroupLinkmanWidget extends StatelessWidget {
         options.add(item);
       }
     }
+    optionController.options = options;
 
     return options;
   }
 
-  ///将群成员的数据转换从列表显示数据TileData
-  Future<List<TileData>> _buildTileData() async {
-    title = await _findGroupName();
-    List<TileData> tiles = [];
-    var groupMembers = await groupMemberService.findByGroupId(groupPeerId);
-    if (groupMembers.isNotEmpty) {
-      for (var groupMember in groupMembers) {
-        var title = groupMember.memberAlias!;
-        String? memberPeerId = groupMember.memberPeerId;
-        if (memberPeerId != null) {
-          var avatar = await linkmanService.findAvatarImageWidget(memberPeerId);
-          TileData tile = TileData(
-            prefix: avatar,
-            title: title,
-            subtitle: memberPeerId,
-            dense: false,
-          );
-          tiles.add(tile);
-        }
-      }
-    }
-    return tiles;
+  /// 简单多选对话框，使用时外部用对话框包裹
+  Widget _buildDialogWidget(BuildContext context, Widget child) {
+    var size = MediaQuery.of(context).size;
+    var selector = Center(
+        child: Container(
+      color: Colors.white,
+      width: size.width * 0.9,
+      height: size.height * 0.9,
+      alignment: Alignment.center,
+      child: Column(children: [
+        AppBarWidget.buildTitleBar(
+            title: Text(
+          AppLocalizations.t(title!),
+          style: const TextStyle(fontSize: 16, color: Colors.white),
+        )),
+        const SizedBox(
+          height: 10,
+        ),
+        Expanded(child: child),
+      ]),
+    ));
+    return selector;
   }
 
   /// 简单多选对话框的形式，内含一个搜索字段和多选，使用时外部用对话框包裹
-  Widget _buildMultiSelectDialog(BuildContext context) {
+  Widget _buildChipMultiSelect(BuildContext context) {
     var selector = FutureBuilder(
         future: _buildOptions(),
         builder: (BuildContext context,
@@ -93,23 +93,41 @@ class GroupLinkmanWidget extends StatelessWidget {
           if (options == null) {
             return Container();
           }
-          return MultiSelectUtil.buildMultiSelectDialog<String>(
-            title: AppBarWidget.buildTitleBar(
-                title: Text(
-              title ?? '',
-              style: const TextStyle(fontSize: 16, color: Colors.white),
-            )),
+          return ChipMultiSelect(
             onConfirm: (selected) {
-              onSelected(selected);
+              onSelected(selected!);
             },
-            items: options,
+            optionController: optionController,
+          );
+        });
+    return selector;
+  }
+
+  Widget _buildDataListMultiSelect(BuildContext context) {
+    var selector = FutureBuilder(
+        future: _buildOptions(),
+        builder: (BuildContext context,
+            AsyncSnapshot<List<Option<String>>> snapshot) {
+          var hasData = snapshot.hasData;
+          if (!hasData) {
+            return Container();
+          }
+          List<Option<String>>? options = snapshot.data;
+          if (options == null) {
+            return Container();
+          }
+          return DataListMultiSelect(
+            onConfirm: (selected) {
+              onSelected(selected!);
+            },
+            optionController: optionController,
           );
         });
     return selector;
   }
 
   /// DataListSingleSelect的单选对话框，一个搜索字段和单选的组合，使用时外部用对话框包裹
-  Widget _buildDataListSingleSelectView(BuildContext context) {
+  Widget _buildDataListSingleSelect(BuildContext context) {
     var dataListView = FutureBuilder(
         future: _buildOptions(),
         builder: (BuildContext context,
@@ -123,14 +141,7 @@ class GroupLinkmanWidget extends StatelessWidget {
             return Container();
           }
           return DataListSingleSelect(
-            title: Column(children: [
-              AppBarWidget.buildTitleBar(
-                  title: Text(
-                AppLocalizations.t(title!),
-                style: const TextStyle(fontSize: 16, color: Colors.white),
-              )),
-            ]),
-            items: options,
+            optionController: optionController,
             onChanged: (String? value) {
               onSelected([value!]);
             },
@@ -143,14 +154,19 @@ class GroupLinkmanWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     Widget selector;
     switch (selectType) {
-      case SelectType.multidialog:
-        selector = _buildMultiSelectDialog(context);
+      case SelectType.dataListMultiSelect:
+        selector =
+            _buildDialogWidget(context, _buildDataListMultiSelect(context));
         break;
-      case SelectType.listview:
-        selector = _buildDataListSingleSelectView(context);
+      case SelectType.chipMultiSelect:
+        selector = _buildDialogWidget(context, _buildChipMultiSelect(context));
+        break;
+      case SelectType.singleSelect:
+        selector =
+            _buildDialogWidget(context, _buildDataListSingleSelect(context));
         break;
       default:
-        selector = _buildMultiSelectDialog(context);
+        selector = _buildDialogWidget(context, _buildChipMultiSelect(context));
     }
     return selector;
   }

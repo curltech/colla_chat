@@ -37,6 +37,7 @@ final List<ColumnFieldDef> groupColumnFieldDefs = [
       prefixIcon: const Icon(Icons.person_pin)),
 ];
 
+///创建和修改群，填写群的基本信息，选择群成员和群主
 class LinkmanGroupEditWidget extends StatefulWidget with TileDataMixin {
   LinkmanGroupEditWidget({Key? key}) : super(key: key);
 
@@ -138,7 +139,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
         builder:
             (BuildContext context, List<String> groupMembers, Widget? child) {
           return LinkmanGroupSearchWidget(
-            selectType: SelectType.smartselect,
+            selectType: SelectType.multiSmartSelectField,
             onSelected: (List<String>? selected) async {
               if (selected != null) {
                 this.groupMembers.value = selected;

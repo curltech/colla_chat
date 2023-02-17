@@ -216,7 +216,7 @@ class MessageWidget {
         await DialogUtil.show(
             builder: (BuildContext context) {
               return LinkmanGroupSearchWidget(
-                selectType: SelectType.multidialog,
+                selectType: SelectType.chipMultiSelect,
                 onSelected: (List<String>? selected) {
                   if (selected != null) {
                     selects = selected;

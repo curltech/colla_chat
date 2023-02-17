@@ -164,7 +164,7 @@ class _ExtendedTextMessageInputWidgetState
             context: context,
             builder: (BuildContext context) {
               return GroupLinkmanWidget(
-                selectType: SelectType.listview,
+                selectType: SelectType.singleSelect,
                 onSelected: _onSelected,
                 selected: const <String>[],
                 groupPeerId: groupPeerId!,
