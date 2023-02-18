@@ -139,7 +139,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
         builder:
             (BuildContext context, List<String> groupMembers, Widget? child) {
           return LinkmanGroupSearchWidget(
-            selectType: SelectType.multiSmartSelectField,
+            selectType: SelectType.chipMultiSelect,
             onSelected: (List<String>? selected) async {
               if (selected != null) {
                 this.groupMembers.value = selected;
@@ -160,20 +160,19 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
         valueListenable: groupOwnerChoices,
         builder: (BuildContext context, List<Option<String>> groupOwnerChoices,
             Widget? child) {
-          return SmartSelectUtil.single<String>(
+          return DataListSingleSelect(
             title: 'GroupOwnerPeer',
-            placeholder: 'Select one linkman',
-            onChange: (selected) {
+            onChanged: (selected) {
               group.value.groupOwnerPeerId = selected;
             },
-            items: this.groupOwnerChoices.value,
+            // items: this.groupOwnerChoices.value,
             // chipOnDelete: (i) {
             //   groupOwnerPeerId.value = '';
             //   if (group != null) {
             //     group!.groupOwnerPeerId = null;
             //   }
             // },
-            selectedValue: group.value.groupOwnerPeerId ?? '',
+            // selectedValue: group.value.groupOwnerPeerId ?? '',
           );
         });
     return selector;

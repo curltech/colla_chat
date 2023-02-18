@@ -1,5 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
@@ -26,22 +27,25 @@ class _BrightnessPickerState extends State<BrightnessPicker> {
 
   //群主选择界面
   Widget _buildSelectWidget(BuildContext context) {
-    List<Option<ThemeMode>> themeModeChoices = [];
+    List<Option<String>> themeModeOptions = [];
     for (var themeModeOption in ThemeMode.values) {
-      Option<ThemeMode> item =
-          Option<ThemeMode>(themeModeOption.name, themeModeOption);
-      themeModeChoices.add(item);
+      Option<String> option =
+          Option<String>(themeModeOption.name, themeModeOption.name);
+
+      if (myself.themeMode.name == option.value) {
+        option.checked = true;
+      }
+      themeModeOptions.add(option);
     }
-    return SmartSelectUtil.single<ThemeMode>(
+    return CustomSingleSelectField(
       title: 'Brightness',
-      placeholder: 'Select one brightness',
-      onChange: (selected) {
+      onChanged: (selected) {
         if (selected != null) {
-          myself.themeMode = selected;
+          myself.themeMode =
+              StringUtil.enumFromString(ThemeMode.values, selected)!;
         }
       },
-      items: themeModeChoices,
-      selectedValue: myself.themeMode,
+      options: themeModeOptions,
     );
   }
 

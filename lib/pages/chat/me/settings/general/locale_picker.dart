@@ -1,5 +1,7 @@
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/locale_util.dart';
+import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
 
@@ -25,16 +27,24 @@ class _LocalePickerState extends State<LocalePicker> {
 
   //群主选择界面
   Widget _buildSelectWidget(BuildContext context) {
-    return SmartSelectUtil.single<Locale>(
+    List<Option<String>> options = [];
+    for (var localeOption in localeOptions) {
+      Option<String> option =
+          Option<String>(localeOption.label, localeOption.value.toString());
+
+      if (myself.locale.toString() == option.value) {
+        option.checked = true;
+      }
+      options.add(option);
+    }
+    return CustomSingleSelectField(
       title: 'Locale',
-      placeholder: 'Select one locale',
-      onChange: (selected) {
+      onChanged: (selected) {
         if (selected != null) {
-          myself.locale = selected;
+          myself.locale = LocaleUtil.getLocale(selected);
         }
       },
-      items: localeOptions,
-      selectedValue: myself.locale,
+      options: options,
     );
   }
 

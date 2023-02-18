@@ -18,11 +18,13 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
   String _wsConnectAddress = '';
   final TextEditingController _wsConnectAddressController =
       TextEditingController();
+  final OptionController optionController = OptionController();
 
   @override
   void initState() {
     super.initState();
     peerEndpointController.addListener(_update);
+    optionController.addListener(_update);
     var defaultPeerEndpoint = peerEndpointController.defaultPeerEndpoint;
     if (defaultPeerEndpoint != null) {
       var wsConnectAddress = defaultPeerEndpoint.wsConnectAddress;
@@ -32,6 +34,17 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
       _wsConnectAddressController.text = _wsConnectAddress;
       _peerId = defaultPeerEndpoint.peerId;
     }
+    List<Option<String>> addressOptions = [];
+    var peerEndpoints = peerEndpointController.data;
+    for (var peerEndpoint in peerEndpoints) {
+      Option<String> item =
+          Option<String>(peerEndpoint.name, peerEndpoint.peerId);
+      if (defaultPeerEndpoint?.peerId == peerEndpoint.peerId) {
+        item.checked = true;
+      }
+      addressOptions.add(item);
+    }
+    optionController.options = addressOptions;
   }
 
   _update() {
@@ -40,23 +53,16 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
 
   //群主选择界面
   Widget _buildSelectWidget(BuildContext context) {
-    List<Option<String>>? addressChoices = [];
-    var peerEndpoints = peerEndpointController.data;
-    for (var peerEndpoint in peerEndpoints) {
-      Option<String> item =
-          Option<String>(peerEndpoint.name, peerEndpoint.peerId);
-      addressChoices.add(item);
-    }
-    return SmartSelectUtil.single<String>(
+    return CustomSingleSelectField(
       title: 'Address',
-      placeholder: 'Select one address',
-      onChange: (selected) {
+      optionController: optionController,
+      onChanged: (selected) {
         if (selected != null) {
-          _peerId = selected;
+          optionController.setSelectedChecked(selected, true);
           var peerEndpoints = peerEndpointController.data;
           int i = 0;
           for (var peerEndpoint in peerEndpoints) {
-            if (peerEndpoint.peerId == _peerId) {
+            if (peerEndpoint.peerId == selected) {
               var wsConnectAddress = peerEndpoint.wsConnectAddress;
               wsConnectAddress ??= '';
               _wsConnectAddressController.text = wsConnectAddress;
@@ -67,8 +73,6 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
           }
         }
       },
-      items: addressChoices,
-      selectedValue: _peerId,
     );
   }
 

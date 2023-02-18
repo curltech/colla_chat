@@ -93,7 +93,7 @@ class GroupLinkmanWidget extends StatelessWidget {
           if (options == null) {
             return Container();
           }
-          return ChipMultiSelect(
+          return CustomMultiSelect(
             onConfirm: (selected) {
               onSelected(selected!);
             },
@@ -116,7 +116,7 @@ class GroupLinkmanWidget extends StatelessWidget {
           if (options == null) {
             return Container();
           }
-          return DataListMultiSelect(
+          return CustomMultiSelect(
             onConfirm: (selected) {
               onSelected(selected!);
             },

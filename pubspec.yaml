@@ -99,9 +99,9 @@ dependencies:
   flutter_animate: ^3.0.0
   fluro: ^2.0.3
   flutter_multi_formatter: ^2.5.1
-  flutter_awesome_select: ^6.5.0
+  #flutter_awesome_select: ^6.5.0
   #awesome_select: ^6.0.0
-  multi_select_flutter: ^4.1.2
+  #multi_select_flutter: ^4.1.2
   chips_choice: ^3.0.0
   phone_number: ^1.0.0
   #sim_info: ^0.1.3

@@ -9,4 +9,11 @@ class Option<T> {
 
   Option(this.label, this.value,
       {this.checked = false, this.leading, this.hint});
+
+  Option<T> copy() {
+    Option<T> option =
+        Option<T>(label, value, checked: checked, leading: leading, hint: hint);
+
+    return option;
+  }
 }

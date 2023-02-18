@@ -3,7 +3,6 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/richtext/quill_util.dart';
 import 'package:flutter/material.dart';
-import 'package:visual_editor/documents/models/delta/delta-changes.model.dart';
 import 'package:visual_editor/visual-editor.dart';
 
 //富文本的编辑的页面
@@ -113,11 +112,6 @@ class _VisualRichTextWidgetState extends State<VisualRichTextWidget> {
       var content = JsonUtil.toJson(EMPTY_DELTA_DOC_JSON);
       _controller = EditorController(document: DocumentM.fromJson(content));
     }
-    _controller!.changes.listen((DeltaChangeM deltaChangeM) {
-      if (widget.onStore != null) {
-        widget.onStore!(_controller!.document);
-      }
-    });
   }
 
   @override
