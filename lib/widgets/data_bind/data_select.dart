@@ -5,8 +5,6 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
-import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
-import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -27,22 +25,17 @@ class OptionController with ChangeNotifier {
   setChecked(Option<String> option, bool checked) {
     if (option.checked != checked) {
       option.checked = checked;
-      _options = [..._options];
       notifyListeners();
     }
   }
 
-  setSelectedChecked(String selected, bool checked) {
-    Option<String>? selectedOption;
-    for (var option in _options) {
-      option.checked = false;
-      if (option.value == selected) {
-        selectedOption = option;
+  setSingleChecked(Option<String> option, bool checked) {
+    for (var opt in _options) {
+      if (opt != option) {
+        opt.checked = false;
       }
     }
-    if (selectedOption != null) {
-      setChecked(selectedOption, true);
-    }
+    setChecked(option, checked);
   }
 
   List<Option<String>> get selectedOptions {
@@ -141,18 +134,25 @@ class _DataDropdownButtonState extends State<DataDropdownButton> {
 ///利用DataListView实现的单选对组件类，可以包装到对话框中
 ///利用回调函数onChanged回传选择的值
 class DataListSingleSelect extends StatefulWidget {
+  final List<Option<String>>? options;
   late final OptionController optionController;
   final String? title;
+  final Future<List<Option<String>>> Function(String keyword)? onSearch;
   final Function(String? selected) onChanged;
 
   DataListSingleSelect(
       {Key? key,
+      this.options,
       OptionController? optionController,
       this.title,
+      this.onSearch,
       required this.onChanged})
       : super(key: key) {
     if (optionController == null) {
       this.optionController = OptionController();
+      if (options != null) {
+        this.optionController.options = options!;
+      }
     } else {
       this.optionController = optionController;
     }
@@ -163,56 +163,146 @@ class DataListSingleSelect extends StatefulWidget {
 }
 
 class _DataListSingleSelectState extends State<DataListSingleSelect> {
+  final TextEditingController textController = TextEditingController();
+  ValueNotifier<List<Option<String>>> options =
+      ValueNotifier<List<Option<String>>>(<Option<String>>[]);
+
   @override
   void initState() {
     super.initState();
     widget.optionController.addListener(_update);
+    _search();
   }
 
   _update() {
-    setState(() {});
+    options.value = [...widget.optionController.options];
+  }
+
+  _search() async {
+    if (widget.onSearch != null) {
+      List<Option<String>> options =
+          await widget.onSearch!(textController.text);
+      widget.optionController.options = options;
+    } else {
+      _update();
+    }
+  }
+
+  Widget _buildSearchTextField(BuildContext context) {
+    var searchTextField = TextFormField(
+      autofocus: true,
+      controller: textController,
+      keyboardType: TextInputType.text,
+      decoration: InputDecoration(
+        fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
+        filled: true,
+        border: InputBorder.none,
+        focusedBorder: InputBorder.none,
+        enabledBorder: InputBorder.none,
+        errorBorder: InputBorder.none,
+        disabledBorder: InputBorder.none,
+        focusedErrorBorder: InputBorder.none,
+        suffixIcon: IconButton(
+          onPressed: () async {
+            await _search();
+          },
+          icon: Icon(
+            Icons.search,
+            color: myself.primary,
+          ),
+        ),
+      ),
+      onChanged: (String? value) async {
+        await _search();
+      },
+      onEditingComplete: () async {
+        await _search();
+      },
+      onFieldSubmitted: (String? value) async {
+        await _search();
+      },
+    );
+
+    return searchTextField;
   }
 
   /// 简单多选对话框，使用时外部用对话框包裹
   Widget _buildDialogWidget(BuildContext context, Widget child) {
     Widget selector = child;
+    List<Widget> children = [];
     if (StringUtil.isNotEmpty(widget.title)) {
-      var size = MediaQuery.of(context).size;
-      selector = Center(
-          child: Container(
-        color: Colors.white,
-        width: size.width * 0.9,
-        height: size.height * 0.9,
-        alignment: Alignment.center,
-        child: Column(children: [
-          AppBarWidget.buildTitleBar(
-              title: Text(
-            AppLocalizations.t(widget.title ?? ''),
-            style: const TextStyle(fontSize: 16, color: Colors.white),
-          )),
-          const SizedBox(
-            height: 10,
-          ),
-          Expanded(child: selector),
-        ]),
-      ));
+      children.add(
+        AppBarWidget.buildTitleBar(
+            title: Text(
+          AppLocalizations.t(widget.title ?? ''),
+          style: const TextStyle(fontSize: 16, color: Colors.white),
+        )),
+      );
+      children.add(
+        const SizedBox(
+          height: 10,
+        ),
+      );
     }
+    if (widget.onSearch != null) {
+      children.add(
+        Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            child: _buildSearchTextField(context)),
+      );
+      children.add(
+        const SizedBox(
+          height: 10,
+        ),
+      );
+    }
+    children.add(
+      Expanded(child: selector),
+    );
+    var size = MediaQuery.of(context).size;
+    selector = Center(
+        child: Container(
+      color: Colors.white,
+      width: size.width * 0.9,
+      height: size.height * 0.9,
+      alignment: Alignment.center,
+      child: Column(children: children),
+    ));
     return selector;
   }
 
   Widget _buildDataListView(BuildContext context) {
-    List<TileData> tileData = [];
-    for (var item in widget.optionController.options) {
-      var label = AppLocalizations.t(item.label);
-      var tile =
-          TileData(title: label, subtitle: item.value, prefix: item.leading);
-      tileData.add(tile);
-    }
-    return DataListView(tileData: tileData, onTap: _onTap);
-  }
+    return ValueListenableBuilder(
+        valueListenable: options,
+        builder: (BuildContext context, List<Option<String>> options,
+            Widget? child) {
+          return ListView.builder(
+              //采用options本地的变量，不影响控制器的数据，只有确认按钮才会影响控制器数据
+              shrinkWrap: true,
+              itemCount: options.length,
+              //physics: const NeverScrollableScrollPhysics(),
+              controller: ScrollController(),
+              itemBuilder: (BuildContext context, int index) {
+                Option<String> option = options[index];
 
-  _onTap(int index, String title, {String? subtitle, TileData? group}) {
-    widget.onChanged(subtitle);
+                Widget tileWidget = RadioListTile<bool>(
+                  groupValue: true,
+                  title: Text(option.label),
+                  secondary: option.leading!,
+                  controlAffinity: ListTileControlAffinity.trailing,
+                  activeColor: myself.primary,
+                  selected: option.checked,
+                  value: option.checked,
+                  onChanged: (bool? value) {
+                    //通知本地变量的改变，刷新界面RadioListTile
+                    widget.optionController.setSingleChecked(option, !value!);
+                    widget.onChanged(option.value);
+                  },
+                );
+
+                return tileWidget;
+              });
+        });
   }
 
   @override
@@ -230,9 +320,9 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
 }
 
 class CustomSingleSelectField extends StatefulWidget {
-  late final OptionController optionController;
   final List<Option<String>>? options;
-  final Function(List<String>? value)? onConfirm;
+  late final OptionController optionController;
+  final Future<List<Option<String>>> Function(String keyword)? onSearch;
   final String title;
   final Widget? prefix;
   final Widget? suffix;
@@ -241,13 +331,13 @@ class CustomSingleSelectField extends StatefulWidget {
 
   CustomSingleSelectField({
     Key? key,
-    OptionController? optionController,
     this.options,
-    this.onConfirm,
+    OptionController? optionController,
     required this.title,
     this.prefix,
     this.suffix,
     this.selectType = SelectType.chipMultiSelect,
+    this.onSearch,
     required this.onChanged,
   }) : super(key: key) {
     if (optionController == null) {
@@ -267,18 +357,20 @@ class CustomSingleSelectField extends StatefulWidget {
 class _CustomSingleSelectFieldState extends State<CustomSingleSelectField> {
   TextEditingController textEditingController = TextEditingController();
 
-  ValueNotifier<List<Option<String>>> options =
-      ValueNotifier<List<Option<String>>>(<Option<String>>[]);
-
   @override
   void initState() {
     super.initState();
     widget.optionController.addListener(_update);
-    _update();
   }
 
   _update() {
-    options.value = [...widget.optionController.options];
+    for (var option in widget.optionController.options) {
+      if (option.checked) {
+        textEditingController.text = option.label;
+        return;
+      }
+    }
+    textEditingController.text = '';
   }
 
   Widget _buildSingleSelectField(BuildContext context) {
@@ -289,9 +381,9 @@ class _CustomSingleSelectFieldState extends State<CustomSingleSelectField> {
         );
     return TextFormField(
       controller: textEditingController,
+      readOnly: true,
       keyboardType: TextInputType.text,
       minLines: 1,
-      initialValue: '',
       decoration: InputDecoration(
         labelText: AppLocalizations.t(widget.title ?? ''),
         fillColor: Colors.grey.withOpacity(AppOpacity.xlOpacity),
@@ -312,6 +404,7 @@ class _CustomSingleSelectFieldState extends State<CustomSingleSelectField> {
                     return DataListSingleSelect(
                       title: widget.title,
                       optionController: widget.optionController,
+                      onSearch: widget.onSearch,
                       onChanged: (String? selected) {
                         Navigator.pop(
                           context,
@@ -321,6 +414,13 @@ class _CustomSingleSelectFieldState extends State<CustomSingleSelectField> {
                     );
                   });
               widget.onChanged(selected);
+              for (var option in widget.optionController.options) {
+                selected = selected ?? '';
+                if (option.value == selected) {
+                  textEditingController.text = option.label;
+                  break;
+                }
+              }
             }),
       ),
     );
@@ -341,26 +441,36 @@ class _CustomSingleSelectFieldState extends State<CustomSingleSelectField> {
 enum SelectType {
   dataListMultiSelect, //多选对话框
   chipMultiSelect, //多选对话框
+  dataListMultiSelectField, //多选对话框
+  chipMultiSelectField, //多选对话框
   singleSelect, //单选对话框
+  singleSelectField,
 }
 
 ///利用Chip实现的多选对组件类，可以包装到对话框中
 ///利用回调函数onConfirm回传选择的值
 class CustomMultiSelect extends StatefulWidget {
+  final List<Option<String>>? options;
   late final OptionController optionController;
+  final Future<List<Option<String>>> Function(String keyword)? onSearch;
   final Function(List<String>? selected) onConfirm;
   final String? title;
   final SelectType selectType;
 
   CustomMultiSelect({
     Key? key,
+    this.options,
     OptionController? optionController,
     required this.onConfirm,
+    this.onSearch,
     this.title,
     this.selectType = SelectType.chipMultiSelect,
   }) : super(key: key) {
     if (optionController == null) {
       this.optionController = OptionController();
+      if (options != null) {
+        this.optionController.options = options!;
+      }
     } else {
       this.optionController = optionController;
     }
@@ -371,6 +481,8 @@ class CustomMultiSelect extends StatefulWidget {
 }
 
 class _CustomMultiSelectState extends State<CustomMultiSelect> {
+  final TextEditingController textController = TextEditingController();
+
   ValueNotifier<List<Option<String>>> options =
       ValueNotifier<List<Option<String>>>(<Option<String>>[]);
 
@@ -378,11 +490,57 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
   void initState() {
     super.initState();
     widget.optionController.addListener(_update);
-    _update();
+    _search();
   }
 
   _update() {
     options.value = widget.optionController.copy();
+  }
+
+  _search() async {
+    if (widget.onSearch != null) {
+      List<Option<String>> options =
+          await widget.onSearch!(textController.text);
+      widget.optionController.options = options;
+    }
+  }
+
+  Widget _buildSearchTextField(BuildContext context) {
+    var searchTextField = TextFormField(
+      autofocus: true,
+      controller: textController,
+      keyboardType: TextInputType.text,
+      decoration: InputDecoration(
+        fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
+        filled: true,
+        border: InputBorder.none,
+        focusedBorder: InputBorder.none,
+        enabledBorder: InputBorder.none,
+        errorBorder: InputBorder.none,
+        disabledBorder: InputBorder.none,
+        focusedErrorBorder: InputBorder.none,
+        suffixIcon: IconButton(
+          onPressed: () async {
+            await _search();
+          },
+          icon: Icon(
+            Icons.search,
+            color: myself.primary,
+          ),
+        ),
+      ),
+      onChanged: (String? value) async {
+        await _search();
+      },
+      onEditingComplete: () async {
+        await _search();
+      },
+      onFieldSubmitted: (String? value) async {
+        await _search();
+      },
+    );
+
+    return searchTextField;
   }
 
   Widget _buildChipView(BuildContext context) {
@@ -443,7 +601,9 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
                 Widget tileWidget = CheckboxListTile(
                   title: Text(option.label),
                   secondary: option.leading!,
+                  controlAffinity: ListTileControlAffinity.trailing,
                   value: option.checked,
+                  selected: option.checked,
                   onChanged: (bool? value) {
                     option.checked = value!;
                     //通知本地变量的改变，刷新界面CheckboxListTile
@@ -459,27 +619,45 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
   /// 简单多选对话框，使用时外部用对话框包裹
   Widget _buildDialogWidget(BuildContext context, Widget child) {
     Widget selector = child;
+    List<Widget> children = [];
     if (StringUtil.isNotEmpty(widget.title)) {
-      var size = MediaQuery.of(context).size;
-      selector = Center(
-          child: Container(
-        color: Colors.white,
-        width: size.width * 0.9,
-        height: size.height * 0.9,
-        alignment: Alignment.center,
-        child: Column(children: [
-          AppBarWidget.buildTitleBar(
-              title: Text(
-            AppLocalizations.t(widget.title ?? ''),
-            style: const TextStyle(fontSize: 16, color: Colors.white),
-          )),
-          const SizedBox(
-            height: 10,
-          ),
-          Expanded(child: selector),
-        ]),
-      ));
+      children.add(
+        AppBarWidget.buildTitleBar(
+            title: Text(
+          AppLocalizations.t(widget.title ?? ''),
+          style: const TextStyle(fontSize: 16, color: Colors.white),
+        )),
+      );
+      children.add(
+        const SizedBox(
+          height: 10,
+        ),
+      );
     }
+    if (widget.onSearch != null) {
+      children.add(
+        Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            child: _buildSearchTextField(context)),
+      );
+      children.add(
+        const SizedBox(
+          height: 10,
+        ),
+      );
+    }
+    children.add(
+      Expanded(child: selector),
+    );
+    var size = MediaQuery.of(context).size;
+    selector = Center(
+        child: Container(
+      color: Colors.white,
+      width: size.width * 0.9,
+      height: size.height * 0.9,
+      alignment: Alignment.center,
+      child: Column(children: children),
+    ));
     return selector;
   }
 
@@ -527,34 +705,32 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
 ///利用Chip实现的多选字段组件类，将ChipMultiSelect包装到对话框中
 ///利用回调函数onConfirm回传选择的值
 class CustomMultiSelectField extends StatefulWidget {
-  late final OptionController optionController;
+  final List<Option<String>>? options;
+  final Future<List<Option<String>>> Function(String keyword)? onSearch;
   final Function(List<String>? value)? onConfirm;
   final String title;
   final Widget? prefix;
   final Widget? suffix;
   final SelectType selectType;
 
-  CustomMultiSelectField(
+  const CustomMultiSelectField(
       {Key? key,
+      this.options,
       OptionController? optionController,
+      required this.onSearch,
       this.onConfirm,
       required this.title,
       this.prefix,
       this.suffix,
       this.selectType = SelectType.chipMultiSelect})
-      : super(key: key) {
-    if (optionController == null) {
-      this.optionController = OptionController();
-    } else {
-      this.optionController = optionController;
-    }
-  }
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _CustomMultiSelectFieldState();
 }
 
 class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
+  final OptionController optionController = OptionController();
   ValueNotifier<List<Option<String>>> options =
       ValueNotifier<List<Option<String>>>(<Option<String>>[]);
   ValueNotifier<bool> chipVisible = ValueNotifier<bool>(false);
@@ -562,12 +738,14 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
   @override
   void initState() {
     super.initState();
-    widget.optionController.addListener(_update);
-    _update();
+    optionController.addListener(_update);
+    if (widget.options != null) {
+      optionController.options = widget.options!;
+    }
   }
 
   _update() {
-    options.value = [...widget.optionController.options];
+    options.value = [...optionController.options];
   }
 
   Widget _buildSelectedChips(BuildContext context) {
@@ -576,7 +754,7 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
         builder: (BuildContext context, List<Option<String>> options,
             Widget? child) {
           List<Chip> chips = [];
-          for (var option in widget.optionController.options) {
+          for (var option in optionController.options) {
             if (option.checked) {
               var chip = Chip(
                 label: Text(
@@ -587,7 +765,7 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
                 backgroundColor: Colors.white,
                 deleteIconColor: myself.primary,
                 onDeleted: () {
-                  widget.optionController.setChecked(option, false);
+                  optionController.setChecked(option, false);
                 },
               );
               chips.add(chip);
@@ -622,8 +800,10 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
               builder: (BuildContext context) {
                 return CustomMultiSelect(
                   title: widget.title,
+                  options: widget.options,
                   selectType: widget.selectType,
-                  optionController: widget.optionController,
+                  optionController: optionController,
+                  onSearch: widget.onSearch,
                   onConfirm: (List<String>? selected) {
                     Navigator.pop(
                       context,
@@ -663,7 +843,7 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
 
   @override
   void dispose() {
-    widget.optionController.removeListener(_update);
+    optionController.removeListener(_update);
     super.dispose();
   }
 }

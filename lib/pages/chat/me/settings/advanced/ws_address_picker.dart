@@ -15,50 +15,47 @@ class WsAddressPicker extends StatefulWidget {
 
 class _WsAddressPickerState extends State<WsAddressPicker> {
   String _peerId = '';
+  List<Option<String>> addressOptions = [];
   String _wsConnectAddress = '';
   final TextEditingController _wsConnectAddressController =
       TextEditingController();
-  final OptionController optionController = OptionController();
 
   @override
   void initState() {
     super.initState();
     peerEndpointController.addListener(_update);
-    optionController.addListener(_update);
-    var defaultPeerEndpoint = peerEndpointController.defaultPeerEndpoint;
-    if (defaultPeerEndpoint != null) {
-      var wsConnectAddress = defaultPeerEndpoint.wsConnectAddress;
-      if (wsConnectAddress != null) {
-        _wsConnectAddress = wsConnectAddress;
-      }
-      _wsConnectAddressController.text = _wsConnectAddress;
-      _peerId = defaultPeerEndpoint.peerId;
-    }
-    List<Option<String>> addressOptions = [];
-    var peerEndpoints = peerEndpointController.data;
-    for (var peerEndpoint in peerEndpoints) {
-      Option<String> item =
-          Option<String>(peerEndpoint.name, peerEndpoint.peerId);
-      if (defaultPeerEndpoint?.peerId == peerEndpoint.peerId) {
-        item.checked = true;
-      }
-      addressOptions.add(item);
-    }
-    optionController.options = addressOptions;
   }
 
   _update() {
-    setState(() {});
+    setState(() {
+      var defaultPeerEndpoint = peerEndpointController.defaultPeerEndpoint;
+      if (defaultPeerEndpoint != null) {
+        var wsConnectAddress = defaultPeerEndpoint.wsConnectAddress;
+        if (wsConnectAddress != null) {
+          _wsConnectAddress = wsConnectAddress;
+        }
+        _wsConnectAddressController.text = _wsConnectAddress;
+        _peerId = defaultPeerEndpoint.peerId;
+      }
+      var peerEndpoints = peerEndpointController.data;
+      for (var peerEndpoint in peerEndpoints) {
+        Option<String> option =
+            Option<String>(peerEndpoint.name, peerEndpoint.peerId);
+        if (defaultPeerEndpoint?.peerId == peerEndpoint.peerId) {
+          option.checked = true;
+        }
+        addressOptions.add(option);
+      }
+    });
   }
 
   //群主选择界面
   Widget _buildSelectWidget(BuildContext context) {
     return CustomSingleSelectField(
       title: 'Address',
-      optionController: optionController,
+      options: addressOptions,
       onChanged: (selected) {
         if (selected != null) {
-          optionController.setSelectedChecked(selected, true);
           var peerEndpoints = peerEndpointController.data;
           int i = 0;
           for (var peerEndpoint in peerEndpoints) {

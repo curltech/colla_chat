@@ -20,7 +20,7 @@ class BackgroundSelector extends StatelessWidget {
           fit: BoxFit.fill,
         ),
       ),
-      onTap: () => DialogUtil.showToast(AppLocalizations.t('Please waiting')),
+      //onTap: () => DialogUtil.showToast(AppLocalizations.t('Please waiting')),
     );
   }
 

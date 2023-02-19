@@ -121,7 +121,7 @@ dependencies:
   #pluto_grid_export: ^1.0.2
   flutter_neumorphic: ^3.2.0
   fl_chart: ^0.50.5
-  toast: ^0.3.0 #toast提示框
+  fluttertoast: 8.1.2
   extended_text: ^9.1.2 #文本扩展显示
   extended_text_field: ^10.2.0 #文字表情混入
   extended_text_library: ^9.1.0 #Flutter2.5用这个,,其他可注释

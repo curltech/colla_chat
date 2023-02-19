@@ -60,11 +60,13 @@ class LinkmanGroupEditWidget extends StatefulWidget with TileDataMixin {
 class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
   TextEditingController controller = TextEditingController();
 
+  OptionController groupOwnerController = OptionController();
+
   //选择的群成员
   ValueNotifier<List<String>> groupMembers = ValueNotifier([]);
 
   //群主的选项
-  ValueNotifier<List<Option<String>>> groupOwnerChoices = ValueNotifier([]);
+  // ValueNotifier<List<Option<String>>> groupOwnerOptions = ValueNotifier([]);
 
   //当前群
   ValueNotifier<Group> group = ValueNotifier(Group('', ''));
@@ -97,14 +99,14 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
         }
       }
       this.groupMembers.value = groupMembers;
-      await _buildGroupOwnerChoices(groupMembers);
+      await _buildGroupOwnerOptions(groupMembers);
     }
   }
 
   //更新groupOwnerChoices
-  _buildGroupOwnerChoices(List<String> selected) async {
+  _buildGroupOwnerOptions(List<String> selected) async {
     group.value.groupOwnerPeerId ??= myself.peerId;
-    List<Option<String>> groupOwnerChoices = [];
+    List<Option<String>> groupOwnerOptions = [];
     if (selected.isNotEmpty) {
       for (String groupMemberId in selected) {
         Linkman? linkman =
@@ -117,9 +119,9 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
               checked = true;
             }
           }
-          Option<String> item =
-              Option<String>(linkman.name, linkman.peerId, checked: checked);
-          groupOwnerChoices.add(item);
+          Option<String> option = Option<String>(linkman.name, linkman.peerId,
+              checked: checked, leading: linkman.avatarImage);
+          groupOwnerOptions.add(option);
         } else {
           logger.e('Group member $groupMemberId is not linkman');
           if (mounted) {
@@ -129,7 +131,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
         }
       }
     }
-    this.groupOwnerChoices.value = groupOwnerChoices;
+    groupOwnerController.options = groupOwnerOptions;
   }
 
   //群成员显示和编辑界面
@@ -139,11 +141,11 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
         builder:
             (BuildContext context, List<String> groupMembers, Widget? child) {
           return LinkmanGroupSearchWidget(
-            selectType: SelectType.chipMultiSelect,
+            selectType: SelectType.dataListMultiSelectField,
             onSelected: (List<String>? selected) async {
               if (selected != null) {
                 this.groupMembers.value = selected;
-                await _buildGroupOwnerChoices(selected);
+                await _buildGroupOwnerOptions(selected);
               }
             },
             selected: this.groupMembers.value,
@@ -156,25 +158,12 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
 
   //群主选择界面
   Widget _buildGroupOwnerWidget(BuildContext context) {
-    var selector = ValueListenableBuilder(
-        valueListenable: groupOwnerChoices,
-        builder: (BuildContext context, List<Option<String>> groupOwnerChoices,
-            Widget? child) {
-          return DataListSingleSelect(
-            title: 'GroupOwnerPeer',
-            onChanged: (selected) {
-              group.value.groupOwnerPeerId = selected;
-            },
-            // items: this.groupOwnerChoices.value,
-            // chipOnDelete: (i) {
-            //   groupOwnerPeerId.value = '';
-            //   if (group != null) {
-            //     group!.groupOwnerPeerId = null;
-            //   }
-            // },
-            // selectedValue: group.value.groupOwnerPeerId ?? '',
-          );
-        });
+    var selector = CustomSingleSelectField(
+        title: 'GroupOwnerPeer',
+        onChanged: (selected) {
+          group.value.groupOwnerPeerId = selected;
+        },
+        optionController: groupOwnerController);
     return selector;
   }
 

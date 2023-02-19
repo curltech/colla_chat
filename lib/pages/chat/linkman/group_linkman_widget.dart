@@ -1,9 +1,6 @@
 import 'package:colla_chat/entity/chat/group.dart';
-import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
-import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +12,6 @@ class GroupLinkmanWidget extends StatelessWidget {
   final SelectType selectType;
   final String groupPeerId;
   String? title;
-  final OptionController optionController = OptionController();
 
   GroupLinkmanWidget({
     Key? key,
@@ -23,7 +19,6 @@ class GroupLinkmanWidget extends StatelessWidget {
     required this.selected,
     this.selectType = SelectType.chipMultiSelect,
     required this.groupPeerId,
-    this.title,
   }) : super(key: key);
 
   Future<String?> _findGroupName() async {
@@ -50,33 +45,8 @@ class GroupLinkmanWidget extends StatelessWidget {
         options.add(item);
       }
     }
-    optionController.options = options;
 
     return options;
-  }
-
-  /// 简单多选对话框，使用时外部用对话框包裹
-  Widget _buildDialogWidget(BuildContext context, Widget child) {
-    var size = MediaQuery.of(context).size;
-    var selector = Center(
-        child: Container(
-      color: Colors.white,
-      width: size.width * 0.9,
-      height: size.height * 0.9,
-      alignment: Alignment.center,
-      child: Column(children: [
-        AppBarWidget.buildTitleBar(
-            title: Text(
-          AppLocalizations.t(title!),
-          style: const TextStyle(fontSize: 16, color: Colors.white),
-        )),
-        const SizedBox(
-          height: 10,
-        ),
-        Expanded(child: child),
-      ]),
-    ));
-    return selector;
   }
 
   /// 简单多选对话框的形式，内含一个搜索字段和多选，使用时外部用对话框包裹
@@ -94,10 +64,11 @@ class GroupLinkmanWidget extends StatelessWidget {
             return Container();
           }
           return CustomMultiSelect(
+            title: title,
             onConfirm: (selected) {
               onSelected(selected!);
             },
-            optionController: optionController,
+            options: options,
           );
         });
     return selector;
@@ -117,10 +88,11 @@ class GroupLinkmanWidget extends StatelessWidget {
             return Container();
           }
           return CustomMultiSelect(
+            title: title,
             onConfirm: (selected) {
               onSelected(selected!);
             },
-            optionController: optionController,
+            options: options,
           );
         });
     return selector;
@@ -141,7 +113,8 @@ class GroupLinkmanWidget extends StatelessWidget {
             return Container();
           }
           return DataListSingleSelect(
-            optionController: optionController,
+            title: title,
+            options: options,
             onChanged: (String? value) {
               onSelected([value!]);
             },
@@ -155,18 +128,16 @@ class GroupLinkmanWidget extends StatelessWidget {
     Widget selector;
     switch (selectType) {
       case SelectType.dataListMultiSelect:
-        selector =
-            _buildDialogWidget(context, _buildDataListMultiSelect(context));
+        selector = _buildDataListMultiSelect(context);
         break;
       case SelectType.chipMultiSelect:
-        selector = _buildDialogWidget(context, _buildChipMultiSelect(context));
+        selector = _buildChipMultiSelect(context);
         break;
       case SelectType.singleSelect:
-        selector =
-            _buildDialogWidget(context, _buildDataListSingleSelect(context));
+        selector = _buildDataListSingleSelect(context);
         break;
       default:
-        selector = _buildDialogWidget(context, _buildChipMultiSelect(context));
+        selector = _buildChipMultiSelect(context);
     }
     return selector;
   }

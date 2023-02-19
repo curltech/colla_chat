@@ -2,7 +2,6 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
-import 'package:toast/toast.dart';
 
 class DialogUtil {
   ///利用Option产生的SelectDialog
@@ -260,7 +259,7 @@ class DialogUtil {
     return showBottomSheet<T>(context: context, builder: builder);
   }
 
-  static showToast(String msg, {int duration = 1, int gravity = 0}) {
-    Toast.show(AppLocalizations.t(msg), duration: duration, gravity: gravity);
-  }
+  // static showToast(String msg, {int duration = 1, int gravity = 0}) {
+  //   Toast.show(AppLocalizations.t(msg), duration: duration, gravity: gravity);
+  // }
 }
