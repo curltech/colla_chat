@@ -61,6 +61,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
         onPressed: () {
           myselfPeerService.logout();
           indexWidgetProvider.pop(context: context);
+          indexWidgetProvider.currentMainIndex = 0;
           Application.router
               .navigateTo(context, Application.p2pLogin, replace: true);
         },
