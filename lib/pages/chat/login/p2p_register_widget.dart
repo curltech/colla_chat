@@ -30,13 +30,13 @@ final List<ColumnFieldDef> p2pRegisterInputFieldDef = [
       name: 'plainPassword',
       label: 'PlainPassword',
       inputType: InputType.password,
-      initValue: '123456',
+      initValue: '1234',
       prefixIcon: const Icon(Icons.password)),
   ColumnFieldDef(
       name: 'confirmPassword',
       label: 'ConfirmPassword',
       inputType: InputType.password,
-      initValue: '123456',
+      initValue: '1234',
       prefixIcon: const Icon(Icons.confirmation_num))
 ];
 
