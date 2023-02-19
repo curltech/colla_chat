@@ -24,28 +24,35 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
   void initState() {
     super.initState();
     peerEndpointController.addListener(_update);
+    _init();
+  }
+
+  _init() {
+    var defaultPeerEndpoint = peerEndpointController.defaultPeerEndpoint;
+    if (defaultPeerEndpoint != null) {
+      var wsConnectAddress = defaultPeerEndpoint.wsConnectAddress;
+      if (wsConnectAddress != null) {
+        _wsConnectAddress = wsConnectAddress;
+      }
+      _wsConnectAddressController.text = _wsConnectAddress;
+      _peerId = defaultPeerEndpoint.peerId;
+    }
+    var peerEndpoints = peerEndpointController.data;
+    List<Option<String>> addressOptions = [];
+    for (var peerEndpoint in peerEndpoints) {
+      Option<String> option =
+          Option<String>(peerEndpoint.name, peerEndpoint.peerId);
+      if (defaultPeerEndpoint?.peerId == peerEndpoint.peerId) {
+        option.checked = true;
+      }
+      addressOptions.add(option);
+    }
+    this.addressOptions = addressOptions;
   }
 
   _update() {
     setState(() {
-      var defaultPeerEndpoint = peerEndpointController.defaultPeerEndpoint;
-      if (defaultPeerEndpoint != null) {
-        var wsConnectAddress = defaultPeerEndpoint.wsConnectAddress;
-        if (wsConnectAddress != null) {
-          _wsConnectAddress = wsConnectAddress;
-        }
-        _wsConnectAddressController.text = _wsConnectAddress;
-        _peerId = defaultPeerEndpoint.peerId;
-      }
-      var peerEndpoints = peerEndpointController.data;
-      for (var peerEndpoint in peerEndpoints) {
-        Option<String> option =
-            Option<String>(peerEndpoint.name, peerEndpoint.peerId);
-        if (defaultPeerEndpoint?.peerId == peerEndpoint.peerId) {
-          option.checked = true;
-        }
-        addressOptions.add(option);
-      }
+      _init();
     });
   }
 

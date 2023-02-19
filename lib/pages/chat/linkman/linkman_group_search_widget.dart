@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
@@ -87,7 +88,10 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
   Widget _buildChipMultiSelectField(BuildContext context) {
     var selector = CustomMultiSelectField(
       title: title,
-      prefix: const Icon(Icons.person_add),
+      prefix: Icon(
+        Icons.person_add,
+        color: myself.primary,
+      ),
       onSearch: _onSearch,
       onConfirm: (selected) {
         widget.onSelected(selected);
@@ -101,7 +105,10 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
   Widget _buildDataListMultiSelectField(BuildContext context) {
     var selector = CustomMultiSelectField(
       title: title,
-      prefix: const Icon(Icons.person_add),
+      prefix: Icon(
+        Icons.person_add,
+        color: myself.primary,
+      ),
       onSearch: _onSearch,
       onConfirm: (selected) {
         widget.onSelected(selected);

@@ -288,7 +288,7 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
                 Widget tileWidget = RadioListTile<bool>(
                   groupValue: true,
                   title: Text(option.label),
-                  secondary: option.leading!,
+                  secondary: option.leading,
                   controlAffinity: ListTileControlAffinity.trailing,
                   activeColor: myself.primary,
                   selected: option.checked,
@@ -377,7 +377,7 @@ class _CustomSingleSelectFieldState extends State<CustomSingleSelectField> {
     var suffix = widget.suffix ??
         Icon(
           Icons.arrow_drop_down,
-          color: myself.secondary,
+          color: Colors.white,
         );
     return TextFormField(
       controller: textEditingController,
@@ -600,7 +600,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
 
                 Widget tileWidget = CheckboxListTile(
                   title: Text(option.label),
-                  secondary: option.leading!,
+                  secondary: option.leading,
                   controlAffinity: ListTileControlAffinity.trailing,
                   value: option.checked,
                   selected: option.checked,
@@ -785,9 +785,9 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
 
   Widget _buildMultiSelectField(BuildContext context) {
     var suffix = widget.suffix ??
-        Icon(
+        const Icon(
           Icons.chevron_right,
-          color: myself.secondary,
+          color: Colors.white,
         );
     return Column(children: [
       ListTile(
