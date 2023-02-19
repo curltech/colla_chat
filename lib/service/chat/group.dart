@@ -331,7 +331,7 @@ class GroupService extends PeerPartyService<Group> {
 
   ///删除群
   removeByGroupPeerId(String peerId) async {
-    await delete(where: 'groupPeerId=?', whereArgs: [peerId]);
+    await delete(where: 'peerId=?', whereArgs: [peerId]);
     groups.remove(peerId);
   }
 }
