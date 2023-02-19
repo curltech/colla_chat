@@ -3,6 +3,7 @@ import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/dht/peerprofile.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/dht/base.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/service/servicelocator.dart';
@@ -110,6 +111,10 @@ class PeerClientService extends PeerEntityService<PeerClient> {
         clientId: peerClient.clientId);
     if (peerClient_ != null) {
       peerClient.id = peerClient_.id;
+      if (myself.peerId == null && peerClient.ownerPeerId == null) {
+        peerClient.ownerPeerId = peerClient_.ownerPeerId;
+        peerClient.ownerPeerId ??= peerClient.peerId;
+      }
       if (!mobile) {
         peerClient.mobile = peerClient_.mobile;
       }
@@ -119,6 +124,15 @@ class PeerClientService extends PeerEntityService<PeerClient> {
       await update(peerClient);
     } else {
       peerClient.id = null;
+      if (!mobile) {
+        peerClient.mobile = null;
+      }
+      if (!email) {
+        peerClient.email = null;
+      }
+      if (myself.peerId == null && peerClient.ownerPeerId == null) {
+        peerClient.ownerPeerId = peerClient.peerId;
+      }
       await insert(peerClient);
     }
     var peerId = peerClient.peerId;

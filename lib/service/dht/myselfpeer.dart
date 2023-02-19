@@ -50,7 +50,8 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       List<PeerClient> peerClients = chainMessage.payload;
       if (peerClients.isNotEmpty) {
         for (var peerClient in peerClients) {
-          await peerClientService.store(peerClient);
+          await peerClientService.store(peerClient,
+              mobile: false, email: false);
         }
       }
     }

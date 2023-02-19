@@ -148,8 +148,6 @@ class LinkmanService extends PeerPartyService<Linkman> {
         linkman.status = linkmanStatus.name;
       }
       linkman.id = null;
-      linkman.email = null;
-      linkman.mobile = null;
       await insert(linkman);
       linkmen[peerId] = linkman;
       await chatSummaryService.upsertByLinkman(linkman);
@@ -246,7 +244,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
   @override
   Future<String> updateAvatar(String peerId, List<int> avatar) async {
     String data = await super.updateAvatar(peerId, avatar);
-    await removeByPeerId(peerId);
+    linkmen.remove(peerId);
 
     return data;
   }
