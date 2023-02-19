@@ -91,7 +91,7 @@ class GroupService extends PeerPartyService<Group> {
         await cryptoGraphy.export(peerPrivateKey, myself.password!.codeUnits);
     group.peerPublicKey = peerId;
     group.peerId = peerId;
-
+    group.groupOwnerPeerId = myself.peerId;
     group.status = EntityStatus.effective.name;
 
     ///加密对应的密钥对x25519
@@ -116,16 +116,7 @@ class GroupService extends PeerPartyService<Group> {
     await upsert(group);
     groups[group.peerId] = group;
     await chatSummaryService.upsertByGroup(group);
-    List<PeerParty> members = group.memberPeers;
-    if (members.isNotEmpty) {
-      for (var member in members) {
-        GroupMember groupMember = GroupMember();
-        groupMember.memberPeerId = member.peerId;
-        groupMember.groupId = group.peerId;
-        groupMember.memberAlias = member.alias;
-        groupMemberService.store(groupMember);
-      }
-    }
+
     return group;
   }
 

@@ -35,7 +35,7 @@ enum CallStatus {
 enum VideoMode {
   linkman, //在单聊的场景下视频通话
   group, //在群聊的场景下视频通话
-  conferencing, //没有在聊天的场景下的视频通话
+  conference, //没有在聊天的场景下的视频通话
 }
 
 ///视频通话的流程，适用单个通话和群
@@ -57,7 +57,7 @@ enum VideoMode {
 class LocalVideoWidget extends StatefulWidget {
   final VideoMode videoMode;
 
-  const LocalVideoWidget({Key? key, this.videoMode = VideoMode.conferencing})
+  const LocalVideoWidget({Key? key, this.videoMode = VideoMode.conference})
       : super(key: key);
 
   @override
@@ -110,7 +110,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   _init() async {
     _buildActionDataAndVisible();
-    if (widget.videoMode == VideoMode.conferencing) {
+    if (widget.videoMode == VideoMode.conference) {
       return;
     }
     ChatSummary? chatSummary = chatMessageController.chatSummary;
@@ -195,7 +195,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///弹出界面，选择参与者，返回房间
   Future<void> _buildConference() async {
     List<String> participants = [myself.peerId!];
-    if (widget.videoMode == VideoMode.conferencing) {
+    if (widget.videoMode == VideoMode.conference) {
       List<String> selected = <String>[];
       await DialogUtil.show(
           context: context,

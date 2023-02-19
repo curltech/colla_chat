@@ -1,5 +1,5 @@
 import 'package:colla_chat/pages/chat/me/collection/collection_list_widget.dart';
-import 'package:colla_chat/pages/chat/me/conference/video_conference_widget.dart';
+import 'package:colla_chat/pages/chat/me/conference/conference_list_widget.dart';
 import 'package:colla_chat/pages/chat/me/mail/mail_widget.dart';
 import 'package:colla_chat/pages/chat/me/me_head_widget.dart';
 import 'package:colla_chat/pages/chat/me/media/media_widget.dart';
@@ -23,8 +23,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   final WebrtcWidget webrtcWidget = WebrtcWidget();
   final MediaWidget mediaWidget = MediaWidget();
   final PlatformWebViewWidget webViewWidget = PlatformWebViewWidget();
-  final VideoConferenceWidget videoConferenceWidget =
-      const VideoConferenceWidget();
+  final ConferenceListWidget conferenceListWidget = ConferenceListWidget();
 
   late final List<TileData> meTileData;
 
@@ -36,7 +35,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(webrtcWidget);
     indexWidgetProvider.define(webViewWidget);
     indexWidgetProvider.define(mediaWidget);
-    indexWidgetProvider.define(videoConferenceWidget);
+    indexWidgetProvider.define(conferenceListWidget);
     List<TileDataMixin> mixins = [
       settingWidget,
       collectionListWidget,
@@ -44,7 +43,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
       webrtcWidget,
       mediaWidget,
       webViewWidget,
-      videoConferenceWidget
+      conferenceListWidget
     ];
     meTileData = TileData.from(mixins);
     for (var tile in meTileData) {

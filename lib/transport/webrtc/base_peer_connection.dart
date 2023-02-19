@@ -25,10 +25,11 @@ class SignalExtension {
     name = json['name'];
     Map<String, dynamic>? conference = json['conference'];
     if (conference != null) {
-      this.conference = Conference(conference['conferenceId'],
-          name: conference['name'],
-          peerId: conference['peerId'],
-          identity: conference['identity']);
+      this.conference = Conference(
+        conference['conferenceId'],
+        name: conference['name'],
+        conferenceOwnerPeerId: conference['conferenceOwnerPeerId'],
+      );
     }
     var iceServers = json['iceServers'];
     if (iceServers != null) {

@@ -24,13 +24,13 @@ class VideoConferenceWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  String get routeName => 'video_conferencing';
+  String get routeName => 'video_conference';
 
   @override
   IconData get iconData => Icons.video_camera_back;
 
   @override
-  String get title => 'VideoConferencing';
+  String get title => 'VideoConference';
 }
 
 class _VideoConferenceWidgetState extends State<VideoConferenceWidget> {
@@ -48,7 +48,7 @@ class _VideoConferenceWidgetState extends State<VideoConferenceWidget> {
     if (overlayEntry != null) {
       overlayEntry!.remove();
       overlayEntry = null;
-      indexWidgetProvider.push('video_conferencing');
+      indexWidgetProvider.push('video_conference');
     }
   }
 
@@ -83,7 +83,7 @@ class _VideoConferenceWidgetState extends State<VideoConferenceWidget> {
           if (conferenceId != null) {
             view = RemoteVideoWidget(
               key: UniqueKey(),
-              videoMode: VideoMode.conferencing,
+              videoMode: VideoMode.conference,
             );
           }
         }

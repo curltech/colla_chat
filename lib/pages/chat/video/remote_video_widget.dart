@@ -72,7 +72,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
 
   _init() async {
     _buildActionDataAndVisible();
-    if (widget.videoMode == VideoMode.conferencing) {
+    if (widget.videoMode == VideoMode.conference) {
       return;
     }
     ChatSummary? chatSummary = chatMessageController.chatSummary;

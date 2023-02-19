@@ -1,13 +1,13 @@
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
-import 'package:colla_chat/entity/chat/message_attachment.dart';
+import 'package:colla_chat/entity/chat/group.dart';
+import 'package:colla_chat/entity/chat/peer_party.dart';
 
 class Conference extends StatusEntity {
   String conferenceId; // 会议编号，也是房间号，也是邀请消息号
   String? name;
   String? title;
-  String? identity;
-  String? peerId; // 发起人
+  String? conferenceOwnerPeerId; // 发起人
   String? password; // 密码
   bool linkman = false; // 是否好友才能参加
   bool contact = false; // 是否在地址本才能参加
@@ -19,22 +19,19 @@ class Conference extends StatusEntity {
   bool wait = true; // 自动等待
   bool advance = true; // 参会者可提前加入
   int upperNumber = 300; // 参会人数上限
-  List<String> participants; // 参与人的集合
-  ChatMessage? chatMessage;
-  List<MessageAttachment> attachments = []; // 会议资料
+  List<String> participants; // 参与人peerId的集合
 
   Conference(this.conferenceId,
       {this.name,
-      this.peerId,
-      this.identity,
+      this.conferenceOwnerPeerId,
+      this.title,
       this.participants = const <String>[]});
 
   Conference.fromJson(Map json)
       : conferenceId = json['conferenceId'],
         name = json['name'],
         title = json['title'],
-        identity = json['identity'],
-        peerId = json['peerId'],
+        conferenceOwnerPeerId = json['conferenceOwnerPeerId'],
         password = json['password'],
         startDate = json['startDate'],
         endDate = json['endDate'],
@@ -52,7 +49,6 @@ class Conference extends StatusEntity {
             json['advance'] == true || json['advance'] == 1 ? true : false,
         upperNumber = json['upperNumber'],
         participants = json['participants'],
-        //attachments = json['attachments'],
         super.fromJson(json);
 
   @override
@@ -62,8 +58,7 @@ class Conference extends StatusEntity {
       'conferenceId': conferenceId,
       'name': name,
       'title': title,
-      'identity': identity,
-      'peerId': peerId,
+      'conferenceOwnerPeerId': conferenceOwnerPeerId,
       'password': password,
       'startDate': startDate,
       'endDate': endDate,
@@ -74,7 +69,6 @@ class Conference extends StatusEntity {
       'advance': advance,
       'video': video,
       'upperNumber': upperNumber,
-      //'attachments': attachments,
     });
     return json;
   }

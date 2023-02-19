@@ -12,14 +12,8 @@ class Group extends PeerParty {
   String? groupOwnerPeerId; // 群主peerId
   String? peerPrivateKey;
   String? privateKey;
-
   String? signalPublicKey;
-
   String? signalPrivateKey;
-
-  List<PeerParty> memberPeers = [];
-
-  List<GroupMember> groupMembers = [];
 
   Group(String peerId, String name) : super(peerId, name);
 
