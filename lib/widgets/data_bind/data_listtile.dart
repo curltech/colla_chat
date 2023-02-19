@@ -147,7 +147,7 @@ class DataListTile extends StatelessWidget {
 
     ///然后，如果路由名称存在，加入路由图标
     if (tileData.routeName != null) {
-      trailing.add(Icon(Icons.chevron_right, color: Colors.white));
+      trailing.add(Icon(Icons.chevron_right, color: myself.secondary));
     }
 
     ///横向排列尾部的组件
@@ -171,10 +171,12 @@ class DataListTile extends StatelessWidget {
       leading: leading,
       title: Text(
         AppLocalizations.t(tileData.title),
+        // style: const TextStyle(color: Colors.white),
       ),
       subtitle: tileData.subtitle != null
           ? Text(
               tileData.subtitle!,
+              // style: const TextStyle(color: Colors.white),
             )
           : null,
       trailing: trailingWidget,
