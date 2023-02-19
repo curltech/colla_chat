@@ -192,7 +192,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     var chatSummary = _chatSummary.value;
     if (chatSummary == null) {
       return AppBarView(
-          title: AppLocalizations.t('No current PeerId'),
+          title: AppLocalizations.t('No current chatSummary'),
           withLeading: widget.withLeading,
           child: Container());
     }

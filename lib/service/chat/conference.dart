@@ -3,6 +3,7 @@ import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/chat_summary.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
@@ -129,6 +130,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
     }
     await upsert(conference);
     conferences[conference.conferenceId] = conference;
+    await chatSummaryService.upsertByConference(conference);
 
     return conference;
   }

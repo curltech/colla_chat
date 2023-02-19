@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
+import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -98,6 +99,24 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummaries[chatSummary.peerId!] = chatSummary;
     } else {
       chatSummary.name = group.name;
+      await upsert(chatSummary);
+    }
+  }
+
+  upsertByConference(Conference conference) async {
+    ChatSummary? chatSummary =
+        await findCachedOneByPeerId(conference.conferenceId);
+    if (chatSummary == null) {
+      chatSummary = ChatSummary();
+      chatSummary.peerId = conference.conferenceId;
+      chatSummary.partyType = PartyType.conference.name;
+      chatSummary.subPartyType = conference.title;
+      chatSummary.name = conference.name;
+      await insert(chatSummary);
+      chatSummaries[chatSummary.peerId!] = chatSummary;
+    } else {
+      chatSummary.name = conference.name;
+      chatSummary.subPartyType = conference.title;
       await upsert(chatSummary);
     }
   }
