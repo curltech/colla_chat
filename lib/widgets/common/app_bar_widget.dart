@@ -146,7 +146,7 @@ class AppBarWidget {
         ++i;
       }
       popMenuButton = PopupMenuButton<int>(
-        color: Colors.grey.withOpacity(AppOpacity.smOpacity),
+        color: Colors.white.withOpacity(AppOpacity.xsOpacity),
         itemBuilder: (BuildContext context) {
           return items;
         },

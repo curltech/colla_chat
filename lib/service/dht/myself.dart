@@ -4,6 +4,10 @@ import 'package:colla_chat/entity/dht/myselfpeer.dart';
 import 'package:colla_chat/entity/dht/peerprofile.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/conference.dart';
+import 'package:colla_chat/service/chat/group.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
@@ -127,6 +131,10 @@ class MyselfService {
     myself.privateKey = null;
     myself.publicKey = null;
     logger.clearMyLogger();
+    linkmanService.linkmen.clear();
+    peerClientService.peerClients.clear();
+    groupService.groups.clear();
+    conferenceService.conferences.clear();
 
     return true;
   }

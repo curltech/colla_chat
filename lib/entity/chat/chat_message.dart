@@ -88,8 +88,8 @@ enum MessageStatus {
   deleted, //删除
 }
 
-///好友，群，潜在，联系人，频道，房间
-enum PartyType { linkman, group, peerClient, contact, channel, room }
+///好友，群，潜在，联系人，频道，会议
+enum PartyType { linkman, group, peerClient, contact, channel, conference }
 
 enum ChatDirect { receive, send }
 

@@ -1,12 +1,14 @@
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/group.dart';
-import 'package:colla_chat/entity/chat/peer_party.dart';
+import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/widgets/common/combine_grid_view.dart';
+import 'package:flutter/material.dart';
 import 'package:uuid/uuid.dart';
 
 class ConferenceService extends GeneralBaseService<Conference> {
@@ -62,15 +64,42 @@ class ConferenceService extends GeneralBaseService<Conference> {
       whereArgs: whereArgs,
       orderBy: 'startDate desc',
     );
+    if (conferences.isNotEmpty) {
+      for (var conference in conferences) {
+        setAvatar(conference);
+      }
+    }
 
     return conferences;
+  }
+
+  Future<void> setAvatar(Conference conference) async {
+    String conferenceId = conference.conferenceId;
+    List<GroupMember> members =
+        await groupMemberService.findByGroupId(conferenceId);
+    List<Linkman> linkmen = await groupMemberService.findLinkmen(members);
+    if (linkmen.isNotEmpty) {
+      List<Widget> widgets = [];
+      for (var linkman in linkmen) {
+        if (linkman.avatarImage != null) {
+          widgets.add(linkman.avatarImage!);
+        }
+      }
+      conference.avatarImage = CombineGridView(
+        widgets: widgets,
+        width: 32,
+        height: 32,
+        maxCount: 9,
+      );
+    }
+    conferences[conferenceId] = conference;
   }
 
   Future<Conference> createConference(
     String name, {
     String? title,
     String? conferenceOwnerPeerId,
-    List<String> participants = const <String>[],
+    List<String>? participants,
   }) async {
     var old = await findOneByName(name);
     if (old != null) {

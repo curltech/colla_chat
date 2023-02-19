@@ -1,7 +1,5 @@
 import 'package:colla_chat/entity/base.dart';
-import 'package:colla_chat/entity/chat/chat_message.dart';
-import 'package:colla_chat/entity/chat/group.dart';
-import 'package:colla_chat/entity/chat/peer_party.dart';
+import 'package:flutter/material.dart';
 
 class Conference extends StatusEntity {
   String conferenceId; // 会议编号，也是房间号，也是邀请消息号
@@ -19,7 +17,8 @@ class Conference extends StatusEntity {
   bool wait = true; // 自动等待
   bool advance = true; // 参会者可提前加入
   int upperNumber = 300; // 参会人数上限
-  List<String> participants; // 参与人peerId的集合
+  List<String>? participants; // 参与人peerId的集合
+  Widget? avatarImage;
 
   Conference(this.conferenceId,
       {this.name,
@@ -47,8 +46,8 @@ class Conference extends StatusEntity {
         wait = json['wait'] == true || json['wait'] == 1 ? true : false,
         advance =
             json['advance'] == true || json['advance'] == 1 ? true : false,
-        upperNumber = json['upperNumber'],
-        participants = json['participants'],
+        upperNumber = json['upperNumber'] ?? 300,
+        //participants = json['participants'],
         super.fromJson(json);
 
   @override
@@ -69,6 +68,7 @@ class Conference extends StatusEntity {
       'advance': advance,
       'video': video,
       'upperNumber': upperNumber,
+      //'participants': participants,
     });
     return json;
   }

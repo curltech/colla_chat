@@ -4,7 +4,7 @@ import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
-import 'package:colla_chat/pages/chat/me/conference/conference_list_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/conference.dart';
@@ -220,10 +220,15 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
           content: AppLocalizations.t('Must has conference owner'));
       return null;
     }
+    if (StringUtil.isEmpty(conference.value.title)) {
+      DialogUtil.error(context,
+          content: AppLocalizations.t('Must has conference title'));
+      return null;
+    }
     var current = conferenceController.current;
     current ??=
         await conferenceService.createConference(currentConference.name!);
-    if (current?.title != currentConference.title) {
+    if (current.title != currentConference.title) {
       current.title = currentConference.title;
       conferenceModified = true;
     }

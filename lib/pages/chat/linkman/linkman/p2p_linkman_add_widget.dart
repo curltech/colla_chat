@@ -101,9 +101,6 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
           if (peerId == myself.peerId && clientId == myself.clientId) {
             continue;
           }
-          await peerClientService.store(peerClient,
-              mobile: false, email: false);
-          await linkmanService.storeByPeerClient(peerClient);
         }
         await _buildTiles(peerClients);
         linkmanChatSummaryController.refresh();
@@ -118,30 +115,48 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
         var title = peerClient.name;
         var peerId = peerClient.peerId;
         Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
-        bool isStranger = false;
-        if (linkman == null || linkman.status != LinkmanStatus.friend.name) {
-          isStranger = true;
-        }
-        Widget suffix = const SizedBox(
-          height: 0,
-        );
-        if (isStranger) {
+        Widget suffix;
+        if (linkman == null) {
           suffix = IconButton(
             iconSize: 24.0,
             icon: Icon(Icons.person_add, color: myself.primary),
             onPressed: () async {
-              await linkmanService
-                  .update({'status': LinkmanStatus.friend.name},
-                      where: 'peerId=?', whereArgs: [peerClient.peerId])
-                  .then((value) {
-                linkman!.status = LinkmanStatus.friend.name;
-                _buildTiles(peerClients);
+              await peerClientService.store(peerClient,
+                  mobile: false, email: false);
+              await linkmanService.storeByPeerClient(peerClient);
+              _buildTiles(peerClients);
+              if (mounted) {
                 DialogUtil.info(context,
                     content: AppLocalizations.t('Add peerClient as linkman:') +
                         peerId);
-              });
+              }
             },
           );
+        } else {
+          //加好友
+          if (linkman.status != LinkmanStatus.friend.name) {
+            suffix = IconButton(
+              iconSize: 24.0,
+              icon: Icon(Icons.mobile_friendly, color: myself.primary),
+              onPressed: () async {
+                await linkmanService.update(
+                    {'status': LinkmanStatus.friend.name},
+                    where: 'peerId=?',
+                    whereArgs: [peerClient.peerId]);
+                linkman.status = LinkmanStatus.friend.name;
+                _buildTiles(peerClients);
+                if (mounted) {
+                  DialogUtil.info(context,
+                      content: AppLocalizations.t('Add peerClient as friend:') +
+                          peerId);
+                }
+              },
+            );
+          } else {
+            suffix = const SizedBox(
+              height: 0,
+            );
+          }
         }
         TileData tile = TileData(
             title: title, subtitle: peerId, suffix: suffix, selected: false);

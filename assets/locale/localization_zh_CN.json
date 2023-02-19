@@ -240,5 +240,11 @@
   "received": "接收",
   "terminated": "终止",
   "receipt": "回执",
-  "VideoConference": "视频会议"
+  "VideoConference": "视频会议",
+  "Conference": "视频会议",
+  "Add conference": "创建会议",
+  "Conference edit": "修改会议",
+  "ConferenceOwnerPeer": "发起人",
+  "ConferenceId": "会议编号",
+  "ConferenceOwnerPeerId": "发起人身份码"
 }

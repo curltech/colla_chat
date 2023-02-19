@@ -4,6 +4,7 @@ import 'package:badges/badges.dart' as badges;
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
+import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -14,6 +15,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/chat_summary.dart';
+import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/connectivity_util.dart';
@@ -80,7 +82,21 @@ class GroupChatSummaryController extends DataListController<ChatSummary> {
 final GroupChatSummaryController groupChatSummaryController =
     GroupChatSummaryController();
 
-/// 聊天的主页面，展示可以聊天的目标对象，可以是一个人，或者是一个群
+class ConferenceChatSummaryController extends DataListController<ChatSummary> {
+  Future<void> refresh() async {
+    List<ChatSummary> chatSummary =
+        await chatSummaryService.findByPartyType(PartyType.conference.name);
+    if (chatSummary.isNotEmpty) {
+      replaceAll(chatSummary);
+    }
+  }
+}
+
+///会议的汇总控制器
+final ConferenceChatSummaryController conferenceChatSummaryController =
+    ConferenceChatSummaryController();
+
+/// 聊天的主页面，展示可以聊天的目标对象，可以是一个人，或者是一个群，或者是一个会议
 /// 选择好目标点击进入具体的聊天页面ChatMessage
 class ChatListWidget extends StatefulWidget with TileDataMixin {
   ChatListWidget({Key? key}) : super(key: key) {
@@ -115,6 +131,8 @@ class _ChatListWidgetState extends State<ChatListWidget>
       ValueNotifier<List<TileData>>([]);
   final ValueNotifier<List<TileData>> _groupTileData =
       ValueNotifier<List<TileData>>([]);
+  final ValueNotifier<List<TileData>> _conferenceTileData =
+      ValueNotifier<List<TileData>>([]);
   final ValueNotifier<int> _currentTab = ValueNotifier<int>(0);
 
   late TabController _tabController;
@@ -122,7 +140,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
   @override
   initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(_updateCurrentTab);
     _reconnect();
 
@@ -130,6 +148,8 @@ class _ChatListWidgetState extends State<ChatListWidget>
     linkmanChatSummaryController.refresh();
     groupChatSummaryController.addListener(_updateGroupChatSummary);
     groupChatSummaryController.refresh();
+    conferenceChatSummaryController.addListener(_updateConferenceChatSummary);
+    conferenceChatSummaryController.refresh();
 
     connectivityController.addListener(_updateConnectivity);
 
@@ -161,6 +181,10 @@ class _ChatListWidgetState extends State<ChatListWidget>
 
   _updateGroupChatSummary() {
     _buildGroupTileData();
+  }
+
+  _updateConferenceChatSummary() {
+    _buildConferenceTileData();
   }
 
   _updateConnectivity() {
@@ -298,6 +322,59 @@ class _ChatListWidgetState extends State<ChatListWidget>
     _groupTileData.value = tiles;
   }
 
+  _buildConferenceTileData() async {
+    var conferenceChatSummary = conferenceChatSummaryController.data;
+    List<TileData> tiles = [];
+    if (conferenceChatSummary.isNotEmpty) {
+      for (var chatSummary in conferenceChatSummary) {
+        var title = chatSummary.name ?? '';
+        var peerId = chatSummary.peerId ?? '';
+        var unreadNumber = chatSummary.unreadNumber;
+        Conference? conference =
+            await conferenceService.findCachedOneByConferenceId(peerId);
+        if (conference == null) {
+          chatSummaryService.delete(entity: chatSummary);
+          continue;
+        }
+        var badge = conference.avatarImage ?? AppImage.mdAppImage;
+        if (unreadNumber > 0) {
+          badge = badges.Badge(
+            badgeContent: Text('$unreadNumber',
+                style: const TextStyle(color: Colors.white)),
+            badgeStyle: badges.BadgeStyle(
+              elevation: 0.0,
+              shape: badges.BadgeShape.square,
+              borderRadius: BorderRadius.circular(8),
+              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5.0),
+            ),
+            child: badge,
+          );
+        }
+        TileData tile = TileData(
+            prefix: badge,
+            title: title,
+            subtitle: peerId,
+            dense: true,
+            selected: false,
+            routeName: 'chat_message');
+        List<TileData> slideActions = [];
+        TileData deleteSlideAction = TileData(
+            title: 'Delete',
+            prefix: Icons.bookmark_remove,
+            onTap: (int index, String label, {String? subtitle}) async {
+              conferenceChatSummaryController.currentIndex = index;
+              await chatSummaryService.removeChatSummary(peerId);
+              await chatMessageService.removeByGroup(peerId);
+              conferenceChatSummaryController.delete();
+            });
+        slideActions.add(deleteSlideAction);
+        tile.slideActions = slideActions;
+        tiles.add(tile);
+      }
+    }
+    _conferenceTileData.value = tiles;
+  }
+
   _onTapLinkman(int index, String title, {String? subtitle, TileData? group}) {
     linkmanChatSummaryController.currentIndex = index;
     ChatSummary? current = linkmanChatSummaryController.current;
@@ -309,6 +386,15 @@ class _ChatListWidgetState extends State<ChatListWidget>
   _onTapGroup(int index, String title, {String? subtitle, TileData? group}) {
     groupChatSummaryController.currentIndex = index;
     ChatSummary? current = groupChatSummaryController.current;
+
+    ///更新消息控制器的当前消息汇总，从而确定拥有消息的好友或者群
+    chatMessageController.chatSummary = current;
+  }
+
+  _onTapConference(int index, String title,
+      {String? subtitle, TileData? group}) {
+    conferenceChatSummaryController.currentIndex = index;
+    ChatSummary? current = conferenceChatSummaryController.current;
 
     ///更新消息控制器的当前消息汇总，从而确定拥有消息的好友或者群
     chatMessageController.chatSummary = current;
@@ -336,6 +422,16 @@ class _ChatListWidgetState extends State<ChatListWidget>
               iconMargin: const EdgeInsets.all(0.0),
             );
           }),
+      ValueListenableBuilder(
+          valueListenable: _currentTab,
+          builder: (context, value, child) {
+            return Tab(
+              icon: Icon(Icons.meeting_room,
+                  color: value == 2 ? myself.primary : Colors.white),
+              //text: AppLocalizations.t('Conference'),
+              iconMargin: const EdgeInsets.all(0.0),
+            );
+          }),
     ];
     final tabBar = TabBar(
       tabs: tabs,
@@ -350,6 +446,8 @@ class _ChatListWidgetState extends State<ChatListWidget>
           linkmanChatSummaryController.refresh();
         } else if (index == 1) {
           groupChatSummaryController.refresh();
+        } else if (index == 2) {
+          conferenceChatSummaryController.refresh();
         }
       },
     );
@@ -372,9 +470,18 @@ class _ChatListWidgetState extends State<ChatListWidget>
           );
         });
 
+    var conferenceView = ValueListenableBuilder(
+        valueListenable: _conferenceTileData,
+        builder: (context, value, child) {
+          return DataListView(
+            tileData: value,
+            onTap: _onTapConference,
+          );
+        });
+
     final tabBarView = TabBarView(
       controller: _tabController,
-      children: [linkmanView, groupView],
+      children: [linkmanView, groupView, conferenceView],
     );
 
     return Column(
@@ -443,6 +550,8 @@ class _ChatListWidgetState extends State<ChatListWidget>
     _tabController.dispose();
     linkmanChatSummaryController.removeListener(_updateLinkmanChatSummary);
     groupChatSummaryController.removeListener(_updateGroupChatSummary);
+    conferenceChatSummaryController
+        .removeListener(_updateConferenceChatSummary);
     Websocket? websocket = websocketPool.getDefault();
     if (websocket != null) {
       websocketPool.unregisterStatusChanged(

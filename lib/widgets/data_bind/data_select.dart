@@ -560,7 +560,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
                 const SizedBox(
                   width: 10,
                 ),
-                option.leading!,
+                option.leading ?? Container(),
               ]),
               //avatar: option.leading,
               disabledColor: Colors.white,
@@ -761,7 +761,7 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
                   option.label,
                   style: const TextStyle(color: Colors.black),
                 ),
-                avatar: option.leading!,
+                avatar: option.leading,
                 backgroundColor: Colors.white,
                 deleteIconColor: myself.primary,
                 onDeleted: () {

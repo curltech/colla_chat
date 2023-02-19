@@ -1,11 +1,13 @@
 import 'package:barcode_scan2/model/model.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
+import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/linkman/conference/conference_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/group/group_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_edit_widget.dart';
@@ -14,6 +16,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/chat_summary.dart';
+import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
@@ -21,6 +24,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/qrcode_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -30,17 +34,33 @@ import 'package:flutter/material.dart';
 final DataListController<Linkman> linkmanController =
     DataListController<Linkman>();
 final DataListController<Group> groupController = DataListController<Group>();
+final DataListController<Conference> conferenceController =
+    DataListController<Conference>();
 
 ///联系人和群的查询界面
 class LinkmanListWidget extends StatefulWidget with TileDataMixin {
   final LinkmanEditWidget linkmanEditWidget = LinkmanEditWidget();
   final LinkmanAddWidget linkmanAddWidget = LinkmanAddWidget();
   final GroupAddWidget groupAddWidget = GroupAddWidget();
+  final ConferenceEditWidget conferenceEditWidget = ConferenceEditWidget();
+  late final List<TileData> linkmanTileData;
 
   LinkmanListWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(linkmanEditWidget);
     indexWidgetProvider.define(linkmanAddWidget);
     indexWidgetProvider.define(groupAddWidget);
+    indexWidgetProvider.define(conferenceEditWidget);
+    List<TileDataMixin> mixins = [
+      linkmanEditWidget,
+      linkmanAddWidget,
+      groupAddWidget,
+      conferenceEditWidget,
+    ];
+    linkmanTileData = TileData.from(mixins);
+    for (var tile in linkmanTileData) {
+      tile.dense = false;
+      tile.selected = false;
+    }
   }
 
   @override
@@ -63,9 +83,13 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     with TickerProviderStateMixin {
   final TextEditingController _linkmanTextController = TextEditingController();
   final TextEditingController _groupTextController = TextEditingController();
+  final TextEditingController _conferenceTextController =
+      TextEditingController();
   final ValueNotifier<List<TileData>> _linkmanTileData =
       ValueNotifier<List<TileData>>([]);
   final ValueNotifier<List<TileData>> _groupTileData =
+      ValueNotifier<List<TileData>>([]);
+  final ValueNotifier<List<TileData>> _conferenceTileData =
       ValueNotifier<List<TileData>>([]);
   final ValueNotifier<int> _currentTab = ValueNotifier<int>(0);
 
@@ -74,12 +98,14 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   @override
   initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(_updateCurrentTab);
     linkmanController.addListener(_updateLinkman);
     groupController.addListener(_updateGroup);
+    conferenceController.addListener(_updateConference);
     _searchLinkman(_linkmanTextController.text);
     _searchGroup(_groupTextController.text);
+    _searchConference(_conferenceTextController.text);
   }
 
   _updateCurrentTab() {
@@ -94,32 +120,23 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     _buildGroupTileData();
   }
 
+  _updateConference() {
+    _buildConferenceTileData();
+  }
+
   _searchLinkman(String key) async {
     List<Linkman> linkmen = await linkmanService.search(key);
-    List<Linkman> ls = [];
-    if (linkmen.isNotEmpty) {
-      for (var linkman in linkmen) {
-        Linkman? l = await linkmanService.findCachedOneByPeerId(linkman.peerId);
-        if (l != null) {
-          ls.add(l);
-        }
-      }
-    }
-    linkmanController.replaceAll(ls);
+    linkmanController.replaceAll(linkmen);
   }
 
   _searchGroup(String key) async {
     List<Group> groups = await groupService.search(key);
-    List<Group> gs = [];
-    if (groups.isNotEmpty) {
-      for (var group in groups) {
-        Group? g = await groupService.findCachedOneByPeerId(group.peerId);
-        if (g != null) {
-          gs.add(g);
-        }
-      }
-    }
-    groupController.replaceAll(gs);
+    groupController.replaceAll(groups);
+  }
+
+  _searchConference(String key) async {
+    List<Conference> conferences = await conferenceService.search(key);
+    conferenceController.replaceAll(conferences);
   }
 
   _buildLinkmanSearchTextField(BuildContext context) {
@@ -173,6 +190,37 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
               suffixIcon: IconButton(
                 onPressed: () {
                   _searchGroup(_groupTextController.text);
+                },
+                icon: Icon(
+                  Icons.search,
+                  color: myself.primary,
+                ),
+              ),
+            )));
+
+    return searchTextField;
+  }
+
+  _buildConferenceSearchTextField(BuildContext context) {
+    var searchTextField = Container(
+        padding: const EdgeInsets.all(10.0),
+        child: TextFormField(
+            autofocus: true,
+            controller: _conferenceTextController,
+            keyboardType: TextInputType.text,
+            decoration: InputDecoration(
+              fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
+              filled: true,
+              border: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              errorBorder: InputBorder.none,
+              disabledBorder: InputBorder.none,
+              focusedErrorBorder: InputBorder.none,
+              //labelText: AppLocalizations.t('Search'),
+              suffixIcon: IconButton(
+                onPressed: () {
+                  _searchConference(_conferenceTextController.text);
                 },
                 icon: Icon(
                   Icons.search,
@@ -337,12 +385,66 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     _groupTileData.value = tiles;
   }
 
+  _buildConferenceTileData() {
+    var conferences = conferenceController.data;
+    List<TileData> tiles = [];
+    if (conferences.isNotEmpty) {
+      for (var conference in conferences) {
+        var title = conference.name;
+        var subtitle = conference.conferenceId;
+        TileData tile = TileData(
+            prefix: conference.avatarImage ?? AppImage.mdAppImage,
+            title: title!,
+            subtitle: subtitle,
+            selected: false,
+            routeName: 'conference_edit');
+        List<TileData> slideActions = [];
+        TileData deleteSlideAction = TileData(
+            title: 'Delete',
+            prefix: Icons.playlist_remove_outlined,
+            onTap: (int index, String label, {String? subtitle}) async {
+              conferenceController.currentIndex = index;
+              await conferenceService.removeByConferenceId(subtitle!);
+              await groupMemberService.removeByGroupPeerId(subtitle);
+              await chatSummaryService.removeChatSummary(subtitle);
+              await chatMessageService.removeByGroup(subtitle);
+              conferenceController.delete();
+            });
+        slideActions.add(deleteSlideAction);
+        tile.slideActions = slideActions;
+
+        List<TileData> endSlideActions = [];
+        TileData chatSlideAction = TileData(
+            title: 'Chat',
+            prefix: Icons.chat,
+            onTap: (int index, String label, {String? subtitle}) async {
+              ChatSummary? chatSummary = await chatSummaryService
+                  .findOneByPeerId(conference.conferenceId);
+              if (chatSummary != null) {
+                chatMessageController.chatSummary = chatSummary;
+              }
+              indexWidgetProvider.push('chat_message');
+            });
+        endSlideActions.add(chatSlideAction);
+        tile.endSlideActions = endSlideActions;
+
+        tiles.add(tile);
+      }
+    }
+    _conferenceTileData.value = tiles;
+  }
+
   _onTapLinkman(int index, String title, {String? subtitle, TileData? group}) {
     linkmanController.currentIndex = index;
   }
 
   _onTapGroup(int index, String title, {String? subtitle, TileData? group}) {
     groupController.currentIndex = index;
+  }
+
+  _onTapConference(int index, String title,
+      {String? subtitle, TileData? group}) {
+    conferenceController.currentIndex = index;
   }
 
   Widget _buildLinkmanListView(BuildContext context) {
@@ -367,6 +469,16 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
               iconMargin: const EdgeInsets.all(0.0),
             );
           }),
+      ValueListenableBuilder(
+          valueListenable: _currentTab,
+          builder: (context, value, child) {
+            return Tab(
+              icon: Icon(Icons.meeting_room,
+                  color: value == 2 ? myself.primary : Colors.white),
+              //text: AppLocalizations.t('Group'),
+              iconMargin: const EdgeInsets.all(0.0),
+            );
+          }),
     ];
     final tabBar = TabBar(
       tabs: tabs,
@@ -381,6 +493,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           _searchLinkman(_linkmanTextController.text);
         } else if (index == 1) {
           _searchGroup(_groupTextController.text);
+        } else if (index == 2) {
+          _searchConference(_conferenceTextController.text);
         }
       },
     );
@@ -411,10 +525,23 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
               }))
     ]);
 
+    var conferenceView = Column(children: [
+      _buildConferenceSearchTextField(context),
+      Expanded(
+          child: ValueListenableBuilder(
+              valueListenable: _conferenceTileData,
+              builder: (context, value, child) {
+                return DataListView(
+                  tileData: value,
+                  onTap: _onTapConference,
+                );
+              }))
+    ]);
+
     final tabBarView = KeepAliveWrapper(
         child: TabBarView(
       controller: _tabController,
-      children: [linkmanView, groupView],
+      children: [linkmanView, groupView, conferenceView],
     ));
 
     return Column(
@@ -424,6 +551,40 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
 
   @override
   Widget build(BuildContext context) {
+    List<AppBarPopupMenu> rightPopupMenus = [
+      AppBarPopupMenu(
+          onPressed: () {
+            linkmanController.currentIndex = -1;
+            indexWidgetProvider.push('linkman_add');
+          },
+          icon: Icon(Icons.person_add_alt, color: myself.primary),
+          title: AppLocalizations.t('Add linkman')),
+      AppBarPopupMenu(
+          onPressed: () {
+            groupController.currentIndex = -1;
+            indexWidgetProvider.push('group_add');
+          },
+          icon: Icon(Icons.group_add, color: myself.primary),
+          title: AppLocalizations.t('Add group')),
+      AppBarPopupMenu(
+          onPressed: () {
+            conferenceController.currentIndex = -1;
+            indexWidgetProvider.push('conference_edit');
+          },
+          icon: Icon(Icons.add_business_outlined, color: myself.primary),
+          title: AppLocalizations.t('Add conference')),
+      AppBarPopupMenu(
+          onPressed: () async {
+            ScanResult scanResult = await QrcodeUtil.scan();
+            String content = scanResult.rawContent;
+            var map = JsonUtil.toJson(content);
+            PeerClient peerClient = PeerClient.fromJson(map);
+            await peerClientService.store(peerClient);
+            await linkmanService.storeByPeerClient(peerClient);
+          },
+          icon: Icon(Icons.qr_code, color: myself.primary),
+          title: AppLocalizations.t('Qrcode scan')),
+    ];
     var rightWidgets = [
       IconButton(
           onPressed: () {
@@ -440,6 +601,13 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           icon: const Icon(Icons.group_add, color: Colors.white),
           tooltip: AppLocalizations.t('Add group')),
       IconButton(
+          onPressed: () {
+            conferenceController.currentIndex = -1;
+            indexWidgetProvider.push('conference_edit');
+          },
+          icon: const Icon(Icons.add_business_outlined, color: Colors.white),
+          tooltip: AppLocalizations.t('Add conference')),
+      IconButton(
           onPressed: () async {
             ScanResult scanResult = await QrcodeUtil.scan();
             String content = scanResult.rawContent;
@@ -453,7 +621,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     ];
     return AppBarView(
         title: widget.title,
-        rightWidgets: rightWidgets,
+        //rightWidgets: rightWidgets,
+        rightPopupMenus: rightPopupMenus,
         child: _buildLinkmanListView(context));
   }
 
@@ -463,6 +632,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     _tabController.dispose();
     linkmanController.removeListener(_updateLinkman);
     groupController.removeListener(_updateGroup);
+    groupController.removeListener(_updateConference);
     super.dispose();
   }
 }

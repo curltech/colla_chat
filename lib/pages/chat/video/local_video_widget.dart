@@ -8,6 +8,7 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.da
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/group_linkman_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/pages/chat/video/video_view_card.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -111,6 +112,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   _init() async {
     _buildActionDataAndVisible();
     if (widget.videoMode == VideoMode.conference) {
+      conference = conferenceController.current;
       return;
     }
     ChatSummary? chatSummary = chatMessageController.chatSummary;
@@ -119,11 +121,17 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           .e('videoMode is ${widget.videoMode.name}, but chatSummary is null');
       return;
     }
-    peerId = chatSummary.peerId!;
-    name = chatSummary.name!;
     var partyType = chatSummary.partyType;
     if (partyType == PartyType.group.name) {
       groupPeerId = chatSummary.peerId!;
+      name = chatSummary.name!;
+    } else if (partyType == PartyType.linkman.name) {
+      peerId = chatSummary.peerId!;
+      name = chatSummary.name!;
+    } else {
+      logger.e(
+          'videoMode is ${widget.videoMode.name}, but chatSummary PartyType $partyType');
+      return;
     }
     //当前的视频通话的邀请消息，如果存在，获取房间信息
     ChatMessage? chatMessage = videoChatMessageController.chatMessage;
