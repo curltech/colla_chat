@@ -120,7 +120,7 @@ class MyselfService {
 
   bool logout() {
     myself.myselfPeer = MyselfPeer('', '', '', '');
-    myself.peerProfile = PeerProfile('', '');
+    myself.peerProfile = PeerProfile('');
     myself.id = null;
     myself.peerId = null;
     myself.name = null;

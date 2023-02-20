@@ -1,4 +1,3 @@
-import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -210,7 +209,10 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
       return null;
     }
     var current = groupController.current;
-    current ??= await groupService.createGroup(currentGroup.name);
+    if (current == null) {
+      current = await groupService.createGroup(currentGroup.name);
+      groupModified = true;
+    }
     if (current.myAlias != currentGroup.myAlias) {
       current.myAlias = currentGroup.myAlias;
       groupModified = true;
@@ -233,62 +235,29 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
     }
     group.value.groupOwnerPeerId ??= myself.peerId;
     current.groupOwnerPeerId = group.value.groupOwnerPeerId;
-    await groupService.store(current);
+    current.participants = groupMembers.value;
+    List<Object> gs = await groupService.store(current);
     group.value = current;
-    String groupId = current.peerId;
-    List<GroupMember> members =
-        await groupMemberService.findByGroupId(current.peerId);
-    Map<String, GroupMember> oldMembers = {};
-    //所有的现有成员
-    if (members.isNotEmpty) {
-      for (GroupMember member in members) {
-        oldMembers[member.memberPeerId!] = member;
-      }
-    }
-    //新增加的成员
-    List<GroupMember> newMembers = [];
-    for (var groupMemberId in groupMembers.value) {
-      var member = oldMembers[groupMemberId];
-      if (member == null) {
-        Linkman? linkman =
-            await linkmanService.findCachedOneByPeerId(groupMemberId);
-        if (linkman != null) {
-          GroupMember groupMember = GroupMember();
-          groupMember.groupId = groupId;
-          groupMember.memberPeerId = groupMemberId;
-          groupMember.memberType = MemberType.member.name;
-          if (StringUtil.isEmpty(linkman.alias)) {
-            groupMember.memberAlias = linkman.name;
-          } else {
-            groupMember.memberAlias = linkman.alias;
-          }
-          groupMember.status = EntityStatus.effective.name;
-          await groupMemberService.store(groupMember);
-          newMembers.add(groupMember);
-        }
-      } else {
-        oldMembers.remove(groupMemberId);
-      }
-    }
+    var groupId = current.peerId;
+
     //对所有的成员发送组变更的消息
     if (add) {
       await groupService.addGroup(current);
     } else if (groupModified) {
       await groupService.modifyGroup(current);
     }
-    if (newMembers.isNotEmpty) {
+    //新增加的成员
+    Object newMembers = gs[1];
+    if (newMembers is List<GroupMember> && newMembers.isNotEmpty) {
       //对所有的成员发送组员增加的消息
       await groupService.addGroupMember(groupId, newMembers);
     }
 
+    Object oldMembers = gs[2];
     //处理删除的成员
-    if (oldMembers.isNotEmpty) {
+    if (oldMembers is List<GroupMember> && oldMembers.isNotEmpty) {
       //对所有的成员发送组员删除的消息
-      await groupService.removeGroupMember(groupId, oldMembers.values.toList());
-      for (GroupMember member in oldMembers.values) {
-        oldMembers[member.memberPeerId!] = member;
-        await groupMemberService.delete(entity: {'id': member.id});
-      }
+      await groupService.removeGroupMember(groupId, oldMembers);
     }
 
     if (groupController.current == null) {

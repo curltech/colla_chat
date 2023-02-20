@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
@@ -22,10 +23,41 @@ class VideoChatMessageController with ChangeNotifier {
     return _chatMessage;
   }
 
-  set chatMessage(ChatMessage? chatMessage) {
-    if (_chatMessage != chatMessage) {
-      _chatMessage = chatMessage;
+  setChatMessage(ChatMessage? chatMessage) async {
+    if (_chatMessage == chatMessage) {
+      return;
     }
+    _chatMessage = chatMessage;
+    _chatReceipt = null;
+    _acceptedChatReceipts.clear();
+    _rejectedChatReceipts.clear();
+    _terminatedChatReceipts.clear();
+    if (chatMessage == null) {
+      notifyListeners();
+      return;
+    }
+    var messageId = chatMessage.messageId!;
+    List<ChatMessage> chatMessages =
+        await chatMessageService.findByMessageId(messageId);
+    if (chatMessages.isEmpty) {
+      notifyListeners();
+      return;
+    }
+
+    for (var chatMessage in chatMessages) {
+      if (chatMessage.receiverPeerId == myself.peerId) {
+        if (chatMessage.status == MessageStatus.accepted.name) {
+          _acceptedChatReceipts[chatMessage.senderPeerId!] = chatMessage;
+        }
+        if (chatMessage.status == MessageStatus.rejected.name) {
+          _rejectedChatReceipts[chatMessage.senderPeerId!] = chatMessage;
+        }
+        if (chatMessage.status == MessageStatus.terminated.name) {
+          _terminatedChatReceipts[chatMessage.senderPeerId!] = chatMessage;
+        }
+      }
+    }
+    notifyListeners();
   }
 
   ChatMessage? get chatReceipt {

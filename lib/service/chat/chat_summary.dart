@@ -110,13 +110,13 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummary = ChatSummary();
       chatSummary.peerId = conference.conferenceId;
       chatSummary.partyType = PartyType.conference.name;
-      chatSummary.subPartyType = conference.title;
+      chatSummary.subPartyType = conference.topic;
       chatSummary.name = conference.name;
       await insert(chatSummary);
       chatSummaries[chatSummary.peerId!] = chatSummary;
     } else {
       chatSummary.name = conference.name;
-      chatSummary.subPartyType = conference.title;
+      chatSummary.subPartyType = conference.topic;
       await upsert(chatSummary);
     }
   }

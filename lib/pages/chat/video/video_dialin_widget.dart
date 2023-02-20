@@ -39,7 +39,7 @@ class VideoDialInWidget extends StatelessWidget {
         String? subMessageType = chatMessage.subMessageType;
         if (receiptType == MessageStatus.accepted) {
           //接受视频邀请，将当前视频邀请消息放入控制器
-          videoChatMessageController.chatMessage = chatMessage;
+          await videoChatMessageController.setChatMessage(chatMessage);
           var peerId = chatReceipt.receiverPeerId!;
           var clientId = chatReceipt.receiverClientId!;
           PeerVideoRender? localRender;

@@ -1,3 +1,5 @@
+import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
+
 import 'base.dart';
 
 ///联系人（Linkman）能够连接节点服务器的客户
@@ -5,20 +7,18 @@ import 'base.dart';
 ///代表一个联系人（Linkman）通过多个机器设备登录
 ///这些数据的来源都是查询节点服务器
 class PeerClient extends PeerEntity {
-  String clientId; //peerClient的唯一编码
   String? deviceToken; //设备的远程推送通知的token，唯一确定设备
   String? deviceDesc; //设备的描述，比如是ios还是android
-
   // 客户连接到节点的位置
   String? connectPeerId;
   String? connectAddress;
   String? connectSessionId;
 
-  PeerClient(String peerId, this.clientId, String name) : super(peerId, name);
+  PeerClient(String peerId, String name, {String clientId = unknownClientId})
+      : super(peerId, name, clientId: clientId);
 
   PeerClient.fromJson(Map json)
-      : clientId = json['clientId'] ?? '',
-        deviceToken = json['deviceToken'],
+      : deviceToken = json['deviceToken'],
         deviceDesc = json['deviceDesc'],
         connectPeerId = json['connectPeerId'],
         connectAddress = json['connectAddress'],
@@ -29,7 +29,6 @@ class PeerClient extends PeerEntity {
   Map<String, dynamic> toJson() {
     var json = super.toJson();
     json.addAll({
-      'clientId': clientId,
       'deviceToken': deviceToken,
       'deviceDesc': deviceDesc,
       'connectPeerId': connectPeerId,

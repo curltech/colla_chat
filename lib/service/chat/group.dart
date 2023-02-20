@@ -7,7 +7,6 @@ import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
-import 'package:colla_chat/entity/chat/peer_party.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/chat_summary.dart';
@@ -105,7 +104,8 @@ class GroupService extends PeerPartyService<Group> {
     return group;
   }
 
-  Future<Group?> store(Group group) async {
+  ///返回数组，内含保存的组，增加的成员和删除的成员
+  Future<List<Object>> store(Group group) async {
     Group? old = await findOneByPeerId(group.peerId);
     if (old != null) {
       group.id = old.id;
@@ -114,10 +114,53 @@ class GroupService extends PeerPartyService<Group> {
       group.id = null;
     }
     await upsert(group);
+
+    var participants = group.participants;
+    if (participants == null || participants.isEmpty) {
+      return [group, [], []];
+    }
+    String groupId = group.peerId;
+    List<GroupMember> members = await groupMemberService.findByGroupId(groupId);
+    Map<String, GroupMember> oldMembers = {};
+    //所有的现有成员
+    if (members.isNotEmpty) {
+      for (GroupMember member in members) {
+        oldMembers[member.memberPeerId!] = member;
+      }
+    }
+    //新增加的成员
+    List<GroupMember> newMembers = [];
+    for (var groupMemberId in participants) {
+      var member = oldMembers[groupMemberId];
+      if (member == null) {
+        Linkman? linkman =
+            await linkmanService.findCachedOneByPeerId(groupMemberId);
+        if (linkman != null) {
+          GroupMember groupMember = GroupMember(groupId, groupMemberId);
+          groupMember.memberType = MemberType.member.name;
+          if (StringUtil.isEmpty(linkman.alias)) {
+            groupMember.memberAlias = linkman.name;
+          } else {
+            groupMember.memberAlias = linkman.alias;
+          }
+          groupMember.status = EntityStatus.effective.name;
+          await groupMemberService.store(groupMember);
+          newMembers.add(groupMember);
+        }
+      } else {
+        oldMembers.remove(groupMemberId);
+      }
+    }
+    //处理删除的成员
+    if (oldMembers.isNotEmpty) {
+      for (GroupMember member in oldMembers.values) {
+        await groupMemberService.delete(entity: {'id': member.id});
+      }
+    }
     groups[group.peerId] = group;
     await chatSummaryService.upsertByGroup(group);
 
-    return group;
+    return [group, newMembers, oldMembers.values.toList()];
   }
 
   Future<List<Group>> search(String key) async {
@@ -408,4 +451,4 @@ final groupMemberService = GroupMemberService(
       'memberPeerId',
       'memberType'
     ],
-    fields: ServiceLocator.buildFields(GroupMember(), []));
+    fields: ServiceLocator.buildFields(GroupMember('', ''), []));

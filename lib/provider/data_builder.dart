@@ -1,21 +1,19 @@
 import 'package:colla_chat/crypto/cryptography.dart';
-import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/entity/dht/myselfpeer.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/chat_summary.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
-import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:cryptography/cryptography.dart';
-
 
 class DataBuilder {
   static build() async {
@@ -23,21 +21,17 @@ class DataBuilder {
     var deviceData = platformParams.deviceData;
     var clientDevice = JsonUtil.toJsonString(deviceData);
     var hash = await cryptoGraphy.hash(clientDevice.codeUnits);
-    var clientId = CryptoUtil.encodeBase58(hash);
-    for (var i = 0; i < 20; ++i) {
-      PeerClient peerClient = PeerClient('', clientId, '');
+    for (var i = 0; i < 10; ++i) {
+      MyselfPeer myselfPeer = await myselfPeerService
+          .register('胡劲松$i', '1360961960$i', '1234', mobile: '1360961960$i');
+      PeerClient peerClient = PeerClient(myselfPeer.peerId, myselfPeer.name,
+          clientId: myselfPeer.clientId);
 
-      ///peerId对应的密钥对
-      SimpleKeyPair peerPrivateKey = await cryptoGraphy.generateKeyPair();
-      peerClient.peerPublicKey =
-          await cryptoGraphy.exportPublicKey(peerPrivateKey);
-      peerClient.peerId = peerClient.peerPublicKey!;
+      peerClient.peerPublicKey = myselfPeer.peerPublicKey;
+      peerClient.publicKey = myselfPeer.publicKey;
+      peerClient.peerId = myselfPeer.peerPublicKey!;
+      peerClient.mobile = myselfPeer.mobile;
 
-      ///加密对应的密钥对x25519
-      SimpleKeyPair keyPair =
-          await cryptoGraphy.generateKeyPair(keyPairType: KeyPairType.x25519);
-      peerClient.publicKey = await cryptoGraphy.exportPublicKey(keyPair);
-      peerClient.name = 'PeerClient$i';
       peerClientService.insert(peerClient);
 
       if (i % 3 == 0) {
@@ -65,7 +59,7 @@ class DataBuilder {
       SimpleKeyPair keyPair =
           await cryptoGraphy.generateKeyPair(keyPairType: KeyPairType.x25519);
       var publicKey = await cryptoGraphy.exportPublicKey(keyPair);
-      var name = 'Group$i';
+      var name = '家庭$i';
       Group group = Group(peerId, name);
       group.publicKey = publicKey;
       group.peerPublicKey = peerPublicKey;
@@ -80,9 +74,8 @@ class DataBuilder {
 
       for (var j = 0; j < 3; ++j) {
         ///每个群分别有3，4，5个成员
-        GroupMember groupMember = GroupMember();
-        groupMember.groupId = group.peerId;
-        groupMember.memberPeerId = linkmen[i + j].peerId;
+        GroupMember groupMember =
+            GroupMember(group.peerId, linkmen[i + j].peerId);
         if (j == 0) {
           groupMember.memberType = MemberType.owner.name;
         } else {
@@ -91,73 +84,71 @@ class DataBuilder {
         await groupMemberService.insert(groupMember);
       }
 
-      GroupMember groupMember = GroupMember();
-      groupMember.groupId = group.peerId;
-      groupMember.memberPeerId = myself.peerId;
-      groupMember.memberType = MemberType.member.name;
+      GroupMember groupMember = GroupMember(group.peerId, myself.peerId);
+      groupMember.memberType = MemberType.owner.name;
       await groupMemberService.insert(groupMember);
     }
-
-    /// 100条消息
-    for (var i = 0; i < 100; ++i) {
-      ChatMessage chatMessage = ChatMessage();
-      chatMessage.title = 'title$i';
-      chatMessage.content = 'message content$i';
-      chatMessage.contentType = ContentType.text.name;
-      chatMessage.messageId = await cryptoGraphy.getRandomAsciiString();
-      chatMessage.messageType = ChatMessageType.chat.name;
-      if (i % 2 == 0) {
-        chatMessage.direct = ChatDirect.send.name;
-        if (i % 3 == 0) {
-          chatMessage.receiverPeerId = groups[i % 3].peerId;
-          chatMessage.receiverName = groups[i % 3].name;
-          chatMessage.receiverType = PartyType.group.name;
-        } else {
-          chatMessage.receiverPeerId = linkmen[i % 7].peerId;
-          chatMessage.receiverName = linkmen[i % 7].name;
-          chatMessage.receiverType = PartyType.linkman.name;
-        }
-        chatMessage.sendTime = DateUtil.currentDate();
-        await chatMessageService.insert(chatMessage);
-        ChatSummary? chatSummary =
-            await chatSummaryService.findByPeerId(chatMessage.receiverPeerId!);
-        if (chatSummary != null) {
-          chatSummary.messageId = chatMessage.messageId;
-          chatSummary.messageType = chatMessage.messageType;
-          chatSummary.title = chatMessage.title;
-          chatSummary.content = chatMessage.content;
-          chatSummary.contentType = chatMessage.contentType;
-          chatSummary.sendReceiveTime = chatMessage.sendTime;
-          var unreadNumber = chatSummary.unreadNumber;
-          chatSummary.unreadNumber = unreadNumber + 1;
-          await chatSummaryService.update(chatSummary);
-        }
-      } else {
-        chatMessage.direct = ChatDirect.receive.name;
-        chatMessage.senderPeerId = linkmen[i % 7].peerId;
-        if (i % 3 == 0) {
-          chatMessage.receiverPeerId = groups[i % 3].peerId;
-          chatMessage.receiverType = PartyType.group.name;
-        } else {
-          chatMessage.receiverType = PartyType.linkman.name;
-        }
-        chatMessage.receiveTime = DateUtil.currentDate();
-        await chatMessageService.insert(chatMessage);
-
-        ChatSummary? chatSummary =
-            await chatSummaryService.findByPeerId(chatMessage.senderPeerId!);
-        if (chatSummary != null) {
-          chatSummary.messageId = chatMessage.messageId;
-          chatSummary.messageType = chatMessage.messageType;
-          chatSummary.title = chatMessage.title;
-          chatSummary.content = chatMessage.content;
-          chatSummary.contentType = chatMessage.contentType;
-          chatSummary.sendReceiveTime = chatMessage.receiveTime;
-          var unreadNumber = chatSummary.unreadNumber;
-          chatSummary.unreadNumber = unreadNumber + 1;
-          await chatSummaryService.update(chatSummary);
-        }
-      }
-    }
+    //
+    // /// 100条消息
+    // for (var i = 0; i < 100; ++i) {
+    //   ChatMessage chatMessage = ChatMessage();
+    //   chatMessage.title = 'title$i';
+    //   chatMessage.content = 'message content$i';
+    //   chatMessage.contentType = ContentType.text.name;
+    //   chatMessage.messageId = await cryptoGraphy.getRandomAsciiString();
+    //   chatMessage.messageType = ChatMessageType.chat.name;
+    //   if (i % 2 == 0) {
+    //     chatMessage.direct = ChatDirect.send.name;
+    //     if (i % 3 == 0) {
+    //       chatMessage.receiverPeerId = groups[i % 3].peerId;
+    //       chatMessage.receiverName = groups[i % 3].name;
+    //       chatMessage.receiverType = PartyType.group.name;
+    //     } else {
+    //       chatMessage.receiverPeerId = linkmen[i % 7].peerId;
+    //       chatMessage.receiverName = linkmen[i % 7].name;
+    //       chatMessage.receiverType = PartyType.linkman.name;
+    //     }
+    //     chatMessage.sendTime = DateUtil.currentDate();
+    //     await chatMessageService.insert(chatMessage);
+    //     ChatSummary? chatSummary =
+    //         await chatSummaryService.findByPeerId(chatMessage.receiverPeerId!);
+    //     if (chatSummary != null) {
+    //       chatSummary.messageId = chatMessage.messageId;
+    //       chatSummary.messageType = chatMessage.messageType;
+    //       chatSummary.title = chatMessage.title;
+    //       chatSummary.content = chatMessage.content;
+    //       chatSummary.contentType = chatMessage.contentType;
+    //       chatSummary.sendReceiveTime = chatMessage.sendTime;
+    //       var unreadNumber = chatSummary.unreadNumber;
+    //       chatSummary.unreadNumber = unreadNumber + 1;
+    //       await chatSummaryService.update(chatSummary);
+    //     }
+    //   } else {
+    //     chatMessage.direct = ChatDirect.receive.name;
+    //     chatMessage.senderPeerId = linkmen[i % 7].peerId;
+    //     if (i % 3 == 0) {
+    //       chatMessage.receiverPeerId = groups[i % 3].peerId;
+    //       chatMessage.receiverType = PartyType.group.name;
+    //     } else {
+    //       chatMessage.receiverType = PartyType.linkman.name;
+    //     }
+    //     chatMessage.receiveTime = DateUtil.currentDate();
+    //     await chatMessageService.insert(chatMessage);
+    //
+    //     ChatSummary? chatSummary =
+    //         await chatSummaryService.findByPeerId(chatMessage.senderPeerId!);
+    //     if (chatSummary != null) {
+    //       chatSummary.messageId = chatMessage.messageId;
+    //       chatSummary.messageType = chatMessage.messageType;
+    //       chatSummary.title = chatMessage.title;
+    //       chatSummary.content = chatMessage.content;
+    //       chatSummary.contentType = chatMessage.contentType;
+    //       chatSummary.sendReceiveTime = chatMessage.receiveTime;
+    //       var unreadNumber = chatSummary.unreadNumber;
+    //       chatSummary.unreadNumber = unreadNumber + 1;
+    //       await chatSummaryService.update(chatSummary);
+    //     }
+    //   }
+    // }
   }
 }

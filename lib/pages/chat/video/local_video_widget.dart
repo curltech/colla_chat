@@ -13,6 +13,7 @@ import 'package:colla_chat/pages/chat/video/video_view_card.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
@@ -26,7 +27,6 @@ import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:uuid/uuid.dart';
 
 enum CallStatus {
   calling, //正在呼叫中
@@ -200,10 +200,14 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     this.actionData.value = actionData;
   }
 
-  ///弹出界面，选择参与者，返回房间
+  ///对于群来说，需要创建一个临时的会议，会议成员从群成员中选择
+  ///弹出界面，选择会议成员，设置conference
   Future<void> _buildConference() async {
     List<String> participants = [myself.peerId!];
     if (widget.videoMode == VideoMode.conference) {
+      if (conference != null) {
+        return;
+      }
       List<String> selected = <String>[];
       await DialogUtil.show(
           context: context,
@@ -221,31 +225,39 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                 includeGroup: false,
                 selectType: SelectType.chipMultiSelect);
           });
-    } else if (peerId != null) {
-      if (groupPeerId == null) {
-        participants.add(peerId!);
-      } else {
-        await DialogUtil.show(
-            context: context,
-            builder: (BuildContext context) {
-              return GroupLinkmanWidget(
-                onSelected: (List<String> peerIds) {
-                  participants.addAll(peerIds);
-                  Navigator.pop(context, participants);
-                },
-                selected: const <String>[],
-                groupPeerId: peerId!,
-              );
-            });
-      }
     }
-    var uuid = const Uuid();
-    String conferenceId = uuid.v4();
-    conference = Conference(conferenceId, participants: participants);
+    if (widget.videoMode == VideoMode.group) {
+      if (groupPeerId == null) {
+        return;
+      }
+      if (conference != null) {
+        return;
+      }
+      await DialogUtil.show(
+          context: context,
+          builder: (BuildContext context) {
+            return GroupLinkmanWidget(
+              onSelected: (List<String> peerIds) {
+                participants.addAll(peerIds);
+                Navigator.pop(context, participants);
+              },
+              selected: const <String>[],
+              groupPeerId: groupPeerId!,
+            );
+          });
+    }
+    if (widget.videoMode == VideoMode.linkman) {
+      if (peerId == null) {
+        return;
+      }
+      participants.add(peerId!);
+    }
+    conference = await conferenceService.createConference(name!,
+        participants: participants);
     if (mounted) {
       DialogUtil.info(context,
           content:
-              '${AppLocalizations.t('Create room')} ${conference!.conferenceId}');
+              '${AppLocalizations.t('Create conference')} ${conference!.conferenceId}');
     }
   }
 
@@ -351,7 +363,10 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         chatMessage = await _sendVideoChatMessage(
             contentType: ContentType.audio.name, conference: conference!);
       }
-      videoChatMessageController.chatMessage = chatMessage;
+      await videoChatMessageController.setChatMessage(chatMessage);
+      if (widget.videoMode == VideoMode.group) {
+        await conferenceService.store(conference!);
+      }
       videoRoomRenderPool.createRemoteVideoRenderController(conference!);
     } else {
       //当前视频消息不为空，则有同意回执的直接重新协商
@@ -375,7 +390,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///挂断视频通话，先关闭所有的本地视频，设置当前邀请消息为空，呼叫状态为结束
   _closeCall() async {
     localVideoRenderController.close();
-    videoChatMessageController.chatMessage = null;
+    videoChatMessageController.setChatMessage(null);
     conference = null;
     callStatus.value = CallStatus.end;
   }

@@ -44,7 +44,27 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     // });
   }
 
-  Future<ChatMessage?> findByMessageId(String messageId,
+  ///查询消息号相同的所有消息
+  Future<List<ChatMessage>> findByMessageId(String messageId,
+      {String? receiverPeerId, String? senderPeerId}) async {
+    String where = 'messageId=?';
+    List<Object> whereArgs = [messageId];
+    if (receiverPeerId != null) {
+      where = '$where and receiverPeerId=?';
+      whereArgs.add(receiverPeerId);
+    }
+    if (senderPeerId != null) {
+      where = '$where and senderPeerId=?';
+      whereArgs.add(senderPeerId);
+    }
+    return await find(
+      where: where,
+      whereArgs: whereArgs,
+    );
+  }
+
+  ///查询消息号的唯一原始消息
+  Future<ChatMessage?> findOriginByMessageId(String messageId,
       {String? receiverPeerId, String? senderPeerId}) async {
     String where = 'messageId=?';
     List<Object> whereArgs = [messageId];
@@ -207,7 +227,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       if (messageId == null) {
         logger.e('chatReceipt message must have messageId');
       }
-      ChatMessage? originChatMessage = await findByMessageId(messageId!,
+      ChatMessage? originChatMessage = await findOriginByMessageId(messageId!,
           receiverPeerId: chatMessage.senderPeerId!);
       if (originChatMessage == null) {
         logger.e('chatReceipt message has no chatMessage with same messageId');
@@ -715,7 +735,6 @@ final mergedMessageService = MergedMessageService(
     indexFields: ['ownerPeerId', 'mergedMessageId', 'messageId', 'createDate'],
     fields: ServiceLocator.buildFields(MergedMessage(), []));
 
-
 class ReceiveService extends GeneralBaseService<Receive> {
   ReceiveService(
       {required super.tableName,
@@ -738,4 +757,3 @@ final receiveService = ReceiveService(
       'messageType',
     ],
     fields: ServiceLocator.buildFields(Receive(), []));
-

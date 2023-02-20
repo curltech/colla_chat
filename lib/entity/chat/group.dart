@@ -14,6 +14,7 @@ class Group extends PeerParty {
   String? privateKey;
   String? signalPublicKey;
   String? signalPrivateKey;
+  List<String>? participants;
 
   Group(String peerId, String name) : super(peerId, name);
 
@@ -59,7 +60,9 @@ class GroupMember extends StatusEntity {
   String? creatorPeerId;
   String?
       memberType; // 成员类型，包括：Owner（创建者/群主，默认管理员）, Member（一般成员）,…可能的扩充：Admin（管理员）, Subscriber（订阅者）
-  GroupMember();
+  GroupMember(this.groupId, this.memberPeerId, {this.memberType}) {
+    memberType ??= MemberType.member.name;
+  }
 
   GroupMember.fromJson(Map json)
       : groupId = json['groupId'],

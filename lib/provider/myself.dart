@@ -31,7 +31,6 @@ class Myself with ChangeNotifier {
   SimpleKeyPair? privateKey;
 
   MyselfPeer myselfPeer = MyselfPeer('', '', '', '');
-  PeerProfile peerProfile = PeerProfile('', '');
 
   ///当连接p2p节点成功后设置
   PeerClient? myselfPeerClient;
@@ -49,6 +48,14 @@ class Myself with ChangeNotifier {
   Myself() {
     _buildThemeData();
     _buildDarkThemeData();
+  }
+
+  PeerProfile get peerProfile {
+    return myselfPeer.peerProfile;
+  }
+
+  set peerProfile(PeerProfile peerProfile) {
+    myselfPeer.peerProfile = peerProfile;
   }
 
   _buildThemeData() {

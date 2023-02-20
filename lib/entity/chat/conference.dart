@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class Conference extends StatusEntity {
   String conferenceId; // 会议编号，也是房间号，也是邀请消息号
   String? name;
-  String? title;
+  String? topic;
   String? conferenceOwnerPeerId; // 发起人
   String? password; // 密码
   bool linkman = false; // 是否好友才能参加
@@ -23,13 +23,15 @@ class Conference extends StatusEntity {
   Conference(this.conferenceId,
       {this.name,
       this.conferenceOwnerPeerId,
-      this.title,
+      this.topic,
+      this.startDate,
+      this.endDate,
       this.participants = const <String>[]});
 
   Conference.fromJson(Map json)
       : conferenceId = json['conferenceId'],
         name = json['name'],
-        title = json['title'],
+        topic = json['topic'],
         conferenceOwnerPeerId = json['conferenceOwnerPeerId'],
         password = json['password'],
         startDate = json['startDate'],
@@ -56,7 +58,7 @@ class Conference extends StatusEntity {
     json.addAll({
       'conferenceId': conferenceId,
       'name': name,
-      'title': title,
+      'topic': topic,
       'conferenceOwnerPeerId': conferenceOwnerPeerId,
       'password': password,
       'startDate': startDate,

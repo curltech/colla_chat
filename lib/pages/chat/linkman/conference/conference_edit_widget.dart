@@ -1,8 +1,8 @@
-import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -110,7 +110,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     }
   }
 
-  //更新groupOwnerOptions
+  //更新ConferenceOwnerOptions，从会议成员中选择
   _buildConferenceOwnerOptions(List<String> selected) async {
     conference.value.conferenceOwnerPeerId ??= myself.peerId;
     List<Option<String>> conferenceOwnerOptions = [];
@@ -142,7 +142,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     conferenceOwnerController.options = conferenceOwnerOptions;
   }
 
-  //群成员显示和编辑界面
+  //会议成员显示和编辑界面，从所有的联系人中选择会议成员
   Widget _buildConferenceMembersWidget(BuildContext context) {
     var selector = ValueListenableBuilder(
         valueListenable: conferenceMembers,
@@ -164,18 +164,18 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     return selector;
   }
 
-  //群主选择界面
+  //会议发起人选择界面
   Widget _buildConferenceOwnerWidget(BuildContext context) {
     var selector = CustomSingleSelectField(
         title: 'ConferenceOwnerPeer',
         onChanged: (selected) {
-          conference.value?.conferenceOwnerPeerId = selected;
+          conference.value.conferenceOwnerPeerId = selected;
         },
         optionController: conferenceOwnerController);
     return selector;
   }
 
-  //群信息编辑界面
+  //会议信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
     var formInputWidget = SingleChildScrollView(
         child: Container(
@@ -192,10 +192,10 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
                   }
                   return FormInputWidget(
                     onOk: (Map<String, dynamic> values) {
-                      _onOk(values).then((groupId) {
+                      _onOk(values).then((conferenceId) {
                         DialogUtil.info(context,
                             content:
-                                'Conference $groupId operation is completed');
+                                'Conference $conferenceId operation is completed');
                       });
                     },
                     columnFieldDefs: conferenceColumnFieldDefs,
@@ -220,88 +220,54 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
           content: AppLocalizations.t('Must has conference owner'));
       return null;
     }
-    if (StringUtil.isEmpty(conference.value.title)) {
+    if (StringUtil.isEmpty(conference.value.topic)) {
       DialogUtil.error(context,
-          content: AppLocalizations.t('Must has conference title'));
+          content: AppLocalizations.t('Must has conference topic'));
       return null;
     }
     var current = conferenceController.current;
-    current ??=
-        await conferenceService.createConference(currentConference.name!);
-    if (current.title != currentConference.title) {
-      current.title = currentConference.title;
+    if (current == null) {
+      current = await conferenceService.createConference(
+        currentConference.name!,
+        topic: currentConference.topic,
+        conferenceOwnerPeerId: currentConference.conferenceOwnerPeerId,
+        startDate: currentConference.startDate,
+        endDate: currentConference.endDate,
+      );
       conferenceModified = true;
-    }
-    if (current.name != currentConference.name) {
-      current.name = currentConference.name;
-      conferenceModified = true;
-    }
-    if (current.conferenceOwnerPeerId !=
-        currentConference.conferenceOwnerPeerId) {
-      current.conferenceOwnerPeerId = currentConference.conferenceOwnerPeerId;
-      conferenceModified = true;
-    }
-    if (current.password != currentConference.password) {
-      current.password = currentConference.password;
-      conferenceModified = true;
-    }
-    bool add = true;
-    if (current.id != null) {
-      add = false;
+    } else {
+      if (current.topic != currentConference.topic) {
+        current.topic = currentConference.topic;
+        conferenceModified = true;
+      }
+      if (current.name != currentConference.name) {
+        current.name = currentConference.name;
+        conferenceModified = true;
+      }
+      if (current.conferenceOwnerPeerId !=
+          currentConference.conferenceOwnerPeerId) {
+        current.conferenceOwnerPeerId = currentConference.conferenceOwnerPeerId;
+        conferenceModified = true;
+      }
+      if (current.password != currentConference.password) {
+        current.password = currentConference.password;
+        conferenceModified = true;
+      }
     }
     conference.value.conferenceOwnerPeerId ??= myself.peerId;
     current.conferenceOwnerPeerId = conference.value.conferenceOwnerPeerId;
+    current.participants = conferenceMembers.value;
     await conferenceService.store(current);
     conference.value = current;
-    String conferenceId = current.conferenceId;
-    List<GroupMember> members =
-        await groupMemberService.findByGroupId(current.conferenceId);
-    Map<String, GroupMember> oldMembers = {};
-    //所有的现有成员
-    if (members.isNotEmpty) {
-      for (GroupMember member in members) {
-        oldMembers[member.memberPeerId!] = member;
-      }
-    }
-    //新增加的成员
-    List<GroupMember> newMembers = [];
-    for (var memberPeerId in conferenceMembers.value) {
-      var member = oldMembers[memberPeerId];
-      if (member == null) {
-        Linkman? linkman =
-            await linkmanService.findCachedOneByPeerId(memberPeerId);
-        if (linkman != null) {
-          GroupMember groupMember = GroupMember();
-          groupMember.groupId = conferenceId;
-          groupMember.memberPeerId = memberPeerId;
-          groupMember.memberType = MemberType.member.name;
-          if (StringUtil.isEmpty(linkman.alias)) {
-            groupMember.memberAlias = linkman.name;
-          } else {
-            groupMember.memberAlias = linkman.alias;
-          }
-          groupMember.status = EntityStatus.effective.name;
-          await groupMemberService.store(groupMember);
-          newMembers.add(groupMember);
-        }
-      } else {
-        oldMembers.remove(memberPeerId);
-      }
-    }
-
-    //处理删除的成员
-    if (oldMembers.isNotEmpty) {
-      for (GroupMember member in oldMembers.values) {
-        oldMembers[member.memberPeerId!] = member;
-        await groupMemberService.delete(entity: {'id': member.id});
-      }
-    }
 
     if (conferenceController.current == null) {
       conferenceController.add(current);
     }
+    if (conferenceModified) {
+      conferenceChatSummaryController.refresh();
+    }
 
-    return conferenceId;
+    return conference.value.conferenceId;
   }
 
   Widget _buildConferenceEdit(BuildContext context) {

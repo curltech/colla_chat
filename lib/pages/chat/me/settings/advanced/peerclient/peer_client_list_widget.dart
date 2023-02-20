@@ -54,7 +54,7 @@ class PeerClientListWidget extends StatefulWidget with TileDataMixin {
           tooltip: AppLocalizations.t('Last')),
       IconButton(
           onPressed: () {
-            var current = PeerClient('', '', '');
+            var current = PeerClient('', '');
             current.state = EntityState.insert;
             peerClientDataPageController.add(current);
           },

@@ -1,4 +1,5 @@
 import 'package:colla_chat/entity/dht/peerprofile.dart';
+import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:flutter/material.dart';
 
 import '../base.dart';
@@ -14,6 +15,7 @@ abstract class PeerEntity extends StatusEntity {
   String peerId;
   String name;
 
+  String clientId; //peer的唯一设备编码
   //加密的配置
   //String? securityContext;
   //   ed25519的公私钥,表明身份，用于签名
@@ -41,13 +43,16 @@ abstract class PeerEntity extends StatusEntity {
   //不存储数据库
   Widget? avatarImage;
   Widget? avatarIcon;
-  PeerProfile? peerProfile;
+  late PeerProfile peerProfile;
 
-  PeerEntity(this.peerId, this.name);
+  PeerEntity(this.peerId, this.name, {this.clientId = unknownClientId}) {
+    peerProfile = PeerProfile(peerId, clientId: clientId);
+  }
 
   PeerEntity.fromJson(Map json)
       : peerId = json['peerId'],
         name = json['name'] ?? '',
+        clientId = json['clientId'] ?? unknownClientId,
         peerPublicKey = json['peerPublicKey'] ?? '',
         publicKey = json['publicKey'] ?? '',
         address = json['address'],
@@ -72,6 +77,7 @@ abstract class PeerEntity extends StatusEntity {
     json.addAll({
       'peerId': peerId,
       'name': name,
+      'clientId': clientId,
       'peerPublicKey': peerPublicKey,
       'publicKey': publicKey,
       'address': address,

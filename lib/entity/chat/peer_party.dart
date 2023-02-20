@@ -1,4 +1,3 @@
-
 //当事方，联系人，群，手机联系人（潜在联系人）的共同父类
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/dht/base.dart';
@@ -38,27 +37,27 @@ abstract class PeerParty extends PeerEntity {
         lastConnectTime = json['lastConnectTime'],
         locked = json['locked'] == true || json['locked'] == 1 ? true : false,
         notAlert =
-        json['notAlert'] == true || json['notAlert'] == 1 ? true : false,
+            json['notAlert'] == true || json['notAlert'] == 1 ? true : false,
         top = json['top'] == true || json['top'] == 1 ? true : false,
         blackedMe =
-        json['blackedMe'] == true || json['blackedMe'] == 1 ? true : false,
+            json['blackedMe'] == true || json['blackedMe'] == 1 ? true : false,
         droppedMe =
-        json['droppedMe'] == true || json['droppedMe'] == 1 ? true : false,
+            json['droppedMe'] == true || json['droppedMe'] == 1 ? true : false,
         recallTimeLimit =
-        json['recallTimeLimit'] == true || json['recallTimeLimit'] == 1
-            ? true
-            : false,
+            json['recallTimeLimit'] == true || json['recallTimeLimit'] == 1
+                ? true
+                : false,
         recallAlert = json['recallAlert'] == true || json['recallAlert'] == 1
             ? true
             : false,
         myselfRecallTimeLimit = json['myselfRecallTimeLimit'] == true ||
-            json['myselfRecallTimeLimit'] == 1
+                json['myselfRecallTimeLimit'] == 1
             ? true
             : false,
         myselfRecallAlert =
-        json['myselfRecallAlert'] == true || json['myselfRecallAlert'] == 1
-            ? true
-            : false,
+            json['myselfRecallAlert'] == true || json['myselfRecallAlert'] == 1
+                ? true
+                : false,
         super.fromJson(json);
 
   @override
@@ -84,7 +83,6 @@ abstract class PeerParty extends PeerEntity {
     return json;
   }
 }
-
 
 // 联系人标签
 class Tag extends BaseEntity {

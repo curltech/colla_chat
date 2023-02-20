@@ -2,6 +2,12 @@ import 'package:colla_chat/l10n/localization.dart';
 
 class DateUtil {
   ///获取当前时间的ISO字符串
+  static DateTime currentDateTime() {
+    var currentDate = DateTime.now().toUtc();
+    return currentDate;
+  }
+
+  ///获取当前时间的ISO字符串
   static String currentDate() {
     var currentDate = DateTime.now().toUtc().toIso8601String();
     return currentDate;

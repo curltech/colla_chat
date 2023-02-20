@@ -5,8 +5,10 @@ import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_summary.dart';
 import 'package:colla_chat/service/chat/group.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
+import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/combine_grid_view.dart';
 import 'package:flutter/material.dart';
@@ -98,10 +100,13 @@ class ConferenceService extends GeneralBaseService<Conference> {
 
   Future<Conference> createConference(
     String name, {
-    String? title,
+    String? topic,
     String? conferenceOwnerPeerId,
+    String? startDate,
+    String? endDate,
     List<String>? participants,
   }) async {
+    //不允许创建同名的会议
     var old = await findOneByName(name);
     if (old != null) {
       return old;
@@ -109,10 +114,16 @@ class ConferenceService extends GeneralBaseService<Conference> {
     var uuid = const Uuid();
     String conferenceId = uuid.v4();
     conferenceOwnerPeerId = conferenceOwnerPeerId ?? myself.peerId;
+    startDate ??= DateUtil.currentDate();
+    endDate ??= DateUtil.currentDateTime()
+        .add(const Duration(minutes: 60))
+        .toIso8601String();
     var conference = Conference(conferenceId,
         name: name,
-        title: title,
+        topic: topic,
         conferenceOwnerPeerId: conferenceOwnerPeerId,
+        startDate: startDate,
+        endDate: endDate,
         participants: participants);
 
     conference.status = EntityStatus.effective.name;
@@ -120,7 +131,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
     return conference;
   }
 
-  Future<Conference?> store(Conference conference) async {
+  Future<List<Object>> store(Conference conference) async {
     Conference? old = await findOneByConferenceId(conference.conferenceId);
     if (old != null) {
       conference.id = old.id;
@@ -129,10 +140,54 @@ class ConferenceService extends GeneralBaseService<Conference> {
       conference.id = null;
     }
     await upsert(conference);
+    var conferenceId = conference.conferenceId;
+    var participants = conference.participants;
+    if (participants == null || participants.isEmpty) {
+      return [conference, [], []];
+    }
+    List<GroupMember> members =
+        await groupMemberService.findByGroupId(conferenceId);
+    Map<String, GroupMember> oldMembers = {};
+    //所有的现有成员
+    if (members.isNotEmpty) {
+      for (GroupMember member in members) {
+        oldMembers[member.memberPeerId!] = member;
+      }
+    }
+    //新增加的成员
+    List<GroupMember> newMembers = [];
+    for (var memberPeerId in participants) {
+      var member = oldMembers[memberPeerId];
+      if (member == null) {
+        Linkman? linkman =
+            await linkmanService.findCachedOneByPeerId(memberPeerId);
+        if (linkman != null) {
+          GroupMember groupMember = GroupMember(conferenceId, memberPeerId);
+          groupMember.memberType = MemberType.member.name;
+          if (StringUtil.isEmpty(linkman.alias)) {
+            groupMember.memberAlias = linkman.name;
+          } else {
+            groupMember.memberAlias = linkman.alias;
+          }
+          groupMember.status = EntityStatus.effective.name;
+          await groupMemberService.store(groupMember);
+          newMembers.add(groupMember);
+        }
+      } else {
+        oldMembers.remove(memberPeerId);
+      }
+    }
+
+    //处理删除的成员
+    if (oldMembers.isNotEmpty) {
+      for (GroupMember member in oldMembers.values) {
+        await groupMemberService.delete(entity: {'id': member.id});
+      }
+    }
     conferences[conference.conferenceId] = conference;
     await chatSummaryService.upsertByConference(conference);
 
-    return conference;
+    return [conference, newMembers, oldMembers.values.toList()];
   }
 
   removeByConferenceId(String conferenceId) async {

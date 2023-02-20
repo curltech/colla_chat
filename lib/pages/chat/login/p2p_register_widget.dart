@@ -1,5 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -99,11 +100,10 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
       myselfPeerService
           .register(name, loginName, plainPassword,
               mobile: _mobile, email: email)
-          .then((registerStatus) {
-        if (registerStatus) {
-          Application.router
-              .navigateTo(context, Application.p2pLogin, replace: true);
-        }
+          .then((myselfPeer) {
+        myself.myselfPeer = myselfPeer;
+        Application.router
+            .navigateTo(context, Application.p2pLogin, replace: true);
       }).onError((error, stackTrace) {
         DialogUtil.error(context, content: error.toString());
       });

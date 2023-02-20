@@ -160,4 +160,4 @@ class PeerClientService extends PeerEntityService<PeerClient> {
 final peerClientService = PeerClientService(
     tableName: "blc_peerclient",
     indexFields: ['peerId', 'name', 'mobile'],
-    fields: ServiceLocator.buildFields(PeerClient('', '', ''), []));
+    fields: ServiceLocator.buildFields(PeerClient('', ''), []));

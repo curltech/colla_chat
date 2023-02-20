@@ -63,5 +63,5 @@ class PeerProfileService extends PeerEntityService<PeerProfile> {
 
 final peerProfileService = PeerProfileService(
     tableName: "blc_peerprofile",
-    fields: ServiceLocator.buildFields(PeerProfile('', ''), []),
+    fields: ServiceLocator.buildFields(PeerProfile(''), []),
     indexFields: ['peerId', 'clientId']);

@@ -511,7 +511,7 @@ class MessageWidget {
       return Container();
     }
     return FutureBuilder(
-      future: chatMessageService.findByMessageId(parentMessageId),
+      future: chatMessageService.findOriginByMessageId(parentMessageId),
       builder: (BuildContext context, AsyncSnapshot<ChatMessage?> snapshot) {
         if (snapshot.hasData) {
           ChatMessage? chatMessage = snapshot.data;

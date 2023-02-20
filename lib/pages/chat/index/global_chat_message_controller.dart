@@ -63,7 +63,7 @@ class GlobalChatMessageController with ChangeNotifier {
         break;
       case ChatMessageSubType.chatReceipt:
         //处理视频通话消息的回执
-        ChatMessage? originMessage = await chatMessageService.findByMessageId(
+        ChatMessage? originMessage = await chatMessageService.findOriginByMessageId(
             messageId,
             receiverPeerId: chatMessage.senderPeerId!);
         if (originMessage == null) {

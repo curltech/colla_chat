@@ -1,3 +1,4 @@
+import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:flutter/material.dart';
 
 import '../base.dart';
@@ -46,7 +47,7 @@ class PeerProfile extends StatusEntity {
   String? currency;
   String? lastTransactionTime;
 
-  PeerProfile(this.peerId, this.clientId);
+  PeerProfile(this.peerId, {this.clientId = unknownClientId});
 
   PeerProfile.fromJson(Map json)
       : peerId = json['peerId'],

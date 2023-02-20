@@ -81,7 +81,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
   }
 
   /// 注册新的p2p账户
-  Future<bool> register(String name, String loginName, String password,
+  Future<MyselfPeer> register(String name, String loginName, String password,
       {String? code, String? mobile, String? email}) async {
     if (code != null && mobile != null) {
       var isPhoneNumberValid = false;
@@ -121,7 +121,6 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     myselfPeer.endDate = '9999-12-31T11:59:59.999Z';
     myselfPeer.statusDate = currentDate;
     await store(myselfPeer);
-    myself.myselfPeer = myselfPeer;
 
     // 初始化profile
     String? peerId = myselfPeer.peerId;
@@ -129,7 +128,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     if (profile != null) {
       await peerProfileService.delete(entity: profile);
     }
-    var peerProfile = PeerProfile(peerId, myselfPeer.clientId);
+    var peerProfile = PeerProfile(peerId, clientId: myselfPeer.clientId);
     peerProfile.peerId = peerId;
     peerProfile.ownerPeerId = peerId;
     peerProfile.status = EntityStatus.effective.name;
@@ -145,9 +144,9 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     peerProfile.logLevel = 'none';
     peerProfile.lastSyncTime = currentDate;
     await peerProfileService.upsert(peerProfile);
-    myself.peerProfile = peerProfile;
+    myselfPeer.peerProfile = peerProfile;
 
-    return true;
+    return myselfPeer;
   }
 
   ///获取最后一次登录的用户名
