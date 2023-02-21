@@ -44,7 +44,7 @@ class _LocalePickerState extends State<LocalePicker> {
           myself.locale = LocaleUtil.getLocale(selected);
         }
       },
-      options: options,
+      optionController: OptionController(options: options),
     );
   }
 

@@ -33,6 +33,7 @@ class LinkmanGroupSearchWidget extends StatefulWidget {
 class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
   String title = '';
   String placeholder = '';
+  OptionController optionController = OptionController();
 
   @override
   initState() {
@@ -86,65 +87,111 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
 
   /// 复杂多选对话框样式，选择项通过传入的回调方法返回
   Widget _buildChipMultiSelectField(BuildContext context) {
-    var selector = CustomMultiSelectField(
-      title: title,
-      prefix: Icon(
-        Icons.person_add,
-        color: myself.primary,
-      ),
-      onSearch: _onSearch,
-      onConfirm: (selected) {
-        widget.onSelected(selected);
-      },
-    );
+    var selector = FutureBuilder(
+        future: _onSearch(''),
+        builder: (BuildContext context,
+            AsyncSnapshot<List<Option<String>>> snapshot) {
+          if (!snapshot.hasData) {
+            return Container();
+          }
+          var options = snapshot.data;
+          optionController.options = options!;
+          return CustomMultiSelectField(
+            title: title,
+            prefix: Icon(
+              Icons.person_add,
+              color: myself.primary,
+            ),
+            optionController: optionController,
+            onSearch: _onSearch,
+            onConfirm: (selected) {
+              widget.onSelected(selected);
+            },
+          );
+        });
 
     return selector;
   }
 
   /// 简单多选字段，选择项通过传入的回调方法返回
   Widget _buildDataListMultiSelectField(BuildContext context) {
-    var selector = CustomMultiSelectField(
-      title: title,
-      prefix: Icon(
-        Icons.person_add,
-        color: myself.primary,
-      ),
-      onSearch: _onSearch,
-      onConfirm: (selected) {
-        widget.onSelected(selected);
-      },
-      selectType: SelectType.dataListMultiSelect,
-    );
+    var selector = FutureBuilder(
+        future: _onSearch(''),
+        builder: (BuildContext context,
+            AsyncSnapshot<List<Option<String>>> snapshot) {
+          if (!snapshot.hasData) {
+            return Container();
+          }
+          var options = snapshot.data;
+          optionController.options = options!;
+          //非const的组件必须有key
+          return CustomMultiSelectField(
+            title: title,
+            prefix: Icon(
+              Icons.person_add,
+              color: myself.primary,
+            ),
+            optionController: optionController,
+            onSearch: _onSearch,
+            onConfirm: (selected) {
+              widget.onSelected(selected);
+            },
+            selectType: SelectType.dataListMultiSelect,
+          );
+        });
 
     return selector;
   }
 
   /// 简单多选对话框，使用时外部用对话框包裹
   Widget _buildChipMultiSelect(BuildContext context) {
-    var selector = CustomMultiSelect(
-      onSearch: _onSearch,
-      onConfirm: (selected) {
-        widget.onSelected(selected);
-      },
-      title: title,
-    );
+    var selector = FutureBuilder(
+        future: _onSearch(''),
+        builder: (BuildContext context,
+            AsyncSnapshot<List<Option<String>>> snapshot) {
+          if (!snapshot.hasData) {
+            return Container();
+          }
+          var options = snapshot.data;
+          optionController.options = options!;
+          return CustomMultiSelect(
+            onSearch: _onSearch,
+            optionController: optionController,
+            onConfirm: (selected) {
+              widget.onSelected(selected);
+            },
+            title: title,
+          );
+        });
     return selector;
   }
 
   Widget _buildDataListMultiSelect(BuildContext context) {
-    return CustomMultiSelect(
-      onSearch: _onSearch,
-      onConfirm: (selected) {
-        widget.onSelected(selected);
-      },
-      selectType: SelectType.dataListMultiSelect,
-      title: title,
-    );
+    return FutureBuilder(
+        future: _onSearch(''),
+        builder: (BuildContext context,
+            AsyncSnapshot<List<Option<String>>> snapshot) {
+          if (!snapshot.hasData) {
+            return Container();
+          }
+          var options = snapshot.data;
+          optionController.options = options!;
+          return CustomMultiSelect(
+            onSearch: _onSearch,
+            optionController: optionController,
+            onConfirm: (selected) {
+              widget.onSelected(selected);
+            },
+            selectType: SelectType.dataListMultiSelect,
+            title: title,
+          );
+        });
   }
 
   /// DataListView的单选对话框，使用时外部用对话框包裹
   Widget _buildDataListSingleSelect(BuildContext context) {
     var dataListView = DataListSingleSelect(
+      optionController: optionController,
       onSearch: _onSearch,
       onChanged: (String? value) {
         widget.onSelected([value!]);
@@ -156,6 +203,7 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
 
   Widget _buildDataListSingleSelectField(BuildContext context) {
     var dataListView = CustomSingleSelectField(
+      optionController: optionController,
       onSearch: _onSearch,
       onChanged: (String? value) {
         widget.onSelected([value!]);

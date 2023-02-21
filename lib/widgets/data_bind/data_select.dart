@@ -9,7 +9,11 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class OptionController with ChangeNotifier {
-  List<Option<String>> _options = [];
+  late List<Option<String>> _options;
+
+  OptionController({List<Option<String>> options = const <Option<String>>[]}) {
+    _options = options;
+  }
 
   List<Option<String>> get options {
     return _options;
@@ -134,29 +138,18 @@ class _DataDropdownButtonState extends State<DataDropdownButton> {
 ///利用DataListView实现的单选对组件类，可以包装到对话框中
 ///利用回调函数onChanged回传选择的值
 class DataListSingleSelect extends StatefulWidget {
-  final List<Option<String>>? options;
-  late final OptionController optionController;
+  final OptionController optionController;
   final String? title;
   final Future<List<Option<String>>> Function(String keyword)? onSearch;
   final Function(String? selected) onChanged;
 
-  DataListSingleSelect(
+  const DataListSingleSelect(
       {Key? key,
-      this.options,
-      OptionController? optionController,
+      required this.optionController,
       this.title,
       this.onSearch,
       required this.onChanged})
-      : super(key: key) {
-    if (optionController == null) {
-      this.optionController = OptionController();
-      if (options != null) {
-        this.optionController.options = options!;
-      }
-    } else {
-      this.optionController = optionController;
-    }
-  }
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _DataListSingleSelectState();
@@ -320,8 +313,7 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
 }
 
 class CustomSingleSelectField extends StatefulWidget {
-  final List<Option<String>>? options;
-  late final OptionController optionController;
+  final OptionController optionController;
   final Future<List<Option<String>>> Function(String keyword)? onSearch;
   final String title;
   final Widget? prefix;
@@ -329,26 +321,16 @@ class CustomSingleSelectField extends StatefulWidget {
   final SelectType selectType;
   final Function(String?) onChanged;
 
-  CustomSingleSelectField({
+  const CustomSingleSelectField({
     Key? key,
-    this.options,
-    OptionController? optionController,
+    required this.optionController,
     required this.title,
     this.prefix,
     this.suffix,
     this.selectType = SelectType.chipMultiSelect,
     this.onSearch,
     required this.onChanged,
-  }) : super(key: key) {
-    if (optionController == null) {
-      this.optionController = OptionController();
-      if (options != null) {
-        this.optionController.options = options!;
-      }
-    } else {
-      this.optionController = optionController;
-    }
-  }
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _CustomSingleSelectFieldState();
@@ -375,7 +357,7 @@ class _CustomSingleSelectFieldState extends State<CustomSingleSelectField> {
 
   Widget _buildSingleSelectField(BuildContext context) {
     var suffix = widget.suffix ??
-        Icon(
+        const Icon(
           Icons.arrow_drop_down,
           color: Colors.white,
         );
@@ -450,31 +432,20 @@ enum SelectType {
 ///利用Chip实现的多选对组件类，可以包装到对话框中
 ///利用回调函数onConfirm回传选择的值
 class CustomMultiSelect extends StatefulWidget {
-  final List<Option<String>>? options;
-  late final OptionController optionController;
+  final OptionController optionController;
   final Future<List<Option<String>>> Function(String keyword)? onSearch;
   final Function(List<String>? selected) onConfirm;
   final String? title;
   final SelectType selectType;
 
-  CustomMultiSelect({
+  const CustomMultiSelect({
     Key? key,
-    this.options,
-    OptionController? optionController,
+    required this.optionController,
     required this.onConfirm,
     this.onSearch,
     this.title,
     this.selectType = SelectType.chipMultiSelect,
-  }) : super(key: key) {
-    if (optionController == null) {
-      this.optionController = OptionController();
-      if (options != null) {
-        this.optionController.options = options!;
-      }
-    } else {
-      this.optionController = optionController;
-    }
-  }
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _CustomMultiSelectState();
@@ -490,7 +461,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
   void initState() {
     super.initState();
     widget.optionController.addListener(_update);
-    _search();
+    options.value = widget.optionController.copy();
   }
 
   _update() {
@@ -543,6 +514,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
     return searchTextField;
   }
 
+  //对话框界面的数据必须使用本地数据，不能使用控制器数据，否则边选择数据边改了
   Widget _buildChipView(BuildContext context) {
     return ValueListenableBuilder(
         valueListenable: options,
@@ -584,6 +556,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
         });
   }
 
+  //对话框界面的数据必须使用本地数据，不能使用控制器数据，否则边选择数据边改了
   Widget _buildDataListView(BuildContext context) {
     return ValueListenableBuilder(
         valueListenable: options,
@@ -705,18 +678,17 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
 ///利用Chip实现的多选字段组件类，将ChipMultiSelect包装到对话框中
 ///利用回调函数onConfirm回传选择的值
 class CustomMultiSelectField extends StatefulWidget {
-  final List<Option<String>>? options;
   final Future<List<Option<String>>> Function(String keyword)? onSearch;
   final Function(List<String>? value)? onConfirm;
   final String title;
   final Widget? prefix;
   final Widget? suffix;
   final SelectType selectType;
+  final OptionController optionController;
 
   const CustomMultiSelectField(
       {Key? key,
-      this.options,
-      OptionController? optionController,
+      required this.optionController,
       required this.onSearch,
       this.onConfirm,
       required this.title,
@@ -730,31 +702,26 @@ class CustomMultiSelectField extends StatefulWidget {
 }
 
 class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
-  final OptionController optionController = OptionController();
-  ValueNotifier<List<Option<String>>> options =
-      ValueNotifier<List<Option<String>>>(<Option<String>>[]);
+  ValueNotifier<bool> optionsChanged = ValueNotifier<bool>(true);
   ValueNotifier<bool> chipVisible = ValueNotifier<bool>(false);
 
   @override
   void initState() {
     super.initState();
-    optionController.addListener(_update);
-    if (widget.options != null) {
-      optionController.options = widget.options!;
-    }
+    widget.optionController.addListener(_update);
   }
 
   _update() {
-    options.value = [...optionController.options];
+    optionsChanged.value = !optionsChanged.value;
   }
 
+  //字段的数据使用控制器数据，直接修改，optionsChanged用于表示控制器数据改变了
   Widget _buildSelectedChips(BuildContext context) {
     return ValueListenableBuilder(
-        valueListenable: options,
-        builder: (BuildContext context, List<Option<String>> options,
-            Widget? child) {
+        valueListenable: optionsChanged,
+        builder: (BuildContext context, bool optionsChanged, Widget? child) {
           List<Chip> chips = [];
-          for (var option in optionController.options) {
+          for (var option in widget.optionController.options) {
             if (option.checked) {
               var chip = Chip(
                 label: Text(
@@ -765,7 +732,8 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
                 backgroundColor: Colors.white,
                 deleteIconColor: myself.primary,
                 onDeleted: () {
-                  optionController.setChecked(option, false);
+                  widget.optionController.setChecked(option, false);
+                  widget.onConfirm!(widget.optionController.selected);
                 },
               );
               chips.add(chip);
@@ -800,9 +768,8 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
               builder: (BuildContext context) {
                 return CustomMultiSelect(
                   title: widget.title,
-                  options: widget.options,
                   selectType: widget.selectType,
-                  optionController: optionController,
+                  optionController: widget.optionController,
                   onSearch: widget.onSearch,
                   onConfirm: (List<String>? selected) {
                     Navigator.pop(
@@ -843,7 +810,7 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
 
   @override
   void dispose() {
-    optionController.removeListener(_update);
+    widget.optionController.removeListener(_update);
     super.dispose();
   }
 }

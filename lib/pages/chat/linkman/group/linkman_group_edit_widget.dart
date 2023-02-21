@@ -78,7 +78,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
   }
 
   _update() {
-    setState(() {});
+    _buildGroupData();
   }
 
   _buildGroupData() async {
@@ -163,6 +163,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
           group.value.groupOwnerPeerId = selected;
         },
         optionController: groupOwnerController);
+
     return selector;
   }
 

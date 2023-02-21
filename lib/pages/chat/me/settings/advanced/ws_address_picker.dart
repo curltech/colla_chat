@@ -60,7 +60,7 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
   Widget _buildSelectWidget(BuildContext context) {
     return CustomSingleSelectField(
       title: 'Address',
-      options: addressOptions,
+      optionController: OptionController(options:addressOptions),
       onChanged: (selected) {
         if (selected != null) {
           var peerEndpoints = peerEndpointController.data;

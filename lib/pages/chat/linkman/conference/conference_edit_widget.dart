@@ -73,7 +73,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
   ValueNotifier<List<String>> conferenceMembers = ValueNotifier([]);
 
   //群主的选项
-  // ValueNotifier<List<Option<String>>> groupOwnerOptions = ValueNotifier([]);
+  //ValueNotifier<List<Option<String>>> groupOwnerOptions = ValueNotifier([]);
 
   //当前会议
   ValueNotifier<Conference> conference = ValueNotifier(Conference(''));
@@ -86,9 +86,12 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
   }
 
   _update() {
-    setState(() {});
+    if (mounted) {
+      _buildConferenceData();
+    }
   }
 
+  //当当前会议改变后，更新数据，局部刷新
   _buildConferenceData() async {
     var current = conferenceController.current;
     if (current != null) {
@@ -156,7 +159,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
                 await _buildConferenceOwnerOptions(selected);
               }
             },
-            selected: this.conferenceMembers.value,
+            selected: conferenceMembers,
             includeGroup: false,
           );
         });
@@ -166,12 +169,18 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
 
   //会议发起人选择界面
   Widget _buildConferenceOwnerWidget(BuildContext context) {
-    var selector = CustomSingleSelectField(
-        title: 'ConferenceOwnerPeer',
-        onChanged: (selected) {
-          conference.value.conferenceOwnerPeerId = selected;
-        },
-        optionController: conferenceOwnerController);
+    var selector =
+        // ValueListenableBuilder(
+        //     valueListenable: groupOwnerOptions,
+        //     builder: (BuildContext context, List<Option> option, Widget? child) {
+        //       return
+        CustomSingleSelectField(
+            title: 'ConferenceOwnerPeer',
+            onChanged: (selected) {
+              conference.value.conferenceOwnerPeerId = selected;
+            },
+            optionController: conferenceOwnerController);
+    // });
     return selector;
   }
 
@@ -206,7 +215,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     return formInputWidget;
   }
 
-  //修改提交
+//修改提交
   Future<String?> _onOk(Map<String, dynamic> values) async {
     bool conferenceModified = false;
     Conference currentConference = Conference.fromJson(values);
@@ -256,7 +265,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     }
     conference.value.conferenceOwnerPeerId ??= myself.peerId;
     current.conferenceOwnerPeerId = conference.value.conferenceOwnerPeerId;
-    current.participants = conferenceMembers.value;
+    current.participants = conferenceMembers!.value;
     await conferenceService.store(current);
     conference.value = current;
 
@@ -297,6 +306,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
 
   @override
   void dispose() {
+    conferenceController.current = null;
     conferenceController.removeListener(_update);
     controller.dispose();
     super.dispose();

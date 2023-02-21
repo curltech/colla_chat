@@ -6,14 +6,13 @@ import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
 
 ///在群的成员中选择联系人的多选或者单选对话框
-class GroupLinkmanWidget extends StatelessWidget {
+class GroupLinkmanWidget extends StatefulWidget {
   final Function(List<String>) onSelected; //获取返回的选择
   final List<String> selected;
   final SelectType selectType;
   final String groupPeerId;
-  String? title;
 
-  GroupLinkmanWidget({
+  const GroupLinkmanWidget({
     Key? key,
     required this.onSelected,
     required this.selected,
@@ -21,8 +20,21 @@ class GroupLinkmanWidget extends StatelessWidget {
     required this.groupPeerId,
   }) : super(key: key);
 
+  @override
+  State<StatefulWidget> createState() => _GroupLinkmanWidgetState();
+}
+
+class _GroupLinkmanWidgetState extends State<GroupLinkmanWidget> {
+  String? title;
+  OptionController optionController = OptionController();
+
+  @override
+  initState() {
+    super.initState();
+  }
+
   Future<String?> _findGroupName() async {
-    Group? group = await groupService.findCachedOneByPeerId(groupPeerId);
+    Group? group = await groupService.findCachedOneByPeerId(widget.groupPeerId);
     if (group != null) {
       return group.name;
     }
@@ -32,13 +44,14 @@ class GroupLinkmanWidget extends StatelessWidget {
   ///查询群的成员，并生成群成员的选项
   Future<List<Option<String>>> _buildOptions() async {
     title = await _findGroupName();
-    var groupMembers = await groupMemberService.findByGroupId(groupPeerId);
+    var groupMembers =
+        await groupMemberService.findByGroupId(widget.groupPeerId);
     List<Option<String>> options = [];
     for (GroupMember groupMember in groupMembers) {
       String? memberPeerId = groupMember.memberPeerId;
       if (memberPeerId != null) {
         var avatar = await linkmanService.findAvatarImageWidget(memberPeerId);
-        bool checked = selected.contains(memberPeerId);
+        bool checked = widget.selected.contains(memberPeerId);
         Option<String> item = Option<String>(
             groupMember.memberAlias!, memberPeerId,
             leading: avatar, checked: checked);
@@ -63,12 +76,13 @@ class GroupLinkmanWidget extends StatelessWidget {
           if (options == null) {
             return Container();
           }
+          optionController.options = options;
           return CustomMultiSelect(
             title: title,
             onConfirm: (selected) {
-              onSelected(selected!);
+              widget.onSelected(selected!);
             },
-            options: options,
+            optionController: optionController,
           );
         });
     return selector;
@@ -87,12 +101,13 @@ class GroupLinkmanWidget extends StatelessWidget {
           if (options == null) {
             return Container();
           }
+          optionController.options = options;
           return CustomMultiSelect(
             title: title,
             onConfirm: (selected) {
-              onSelected(selected!);
+              widget.onSelected(selected!);
             },
-            options: options,
+            optionController: optionController,
           );
         });
     return selector;
@@ -112,11 +127,12 @@ class GroupLinkmanWidget extends StatelessWidget {
           if (options == null) {
             return Container();
           }
+          optionController.options = options;
           return DataListSingleSelect(
             title: title,
-            options: options,
+            optionController: optionController,
             onChanged: (String? value) {
-              onSelected([value!]);
+              widget.onSelected([value!]);
             },
           );
         });
@@ -126,7 +142,7 @@ class GroupLinkmanWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget selector;
-    switch (selectType) {
+    switch (widget.selectType) {
       case SelectType.dataListMultiSelect:
         selector = _buildDataListMultiSelect(context);
         break;
