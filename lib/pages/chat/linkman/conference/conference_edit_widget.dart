@@ -76,7 +76,8 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
   //ValueNotifier<List<Option<String>>> groupOwnerOptions = ValueNotifier([]);
 
   //当前会议
-  ValueNotifier<Conference> conference = ValueNotifier(Conference(''));
+  ValueNotifier<Conference> conference =
+      ValueNotifier(Conference('', name: ''));
 
   @override
   initState() {
@@ -97,7 +98,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     if (current != null) {
       conference.value = current;
     } else {
-      conference.value = Conference('');
+      conference.value = Conference('', name: '');
     }
     if (conference.value.id != null) {
       List<String> conferenceMembers = [];

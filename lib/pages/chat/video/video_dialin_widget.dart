@@ -27,6 +27,7 @@ class VideoDialInWidget extends StatelessWidget {
   ///接受或者拒绝视频通话邀请的处理
   _processVideoChat(MessageStatus receiptType) async {
     var groupPeerId = chatMessage.groupPeerId;
+    var groupType = chatMessage.groupType;
     var messageId = chatMessage.messageId;
     //单个联系人视频通话邀请
     if (groupPeerId == null) {
@@ -66,7 +67,8 @@ class VideoDialInWidget extends StatelessWidget {
             await advancedPeerConnection.addLocalRender(localRender!);
             //创建房间，将连接加入房间
             List<String> participants = [myself.peerId!, peerId];
-            var conference = Conference(messageId!, participants: participants);
+            var conference =
+                Conference(messageId!, name: '', participants: participants);
             //同意视频通话则加入到视频连接池中
             RemoteVideoRenderController videoRoomRenderController =
                 videoRoomRenderPool
@@ -78,7 +80,14 @@ class VideoDialInWidget extends StatelessWidget {
           }
         }
       }
-    } else {
+    } else if (groupType == PartyType.group.name) {
+      //群视频通话邀请
+      //除了向发送方外，还需要向房间的各接收人发送回执，
+      //首先检查接收人是否已经存在给自己的回执，不存在或者存在是accepted则发送回执
+      //如果存在，如果是rejected或者terminated，则不发送回执
+      Map json = JsonUtil.toJson(chatMessage.content!);
+      var conference = Conference.fromJson(json);
+    } else if (groupType == PartyType.conference.name) {
       //群视频通话邀请
       //除了向发送方外，还需要向房间的各接收人发送回执，
       //首先检查接收人是否已经存在给自己的回执，不存在或者存在是accepted则发送回执

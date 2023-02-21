@@ -118,10 +118,12 @@ class ChatMessage extends StatusEntity {
   ///此时发送者的信息可以不填写
   String? receiverPeerId; // 目标的唯一id标识（单聊对应linkman-peerId，群聊对应group-peerId）
   String? receiverClientId;
-  String? receiverType; // 包括：Linkman（单聊）, Group（群聊）,Channel,
+  String? receiverType; // 包括：Linkman(单聊),Group(群聊),Conference(会议),
   String? receiverName;
-  String? groupPeerId; // 目标的唯一id标识（单聊对应linkman-peerId，群聊对应group-peerId）
+  String?
+      groupPeerId; // 目标的唯一id标识（单聊对应linkman-peerId，群聊对应group-peerId，会议对应conferenceId）
   String? groupName;
+  String? groupType;
   String? receiverAddress;
   String? receiveTime; // 接收时间
   String? receiptTime; // 发送回执时间
@@ -165,6 +167,7 @@ class ChatMessage extends StatusEntity {
         receiverName = json['receiverName'],
         groupPeerId = json['groupPeerId'],
         groupName = json['groupName'],
+        groupType = json['groupType'],
         receiverAddress = json['receiverAddress'],
         messageId = json['messageId'],
         messageType = json['messageType'] ?? ChatMessageType.chat.name,
@@ -224,6 +227,7 @@ class ChatMessage extends StatusEntity {
       'receiverName': receiverName,
       'groupPeerId': groupPeerId,
       'groupName': groupName,
+      'groupType': groupType,
       'receiverAddress': receiverAddress,
       'messageId': messageId,
       'messageType': messageType,
@@ -283,7 +287,6 @@ class MergedMessage extends BaseEntity {
   }
 }
 
-
 // 发送接收记录（群聊联系人请求/群聊/频道）
 class Receive extends BaseEntity {
   String? targetType; // 外键（对应message-targetType、对群聊联系人请求为LinkmanRequest）
@@ -320,4 +323,3 @@ class Receive extends BaseEntity {
     return json;
   }
 }
-

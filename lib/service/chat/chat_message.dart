@@ -4,6 +4,7 @@ import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
@@ -13,6 +14,7 @@ import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_summary.dart';
+import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
@@ -329,6 +331,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String? receiverName,
     String? groupPeerId,
     String? groupName,
+    PartyType? groupType,
     String? title,
     dynamic receiptContent,
     List<int>? thumbnail,
@@ -369,8 +372,12 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.receiverType = receiverType.name;
     chatMessage.receiverClientId = clientId;
     chatMessage.receiverName = receiverName;
-    chatMessage.groupPeerId = groupPeerId;
-    chatMessage.groupName = groupName;
+    if (groupPeerId != null) {
+      chatMessage.groupPeerId = groupPeerId;
+      chatMessage.groupName = groupName;
+      groupType = groupType ?? PartyType.group;
+      chatMessage.groupType = groupType.name;
+    }
     chatMessage.title = title;
     if (receiptContent != null) {
       List<int> data;
@@ -414,7 +421,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
 
   //未填写的字段：transportType,senderAddress,receiverAddress,receiveTime,actualReceiveTime,readTime,destroyTime
   Future<List<ChatMessage>> buildGroupChatMessage(
-    String groupPeerId, {
+    String groupPeerId,
+    PartyType groupType, {
     dynamic content,
     ChatMessageType messageType = ChatMessageType.chat,
     ChatMessageSubType subMessageType = ChatMessageSubType.chat,
@@ -429,56 +437,76 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     List<String>? peerIds,
   }) async {
     List<ChatMessage> chatMessages = [];
-    Group? group = await groupService.findCachedOneByPeerId(groupPeerId);
-    if (group != null) {
-      var groupName = group.name;
-      var groupChatMessage = await buildChatMessage(groupPeerId,
-          content: content,
-          messageId: messageId,
-          messageType: messageType,
-          subMessageType: subMessageType,
-          contentType: contentType,
-          mimeType: mimeType,
-          receiverType: PartyType.group,
-          receiverName: groupName,
-          groupPeerId: groupPeerId,
-          groupName: groupName,
-          title: title,
-          receiptContent: receiptContent,
-          thumbnail: thumbnail,
-          deleteTime: deleteTime,
-          parentMessageId: parentMessageId);
-      chatMessages.add(groupChatMessage);
-      messageId = groupChatMessage.messageId;
+    String? groupName;
+    if (groupType == PartyType.group) {
+      Group? group = await groupService.findCachedOneByPeerId(groupPeerId);
+      if (group != null) {
+        groupName = group.name;
+      }
+    }
+    if (groupType == PartyType.conference) {
+      Conference? conference =
+          await conferenceService.findCachedOneByConferenceId(groupPeerId);
+      if (conference != null) {
+        groupName = conference.name;
+      }
+    }
+
+    var groupChatMessage = await buildChatMessage(groupPeerId,
+        content: content,
+        messageId: messageId,
+        messageType: messageType,
+        subMessageType: subMessageType,
+        contentType: contentType,
+        mimeType: mimeType,
+        receiverType: groupType,
+        receiverName: groupName,
+        groupPeerId: groupPeerId,
+        groupName: groupName,
+        groupType: groupType,
+        title: title,
+        receiptContent: receiptContent,
+        thumbnail: thumbnail,
+        deleteTime: deleteTime,
+        parentMessageId: parentMessageId);
+    chatMessages.add(groupChatMessage);
+    messageId = groupChatMessage.messageId;
+
+    if (peerIds == null) {
+      peerIds = <String>[];
       List<GroupMember> groupMembers =
           await groupMemberService.findByGroupId(groupPeerId);
-      List<Linkman> linkmen =
-          await groupMemberService.findLinkmen(groupMembers);
-      for (var linkman in linkmen) {
-        var peerId = linkman.peerId;
-        if (peerIds != null && !peerIds.contains(peerId)) {
-          continue;
+      if (groupMembers.isNotEmpty) {
+        for (var groupMember in groupMembers) {
+          peerIds.add(groupMember.memberPeerId!);
         }
-        var receiverName = linkman.name;
-        ChatMessage chatMessage = await buildChatMessage(
-          peerId,
-          messageId: messageId,
-          messageType: messageType,
-          subMessageType: subMessageType,
-          contentType: contentType,
-          mimeType: mimeType,
-          receiverName: receiverName,
-          groupPeerId: groupPeerId,
-          groupName: groupName,
-          deleteTime: deleteTime,
-          parentMessageId: parentMessageId,
-        );
-        chatMessage.title = groupChatMessage.title;
-        chatMessage.content = groupChatMessage.content;
-        chatMessage.receiptContent = groupChatMessage.receiptContent;
-        chatMessage.thumbnail = groupChatMessage.thumbnail;
-        chatMessages.add(chatMessage);
       }
+    }
+    for (var peerId in peerIds) {
+      Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+      if (linkman == null) {
+        continue;
+      }
+      var receiverName = linkman.name;
+      ChatMessage chatMessage = await buildChatMessage(
+        peerId,
+        messageId: messageId,
+        messageType: messageType,
+        subMessageType: subMessageType,
+        contentType: contentType,
+        mimeType: mimeType,
+        receiverName: receiverName,
+        groupPeerId: groupPeerId,
+        groupName: groupName,
+        groupType: groupType,
+        deleteTime: deleteTime,
+        parentMessageId: parentMessageId,
+      );
+      chatMessage.title = groupChatMessage.title;
+      chatMessage.content = groupChatMessage.content;
+      chatMessage.receiptContent = groupChatMessage.receiptContent;
+      chatMessage.thumbnail = groupChatMessage.thumbnail;
+      chatMessages.add(chatMessage);
     }
     return chatMessages;
   }
@@ -534,6 +562,72 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return chatMessage;
   }
 
+  ///发送文本消息,目标可以是linkman，也可以是群，也可以是会议
+  ///返回消息是第一个群消息
+  Future<ChatMessage?> sendAndStores(
+    String peerId,
+    PartyType partyType, {
+    String? title,
+    dynamic content,
+    ContentType contentType = ContentType.text,
+    String? mimeType,
+    String? messageId,
+    ChatMessageType messageType = ChatMessageType.chat,
+    ChatMessageSubType subMessageType = ChatMessageSubType.chat,
+    List<String>? peerIds,
+    int deleteTime = 0,
+    String? parentMessageId,
+  }) async {
+    ChatMessage? chatMessage;
+    if (partyType == PartyType.linkman) {
+      peerIds = [];
+      peerIds.add(peerId);
+      for (var peerId in peerIds) {
+        //保存消息
+        chatMessage = await chatMessageService.buildChatMessage(
+          peerId,
+          title: title,
+          content: content,
+          contentType: contentType,
+          mimeType: mimeType,
+          messageId: messageId,
+          messageType: messageType,
+          subMessageType: subMessageType,
+          deleteTime: deleteTime,
+          parentMessageId: parentMessageId,
+        );
+        chatMessage = await chatMessageService.sendAndStore(chatMessage);
+      }
+    }
+    if (partyType == PartyType.group || partyType == PartyType.conference) {
+      //保存群消息
+      List<ChatMessage> chatMessages =
+          await chatMessageService.buildGroupChatMessage(
+        peerId,
+        partyType,
+        messageId: messageId,
+        content: content,
+        contentType: contentType,
+        mimeType: mimeType,
+        subMessageType: subMessageType,
+        deleteTime: deleteTime,
+        peerIds: peerIds,
+      );
+      if (chatMessages.isNotEmpty) {
+        int i = 0;
+        for (var chatMessage in chatMessages) {
+          if (i == 0) {
+            chatMessage = await chatMessageService.sendAndStore(chatMessage);
+          } else {
+            await chatMessageService.sendAndStore(chatMessage);
+          }
+          i++;
+        }
+      }
+    }
+    return chatMessage!;
+  }
+
   ///转发消息
   Future<ChatMessage?> forward(ChatMessage chatMessage, String peerId,
       {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
@@ -572,6 +666,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       if (group != null) {
         List<ChatMessage> messages = await buildGroupChatMessage(
           peerId,
+          PartyType.group,
           content: content,
           messageType: messageType!,
           subMessageType: subMessageType!,

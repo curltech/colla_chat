@@ -189,6 +189,7 @@ class GroupService extends PeerPartyService<Group> {
     List<ChatMessage> chatMessages =
         await chatMessageService.buildGroupChatMessage(
       group.peerId,
+      PartyType.group,
       content: group,
       subMessageType: ChatMessageSubType.addGroup,
     );
@@ -215,6 +216,7 @@ class GroupService extends PeerPartyService<Group> {
     List<ChatMessage> chatMessages =
         await chatMessageService.buildGroupChatMessage(
       group.peerId,
+      PartyType.group,
       content: group,
       subMessageType: ChatMessageSubType.modifyGroup,
     );
@@ -250,6 +252,7 @@ class GroupService extends PeerPartyService<Group> {
     List<ChatMessage> chatMessages =
         await chatMessageService.buildGroupChatMessage(
       group.peerId,
+      PartyType.group,
       title: group.peerId,
       content: group.name,
       subMessageType: ChatMessageSubType.dismissGroup,
@@ -288,6 +291,7 @@ class GroupService extends PeerPartyService<Group> {
     List<ChatMessage> chatMessages =
         await chatMessageService.buildGroupChatMessage(
       groupId,
+      PartyType.group,
       content: groupMembers,
       subMessageType: ChatMessageSubType.addGroupMember,
     );
@@ -316,6 +320,7 @@ class GroupService extends PeerPartyService<Group> {
     List<ChatMessage> chatMessages =
         await chatMessageService.buildGroupChatMessage(
       groupId,
+      PartyType.group,
       content: groupMembers,
       subMessageType: ChatMessageSubType.removeGroupMember,
     );
@@ -346,6 +351,7 @@ class GroupService extends PeerPartyService<Group> {
     List<ChatMessage> chatMessages =
         await chatMessageService.buildGroupChatMessage(
       groupId,
+      PartyType.group,
       content: data,
       subMessageType: ChatMessageSubType.groupFile,
     );

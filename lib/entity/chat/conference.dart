@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 class Conference extends StatusEntity {
   String conferenceId; // 会议编号，也是房间号，也是邀请消息号
-  String? name;
+  String name;
   String? topic;
   String? conferenceOwnerPeerId; // 发起人
   String? password; // 密码
@@ -21,7 +21,7 @@ class Conference extends StatusEntity {
   Widget? avatarImage;
 
   Conference(this.conferenceId,
-      {this.name,
+      {required this.name,
       this.conferenceOwnerPeerId,
       this.topic,
       this.startDate,

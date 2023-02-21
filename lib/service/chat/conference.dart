@@ -206,4 +206,4 @@ final conferenceService = ConferenceService(
       'name',
       'title'
     ],
-    fields: ServiceLocator.buildFields(Conference(''), []));
+    fields: ServiceLocator.buildFields(Conference('', name: ''), []));

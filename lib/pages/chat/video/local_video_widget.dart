@@ -28,9 +28,10 @@ import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-enum CallStatus {
-  calling, //正在呼叫中
-  end, //不在呼叫中
+enum VideoChatStatus {
+  chatting, //正在视频中，只要开始重新协商，表明进入
+  calling, //正在呼叫中，发送邀请消息后，等待固定时间的振铃或者有人回答接受或者拒绝邀请后结束
+  end, //结束
 }
 
 enum VideoMode {
@@ -68,12 +69,18 @@ class LocalVideoWidget extends StatefulWidget {
 }
 
 class _LocalVideoWidgetState extends State<LocalVideoWidget> {
+  //或者会议名称，或者群名称，或者联系人名称
+  String? name;
+
+  //当前的会议编号，说明正在群中聊天
+  String? conferenceId;
+  String? conferenceName;
+
   //当前的群编号，说明正在群中聊天
   String? groupPeerId;
 
   //当前的联系人编号和名称，说明正在一对一聊天
   String? peerId;
-  String? name;
 
   //当前的通话房间，房间是临时组建的一组联系人，互相聊天和视频通话
   //如果当前的群存在的话，房间的人在群的联系人中选择，否则在所有的联系人中选择
@@ -90,8 +97,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       ValueNotifier<List<ActionData>>([]);
 
   //呼叫状态
-  ValueNotifier<CallStatus> callStatus =
-      ValueNotifier<CallStatus>(CallStatus.end);
+  ValueNotifier<VideoChatStatus> videoChatStatus =
+      ValueNotifier<VideoChatStatus>(VideoChatStatus.end);
 
   //控制面板可见性的计时器
   Timer? _hideControlPanelTimer;
@@ -109,37 +116,110 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     _init();
   }
 
+  ///初始化是根据当前的视频邀请消息来决定的，无论是发起还是接收邀请
+  ///也可以根据当前会议来决定的，适用于群和会议模式
+  ///如果没有设置，表明是新的会议
   _init() async {
     _buildActionDataAndVisible();
-    if (widget.videoMode == VideoMode.conference) {
-      conference = conferenceController.current;
-      return;
-    }
+    // if (widget.videoMode == VideoMode.conference) {
+    //   conference = conferenceController.current;
+    //   if (conference != null) {
+    //     conferenceId = conference!.conferenceId;
+    //     conference =
+    //         await conferenceService.findOneByConferenceId(conferenceId!);
+    //     if (conference != null) {
+    //       name = conference!.name;
+    //       conferenceName = conference!.name;
+    //       conferenceController.current = conference;
+    //       //检查当前消息，进入视频界面是先选择了视频邀请消息，或者没有
+    //       ChatMessage? chatMessage =
+    //           await chatMessageService.findOriginByMessageId(conferenceId!);
+    //       if (chatMessage != null) {
+    //         //进入视频界面是先选择了视频邀请消息
+    //         if (chatMessage.subMessageType ==
+    //             ChatMessageSubType.videoChat.name) {
+    //           videoChatMessageController.setChatMessage(chatMessage);
+    //         }
+    //       }
+    //     }
+    //   }
+    // }
     ChatSummary? chatSummary = chatMessageController.chatSummary;
     if (chatSummary == null) {
       logger
           .e('videoMode is ${widget.videoMode.name}, but chatSummary is null');
       return;
     }
+    videoChatMessageController.setChatMessage(null);
     var partyType = chatSummary.partyType;
     if (partyType == PartyType.group.name) {
+      if (widget.videoMode != VideoMode.group) {
+        logger.e(
+            'videoMode is ${widget.videoMode.name}, but chatSummary partyType is $partyType');
+        return;
+      }
       groupPeerId = chatSummary.peerId!;
       name = chatSummary.name!;
+      //检查当前消息，进入视频界面是先选择了视频邀请消息，或者没有
+      ChatMessage? chatMessage = chatMessageController.current;
+      if (chatMessage != null) {
+        //进入视频界面是先选择了视频邀请消息
+        if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
+          conferenceId = chatMessage.messageId!;
+          conference =
+              await conferenceService.findOneByConferenceId(conferenceId!);
+          if (conference != null) {
+            conferenceName = conference!.name;
+            conferenceController.current = conference;
+            videoChatMessageController.setChatMessage(chatMessage);
+          }
+        }
+      }
     } else if (partyType == PartyType.linkman.name) {
+      if (widget.videoMode != VideoMode.linkman) {
+        logger.e(
+            'videoMode is ${widget.videoMode.name}, but chatSummary partyType is $partyType');
+        return;
+      }
       peerId = chatSummary.peerId!;
       name = chatSummary.name!;
-    } else {
-      logger.e(
-          'videoMode is ${widget.videoMode.name}, but chatSummary PartyType $partyType');
-      return;
-    }
-    //当前的视频通话的邀请消息，如果存在，获取房间信息
-    ChatMessage? chatMessage = videoChatMessageController.chatMessage;
-    if (chatMessage != null) {
-      String content = chatMessage.content!;
-      content = chatMessageService.recoverContent(content);
-      Map json = JsonUtil.toJson(content);
-      conference = Conference.fromJson(json);
+      //检查当前消息，进入视频界面是先选择了视频邀请消息，或者没有
+      ChatMessage? chatMessage = chatMessageController.current;
+      if (chatMessage != null) {
+        //进入视频界面是先选择了视频邀请消息
+        if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
+          String content = chatMessage.content!;
+          content = chatMessageService.recoverContent(content);
+          Map json = JsonUtil.toJson(content);
+          conference = Conference.fromJson(json);
+          name = conference!.name;
+          conferenceName = conference!.name;
+          //conferenceController.current = conference;
+          videoChatMessageController.setChatMessage(chatMessage);
+        }
+      }
+    } else if (partyType == PartyType.conference.name) {
+      if (widget.videoMode != VideoMode.conference) {
+        logger.e(
+            'videoMode is ${widget.videoMode.name}, but chatSummary PartyType $partyType');
+        return;
+      }
+      conferenceId = chatSummary.peerId!;
+      conference = await conferenceService.findOneByConferenceId(conferenceId!);
+      if (conference != null) {
+        name = conference!.name;
+        conferenceName = conference!.name;
+        conferenceController.current = conference;
+        //检查当前消息，进入视频界面是先选择了视频邀请消息，或者没有
+        ChatMessage? chatMessage =
+            await chatMessageService.findOriginByMessageId(conferenceId!);
+        if (chatMessage != null) {
+          //进入视频界面是先选择了视频邀请消息
+          if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
+            videoChatMessageController.setChatMessage(chatMessage);
+          }
+        }
+      }
     }
   }
 
@@ -149,6 +229,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
   }
 
+  ///调整显示哪些命令按钮
   _buildActionDataAndVisible() {
     List<ActionData> actionData = [];
     if (localVideoRenderController.videoChatRender == null ||
@@ -200,9 +281,15 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     this.actionData.value = actionData;
   }
 
-  ///对于群来说，需要创建一个临时的会议，会议成员从群成员中选择
-  ///弹出界面，选择会议成员，设置conference
+  ///创建新的会议功能
+  ///对联系人模式，可以临时创建一个会议，会议成员从群成员中选择就是自己和对方，会议名称是对方的名称，不保存会议
+  ///对群模式，可以创建一个会议，会议成员从群成员中选择，会议名称是群的名称加上当前时间，保存会议
+  ///对会议模式，直接转到会议创建界面，
   Future<void> _buildConference() async {
+    if (conference != null) {
+      logger.e('conference ${conference!.name} is exist');
+      return;
+    }
     List<String> participants = [myself.peerId!];
     if (widget.videoMode == VideoMode.conference) {
       if (conference != null) {
@@ -341,8 +428,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
   }
 
-  ///呼叫，发送视频通话邀请消息
-  ///如果已有视频通话邀请消息，说明已收到接收方的同意回执，则直接开始重新协商
+  ///呼叫，打开本地视频，如果没有会议，先创建会议，发送视频通话邀请消息
+  ///如果已有视频通话邀请消息，则直接开始重新协商
   _call() async {
     //确保本地视频已经被打开
     var videoChatRender = localVideoRenderController.videoChatRender;
@@ -350,12 +437,14 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       await _openVideoMedia(video: true);
       videoChatRender = localVideoRenderController.videoChatRender;
     }
+    //创建会议
+    if (conference == null) {
+      await _buildConference();
+    }
     //检查当前的视频邀请消息是否存在
     ChatMessage? chatMessage = videoChatMessageController.chatMessage;
     if (chatMessage == null) {
-      //当前视频消息为空，则创建房间，发送视频通话邀请消息
-      //由消息的接收方同意后直接重新协商
-      await _buildConference();
+      //发送会议邀请消息
       if (videoChatRender!.video) {
         chatMessage = await _sendVideoChatMessage(
             contentType: ContentType.video.name, conference: conference!);
@@ -364,6 +453,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             contentType: ContentType.audio.name, conference: conference!);
       }
       await videoChatMessageController.setChatMessage(chatMessage);
+      //在联系人模式下，会议不保存，在群模式下，在邀请消息发送后才保存
+      //在会议模式下，会议在创建后保存，直接发送邀请消息和保存
       if (widget.videoMode == VideoMode.group) {
         await conferenceService.store(conference!);
       }
@@ -384,20 +475,21 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         }
       }
     }
-    callStatus.value = CallStatus.calling;
+    videoChatStatus.value = VideoChatStatus.calling;
   }
 
-  ///挂断视频通话，先关闭所有的本地视频，设置当前邀请消息为空，呼叫状态为结束
-  _closeCall() async {
-    localVideoRenderController.close();
-    videoChatMessageController.setChatMessage(null);
-    conference = null;
-    callStatus.value = CallStatus.end;
-  }
-
-  ///关闭所有的本地视频流
+  ///如果正在呼叫calling，停止呼叫，关闭所有的本地视频，呼叫状态改为结束
+  ///如果正在通话chatting，挂断视频通话，关闭所有的本地视频和远程视频，呼叫状态改为结束
   _close() async {
-    localVideoRenderController.close();
+    if (videoChatStatus.value == VideoChatStatus.calling) {
+      localVideoRenderController.close();
+    }
+    if (videoChatStatus.value == VideoChatStatus.chatting) {
+      localVideoRenderController.close();
+      videoChatMessageController.setChatMessage(null);
+      conference = null;
+    }
+    videoChatStatus.value = VideoChatStatus.end;
   }
 
   ///发送group视频通邀请话消息,此时消息必须有content,包含Room信息
@@ -500,14 +592,14 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   ///创建呼叫按钮
   Widget _buildCallButton() {
-    return ValueListenableBuilder<CallStatus>(
-        valueListenable: callStatus,
-        builder: (BuildContext context, CallStatus value, Widget? child) {
+    return ValueListenableBuilder<VideoChatStatus>(
+        valueListenable: videoChatStatus,
+        builder: (BuildContext context, VideoChatStatus value, Widget? child) {
           Widget buttonWidget;
-          if (value == CallStatus.calling) {
+          if (value == VideoChatStatus.calling) {
             buttonWidget = WidgetUtil.buildCircleButton(
               onPressed: () {
-                _closeCall();
+                _close();
               },
               elevation: 2.0,
               backgroundColor: Colors.red,
@@ -518,7 +610,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                 color: Colors.white,
               ),
             );
-          } else if (value == CallStatus.end) {
+          } else if (value == VideoChatStatus.end) {
             buttonWidget = WidgetUtil.buildCircleButton(
               onPressed: () {
                 _call();

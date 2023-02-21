@@ -3,6 +3,7 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/tool/string_util.dart';
 
 ///好友或者群的消息控制器，包含某个连接的所有消息
 class ChatMessageController extends DataMoreController<ChatMessage> {
@@ -130,7 +131,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         peerIds: peerIds);
   }
 
-  ///发送文本消息,发送命令消息目标可以是linkman，也可以是群，取决于当前chatSummary
+  ///发送文本消息,发送命令消息目标可以是linkman，也可以是群，也可以是会议，取决于当前chatSummary
   ///先通过网络发送消息，然后保存在本地数据库
   Future<ChatMessage?> send(
       {String? title,
@@ -146,57 +147,29 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     }
     String peerId = _chatSummary!.peerId!;
     String partyType = _chatSummary!.partyType!;
-    ChatMessage? chatMessage;
-    if (partyType == PartyType.linkman.name) {
-      peerIds = [];
-      peerIds.add(peerId);
-      for (var peerId in peerIds) {
-        //保存消息
-        chatMessage = await chatMessageService.buildChatMessage(
-          peerId,
-          title: title,
-          content: content,
-          contentType: contentType,
-          mimeType: mimeType,
-          messageId: messageId,
-          messageType: messageType,
-          subMessageType: subMessageType,
-          deleteTime: _deleteTime,
-          parentMessageId: _parentMessageId,
-        );
-        chatMessage = await chatMessageService.sendAndStore(chatMessage);
-        _deleteTime = 0;
-        _parentMessageId = null;
+    PartyType? type = StringUtil.enumFromString(PartyType.values, partyType);
+    if (type == null) {
+      if (peerIds == null) {
+        type = PartyType.linkman;
+      } else {
+        type = PartyType.group;
       }
-      notifyListeners();
     }
-    if (partyType == PartyType.group.name) {
-      //保存群消息
-      List<ChatMessage> chatMessages =
-          await chatMessageService.buildGroupChatMessage(
-        peerId,
-        messageId: messageId,
+    ChatMessage? chatMessage = await chatMessageService.sendAndStores(
+        peerId, type,
+        title: title,
         content: content,
         contentType: contentType,
         mimeType: mimeType,
+        messageId: messageId,
+        messageType: messageType,
         subMessageType: subMessageType,
-        deleteTime: _deleteTime,
         peerIds: peerIds,
-      );
-      _deleteTime = 0;
-      if (chatMessages.isNotEmpty) {
-        int i = 0;
-        for (var chatMessage in chatMessages) {
-          if (i == 0) {
-            chatMessage = await chatMessageService.sendAndStore(chatMessage);
-          } else {
-            await chatMessageService.sendAndStore(chatMessage);
-          }
-          i++;
-        }
-        notifyListeners();
-      }
-    }
+        deleteTime: _deleteTime,
+        parentMessageId: _parentMessageId);
+    _deleteTime = 0;
+    _parentMessageId = null;
+
     return chatMessage!;
   }
 }
