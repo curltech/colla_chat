@@ -139,17 +139,19 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
         valueListenable: groupMembers,
         builder:
             (BuildContext context, List<String> groupMembers, Widget? child) {
-          return LinkmanGroupSearchWidget(
-            selectType: SelectType.dataListMultiSelectField,
-            onSelected: (List<String>? selected) async {
-              if (selected != null) {
-                this.groupMembers.value = selected;
-                await _buildGroupOwnerOptions(selected);
-              }
-            },
-            selected: this.groupMembers.value,
-            includeGroup: false,
-          );
+          return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: LinkmanGroupSearchWidget(
+                selectType: SelectType.dataListMultiSelectField,
+                onSelected: (List<String>? selected) async {
+                  if (selected != null) {
+                    this.groupMembers.value = selected;
+                    await _buildGroupOwnerOptions(selected);
+                  }
+                },
+                selected: this.groupMembers.value,
+                includeGroup: false,
+              ));
         });
 
     return selector;
@@ -157,12 +159,14 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
 
   //群主选择界面
   Widget _buildGroupOwnerWidget(BuildContext context) {
-    var selector = CustomSingleSelectField(
-        title: 'GroupOwnerPeer',
-        onChanged: (selected) {
-          group.value.groupOwnerPeerId = selected;
-        },
-        optionController: groupOwnerController);
+    var selector = Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        child: CustomSingleSelectField(
+            title: 'GroupOwnerPeer',
+            onChanged: (selected) {
+              group.value.groupOwnerPeerId = selected;
+            },
+            optionController: groupOwnerController));
 
     return selector;
   }
@@ -183,8 +187,10 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
                   return FormInputWidget(
                     onOk: (Map<String, dynamic> values) {
                       _onOk(values).then((group) {
-                        DialogUtil.info(context,
-                            content: 'Group ${group!.name} is built');
+                        if (group != null) {
+                          DialogUtil.info(context,
+                              content: 'Group ${group!.name} is built');
+                        }
                       });
                     },
                     columnFieldDefs: groupColumnFieldDefs,

@@ -27,7 +27,7 @@ final List<ColumnFieldDef> conferenceColumnFieldDefs = [
       name: 'conferenceId',
       label: 'ConferenceId',
       inputType: InputType.label,
-      prefixIcon: const Icon(Icons.meeting_room)),
+      prefixIcon: Icon(Icons.meeting_room, color: myself.primary)),
   ColumnFieldDef(
       name: 'name', label: 'Name', prefixIcon: const Icon(Icons.person)),
   ColumnFieldDef(
@@ -36,7 +36,7 @@ final List<ColumnFieldDef> conferenceColumnFieldDefs = [
       name: 'conferenceOwnerPeerId',
       label: 'ConferenceOwnerPeerId',
       inputType: InputType.label,
-      prefixIcon: const Icon(Icons.perm_identity)),
+      prefixIcon: Icon(Icons.perm_identity, color: myself.primary)),
   ColumnFieldDef(
       name: 'password',
       label: 'Password',
@@ -152,17 +152,19 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
         valueListenable: conferenceMembers,
         builder: (BuildContext context, List<String> conferenceMembers,
             Widget? child) {
-          return LinkmanGroupSearchWidget(
-            selectType: SelectType.dataListMultiSelectField,
-            onSelected: (List<String>? selected) async {
-              if (selected != null) {
-                this.conferenceMembers.value = selected;
-                await _buildConferenceOwnerOptions(selected);
-              }
-            },
-            selected: conferenceMembers,
-            includeGroup: false,
-          );
+          return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: LinkmanGroupSearchWidget(
+                selectType: SelectType.dataListMultiSelectField,
+                onSelected: (List<String>? selected) async {
+                  if (selected != null) {
+                    this.conferenceMembers.value = selected;
+                    await _buildConferenceOwnerOptions(selected);
+                  }
+                },
+                selected: conferenceMembers,
+                includeGroup: false,
+              ));
         });
 
     return selector;
@@ -175,12 +177,14 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
         //     valueListenable: groupOwnerOptions,
         //     builder: (BuildContext context, List<Option> option, Widget? child) {
         //       return
-        CustomSingleSelectField(
-            title: 'ConferenceOwnerPeer',
-            onChanged: (selected) {
-              conference.value.conferenceOwnerPeerId = selected;
-            },
-            optionController: conferenceOwnerController);
+        Container(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: CustomSingleSelectField(
+                title: 'ConferenceOwnerPeer',
+                onChanged: (selected) {
+                  conference.value.conferenceOwnerPeerId = selected;
+                },
+                optionController: conferenceOwnerController));
     // });
     return selector;
   }
@@ -233,7 +237,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
           content: AppLocalizations.t('Must has conference owner'));
       return null;
     }
-    if (StringUtil.isEmpty(conference.value.topic)) {
+    if (StringUtil.isEmpty(currentConference.topic)) {
       DialogUtil.error(context,
           content: AppLocalizations.t('Must has conference topic'));
       return null;
@@ -242,7 +246,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     if (current == null) {
       current = await conferenceService.createConference(currentConference.name,
           topic: currentConference.topic,
-          conferenceOwnerPeerId: currentConference.conferenceOwnerPeerId,
+          conferenceOwnerPeerId: conference.value.conferenceOwnerPeerId,
           startDate: currentConference.startDate,
           endDate: currentConference.endDate,
           participants: conferenceMembers.value);

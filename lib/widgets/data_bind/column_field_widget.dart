@@ -249,17 +249,19 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     String label = widget.controller.columnFieldDef.label;
     label = '${AppLocalizations.t(label)}:';
     final value = widget.controller.value ?? '';
-    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      _buildIcon()!,
-      const SizedBox(
-        width: 15.0,
-      ),
-      Text(label),
-      const SizedBox(
-        width: 15.0,
-      ),
-      Expanded(child: Text(value, textAlign: TextAlign.start))
-    ]);
+    return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14.0),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          _buildIcon()!,
+          const SizedBox(
+            width: 10.0,
+          ),
+          Text(label),
+          const SizedBox(
+            width: 10.0,
+          ),
+          Expanded(child: Text(value, textAlign: TextAlign.start))
+        ]));
   }
 
   Widget _buildTextFormField(BuildContext context) {

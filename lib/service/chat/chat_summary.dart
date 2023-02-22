@@ -96,6 +96,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummary.peerId = group.peerId;
       chatSummary.partyType = PartyType.group.name;
       chatSummary.subPartyType = group.groupType;
+      chatSummary.status = group.status;
       chatSummary.name = group.name;
       await insert(chatSummary);
       chatSummaries[chatSummary.peerId!] = chatSummary;
@@ -114,6 +115,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummary.peerId = conference.conferenceId;
       chatSummary.partyType = PartyType.conference.name;
       chatSummary.subPartyType = conference.topic;
+      chatSummary.status = conference.status;
       chatSummary.name = conference.name;
       await insert(chatSummary);
       chatSummaries[chatSummary.peerId!] = chatSummary;
@@ -188,6 +190,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummary.contentType = chatMessage.contentType;
       chatSummary.sendReceiveTime = chatMessage.sendTime;
       chatSummary.unreadNumber = chatSummary.unreadNumber + 1;
+      chatSummary.status = chatMessage.status;
       await upsert(chatSummary);
       chatSummaries[chatSummary.peerId!] = chatSummary;
     }
