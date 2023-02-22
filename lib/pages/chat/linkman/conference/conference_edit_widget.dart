@@ -31,9 +31,7 @@ final List<ColumnFieldDef> conferenceColumnFieldDefs = [
   ColumnFieldDef(
       name: 'name', label: 'Name', prefixIcon: const Icon(Icons.person)),
   ColumnFieldDef(
-      name: 'topic',
-      label: 'Topic',
-      prefixIcon: const Icon(Icons.topic)),
+      name: 'topic', label: 'Topic', prefixIcon: const Icon(Icons.topic)),
   ColumnFieldDef(
       name: 'conferenceOwnerPeerId',
       label: 'ConferenceOwnerPeerId',
@@ -205,10 +203,10 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
                   return FormInputWidget(
                     onOk: (Map<String, dynamic> values) {
                       _onOk(values).then((conference) {
-                        if (conference!=null) {
+                        if (conference != null) {
                           DialogUtil.info(context,
-                              content: 'Conference ${conference!
-                                  .name} is built');
+                              content:
+                                  'Conference ${conference.name} is built');
                         }
                       });
                     },

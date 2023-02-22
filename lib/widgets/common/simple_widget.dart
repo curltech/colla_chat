@@ -121,16 +121,25 @@ class WidgetUtil {
   }
 
   static ButtonStyle buildButtonStyle(
-      {Color? backgroundColor,
+      {TextStyle? textStyle,
+      Color? backgroundColor,
+      Color? foregroundColor,
+      double? elevation = 0.0,
       double borderRadius = 8.0,
       EdgeInsets padding =
           const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
-      Size minimumSize = const Size(50, 40.0),
+      Size minimumSize = const Size(60, 40.0),
       Size maximumSize = const Size(120.0, 48.0)}) {
     backgroundColor =
-        backgroundColor ?? Colors.grey.withOpacity(AppOpacity.lgOpacity);
+        backgroundColor ?? Colors.grey.withOpacity(AppOpacity.smOpacity);
+    foregroundColor = foregroundColor ?? Colors.white;
+    textStyle = textStyle ?? const TextStyle(color: Colors.white);
+    elevation = elevation ?? 0.0;
     ButtonStyle style = ButtonStyle(
       backgroundColor: MaterialStateProperty.all(backgroundColor),
+      foregroundColor: MaterialStateProperty.all(foregroundColor),
+      textStyle: MaterialStateProperty.all(textStyle),
+      elevation: MaterialStateProperty.all(elevation),
       shape: MaterialStateProperty.all(
         RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadius),

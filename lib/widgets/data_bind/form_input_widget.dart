@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
@@ -168,6 +169,8 @@ class FormInputWidget extends StatelessWidget {
       height: 30.0,
     ));
     ButtonStyle style = WidgetUtil.buildButtonStyle();
+    ButtonStyle mainStyle = WidgetUtil.buildButtonStyle(
+        backgroundColor: myself.primary, elevation: 10.0);
     children.add(
       ButtonBar(children: [
         TextButton(
@@ -178,7 +181,7 @@ class FormInputWidget extends StatelessWidget {
           },
         ),
         TextButton(
-          style: style,
+          style: mainStyle,
           child: Text(AppLocalizations.t(okLabel)),
           onPressed: () {
             var values = controller.getValues();

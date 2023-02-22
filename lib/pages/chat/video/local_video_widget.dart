@@ -651,7 +651,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                   child: Padding(
                       padding: const EdgeInsets.all(5.0),
                       child: Text(
-                          '${AppLocalizations.t('roomId')}:${conference!.conferenceId!}'))),
+                          '${AppLocalizations.t('roomId')}:${conference!.conferenceId}'))),
             );
           } else {
             children.add(const SizedBox(

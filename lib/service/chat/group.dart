@@ -137,7 +137,11 @@ class GroupService extends PeerPartyService<Group> {
             await linkmanService.findCachedOneByPeerId(groupMemberId);
         if (linkman != null) {
           GroupMember groupMember = GroupMember(groupId, groupMemberId);
-          groupMember.memberType = MemberType.member.name;
+          if (linkman.peerId == group.groupOwnerPeerId) {
+            groupMember.memberType = MemberType.owner.name;
+          } else {
+            groupMember.memberType = MemberType.member.name;
+          }
           if (StringUtil.isEmpty(linkman.alias)) {
             groupMember.memberAlias = linkman.name;
           } else {
@@ -207,7 +211,8 @@ class GroupService extends PeerPartyService<Group> {
     await groupService.store(group);
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
-    await chatMessageService.updateReceiptStatus(chatMessage, MessageStatus.accepted);
+    await chatMessageService.updateReceiptStatus(
+        chatMessage, MessageStatus.accepted);
     await chatMessageService.sendAndStore(chatReceipt);
   }
 
@@ -233,7 +238,8 @@ class GroupService extends PeerPartyService<Group> {
     await groupService.store(group);
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
-    await chatMessageService.updateReceiptStatus(chatMessage, MessageStatus.accepted);
+    await chatMessageService.updateReceiptStatus(
+        chatMessage, MessageStatus.accepted);
 
     await chatMessageService.sendAndStore(chatReceipt!);
   }
@@ -283,7 +289,8 @@ class GroupService extends PeerPartyService<Group> {
     });
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
-    await chatMessageService.updateReceiptStatus(chatMessage, MessageStatus.accepted);
+    await chatMessageService.updateReceiptStatus(
+        chatMessage, MessageStatus.accepted);
 
     await chatMessageService.sendAndStore(chatReceipt!);
   }
@@ -313,7 +320,8 @@ class GroupService extends PeerPartyService<Group> {
 
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
-    await chatMessageService.updateReceiptStatus(chatMessage, MessageStatus.accepted);
+    await chatMessageService.updateReceiptStatus(
+        chatMessage, MessageStatus.accepted);
 
     await chatMessageService.sendAndStore(chatReceipt!);
   }
@@ -345,7 +353,8 @@ class GroupService extends PeerPartyService<Group> {
 
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
-    await chatMessageService.updateReceiptStatus(chatMessage, MessageStatus.accepted);
+    await chatMessageService.updateReceiptStatus(
+        chatMessage, MessageStatus.accepted);
 
     await chatMessageService.sendAndStore(chatReceipt!);
   }
@@ -369,7 +378,8 @@ class GroupService extends PeerPartyService<Group> {
 
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
-    await chatMessageService.updateReceiptStatus(chatMessage, MessageStatus.accepted);
+    await chatMessageService.updateReceiptStatus(
+        chatMessage, MessageStatus.accepted);
 
     await chatMessageService.sendAndStore(chatReceipt!);
   }
