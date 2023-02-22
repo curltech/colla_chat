@@ -68,7 +68,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
     return chatSummary;
   }
 
-  upsertByLinkman(Linkman linkman) async {
+  Future<ChatSummary> upsertByLinkman(Linkman linkman) async {
     ChatSummary? chatSummary = await findCachedOneByPeerId(linkman.peerId);
     if (chatSummary == null) {
       chatSummary = ChatSummary();
@@ -85,9 +85,11 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummary.name = linkman.name;
       await upsert(chatSummary);
     }
+
+    return chatSummary;
   }
 
-  upsertByGroup(Group group) async {
+  Future<ChatSummary> upsertByGroup(Group group) async {
     ChatSummary? chatSummary = await findCachedOneByPeerId(group.peerId);
     if (chatSummary == null) {
       chatSummary = ChatSummary();
@@ -101,9 +103,10 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummary.name = group.name;
       await upsert(chatSummary);
     }
+    return chatSummary;
   }
 
-  upsertByConference(Conference conference) async {
+  Future<ChatSummary> upsertByConference(Conference conference) async {
     ChatSummary? chatSummary =
         await findCachedOneByPeerId(conference.conferenceId);
     if (chatSummary == null) {
@@ -119,12 +122,13 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummary.subPartyType = conference.topic;
       await upsert(chatSummary);
     }
+    return chatSummary;
   }
 
   ///新的ChatMessage来了，更新ChatSummary
-  upsertByChatMessage(ChatMessage chatMessage) async {
+  Future<ChatSummary?> upsertByChatMessage(ChatMessage chatMessage) async {
     if (chatMessage.messageType == ChatMessageType.system.name) {
-      return;
+      return null;
     }
     var groupPeerId = chatMessage.groupPeerId;
     var senderPeerId = chatMessage.senderPeerId;
@@ -187,6 +191,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       await upsert(chatSummary);
       chatSummaries[chatSummary.peerId!] = chatSummary;
     }
+    return chatSummary;
   }
 
   removeChatSummary(String peerId) async {

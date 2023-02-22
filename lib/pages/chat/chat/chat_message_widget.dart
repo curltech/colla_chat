@@ -131,7 +131,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     return chatMessageItem;
   }
 
-  ///创建消息显示面板，包含消息的输入框
+  ///创建消息显示面板
   Widget _buildChatMessageWidget(BuildContext context) {
     return RefreshIndicator(
         onRefresh: _onRefresh,

@@ -274,9 +274,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             onTap: (int index, String label, {String? subtitle}) async {
               ChatSummary? chatSummary =
                   await chatSummaryService.findOneByPeerId(linkman.peerId);
-              if (chatSummary != null) {
-                chatMessageController.chatSummary = chatSummary;
-              }
+              chatSummary ??= await chatSummaryService.upsertByLinkman(linkman);
+              chatMessageController.chatSummary = chatSummary;
               indexWidgetProvider.push('chat_message');
             });
         slideActions.add(chatSlideAction);
@@ -371,9 +370,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             onTap: (int index, String label, {String? subtitle}) async {
               ChatSummary? chatSummary =
                   await chatSummaryService.findOneByPeerId(group.peerId);
-              if (chatSummary != null) {
-                chatMessageController.chatSummary = chatSummary;
-              }
+              chatSummary ??= await chatSummaryService.upsertByGroup(group);
+              chatMessageController.chatSummary = chatSummary;
               indexWidgetProvider.push('chat_message');
             });
         endSlideActions.add(chatSlideAction);
@@ -420,9 +418,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             onTap: (int index, String label, {String? subtitle}) async {
               ChatSummary? chatSummary = await chatSummaryService
                   .findOneByPeerId(conference.conferenceId);
-              if (chatSummary != null) {
-                chatMessageController.chatSummary = chatSummary;
-              }
+              chatSummary ??=
+                  await chatSummaryService.upsertByConference(conference);
+              chatMessageController.chatSummary = chatSummary;
               indexWidgetProvider.push('chat_message');
             });
         endSlideActions.add(chatSlideAction);

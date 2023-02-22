@@ -189,6 +189,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     }
     _deleteTime = 0;
     _parentMessageId = null;
+    notifyListeners();
 
     return returnChatMessage;
   }
