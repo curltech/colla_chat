@@ -461,7 +461,8 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
   void initState() {
     super.initState();
     widget.optionController.addListener(_update);
-    options.value = widget.optionController.copy();
+    //初始化数据
+    _search();
   }
 
   _update() {

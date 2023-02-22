@@ -24,13 +24,13 @@ class EntityUtil {
     if (entity is Map) {
       entity['createDate'] = currentDate;
       entity['updateDate'] = currentDate;
-      if (ownerPeerId != null && entity['ownerPeerId'] == null) {
+      if (ownerPeerId != null) {
         entity['ownerPeerId'] = ownerPeerId;
       }
     } else {
       entity.createDate = currentDate;
       entity.updateDate = currentDate;
-      if (ownerPeerId != null && entity.ownerPeerId == null) {
+      if (ownerPeerId != null) {
         entity.ownerPeerId = ownerPeerId;
       }
     }
@@ -41,12 +41,12 @@ class EntityUtil {
     var ownerPeerId = myself.peerId;
     if (entity is Map) {
       entity['updateDate'] = currentDate;
-      if (ownerPeerId != null && entity['ownerPeerId'] == null) {
+      if (ownerPeerId != null) {
         entity['ownerPeerId'] = ownerPeerId;
       }
     } else {
       entity.updateDate = currentDate;
-      if (ownerPeerId != null && entity.ownerPeerId == null) {
+      if (ownerPeerId != null) {
         entity.ownerPeerId = ownerPeerId;
       }
     }
