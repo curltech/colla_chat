@@ -14,6 +14,7 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/conference.dart';
+import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
@@ -339,7 +340,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       }
       participants.add(peerId!);
     }
-    conference = await conferenceService.createConference(name!,
+    conference = await conferenceService.createConference(
+        '${name!}-${DateUtil.currentDate()}',
         participants: participants);
     if (mounted) {
       DialogUtil.info(context,
