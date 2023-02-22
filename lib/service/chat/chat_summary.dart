@@ -31,7 +31,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
     var chatSummary = await find(
       where: where,
       whereArgs: whereArgs,
-      orderBy: 'sendReceiveTime',
+      orderBy: 'sendReceiveTime desc',
     );
 
     return chatSummary;
