@@ -282,11 +282,11 @@ class Myself with ChangeNotifier {
   }
 
   Widget? get avatarImage {
-    return myselfPeer.avatarImage;
+    return myselfPeer.avatarImage ?? AppImage.mdAppImage;
   }
 
   Widget? get avatarIcon {
-    return myselfPeer.avatarIcon;
+    return myselfPeer.avatarIcon ?? AppIcon.mdAppIcon;
   }
 
   /// locale操作
