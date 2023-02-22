@@ -115,7 +115,7 @@ class _IndexViewState extends State<IndexView>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Row(children: [
-                          myself.avatarImage!,
+                          myself.avatarImage ?? AppImage.mdAppImage,
                           const SizedBox(
                             width: 15.0,
                           ),
