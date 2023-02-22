@@ -6,6 +6,9 @@ class Conference extends StatusEntity {
   String name;
   String? topic;
   String? conferenceOwnerPeerId; // 发起人
+  String? groupPeerId; // 如果是从群中发起的会议，设置为群的编号
+  String? groupName;
+  String? groupType;
   String? password; // 密码
   bool linkman = false; // 是否好友才能参加
   bool contact = false; // 是否在地址本才能参加
@@ -18,7 +21,7 @@ class Conference extends StatusEntity {
   bool advance = true; // 参会者可提前加入
   int upperNumber = 300; // 参会人数上限
   List<String>? participants; // 参与人peerId的集合
-  Widget? avatarImage;
+  Widget? avatarImage; //类似群的图标，几个参加者的图标的混合
 
   Conference(this.conferenceId,
       {required this.name,
@@ -26,6 +29,9 @@ class Conference extends StatusEntity {
       this.topic,
       this.startDate,
       this.endDate,
+      this.groupPeerId,
+      this.groupName,
+      this.groupType,
       this.participants = const <String>[]});
 
   Conference.fromJson(Map json)
@@ -33,6 +39,9 @@ class Conference extends StatusEntity {
         name = json['name'],
         topic = json['topic'],
         conferenceOwnerPeerId = json['conferenceOwnerPeerId'],
+        groupPeerId = json['groupPeerId'],
+        groupName = json['groupName'],
+        groupType = json['groupType'],
         password = json['password'],
         startDate = json['startDate'],
         endDate = json['endDate'],
@@ -60,6 +69,9 @@ class Conference extends StatusEntity {
       'name': name,
       'topic': topic,
       'conferenceOwnerPeerId': conferenceOwnerPeerId,
+      'groupPeerId': groupPeerId,
+      'groupName': groupName,
+      'groupType': groupType,
       'password': password,
       'startDate': startDate,
       'endDate': endDate,

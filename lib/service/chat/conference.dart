@@ -102,6 +102,9 @@ class ConferenceService extends GeneralBaseService<Conference> {
     String name, {
     String? topic,
     String? conferenceOwnerPeerId,
+    String? groupPeerId,
+    String? groupName,
+    String? groupType,
     String? startDate,
     String? endDate,
     List<String>? participants,
@@ -122,6 +125,9 @@ class ConferenceService extends GeneralBaseService<Conference> {
         name: name,
         topic: topic,
         conferenceOwnerPeerId: conferenceOwnerPeerId,
+        groupPeerId: groupPeerId,
+        groupName: groupName,
+        groupType: groupType,
         startDate: startDate,
         endDate: endDate,
         participants: participants);

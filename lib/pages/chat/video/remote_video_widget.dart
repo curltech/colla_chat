@@ -5,7 +5,6 @@ import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/video/local_video_widget.dart';
 import 'package:colla_chat/pages/chat/video/video_view_card.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
@@ -18,7 +17,7 @@ import 'package:flutter/material.dart';
 ///远程视频通话窗口，显示多个小视频窗口，每个小窗口代表一个远程视频
 ///以及各种功能按钮
 class RemoteVideoWidget extends StatefulWidget {
-  final VideoMode videoMode;
+  final PartyType videoMode;
 
   const RemoteVideoWidget({
     Key? key,
@@ -72,7 +71,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
 
   _init() async {
     _buildActionDataAndVisible();
-    if (widget.videoMode == VideoMode.conference) {
+    if (widget.videoMode == PartyType.conference) {
       return;
     }
     ChatSummary? chatSummary = chatMessageController.chatSummary;

@@ -1,4 +1,5 @@
 import 'package:card_swiper/card_swiper.dart';
+import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/video/local_video_widget.dart';
@@ -84,7 +85,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
           view = Container();
           if (conferenceId != null) {
             view = const RemoteVideoWidget(
-              videoMode: VideoMode.linkman,
+              videoMode: PartyType.linkman,
             );
           }
         }

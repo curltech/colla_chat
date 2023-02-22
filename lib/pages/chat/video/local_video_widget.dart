@@ -35,12 +35,6 @@ enum VideoChatStatus {
   end, //结束
 }
 
-enum VideoMode {
-  linkman, //在单聊的场景下视频通话
-  group, //在群聊的场景下视频通话
-  conference, //没有在聊天的场景下的视频通话
-}
-
 ///视频通话的流程，适用单个通话和群
 ///1.发起方在本地通话窗口发起视频通话请求（缺省会打开本地的视频或者音频，但不会打开屏幕共享），
 ///实际是先打开本地流（还没有加入连接中，重新协商），
@@ -58,9 +52,9 @@ enum VideoMode {
 ///本地视频通话显示和拨出的窗口，显示多个本地视频，音频和屏幕共享的小视频窗口
 ///各种功能按钮，可以切换视频和音频，添加屏幕共享视频，此时需要发起重新协商
 class LocalVideoWidget extends StatefulWidget {
-  final VideoMode videoMode;
+  final PartyType videoMode;
 
-  const LocalVideoWidget({Key? key, this.videoMode = VideoMode.conference})
+  const LocalVideoWidget({Key? key, this.videoMode = PartyType.conference})
       : super(key: key);
 
   @override
@@ -154,7 +148,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     videoChatMessageController.setChatMessage(null);
     var partyType = chatSummary.partyType;
     if (partyType == PartyType.group.name) {
-      if (widget.videoMode != VideoMode.group) {
+      if (widget.videoMode != PartyType.group) {
         logger.e(
             'videoMode is ${widget.videoMode.name}, but chatSummary partyType is $partyType');
         return;
@@ -177,7 +171,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         }
       }
     } else if (partyType == PartyType.linkman.name) {
-      if (widget.videoMode != VideoMode.linkman) {
+      if (widget.videoMode != PartyType.linkman) {
         logger.e(
             'videoMode is ${widget.videoMode.name}, but chatSummary partyType is $partyType');
         return;
@@ -200,7 +194,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         }
       }
     } else if (partyType == PartyType.conference.name) {
-      if (widget.videoMode != VideoMode.conference) {
+      if (widget.videoMode != PartyType.conference) {
         logger.e(
             'videoMode is ${widget.videoMode.name}, but chatSummary PartyType $partyType');
         return;
@@ -292,7 +286,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       return;
     }
     List<String> participants = [myself.peerId!];
-    if (widget.videoMode == VideoMode.conference) {
+    if (widget.videoMode == PartyType.conference) {
       if (conference != null) {
         return;
       }
@@ -314,7 +308,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                 selectType: SelectType.chipMultiSelect);
           });
     }
-    if (widget.videoMode == VideoMode.group) {
+    if (widget.videoMode == PartyType.group) {
       if (groupPeerId == null) {
         return;
       }
@@ -334,7 +328,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             );
           });
     }
-    if (widget.videoMode == VideoMode.linkman) {
+    if (widget.videoMode == PartyType.linkman) {
       if (peerId == null) {
         return;
       }
@@ -343,6 +337,11 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     conference = await conferenceService.createConference(
         '${name!}-${DateUtil.currentDate()}',
         participants: participants);
+    if (widget.videoMode == PartyType.group) {
+      conference!.groupPeerId = groupPeerId;
+      conference!.groupName = name;
+      conference!.groupType = widget.videoMode.name;
+    }
     if (mounted) {
       DialogUtil.info(context,
           content:
@@ -448,7 +447,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (chatMessage == null) {
       //在联系人模式下，会议不保存，在群模式下，在邀请消息发送后才保存
       //在会议模式下，会议在创建后保存，直接发送邀请消息和保存
-      if (widget.videoMode == VideoMode.group) {
+      if (widget.videoMode == PartyType.group) {
         await conferenceService.store(conference!);
       }
       //发送会议邀请消息
