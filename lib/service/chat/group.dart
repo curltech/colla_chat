@@ -207,8 +207,8 @@ class GroupService extends PeerPartyService<Group> {
     await groupService.store(group);
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
-
-    await chatMessageService.sendAndStore(chatReceipt!);
+    await chatMessageService.updateReceiptStatus(chatMessage, MessageStatus.accepted);
+    await chatMessageService.sendAndStore(chatReceipt);
   }
 
   ///向群成员发送群属性变化的消息
@@ -233,6 +233,7 @@ class GroupService extends PeerPartyService<Group> {
     await groupService.store(group);
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
+    await chatMessageService.updateReceiptStatus(chatMessage, MessageStatus.accepted);
 
     await chatMessageService.sendAndStore(chatReceipt!);
   }
@@ -282,6 +283,7 @@ class GroupService extends PeerPartyService<Group> {
     });
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
+    await chatMessageService.updateReceiptStatus(chatMessage, MessageStatus.accepted);
 
     await chatMessageService.sendAndStore(chatReceipt!);
   }
@@ -311,6 +313,7 @@ class GroupService extends PeerPartyService<Group> {
 
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
+    await chatMessageService.updateReceiptStatus(chatMessage, MessageStatus.accepted);
 
     await chatMessageService.sendAndStore(chatReceipt!);
   }
@@ -342,6 +345,7 @@ class GroupService extends PeerPartyService<Group> {
 
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
+    await chatMessageService.updateReceiptStatus(chatMessage, MessageStatus.accepted);
 
     await chatMessageService.sendAndStore(chatReceipt!);
   }
@@ -365,6 +369,7 @@ class GroupService extends PeerPartyService<Group> {
 
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
         chatMessage, MessageStatus.accepted);
+    await chatMessageService.updateReceiptStatus(chatMessage, MessageStatus.accepted);
 
     await chatMessageService.sendAndStore(chatReceipt!);
   }

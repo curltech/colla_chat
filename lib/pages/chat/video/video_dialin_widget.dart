@@ -31,54 +31,51 @@ class VideoDialInWidget extends StatelessWidget {
     var groupType = chatMessage.groupType;
     var messageId = chatMessage.messageId;
     //单个联系人视频通话邀请
-    if (groupPeerId == null) {
+    if (groupType == null) {
       //创建回执消息
-      ChatMessage? chatReceipt =
+      ChatMessage chatReceipt =
           await chatMessageService.buildChatReceipt(chatMessage, receiptType);
-      if (chatReceipt != null) {
-        //发送回执
-        await chatMessageService.sendAndStore(chatReceipt);
-        String? subMessageType = chatMessage.subMessageType;
-        if (receiptType == MessageStatus.accepted) {
-          //接受视频邀请，将当前视频邀请消息放入控制器
-          await videoChatMessageController.setChatMessage(chatMessage);
-          var peerId = chatReceipt.receiverPeerId!;
-          var clientId = chatReceipt.receiverClientId!;
-          PeerVideoRender? localRender;
-          //根据title来判断是请求音频还是视频，并创建本地视频render
-          String? title = chatMessage.title;
-          if (title == ContentType.audio.name) {
-            localRender =
-                await localVideoRenderController.createAudioMediaRender();
-          } else if (title == ContentType.video.name) {
-            // localRender =
-            //     await localVideoRenderController.createVideoMediaRender();
-            //测试目的，使用屏幕
-            localRender =
-                await localVideoRenderController.createDisplayMediaRender();
-          }
+      await chatMessageService.updateReceiptStatus(chatMessage, receiptType);
+      await chatMessageService.sendAndStore(chatReceipt);
+      String? subMessageType = chatMessage.subMessageType;
+      if (receiptType == MessageStatus.accepted) {
+        //接受视频邀请，将当前视频邀请消息放入控制器
+        await videoChatMessageController.setChatMessage(chatMessage);
+        var peerId = chatReceipt.receiverPeerId!;
+        var clientId = chatReceipt.receiverClientId!;
+        PeerVideoRender? localRender;
+        //根据title来判断是请求音频还是视频，并创建本地视频render
+        String? title = chatMessage.title;
+        if (title == ContentType.audio.name) {
+          localRender =
+              await localVideoRenderController.createAudioMediaRender();
+        } else if (title == ContentType.video.name) {
+          // localRender =
+          //     await localVideoRenderController.createVideoMediaRender();
+          //测试目的，使用屏幕
+          localRender =
+              await localVideoRenderController.createDisplayMediaRender();
+        }
 
-          //将本地的render加入webrtc连接
-          AdvancedPeerConnection? advancedPeerConnection =
-              peerConnectionPool.getOne(
-            peerId,
-            clientId: clientId,
-          );
-          if (advancedPeerConnection != null) {
-            await advancedPeerConnection.addLocalRender(localRender!);
-            //创建房间，将连接加入房间
-            List<String> participants = [myself.peerId!, peerId];
-            var conference =
-                Conference(messageId!, name: '', participants: participants);
-            //同意视频通话则加入到视频连接池中
-            RemoteVideoRenderController videoRoomRenderController =
-                videoRoomRenderPool
-                    .createRemoteVideoRenderController(conference);
-            videoRoomRenderController
-                .addAdvancedPeerConnection(advancedPeerConnection);
-            indexWidgetProvider.push('chat_message');
-            indexWidgetProvider.push('video_chat');
-          }
+        //将本地的render加入webrtc连接
+        AdvancedPeerConnection? advancedPeerConnection =
+            peerConnectionPool.getOne(
+          peerId,
+          clientId: clientId,
+        );
+        if (advancedPeerConnection != null) {
+          await advancedPeerConnection.addLocalRender(localRender!);
+          //创建房间，将连接加入房间
+          List<String> participants = [myself.peerId!, peerId];
+          var conference =
+              Conference(messageId!, name: '', participants: participants);
+          //同意视频通话则加入到视频连接池中
+          RemoteVideoRenderController videoRoomRenderController =
+              videoRoomRenderPool.createRemoteVideoRenderController(conference);
+          videoRoomRenderController
+              .addAdvancedPeerConnection(advancedPeerConnection);
+          indexWidgetProvider.push('chat_message');
+          indexWidgetProvider.push('video_chat');
         }
       }
     } else if (groupType == PartyType.group.name) {
@@ -95,6 +92,7 @@ class VideoDialInWidget extends StatelessWidget {
           await chatMessageService.sendAndStore(chatReceipt);
         }
       }
+      await chatMessageService.updateReceiptStatus(chatMessage, receiptType);
       Map json = JsonUtil.toJson(chatMessage.content!);
       var conference = Conference.fromJson(json);
       await conferenceService.store(conference);

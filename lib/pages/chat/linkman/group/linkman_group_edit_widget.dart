@@ -182,9 +182,9 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
                   }
                   return FormInputWidget(
                     onOk: (Map<String, dynamic> values) {
-                      _onOk(values).then((groupId) {
+                      _onOk(values).then((group) {
                         DialogUtil.info(context,
-                            content: 'Group $groupId operation is completed');
+                            content: 'Group ${group!.name} is built');
                       });
                     },
                     columnFieldDefs: groupColumnFieldDefs,
@@ -196,7 +196,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
   }
 
   //修改提交
-  Future<String?> _onOk(Map<String, dynamic> values) async {
+  Future<Group?> _onOk(Map<String, dynamic> values) async {
     bool groupModified = false;
     Group currentGroup = Group.fromJson(values);
     if (StringUtil.isEmpty(currentGroup.name)) {
@@ -268,7 +268,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
       groupChatSummaryController.refresh();
     }
 
-    return groupId;
+    return current;
   }
 
   Widget _buildGroupEdit(BuildContext context) {

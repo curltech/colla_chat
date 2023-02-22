@@ -220,104 +220,6 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return content;
   }
 
-  ///接受到普通消息或者回执，修改状态并保存
-  Future<ChatMessage?> receiveChatMessage(ChatMessage chatMessage) async {
-    String? subMessageType = chatMessage.subMessageType;
-    //收到回执，更新原消息
-    if (subMessageType == ChatMessageSubType.chatReceipt.name) {
-      String? messageId = chatMessage.messageId;
-      if (messageId == null) {
-        logger.e('chatReceipt message must have messageId');
-      }
-      ChatMessage? originChatMessage = await findOriginByMessageId(messageId!,
-          receiverPeerId: chatMessage.senderPeerId!);
-      if (originChatMessage == null) {
-        logger.e('chatReceipt message has no chatMessage with same messageId');
-        return null;
-      }
-      originChatMessage.receiptContent = chatMessage.content;
-      originChatMessage.receiptTime = chatMessage.receiptTime;
-      originChatMessage.receiveTime = chatMessage.receiveTime;
-      originChatMessage.status = chatMessage.status;
-      originChatMessage.deleteTime = chatMessage.deleteTime;
-      await store(originChatMessage);
-
-      return originChatMessage;
-    } else {
-      //收到一般消息，保存
-      chatMessage.direct = ChatDirect.receive.name;
-      chatMessage.receiveTime = DateUtil.currentDate();
-      chatMessage.readTime = null;
-      chatMessage.status = MessageStatus.received.name;
-      chatMessage.id = null;
-      await store(chatMessage);
-
-      return chatMessage;
-    }
-  }
-
-  ///接受到普通消息，创建回执，subMessageType为chatReceipt
-  Future<ChatMessage> buildChatReceipt(
-      ChatMessage chatMessage, MessageStatus receiptType,
-      {List<int>? receiptContent}) async {
-    //改变发送消息的状态为接收
-    await updateReceiptStatus(chatMessage, receiptType);
-
-    //创建回执消息
-    ChatMessageType? messageType = StringUtil.enumFromString(
-        ChatMessageType.values, chatMessage.messageType);
-    PartyType? groupType;
-    if (chatMessage.groupType != null) {
-      groupType =
-          StringUtil.enumFromString(PartyType.values, chatMessage.groupType);
-    }
-    PartyType? receiverType;
-    if (chatMessage.senderType != null) {
-      receiverType =
-          StringUtil.enumFromString(PartyType.values, chatMessage.senderType);
-    }
-    ChatMessage chatReceipt = await buildChatMessage(
-      chatMessage.senderPeerId!,
-      clientId: chatMessage.senderClientId,
-      receiverName: chatMessage.senderName,
-      messageId: chatMessage.messageId,
-      messageType: messageType!,
-      subMessageType: ChatMessageSubType.chatReceipt,
-      groupPeerId: chatMessage.groupPeerId,
-      groupName: chatMessage.groupName,
-      groupType: groupType,
-      title: chatMessage.subMessageType,
-      receiverType: receiverType!,
-      receiptContent: receiptContent != null
-          ? CryptoUtil.encodeBase64(receiptContent)
-          : null,
-      status: chatMessage.status,
-    );
-
-    chatReceipt.receiptTime = chatMessage.receiptTime;
-    chatReceipt.receiveTime = chatMessage.receiveTime;
-    chatReceipt.readTime = chatMessage.readTime;
-    chatReceipt.deleteTime = chatMessage.deleteTime;
-
-    return chatReceipt;
-  }
-
-  Future<void> updateReceiptStatus(
-      ChatMessage chatMessage, MessageStatus receiptType) async {
-    chatMessage.receiptTime = DateUtil.currentDate();
-    if (receiptType == MessageStatus.read) {
-      chatMessage.readTime = DateUtil.currentDate();
-    } else if (receiptType == MessageStatus.accepted) {
-      chatMessage.status = MessageStatus.accepted.name;
-    } else if (receiptType == MessageStatus.rejected) {
-      chatMessage.status = MessageStatus.rejected.name;
-    } else if (receiptType == MessageStatus.deleted) {
-      chatMessage.deleteTime = chatMessage.deleteTime;
-      chatMessage.status = MessageStatus.deleted.name;
-    }
-    await store(chatMessage, updateSummary: false);
-  }
-
   ///content和receiptContent可以是任意对象，最终会是base64的字符串
   //未填写的字段：transportType,senderAddress,receiverAddress,receiveTime,actualReceiveTime,readTime,destroyTime
   Future<ChatMessage> buildChatMessage(
@@ -512,6 +414,116 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       chatMessages.add(chatMessage);
     }
     return chatMessages;
+  }
+
+  ///接受到普通消息或者回执，修改状态并保存
+  Future<ChatMessage?> receiveChatMessage(ChatMessage chatMessage) async {
+    String? subMessageType = chatMessage.subMessageType;
+    String? groupType = chatMessage.groupType;
+    String? messageId = chatMessage.messageId;
+    //收到回执，更新原消息
+    if (subMessageType == ChatMessageSubType.chatReceipt.name) {
+      if (groupType == null) {
+        if (messageId == null) {
+          logger.e('chatReceipt message must have messageId');
+        }
+        ChatMessage? originChatMessage = await findOriginByMessageId(messageId!,
+            receiverPeerId: chatMessage.senderPeerId!);
+        if (originChatMessage == null) {
+          logger
+              .e('chatReceipt message has no chatMessage with same messageId');
+          return null;
+        }
+        originChatMessage.receiptContent = chatMessage.content;
+        originChatMessage.receiptTime = chatMessage.receiptTime;
+        originChatMessage.receiveTime = chatMessage.receiveTime;
+        originChatMessage.status = chatMessage.status;
+        originChatMessage.deleteTime = chatMessage.deleteTime;
+        await store(originChatMessage);
+
+        return originChatMessage;
+      } else {
+        //如果是对群消息的回复，直接保存
+        chatMessage.direct = ChatDirect.receive.name;
+        chatMessage.receiveTime = DateUtil.currentDate();
+        chatMessage.readTime = null;
+        chatMessage.status = MessageStatus.received.name;
+        chatMessage.id = null;
+        await store(chatMessage);
+
+        return chatMessage;
+      }
+    } else {
+      //收到一般消息，保存
+      chatMessage.direct = ChatDirect.receive.name;
+      chatMessage.receiveTime = DateUtil.currentDate();
+      chatMessage.readTime = null;
+      chatMessage.status = MessageStatus.received.name;
+      chatMessage.id = null;
+      await store(chatMessage);
+
+      return chatMessage;
+    }
+  }
+
+  ///接受到普通消息，创建回执，subMessageType为chatReceipt
+  Future<ChatMessage> buildChatReceipt(
+      ChatMessage chatMessage, MessageStatus receiptType,
+      {List<int>? receiptContent}) async {
+    //创建回执消息
+    ChatMessageType? messageType = StringUtil.enumFromString(
+        ChatMessageType.values, chatMessage.messageType);
+    PartyType? groupType;
+    if (chatMessage.groupType != null) {
+      groupType =
+          StringUtil.enumFromString(PartyType.values, chatMessage.groupType);
+    }
+    PartyType? receiverType;
+    if (chatMessage.senderType != null) {
+      receiverType =
+          StringUtil.enumFromString(PartyType.values, chatMessage.senderType);
+    }
+    ChatMessage chatReceipt = await buildChatMessage(
+      chatMessage.senderPeerId!,
+      clientId: chatMessage.senderClientId,
+      receiverName: chatMessage.senderName,
+      messageId: chatMessage.messageId,
+      messageType: messageType!,
+      subMessageType: ChatMessageSubType.chatReceipt,
+      groupPeerId: chatMessage.groupPeerId,
+      groupName: chatMessage.groupName,
+      groupType: groupType,
+      title: chatMessage.subMessageType,
+      receiverType: receiverType!,
+      receiptContent: receiptContent != null
+          ? CryptoUtil.encodeBase64(receiptContent)
+          : null,
+      status: chatMessage.status,
+    );
+
+    chatReceipt.receiptTime = chatMessage.receiptTime;
+    chatReceipt.receiveTime = chatMessage.receiveTime;
+    chatReceipt.readTime = chatMessage.readTime;
+    chatReceipt.deleteTime = chatMessage.deleteTime;
+
+    return chatReceipt;
+  }
+
+  ///发送回执消息的时候，更新收到的消息的状态
+  Future<void> updateReceiptStatus(
+      ChatMessage chatMessage, MessageStatus receiptType) async {
+    chatMessage.receiptTime = DateUtil.currentDate();
+    if (receiptType == MessageStatus.read) {
+      chatMessage.readTime = DateUtil.currentDate();
+    } else if (receiptType == MessageStatus.accepted) {
+      chatMessage.status = MessageStatus.accepted.name;
+    } else if (receiptType == MessageStatus.rejected) {
+      chatMessage.status = MessageStatus.rejected.name;
+    } else if (receiptType == MessageStatus.deleted) {
+      chatMessage.deleteTime = chatMessage.deleteTime;
+      chatMessage.status = MessageStatus.deleted.name;
+    }
+    await store(chatMessage, updateSummary: false);
   }
 
   Future<List<ChatMessage>> buildGroupChatReceipt(

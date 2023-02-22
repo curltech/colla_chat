@@ -204,10 +204,9 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
                   }
                   return FormInputWidget(
                     onOk: (Map<String, dynamic> values) {
-                      _onOk(values).then((conferenceId) {
+                      _onOk(values).then((conference) {
                         DialogUtil.info(context,
-                            content:
-                                'Conference $conferenceId operation is completed');
+                            content: 'Conference ${conference!.name} is built');
                       });
                     },
                     columnFieldDefs: conferenceColumnFieldDefs,
@@ -219,7 +218,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
   }
 
   //修改提交
-  Future<String?> _onOk(Map<String, dynamic> values) async {
+  Future<Conference?> _onOk(Map<String, dynamic> values) async {
     bool conferenceModified = false;
     bool conferenceAdd = false;
     Conference currentConference = Conference.fromJson(values);
@@ -296,7 +295,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
       conferenceChatSummaryController.refresh();
     }
 
-    return conference.value.conferenceId;
+    return current;
   }
 
   Widget _buildConferenceEdit(BuildContext context) {

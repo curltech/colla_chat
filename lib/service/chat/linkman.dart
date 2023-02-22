@@ -194,6 +194,8 @@ class LinkmanService extends PeerPartyService<Linkman> {
     String json = JsonUtil.toJsonString(myself.myselfPeer);
     ChatMessage? chatReceipt =
         await chatMessageService.buildChatReceipt(chatMessage, receiptType);
+    //改变发送消息的状态为接收
+    await chatMessageService.updateReceiptStatus(chatMessage, receiptType);
     if (receiptType == MessageStatus.accepted) {
       chatReceipt!.content = json;
     }
