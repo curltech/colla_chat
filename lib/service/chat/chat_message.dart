@@ -417,6 +417,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   ///接受到普通消息或者回执，修改状态并保存
+  ///对回执的处理一般都是直接更新原消息的状态，但是对群回执需要单独保存，
+  ///特别的是对群视频邀请的回执是需要群发的，也需要单独保存
   Future<ChatMessage?> receiveChatMessage(ChatMessage chatMessage) async {
     String? subMessageType = chatMessage.subMessageType;
     String? groupType = chatMessage.groupType;
@@ -467,6 +469,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   ///接受到普通消息，创建回执，subMessageType为chatReceipt
+  ///一般只有对一些特殊命令才需要发送回执并保存，或者发送者明确要求回执
+  ///一般的命令回执只发送给发送人，群发的消息回执也是各自回复发送人
+  ///群视频邀请命令的回执是需要两两发送的，也就是每个人都需要知道其他人的回复
   Future<ChatMessage> buildChatReceipt(
       ChatMessage chatMessage, MessageStatus receiptType,
       {List<int>? receiptContent}) async {
