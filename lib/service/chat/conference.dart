@@ -169,7 +169,11 @@ class ConferenceService extends GeneralBaseService<Conference> {
             await linkmanService.findCachedOneByPeerId(memberPeerId);
         if (linkman != null) {
           GroupMember groupMember = GroupMember(conferenceId, memberPeerId);
-          groupMember.memberType = MemberType.member.name;
+          if (linkman.peerId == conference.conferenceOwnerPeerId) {
+            groupMember.memberType = MemberType.owner.name;
+          } else {
+            groupMember.memberType = MemberType.member.name;
+          }
           if (StringUtil.isEmpty(linkman.alias)) {
             groupMember.memberAlias = linkman.name;
           } else {
