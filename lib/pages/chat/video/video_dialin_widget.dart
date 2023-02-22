@@ -102,11 +102,19 @@ class VideoDialInWidget extends StatelessWidget {
       //除了向发送方外，还需要向房间的各接收人发送回执，
       //首先检查接收人是否已经存在给自己的回执，不存在或者存在是accepted则发送回执
       //如果存在，如果是rejected或者terminated，则不发送回执
-      if (receiptType == MessageStatus.accepted) {
-        Map json = JsonUtil.toJson(chatMessage.content!);
-        var conference = Conference.fromJson(json);
-        await conferenceService.store(conference);
+      List<ChatMessage> chatReceipts = await chatMessageService
+          .buildGroupChatReceipt(chatMessage, receiptType);
+      if (chatReceipts.isNotEmpty) {
+        for (var chatReceipt in chatReceipts) {
+          //发送回执
+          await chatMessageService.sendAndStore(chatReceipt);
+        }
       }
+      await chatMessageService.updateReceiptStatus(chatMessage, receiptType);
+      Map json = JsonUtil.toJson(chatMessage.content!);
+      var conference = Conference.fromJson(json);
+      await conferenceService.store(conference);
+      if (receiptType == MessageStatus.accepted) {}
     }
   }
 

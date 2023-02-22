@@ -515,6 +515,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.receiptTime = DateUtil.currentDate();
     if (receiptType == MessageStatus.read) {
       chatMessage.readTime = DateUtil.currentDate();
+      chatMessage.status = MessageStatus.read.name;
     } else if (receiptType == MessageStatus.accepted) {
       chatMessage.status = MessageStatus.accepted.name;
     } else if (receiptType == MessageStatus.rejected) {
@@ -523,7 +524,15 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       chatMessage.deleteTime = chatMessage.deleteTime;
       chatMessage.status = MessageStatus.deleted.name;
     }
-    await store(chatMessage, updateSummary: false);
+    await update(
+        {
+          'status': chatMessage.status,
+          'receiptTime': chatMessage.receiptTime,
+          'readTime': chatMessage.readTime,
+          'deleteTime': chatMessage.deleteTime,
+        },
+        where: 'id=?',
+        whereArgs: [chatMessage.id!]);
   }
 
   Future<List<ChatMessage>> buildGroupChatReceipt(
