@@ -1,3 +1,4 @@
+import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
@@ -7,6 +8,7 @@ import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
@@ -216,9 +218,10 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     return formInputWidget;
   }
 
-//修改提交
+  //修改提交
   Future<String?> _onOk(Map<String, dynamic> values) async {
     bool conferenceModified = false;
+    bool conferenceAdd = false;
     Conference currentConference = Conference.fromJson(values);
     if (StringUtil.isEmpty(currentConference.name)) {
       DialogUtil.error(context,
@@ -237,14 +240,14 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     }
     var current = conferenceController.current;
     if (current == null) {
-      current = await conferenceService.createConference(
-        currentConference.name!,
-        topic: currentConference.topic,
-        conferenceOwnerPeerId: currentConference.conferenceOwnerPeerId,
-        startDate: currentConference.startDate,
-        endDate: currentConference.endDate,
-      );
+      current = await conferenceService.createConference(currentConference.name,
+          topic: currentConference.topic,
+          conferenceOwnerPeerId: currentConference.conferenceOwnerPeerId,
+          startDate: currentConference.startDate,
+          endDate: currentConference.endDate,
+          participants: conferenceMembers.value);
       conferenceModified = true;
+      conferenceAdd = true;
     } else {
       if (current.topic != currentConference.topic) {
         current.topic = currentConference.topic;
@@ -266,9 +269,25 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     }
     conference.value.conferenceOwnerPeerId ??= myself.peerId;
     current.conferenceOwnerPeerId = conference.value.conferenceOwnerPeerId;
-    current.participants = conferenceMembers!.value;
+    current.participants = conferenceMembers.value;
     await conferenceService.store(current);
     conference.value = current;
+    if (conferenceAdd) {
+      List<ChatMessage> chatMessages =
+          await chatMessageService.buildGroupChatMessage(
+        current.conferenceId,
+        PartyType.conference,
+        contentType: ContentType.video,
+        title: ContentType.video.name,
+        content: current,
+        messageId: current.conferenceId,
+        subMessageType: ChatMessageSubType.videoChat,
+        peerIds: current.participants,
+      );
+      for (var chatMessage in chatMessages) {
+        await chatMessageService.sendAndStore(chatMessage);
+      }
+    }
 
     if (conferenceController.current == null) {
       conferenceController.add(current);

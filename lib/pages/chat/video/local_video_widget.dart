@@ -444,6 +444,11 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     //检查当前的视频邀请消息是否存在
     ChatMessage? chatMessage = videoChatMessageController.chatMessage;
     if (chatMessage == null) {
+      //在联系人模式下，会议不保存，在群模式下，在邀请消息发送后才保存
+      //在会议模式下，会议在创建后保存，直接发送邀请消息和保存
+      if (widget.videoMode == VideoMode.group) {
+        await conferenceService.store(conference!);
+      }
       //发送会议邀请消息
       if (videoChatRender!.video) {
         chatMessage = await _sendVideoChatMessage(
@@ -453,11 +458,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             contentType: ContentType.audio.name, conference: conference!);
       }
       await videoChatMessageController.setChatMessage(chatMessage);
-      //在联系人模式下，会议不保存，在群模式下，在邀请消息发送后才保存
-      //在会议模式下，会议在创建后保存，直接发送邀请消息和保存
-      if (widget.videoMode == VideoMode.group) {
-        await conferenceService.store(conference!);
-      }
       videoRoomRenderPool.createRemoteVideoRenderController(conference!);
     } else {
       //当前视频消息不为空，则有同意回执的直接重新协商

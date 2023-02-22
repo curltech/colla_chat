@@ -155,22 +155,42 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         type = PartyType.group;
       }
     }
-    ChatMessage? chatMessage = await chatMessageService.sendAndStores(
-        peerId, type,
-        title: title,
-        content: content,
-        contentType: contentType,
-        mimeType: mimeType,
-        messageId: messageId,
-        messageType: messageType,
-        subMessageType: subMessageType,
-        peerIds: peerIds,
-        deleteTime: _deleteTime,
-        parentMessageId: _parentMessageId);
+    ChatMessage returnChatMessage;
+    if (type == PartyType.linkman) {
+      ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+          peerId,
+          title: title,
+          content: content,
+          contentType: contentType,
+          mimeType: mimeType,
+          messageId: messageId,
+          messageType: messageType,
+          subMessageType: subMessageType,
+          deleteTime: _deleteTime,
+          parentMessageId: _parentMessageId);
+      returnChatMessage = await chatMessageService.sendAndStore(chatMessage);
+    } else {
+      List<ChatMessage> chatMessages =
+          await chatMessageService.buildGroupChatMessage(peerId, type,
+              title: title,
+              content: content,
+              contentType: contentType,
+              mimeType: mimeType,
+              messageId: messageId,
+              messageType: messageType,
+              subMessageType: subMessageType,
+              peerIds: peerIds,
+              deleteTime: _deleteTime,
+              parentMessageId: _parentMessageId);
+      for (var chatMessage in chatMessages) {
+        await chatMessageService.sendAndStore(chatMessage);
+      }
+      returnChatMessage = chatMessages[0];
+    }
     _deleteTime = 0;
     _parentMessageId = null;
 
-    return chatMessage!;
+    return returnChatMessage;
   }
 }
 

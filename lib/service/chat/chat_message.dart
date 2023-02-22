@@ -257,9 +257,53 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   ///接受到普通消息，创建回执，subMessageType为chatReceipt
-  Future<ChatMessage?> buildChatReceipt(
+  Future<ChatMessage> buildChatReceipt(
       ChatMessage chatMessage, MessageStatus receiptType,
       {List<int>? receiptContent}) async {
+    //改变发送消息的状态为接收
+    await updateReceiptStatus(chatMessage, receiptType);
+
+    //创建回执消息
+    ChatMessageType? messageType = StringUtil.enumFromString(
+        ChatMessageType.values, chatMessage.messageType);
+    PartyType? groupType;
+    if (chatMessage.groupType != null) {
+      groupType =
+          StringUtil.enumFromString(PartyType.values, chatMessage.groupType);
+    }
+    PartyType? receiverType;
+    if (chatMessage.senderType != null) {
+      receiverType =
+          StringUtil.enumFromString(PartyType.values, chatMessage.senderType);
+    }
+    ChatMessage chatReceipt = await buildChatMessage(
+      chatMessage.senderPeerId!,
+      clientId: chatMessage.senderClientId,
+      receiverName: chatMessage.senderName,
+      messageId: chatMessage.messageId,
+      messageType: messageType!,
+      subMessageType: ChatMessageSubType.chatReceipt,
+      groupPeerId: chatMessage.groupPeerId,
+      groupName: chatMessage.groupName,
+      groupType: groupType,
+      title: chatMessage.subMessageType,
+      receiverType: receiverType!,
+      receiptContent: receiptContent != null
+          ? CryptoUtil.encodeBase64(receiptContent)
+          : null,
+      status: chatMessage.status,
+    );
+
+    chatReceipt.receiptTime = chatMessage.receiptTime;
+    chatReceipt.receiveTime = chatMessage.receiveTime;
+    chatReceipt.readTime = chatMessage.readTime;
+    chatReceipt.deleteTime = chatMessage.deleteTime;
+
+    return chatReceipt;
+  }
+
+  Future<void> updateReceiptStatus(
+      ChatMessage chatMessage, MessageStatus receiptType) async {
     chatMessage.receiptTime = DateUtil.currentDate();
     if (receiptType == MessageStatus.read) {
       chatMessage.readTime = DateUtil.currentDate();
@@ -272,47 +316,6 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       chatMessage.status = MessageStatus.deleted.name;
     }
     await store(chatMessage, updateSummary: false);
-
-    ChatMessage chatReceipt = ChatMessage();
-    chatReceipt.messageId = chatMessage.messageId;
-    chatReceipt.messageType = chatMessage.messageType;
-    chatReceipt.subMessageType = ChatMessageSubType.chatReceipt.name;
-    chatReceipt.direct = ChatDirect.send.name;
-    chatReceipt.senderPeerId = myself.peerId!;
-    chatReceipt.senderClientId = myself.clientId;
-    chatReceipt.senderType = PartyType.linkman.name;
-    chatReceipt.senderName = myself.myselfPeer!.name;
-    chatReceipt.sendTime = DateUtil.currentDate();
-    chatReceipt.receiverPeerId = chatMessage.senderPeerId;
-    chatReceipt.receiverClientId = chatMessage.senderClientId;
-    chatReceipt.receiverType = chatMessage.senderType;
-    chatReceipt.title = chatMessage.subMessageType;
-    chatReceipt.groupPeerId = chatMessage.groupPeerId;
-    chatReceipt.groupName = chatMessage.groupName;
-    String? receiverPeerId = chatMessage.senderPeerId;
-    if (receiverPeerId == null) {
-      logger.e('receiverPeerId is null');
-      return null;
-    }
-    String? senderName = chatMessage.senderName;
-    if (senderName == null) {
-      PeerClient? peerClient =
-          await peerClientService.findCachedOneByPeerId(receiverPeerId);
-      if (peerClient != null) {
-        senderName = peerClient.name;
-      }
-    }
-    chatReceipt.receiverName = senderName;
-    chatReceipt.receiptTime = chatMessage.receiptTime;
-    chatReceipt.receiveTime = chatMessage.receiveTime;
-    chatReceipt.status = chatMessage.status;
-    chatReceipt.readTime = chatMessage.readTime;
-    chatReceipt.deleteTime = chatMessage.deleteTime;
-    if (receiptContent != null) {
-      chatReceipt.receiptContent = CryptoUtil.encodeBase64(receiptContent);
-    }
-
-    return chatReceipt;
   }
 
   ///content和receiptContent可以是任意对象，最终会是base64的字符串
@@ -351,7 +354,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.senderPeerId = myself.peerId!;
     chatMessage.senderClientId = myself.clientId;
     chatMessage.senderType = PartyType.linkman.name;
-    chatMessage.senderName = myself.myselfPeer!.name;
+    chatMessage.senderName = myself.myselfPeer.name;
     Websocket? websocket = websocketPool.getDefault();
     if (websocket != null) {
       chatMessage.senderAddress = websocket.address;
@@ -511,7 +514,52 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return chatMessages;
   }
 
-  ///发送消息并保存，如果是发送给自己的消息或者群消息，只保存不发送
+  Future<List<ChatMessage>> buildGroupChatReceipt(
+    ChatMessage chatMessage,
+    MessageStatus receiptType, {
+    List<int>? receiptContent,
+    List<String>? peerIds,
+  }) async {
+    String groupPeerId = chatMessage.groupPeerId!;
+    List<ChatMessage> chatReceipts = [];
+
+    var groupChatReceipt = await buildChatReceipt(
+      chatMessage,
+      receiptType,
+      receiptContent: receiptContent,
+    );
+    chatReceipts.add(groupChatReceipt);
+
+    if (peerIds == null) {
+      peerIds = <String>[];
+      List<GroupMember> groupMembers =
+          await groupMemberService.findByGroupId(groupPeerId);
+      if (groupMembers.isNotEmpty) {
+        for (var groupMember in groupMembers) {
+          peerIds.add(groupMember.memberPeerId!);
+        }
+      }
+    }
+    for (var peerId in peerIds) {
+      Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+      if (linkman == null) {
+        continue;
+      }
+      ChatMessage chatReceipt = await buildChatReceipt(
+        chatMessage,
+        receiptType,
+        receiptContent: receiptContent,
+      );
+      chatReceipt.title = groupChatReceipt.title;
+      chatReceipt.content = groupChatReceipt.content;
+      chatReceipt.receiptContent = groupChatReceipt.receiptContent;
+      chatReceipt.thumbnail = groupChatReceipt.thumbnail;
+      chatReceipts.add(chatReceipt);
+    }
+    return chatReceipts;
+  }
+
+  ///发送消息，并更新发送状态字段
   Future<ChatMessage> send(ChatMessage chatMessage,
       {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     var peerId = chatMessage.receiverPeerId;
@@ -554,78 +602,13 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return chatMessage;
   }
 
+  ///发送单条消息，并保存本地
   Future<ChatMessage> sendAndStore(ChatMessage chatMessage,
       {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     await send(chatMessage, cryptoOption: cryptoOption);
     await chatMessageService.store(chatMessage);
 
     return chatMessage;
-  }
-
-  ///发送文本消息,目标可以是linkman，也可以是群，也可以是会议
-  ///返回消息是第一个群消息
-  Future<ChatMessage?> sendAndStores(
-    String peerId,
-    PartyType partyType, {
-    String? title,
-    dynamic content,
-    ContentType contentType = ContentType.text,
-    String? mimeType,
-    String? messageId,
-    ChatMessageType messageType = ChatMessageType.chat,
-    ChatMessageSubType subMessageType = ChatMessageSubType.chat,
-    List<String>? peerIds,
-    int deleteTime = 0,
-    String? parentMessageId,
-  }) async {
-    ChatMessage? chatMessage;
-    if (partyType == PartyType.linkman) {
-      peerIds = [];
-      peerIds.add(peerId);
-      for (var peerId in peerIds) {
-        //保存消息
-        chatMessage = await chatMessageService.buildChatMessage(
-          peerId,
-          title: title,
-          content: content,
-          contentType: contentType,
-          mimeType: mimeType,
-          messageId: messageId,
-          messageType: messageType,
-          subMessageType: subMessageType,
-          deleteTime: deleteTime,
-          parentMessageId: parentMessageId,
-        );
-        chatMessage = await chatMessageService.sendAndStore(chatMessage);
-      }
-    }
-    if (partyType == PartyType.group || partyType == PartyType.conference) {
-      //保存群消息
-      List<ChatMessage> chatMessages =
-          await chatMessageService.buildGroupChatMessage(
-        peerId,
-        partyType,
-        messageId: messageId,
-        content: content,
-        contentType: contentType,
-        mimeType: mimeType,
-        subMessageType: subMessageType,
-        deleteTime: deleteTime,
-        peerIds: peerIds,
-      );
-      if (chatMessages.isNotEmpty) {
-        int i = 0;
-        for (var chatMessage in chatMessages) {
-          if (i == 0) {
-            chatMessage = await chatMessageService.sendAndStore(chatMessage);
-          } else {
-            await chatMessageService.sendAndStore(chatMessage);
-          }
-          i++;
-        }
-      }
-    }
-    return chatMessage!;
   }
 
   ///转发消息

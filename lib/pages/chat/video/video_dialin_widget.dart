@@ -5,6 +5,7 @@ import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_control
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
@@ -85,15 +86,29 @@ class VideoDialInWidget extends StatelessWidget {
       //除了向发送方外，还需要向房间的各接收人发送回执，
       //首先检查接收人是否已经存在给自己的回执，不存在或者存在是accepted则发送回执
       //如果存在，如果是rejected或者terminated，则不发送回执
+      //创建回执消息
+      List<ChatMessage> chatReceipts = await chatMessageService
+          .buildGroupChatReceipt(chatMessage, receiptType);
+      if (chatReceipts.isNotEmpty) {
+        for (var chatReceipt in chatReceipts) {
+          //发送回执
+          await chatMessageService.sendAndStore(chatReceipt);
+        }
+      }
       Map json = JsonUtil.toJson(chatMessage.content!);
       var conference = Conference.fromJson(json);
+      await conferenceService.store(conference);
+      if (receiptType == MessageStatus.accepted) {}
     } else if (groupType == PartyType.conference.name) {
-      //群视频通话邀请
+      //会议视频通话邀请
       //除了向发送方外，还需要向房间的各接收人发送回执，
       //首先检查接收人是否已经存在给自己的回执，不存在或者存在是accepted则发送回执
       //如果存在，如果是rejected或者terminated，则不发送回执
-      Map json = JsonUtil.toJson(chatMessage.content!);
-      var conference = Conference.fromJson(json);
+      if (receiptType == MessageStatus.accepted) {
+        Map json = JsonUtil.toJson(chatMessage.content!);
+        var conference = Conference.fromJson(json);
+        await conferenceService.store(conference);
+      }
     }
   }
 
