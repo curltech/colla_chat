@@ -511,10 +511,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           : null,
       content: receiptType.name,
     );
-
-    chatReceipt.receiptTime = chatMessage.receiptTime;
+    var currentDate = DateUtil.currentDate();
+    chatReceipt.receiptTime = currentDate;
     chatReceipt.receiveTime = chatMessage.receiveTime;
-    chatReceipt.readTime = chatMessage.readTime;
+    chatReceipt.readTime = currentDate;
     chatReceipt.deleteTime = chatMessage.deleteTime;
 
     return chatReceipt;
