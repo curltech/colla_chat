@@ -474,7 +474,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   ///群视频邀请命令的回执是需要两两发送的，也就是每个人都需要知道其他人的回复
   Future<ChatMessage> buildChatReceipt(
       ChatMessage chatMessage, MessageStatus receiptType,
-      {List<int>? receiptContent}) async {
+      {String? receiverPeerId,
+      String? clientId,
+      String? receiverName,
+      List<int>? receiptContent}) async {
     //创建回执消息
     ChatMessageType? messageType = StringUtil.enumFromString(
         ChatMessageType.values, chatMessage.messageType);
@@ -488,10 +491,13 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       receiverType =
           StringUtil.enumFromString(PartyType.values, chatMessage.senderType);
     }
+    receiverPeerId = receiverPeerId ?? chatMessage.senderPeerId!;
+    clientId = clientId ?? chatMessage.senderClientId;
+    receiverName = receiverName ?? chatMessage.senderName;
     ChatMessage chatReceipt = await buildChatMessage(
-      chatMessage.senderPeerId!,
-      clientId: chatMessage.senderClientId,
-      receiverName: chatMessage.senderName,
+      receiverPeerId,
+      clientId: clientId,
+      receiverName: receiverName,
       messageId: chatMessage.messageId,
       messageType: messageType!,
       subMessageType: ChatMessageSubType.chatReceipt,
@@ -503,7 +509,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       receiptContent: receiptContent != null
           ? CryptoUtil.encodeBase64(receiptContent)
           : null,
-      status: chatMessage.status,
+      status: receiptType.name,
     );
 
     chatReceipt.receiptTime = chatMessage.receiptTime;
@@ -550,13 +556,6 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String groupPeerId = chatMessage.groupPeerId!;
     List<ChatMessage> chatReceipts = [];
 
-    var groupChatReceipt = await buildChatReceipt(
-      chatMessage,
-      receiptType,
-      receiptContent: receiptContent,
-    );
-    chatReceipts.add(groupChatReceipt);
-
     if (peerIds == null) {
       peerIds = <String>[];
       List<GroupMember> groupMembers =
@@ -576,12 +575,12 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       ChatMessage chatReceipt = await buildChatReceipt(
         chatMessage,
         receiptType,
+        receiverPeerId: peerId,
+        receiverName: linkman.name,
+        clientId: linkman.clientId,
         receiptContent: receiptContent,
       );
-      chatReceipt.title = groupChatReceipt.title;
-      chatReceipt.content = groupChatReceipt.content;
-      chatReceipt.receiptContent = groupChatReceipt.receiptContent;
-      chatReceipt.thumbnail = groupChatReceipt.thumbnail;
+      chatReceipt.title = chatMessage.title;
       chatReceipts.add(chatReceipt);
     }
     return chatReceipts;

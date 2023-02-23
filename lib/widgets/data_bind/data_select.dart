@@ -4,6 +4,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
+import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -647,14 +648,19 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
     }
     List<Widget> children = <Widget>[];
     children.add(Expanded(child: SingleChildScrollView(child: selectView)));
+    ButtonStyle style = WidgetUtil.buildButtonStyle();
+    ButtonStyle mainStyle = WidgetUtil.buildButtonStyle(
+        backgroundColor: myself.primary, elevation: 10.0);
     children.add(ButtonBar(
       children: [
         TextButton(
+            style: style,
             onPressed: () {
               widget.onConfirm(null);
             },
             child: Text(AppLocalizations.t('Cancel'))),
         TextButton(
+            style: mainStyle,
             onPressed: () {
               widget.optionController.options = options.value;
               widget.onConfirm(widget.optionController.selected);
