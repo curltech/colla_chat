@@ -245,7 +245,7 @@ dependencies:
   just_audio_windows: ^0.2.0
   just_audio_mpv: ^0.1.4
   just_waveform: any
-  audio_service: any
+  audio_service: ^0.18.9
   just_audio_background: ^0.0.1-beta.7
   flutter_tts: ^3.5.3
   speech_to_text: any

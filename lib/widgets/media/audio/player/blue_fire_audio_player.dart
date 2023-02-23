@@ -11,7 +11,12 @@ import 'package:flutter/widgets.dart';
 import 'package:video_player/video_player.dart';
 
 class BlueFireAudioPlayer {
-  AudioPlayer player = AudioPlayer();
+  late AudioPlayer player;
+
+  BlueFireAudioPlayer() {
+    player = AudioPlayer();
+    AudioPlayer.global.setGlobalAudioContext(AudioContextConfig().build());
+  }
 
   Source _audioSource({required String filename}) {
     Source source;
@@ -61,6 +66,10 @@ class BlueFireAudioPlayer {
 
   release() async {
     await player.release();
+  }
+
+  setLoopMode(bool mode) async {
+    await player.setReleaseMode(mode ? ReleaseMode.loop : ReleaseMode.stop);
   }
 }
 

@@ -67,6 +67,10 @@ class JustAudioPlayer {
   release() async {
     await player.dispose();
   }
+
+  setLoopMode(bool mode) async {
+    await player.setLoopMode(mode ? LoopMode.all : LoopMode.off);
+  }
 }
 
 ///采用just_audio和record实现的音频的播放和记录，适用于Android, iOS, Linux, macOS, Windows, and web.
