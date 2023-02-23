@@ -17,7 +17,6 @@ import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
@@ -188,10 +187,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       if (chatMessage != null) {
         //进入视频界面是先选择了视频邀请消息
         if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-          String content = chatMessage.content!;
-          content = chatMessageService.recoverContent(content);
-          Map json = JsonUtil.toJson(content);
-          conference = Conference.fromJson(json);
+          conference = videoChatMessageController.conference;
           name = conference!.name;
           conferenceName = conference!.name;
           //conferenceController.current = conference;

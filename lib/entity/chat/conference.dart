@@ -92,7 +92,8 @@ class Conference extends StatusEntity {
       'advance': advance,
       'video': video,
       'upperNumber': upperNumber,
-      'participants': JsonUtil.toJsonString(participants),
+      'participants':
+          participants == null ? null : JsonUtil.toJsonString(participants),
     });
     return json;
   }
