@@ -281,8 +281,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
           await chatMessageService.buildGroupChatMessage(
         current.conferenceId,
         PartyType.conference,
-        contentType: ContentType.video,
-        title: ContentType.video.name,
+        title: current.video ? ContentType.video.name : ContentType.audio.name,
         content: current,
         messageId: current.conferenceId,
         subMessageType: ChatMessageSubType.videoChat,

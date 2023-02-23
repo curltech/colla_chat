@@ -493,8 +493,9 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     videoChatStatus.value = VideoChatStatus.end;
   }
 
-  ///发送group视频通邀请话消息,此时消息必须有content,包含Room信息
-  ///需要群发给room里面的参与者，而不是group的所有成员
+  ///发送group视频通邀请话消息,此时消息必须有content,包含conference信息
+  ///conference的participants，而不是group的所有成员
+  ///title字段存放是视频还是音频的信息
   Future<ChatMessage?> _sendVideoChatMessage(
       {required String contentType, required Conference conference}) async {
     ChatMessage? chatMessage = await chatMessageController.send(

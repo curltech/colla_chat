@@ -19,11 +19,14 @@ import 'package:flutter/material.dart';
 class VideoDialInWidget extends StatelessWidget {
   ///视频通话的消息请求
   final ChatMessage chatMessage;
+  late final Conference conference;
 
   final Function(ChatMessage chatMessage, MessageStatus chatReceiptType)? onTap;
 
-  const VideoDialInWidget({Key? key, required this.chatMessage, this.onTap})
-      : super(key: key);
+  VideoDialInWidget({Key? key, required this.chatMessage, this.onTap})
+      : super(key: key) {
+    conference = _parseConference();
+  }
 
   ///接受或者拒绝视频通话邀请的处理
   _processVideoChat(MessageStatus receiptType) async {
@@ -93,8 +96,6 @@ class VideoDialInWidget extends StatelessWidget {
         }
       }
       await chatMessageService.updateReceiptStatus(chatMessage, receiptType);
-      Map json = JsonUtil.toJson(chatMessage.content!);
-      var conference = Conference.fromJson(json);
       await conferenceService.store(conference);
       if (receiptType == MessageStatus.accepted) {}
     } else if (groupType == PartyType.conference.name) {
@@ -111,21 +112,32 @@ class VideoDialInWidget extends StatelessWidget {
         }
       }
       await chatMessageService.updateReceiptStatus(chatMessage, receiptType);
-      Map json = JsonUtil.toJson(chatMessage.content!);
-      var conference = Conference.fromJson(json);
       await conferenceService.store(conference);
       if (receiptType == MessageStatus.accepted) {}
     }
+  }
+
+  Conference _parseConference() {
+    Map json = JsonUtil.toJson(chatMessage.content!);
+    var conference = Conference.fromJson(json);
+
+    return conference;
   }
 
   @override
   Widget build(BuildContext context) {
     var name = chatMessage.senderName;
     name = name ?? '';
+    var title = chatMessage.title;
+    title = title ?? '';
     return ListTile(
         leading: myself.avatarImage,
+        isThreeLine: true,
         title: Text(name, style: const TextStyle(color: Colors.white)),
-        subtitle: Text(AppLocalizations.t('Inviting you video chat'),
+        subtitle: Text(
+            AppLocalizations.t('Inviting you $title chat, ') +
+                AppLocalizations.t('conference name ') +
+                conference.name,
             style: const TextStyle(color: Colors.white)),
         trailing: SizedBox(
           width: 130,

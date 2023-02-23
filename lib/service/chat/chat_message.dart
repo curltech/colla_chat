@@ -592,7 +592,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     var receiverType = chatMessage.receiverType;
     if (peerId != null &&
         peerId != myself.peerId &&
-        receiverType != PartyType.group.name) {
+        receiverType != PartyType.group.name &&
+        receiverType != PartyType.conference.name) {
       var transportType = chatMessage.transportType;
       if (transportType == TransportType.webrtc.name) {
         bool success = await peerConnectionPool.send(peerId, chatMessage,
@@ -709,6 +710,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String? contentType = chatMessage.contentType;
     String? mimeType = chatMessage.mimeType;
     String? messageId;
+    //内容是否需要以附件形式保存
+    bool attachment = false;
     if (content != null) {
       if (contentType != null &&
           (contentType == ContentType.file.name ||
@@ -716,14 +719,17 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
               contentType == ContentType.video.name ||
               contentType == ContentType.audio.name ||
               contentType == ContentType.rich.name)) {
+        //保存的时候，设置内容为空
         chatMessage.content = null;
+        attachment = true;
         messageId = chatMessage.messageId;
       }
     }
 
     try {
       await upsert(chatMessage);
-      if (messageId != null) {
+      //作为附件存储内容
+      if (messageId != null && attachment) {
         if (id == null) {
           await messageAttachmentService.store(
               chatMessage.id!, messageId, title, content!, EntityState.insert);
@@ -731,6 +737,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           await messageAttachmentService.store(
               chatMessage.id!, messageId, title, content!, EntityState.update);
         }
+        //恢复内容
+        chatMessage.content = content;
       }
       if (updateSummary) {
         await chatSummaryService.upsertByChatMessage(chatMessage);
