@@ -137,7 +137,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
     return conference;
   }
 
-  ///保存会议以及成员，成员根据participants
+  ///保存会议以及成员，成员根据participants,conferenceOwnerPeerId决定成员表的身份
   Future<List<Object>> store(Conference conference) async {
     Conference? old = await findOneByConferenceId(conference.conferenceId);
     if (old != null) {
