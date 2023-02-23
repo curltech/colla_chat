@@ -26,6 +26,7 @@ import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
+import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
@@ -103,6 +104,10 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   VideoChatMessageController videoChatMessageController =
       VideoChatMessageController();
+
+  BlueFireAudioPlayer audioPlayer = BlueFireAudioPlayer();
+
+  //JustAudioPlayer audioPlayer = JustAudioPlayer();
 
   @override
   void initState() {
@@ -254,6 +259,9 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         videoChatMessageController.receivedChatReceipt(chatMessage);
       }
     }
+
+    audioPlayer.stop();
+    videoChatStatus.value = VideoChatStatus.end;
   }
 
   ///调整显示哪些命令按钮
@@ -509,6 +517,12 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       }
     }
     videoChatStatus.value = VideoChatStatus.calling;
+    audioPlayer.play('assets/medias/mediaInvitation.mp3');
+    //延时60秒后一般消息消失
+    Future.delayed(const Duration(seconds: 60)).then((value) {
+      audioPlayer.stop();
+      videoChatStatus.value = VideoChatStatus.end;
+    });
   }
 
   ///如果正在呼叫calling，停止呼叫，关闭所有的本地视频，呼叫状态改为结束
@@ -522,6 +536,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       videoChatMessageController.setChatMessage(null);
       conference = null;
     }
+    audioPlayer.stop();
     videoChatStatus.value = VideoChatStatus.end;
   }
 

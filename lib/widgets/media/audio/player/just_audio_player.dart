@@ -7,6 +7,68 @@ import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:rxdart/rxdart.dart';
 
+class JustAudioPlayer {
+  late AudioPlayer player;
+
+  JustAudioPlayer({
+    String? userAgent,
+    bool handleInterruptions = true,
+    bool androidApplyAudioAttributes = true,
+    bool handleAudioSessionActivation = true,
+    AudioLoadConfiguration? audioLoadConfiguration,
+    AudioPipeline? audioPipeline,
+    bool androidOffloadSchedulingEnabled = false,
+  }) {
+    player = AudioPlayer(
+        userAgent: userAgent,
+        handleInterruptions: handleInterruptions,
+        androidApplyAudioAttributes: androidApplyAudioAttributes,
+        handleAudioSessionActivation: handleAudioSessionActivation,
+        audioLoadConfiguration: audioLoadConfiguration,
+        audioPipeline: audioPipeline,
+        androidOffloadSchedulingEnabled: androidOffloadSchedulingEnabled);
+  }
+
+  AudioSource _audioSource({required String filename}) {
+    AudioSource audioSource;
+    if (filename.startsWith('assets')) {
+      audioSource = AudioSource.uri(Uri.parse(filename));
+    } else if (filename.startsWith('http')) {
+      audioSource = AudioSource.uri(Uri.parse(filename));
+    } else {
+      audioSource = AudioSource.uri(Uri.file(filename));
+    }
+
+    return audioSource;
+  }
+
+  play(String filename) async {
+    try {
+      AudioSource audioSource = _audioSource(filename: filename);
+      await player.setAudioSource(audioSource);
+      await player.play();
+    } catch (e) {
+      logger.e('$e');
+    }
+  }
+
+  pause() async {
+    await player.pause();
+  }
+
+  resume() async {
+    await player.play();
+  }
+
+  stop() async {
+    await player.stop();
+  }
+
+  release() async {
+    await player.dispose();
+  }
+}
+
 ///采用just_audio和record实现的音频的播放和记录，适用于Android, iOS, Linux, macOS, Windows, and web.
 class JustAudioSource {
   static AudioSource audioSource(

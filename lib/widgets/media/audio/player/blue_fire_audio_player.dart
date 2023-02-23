@@ -10,6 +10,60 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/widgets.dart';
 import 'package:video_player/video_player.dart';
 
+class BlueFireAudioPlayer {
+  AudioPlayer player = AudioPlayer();
+
+  Source _audioSource({required String filename}) {
+    Source source;
+    if (filename.startsWith('assets/')) {
+      source = AssetSource(filename);
+    } else if (filename.startsWith('http')) {
+      source = UrlSource(filename);
+    } else {
+      source = DeviceFileSource(filename);
+    }
+
+    return source;
+  }
+
+  play(
+    String filename, {
+    double? volume,
+    double? balance,
+    AudioContext? ctx,
+    Duration? position,
+    PlayerMode? mode,
+  }) async {
+    try {
+      Source source = _audioSource(filename: filename);
+      await player.play(source,
+          volume: volume,
+          balance: balance,
+          ctx: ctx,
+          position: position,
+          mode: mode);
+    } catch (e) {
+      logger.e('$e');
+    }
+  }
+
+  pause() async {
+    await player.pause();
+  }
+
+  resume() async {
+    await player.resume();
+  }
+
+  stop() async {
+    await player.stop();
+  }
+
+  release() async {
+    await player.release();
+  }
+}
+
 class BlueFireAudioSource {
   static Source mediaStream(
       {required Uint8List data, required MimeType mediaFormat}) {

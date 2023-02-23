@@ -11,6 +11,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
+import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:extended_text/extended_text.dart';
@@ -38,6 +39,9 @@ class _IndexViewState extends State<IndexView>
       CustomSpecialTextSpanBuilder();
   VideoChatMessageController videoChatMessageController =
       VideoChatMessageController();
+  BlueFireAudioPlayer audioPlayer = BlueFireAudioPlayer();
+
+  //JustAudioPlayer audioPlayer = JustAudioPlayer();
 
   @override
   void initState() {
@@ -163,6 +167,7 @@ class _IndexViewState extends State<IndexView>
                 WidgetUtil.buildCircleButton(
                     onPressed: () {
                       videoChatMessageVisible.value = false;
+                      audioPlayer.stop();
                       videoChatMessageController
                           .sendChatReceipt(MessageStatus.rejected);
                     },
@@ -172,6 +177,7 @@ class _IndexViewState extends State<IndexView>
                 WidgetUtil.buildCircleButton(
                     onPressed: () {
                       videoChatMessageVisible.value = false;
+                      audioPlayer.stop();
                       videoChatMessageController
                           .sendChatReceipt(MessageStatus.accepted);
                     },
@@ -188,6 +194,7 @@ class _IndexViewState extends State<IndexView>
       builder: (BuildContext context, bool value, Widget? child) {
         Widget videoChatMessageWidget = Container();
         if (value) {
+          audioPlayer.play('assets/medias/mediaInvitation.mp3');
           ChatMessage? chatMessage = globalChatMessageController.chatMessage;
           if (chatMessage != null) {
             //视频通话请求消息
@@ -197,6 +204,7 @@ class _IndexViewState extends State<IndexView>
                   _buildVideoChatMessageWidget(context, chatMessage);
               //延时60秒后一般消息消失
               Future.delayed(const Duration(seconds: 60)).then((value) {
+                audioPlayer.stop();
                 if (videoChatMessageVisible.value) {
                   videoChatMessageVisible.value = false;
                   ChatMessage? chatMessage =
