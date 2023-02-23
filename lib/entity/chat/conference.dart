@@ -59,10 +59,17 @@ class Conference extends StatusEntity {
         advance =
             json['advance'] == true || json['advance'] == 1 ? true : false,
         upperNumber = json['upperNumber'] ?? 300,
-        participants = json['participants'] != null
-            ? JsonUtil.toJson(json['participants'])
-            : null,
-        super.fromJson(json);
+        super.fromJson(json) {
+    var participants = json['participants'] != null
+        ? JsonUtil.toJson(json['participants'])
+        : null;
+    if (participants != null && participants is List) {
+      this.participants = <String>[];
+      for (var participant in participants) {
+        this.participants!.add(participant.toString());
+      }
+    }
+  }
 
   @override
   Map<String, dynamic> toJson() {
