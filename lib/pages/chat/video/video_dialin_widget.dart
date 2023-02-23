@@ -118,8 +118,9 @@ class VideoDialInWidget extends StatelessWidget {
   }
 
   Conference _parseConference() {
-    Map json = JsonUtil.toJson(chatMessage.content!);
-    var conference = Conference.fromJson(json);
+    String json = chatMessageService.recoverContent(chatMessage.content!);
+    Map map = JsonUtil.toJson(json);
+    var conference = Conference.fromJson(map);
 
     return conference;
   }
