@@ -1,4 +1,5 @@
 import 'package:colla_chat/entity/base.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:flutter/material.dart';
 
 class Conference extends StatusEntity {
@@ -58,7 +59,9 @@ class Conference extends StatusEntity {
         advance =
             json['advance'] == true || json['advance'] == 1 ? true : false,
         upperNumber = json['upperNumber'] ?? 300,
-        //participants = json['participants'],
+        participants = json['participants'] != null
+            ? JsonUtil.toJson(json['participants'])
+            : null,
         super.fromJson(json);
 
   @override
@@ -82,7 +85,7 @@ class Conference extends StatusEntity {
       'advance': advance,
       'video': video,
       'upperNumber': upperNumber,
-      //'participants': participants,
+      'participants': JsonUtil.toJsonString(participants),
     });
     return json;
   }
