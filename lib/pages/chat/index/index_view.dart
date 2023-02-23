@@ -162,18 +162,18 @@ class _IndexViewState extends State<IndexView>
               child: Row(children: [
                 WidgetUtil.buildCircleButton(
                     onPressed: () {
+                      videoChatMessageVisible.value = false;
                       videoChatMessageController
                           .sendChatReceipt(MessageStatus.rejected);
-                      videoChatMessageVisible.value = false;
                     },
                     child: const Icon(
                         color: Colors.white, size: 16, Icons.call_end),
                     backgroundColor: Colors.red),
                 WidgetUtil.buildCircleButton(
                     onPressed: () {
+                      videoChatMessageVisible.value = false;
                       videoChatMessageController
                           .sendChatReceipt(MessageStatus.accepted);
-                      videoChatMessageVisible.value = false;
                     },
                     child: const Icon(
                         color: Colors.white, size: 16, Icons.video_call),
@@ -197,12 +197,14 @@ class _IndexViewState extends State<IndexView>
                   _buildVideoChatMessageWidget(context, chatMessage);
               //延时60秒后一般消息消失
               Future.delayed(const Duration(seconds: 60)).then((value) {
-                videoChatMessageVisible.value = false;
-                ChatMessage? chatMessage =
-                    videoChatMessageController.chatMessage;
-                if (chatMessage != null && chatMessage.groupType != null) {
-                  videoChatMessageController
-                      .sendChatReceipt(MessageStatus.accepted);
+                if (videoChatMessageVisible.value) {
+                  videoChatMessageVisible.value = false;
+                  ChatMessage? chatMessage =
+                      videoChatMessageController.chatMessage;
+                  if (chatMessage != null && chatMessage.groupType != null) {
+                    videoChatMessageController
+                        .sendChatReceipt(MessageStatus.accepted);
+                  }
                 }
               });
             }
