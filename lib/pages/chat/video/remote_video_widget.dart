@@ -55,6 +55,9 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   //控制面板可见性的计时器
   Timer? _hideControlPanelTimer;
 
+  VideoChatMessageController videoChatMessageController =
+      VideoChatMessageController();
+
   @override
   void initState() {
     super.initState();

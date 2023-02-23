@@ -1,14 +1,16 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/index/bottom_bar.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/index/index_widget.dart';
 import 'package:colla_chat/pages/chat/login/loading.dart';
-import 'package:colla_chat/pages/chat/video/video_dialin_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:extended_text/extended_text.dart';
@@ -29,10 +31,13 @@ class IndexView extends StatefulWidget {
 
 class _IndexViewState extends State<IndexView>
     with SingleTickerProviderStateMixin {
-  final ValueNotifier<bool> videoChatVisible = ValueNotifier<bool>(false);
+  final ValueNotifier<bool> videoChatMessageVisible =
+      ValueNotifier<bool>(false);
   final ValueNotifier<bool> chatMessageVisible = ValueNotifier<bool>(false);
   final CustomSpecialTextSpanBuilder customSpecialTextSpanBuilder =
       CustomSpecialTextSpanBuilder();
+  VideoChatMessageController videoChatMessageController =
+      VideoChatMessageController();
 
   @override
   void initState() {
@@ -42,48 +47,29 @@ class _IndexViewState extends State<IndexView>
     appDataProvider.addListener(_update);
   }
 
-  _onTap(ChatMessage chatMessage, MessageStatus chatReceiptType) {
-    videoChatVisible.value = false;
+  ///myself和appDataProvider发生变化后刷新整个界面
+  _update() async {
+    if (mounted) {
+      //setState(() {});
+    }
   }
 
-  Widget _buildVideoDialIn(BuildContext context, ChatMessage chatMessage) {
-    Widget videoDialInWidget = Container(
-        alignment: Alignment.topLeft,
-        width: appDataProvider.totalSize.width,
-        padding: const EdgeInsets.all(5.0),
-        color: Colors.black.withOpacity(AppOpacity.mdOpacity),
-        child: VideoDialInWidget(
-          chatMessage: chatMessage,
-          onTap: _onTap,
-        ));
-    return videoDialInWidget;
+  ///有新消息到来的时候，一般消息直接显示，视频邀请消息显示带按钮选择接受还是拒绝
+  _updateGlobalChatMessage() async {
+    ChatMessage? chatMessage = globalChatMessageController.chatMessage;
+    if (chatMessage != null) {
+      if (chatMessage.subMessageType == ChatMessageSubType.chat.name) {
+        chatMessageVisible.value = true;
+      } else if (chatMessage.subMessageType ==
+          ChatMessageSubType.videoChat.name) {
+        await videoChatMessageController.setChatMessage(chatMessage);
+        videoChatMessageVisible.value = true;
+      }
+    }
   }
 
-  _buildVideoChatMessage(BuildContext context) {
-    return ValueListenableBuilder(
-      valueListenable: videoChatVisible,
-      builder: (BuildContext context, bool value, Widget? child) {
-        Widget videoDialIn = Container();
-        if (value) {
-          ChatMessage? chatMessage = globalChatMessageController.chatMessage;
-          if (chatMessage != null) {
-            //视频通话请求消息
-            if (chatMessage.subMessageType ==
-                ChatMessageSubType.videoChat.name) {
-              videoDialIn = _buildVideoDialIn(context, chatMessage);
-            }
-          }
-          //延时，移除 OverlayEntry
-          Future.delayed(const Duration(seconds: 60)).then((value) {
-            videoChatVisible.value = false;
-          });
-        }
-        return Visibility(visible: videoChatVisible.value, child: videoDialIn);
-      },
-    );
-  }
-
-  _buildChatMessage(BuildContext context) {
+  ///显示一般消息
+  _buildChatMessageBanner(BuildContext context) {
     return ValueListenableBuilder(
         valueListenable: chatMessageVisible,
         builder: (BuildContext context, bool value, Widget? child) {
@@ -140,11 +126,9 @@ class _IndexViewState extends State<IndexView>
                         ),
                       ]));
 
-              //延时
+              //延时30秒后一般消息消失
               Future.delayed(const Duration(seconds: 30)).then((value) {
-                setState(() {
-                  chatMessageVisible.value = false;
-                });
+                chatMessageVisible.value = false;
               });
             }
           }
@@ -152,24 +136,83 @@ class _IndexViewState extends State<IndexView>
         });
   }
 
-  _updateGlobalChatMessage() async {
-    if (mounted) {
-      ChatMessage? chatMessage = globalChatMessageController.chatMessage;
-      if (chatMessage != null) {
-        if (chatMessage.subMessageType == ChatMessageSubType.chat.name) {
-          chatMessageVisible.value = true;
-        } else if (chatMessage.subMessageType ==
-            ChatMessageSubType.videoChat.name) {
-          videoChatVisible.value = true;
-        }
-      }
-    }
+  ///显示视频邀请消息组件
+  Widget _buildVideoChatMessageWidget(
+      BuildContext context, ChatMessage chatMessage) {
+    var name = chatMessage.senderName;
+    name = name ?? '';
+    var title = chatMessage.title;
+    title = title ?? '';
+    return Container(
+        alignment: Alignment.topLeft,
+        width: appDataProvider.totalSize.width,
+        padding: const EdgeInsets.all(5.0),
+        color: Colors.black.withOpacity(AppOpacity.mdOpacity),
+        child: ListTile(
+            leading: myself.avatarImage,
+            isThreeLine: true,
+            title: Text(name, style: const TextStyle(color: Colors.white)),
+            subtitle: Text(
+                AppLocalizations.t('Inviting you $title chat, ') +
+                    AppLocalizations.t('conference name ') +
+                    videoChatMessageController.conference!.name,
+                style: const TextStyle(color: Colors.white)),
+            trailing: SizedBox(
+              width: 130,
+              child: Row(children: [
+                WidgetUtil.buildCircleButton(
+                    onPressed: () {
+                      videoChatMessageController
+                          .sendChatReceipt(MessageStatus.rejected);
+                      videoChatMessageVisible.value = false;
+                    },
+                    child: const Icon(
+                        color: Colors.white, size: 16, Icons.call_end),
+                    backgroundColor: Colors.red),
+                WidgetUtil.buildCircleButton(
+                    onPressed: () {
+                      videoChatMessageController
+                          .sendChatReceipt(MessageStatus.accepted);
+                      videoChatMessageVisible.value = false;
+                    },
+                    child: const Icon(
+                        color: Colors.white, size: 16, Icons.video_call),
+                    backgroundColor: Colors.green),
+              ]),
+            )));
   }
 
-  _update() async {
-    if (mounted) {
-      //setState(() {});
-    }
+  _buildVideoChatMessageBanner(BuildContext context) {
+    return ValueListenableBuilder(
+      valueListenable: videoChatMessageVisible,
+      builder: (BuildContext context, bool value, Widget? child) {
+        Widget videoChatMessageWidget = Container();
+        if (value) {
+          ChatMessage? chatMessage = globalChatMessageController.chatMessage;
+          if (chatMessage != null) {
+            //视频通话请求消息
+            if (chatMessage.subMessageType ==
+                ChatMessageSubType.videoChat.name) {
+              videoChatMessageWidget =
+                  _buildVideoChatMessageWidget(context, chatMessage);
+              //延时60秒后一般消息消失
+              Future.delayed(const Duration(seconds: 60)).then((value) {
+                videoChatMessageVisible.value = false;
+                ChatMessage? chatMessage =
+                    videoChatMessageController.chatMessage;
+                if (chatMessage != null && chatMessage.groupType != null) {
+                  videoChatMessageController
+                      .sendChatReceipt(MessageStatus.accepted);
+                }
+              });
+            }
+          }
+        }
+        return Visibility(
+            visible: videoChatMessageVisible.value,
+            child: videoChatMessageWidget);
+      },
+    );
   }
 
   Widget _createScaffold(
@@ -191,8 +234,8 @@ class _IndexViewState extends State<IndexView>
                   height: appDataProvider.actualSize.height,
                   width: appDataProvider.actualSize.width)),
           Row(children: [
-            _buildChatMessage(context),
-            _buildVideoChatMessage(context)
+            _buildChatMessageBanner(context),
+            _buildVideoChatMessageBanner(context)
           ]),
         ])),
         //endDrawer: endDrawer,

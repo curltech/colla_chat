@@ -62,25 +62,6 @@ class GlobalChatMessageController with ChangeNotifier {
       case ChatMessageSubType.videoChat:
         break;
       case ChatMessageSubType.chatReceipt:
-        //处理视频通话消息的回执
-        ChatMessage? originMessage = await chatMessageService.findOriginByMessageId(
-            messageId,
-            receiverPeerId: chatMessage.senderPeerId!);
-        if (originMessage == null) {
-          logger.e('messageId:$messageId original chatMessage is not exist');
-          return;
-        }
-        String? originMessageType = originMessage.messageType;
-        String? originSubMessageType = originMessage.subMessageType;
-        if (originSubMessageType == ChatMessageSubType.videoChat.name) {
-          if (chatMessage.status == MessageStatus.accepted.name) {
-            //收到视频通话邀请同意回执，发出本地流，关闭拨号窗口VideoDialOutWidget，显示视频通话窗口VideoChatWidget
-            videoChatMessageController.receivedChatReceipt(chatMessage);
-          } else if (chatMessage.status == MessageStatus.rejected.name) {
-            //收到视频通话邀请拒绝回执，关闭本地流，关闭拨号窗口VideoDialOutWidget
-            videoChatMessageController.receivedChatReceipt(chatMessage);
-          }
-        }
         break;
       case ChatMessageSubType.addFriend:
         break;

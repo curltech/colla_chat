@@ -6,6 +6,7 @@ import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/group_linkman_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
@@ -101,6 +102,9 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   //呼叫时间的计时器，如果是在单聊的场景下，对方在时间内未有回执，则自动关闭
   Timer? _linkmanCallTimer;
 
+  VideoChatMessageController videoChatMessageController =
+      VideoChatMessageController();
+
   @override
   void initState() {
     super.initState();
@@ -108,6 +112,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     videoChatMessageController.addListener(_update);
     //本地视频的存放地
     localVideoRenderController.addListener(_update);
+    globalChatMessageController.addListener(_updateVideoChatReceipt);
     _init();
   }
 
@@ -221,6 +226,37 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   _update() {
     if (mounted) {
       _buildActionDataAndVisible();
+    }
+  }
+
+  _updateVideoChatReceipt() async {
+    ChatMessage? chatReceipt = globalChatMessageController.chatMessage;
+    if (chatReceipt == null) {
+      return;
+    }
+    if (chatReceipt.subMessageType != ChatMessageSubType.chatReceipt.name) {
+      return;
+    }
+    String messageId = chatReceipt.messageId!;
+    //处理视频通话消息的回执
+    ChatMessage? chatMessage = await chatMessageService.findOriginByMessageId(
+        messageId,
+        receiverPeerId: chatReceipt.senderPeerId!);
+    if (chatMessage == null) {
+      logger.e('messageId:$messageId original chatMessage is not exist');
+      return;
+    }
+    videoChatMessageController.setChatMessage(chatMessage);
+    String? messageType = chatMessage.messageType;
+    String? subMessageType = chatMessage.subMessageType;
+    if (subMessageType == ChatMessageSubType.videoChat.name) {
+      if (chatReceipt.status == MessageStatus.accepted.name) {
+        //收到视频通话邀请同意回执，发出本地流，关闭拨号窗口VideoDialOutWidget，显示视频通话窗口VideoChatWidget
+        videoChatMessageController.receivedChatReceipt(chatMessage);
+      } else if (chatReceipt.status == MessageStatus.rejected.name) {
+        //收到视频通话邀请拒绝回执，关闭本地流，关闭拨号窗口VideoDialOutWidget
+        videoChatMessageController.receivedChatReceipt(chatMessage);
+      }
     }
   }
 
@@ -652,7 +688,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                   child: Padding(
                       padding: const EdgeInsets.all(5.0),
                       child: Text(
-                          '${AppLocalizations.t('roomId')}:${conference!.conferenceId}'))),
+                          '${AppLocalizations.t('conferenceId')}:${conference!.conferenceId}'))),
             );
           } else {
             children.add(const SizedBox(

@@ -569,7 +569,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     }
     for (var peerId in peerIds) {
       Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
-      if (linkman == null) {
+      if (linkman == null || peerId == myself.peerId) {
+        logger.i('peerId $peerId linkman is not exist or myself');
         continue;
       }
       ChatMessage chatReceipt = await buildChatReceipt(
