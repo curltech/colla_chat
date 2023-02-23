@@ -314,7 +314,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     }
     chatMessage.contentType = contentType.name;
     chatMessage.mimeType = mimeType;
-    chatMessage.status = status ?? MessageStatus.unsent.name;
+    chatMessage.status = status ?? MessageStatus.sent.name;
     chatMessage.transportType = transportType.name;
     chatMessage.deleteTime = deleteTime;
     chatMessage.parentMessageId = parentMessageId;
@@ -630,7 +630,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return chatMessage;
   }
 
-  ///发送单条消息，并保存本地
+  ///发送单条消息，并保存本地，由于是先发送后保存，所以新消息的id，createDate等字段是空的
   Future<ChatMessage> sendAndStore(ChatMessage chatMessage,
       {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     await send(chatMessage, cryptoOption: cryptoOption);
