@@ -314,7 +314,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     }
     chatMessage.contentType = contentType.name;
     chatMessage.mimeType = mimeType;
-    chatMessage.status = status; // ?? MessageStatus.sent.name;
+    chatMessage.status = status ?? MessageStatus.unsent.name;
     chatMessage.transportType = transportType.name;
     chatMessage.deleteTime = deleteTime;
     chatMessage.parentMessageId = parentMessageId;
@@ -509,7 +509,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       receiptContent: receiptContent != null
           ? CryptoUtil.encodeBase64(receiptContent)
           : null,
-      status: receiptType.name,
+      content: receiptType.name,
     );
 
     chatReceipt.receiptTime = chatMessage.receiptTime;
