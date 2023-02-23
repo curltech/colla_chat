@@ -1,7 +1,6 @@
 import 'package:colla_chat/entity/dht/peerendpoint.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
-import 'package:colla_chat/tool/json_util.dart';
 
 /// 根据目标peerpoint的peerid搜索
 class FindPeerAction extends BaseAction {

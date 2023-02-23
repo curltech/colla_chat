@@ -1,5 +1,3 @@
-
-
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
 

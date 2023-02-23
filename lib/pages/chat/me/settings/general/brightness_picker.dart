@@ -45,7 +45,7 @@ class _BrightnessPickerState extends State<BrightnessPicker> {
               StringUtil.enumFromString(ThemeMode.values, selected)!;
         }
       },
-      optionController: OptionController(options:themeModeOptions),
+      optionController: OptionController(options: themeModeOptions),
     );
   }
 

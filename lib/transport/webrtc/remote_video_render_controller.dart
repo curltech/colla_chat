@@ -171,7 +171,8 @@ class VideoRoomRenderPool with ChangeNotifier {
   }
 
   ///根据房间号返回房间控制器，没有则返回null
-  RemoteVideoRenderController? getRemoteVideoRenderController(String conferenceId) {
+  RemoteVideoRenderController? getRemoteVideoRenderController(
+      String conferenceId) {
     return remoteVideoRenderControllers[conferenceId];
   }
 
@@ -180,7 +181,8 @@ class VideoRoomRenderPool with ChangeNotifier {
   }
 
   ///创建新的房间，返回其控制器，假如房间号已经存在，直接返回
-  RemoteVideoRenderController createRemoteVideoRenderController(Conference conference) {
+  RemoteVideoRenderController createRemoteVideoRenderController(
+      Conference conference) {
     String conferenceId = conference.conferenceId!;
     RemoteVideoRenderController? remoteVideoRenderController =
         remoteVideoRenderControllers[conferenceId];

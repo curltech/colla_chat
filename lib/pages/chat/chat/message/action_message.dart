@@ -1,4 +1,3 @@
-
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -153,9 +152,9 @@ class ActionMessage extends StatelessWidget {
                     group.name,
                     key: UniqueKey(),
                     style: const TextStyle(
-                      //color: isMyself ? Colors.white : Colors.black,
-                      //fontSize: 16.0,
-                    ),
+                        //color: isMyself ? Colors.white : Colors.black,
+                        //fontSize: 16.0,
+                        ),
                     //specialTextSpanBuilder: customSpecialTextSpanBuilder,
                   ),
                 ),
@@ -208,9 +207,9 @@ class ActionMessage extends StatelessWidget {
           var member = Text(
             groupMember.memberAlias!,
             style: const TextStyle(
-              //color: isMyself ? Colors.white : Colors.black,
-              //fontSize: 16.0,
-            ),
+                //color: isMyself ? Colors.white : Colors.black,
+                //fontSize: 16.0,
+                ),
             //specialTextSpanBuilder: customSpecialTextSpanBuilder,
           );
           members.add(member);

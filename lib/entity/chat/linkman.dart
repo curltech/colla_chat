@@ -1,5 +1,3 @@
-
-
 import 'package:colla_chat/entity/chat/peer_party.dart';
 
 enum LinkmanStatus {

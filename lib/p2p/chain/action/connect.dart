@@ -21,8 +21,7 @@ class ConnectAction extends BaseAction {
       peerClient.email = CryptoUtil.encodeBase64(
           await cryptoGraphy.hash(peerClient.email!.codeUnits));
     }
-    ChainMessage chainMessage =
-        await prepareSend(peerClient);
+    ChainMessage chainMessage = await prepareSend(peerClient);
     chainMessage.payloadType = PayloadType.peerClient.name;
     peerClient.connectPeerId = chainMessage.connectPeerId;
     peerClient.connectAddress = chainMessage.connectAddress;

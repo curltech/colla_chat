@@ -6,7 +6,6 @@ import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/json_util.dart';

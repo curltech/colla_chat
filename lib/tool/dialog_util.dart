@@ -259,7 +259,7 @@ class DialogUtil {
     return showBottomSheet<T>(context: context, builder: builder);
   }
 
-  // static showToast(String msg, {int duration = 1, int gravity = 0}) {
-  //   Toast.show(AppLocalizations.t(msg), duration: duration, gravity: gravity);
-  // }
+// static showToast(String msg, {int duration = 1, int gravity = 0}) {
+//   Toast.show(AppLocalizations.t(msg), duration: duration, gravity: gravity);
+// }
 }
