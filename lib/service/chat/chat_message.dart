@@ -540,6 +540,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         whereArgs: [chatMessage.id!]);
   }
 
+  ///创建群回执消息，如果peerIds为空，通过groupPeerId查询成员表决定
   Future<List<ChatMessage>> buildGroupChatReceipt(
     ChatMessage chatMessage,
     MessageStatus receiptType, {

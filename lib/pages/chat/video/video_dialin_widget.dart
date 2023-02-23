@@ -104,7 +104,8 @@ class VideoDialInWidget extends StatelessWidget {
       //首先检查接收人是否已经存在给自己的回执，不存在或者存在是accepted则发送回执
       //如果存在，如果是rejected或者terminated，则不发送回执
       List<ChatMessage> chatReceipts = await chatMessageService
-          .buildGroupChatReceipt(chatMessage, receiptType);
+          .buildGroupChatReceipt(chatMessage, receiptType,
+              peerIds: conference.participants);
       if (chatReceipts.isNotEmpty) {
         for (var chatReceipt in chatReceipts) {
           //发送回执
