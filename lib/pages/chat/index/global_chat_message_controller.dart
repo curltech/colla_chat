@@ -21,12 +21,40 @@ class GlobalChatMessageController with ChangeNotifier {
   //最新的到来消息
   ChatMessage? _chatMessage;
 
-  ChatMessage? get chatMessage {
-    return _chatMessage;
-  }
+  final Map<String, List<Function(ChatMessage chatMessage)>> _receivers = {};
 
   GlobalChatMessageController() {
     chatAction.registerReceiver(onChat);
+  }
+
+  ///注册消息接收监听器，用于自定义的特殊处理
+  registerReceiver(
+      String subMessageType, Function(ChatMessage chatMessage) fn) {
+    List<Function(ChatMessage chatMessage)>? fns = _receivers[subMessageType];
+    if (fns == null) {
+      fns = <Function(ChatMessage chatMessage)>[];
+      _receivers[subMessageType] = fns;
+    }
+    if (!fns.contains(fn)) {
+      fns.add(fn);
+    }
+  }
+
+  unregisterReceiver(
+      String subMessageType, Function(ChatMessage chatMessage) fn) {
+    List<Function(ChatMessage chatMessage)>? fns = _receivers[subMessageType];
+    if (fns != null) {
+      if (fns.contains(fn)) {
+        fns.remove(fn);
+        if (fns.isEmpty) {
+          _receivers.remove(subMessageType);
+        }
+      }
+    }
+  }
+
+  ChatMessage? get chatMessage {
+    return _chatMessage;
   }
 
   ///从websocket的ChainMessage方式，chatAction接收到的ChatMessage
@@ -56,6 +84,8 @@ class GlobalChatMessageController with ChangeNotifier {
     String? content = chatMessage.content;
     ChatMessageSubType? subMessageType = StringUtil.enumFromString(
         ChatMessageSubType.values, chatMessage.subMessageType);
+
+    //接收消息的标准处理
     logger.i('chatMessage subMessageType:${subMessageType!.name} title:$title');
     switch (subMessageType) {
       case ChatMessageSubType.videoChat:
@@ -103,6 +133,13 @@ class GlobalChatMessageController with ChangeNotifier {
         break;
       default:
         break;
+    }
+    //调用注册的消息接收监听器，用于自定义的特殊处理
+    List<Function(ChatMessage chatMessage)>? fns = _receivers[subMessageType];
+    if (fns != null && fns.isNotEmpty) {
+      for (var fn in fns) {
+        fn(chatMessage);
+      }
     }
     //对于接收到的非系统消息，对消息控制器进行刷新
     if (chatMessage.messageType != ChatMessageType.system.name) {

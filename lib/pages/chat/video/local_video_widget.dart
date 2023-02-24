@@ -209,6 +209,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   _update() {
     if (mounted) {
       _buildActionDataAndVisible();
+      videoChatStatus.value = VideoChatStatus.chatting;
     }
   }
 
@@ -240,11 +241,10 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       } else if (chatReceipt.status == MessageStatus.rejected.name) {
         //收到视频通话邀请拒绝回执，关闭本地流，关闭拨号窗口VideoDialOutWidget
         videoChatMessageController.receivedChatReceipt(chatMessage);
+        videoChatStatus.value = VideoChatStatus.end;
       }
     }
-
     _stop();
-    videoChatStatus.value = VideoChatStatus.end;
   }
 
   _play() {
@@ -431,18 +431,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
     PeerVideoRender? videoChatRender =
         await localVideoRenderController.createMediaStreamRender(stream);
-    var messageId = chatMessage.messageId!;
-    var videoRoomController =
-        videoConferenceRenderPool.getRemoteVideoRenderController(messageId);
-    if (videoRoomController != null) {
-      List<AdvancedPeerConnection> pcs =
-          videoRoomController.getAdvancedPeerConnections(peerId!);
-      if (pcs.isNotEmpty) {
-        for (var pc in pcs) {
-          pc.negotiate();
-        }
-      }
-    }
+
     return videoChatRender;
   }
 
