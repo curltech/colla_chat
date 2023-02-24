@@ -21,7 +21,7 @@ class BlueFireAudioPlayer {
   Source _audioSource({required String filename}) {
     Source source;
     if (filename.startsWith('assets/')) {
-      source = AssetSource(filename);
+      source = AssetSource(filename.substring(7));
     } else if (filename.startsWith('http')) {
       source = UrlSource(filename);
     } else {

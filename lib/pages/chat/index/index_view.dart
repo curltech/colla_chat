@@ -58,6 +58,15 @@ class _IndexViewState extends State<IndexView>
     }
   }
 
+  _play() {
+    audioPlayer.setLoopMode(true);
+    audioPlayer.play('assets/medias/mediaInvitation.mp3');
+  }
+
+  _stop() {
+    audioPlayer.stop();
+  }
+
   ///有新消息到来的时候，一般消息直接显示，视频邀请消息显示带按钮选择接受还是拒绝
   _updateGlobalChatMessage() async {
     ChatMessage? chatMessage = globalChatMessageController.chatMessage;
@@ -167,7 +176,7 @@ class _IndexViewState extends State<IndexView>
                 WidgetUtil.buildCircleButton(
                     onPressed: () {
                       videoChatMessageVisible.value = false;
-                      audioPlayer.stop();
+                      _stop();
                       videoChatMessageController
                           .sendChatReceipt(MessageStatus.rejected);
                     },
@@ -177,7 +186,7 @@ class _IndexViewState extends State<IndexView>
                 WidgetUtil.buildCircleButton(
                     onPressed: () {
                       videoChatMessageVisible.value = false;
-                      audioPlayer.stop();
+                      _stop();
                       videoChatMessageController
                           .sendChatReceipt(MessageStatus.accepted);
                     },
@@ -194,7 +203,7 @@ class _IndexViewState extends State<IndexView>
       builder: (BuildContext context, bool value, Widget? child) {
         Widget videoChatMessageWidget = Container();
         if (value) {
-          audioPlayer.play('assets/medias/mediaInvitation.mp3');
+          _play();
           ChatMessage? chatMessage = globalChatMessageController.chatMessage;
           if (chatMessage != null) {
             //视频通话请求消息
@@ -204,7 +213,7 @@ class _IndexViewState extends State<IndexView>
                   _buildVideoChatMessageWidget(context, chatMessage);
               //延时60秒后一般消息消失
               Future.delayed(const Duration(seconds: 60)).then((value) {
-                audioPlayer.stop();
+                _stop();
                 if (videoChatMessageVisible.value) {
                   videoChatMessageVisible.value = false;
                   ChatMessage? chatMessage =
