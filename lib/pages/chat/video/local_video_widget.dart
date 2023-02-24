@@ -268,10 +268,10 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         localVideoRenderController.video) {
       actionData.add(
         ActionData(
-            label: 'Audio',
-            tooltip: 'Open local audio',
-            icon: const Icon(Icons.multitrack_audio_outlined,
-                color: Colors.white)),
+          label: 'Audio',
+          tooltip: 'Open local audio',
+          icon: const Icon(Icons.multitrack_audio, color: Colors.white),
+        ),
       );
     }
     if (localVideoRenderController.videoChatRender != null) {

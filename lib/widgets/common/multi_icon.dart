@@ -20,7 +20,7 @@ class AnimateMultiIcon extends StatefulWidget {
   const AnimateMultiIcon(
       {super.key,
       required this.icons,
-      this.duration = const Duration(milliseconds: 100)});
+      this.duration = const Duration(milliseconds: 150)});
 
   @override
   State<StatefulWidget> createState() {
@@ -35,13 +35,15 @@ class _AnimateMultiIconStat extends State<AnimateMultiIcon> {
   initState() {
     super.initState();
     Future.doWhile(() async {
-      if (index >= widget.icons.length - 1) {
+      if (index >= widget.icons.length) {
         index = 0;
       }
       await Future.delayed(widget.duration, () {
-        index++;
-        setState(() {});
+        if (mounted) {
+          setState(() {});
+        }
       });
+      index++;
       return true;
     });
   }
