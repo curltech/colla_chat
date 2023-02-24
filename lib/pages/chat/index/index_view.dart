@@ -60,7 +60,7 @@ class _IndexViewState extends State<IndexView>
 
   _play() {
     audioPlayer.setLoopMode(true);
-    audioPlayer.play('assets/medias/mediaInvitation.mp3');
+    audioPlayer.play('assets/medias/invitation.mp3');
   }
 
   _stop() {
@@ -190,8 +190,8 @@ class _IndexViewState extends State<IndexView>
                       videoChatMessageController
                           .sendChatReceipt(MessageStatus.accepted);
                     },
-                    child: const Icon(
-                        color: Colors.white, size: 16, Icons.video_call),
+                    child:
+                        const Icon(color: Colors.white, size: 16, Icons.call),
                     backgroundColor: Colors.green),
               ]),
             )));

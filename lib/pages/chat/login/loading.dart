@@ -79,7 +79,6 @@ class Loading extends StatefulWidget {
   final bool autoPlay;
 
   final SwiperController controller = SwiperController();
-  final animateDuration = const Duration(milliseconds: 500);
 
   Loading({Key? key, required this.title, this.autoPlay = true})
       : super(key: key);

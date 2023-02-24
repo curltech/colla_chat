@@ -6,6 +6,7 @@ import 'package:colla_chat/pages/chat/chat/more_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/text_message_input.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:flutter/material.dart';
 
 import 'controller/chat_message_controller.dart';
@@ -33,6 +34,7 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
   bool emojiVisible = false;
   bool moreVisible = false;
   bool keyboardVisible = false;
+  BlueFireAudioPlayer audioPlayer = BlueFireAudioPlayer();
 
   @override
   void initState() {
@@ -44,8 +46,18 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
     setState(() {});
   }
 
+  _play() {
+    audioPlayer.setLoopMode(false);
+    audioPlayer.play('assets/medias/send.mp3');
+  }
+
+  _stop() {
+    audioPlayer.stop();
+  }
+
   Future<void> onSendPressed() async {
     if (widget.onSend != null) {
+      _play();
       widget.onSend!(message: widget.textEditingController.text);
     }
   }

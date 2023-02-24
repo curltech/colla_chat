@@ -21,6 +21,7 @@ import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
+import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
@@ -53,10 +54,7 @@ enum VideoChatStatus {
 ///本地视频通话显示和拨出的窗口，显示多个本地视频，音频和屏幕共享的小视频窗口
 ///各种功能按钮，可以切换视频和音频，添加屏幕共享视频，此时需要发起重新协商
 class LocalVideoWidget extends StatefulWidget {
-  final PartyType videoMode;
-
-  const LocalVideoWidget({Key? key, this.videoMode = PartyType.conference})
-      : super(key: key);
+  const LocalVideoWidget({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -65,6 +63,8 @@ class LocalVideoWidget extends StatefulWidget {
 }
 
 class _LocalVideoWidgetState extends State<LocalVideoWidget> {
+  String? partyType;
+
   //或者会议名称，或者群名称，或者联系人名称
   String? name;
 
@@ -120,105 +120,82 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     _init();
   }
 
-  ///初始化是根据当前的视频邀请消息来决定的，无论是发起还是接收邀请
+  ///本界面是在聊天界面转过来，所以当前chatSummary是必然存在的，
+  ///当前chatMessage在选择了视频邀请消息后，也是存在的
+  ///如果chatMessage不存在，表明是想开始发起新的linkman或者group会议
+  ///初始化是根据当前的视频邀请消息chatMessage来决定的，无论是发起还是接收邀请
   ///也可以根据当前会议来决定的，适用于群和会议模式
   ///如果没有设置，表明是新的会议
   _init() async {
     _buildActionDataAndVisible();
-    // if (widget.videoMode == VideoMode.conference) {
-    //   conference = conferenceController.current;
-    //   if (conference != null) {
-    //     conferenceId = conference!.conferenceId;
-    //     conference =
-    //         await conferenceService.findOneByConferenceId(conferenceId!);
-    //     if (conference != null) {
-    //       name = conference!.name;
-    //       conferenceName = conference!.name;
-    //       conferenceController.current = conference;
-    //       //检查当前消息，进入视频界面是先选择了视频邀请消息，或者没有
-    //       ChatMessage? chatMessage =
-    //           await chatMessageService.findOriginByMessageId(conferenceId!);
-    //       if (chatMessage != null) {
-    //         //进入视频界面是先选择了视频邀请消息
-    //         if (chatMessage.subMessageType ==
-    //             ChatMessageSubType.videoChat.name) {
-    //           videoChatMessageController.setChatMessage(chatMessage);
-    //         }
-    //       }
-    //     }
-    //   }
-    // }
     ChatSummary? chatSummary = chatMessageController.chatSummary;
     if (chatSummary == null) {
-      logger
-          .e('videoMode is ${widget.videoMode.name}, but chatSummary is null');
+      logger.e('chatSummary is null');
       return;
     }
+    partyType = chatSummary.partyType;
+    //先设置当前视频聊天控制器的邀请消息为null
     videoChatMessageController.setChatMessage(null);
-    var partyType = chatSummary.partyType;
-    if (partyType == PartyType.group.name) {
-      if (widget.videoMode != PartyType.group) {
-        logger.e(
-            'videoMode is ${widget.videoMode.name}, but chatSummary partyType is $partyType');
-        return;
-      }
-      groupPeerId = chatSummary.peerId!;
-      name = chatSummary.name!;
-      //检查当前消息，进入视频界面是先选择了视频邀请消息，或者没有
-      ChatMessage? chatMessage = chatMessageController.current;
-      if (chatMessage != null) {
-        //进入视频界面是先选择了视频邀请消息
-        if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-          conferenceId = chatMessage.messageId!;
-          conference =
-              await conferenceService.findOneByConferenceId(conferenceId!);
-          if (conference != null) {
-            conferenceName = conference!.name;
-            conferenceController.current = conference;
-            videoChatMessageController.setChatMessage(chatMessage);
-          }
-        }
-      }
-    } else if (partyType == PartyType.linkman.name) {
-      if (widget.videoMode != PartyType.linkman) {
-        logger.e(
-            'videoMode is ${widget.videoMode.name}, but chatSummary partyType is $partyType');
-        return;
-      }
+    if (partyType == PartyType.linkman.name) {
       peerId = chatSummary.peerId!;
       name = chatSummary.name!;
+    } else if (partyType == PartyType.group.name) {
+      groupPeerId = chatSummary.peerId!;
+      name = chatSummary.name!;
+    } else if (partyType == PartyType.conference.name) {
+      _initConference(chatSummary);
+    }
+    ChatMessage? chatMessage = chatMessageController.current;
+    if (chatMessage == null) {
+      logger.e('current chatMessage is not exist');
+    } else {
+      if (partyType == PartyType.linkman.name) {
+        _initLinkman(chatMessage);
+      } else if (partyType == PartyType.group.name) {
+        _initGroup(chatMessage);
+      }
+    }
+  }
+
+  ///linkman模式的初始化
+  _initLinkman(ChatMessage chatMessage) async {
+    //进入视频界面是先选择了视频邀请消息
+    if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
+      conference = videoChatMessageController.conference;
+      name = conference!.name;
+      conferenceName = conference!.name;
+      //conferenceController.current = conference;
+      videoChatMessageController.setChatMessage(chatMessage);
+    }
+  }
+
+  _initGroup(ChatMessage chatMessage) async {
+    //进入视频界面是先选择了视频邀请消息
+    if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
+      conferenceId = chatMessage.messageId!;
+      conference = await conferenceService.findOneByConferenceId(conferenceId!);
+      if (conference != null) {
+        conferenceName = conference!.name;
+        conferenceController.current = conference;
+        videoChatMessageController.setChatMessage(chatMessage);
+      }
+    }
+  }
+
+  _initConference(ChatSummary chatSummary) async {
+    conferenceId = chatSummary.peerId!;
+    conference = await conferenceService.findOneByConferenceId(conferenceId!);
+    if (conference != null) {
+      name = conference!.name;
+      conferenceName = conference!.name;
+      conferenceController.current = conference;
       //检查当前消息，进入视频界面是先选择了视频邀请消息，或者没有
-      ChatMessage? chatMessage = chatMessageController.current;
+      ChatMessage? chatMessage =
+          await chatMessageService.findOriginByMessageId(conferenceId!);
       if (chatMessage != null) {
         //进入视频界面是先选择了视频邀请消息
         if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-          conference = videoChatMessageController.conference;
-          name = conference!.name;
-          conferenceName = conference!.name;
-          //conferenceController.current = conference;
           videoChatMessageController.setChatMessage(chatMessage);
-        }
-      }
-    } else if (partyType == PartyType.conference.name) {
-      if (widget.videoMode != PartyType.conference) {
-        logger.e(
-            'videoMode is ${widget.videoMode.name}, but chatSummary PartyType $partyType');
-        return;
-      }
-      conferenceId = chatSummary.peerId!;
-      conference = await conferenceService.findOneByConferenceId(conferenceId!);
-      if (conference != null) {
-        name = conference!.name;
-        conferenceName = conference!.name;
-        conferenceController.current = conference;
-        //检查当前消息，进入视频界面是先选择了视频邀请消息，或者没有
-        ChatMessage? chatMessage =
-            await chatMessageService.findOriginByMessageId(conferenceId!);
-        if (chatMessage != null) {
-          //进入视频界面是先选择了视频邀请消息
-          if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-            videoChatMessageController.setChatMessage(chatMessage);
-          }
         }
       }
     }
@@ -230,6 +207,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
   }
 
+  ///如果视频邀请消息的回执到来，如果不在此界面的时候，新的回执不会被此处理
   _updateVideoChatReceipt() async {
     ChatMessage? chatReceipt = globalChatMessageController.chatMessage;
     if (chatReceipt == null) {
@@ -260,8 +238,18 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       }
     }
 
-    audioPlayer.stop();
+    _stop();
     videoChatStatus.value = VideoChatStatus.end;
+  }
+
+  _play() {
+    audioPlayer.setLoopMode(true);
+    audioPlayer.play('assets/medias/invitation.mp3');
+  }
+
+  _stop() {
+    audioPlayer.setLoopMode(true);
+    audioPlayer.play('assets/medias/close.mp3');
   }
 
   ///调整显示哪些命令按钮
@@ -326,7 +314,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       return;
     }
     List<String> participants = [myself.peerId!];
-    if (widget.videoMode == PartyType.conference) {
+    if (partyType == PartyType.conference.name) {
       if (conference != null) {
         return;
       }
@@ -348,7 +336,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                 selectType: SelectType.chipMultiSelect);
           });
     }
-    if (widget.videoMode == PartyType.group) {
+    if (partyType == PartyType.group.name) {
       if (groupPeerId == null) {
         return;
       }
@@ -368,7 +356,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             );
           });
     }
-    if (widget.videoMode == PartyType.linkman) {
+    if (partyType == PartyType.linkman.name) {
       if (peerId == null) {
         return;
       }
@@ -377,10 +365,10 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     conference = await conferenceService.createConference(
         '${name!}-${DateUtil.currentDate()}',
         participants: participants);
-    if (widget.videoMode == PartyType.group) {
+    if (partyType == PartyType.group.name) {
       conference!.groupPeerId = groupPeerId;
       conference!.groupName = name;
-      conference!.groupType = widget.videoMode.name;
+      conference!.groupType = partyType;
     }
     if (mounted) {
       DialogUtil.info(context,
@@ -389,72 +377,54 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
   }
 
-  _openVideoMedia({bool video = true}) async {
-    if (peerId != null) {
-      var status = peerConnectionPool.status(peerId!);
-      if (status != PeerConnectionStatus.connected) {
-        DialogUtil.error(context,
-            content: AppLocalizations.t('No Webrtc connected PeerConnection'));
-        return;
-      }
-    }
-
+  Future<PeerVideoRender?> _openVideoMedia({bool video = true}) async {
     ///本地视频不存在，可以直接创建，并发送视频邀请消息，否则根据情况觉得是否音视频切换
-    var videoChatRender = localVideoRenderController.videoChatRender;
+    PeerVideoRender? videoChatRender =
+        localVideoRenderController.videoChatRender;
     if (videoChatRender == null) {
       if (video) {
-        await localVideoRenderController.createVideoMediaRender();
+        videoChatRender =
+            await localVideoRenderController.createVideoMediaRender();
       } else {
-        await localVideoRenderController.createAudioMediaRender();
+        videoChatRender =
+            await localVideoRenderController.createAudioMediaRender();
       }
     } else {
       if (video) {
         if (!localVideoRenderController.video) {
-          await localVideoRenderController.createVideoMediaRender();
+          videoChatRender =
+              await localVideoRenderController.createVideoMediaRender();
         }
       } else {
         if (localVideoRenderController.video) {
-          await localVideoRenderController.createAudioMediaRender();
+          videoChatRender =
+              await localVideoRenderController.createAudioMediaRender();
         }
       }
     }
+    return videoChatRender;
   }
 
-  _openDisplayMedia() async {
-    if (peerId != null) {
-      var status = peerConnectionPool.status(peerId!);
-      if (status != PeerConnectionStatus.connected) {
-        DialogUtil.error(context,
-            content: AppLocalizations.t('No Webrtc connected PeerConnection'));
-        return;
-      }
-    }
+  Future<PeerVideoRender?> _openDisplayMedia() async {
     final source = await DialogUtil.show<DesktopCapturerSource>(
       context: context,
       builder: (context) => Dialog(child: ScreenSelectDialog()),
     );
     if (source != null) {
-      await localVideoRenderController.createDisplayMediaRender(
+      return await localVideoRenderController.createDisplayMediaRender(
           selectedSource: source);
     }
+    return null;
   }
 
-  _openMediaStream(MediaStream stream) async {
-    if (peerId != null) {
-      var status = peerConnectionPool.status(peerId!);
-      if (status != PeerConnectionStatus.connected) {
-        DialogUtil.error(context,
-            content: AppLocalizations.t('No Webrtc connected PeerConnection'));
-        return;
-      }
-    }
-
+  Future<PeerVideoRender?> _openMediaStream(MediaStream stream) async {
     ChatMessage? chatMessage = videoChatMessageController.chatMessage;
     if (chatMessage == null) {
       DialogUtil.error(context, content: AppLocalizations.t('No room'));
-      return;
+      return null;
     }
-    await localVideoRenderController.createMediaStreamRender(stream);
+    PeerVideoRender? videoChatRender =
+        await localVideoRenderController.createMediaStreamRender(stream);
     var messageId = chatMessage.messageId!;
     var videoRoomController =
         videoRoomRenderPool.getRemoteVideoRenderController(messageId);
@@ -467,16 +437,27 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         }
       }
     }
+    return videoChatRender;
   }
 
   ///呼叫，打开本地视频，如果没有会议，先创建会议，发送视频通话邀请消息
   ///如果已有视频通话邀请消息，则直接开始重新协商
   _call() async {
+    if (partyType == PartyType.linkman.name && peerId != null) {
+      var status = peerConnectionPool.status(peerId!);
+      if (status != PeerConnectionStatus.connected) {
+        DialogUtil.error(context,
+            content:
+                '$name ${AppLocalizations.t('has no Webrtc connected PeerConnection')}');
+        return null;
+      }
+    }
     //确保本地视频已经被打开
-    var videoChatRender = localVideoRenderController.videoChatRender;
+    PeerVideoRender? videoChatRender =
+        localVideoRenderController.videoChatRender;
+    videoChatRender ??= await _openVideoMedia(video: true);
     if (videoChatRender == null) {
-      await _openVideoMedia(video: true);
-      videoChatRender = localVideoRenderController.videoChatRender;
+      return;
     }
     //创建会议
     if (conference == null) {
@@ -487,7 +468,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (chatMessage == null) {
       //在联系人模式下，会议不保存，在群模式下，在邀请消息发送后才保存
       //在会议模式下，会议在创建后保存，直接发送邀请消息和保存
-      if (widget.videoMode == PartyType.group) {
+      if (partyType == PartyType.group.name) {
         await conferenceService.store(conference!);
       }
       //发送会议邀请消息
@@ -517,11 +498,13 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       }
     }
     videoChatStatus.value = VideoChatStatus.calling;
-    audioPlayer.play('assets/medias/mediaInvitation.mp3');
-    //延时60秒后一般消息消失
+    _play();
+    //延时60秒后自动挂断
     Future.delayed(const Duration(seconds: 60)).then((value) {
-      audioPlayer.stop();
-      videoChatStatus.value = VideoChatStatus.end;
+      if (videoChatStatus.value != VideoChatStatus.end) {
+        videoChatStatus.value = VideoChatStatus.end;
+        _stop();
+      }
     });
   }
 
@@ -536,7 +519,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       videoChatMessageController.setChatMessage(null);
       conference = null;
     }
-    audioPlayer.stop();
+    _stop();
     videoChatStatus.value = VideoChatStatus.end;
   }
 

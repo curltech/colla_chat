@@ -114,6 +114,7 @@ class LocalVideoRenderController extends VideoRenderController {
   //本地视频和音频的render，只能是其中一种，可以切换
   PeerVideoRender? _videoChatRender;
 
+  //本地视频和音频的render
   PeerVideoRender? get videoChatRender {
     return _videoChatRender;
   }
