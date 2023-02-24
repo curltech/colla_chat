@@ -107,6 +107,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
     String? groupType,
     String? startDate,
     String? endDate,
+    bool video = true,
     List<String>? participants,
   }) async {
     //不允许创建同名的会议
@@ -130,6 +131,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
         groupType: groupType,
         startDate: startDate,
         endDate: endDate,
+        video: video,
         participants: participants);
 
     conference.status = EntityStatus.effective.name;

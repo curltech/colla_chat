@@ -30,6 +30,7 @@ class Conference extends StatusEntity {
       this.topic,
       this.startDate,
       this.endDate,
+      this.video = true,
       this.groupPeerId,
       this.groupName,
       this.groupType,

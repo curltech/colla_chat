@@ -308,7 +308,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///对联系人模式，可以临时创建一个会议，会议成员从群成员中选择就是自己和对方，会议名称是对方的名称，不保存会议
   ///对群模式，可以创建一个会议，会议成员从群成员中选择，会议名称是群的名称加上当前时间，保存会议
   ///对会议模式，直接转到会议创建界面，
-  Future<void> _buildConference() async {
+  Future<void> _buildConference({bool video = true}) async {
     if (conference != null) {
       logger.e('conference ${conference!.name} is exist');
       return;
@@ -364,6 +364,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
     conference = await conferenceService.createConference(
         '${name!}-${DateUtil.currentDate()}',
+        video: video,
         participants: participants);
     if (partyType == PartyType.group.name) {
       conference!.groupPeerId = groupPeerId;
@@ -461,7 +462,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
     //创建会议
     if (conference == null) {
-      await _buildConference();
+      await _buildConference(video: videoChatRender.video);
     }
     //检查当前的视频邀请消息是否存在
     ChatMessage? chatMessage = videoChatMessageController.chatMessage;
@@ -472,7 +473,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         await conferenceService.store(conference!);
       }
       //发送会议邀请消息
-      if (videoChatRender!.video) {
+      if (videoChatRender.video) {
         chatMessage = await _sendVideoChatMessage(
             contentType: ContentType.video.name, conference: conference!);
       } else {
