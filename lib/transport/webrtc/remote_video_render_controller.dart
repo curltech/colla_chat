@@ -10,12 +10,12 @@ import 'package:flutter/material.dart';
 class RemoteVideoRenderController extends VideoRenderController {
   ///根据peerId和clientId对应的所有的webrtc连接
   final Map<String, AdvancedPeerConnection> _peerConnections = {};
-  final Conference conference;
+  final Conference? conference;
 
   ///根据peerId和clientId的连接所对应的视频render控制器，每一个视频render控制器包含多个视频render
   Map<String, VideoRenderController> videoRenderControllers = {};
 
-  RemoteVideoRenderController(this.conference);
+  RemoteVideoRenderController({this.conference});
 
   String _getKey(String peerId, String clientId) {
     var key = '$peerId:$clientId';
@@ -135,12 +135,12 @@ class RemoteVideoRenderController extends VideoRenderController {
 }
 
 ///所有的视频通话的房间的池，包含多个房间，每个房间的房间号是视频通话邀请的消息号
-class VideoRoomRenderPool with ChangeNotifier {
+class VideoConferenceRenderPool with ChangeNotifier {
   Map<String, RemoteVideoRenderController> remoteVideoRenderControllers = {};
   Map<String, Conference> conferences = {};
   String? _conferenceId;
 
-  VideoRoomRenderPool();
+  VideoConferenceRenderPool();
 
   ///获取当前房间号
   String? get conferenceId {
@@ -180,14 +180,15 @@ class VideoRoomRenderPool with ChangeNotifier {
     return conferences[conferenceId];
   }
 
-  ///创建新的房间，返回其控制器，假如房间号已经存在，直接返回
+  ///创建新的远程视频会议控制器，假如会议号已经存在，直接返回控制器
   RemoteVideoRenderController createRemoteVideoRenderController(
       Conference conference) {
-    String conferenceId = conference.conferenceId!;
+    String conferenceId = conference.conferenceId;
     RemoteVideoRenderController? remoteVideoRenderController =
         remoteVideoRenderControllers[conferenceId];
     if (remoteVideoRenderController == null) {
-      remoteVideoRenderController = RemoteVideoRenderController(conference);
+      remoteVideoRenderController =
+          RemoteVideoRenderController(conference: conference);
       remoteVideoRenderControllers[conferenceId] = remoteVideoRenderController;
       conferences[conferenceId] = conference;
       _conferenceId = conferenceId;
@@ -210,4 +211,5 @@ class VideoRoomRenderPool with ChangeNotifier {
   }
 }
 
-final VideoRoomRenderPool videoRoomRenderPool = VideoRoomRenderPool();
+final VideoConferenceRenderPool videoConferenceRenderPool =
+    VideoConferenceRenderPool();

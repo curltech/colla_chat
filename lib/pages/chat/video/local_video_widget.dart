@@ -129,13 +129,13 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   _init() async {
     _buildActionDataAndVisible();
     ChatSummary? chatSummary = chatMessageController.chatSummary;
+    //先设置当前视频聊天控制器的邀请消息为null
+    videoChatMessageController.setChatMessage(null, chatSummary: chatSummary);
     if (chatSummary == null) {
       logger.e('chatSummary is null');
       return;
     }
     partyType = chatSummary.partyType;
-    //先设置当前视频聊天控制器的邀请消息为null
-    videoChatMessageController.setChatMessage(null);
     if (partyType == PartyType.linkman.name) {
       peerId = chatSummary.peerId!;
       name = chatSummary.name!;
@@ -150,26 +150,29 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       logger.e('current chatMessage is not exist');
     } else {
       if (partyType == PartyType.linkman.name) {
-        _initLinkman(chatMessage);
+        _initLinkman(chatMessage, chatSummary: chatSummary);
       } else if (partyType == PartyType.group.name) {
-        _initGroup(chatMessage);
+        _initGroup(chatMessage, chatSummary: chatSummary);
       }
     }
   }
 
   ///linkman模式的初始化
-  _initLinkman(ChatMessage chatMessage) async {
+  _initLinkman(ChatMessage chatMessage,
+      {required ChatSummary chatSummary}) async {
     //进入视频界面是先选择了视频邀请消息
     if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
       conference = videoChatMessageController.conference;
       name = conference!.name;
       conferenceName = conference!.name;
       //conferenceController.current = conference;
-      videoChatMessageController.setChatMessage(chatMessage);
+      videoChatMessageController.setChatMessage(chatMessage,
+          chatSummary: chatSummary);
     }
   }
 
-  _initGroup(ChatMessage chatMessage) async {
+  _initGroup(ChatMessage chatMessage,
+      {required ChatSummary chatSummary}) async {
     //进入视频界面是先选择了视频邀请消息
     if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
       conferenceId = chatMessage.messageId!;
@@ -177,7 +180,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       if (conference != null) {
         conferenceName = conference!.name;
         conferenceController.current = conference;
-        videoChatMessageController.setChatMessage(chatMessage);
+        videoChatMessageController.setChatMessage(chatMessage,
+            chatSummary: chatSummary);
       }
     }
   }
@@ -195,7 +199,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       if (chatMessage != null) {
         //进入视频界面是先选择了视频邀请消息
         if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-          videoChatMessageController.setChatMessage(chatMessage);
+          videoChatMessageController.setChatMessage(chatMessage,
+              chatSummary: chatSummary);
         }
       }
     }
@@ -428,7 +433,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         await localVideoRenderController.createMediaStreamRender(stream);
     var messageId = chatMessage.messageId!;
     var videoRoomController =
-        videoRoomRenderPool.getRemoteVideoRenderController(messageId);
+        videoConferenceRenderPool.getRemoteVideoRenderController(messageId);
     if (videoRoomController != null) {
       List<AdvancedPeerConnection> pcs =
           videoRoomController.getAdvancedPeerConnections(peerId!);
@@ -481,13 +486,13 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             contentType: ContentType.audio.name, conference: conference!);
       }
       await videoChatMessageController.setChatMessage(chatMessage);
-      videoRoomRenderPool.createRemoteVideoRenderController(conference!);
+      videoConferenceRenderPool.createRemoteVideoRenderController(conference!);
     } else {
       //当前视频消息不为空，则有同意回执的直接重新协商
       var messageId = chatMessage.messageId!;
       logger.i('current video chatMessage $messageId');
       var videoRoomRenderController =
-          videoRoomRenderPool.getRemoteVideoRenderController(messageId);
+          videoConferenceRenderPool.getRemoteVideoRenderController(messageId);
       if (videoRoomRenderController != null) {
         List<AdvancedPeerConnection> pcs =
             videoRoomRenderController.getAdvancedPeerConnections(peerId!);

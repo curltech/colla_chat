@@ -1,5 +1,4 @@
 import 'package:card_swiper/card_swiper.dart';
-import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/video/local_video_widget.dart';
@@ -42,7 +41,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   @override
   void initState() {
     super.initState();
-    videoRoomRenderPool.addListener(_update);
+    videoConferenceRenderPool.addListener(_update);
   }
 
   _update() {}
@@ -74,7 +73,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   }
 
   Widget _buildVideoChatView(BuildContext context) {
-    var conferenceId = videoRoomRenderPool.conferenceId;
+    var conferenceId = videoConferenceRenderPool.conferenceId;
     return Swiper(
       controller: SwiperController(),
       itemCount: 2,
@@ -84,9 +83,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
         if (index == 1) {
           view = Container();
           if (conferenceId != null) {
-            view = const RemoteVideoWidget(
-              videoMode: PartyType.linkman,
-            );
+            view = const RemoteVideoWidget();
           }
         }
         return Center(child: view);
@@ -126,7 +123,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
 
   @override
   void dispose() {
-    videoRoomRenderPool.removeListener(_update);
+    videoConferenceRenderPool.removeListener(_update);
     super.dispose();
   }
 }

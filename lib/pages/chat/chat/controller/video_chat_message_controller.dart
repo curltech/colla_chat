@@ -1,9 +1,12 @@
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
+import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/service/chat/chat_summary.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
@@ -16,12 +19,19 @@ import 'package:flutter/material.dart';
 ///视频通话的消息控制器
 ///接受方根据发起方的消息生成对应的接受或者拒绝或者终止的回执,发起方收到回执进行处理
 class VideoChatMessageController with ChangeNotifier {
+  //视频邀请消息对应的汇总消息
+  ChatSummary? _chatSummary;
+
   //视频邀请消息
   ChatMessage? _chatMessage;
   final Map<String, ChatMessage> _acceptedChatReceipts = {};
   final Map<String, ChatMessage> _rejectedChatReceipts = {};
   final Map<String, ChatMessage> _terminatedChatReceipts = {};
   Conference? _conference;
+
+  ChatSummary? get chatSummary {
+    return _chatSummary;
+  }
 
   ChatMessage? get chatMessage {
     return _chatMessage;
@@ -31,10 +41,12 @@ class VideoChatMessageController with ChangeNotifier {
     return _conference;
   }
 
-  setChatMessage(ChatMessage? chatMessage) async {
+  ///设置当前的视频邀请消息汇总和视频邀请消息
+  setChatMessage(ChatMessage? chatMessage, {ChatSummary? chatSummary}) async {
     if (_chatMessage == chatMessage) {
       return;
     }
+    _chatSummary = chatSummary;
     _chatMessage = chatMessage;
     _conference = null;
     _acceptedChatReceipts.clear();
@@ -43,6 +55,28 @@ class VideoChatMessageController with ChangeNotifier {
     if (chatMessage == null) {
       notifyListeners();
       return;
+    }
+    //设置正确的_chatSummary
+    if (_chatSummary == null) {
+      if (_chatMessage!.direct == ChatDirect.send.name) {
+        _chatSummary = await chatSummaryService
+            .findCachedOneByPeerId(_chatMessage!.receiverPeerId!);
+      }
+      if (_chatMessage!.direct == ChatDirect.receive.name) {
+        _chatSummary = await chatSummaryService
+            .findCachedOneByPeerId(_chatMessage!.senderPeerId!);
+      }
+    } else {
+      if (_chatMessage!.direct == ChatDirect.send.name) {
+        if (_chatSummary!.peerId != _chatMessage!.receiverPeerId!) {
+          return;
+        }
+      }
+      if (_chatMessage!.direct == ChatDirect.receive.name) {
+        if (_chatSummary!.peerId != _chatMessage!.senderPeerId!) {
+          return;
+        }
+      }
     }
     var messageId = chatMessage.messageId!;
     List<ChatMessage> chatMessages =
@@ -122,7 +156,7 @@ class VideoChatMessageController with ChangeNotifier {
       var peerId = chatReceipt.receiverPeerId!;
       var clientId = chatReceipt.receiverClientId!;
       PeerVideoRender? localRender;
-      //根据title来判断是请求音频还是视频，并创建本地视频render
+      //根据conference.video来判断是请求音频还是视频，并创建本地视频render
       bool video = _conference!.video;
       if (video) {
         // localRender =
@@ -142,11 +176,15 @@ class VideoChatMessageController with ChangeNotifier {
       );
       if (advancedPeerConnection != null) {
         await advancedPeerConnection.addLocalRender(localRender);
-        //同意视频通话则加入到视频连接池中
-        RemoteVideoRenderController videoRoomRenderController =
-            videoRoomRenderPool.createRemoteVideoRenderController(_conference!);
-        videoRoomRenderController
+        //同意视频通话则加入到视频连接池中，远程视频通过远程会议池和会议号获取
+        RemoteVideoRenderController remoteVideoRenderController =
+            videoConferenceRenderPool
+                .createRemoteVideoRenderController(_conference!);
+        remoteVideoRenderController
             .addAdvancedPeerConnection(advancedPeerConnection);
+        //设置当前消息，转入视频会议界面
+        chatMessageController.chatSummary = _chatSummary;
+        chatMessageController.current = _chatMessage;
         indexWidgetProvider.push('chat_message');
         indexWidgetProvider.push('video_chat');
       }
@@ -229,15 +267,15 @@ class VideoChatMessageController with ChangeNotifier {
   ///在群通话的情况下，可以收到多次，包括多个接收人的回执
   ///根据消息回执是接受拒绝还是终止进行处理
   _receivedChatReceipt(ChatMessage chatReceipt) async {
-    String? status = chatReceipt.status;
+    String? content = chatReceipt.content;
     String? subMessageType = chatReceipt.subMessageType;
-    logger.w('received videoChat chatReceipt status: $status');
+    logger.w('received videoChat chatReceipt content: $content');
     if (subMessageType != ChatMessageSubType.chatReceipt.name) {
       return;
     }
     String messageId = chatReceipt.messageId!;
     //接受通话请求的回执，加本地流，重新协商
-    if (status == MessageStatus.accepted.name) {
+    if (content == MessageStatus.accepted.name) {
       var peerId = chatReceipt.senderPeerId!;
       var clientId = chatReceipt.senderClientId!;
       AdvancedPeerConnection? advancedPeerConnection =
@@ -247,12 +285,13 @@ class VideoChatMessageController with ChangeNotifier {
       );
       //与发送者的连接存在，将本地的视频render加入连接中
       if (advancedPeerConnection != null) {
-        RemoteVideoRenderController? videoRoomRenderController =
-            videoRoomRenderPool.getRemoteVideoRenderController(messageId);
-        if (videoRoomRenderController != null) {
-          videoRoomRenderController
+        RemoteVideoRenderController? remoteVideoRenderController =
+            videoConferenceRenderPool.getRemoteVideoRenderController(messageId);
+        if (remoteVideoRenderController != null) {
+          remoteVideoRenderController
               .addAdvancedPeerConnection(advancedPeerConnection);
         }
+        //把本地视频加入连接中，然后重新协商
         Map<String, PeerVideoRender> videoRenders =
             localVideoRenderController.getVideoRenders();
         for (var render in videoRenders.values) {
@@ -261,8 +300,8 @@ class VideoChatMessageController with ChangeNotifier {
         //本地视频render加入后，发起重新协商
         await advancedPeerConnection.negotiate();
       }
-    } else if (status == MessageStatus.rejected.name) {
-    } else if (status == MessageStatus.terminated.name) {
+    } else if (content == MessageStatus.rejected.name) {
+    } else if (content == MessageStatus.terminated.name) {
       var peerId = chatReceipt.senderPeerId!;
       var clientId = chatReceipt.senderClientId!;
       AdvancedPeerConnection? advancedPeerConnection =
@@ -272,10 +311,10 @@ class VideoChatMessageController with ChangeNotifier {
       );
       //与发送者的连接存在，将本地的视频render加入连接中
       if (advancedPeerConnection != null) {
-        RemoteVideoRenderController? videoRoomRenderController =
-            videoRoomRenderPool.getRemoteVideoRenderController(messageId);
-        if (videoRoomRenderController != null) {
-          videoRoomRenderController
+        RemoteVideoRenderController? remoteVideoRenderController =
+            videoConferenceRenderPool.getRemoteVideoRenderController(messageId);
+        if (remoteVideoRenderController != null) {
+          remoteVideoRenderController
               .removeAdvancedPeerConnection(advancedPeerConnection);
         }
         Map<String, PeerVideoRender> videoRenders =

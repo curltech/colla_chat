@@ -186,7 +186,7 @@ class AdvancedPeerConnection {
     }
     String conferenceId = conference!.conferenceId!;
     RemoteVideoRenderController? videoRoomController =
-        videoRoomRenderPool.getRemoteVideoRenderController(conferenceId);
+        videoConferenceRenderPool.getRemoteVideoRenderController(conferenceId);
     if (videoRoomController == null) {
       logger.e('videoRoomController:$conferenceId is not exist');
       return null;
@@ -221,7 +221,7 @@ class AdvancedPeerConnection {
     }
     String conferenceId = conference!.conferenceId!;
     RemoteVideoRenderController? videoRoomController =
-        videoRoomRenderPool.getRemoteVideoRenderController(conferenceId);
+        videoConferenceRenderPool.getRemoteVideoRenderController(conferenceId);
     if (videoRoomController == null) {
       logger.e('videoRoomController:$conferenceId is not exist');
       return null;
