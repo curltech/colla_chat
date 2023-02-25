@@ -47,6 +47,7 @@ class _IndexViewState extends State<IndexView>
   void initState() {
     super.initState();
     globalChatMessageController.addListener(_updateGlobalChatMessage);
+    videoChatMessageController.addListener(_updateVideoChatMessage);
     myself.addListener(_update);
     appDataProvider.addListener(_update);
   }
@@ -67,14 +68,21 @@ class _IndexViewState extends State<IndexView>
     audioPlayer.stop();
   }
 
-  ///有新消息到来的时候，一般消息直接显示，视频邀请消息显示带按钮选择接受还是拒绝
+  ///有新消息到来的时候，一般消息直接显示
   _updateGlobalChatMessage() async {
     ChatMessage? chatMessage = globalChatMessageController.chatMessage;
     if (chatMessage != null) {
       if (chatMessage.subMessageType == ChatMessageSubType.chat.name) {
         chatMessageVisible.value = true;
-      } else if (chatMessage.subMessageType ==
-          ChatMessageSubType.videoChat.name) {
+      }
+    }
+  }
+
+  ///有新视频消息到来的时候，视频邀请消息显示带按钮选择接受还是拒绝
+  _updateVideoChatMessage() async {
+    ChatMessage? chatMessage = videoChatMessageController.chatMessage;
+    if (chatMessage != null) {
+      if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
         await videoChatMessageController.setChatMessage(chatMessage);
         videoChatMessageVisible.value = true;
       }
