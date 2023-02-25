@@ -1,15 +1,8 @@
 import 'dart:async';
 
-import 'package:colla_chat/entity/chat/chat_message.dart';
-import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
-import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/pages/chat/video/video_view_card.dart';
-import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/service/chat/chat_message.dart';
-import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -18,9 +11,10 @@ import 'package:flutter/material.dart';
 ///远程视频通话窗口，显示多个小视频窗口，每个小窗口代表一个远程视频
 ///以及各种功能按钮
 class RemoteVideoWidget extends StatefulWidget {
-  const RemoteVideoWidget({
-    Key? key,
-  }) : super(key: key);
+  final VideoChatMessageController videoChatMessageController;
+
+  const RemoteVideoWidget({Key? key, required this.videoChatMessageController})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -58,16 +52,11 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   //控制面板可见性的计时器
   Timer? _hideControlPanelTimer;
 
-  //视频邀请消息和回执的控制器
-  VideoChatMessageController videoChatMessageController =
-      VideoChatMessageController();
-
   @override
   void initState() {
     super.initState();
     //视频通话的消息存放地
-    videoChatMessageController.addListener(_update);
-    _init();
+    widget.videoChatMessageController.addListener(_update);
     RemoteVideoRenderController? remoteVideoRenderController =
         videoConferenceRenderPool
             .getRemoteVideoRenderController(conference!.conferenceId);
@@ -79,91 +68,6 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   _update() {
     if (mounted) {
       setState(() {});
-    }
-  }
-
-  ///本界面是在聊天界面转过来，所以当前chatSummary是必然存在的，
-  ///当前chatMessage在选择了视频邀请消息后，也是存在的
-  ///如果chatMessage不存在，表明是想开始发起新的linkman或者group会议
-  ///初始化是根据当前的视频邀请消息chatMessage来决定的，无论是发起还是接收邀请
-  ///也可以根据当前会议来决定的，适用于群和会议模式
-  ///如果没有设置，表明是新的会议
-  _init() async {
-    _buildActionDataAndVisible();
-    ChatSummary? chatSummary = chatMessageController.chatSummary;
-    //先设置当前视频聊天控制器的邀请消息为null
-    videoChatMessageController.setChatMessage(null, chatSummary: chatSummary);
-    if (chatSummary == null) {
-      logger.e('chatSummary is null');
-      return;
-    }
-    partyType = chatSummary.partyType;
-    if (partyType == PartyType.linkman.name) {
-      peerId = chatSummary.peerId!;
-      name = chatSummary.name!;
-    } else if (partyType == PartyType.group.name) {
-      groupPeerId = chatSummary.peerId!;
-      name = chatSummary.name!;
-    } else if (partyType == PartyType.conference.name) {
-      _initConference(chatSummary);
-    }
-    ChatMessage? chatMessage = chatMessageController.current;
-    if (chatMessage == null) {
-      logger.e('current chatMessage is not exist');
-    } else {
-      if (partyType == PartyType.linkman.name) {
-        _initLinkman(chatMessage, chatSummary: chatSummary);
-      } else if (partyType == PartyType.group.name) {
-        _initGroup(chatMessage, chatSummary: chatSummary);
-      }
-    }
-  }
-
-  ///linkman模式的初始化
-  _initLinkman(ChatMessage chatMessage,
-      {required ChatSummary chatSummary}) async {
-    //进入视频界面是先选择了视频邀请消息
-    if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-      conference = videoChatMessageController.conference;
-      name = conference!.name;
-      conferenceName = conference!.name;
-      //conferenceController.current = conference;
-      videoChatMessageController.setChatMessage(chatMessage,
-          chatSummary: chatSummary);
-    }
-  }
-
-  _initGroup(ChatMessage chatMessage,
-      {required ChatSummary chatSummary}) async {
-    //进入视频界面是先选择了视频邀请消息
-    if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-      conferenceId = chatMessage.messageId!;
-      conference = await conferenceService.findOneByConferenceId(conferenceId!);
-      if (conference != null) {
-        conferenceName = conference!.name;
-        conferenceController.current = conference;
-        videoChatMessageController.setChatMessage(chatMessage,
-            chatSummary: chatSummary);
-      }
-    }
-  }
-
-  _initConference(ChatSummary chatSummary) async {
-    conferenceId = chatSummary.peerId!;
-    conference = await conferenceService.findOneByConferenceId(conferenceId!);
-    if (conference != null) {
-      name = conference!.name;
-      conferenceName = conference!.name;
-      conferenceController.current = conference;
-      //检查当前消息，进入视频界面是先选择了视频邀请消息，或者没有
-      ChatMessage? chatMessage =
-          await chatMessageService.findOriginByMessageId(conferenceId!);
-      if (chatMessage != null) {
-        //进入视频界面是先选择了视频邀请消息
-        if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-          videoChatMessageController.setChatMessage(chatMessage);
-        }
-      }
     }
   }
 

@@ -1,6 +1,9 @@
 import 'package:card_swiper/card_swiper.dart';
+import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/video/local_video_widget.dart';
 import 'package:colla_chat/pages/chat/video/remote_video_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -37,11 +40,17 @@ class VideoChatWidget extends StatefulWidget with TileDataMixin {
 
 class _VideoChatWidgetState extends State<VideoChatWidget> {
   OverlayEntry? overlayEntry;
+  final VideoChatMessageController videoChatMessageController =
+      VideoChatMessageController();
 
   @override
   void initState() {
     super.initState();
     videoConferenceRenderPool.addListener(_update);
+    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    ChatMessage? chatMessage = chatMessageController.current;
+    videoChatMessageController.setChatMessage(chatMessage,
+        chatSummary: chatSummary);
   }
 
   _update() {}
@@ -79,11 +88,13 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
       itemCount: 2,
       index: 0,
       itemBuilder: (BuildContext context, int index) {
-        Widget view = const LocalVideoWidget();
+        Widget view = LocalVideoWidget(
+            videoChatMessageController: videoChatMessageController);
         if (index == 1) {
           view = Container();
           if (conferenceId != null) {
-            view = const RemoteVideoWidget();
+            view = RemoteVideoWidget(
+                videoChatMessageController: videoChatMessageController);
           }
         }
         return Center(child: view);

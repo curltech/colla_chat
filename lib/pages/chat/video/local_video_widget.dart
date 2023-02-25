@@ -1,19 +1,15 @@
 import 'dart:async';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
-import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/group_linkman_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
-import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/pages/chat/video/video_view_card.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -54,7 +50,10 @@ enum VideoChatStatus {
 ///本地视频通话显示和拨出的窗口，显示多个本地视频，音频和屏幕共享的小视频窗口
 ///各种功能按钮，可以切换视频和音频，添加屏幕共享视频，此时需要发起重新协商
 class LocalVideoWidget extends StatefulWidget {
-  const LocalVideoWidget({Key? key}) : super(key: key);
+  final VideoChatMessageController videoChatMessageController;
+
+  const LocalVideoWidget({Key? key, required this.videoChatMessageController})
+      : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -102,9 +101,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   //呼叫时间的计时器，如果是在单聊的场景下，对方在时间内未有回执，则自动关闭
   Timer? _linkmanCallTimer;
 
-  VideoChatMessageController videoChatMessageController =
-      VideoChatMessageController();
-
   BlueFireAudioPlayer audioPlayer = BlueFireAudioPlayer();
 
   //JustAudioPlayer audioPlayer = JustAudioPlayer();
@@ -113,97 +109,10 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   void initState() {
     super.initState();
     //视频通话的消息存放地
-    videoChatMessageController.addListener(_update);
+    widget.videoChatMessageController.addListener(_updateVideoChatReceipt);
     //本地视频的存放地
     localVideoRenderController.addListener(_update);
-    globalChatMessageController.addListener(_updateVideoChatReceipt);
-    _init();
-  }
-
-  ///本界面是在聊天界面转过来，所以当前chatSummary是必然存在的，
-  ///当前chatMessage在选择了视频邀请消息后，也是存在的
-  ///如果chatMessage不存在，表明是想开始发起新的linkman或者group会议
-  ///初始化是根据当前的视频邀请消息chatMessage来决定的，无论是发起还是接收邀请
-  ///也可以根据当前会议来决定的，适用于群和会议模式
-  ///如果没有设置，表明是新的会议
-  _init() async {
     _buildActionDataAndVisible();
-    ChatSummary? chatSummary = chatMessageController.chatSummary;
-    //先设置当前视频聊天控制器的邀请消息为null
-    videoChatMessageController.setChatMessage(null, chatSummary: chatSummary);
-    if (chatSummary == null) {
-      logger.e('chatSummary is null');
-      return;
-    }
-    partyType = chatSummary.partyType;
-    if (partyType == PartyType.linkman.name) {
-      peerId = chatSummary.peerId!;
-      name = chatSummary.name!;
-    } else if (partyType == PartyType.group.name) {
-      groupPeerId = chatSummary.peerId!;
-      name = chatSummary.name!;
-    } else if (partyType == PartyType.conference.name) {
-      _initConference(chatSummary);
-    }
-    ChatMessage? chatMessage = chatMessageController.current;
-    if (chatMessage == null) {
-      logger.e('current chatMessage is not exist');
-    } else {
-      if (partyType == PartyType.linkman.name) {
-        _initLinkman(chatMessage, chatSummary: chatSummary);
-      } else if (partyType == PartyType.group.name) {
-        _initGroup(chatMessage, chatSummary: chatSummary);
-      }
-    }
-  }
-
-  ///linkman模式的初始化
-  _initLinkman(ChatMessage chatMessage,
-      {required ChatSummary chatSummary}) async {
-    //进入视频界面是先选择了视频邀请消息
-    if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-      conference = videoChatMessageController.conference;
-      name = conference!.name;
-      conferenceName = conference!.name;
-      //conferenceController.current = conference;
-      videoChatMessageController.setChatMessage(chatMessage,
-          chatSummary: chatSummary);
-    }
-  }
-
-  _initGroup(ChatMessage chatMessage,
-      {required ChatSummary chatSummary}) async {
-    //进入视频界面是先选择了视频邀请消息
-    if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-      conferenceId = chatMessage.messageId!;
-      conference = await conferenceService.findOneByConferenceId(conferenceId!);
-      if (conference != null) {
-        conferenceName = conference!.name;
-        conferenceController.current = conference;
-        videoChatMessageController.setChatMessage(chatMessage,
-            chatSummary: chatSummary);
-      }
-    }
-  }
-
-  _initConference(ChatSummary chatSummary) async {
-    conferenceId = chatSummary.peerId!;
-    conference = await conferenceService.findOneByConferenceId(conferenceId!);
-    if (conference != null) {
-      name = conference!.name;
-      conferenceName = conference!.name;
-      conferenceController.current = conference;
-      //检查当前消息，进入视频界面是先选择了视频邀请消息，或者没有
-      ChatMessage? chatMessage =
-          await chatMessageService.findOriginByMessageId(conferenceId!);
-      if (chatMessage != null) {
-        //进入视频界面是先选择了视频邀请消息
-        if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-          videoChatMessageController.setChatMessage(chatMessage,
-              chatSummary: chatSummary);
-        }
-      }
-    }
   }
 
   _update() {
@@ -215,34 +124,15 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   ///如果视频邀请消息的回执到来，如果不在此界面的时候，新的回执不会被此处理
   _updateVideoChatReceipt() async {
-    ChatMessage? chatReceipt = globalChatMessageController.chatMessage;
+    ChatMessage? chatReceipt = widget.videoChatMessageController.current;
     if (chatReceipt == null) {
       return;
     }
     if (chatReceipt.subMessageType != ChatMessageSubType.chatReceipt.name) {
       return;
     }
-    String messageId = chatReceipt.messageId!;
-    //处理视频通话消息的回执
-    ChatMessage? chatMessage = await chatMessageService.findOriginByMessageId(
-        messageId,
-        receiverPeerId: chatReceipt.senderPeerId!);
-    if (chatMessage == null) {
-      logger.e('messageId:$messageId original chatMessage is not exist');
-      return;
-    }
-    videoChatMessageController.setChatMessage(chatMessage);
-    String? messageType = chatMessage.messageType;
-    String? subMessageType = chatMessage.subMessageType;
-    if (subMessageType == ChatMessageSubType.videoChat.name) {
-      if (chatReceipt.status == MessageStatus.accepted.name) {
-        //收到视频通话邀请同意回执，发出本地流，关闭拨号窗口VideoDialOutWidget，显示视频通话窗口VideoChatWidget
-        videoChatMessageController.receivedChatReceipt(chatMessage);
-      } else if (chatReceipt.status == MessageStatus.rejected.name) {
-        //收到视频通话邀请拒绝回执，关闭本地流，关闭拨号窗口VideoDialOutWidget
-        videoChatMessageController.receivedChatReceipt(chatMessage);
-        videoChatStatus.value = VideoChatStatus.end;
-      }
+    if (chatReceipt.status == MessageStatus.rejected.name) {
+      videoChatStatus.value = VideoChatStatus.end;
     }
     _stop();
   }
@@ -424,7 +314,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   Future<PeerVideoRender?> _openMediaStream(MediaStream stream) async {
-    ChatMessage? chatMessage = videoChatMessageController.chatMessage;
+    ChatMessage? chatMessage = widget.videoChatMessageController.chatMessage;
     if (chatMessage == null) {
       DialogUtil.error(context, content: AppLocalizations.t('No room'));
       return null;
@@ -459,7 +349,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       await _buildConference(video: videoChatRender.video);
     }
     //检查当前的视频邀请消息是否存在
-    ChatMessage? chatMessage = videoChatMessageController.chatMessage;
+    ChatMessage? chatMessage = widget.videoChatMessageController.chatMessage;
     if (chatMessage == null) {
       //在联系人模式下，会议不保存，在群模式下，在邀请消息发送后才保存
       //在会议模式下，会议在创建后保存，直接发送邀请消息和保存
@@ -474,7 +364,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         chatMessage = await _sendVideoChatMessage(
             contentType: ContentType.audio.name, conference: conference!);
       }
-      await videoChatMessageController.setChatMessage(chatMessage);
+      await widget.videoChatMessageController.setChatMessage(chatMessage);
       videoConferenceRenderPool.createRemoteVideoRenderController(conference!);
     } else {
       //当前视频消息不为空，则有同意回执的直接重新协商
@@ -511,7 +401,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
     if (videoChatStatus.value == VideoChatStatus.chatting) {
       localVideoRenderController.close();
-      videoChatMessageController.setChatMessage(null);
+      widget.videoChatMessageController.setChatMessage(null);
       conference = null;
     }
     _stop();
@@ -720,6 +610,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   @override
   void dispose() {
     localVideoRenderController.removeListener(_update);
+    widget.videoChatMessageController.removeListener(_update);
     super.dispose();
   }
 }
