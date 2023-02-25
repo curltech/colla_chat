@@ -62,25 +62,6 @@ class LocalVideoWidget extends StatefulWidget {
 }
 
 class _LocalVideoWidgetState extends State<LocalVideoWidget> {
-  String? partyType;
-
-  //或者会议名称，或者群名称，或者联系人名称
-  String? name;
-
-  //当前的会议编号，说明正在群中聊天
-  String? conferenceId;
-  String? conferenceName;
-
-  //当前的群编号，说明正在群中聊天
-  String? groupPeerId;
-
-  //当前的联系人编号和名称，说明正在一对一聊天
-  String? peerId;
-
-  //当前的通话房间，房间是临时组建的一组联系人，互相聊天和视频通话
-  //如果当前的群存在的话，房间的人在群的联系人中选择，否则在所有的联系人中选择
-  Conference? conference;
-
   //控制面板的可见性，包括视频功能按钮和呼叫按钮
   ValueNotifier<bool> controlPanelVisible = ValueNotifier<bool>(true);
 
@@ -203,16 +184,15 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///对联系人模式，可以临时创建一个会议，会议成员从群成员中选择就是自己和对方，会议名称是对方的名称，不保存会议
   ///对群模式，可以创建一个会议，会议成员从群成员中选择，会议名称是群的名称加上当前时间，保存会议
   ///对会议模式，直接转到会议创建界面，
-  Future<void> _buildConference({bool video = true}) async {
+  Future<Conference?> _buildConference({bool video = true}) async {
+    var conference = widget.videoChatMessageController.conference;
     if (conference != null) {
-      logger.e('conference ${conference!.name} is exist');
-      return;
+      logger.e('conference ${conference.name} is exist');
+      return conference;
     }
     List<String> participants = [myself.peerId!];
+    var partyType = widget.videoChatMessageController.partyType;
     if (partyType == PartyType.conference.name) {
-      if (conference != null) {
-        return;
-      }
       List<String> selected = <String>[];
       await DialogUtil.show(
           context: context,
@@ -231,12 +211,13 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                 selectType: SelectType.chipMultiSelect);
           });
     }
+    var groupPeerId = widget.videoChatMessageController.groupPeerId;
     if (partyType == PartyType.group.name) {
       if (groupPeerId == null) {
-        return;
+        return null;
       }
       if (conference != null) {
-        return;
+        return conference;
       }
       await DialogUtil.show(
           context: context,
@@ -247,30 +228,34 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                 Navigator.pop(context, participants);
               },
               selected: const <String>[],
-              groupPeerId: groupPeerId!,
+              groupPeerId: groupPeerId,
             );
           });
     }
     if (partyType == PartyType.linkman.name) {
+      var peerId = widget.videoChatMessageController.peerId;
       if (peerId == null) {
-        return;
+        return null;
       }
-      participants.add(peerId!);
+      participants.add(peerId);
     }
+    var name = widget.videoChatMessageController.name;
     conference = await conferenceService.createConference(
         '${name!}-${DateUtil.currentDate()}',
         video: video,
         participants: participants);
     if (partyType == PartyType.group.name) {
-      conference!.groupPeerId = groupPeerId;
-      conference!.groupName = name;
-      conference!.groupType = partyType;
+      conference.groupPeerId = groupPeerId;
+      conference.groupName = name;
+      conference.groupType = partyType;
     }
     if (mounted) {
       DialogUtil.info(context,
           content:
-              '${AppLocalizations.t('Create conference')} ${conference!.conferenceId}');
+              '${AppLocalizations.t('Create conference')} ${conference.conferenceId}');
     }
+
+    return conference;
   }
 
   Future<PeerVideoRender?> _openVideoMedia({bool video = true}) async {
@@ -328,8 +313,11 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///呼叫，打开本地视频，如果没有会议，先创建会议，发送视频通话邀请消息
   ///如果已有视频通话邀请消息，则直接开始重新协商
   _call() async {
+    var name = widget.videoChatMessageController.name;
+    var partyType = widget.videoChatMessageController.partyType;
+    var peerId = widget.videoChatMessageController.peerId;
     if (partyType == PartyType.linkman.name && peerId != null) {
-      var status = peerConnectionPool.status(peerId!);
+      var status = peerConnectionPool.status(peerId);
       if (status != PeerConnectionStatus.connected) {
         DialogUtil.error(context,
             content:
@@ -344,6 +332,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (videoChatRender == null) {
       return;
     }
+    var conference = widget.videoChatMessageController.conference;
     //创建会议
     if (conference == null) {
       await _buildConference(video: videoChatRender.video);
@@ -402,7 +391,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (videoChatStatus.value == VideoChatStatus.chatting) {
       localVideoRenderController.close();
       widget.videoChatMessageController.setChatMessage(null);
-      conference = null;
     }
     _stop();
     videoChatStatus.value = VideoChatStatus.end;
@@ -560,6 +548,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               child: buttonWidget,
             ),
           ];
+          var conference = widget.videoChatMessageController.conference;
           if (conference != null) {
             children.add(
               Align(

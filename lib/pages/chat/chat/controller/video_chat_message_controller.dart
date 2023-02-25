@@ -74,26 +74,32 @@ class VideoChatMessageController with ChangeNotifier {
     return _conference;
   }
 
+  set conference(Conference? conference) {
+    if (_conference != conference) {
+      _conference = conference;
+      notifyListeners();
+    }
+  }
+
   ///设置当前的视频邀请消息汇总和视频邀请消息，可以从chatMessageController中获取当前
   setChatMessage(
     ChatMessage? chatMessage, {
     ChatSummary? chatSummary,
   }) async {
+    //消息未变，直接返回
     if (_chatSummary == chatSummary && _chatMessage == chatMessage) {
       return;
     }
     _chatSummary = chatSummary;
     _chatMessage = chatMessage;
+    //先清空数据
     _conference = null;
     _acceptedChatReceipts.clear();
     _rejectedChatReceipts.clear();
     _terminatedChatReceipts.clear();
-    if (chatSummary == null && chatMessage == null) {
-      notifyListeners();
-      return;
-    }
-    //设置正确的_chatSummary
-    if (_chatSummary == null) {
+
+    //如果_chatSummary为空，通过_chatMessage数据设置正确的_chatSummary
+    if (_chatSummary == null && _chatMessage != null) {
       if (_chatMessage!.direct == ChatDirect.send.name) {
         _chatSummary = await chatSummaryService
             .findCachedOneByPeerId(_chatMessage!.receiverPeerId!);
@@ -103,18 +109,28 @@ class VideoChatMessageController with ChangeNotifier {
             .findCachedOneByPeerId(_chatMessage!.senderPeerId!);
       }
     } else {
-      if (_chatMessage!.direct == ChatDirect.send.name) {
-        if (_chatSummary!.peerId != _chatMessage!.receiverPeerId!) {
-          return;
+      if (_chatMessage != null) {
+        if (_chatMessage!.direct == ChatDirect.send.name) {
+          if (_chatSummary!.peerId != _chatMessage!.receiverPeerId!) {
+            return;
+          }
         }
-      }
-      if (_chatMessage!.direct == ChatDirect.receive.name) {
-        if (_chatSummary!.peerId != _chatMessage!.senderPeerId!) {
-          return;
+        if (_chatMessage!.direct == ChatDirect.receive.name) {
+          if (_chatSummary!.peerId != _chatMessage!.senderPeerId!) {
+            return;
+          }
         }
       }
     }
-    var messageId = chatMessage!.messageId!;
+    _initChatSummary();
+    //如果是清空数据，直接返回
+    if (_chatMessage == null) {
+      notifyListeners();
+      return;
+    }
+
+    //如果_chatMessage不为空，查询所有的相同的消息
+    var messageId = _chatMessage!.messageId!;
     List<ChatMessage> chatMessages =
         await chatMessageService.findByMessageId(messageId);
     if (chatMessages.isEmpty) {
@@ -135,8 +151,8 @@ class VideoChatMessageController with ChangeNotifier {
         }
       }
     }
-    _parseConference();
-    _init();
+    _initChatMessage();
+
     notifyListeners();
   }
 
@@ -146,12 +162,8 @@ class VideoChatMessageController with ChangeNotifier {
   ///初始化是根据当前的视频邀请消息chatMessage来决定的，无论是发起还是接收邀请
   ///也可以根据当前会议来决定的，适用于群和会议模式
   ///如果没有设置，表明是新的会议
-  _init() async {
-    ChatSummary? chatSummary = _chatSummary;
-    if (chatSummary == null) {
-      logger.e('chatSummary is null');
-      return;
-    }
+  _initChatSummary() async {
+    ChatSummary chatSummary = _chatSummary!;
     partyType = chatSummary.partyType;
     if (partyType == PartyType.linkman.name) {
       peerId = chatSummary.peerId!;
@@ -160,56 +172,32 @@ class VideoChatMessageController with ChangeNotifier {
       groupPeerId = chatSummary.peerId!;
       name = chatSummary.name!;
     } else if (partyType == PartyType.conference.name) {
-      _initConference();
-    }
-    ChatMessage? chatMessage = _chatMessage;
-    if (chatMessage == null) {
-      logger.e('current chatMessage is not exist');
-    } else {
-      if (partyType == PartyType.linkman.name) {
-        _initLinkman();
-      } else if (partyType == PartyType.group.name) {
-        _initGroup();
-      }
-    }
-  }
-
-  ///linkman模式的初始化
-  _initLinkman() async {
-    ChatMessage? chatMessage = _chatMessage;
-    //进入视频界面是先选择了视频邀请消息
-    if (chatMessage!.subMessageType == ChatMessageSubType.videoChat.name) {
-      name = conference!.name;
-      conferenceName = conference!.name;
-    }
-  }
-
-  _initGroup() async {
-    ChatMessage? chatMessage = _chatMessage;
-    //进入视频界面是先选择了视频邀请消息
-    if (chatMessage!.subMessageType == ChatMessageSubType.videoChat.name) {
-      conferenceId = chatMessage.messageId!;
+      conferenceId = _chatSummary!.peerId!;
       _conference =
           await conferenceService.findOneByConferenceId(conferenceId!);
-      if (conference != null) {
-        conferenceName = conference!.name;
+      if (_conference != null) {
+        name = _conference!.name;
+        conferenceName = _conference!.name;
       }
     }
   }
 
-  _initConference() async {
-    ChatSummary? chatSummary = _chatSummary;
-    conferenceId = chatSummary!.peerId!;
-    _conference = await conferenceService.findOneByConferenceId(conferenceId!);
-    if (conference != null) {
-      name = conference!.name;
-      conferenceName = conference!.name;
-      //检查当前消息，进入视频界面是先选择了视频邀请消息，或者没有
-      ChatMessage? chatMessage =
-          await chatMessageService.findOriginByMessageId(conferenceId!);
-      if (chatMessage != null) {
-        //进入视频界面是先选择了视频邀请消息
-        if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {}
+  _initChatMessage() async {
+    if (partyType == PartyType.linkman.name) {
+      String json = chatMessageService.recoverContent(_chatMessage!.content!);
+      Map map = JsonUtil.toJson(json);
+      _conference = Conference.fromJson(map);
+      if (_chatMessage!.subMessageType == ChatMessageSubType.videoChat.name) {
+        conferenceName = _conference!.name;
+      }
+    } else if (partyType == PartyType.group.name) {
+      if (_chatMessage!.subMessageType == ChatMessageSubType.videoChat.name) {
+        conferenceId = _chatMessage!.messageId!;
+        _conference =
+            await conferenceService.findOneByConferenceId(conferenceId!);
+        if (conference != null) {
+          conferenceName = _conference!.name;
+        }
       }
     }
   }
@@ -231,13 +219,9 @@ class VideoChatMessageController with ChangeNotifier {
     return _terminatedChatReceipts[_getKey(peerId, clientId)];
   }
 
-  void _parseConference() {
-    String json = chatMessageService.recoverContent(_chatMessage!.content!);
-    Map map = JsonUtil.toJson(json);
-    _conference = Conference.fromJson(map);
+  _receivedVideoChat(ChatMessage chatMessage) async {
+    notifyListeners();
   }
-
-  _receivedVideoChat(ChatMessage chatMessage) async {}
 
   ///接收到视频通话邀请，做出接受或者拒绝视频通话邀请的决定
   sendChatReceipt(MessageStatus receiptType) async {

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/video/video_view_card.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
@@ -23,25 +22,6 @@ class RemoteVideoWidget extends StatefulWidget {
 }
 
 class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
-  String? partyType;
-
-  //或者会议名称，或者群名称，或者联系人名称
-  String? name;
-
-  //当前的会议编号，说明正在群中聊天
-  String? conferenceId;
-  String? conferenceName;
-
-  //当前的群编号，说明正在群中聊天
-  String? groupPeerId;
-
-  //当前的联系人编号和名称，说明正在一对一聊天
-  String? peerId;
-
-  //当前的通话房间，房间是临时组建的一组联系人，互相聊天和视频通话
-  //如果当前的群存在的话，房间的人在群的联系人中选择，否则在所有的联系人中选择
-  Conference? conference;
-
   //控制面板的可见性，包括视频功能按钮和呼叫按钮
   ValueNotifier<bool> controlPanelVisible = ValueNotifier<bool>(true);
 
@@ -57,9 +37,10 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
     super.initState();
     //视频通话的消息存放地
     widget.videoChatMessageController.addListener(_update);
+    var conferenceId =
+        widget.videoChatMessageController.conference!.conferenceId;
     RemoteVideoRenderController? remoteVideoRenderController =
-        videoConferenceRenderPool
-            .getRemoteVideoRenderController(conference!.conferenceId);
+        videoConferenceRenderPool.getRemoteVideoRenderController(conferenceId);
     if (remoteVideoRenderController != null) {
       remoteVideoRenderController.addListener(_update);
     }
@@ -105,8 +86,10 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   }
 
   _close() async {
-    var remoteVideoRenderController = videoConferenceRenderPool
-        .getRemoteVideoRenderController(conference!.conferenceId);
+    var conferenceId =
+        widget.videoChatMessageController.conference!.conferenceId;
+    var remoteVideoRenderController =
+        videoConferenceRenderPool.getRemoteVideoRenderController(conferenceId);
     if (remoteVideoRenderController != null) {
       remoteVideoRenderController.close();
     }
@@ -183,9 +166,10 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   }
 
   Widget _buildVideoChatView(BuildContext context) {
+    var conferenceId =
+        widget.videoChatMessageController.conference!.conferenceId;
     RemoteVideoRenderController? remoteVideoRenderController =
-        videoConferenceRenderPool
-            .getRemoteVideoRenderController(conference!.conferenceId);
+        videoConferenceRenderPool.getRemoteVideoRenderController(conferenceId);
     if (remoteVideoRenderController == null) {
       return Container();
     }
@@ -207,8 +191,10 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
 
   @override
   void dispose() {
-    var remoteVideoRenderController = videoConferenceRenderPool
-        .getRemoteVideoRenderController(conference!.conferenceId);
+    var conferenceId =
+        widget.videoChatMessageController.conference!.conferenceId;
+    var remoteVideoRenderController =
+        videoConferenceRenderPool.getRemoteVideoRenderController(conferenceId);
     if (remoteVideoRenderController != null) {
       remoteVideoRenderController.removeListener(_update);
     }
