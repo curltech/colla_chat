@@ -145,9 +145,9 @@ class VideoChatMessageController with ChangeNotifier {
       notifyListeners();
       return;
     }
-    _initChatSummary();
-    _initChatMessage();
-    _initChatReceipt();
+    await _initChatSummary();
+    await _initChatMessage();
+    await _initChatReceipt();
     notifyListeners();
   }
 
@@ -255,7 +255,7 @@ class VideoChatMessageController with ChangeNotifier {
     if (_chatMessage == null || _chatMessage != chatMessage) {
       if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
         _current = chatMessage;
-        setChatMessage(chatMessage);
+        await setChatMessage(chatMessage);
       }
     }
   }
@@ -399,7 +399,7 @@ class VideoChatMessageController with ChangeNotifier {
     if (chatReceipt.status == MessageStatus.terminated.name) {
       _terminatedChatReceipts[key] = chatReceipt;
     }
-    _receivedChatReceipt(chatReceipt);
+    await _receivedChatReceipt(chatReceipt);
     notifyListeners();
   }
 

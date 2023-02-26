@@ -84,7 +84,6 @@ class _IndexViewState extends State<IndexView>
     ChatMessage? chatMessage = videoChatMessageController.chatMessage;
     if (chatMessage != null) {
       if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-        await videoChatMessageController.setChatMessage(chatMessage);
         videoChatMessageVisible.value = true;
       }
     }
