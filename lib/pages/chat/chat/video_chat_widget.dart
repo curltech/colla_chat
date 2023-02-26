@@ -46,16 +46,21 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   void initState() {
     super.initState();
     videoConferenceRenderPool.addListener(_update);
-    ChatSummary? chatSummary = chatMessageController.chatSummary;
-    ChatMessage? chatMessage = chatMessageController.current;
-    if (chatMessage != null &&
-        chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-      videoChatMessageController = videoConferenceRenderPool
-          .videoChatMessageControllers[chatMessage.messageId!];
-    }
+    videoChatMessageController =
+        videoConferenceRenderPool.videoChatMessageController;
+    //当前无激活的会议，创建基于当前聊天的视频消息控制器
     if (videoChatMessageController == null) {
-      videoChatMessageController = VideoChatMessageController();
-      videoChatMessageController!.setChatSummary(chatSummary);
+      ChatSummary? chatSummary = chatMessageController.chatSummary;
+      ChatMessage? chatMessage = chatMessageController.current;
+      if (chatMessage != null &&
+          chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
+        videoChatMessageController = videoConferenceRenderPool
+            .getVideoChatMessageController(chatMessage.messageId!);
+      }
+      if (videoChatMessageController == null) {
+        videoChatMessageController = VideoChatMessageController();
+        videoChatMessageController!.setChatSummary(chatSummary);
+      }
     }
   }
 

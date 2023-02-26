@@ -84,6 +84,7 @@ enum MessageStatus {
   accepted, //同意，是一种消息的回执，表明同意消息的行为
   rejected, //拒绝，是一种消息的回执，表明拒绝消息的行为
   terminated, //终止，是一种消息的回执，表明终止消息的行为
+  busy, //忙，是一种消息的回执，表明自己忙
   ignored,
   deleted, //删除
 }

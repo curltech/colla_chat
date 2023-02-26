@@ -53,6 +53,17 @@ class GlobalChatMessageController with ChangeNotifier {
     }
   }
 
+  callReceiver(ChatMessage chatMessage) async {
+    //调用注册的消息接收监听器，用于自定义的特殊处理
+    List<Function(ChatMessage chatMessage)>? fns =
+        _receivers[chatMessage.subMessageType];
+    if (fns != null && fns.isNotEmpty) {
+      for (var fn in fns) {
+        await fn(chatMessage);
+      }
+    }
+  }
+
   ChatMessage? get chatMessage {
     return _chatMessage;
   }
@@ -135,13 +146,7 @@ class GlobalChatMessageController with ChangeNotifier {
         break;
     }
     //调用注册的消息接收监听器，用于自定义的特殊处理
-    List<Function(ChatMessage chatMessage)>? fns =
-        _receivers[subMessageType.name];
-    if (fns != null && fns.isNotEmpty) {
-      for (var fn in fns) {
-        await fn(chatMessage);
-      }
-    }
+    await callReceiver(chatMessage);
     //对于接收到的非系统消息，对消息控制器进行刷新
     if (chatMessage.messageType != ChatMessageType.system.name) {
       chatMessageController.notifyListeners();

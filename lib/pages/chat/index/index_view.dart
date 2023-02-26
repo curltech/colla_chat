@@ -37,8 +37,7 @@ class _IndexViewState extends State<IndexView>
   final ValueNotifier<bool> chatMessageVisible = ValueNotifier<bool>(false);
   final CustomSpecialTextSpanBuilder customSpecialTextSpanBuilder =
       CustomSpecialTextSpanBuilder();
-  VideoChatMessageController videoChatMessageController =
-      VideoChatMessageController();
+  VideoChatMessageController? videoChatMessageController;
   BlueFireAudioPlayer audioPlayer = BlueFireAudioPlayer();
 
   //JustAudioPlayer audioPlayer = JustAudioPlayer();
@@ -47,7 +46,6 @@ class _IndexViewState extends State<IndexView>
   void initState() {
     super.initState();
     globalChatMessageController.addListener(_updateGlobalChatMessage);
-    videoChatMessageController.addListener(_updateVideoChatMessage);
     myself.addListener(_update);
     appDataProvider.addListener(_update);
   }
@@ -75,16 +73,17 @@ class _IndexViewState extends State<IndexView>
       if (chatMessage.subMessageType == ChatMessageSubType.chat.name) {
         chatMessageVisible.value = true;
       }
-    }
-  }
-
-  ///有新视频消息到来的时候，视频邀请消息显示带按钮选择接受还是拒绝
-  ///并设置视频消息控制器
-  _updateVideoChatMessage() async {
-    ChatMessage? chatMessage = videoChatMessageController.chatMessage;
-    if (chatMessage != null) {
+      //新的视频邀请消息到来，创建新的视频消息控制器，原来的如果存在，新的将被忽视，占线
       if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-        videoChatMessageVisible.value = true;
+        if (videoChatMessageController == null) {
+          videoChatMessageController = VideoChatMessageController();
+          await videoChatMessageController!.setChatMessage(chatMessage);
+          videoChatMessageVisible.value = true;
+        } else {
+          var videoChatMessageController = VideoChatMessageController();
+          await videoChatMessageController.setChatMessage(chatMessage);
+          await videoChatMessageController.sendChatReceipt(MessageStatus.busy);
+        }
       }
     }
   }
@@ -176,27 +175,29 @@ class _IndexViewState extends State<IndexView>
             subtitle: Text(
                 AppLocalizations.t('Inviting you $title chat, ') +
                     AppLocalizations.t('conference name ') +
-                    videoChatMessageController.conference!.name,
+                    videoChatMessageController!.conference!.name,
                 style: const TextStyle(color: Colors.white)),
             trailing: SizedBox(
               width: 130,
               child: Row(children: [
                 WidgetUtil.buildCircleButton(
-                    onPressed: () {
+                    onPressed: () async {
                       videoChatMessageVisible.value = false;
                       _stop();
-                      videoChatMessageController
+                      await videoChatMessageController!
                           .sendChatReceipt(MessageStatus.rejected);
+                      videoChatMessageController = null;
                     },
                     child: const Icon(
                         color: Colors.white, size: 16, Icons.call_end),
                     backgroundColor: Colors.red),
                 WidgetUtil.buildCircleButton(
-                    onPressed: () {
+                    onPressed: () async {
                       videoChatMessageVisible.value = false;
                       _stop();
-                      videoChatMessageController
+                      await videoChatMessageController!
                           .sendChatReceipt(MessageStatus.accepted);
+                      videoChatMessageController = null;
                     },
                     child:
                         const Icon(color: Colors.white, size: 16, Icons.call),
@@ -220,17 +221,21 @@ class _IndexViewState extends State<IndexView>
               videoChatMessageWidget =
                   _buildVideoChatMessageWidget(context, chatMessage);
               //延时60秒后一般消息消失
-              Future.delayed(const Duration(seconds: 60)).then((value) {
+              Future.delayed(const Duration(seconds: 60)).then((value) async {
                 _stop();
                 if (videoChatMessageVisible.value) {
                   videoChatMessageVisible.value = false;
                   ChatMessage? chatMessage =
-                      videoChatMessageController.chatMessage;
+                      videoChatMessageController!.chatMessage;
                   if (chatMessage != null && chatMessage.groupType != null) {
-                    videoChatMessageController
+                    await videoChatMessageController!
                         .sendChatReceipt(MessageStatus.accepted);
+                  } else {
+                    await videoChatMessageController!
+                        .sendChatReceipt(MessageStatus.ignored);
                   }
                 }
+                videoChatMessageController = null;
               });
             }
           }

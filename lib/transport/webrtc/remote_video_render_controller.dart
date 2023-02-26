@@ -1,3 +1,4 @@
+import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
@@ -134,10 +135,9 @@ class RemoteVideoRenderController extends VideoRenderController {
   }
 }
 
-///所有的视频通话的房间的池，包含多个房间，每个房间的房间号是视频通话邀请的消息号
+///所有的视频通话的房间的池，包含多个会议，每个会议的会议号是视频通话邀请的消息号
 class VideoConferenceRenderPool with ChangeNotifier {
   Map<String, RemoteVideoRenderController> remoteVideoRenderControllers = {};
-  Map<String, VideoChatMessageController> videoChatMessageControllers = {};
   String? _conferenceId;
 
   VideoConferenceRenderPool();
@@ -150,7 +150,16 @@ class VideoConferenceRenderPool with ChangeNotifier {
   ///设置当前会议号
   set conferenceId(String? conferenceId) {
     if (_conferenceId != conferenceId) {
-      _conferenceId = conferenceId;
+      if (conferenceId != null) {
+        if (remoteVideoRenderControllers.containsKey(conferenceId)) {
+          _conferenceId = conferenceId;
+        } else {
+          _conferenceId = null;
+        }
+      } else {
+        _conferenceId = conferenceId;
+      }
+      notifyListeners();
     }
   }
 
@@ -162,25 +171,35 @@ class VideoConferenceRenderPool with ChangeNotifier {
     return null;
   }
 
-  ///获取当前房间
+  ///获取当前会议控制器
   VideoChatMessageController? get videoChatMessageController {
     if (_conferenceId != null) {
-      return videoChatMessageControllers[_conferenceId];
+      return remoteVideoRenderControllers[_conferenceId]
+          ?.videoChatMessageController;
     }
     return null;
   }
 
-  ///根据房间号返回房间控制器，没有则返回null
+  ///根据会议号返回会议控制器，没有则返回null
   RemoteVideoRenderController? getRemoteVideoRenderController(
       String conferenceId) {
     return remoteVideoRenderControllers[conferenceId];
   }
 
-  VideoChatMessageController? getConference(String conferenceId) {
-    return videoChatMessageControllers[conferenceId];
+  VideoChatMessageController? getVideoChatMessageController(
+      String conferenceId) {
+    return getRemoteVideoRenderController(conferenceId)
+        ?.videoChatMessageController;
+  }
+
+  Conference? getConference(String conferenceId) {
+    return getRemoteVideoRenderController(conferenceId)
+        ?.videoChatMessageController
+        ?.conference;
   }
 
   ///创建新的远程视频会议控制器，假如会议号已经存在，直接返回控制器
+  ///在发起者接收到至少一个同意回执，开始重新协商，或者接收者发送出同意回执的时候调用
   RemoteVideoRenderController createRemoteVideoRenderController(
       VideoChatMessageController videoChatMessageController) {
     String conferenceId = videoChatMessageController.conferenceId!;
@@ -190,11 +209,9 @@ class VideoConferenceRenderPool with ChangeNotifier {
       remoteVideoRenderController = RemoteVideoRenderController(
           videoChatMessageController: videoChatMessageController);
       remoteVideoRenderControllers[conferenceId] = remoteVideoRenderController;
-      videoChatMessageControllers[conferenceId] = videoChatMessageController;
-      _conferenceId = conferenceId;
-    } else {
-      _conferenceId = conferenceId;
     }
+    _conferenceId = conferenceId;
+
     return remoteVideoRenderController;
   }
 
@@ -203,7 +220,6 @@ class VideoConferenceRenderPool with ChangeNotifier {
         remoteVideoRenderControllers[conferenceId];
     if (remoteVideoRenderController != null) {
       remoteVideoRenderController.close();
-      videoChatMessageControllers.remove(conferenceId);
     }
     if (conferenceId == _conferenceId) {
       _conferenceId = null;
@@ -211,5 +227,6 @@ class VideoConferenceRenderPool with ChangeNotifier {
   }
 }
 
+///存放已经开始的会议，就是发起者接收到至少一个同意回执，开始重新协商，或者接收者发送出同意回执
 final VideoConferenceRenderPool videoConferenceRenderPool =
     VideoConferenceRenderPool();

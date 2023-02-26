@@ -47,11 +47,50 @@ class VideoChatMessageController with ChangeNotifier {
   //如果当前的群存在的话，房间的人在群的联系人中选择，否则在所有的联系人中选择
   Conference? _conference;
 
+  final Map<String, List<Function(ChatMessage chatMessage)>> _receivers = {};
+
   VideoChatMessageController() {
     globalChatMessageController.registerReceiver(
         ChatMessageSubType.videoChat.name, receivedVideoChat);
     globalChatMessageController.registerReceiver(
         ChatMessageSubType.chatReceipt.name, receivedChatReceipt);
+  }
+
+  ///注册消息接收监听器，用于自定义的特殊处理
+  registerReceiver(
+      String subMessageType, Function(ChatMessage chatMessage) fn) {
+    List<Function(ChatMessage chatMessage)>? fns = _receivers[subMessageType];
+    if (fns == null) {
+      fns = <Function(ChatMessage chatMessage)>[];
+      _receivers[subMessageType] = fns;
+    }
+    if (!fns.contains(fn)) {
+      fns.add(fn);
+    }
+  }
+
+  unregisterReceiver(
+      String subMessageType, Function(ChatMessage chatMessage) fn) {
+    List<Function(ChatMessage chatMessage)>? fns = _receivers[subMessageType];
+    if (fns != null) {
+      if (fns.contains(fn)) {
+        fns.remove(fn);
+        if (fns.isEmpty) {
+          _receivers.remove(subMessageType);
+        }
+      }
+    }
+  }
+
+  callReceiver(ChatMessage chatMessage) async {
+    //调用注册的消息接收监听器，用于自定义的特殊处理
+    List<Function(ChatMessage chatMessage)>? fns =
+        _receivers[chatMessage.subMessageType];
+    if (fns != null && fns.isNotEmpty) {
+      for (var fn in fns) {
+        await fn(chatMessage);
+      }
+    }
   }
 
   ChatSummary? get chatSummary {
@@ -139,7 +178,6 @@ class VideoChatMessageController with ChangeNotifier {
     await _initChatSummary();
     await _initChatMessage();
     await _initChatReceipt();
-    notifyListeners();
   }
 
   ///根据_chatMessage查找对应的chatSummary
@@ -242,11 +280,13 @@ class VideoChatMessageController with ChangeNotifier {
       if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
         _current = chatMessage;
         await setChatMessage(chatMessage);
+        await callReceiver(chatMessage);
       }
     }
   }
 
   ///接收到视频通话邀请，做出接受或者拒绝视频通话邀请的决定
+  ///如果是接受决定，本控制器将被加入到池中
   sendChatReceipt(MessageStatus receiptType) async {
     ChatMessage? chatMessage = _chatMessage;
     if (chatMessage == null) {
@@ -385,7 +425,7 @@ class VideoChatMessageController with ChangeNotifier {
       _terminatedChatReceipts[key] = chatReceipt;
     }
     await _receivedChatReceipt(chatReceipt);
-    notifyListeners();
+    await callReceiver(chatReceipt);
   }
 
   ///收到视频通话的回执的处理，

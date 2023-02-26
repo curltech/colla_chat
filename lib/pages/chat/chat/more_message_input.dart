@@ -14,6 +14,7 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/smart_dialog_util.dart';
+import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -152,6 +153,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   ///视频通话
   _onActionVideoChat() {
     chatMessageController.current = null;
+    videoConferenceRenderPool.conferenceId = null;
     indexWidgetProvider.push('video_chat');
   }
 
