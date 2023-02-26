@@ -145,14 +145,14 @@ class VideoChatMessageController with ChangeNotifier {
       notifyListeners();
       return;
     }
-    _validateChatSummary();
+    _initChatSummary();
     _initChatMessage();
     _initChatReceipt();
     notifyListeners();
   }
 
   ///根据_chatMessage查找对应的chatSummary
-  Future<ChatSummary?> _initChatSummary() async {
+  Future<ChatSummary?> _findChatSummary() async {
     if (_chatMessage!.direct == ChatDirect.send.name) {
       return await chatSummaryService
           .findCachedOneByPeerId(_chatMessage!.receiverPeerId!);
@@ -165,18 +165,21 @@ class VideoChatMessageController with ChangeNotifier {
   }
 
   ///校验_chatMessage和_chatSummary，不一致则重新设置_chatSummary
-  _validateChatSummary() async {
-    if (_chatSummary != null && _chatMessage != null) {
+  _initChatSummary() async {
+    if (_chatSummary == null && _chatMessage != null) {
+      var chatSummary = await _findChatSummary();
+      setChatSummary(chatSummary);
+    } else if (_chatSummary != null && _chatMessage != null) {
       if (_chatMessage!.direct == ChatDirect.send.name) {
         if (_chatSummary!.peerId != _chatMessage!.receiverPeerId!) {
-          var chatSummary = await _initChatSummary();
+          var chatSummary = await _findChatSummary();
           setChatSummary(chatSummary);
         }
       }
       if (_chatMessage!.direct == ChatDirect.receive.name) {
         if (_chatSummary!.peerId != _chatMessage!.senderPeerId!) {
           _chatSummary = null;
-          var chatSummary = await _initChatSummary();
+          var chatSummary = await _findChatSummary();
           setChatSummary(chatSummary);
         }
       }
