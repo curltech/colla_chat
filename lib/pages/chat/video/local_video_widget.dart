@@ -352,8 +352,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             contentType: ContentType.audio.name, conference: conference!);
       }
       await widget.videoChatMessageController.setChatMessage(chatMessage);
-      videoConferenceRenderPool
-          .createRemoteVideoRenderController(widget.videoChatMessageController);
+      // videoConferenceRenderPool
+      //     .createRemoteVideoRenderController(widget.videoChatMessageController);
     } else {
       //当前视频消息不为空，则有同意回执的直接重新协商
       var messageId = chatMessage.messageId!;

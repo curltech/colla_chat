@@ -99,7 +99,6 @@ class VideoChatMessageController with ChangeNotifier {
     conferenceId = null;
     conferenceName = null;
     if (chatSummary == null) {
-      notifyListeners();
       return;
     }
     partyType = chatSummary.partyType;
@@ -119,7 +118,6 @@ class VideoChatMessageController with ChangeNotifier {
         conferenceName = _conference!.name;
       }
     }
-    notifyListeners();
   }
 
   ///设置当前的视频邀请消息，可以从chatMessageController中获取当前

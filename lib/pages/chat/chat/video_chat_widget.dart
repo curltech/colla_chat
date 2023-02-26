@@ -48,14 +48,14 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     videoConferenceRenderPool.addListener(_update);
     ChatSummary? chatSummary = chatMessageController.chatSummary;
     ChatMessage? chatMessage = chatMessageController.current;
-    if (chatMessage == null) {
-      videoChatMessageController = VideoChatMessageController();
-      videoChatMessageController!.setChatSummary(chatSummary);
-      videoChatMessageController!.setChatMessage(chatMessage);
-    } else if (chatMessage.subMessageType ==
-        ChatMessageSubType.videoChat.name) {
+    if (chatMessage != null &&
+        chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
       videoChatMessageController = videoConferenceRenderPool
           .videoChatMessageControllers[chatMessage.messageId!];
+    }
+    if (videoChatMessageController == null) {
+      videoChatMessageController = VideoChatMessageController();
+      videoChatMessageController!.setChatSummary(chatSummary);
     }
   }
 

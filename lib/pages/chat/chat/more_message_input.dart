@@ -151,6 +151,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
 
   ///视频通话
   _onActionVideoChat() {
+    chatMessageController.current = null;
     indexWidgetProvider.push('video_chat');
   }
 
