@@ -135,10 +135,11 @@ class GlobalChatMessageController with ChangeNotifier {
         break;
     }
     //调用注册的消息接收监听器，用于自定义的特殊处理
-    List<Function(ChatMessage chatMessage)>? fns = _receivers[subMessageType.name];
+    List<Function(ChatMessage chatMessage)>? fns =
+        _receivers[subMessageType.name];
     if (fns != null && fns.isNotEmpty) {
       for (var fn in fns) {
-        fn(chatMessage);
+        await fn(chatMessage);
       }
     }
     //对于接收到的非系统消息，对消息控制器进行刷新
