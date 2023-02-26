@@ -48,9 +48,9 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     super.initState();
     videoConferenceRenderPool.addListener(_update);
     ChatSummary? chatSummary = chatMessageController.chatSummary;
+    videoChatMessageController.setChatSummary(chatSummary);
     ChatMessage? chatMessage = chatMessageController.current;
-    videoChatMessageController.setChatMessage(chatMessage,
-        chatSummary: chatSummary);
+    videoChatMessageController.setChatMessage(chatMessage);
   }
 
   _update() {}

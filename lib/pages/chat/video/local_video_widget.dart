@@ -334,9 +334,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
     var conference = widget.videoChatMessageController.conference;
     //创建会议
-    if (conference == null) {
-      await _buildConference(video: videoChatRender.video);
-    }
+    conference ??= await _buildConference(video: videoChatRender.video);
     //检查当前的视频邀请消息是否存在
     ChatMessage? chatMessage = widget.videoChatMessageController.chatMessage;
     if (chatMessage == null) {
@@ -354,7 +352,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             contentType: ContentType.audio.name, conference: conference!);
       }
       await widget.videoChatMessageController.setChatMessage(chatMessage);
-      videoConferenceRenderPool.createRemoteVideoRenderController(conference!);
+      videoConferenceRenderPool.createRemoteVideoRenderController(conference);
     } else {
       //当前视频消息不为空，则有同意回执的直接重新协商
       var messageId = chatMessage.messageId!;

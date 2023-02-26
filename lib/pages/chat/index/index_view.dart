@@ -79,6 +79,7 @@ class _IndexViewState extends State<IndexView>
   }
 
   ///有新视频消息到来的时候，视频邀请消息显示带按钮选择接受还是拒绝
+  ///并设置视频消息控制器
   _updateVideoChatMessage() async {
     ChatMessage? chatMessage = videoChatMessageController.chatMessage;
     if (chatMessage != null) {

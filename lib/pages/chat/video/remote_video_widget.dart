@@ -52,39 +52,6 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
     }
   }
 
-  _buildActionDataAndVisible() {
-    List<ActionData> actionData = [];
-
-    this.actionData.value = actionData;
-  }
-
-  Widget _buildActionCard(BuildContext context) {
-    double height = 80;
-    return Container(
-      margin: const EdgeInsets.all(0.0),
-      padding: const EdgeInsets.only(bottom: 0.0),
-      child: ValueListenableBuilder<List<ActionData>>(
-          valueListenable: actionData,
-          builder: (context, value, child) {
-            return DataActionCard(
-              actions: value,
-              height: height,
-              //width: 320,
-              onPressed: _onAction,
-              crossAxisCount: 4,
-              labelColor: Colors.white,
-            );
-          }),
-    );
-  }
-
-  Future<void> _onAction(int index, String name, {String? value}) async {
-    switch (name) {
-      default:
-        break;
-    }
-  }
-
   _close() async {
     var conferenceId =
         widget.videoChatMessageController.conference!.conferenceId;
@@ -132,7 +99,6 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
             return Visibility(
                 visible: controlPanelVisible.value,
                 child: Column(children: [
-                  _buildActionCard(context),
                   Center(
                       child: Container(
                     padding: const EdgeInsets.all(25.0),
