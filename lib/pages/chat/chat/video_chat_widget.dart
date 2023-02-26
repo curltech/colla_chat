@@ -46,6 +46,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   void initState() {
     super.initState();
     videoConferenceRenderPool.addListener(_update);
+    //优先展示当前活动的会议
     videoChatMessageController =
         videoConferenceRenderPool.videoChatMessageController;
     //当前无激活的会议，创建基于当前聊天的视频消息控制器
