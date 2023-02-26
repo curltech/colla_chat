@@ -370,7 +370,7 @@ class VideoChatMessageController with ChangeNotifier {
   ///如果不存在，则发送自己的决定，如果存在是rejected或者terminated，则不处理
   receivedChatReceipt(ChatMessage chatReceipt) async {
     //当前的视频通话邀请消息不为空
-    if (_chatMessage != null) {
+    if (_chatMessage == null) {
       logger.e('Video chatMessage is null');
       return;
     }
