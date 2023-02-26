@@ -168,19 +168,19 @@ class VideoChatMessageController with ChangeNotifier {
   _initChatSummary() async {
     if (_chatSummary == null && _chatMessage != null) {
       var chatSummary = await _findChatSummary();
-      setChatSummary(chatSummary);
+      await setChatSummary(chatSummary);
     } else if (_chatSummary != null && _chatMessage != null) {
       if (_chatMessage!.direct == ChatDirect.send.name) {
         if (_chatSummary!.peerId != _chatMessage!.receiverPeerId!) {
           var chatSummary = await _findChatSummary();
-          setChatSummary(chatSummary);
+          await setChatSummary(chatSummary);
         }
       }
       if (_chatMessage!.direct == ChatDirect.receive.name) {
         if (_chatSummary!.peerId != _chatMessage!.senderPeerId!) {
           _chatSummary = null;
           var chatSummary = await _findChatSummary();
-          setChatSummary(chatSummary);
+          await setChatSummary(chatSummary);
         }
       }
     }

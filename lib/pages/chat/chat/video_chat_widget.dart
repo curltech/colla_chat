@@ -50,7 +50,10 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     ChatSummary? chatSummary = chatMessageController.chatSummary;
     videoChatMessageController.setChatSummary(chatSummary);
     ChatMessage? chatMessage = chatMessageController.current;
-    videoChatMessageController.setChatMessage(chatMessage);
+    if (chatMessage == null ||
+        chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
+      videoChatMessageController.setChatMessage(chatMessage);
+    }
   }
 
   _update() {}
