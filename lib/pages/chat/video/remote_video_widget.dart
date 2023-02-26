@@ -55,12 +55,13 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   }
 
   _close() async {
-    var conferenceId =
-        widget.videoChatMessageController.conference!.conferenceId;
-    var remoteVideoRenderController =
-        videoConferenceRenderPool.getRemoteVideoRenderController(conferenceId);
-    if (remoteVideoRenderController != null) {
-      remoteVideoRenderController.close();
+    var conferenceId = widget.videoChatMessageController.conferenceId;
+    if (conferenceId != null) {
+      var remoteVideoRenderController = videoConferenceRenderPool
+          .getRemoteVideoRenderController(conferenceId);
+      if (remoteVideoRenderController != null) {
+        remoteVideoRenderController.close();
+      }
     }
   }
 
@@ -134,12 +135,15 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   }
 
   Widget _buildVideoChatView(BuildContext context) {
-    var conferenceId =
-        widget.videoChatMessageController.conference!.conferenceId;
-    RemoteVideoRenderController? remoteVideoRenderController =
-        videoConferenceRenderPool.getRemoteVideoRenderController(conferenceId);
+    String? conferenceId = widget.videoChatMessageController.conferenceId;
+    RemoteVideoRenderController? remoteVideoRenderController;
+    if (conferenceId != null) {
+      remoteVideoRenderController = videoConferenceRenderPool
+          .getRemoteVideoRenderController(conferenceId);
+    }
     if (remoteVideoRenderController == null) {
-      return Container();
+      return const Center(
+          child: Text('No conference', style: TextStyle(color: Colors.white)));
     }
     return Container(
         padding: const EdgeInsets.all(5.0),
