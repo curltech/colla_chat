@@ -6,6 +6,7 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.da
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/video/local_video_widget.dart';
 import 'package:colla_chat/pages/chat/video/remote_video_widget.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
@@ -94,7 +95,6 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   }
 
   Widget _buildVideoChatView(BuildContext context) {
-    var conferenceId = videoConferenceRenderPool.conferenceId;
     return Swiper(
       controller: SwiperController(),
       itemCount: 2,
@@ -104,12 +104,13 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
             videoChatMessageController: videoChatMessageController!);
         if (index == 1) {
           view = Container();
-          if (conferenceId != null) {
-            view = RemoteVideoWidget(
-                videoChatMessageController: videoChatMessageController!);
-          }
+          view = RemoteVideoWidget(
+              videoChatMessageController: videoChatMessageController!);
         }
         return Center(child: view);
+      },
+      onIndexChanged: (int index) {
+        logger.i('changed to index $index');
       },
       // pagination: SwiperPagination(
       //     builder: DotSwiperPaginationBuilder(

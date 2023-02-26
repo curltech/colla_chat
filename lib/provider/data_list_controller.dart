@@ -33,8 +33,10 @@ class DataListController<T> with ChangeNotifier {
   }
 
   set current(T? element) {
-    if (_currentIndex > -1 && element != null) {
-      data[_currentIndex] = element;
+    if (element == null) {
+      currentIndex = -1;
+    } else {
+      _currentIndex = data.indexOf(element);
       notifyListeners();
     }
   }
