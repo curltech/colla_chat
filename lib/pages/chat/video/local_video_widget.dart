@@ -94,6 +94,11 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     //本地视频的存放地
     localVideoRenderController.addListener(_update);
     _buildActionDataAndVisible();
+    if (widget.videoChatMessageController.conference == null) {
+      videoChatStatus.value = VideoChatStatus.end;
+    } else {
+      videoChatStatus.value = VideoChatStatus.chatting;
+    }
   }
 
   _update() {
@@ -500,7 +505,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         valueListenable: videoChatStatus,
         builder: (BuildContext context, VideoChatStatus value, Widget? child) {
           Widget buttonWidget;
-          if (value == VideoChatStatus.calling) {
+          if (value == VideoChatStatus.calling ||
+              value == VideoChatStatus.chatting) {
             buttonWidget = WidgetUtil.buildCircleButton(
               onPressed: () {
                 _close();
