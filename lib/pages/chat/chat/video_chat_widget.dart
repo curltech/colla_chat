@@ -40,19 +40,22 @@ class VideoChatWidget extends StatefulWidget with TileDataMixin {
 
 class _VideoChatWidgetState extends State<VideoChatWidget> {
   OverlayEntry? overlayEntry;
-  final VideoChatMessageController videoChatMessageController =
-      VideoChatMessageController();
+  VideoChatMessageController? videoChatMessageController;
 
   @override
   void initState() {
     super.initState();
     videoConferenceRenderPool.addListener(_update);
     ChatSummary? chatSummary = chatMessageController.chatSummary;
-    videoChatMessageController.setChatSummary(chatSummary);
     ChatMessage? chatMessage = chatMessageController.current;
-    if (chatMessage == null ||
-        chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-      videoChatMessageController.setChatMessage(chatMessage);
+    if (chatMessage == null) {
+      videoChatMessageController = VideoChatMessageController();
+      videoChatMessageController!.setChatSummary(chatSummary);
+      videoChatMessageController!.setChatMessage(chatMessage);
+    } else if (chatMessage.subMessageType ==
+        ChatMessageSubType.videoChat.name) {
+      videoChatMessageController = videoConferenceRenderPool
+          .videoChatMessageControllers[chatMessage.messageId!];
     }
   }
 
@@ -92,12 +95,12 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
       index: 0,
       itemBuilder: (BuildContext context, int index) {
         Widget view = LocalVideoWidget(
-            videoChatMessageController: videoChatMessageController);
+            videoChatMessageController: videoChatMessageController!);
         if (index == 1) {
           view = Container();
           if (conferenceId != null) {
             view = RemoteVideoWidget(
-                videoChatMessageController: videoChatMessageController);
+                videoChatMessageController: videoChatMessageController!);
           }
         }
         return Center(child: view);

@@ -1,4 +1,4 @@
-import 'package:colla_chat/entity/chat/conference.dart';
+import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
@@ -10,12 +10,12 @@ import 'package:flutter/material.dart';
 class RemoteVideoRenderController extends VideoRenderController {
   ///根据peerId和clientId对应的所有的webrtc连接
   final Map<String, AdvancedPeerConnection> _peerConnections = {};
-  final Conference? conference;
+  final VideoChatMessageController? videoChatMessageController;
 
   ///根据peerId和clientId的连接所对应的视频render控制器，每一个视频render控制器包含多个视频render
   Map<String, VideoRenderController> videoRenderControllers = {};
 
-  RemoteVideoRenderController({this.conference});
+  RemoteVideoRenderController({this.videoChatMessageController});
 
   String _getKey(String peerId, String clientId) {
     var key = '$peerId:$clientId';
@@ -137,17 +137,17 @@ class RemoteVideoRenderController extends VideoRenderController {
 ///所有的视频通话的房间的池，包含多个房间，每个房间的房间号是视频通话邀请的消息号
 class VideoConferenceRenderPool with ChangeNotifier {
   Map<String, RemoteVideoRenderController> remoteVideoRenderControllers = {};
-  Map<String, Conference> conferences = {};
+  Map<String, VideoChatMessageController> videoChatMessageControllers = {};
   String? _conferenceId;
 
   VideoConferenceRenderPool();
 
-  ///获取当前房间号
+  ///获取当前会议号
   String? get conferenceId {
     return _conferenceId;
   }
 
-  ///设置当前房间号
+  ///设置当前会议号
   set conferenceId(String? conferenceId) {
     if (_conferenceId != conferenceId) {
       _conferenceId = conferenceId;
@@ -163,9 +163,9 @@ class VideoConferenceRenderPool with ChangeNotifier {
   }
 
   ///获取当前房间
-  Conference? get conference {
+  VideoChatMessageController? get videoChatMessageController {
     if (_conferenceId != null) {
-      return conferences[_conferenceId];
+      return videoChatMessageControllers[_conferenceId];
     }
     return null;
   }
@@ -176,21 +176,21 @@ class VideoConferenceRenderPool with ChangeNotifier {
     return remoteVideoRenderControllers[conferenceId];
   }
 
-  Conference? getConference(String conferenceId) {
-    return conferences[conferenceId];
+  VideoChatMessageController? getConference(String conferenceId) {
+    return videoChatMessageControllers[conferenceId];
   }
 
   ///创建新的远程视频会议控制器，假如会议号已经存在，直接返回控制器
   RemoteVideoRenderController createRemoteVideoRenderController(
-      Conference conference) {
-    String conferenceId = conference.conferenceId;
+      VideoChatMessageController videoChatMessageController) {
+    String conferenceId = videoChatMessageController.conferenceId!;
     RemoteVideoRenderController? remoteVideoRenderController =
         remoteVideoRenderControllers[conferenceId];
     if (remoteVideoRenderController == null) {
-      remoteVideoRenderController =
-          RemoteVideoRenderController(conference: conference);
+      remoteVideoRenderController = RemoteVideoRenderController(
+          videoChatMessageController: videoChatMessageController);
       remoteVideoRenderControllers[conferenceId] = remoteVideoRenderController;
-      conferences[conferenceId] = conference;
+      videoChatMessageControllers[conferenceId] = videoChatMessageController;
       _conferenceId = conferenceId;
     } else {
       _conferenceId = conferenceId;
@@ -203,7 +203,7 @@ class VideoConferenceRenderPool with ChangeNotifier {
         remoteVideoRenderControllers[conferenceId];
     if (remoteVideoRenderController != null) {
       remoteVideoRenderController.close();
-      conferences.remove(conferenceId);
+      videoChatMessageControllers.remove(conferenceId);
     }
     if (conferenceId == _conferenceId) {
       _conferenceId = null;

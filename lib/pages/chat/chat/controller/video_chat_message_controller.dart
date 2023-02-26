@@ -312,8 +312,7 @@ class VideoChatMessageController with ChangeNotifier {
         await advancedPeerConnection.addLocalRender(localRender);
         //同意视频通话则加入到视频连接池中，远程视频通过远程会议池和会议号获取
         RemoteVideoRenderController remoteVideoRenderController =
-            videoConferenceRenderPool
-                .createRemoteVideoRenderController(_conference!);
+            videoConferenceRenderPool.createRemoteVideoRenderController(this);
         remoteVideoRenderController
             .addAdvancedPeerConnection(advancedPeerConnection);
         //设置当前消息，转入视频会议界面
@@ -421,12 +420,10 @@ class VideoChatMessageController with ChangeNotifier {
       );
       //与发送者的连接存在，将本地的视频render加入连接中
       if (advancedPeerConnection != null) {
-        RemoteVideoRenderController? remoteVideoRenderController =
-            videoConferenceRenderPool.getRemoteVideoRenderController(messageId);
-        if (remoteVideoRenderController != null) {
-          remoteVideoRenderController
-              .addAdvancedPeerConnection(advancedPeerConnection);
-        }
+        RemoteVideoRenderController remoteVideoRenderController =
+            videoConferenceRenderPool.createRemoteVideoRenderController(this);
+        remoteVideoRenderController
+            .addAdvancedPeerConnection(advancedPeerConnection);
         //把本地视频加入连接中，然后重新协商
         Map<String, PeerVideoRender> videoRenders =
             localVideoRenderController.getVideoRenders();
