@@ -37,10 +37,6 @@ class VideoChatMessageController with ChangeNotifier {
   //或者会议名称，或者群名称，或者联系人名称
   String? name;
 
-  //当前的会议编号，说明正在群中聊天
-  String? conferenceId;
-  String? conferenceName;
-
   //当前的群编号，说明正在群中聊天
   String? groupPeerId;
 
@@ -74,11 +70,12 @@ class VideoChatMessageController with ChangeNotifier {
     return _conference;
   }
 
-  set conference(Conference? conference) {
-    if (_conference != conference) {
-      _conference = conference;
-      notifyListeners();
-    }
+  String? get conferenceId {
+    return _conference?.conferenceId;
+  }
+
+  String? get conferenceName {
+    return _conference?.name;
   }
 
   ///设置当前的视频邀请消息汇总和视频邀请消息，可以从chatMessageController中获取当前
@@ -96,8 +93,6 @@ class VideoChatMessageController with ChangeNotifier {
     peerId = null;
     groupPeerId = null;
     _conference = null;
-    conferenceId = null;
-    conferenceName = null;
     if (chatSummary == null) {
       return;
     }
@@ -110,12 +105,10 @@ class VideoChatMessageController with ChangeNotifier {
       name = chatSummary.name!;
     } else if (partyType == PartyType.conference.name) {
       //conference的会议信息保存，_chatSummary中获取peerId，就是conferenceId
-      conferenceId = _chatSummary!.peerId!;
-      _conference =
-          await conferenceService.findOneByConferenceId(conferenceId!);
+      var conferenceId = _chatSummary!.peerId!;
+      _conference = await conferenceService.findOneByConferenceId(conferenceId);
       if (_conference != null) {
         name = _conference!.name;
-        conferenceName = _conference!.name;
       }
     }
   }
@@ -191,18 +184,13 @@ class VideoChatMessageController with ChangeNotifier {
       String json = chatMessageService.recoverContent(_chatMessage!.content!);
       Map map = JsonUtil.toJson(json);
       _conference = Conference.fromJson(map);
-      if (_chatMessage!.subMessageType == ChatMessageSubType.videoChat.name) {
-        conferenceName = _conference!.name;
-      }
+      if (_chatMessage!.subMessageType == ChatMessageSubType.videoChat.name) {}
     } else if (partyType == PartyType.group.name) {
       //group的会议信息保存，_chatMessage中获取messageId，就是conferenceId
       if (_chatMessage!.subMessageType == ChatMessageSubType.videoChat.name) {
-        conferenceId = _chatMessage!.messageId!;
+        var conferenceId = _chatMessage!.messageId!;
         _conference =
-            await conferenceService.findOneByConferenceId(conferenceId!);
-        if (conference != null) {
-          conferenceName = _conference!.name;
-        }
+            await conferenceService.findOneByConferenceId(conferenceId);
       }
     }
   }
@@ -405,6 +393,7 @@ class VideoChatMessageController with ChangeNotifier {
   ///根据消息回执是接受拒绝还是终止进行处理
   _receivedChatReceipt(ChatMessage chatReceipt) async {
     String? content = chatReceipt.content;
+    content = chatMessageService.recoverContent(content!);
     logger.w('received videoChat chatReceipt content: $content');
     String messageId = chatReceipt.messageId!;
     //接受通话请求的回执，加本地流，重新协商
