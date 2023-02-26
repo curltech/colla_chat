@@ -249,7 +249,7 @@ class VideoChatMessageController with ChangeNotifier {
   }
 
   receivedVideoChat(ChatMessage chatMessage) async {
-    if (_chatMessage != chatMessage) {
+    if (_chatMessage == null || _chatMessage != chatMessage) {
       if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
         _current = chatMessage;
         setChatMessage(chatMessage);
