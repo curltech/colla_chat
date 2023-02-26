@@ -37,12 +37,14 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
     super.initState();
     //视频通话的消息存放地
     widget.videoChatMessageController.addListener(_update);
-    var conferenceId =
-        widget.videoChatMessageController.conference!.conferenceId;
-    RemoteVideoRenderController? remoteVideoRenderController =
-        videoConferenceRenderPool.getRemoteVideoRenderController(conferenceId);
-    if (remoteVideoRenderController != null) {
-      remoteVideoRenderController.addListener(_update);
+    String? conferenceId = widget.videoChatMessageController.conferenceId;
+    if (conferenceId != null) {
+      RemoteVideoRenderController? remoteVideoRenderController =
+          videoConferenceRenderPool
+              .getRemoteVideoRenderController(conferenceId);
+      if (remoteVideoRenderController != null) {
+        remoteVideoRenderController.addListener(_update);
+      }
     }
   }
 
@@ -157,12 +159,13 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
 
   @override
   void dispose() {
-    var conferenceId =
-        widget.videoChatMessageController.conference!.conferenceId;
-    var remoteVideoRenderController =
-        videoConferenceRenderPool.getRemoteVideoRenderController(conferenceId);
-    if (remoteVideoRenderController != null) {
-      remoteVideoRenderController.removeListener(_update);
+    String? conferenceId = widget.videoChatMessageController.conferenceId;
+    if (conferenceId != null) {
+      var remoteVideoRenderController = videoConferenceRenderPool
+          .getRemoteVideoRenderController(conferenceId);
+      if (remoteVideoRenderController != null) {
+        remoteVideoRenderController.removeListener(_update);
+      }
     }
     super.dispose();
   }
