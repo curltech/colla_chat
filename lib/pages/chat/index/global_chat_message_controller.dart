@@ -59,7 +59,7 @@ class GlobalChatMessageController with ChangeNotifier {
         _receivers[chatMessage.subMessageType];
     if (fns != null && fns.isNotEmpty) {
       for (var fn in fns) {
-        await fn(chatMessage);
+        fn(chatMessage);
       }
     }
   }

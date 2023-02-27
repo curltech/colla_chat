@@ -2,9 +2,11 @@ import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
+import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 ///视频通话的一个房间内的所有的webrtc连接及其包含的远程视频，
 ///这些连接与自己正在视频通话，此控制器用于通知视频通话界面的刷新
@@ -106,6 +108,10 @@ class RemoteVideoRenderController extends VideoRenderController {
     var key = _getKey(peerConnection.peerId, peerConnection.clientId);
     if (!_peerConnections.containsKey(key)) {
       _peerConnections[key] = peerConnection;
+      peerConnection.registerWebrtcEvent(
+          WebrtcEventType.stream, _onAddRemoteStream);
+      peerConnection.registerWebrtcEvent(
+          WebrtcEventType.removeStream, _onRemoveRemoteStream);
       VideoRenderController? videoRenderController =
           videoRenderControllers[key];
       if (videoRenderController == null) {
@@ -117,11 +123,38 @@ class RemoteVideoRenderController extends VideoRenderController {
     }
   }
 
+  ///远程流到来渲染流
+  Future<void> _onAddRemoteStream(WebrtcEvent webrtcEvent) async {
+    MediaStream stream = webrtcEvent.data;
+    String peerId = webrtcEvent.peerId;
+    String clientId = webrtcEvent.clientId;
+    String name = webrtcEvent.name;
+    String streamId = stream.id;
+    PeerVideoRender? videoRender = videoRenders[streamId];
+    if (videoRender != null) {
+      return;
+    }
+    PeerVideoRender render = await PeerVideoRender.fromMediaStream(peerId,
+        clientId: clientId, name: name, stream: stream);
+    add(render);
+  }
+
+  //远程关闭流事件触发
+  Future<void> _onRemoveRemoteStream(WebrtcEvent webrtcEvent) async {
+    MediaStream stream = webrtcEvent.data;
+    String streamId = stream.id;
+    close(streamId: streamId);
+  }
+
   ///将连接移出控制器，对应的视频通话流关闭
   removeAdvancedPeerConnection(AdvancedPeerConnection peerConnection) {
     var key = _getKey(peerConnection.peerId, peerConnection.clientId);
     var advancedPeerConnection = _peerConnections.remove(key);
     if (advancedPeerConnection != null) {
+      peerConnection.unregisterWebrtcEvent(
+          WebrtcEventType.stream, _onAddRemoteStream);
+      peerConnection.unregisterWebrtcEvent(
+          WebrtcEventType.removeStream, _onRemoveRemoteStream);
       VideoRenderController? controller = videoRenderControllers.remove(key);
       if (controller != null) {
         for (var streamId in controller.videoRenders.keys) {
@@ -129,7 +162,6 @@ class RemoteVideoRenderController extends VideoRenderController {
         }
         controller.close();
       }
-      advancedPeerConnection.conference = null;
       notifyListeners();
     }
   }

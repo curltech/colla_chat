@@ -156,7 +156,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     }
   }
 
-  _updatePeerConnectionStatus(WebrtcEvent event) {
+  Future<void> _updatePeerConnectionStatus(WebrtcEvent event) async {
     PeerConnectionStatus status = event.data;
     var oldStatus = _peerConnectionStatus.value;
     if (oldStatus != status) {

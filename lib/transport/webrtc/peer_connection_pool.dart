@@ -10,7 +10,6 @@ import 'package:colla_chat/p2p/chain/action/signal.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
@@ -131,7 +130,7 @@ class PeerConnectionPool {
 
   Map<String, dynamic> protocolHandlers = {};
 
-  Map<String, List<Function(WebrtcEvent event)>> fnsm = {};
+  Map<String, List<Future<void> Function(WebrtcEvent event)>> fnsm = {};
 
   PeerConnectionPool() {
     signalAction.registerReceiver(onSignal);
@@ -193,25 +192,31 @@ class PeerConnectionPool {
     }
   }
 
-  registerWebrtcEvent(
-      String peerId, WebrtcEventType eventType, Function(WebrtcEvent) fn) {
-    List<Function(WebrtcEvent)>? fns = fnsm['$peerId:${eventType.name}'];
+  String _getKey(String peerId, WebrtcEventType eventType) {
+    return '$peerId:${eventType.name}';
+  }
+
+  registerWebrtcEvent(String peerId, WebrtcEventType eventType,
+      Future<void> Function(WebrtcEvent) fn) {
+    String key = _getKey(peerId, eventType);
+    List<Future<void> Function(WebrtcEvent)>? fns = fnsm[key];
     if (fns == null) {
       fns = [];
-      fnsm['$peerId:${eventType.name}'] = fns;
+      fnsm[key] = fns;
     }
     fns.add(fn);
   }
 
-  unregisterWebrtcEvent(
-      String peerId, WebrtcEventType eventType, Function(WebrtcEvent) fn) {
-    List<Function(WebrtcEvent)>? fns = fnsm['$peerId:${eventType.name}'];
+  unregisterWebrtcEvent(String peerId, WebrtcEventType eventType,
+      Future<void> Function(WebrtcEvent) fn) {
+    String key = _getKey(peerId, eventType);
+    List<Future<void> Function(WebrtcEvent)>? fns = fnsm[key];
     if (fns == null) {
       return;
     }
     fns.remove(fn);
     if (fns.isEmpty) {
-      fnsm.remove('$peerId:${eventType.name}');
+      fnsm.remove(key);
     }
   }
 
@@ -219,7 +224,8 @@ class PeerConnectionPool {
     String peerId = event.peerId;
     WebrtcEventType eventType = event.eventType;
     logger.w('Webrtc peer connection $peerId webrtcEvent $eventType coming');
-    List<Function(WebrtcEvent)>? fns = fnsm['$peerId:${eventType.name}'];
+    String key = _getKey(peerId, eventType);
+    List<Future<void> Function(WebrtcEvent)>? fns = fnsm[key];
     if (fns != null) {
       for (var fn in fns) {
         fn(event);
@@ -289,8 +295,7 @@ class PeerConnectionPool {
           'peerId:$peerId clientId:$clientId is closed and will be re-created!');
     }
     //创建新的主叫方
-    peerConnection = AdvancedPeerConnection(peerId, true,
-        clientId: clientId, conference: conference);
+    peerConnection = AdvancedPeerConnection(peerId, true, clientId: clientId);
     String name = unknownName;
     Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
     if (linkman != null) {
@@ -451,8 +456,8 @@ class PeerConnectionPool {
         getOne(peerId, clientId: clientId);
     if (advancedPeerConnection == null) {
       logger.i('advancedPeerConnection is null,create new one');
-      advancedPeerConnection = AdvancedPeerConnection(peerId, false,
-          clientId: clientId, name: name, conference: conference);
+      advancedPeerConnection =
+          AdvancedPeerConnection(peerId, false, clientId: clientId, name: name);
       await put(peerId, advancedPeerConnection, clientId: clientId);
       var result = await advancedPeerConnection.init(iceServers: iceServers);
       if (!result) {
@@ -609,10 +614,7 @@ class PeerConnectionPool {
   ///收到发来的ChatMessage的payload（map对象），进行后续的action处理
   onMessage(WebrtcEvent event) async {
     logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onMessage');
-    ChatMessage chatMessage = ChatMessage.fromJson(event.data);
-
-    ///对消息进行业务处理
-    await globalChatMessageController.receiveChatMessage(chatMessage);
+    onWebrtcEvent(event);
   }
 
   onStatusChanged(WebrtcEvent event) async {
@@ -628,6 +630,7 @@ class PeerConnectionPool {
     onWebrtcEvent(event);
   }
 
+  ///从池中移除连接
   onClosed(WebrtcEvent event) async {
     logger.i('peerId: ${event.peerId} clientId:${event.clientId} is closed');
     remove(event.peerId, clientId: event.clientId);
@@ -707,37 +710,6 @@ class PeerConnectionPool {
     }
 
     return status;
-  }
-
-  ///调用signalAction发送signal到信号服务器
-  Future<bool> signal(WebrtcEvent evt) async {
-    try {
-      var peerId = evt.peerId;
-      var clientId = evt.clientId;
-      AdvancedPeerConnection? advancedPeerConnection =
-          getOne(peerId, clientId: clientId);
-      if (advancedPeerConnection != null && advancedPeerConnection.connected) {
-        ChatMessage chatMessage = await chatMessageService.buildChatMessage(
-            peerId,
-            content: evt.data,
-            clientId: clientId,
-            messageType: ChatMessageType.system,
-            subMessageType: ChatMessageSubType.signal);
-        await chatMessageService.sendAndStore(chatMessage);
-        // logger.w(
-        //     'sent signal chatMessage by webrtc peerId:$peerId, clientId:$clientId, signal:$jsonStr');
-      } else {
-        var success = await signalAction.signal(evt.data, peerId,
-            targetClientId: clientId);
-        if (!success) {
-          logger.e('signalAction signal err');
-        }
-        return success;
-      }
-    } catch (err) {
-      logger.e('signal err:$err');
-    }
-    return false;
   }
 }
 
