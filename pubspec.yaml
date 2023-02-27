@@ -210,6 +210,7 @@ dependencies:
   flutter_inappwebview: ^5.7.2+3
   #flutter_webview_pro: ^3.0.1+4
   webview_flutter: ^3.0.4 #web显示
+  flutter_rte: ^0.4.1
   #easy_web_view: ^1.6.0
 
   # 多媒体
