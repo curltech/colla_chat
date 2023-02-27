@@ -512,6 +512,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       content: receiptType.name,
     );
     var currentDate = DateUtil.currentDate();
+    chatReceipt.receiverAddress ??= chatMessage.senderAddress;
     chatReceipt.receiptTime = currentDate;
     chatReceipt.receiveTime = chatMessage.receiveTime;
     chatReceipt.readTime = currentDate;
