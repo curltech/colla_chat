@@ -146,8 +146,8 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
           child: Text('No conference', style: TextStyle(color: Colors.white)));
     }
     return Container(
-        padding: const EdgeInsets.all(5.0),
-        color: Colors.black.withOpacity(0.5),
+        padding: const EdgeInsets.all(0.0),
+        color: Colors.black,
         child: VideoViewCard(
           videoRenderController: remoteVideoRenderController,
         ));

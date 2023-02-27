@@ -3,7 +3,7 @@ import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-///媒体控制器，内部是PeerVideoRender的集合
+///媒体控制器，内部是PeerVideoRender的集合，以流的id为key
 ///LocalVideoRenderController和VideoRoomRenderController是其子类，
 ///前者代表本地的视频和音频的总共只能有一个，屏幕共享和媒体播放可以有多个
 ///后者代表远程的视频，包含所有的远程视频流的PeerVideoRender
@@ -13,10 +13,48 @@ class VideoRenderController with ChangeNotifier {
 
   final Map<String, PeerVideoRender> videoRenders = {};
 
+  Map<String, List<Future<void> Function(PeerVideoRender? videoRender)>> fnsm =
+      {};
+
   VideoRenderController({List<PeerVideoRender> videoRenders = const []}) {
     if (videoRenders.isNotEmpty) {
       for (var render in videoRenders) {
         add(render);
+      }
+    }
+  }
+
+  registerVideoRenderOperator(
+      String videoRenderOperator, Future<void> Function(PeerVideoRender?) fn) {
+    List<Future<void> Function(PeerVideoRender?)>? fns =
+        fnsm[videoRenderOperator];
+    if (fns == null) {
+      fns = [];
+      fnsm[videoRenderOperator] = fns;
+    }
+    fns.add(fn);
+  }
+
+  unregisterVideoRenderOperator(
+      String videoRenderOperator, Future<void> Function(PeerVideoRender?) fn) {
+    List<Future<void> Function(PeerVideoRender?)>? fns =
+        fnsm[videoRenderOperator];
+    if (fns == null) {
+      return;
+    }
+    fns.remove(fn);
+    if (fns.isEmpty) {
+      fnsm.remove(videoRenderOperator);
+    }
+  }
+
+  onVideoRenderOperator(
+      String videoRenderOperator, PeerVideoRender? videoRender) {
+    List<Future<void> Function(PeerVideoRender?)>? fns =
+        fnsm[videoRenderOperator];
+    if (fns != null) {
+      for (var fn in fns) {
+        fn(videoRender);
       }
     }
   }
@@ -74,7 +112,7 @@ class VideoRenderController with ChangeNotifier {
     var id = videoRender.id;
     if (id != null && !videoRenders.containsKey(id)) {
       videoRenders[id] = videoRender;
-      notifyListeners();
+      onVideoRenderOperator(VideoRenderOperator.remove.name, videoRender);
     }
   }
 
@@ -83,7 +121,7 @@ class VideoRenderController with ChangeNotifier {
     if (id != null && videoRenders.containsKey(id)) {
       videoRender.dispose();
       videoRenders.remove(id);
-      notifyListeners();
+      onVideoRenderOperator(VideoRenderOperator.remove.name, videoRender);
     }
   }
 
@@ -95,6 +133,7 @@ class VideoRenderController with ChangeNotifier {
       }
       videoRenders.clear();
       _videoRender = null;
+      onVideoRenderOperator(VideoRenderOperator.close.name, null);
     } else {
       var videoRender = videoRenders[streamId];
       if (videoRender != null) {
@@ -103,9 +142,9 @@ class VideoRenderController with ChangeNotifier {
         if (_videoRender != null && _videoRender!.id == streamId) {
           _videoRender = null;
         }
+        onVideoRenderOperator(VideoRenderOperator.remove.name, videoRender);
       }
     }
-    notifyListeners();
   }
 }
 
@@ -127,8 +166,6 @@ class LocalVideoRenderController extends VideoRenderController {
       _videoChatRender = videoRender;
       if (videoRender != null) {
         add(videoRender);
-      } else {
-        notifyListeners();
       }
     }
   }
@@ -158,6 +195,7 @@ class LocalVideoRenderController extends VideoRenderController {
       minFrameRate: minFrameRate,
     );
     videoChatRender = render;
+    onVideoRenderOperator(VideoRenderOperator.create.name, videoRender);
 
     return render;
   }
@@ -170,6 +208,7 @@ class LocalVideoRenderController extends VideoRenderController {
       name: myself.myselfPeer.name,
     );
     videoChatRender = render;
+    onVideoRenderOperator(VideoRenderOperator.create.name, videoRender);
 
     return render;
   }

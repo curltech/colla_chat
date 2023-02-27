@@ -25,8 +25,8 @@ class RemoteVideoRenderController extends VideoRenderController {
     return key;
   }
 
-  ///增加视频render，确保之前连接已经加入
-  ///新增的render还要加入到对应的连接的控制器中
+  ///增加远程视频render，确保之前连接已经加入
+  ///新增的远程视频render还要加入到对应的连接的控制器中
   @override
   add(PeerVideoRender videoRender) {
     super.add(videoRender);
@@ -41,6 +41,22 @@ class RemoteVideoRenderController extends VideoRenderController {
         videoRenderControllers[key] = videoRenderController;
       }
       videoRenderController.add(videoRender);
+    }
+  }
+
+  ///把本地新的videoRender加入到会议的所有连接中，并且都重新协商
+  addLocalVideoRender(PeerVideoRender videoRender) {
+    for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
+      peerConnection.addLocalRender(videoRender);
+      peerConnection.negotiate();
+    }
+  }
+
+  ///会议的所有连接中移除本地videoRender，并且都重新协商
+  removeLocalVideoRender(PeerVideoRender videoRender) {
+    for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
+      peerConnection.removeLocalRender(videoRender);
+      peerConnection.negotiate();
     }
   }
 
@@ -245,6 +261,23 @@ class VideoConferenceRenderPool with ChangeNotifier {
     _conferenceId = conferenceId;
 
     return remoteVideoRenderController;
+  }
+
+  ///把本地新的videoRender加入到会议的所有连接中，并且都重新协商
+  addLocalVideoRender(String conferenceId, PeerVideoRender videoRender) {
+    RemoteVideoRenderController? remoteVideoRenderController =
+        remoteVideoRenderControllers[conferenceId];
+    if (remoteVideoRenderController != null) {
+      remoteVideoRenderController.addLocalVideoRender(videoRender);
+    }
+  }
+
+  removeLocalVideoRender(String conferenceId, PeerVideoRender videoRender) {
+    RemoteVideoRenderController? remoteVideoRenderController =
+        remoteVideoRenderControllers[conferenceId];
+    if (remoteVideoRenderController != null) {
+      remoteVideoRenderController.removeLocalVideoRender(videoRender);
+    }
   }
 
   closeConferenceId(String conferenceId) {

@@ -92,7 +92,10 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     //视频通话的消息存放地
     widget.videoChatMessageController.addListener(_updateVideoChatReceipt);
     //本地视频的存放地
-    localVideoRenderController.addListener(_updateLocalVideoRender);
+    localVideoRenderController.registerVideoRenderOperator(
+        VideoRenderOperator.remove.name, _removeLocalVideoRender);
+    localVideoRenderController.registerVideoRenderOperator(
+        VideoRenderOperator.add.name, _addLocalVideoRender);
     _buildActionDataAndVisible();
     if (widget.videoChatMessageController.conference == null) {
       videoChatStatus.value = VideoChatStatus.end;
@@ -101,7 +104,14 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
   }
 
-  _updateLocalVideoRender() {
+  Future<void> _addLocalVideoRender(PeerVideoRender? videoRender) async {
+    if (mounted) {
+      _buildActionDataAndVisible();
+    }
+  }
+
+  Future<void> _removeLocalVideoRender(PeerVideoRender? videoRender) async {
+    removeLocalVideoRender(videoRender!);
     if (mounted) {
       _buildActionDataAndVisible();
     }
@@ -264,30 +274,32 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   Future<PeerVideoRender?> _openVideoMedia({bool video = true}) async {
     ///本地视频不存在，可以直接创建，并发送视频邀请消息，否则根据情况觉得是否音视频切换
-    PeerVideoRender? videoChatRender =
-        localVideoRenderController.videoChatRender;
-    if (videoChatRender == null) {
+    PeerVideoRender? videoRender = localVideoRenderController.videoChatRender;
+    if (videoRender == null) {
       if (video) {
-        videoChatRender =
-            await localVideoRenderController.createVideoMediaRender();
+        videoRender = await localVideoRenderController.createVideoMediaRender();
       } else {
-        videoChatRender =
-            await localVideoRenderController.createAudioMediaRender();
+        videoRender = await localVideoRenderController.createAudioMediaRender();
       }
+      addLocalVideoRender(videoRender);
     } else {
       if (video) {
         if (!localVideoRenderController.video) {
-          videoChatRender =
+          removeLocalVideoRender(videoRender);
+          videoRender =
               await localVideoRenderController.createVideoMediaRender();
+          addLocalVideoRender(videoRender);
         }
       } else {
         if (localVideoRenderController.video) {
-          videoChatRender =
+          removeLocalVideoRender(videoRender);
+          videoRender =
               await localVideoRenderController.createAudioMediaRender();
+          addLocalVideoRender(videoRender);
         }
       }
     }
-    return videoChatRender;
+    return videoRender;
   }
 
   Future<PeerVideoRender?> _openDisplayMedia() async {
@@ -296,8 +308,10 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       builder: (context) => Dialog(child: ScreenSelectDialog()),
     );
     if (source != null) {
-      return await localVideoRenderController.createDisplayMediaRender(
-          selectedSource: source);
+      PeerVideoRender videoRender = await localVideoRenderController
+          .createDisplayMediaRender(selectedSource: source);
+      addLocalVideoRender(videoRender);
+      return videoRender;
     }
     return null;
   }
@@ -308,10 +322,31 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       DialogUtil.error(context, content: AppLocalizations.t('No conference'));
       return null;
     }
-    PeerVideoRender? videoChatRender =
+    PeerVideoRender? videoRender =
         await localVideoRenderController.createMediaStreamRender(stream);
+    addLocalVideoRender(videoRender);
 
-    return videoChatRender;
+    return videoRender;
+  }
+
+  addLocalVideoRender(PeerVideoRender videoRender) {
+    Conference? conference = widget.videoChatMessageController.conference;
+
+    if (conference != null &&
+        videoChatStatus.value == VideoChatStatus.chatting) {
+      videoConferenceRenderPool.addLocalVideoRender(
+          conference.conferenceId, videoRender);
+    }
+  }
+
+  removeLocalVideoRender(PeerVideoRender videoRender) {
+    Conference? conference = widget.videoChatMessageController.conference;
+
+    if (conference != null &&
+        videoChatStatus.value == VideoChatStatus.chatting) {
+      videoConferenceRenderPool.removeLocalVideoRender(
+          conference.conferenceId, videoRender);
+    }
   }
 
   ///呼叫，打开本地视频，如果没有会议，先创建会议，发送视频通话邀请消息
@@ -379,7 +414,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     //延时60秒后自动挂断
     Future.delayed(const Duration(seconds: 60)).then((value) {
       if (videoChatStatus.value != VideoChatStatus.end) {
-        //videoChatStatus.value = VideoChatStatus.end;
         _stop();
       }
     });
@@ -603,7 +637,10 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   @override
   void dispose() {
-    localVideoRenderController.removeListener(_updateLocalVideoRender);
+    localVideoRenderController.unregisterVideoRenderOperator(
+        VideoRenderOperator.remove.name, _removeLocalVideoRender);
+    localVideoRenderController.unregisterVideoRenderOperator(
+        VideoRenderOperator.add.name, _addLocalVideoRender);
     widget.videoChatMessageController.removeListener(_updateVideoChatReceipt);
     super.dispose();
   }
