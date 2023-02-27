@@ -1,7 +1,5 @@
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/richtext/quill_richtext_widget.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class CollectionItemWidget extends StatefulWidget with TileDataMixin {
@@ -39,7 +37,7 @@ class _CollectionItemWidgetState extends State<CollectionItemWidget> {
     return AppBarView(
       centerTitle: false,
       title: widget.title,
-      child: const QuillRichTextWidget(),
+      child: Container(),
     );
   }
 }

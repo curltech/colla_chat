@@ -64,7 +64,6 @@ class FluentWidgetFactory extends WidgetFactory {
   Widget buildTextFormField({
     Key? key,
     TextEditingController? controller,
-    String? initialValue,
     FocusNode? focusNode,
     material.InputDecoration? decoration = const material.InputDecoration(),
     TextInputType? keyboardType,
@@ -118,7 +117,6 @@ class FluentWidgetFactory extends WidgetFactory {
     return TextFormBox(
       key: key,
       controller: controller,
-      initialValue: initialValue,
       focusNode: focusNode,
       //decoration: decoration,
       keyboardType: keyboardType,
@@ -205,7 +203,7 @@ class FluentWidgetFactory extends WidgetFactory {
     bool? enabled,
     double cursorWidth = 2.0,
     double? cursorHeight,
-    Radius? cursorRadius,
+    required Radius cursorRadius,
     Color? cursorColor,
     Brightness? keyboardAppearance,
     EdgeInsets scrollPadding = const EdgeInsets.all(20.0),
