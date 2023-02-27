@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -104,10 +105,11 @@ class _DataListViewState extends State<DataListView> {
         margin: const EdgeInsets.only(top: 2.0),
         child: Column(children: <Widget>[
           dataListTile,
-          const Padding(
-            padding: EdgeInsets.only(left: 2.0, right: 2.0),
+          Padding(
+            padding: const EdgeInsets.only(left: 2.0, right: 2.0),
             child: Divider(
-              height: 0.5,
+              height: 1,
+              color: Colors.grey.withOpacity(AppOpacity.lgOpacity),
             ),
           ),
         ]));

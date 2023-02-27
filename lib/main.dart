@@ -74,7 +74,6 @@ void main(List<String> args) async {
       WindowsWebViewPlatform.registerWith();
     }
     if (platformParams.android) {
-      //webview.WebView.platform = webview.AndroidWebView();
       inapp.AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
     }
     if (platformParams.windows ||
