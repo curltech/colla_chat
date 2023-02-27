@@ -92,7 +92,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     //视频通话的消息存放地
     widget.videoChatMessageController.addListener(_updateVideoChatReceipt);
     //本地视频的存放地
-    localVideoRenderController.addListener(_update);
+    localVideoRenderController.addListener(_updateLocalVideoRender);
     _buildActionDataAndVisible();
     if (widget.videoChatMessageController.conference == null) {
       videoChatStatus.value = VideoChatStatus.end;
@@ -101,10 +101,9 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
   }
 
-  _update() {
+  _updateLocalVideoRender() {
     if (mounted) {
       _buildActionDataAndVisible();
-      videoChatStatus.value = VideoChatStatus.chatting;
     }
   }
 
@@ -306,7 +305,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   Future<PeerVideoRender?> _openMediaStream(MediaStream stream) async {
     ChatMessage? chatMessage = widget.videoChatMessageController.chatMessage;
     if (chatMessage == null) {
-      DialogUtil.error(context, content: AppLocalizations.t('No room'));
+      DialogUtil.error(context, content: AppLocalizations.t('No conference'));
       return null;
     }
     PeerVideoRender? videoChatRender =
@@ -604,8 +603,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   @override
   void dispose() {
-    localVideoRenderController.removeListener(_update);
-    widget.videoChatMessageController.removeListener(_update);
+    localVideoRenderController.removeListener(_updateLocalVideoRender);
+    widget.videoChatMessageController.removeListener(_updateVideoChatReceipt);
     super.dispose();
   }
 }
