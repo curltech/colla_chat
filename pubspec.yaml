@@ -77,7 +77,7 @@ dependencies:
   dio: ^4.0.6
   dio_http2_adapter: ^2.0.0
   web_socket_channel: ^2.2.0
-  cached_network_image: ^3.0.0
+  #cached_network_image: ^3.0.0
   telephony: 0.2.0
 
   #界面

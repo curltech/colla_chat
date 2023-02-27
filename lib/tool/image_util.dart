@@ -3,11 +3,9 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:ui' as ui;
 
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
-import 'package:colla_chat/transport/httpclient.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -85,18 +83,17 @@ class ImageUtil {
         fit: fit,
       );
     } else if (ImageUtil.isNetWorkImg(image)) {
-      imageWidget = CachedNetworkImage(
-        imageUrl: image,
+      imageWidget = Image.network(
+        image,
         key: UniqueKey(),
         width: width,
         height: height,
         fit: fit,
-        cacheManager: defaultCacheManager,
       );
     } else {
       imageWidget = Image.asset(
-        key: UniqueKey(),
         AppImageFile.mdAppIconFile,
+        key: UniqueKey(),
         width: width,
         height: height,
         fit: fit,
