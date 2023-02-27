@@ -1,15 +1,15 @@
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart' as inapp;
-import 'package:webview_flutter/platform_interface.dart';
 import 'package:webview_flutter/webview_flutter.dart' as webview;
+import 'package:webview_flutter/webview_flutter.dart';
 
 class PlatformWebViewController with ChangeNotifier {
   inapp.InAppWebViewController? inAppWebViewController;
   webview.WebViewController? webViewController;
 
+  ///包装两种webview的实现
   PlatformWebViewController(
       {this.webViewController, this.inAppWebViewController});
 
@@ -48,7 +48,7 @@ class PlatformWebViewController with ChangeNotifier {
       }
     } else if (filename.startsWith('http')) {
       if (webViewController != null) {
-        await webViewController!.loadUrl(filename);
+        await webViewController!.loadRequest(Uri.parse(filename));
       } else if (inAppWebViewController != null) {
         inapp.URLRequest urlRequest =
             inapp.URLRequest(url: Uri.parse(filename));
@@ -139,6 +139,26 @@ class _PlatformWebViewState extends State<PlatformWebView> {
   @override
   void initState() {
     super.initState();
+    webViewController = PlatformWebViewController(
+        webViewController: WebViewController()
+          ..setJavaScriptMode(JavaScriptMode.unrestricted)
+          ..setBackgroundColor(const Color(0x00000000))
+          ..setNavigationDelegate(
+            NavigationDelegate(
+              onProgress: (int progress) {
+                // Update loading bar.
+              },
+              onPageStarted: (String url) {},
+              onPageFinished: (String url) {},
+              onWebResourceError: (WebResourceError error) {},
+              onNavigationRequest: (NavigationRequest request) {
+                if (request.url.startsWith('https://www.youtube.com/')) {
+                  return NavigationDecision.prevent;
+                }
+                return NavigationDecision.navigate;
+              },
+            ),
+          ));
   }
 
   _onWebViewCreated(dynamic controller) {
@@ -152,18 +172,9 @@ class _PlatformWebViewState extends State<PlatformWebView> {
   Widget build(BuildContext context) {
     Widget webviewWidget;
     if (platformParams.windows || platformParams.mobile || platformParams.web) {
-      webviewWidget = webview.WebView(
+      webviewWidget = WebViewWidget(
         key: UniqueKey(),
-        backgroundColor: Colors.black,
-        initialUrl: widget.initialUrl,
-        javascriptMode: webview.JavascriptMode.unrestricted,
-        onWebViewCreated: _onWebViewCreated,
-        onPageStarted: (url) => logger.i("onPageStarted: $url"),
-        onPageFinished: (url) => logger.i("onPageFinished"),
-        onWebResourceError: (error) => logger.i("error: ${error.failingUrl}"),
-        gestureNavigationEnabled: true,
-        allowsInlineMediaPlayback: true,
-        initialMediaPlaybackPolicy: AutoMediaPlaybackPolicy.always_allow,
+        controller: webViewController!.webViewController!,
       );
     } else {
       webviewWidget = inapp.InAppWebView(

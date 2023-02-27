@@ -1,7 +1,3 @@
-import 'dart:async';
-
-import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -29,25 +25,30 @@ class MobileWebViewWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _MobileWebViewWidgetState extends State<MobileWebViewWidget> {
-  final Completer<WebViewController> controller =
-      Completer<WebViewController>();
+  late final WebViewController webViewController;
 
   @override
   void initState() {
     super.initState();
-    if (platformParams.android) {
-      WebView.platform = SurfaceAndroidWebView();
-    }
-  }
-
-  JavascriptChannel _toasterJavascriptChannel(BuildContext context) {
-    return JavascriptChannel(
-        name: 'Toaster',
-        onMessageReceived: (JavascriptMessage message) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(message.message)),
-          );
-        });
+    webViewController = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..setBackgroundColor(const Color(0x00000000))
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onProgress: (int progress) {
+            // Update loading bar.
+          },
+          onPageStarted: (String url) {},
+          onPageFinished: (String url) {},
+          onWebResourceError: (WebResourceError error) {},
+          onNavigationRequest: (NavigationRequest request) {
+            if (request.url.startsWith('https://www.youtube.com/')) {
+              return NavigationDecision.prevent;
+            }
+            return NavigationDecision.navigate;
+          },
+        ),
+      );
   }
 
   @override
@@ -55,34 +56,9 @@ class _MobileWebViewWidgetState extends State<MobileWebViewWidget> {
     var appBarView = AppBarView(
       title: widget.title,
       withLeading: widget.withLeading,
-      child: WebView(
-        initialUrl: widget.url,
-        javascriptMode: JavascriptMode.unrestricted,
-        onWebViewCreated: (WebViewController webViewController) {
-          controller.complete(webViewController);
-        },
-        onProgress: (int progress) {
-          logger.i('WebView is loading (progress : $progress%)');
-        },
-        javascriptChannels: <JavascriptChannel>{
-          _toasterJavascriptChannel(context),
-        },
-        navigationDelegate: (NavigationRequest request) {
-          if (request.url.startsWith('https://www.youtube.com/')) {
-            logger.i('blocking navigation to $request}');
-            return NavigationDecision.prevent;
-          }
-          logger.i('allowing navigation to $request');
-          return NavigationDecision.navigate;
-        },
-        onPageStarted: (String url) {
-          logger.i('Page started loading: $url');
-        },
-        onPageFinished: (String url) {
-          logger.i('Page finished loading: $url');
-        },
-        gestureNavigationEnabled: true,
-        backgroundColor: const Color(0x00000000),
+      child: WebViewWidget(
+        key: UniqueKey(),
+        controller: webViewController,
       ),
     );
 

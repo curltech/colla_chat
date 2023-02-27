@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
@@ -19,7 +18,6 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
-import 'package:webview_flutter/webview_flutter.dart' as webview;
 import 'package:webview_win_floating/webview.dart';
 import 'package:window_manager/window_manager.dart';
 
@@ -73,10 +71,10 @@ void main(List<String> args) async {
   // }
   ServiceLocator.init().then((bool loginStatus) {
     if (platformParams.windows) {
-      webview.WebView.platform = WindowsWebViewPlugin();
+      WindowsWebViewPlatform.registerWith();
     }
     if (platformParams.android) {
-      webview.WebView.platform = webview.AndroidWebView();
+      //webview.WebView.platform = webview.AndroidWebView();
       inapp.AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
     }
     if (platformParams.windows ||
