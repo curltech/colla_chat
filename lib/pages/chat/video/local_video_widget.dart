@@ -66,7 +66,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ValueNotifier<bool> controlPanelVisible = ValueNotifier<bool>(true);
 
   //视频通话窗口的可见性
-  ValueNotifier<bool> videoViewVisible = ValueNotifier<bool>(false);
+  ValueNotifier<int> videoViewCount = ValueNotifier<int>(0);
 
   //视频功能按钮对应的数据
   ValueNotifier<List<ActionData>> actionData =
@@ -93,9 +93,9 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     widget.videoChatMessageController.addListener(_updateVideoChatReceipt);
     //本地视频的存放地
     localVideoRenderController.registerVideoRenderOperator(
-        VideoRenderOperator.remove.name, _removeLocalVideoRender);
-    localVideoRenderController.registerVideoRenderOperator(
         VideoRenderOperator.add.name, _addLocalVideoRender);
+    localVideoRenderController.registerVideoRenderOperator(
+        VideoRenderOperator.remove.name, _removeLocalVideoRender);
     _buildActionDataAndVisible();
     if (widget.videoChatMessageController.conference == null) {
       videoChatStatus.value = VideoChatStatus.end;
@@ -105,9 +105,11 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   Future<void> _addLocalVideoRender(PeerVideoRender? videoRender) async {
+    addLocalVideoRender(videoRender!);
     if (mounted) {
       _buildActionDataAndVisible();
     }
+    videoViewCount.value = localVideoRenderController.videoRenders.length;
   }
 
   Future<void> _removeLocalVideoRender(PeerVideoRender? videoRender) async {
@@ -115,6 +117,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (mounted) {
       _buildActionDataAndVisible();
     }
+    videoViewCount.value = localVideoRenderController.videoRenders.length;
   }
 
   ///如果视频邀请消息的回执到来，如果不在此界面的时候，新的回执不会被此处理
@@ -179,7 +182,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     //       icon: const Icon(Icons.video_file, color: Colors.white)),
     // );
     if (localVideoRenderController.videoRenders.isNotEmpty) {
-      videoViewVisible.value = true;
+      videoViewCount.value = localVideoRenderController.videoRenders.length;
       actionData.add(
         ActionData(
             label: 'Close',
@@ -188,7 +191,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                 const Icon(Icons.closed_caption_disabled, color: Colors.white)),
       );
     } else {
-      videoViewVisible.value = false;
+      videoViewCount.value = localVideoRenderController.videoRenders.length;
       controlPanelVisible.value = true;
     }
     this.actionData.value = actionData;
@@ -233,18 +236,20 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       if (conference != null) {
         return conference;
       }
-      await DialogUtil.show(
-          context: context,
-          builder: (BuildContext context) {
-            return GroupLinkmanWidget(
-              onSelected: (List<String> peerIds) {
-                participants.addAll(peerIds);
-                Navigator.pop(context, participants);
-              },
-              selected: const <String>[],
-              groupPeerId: groupPeerId,
-            );
-          });
+      if (mounted) {
+        await DialogUtil.show(
+            context: context,
+            builder: (BuildContext context) {
+              return GroupLinkmanWidget(
+                onSelected: (List<String> peerIds) {
+                  participants.addAll(peerIds);
+                  Navigator.pop(context, participants);
+                },
+                selected: const <String>[],
+                groupPeerId: groupPeerId,
+              );
+            });
+      }
     }
     if (partyType == PartyType.linkman.name) {
       var peerId = widget.videoChatMessageController.peerId;
@@ -610,10 +615,10 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   @override
   Widget build(BuildContext context) {
     var videoViewCard = GestureDetector(
-      child: ValueListenableBuilder<bool>(
-          valueListenable: videoViewVisible,
+      child: ValueListenableBuilder<int>(
+          valueListenable: videoViewCount,
           builder: (context, value, child) {
-            if (value) {
+            if (value > 0) {
               return VideoViewCard(
                 videoRenderController: localVideoRenderController,
               );

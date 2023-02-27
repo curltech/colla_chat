@@ -60,7 +60,7 @@ class RemoteVideoRenderController extends VideoRenderController {
     }
   }
 
-  ///关闭streamId的流或者关闭附件所有控制器的所有流，相当于关闭了房间
+  ///关闭streamId的流或者关闭附件所有控制器的所有流，相当于关闭了会议
   @override
   close({String? streamId}) {
     super.close(streamId: streamId);

@@ -112,7 +112,7 @@ class VideoRenderController with ChangeNotifier {
     var id = videoRender.id;
     if (id != null && !videoRenders.containsKey(id)) {
       videoRenders[id] = videoRender;
-      onVideoRenderOperator(VideoRenderOperator.remove.name, videoRender);
+      onVideoRenderOperator(VideoRenderOperator.add.name, videoRender);
     }
   }
 

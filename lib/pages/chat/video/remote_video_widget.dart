@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/video/video_view_card.dart';
+import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -25,9 +26,14 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   //控制面板的可见性，包括视频功能按钮和呼叫按钮
   ValueNotifier<bool> controlPanelVisible = ValueNotifier<bool>(true);
 
+  //视频通话窗口的可见性
+  ValueNotifier<int> videoViewCount = ValueNotifier<int>(0);
+
   //视频功能按钮对应的数据
   ValueNotifier<List<ActionData>> actionData =
       ValueNotifier<List<ActionData>>([]);
+
+  RemoteVideoRenderController? remoteVideoRenderController;
 
   //控制面板可见性的计时器
   Timer? _hideControlPanelTimer;
@@ -36,32 +42,35 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   void initState() {
     super.initState();
     //视频通话的消息存放地
-    widget.videoChatMessageController.addListener(_update);
+    //widget.videoChatMessageController.addListener(_update);
     String? conferenceId = widget.videoChatMessageController.conferenceId;
     if (conferenceId != null) {
-      RemoteVideoRenderController? remoteVideoRenderController =
-          videoConferenceRenderPool
-              .getRemoteVideoRenderController(conferenceId);
+      remoteVideoRenderController = videoConferenceRenderPool
+          .getRemoteVideoRenderController(conferenceId);
       if (remoteVideoRenderController != null) {
-        remoteVideoRenderController.addListener(_update);
+        remoteVideoRenderController!.registerVideoRenderOperator(
+            VideoRenderOperator.add.name, _addLocalVideoRender);
+        remoteVideoRenderController!.registerVideoRenderOperator(
+            VideoRenderOperator.remove.name, _removeLocalVideoRender);
       }
     }
   }
 
-  _update() {
-    if (mounted) {
-      setState(() {});
+  Future<void> _addLocalVideoRender(PeerVideoRender? videoRender) async {
+    if (remoteVideoRenderController != null) {
+      videoViewCount.value = remoteVideoRenderController!.videoRenders.length;
+    }
+  }
+
+  Future<void> _removeLocalVideoRender(PeerVideoRender? videoRender) async {
+    if (remoteVideoRenderController != null) {
+      videoViewCount.value = remoteVideoRenderController!.videoRenders.length;
     }
   }
 
   _close() async {
-    var conferenceId = widget.videoChatMessageController.conferenceId;
-    if (conferenceId != null) {
-      var remoteVideoRenderController = videoConferenceRenderPool
-          .getRemoteVideoRenderController(conferenceId);
-      if (remoteVideoRenderController != null) {
-        remoteVideoRenderController.close();
-      }
+    if (remoteVideoRenderController != null) {
+      remoteVideoRenderController!.close();
     }
   }
 
@@ -129,28 +138,31 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
       child: _buildVideoChatView(context),
       onLongPress: () {
         _toggleActionCard();
-        //focusNode.requestFocus();
       },
     );
   }
 
   Widget _buildVideoChatView(BuildContext context) {
-    String? conferenceId = widget.videoChatMessageController.conferenceId;
-    RemoteVideoRenderController? remoteVideoRenderController;
-    if (conferenceId != null) {
-      remoteVideoRenderController = videoConferenceRenderPool
-          .getRemoteVideoRenderController(conferenceId);
-    }
-    if (remoteVideoRenderController == null) {
-      return const Center(
-          child: Text('No conference', style: TextStyle(color: Colors.white)));
-    }
-    return Container(
-        padding: const EdgeInsets.all(0.0),
-        color: Colors.black,
-        child: VideoViewCard(
-          videoRenderController: remoteVideoRenderController,
-        ));
+    return ValueListenableBuilder<int>(
+        valueListenable: videoViewCount,
+        builder: (context, value, child) {
+          if (remoteVideoRenderController == null) {
+            return const Center(
+                child: Text('No conference',
+                    style: TextStyle(color: Colors.white)));
+          }
+          if (value == 0) {
+            return const Center(
+                child: Text('Video view count is 0',
+                    style: TextStyle(color: Colors.white)));
+          }
+          return Container(
+              padding: const EdgeInsets.all(0.0),
+              color: Colors.black,
+              child: VideoViewCard(
+                videoRenderController: remoteVideoRenderController!,
+              ));
+        });
   }
 
   @override
@@ -163,13 +175,11 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
 
   @override
   void dispose() {
-    String? conferenceId = widget.videoChatMessageController.conferenceId;
-    if (conferenceId != null) {
-      var remoteVideoRenderController = videoConferenceRenderPool
-          .getRemoteVideoRenderController(conferenceId);
-      if (remoteVideoRenderController != null) {
-        remoteVideoRenderController.removeListener(_update);
-      }
+    if (remoteVideoRenderController != null) {
+      remoteVideoRenderController!.unregisterVideoRenderOperator(
+          VideoRenderOperator.add.name, _addLocalVideoRender);
+      remoteVideoRenderController!.unregisterVideoRenderOperator(
+          VideoRenderOperator.remove.name, _removeLocalVideoRender);
     }
     super.dispose();
   }
