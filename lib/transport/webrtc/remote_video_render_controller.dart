@@ -10,6 +10,8 @@ import 'package:flutter_webrtc/flutter_webrtc.dart';
 ///视频通话的一个房间内的所有的webrtc连接及其包含的远程视频，
 ///这些连接与自己正在视频通话，此控制器用于通知视频通话界面的刷新
 class RemoteVideoRenderController extends VideoRenderController {
+  final Key key = UniqueKey();
+
   ///根据peerId和clientId对应的所有的webrtc连接
   final Map<String, AdvancedPeerConnection> _peerConnections = {};
   final VideoChatMessageController? videoChatMessageController;
