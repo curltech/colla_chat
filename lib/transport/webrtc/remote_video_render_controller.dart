@@ -30,6 +30,7 @@ class RemoteVideoRenderController extends VideoRenderController {
   ///新增的远程视频render还要加入到对应的连接的控制器中
   @override
   add(PeerVideoRender videoRender) {
+    //加入总的远程视频控制器
     super.add(videoRender);
     AdvancedPeerConnection? peerConnection =
         getAdvancedPeerConnection(videoRender.peerId!, videoRender.clientId!);
@@ -41,6 +42,7 @@ class RemoteVideoRenderController extends VideoRenderController {
         videoRenderController = VideoRenderController();
         videoRenderControllers[key] = videoRenderController;
       }
+      //加入到对应连接的视频控制器
       videoRenderController.add(videoRender);
     }
   }
