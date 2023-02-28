@@ -1,3 +1,4 @@
+import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/video/single_video_view_widget.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
@@ -6,8 +7,10 @@ import 'package:flutter/material.dart';
 ///多个小视频窗口的排列
 class VideoViewCard extends StatefulWidget {
   final VideoRenderController videoRenderController;
+  final Conference? conference;
 
-  const VideoViewCard({Key? key, required this.videoRenderController})
+  const VideoViewCard(
+      {Key? key, required this.videoRenderController, this.conference})
       : super(key: key);
 
   @override
@@ -37,6 +40,8 @@ class _VideoViewCardState extends State<VideoViewCard> {
     List<Widget> videoViews = [];
     for (var render in videoRenders) {
       Widget videoView = SingleVideoViewWidget(
+        videoRenderController: widget.videoRenderController,
+        conference: widget.conference,
         render: render,
         // width: size.width,
         // height: size.height,

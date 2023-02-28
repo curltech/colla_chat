@@ -1,17 +1,23 @@
+import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
+import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 
 ///单个小视频窗口，显示一个视频流的PeerVideoRender，长按出现更大的窗口，带有操作按钮
 class SingleVideoViewWidget extends StatefulWidget {
+  final VideoRenderController videoRenderController;
+  final Conference? conference;
   final PeerVideoRender render;
   final double? height;
   final double? width;
 
   const SingleVideoViewWidget({
     Key? key,
+    required this.videoRenderController,
+    this.conference,
     required this.render,
     this.height,
     this.width,
@@ -65,7 +71,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
 
   List<ActionData> _buildVideoActionData() {
     List<ActionData> videoActionData = [];
-    if (localVideoRenderController.videoChatRender != null) {
+    if (widget.videoRenderController.currentVideoRender != null) {
       videoActionData.add(
         ActionData(
             label: 'Camera switch',
@@ -166,7 +172,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         onTap: () {
           setState(() {
             actionVisible = !actionVisible;
-            localVideoRenderController.videoRender = widget.render;
+            widget.videoRenderController.currentVideoRender = widget.render;
           });
         },
         child: videoView,
@@ -174,8 +180,9 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
     );
     var selected = false;
     if (widget.render.id != null &&
-        localVideoRenderController.videoRender != null) {
-      selected = widget.render.id == localVideoRenderController.videoRender!.id;
+        widget.videoRenderController.currentVideoRender != null) {
+      selected = widget.render.id ==
+          widget.videoRenderController.currentVideoRender!.id;
     }
     var primary = myself.primary;
     return Container(
@@ -243,7 +250,7 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         break;
       case 'Zoom out':
         _popupDialog = _buildPopupDialog();
-        Overlay.of(context)?.insert(_popupDialog);
+        Overlay.of(context).insert(_popupDialog);
         setState(() {
           enableFullScreen = true;
         });
@@ -255,7 +262,12 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         });
         break;
       case 'Close':
-        localVideoRenderController.close(streamId: widget.render.id);
+        if (widget.conference != null) {
+          String conferenceId = widget.conference!.conferenceId;
+          await videoConferenceRenderPool
+              .removeVideoRender(conferenceId, [widget.render]);
+        }
+        await widget.videoRenderController.close(widget.render.id!);
         break;
       default:
         break;

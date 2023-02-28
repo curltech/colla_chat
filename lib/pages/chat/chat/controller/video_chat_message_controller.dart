@@ -317,17 +317,16 @@ class VideoChatMessageController with ChangeNotifier {
     if (receiptType == MessageStatus.accepted) {
       var peerId = chatReceipt.receiverPeerId!;
       var clientId = chatReceipt.receiverClientId!;
-      PeerVideoRender? localRender;
       //根据conference.video来判断是请求音频还是视频，并创建本地视频render
       bool video = _conference!.video;
       if (video) {
         // localRender =
         //     await localVideoRenderController.createVideoMediaRender();
         //测试目的，使用屏幕
-        localRender =
-            await localVideoRenderController.createDisplayMediaRender();
+
+        await localVideoRenderController.createDisplayMediaRender();
       } else {
-        localRender = await localVideoRenderController.createAudioMediaRender();
+        await localVideoRenderController.createAudioMediaRender();
       }
 
       //将本地的render加入webrtc连接
@@ -345,9 +344,8 @@ class VideoChatMessageController with ChangeNotifier {
         //把本地视频加入连接中，然后重新协商
         Map<String, PeerVideoRender> videoRenders =
             localVideoRenderController.getVideoRenders();
-        await remoteVideoRenderController.addLocalVideoRender(
-            videoRenders.values.toList(),
-            peerConnection: advancedPeerConnection);
+        await remoteVideoRenderController
+            .addLocalVideoRender(videoRenders.values.toList());
         videoConferenceRenderPool.conferenceId = remoteVideoRenderController
             .videoChatMessageController!.conferenceId;
         //设置当前消息，转入视频会议界面
@@ -376,7 +374,24 @@ class VideoChatMessageController with ChangeNotifier {
       }
     }
     await chatMessageService.updateReceiptStatus(chatMessage, receiptType);
-    if (receiptType == MessageStatus.accepted) {}
+    if (receiptType == MessageStatus.accepted) {
+      RemoteVideoRenderController remoteVideoRenderController =
+          videoConferenceRenderPool.createRemoteVideoRenderController(this);
+      List<String>? participants = conference!.participants;
+      if (participants != null && participants.isNotEmpty) {
+        for (var participant in participants) {
+          if (participant == myself.peerId || participant == peerId) {
+            continue;
+          }
+          List<AdvancedPeerConnection> peerConnections =
+              peerConnectionPool.get(participant);
+          if (peerConnections.isNotEmpty) {
+            remoteVideoRenderController
+                .addAdvancedPeerConnection(peerConnections[0]);
+          }
+        }
+      }
+    }
   }
 
   _sendConferenceChatReceipt(
@@ -485,7 +500,7 @@ class VideoChatMessageController with ChangeNotifier {
               .removeAdvancedPeerConnection(advancedPeerConnection);
           Map<String, PeerVideoRender> videoRenders =
               localVideoRenderController.getVideoRenders();
-          remoteVideoRenderController.removeLocalVideoRender(
+          remoteVideoRenderController.removeVideoRender(
               videoRenders.values.toList(),
               peerConnection: advancedPeerConnection);
         }

@@ -13,7 +13,6 @@ import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
-import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -286,7 +285,7 @@ class AdvancedPeerConnection {
   }
 
   ///把渲染器的流连接中删除，然后把渲染器从渲染器集合删除，并关闭
-  removeLocalRender(PeerVideoRender render) async {
+  removeRender(PeerVideoRender render) async {
     logger.i('removeLocalRender ${render.id}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
@@ -297,20 +296,6 @@ class AdvancedPeerConnection {
       if (render.mediaStream != null) {
         await basePeerConnection.removeStream(render.mediaStream!);
       }
-      await _removeRender(render);
-    }
-  }
-
-  ///把渲染器从渲染器集合删除，并关闭
-  _removeRender(PeerVideoRender render) async {
-    logger.i('_removeRender ${render.id}');
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
-    }
-    var streamId = render.id;
-    if (streamId != null) {
-      localVideoRenderController.close(streamId: streamId);
     }
   }
 

@@ -68,7 +68,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
 
   void _hangUp() async {
     try {
-      localVideoRenderController.close();
+      localVideoRenderController.exit();
       setState(() {
         _inCalling = false;
       });
