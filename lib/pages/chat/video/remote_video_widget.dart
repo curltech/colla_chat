@@ -52,6 +52,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
             VideoRenderOperator.add.name, _addLocalVideoRender);
         remoteVideoRenderController!.registerVideoRenderOperator(
             VideoRenderOperator.remove.name, _removeLocalVideoRender);
+        videoViewCount.value = remoteVideoRenderController!.videoRenders.length;
       }
     }
   }
