@@ -1,6 +1,5 @@
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
@@ -44,19 +43,40 @@ class RemoteVideoRenderController extends VideoRenderController {
     }
   }
 
-  ///把本地新的videoRender加入到会议的所有连接中，并且都重新协商
-  addLocalVideoRender(PeerVideoRender videoRender) {
-    for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
-      peerConnection.addLocalRender(videoRender);
-      peerConnection.negotiate();
+  ///把本地新的videoRender加入到指定连接或者会议的所有连接中，并且都重新协商
+  ///指定连接用在加入新的连接的时候，所有连接用在加入新的videoRender的时候
+  addLocalVideoRender(List<PeerVideoRender> videoRenders,
+      {AdvancedPeerConnection? peerConnection}) async {
+    if (peerConnection != null) {
+      for (var videoRender in videoRenders) {
+        await peerConnection.addLocalRender(videoRender);
+      }
+      await peerConnection.negotiate();
+    } else {
+      for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
+        for (var videoRender in videoRenders) {
+          await peerConnection.addLocalRender(videoRender);
+        }
+        await peerConnection.negotiate();
+      }
     }
   }
 
-  ///会议的所有连接中移除本地videoRender，并且都重新协商
-  removeLocalVideoRender(PeerVideoRender videoRender) {
-    for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
-      peerConnection.removeLocalRender(videoRender);
-      peerConnection.negotiate();
+  ///会议的指定连接或者所有连接中移除本地videoRender，并且都重新协商
+  removeLocalVideoRender(List<PeerVideoRender> videoRenders,
+      {AdvancedPeerConnection? peerConnection}) async {
+    if (peerConnection != null) {
+      for (var videoRender in videoRenders) {
+        await peerConnection.removeLocalRender(videoRender);
+      }
+      await peerConnection.negotiate();
+    } else {
+      for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
+        for (var videoRender in videoRenders) {
+          await peerConnection.removeLocalRender(videoRender);
+        }
+        await peerConnection.negotiate();
+      }
     }
   }
 
@@ -134,8 +154,6 @@ class RemoteVideoRenderController extends VideoRenderController {
         videoRenderController = VideoRenderController();
         videoRenderControllers[key] = videoRenderController;
       }
-      logger.i(
-          'AdvancedPeerConnection peerId:peerId clientId:${peerConnection.clientId} added in PeerConnectionsController');
     }
   }
 
@@ -264,19 +282,24 @@ class VideoConferenceRenderPool with ChangeNotifier {
   }
 
   ///把本地新的videoRender加入到会议的所有连接中，并且都重新协商
-  addLocalVideoRender(String conferenceId, PeerVideoRender videoRender) {
+  addLocalVideoRender(String conferenceId, List<PeerVideoRender> videoRenders,
+      {AdvancedPeerConnection? peerConnection}) async {
     RemoteVideoRenderController? remoteVideoRenderController =
         remoteVideoRenderControllers[conferenceId];
     if (remoteVideoRenderController != null) {
-      remoteVideoRenderController.addLocalVideoRender(videoRender);
+      await remoteVideoRenderController.addLocalVideoRender(videoRenders,
+          peerConnection: peerConnection);
     }
   }
 
-  removeLocalVideoRender(String conferenceId, PeerVideoRender videoRender) {
+  removeLocalVideoRender(
+      String conferenceId, List<PeerVideoRender> videoRenders,
+      {AdvancedPeerConnection? peerConnection}) async {
     RemoteVideoRenderController? remoteVideoRenderController =
         remoteVideoRenderControllers[conferenceId];
     if (remoteVideoRenderController != null) {
-      remoteVideoRenderController.removeLocalVideoRender(videoRender);
+      await remoteVideoRenderController.removeLocalVideoRender(videoRenders,
+          peerConnection: peerConnection);
     }
   }
 

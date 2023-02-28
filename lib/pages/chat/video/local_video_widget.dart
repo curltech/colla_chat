@@ -339,8 +339,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
     if (conference != null &&
         videoChatStatus.value == VideoChatStatus.chatting) {
-      videoConferenceRenderPool.addLocalVideoRender(
-          conference.conferenceId, videoRender);
+      videoConferenceRenderPool
+          .addLocalVideoRender(conference.conferenceId, [videoRender]);
     }
   }
 
@@ -349,8 +349,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
     if (conference != null &&
         videoChatStatus.value == VideoChatStatus.chatting) {
-      videoConferenceRenderPool.removeLocalVideoRender(
-          conference.conferenceId, videoRender);
+      videoConferenceRenderPool
+          .removeLocalVideoRender(conference.conferenceId, [videoRender]);
     }
   }
 

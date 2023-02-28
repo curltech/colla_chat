@@ -305,6 +305,8 @@ class VideoChatMessageController with ChangeNotifier {
     }
   }
 
+  ///发送视频邀请消息的回执，如果是接受，则最后转入视频页面
+  ///设置当前的消息为视频邀请消息
   _sendLinkmanChatReceipt(
       ChatMessage chatMessage, MessageStatus receiptType) async {
     //创建回执消息
@@ -335,12 +337,19 @@ class VideoChatMessageController with ChangeNotifier {
         clientId: clientId,
       );
       if (advancedPeerConnection != null) {
-        await advancedPeerConnection.addLocalRender(localRender);
         //同意视频通话则加入到视频连接池中，远程视频通过远程会议池和会议号获取
         RemoteVideoRenderController remoteVideoRenderController =
             videoConferenceRenderPool.createRemoteVideoRenderController(this);
         remoteVideoRenderController
             .addAdvancedPeerConnection(advancedPeerConnection);
+        //把本地视频加入连接中，然后重新协商
+        Map<String, PeerVideoRender> videoRenders =
+            localVideoRenderController.getVideoRenders();
+        await remoteVideoRenderController.addLocalVideoRender(
+            videoRenders.values.toList(),
+            peerConnection: advancedPeerConnection);
+        videoConferenceRenderPool.conferenceId = remoteVideoRenderController
+            .videoChatMessageController!.conferenceId;
         //设置当前消息，转入视频会议界面
         chatMessageController.chatSummary = _chatSummary;
         chatMessageController.current = _chatMessage;
@@ -454,11 +463,9 @@ class VideoChatMessageController with ChangeNotifier {
         //把本地视频加入连接中，然后重新协商
         Map<String, PeerVideoRender> videoRenders =
             localVideoRenderController.getVideoRenders();
-        for (var render in videoRenders.values) {
-          await advancedPeerConnection.addLocalRender(render);
-        }
-        //本地视频render加入后，发起重新协商
-        await advancedPeerConnection.negotiate();
+        await remoteVideoRenderController.addLocalVideoRender(
+            videoRenders.values.toList(),
+            peerConnection: advancedPeerConnection);
       }
     } else if (content == MessageStatus.rejected.name) {
     } else if (content == MessageStatus.terminated.name) {
@@ -476,14 +483,12 @@ class VideoChatMessageController with ChangeNotifier {
         if (remoteVideoRenderController != null) {
           remoteVideoRenderController
               .removeAdvancedPeerConnection(advancedPeerConnection);
+          Map<String, PeerVideoRender> videoRenders =
+              localVideoRenderController.getVideoRenders();
+          remoteVideoRenderController.removeLocalVideoRender(
+              videoRenders.values.toList(),
+              peerConnection: advancedPeerConnection);
         }
-        Map<String, PeerVideoRender> videoRenders =
-            localVideoRenderController.getVideoRenders();
-        for (var render in videoRenders.values) {
-          await advancedPeerConnection.removeLocalRender(render);
-        }
-        //本地视频render加入后，发起重新协商
-        await advancedPeerConnection.negotiate();
       }
     }
   }
