@@ -613,7 +613,6 @@ class PeerConnectionPool {
 
   ///收到发来的ChatMessage的payload（map对象），进行后续的action处理
   onMessage(WebrtcEvent event) async {
-    logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onMessage');
     onWebrtcEvent(event);
   }
 
@@ -622,7 +621,6 @@ class PeerConnectionPool {
   }
 
   onConnected(WebrtcEvent event) async {
-    // logger.i('peerId: ${event.peerId} clientId:${event.clientId} is connected');
     globalChatMessageController.sendModifyFriend(event.peerId,
         clientId: event.clientId);
     globalChatMessageController.sendPreKeyBundle(event.peerId,
@@ -632,43 +630,32 @@ class PeerConnectionPool {
 
   ///从池中移除连接
   onClosed(WebrtcEvent event) async {
-    logger.i('peerId: ${event.peerId} clientId:${event.clientId} is closed');
     remove(event.peerId, clientId: event.clientId);
     onWebrtcEvent(event);
     signalSessionPool.close(peerId: event.peerId, clientId: event.clientId);
   }
 
   onError(WebrtcEvent event) async {
-    logger.i('peerId: ${event.peerId} clientId:${event.clientId} is error');
     onWebrtcEvent(event);
   }
 
   onAddStream(WebrtcEvent event) async {
-    logger
-        .i('peerId: ${event.peerId} clientId:${event.clientId} is onAddStream');
     onWebrtcEvent(event);
   }
 
   onRemoveStream(WebrtcEvent event) async {
-    logger.i(
-        'peerId: ${event.peerId} clientId:${event.clientId} is onRemoveStream');
     onWebrtcEvent(event);
   }
 
   onTrack(WebrtcEvent event) async {
-    logger.i('peerId: ${event.peerId} clientId:${event.clientId} is onTrack');
     onWebrtcEvent(event);
   }
 
   onAddTrack(WebrtcEvent event) async {
-    logger
-        .i('peerId: ${event.peerId} clientId:${event.clientId} is onAddTrack');
     onWebrtcEvent(event);
   }
 
   onRemoveTrack(WebrtcEvent event) async {
-    logger.i(
-        'peerId: ${event.peerId} clientId:${event.clientId} is onRemoveTrack');
     onWebrtcEvent(event);
   }
 

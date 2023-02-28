@@ -85,8 +85,9 @@ class GlobalChatMessageController with ChangeNotifier {
     ///保存消息
     ChatMessage? savedChatMessage =
         await chatMessageService.receiveChatMessage(chatMessage);
-    if (savedChatMessage == null) {
+    if (savedChatMessage == null || chatMessage.id == null) {
       logger.e('new chatMessage save fail');
+      throw 'new chatMessage save fail';
     }
     _chatMessage = chatMessage;
     String messageId = chatMessage.messageId!;

@@ -13,7 +13,6 @@ import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
-import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -215,7 +214,7 @@ class AdvancedPeerConnection {
   }
 
   onAddRemoteStream(MediaStream stream) async {
-    logger.i('peerId: $peerId clientId:$clientId is onAddRemoteStream');
+    logger.i('streamId: ${stream.id} onAddRemoteStream');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -230,7 +229,7 @@ class AdvancedPeerConnection {
   }
 
   onRemoveRemoteStream(MediaStream stream) async {
-    logger.i('peerId: $peerId clientId:$clientId is onRemoveRemoteStream');
+    logger.i('streamId: ${stream.id} onRemoveRemoteStream');
     var webrtcEvent = WebrtcEvent(peerId,
         clientId: clientId,
         name: name,
@@ -241,7 +240,7 @@ class AdvancedPeerConnection {
   }
 
   onRemoteTrack(RTCTrackEvent event) async {
-    logger.i('peerId: $peerId clientId:$clientId is onRemoteTrack');
+    logger.i('trackId: ${event.track.id} onRemoteTrack');
     var webrtcEvent = WebrtcEvent(peerId,
         clientId: clientId,
         name: name,
@@ -252,7 +251,9 @@ class AdvancedPeerConnection {
   }
 
   onAddRemoteTrack(dynamic data) async {
-    logger.i('peerId: $peerId clientId:$clientId is onAddRemoteTrack');
+    MediaStream stream = data['stream'];
+    MediaStreamTrack track = data['track'];
+    logger.i('streamId: ${stream.id} trackId:${track.id} is onAddRemoteTrack');
     var webrtcEvent = WebrtcEvent(peerId,
         clientId: clientId,
         name: name,
@@ -263,7 +264,10 @@ class AdvancedPeerConnection {
   }
 
   onRemoveRemoteTrack(dynamic data) async {
-    logger.i('peerId: $peerId clientId:$clientId is onRemoveRemoteTrack');
+    MediaStream stream = data['stream'];
+    MediaStreamTrack track = data['track'];
+    logger
+        .i('streamId: ${stream.id} trackId:${track.id} is onRemoveRemoteTrack');
     var webrtcEvent = WebrtcEvent(peerId,
         clientId: clientId,
         name: name,
@@ -275,8 +279,7 @@ class AdvancedPeerConnection {
 
   ///将本地渲染器包含的流加入连接中，在收到接受视频要求的时候调用
   Future<bool> addLocalRender(PeerVideoRender render) async {
-    logger.i(
-        'AdvancedPeerConnection peerId:$peerId addLocalRender ${render.mediaStream!.id}');
+    logger.i('addLocalRender ${render.id}');
     var stream = render.mediaStream;
     if (stream != null) {
       var success = await basePeerConnection.addLocalStream(stream);
@@ -297,20 +300,6 @@ class AdvancedPeerConnection {
       if (render.mediaStream != null) {
         await basePeerConnection.removeStream(render.mediaStream!);
       }
-      await _removeRender(render);
-    }
-  }
-
-  ///把渲染器从渲染器集合删除，并关闭
-  _removeRender(PeerVideoRender render) async {
-    logger.i('_removeRender ${render.id}');
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
-    }
-    var streamId = render.id;
-    if (streamId != null) {
-      localVideoRenderController.close(streamId: streamId);
     }
   }
 

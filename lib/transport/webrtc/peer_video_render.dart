@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/platform.dart';
@@ -33,22 +32,7 @@ class PeerVideoRender {
   bool audio = false;
   bool video = false;
 
-  PeerVideoRender({this.mediaStream}) {
-    if (mediaStream != null) {
-      id = mediaStream!.id;
-    }
-  }
-
-  setStream(MediaStream? mediaStream) async {
-    await dispose();
-    if (mediaStream != null) {
-      this.mediaStream = mediaStream;
-      id = mediaStream.id;
-    } else {
-      this.mediaStream = null;
-      id = null;
-    }
-  }
+  PeerVideoRender();
 
   static Future<PeerVideoRender> fromVideoMedia(
     String peerId, {
@@ -121,6 +105,8 @@ class PeerVideoRender {
     render.name = name;
     render.mediaStream = stream;
     render.id = stream.id;
+    render.video = stream.getVideoTracks().isNotEmpty;
+    render.audio = stream.getAudioTracks().isNotEmpty;
     await render.bindRTCVideoRender();
 
     return render;
