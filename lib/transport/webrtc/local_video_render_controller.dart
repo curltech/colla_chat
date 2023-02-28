@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
 ///媒体控制器，内部是PeerVideoRender的集合，以流的id为key
-///LocalVideoRenderController和VideoRoomRenderController是其子类，
+///LocalVideoRenderController和RemoteVideoRoomRenderController是其子类，
 ///前者代表本地的视频和音频的总共只能有一个，屏幕共享和媒体播放可以有多个
 ///后者代表远程的视频，包含所有的远程视频流的PeerVideoRender
 class VideoRenderController with ChangeNotifier {
   //当前选择的render
-  PeerVideoRender? _videoRender;
+  PeerVideoRender? _currentVideoRender;
 
   final Map<String, PeerVideoRender> videoRenders = {};
 
@@ -59,13 +59,13 @@ class VideoRenderController with ChangeNotifier {
     }
   }
 
-  PeerVideoRender? get videoRender {
-    return _videoRender;
+  PeerVideoRender? get currentVideoRender {
+    return _currentVideoRender;
   }
 
-  set videoRender(PeerVideoRender? videoRender) {
-    if (_videoRender != videoRender) {
-      _videoRender = videoRender;
+  set currentVideoRender(PeerVideoRender? currentVideoRender) {
+    if (_currentVideoRender != currentVideoRender) {
+      _currentVideoRender = currentVideoRender;
     }
   }
 
@@ -108,6 +108,7 @@ class VideoRenderController with ChangeNotifier {
     return streams;
   }
 
+  ///增加videoRender，激活add事件
   add(PeerVideoRender videoRender) {
     var id = videoRender.id;
     if (id != null && !videoRenders.containsKey(id)) {
@@ -116,69 +117,70 @@ class VideoRenderController with ChangeNotifier {
     }
   }
 
-  remove(PeerVideoRender videoRender) {
-    var id = videoRender.id;
-    if (id != null && videoRenders.containsKey(id)) {
-      videoRender.dispose();
-      videoRenders.remove(id);
-      onVideoRenderOperator(VideoRenderOperator.remove.name, videoRender);
+  ///关闭videoRender，激活remove事件
+  remove(PeerVideoRender videoRender) async {
+    var streamId = videoRender.id;
+    if (streamId != null && videoRenders.containsKey(streamId)) {
+      //在流被关闭前调用事件处理
+      await onVideoRenderOperator(VideoRenderOperator.remove.name, videoRender);
+      await videoRender.close();
+      videoRenders.remove(streamId);
+      if (_currentVideoRender != null && _currentVideoRender!.id == streamId) {
+        _currentVideoRender = null;
+      }
     }
   }
 
-  ///关闭streamId的流或者关闭控制器所有的流
-  close({String? streamId}) {
-    if (streamId == null) {
-      for (var videoRender in videoRenders.values) {
-        videoRender.dispose();
-      }
-      videoRenders.clear();
-      _videoRender = null;
-      onVideoRenderOperator(VideoRenderOperator.close.name, null);
-    } else {
-      var videoRender = videoRenders[streamId];
-      if (videoRender != null) {
-        videoRender.dispose();
-        videoRenders.remove(streamId);
-        if (_videoRender != null && _videoRender!.id == streamId) {
-          _videoRender = null;
-        }
-        onVideoRenderOperator(VideoRenderOperator.remove.name, videoRender);
-      }
+  ///关闭streamId的流，激活remove事件
+  close(String streamId) async {
+    var videoRender = videoRenders[streamId];
+    if (videoRender != null) {
+      await remove(videoRender);
     }
+  }
+
+  ///关闭关闭控制器所有的流，激活exit事件
+  exit() async {
+    await onVideoRenderOperator(VideoRenderOperator.exit.name, null);
+    for (var videoRender in videoRenders.values) {
+      await videoRender.close();
+    }
+    videoRenders.clear();
+    _currentVideoRender = null;
   }
 }
 
 ///本地媒体控制器
 class LocalVideoRenderController extends VideoRenderController {
   //本地视频和音频的render，只能是其中一种，可以切换
-  PeerVideoRender? _videoChatRender;
+  PeerVideoRender? _mainVideoRender;
 
   //本地视频和音频的render
-  PeerVideoRender? get videoChatRender {
-    return _videoChatRender;
+  PeerVideoRender? get mainVideoRender {
+    return _mainVideoRender;
   }
 
-  set videoChatRender(PeerVideoRender? videoRender) {
-    if (_videoChatRender != videoRender) {
-      if (_videoChatRender != null) {
-        remove(_videoChatRender!);
+  set mainVideoRender(PeerVideoRender? mainVideoRender) {
+    if (_mainVideoRender != mainVideoRender) {
+      if (_mainVideoRender != null) {
+        remove(_mainVideoRender!);
       }
-      _videoChatRender = videoRender;
-      if (videoRender != null) {
-        add(videoRender);
+      _mainVideoRender = mainVideoRender;
+      if (_mainVideoRender != null) {
+        add(_mainVideoRender!);
       }
     }
   }
 
   //判断是否有视频
   bool get video {
-    if (_videoChatRender != null) {
-      return _videoChatRender!.video;
+    if (_mainVideoRender != null) {
+      return _mainVideoRender!.video;
     }
     return false;
   }
 
-  ///创建本地的Video render
+  ///创建本地的Video render，设置当前videoChatRender，激活create和add监听事件
   Future<PeerVideoRender> createVideoMediaRender({
     bool audio = true,
     int minWidth = 640,
@@ -194,26 +196,26 @@ class LocalVideoRenderController extends VideoRenderController {
       minHeight: minHeight,
       minFrameRate: minFrameRate,
     );
-    videoChatRender = render;
-    onVideoRenderOperator(VideoRenderOperator.create.name, videoRender);
+    _mainVideoRender = render;
+    onVideoRenderOperator(VideoRenderOperator.create.name, _mainVideoRender);
 
     return render;
   }
 
-  ///创建本地的Audio render
+  ///创建本地的Audio render，设置当前videoChatRender，激活create和add监听事件
   Future<PeerVideoRender> createAudioMediaRender() async {
     PeerVideoRender render = await PeerVideoRender.fromAudioMedia(
       myself.peerId!,
       clientId: myself.clientId,
       name: myself.myselfPeer.name,
     );
-    videoChatRender = render;
-    onVideoRenderOperator(VideoRenderOperator.create.name, videoRender);
+    _mainVideoRender = render;
+    onVideoRenderOperator(VideoRenderOperator.create.name, _mainVideoRender);
 
     return render;
   }
 
-  ///创建本地的Display render
+  ///创建本地的Display render，激活create和add监听事件
   Future<PeerVideoRender> createDisplayMediaRender({
     DesktopCapturerSource? selectedSource,
     bool audio = false,
@@ -225,11 +227,12 @@ class LocalVideoRenderController extends VideoRenderController {
         selectedSource: selectedSource,
         audio: audio);
     add(render);
+    onVideoRenderOperator(VideoRenderOperator.create.name, render);
 
     return render;
   }
 
-  ///创建本地的Stream render
+  ///创建本地的Stream render，激活add监听事件
   Future<PeerVideoRender> createMediaStreamRender(
     MediaStream stream,
   ) async {
@@ -249,18 +252,23 @@ class LocalVideoRenderController extends VideoRenderController {
     return render;
   }
 
+  ///关闭本地特定的流，激活close或者remove事件
   @override
-  close({String? streamId}) {
-    if (streamId == null) {
-      _videoChatRender = null;
-    } else {
-      if (_videoChatRender != null && streamId == _videoChatRender!.id) {
-        _videoChatRender = null;
-      }
+  close(String streamId) {
+    super.close(streamId);
+    if (currentVideoRender != null && streamId == currentVideoRender!.id) {
+      currentVideoRender = null;
     }
-    super.close(streamId: streamId);
+  }
+
+  ///关闭本地所有的流，激活exit事件
+  @override
+  exit() {
+    super.exit();
+    currentVideoRender = null;
   }
 }
 
+///本地视频流和渲染器的控制器，本地流操作会触发事件，不涉及webrtc的连接对应的操作
 final LocalVideoRenderController localVideoRenderController =
     LocalVideoRenderController();

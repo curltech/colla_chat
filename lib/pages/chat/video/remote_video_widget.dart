@@ -69,9 +69,9 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
     }
   }
 
-  _close() async {
+  _exit() async {
     if (remoteVideoRenderController != null) {
-      remoteVideoRenderController!.close();
+      remoteVideoRenderController!.exit();
     }
   }
 
@@ -117,7 +117,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
                     padding: const EdgeInsets.all(25.0),
                     child: WidgetUtil.buildCircleButton(
                       onPressed: () {
-                        _close();
+                        _exit();
                       },
                       elevation: 2.0,
                       backgroundColor: Colors.red,
@@ -162,6 +162,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
               color: Colors.black,
               child: VideoViewCard(
                 videoRenderController: remoteVideoRenderController!,
+                conference: widget.videoChatMessageController.conference,
               ));
         });
   }

@@ -85,7 +85,7 @@ class _GetDisplayMediaWidgetState extends State<GetDisplayMediaWidget> {
 
   void _hangUp() async {
     try {
-      peerVideoRenderer.dispose();
+      peerVideoRenderer.close();
       setState(() {
         _inCalling = false;
       });

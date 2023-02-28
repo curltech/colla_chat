@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
@@ -7,17 +8,19 @@ import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-///视频通话的一个房间内的所有的webrtc连接及其包含的远程视频，
+///视频通话的一个会议内的所有的webrtc连接及其包含的远程视频，
 ///这些连接与自己正在视频通话，此控制器用于通知视频通话界面的刷新
 class RemoteVideoRenderController extends VideoRenderController {
   final Key key = UniqueKey();
 
-  ///根据peerId和clientId对应的所有的webrtc连接
+  //根据peerId和clientId对应的所有的webrtc连接
   final Map<String, AdvancedPeerConnection> _peerConnections = {};
-  final VideoChatMessageController? videoChatMessageController;
 
-  ///根据peerId和clientId的连接所对应的视频render控制器，每一个视频render控制器包含多个视频render
+  //根据peerId和clientId的连接所对应的视频render控制器，每一个视频render控制器包含多个视频render
   Map<String, VideoRenderController> videoRenderControllers = {};
+
+  //总的视频控制器，是所有连接对应的远程流的汇总控制器
+  final VideoChatMessageController? videoChatMessageController;
 
   RemoteVideoRenderController({this.videoChatMessageController});
 
@@ -28,6 +31,7 @@ class RemoteVideoRenderController extends VideoRenderController {
 
   ///增加远程视频render，确保之前连接已经加入
   ///新增的远程视频render还要加入到对应的连接的控制器中
+  ///激活add事件
   @override
   add(PeerVideoRender videoRender) {
     //加入总的远程视频控制器
@@ -44,6 +48,41 @@ class RemoteVideoRenderController extends VideoRenderController {
       }
       //加入到对应连接的视频控制器
       videoRenderController.add(videoRender);
+    } else {
+      logger.e('PeerConnection of add videoRender is not exist');
+    }
+  }
+
+  ///关闭streamId的流，激活remove事件，
+  @override
+  close(String streamId) {
+    super.close(streamId);
+    List<String> keys = videoRenderControllers.keys.toList();
+    for (var key in keys) {
+      var videoRenderController = videoRenderControllers[key];
+      if (videoRenderController != null) {
+        videoRenderController.close(streamId);
+        if (videoRenderController.videoRenders.isEmpty) {
+          videoRenderControllers.remove(key);
+        }
+      }
+    }
+  }
+
+  ///关闭会议，或者叫退出会议
+  ///关闭所有的流，激活exit事件
+  @override
+  exit() {
+    super.exit();
+    List<String> keys = videoRenderControllers.keys.toList();
+    for (var key in keys) {
+      var videoRenderController = videoRenderControllers[key];
+      if (videoRenderController != null) {
+        videoRenderController.exit();
+        if (videoRenderController.videoRenders.isEmpty) {
+          videoRenderControllers.remove(key);
+        }
+      }
     }
   }
 
@@ -66,61 +105,20 @@ class RemoteVideoRenderController extends VideoRenderController {
     }
   }
 
-  ///会议的指定连接或者所有连接中移除本地videoRender，并且都重新协商
-  removeLocalVideoRender(List<PeerVideoRender> videoRenders,
+  ///会议的指定连接或者所有连接中移除本地或者远程的videoRender，并且都重新协商
+  removeVideoRender(List<PeerVideoRender> videoRenders,
       {AdvancedPeerConnection? peerConnection}) async {
     if (peerConnection != null) {
       for (var videoRender in videoRenders) {
-        await peerConnection.removeLocalRender(videoRender);
+        await peerConnection.removeRender(videoRender);
       }
       await peerConnection.negotiate();
     } else {
       for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
         for (var videoRender in videoRenders) {
-          await peerConnection.removeLocalRender(videoRender);
+          await peerConnection.removeRender(videoRender);
         }
         await peerConnection.negotiate();
-      }
-    }
-  }
-
-  ///关闭streamId的流或者关闭附件所有控制器的所有流，相当于关闭了会议
-  @override
-  close({String? streamId}) {
-    super.close(streamId: streamId);
-    if (streamId == null) {
-      List<String> keys = videoRenderControllers.keys.toList();
-      for (var key in keys) {
-        var advancedPeerConnection = _peerConnections[key];
-        if (advancedPeerConnection != null) {
-          removeAdvancedPeerConnection(advancedPeerConnection);
-        }
-      }
-    } else {
-      List<String> keys = videoRenderControllers.keys.toList();
-      for (var key in keys) {
-        var videoRenderController = videoRenderControllers[key];
-        if (videoRenderController != null) {
-          videoRenderController.close(streamId: streamId);
-          if (videoRenderController.videoRenders.isEmpty) {
-            _peerConnections.remove(key);
-            videoRenderControllers.remove(key);
-          }
-        }
-      }
-    }
-  }
-
-  ///清除peerId和clientId对应的连接和相应的render
-  ///或者关闭所有的控制器的所有流，相对于关闭房间
-  clear({String? peerId, String? clientId}) {
-    if (peerId == null && clientId == null) {
-      close();
-    } else {
-      var key = _getKey(peerId!, clientId!);
-      var advancedPeerConnection = _peerConnections[key];
-      if (advancedPeerConnection != null) {
-        removeAdvancedPeerConnection(advancedPeerConnection);
       }
     }
   }
@@ -161,7 +159,20 @@ class RemoteVideoRenderController extends VideoRenderController {
     }
   }
 
-  ///远程流到来渲染流
+  ///将连接移出控制器，对应的视频通话流关闭
+  removeAdvancedPeerConnection(AdvancedPeerConnection peerConnection) {
+    var key = _getKey(peerConnection.peerId, peerConnection.clientId);
+    var advancedPeerConnection = _peerConnections.remove(key);
+    if (advancedPeerConnection != null) {
+      peerConnection.unregisterWebrtcEvent(
+          WebrtcEventType.stream, _onAddRemoteStream);
+      peerConnection.unregisterWebrtcEvent(
+          WebrtcEventType.removeStream, _onRemoveRemoteStream);
+      videoRenderControllers.remove(key);
+    }
+  }
+
+  ///远程流到来渲染流，激活add事件
   Future<void> _onAddRemoteStream(WebrtcEvent webrtcEvent) async {
     MediaStream stream = webrtcEvent.data;
     String peerId = webrtcEvent.peerId;
@@ -177,31 +188,11 @@ class RemoteVideoRenderController extends VideoRenderController {
     add(render);
   }
 
-  //远程关闭流事件触发
+  ///远程关闭流事件触发，激活remove事件
   Future<void> _onRemoveRemoteStream(WebrtcEvent webrtcEvent) async {
     MediaStream stream = webrtcEvent.data;
     String streamId = stream.id;
-    close(streamId: streamId);
-  }
-
-  ///将连接移出控制器，对应的视频通话流关闭
-  removeAdvancedPeerConnection(AdvancedPeerConnection peerConnection) {
-    var key = _getKey(peerConnection.peerId, peerConnection.clientId);
-    var advancedPeerConnection = _peerConnections.remove(key);
-    if (advancedPeerConnection != null) {
-      peerConnection.unregisterWebrtcEvent(
-          WebrtcEventType.stream, _onAddRemoteStream);
-      peerConnection.unregisterWebrtcEvent(
-          WebrtcEventType.removeStream, _onRemoveRemoteStream);
-      VideoRenderController? controller = videoRenderControllers.remove(key);
-      if (controller != null) {
-        for (var streamId in controller.videoRenders.keys) {
-          close(streamId: streamId);
-        }
-        controller.close();
-      }
-      notifyListeners();
-    }
+    close(streamId);
   }
 }
 
@@ -296,22 +287,28 @@ class VideoConferenceRenderPool with ChangeNotifier {
     }
   }
 
-  removeLocalVideoRender(
-      String conferenceId, List<PeerVideoRender> videoRenders,
+  ///会议的指定连接或者所有连接中移除本地或者远程的videoRender，并且都重新协商
+  removeVideoRender(String conferenceId, List<PeerVideoRender> videoRenders,
       {AdvancedPeerConnection? peerConnection}) async {
     RemoteVideoRenderController? remoteVideoRenderController =
         remoteVideoRenderControllers[conferenceId];
     if (remoteVideoRenderController != null) {
-      await remoteVideoRenderController.removeLocalVideoRender(videoRenders,
+      await remoteVideoRenderController.removeVideoRender(videoRenders,
           peerConnection: peerConnection);
     }
   }
 
-  closeConferenceId(String conferenceId) {
+  ///关闭会议，或者叫退出会议
+  ///首先移除所有连接的所有远程流，然后关闭这些流，激活exit事件
+  closeConferenceId(String conferenceId) async {
     RemoteVideoRenderController? remoteVideoRenderController =
         remoteVideoRenderControllers[conferenceId];
     if (remoteVideoRenderController != null) {
-      remoteVideoRenderController.close();
+      var videoRenders =
+          remoteVideoRenderController.videoRenders.values.toList();
+      await remoteVideoRenderController.removeVideoRender(videoRenders);
+      await remoteVideoRenderController.exit();
+      remoteVideoRenderControllers.remove(conferenceId);
     }
     if (conferenceId == _conferenceId) {
       _conferenceId = null;

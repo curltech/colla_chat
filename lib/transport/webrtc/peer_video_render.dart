@@ -13,7 +13,7 @@ final emptyVideoView = Center(
   child: AppImage.mdAppImage,
 );
 
-enum VideoRenderOperator { create, add, remove, close, mute, volume, torch }
+enum VideoRenderOperator { create, add, remove, exit, mute, volume, torch }
 
 /// 简单包装webrtc视频流的渲染器，可以构造本地视频流或者传入的视频流
 /// 视频流绑定渲染器，并创建展示视图
@@ -32,7 +32,22 @@ class PeerVideoRender {
   bool audio = false;
   bool video = false;
 
-  PeerVideoRender();
+  PeerVideoRender({this.mediaStream}) {
+    if (mediaStream != null) {
+      id = mediaStream!.id;
+    }
+  }
+
+  setStream(MediaStream? mediaStream) async {
+    await close();
+    if (mediaStream != null) {
+      this.mediaStream = mediaStream;
+      id = mediaStream.id;
+    } else {
+      this.mediaStream = null;
+      id = null;
+    }
+  }
 
   static Future<PeerVideoRender> fromVideoMedia(
     String peerId, {
@@ -105,8 +120,6 @@ class PeerVideoRender {
     render.name = name;
     render.mediaStream = stream;
     render.id = stream.id;
-    render.video = stream.getVideoTracks().isNotEmpty;
-    render.audio = stream.getAudioTracks().isNotEmpty;
     await render.bindRTCVideoRender();
 
     return render;
@@ -121,7 +134,7 @@ class PeerVideoRender {
       bool replace = false}) async {
     if (id != null) {
       if (replace) {
-        await dispose();
+        await close();
       } else {
         return;
       }
@@ -155,7 +168,7 @@ class PeerVideoRender {
       bool replace = false}) async {
     if (id != null) {
       if (replace) {
-        await dispose();
+        await close();
       } else {
         return;
       }
@@ -176,7 +189,7 @@ class PeerVideoRender {
       'audio': audio,
       'video': video
     };
-    await dispose();
+    await close();
     var mediaStream =
         await navigator.mediaDevices.getDisplayMedia(mediaConstraints);
     this.mediaStream = mediaStream;
@@ -189,7 +202,7 @@ class PeerVideoRender {
   Future<void> createAudioMedia({bool replace = false}) async {
     if (id != null) {
       if (replace) {
-        await dispose();
+        await close();
       } else {
         return;
       }
@@ -256,13 +269,14 @@ class PeerVideoRender {
     return null;
   }
 
-  dispose() async {
+  ///关闭渲染器和流，关闭后里面的流为空
+  close() async {
     var mediaStream = this.mediaStream;
     if (mediaStream != null) {
       try {
         await mediaStream.dispose();
       } catch (e) {
-        logger.e('mediaStream.dispose failure:$e');
+        logger.e('mediaStream.close failure:$e');
       }
       this.mediaStream = null;
       id = null;

@@ -13,7 +13,6 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
@@ -91,33 +90,16 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     super.initState();
     //视频通话的消息存放地
     widget.videoChatMessageController.addListener(_updateVideoChatReceipt);
-    //本地视频的存放地
+    // 本地视频的存放地
     localVideoRenderController.registerVideoRenderOperator(
-        VideoRenderOperator.add.name, _addLocalVideoRender);
-    localVideoRenderController.registerVideoRenderOperator(
-        VideoRenderOperator.remove.name, _removeLocalVideoRender);
-    _buildActionDataAndVisible();
+        VideoRenderOperator.remove.name, _update);
+
     if (widget.videoChatMessageController.conference == null) {
       videoChatStatus.value = VideoChatStatus.end;
     } else {
       videoChatStatus.value = VideoChatStatus.chatting;
     }
-  }
-
-  Future<void> _addLocalVideoRender(PeerVideoRender? videoRender) async {
-    addLocalVideoRender(videoRender!);
-    if (mounted) {
-      _buildActionDataAndVisible();
-    }
-    videoViewCount.value = localVideoRenderController.videoRenders.length;
-  }
-
-  Future<void> _removeLocalVideoRender(PeerVideoRender? videoRender) async {
-    removeLocalVideoRender(videoRender!);
-    if (mounted) {
-      _buildActionDataAndVisible();
-    }
-    videoViewCount.value = localVideoRenderController.videoRenders.length;
+    _update(null);
   }
 
   ///如果视频邀请消息的回执到来，如果不在此界面的时候，新的回执不会被此处理
@@ -145,10 +127,10 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     audioPlayer.play('assets/medias/close.mp3');
   }
 
-  ///调整显示哪些命令按钮
-  _buildActionDataAndVisible() {
+  ///调整界面的显示
+  Future<void> _update(PeerVideoRender? peerVideoRender) async {
     List<ActionData> actionData = [];
-    if (localVideoRenderController.videoChatRender == null ||
+    if (localVideoRenderController.currentVideoRender == null ||
         !localVideoRenderController.video) {
       actionData.add(
         ActionData(
@@ -157,7 +139,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             icon: const Icon(Icons.video_call, color: Colors.white)),
       );
     }
-    if (localVideoRenderController.videoChatRender == null ||
+    if (localVideoRenderController.currentVideoRender == null ||
         localVideoRenderController.video) {
       actionData.add(
         ActionData(
@@ -167,7 +149,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         ),
       );
     }
-    if (localVideoRenderController.videoChatRender != null) {
+    if (localVideoRenderController.currentVideoRender != null) {
       actionData.add(
         ActionData(
             label: 'Screen share',
@@ -182,7 +164,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     //       icon: const Icon(Icons.video_file, color: Colors.white)),
     // );
     if (localVideoRenderController.videoRenders.isNotEmpty) {
-      videoViewCount.value = localVideoRenderController.videoRenders.length;
       actionData.add(
         ActionData(
             label: 'Close',
@@ -191,10 +172,10 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                 const Icon(Icons.closed_caption_disabled, color: Colors.white)),
       );
     } else {
-      videoViewCount.value = localVideoRenderController.videoRenders.length;
       controlPanelVisible.value = true;
     }
     this.actionData.value = actionData;
+    videoViewCount.value = localVideoRenderController.videoRenders.length;
   }
 
   ///创建新的会议功能
@@ -277,30 +258,33 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     return conference;
   }
 
+  ///创建本地的Video render，支持视频和音频的切换，设置当前videoChatRender，激活create。add和remove监听事件
   Future<PeerVideoRender?> _openVideoMedia({bool video = true}) async {
     ///本地视频不存在，可以直接创建，并发送视频邀请消息，否则根据情况觉得是否音视频切换
-    PeerVideoRender? videoRender = localVideoRenderController.videoChatRender;
+    PeerVideoRender? videoRender = localVideoRenderController.mainVideoRender;
     if (videoRender == null) {
       if (video) {
         videoRender = await localVideoRenderController.createVideoMediaRender();
       } else {
         videoRender = await localVideoRenderController.createAudioMediaRender();
       }
-      addLocalVideoRender(videoRender);
+      await addLocalVideoRender(videoRender);
     } else {
       if (video) {
         if (!localVideoRenderController.video) {
-          removeLocalVideoRender(videoRender);
+          await removeVideoRender(videoRender);
+          localVideoRenderController.close(videoRender.id!);
           videoRender =
               await localVideoRenderController.createVideoMediaRender();
-          addLocalVideoRender(videoRender);
+          await addLocalVideoRender(videoRender);
         }
       } else {
         if (localVideoRenderController.video) {
-          removeLocalVideoRender(videoRender);
+          await removeVideoRender(videoRender);
+          localVideoRenderController.close(videoRender.id!);
           videoRender =
               await localVideoRenderController.createAudioMediaRender();
-          addLocalVideoRender(videoRender);
+          await addLocalVideoRender(videoRender);
         }
       }
     }
@@ -315,7 +299,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (source != null) {
       PeerVideoRender videoRender = await localVideoRenderController
           .createDisplayMediaRender(selectedSource: source);
-      addLocalVideoRender(videoRender);
+      await addLocalVideoRender(videoRender);
+
       return videoRender;
     }
     return null;
@@ -329,28 +314,40 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
     PeerVideoRender? videoRender =
         await localVideoRenderController.createMediaStreamRender(stream);
-    addLocalVideoRender(videoRender);
+    await addLocalVideoRender(videoRender);
 
     return videoRender;
   }
 
-  addLocalVideoRender(PeerVideoRender videoRender) {
+  addLocalVideoRender(PeerVideoRender videoRender) async {
     Conference? conference = widget.videoChatMessageController.conference;
 
     if (conference != null &&
         videoChatStatus.value == VideoChatStatus.chatting) {
-      videoConferenceRenderPool
+      await videoConferenceRenderPool
           .addLocalVideoRender(conference.conferenceId, [videoRender]);
     }
   }
 
-  removeLocalVideoRender(PeerVideoRender videoRender) {
+  addLocalVideoRenders() async {
     Conference? conference = widget.videoChatMessageController.conference;
 
     if (conference != null &&
         videoChatStatus.value == VideoChatStatus.chatting) {
-      videoConferenceRenderPool
-          .removeLocalVideoRender(conference.conferenceId, [videoRender]);
+      var videoRenders =
+          localVideoRenderController.videoRenders.values.toList();
+      await videoConferenceRenderPool.addLocalVideoRender(
+          conference.conferenceId, videoRenders);
+    }
+  }
+
+  removeVideoRender(PeerVideoRender videoRender) async {
+    Conference? conference = widget.videoChatMessageController.conference;
+
+    if (conference != null &&
+        videoChatStatus.value == VideoChatStatus.chatting) {
+      await videoConferenceRenderPool
+          .removeVideoRender(conference.conferenceId, [videoRender]);
     }
   }
 
@@ -370,15 +367,14 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       }
     }
     //确保本地视频已经被打开
-    PeerVideoRender? videoChatRender =
-        localVideoRenderController.videoChatRender;
-    videoChatRender ??= await _openVideoMedia(video: true);
-    if (videoChatRender == null) {
+    PeerVideoRender? videoRender = localVideoRenderController.mainVideoRender;
+    videoRender ??= await _openVideoMedia(video: true);
+    if (videoRender == null) {
       return;
     }
     var conference = widget.videoChatMessageController.conference;
     //创建会议
-    conference ??= await _buildConference(video: videoChatRender.video);
+    conference ??= await _buildConference(video: videoRender.video);
     //检查当前的视频邀请消息是否存在
     ChatMessage? chatMessage = widget.videoChatMessageController.chatMessage;
     if (chatMessage == null) {
@@ -388,7 +384,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         await conferenceService.store(conference!);
       }
       //发送会议邀请消息
-      if (videoChatRender.video) {
+      if (videoRender.video) {
         chatMessage = await _sendVideoChatMessage(
             contentType: ContentType.video.name, conference: conference!);
       } else {
@@ -396,23 +392,12 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             contentType: ContentType.audio.name, conference: conference!);
       }
       await widget.videoChatMessageController.setChatMessage(chatMessage);
-      // videoConferenceRenderPool
-      //     .createRemoteVideoRenderController(widget.videoChatMessageController);
+      await addLocalVideoRender(videoRender);
+      _update(videoRender);
     } else {
       //当前视频消息不为空，则有同意回执的直接重新协商
       var messageId = chatMessage.messageId!;
       logger.i('current video chatMessage $messageId');
-      var videoRoomRenderController =
-          videoConferenceRenderPool.getRemoteVideoRenderController(messageId);
-      if (videoRoomRenderController != null) {
-        List<AdvancedPeerConnection> pcs =
-            videoRoomRenderController.getAdvancedPeerConnections(peerId!);
-        if (pcs.isNotEmpty) {
-          for (var pc in pcs) {
-            pc.negotiate();
-          }
-        }
-      }
     }
     videoChatStatus.value = VideoChatStatus.calling;
     _play();
@@ -424,14 +409,29 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     });
   }
 
+  ///移除本地所有的视频
+  _close() async {
+    var videoRenders = localVideoRenderController.videoRenders.values.toList();
+    Conference? conference = widget.videoChatMessageController.conference;
+    if (conference != null) {
+      videoConferenceRenderPool.removeVideoRender(
+          conference.conferenceId, videoRenders);
+    }
+    await localVideoRenderController.exit();
+  }
+
   ///如果正在呼叫calling，停止呼叫，关闭所有的本地视频，呼叫状态改为结束
   ///如果正在通话chatting，挂断视频通话，关闭所有的本地视频和远程视频，呼叫状态改为结束
-  _close() async {
-    if (videoChatStatus.value == VideoChatStatus.calling) {
-      localVideoRenderController.close();
-    }
+  ///结束会议
+  _exit() async {
+    await _close();
     if (videoChatStatus.value == VideoChatStatus.chatting) {
-      localVideoRenderController.close();
+      Conference? conference = widget.videoChatMessageController.conference;
+      if (conference != null &&
+          videoChatStatus.value == VideoChatStatus.chatting) {
+        await videoConferenceRenderPool
+            .closeConferenceId(conference.conferenceId);
+      }
       widget.videoChatMessageController.setChatMessage(null);
     }
     _stop();
@@ -459,16 +459,20 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   Future<void> _onAction(int index, String name, {String? value}) async {
     switch (name) {
       case 'Video':
-        _openVideoMedia();
+        await _openVideoMedia();
+        _update(null);
         break;
       case 'Audio':
-        _openVideoMedia(video: false);
+        await _openVideoMedia(video: false);
+        _update(null);
         break;
       case 'Screen share':
         _openDisplayMedia();
+        _update(null);
         break;
       case 'Media play':
         //_openMediaStream(stream);
+        //   _update();
         break;
       case 'Close':
         _close();
@@ -547,7 +551,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               value == VideoChatStatus.chatting) {
             buttonWidget = WidgetUtil.buildCircleButton(
               onPressed: () {
-                _close();
+                _exit();
               },
               elevation: 2.0,
               backgroundColor: Colors.red,
@@ -621,6 +625,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             if (value > 0) {
               return VideoViewCard(
                 videoRenderController: localVideoRenderController,
+                conference: widget.videoChatMessageController.conference,
               );
             } else {
               var size = MediaQuery.of(context).size;
@@ -643,9 +648,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   @override
   void dispose() {
     localVideoRenderController.unregisterVideoRenderOperator(
-        VideoRenderOperator.remove.name, _removeLocalVideoRender);
-    localVideoRenderController.unregisterVideoRenderOperator(
-        VideoRenderOperator.add.name, _addLocalVideoRender);
+        VideoRenderOperator.remove.name, _update);
     widget.videoChatMessageController.removeListener(_updateVideoChatReceipt);
     super.dispose();
   }
