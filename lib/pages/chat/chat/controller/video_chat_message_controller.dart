@@ -342,10 +342,9 @@ class VideoChatMessageController with ChangeNotifier {
         remoteVideoRenderController
             .addAdvancedPeerConnection(advancedPeerConnection);
         //把本地视频加入连接中，然后重新协商
-        Map<String, PeerVideoRender> videoRenders =
-            localVideoRenderController.getVideoRenders();
-        await remoteVideoRenderController
-            .addLocalVideoRender(videoRenders.values.toList());
+        List<PeerVideoRender> videoRenders =
+            localVideoRenderController.getVideoRenders().values.toList();
+        await remoteVideoRenderController.addLocalVideoRender(videoRenders);
         videoConferenceRenderPool.conferenceId = remoteVideoRenderController
             .videoChatMessageController!.conferenceId;
         //设置当前消息，转入视频会议界面
