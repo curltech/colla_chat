@@ -121,13 +121,13 @@ class VideoRenderController with ChangeNotifier {
   remove(PeerVideoRender videoRender) async {
     var streamId = videoRender.id;
     if (streamId != null && videoRenders.containsKey(streamId)) {
-      //在流被关闭前调用事件处理
-      await onVideoRenderOperator(VideoRenderOperator.remove.name, videoRender);
       await videoRender.close();
       videoRenders.remove(streamId);
       if (_currentVideoRender != null && _currentVideoRender!.id == streamId) {
         _currentVideoRender = null;
       }
+      //在流被关闭前调用事件处理
+      await onVideoRenderOperator(VideoRenderOperator.remove.name, videoRender);
     }
   }
 
@@ -141,12 +141,12 @@ class VideoRenderController with ChangeNotifier {
 
   ///关闭关闭控制器所有的流，激活exit事件
   exit() async {
-    await onVideoRenderOperator(VideoRenderOperator.exit.name, null);
     for (var videoRender in videoRenders.values) {
       await videoRender.close();
     }
     videoRenders.clear();
     _currentVideoRender = null;
+    await onVideoRenderOperator(VideoRenderOperator.exit.name, null);
   }
 }
 
@@ -196,8 +196,8 @@ class LocalVideoRenderController extends VideoRenderController {
       minHeight: minHeight,
       minFrameRate: minFrameRate,
     );
-    _mainVideoRender = render;
     onVideoRenderOperator(VideoRenderOperator.create.name, _mainVideoRender);
+    mainVideoRender = render;
 
     return render;
   }
@@ -209,8 +209,8 @@ class LocalVideoRenderController extends VideoRenderController {
       clientId: myself.clientId,
       name: myself.myselfPeer.name,
     );
-    _mainVideoRender = render;
     onVideoRenderOperator(VideoRenderOperator.create.name, _mainVideoRender);
+    mainVideoRender = render;
 
     return render;
   }
@@ -226,8 +226,8 @@ class LocalVideoRenderController extends VideoRenderController {
         name: myself.myselfPeer.name,
         selectedSource: selectedSource,
         audio: audio);
-    add(render);
     onVideoRenderOperator(VideoRenderOperator.create.name, render);
+    add(render);
 
     return render;
   }
@@ -247,6 +247,7 @@ class LocalVideoRenderController extends VideoRenderController {
       name: myself.myselfPeer.name,
       stream: stream,
     );
+    onVideoRenderOperator(VideoRenderOperator.create.name, render);
     add(render);
 
     return render;
@@ -256,8 +257,8 @@ class LocalVideoRenderController extends VideoRenderController {
   @override
   close(String streamId) {
     super.close(streamId);
-    if (currentVideoRender != null && streamId == currentVideoRender!.id) {
-      currentVideoRender = null;
+    if (mainVideoRender != null && streamId == mainVideoRender!.id) {
+      mainVideoRender = null;
     }
   }
 
@@ -265,7 +266,7 @@ class LocalVideoRenderController extends VideoRenderController {
   @override
   exit() {
     super.exit();
-    currentVideoRender = null;
+    mainVideoRender = null;
   }
 }
 

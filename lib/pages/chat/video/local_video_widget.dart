@@ -130,7 +130,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///调整界面的显示
   Future<void> _update(PeerVideoRender? peerVideoRender) async {
     List<ActionData> actionData = [];
-    if (localVideoRenderController.currentVideoRender == null ||
+    if (localVideoRenderController.mainVideoRender == null ||
         !localVideoRenderController.video) {
       actionData.add(
         ActionData(
@@ -139,7 +139,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             icon: const Icon(Icons.video_call, color: Colors.white)),
       );
     }
-    if (localVideoRenderController.currentVideoRender == null ||
+    if (localVideoRenderController.mainVideoRender == null ||
         localVideoRenderController.video) {
       actionData.add(
         ActionData(
@@ -149,7 +149,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         ),
       );
     }
-    if (localVideoRenderController.currentVideoRender != null) {
+    if (localVideoRenderController.mainVideoRender != null) {
       actionData.add(
         ActionData(
             label: 'Screen share',
@@ -269,22 +269,25 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         videoRender = await localVideoRenderController.createAudioMediaRender();
       }
       await addLocalVideoRender(videoRender);
+      _update(null);
     } else {
       if (video) {
         if (!localVideoRenderController.video) {
           await removeVideoRender(videoRender);
-          localVideoRenderController.close(videoRender.id!);
+          await localVideoRenderController.close(videoRender.id!);
           videoRender =
               await localVideoRenderController.createVideoMediaRender();
           await addLocalVideoRender(videoRender);
+          _update(null);
         }
       } else {
         if (localVideoRenderController.video) {
           await removeVideoRender(videoRender);
-          localVideoRenderController.close(videoRender.id!);
+          await localVideoRenderController.close(videoRender.id!);
           videoRender =
               await localVideoRenderController.createAudioMediaRender();
           await addLocalVideoRender(videoRender);
+          _update(null);
         }
       }
     }
@@ -300,6 +303,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       PeerVideoRender videoRender = await localVideoRenderController
           .createDisplayMediaRender(selectedSource: source);
       await addLocalVideoRender(videoRender);
+      _update(null);
 
       return videoRender;
     }
@@ -315,6 +319,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     PeerVideoRender? videoRender =
         await localVideoRenderController.createMediaStreamRender(stream);
     await addLocalVideoRender(videoRender);
+    _update(null);
 
     return videoRender;
   }
@@ -418,6 +423,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           conference.conferenceId, videoRenders);
     }
     await localVideoRenderController.exit();
+    _update(null);
   }
 
   ///如果正在呼叫calling，停止呼叫，关闭所有的本地视频，呼叫状态改为结束
@@ -460,19 +466,15 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     switch (name) {
       case 'Video':
         await _openVideoMedia();
-        _update(null);
         break;
       case 'Audio':
         await _openVideoMedia(video: false);
-        _update(null);
         break;
       case 'Screen share':
         _openDisplayMedia();
-        _update(null);
         break;
       case 'Media play':
         //_openMediaStream(stream);
-        //   _update();
         break;
       case 'Close':
         _close();
