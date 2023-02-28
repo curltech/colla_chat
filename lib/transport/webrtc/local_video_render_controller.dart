@@ -177,6 +177,7 @@ class VideoRenderController with ChangeNotifier {
     }
     videoRenders.clear();
     _currentVideoRender = null;
+    _mainVideoRender = null;
     await onVideoRenderOperator(VideoRenderOperator.exit.name, null);
   }
 }
