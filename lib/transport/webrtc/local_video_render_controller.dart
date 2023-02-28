@@ -11,6 +11,9 @@ class VideoRenderController with ChangeNotifier {
   //当前选择的render
   PeerVideoRender? _currentVideoRender;
 
+  //主视频
+  PeerVideoRender? _mainVideoRender;
+
   final Map<String, PeerVideoRender> videoRenders = {};
 
   Map<String, List<Future<void> Function(PeerVideoRender? videoRender)>> fnsm =
@@ -57,6 +60,31 @@ class VideoRenderController with ChangeNotifier {
         fn(videoRender);
       }
     }
+  }
+
+  //本地视频和音频的render
+  PeerVideoRender? get mainVideoRender {
+    return _mainVideoRender;
+  }
+
+  set mainVideoRender(PeerVideoRender? mainVideoRender) {
+    if (_mainVideoRender != mainVideoRender) {
+      if (_mainVideoRender != null) {
+        remove(_mainVideoRender!);
+      }
+      _mainVideoRender = mainVideoRender;
+      if (_mainVideoRender != null) {
+        add(_mainVideoRender!);
+      }
+    }
+  }
+
+  //判断是否有视频
+  bool get video {
+    if (_mainVideoRender != null) {
+      return _mainVideoRender!.video;
+    }
+    return false;
   }
 
   PeerVideoRender? get currentVideoRender {
@@ -126,6 +154,9 @@ class VideoRenderController with ChangeNotifier {
       if (_currentVideoRender != null && _currentVideoRender!.id == streamId) {
         _currentVideoRender = null;
       }
+      if (_mainVideoRender != null && _mainVideoRender!.id == streamId) {
+        _mainVideoRender = null;
+      }
       //在流被关闭前调用事件处理
       await onVideoRenderOperator(VideoRenderOperator.remove.name, videoRender);
     }
@@ -152,34 +183,6 @@ class VideoRenderController with ChangeNotifier {
 
 ///本地媒体控制器
 class LocalVideoRenderController extends VideoRenderController {
-  //本地视频和音频的render，只能是其中一种，可以切换
-  PeerVideoRender? _mainVideoRender;
-
-  //本地视频和音频的render
-  PeerVideoRender? get mainVideoRender {
-    return _mainVideoRender;
-  }
-
-  set mainVideoRender(PeerVideoRender? mainVideoRender) {
-    if (_mainVideoRender != mainVideoRender) {
-      if (_mainVideoRender != null) {
-        remove(_mainVideoRender!);
-      }
-      _mainVideoRender = mainVideoRender;
-      if (_mainVideoRender != null) {
-        add(_mainVideoRender!);
-      }
-    }
-  }
-
-  //判断是否有视频
-  bool get video {
-    if (_mainVideoRender != null) {
-      return _mainVideoRender!.video;
-    }
-    return false;
-  }
-
   ///创建本地的Video render，设置当前videoChatRender，激活create和add监听事件
   Future<PeerVideoRender> createVideoMediaRender({
     bool audio = true,

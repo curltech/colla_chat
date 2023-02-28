@@ -90,7 +90,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     super.initState();
     //视频通话的消息存放地
     widget.videoChatMessageController.addListener(_updateVideoChatReceipt);
-    // 本地视频的存放地
+    // 本地视频可能在其他地方关闭，所有需要注册关闭事件
     localVideoRenderController.registerVideoRenderOperator(
         VideoRenderOperator.remove.name, _update);
 
