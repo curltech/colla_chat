@@ -471,13 +471,13 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         await _openVideoMedia(video: false);
         break;
       case 'Screen share':
-        _openDisplayMedia();
+        await _openDisplayMedia();
         break;
       case 'Media play':
-        //_openMediaStream(stream);
+        //await _openMediaStream(stream);
         break;
       case 'Close':
-        _close();
+        await _close();
         break;
       default:
         break;

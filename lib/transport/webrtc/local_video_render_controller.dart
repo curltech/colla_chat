@@ -255,8 +255,8 @@ class LocalVideoRenderController extends VideoRenderController {
 
   ///关闭本地特定的流，激活close或者remove事件
   @override
-  close(String streamId) {
-    super.close(streamId);
+  close(String streamId) async {
+    await super.close(streamId);
     if (mainVideoRender != null && streamId == mainVideoRender!.id) {
       mainVideoRender = null;
     }
@@ -264,8 +264,8 @@ class LocalVideoRenderController extends VideoRenderController {
 
   ///关闭本地所有的流，激活exit事件
   @override
-  exit() {
-    super.exit();
+  exit() async {
+    await super.exit();
     mainVideoRender = null;
   }
 }
