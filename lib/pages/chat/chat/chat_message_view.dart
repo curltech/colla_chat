@@ -163,12 +163,12 @@ class _ChatMessageViewState extends State<ChatMessageView> {
       _peerConnectionStatus.value = status;
       if (_peerConnectionStatus.value == PeerConnectionStatus.connected) {
         DialogUtil.info(context,
-            content: AppLocalizations.t(
-                'PeerConnection status was changed from ${oldStatus.name} to ${status.name}'));
+            content:
+                '${AppLocalizations.t('PeerConnection status was changed from ')}${oldStatus.name}${AppLocalizations.t(' to ')}${status.name}');
       } else {
         DialogUtil.error(context,
-            content: AppLocalizations.t(
-                'PeerConnection status was changed from ${oldStatus.name} to ${status.name}'));
+            content:
+                '${AppLocalizations.t('PeerConnection status was changed from ')}${oldStatus.name}${AppLocalizations.t(' to ')}${status.name}');
       }
     }
   }

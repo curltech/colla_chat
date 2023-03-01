@@ -255,11 +255,12 @@ class _ChatListWidgetState extends State<ChatListWidget>
           badge = badges.Badge(
             badgeContent: Text('$unreadNumber',
                 style: const TextStyle(color: Colors.white)),
-            badgeStyle: badges.BadgeStyle(
+            badgeStyle: const badges.BadgeStyle(
               elevation: 0.0,
               shape: badges.BadgeShape.square,
-              borderRadius: BorderRadius.circular(8),
-              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0.0),
+              borderRadius: BorderRadius.horizontal(
+                  left: Radius.circular(8), right: Radius.circular(8)),
+              padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
             ),
             child: badge,
           );
@@ -483,7 +484,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
       controller: _tabController,
       isScrollable: false,
       indicatorColor: myself.primary.withOpacity(AppOpacity.xlOpacity),
-      labelColor: Colors.white,
+      dividerColor: Colors.white.withOpacity(AppOpacity.xlOpacity),
       padding: const EdgeInsets.all(0.0),
       labelPadding: const EdgeInsets.all(0.0),
       onTap: (int index) {

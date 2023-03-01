@@ -64,7 +64,7 @@ class DataActionCard extends StatelessWidget {
     this.size = 32,
     this.showLabel = true,
     this.showTooltip = true,
-    this.labelColor = Colors.black,
+    this.labelColor,
     this.width,
   }) : super(key: key) {
     mainAxisExtent ??= size + (showLabel ? 30 : 10);

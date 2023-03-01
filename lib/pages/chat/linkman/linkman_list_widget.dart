@@ -141,7 +141,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
 
   _buildLinkmanSearchTextField(BuildContext context) {
     var searchTextField = Container(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
         child: TextFormField(
             autofocus: true,
             controller: _linkmanTextController,
@@ -489,7 +489,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
       controller: _tabController,
       isScrollable: false,
       indicatorColor: myself.primary.withOpacity(AppOpacity.xlOpacity),
-      labelColor: Colors.white,
+      //labelColor: Colors.white,
+      dividerColor: Colors.white.withOpacity(AppOpacity.xlOpacity),
       padding: const EdgeInsets.all(0.0),
       labelPadding: const EdgeInsets.all(0.0),
       onTap: (int index) {

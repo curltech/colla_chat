@@ -30,11 +30,11 @@ class AppIconSize {
   //32大小
   static const mdSize = Size(32, 32);
 
-  //48大小
-  static const lgSize = Size(48, 48);
+  //40大小
+  static const lgSize = Size(40, 40);
 
-  //64大小
-  static const xlSize = Size(64, 64);
+  //48大小
+  static const xlSize = Size(48, 48);
 }
 
 class AppImageFile {
