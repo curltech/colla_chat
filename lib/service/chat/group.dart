@@ -49,7 +49,10 @@ class GroupService extends PeerPartyService<Group> {
     String? avatar = group.avatar;
     if (avatar != null) {
       var avatarImage = ImageUtil.buildImageWidget(
-          image: avatar, height: 32, width: 32, fit: BoxFit.contain);
+          image: avatar,
+          height: AppIconSize.lgSize.height,
+          width: AppIconSize.lgSize.width,
+          fit: BoxFit.contain);
       group.avatarImage = avatarImage;
     } else {
       List<GroupMember> members =
@@ -64,8 +67,8 @@ class GroupService extends PeerPartyService<Group> {
         }
         group.avatarImage = CombineGridView(
           widgets: widgets,
-          width: 32,
-          height: 32,
+          height: AppIconSize.lgSize.height,
+          width: AppIconSize.lgSize.width,
           maxCount: 9,
         );
       } else {

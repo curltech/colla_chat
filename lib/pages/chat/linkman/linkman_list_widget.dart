@@ -238,7 +238,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   }
 
   _changeSubscriptStatus(Linkman linkman, LinkmanStatus status) async {
-    int id = linkman!.id!;
+    int id = linkman.id!;
     await linkmanService.update({'id': id, 'subscriptStatus': status.name});
   }
 
@@ -250,10 +250,12 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
       for (var linkman in linkmen) {
         var name = linkman.name;
         var peerId = linkman.peerId;
+        var status = linkman.status ?? '';
+        var subtitle = AppLocalizations.t(status);
         TileData tile = TileData(
-            prefix: linkman.avatarImage ?? AppImage.mdAppImage,
+            prefix: linkman.avatarImage ?? AppImage.lgAppImage,
             title: name,
-            subtitle: peerId,
+            subtitle: subtitle,
             selected: false,
             routeName: 'linkman_edit');
         List<TileData> slideActions = [];
@@ -263,7 +265,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             onTap: (int index, String label, {String? subtitle}) async {
               linkmanController.currentIndex = index;
               await linkmanService.removeByPeerId(subtitle!);
-              await chatSummaryService.removeChatSummary(subtitle!);
+              await chatSummaryService.removeChatSummary(subtitle);
               await chatMessageService.removeByLinkman(subtitle);
               linkmanController.delete();
             });
@@ -332,7 +334,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         var title = group.name;
         var subtitle = group.peerId;
         TileData tile = TileData(
-            prefix: group.avatarImage ?? AppImage.mdAppImage,
+            prefix: group.avatarImage ?? AppImage.lgAppImage,
             title: title,
             subtitle: subtitle,
             selected: false,
@@ -391,7 +393,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         var title = conference.name;
         var subtitle = conference.conferenceId;
         TileData tile = TileData(
-            prefix: conference.avatarImage ?? AppImage.mdAppImage,
+            prefix: conference.avatarImage ?? AppImage.lgAppImage,
             title: title!,
             subtitle: subtitle,
             selected: false,

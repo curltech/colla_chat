@@ -206,7 +206,10 @@ class _ChatMessageViewState extends State<ChatMessageView> {
       var peerConnectionStatusWidget = ValueListenableBuilder(
           valueListenable: _peerConnectionStatus,
           builder: (context, value, child) {
-            Widget widget = const Icon(Icons.wifi);
+            Widget widget = const Icon(
+              Icons.wifi,
+              //color: Colors.green,
+            );
             if (peerId == myself.peerId) {
               widget = myself.avatarImage ?? AppImage.mdAppImage;
             } else if (_peerConnectionStatus.value !=
@@ -215,7 +218,10 @@ class _ChatMessageViewState extends State<ChatMessageView> {
                   onTap: () {
                     _createPeerConnection();
                   },
-                  child: const Icon(Icons.wifi_off));
+                  child: const Icon(
+                    Icons.wifi_off,
+                    color: Colors.red,
+                  ));
             }
             return widget;
           });

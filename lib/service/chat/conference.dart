@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/group.dart';
@@ -90,8 +91,8 @@ class ConferenceService extends GeneralBaseService<Conference> {
       }
       conference.avatarImage = CombineGridView(
         widgets: widgets,
-        width: 32,
-        height: 32,
+        height: AppIconSize.lgSize.height,
+        width: AppIconSize.lgSize.width,
         maxCount: 9,
       );
     }

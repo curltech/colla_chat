@@ -159,7 +159,6 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
           }
           return Container(
               padding: const EdgeInsets.all(0.0),
-              color: Colors.black,
               child: VideoViewCard(
                 videoRenderController: remoteVideoRenderController!,
                 conference: widget.videoChatMessageController.conference,

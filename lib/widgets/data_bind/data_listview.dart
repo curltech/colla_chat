@@ -102,11 +102,11 @@ class _DataListViewState extends State<DataListView> {
 
   Widget _buildListTile(BuildContext context, DataListTile dataListTile) {
     return Container(
-        margin: const EdgeInsets.only(top: 2.0),
+        margin: const EdgeInsets.only(top: 0.0),
         child: Column(children: <Widget>[
           dataListTile,
           Padding(
-            padding: const EdgeInsets.only(left: 2.0, right: 2.0),
+            padding: const EdgeInsets.only(left: 0.0, right: 0.0),
             child: Divider(
               height: 1,
               color: Colors.grey.withOpacity(AppOpacity.lgOpacity),

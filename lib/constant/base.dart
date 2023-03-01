@@ -21,18 +21,19 @@ class AppPadding {
 
 ///icon size
 class AppIconSize {
+  //16大小
   static const xsSize = Size(16, 16);
 
-  //sm (small),
+  //24大小
   static const smSize = Size(24, 24);
 
-  //md (medium),
+  //32大小
   static const mdSize = Size(32, 32);
 
-  //lg (large),
+  //48大小
   static const lgSize = Size(48, 48);
 
-  //xl (extra large)
+  //64大小
   static const xlSize = Size(64, 64);
 }
 
@@ -44,6 +45,7 @@ class AppImageFile {
 }
 
 class AppIcon {
+  ///16大小的app缺省图标
   static final xsAppIcon = ImageIcon(
     const AssetImage(
       AppImageFile.xsAppIconFile,
@@ -51,6 +53,7 @@ class AppIcon {
     size: AppIconSize.xsSize.width,
   );
 
+  ///24大小的app缺省图标
   static final smAppIcon = ImageIcon(
     const AssetImage(
       AppImageFile.mdAppIconFile,
@@ -58,15 +61,33 @@ class AppIcon {
     size: AppIconSize.smSize.width,
   );
 
+  ///32大小的app缺省图标
   static final mdAppIcon = ImageIcon(
     const AssetImage(
       AppImageFile.mdAppIconFile,
     ),
     size: AppIconSize.mdSize.width,
   );
+
+  ///48大小的app缺省图标
+  static final lgAppIcon = ImageIcon(
+    const AssetImage(
+      AppImageFile.mdAppIconFile,
+    ),
+    size: AppIconSize.lgSize.width,
+  );
+
+  ///64大小的app缺省图标
+  static final xlAppIcon = ImageIcon(
+    const AssetImage(
+      AppImageFile.mdAppIconFile,
+    ),
+    size: AppIconSize.xlSize.width,
+  );
 }
 
 class AppImage {
+  ///16大小的app缺省图像
   static final xsAppImage = ImageUtil.buildImageWidget(
     image: AppImageFile.xsAppIconFile,
     width: AppIconSize.xsSize.width,
@@ -74,6 +95,7 @@ class AppImage {
     fit: BoxFit.contain,
   );
 
+  ///24大小的app缺省图像
   static final smAppImage = ImageUtil.buildImageWidget(
     image: AppImageFile.mdAppIconFile,
     width: AppIconSize.smSize.width,
@@ -81,11 +103,27 @@ class AppImage {
     fit: BoxFit.contain,
   );
 
-  ///中等大小的app缺省图像
+  ///32大小的app缺省图像
   static final mdAppImage = ImageUtil.buildImageWidget(
     image: AppImageFile.mdAppIconFile,
     width: AppIconSize.mdSize.width,
     height: AppIconSize.mdSize.height,
+    fit: BoxFit.contain,
+  );
+
+  ///48大小的app缺省图像
+  static final lgAppImage = ImageUtil.buildImageWidget(
+    image: AppImageFile.mdAppIconFile,
+    width: AppIconSize.lgSize.width,
+    height: AppIconSize.lgSize.height,
+    fit: BoxFit.contain,
+  );
+
+  ///64大小的app缺省图像
+  static final xlAppImage = ImageUtil.buildImageWidget(
+    image: AppImageFile.mdAppIconFile,
+    width: AppIconSize.xlSize.width,
+    height: AppIconSize.xlSize.height,
     fit: BoxFit.contain,
   );
 }

@@ -90,7 +90,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
                 const Icon(size: 32, color: Colors.white, Icons.zoom_out_map)),
       );
     });
-    Overlay.of(context)!.insert(overlayEntry!);
+    Overlay.of(context).insert(overlayEntry!);
     indexWidgetProvider.pop();
   }
 

@@ -335,7 +335,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       if (status != PeerConnectionStatus.connected) {
         DialogUtil.error(context,
             content:
-                '$name ${AppLocalizations.t('has no Webrtc connected PeerConnection')}');
+                '$name ${AppLocalizations.t('has no webrtc connected peerConnection')}');
         return null;
       }
     }
@@ -367,7 +367,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         if (mounted) {
           DialogUtil.info(context,
               content:
-                  '${AppLocalizations.t('Create conference and send videoChat chatMessage ')} ${chatMessage.messageId}');
+                  '${AppLocalizations.t('Create conference and send videoChat chatMessage')} ${chatMessage.messageId}');
         }
         await addLocalVideoRender(videoRender);
         _update(videoRender);
@@ -568,7 +568,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                   child: Padding(
                       padding: const EdgeInsets.all(5.0),
                       child: Text(
-                          '${AppLocalizations.t('conferenceId')}:${conference.conferenceId}',
+                          '${AppLocalizations.t('ConferenceId')}:${conference.conferenceId}',
                           style: const TextStyle(color: Colors.white)))),
             );
           } else {

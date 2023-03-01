@@ -316,13 +316,16 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     final myselfPeer = myself.myselfPeer;
     myselfPeer.avatar = data;
     var avatarImage = ImageUtil.buildImageWidget(
-        image: data, height: 32, width: 32, fit: BoxFit.contain);
+        image: data,
+        height: AppIconSize.lgSize.height,
+        width: AppIconSize.lgSize.width,
+        fit: BoxFit.contain);
     myselfPeer.avatarImage = avatarImage;
     var avatarIcon = ImageIcon(
       AssetImage(
         data,
       ),
-      size: AppIconSize.mdSize.width,
+      size: AppIconSize.lgSize.width,
     );
     myselfPeer.avatarIcon = avatarIcon;
     await peerClientService.updateAvatar(peerId, avatar);

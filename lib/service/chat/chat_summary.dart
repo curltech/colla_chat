@@ -16,7 +16,13 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
     required super.tableName,
     required super.fields,
     required super.indexFields,
-    super.encryptFields = const ['content', 'thumbBody', 'thumbnail', 'title'],
+    super.encryptFields = const [
+      'content',
+      'thumbBody',
+      'thumbnail',
+      'title',
+      'receiptContent'
+    ],
   }) {
     post = (Map map) {
       return ChatSummary.fromJson(map);

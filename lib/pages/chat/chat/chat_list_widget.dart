@@ -19,6 +19,7 @@ import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/connectivity_util.dart';
+import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/websocket.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -206,14 +207,12 @@ class _ChatListWidgetState extends State<ChatListWidget>
     if (socketStatus != status) {
       if (_socketStatus.value == SocketStatus.connected) {
         DialogUtil.info(context,
-            content: AppLocalizations.t(
-                    'Websocket $address status was changed to:') +
-                _socketStatus.value.name);
+            content:
+                '$address ${AppLocalizations.t('Websocket status was changed to:')}${_socketStatus.value.name}');
       } else {
         DialogUtil.error(context,
-            content: AppLocalizations.t(
-                    'Websocket $address status was changed to:') +
-                _socketStatus.value.name);
+            content:
+                '$address ${AppLocalizations.t('Websocket status was changed to:')}${_socketStatus.value.name}');
       }
     }
   }
@@ -223,15 +222,27 @@ class _ChatListWidgetState extends State<ChatListWidget>
     List<TileData> tiles = [];
     if (linkmenChatSummary.isNotEmpty) {
       for (var chatSummary in linkmenChatSummary) {
-        var title = chatSummary.name ?? '';
+        var title = chatSummary.title ?? '';
+        var name = chatSummary.name ?? '';
         var peerId = chatSummary.peerId ?? '';
+        var subtitle = peerId;
+        var subMessageType = chatSummary.subMessageType;
+        var sendReceiveTime = chatSummary.sendReceiveTime ?? '';
+        sendReceiveTime = DateUtil.formatEasyRead(sendReceiveTime);
+        if (subMessageType == ChatMessageSubType.chat.name) {
+          var content = chatSummary.content ?? '';
+          subtitle = chatMessageService.recoverContent(content);
+        }
+        if (subMessageType == ChatMessageSubType.videoChat.name) {
+          subtitle = AppLocalizations.t(subMessageType!);
+        }
         var unreadNumber = chatSummary.unreadNumber;
         Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
         if (linkman == null) {
           chatSummaryService.delete(entity: chatSummary);
           continue;
         }
-        var badge = linkman.avatarImage ?? AppImage.mdAppImage;
+        var badge = linkman.avatarImage ?? AppImage.lgAppImage;
         if (unreadNumber > 0) {
           badge = badges.Badge(
             badgeContent: Text('$unreadNumber',
@@ -240,15 +251,16 @@ class _ChatListWidgetState extends State<ChatListWidget>
               elevation: 0.0,
               shape: badges.BadgeShape.square,
               borderRadius: BorderRadius.circular(8),
-              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5.0),
+              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 0.0),
             ),
             child: badge,
           );
         }
+
         TileData tile = TileData(
             prefix: badge,
-            title: title,
-            subtitle: peerId,
+            title: '$name               $sendReceiveTime',
+            subtitle: subtitle,
             dense: true,
             selected: false,
             routeName: 'chat_message');
@@ -275,15 +287,27 @@ class _ChatListWidgetState extends State<ChatListWidget>
     List<TileData> tiles = [];
     if (groupChatSummary.isNotEmpty) {
       for (var chatSummary in groupChatSummary) {
-        var title = chatSummary.name ?? '';
+        var title = chatSummary.title ?? '';
+        var name = chatSummary.name ?? '';
         var peerId = chatSummary.peerId ?? '';
+        var subtitle = peerId;
+        var subMessageType = chatSummary.subMessageType;
+        var sendReceiveTime = chatSummary.sendReceiveTime ?? '';
+        sendReceiveTime = DateUtil.formatEasyRead(sendReceiveTime);
+        if (subMessageType == ChatMessageSubType.chat.name) {
+          var content = chatSummary.content ?? '';
+          subtitle = chatMessageService.recoverContent(content);
+        }
+        if (subMessageType == ChatMessageSubType.videoChat.name) {
+          subtitle = AppLocalizations.t(subMessageType!);
+        }
         var unreadNumber = chatSummary.unreadNumber;
         Group? group = await groupService.findCachedOneByPeerId(peerId);
         if (group == null) {
           chatSummaryService.delete(entity: chatSummary);
           continue;
         }
-        var badge = group.avatarImage ?? AppImage.mdAppImage;
+        var badge = group.avatarImage ?? AppImage.lgAppImage;
         if (unreadNumber > 0) {
           badge = badges.Badge(
             badgeContent: Text('$unreadNumber',
@@ -299,8 +323,8 @@ class _ChatListWidgetState extends State<ChatListWidget>
         }
         TileData tile = TileData(
             prefix: badge,
-            title: title,
-            subtitle: peerId,
+            title: '$name               $sendReceiveTime',
+            subtitle: subtitle,
             dense: true,
             selected: false,
             routeName: 'chat_message');
@@ -327,8 +351,20 @@ class _ChatListWidgetState extends State<ChatListWidget>
     List<TileData> tiles = [];
     if (conferenceChatSummary.isNotEmpty) {
       for (var chatSummary in conferenceChatSummary) {
-        var title = chatSummary.name ?? '';
+        var title = chatSummary.title ?? '';
+        var name = chatSummary.name ?? '';
         var peerId = chatSummary.peerId ?? '';
+        var subtitle = peerId;
+        var subMessageType = chatSummary.subMessageType;
+        var sendReceiveTime = chatSummary.sendReceiveTime ?? '';
+        sendReceiveTime = DateUtil.formatEasyRead(sendReceiveTime);
+        if (subMessageType == ChatMessageSubType.chat.name) {
+          var content = chatSummary.content ?? '';
+          subtitle = chatMessageService.recoverContent(content);
+        }
+        if (subMessageType == ChatMessageSubType.videoChat.name) {
+          subtitle = AppLocalizations.t(subMessageType!);
+        }
         var unreadNumber = chatSummary.unreadNumber;
         Conference? conference =
             await conferenceService.findCachedOneByConferenceId(peerId);
@@ -336,7 +372,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
           chatSummaryService.delete(entity: chatSummary);
           continue;
         }
-        var badge = conference.avatarImage ?? AppImage.mdAppImage;
+        var badge = conference.avatarImage ?? AppImage.lgAppImage;
         if (unreadNumber > 0) {
           badge = badges.Badge(
             badgeContent: Text('$unreadNumber',
@@ -352,8 +388,8 @@ class _ChatListWidgetState extends State<ChatListWidget>
         }
         TileData tile = TileData(
             prefix: badge,
-            title: title,
-            subtitle: peerId,
+            title: '$name               $sendReceiveTime',
+            subtitle: subtitle,
             dense: true,
             selected: false,
             routeName: 'chat_message');
@@ -504,8 +540,16 @@ class _ChatListWidgetState extends State<ChatListWidget>
             Text(_connectivityResult.value.name,
                 style: const TextStyle(fontSize: 12)),
             _connectivityResult.value == ConnectivityResult.none
-                ? const Icon(Icons.wifi_off, size: 20)
-                : const Icon(Icons.wifi, size: 20),
+                ? const Icon(
+                    Icons.wifi_off,
+                    size: 20,
+                    color: Colors.red,
+                  )
+                : const Icon(
+                    Icons.wifi,
+                    size: 20,
+                    //color: Colors.green,
+                  ),
           ]);
         });
     rightWidgets.add(connectivityWidget);
@@ -530,8 +574,14 @@ class _ChatListWidgetState extends State<ChatListWidget>
                     }
                   : null,
               child: _socketStatus.value == SocketStatus.connected
-                  ? const Icon(Icons.cloud_done)
-                  : const Icon(Icons.cloud_off));
+                  ? const Icon(
+                      Icons.cloud_done,
+                      //color: Colors.green,
+                    )
+                  : const Icon(
+                      Icons.cloud_off,
+                      color: Colors.red,
+                    ));
         });
     rightWidgets.add(wssWidget);
     rightWidgets.add(const SizedBox(
