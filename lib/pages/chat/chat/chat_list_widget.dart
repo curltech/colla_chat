@@ -164,11 +164,15 @@ class _ChatListWidgetState extends State<ChatListWidget>
     }
   }
 
-  ///如果没有缺省的websocket，尝试重连
+  ///网络连通的情况下，如果没有缺省的websocket，尝试重连websocket
   _reconnect() async {
-    Websocket? websocket = websocketPool.getDefault();
-    if (websocket == null) {
-      await websocketPool.connect();
+    if (_connectivityResult.value != ConnectivityResult.none &&
+        (_socketStatus.value != SocketStatus.connected ||
+            _socketStatus.value != SocketStatus.reconnecting)) {
+      Websocket? websocket = websocketPool.getDefault();
+      if (websocket == null) {
+        await websocketPool.connect();
+      }
     }
   }
 
@@ -194,6 +198,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
       DialogUtil.error(context,
           content: AppLocalizations.t('Connectivity were break down'));
     } else {
+      _reconnect();
       DialogUtil.info(context,
           content: AppLocalizations.t('Connectivity status was changed to:') +
               result.name);
@@ -206,6 +211,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
     _socketStatus.value = socketStatus;
     if (socketStatus != status) {
       if (_socketStatus.value == SocketStatus.connected) {
+        _reconnectWebrtc();
         DialogUtil.info(context,
             content:
                 '$address ${AppLocalizations.t('Websocket status was changed to:')}${_socketStatus.value.name}');
@@ -216,6 +222,8 @@ class _ChatListWidgetState extends State<ChatListWidget>
       }
     }
   }
+
+  _reconnectWebrtc() {}
 
   _buildLinkmanTileData() async {
     var linkmenChatSummary = linkmanChatSummaryController.data;
