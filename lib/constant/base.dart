@@ -38,10 +38,10 @@ class AppIconSize {
 }
 
 class AppImageFile {
-  static const xsAppIconFile = 'assets/icons/favicon-16x16.png';
-  static const mdAppIconFile = 'assets/icons/favicon-32x32.png';
-  static const defaultAvatarFile = 'assets/images/colla-o1.png';
-  static const defaultGroupAvatarFile = 'assets/images/colla-o1.png';
+  static const xsAppIconFile = 'assets/images/app.png';
+  static const mdAppIconFile = 'assets/images/app.png';
+  static const defaultAvatarFile = 'assets/images/app.png';
+  static const defaultGroupAvatarFile = 'assets/images/app.png';
 }
 
 class AppIcon {

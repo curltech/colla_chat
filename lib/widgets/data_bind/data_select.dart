@@ -6,7 +6,6 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class OptionController with ChangeNotifier {
@@ -256,7 +255,7 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
     var size = MediaQuery.of(context).size;
     selector = Center(
         child: Container(
-      color: Colors.white,
+      color: Colors.grey.withOpacity(AppOpacity.smOpacity),
       width: size.width * 0.9,
       height: size.height * 0.9,
       alignment: Alignment.center,
@@ -627,7 +626,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
     var size = MediaQuery.of(context).size;
     selector = Center(
         child: Container(
-      color: Colors.white,
+      color: Colors.grey.withOpacity(AppOpacity.smOpacity),
       width: size.width * 0.9,
       height: size.height * 0.9,
       alignment: Alignment.center,
