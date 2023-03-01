@@ -1,4 +1,3 @@
-import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -210,13 +209,14 @@ class DataListTile extends StatelessWidget {
     List<SlidableAction> slidableActions = [];
     for (var slideAction in slideActions!) {
       SlidableAction slidableAction = SlidableAction(
+        padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 0),
         onPressed: (context) {
           if (slideAction.onTap != null) {
             slideAction.onTap!(index, tileData.title,
                 subtitle: slideAction.title);
           }
         },
-        backgroundColor: Colors.white.withOpacity(AppOpacity.lgOpacity),
+        backgroundColor: Colors.grey,
         foregroundColor: myself.primary,
         icon: slideAction.prefix,
         label: AppLocalizations.t(slideAction.title),
