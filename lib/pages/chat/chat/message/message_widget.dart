@@ -165,7 +165,6 @@ class MessageWidget {
           onTap: () {
             chatMessageController.currentIndex = index;
             indexWidgetProvider.push('full_screen');
-            openLocationMap(context);
           },
           child: body);
 

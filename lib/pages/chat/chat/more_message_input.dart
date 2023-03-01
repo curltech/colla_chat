@@ -21,6 +21,7 @@ import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
@@ -209,7 +210,6 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     double longitude = position.longitude;
     String? address;
     await SmartDialogUtil.show(
-        context: context,
         title: AppBarWidget.buildTitleBar(
             title: Text(AppLocalizations.t('Location map'))),
         builder: (BuildContext? context) {
@@ -220,6 +220,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
                 longitude = data.latLong.longitude;
                 latitude = data.latLong.latitude;
                 address = data.address;
+                SmartDialog.dismiss();
               });
         });
     // await SmartDialogUtil.show(
