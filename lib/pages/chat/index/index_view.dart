@@ -80,6 +80,7 @@ class _IndexViewState extends State<IndexView>
           await videoChatMessageController!.setChatMessage(chatMessage);
           videoChatMessageVisible.value = true;
         } else {
+          //videoChatMessageController.dispose();
           var videoChatMessageController = VideoChatMessageController();
           await videoChatMessageController.setChatMessage(chatMessage);
           await videoChatMessageController.sendChatReceipt(MessageStatus.busy);

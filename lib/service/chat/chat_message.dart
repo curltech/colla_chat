@@ -36,7 +36,13 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     required super.tableName,
     required super.fields,
     required super.indexFields,
-    super.encryptFields = const ['content', 'thumbBody', 'thumbnail', 'title'],
+    super.encryptFields = const [
+      'content',
+      'thumbBody',
+      'thumbnail',
+      'title',
+      'receiptContent'
+    ],
   }) {
     post = (Map map) {
       return ChatMessage.fromJson(map);
@@ -81,6 +87,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return await findOne(
       where: where,
       whereArgs: whereArgs,
+      orderBy: 'id',
     );
   }
 
@@ -438,8 +445,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         }
         originChatMessage.receiptContent = chatMessage.content;
         originChatMessage.receiptTime = chatMessage.receiptTime;
-        originChatMessage.receiveTime = chatMessage.receiveTime;
-        originChatMessage.status = chatMessage.status;
+        originChatMessage.receiveTime = DateUtil.currentDate();
+        originChatMessage.status = MessageStatus.received.name;
         originChatMessage.deleteTime = chatMessage.deleteTime;
         await store(originChatMessage);
 

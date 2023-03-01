@@ -20,6 +20,8 @@ import 'package:flutter/material.dart';
 ///视频通话的消息控制器
 ///接受方根据发起方的消息生成对应的接受或者拒绝或者终止的回执,发起方收到回执进行处理
 class VideoChatMessageController with ChangeNotifier {
+  final Key key = UniqueKey();
+
   //视频邀请消息对应的汇总消息
   ChatSummary? _chatSummary;
 
@@ -49,12 +51,7 @@ class VideoChatMessageController with ChangeNotifier {
 
   final Map<String, List<Function(ChatMessage chatMessage)>> _receivers = {};
 
-  VideoChatMessageController() {
-    globalChatMessageController.registerReceiver(
-        ChatMessageSubType.videoChat.name, receivedVideoChat);
-    globalChatMessageController.registerReceiver(
-        ChatMessageSubType.chatReceipt.name, receivedChatReceipt);
-  }
+  VideoChatMessageController();
 
   ///注册消息接收监听器，用于自定义的特殊处理
   registerReceiver(
@@ -133,6 +130,8 @@ class VideoChatMessageController with ChangeNotifier {
     groupPeerId = null;
     _conference = null;
     if (chatSummary == null) {
+      globalChatMessageController.unregisterReceiver(
+          ChatMessageSubType.videoChat.name, receivedVideoChat);
       return;
     }
     partyType = chatSummary.partyType;
@@ -150,6 +149,8 @@ class VideoChatMessageController with ChangeNotifier {
         name = _conference!.name;
       }
     }
+    globalChatMessageController.registerReceiver(
+        ChatMessageSubType.videoChat.name, receivedVideoChat);
   }
 
   ///设置当前的视频邀请消息，可以从chatMessageController中获取当前
@@ -172,11 +173,14 @@ class VideoChatMessageController with ChangeNotifier {
     _terminatedChatReceipts.clear();
     //如果是清空数据，直接返回
     if (_chatMessage == null) {
-      notifyListeners();
+      globalChatMessageController.unregisterReceiver(
+          ChatMessageSubType.chatReceipt.name, receivedChatReceipt);
       return;
     }
     await _initChatSummary();
     await _initChatMessage();
+    globalChatMessageController.registerReceiver(
+        ChatMessageSubType.chatReceipt.name, receivedChatReceipt);
     await _initChatReceipt();
   }
 
