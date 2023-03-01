@@ -42,8 +42,8 @@ class LocationPosition {
   });
 
   LocationPosition.fromJson(Map<String, dynamic> json)
-      : latitude = json['latitude'],
-        longitude = json['longitude'],
+      : latitude = json['latitude'] ?? 0,
+        longitude = json['longitude'] ?? 0,
         altitude = json['altitude'] ?? 0.0,
         accuracy = json['accuracy'] ?? 0.0,
         heading = json['heading'] ?? 0.0,

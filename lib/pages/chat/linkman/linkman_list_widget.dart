@@ -590,40 +590,6 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           icon: Icon(Icons.qr_code, color: myself.primary),
           title: AppLocalizations.t('Qrcode scan')),
     ];
-    var rightWidgets = [
-      IconButton(
-          onPressed: () {
-            linkmanController.currentIndex = -1;
-            indexWidgetProvider.push('linkman_add');
-          },
-          icon: const Icon(Icons.person_add_alt, color: Colors.white),
-          tooltip: AppLocalizations.t('Add linkman')),
-      IconButton(
-          onPressed: () {
-            groupController.currentIndex = -1;
-            indexWidgetProvider.push('group_add');
-          },
-          icon: const Icon(Icons.group_add, color: Colors.white),
-          tooltip: AppLocalizations.t('Add group')),
-      IconButton(
-          onPressed: () {
-            conferenceController.currentIndex = -1;
-            indexWidgetProvider.push('conference_edit');
-          },
-          icon: const Icon(Icons.add_business_outlined, color: Colors.white),
-          tooltip: AppLocalizations.t('Add conference')),
-      IconButton(
-          onPressed: () async {
-            ScanResult scanResult = await QrcodeUtil.scan();
-            String content = scanResult.rawContent;
-            var map = JsonUtil.toJson(content);
-            PeerClient peerClient = PeerClient.fromJson(map);
-            await peerClientService.store(peerClient);
-            await linkmanService.storeByPeerClient(peerClient);
-          },
-          icon: const Icon(Icons.qr_code, color: Colors.white),
-          tooltip: AppLocalizations.t('Qrcode scan')),
-    ];
     return AppBarView(
         title: widget.title,
         //rightWidgets: rightWidgets,

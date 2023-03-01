@@ -262,5 +262,12 @@
   "myself": "自己",
   "No current chatSummary": "没有当前消息汇总",
   "PeerConnection status was changed from ": "连接状态被改变，从",
-  " to ": "变成"
+  " to ": "变成",
+  "Built conference ": "创建会议：",
+  "Must has conference name": "必须有会议名称",
+  "Must has conference owner": "必须有会议发起人",
+  "Must has conference topic": "必须有会议主题",
+  "Conference member ": "会议成员：",
+  " is not linkman": "不是联系人：",
+  "Topic": "主题"
 }

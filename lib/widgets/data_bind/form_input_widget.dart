@@ -117,7 +117,7 @@ class FormInputWidget extends StatelessWidget {
   final Map<String, dynamic>? initValues;
   late final FormInputController controller;
 
-  final Function(Map<String, dynamic>) onOk;
+  final Function(Map<String, dynamic>)? onOk;
   String okLabel;
   String resetLabel;
   final MainAxisAlignment mainAxisAlignment;
@@ -127,7 +127,7 @@ class FormInputWidget extends StatelessWidget {
       {Key? key,
       required List<ColumnFieldDef> columnFieldDefs,
       this.initValues,
-      required this.onOk,
+      this.onOk,
       this.okLabel = 'Ok',
       this.resetLabel = 'Reset',
       this.mainAxisAlignment = MainAxisAlignment.start,
@@ -171,25 +171,27 @@ class FormInputWidget extends StatelessWidget {
     ButtonStyle style = WidgetUtil.buildButtonStyle();
     ButtonStyle mainStyle = WidgetUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);
-    children.add(
-      ButtonBar(children: [
-        TextButton(
-          style: style,
-          child: Text(AppLocalizations.t(resetLabel)),
-          onPressed: () {
-            controller.clear();
-          },
-        ),
-        TextButton(
-          style: mainStyle,
-          child: Text(AppLocalizations.t(okLabel)),
-          onPressed: () {
-            var values = controller.getValues();
-            onOk(values);
-          },
-        ),
-      ]),
-    );
+    if (onOk != null) {
+      children.add(
+        ButtonBar(children: [
+          TextButton(
+            style: style,
+            child: Text(AppLocalizations.t(resetLabel)),
+            onPressed: () {
+              controller.clear();
+            },
+          ),
+          TextButton(
+            style: mainStyle,
+            child: Text(AppLocalizations.t(okLabel)),
+            onPressed: () {
+              var values = controller.getValues();
+              onOk!(values);
+            },
+          ),
+        ]),
+      );
+    }
     return Column(
         mainAxisAlignment: mainAxisAlignment,
         crossAxisAlignment: CrossAxisAlignment.start,

@@ -242,6 +242,11 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
     }
     group.value.groupOwnerPeerId ??= myself.peerId;
     current.groupOwnerPeerId = group.value.groupOwnerPeerId;
+    var participants = groupMembers.value;
+    if (!participants.contains(myself.peerId!)) {
+      participants.add(myself.peerId!);
+      groupMembers.value = [...participants];
+    }
     current.participants = groupMembers.value;
     List<Object> gs = await groupService.store(current);
     group.value = current;

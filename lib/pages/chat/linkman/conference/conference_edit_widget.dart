@@ -42,6 +42,11 @@ final List<ColumnFieldDef> conferenceColumnFieldDefs = [
       label: 'Password',
       inputType: InputType.password,
       prefixIcon: const Icon(Icons.password)),
+  ColumnFieldDef(
+      name: 'video',
+      label: 'Video',
+      inputType: InputType.checkbox,
+      prefixIcon: const Icon(Icons.video_call)),
 ];
 
 ///创建和修改群，填写群的基本信息，选择群成员和群主
@@ -137,8 +142,9 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
           logger.e('Conference member $conferenceMemberId is not linkman');
           if (mounted) {
             DialogUtil.error(context,
-                content:
-                    'Conference member $conferenceMemberId is not linkman');
+                content: AppLocalizations.t('Conference member ') +
+                    conferenceMemberId +
+                    AppLocalizations.t(' is not linkman'));
           }
         }
       }
@@ -209,8 +215,8 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
                       _onOk(values).then((conference) {
                         if (conference != null) {
                           DialogUtil.info(context,
-                              content:
-                                  'Conference ${conference.name} is built');
+                              content: AppLocalizations.t('Built conference ') +
+                                  conference.name);
                         }
                       });
                     },
@@ -244,6 +250,11 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     }
     var current = conferenceController.current;
     if (current == null) {
+      var participants = conferenceMembers.value;
+      if (!participants.contains(myself.peerId!)) {
+        participants.add(myself.peerId!);
+        conferenceMembers.value = [...participants];
+      }
       current = await conferenceService.createConference(currentConference.name,
           topic: currentConference.topic,
           conferenceOwnerPeerId: conference.value.conferenceOwnerPeerId,

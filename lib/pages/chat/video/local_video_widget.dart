@@ -274,7 +274,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   ///选择会议参加人的界面，返回会议参加人
   Future<List<String>> _selectParticipants() async {
-    List<String> participants = [myself.peerId!];
+    List<String> participants = [];
     var partyType = widget.videoChatMessageController.partyType;
     if (partyType == PartyType.conference.name) {
       List<String> selected = <String>[];
@@ -319,6 +319,9 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         return participants;
       }
       participants.add(peerId);
+    }
+    if (!participants.contains(myself.peerId!)) {
+      participants.add(myself.peerId!);
     }
 
     return participants;

@@ -15,6 +15,7 @@ import 'package:colla_chat/pages/chat/chat/message/location_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/name_card_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/rich_text_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/url_message.dart';
+import 'package:colla_chat/pages/chat/chat/message/video_chat_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/video_message.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/platform.dart';
@@ -139,7 +140,7 @@ class MessageWidget {
           break;
       }
     } else if (subMessageType == ChatMessageSubType.videoChat) {
-      body = buildActionMessageWidget(context, subMessageType!);
+      body = buildVideoChatMessageWidget(context);
     } else if (subMessageType == ChatMessageSubType.addFriend) {
       body = buildActionMessageWidget(context, subMessageType!);
     } else if (subMessageType == ChatMessageSubType.addGroup) {
@@ -265,6 +266,20 @@ class MessageWidget {
       subMessageType: subMessageType,
       title: chatMessage.title,
       content: content,
+    );
+  }
+
+  VideoChatMessage buildVideoChatMessageWidget(BuildContext context) {
+    String? content = chatMessage.content;
+    if (content != null) {
+      content = chatMessageService.recoverContent(content);
+    }
+    return VideoChatMessage(
+      key: UniqueKey(),
+      isMyself: isMyself,
+      fullScreen: fullScreen,
+      title: chatMessage.title,
+      content: content!,
     );
   }
 

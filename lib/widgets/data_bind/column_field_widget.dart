@@ -260,7 +260,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
           const SizedBox(
             width: 10.0,
           ),
-          Expanded(child: Text(value, textAlign: TextAlign.start))
+          Expanded(child: Text(value.toString(), textAlign: TextAlign.start))
         ]));
   }
 
