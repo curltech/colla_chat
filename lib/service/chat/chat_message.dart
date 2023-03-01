@@ -706,6 +706,11 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
 
   /// 保存消息，对于复杂消息，存储附件
   store(ChatMessage chatMessage, {bool updateSummary = true}) async {
+    String subMessageType = chatMessage.subMessageType;
+    //signal消息暂时不保存
+    if (subMessageType == ChatMessageSubType.signal.name) {
+      return;
+    }
     int? id = chatMessage.id;
     String? content = chatMessage.content;
     String? title = chatMessage.title;
