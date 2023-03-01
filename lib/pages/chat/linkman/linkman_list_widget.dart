@@ -252,6 +252,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         var peerId = linkman.peerId;
         var status = linkman.status ?? '';
         var subtitle = AppLocalizations.t(status);
+        if (peerId == myself.peerId) {
+          subtitle = AppLocalizations.t('myself');
+        }
         TileData tile = TileData(
             prefix: linkman.avatarImage ?? AppImage.lgAppImage,
             title: name,
@@ -394,7 +397,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         var subtitle = conference.conferenceId;
         TileData tile = TileData(
             prefix: conference.avatarImage ?? AppImage.lgAppImage,
-            title: title!,
+            title: title,
             subtitle: subtitle,
             selected: false,
             routeName: 'conference_edit');
