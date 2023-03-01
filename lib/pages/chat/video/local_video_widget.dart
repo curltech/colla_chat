@@ -3,15 +3,11 @@ import 'dart:async';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/group_linkman_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/video/video_view_card.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/chat/conference.dart';
-import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
@@ -178,86 +174,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     videoViewCount.value = localVideoRenderController.videoRenders.length;
   }
 
-  ///创建新的会议功能
-  ///对联系人模式，可以临时创建一个会议，会议成员从群成员中选择就是自己和对方，会议名称是对方的名称，不保存会议
-  ///对群模式，可以创建一个会议，会议成员从群成员中选择，会议名称是群的名称加上当前时间，保存会议
-  ///对会议模式，直接转到会议创建界面，
-  Future<Conference?> _buildConference({bool video = true}) async {
-    var conference = widget.videoChatMessageController.conference;
-    if (conference != null) {
-      logger.e('conference ${conference.name} is exist');
-      return conference;
-    }
-    List<String> participants = [myself.peerId!];
-    var partyType = widget.videoChatMessageController.partyType;
-    if (partyType == PartyType.conference.name) {
-      List<String> selected = <String>[];
-      await DialogUtil.show(
-          context: context,
-          // title: AppBarWidget.buildTitleBar(
-          //     title: Text(AppLocalizations.t('Select one linkman'))),
-          builder: (BuildContext context) {
-            return LinkmanGroupSearchWidget(
-                onSelected: (List<String>? peerIds) async {
-                  if (peerIds != null) {
-                    participants.addAll(peerIds);
-                  }
-                  Navigator.pop(context, participants);
-                },
-                selected: selected,
-                includeGroup: false,
-                selectType: SelectType.chipMultiSelect);
-          });
-    }
-    var groupPeerId = widget.videoChatMessageController.groupPeerId;
-    if (partyType == PartyType.group.name) {
-      if (groupPeerId == null) {
-        return null;
-      }
-      if (conference != null) {
-        return conference;
-      }
-      if (mounted) {
-        await DialogUtil.show(
-            context: context,
-            builder: (BuildContext context) {
-              return GroupLinkmanWidget(
-                onSelected: (List<String> peerIds) {
-                  participants.addAll(peerIds);
-                  Navigator.pop(context, participants);
-                },
-                selected: const <String>[],
-                groupPeerId: groupPeerId,
-              );
-            });
-      }
-    }
-    if (partyType == PartyType.linkman.name) {
-      var peerId = widget.videoChatMessageController.peerId;
-      if (peerId == null) {
-        return null;
-      }
-      participants.add(peerId);
-    }
-    var name = widget.videoChatMessageController.name;
-    conference = await conferenceService.createConference(
-        '${name!}-${DateUtil.currentDate()}',
-        video: video,
-        participants: participants);
-    if (partyType == PartyType.group.name) {
-      conference.groupPeerId = groupPeerId;
-      conference.groupName = name;
-      conference.groupType = partyType;
-    }
-    if (mounted) {
-      DialogUtil.info(context,
-          content:
-              '${AppLocalizations.t('Create conference')} ${conference.conferenceId}');
-    }
-
-    return conference;
-  }
-
   ///创建本地的Video render，支持视频和音频的切换，设置当前videoChatRender，激活create。add和remove监听事件
   Future<PeerVideoRender?> _openVideoMedia({bool video = true}) async {
     ///本地视频不存在，可以直接创建，并发送视频邀请消息，否则根据情况觉得是否音视频切换
@@ -356,6 +272,58 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
   }
 
+  ///选择会议参加人的界面，返回会议参加人
+  Future<List<String>> _selectParticipants() async {
+    List<String> participants = [myself.peerId!];
+    var partyType = widget.videoChatMessageController.partyType;
+    if (partyType == PartyType.conference.name) {
+      List<String> selected = <String>[];
+      await DialogUtil.show(
+          context: context,
+          // title: AppBarWidget.buildTitleBar(
+          //     title: Text(AppLocalizations.t('Select one linkman'))),
+          builder: (BuildContext context) {
+            return LinkmanGroupSearchWidget(
+                onSelected: (List<String>? peerIds) async {
+                  if (peerIds != null) {
+                    participants.addAll(peerIds);
+                  }
+                  Navigator.pop(context, participants);
+                },
+                selected: selected,
+                includeGroup: false,
+                selectType: SelectType.chipMultiSelect);
+          });
+    } else if (partyType == PartyType.group.name) {
+      var groupPeerId = widget.videoChatMessageController.groupPeerId;
+      if (groupPeerId == null) {
+        return participants;
+      }
+      if (mounted) {
+        await DialogUtil.show(
+            context: context,
+            builder: (BuildContext context) {
+              return GroupLinkmanWidget(
+                onSelected: (List<String> peerIds) {
+                  participants.addAll(peerIds);
+                  Navigator.pop(context, participants);
+                },
+                selected: const <String>[],
+                groupPeerId: groupPeerId,
+              );
+            });
+      }
+    } else if (partyType == PartyType.linkman.name) {
+      var peerId = widget.videoChatMessageController.peerId;
+      if (peerId == null) {
+        return participants;
+      }
+      participants.add(peerId);
+    }
+
+    return participants;
+  }
+
   ///呼叫，打开本地视频，如果没有会议，先创建会议，发送视频通话邀请消息
   ///如果已有视频通话邀请消息，则直接开始重新协商
   _call() async {
@@ -375,43 +343,56 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     PeerVideoRender? videoRender = localVideoRenderController.mainVideoRender;
     videoRender ??= await _openVideoMedia(video: true);
     if (videoRender == null) {
+      if (mounted) {
+        DialogUtil.error(context,
+            content: AppLocalizations.t('OpenVideoMedia failure'));
+      }
       return;
     }
-    var conference = widget.videoChatMessageController.conference;
-    //创建会议
-    conference ??= await _buildConference(video: videoRender.video);
     //检查当前的视频邀请消息是否存在
     ChatMessage? chatMessage = widget.videoChatMessageController.chatMessage;
     if (chatMessage == null) {
-      //在联系人模式下，会议不保存，在群模式下，在邀请消息发送后才保存
-      //在会议模式下，会议在创建后保存，直接发送邀请消息和保存
-      if (partyType == PartyType.group.name) {
-        await conferenceService.store(conference!);
-      }
+      List<String> participants = await _selectParticipants();
       //发送会议邀请消息
       if (videoRender.video) {
-        chatMessage = await _sendVideoChatMessage(
-            contentType: ContentType.video.name, conference: conference!);
+        chatMessage = await widget.videoChatMessageController
+            .sendVideoChatMessage(
+                contentType: ContentType.video, participants: participants);
       } else {
-        chatMessage = await _sendVideoChatMessage(
-            contentType: ContentType.audio.name, conference: conference!);
+        chatMessage = await widget.videoChatMessageController
+            .sendVideoChatMessage(
+                contentType: ContentType.audio, participants: participants);
       }
-      await widget.videoChatMessageController.setChatMessage(chatMessage);
-      await addLocalVideoRender(videoRender);
-      _update(videoRender);
+      if (chatMessage != null) {
+        if (mounted) {
+          DialogUtil.info(context,
+              content:
+                  '${AppLocalizations.t('Create conference and send videoChat chatMessage ')} ${chatMessage.messageId}');
+        }
+        await addLocalVideoRender(videoRender);
+        _update(videoRender);
+
+        videoChatStatus.value = VideoChatStatus.calling;
+        _play();
+        //延时60秒后自动挂断
+        Future.delayed(const Duration(seconds: 60)).then((value) {
+          if (videoChatStatus.value != VideoChatStatus.end) {
+            _stop();
+          }
+        });
+      } else {
+        if (mounted) {
+          DialogUtil.error(context,
+              content: AppLocalizations.t(
+                  'Create conference and send videoChat chatMessage failure'));
+        }
+      }
     } else {
-      //当前视频消息不为空，则有同意回执的直接重新协商
-      var messageId = chatMessage.messageId!;
-      logger.i('current video chatMessage $messageId');
-    }
-    videoChatStatus.value = VideoChatStatus.calling;
-    _play();
-    //延时60秒后自动挂断
-    Future.delayed(const Duration(seconds: 60)).then((value) {
-      if (videoChatStatus.value != VideoChatStatus.end) {
-        _stop();
+      if (mounted) {
+        DialogUtil.error(context,
+            content: AppLocalizations.t('VideoChat chatMessage is exist'));
       }
-    });
+    }
   }
 
   ///移除本地所有的视频
@@ -442,24 +423,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
     _stop();
     videoChatStatus.value = VideoChatStatus.end;
-  }
-
-  ///发送group视频通邀请话消息,此时消息必须有content,包含conference信息
-  ///conference的participants，而不是group的所有成员
-  ///title字段存放是视频还是音频的信息
-  Future<ChatMessage?> _sendVideoChatMessage(
-      {required String contentType, required Conference conference}) async {
-    ChatMessage? chatMessage = await chatMessageController.send(
-        title: contentType,
-        content: conference,
-        messageId: conference.conferenceId,
-        subMessageType: ChatMessageSubType.videoChat,
-        peerIds: conference.participants);
-    if (chatMessage != null) {
-      logger.i('send video chatMessage ${chatMessage.messageId}');
-    }
-
-    return chatMessage;
   }
 
   Future<void> _onAction(int index, String name, {String? value}) async {

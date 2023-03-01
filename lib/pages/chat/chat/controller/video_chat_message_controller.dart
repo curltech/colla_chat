@@ -9,6 +9,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/chat_summary.dart';
 import 'package:colla_chat/service/chat/conference.dart';
+import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
@@ -17,8 +18,8 @@ import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:flutter/material.dart';
 
-///视频通话的消息控制器
-///接受方根据发起方的消息生成对应的接受或者拒绝或者终止的回执,发起方收到回执进行处理
+///视频通话的消息控制器，是视频会议的命令控制器
+///1.发起视频会议邀请；2.接收邀请；3.发送邀请回执；4.接收邀请回执
 class VideoChatMessageController with ChangeNotifier {
   final Key key = UniqueKey();
 
@@ -79,7 +80,7 @@ class VideoChatMessageController with ChangeNotifier {
     }
   }
 
-  callReceiver(ChatMessage chatMessage) async {
+  onVideoChatMessage(ChatMessage chatMessage) async {
     //调用注册的消息接收监听器，用于自定义的特殊处理
     List<Function(ChatMessage chatMessage)>? fns =
         _receivers[chatMessage.subMessageType];
@@ -114,7 +115,8 @@ class VideoChatMessageController with ChangeNotifier {
     return _conference?.name;
   }
 
-  ///设置当前的视频邀请消息汇总和视频邀请消息，可以从chatMessageController中获取当前
+  ///设置当前的视频邀请消息汇总，可以从chatMessageController中获取当前
+  ///在conference模式下，peerId就是会议编号
   setChatSummary(ChatSummary? chatSummary) async {
     //消息汇总未变，直接返回
     if (_chatSummary == chatSummary) {
@@ -153,13 +155,10 @@ class VideoChatMessageController with ChangeNotifier {
         ChatMessageSubType.videoChat.name, receivedVideoChat);
   }
 
-  ///设置当前的视频邀请消息，可以从chatMessageController中获取当前
-  ///本界面是在聊天界面转过来，所以当前chatSummary是必然存在的，
+  ///设置当前的视频邀请消息，可以从chatMessageController中获取当前，
+  ///当前chatSummary是必须存在的，不存在就查找到
   ///当前chatMessage在选择了视频邀请消息后，也是存在的
-  ///如果chatMessage不存在，表明是想开始发起新的linkman或者group会议
-  ///初始化是根据当前的视频邀请消息chatMessage来决定的，无论是发起还是接收邀请
-  ///也可以根据当前会议来决定的，适用于群和会议模式
-  ///如果没有设置，表明是新的会议
+  ///如果chatMessage不存在，表明是准备新的会议
   setChatMessage(ChatMessage? chatMessage) async {
     //消息未变，直接返回
     if (_chatMessage == chatMessage) {
@@ -279,16 +278,85 @@ class VideoChatMessageController with ChangeNotifier {
     return _terminatedChatReceipts[_getKey(peerId, clientId)];
   }
 
+  ///创建新的会议功能
+  ///对联系人模式，可以临时创建一个会议，会议成员从群成员中选择就是自己和对方，会议名称是对方的名称，不保存会议
+  ///对群模式，可以创建一个会议，会议成员从群成员中选择，会议名称是群的名称加上当前时间，保存会议
+  ///对会议模式，直接转到会议创建界面，
+  Future<Conference?> _buildConference(
+      {bool video = true, required List<String> participants}) async {
+    var conference = _conference;
+    if (conference != null) {
+      logger.e('conference ${conference.name} is exist');
+      return conference;
+    }
+    var partyType = this.partyType;
+    if (partyType == PartyType.conference.name) {}
+    var groupPeerId = this.groupPeerId;
+    if (partyType == PartyType.group.name) {
+      if (groupPeerId == null) {
+        return null;
+      }
+    }
+    if (partyType == PartyType.linkman.name) {
+      var peerId = this.peerId;
+      if (peerId == null) {
+        return null;
+      }
+      participants.add(peerId);
+    }
+    var name = this.name;
+    _conference = await conferenceService.createConference(
+        '${name!}-${DateUtil.currentDate()}',
+        video: video,
+        participants: participants);
+    if (partyType == PartyType.group.name) {
+      _conference!.groupPeerId = groupPeerId;
+      _conference!.groupName = name;
+      _conference!.groupType = partyType;
+    }
+    return _conference;
+  }
+
+  ///1.发送视频通邀请话消息,此时消息必须有content,包含conference信息
+  ///conference的participants，而不是group的所有成员
+  ///title字段存放是视频还是音频的信息
+  Future<ChatMessage?> sendVideoChatMessage(
+      {required ContentType contentType,
+      bool video = true,
+      required List<String> participants}) async {
+    var conference =
+        await _buildConference(video: video, participants: participants);
+    if (conference != null) {
+      if (partyType == PartyType.group.name) {
+        await conferenceService.store(conference);
+      }
+    }
+    ChatMessage? chatMessage = await chatMessageController.send(
+        title: contentType.name,
+        content: _conference,
+        messageId: _conference!.conferenceId,
+        subMessageType: ChatMessageSubType.videoChat,
+        peerIds: _conference!.participants);
+    if (chatMessage != null) {
+      logger.i('send video chatMessage ${chatMessage.messageId}');
+    }
+    await setChatMessage(chatMessage);
+
+    return chatMessage;
+  }
+
+  ///2.接收会议邀请消息
   receivedVideoChat(ChatMessage chatMessage) async {
     if (_chatMessage == null || _chatMessage != chatMessage) {
       if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
         _current = chatMessage;
         await setChatMessage(chatMessage);
-        await callReceiver(chatMessage);
+        await onVideoChatMessage(chatMessage);
       }
     }
   }
 
+  ///3.发送会议邀请回执
   ///接收到视频通话邀请，做出接受或者拒绝视频通话邀请的决定
   ///如果是接受决定，本控制器将被加入到池中
   sendChatReceipt(MessageStatus receiptType) async {
@@ -417,7 +485,7 @@ class VideoChatMessageController with ChangeNotifier {
     if (receiptType == MessageStatus.accepted) {}
   }
 
-  ///接受到视频通话回执，一般由globalChatMessageController分发到此
+  ///4.接受到视频通话回执，一般由globalChatMessageController分发到此
   ///在多个接收人的场景下，首先检查自己是否已经发过回执，存在是accepted则继续处理
   ///如果不存在，则发送自己的决定，如果存在是rejected或者terminated，则不处理
   receivedChatReceipt(ChatMessage chatReceipt) async {
@@ -452,7 +520,7 @@ class VideoChatMessageController with ChangeNotifier {
       _terminatedChatReceipts[key] = chatReceipt;
     }
     await _receivedChatReceipt(chatReceipt);
-    await callReceiver(chatReceipt);
+    await onVideoChatMessage(chatReceipt);
   }
 
   ///收到视频通话的回执的处理，
@@ -513,10 +581,14 @@ class VideoChatMessageController with ChangeNotifier {
 
   @override
   dispose() {
-    globalChatMessageController.unregisterReceiver(
-        ChatMessageSubType.videoChat.name, receivedVideoChat);
-    globalChatMessageController.unregisterReceiver(
-        ChatMessageSubType.chatReceipt.name, receivedChatReceipt);
+    if (_chatSummary != null) {
+      globalChatMessageController.unregisterReceiver(
+          ChatMessageSubType.videoChat.name, receivedVideoChat);
+    }
+    if (_chatMessage != null) {
+      globalChatMessageController.unregisterReceiver(
+          ChatMessageSubType.chatReceipt.name, receivedChatReceipt);
+    }
     super.dispose();
   }
 }
