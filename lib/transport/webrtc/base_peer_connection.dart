@@ -1147,6 +1147,6 @@ class BasePeerConnection {
     // if (reconnectTimes > 0) {
     //   reconnect();
     // }
-    emit(WebrtcEventType.closed, '');
+    emit(WebrtcEventType.closed, this);
   }
 }

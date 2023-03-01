@@ -150,7 +150,7 @@ class AdvancedPeerConnection {
           clientId: clientId,
           name: name,
           eventType: WebrtcEventType.closed,
-          data: data);
+          data: this);
       onWebrtcEvent(webrtcEvent);
       await peerConnectionPool.onClosed(webrtcEvent);
     });

@@ -150,6 +150,7 @@ class RemoteVideoRenderController extends VideoRenderController {
           WebrtcEventType.stream, _onAddRemoteStream);
       peerConnection.registerWebrtcEvent(
           WebrtcEventType.removeStream, _onRemoveRemoteStream);
+      peerConnection.registerWebrtcEvent(WebrtcEventType.closed, _onClosed);
       VideoRenderController? videoRenderController =
           videoRenderControllers[key];
       if (videoRenderController == null) {
@@ -168,8 +169,15 @@ class RemoteVideoRenderController extends VideoRenderController {
           WebrtcEventType.stream, _onAddRemoteStream);
       peerConnection.unregisterWebrtcEvent(
           WebrtcEventType.removeStream, _onRemoveRemoteStream);
+      peerConnection.unregisterWebrtcEvent(
+          WebrtcEventType.removeStream, _onClosed);
       videoRenderControllers.remove(key);
     }
+  }
+
+  Future<void> _onClosed(WebrtcEvent webrtcEvent) async {
+    AdvancedPeerConnection peerConnection = webrtcEvent.data;
+    removeAdvancedPeerConnection(peerConnection);
   }
 
   ///远程流到来渲染流，激活add事件
