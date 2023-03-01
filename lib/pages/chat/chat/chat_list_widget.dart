@@ -21,6 +21,7 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/connectivity_util.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/websocket.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
@@ -225,6 +226,42 @@ class _ChatListWidgetState extends State<ChatListWidget>
 
   _reconnectWebrtc() {}
 
+  String _buildSubtitle(
+      {required String subMessageType, String? contentType, String? content}) {
+    String subtitle = '';
+    if (subMessageType == ChatMessageSubType.chat.name) {
+      content = content ?? '';
+      subtitle = chatMessageService.recoverContent(content);
+      if (contentType == ContentType.location.name) {
+        Map<String, dynamic> map = JsonUtil.toJson(subtitle);
+        subtitle = map['address'];
+      }
+    } else if (subMessageType == ChatMessageSubType.videoChat.name) {
+      subtitle = AppLocalizations.t(subMessageType);
+    }
+    return subtitle;
+  }
+
+  Widget _buildBadge(int unreadNumber, {Widget? avatarImage}) {
+    var badge = avatarImage ?? AppImage.lgAppImage;
+    if (unreadNumber > 0) {
+      badge = badges.Badge(
+        badgeContent:
+            Text('$unreadNumber', style: const TextStyle(color: Colors.white)),
+        badgeStyle: const badges.BadgeStyle(
+          elevation: 0.0,
+          shape: badges.BadgeShape.square,
+          borderRadius: BorderRadius.horizontal(
+              left: Radius.circular(8), right: Radius.circular(8)),
+          padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
+        ),
+        child: badge,
+      );
+    }
+
+    return badge;
+  }
+
   _buildLinkmanTileData() async {
     var linkmenChatSummary = linkmanChatSummaryController.data;
     List<TileData> tiles = [];
@@ -237,58 +274,53 @@ class _ChatListWidgetState extends State<ChatListWidget>
         var subMessageType = chatSummary.subMessageType;
         var sendReceiveTime = chatSummary.sendReceiveTime ?? '';
         sendReceiveTime = DateUtil.formatEasyRead(sendReceiveTime);
-        if (subMessageType == ChatMessageSubType.chat.name) {
-          var content = chatSummary.content ?? '';
-          subtitle = chatMessageService.recoverContent(content);
-        }
-        if (subMessageType == ChatMessageSubType.videoChat.name) {
-          subtitle = AppLocalizations.t(subMessageType!);
-        }
+        subtitle = _buildSubtitle(
+            subMessageType: subMessageType!,
+            contentType: chatSummary.contentType,
+            content: chatSummary.content);
         var unreadNumber = chatSummary.unreadNumber;
         Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
         if (linkman == null) {
           chatSummaryService.delete(entity: chatSummary);
           continue;
         }
-        var badge = linkman.avatarImage ?? AppImage.lgAppImage;
-        if (unreadNumber > 0) {
-          badge = badges.Badge(
-            badgeContent: Text('$unreadNumber',
-                style: const TextStyle(color: Colors.white)),
-            badgeStyle: const badges.BadgeStyle(
-              elevation: 0.0,
-              shape: badges.BadgeShape.square,
-              borderRadius: BorderRadius.horizontal(
-                  left: Radius.circular(8), right: Radius.circular(8)),
-              padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
-            ),
-            child: badge,
-          );
-        }
+        var badge = _buildBadge(unreadNumber, avatarImage: linkman.avatarImage);
 
-        TileData tile = TileData(
-            prefix: badge,
-            title: '$name               $sendReceiveTime',
-            subtitle: subtitle,
-            dense: true,
-            selected: false,
-            routeName: 'chat_message');
-        List<TileData> slideActions = [];
-        TileData deleteSlideAction = TileData(
-            title: 'Delete',
-            prefix: Icons.bookmark_remove,
-            onTap: (int index, String label, {String? subtitle}) async {
-              linkmanChatSummaryController.currentIndex = index;
-              await chatSummaryService.removeChatSummary(peerId);
-              await chatMessageService.removeByLinkman(peerId);
-              linkmanChatSummaryController.delete();
-            });
-        slideActions.add(deleteSlideAction);
-        tile.slideActions = slideActions;
+        TileData tile = _buildTile(badge, name, sendReceiveTime, subtitle,
+            peerId, linkmanChatSummaryController);
         tiles.add(tile);
       }
     }
     _linkmanTileData.value = tiles;
+  }
+
+  TileData _buildTile(
+      Widget badge,
+      String name,
+      String sendReceiveTime,
+      String subtitle,
+      String peerId,
+      DataListController<ChatSummary> chatSummaryController) {
+    TileData tile = TileData(
+        prefix: badge,
+        title: '$name               $sendReceiveTime',
+        subtitle: subtitle,
+        dense: true,
+        selected: false,
+        routeName: 'chat_message');
+    List<TileData> slideActions = [];
+    TileData deleteSlideAction = TileData(
+        title: 'Delete',
+        prefix: Icons.bookmark_remove,
+        onTap: (int index, String label, {String? subtitle}) async {
+          chatSummaryController.currentIndex = index;
+          await chatSummaryService.removeChatSummary(peerId);
+          await chatMessageService.removeByLinkman(peerId);
+          chatSummaryController.delete();
+        });
+    slideActions.add(deleteSlideAction);
+    tile.slideActions = slideActions;
+    return tile;
   }
 
   _buildGroupTileData() async {
@@ -303,52 +335,20 @@ class _ChatListWidgetState extends State<ChatListWidget>
         var subMessageType = chatSummary.subMessageType;
         var sendReceiveTime = chatSummary.sendReceiveTime ?? '';
         sendReceiveTime = DateUtil.formatEasyRead(sendReceiveTime);
-        if (subMessageType == ChatMessageSubType.chat.name) {
-          var content = chatSummary.content ?? '';
-          subtitle = chatMessageService.recoverContent(content);
-        }
-        if (subMessageType == ChatMessageSubType.videoChat.name) {
-          subtitle = AppLocalizations.t(subMessageType!);
-        }
+        subtitle = _buildSubtitle(
+            subMessageType: subMessageType!,
+            contentType: chatSummary.contentType,
+            content: chatSummary.content);
         var unreadNumber = chatSummary.unreadNumber;
         Group? group = await groupService.findCachedOneByPeerId(peerId);
         if (group == null) {
           chatSummaryService.delete(entity: chatSummary);
           continue;
         }
-        var badge = group.avatarImage ?? AppImage.lgAppImage;
-        if (unreadNumber > 0) {
-          badge = badges.Badge(
-            badgeContent: Text('$unreadNumber',
-                style: const TextStyle(color: Colors.white)),
-            badgeStyle: badges.BadgeStyle(
-              elevation: 0.0,
-              shape: badges.BadgeShape.square,
-              borderRadius: BorderRadius.circular(8),
-              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5.0),
-            ),
-            child: badge,
-          );
-        }
-        TileData tile = TileData(
-            prefix: badge,
-            title: '$name               $sendReceiveTime',
-            subtitle: subtitle,
-            dense: true,
-            selected: false,
-            routeName: 'chat_message');
-        List<TileData> slideActions = [];
-        TileData deleteSlideAction = TileData(
-            title: 'Delete',
-            prefix: Icons.bookmark_remove,
-            onTap: (int index, String label, {String? subtitle}) async {
-              groupChatSummaryController.currentIndex = index;
-              await chatSummaryService.removeChatSummary(peerId);
-              await chatMessageService.removeByGroup(peerId);
-              groupChatSummaryController.delete();
-            });
-        slideActions.add(deleteSlideAction);
-        tile.slideActions = slideActions;
+        var badge = _buildBadge(unreadNumber, avatarImage: group.avatarImage);
+
+        TileData tile = _buildTile(badge, name, sendReceiveTime, subtitle,
+            peerId, groupChatSummaryController);
         tiles.add(tile);
       }
     }
@@ -367,13 +367,10 @@ class _ChatListWidgetState extends State<ChatListWidget>
         var subMessageType = chatSummary.subMessageType;
         var sendReceiveTime = chatSummary.sendReceiveTime ?? '';
         sendReceiveTime = DateUtil.formatEasyRead(sendReceiveTime);
-        if (subMessageType == ChatMessageSubType.chat.name) {
-          var content = chatSummary.content ?? '';
-          subtitle = chatMessageService.recoverContent(content);
-        }
-        if (subMessageType == ChatMessageSubType.videoChat.name) {
-          subtitle = AppLocalizations.t(subMessageType!);
-        }
+        subtitle = _buildSubtitle(
+            subMessageType: subMessageType!,
+            contentType: chatSummary.contentType,
+            content: chatSummary.content);
         var unreadNumber = chatSummary.unreadNumber;
         Conference? conference =
             await conferenceService.findCachedOneByConferenceId(peerId);
@@ -381,39 +378,10 @@ class _ChatListWidgetState extends State<ChatListWidget>
           chatSummaryService.delete(entity: chatSummary);
           continue;
         }
-        var badge = conference.avatarImage ?? AppImage.lgAppImage;
-        if (unreadNumber > 0) {
-          badge = badges.Badge(
-            badgeContent: Text('$unreadNumber',
-                style: const TextStyle(color: Colors.white)),
-            badgeStyle: badges.BadgeStyle(
-              elevation: 0.0,
-              shape: badges.BadgeShape.square,
-              borderRadius: BorderRadius.circular(8),
-              padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5.0),
-            ),
-            child: badge,
-          );
-        }
-        TileData tile = TileData(
-            prefix: badge,
-            title: '$name               $sendReceiveTime',
-            subtitle: subtitle,
-            dense: true,
-            selected: false,
-            routeName: 'chat_message');
-        List<TileData> slideActions = [];
-        TileData deleteSlideAction = TileData(
-            title: 'Delete',
-            prefix: Icons.bookmark_remove,
-            onTap: (int index, String label, {String? subtitle}) async {
-              conferenceChatSummaryController.currentIndex = index;
-              await chatSummaryService.removeChatSummary(peerId);
-              await chatMessageService.removeByGroup(peerId);
-              conferenceChatSummaryController.delete();
-            });
-        slideActions.add(deleteSlideAction);
-        tile.slideActions = slideActions;
+        var badge =
+            _buildBadge(unreadNumber, avatarImage: conference.avatarImage);
+        TileData tile = _buildTile(badge, name, sendReceiveTime, subtitle,
+            peerId, conferenceChatSummaryController);
         tiles.add(tile);
       }
     }

@@ -56,6 +56,7 @@ class Myself with ChangeNotifier {
 
   set peerProfile(PeerProfile peerProfile) {
     myselfPeer.peerProfile = peerProfile;
+    notifyListeners();
   }
 
   _buildThemeData() {
