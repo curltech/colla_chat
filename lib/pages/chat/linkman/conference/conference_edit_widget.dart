@@ -365,7 +365,6 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
 
   @override
   void dispose() {
-    conferenceController.current = null;
     conferenceController.removeListener(_update);
     controller.dispose();
     super.dispose();
