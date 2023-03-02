@@ -180,7 +180,8 @@ class _ChatMessageViewState extends State<ChatMessageView> {
         //使用列表渲染消息
         child: widget.chatMessageWidget,
       ),
-      const Divider(
+      Divider(
+        color: Colors.white.withOpacity(AppOpacity.xlOpacity),
         height: 1.0,
       ),
       widget.chatMessageInputWidget,
