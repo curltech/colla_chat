@@ -269,5 +269,14 @@
   "Must has conference topic": "必须有会议主题",
   "Conference member ": "会议成员：",
   " is not linkman": "不是联系人：",
-  "Topic": "主题"
+  "Topic": "主题",
+  "StartDate": "开始时间",
+  "EndDate": "结束时间",
+  "Current date": "当前时间",
+  "Date format error": "日期时间格式错误",
+  "Date range invalid error": "日期时间范围错误",
+  "Date": "日期",
+  "Must be not empty": "不可为空",
+  "Hour": "小时",
+  "Minute": "分钟"
 }

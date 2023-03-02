@@ -2,9 +2,11 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
+import 'package:omni_datetime_picker/omni_datetime_picker.dart';
 
 ///指定路由样式，不指定则系统判断，系统判断的方法是如果是移动则走全局路由，否则走工作区路由
 enum InputType {
@@ -14,13 +16,28 @@ enum InputType {
   radio,
   checkbox,
   select,
+  switcher,
   textarea,
   date,
   time,
+  datetime,
+  datetimerange,
+  calendar,
   custom
 }
 
-enum DataType { int, double, string, bool, date, time, set, list, map }
+enum DataType {
+  int,
+  double,
+  string,
+  bool,
+  date,
+  time,
+  datetime,
+  set,
+  list,
+  map
+}
 
 /// 通用列表项的数据模型
 class ColumnFieldDef {
@@ -219,13 +236,16 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
         widget.controller.value ?? widget.controller.columnFieldDef.initValue;
     if (dataType == DataType.set ||
         dataType == DataType.list ||
-        dataType == DataType.map) {
+        dataType == DataType.map ||
+        dataType == DataType.bool ||
+        dataType == DataType.int ||
+        dataType == DataType.double) {
       return v;
     }
     if (v == null) {
       return '';
     }
-    if (dataType == DataType.date) {
+    if (dataType == DataType.date || dataType == DataType.datetime) {
       var d = v as DateTime;
       return d.toUtc().toIso8601String();
     }
@@ -378,17 +398,20 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     return textFormField;
   }
 
+  ///多个字符串选择一个，对应的字段是字符串
   Widget _buildRadioField(BuildContext context) {
     widget.controller.controller = null;
     var columnFieldDef = widget.controller.columnFieldDef;
+    var label = columnFieldDef.label;
     var options = columnFieldDef.options;
-    List<Widget> children = [];
+    List<Widget> children = [Text(label)];
     if (options != null && options.isNotEmpty) {
       for (var i = 0; i < options.length; ++i) {
         var option = options[i];
         var radio = Radio<String>(
           onChanged: (String? value) {
             widget.controller.value = value;
+            setState(() {});
           },
           value: option.value,
           groupValue: _getInitValue(context),
@@ -403,11 +426,13 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     return Column(children: children);
   }
 
+  ///多个字符串选择多个，对应的字段是字符串的Set
   Widget _buildCheckboxField(BuildContext context) {
     widget.controller.controller = null;
     var columnFieldDef = widget.controller.columnFieldDef;
+    var label = columnFieldDef.label;
     var options = columnFieldDef.options;
-    List<Widget> children = [];
+    List<Widget> children = [Text(label)];
     if (options != null && options.isNotEmpty) {
       for (var i = 0; i < options.length; ++i) {
         var option = options[i];
@@ -423,6 +448,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
               }
             }
             widget.controller.value = value;
+            setState(() {});
           },
           value: value.contains(option.value),
         );
@@ -436,37 +462,41 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     return Column(children: children);
   }
 
+  ///适合数据类型为bool
   Widget _buildSwitchField(BuildContext context) {
     widget.controller.controller = null;
     var columnFieldDef = widget.controller.columnFieldDef;
-    var options = columnFieldDef.options;
     List<Widget> children = [];
-    if (options != null && options.isNotEmpty) {
-      for (var i = 0; i < options.length; ++i) {
-        var option = options[i];
-        Set<String>? value = _getInitValue(context);
-        value ??= <String>{};
-        var checkbox = Switch(
-          onChanged: (bool? selected) {
-            if (value != null) {
-              if (selected == null || !selected) {
-                value.remove(option.value);
-              } else if (selected) {
-                value.add(option.value);
-              }
-            }
-            widget.controller.value = value;
-          },
-          value: value.contains(option.value),
-        );
-        var row = Row(
-          children: [checkbox, Text(option.label)],
-        );
-        children.add(row);
-      }
+    var prefixIcon = columnFieldDef.prefixIcon;
+    if (prefixIcon != null) {
+      children.add(prefixIcon);
+      children.add(const SizedBox(
+        width: 15.0,
+      ));
     }
+    var label = columnFieldDef.label;
+    if (prefixIcon != null) {
+      children.add(Text(AppLocalizations.t(label)));
+      children.add(const SizedBox(
+        width: 20.0,
+      ));
+    }
+    var switcher = Switch(
+      activeColor: myself.primary,
+      activeTrackColor: Colors.white,
+      inactiveThumbColor: myself.secondary,
+      inactiveTrackColor: Colors.grey,
+      onChanged: (bool? value) {
+        widget.controller.value = value;
+        setState(() {});
+      },
+      value: widget.controller.value,
+    );
+    children.add(switcher);
 
-    return Column(children: children);
+    return Container(
+        padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10.0),
+        child: Row(children: children));
   }
 
   Widget _buildDropdownButton(BuildContext context) {
@@ -531,8 +561,20 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
       decoration: InputDecoration(
           labelText: AppLocalizations.t(columnFieldDef.label),
           prefixIcon: _buildIcon(),
-          suffixIcon:
-              IconButton(icon: const Icon(Icons.date_range), onPressed: () {}),
+          suffixIcon: IconButton(
+              icon: const Icon(Icons.date_range),
+              onPressed: () async {
+                DateTime? initialDate;
+                if (controller.text.isNotEmpty) {
+                  initialDate = DateUtil.toDateTime(controller.text);
+                }
+                var value =
+                    await _showDatePicker(context, initialDate: initialDate);
+                if (value != null) {
+                  controller.text = value.toUtc().toIso8601String();
+                }
+                widget.controller.value = controller.value.text;
+              }),
           suffix: suffix,
           hintText: columnFieldDef.hintText),
     );
@@ -540,76 +582,254 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     return textFormField;
   }
 
-  _showDatePicker(BuildContext context, TextEditingController controller) {
-    showDatePicker(
+  _showDatePicker(BuildContext context, {DateTime? initialDate}) {
+    initialDate = initialDate ?? DateTime.now();
+    return showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
       // 初始化选中日期
-      firstDate: DateTime(2018, 6),
+      initialDate: initialDate,
       // 开始日期
-      lastDate: DateTime(2025, 6),
+      firstDate: initialDate.subtract(const Duration(days: 365)),
       // 结束日期
-      currentDate: DateTime(2020, 10, 20),
+      lastDate: initialDate.add(const Duration(days: 365)),
       // 当前日期
-      helpText: "helpText",
+      //currentDate: initialDate,
+      // 日历弹框样式
+      initialEntryMode: DatePickerEntryMode.calendar,
+      // 文字方向
+      textDirection: TextDirection.ltr,
       // 左上方提示
-      cancelText: "cancelText",
+      helpText: AppLocalizations.t("Current date"),
       // 取消按钮文案
-      confirmText: "confirmText", // 确认按钮文案
-    ).then((value) {
-      if (value != null) {
-        controller.text = value.toUtc().toIso8601String();
-      }
-    });
+      cancelText: AppLocalizations.t("Cancel"),
+      // 确认按钮文案
+      confirmText: AppLocalizations.t("Confirm"),
+      // 格式错误提示
+      errorFormatText: AppLocalizations.t("Date format error"),
+      // 输入不在 first 与 last 之间日期提示
+      errorInvalidText: AppLocalizations.t("Date range invalid error"),
+      // 输入框上方提示
+      fieldLabelText: AppLocalizations.t("Date"),
+      // 输入框为空时内部提示
+      fieldHintText: AppLocalizations.t("Must be not empty"),
+      // 日期选择模式，默认为天数选择
+      initialDatePickerMode: DatePickerMode.day,
+      // 是否为根导航器
+      useRootNavigator: true,
+      // 设置不可选日期，这里将 2020-10-15，2020-10-16，2020-10-17 三天设置不可选
+      // selectableDayPredicate: (dayTime) {
+      //   if (dayTime == DateTime(2020, 10, 15) ||
+      //       dayTime == DateTime(2020, 10, 16) ||
+      //       dayTime == DateTime(2020, 10, 17)) {
+      //     return false;
+      //   }
+      //   return true;
+      // }
+    );
   }
 
-  _showDatePickerInput(BuildContext context) {
-    showDatePicker(
-        context: context,
-        initialDate: DateTime.now(),
-        // 初始化选中日期
-        firstDate: DateTime(2020, 6),
-        // 开始日期
-        lastDate: DateTime(2021, 6),
-        // 结束日期
-        initialEntryMode: DatePickerEntryMode.input,
-        // 日历弹框样式
+  Widget _buildInputTime(BuildContext context) {
+    var controller = TextEditingController();
+    var value = widget.controller.value ?? '';
+    controller.value = TextEditingValue(
+        text: value,
+        selection: TextSelection.fromPosition(TextPosition(
+            offset: value.length, affinity: TextAffinity.downstream)));
+    widget.controller.controller = controller;
+    var columnFieldDef = widget.controller.columnFieldDef;
+    Widget? suffix;
+    if (columnFieldDef.cancel) {
+      suffix = controller.text.isNotEmpty
+          ? IconButton(
+              //如果文本长度不为空则显示清除按钮
+              onPressed: () {
+                controller.clear();
+              },
+              icon: const Icon(Icons.cancel, color: Colors.grey))
+          : null;
+    }
+    var textFormField = TextFormField(
+      controller: controller,
+      keyboardType: columnFieldDef.textInputType,
+      readOnly: true,
+      decoration: InputDecoration(
+          labelText: AppLocalizations.t(columnFieldDef.label),
+          prefixIcon: _buildIcon(),
+          suffixIcon: IconButton(
+              icon: const Icon(Icons.date_range),
+              onPressed: () async {
+                TimeOfDay? initialTime;
+                if (controller.text.isNotEmpty) {
+                  initialTime = DateUtil.toTime(controller.text);
+                }
+                var value =
+                    await _showTimePicker(context, initialTime: initialTime);
+                if (value != null) {
+                  controller.text = value.toString();
+                }
+                widget.controller.value = controller.value.text;
+              }),
+          suffix: suffix,
+          hintText: columnFieldDef.hintText),
+    );
 
-        textDirection: TextDirection.ltr,
-        // 文字方向
+    return textFormField;
+  }
 
-        currentDate: DateTime(2020, 10, 20),
-        // 当前日期
-        helpText: "helpText",
-        // 左上方提示
-        cancelText: "cancelText",
-        // 取消按钮文案
-        confirmText: "confirmText",
-        // 确认按钮文案
+  _showTimePicker(BuildContext context, {TimeOfDay? initialTime}) {
+    var now = DateTime.now();
+    initialTime = initialTime ?? TimeOfDay(hour: now.hour, minute: now.minute);
+    return showTimePicker(
+      context: context,
+      // 初始化选中日期
+      initialTime: initialTime,
+      // 日历弹框样式
+      initialEntryMode: TimePickerEntryMode.dial,
+      // 取消按钮文案
+      cancelText: AppLocalizations.t("Cancel"),
+      // 确认按钮文案
+      confirmText: AppLocalizations.t("Confirm"),
+      hourLabelText: AppLocalizations.t("Hour"),
+      minuteLabelText: AppLocalizations.t("Minute"),
+      // 输入不在 first 与 last 之间日期提示
+      errorInvalidText: AppLocalizations.t("Invalid error"),
+      useRootNavigator: true,
+    );
+  }
 
-        errorFormatText: "errorFormatText",
-        // 格式错误提示
-        errorInvalidText: "errorInvalidText",
-        // 输入不在 first 与 last 之间日期提示
+  Widget _buildInputDateTime(BuildContext context) {
+    var controller = TextEditingController();
+    var value = widget.controller.value ?? '';
+    controller.value = TextEditingValue(
+        text: value,
+        selection: TextSelection.fromPosition(TextPosition(
+            offset: value.length, affinity: TextAffinity.downstream)));
+    widget.controller.controller = controller;
+    var columnFieldDef = widget.controller.columnFieldDef;
+    Widget? suffix;
+    if (columnFieldDef.cancel) {
+      suffix = controller.text.isNotEmpty
+          ? IconButton(
+              //如果文本长度不为空则显示清除按钮
+              onPressed: () {
+                controller.clear();
+              },
+              icon: const Icon(Icons.cancel, color: Colors.grey))
+          : null;
+    }
+    var textFormField = TextFormField(
+      controller: controller,
+      keyboardType: columnFieldDef.textInputType,
+      readOnly: true,
+      decoration: InputDecoration(
+          labelText: AppLocalizations.t(columnFieldDef.label),
+          prefixIcon: _buildIcon(),
+          suffixIcon: IconButton(
+              icon: const Icon(Icons.date_range),
+              onPressed: () async {
+                DateTime? initialDate;
+                if (controller.text.isNotEmpty) {
+                  initialDate = DateUtil.toDateTime(controller.text);
+                }
+                var value = await _showDateTimePicker(context,
+                    initialDate: initialDate);
+                if (value != null) {
+                  controller.text = value.toUtc().toIso8601String();
+                }
+                widget.controller.value = controller.value.text;
+              }),
+          suffix: suffix,
+          hintText: columnFieldDef.hintText),
+    );
 
-        fieldLabelText: "fieldLabelText",
-        // 输入框上方提示
-        fieldHintText: "fieldHintText",
-        // 输入框为空时内部提示
+    return textFormField;
+  }
 
-        initialDatePickerMode: DatePickerMode.day,
-        // 日期选择模式，默认为天数选择
-        useRootNavigator: true,
-        // 是否为根导航器
-        // 设置不可选日期，这里将 2020-10-15，2020-10-16，2020-10-17 三天设置不可选
-        selectableDayPredicate: (dayTime) {
-          if (dayTime == DateTime(2020, 10, 15) ||
-              dayTime == DateTime(2020, 10, 16) ||
-              dayTime == DateTime(2020, 10, 17)) {
-            return false;
-          }
+  _showDateTimePicker(BuildContext context, {DateTime? initialDate}) {
+    initialDate = initialDate ?? DateTime.now();
+    return showOmniDateTimePicker(
+      context: context,
+      initialDate: initialDate,
+      // 开始日期
+      firstDate: initialDate.subtract(const Duration(days: 365)),
+      // 结束日期
+      lastDate: initialDate.add(const Duration(days: 365)),
+      is24HourMode: true,
+      isShowSeconds: false,
+      minutesInterval: 1,
+      secondsInterval: 1,
+      borderRadius: const BorderRadius.all(Radius.circular(16)),
+      constraints: const BoxConstraints(
+        maxWidth: 350,
+        maxHeight: 650,
+      ),
+      transitionBuilder: (context, anim1, anim2, child) {
+        return FadeTransition(
+          opacity: anim1.drive(
+            Tween(
+              begin: 0,
+              end: 1,
+            ),
+          ),
+          child: child,
+        );
+      },
+      transitionDuration: const Duration(milliseconds: 200),
+      barrierDismissible: true,
+      selectableDayPredicate: (dateTime) {
+        // Disable 25th Feb 2023
+        if (dateTime == DateTime(2023, 2, 25)) {
+          return false;
+        } else {
           return true;
-        });
+        }
+      },
+    );
+  }
+
+  _showDateTimeRangePicker(BuildContext context,
+      {DateTime? startInitialDate, DateTime? endInitialDate}) {
+    startInitialDate = startInitialDate ?? DateTime.now();
+    endInitialDate = endInitialDate ?? DateTime.now();
+    return showOmniDateTimeRangePicker(
+      context: context,
+      startInitialDate: startInitialDate,
+      startFirstDate: startInitialDate.subtract(const Duration(days: 365)),
+      startLastDate: startInitialDate.add(const Duration(days: 365)),
+      endInitialDate: endInitialDate,
+      endFirstDate: endInitialDate.subtract(const Duration(days: 365)),
+      endLastDate: endInitialDate.add(const Duration(days: 365)),
+      is24HourMode: true,
+      isShowSeconds: false,
+      minutesInterval: 1,
+      secondsInterval: 1,
+      borderRadius: const BorderRadius.all(Radius.circular(16)),
+      constraints: const BoxConstraints(
+        maxWidth: 350,
+        maxHeight: 650,
+      ),
+      transitionBuilder: (context, anim1, anim2, child) {
+        return FadeTransition(
+          opacity: anim1.drive(
+            Tween(
+              begin: 0,
+              end: 1,
+            ),
+          ),
+          child: child,
+        );
+      },
+      transitionDuration: const Duration(milliseconds: 200),
+      barrierDismissible: true,
+      // selectableDayPredicate: (dateTime) {
+      //   // Disable 25th Feb 2023
+      //   if (dateTime == DateTime(2023, 2, 25)) {
+      //     return false;
+      //   } else {
+      //     return true;
+      //   }
+      // },
+    );
   }
 
   CalendarDatePicker _calendarDatePicker(DatePickerMode mode) {
@@ -666,6 +886,27 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
           break;
         case InputType.password:
           columnFieldWidget = _buildPasswordField(context);
+          break;
+        case InputType.checkbox:
+          columnFieldWidget = _buildCheckboxField(context);
+          break;
+        case InputType.radio:
+          columnFieldWidget = _buildRadioField(context);
+          break;
+        case InputType.select:
+          columnFieldWidget = _buildDropdownButton(context);
+          break;
+        case InputType.switcher:
+          columnFieldWidget = _buildSwitchField(context);
+          break;
+        case InputType.date:
+          columnFieldWidget = _buildInputDate(context);
+          break;
+        case InputType.time:
+          columnFieldWidget = _buildInputTime(context);
+          break;
+        case InputType.datetime:
+          columnFieldWidget = _buildInputDateTime(context);
           break;
         default:
           columnFieldWidget = _buildTextFormField(context);

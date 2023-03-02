@@ -1,4 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:flutter/material.dart';
 
 class DateUtil {
   ///获取当前时间的ISO字符串
@@ -96,5 +97,11 @@ class DateUtil {
 
   static DateTime toDateTime(String formattedString) {
     return DateTime.parse(formattedString);
+  }
+
+  static TimeOfDay toTime(String formattedString) {
+    var hour = formattedString.substring(0, 2);
+    var minute = formattedString.substring(3, 2);
+    return TimeOfDay(hour: int.parse(hour), minute: int.parse(minute));
   }
 }

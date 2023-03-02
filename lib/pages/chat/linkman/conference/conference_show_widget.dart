@@ -33,6 +33,16 @@ final List<ColumnFieldDef> conferenceColumnFieldDefs = [
       label: 'Video',
       inputType: InputType.label,
       prefixIcon: Icon(Icons.video_call, color: myself.primary)),
+  ColumnFieldDef(
+      name: 'startDate',
+      label: 'StartDate',
+      inputType: InputType.label,
+      prefixIcon: Icon(Icons.start, color: myself.primary)),
+  ColumnFieldDef(
+      name: 'endDate',
+      label: 'EndDate',
+      inputType: InputType.label,
+      prefixIcon: Icon(Icons.pin_end, color: myself.primary)),
 ];
 
 ///显示会议的基本信息，会议成员和会议发起人

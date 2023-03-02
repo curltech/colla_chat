@@ -45,8 +45,21 @@ final List<ColumnFieldDef> conferenceColumnFieldDefs = [
   ColumnFieldDef(
       name: 'video',
       label: 'Video',
-      inputType: InputType.checkbox,
-      prefixIcon: const Icon(Icons.video_call)),
+      inputType: InputType.switcher,
+      dataType: DataType.bool,
+      prefixIcon: Icon(Icons.video_call, color: myself.primary)),
+  ColumnFieldDef(
+      name: 'startDate',
+      label: 'StartDate',
+      inputType: InputType.datetime,
+      dataType: DataType.string,
+      prefixIcon: Icon(Icons.start, color: myself.primary)),
+  ColumnFieldDef(
+      name: 'endDate',
+      label: 'EndDate',
+      inputType: InputType.datetime,
+      dataType: DataType.string,
+      prefixIcon: Icon(Icons.pin_end, color: myself.primary)),
 ];
 
 ///创建和修改群，填写群的基本信息，选择群成员和群主
@@ -279,6 +292,18 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
       }
       if (current.password != currentConference.password) {
         current.password = currentConference.password;
+        conferenceModified = true;
+      }
+      if (current.video != currentConference.video) {
+        current.video = currentConference.video;
+        conferenceModified = true;
+      }
+      if (current.startDate != currentConference.startDate) {
+        current.startDate = currentConference.startDate;
+        conferenceModified = true;
+      }
+      if (current.endDate != currentConference.endDate) {
+        current.endDate = currentConference.endDate;
         conferenceModified = true;
       }
     }
