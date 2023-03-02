@@ -331,6 +331,7 @@ class VideoChatMessageController with ChangeNotifier {
         await conferenceService.store(conference);
       }
     }
+    //主题是会议名称
     ChatMessage? chatMessage = await chatMessageController.send(
         title: contentType.name,
         content: _conference,
@@ -386,6 +387,7 @@ class VideoChatMessageController with ChangeNotifier {
         await chatMessageService.buildChatReceipt(chatMessage, receiptType);
     await chatMessageService.updateReceiptStatus(chatMessage, receiptType);
     await chatMessageService.sendAndStore(chatReceipt);
+    //立即接听
     if (receiptType == MessageStatus.accepted) {
       var peerId = chatReceipt.receiverPeerId!;
       var clientId = chatReceipt.receiverClientId!;
@@ -445,6 +447,7 @@ class VideoChatMessageController with ChangeNotifier {
       }
     }
     await chatMessageService.updateReceiptStatus(chatMessage, receiptType);
+    //立即接听
     if (receiptType == MessageStatus.accepted) {
       RemoteVideoRenderController remoteVideoRenderController =
           videoConferenceRenderPool.createRemoteVideoRenderController(this);
@@ -482,7 +485,8 @@ class VideoChatMessageController with ChangeNotifier {
       }
     }
     await chatMessageService.updateReceiptStatus(chatMessage, receiptType);
-    if (receiptType == MessageStatus.accepted) {}
+    //稍后加入
+    if (receiptType == MessageStatus.hold) {}
   }
 
   ///4.接受到视频通话回执，一般由globalChatMessageController分发到此
@@ -531,7 +535,7 @@ class VideoChatMessageController with ChangeNotifier {
     content = chatMessageService.recoverContent(content!);
     logger.w('received videoChat chatReceipt content: $content');
     String messageId = chatReceipt.messageId!;
-    //接受通话请求的回执，加本地流，重新协商
+    //对方立即接受通话请求的回执，加本地流，重新协商
     if (content == MessageStatus.accepted.name) {
       var peerId = chatReceipt.senderPeerId!;
       var clientId = chatReceipt.senderClientId!;

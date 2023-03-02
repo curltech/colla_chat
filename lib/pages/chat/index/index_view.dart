@@ -10,6 +10,7 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
@@ -164,6 +165,43 @@ class _IndexViewState extends State<IndexView>
     name = name ?? '';
     var title = chatMessage.title;
     title = title ?? '';
+    var rejectedButton = WidgetUtil.buildCircleButton(
+        onPressed: () async {
+          videoChatMessageVisible.value = false;
+          _stop();
+          await videoChatMessageController!
+              .sendChatReceipt(MessageStatus.rejected);
+          videoChatMessageController = null;
+        },
+        child: const Icon(color: Colors.white, size: 16, Icons.call_end),
+        backgroundColor: Colors.red);
+    var holdButton = WidgetUtil.buildCircleButton(
+        onPressed: () async {
+          videoChatMessageVisible.value = false;
+          _stop();
+          await videoChatMessageController!.sendChatReceipt(MessageStatus.hold);
+          videoChatMessageController = null;
+        },
+        child: const Icon(color: Colors.white, size: 16, Icons.add_call),
+        backgroundColor: Colors.amber);
+    var acceptedButton = WidgetUtil.buildCircleButton(
+        onPressed: () async {
+          videoChatMessageVisible.value = false;
+          _stop();
+          await videoChatMessageController!
+              .sendChatReceipt(MessageStatus.accepted);
+          videoChatMessageController = null;
+        },
+        child: const Icon(color: Colors.white, size: 16, Icons.call),
+        backgroundColor: Colors.green);
+    List<Widget> buttons = <Widget>[];
+    buttons.add(rejectedButton);
+    buttons.add(holdButton);
+    //立即接听按钮只有当前不在会议中，而且是个人或者群模式才可以
+    if (videoConferenceRenderPool.conferenceId == null &&
+        chatMessage.groupType != PartyType.conference.name) {
+      buttons.add(acceptedButton);
+    }
     return Container(
         alignment: Alignment.topLeft,
         width: appDataProvider.totalSize.width,
@@ -180,30 +218,7 @@ class _IndexViewState extends State<IndexView>
                 style: const TextStyle(color: Colors.white)),
             trailing: SizedBox(
               width: 130,
-              child: Row(children: [
-                WidgetUtil.buildCircleButton(
-                    onPressed: () async {
-                      videoChatMessageVisible.value = false;
-                      _stop();
-                      await videoChatMessageController!
-                          .sendChatReceipt(MessageStatus.rejected);
-                      videoChatMessageController = null;
-                    },
-                    child: const Icon(
-                        color: Colors.white, size: 16, Icons.call_end),
-                    backgroundColor: Colors.red),
-                WidgetUtil.buildCircleButton(
-                    onPressed: () async {
-                      videoChatMessageVisible.value = false;
-                      _stop();
-                      await videoChatMessageController!
-                          .sendChatReceipt(MessageStatus.accepted);
-                      videoChatMessageController = null;
-                    },
-                    child:
-                        const Icon(color: Colors.white, size: 16, Icons.call),
-                    backgroundColor: Colors.green),
-              ]),
+              child: Row(children: buttons),
             )));
   }
 
@@ -221,20 +236,13 @@ class _IndexViewState extends State<IndexView>
                 ChatMessageSubType.videoChat.name) {
               videoChatMessageWidget =
                   _buildVideoChatMessageWidget(context, chatMessage);
-              //延时60秒后一般消息消失
+              //延时60秒后视频邀请消息消失，发送ignored回执
               Future.delayed(const Duration(seconds: 60)).then((value) async {
                 _stop();
                 if (videoChatMessageVisible.value) {
                   videoChatMessageVisible.value = false;
-                  ChatMessage? chatMessage =
-                      videoChatMessageController!.chatMessage;
-                  if (chatMessage != null && chatMessage.groupType != null) {
-                    await videoChatMessageController!
-                        .sendChatReceipt(MessageStatus.accepted);
-                  } else {
-                    await videoChatMessageController!
-                        .sendChatReceipt(MessageStatus.ignored);
-                  }
+                  await videoChatMessageController!
+                      .sendChatReceipt(MessageStatus.ignored);
                 }
                 videoChatMessageController = null;
               });
