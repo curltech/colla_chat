@@ -240,8 +240,8 @@ class VideoChatMessageController with ChangeNotifier {
             await conferenceService.findOneByConferenceId(conferenceId);
         if (conference != null) {
           logger.e('Conference $conferenceId name ${conference.name} is exist');
-          _conference!.id = conference.id;
-          await conferenceService.store(_conference!);
+          // _conference!.id = conference.id;
+          // await conferenceService.store(_conference!);
         }
       }
     }
