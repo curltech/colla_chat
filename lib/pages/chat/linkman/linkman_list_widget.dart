@@ -251,14 +251,14 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         var name = linkman.name;
         var peerId = linkman.peerId;
         var status = linkman.status ?? '';
-        var subtitle = AppLocalizations.t(status);
+        status = AppLocalizations.t(status);
         if (peerId == myself.peerId) {
-          subtitle = AppLocalizations.t('myself');
+          status = AppLocalizations.t('myself');
         }
         TileData tile = TileData(
             prefix: linkman.avatarImage ?? AppImage.lgAppImage,
             title: name,
-            subtitle: subtitle,
+            subtitle: status,
             selected: false,
             routeName: 'linkman_edit');
         List<TileData> slideActions = [];
@@ -361,11 +361,11 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     if (groups.isNotEmpty) {
       for (var group in groups) {
         var title = group.name;
-        var subtitle = group.peerId;
+        var peerId = group.peerId;
         TileData tile = TileData(
             prefix: group.avatarImage ?? AppImage.lgAppImage,
             title: title,
-            subtitle: subtitle,
+            subtitle: peerId,
             selected: false,
             routeName: 'linkman_group_edit');
         List<TileData> slideActions = [];
@@ -374,10 +374,10 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             prefix: Icons.group_remove,
             onTap: (int index, String label, {String? subtitle}) async {
               groupController.currentIndex = index;
-              await groupService.removeByGroupPeerId(group.peerId);
-              await groupMemberService.removeByGroupPeerId(group.peerId);
-              await chatSummaryService.removeChatSummary(group.peerId);
-              await chatMessageService.removeByGroup(group.peerId);
+              await groupService.removeByGroupPeerId(peerId);
+              await groupMemberService.removeByGroupPeerId(peerId);
+              await chatSummaryService.removeChatSummary(peerId);
+              await chatMessageService.removeByGroup(peerId);
               groupController.delete();
               if (mounted) {
                 DialogUtil.info(context,
@@ -391,7 +391,12 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             prefix: Icons.group_off,
             onTap: (int index, String label, {String? subtitle}) async {
               if (group.ownerPeerId == myself.peerId) {
-                groupService.dismissGroup(group);
+                await groupService.dismissGroup(group);
+                if (mounted) {
+                  DialogUtil.info(context,
+                      content:
+                          '${AppLocalizations.t('Group:')} ${group.name}${AppLocalizations.t(' is dismiss')}');
+                }
               } else {
                 DialogUtil.error(context, content: 'Must be group owner');
               }
@@ -425,11 +430,11 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     if (conferences.isNotEmpty) {
       for (var conference in conferences) {
         var title = conference.name;
-        var subtitle = conference.conferenceId;
+        var conferenceId = conference.conferenceId;
         TileData tile = TileData(
             prefix: conference.avatarImage ?? AppImage.lgAppImage,
             title: title,
-            subtitle: subtitle,
+            subtitle: conferenceId,
             selected: false,
             routeName: 'conference_edit');
         List<TileData> slideActions = [];
@@ -438,13 +443,10 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             prefix: Icons.playlist_remove_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
               conferenceController.currentIndex = index;
-              await conferenceService
-                  .removeByConferenceId(conference.conferenceId!);
-              await groupMemberService
-                  .removeByGroupPeerId(conference.conferenceId);
-              await chatSummaryService
-                  .removeChatSummary(conference.conferenceId);
-              await chatMessageService.removeByGroup(conference.conferenceId);
+              await conferenceService.removeByConferenceId(conferenceId);
+              await groupMemberService.removeByGroupPeerId(conferenceId);
+              await chatSummaryService.removeChatSummary(conferenceId);
+              await chatMessageService.removeByGroup(conferenceId);
               conferenceController.delete();
               if (mounted) {
                 DialogUtil.info(context,
