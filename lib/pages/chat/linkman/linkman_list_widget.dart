@@ -440,7 +440,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             titleTail: conferenceOwnerName,
             subtitle: topic,
             selected: false,
-            isThreeLine: true,
+            isThreeLine: false,
             routeName: 'conference_edit');
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(
