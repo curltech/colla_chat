@@ -18,10 +18,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
 
   ///更新chatSummary，清空原数据，查询新数据
   set chatSummary(ChatSummary? chatSummary) {
-    if (_chatSummary != null &&
-        chatSummary != null &&
-        _chatSummary!.id == chatSummary.id) {
-    } else {
+    if (_chatSummary != chatSummary) {
       _chatSummary = chatSummary;
       clear(notify: false);
       previous(limit: defaultLimit);
