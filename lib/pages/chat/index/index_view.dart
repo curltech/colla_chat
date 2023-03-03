@@ -114,13 +114,21 @@ class _IndexViewState extends State<IndexView>
               var name = chatMessage.senderName;
               if (name != null) {
                 children.add(
-                  Text(name, style: const TextStyle(color: Colors.white)),
+                  Text(name,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500)),
                 );
               }
               String? title = chatMessage.title;
               if (title != null) {
                 children.add(
-                  Text(title, style: const TextStyle(color: Colors.white)),
+                  Text(title,
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w400)),
                 );
               }
               String? content = chatMessage.content;
@@ -145,19 +153,21 @@ class _IndexViewState extends State<IndexView>
                     chatMessageVisible.value = false;
                   },
                   child: Container(
-                      height: 80,
+                      height: appDataProvider.toolbarHeight,
                       width: appDataProvider.totalSize.width,
                       alignment: Alignment.topLeft,
                       padding: const EdgeInsets.all(5.0),
                       color: Colors.black.withOpacity(AppOpacity.mdOpacity),
                       child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             bannerAvatarImage!,
                             const SizedBox(
                               width: 15.0,
                             ),
-                            Column(children: children),
+                            Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: children),
                           ])));
 
               //延时30秒后一般消息消失
