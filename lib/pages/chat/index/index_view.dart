@@ -44,7 +44,7 @@ class _IndexViewState extends State<IndexView>
   BlueFireAudioPlayer audioPlayer = BlueFireAudioPlayer();
 
   //JustAudioPlayer audioPlayer = JustAudioPlayer();
-  Widget? bannerAvatarImage;
+  Widget bannerAvatarImage = AppImage.mdAppImage;
 
   @override
   void initState() {
@@ -161,7 +161,7 @@ class _IndexViewState extends State<IndexView>
                       child: Row(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            bannerAvatarImage!,
+                            bannerAvatarImage,
                             const SizedBox(
                               width: 15.0,
                             ),
