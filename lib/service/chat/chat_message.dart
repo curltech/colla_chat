@@ -511,7 +511,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       groupPeerId: chatMessage.groupPeerId,
       groupName: chatMessage.groupName,
       groupType: groupType,
-      title: chatMessage.subMessageType,
+      title: chatMessage.title,
       receiverType: receiverType!,
       receiptContent: receiptContent != null
           ? CryptoUtil.encodeBase64(receiptContent)
@@ -588,7 +588,6 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         clientId: linkman.clientId,
         receiptContent: receiptContent,
       );
-      chatReceipt.title = chatMessage.title;
       chatReceipts.add(chatReceipt);
     }
     return chatReceipts;
