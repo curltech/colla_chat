@@ -314,6 +314,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
       }
     }
     conference.value.conferenceOwnerPeerId = current.conferenceOwnerPeerId;
+    conference.value.conferenceOwnerName = current.conferenceOwnerName;
     current.participants = conferenceMembers.value;
     await conferenceService.store(current);
     conference.value = current;
