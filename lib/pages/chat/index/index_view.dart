@@ -113,40 +113,45 @@ class _IndexViewState extends State<IndexView>
               title = title ?? '';
               var name = chatMessage.senderName;
               name = name ?? '';
-              banner = Container(
-                  height: 80,
-                  width: appDataProvider.totalSize.width,
-                  alignment: Alignment.topLeft,
-                  padding: const EdgeInsets.all(5.0),
-                  color: Colors.black.withOpacity(AppOpacity.mdOpacity),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(children: [
-                          myself.avatarImage ?? AppImage.mdAppImage,
-                          const SizedBox(
-                            width: 15.0,
-                          ),
-                          Text(name,
-                              style: const TextStyle(color: Colors.white)),
-                          const SizedBox(
-                            width: 15.0,
-                          ),
-                          Text(title,
-                              style: const TextStyle(color: Colors.white)),
-                        ]),
-                        const SizedBox(
-                          height: 15.0,
-                        ),
-                        ExtendedText(
-                          content,
-                          style: const TextStyle(
-                            color: Colors.white,
-                            //fontSize: 16.0,
-                          ),
-                          specialTextSpanBuilder: customSpecialTextSpanBuilder,
-                        ),
-                      ]));
+              banner = InkWell(
+                  onTap: () {
+                    chatMessageVisible.value = false;
+                  },
+                  child: Container(
+                      height: 80,
+                      width: appDataProvider.totalSize.width,
+                      alignment: Alignment.topLeft,
+                      padding: const EdgeInsets.all(5.0),
+                      color: Colors.black.withOpacity(AppOpacity.mdOpacity),
+                      child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            myself.avatarImage ?? AppImage.mdAppImage,
+                            const SizedBox(
+                              width: 15.0,
+                            ),
+                            Column(children: [
+                              Text(name,
+                                  style: const TextStyle(color: Colors.white)),
+                              const SizedBox(
+                                width: 15.0,
+                              ),
+                              Text(title,
+                                  style: const TextStyle(color: Colors.white)),
+                              const SizedBox(
+                                height: 15.0,
+                              ),
+                              ExtendedText(
+                                content,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  //fontSize: 16.0,
+                                ),
+                                specialTextSpanBuilder:
+                                    customSpecialTextSpanBuilder,
+                              ),
+                            ]),
+                          ])));
 
               //延时30秒后一般消息消失
               Future.delayed(const Duration(seconds: 30)).then((value) {
@@ -209,7 +214,7 @@ class _IndexViewState extends State<IndexView>
         color: Colors.black.withOpacity(AppOpacity.mdOpacity),
         child: ListTile(
             leading: myself.avatarImage,
-            isThreeLine: true,
+            isThreeLine: false,
             title: Text(name, style: const TextStyle(color: Colors.white)),
             subtitle: Text(
                 AppLocalizations.t('Inviting you $title chat, ') +

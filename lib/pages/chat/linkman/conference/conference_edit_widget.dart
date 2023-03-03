@@ -269,10 +269,15 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
       }
       current = await conferenceService.createConference(currentConference.name,
           topic: currentConference.topic,
+          video: currentConference.video,
           conferenceOwnerPeerId: conference.value.conferenceOwnerPeerId,
           startDate: currentConference.startDate,
           endDate: currentConference.endDate,
           participants: conferenceMembers.value);
+      current.password = currentConference.password;
+      current.advance = currentConference.advance;
+      current.mute = currentConference.mute;
+      current.contact = currentConference.contact;
       conferenceModified = true;
       conferenceAdd = true;
     } else {
