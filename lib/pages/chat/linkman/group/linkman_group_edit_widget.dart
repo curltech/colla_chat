@@ -253,9 +253,9 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
     if (current.id != null) {
       add = false;
     }
-    current.groupOwnerPeerId ??= myself.peerId;
+    current.groupOwnerPeerId = group.value.groupOwnerPeerId ?? myself.peerId;
     for (var option in groupOwnerController.options) {
-      if (option.value == group.value.groupOwnerPeerId) {
+      if (option.value == current.groupOwnerPeerId) {
         current.groupOwnerName = option.label;
         break;
       }

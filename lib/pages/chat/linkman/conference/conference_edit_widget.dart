@@ -286,14 +286,8 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
       }
       if (current.conferenceOwnerPeerId !=
           currentConference.conferenceOwnerPeerId) {
-        current.conferenceOwnerPeerId = currentConference.conferenceOwnerPeerId;
-        current.conferenceOwnerPeerId ??= myself.peerId;
-        for (var option in conferenceOwnerController.options) {
-          if (option.value == current.conferenceOwnerPeerId) {
-            current.conferenceOwnerName = option.label;
-            break;
-          }
-        }
+        current.conferenceOwnerPeerId =
+            currentConference.conferenceOwnerPeerId ?? myself.peerId;
         conferenceModified = true;
       }
       if (current.password != currentConference.password) {
@@ -311,6 +305,12 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
       if (current.endDate != currentConference.endDate) {
         current.endDate = currentConference.endDate;
         conferenceModified = true;
+      }
+    }
+    for (var option in conferenceOwnerController.options) {
+      if (option.value == current.conferenceOwnerPeerId) {
+        current.conferenceOwnerName = option.label;
+        break;
       }
     }
     current.participants = conferenceMembers.value;
