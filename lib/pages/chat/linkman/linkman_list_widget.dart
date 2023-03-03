@@ -267,10 +267,15 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             prefix: Icons.person_remove,
             onTap: (int index, String label, {String? subtitle}) async {
               linkmanController.currentIndex = index;
-              await linkmanService.removeByPeerId(subtitle!);
-              await chatSummaryService.removeChatSummary(subtitle);
-              await chatMessageService.removeByLinkman(subtitle);
+              await linkmanService.removeByPeerId(linkman.peerId);
+              await chatSummaryService.removeChatSummary(linkman.peerId);
+              await chatMessageService.removeByLinkman(linkman.peerId);
               linkmanController.delete();
+              if (mounted) {
+                DialogUtil.info(context,
+                    content:
+                        '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is deleted')}');
+              }
             });
         slideActions.add(deleteSlideAction);
         TileData chatSlideAction = TileData(
@@ -292,16 +297,26 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             TileData(
                 title: 'Remove blacklist',
                 prefix: Icons.person_outlined,
-                onTap: (int index, String title, {String? subtitle}) {
-                  _changeStatus(linkman, LinkmanStatus.stranger);
+                onTap: (int index, String title, {String? subtitle}) async {
+                  await _changeStatus(linkman, LinkmanStatus.effective);
+                  if (mounted) {
+                    DialogUtil.info(context,
+                        content:
+                            '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is removed blacklist')}');
+                  }
                 }),
           );
         } else {
           endSlideActions.add(TileData(
               title: 'Add blacklist',
               prefix: Icons.person_off,
-              onTap: (int index, String title, {String? subtitle}) {
-                _changeStatus(linkman, LinkmanStatus.blacklist);
+              onTap: (int index, String title, {String? subtitle}) async {
+                await _changeStatus(linkman, LinkmanStatus.blacklist);
+                if (mounted) {
+                  DialogUtil.info(context,
+                      content:
+                          '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is added blacklist')}');
+                }
               }));
         }
         if (linkman.status == LinkmanStatus.blacklist.name) {
@@ -309,16 +324,27 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             TileData(
                 title: 'Remove subscript',
                 prefix: Icons.unsubscribe,
-                onTap: (int index, String title, {String? subtitle}) {
-                  _changeSubscriptStatus(linkman, LinkmanStatus.stranger);
+                onTap: (int index, String title, {String? subtitle}) async {
+                  await _changeSubscriptStatus(
+                      linkman, LinkmanStatus.effective);
+                  if (mounted) {
+                    DialogUtil.info(context,
+                        content:
+                            '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is removed subscript')}');
+                  }
                 }),
           );
         } else {
           endSlideActions.add(TileData(
               title: 'Add subscript',
               prefix: Icons.subscriptions,
-              onTap: (int index, String title, {String? subtitle}) {
-                _changeSubscriptStatus(linkman, LinkmanStatus.subscript);
+              onTap: (int index, String title, {String? subtitle}) async {
+                await _changeSubscriptStatus(linkman, LinkmanStatus.subscript);
+                if (mounted) {
+                  DialogUtil.info(context,
+                      content:
+                          '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is added subscript')}');
+                }
               }));
         }
         tile.endSlideActions = endSlideActions;
@@ -350,9 +376,14 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
               groupController.currentIndex = index;
               await groupService.removeByGroupPeerId(group.peerId);
               await groupMemberService.removeByGroupPeerId(group.peerId);
-              await chatSummaryService.removeChatSummary(subtitle!);
-              await chatMessageService.removeByGroup(subtitle);
+              await chatSummaryService.removeChatSummary(group.peerId);
+              await chatMessageService.removeByGroup(group.peerId);
               groupController.delete();
+              if (mounted) {
+                DialogUtil.info(context,
+                    content:
+                        '${AppLocalizations.t('Group:')} ${group.name}${AppLocalizations.t(' is deleted')}');
+              }
             });
         slideActions.add(deleteSlideAction);
         TileData dismissSlideAction = TileData(
@@ -407,11 +438,19 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             prefix: Icons.playlist_remove_outlined,
             onTap: (int index, String label, {String? subtitle}) async {
               conferenceController.currentIndex = index;
-              await conferenceService.removeByConferenceId(subtitle!);
-              await groupMemberService.removeByGroupPeerId(subtitle);
-              await chatSummaryService.removeChatSummary(subtitle);
-              await chatMessageService.removeByGroup(subtitle);
+              await conferenceService
+                  .removeByConferenceId(conference.conferenceId!);
+              await groupMemberService
+                  .removeByGroupPeerId(conference.conferenceId);
+              await chatSummaryService
+                  .removeChatSummary(conference.conferenceId);
+              await chatMessageService.removeByGroup(conference.conferenceId);
               conferenceController.delete();
+              if (mounted) {
+                DialogUtil.info(context,
+                    content:
+                        '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is deleted')}');
+              }
             });
         slideActions.add(deleteSlideAction);
         tile.slideActions = slideActions;

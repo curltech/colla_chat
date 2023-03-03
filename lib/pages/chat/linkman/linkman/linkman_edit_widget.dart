@@ -5,6 +5,7 @@ import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
@@ -99,6 +100,11 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     await _changeStatus(LinkmanStatus.friend);
     // 加好友会发送自己的信息，回执将收到对方的信息
     await linkmanService.addFriend(linkman!.peerId, tip!);
+    if (mounted) {
+      DialogUtil.info(context,
+          content:
+              '${AppLocalizations.t('Linkman:')} ${linkman!.name}${AppLocalizations.t(' is added friend')}');
+    }
   }
 
   _changeStatus(LinkmanStatus status) async {
@@ -156,8 +162,13 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
           TileData(
               title: 'Remove friend',
               prefix: const Icon(Icons.person_remove),
-              onTap: (int index, String title, {String? subtitle}) {
-                _changeStatus(LinkmanStatus.stranger);
+              onTap: (int index, String title, {String? subtitle}) async {
+                await _changeStatus(LinkmanStatus.effective);
+                if (mounted) {
+                  DialogUtil.info(context,
+                      content:
+                          '${AppLocalizations.t('Linkman:')} ${linkman!.name}${AppLocalizations.t(' is removed friend')}');
+                }
               }),
         );
       }

@@ -2,7 +2,7 @@ import 'package:colla_chat/entity/chat/peer_party.dart';
 
 enum LinkmanStatus {
   none,
-  stranger, //陌生人
+  effective, //陌生人
   friend, //好友
   blacklist, //黑名单
   subscript, //订阅
