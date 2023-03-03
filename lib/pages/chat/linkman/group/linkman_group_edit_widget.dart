@@ -260,8 +260,6 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
         break;
       }
     }
-    group.value.groupOwnerPeerId = current.groupOwnerPeerId;
-    group.value.groupOwnerName = current.groupOwnerName;
     var participants = groupMembers.value;
     if (!participants.contains(myself.peerId!)) {
       participants.add(myself.peerId!);
