@@ -234,6 +234,11 @@
   "accepted": "接受",
   "rejected": "拒绝",
   "received": "接收",
+  "busy": "占线",
+  "ignored": "忽略",
+  "hold": "保持",
+  "exit": "退出",
+  "deleted": "删除",
   "terminated": "终止",
   "receipt": "回执",
   "VideoConference": "视频会议",
@@ -276,9 +281,12 @@
   "Date format error": "日期时间格式错误",
   "Date range invalid error": "日期时间范围错误",
   "Date": "日期",
-  "Must be not empty": "不可为空",
+  "video": "视频",
+  "conference": "会议",
   "Hour": "小时",
   "Minute": "分钟",
   "Inviting you video chat ": "邀请你参加视频会议：",
-  "Inviting you audio chat ": "邀请你参加音频会议："
+  "Inviting you audio chat ": "邀请你参加音频会议：",
+  "video chat invitation": "视频会议邀请",
+  "audio chat invitation": "音频会议邀请"
 }

@@ -167,7 +167,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       List<Map<String, dynamic>> maps = await AssetUtil.toJsons(result);
       String content = JsonUtil.toJsonString(maps);
       await chatMessageController.sendText(
-          message: content, contentType: ContentType.image);
+          message: content, contentType: ChatMessageContentType.image);
     }
   }
 
@@ -190,10 +190,10 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       if (mediaFile!.mimeType != null) {
         mimeType = mediaFile!.mimeType!;
       }
-      ContentType contentType = ContentType.image;
+      ChatMessageContentType contentType = ChatMessageContentType.image;
       if (mimeType.endsWith('mp4')) {
-        contentType = ContentType.video;
-        mimeType = MimeType.mp4.name;
+        contentType = ChatMessageContentType.video;
+        mimeType = ChatMessageMimeType.mp4.name;
       }
       await chatMessageController.send(
           title: name,
@@ -249,7 +249,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     JsonUtil.toJsonString(map);
     String content = JsonUtil.toJsonString(map);
     await chatMessageController.sendText(
-        message: content, contentType: ContentType.location);
+        message: content, contentType: ChatMessageContentType.location);
   }
 
   ///名片
@@ -267,7 +267,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
                   if (linkman != null) {
                     String content = JsonUtil.toJsonString(linkman);
                     await chatMessageController.sendText(
-                        message: content, contentType: ContentType.card);
+                        message: content, contentType: ChatMessageContentType.card);
                   }
                 }
               },
@@ -286,7 +286,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       await chatMessageController.send(
           title: FileUtil.filename(xfile.path),
           content: data,
-          contentType: ContentType.file,
+          contentType: ChatMessageContentType.file,
           mimeType: mimeType);
     }
   }

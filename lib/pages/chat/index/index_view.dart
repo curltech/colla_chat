@@ -113,7 +113,7 @@ class _IndexViewState extends State<IndexView>
               String? contentType = chatMessage.contentType;
               if (content != null &&
                   (contentType == null ||
-                      contentType == ContentType.text.name)) {
+                      contentType == ChatMessageContentType.text.name)) {
                 content = chatMessageService.recoverContent(content);
               } else {
                 content = '';

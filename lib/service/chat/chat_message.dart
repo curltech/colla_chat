@@ -237,7 +237,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     TransportType transportType = TransportType.webrtc,
     ChatMessageType messageType = ChatMessageType.chat,
     ChatMessageSubType subMessageType = ChatMessageSubType.chat,
-    ContentType contentType = ContentType.text,
+    ChatMessageContentType contentType = ChatMessageContentType.text,
     String? mimeType,
     PartyType receiverType = PartyType.linkman,
     String? receiverName,
@@ -338,7 +338,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     dynamic content,
     ChatMessageType messageType = ChatMessageType.chat,
     ChatMessageSubType subMessageType = ChatMessageSubType.chat,
-    ContentType contentType = ContentType.text,
+    ChatMessageContentType contentType = ChatMessageContentType.text,
     String? mimeType,
     String? title,
     String? messageId,
@@ -657,8 +657,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         ChatMessageType.values, chatMessage.messageType);
     ChatMessageSubType? subMessageType = StringUtil.enumFromString(
         ChatMessageSubType.values, chatMessage.subMessageType);
-    ContentType? contentType =
-        StringUtil.enumFromString(ContentType.values, chatMessage.contentType);
+    ChatMessageContentType? contentType =
+        StringUtil.enumFromString(ChatMessageContentType.values, chatMessage.contentType);
 
     List<int>? thumbnail;
     if (chatMessage.thumbnail != null) {
@@ -727,11 +727,11 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     bool attachment = false;
     if (content != null) {
       if (contentType != null &&
-          (contentType == ContentType.file.name ||
-              contentType == ContentType.image.name ||
-              contentType == ContentType.video.name ||
-              contentType == ContentType.audio.name ||
-              contentType == ContentType.rich.name)) {
+          (contentType == ChatMessageContentType.file.name ||
+              contentType == ChatMessageContentType.image.name ||
+              contentType == ChatMessageContentType.video.name ||
+              contentType == ChatMessageContentType.audio.name ||
+              contentType == ChatMessageContentType.rich.name)) {
         //保存的时候，设置内容为空
         chatMessage.content = null;
         attachment = true;

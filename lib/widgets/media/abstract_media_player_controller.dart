@@ -20,7 +20,7 @@ enum MediaSourceType {
 ///平台定义的媒体源
 class PlatformMediaSource {
   final String filename;
-  final MimeType? mediaFormat;
+  final ChatMessageMimeType? mediaFormat;
   final MediaSourceType mediaSourceType;
 
   PlatformMediaSource({
@@ -30,7 +30,7 @@ class PlatformMediaSource {
   });
 
   static FutureOr<PlatformMediaSource?> mediaStream(
-      {required Uint8List data, required MimeType mediaFormat}) async {
+      {required Uint8List data, required ChatMessageMimeType mediaFormat}) async {
     String? filename =
         await FileUtil.writeTempFile(data, extension: mediaFormat.name);
     PlatformMediaSource? mediaSource = PlatformMediaSource(
@@ -42,12 +42,12 @@ class PlatformMediaSource {
   }
 
   static PlatformMediaSource media(
-      {required String filename, MimeType? mediaFormat}) {
+      {required String filename, ChatMessageMimeType? mediaFormat}) {
     PlatformMediaSource mediaSource;
     if (mediaFormat == null) {
       int pos = filename.lastIndexOf('.');
       String extension = filename.substring(pos + 1);
-      mediaFormat = StringUtil.enumFromString(MimeType.values, extension);
+      mediaFormat = StringUtil.enumFromString(ChatMessageMimeType.values, extension);
     }
     if (filename.startsWith('assets')) {
       mediaSource = PlatformMediaSource(

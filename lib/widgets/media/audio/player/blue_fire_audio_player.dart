@@ -75,7 +75,7 @@ class BlueFireAudioPlayer {
 
 class BlueFireAudioSource {
   static Source mediaStream(
-      {required Uint8List data, required MimeType mediaFormat}) {
+      {required Uint8List data, required ChatMessageMimeType mediaFormat}) {
     Source source = BytesSource(data);
 
     return source;

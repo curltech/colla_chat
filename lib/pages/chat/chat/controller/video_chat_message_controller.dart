@@ -335,7 +335,7 @@ class VideoChatMessageController with ChangeNotifier {
         await chatMessageService.buildGroupChatMessage(
       conference.conferenceId,
       PartyType.conference,
-      title: conference.video ? ContentType.video.name : ContentType.audio.name,
+      title: conference.video ? ChatMessageContentType.video.name : ChatMessageContentType.audio.name,
       content: conference,
       messageId: conference.conferenceId,
       subMessageType: ChatMessageSubType.videoChat,
@@ -352,7 +352,7 @@ class VideoChatMessageController with ChangeNotifier {
   ///conference的participants，而不是group的所有成员
   ///title字段存放是视频还是音频的信息
   Future<ChatMessage?> sendVideoChatMessage(
-      {required ContentType contentType,
+      {required ChatMessageContentType contentType,
       bool video = true,
       required List<String> participants}) async {
     var conference =

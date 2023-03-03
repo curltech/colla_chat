@@ -32,7 +32,7 @@ class ImageUtil {
 
   static String prefixBase64 = 'data:image/*;base64,';
 
-  static String base64Img(String img, {MimeType? type}) {
+  static String base64Img(String img, {ChatMessageMimeType? type}) {
     if (type != null) {
       return prefixBase64.replaceFirst('*', type.name) + img;
     } else {

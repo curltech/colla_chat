@@ -1,7 +1,7 @@
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/message_attachment.dart';
 
-enum ContentType {
+enum ChatMessageContentType {
   rich, // 根据场景包含类型不同，如非系统类型、可搜索类型等
   image,
   text,
@@ -16,7 +16,7 @@ enum ContentType {
   action,
 }
 
-enum MimeType {
+enum ChatMessageMimeType {
   gif,
   png,
   jpeg,

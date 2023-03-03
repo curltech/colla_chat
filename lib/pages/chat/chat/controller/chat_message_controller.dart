@@ -126,7 +126,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   Future<ChatMessage?> sendText(
       {String? title,
       String? message,
-      ContentType contentType = ContentType.text,
+      ChatMessageContentType contentType = ChatMessageContentType.text,
       String? mimeType,
       ChatMessageType messageType = ChatMessageType.chat,
       ChatMessageSubType subMessageType = ChatMessageSubType.chat,
@@ -146,7 +146,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   Future<ChatMessage?> send(
       {String? title,
       dynamic content,
-      ContentType contentType = ContentType.text,
+      ChatMessageContentType contentType = ChatMessageContentType.text,
       String? mimeType,
       String? messageId,
       ChatMessageType messageType = ChatMessageType.chat,

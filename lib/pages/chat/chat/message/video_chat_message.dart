@@ -1,3 +1,4 @@
+import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/conference/conference_show_widget.dart';
@@ -25,30 +26,31 @@ class VideoChatMessage extends StatelessWidget {
     Color primary = myself.primary;
     Map<String, dynamic> map = JsonUtil.toJson(content);
     Conference conference = Conference.fromJson(map);
+    var video = conference.video
+        ? ChatMessageContentType.video.name
+        : ChatMessageContentType.audio.name;
     Widget actionWidget;
     if (fullScreen) {
       actionWidget = ConferenceShowWidget(conference: conference);
     } else {
       actionWidget = InkWell(
-          onTap: () {},
-          child: Padding(
-            padding: const EdgeInsets.all(0),
-            child: ListTile(
-              leading: Icon(
-                Icons.video_call,
-                color: primary,
-              ),
-              title: Text(
-                AppLocalizations.t('Invite video chat'),
-              ),
-              subtitle: Text(conference.name),
-              //dense: true,
-              //contentPadding: EdgeInsets.zero,
-              //horizontalTitleGap: 0,
-              minVerticalPadding: 0,
-              //minLeadingWidth: 0,
-            ),
-          ));
+        onTap: () {},
+        child: ListTile(
+          leading: Icon(
+            conference.video ? Icons.video_call : Icons.multitrack_audio,
+            color: primary,
+          ),
+          title: Text(
+            AppLocalizations.t('$video chat invitation'),
+          ),
+          subtitle: Text('${conference.name}\n${conference.topic ?? ''}'),
+          //dense: true,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 5.0),
+          horizontalTitleGap: 0,
+          minVerticalPadding: 0,
+          //minLeadingWidth: 5,
+        ),
+      );
     }
     return Card(elevation: 0, child: actionWidget);
   }

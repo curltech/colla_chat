@@ -360,11 +360,11 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       if (videoRender.video) {
         chatMessage = await widget.videoChatMessageController
             .sendVideoChatMessage(
-                contentType: ContentType.video, participants: participants);
+                contentType: ChatMessageContentType.video, participants: participants);
       } else {
         chatMessage = await widget.videoChatMessageController
             .sendVideoChatMessage(
-                contentType: ContentType.audio, participants: participants);
+                contentType: ChatMessageContentType.audio, participants: participants);
       }
       if (chatMessage != null) {
         if (mounted) {

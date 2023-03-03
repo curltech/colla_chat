@@ -96,43 +96,43 @@ class MessageWidget {
   ///消息体：扩展文本，图像，声音，视频，页面，复合文本，文件，名片，位置，收藏等种类
   ///每种消息体一个类
   Future<Widget> buildMessageBody(BuildContext context) async {
-    ContentType? contentType;
+    ChatMessageContentType? contentType;
     if (chatMessage.contentType != null) {
       contentType = StringUtil.enumFromString(
-          ContentType.values, chatMessage.contentType!);
+          ChatMessageContentType.values, chatMessage.contentType!);
     }
-    contentType = contentType ?? ContentType.text;
+    contentType = contentType ?? ChatMessageContentType.text;
     ChatMessageSubType? subMessageType;
     subMessageType = StringUtil.enumFromString(
         ChatMessageSubType.values, chatMessage.subMessageType);
     Widget body;
     if (subMessageType == ChatMessageSubType.chat) {
       switch (contentType) {
-        case ContentType.text:
+        case ChatMessageContentType.text:
           body = buildExtendedTextMessageWidget(context);
           break;
-        case ContentType.audio:
+        case ChatMessageContentType.audio:
           body = buildAudioMessageWidget(context);
           break;
-        case ContentType.video:
+        case ChatMessageContentType.video:
           body = buildVideoMessageWidget(context);
           break;
-        case ContentType.file:
+        case ChatMessageContentType.file:
           body = await buildFileMessageWidget(context);
           break;
-        case ContentType.image:
+        case ChatMessageContentType.image:
           body = buildImageMessageWidget(context);
           break;
-        case ContentType.card:
+        case ChatMessageContentType.card:
           body = buildNameCardMessageWidget(context);
           break;
-        case ContentType.rich:
+        case ChatMessageContentType.rich:
           body = buildRichTextMessageWidget(context);
           break;
-        case ContentType.link:
+        case ChatMessageContentType.link:
           body = buildUrlMessageWidget(context);
           break;
-        case ContentType.location:
+        case ChatMessageContentType.location:
           body = buildLocationMessageWidget(context);
           break;
         default:
@@ -535,7 +535,7 @@ class MessageWidget {
             var contentType = chatMessage.contentType;
             String data = '$senderName: ';
             if (subMessageType == ChatMessageSubType.chat.name &&
-                contentType == ContentType.text.name) {
+                contentType == ChatMessageContentType.text.name) {
               var title = chatMessage.title;
               var content = chatMessage.content ?? '';
               content = chatMessageService.recoverContent(content);
