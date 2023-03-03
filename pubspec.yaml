@@ -188,6 +188,8 @@ dependencies:
   receive_sharing_intent: ^1.4.5
   date_format: ^2.0.6
   omni_datetime_picker: ^1.0.1
+  toggle_switch: ^2.0.1
+  expandable: ^5.0.1
   classic_logger: any
   logger: ^1.1.0
   #logging: ^1.0.2
