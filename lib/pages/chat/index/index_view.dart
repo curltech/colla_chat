@@ -1,5 +1,6 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/index/bottom_bar.dart';
@@ -10,6 +11,7 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
@@ -42,6 +44,7 @@ class _IndexViewState extends State<IndexView>
   BlueFireAudioPlayer audioPlayer = BlueFireAudioPlayer();
 
   //JustAudioPlayer audioPlayer = JustAudioPlayer();
+  Widget? bannerAvatarImage;
 
   @override
   void initState() {
@@ -71,6 +74,12 @@ class _IndexViewState extends State<IndexView>
   _updateGlobalChatMessage() async {
     ChatMessage? chatMessage = globalChatMessageController.chatMessage;
     if (chatMessage != null) {
+      String senderPeerId = chatMessage.senderPeerId!;
+      Linkman? linkman =
+          await linkmanService.findCachedOneByPeerId(senderPeerId);
+      if (linkman != null) {
+        bannerAvatarImage = linkman.avatarImage ?? AppImage.mdAppImage;
+      }
       if (chatMessage.subMessageType == ChatMessageSubType.chat.name) {
         chatMessageVisible.value = true;
       }
@@ -126,7 +135,7 @@ class _IndexViewState extends State<IndexView>
                       child: Row(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            myself.avatarImage ?? AppImage.mdAppImage,
+                            bannerAvatarImage!,
                             const SizedBox(
                               width: 15.0,
                             ),
@@ -213,7 +222,7 @@ class _IndexViewState extends State<IndexView>
         padding: const EdgeInsets.all(5.0),
         color: Colors.black.withOpacity(AppOpacity.mdOpacity),
         child: ListTile(
-            leading: myself.avatarImage,
+            leading: bannerAvatarImage!,
             isThreeLine: false,
             title: Text(name, style: const TextStyle(color: Colors.white)),
             subtitle: Text(

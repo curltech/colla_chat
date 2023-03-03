@@ -653,7 +653,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
           labelText: AppLocalizations.t(columnFieldDef.label),
           prefixIcon: _buildIcon(),
           suffixIcon: IconButton(
-              icon: const Icon(Icons.date_range),
+              icon: Icon(Icons.date_range, color: myself.primary),
               onPressed: () async {
                 DateTime? initialDate;
                 if (controller.text.isNotEmpty) {
@@ -747,7 +747,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
           labelText: AppLocalizations.t(columnFieldDef.label),
           prefixIcon: _buildIcon(),
           suffixIcon: IconButton(
-              icon: const Icon(Icons.date_range),
+              icon: Icon(Icons.access_time_filled, color: myself.primary),
               onPressed: () async {
                 TimeOfDay? initialTime;
                 if (controller.text.isNotEmpty) {
@@ -816,7 +816,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
           labelText: AppLocalizations.t(columnFieldDef.label),
           prefixIcon: _buildIcon(),
           suffixIcon: IconButton(
-              icon: const Icon(Icons.date_range),
+              icon: Icon(Icons.date_range, color: myself.primary),
               onPressed: () async {
                 DateTime? initialDate;
                 if (controller.text.isNotEmpty) {
