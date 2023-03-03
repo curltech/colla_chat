@@ -4,7 +4,6 @@ import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
@@ -149,12 +148,9 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       if (chatSummary == null) {
         chatSummary = ChatSummary();
         chatSummary.peerId = groupPeerId;
-        chatSummary.partyType = PartyType.group.name;
+        chatSummary.partyType = chatMessage.groupType;
+        chatSummary.name = chatMessage.groupName;
         chatSummary.sendReceiveTime = chatMessage.sendTime;
-        Group? group = await groupService.findCachedOneByPeerId(groupPeerId);
-        if (group != null) {
-          chatSummary.name = group.name;
-        }
       }
     } else {
       if (senderPeerId != null && senderPeerId != myself.peerId) {

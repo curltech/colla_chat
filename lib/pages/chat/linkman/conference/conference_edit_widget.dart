@@ -1,14 +1,13 @@
-import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
+import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
@@ -312,20 +311,9 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     current.participants = conferenceMembers.value;
     await conferenceService.store(current);
     conference.value = current;
+    //发出新增的会议邀请消息
     if (conferenceAdd) {
-      List<ChatMessage> chatMessages =
-          await chatMessageService.buildGroupChatMessage(
-        current.conferenceId,
-        PartyType.conference,
-        title: current.video ? ContentType.video.name : ContentType.audio.name,
-        content: current,
-        messageId: current.conferenceId,
-        subMessageType: ChatMessageSubType.videoChat,
-        peerIds: current.participants,
-      );
-      for (var chatMessage in chatMessages) {
-        await chatMessageService.sendAndStore(chatMessage);
-      }
+      await VideoChatMessageController.sendConferenceVideoChatMessage(current);
     }
 
     if (conferenceController.current == null) {

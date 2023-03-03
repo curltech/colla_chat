@@ -185,21 +185,28 @@ class VideoChatMessageController with ChangeNotifier {
 
   ///根据_chatMessage查找对应的chatSummary
   Future<ChatSummary?> _findChatSummary() async {
-    if (_chatMessage!.direct == ChatDirect.send.name) {
-      return await chatSummaryService
-          .findCachedOneByPeerId(_chatMessage!.receiverPeerId!);
+    ChatSummary? chatSummary;
+    if (_chatMessage!.groupType == null) {
+      if (_chatMessage!.direct == ChatDirect.send.name) {
+        chatSummary = await chatSummaryService
+            .findCachedOneByPeerId(_chatMessage!.receiverPeerId!);
+      } else if (_chatMessage!.direct == ChatDirect.receive.name) {
+        chatSummary = await chatSummaryService
+            .findCachedOneByPeerId(_chatMessage!.senderPeerId!);
+      }
+    } else {
+      chatSummary = await chatSummaryService
+          .findCachedOneByPeerId(_chatMessage!.messageId!);
     }
-    if (_chatMessage!.direct == ChatDirect.receive.name) {
-      return await chatSummaryService
-          .findCachedOneByPeerId(_chatMessage!.senderPeerId!);
-    }
-    return null;
+    chatSummary ??= await chatSummaryService.upsertByChatMessage(_chatMessage!);
+
+    return chatSummary;
   }
 
   ///校验_chatMessage和_chatSummary，不一致则重新设置_chatSummary
   _initChatSummary() async {
     if (_chatSummary == null && _chatMessage != null) {
-      var chatSummary = await _findChatSummary();
+      ChatSummary? chatSummary = await _findChatSummary();
       await setChatSummary(chatSummary);
     } else if (_chatSummary != null && _chatMessage != null) {
       if (_chatMessage!.direct == ChatDirect.send.name) {
@@ -317,7 +324,27 @@ class VideoChatMessageController with ChangeNotifier {
     return _conference;
   }
 
+  ///群发送视频会议邀请消息，当前chatSummary可以不存在，因此不需要当前处于聊天场景下
+  static Future<ChatMessage?> sendConferenceVideoChatMessage(
+      Conference conference) async {
+    List<ChatMessage> chatMessages =
+        await chatMessageService.buildGroupChatMessage(
+      conference.conferenceId,
+      PartyType.conference,
+      title: conference.video ? ContentType.video.name : ContentType.audio.name,
+      content: conference,
+      messageId: conference.conferenceId,
+      subMessageType: ChatMessageSubType.videoChat,
+      peerIds: conference.participants,
+    );
+    for (var chatMessage in chatMessages) {
+      await chatMessageService.sendAndStore(chatMessage);
+    }
+    return chatMessages[0];
+  }
+
   ///1.发送视频通邀请话消息,此时消息必须有content,包含conference信息
+  ///当前chatSummary必须存在，因此只能用于当前正在聊天的时候
   ///conference的participants，而不是group的所有成员
   ///title字段存放是视频还是音频的信息
   Future<ChatMessage?> sendVideoChatMessage(
@@ -331,7 +358,7 @@ class VideoChatMessageController with ChangeNotifier {
         await conferenceService.store(conference);
       }
     }
-    //主题是会议名称
+    //主题是会议视频属性
     ChatMessage? chatMessage = await chatMessageController.send(
         title: contentType.name,
         content: _conference,
