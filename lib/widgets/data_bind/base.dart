@@ -6,9 +6,10 @@ class Option<T> {
   String? hint;
   bool checked;
   Widget? leading;
+  IconData? icon;
 
   Option(this.label, this.value,
-      {this.checked = false, this.leading, this.hint});
+      {this.checked = false, this.leading, this.icon, this.hint});
 
   Option<T> copy() {
     Option<T> option =

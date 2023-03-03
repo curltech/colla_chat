@@ -7,6 +7,7 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
+import 'package:toggle_switch/toggle_switch.dart';
 
 ///指定路由样式，不指定则系统判断，系统判断的方法是如果是移动则走全局路由，否则走工作区路由
 enum InputType {
@@ -15,8 +16,10 @@ enum InputType {
   password,
   radio,
   checkbox,
+  togglebuttons,
   select,
   switcher,
+  toggle,
   textarea,
   date,
   time,
@@ -426,6 +429,48 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     return Column(children: children);
   }
 
+  ///多个字符串选择一个，对应的字段是字符串
+  Widget _buildToggleField(BuildContext context) {
+    widget.controller.controller = null;
+    var columnFieldDef = widget.controller.columnFieldDef;
+    var label = columnFieldDef.label;
+    var options = columnFieldDef.options;
+    List<String> labels = [];
+    List<IconData?> icons = [];
+    String? value = _getInitValue(context);
+    int? index;
+    if (options != null && options.isNotEmpty) {
+      for (var i = 0; i < options.length; ++i) {
+        var option = options[i];
+        labels.add(AppLocalizations.t(option.label));
+        icons.add(option.icon);
+        if (value == option.value) {
+          index = i;
+        }
+      }
+    }
+
+    var toggleSwitch = ToggleSwitch(
+      initialLabelIndex: index,
+      activeBgColor: [myself.primary],
+      activeFgColor: Colors.white,
+      inactiveBgColor: myself.secondary,
+      inactiveFgColor: Colors.white,
+      totalSwitches: labels.length,
+      labels: labels,
+      icons: icons,
+      onToggle: (index) {
+        if (index != null) {
+          widget.controller.value = options![index].value;
+        } else {
+          widget.controller.value = null;
+        }
+      },
+    );
+
+    return Row(children: [Text(label), toggleSwitch]);
+  }
+
   ///多个字符串选择多个，对应的字段是字符串的Set
   Widget _buildCheckboxField(BuildContext context) {
     widget.controller.controller = null;
@@ -458,6 +503,52 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
         children.add(row);
       }
     }
+
+    return Column(children: children);
+  }
+
+  ///多个字符串选择多个，对应的字段是字符串的Set
+  Widget _buildToggleButtonsField(BuildContext context) {
+    widget.controller.controller = null;
+    var columnFieldDef = widget.controller.columnFieldDef;
+    var label = columnFieldDef.label;
+    var options = columnFieldDef.options;
+    List<Widget> children = [];
+    List<bool> isSelected = [];
+    Set<String>? value = _getInitValue(context);
+    if (options != null && options.isNotEmpty) {
+      value ??= <String>{};
+      for (var i = 0; i < options.length; ++i) {
+        var option = options[i];
+        children.add(option.leading!);
+        if (value.contains(option.value)) {
+          isSelected.add(true);
+        } else {
+          isSelected.add(false);
+        }
+      }
+    }
+    var toggleButtons = ToggleButtons(
+      onPressed: (int newIndex) {
+        isSelected[newIndex] = true;
+        Set<String>? value = widget.controller.value;
+        var option = options![newIndex];
+        if (value!.contains(option.value)) {
+          value.remove(option.value);
+        } else {
+          value.add(option.value);
+        }
+        widget.controller.value = value;
+      },
+      isSelected: isSelected,
+      children: children,
+    );
+    var row = Row(
+      children: [
+        Text(label),
+        toggleButtons,
+      ],
+    );
 
     return Column(children: children);
   }
@@ -887,6 +978,9 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
         case InputType.password:
           columnFieldWidget = _buildPasswordField(context);
           break;
+        case InputType.togglebuttons:
+          columnFieldWidget = _buildToggleButtonsField(context);
+          break;
         case InputType.checkbox:
           columnFieldWidget = _buildCheckboxField(context);
           break;
@@ -895,6 +989,9 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
           break;
         case InputType.select:
           columnFieldWidget = _buildDropdownButton(context);
+          break;
+        case InputType.toggle:
+          columnFieldWidget = _buildToggleField(context);
           break;
         case InputType.switcher:
           columnFieldWidget = _buildSwitchField(context);
