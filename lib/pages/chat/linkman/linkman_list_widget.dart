@@ -360,12 +360,13 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     List<TileData> tiles = [];
     if (groups.isNotEmpty) {
       for (var group in groups) {
-        var title = group.name;
+        var groupName = group.name;
         var peerId = group.peerId;
+        var groupOwnerName = group.groupOwnerName;
         TileData tile = TileData(
             prefix: group.avatarImage ?? AppImage.lgAppImage,
-            title: title,
-            subtitle: peerId,
+            title: groupName,
+            subtitle: groupOwnerName,
             selected: false,
             routeName: 'linkman_group_edit');
         List<TileData> slideActions = [];
@@ -429,12 +430,13 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     List<TileData> tiles = [];
     if (conferences.isNotEmpty) {
       for (var conference in conferences) {
-        var title = conference.name;
+        var conferenceName = conference.name;
         var conferenceId = conference.conferenceId;
+        var topic = conference.topic;
         TileData tile = TileData(
             prefix: conference.avatarImage ?? AppImage.lgAppImage,
-            title: title,
-            subtitle: conferenceId,
+            title: conferenceName,
+            subtitle: topic,
             selected: false,
             routeName: 'conference_edit');
         List<TileData> slideActions = [];

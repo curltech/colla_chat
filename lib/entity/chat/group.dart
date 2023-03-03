@@ -10,6 +10,7 @@ class Group extends PeerParty {
   String? pyDescription; // 组描述拼音
   String? myAlias; // 我在本群的昵称
   String? groupOwnerPeerId; // 群主peerId
+  String? groupOwnerName; // 群主name
   String? peerPrivateKey;
   String? privateKey;
   String? signalPublicKey;
@@ -25,6 +26,7 @@ class Group extends PeerParty {
         pyDescription = json['pyDescription'],
         myAlias = json['myAlias'],
         groupOwnerPeerId = json['groupOwnerPeerId'],
+        groupOwnerName = json['groupOwnerName'],
         peerPrivateKey = json['peerPrivateKey'],
         privateKey = json['privateKey'],
         signalPublicKey = json['signalPublicKey'],
@@ -41,6 +43,7 @@ class Group extends PeerParty {
       'pyDescription': pyDescription,
       'myAlias': myAlias,
       'groupOwnerPeerId': groupOwnerPeerId,
+      'groupOwnerName': groupOwnerName,
       'peerPrivateKey': peerPrivateKey,
       'privateKey': privateKey,
       'signalPublicKey': signalPublicKey,

@@ -94,6 +94,7 @@ class GroupService extends PeerPartyService<Group> {
     group.peerPublicKey = peerId;
     group.peerId = peerId;
     group.groupOwnerPeerId = myself.peerId;
+    group.groupOwnerName = myself.name;
     group.status = EntityStatus.effective.name;
 
     ///加密对应的密钥对x25519

@@ -105,6 +105,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
   //更新groupOwnerChoices
   _buildGroupOwnerOptions(List<String> selected) async {
     group.value.groupOwnerPeerId ??= myself.peerId;
+    group.value.groupOwnerName ??= myself.name;
     List<Option<String>> groupOwnerOptions = [];
     if (selected.isNotEmpty) {
       for (String groupMemberId in selected) {
@@ -164,7 +165,19 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
         child: CustomSingleSelectField(
             title: 'GroupOwnerPeer',
             onChanged: (selected) {
-              group.value.groupOwnerPeerId = selected;
+              if (selected != null) {
+                group.value.groupOwnerPeerId = selected;
+                var options = groupOwnerController.options;
+                for (var option in options) {
+                  if (option.value == selected) {
+                    group.value.groupOwnerName = option.label;
+                    break;
+                  }
+                }
+              } else {
+                DialogUtil.error(context,
+                    content: AppLocalizations.t('Must has group owner'));
+              }
             },
             optionController: groupOwnerController));
 
@@ -241,7 +254,9 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
       add = false;
     }
     group.value.groupOwnerPeerId ??= myself.peerId;
+    group.value.groupOwnerName ??= myself.name;
     current.groupOwnerPeerId = group.value.groupOwnerPeerId;
+    current.groupOwnerName = group.value.groupOwnerName;
     var participants = groupMembers.value;
     if (!participants.contains(myself.peerId!)) {
       participants.add(myself.peerId!);
