@@ -92,7 +92,8 @@ class _IndexViewState extends State<IndexView>
         } else {
           var videoChatMessageController = VideoChatMessageController();
           await videoChatMessageController.setChatMessage(chatMessage);
-          await videoChatMessageController.sendChatReceipt(MessageReceiptType.busy);
+          await videoChatMessageController
+              .sendChatReceipt(MessageReceiptType.busy);
           videoChatMessageController.dispose();
         }
       }
@@ -109,19 +110,36 @@ class _IndexViewState extends State<IndexView>
             ChatMessage? chatMessage = globalChatMessageController.chatMessage;
             if (chatMessage != null &&
                 chatMessage.subMessageType == ChatMessageSubType.chat.name) {
+              List<Widget> children = <Widget>[];
+              var name = chatMessage.senderName;
+              if (name != null) {
+                children.add(
+                  Text(name, style: const TextStyle(color: Colors.white)),
+                );
+              }
+              String? title = chatMessage.title;
+              if (title != null) {
+                children.add(
+                  Text(title, style: const TextStyle(color: Colors.white)),
+                );
+              }
               String? content = chatMessage.content;
               String? contentType = chatMessage.contentType;
               if (content != null &&
                   (contentType == null ||
                       contentType == ChatMessageContentType.text.name)) {
                 content = chatMessageService.recoverContent(content);
-              } else {
-                content = '';
+                children.add(Expanded(
+                    child: ExtendedText(
+                  content,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    //fontSize: 16.0,
+                  ),
+                  specialTextSpanBuilder: customSpecialTextSpanBuilder,
+                )));
               }
-              String? title = chatMessage.title;
-              title = title ?? '';
-              var name = chatMessage.senderName;
-              name = name ?? '';
+
               banner = InkWell(
                   onTap: () {
                     chatMessageVisible.value = false;
@@ -139,27 +157,7 @@ class _IndexViewState extends State<IndexView>
                             const SizedBox(
                               width: 15.0,
                             ),
-                            Column(children: [
-                              Text(name,
-                                  style: const TextStyle(color: Colors.white)),
-                              const SizedBox(
-                                width: 15.0,
-                              ),
-                              Text(title,
-                                  style: const TextStyle(color: Colors.white)),
-                              const SizedBox(
-                                height: 15.0,
-                              ),
-                              ExtendedText(
-                                content,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  //fontSize: 16.0,
-                                ),
-                                specialTextSpanBuilder:
-                                    customSpecialTextSpanBuilder,
-                              ),
-                            ]),
+                            Column(children: children),
                           ])));
 
               //延时30秒后一般消息消失
@@ -193,7 +191,8 @@ class _IndexViewState extends State<IndexView>
         onPressed: () async {
           videoChatMessageVisible.value = false;
           _stop();
-          await videoChatMessageController!.sendChatReceipt(MessageReceiptType.hold);
+          await videoChatMessageController!
+              .sendChatReceipt(MessageReceiptType.hold);
           videoChatMessageController = null;
         },
         child: const Icon(color: Colors.white, size: 16, Icons.add_call),
