@@ -133,9 +133,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     //当通过群peerId查询群消息时，发送的群消息会拆分到个体的消息记录需要排除，否则重复显示
     else if (groupPeerId != null) {
       where =
-          '$where and groupPeerId=? and receiverType=? and receiverPeerId=?';
+          '$where and senderPeerId!=receiverPeerId and groupPeerId=? and (senderPeerId=? or receiverPeerId=?)';
       whereArgs.add(groupPeerId);
-      whereArgs.add(PartyType.linkman.name);
+      whereArgs.add(myselfPeerId);
       whereArgs.add(myselfPeerId);
     }
     if (direct != null) {
@@ -188,9 +188,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     //当通过群peerId查询群消息时，发送的群消息会拆分到个体的消息记录需要排除，否则重复显示
     else if (groupPeerId != null) {
       where =
-          '$where and groupPeerId=? and receiverType=? and receiverPeerId=?';
+          '$where and senderPeerId!=receiverPeerId and groupPeerId=? and (senderPeerId=? or receiverPeerId=?)';
       whereArgs.add(groupPeerId);
-      whereArgs.add(PartyType.linkman.name);
+      whereArgs.add(myselfPeerId);
       whereArgs.add(myselfPeerId);
     }
     if (messageType != null) {
