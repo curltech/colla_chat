@@ -227,18 +227,22 @@ class VideoChatMessageController with ChangeNotifier {
 
   ///根据_chatMessage设置会议属性
   _initChatMessage() async {
-    //linkman的会议信息不保存，从消息中获取
-    if (partyType == PartyType.linkman.name) {
+    if (_chatMessage!.subMessageType == ChatMessageSubType.videoChat.name) {
       String json = chatMessageService.recoverContent(_chatMessage!.content!);
       Map map = JsonUtil.toJson(json);
       _conference = Conference.fromJson(map);
-      if (_chatMessage!.subMessageType == ChatMessageSubType.videoChat.name) {}
-    } else if (partyType == PartyType.group.name) {
-      //group的会议信息保存，_chatMessage中获取messageId，就是conferenceId
+    }
+    //linkman的会议信息不保存，从消息中获取
+    if (partyType != PartyType.linkman.name) {
       if (_chatMessage!.subMessageType == ChatMessageSubType.videoChat.name) {
         var conferenceId = _chatMessage!.messageId!;
-        _conference =
+        var conference =
             await conferenceService.findOneByConferenceId(conferenceId);
+        if (conference != null) {
+          logger.e('Conference $conferenceId name ${conference.name} is exist');
+          _conference!.id = conference.id;
+          await conferenceService.store(_conference!);
+        }
       }
     }
   }
