@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:badges/badges.dart' as badges;
+import 'package:badges/badges.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
@@ -246,14 +247,24 @@ class _ChatListWidgetState extends State<ChatListWidget>
     var badge = avatarImage ?? AppImage.lgAppImage;
     if (unreadNumber > 0) {
       badge = badges.Badge(
-        badgeContent:
-            Text('$unreadNumber', style: const TextStyle(color: Colors.white)),
+        position: BadgePosition.topEnd(),
+        stackFit: StackFit.loose,
+        badgeContent: ConstrainedBox(
+            constraints: const BoxConstraints(
+              minWidth: 12,
+            ),
+            child: Center(
+                child: Text('$unreadNumber',
+                    style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white)))),
         badgeStyle: const badges.BadgeStyle(
           elevation: 0.0,
           shape: badges.BadgeShape.square,
           borderRadius: BorderRadius.horizontal(
               left: Radius.circular(8), right: Radius.circular(8)),
-          padding: EdgeInsets.symmetric(vertical: 2.0, horizontal: 2.0),
+          padding: EdgeInsets.symmetric(vertical: 0.0, horizontal: 2.0),
         ),
         child: badge,
       );
@@ -304,10 +315,11 @@ class _ChatListWidgetState extends State<ChatListWidget>
     TileData tile = TileData(
         prefix: badge,
         title: name,
-        subtitle: '$sendReceiveTime\n$subtitle',
+        titleTail: sendReceiveTime,
+        subtitle: subtitle,
         dense: true,
         selected: false,
-        isThreeLine: true,
+        isThreeLine: false,
         routeName: 'chat_message');
     List<TileData> slideActions = [];
     TileData deleteSlideAction = TileData(
