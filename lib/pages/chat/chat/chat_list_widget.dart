@@ -295,6 +295,12 @@ class _ChatListWidgetState extends State<ChatListWidget>
           chatSummaryService.delete(entity: chatSummary);
           continue;
         }
+        var status = linkman.status ?? '';
+        status = AppLocalizations.t(status);
+        if (peerId == myself.peerId) {
+          status = AppLocalizations.t('myself');
+        }
+        name = '$name($status)';
         var badge = _buildBadge(unreadNumber, avatarImage: linkman.avatarImage);
 
         TileData tile = _buildTile(badge, name, sendReceiveTime, subtitle,
@@ -432,9 +438,8 @@ class _ChatListWidgetState extends State<ChatListWidget>
           valueListenable: _currentTab,
           builder: (context, value, child) {
             return Tab(
-              icon: myself.avatarImage,
-              // icon: Icon(Icons.person,
-              //     color: value == 0 ? myself.primary : Colors.white),
+              icon: Icon(Icons.person,
+                  color: value == 0 ? myself.primary : Colors.white),
               //text: AppLocalizations.t('Linkman'),
               iconMargin: const EdgeInsets.all(0.0),
             );

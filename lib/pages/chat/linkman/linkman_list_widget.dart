@@ -502,9 +502,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           valueListenable: _currentTab,
           builder: (context, value, child) {
             return Tab(
-              icon: myself.avatarImage,
-              // icon: Icon(Icons.person,
-              //     color: value == 0 ? myself.primary : Colors.white),
+              icon: Icon(Icons.person,
+                  color: value == 0 ? myself.primary : Colors.white),
               //text: AppLocalizations.t('Linkman'),
               iconMargin: const EdgeInsets.all(0.0),
             );
