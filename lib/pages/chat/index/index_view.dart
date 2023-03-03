@@ -217,8 +217,7 @@ class _IndexViewState extends State<IndexView>
             isThreeLine: false,
             title: Text(name, style: const TextStyle(color: Colors.white)),
             subtitle: Text(
-                AppLocalizations.t('Inviting you $title chat, ') +
-                    AppLocalizations.t('conference name ') +
+                AppLocalizations.t('Inviting you $title chat ') +
                     videoChatMessageController!.conference!.name,
                 style: const TextStyle(color: Colors.white)),
             trailing: SizedBox(

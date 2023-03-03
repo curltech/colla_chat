@@ -278,5 +278,7 @@
   "Date": "日期",
   "Must be not empty": "不可为空",
   "Hour": "小时",
-  "Minute": "分钟"
+  "Minute": "分钟",
+  "Inviting you video chat ": "邀请你参加视频会议：",
+  "Inviting you audio chat ": "邀请你参加音频会议："
 }
