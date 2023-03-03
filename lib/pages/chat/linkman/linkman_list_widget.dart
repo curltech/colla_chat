@@ -437,7 +437,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         TileData tile = TileData(
             prefix: conference.avatarImage ?? AppImage.lgAppImage,
             title: conferenceName,
-            subtitle: '${conferenceOwnerName!}\n$topic',
+            titleTail: conferenceOwnerName,
+            subtitle: topic,
             selected: false,
             isThreeLine: true,
             routeName: 'conference_edit');
