@@ -17,6 +17,8 @@ class ChatReceiptMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     var title = AppLocalizations.t(chatMessage.title ?? '');
     var content = chatMessageService.recoverContent(chatMessage.content!);
+    var receiverPeerId = chatMessage.receiverPeerId;
+    var receiverName = chatMessage.receiverName;
     var groupName = chatMessage.groupName ?? '';
     var groupType = AppLocalizations.t(chatMessage.groupType ?? '');
     Widget leading = Icon(
@@ -28,7 +30,8 @@ class ChatReceiptMessage extends StatelessWidget {
       child: ListTile(
         leading: leading,
         title: Text(title + groupType + AppLocalizations.t('receipt')),
-        subtitle: Text('$groupName\n${AppLocalizations.t(content)}'),
+        subtitle:
+            Text('$receiverName\n$groupName\n${AppLocalizations.t(content)}'),
         //dense: true,
         contentPadding: const EdgeInsets.symmetric(horizontal: 5.0),
         horizontalTitleGap: 0,
