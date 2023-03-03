@@ -287,6 +287,13 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
       if (current.conferenceOwnerPeerId !=
           currentConference.conferenceOwnerPeerId) {
         current.conferenceOwnerPeerId = currentConference.conferenceOwnerPeerId;
+        current.conferenceOwnerPeerId ??= myself.peerId;
+        for (var option in conferenceOwnerController.options) {
+          if (option.value == current.conferenceOwnerPeerId) {
+            current.conferenceOwnerName = option.label;
+            break;
+          }
+        }
         conferenceModified = true;
       }
       if (current.password != currentConference.password) {
@@ -306,8 +313,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
         conferenceModified = true;
       }
     }
-    conference.value.conferenceOwnerPeerId ??= myself.peerId;
-    current.conferenceOwnerPeerId = conference.value.conferenceOwnerPeerId;
+    conference.value.conferenceOwnerPeerId = current.conferenceOwnerPeerId;
     current.participants = conferenceMembers.value;
     await conferenceService.store(current);
     conference.value = current;

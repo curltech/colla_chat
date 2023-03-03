@@ -7,6 +7,7 @@ class Conference extends StatusEntity {
   String name;
   String? topic;
   String? conferenceOwnerPeerId; // 发起人
+  String? conferenceOwnerName; // 发起人
   String? groupPeerId; // 如果是从群中发起的会议，设置为群的编号
   String? groupName;
   String? groupType;
@@ -41,6 +42,7 @@ class Conference extends StatusEntity {
         name = json['name'],
         topic = json['topic'],
         conferenceOwnerPeerId = json['conferenceOwnerPeerId'],
+        conferenceOwnerName = json['conferenceOwnerName'],
         groupPeerId = json['groupPeerId'],
         groupName = json['groupName'],
         groupType = json['groupType'],
@@ -80,6 +82,7 @@ class Conference extends StatusEntity {
       'name': name,
       'topic': topic,
       'conferenceOwnerPeerId': conferenceOwnerPeerId,
+      'conferenceOwnerName': conferenceOwnerName,
       'groupPeerId': groupPeerId,
       'groupName': groupName,
       'groupType': groupType,
