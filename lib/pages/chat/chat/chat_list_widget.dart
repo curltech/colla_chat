@@ -303,10 +303,11 @@ class _ChatListWidgetState extends State<ChatListWidget>
       DataListController<ChatSummary> chatSummaryController) {
     TileData tile = TileData(
         prefix: badge,
-        title: '$name               $sendReceiveTime',
-        subtitle: subtitle,
+        title: name,
+        subtitle: '$sendReceiveTime\n$subtitle',
         dense: true,
         selected: false,
+        isThreeLine: true,
         routeName: 'chat_message');
     List<TileData> slideActions = [];
     TileData deleteSlideAction = TileData(

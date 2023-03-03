@@ -432,12 +432,14 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
       for (var conference in conferences) {
         var conferenceName = conference.name;
         var conferenceId = conference.conferenceId;
+        var conferenceOwnerName = conference.conferenceOwnerName;
         var topic = conference.topic;
         TileData tile = TileData(
             prefix: conference.avatarImage ?? AppImage.lgAppImage,
             title: conferenceName,
-            subtitle: topic,
+            subtitle: '${conferenceOwnerName!}\n$topic',
             selected: false,
+            isThreeLine: true,
             routeName: 'conference_edit');
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(
