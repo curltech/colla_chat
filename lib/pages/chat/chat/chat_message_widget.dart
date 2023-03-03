@@ -4,6 +4,7 @@ import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_item.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:flutter/material.dart';
@@ -46,6 +47,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     scrollController.addListener(_onScroll);
     animateController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 500));
+    globalChatMessageController.addListener(_updateGlobalChatMessage);
 
     ///滚到指定的位置
     // widget.scrollController.animateTo(offset,
@@ -56,6 +58,18 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
     setState(() {
       chatMessageController.latest();
     });
+  }
+
+  ///有新消息到来的时候，一般消息直接显示
+  _updateGlobalChatMessage() async {
+    ChatMessage? chatMessage = globalChatMessageController.chatMessage;
+    if (chatMessage != null) {
+      var peerId = chatMessageController.chatSummary!.peerId;
+      if (chatMessage.senderPeerId == peerId ||
+          chatMessage.groupPeerId == peerId) {
+        _update();
+      }
+    }
   }
 
   void _onScroll() {
@@ -158,6 +172,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   @override
   void dispose() {
     chatMessageController.removeListener(_update);
+    globalChatMessageController.removeListener(_updateGlobalChatMessage);
     widget.scrollController.removeListener(_onScroll);
     animateController.dispose();
     super.dispose();
