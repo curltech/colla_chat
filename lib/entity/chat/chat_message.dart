@@ -81,6 +81,11 @@ enum MessageStatus {
   sent, //发送成功
   received, //已接收
   read, //已读
+  deleted, //删除
+}
+
+///消息回执的类型，写入receiptContent字段
+enum MessageReceiptType {
   accepted, //同意，是一种消息的回执，表明同意消息的行为，视频的时候表示立即接听
   rejected, //拒绝，是一种消息的回执，表明拒绝消息的行为，视频的时候表示拒绝邀请
   terminated, //终止，是一种消息的回执，表明终止消息的行为，视频的时候表示曾经接收邀请，现在终止，后面不会加入
@@ -88,7 +93,6 @@ enum MessageStatus {
   ignored, //忽视，是一种消息的回执，视频的时候表明有意或者无意地忽视，后面有可能加入
   hold, //保持，是一种消息的回执，视频的时候表明忙但是接受邀请，类似主动ignored，后面加入
   exit, //退出，是一种消息的回执，视频的时候表明加入后暂时退出，后面再加入
-  deleted, //删除
 }
 
 ///好友，群，潜在，联系人，频道，会议
@@ -124,7 +128,7 @@ class ChatMessage extends StatusEntity {
   String? receiverType; // 包括：Linkman(单聊),Group(群聊),Conference(会议),
   String? receiverName;
   String?
-  groupPeerId; // 目标的唯一id标识（单聊对应linkman-peerId，群聊对应group-peerId，会议对应conferenceId）
+      groupPeerId; // 目标的唯一id标识（单聊对应linkman-peerId，群聊对应group-peerId，会议对应conferenceId）
   String? groupName;
   String? groupType;
   String? receiverAddress;
@@ -134,7 +138,7 @@ class ChatMessage extends StatusEntity {
   String? title; // 消息标题
   String? thumbnail; // 预览缩略图（base64图片，适用需预览的content，如笔记、联系人名片）
   String? content; // 消息内容
-  String? receiptContent; // 回执的内容
+  String? receiptType; // 回执的内容
   String? contentType;
   String? mimeType;
   int deleteTime = 0; // 阅读后的删除时间，秒数，0表示不删除
@@ -185,7 +189,7 @@ class ChatMessage extends StatusEntity {
         receiptTime = json['receiptTime'],
         readTime = json['readTime'],
         title = json['title'],
-        receiptContent = json['receiptContent'],
+        receiptType = json['receiptType'],
         thumbnail = json['thumbnail'],
         content = json['content'],
         contentType = json['contentType'],
@@ -200,22 +204,22 @@ class ChatMessage extends StatusEntity {
         payloadKey = json['payloadKey'],
         ephemeralPublicKey = json['ephemeralPublicKey'],
         needCompress = json['needEncrypt'] == null ||
-            json['needCompress'] == true ||
-            json['needCompress'] == 1
+                json['needCompress'] == true ||
+                json['needCompress'] == 1
             ? true
             : false,
         needEncrypt = json['needEncrypt'] == null ||
-            json['needEncrypt'] == true ||
-            json['needEncrypt'] == 1
+                json['needEncrypt'] == true ||
+                json['needEncrypt'] == 1
             ? true
             : false,
         needReceipt = json['needReceipt'] == true || json['needReceipt'] == 1
             ? true
             : false,
         needReadReceipt =
-        json['needReadReceipt'] == true || json['needReadReceipt'] == 1
-            ? true
-            : false,
+            json['needReadReceipt'] == true || json['needReadReceipt'] == 1
+                ? true
+                : false,
         super.fromJson(json);
 
   @override
@@ -245,7 +249,7 @@ class ChatMessage extends StatusEntity {
       'receiptTime': receiptTime,
       'readTime': readTime,
       'title': title,
-      'receiptContent': receiptContent,
+      'receiptType': receiptType,
       'thumbnail': thumbnail,
       'content': content,
       'contentType': contentType,

@@ -107,7 +107,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (chatReceipt.subMessageType != ChatMessageSubType.chatReceipt.name) {
       return;
     }
-    if (chatReceipt.status == MessageStatus.rejected.name) {
+    if (chatReceipt.receiptType == MessageReceiptType.rejected.name) {
       videoChatStatus.value = VideoChatStatus.end;
     }
     _stop();
@@ -360,11 +360,13 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       if (videoRender.video) {
         chatMessage = await widget.videoChatMessageController
             .sendVideoChatMessage(
-                contentType: ChatMessageContentType.video, participants: participants);
+                contentType: ChatMessageContentType.video,
+                participants: participants);
       } else {
         chatMessage = await widget.videoChatMessageController
             .sendVideoChatMessage(
-                contentType: ChatMessageContentType.audio, participants: participants);
+                contentType: ChatMessageContentType.audio,
+                participants: participants);
       }
       if (chatMessage != null) {
         if (mounted) {

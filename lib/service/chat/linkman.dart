@@ -193,13 +193,13 @@ class LinkmanService extends PeerPartyService<Linkman> {
 
   ///接收到加好友的请求，发送回执
   Future<ChatMessage> receiveAddFriend(
-      ChatMessage chatMessage, MessageStatus receiptType) async {
+      ChatMessage chatMessage, MessageReceiptType receiptType) async {
     String json = JsonUtil.toJsonString(myself.myselfPeer);
     ChatMessage? chatReceipt =
         await chatMessageService.buildChatReceipt(chatMessage, receiptType);
     //改变发送消息的状态为接收
-    await chatMessageService.updateReceiptStatus(chatMessage, receiptType);
-    if (receiptType == MessageStatus.accepted) {
+    await chatMessageService.updateReceiptType(chatMessage, receiptType);
+    if (receiptType == MessageReceiptType.accepted) {
       chatReceipt!.content = json;
     }
     return await chatMessageService.sendAndStore(chatReceipt!);

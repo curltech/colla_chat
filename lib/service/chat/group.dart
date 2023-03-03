@@ -214,9 +214,9 @@ class GroupService extends PeerPartyService<Group> {
     group.id = null;
     await groupService.store(group);
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
-        chatMessage, MessageStatus.accepted);
-    await chatMessageService.updateReceiptStatus(
-        chatMessage, MessageStatus.accepted);
+        chatMessage, MessageReceiptType.accepted);
+    await chatMessageService.updateReceiptType(
+        chatMessage, MessageReceiptType.accepted);
     await chatMessageService.sendAndStore(chatReceipt);
   }
 
@@ -241,11 +241,11 @@ class GroupService extends PeerPartyService<Group> {
     Group group = Group.fromJson(map);
     await groupService.store(group);
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
-        chatMessage, MessageStatus.accepted);
-    await chatMessageService.updateReceiptStatus(
-        chatMessage, MessageStatus.accepted);
+        chatMessage, MessageReceiptType.accepted);
+    await chatMessageService.updateReceiptType(
+        chatMessage, MessageReceiptType.accepted);
 
-    await chatMessageService.sendAndStore(chatReceipt!);
+    await chatMessageService.sendAndStore(chatReceipt);
   }
 
   ///向群成员发送散群的消息
@@ -292,9 +292,9 @@ class GroupService extends PeerPartyService<Group> {
       'peerId': peerId,
     });
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
-        chatMessage, MessageStatus.accepted);
-    await chatMessageService.updateReceiptStatus(
-        chatMessage, MessageStatus.accepted);
+        chatMessage, MessageReceiptType.accepted);
+    await chatMessageService.updateReceiptType(
+        chatMessage, MessageReceiptType.accepted);
 
     await chatMessageService.sendAndStore(chatReceipt!);
   }
@@ -323,9 +323,9 @@ class GroupService extends PeerPartyService<Group> {
     }
 
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
-        chatMessage, MessageStatus.accepted);
-    await chatMessageService.updateReceiptStatus(
-        chatMessage, MessageStatus.accepted);
+        chatMessage, MessageReceiptType.accepted);
+    await chatMessageService.updateReceiptType(
+        chatMessage, MessageReceiptType.accepted);
 
     await chatMessageService.sendAndStore(chatReceipt!);
   }
@@ -356,9 +356,9 @@ class GroupService extends PeerPartyService<Group> {
     }
 
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
-        chatMessage, MessageStatus.accepted);
-    await chatMessageService.updateReceiptStatus(
-        chatMessage, MessageStatus.accepted);
+        chatMessage, MessageReceiptType.accepted);
+    await chatMessageService.updateReceiptType(
+        chatMessage, MessageReceiptType.accepted);
 
     await chatMessageService.sendAndStore(chatReceipt!);
   }
@@ -381,9 +381,9 @@ class GroupService extends PeerPartyService<Group> {
     Uint8List data = CryptoUtil.decodeBase64(chatMessage.content!);
 
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
-        chatMessage, MessageStatus.accepted);
-    await chatMessageService.updateReceiptStatus(
-        chatMessage, MessageStatus.accepted);
+        chatMessage, MessageReceiptType.accepted);
+    await chatMessageService.updateReceiptType(
+        chatMessage, MessageReceiptType.accepted);
 
     await chatMessageService.sendAndStore(chatReceipt!);
   }

@@ -41,7 +41,6 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       'thumbBody',
       'thumbnail',
       'title',
-      'receiptContent'
     ],
   }) {
     post = (Map map) {
@@ -124,7 +123,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     List<Object> whereArgs = [];
     if (peerId != null) {
       where =
-          '$where and groupPeerId is null and ((senderPeerId=? and receiverPeerId=?) or (senderPeerId=? and receiverPeerId=?))';
+          '$where and groupPeerId is null and subMessageType!=? and ((senderPeerId=? and receiverPeerId=?) or (senderPeerId=? and receiverPeerId=?))';
+      whereArgs.add(ChatMessageSubType.chatReceipt.name);
       whereArgs.add(peerId);
       whereArgs.add(myselfPeerId);
       whereArgs.add(myselfPeerId);
@@ -133,9 +133,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     //当通过群peerId查询群消息时，发送的群消息会拆分到个体的消息记录需要排除，否则重复显示
     else if (groupPeerId != null) {
       where =
-          '$where and senderPeerId!=receiverPeerId and groupPeerId=? and (senderPeerId=? or receiverPeerId=?)';
+          '$where and and receiverPeerId!=senderPeerId and groupPeerId=? and subMessageType!=? and (receiverPeerId=? or receiverPeerId=groupPeerId)';
       whereArgs.add(groupPeerId);
-      whereArgs.add(myselfPeerId);
+      whereArgs.add(ChatMessageSubType.chatReceipt.name);
       whereArgs.add(myselfPeerId);
     }
     if (direct != null) {
@@ -179,7 +179,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     List<Object> whereArgs = [];
     if (peerId != null) {
       where =
-          '$where and groupPeerId is null and ((senderPeerId=? and receiverPeerId=?) or (senderPeerId=? and receiverPeerId=?))';
+          '$where and groupPeerId is null and subMessageType!=? and ((senderPeerId=? and receiverPeerId=?) or (senderPeerId=? and receiverPeerId=?))';
+      whereArgs.add(ChatMessageSubType.chatReceipt.name);
       whereArgs.add(peerId);
       whereArgs.add(myselfPeerId);
       whereArgs.add(myselfPeerId);
@@ -188,9 +189,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     //当通过群peerId查询群消息时，发送的群消息会拆分到个体的消息记录需要排除，否则重复显示
     else if (groupPeerId != null) {
       where =
-          '$where and senderPeerId!=receiverPeerId and groupPeerId=? and (senderPeerId=? or receiverPeerId=?)';
+          '$where and and receiverPeerId!=senderPeerId and groupPeerId=? and subMessageType!=? and (receiverPeerId=? or receiverPeerId=groupPeerId)';
       whereArgs.add(groupPeerId);
-      whereArgs.add(myselfPeerId);
+      whereArgs.add(ChatMessageSubType.chatReceipt.name);
       whereArgs.add(myselfPeerId);
     }
     if (messageType != null) {
@@ -245,7 +246,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String? groupName,
     PartyType? groupType,
     String? title,
-    dynamic receiptContent,
+    String? receiptType,
     List<int>? thumbnail,
     String? status,
     int deleteTime = 0,
@@ -291,18 +292,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       chatMessage.groupType = groupType.name;
     }
     chatMessage.title = title;
-    if (receiptContent != null) {
-      List<int> data;
-      if (receiptContent is List<int>) {
-        data = receiptContent;
-      } else if (receiptContent is String) {
-        data = CryptoUtil.stringToUtf8(receiptContent);
-      } else {
-        var jsonStr = JsonUtil.toJsonString(receiptContent!);
-        data = CryptoUtil.stringToUtf8(jsonStr);
-      }
-      chatMessage.receiptContent = CryptoUtil.encodeBase64(data);
-    }
+    chatMessage.receiptType = receiptType;
     if (thumbnail != null) {
       chatMessage.thumbnail = CryptoUtil.encodeBase64(thumbnail);
     }
@@ -342,7 +332,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String? mimeType,
     String? title,
     String? messageId,
-    dynamic receiptContent,
+    String? receiptType,
     List<int>? thumbnail,
     int deleteTime = 0,
     String? parentMessageId,
@@ -377,7 +367,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         groupName: groupName,
         groupType: groupType,
         title: title,
-        receiptContent: receiptContent,
+        receiptType: receiptType,
         thumbnail: thumbnail,
         deleteTime: deleteTime,
         parentMessageId: parentMessageId);
@@ -416,7 +406,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       );
       chatMessage.title = groupChatMessage.title;
       chatMessage.content = groupChatMessage.content;
-      chatMessage.receiptContent = groupChatMessage.receiptContent;
+      chatMessage.receiptType = groupChatMessage.receiptType;
       chatMessage.thumbnail = groupChatMessage.thumbnail;
       chatMessages.add(chatMessage);
     }
@@ -443,7 +433,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
               .e('chatReceipt message has no chatMessage with same messageId');
           return null;
         }
-        originChatMessage.receiptContent = chatMessage.content;
+        originChatMessage.receiptType = chatMessage.content;
         originChatMessage.receiptTime = chatMessage.receiptTime;
         originChatMessage.receiveTime = DateUtil.currentDate();
         originChatMessage.status = MessageStatus.received.name;
@@ -480,11 +470,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   ///一般的命令回执只发送给发送人，群发的消息回执也是各自回复发送人
   ///群视频邀请命令的回执是需要两两发送的，也就是每个人都需要知道其他人的回复
   Future<ChatMessage> buildChatReceipt(
-      ChatMessage chatMessage, MessageStatus receiptType,
-      {String? receiverPeerId,
-      String? clientId,
-      String? receiverName,
-      List<int>? receiptContent}) async {
+      ChatMessage chatMessage, MessageReceiptType receiptType,
+      {String? receiverPeerId, String? clientId, String? receiverName}) async {
     //创建回执消息
     ChatMessageType? messageType = StringUtil.enumFromString(
         ChatMessageType.values, chatMessage.messageType);
@@ -513,10 +500,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       groupType: groupType,
       title: chatMessage.title,
       receiverType: receiverType!,
-      receiptContent: receiptContent != null
-          ? CryptoUtil.encodeBase64(receiptContent)
-          : null,
-      content: receiptType.name,
+      receiptType: receiptType.name,
     );
     var currentDate = DateUtil.currentDate();
     chatReceipt.receiverAddress ??= chatMessage.senderAddress;
@@ -529,23 +513,25 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   ///发送回执消息的时候，更新收到的消息的状态
-  Future<void> updateReceiptStatus(
-      ChatMessage chatMessage, MessageStatus receiptType) async {
-    chatMessage.receiptTime = DateUtil.currentDate();
-    if (receiptType == MessageStatus.read) {
+  Future<void> updateMessageStatus(
+      ChatMessage chatMessage, MessageStatus messageStatus) async {
+    if (messageStatus == MessageStatus.read) {
       chatMessage.readTime = DateUtil.currentDate();
       chatMessage.status = MessageStatus.read.name;
-    } else if (receiptType == MessageStatus.accepted) {
-      chatMessage.status = MessageStatus.accepted.name;
-    } else if (receiptType == MessageStatus.rejected) {
-      chatMessage.status = MessageStatus.rejected.name;
-    } else if (receiptType == MessageStatus.deleted) {
+    } else if (messageStatus == MessageStatus.received) {
+      chatMessage.receiptTime = DateUtil.currentDate();
+      chatMessage.status = MessageStatus.received.name;
+    } else if (messageStatus == MessageStatus.sent) {
+      chatMessage.sendTime = DateUtil.currentDate();
+      chatMessage.status = MessageStatus.sent.name;
+    } else if (messageStatus == MessageStatus.deleted) {
       chatMessage.deleteTime = chatMessage.deleteTime;
       chatMessage.status = MessageStatus.deleted.name;
     }
     await update(
         {
           'status': chatMessage.status,
+          'sendTime': chatMessage.sendTime,
           'receiptTime': chatMessage.receiptTime,
           'readTime': chatMessage.readTime,
           'deleteTime': chatMessage.deleteTime,
@@ -554,11 +540,22 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         whereArgs: [chatMessage.id!]);
   }
 
+  ///发送回执消息的时候，更新收到的消息的状态
+  Future<void> updateReceiptType(
+      ChatMessage chatMessage, MessageReceiptType receiptType) async {
+    chatMessage.receiptType = receiptType.name;
+    await update(
+        {
+          'receiptType': chatMessage.receiptType,
+        },
+        where: 'id=?',
+        whereArgs: [chatMessage.id!]);
+  }
+
   ///创建群回执消息，如果peerIds为空，通过groupPeerId查询成员表决定
   Future<List<ChatMessage>> buildGroupChatReceipt(
     ChatMessage chatMessage,
-    MessageStatus receiptType, {
-    List<int>? receiptContent,
+    MessageReceiptType receiptType, {
     List<String>? peerIds,
   }) async {
     String groupPeerId = chatMessage.groupPeerId!;
@@ -586,7 +583,6 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         receiverPeerId: peerId,
         receiverName: linkman.name,
         clientId: linkman.clientId,
-        receiptContent: receiptContent,
       );
       chatReceipts.add(chatReceipt);
     }
@@ -657,8 +653,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         ChatMessageType.values, chatMessage.messageType);
     ChatMessageSubType? subMessageType = StringUtil.enumFromString(
         ChatMessageSubType.values, chatMessage.subMessageType);
-    ChatMessageContentType? contentType =
-        StringUtil.enumFromString(ChatMessageContentType.values, chatMessage.contentType);
+    ChatMessageContentType? contentType = StringUtil.enumFromString(
+        ChatMessageContentType.values, chatMessage.contentType);
 
     List<int>? thumbnail;
     if (chatMessage.thumbnail != null) {
@@ -675,7 +671,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         mimeType: chatMessage.mimeType,
         receiverName: linkman.name,
         title: title,
-        receiptContent: chatMessage.receiptContent,
+        receiptType: chatMessage.receiptType,
         thumbnail: thumbnail,
       );
       return await sendAndStore(message, cryptoOption: cryptoOption);
@@ -691,7 +687,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           contentType: contentType!,
           mimeType: chatMessage.mimeType,
           title: title,
-          receiptContent: chatMessage.receiptContent,
+          receiptType: chatMessage.receiptType,
           thumbnail: thumbnail,
         );
         ChatMessage? msg;

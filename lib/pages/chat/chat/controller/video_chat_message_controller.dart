@@ -259,13 +259,13 @@ class VideoChatMessageController with ChangeNotifier {
 
     for (var chatMessage in chatMessages) {
       if (chatMessage.receiverPeerId == myself.peerId) {
-        if (chatMessage.status == MessageStatus.accepted.name) {
+        if (chatMessage.status == MessageReceiptType.accepted.name) {
           _acceptedChatReceipts[chatMessage.senderPeerId!] = chatMessage;
         }
-        if (chatMessage.status == MessageStatus.rejected.name) {
+        if (chatMessage.status == MessageReceiptType.rejected.name) {
           _rejectedChatReceipts[chatMessage.senderPeerId!] = chatMessage;
         }
-        if (chatMessage.status == MessageStatus.terminated.name) {
+        if (chatMessage.status == MessageReceiptType.terminated.name) {
           _terminatedChatReceipts[chatMessage.senderPeerId!] = chatMessage;
         }
       }
@@ -391,7 +391,7 @@ class VideoChatMessageController with ChangeNotifier {
   ///3.发送会议邀请回执
   ///接收到视频通话邀请，做出接受或者拒绝视频通话邀请的决定
   ///如果是接受决定，本控制器将被加入到池中
-  sendChatReceipt(MessageStatus receiptType) async {
+  sendChatReceipt(MessageReceiptType receiptType) async {
     ChatMessage? chatMessage = _chatMessage;
     if (chatMessage == null) {
       return;
@@ -412,14 +412,14 @@ class VideoChatMessageController with ChangeNotifier {
   ///发送视频邀请消息的回执，如果是接受，则最后转入视频页面
   ///设置当前的消息为视频邀请消息
   _sendLinkmanChatReceipt(
-      ChatMessage chatMessage, MessageStatus receiptType) async {
+      ChatMessage chatMessage, MessageReceiptType receiptType) async {
     //创建回执消息
     ChatMessage chatReceipt =
         await chatMessageService.buildChatReceipt(chatMessage, receiptType);
-    await chatMessageService.updateReceiptStatus(chatMessage, receiptType);
+    await chatMessageService.updateReceiptType(chatMessage, receiptType);
     await chatMessageService.sendAndStore(chatReceipt);
     //立即接听
-    if (receiptType == MessageStatus.accepted) {
+    if (receiptType == MessageReceiptType.accepted) {
       var peerId = chatReceipt.receiverPeerId!;
       var clientId = chatReceipt.receiverClientId!;
       //根据conference.video来判断是请求音频还是视频，并创建本地视频render
@@ -462,7 +462,7 @@ class VideoChatMessageController with ChangeNotifier {
   }
 
   _sendGroupChatReceipt(
-      ChatMessage chatMessage, MessageStatus receiptType) async {
+      ChatMessage chatMessage, MessageReceiptType receiptType) async {
     //群视频通话邀请
     //除了向发送方外，还需要向房间的各接收人发送回执，
     //首先检查接收人是否已经存在给自己的回执，不存在或者存在是accepted则发送回执
@@ -477,9 +477,9 @@ class VideoChatMessageController with ChangeNotifier {
         await chatMessageService.sendAndStore(chatReceipt);
       }
     }
-    await chatMessageService.updateReceiptStatus(chatMessage, receiptType);
+    await chatMessageService.updateReceiptType(chatMessage, receiptType);
     //立即接听
-    if (receiptType == MessageStatus.accepted) {
+    if (receiptType == MessageReceiptType.accepted) {
       RemoteVideoRenderController remoteVideoRenderController =
           videoConferenceRenderPool.createRemoteVideoRenderController(this);
       List<String>? participants = conference!.participants;
@@ -500,7 +500,7 @@ class VideoChatMessageController with ChangeNotifier {
   }
 
   _sendConferenceChatReceipt(
-      ChatMessage chatMessage, MessageStatus receiptType) async {
+      ChatMessage chatMessage, MessageReceiptType receiptType) async {
     //会议视频通话邀请
     //除了向发送方外，还需要向房间的各接收人发送回执，
     //首先检查接收人是否已经存在给自己的回执，不存在或者存在是accepted则发送回执
@@ -515,9 +515,9 @@ class VideoChatMessageController with ChangeNotifier {
         await chatMessageService.sendAndStore(chatReceipt);
       }
     }
-    await chatMessageService.updateReceiptStatus(chatMessage, receiptType);
+    await chatMessageService.updateReceiptType(chatMessage, receiptType);
     //稍后加入
-    if (receiptType == MessageStatus.hold) {}
+    if (receiptType == MessageReceiptType.hold) {}
   }
 
   ///4.接受到视频通话回执，一般由globalChatMessageController分发到此
@@ -545,13 +545,13 @@ class VideoChatMessageController with ChangeNotifier {
     _current = chatReceipt;
     //把回执消息分类存放
     var key = _getKey(chatReceipt.senderPeerId!, chatReceipt.senderClientId!);
-    if (chatReceipt.status == MessageStatus.accepted.name) {
+    if (chatReceipt.status == MessageReceiptType.accepted.name) {
       _acceptedChatReceipts[key] = chatReceipt;
     }
-    if (chatReceipt.status == MessageStatus.rejected.name) {
+    if (chatReceipt.status == MessageReceiptType.rejected.name) {
       _rejectedChatReceipts[key] = chatReceipt;
     }
-    if (chatReceipt.status == MessageStatus.terminated.name) {
+    if (chatReceipt.status == MessageReceiptType.terminated.name) {
       _terminatedChatReceipts[key] = chatReceipt;
     }
     await _receivedChatReceipt(chatReceipt);
@@ -567,7 +567,7 @@ class VideoChatMessageController with ChangeNotifier {
     logger.w('received videoChat chatReceipt content: $content');
     String messageId = chatReceipt.messageId!;
     //对方立即接受通话请求的回执，加本地流，重新协商
-    if (content == MessageStatus.accepted.name) {
+    if (content == MessageReceiptType.accepted.name) {
       var peerId = chatReceipt.senderPeerId!;
       var clientId = chatReceipt.senderClientId!;
       AdvancedPeerConnection? advancedPeerConnection =
@@ -588,8 +588,8 @@ class VideoChatMessageController with ChangeNotifier {
             videoRenders.values.toList(),
             peerConnection: advancedPeerConnection);
       }
-    } else if (content == MessageStatus.rejected.name) {
-    } else if (content == MessageStatus.terminated.name) {
+    } else if (content == MessageReceiptType.rejected.name) {
+    } else if (content == MessageReceiptType.terminated.name) {
       var peerId = chatReceipt.senderPeerId!;
       var clientId = chatReceipt.senderClientId!;
       AdvancedPeerConnection? advancedPeerConnection =

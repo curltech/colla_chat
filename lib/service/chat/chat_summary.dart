@@ -186,7 +186,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummary.messageType = chatMessage.messageType;
       chatSummary.subMessageType = chatMessage.subMessageType;
       chatSummary.title = chatMessage.title;
-      chatSummary.receiptContent = chatMessage.receiptContent;
+      chatSummary.receiptContent = chatMessage.receiptType;
       chatSummary.thumbnail = chatMessage.thumbnail;
       chatSummary.content = chatMessage.content;
       chatSummary.contentType = chatMessage.contentType;

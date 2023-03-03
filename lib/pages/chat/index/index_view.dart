@@ -92,7 +92,7 @@ class _IndexViewState extends State<IndexView>
         } else {
           var videoChatMessageController = VideoChatMessageController();
           await videoChatMessageController.setChatMessage(chatMessage);
-          await videoChatMessageController.sendChatReceipt(MessageStatus.busy);
+          await videoChatMessageController.sendChatReceipt(MessageReceiptType.busy);
           videoChatMessageController.dispose();
         }
       }
@@ -184,7 +184,7 @@ class _IndexViewState extends State<IndexView>
           videoChatMessageVisible.value = false;
           _stop();
           await videoChatMessageController!
-              .sendChatReceipt(MessageStatus.rejected);
+              .sendChatReceipt(MessageReceiptType.rejected);
           videoChatMessageController = null;
         },
         child: const Icon(color: Colors.white, size: 16, Icons.call_end),
@@ -193,7 +193,7 @@ class _IndexViewState extends State<IndexView>
         onPressed: () async {
           videoChatMessageVisible.value = false;
           _stop();
-          await videoChatMessageController!.sendChatReceipt(MessageStatus.hold);
+          await videoChatMessageController!.sendChatReceipt(MessageReceiptType.hold);
           videoChatMessageController = null;
         },
         child: const Icon(color: Colors.white, size: 16, Icons.add_call),
@@ -203,7 +203,7 @@ class _IndexViewState extends State<IndexView>
           videoChatMessageVisible.value = false;
           _stop();
           await videoChatMessageController!
-              .sendChatReceipt(MessageStatus.accepted);
+              .sendChatReceipt(MessageReceiptType.accepted);
           videoChatMessageController = null;
         },
         child: const Icon(color: Colors.white, size: 16, Icons.call),
@@ -255,7 +255,7 @@ class _IndexViewState extends State<IndexView>
                 if (videoChatMessageVisible.value) {
                   videoChatMessageVisible.value = false;
                   await videoChatMessageController!
-                      .sendChatReceipt(MessageStatus.ignored);
+                      .sendChatReceipt(MessageReceiptType.ignored);
                 }
                 videoChatMessageController = null;
               });
