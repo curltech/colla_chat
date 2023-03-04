@@ -1,9 +1,14 @@
+import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
+import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
+import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -117,6 +122,27 @@ class ConferenceShowWidget extends StatelessWidget {
     return formInputWidget;
   }
 
+  Future<List<TileData>> _buildChatReceipts() async {
+    Map<String, Map<String, ChatMessage>> chatReceiptMap =
+        await VideoChatMessageController.findChatReceipts(
+            conference.conferenceId);
+    List<TileData> tiles = [];
+    for (var key in chatReceiptMap.keys) {
+      var chatReceipts = chatReceiptMap[key];
+      for (var chatReceipt in chatReceipts!.values) {
+        Linkman? linkman = await linkmanService
+            .findCachedOneByPeerId(chatReceipt.senderPeerId!);
+        var tile = TileData(
+            title: chatReceipt.senderName!,
+            titleTail: key,
+            prefix: linkman?.avatarImage);
+
+        tiles.add(tile);
+      }
+    }
+    return tiles;
+  }
+
   Widget _buildConferenceShow(BuildContext context) {
     return Column(
       children: [
@@ -124,7 +150,20 @@ class ConferenceShowWidget extends StatelessWidget {
         const SizedBox(
           height: 5,
         ),
-        Expanded(child: _buildFormInputWidget(context)),
+        _buildFormInputWidget(context),
+        Expanded(
+            child: FutureBuilder<List<TileData>>(
+          future: _buildChatReceipts(),
+          builder:
+              (BuildContext context, AsyncSnapshot<List<TileData>> snapshot) {
+            if (snapshot.hasData && snapshot.data != null) {
+              return DataListView(
+                tileData: snapshot.data!,
+              );
+            }
+            return Container();
+          },
+        )),
       ],
     );
   }

@@ -384,8 +384,10 @@ class _ChatListWidgetState extends State<ChatListWidget>
         var peerId = chatSummary.peerId ?? '';
         var subtitle = peerId;
         var subMessageType = chatSummary.subMessageType;
-        var sendReceiveTime = chatSummary.sendReceiveTime ?? '';
-        sendReceiveTime = DateUtil.formatEasyRead(sendReceiveTime);
+        var sendReceiveTime = chatSummary.sendReceiveTime;
+        sendReceiveTime = sendReceiveTime != null
+            ? DateUtil.formatEasyRead(sendReceiveTime)
+            : '';
         subtitle = _buildSubtitle(
             subMessageType: subMessageType!,
             contentType: chatSummary.contentType,

@@ -32,9 +32,8 @@ class VideoChatMessageController with ChangeNotifier {
   //最新的消息
   ChatMessage? _current;
 
-  final Map<String, ChatMessage> _acceptedChatReceipts = {};
-  final Map<String, ChatMessage> _rejectedChatReceipts = {};
-  final Map<String, ChatMessage> _terminatedChatReceipts = {};
+  //回执
+  Map<String, Map<String, ChatMessage>> _chatReceipts = {};
   String? partyType;
 
   //或者会议名称，或者群名称，或者联系人名称
@@ -124,9 +123,7 @@ class VideoChatMessageController with ChangeNotifier {
     }
     _chatSummary = chatSummary;
     //先清空数据
-    _acceptedChatReceipts.clear();
-    _rejectedChatReceipts.clear();
-    _terminatedChatReceipts.clear();
+    _chatReceipts = {};
     partyType = null;
     peerId = null;
     groupPeerId = null;
@@ -167,9 +164,7 @@ class VideoChatMessageController with ChangeNotifier {
     _chatMessage = chatMessage;
     //先清空数据
     _conference = null;
-    _acceptedChatReceipts.clear();
-    _rejectedChatReceipts.clear();
-    _terminatedChatReceipts.clear();
+    _chatReceipts = {};
     //如果是清空数据，直接返回
     if (_chatMessage == null) {
       globalChatMessageController.unregisterReceiver(
@@ -247,46 +242,43 @@ class VideoChatMessageController with ChangeNotifier {
     }
   }
 
-  _initChatReceipt() async {
-    //如果_chatMessage不为空，查询所有的相同的消息
-    var messageId = _chatMessage!.messageId!;
+  static Future<Map<String, Map<String, ChatMessage>>> findChatReceipts(
+      String messageId) async {
     List<ChatMessage> chatMessages =
         await chatMessageService.findByMessageId(messageId);
+    Map<String, Map<String, ChatMessage>> chatReceipts = {};
     if (chatMessages.isEmpty) {
-      notifyListeners();
-      return;
+      return chatReceipts;
     }
 
     for (var chatMessage in chatMessages) {
-      if (chatMessage.receiverPeerId == myself.peerId) {
-        if (chatMessage.status == MessageReceiptType.accepted.name) {
-          _acceptedChatReceipts[chatMessage.senderPeerId!] = chatMessage;
-        }
-        if (chatMessage.status == MessageReceiptType.rejected.name) {
-          _rejectedChatReceipts[chatMessage.senderPeerId!] = chatMessage;
-        }
-        if (chatMessage.status == MessageReceiptType.terminated.name) {
-          _terminatedChatReceipts[chatMessage.senderPeerId!] = chatMessage;
-        }
+      if (chatMessage.subMessageType == ChatMessageSubType.chatReceipt.name) {
+        putChatReceipt(chatReceipts, chatMessage);
       }
     }
+    return chatReceipts;
   }
 
-  String _getKey(String peerId, String clientId) {
-    var key = '$peerId:$clientId';
-    return key;
+  static void putChatReceipt(
+      Map<String, Map<String, ChatMessage>> chatReceiptMap,
+      ChatMessage chatReceipt) {
+    Map<String, ChatMessage>? chatReceipts =
+        chatReceiptMap[chatReceipt.receiptType!];
+    if (chatReceipts == null) {
+      chatReceipts = {};
+      chatReceiptMap[chatReceipt.receiptType!] = chatReceipts;
+    }
+    chatReceipts[chatReceipt.senderPeerId!] = chatReceipt;
   }
 
-  ChatMessage? getAcceptedChatReceipts(String peerId, String clientId) {
-    return _acceptedChatReceipts[_getKey(peerId, clientId)];
+  _initChatReceipt() async {
+    //如果_chatMessage不为空，查询所有的相同的消息
+    var messageId = _chatMessage!.messageId!;
+    _chatReceipts = await findChatReceipts(messageId);
   }
 
-  ChatMessage? getRejectedChatReceipts(String peerId, String clientId) {
-    return _rejectedChatReceipts[_getKey(peerId, clientId)];
-  }
-
-  ChatMessage? getTerminatedChatReceipts(String peerId, String clientId) {
-    return _terminatedChatReceipts[_getKey(peerId, clientId)];
+  ChatMessage? getChatReceipt(String subMessageType, String peerId) {
+    return _chatReceipts[subMessageType]?[peerId];
   }
 
   ///创建新的会议功能
@@ -335,7 +327,9 @@ class VideoChatMessageController with ChangeNotifier {
         await chatMessageService.buildGroupChatMessage(
       conference.conferenceId,
       PartyType.conference,
-      title: conference.video ? ChatMessageContentType.video.name : ChatMessageContentType.audio.name,
+      title: conference.video
+          ? ChatMessageContentType.video.name
+          : ChatMessageContentType.audio.name,
       content: conference,
       messageId: conference.conferenceId,
       subMessageType: ChatMessageSubType.videoChat,
@@ -543,17 +537,7 @@ class VideoChatMessageController with ChangeNotifier {
     }
 
     _current = chatReceipt;
-    //把回执消息分类存放
-    var key = _getKey(chatReceipt.senderPeerId!, chatReceipt.senderClientId!);
-    if (chatReceipt.status == MessageReceiptType.accepted.name) {
-      _acceptedChatReceipts[key] = chatReceipt;
-    }
-    if (chatReceipt.status == MessageReceiptType.rejected.name) {
-      _rejectedChatReceipts[key] = chatReceipt;
-    }
-    if (chatReceipt.status == MessageReceiptType.terminated.name) {
-      _terminatedChatReceipts[key] = chatReceipt;
-    }
+    putChatReceipt(_chatReceipts, chatReceipt);
     await _receivedChatReceipt(chatReceipt);
     await onVideoChatMessage(chatReceipt);
   }

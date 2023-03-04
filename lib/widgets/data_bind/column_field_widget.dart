@@ -4,6 +4,7 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
@@ -106,6 +107,7 @@ class ColumnFieldDef {
 
 enum ColumnFieldMode { edit, label, custom }
 
+///存储字段的真实值和文本显示值
 class ColumnFieldController with ChangeNotifier {
   final ColumnFieldDef columnFieldDef;
 
@@ -129,27 +131,57 @@ class ColumnFieldController with ChangeNotifier {
     _mode = mode;
   }
 
+  ///获取真实值
   dynamic get value {
     var controller = _controller;
     if (controller != null) {
-      return controller.text;
-    } else {
-      return _value;
-    }
-  }
-
-  set value(dynamic value) {
-    var controller = _controller;
-    if (controller != null) {
-      if (controller.text != value) {
-        controller.text = value;
-        _changed = true;
+      if (columnFieldDef.inputType == InputType.text ||
+          columnFieldDef.inputType == InputType.password) {
+        String valueStr = controller.text;
+        if (valueStr.isNotEmpty) {
+          if (columnFieldDef.dataType == DataType.int) {
+            _value = int.parse(valueStr);
+          } else if (columnFieldDef.dataType == DataType.double) {
+            _value = double.parse(valueStr);
+          } else if (columnFieldDef.dataType == DataType.string) {
+            _value = controller.text;
+          }
+        } else {
+          _value = null;
+        }
       }
     }
-    if (_value != value) {
-      _value = value;
+    return _value;
+  }
+
+  ///设置真实值
+  set value(dynamic value) {
+    var realValue = value;
+    String valueStr = '';
+    var controller = _controller;
+    if (controller != null) {
+      if (value != null) {
+        if (value is DateTime &&
+            (columnFieldDef.inputType == InputType.datetime ||
+                columnFieldDef.inputType == InputType.date)) {
+          valueStr = value.toLocal().toIso8601String();
+          realValue = value.toUtc().toIso8601String();
+        } else if (value is TimeOfDay &&
+            columnFieldDef.inputType == InputType.time) {
+          valueStr = value.toString();
+          realValue = value.toString();
+        }
+      } else {
+        valueStr = '';
+        realValue = null;
+      }
+    }
+    if (_value != realValue) {
+      _value = realValue;
+      if (controller != null) {
+        controller.text = valueStr;
+      }
       _changed = true;
-      notifyListeners();
     }
   }
 
@@ -239,20 +271,10 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
         widget.controller.value ?? widget.controller.columnFieldDef.initValue;
     if (dataType == DataType.set ||
         dataType == DataType.list ||
-        dataType == DataType.map ||
-        dataType == DataType.bool ||
-        dataType == DataType.int ||
-        dataType == DataType.double) {
-      return v;
+        dataType == DataType.map) {
+      return JsonUtil.toJsonString(v);
     }
-    if (v == null) {
-      return '';
-    }
-    if (dataType == DataType.date || dataType == DataType.datetime) {
-      var d = v as DateTime;
-      return d.toUtc().toIso8601String();
-    }
-    return v.toString();
+    return v;
   }
 
   Widget? _buildIcon() {
@@ -288,15 +310,15 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
   }
 
   Widget _buildTextFormField(BuildContext context) {
-    final value = widget.controller.value == null
-        ? ''
-        : widget.controller.value.toString();
+    final value = widget.controller.value;
     var controller = TextEditingController();
-    controller.value = TextEditingValue(
-        text: value,
-        selection: TextSelection.fromPosition(TextPosition(
-            offset: value.length, affinity: TextAffinity.downstream)));
     widget.controller.controller = controller;
+    final valueStr = value == null ? '' : value.toString();
+    controller.value = TextEditingValue(
+        text: valueStr,
+        selection: TextSelection.fromPosition(TextPosition(
+            offset: valueStr.length, affinity: TextAffinity.downstream)));
+
     var columnFieldDef = widget.controller.columnFieldDef;
     var suffixIcon = columnFieldDef.suffixIcon;
     Widget? suffix;
@@ -346,13 +368,15 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
 
   Widget _buildPasswordField(BuildContext context) {
     bool pwdShow = widget.controller.flag ?? false;
-    final value = widget.controller.value ?? '';
+    final value = widget.controller.value;
     var controller = TextEditingController();
-    controller.value = TextEditingValue(
-        text: value,
-        selection: TextSelection.fromPosition(TextPosition(
-            offset: value.length, affinity: TextAffinity.downstream)));
     widget.controller.controller = controller;
+    final valueStr = value == null ? '' : value.toString();
+    controller.value = TextEditingValue(
+        text: valueStr,
+        selection: TextSelection.fromPosition(TextPosition(
+            offset: valueStr.length, affinity: TextAffinity.downstream)));
+
     var columnFieldDef = widget.controller.columnFieldDef;
     Widget? suffix;
     if (columnFieldDef.cancel) {
@@ -626,13 +650,18 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
   }
 
   Widget _buildInputDate(BuildContext context) {
+    String? initialValue = widget.controller.value;
+    var valueText = '';
+    if (initialValue != null) {
+      valueText = DateUtil.toLocal(initialValue);
+    }
     var controller = TextEditingController();
-    var value = widget.controller.value ?? '';
-    controller.value = TextEditingValue(
-        text: value,
-        selection: TextSelection.fromPosition(TextPosition(
-            offset: value.length, affinity: TextAffinity.downstream)));
     widget.controller.controller = controller;
+    controller.value = TextEditingValue(
+        text: valueText,
+        selection: TextSelection.fromPosition(TextPosition(
+            offset: valueText.length, affinity: TextAffinity.downstream)));
+
     var columnFieldDef = widget.controller.columnFieldDef;
     Widget? suffix;
     if (columnFieldDef.cancel) {
@@ -656,15 +685,12 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
               icon: Icon(Icons.date_range, color: myself.primary),
               onPressed: () async {
                 DateTime? initialDate;
-                if (controller.text.isNotEmpty) {
-                  initialDate = DateUtil.toDateTime(controller.text);
+                if (initialValue != null) {
+                  initialDate = DateUtil.toDateTime(initialValue);
                 }
                 var value =
                     await _showDatePicker(context, initialDate: initialDate);
-                if (value != null) {
-                  controller.text = value.toUtc().toIso8601String();
-                }
-                widget.controller.value = controller.value.text;
+                widget.controller.value = value;
               }),
           suffix: suffix,
           hintText: columnFieldDef.hintText),
@@ -673,7 +699,8 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     return textFormField;
   }
 
-  _showDatePicker(BuildContext context, {DateTime? initialDate}) {
+  Future<DateTime?> _showDatePicker(BuildContext context,
+      {DateTime? initialDate}) {
     initialDate = initialDate ?? DateTime.now();
     return showDatePicker(
       context: context,
@@ -720,13 +747,18 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
   }
 
   Widget _buildInputTime(BuildContext context) {
+    String? initialValue = widget.controller.value;
+    var valueText = '';
+    if (initialValue != null) {
+      valueText = initialValue;
+    }
     var controller = TextEditingController();
-    var value = widget.controller.value ?? '';
-    controller.value = TextEditingValue(
-        text: value,
-        selection: TextSelection.fromPosition(TextPosition(
-            offset: value.length, affinity: TextAffinity.downstream)));
     widget.controller.controller = controller;
+    controller.value = TextEditingValue(
+        text: valueText,
+        selection: TextSelection.fromPosition(TextPosition(
+            offset: valueText.length, affinity: TextAffinity.downstream)));
+
     var columnFieldDef = widget.controller.columnFieldDef;
     Widget? suffix;
     if (columnFieldDef.cancel) {
@@ -750,15 +782,12 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
               icon: Icon(Icons.access_time_filled, color: myself.primary),
               onPressed: () async {
                 TimeOfDay? initialTime;
-                if (controller.text.isNotEmpty) {
-                  initialTime = DateUtil.toTime(controller.text);
+                if (initialValue != null) {
+                  initialTime = DateUtil.toTime(initialValue);
                 }
                 var value =
                     await _showTimePicker(context, initialTime: initialTime);
-                if (value != null) {
-                  controller.text = value.toString();
-                }
-                widget.controller.value = controller.value.text;
+                widget.controller.value = value;
               }),
           suffix: suffix,
           hintText: columnFieldDef.hintText),
@@ -767,7 +796,8 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     return textFormField;
   }
 
-  _showTimePicker(BuildContext context, {TimeOfDay? initialTime}) {
+  Future<TimeOfDay?> _showTimePicker(BuildContext context,
+      {TimeOfDay? initialTime}) {
     var now = DateTime.now();
     initialTime = initialTime ?? TimeOfDay(hour: now.hour, minute: now.minute);
     return showTimePicker(
@@ -789,13 +819,17 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
   }
 
   Widget _buildInputDateTime(BuildContext context) {
+    String? initialValue = widget.controller.value;
+    var valueText = '';
+    if (initialValue != null) {
+      valueText = DateUtil.toLocal(initialValue);
+    }
     var controller = TextEditingController();
-    var value = widget.controller.value ?? '';
-    controller.value = TextEditingValue(
-        text: value,
-        selection: TextSelection.fromPosition(TextPosition(
-            offset: value.length, affinity: TextAffinity.downstream)));
     widget.controller.controller = controller;
+    controller.value = TextEditingValue(
+        text: valueText,
+        selection: TextSelection.fromPosition(TextPosition(
+            offset: valueText.length, affinity: TextAffinity.downstream)));
     var columnFieldDef = widget.controller.columnFieldDef;
     Widget? suffix;
     if (columnFieldDef.cancel) {
@@ -819,15 +853,12 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
               icon: Icon(Icons.date_range, color: myself.primary),
               onPressed: () async {
                 DateTime? initialDate;
-                if (controller.text.isNotEmpty) {
-                  initialDate = DateUtil.toDateTime(controller.text);
+                if (initialValue != null) {
+                  initialDate = DateUtil.toDateTime(initialValue);
                 }
                 var value = await _showDateTimePicker(context,
                     initialDate: initialDate);
-                if (value != null) {
-                  controller.text = value.toUtc().toIso8601String();
-                }
-                widget.controller.value = controller.value.text;
+                widget.controller.value = value;
               }),
           suffix: suffix,
           hintText: columnFieldDef.hintText),
@@ -836,7 +867,8 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     return textFormField;
   }
 
-  _showDateTimePicker(BuildContext context, {DateTime? initialDate}) {
+  Future<DateTime?> _showDateTimePicker(BuildContext context,
+      {DateTime? initialDate}) {
     initialDate = initialDate ?? DateTime.now();
     return showOmniDateTimePicker(
       context: context,

@@ -104,4 +104,14 @@ class DateUtil {
     var minute = formattedString.substring(3, 2);
     return TimeOfDay(hour: int.parse(hour), minute: int.parse(minute));
   }
+
+  static String toLocal(String formattedString) {
+    var dateTime = DateTime.parse(formattedString);
+    return dateTime.toLocal().toIso8601String();
+  }
+
+  static String toUtc(String formattedString) {
+    var dateTime = DateTime.parse(formattedString);
+    return dateTime.toUtc().toIso8601String();
+  }
 }

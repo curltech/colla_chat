@@ -6,7 +6,7 @@ class ChatSummary extends StatusEntity {
   // 聊天信息汇总没有clientId，每一条汇总对应一个peerId和多个clientId
   String? peerId; // 接收者或者发送者的联系人或群 //String? clientId;
   String? partyType; // 接收者或者发送者类型
-  String? subPartyType; //
+  String? subPartyType; //接收者或者发送者子类型，比如群的子类型
   String? messageId; // 最新的消息Id
   String? messageType; // 最新的消息类型
   String? subMessageType; // 最新的消息子类型
