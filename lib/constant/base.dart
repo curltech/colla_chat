@@ -3,24 +3,30 @@ import 'package:flutter/widgets.dart';
 
 ///background opacity
 class AppOpacity {
-  static const double xlOpacity = 0;
-  static const double lgOpacity = 0.2;
+  static const double maxOpacity = 0;
+  static const double xlOpacity = 0.1;
+  static const double lgOpacity = 0.3;
   static const double mdOpacity = 0.5;
-  static const double smOpacity = 0.8;
-  static const double xsOpacity = 1;
+  static const double smOpacity = 0.7;
+  static const double xsOpacity = 0.9;
+  static const double minOpacity = 1;
 }
 
 ///padding
 class AppPadding {
-  static const double xlPadding = 30.0;
+  static const double maxPadding = 30.0;
+  static const double xlPadding = 20.0;
   static const double lgPadding = 15.0;
   static const double mdPadding = 10.0;
   static const double smPadding = 5.0;
   static const double xsPadding = 1.0;
+  static const double minPadding = 0.0;
 }
 
 ///icon size
 class AppIconSize {
+  static const minSize = Size(8, 8);
+
   //16大小
   static const xsSize = Size(16, 16);
 
@@ -35,6 +41,8 @@ class AppIconSize {
 
   //48大小
   static const xlSize = Size(48, 48);
+
+  static const maxSize = Size(64, 64);
 }
 
 class AppImageFile {

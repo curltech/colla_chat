@@ -359,13 +359,13 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     return Column(
       children: [
         _buildConferenceMembersWidget(context),
-        const SizedBox(
-          height: 5,
-        ),
+        // const SizedBox(
+        //   height: 5,
+        // ),
         _buildConferenceOwnerWidget(context),
-        const SizedBox(
-          height: 5,
-        ),
+        // const SizedBox(
+        //   height: 5,
+        // ),
         Expanded(child: _buildFormInputWidget(context)),
       ],
     );
