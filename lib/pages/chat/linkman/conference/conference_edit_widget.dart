@@ -23,42 +23,62 @@ import 'package:flutter/material.dart';
 
 final List<ColumnFieldDef> conferenceColumnFieldDefs = [
   ColumnFieldDef(
-      name: 'conferenceId',
-      label: 'ConferenceId',
-      inputType: InputType.label,
-      prefixIcon: Icon(Icons.meeting_room, color: myself.primary)),
+    name: 'conferenceId',
+    label: 'ConferenceId',
+    inputType: InputType.label,
+    prefixIcon: Icon(Icons.meeting_room, color: myself.primary),
+    groupName: '1',
+  ),
   ColumnFieldDef(
-      name: 'name', label: 'Name', prefixIcon: const Icon(Icons.person)),
+    name: 'name',
+    label: 'Name',
+    prefixIcon: const Icon(Icons.person),
+    groupName: '1',
+  ),
   ColumnFieldDef(
-      name: 'topic', label: 'Topic', prefixIcon: const Icon(Icons.topic)),
+    name: 'topic',
+    label: 'Topic',
+    prefixIcon: const Icon(Icons.topic),
+    groupName: '1',
+  ),
   ColumnFieldDef(
-      name: 'conferenceOwnerPeerId',
-      label: 'ConferenceOwnerPeerId',
-      inputType: InputType.label,
-      prefixIcon: Icon(Icons.perm_identity, color: myself.primary)),
+    name: 'conferenceOwnerPeerId',
+    label: 'ConferenceOwnerPeerId',
+    inputType: InputType.label,
+    prefixIcon: Icon(Icons.perm_identity, color: myself.primary),
+    groupName: '1',
+  ),
   ColumnFieldDef(
-      name: 'password',
-      label: 'Password',
-      inputType: InputType.password,
-      prefixIcon: const Icon(Icons.password)),
+    name: 'password',
+    label: 'Password',
+    inputType: InputType.password,
+    prefixIcon: const Icon(Icons.password),
+    groupName: '1',
+  ),
   ColumnFieldDef(
-      name: 'video',
-      label: 'Video',
-      inputType: InputType.switcher,
-      dataType: DataType.bool,
-      prefixIcon: Icon(Icons.video_call, color: myself.primary)),
+    name: 'video',
+    label: 'Video',
+    inputType: InputType.switcher,
+    dataType: DataType.bool,
+    prefixIcon: Icon(Icons.video_call, color: myself.primary),
+    groupName: '2',
+  ),
   ColumnFieldDef(
-      name: 'startDate',
-      label: 'StartDate',
-      inputType: InputType.datetime,
-      dataType: DataType.string,
-      prefixIcon: Icon(Icons.start, color: myself.primary)),
+    name: 'startDate',
+    label: 'StartDate',
+    inputType: InputType.datetime,
+    dataType: DataType.string,
+    prefixIcon: Icon(Icons.start, color: myself.primary),
+    groupName: '2',
+  ),
   ColumnFieldDef(
-      name: 'endDate',
-      label: 'EndDate',
-      inputType: InputType.datetime,
-      dataType: DataType.string,
-      prefixIcon: Icon(Icons.pin_end, color: myself.primary)),
+    name: 'endDate',
+    label: 'EndDate',
+    inputType: InputType.datetime,
+    dataType: DataType.string,
+    prefixIcon: Icon(Icons.pin_end, color: myself.primary),
+    groupName: '2',
+  ),
 ];
 
 ///创建和修改群，填写群的基本信息，选择群成员和群主
@@ -209,8 +229,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
 
   //会议信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
-    var formInputWidget = SingleChildScrollView(
-        child: Container(
+    var formInputWidget =  Container(
             padding: const EdgeInsets.all(15.0),
             child: ValueListenableBuilder(
                 valueListenable: conference,
@@ -235,7 +254,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
                     columnFieldDefs: conferenceColumnFieldDefs,
                     initValues: initValues,
                   );
-                })));
+                }));
 
     return formInputWidget;
   }

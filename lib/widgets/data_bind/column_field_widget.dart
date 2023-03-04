@@ -71,6 +71,8 @@ class ColumnFieldDef {
 
   final List<Option>? options;
 
+  String? groupName; //分页功能
+
   final bool enableColumnFilter = false;
 
   final Function(dynamic value)? formatter;
@@ -98,6 +100,7 @@ class ColumnFieldDef {
       this.maxLines = 4,
       this.readOnly = false,
       this.options,
+      this.groupName,
       this.formatter,
       this.validator,
       this.autoValidate = false,
