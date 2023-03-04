@@ -193,6 +193,7 @@ class _IndexViewState extends State<IndexView>
           _stop();
           await videoChatMessageController!
               .sendChatReceipt(MessageReceiptType.rejected);
+          videoChatMessageController?.dispose();
           videoChatMessageController = null;
         },
         child: const Icon(color: Colors.white, size: 16, Icons.call_end),
@@ -203,6 +204,7 @@ class _IndexViewState extends State<IndexView>
           _stop();
           await videoChatMessageController!
               .sendChatReceipt(MessageReceiptType.hold);
+          videoChatMessageController?.dispose();
           videoChatMessageController = null;
         },
         child: const Icon(color: Colors.white, size: 16, Icons.add_call),
@@ -213,6 +215,7 @@ class _IndexViewState extends State<IndexView>
           _stop();
           await videoChatMessageController!
               .sendChatReceipt(MessageReceiptType.accepted);
+          videoChatMessageController?.dispose();
           videoChatMessageController = null;
         },
         child: const Icon(color: Colors.white, size: 16, Icons.call),
@@ -231,7 +234,7 @@ class _IndexViewState extends State<IndexView>
         padding: const EdgeInsets.all(5.0),
         color: Colors.black.withOpacity(AppOpacity.mdOpacity),
         child: ListTile(
-            leading: bannerAvatarImage!,
+            leading: bannerAvatarImage,
             isThreeLine: false,
             title: Text(name, style: const TextStyle(color: Colors.white)),
             subtitle: Text(
@@ -266,6 +269,7 @@ class _IndexViewState extends State<IndexView>
                   await videoChatMessageController!
                       .sendChatReceipt(MessageReceiptType.ignored);
                 }
+                videoChatMessageController?.dispose();
                 videoChatMessageController = null;
               });
             }
