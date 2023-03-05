@@ -81,23 +81,38 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     super.initState();
     // 本地视频可能在其他地方关闭，所有需要注册关闭事件
     localVideoRenderController.registerVideoRenderOperator(
-        VideoRenderOperator.remove.name, _update);
+        VideoRenderOperator.remove.name, _updateVideoRender);
     videoChatStatus.value = widget.videoChatMessageController.status;
-    _update(null);
+    widget.videoChatMessageController.registerReceiver(
+        ChatMessageSubType.chatReceipt.name, _receivedChatReceipt);
+    _update();
   }
 
   _play() {
+    videoChatStatus.value = VideoChatStatus.calling;
     audioPlayer.setLoopMode(true);
     audioPlayer.play('assets/medias/call.mp3');
   }
 
   _stop() {
+    videoChatStatus.value = VideoChatStatus.end;
     audioPlayer.setLoopMode(true);
     audioPlayer.play('assets/medias/close.mp3');
   }
 
+  ///收到回执，如果是拒绝，则stop呼叫
+  _receivedChatReceipt(ChatMessage chatReceipt) {
+    if (chatReceipt.receiptType == MessageReceiptType.rejected.name) {
+      _stop();
+    }
+  }
+
+  Future<void> _updateVideoRender(PeerVideoRender? peerVideoRender) async {
+    _update();
+  }
+
   ///调整界面的显示
-  Future<void> _update(PeerVideoRender? peerVideoRender) async {
+  Future<void> _update() async {
     List<ActionData> actionData = [];
     if (localVideoRenderController.mainVideoRender == null ||
         !localVideoRenderController.video) {
@@ -158,7 +173,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         videoRender = await localVideoRenderController.createAudioMediaRender();
       }
       await addLocalVideoRender(videoRender);
-      _update(null);
+      _update();
     } else {
       if (video) {
         if (!localVideoRenderController.video) {
@@ -167,7 +182,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           videoRender =
               await localVideoRenderController.createVideoMediaRender();
           await addLocalVideoRender(videoRender);
-          _update(null);
+          _update();
         }
       } else {
         if (localVideoRenderController.video) {
@@ -176,7 +191,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           videoRender =
               await localVideoRenderController.createAudioMediaRender();
           await addLocalVideoRender(videoRender);
-          _update(null);
+          _update();
         }
       }
     }
@@ -192,7 +207,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       PeerVideoRender videoRender = await localVideoRenderController
           .createDisplayMediaRender(selectedSource: source);
       await addLocalVideoRender(videoRender);
-      _update(null);
+      _update();
 
       return videoRender;
     }
@@ -208,7 +223,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     PeerVideoRender? videoRender =
         await localVideoRenderController.createMediaStreamRender(stream);
     await addLocalVideoRender(videoRender);
-    _update(null);
+    _update();
 
     return videoRender;
   }
@@ -350,7 +365,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             content:
                 '${AppLocalizations.t('Send videoChat chatMessage')} ${chatMessage.messageId}');
       }
-      videoChatStatus.value = VideoChatStatus.calling;
       _play();
       //延时60秒后自动挂断
       Future.delayed(const Duration(seconds: 60)).then((value) {
@@ -387,7 +401,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           conference.conferenceId, videoRenders);
     }
     await localVideoRenderController.exit();
-    _update(null);
+    _update();
   }
 
   ///如果正在呼叫calling，停止呼叫，关闭所有的本地视频，呼叫状态改为结束
@@ -405,7 +419,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       widget.videoChatMessageController.exit();
     }
     _stop();
-    videoChatStatus.value = VideoChatStatus.end;
   }
 
   Future<void> _onAction(int index, String name, {String? value}) async {
@@ -596,7 +609,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   @override
   void dispose() {
     localVideoRenderController.unregisterVideoRenderOperator(
-        VideoRenderOperator.remove.name, _update);
+        VideoRenderOperator.remove.name, _updateVideoRender);
     super.dispose();
   }
 }
