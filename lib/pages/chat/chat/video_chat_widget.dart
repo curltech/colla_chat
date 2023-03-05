@@ -49,7 +49,6 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   @override
   void initState() {
     super.initState();
-    videoConferenceRenderPool.addListener(_update);
     _initVideoChatMessageController();
     //如果此时overlay界面存在
     if (widget.overlayEntry != null) {
@@ -81,13 +80,13 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     this.videoChatMessageController = videoChatMessageController;
   }
 
-  _update() {}
-
   ///关闭最小化界面，把本界面显示
   _closeOverlayEntry() {
     if (widget.overlayEntry != null) {
       widget.overlayEntry!.dispose();
       widget.overlayEntry = null;
+      indexWidgetProvider.currentMainIndex = 0;
+      indexWidgetProvider.push('chat_message');
       indexWidgetProvider.push('video_chat');
     }
   }
@@ -160,7 +159,6 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
 
   @override
   void dispose() {
-    videoConferenceRenderPool.removeListener(_update);
     super.dispose();
   }
 }
