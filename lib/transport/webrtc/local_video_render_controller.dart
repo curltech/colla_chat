@@ -257,6 +257,22 @@ class LocalVideoRenderController extends VideoRenderController {
     return render;
   }
 
+  ///在会议创建后，自动创建本地视频，如果存在则直接返回
+  openLocalVideoRender(bool video) async {
+    //如果本地主视频存在，直接返回
+    if (mainVideoRender != null) {
+      return;
+    }
+    //根据conference.video来判断是请求音频还是视频，并创建本地视频render
+    if (video) {
+      //await localVideoRenderController.createVideoMediaRender();
+      //测试目的，使用屏幕
+      await localVideoRenderController.createDisplayMediaRender();
+    } else {
+      await localVideoRenderController.createAudioMediaRender();
+    }
+  }
+
   ///关闭本地特定的流，激活close或者remove事件
   @override
   close(String streamId) async {

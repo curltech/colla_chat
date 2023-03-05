@@ -254,7 +254,7 @@ class _IndexViewState extends State<IndexView>
         Widget videoChatMessageWidget = Container();
         if (value) {
           _play();
-          ChatMessage? chatMessage = globalChatMessageController.chatMessage;
+          ChatMessage? chatMessage = videoChatMessageController!.chatMessage;
           if (chatMessage != null) {
             //视频通话请求消息
             if (chatMessage.subMessageType ==

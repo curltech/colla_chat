@@ -41,33 +41,48 @@ class VideoChatWidget extends StatefulWidget with TileDataMixin {
 
 class _VideoChatWidgetState extends State<VideoChatWidget> {
   OverlayEntry? overlayEntry;
-  VideoChatMessageController? videoChatMessageController;
+
+  //视频消息控制器，chatSummary为空，表示没在聊天，chatMessage为空，表示没选择邀请消息
+  late VideoChatMessageController videoChatMessageController;
 
   @override
   void initState() {
     super.initState();
     videoConferenceRenderPool.addListener(_update);
-    //优先展示当前活动的会议，其次是有当前视频邀请消息的会议，最后是准备创建的会议
-    videoChatMessageController =
-        videoConferenceRenderPool.videoChatMessageController;
-    //当前无激活的会议，创建基于当前聊天的视频消息控制器
-    if (videoChatMessageController == null) {
-      ChatSummary? chatSummary = chatMessageController.chatSummary;
-      ChatMessage? chatMessage = chatMessageController.current;
-      if (chatMessage != null &&
-          chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
-        videoChatMessageController = videoConferenceRenderPool
-            .getVideoChatMessageController(chatMessage.messageId!);
-      }
-      if (videoChatMessageController == null) {
-        videoChatMessageController = VideoChatMessageController();
-        videoChatMessageController!.setChatSummary(chatSummary);
-      }
+    _initVideoChatMessageController();
+    //如果此时overlay界面存在
+    if (overlayEntry != null) {
+      overlayEntry!.remove();
+      overlayEntry = null;
     }
+  }
+
+  _initVideoChatMessageController() {
+    //优先展示当前活动的会议，其次是有当前视频邀请消息的会议，最后是准备创建的会议
+    var videoChatMessageController =
+        videoConferenceRenderPool.videoChatMessageController;
+    if (videoChatMessageController != null) {
+      this.videoChatMessageController = videoChatMessageController;
+      return;
+    }
+    //当前无激活的会议，创建基于当前聊天的视频消息控制器
+    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    ChatMessage? chatMessage = chatMessageController.current;
+    if (chatMessage != null &&
+        chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
+      videoChatMessageController = videoConferenceRenderPool
+          .getVideoChatMessageController(chatMessage.messageId!);
+    }
+    if (videoChatMessageController == null) {
+      videoChatMessageController = VideoChatMessageController();
+      videoChatMessageController.setChatSummary(chatSummary);
+    }
+    this.videoChatMessageController = videoChatMessageController;
   }
 
   _update() {}
 
+  ///关闭最小化界面，把本界面显示
   _closeOverlayEntry() {
     if (overlayEntry != null) {
       overlayEntry!.remove();
@@ -76,6 +91,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     }
   }
 
+  ///最小化界面，将overlay按钮压入，本界面被弹出
   _minimize(BuildContext context) {
     overlayEntry = OverlayEntry(builder: (context) {
       return Align(
@@ -101,11 +117,11 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
       index: 0,
       itemBuilder: (BuildContext context, int index) {
         Widget view = LocalVideoWidget(
-            videoChatMessageController: videoChatMessageController!);
+            videoChatMessageController: videoChatMessageController);
         if (index == 1) {
           view = Container();
           view = RemoteVideoWidget(
-              videoChatMessageController: videoChatMessageController!);
+              videoChatMessageController: videoChatMessageController);
         }
         return Center(child: view);
       },
