@@ -446,6 +446,32 @@ class VideoChatMessageController with ChangeNotifier {
     await localVideoRenderController.openLocalVideoRender(_conference!.video);
   }
 
+  ///在视频会议中增加本地视频到所有连接
+  addLocalVideoRender(PeerVideoRender videoRender) async {
+    if (_conference != null && status == VideoChatStatus.chatting) {
+      await videoConferenceRenderPool
+          .addLocalVideoRender(_conference!.conferenceId, [videoRender]);
+    }
+  }
+
+  ///在视频会议中增加多个本地视频到所有连接
+  addLocalVideoRenders() async {
+    if (_conference != null && status == VideoChatStatus.chatting) {
+      var videoRenders =
+          localVideoRenderController.videoRenders.values.toList();
+      await videoConferenceRenderPool.addLocalVideoRender(
+          _conference!.conferenceId, videoRenders);
+    }
+  }
+
+  ///在视频会议中删除本地视频到所有连接
+  removeVideoRender(PeerVideoRender videoRender) async {
+    if (_conference != null && status == VideoChatStatus.chatting) {
+      await videoConferenceRenderPool
+          .removeVideoRender(_conference!.conferenceId, [videoRender]);
+    }
+  }
+
   ///发送group视频邀请消息的回执
   _sendGroupChatReceipt(MessageReceiptType receiptType) async {
     ChatMessage? chatMessage = _chatMessage;

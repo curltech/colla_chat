@@ -172,25 +172,29 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       } else {
         videoRender = await localVideoRenderController.createAudioMediaRender();
       }
-      await addLocalVideoRender(videoRender);
+      await widget.videoChatMessageController.addLocalVideoRender(videoRender);
       _update();
     } else {
       if (video) {
         if (!localVideoRenderController.video) {
-          await removeVideoRender(videoRender);
+          await widget.videoChatMessageController
+              .removeVideoRender(videoRender);
           await localVideoRenderController.close(videoRender.id!);
           videoRender =
               await localVideoRenderController.createVideoMediaRender();
-          await addLocalVideoRender(videoRender);
+          await widget.videoChatMessageController
+              .addLocalVideoRender(videoRender);
           _update();
         }
       } else {
         if (localVideoRenderController.video) {
-          await removeVideoRender(videoRender);
+          await widget.videoChatMessageController
+              .removeVideoRender(videoRender);
           await localVideoRenderController.close(videoRender.id!);
           videoRender =
               await localVideoRenderController.createAudioMediaRender();
-          await addLocalVideoRender(videoRender);
+          await widget.videoChatMessageController
+              .addLocalVideoRender(videoRender);
           _update();
         }
       }
@@ -206,7 +210,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     if (source != null) {
       PeerVideoRender videoRender = await localVideoRenderController
           .createDisplayMediaRender(selectedSource: source);
-      await addLocalVideoRender(videoRender);
+      await widget.videoChatMessageController.addLocalVideoRender(videoRender);
       _update();
 
       return videoRender;
@@ -222,42 +226,10 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
     PeerVideoRender? videoRender =
         await localVideoRenderController.createMediaStreamRender(stream);
-    await addLocalVideoRender(videoRender);
+    await widget.videoChatMessageController.addLocalVideoRender(videoRender);
     _update();
 
     return videoRender;
-  }
-
-  addLocalVideoRender(PeerVideoRender videoRender) async {
-    Conference? conference = widget.videoChatMessageController.conference;
-
-    if (conference != null &&
-        videoChatStatus.value == VideoChatStatus.chatting) {
-      await videoConferenceRenderPool
-          .addLocalVideoRender(conference.conferenceId, [videoRender]);
-    }
-  }
-
-  addLocalVideoRenders() async {
-    Conference? conference = widget.videoChatMessageController.conference;
-
-    if (conference != null &&
-        videoChatStatus.value == VideoChatStatus.chatting) {
-      var videoRenders =
-          localVideoRenderController.videoRenders.values.toList();
-      await videoConferenceRenderPool.addLocalVideoRender(
-          conference.conferenceId, videoRenders);
-    }
-  }
-
-  removeVideoRender(PeerVideoRender videoRender) async {
-    Conference? conference = widget.videoChatMessageController.conference;
-
-    if (conference != null &&
-        videoChatStatus.value == VideoChatStatus.chatting) {
-      await videoConferenceRenderPool
-          .removeVideoRender(conference.conferenceId, [videoRender]);
-    }
   }
 
   ///选择会议参加人的界面，返回会议参加人
