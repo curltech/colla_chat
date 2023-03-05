@@ -29,7 +29,7 @@ import 'package:flutter/material.dart';
 /// 支持群聊
 class ChatMessageView extends StatefulWidget with TileDataMixin {
   final FullScreenWidget fullScreenWidget = const FullScreenWidget();
-  final VideoChatWidget videoChatWidget = const VideoChatWidget();
+  final VideoChatWidget videoChatWidget = VideoChatWidget();
   final ChatMessageWidget chatMessageWidget = ChatMessageWidget();
   final ChatMessageInputWidget chatMessageInputWidget =
       ChatMessageInputWidget();

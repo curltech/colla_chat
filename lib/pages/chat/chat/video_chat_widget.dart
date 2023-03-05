@@ -11,13 +11,16 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/drag_overlay.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
 ///视频聊天窗口，分页显示本地视频和远程视频
 class VideoChatWidget extends StatefulWidget with TileDataMixin {
-  const VideoChatWidget({
+  DragOverlay? overlayEntry;
+
+  VideoChatWidget({
     Key? key,
   }) : super(key: key);
 
@@ -40,8 +43,6 @@ class VideoChatWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _VideoChatWidgetState extends State<VideoChatWidget> {
-  OverlayEntry? overlayEntry;
-
   //视频消息控制器，chatSummary为空，表示没在聊天，chatMessage为空，表示没选择邀请消息
   late VideoChatMessageController videoChatMessageController;
 
@@ -51,9 +52,9 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     videoConferenceRenderPool.addListener(_update);
     _initVideoChatMessageController();
     //如果此时overlay界面存在
-    if (overlayEntry != null) {
-      overlayEntry!.remove();
-      overlayEntry = null;
+    if (widget.overlayEntry != null) {
+      widget.overlayEntry!.dispose();
+      widget.overlayEntry = null;
     }
   }
 
@@ -84,29 +85,25 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
 
   ///关闭最小化界面，把本界面显示
   _closeOverlayEntry() {
-    if (overlayEntry != null) {
-      overlayEntry!.remove();
-      overlayEntry = null;
+    if (widget.overlayEntry != null) {
+      widget.overlayEntry!.dispose();
+      widget.overlayEntry = null;
       indexWidgetProvider.push('video_chat');
     }
   }
 
   ///最小化界面，将overlay按钮压入，本界面被弹出
   _minimize(BuildContext context) {
-    overlayEntry = OverlayEntry(builder: (context) {
-      return Align(
-        alignment: Alignment.topRight,
-        child: WidgetUtil.buildCircleButton(
-            padding: const EdgeInsets.all(15.0),
-            backgroundColor: myself.primary,
-            onPressed: () {
-              _closeOverlayEntry();
-            },
-            child:
-                const Icon(size: 32, color: Colors.white, Icons.zoom_out_map)),
-      );
-    });
-    Overlay.of(context).insert(overlayEntry!);
+    widget.overlayEntry = DragOverlay(
+      child: WidgetUtil.buildCircleButton(
+          padding: const EdgeInsets.all(15.0),
+          backgroundColor: myself.primary,
+          onPressed: () {
+            _closeOverlayEntry();
+          },
+          child: const Icon(size: 32, color: Colors.white, Icons.zoom_out_map)),
+    );
+    widget.overlayEntry!.show(context: context);
     indexWidgetProvider.pop();
   }
 

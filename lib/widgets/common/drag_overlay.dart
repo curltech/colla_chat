@@ -1,31 +1,24 @@
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:flutter/cupertino.dart';
-
-import '../../plugin/logger.dart';
 
 class DragOverlay {
   OverlayEntry? overlayEntry;
   Widget child;
+  double top = 20.0;
 
-  DragOverlay(this.child);
+  DragOverlay({required this.child});
 
-  void dispose() {
-    if (overlayEntry != null) {
-      overlayEntry!.remove();
-      overlayEntry = null;
-    }
-  }
-
-  void show({required BuildContext context, required Widget child}) {
+  void show({required BuildContext context}) {
     overlayEntry = OverlayEntry(
         maintainState: true,
         builder: (context) {
           return Positioned(
-            top: 0,
+            top: top,
             right: 0,
             child: _buildDraggable(context),
           );
         });
-    Overlay.of(context)!.insert(overlayEntry!);
+    Overlay.of(context).insert(overlayEntry!);
   }
 
   Draggable _buildDraggable(context) {
@@ -33,9 +26,11 @@ class DragOverlay {
       feedback: child,
       onDragStarted: () {},
       onDragEnd: (DraggableDetails detail) {
-        logger.i("onDragEnd:${detail.offset}");
         //放手时候创建一个DragTarget
-        createDragTarget(offset: detail.offset, context: context);
+        createDragTarget(
+          context: context,
+          offset: detail.offset,
+        );
       },
       //当拖拽的时候就展示空
       childWhenDragging: Container(),
@@ -45,25 +40,43 @@ class DragOverlay {
   }
 
   void createDragTarget(
-      {required Offset offset, required BuildContext context}) {
+      {required BuildContext context, required Offset offset}) {
     if (overlayEntry != null) {
       overlayEntry!.remove();
     }
+    var size = MediaQuery.of(context).size;
     overlayEntry = OverlayEntry(builder: (context) {
-      bool isLeft = true;
-      if (offset.dx + 100 > MediaQuery.of(context).size.width / 2) {
-        isLeft = false;
+      //最大的高度是离底部100px
+      double maxY = size.height - 80;
+      //如果目标高度小于top，则取top，如果大于最大高度，则取最大高度，否则就是拖拽的目标高度
+      double? left = offset.dx;
+      double? right;
+      if (left < 0) {
+        left = 0;
       }
-      double maxY = MediaQuery.of(context).size.height - 100;
-
+      if (left > size.width - 100) {
+        left = size.width - 100;
+      }
+      var top = offset.dy;
+      if (offset.dy < this.top) {
+        top = this.top;
+      } else {
+        if (offset.dy > maxY) {
+          top = maxY;
+        } else {
+          top = offset.dy;
+          if (offset.dx + 100 > size.width / 2) {
+            left = null;
+            right = 0;
+          } else {
+            left = 0;
+          }
+        }
+      }
       return Positioned(
-        top: offset.dy < 50
-            ? 50
-            : offset.dy > maxY
-                ? maxY
-                : offset.dy,
-        left: isLeft ? 0 : null,
-        right: isLeft ? null : 0,
+        top: top,
+        left: left,
+        right: right,
         child: DragTarget(
           onWillAccept: (data) {
             logger.i('onWillAccept:$data');
@@ -83,6 +96,13 @@ class DragOverlay {
         ),
       );
     });
-    Overlay.of(context)!.insert(overlayEntry!);
+    Overlay.of(context).insert(overlayEntry!);
+  }
+
+  void dispose() {
+    if (overlayEntry != null) {
+      overlayEntry!.remove();
+      overlayEntry = null;
+    }
   }
 }
