@@ -8,8 +8,9 @@ import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
 
-///视频通话的一个会议内的所有的webrtc连接及其包含的远程视频，
-///这些连接与自己正在视频通话，此控制器用于通知视频通话界面的刷新
+///视频会议控制器，代表一个正在进行的视频会议，
+///包含一个必须的视频会议消息控制器和一个会议内的所有的webrtc连接及其包含的远程视频，
+///这些连接与自己正在视频通话
 class RemoteVideoRenderController extends VideoRenderController {
   final Key key = UniqueKey();
 
@@ -19,10 +20,10 @@ class RemoteVideoRenderController extends VideoRenderController {
   //根据peerId和clientId的连接所对应的视频render控制器，每一个视频render控制器包含多个视频render
   Map<String, VideoRenderController> videoRenderControllers = {};
 
-  //总的视频控制器，是所有连接对应的远程流的汇总控制器
-  final VideoChatMessageController? videoChatMessageController;
+  //总的视频消息控制器，是所有连接对应的远程流的汇总控制器
+  final VideoChatMessageController videoChatMessageController;
 
-  RemoteVideoRenderController({this.videoChatMessageController});
+  RemoteVideoRenderController({required this.videoChatMessageController});
 
   String _getKey(String peerId, String clientId) {
     var key = '$peerId:$clientId';
@@ -204,7 +205,7 @@ class RemoteVideoRenderController extends VideoRenderController {
   }
 }
 
-///所有的视频通话的房间的池，包含多个会议，每个会议的会议号是视频通话邀请的消息号
+///所有的正在视频会议的池，包含多个视频会议，每个会议的会议号是视频通话邀请的消息号
 class VideoConferenceRenderPool with ChangeNotifier {
   Map<String, RemoteVideoRenderController> remoteVideoRenderControllers = {};
   String? _conferenceId;

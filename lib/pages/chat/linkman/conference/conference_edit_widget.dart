@@ -342,7 +342,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     conference.value = current;
     //发出新增的会议邀请消息
     if (conferenceAdd) {
-      await VideoChatMessageController.sendConferenceVideoChatMessage(current);
+      await VideoChatMessageController.invite(current);
     }
 
     if (conferenceController.current == null) {

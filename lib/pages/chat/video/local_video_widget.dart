@@ -359,12 +359,12 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       //发送会议邀请消息
       if (videoRender.video) {
         chatMessage = await widget.videoChatMessageController
-            .sendVideoChatMessage(
+            .inviteWithChatSummary(
                 contentType: ChatMessageContentType.video,
                 participants: participants);
       } else {
         chatMessage = await widget.videoChatMessageController
-            .sendVideoChatMessage(
+            .inviteWithChatSummary(
                 contentType: ChatMessageContentType.audio,
                 participants: participants);
       }
@@ -424,7 +424,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         await videoConferenceRenderPool
             .closeConferenceId(conference.conferenceId);
       }
-      widget.videoChatMessageController.setChatMessage(null);
+      widget.videoChatMessageController.exit();
     }
     _stop();
     videoChatStatus.value = VideoChatStatus.end;
