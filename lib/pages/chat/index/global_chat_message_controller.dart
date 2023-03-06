@@ -151,7 +151,8 @@ class GlobalChatMessageController with ChangeNotifier {
     //对于接收到的非系统消息，如果消息控制器的目标与发送者相同，进行刷新
     //由于此处刷新了消息控制器，所以对非系统消息，不能同时监听chatMessageController和globalChatMessageController
     //否则会出现消息的重复
-    if (chatMessage.messageType != ChatMessageType.system.name) {
+    if (chatMessage.messageType != ChatMessageType.system.name &&
+        chatMessageController.chatSummary != null) {
       var peerId = chatMessageController.chatSummary!.peerId;
       if (chatMessage.senderPeerId == peerId ||
           chatMessage.groupPeerId == peerId) {
