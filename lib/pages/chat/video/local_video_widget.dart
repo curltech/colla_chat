@@ -528,22 +528,9 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               child: buttonWidget,
             ),
           ];
-          var conference = widget.videoChatMessageController.conference;
-          if (conference != null) {
-            children.add(
-              Align(
-                  alignment: Alignment.centerRight,
-                  child: Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: Text(
-                          '${AppLocalizations.t('ConferenceId')}:${conference.conferenceId}',
-                          style: const TextStyle(color: Colors.white)))),
-            );
-          } else {
-            children.add(const SizedBox(
-              height: 25.0,
-            ));
-          }
+          children.add(const SizedBox(
+            height: 25.0,
+          ));
 
           return Column(children: children);
         });

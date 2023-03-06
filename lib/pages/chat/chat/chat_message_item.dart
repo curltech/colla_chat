@@ -106,7 +106,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
       crossAxisAlignment = CrossAxisAlignment.end;
     }
     return Container(
-        constraints: const BoxConstraints(minWidth: 0, maxWidth: 300),
+        constraints: const BoxConstraints(minWidth: 100, maxWidth: 300),
         child: Column(crossAxisAlignment: crossAxisAlignment, children: [
           Bubble(
               elevation: 0.0,
@@ -127,17 +127,13 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
 
   ///矩形消息容器，内包消息体
   Widget _buildMessageContainer(BuildContext context) {
-    double lrEdgeInsets = 15.0;
-    double tbEdgeInsets = 10.0;
-
     return Row(
       mainAxisAlignment:
           widget.isMyself ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: <Widget>[
         Container(
-            padding: EdgeInsets.fromLTRB(
-                lrEdgeInsets, tbEdgeInsets, lrEdgeInsets, tbEdgeInsets),
-            constraints: const BoxConstraints(maxWidth: 300.0),
+            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+            constraints: const BoxConstraints(minWidth: 100, maxWidth: 300.0),
             decoration: BoxDecoration(
               color: widget.isMyself ? myself.primary : Colors.white,
               borderRadius: BorderRadius.only(

@@ -269,16 +269,12 @@ class MessageWidget {
   }
 
   VideoChatMessage buildVideoChatMessageWidget(BuildContext context) {
-    String? content = chatMessage.content;
-    if (content != null) {
-      content = chatMessageService.recoverContent(content);
-    }
+
     return VideoChatMessage(
       key: UniqueKey(),
       isMyself: isMyself,
       fullScreen: fullScreen,
-      title: chatMessage.title,
-      content: content!,
+      chatMessage: chatMessage,
     );
   }
 

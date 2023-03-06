@@ -59,7 +59,7 @@ class _FullScreenWidgetState extends State<FullScreenWidget> {
           ChatMessage? chatMessage = chatMessageController.current;
           var title = AppLocalizations.t(widget.title);
           if (chatMessage != null) {
-            title = '${chatMessage.senderName} => ${chatMessage.receiverName}';
+            title = '${chatMessage.receiverName} - ${chatMessage.senderName}';
           }
           return Text(title);
         });
