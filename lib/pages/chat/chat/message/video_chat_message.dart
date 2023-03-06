@@ -41,6 +41,10 @@ class VideoChatMessage extends StatelessWidget {
     if (fullScreen) {
       actionWidget = ConferenceShowWidget(conference: conference);
     } else {
+      String subtitle = conference.name;
+      if (conference.topic != null) {
+        subtitle = '$subtitle\n${conference.topic}';
+      }
       actionWidget = ListTile(
         leading: IconButton(
             onPressed: () {
@@ -56,7 +60,7 @@ class VideoChatMessage extends StatelessWidget {
         title: Text(
           AppLocalizations.t('$video chat invitation'),
         ),
-        subtitle: Text('${conference.name}\n${conference.topic ?? ''}'),
+        subtitle: Text(subtitle),
         //dense: true,
         contentPadding: const EdgeInsets.symmetric(horizontal: 5.0),
         horizontalTitleGap: 0,

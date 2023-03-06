@@ -9,7 +9,6 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/chat_summary.dart';
 import 'package:colla_chat/service/chat/conference.dart';
-import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
@@ -317,8 +316,9 @@ class VideoChatMessageController with ChangeNotifier {
       participants.add(peerId);
     }
     var name = this.name;
+    var dateName = DateTime.now().toLocal().toIso8601String();
     _conference = await conferenceService.createConference(
-        '${name!}-${DateUtil.currentDate()}',
+        'video-chat-$dateName',
         video: video,
         participants: participants);
     if (partyType == PartyType.group.name) {
@@ -388,7 +388,7 @@ class VideoChatMessageController with ChangeNotifier {
     }
   }
 
-  ///3.发送会议邀请回执
+  ///3.发送会议邀请回执，用于被邀请方
   ///接收到视频通话邀请，做出接受或者拒绝视频通话邀请的决定
   ///如果是接受决定，本控制器将被加入到池中
   sendChatReceipt(MessageReceiptType receiptType) async {
@@ -396,12 +396,10 @@ class VideoChatMessageController with ChangeNotifier {
     if (chatMessage == null) {
       return;
     }
-    var groupPeerId = chatMessage.groupPeerId;
+    await _sendChatReceipt(receiptType);
     var groupType = chatMessage.groupType;
-    var messageId = chatMessage.messageId;
     //单个联系人视频通话邀请
     if (groupType == null) {
-      await _sendLinkmanChatReceipt(receiptType);
       //立即接听
       if (receiptType == MessageReceiptType.accepted) {
         await joinConference();
@@ -412,7 +410,6 @@ class VideoChatMessageController with ChangeNotifier {
         indexWidgetProvider.push('video_chat');
       }
     } else if (groupType == PartyType.group.name) {
-      await _sendGroupChatReceipt(receiptType);
       //立即接听
       if (receiptType == MessageReceiptType.accepted) {
         await joinConference();
@@ -422,6 +419,21 @@ class VideoChatMessageController with ChangeNotifier {
         indexWidgetProvider.push('chat_message');
         indexWidgetProvider.push('video_chat');
       }
+    }
+  }
+
+  ///仅仅发送回执消息
+  _sendChatReceipt(MessageReceiptType receiptType) async {
+    ChatMessage? chatMessage = _chatMessage;
+    if (chatMessage == null) {
+      return;
+    }
+    var groupType = chatMessage.groupType;
+    //单个联系人视频通话邀请
+    if (groupType == null) {
+      await _sendLinkmanChatReceipt(receiptType);
+    } else if (groupType == PartyType.group.name) {
+      await _sendGroupChatReceipt(receiptType);
     } else if (groupType == PartyType.conference.name) {
       await _sendConferenceChatReceipt(receiptType);
     }
@@ -438,38 +450,6 @@ class VideoChatMessageController with ChangeNotifier {
         await chatMessageService.buildChatReceipt(chatMessage, receiptType);
     await chatMessageService.sendAndStore(chatReceipt);
     await chatMessageService.updateReceiptType(chatMessage, receiptType);
-  }
-
-  ///在会议创建后，自动创建本地视频，如果存在则直接返回
-  openLocalVideoRender() async {
-    //如果本地主视频存在，直接返回
-    await localVideoRenderController.openLocalVideoRender(_conference!.video);
-  }
-
-  ///在视频会议中增加本地视频到所有连接
-  addLocalVideoRender(PeerVideoRender videoRender) async {
-    if (_conference != null && status == VideoChatStatus.chatting) {
-      await videoConferenceRenderPool
-          .addLocalVideoRender(_conference!.conferenceId, [videoRender]);
-    }
-  }
-
-  ///在视频会议中增加多个本地视频到所有连接
-  addLocalVideoRenders() async {
-    if (_conference != null && status == VideoChatStatus.chatting) {
-      var videoRenders =
-          localVideoRenderController.videoRenders.values.toList();
-      await videoConferenceRenderPool.addLocalVideoRender(
-          _conference!.conferenceId, videoRenders);
-    }
-  }
-
-  ///在视频会议中删除本地视频到所有连接
-  removeVideoRender(PeerVideoRender videoRender) async {
-    if (_conference != null && status == VideoChatStatus.chatting) {
-      await videoConferenceRenderPool
-          .removeVideoRender(_conference!.conferenceId, [videoRender]);
-    }
   }
 
   ///发送group视频邀请消息的回执
@@ -516,6 +496,38 @@ class VideoChatMessageController with ChangeNotifier {
       }
     }
     await chatMessageService.updateReceiptType(chatMessage, receiptType);
+  }
+
+  ///在会议创建后，自动创建本地视频，如果存在则直接返回
+  openLocalMainVideoRender() async {
+    //如果本地主视频存在，直接返回
+    await localVideoRenderController.openLocalMainVideoRender(_conference!.video);
+  }
+
+  ///在视频会议中增加本地视频到所有连接
+  addLocalVideoRender(PeerVideoRender videoRender) async {
+    if (_conference != null && status == VideoChatStatus.chatting) {
+      await videoConferenceRenderPool
+          .addLocalVideoRender(_conference!.conferenceId, [videoRender]);
+    }
+  }
+
+  ///在视频会议中增加多个本地视频到所有连接
+  addLocalVideoRenders() async {
+    if (_conference != null && status == VideoChatStatus.chatting) {
+      var videoRenders =
+          localVideoRenderController.videoRenders.values.toList();
+      await videoConferenceRenderPool.addLocalVideoRender(
+          _conference!.conferenceId, videoRenders);
+    }
+  }
+
+  ///在视频会议中删除本地视频到所有连接
+  removeVideoRender(PeerVideoRender videoRender) async {
+    if (_conference != null && status == VideoChatStatus.chatting) {
+      await videoConferenceRenderPool
+          .removeVideoRender(_conference!.conferenceId, [videoRender]);
+    }
   }
 
   ///4.接受到视频通话回执，一般由globalChatMessageController分发到此
@@ -596,17 +608,21 @@ class VideoChatMessageController with ChangeNotifier {
     }
   }
 
+  ///对方只是表示收到，自己什么都不用做
   Future<void> _onReceived(
       String peerId, String clientId, String messageId) async {}
 
+  ///对方立即接受邀请，并且加入会议，自己也要立即加入
   Future<void> _onAccepted(
       String peerId, String clientId, String messageId) async {
     await _onJoin(peerId, clientId, messageId);
   }
 
+  ///对方拒绝，自己什么都不用做
   Future<void> _onRejected(
       String peerId, String clientId, String messageId) async {}
 
+  ///对方终止，把对方移除会议
   _onTerminated(String peerId, String clientId, String messageId) {
     AdvancedPeerConnection? advancedPeerConnection = peerConnectionPool.getOne(
       peerId,
@@ -628,16 +644,20 @@ class VideoChatMessageController with ChangeNotifier {
     }
   }
 
+  ///对方占线，自己什么都不用做
   Future<void> _onBusy(
       String peerId, String clientId, String messageId) async {}
 
+  ///对方没响应，自己什么都不用做
   Future<void> _onIgnored(
       String peerId, String clientId, String messageId) async {}
 
-  Future<void> _onHold(
-      String peerId, String clientId, String messageId) async {}
+  ///对方保持，自己可以先加入，等待对方后续加入
+  Future<void> _onHold(String peerId, String clientId, String messageId) async {
+    await join();
+  }
 
-  ///对方加入，自己也要配合对方的加入本地流
+  ///对方加入，自己也要配合把对方的连接加入本地流
   Future<void> _onJoin(String peerId, String clientId, String messageId) async {
     AdvancedPeerConnection? advancedPeerConnection = peerConnectionPool.getOne(
       peerId,
@@ -658,19 +678,41 @@ class VideoChatMessageController with ChangeNotifier {
     }
   }
 
-  Future<void> _onExit(
-      String peerId, String clientId, String messageId) async {}
+  ///对方退出，自己也要配合把对方的连接退出
+  Future<void> _onExit(String peerId, String clientId, String messageId) async {
+    AdvancedPeerConnection? advancedPeerConnection = peerConnectionPool.getOne(
+      peerId,
+      clientId: clientId,
+    );
+    //将发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
+    if (advancedPeerConnection != null) {
+      RemoteVideoRenderController? remoteVideoRenderController =
+          videoConferenceRenderPool
+              .getRemoteVideoRenderController(_conference!.conferenceId);
+      if (remoteVideoRenderController != null) {
+        remoteVideoRenderController
+            .removeAdvancedPeerConnection(advancedPeerConnection);
 
-  ///通知所有人加入会议，发送join回执，并且加入
+        //把本地视频加入连接中，然后重新协商
+        Map<String, PeerVideoRender> videoRenders =
+            localVideoRenderController.getVideoRenders();
+        await remoteVideoRenderController.removeVideoRender(
+            videoRenders.values.toList(),
+            peerConnection: advancedPeerConnection);
+      }
+    }
+  }
+
+  ///通知所有人自己加入会议，发送join回执，并且加入
   join() async {
-    await sendChatReceipt(MessageReceiptType.join);
+    await _sendChatReceipt(MessageReceiptType.join);
     await joinConference();
   }
 
   ///包含加本地视频和将会议的每个参与者加入会议中两步，自己主动加入
   ///每一个新加入的会议是池中的当前会议
   joinConference() async {
-    await openLocalVideoRender();
+    await openLocalMainVideoRender();
     //创建新的视频会议控制器
     RemoteVideoRenderController remoteVideoRenderController =
         videoConferenceRenderPool.createRemoteVideoRenderController(this);
@@ -701,14 +743,14 @@ class VideoChatMessageController with ChangeNotifier {
 
   ///包装的发送exit回执的方法，自己主动退出
   exit() async {
-    await sendChatReceipt(MessageReceiptType.exit);
+    await _sendChatReceipt(MessageReceiptType.exit);
     videoConferenceRenderPool.closeConferenceId(_conference!.conferenceId);
     status = VideoChatStatus.end;
   }
 
   ///包装的发送terminate回执的方法，自己主动终止
   terminate() async {
-    await sendChatReceipt(MessageReceiptType.terminated);
+    await _sendChatReceipt(MessageReceiptType.terminated);
     videoConferenceRenderPool.closeConferenceId(_conference!.conferenceId);
     status = VideoChatStatus.end;
   }

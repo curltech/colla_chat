@@ -327,7 +327,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             content: AppLocalizations.t('Create conference failure'));
       }
     }
-    await widget.videoChatMessageController.openLocalVideoRender();
+    await widget.videoChatMessageController.openLocalMainVideoRender();
     //发送会议邀请消息
     await widget.videoChatMessageController.inviteWithChatSummary();
     ChatMessage? chatMessage = widget.videoChatMessageController.chatMessage;

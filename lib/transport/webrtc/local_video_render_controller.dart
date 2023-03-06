@@ -258,7 +258,7 @@ class LocalVideoRenderController extends VideoRenderController {
   }
 
   ///在会议创建后，自动创建本地视频，如果存在则直接返回
-  openLocalVideoRender(bool video) async {
+  openLocalMainVideoRender(bool video) async {
     //如果本地主视频存在，直接返回
     if (mainVideoRender != null) {
       return;
