@@ -148,9 +148,15 @@ class GlobalChatMessageController with ChangeNotifier {
     }
     //调用注册的消息接收监听器，用于自定义的特殊处理
     await callReceiver(chatMessage);
-    //对于接收到的非系统消息，对消息控制器进行刷新
+    //对于接收到的非系统消息，如果消息控制器的目标与发送者相同，进行刷新
+    //由于此处刷新了消息控制器，所以对非系统消息，不能同时监听chatMessageController和globalChatMessageController
+    //否则会出现消息的重复
     if (chatMessage.messageType != ChatMessageType.system.name) {
-      chatMessageController.notifyListeners();
+      var peerId = chatMessageController.chatSummary!.peerId;
+      if (chatMessage.senderPeerId == peerId ||
+          chatMessage.groupPeerId == peerId) {
+        chatMessageController.notifyListeners();
+      }
     }
     notifyListeners();
   }
