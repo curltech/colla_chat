@@ -12,7 +12,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
-///联系人和群的查询界面
+///会议池的显示界面
 class VideoConferencePoolWidget extends StatefulWidget {
   const VideoConferencePoolWidget({Key? key}) : super(key: key);
 
@@ -52,7 +52,7 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
             title: conferenceName,
             titleTail: conferenceOwnerName,
             subtitle: topic,
-            selected: false,
+            selected: videoConferenceRenderPool.conferenceId == conferenceId,
             isThreeLine: false,
             routeName: 'conference_edit');
         List<TileData> slideActions = [];

@@ -127,7 +127,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
           view = Container();
           view = const VideoConferencePoolWidget();
         }
-        return Center(child: view);
+        return view;
       },
       onIndexChanged: (int index) {
         logger.i('changed to index $index');

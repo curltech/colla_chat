@@ -34,16 +34,17 @@ class TileData {
   List<TileData>? slideActions;
   List<TileData>? endSlideActions;
 
-  TileData({this.prefix,
-    required this.title,
-    this.subtitle,
-    this.titleTail,
-    this.suffix,
-    this.routeName,
-    this.dense = true,
-    this.selected = false,
-    this.isThreeLine = false,
-    this.onTap});
+  TileData(
+      {this.prefix,
+      required this.title,
+      this.subtitle,
+      this.titleTail,
+      this.suffix,
+      this.routeName,
+      this.dense = true,
+      this.selected = false,
+      this.isThreeLine = false,
+      this.onTap});
 
   static TileData of(TileDataMixin mixin) {
     return TileData(
@@ -111,11 +112,12 @@ class DataListTile extends StatelessWidget {
   ///二是数据项里面定义的，用于自定义的后续任务
   final Function(int index, String title, {String? subtitle})? onTap;
 
-  const DataListTile({Key? key,
-    required this.dataListViewController,
-    required this.tileData,
-    required this.index,
-    this.onTap})
+  const DataListTile(
+      {Key? key,
+      required this.dataListViewController,
+      required this.tileData,
+      required this.index,
+      this.onTap})
       : super(key: key);
 
   Widget _buildListTile(BuildContext context) {
@@ -167,6 +169,7 @@ class DataListTile extends StatelessWidget {
       minVerticalPadding: 0,
       minLeadingWidth: 0,
       selected: selected,
+      selectedColor: myself.primary,
       leading: leading,
       title: Row(children: [
         Text(
@@ -180,15 +183,15 @@ class DataListTile extends StatelessWidget {
           AppLocalizations.t(tileData.titleTail ?? ''),
           style: tileData.dense
               ? const TextStyle(
-            fontSize: 12,
-          )
+                  fontSize: 12,
+                )
               : null,
         ),
       ]),
       subtitle: tileData.subtitle != null
           ? Text(
-        tileData.subtitle!,
-      )
+              tileData.subtitle!,
+            )
           : null,
       trailing: trailingWidget,
       isThreeLine: tileData.isThreeLine,
@@ -214,8 +217,8 @@ class DataListTile extends StatelessWidget {
     return listTile;
   }
 
-  ActionPane _buildActionPane(BuildContext context,
-      List<TileData>? slideActions) {
+  ActionPane _buildActionPane(
+      BuildContext context, List<TileData>? slideActions) {
     List<SlidableAction> slidableActions = [];
     for (var slideAction in slideActions!) {
       SlidableAction slidableAction = SlidableAction(
