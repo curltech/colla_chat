@@ -242,7 +242,7 @@ class _IndexViewState extends State<IndexView>
                     videoChatMessageController!.conference!.name,
                 style: const TextStyle(color: Colors.white)),
             trailing: SizedBox(
-              width: 130,
+              width: 200,
               child: Row(children: buttons),
             )));
   }
