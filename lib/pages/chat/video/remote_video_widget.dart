@@ -4,7 +4,6 @@ import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_control
 import 'package:colla_chat/pages/chat/video/video_view_card.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
-import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 
@@ -41,38 +40,87 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   @override
   void initState() {
     super.initState();
-    //视频通话的消息存放地
-    //widget.videoChatMessageController.addListener(_update);
+    _init();
+    _update();
+  }
+
+  ///注册远程流到来或者关闭的监听器
+  ///重新计算远程流的数量是否变化，决定是否重新渲染界面
+  void _init() {
     String? conferenceId = widget.videoChatMessageController.conferenceId;
     if (conferenceId != null) {
       remoteVideoRenderController = videoConferenceRenderPool
           .getRemoteVideoRenderController(conferenceId);
       if (remoteVideoRenderController != null) {
         remoteVideoRenderController!.registerVideoRenderOperator(
-            VideoRenderOperator.add.name, _addLocalVideoRender);
+            VideoRenderOperator.add.name, _onAddVideoRender);
         remoteVideoRenderController!.registerVideoRenderOperator(
-            VideoRenderOperator.remove.name, _removeLocalVideoRender);
+            VideoRenderOperator.remove.name, _onRemoveVideoRender);
         videoViewCount.value = remoteVideoRenderController!.videoRenders.length;
       }
     }
   }
 
-  Future<void> _addLocalVideoRender(PeerVideoRender? videoRender) async {
+  Future<void> _onAddVideoRender(PeerVideoRender? videoRender) async {
     if (remoteVideoRenderController != null) {
       videoViewCount.value = remoteVideoRenderController!.videoRenders.length;
     }
   }
 
-  Future<void> _removeLocalVideoRender(PeerVideoRender? videoRender) async {
+  Future<void> _onRemoveVideoRender(PeerVideoRender? videoRender) async {
     if (remoteVideoRenderController != null) {
       videoViewCount.value = remoteVideoRenderController!.videoRenders.length;
     }
   }
 
-  _exit() async {
-    if (remoteVideoRenderController != null) {
-      remoteVideoRenderController!.exit();
+  ///调整界面的显示
+  Future<void> _update() async {
+    List<ActionData> actionData = [];
+    if (remoteVideoRenderController == null) {
+      return;
     }
+    if (remoteVideoRenderController!.videoRenders.isNotEmpty) {
+      actionData.add(
+        ActionData(
+            label: 'Close',
+            tooltip: 'Close all video',
+            icon:
+                const Icon(Icons.closed_caption_disabled, color: Colors.white)),
+      );
+    } else {
+      controlPanelVisible.value = true;
+    }
+    this.actionData.value = actionData;
+    videoViewCount.value = remoteVideoRenderController!.videoRenders.length;
+  }
+
+  Future<void> _onAction(int index, String name, {String? value}) async {
+    switch (name) {
+      case 'Close':
+        break;
+      default:
+        break;
+    }
+  }
+
+  Widget _buildActionCard(BuildContext context) {
+    double height = 80;
+    return Container(
+      margin: const EdgeInsets.all(0.0),
+      padding: const EdgeInsets.only(bottom: 0.0),
+      child: ValueListenableBuilder<List<ActionData>>(
+          valueListenable: actionData,
+          builder: (context, value, child) {
+            return DataActionCard(
+              actions: value,
+              height: height,
+              //width: 320,
+              onPressed: _onAction,
+              crossAxisCount: 4,
+              labelColor: Colors.white,
+            );
+          }),
+    );
   }
 
   ///切换显示按钮面板
@@ -112,25 +160,9 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
             return Visibility(
                 visible: controlPanelVisible.value,
                 child: Column(children: [
-                  Center(
-                      child: Container(
-                    padding: const EdgeInsets.all(25.0),
-                    child: WidgetUtil.buildCircleButton(
-                      onPressed: () {
-                        _exit();
-                      },
-                      elevation: 2.0,
-                      backgroundColor: Colors.red,
-                      padding: const EdgeInsets.all(15.0),
-                      child: const Icon(
-                        Icons.call_end,
-                        size: 48.0,
-                        color: Colors.white,
-                      ),
-                    ),
-                  )),
+                  _buildActionCard(context),
                 ]));
-          })
+          }),
     ]);
   }
 
@@ -178,9 +210,9 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   void dispose() {
     if (remoteVideoRenderController != null) {
       remoteVideoRenderController!.unregisterVideoRenderOperator(
-          VideoRenderOperator.add.name, _addLocalVideoRender);
+          VideoRenderOperator.add.name, _onAddVideoRender);
       remoteVideoRenderController!.unregisterVideoRenderOperator(
-          VideoRenderOperator.remove.name, _removeLocalVideoRender);
+          VideoRenderOperator.remove.name, _onRemoveVideoRender);
     }
     super.dispose();
   }
