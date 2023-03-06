@@ -437,7 +437,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
               .e('chatReceipt message has no chatMessage with same messageId');
           return null;
         }
-        originChatMessage.receiptType = chatMessage.content;
+        originChatMessage.receiptType = chatMessage.receiptType;
         originChatMessage.receiptTime = chatMessage.receiptTime;
         originChatMessage.receiveTime = DateUtil.currentDate();
         originChatMessage.status = MessageStatus.received.name;
