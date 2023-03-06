@@ -166,7 +166,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
             titleWidget = Column(children: [
               titleWidget,
               Text('${value.conferenceName}',
-                  style: const TextStyle(fontSize: 16))
+                  style: const TextStyle(fontSize: 12))
             ]);
           }
           return AppBarView(
