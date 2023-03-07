@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/video/video_view_card.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
@@ -94,9 +95,24 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
     videoViewCount.value = remoteVideoRenderController!.videoRenders.length;
   }
 
+  ///移除远程所有的视频，这时候还能看远程的视频
+  _close() async {
+    if (remoteVideoRenderController != null) {
+      var videoRenders =
+          remoteVideoRenderController!.videoRenders.values.toList();
+      Conference? conference = widget.videoChatMessageController.conference;
+      if (conference != null) {
+        videoConferenceRenderPool.removeVideoRender(
+            conference.conferenceId, videoRenders);
+      }
+      await remoteVideoRenderController!.exit();
+    }
+  }
+
   Future<void> _onAction(int index, String name, {String? value}) async {
     switch (name) {
       case 'Close':
+        _close();
         break;
       default:
         break;

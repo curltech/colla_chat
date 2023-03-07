@@ -322,7 +322,7 @@ class VideoConferenceRenderPool with ChangeNotifier {
       }
     }
     if (conferenceId == _conferenceId) {
-      _conferenceId = null;
+      this.conferenceId = null;
     }
   }
 }

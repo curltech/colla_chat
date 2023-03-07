@@ -893,7 +893,6 @@ class BasePeerConnection {
 
   ///判断流是否存在，0表示不存在，1表示本地流，2表示远程流
   int exist(MediaStream stream) {
-    logger.i('_removeLocalStream stream:${stream.id} ${stream.ownerTag}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return 0;
@@ -929,7 +928,7 @@ class BasePeerConnection {
 
   /// 主动从连接中移除流，然后会激活onRemoveStream
   removeStream(MediaStream stream) async {
-    logger.i('_removeLocalStream stream:${stream.id} ${stream.ownerTag}');
+    logger.i('removeStream stream:${stream.id} ${stream.ownerTag}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -937,7 +936,7 @@ class BasePeerConnection {
     RTCPeerConnection? peerConnection = this.peerConnection;
     if (peerConnection != null) {
       try {
-        int existResult = exist(stream);
+        exist(stream);
         await peerConnection.removeStream(stream);
       } catch (e) {
         logger.e('peer connection removeStream failure, $e');
