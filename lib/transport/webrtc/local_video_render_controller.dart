@@ -149,8 +149,8 @@ class VideoRenderController with ChangeNotifier {
   remove(PeerVideoRender videoRender) async {
     var streamId = videoRender.id;
     if (streamId != null && videoRenders.containsKey(streamId)) {
-      await videoRender.close();
       videoRenders.remove(streamId);
+      await videoRender.close();
       if (_currentVideoRender != null && _currentVideoRender!.id == streamId) {
         _currentVideoRender = null;
       }

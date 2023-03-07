@@ -290,7 +290,7 @@ class AdvancedPeerConnection {
 
   ///把渲染器的流连接中删除，然后把渲染器从渲染器集合删除，并关闭
   removeRender(PeerVideoRender render) async {
-    logger.i('removeLocalRender ${render.id}');
+    logger.i('removeRender ${render.id}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;

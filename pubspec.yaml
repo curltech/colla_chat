@@ -71,7 +71,7 @@ dependencies:
   idb_shim: ^2.0.1
 
   #网络
-  flutter_webrtc: ^0.9.18
+  flutter_webrtc: ^0.9.24
   dart_webrtc: ^1.0.12
   #flutter_web_auth: ^0.4.0  #macos有问题
   dio: ^4.0.6

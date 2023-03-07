@@ -708,11 +708,12 @@ class VideoChatMessageController with ChangeNotifier {
       remoteVideoRenderController
           .addAdvancedPeerConnection(advancedPeerConnection);
       //把本地视频加入连接中，然后重新协商
-      Map<String, PeerVideoRender> videoRenders =
-          localVideoRenderController.getVideoRenders();
-      await remoteVideoRenderController.addLocalVideoRender(
-          videoRenders.values.toList(),
-          peerConnection: advancedPeerConnection);
+      List<PeerVideoRender> videoRenders =
+          localVideoRenderController.getVideoRenders().values.toList();
+      if (videoRenders.isNotEmpty) {
+        // await remoteVideoRenderController.addLocalVideoRender(videoRenders,
+        //     peerConnection: advancedPeerConnection);
+      }
     }
     status = VideoChatStatus.chatting;
   }
