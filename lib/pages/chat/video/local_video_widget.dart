@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -498,7 +499,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               padding: const EdgeInsets.all(15.0),
               child: const Icon(
                 Icons.call_end,
-                size: 48.0,
+                size: AppIconSize.lgSize,
                 color: Colors.white,
               ),
             );
@@ -512,7 +513,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               padding: const EdgeInsets.all(15.0),
               child: const Icon(
                 Icons.call,
-                size: 48.0,
+                size: AppIconSize.lgSize,
                 color: Colors.white,
               ),
             );
@@ -523,7 +524,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               padding: const EdgeInsets.all(15.0),
               child: const Icon(
                 Icons.call_end,
-                size: 48.0,
+                size: AppIconSize.lgSize,
                 color: Colors.white,
               ),
             );

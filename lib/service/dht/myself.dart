@@ -109,7 +109,7 @@ class MyselfService {
           AssetImage(
             avatar,
           ),
-          size: AppIconSize.mdSize.width,
+          size: AppIconSize.mdSize,
         );
         myselfPeer.avatarIcon = avatarIcon;
       }

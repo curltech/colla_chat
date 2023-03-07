@@ -61,8 +61,8 @@ class LinkmanService extends PeerPartyService<Linkman> {
     if (avatar != null) {
       var avatarImage = ImageUtil.buildImageWidget(
           image: avatar,
-          height: AppIconSize.lgSize.height,
-          width: AppIconSize.lgSize.width,
+          height: AppIconSize.lgSize,
+          width: AppIconSize.lgSize,
           fit: BoxFit.contain);
       linkman.avatarImage = avatarImage;
     } else {

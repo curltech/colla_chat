@@ -50,8 +50,8 @@ class GroupService extends PeerPartyService<Group> {
     if (avatar != null) {
       var avatarImage = ImageUtil.buildImageWidget(
           image: avatar,
-          height: AppIconSize.lgSize.height,
-          width: AppIconSize.lgSize.width,
+          height: AppIconSize.lgSize,
+          width: AppIconSize.lgSize,
           fit: BoxFit.contain);
       group.avatarImage = avatarImage;
     } else {
@@ -67,8 +67,8 @@ class GroupService extends PeerPartyService<Group> {
         }
         group.avatarImage = CombineGridView(
           widgets: widgets,
-          height: AppIconSize.lgSize.height,
-          width: AppIconSize.lgSize.width,
+          height: AppIconSize.lgSize,
+          width: AppIconSize.lgSize,
           maxCount: 9,
         );
       } else {

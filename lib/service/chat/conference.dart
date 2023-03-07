@@ -91,8 +91,8 @@ class ConferenceService extends GeneralBaseService<Conference> {
       }
       conference.avatarImage = CombineGridView(
         widgets: widgets,
-        height: AppIconSize.lgSize.height,
-        width: AppIconSize.lgSize.width,
+        height: AppIconSize.lgSize,
+        width: AppIconSize.lgSize,
         maxCount: 9,
       );
     }

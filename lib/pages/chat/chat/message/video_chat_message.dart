@@ -52,7 +52,7 @@ class VideoChatMessage extends StatelessWidget {
               chatMessageController.current = chatMessage;
               indexWidgetProvider.push('video_chat');
             },
-            iconSize: AppIconSize.lgSize.width,
+            iconSize: AppIconSize.lgSize,
             icon: Icon(
               conference.video ? Icons.video_call : Icons.multitrack_audio,
               color: primary,
