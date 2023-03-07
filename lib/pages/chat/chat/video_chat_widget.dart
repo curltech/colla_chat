@@ -44,14 +44,9 @@ class VideoChatWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _VideoChatWidgetState extends State<VideoChatWidget> {
-  //视频消息控制器，chatSummary为空，表示没在聊天，chatMessage为空，表示没选择邀请消息
-  ValueNotifier<VideoChatMessageController> videoChatMessageController =
-      ValueNotifier<VideoChatMessageController>(VideoChatMessageController());
-
   @override
   void initState() {
     super.initState();
-    _initVideoChatMessageController();
     //如果此时overlay界面存在
     if (widget.overlayEntry != null) {
       widget.overlayEntry!.dispose();
@@ -59,13 +54,12 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
     }
   }
 
-  _initVideoChatMessageController() async {
+  Future<VideoChatMessageController> _getVideoChatMessageController() async {
     //优先展示当前活动的会议，其次是有当前视频邀请消息的会议，最后是准备创建的会议
     var videoChatMessageController =
         videoConferenceRenderPool.videoChatMessageController;
     if (videoChatMessageController != null) {
-      this.videoChatMessageController.value = videoChatMessageController;
-      return;
+      return videoChatMessageController;
     }
     //当前无激活的会议，创建基于当前聊天的视频消息控制器
     ChatSummary? chatSummary = chatMessageController.chatSummary;
@@ -80,7 +74,8 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
       await videoChatMessageController.setChatSummary(chatSummary);
       await videoChatMessageController.setChatMessage(chatMessage);
     }
-    this.videoChatMessageController.value = videoChatMessageController;
+
+    return videoChatMessageController;
   }
 
   ///关闭最小化界面，把本界面显示
@@ -148,27 +143,35 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
           },
           icon: const Icon(Icons.zoom_in_map, color: Colors.white)),
     ];
-    return ValueListenableBuilder(
-        valueListenable: videoChatMessageController,
-        builder: (BuildContext context, VideoChatMessageController value,
-            Widget? child) {
-          Widget videoChatView = Container();
+    return FutureBuilder(
+        future: _getVideoChatMessageController(),
+        builder: (BuildContext context,
+            AsyncSnapshot<VideoChatMessageController> snapshot) {
+          Widget videoChatView = Center(
+              child: Text(AppLocalizations.t(
+                  'VideoChatMessageController is not ready')));
+          if (!snapshot.hasData || snapshot.data == null) {
+            return videoChatView;
+          }
+          VideoChatMessageController videoChatMessageController =
+              snapshot.data!;
           var peerName = '';
           var chatSummary = chatMessageController.chatSummary;
           if (chatSummary != null) {
             peerName = chatSummary.name!;
-            videoChatView = _buildVideoChatView(context, value);
+            videoChatView =
+                _buildVideoChatView(context, videoChatMessageController);
           }
           String title = widget.title;
           if (chatSummary!.partyType == PartyType.conference.name) {
             title = 'VideoConference';
           }
           Widget titleWidget = Text('${AppLocalizations.t(title)} - $peerName');
-          if (value.conferenceName != null &&
+          if (videoChatMessageController.conferenceName != null &&
               chatSummary.partyType != PartyType.conference.name) {
             titleWidget = Column(children: [
               titleWidget,
-              Text('${value.conferenceName}',
+              Text('${videoChatMessageController.conferenceName}',
                   style: const TextStyle(fontSize: 12))
             ]);
           }
