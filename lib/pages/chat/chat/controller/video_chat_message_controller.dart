@@ -788,7 +788,6 @@ class VideoChatMessageController with ChangeNotifier {
     await _sendChatReceipt(MessageReceiptType.exit);
     await videoConferenceRenderPool
         .closeConferenceId(_conference!.conferenceId);
-    setChatMessage(null);
     status = VideoChatStatus.end;
   }
 
@@ -798,7 +797,6 @@ class VideoChatMessageController with ChangeNotifier {
     await _sendChatReceipt(MessageReceiptType.terminated);
     await videoConferenceRenderPool
         .closeConferenceId(_conference!.conferenceId);
-    setChatMessage(null);
     status = VideoChatStatus.end;
   }
 

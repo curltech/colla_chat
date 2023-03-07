@@ -319,10 +319,6 @@ class VideoConferenceRenderPool with ChangeNotifier {
         await remoteVideoRenderController.removeVideoRender(videoRenders);
         await remoteVideoRenderController.exit();
       }
-      var videoChatMessageController =
-          remoteVideoRenderController.videoChatMessageController;
-      videoChatMessageController.setChatMessage(null);
-      //videoChatMessageController.dispose();
       remoteVideoRenderControllers.remove(conferenceId);
       if (conferenceId == _conferenceId) {
         _conferenceId = null;
