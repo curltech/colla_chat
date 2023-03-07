@@ -94,13 +94,11 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   _play() {
-    widget.videoChatMessageController.status = VideoChatStatus.calling;
     audioPlayer.setLoopMode(true);
     audioPlayer.play('assets/medias/call.mp3');
   }
 
   _stop() {
-    widget.videoChatMessageController.status = VideoChatStatus.end;
     audioPlayer.setLoopMode(true);
     audioPlayer.play('assets/medias/close.mp3');
   }
@@ -343,11 +341,14 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                 '${AppLocalizations.t('Send videoChat chatMessage')} ${chatMessage.messageId}');
       }
       _play();
+      widget.videoChatMessageController.status = VideoChatStatus.calling;
       //延时60秒后自动挂断
       Future.delayed(const Duration(seconds: 60)).then((value) {
+        //时间到了后，如果还是呼叫状态，则修改状态为结束
         if (widget.videoChatMessageController.status ==
             VideoChatStatus.calling) {
           _stop();
+          widget.videoChatMessageController.status = VideoChatStatus.end;
         }
       });
     } else {
@@ -396,6 +397,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         await widget.videoChatMessageController.exit();
       }
     }
+    widget.videoChatMessageController.status = VideoChatStatus.end;
   }
 
   Future<void> _onAction(int index, String name, {String? value}) async {
