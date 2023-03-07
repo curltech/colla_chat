@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:colla_chat/entity/chat/conference.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/video/video_view_card.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
@@ -196,14 +197,14 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
         valueListenable: videoViewCount,
         builder: (context, value, child) {
           if (remoteVideoRenderController == null) {
-            return const Center(
-                child: Text('No conference',
-                    style: TextStyle(color: Colors.white)));
+            return Center(
+                child: Text(AppLocalizations.t('No conference'),
+                    style: const TextStyle(color: Colors.white)));
           }
           if (value == 0) {
-            return const Center(
-                child: Text('Video view count is 0',
-                    style: TextStyle(color: Colors.white)));
+            return Center(
+                child: Text(AppLocalizations.t('No video view in current conference'),
+                    style: const TextStyle(color: Colors.white)));
           }
           return Container(
               padding: const EdgeInsets.all(0.0),

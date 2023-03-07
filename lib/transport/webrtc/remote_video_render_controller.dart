@@ -318,11 +318,16 @@ class VideoConferenceRenderPool with ChangeNotifier {
       if (videoRenders.isNotEmpty) {
         await remoteVideoRenderController.removeVideoRender(videoRenders);
         await remoteVideoRenderController.exit();
-        remoteVideoRenderControllers.remove(conferenceId);
       }
-    }
-    if (conferenceId == _conferenceId) {
-      this.conferenceId = null;
+      var videoChatMessageController =
+          remoteVideoRenderController.videoChatMessageController;
+      videoChatMessageController.setChatMessage(null);
+      videoChatMessageController.dispose();
+      remoteVideoRenderControllers.remove(conferenceId);
+      if (conferenceId == _conferenceId) {
+        _conferenceId = null;
+      }
+      notifyListeners();
     }
   }
 }
