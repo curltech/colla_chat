@@ -27,7 +27,12 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
   @override
   initState() {
     super.initState();
+    videoConferenceRenderPool.addListener(_update);
     _buildConferenceTileData();
+  }
+
+  _update() {
+    setState(() {});
   }
 
   _buildConferenceTileData() {
@@ -114,6 +119,7 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
 
   @override
   void dispose() {
+    videoConferenceRenderPool.removeListener(_update);
     super.dispose();
   }
 }

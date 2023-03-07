@@ -83,6 +83,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     localVideoRenderController.registerVideoRenderOperator(
         VideoRenderOperator.remove.name, _updateVideoRender);
     widget.videoChatMessageController.addListener(_updateVideoChatStatus);
+    videoChatStatus.value = widget.videoChatMessageController.status;
     widget.videoChatMessageController.registerReceiver(
         ChatMessageSubType.chatReceipt.name, _receivedChatReceipt);
     _update();
@@ -573,6 +574,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     localVideoRenderController.unregisterVideoRenderOperator(
         VideoRenderOperator.remove.name, _updateVideoRender);
     widget.videoChatMessageController.removeListener(_updateVideoChatStatus);
+    widget.videoChatMessageController.unregisterReceiver(
+        ChatMessageSubType.chatReceipt.name, _receivedChatReceipt);
     super.dispose();
   }
 }

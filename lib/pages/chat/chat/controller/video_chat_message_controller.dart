@@ -793,6 +793,7 @@ class VideoChatMessageController with ChangeNotifier {
     await videoConferenceRenderPool
         .closeConferenceId(_conference!.conferenceId);
     status = VideoChatStatus.end;
+    setChatMessage(null);
   }
 
   ///自己主动终止，发送terminate回执，关闭会议
@@ -802,6 +803,7 @@ class VideoChatMessageController with ChangeNotifier {
     await videoConferenceRenderPool
         .closeConferenceId(_conference!.conferenceId);
     status = VideoChatStatus.end;
+    setChatMessage(null);
   }
 
   @override
