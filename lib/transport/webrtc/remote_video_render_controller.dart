@@ -315,9 +315,11 @@ class VideoConferenceRenderPool with ChangeNotifier {
     if (remoteVideoRenderController != null) {
       var videoRenders =
           remoteVideoRenderController.videoRenders.values.toList();
-      await remoteVideoRenderController.removeVideoRender(videoRenders);
-      await remoteVideoRenderController.exit();
-      remoteVideoRenderControllers.remove(conferenceId);
+      if (videoRenders.isNotEmpty) {
+        await remoteVideoRenderController.removeVideoRender(videoRenders);
+        await remoteVideoRenderController.exit();
+        remoteVideoRenderControllers.remove(conferenceId);
+      }
     }
     if (conferenceId == _conferenceId) {
       _conferenceId = null;

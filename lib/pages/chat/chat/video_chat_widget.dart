@@ -119,12 +119,10 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
         Widget view = LocalVideoWidget(
             videoChatMessageController: videoChatMessageController);
         if (index == 1) {
-          view = Container();
           view = RemoteVideoWidget(
               videoChatMessageController: videoChatMessageController);
         }
         if (index == 2) {
-          view = Container();
           view = const VideoConferencePoolWidget();
         }
         return view;

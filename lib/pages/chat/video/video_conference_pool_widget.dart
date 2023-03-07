@@ -96,6 +96,9 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
     var conferenceView = ValueListenableBuilder(
         valueListenable: _conferenceTileData,
         builder: (context, value, child) {
+          if (value.isEmpty) {
+            return Text(AppLocalizations.t('No active conference in pool'));
+          }
           return DataListView(
             tileData: value,
           );

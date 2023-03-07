@@ -419,6 +419,7 @@ class VideoChatMessageController with ChangeNotifier {
         chatMessageController.current = _chatMessage;
         indexWidgetProvider.push('chat_message');
         indexWidgetProvider.push('video_chat');
+        return;
       }
     } else if (groupType == PartyType.group.name) {
       //立即接听
@@ -429,6 +430,7 @@ class VideoChatMessageController with ChangeNotifier {
         chatMessageController.current = _chatMessage;
         indexWidgetProvider.push('chat_message');
         indexWidgetProvider.push('video_chat');
+        return;
       }
     }
   }
@@ -797,7 +799,8 @@ class VideoChatMessageController with ChangeNotifier {
   ///如果会议发起人发出终止信号，收到的参与者都将退出，而且会议将不可再加入
   terminate() async {
     await _sendChatReceipt(MessageReceiptType.terminated);
-    await videoConferenceRenderPool.closeConferenceId(_conference!.conferenceId);
+    await videoConferenceRenderPool
+        .closeConferenceId(_conference!.conferenceId);
     status = VideoChatStatus.end;
   }
 

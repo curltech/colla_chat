@@ -215,8 +215,6 @@ class _IndexViewState extends State<IndexView>
           _stop();
           await videoChatMessageController!
               .sendChatReceipt(MessageReceiptType.accepted);
-          videoChatMessageController?.dispose();
-          videoChatMessageController = null;
         },
         child: const Icon(color: Colors.white, size: 16, Icons.call),
         backgroundColor: Colors.green);
@@ -268,9 +266,9 @@ class _IndexViewState extends State<IndexView>
                   videoChatMessageVisible.value = false;
                   await videoChatMessageController!
                       .sendChatReceipt(MessageReceiptType.ignored);
+                  videoChatMessageController?.dispose();
+                  videoChatMessageController = null;
                 }
-                videoChatMessageController?.dispose();
-                videoChatMessageController = null;
               });
             }
           }
