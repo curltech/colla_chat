@@ -145,7 +145,7 @@ class VideoRenderController with ChangeNotifier {
     }
   }
 
-  ///关闭videoRender，激活remove事件
+  ///关闭视频渲染器和流，设置里面的流Id为空，激活remove事件
   remove(PeerVideoRender videoRender) async {
     var streamId = videoRender.id;
     if (streamId != null && videoRenders.containsKey(streamId)) {
@@ -162,7 +162,7 @@ class VideoRenderController with ChangeNotifier {
     }
   }
 
-  ///关闭streamId的流，激活remove事件
+  ///关闭streamId的视频，激活remove事件
   close(String streamId) async {
     var videoRender = videoRenders[streamId];
     if (videoRender != null) {
@@ -170,7 +170,7 @@ class VideoRenderController with ChangeNotifier {
     }
   }
 
-  ///关闭关闭控制器所有的流，激活exit事件
+  ///关闭关闭控制器所有的视频，激活exit事件
   exit() async {
     for (var videoRender in videoRenders.values) {
       await videoRender.close();

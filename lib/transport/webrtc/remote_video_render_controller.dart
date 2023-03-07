@@ -54,39 +54,6 @@ class RemoteVideoRenderController extends VideoRenderController {
     }
   }
 
-  ///关闭streamId的流，激活remove事件，
-  @override
-  close(String streamId) {
-    super.close(streamId);
-    List<String> keys = videoRenderControllers.keys.toList();
-    for (var key in keys) {
-      var videoRenderController = videoRenderControllers[key];
-      if (videoRenderController != null) {
-        videoRenderController.close(streamId);
-        if (videoRenderController.videoRenders.isEmpty) {
-          videoRenderControllers.remove(key);
-        }
-      }
-    }
-  }
-
-  ///关闭会议，或者叫退出会议
-  ///关闭所有的流，激活exit事件
-  @override
-  exit() {
-    super.exit();
-    List<String> keys = videoRenderControllers.keys.toList();
-    for (var key in keys) {
-      var videoRenderController = videoRenderControllers[key];
-      if (videoRenderController != null) {
-        videoRenderController.exit();
-        if (videoRenderController.videoRenders.isEmpty) {
-          videoRenderControllers.remove(key);
-        }
-      }
-    }
-  }
-
   ///把本地新的videoRender加入到指定连接或者会议的所有连接中，并且都重新协商
   ///指定连接用在加入新的连接的时候，所有连接用在加入新的videoRender的时候
   addLocalVideoRender(List<PeerVideoRender> videoRenders,
@@ -202,6 +169,39 @@ class RemoteVideoRenderController extends VideoRenderController {
     MediaStream stream = webrtcEvent.data;
     String streamId = stream.id;
     close(streamId);
+  }
+
+  ///关闭streamId的流，激活remove事件，
+  @override
+  close(String streamId) async {
+    await super.close(streamId);
+    List<String> keys = videoRenderControllers.keys.toList();
+    for (var key in keys) {
+      var videoRenderController = videoRenderControllers[key];
+      if (videoRenderController != null) {
+        await videoRenderController.close(streamId);
+        if (videoRenderController.videoRenders.isEmpty) {
+          videoRenderControllers.remove(key);
+        }
+      }
+    }
+  }
+
+  ///关闭会议，或者叫退出会议
+  ///关闭所有的流，激活exit事件
+  @override
+  exit() async {
+    await super.exit();
+    List<String> keys = videoRenderControllers.keys.toList();
+    for (var key in keys) {
+      var videoRenderController = videoRenderControllers[key];
+      if (videoRenderController != null) {
+        await videoRenderController.exit();
+        if (videoRenderController.videoRenders.isEmpty) {
+          videoRenderControllers.remove(key);
+        }
+      }
+    }
   }
 }
 

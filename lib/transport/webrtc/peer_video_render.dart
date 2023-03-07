@@ -269,7 +269,7 @@ class PeerVideoRender {
     return null;
   }
 
-  ///关闭渲染器和流，关闭后里面的流为空
+  ///关闭视频渲染器和流，关闭后里面的流为空
   close() async {
     var mediaStream = this.mediaStream;
     if (mediaStream != null) {

@@ -55,7 +55,7 @@ class VideoChatMessageController with ChangeNotifier {
   //如果当前的群存在的话，房间的人在群的联系人中选择，否则在所有的联系人中选择
   Conference? _conference;
 
-  VideoChatStatus status = VideoChatStatus.end;
+  VideoChatStatus _status = VideoChatStatus.end;
 
   final Map<String, List<Function(ChatMessage chatMessage)>> _receivers = {};
 
@@ -120,6 +120,17 @@ class VideoChatMessageController with ChangeNotifier {
 
   String? get conferenceName {
     return _conference?.name;
+  }
+
+  VideoChatStatus get status {
+    return _status;
+  }
+
+  set status(VideoChatStatus status) {
+    if (_status != status) {
+      _status = status;
+      notifyListeners();
+    }
   }
 
   ///设置当前的视频邀请消息汇总，可以从chatMessageController中获取当前
@@ -501,7 +512,8 @@ class VideoChatMessageController with ChangeNotifier {
   ///在会议创建后，自动创建本地视频，如果存在则直接返回
   openLocalMainVideoRender() async {
     //如果本地主视频存在，直接返回
-    await localVideoRenderController.openLocalMainVideoRender(_conference!.video);
+    await localVideoRenderController
+        .openLocalMainVideoRender(_conference!.video);
   }
 
   ///在视频会议中增加本地视频到所有连接
@@ -610,20 +622,34 @@ class VideoChatMessageController with ChangeNotifier {
 
   ///对方只是表示收到，自己什么都不用做
   Future<void> _onReceived(
-      String peerId, String clientId, String messageId) async {}
+      String peerId, String clientId, String messageId) async {
+    if (status == VideoChatStatus.calling) {
+      status = VideoChatStatus.end;
+    }
+  }
 
   ///对方立即接受邀请，并且加入会议，自己也要立即加入
   Future<void> _onAccepted(
       String peerId, String clientId, String messageId) async {
+    if (status == VideoChatStatus.calling) {
+      status = VideoChatStatus.end;
+    }
     await _onJoin(peerId, clientId, messageId);
   }
 
   ///对方拒绝，自己什么都不用做
   Future<void> _onRejected(
-      String peerId, String clientId, String messageId) async {}
+      String peerId, String clientId, String messageId) async {
+    if (status == VideoChatStatus.calling) {
+      status = VideoChatStatus.end;
+    }
+  }
 
   ///对方终止，把对方移除会议
   _onTerminated(String peerId, String clientId, String messageId) {
+    if (status == VideoChatStatus.calling) {
+      status = VideoChatStatus.end;
+    }
     AdvancedPeerConnection? advancedPeerConnection = peerConnectionPool.getOne(
       peerId,
       clientId: clientId,
@@ -645,20 +671,33 @@ class VideoChatMessageController with ChangeNotifier {
   }
 
   ///对方占线，自己什么都不用做
-  Future<void> _onBusy(
-      String peerId, String clientId, String messageId) async {}
+  Future<void> _onBusy(String peerId, String clientId, String messageId) async {
+    if (status == VideoChatStatus.calling) {
+      status = VideoChatStatus.end;
+    }
+  }
 
   ///对方没响应，自己什么都不用做
   Future<void> _onIgnored(
-      String peerId, String clientId, String messageId) async {}
+      String peerId, String clientId, String messageId) async {
+    if (status == VideoChatStatus.calling) {
+      status = VideoChatStatus.end;
+    }
+  }
 
   ///对方保持，自己可以先加入，等待对方后续加入
   Future<void> _onHold(String peerId, String clientId, String messageId) async {
+    if (status == VideoChatStatus.calling) {
+      status = VideoChatStatus.end;
+    }
     await join();
   }
 
-  ///对方加入，自己也要配合把对方的连接加入本地流
+  ///对方加入，自己也要配合把对方的连接加入本地流，属于被动加入
   Future<void> _onJoin(String peerId, String clientId, String messageId) async {
+    if (status == VideoChatStatus.calling) {
+      status = VideoChatStatus.end;
+    }
     AdvancedPeerConnection? advancedPeerConnection = peerConnectionPool.getOne(
       peerId,
       clientId: clientId,
@@ -676,10 +715,14 @@ class VideoChatMessageController with ChangeNotifier {
           videoRenders.values.toList(),
           peerConnection: advancedPeerConnection);
     }
+    status = VideoChatStatus.chatting;
   }
 
   ///对方退出，自己也要配合把对方的连接退出
   Future<void> _onExit(String peerId, String clientId, String messageId) async {
+    if (status == VideoChatStatus.calling) {
+      status = VideoChatStatus.end;
+    }
     AdvancedPeerConnection? advancedPeerConnection = peerConnectionPool.getOne(
       peerId,
       clientId: clientId,
@@ -709,7 +752,7 @@ class VideoChatMessageController with ChangeNotifier {
     await joinConference();
   }
 
-  ///包含加本地视频和将会议的每个参与者加入会议中两步，自己主动加入
+  ///自己主动加入，包含加本地视频和将会议的每个参与者加入会议中两步，对会议的参与者的所以连接操作
   ///每一个新加入的会议是池中的当前会议
   joinConference() async {
     await openLocalMainVideoRender();
@@ -739,19 +782,22 @@ class VideoChatMessageController with ChangeNotifier {
         }
       }
     }
+    status = VideoChatStatus.chatting;
   }
 
-  ///包装的发送exit回执的方法，自己主动退出
+  ///自己主动退出会议，发送exit回执，关闭会议
   exit() async {
     await _sendChatReceipt(MessageReceiptType.exit);
-    videoConferenceRenderPool.closeConferenceId(_conference!.conferenceId);
+    await videoConferenceRenderPool
+        .closeConferenceId(_conference!.conferenceId);
     status = VideoChatStatus.end;
   }
 
-  ///包装的发送terminate回执的方法，自己主动终止
+  ///自己主动终止，发送terminate回执，关闭会议
+  ///如果会议发起人发出终止信号，收到的参与者都将退出，而且会议将不可再加入
   terminate() async {
     await _sendChatReceipt(MessageReceiptType.terminated);
-    videoConferenceRenderPool.closeConferenceId(_conference!.conferenceId);
+    await videoConferenceRenderPool.closeConferenceId(_conference!.conferenceId);
     status = VideoChatStatus.end;
   }
 

@@ -82,20 +82,24 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     // 本地视频可能在其他地方关闭，所有需要注册关闭事件
     localVideoRenderController.registerVideoRenderOperator(
         VideoRenderOperator.remove.name, _updateVideoRender);
-    videoChatStatus.value = widget.videoChatMessageController.status;
+    widget.videoChatMessageController.addListener(_updateVideoChatStatus);
     widget.videoChatMessageController.registerReceiver(
         ChatMessageSubType.chatReceipt.name, _receivedChatReceipt);
     _update();
   }
 
+  _updateVideoChatStatus() {
+    videoChatStatus.value = widget.videoChatMessageController.status;
+  }
+
   _play() {
-    videoChatStatus.value = VideoChatStatus.calling;
+    widget.videoChatMessageController.status = VideoChatStatus.calling;
     audioPlayer.setLoopMode(true);
     audioPlayer.play('assets/medias/call.mp3');
   }
 
   _stop() {
-    videoChatStatus.value = VideoChatStatus.end;
+    widget.videoChatMessageController.status = VideoChatStatus.end;
     audioPlayer.setLoopMode(true);
     audioPlayer.play('assets/medias/close.mp3');
   }
@@ -340,7 +344,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       _play();
       //延时60秒后自动挂断
       Future.delayed(const Duration(seconds: 60)).then((value) {
-        if (videoChatStatus.value != VideoChatStatus.end) {
+        if (widget.videoChatMessageController.status != VideoChatStatus.end) {
           _stop();
         }
       });
@@ -364,7 +368,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     await widget.videoChatMessageController.join();
   }
 
-  ///移除本地所有的视频
+  ///移除本地所有的视频，这时候还能看远程的视频
   _close() async {
     var videoRenders = localVideoRenderController.videoRenders.values.toList();
     Conference? conference = widget.videoChatMessageController.conference;
@@ -378,19 +382,18 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   ///如果正在呼叫calling，停止呼叫，关闭所有的本地视频，呼叫状态改为结束
   ///如果正在通话chatting，挂断视频通话，关闭所有的本地视频和远程视频，呼叫状态改为结束
-  ///结束会议
+  ///结束会议，这时候本地和远程的视频都应该被关闭
   _exit() async {
-    await _close();
-    if (videoChatStatus.value == VideoChatStatus.chatting) {
+    var status = widget.videoChatMessageController.status;
+    if (status == VideoChatStatus.calling) {
+      _stop();
+    } else if (status == VideoChatStatus.chatting) {
+      await _close();
       Conference? conference = widget.videoChatMessageController.conference;
-      if (conference != null &&
-          videoChatStatus.value == VideoChatStatus.chatting) {
-        await videoConferenceRenderPool
-            .closeConferenceId(conference.conferenceId);
+      if (conference != null) {
+        await widget.videoChatMessageController.exit();
       }
-      widget.videoChatMessageController.exit();
     }
-    _stop();
   }
 
   Future<void> _onAction(int index, String name, {String? value}) async {
@@ -569,6 +572,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   void dispose() {
     localVideoRenderController.unregisterVideoRenderOperator(
         VideoRenderOperator.remove.name, _updateVideoRender);
+    widget.videoChatMessageController.removeListener(_updateVideoChatStatus);
     super.dispose();
   }
 }
