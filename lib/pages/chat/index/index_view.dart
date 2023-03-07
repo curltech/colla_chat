@@ -215,6 +215,7 @@ class _IndexViewState extends State<IndexView>
           _stop();
           await videoChatMessageController!
               .sendChatReceipt(MessageReceiptType.accepted);
+          videoChatMessageController = null;
         },
         child: const Icon(color: Colors.white, size: 16, Icons.call),
         backgroundColor: Colors.green);
