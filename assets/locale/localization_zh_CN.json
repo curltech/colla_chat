@@ -288,5 +288,7 @@
   "Inviting you video chat ": "邀请你参加视频会议：",
   "Inviting you audio chat ": "邀请你参加音频会议：",
   "video chat invitation": "视频会议邀请",
-  "audio chat invitation": "音频会议邀请"
+  "audio chat invitation": "音频会议邀请",
+  "No conference": "当前无视频会议",
+  "No active conference in pool": "会议池中无活动视频会议"
 }
