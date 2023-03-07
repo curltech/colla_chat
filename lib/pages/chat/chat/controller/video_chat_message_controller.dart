@@ -634,7 +634,7 @@ class VideoChatMessageController with ChangeNotifier {
   Future<void> _onAccepted(
       String peerId, String clientId, String messageId) async {
     if (status == VideoChatStatus.calling) {
-      status = VideoChatStatus.end;
+      status = VideoChatStatus.chatting;
     }
     await _onJoin(peerId, clientId, messageId);
   }
