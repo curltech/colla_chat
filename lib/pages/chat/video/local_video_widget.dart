@@ -345,7 +345,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       _play();
       //延时60秒后自动挂断
       Future.delayed(const Duration(seconds: 60)).then((value) {
-        if (widget.videoChatMessageController.status != VideoChatStatus.end) {
+        if (widget.videoChatMessageController.status ==
+            VideoChatStatus.calling) {
           _stop();
         }
       });
