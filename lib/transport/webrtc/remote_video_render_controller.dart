@@ -70,10 +70,15 @@ class RemoteVideoRenderController extends VideoRenderController {
     if (!_peerConnections.containsKey(key)) {
       logger.e('PeerConnection of remove videoRender is not exist');
     }
-    List<MediaStream?> remoteStreams =
-        peerConnection.basePeerConnection.peerConnection!.getRemoteStreams();
+    RTCPeerConnection? pc = peerConnection.basePeerConnection.peerConnection;
+    if (pc == null) {
+      logger.e('RTCPeerConnection of remove videoRender is null');
+      return;
+    }
+    List<MediaStream?> remoteStreams = pc.getRemoteStreams();
     if (remoteStreams.isEmpty) {
-      logger.e('PeerConnection of add videoRender is no remote stream');
+      logger.e('PeerConnection of remove videoRender is no remote stream');
+      return;
     }
     for (var stream in remoteStreams) {
       if (stream == null) {
@@ -268,7 +273,8 @@ class VideoConferenceRenderPool with ChangeNotifier {
 
   Conference? getConference(String conferenceId) {
     return getRemoteVideoRenderController(conferenceId)
-        ?.videoChatMessageController.conference;
+        ?.videoChatMessageController
+        .conference;
   }
 
   ///创建新的远程视频会议控制器，假如会议号已经存在，直接返回控制器
