@@ -291,5 +291,6 @@
   "audio chat invitation": "音频会议邀请",
   "No conference": "当前无视频会议",
   "No video view in current conference": "当前视频会议无活动远程视频窗口",
-  "No active conference in pool": "会议池中无活动视频会议"
+  "No active conference in pool": "会议池中无活动视频会议",
+  "Join conference:": "加入会议："
 }

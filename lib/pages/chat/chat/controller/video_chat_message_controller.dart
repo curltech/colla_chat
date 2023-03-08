@@ -636,7 +636,7 @@ class VideoChatMessageController with ChangeNotifier {
     if (_status == VideoChatStatus.calling) {
       status = VideoChatStatus.chatting;
     }
-    await _onJoin(peerId, clientId, messageId);
+    await joinConference();
   }
 
   ///对方拒绝，自己什么都不用做
@@ -695,27 +695,11 @@ class VideoChatMessageController with ChangeNotifier {
     await join();
   }
 
-  ///对方加入，自己也要配合把对方的连接加入本地流，属于被动加入
+  ///对方加入，自己什么都不用做
   Future<void> _onJoin(String peerId, String clientId, String messageId) async {
-    AdvancedPeerConnection? advancedPeerConnection = peerConnectionPool.getOne(
-      peerId,
-      clientId: clientId,
-    );
-    //将发送者的连接加入远程会议控制器中，本地的视频render加入发送者的连接中
-    if (advancedPeerConnection != null) {
-      RemoteVideoRenderController remoteVideoRenderController =
-          videoConferenceRenderPool.createRemoteVideoRenderController(this);
-      remoteVideoRenderController
-          .addAdvancedPeerConnection(advancedPeerConnection);
-      //把本地视频加入连接中，然后重新协商
-      List<PeerVideoRender> videoRenders =
-          localVideoRenderController.getVideoRenders().values.toList();
-      if (videoRenders.isNotEmpty) {
-        // await remoteVideoRenderController.addLocalVideoRender(videoRenders,
-        //     peerConnection: advancedPeerConnection);
-      }
+    if (_status == VideoChatStatus.calling) {
+      status = VideoChatStatus.end;
     }
-    status = VideoChatStatus.chatting;
   }
 
   ///对方退出，自己也要配合把对方的连接退出
