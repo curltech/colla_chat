@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -273,8 +274,11 @@ class PeerVideoRender {
   close() async {
     var mediaStream = this.mediaStream;
     if (mediaStream != null) {
+      logger.i('dispose stream:${mediaStream.id} ${mediaStream.ownerTag}');
       try {
-        await mediaStream.dispose();
+        if (peerId == myself.peerId) {
+          await mediaStream.dispose();
+        }
       } catch (e) {
         logger.e('mediaStream.close failure:$e');
       }

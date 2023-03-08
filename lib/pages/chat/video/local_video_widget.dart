@@ -311,8 +311,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     }
 
     //检查当前的视频邀请消息是否存在
-    ChatMessage? chatMessage = widget.videoChatMessageController.chatMessage;
-    if (chatMessage == null) {
+    Conference? conference = widget.videoChatMessageController.conference;
+    if (conference == null) {
       await _invite();
     } else {
       await _join();

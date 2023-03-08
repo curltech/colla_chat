@@ -118,18 +118,20 @@ class RemoteVideoRenderController extends VideoRenderController {
     if (peerConnection != null) {
       for (var videoRender in videoRenders) {
         await peerConnection.removeRender(videoRender);
-        this.videoRenders.remove(videoRender.id);
-        await close(videoRender.id!);
       }
       await peerConnection.negotiate();
+      for (var videoRender in videoRenders) {
+        await close(videoRender.id!);
+      }
     } else {
       for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
         for (var videoRender in videoRenders) {
           await peerConnection.removeRender(videoRender);
-          this.videoRenders.remove(videoRender);
-          await close(videoRender.id!);
         }
         await peerConnection.negotiate();
+      }
+      for (var videoRender in videoRenders) {
+        await close(videoRender.id!);
       }
     }
   }

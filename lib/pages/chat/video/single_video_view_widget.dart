@@ -263,11 +263,14 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         break;
       case 'Close':
         if (widget.conference != null) {
+          //在会议中，所有的连接移除流，移除流渲染器
           String conferenceId = widget.conference!.conferenceId;
           await videoConferenceRenderPool
               .removeVideoRender(conferenceId, [widget.render]);
+        } else {
+          //不在会议中，直接关闭流
+          await widget.videoRenderController.close(widget.render.id!);
         }
-        await widget.videoRenderController.close(widget.render.id!);
         break;
       default:
         break;

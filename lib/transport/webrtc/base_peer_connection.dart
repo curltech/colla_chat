@@ -517,8 +517,8 @@ class BasePeerConnection {
   }
 
   onRenegotiationNeeded() {
-    //logger.w('onRenegotiationNeeded event');
-    //negotiate();
+    logger.w('onRenegotiationNeeded event');
+    negotiate();
   }
 
   //数据通道状态事件
@@ -961,10 +961,10 @@ class BasePeerConnection {
         logger.e('peer connection removeStream failure, $e');
       }
     }
-    var tracks = stream.getTracks();
-    for (var track in tracks) {
-      removeTrack(stream, track);
-    }
+    // var tracks = stream.getTracks();
+    // for (var track in tracks) {
+    //   removeTrack(stream, track);
+    // }
   }
 
   ///克隆远程流，可用于转发
