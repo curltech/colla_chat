@@ -383,7 +383,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     var videoRenders = localVideoRenderController.videoRenders.values.toList();
     Conference? conference = widget.videoChatMessageController.conference;
     if (conference != null) {
-      videoConferenceRenderPool.removeVideoRender(
+      await videoConferenceRenderPool.removeVideoRender(
           conference.conferenceId, videoRenders);
     }
     await localVideoRenderController.exit();
