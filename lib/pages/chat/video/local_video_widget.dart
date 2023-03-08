@@ -358,6 +358,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             content: AppLocalizations.t('Send videoChat chatMessage failure'));
       }
     }
+    _update();
   }
 
   Future<void> _join() async {
@@ -374,6 +375,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       DialogUtil.info(context,
           content: AppLocalizations.t('Join conference:') + conference.name);
     }
+    _update();
   }
 
   ///移除本地所有的视频，这时候还能看远程的视频
