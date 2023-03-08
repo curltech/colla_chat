@@ -145,12 +145,11 @@ class VideoRenderController with ChangeNotifier {
     }
   }
 
-  ///关闭视频渲染器和流，设置里面的流Id为空，激活remove事件
+  ///移除视频渲染器和流，激活remove事件
   remove(PeerVideoRender videoRender) async {
     var streamId = videoRender.id;
     if (streamId != null && videoRenders.containsKey(streamId)) {
       videoRenders.remove(streamId);
-      await videoRender.close();
       if (_currentVideoRender != null && _currentVideoRender!.id == streamId) {
         _currentVideoRender = null;
       }
@@ -162,20 +161,19 @@ class VideoRenderController with ChangeNotifier {
     }
   }
 
-  ///关闭streamId的视频，激活remove事件
-  close(String streamId) async {
-    var videoRender = videoRenders[streamId];
-    if (videoRender != null) {
-      await remove(videoRender);
-    }
+  ///关闭渲染器和流
+  close(PeerVideoRender videoRender) async {
+    await videoRender.close();
   }
 
-  ///关闭关闭控制器所有的视频，激活exit事件
+  ///移除并且关闭控制器所有的视频，激活exit事件
   exit() async {
-    for (var videoRender in videoRenders.values) {
+    //先移除，后关闭
+    this.videoRenders.clear();
+    var videoRenders = this.videoRenders.values.toList();
+    for (var videoRender in videoRenders) {
       await videoRender.close();
     }
-    videoRenders.clear();
     _currentVideoRender = null;
     _mainVideoRender = null;
     await onVideoRenderOperator(VideoRenderOperator.exit.name, null);
@@ -273,11 +271,11 @@ class LocalVideoRenderController extends VideoRenderController {
     }
   }
 
-  ///关闭本地特定的流，激活close或者remove事件
+  ///关闭本地特定的流
   @override
-  close(String streamId) async {
-    await super.close(streamId);
-    if (mainVideoRender != null && streamId == mainVideoRender!.id) {
+  close(PeerVideoRender videoRender) async {
+    await super.close(videoRender);
+    if (mainVideoRender != null && videoRender.id == mainVideoRender!.id) {
       mainVideoRender = null;
     }
   }

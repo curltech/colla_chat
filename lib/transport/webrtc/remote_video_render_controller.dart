@@ -62,7 +62,7 @@ class RemoteVideoRenderController extends VideoRenderController {
     }
   }
 
-  ///把连接的远程视频移除
+  ///移除连接的远程视频
   _removeVideoRender(AdvancedPeerConnection peerConnection) async {
     var peerId = peerConnection.peerId;
     var clientId = peerConnection.clientId;
@@ -120,18 +120,12 @@ class RemoteVideoRenderController extends VideoRenderController {
         await peerConnection.removeRender(videoRender);
       }
       await peerConnection.negotiate();
-      for (var videoRender in videoRenders) {
-        await close(videoRender.id!);
-      }
     } else {
       for (AdvancedPeerConnection peerConnection in _peerConnections.values) {
         for (var videoRender in videoRenders) {
           await peerConnection.removeRender(videoRender);
         }
         await peerConnection.negotiate();
-      }
-      for (var videoRender in videoRenders) {
-        await close(videoRender.id!);
       }
     }
   }
@@ -207,8 +201,11 @@ class RemoteVideoRenderController extends VideoRenderController {
   ///远程关闭流事件触发，激活remove事件
   Future<void> _onRemoveRemoteStream(WebrtcEvent webrtcEvent) async {
     MediaStream stream = webrtcEvent.data;
-    String streamId = stream.id;
-    await close(streamId);
+    PeerVideoRender? videoRender = videoRenders[stream.id];
+    if (videoRender != null) {
+      await remove(videoRender);
+      await close(videoRender);
+    }
   }
 }
 
@@ -271,8 +268,7 @@ class VideoConferenceRenderPool with ChangeNotifier {
 
   Conference? getConference(String conferenceId) {
     return getRemoteVideoRenderController(conferenceId)
-        ?.videoChatMessageController
-        ?.conference;
+        ?.videoChatMessageController.conference;
   }
 
   ///创建新的远程视频会议控制器，假如会议号已经存在，直接返回控制器

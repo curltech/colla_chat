@@ -183,7 +183,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         if (!localVideoRenderController.video) {
           await widget.videoChatMessageController
               .removeVideoRender(videoRender);
-          await localVideoRenderController.close(videoRender.id!);
+          await localVideoRenderController.close(videoRender);
           videoRender =
               await localVideoRenderController.createVideoMediaRender();
           await widget.videoChatMessageController
@@ -194,7 +194,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         if (localVideoRenderController.video) {
           await widget.videoChatMessageController
               .removeVideoRender(videoRender);
-          await localVideoRenderController.close(videoRender.id!);
+          await localVideoRenderController.close(videoRender);
           videoRender =
               await localVideoRenderController.createAudioMediaRender();
           await widget.videoChatMessageController
