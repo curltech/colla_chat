@@ -303,6 +303,22 @@ class AdvancedPeerConnection {
     }
   }
 
+  ///把渲染器的流克隆，然后可以当作本地流加入到其他连接中，用于转发
+  Future<MediaStream?> cloneRender(PeerVideoRender render) async {
+    logger.i('removeRender ${render.id}');
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return null;
+    }
+    var streamId = render.id;
+    if (streamId != null) {
+      if (render.mediaStream != null) {
+        return await basePeerConnection.cloneStream(render.mediaStream!);
+      }
+    }
+    return null;
+  }
+
   removeTrack(MediaStream stream, MediaStreamTrack track) async {
     await basePeerConnection.removeTrack(stream, track);
   }

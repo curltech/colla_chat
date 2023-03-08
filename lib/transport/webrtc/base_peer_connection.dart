@@ -906,7 +906,7 @@ class BasePeerConnection {
       List<MediaStream?> streams = peerConnection.getLocalStreams();
       if (streams.isNotEmpty) {
         for (var s in streams) {
-          if (s?.id == stream.id) {
+          if (s != null && s.id == stream.id) {
             logger.i('stream ${stream.id} is local');
             return true;
           }
@@ -933,8 +933,8 @@ class BasePeerConnection {
       List<MediaStream?> streams = peerConnection.getRemoteStreams();
       if (streams.isNotEmpty) {
         for (var s in streams) {
-          if (s?.id == stream.id) {
-            logger.i('stream ${stream.id} is local');
+          if (s != null && s.id == stream.id) {
+            logger.i('stream ${stream.id} is remote');
             return true;
           }
         }
@@ -965,6 +965,37 @@ class BasePeerConnection {
     for (var track in tracks) {
       removeTrack(stream, track);
     }
+  }
+
+  ///克隆远程流，可用于转发
+  Future<MediaStream?> cloneStream(MediaStream stream) async {
+    logger.i('removeStream stream:${stream.id} ${stream.ownerTag}');
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return null;
+    }
+    RTCPeerConnection? peerConnection = this.peerConnection;
+    if (peerConnection != null) {
+      try {
+        existRemote(stream);
+        try {
+          List<MediaStream?> streams = peerConnection.getRemoteStreams();
+          if (streams.isNotEmpty) {
+            for (var s in streams) {
+              if (s != null && s.id == stream.id) {
+                MediaStream cloneStream = await s.clone();
+                return cloneStream;
+              }
+            }
+          }
+        } catch (e) {
+          logger.e('peer connection getRemoteStreams failure, $e');
+        }
+      } catch (e) {
+        logger.e('peer connection stream clone failure, $e');
+      }
+    }
+    return null;
   }
 
   /// 主动从连接中移除一个轨道，然后会激活onRemoveTrack
