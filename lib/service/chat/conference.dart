@@ -58,11 +58,13 @@ class ConferenceService extends GeneralBaseService<Conference> {
 
   Future<List<Conference>> search(String key) async {
     var keyword = '%$key%';
-    if (StringUtil.isEmpty(key)) {
-      return await findAll();
+    var where = '1=1';
+    List<Object> whereArgs = [];
+    if (StringUtil.isNotEmpty(key)) {
+      where =
+          '$where and conferenceOwnerPeerId=? or name like ? or title like ?';
+      whereArgs.addAll([key, keyword, keyword]);
     }
-    var where = 'conferenceOwnerPeerId=? or name like ? or title like ?';
-    var whereArgs = [key, keyword, keyword];
     var conferences = await find(
       where: where,
       whereArgs: whereArgs,

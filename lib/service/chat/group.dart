@@ -173,12 +173,13 @@ class GroupService extends PeerPartyService<Group> {
 
   Future<List<Group>> search(String key) async {
     var keyword = '%$key%';
-    if (StringUtil.isEmpty(key)) {
-      return await findAll();
+    var where = '1=1';
+    List<Object> whereArgs = [];
+    if (StringUtil.isNotEmpty(key)) {
+      where =
+          '$where and peerId=? or mobile like ? or name like ? or myAlias like ? or email like ?';
+      whereArgs.addAll([key, keyword, keyword, keyword, keyword]);
     }
-    var where =
-        'peerId=? or mobile like ? or name like ? or myAlias like ? or email like ?';
-    var whereArgs = [key, keyword, keyword, keyword, keyword];
     var groups = await find(
       where: where,
       whereArgs: whereArgs,
