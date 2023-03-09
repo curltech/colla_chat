@@ -264,7 +264,7 @@
   "Volume increase": "扩大音量",
   "Qrcode scan": "二维码",
   "Websocket status was changed to:": "Websocket状态：",
-  "myself": "自己",
+  "myself": "我",
   "No current chatSummary": "没有当前消息汇总",
   "PeerConnection status was changed from ": "连接状态被改变，从",
   " to ": "变成",
@@ -292,5 +292,6 @@
   "No conference": "当前无视频会议",
   "No video view in current conference": "当前视频会议无活动远程视频窗口",
   "No active conference in pool": "会议池中无活动视频会议",
-  "Join conference:": "加入会议："
+  "Join conference:": "加入会议：",
+  "avatar": "头像"
 }
