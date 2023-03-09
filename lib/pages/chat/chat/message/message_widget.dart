@@ -269,7 +269,6 @@ class MessageWidget {
   }
 
   VideoChatMessage buildVideoChatMessageWidget(BuildContext context) {
-
     return VideoChatMessage(
       key: UniqueKey(),
       isMyself: isMyself,

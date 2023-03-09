@@ -156,19 +156,18 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
 
   Future<dynamic> _showActionCard(BuildContext context) {
     return SmartDialogUtil.popModalBottomSheet(context, builder: (context) {
-      return Center(
-          child: Card(
-              child: DataActionCard(
-                  onPressed: (int index, String label, {String? value}) {
-                    _onAction(context!, index, label, value: value);
-                  },
-                  showLabel: true,
-                  showTooltip: true,
-                  crossAxisCount: 4,
-                  actions: _buildVideoActionData(),
-                  // height: 120,
-                  //width: 320,
-                  size: 20)));
+      return Card(
+          child: DataActionCard(
+              onPressed: (int index, String label, {String? value}) {
+                _onAction(context!, index, label, value: value);
+              },
+              showLabel: true,
+              showTooltip: true,
+              crossAxisCount: 4,
+              actions: _buildVideoActionData(),
+              height: 120,
+              width: 320,
+              size: 20));
     });
   }
 

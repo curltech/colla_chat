@@ -206,6 +206,7 @@ class DataActionCard extends StatelessWidget {
       return _buildAction(context, actionData, index);
     });
     return Container(
+        alignment: Alignment.center,
         height: height,
         width: width,
         margin: const EdgeInsets.all(2.0),
