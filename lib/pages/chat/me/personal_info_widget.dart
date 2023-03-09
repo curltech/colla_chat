@@ -93,7 +93,10 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
             String label, {
             String? subtitle,
           }) async {
-            await _pickAvatar(peerId, context);
+            await _pickAvatar(
+              context,
+              peerId,
+            );
           }),
       TileData(
         title: 'PeerId',
@@ -135,7 +138,10 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
     return personalInfo;
   }
 
-  Future<void> _pickAvatar(String? peerId, BuildContext context) async {
+  Future<void> _pickAvatar(
+    BuildContext context,
+    String? peerId,
+  ) async {
     if (platformParams.desktop) {
       List<XFile> xfiles = await FileUtil.pickFiles(type: FileType.image);
       if (xfiles.isNotEmpty) {

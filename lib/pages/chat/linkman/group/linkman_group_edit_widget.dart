@@ -1,14 +1,20 @@
+import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -16,24 +22,29 @@ import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
+import 'package:cross_file/cross_file.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 final List<ColumnFieldDef> groupColumnFieldDefs = [
   ColumnFieldDef(
       name: 'peerId',
       label: 'PeerId',
       inputType: InputType.label,
-      prefixIcon: const Icon(Icons.perm_identity)),
+      prefixIcon: Icon(Icons.perm_identity, color: myself.primary)),
   ColumnFieldDef(
-      name: 'name', label: 'Name', prefixIcon: const Icon(Icons.person)),
+      name: 'name',
+      label: 'Name',
+      prefixIcon: Icon(Icons.person, color: myself.primary)),
   ColumnFieldDef(
       name: 'alias',
       label: 'Alias',
-      prefixIcon: const Icon(Icons.perm_identity)),
+      prefixIcon: Icon(Icons.person_pin_sharp, color: myself.primary)),
   ColumnFieldDef(
       name: 'myAlias',
       label: 'MyAlias',
-      prefixIcon: const Icon(Icons.person_pin)),
+      prefixIcon: Icon(Icons.person_pin, color: myself.primary)),
 ];
 
 ///创建和修改群，填写群的基本信息，选择群成员和群主
@@ -64,11 +75,11 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
   //选择的群成员
   ValueNotifier<List<String>> groupMembers = ValueNotifier([]);
 
-  //群主的选项
-  // ValueNotifier<List<Option<String>>> groupOwnerOptions = ValueNotifier([]);
-
   //当前群
   ValueNotifier<Group> group = ValueNotifier(Group('', ''));
+
+  //当前群的头像
+  ValueNotifier<String?> groupAvatar = ValueNotifier(null);
 
   @override
   initState() {
@@ -85,6 +96,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
     var current = groupController.current;
     if (current != null) {
       group.value = current;
+      groupAvatar.value = current.avatar;
     } else {
       group.value = Group('', '');
     }
@@ -184,6 +196,61 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
     return selector;
   }
 
+  Future<void> _pickAvatar(BuildContext context) async {
+    if (platformParams.desktop) {
+      List<XFile> xfiles = await FileUtil.pickFiles(type: FileType.image);
+      if (xfiles.isNotEmpty) {
+        List<int> avatar = await xfiles[0].readAsBytes();
+        group.value.avatar =
+            ImageUtil.base64Img(CryptoUtil.encodeBase64(avatar));
+        groupAvatar.value = group.value.avatar;
+      }
+    } else if (platformParams.mobile) {
+      List<AssetEntity>? assets = await AssetUtil.pickAssets(context);
+      if (assets != null && assets.isNotEmpty) {
+        List<int>? avatar = await assets[0].originBytes;
+        if (avatar != null) {
+          group.value.avatar =
+              ImageUtil.base64Img(CryptoUtil.encodeBase64(avatar));
+          groupAvatar.value = group.value.avatar;
+        }
+      }
+    }
+  }
+
+  Widget _buildAvatarWidget(BuildContext context) {
+    var avatarWidget = ValueListenableBuilder(
+        valueListenable: groupAvatar,
+        builder: (BuildContext context, String? groupAvatar, Widget? child) {
+          var avatar = group.value.avatar;
+          if (avatar != null && avatar.isNotEmpty) {
+            var avatarImage = ImageUtil.buildImageWidget(
+                image: avatar,
+                height: AppIconSize.mdSize,
+                width: AppIconSize.mdSize,
+                fit: BoxFit.contain);
+            group.value.avatarImage = avatarImage;
+          }
+          return Container(
+            padding:
+                const EdgeInsets.symmetric(vertical: 0.0, horizontal: 14.0),
+            child: ListTile(
+                leading: Icon(Icons.image, color: myself.primary),
+                title: Text(AppLocalizations.t('avatar')),
+                trailing: group.value.avatarImage,
+                minVerticalPadding: 0.0,
+                minLeadingWidth: 0.0,
+                onTap: () async {
+                  await _pickAvatar(
+                    context,
+                  );
+                }),
+          );
+        });
+
+    return avatarWidget;
+  }
+
   //群信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
     var formInputWidget = SingleChildScrollView(
@@ -202,7 +269,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
                       _onOk(values).then((group) {
                         if (group != null) {
                           DialogUtil.info(context,
-                              content: 'Group ${group!.name} is built');
+                              content: 'Group ${group.name} is built');
                         }
                       });
                     },
@@ -305,11 +372,15 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
       children: [
         _buildGroupMembersWidget(context),
         const SizedBox(
-          height: 5,
+          height: 1,
         ),
         _buildGroupOwnerWidget(context),
         const SizedBox(
-          height: 5,
+          height: 1,
+        ),
+        _buildAvatarWidget(context),
+        const SizedBox(
+          height: 1,
         ),
         Expanded(child: _buildFormInputWidget(context)),
       ],
