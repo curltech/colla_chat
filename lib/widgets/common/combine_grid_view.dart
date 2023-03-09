@@ -23,7 +23,7 @@ class CombineGridView extends StatelessWidget {
     this.maxCount,
     this.mainAxisSpacing = 0.0,
     this.crossAxisSpacing = 0.0,
-    this.mainAxisExtent = 32,
+    this.mainAxisExtent,
     this.childAspectRatio = 1,
   }) : super(key: key) {
     if (widgets.length <= 4) {

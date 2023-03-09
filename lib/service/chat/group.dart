@@ -64,7 +64,7 @@ class GroupService extends PeerPartyService<Group> {
           if (linkman.avatarImage != null) {
             widgets.add(linkman.avatarImage!);
           } else {
-            widgets.add(AppImage.mdAppImage);
+            widgets.add(AppImage.lgAppImage);
           }
         }
         group.avatarImage = CombineGridView(
@@ -189,7 +189,7 @@ class GroupService extends PeerPartyService<Group> {
     );
     if (groups.isNotEmpty) {
       for (var group in groups) {
-        setAvatar(group);
+        await setAvatar(group);
       }
     }
     return groups;
