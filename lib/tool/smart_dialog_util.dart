@@ -310,8 +310,7 @@ class SmartDialogUtil {
     );
   }
 
-  /// 底部弹出半屏对话框，内部调用Navigator.of(context).pop(result)关闭
-  /// result返回
+  /// 底部弹出半屏对话框，内部调用SmartDialog.dismiss()关闭
   static Future<T?> popModalBottomSheet<T>(BuildContext? context,
       {required Widget Function(BuildContext?) builder}) {
     return show(

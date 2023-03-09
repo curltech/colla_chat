@@ -2,7 +2,6 @@ import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
-import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 
@@ -13,10 +12,12 @@ class SingleVideoViewWidget extends StatefulWidget {
   final PeerVideoRender render;
   final double? height;
   final double? width;
+  final Function(PeerVideoRender render) onClosed;
 
   const SingleVideoViewWidget({
     Key? key,
     required this.videoRenderController,
+    required this.onClosed,
     this.conference,
     required this.render,
     this.height,
@@ -262,23 +263,15 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
         });
         break;
       case 'Close':
-        if (widget.conference != null) {
-          //在会议中，如果是本地流，先所有的连接中移除
-          String conferenceId = widget.conference!.conferenceId;
-          await videoConferenceRenderPool
-              .removeVideoRender(conferenceId, [widget.render]);
-        }
-        //无论是本地或者远程，是否在会议中
-        //移除流渲染器
-        await widget.videoRenderController.remove(widget.render);
-        //本地流需要关闭
-        if (widget.videoRenderController is LocalVideoRenderController) {
-          await widget.videoRenderController.close(widget.render);
-        }
+        await _close();
         break;
       default:
         break;
     }
+  }
+
+  Future<void> _close() async {
+    widget.onClosed(widget.render);
   }
 
   @override

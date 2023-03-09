@@ -4,6 +4,7 @@ import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/video/video_view_card.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -203,16 +204,39 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
           }
           if (value == 0) {
             return Center(
-                child: Text(AppLocalizations.t('No video view in current conference'),
+                child: Text(
+                    AppLocalizations.t('No video view in current conference'),
                     style: const TextStyle(color: Colors.white)));
           }
           return Container(
               padding: const EdgeInsets.all(0.0),
               child: VideoViewCard(
                 videoRenderController: remoteVideoRenderController!,
+                onClosed: _onClosedVideoRender,
                 conference: widget.videoChatMessageController.conference,
               ));
         });
+  }
+
+  Future<void> _onClosedVideoRender(PeerVideoRender videoRender) async {
+    if (widget.videoChatMessageController.conference != null) {
+      //在会议中，如果是本地流，先所有的连接中移除
+      String conferenceId =
+          widget.videoChatMessageController.conference!.conferenceId;
+      RemoteVideoRenderController? remoteVideoRenderController =
+          videoConferenceRenderPool
+              .getRemoteVideoRenderController(conferenceId);
+      if (remoteVideoRenderController != null) {
+        await remoteVideoRenderController.removeVideoRender([videoRender]);
+        await remoteVideoRenderController.remove(videoRender);
+        //对于远程流，能不能关闭？
+        await remoteVideoRenderController.close(videoRender);
+      } else {
+        logger.e('RemoteVideoRenderController is null');
+      }
+    } else {
+      logger.e('No in conference');
+    }
   }
 
   @override

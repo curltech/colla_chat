@@ -8,9 +8,13 @@ import 'package:flutter/material.dart';
 class VideoViewCard extends StatefulWidget {
   final VideoRenderController videoRenderController;
   final Conference? conference;
+  final Function(PeerVideoRender render) onClosed;
 
   const VideoViewCard(
-      {Key? key, required this.videoRenderController, this.conference})
+      {Key? key,
+      required this.videoRenderController,
+      required this.onClosed,
+      this.conference})
       : super(key: key);
 
   @override
@@ -41,6 +45,7 @@ class _VideoViewCardState extends State<VideoViewCard> {
     for (var render in videoRenders) {
       Widget videoView = SingleVideoViewWidget(
         videoRenderController: widget.videoRenderController,
+        onClosed: widget.onClosed,
         conference: widget.conference,
         render: render,
         // width: size.width,

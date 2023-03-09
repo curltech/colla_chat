@@ -550,6 +550,18 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         });
   }
 
+  Future<void> _onClosedVideoRender(PeerVideoRender videoRender) async {
+    localVideoRenderController.remove(videoRender);
+    if (widget.videoChatMessageController.conference != null) {
+      //在会议中，如果是本地流，先所有的连接中移除
+      String conferenceId =
+          widget.videoChatMessageController.conference!.conferenceId;
+      await videoConferenceRenderPool
+          .removeVideoRender(conferenceId, [videoRender]);
+    }
+    localVideoRenderController.close(videoRender);
+  }
+
   @override
   Widget build(BuildContext context) {
     var videoViewCard = GestureDetector(
@@ -559,6 +571,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             if (value > 0) {
               return VideoViewCard(
                 videoRenderController: localVideoRenderController,
+                onClosed: _onClosedVideoRender,
                 conference: widget.videoChatMessageController.conference,
               );
             } else {
