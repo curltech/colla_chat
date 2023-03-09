@@ -1,5 +1,7 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -29,7 +31,6 @@ class SingleVideoViewWidget extends StatefulWidget {
 }
 
 class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
-  bool actionVisible = false;
   bool enableFullScreen = false;
   bool enableMute = false;
   bool enableSpeaker = false;
@@ -41,10 +42,18 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
   @override
   initState() {
     super.initState();
+    widget.videoRenderController.registerVideoRenderOperator(
+        VideoRenderOperator.selected.name, _updateSelected);
+    widget.videoRenderController.registerVideoRenderOperator(
+        VideoRenderOperator.unselected.name, _updateSelected);
   }
 
-  _update() {
-    setState(() {});
+  Future<void> _updateSelected(PeerVideoRender? videoRender) async {
+    if (widget.render.id != null &&
+        videoRender != null &&
+        videoRender.id == widget.render.id) {
+      setState(() {});
+    }
   }
 
   OverlayEntry _buildPopupDialog() {
@@ -55,19 +64,21 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
     );
   }
 
-  Widget _buildAppBar() {
-    return _buildActionCard(context);
-  }
-
   Widget _buildPopupVideoView() {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    Widget videoView = Stack(children: [
-      widget.render.createVideoView(height: height, width: width),
-      _buildAppBar(),
-    ]);
+    Widget videoView =
+        widget.render.createVideoView(height: height, width: width);
+    Widget singleVideoView = Builder(
+      builder: (context) => InkWell(
+        onLongPress: () async {
+          await _showActionCard(context);
+        },
+        child: videoView,
+      ),
+    );
 
-    return videoView;
+    return singleVideoView;
   }
 
   List<ActionData> _buildVideoActionData() {
@@ -143,38 +154,42 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
     return videoActionData;
   }
 
-  Widget _buildActionCard(BuildContext context) {
-    return Visibility(
-        visible: actionVisible,
-        child: Center(
-            child: Card(
-                child: DataActionCard(
-                    onPressed: (int index, String label, {String? value}) {
-                      _onAction(context, index, label, value: value);
-                    },
-                    showLabel: false,
-                    showTooltip: false,
-                    crossAxisCount: 4,
-                    actions: _buildVideoActionData(),
-                    // height: 120,
-                    //width: 320,
-                    size: 20))));
+  Future<dynamic> _showActionCard(BuildContext context) {
+    return SmartDialogUtil.popModalBottomSheet(context, builder: (context) {
+      return Center(
+          child: Card(
+              child: DataActionCard(
+                  onPressed: (int index, String label, {String? value}) {
+                    _onAction(context!, index, label, value: value);
+                  },
+                  showLabel: true,
+                  showTooltip: true,
+                  crossAxisCount: 4,
+                  actions: _buildVideoActionData(),
+                  // height: 120,
+                  //width: 320,
+                  size: 20)));
+    });
   }
 
   ///单个视频窗口
   Widget _buildSingleVideoView(
       BuildContext context, double? height, double? width) {
     String name = widget.render.name ?? '';
-    Widget actionWidget = _buildActionCard(context);
     Widget videoView =
         widget.render.createVideoView(height: height, width: width);
     Widget singleVideoView = Builder(
       builder: (context) => InkWell(
-        onTap: () {
+        onTap: () async {
           setState(() {
-            actionVisible = !actionVisible;
             widget.videoRenderController.currentVideoRender = widget.render;
           });
+        },
+        onLongPress: () async {
+          setState(() {
+            widget.videoRenderController.currentVideoRender = widget.render;
+          });
+          await _showActionCard(context);
         },
         child: videoView,
       ),
@@ -185,10 +200,9 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
       selected = widget.render.id ==
           widget.videoRenderController.currentVideoRender!.id;
     }
-    var primary = myself.primary;
     return Container(
       decoration: selected
-          ? BoxDecoration(border: Border.all(width: 1, color: Colors.yellow))
+          ? BoxDecoration(border: Border.all(width: 1, color: myself.primary))
           : null,
       padding: const EdgeInsets.symmetric(horizontal: 0.0),
       child: Stack(
@@ -199,9 +213,9 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
                   const EdgeInsets.symmetric(horizontal: 5.0, vertical: 5.0),
               child: Text(
                 name,
-                style: const TextStyle(color: Colors.white, fontSize: 16),
+                style: const TextStyle(
+                    color: Colors.white, fontSize: AppFontSize.xsFontSize),
               )),
-          actionWidget,
         ],
       ),
     );
@@ -281,6 +295,10 @@ class _SingleVideoViewWidgetState extends State<SingleVideoViewWidget> {
 
   @override
   void dispose() {
+    widget.videoRenderController.unregisterVideoRenderOperator(
+        VideoRenderOperator.selected.name, _updateSelected);
+    widget.videoRenderController.unregisterVideoRenderOperator(
+        VideoRenderOperator.unselected.name, _updateSelected);
     super.dispose();
   }
 }

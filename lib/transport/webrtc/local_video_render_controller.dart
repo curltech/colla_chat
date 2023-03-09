@@ -93,7 +93,11 @@ class VideoRenderController with ChangeNotifier {
 
   set currentVideoRender(PeerVideoRender? currentVideoRender) {
     if (_currentVideoRender != currentVideoRender) {
+      onVideoRenderOperator(
+          VideoRenderOperator.unselected.name, _currentVideoRender);
       _currentVideoRender = currentVideoRender;
+      onVideoRenderOperator(
+          VideoRenderOperator.selected.name, _currentVideoRender);
     }
   }
 

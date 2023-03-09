@@ -45,6 +45,16 @@ class AppIconSize {
   static const maxSize = 64.0;
 }
 
+class AppFontSize {
+  static const double maxFontSize = 22.0;
+  static const double xlFontSize = 20.0;
+  static const double lgFontSize = 18.0;
+  static const double mdFontSize = 16.0;
+  static const double smFontSize = 14.0;
+  static const double xsFontSize = 12.0;
+  static const double minFontSize = 10.0;
+}
+
 class AppImageFile {
   static const xsAppIconFile = 'assets/images/app.png';
   static const mdAppIconFile = 'assets/images/app.png';

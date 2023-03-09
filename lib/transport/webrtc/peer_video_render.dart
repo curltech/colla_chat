@@ -13,7 +13,17 @@ final emptyVideoView = Center(
   child: AppImage.mdAppImage,
 );
 
-enum VideoRenderOperator { create, add, remove, exit, mute, volume, torch }
+enum VideoRenderOperator {
+  create,
+  add,
+  remove,
+  unselected,
+  selected,
+  exit,
+  mute,
+  volume,
+  torch
+}
 
 /// 简单包装webrtc视频流的渲染器，可以构造本地视频流或者传入的视频流
 /// 视频流绑定渲染器，并创建展示视图
