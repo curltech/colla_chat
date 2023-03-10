@@ -2,8 +2,8 @@ import 'dart:io';
 
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webclient.dart';
-import 'package:dio/adapter.dart';
 import 'package:dio/dio.dart';
+import 'package:dio/io.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 
 import '../pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
@@ -15,7 +15,7 @@ class DioHttpClient implements IWebClient {
   DioHttpClient(String address) {
     if (address.startsWith('http')) {
       ///获取dio中的httpclient，处理证书问题
-      (_client.httpClientAdapter as DefaultHttpClientAdapter)
+      (_client.httpClientAdapter as IOHttpClientAdapter)
           .onHttpClientCreate = (HttpClient client) {
         client.badCertificateCallback =
             (X509Certificate cert, String host, int port) => true;
@@ -24,8 +24,8 @@ class DioHttpClient implements IWebClient {
       };
       // Set default configs
       _client.options.baseUrl = address;
-      _client.options.connectTimeout = 5000; //5s
-      _client.options.receiveTimeout = 1800000;
+      _client.options.connectTimeout = const Duration(seconds: 5); //5s
+      _client.options.receiveTimeout = const Duration(seconds: 1800);
       var token = '';
       var headers = {'Authorization': 'Bearer $token'};
       _client.options.headers = headers;
