@@ -145,7 +145,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
 
   _buildLinkmanSearchTextField(BuildContext context) {
     var searchTextField = Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        padding: const EdgeInsets.all(10.0),
         child: TextFormField(
             autofocus: true,
             controller: _linkmanTextController,
