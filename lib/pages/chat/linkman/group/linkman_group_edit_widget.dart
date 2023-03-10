@@ -153,7 +153,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
         builder:
             (BuildContext context, List<String> groupMembers, Widget? child) {
           return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(horizontal: 0.0),
               child: LinkmanGroupSearchWidget(
                 selectType: SelectType.dataListMultiSelectField,
                 onSelected: (List<String>? selected) async {
@@ -173,7 +173,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
   //群主选择界面
   Widget _buildGroupOwnerWidget(BuildContext context) {
     var selector = Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20.0),
+        padding: const EdgeInsets.symmetric(horizontal: 0.0),
         child: CustomSingleSelectField(
             title: 'GroupOwnerPeer',
             onChanged: (selected) {
@@ -232,8 +232,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
             group.value.avatarImage = avatarImage;
           }
           return Container(
-            padding:
-                const EdgeInsets.symmetric(vertical: 0.0, horizontal: 14.0),
+            padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 0.0),
             child: ListTile(
                 leading: Icon(Icons.image, color: myself.primary),
                 title: Text(AppLocalizations.t('avatar')),
@@ -253,30 +252,43 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
 
   //群信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
-    var formInputWidget = SingleChildScrollView(
-        child: Container(
-            padding: const EdgeInsets.all(15.0),
-            child: ValueListenableBuilder(
-                valueListenable: group,
-                builder: (BuildContext context, Group? group, Widget? child) {
-                  Map<String, dynamic>? initValues = {};
-                  if (group != null) {
-                    initValues = groupController
-                        .getInitValue(groupColumnFieldDefs, entity: group);
-                  }
-                  return FormInputWidget(
-                    onOk: (Map<String, dynamic> values) {
-                      _onOk(values).then((group) {
-                        if (group != null) {
-                          DialogUtil.info(context,
-                              content: 'Group ${group.name} is built');
-                        }
-                      });
-                    },
-                    columnFieldDefs: groupColumnFieldDefs,
-                    initValues: initValues,
-                  );
-                })));
+    Widget head = Column(
+      children: [
+        _buildGroupMembersWidget(context),
+        const SizedBox(
+          height: 1,
+        ),
+        _buildGroupOwnerWidget(context),
+        const SizedBox(
+          height: 1,
+        ),
+        _buildAvatarWidget(context),
+      ],
+    );
+    var formInputWidget = Container(
+        padding: const EdgeInsets.all(15.0),
+        child: ValueListenableBuilder(
+            valueListenable: group,
+            builder: (BuildContext context, Group? group, Widget? child) {
+              Map<String, dynamic>? initValues = {};
+              if (group != null) {
+                initValues = groupController.getInitValue(groupColumnFieldDefs,
+                    entity: group);
+              }
+              return FormInputWidget(
+                onOk: (Map<String, dynamic> values) {
+                  _onOk(values).then((group) {
+                    if (group != null) {
+                      DialogUtil.info(context,
+                          content: 'Group ${group.name} is built');
+                    }
+                  });
+                },
+                columnFieldDefs: groupColumnFieldDefs,
+                initValues: initValues,
+                head: head,
+              );
+            }));
 
     return formInputWidget;
   }
@@ -367,32 +379,12 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
     return current;
   }
 
-  Widget _buildGroupEdit(BuildContext context) {
-    return Column(
-      children: [
-        _buildGroupMembersWidget(context),
-        const SizedBox(
-          height: 1,
-        ),
-        _buildGroupOwnerWidget(context),
-        const SizedBox(
-          height: 1,
-        ),
-        _buildAvatarWidget(context),
-        const SizedBox(
-          height: 1,
-        ),
-        Expanded(child: _buildFormInputWidget(context)),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
         title: widget.title,
         withLeading: widget.withLeading,
-        child: _buildGroupEdit(context));
+        child: _buildFormInputWidget(context));
     return appBarView;
   }
 

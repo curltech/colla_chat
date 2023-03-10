@@ -191,7 +191,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
         builder: (BuildContext context, List<String> conferenceMembers,
             Widget? child) {
           return Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              padding: const EdgeInsets.symmetric(horizontal: 0.0),
               child: LinkmanGroupSearchWidget(
                 selectType: SelectType.dataListMultiSelectField,
                 onSelected: (List<String>? selected) async {
@@ -216,7 +216,7 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
         //     builder: (BuildContext context, List<Option> option, Widget? child) {
         //       return
         Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 0.0),
             child: CustomSingleSelectField(
                 title: 'ConferenceOwnerPeer',
                 onChanged: (selected) {
@@ -229,32 +229,39 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
 
   //会议信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
-    var formInputWidget =  Container(
-            padding: const EdgeInsets.all(15.0),
-            child: ValueListenableBuilder(
-                valueListenable: conference,
-                builder: (BuildContext context, Conference? conference,
-                    Widget? child) {
-                  Map<String, dynamic>? initValues = {};
-                  if (conference != null) {
-                    initValues = conferenceController.getInitValue(
-                        conferenceColumnFieldDefs,
-                        entity: conference);
-                  }
-                  return FormInputWidget(
-                    onOk: (Map<String, dynamic> values) {
-                      _onOk(values).then((conference) {
-                        if (conference != null) {
-                          DialogUtil.info(context,
-                              content: AppLocalizations.t('Built conference ') +
-                                  conference.name);
-                        }
-                      });
-                    },
-                    columnFieldDefs: conferenceColumnFieldDefs,
-                    initValues: initValues,
-                  );
-                }));
+    var head = Column(
+      children: [
+        _buildConferenceMembersWidget(context),
+        _buildConferenceOwnerWidget(context),
+      ],
+    );
+    var formInputWidget = Container(
+        padding: const EdgeInsets.all(15.0),
+        child: ValueListenableBuilder(
+            valueListenable: conference,
+            builder:
+                (BuildContext context, Conference? conference, Widget? child) {
+              Map<String, dynamic>? initValues = {};
+              if (conference != null) {
+                initValues = conferenceController.getInitValue(
+                    conferenceColumnFieldDefs,
+                    entity: conference);
+              }
+              return FormInputWidget(
+                onOk: (Map<String, dynamic> values) {
+                  _onOk(values).then((conference) {
+                    if (conference != null) {
+                      DialogUtil.info(context,
+                          content: AppLocalizations.t('Built conference ') +
+                              conference.name);
+                    }
+                  });
+                },
+                columnFieldDefs: conferenceColumnFieldDefs,
+                initValues: initValues,
+                head: head,
+              );
+            }));
 
     return formInputWidget;
   }
@@ -355,28 +362,12 @@ class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
     return current;
   }
 
-  Widget _buildConferenceEdit(BuildContext context) {
-    return Column(
-      children: [
-        _buildConferenceMembersWidget(context),
-        // const SizedBox(
-        //   height: 5,
-        // ),
-        _buildConferenceOwnerWidget(context),
-        // const SizedBox(
-        //   height: 5,
-        // ),
-        Expanded(child: _buildFormInputWidget(context)),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
         title: widget.title,
         withLeading: widget.withLeading,
-        child: _buildConferenceEdit(context));
+        child: _buildFormInputWidget(context));
     return appBarView;
   }
 

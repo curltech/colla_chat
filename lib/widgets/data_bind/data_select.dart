@@ -646,7 +646,9 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
       selectView = _buildChipView(context);
     }
     List<Widget> children = <Widget>[];
-    children.add(Expanded(child: SingleChildScrollView(child: selectView)));
+    children.add(Expanded(
+        child: SingleChildScrollView(
+            controller: ScrollController(), child: selectView)));
     ButtonStyle style = WidgetUtil.buildButtonStyle();
     ButtonStyle mainStyle = WidgetUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);
@@ -804,6 +806,7 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
                 child: SizedBox(
                     height: 180,
                     child: SingleChildScrollView(
+                        controller: ScrollController(),
                         child: _buildSelectedChips(context))));
           }),
     ]);

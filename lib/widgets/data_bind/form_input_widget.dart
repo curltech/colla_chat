@@ -128,20 +128,24 @@ class FormInputWidget extends StatelessWidget {
   final MainAxisAlignment mainAxisAlignment;
   final double spacing;
   final double buttonSpacing;
+  final Widget? head;
+  final Widget? tail;
 
-  FormInputWidget(
-      {Key? key,
-      required List<ColumnFieldDef> columnFieldDefs,
-      this.initValues,
-      this.onOk,
-      this.okLabel = 'Ok',
-      this.resetLabel = 'Reset',
-      this.minHeight = 0.0,
-      this.maxHeight = 300.0,
-      this.mainAxisAlignment = MainAxisAlignment.start,
-      this.spacing = 0.0,
-      this.buttonSpacing = 0.0})
-      : super(key: key) {
+  FormInputWidget({
+    Key? key,
+    required List<ColumnFieldDef> columnFieldDefs,
+    this.initValues,
+    this.onOk,
+    this.okLabel = 'Ok',
+    this.resetLabel = 'Reset',
+    this.minHeight = 0.0,
+    this.maxHeight = 440,
+    this.mainAxisAlignment = MainAxisAlignment.start,
+    this.spacing = 0.0,
+    this.buttonSpacing = 10.0,
+    this.head,
+    this.tail,
+  }) : super(key: key) {
     controller = FormInputController(columnFieldDefs);
     if (initValues != null) {
       var state = initValues!['state'];
@@ -153,13 +157,17 @@ class FormInputWidget extends StatelessWidget {
 
   List<Widget> _buildFormViews(BuildContext context) {
     Map<String, List<Widget>> viewMap = {};
-    for (var columnFieldDef in controller.columnFieldDefs) {
+    for (var i = 0; i < controller.columnFieldDefs.length; i++) {
+      ColumnFieldDef columnFieldDef = controller.columnFieldDefs[i];
       String? groupName = columnFieldDef.groupName;
       groupName = groupName ?? '';
       List<Widget>? children = viewMap[groupName];
       if (children == null) {
         children = <Widget>[];
         viewMap[groupName] = children;
+      }
+      if (i == 0 && head != null) {
+        children.add(head!);
       }
       children.add(SizedBox(
         height: spacing,
@@ -180,14 +188,19 @@ class FormInputWidget extends StatelessWidget {
         controller: columnFieldController,
       );
       children.add(columnFieldWidget);
+      if (i == controller.columnFieldDefs.length - 1 && tail != null) {
+        children.add(tail!);
+      }
     }
     List<Widget> views = <Widget>[];
     for (var groupName in viewMap.keys) {
       List<Widget>? children = viewMap[groupName];
-      var view = Column(
-          mainAxisAlignment: mainAxisAlignment,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: children!);
+      var view = SingleChildScrollView(
+          controller: ScrollController(),
+          child: Column(
+              mainAxisAlignment: mainAxisAlignment,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: children!));
       views.add(view);
     }
     return views;
@@ -232,20 +245,25 @@ class FormInputWidget extends StatelessWidget {
             itemCount: views.length,
             index: 0,
             itemBuilder: (BuildContext context, int index) {
-              return Center(child: views[index]);
+              return views[index];
             },
             onIndexChanged: (int index) {
               logger.i('changed to index $index');
             },
-            pagination: SwiperPagination(
-                builder: DotSwiperPaginationBuilder(
-              activeColor: myself.primary,
-              color: Colors.white,
-              activeSize: 15,
-            )),
+            // pagination: SwiperPagination(
+            //     builder: DotSwiperPaginationBuilder(
+            //   activeColor: myself.primary,
+            //   color: Colors.white,
+            //   activeSize: 15,
+            // )),
           ));
     } else if (views.length == 1) {
-      return views[0];
+      return ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: minHeight, //最小高度
+            maxHeight: maxHeight,
+          ), //最大高度
+          child: views[0]);
     } else {
       return Container();
     }
