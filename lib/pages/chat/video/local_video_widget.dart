@@ -284,9 +284,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       }
       participants.add(peerId);
     }
-    if (!participants.contains(myself.peerId!)) {
-      participants.add(myself.peerId!);
-    }
 
     return participants;
   }
@@ -322,6 +319,16 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///选择会议参与者，发送会议邀请消息
   Future<void> _invite() async {
     List<String> participants = await _selectParticipants();
+    if (!participants.contains(myself.peerId!)) {
+      participants.add(myself.peerId!);
+    }
+    if (participants.length < 2) {
+      if (mounted) {
+        DialogUtil.error(context,
+            content: AppLocalizations.t('Please select participants'));
+      }
+      return;
+    }
     await widget.videoChatMessageController
         .buildConference(participants: participants);
     Conference? conference = widget.videoChatMessageController.conference;

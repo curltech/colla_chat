@@ -59,7 +59,7 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
             subtitle: topic,
             selected: videoConferenceRenderPool.conferenceId == conferenceId,
             isThreeLine: false,
-            routeName: 'conference_edit');
+            routeName: 'conference_show');
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(
             title: 'Delete',

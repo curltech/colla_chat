@@ -337,11 +337,11 @@ class VideoChatMessageController with ChangeNotifier {
       _conference!.groupName = name;
       _conference!.groupType = partyType;
     }
-    if (_conference != null) {
-      if (partyType == PartyType.group.name) {
-        await conferenceService.store(_conference!);
-      }
-    }
+    // if (_conference != null) {
+    //   if (partyType == PartyType.group.name) {
+    //     await conferenceService.store(_conference!);
+    //   }
+    // }
   }
 
   ///1.发送视频通邀请话消息,此时消息必须有content,包含conference信息
@@ -476,7 +476,7 @@ class VideoChatMessageController with ChangeNotifier {
     //首先检查接收人是否已经存在给自己的回执，不存在或者存在是accepted则发送回执
     //如果存在，如果是rejected或者terminated，则不发送回执
     //创建回执消息
-    await conferenceService.store(_conference!);
+    //await conferenceService.store(_conference!);
     List<ChatMessage> chatReceipts = await chatMessageService
         .buildGroupChatReceipt(chatMessage, receiptType);
     if (chatReceipts.isNotEmpty) {

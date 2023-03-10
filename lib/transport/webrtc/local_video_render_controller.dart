@@ -173,8 +173,8 @@ class VideoRenderController with ChangeNotifier {
   ///移除并且关闭控制器所有的视频，激活exit事件
   exit() async {
     //先移除，后关闭
-    this.videoRenders.clear();
     var videoRenders = this.videoRenders.values.toList();
+    this.videoRenders.clear();
     for (var videoRender in videoRenders) {
       await videoRender.close();
     }

@@ -434,7 +434,7 @@ enum SelectType {
 class CustomMultiSelect extends StatefulWidget {
   final OptionController optionController;
   final Future<List<Option<String>>> Function(String keyword)? onSearch;
-  final Function(List<String>? selected) onConfirm;
+  final Function(List<String> selected) onConfirm;
   final String? title;
   final SelectType selectType;
 
@@ -474,6 +474,8 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
       List<Option<String>> options =
           await widget.onSearch!(textController.text);
       widget.optionController.options = options;
+    } else {
+      _update();
     }
   }
 
@@ -657,7 +659,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
         TextButton(
             style: style,
             onPressed: () {
-              widget.onConfirm(null);
+              widget.onConfirm([]);
             },
             child: Text(AppLocalizations.t('Cancel'))),
         TextButton(

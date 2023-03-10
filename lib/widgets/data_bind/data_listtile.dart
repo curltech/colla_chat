@@ -170,6 +170,30 @@ class DataListTile extends StatelessWidget {
           child: Row(
               mainAxisAlignment: MainAxisAlignment.end, children: trailing));
     }
+    Widget titleWidget = Text(
+      AppLocalizations.t(tileData.title),
+      style: tileData.dense
+          ? const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)
+          : null,
+      // softWrap: true,
+      // overflow: TextOverflow.ellipsis,
+    );
+    if (tileData.titleTail != null) {
+      titleWidget = Row(children: [
+        Expanded(child: titleWidget),
+        const Spacer(),
+        Text(
+          AppLocalizations.t(tileData.titleTail ?? ''),
+          style: tileData.dense
+              ? const TextStyle(
+                  fontSize: 12,
+                )
+              : null,
+          softWrap: true,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ]);
+    }
 
     ///未来不使用ListTile，因为高度固定，不够灵活
     var listTile = ListTile(
@@ -180,23 +204,7 @@ class DataListTile extends StatelessWidget {
       selected: selected,
       selectedColor: myself.primary,
       leading: leading,
-      title: Row(children: [
-        Text(
-          AppLocalizations.t(tileData.title),
-          style: tileData.dense
-              ? const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)
-              : null,
-        ),
-        const Spacer(),
-        Text(
-          AppLocalizations.t(tileData.titleTail ?? ''),
-          style: tileData.dense
-              ? const TextStyle(
-                  fontSize: 12,
-                )
-              : null,
-        ),
-      ]),
+      title: titleWidget,
       subtitle: tileData.subtitle != null
           ? Text(
               tileData.subtitle!,
