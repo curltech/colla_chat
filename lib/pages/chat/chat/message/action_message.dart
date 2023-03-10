@@ -110,7 +110,7 @@ class ActionMessage extends StatelessWidget {
           iconSize: AppIconSize.mdSize,
           onPressed: () {},
         ),
-        title: 'addGroupMember ',
+        title: 'Add group member',
         subtitle: members.toString(),
         dense: false,
       );
@@ -135,7 +135,7 @@ class ActionMessage extends StatelessWidget {
           iconSize: AppIconSize.mdSize,
           onPressed: () {},
         ),
-        title: 'removeGroupMember',
+        title: 'Remove group member',
         subtitle: members.toString(),
         dense: false,
       );
