@@ -103,28 +103,37 @@ class TileData {
 
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
 class DataListTile extends StatelessWidget {
-  final DataListController<TileData> dataListViewController;
+  final DataListController<TileData>? dataListViewController;
   final TileData tileData;
   final int index;
+  final EdgeInsets? contentPadding;
+  final double? horizontalTitleGap;
+  final double? minVerticalPadding;
+  final double? minLeadingWidth;
 
   ///如果定义了点击回调函数，序号为参数进行回调
   ///回调函数有两个，一个构造函数传入的成员变量，用于处理高亮显示
   ///二是数据项里面定义的，用于自定义的后续任务
   final Function(int index, String title, {String? subtitle})? onTap;
 
-  const DataListTile(
-      {Key? key,
-      required this.dataListViewController,
-      required this.tileData,
-      required this.index,
-      this.onTap})
-      : super(key: key);
+  const DataListTile({
+    Key? key,
+    this.dataListViewController,
+    required this.tileData,
+    this.index = 0,
+    this.onTap,
+    this.contentPadding,
+    this.horizontalTitleGap,
+    this.minVerticalPadding,
+    this.minLeadingWidth,
+  }) : super(key: key);
 
   Widget _buildListTile(BuildContext context) {
     bool selected = false;
     if (tileData.selected == true ||
         (tileData.selected == null &&
-            dataListViewController.currentIndex == index)) {
+            dataListViewController != null &&
+            dataListViewController!.currentIndex == index)) {
       selected = true;
     }
 
@@ -164,10 +173,10 @@ class DataListTile extends StatelessWidget {
 
     ///未来不使用ListTile，因为高度固定，不够灵活
     var listTile = ListTile(
-      contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-      horizontalTitleGap: 10,
-      minVerticalPadding: 0,
-      minLeadingWidth: 0,
+      contentPadding: contentPadding,
+      horizontalTitleGap: horizontalTitleGap,
+      minVerticalPadding: minVerticalPadding,
+      minLeadingWidth: minLeadingWidth,
       selected: selected,
       selectedColor: myself.primary,
       leading: leading,
@@ -196,22 +205,26 @@ class DataListTile extends StatelessWidget {
       trailing: trailingWidget,
       isThreeLine: tileData.isThreeLine,
       dense: tileData.dense,
-      onTap: () async {
-        dataListViewController.currentIndex = index;
-        var fn = onTap;
-        if (fn != null) {
-          await fn(index, tileData.title, subtitle: tileData.subtitle);
-        }
-        fn = tileData.onTap;
-        if (fn != null) {
-          await fn(index, tileData.title, subtitle: tileData.subtitle);
-        }
+      onTap: onTap != null
+          ? () async {
+              if (dataListViewController != null) {
+                dataListViewController!.currentIndex = index;
+              }
+              var fn = onTap;
+              if (fn != null) {
+                await fn(index, tileData.title, subtitle: tileData.subtitle);
+              }
+              fn = tileData.onTap;
+              if (fn != null) {
+                await fn(index, tileData.title, subtitle: tileData.subtitle);
+              }
 
-        ///如果路由名称存在，点击会调用路由
-        if (tileData.routeName != null) {
-          indexWidgetProvider.push(tileData.routeName!, context: context);
-        }
-      },
+              ///如果路由名称存在，点击会调用路由
+              if (tileData.routeName != null) {
+                indexWidgetProvider.push(tileData.routeName!, context: context);
+              }
+            }
+          : null,
     );
 
     return listTile;

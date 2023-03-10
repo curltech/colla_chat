@@ -1,9 +1,9 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/group.dart';
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
 import 'package:flutter/material.dart';
 
@@ -28,213 +28,118 @@ class ActionMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     Color primary = myself.primary;
     Widget actionWidget = Container();
-    if (subMessageType == ChatMessageSubType.videoChat) {
-      actionWidget = InkWell(
-          onTap: () {},
-          child: Padding(
-              padding: const EdgeInsets.all(5),
-              child: Row(children: [
-                Icon(
-                  Icons.video_call,
-                  color: primary,
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                Text(
-                  AppLocalizations.t('Invite video chat'),
-                  key: UniqueKey(),
-                  style: const TextStyle(
-                      //color: isMyself ? Colors.white : Colors.black,
-                      //fontSize: 16.0,
-                      ),
-                  //specialTextSpanBuilder: customSpecialTextSpanBuilder,
-                ),
-              ])));
-    }
     if (subMessageType == ChatMessageSubType.addFriend) {
-      actionWidget = InkWell(
-          onTap: () {},
-          child: Padding(
-              padding: const EdgeInsets.all(5),
-              child: Row(children: [
-                Icon(
-                  Icons.person_add,
-                  color: primary,
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                Expanded(
-                  child: Text(
-                    AppLocalizations.t('Add friend'),
-                    key: UniqueKey(),
-                    style: const TextStyle(
-                        //color: isMyself ? Colors.white : Colors.black,
-                        //fontSize: 16.0,
-                        ),
-                    //specialTextSpanBuilder: customSpecialTextSpanBuilder,
-                  ),
-                ),
-              ])));
+      var tileData = TileData(
+        prefix: IconButton(
+          icon: Icon(
+            Icons.person_add,
+            color: primary,
+          ),
+          iconSize: AppIconSize.mdSize,
+          onPressed: () {},
+        ),
+        title: 'Add friend',
+        dense: false,
+      );
+      actionWidget = DataListTile(tileData: tileData);
     }
     if (subMessageType == ChatMessageSubType.addGroup) {
       Group group = Group.fromJson(JsonUtil.toJson(content!));
-
-      actionWidget = InkWell(
-          onTap: () {},
-          child: Padding(
-              padding: const EdgeInsets.all(5),
-              child: Row(children: [
-                Icon(
-                  Icons.group_add,
-                  color: primary,
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                Expanded(
-                  child: Text(
-                    group.name,
-                    key: UniqueKey(),
-                    style: const TextStyle(
-                        //color: isMyself ? Colors.white : Colors.black,
-                        //fontSize: 16.0,
-                        ),
-                    //specialTextSpanBuilder: customSpecialTextSpanBuilder,
-                  ),
-                ),
-              ])));
+      var tileData = TileData(
+        prefix: IconButton(
+          icon: Icon(
+            Icons.group_add,
+            color: primary,
+          ),
+          iconSize: AppIconSize.mdSize,
+          onPressed: () {},
+        ),
+        title: group.name,
+        dense: false,
+      );
+      actionWidget = DataListTile(tileData: tileData);
     }
     if (subMessageType == ChatMessageSubType.dismissGroup) {
-      var content = chatMessageService.recoverContent(this.content!);
-      actionWidget = InkWell(
-          onTap: () {},
-          child: Padding(
-              padding: const EdgeInsets.all(5),
-              child: Row(children: [
-                Icon(
-                  Icons.group_off,
-                  color: primary,
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                Expanded(
-                  child: Text(
-                    content,
-                    key: UniqueKey(),
-                    style: const TextStyle(
-                        //color: isMyself ? Colors.white : Colors.black,
-                        //fontSize: 16.0,
-                        ),
-                    //specialTextSpanBuilder: customSpecialTextSpanBuilder,
-                  ),
-                ),
-              ])));
+      Group group = Group.fromJson(JsonUtil.toJson(content!));
+      var tileData = TileData(
+        prefix: IconButton(
+          icon: Icon(
+            Icons.group_off,
+            color: primary,
+          ),
+          iconSize: AppIconSize.mdSize,
+          onPressed: () {},
+        ),
+        title: group.name,
+        dense: false,
+      );
+      actionWidget = DataListTile(tileData: tileData);
     }
     if (subMessageType == ChatMessageSubType.modifyGroup) {
       Group group = Group.fromJson(JsonUtil.toJson(content!));
-      actionWidget = InkWell(
-          onTap: () {},
-          child: Padding(
-              padding: const EdgeInsets.all(5),
-              child: Row(children: [
-                Icon(
-                  Icons.update,
-                  color: primary,
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                Expanded(
-                  child: Text(
-                    group.name,
-                    key: UniqueKey(),
-                    style: const TextStyle(
-                        //color: isMyself ? Colors.white : Colors.black,
-                        //fontSize: 16.0,
-                        ),
-                    //specialTextSpanBuilder: customSpecialTextSpanBuilder,
-                  ),
-                ),
-              ])));
+      var tileData = TileData(
+        prefix: IconButton(
+          icon: Icon(
+            Icons.update,
+            color: primary,
+          ),
+          iconSize: AppIconSize.mdSize,
+          onPressed: () {},
+        ),
+        title: group.name,
+        dense: false,
+      );
+      actionWidget = DataListTile(tileData: tileData);
     }
     if (subMessageType == ChatMessageSubType.addGroupMember) {
       List<dynamic> maps = JsonUtil.toJson(content!);
-      List<Widget> members = [];
+      List<String> members = [];
       if (maps.isNotEmpty) {
         for (var map in maps) {
           GroupMember groupMember = GroupMember.fromJson(map);
-          var member = Text(
-            groupMember.memberAlias!,
-            style: const TextStyle(
-                //color: isMyself ? Colors.white : Colors.black,
-                //fontSize: 16.0,
-                ),
-            //specialTextSpanBuilder: customSpecialTextSpanBuilder,
-          );
+          var member = groupMember.memberAlias!;
           members.add(member);
         }
       }
-
-      actionWidget = InkWell(
-          onTap: () {},
-          child: Padding(
-              padding: const EdgeInsets.all(5),
-              child: Row(children: [
-                Icon(
-                  Icons.person_add,
-                  color: primary,
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: members,
-                  ),
-                ),
-              ])));
+      var tileData = TileData(
+        prefix: IconButton(
+          icon: Icon(
+            Icons.person_add,
+            color: primary,
+          ),
+          iconSize: AppIconSize.mdSize,
+          onPressed: () {},
+        ),
+        title: 'addGroupMember ',
+        subtitle: members.toString(),
+        dense: false,
+      );
+      actionWidget = DataListTile(tileData: tileData);
     }
     if (subMessageType == ChatMessageSubType.removeGroupMember) {
       List<dynamic> maps = JsonUtil.toJson(content!);
-      List<Widget> members = [];
+      List<String> members = [];
       if (maps.isNotEmpty) {
         for (var map in maps) {
           GroupMember groupMember = GroupMember.fromJson(map);
-          var member = Text(
-            groupMember.memberAlias!,
-            style: const TextStyle(
-                //color: isMyself ? Colors.white : Colors.black,
-                //fontSize: 16.0,
-                ),
-            //specialTextSpanBuilder: customSpecialTextSpanBuilder,
-          );
+          var member = groupMember.memberAlias!;
           members.add(member);
         }
       }
-
-      actionWidget = InkWell(
-          onTap: () {},
-          child: Padding(
-              padding: const EdgeInsets.all(5),
-              child: Row(children: [
-                Icon(
-                  Icons.group_remove,
-                  color: primary,
-                ),
-                const SizedBox(
-                  width: 5,
-                ),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: members,
-                  ),
-                ),
-              ])));
+      var tileData = TileData(
+        prefix: IconButton(
+          icon: Icon(
+            Icons.group_remove,
+            color: primary,
+          ),
+          iconSize: AppIconSize.mdSize,
+          onPressed: () {},
+        ),
+        title: 'removeGroupMember',
+        subtitle: members.toString(),
+        dense: false,
+      );
+      actionWidget = DataListTile(tileData: tileData);
     }
 
     return Card(elevation: 0, child: actionWidget);
