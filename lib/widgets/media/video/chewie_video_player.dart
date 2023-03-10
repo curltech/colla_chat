@@ -1,4 +1,5 @@
 import 'package:chewie/chewie.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
 import 'package:flutter/material.dart';
 
@@ -55,7 +56,11 @@ class ChewieVideoPlayerController extends OriginVideoPlayerController {
             key: key,
             controller: chewieController,
           )
-        : const Center(child: Text('Please select a media file!'));
+        : Center(
+            child: Text(
+            AppLocalizations.t('Please select a media file'),
+            style: const TextStyle(color: Colors.white),
+          ));
 
     return player;
   }

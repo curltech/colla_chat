@@ -201,6 +201,7 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
     }
   }
 
+  @override
   play() async {
     var audioSource = player.audioSource;
     if (audioSource != null) {
@@ -208,14 +209,17 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
     }
   }
 
+  @override
   pause() async {
     await player.pause();
   }
 
+  @override
   stop() async {
     await player.stop();
   }
 
+  @override
   resume() async {
     await player.play();
   }
@@ -226,9 +230,10 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
     super.dispose();
   }
 
+  @override
   seek(Duration? position, {int? index}) async {
     if (index != null) {
-      setCurrentIndex(index!);
+      setCurrentIndex(index);
     }
     if (position != null) {
       try {
@@ -255,10 +260,12 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
     return player.bufferedPosition;
   }
 
+  @override
   Future<double> getVolume() async {
     return Future.value(player.volume);
   }
 
+  @override
   setVolume(double volume) async {
     await player.setVolume(volume);
   }
@@ -267,6 +274,7 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
     return Future.value(player.speed);
   }
 
+  @override
   setSpeed(double speed) async {
     await player.setSpeed(speed);
   }

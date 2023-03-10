@@ -50,9 +50,7 @@ class WaveformsAudioPlayerController extends AbstractAudioPlayerController {
 
   @override
   resume() async {
-    if (currentIndex != null) {
-      await playerController.startPlayer();
-    }
+    await playerController.startPlayer();
   }
 
   @override
@@ -64,32 +62,27 @@ class WaveformsAudioPlayerController extends AbstractAudioPlayerController {
   @override
   seek(Duration position, {int? index}) async {
     if (index != null) {
-      setCurrentIndex(index!);
+      setCurrentIndex(index);
     }
-    if (position != null) {
-      try {
-        await playerController.seekTo(position.inMilliseconds);
-      } catch (e) {
-        logger.e('seek failure:$e');
-      }
+    try {
+      await playerController.seekTo(position.inMilliseconds);
+    } catch (e) {
+      logger.e('seek failure:$e');
     }
   }
 
-  @override
   Future<Duration?> getDuration() async {
     int milliseconds = await playerController.getDuration(DurationType.max);
 
     return Duration(milliseconds: milliseconds);
   }
 
-  @override
   Future<Duration?> getPosition() async {
     int milliseconds = await playerController.getDuration(DurationType.current);
 
     return Duration(milliseconds: milliseconds);
   }
 
-  @override
   Future<Duration?> getBufferedPosition() async {
     return Future.value(const Duration(milliseconds: 0));
   }
