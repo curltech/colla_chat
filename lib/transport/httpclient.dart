@@ -1,12 +1,11 @@
 import 'dart:io';
 
+import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:dio/dio.dart';
 import 'package:dio/io.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-
-import '../pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
 
 class DioHttpClient implements IWebClient {
   final Dio _client = Dio();
