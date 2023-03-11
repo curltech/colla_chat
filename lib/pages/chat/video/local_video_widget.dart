@@ -97,15 +97,23 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   _updateVideoChatMessageController() {
-    var videoChatMessageController =
+    var videoChatMessageController = this.videoChatMessageController.value;
+    if (videoChatMessageController != null) {
+      videoChatMessageController.removeListener(_updateVideoChatStatus);
+      videoChatMessageController.unregisterReceiver(
+          ChatMessageSubType.chatReceipt.name, _receivedChatReceipt);
+    }
+    videoChatMessageController =
         videoConferenceRenderPool.videoChatMessageController;
-    this.videoChatMessageController.value = videoChatMessageController;
     if (videoChatMessageController != null) {
       videoChatMessageController.addListener(_updateVideoChatStatus);
       videoChatStatus.value = videoChatMessageController.status;
       videoChatMessageController.registerReceiver(
           ChatMessageSubType.chatReceipt.name, _receivedChatReceipt);
+    } else {
+      videoChatStatus.value = VideoChatStatus.end;
     }
+    this.videoChatMessageController.value = videoChatMessageController;
     _update();
   }
 

@@ -71,6 +71,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   _updateVideoChatMessageController() {
     videoChatMessageController.value =
         videoConferenceRenderPool.videoChatMessageController;
+    _update();
   }
 
   Future<void> _onAddVideoRender(PeerVideoRender? videoRender) async {

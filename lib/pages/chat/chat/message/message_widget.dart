@@ -196,7 +196,8 @@ class MessageWidget {
       {String? value}) async {
     switch (label) {
       case 'Delete':
-        await chatMessageService.delete(entity: chatMessage);
+        await chatMessageService
+            .delete(where: 'messageId=?', whereArgs: [chatMessage.messageId!]);
         chatMessageController.delete(index: this.index);
         break;
       case 'Cancel':
@@ -206,7 +207,8 @@ class MessageWidget {
             message: messageId,
             subMessageType: ChatMessageSubType.cancel,
           );
-          await chatMessageService.delete(entity: chatMessage);
+          await chatMessageService.delete(
+              where: 'messageId=?', whereArgs: [chatMessage.messageId!]);
           chatMessageController.delete(index: this.index);
         }
         break;
