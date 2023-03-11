@@ -517,8 +517,8 @@ class BasePeerConnection {
   }
 
   onRenegotiationNeeded() {
-    logger.w('onRenegotiationNeeded event');
-    negotiate();
+    // logger.w('onRenegotiationNeeded event');
+    // negotiate();
   }
 
   //数据通道状态事件
