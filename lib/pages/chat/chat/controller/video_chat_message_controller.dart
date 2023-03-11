@@ -678,6 +678,8 @@ class VideoChatMessageController with ChangeNotifier {
             videoRenders.values.toList(),
             peerConnection: advancedPeerConnection);
       }
+    } else {
+      logger.e('participant $peerId has no peerConnections');
     }
   }
 
@@ -723,6 +725,8 @@ class VideoChatMessageController with ChangeNotifier {
         await remoteVideoRenderController.addLocalVideoRender(videoRenders,
             peerConnection: advancedPeerConnection);
       }
+    } else {
+      logger.e('participant $peerId has no peerConnections');
     }
   }
 
@@ -751,6 +755,8 @@ class VideoChatMessageController with ChangeNotifier {
             videoRenders.values.toList(),
             peerConnection: advancedPeerConnection);
       }
+    } else {
+      logger.e('participant $peerId has no peerConnections');
     }
   }
 
@@ -783,6 +789,8 @@ class VideoChatMessageController with ChangeNotifier {
           List<PeerVideoRender> videoRenders =
               localVideoRenderController.getVideoRenders().values.toList();
           await remoteVideoRenderController.addLocalVideoRender(videoRenders);
+        } else {
+          logger.e('participant $participant has no peerConnections');
         }
       }
     }
