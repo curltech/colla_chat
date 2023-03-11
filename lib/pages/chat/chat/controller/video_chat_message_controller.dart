@@ -327,10 +327,16 @@ class VideoChatMessageController with ChangeNotifier {
       participants.add(peerId);
     }
     var name = this.name;
-    var dateName = DateTime.now().toLocal().toIso8601String();
+    var current = DateTime.now();
+    var dateName = current.toLocal().toIso8601String();
     _conference = await conferenceService.createConference(
         'video-chat-$dateName',
         video: video,
+        startDate: current.toUtc().toIso8601String(),
+        endDate: current
+            .add(const Duration(seconds: 7200))
+            .toUtc()
+            .toIso8601String(),
         participants: participants);
     if (partyType == PartyType.group.name) {
       _conference!.groupPeerId = groupPeerId;
