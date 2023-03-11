@@ -628,7 +628,7 @@ class BasePeerConnection {
     if (signalType == SignalType.renegotiate.name &&
         webrtcSignal.renegotiate != null) {
       logger.i('onSignal renegotiate');
-      negotiate();
+      await negotiate();
     }
     //被要求收发，则加收发器
     else if (webrtcSignal.transceiverRequest != null) {
