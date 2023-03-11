@@ -3,19 +3,82 @@ import 'dart:typed_data';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/audio/abstract_audio_player_controller.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/widgets.dart';
 import 'package:video_player/video_player.dart';
 
 class BlueFireAudioPlayer {
   late AudioPlayer player;
 
+  static GlobalPlatformInterface get _global => AudioPlayer.global;
+
+  // Set config for all platforms
+  AudioContextConfig audioContextConfig = AudioContextConfig();
+
+  // Set config for each platform individually
+  AudioContext audioContext = const AudioContext();
+
   BlueFireAudioPlayer() {
     player = AudioPlayer();
-    AudioPlayer.global.setGlobalAudioContext(AudioContextConfig().build());
+    _global.setGlobalAudioContext(audioContextConfig.build());
+  }
+
+  setGlobalAudioContext({
+    bool? forceSpeaker,
+    bool? duckAudio,
+    bool? respectSilence,
+    bool? stayAwake,
+  }) async {
+    await _global.setGlobalAudioContext(_build(
+        forceSpeaker: forceSpeaker,
+        duckAudio: duckAudio,
+        respectSilence: respectSilence,
+        stayAwake: stayAwake));
+  }
+
+  setAudioContext({
+    bool? forceSpeaker,
+    bool? duckAudio,
+    bool? respectSilence,
+    bool? stayAwake,
+  }) async {
+    audioContext = _build(
+        forceSpeaker: forceSpeaker,
+        duckAudio: duckAudio,
+        respectSilence: respectSilence,
+        stayAwake: stayAwake);
+    if (platformParams.mobile) {
+      await player.setAudioContext(audioContext);
+    }
+  }
+
+  AudioContext _build({
+    bool? forceSpeaker,
+    bool? duckAudio,
+    bool? respectSilence,
+    bool? stayAwake,
+  }) {
+    AudioContextConfig config = audioContextConfig.copy(
+        forceSpeaker: forceSpeaker,
+        duckAudio: duckAudio,
+        respectSilence: respectSilence,
+        stayAwake: stayAwake);
+
+    return config.build();
+    audioContext.android.copy(
+      isSpeakerphoneOn: forceSpeaker,
+      stayAwake: stayAwake,
+      audioMode: AndroidAudioMode.normal,
+      contentType: AndroidContentType.unknown,
+      usageType: AndroidUsageType.unknown,
+      audioFocus: AndroidAudioFocus.none,
+    );
+    audioContext.iOS.copy(
+        category: AVAudioSessionCategory.playback,
+        options: [AVAudioSessionOptions.defaultToSpeaker]);
   }
 
   Source _audioSource({required String filename}) {

@@ -1,8 +1,10 @@
+import 'dart:math';
+
+import 'package:audio_session/audio_session.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/audio/abstract_audio_player_controller.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:rxdart/rxdart.dart';
@@ -27,6 +29,74 @@ class JustAudioPlayer {
         audioLoadConfiguration: audioLoadConfiguration,
         audioPipeline: audioPipeline,
         androidOffloadSchedulingEnabled: androidOffloadSchedulingEnabled);
+  }
+
+  initSession() {
+    AudioSession.instance.then((audioSession) async {
+      // This line configures the app's audio session, indicating to the OS the
+      // type of audio we intend to play. Using the "speech" recipe rather than
+      // "music" since we are playing a podcast.
+      await audioSession.configure(const AudioSessionConfiguration.speech());
+      await audioSession.configure(const AudioSessionConfiguration(
+        avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
+        avAudioSessionCategoryOptions: AVAudioSessionCategoryOptions.allowBluetooth,
+        avAudioSessionMode: AVAudioSessionMode.spokenAudio,
+        avAudioSessionRouteSharingPolicy: AVAudioSessionRouteSharingPolicy.defaultPolicy,
+        avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
+        androidAudioAttributes: AndroidAudioAttributes(
+          contentType: AndroidAudioContentType.speech,
+          flags: AndroidAudioFlags.none,
+          usage: AndroidAudioUsage.voiceCommunication,
+        ),
+        androidAudioFocusGainType: AndroidAudioFocusGainType.gain,
+        androidWillPauseWhenDucked: true,
+      ));
+      // Listen to audio interruptions and pause or duck as appropriate.
+      audioSession.becomingNoisyEventStream.listen((_) {
+        //_player.pause();
+      });
+      audioSession.interruptionEventStream.listen((event) {
+        print('interruption begin: ${event.begin}');
+        print('interruption type: ${event.type}');
+        if (event.begin) {
+          switch (event.type) {
+            case AudioInterruptionType.duck:
+              if (audioSession.androidAudioAttributes!.usage ==
+                  AndroidAudioUsage.game) {
+                player.setVolume(player.volume / 2);
+              }
+              //playInterrupted = false;
+              break;
+            case AudioInterruptionType.pause:
+            case AudioInterruptionType.unknown:
+              if (player.playing) {
+                player.pause();
+                //playInterrupted = true;
+              }
+              break;
+          }
+        } else {
+          switch (event.type) {
+            case AudioInterruptionType.duck:
+              player.setVolume(min(1.0, player.volume * 2));
+              //playInterrupted = false;
+              break;
+            case AudioInterruptionType.pause:
+              // if (playInterrupted) player.play();
+              // playInterrupted = false;
+              break;
+            case AudioInterruptionType.unknown:
+              // playInterrupted = false;
+              break;
+          }
+        }
+      });
+      audioSession.devicesChangedEventStream.listen((event) {
+        print('Devices added: ${event.devicesAdded}');
+        print('Devices removed: ${event.devicesRemoved}');
+      });
+      await audioSession.setActive(true);
+    });
   }
 
   AudioSource _audioSource({required String filename}) {

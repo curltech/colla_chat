@@ -220,7 +220,6 @@ dependencies:
   #-lc++
   #-lstd++
   flutter_sound: ^9.2.13
-  audio_session: ^0.1.6
   audioplayers: ^3.0.1 #音频处理,所有平台
   audioplayers_platform_interface: ^4.0.0
   audioplayers_windows: ^1.1.3
@@ -245,9 +244,10 @@ dependencies:
   just_audio: ^0.9.30
   just_audio_windows: ^0.2.0
   just_audio_mpv: ^0.1.4
-  just_waveform: any
+  just_waveform: ^0.0.4
   audio_service: ^0.18.9
-  just_audio_background: ^0.0.1-beta.7
+  just_audio_background: ^0.0.1-beta.9
+  audio_session: ^0.1.13
   flutter_tts: ^3.5.3
   speech_to_text: any
   flutter_image_compress: ^1.0.0-nullsafety #图片压缩1

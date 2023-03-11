@@ -8,6 +8,7 @@ import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_control
 import 'package:colla_chat/pages/chat/linkman/group_linkman_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/video/video_view_card.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
@@ -67,6 +68,9 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ValueNotifier<VideoChatStatus> videoChatStatus =
       ValueNotifier<VideoChatStatus>(VideoChatStatus.end);
 
+  //Speaker状态
+  ValueNotifier<bool> speakerStatus = ValueNotifier<bool>(false);
+
   //控制面板可见性的计时器
   Timer? _hideControlPanelTimer;
 
@@ -92,6 +96,11 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
 
   _updateVideoChatStatus() {
     videoChatStatus.value = widget.videoChatMessageController.status;
+    if (mounted) {
+      DialogUtil.info(context,
+          content: AppLocalizations.t('Video chat status:') +
+              AppLocalizations.t(videoChatStatus.value.name));
+    }
   }
 
   _play() {
@@ -100,7 +109,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   _stop() {
-    audioPlayer.setLoopMode(true);
+    audioPlayer.setLoopMode(false);
     audioPlayer.play('assets/medias/close.mp3');
   }
 
@@ -292,7 +301,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   ///呼叫需要创建新的视频会议conference，linkman模式下是临时conference，不存储，group模式下存储
   ///发出会议邀请消息
   ///加入会议是在当前选择了会议邀请消息后的操作，需要创建本地视频（如果不存在）
-  _call() async {
+  bool _checkWbertcStatus() {
     //检查webrtc的状态
     var name = widget.videoChatMessageController.name;
     var partyType = widget.videoChatMessageController.partyType;
@@ -303,21 +312,18 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
         DialogUtil.error(context,
             content:
                 '$name ${AppLocalizations.t('has no webrtc connected peerConnection')}');
-        return null;
+        return false;
       }
     }
-
-    //检查当前的视频邀请消息是否存在
-    Conference? conference = widget.videoChatMessageController.conference;
-    if (conference == null) {
-      await _invite();
-    } else {
-      await _join();
-    }
+    return true;
   }
 
   ///选择会议参与者，发送会议邀请消息
   Future<void> _invite() async {
+    var status = _checkWbertcStatus();
+    if (!status) {
+      return;
+    }
     List<String> participants = await _selectParticipants();
     if (!participants.contains(myself.peerId!)) {
       participants.add(myself.peerId!);
@@ -349,7 +355,6 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                 '${AppLocalizations.t('Send videoChat chatMessage')} ${chatMessage.messageId}');
       }
       _play();
-      widget.videoChatMessageController.status = VideoChatStatus.calling;
       //延时60秒后自动挂断
       Future.delayed(const Duration(seconds: 60)).then((value) {
         //时间到了后，如果还是呼叫状态，则修改状态为结束
@@ -369,6 +374,10 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
   }
 
   Future<void> _join() async {
+    var status = _checkWbertcStatus();
+    if (!status) {
+      return;
+    }
     ChatMessage? chatMessage = widget.videoChatMessageController.chatMessage;
     if (chatMessage == null) {
       return;
@@ -397,14 +406,17 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     _update();
   }
 
+  _hangup() async {
+    _stop();
+    widget.videoChatMessageController.status = VideoChatStatus.end;
+  }
+
   ///如果正在呼叫calling，停止呼叫，关闭所有的本地视频，呼叫状态改为结束
   ///如果正在通话chatting，挂断视频通话，关闭所有的本地视频和远程视频，呼叫状态改为结束
   ///结束会议，这时候本地和远程的视频都应该被关闭
   _exit() async {
     var status = widget.videoChatMessageController.status;
-    if (status == VideoChatStatus.calling) {
-      _stop();
-    } else if (status == VideoChatStatus.chatting) {
+    if (status == VideoChatStatus.chatting) {
       await _close();
       Conference? conference = widget.videoChatMessageController.conference;
       if (conference != null) {
@@ -495,6 +507,29 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     ]);
   }
 
+  Widget _buildSpeakerSwitchButton(BuildContext context) {
+    Widget button = ValueListenableBuilder<bool>(
+        valueListenable: speakerStatus,
+        builder: (BuildContext context, bool status, Widget? child) {
+          return WidgetUtil.buildCircleButton(
+            label: status ? 'Speaker on' : 'Speaker off',
+            onPressed: () async {
+              speakerStatus.value = !speakerStatus.value;
+              await audioPlayer.setAudioContext(
+                  forceSpeaker: speakerStatus.value);
+            },
+            backgroundColor: status ? Colors.black : Colors.white,
+            child: Icon(
+              status ? Icons.volume_up : Icons.volume_off,
+              size: AppIconSize.mdSize,
+              color: status ? Colors.white : Colors.black,
+            ),
+          );
+        });
+
+    return button;
+  }
+
   ///创建呼叫按钮
   Widget _buildCallButton() {
     return ValueListenableBuilder<VideoChatStatus>(
@@ -503,30 +538,57 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           Widget buttonWidget;
           if (value == VideoChatStatus.calling ||
               value == VideoChatStatus.chatting) {
+            String? label;
+            if (value == VideoChatStatus.calling) {
+              label = 'Calling, you can hangup';
+            } else if (value == VideoChatStatus.chatting) {
+              label = 'Chatting, you can exit';
+            }
             buttonWidget = WidgetUtil.buildCircleButton(
+              label: label,
               onPressed: () {
-                _exit();
+                if (value == VideoChatStatus.calling) {
+                  _hangup();
+                } else if (value == VideoChatStatus.chatting) {
+                  _exit();
+                }
               },
-              elevation: 2.0,
               backgroundColor: Colors.red,
-              padding: const EdgeInsets.all(15.0),
               child: const Icon(
                 Icons.call_end,
-                size: AppIconSize.lgSize,
+                size: AppIconSize.mdSize,
                 color: Colors.white,
               ),
             );
+            if (value == VideoChatStatus.calling && platformParams.mobile) {
+              buttonWidget =
+                  ButtonBar(alignment: MainAxisAlignment.center, children: [
+                buttonWidget,
+                _buildSpeakerSwitchButton(context),
+              ]);
+            }
           } else if (value == VideoChatStatus.end) {
+            String? label;
+            Conference? conference =
+                widget.videoChatMessageController.conference;
+            if (conference == null) {
+              label = 'No conference, you can invite';
+            } else {
+              label = 'In conference, you can join';
+            }
             buttonWidget = WidgetUtil.buildCircleButton(
-              onPressed: () {
-                _call();
+              label: label,
+              onPressed: () async {
+                if (conference == null) {
+                  await _invite();
+                } else {
+                  await _join();
+                }
               },
-              elevation: 2.0,
               backgroundColor: Colors.green,
-              padding: const EdgeInsets.all(15.0),
               child: const Icon(
                 Icons.call,
-                size: AppIconSize.lgSize,
+                size: AppIconSize.mdSize,
                 color: Colors.white,
               ),
             );
@@ -537,7 +599,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               padding: const EdgeInsets.all(15.0),
               child: const Icon(
                 Icons.call_end,
-                size: AppIconSize.lgSize,
+                size: AppIconSize.mdSize,
                 color: Colors.white,
               ),
             );

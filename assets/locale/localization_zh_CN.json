@@ -295,5 +295,11 @@
   "Join conference:": "加入会议：",
   "avatar": "头像",
   "Add group member": "增加群成员：",
-  "Remove group member": "移除群成员"
+  "Remove group member": "移除群成员",
+  "Calling, you can hangup": "正在呼叫中，可以挂断",
+  "Chatting, you can exit": "正在会议中，可以退出",
+  "No conference, you can invite": "没有当前会议，可以发起会议邀请",
+  "In conference, you can join": "有当前会议，可以加入",
+  "Speaker off": "扬声器已关",
+  "Speaker on": "扬声器已开"
 }

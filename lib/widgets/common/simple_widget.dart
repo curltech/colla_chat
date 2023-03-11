@@ -5,13 +5,14 @@ import 'package:flutter/material.dart';
 class WidgetUtil {
   static buildCircleButton({
     Key? key,
+    String? label,
     void Function()? onPressed,
     Color? backgroundColor,
     double elevation = 2.0,
-    EdgeInsetsGeometry padding = EdgeInsets.zero,
+    EdgeInsetsGeometry padding = const EdgeInsets.all(15.0),
     required Widget child,
   }) {
-    return TextButton(
+    Widget button = TextButton(
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all(backgroundColor),
         padding: MaterialStateProperty.all(padding),
@@ -23,6 +24,21 @@ class WidgetUtil {
       onPressed: onPressed,
       child: child,
     );
+    if (label != null) {
+      button = Column(
+        children: [
+          button,
+          const SizedBox(
+            height: 10.0,
+          ),
+          Text(
+            AppLocalizations.t(label),
+            style: const TextStyle(color: Colors.white),
+          )
+        ],
+      );
+    }
+    return button;
   }
 
   static buildIconTextButton({
