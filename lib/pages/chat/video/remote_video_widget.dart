@@ -116,7 +116,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
     if (remoteVideoRenderController != null) {
       var videoRenders =
           remoteVideoRenderController!.videoRenders.values.toList();
-      Conference? conference = videoChatMessageController!.conference;
+      Conference? conference = videoChatMessageController.conference;
       if (conference != null) {
         videoConferenceRenderPool.removeVideoRender(
             conference.conferenceId, videoRenders);

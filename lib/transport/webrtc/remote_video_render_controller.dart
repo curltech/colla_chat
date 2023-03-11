@@ -212,6 +212,25 @@ class RemoteVideoRenderController extends VideoRenderController {
       await close(videoRender);
     }
   }
+
+  @override
+  close(PeerVideoRender videoRender) async {
+    //await videoRender.close();
+  }
+
+  ///移除并且关闭控制器所有的视频，激活exit事件
+  @override
+  exit() async {
+    //先移除，后关闭
+    var videoRenders = this.videoRenders.values.toList();
+    this.videoRenders.clear();
+    // for (var videoRender in videoRenders) {
+    //   await videoRender.close();
+    // }
+    currentVideoRender = null;
+    mainVideoRender = null;
+    await onVideoRenderOperator(VideoRenderOperator.exit.name, null);
+  }
 }
 
 ///所有的正在视频会议的池，包含多个视频会议，每个会议的会议号是视频通话邀请的消息号
