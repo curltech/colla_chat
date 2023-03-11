@@ -800,8 +800,7 @@ class VideoChatMessageController with ChangeNotifier {
     status = VideoChatStatus.end;
   }
 
-  @override
-  dispose() {
+  unregister() {
     if (_chatSummary != null) {
       globalChatMessageController.unregisterReceiver(
           ChatMessageSubType.videoChat.name, onReceivedInvitation);
@@ -810,6 +809,5 @@ class VideoChatMessageController with ChangeNotifier {
       globalChatMessageController.unregisterReceiver(
           ChatMessageSubType.chatReceipt.name, onReceivedChatReceipt);
     }
-    super.dispose();
   }
 }
