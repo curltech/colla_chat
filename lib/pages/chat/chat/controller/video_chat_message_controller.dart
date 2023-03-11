@@ -440,6 +440,8 @@ class VideoChatMessageController with ChangeNotifier {
         return;
       }
     }
+    await setChatSummary(null);
+    await setChatMessage(null);
   }
 
   ///仅仅发送回执消息
@@ -781,9 +783,6 @@ class VideoChatMessageController with ChangeNotifier {
           List<PeerVideoRender> videoRenders =
               localVideoRenderController.getVideoRenders().values.toList();
           await remoteVideoRenderController.addLocalVideoRender(videoRenders);
-          //设置当前会议为本会议
-          videoConferenceRenderPool.conferenceId = remoteVideoRenderController
-              .videoChatMessageController.conferenceId;
         }
       }
     }

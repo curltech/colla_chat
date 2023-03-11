@@ -94,7 +94,6 @@ class _IndexViewState extends State<IndexView>
           await videoChatMessageController.setChatMessage(chatMessage);
           await videoChatMessageController
               .sendChatReceipt(MessageReceiptType.busy);
-          videoChatMessageController.dispose();
         }
       }
     }
@@ -193,7 +192,6 @@ class _IndexViewState extends State<IndexView>
           _stop();
           await videoChatMessageController!
               .sendChatReceipt(MessageReceiptType.rejected);
-          videoChatMessageController?.dispose();
           videoChatMessageController = null;
         },
         child: const Icon(color: Colors.white, size: 16, Icons.call_end),
@@ -204,7 +202,6 @@ class _IndexViewState extends State<IndexView>
           _stop();
           await videoChatMessageController!
               .sendChatReceipt(MessageReceiptType.hold);
-          videoChatMessageController?.dispose();
           videoChatMessageController = null;
         },
         child: const Icon(color: Colors.white, size: 16, Icons.add_call),
