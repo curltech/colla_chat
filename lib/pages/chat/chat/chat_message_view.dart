@@ -153,6 +153,19 @@ class _ChatMessageViewState extends State<ChatMessageView> {
           }
         }
       }
+    } else if (partyType == PartyType.conference.name) {
+      List<GroupMember> groupMembers =
+          await groupMemberService.findByGroupId(peerId);
+      for (var groupMember in groupMembers) {
+        String? memberPeerId = groupMember.memberPeerId;
+        if (memberPeerId != null && memberPeerId != myself.peerId) {
+          List<AdvancedPeerConnection> advancedPeerConnections =
+              peerConnectionPool.get(memberPeerId);
+          if (advancedPeerConnections.isEmpty) {
+            peerConnectionPool.create(memberPeerId);
+          }
+        }
+      }
     }
   }
 
