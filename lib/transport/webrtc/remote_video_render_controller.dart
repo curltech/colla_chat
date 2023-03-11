@@ -289,7 +289,7 @@ class VideoConferenceRenderPool with ChangeNotifier {
           videoChatMessageController: videoChatMessageController);
       remoteVideoRenderControllers[conferenceId] = remoteVideoRenderController;
     }
-    _conferenceId = conferenceId;
+    this.conferenceId = conferenceId;
 
     return remoteVideoRenderController;
   }
@@ -324,6 +324,10 @@ class VideoConferenceRenderPool with ChangeNotifier {
     if (remoteVideoRenderController != null) {
       await remoteVideoRenderController.exit();
       remoteVideoRenderControllers.remove(conferenceId);
+      remoteVideoRenderController.videoChatMessageController
+          .setChatMessage(null);
+      remoteVideoRenderController.videoChatMessageController
+          .setChatSummary(null);
       if (conferenceId == _conferenceId) {
         _conferenceId = null;
       }

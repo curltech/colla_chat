@@ -1,7 +1,9 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/conference/conference_show_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -23,6 +25,25 @@ class VideoChatMessage extends StatelessWidget {
       this.fullScreen = false,
       required this.chatMessage})
       : super(key: key);
+
+  ///查找或者创建当前消息对应的会议，并设置为当前会议
+  Future<void> _initVideoChatMessageController() async {
+    //创建基于当前聊天的视频消息控制器
+    ChatSummary chatSummary = chatMessageController.chatSummary!;
+    ChatMessage chatMessage = chatMessageController.current!;
+    if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {
+      VideoChatMessageController? videoChatMessageController =
+          videoConferenceRenderPool
+              .getVideoChatMessageController(chatMessage.messageId!);
+      if (videoChatMessageController == null) {
+        videoChatMessageController = VideoChatMessageController();
+        await videoChatMessageController.setChatSummary(chatSummary);
+        await videoChatMessageController.setChatMessage(chatMessage);
+        videoConferenceRenderPool
+            .createRemoteVideoRenderController(videoChatMessageController);
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -50,9 +71,9 @@ class VideoChatMessage extends StatelessWidget {
           subtitle: subtitle,
           dense: false,
           prefix: IconButton(
-              onPressed: () {
-                videoConferenceRenderPool.conferenceId = null;
+              onPressed: () async {
                 chatMessageController.current = chatMessage;
+                await _initVideoChatMessageController();
                 indexWidgetProvider.push('video_chat');
               },
               iconSize: AppIconSize.mdSize,

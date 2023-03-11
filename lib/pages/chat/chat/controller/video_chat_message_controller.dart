@@ -383,6 +383,7 @@ class VideoChatMessageController with ChangeNotifier {
       logger.i('send video chatMessage ${chatMessage.messageId}');
     }
     await setChatMessage(chatMessage!);
+    videoConferenceRenderPool.createRemoteVideoRenderController(this);
     status = VideoChatStatus.calling;
 
     return chatMessage;
@@ -798,16 +799,5 @@ class VideoChatMessageController with ChangeNotifier {
     await videoConferenceRenderPool
         .closeConferenceId(_conference!.conferenceId);
     status = VideoChatStatus.end;
-  }
-
-  unregister() {
-    if (_chatSummary != null) {
-      globalChatMessageController.unregisterReceiver(
-          ChatMessageSubType.videoChat.name, onReceivedInvitation);
-    }
-    if (_chatMessage != null) {
-      globalChatMessageController.unregisterReceiver(
-          ChatMessageSubType.chatReceipt.name, onReceivedChatReceipt);
-    }
   }
 }

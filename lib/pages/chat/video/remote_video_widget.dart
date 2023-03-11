@@ -13,10 +13,9 @@ import 'package:flutter/material.dart';
 ///远程视频通话窗口，显示多个小视频窗口，每个小窗口代表一个远程视频
 ///以及各种功能按钮
 class RemoteVideoWidget extends StatefulWidget {
-  final VideoChatMessageController videoChatMessageController;
-
-  const RemoteVideoWidget({Key? key, required this.videoChatMessageController})
-      : super(key: key);
+  const RemoteVideoWidget({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
@@ -25,6 +24,10 @@ class RemoteVideoWidget extends StatefulWidget {
 }
 
 class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
+  ValueNotifier<VideoChatMessageController?> videoChatMessageController =
+      ValueNotifier<VideoChatMessageController?>(
+          videoConferenceRenderPool.videoChatMessageController);
+
   //控制面板的可见性，包括视频功能按钮和呼叫按钮
   ValueNotifier<bool> controlPanelVisible = ValueNotifier<bool>(true);
 
@@ -50,7 +53,8 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
   ///注册远程流到来或者关闭的监听器
   ///重新计算远程流的数量是否变化，决定是否重新渲染界面
   void _init() {
-    String? conferenceId = widget.videoChatMessageController.conferenceId;
+    videoConferenceRenderPool.addListener(_updateVideoChatMessageController);
+    String? conferenceId = videoChatMessageController.value?.conferenceId;
     if (conferenceId != null) {
       remoteVideoRenderController = videoConferenceRenderPool
           .getRemoteVideoRenderController(conferenceId);
@@ -62,6 +66,11 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
         videoViewCount.value = remoteVideoRenderController!.videoRenders.length;
       }
     }
+  }
+
+  _updateVideoChatMessageController() {
+    videoChatMessageController.value =
+        videoConferenceRenderPool.videoChatMessageController;
   }
 
   Future<void> _onAddVideoRender(PeerVideoRender? videoRender) async {
@@ -99,10 +108,14 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
 
   ///移除远程所有的视频，这时候还能看远程的视频
   _close() async {
+    var videoChatMessageController = this.videoChatMessageController.value;
+    if (videoChatMessageController == null) {
+      return;
+    }
     if (remoteVideoRenderController != null) {
       var videoRenders =
           remoteVideoRenderController!.videoRenders.values.toList();
-      Conference? conference = widget.videoChatMessageController.conference;
+      Conference? conference = videoChatMessageController!.conference;
       if (conference != null) {
         videoConferenceRenderPool.removeVideoRender(
             conference.conferenceId, videoRenders);
@@ -197,7 +210,10 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
     return ValueListenableBuilder<int>(
         valueListenable: videoViewCount,
         builder: (context, value, child) {
-          if (remoteVideoRenderController == null) {
+          var videoChatMessageController =
+              this.videoChatMessageController.value;
+          if (videoChatMessageController == null ||
+              remoteVideoRenderController == null) {
             return Center(
                 child: Text(AppLocalizations.t('No conference'),
                     style: const TextStyle(color: Colors.white)));
@@ -213,16 +229,19 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
               child: VideoViewCard(
                 videoRenderController: remoteVideoRenderController!,
                 onClosed: _onClosedVideoRender,
-                conference: widget.videoChatMessageController.conference,
+                conference: videoChatMessageController!.conference,
               ));
         });
   }
 
   Future<void> _onClosedVideoRender(PeerVideoRender videoRender) async {
-    if (widget.videoChatMessageController.conference != null) {
+    var videoChatMessageController = this.videoChatMessageController.value;
+    if (videoChatMessageController == null) {
+      return;
+    }
+    if (videoChatMessageController.conference != null) {
       //在会议中，如果是本地流，先所有的连接中移除
-      String conferenceId =
-          widget.videoChatMessageController.conference!.conferenceId;
+      String conferenceId = videoChatMessageController.conference!.conferenceId;
       RemoteVideoRenderController? remoteVideoRenderController =
           videoConferenceRenderPool
               .getRemoteVideoRenderController(conferenceId);
@@ -255,6 +274,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
       remoteVideoRenderController!.unregisterVideoRenderOperator(
           VideoRenderOperator.remove.name, _onRemoveVideoRender);
     }
+    videoConferenceRenderPool.removeListener(_updateVideoChatMessageController);
     super.dispose();
   }
 }

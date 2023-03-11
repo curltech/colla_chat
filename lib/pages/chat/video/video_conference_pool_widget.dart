@@ -1,11 +1,7 @@
 import 'package:colla_chat/constant/base.dart';
-import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
-import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/service/chat/chat_summary.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -32,7 +28,7 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
   }
 
   _update() {
-    setState(() {});
+    _buildConferenceTileData();
   }
 
   _buildConferenceTileData() {
@@ -75,21 +71,6 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
             });
         slideActions.add(deleteSlideAction);
         tile.slideActions = slideActions;
-
-        List<TileData> endSlideActions = [];
-        TileData chatSlideAction = TileData(
-            title: 'Chat',
-            prefix: Icons.chat,
-            onTap: (int index, String label, {String? subtitle}) async {
-              ChatSummary? chatSummary = await chatSummaryService
-                  .findOneByPeerId(conference.conferenceId);
-              chatSummary ??=
-                  await chatSummaryService.upsertByConference(conference);
-              chatMessageController.chatSummary = chatSummary;
-              indexWidgetProvider.push('chat_message');
-            });
-        endSlideActions.add(chatSlideAction);
-        tile.endSlideActions = endSlideActions;
 
         tiles.add(tile);
       }
