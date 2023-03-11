@@ -283,7 +283,11 @@ class PeerVideoRender {
   close() async {
     var mediaStream = this.mediaStream;
     if (mediaStream != null) {
-      logger.i('dispose stream:${mediaStream.id} ${mediaStream.ownerTag}');
+      if (mediaStream.ownerTag != 'local') {
+        logger.e('dispose stream:${mediaStream.id} ${mediaStream.ownerTag}');
+      } else {
+        logger.i('dispose stream:${mediaStream.id} ${mediaStream.ownerTag}');
+      }
       try {
         await mediaStream.dispose();
       } catch (e) {
