@@ -134,7 +134,9 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
 
   ///新的ChatMessage来了，更新ChatSummary
   Future<ChatSummary?> upsertByChatMessage(ChatMessage chatMessage) async {
-    if (chatMessage.messageType == ChatMessageType.system.name) {
+    if (chatMessage.messageType == ChatMessageType.system.name ||
+        chatMessage.messageType == ChatMessageType.channel.name ||
+        chatMessage.messageType == ChatMessageType.collection.name) {
       return null;
     }
     if (chatMessage.subMessageType == ChatMessageSubType.chatReceipt.name ||

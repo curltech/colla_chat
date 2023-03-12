@@ -90,23 +90,41 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     );
   }
 
-  Future<Pagination<ChatMessage>> findByMessageType(
-    String messageType,
-    String targetAddress,
-    String subMessageType, {
+  Future<List<ChatMessage>> findByMessageType(
+    String messageType, {
+    String? targetAddress,
+    String? subMessageType,
+    String? contentType,
+    String? mimeType,
     int limit = defaultLimit,
     int offset = defaultOffset,
   }) async {
-    String where = 'messageType=? and targetAddress=? and subMessageType=?';
-    List<Object> whereArgs = [messageType, targetAddress, subMessageType];
-    var page = await findPage(
+    String where = 'messageType=?';
+    List<Object> whereArgs = [messageType];
+    if (subMessageType != null) {
+      where = '$where and subMessageType=?';
+      whereArgs.add(subMessageType);
+    }
+    if (targetAddress != null) {
+      where = '$where and targetAddress=?';
+      whereArgs.add(targetAddress);
+    }
+    if (contentType != null) {
+      where = '$where and contentType=?';
+      whereArgs.add(contentType);
+    }
+    if (mimeType != null) {
+      where = '$where and mimeType=?';
+      whereArgs.add(mimeType);
+    }
+    var chatMessages = await find(
         where: where,
         whereArgs: whereArgs,
         orderBy: 'sendTime',
         offset: offset,
         limit: limit);
 
-    return page;
+    return chatMessages;
   }
 
   Future<List<ChatMessage>> findByPeerId(
@@ -243,7 +261,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     ChatMessageType messageType = ChatMessageType.chat,
     ChatMessageSubType subMessageType = ChatMessageSubType.chat,
     ChatMessageContentType contentType = ChatMessageContentType.text,
-    String? mimeType,
+    ChatMessageMimeType? mimeType,
     PartyType receiverType = PartyType.linkman,
     String? receiverName,
     String? groupPeerId,
@@ -314,7 +332,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       chatMessage.content = CryptoUtil.encodeBase64(data);
     }
     chatMessage.contentType = contentType.name;
-    chatMessage.mimeType = mimeType;
+    chatMessage.mimeType = mimeType?.name;
     chatMessage.status = status ?? MessageStatus.sent.name;
     chatMessage.transportType = transportType.name;
     chatMessage.deleteTime = deleteTime;
@@ -333,7 +351,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     ChatMessageType messageType = ChatMessageType.chat,
     ChatMessageSubType subMessageType = ChatMessageSubType.chat,
     ChatMessageContentType contentType = ChatMessageContentType.text,
-    String? mimeType,
+    ChatMessageMimeType? mimeType,
     String? title,
     String? messageId,
     String? receiptType,
@@ -665,6 +683,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       thumbnail = CryptoUtil.decodeBase64(chatMessage.thumbnail!);
     }
     Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+    ChatMessageMimeType? chatMessageMimeType =
+        StringUtil.enumFromString<ChatMessageMimeType>(
+            ChatMessageMimeType.values, chatMessage.mimeType);
     if (linkman != null) {
       ChatMessage? message = await buildChatMessage(
         peerId,
@@ -672,7 +693,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         messageType: messageType!,
         subMessageType: subMessageType!,
         contentType: contentType!,
-        mimeType: chatMessage.mimeType,
+        mimeType: chatMessageMimeType,
         receiverName: linkman.name,
         title: title,
         receiptType: chatMessage.receiptType,
@@ -689,7 +710,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           messageType: messageType!,
           subMessageType: subMessageType!,
           contentType: contentType!,
-          mimeType: chatMessage.mimeType,
+          mimeType: chatMessageMimeType,
           title: title,
           receiptType: chatMessage.receiptType,
           thumbnail: thumbnail,
@@ -711,6 +732,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   /// 保存消息，对于复杂消息，存储附件
+  /// 如果content为空，不用考虑附件，有可能title就是文件名
   store(ChatMessage chatMessage, {bool updateSummary = true}) async {
     String subMessageType = chatMessage.subMessageType;
     //signal消息暂时不保存

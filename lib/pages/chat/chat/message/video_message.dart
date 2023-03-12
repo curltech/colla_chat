@@ -33,7 +33,7 @@ class VideoMessage extends StatelessWidget {
               key: UniqueKey(),
               showPlaylist: false,
               filename: filename,
-              mediaPlayerType: MediaPlayerType.webview,
+              videoPlayerType: VideoPlayerType.webview,
             );
           }
           return Container();

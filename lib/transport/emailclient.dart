@@ -405,7 +405,7 @@ class EmailClient {
   }
 
   ///用邮件客户端获取消息
-  Future<Pagination<MimeMessage>?> fetchMessages(
+  Future<List<MimeMessage>?> fetchMessages(
       {int limit = defaultLimit,
       FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
       Mailbox? mailbox,
@@ -418,11 +418,7 @@ class EmailClient {
           fetchPreference: fetchPreference,
           mailbox: mailbox,
           page: Pagination.getPage(offset, limit));
-      return Pagination(
-          rowsNumber: total,
-          data: messages,
-          rowsPerPage: limit,
-          offset: offset);
+      return messages;
     }
     return null;
   }

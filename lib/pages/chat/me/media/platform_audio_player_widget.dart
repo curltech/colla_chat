@@ -26,7 +26,7 @@ class PlatformAudioPlayerWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
-  MediaPlayerType? mediaPlayerType;
+  VideoPlayerType? mediaPlayerType;
 
   @override
   void initState() {
@@ -40,7 +40,7 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
 
   List<AppBarPopupMenu>? _buildRightPopupMenus() {
     List<AppBarPopupMenu> menus = [];
-    for (var type in MediaPlayerType.values) {
+    for (var type in VideoPlayerType.values) {
       AppBarPopupMenu menu = AppBarPopupMenu(
           title: type.name,
           onPressed: () {
@@ -65,7 +65,7 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
           ? PlatformMediaPlayer(
               key: UniqueKey(),
               showPlaylist: false,
-              mediaPlayerType: mediaPlayerType!,
+              videoPlayerType: mediaPlayerType!,
               filename: filename)
           : const Center(child: Text('Please select a MediaPlayerType!')),
     );

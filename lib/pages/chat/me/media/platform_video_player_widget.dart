@@ -1,5 +1,4 @@
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -7,11 +6,15 @@ import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player_win/video_player_win_plugin.dart';
 
-///平台标准的video_player的实现，移动采用flick，桌面采用vlc
+///平台标准的video_player的实现，缺省采用origin
 class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
   PlatformVideoPlayerWidget({
     Key? key,
-  }) : super(key: key);
+  }) : super(key: key) {
+    if (platformParams.windows) {
+      WindowsVideoPlayer.registerWith();
+    }
+  }
 
   @override
   State createState() => _PlatformVideoPlayerWidgetState();
@@ -30,30 +33,21 @@ class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
-  MediaPlayerType? mediaPlayerType;
+  VideoPlayerType videoPlayerType = VideoPlayerType.origin;
 
   @override
   void initState() {
     super.initState();
-    if (platformParams.windows) {
-      WindowsVideoPlayer.registerWith();
-    }
-  }
-
-  @override
-  void dispose() {
-    super.dispose();
   }
 
   List<AppBarPopupMenu>? _buildRightPopupMenus() {
     List<AppBarPopupMenu> menus = [];
-    for (var type in MediaPlayerType.values) {
+    for (var type in VideoPlayerType.values) {
       AppBarPopupMenu menu = AppBarPopupMenu(
           title: type.name,
           onPressed: () {
             setState(() {
-              mediaPlayerType = type;
-              logger.i('mediaPlayerType:$type');
+              videoPlayerType = type;
             });
           });
       menus.add(menu);
@@ -63,16 +57,12 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    String filename = 'C:\\document\\iceland_compressed.mp4';
     List<AppBarPopupMenu>? rightPopupMenus = _buildRightPopupMenus();
-    Widget child =
-        const Center(child: Text('Please select a MediaPlayerType!'));
-    if (mediaPlayerType != null) {
-      child = PlatformMediaPlayer(
-          showPlaylist: true,
-          mediaPlayerType: mediaPlayerType!,
-          filename: filename);
-    }
+    Widget child = PlatformMediaPlayer(
+      key: UniqueKey(),
+      showPlaylist: true,
+      videoPlayerType: videoPlayerType,
+    );
     return AppBarView(
       title: widget.title,
       withLeading: true,
@@ -80,5 +70,10 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
       child: child,
       // child:const VideoPlayer(),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

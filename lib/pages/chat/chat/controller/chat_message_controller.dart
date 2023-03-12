@@ -163,13 +163,16 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       }
     }
     ChatMessage returnChatMessage;
+    ChatMessageMimeType? chatMessageMimeType =
+        StringUtil.enumFromString<ChatMessageMimeType>(
+            ChatMessageMimeType.values, mimeType);
     if (type == PartyType.linkman) {
       ChatMessage chatMessage = await chatMessageService.buildChatMessage(
           peerId,
           title: title,
           content: content,
           contentType: contentType,
-          mimeType: mimeType,
+          mimeType: chatMessageMimeType,
           messageId: messageId,
           messageType: messageType,
           subMessageType: subMessageType,
@@ -182,7 +185,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
               title: title,
               content: content,
               contentType: contentType,
-              mimeType: mimeType,
+              mimeType: chatMessageMimeType,
               messageId: messageId,
               messageType: messageType,
               subMessageType: subMessageType,

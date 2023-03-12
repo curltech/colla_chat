@@ -47,12 +47,31 @@ class ImageUtil {
     return bytes;
   }
 
+  static Widget buildMemoryImageWidget(Uint8List image,
+      {double? width,
+      double? height,
+      BoxFit? fit = BoxFit.contain,
+      bool isRadius = false,
+      double radius = 8.0}) {
+    Widget imageWidget =
+        Image.memory(image, width: width, height: height, fit: fit);
+    if (isRadius) {
+      imageWidget = ClipRRect(
+        borderRadius: BorderRadius.all(
+          Radius.circular(radius),
+        ),
+        child: imageWidget,
+      );
+    }
+    return imageWidget;
+  }
+
   static Widget buildImageWidget(
       {String? image,
       double? width,
       double? height,
       BoxFit? fit = BoxFit.contain,
-      bool isRadius = true,
+      bool isRadius = false,
       double radius = 8.0}) {
     Widget imageWidget;
     if (image == null) {

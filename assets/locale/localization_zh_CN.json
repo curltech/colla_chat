@@ -309,5 +309,7 @@
   "join": "加入",
   "Conference show": "会议信息",
   "true": "是",
-  "false": "否"
+  "false": "否",
+  "Playlist is empty": "播放列表空",
+  "Please select a media file": "选择媒体文件"
 }

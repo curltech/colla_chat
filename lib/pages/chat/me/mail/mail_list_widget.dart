@@ -61,7 +61,7 @@ class _MailListWidgetState extends State<MailListWidget> {
       var currentChatMessagePages = mailAddressProvider.currentChatMessagePage;
       List<ChatMessage> currentChatMessages = [];
       if (currentChatMessagePages != null) {
-        currentChatMessages = currentChatMessagePages.data;
+        currentChatMessages = currentChatMessagePages;
       }
       var tiles = _convert(currentChatMessages);
       var dataListView =

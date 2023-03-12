@@ -1,4 +1,3 @@
-import 'package:colla_chat/datastore/datastore.dart' as datastore;
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/mailaddress.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -13,9 +12,9 @@ import 'package:flutter/material.dart';
 class MailDataProvider with ChangeNotifier {
   final Map<String, MailAddress> _mailAddress = {};
   final Map<String, Map<String, enough_mail.Mailbox?>> _addressMailboxes = {};
-  final Map<String, Map<String, datastore.Pagination<ChatMessage>>>
-      _addressChatMessagePages = {};
-  final Map<String, Map<String, datastore.Pagination<enough_mail.MimeMessage>>>
+  final Map<String, Map<String, List<ChatMessage>>> _addressChatMessagePages =
+      {};
+  final Map<String, Map<String, List<enough_mail.MimeMessage>>>
       _addressMimeMessagePages = {};
   MailAddress? _currentMailAddress;
   String? _currentMailboxName;
@@ -242,43 +241,40 @@ class MailDataProvider with ChangeNotifier {
   }
 
   ///获取当前地址的邮箱名称的邮件
-  datastore.Pagination<ChatMessage>? getMailboxChatMessages(
-      String mailboxName) {
+  List<ChatMessage>? getMailboxChatMessages(String mailboxName) {
     var currentMailAddress = this.currentMailAddress;
     if (currentMailAddress == null) {
       return null;
     }
     var email = currentMailAddress.email;
-    Map<String, datastore.Pagination<ChatMessage>>? mailboxChatMessagePages =
+    Map<String, List<ChatMessage>>? mailboxChatMessagePages =
         _addressChatMessagePages[email];
     if (mailboxChatMessagePages == null) {
       return null;
     }
-    datastore.Pagination<ChatMessage>? chatMessages =
-        mailboxChatMessagePages[mailboxName];
+    List<ChatMessage>? chatMessages = mailboxChatMessagePages[mailboxName];
     return chatMessages;
   }
 
   ///获取当前地址的当前邮箱的邮件
-  datastore.Pagination<ChatMessage>? get currentChatMessagePage {
+  List<ChatMessage>? get currentChatMessagePage {
     var currentMailboxName = _currentMailboxName;
     if (currentMailboxName == null) {
       return null;
     }
-    datastore.Pagination<ChatMessage>? chatMessagePage =
+    List<ChatMessage>? chatMessagePage =
         getMailboxChatMessages(currentMailboxName);
     return chatMessagePage;
   }
 
   ///获取当前地址的当前邮箱的邮件
-  set currentChatMessagePage(
-      datastore.Pagination<ChatMessage>? chatMessagePage) {
+  set currentChatMessagePage(List<ChatMessage>? chatMessagePage) {
     var currentMailAddress = this.currentMailAddress;
     if (currentMailAddress == null) {
       return;
     }
     var email = currentMailAddress.email;
-    Map<String, datastore.Pagination<ChatMessage>>? mailboxChatMessagePages =
+    Map<String, List<ChatMessage>>? mailboxChatMessagePages =
         _addressChatMessagePages[email];
     if (mailboxChatMessagePages == null) {
       return;
@@ -295,14 +291,14 @@ class MailDataProvider with ChangeNotifier {
   }
 
   ///获取当前地址的当前邮箱的邮件
-  datastore.Pagination<enough_mail.MimeMessage>? get currentMimeMessagePage {
+  List<enough_mail.MimeMessage>? get currentMimeMessagePage {
     var currentMailAddress = this.currentMailAddress;
     if (currentMailAddress == null) {
       return null;
     }
     var email = currentMailAddress.email;
-    Map<String, datastore.Pagination<enough_mail.MimeMessage>>?
-        mailboxMimeMessagePages = _addressMimeMessagePages[email];
+    Map<String, List<enough_mail.MimeMessage>>? mailboxMimeMessagePages =
+        _addressMimeMessagePages[email];
     if (mailboxMimeMessagePages == null) {
       return null;
     }
@@ -310,21 +306,20 @@ class MailDataProvider with ChangeNotifier {
     if (currentMailboxName == null) {
       return null;
     }
-    datastore.Pagination<enough_mail.MimeMessage>? mimeMessagePage =
+    List<enough_mail.MimeMessage>? mimeMessagePage =
         mailboxMimeMessagePages[currentMailboxName];
     return mimeMessagePage;
   }
 
   ///获取当前地址的当前邮箱的邮件
-  set currentMimeMessagePage(
-      datastore.Pagination<enough_mail.MimeMessage>? mimeMessagePage) {
+  set currentMimeMessagePage(List<enough_mail.MimeMessage>? mimeMessagePage) {
     var currentMailAddress = this.currentMailAddress;
     if (currentMailAddress == null) {
       return;
     }
     var email = currentMailAddress.email;
-    Map<String, datastore.Pagination<enough_mail.MimeMessage>>?
-        mailboxMimeMessagePages = _addressMimeMessagePages[email];
+    Map<String, List<enough_mail.MimeMessage>>? mailboxMimeMessagePages =
+        _addressMimeMessagePages[email];
     if (mailboxMimeMessagePages == null) {
       return;
     }
@@ -343,7 +338,7 @@ class MailDataProvider with ChangeNotifier {
   ChatMessage? get currentChatMessage {
     var currentChatMessagePage = this.currentChatMessagePage;
     if (currentChatMessagePage != null) {
-      return currentChatMessagePage.data[_currentIndex];
+      return currentChatMessagePage[_currentIndex];
     }
     return null;
   }
@@ -368,30 +363,27 @@ class MailDataProvider with ChangeNotifier {
     }
 
     var currentMimeMessagePage = this.currentMimeMessagePage;
-    datastore.Pagination<enough_mail.MimeMessage>? mimeMessagePage;
+    List<enough_mail.MimeMessage>? mimeMessagePage;
     if (currentMimeMessagePage == null) {
       mimeMessagePage =
           await emailClient.fetchMessages(mailbox: currentMailbox);
       currentMimeMessagePage = mimeMessagePage;
     } else {
-      int offset = currentMimeMessagePage.next();
       mimeMessagePage = await emailClient.fetchMessages(
-          mailbox: currentMailbox, offset: offset);
+        mailbox: currentMailbox,
+      );
       if (mimeMessagePage != null) {
-        currentMimeMessagePage.data.addAll(mimeMessagePage.data);
-        currentMimeMessagePage.page++;
+        currentMimeMessagePage.addAll(mimeMessagePage);
       }
     }
     this.currentMimeMessagePage = currentMimeMessagePage;
-    if (mimeMessagePage != null && mimeMessagePage.data.isNotEmpty) {
+    if (mimeMessagePage != null && mimeMessagePage.isNotEmpty) {
       var currentChatMessagePage = this.currentChatMessagePage;
       if (currentChatMessagePage == null) {
-        currentChatMessagePage = datastore.Pagination(
-            rowsNumber: currentMailbox.messagesExists,
-            data: const <ChatMessage>[]);
+        currentChatMessagePage = <ChatMessage>[];
         this.currentChatMessagePage = currentChatMessagePage;
       }
-      for (var mimeMessage in mimeMessagePage.data) {
+      for (var mimeMessage in mimeMessagePage) {
         var chatMessage = EmailMessageUtil.convertToChatMessage(mimeMessage);
         chatMessage.subMessageType = currentMailboxName!;
         chatMessage.senderAddress = email;
@@ -407,7 +399,7 @@ class MailDataProvider with ChangeNotifier {
         } catch (e) {
           logger.e(e);
         }
-        currentChatMessagePage.data.add(chatMessage);
+        currentChatMessagePage.add(chatMessage);
       }
 
       notifyListeners();
@@ -432,26 +424,26 @@ class MailDataProvider with ChangeNotifier {
     var currentChatMessagePage = this.currentChatMessagePage;
     if (currentChatMessagePage == null) {
       chatMessageService
-          .findByMessageType(
-              ChatMessageType.email.name, email, currentMailboxName)
+          .findByMessageType(ChatMessageType.email.name,
+              targetAddress: email, subMessageType: currentMailboxName)
           .then((chatMessagePage) {
         currentChatMessagePage = chatMessagePage;
         this.currentChatMessagePage = chatMessagePage;
         if (currentChatMessagePage != null) {
-          currentChatMessagePage!.data.addAll(chatMessagePage.data);
+          currentChatMessagePage!.addAll(chatMessagePage);
           notifyListeners();
         }
       });
     } else {
-      var offset = currentChatMessagePage.next();
       chatMessageService
           .findByMessageType(
-              ChatMessageType.email.name, email, currentMailboxName,
-              offset: offset)
+        ChatMessageType.email.name,
+        targetAddress: email,
+        subMessageType: currentMailboxName,
+      )
           .then((chatMessagePage) {
         if (currentChatMessagePage != null) {
-          currentChatMessagePage!.data.addAll(chatMessagePage.data);
-          currentChatMessagePage!.page++;
+          currentChatMessagePage!.addAll(chatMessagePage);
           notifyListeners();
         }
       });

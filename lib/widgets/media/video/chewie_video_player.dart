@@ -1,5 +1,6 @@
 import 'package:chewie/chewie.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
 import 'package:flutter/material.dart';
 
@@ -29,10 +30,10 @@ class ChewieVideoPlayerController extends OriginVideoPlayerController {
       hideControlsTimer: const Duration(seconds: 3),
       showControls: true,
       materialProgressColors: ChewieProgressColors(
-        playedColor: Colors.red,
-        handleColor: Colors.blue,
-        backgroundColor: Colors.grey,
-        bufferedColor: Colors.lightGreen,
+        playedColor: myself.primary,
+        handleColor: myself.primary,
+        backgroundColor: myself.secondary,
+        bufferedColor: Colors.green,
       ),
       placeholder: Container(
         color: Colors.black,

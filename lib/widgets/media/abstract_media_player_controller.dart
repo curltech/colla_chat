@@ -22,15 +22,18 @@ class PlatformMediaSource {
   final String filename;
   final ChatMessageMimeType? mediaFormat;
   final MediaSourceType mediaSourceType;
+  final Widget? thumbnail;
 
   PlatformMediaSource({
     required this.filename,
-    this.mediaFormat,
     required this.mediaSourceType,
+    this.mediaFormat,
+    this.thumbnail,
   });
 
   static FutureOr<PlatformMediaSource?> mediaStream(
-      {required Uint8List data, required ChatMessageMimeType mediaFormat}) async {
+      {required Uint8List data,
+      required ChatMessageMimeType mediaFormat}) async {
     String? filename =
         await FileUtil.writeTempFile(data, extension: mediaFormat.name);
     PlatformMediaSource? mediaSource = PlatformMediaSource(
@@ -41,13 +44,17 @@ class PlatformMediaSource {
     return mediaSource;
   }
 
-  static PlatformMediaSource media(
+  static PlatformMediaSource? media(
       {required String filename, ChatMessageMimeType? mediaFormat}) {
     PlatformMediaSource mediaSource;
     if (mediaFormat == null) {
       int pos = filename.lastIndexOf('.');
       String extension = filename.substring(pos + 1);
-      mediaFormat = StringUtil.enumFromString(ChatMessageMimeType.values, extension);
+      mediaFormat =
+          StringUtil.enumFromString(ChatMessageMimeType.values, extension);
+    }
+    if (mediaFormat == null) {
+      return null;
     }
     if (filename.startsWith('assets')) {
       mediaSource = PlatformMediaSource(
@@ -72,7 +79,10 @@ class PlatformMediaSource {
   static List<PlatformMediaSource> playlist(List<String> filenames) {
     List<PlatformMediaSource> playlist = [];
     for (var filename in filenames) {
-      playlist.add(media(filename: filename));
+      PlatformMediaSource? mediaSource = media(filename: filename);
+      if (mediaSource != null) {
+        playlist.add(mediaSource);
+      }
     }
 
     return playlist;
@@ -93,7 +103,7 @@ class PositionData {
 ///选择文件的功能，媒体窗口的产生方法接口
 abstract class AbstractMediaPlayerController with ChangeNotifier {
   List<PlatformMediaSource> playlist = [];
-  bool _playlistVisible = false;
+  bool _playlistVisible = true;
   int _currentIndex = -1;
   FileType fileType = FileType.any;
 
@@ -144,12 +154,24 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
         return null;
       }
     }
-    PlatformMediaSource mediaSource =
+    PlatformMediaSource? mediaSource =
         PlatformMediaSource.media(filename: filename);
-    playlist.add(mediaSource);
-    await setCurrentIndex(playlist.length - 1);
+    if (mediaSource != null) {
+      playlist.add(mediaSource);
+      await setCurrentIndex(playlist.length - 1);
+    }
 
     return mediaSource;
+  }
+
+  Future<List<PlatformMediaSource>> addAll(
+      {required List<String> filenames}) async {
+    List<PlatformMediaSource> mediaSources =
+        PlatformMediaSource.playlist(filenames);
+    playlist.addAll(mediaSources);
+    await setCurrentIndex(playlist.length - 1);
+
+    return mediaSources;
   }
 
   Future<PlatformMediaSource?> insert(int index,
@@ -160,10 +182,12 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
         return null;
       }
     }
-    PlatformMediaSource mediaSource =
+    PlatformMediaSource? mediaSource =
         PlatformMediaSource.media(filename: filename);
-    playlist.insert(index, mediaSource);
-    await setCurrentIndex(index);
+    if (mediaSource != null) {
+      playlist.insert(index, mediaSource);
+      await setCurrentIndex(index);
+    }
 
     return mediaSource;
   }
