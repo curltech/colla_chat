@@ -3,7 +3,6 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/audio/abstract_audio_player_controller.dart';
 import 'package:fluent_ui/fluent_ui.dart';
-import 'package:flutter/src/widgets/framework.dart';
 
 ///WaveformsAudio音频播放器，Android, iOS, Linux, macOS, Windows, and web.
 ///还可以产生音频播放的波形图形组件
@@ -11,7 +10,7 @@ class WaveformsAudioPlayerController extends AbstractAudioPlayerController {
   late PlayerController playerController;
   double _volume = 1.0;
 
-  WaveformsAudioPlayerController() {
+  WaveformsAudioPlayerController() : super() {
     playerController = PlayerController();
     playerController.onCurrentDurationChanged.listen((event) {});
     playerController.onPlayerStateChanged.listen((state) {});

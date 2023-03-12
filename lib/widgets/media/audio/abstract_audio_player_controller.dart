@@ -1,8 +1,13 @@
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:video_player/video_player.dart';
 
 abstract class AbstractAudioPlayerController
     extends AbstractMediaPlayerController {
+  AbstractAudioPlayerController() : super() {
+    fileType = FileType.audio;
+  }
+
   VideoPlayerValue _value = VideoPlayerValue(duration: Duration.zero);
   bool _closedCaptionFile = false;
 

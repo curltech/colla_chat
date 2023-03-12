@@ -20,7 +20,7 @@ class JustAudioPlayer {
     AudioLoadConfiguration? audioLoadConfiguration,
     AudioPipeline? audioPipeline,
     bool androidOffloadSchedulingEnabled = false,
-  }) {
+  }): super() {
     player = AudioPlayer(
         userAgent: userAgent,
         handleInterruptions: handleInterruptions,

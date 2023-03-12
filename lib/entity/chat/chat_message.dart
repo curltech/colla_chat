@@ -8,6 +8,7 @@ enum ChatMessageContentType {
   file,
   audio,
   video,
+  media,
   display,
   card,
   channel,
@@ -130,7 +131,7 @@ class ChatMessage extends StatusEntity {
   String? receiverType; // 包括：Linkman(单聊),Group(群聊),Conference(会议),
   String? receiverName;
   String?
-  groupPeerId; // 目标的唯一id标识（单聊对应linkman-peerId，群聊对应group-peerId，会议对应conferenceId）
+      groupPeerId; // 目标的唯一id标识（单聊对应linkman-peerId，群聊对应group-peerId，会议对应conferenceId）
   String? groupName;
   String? groupType;
   String? receiverAddress;
@@ -206,22 +207,22 @@ class ChatMessage extends StatusEntity {
         payloadKey = json['payloadKey'],
         ephemeralPublicKey = json['ephemeralPublicKey'],
         needCompress = json['needEncrypt'] == null ||
-            json['needCompress'] == true ||
-            json['needCompress'] == 1
+                json['needCompress'] == true ||
+                json['needCompress'] == 1
             ? true
             : false,
         needEncrypt = json['needEncrypt'] == null ||
-            json['needEncrypt'] == true ||
-            json['needEncrypt'] == 1
+                json['needEncrypt'] == true ||
+                json['needEncrypt'] == 1
             ? true
             : false,
         needReceipt = json['needReceipt'] == true || json['needReceipt'] == 1
             ? true
             : false,
         needReadReceipt =
-        json['needReadReceipt'] == true || json['needReadReceipt'] == 1
-            ? true
-            : false,
+            json['needReadReceipt'] == true || json['needReadReceipt'] == 1
+                ? true
+                : false,
         super.fromJson(json);
 
   @override

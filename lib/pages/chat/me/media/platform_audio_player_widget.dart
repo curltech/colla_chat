@@ -1,4 +1,3 @@
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -26,7 +25,7 @@ class PlatformAudioPlayerWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
-  VideoPlayerType? mediaPlayerType;
+  AudioPlayerType audioPlayerType = AudioPlayerType.audioplayers;
 
   @override
   void initState() {
@@ -40,13 +39,12 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
 
   List<AppBarPopupMenu>? _buildRightPopupMenus() {
     List<AppBarPopupMenu> menus = [];
-    for (var type in VideoPlayerType.values) {
+    for (var type in AudioPlayerType.values) {
       AppBarPopupMenu menu = AppBarPopupMenu(
           title: type.name,
           onPressed: () {
             setState(() {
-              mediaPlayerType = type;
-              logger.i('mediaPlayerType:$type');
+              audioPlayerType = type;
             });
           });
       menus.add(menu);
@@ -56,18 +54,14 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
 
   @override
   Widget build(BuildContext context) {
-    String filename = 'C:\\Users\\hujs\\Documents\\content\\2d20a19.m4a';
     return AppBarView(
       title: widget.title,
       withLeading: true,
       rightPopupMenus: _buildRightPopupMenus(),
-      child: mediaPlayerType != null
-          ? PlatformMediaPlayer(
-              key: UniqueKey(),
-              showPlaylist: false,
-              videoPlayerType: mediaPlayerType!,
-              filename: filename)
-          : const Center(child: Text('Please select a MediaPlayerType!')),
+      child: PlatformMediaPlayer(
+          key: UniqueKey(),
+          showPlaylist: true,
+          audioPlayerType: audioPlayerType),
     );
   }
 }

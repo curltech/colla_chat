@@ -193,10 +193,14 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       ChatMessageMimeType? chatMessageMimeType =
           StringUtil.enumFromString<ChatMessageMimeType>(
               ChatMessageMimeType.values, mediaFormat);
+      String fileType = widget.controller.fileType.name;
+      ChatMessageContentType? contentType =
+          StringUtil.enumFromString(ChatMessageContentType.values, fileType);
+      contentType = contentType ?? ChatMessageContentType.media;
       var chatMessage = await chatMessageService.buildChatMessage(
         myself.peerId!,
         messageType: ChatMessageType.collection,
-        contentType: ChatMessageContentType.video,
+        contentType: contentType,
         mimeType: chatMessageMimeType,
         title: filename,
         thumbnail: thumbnail,

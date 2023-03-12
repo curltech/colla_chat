@@ -68,7 +68,6 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
       withLeading: true,
       rightPopupMenus: rightPopupMenus,
       child: child,
-      // child:const VideoPlayer(),
     );
   }
 
