@@ -225,6 +225,7 @@ class BasePeerConnection {
   RTCPeerConnection? peerConnection;
   PeerConnectionStatus _status = PeerConnectionStatus.created;
   NegotiateStatus _negotiateStatus = NegotiateStatus.none;
+  bool renegotiate = false;
 
   //数据通道的状态是否打开
   bool dataChannelOpen = false;
@@ -489,6 +490,10 @@ class BasePeerConnection {
     }
     if (state == RTCSignalingState.RTCSignalingStateStable) {
       negotiateStatus = NegotiateStatus.negotiated;
+      if (renegotiate) {
+        renegotiate = false;
+        negotiate();
+      }
     }
     emit(WebrtcEventType.signalingState, state);
   }
@@ -517,8 +522,8 @@ class BasePeerConnection {
   }
 
   onRenegotiationNeeded() {
-    // logger.w('onRenegotiationNeeded event');
-    // negotiate();
+    logger.w('onRenegotiationNeeded event');
+    negotiate();
   }
 
   //数据通道状态事件
@@ -569,6 +574,7 @@ class BasePeerConnection {
     }
     if (negotiateStatus == NegotiateStatus.negotiating) {
       logger.e('PeerConnectionStatus already negotiating');
+      renegotiate = true;
       return;
     }
     logger.w('Start negotiate');
@@ -676,6 +682,7 @@ class BasePeerConnection {
     }
     if (negotiateStatus == NegotiateStatus.negotiating) {
       logger.e('already negotiating');
+      renegotiate = true;
       return;
     }
     if (status != PeerConnectionStatus.connected) {
