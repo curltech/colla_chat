@@ -4,10 +4,14 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_linux
+  awesome_notifications
   dart_vlc
   emoji_picker_flutter
   file_saver
+  file_selector_linux
   flutter_secure_storage_linux
+  flutter_webrtc
+  maps_launcher
   openpgp
   record_linux
   screen_retriever

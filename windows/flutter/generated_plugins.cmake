@@ -4,27 +4,33 @@
 
 list(APPEND FLUTTER_PLUGIN_LIST
   audioplayers_windows
-  battery_plus_windows
+  awesome_notifications
+  battery_plus
   camera_windows
   connectivity_plus
   dart_vlc
   emoji_picker_flutter
   file_saver
-  flutter_native_view
+  file_selector_windows
   flutter_secure_storage_windows
   flutter_tts
   flutter_webrtc
+  fullscreen_window
   geolocator_windows
   just_audio_windows
   local_auth_windows
-  network_info_plus_windows
+  maps_launcher
+  network_info_plus
   openpgp
   pdfx
   permission_handler_windows
   record_windows
   screen_retriever
+  share_plus
   sqlite3_flutter_libs
   url_launcher_windows
+  video_player_win
+  webview_win_floating
   window_manager
 )
 

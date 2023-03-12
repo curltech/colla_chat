@@ -2,63 +2,21 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel>
-      <module name="android.another_audio_recorder" target="17" />
-      <module name="android.audio_service" target="17" />
-      <module name="android.audio_session" target="17" />
-      <module name="android.audio_waveforms" target="17" />
-      <module name="android.barcode_scan2" target="17" />
-      <module name="android.battery_plus" target="17" />
-      <module name="android.camera_android" target="17" />
-      <module name="android.file_picker" target="17" />
-      <module name="android.file_saver" target="17" />
-      <module name="android.flutter_background" target="17" />
-      <module name="android.flutter_contacts" target="17" />
-      <module name="android.flutter_image_compress" target="17" />
       <module name="android.flutter_inappwebview_quill" target="17" />
-      <module name="android.flutter_local_notifications" target="17" />
-      <module name="android.flutter_plugin_android_lifecycle" target="17" />
-      <module name="android.flutter_secure_storage" target="17" />
-      <module name="android.flutter_sound" target="17" />
-      <module name="android.flutter_tts" target="17" />
-      <module name="android.gallery_saver" target="17" />
-      <module name="android.geolocator_android" target="17" />
-      <module name="android.image_gallery_saver" target="17" />
-      <module name="android.image_picker_android" target="17" />
-      <module name="android.just_audio" target="17" />
-      <module name="android.just_waveform" target="17" />
-      <module name="android.mobile_number" target="17" />
-      <module name="android.onesignal_flutter" target="17" />
-      <module name="android.open_file" target="17" />
-      <module name="android.openpgp" target="17" />
-      <module name="android.orientation" target="17" />
-      <module name="android.package_info" target="17" />
-      <module name="android.package_info_plus" target="17" />
-      <module name="android.path_provider_android" target="17" />
-      <module name="android.pdfx" target="17" />
-      <module name="android.phone_number" target="17" />
-      <module name="android.shared_preferences_android" target="17" />
-      <module name="android.speech_to_text" target="17" />
-      <module name="android.sqlite3_flutter_libs" target="17" />
-      <module name="android.telephony" target="17" />
-      <module name="android.url_launcher_android" target="17" />
-      <module name="android.video_player_android" target="17" />
-      <module name="android.video_thumbnail" target="17" />
-      <module name="android.wakelock" target="17" />
-      <module name="android.webcrypto" target="17" />
-      <module name="android.webview_flutter_android" target="17" />
-      <module name="com.baseflow.permissionhandler.android.permission_handler_android" target="17" />
-      <module name="com.cloudwebrtc.webrtc.android.flutter_webrtc" target="17" />
-      <module name="com.fintasys.emoji_picker_flutter.android.emoji_picker_flutter" target="17" />
-      <module name="com.fluttercandies.photo_manager.android.photo_manager" target="17" />
+      <module name="android.webview_pro_android" target="17" />
+      <module name="com.baseflow.geolocator.android.geolocator_android" target="17" />
+      <module name="com.csdcorp.speech_to_text.android.speech_to_text" target="17" />
       <module name="com.jrai.flutter_keyboard_visibility.android.flutter_keyboard_visibility" target="17" />
       <module name="com.llfbandit.record.android.record" target="17" />
       <module name="com.tekartik.sqflite.android.sqflite" target="17" />
       <module name="dev.fluttercommunity.plus.device_info.android.device_info_plus" target="17" />
       <module name="dev.fluttercommunity.plus.network_info.android.network_info_plus" target="17" />
       <module name="dev.fluttercommunity.plus.share.android.share_plus" target="17" />
-      <module name="io.flutter.plugins.connectivity.android.connectivity_plus" target="17" />
+      <module name="io.flutter.plugins.camera.android.camera_android" target="17" />
       <module name="io.flutter.plugins.localauth.android.local_auth_android" target="17" />
       <module name="io.flutter.plugins.sensors.android.sensors_plus" target="17" />
+      <module name="io.flutter.plugins.sharedpreferences.android.shared_preferences_android" target="17" />
+      <module name="io.scer.pdf_renderer.android.pdfx" target="17" />
       <module name="xyz.luan.audioplayers.android.audioplayers_android" target="17" />
     </bytecodeTargetLevel>
   </component>
