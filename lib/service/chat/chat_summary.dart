@@ -137,6 +137,11 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
     if (chatMessage.messageType == ChatMessageType.system.name) {
       return null;
     }
+    if (chatMessage.subMessageType == ChatMessageSubType.chatReceipt.name ||
+        chatMessage.subMessageType == ChatMessageSubType.signal.name ||
+        chatMessage.subMessageType == ChatMessageSubType.preKeyBundle.name) {
+      return null;
+    }
     var groupPeerId = chatMessage.groupPeerId;
     var senderPeerId = chatMessage.senderPeerId;
     var receiverPeerId = chatMessage.receiverPeerId;
