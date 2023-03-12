@@ -6,6 +6,7 @@ class WidgetUtil {
   static buildCircleButton({
     Key? key,
     String? label,
+    String? tip,
     void Function()? onPressed,
     Color? backgroundColor,
     double elevation = 2.0,
@@ -24,20 +25,41 @@ class WidgetUtil {
       onPressed: onPressed,
       child: child,
     );
-    if (label != null) {
-      button = Column(
-        children: [
-          button,
-          const SizedBox(
-            height: 10.0,
-          ),
-          Text(
-            AppLocalizations.t(label),
-            style: const TextStyle(color: Colors.white),
-          )
-        ],
+    List<Widget> children = [];
+    if (tip != null) {
+      children.add(
+        Text(
+          AppLocalizations.t(tip),
+          style: const TextStyle(
+              color: Colors.white, fontSize: AppFontSize.xsFontSize),
+        ),
+      );
+      children.add(
+        const SizedBox(
+          height: 10.0,
+        ),
       );
     }
+    children.add(button);
+    if (label != null) {
+      children.add(
+        const SizedBox(
+          height: 10.0,
+        ),
+      );
+      children.add(
+        Text(
+          AppLocalizations.t(label),
+          style: const TextStyle(
+              color: Colors.white, fontSize: AppFontSize.mdFontSize),
+        ),
+      );
+    }
+
+    button = Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: children,
+    );
     return button;
   }
 

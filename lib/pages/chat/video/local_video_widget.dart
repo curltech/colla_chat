@@ -484,7 +484,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       case 'Media play':
         //await _openMediaStream(stream);
         break;
-      case 'Close':
+      case 'Close all':
         await _close();
         break;
       default:
@@ -583,13 +583,17 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
           if (value == VideoChatStatus.calling ||
               value == VideoChatStatus.chatting) {
             String? label;
+            String? tip;
             if (value == VideoChatStatus.calling) {
-              label = 'Calling, you can hangup';
+              label = 'Hangup';
+              tip = 'Calling';
             } else if (value == VideoChatStatus.chatting) {
-              label = 'Chatting, you can exit';
+              label = 'Exit';
+              tip = 'Chatting';
             }
             buttonWidget = WidgetUtil.buildCircleButton(
               label: label,
+              tip: tip,
               onPressed: () {
                 if (value == VideoChatStatus.calling) {
                   _hangup();
@@ -613,16 +617,20 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
             }
           } else if (value == VideoChatStatus.end) {
             String? label;
+            String? tip;
             var videoChatMessageController =
                 this.videoChatMessageController.value;
             Conference? conference = videoChatMessageController?.conference;
             if (conference == null) {
-              label = 'No conference, you can invite';
+              label = 'Invite';
+              tip = 'No conference';
             } else {
-              label = 'In conference, you can join';
+              label = 'Join';
+              tip = 'In conference';
             }
             buttonWidget = WidgetUtil.buildCircleButton(
               label: label,
+              tip: tip,
               onPressed: () async {
                 if (conference == null) {
                   await _invite();

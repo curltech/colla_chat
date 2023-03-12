@@ -95,7 +95,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
     if (remoteVideoRenderController!.videoRenders.isNotEmpty) {
       actionData.add(
         ActionData(
-            label: 'Close',
+            label: 'Close all',
             tooltip: 'Close all video',
             icon:
                 const Icon(Icons.closed_caption_disabled, color: Colors.white)),
@@ -230,7 +230,7 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
               child: VideoViewCard(
                 videoRenderController: remoteVideoRenderController!,
                 onClosed: _onClosedVideoRender,
-                conference: videoChatMessageController!.conference,
+                conference: videoChatMessageController.conference,
               ));
         });
   }
