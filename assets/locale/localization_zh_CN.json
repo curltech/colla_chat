@@ -289,7 +289,6 @@
   "Inviting you audio chat ": "邀请你参加音频会议：",
   "video chat invitation": "视频会议邀请",
   "audio chat invitation": "音频会议邀请",
-  "No conference": "当前无视频会议",
   "No video view in current conference": "当前视频会议无活动远程视频窗口",
   "No active conference in pool": "会议池中无活动视频会议",
   "Join conference:": "加入会议：",
@@ -305,5 +304,10 @@
   "Invite": "发起会议邀请",
   "Join": "加入",
   "Speaker off": "扬声器已关",
-  "Speaker on": "扬声器已开"
+  "Speaker on": "扬声器已开",
+  "invite": "邀请",
+  "join": "加入",
+  "Conference show": "会议信息",
+  "true": "是",
+  "false": "否"
 }
