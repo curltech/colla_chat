@@ -177,6 +177,7 @@ class ChatGPT {
     double? frequencyPenalty,
     Map<String, dynamic>? logitBias,
     String? user,
+    String role='user',
     required Function(OpenAIStreamChatCompletionModel) onCompletion,
   }) {
     Stream<OpenAIStreamChatCompletionModel> chatStream =
@@ -185,7 +186,7 @@ class ChatGPT {
       messages: [
         OpenAIChatCompletionChoiceMessageModel(
           content: message,
-          role: user!,
+          role: role,
         )
       ],
       maxTokens: maxTokens,

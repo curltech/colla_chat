@@ -204,9 +204,12 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       if (chatGPT == null) {
         returnChatMessage = await chatMessageService.sendAndStore(chatMessage);
       } else {
-        returnChatMessage = await chatMessageService.store(chatMessage);
-        chatGPT!
-            .chatCompletionStream(message: content, onCompletion: onCompletion);
+        await chatMessageService.store(chatMessage);
+        returnChatMessage = chatMessage;
+        chatGPT!.chatCompletionStream(
+          message: content,
+          onCompletion: onCompletion,
+        );
       }
     } else {
       List<ChatMessage> chatMessages =
@@ -233,35 +236,47 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     return returnChatMessage;
   }
 
+  String completionContent = '';
+
   onCompletion(OpenAIStreamChatCompletionModel streamChatCompletion) async {
     if (streamChatCompletion.choices.isNotEmpty) {
-      String content = streamChatCompletion.choices.first.delta.content!;
-      ChatMessage chatMessage = ChatMessage();
-      var uuid = const Uuid();
-      chatMessage.messageId = uuid.v4();
-      chatMessage.messageType = ChatMessageType.chat.name;
-      chatMessage.subMessageType = ChatMessageSubType.chat.name;
-      chatMessage.direct = ChatDirect.receive.name; //对自己而言，消息是属于发送或者接受
-      chatMessage.senderPeerId = _chatSummary!.peerId!;
-      chatMessage.senderType = PartyType.linkman.name;
-      chatMessage.senderName = _chatSummary!.name;
-      var current = DateUtil.currentDate();
-      chatMessage.sendTime = current;
-      chatMessage.readTime = current;
-      chatMessage.receiverPeerId = myself.peerId;
-      chatMessage.receiverType = PartyType.linkman.name;
-      chatMessage.receiverClientId = myself.clientId;
-      chatMessage.receiverName = myself.name;
-      chatMessage.content =
-          CryptoUtil.encodeBase64(CryptoUtil.stringToUtf8(content));
-      chatMessage.contentType = ChatMessageContentType.text.name;
-      chatMessage.status = MessageStatus.received.name;
-      chatMessage.transportType = TransportType.chatGPT.name;
-      chatMessage.deleteTime = deleteTime;
-      chatMessage.parentMessageId = parentMessageId;
-      chatMessage.id = null;
-      await chatMessageService.store(chatMessage);
-      notifyListeners();
+      String? content = streamChatCompletion.choices.first.delta.content;
+      if (content != null) {
+        if (content != '\n\n') {
+          completionContent = completionContent + content;
+        }
+      } else {
+        if (completionContent.isEmpty) {
+          return;
+        }
+        ChatMessage chatMessage = ChatMessage();
+        var uuid = const Uuid();
+        chatMessage.messageId = uuid.v4();
+        chatMessage.messageType = ChatMessageType.chat.name;
+        chatMessage.subMessageType = ChatMessageSubType.chat.name;
+        chatMessage.direct = ChatDirect.receive.name; //对自己而言，消息是属于发送或者接受
+        chatMessage.senderPeerId = _chatSummary!.peerId!;
+        chatMessage.senderType = PartyType.linkman.name;
+        chatMessage.senderName = _chatSummary!.name;
+        var current = DateUtil.currentDate();
+        chatMessage.sendTime = current;
+        chatMessage.readTime = current;
+        chatMessage.receiverPeerId = myself.peerId;
+        chatMessage.receiverType = PartyType.linkman.name;
+        chatMessage.receiverClientId = myself.clientId;
+        chatMessage.receiverName = myself.name;
+        chatMessage.content =
+            CryptoUtil.encodeBase64(CryptoUtil.stringToUtf8(completionContent));
+        chatMessage.contentType = ChatMessageContentType.text.name;
+        chatMessage.status = MessageStatus.received.name;
+        chatMessage.transportType = TransportType.chatGPT.name;
+        chatMessage.deleteTime = deleteTime;
+        chatMessage.parentMessageId = parentMessageId;
+        chatMessage.id = null;
+        await chatMessageService.store(chatMessage);
+        completionContent = '';
+        notifyListeners();
+      }
     }
   }
 }

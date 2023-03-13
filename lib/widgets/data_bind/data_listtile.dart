@@ -181,7 +181,7 @@ class DataListTile extends StatelessWidget {
     if (tileData.titleTail != null) {
       titleWidget = Row(children: [
         Expanded(child: titleWidget),
-        const Spacer(),
+        //const Spacer(),
         Text(
           AppLocalizations.t(tileData.titleTail ?? ''),
           style: tileData.dense
