@@ -20,7 +20,6 @@ import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/qrcode_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -254,11 +253,11 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         Widget? prefix = linkman.avatarImage;
         String routeName = 'linkman_edit';
         if (linkmanStatus == LinkmanStatus.chatGPT.name) {
-          prefix = prefix ??
-              ImageUtil.buildImageWidget(
-                  image: 'assets/images/openai.png',
-                  width: AppIconSize.lgSize,
-                  height: AppIconSize.lgSize);
+          // prefix = prefix ??
+          //     ImageUtil.buildImageWidget(
+          //         image: 'assets/images/openai.png',
+          //         width: AppIconSize.lgSize,
+          //         height: AppIconSize.lgSize);
           routeName = 'chat_gpt_edit';
         }
         prefix = prefix ?? AppImage.lgAppImage;

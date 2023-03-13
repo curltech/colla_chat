@@ -307,13 +307,13 @@ class _ChatListWidgetState extends State<ChatListWidget>
         }
         name = '$name($linkmanStatus)';
         var avatarImage = linkman.avatarImage;
-        if (linkmanStatus == LinkmanStatus.chatGPT.name) {
-          avatarImage = avatarImage ??
-              ImageUtil.buildImageWidget(
-                  image: 'assets/images/openai.png',
-                  width: AppIconSize.lgSize,
-                  height: AppIconSize.lgSize);
-        }
+        // if (linkmanStatus == LinkmanStatus.chatGPT.name) {
+        //   avatarImage = avatarImage ??
+        //       ImageUtil.buildImageWidget(
+        //           image: 'assets/images/openai.png',
+        //           width: AppIconSize.lgSize,
+        //           height: AppIconSize.lgSize);
+        // }
         var badge = _buildBadge(unreadNumber, avatarImage: avatarImage);
 
         TileData tile = _buildTile(badge, name, sendReceiveTime, subtitle,
