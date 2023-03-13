@@ -2,6 +2,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/group.dart';
+import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_input.dart';
@@ -15,8 +16,10 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/chat_summary.dart';
 import 'package:colla_chat/service/chat/group.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/transport/openai/openai_chat_gpt.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
@@ -113,29 +116,38 @@ class _ChatMessageViewState extends State<ChatMessageView> {
       logger.e('chatSummary is null');
       return;
     }
+    chatMessageController.chatGPT = null;
     String peerId = chatSummary.peerId!;
     String partyType = chatSummary.partyType!;
     peerConnectionPool.registerWebrtcEvent(
         peerId, WebrtcEventType.status, _updatePeerConnectionStatus);
     if (partyType == PartyType.linkman.name) {
       if (peerId != myself.peerId) {
-        List<AdvancedPeerConnection> advancedPeerConnections =
-            peerConnectionPool.get(peerId);
-        if (advancedPeerConnections.isEmpty) {
-          AdvancedPeerConnection? advancedPeerConnection =
-              await peerConnectionPool.create(peerId);
-          if (advancedPeerConnection != null) {
-            _peerConnectionStatus.value = advancedPeerConnection.status;
+        Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+        if (linkman != null) {
+          if (linkman.linkmanStatus == LinkmanStatus.chatGPT.name) {
+            ChatGPT chatGPT = ChatGPT(linkman.peerId);
+            chatMessageController.chatGPT = chatGPT;
           } else {
-            _peerConnectionStatus.value = PeerConnectionStatus.none;
-          }
-        } else {
-          for (AdvancedPeerConnection advancedPeerConnection
-              in advancedPeerConnections) {
-            _peerConnectionStatus.value = advancedPeerConnection.status;
-            if (advancedPeerConnection.status ==
-                PeerConnectionStatus.connected) {
-              break;
+            List<AdvancedPeerConnection> advancedPeerConnections =
+                peerConnectionPool.get(peerId);
+            if (advancedPeerConnections.isEmpty) {
+              AdvancedPeerConnection? advancedPeerConnection =
+                  await peerConnectionPool.create(peerId);
+              if (advancedPeerConnection != null) {
+                _peerConnectionStatus.value = advancedPeerConnection.status;
+              } else {
+                _peerConnectionStatus.value = PeerConnectionStatus.none;
+              }
+            } else {
+              for (AdvancedPeerConnection advancedPeerConnection
+                  in advancedPeerConnections) {
+                _peerConnectionStatus.value = advancedPeerConnection.status;
+                if (advancedPeerConnection.status ==
+                    PeerConnectionStatus.connected) {
+                  break;
+                }
+              }
             }
           }
         }

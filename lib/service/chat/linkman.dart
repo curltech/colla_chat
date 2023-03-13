@@ -71,6 +71,13 @@ class LinkmanService extends PeerPartyService<Linkman> {
         linkman.avatarImage = peerClient.avatarImage;
       }
     }
+    if (linkman.avatarImage == null &&
+        linkman.linkmanStatus == LinkmanStatus.chatGPT.name) {
+      linkman.avatarImage = ImageUtil.buildImageWidget(
+          image: 'assets/images/openai.png',
+          width: AppIconSize.lgSize,
+          height: AppIconSize.lgSize);
+    }
     linkmen[peerId] = linkman;
   }
 

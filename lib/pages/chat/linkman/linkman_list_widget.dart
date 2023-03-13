@@ -7,12 +7,9 @@ import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/linkman/conference/conference_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/conference/conference_show_view.dart';
-import 'package:colla_chat/pages/chat/linkman/group/group_add_widget.dart';
-import 'package:colla_chat/pages/chat/linkman/linkman/chat_gpt_edit_widget.dart';
-import 'package:colla_chat/pages/chat/linkman/linkman/linkman_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_edit_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman_add_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -27,7 +24,6 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/qrcode_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -42,27 +38,18 @@ final DataListController<Conference> conferenceController =
 
 ///联系人和群的查询界面
 class LinkmanListWidget extends StatefulWidget with TileDataMixin {
-  final LinkmanEditWidget linkmanEditWidget = LinkmanEditWidget();
-  final ChatGPTEditWidget chatGPTEditWidget = const ChatGPTEditWidget();
   final LinkmanAddWidget linkmanAddWidget = LinkmanAddWidget();
-  final GroupAddWidget groupAddWidget = GroupAddWidget();
-  final ConferenceEditWidget conferenceEditWidget = ConferenceEditWidget();
+  final LinkmanEditWidget linkmanEditWidget = LinkmanEditWidget();
   final ConferenceShowView conferenceShowView = ConferenceShowView();
   late final List<TileData> linkmanTileData;
 
   LinkmanListWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(linkmanEditWidget);
-    indexWidgetProvider.define(chatGPTEditWidget);
     indexWidgetProvider.define(linkmanAddWidget);
-    indexWidgetProvider.define(groupAddWidget);
-    indexWidgetProvider.define(conferenceEditWidget);
     indexWidgetProvider.define(conferenceShowView);
     List<TileDataMixin> mixins = [
       linkmanEditWidget,
-      chatGPTEditWidget,
       linkmanAddWidget,
-      groupAddWidget,
-      conferenceEditWidget,
       conferenceShowView,
     ];
     linkmanTileData = TileData.from(mixins);
@@ -264,14 +251,23 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         if (peerId == myself.peerId) {
           linkmanStatus = AppLocalizations.t('myself');
         }
+        Widget? prefix = linkman.avatarImage;
+        String routeName = 'linkman_edit';
+        if (linkmanStatus == LinkmanStatus.chatGPT.name) {
+          prefix = prefix ??
+              ImageUtil.buildImageWidget(
+                  image: 'assets/images/openai.png',
+                  width: AppIconSize.lgSize,
+                  height: AppIconSize.lgSize);
+          routeName = 'chat_gpt_edit';
+        }
+        prefix = prefix ?? AppImage.lgAppImage;
         TileData tile = TileData(
-            prefix: linkman.avatarImage ?? AppImage.lgAppImage,
+            prefix: prefix,
             title: name,
             subtitle: linkmanStatus,
             selected: false,
-            routeName: linkmanStatus == LinkmanStatus.chatGPT.name
-                ? 'chat_gpt_edit'
-                : 'linkman_edit');
+            routeName: routeName);
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(
             title: 'Delete',
@@ -611,51 +607,33 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
 
   @override
   Widget build(BuildContext context) {
-    List<AppBarPopupMenu> rightPopupMenus = [
-      AppBarPopupMenu(
-          onPressed: () {
-            linkmanController.currentIndex = -1;
-            indexWidgetProvider.push('linkman_add');
-          },
-          icon: Icon(Icons.person_add_alt, color: myself.primary),
-          title: AppLocalizations.t('Add linkman')),
-      AppBarPopupMenu(
-          onPressed: () {
-            groupController.currentIndex = -1;
-            indexWidgetProvider.push('group_add');
-          },
-          icon: Icon(Icons.group_add, color: myself.primary),
-          title: AppLocalizations.t('Add group')),
-      AppBarPopupMenu(
-          onPressed: () {
-            conferenceController.currentIndex = -1;
-            indexWidgetProvider.push('conference_edit');
-          },
-          icon: Icon(Icons.add_business_outlined, color: myself.primary),
-          title: AppLocalizations.t('Add conference')),
-      AppBarPopupMenu(
-          onPressed: () {
-            linkmanController.currentIndex = -1;
-            indexWidgetProvider.push('chat_gpt_edit');
-          },
-          icon: ImageUtil.buildImageWidget(image: 'assets/images/openai.png'),
-          title: AppLocalizations.t('Add chatGPT account')),
-      AppBarPopupMenu(
-          onPressed: () async {
-            ScanResult scanResult = await QrcodeUtil.scan();
-            String content = scanResult.rawContent;
-            var map = JsonUtil.toJson(content);
-            PeerClient peerClient = PeerClient.fromJson(map);
-            await peerClientService.store(peerClient);
-            await linkmanService.storeByPeerClient(peerClient);
-          },
-          icon: Icon(Icons.qr_code, color: myself.primary),
-          title: AppLocalizations.t('Qrcode scan')),
+    List<Widget> rightWidgets = [
+      IconButton(
+        onPressed: () {
+          linkmanController.currentIndex = -1;
+          groupController.currentIndex = -1;
+          conferenceController.currentIndex = -1;
+          indexWidgetProvider.push('linkman_add');
+        },
+        icon: const Icon(Icons.add_circle_outline),
+      ),
+      IconButton(
+        onPressed: () async {
+          ScanResult scanResult = await QrcodeUtil.scan();
+          String content = scanResult.rawContent;
+          var map = JsonUtil.toJson(content);
+          PeerClient peerClient = PeerClient.fromJson(map);
+          await peerClientService.store(peerClient);
+          await linkmanService.storeByPeerClient(peerClient);
+        },
+        icon: const Icon(Icons.qr_code),
+      )
     ];
+
     return AppBarView(
         title: widget.title,
         //rightWidgets: rightWidgets,
-        rightPopupMenus: rightPopupMenus,
+        rightWidgets: rightWidgets,
         child: _buildLinkmanListView(context));
   }
 

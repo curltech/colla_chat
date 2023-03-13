@@ -1,7 +1,12 @@
+import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -12,23 +17,41 @@ import 'package:flutter/material.dart';
 final List<ColumnFieldDef> chatGPTColumnFieldDefs = [
   ColumnFieldDef(
       name: 'peerId',
-      label: 'apiKey',
-      inputType: InputType.label,
-      prefixIcon: const Icon(Icons.key)),
+      label: 'ApiKey',
+      prefixIcon: Icon(
+        Icons.key,
+        color: myself.primary,
+      )),
   ColumnFieldDef(
-      name: 'name', label: 'Name', prefixIcon: const Icon(Icons.person)),
+      name: 'name',
+      label: 'LoginName',
+      prefixIcon: Icon(
+        Icons.person,
+        color: myself.primary,
+      )),
   ColumnFieldDef(
-      name: 'alias', label: 'Alias', prefixIcon: const Icon(Icons.person_pin)),
+      name: 'alias',
+      label: 'Organization',
+      prefixIcon: Icon(
+        Icons.person_pin,
+        color: myself.primary,
+      )),
   ColumnFieldDef(
       name: 'email',
       label: 'Email',
-      prefixIcon: const Icon(Icons.email),
+      prefixIcon: Icon(
+        Icons.email,
+        color: myself.primary,
+      ),
       inputType: InputType.text),
   ColumnFieldDef(
-      name: 'clientId',
-      label: 'password',
+      name: 'publicKey',
+      label: 'Password',
       inputType: InputType.password,
-      prefixIcon: const Icon(Icons.password)),
+      prefixIcon: Icon(
+        Icons.password,
+        color: myself.primary,
+      )),
 ];
 
 //联系人信息页面
@@ -45,8 +68,10 @@ class ChatGPTEditWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  dynamic get iconData =>
-      ImageUtil.buildImageWidget(image: 'assets/images/openai.png');
+  dynamic get iconData => ImageUtil.buildImageWidget(
+      image: 'assets/images/openai.png',
+      width: AppIconSize.smSize,
+      height: AppIconSize.smSize);
 
   @override
   String get title => 'ChatGPT edit';
@@ -84,14 +109,32 @@ class _ChatGPTEditWidgetState extends State<ChatGPTEditWidget> {
   }
 
   _onOk(Map<String, dynamic> values) async {
+    if (values['peerId'] == null) {
+      DialogUtil.error(context, content: 'Must have apiKey');
+      return;
+    }
+    if (values['name'] == null) {
+      DialogUtil.error(context, content: 'Must have loginName');
+      return;
+    }
+    if (values['alias'] == null) {
+      DialogUtil.error(context, content: 'Must have organization');
+      return;
+    }
+    if (values['publicKey'] == null) {
+      DialogUtil.error(context, content: 'Must have password');
+      return;
+    }
     Linkman currentLinkman = Linkman.fromJson(values);
-    linkman!.peerId = currentLinkman.peerId;
-    linkman!.name = currentLinkman.name;
+    linkman ??= Linkman(currentLinkman.peerId, currentLinkman.name);
     linkman!.alias = currentLinkman.alias;
     linkman!.mobile = currentLinkman.mobile;
     linkman!.email = currentLinkman.email;
-    linkman!.clientId = currentLinkman.clientId;
+    linkman!.publicKey = currentLinkman.publicKey;
     linkman!.linkmanStatus = LinkmanStatus.chatGPT.name;
+    linkman!.status ??= EntityStatus.effective.name;
+    linkman!.startDate ??= DateUtil.currentDate();
+    linkman!.endDate ??= DateUtil.maxDate();
     await linkmanService.store(linkman!);
     linkmanChatSummaryController.refresh();
   }

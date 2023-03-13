@@ -14,6 +14,10 @@ class DateUtil {
     return currentDate;
   }
 
+  static String maxDate() {
+    return '9999-12-31T11:59:59.999Z';
+  }
+
   ///将时间字符串格式化成易读的文字
   static String formatEasyRead(String strDate) {
     DateTime t = DateTime.parse(strDate).toLocal();

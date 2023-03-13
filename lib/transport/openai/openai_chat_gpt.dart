@@ -5,11 +5,11 @@ import 'package:dart_openai/openai.dart';
 
 ///提供ChatGpt完整的功能，包括聊天，翻译，训练，优化，设置规则，图像生成，语音识别
 ///
-/// const kTextDavinci3 = 'text-davinci-003';
-/// const kTextDavinci2 = 'text-davinci-002';
-/// const kCodeDavinci2 = 'code-davinci-002';
-/// const kChatGptTurboModel = 'gpt-3.5-turbo'; // gpt 3.5
-/// const kChatGptTurbo0301Model = 'gpt-3.5-turbo-0301';
+///  'text-davinci-003';
+///  'text-davinci-002';
+///  'code-davinci-002';
+///  'gpt-3.5-turbo'; // gpt 3.5
+///  'gpt-3.5-turbo-0301';
 class ChatGPT {
   late OpenAI openAI;
 
@@ -132,7 +132,7 @@ class ChatGPT {
 
   ///发起chat completion
   Future<OpenAIChatCompletionModel> chatCompletion({
-    required String model,
+    String model = 'gpt-3.5-turbo-0301',
     required String message,
     double? temperature,
     double? topP,
@@ -165,8 +165,8 @@ class ChatGPT {
   }
 
   ///流模式发起chat completion
-  chatStreamCompletion({
-    required String model,
+  chatCompletionStream({
+    String model = 'gpt-3.5-turbo-0301',
     required String message,
     double? temperature,
     double? topP,

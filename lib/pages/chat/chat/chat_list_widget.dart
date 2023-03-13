@@ -22,6 +22,7 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/connectivity_util.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/websocket.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -283,10 +284,14 @@ class _ChatListWidgetState extends State<ChatListWidget>
         var peerId = chatSummary.peerId ?? '';
         var subtitle = peerId;
         var subMessageType = chatSummary.subMessageType;
-        var sendReceiveTime = chatSummary.sendReceiveTime ?? '';
-        sendReceiveTime = DateUtil.formatEasyRead(sendReceiveTime);
+        var sendReceiveTime = chatSummary.sendReceiveTime;
+        if (sendReceiveTime != null) {
+          sendReceiveTime = DateUtil.formatEasyRead(sendReceiveTime);
+        } else {
+          sendReceiveTime = '';
+        }
         subtitle = _buildSubtitle(
-            subMessageType: subMessageType!,
+            subMessageType: subMessageType ?? '',
             contentType: chatSummary.contentType,
             content: chatSummary.content);
         var unreadNumber = chatSummary.unreadNumber;
@@ -295,13 +300,21 @@ class _ChatListWidgetState extends State<ChatListWidget>
           chatSummaryService.delete(entity: chatSummary);
           continue;
         }
-        var status = linkman.status ?? '';
-        status = AppLocalizations.t(status);
+        var linkmanStatus = linkman.linkmanStatus ?? '';
+        linkmanStatus = AppLocalizations.t(linkmanStatus);
         if (peerId == myself.peerId) {
-          status = AppLocalizations.t('myself');
+          linkmanStatus = AppLocalizations.t('myself');
         }
-        name = '$name($status)';
-        var badge = _buildBadge(unreadNumber, avatarImage: linkman.avatarImage);
+        name = '$name($linkmanStatus)';
+        var avatarImage = linkman.avatarImage;
+        if (linkmanStatus == LinkmanStatus.chatGPT.name) {
+          avatarImage = avatarImage ??
+              ImageUtil.buildImageWidget(
+                  image: 'assets/images/openai.png',
+                  width: AppIconSize.lgSize,
+                  height: AppIconSize.lgSize);
+        }
+        var badge = _buildBadge(unreadNumber, avatarImage: avatarImage);
 
         TileData tile = _buildTile(badge, name, sendReceiveTime, subtitle,
             peerId, linkmanChatSummaryController);

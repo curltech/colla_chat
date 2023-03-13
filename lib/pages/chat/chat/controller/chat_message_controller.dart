@@ -1,14 +1,22 @@
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
+import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/transport/openai/openai_chat_gpt.dart';
+import 'package:dart_openai/openai.dart';
+import 'package:uuid/uuid.dart';
 
 ///好友或者群的消息控制器，包含某个连接的所有消息
 class ChatMessageController extends DataMoreController<ChatMessage> {
   ChatSummary? _chatSummary;
-
+  ChatGPT? chatGPT;
   int _deleteTime = 0;
   String? _parentMessageId;
 
@@ -20,6 +28,21 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   set chatSummary(ChatSummary? chatSummary) {
     if (_chatSummary != chatSummary) {
       _chatSummary = chatSummary;
+      if (_chatSummary != null) {
+        var peerId = _chatSummary!.peerId;
+        linkmanService.findCachedOneByPeerId(peerId!).then((Linkman? linkman) {
+          if (linkman != null) {
+            if (linkman.linkmanStatus == LinkmanStatus.chatGPT.name) {
+              ChatGPT chatGPT = ChatGPT(linkman.peerId);
+              chatGPT = chatGPT;
+            } else {
+              chatGPT = null;
+            }
+          }
+        });
+      } else {
+        chatGPT = null;
+      }
       clear(notify: false);
       previous(limit: defaultLimit);
     }
@@ -178,7 +201,13 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
           subMessageType: subMessageType,
           deleteTime: _deleteTime,
           parentMessageId: _parentMessageId);
-      returnChatMessage = await chatMessageService.sendAndStore(chatMessage);
+      if (chatGPT == null) {
+        returnChatMessage = await chatMessageService.sendAndStore(chatMessage);
+      } else {
+        returnChatMessage = await chatMessageService.store(chatMessage);
+        chatGPT!
+            .chatCompletionStream(message: content, onCompletion: onCompletion);
+      }
     } else {
       List<ChatMessage> chatMessages =
           await chatMessageService.buildGroupChatMessage(peerId, type,
@@ -202,6 +231,38 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     notifyListeners();
 
     return returnChatMessage;
+  }
+
+  onCompletion(OpenAIStreamChatCompletionModel streamChatCompletion) async {
+    if (streamChatCompletion.choices.isNotEmpty) {
+      String content = streamChatCompletion.choices.first.delta.content!;
+      ChatMessage chatMessage = ChatMessage();
+      var uuid = const Uuid();
+      chatMessage.messageId = uuid.v4();
+      chatMessage.messageType = ChatMessageType.chat.name;
+      chatMessage.subMessageType = ChatMessageSubType.chat.name;
+      chatMessage.direct = ChatDirect.receive.name; //对自己而言，消息是属于发送或者接受
+      chatMessage.senderPeerId = _chatSummary!.peerId!;
+      chatMessage.senderType = PartyType.linkman.name;
+      chatMessage.senderName = _chatSummary!.name;
+      var current = DateUtil.currentDate();
+      chatMessage.sendTime = current;
+      chatMessage.readTime = current;
+      chatMessage.receiverPeerId = myself.peerId;
+      chatMessage.receiverType = PartyType.linkman.name;
+      chatMessage.receiverClientId = myself.clientId;
+      chatMessage.receiverName = myself.name;
+      chatMessage.content =
+          CryptoUtil.encodeBase64(CryptoUtil.stringToUtf8(content));
+      chatMessage.contentType = ChatMessageContentType.text.name;
+      chatMessage.status = MessageStatus.received.name;
+      chatMessage.transportType = TransportType.chatGPT.name;
+      chatMessage.deleteTime = deleteTime;
+      chatMessage.parentMessageId = parentMessageId;
+      chatMessage.id = null;
+      await chatMessageService.store(chatMessage);
+      notifyListeners();
+    }
   }
 }
 
