@@ -37,13 +37,20 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
     setState(() {});
   }
 
-  _refresh() async {
+  ///从收藏的文件中加入播放列表
+  _collect() async {
+    String fileType = widget.controller.fileType.name;
+    ChatMessageContentType? contentType =
+        StringUtil.enumFromString(ChatMessageContentType.values, fileType);
+    contentType = contentType ?? ChatMessageContentType.media;
     List<ChatMessage> chatMessages = await chatMessageService.findByMessageType(
       ChatMessageType.collection.name,
-      contentType: ChatMessageContentType.video.name,
+      contentType: contentType.name,
     );
     widget.controller.playlist.clear();
     List<String> filenames = [];
+    List<String?> messageIds = [];
+    List<Widget?> thumbnails = [];
     for (var chatMessage in chatMessages) {
       var title = chatMessage.title!;
       File file = File(title);
@@ -52,6 +59,10 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
         continue;
       }
       filenames.add(title);
+      messageIds.add(chatMessage.messageId);
+      Widget? thumbnailWidget =
+          await _buildThumbnail(title, chatMessage.thumbnail);
+      thumbnails.add(thumbnailWidget);
     }
     widget.controller.addAll(filenames: filenames);
   }
@@ -172,41 +183,54 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
     }
   }
 
+  ///选择文件加入播放列表
   _addMediaSource() async {
     List<PlatformMediaSource> mediaSources =
         await widget.controller.sourceFilePicker();
-    for (var mediaSource in mediaSources) {
-      var filename = mediaSource.filename;
-      var mediaFormat = mediaSource.mediaFormat!.name;
-      File file = File(filename);
-      bool exist = file.existsSync();
-      if (!exist) {
-        continue;
-      }
-      Uint8List? thumbnail;
-      if (platformParams.mobile) {
-        thumbnail = await VideoUtil.thumbnailData(
-            videoFile: filename,
-            maxHeight: AppIconSize.maxSize.toInt(),
-            maxWidth: AppIconSize.maxSize.toInt());
-      }
-      ChatMessageMimeType? chatMessageMimeType =
-          StringUtil.enumFromString<ChatMessageMimeType>(
-              ChatMessageMimeType.values, mediaFormat);
-      String fileType = widget.controller.fileType.name;
-      ChatMessageContentType? contentType =
-          StringUtil.enumFromString(ChatMessageContentType.values, fileType);
-      contentType = contentType ?? ChatMessageContentType.media;
-      var chatMessage = await chatMessageService.buildChatMessage(
-        myself.peerId!,
-        messageType: ChatMessageType.collection,
-        contentType: contentType,
-        mimeType: chatMessageMimeType,
-        title: filename,
-        thumbnail: thumbnail,
-      );
-      await chatMessageService.store(chatMessage);
+  }
+
+  _removeFromCollect(int index) async {
+    PlatformMediaSource mediaSource = widget.controller.playlist[index];
+    var messageId = mediaSource.messageId;
+    if (messageId != null) {
+      await chatMessageService
+          .delete(where: 'messageId=?', whereArgs: [messageId]);
     }
+  }
+
+  ///将播放列表的文件加入收藏
+  _collectMediaSource(int index) async {
+    PlatformMediaSource mediaSource = widget.controller.playlist[index];
+    var filename = mediaSource.filename;
+    var mediaFormat = mediaSource.mediaFormat!.name;
+    File file = File(filename);
+    bool exist = file.existsSync();
+    if (!exist) {
+      return;
+    }
+    Uint8List? thumbnail;
+    if (platformParams.mobile) {
+      thumbnail = await VideoUtil.thumbnailData(
+          videoFile: filename,
+          maxHeight: AppIconSize.maxSize.toInt(),
+          maxWidth: AppIconSize.maxSize.toInt());
+    }
+    ChatMessageMimeType? chatMessageMimeType =
+        StringUtil.enumFromString<ChatMessageMimeType>(
+            ChatMessageMimeType.values, mediaFormat);
+    String fileType = widget.controller.fileType.name;
+    ChatMessageContentType? contentType =
+        StringUtil.enumFromString(ChatMessageContentType.values, fileType);
+    contentType = contentType ?? ChatMessageContentType.media;
+    var chatMessage = await chatMessageService.buildChatMessage(
+      myself.peerId!,
+      messageType: ChatMessageType.collection,
+      contentType: contentType,
+      mimeType: chatMessageMimeType,
+      title: filename,
+      thumbnail: thumbnail,
+    );
+    await chatMessageService.store(chatMessage);
   }
 
   ///播放列表按钮
@@ -227,11 +251,25 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           },
         ),
         InkWell(
-          child: const Icon(Icons.refresh),
+          child: const Icon(Icons.video_collection),
           onTap: () async {
-            await _refresh();
+            await _collect();
           },
-        )
+        ),
+        InkWell(
+          child: const Icon(Icons.collections),
+          onTap: () async {
+            var currentIndex = widget.controller.currentIndex;
+            await _collectMediaSource(currentIndex);
+          },
+        ),
+        InkWell(
+          child: const Icon(Icons.bookmark_remove),
+          onTap: () async {
+            var currentIndex = widget.controller.currentIndex;
+            await _removeFromCollect(currentIndex);
+          },
+        ),
       ],
     );
   }

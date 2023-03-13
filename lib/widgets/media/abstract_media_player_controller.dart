@@ -22,12 +22,16 @@ class PlatformMediaSource {
   final String filename;
   final ChatMessageMimeType? mediaFormat;
   final MediaSourceType mediaSourceType;
-  final Widget? thumbnail;
+
+  //下面两个字段用于媒体收藏功能
+  String? messageId;
+  Widget? thumbnail;
 
   PlatformMediaSource({
     required this.filename,
     required this.mediaSourceType,
     this.mediaFormat,
+    this.messageId,
     this.thumbnail,
   });
 
@@ -147,7 +151,8 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     await setCurrentIndex(_currentIndex + 1);
   }
 
-  Future<PlatformMediaSource?> add({required String filename}) async {
+  Future<PlatformMediaSource?> add(
+      {required String filename, String? messageId, Widget? thumbnail}) async {
     for (var mediaSource in playlist) {
       var name = mediaSource.filename;
       if (name == filename) {
@@ -157,6 +162,8 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     PlatformMediaSource? mediaSource =
         PlatformMediaSource.media(filename: filename);
     if (mediaSource != null) {
+      mediaSource.messageId = messageId;
+      mediaSource.thumbnail = thumbnail;
       playlist.add(mediaSource);
       await setCurrentIndex(playlist.length - 1);
     }
@@ -165,11 +172,26 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   }
 
   Future<List<PlatformMediaSource>> addAll(
-      {required List<String> filenames}) async {
+      {required List<String> filenames,
+      List<String?>? messageIds,
+      List<Widget?>? thumbnails}) async {
     List<PlatformMediaSource> mediaSources =
         PlatformMediaSource.playlist(filenames);
+    if (messageIds != null && messageIds.isNotEmpty) {
+      for (var i = 0; i < mediaSources.length; i++) {
+        var mediaSource = mediaSources[i];
+        if (messageIds.length > i) {
+          mediaSource.messageId = messageIds[i];
+        }
+        if (thumbnails != null && thumbnails.length > i) {
+          mediaSource.thumbnail = thumbnails[i];
+        }
+      }
+    }
     playlist.addAll(mediaSources);
-    await setCurrentIndex(playlist.length - 1);
+    if (playlist.isNotEmpty) {
+      await setCurrentIndex(playlist.length - 1);
+    }
 
     return mediaSources;
   }

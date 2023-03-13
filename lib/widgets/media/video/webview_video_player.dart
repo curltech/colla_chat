@@ -9,7 +9,7 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
   PlatformWebViewController? controller;
 
   WebViewVideoPlayerController() {
-    fileType = FileType.video;
+    fileType = FileType.media;
   }
 
   @override

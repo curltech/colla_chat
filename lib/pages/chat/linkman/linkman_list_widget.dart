@@ -10,6 +10,7 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.da
 import 'package:colla_chat/pages/chat/linkman/conference/conference_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/conference/conference_show_view.dart';
 import 'package:colla_chat/pages/chat/linkman/group/group_add_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman/chat_gpt_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_edit_widget.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
@@ -22,6 +23,7 @@ import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/qrcode_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -41,6 +43,7 @@ final DataListController<Conference> conferenceController =
 ///联系人和群的查询界面
 class LinkmanListWidget extends StatefulWidget with TileDataMixin {
   final LinkmanEditWidget linkmanEditWidget = LinkmanEditWidget();
+  final ChatGPTEditWidget chatGPTEditWidget = const ChatGPTEditWidget();
   final LinkmanAddWidget linkmanAddWidget = LinkmanAddWidget();
   final GroupAddWidget groupAddWidget = GroupAddWidget();
   final ConferenceEditWidget conferenceEditWidget = ConferenceEditWidget();
@@ -49,12 +52,14 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
 
   LinkmanListWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(linkmanEditWidget);
+    indexWidgetProvider.define(chatGPTEditWidget);
     indexWidgetProvider.define(linkmanAddWidget);
     indexWidgetProvider.define(groupAddWidget);
     indexWidgetProvider.define(conferenceEditWidget);
     indexWidgetProvider.define(conferenceShowView);
     List<TileDataMixin> mixins = [
       linkmanEditWidget,
+      chatGPTEditWidget,
       linkmanAddWidget,
       groupAddWidget,
       conferenceEditWidget,
@@ -236,9 +241,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     return searchTextField;
   }
 
-  _changeStatus(Linkman linkman, LinkmanStatus status) async {
+  _changeLinkmanStatus(Linkman linkman, LinkmanStatus status) async {
     int id = linkman.id!;
-    await linkmanService.update({'id': id, 'status': status.name});
+    await linkmanService.update({'id': id, 'linkmanStatus': status.name});
   }
 
   _changeSubscriptStatus(Linkman linkman, LinkmanStatus status) async {
@@ -254,17 +259,19 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
       for (var linkman in linkmen) {
         var name = linkman.name;
         var peerId = linkman.peerId;
-        var status = linkman.status ?? '';
-        status = AppLocalizations.t(status);
+        String? linkmanStatus = linkman.linkmanStatus ?? '';
+        linkmanStatus = AppLocalizations.t(linkmanStatus);
         if (peerId == myself.peerId) {
-          status = AppLocalizations.t('myself');
+          linkmanStatus = AppLocalizations.t('myself');
         }
         TileData tile = TileData(
             prefix: linkman.avatarImage ?? AppImage.lgAppImage,
             title: name,
-            subtitle: status,
+            subtitle: linkmanStatus,
             selected: false,
-            routeName: 'linkman_edit');
+            routeName: linkmanStatus == LinkmanStatus.chatGPT.name
+                ? 'chat_gpt_edit'
+                : 'linkman_edit');
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(
             title: 'Delete',
@@ -302,7 +309,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 title: 'Remove blacklist',
                 prefix: Icons.person_outlined,
                 onTap: (int index, String title, {String? subtitle}) async {
-                  await _changeStatus(linkman, LinkmanStatus.effective);
+                  await _changeLinkmanStatus(linkman, LinkmanStatus.stranger);
                   if (mounted) {
                     DialogUtil.info(context,
                         content:
@@ -315,7 +322,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
               title: 'Add blacklist',
               prefix: Icons.person_off,
               onTap: (int index, String title, {String? subtitle}) async {
-                await _changeStatus(linkman, LinkmanStatus.blacklist);
+                await _changeLinkmanStatus(linkman, LinkmanStatus.blacklist);
                 if (mounted) {
                   DialogUtil.info(context,
                       content:
@@ -329,8 +336,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 title: 'Remove subscript',
                 prefix: Icons.unsubscribe,
                 onTap: (int index, String title, {String? subtitle}) async {
-                  await _changeSubscriptStatus(
-                      linkman, LinkmanStatus.effective);
+                  await _changeSubscriptStatus(linkman, LinkmanStatus.none);
                   if (mounted) {
                     DialogUtil.info(context,
                         content:
@@ -627,6 +633,13 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           },
           icon: Icon(Icons.add_business_outlined, color: myself.primary),
           title: AppLocalizations.t('Add conference')),
+      AppBarPopupMenu(
+          onPressed: () {
+            linkmanController.currentIndex = -1;
+            indexWidgetProvider.push('chat_gpt_edit');
+          },
+          icon: ImageUtil.buildImageWidget(image: 'assets/images/openai.png'),
+          title: AppLocalizations.t('Add chatGPT account')),
       AppBarPopupMenu(
           onPressed: () async {
             ScanResult scanResult = await QrcodeUtil.scan();

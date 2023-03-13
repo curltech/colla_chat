@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class AppBarPopupMenu {
-  Icon? icon;
+  Widget? icon;
   void Function()? onPressed;
   String? title;
 

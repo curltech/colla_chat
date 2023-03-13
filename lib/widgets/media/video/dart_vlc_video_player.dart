@@ -6,9 +6,9 @@ import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart'
     as platform;
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:dart_vlc/dart_vlc.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:file_picker/file_picker.dart';
 
 class DartVlcMediaSource {
   static Media media({required String filename}) {
@@ -57,7 +57,7 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
     List<String>? commandlineArguments,
     dynamic bool = false,
   }) {
-      fileType = FileType.video;
+    fileType = FileType.media;
     DartVLC.initialize();
     devices = Devices.all;
     player = Player(
@@ -118,7 +118,8 @@ class DartVlcVideoPlayerController extends AbstractMediaPlayerController {
 
   ///下面是播放列表的功能
   @override
-  Future<platform.PlatformMediaSource?> add({required String filename}) async {
+  Future<platform.PlatformMediaSource?> add(
+      {required String filename, String? messageId, Widget? thumbnail}) async {
     platform.PlatformMediaSource? mediaSource =
         await super.add(filename: filename);
     if (mediaSource != null) {

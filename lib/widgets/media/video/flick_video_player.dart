@@ -7,7 +7,7 @@ import 'package:file_picker/file_picker.dart';
 ///基于flick实现的媒体播放器和记录器，
 class FlickVideoPlayerController extends OriginVideoPlayerController {
   FlickVideoPlayerController(){
-    fileType = FileType.video;
+    fileType = FileType.media;
   }
 
   FlickManager? _buildFlickManager() {

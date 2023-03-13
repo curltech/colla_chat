@@ -48,7 +48,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   VideoPlayerController? _controller;
 
   OriginVideoPlayerController() {
-    fileType = FileType.video;
+    fileType = FileType.media;
   }
 
   VideoPlayerController? get controller {

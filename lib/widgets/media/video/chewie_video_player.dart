@@ -2,13 +2,13 @@ import 'package:chewie/chewie.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
-import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 
 ///基于Chewie实现的媒体播放器和记录器，
 class ChewieVideoPlayerController extends OriginVideoPlayerController {
-  ChewieVideoPlayerController(){
-    fileType = FileType.video;
+  ChewieVideoPlayerController() {
+    fileType = FileType.media;
   }
 
   ChewieController? _buildChewieController() {

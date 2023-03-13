@@ -120,7 +120,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     var chatMessages = await find(
         where: where,
         whereArgs: whereArgs,
-        orderBy: 'sendTime',
+        orderBy: 'id desc',
         offset: offset,
         limit: limit);
 

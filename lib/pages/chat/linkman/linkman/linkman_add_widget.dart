@@ -25,7 +25,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
     List<TileDataMixin> mixins = [
       p2pLinkmanAddWidget,
       contactLinkmanAddWidget,
-      nearbyLinkmanAddWidget
+      nearbyLinkmanAddWidget,
     ];
     linkmanAddTileData = TileData.from(mixins);
   }

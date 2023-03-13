@@ -97,7 +97,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
   }
 
   _addFriend({String? tip}) async {
-    await _changeStatus(LinkmanStatus.friend);
+    await _changeLinkmanStatus(LinkmanStatus.friend);
     // 加好友会发送自己的信息，回执将收到对方的信息
     await linkmanService.addFriend(linkman!.peerId, tip!);
     if (mounted) {
@@ -107,9 +107,9 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     }
   }
 
-  _changeStatus(LinkmanStatus status) async {
+  _changeLinkmanStatus(LinkmanStatus status) async {
     int id = linkman!.id!;
-    await linkmanService.update({'id': id, 'status': status.name});
+    await linkmanService.update({'id': id, 'linkmanStatus': status.name});
     linkman = await linkmanService.findOne(where: 'id=?', whereArgs: [id]);
     linkmanController.current = linkman;
   }
@@ -163,7 +163,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
               title: 'Remove friend',
               prefix: const Icon(Icons.person_remove),
               onTap: (int index, String title, {String? subtitle}) async {
-                await _changeStatus(LinkmanStatus.effective);
+                await _changeLinkmanStatus(LinkmanStatus.stranger);
                 if (mounted) {
                   DialogUtil.info(context,
                       content:

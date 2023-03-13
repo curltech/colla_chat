@@ -171,7 +171,7 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
   StreamSubscription? _playerCompleteSubscription;
   StreamSubscription? _playerStateChangeSubscription;
 
-  BlueFireAudioPlayerController() : super(){
+  BlueFireAudioPlayerController() : super() {
     player = AudioPlayer();
     _initStreams();
   }
@@ -215,6 +215,15 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
         );
       }
     });
+  }
+
+  @override
+  setCurrentIndex(int index) async {
+    if (index >= -1 && index < playlist.length && currentIndex != index) {
+      close();
+      await super.setCurrentIndex(index);
+      play();
+    }
   }
 
   ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频

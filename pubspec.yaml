@@ -309,6 +309,14 @@ dependencies:
   # 支持本地和fcm
   awesome_notifications: ^0.7.4+1
   awesome_notifications_fcm: ^0.7.4+1
+  #openai_gpt3_api:
+  dart_openai: ^1.8.0
+  chat_gpt_sdk: ^2.0.4
+  flutter_chatgpt_api: ^1.1.0
+  masamune_ai_openai: ^1.1.4
+  whisper_dart: ^0.0.11
+  openai_dalle_wrapper: ^1.0.0
+  dart_chatgpt: ^1.0.2
 dependency_overrides:
   photo_view: ^0.14.0
   device_info_plus: ^8.0.0
@@ -342,6 +350,8 @@ dependency_overrides:
   firebase_messaging: ^14.2.1
   firebase_core: ^2.1.1
   video_player_platform_interface: ^6.0.1
+  path: ^1.8.3
+  dio: ^5.0.2 #^4.0.6 openai
 dev_dependencies:
   flutter_test:
     sdk: flutter

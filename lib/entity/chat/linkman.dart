@@ -2,7 +2,9 @@ import 'package:colla_chat/entity/chat/peer_party.dart';
 
 enum LinkmanStatus {
   none,
-  effective, //陌生人
+  stranger, //陌生人
+  bot, //机器人
+  chatGPT, //chatGPT聊天机器人
   friend, //好友
   blacklist, //黑名单
   subscript, //订阅
@@ -16,6 +18,7 @@ class Linkman extends PeerParty {
   //非好友的消息需要特别的界面进行处理，非好友的发布的文章也不能直接看到
   //我在对方的状态
   String? myStatus;
+  String? linkmanStatus;
 
   //订阅状态
   String? subscriptStatus;
@@ -24,13 +27,18 @@ class Linkman extends PeerParty {
 
   Linkman.fromJson(Map json)
       : myStatus = json['myStatus'],
+        linkmanStatus = json['linkmanStatus'],
         subscriptStatus = json['subscriptStatus'],
         super.fromJson(json);
 
   @override
   Map<String, dynamic> toJson() {
     var json = super.toJson();
-    json.addAll({'myStatus': myStatus, 'subscriptStatus': subscriptStatus});
+    json.addAll({
+      'myStatus': myStatus,
+      'linkmanStatus': linkmanStatus,
+      'subscriptStatus': subscriptStatus
+    });
     return json;
   }
 }

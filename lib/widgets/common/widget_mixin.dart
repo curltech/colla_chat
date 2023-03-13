@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 mixin TileDataMixin on Widget {
   //指示图标
-  IconData get iconData;
+  dynamic get iconData;
 
   //标题
   String get title;
