@@ -1,6 +1,7 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -110,23 +111,29 @@ class _ChatGPTEditWidgetState extends State<ChatGPTEditWidget> {
 
   _onOk(Map<String, dynamic> values) async {
     if (values['peerId'] == null) {
-      DialogUtil.error(context, content: 'Must have apiKey');
+      DialogUtil.error(context,
+          content: AppLocalizations.t('Must have apiKey'));
       return;
     }
     if (values['name'] == null) {
-      DialogUtil.error(context, content: 'Must have loginName');
+      DialogUtil.error(context,
+          content: AppLocalizations.t('Must have loginName'));
       return;
     }
     if (values['alias'] == null) {
-      DialogUtil.error(context, content: 'Must have organization');
+      DialogUtil.error(context,
+          content: AppLocalizations.t('Must have organization'));
       return;
     }
     if (values['publicKey'] == null) {
-      DialogUtil.error(context, content: 'Must have password');
+      DialogUtil.error(context,
+          content: AppLocalizations.t('Must have password'));
       return;
     }
     Linkman currentLinkman = Linkman.fromJson(values);
     linkman ??= Linkman(currentLinkman.peerId, currentLinkman.name);
+    linkman!.peerId = currentLinkman.peerId;
+    linkman!.name = currentLinkman.name;
     linkman!.alias = currentLinkman.alias;
     linkman!.mobile = currentLinkman.mobile;
     linkman!.email = currentLinkman.email;
@@ -136,6 +143,11 @@ class _ChatGPTEditWidgetState extends State<ChatGPTEditWidget> {
     linkman!.startDate ??= DateUtil.currentDate();
     linkman!.endDate ??= DateUtil.maxDate();
     await linkmanService.store(linkman!);
+    if (mounted) {
+      DialogUtil.info(context,
+          content:
+              AppLocalizations.t('Create ChatGPT linkman is successfully'));
+    }
     linkmanChatSummaryController.refresh();
   }
 

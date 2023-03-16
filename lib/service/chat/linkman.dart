@@ -61,8 +61,8 @@ class LinkmanService extends PeerPartyService<Linkman> {
     if (avatar != null) {
       var avatarImage = ImageUtil.buildImageWidget(
           image: avatar,
-          height: AppIconSize.lgSize,
-          width: AppIconSize.lgSize,
+          height: AppImageSize.mdSize,
+          width: AppImageSize.mdSize,
           fit: BoxFit.contain);
       linkman.avatarImage = avatarImage;
     } else {
@@ -117,7 +117,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
   }
 
   Future<Widget> findAvatarImageWidget(String peerId) async {
-    Widget image = AppImage.lgAppImage;
+    Widget image = AppImage.mdAppImage;
     var linkman = await findCachedOneByPeerId(peerId);
     if (linkman != null && linkman.avatarImage != null) {
       image = linkman.avatarImage!;

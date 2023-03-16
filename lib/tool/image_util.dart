@@ -6,6 +6,7 @@ import 'dart:ui' as ui;
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:dio/dio.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -64,6 +65,25 @@ class ImageUtil {
       );
     }
     return imageWidget;
+  }
+
+  static Future<Uint8List> loadUrlImage(String url) async {
+    final Dio dio = Dio();
+    Response response = await dio.get(
+      url,
+      //Received data with List<int>
+      options: Options(
+          responseType: ResponseType.bytes,
+          followRedirects: false,
+          validateStatus: (status) {
+            return status! < 500;
+          }),
+    );
+    Uint8List raw = response.data;
+
+    return raw;
+    var buffer = raw.buffer;
+    ByteData byteData = ByteData.view(buffer);
   }
 
   static Widget buildImageWidget(

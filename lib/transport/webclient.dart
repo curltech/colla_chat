@@ -16,7 +16,6 @@ class WebClient extends IWebClient {
   IWebClient? _wsDefault;
 
   WebClient() {
-    HttpClientPool httpClientPool = HttpClientPool.instance;
     _httpDefault = httpClientPool.defaultHttpClient;
     _wsDefault = websocketPool.getDefault();
     if (_httpDefault == null && _wsDefault == null) {
@@ -29,7 +28,6 @@ class WebClient extends IWebClient {
       _wsDefault = await websocketPool.get(address, isDefault: true);
     } else if (address.startsWith('https') || address.startsWith('http')) {
       if (address == 'https' || address == 'http') {
-        HttpClientPool httpClientPool = HttpClientPool.instance;
         _httpDefault = httpClientPool.setDefalutHttpClient(address);
       }
     }

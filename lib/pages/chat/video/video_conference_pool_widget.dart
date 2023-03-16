@@ -49,7 +49,7 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
         var conferenceOwnerName = conference.conferenceOwnerName;
         var topic = conference.topic;
         TileData tile = TileData(
-            prefix: conference.avatarImage ?? AppImage.lgAppImage,
+            prefix: conference.avatarImage ?? AppImage.mdAppImage,
             title: conferenceName,
             titleTail: conferenceOwnerName,
             subtitle: topic,

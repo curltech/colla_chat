@@ -64,17 +64,17 @@ class GroupService extends PeerPartyService<Group> {
           if (linkman.avatarImage != null) {
             widgets.add(linkman.avatarImage!);
           } else {
-            widgets.add(AppImage.lgAppImage);
+            widgets.add(AppImage.mdAppImage);
           }
         }
         group.avatarImage = CombineGridView(
           widgets: widgets,
-          height: AppIconSize.lgSize,
-          width: AppIconSize.lgSize,
+          height: AppImageSize.mdSize,
+          width: AppImageSize.mdSize,
           maxCount: 9,
         );
       } else {
-        group.avatarImage = AppImage.lgAppImage;
+        group.avatarImage = AppImage.mdAppImage;
       }
     }
     groups[peerId] = group;
@@ -195,7 +195,7 @@ class GroupService extends PeerPartyService<Group> {
     return groups;
   }
 
-  ///向群成员发送加群的消息
+  ///向联系人发送加群的消息，群成员在group的participants中
   addGroup(Group group) async {
     List<ChatMessage> chatMessages =
         await chatMessageService.buildGroupChatMessage(
@@ -299,7 +299,7 @@ class GroupService extends PeerPartyService<Group> {
     await chatMessageService.updateReceiptType(
         chatMessage, MessageReceiptType.accepted);
 
-    await chatMessageService.sendAndStore(chatReceipt!);
+    await chatMessageService.sendAndStore(chatReceipt);
   }
 
   ///向群成员发送加群成员的消息

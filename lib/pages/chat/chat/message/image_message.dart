@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:flutter/material.dart';
@@ -5,26 +6,28 @@ import 'package:flutter/material.dart';
 ///消息体：图片消息
 class ImageMessage extends StatelessWidget {
   final String? image;
-  final String mimeType;
   final String messageId;
   final String? title;
   final bool isMyself;
-  final double? width;
-  final double? height;
+  final bool fullScreen;
 
   const ImageMessage({
     Key? key,
     this.image,
     required this.messageId,
     required this.isMyself,
-    required this.mimeType,
-    this.width,
-    this.height,
     this.title,
+    this.fullScreen = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    double? width;
+    double? height;
+    if (!fullScreen) {
+      width = AppImageSize.maxSize;
+      height = AppImageSize.maxSize;
+    }
     var imageWidget = FutureBuilder(
         future: messageAttachmentService.getDecryptFilename(messageId, title),
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
@@ -46,10 +49,7 @@ class ImageMessage extends StatelessWidget {
               height: height,
             );
           } else {
-            return ImageUtil.buildImageWidget(
-              width: width,
-              height: height,
-            );
+            return ImageUtil.buildImageWidget();
           }
         });
     return imageWidget;

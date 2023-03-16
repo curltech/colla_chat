@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:colla_chat/pages/chat/chat/emoji_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/more_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/text_message_input.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:flutter/material.dart';
@@ -17,7 +16,7 @@ class ChatMessageInputWidget extends StatefulWidget {
   final Future<void> Function(int index, String name, {String? value})?
       onAction;
 
-  ChatMessageInputWidget({Key? key, this.onAction}) : super(key: key);
+  const ChatMessageInputWidget({Key? key, this.onAction}) : super(key: key);
 
   @override
   State createState() => _ChatMessageInputWidgetState();
@@ -51,6 +50,7 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
     audioPlayer.stop();
   }
 
+  ///发送文本消息
   Future<void> onSendPressed() async {
     _play();
     await chatMessageController.sendText(message: textEditingController.text);
@@ -113,7 +113,6 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
   }
 
   _onEmojiTap(String text) {
-    logger.i('Emoji: $text');
     _insertText(text);
   }
 

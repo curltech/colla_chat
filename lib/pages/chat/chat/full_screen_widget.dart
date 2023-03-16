@@ -61,7 +61,10 @@ class _FullScreenWidgetState extends State<FullScreenWidget> {
           if (chatMessage != null) {
             title = '${chatMessage.receiverName} - ${chatMessage.senderName}';
           }
-          return Text(title);
+          return Text(
+            title,
+            style: TextStyle(fontSize: title.length > 12 ? 20 : 24),
+          );
         });
   }
 

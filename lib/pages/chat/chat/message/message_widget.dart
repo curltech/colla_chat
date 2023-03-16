@@ -23,6 +23,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
+import 'package:colla_chat/tool/clipboard_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/document_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
@@ -160,9 +161,11 @@ class MessageWidget {
     } else {
       body = Container();
     }
+
+    ///双击全屏
     if (!fullScreen) {
       body = InkWell(
-          onTap: () {
+          onDoubleTap: () {
             chatMessageController.currentIndex = index;
             indexWidgetProvider.push('full_screen');
           },
@@ -213,6 +216,13 @@ class MessageWidget {
         }
         break;
       case 'Copy':
+        String? content = chatMessage.content;
+        String? contentType = chatMessage.contentType;
+        if (contentType == ChatMessageContentType.text.name &&
+            content != null) {
+          content = chatMessageService.recoverContent(content);
+          await ClipboardUtil.copy(content);
+        }
         break;
       case 'Forward':
         List<String> selects = [];
@@ -394,17 +404,13 @@ class MessageWidget {
     String? title = chatMessage.title;
     String? thumbnail = chatMessage.thumbnail;
     String mimeType = chatMessage.mimeType!;
-    double width = 64;
-    double height = 64;
     return ImageMessage(
       key: UniqueKey(),
       messageId: messageId!,
       title: title,
       image: thumbnail,
       isMyself: isMyself,
-      mimeType: mimeType,
-      width: width,
-      height: height,
+      fullScreen: fullScreen,
     );
   }
 

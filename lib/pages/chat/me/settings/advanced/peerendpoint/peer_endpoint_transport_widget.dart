@@ -56,7 +56,7 @@ class _PeerEndpointTransportWidgetState
     Icon httpLight = grey;
     if (peerEndpoint.httpConnectAddress != null) {
       DioHttpClient? dioHttpClient =
-          HttpClientPool.instance.get(peerEndpoint.httpConnectAddress!);
+          httpClientPool.get(peerEndpoint.httpConnectAddress!);
       if (dioHttpClient == null) {
         httpLight = grey;
       } else {

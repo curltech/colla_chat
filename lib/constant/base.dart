@@ -45,6 +45,28 @@ class AppIconSize {
   static const maxSize = 64.0;
 }
 
+///image size
+class AppImageSize {
+  static const minSize = 16.0;
+
+  //24大小
+  static const xsSize = 24.0;
+
+  //32大小
+  static const smSize = 32.0;
+
+  //40大小
+  static const mdSize = 40.0;
+
+  //64大小
+  static const lgSize = 64.0;
+
+  //128大小
+  static const xlSize = 128.0;
+
+  static const maxSize = 256.0;
+}
+
 class AppFontSize {
   static const double maxFontSize = 22.0;
   static const double xlFontSize = 20.0;
@@ -106,42 +128,42 @@ class AppIcon {
 
 class AppImage {
   ///16大小的app缺省图像
-  static final xsAppImage = ImageUtil.buildImageWidget(
+  static final minAppImage = ImageUtil.buildImageWidget(
     image: AppImageFile.xsAppIconFile,
-    width: AppIconSize.xsSize,
-    height: AppIconSize.xsSize,
+    width: AppImageSize.minSize,
+    height: AppImageSize.minSize,
     fit: BoxFit.contain,
   );
 
   ///24大小的app缺省图像
-  static final smAppImage = ImageUtil.buildImageWidget(
+  static final xsAppImage = ImageUtil.buildImageWidget(
     image: AppImageFile.mdAppIconFile,
-    width: AppIconSize.smSize,
-    height: AppIconSize.smSize,
+    width: AppImageSize.xsSize,
+    height: AppImageSize.xsSize,
     fit: BoxFit.contain,
   );
 
   ///32大小的app缺省图像
-  static final mdAppImage = ImageUtil.buildImageWidget(
+  static final smAppImage = ImageUtil.buildImageWidget(
     image: AppImageFile.mdAppIconFile,
-    width: AppIconSize.mdSize,
-    height: AppIconSize.mdSize,
+    width: AppImageSize.smSize,
+    height: AppImageSize.smSize,
     fit: BoxFit.contain,
   );
 
-  ///48大小的app缺省图像
-  static final lgAppImage = ImageUtil.buildImageWidget(
+  ///40大小的app缺省图像
+  static final mdAppImage = ImageUtil.buildImageWidget(
     image: AppImageFile.mdAppIconFile,
-    width: AppIconSize.lgSize,
-    height: AppIconSize.lgSize,
+    width: AppImageSize.mdSize,
+    height: AppImageSize.mdSize,
     fit: BoxFit.contain,
   );
 
   ///64大小的app缺省图像
-  static final xlAppImage = ImageUtil.buildImageWidget(
+  static final lgAppImage = ImageUtil.buildImageWidget(
     image: AppImageFile.mdAppIconFile,
-    width: AppIconSize.xlSize,
-    height: AppIconSize.xlSize,
+    width: AppImageSize.lgSize,
+    height: AppImageSize.lgSize,
     fit: BoxFit.contain,
   );
 }

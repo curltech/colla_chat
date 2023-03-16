@@ -14,8 +14,14 @@ class DioHttpClient implements IWebClient {
   DioHttpClient(String address) {
     if (address.startsWith('http')) {
       ///获取dio中的httpclient，处理证书问题
-      (_client.httpClientAdapter as IOHttpClientAdapter)
-          .onHttpClientCreate = (HttpClient client) {
+      (_client.httpClientAdapter as IOHttpClientAdapter).onHttpClientCreate =
+          (HttpClient client) {
+        client.findProxy = (url) {
+          // ///设置代理 电脑ip地址
+          // return "PROXY 192.168.31.102:8888";
+          ///不设置代理
+          return 'DIRECT';
+        };
         client.badCertificateCallback =
             (X509Certificate cert, String host, int port) => true;
 
@@ -65,35 +71,26 @@ class DioHttpClient implements IWebClient {
 }
 
 class HttpClientPool {
-  static final HttpClientPool _instance = HttpClientPool();
-  static bool initStatus = false;
   final _httpClients = <String, DioHttpClient>{};
   DioHttpClient? _default;
 
-  HttpClientPool();
-
-  /// 初始化连接池，设置缺省httpclient，返回连接池
-  static HttpClientPool get instance {
-    if (!initStatus) {
-      var peerEndpoints = peerEndpointController.data;
-      if (peerEndpoints.isNotEmpty) {
-        int i = 0;
-        for (var peerEndpoint in peerEndpoints) {
-          var httpConnectAddress = peerEndpoint.httpConnectAddress;
-          if (httpConnectAddress != null &&
-              httpConnectAddress.startsWith('http')) {
-            var httpClient = DioHttpClient(httpConnectAddress);
-            _instance._httpClients[httpConnectAddress] = httpClient;
-            if (i == 0) {
-              _instance._default = httpClient;
-            }
+  HttpClientPool() {
+    var peerEndpoints = peerEndpointController.data;
+    if (peerEndpoints.isNotEmpty) {
+      int i = 0;
+      for (var peerEndpoint in peerEndpoints) {
+        var httpConnectAddress = peerEndpoint.httpConnectAddress;
+        if (httpConnectAddress != null &&
+            httpConnectAddress.startsWith('http')) {
+          var httpClient = DioHttpClient(httpConnectAddress);
+          _httpClients[httpConnectAddress] = httpClient;
+          if (i == 0) {
+            _default = httpClient;
           }
-          ++i;
         }
+        ++i;
       }
-      initStatus = true;
     }
-    return _instance;
   }
 
   DioHttpClient? get(String address) {
@@ -125,4 +122,5 @@ class HttpClientPool {
   }
 }
 
+final HttpClientPool httpClientPool = HttpClientPool();
 final DefaultCacheManager defaultCacheManager = DefaultCacheManager();

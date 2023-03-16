@@ -35,7 +35,7 @@ class ChatMessageView extends StatefulWidget with TileDataMixin {
   final VideoChatWidget videoChatWidget = VideoChatWidget();
   final ChatMessageWidget chatMessageWidget = ChatMessageWidget();
   final ChatMessageInputWidget chatMessageInputWidget =
-      ChatMessageInputWidget();
+      const ChatMessageInputWidget();
 
   ChatMessageView({
     Key? key,
@@ -110,6 +110,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
   }
 
   ///初始化，webrtc如果没有连接，尝试连接
+  ///如果ChatGPT，则设置
   _createPeerConnection() async {
     var chatSummary = _chatSummary.value;
     if (chatSummary == null) {
@@ -122,60 +123,60 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     peerConnectionPool.registerWebrtcEvent(
         peerId, WebrtcEventType.status, _updatePeerConnectionStatus);
     if (partyType == PartyType.linkman.name) {
-      if (peerId != myself.peerId) {
-        Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
-        if (linkman != null) {
-          if (linkman.linkmanStatus == LinkmanStatus.chatGPT.name) {
-            ChatGPT chatGPT = ChatGPT(linkman.peerId);
-            chatMessageController.chatGPT = chatGPT;
-          } else {
-            List<AdvancedPeerConnection> advancedPeerConnections =
-                peerConnectionPool.get(peerId);
-            if (advancedPeerConnections.isEmpty) {
-              AdvancedPeerConnection? advancedPeerConnection =
-                  await peerConnectionPool.create(peerId);
-              if (advancedPeerConnection != null) {
-                _peerConnectionStatus.value = advancedPeerConnection.status;
-              } else {
-                _peerConnectionStatus.value = PeerConnectionStatus.none;
-              }
-            } else {
-              for (AdvancedPeerConnection advancedPeerConnection
-                  in advancedPeerConnections) {
-                _peerConnectionStatus.value = advancedPeerConnection.status;
-                if (advancedPeerConnection.status ==
-                    PeerConnectionStatus.connected) {
-                  break;
-                }
-              }
-            }
-          }
-        }
-      }
+      await _createLinkmanPeerConnection(peerId);
     } else if (partyType == PartyType.group.name) {
-      List<GroupMember> groupMembers =
-          await groupMemberService.findByGroupId(peerId);
-      for (var groupMember in groupMembers) {
-        String? memberPeerId = groupMember.memberPeerId;
-        if (memberPeerId != null && memberPeerId != myself.peerId) {
-          List<AdvancedPeerConnection> advancedPeerConnections =
-              peerConnectionPool.get(memberPeerId);
-          if (advancedPeerConnections.isEmpty) {
-            peerConnectionPool.create(memberPeerId);
+      await _createGroupPeerConnection(peerId);
+    } else if (partyType == PartyType.conference.name) {
+      await _createGroupPeerConnection(peerId);
+    }
+  }
+
+  ///linkman的PeerConnection初始化
+  _createLinkmanPeerConnection(String peerId) async {
+    if (peerId == myself.peerId) {
+      return;
+    }
+    Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+    if (linkman == null) {
+      return;
+    }
+    if (linkman.linkmanStatus == LinkmanStatus.chatGPT.name) {
+      ChatGPT chatGPT = ChatGPT(linkman.peerId);
+      chatMessageController.chatGPT = chatGPT;
+    } else {
+      List<AdvancedPeerConnection> advancedPeerConnections =
+          peerConnectionPool.get(peerId);
+      if (advancedPeerConnections.isEmpty) {
+        AdvancedPeerConnection? advancedPeerConnection =
+            await peerConnectionPool.create(peerId);
+        if (advancedPeerConnection != null) {
+          _peerConnectionStatus.value = advancedPeerConnection.status;
+        } else {
+          _peerConnectionStatus.value = PeerConnectionStatus.none;
+        }
+      } else {
+        for (AdvancedPeerConnection advancedPeerConnection
+            in advancedPeerConnections) {
+          _peerConnectionStatus.value = advancedPeerConnection.status;
+          if (advancedPeerConnection.status == PeerConnectionStatus.connected) {
+            break;
           }
         }
       }
-    } else if (partyType == PartyType.conference.name) {
-      List<GroupMember> groupMembers =
-          await groupMemberService.findByGroupId(peerId);
-      for (var groupMember in groupMembers) {
-        String? memberPeerId = groupMember.memberPeerId;
-        if (memberPeerId != null && memberPeerId != myself.peerId) {
-          List<AdvancedPeerConnection> advancedPeerConnections =
-              peerConnectionPool.get(memberPeerId);
-          if (advancedPeerConnections.isEmpty) {
-            peerConnectionPool.create(memberPeerId);
-          }
+    }
+  }
+
+  ///群或者会议的成员全部尝试连接
+  _createGroupPeerConnection(String peerId) async {
+    List<GroupMember> groupMembers =
+        await groupMemberService.findByGroupId(peerId);
+    for (var groupMember in groupMembers) {
+      String? memberPeerId = groupMember.memberPeerId;
+      if (memberPeerId != null && memberPeerId != myself.peerId) {
+        List<AdvancedPeerConnection> advancedPeerConnections =
+            peerConnectionPool.get(memberPeerId);
+        if (advancedPeerConnections.isEmpty) {
+          peerConnectionPool.create(memberPeerId);
         }
       }
     }

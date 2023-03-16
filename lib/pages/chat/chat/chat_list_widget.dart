@@ -233,8 +233,12 @@ class _ChatListWidgetState extends State<ChatListWidget>
     String subtitle = '';
     if (subMessageType == ChatMessageSubType.chat.name) {
       content = content ?? '';
-      subtitle = chatMessageService.recoverContent(content);
+      if (contentType == null ||
+          contentType == ChatMessageContentType.text.name) {
+        subtitle = chatMessageService.recoverContent(content);
+      }
       if (contentType == ChatMessageContentType.location.name) {
+        subtitle = chatMessageService.recoverContent(content);
         Map<String, dynamic> map = JsonUtil.toJson(subtitle);
         subtitle = map['address'];
       }
@@ -245,7 +249,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
   }
 
   Widget _buildBadge(int unreadNumber, {Widget? avatarImage}) {
-    var badge = avatarImage ?? AppImage.lgAppImage;
+    var badge = avatarImage ?? AppImage.mdAppImage;
     if (unreadNumber > 0) {
       badge = badges.Badge(
         position: BadgePosition.topEnd(),
@@ -307,13 +311,13 @@ class _ChatListWidgetState extends State<ChatListWidget>
         }
         name = '$name($linkmanStatus)';
         var avatarImage = linkman.avatarImage;
-        // if (linkmanStatus == LinkmanStatus.chatGPT.name) {
-        //   avatarImage = avatarImage ??
-        //       ImageUtil.buildImageWidget(
-        //           image: 'assets/images/openai.png',
-        //           width: AppIconSize.lgSize,
-        //           height: AppIconSize.lgSize);
-        // }
+        if (linkmanStatus == LinkmanStatus.chatGPT.name) {
+          avatarImage = avatarImage ??
+              ImageUtil.buildImageWidget(
+                  image: 'assets/images/openai.png',
+                  width: AppImageSize.mdSize,
+                  height: AppImageSize.mdSize);
+        }
         var badge = _buildBadge(unreadNumber, avatarImage: avatarImage);
 
         TileData tile = _buildTile(badge, name, sendReceiveTime, subtitle,

@@ -260,7 +260,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           //         height: AppIconSize.lgSize);
           routeName = 'chat_gpt_edit';
         }
-        prefix = prefix ?? AppImage.lgAppImage;
+        prefix = prefix ?? AppImage.mdAppImage;
         TileData tile = TileData(
             prefix: prefix,
             title: name,
@@ -369,7 +369,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         var peerId = group.peerId;
         var groupOwnerName = group.groupOwnerName;
         TileData tile = TileData(
-            prefix: group.avatarImage ?? AppImage.lgAppImage,
+            prefix: group.avatarImage ?? AppImage.mdAppImage,
             title: groupName,
             subtitle: groupOwnerName,
             selected: false,
@@ -440,7 +440,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         var conferenceOwnerName = conference.conferenceOwnerName;
         var topic = conference.topic;
         TileData tile = TileData(
-            prefix: conference.avatarImage ?? AppImage.lgAppImage,
+            prefix: conference.avatarImage ?? AppImage.mdAppImage,
             title: conferenceName,
             titleTail: conferenceOwnerName,
             subtitle: topic,

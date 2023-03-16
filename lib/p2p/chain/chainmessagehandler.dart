@@ -175,7 +175,7 @@ class ChainMessageHandler {
       if (!success &&
           connectAddress != null &&
           connectAddress.startsWith('http')) {
-        var httpClient = HttpClientPool.instance.get(connectAddress);
+        var httpClient = httpClientPool.get(connectAddress);
         if (httpClient != null) {
           var data = JsonUtil.toJsonString(chainMessage);
           Response response = await httpClient.send('/receive', data);

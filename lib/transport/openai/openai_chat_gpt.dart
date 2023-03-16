@@ -9,8 +9,14 @@ import 'package:dart_openai/openai.dart';
 ///  'text-davinci-002';
 ///  'code-davinci-002';
 ///  'gpt-3.5-turbo'; // gpt 3.5
-///  'gpt-3.5-turbo-0301';
+///  'gpt-3.5-turbo-0301'
+///  gpt-4, gpt-4-0314, gpt-4-32k, gpt-4-32k-0314，
+///  whisper-1
+///  davinci, curie, babbage, ada
 class ChatGPT {
+  static String translate =
+      'Translate this into 1. French, 2. Spanish and 3. Japanese:\n\n';
+  static String extract = 'Extract keywords from this text:\n\n';
   late OpenAI openAI;
 
   ChatGPT(String apiKey, {String? organization}) {
@@ -38,17 +44,30 @@ class ChatGPT {
     required String model,
     dynamic prompt,
     String? suffix,
+    //最大的输出token数量
     int? maxTokens,
+    //0-2，值越高，回答的多样性越高，Higher values like 0.8 will make the output more random
     double? temperature,
+    //0.1 means only the tokens comprising the top 10% probability mass are considered
     double? topP,
+    //结果的数量，How many completions to generate for each prompt
     int? n,
+    //max logprobs is 5, the API will return a list of the 5 most likely tokens
     int? logprobs,
     bool? echo,
+    //指示完成回答的时候出现的字符串,
+    // Up to 4 sequences where the API will stop generating further tokens
     String? stop,
+    //Number between -2.0 and 2.0. Positive values penalize new tokens based on whether they appear
+    // in the text so far, increasing the model's likelihood to talk about new topics.
     double? presencePenalty,
+    //Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing
+    // frequency in the text so far, decreasing the model's likelihood to repeat the same line verbatim
     double? frequencyPenalty,
     int? bestOf,
+    //Modify the likelihood of specified tokens appearing in the completion
     Map<String, dynamic>? logitBias,
+    //A unique identifier representing your end-user
     String? user,
   }) async {
     OpenAICompletionModel completion = await openAI.completion.create(
@@ -133,7 +152,7 @@ class ChatGPT {
   ///发起chat completion
   Future<OpenAIChatCompletionModel> chatCompletion({
     String model = 'gpt-3.5-turbo-0301',
-    required String message,
+    required List<OpenAIChatCompletionChoiceMessageModel> messages,
     double? temperature,
     double? topP,
     int? n,
@@ -147,9 +166,7 @@ class ChatGPT {
     OpenAIChatCompletionModel chatCompletion =
         await OpenAI.instance.chat.create(
       model: model,
-      messages: [
-        OpenAIChatCompletionChoiceMessageModel(content: message, role: user!),
-      ],
+      messages: messages,
       maxTokens: maxTokens,
       temperature: temperature,
       topP: topP,
@@ -167,7 +184,7 @@ class ChatGPT {
   ///流模式发起chat completion
   chatCompletionStream({
     String model = 'gpt-3.5-turbo-0301',
-    required String message,
+    required List<OpenAIChatCompletionChoiceMessageModel> messages,
     double? temperature,
     double? topP,
     int? n,
@@ -177,18 +194,13 @@ class ChatGPT {
     double? frequencyPenalty,
     Map<String, dynamic>? logitBias,
     String? user,
-    String role='user',
+    String role = 'user',
     required Function(OpenAIStreamChatCompletionModel) onCompletion,
   }) {
     Stream<OpenAIStreamChatCompletionModel> chatStream =
         openAI.chat.createStream(
       model: "gpt-3.5-turbo",
-      messages: [
-        OpenAIChatCompletionChoiceMessageModel(
-          content: message,
-          role: role,
-        )
-      ],
+      messages: messages,
       maxTokens: maxTokens,
       temperature: temperature,
       topP: topP,
@@ -225,13 +237,13 @@ class ChatGPT {
     return edit;
   }
 
-  ///根据文本创建图像
+  ///根据文本创建图像,png
   Future<OpenAIImageModel> createImage({
     required String prompt,
     int? n = 1,
-    OpenAIImageSize? size = OpenAIImageSize.size1024,
+    OpenAIImageSize? size = OpenAIImageSize.size256,
     OpenAIResponseFormat? responseFormat = OpenAIResponseFormat.url,
-    String? user,
+    String? user = 'user',
   }) async {
     OpenAIImageModel image = await openAI.image.create(
       prompt: prompt,
@@ -301,6 +313,7 @@ class ChatGPT {
   }
 
   ///语音转录
+  /// responseFormat:json, text, srt, verbose_json, or vtt
   Future<OpenAIAudioModel> createTranscription({
     required File file,
     String model = "whisper-1",
@@ -342,6 +355,9 @@ class ChatGPT {
   }
 
   ///列出账户中的数据文件
+  ///{"prompt": "<prompt text>", "completion": "<ideal generated text>"}
+  // {"prompt": "<prompt text>", "completion": "<ideal generated text>"}
+  // {"prompt": "<prompt text>", "completion": "<ideal generated text>"}
   Future<List<OpenAIFileModel>> listFiles() async {
     List<OpenAIFileModel> files = await openAI.file.list();
 
