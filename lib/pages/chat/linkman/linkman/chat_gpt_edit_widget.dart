@@ -24,6 +24,13 @@ final List<ColumnFieldDef> chatGPTColumnFieldDefs = [
         color: myself.primary,
       )),
   ColumnFieldDef(
+      name: 'peerPublicKey',
+      label: 'Model',
+      prefixIcon: Icon(
+        Icons.model_training,
+        color: myself.primary,
+      )),
+  ColumnFieldDef(
       name: 'name',
       label: 'LoginName',
       prefixIcon: Icon(
@@ -138,6 +145,7 @@ class _ChatGPTEditWidgetState extends State<ChatGPTEditWidget> {
     linkman!.mobile = currentLinkman.mobile;
     linkman!.email = currentLinkman.email;
     linkman!.publicKey = currentLinkman.publicKey;
+    linkman!.peerPublicKey = currentLinkman.peerPublicKey;
     linkman!.linkmanStatus = LinkmanStatus.chatGPT.name;
     linkman!.status ??= EntityStatus.effective.name;
     linkman!.startDate ??= DateUtil.currentDate();

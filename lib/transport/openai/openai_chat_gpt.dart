@@ -18,8 +18,10 @@ class ChatGPT {
       'Translate this into 1. French, 2. Spanish and 3. Japanese:\n\n';
   static String extract = 'Extract keywords from this text:\n\n';
   late OpenAI openAI;
+  late String model;
 
-  ChatGPT(String apiKey, {String? organization}) {
+  ChatGPT(String apiKey,
+      {String? organization, this.model = 'gpt-3.5-turbo-0301'}) {
     OpenAI.apiKey = apiKey;
     OpenAI.organization = organization;
     openAI = OpenAI.instance;
@@ -151,7 +153,6 @@ class ChatGPT {
 
   ///发起chat completion
   Future<OpenAIChatCompletionModel> chatCompletion({
-    String model = 'gpt-3.5-turbo-0301',
     required List<OpenAIChatCompletionChoiceMessageModel> messages,
     double? temperature,
     double? topP,
@@ -183,7 +184,6 @@ class ChatGPT {
 
   ///流模式发起chat completion
   chatCompletionStream({
-    String model = 'gpt-3.5-turbo-0301',
     required List<OpenAIChatCompletionChoiceMessageModel> messages,
     double? temperature,
     double? topP,
@@ -199,7 +199,7 @@ class ChatGPT {
   }) {
     Stream<OpenAIStreamChatCompletionModel> chatStream =
         openAI.chat.createStream(
-      model: "gpt-3.5-turbo",
+      model: model,
       messages: messages,
       maxTokens: maxTokens,
       temperature: temperature,

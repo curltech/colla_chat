@@ -19,6 +19,7 @@ import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/openai/openai_chat_gpt.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
@@ -142,6 +143,9 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     }
     if (linkman.linkmanStatus == LinkmanStatus.chatGPT.name) {
       ChatGPT chatGPT = ChatGPT(linkman.peerId);
+      if (StringUtil.isNotEmpty(linkman.peerPublicKey)) {
+        chatGPT.model = linkman.peerPublicKey!;
+      }
       chatMessageController.chatGPT = chatGPT;
     } else {
       List<AdvancedPeerConnection> advancedPeerConnections =
