@@ -63,14 +63,14 @@ final List<ColumnFieldDef> chatGPTColumnFieldDefs = [
 ];
 
 //联系人信息页面
-class ChatGPTEditWidget extends StatefulWidget with TileDataMixin {
-  const ChatGPTEditWidget({Key? key}) : super(key: key);
+class ChatGPTAddWidget extends StatefulWidget with TileDataMixin {
+  const ChatGPTAddWidget({Key? key}) : super(key: key);
 
   @override
-  State<StatefulWidget> createState() => _ChatGPTEditWidgetState();
+  State<StatefulWidget> createState() => _ChatGPTAddWidgetState();
 
   @override
-  String get routeName => 'chat_gpt_edit';
+  String get routeName => 'chat_gpt_add';
 
   @override
   bool get withLeading => true;
@@ -82,10 +82,10 @@ class ChatGPTEditWidget extends StatefulWidget with TileDataMixin {
       height: AppIconSize.smSize);
 
   @override
-  String get title => 'ChatGPT edit';
+  String get title => 'Add chatGPT';
 }
 
-class _ChatGPTEditWidgetState extends State<ChatGPTEditWidget> {
+class _ChatGPTAddWidgetState extends State<ChatGPTAddWidget> {
   Linkman? linkman;
 
   @override

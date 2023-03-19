@@ -48,31 +48,31 @@ final List<ColumnFieldDef> groupColumnFieldDefs = [
 ];
 
 ///创建和修改群，填写群的基本信息，选择群成员和群主
-class LinkmanGroupEditWidget extends StatefulWidget with TileDataMixin {
-  LinkmanGroupEditWidget({Key? key}) : super(key: key);
+class LinkmanGroupAddWidget extends StatefulWidget with TileDataMixin {
+  LinkmanGroupAddWidget({Key? key}) : super(key: key);
 
   @override
   IconData get iconData => Icons.person;
 
   @override
-  String get routeName => 'linkman_group_edit';
+  String get routeName => 'linkman_add_edit';
 
   @override
-  String get title => 'Linkman edit group';
+  String get title => 'Linkman add group';
 
   @override
   bool get withLeading => true;
 
   @override
-  State<StatefulWidget> createState() => _LinkmanGroupEditWidgetState();
+  State<StatefulWidget> createState() => _LinkmanGroupAddWidgetState();
 }
 
-class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
+class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
   TextEditingController controller = TextEditingController();
 
   OptionController groupOwnerController = OptionController();
 
-  //选择的群成员
+  //已经选择的群成员
   ValueNotifier<List<String>> groupMembers = ValueNotifier([]);
 
   //当前群
@@ -83,8 +83,8 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
 
   @override
   initState() {
-    groupController.addListener(_update);
     super.initState();
+    groupController.addListener(_update);
     _buildGroupData();
   }
 
@@ -99,25 +99,27 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
       groupAvatar.value = current.avatar;
     } else {
       group.value = Group('', '');
+      return;
     }
     if (group.value.id != null) {
       List<String> groupMembers = [];
       List<GroupMember> members =
-          await groupMemberService.findByGroupId(group.value.peerId);
+          await groupMemberService.findByGroupId(group.value!.peerId);
       if (members.isNotEmpty) {
         for (GroupMember member in members) {
           groupMembers.add(member.memberPeerId!);
         }
       }
-      this.groupMembers.value = groupMembers;
       await _buildGroupOwnerOptions(groupMembers);
+      this.groupMembers.value = groupMembers;
     }
   }
 
   //更新groupOwnerChoices
   _buildGroupOwnerOptions(List<String> selected) async {
-    group.value.groupOwnerPeerId ??= myself.peerId;
-    group.value.groupOwnerName ??= myself.name;
+    Group group = this.group.value;
+    group.groupOwnerPeerId ??= myself.peerId;
+    group.groupOwnerName ??= myself.name;
     List<Option<String>> groupOwnerOptions = [];
     if (selected.isNotEmpty) {
       for (String groupMemberId in selected) {
@@ -125,8 +127,8 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
             await linkmanService.findCachedOneByPeerId(groupMemberId);
         bool checked = false;
         if (linkman != null) {
-          if (group.value.groupOwnerPeerId != null) {
-            String peerId = group.value.groupOwnerPeerId!;
+          if (group.groupOwnerPeerId != null) {
+            String peerId = group.groupOwnerPeerId!;
             if (linkman.peerId == peerId) {
               checked = true;
             }
@@ -155,6 +157,7 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
           return Container(
               padding: const EdgeInsets.symmetric(horizontal: 0.0),
               child: LinkmanGroupSearchWidget(
+                key: UniqueKey(),
                 selectType: SelectType.dataListMultiSelectField,
                 onSelected: (List<String>? selected) async {
                   if (selected != null) {
@@ -172,17 +175,18 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
 
   //群主选择界面
   Widget _buildGroupOwnerWidget(BuildContext context) {
+    Group group = this.group.value;
     var selector = Container(
         padding: const EdgeInsets.symmetric(horizontal: 0.0),
         child: CustomSingleSelectField(
             title: 'GroupOwnerPeer',
             onChanged: (selected) {
               if (selected != null) {
-                group.value.groupOwnerPeerId = selected;
+                group.groupOwnerPeerId = selected;
                 var options = groupOwnerController.options;
                 for (var option in options) {
                   if (option.value == selected) {
-                    group.value.groupOwnerName = option.label;
+                    group.groupOwnerName = option.label;
                     break;
                   }
                 }
@@ -197,46 +201,46 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
   }
 
   Future<void> _pickAvatar(BuildContext context) async {
+    Group group = this.group.value;
     if (platformParams.desktop) {
       List<XFile> xfiles = await FileUtil.pickFiles(type: FileType.image);
       if (xfiles.isNotEmpty) {
         List<int> avatar = await xfiles[0].readAsBytes();
-        group.value.avatar =
-            ImageUtil.base64Img(CryptoUtil.encodeBase64(avatar));
-        groupAvatar.value = group.value.avatar;
+        group.avatar = ImageUtil.base64Img(CryptoUtil.encodeBase64(avatar));
+        groupAvatar.value = group.avatar;
       }
     } else if (platformParams.mobile) {
       List<AssetEntity>? assets = await AssetUtil.pickAssets(context);
       if (assets != null && assets.isNotEmpty) {
         List<int>? avatar = await assets[0].originBytes;
         if (avatar != null) {
-          group.value.avatar =
-              ImageUtil.base64Img(CryptoUtil.encodeBase64(avatar));
-          groupAvatar.value = group.value.avatar;
+          group.avatar = ImageUtil.base64Img(CryptoUtil.encodeBase64(avatar));
+          groupAvatar.value = group.avatar;
         }
       }
     }
   }
 
   Widget _buildAvatarWidget(BuildContext context) {
+    Group group = this.group.value;
     var avatarWidget = ValueListenableBuilder(
         valueListenable: groupAvatar,
         builder: (BuildContext context, String? groupAvatar, Widget? child) {
-          var avatar = group.value.avatar;
+          var avatar = group.avatar;
           if (avatar != null && avatar.isNotEmpty) {
             var avatarImage = ImageUtil.buildImageWidget(
                 image: avatar,
                 height: AppIconSize.mdSize,
                 width: AppIconSize.mdSize,
                 fit: BoxFit.contain);
-            group.value.avatarImage = avatarImage;
+            group.avatarImage = avatarImage;
           }
           return Container(
             padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 0.0),
             child: ListTile(
                 leading: Icon(Icons.image, color: myself.primary),
                 title: Text(AppLocalizations.t('avatar')),
-                trailing: group.value.avatarImage,
+                trailing: group.avatarImage,
                 minVerticalPadding: 0.0,
                 minLeadingWidth: 0.0,
                 onTap: () async {
@@ -381,8 +385,13 @@ class _LinkmanGroupEditWidgetState extends State<LinkmanGroupEditWidget> {
 
   @override
   Widget build(BuildContext context) {
+    String title = 'Add group';
+    int? id = group.value.id;
+    if (id != null) {
+      title = 'Edit group';
+    }
     var appBarView = AppBarView(
-        title: widget.title,
+        title: title,
         withLeading: widget.withLeading,
         child: _buildFormInputWidget(context));
     return appBarView;

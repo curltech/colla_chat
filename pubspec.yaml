@@ -153,7 +153,7 @@ dependencies:
   flutter_floating_bottom_bar: ^1.1.0
   focused_menu: ^1.0.5
   floating_action_bubble: ^1.1.4
-
+  expandable: ^5.0.1
   #安全加密
   cryptography: ^2.0.5 #ecc,aes
   #在macos上不能使用，error: cannot call value of non-function type 'FlutterBinaryMessenger'
@@ -189,7 +189,6 @@ dependencies:
   date_format: ^2.0.6
   omni_datetime_picker: ^1.0.1
   toggle_switch: ^2.0.1
-  expandable: ^5.0.1
   classic_logger: any
   logger: ^1.1.0
   #logging: ^1.0.2

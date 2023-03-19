@@ -48,9 +48,37 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
       title = 'Group';
       placeholder = 'groups';
     }
+    _initOption();
   }
 
-  Future<List<Option<String>>> _onSearch(String keyword) async {
+  ///构造已选择的联系人和群的数据
+  _initOption() async {
+    List<Option<String>> options = [];
+    if (widget.selected.isNotEmpty) {
+      for (String select in widget.selected) {
+        if (widget.includeLinkman) {
+          Linkman? linkman = await linkmanService.findCachedOneByPeerId(select);
+          if (linkman != null) {
+            Option<String> item = Option<String>(linkman.name, linkman.peerId,
+                checked: true, leading: linkman.avatarImage);
+            options.add(item);
+          }
+        }
+        if (widget.includeGroup) {
+          Group? group = await groupService.findCachedOneByPeerId(select);
+          if (group != null) {
+            Option<String> item = Option<String>(group.name, group.peerId,
+                checked: true, leading: group.avatarImage);
+            options.add(item);
+          }
+        }
+      }
+    }
+    optionController.options = options;
+  }
+
+  ///执行查询命令，重新构造全部的，以及已选择的联系人和群的数据
+  Future<void> _onSearch(String keyword) async {
     List<Linkman> linkmen = <Linkman>[];
     List<Group> groups = <Group>[];
     if (widget.includeLinkman) {
@@ -59,11 +87,7 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
     if (widget.includeGroup) {
       groups = await groupService.search(keyword);
     }
-    return _buildOptions(linkmen, groups);
-  }
 
-  List<Option<String>> _buildOptions(
-      List<Linkman> linkmen, List<Group> groups) {
     List<Option<String>> options = [];
     if (widget.includeLinkman) {
       for (Linkman linkman in linkmen) {
@@ -82,23 +106,12 @@ class _LinkmanGroupSearchWidgetState extends State<LinkmanGroupSearchWidget> {
       }
     }
 
-    return options;
+    optionController.options = options;
   }
 
   /// 复杂多选对话框样式，选择项通过传入的回调方法返回
   Widget _buildChipMultiSelectField(BuildContext context) {
-    var selector =
-        // FutureBuilder(
-        //     future: _onSearch(''),
-        //     builder: (BuildContext context,
-        //         AsyncSnapshot<List<Option<String>>> snapshot) {
-        //       if (!snapshot.hasData) {
-        //         return Container();
-        //       }
-        //       // var options = snapshot.data;
-        //       // optionController.options = options!;
-        //       return
-        CustomMultiSelectField(
+    var selector = CustomMultiSelectField(
       title: title,
       prefix: Icon(
         Icons.person_add,

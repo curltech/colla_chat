@@ -6,6 +6,7 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
+import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 
 class OptionController with ChangeNotifier {
@@ -140,7 +141,7 @@ class _DataDropdownButtonState extends State<DataDropdownButton> {
 class DataListSingleSelect extends StatefulWidget {
   final OptionController optionController;
   final String? title;
-  final Future<List<Option<String>>> Function(String keyword)? onSearch;
+  final Future<void> Function(String keyword)? onSearch;
   final Function(String? selected) onChanged;
 
   const DataListSingleSelect(
@@ -173,9 +174,7 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
 
   _search() async {
     if (widget.onSearch != null) {
-      List<Option<String>> options =
-          await widget.onSearch!(textController.text);
-      widget.optionController.options = options;
+      await widget.onSearch!(textController.text);
     } else {
       _update();
     }
@@ -314,7 +313,7 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
 
 class CustomSingleSelectField extends StatefulWidget {
   final OptionController optionController;
-  final Future<List<Option<String>>> Function(String keyword)? onSearch;
+  final Future<void> Function(String keyword)? onSearch;
   final String title;
   final Widget? prefix;
   final Widget? suffix;
@@ -433,8 +432,8 @@ enum SelectType {
 ///利用回调函数onConfirm回传选择的值
 class CustomMultiSelect extends StatefulWidget {
   final OptionController optionController;
-  final Future<List<Option<String>>> Function(String keyword)? onSearch;
-  final Function(List<String> selected) onConfirm;
+  final Future<void> Function(String keyword)? onSearch;
+  final Function(List<String>? selected) onConfirm;
   final String? title;
   final SelectType selectType;
 
@@ -471,9 +470,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
 
   _search() async {
     if (widget.onSearch != null) {
-      List<Option<String>> options =
-          await widget.onSearch!(textController.text);
-      widget.optionController.options = options;
+      await widget.onSearch!(textController.text);
     } else {
       _update();
     }
@@ -659,7 +656,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
         TextButton(
             style: style,
             onPressed: () {
-              widget.onConfirm([]);
+              widget.onConfirm(null);
             },
             child: Text(AppLocalizations.t('Cancel'))),
         TextButton(
@@ -688,7 +685,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
 ///利用Chip实现的多选字段组件类，将ChipMultiSelect包装到对话框中
 ///利用回调函数onConfirm回传选择的值
 class CustomMultiSelectField extends StatefulWidget {
-  final Future<List<Option<String>>> Function(String keyword)? onSearch;
+  final Future<void> Function(String keyword)? onSearch;
   final Function(List<String>? value)? onConfirm;
   final String title;
   final Widget? prefix;
@@ -713,7 +710,6 @@ class CustomMultiSelectField extends StatefulWidget {
 
 class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
   ValueNotifier<bool> optionsChanged = ValueNotifier<bool>(true);
-  ValueNotifier<bool> chipVisible = ValueNotifier<bool>(false);
 
   @override
   void initState() {
@@ -725,7 +721,7 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
     optionsChanged.value = !optionsChanged.value;
   }
 
-  //字段的数据使用控制器数据，直接修改，optionsChanged用于表示控制器数据改变了
+  ///已经选择的数据的Chip样式显示
   Widget _buildSelectedChips(BuildContext context) {
     return ValueListenableBuilder(
         valueListenable: optionsChanged,
@@ -761,18 +757,47 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
         });
   }
 
-  Widget _buildMultiSelectField(BuildContext context) {
+  ///listtile样式，以及弹出的选择对话框
+  Widget _buildListTileField(BuildContext context) {
+    return Column(children: [
+      ExpandablePanel(
+        theme: const ExpandableThemeData(
+          iconColor: Colors.white,
+        ),
+        header: Container(
+            padding:
+                const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
+            child: Row(children: [
+              widget.prefix!,
+              const SizedBox(
+                width: 20,
+              ),
+              Text(AppLocalizations.t(widget.title ?? '')),
+            ])),
+        collapsed: Container(),
+        expanded: _buildButtonField(context),
+      ),
+    ]);
+  }
+
+  ///增加按钮样式，以及弹出的选择对话框
+  Widget _buildButtonField(BuildContext context) {
     var suffix = widget.suffix ??
-        const Icon(
-          Icons.chevron_right,
-          color: Colors.white,
+        Icon(
+          Icons.add_circle_outline,
+          color: myself.primary,
         );
     return Column(children: [
-      ListTile(
-        leading: widget.prefix,
-        title: Text(AppLocalizations.t(widget.title ?? '')),
-        trailing: suffix,
-        onTap: () async {
+      SizedBox(
+          height: 180,
+          child: SingleChildScrollView(
+              controller: ScrollController(),
+              child: _buildSelectedChips(context))),
+      const SizedBox(
+        height: 5.0,
+      ),
+      TextButton(
+        onPressed: () async {
           List<String>? selected = await DialogUtil.show(
               context: context,
               builder: (BuildContext context) {
@@ -793,30 +818,14 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
             widget.onConfirm!(selected);
           }
         },
-        onLongPress: () {
-          chipVisible.value = !chipVisible.value;
-        },
+        child: suffix,
       ),
-      const SizedBox(
-        height: 5.0,
-      ),
-      ValueListenableBuilder(
-          valueListenable: chipVisible,
-          builder: (BuildContext context, bool chipVisible, Widget? child) {
-            return Visibility(
-                visible: chipVisible,
-                child: SizedBox(
-                    height: 180,
-                    child: SingleChildScrollView(
-                        controller: ScrollController(),
-                        child: _buildSelectedChips(context))));
-          }),
     ]);
   }
 
   @override
   Widget build(BuildContext context) {
-    return _buildMultiSelectField(context);
+    return _buildListTileField(context);
   }
 
   @override

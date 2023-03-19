@@ -82,26 +82,26 @@ final List<ColumnFieldDef> conferenceColumnFieldDefs = [
 ];
 
 ///创建和修改群，填写群的基本信息，选择群成员和群主
-class ConferenceEditWidget extends StatefulWidget with TileDataMixin {
-  ConferenceEditWidget({Key? key}) : super(key: key);
+class ConferenceAddWidget extends StatefulWidget with TileDataMixin {
+  ConferenceAddWidget({Key? key}) : super(key: key);
 
   @override
   IconData get iconData => Icons.meeting_room_outlined;
 
   @override
-  String get routeName => 'conference_edit';
+  String get routeName => 'conference_add';
 
   @override
-  String get title => 'Conference edit';
+  String get title => 'Add conference';
 
   @override
   bool get withLeading => true;
 
   @override
-  State<StatefulWidget> createState() => _ConferenceEditWidgetState();
+  State<StatefulWidget> createState() => _ConferenceAddWidgetState();
 }
 
-class _ConferenceEditWidgetState extends State<ConferenceEditWidget> {
+class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
   TextEditingController controller = TextEditingController();
 
   OptionController conferenceOwnerController = OptionController();
