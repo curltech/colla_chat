@@ -258,7 +258,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           //         image: 'assets/images/openai.png',
           //         width: AppIconSize.lgSize,
           //         height: AppIconSize.lgSize);
-          routeName = 'chat_gpt_edit';
+          routeName = 'chat_gpt_add';
         }
         prefix = prefix ?? AppImage.mdAppImage;
         TileData tile = TileData(

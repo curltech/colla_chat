@@ -261,7 +261,20 @@ class _ChatMessageViewState extends State<ChatMessageView> {
         width: 15,
       ));
     }
-
+    if (partyType == PartyType.group.name) {
+      rightWidgets.add(IconButton(
+          onPressed: () {
+            indexWidgetProvider.push('linkman_add_group');
+          },
+          icon: const Icon(Icons.more_vert)));
+    }
+    if (partyType == PartyType.conference.name) {
+      rightWidgets.add(IconButton(
+          onPressed: () {
+            indexWidgetProvider.push('conference_add');
+          },
+          icon: const Icon(Icons.more_vert)));
+    }
     var appBarView = KeepAliveWrapper(
         child: AppBarView(
             titleWidget: titleWidget,

@@ -199,8 +199,13 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     actionTiles.add(Expanded(
         child: SingleChildScrollView(child: _buildFormInputWidget(context))));
 
+    String title = 'Add linkman';
+    int? id = linkman?.id;
+    if (id != null) {
+      title = 'Edit linkman';
+    }
     var appBarView = AppBarView(
-        title: widget.title,
+        title: title,
         withLeading: widget.withLeading,
         child: Column(children: actionTiles));
     return appBarView;

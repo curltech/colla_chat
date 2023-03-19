@@ -7,16 +7,16 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:html_editor_enhanced/html_editor.dart';
 
-class HtmlRichTextWidget extends StatefulWidget {
-  const HtmlRichTextWidget({Key? key, required this.title}) : super(key: key);
+class HtmlEdtorWidget extends StatefulWidget {
+  const HtmlEdtorWidget({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
   @override
-  State createState() => _HtmlRichTextWidgetState();
+  State createState() => _HtmlEdtorWidgetState();
 }
 
-class _HtmlRichTextWidgetState extends State<HtmlRichTextWidget> {
+class _HtmlEdtorWidgetState extends State<HtmlEdtorWidget> {
   String result = '';
   final HtmlEditorController controller = HtmlEditorController();
 

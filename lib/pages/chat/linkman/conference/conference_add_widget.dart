@@ -146,8 +146,8 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
           conferenceMembers.add(member.memberPeerId!);
         }
       }
-      this.conferenceMembers.value = conferenceMembers;
       await _buildConferenceOwnerOptions(conferenceMembers);
+      this.conferenceMembers.value = conferenceMembers;
     }
   }
 
@@ -193,6 +193,7 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
           return Container(
               padding: const EdgeInsets.symmetric(horizontal: 0.0),
               child: LinkmanGroupSearchWidget(
+                key: UniqueKey(),
                 selectType: SelectType.dataListMultiSelectField,
                 onSelected: (List<String>? selected) async {
                   if (selected != null) {
@@ -210,19 +211,14 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
 
   //会议发起人选择界面
   Widget _buildConferenceOwnerWidget(BuildContext context) {
-    var selector =
-        // ValueListenableBuilder(
-        //     valueListenable: groupOwnerOptions,
-        //     builder: (BuildContext context, List<Option> option, Widget? child) {
-        //       return
-        Container(
-            padding: const EdgeInsets.symmetric(horizontal: 0.0),
-            child: CustomSingleSelectField(
-                title: 'ConferenceOwnerPeer',
-                onChanged: (selected) {
-                  conference.value.conferenceOwnerPeerId = selected;
-                },
-                optionController: conferenceOwnerController));
+    var selector = Container(
+        padding: const EdgeInsets.symmetric(horizontal: 0.0),
+        child: CustomSingleSelectField(
+            title: 'ConferenceOwnerPeer',
+            onChanged: (selected) {
+              conference.value.conferenceOwnerPeerId = selected;
+            },
+            optionController: conferenceOwnerController));
     // });
     return selector;
   }
@@ -364,8 +360,13 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
 
   @override
   Widget build(BuildContext context) {
+    String title = 'Add conference';
+    int? id = conference.value.id;
+    if (id != null) {
+      title = 'Edit conference';
+    }
     var appBarView = AppBarView(
-        title: widget.title,
+        title: title,
         withLeading: widget.withLeading,
         child: _buildFormInputWidget(context));
     return appBarView;

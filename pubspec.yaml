@@ -332,8 +332,8 @@ dependency_overrides:
   #webview_flutter_wkwebview: ^3.0.1
   #webview_flutter_web: ^0.1.0+4
   #webview_flutter_platform_interface: ^2.0.0
-  webview_win_floating: 2.0.0 #webView for
-    #git: https://github.com/jakky1/webview_win_floating.git
+  webview_win_floating: #2.0.0 #webView for
+    git: https://github.com/jakky1/webview_win_floating.git
   sprintf: ^7.0.0
   flex_color_picker: ^3.0.0
   permission_handler: ^10.2.0

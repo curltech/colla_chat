@@ -1,9 +1,10 @@
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/widgets/common/flutter_webview.dart';
+import 'package:colla_chat/widgets/common/inapp_webview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart' as inapp;
 import 'package:webview_flutter/webview_flutter.dart' as webview;
-import 'package:webview_flutter/webview_flutter.dart';
 
 class PlatformWebViewController with ChangeNotifier {
   inapp.InAppWebViewController? inAppWebViewController;
@@ -112,53 +113,11 @@ class PlatformWebView extends StatefulWidget {
 }
 
 class _PlatformWebViewState extends State<PlatformWebView> {
-  inapp.InAppWebViewGroupOptions options = inapp.InAppWebViewGroupOptions(
-      crossPlatform: inapp.InAppWebViewOptions(
-        useShouldOverrideUrlLoading: true,
-        mediaPlaybackRequiresUserGesture: false,
-      ),
-      android: inapp.AndroidInAppWebViewOptions(
-        useHybridComposition: true,
-      ),
-      ios: inapp.IOSInAppWebViewOptions(
-        allowsInlineMediaPlayback: true,
-      ));
-
-  ///6.x.x
-  // inapp.InAppWebViewSettings settings = inapp.InAppWebViewSettings(
-  //     useShouldOverrideUrlLoading: true,
-  //     mediaPlaybackRequiresUserGesture: false,
-  //     allowsInlineMediaPlayback: true,
-  //     iframeAllow: "camera; microphone",
-  //     iframeAllowFullscreen: true);
-
-  inapp.PullToRefreshController pullToRefreshController =
-      inapp.PullToRefreshController();
   PlatformWebViewController? webViewController;
 
   @override
   void initState() {
     super.initState();
-    webViewController = PlatformWebViewController(
-        webViewController: WebViewController()
-          ..setJavaScriptMode(JavaScriptMode.unrestricted)
-          ..setBackgroundColor(const Color(0x00000000))
-          ..setNavigationDelegate(
-            NavigationDelegate(
-              onProgress: (int progress) {
-                // Update loading bar.
-              },
-              onPageStarted: (String url) {},
-              onPageFinished: (String url) {},
-              onWebResourceError: (WebResourceError error) {},
-              onNavigationRequest: (NavigationRequest request) {
-                if (request.url.startsWith('https://www.youtube.com/')) {
-                  return NavigationDecision.prevent;
-                }
-                return NavigationDecision.navigate;
-              },
-            ),
-          ));
   }
 
   _onWebViewCreated(dynamic controller) {
@@ -170,45 +129,23 @@ class _PlatformWebViewState extends State<PlatformWebView> {
 
   @override
   Widget build(BuildContext context) {
-    Widget webviewWidget;
+    Widget platformWebView;
     if (platformParams.windows || platformParams.mobile || platformParams.web) {
-      webviewWidget = WebViewWidget(
-        key: UniqueKey(),
-        controller: webViewController!.webViewController!,
+      platformWebView = FlutterWebView(
+        initialUrl: widget.initialUrl,
+        onWebViewCreated: (webview.WebViewController controller) {
+          _onWebViewCreated(controller);
+        },
       );
     } else {
-      webviewWidget = inapp.InAppWebView(
-        key: UniqueKey(),
-        initialUrlRequest: widget.initialUrl != null
-            ? inapp.URLRequest(url: Uri.parse(widget.initialUrl!))
-            : null,
-        initialOptions: options,
-        // initialSettings: settings,
-        onWebViewCreated: _onWebViewCreated,
-        pullToRefreshController: pullToRefreshController,
-        onLoadStart: (controller, url) {},
-        androidOnPermissionRequest: (controller, origin, resources) async {
-          return inapp.PermissionRequestResponse(
-              resources: resources,
-              action: inapp.PermissionRequestResponseAction.GRANT);
+      platformWebView = FlutterInAppWebView(
+        initialUrl: widget.initialUrl,
+        onWebViewCreated: (inapp.InAppWebViewController controller) {
+          _onWebViewCreated(controller);
         },
-        shouldOverrideUrlLoading: (controller, navigationAction) async {},
-        onLoadStop: (controller, url) async {
-          pullToRefreshController.endRefreshing();
-        },
-        onLoadError: (controller, url, code, message) {
-          pullToRefreshController.endRefreshing();
-        },
-        onProgressChanged: (controller, progress) {
-          if (progress == 100) {
-            pullToRefreshController.endRefreshing();
-          }
-        },
-        onUpdateVisitedHistory: (controller, url, androidIsReload) {},
-        onConsoleMessage: (controller, consoleMessage) {},
       );
     }
 
-    return webviewWidget;
+    return platformWebView;
   }
 }

@@ -161,8 +161,13 @@ class _ChatGPTAddWidgetState extends State<ChatGPTAddWidget> {
 
   @override
   Widget build(BuildContext context) {
+    String title = 'Add chatGPT';
+    int? id = linkman?.id;
+    if (id != null) {
+      title = 'Edit chatGPT';
+    }
     var appBarView = AppBarView(
-        title: widget.title,
+        title: title,
         withLeading: widget.withLeading,
         child: SingleChildScrollView(child: _buildFormInputWidget(context)));
     return appBarView;

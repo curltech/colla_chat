@@ -55,7 +55,7 @@ class LinkmanGroupAddWidget extends StatefulWidget with TileDataMixin {
   IconData get iconData => Icons.person;
 
   @override
-  String get routeName => 'linkman_add_edit';
+  String get routeName => 'linkman_add_group';
 
   @override
   String get title => 'Linkman add group';
@@ -104,7 +104,7 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
     if (group.value.id != null) {
       List<String> groupMembers = [];
       List<GroupMember> members =
-          await groupMemberService.findByGroupId(group.value!.peerId);
+          await groupMemberService.findByGroupId(group.value.peerId);
       if (members.isNotEmpty) {
         for (GroupMember member in members) {
           groupMembers.add(member.memberPeerId!);
