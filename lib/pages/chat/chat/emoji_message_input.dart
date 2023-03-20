@@ -1,10 +1,9 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/special_text/emoji_text.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
-
-import '../../../widgets/special_text/emoji_text.dart';
 
 ///Emoji文本消息的输入面板
 class EmojiMessageInputWidget extends StatefulWidget {
@@ -33,6 +32,7 @@ class _EmojiMessageInputWidgetState extends State<EmojiMessageInputWidget> {
     setState(() {});
   }
 
+  ///构造自定义的emoji的选择组件
   Widget _buildEmojiWidget(BuildContext context) {
     return GestureDetector(
       child: SizedBox(
@@ -66,7 +66,7 @@ class _EmojiMessageInputWidgetState extends State<EmojiMessageInputWidget> {
     return SizedBox(
         height: widget.height,
         child: EmojiPicker(
-            textEditingController: TextEditingController(),
+            //textEditingController: TextEditingController(),
             onEmojiSelected: (Category? category, Emoji emoji) {
               if (widget.onTap != null) {
                 widget.onTap!(emoji.emoji);
