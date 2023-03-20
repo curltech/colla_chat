@@ -42,12 +42,14 @@ abstract class BaseEntity {
         updateDate = json['updateDate'],
         ownerPeerId = json['ownerPeerId'];
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'createDate': createDate,
-        'updateDate': updateDate,
-        'ownerPeerId': ownerPeerId
-      };
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'createDate': createDate,
+      'updateDate': updateDate,
+      'ownerPeerId': ownerPeerId
+    };
+  }
 }
 
 abstract class StatusEntity extends BaseEntity {

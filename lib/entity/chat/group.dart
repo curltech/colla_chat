@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/peer_party.dart';
+import 'package:colla_chat/tool/json_util.dart';
 
 // 组（群聊/频道）
 class Group extends PeerParty {
@@ -84,5 +85,41 @@ class GroupMember extends StatusEntity {
       'memberType': memberType,
     });
     return json;
+  }
+}
+
+class GroupChange {
+  Group? group;
+  List<GroupMember>? addGroupMembers;
+  List<GroupMember>? removeGroupMembers;
+
+  GroupChange({this.group, this.addGroupMembers, this.removeGroupMembers});
+
+  GroupChange.fromJson(Map json) {
+    if (json['group'] != null) {
+      group = Group.fromJson(json['group']);
+    }
+    if (json['addGroupMembers'] != null) {
+      addGroupMembers = <GroupMember>[];
+      for (var json in json['addGroupMembers']) {
+        var groupMember = GroupMember.fromJson(json);
+        addGroupMembers!.add(groupMember);
+      }
+    }
+    if (json['removeGroupMembers'] != null) {
+      removeGroupMembers = <GroupMember>[];
+      for (var json in json['removeGroupMembers']) {
+        var groupMember = GroupMember.fromJson(json);
+        removeGroupMembers!.add(groupMember);
+      }
+    }
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'group': group?.toJson(),
+      'addGroupMembers': JsonUtil.toJson(addGroupMembers),
+      'removeGroupMembers': JsonUtil.toJson(removeGroupMembers),
+    };
   }
 }

@@ -297,7 +297,11 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
     return formInputWidget;
   }
 
-  //修改提交
+  ///修改提交，首先分清楚增加群和修改群
+  ///在增加群的情况下，对所有的参与者发送群消息
+  ///在修改群的情况下，如果只修改群信息，对所有参与者发送群消息
+  ///在增加参与者的情况下，对增加的参与者发送群消息，参与者点击群消息，表示同意，向所有参与者发送成员增加消息
+  ///在减少参与者的情况下，对所有的参与者发送成员删除消息
   Future<Group?> _onOk(Map<String, dynamic> values) async {
     bool groupModified = false;
     Group currentGroup = Group.fromJson(values);
@@ -349,7 +353,7 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
       groupMembers.value = [...participants];
     }
     current.participants = groupMembers.value;
-    List<Object> gs = await groupService.store(current);
+    GroupChange groupChange = await groupService.store(current);
     group.value = current;
     var groupId = current.peerId;
 
@@ -360,13 +364,17 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
       await groupService.modifyGroup(current);
     }
     //新增加的成员
-    Object newMembers = gs[1];
+    List<GroupMember>? newMembers = groupChange.addGroupMembers;
     if (newMembers is List<GroupMember> && newMembers.isNotEmpty) {
-      //对所有的成员发送组员增加的消息
-      await groupService.addGroupMember(groupId, newMembers);
+      //对增加的成员发送群消息
+      List<String> peerIds = [];
+      for (var newMember in newMembers) {
+        peerIds.add(newMember.memberPeerId!);
+      }
+      await groupService.addGroup(current, peerIds: peerIds);
     }
 
-    Object oldMembers = gs[2];
+    List<GroupMember>? oldMembers = groupChange.removeGroupMembers;
     //处理删除的成员
     if (oldMembers is List<GroupMember> && oldMembers.isNotEmpty) {
       //对所有的成员发送组员删除的消息

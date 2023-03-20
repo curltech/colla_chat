@@ -111,7 +111,7 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   ///返回数组，内含保存的组，增加的成员和删除的成员
-  Future<List<Object>> store(Group group) async {
+  Future<GroupChange> store(Group group) async {
     Group? old = await findOneByPeerId(group.peerId);
     if (old != null) {
       group.id = old.id;
@@ -123,7 +123,7 @@ class GroupService extends PeerPartyService<Group> {
 
     var participants = group.participants;
     if (participants == null || participants.isEmpty) {
-      return [group, [], []];
+      return GroupChange(group: group);
     }
     String groupId = group.peerId;
     List<GroupMember> members = await groupMemberService.findByGroupId(groupId);
@@ -170,7 +170,10 @@ class GroupService extends PeerPartyService<Group> {
     groups[group.peerId] = group;
     await chatSummaryService.upsertByGroup(group);
 
-    return [group, newMembers, oldMembers.values.toList()];
+    return GroupChange(
+        group: group,
+        addGroupMembers: newMembers,
+        removeGroupMembers: oldMembers.values.toList());
   }
 
   Future<List<Group>> search(String key) async {
