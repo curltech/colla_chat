@@ -158,7 +158,7 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
               padding: const EdgeInsets.symmetric(horizontal: 0.0),
               child: LinkmanGroupSearchWidget(
                 key: UniqueKey(),
-                selectType: SelectType.dataListMultiSelectField,
+                selectType: SelectType.chipMultiSelectField,
                 onSelected: (List<String>? selected) async {
                   if (selected != null) {
                     this.groupMembers.value = selected;

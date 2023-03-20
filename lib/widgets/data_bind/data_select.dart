@@ -692,6 +692,7 @@ class CustomMultiSelectField extends StatefulWidget {
   final Widget? suffix;
   final SelectType selectType;
   final OptionController optionController;
+  final bool expandable;
 
   const CustomMultiSelectField(
       {Key? key,
@@ -701,6 +702,7 @@ class CustomMultiSelectField extends StatefulWidget {
       required this.title,
       this.prefix,
       this.suffix,
+      this.expandable = false,
       this.selectType = SelectType.chipMultiSelect})
       : super(key: key);
 
@@ -757,8 +759,8 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
         });
   }
 
-  ///listtile样式，以及弹出的选择对话框
-  Widget _buildListTileField(BuildContext context) {
+  ///ExpandablePanel样式，以及弹出的选择对话框
+  Widget _buildExpandablePanelField(BuildContext context) {
     return Column(children: [
       ExpandablePanel(
         theme: const ExpandableThemeData(
@@ -825,7 +827,9 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
 
   @override
   Widget build(BuildContext context) {
-    return _buildListTileField(context);
+    return widget.expandable
+        ? _buildExpandablePanelField(context)
+        : _buildButtonField(context);
   }
 
   @override
