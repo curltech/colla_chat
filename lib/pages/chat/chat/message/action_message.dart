@@ -2,6 +2,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
@@ -52,7 +53,14 @@ class ActionMessage extends StatelessWidget {
             color: primary,
           ),
           iconSize: AppIconSize.mdSize,
-          onPressed: () {},
+          onPressed: () async {
+            //同意加入群，向群的所有成员告知自己加入
+            // GroupMember? member = await groupMemberService.findOneByGroupId(
+            //     group.peerId, myself.peerId!);
+            // if (member != null) {
+            //   await groupService.addGroupMember(group.peerId, [member]);
+            // }
+          },
         ),
         title: group.name,
         dense: false,

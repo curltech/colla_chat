@@ -214,7 +214,7 @@ class GroupService extends PeerPartyService<Group> {
     }
   }
 
-  ///接收加群的消息，完成加群，发送回执
+  ///接收加群的消息，自动完成加群，发送回执
   receiveAddGroup(ChatMessage chatMessage) async {
     String json = chatMessageService.recoverContent(chatMessage.content!);
     Map<String, dynamic> map = JsonUtil.toJson(json);
@@ -226,6 +226,12 @@ class GroupService extends PeerPartyService<Group> {
     await chatMessageService.updateReceiptType(
         chatMessage, MessageReceiptType.accepted);
     await chatMessageService.sendAndStore(chatReceipt);
+    //同意加入群，向群的所有成员告知自己加入
+    GroupMember? member =
+        await groupMemberService.findOneByGroupId(group.peerId, myself.peerId!);
+    if (member != null) {
+      await addGroupMember(group.peerId, [member]);
+    }
   }
 
   ///向群成员发送群属性变化的消息
