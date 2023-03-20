@@ -2,7 +2,7 @@ import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
 
 const String emojiFilePath = "assets/images/emoji";
-const int emojiCount = 112;
+const int emojiCount = 108;
 
 ///自定义的emoji/image特殊文本
 ///使用[]把数字的序号包裹起来，数字对应相应目录下的图像

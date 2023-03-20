@@ -523,17 +523,12 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
           List<FilterChip> chips = [];
           for (var option in options) {
             var chip = FilterChip(
-              label: Row(mainAxisSize: MainAxisSize.min, children: [
-                Text(
-                  option.label,
-                  style: TextStyle(
-                      color: option.checked ? Colors.white : Colors.black),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                option.leading ?? Container(),
-              ]),
+              avatar: option.leading,
+              label: Text(
+                option.label,
+                style: TextStyle(
+                    color: option.checked ? Colors.white : Colors.black),
+              ),
               //avatar: option.leading,
               disabledColor: Colors.white,
               selectedColor: myself.primary,
