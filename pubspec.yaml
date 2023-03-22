@@ -225,6 +225,7 @@ dependencies:
   audiofileplayer: ^2.1.1
   record_mp3: ^3.0.0
   audio_waveforms: ^1.0.1
+  audio_video_progress_bar: ^1.0.0
   video_player_web: ^2.0.15
   flick_video_player: ^0.5.0 #video_player的封装
   appinio_video_player: ^1.2.0 #video_player的封装
