@@ -303,11 +303,11 @@ dependencies:
   #pusher_channels_flutter: ^2.0.1
   flutter_apns: ^1.6.0
   mobpush_plugin: ^1.2.4 #有容量限制，收费
-  xiao_mi_push_plugin: ^2.0.0
+  #xiao_mi_push_plugin: ^2.0.0  #android下有错误，gradle的配置旧了
   huawei_push: ^6.7.0+300
   # 支持本地和fcm
   awesome_notifications: ^0.7.4+1
-  awesome_notifications_fcm: ^0.7.4+1
+  awesome_notifications_fcm: ^0.7.4+1 #对minsdk有要求
   #openai_gpt3_api:
   dart_openai: ^1.8.0
   chat_gpt_sdk: ^2.0.4
