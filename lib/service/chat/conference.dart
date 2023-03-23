@@ -220,6 +220,6 @@ final conferenceService = ConferenceService(
       'conferenceOwnerPeerId',
       'startDate',
       'name',
-      'title'
+      'topic'
     ],
     fields: ServiceLocator.buildFields(Conference('', name: ''), []));
