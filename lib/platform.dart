@@ -2,10 +2,10 @@ import 'dart:core';
 import 'dart:io' as io;
 
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/tool/path_util.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:path_provider/path_provider.dart';
 
 /// 平台的参数，包括平台的硬件和系统软件特征，是只读的数据
 class PlatformParams {
@@ -51,8 +51,8 @@ class PlatformParams {
       web = true;
     }
 
-    var dir = await getApplicationDocumentsDirectory();
-    path = dir.path;
+    var dir = await PathUtil.getApplicationDirectory();
+    path = dir!.path;
 
     try {
       var locales = io.Platform.localeName.split('_');

@@ -4,10 +4,10 @@ import 'dart:typed_data';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
-import 'package:path_provider/path_provider.dart';
 
 final emptyVideoView = Center(
   child: AppImage.mdAppImage,
@@ -468,8 +468,8 @@ class PeerVideoRender {
     }
     // TODO(rostopira): request write storage permission
     if (filePath == null) {
-      Directory? storagePath = await getApplicationDocumentsDirectory();
-      filePath = '${storagePath.path}/webrtc_sample/test.mp4';
+      Directory? storagePath = await PathUtil.getApplicationDirectory();
+      filePath = '${storagePath?.path}/webrtc_sample/test.mp4';
     }
     mediaRecorder = MediaRecorder();
     final videoTrack = mediaStream!

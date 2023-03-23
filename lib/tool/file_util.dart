@@ -1,14 +1,12 @@
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:file_saver/file_saver.dart';
 import 'package:file_selector/file_selector.dart';
-import 'package:file_selector_platform_interface/file_selector_platform_interface.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,8 +19,8 @@ import 'package:uuid/uuid.dart';
 class FileUtil {
   static Future<String> writeFile(List<int> bytes, String filename) async {
     if (!filename.contains(p.separator)) {
-      final dir = await getApplicationDocumentsDirectory();
-      filename = p.join(dir.path, filename);
+      final dir = await PathUtil.getApplicationDirectory();
+      filename = p.join(dir!.path, filename);
     }
     var file = File(filename);
     bool exist = await file.exists();
