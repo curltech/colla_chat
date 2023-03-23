@@ -107,7 +107,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     var clientDevice = JsonUtil.toJsonString(deviceData);
     var hash = await cryptoGraphy.hash(clientDevice.codeUnits);
     var clientId = CryptoUtil.encodeBase58(hash);
-    var myselfPeer = MyselfPeer('', clientId, name, loginName);
+    var myselfPeer = MyselfPeer('', name, clientId, loginName);
     myselfPeer.status = EntityStatus.effective.name;
     myselfPeer.mobile = mobile;
     myselfPeer.email = email;
