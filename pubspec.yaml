@@ -260,7 +260,7 @@ dependencies:
   #chatview: ^1.2.1
 
   #应用
-  flutter_filereader: 3.0.0
+  #  flutter_filereader: 3.0.0 #引入x5浏览器
   i18n_extension: ^8.0.0
   #quill_html_editor: ^2.1.6
   html_editor_enhanced: ^2.5.1
