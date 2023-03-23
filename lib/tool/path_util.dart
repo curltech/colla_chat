@@ -1,73 +1,72 @@
 import 'dart:io';
 
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:path_provider/path_provider.dart' as path;
 
 class PathUtil {
   ///获取本应用的数据存放路径
   static Future<Directory?> getApplicationDirectory() async {
     Directory? dir;
     try {
-      dir = await getApplicationDocumentsDirectory();
+      dir = await path.getApplicationDocumentsDirectory();
     } catch (e) {
-      logger.e(e.toString());
+      print('getApplicationDocumentsDirectory err:$e');
     }
     if (dir == null) {
       try {
-        dir = await getApplicationSupportDirectory();
+        dir = await path.getApplicationSupportDirectory();
       } catch (e) {
-        logger.e(e.toString());
+        print('getApplicationSupportDirectory err:$e');
       }
     }
     if (dir == null && !platformParams.ios) {
       try {
-        dir = await getExternalStorageDirectory();
+        dir = await path.getExternalStorageDirectory();
       } catch (e) {
-        logger.e(e.toString());
+        print('getExternalStorageDirectory err:$e');
       }
     }
     if (dir == null && !platformParams.android) {
       try {
-        dir = await getLibraryDirectory();
+        dir = await path.getLibraryDirectory();
       } catch (e) {
-        logger.e(e.toString());
+        print('getLibraryDirectory err:$e');
       }
     }
     return dir;
   }
 
   /// 获取文档目录文件
-  static Future<Directory> getLocalDocumentFile() async {
-    final dir = await getApplicationDocumentsDirectory();
+  static Future<Directory> getApplicationDocumentsDirectory() async {
+    final dir = await path.getApplicationDocumentsDirectory();
 
     return dir;
   }
 
   /// 获取临时目录文件
-  static Future<Directory> getLocalTemporaryFile() async {
-    final dir = await getTemporaryDirectory();
+  static Future<Directory> getTemporaryDirectory() async {
+    final dir = await path.getTemporaryDirectory();
     return dir;
   }
 
   /// 获取应用程序目录文件
-  static Future<Directory> getLocalSupportFile() async {
-    final dir = await getApplicationSupportDirectory();
+  static Future<Directory> getApplicationSupportDirectory() async {
+    final dir = await path.getApplicationSupportDirectory();
     return dir;
   }
 
   static Future<Directory> getLibraryDirectory() async {
-    final dir = await getLibraryDirectory();
+    final dir = await path.getLibraryDirectory();
     return dir;
   }
 
-  static Future<Directory> getExternalStorageDirectory() async {
-    final dir = await getLibraryDirectory();
+  static Future<Directory?> getExternalStorageDirectory() async {
+    final dir = await path.getExternalStorageDirectory();
     return dir;
   }
 
-  static Future<Directory> getDownloadsDirectory() async {
-    final dir = await getDownloadsDirectory();
+  static Future<Directory?> getDownloadsDirectory() async {
+    final dir = await path.getDownloadsDirectory();
     return dir;
   }
 }

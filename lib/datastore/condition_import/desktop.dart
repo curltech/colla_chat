@@ -13,12 +13,11 @@ Future<CommonDatabase> openSqlite3({String name = 'colla_chat.db'}) async {
     String path = name;
     if (dbFolder != null) {
       path = p.join(dbFolder.path, name);
-    }
-    CommonDatabase db = sqlite3.open(path);
-    //logger.i('sqlite3 path:$path');
-    appDataProvider.sqlite3Path = path;
+      CommonDatabase db = sqlite3.open(path);
+      appDataProvider.sqlite3Path = path;
 
-    return db;
+      return db;
+    }
   }
 
   throw UnimplementedError('desktop');

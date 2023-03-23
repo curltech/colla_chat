@@ -28,7 +28,7 @@ class PlatformParams {
   String? phoneNumber;
 
   late Map<String, dynamic> deviceData;
-  late String path;
+  String path = '';
 
   Future<void> init() async {
     final DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
@@ -52,7 +52,9 @@ class PlatformParams {
     }
 
     var dir = await PathUtil.getApplicationDirectory();
-    path = dir!.path;
+    if (dir != null) {
+      path = dir!.path;
+    }
 
     try {
       var locales = io.Platform.localeName.split('_');
