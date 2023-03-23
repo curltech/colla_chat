@@ -505,10 +505,10 @@ class MessageWidget {
     if (messageId != null) {
       String? filename =
           await messageAttachmentService.getDecryptFilename(messageId, title);
-      if (filename != null && fullScreen) {
-        return DocumentUtil.buildFileReaderView(
-            key: UniqueKey(), filePath: filename);
-      }
+      // if (filename != null && fullScreen) {
+      //   return DocumentUtil.buildFileReaderView(
+      //       key: UniqueKey(), filePath: filename);
+      // }
     }
     return Container();
   }
