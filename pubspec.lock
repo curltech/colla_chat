@@ -5,10 +5,10 @@ packages:
     dependency: transitive
     description:
       name: _fe_analyzer_shared
-      sha256: d74f051467a841ce893a50ebeb420b7a5695f985d2781e22b3927fbc849aea45
+      sha256: a36ec4843dc30ea6bf652bf25e3448db6c5e8bcf4aa55f063a5d1dad216d8214
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "57.0.0"
+    version: "58.0.0"
   _flutterfire_internals:
     dependency: transitive
     description:
@@ -45,10 +45,10 @@ packages:
     dependency: "direct dev"
     description:
       name: analyzer
-      sha256: b665679cdccab0c754e65021f01087c6fab07a0b13659dd58827f765739b40f8
+      sha256: cc4242565347e98424ce9945c819c192ec0838cb9d1f6aa4a97cc96becbc5b27
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "5.9.0"
+    version: "5.10.0"
   animated_bottom_navigation_bar:
     dependency: "direct main"
     description:
