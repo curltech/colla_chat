@@ -1,6 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/routers/navigator_util.dart';
 import 'package:colla_chat/routers/routes.dart';
@@ -142,7 +142,7 @@ class IndexWidgetProvider with ChangeNotifier {
   ///增加新的视图，不能在initState和build构建方法中调用listen=true，
   ///因为本方法会引起整个pageview视图的重新构建
   define(TileDataMixin view, {bool listen = false}) {
-    if (!useNavigator || !appDataProvider.mobile) {
+    if (!useNavigator || !platformParams.mobile) {
       allViews[view.routeName] = view;
       int? viewIndex = viewPositions[view.routeName];
       if (viewIndex != null && viewIndex < mainViews.length) {
@@ -234,7 +234,7 @@ class IndexWidgetProvider with ChangeNotifier {
       }
     }
     //桌面工作区模式
-    if (!useNavigator || !appDataProvider.mobile) {
+    if (!useNavigator || !platformParams.mobile) {
       var controller = this.controller;
       if (controller == null) {
         logger.e('swiperController is not exist');
@@ -304,7 +304,7 @@ class IndexWidgetProvider with ChangeNotifier {
   ///弹出最新的，跳转到第二新的
   pop({BuildContext? context}) {
     //桌面工作区模式
-    if (!useNavigator || !appDataProvider.mobile) {
+    if (!useNavigator || !platformParams.mobile) {
       var controller = this.controller;
       if (controller == null) {
         logger.e('swiperController is not exist');
@@ -333,7 +333,7 @@ class IndexWidgetProvider with ChangeNotifier {
     String? head = stack.head;
     if (head != null) {
       return true;
-    } else if (useNavigator && appDataProvider.mobile) {
+    } else if (useNavigator && platformParams.mobile) {
       if (context != null) {
         can = NavigatorUtil.canBack(context);
       } else {

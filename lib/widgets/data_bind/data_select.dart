@@ -9,6 +9,8 @@ import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 
+const double dialogSizeIndex = 0.8;
+
 class OptionController with ChangeNotifier {
   late List<Option<String>> _options;
 
@@ -227,7 +229,8 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
         AppBarWidget.buildTitleBar(
             title: Text(
           AppLocalizations.t(widget.title ?? ''),
-          style: const TextStyle(fontSize: 16, color: Colors.white),
+          style: const TextStyle(
+              fontSize: AppFontSize.mdFontSize, color: Colors.white),
         )),
       );
       children.add(
@@ -254,9 +257,9 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
     var size = MediaQuery.of(context).size;
     selector = Center(
         child: Container(
-      color: Colors.grey.withOpacity(AppOpacity.smOpacity),
-      width: size.width * 0.9,
-      height: size.height * 0.9,
+      color: Colors.grey.withOpacity(AppOpacity.minOpacity),
+      width: size.width * dialogSizeIndex,
+      height: size.height * dialogSizeIndex,
       alignment: Alignment.center,
       child: Column(children: children),
     ));
@@ -620,9 +623,9 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
     var size = MediaQuery.of(context).size;
     selector = Center(
         child: Container(
-      color: Colors.grey.withOpacity(AppOpacity.smOpacity),
-      width: size.width * 0.9,
-      height: size.height * 0.9,
+      color: Colors.grey.withOpacity(AppOpacity.minOpacity),
+      width: size.width * dialogSizeIndex,
+      height: size.height * dialogSizeIndex,
       alignment: Alignment.center,
       child: Column(children: children),
     ));

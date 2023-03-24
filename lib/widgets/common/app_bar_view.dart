@@ -29,7 +29,7 @@ class AppBarView extends StatefulWidget {
     this.leadingCallBack,
     this.title,
     this.titleWidget,
-    this.centerTitle = true,
+    this.centerTitle = false,
     this.rightWidgets,
     this.rightPopupMenus,
     this.bottom,

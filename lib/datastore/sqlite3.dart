@@ -53,7 +53,11 @@ class Sqlite3 extends DataStore {
           print('sqlite3 init create exception:$e');
         }
       }
-      db.userVersion = 1;
+      try {
+        db.userVersion = 1;
+      } catch (e) {
+        print('sqlite3 db set userVersion failure:$e');
+      }
     }
     for (GeneralBaseService service in ServiceLocator.services.values) {
       service.dataStore = instance;

@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/routers/routes.dart';
@@ -24,8 +25,9 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
     ColumnFieldDef(
       name: 'credential',
       label: 'Credential(Mobile/Email/LoginName)',
-      prefixIcon: const Icon(
+      prefixIcon: Icon(
         Icons.person,
+        color: myself.primary,
       ),
       cancel: true,
     ),
@@ -33,8 +35,9 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
       name: 'password',
       label: 'Password',
       inputType: InputType.password,
-      prefixIcon: const Icon(
+      prefixIcon: Icon(
         Icons.password,
+        color: myself.primary,
       ),
     ),
   ];
@@ -65,8 +68,8 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
       ),
       ImageUtil.buildImageWidget(
         image: 'assets/images/colla.png',
-        height: 128,
-        width: 128,
+        height: AppImageSize.xlSize,
+        width: AppImageSize.xlSize,
       ),
       const SizedBox(
         height: 50,

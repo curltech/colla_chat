@@ -4,6 +4,99 @@ import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
 
 class DialogUtil {
+  static ScaffoldFeatureController<MaterialBanner, MaterialBannerClosedReason>
+      showMaterialBanner(
+    BuildContext context, {
+    Key? key,
+    required Widget content,
+    TextStyle? contentTextStyle,
+    List<Widget>? actions,
+    double? elevation,
+    Widget? leading,
+    Color? backgroundColor,
+    Color? surfaceTintColor,
+    Color? shadowColor,
+    Color? dividerColor,
+    EdgeInsetsGeometry? padding,
+    EdgeInsetsGeometry? leadingPadding,
+    bool forceActionsBelow = false,
+    OverflowBarAlignment overflowAlignment = OverflowBarAlignment.end,
+    Animation<double>? animation,
+    void Function()? onVisible,
+  }) {
+    return ScaffoldMessenger.of(context).showMaterialBanner(
+      MaterialBanner(
+        key: key,
+        content: content,
+        contentTextStyle: contentTextStyle,
+        elevation: elevation,
+        leading: leading,
+        backgroundColor: backgroundColor,
+        surfaceTintColor: surfaceTintColor,
+        shadowColor: shadowColor,
+        dividerColor: dividerColor,
+        padding: padding,
+        leadingPadding: leadingPadding,
+        forceActionsBelow: forceActionsBelow = false,
+        overflowAlignment: overflowAlignment = OverflowBarAlignment.end,
+        animation: animation,
+        onVisible: onVisible,
+        actions: actions ??
+            <Widget>[
+              TextButton(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
+                },
+                child: Text(AppLocalizations.t('Dismiss')),
+              ),
+            ],
+      ),
+    );
+  }
+
+  static ScaffoldFeatureController<SnackBar, SnackBarClosedReason> showSnackBar(
+    BuildContext context, {
+    Key? key,
+    required Widget content,
+    Color? backgroundColor,
+    double? elevation,
+    EdgeInsetsGeometry? margin,
+    EdgeInsetsGeometry? padding,
+    double? width,
+    ShapeBorder? shape,
+    SnackBarBehavior? behavior,
+    SnackBarAction? action,
+    bool? showCloseIcon,
+    Color? closeIconColor,
+    Duration duration = const Duration(milliseconds: 4000),
+    Animation<double>? animation,
+    void Function()? onVisible,
+    DismissDirection dismissDirection = DismissDirection.down,
+    Clip clipBehavior = Clip.hardEdge,
+  }) {
+    return ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        key: key,
+        content: content,
+        backgroundColor: backgroundColor,
+        elevation: elevation,
+        margin: margin,
+        padding: padding,
+        width: width,
+        shape: shape,
+        behavior: behavior,
+        action: action,
+        showCloseIcon: showCloseIcon,
+        closeIconColor: closeIconColor,
+        duration: duration,
+        animation: animation,
+        onVisible: onVisible,
+        dismissDirection: dismissDirection = DismissDirection.down,
+        clipBehavior: clipBehavior = Clip.hardEdge,
+      ),
+    );
+  }
+
   ///利用Option产生的SelectDialog
   static Future<T?> showSelectDialog<T>({
     required BuildContext context,
@@ -106,7 +199,7 @@ class DialogUtil {
     required Widget Function(BuildContext) builder,
     Widget? title,
     bool barrierDismissible = true,
-    Color? barrierColor = Colors.black54,
+    Color? barrierColor,
     String? barrierLabel,
     bool useSafeArea = true,
     bool useRootNavigator = true,

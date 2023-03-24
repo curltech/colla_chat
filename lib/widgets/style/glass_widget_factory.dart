@@ -24,7 +24,7 @@ final defaultBorderGradient = LinearGradient(
   ],
 );
 
-const double blur = 5;
+const double blur = 8;
 const double border = 0;
 const double borderRadius = 0;
 

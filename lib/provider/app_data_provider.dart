@@ -1,3 +1,4 @@
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/locale_util.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ class AppDataProvider with ChangeNotifier {
 
   AppDataProvider();
 
+  ///总的屏幕尺寸
   Size get totalSize {
     return _totalSize;
   }
@@ -38,20 +40,34 @@ class AppDataProvider with ChangeNotifier {
     return Size(width, height);
   }
 
+  ///实际的屏幕尺寸，也是玻璃等特殊效果的尺寸，对移动设备来说，与总尺寸一致，
+  ///对桌面来说，是登录等小页面的尺寸，露出后面的背景图像
   Size get actualSize {
-    Size fixedSize = const Size(412.0, 869.0);
-    double width =
-        _totalSize.width < fixedSize.width ? _totalSize.width : fixedSize.width;
-    double height = _totalSize.height < fixedSize.height
-        ? _totalSize.height
-        : fixedSize.height;
-    height = height - bottomBarHeight;
+    //特殊效果的尺寸，宽度最大是412，高度最大是892
+    Size fixedSize = const Size(412.0, 892.0);
+    double width = _totalSize.width;
+    double height = _totalSize.height;
+    //桌面需要根据固定的尺寸来计算
+    if (!platformParams.mobile) {
+      width = _totalSize.width < fixedSize.width
+          ? _totalSize.width
+          : fixedSize.width;
+      height = _totalSize.height < fixedSize.height
+          ? _totalSize.height
+          : fixedSize.height;
+      //高度还要减去底部工具栏的高度
+      height = height - bottomBarHeight;
+    }
 
     return Size(width, height);
   }
 
-  bool get mobile {
+  bool get landscape {
     return _totalSize.height > _totalSize.width;
+  }
+
+  bool get portrait {
+    return _totalSize.height < _totalSize.width;
   }
 
   double get keyboardHeight {

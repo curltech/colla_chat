@@ -14,17 +14,26 @@ final List<ColumnFieldDef> p2pRegisterInputFieldDef = [
   ColumnFieldDef(
       name: 'name',
       label: 'Name',
-      prefixIcon: const Icon(Icons.person),
+      prefixIcon: Icon(
+        Icons.person,
+        color: myself.primary,
+      ),
       initValue: '胡劲松'),
   ColumnFieldDef(
       name: 'loginName',
       label: 'LoginName',
-      prefixIcon: const Icon(Icons.mobile_friendly),
+      prefixIcon: Icon(
+        Icons.mobile_friendly,
+        color: myself.primary,
+      ),
       initValue: '13609619603'),
   ColumnFieldDef(
       name: 'email',
       label: 'Email',
-      prefixIcon: const Icon(Icons.email),
+      prefixIcon: Icon(
+        Icons.email,
+        color: myself.primary,
+      ),
       initValue: 'hujs@colla.cc',
       textInputType: TextInputType.emailAddress),
   ColumnFieldDef(
@@ -32,13 +41,19 @@ final List<ColumnFieldDef> p2pRegisterInputFieldDef = [
       label: 'PlainPassword',
       inputType: InputType.password,
       initValue: '1234',
-      prefixIcon: const Icon(Icons.password)),
+      prefixIcon: Icon(
+        Icons.password,
+        color: myself.primary,
+      )),
   ColumnFieldDef(
       name: 'confirmPassword',
       label: 'ConfirmPassword',
       inputType: InputType.password,
       initValue: '1234',
-      prefixIcon: const Icon(Icons.confirmation_num))
+      prefixIcon: Icon(
+        Icons.confirmation_num,
+        color: myself.primary,
+      ))
 ];
 
 /// 用户注册组件，一个card下的录入框和按钮组合

@@ -53,7 +53,7 @@ class PlatformParams {
 
     var dir = await PathUtil.getApplicationDirectory();
     if (dir != null) {
-      path = dir!.path;
+      path = dir.path;
     }
 
     try {
