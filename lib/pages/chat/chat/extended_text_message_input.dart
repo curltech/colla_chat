@@ -176,7 +176,7 @@ class _ExtendedTextMessageInputWidgetState
 
   @override
   Widget build(BuildContext context) {
-    //FocusScope.of(context).autofocus(_focusNode);
+    FocusScope.of(context).autofocus(focusNode);
     final MediaQueryData mediaQueryData = MediaQuery.of(context);
     final double keyboardHeight = mediaQueryData.viewInsets.bottom;
     appDataProvider.keyboardHeight = keyboardHeight;
@@ -201,8 +201,8 @@ class _ExtendedTextMessageInputWidgetState
       ),
       controller: widget.textEditingController,
       selectionControls: extendedMaterialTextSelectionControls,
-      //focusNode: focusNode,
-      autofocus: true,
+      focusNode: focusNode,
+      //autofocus: true,
       onTap: () => setState(() {
         if (focusNode.hasFocus) {}
       }),
