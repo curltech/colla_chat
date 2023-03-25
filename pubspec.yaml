@@ -168,7 +168,7 @@ dependencies:
   keyboard_actions: ^4.1.0
   synchronized: ^3.0.0+2
   flutter_smart_dialog: ^4.9.0+1
-  pdfx: ^2.2.0 #2.3.0在macos下编译错误
+  pdfx: 2.2.0 #2.3.0在macos下编译错误
   #pdf_flutter: ^1.1.4
   pdf: ^3.8.3
   #syncfusion_flutter_pdfviewer: ^20.3.49
