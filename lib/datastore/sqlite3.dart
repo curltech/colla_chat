@@ -43,7 +43,12 @@ class Sqlite3 extends DataStore {
   }
 
   init(CommonDatabase db) {
-    int userVersion = db.userVersion;
+    int userVersion = 0;
+    try {
+      userVersion = db.userVersion;
+    } catch (e) {
+      print('sqlite3 db get userVersion failure:$e');
+    }
     if (userVersion == 0) {
       for (GeneralBaseService service in ServiceLocator.services.values) {
         try {
