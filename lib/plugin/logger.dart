@@ -85,7 +85,11 @@ class FileOutput extends LogOutput {
     file = File(filename);
     bool exist = await file!.exists();
     if (!exist) {
-      file = await file!.create(recursive: true);
+      try {
+        file = await file!.create(recursive: true);
+      } catch (e) {
+        print('create file:$filename failure, $e');
+      }
     }
   }
 
