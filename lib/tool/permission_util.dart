@@ -9,12 +9,17 @@ class PermissionUtil {
 
   static Future<PermissionStatus> requestPermission(
       Permission permission) async {
-    var status = await permission.status;
-    if (!status.isGranted) {
-      status = await permission.request();
-    }
+    try {
+      var status = await permission.status;
+      if (!status.isGranted) {
+        status = await permission.request();
+      }
 
-    return status;
+      return status;
+    } catch (e) {
+      print('requestPermission failure:$e');
+    }
+    return PermissionStatus.denied;
   }
 
   static openAppSettings(Permission permission) async {
