@@ -369,14 +369,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.2.2"
-  better_player:
-    dependency: "direct main"
-    description:
-      name: better_player
-      sha256: f2e5d57ea49fb7c4d93838d23846ca5ddf78af6f946e103aeacf2afdd01909b3
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.0.83"
   bidi:
     dependency: transitive
     description:
@@ -1813,14 +1805,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "0.9.24"
-  flutter_widget_from_html_core:
-    dependency: transitive
-    description:
-      name: flutter_widget_from_html_core
-      sha256: e8f4f8b461a140ffb7c71f938bc76efc758893e7468843d9dbf70cb0b9e900cb
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.8.5+3"
   fluttericon:
     dependency: "direct main"
     description:
@@ -1877,14 +1861,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.4"
-  fwfh_text_style:
-    dependency: transitive
-    description:
-      name: fwfh_text_style
-      sha256: "37806ee0222f79b6e8d4c698c322c897eae6a817258156f40aeece4e588fac60"
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.22.08+1"
   galaxeus_lib:
     dependency: transitive
     description:
@@ -2129,10 +2105,10 @@ packages:
     dependency: "direct overridden"
     description:
       name: image_cropper
-      sha256: "85324928ee8a8be35a529446435ca53067865b9353c8681983472eeec66d780f"
+      sha256: e08311fcf0cdba367715a5036aec8d8e9b3ab84479909dc2156dd5bf872edefb
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "3.0.1"
+    version: "3.0.2"
   image_cropper_for_web:
     dependency: transitive
     description:
@@ -2969,10 +2945,10 @@ packages:
     dependency: "direct main"
     description:
       name: pdfx
-      sha256: cad7eab6358a89922c8ea592b738891b3984edab43300558d25dc9b15a94a35e
+      sha256: "0d9b3932f6e43ec5c78ebda579149f1c671d856e8e49ded97427a47cd50cf689"
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.3.0"
+    version: "2.2.0"
   pedantic:
     dependency: transitive
     description:
@@ -4064,10 +4040,10 @@ packages:
     dependency: "direct main"
     description:
       name: wechat_assets_picker
-      sha256: "8ddf607e5416b69e25cef1c86c7ffcfe3ad61c368e4cf54e4d4db8e317e9a651"
+      sha256: "93ec8af5670d5c34289ff86d4fd9cfc80930c337112f1f8bf5a57a942a82b337"
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "8.4.0"
+    version: "8.4.1"
   wechat_camera_picker:
     dependency: "direct main"
     description:

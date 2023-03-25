@@ -8,11 +8,9 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/audioplayers-3.0.1" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/telephony-0.2.0" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/file_selector_linux-0.9.1+2" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/image_cropper-3.0.1" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/flutter_background_service_ios-2.4.0" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/speech_to_text_macos-1.0.2" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/wakelock-0.6.2" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/better_player-0.0.83" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/path_provider_windows-2.1.5" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/webview_flutter-4.0.7" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/barcode_scan2-4.2.4" />
@@ -75,7 +73,6 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/fullscreen_window-1.0.4" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/network_info_plus-3.0.2" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/local_auth_android-1.0.21" />
-      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/pdfx-2.3.0" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/url_launcher_windows-3.0.5" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/just_audio-0.9.32" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/path_provider-2.0.14" />
@@ -157,6 +154,8 @@
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/google_maps_flutter_ios-2.2.1" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/firebase_core-2.8.0" />
       <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/video_player_win-2.2.2" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/image_cropper-3.0.2" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.flutter-io.cn/pdfx-2.2.0" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
