@@ -7,6 +7,7 @@ import 'package:colla_chat/pages/chat/index/bottom_bar.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/index/index_widget.dart';
 import 'package:colla_chat/pages/chat/login/loading.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -283,8 +284,12 @@ class _IndexViewState extends State<IndexView>
     var bottomNavigationBar = Offstage(
         offstage: !indexWidgetProvider.bottomBarVisible,
         child: const BottomBar());
+    var toolbarHeight = 0.0;
+    if (platformParams.android) {
+      toolbarHeight = 45.0;
+    }
     Scaffold scaffold = Scaffold(
-        appBar: AppBar(toolbarHeight: 0.0, elevation: 0.0),
+        appBar: AppBar(toolbarHeight: toolbarHeight, elevation: 0.0),
         body: SafeArea(
             child: Stack(children: <Widget>[
           Opacity(
