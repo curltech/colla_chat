@@ -165,7 +165,7 @@ dependencies:
   xml: ^6.0.1
   mime: ^1.0.2
   flutter_keyboard_visibility: ^5.4.0
-  keyboard_actions: ^4.1.0
+  keyboard_actions: ^4.2.0
   synchronized: ^3.0.0+2
   flutter_smart_dialog: ^4.9.0+1
   pdfx: 2.2.0 #2.3.0在macos下编译错误
@@ -302,7 +302,7 @@ dependencies:
   awesome_notifications: ^0.7.4+1
   awesome_notifications_fcm: ^0.7.4+1 #对minsdk有要求
   #openai_gpt3_api:
-  dart_openai: ^1.8.0
+  dart_openai: ^1.9.1
   chat_gpt_sdk: ^2.0.4
   flutter_chatgpt_api: ^1.1.0
   masamune_ai_openai: ^1.1.4

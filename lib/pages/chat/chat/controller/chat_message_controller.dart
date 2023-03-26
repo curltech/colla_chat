@@ -217,7 +217,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
           chatGPT!.chatCompletionStream(
             messages: [
               OpenAIChatCompletionChoiceMessageModel(
-                  role: 'user', content: content)
+                  role: OpenAIChatMessageRole.user, content: content)
             ],
             onCompletion: onChatCompletion,
           );

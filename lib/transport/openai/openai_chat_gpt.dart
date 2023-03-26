@@ -242,7 +242,7 @@ class ChatGPT {
     required String prompt,
     int? n = 1,
     OpenAIImageSize? size = OpenAIImageSize.size256,
-    OpenAIResponseFormat? responseFormat = OpenAIResponseFormat.url,
+    OpenAIImageResponseFormat? responseFormat = OpenAIImageResponseFormat.url,
     String? user = 'user',
   }) async {
     OpenAIImageModel image = await openAI.image.create(
@@ -261,7 +261,7 @@ class ChatGPT {
     required File image,
     int? n = 1,
     OpenAIImageSize? size = OpenAIImageSize.size1024,
-    OpenAIResponseFormat? responseFormat = OpenAIResponseFormat.url,
+    OpenAIImageResponseFormat? responseFormat = OpenAIImageResponseFormat.url,
     String? user,
   }) async {
     OpenAIImageVariationModel imageVariation = await openAI.image.variation(
@@ -282,7 +282,7 @@ class ChatGPT {
     required String prompt,
     int? n = 1,
     OpenAIImageSize? size = OpenAIImageSize.size1024,
-    OpenAIResponseFormat? responseFormat = OpenAIResponseFormat.url,
+    OpenAIImageResponseFormat? responseFormat = OpenAIImageResponseFormat.url,
     String? user,
   }) async {
     OpenAiImageEditModel imageEdit = await openAI.image.edit(
@@ -318,7 +318,7 @@ class ChatGPT {
     required File file,
     String model = "whisper-1",
     String? prompt,
-    String? responseFormat,
+    OpenAIAudioResponseFormat? responseFormat,
     double? temperature,
     String? language,
   }) async {
@@ -328,7 +328,7 @@ class ChatGPT {
       prompt: prompt,
       responseFormat: responseFormat,
       temperature: temperature,
-      laungage: language,
+      language: language,
     );
 
     return transcription;
@@ -340,7 +340,7 @@ class ChatGPT {
     required File file,
     String model = "whisper-1",
     String? prompt,
-    String? responseFormat,
+    OpenAIAudioResponseFormat? responseFormat,
     double? temperature,
   }) async {
     OpenAIAudioModel translation = await openAI.audio.createTranslation(

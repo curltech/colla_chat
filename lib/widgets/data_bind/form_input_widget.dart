@@ -7,6 +7,7 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:provider/provider.dart';
 
 class FormInputController with ChangeNotifier {
@@ -116,7 +117,7 @@ class FormInputController with ChangeNotifier {
   }
 }
 
-class FormInputWidget extends StatelessWidget {
+class FormInputWidget extends StatefulWidget {
   final Map<String, dynamic>? initValues;
   late final FormInputController controller;
 
@@ -155,10 +156,48 @@ class FormInputWidget extends StatelessWidget {
     }
   }
 
+  @override
+  State createState() => _FormInputWidgetState();
+}
+
+class _FormInputWidgetState extends State<FormInputWidget> {
+  final Map<String, FocusNode> focusNodes = {};
+
+  @override
+  initState() {
+    super.initState();
+  }
+
+  ///创建KeyboardActionsConfig钩住所有的字段
+  KeyboardActionsConfig _buildKeyboardActionsConfig(BuildContext context) {
+    List<KeyboardActionsItem> actions = [];
+    for (var i = 0; i < widget.controller.columnFieldDefs.length; i++) {
+      ColumnFieldDef columnFieldDef = widget.controller.columnFieldDefs[i];
+      var name = columnFieldDef.name;
+      var inputType = columnFieldDef.inputType;
+      if (inputType == InputType.text ||
+          inputType == InputType.password ||
+          inputType == InputType.textarea) {
+        var focusNode = FocusNode();
+        focusNodes[name] = focusNode;
+        KeyboardActionsItem action = KeyboardActionsItem(
+          focusNode: focusNode,
+        );
+        actions.add(action);
+      }
+    }
+    return KeyboardActionsConfig(
+      keyboardActionsPlatform: KeyboardActionsPlatform.ALL,
+      keyboardBarColor: Colors.grey[200],
+      nextFocus: true,
+      actions: actions,
+    );
+  }
+
   List<Widget> _buildFormViews(BuildContext context) {
     Map<String, List<Widget>> viewMap = {};
-    for (var i = 0; i < controller.columnFieldDefs.length; i++) {
-      ColumnFieldDef columnFieldDef = controller.columnFieldDefs[i];
+    for (var i = 0; i < widget.controller.columnFieldDefs.length; i++) {
+      ColumnFieldDef columnFieldDef = widget.controller.columnFieldDefs[i];
       String? groupName = columnFieldDef.groupName;
       groupName = groupName ?? '';
       List<Widget>? children = viewMap[groupName];
@@ -166,39 +205,42 @@ class FormInputWidget extends StatelessWidget {
         children = <Widget>[];
         viewMap[groupName] = children;
       }
-      if (i == 0 && head != null) {
-        children.add(head!);
+      if (i == 0 && widget.head != null) {
+        children.add(widget.head!);
       }
       children.add(SizedBox(
-        height: spacing,
+        height: widget.spacing,
       ));
       String name = columnFieldDef.name;
       dynamic initValue;
-      if (initValues == null) {
+      if (widget.initValues == null) {
         initValue = columnFieldDef.initValue;
       } else {
-        initValue = initValues![name];
+        initValue = widget.initValues![name];
       }
       ColumnFieldController columnFieldController = ColumnFieldController(
           columnFieldDef,
           value: initValue,
           mode: ColumnFieldMode.edit);
-      controller.setController(columnFieldDef.name, columnFieldController);
+      widget.controller
+          .setController(columnFieldDef.name, columnFieldController);
       Widget columnFieldWidget = ColumnFieldWidget(
         controller: columnFieldController,
+        focusNode: focusNodes[name],
       );
       children.add(columnFieldWidget);
-      if (i == controller.columnFieldDefs.length - 1 && tail != null) {
-        children.add(tail!);
+      if (i == widget.controller.columnFieldDefs.length - 1 &&
+          widget.tail != null) {
+        children.add(widget.tail!);
       }
     }
     List<Widget> views = <Widget>[];
     for (var groupName in viewMap.keys) {
       List<Widget>? children = viewMap[groupName];
-      var view = SingleChildScrollView(
-          controller: ScrollController(),
+      var view = KeyboardActions(
+          config: _buildKeyboardActionsConfig(context),
           child: Column(
-              mainAxisAlignment: mainAxisAlignment,
+              mainAxisAlignment: widget.mainAxisAlignment,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: children!));
       views.add(view);
@@ -210,21 +252,21 @@ class FormInputWidget extends StatelessWidget {
     ButtonStyle style = WidgetUtil.buildButtonStyle();
     ButtonStyle mainStyle = WidgetUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);
-    if (onOk != null) {
+    if (widget.onOk != null) {
       return ButtonBar(children: [
         TextButton(
           style: style,
-          child: Text(AppLocalizations.t(resetLabel)),
+          child: Text(AppLocalizations.t(widget.resetLabel)),
           onPressed: () {
-            controller.clear();
+            widget.controller.clear();
           },
         ),
         TextButton(
           style: mainStyle,
-          child: Text(AppLocalizations.t(okLabel)),
+          child: Text(AppLocalizations.t(widget.okLabel)),
           onPressed: () {
-            var values = controller.getValues();
-            onOk!(values);
+            var values = widget.controller.getValues();
+            widget.onOk!(values);
           },
         ),
       ]);
@@ -237,8 +279,8 @@ class FormInputWidget extends StatelessWidget {
     if (views.length > 1) {
       return ConstrainedBox(
           constraints: BoxConstraints(
-            minHeight: minHeight, //最小高度
-            maxHeight: maxHeight,
+            minHeight: widget.minHeight, //最小高度
+            maxHeight: widget.maxHeight,
           ), //最大高度
           child: Swiper(
             controller: SwiperController(),
@@ -260,8 +302,8 @@ class FormInputWidget extends StatelessWidget {
     } else if (views.length == 1) {
       return ConstrainedBox(
           constraints: BoxConstraints(
-            minHeight: minHeight, //最小高度
-            maxHeight: maxHeight,
+            minHeight: widget.minHeight, //最小高度
+            maxHeight: widget.maxHeight,
           ), //最大高度
           child: views[0]);
     } else {
@@ -276,12 +318,12 @@ class FormInputWidget extends StatelessWidget {
       return Column(children: [
         _buildFormSwiper(context),
         SizedBox(
-          height: buttonSpacing,
+          height: widget.buttonSpacing,
         ),
         _buildButtonBar(context)
       ]);
     }, create: (BuildContext context) {
-      return controller;
+      return widget.controller;
     });
   }
 }

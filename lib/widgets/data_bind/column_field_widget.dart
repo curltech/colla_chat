@@ -244,10 +244,12 @@ class ColumnFieldController with ChangeNotifier {
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
 class ColumnFieldWidget extends StatefulWidget {
   final ColumnFieldController controller;
+  final FocusNode? focusNode;
 
   const ColumnFieldWidget({
     Key? key,
     required this.controller,
+    this.focusNode,
   }) : super(key: key);
 
   @override
@@ -346,6 +348,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     String label = AppLocalizations.t(columnFieldDef.label);
     var textFormField = TextFormField(
       controller: controller,
+      focusNode: widget.focusNode,
       keyboardType: columnFieldDef.textInputType,
       maxLines: columnFieldDef.maxLines,
       minLines: 1,
@@ -397,6 +400,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     }
     var textFormField = TextFormField(
       controller: controller,
+      focusNode: widget.focusNode,
       keyboardType: columnFieldDef.textInputType,
       obscureText: !pwdShow,
       decoration: InputDecoration(
@@ -679,6 +683,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     }
     var textFormField = TextFormField(
       controller: controller,
+      focusNode: widget.focusNode,
       keyboardType: columnFieldDef.textInputType,
       readOnly: true,
       decoration: InputDecoration(
@@ -776,6 +781,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     }
     var textFormField = TextFormField(
       controller: controller,
+      focusNode: widget.focusNode,
       keyboardType: columnFieldDef.textInputType,
       readOnly: true,
       decoration: InputDecoration(
@@ -847,6 +853,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     }
     var textFormField = TextFormField(
       controller: controller,
+      focusNode: widget.focusNode,
       keyboardType: columnFieldDef.textInputType,
       readOnly: true,
       decoration: InputDecoration(
