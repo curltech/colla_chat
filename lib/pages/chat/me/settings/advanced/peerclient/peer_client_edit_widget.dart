@@ -70,6 +70,7 @@ class _PeerClientEditWidgetState extends State<PeerClientEditWidget> {
   Widget _buildFormInputWidget(BuildContext context) {
     var initValues = widget.controller.getInitValue(peerClientColumnFieldDefs);
     var formInputWidget = FormInputWidget(
+      height: 300,
       onOk: (Map<String, dynamic> values) {
         _onOk(values);
       },

@@ -244,6 +244,7 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
                     entity: conference);
               }
               return FormInputWidget(
+                height: 300,
                 onOk: (Map<String, dynamic> values) {
                   _onOk(values).then((conference) {
                     if (conference != null) {

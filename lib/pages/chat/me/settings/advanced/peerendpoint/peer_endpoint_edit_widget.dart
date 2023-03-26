@@ -85,6 +85,7 @@ class _PeerEndpointEditWidgetState extends State<PeerEndpointEditWidget> {
     var initValues =
         widget.controller.getInitValue(peerEndpointColumnFieldDefs);
     var formInputWidget = FormInputWidget(
+      height: 300,
       onOk: (Map<String, dynamic> values) {
         _onOk(values);
       },

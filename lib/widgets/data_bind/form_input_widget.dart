@@ -124,8 +124,7 @@ class FormInputWidget extends StatefulWidget {
   final Function(Map<String, dynamic>)? onOk;
   final String okLabel;
   final String resetLabel;
-  final double minHeight; //最小高度
-  final double maxHeight;
+  final double height; //高度
   final MainAxisAlignment mainAxisAlignment;
   final double spacing;
   final double buttonSpacing;
@@ -139,8 +138,7 @@ class FormInputWidget extends StatefulWidget {
     this.onOk,
     this.okLabel = 'Ok',
     this.resetLabel = 'Reset',
-    this.minHeight = 0.0,
-    this.maxHeight = 440,
+    required this.height,
     this.mainAxisAlignment = MainAxisAlignment.start,
     this.spacing = 0.0,
     this.buttonSpacing = 10.0,
@@ -229,9 +227,10 @@ class _FormInputWidgetState extends State<FormInputWidget> {
         focusNode: focusNodes[name],
       );
       children.add(columnFieldWidget);
-      if (i == widget.controller.columnFieldDefs.length - 1 &&
-          widget.tail != null) {
-        children.add(widget.tail!);
+      if (i == widget.controller.columnFieldDefs.length - 1) {
+        if (widget.tail != null) {
+          children.add(widget.tail!);
+        }
       }
     }
     List<Widget> views = <Widget>[];
@@ -277,11 +276,8 @@ class _FormInputWidgetState extends State<FormInputWidget> {
   Widget _buildFormSwiper(BuildContext context) {
     List<Widget> views = _buildFormViews(context);
     if (views.length > 1) {
-      return ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: widget.minHeight, //最小高度
-            maxHeight: widget.maxHeight,
-          ), //最大高度
+      return SizedBox(
+          height: widget.height, //最大高度
           child: Swiper(
             controller: SwiperController(),
             itemCount: views.length,
@@ -300,11 +296,12 @@ class _FormInputWidgetState extends State<FormInputWidget> {
             // )),
           ));
     } else if (views.length == 1) {
-      return ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: widget.minHeight, //最小高度
-            maxHeight: widget.maxHeight,
-          ), //最大高度
+      return SizedBox(
+          height: widget.height,
+          // constraints: BoxConstraints(
+          //   minHeight: widget.minHeight, //最小高度
+          //   maxHeight: widget.maxHeight,
+          // ), //最大高度
           child: views[0]);
     } else {
       return Container();
@@ -320,7 +317,7 @@ class _FormInputWidgetState extends State<FormInputWidget> {
         SizedBox(
           height: widget.buttonSpacing,
         ),
-        _buildButtonBar(context)
+        _buildButtonBar(context),
       ]);
     }, create: (BuildContext context) {
       return widget.controller;

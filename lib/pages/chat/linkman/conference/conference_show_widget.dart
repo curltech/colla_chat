@@ -115,6 +115,7 @@ class ConferenceShowWidget extends StatelessWidget {
         child: Container(
             padding: const EdgeInsets.all(10.0),
             child: FormInputWidget(
+              height: 300,
               columnFieldDefs: conferenceColumnFieldDefs,
               initValues: initValues,
             )));

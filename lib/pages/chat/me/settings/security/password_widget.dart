@@ -55,6 +55,7 @@ class _PasswordWidgetState extends State<PasswordWidget> {
         Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
             child: FormInputWidget(
+              height: 200,
               onOk: _onOk,
               okLabel: 'Ok',
               columnFieldDefs: p2pRegisterInputFieldDef,
