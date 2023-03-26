@@ -299,7 +299,7 @@ class _IndexViewState extends State<IndexView>
           Center(
               child: platformWidgetFactory.buildSizedBox(
                   child: widget.indexWidget,
-                  height: appDataProvider.actualSize.height,
+                  height: appDataProvider.actualSize.height - toolbarHeight,
                   width: appDataProvider.actualSize.width)),
           Row(children: [
             _buildChatMessageBanner(context),
