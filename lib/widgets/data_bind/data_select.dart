@@ -345,6 +345,7 @@ class _CustomSingleSelectFieldState extends State<CustomSingleSelectField> {
   void initState() {
     super.initState();
     widget.optionController.addListener(_update);
+    _update();
   }
 
   _update() {
