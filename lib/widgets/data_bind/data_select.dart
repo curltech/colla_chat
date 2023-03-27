@@ -255,15 +255,12 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
       Expanded(child: selector),
     );
     var size = MediaQuery.of(context).size;
-    selector = Card(
-        elevation: 0,
-        child: Container(
-          //color: Colors.grey.withOpacity(AppOpacity.minOpacity),
-          width: size.width * dialogSizeIndex,
-          height: size.height * dialogSizeIndex,
-          alignment: Alignment.center,
-          child: Column(children: children),
-        ));
+    selector = Center(
+        child: SizedBox(
+      width: size.width * dialogSizeIndex,
+      height: size.height * dialogSizeIndex,
+      child: Card(child: Column(children: children)),
+    ));
     return selector;
   }
 
@@ -623,15 +620,12 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
       Expanded(child: selector),
     );
     var size = MediaQuery.of(context).size;
-    selector = Card(
-        elevation: 0.0,
-        child: Container(
-          //color: Colors.grey.withOpacity(AppOpacity.minOpacity),
-          width: size.width * dialogSizeIndex,
-          height: size.height * dialogSizeIndex,
-          alignment: Alignment.center,
-          child: Column(children: children),
-        ));
+    selector = Center(
+        child: SizedBox(
+      width: size.width * dialogSizeIndex,
+      height: size.height * dialogSizeIndex,
+      child: Card(child: Column(children: children)),
+    ));
     return selector;
   }
 
