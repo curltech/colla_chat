@@ -373,7 +373,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             title: groupName,
             subtitle: groupOwnerName,
             selected: false,
-            routeName: 'linkman_group_edit');
+            routeName: 'linkman_add_group');
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(
             title: 'Delete',
@@ -446,7 +446,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             subtitle: topic,
             selected: false,
             isThreeLine: false,
-            routeName: 'conference_edit');
+            routeName: 'conference_add');
         List<TileData> slideActions = [];
         TileData deleteSlideAction = TileData(
             title: 'Delete',
