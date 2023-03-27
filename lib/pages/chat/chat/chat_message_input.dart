@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:colla_chat/pages/chat/chat/emoji_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/more_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/text_message_input.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:flutter/material.dart';
 
@@ -13,10 +12,13 @@ import 'controller/chat_message_controller.dart';
 ///第一行：包括声音按钮，扩展文本输入框，emoji按钮，其他多种格式输入按钮和发送按钮
 ///第二行：emoji面板，其他多种格式输入面板
 class ChatMessageInputWidget extends StatefulWidget {
+  final FocusNode focusNode;
   final Future<void> Function(int index, String name, {String? value})?
       onAction;
 
-  const ChatMessageInputWidget({Key? key, this.onAction}) : super(key: key);
+  const ChatMessageInputWidget(
+      {Key? key, required this.focusNode, this.onAction})
+      : super(key: key);
 
   @override
   State createState() => _ChatMessageInputWidgetState();
@@ -28,7 +30,6 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
   final double height = 270;
   bool emojiVisible = false;
   bool moreVisible = false;
-  bool keyboardVisible = false;
   BlueFireAudioPlayer audioPlayer = BlueFireAudioPlayer();
 
   @override
@@ -57,23 +58,14 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
   }
 
   void onEmojiPressed() {
-    if (keyboardVisible) {
-      emojiVisible = false;
+    emojiVisible = !emojiVisible;
+    if (emojiVisible) {
       moreVisible = false;
-    } else {
-      emojiVisible = !emojiVisible;
-      if (emojiVisible) {
-        moreVisible = false;
-      }
-      _update();
     }
+    _update();
   }
 
   void onMorePressed() {
-    if (keyboardVisible) {
-      emojiVisible = false;
-      moreVisible = false;
-    }
     moreVisible = !moreVisible;
     if (moreVisible) {
       emojiVisible = false;
@@ -117,12 +109,9 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
   }
 
   Widget _buildChatMessageInput(BuildContext context) {
-    double height = this.height > appDataProvider.keyboardHeight
-        ? this.height
-        : appDataProvider.keyboardHeight;
-
     return Column(children: [
       TextMessageInputWidget(
+        focusNode: widget.focusNode,
         textEditingController: textEditingController,
         onEmojiPressed: onEmojiPressed,
         onMorePressed: onMorePressed,
@@ -145,11 +134,6 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
 
   @override
   Widget build(BuildContext context) {
-    final MediaQueryData mediaQueryData = MediaQuery.of(context);
-    final double keyboardHeight = mediaQueryData.viewInsets.bottom;
-    if (keyboardHeight > 0) {
-      keyboardVisible = true;
-    }
     return _buildChatMessageInput(context);
   }
 

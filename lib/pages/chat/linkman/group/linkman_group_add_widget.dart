@@ -278,7 +278,7 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
                     entity: group);
               }
               return FormInputWidget(
-                height: 300,
+                height: 250,
                 onOk: (Map<String, dynamic> values) {
                   _onOk(values).then((group) {
                     if (group != null) {

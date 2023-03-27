@@ -58,7 +58,7 @@ class _IndexViewState extends State<IndexView>
   ///myself和appDataProvider发生变化后刷新整个界面
   _update() async {
     if (mounted) {
-      //setState(() {});
+      setState(() {});
     }
   }
 

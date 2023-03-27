@@ -10,7 +10,6 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
-import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -76,7 +75,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     var formInputWidget = Container(
         padding: const EdgeInsets.all(15.0),
         child: FormInputWidget(
-          height: 300,
+          height: 330,
           onOk: (Map<String, dynamic> values) {
             _onOk(values);
           },
@@ -84,7 +83,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
           initValues: initValues,
         ));
 
-    return ListView(children: [formInputWidget]);
+    return formInputWidget;
   }
 
   _onOk(Map<String, dynamic> values) async {
@@ -155,29 +154,30 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     return addFriendTextField;
   }
 
-  Widget _buildActionTiles(BuildContext context) {
-    List<TileData> tileData = [];
+  Widget? _buildActionTiles(BuildContext context) {
+    TileData? tileData;
     if (linkman != null) {
       if (linkman!.status == LinkmanStatus.friend.name) {
-        tileData.add(
-          TileData(
-              title: 'Remove friend',
-              prefix: const Icon(Icons.person_remove),
-              onTap: (int index, String title, {String? subtitle}) async {
-                await _changeLinkmanStatus(LinkmanStatus.stranger);
-                if (mounted) {
-                  DialogUtil.info(context,
-                      content:
-                          '${AppLocalizations.t('Linkman:')} ${linkman!.name}${AppLocalizations.t(' is removed friend')}');
-                }
-              }),
-        );
+        tileData = TileData(
+            title: 'Remove friend',
+            prefix: const Icon(Icons.person_remove),
+            onTap: (int index, String title, {String? subtitle}) async {
+              await _changeLinkmanStatus(LinkmanStatus.stranger);
+              if (mounted) {
+                DialogUtil.info(context,
+                    content:
+                        '${AppLocalizations.t('Linkman:')} ${linkman!.name}${AppLocalizations.t(' is removed friend')}');
+              }
+            });
       }
     }
-    var listView = DataListView(
-      tileData: tileData,
-    );
-    return listView;
+    DataListTile? tile;
+    if (tileData != null) {
+      DataListTile(
+        tileData: tileData,
+      );
+    }
+    return tile;
   }
 
   @override
@@ -186,19 +186,19 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     if (linkman != null) {
       if (linkman!.status != LinkmanStatus.friend.name) {
         actionTiles.add(_buildAddFriendTextField(context));
-        actionTiles.add(
-          const SizedBox(
-            height: 15,
-          ),
-        );
       }
     }
-    actionTiles.add(_buildActionTiles(context));
-    actionTiles.add(const SizedBox(
-      height: 15,
-    ));
-    actionTiles.add(Expanded(
-        child: SingleChildScrollView(child: _buildFormInputWidget(context))));
+    Widget? tile = _buildActionTiles(context);
+    if (tile != null) {
+      actionTiles.add(const SizedBox(
+        height: 15,
+      ));
+      actionTiles.add(tile);
+    }
+    // actionTiles.add(const SizedBox(
+    //   height: 15,
+    // ));
+    actionTiles.add(_buildFormInputWidget(context));
 
     String title = 'Add linkman';
     int? id = linkman?.id;
@@ -208,7 +208,8 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     var appBarView = AppBarView(
         title: title,
         withLeading: widget.withLeading,
-        child: Column(children: actionTiles));
+        child: ListView(children: actionTiles));
+
     return appBarView;
   }
 

@@ -128,8 +128,8 @@ class FormInputWidget extends StatefulWidget {
   final MainAxisAlignment mainAxisAlignment;
   final double spacing;
   final double buttonSpacing;
-  final Widget? head;
-  final Widget? tail;
+  final List<Widget>? heads;
+  final List<Widget>? tails;
 
   FormInputWidget({
     Key? key,
@@ -142,8 +142,8 @@ class FormInputWidget extends StatefulWidget {
     this.mainAxisAlignment = MainAxisAlignment.start,
     this.spacing = 0.0,
     this.buttonSpacing = 10.0,
-    this.head,
-    this.tail,
+    this.heads,
+    this.tails,
   }) : super(key: key) {
     controller = FormInputController(columnFieldDefs);
     if (initValues != null) {
@@ -203,8 +203,8 @@ class _FormInputWidgetState extends State<FormInputWidget> {
         children = <Widget>[];
         viewMap[groupName] = children;
       }
-      if (i == 0 && widget.head != null) {
-        children.add(widget.head!);
+      if (i == 0 && widget.heads != null) {
+        children.addAll(widget.heads!);
       }
       children.add(SizedBox(
         height: widget.spacing,
@@ -228,8 +228,8 @@ class _FormInputWidgetState extends State<FormInputWidget> {
       );
       children.add(columnFieldWidget);
       if (i == widget.controller.columnFieldDefs.length - 1) {
-        if (widget.tail != null) {
-          children.add(widget.tail!);
+        if (widget.tails != null) {
+          children.addAll(widget.tails!);
         }
       }
     }
@@ -296,9 +296,7 @@ class _FormInputWidgetState extends State<FormInputWidget> {
             // )),
           ));
     } else if (views.length == 1) {
-      return SizedBox(
-          height: widget.height,
-          child: views[0]);
+      return SizedBox(height: widget.height, child: views[0]);
     } else {
       return Container();
     }

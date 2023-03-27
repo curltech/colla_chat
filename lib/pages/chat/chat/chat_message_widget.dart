@@ -19,13 +19,13 @@ class ChatMessageWidget extends StatefulWidget {
   final bool Function(ScrollNotification scrollNotification)?
       notificationPredicate;
 
-  ChatMessageWidget(
-      {Key? key,
-      this.onScrollMax,
-      this.onScrollMin,
-      this.onRefresh,
-      this.notificationPredicate})
-      : super(key: key);
+  ChatMessageWidget({
+    Key? key,
+    this.onScrollMax,
+    this.onScrollMin,
+    this.onRefresh,
+    this.notificationPredicate,
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {

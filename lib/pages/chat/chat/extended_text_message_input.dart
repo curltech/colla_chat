@@ -1,13 +1,9 @@
-import 'dart:async';
-import 'dart:math';
-
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/group_linkman_widget.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -17,14 +13,14 @@ import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder
 import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter/services.dart';
 
 ///发送文本消息的输入框
 class ExtendedTextMessageInputWidget extends StatefulWidget {
+  final FocusNode focusNode;
   final TextEditingController textEditingController;
 
   const ExtendedTextMessageInputWidget(
-      {Key? key, required this.textEditingController})
+      {Key? key, required this.textEditingController, required this.focusNode})
       : super(key: key);
 
   @override
@@ -39,33 +35,6 @@ class _ExtendedTextMessageInputWidgetState
       GlobalKey<ExtendedTextFieldState>();
   final CustomSpecialTextSpanBuilder specialTextSpanBuilder =
       CustomSpecialTextSpanBuilder();
-  final StreamController<void> gridBuilderController =
-      StreamController<void>.broadcast();
-
-  final FocusNode focusNode = FocusNode();
-  double _keyboardHeight = 0;
-  double _preKeyboardHeight = 0;
-
-  bool get showCustomKeyBoard =>
-      activeEmojiGird || activeAtGrid || activeDollarGrid;
-  bool activeEmojiGird = false;
-  bool activeAtGrid = false;
-  bool activeDollarGrid = false;
-
-  //获取焦点
-  void getFocusFunction(BuildContext context) {
-    FocusScope.of(context).requestFocus(focusNode);
-  }
-
-  //失去焦点
-  void unFocusFunction() {
-    focusNode.unfocus();
-  }
-
-  //隐藏键盘而不丢失文本字段焦点
-  void hideKeyBoard() {
-    SystemChannels.textInput.invokeMethod('TextInput.hide');
-  }
 
   void _insertText(String text) {
     final TextEditingValue value = widget.textEditingController.value;
@@ -176,36 +145,17 @@ class _ExtendedTextMessageInputWidgetState
 
   @override
   Widget build(BuildContext context) {
-    FocusScope.of(context).autofocus(focusNode);
-    final MediaQueryData mediaQueryData = MediaQuery.of(context);
-    final double keyboardHeight = mediaQueryData.viewInsets.bottom;
-    appDataProvider.keyboardHeight = keyboardHeight;
-
-    final bool showingKeyboard = keyboardHeight > _preKeyboardHeight;
-    _preKeyboardHeight = keyboardHeight;
-    if ((keyboardHeight > 0 && keyboardHeight >= _keyboardHeight) ||
-        showingKeyboard) {
-      activeEmojiGird = activeAtGrid = activeDollarGrid = false;
-      gridBuilderController.add(null);
-    }
-
-    _keyboardHeight = max(_keyboardHeight, keyboardHeight);
-
     return ExtendedTextField(
       key: _key,
       minLines: 1,
-      maxLines: 4,
+      maxLines: 8,
       strutStyle: const StrutStyle(),
       specialTextSpanBuilder: CustomSpecialTextSpanBuilder(
         showAtBackground: true,
       ),
       controller: widget.textEditingController,
       selectionControls: extendedMaterialTextSelectionControls,
-      focusNode: focusNode,
-      //autofocus: true,
-      onTap: () => setState(() {
-        if (focusNode.hasFocus) {}
-      }),
+      focusNode: widget.focusNode,
       onChanged: (String value) async {
         if (value == '@') {
           await _selectGroupLinkman();

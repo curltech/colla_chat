@@ -98,7 +98,7 @@ class AppDataProvider with ChangeNotifier {
     if (_keyboardHeight == 270.0 && bottom != 0) {
       _keyboardHeight = bottom;
     }
-    //notifyListeners();
+    notifyListeners();
   }
 }
 

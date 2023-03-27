@@ -106,7 +106,7 @@ class _ChatGPTAddWidgetState extends State<ChatGPTAddWidget> {
     var formInputWidget = Container(
         padding: const EdgeInsets.all(15.0),
         child: FormInputWidget(
-          height: 300,
+          height: 420,
           onOk: (Map<String, dynamic> values) {
             _onOk(values);
           },
