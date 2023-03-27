@@ -62,7 +62,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
+    return ListView(children: [
       const SizedBox(
         height: 50,
       ),
@@ -74,16 +74,15 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
       const SizedBox(
         height: 50,
       ),
-      Expanded(
-          child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              child: FormInputWidget(
-                mainAxisAlignment: MainAxisAlignment.start,
-                height: 150,
-                onOk: _login,
-                okLabel: 'Login',
-                columnFieldDefs: p2pLoginInputFieldDef,
-              ))),
+      Container(
+          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+          child: FormInputWidget(
+            mainAxisAlignment: MainAxisAlignment.start,
+            height: 150,
+            onOk: _login,
+            okLabel: 'Login',
+            columnFieldDefs: p2pLoginInputFieldDef,
+          )),
     ]);
   }
 

@@ -298,10 +298,6 @@ class _FormInputWidgetState extends State<FormInputWidget> {
     } else if (views.length == 1) {
       return SizedBox(
           height: widget.height,
-          // constraints: BoxConstraints(
-          //   minHeight: widget.minHeight, //最小高度
-          //   maxHeight: widget.maxHeight,
-          // ), //最大高度
           child: views[0]);
     } else {
       return Container();

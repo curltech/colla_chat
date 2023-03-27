@@ -31,17 +31,17 @@ class _P2pSettingWidgetState extends State<P2pSettingWidget> {
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
         const SizedBox(height: 30.0),
-        Padding(
+        Container(
           padding: padding,
           child: const LocalePicker(),
         ),
         const SizedBox(height: 10.0),
-        Padding(
+        Container(
           padding: padding,
           child: const WsAddressPicker(),
         ),
         const SizedBox(height: 10.0),
-        Padding(
+        Container(
           padding: padding,
           child: const BrightnessPicker(),
         ),

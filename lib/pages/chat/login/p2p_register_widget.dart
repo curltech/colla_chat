@@ -73,7 +73,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
     return ListView(
       children: <Widget>[
         const SizedBox(height: 30.0),
-        Padding(
+        Container(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           child: IntlPhoneField(
             initialCountryCode: _countryCode,
@@ -94,7 +94,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
             disableLengthCheck: true,
           ),
         ),
-        Padding(
+        Container(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
             child: FormInputWidget(
               height: 320,
