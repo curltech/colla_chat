@@ -84,7 +84,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
           initValues: initValues,
         ));
 
-    return formInputWidget;
+    return ListView(children: [formInputWidget]);
   }
 
   _onOk(Map<String, dynamic> values) async {

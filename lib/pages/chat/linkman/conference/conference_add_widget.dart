@@ -225,12 +225,10 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
 
   //会议信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
-    var head = Column(
-      children: [
-        _buildConferenceMembersWidget(context),
-        _buildConferenceOwnerWidget(context),
-      ],
-    );
+    var children = [
+      _buildConferenceMembersWidget(context),
+      _buildConferenceOwnerWidget(context),
+    ];
     var formInputWidget = Container(
         padding: const EdgeInsets.all(15.0),
         child: ValueListenableBuilder(
@@ -256,11 +254,11 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
                 },
                 columnFieldDefs: conferenceColumnFieldDefs,
                 initValues: initValues,
-                head: head,
               );
             }));
+    children.add(formInputWidget);
 
-    return formInputWidget;
+    return ListView(children: children);
   }
 
   //修改提交

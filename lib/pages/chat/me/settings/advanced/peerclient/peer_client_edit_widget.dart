@@ -78,7 +78,7 @@ class _PeerClientEditWidgetState extends State<PeerClientEditWidget> {
       initValues: initValues,
     );
 
-    return formInputWidget;
+    return ListView(children: [formInputWidget]);
   }
 
   _onOk(Map<String, dynamic> values) {

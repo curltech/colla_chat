@@ -94,7 +94,7 @@ class _PeerEndpointEditWidgetState extends State<PeerEndpointEditWidget> {
     );
 
     return ListView(children: <Widget>[
-      Padding(
+      Container(
           padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
           child: formInputWidget),
       const SizedBox(

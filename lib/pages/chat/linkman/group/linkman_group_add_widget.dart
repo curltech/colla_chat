@@ -256,19 +256,17 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
 
   //群信息编辑界面
   Widget _buildFormInputWidget(BuildContext context) {
-    Widget head = Column(
-      children: [
-        _buildGroupMembersWidget(context),
-        const SizedBox(
-          height: 1,
-        ),
-        _buildGroupOwnerWidget(context),
-        const SizedBox(
-          height: 1,
-        ),
-        _buildAvatarWidget(context),
-      ],
-    );
+    List<Widget> children = [
+      _buildGroupMembersWidget(context),
+      const SizedBox(
+        height: 1,
+      ),
+      _buildGroupOwnerWidget(context),
+      const SizedBox(
+        height: 1,
+      ),
+      _buildAvatarWidget(context),
+    ];
     var formInputWidget = Container(
         padding: const EdgeInsets.all(15.0),
         child: ValueListenableBuilder(
@@ -291,11 +289,13 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
                 },
                 columnFieldDefs: groupColumnFieldDefs,
                 initValues: initValues,
-                head: head,
               );
             }));
+    children.add(formInputWidget);
 
-    return formInputWidget;
+    return ListView(
+      children: children,
+    );
   }
 
   ///修改提交，首先分清楚增加群和修改群

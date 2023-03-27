@@ -114,7 +114,7 @@ class _ChatGPTAddWidgetState extends State<ChatGPTAddWidget> {
           initValues: initValues,
         ));
 
-    return formInputWidget;
+    return ListView(children: [formInputWidget]);
   }
 
   _onOk(Map<String, dynamic> values) async {
@@ -170,7 +170,8 @@ class _ChatGPTAddWidgetState extends State<ChatGPTAddWidget> {
     var appBarView = AppBarView(
         title: title,
         withLeading: widget.withLeading,
-        child: SingleChildScrollView(child: _buildFormInputWidget(context)));
+        child: _buildFormInputWidget(context));
+
     return appBarView;
   }
 

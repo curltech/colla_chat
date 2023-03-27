@@ -52,7 +52,7 @@ class _PasswordWidgetState extends State<PasswordWidget> {
   Widget _build(BuildContext context) {
     return ListView(
       children: <Widget>[
-        Padding(
+        Container(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
             child: FormInputWidget(
               height: 200,
