@@ -31,8 +31,6 @@ class _ExtendedTextMessageInputWidgetState
     extends State<ExtendedTextMessageInputWidget> {
   final CustomTextSelectionControls extendedMaterialTextSelectionControls =
       CustomTextSelectionControls();
-  final GlobalKey<ExtendedTextFieldState> _key =
-      GlobalKey<ExtendedTextFieldState>();
   final CustomSpecialTextSpanBuilder specialTextSpanBuilder =
       CustomSpecialTextSpanBuilder();
 
@@ -67,7 +65,7 @@ class _ExtendedTextMessageInputWidgetState
     }
 
     SchedulerBinding.instance.addPostFrameCallback((Duration timeStamp) {
-      _key.currentState
+      chatMessageViewController.extendedTextKey.currentState
           ?.bringIntoView(widget.textEditingController.selection.base);
     });
   }
@@ -145,8 +143,9 @@ class _ExtendedTextMessageInputWidgetState
 
   @override
   Widget build(BuildContext context) {
+    chatMessageViewController.changeExtendedTextHeight();
     return ExtendedTextField(
-      key: _key,
+      key: chatMessageViewController.extendedTextKey,
       minLines: 1,
       maxLines: 8,
       strutStyle: const StrutStyle(),

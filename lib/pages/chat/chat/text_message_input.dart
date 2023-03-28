@@ -211,7 +211,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
         child: Row(children: <Widget>[
           Container(
             margin: EdgeInsets.symmetric(
-                horizontal: iconInset, vertical: iconInset),
+                horizontal: iconInset * 3, vertical: iconInset),
             child: InkWell(
               child: voiceVisible
                   ? Icon(Icons.record_voice_over, color: myself.primary)

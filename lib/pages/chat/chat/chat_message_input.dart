@@ -111,7 +111,6 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
   Widget _buildChatMessageInput(BuildContext context) {
     List<Widget> children = [
       SizedBox(
-          height: chatMessageViewController.chatMessageInputHeight,
           child: TextMessageInputWidget(
             textEditingController: textEditingController,
             onEmojiPressed: onEmojiPressed,

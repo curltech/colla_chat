@@ -12,7 +12,6 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controll
 import 'package:colla_chat/pages/chat/chat/full_screen_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video_chat_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
@@ -71,6 +70,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
       ValueNotifier<PeerConnectionStatus>(PeerConnectionStatus.none);
   final ValueNotifier<ChatSummary?> _chatSummary =
       ValueNotifier<ChatSummary?>(chatMessageController.chatSummary);
+  final ValueNotifier<double> chatMessageHeight = ValueNotifier<double>(0);
 
   @override
   void initState() {
@@ -78,10 +78,11 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     chatMessageViewController.addListener(_update);
     _createPeerConnection();
     _buildReadStatus();
+    _update();
   }
 
   _update() {
-    setState(() {});
+    chatMessageHeight.value = chatMessageViewController.chatMessageHeight;
   }
 
   ///更新为已读状态
@@ -220,7 +221,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     ];
     return KeyboardActionsConfig(
       keyboardActionsPlatform: KeyboardActionsPlatform.ALL,
-      keyboardBarColor: Colors.grey[200],
+      keyboardBarColor: myself.primary,
       nextFocus: true,
       actions: actions,
     );
@@ -228,22 +229,12 @@ class _ChatMessageViewState extends State<ChatMessageView> {
 
   ///创建消息显示面板，包含消息的输入框
   Widget _buildChatMessageWidget(BuildContext context) {
-    final Widget chatMessageInputWidget =
-        SizedBox(child: widget.chatMessageInputWidget);
-    double bottomHeight = chatMessageViewController.chatMessageInputHeight;
-    if (chatMessageViewController.emojiMessageInputHeight > 0) {
-      bottomHeight =
-          bottomHeight + chatMessageViewController.emojiMessageInputHeight;
-    }
-    if (chatMessageViewController.moreMessageInputHeight > 0) {
-      bottomHeight =
-          bottomHeight + chatMessageViewController.moreMessageInputHeight;
-    }
-    double height = appDataProvider.actualSize.height -
-        appDataProvider.toolbarHeight -
-        bottomHeight-1;
-    final Widget chatMessageWidget =
-        SizedBox(height: height, child: widget.chatMessageWidget);
+    final Widget chatMessageWidget = ValueListenableBuilder(
+        valueListenable: chatMessageHeight,
+        builder: (BuildContext context, double value, Widget? child) {
+          return SizedBox(height: value, child: widget.chatMessageWidget);
+        });
+
     return KeyboardActions(
         autoScroll: true,
         config: _buildKeyboardActionsConfig(context),
@@ -253,7 +244,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
             color: Colors.white.withOpacity(AppOpacity.xlOpacity),
             height: 1.0,
           ),
-          chatMessageInputWidget
+          widget.chatMessageInputWidget
         ]));
   }
 
