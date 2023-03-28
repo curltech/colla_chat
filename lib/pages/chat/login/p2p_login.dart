@@ -42,7 +42,7 @@ class _P2pLoginState extends State<P2pLogin> {
 
   _update() {
     if (mounted) {
-      setState(() {});
+      //setState(() {});
     }
   }
 

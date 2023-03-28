@@ -12,12 +12,11 @@ import 'controller/chat_message_controller.dart';
 ///第一行：包括声音按钮，扩展文本输入框，emoji按钮，其他多种格式输入按钮和发送按钮
 ///第二行：emoji面板，其他多种格式输入面板
 class ChatMessageInputWidget extends StatefulWidget {
-  final FocusNode focusNode;
+  final double height;
   final Future<void> Function(int index, String name, {String? value})?
       onAction;
 
-  const ChatMessageInputWidget(
-      {Key? key, required this.focusNode, this.onAction})
+  const ChatMessageInputWidget({Key? key, this.height = 270, this.onAction})
       : super(key: key);
 
   @override
@@ -27,7 +26,6 @@ class ChatMessageInputWidget extends StatefulWidget {
 class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
   ///扩展文本输入框的控制器
   final TextEditingController textEditingController = TextEditingController();
-  final double height = 270;
   bool emojiVisible = false;
   bool moreVisible = false;
   BlueFireAudioPlayer audioPlayer = BlueFireAudioPlayer();
@@ -110,23 +108,24 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
 
   Widget _buildChatMessageInput(BuildContext context) {
     return Column(children: [
-      TextMessageInputWidget(
-        focusNode: widget.focusNode,
-        textEditingController: textEditingController,
-        onEmojiPressed: onEmojiPressed,
-        onMorePressed: onMorePressed,
-        onSendPressed: onSendPressed,
-      ),
+      SizedBox(
+          height: 115,
+          child: TextMessageInputWidget(
+            textEditingController: textEditingController,
+            onEmojiPressed: onEmojiPressed,
+            onMorePressed: onMorePressed,
+            onSendPressed: onSendPressed,
+          )),
       Visibility(
           visible: emojiVisible,
           child: EmojiMessageInputWidget(
             onTap: _onEmojiTap,
-            height: height,
+            height: widget.height,
           )),
       Visibility(
           visible: moreVisible,
           child: MoreMessageInput(
-            height: height,
+            height: widget.height,
             onAction: widget.onAction,
           )),
     ]);

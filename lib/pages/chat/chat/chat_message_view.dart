@@ -8,6 +8,7 @@ import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controller.dart';
 import 'package:colla_chat/pages/chat/chat/full_screen_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video_chat_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -37,6 +38,8 @@ class ChatMessageView extends StatefulWidget with TileDataMixin {
   final FullScreenWidget fullScreenWidget = const FullScreenWidget();
   final VideoChatWidget videoChatWidget = VideoChatWidget();
   final ChatMessageWidget chatMessageWidget = ChatMessageWidget();
+  final ChatMessageInputWidget chatMessageInputWidget =
+      const ChatMessageInputWidget();
 
   ChatMessageView({
     Key? key,
@@ -64,8 +67,6 @@ class ChatMessageView extends StatefulWidget with TileDataMixin {
 }
 
 class _ChatMessageViewState extends State<ChatMessageView> {
-  //输入消息的焦点
-  final FocusNode focusNode = FocusNode();
   final ValueNotifier<PeerConnectionStatus> _peerConnectionStatus =
       ValueNotifier<PeerConnectionStatus>(PeerConnectionStatus.none);
   final ValueNotifier<ChatSummary?> _chatSummary =
@@ -74,15 +75,8 @@ class _ChatMessageViewState extends State<ChatMessageView> {
   @override
   void initState() {
     super.initState();
-    appDataProvider.addListener(_update);
     _createPeerConnection();
     _buildReadStatus();
-  }
-
-  _update() async {
-    if (mounted) {
-      setState(() {});
-    }
   }
 
   ///更新为已读状态
@@ -216,7 +210,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
   KeyboardActionsConfig _buildKeyboardActionsConfig(BuildContext context) {
     List<KeyboardActionsItem> actions = [
       KeyboardActionsItem(
-        focusNode: focusNode,
+        focusNode: chatMessageViewController.focusNode,
       )
     ];
     return KeyboardActionsConfig(
@@ -229,25 +223,21 @@ class _ChatMessageViewState extends State<ChatMessageView> {
 
   ///创建消息显示面板，包含消息的输入框
   Widget _buildChatMessageWidget(BuildContext context) {
-    final Widget chatMessageInputWidget = SizedBox(
-        child: ChatMessageInputWidget(
-      focusNode: focusNode,
-    ));
+    final Widget chatMessageInputWidget =
+        SizedBox(child: widget.chatMessageInputWidget);
     double height = appDataProvider.actualSize.height - 115;
     final Widget chatMessageWidget =
         SizedBox(height: height, child: widget.chatMessageWidget);
-    return Column(children: <Widget>[
-      chatMessageWidget,
-      Divider(
-        color: Colors.white.withOpacity(AppOpacity.xlOpacity),
-        height: 1.0,
-      ),
-      // KeyboardActions(
-      //     config: _buildKeyboardActionsConfig(context),
-      //     child:
-      chatMessageInputWidget
-      // ),
-    ]);
+    return KeyboardActions(
+        config: _buildKeyboardActionsConfig(context),
+        child: Column(children: <Widget>[
+          Expanded(child: chatMessageWidget),
+          Divider(
+            color: Colors.white.withOpacity(AppOpacity.xlOpacity),
+            height: 1.0,
+          ),
+          chatMessageInputWidget
+        ]));
   }
 
   @override

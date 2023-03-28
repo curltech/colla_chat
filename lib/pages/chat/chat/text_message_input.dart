@@ -17,7 +17,6 @@ import 'package:flutter/material.dart';
 ///发送文本消息的输入框和按钮，
 ///包括声音按钮，扩展文本输入框，emoji按钮，其他多种格式输入按钮和发送按钮
 class TextMessageInputWidget extends StatefulWidget {
-  final FocusNode focusNode;
   final TextEditingController textEditingController;
   final Future<void> Function()? onSendPressed;
   final void Function()? onEmojiPressed;
@@ -25,7 +24,6 @@ class TextMessageInputWidget extends StatefulWidget {
 
   const TextMessageInputWidget({
     Key? key,
-    required this.focusNode,
     required this.textEditingController,
     this.onSendPressed,
     this.onEmojiPressed,
@@ -77,7 +75,6 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   ///文本录入按钮
   Widget _buildExtendedTextField(context) {
     return ExtendedTextMessageInputWidget(
-      focusNode: widget.focusNode,
       textEditingController: widget.textEditingController,
     );
   }
