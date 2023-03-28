@@ -11,6 +11,7 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.da
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controller.dart';
 import 'package:colla_chat/pages/chat/chat/full_screen_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video_chat_widget.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -217,12 +218,22 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     List<KeyboardActionsItem> actions = [
       KeyboardActionsItem(
         focusNode: chatMessageViewController.focusNode,
+        displayActionBar: false,
+        displayArrows: false,
+        displayDoneButton: false,
       )
     ];
+    KeyboardActionsPlatform keyboardActionsPlatform =
+        KeyboardActionsPlatform.ALL;
+    if (platformParams.ios) {
+      keyboardActionsPlatform = KeyboardActionsPlatform.IOS;
+    } else if (platformParams.android) {
+      keyboardActionsPlatform = KeyboardActionsPlatform.ANDROID;
+    }
     return KeyboardActionsConfig(
-      keyboardActionsPlatform: KeyboardActionsPlatform.ALL,
+      keyboardActionsPlatform: keyboardActionsPlatform,
       keyboardBarColor: myself.primary,
-      nextFocus: true,
+      nextFocus: false,
       actions: actions,
     );
   }
@@ -275,11 +286,11 @@ class _ChatMessageViewState extends State<ChatMessageView> {
               widget = myself.avatarImage ?? AppImage.mdAppImage;
             } else if (_peerConnectionStatus.value !=
                 PeerConnectionStatus.connected) {
-              widget = InkWell(
-                  onTap: () {
+              widget = IconButton(
+                  onPressed: () {
                     _createPeerConnection();
                   },
-                  child: const Icon(
+                  icon: const Icon(
                     Icons.wifi_off,
                     color: Colors.red,
                   ));

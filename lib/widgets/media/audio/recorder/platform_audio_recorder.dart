@@ -20,7 +20,7 @@ class PlatformAudioRecorder extends StatefulWidget {
   PlatformAudioRecorder({
     Key? key,
     AbstractAudioRecorderController? controller,
-    this.width = 150,
+    this.width = 250,
     this.height = 48,
     this.onStop,
     this.mediaRecorderType = MediaRecorderType.record,
@@ -118,9 +118,9 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
     if (widget.controller.status == RecorderStatus.recording ||
         widget.controller.status == RecorderStatus.pause) {
       controls.add(
-        InkWell(
-          child: const Icon(Icons.stop, size: 32),
-          onTap: () async {
+        IconButton(
+          icon: const Icon(Icons.stop, size: 32),
+          onPressed: () async {
             await _stop();
           },
         ),
@@ -132,9 +132,9 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
       );
     }
     controls.add(
-      InkWell(
-        child: playIcon,
-        onTap: () async {
+      IconButton(
+        icon: playIcon,
+        onPressed: () async {
           await _action();
         },
       ),
@@ -147,10 +147,9 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
     controls.add(
       Text(controlText),
     );
-    var container = Container(
+    var container = SizedBox(
       width: widget.width,
       height: widget.height,
-      color: Colors.grey,
       child:
           Row(mainAxisAlignment: MainAxisAlignment.center, children: controls),
     );

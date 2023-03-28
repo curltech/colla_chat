@@ -180,14 +180,17 @@ class _FormInputWidgetState extends State<FormInputWidget> {
         focusNodes[name] = focusNode;
         KeyboardActionsItem action = KeyboardActionsItem(
           focusNode: focusNode,
+          displayActionBar: false,
+          displayArrows: false,
+          displayDoneButton: false,
         );
         actions.add(action);
       }
     }
     return KeyboardActionsConfig(
       keyboardActionsPlatform: KeyboardActionsPlatform.ALL,
-      keyboardBarColor: Colors.grey[200],
-      nextFocus: true,
+      keyboardBarColor: myself.primary,
+      nextFocus: false,
       actions: actions,
     );
   }

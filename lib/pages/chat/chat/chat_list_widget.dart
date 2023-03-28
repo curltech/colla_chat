@@ -574,8 +574,8 @@ class _ChatListWidgetState extends State<ChatListWidget>
     var wssWidget = ValueListenableBuilder(
         valueListenable: _socketStatus,
         builder: (context, value, child) {
-          return InkWell(
-              onTap: _socketStatus.value != SocketStatus.connected
+          return IconButton(
+              onPressed: _socketStatus.value != SocketStatus.connected
                   ? () async {
                       //缺省的websocket如果不存在，尝试重连
                       Websocket? websocket = websocketPool.getDefault();
@@ -587,7 +587,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
                       }
                     }
                   : null,
-              child: _socketStatus.value == SocketStatus.connected
+              icon: _socketStatus.value == SocketStatus.connected
                   ? const Icon(
                       Icons.cloud_done,
                       //color: Colors.green,
