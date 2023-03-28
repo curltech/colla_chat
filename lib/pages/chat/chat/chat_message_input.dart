@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controller.dart';
 import 'package:colla_chat/pages/chat/chat/emoji_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/more_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/text_message_input.dart';
@@ -12,12 +13,10 @@ import 'controller/chat_message_controller.dart';
 ///第一行：包括声音按钮，扩展文本输入框，emoji按钮，其他多种格式输入按钮和发送按钮
 ///第二行：emoji面板，其他多种格式输入面板
 class ChatMessageInputWidget extends StatefulWidget {
-  final double height;
   final Future<void> Function(int index, String name, {String? value})?
       onAction;
 
-  const ChatMessageInputWidget({Key? key, this.height = 270, this.onAction})
-      : super(key: key);
+  const ChatMessageInputWidget({Key? key, this.onAction}) : super(key: key);
 
   @override
   State createState() => _ChatMessageInputWidgetState();
@@ -26,13 +25,12 @@ class ChatMessageInputWidget extends StatefulWidget {
 class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
   ///扩展文本输入框的控制器
   final TextEditingController textEditingController = TextEditingController();
-  bool emojiVisible = false;
-  bool moreVisible = false;
   BlueFireAudioPlayer audioPlayer = BlueFireAudioPlayer();
 
   @override
   void initState() {
     super.initState();
+    chatMessageViewController.addListener(_update);
     textEditingController.clear();
   }
 
@@ -56,19 +54,23 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
   }
 
   void onEmojiPressed() {
-    emojiVisible = !emojiVisible;
-    if (emojiVisible) {
-      moreVisible = false;
+    var height = chatMessageViewController.emojiMessageInputHeight;
+    if (height == 0.0) {
+      chatMessageViewController.emojiMessageInputHeight =
+          ChatMessageViewController.defaultEmojiMessageInputHeight;
+    } else {
+      chatMessageViewController.emojiMessageInputHeight = 0.0;
     }
-    _update();
   }
 
   void onMorePressed() {
-    moreVisible = !moreVisible;
-    if (moreVisible) {
-      emojiVisible = false;
+    var height = chatMessageViewController.moreMessageInputHeight;
+    if (height == 0.0) {
+      chatMessageViewController.moreMessageInputHeight =
+          ChatMessageViewController.defaultMoreMessageInputHeight;
+    } else {
+      chatMessageViewController.moreMessageInputHeight = 0.0;
     }
-    _update();
   }
 
   void _insertText(String text) {
@@ -107,28 +109,27 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
   }
 
   Widget _buildChatMessageInput(BuildContext context) {
-    return Column(children: [
+    List<Widget> children = [
       SizedBox(
-          height: 115,
+          height: chatMessageViewController.chatMessageInputHeight,
           child: TextMessageInputWidget(
             textEditingController: textEditingController,
             onEmojiPressed: onEmojiPressed,
             onMorePressed: onMorePressed,
             onSendPressed: onSendPressed,
           )),
-      Visibility(
-          visible: emojiVisible,
-          child: EmojiMessageInputWidget(
-            onTap: _onEmojiTap,
-            height: widget.height,
-          )),
-      Visibility(
-          visible: moreVisible,
-          child: MoreMessageInput(
-            height: widget.height,
-            onAction: widget.onAction,
-          )),
-    ]);
+    ];
+    if (chatMessageViewController.emojiMessageInputHeight > 0) {
+      children.add(EmojiMessageInputWidget(
+        onTap: _onEmojiTap,
+      ));
+    }
+    if (chatMessageViewController.moreMessageInputHeight > 0) {
+      children.add(MoreMessageInput(
+        onAction: widget.onAction,
+      ));
+    }
+    return Column(children: children);
   }
 
   @override
@@ -138,6 +139,7 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
 
   @override
   dispose() {
+    chatMessageViewController.removeListener(_update);
     super.dispose();
   }
 }

@@ -2,6 +2,7 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/mobile_camera_widget.dart';
@@ -60,12 +61,10 @@ final List<ActionData> defaultActionData = [
 
 ///非文本的其他多种格式输入面板，包括照片等
 class MoreMessageInput extends StatefulWidget {
-  final double height;
   final Future<void> Function(int index, String name, {String? value})?
       onAction;
 
-  const MoreMessageInput({Key? key, this.height = 0.0, this.onAction})
-      : super(key: key);
+  const MoreMessageInput({Key? key, this.onAction}) : super(key: key);
 
   @override
   State createState() => _MoreMessageInputState();
@@ -267,7 +266,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
                   if (linkman != null) {
                     String content = JsonUtil.toJsonString(linkman);
                     await chatMessageController.sendText(
-                        message: content, contentType: ChatMessageContentType.card);
+                        message: content,
+                        contentType: ChatMessageContentType.card);
                   }
                 }
               },
@@ -302,7 +302,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       padding: const EdgeInsets.only(bottom: 0.0),
       child: DataActionCard(
         actions: actionData,
-        height: widget.height,
+        height: chatMessageViewController.moreMessageInputHeight,
         onPressed: _onAction,
         crossAxisCount: 4,
       ),

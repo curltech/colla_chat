@@ -209,8 +209,8 @@ class DataActionCard extends StatelessWidget {
         alignment: Alignment.center,
         height: height,
         width: width,
-        margin: const EdgeInsets.all(2.0),
-        padding: const EdgeInsets.all(2.0),
+        margin: const EdgeInsets.all(0.0),
+        padding: const EdgeInsets.all(0.0),
         child: GridView.builder(
             itemCount: actionWidgets.length,
             shrinkWrap: true,

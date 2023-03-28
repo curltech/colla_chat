@@ -75,8 +75,13 @@ class _ChatMessageViewState extends State<ChatMessageView> {
   @override
   void initState() {
     super.initState();
+    chatMessageViewController.addListener(_update);
     _createPeerConnection();
     _buildReadStatus();
+  }
+
+  _update() {
+    setState(() {});
   }
 
   ///更新为已读状态
@@ -225,13 +230,25 @@ class _ChatMessageViewState extends State<ChatMessageView> {
   Widget _buildChatMessageWidget(BuildContext context) {
     final Widget chatMessageInputWidget =
         SizedBox(child: widget.chatMessageInputWidget);
-    double height = appDataProvider.actualSize.height - 115;
+    double bottomHeight = chatMessageViewController.chatMessageInputHeight;
+    if (chatMessageViewController.emojiMessageInputHeight > 0) {
+      bottomHeight =
+          bottomHeight + chatMessageViewController.emojiMessageInputHeight;
+    }
+    if (chatMessageViewController.moreMessageInputHeight > 0) {
+      bottomHeight =
+          bottomHeight + chatMessageViewController.moreMessageInputHeight;
+    }
+    double height = appDataProvider.actualSize.height -
+        appDataProvider.toolbarHeight -
+        bottomHeight-1;
     final Widget chatMessageWidget =
         SizedBox(height: height, child: widget.chatMessageWidget);
     return KeyboardActions(
+        autoScroll: true,
         config: _buildKeyboardActionsConfig(context),
         child: Column(children: <Widget>[
-          Expanded(child: chatMessageWidget),
+          chatMessageWidget,
           Divider(
             color: Colors.white.withOpacity(AppOpacity.xlOpacity),
             height: 1.0,
@@ -309,6 +326,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
 
   @override
   void dispose() {
+    chatMessageViewController.removeListener(_update);
     var chatSummary = _chatSummary.value;
     if (chatSummary != null) {
       peerConnectionPool.unregisterWebrtcEvent(chatSummary.peerId!,

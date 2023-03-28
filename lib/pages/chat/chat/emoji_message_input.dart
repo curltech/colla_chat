@@ -1,4 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controller.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/special_text/emoji_text.dart';
@@ -8,12 +9,10 @@ import 'package:flutter/material.dart';
 ///Emoji文本消息的输入面板
 class EmojiMessageInputWidget extends StatefulWidget {
   final Function(String text)? onTap;
-  final double height;
 
   const EmojiMessageInputWidget({
     Key? key,
     required this.onTap,
-    this.height = 0,
   }) : super(key: key);
 
   @override
@@ -36,7 +35,7 @@ class _EmojiMessageInputWidgetState extends State<EmojiMessageInputWidget> {
   Widget _buildEmojiWidget(BuildContext context) {
     return GestureDetector(
       child: SizedBox(
-        height: widget.height,
+        height: chatMessageViewController.emojiMessageInputHeight,
         child: GridView.builder(
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 7, crossAxisSpacing: 10.0, mainAxisSpacing: 10.0),
@@ -64,7 +63,7 @@ class _EmojiMessageInputWidgetState extends State<EmojiMessageInputWidget> {
   Widget _buildEmojiPicker(BuildContext context) {
     Color primary = myself.primary;
     return SizedBox(
-        height: widget.height,
+        height: chatMessageViewController.emojiMessageInputHeight,
         child: EmojiPicker(
             //textEditingController: TextEditingController(),
             onEmojiSelected: (Category? category, Emoji emoji) {
