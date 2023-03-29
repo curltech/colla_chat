@@ -4,6 +4,7 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 class LoadingBackgroundImage {
   final List<String> darkBackgroundImages = [
@@ -55,6 +56,7 @@ class LoadingBackgroundImage {
       );
       darkChildren.add(image);
     }
+    FlutterNativeSplash.remove();
   }
 
   Widget? currentBackgroundImage(BuildContext? context) {

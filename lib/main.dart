@@ -20,6 +20,7 @@ import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
 import 'package:webview_win_floating/webview.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 ///全局处理证书问题
 class PlatformHttpOverrides extends HttpOverrides {
@@ -63,8 +64,8 @@ void main(List<String> args) async {
   //         ChangeNotifierProvider(create: (context) => AppProfile()),
   //         Provider(create: (context) => AppProfile()),
   //       ],
-  WidgetsFlutterBinding.ensureInitialized();
-
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+  FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
   ///6.x.x
   // if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
   //   await inapp.InAppWebViewController.setWebContentsDebuggingEnabled(true);
