@@ -590,7 +590,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
               icon: _socketStatus.value == SocketStatus.connected
                   ? const Icon(
                       Icons.cloud_done,
-                      //color: Colors.green,
+                      color: Colors.white,
                     )
                   : const Icon(
                       Icons.cloud_off,

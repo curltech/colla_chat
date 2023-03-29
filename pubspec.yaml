@@ -301,6 +301,8 @@ dependencies:
   # 支持本地和fcm
   awesome_notifications: ^0.7.4+1
   awesome_notifications_fcm: ^0.7.4+1 #对minsdk有要求
+  flutter_native_splash: ^2.2.19
+  system_tray: ^2.0.2
   #openai_gpt3_api:
   dart_openai: ^1.9.1
   chat_gpt_sdk: ^2.0.4
@@ -344,7 +346,6 @@ dependency_overrides:
   path: ^1.8.3
   dio: ^5.0.2 #^4.0.6 openai
   audio_video_progress_bar: ^1.0.0
-  flutter_native_splash: ^2.2.19
 dev_dependencies:
   flutter_test:
     sdk: flutter

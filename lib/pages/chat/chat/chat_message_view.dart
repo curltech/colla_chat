@@ -280,7 +280,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
           builder: (context, value, child) {
             Widget widget = const Icon(
               Icons.wifi,
-              //color: Colors.green,
+              color: Colors.white,
             );
             if (peerId == myself.peerId) {
               widget = myself.avatarImage ?? AppImage.mdAppImage;
