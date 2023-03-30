@@ -177,7 +177,7 @@ dependencies:
   provider: ^6.0.1 #状态管理
   pull_to_refresh_notification: ^3.0.0
   share_plus: ^6.3.0
-  receive_sharing_intent: ^1.4.5
+  #receive_sharing_intent: ^1.4.5 #gradle版本低的问题
   date_format: ^2.0.6
   omni_datetime_picker: ^1.0.1
   toggle_switch: ^2.0.1
@@ -243,7 +243,8 @@ dependencies:
   speech_to_text: any
   flutter_image_compress: ^1.0.0-nullsafety #图片压缩1
   video_thumbnail: ^0.5.2
-  image_gallery_saver: ^1.7.1
+  image_gallery_saver: #^1.7.1
+    git: https://github.com/hui-z/image_gallery_saver.git
   extended_image: ^7.0.2
   extended_image_library: ^3.4.1
   image_editor: ^1.3.0
