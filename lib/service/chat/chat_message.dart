@@ -24,7 +24,7 @@ import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/transport/nearby_connection.dart';
+// import 'package:colla_chat/transport/nearby_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/websocket.dart';
 import 'package:uuid/uuid.dart';
@@ -631,13 +631,13 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           chatMessage.status = MessageStatus.sent.name;
         }
       }
-      if (transportType == TransportType.nearby.name) {
-        bool success = await nearbyConnectionPool.send(
-            chatMessage.receiverPeerId!, chatMessage);
-        if (success) {
-          chatMessage.status = MessageStatus.sent.name;
-        }
-      }
+      // if (transportType == TransportType.nearby.name) {
+      //   bool success = await nearbyConnectionPool.send(
+      //       chatMessage.receiverPeerId!, chatMessage);
+      //   if (success) {
+      //     chatMessage.status = MessageStatus.sent.name;
+      //   }
+      // }
       if (transportType == TransportType.websocket.name) {
         try {
           chatAction.chat(chatMessage, peerId,

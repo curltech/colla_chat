@@ -4,7 +4,6 @@ import 'package:colla_chat/pages/chat/linkman/group/linkman_group_add_widget.dar
 import 'package:colla_chat/pages/chat/linkman/group/nearby_group_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/chat_gpt_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/contact_linkman_add_widget.dart';
-import 'package:colla_chat/pages/chat/linkman/linkman/nearby_linkman_add_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/p2p_linkman_add_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -18,11 +17,11 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
   final P2pLinkmanAddWidget p2pLinkmanAddWidget = P2pLinkmanAddWidget();
   final ContactLinkmanAddWidget contactLinkmanAddWidget =
       ContactLinkmanAddWidget();
-  final NearbyLinkmanAddWidget nearbyLinkmanAddWidget =
-      NearbyLinkmanAddWidget();
+
+  // final NearbyLinkmanAddWidget nearbyLinkmanAddWidget =
+  //     NearbyLinkmanAddWidget();
   final ChatGPTAddWidget chatGPTAddWidget = const ChatGPTAddWidget();
-  final LinkmanGroupAddWidget linkmanGroupAddWidget =
-      LinkmanGroupAddWidget();
+  final LinkmanGroupAddWidget linkmanGroupAddWidget = LinkmanGroupAddWidget();
   final NearbyGroupAddWidget nearbyGroupAddWidget = NearbyGroupAddWidget();
   final FaceGroupAddWidget faceGroupAddWidget = FaceGroupAddWidget();
   final ConferenceAddWidget conferenceAddWidget = ConferenceAddWidget();
@@ -31,7 +30,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
   LinkmanAddWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(p2pLinkmanAddWidget);
     indexWidgetProvider.define(contactLinkmanAddWidget);
-    indexWidgetProvider.define(nearbyLinkmanAddWidget);
+    //indexWidgetProvider.define(nearbyLinkmanAddWidget);
     indexWidgetProvider.define(chatGPTAddWidget);
     indexWidgetProvider.define(linkmanGroupAddWidget);
     indexWidgetProvider.define(nearbyGroupAddWidget);
@@ -40,7 +39,7 @@ class LinkmanAddWidget extends StatelessWidget with TileDataMixin {
     List<TileDataMixin> mixins = [
       p2pLinkmanAddWidget,
       contactLinkmanAddWidget,
-      nearbyLinkmanAddWidget,
+      //nearbyLinkmanAddWidget,
       chatGPTAddWidget,
       linkmanGroupAddWidget,
       nearbyGroupAddWidget,
