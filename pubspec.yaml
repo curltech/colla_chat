@@ -55,7 +55,7 @@ dependencies:
   battery_plus: ^3.0.2
   flutter_contacts: ^1.1.4
   connectivity_plus: ^3.0.0
-  flutter_nearby_connections: ^1.1.1
+  #flutter_nearby_connections: ^1.1.1  #目前不支持ios和android之间通信，而且gradle版本配置低，需要修改
   mimecon: ^0.0.2
 
   # 存储
