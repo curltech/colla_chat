@@ -38,8 +38,6 @@ class Sqlite3 extends DataStore {
     //开发调试阶段，每次都重建数据库表
     //db.userVersion = 0;
     await init(db);
-    if (platformParams.web) {
-    } else {}
   }
 
   init(CommonDatabase db) {
