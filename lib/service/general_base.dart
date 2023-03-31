@@ -55,7 +55,7 @@ abstract class GeneralBaseService<T> {
       int? offset}) async {
     whereArgs = whereArgs ?? [];
     where = _buildWhere(where, whereArgs);
-    Map<dynamic, dynamic>? m = await dataStore.findOne(tableName,
+    Map<dynamic, dynamic>? m = dataStore.findOne(tableName,
         where: where,
         distinct: distinct,
         columns: columns,
@@ -93,7 +93,7 @@ abstract class GeneralBaseService<T> {
   }) async {
     whereArgs = whereArgs ?? [];
     where = _buildWhere(where, whereArgs);
-    var ms = await dataStore.find(tableName,
+    var ms = dataStore.find(tableName,
         where: where,
         distinct: distinct,
         columns: columns,
@@ -131,7 +131,7 @@ abstract class GeneralBaseService<T> {
   }) async {
     whereArgs = whereArgs ?? [];
     where = _buildWhere(where, whereArgs);
-    var page = await dataStore.findPage(tableName,
+    var page = dataStore.findPage(tableName,
         where: where,
         distinct: distinct,
         columns: columns,
@@ -272,7 +272,7 @@ abstract class GeneralBaseService<T> {
   Future<int> insert(dynamic entity) async {
     EntityUtil.createTimestamp(entity);
     Map<String, dynamic> json = await encrypt(entity);
-    int key = await dataStore.insert(tableName, json);
+    int key = dataStore.insert(tableName, json);
     Object? id = EntityUtil.getId(entity);
     if (id == null) {
       EntityUtil.setId(entity, key);
@@ -281,11 +281,10 @@ abstract class GeneralBaseService<T> {
   }
 
   /// 删除记录。根据entity的id字段作为条件删除，entity可以是Map
-  Future<int> delete(
-      {dynamic entity, String? where, List<Object>? whereArgs}) async {
+  int delete({dynamic entity, String? where, List<Object>? whereArgs}) {
     whereArgs = whereArgs ?? [];
     where = _buildWhere(where, whereArgs);
-    return await dataStore.delete(tableName,
+    return dataStore.delete(tableName,
         entity: entity, where: where, whereArgs: whereArgs);
   }
 
@@ -299,19 +298,19 @@ abstract class GeneralBaseService<T> {
     whereArgs = whereArgs ?? [];
     where = _buildWhere(where, whereArgs);
     Map<String, dynamic> json = await encrypt(entity);
-    int result = await dataStore.update(tableName, json,
-        where: where, whereArgs: whereArgs);
+    int result =
+        dataStore.update(tableName, json, where: where, whereArgs: whereArgs);
     return result;
   }
 
   /// 批量保存，根据脏标志新增，修改或者删除
-  save(List<T> entities, [dynamic? ignore, dynamic? parent]) async {
+  save(List<T> entities, [dynamic ignore, dynamic parent]) async {
     List<Map<String, dynamic>> operators = [];
     for (var entity in entities) {
       Map<String, dynamic> json = await encrypt(entity);
       operators.add({'table': tableName, 'entity': json});
     }
-    return await dataStore.transaction(operators);
+    return dataStore.transaction(operators);
   }
 
   /// 根据_id是否存在逐条增加或者修改
