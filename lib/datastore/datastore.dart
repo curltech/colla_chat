@@ -92,9 +92,9 @@ abstract class DataStore {
 
   execute(List<Sql> sqls);
 
-  Future<Object?> get(String table, dynamic id);
+  Object? get(String table, dynamic id);
 
-  Future<List<Map>> find(String table,
+  List<Map> find(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -105,7 +105,7 @@ abstract class DataStore {
       int? limit,
       int? offset});
 
-  Future<Pagination> findPage(String table,
+  Pagination findPage(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -120,7 +120,7 @@ abstract class DataStore {
   /// @param {*} tableName
   /// @param {*} fields
   /// @param {*} condition
-  Future<Map?> findOne(String table,
+  Map? findOne(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -134,26 +134,26 @@ abstract class DataStore {
   /// 插入一条记录,假设entity时一个有id属性的Object，或者Map
   /// @param {*} tableName
   /// @param {*} entity
-  Future<int> insert(String table, dynamic entity);
+  int insert(String table, dynamic entity);
 
   /// 删除记录
   /// @param {*} tableName
   /// @param {*} condition
-  Future<int> delete(String table,
+  int delete(String table,
       {dynamic entity, String? where, List<Object>? whereArgs});
 
   /// 更新记录
   /// @param {*} tableName
   /// @param {*} entity
   /// @param {*} condition
-  Future<int> update(String table, dynamic entity,
+  int update(String table, dynamic entity,
       {String? where, List<Object>? whereArgs});
 
-  Future<int> upsert(String table, dynamic entity,
+  int upsert(String table, dynamic entity,
       {String? where, List<Object>? whereArgs});
 
   /// 在一个事务里面执行多个操作（insert,update,devare)
   /// operators是一个operator对象的数组，operator有四个属性（type，tableName，entity，condition）
   /// @param {*} operators
-  Future<Object?> transaction(List<Map<String, dynamic>> operators);
+  Object? transaction(List<Map<String, dynamic>> operators);
 }

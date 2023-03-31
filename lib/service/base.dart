@@ -150,16 +150,16 @@ abstract class BaseService {
         post: post);
   }
 
-  Future<int> insert(dynamic entity, [dynamic? ignore, dynamic? parent]) {
+  int insert(dynamic entity, [dynamic? ignore, dynamic? parent]) {
     EntityUtil.createTimestamp(entity);
     return dataStore.insert(tableName, entity);
   }
 
-  Future<int> delete(dynamic entity) {
+  int delete(dynamic entity) {
     return dataStore.delete(tableName, entity: entity);
   }
 
-  Future<int> update(dynamic entity, [dynamic? ignore, dynamic? parent]) {
+  int update(dynamic entity, [dynamic? ignore, dynamic? parent]) {
     EntityUtil.updateTimestamp(entity);
     return dataStore.update(tableName, entity);
   }
@@ -174,7 +174,7 @@ abstract class BaseService {
   }
 
   /// 根据_id是否存在逐条增加或者修改
-  Future<int> upsert(dynamic entity, [dynamic? ignore, dynamic? parent]) {
+  int upsert(dynamic entity, [dynamic? ignore, dynamic? parent]) {
     var id = EntityUtil.getId(entity);
     if (id != null) {
       return update(entity, ignore, parent);

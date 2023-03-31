@@ -1,9 +1,7 @@
-import 'dart:async';
 import 'dart:convert';
 
 import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/entity/base.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -19,25 +17,13 @@ import 'datastore.dart';
 
 /// 适用于移动手机（无数据限制），desktop和chrome浏览器的sqlite3的数据库（50M数据限制）
 class Sqlite3 extends DataStore {
-  static Sqlite3 instance = Sqlite3();
-  static bool initStatus = false;
   late CommonDatabase db;
-  late String path;
-
-  /// 打开数据库，创建所有的表和索引
-  static Future<Sqlite3> getInstance({String name = dbname}) async {
-    if (!initStatus) {
-      await instance.open();
-      initStatus = true;
-    }
-    return instance;
-  }
 
   open({String name = dbname}) async {
     db = await sqlite3_open.openSqlite3(name: name);
     //开发调试阶段，每次都重建数据库表
     //db.userVersion = 0;
-    await init(db);
+    init(db);
   }
 
   init(CommonDatabase db) {
@@ -50,8 +36,7 @@ class Sqlite3 extends DataStore {
     if (userVersion == 0) {
       for (GeneralBaseService service in ServiceLocator.services.values) {
         try {
-          instance.create(
-              service.tableName, service.fields, service.indexFields);
+          create(service.tableName, service.fields, service.indexFields);
         } catch (e) {
           print('sqlite3 init create exception:$e');
         }
@@ -63,7 +48,7 @@ class Sqlite3 extends DataStore {
       }
     }
     for (GeneralBaseService service in ServiceLocator.services.values) {
-      service.dataStore = instance;
+      service.dataStore = this;
     }
   }
 
@@ -78,9 +63,7 @@ class Sqlite3 extends DataStore {
 
   /// 删除数据库
   /// @param {*} options
-  remove({name = dbname, location = 'default'}) async {
-    if (path != null) {}
-  }
+  remove({name = dbname, location = 'default'}) {}
 
   /// 批量执行sql，参数是二维数组
   /// @param {*} sqls
@@ -138,12 +121,12 @@ class Sqlite3 extends DataStore {
   }
 
   @override
-  Future<Object?> get(String table, dynamic id) {
+  Object? get(String table, dynamic id) {
     return findOne(table, where: 'id=?', whereArgs: [id]);
   }
 
   @override
-  Future<List<Map>> find(String table,
+  List<Map> find(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -152,7 +135,7 @@ class Sqlite3 extends DataStore {
       String? having,
       String? orderBy,
       int? limit,
-      int? offset}) async {
+      int? offset}) {
     var clause = sqlBuilder.select(table,
         distinct: distinct,
         columns: columns,
@@ -172,7 +155,7 @@ class Sqlite3 extends DataStore {
   }
 
   @override
-  Future<Pagination> findPage(String table,
+  Pagination findPage(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -181,7 +164,7 @@ class Sqlite3 extends DataStore {
       String? having,
       String? orderBy,
       int limit = defaultLimit,
-      int offset = defaultOffset}) async {
+      int offset = defaultOffset}) {
     var clause = sqlBuilder.select(
       table,
       distinct: distinct,
@@ -198,7 +181,7 @@ class Sqlite3 extends DataStore {
     // logger.i('execute sql:$clause');
     // logger.i('execute sql params:$whereArgs');
     var rowsNumber = TypeUtil.firstIntValue(totalResults);
-    var results = await find(table,
+    var results = find(table,
         distinct: distinct,
         columns: columns,
         where: where,
@@ -223,7 +206,7 @@ class Sqlite3 extends DataStore {
   /// @param {*} fields
   /// @param {*} condition
   @override
-  Future<Map?> findOne(String table,
+  Map? findOne(String table,
       {bool? distinct,
       List<String>? columns,
       String? where,
@@ -232,8 +215,8 @@ class Sqlite3 extends DataStore {
       String? having,
       String? orderBy,
       int? limit,
-      int? offset}) async {
-    var results = await find(table,
+      int? offset}) {
+    var results = find(table,
         distinct: distinct,
         columns: columns,
         where: where,
@@ -254,10 +237,10 @@ class Sqlite3 extends DataStore {
   /// @param {*} tableName
   /// @param {*} entity
   @override
-  Future<int> insert(String table, dynamic entity) async {
+  int insert(String table, dynamic entity) {
     Map<String, dynamic> map = JsonUtil.toJson(entity) as Map<String, dynamic>;
     Sql sql = sqlBuilder.insert(table, map);
-    await run(sql);
+    run(sql);
     int key = db.lastInsertRowId;
     Object? id = EntityUtil.getId(entity);
     if (id == null) {
@@ -271,8 +254,8 @@ class Sqlite3 extends DataStore {
   /// @param {*} tableName
   /// @param {*} condition
   @override
-  Future<int> delete(String table,
-      {dynamic entity, String? where, List<Object>? whereArgs}) async {
+  int delete(String table,
+      {dynamic entity, String? where, List<Object>? whereArgs}) {
     if (entity != null) {
       Map<String, dynamic> map =
           JsonUtil.toJson(entity) as Map<String, dynamic>;
@@ -285,7 +268,7 @@ class Sqlite3 extends DataStore {
 
     Sql sql = sqlBuilder.delete(table, where!, whereArgs);
 
-    await run(sql);
+    run(sql);
     int result = db.getUpdatedRows();
 
     return result;
@@ -296,8 +279,8 @@ class Sqlite3 extends DataStore {
   /// @param {*} entity
   /// @param {*} condition
   @override
-  Future<int> update(String table, dynamic entity,
-      {String? where, List<Object>? whereArgs}) async {
+  int update(String table, dynamic entity,
+      {String? where, List<Object>? whereArgs}) {
     Map<String, dynamic> map = JsonUtil.toJson(entity) as Map<String, dynamic>;
     var id = EntityUtil.getId(map);
     if (id != null) {
@@ -306,15 +289,15 @@ class Sqlite3 extends DataStore {
     }
     Sql sql = sqlBuilder.update(table, map, where!, whereArgs);
 
-    await run(sql);
+    run(sql);
     int result = db.getUpdatedRows();
 
     return result;
   }
 
   @override
-  Future<int> upsert(String table, dynamic entity,
-      {String? where, List<Object>? whereArgs}) async {
+  int upsert(String table, dynamic entity,
+      {String? where, List<Object>? whereArgs}) {
     Map<String, dynamic> map = JsonUtil.toJson(entity) as Map<String, dynamic>;
     var id = EntityUtil.getId(map);
     if (id != null) {
@@ -328,7 +311,7 @@ class Sqlite3 extends DataStore {
   /// operators是一个operator对象的数组，operator有四个属性（type，tableName，entity，condition）
   /// @param {*} operators
   @override
-  Future<Object?> transaction(List<Map<String, dynamic>> operators) async {
+  Object? transaction(List<Map<String, dynamic>> operators) {
     for (var i = 0; i < operators.length; ++i) {
       var operator = operators[i];
       var table = operator['table'];
@@ -339,7 +322,7 @@ class Sqlite3 extends DataStore {
         var json = jsonEncode(entity);
         entity = jsonDecode(json);
         if (entity is List) {
-          for (var e in entity as List) {
+          for (var e in entity) {
             var json = jsonEncode(e);
             var m = jsonDecode(json);
             var state = m['state'];
@@ -371,14 +354,5 @@ class Sqlite3 extends DataStore {
     }
     var results = db.getUpdatedRows();
     return results;
-  }
-
-  test() async {
-    insert('stk_account', {'id': 1, 'data': 'hello1', 'data_num': 1234561});
-    insert('stk_account', {'id': 2, 'data': 'hello2', 'data_num': 1234562});
-    var results = await findOne('stk_account', where: 'id=?', whereArgs: [1]);
-    update('stk_account', {'data': 'hello-update', 'data_num': 12345678},
-        where: 'id=?', whereArgs: [1]);
-    delete('stk_account', where: 'id=?', whereArgs: [1]);
   }
 }
