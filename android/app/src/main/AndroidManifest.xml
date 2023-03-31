@@ -85,8 +85,8 @@
     <!-- Permissions options for the `alarm` group -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
    <application
-        android:label="colla_chat"
-        android:name="Colla Chat"
+        android:label="CollaChat"
+        android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
         android:usesCleartextTraffic="true">
         <activity
