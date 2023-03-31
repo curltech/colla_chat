@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/type_util.dart';
@@ -34,6 +35,7 @@ class Sqlite3 extends DataStore {
       print('sqlite3 db get userVersion failure:$e');
     }
     if (userVersion == 0) {
+      print('sqlite3 db ${appDataProvider.sqlite3Path} will be re-create');
       for (GeneralBaseService service in ServiceLocator.services.values) {
         try {
           create(service.tableName, service.fields, service.indexFields);

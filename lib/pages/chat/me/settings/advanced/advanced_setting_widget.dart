@@ -1,6 +1,7 @@
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerclient/peer_client_list_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_list_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/ws_address_picker.dart';
+import 'package:colla_chat/pages/chat/me/settings/myself_peer_view.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -14,6 +15,7 @@ class AdvancedSettingWidget extends StatefulWidget with TileDataMixin {
   final PeerEndpointListWidget peerEndpointListWidget =
       PeerEndpointListWidget();
   final PeerClientListWidget peerClientListWidget = PeerClientListWidget();
+  final MyselfPeerView myselfPeerView = const MyselfPeerView();
   late final List<TileData> advancedSettingTileData;
 
   AdvancedSettingWidget({Key? key}) : super(key: key) {
@@ -22,6 +24,7 @@ class AdvancedSettingWidget extends StatefulWidget with TileDataMixin {
     List<TileDataMixin> mixins = [
       peerEndpointListWidget,
       peerClientListWidget,
+      myselfPeerView,
     ];
     advancedSettingTileData = TileData.from(mixins);
     for (var tile in advancedSettingTileData) {

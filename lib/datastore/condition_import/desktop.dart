@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/path_util.dart';
@@ -12,6 +14,10 @@ Future<CommonDatabase> openSqlite3({String name = 'colla_chat.db'}) async {
     String path = name;
     if (dbFolder != null) {
       path = p.join(dbFolder.path, name);
+      File file = File(path);
+      if (file.existsSync()) {
+        print('sqlite3 db $path exist');
+      }
       CommonDatabase db = sqlite3.open(path);
       appDataProvider.sqlite3Path = path;
 

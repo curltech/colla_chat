@@ -45,6 +45,26 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     connectAction.registerResponsor(_connectResponse);
   }
 
+  @override
+  Future<List<MyselfPeer>> findAll() async {
+    List<MyselfPeer> myselfPeers = await find();
+    if (myselfPeers.isNotEmpty) {
+      for (var myselfPeer in myselfPeers) {
+        String? data = myselfPeer.avatar;
+        if (data != null) {
+          var avatarImage = ImageUtil.buildImageWidget(
+              image: data,
+              height: AppIconSize.lgSize,
+              width: AppIconSize.lgSize,
+              fit: BoxFit.contain);
+          myselfPeer.avatarImage = avatarImage;
+        }
+      }
+    }
+
+    return myselfPeers;
+  }
+
   Future<void> _connectResponse(ChainMessage chainMessage) async {
     if (chainMessage.payloadType == PayloadType.peerClients.name) {
       List<PeerClient> peerClients = chainMessage.payload;
