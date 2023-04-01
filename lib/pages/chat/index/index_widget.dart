@@ -14,9 +14,7 @@ class IndexWidget extends StatefulWidget {
     indexWidgetProvider.controller = controller;
     indexWidgetProvider.define(ChatListWidget());
     indexWidgetProvider.define(LinkmanListWidget());
-    indexWidgetProvider.define(ChannelListWidget(
-      dataMoreController: channelChatMessageController,
-    ));
+    indexWidgetProvider.define(ChannelListWidget());
     indexWidgetProvider.define(MeWidget());
   }
 

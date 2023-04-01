@@ -3,7 +3,6 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/channel/channel_item_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -11,23 +10,19 @@ import 'package:flutter/material.dart';
 
 //频道的页面
 class ChannelListWidget extends StatefulWidget with TileDataMixin {
-  final DataMoreController<ChatMessage> dataMoreController;
   final Future<void> Function()? onRefresh;
   final Function()? onScrollMax;
   final Function()? onScrollMin;
   final ScrollController scrollController = ScrollController();
   late final ChannelItemWidget channelItemWidget;
 
-  ChannelListWidget(
-      {Key? key,
-      this.onRefresh,
-      this.onScrollMax,
-      this.onScrollMin,
-      required this.dataMoreController})
-      : super(key: key) {
-    channelItemWidget = ChannelItemWidget(
-      chatMessage: dataMoreController.current!,
-    );
+  ChannelListWidget({
+    Key? key,
+    this.onRefresh,
+    this.onScrollMax,
+    this.onScrollMin,
+  }) : super(key: key) {
+    channelItemWidget = ChannelItemWidget();
     indexWidgetProvider.define(channelItemWidget);
   }
 
@@ -56,7 +51,7 @@ class _ChannelListWidgetState extends State<ChannelListWidget>
   @override
   void initState() {
     super.initState();
-    widget.dataMoreController.addListener(_update);
+    channelChatMessageController.addListener(_update);
     var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
     animateController = AnimationController(
@@ -65,7 +60,7 @@ class _ChannelListWidgetState extends State<ChannelListWidget>
 
   _update() {
     setState(() {
-      widget.dataMoreController.latest();
+      channelChatMessageController.latest();
     });
   }
 
@@ -101,12 +96,12 @@ class _ChannelListWidgetState extends State<ChannelListWidget>
 
   ///创建每一条消息
   Widget _buildMessageItem(BuildContext context, int index) {
-    List<ChatMessage> chatMessages = widget.dataMoreController.data;
+    List<ChatMessage> chatMessages = channelChatMessageController.data;
     ChatMessage chatMessage = chatMessages[index];
     Widget chatMessageItem = ListTile(
         title: Text(chatMessage.title!),
         onTap: () {
-          widget.dataMoreController.current = chatMessage;
+          channelChatMessageController.current = chatMessage;
         });
 
     // index=0执行动画，对最新的消息执行动画
@@ -142,7 +137,7 @@ class _ChannelListWidgetState extends State<ChannelListWidget>
               //消息组件渲染
               itemBuilder: _buildMessageItem,
               //消息条目数
-              itemCount: widget.dataMoreController.data.length,
+              itemCount: channelChatMessageController.data.length,
             )),
       ),
     ]);
@@ -154,7 +149,7 @@ class _ChannelListWidgetState extends State<ChannelListWidget>
     List<Widget>? rightWidgets = [
       IconButton(
           onPressed: () {
-            widget.dataMoreController.current = null;
+            channelChatMessageController.current = null;
             indexWidgetProvider.push('channel_item');
           },
           icon: const Icon(
@@ -171,7 +166,7 @@ class _ChannelListWidgetState extends State<ChannelListWidget>
 
   @override
   void dispose() {
-    widget.dataMoreController.removeListener(_update);
+    channelChatMessageController.removeListener(_update);
     widget.scrollController.removeListener(_onScroll);
     animateController.dispose();
     super.dispose();
