@@ -75,41 +75,32 @@ class WidgetUtil {
     required Widget icon,
   }) {
     List<Widget> children = [
-      Expanded(
-          child: Container(
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(
-            Radius.circular(5.0),
-          ),
-        ),
-        child: Material(
-            color: Colors.transparent,
-            shape: const CircleBorder(),
-            child: IconButton(
-                onPressed: onPressed,
-                padding: padding,
-                color: iconColor,
-                iconSize: iconSize,
-                icon: icon,
-                tooltip: tooltip != null ? AppLocalizations.t(tooltip) : null)),
-      )),
+      icon,
     ];
     if (label != null) {
       children.add(
         const SizedBox(height: 3.0),
       );
       children.add(
-        Text(
+        Expanded(
+            child: Text(
           label,
           style: TextStyle(
             color: labelColor,
           ),
-        ),
+          overflow: TextOverflow.visible,
+        )),
       );
     }
-    return Column(
-      children: children,
-    );
+    return IconButton(
+        onPressed: onPressed,
+        padding: padding,
+        color: iconColor,
+        iconSize: iconSize,
+        tooltip: tooltip != null ? AppLocalizations.t(tooltip) : null,
+        icon: Column(
+          children: children,
+        ));
   }
 
   static buildInkWell({
@@ -124,38 +115,30 @@ class WidgetUtil {
     required Widget icon,
   }) {
     List<Widget> children = [
-      Expanded(
-          child: Container(
-        padding: padding,
-        decoration: const BoxDecoration(
-          borderRadius: BorderRadius.all(
-            Radius.circular(5.0),
-          ),
-        ),
-        child: Ink(
-            color: backgroundColor,
-            child: InkWell(
-              onTap: onPressed,
-              child: icon,
-            )),
-      )),
+      icon,
     ];
     if (label != null) {
       children.add(
         const SizedBox(height: 3.0),
       );
       children.add(
-        Text(
+        Expanded(
+            child: Text(
           label,
           style: TextStyle(
             color: labelColor,
           ),
-        ),
+          overflow: TextOverflow.visible,
+        )),
       );
     }
-    return Column(
-      children: children,
-    );
+    return Ink(
+        color: backgroundColor,
+        child: InkWell(
+            onTap: onPressed,
+            child: Column(
+              children: children,
+            )));
   }
 
   static ButtonStyle buildButtonStyle(
