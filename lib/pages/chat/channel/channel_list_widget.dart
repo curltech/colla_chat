@@ -14,7 +14,7 @@ class ChannelListWidget extends StatefulWidget with TileDataMixin {
   final Function()? onScrollMax;
   final Function()? onScrollMin;
   final ScrollController scrollController = ScrollController();
-  late final ChannelItemWidget channelItemWidget;
+  final ChannelItemWidget channelItemWidget = ChannelItemWidget();
 
   ChannelListWidget({
     Key? key,
@@ -22,7 +22,6 @@ class ChannelListWidget extends StatefulWidget with TileDataMixin {
     this.onScrollMax,
     this.onScrollMin,
   }) : super(key: key) {
-    channelItemWidget = ChannelItemWidget();
     indexWidgetProvider.define(channelItemWidget);
   }
 
