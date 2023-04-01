@@ -5,7 +5,6 @@ import 'package:colla_chat/widgets/media/audio/player/just_audio_player.dart';
 import 'package:colla_chat/widgets/media/audio/player/waveforms_audio_player.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
 import 'package:colla_chat/widgets/media/video/chewie_video_player.dart';
-import 'package:colla_chat/widgets/media/video/dart_vlc_video_player.dart';
 import 'package:colla_chat/widgets/media/video/flick_video_player.dart';
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
 import 'package:colla_chat/widgets/media/video/webview_video_player.dart';
@@ -84,7 +83,7 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
   _updateMediaPlayerType() {
     switch (widget.videoPlayerType) {
       case VideoPlayerType.dart_vlc:
-        controller = DartVlcVideoPlayerController();
+        //controller = DartVlcVideoPlayerController();
         break;
       case VideoPlayerType.flick:
         controller = FlickVideoPlayerController();

@@ -1,6 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -8,9 +8,9 @@ import 'package:flutter/material.dart';
 import 'package:html_editor_enhanced/html_editor.dart';
 
 class HtmlEdtorWidget extends StatefulWidget {
-  const HtmlEdtorWidget({Key? key, required this.title}) : super(key: key);
+  final double height;
 
-  final String title;
+  const HtmlEdtorWidget({Key? key, required this.height}) : super(key: key);
 
   @override
   State createState() => _HtmlEdtorWidgetState();
@@ -25,151 +25,373 @@ class _HtmlEdtorWidgetState extends State<HtmlEdtorWidget> {
     super.initState();
   }
 
-  Widget _buildEditor() {
+  Widget _buildHtmlEditor(BuildContext context) {
     return HtmlEditor(
       controller: controller,
       htmlEditorOptions: HtmlEditorOptions(
         hint: AppLocalizations.t('Your text here...'),
         shouldEnsureVisible: true,
-        darkMode: myself.getBrightness(context) == Brightness.dark,
         //initialText: "<p>text content initial, if any</p>",
       ),
-      htmlToolbarOptions: HtmlToolbarOptions(
-        toolbarPosition: ToolbarPosition.aboveEditor,
-        //by default
-        toolbarType: ToolbarType.nativeScrollable,
-        buttonColor: myself.primary,
-        //by default
-        onButtonPressed:
-            (ButtonType type, bool? status, Function? updateStatus) {
-          return true;
-        },
-        onDropdownChanged: (DropdownType type, dynamic changed,
-            Function(dynamic)? updateSelectedItem) {
-          return true;
-        },
-        mediaLinkInsertInterceptor: (String url, InsertFileType type) {
-          return true;
-        },
-        mediaUploadInterceptor: (PlatformFile file, InsertFileType type) async {
-          return true;
-        },
-      ),
-      otherOptions: const OtherOptions(height: 550),
-      plugins: [
-        SummernoteAtMention(
-            getSuggestionsMobile: (String value) {
-              var mentions = <String>['test1', 'test2', 'test3'];
-              return mentions
-                  .where((element) => element.contains(value))
-                  .toList();
-            },
-            mentionsWeb: ['test1', 'test2', 'test3'],
-            onSelect: (String value) {
-              logger.i(value);
-            }),
-      ],
+      htmlToolbarOptions: _buildHtmlToolbarOptions(),
+      otherOptions: OtherOptions(height: widget.height),
+      callbacks: _buildCallbacks(),
+      plugins: _buildPlugins(),
     );
+  }
+
+  Callbacks _buildCallbacks() {
+    return Callbacks(onBeforeCommand: (String? currentHtml) {
+      logger.i('html before change is $currentHtml');
+    }, onChangeContent: (String? changed) {
+      logger.i('content changed to $changed');
+    }, onChangeCodeview: (String? changed) {
+      logger.i('code changed to $changed');
+    }, onChangeSelection: (EditorSettings settings) {
+      logger.i('parent element is ${settings.parentElement}');
+      logger.i('font name is ${settings.fontName}');
+    }, onDialogShown: () {
+      logger.i('dialog shown');
+    }, onEnter: () {
+      logger.i('enter/return pressed');
+    }, onFocus: () {
+      logger.i('editor focused');
+    }, onBlur: () {
+      logger.i('editor unfocused');
+    }, onBlurCodeview: () {
+      logger.i('codeview either focused or unfocused');
+    }, onInit: () {
+      logger.i('init');
+    }, onImageUploadError:
+        (FileUpload? file, String? base64Str, UploadError error) {
+      logger.i(describeEnum(error));
+      logger.i(base64Str ?? '');
+      if (file != null) {
+        logger.i(file.name);
+        logger.i(file.size);
+        logger.i(file.type);
+      }
+    }, onKeyDown: (int? keyCode) {
+      logger.i('$keyCode key downed');
+      logger.i('current character count: ${controller.characterCount}');
+    }, onKeyUp: (int? keyCode) {
+      logger.i('$keyCode key released');
+    }, onMouseDown: () {
+      logger.i('mouse downed');
+    }, onMouseUp: () {
+      logger.i('mouse released');
+    }, onNavigationRequestMobile: (String url) {
+      logger.i(url);
+      return NavigationActionPolicy.ALLOW;
+    }, onPaste: () {
+      logger.i('pasted into editor');
+    }, onScroll: () {
+      logger.i('editor scrolled');
+    });
+  }
+
+  HtmlToolbarOptions _buildHtmlToolbarOptions() {
+    return HtmlToolbarOptions(
+      toolbarPosition: ToolbarPosition.aboveEditor,
+      toolbarType: ToolbarType.nativeExpandable,
+      initiallyExpanded: true,
+      toolbarItemHeight: 36,
+      gridViewHorizontalSpacing: 5,
+      gridViewVerticalSpacing: 5,
+      onButtonPressed: (ButtonType type, bool? status, Function? updateStatus) {
+        logger.i(
+            "button '${describeEnum(type)}' pressed, the current selected status is $status");
+        return true;
+      },
+      onDropdownChanged: (DropdownType type, dynamic changed,
+          Function(dynamic)? updateSelectedItem) {
+        logger.i("dropdown '${describeEnum(type)}' changed to $changed");
+        return true;
+      },
+      mediaLinkInsertInterceptor: (String url, InsertFileType type) {
+        logger.i(url);
+        return true;
+      },
+      mediaUploadInterceptor: (PlatformFile file, InsertFileType type) async {
+        logger.i(file.name); //filename
+        logger.i(file.size); //size in bytes
+        logger.i(file.extension); //file extension (eg jpeg or mp4)
+        return true;
+      },
+    );
+  }
+
+  List<Plugins> _buildPlugins() {
+    return [
+      SummernoteAtMention(
+          getSuggestionsMobile: (String value) {
+            var mentions = <String>['test1', 'test2', 'test3'];
+            return mentions
+                .where((element) => element.contains(value))
+                .toList();
+          },
+          mentionsWeb: ['test1', 'test2', 'test3'],
+          onSelect: (String value) {
+            logger.i(value);
+          }),
+    ];
   }
 
   List<ActionData> _buildActionData() {
     List<ActionData> actionData = [];
     actionData.add(
-      ActionData(label: 'Undo', icon: const Icon(Icons.undo)),
+      ActionData(
+        label: 'Undo',
+        icon: const Icon(Icons.undo),
+        onTap: (int index, String label, {String? value}) {
+          controller.undo();
+        },
+      ),
     );
     actionData.add(
-      ActionData(label: 'Reset', icon: const Icon(Icons.clear)),
+      ActionData(
+        label: 'Reset',
+        icon: const Icon(Icons.clear),
+        onTap: (int index, String label, {String? value}) {
+          controller.clear();
+        },
+      ),
     );
     actionData.add(
-      ActionData(label: 'Redo', icon: const Icon(Icons.redo)),
+      ActionData(
+        label: 'Submit',
+        icon: const Icon(Icons.check),
+        onTap: (int index, String label, {String? value}) async {
+          var txt = await controller.getText();
+          if (txt.contains('src=\"data:')) {
+            txt =
+                '<text removed due to base-64 data, displaying the text could cause the app to crash>';
+          }
+          setState(() {
+            result = txt;
+          });
+        },
+      ),
     );
     actionData.add(
-      ActionData(label: 'Enable', icon: const Icon(Icons.comment_sharp)),
+      ActionData(
+        label: 'Redo',
+        icon: const Icon(Icons.redo),
+        onTap: (int index, String label, {String? value}) {
+          controller.redo();
+        },
+      ),
     );
     actionData.add(
-      ActionData(label: 'Disable', icon: const Icon(Icons.comments_disabled)),
+      ActionData(
+        label: 'Disable',
+        icon: const Icon(Icons.disabled_by_default_outlined),
+        onTap: (int index, String label, {String? value}) {
+          controller.disable();
+        },
+      ),
     );
+    actionData.add(
+      ActionData(
+        label: 'Enable',
+        icon: const Icon(Icons.phone_enabled),
+        onTap: (int index, String label, {String? value}) {
+          controller.enable();
+        },
+      ),
+    );
+    actionData.add(
+      ActionData(
+        label: 'Insert Text',
+        icon: const Icon(Icons.text_increase),
+        onTap: (int index, String label, {String? value}) {
+          controller.insertText('Google');
+        },
+      ),
+    );
+    actionData.add(
+      ActionData(
+        label: 'Insert HTML',
+        icon: const Icon(Icons.html),
+        onTap: (int index, String label, {String? value}) {
+          controller
+              .insertHtml('''<p style="color: blue">Google in blue</p>''');
+        },
+      ),
+    );
+    actionData.add(
+      ActionData(
+        label: 'Insert Link',
+        icon: const Icon(Icons.link),
+        onTap: (int index, String label, {String? value}) {
+          controller.insertLink('Google linked', 'https://google.com', true);
+        },
+      ),
+    );
+    actionData.add(
+      ActionData(
+        label: 'Insert network image',
+        icon: const Icon(Icons.image),
+        onTap: (int index, String label, {String? value}) {
+          controller.insertNetworkImage(
+              'https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png',
+              filename: 'Google network image');
+        },
+      ),
+    );
+    actionData.add(
+      ActionData(
+        label: 'Info',
+        icon: const Icon(Icons.info_outline),
+        onTap: (int index, String label, {String? value}) {
+          controller.addNotification(
+              'Info notification', NotificationType.info);
+        },
+      ),
+    );
+    actionData.add(
+      ActionData(
+        label: 'Warning',
+        icon: const Icon(Icons.warning_amber_outlined),
+        onTap: (int index, String label, {String? value}) {
+          controller.addNotification(
+              'Warning notification', NotificationType.warning);
+        },
+      ),
+    );
+    actionData.add(
+      ActionData(
+        label: 'Success',
+        icon: const Icon(Icons.check_circle_outline),
+        onTap: (int index, String label, {String? value}) {
+          controller.addNotification(
+              'Success notification', NotificationType.success);
+        },
+      ),
+    );
+    actionData.add(
+      ActionData(
+        label: 'Danger',
+        icon: const Icon(Icons.dangerous_outlined),
+        onTap: (int index, String label, {String? value}) {
+          controller.addNotification(
+              'Danger notification', NotificationType.danger);
+        },
+      ),
+    );
+    actionData.add(
+      ActionData(
+        label: 'Plaintext',
+        icon: const Icon(Icons.text_format),
+        onTap: (int index, String label, {String? value}) {
+          controller.addNotification(
+              'Plaintext notification', NotificationType.plaintext);
+        },
+      ),
+    );
+    actionData.add(
+      ActionData(
+        label: 'Remove',
+        icon: const Icon(Icons.remove_circle_outline),
+        onTap: (int index, String label, {String? value}) {
+          controller.removeNotification();
+        },
+      ),
+    );
+
     return actionData;
+  }
+
+  Future<dynamic> _showActionCard(BuildContext context) {
+    return SmartDialogUtil.popModalBottomSheet(context, builder: (context) {
+      return Card(
+          child: DataActionCard(
+              // onPressed: (int index, String label, {String? value}) {
+              //   _onAction(context!, index, label, value: value);
+              // },
+              showLabel: true,
+              showTooltip: true,
+              crossAxisCount: 3,
+              actions: _buildActionData(),
+              height: 360,
+              width: 340,
+              size: 20));
+    });
   }
 
   Future<void> _onAction(BuildContext context, int index, String name,
       {String? value}) async {
     switch (name) {
-      case 'Undo':
-        controller.undo();
+      case 'Camera switch':
         break;
-      case 'Reset':
-        controller.clear();
+      case 'Microphone switch':
         break;
-      case 'Redo':
-        controller.redo();
+      case 'Speaker switch':
         break;
-      case 'Enable':
-        controller.enable();
+      case 'Volume increase':
         break;
-      case 'Disable':
-        controller.disable();
+      case 'Volume decrease':
         break;
-      case 'InsertText':
-        controller.insertText('');
+      case 'Volume mute':
         break;
-      case 'InsertHtml':
-        controller.insertHtml('');
+      case 'Zoom out':
         break;
-      case 'InsertLink':
-        controller.insertLink('', '', false);
+      case 'Zoom in':
         break;
-      case 'InsertNetworkImage':
-        controller.insertNetworkImage(
-          '',
-        );
+      case 'Close':
         break;
       default:
         break;
     }
   }
 
-  Widget _buildCustomButton() {
-    return Visibility(
-        visible: true,
-        child: Center(
-            child: Card(
-                child: DataActionCard(
-                    onPressed: (int index, String label, {String? value}) {
-                      _onAction(context, index, label, value: value);
-                    },
-                    showLabel: false,
-                    showTooltip: false,
-                    crossAxisCount: 4,
-                    actions: _buildActionData(),
-                    // height: 120,
-                    //width: 320,
-                    size: 20))));
+  Widget _buildToggleCodeView(BuildContext context) {
+    return FloatingActionButton(
+      onPressed: () {
+        controller.toggleCodeView();
+      },
+      child: Text(r'<\>',
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+    );
+  }
+
+  Widget _buildRefreshButton(BuildContext context) {
+    return IconButton(
+        icon: Icon(Icons.refresh),
+        onPressed: () {
+          if (kIsWeb) {
+            controller.reloadWeb();
+          } else {
+            controller.editorController!.reload();
+          }
+        });
   }
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: () {
-          if (!kIsWeb) {
-            controller.clearFocus();
-          }
-        },
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              _buildEditor(),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: _buildCustomButton(),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(result),
-              ),
-            ],
-          ),
-        ));
+      onTap: () {
+        if (!kIsWeb) {
+          controller.clearFocus();
+        }
+      },
+      onLongPress: () {
+        _showActionCard(context);
+      },
+      child: Card(
+          elevation: 0,
+          margin: EdgeInsets.zero,
+          borderOnForeground: false,
+          clipBehavior: Clip.none,
+          //BeveledRectangleBorder,RoundedRectangleBorder,CircleBorder
+          shape: const ContinuousRectangleBorder(),
+          child: SingleChildScrollView(
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  _buildHtmlEditor(context),
+                ]),
+          )),
+    );
   }
 }

@@ -27,7 +27,7 @@ class PlatformParams {
   String? brightness;
   String? phoneNumber;
 
-  late Map<String, dynamic> deviceData;
+  Map<String, dynamic> deviceData = {};
   String path = '';
 
   Future<void> init() async {

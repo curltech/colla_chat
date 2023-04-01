@@ -7,7 +7,7 @@ import 'package:colla_chat/pages/chat/index/bottom_bar.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/index/index_widget.dart';
 import 'package:colla_chat/pages/chat/login/loading.dart';
-import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -42,7 +42,7 @@ class _IndexViewState extends State<IndexView>
   final CustomSpecialTextSpanBuilder customSpecialTextSpanBuilder =
       CustomSpecialTextSpanBuilder();
   VideoChatMessageController? videoChatMessageController;
-  BlueFireAudioPlayer audioPlayer = BlueFireAudioPlayer();
+  BlueFireAudioPlayer? audioPlayer;
 
   //JustAudioPlayer audioPlayer = JustAudioPlayer();
   Widget bannerAvatarImage = AppImage.mdAppImage;
@@ -50,6 +50,11 @@ class _IndexViewState extends State<IndexView>
   @override
   void initState() {
     super.initState();
+    try {
+      audioPlayer = BlueFireAudioPlayer();
+    } catch (e) {
+      logger.e('BlueFireAudioPlayer create error:$e');
+    }
     globalChatMessageController.addListener(_updateGlobalChatMessage);
     myself.addListener(_update);
     appDataProvider.addListener(_update);
@@ -63,12 +68,12 @@ class _IndexViewState extends State<IndexView>
   }
 
   _play() {
-    audioPlayer.setLoopMode(true);
-    audioPlayer.play('assets/medias/invitation.mp3');
+    audioPlayer?.setLoopMode(true);
+    audioPlayer?.play('assets/medias/invitation.mp3');
   }
 
   _stop() {
-    audioPlayer.stop();
+    audioPlayer?.stop();
   }
 
   ///有新消息到来的时候，一般消息直接显示

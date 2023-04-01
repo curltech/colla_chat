@@ -1,4 +1,5 @@
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -55,7 +56,8 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
       title: widget.title,
       rightWidgets: rightWidgets,
       child: HtmlEdtorWidget(
-        title: widget.title,
+        height:
+            appDataProvider.actualSize.height - appDataProvider.toolbarHeight,
       ),
     );
   }
