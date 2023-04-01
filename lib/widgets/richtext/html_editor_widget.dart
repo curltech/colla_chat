@@ -1,4 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
@@ -160,7 +161,7 @@ class _HtmlEdtorWidgetState extends State<HtmlEdtorWidget> {
     actionData.add(
       ActionData(
         label: 'Submit',
-        icon: const Icon(Icons.check),
+        icon: const Icon(Icons.save),
         onTap: (int index, String label, {String? value}) async {
           var txt = await controller.getText();
           if (txt.contains('src=\"data:')) {
@@ -298,6 +299,28 @@ class _HtmlEdtorWidgetState extends State<HtmlEdtorWidget> {
         },
       ),
     );
+    actionData.add(
+      ActionData(
+        label: 'Toggle code view',
+        icon: const Icon(Icons.toggle_on),
+        onTap: (int index, String label, {String? value}) {
+          controller.toggleCodeView();
+        },
+      ),
+    );
+    actionData.add(
+      ActionData(
+        label: 'Refresh',
+        icon: const Icon(Icons.refresh),
+        onTap: (int index, String label, {String? value}) {
+          if (platformParams.web) {
+            controller.reloadWeb();
+          } else {
+            controller.editorController!.reload();
+          }
+        },
+      ),
+    );
 
     return actionData;
   }
@@ -343,28 +366,6 @@ class _HtmlEdtorWidgetState extends State<HtmlEdtorWidget> {
       default:
         break;
     }
-  }
-
-  Widget _buildToggleCodeView(BuildContext context) {
-    return FloatingActionButton(
-      onPressed: () {
-        controller.toggleCodeView();
-      },
-      child: Text(r'<\>',
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-    );
-  }
-
-  Widget _buildRefreshButton(BuildContext context) {
-    return IconButton(
-        icon: Icon(Icons.refresh),
-        onPressed: () {
-          if (kIsWeb) {
-            controller.reloadWeb();
-          } else {
-            controller.editorController!.reload();
-          }
-        });
   }
 
   @override
