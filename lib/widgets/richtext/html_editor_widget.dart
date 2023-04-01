@@ -98,6 +98,21 @@ class _HtmlEdtorWidgetState extends State<HtmlEdtorWidget> {
       toolbarPosition: ToolbarPosition.aboveEditor,
       toolbarType: ToolbarType.nativeExpandable,
       initiallyExpanded: true,
+      defaultToolbarButtons : const [
+        StyleButtons(),
+        FontSettingButtons(fontSizeUnit: true),
+        FontButtons(clearAll: false),
+        ColorButtons(),
+        ListButtons(listStyles: true),
+        ParagraphButtons(
+            textDirection: true, lineHeight: true, caseConverter: true),
+        InsertButtons(
+            video: true,
+            audio: true,
+            table: true,
+            hr: true,
+            otherFile: true),
+      ],
       toolbarItemHeight: 36,
       gridViewHorizontalSpacing: 5,
       gridViewVerticalSpacing: 5,
