@@ -10,17 +10,21 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:html_editor_enhanced/html_editor.dart';
 
-class HtmlEdtorWidget extends StatefulWidget {
+class HtmlEditorWidget extends StatefulWidget {
   final double height;
+  final String? initialText;
+  final Function(String? result)? onSave;
 
-  const HtmlEdtorWidget({Key? key, required this.height}) : super(key: key);
+  const HtmlEditorWidget(
+      {Key? key, required this.height, this.initialText, this.onSave})
+      : super(key: key);
 
   @override
-  State createState() => _HtmlEdtorWidgetState();
+  State createState() => _HtmlEditorWidgetState();
 }
 
-class _HtmlEdtorWidgetState extends State<HtmlEdtorWidget> {
-  String result = '';
+class _HtmlEditorWidgetState extends State<HtmlEditorWidget> {
+  String? result;
   final HtmlEditorController controller = HtmlEditorController();
 
   @override
@@ -34,7 +38,7 @@ class _HtmlEdtorWidgetState extends State<HtmlEdtorWidget> {
       htmlEditorOptions: HtmlEditorOptions(
         hint: AppLocalizations.t('Your text here...'),
         shouldEnsureVisible: true,
-        //initialText: "<p>text content initial, if any</p>",
+        initialText: widget.initialText,
       ),
       htmlToolbarOptions: _buildHtmlToolbarOptions(),
       otherOptions: OtherOptions(height: widget.height),
@@ -98,7 +102,7 @@ class _HtmlEdtorWidgetState extends State<HtmlEdtorWidget> {
       toolbarPosition: ToolbarPosition.aboveEditor,
       toolbarType: ToolbarType.nativeExpandable,
       initiallyExpanded: true,
-      defaultToolbarButtons : const [
+      defaultToolbarButtons: const [
         StyleButtons(),
         FontSettingButtons(fontSizeUnit: true),
         FontButtons(clearAll: false),
@@ -107,11 +111,7 @@ class _HtmlEdtorWidgetState extends State<HtmlEdtorWidget> {
         ParagraphButtons(
             textDirection: true, lineHeight: true, caseConverter: true),
         InsertButtons(
-            video: true,
-            audio: true,
-            table: true,
-            hr: true,
-            otherFile: true),
+            video: true, audio: true, table: true, hr: true, otherFile: true),
       ],
       toolbarItemHeight: 36,
       gridViewHorizontalSpacing: 5,
@@ -181,13 +181,14 @@ class _HtmlEdtorWidgetState extends State<HtmlEdtorWidget> {
         icon: const Icon(Icons.save),
         onTap: (int index, String label, {String? value}) async {
           var txt = await controller.getText();
+          result = txt;
+          if (widget.onSave != null) {
+            widget.onSave!(result);
+          }
           if (txt.contains('src=\"data:')) {
             txt =
                 '<text removed due to base-64 data, displaying the text could cause the app to crash>';
           }
-          setState(() {
-            result = txt;
-          });
         },
       ),
     );

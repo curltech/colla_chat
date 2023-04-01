@@ -26,7 +26,7 @@ class ChannelListWidget extends StatefulWidget with TileDataMixin {
       required this.dataMoreController})
       : super(key: key) {
     channelItemWidget = ChannelItemWidget(
-      dataMoreController: dataMoreController,
+      chatMessage: dataMoreController.current!,
     );
     indexWidgetProvider.define(channelItemWidget);
   }
