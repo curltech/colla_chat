@@ -2,6 +2,7 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/richtext/html_editor_widget.dart';
 import 'package:flutter/material.dart';
 
 class ChannelItemWidget extends StatefulWidget with TileDataMixin {
@@ -49,11 +50,13 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
           icon: const Icon(Icons.save)),
     ];
     return AppBarView(
-      centerTitle: true,
+      centerTitle: false,
       withLeading: true,
       title: widget.title,
       rightWidgets: rightWidgets,
-      child: Container(),
+      child: HtmlEdtorWidget(
+        title: widget.title,
+      ),
     );
   }
 }

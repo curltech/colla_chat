@@ -19,7 +19,7 @@ class AppDataProvider with ChangeNotifier {
 
   //屏幕宽高
   double _keyboardHeight = 270.0;
-  Size _totalSize = const Size(0.0, 0.0);
+  Size _totalSize = const Size(412.0, 892.0);
   double bottomBarHeight = kBottomNavigationBarHeight;
   double toolbarHeight = kToolbarHeight;
   String sqlite3Path = '';
@@ -93,12 +93,15 @@ class AppDataProvider with ChangeNotifier {
 
   ///当外部改变屏幕大小的时候引起index页面的重建，从而调用这个方法改变size
   changeSize(BuildContext context) {
-    _totalSize = MediaQuery.of(context).size;
+    var totalSize = MediaQuery.of(context).size;
+    if (totalSize.width != _totalSize.width ||
+        totalSize.height != _totalSize.height) {
+      _totalSize = totalSize;
+    }
     var bottom = MediaQuery.of(context).viewInsets.bottom;
     if (_keyboardHeight == 270.0 && bottom != 0) {
       _keyboardHeight = bottom;
     }
-    notifyListeners();
   }
 }
 

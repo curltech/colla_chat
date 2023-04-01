@@ -285,9 +285,9 @@ class _IndexViewState extends State<IndexView>
         offstage: !indexWidgetProvider.bottomBarVisible,
         child: const BottomBar());
     var toolbarHeight = 0.0;
-    if (platformParams.android) {
-      toolbarHeight = 45.0;
-    }
+    // if (platformParams.android) {
+    //   toolbarHeight = 45.0;
+    // }
     Scaffold scaffold = Scaffold(
         appBar: AppBar(toolbarHeight: toolbarHeight, elevation: 0.0),
         body: SafeArea(
@@ -314,7 +314,7 @@ class _IndexViewState extends State<IndexView>
 
   @override
   Widget build(BuildContext context) {
-    //appDataProvider.changeSize(context);
+    appDataProvider.changeSize(context);
     var provider = Consumer3<AppDataProvider, IndexWidgetProvider, Myself>(
       builder: (context, appDataProvider, indexWidgetProvider, myself, child) =>
           _createScaffold(context, indexWidgetProvider),

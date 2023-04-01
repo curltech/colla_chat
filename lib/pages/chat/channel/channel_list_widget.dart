@@ -163,7 +163,7 @@ class _ChannelListWidgetState extends State<ChannelListWidget>
           )),
     ];
     return AppBarView(
-        centerTitle: true,
+        centerTitle: false,
         title: widget.title,
         rightWidgets: rightWidgets,
         child: chatMessageWidget);
