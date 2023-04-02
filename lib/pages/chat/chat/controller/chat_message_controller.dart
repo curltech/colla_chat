@@ -198,7 +198,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
             ChatMessageMimeType.values, mimeType);
     if (type == PartyType.linkman) {
       ChatMessage chatMessage = await chatMessageService.buildChatMessage(
-          peerId,
+          receiverPeerId: peerId,
           title: title,
           content: content,
           contentType: contentType,

@@ -189,7 +189,8 @@ class LinkmanService extends PeerPartyService<Linkman> {
       {TransportType transportType = TransportType.webrtc,
       CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     // 加好友会发送自己的信息，回执将收到对方的信息
-    ChatMessage chatMessage = await chatMessageService.buildChatMessage(peerId,
+    ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+        receiverPeerId: peerId,
         content: myself.myselfPeer,
         subMessageType: ChatMessageSubType.addFriend,
         transportType: transportType,
@@ -229,7 +230,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
     Map<String, dynamic> map = JsonUtil.toJson(myself.myselfPeer);
     PeerClient peerClient = PeerClient.fromJson(map);
     ChatMessage chatMessage = await chatMessageService.buildChatMessage(
-      peerId,
+      receiverPeerId: peerId,
       clientId: clientId,
       content: peerClient,
       messageType: ChatMessageType.system,

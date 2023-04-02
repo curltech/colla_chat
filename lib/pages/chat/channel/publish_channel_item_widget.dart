@@ -5,26 +5,27 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/richtext/html_editor_widget.dart';
 import 'package:flutter/material.dart';
 
-class ChannelItemWidget extends StatefulWidget with TileDataMixin {
-  ChannelItemWidget({Key? key}) : super(key: key);
+///自己发布频道消息编辑页面
+class PublishChannelItemWidget extends StatefulWidget with TileDataMixin {
+  PublishChannelItemWidget({Key? key}) : super(key: key);
 
   @override
-  State createState() => _ChannelItemWidgetState();
+  State createState() => _PublishChannelItemWidgetState();
 
   @override
-  String get routeName => 'channel_item';
+  String get routeName => 'publish_channel_item';
 
   @override
   bool get withLeading => true;
 
   @override
-  IconData get iconData => Icons.wifi_channel;
+  IconData get iconData => Icons.edit;
 
   @override
-  String get title => 'Channel Item';
+  String get title => 'Publish Channel Item';
 }
 
-class _ChannelItemWidgetState extends State<ChannelItemWidget> {
+class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
   final TextEditingController textEditingController = TextEditingController();
   List<int>? thumbnail;
 
@@ -34,7 +35,7 @@ class _ChannelItemWidgetState extends State<ChannelItemWidget> {
   }
 
   Future<void> _store(String? result) async {
-    await channelChatMessageController.store(
+    await myChannelChatMessageController.store(
         textEditingController.text, result!, thumbnail);
   }
 

@@ -24,6 +24,7 @@ import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+
 // import 'package:colla_chat/transport/nearby_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/websocket.dart';
@@ -252,8 +253,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
 
   ///content和receiptContent可以是任意对象，最终会是base64的字符串
   //未填写的字段：transportType,senderAddress,receiverAddress,receiveTime,actualReceiveTime,readTime,destroyTime
-  Future<ChatMessage> buildChatMessage(
-    String receiverPeerId, {
+  Future<ChatMessage> buildChatMessage({
+    String? receiverPeerId,
     dynamic content,
     String? clientId,
     String? messageId,
@@ -295,7 +296,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.sendTime = current;
     chatMessage.readTime = current;
     chatMessage.receiverPeerId = receiverPeerId;
-    if (receiverName == null) {
+    if (receiverName == null && receiverPeerId != null) {
       PeerClient? peerClient =
           await peerClientService.findCachedOneByPeerId(receiverPeerId);
       if (peerClient != null) {
@@ -376,7 +377,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       }
     }
 
-    var groupChatMessage = await buildChatMessage(groupPeerId,
+    var groupChatMessage = await buildChatMessage(
+        receiverPeerId: groupPeerId,
         content: content,
         messageId: messageId,
         messageType: messageType,
@@ -413,7 +415,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       }
       var receiverName = linkman.name;
       ChatMessage chatMessage = await buildChatMessage(
-        peerId,
+        receiverPeerId: peerId,
         messageId: messageId,
         messageType: messageType,
         subMessageType: subMessageType,
@@ -511,7 +513,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     clientId = clientId ?? chatMessage.senderClientId;
     receiverName = receiverName ?? chatMessage.senderName;
     ChatMessage chatReceipt = await buildChatMessage(
-      receiverPeerId,
+      receiverPeerId: receiverPeerId,
       clientId: clientId,
       receiverName: receiverName,
       messageId: chatMessage.messageId,
@@ -688,7 +690,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
             ChatMessageMimeType.values, chatMessage.mimeType);
     if (linkman != null) {
       ChatMessage? message = await buildChatMessage(
-        peerId,
+        receiverPeerId: peerId,
         content: content,
         messageType: messageType!,
         subMessageType: subMessageType!,

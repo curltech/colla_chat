@@ -398,7 +398,7 @@ class AdvancedPeerConnection {
     try {
       if (connected) {
         ChatMessage chatMessage = await chatMessageService.buildChatMessage(
-            peerId,
+            receiverPeerId: peerId,
             content: evt.data,
             clientId: clientId,
             messageType: ChatMessageType.system,

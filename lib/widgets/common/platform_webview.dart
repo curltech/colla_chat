@@ -104,9 +104,10 @@ class PlatformWebViewController with ChangeNotifier {
 /// 平台Webview，打开一个内部的浏览器窗口，可以用来观看网页，音频，视频文件，office文件
 class PlatformWebView extends StatefulWidget {
   final String? initialUrl;
+  final String? html;
   final void Function(PlatformWebViewController controller)? onWebViewCreated;
 
-  const PlatformWebView({super.key, this.initialUrl, this.onWebViewCreated});
+  const PlatformWebView({super.key, this.initialUrl,this.html, this.onWebViewCreated});
 
   @override
   State createState() => _PlatformWebViewState();
@@ -133,6 +134,7 @@ class _PlatformWebViewState extends State<PlatformWebView> {
     if (platformParams.windows || platformParams.mobile || platformParams.web) {
       platformWebView = FlutterWebView(
         initialUrl: widget.initialUrl,
+        html: widget.html,
         onWebViewCreated: (webview.WebViewController controller) {
           _onWebViewCreated(controller);
         },
@@ -140,6 +142,7 @@ class _PlatformWebViewState extends State<PlatformWebView> {
     } else {
       platformWebView = FlutterInAppWebView(
         initialUrl: widget.initialUrl,
+        html: widget.html,
         onWebViewCreated: (inapp.InAppWebViewController controller) {
           _onWebViewCreated(controller);
         },

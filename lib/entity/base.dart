@@ -16,6 +16,7 @@ enum EntityStatus {
   merged,
   reversed,
   subscript,
+  published,
 }
 
 ///实体的脏标志，新增，删除，更新，

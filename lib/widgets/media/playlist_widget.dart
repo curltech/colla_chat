@@ -223,7 +223,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
         StringUtil.enumFromString(ChatMessageContentType.values, fileType);
     contentType = contentType ?? ChatMessageContentType.media;
     var chatMessage = await chatMessageService.buildChatMessage(
-      myself.peerId!,
+      receiverPeerId: myself.peerId!,
       messageType: ChatMessageType.collection,
       contentType: contentType,
       mimeType: chatMessageMimeType,

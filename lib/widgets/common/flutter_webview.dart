@@ -6,9 +6,11 @@ import 'package:webview_flutter/webview_flutter.dart';
 /// FlutterWebView，打开一个内部的浏览器窗口，可以用来观看网页，音频，视频文件，office文件
 class FlutterWebView extends StatefulWidget {
   final String? initialUrl;
+  final String? html;
   final void Function(WebViewController controller)? onWebViewCreated;
 
-  const FlutterWebView({super.key, this.initialUrl, this.onWebViewCreated});
+  const FlutterWebView(
+      {super.key, this.initialUrl, this.html, this.onWebViewCreated});
 
   @override
   State createState() => _FlutterWebViewState();
@@ -37,7 +39,12 @@ class _FlutterWebViewState extends State<FlutterWebView> {
       onWebResourceError: (error) =>
           logger.i("onWebResourceError: ${error.description}"),
     ));
-    controller!.loadRequest(Uri.parse(widget.initialUrl!));
+    if (widget.initialUrl != null) {
+      controller!.loadRequest(Uri.parse(widget.initialUrl!));
+    }
+    if (widget.html != null) {
+      controller!.loadHtmlString(widget.html!);
+    }
     if (widget.onWebViewCreated != null) {
       widget.onWebViewCreated!(controller!);
     }

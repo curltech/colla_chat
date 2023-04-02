@@ -5,10 +5,11 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 /// InAppWebView，打开一个内部的浏览器窗口，可以用来观看网页，音频，视频文件，office文件
 class FlutterInAppWebView extends StatefulWidget {
   final String? initialUrl;
+  final String? html;
   final void Function(InAppWebViewController controller)? onWebViewCreated;
 
   const FlutterInAppWebView(
-      {super.key, this.initialUrl, this.onWebViewCreated});
+      {super.key, this.initialUrl, this.html, this.onWebViewCreated});
 
   @override
   State createState() => _FlutterInAppWebViewState();
@@ -83,6 +84,9 @@ class _FlutterInAppWebViewState extends State<FlutterInAppWebView> {
         onUpdateVisitedHistory: (controller, url, androidIsReload) {},
         onConsoleMessage: (controller, consoleMessage) {},
       );
+      if (widget.html != null) {
+        controller!.loadData(data: widget.html!);
+      }
     } else {
       inAppWebView = Container();
     }

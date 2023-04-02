@@ -4,7 +4,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/channel/channel_item_widget.dart';
+import 'package:colla_chat/pages/chat/channel/channel_message_view.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/image_util.dart';
@@ -12,40 +12,40 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
-//频道的页面
-class ChannelListWidget extends StatefulWidget with TileDataMixin {
+//频道的页面,展示自己订阅的频道消息列表
+class SubscribeChannelListWidget extends StatefulWidget with TileDataMixin {
   final Future<void> Function()? onRefresh;
   final Function()? onScrollMax;
   final Function()? onScrollMin;
   final ScrollController scrollController = ScrollController();
-  final ChannelItemWidget channelItemWidget = ChannelItemWidget();
+  final ChannelMessageView channelMessageView = ChannelMessageView();
 
-  ChannelListWidget({
+  SubscribeChannelListWidget({
     Key? key,
     this.onRefresh,
     this.onScrollMax,
     this.onScrollMin,
   }) : super(key: key) {
-    indexWidgetProvider.define(channelItemWidget);
+    indexWidgetProvider.define(channelMessageView);
   }
 
   @override
-  State createState() => _ChannelListWidgetState();
+  State createState() => _SubscribeChannelListWidgetState();
 
   @override
   bool get withLeading => true;
 
   @override
-  String get routeName => 'channel';
+  String get routeName => 'subscribe_channel';
 
   @override
   IconData get iconData => Icons.wifi_channel;
 
   @override
-  String get title => 'Channel';
+  String get title => 'SubscribeChannel';
 }
 
-class _ChannelListWidgetState extends State<ChannelListWidget>
+class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
     with TickerProviderStateMixin {
   late final AnimationController animateController;
 
@@ -122,6 +122,7 @@ class _ChannelListWidgetState extends State<ChannelListWidget>
     Widget chatMessageItem = InkWell(
         onTap: () {
           channelChatMessageController.current = chatMessage;
+          indexWidgetProvider.push('channel_message_view');
         },
         child: Column(children: [
           Row(
@@ -174,11 +175,10 @@ class _ChannelListWidgetState extends State<ChannelListWidget>
     List<Widget>? rightWidgets = [
       IconButton(
           onPressed: () {
-            channelChatMessageController.current = null;
-            indexWidgetProvider.push('channel_item');
+            indexWidgetProvider.push('publish_channel');
           },
           icon: const Icon(
-            Icons.note_add,
+            Icons.publish,
             color: Colors.white,
           )),
     ];
