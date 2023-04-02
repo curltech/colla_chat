@@ -110,7 +110,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
   }
 
   ///创建每一条消息
-  Widget _buildMessageItem(BuildContext context, int index) {
+  Widget _buildChatMessageItem(BuildContext context, int index) {
     ChatMessage chatMessage = chatMessageController.data[index];
     Widget chatMessageItem = ChatMessageItem(
         key: UniqueKey(), chatMessage: chatMessage, index: index);
@@ -143,7 +143,7 @@ class _ChatMessageWidgetState extends State<ChatMessageWidget>
           padding: const EdgeInsets.all(8.0),
           reverse: true,
           //消息组件渲染
-          itemBuilder: _buildMessageItem,
+          itemBuilder: _buildChatMessageItem,
           //消息条目数
           itemCount: chatMessageController.data.length,
         ));

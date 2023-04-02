@@ -49,6 +49,20 @@ class ChannelChatMessageController extends DataMoreController<ChatMessage> {
       notifyListeners();
     }
   }
+
+  store(String title, String content, List<int>? thumbnail) async {
+    ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+        myself.peerId!,
+        title: title,
+        content: content,
+        thumbnail: thumbnail,
+        messageType: ChatMessageType.channel,
+        subMessageType: ChatMessageSubType.sendChannel,
+        transportType: TransportType.none,
+        contentType: ChatMessageContentType.rich,
+        mimeType: ChatMessageMimeType.html);
+    await chatMessageService.store(chatMessage);
+  }
 }
 
 ///好友或者群的消息控制器，包含某个连接的所有消息

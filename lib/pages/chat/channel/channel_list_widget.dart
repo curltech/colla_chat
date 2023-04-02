@@ -1,9 +1,13 @@
+import 'dart:async';
+
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/channel/channel_item_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -43,8 +47,6 @@ class ChannelListWidget extends StatefulWidget with TileDataMixin {
 
 class _ChannelListWidgetState extends State<ChannelListWidget>
     with TickerProviderStateMixin {
-  final _scrollController = ScrollController();
-  final _focusNode = FocusNode();
   late final AnimationController animateController;
 
   @override
@@ -93,15 +95,44 @@ class _ChannelListWidgetState extends State<ChannelListWidget>
     }
   }
 
+  _scrollMin() {
+    // scroll to the bottom of the list when keyboard appears
+    Timer(
+        const Duration(milliseconds: 200),
+        () => widget.scrollController.animateTo(
+            widget.scrollController.position.minScrollExtent,
+            duration: const Duration(milliseconds: 500),
+            curve: Curves.easeIn));
+  }
+
   ///创建每一条消息
-  Widget _buildMessageItem(BuildContext context, int index) {
+  Widget _buildChannelChatMessageItem(BuildContext context, int index) {
     List<ChatMessage> chatMessages = channelChatMessageController.data;
     ChatMessage chatMessage = chatMessages[index];
-    Widget chatMessageItem = ListTile(
-        title: Text(chatMessage.title!),
+    String senderPeerId = chatMessage.senderPeerId!;
+    String name = chatMessage.senderName!;
+    Widget avatarImage = AppImage.mdAppImage;
+    // Linkman? linkman = await linkmanService.findCachedOneByPeerId(senderPeerId);
+    // if (linkman != null && linkman.avatarImage != null) {
+    //   avatarImage = linkman.avatarImage!;
+    // }
+    String title = chatMessage.title!;
+    String thumbnail = chatMessage.thumbnail!;
+    Widget thumbnailWidget = ImageUtil.buildImageWidget(image: thumbnail);
+    Widget chatMessageItem = InkWell(
         onTap: () {
           channelChatMessageController.current = chatMessage;
-        });
+        },
+        child: Column(children: [
+          Row(
+            children: [
+              avatarImage,
+              Text(name),
+            ],
+          ),
+          Text(title),
+          thumbnailWidget,
+        ]));
 
     // index=0执行动画，对最新的消息执行动画
     if (index == 0) {
@@ -122,29 +153,24 @@ class _ChannelListWidgetState extends State<ChannelListWidget>
   }
 
   ///创建消息显示面板，包含消息的输入框
-  Widget _buildChatMessageWidget(BuildContext context) {
-    return Column(children: <Widget>[
-      Flexible(
-        //使用列表渲染消息
-        child: RefreshIndicator(
-            onRefresh: _onRefresh,
-            //notificationPredicate: _notificationPredicate,
-            child: ListView.builder(
-              controller: widget.scrollController,
-              padding: const EdgeInsets.all(8.0),
-              reverse: true,
-              //消息组件渲染
-              itemBuilder: _buildMessageItem,
-              //消息条目数
-              itemCount: channelChatMessageController.data.length,
-            )),
-      ),
-    ]);
+  Widget _buildChannelChatMessageWidget(BuildContext context) {
+    return RefreshIndicator(
+        onRefresh: _onRefresh,
+        //notificationPredicate: _notificationPredicate,
+        child: ListView.builder(
+          controller: widget.scrollController,
+          padding: const EdgeInsets.all(8.0),
+          reverse: true,
+          //消息组件渲染
+          itemBuilder: _buildChannelChatMessageItem,
+          //消息条目数
+          itemCount: channelChatMessageController.data.length,
+        ));
   }
 
   @override
   Widget build(BuildContext context) {
-    var chatMessageWidget = _buildChatMessageWidget(context);
+    var channelChatMessageWidget = _buildChannelChatMessageWidget(context);
     List<Widget>? rightWidgets = [
       IconButton(
           onPressed: () {
@@ -160,7 +186,7 @@ class _ChannelListWidgetState extends State<ChannelListWidget>
         centerTitle: false,
         title: widget.title,
         rightWidgets: rightWidgets,
-        child: chatMessageWidget);
+        child: channelChatMessageWidget);
   }
 
   @override

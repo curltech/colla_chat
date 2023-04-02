@@ -19,6 +19,7 @@ enum ChatMessageContentType {
 
 enum ChatMessageMimeType {
   text,
+  html,
   gif,
   png,
   jpeg,
