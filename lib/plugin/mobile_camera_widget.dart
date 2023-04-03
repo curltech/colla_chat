@@ -564,7 +564,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
           },
           tooltip: 'Toggle Picture Video',
         ),
-        WidgetUtil.buildCircleButton(
+        SimpleWidgetUtil.buildCircleButton(
           onPressed:
               cameraController != null && cameraController.value.isInitialized
                   ? _captureMedia

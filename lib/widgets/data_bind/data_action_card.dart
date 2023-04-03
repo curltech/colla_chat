@@ -83,7 +83,7 @@ class DataActionCard extends StatelessWidget {
       BuildContext context, ActionData actionData, int index) {
     var label = AppLocalizations.t(actionData.label);
     var tooltip = AppLocalizations.t(actionData.tooltip ?? '');
-    return WidgetUtil.buildIconTextButton(
+    return SimpleWidgetUtil.buildIconTextButton(
         iconColor: myself.primary,
         iconSize: size,
         onPressed: () {
@@ -134,7 +134,7 @@ class DataActionCard extends StatelessWidget {
   Widget _buildInkWell(BuildContext context, ActionData actionData, int index) {
     var label = AppLocalizations.t(actionData.label);
     var tooltip = AppLocalizations.t(actionData.tooltip ?? '');
-    return WidgetUtil.buildInkWell(
+    return SimpleWidgetUtil.buildInkWell(
         padding: const EdgeInsets.all(5.0),
         iconColor: myself.primary,
         iconSize: size,
@@ -163,7 +163,7 @@ class DataActionCard extends StatelessWidget {
               Radius.circular(5.0),
             ),
           ),
-          child: WidgetUtil.buildCircleButton(
+          child: SimpleWidgetUtil.buildCircleButton(
               backgroundColor: myself.primary,
               onPressed: () {
                 if (onPressed != null) {

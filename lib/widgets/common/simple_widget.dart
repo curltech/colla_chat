@@ -2,7 +2,9 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:flutter/material.dart';
 
-class WidgetUtil {
+///常用的一些简单组件
+class SimpleWidgetUtil {
+  ///创建常用的大图标按钮
   static buildCircleButton({
     Key? key,
     String? label,
@@ -63,6 +65,7 @@ class WidgetUtil {
     return button;
   }
 
+  ///创建常用的图标文本按钮
   static buildIconTextButton({
     Key? key,
     required void Function()? onPressed,
@@ -103,6 +106,7 @@ class WidgetUtil {
         ));
   }
 
+  ///创建常用的InkWell按钮
   static buildInkWell({
     Key? key,
     required void Function()? onPressed,
@@ -141,6 +145,7 @@ class WidgetUtil {
             )));
   }
 
+  ///创建常用的文按钮样式
   static ButtonStyle buildButtonStyle(
       {TextStyle? textStyle,
       Color? backgroundColor,
@@ -172,5 +177,44 @@ class WidgetUtil {
     );
 
     return style;
+  }
+
+  ///创建常用的文本输入字段
+  static Widget buildTextFormField({
+    TextEditingController? controller,
+    TextInputType? textInputType,
+    int? maxLines = 1,
+    int? minLines,
+    bool readOnly = false,
+    Color? fillColor,
+    String? labelText,
+    Widget? prefixIcon,
+    Widget? suffixIcon,
+    Widget? suffix,
+    String? hintText,
+  }) {
+    var textFormField = TextFormField(
+      controller: controller,
+      keyboardType: textInputType,
+      maxLines: maxLines,
+      minLines: 1,
+      readOnly: readOnly,
+      decoration: InputDecoration(
+          fillColor: fillColor ?? Colors.grey.withOpacity(AppOpacity.xlOpacity),
+          filled: true,
+          border: InputBorder.none,
+          focusedBorder: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          errorBorder: InputBorder.none,
+          disabledBorder: InputBorder.none,
+          focusedErrorBorder: InputBorder.none,
+          labelText: labelText,
+          prefixIcon: prefixIcon,
+          suffixIcon: suffixIcon,
+          suffix: suffix,
+          hintText: hintText),
+    );
+
+    return textFormField;
   }
 }

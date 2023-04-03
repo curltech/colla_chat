@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.dart';
@@ -106,17 +105,10 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
             curve: Curves.easeIn));
   }
 
-  ///创建每一条消息
+  ///展示每一条消息
   Widget _buildChannelChatMessageItem(BuildContext context, int index) {
     List<ChatMessage> chatMessages = myChannelChatMessageController.data;
     ChatMessage chatMessage = chatMessages[index];
-    String senderPeerId = chatMessage.senderPeerId!;
-    String name = chatMessage.senderName!;
-    Widget avatarImage = AppImage.mdAppImage;
-    // Linkman? linkman = await linkmanService.findCachedOneByPeerId(senderPeerId);
-    // if (linkman != null && linkman.avatarImage != null) {
-    //   avatarImage = linkman.avatarImage!;
-    // }
     String title = chatMessage.title!;
     String thumbnail = chatMessage.thumbnail!;
     Widget thumbnailWidget = ImageUtil.buildImageWidget(image: thumbnail);
@@ -126,12 +118,6 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
           indexWidgetProvider.push('publish_channel_item');
         },
         child: Column(children: [
-          Row(
-            children: [
-              avatarImage,
-              Text(name),
-            ],
-          ),
           Text(title),
           thumbnailWidget,
         ]));

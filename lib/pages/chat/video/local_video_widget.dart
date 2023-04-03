@@ -555,7 +555,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     Widget button = ValueListenableBuilder<bool>(
         valueListenable: speakerStatus,
         builder: (BuildContext context, bool status, Widget? child) {
-          return WidgetUtil.buildCircleButton(
+          return SimpleWidgetUtil.buildCircleButton(
             label: status ? 'Speaker on' : 'Speaker off',
             onPressed: () async {
               speakerStatus.value = !speakerStatus.value;
@@ -591,7 +591,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               label = 'Exit';
               tip = 'Chatting';
             }
-            buttonWidget = WidgetUtil.buildCircleButton(
+            buttonWidget = SimpleWidgetUtil.buildCircleButton(
               label: label,
               tip: tip,
               onPressed: () {
@@ -628,7 +628,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               label = 'Join';
               tip = 'In conference';
             }
-            buttonWidget = WidgetUtil.buildCircleButton(
+            buttonWidget = SimpleWidgetUtil.buildCircleButton(
               label: label,
               tip: tip,
               onPressed: () async {
@@ -646,7 +646,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               ),
             );
           } else {
-            buttonWidget = WidgetUtil.buildCircleButton(
+            buttonWidget = SimpleWidgetUtil.buildCircleButton(
               elevation: 2.0,
               backgroundColor: Colors.grey,
               padding: const EdgeInsets.all(15.0),

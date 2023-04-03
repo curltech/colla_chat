@@ -643,8 +643,8 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
     children.add(Expanded(
         child: SingleChildScrollView(
             controller: ScrollController(), child: selectView)));
-    ButtonStyle style = WidgetUtil.buildButtonStyle();
-    ButtonStyle mainStyle = WidgetUtil.buildButtonStyle(
+    ButtonStyle style = SimpleWidgetUtil.buildButtonStyle();
+    ButtonStyle mainStyle = SimpleWidgetUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);
     children.add(ButtonBar(
       children: [

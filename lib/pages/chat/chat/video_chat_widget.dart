@@ -79,7 +79,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   ///最小化界面，将overlay按钮压入，本界面被弹出
   _minimize(BuildContext context) {
     widget.overlayEntry = DragOverlay(
-      child: WidgetUtil.buildCircleButton(
+      child: SimpleWidgetUtil.buildCircleButton(
           padding: const EdgeInsets.all(15.0),
           backgroundColor: myself.primary,
           onPressed: () {

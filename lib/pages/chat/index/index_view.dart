@@ -192,7 +192,7 @@ class _IndexViewState extends State<IndexView>
     name = name ?? '';
     var title = chatMessage.title;
     title = title ?? '';
-    var rejectedButton = WidgetUtil.buildCircleButton(
+    var rejectedButton = SimpleWidgetUtil.buildCircleButton(
         onPressed: () async {
           videoChatMessageVisible.value = false;
           _stop();
@@ -202,7 +202,7 @@ class _IndexViewState extends State<IndexView>
         },
         child: const Icon(color: Colors.white, size: 16, Icons.call_end),
         backgroundColor: Colors.red);
-    var holdButton = WidgetUtil.buildCircleButton(
+    var holdButton = SimpleWidgetUtil.buildCircleButton(
         onPressed: () async {
           videoChatMessageVisible.value = false;
           _stop();
@@ -212,7 +212,7 @@ class _IndexViewState extends State<IndexView>
         },
         child: const Icon(color: Colors.white, size: 16, Icons.add_call),
         backgroundColor: Colors.amber);
-    var acceptedButton = WidgetUtil.buildCircleButton(
+    var acceptedButton = SimpleWidgetUtil.buildCircleButton(
         onPressed: () async {
           videoChatMessageVisible.value = false;
           _stop();

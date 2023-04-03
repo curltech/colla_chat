@@ -51,7 +51,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
   }
 
   Widget _buildLogout(BuildContext context) {
-    ButtonStyle style = WidgetUtil.buildButtonStyle(
+    ButtonStyle style = SimpleWidgetUtil.buildButtonStyle(
         maximumSize: const Size(140.0, 56.0), backgroundColor: myself.primary);
 
     var indexWidgetProvider =

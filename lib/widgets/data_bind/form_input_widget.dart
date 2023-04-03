@@ -251,8 +251,8 @@ class _FormInputWidgetState extends State<FormInputWidget> {
   }
 
   Widget _buildButtonBar(BuildContext context) {
-    ButtonStyle style = WidgetUtil.buildButtonStyle();
-    ButtonStyle mainStyle = WidgetUtil.buildButtonStyle(
+    ButtonStyle style = SimpleWidgetUtil.buildButtonStyle();
+    ButtonStyle mainStyle = SimpleWidgetUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);
     if (widget.onOk != null) {
       return ButtonBar(children: [

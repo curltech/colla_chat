@@ -3,10 +3,12 @@ import 'dart:async';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/channel/channel_message_view.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -109,31 +111,8 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
   Widget _buildChannelChatMessageItem(BuildContext context, int index) {
     List<ChatMessage> chatMessages = channelChatMessageController.data;
     ChatMessage chatMessage = chatMessages[index];
-    String senderPeerId = chatMessage.senderPeerId!;
-    String name = chatMessage.senderName!;
-    Widget avatarImage = AppImage.mdAppImage;
-    // Linkman? linkman = await linkmanService.findCachedOneByPeerId(senderPeerId);
-    // if (linkman != null && linkman.avatarImage != null) {
-    //   avatarImage = linkman.avatarImage!;
-    // }
-    String title = chatMessage.title!;
-    String thumbnail = chatMessage.thumbnail!;
-    Widget thumbnailWidget = ImageUtil.buildImageWidget(image: thumbnail);
-    Widget chatMessageItem = InkWell(
-        onTap: () {
-          channelChatMessageController.current = chatMessage;
-          indexWidgetProvider.push('channel_message_view');
-        },
-        child: Column(children: [
-          Row(
-            children: [
-              avatarImage,
-              Text(name),
-            ],
-          ),
-          Text(title),
-          thumbnailWidget,
-        ]));
+    Widget chatMessageItem =
+        ChannelChatMessageItem(key: UniqueKey(), chatMessage: chatMessage);
 
     // index=0执行动画，对最新的消息执行动画
     if (index == 0) {
@@ -195,5 +174,58 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
     widget.scrollController.removeListener(_onScroll);
     animateController.dispose();
     super.dispose();
+  }
+}
+
+class ChannelChatMessageItem extends StatelessWidget {
+  final ChatMessage chatMessage;
+
+  const ChannelChatMessageItem({super.key, required this.chatMessage});
+
+  ///创建每一条消息
+  Future<Widget> _buildChannelChatMessageItem(BuildContext context) async {
+    String senderPeerId = chatMessage.senderPeerId!;
+    String name = chatMessage.senderName!;
+    Widget avatarImage = AppImage.mdAppImage;
+    Linkman? linkman = await linkmanService.findCachedOneByPeerId(senderPeerId);
+    if (linkman != null && linkman.avatarImage != null) {
+      avatarImage = linkman.avatarImage!;
+    }
+    String title = chatMessage.title!;
+    String thumbnail = chatMessage.thumbnail!;
+    Widget thumbnailWidget = ImageUtil.buildImageWidget(image: thumbnail);
+    Widget chatMessageItem = InkWell(
+        onTap: () {
+          channelChatMessageController.current = chatMessage;
+          indexWidgetProvider.push('channel_message_view');
+        },
+        child: Column(children: [
+          Row(
+            children: [
+              avatarImage,
+              Text(name),
+            ],
+          ),
+          Text(title),
+          thumbnailWidget,
+        ]));
+
+    return chatMessageItem;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+        future: _buildChannelChatMessageItem(context),
+        builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+          if (!snapshot.hasData) {
+            return Container();
+          }
+          Widget? child = snapshot.data;
+          if (child == null) {
+            return Container();
+          }
+          return child;
+        });
   }
 }
