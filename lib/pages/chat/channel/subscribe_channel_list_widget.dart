@@ -6,6 +6,7 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/channel/channel_message_view.dart';
+import 'package:colla_chat/pages/chat/channel/publish_channel_list_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
@@ -20,6 +21,8 @@ class SubscribeChannelListWidget extends StatefulWidget with TileDataMixin {
   final Function()? onScrollMax;
   final Function()? onScrollMin;
   final ScrollController scrollController = ScrollController();
+  final PublishChannelListWidget publishChannelListWidget =
+      PublishChannelListWidget();
   final ChannelMessageView channelMessageView = ChannelMessageView();
 
   SubscribeChannelListWidget({
@@ -28,6 +31,7 @@ class SubscribeChannelListWidget extends StatefulWidget with TileDataMixin {
     this.onScrollMax,
     this.onScrollMin,
   }) : super(key: key) {
+    indexWidgetProvider.define(publishChannelListWidget);
     indexWidgetProvider.define(channelMessageView);
   }
 
