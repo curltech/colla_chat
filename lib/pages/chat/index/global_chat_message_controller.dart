@@ -6,6 +6,7 @@ import 'package:colla_chat/p2p/chain/action/chat.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/service/chat/channel_chat_message.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
@@ -106,8 +107,8 @@ class GlobalChatMessageController with ChangeNotifier {
         break;
       case ChatMessageSubType.addFriend:
         break;
-      case ChatMessageSubType.modifyFriend:
-        linkmanService.receiveModifyFriend(chatMessage);
+      case ChatMessageSubType.modifyLinkman:
+        linkmanService.receiveModifyLinkman(chatMessage);
         break;
       case ChatMessageSubType.cancel:
         //接收到删除消息的消息
@@ -207,8 +208,14 @@ class GlobalChatMessageController with ChangeNotifier {
     }
   }
 
-  sendModifyFriend(String peerId, {String? clientId}) async {
-    linkmanService.modifyFriend(peerId, clientId: clientId);
+  ///发送新的联系人信息
+  sendModifyLinkman(String peerId, {String? clientId}) async {
+    linkmanService.modifyLinkman(peerId, clientId: clientId);
+  }
+
+  ///发送获取新的频道消息的请求
+  sendGetChannel(String peerId, {String? clientId}) async {
+    channelChatMessageService.getChannel(peerId, clientId: clientId);
   }
 
   ///发送PreKeyBundle
@@ -217,7 +224,8 @@ class GlobalChatMessageController with ChangeNotifier {
     PreKeyBundle preKeyBundle =
         signalSessionPool.signalKeyPair.getPreKeyBundle();
     var json = signalSessionPool.signalKeyPair.preKeyBundleToJson(preKeyBundle);
-    ChatMessage chatMessage = await chatMessageService.buildChatMessage(receiverPeerId:peerId,
+    ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+        receiverPeerId: peerId,
         clientId: clientId,
         messageType: ChatMessageType.system,
         subMessageType: ChatMessageSubType.preKeyBundle,

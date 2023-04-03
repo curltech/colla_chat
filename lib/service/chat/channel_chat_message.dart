@@ -1,8 +1,11 @@
 import 'dart:async';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
 
 class ChannelChatMessageService {
   ///获取所有的其他人的频道消息
@@ -79,6 +82,53 @@ class ChannelChatMessageService {
         whereArgs: whereArgs,
         orderBy: 'sendTime desc',
         limit: limit);
+  }
+
+  ///发出更新频道消息的请求
+  Future<ChatMessage?> getChannel(String peerId,
+      {String? clientId,
+      CryptoOption cryptoOption = CryptoOption.cryptography}) async {
+    Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+    if (linkman == null) {
+      return null;
+    }
+    if (linkman.subscriptStatus != LinkmanStatus.subscript.name) {
+      return null;
+    }
+    List<ChatMessage> chatMessages =
+        await findOthersByPeerId(peerId: peerId, limit: 1);
+    String? sendTime;
+    if (chatMessages.isNotEmpty) {
+      sendTime = chatMessages[0].sendTime;
+    }
+    ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+      receiverPeerId: peerId,
+      clientId: clientId,
+      content: sendTime,
+      messageType: ChatMessageType.system,
+      subMessageType: ChatMessageSubType.getChannel,
+    );
+    return await chatMessageService.sendAndStore(chatMessage,
+        cryptoOption: cryptoOption);
+  }
+
+  ///接收到更新频道消息的请求
+  receiveGetChannel(ChatMessage chatMessage) async {
+    var subMessageType = chatMessage.subMessageType;
+    if (ChatMessageSubType.getChannel.name != subMessageType) {
+      return;
+    }
+    String? sendTime = chatMessage.sendTime;
+    List<ChatMessage> chatMessages = await findMyselfByGreaterId(
+        status: MessageStatus.published.name, sendTime: sendTime);
+    if (chatMessages.isNotEmpty) {
+      for (var msg in chatMessages) {
+        msg.receiverPeerId = chatMessage.senderPeerId;
+        msg.receiverName = chatMessage.senderName;
+        msg.senderClientId = chatMessage.senderClientId;
+        await chatMessageService.send(msg);
+      }
+    }
   }
 }
 

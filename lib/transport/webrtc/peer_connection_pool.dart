@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:colla_chat/crypto/signalprotocol.dart';
-import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/conference.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
@@ -621,7 +620,9 @@ class PeerConnectionPool {
   }
 
   onConnected(WebrtcEvent event) async {
-    globalChatMessageController.sendModifyFriend(event.peerId,
+    globalChatMessageController.sendModifyLinkman(event.peerId,
+        clientId: event.clientId);
+    globalChatMessageController.sendGetChannel(event.peerId,
         clientId: event.clientId);
     globalChatMessageController.sendPreKeyBundle(event.peerId,
         clientId: event.clientId);

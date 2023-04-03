@@ -88,8 +88,7 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
             builder: (BuildContext context, List<int>? value, Widget? child) {
               Widget? trailing;
               if (value != null) {
-                trailing =
-                    ImageUtil.buildMemoryImageWidget(value! as Uint8List);
+                trailing = ImageUtil.buildMemoryImageWidget(value as Uint8List);
               }
               return ListTile(
                   title: Text(AppLocalizations.t('thumbnail')),
@@ -98,11 +97,12 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
                     await _pickThumbnail(context);
                   });
             }),
-        HtmlEditorWidget(
+        Expanded(
+            child: HtmlEditorWidget(
           height:
               appDataProvider.actualSize.height - appDataProvider.toolbarHeight,
           onSave: _store,
-        )
+        ))
       ]),
     );
   }

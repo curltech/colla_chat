@@ -208,9 +208,9 @@ class LinkmanService extends PeerPartyService<Linkman> {
     //改变发送消息的状态为接收
     await chatMessageService.updateReceiptType(chatMessage, receiptType);
     if (receiptType == MessageReceiptType.accepted) {
-      chatReceipt!.content = json;
+      chatReceipt.content = json;
     }
-    return await chatMessageService.sendAndStore(chatReceipt!);
+    return await chatMessageService.sendAndStore(chatReceipt);
   }
 
   ///接收到加好友的回执
@@ -222,8 +222,8 @@ class LinkmanService extends PeerPartyService<Linkman> {
     return await linkmanService.storeByPeerClient(peerClient);
   }
 
-  ///发出更新好友信息的请求
-  Future<ChatMessage> modifyFriend(String peerId,
+  ///发出更新联系人信息的请求
+  Future<ChatMessage> modifyLinkman(String peerId,
       {String? clientId,
       CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     // 加好友会发送自己的信息，回执将收到对方的信息
@@ -234,22 +234,22 @@ class LinkmanService extends PeerPartyService<Linkman> {
       clientId: clientId,
       content: peerClient,
       messageType: ChatMessageType.system,
-      subMessageType: ChatMessageSubType.modifyFriend,
+      subMessageType: ChatMessageSubType.modifyLinkman,
     );
     return await chatMessageService.sendAndStore(chatMessage,
         cryptoOption: cryptoOption);
   }
 
-  ///接收到更新好友信息的请求
-  receiveModifyFriend(ChatMessage chatMessage) async {
+  ///接收到更新联系人信息的请求
+  receiveModifyLinkman(ChatMessage chatMessage) async {
     String json = chatMessageService.recoverContent(chatMessage.content!);
     Map<String, dynamic> map = JsonUtil.toJson(json);
     PeerClient peerClient = PeerClient.fromJson(map);
     await peerClientService.store(peerClient);
   }
 
-  removeByPeerId(String peerId) async {
-    await delete(where: 'peerId=?', whereArgs: [peerId]);
+  removeByPeerId(String peerId) {
+    delete(where: 'peerId=?', whereArgs: [peerId]);
     linkmen.remove(peerId);
   }
 

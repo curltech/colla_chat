@@ -56,7 +56,7 @@ enum ChatMessageType {
 
 enum ChatMessageSubType {
   addFriend, // 加好友请求
-  modifyFriend, //修改好友信息，比如头像，名称
+  modifyLinkman, //修改联系人信息，比如头像，名称
   addGroup, // 新建群聊
   dismissGroup, // 解散群聊
   modifyGroup, // 修改群信息
