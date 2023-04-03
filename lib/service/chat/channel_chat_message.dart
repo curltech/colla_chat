@@ -112,7 +112,7 @@ class ChannelChatMessageService {
         cryptoOption: cryptoOption);
   }
 
-  ///接收到更新频道消息的请求
+  ///接收到更新频道消息的请求,发送发布的频道消息
   receiveGetChannel(ChatMessage chatMessage) async {
     var subMessageType = chatMessage.subMessageType;
     if (ChatMessageSubType.getChannel.name != subMessageType) {
