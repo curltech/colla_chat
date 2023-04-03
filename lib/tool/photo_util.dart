@@ -6,14 +6,20 @@ import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 ///photo_view,photo_view_gallery
 class PhotoUtil {
-  static requestPermissionExtend() async {
+  static Future<bool> requestPermissionExtend() async {
     final PermissionState ps = await PhotoManager.requestPermissionExtend();
     if (ps.isAuth) {
-      // Granted.
+      return true;
     } else {
       // Limited(iOS) or Rejected, use `==` for more precise judgements.
       // You can call `PhotoManager.openSetting()` to open settings for further steps.
-      PhotoManager.openSetting();
+      await PhotoManager.openSetting();
+      final PermissionState ps = await PhotoManager.requestPermissionExtend();
+      if (ps.isAuth) {
+        return true;
+      } else {
+        return false;
+      }
     }
   }
 

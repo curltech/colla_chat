@@ -44,8 +44,12 @@ class Websocket extends IWebClient {
 
   Future<void> connect() async {
     await close();
-    channel = websocket_connect.websocketConnect(address,
-        headers: headers, pingInterval: pingInterval);
+    try {
+      channel = websocket_connect.websocketConnect(address,
+          headers: headers, pingInterval: pingInterval);
+    } catch (e) {
+      logger.e('wss address:$address connect failure:$e');
+    }
     if (channel == null) {
       logger.e('wss address:$address connect failure');
       return;
