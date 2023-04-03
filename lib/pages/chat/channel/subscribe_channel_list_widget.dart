@@ -38,13 +38,13 @@ class SubscribeChannelListWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  String get routeName => 'subscribe_channel';
+  String get routeName => 'channel';
 
   @override
   IconData get iconData => Icons.wifi_channel;
 
   @override
-  String get title => 'SubscribeChannel';
+  String get title => 'Channel';
 }
 
 class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
