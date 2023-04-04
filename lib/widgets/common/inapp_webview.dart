@@ -6,10 +6,15 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 class FlutterInAppWebView extends StatefulWidget {
   final String? initialUrl;
   final String? html;
+  final String? initialFilename;
   final void Function(InAppWebViewController controller)? onWebViewCreated;
 
   const FlutterInAppWebView(
-      {super.key, this.initialUrl, this.html, this.onWebViewCreated});
+      {super.key,
+      this.initialUrl,
+      this.html,
+      this.initialFilename,
+      this.onWebViewCreated});
 
   @override
   State createState() => _FlutterInAppWebViewState();
@@ -59,6 +64,7 @@ class _FlutterInAppWebViewState extends State<FlutterInAppWebView> {
         initialUrlRequest: widget.initialUrl != null
             ? URLRequest(url: Uri.parse(widget.initialUrl!))
             : null,
+        initialFile: widget.initialFilename,
         initialOptions: options,
         // initialSettings: settings,
         onWebViewCreated: _onWebViewCreated,

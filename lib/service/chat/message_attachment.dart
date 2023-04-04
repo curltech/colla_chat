@@ -89,7 +89,8 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
     return filename;
   }
 
-  /// 解密的内容
+  /// 获取消息附件的内容
+  /// 读出文件,解密,返回二进制,继续处理的话,对字符串,需要base64处理
   Future<Uint8List?> findContent(String messageId, String? title) async {
     if (!platformParams.web) {
       final filename = await getEncryptFilename(messageId, title);
@@ -146,6 +147,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
   }
 
   ///把加密的内容写入文件，或者附件记录
+  ///content直接base64解码,加密,然后写入文件
   Future<void> store(int id, String messageId, String? title, String content,
       EntityState state) async {
     if (!platformParams.web) {
@@ -173,8 +175,8 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
   }
 
   ///删除消息的附件
-  removeByPeerId(String peerId) async {
-    await delete(where: 'groupPeerId=?', whereArgs: [peerId]);
+  removeByPeerId(String peerId) {
+    delete(where: 'groupPeerId=?', whereArgs: [peerId]);
   }
 }
 

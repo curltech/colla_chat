@@ -105,9 +105,15 @@ class PlatformWebViewController with ChangeNotifier {
 class PlatformWebView extends StatefulWidget {
   final String? initialUrl;
   final String? html;
+  final String? initialFilename;
   final void Function(PlatformWebViewController controller)? onWebViewCreated;
 
-  const PlatformWebView({super.key, this.initialUrl,this.html, this.onWebViewCreated});
+  const PlatformWebView(
+      {super.key,
+      this.initialUrl,
+      this.html,
+      this.initialFilename,
+      this.onWebViewCreated});
 
   @override
   State createState() => _PlatformWebViewState();
@@ -135,6 +141,7 @@ class _PlatformWebViewState extends State<PlatformWebView> {
       platformWebView = FlutterWebView(
         initialUrl: widget.initialUrl,
         html: widget.html,
+        initialFilename: widget.initialFilename,
         onWebViewCreated: (webview.WebViewController controller) {
           _onWebViewCreated(controller);
         },
@@ -143,6 +150,7 @@ class _PlatformWebViewState extends State<PlatformWebView> {
       platformWebView = FlutterInAppWebView(
         initialUrl: widget.initialUrl,
         html: widget.html,
+        initialFilename: widget.initialFilename,
         onWebViewCreated: (inapp.InAppWebViewController controller) {
           _onWebViewCreated(controller);
         },

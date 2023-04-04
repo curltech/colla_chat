@@ -1,14 +1,18 @@
 import 'dart:typed_data';
 
 import 'package:card_swiper/card_swiper.dart';
+import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
@@ -25,9 +29,7 @@ import 'package:photo_manager/photo_manager.dart';
 
 ///自己发布频道消息编辑页面
 class PublishChannelItemWidget extends StatefulWidget with TileDataMixin {
-  ChatMessage? chatMessage;
-
-  PublishChannelItemWidget({Key? key, this.chatMessage}) : super(key: key);
+  PublishChannelItemWidget({Key? key}) : super(key: key);
 
   @override
   State createState() => _PublishChannelItemWidgetState();
@@ -49,10 +51,22 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
   final TextEditingController textEditingController = TextEditingController();
   ValueNotifier<List<int>?> thumbnail = ValueNotifier<List<int>?>(null);
   String? html;
+  String? filename;
 
   @override
   void initState() {
     super.initState();
+    ChatMessage? chatMessage = myChannelChatMessageController.current;
+    if (chatMessage != null) {
+      if (chatMessage.title != null) {
+        textEditingController.text = chatMessage.title!;
+      }
+      if (chatMessage.thumbnail != null) {
+        thumbnail.value = CryptoUtil.decodeBase64(chatMessage.thumbnail!);
+      }
+      messageAttachmentService.findContent(
+          chatMessage.messageId!, chatMessage.title!);
+    }
   }
 
   Future<void> _onSubmit(String? result) async {
@@ -70,14 +84,21 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
           content: AppLocalizations.t('Must be html content'));
       return;
     }
-    var chatMessage = await myChannelChatMessageController
-        .buildChannelChatMessage(title, html!, thumbnail.value);
-    if (widget.chatMessage != null) {
-      chatMessage.id = widget.chatMessage!.id;
-      chatMessage.messageId = widget.chatMessage!.messageId;
+    ChatMessage? chatMessage = myChannelChatMessageController.current;
+    if (chatMessage != null) {
+      chatMessage.title = title;
+      chatMessage.content = chatMessageService.processContent(html!);
+      chatMessage.thumbnail = CryptoUtil.encodeBase64(thumbnail.value!);
+    } else {
+      chatMessage = await myChannelChatMessageController
+          .buildChannelChatMessage(title, html!, thumbnail.value);
+      myChannelChatMessageController.current = chatMessage;
     }
     await chatMessageService.store(chatMessage);
-    widget.chatMessage = chatMessage;
+    if (mounted) {
+      DialogUtil.info(context,
+          content: AppLocalizations.t('Save html file successfully'));
+    }
   }
 
   Widget _buildTextField(BuildContext context) {
@@ -111,13 +132,16 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
     if (platformParams.desktop) {
       List<XFile> xfiles = await FileUtil.pickFiles(type: FileType.any);
       if (xfiles.isNotEmpty) {
-        html = await xfiles[0].readAsString();
+        filename = xfiles[0].path;
+        Uint8List bytes = await xfiles[0].readAsBytes();
+        html = CryptoUtil.utf8ToString(bytes);
       }
     } else if (platformParams.mobile) {
       List<AssetEntity>? assets = await AssetUtil.pickAssets(context);
       if (assets != null && assets.isNotEmpty) {
-        var bytes = await assets[0].originBytes;
-        html = String.fromCharCodes(bytes!);
+        filename = assets[0].relativePath;
+        Uint8List? bytes = await assets[0].originBytes;
+        html = CryptoUtil.utf8ToString(bytes!);
       }
     }
   }
@@ -135,8 +159,10 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
               builder: (BuildContext context, List<int>? value, Widget? child) {
                 Widget? trailing;
                 if (value != null) {
-                  trailing =
-                      ImageUtil.buildMemoryImageWidget(value as Uint8List);
+                  trailing = ImageUtil.buildMemoryImageWidget(
+                      value as Uint8List,
+                      height: AppImageSize.mdSize,
+                      width: AppImageSize.mdSize);
                 }
                 return ListTile(
                     leading: Icon(
@@ -151,6 +177,7 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
               }),
           ListTile(
               title: Text(AppLocalizations.t('Pick html file')),
+              subtitle: Text(filename ?? ''),
               leading: Icon(
                 Icons.file_open,
                 color: myself.primary,
@@ -163,8 +190,13 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
           ),
           ButtonBar(children: [
             TextButton(
-                style: SimpleWidgetUtil.buildButtonStyle(
-                    backgroundColor: myself.primary),
+                style: SimpleWidgetUtil.buildButtonStyle(),
+                onPressed: () {
+                  indexWidgetProvider.push('channel_message_view');
+                },
+                child: Text(AppLocalizations.t('View'))),
+            TextButton(
+                style: SimpleWidgetUtil.buildButtonStyle(),
                 onPressed: () {
                   _save();
                 },
@@ -173,9 +205,16 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
                 style: SimpleWidgetUtil.buildButtonStyle(
                     backgroundColor: myself.primary),
                 onPressed: () {
-                  if (widget.chatMessage != null) {
+                  ChatMessage? chatMessage =
+                      myChannelChatMessageController.current;
+                  if (chatMessage != null) {
                     myChannelChatMessageController
-                        .publish(widget.chatMessage!.messageId!);
+                        .publish(chatMessage.messageId!);
+                    if (mounted) {
+                      DialogUtil.info(context,
+                          content: AppLocalizations.t(
+                              'Publish channel successfully'));
+                    }
                   }
                 },
                 child: Text(AppLocalizations.t('Publish')))

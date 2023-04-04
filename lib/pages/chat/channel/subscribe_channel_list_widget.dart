@@ -157,9 +157,9 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
     var channelChatMessageWidget = _buildChannelChatMessageWidget(context);
     List<Widget>? rightWidgets = [
       IconButton(
-          onPressed: () {
+          onPressed: () async {
             myChannelChatMessageController.clear(notify: false);
-            myChannelChatMessageController.previous(limit: defaultLimit);
+            await myChannelChatMessageController.previous(limit: defaultLimit);
             indexWidgetProvider.push('publish_channel');
           },
           icon: const Icon(

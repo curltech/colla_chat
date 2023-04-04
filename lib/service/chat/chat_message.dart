@@ -243,6 +243,16 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         limit: limit);
   }
 
+  ///字符串变成utf8,然后base64
+  String processContent(String content) {
+    if (StringUtil.isNotEmpty(content)) {
+      content = CryptoUtil.encodeBase64(CryptoUtil.stringToUtf8(content));
+    }
+
+    return content;
+  }
+
+  ///字符串base64解码,然后变成utf8字符串
   String recoverContent(String content) {
     if (StringUtil.isNotEmpty(content)) {
       content = CryptoUtil.utf8ToString(CryptoUtil.decodeBase64(content));
@@ -252,7 +262,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   ///content和receiptContent可以是任意对象，最终会是base64的字符串
-  //未填写的字段：transportType,senderAddress,receiverAddress,receiveTime,actualReceiveTime,readTime,destroyTime
+  ///如果content是字符串,则先转成utf8,然后base64
   Future<ChatMessage> buildChatMessage({
     String? receiverPeerId,
     dynamic content,
@@ -829,17 +839,17 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   ///删除linkman的消息
-  removeByLinkman(String peerId) async {
+  removeByLinkman(String peerId) {
     var myselfPeerId = myself.peerId!;
-    await delete(
+    delete(
         where:
             'groupPeerId is null and ((senderPeerId=? and receiverPeerId=?) or (senderPeerId=? and receiverPeerId=?))',
         whereArgs: [peerId, myselfPeerId, myselfPeerId, peerId]);
   }
 
   ///删除group的消息
-  removeByGroup(String peerId) async {
-    await delete(where: 'groupPeerId=?', whereArgs: [peerId]);
+  removeByGroup(String peerId) {
+    delete(where: 'groupPeerId=?', whereArgs: [peerId]);
   }
 }
 

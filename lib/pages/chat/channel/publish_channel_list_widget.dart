@@ -1,11 +1,14 @@
 import 'dart:async';
 
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/channel/publish_channel_item_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -110,17 +113,36 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
     List<ChatMessage> chatMessages = myChannelChatMessageController.data;
     ChatMessage chatMessage = chatMessages[index];
     String title = chatMessage.title!;
-    String thumbnail = chatMessage.thumbnail!;
-    Widget thumbnailWidget = ImageUtil.buildImageWidget(image: thumbnail);
-    Widget chatMessageItem = InkWell(
-        onTap: () {
-          myChannelChatMessageController.current = chatMessage;
-          indexWidgetProvider.push('publish_channel_item');
-        },
-        child: Column(children: [
-          Text(title),
-          thumbnailWidget,
-        ]));
+    String? thumbnail = chatMessage.thumbnail;
+    Widget? thumbnailWidget;
+    if (thumbnail != null) {
+      thumbnailWidget = ImageUtil.buildImageWidget(
+          image: thumbnail,
+          height: AppImageSize.mdSize,
+          width: AppImageSize.mdSize);
+    }
+    var sendTime = DateUtil.formatEasyRead(chatMessage.sendTime!);
+    var status = chatMessage.status;
+    Widget leading = Icon(
+      Icons.unpublished,
+      color: myself.primary,
+    );
+    if (MessageStatus.published.name == status) {
+      leading = Icon(
+        Icons.check_circle,
+        color: myself.primary,
+      );
+    }
+    Widget chatMessageItem = ListTile(
+      onTap: () {
+        myChannelChatMessageController.current = chatMessage;
+        indexWidgetProvider.push('publish_channel_item');
+      },
+      title: Text(title),
+      subtitle: Text(sendTime),
+      leading: leading,
+      trailing: thumbnailWidget,
+    );
 
     // index=0执行动画，对最新的消息执行动画
     if (index == 0) {
@@ -148,11 +170,11 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
         child: ListView.builder(
           controller: widget.scrollController,
           padding: const EdgeInsets.all(8.0),
-          reverse: true,
+          reverse: false,
           //消息组件渲染
           itemBuilder: _buildChannelChatMessageItem,
           //消息条目数
-          itemCount: channelChatMessageController.data.length,
+          itemCount: myChannelChatMessageController.data.length,
         ));
   }
 

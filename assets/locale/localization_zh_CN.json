@@ -313,5 +313,14 @@
   "true": "是",
   "false": "否",
   "Playlist is empty": "播放列表空",
-  "Please select a media file": "选择媒体文件"
+  "Please select a media file": "选择媒体文件",
+  "PublishChannel": "频道发布",
+  "Publish Channel Item": "发布文章",
+  "ChannelMessageView": "文章浏览",
+  "thumbnail": "缩略图",
+  "Pick html file": "选择html文件",
+  "title": "标题",
+  "View": "查看",
+  "Save": "保存",
+  "Publish": "发布"
 }

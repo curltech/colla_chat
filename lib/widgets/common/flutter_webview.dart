@@ -7,10 +7,15 @@ import 'package:webview_flutter/webview_flutter.dart';
 class FlutterWebView extends StatefulWidget {
   final String? initialUrl;
   final String? html;
+  final String? initialFilename;
   final void Function(WebViewController controller)? onWebViewCreated;
 
   const FlutterWebView(
-      {super.key, this.initialUrl, this.html, this.onWebViewCreated});
+      {super.key,
+      this.initialUrl,
+      this.html,
+      this.initialFilename,
+      this.onWebViewCreated});
 
   @override
   State createState() => _FlutterWebViewState();
@@ -41,6 +46,9 @@ class _FlutterWebViewState extends State<FlutterWebView> {
     ));
     if (widget.initialUrl != null) {
       controller!.loadRequest(Uri.parse(widget.initialUrl!));
+    }
+    if (widget.initialFilename != null) {
+      controller!.loadFile(widget.initialFilename!);
     }
     if (widget.html != null) {
       controller!.loadHtmlString(widget.html!);
