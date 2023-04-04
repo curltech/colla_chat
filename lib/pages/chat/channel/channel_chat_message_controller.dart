@@ -2,6 +2,7 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/channel_chat_message.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/tool/date_util.dart';
 
 ///频道消息的消息控制器,自己订阅的,其他人发布的频道消息
 class ChannelChatMessageController extends DataMoreController<ChatMessage> {
@@ -91,7 +92,8 @@ class MyChannelChatMessageController extends DataMoreController<ChatMessage> {
     }
   }
 
-  store(String title, String content, List<int>? thumbnail) async {
+  Future<ChatMessage> buildChannelChatMessage(
+      String title, String content, List<int>? thumbnail) async {
     ChatMessage chatMessage = await chatMessageService.buildChatMessage(
         title: title,
         content: content,
@@ -102,12 +104,18 @@ class MyChannelChatMessageController extends DataMoreController<ChatMessage> {
         contentType: ChatMessageContentType.rich,
         status: MessageStatus.unsent.name,
         mimeType: ChatMessageMimeType.html);
-    await chatMessageService.store(chatMessage);
+
+    return chatMessage;
   }
 
   publish(String messageId) async {
-    await chatMessageService.update({'status': MessageStatus.published.name},
-        where: 'messageId', whereArgs: [messageId]);
+    await chatMessageService.update(
+        {
+          'status': MessageStatus.published.name,
+          'sendTime': DateUtil.currentDate(),
+        },
+        where: 'messageId',
+        whereArgs: [messageId]);
   }
 }
 

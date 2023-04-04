@@ -35,7 +35,7 @@ class ChatGPTChat {
       Function(CTResponse?)? onComplete}) {
     final request = CompleteText(
       prompt: prompt,
-      model: kTextDavinci3,
+      model: Model.TextDavinci3,
       temperature: temperature,
       maxTokens: maxTokens,
       topP: topP,
@@ -43,15 +43,13 @@ class ChatGPTChat {
       presencePenalty: presencePenalty,
       stop: stop,
     );
-
-    openAI
-        .onCompletionStream(request: request)
-        .listen(onComplete)
-        .onError((err) {});
+    Stream<CTResponse?> response =
+        openAI.onCompletion(request: request).asStream();
+    response.listen(onComplete).onError((err) {});
   }
 
   Future<List<dynamic>> chatCompletion({
-    required String model,
+    required ChatModel model,
     required List<Map<String, String>> messages,
     double? temperature = .3,
     double? topP = 1.0,
@@ -64,7 +62,6 @@ class ChatGPTChat {
     String? user = "",
   }) async {
     final request = ChatCompleteText(
-      //kChatGptTurbo0301Model
       model: model,
       messages: messages,
       //[Map.of({"role": "user", "content": 'Hello!'})],
@@ -84,7 +81,7 @@ class ChatGPTChat {
   }
 
   void chatCompletionStream(
-      {required String model,
+      {required ChatModel model,
       required List<Map<String, String>> messages,
       double? temperature = .3,
       double? topP = 1.0,

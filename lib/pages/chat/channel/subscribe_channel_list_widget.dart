@@ -158,10 +158,12 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
     List<Widget>? rightWidgets = [
       IconButton(
           onPressed: () {
+            myChannelChatMessageController.clear(notify: false);
+            myChannelChatMessageController.previous(limit: defaultLimit);
             indexWidgetProvider.push('publish_channel');
           },
           icon: const Icon(
-            Icons.publish,
+            Icons.edit,
             color: Colors.white,
           )),
     ];

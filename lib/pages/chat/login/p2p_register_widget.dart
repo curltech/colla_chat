@@ -1,14 +1,19 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/mobile_util.dart';
+import 'package:colla_chat/tool/phone_number_util.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
+import 'package:phone_numbers_parser/phone_numbers_parser.dart'
+    as phone_numbers_parser;
 
 final List<ColumnFieldDef> p2pRegisterInputFieldDef = [
   ColumnFieldDef(
@@ -66,7 +71,13 @@ class P2pRegisterWidget extends StatefulWidget {
 
 class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
   String _countryCode = 'CN';
-  String _mobile = '13609619603';
+  TextEditingController mobileController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    mobileController.text = '13609619603';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -76,20 +87,35 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           child: IntlPhoneField(
+            controller: mobileController,
             initialCountryCode: _countryCode,
-            initialValue: _mobile,
             decoration: InputDecoration(
               labelText: AppLocalizations.t('Mobile'),
+              suffixIcon: platformParams.android
+                  ? IconButton(
+                      onPressed: () async {
+                        String? mobile = await MobileUtil.getMobileNumber();
+                        if (mobile != null) {
+                          int pos = mobile.indexOf('+');
+                          if (pos > -1) {
+                            mobile = mobile.substring(pos);
+                          }
+                          phone_numbers_parser.PhoneNumber phoneNumber =
+                              PhoneNumberUtil.fromRaw(mobile);
+                          mobileController.text = phoneNumber.nsn;
+                        }
+                      },
+                      icon: Icon(
+                        Icons.mobile_screen_share,
+                        color: myself.primary,
+                      ))
+                  : null,
             ),
             onChanged: (PhoneNumber phoneNumber) {
-              setState(() {
-                _mobile = phoneNumber.number;
-              });
+              // mobileController.text = phoneNumber.number;
             },
             onCountryChanged: (country) {
-              setState(() {
-                _countryCode = country.name;
-              });
+              _countryCode = country.name;
             },
             disableLengthCheck: true,
           ),
@@ -115,7 +141,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
     if (plainPassword == confirmPassword) {
       myselfPeerService
           .register(name, loginName, plainPassword,
-              mobile: _mobile, email: email)
+              mobile: mobileController.text, email: email)
           .then((myselfPeer) {
         myself.myselfPeer = myselfPeer;
         Application.router

@@ -73,6 +73,7 @@ dependencies:
   web_socket_channel: ^2.2.0
   #cached_network_image: ^3.0.0
   telephony: 0.2.0
+  openvpn_flutter: ^1.2.2
 
   #界面
   bubble: ^1.2.1

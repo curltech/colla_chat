@@ -52,7 +52,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
   @override
   void initState() {
     super.initState();
-    channelChatMessageController.addListener(_update);
+    myChannelChatMessageController.addListener(_update);
     var scrollController = widget.scrollController;
     scrollController.addListener(_onScroll);
     animateController = AnimationController(
@@ -61,7 +61,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
 
   _update() {
     setState(() {
-      channelChatMessageController.latest();
+      myChannelChatMessageController.latest();
     });
   }
 
@@ -172,6 +172,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
     ];
     return AppBarView(
         centerTitle: false,
+        withLeading: true,
         title: widget.title,
         rightWidgets: rightWidgets,
         child: channelChatMessageWidget);
@@ -179,7 +180,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
 
   @override
   void dispose() {
-    channelChatMessageController.removeListener(_update);
+    myChannelChatMessageController.removeListener(_update);
     widget.scrollController.removeListener(_onScroll);
     animateController.dispose();
     super.dispose();

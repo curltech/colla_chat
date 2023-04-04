@@ -13,10 +13,10 @@ import 'package:html_editor_enhanced/html_editor.dart';
 class HtmlEditorWidget extends StatefulWidget {
   final double height;
   final String? initialText;
-  final Function(String? result)? onSave;
+  final Function(String? result)? onSubmit;
 
   const HtmlEditorWidget(
-      {Key? key, required this.height, this.initialText, this.onSave})
+      {Key? key, required this.height, this.initialText, this.onSubmit})
       : super(key: key);
 
   @override
@@ -182,8 +182,8 @@ class _HtmlEditorWidgetState extends State<HtmlEditorWidget> {
         onTap: (int index, String label, {String? value}) async {
           var txt = await controller.getText();
           result = txt;
-          if (widget.onSave != null) {
-            widget.onSave!(result);
+          if (widget.onSubmit != null) {
+            widget.onSubmit!(result);
           }
           if (txt.contains('src=\"data:')) {
             txt =
