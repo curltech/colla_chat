@@ -114,7 +114,7 @@ class MyChannelChatMessageController extends DataMoreController<ChatMessage> {
           'status': MessageStatus.published.name,
           'sendTime': DateUtil.currentDate(),
         },
-        where: 'messageId',
+        where: 'messageId=?',
         whereArgs: [messageId]);
   }
 }
