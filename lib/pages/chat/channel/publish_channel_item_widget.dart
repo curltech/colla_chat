@@ -190,7 +190,7 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
                     ),
                     trailing: html.value != null
                         ? Icon(
-                            Icons.check,
+                            Icons.check_circle,
                             color: myself.primary,
                           )
                         : null,
