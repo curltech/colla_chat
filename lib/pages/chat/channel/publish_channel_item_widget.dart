@@ -238,13 +238,13 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
   Widget _buildChannelItemView(BuildContext context) {
     Widget view = _buildActionWidget(context);
     if (platformParams.mobile) {
-      view = Swiper(
+      Widget swiper = Swiper(
         controller: SwiperController(),
         itemCount: 2,
         index: 0,
         itemBuilder: (BuildContext context, int index) {
           if (index == 1) {
-            view = HtmlEditorWidget(
+            return HtmlEditorWidget(
               height: appDataProvider.actualSize.height -
                   appDataProvider.toolbarHeight,
               onSubmit: _onSubmit,
@@ -262,6 +262,7 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
         //   activeSize: 15,)
         // ),
       );
+      return swiper;
     }
     return view;
   }
