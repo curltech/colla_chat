@@ -135,16 +135,17 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
 
   Widget _buildStageWidget(BuildContext context) {
     var padding = const EdgeInsets.symmetric(horizontal: 15.0);
-    String title = '';
-    if (configIp != null) {
-      title = title + configIp!;
-    }
-    if (configName != null) {
-      title = title + configName!;
-    }
+
     return ValueListenableBuilder(
         valueListenable: config,
         builder: (BuildContext context, String? value, Widget? child) {
+          String title = '';
+          if (configIp != null) {
+            title = title + configIp!;
+          }
+          if (configName != null) {
+            title = title + configName!;
+          }
           return Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
