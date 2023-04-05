@@ -258,6 +258,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   Widget _buildMessageInputWidget(BuildContext context) {
     return Container(
         margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 2.0),
+        alignment: Alignment.center,
         child: Column(children: [
           voiceVisible
               ? _buildExtendedTextField(context)

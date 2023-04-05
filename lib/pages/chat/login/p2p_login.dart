@@ -112,7 +112,7 @@ class _P2pLoginState extends State<P2pLogin> {
     return Scaffold(
         appBar: appBar,
         body: KeyboardDismissOnTap(
-            dismissOnCapturedTaps: true,
+            dismissOnCapturedTaps: false,
             child: Stack(children: <Widget>[
               Opacity(
                 opacity: 1,

@@ -294,7 +294,7 @@ class _IndexViewState extends State<IndexView>
     Scaffold scaffold = Scaffold(
         appBar: AppBar(toolbarHeight: toolbarHeight, elevation: 0.0),
         body: KeyboardDismissOnTap(
-            dismissOnCapturedTaps: true,
+            dismissOnCapturedTaps: false,
             child: SafeArea(
                 child: Stack(children: <Widget>[
               Opacity(
