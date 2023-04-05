@@ -129,7 +129,8 @@ class _ChatListWidgetState extends State<ChatListWidget>
   final ValueNotifier<ConnectivityResult> _connectivityResult =
       ValueNotifier<ConnectivityResult>(
           connectivityController.connectivityResult);
-  late ValueNotifier<SocketStatus> _socketStatus;
+  ValueNotifier<SocketStatus> _socketStatus =
+      ValueNotifier<SocketStatus>(SocketStatus.none);
 
   final ValueNotifier<List<TileData>> _linkmanTileData =
       ValueNotifier<List<TileData>>([]);
@@ -139,13 +140,13 @@ class _ChatListWidgetState extends State<ChatListWidget>
       ValueNotifier<List<TileData>>([]);
   final ValueNotifier<int> _currentTab = ValueNotifier<int>(0);
 
-  late TabController _tabController;
+  TabController? _tabController;
 
   @override
   initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    _tabController.addListener(_updateCurrentTab);
+    _tabController!.addListener(_updateCurrentTab);
     _reconnect();
 
     linkmanChatSummaryController.addListener(_updateLinkmanChatSummary);
@@ -161,9 +162,9 @@ class _ChatListWidgetState extends State<ChatListWidget>
     if (websocket != null) {
       websocketPool.registerStatusChanged(
           websocket.address, _updateWebsocketStatus);
-      _socketStatus = ValueNotifier<SocketStatus>(websocket.status);
+      _socketStatus.value = websocket.status;
     } else {
-      _socketStatus = ValueNotifier<SocketStatus>(SocketStatus.closed);
+      _socketStatus.value = SocketStatus.closed;
     }
   }
 
@@ -180,7 +181,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
   }
 
   _updateCurrentTab() {
-    _currentTab.value = _tabController.index;
+    _currentTab.value = _tabController!.index;
   }
 
   _updateLinkmanChatSummary() {
@@ -611,8 +612,8 @@ class _ChatListWidgetState extends State<ChatListWidget>
 
   @override
   void dispose() {
-    _tabController.removeListener(_updateCurrentTab);
-    _tabController.dispose();
+    _tabController!.removeListener(_updateCurrentTab);
+    _tabController!.dispose();
     linkmanChatSummaryController.removeListener(_updateLinkmanChatSummary);
     groupChatSummaryController.removeListener(_updateGroupChatSummary);
     conferenceChatSummaryController

@@ -9,6 +9,7 @@ import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 /// 远程登录页面，一个Scaffold，IndexStack下的远程登录组件，注册组件和配置组件
 class P2pLogin extends StatefulWidget {
@@ -110,13 +111,15 @@ class _P2pLoginState extends State<P2pLogin> {
     ));
     return Scaffold(
         appBar: appBar,
-        body: Stack(children: <Widget>[
-          Opacity(
-            opacity: 1,
-            child: loadingWidget,
-          ),
-          workspace
-        ]));
+        body: KeyboardDismissOnTap(
+            dismissOnCapturedTaps: true,
+            child: Stack(children: <Widget>[
+              Opacity(
+                opacity: 1,
+                child: loadingWidget,
+              ),
+              workspace
+            ])));
   }
 
   @override

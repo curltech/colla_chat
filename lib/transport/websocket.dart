@@ -14,6 +14,7 @@ import './condition_import/unsupport.dart'
     if (dart.library.io) './condition_import/desktop.dart' as websocket_connect;
 
 enum SocketStatus {
+  none,
   connected, // 已连接
   failed, // 失败
   closed, // 连接关闭

@@ -20,6 +20,7 @@ import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:provider/provider.dart';
 
 class IndexView extends StatefulWidget {
@@ -290,27 +291,26 @@ class _IndexViewState extends State<IndexView>
         offstage: !indexWidgetProvider.bottomBarVisible,
         child: const BottomBar());
     var toolbarHeight = 0.0;
-    // if (platformParams.android) {
-    //   toolbarHeight = 45.0;
-    // }
     Scaffold scaffold = Scaffold(
         appBar: AppBar(toolbarHeight: toolbarHeight, elevation: 0.0),
-        body: SafeArea(
-            child: Stack(children: <Widget>[
-          Opacity(
-            opacity: 1,
-            child: loadingWidget,
-          ),
-          Center(
-              child: platformWidgetFactory.buildSizedBox(
-                  child: widget.indexWidget,
-                  height: appDataProvider.actualSize.height - toolbarHeight,
-                  width: appDataProvider.actualSize.width)),
-          Row(children: [
-            _buildChatMessageBanner(context),
-            _buildVideoChatMessageBanner(context)
-          ]),
-        ])),
+        body: KeyboardDismissOnTap(
+            dismissOnCapturedTaps: true,
+            child: SafeArea(
+                child: Stack(children: <Widget>[
+              Opacity(
+                opacity: 1,
+                child: loadingWidget,
+              ),
+              Center(
+                  child: platformWidgetFactory.buildSizedBox(
+                      child: widget.indexWidget,
+                      height: appDataProvider.actualSize.height - toolbarHeight,
+                      width: appDataProvider.actualSize.width)),
+              Row(children: [
+                _buildChatMessageBanner(context),
+                _buildVideoChatMessageBanner(context)
+              ]),
+            ]))),
         //endDrawer: endDrawer,
         bottomNavigationBar: bottomNavigationBar);
 

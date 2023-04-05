@@ -5,6 +5,7 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 /// Keyboard Visibility
 /// KeyboardVisibilityBuilder isKeyboardVisible
 /// KeyboardVisibilityProvider final bool isKeyboardVisible = KeyboardVisibilityProvider.isKeyboardVisible(context);
+/// KeyboardDismissOnTap dismissOnCapturedTaps: true,
 class KeyboardVisibilityUtil {
   static bool isVisible() {
     var keyboardVisibilityController = KeyboardVisibilityController();
