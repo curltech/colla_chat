@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
@@ -37,7 +38,7 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
   late OpenVPN openvpn;
   ValueNotifier<VpnStatus> status = ValueNotifier<VpnStatus>(VpnStatus.empty());
   ValueNotifier<VPNStage> stage = ValueNotifier<VPNStage>(VPNStage.unknown);
-  String? config;
+  ValueNotifier<String?> config = ValueNotifier<String?>(null);
   String? configName;
   String? configIp;
 
@@ -58,6 +59,7 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
         this.status.value = status;
       },
     );
+    _getConfig();
   }
 
   void _onVpnStatusChanged(VpnStatus? status) {
@@ -76,11 +78,27 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
     }
   }
 
+  _getConfig() async {
+    String? config = await localSecurityStorage.get('openvpn');
+    this.config.value = config;
+    _initConfig();
+  }
+
+  _initConfig() {
+    if (config.value != null) {
+      List<String> cs = config.value!.split('\n');
+      if (cs.isNotEmpty) {
+        configName = cs[0];
+        configIp = cs[3];
+      }
+    }
+  }
+
   void connect() {
     if (stage.value == VPNStage.disconnected) {
-      if (config != null) {
+      if (config.value != null) {
         openvpn.connect(
-          config!,
+          config.value!,
           'client',
           certIsRequired: true,
         );
@@ -100,19 +118,18 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
     if (platformParams.desktop) {
       List<XFile> xfiles = await FileUtil.pickFiles(type: FileType.any);
       if (xfiles.isNotEmpty) {
-        config = await xfiles[0].readAsString();
+        config.value = await xfiles[0].readAsString();
       }
     } else if (platformParams.mobile) {
       List<AssetEntity>? assets = await AssetUtil.pickAssets(context);
       if (assets != null && assets.isNotEmpty) {
         Uint8List? bytes = await assets[0].originBytes;
-        config = String.fromCharCodes(bytes!);
+        config.value = String.fromCharCodes(bytes!);
       }
     }
-    List<String> cs = config!.split('\n');
-    if (cs.isNotEmpty) {
-      configName = cs[0];
-      configIp = cs[3];
+    if (config.value != null) {
+      await localSecurityStorage.save('openvpn', config.value!);
+      _initConfig();
     }
   }
 
@@ -126,8 +143,8 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
       title = title + configName!;
     }
     return ValueListenableBuilder(
-        valueListenable: stage,
-        builder: (BuildContext context, VPNStage value, Widget? child) {
+        valueListenable: config,
+        builder: (BuildContext context, String? value, Widget? child) {
           return Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
