@@ -322,5 +322,11 @@
   "title": "标题",
   "View": "查看",
   "Save": "保存",
-  "Publish": "发布"
+  "Publish": "发布",
+  "OpenVPN": "OpenVPN",
+  "Connection stats": "连接统计",
+  "Byte in": "上行字节",
+  "Byte out": "下行字节",
+  "Duration": "连接时长",
+  "Connected on": "连接时间"
 }

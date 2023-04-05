@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -28,13 +30,13 @@ class OpenVpnWidget extends StatefulWidget with TileDataMixin {
   IconData get iconData => Icons.settings_applications;
 
   @override
-  String get title => 'OpenVpn';
+  String get title => 'OpenVPN';
 }
 
 class _OpenVpnWidgetState extends State<OpenVpnWidget> {
   late OpenVPN openvpn;
-  VpnStatus? status;
-  VPNStage? stage;
+  ValueNotifier<VpnStatus> status = ValueNotifier<VpnStatus>(VpnStatus.empty());
+  ValueNotifier<VPNStage> stage = ValueNotifier<VPNStage>(VPNStage.unknown);
   String? config;
   String? configName;
   String? configIp;
@@ -50,40 +52,46 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
       providerBundleIdentifier: "openvpn.curltech.io.CollaChat",
       localizedDescription: "CurlTech OpenVpn",
       lastStage: (stage) {
-        setState(() {
-          this.stage = stage;
-        });
+        this.stage.value = stage;
       },
       lastStatus: (status) {
-        setState(() {
-          this.status = status;
-        });
+        this.status.value = status;
       },
     );
   }
 
   void _onVpnStatusChanged(VpnStatus? status) {
-    setState(() {
-      this.status = status;
-    });
+    if (status != null) {
+      this.status.value = status;
+    } else {
+      this.status.value = VpnStatus.empty();
+    }
   }
 
   void _onVpnStageChanged(VPNStage? stage, String value) {
-    setState(() {
-      this.stage = stage;
-    });
+    if (stage != null) {
+      this.stage.value = stage;
+    } else {
+      this.stage.value = VPNStage.unknown;
+    }
   }
 
   void connect() {
-    openvpn.connect(
-      config!,
-      'client',
-      certIsRequired: true,
-    );
+    if (stage.value == VPNStage.disconnected) {
+      if (config != null) {
+        openvpn.connect(
+          config!,
+          'client',
+          certIsRequired: true,
+        );
+      }
+    }
   }
 
   void disconnect() {
-    openvpn.disconnect();
+    if (stage.value == VPNStage.connected) {
+      openvpn.disconnect();
+    }
   }
 
   Future<void> _pickConfig(
@@ -108,32 +116,155 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
     }
   }
 
-  Widget _buildOpenVpnWidget(BuildContext context) {
+  Widget _buildStageWidget(BuildContext context) {
     var padding = const EdgeInsets.symmetric(horizontal: 15.0);
+    String title = '';
+    if (configIp != null) {
+      title = title + configIp!;
+    }
+    if (configName != null) {
+      title = title + configName!;
+    }
+    return ValueListenableBuilder(
+        valueListenable: stage,
+        builder: (BuildContext context, VPNStage value, Widget? child) {
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              ListTile(
+                leading: Switch(
+                  value: stage.value == VPNStage.connected,
+                  onChanged: (bool value) {
+                    if (value) {
+                      connect();
+                    } else {
+                      disconnect();
+                    }
+                  },
+                ),
+                title: Text(title),
+                subtitle: Text(stage.value.name),
+                trailing: IconButton(
+                  onPressed: () {
+                    _pickConfig(context);
+                  },
+                  icon: Icon(
+                    Icons.file_open_outlined,
+                    color: myself.primary,
+                  ),
+                ),
+              ),
+            ],
+          );
+        });
+  }
+
+  Widget _buildStatusWidget(BuildContext context) {
+    var titleStyle =
+        const TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold);
+    var dataStyle =
+        const TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold);
+    Widget statusWidget = ValueListenableBuilder(
+        valueListenable: status,
+        builder: (BuildContext context, VpnStatus value, Widget? child) {
+          var connectedOn = status.value.connectedOn;
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(style: titleStyle, AppLocalizations.t('Connection stats')),
+              const SizedBox(
+                height: 15.0,
+              ),
+              Row(
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.download,
+                        color: myself.primary,
+                      ),
+                      const SizedBox(
+                        width: 5.0,
+                      ),
+                      Column(
+                        children: [
+                          Text(style: dataStyle, AppLocalizations.t('Byte in')),
+                          Text(style: dataStyle, status.value.byteIn!),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  Row(
+                    children: [
+                      Icon(
+                        Icons.upload,
+                        color: myself.primary,
+                      ),
+                      const SizedBox(
+                        width: 5.0,
+                      ),
+                      Column(
+                        children: [
+                          Text(
+                              style: dataStyle, AppLocalizations.t('Byte out')),
+                          Text(style: dataStyle, status.value.byteOut!),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              const SizedBox(
+                height: 15.0,
+              ),
+              Row(
+                children: [
+                  Row(
+                    children: [
+                      Column(
+                        children: [
+                          Text(
+                              style: dataStyle, AppLocalizations.t('Duration')),
+                          Text(style: dataStyle, status.value.duration!),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const Spacer(),
+                  Row(
+                    children: [
+                      Column(
+                        children: [
+                          Text(
+                              style: dataStyle,
+                              AppLocalizations.t('Connected on')),
+                          Text(
+                              style: dataStyle,
+                              connectedOn != null
+                                  ? connectedOn.toIso8601String()
+                                  : ''),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ],
+          );
+        });
+
+    return statusWidget;
+  }
+
+  Widget _buildOpenVpnWidget(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[
-        ListTile(
-          leading: Switch(
-            value: stage == VPNStage.connected,
-            onChanged: (bool value) {
-              if (value) {
-                connect();
-              } else {
-                disconnect();
-              }
-            },
-          ),
-          title: Text('$configIp(${configName!})'),
-          subtitle: Text(stage!.name),
-          trailing: IconButton(
-            onPressed: () {
-              _pickConfig(context);
-            },
-            icon: const Icon(Icons.file_open_outlined),
-          ),
-        ),
+      children: [
+        _buildStageWidget(context),
+        Container(
+            padding: const EdgeInsets.all(25.0),
+            child: _buildStatusWidget(context)),
       ],
     );
   }
