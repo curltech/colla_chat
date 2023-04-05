@@ -241,6 +241,12 @@ class ColumnFieldController with ChangeNotifier {
   }
 }
 
+const InputBorder textFormFieldBorder =  InputBorder.none;
+
+// const InputBorder textFormFieldBorder = OutlineInputBorder(
+//     borderSide: BorderSide.none,
+//     borderRadius: BorderRadius.all(Radius.circular(8.0)));
+
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
 class ColumnFieldWidget extends StatefulWidget {
   final ColumnFieldController controller;
@@ -354,14 +360,14 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
       minLines: 1,
       readOnly: columnFieldDef.readOnly,
       decoration: InputDecoration(
-          fillColor: Colors.grey.withOpacity(AppOpacity.xlOpacity),
+          fillColor: Colors.white.withOpacity(AppOpacity.lgOpacity),
           filled: true,
-          border: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          errorBorder: InputBorder.none,
-          disabledBorder: InputBorder.none,
-          focusedErrorBorder: InputBorder.none,
+          border: textFormFieldBorder,
+          focusedBorder: textFormFieldBorder,
+          enabledBorder: textFormFieldBorder,
+          errorBorder: textFormFieldBorder,
+          disabledBorder: textFormFieldBorder,
+          focusedErrorBorder: textFormFieldBorder,
           labelText: label,
           prefixIcon: _buildIcon(),
           suffixIcon: suffixIcon,
@@ -404,14 +410,14 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
       keyboardType: columnFieldDef.textInputType,
       obscureText: !pwdShow,
       decoration: InputDecoration(
-          fillColor: Colors.grey.withOpacity(AppOpacity.xlOpacity),
+          fillColor: Colors.white.withOpacity(AppOpacity.lgOpacity),
           filled: true,
-          border: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          errorBorder: InputBorder.none,
-          disabledBorder: InputBorder.none,
-          focusedErrorBorder: InputBorder.none,
+          border: textFormFieldBorder,
+          focusedBorder: textFormFieldBorder,
+          enabledBorder: textFormFieldBorder,
+          errorBorder: textFormFieldBorder,
+          disabledBorder: textFormFieldBorder,
+          focusedErrorBorder: textFormFieldBorder,
           labelText: AppLocalizations.t(columnFieldDef.label),
           prefixIcon: _buildIcon(),
           suffixIcon: IconButton(
