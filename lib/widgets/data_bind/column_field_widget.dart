@@ -241,11 +241,11 @@ class ColumnFieldController with ChangeNotifier {
   }
 }
 
-const InputBorder textFormFieldBorder =  InputBorder.none;
+// const InputBorder textFormFieldBorder =  InputBorder.none;
 
-// const InputBorder textFormFieldBorder = OutlineInputBorder(
-//     borderSide: BorderSide.none,
-//     borderRadius: BorderRadius.all(Radius.circular(8.0)));
+const InputBorder textFormFieldBorder = UnderlineInputBorder(
+    borderSide: BorderSide.none,
+    borderRadius: BorderRadius.all(Radius.circular(4.0)));
 
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
 class ColumnFieldWidget extends StatefulWidget {
@@ -360,7 +360,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
       minLines: 1,
       readOnly: columnFieldDef.readOnly,
       decoration: InputDecoration(
-          fillColor: Colors.white.withOpacity(AppOpacity.lgOpacity),
+          fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
           filled: true,
           border: textFormFieldBorder,
           focusedBorder: textFormFieldBorder,
@@ -410,7 +410,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
       keyboardType: columnFieldDef.textInputType,
       obscureText: !pwdShow,
       decoration: InputDecoration(
-          fillColor: Colors.white.withOpacity(AppOpacity.lgOpacity),
+          fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
           filled: true,
           border: textFormFieldBorder,
           focusedBorder: textFormFieldBorder,
