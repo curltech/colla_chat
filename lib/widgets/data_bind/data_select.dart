@@ -4,7 +4,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
-import 'package:colla_chat/widgets/common/simple_widget.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
@@ -643,8 +643,8 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
     children.add(Expanded(
         child: SingleChildScrollView(
             controller: ScrollController(), child: selectView)));
-    ButtonStyle style = SimpleWidgetUtil.buildButtonStyle();
-    ButtonStyle mainStyle = SimpleWidgetUtil.buildButtonStyle(
+    ButtonStyle style = StyleUtil.buildButtonStyle();
+    ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);
     children.add(ButtonBar(
       children: [

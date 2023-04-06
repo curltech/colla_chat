@@ -5,6 +5,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
 import 'package:omni_datetime_picker/omni_datetime_picker.dart';
@@ -240,12 +241,6 @@ class ColumnFieldController with ChangeNotifier {
     }
   }
 }
-
-// const InputBorder textFormFieldBorder =  InputBorder.none;
-
-const InputBorder textFormFieldBorder = UnderlineInputBorder(
-    borderSide: BorderSide.none,
-    borderRadius: BorderRadius.all(Radius.circular(4.0)));
 
 /// 通用列表项，用构造函数传入数据，根据数据构造列表项
 class ColumnFieldWidget extends StatefulWidget {

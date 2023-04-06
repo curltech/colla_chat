@@ -1,6 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/widgets/common/simple_widget.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 
 enum ActionType {
@@ -83,7 +83,7 @@ class DataActionCard extends StatelessWidget {
       BuildContext context, ActionData actionData, int index) {
     var label = AppLocalizations.t(actionData.label);
     var tooltip = AppLocalizations.t(actionData.tooltip ?? '');
-    return SimpleWidgetUtil.buildIconTextButton(
+    return IconTextButton(
         iconColor: myself.primary,
         iconSize: size,
         onPressed: () {
@@ -131,10 +131,10 @@ class DataActionCard extends StatelessWidget {
     return addFriendTextField;
   }
 
-  Widget _buildInkWell(BuildContext context, ActionData actionData, int index) {
+  Widget _buildInkWellTextButton(BuildContext context, ActionData actionData, int index) {
     var label = AppLocalizations.t(actionData.label);
     var tooltip = AppLocalizations.t(actionData.tooltip ?? '');
-    return SimpleWidgetUtil.buildInkWell(
+    return InkWellTextButton(
         padding: const EdgeInsets.all(5.0),
         iconColor: myself.primary,
         iconSize: size,
@@ -150,7 +150,7 @@ class DataActionCard extends StatelessWidget {
         icon: actionData.icon);
   }
 
-  Widget _buildCircleButton(
+  Widget _buildCircleTextButton(
       BuildContext context, ActionData actionData, int index) {
     var label = AppLocalizations.t(actionData.label);
     var tooltip = AppLocalizations.t(actionData.tooltip ?? '');
@@ -163,7 +163,7 @@ class DataActionCard extends StatelessWidget {
               Radius.circular(5.0),
             ),
           ),
-          child: SimpleWidgetUtil.buildCircleButton(
+          child: CircleTextButton(
               backgroundColor: myself.primary,
               onPressed: () {
                 if (onPressed != null) {

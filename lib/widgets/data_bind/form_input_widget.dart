@@ -4,7 +4,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:colla_chat/widgets/common/simple_widget.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
@@ -251,8 +251,8 @@ class _FormInputWidgetState extends State<FormInputWidget> {
   }
 
   Widget _buildButtonBar(BuildContext context) {
-    ButtonStyle style = SimpleWidgetUtil.buildButtonStyle();
-    ButtonStyle mainStyle = SimpleWidgetUtil.buildButtonStyle(
+    ButtonStyle style = StyleUtil.buildButtonStyle();
+    ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);
     if (widget.onOk != null) {
       return ButtonBar(children: [

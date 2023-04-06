@@ -19,7 +19,7 @@ import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/screen_select_widget.dart';
-import 'package:colla_chat/widgets/common/simple_widget.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
@@ -555,7 +555,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
     Widget button = ValueListenableBuilder<bool>(
         valueListenable: speakerStatus,
         builder: (BuildContext context, bool status, Widget? child) {
-          return SimpleWidgetUtil.buildCircleButton(
+          return CircleTextButton(
             label: status ? 'Speaker on' : 'Speaker off',
             onPressed: () async {
               speakerStatus.value = !speakerStatus.value;
@@ -591,7 +591,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               label = 'Exit';
               tip = 'Chatting';
             }
-            buttonWidget = SimpleWidgetUtil.buildCircleButton(
+            buttonWidget = CircleTextButton(
               label: label,
               tip: tip,
               onPressed: () {
@@ -628,7 +628,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               label = 'Join';
               tip = 'In conference';
             }
-            buttonWidget = SimpleWidgetUtil.buildCircleButton(
+            buttonWidget = CircleTextButton(
               label: label,
               tip: tip,
               onPressed: () async {
@@ -646,11 +646,11 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
               ),
             );
           } else {
-            buttonWidget = SimpleWidgetUtil.buildCircleButton(
+            buttonWidget = const CircleTextButton(
               elevation: 2.0,
               backgroundColor: Colors.grey,
-              padding: const EdgeInsets.all(15.0),
-              child: const Icon(
+              padding: EdgeInsets.all(15.0),
+              child: Icon(
                 Icons.call_end,
                 size: AppIconSize.mdSize,
                 color: Colors.white,

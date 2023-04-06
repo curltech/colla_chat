@@ -14,7 +14,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
-import 'package:colla_chat/widgets/common/simple_widget.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
@@ -193,7 +193,7 @@ class _IndexViewState extends State<IndexView>
     name = name ?? '';
     var title = chatMessage.title;
     title = title ?? '';
-    var rejectedButton = SimpleWidgetUtil.buildCircleButton(
+    var rejectedButton = CircleTextButton(
         onPressed: () async {
           videoChatMessageVisible.value = false;
           _stop();
@@ -201,9 +201,9 @@ class _IndexViewState extends State<IndexView>
               .sendChatReceipt(MessageReceiptType.rejected);
           videoChatMessageController = null;
         },
-        child: const Icon(color: Colors.white, size: 16, Icons.call_end),
-        backgroundColor: Colors.red);
-    var holdButton = SimpleWidgetUtil.buildCircleButton(
+        backgroundColor: Colors.red,
+        child: const Icon(color: Colors.white, size: 16, Icons.call_end));
+    var holdButton = CircleTextButton(
         onPressed: () async {
           videoChatMessageVisible.value = false;
           _stop();
@@ -211,9 +211,9 @@ class _IndexViewState extends State<IndexView>
               .sendChatReceipt(MessageReceiptType.hold);
           videoChatMessageController = null;
         },
-        child: const Icon(color: Colors.white, size: 16, Icons.add_call),
-        backgroundColor: Colors.amber);
-    var acceptedButton = SimpleWidgetUtil.buildCircleButton(
+        backgroundColor: Colors.amber,
+        child: const Icon(color: Colors.white, size: 16, Icons.add_call));
+    var acceptedButton = CircleTextButton(
         onPressed: () async {
           videoChatMessageVisible.value = false;
           _stop();
@@ -221,8 +221,8 @@ class _IndexViewState extends State<IndexView>
               .sendChatReceipt(MessageReceiptType.accepted);
           videoChatMessageController = null;
         },
-        child: const Icon(color: Colors.white, size: 16, Icons.call),
-        backgroundColor: Colors.green);
+        backgroundColor: Colors.green,
+        child: const Icon(color: Colors.white, size: 16, Icons.call));
     List<Widget> buttons = <Widget>[];
     buttons.add(rejectedButton);
     buttons.add(holdButton);

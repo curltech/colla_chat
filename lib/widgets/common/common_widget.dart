@@ -2,19 +2,29 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:flutter/material.dart';
 
-///常用的一些简单组件
-class SimpleWidgetUtil {
-  ///创建常用的大图标按钮
-  static buildCircleButton({
-    Key? key,
-    String? label,
-    String? tip,
-    void Function()? onPressed,
-    Color? backgroundColor,
-    double elevation = 2.0,
-    EdgeInsetsGeometry padding = const EdgeInsets.all(15.0),
-    required Widget child,
-  }) {
+///创建常用的大图标按钮
+class CircleTextButton extends StatelessWidget {
+  final String? label;
+  final String? tip;
+  final void Function()? onPressed;
+  final Color? backgroundColor;
+  final double elevation;
+  final EdgeInsetsGeometry padding;
+  final Widget child;
+
+  const CircleTextButton({
+    super.key,
+    this.label,
+    this.tip,
+    this.onPressed,
+    this.backgroundColor,
+    this.elevation = 2.0,
+    this.padding = const EdgeInsets.all(15.0),
+    required this.child,
+  });
+
+  @override
+  build(BuildContext context) {
     Widget button = TextButton(
       style: ButtonStyle(
         backgroundColor: MaterialStateProperty.all(backgroundColor),
@@ -31,7 +41,7 @@ class SimpleWidgetUtil {
     if (tip != null) {
       children.add(
         Text(
-          AppLocalizations.t(tip),
+          AppLocalizations.t(tip!),
           style: const TextStyle(
               color: Colors.white, fontSize: AppFontSize.xsFontSize),
         ),
@@ -51,7 +61,7 @@ class SimpleWidgetUtil {
       );
       children.add(
         Text(
-          AppLocalizations.t(label),
+          AppLocalizations.t(label!),
           style: const TextStyle(
               color: Colors.white, fontSize: AppFontSize.mdFontSize),
         ),
@@ -64,19 +74,33 @@ class SimpleWidgetUtil {
     );
     return button;
   }
+}
 
-  ///创建常用的图标文本按钮
-  static buildIconTextButton({
-    Key? key,
-    required void Function()? onPressed,
-    Color? iconColor,
-    double? iconSize,
-    EdgeInsetsGeometry padding = EdgeInsets.zero,
-    String? label,
-    String? tooltip,
-    Color? labelColor,
-    required Widget icon,
-  }) {
+///创建常用的图标文本按钮
+class IconTextButton extends StatelessWidget {
+  final void Function()? onPressed;
+  final Color? iconColor;
+  final double? iconSize;
+  final EdgeInsetsGeometry padding;
+  final String? label;
+  final String? tooltip;
+  final Color? labelColor;
+  final Widget icon;
+
+  const IconTextButton({
+    super.key,
+    this.onPressed,
+    this.iconColor,
+    this.iconSize,
+    this.label,
+    this.tooltip,
+    this.labelColor,
+    required this.icon,
+    this.padding = EdgeInsets.zero,
+  });
+
+  @override
+  build(BuildContext context) {
     List<Widget> children = [
       icon,
     ];
@@ -87,7 +111,7 @@ class SimpleWidgetUtil {
       children.add(
         Expanded(
             child: Text(
-          label,
+          label ?? '',
           style: TextStyle(
             color: labelColor,
           ),
@@ -100,24 +124,38 @@ class SimpleWidgetUtil {
         padding: padding,
         color: iconColor,
         iconSize: iconSize,
-        tooltip: tooltip != null ? AppLocalizations.t(tooltip) : null,
+        tooltip: tooltip != null ? AppLocalizations.t(tooltip ?? '') : null,
         icon: Column(
           children: children,
         ));
   }
+}
 
-  ///创建常用的InkWell按钮
-  static buildInkWell({
-    Key? key,
-    required void Function()? onPressed,
-    Color? iconColor,
-    double? iconSize,
-    EdgeInsetsGeometry padding = EdgeInsets.zero,
-    String? label,
-    Color? labelColor,
-    Color? backgroundColor,
-    required Widget icon,
-  }) {
+///创建常用的InkWell按钮
+class InkWellTextButton extends StatelessWidget {
+  final void Function()? onPressed;
+  final Color? iconColor;
+  final double? iconSize;
+  final EdgeInsetsGeometry padding;
+  final String? label;
+  final Color? labelColor;
+  final Color? backgroundColor;
+  final Widget icon;
+
+  const InkWellTextButton({
+    super.key,
+    this.onPressed,
+    this.iconColor,
+    this.iconSize,
+    this.label,
+    this.labelColor,
+    this.backgroundColor,
+    required this.icon,
+    this.padding = EdgeInsets.zero,
+  });
+
+  @override
+  build(BuildContext context) {
     List<Widget> children = [
       icon,
     ];
@@ -128,7 +166,7 @@ class SimpleWidgetUtil {
       children.add(
         Expanded(
             child: Text(
-          label,
+          label ?? '',
           style: TextStyle(
             color: labelColor,
           ),
@@ -144,8 +182,11 @@ class SimpleWidgetUtil {
               children: children,
             )));
   }
+}
 
-  ///创建常用的文按钮样式
+///创建常用的组件样式，包括按钮，输入框
+class StyleUtil {
+  ///创建常用的按钮样式
   static ButtonStyle buildButtonStyle(
       {TextStyle? textStyle,
       Color? backgroundColor,
@@ -178,21 +219,43 @@ class SimpleWidgetUtil {
 
     return style;
   }
+}
 
-  ///创建常用的文本输入字段
-  static Widget buildTextFormField({
-    TextEditingController? controller,
-    TextInputType? textInputType,
-    int? maxLines = 1,
-    int? minLines,
-    bool readOnly = false,
-    Color? fillColor,
-    String? labelText,
-    Widget? prefixIcon,
-    Widget? suffixIcon,
-    Widget? suffix,
-    String? hintText,
-  }) {
+const InputBorder textFormFieldBorder = UnderlineInputBorder(
+    borderSide: BorderSide.none,
+    borderRadius: BorderRadius.all(Radius.circular(4.0)));
+
+///创建常用的文本输入字段
+class AutoSizeTextFormField extends StatelessWidget {
+  final TextEditingController? controller;
+  final TextInputType? textInputType;
+  final int? maxLines;
+
+  final int? minLines;
+  final bool readOnly;
+  final Color? fillColor;
+  final String? labelText;
+  final Widget? prefixIcon;
+  final Widget? suffixIcon;
+  final Widget? suffix;
+  final String? hintText;
+
+  const AutoSizeTextFormField(
+      {super.key,
+      this.controller,
+      this.textInputType,
+      this.minLines,
+      this.fillColor,
+      this.labelText,
+      this.prefixIcon,
+      this.suffixIcon,
+      this.suffix,
+      this.hintText,
+      this.readOnly = false,
+      this.maxLines = 1});
+
+  @override
+  build(BuildContext context) {
     var textFormField = TextFormField(
       controller: controller,
       keyboardType: textInputType,
@@ -202,12 +265,12 @@ class SimpleWidgetUtil {
       decoration: InputDecoration(
           fillColor: fillColor ?? Colors.grey.withOpacity(AppOpacity.xlOpacity),
           filled: true,
-          border: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          errorBorder: InputBorder.none,
-          disabledBorder: InputBorder.none,
-          focusedErrorBorder: InputBorder.none,
+          border: textFormFieldBorder,
+          focusedBorder: textFormFieldBorder,
+          enabledBorder: textFormFieldBorder,
+          errorBorder: textFormFieldBorder,
+          disabledBorder: textFormFieldBorder,
+          focusedErrorBorder: textFormFieldBorder,
           labelText: labelText,
           prefixIcon: prefixIcon,
           suffixIcon: suffixIcon,

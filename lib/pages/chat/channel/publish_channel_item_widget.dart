@@ -19,7 +19,7 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/simple_widget.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/richtext/html_editor_widget.dart';
 import 'package:cross_file/cross_file.dart';
@@ -108,7 +108,7 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
   }
 
   Widget _buildTextField(BuildContext context) {
-    var textFormField = SimpleWidgetUtil.buildTextFormField(
+    var textFormField = AutoSizeTextFormField(
       controller: textEditingController,
       labelText: AppLocalizations.t('title'),
     );
@@ -203,19 +203,19 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
           ),
           ButtonBar(children: [
             TextButton(
-                style: SimpleWidgetUtil.buildButtonStyle(),
+                style: StyleUtil.buildButtonStyle(),
                 onPressed: () {
                   indexWidgetProvider.push('channel_message_view');
                 },
                 child: Text(AppLocalizations.t('View'))),
             TextButton(
-                style: SimpleWidgetUtil.buildButtonStyle(),
+                style: StyleUtil.buildButtonStyle(),
                 onPressed: () {
                   _save();
                 },
                 child: Text(AppLocalizations.t('Save'))),
             TextButton(
-                style: SimpleWidgetUtil.buildButtonStyle(
+                style: StyleUtil.buildButtonStyle(
                     backgroundColor: myself.primary),
                 onPressed: () async {
                   ChatMessage? chatMessage =

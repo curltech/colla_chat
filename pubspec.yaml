@@ -121,7 +121,8 @@ dependencies:
   extended_text_field: ^11.0.1 #文字表情混入
   extended_text_library: ^10.0.0 #Flutter2.5用这个,,其他可注释
   azlistview: ^2.0.0 #特殊列表滑动
-  # flutter_echarts: ^2.4.0
+  graphic: ^2.0.2
+  flutter_echarts: ^2.4.0
   fluent_ui: 4.4.0
   macos_ui: ^1.11.1
   flutter_material_color_picker: ^1.1.0+2
@@ -148,6 +149,10 @@ dependencies:
   focused_menu: ^1.0.5
   floating_action_bubble: ^1.1.4
   expandable: ^5.0.1
+  auto_size_text: ^3.0.0
+  auto_size_text_field: ^2.2.1
+  responsive_sizer: ^3.1.1
+
   #安全加密
   cryptography: ^2.0.5 #ecc,aes
   #在macos上不能使用，error: cannot call value of non-function type 'FlutterBinaryMessenger'

@@ -6,7 +6,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/widgets/common/simple_widget.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -564,7 +564,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
           },
           tooltip: 'Toggle Picture Video',
         ),
-        SimpleWidgetUtil.buildCircleButton(
+        CircleTextButton(
           onPressed:
               cameraController != null && cameraController.value.isInitialized
                   ? _captureMedia

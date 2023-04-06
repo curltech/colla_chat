@@ -8,7 +8,7 @@ import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/simple_widget.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -51,7 +51,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
   }
 
   Widget _buildLogout(BuildContext context) {
-    ButtonStyle style = SimpleWidgetUtil.buildButtonStyle(
+    ButtonStyle style = StyleUtil.buildButtonStyle(
         maximumSize: const Size(140.0, 56.0), backgroundColor: myself.primary);
 
     var indexWidgetProvider =

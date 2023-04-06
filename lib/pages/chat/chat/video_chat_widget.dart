@@ -12,8 +12,8 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/drag_overlay.dart';
-import 'package:colla_chat/widgets/common/simple_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
@@ -79,7 +79,7 @@ class _VideoChatWidgetState extends State<VideoChatWidget> {
   ///最小化界面，将overlay按钮压入，本界面被弹出
   _minimize(BuildContext context) {
     widget.overlayEntry = DragOverlay(
-      child: SimpleWidgetUtil.buildCircleButton(
+      child: CircleTextButton(
           padding: const EdgeInsets.all(15.0),
           backgroundColor: myself.primary,
           onPressed: () {
