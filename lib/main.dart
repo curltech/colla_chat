@@ -15,12 +15,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter_background/flutter_background.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart' as inapp;
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:provider/provider.dart';
 import 'package:provider/single_child_widget.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:webview_win_floating/webview.dart';
 import 'package:window_manager/window_manager.dart';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 
 ///全局处理证书问题
 class PlatformHttpOverrides extends HttpOverrides {
@@ -66,6 +67,7 @@ void main(List<String> args) async {
   //       ],
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
   ///6.x.x
   // if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
   //   await inapp.InAppWebViewController.setWebContentsDebuggingEnabled(true);
@@ -107,58 +109,66 @@ class CollaChatApp extends StatelessWidget {
         ],
         child: Consumer<Myself>(
             builder: (BuildContext context, myself, Widget? child) {
-          return MaterialApp(
-            onGenerateTitle: (context) {
-              return AppLocalizations.t('Welcome to CollaChat');
-            },
-            //title: 'Welcome to CollaChat',
-            debugShowCheckedModeBanner: false,
-            theme: myself.themeData,
-            darkTheme: myself.darkThemeData,
-            themeMode: myself.themeMode,
+          return ResponsiveSizer(builder: (context, orientation, screenType) {
+            return MaterialApp(
+              onGenerateTitle: (context) {
+                return AppLocalizations.t('Welcome to CollaChat');
+              },
+              //title: 'Welcome to CollaChat',
+              debugShowCheckedModeBanner: false,
+              theme: myself.themeData,
+              darkTheme: myself.darkThemeData,
+              themeMode: myself.themeMode,
 
-            ///Scaffold 是 Material 库中提供的一个 widget，它提供了默认的导航栏、标题和包含主屏幕 widget 树的 body 属性
-            home: loginStatus ? indexView : p2pLogin,
-            onGenerateRoute: Application.router.generator,
-            // 初始化FlutterSmartDialog
-            navigatorObservers: [FlutterSmartDialog.observer],
-            builder: FlutterSmartDialog.init(
-              //default toast widget
-              toastBuilder: (String msg) =>
-                  SmartDialogUtil.defaultLoadingWidget(),
-              //default loading widget
-              loadingBuilder: (String msg) =>
-                  SmartDialogUtil.defaultLoadingWidget(),
-            ),
-            // themeMode: StringUtil.enumFromString(
-            //     ThemeMode.values, appDataProvider.brightness),
-            // AppLocalizations.localizationsDelegates,
-            localizationsDelegates: const [
-              AppLocalizationsDelegate(),
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: supportedLocales,
-            // localeResolutionCallback:
-            //     (Locale? locale, Iterable<Locale> supportedLocales) {
-            //   if (localeDataProvider.getLocale() != null) {
-            //     return localeDataProvider.getLocale();
-            //   } else {
-            //     Locale? _locale;
-            //     if (supportedLocales.contains(locale)) {
-            //       _locale = locale;
-            //       Provider.of<LocaleDataProvider>(context, listen: false)
-            //           .setLocale(_locale);
-            //     } else {
-            //       _locale =
-            //           Provider.of<LocaleDataProvider>(context).getLocale();
-            //     }
-            //     return _locale;
-            //   }
-            // },
-            locale: myself.locale,
-          );
+              ///Scaffold 是 Material 库中提供的一个 widget，它提供了默认的导航栏、标题和包含主屏幕 widget 树的 body 属性
+              home: loginStatus ? indexView : p2pLogin,
+              onGenerateRoute: Application.router.generator,
+              // 初始化FlutterSmartDialog
+              navigatorObservers: [FlutterSmartDialog.observer],
+              // builder:  (context, widget) {
+              // return MediaQuery(
+              //   //设置全局的文字的textScaleFactor为1.0，文字不再随系统设置改变
+              //   data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+              //   child: widget,
+              // );
+              builder: FlutterSmartDialog.init(
+                //default toast widget
+                toastBuilder: (String msg) =>
+                    SmartDialogUtil.defaultLoadingWidget(),
+                //default loading widget
+                loadingBuilder: (String msg) =>
+                    SmartDialogUtil.defaultLoadingWidget(),
+              ),
+              // themeMode: StringUtil.enumFromString(
+              //     ThemeMode.values, appDataProvider.brightness),
+              // AppLocalizations.localizationsDelegates,
+              localizationsDelegates: const [
+                AppLocalizationsDelegate(),
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
+              supportedLocales: supportedLocales,
+              // localeResolutionCallback:
+              //     (Locale? locale, Iterable<Locale> supportedLocales) {
+              //   if (localeDataProvider.getLocale() != null) {
+              //     return localeDataProvider.getLocale();
+              //   } else {
+              //     Locale? _locale;
+              //     if (supportedLocales.contains(locale)) {
+              //       _locale = locale;
+              //       Provider.of<LocaleDataProvider>(context, listen: false)
+              //           .setLocale(_locale);
+              //     } else {
+              //       _locale =
+              //           Provider.of<LocaleDataProvider>(context).getLocale();
+              //     }
+              //     return _locale;
+              //   }
+              // },
+              locale: myself.locale,
+            );
+          });
         }));
   }
 }

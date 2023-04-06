@@ -1,6 +1,182 @@
+import 'dart:ui';
+
+import 'package:auto_size_text/auto_size_text.dart';
+import 'package:auto_size_text_field/auto_size_text_field.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+class CommonAutoSizeText extends AutoSizeText {
+  const CommonAutoSizeText(
+    String data, {
+    Key? key,
+    Key? textKey,
+    TextStyle? style,
+    StrutStyle? strutStyle,
+    double minFontSize = 12,
+    double maxFontSize = double.infinity,
+    double stepGranularity = 1,
+    List<double>? presetFontSizes,
+    AutoSizeGroup? group,
+    TextAlign? textAlign,
+    TextDirection? textDirection,
+    Locale? locale,
+    bool softWrap = true,
+    bool wrapWords = true,
+    TextOverflow? overflow,
+    Widget? overflowReplacement,
+    double textScaleFactor = 1.0,
+    int maxLines = 1,
+    String? semanticsLabel,
+  }) : super(
+          data,
+          key: key,
+          textKey: textKey,
+          style: style,
+          strutStyle: strutStyle,
+          minFontSize: minFontSize,
+          maxFontSize: maxFontSize,
+          stepGranularity: stepGranularity,
+          presetFontSizes: presetFontSizes,
+          group: group,
+          textAlign: textAlign,
+          textDirection: textDirection,
+          locale: locale,
+          softWrap: softWrap,
+          wrapWords: wrapWords,
+          overflow: overflow,
+          overflowReplacement: overflowReplacement,
+          textScaleFactor: textScaleFactor,
+          maxLines: maxLines,
+          semanticsLabel: semanticsLabel,
+        );
+}
+
+class CommonAutoSizeTextField extends AutoSizeTextField {
+  const CommonAutoSizeTextField({
+    Key? key,
+    bool fullwidth = true,
+    Key? textFieldKey,
+    TextStyle? style,
+    StrutStyle? strutStyle,
+    double minFontSize = 12,
+    double maxFontSize = double.infinity,
+    double stepGranularity = 1,
+    List<double>? presetFontSizes,
+    TextAlign textAlign = TextAlign.start,
+    TextDirection? textDirection,
+    Locale? locale,
+    bool wrapWords = true,
+    Widget? overflowReplacement,
+    String? semanticsLabel,
+    TextEditingController? controller,
+    FocusNode? focusNode,
+    InputDecoration decoration = const InputDecoration(),
+    TextInputType? keyboardType,
+    TextInputAction? textInputAction,
+    TextCapitalization textCapitalization = TextCapitalization.none,
+    TextAlignVertical? textAlignVertical,
+    Iterable<String>? autofillHints,
+    bool autofocus = false,
+    bool obscureText = false,
+    bool autocorrect = true,
+    SmartDashesType? smartDashesType,
+    SmartQuotesType? smartQuotesType,
+    bool enableSuggestions = true,
+    int? maxLines = 1,
+    bool expands = false,
+    bool readOnly = false,
+    EditableTextContextMenuBuilder? contextMenuBuilder,
+    bool? showCursor,
+    int maxLength = 1,
+    MaxLengthEnforcement? maxLengthEnforcement,
+    void Function(String)? onChanged,
+    void Function()? onEditingComplete,
+    Function(String)? onSubmitted,
+    List<TextInputFormatter>? inputFormatters,
+    bool? enabled,
+    double? cursorHeight,
+    double cursorWidth = 2.0,
+    Radius? cursorRadius,
+    Color? cursorColor,
+    BoxHeightStyle selectionHeightStyle = BoxHeightStyle.tight,
+    BoxWidthStyle selectionWidthStyle = BoxWidthStyle.tight,
+    Brightness? keyboardAppearance,
+    EdgeInsets scrollPadding = const EdgeInsets.all(20.0),
+    DragStartBehavior dragStartBehavior = DragStartBehavior.start,
+    bool enableInteractiveSelection = true,
+    void Function()? onTap,
+    Widget? Function(BuildContext,
+            {required int currentLength,
+            required bool isFocused,
+            required int? maxLength})?
+        buildCounter,
+    ScrollPhysics? scrollPhysics,
+    ScrollController? scrollController,
+    int minLines = 1,
+    double? minWidth,
+  }) : super(
+          key: key,
+          fullwidth: fullwidth,
+          textFieldKey: textFieldKey,
+          style: style,
+          strutStyle: strutStyle,
+          minFontSize: minFontSize,
+          maxFontSize: maxFontSize,
+          stepGranularity: stepGranularity,
+          presetFontSizes: presetFontSizes,
+          textAlign: textAlign,
+          textDirection: textDirection,
+          locale: locale,
+          wrapWords: wrapWords,
+          overflowReplacement: overflowReplacement,
+          semanticsLabel: semanticsLabel,
+          controller: controller,
+          focusNode: focusNode,
+          decoration: decoration,
+          keyboardType: keyboardType,
+          textInputAction: textInputAction,
+          textCapitalization: textCapitalization,
+          textAlignVertical: textAlignVertical,
+          autofillHints: autofillHints,
+          autofocus: autofocus,
+          obscureText: obscureText,
+          autocorrect: autocorrect,
+          smartDashesType: smartDashesType,
+          smartQuotesType: smartQuotesType,
+          enableSuggestions: enableSuggestions,
+          maxLines: maxLines,
+          expands: expands,
+          readOnly: readOnly,
+          contextMenuBuilder: contextMenuBuilder,
+          showCursor: showCursor,
+          maxLength: maxLength,
+          maxLengthEnforcement: maxLengthEnforcement,
+          onChanged: onChanged,
+          onEditingComplete: onEditingComplete,
+          onSubmitted: onSubmitted,
+          inputFormatters: inputFormatters,
+          enabled: enabled,
+          cursorHeight: cursorHeight,
+          cursorWidth: cursorWidth,
+          cursorRadius: cursorRadius,
+          cursorColor: cursorColor,
+          selectionHeightStyle: selectionHeightStyle,
+          selectionWidthStyle: selectionWidthStyle,
+          keyboardAppearance: keyboardAppearance,
+          scrollPadding: scrollPadding,
+          dragStartBehavior: dragStartBehavior,
+          enableInteractiveSelection: enableInteractiveSelection,
+          onTap: onTap,
+          buildCounter: buildCounter,
+          scrollPhysics: scrollPhysics,
+          scrollController: scrollController,
+          minLines: minLines,
+          minWidth: minWidth,
+        );
+}
 
 ///创建常用的大图标按钮
 class CircleTextButton extends StatelessWidget {
@@ -40,7 +216,7 @@ class CircleTextButton extends StatelessWidget {
     List<Widget> children = [];
     if (tip != null) {
       children.add(
-        Text(
+        CommonAutoSizeText(
           AppLocalizations.t(tip!),
           style: const TextStyle(
               color: Colors.white, fontSize: AppFontSize.xsFontSize),
@@ -60,7 +236,7 @@ class CircleTextButton extends StatelessWidget {
         ),
       );
       children.add(
-        Text(
+        CommonAutoSizeText(
           AppLocalizations.t(label!),
           style: const TextStyle(
               color: Colors.white, fontSize: AppFontSize.mdFontSize),
@@ -110,7 +286,7 @@ class IconTextButton extends StatelessWidget {
       );
       children.add(
         Expanded(
-            child: Text(
+            child: CommonAutoSizeText(
           label ?? '',
           style: TextStyle(
             color: labelColor,
@@ -165,7 +341,7 @@ class InkWellTextButton extends StatelessWidget {
       );
       children.add(
         Expanded(
-            child: Text(
+            child: CommonAutoSizeText(
           label ?? '',
           style: TextStyle(
             color: labelColor,
