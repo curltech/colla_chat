@@ -52,8 +52,8 @@ class AppBarWidget {
       leading: leading,
       actions: actions,
       bottom: bottom,
-      backgroundColor: myself.primary.withOpacity(AppOpacity.xsOpacity),
-      foregroundColor: Colors.white,
+      // backgroundColor: myself.primary.withOpacity(AppOpacity.xsOpacity),
+      // foregroundColor: Colors.white,
     );
     return appBar;
   }
