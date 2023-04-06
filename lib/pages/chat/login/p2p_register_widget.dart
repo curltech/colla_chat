@@ -83,7 +83,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
   Widget build(BuildContext context) {
     return ListView(
       children: <Widget>[
-        const SizedBox(height: 30.0),
+        const SizedBox(height: 10.0),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           child: IntlPhoneField(
@@ -123,7 +123,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
         Container(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
             child: FormInputWidget(
-              height: 320,
+              height: 460,
               onOk: _onOk,
               okLabel: 'Register',
               columnFieldDefs: p2pRegisterInputFieldDef,
