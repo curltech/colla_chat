@@ -130,7 +130,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
   final ValueNotifier<ConnectivityResult> _connectivityResult =
       ValueNotifier<ConnectivityResult>(
           connectivityController.connectivityResult);
-  ValueNotifier<SocketStatus> _socketStatus =
+  final ValueNotifier<SocketStatus> _socketStatus =
       ValueNotifier<SocketStatus>(SocketStatus.none);
 
   final ValueNotifier<List<TileData>> _linkmanTileData =
@@ -459,7 +459,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
           valueListenable: _currentTab,
           builder: (context, value, child) {
             return Tab(
-              icon: Icon(Icons.person,
+              icon: Icon(Icons.person_outline,
                   color: value == 0 ? myself.primary : Colors.white),
               //text: AppLocalizations.t('Linkman'),
               iconMargin: const EdgeInsets.all(0.0),
@@ -469,7 +469,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
           valueListenable: _currentTab,
           builder: (context, value, child) {
             return Tab(
-              icon: Icon(Icons.group,
+              icon: Icon(Icons.group_outlined,
                   color: value == 1 ? myself.primary : Colors.white),
               //text: AppLocalizations.t('Group'),
               iconMargin: const EdgeInsets.all(0.0),
@@ -479,7 +479,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
           valueListenable: _currentTab,
           builder: (context, value, child) {
             return Tab(
-              icon: Icon(Icons.meeting_room,
+              icon: Icon(Icons.meeting_room_outlined,
                   color: value == 2 ? myself.primary : Colors.white),
               //text: AppLocalizations.t('Conference'),
               iconMargin: const EdgeInsets.all(0.0),
