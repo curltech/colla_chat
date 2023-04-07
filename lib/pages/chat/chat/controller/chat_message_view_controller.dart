@@ -1,3 +1,4 @@
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:extended_text_field/extended_text_field.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,7 @@ class ChatMessageViewController with ChangeNotifier {
 
   ///消息显示部分的高度
   double get chatMessageHeight {
-    double bottomHeight = _chatMessageInputHeight + 12;
+    double bottomHeight = _chatMessageInputHeight + 8;
     if (chatMessageViewController.emojiMessageInputHeight > 0) {
       bottomHeight = bottomHeight + _emojiMessageInputHeight;
     }
@@ -27,8 +28,7 @@ class ChatMessageViewController with ChangeNotifier {
     }
     var chatMessageHeight = appDataProvider.actualSize.height -
         appDataProvider.toolbarHeight -
-        bottomHeight -
-        1;
+        bottomHeight;
 
     return chatMessageHeight;
   }
@@ -41,6 +41,7 @@ class ChatMessageViewController with ChangeNotifier {
       if (chatMessageInputHeight != null &&
           _chatMessageInputHeight != chatMessageInputHeight) {
         _chatMessageInputHeight = chatMessageInputHeight;
+        logger.i('chatMessageInputHeight: $_chatMessageInputHeight');
         notifyListeners();
       }
     });
@@ -50,13 +51,6 @@ class ChatMessageViewController with ChangeNotifier {
     return _chatMessageInputHeight;
   }
 
-  set chatMessageInputHeight(double chatMessageInputHeight) {
-    if (_chatMessageInputHeight != chatMessageInputHeight) {
-      _chatMessageInputHeight = chatMessageInputHeight;
-      notifyListeners();
-    }
-  }
-
   double get emojiMessageInputHeight {
     return _emojiMessageInputHeight;
   }
@@ -64,6 +58,7 @@ class ChatMessageViewController with ChangeNotifier {
   set emojiMessageInputHeight(double emojiMessageInputHeight) {
     if (_emojiMessageInputHeight != emojiMessageInputHeight) {
       _emojiMessageInputHeight = emojiMessageInputHeight;
+      logger.i('emojiMessageInputHeight: $_emojiMessageInputHeight');
       if (_emojiMessageInputHeight > 0) {
         _moreMessageInputHeight = 0;
       }
@@ -78,6 +73,7 @@ class ChatMessageViewController with ChangeNotifier {
   set moreMessageInputHeight(double moreMessageInputHeight) {
     if (_moreMessageInputHeight != moreMessageInputHeight) {
       _moreMessageInputHeight = moreMessageInputHeight;
+      logger.i('moreMessageInputHeight: $_moreMessageInputHeight');
       if (_moreMessageInputHeight > 0) {
         _emojiMessageInputHeight = 0;
       }

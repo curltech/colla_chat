@@ -1,4 +1,5 @@
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/locale_util.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
@@ -97,11 +98,15 @@ class AppDataProvider with ChangeNotifier {
     if (totalSize.width != _totalSize.width ||
         totalSize.height != _totalSize.height) {
       _totalSize = totalSize;
+      logger.i('Total size: $_totalSize');
     }
     var bottom = MediaQuery.of(context).viewInsets.bottom;
     if (_keyboardHeight == 270.0 && bottom != 0) {
       _keyboardHeight = bottom;
+      logger.i('KeyboardHeight: $_keyboardHeight');
     }
+    logger.i('bottomBarHeight: $bottomBarHeight');
+    logger.i('toolbarHeight: $toolbarHeight');
   }
 }
 

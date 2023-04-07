@@ -206,15 +206,18 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   Widget _buildTextMessageInput(BuildContext context) {
     double iconInset = 0.0;
     return Card(
+        elevation: 0.0,
         margin:
             EdgeInsets.symmetric(horizontal: iconInset, vertical: iconInset),
+        shape: const ContinuousRectangleBorder(),
         child: Row(children: <Widget>[
           Container(
             margin: EdgeInsets.symmetric(
                 horizontal: iconInset, vertical: iconInset),
             child: IconButton(
               icon: voiceVisible
-                  ? Icon(Icons.record_voice_over_outlined, color: myself.primary)
+                  ? Icon(Icons.record_voice_over_outlined,
+                      color: myself.primary)
                   : Icon(Icons.keyboard_alt_outlined, color: myself.primary),
               onPressed: () {
                 setState(() {
