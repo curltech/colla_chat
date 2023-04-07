@@ -41,11 +41,15 @@ class AppDataProvider with ChangeNotifier {
     return Size(width, height);
   }
 
+  Size get designSize {
+    //特殊效果的尺寸，宽度最大是412，高度最大是892
+    return const Size(412.0, 892.0);
+  }
+
   ///实际的屏幕尺寸，也是玻璃等特殊效果的尺寸，对移动设备来说，与总尺寸一致，
   ///对桌面来说，是登录等小页面的尺寸，露出后面的背景图像
   Size get actualSize {
-    //特殊效果的尺寸，宽度最大是412，高度最大是892
-    Size fixedSize = const Size(412.0, 892.0);
+    Size fixedSize = designSize;
     double width = _totalSize.width;
     double height = _totalSize.height;
     //桌面需要根据固定的尺寸来计算
