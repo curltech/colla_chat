@@ -34,6 +34,9 @@ class _BottomBarState extends State<BottomBar> {
           BottomNavigationBarItem(
               icon: const Icon(Icons.wifi_channel),
               label: indexWidgetProvider.getLabel(2)),
+          // BottomNavigationBarItem(
+          //     icon: const Icon(Icons.candlestick_chart),
+          //     label: indexWidgetProvider.getLabel(3)),
           BottomNavigationBarItem(
               icon: const Icon(Icons.person),
               label: indexWidgetProvider.getLabel(3)),
@@ -46,6 +49,8 @@ class _BottomBarState extends State<BottomBar> {
         unselectedFontSize: 14.0,
         showSelectedLabels: true,
         showUnselectedLabels: true,
+        selectedLabelStyle:const TextStyle(fontWeight:FontWeight.bold),
+        type:BottomNavigationBarType.fixed,
         onTap: (int index) {
           indexWidgetProvider.currentMainIndex = index;
         },
