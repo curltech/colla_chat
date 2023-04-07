@@ -110,13 +110,12 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
 
   Widget _buildChatMessageInput(BuildContext context) {
     List<Widget> children = [
-      Center(
-          child: TextMessageInputWidget(
+      TextMessageInputWidget(
         textEditingController: textEditingController,
         onEmojiPressed: onEmojiPressed,
         onMorePressed: onMorePressed,
         onSendPressed: onSendPressed,
-      )),
+      ),
     ];
     if (chatMessageViewController.emojiMessageInputHeight > 0) {
       children.add(EmojiMessageInputWidget(

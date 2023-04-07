@@ -167,7 +167,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 0.0),
           child: IconButton(
-            icon: Icon(Icons.send, color: myself.primary),
+            icon: Icon(Icons.send_outlined, color: myself.primary),
             onPressed: () {
               _send();
             },
@@ -205,7 +205,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   ///文本，录音，其他消息，ChatGPT消息命令和发送按钮
   Widget _buildTextMessageInput(BuildContext context) {
     double iconInset = 0.0;
-    return Container(
+    return Card(
         margin:
             EdgeInsets.symmetric(horizontal: iconInset, vertical: iconInset),
         child: Row(children: <Widget>[
@@ -214,8 +214,8 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
                 horizontal: iconInset, vertical: iconInset),
             child: IconButton(
               icon: voiceVisible
-                  ? Icon(Icons.record_voice_over, color: myself.primary)
-                  : Icon(Icons.keyboard, color: myself.primary),
+                  ? Icon(Icons.record_voice_over_outlined, color: myself.primary)
+                  : Icon(Icons.keyboard_alt_outlined, color: myself.primary),
               onPressed: () {
                 setState(() {
                   voiceVisible = !voiceVisible;
@@ -228,7 +228,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
             margin: EdgeInsets.symmetric(
                 horizontal: iconInset, vertical: iconInset),
             child: IconButton(
-              icon: Icon(Icons.emoji_emotions, color: myself.primary),
+              icon: Icon(Icons.emoji_emotions_outlined, color: myself.primary),
               onPressed: () {
                 if (widget.onEmojiPressed != null) {
                   widget.onEmojiPressed!();
