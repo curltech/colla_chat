@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 
 class DocumentData {
   late final Icon icon;
@@ -34,11 +35,11 @@ class DocumentTile extends StatelessWidget {
       child: Column(
         children: <Widget>[
           _documentData.icon,
-          Text(
+          CommonAutoSizeText(
             _documentData.title,
             style: TextStyle(fontSize: 16.0, color: Colors.cyan),
           ),
-          Text(
+          CommonAutoSizeText(
             _documentData.subtitle!,
             style: TextStyle(fontSize: 12.0, color: Colors.cyan),
           ),

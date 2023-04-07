@@ -307,11 +307,11 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
           const SizedBox(
             width: 10.0,
           ),
-          Text(label),
+          CommonAutoSizeText(label),
           const SizedBox(
             width: 10.0,
           ),
-          Expanded(child: Text(value.toString(), textAlign: TextAlign.start))
+          Expanded(child: CommonAutoSizeText(value.toString(), textAlign: TextAlign.start))
         ]));
   }
 
@@ -452,7 +452,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
           groupValue: _getInitValue(context),
         );
         var row = Row(
-          children: [radio, Text(option.label)],
+          children: [radio, CommonAutoSizeText(option.label)],
         );
         children.add(row);
       }
@@ -530,7 +530,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
           value: value.contains(option.value),
         );
         var row = Row(
-          children: [checkbox, Text(option.label)],
+          children: [checkbox, CommonAutoSizeText(option.label)],
         );
         children.add(row);
       }
@@ -577,7 +577,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     );
     var row = Row(
       children: [
-        Text(label),
+        CommonAutoSizeText(label),
         toggleButtons,
       ],
     );
@@ -632,18 +632,18 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
         var option = options[i];
         var item = DropdownMenuItem<String>(
           value: option.value,
-          child: Text(option.label),
+          child: CommonAutoSizeText(option.label),
         );
         children.add(item);
       }
     }
     var dropdownButton = Row(children: [
-      Text(AppLocalizations.t(columnFieldDef.label)),
+      CommonAutoSizeText(AppLocalizations.t(columnFieldDef.label)),
       const Spacer(),
       DropdownButton<String>(
         dropdownColor: Colors.grey.withOpacity(0.7),
         underline: Container(),
-        hint: Text(AppLocalizations.t(columnFieldDef.hintText ?? '')),
+        hint: CommonAutoSizeText(AppLocalizations.t(columnFieldDef.hintText ?? '')),
         elevation: 0,
         value: widget.controller.value,
         items: children,

@@ -3,6 +3,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/linkman/conference/conference_show_widget.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
@@ -39,7 +40,7 @@ class _ConferenceShowViewState extends State<ConferenceShowView> {
     var conferenceId = videoConferenceRenderPool.conferenceId;
     if (conferenceId == null) {
       return Center(
-          child: Text(
+          child: CommonAutoSizeText(
         AppLocalizations.t('No current conference'),
         style: const TextStyle(color: Colors.white),
       ));

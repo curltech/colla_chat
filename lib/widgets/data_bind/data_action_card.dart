@@ -175,7 +175,7 @@ class DataActionCard extends StatelessWidget {
               child: actionData.icon),
         )),
         const SizedBox(height: 5.0),
-        Text(
+        CommonAutoSizeText(
           label,
           style: TextStyle(
             color: labelColor,

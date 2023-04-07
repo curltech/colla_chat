@@ -7,6 +7,7 @@ import 'package:colla_chat/pages/chat/me/settings/security/security_setting_widg
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/local_auth.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -103,7 +104,7 @@ class _SettingWidgetState extends State<SettingWidget> {
                     ? child
                     : Center(
                         child:
-                            Text(AppLocalizations.t('Authenticate failure'))),
+                            CommonAutoSizeText(AppLocalizations.t('Authenticate failure'))),
               ],
             )));
     return setting;

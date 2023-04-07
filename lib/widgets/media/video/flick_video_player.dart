@@ -1,4 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
@@ -41,7 +42,7 @@ class FlickVideoPlayerController extends OriginVideoPlayerController {
             flickVideoWithControls: flickVideoWithControls,
           )
         : Center(
-            child: Text(
+            child: CommonAutoSizeText(
             AppLocalizations.t('Please select a media file'),
             style: const TextStyle(color: Colors.white),
           ));

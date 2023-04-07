@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/media/platform_audio_recorder_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_audio_recorder_controller.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/another_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
@@ -145,7 +146,7 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
       ),
     );
     controls.add(
-      Text(controlText),
+      CommonAutoSizeText(controlText),
     );
     var container = SizedBox(
       width: widget.width,

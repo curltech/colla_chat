@@ -1,6 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/stock/login/remote_login_widget.dart';
 import 'package:colla_chat/pages/stock/login/remote_register_widget.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 
 /// 远程登录页面，一个Scaffold，IndexStack下的远程登录组件，注册组件和配置组件
@@ -34,7 +35,7 @@ class _RemoteLoginState extends State<RemoteLogin> {
       children: _children,
     );
     var appBar = AppBar(
-      title: Text(AppLocalizations.t('Login')),
+      title: CommonAutoSizeText(AppLocalizations.t('Login')),
       actions: [
         IconButton(
           onPressed: () async {

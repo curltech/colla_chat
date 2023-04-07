@@ -66,7 +66,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
               .navigateTo(context, Application.p2pLogin, replace: true);
         },
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Text(AppLocalizations.t('Logout')),
+          CommonAutoSizeText(AppLocalizations.t('Logout')),
           const SizedBox(
             width: 5,
           ),

@@ -2,6 +2,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -56,7 +57,7 @@ class _AppBarViewState extends State<AppBarView> {
   @override
   Widget build(BuildContext context) {
     Widget titleWidget =
-        widget.titleWidget ?? Text(AppLocalizations.t(widget.title ?? ''));
+        widget.titleWidget ?? CommonAutoSizeText(AppLocalizations.t(widget.title ?? ''));
     return Consumer<IndexWidgetProvider>(
         builder: (context, indexWidgetProvider, child) {
       return Column(children: [

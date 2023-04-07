@@ -106,7 +106,7 @@ class _DataDropdownButtonState extends State<DataDropdownButton> {
     for (var item in widget.optionController.options) {
       var label = AppLocalizations.t(item.label);
       var menuItem =
-          DropdownMenuItem<String>(value: item.value, child: Text(label));
+          DropdownMenuItem<String>(value: item.value, child: CommonAutoSizeText(label));
       if (item.checked) {
         selected = item.value;
       }
@@ -227,7 +227,7 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
     if (StringUtil.isNotEmpty(widget.title)) {
       children.add(
         AppBarWidget.buildTitleBar(
-            title: Text(
+            title: CommonAutoSizeText(
           AppLocalizations.t(widget.title ?? ''),
           style: const TextStyle(
               fontSize: AppFontSize.mdFontSize, color: Colors.white),
@@ -280,7 +280,7 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
 
                 Widget tileWidget = RadioListTile<bool>(
                   groupValue: true,
-                  title: Text(option.label),
+                  title: CommonAutoSizeText(option.label),
                   secondary: option.leading,
                   controlAffinity: ListTileControlAffinity.trailing,
                   activeColor: myself.primary,
@@ -526,7 +526,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
           for (var option in options) {
             var chip = FilterChip(
               avatar: option.leading,
-              label: Text(
+              label: CommonAutoSizeText(
                 option.label,
                 style: TextStyle(
                     color: option.checked ? Colors.white : Colors.black),
@@ -569,7 +569,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
                 Option<String> option = options[index];
 
                 Widget tileWidget = CheckboxListTile(
-                  title: Text(option.label),
+                  title: CommonAutoSizeText(option.label),
                   secondary: option.leading,
                   controlAffinity: ListTileControlAffinity.trailing,
                   value: option.checked,
@@ -593,7 +593,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
     if (StringUtil.isNotEmpty(widget.title)) {
       children.add(
         AppBarWidget.buildTitleBar(
-            title: Text(
+            title: CommonAutoSizeText(
           AppLocalizations.t(widget.title ?? ''),
           style: const TextStyle(fontSize: 16, color: Colors.white),
         )),
@@ -653,14 +653,14 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
             onPressed: () {
               widget.onConfirm(null);
             },
-            child: Text(AppLocalizations.t('Cancel'))),
+            child: CommonAutoSizeText(AppLocalizations.t('Cancel'))),
         TextButton(
             style: mainStyle,
             onPressed: () {
               widget.optionController.options = options.value;
               widget.onConfirm(widget.optionController.selected);
             },
-            child: Text(AppLocalizations.t('Ok'))),
+            child: CommonAutoSizeText(AppLocalizations.t('Ok'))),
       ],
     ));
     return _buildDialogWidget(
@@ -727,7 +727,7 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
           for (var option in widget.optionController.options) {
             if (option.checked) {
               var chip = Chip(
-                label: Text(
+                label: CommonAutoSizeText(
                   option.label,
                   style: const TextStyle(color: Colors.black),
                 ),
@@ -769,7 +769,7 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
               const SizedBox(
                 width: 20,
               ),
-              Text(AppLocalizations.t(widget.title ?? '')),
+              CommonAutoSizeText(AppLocalizations.t(widget.title ?? '')),
             ])),
         collapsed: Container(),
         expanded: _buildButtonField(context),

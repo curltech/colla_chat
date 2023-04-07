@@ -1,6 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flex_color_picker/flex_color_picker.dart' as flex;
 import 'package:flutter/material.dart';
 
@@ -38,15 +39,15 @@ class _ColorPickerState extends State<ColorPicker> {
       spacing: 5,
       runSpacing: 5,
       wheelDiameter: 155,
-      heading: Text(
+      heading: CommonAutoSizeText(
         AppLocalizations.t('Select color'),
         style: themeData.textTheme.titleMedium,
       ),
-      subheading: Text(
+      subheading: CommonAutoSizeText(
         AppLocalizations.t('Select color shade'),
         style: themeData.textTheme.titleMedium,
       ),
-      wheelSubheading: Text(
+      wheelSubheading: CommonAutoSizeText(
         AppLocalizations.t('Selected color and its shades'),
         style: themeData.textTheme.titleMedium,
       ),
@@ -93,7 +94,7 @@ class _ColorPickerState extends State<ColorPicker> {
       },
     );
     return Row(children: [
-      Text(AppLocalizations.t('Seed color')),
+      CommonAutoSizeText(AppLocalizations.t('Seed color')),
       const Spacer(),
       indicator,
       const SizedBox(

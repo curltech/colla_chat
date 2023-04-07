@@ -1,4 +1,5 @@
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 
 ///消息体：撤销消息
@@ -23,7 +24,7 @@ class CancelMessage extends StatelessWidget {
           const SizedBox(
             width: 5,
           ),
-          Expanded(child: Text(content)),
+          Expanded(child: CommonAutoSizeText(content)),
         ]),
       ),
     );

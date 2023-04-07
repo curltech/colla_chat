@@ -7,6 +7,7 @@ import 'package:colla_chat/pages/chat/video/video_view_card.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 
@@ -216,12 +217,12 @@ class _RemoteVideoWidgetState extends State<RemoteVideoWidget> {
           if (videoChatMessageController == null ||
               remoteVideoRenderController == null) {
             return Center(
-                child: Text(AppLocalizations.t('No conference'),
+                child: CommonAutoSizeText(AppLocalizations.t('No conference'),
                     style: const TextStyle(color: Colors.white)));
           }
           if (value == 0) {
             return Center(
-                child: Text(
+                child: CommonAutoSizeText(
                     AppLocalizations.t('No video view in current conference'),
                     style: const TextStyle(color: Colors.white)));
           }

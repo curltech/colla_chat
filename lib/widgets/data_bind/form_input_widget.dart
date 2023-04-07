@@ -258,14 +258,14 @@ class _FormInputWidgetState extends State<FormInputWidget> {
       return ButtonBar(children: [
         TextButton(
           style: style,
-          child: Text(AppLocalizations.t(widget.resetLabel)),
+          child: CommonAutoSizeText(AppLocalizations.t(widget.resetLabel)),
           onPressed: () {
             widget.controller.clear();
           },
         ),
         TextButton(
           style: mainStyle,
-          child: Text(AppLocalizations.t(widget.okLabel)),
+          child: CommonAutoSizeText(AppLocalizations.t(widget.okLabel)),
           onPressed: () {
             var values = widget.controller.getValues();
             widget.onOk!(values);

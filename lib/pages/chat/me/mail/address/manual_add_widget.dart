@@ -1,8 +1,8 @@
+import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
-import '../../../../../l10n/localization.dart';
 
 /// 邮件地址手工注册组件，一个card下的录入框和按钮组合
 class ManualAddWidget extends StatefulWidget {
@@ -32,7 +32,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
   Widget _buildSmtp() {
     return ExpansionTile(
       leading: Icon(Icons.send),
-      title: Text('Smtp'),
+      title: CommonAutoSizeText('Smtp'),
       initiallyExpanded: false,
       children: <Widget>[
         Column(children: <Widget>[
@@ -88,7 +88,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
   Widget _buildImap() {
     return ExpansionTile(
         leading: Icon(Icons.receipt),
-        title: Text('Imap'),
+        title: CommonAutoSizeText('Imap'),
         initiallyExpanded: false,
         children: <Widget>[
           Column(children: <Widget>[
@@ -143,7 +143,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
   Widget _buildPop() {
     return ExpansionTile(
         leading: Icon(Icons.receipt),
-        title: Text('Pop3'),
+        title: CommonAutoSizeText('Pop3'),
         initiallyExpanded: false,
         children: <Widget>[
           Column(children: <Widget>[
@@ -281,13 +281,13 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
             padding: EdgeInsets.symmetric(horizontal: 15.0),
             child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
               TextButton(
-                child: Text(AppLocalizations.t('Connect')),
+                child: CommonAutoSizeText(AppLocalizations.t('Connect')),
                 onPressed: () async {
                   await _connect();
                 },
               ),
               TextButton(
-                child: Text(AppLocalizations.t('Add')),
+                child: CommonAutoSizeText(AppLocalizations.t('Add')),
                 onPressed: () async {},
               )
             ]),

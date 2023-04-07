@@ -1,12 +1,13 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/service/chat/mailaddress.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/transport/emailclient.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:enough_mail/discover.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../../l10n/localization.dart';
-import '../../../../../service/chat/mailaddress.dart';
-import '../../../../../transport/emailclient.dart';
 
 /// 自动邮件发现组件，一个card下的录入框和按钮组合
 class AutoDiscoverWidget extends StatefulWidget {
@@ -111,7 +112,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget>
             padding: EdgeInsets.symmetric(horizontal: 50.0),
             child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
               TextButton(
-                child: Text(
+                child: CommonAutoSizeText(
                   AppLocalizations.t('Discover'),
                 ),
                 onPressed: () async {
@@ -119,7 +120,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget>
                 },
               ),
               TextButton(
-                child: Text(AppLocalizations.t('Connect')),
+                child: CommonAutoSizeText(AppLocalizations.t('Connect')),
                 onPressed: () async {
                   await _connect();
                 },

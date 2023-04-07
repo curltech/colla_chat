@@ -1,5 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
 
@@ -47,7 +48,7 @@ class DialogUtil {
                 onPressed: () {
                   ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
                 },
-                child: Text(AppLocalizations.t('Dismiss')),
+                child: CommonAutoSizeText(AppLocalizations.t('Dismiss')),
               ),
             ],
       ),
@@ -137,7 +138,7 @@ class DialogUtil {
           Navigator.pop(context, value);
         },
         child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          Text(
+          CommonAutoSizeText(
             label,
             style: checked ? style : null,
           ),
@@ -184,7 +185,7 @@ class DialogUtil {
     return PopupMenuItem(
         value: value,
         child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-          Text(
+          CommonAutoSizeText(
             AppLocalizations.t(label),
             style: checked ? style : null,
           ),
@@ -244,7 +245,7 @@ class DialogUtil {
               const CircularProgressIndicator(),
               Padding(
                 padding: const EdgeInsets.only(top: 24.0),
-                child: Text(AppLocalizations.t(tip)),
+                child: CommonAutoSizeText(AppLocalizations.t(tip)),
               )
             ],
           ),
@@ -275,19 +276,19 @@ class DialogUtil {
         return AlertDialog(
           title: Row(children: <Widget>[
             i,
-            Text(AppLocalizations.t(title)),
+            CommonAutoSizeText(AppLocalizations.t(title)),
           ]),
-          content: Text(content),
+          content: CommonAutoSizeText(content),
           actions: <Widget>[
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(AppLocalizations.t('Cancel')),
+              child: CommonAutoSizeText(AppLocalizations.t('Cancel')),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(true);
               },
-              child: Text(AppLocalizations.t('Ok')),
+              child: CommonAutoSizeText(AppLocalizations.t('Ok')),
             ),
           ],
         );
@@ -317,7 +318,7 @@ class DialogUtil {
   /// 底部延时提示错误
   static error(BuildContext context, {String content = 'Error'}) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(AppLocalizations.t(content)),
+      content: CommonAutoSizeText(AppLocalizations.t(content)),
       backgroundColor: Colors.red,
     ));
   }
@@ -325,7 +326,7 @@ class DialogUtil {
   /// 底部延时警告
   static warn(BuildContext context, {String content = 'Warning'}) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(AppLocalizations.t(content)),
+      content: CommonAutoSizeText(AppLocalizations.t(content)),
       backgroundColor: Colors.amber,
     ));
   }
@@ -333,7 +334,7 @@ class DialogUtil {
   /// 底部延时提示
   static info(BuildContext context, {String content = 'Information'}) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(AppLocalizations.t(content)),
+      content: CommonAutoSizeText(AppLocalizations.t(content)),
       backgroundColor: Colors.green,
     ));
   }

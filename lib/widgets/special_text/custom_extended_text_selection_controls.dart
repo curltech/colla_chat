@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -273,7 +274,7 @@ class _TextSelectionControlsToolbarState
           padding: TextSelectionToolbarTextButton.getPadding(
               entry.key, itemDatas.length),
           onPressed: entry.value.onPressed,
-          child: Text(entry.value.label),
+          child: CommonAutoSizeText(entry.value.label),
         );
       }).toList(),
     );

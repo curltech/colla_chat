@@ -26,6 +26,7 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/websocket.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -260,7 +261,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
               minWidth: 12,
             ),
             child: Center(
-                child: Text('$unreadNumber',
+                child: CommonAutoSizeText('$unreadNumber',
                     style: const TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
@@ -552,7 +553,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
             const SizedBox(
               height: 3,
             ),
-            Text(_connectivityResult.value.name,
+            CommonAutoSizeText(_connectivityResult.value.name,
                 style: const TextStyle(fontSize: 12)),
             _connectivityResult.value == ConnectivityResult.none
                 ? const Icon(

@@ -109,6 +109,14 @@ class CollaChatApp extends StatelessWidget {
         ],
         child: Consumer<Myself>(
             builder: (BuildContext context, myself, Widget? child) {
+          /// 在 MaterialApp 组件外层包裹一层 ScreenUtilInit 组件
+          ///     return ScreenUtilInit(
+          ///       /// 设置设计稿宽高
+          ///       designSize: Size(750, 1334),
+          ///
+          ///       /// 设置原本要显示的 MaterialApp
+          ///       builder: ()=>MaterialApp(),
+          ///     );
           return ResponsiveSizer(builder: (context, orientation, screenType) {
             return MaterialApp(
               onGenerateTitle: (context) {

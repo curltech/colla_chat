@@ -1,6 +1,7 @@
 import 'package:colla_chat/entity/stock/user.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/routers/routes.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 
 /// 远程登录组件，一个card下的录入框和按钮组合
@@ -94,13 +95,13 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
             padding: EdgeInsets.symmetric(horizontal: 50.0),
             child: Row(children: [
               TextButton(
-                child: Text(AppLocalizations.t('Login')),
+                child: CommonAutoSizeText(AppLocalizations.t('Login')),
                 onPressed: () async {
                   _login();
                 },
               ),
               TextButton(
-                child: Text(AppLocalizations.t('Reset')),
+                child: CommonAutoSizeText(AppLocalizations.t('Reset')),
                 onPressed: () async {},
               )
             ]),

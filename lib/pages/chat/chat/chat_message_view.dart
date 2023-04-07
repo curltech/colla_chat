@@ -27,6 +27,7 @@ import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -272,7 +273,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     String name = chatSummary.name!;
     String partyType = chatSummary.partyType!;
     String title = AppLocalizations.t(name);
-    Widget titleWidget = Text(title);
+    Widget titleWidget = CommonAutoSizeText(title);
     List<Widget> rightWidgets = [];
     if (partyType == PartyType.linkman.name) {
       var peerConnectionStatusWidget = ValueListenableBuilder(

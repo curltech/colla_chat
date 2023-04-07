@@ -2,6 +2,7 @@ import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/pages/chat/me/collection/collection_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
@@ -88,7 +89,7 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
   Widget _buildMessageItem(BuildContext context, int index) {
     List<ChatMessage> messages = collectionChatMessageController.data;
     ChatMessage chatMessage = messages[index];
-    Widget chatMessageItem = ListTile(title: Text(chatMessage.title!));
+    Widget chatMessageItem = ListTile(title: CommonAutoSizeText(chatMessage.title!));
 
     // index=0执行动画，对最新的消息执行动画
     if (index == 0) {

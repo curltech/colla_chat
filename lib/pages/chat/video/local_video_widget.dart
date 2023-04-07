@@ -280,7 +280,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
       await DialogUtil.show(
           context: context,
           // title: AppBarWidget.buildTitleBar(
-          //     title: Text(AppLocalizations.t('Select one linkman'))),
+          //     title: CommonAutoSizeText(AppLocalizations.t('Select one linkman'))),
           builder: (BuildContext context) {
             return LinkmanGroupSearchWidget(
                 onSelected: (List<String>? peerIds) async {

@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:just_waveform/just_waveform.dart';
 import 'package:path/path.dart' as p;
@@ -62,7 +63,7 @@ Future<StreamBuilder<WaveformProgress>?> buildWaveformProgress(
     builder: (context, snapshot) {
       if (snapshot.hasError) {
         return Center(
-          child: Text(
+          child: CommonAutoSizeText(
             'Error: ${snapshot.error}',
             style: Theme.of(context).textTheme.headline6,
             textAlign: TextAlign.center,
@@ -73,7 +74,7 @@ Future<StreamBuilder<WaveformProgress>?> buildWaveformProgress(
       final waveform = snapshot.data?.waveform;
       if (waveform == null) {
         return Center(
-          child: Text(
+          child: CommonAutoSizeText(
             '${(100 * progress).toInt()}%',
             style: Theme.of(context).textTheme.headline6,
           ),

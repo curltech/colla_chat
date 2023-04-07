@@ -1,6 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/routers/routes.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/material.dart' as material;
@@ -334,7 +335,7 @@ class FluentWidgetFactory extends WidgetFactory {
     TextWidthBasis? textWidthBasis,
     TextHeightBehavior? textHeightBehavior,
   }) {
-    return Text(
+    return CommonAutoSizeText(
       data,
       key: key,
       style: style,

@@ -14,6 +14,7 @@ import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -106,7 +107,7 @@ class _ContactLinkmanAddWidgetState extends State<ContactLinkmanAddWidget> {
             isFriend = true;
           }
         }
-        Widget suffix = Text(AppLocalizations.t('friend'));
+        Widget suffix = CommonAutoSizeText(AppLocalizations.t('friend'));
         if (!isFriend) {
           suffix = IconButton(
             iconSize: 24.0,

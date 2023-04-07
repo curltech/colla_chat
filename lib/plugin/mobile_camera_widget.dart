@@ -171,7 +171,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
+                CommonAutoSizeText(
                   AppLocalizations.t('Resolution') +
                       ': ${resolutionPreset.name}',
                   style: const TextStyle(
@@ -180,7 +180,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
                     fontWeight: FontWeight.w400,
                   ),
                 ),
-                Text(
+                CommonAutoSizeText(
                   AppLocalizations.t('Size') +
                       ': ${previewSize.width.toStringAsFixed(0)}x${previewSize.height.toStringAsFixed(0)}',
                   style: const TextStyle(
@@ -418,7 +418,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
           child: Column(
             children: <Widget>[
               Center(
-                child: Text(AppLocalizations.t('Exposure Mode')),
+                child: CommonAutoSizeText(AppLocalizations.t('Exposure Mode')),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -435,31 +435,31 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
                             AppLocalizations.t('Resetting exposure point'));
                       }
                     },
-                    child: Text(AppLocalizations.t('Auto')),
+                    child: CommonAutoSizeText(AppLocalizations.t('Auto')),
                   ),
                   TextButton(
                     style: styleLocked,
                     onPressed: controller != null
                         ? () => _setExposureMode(ExposureMode.locked)
                         : null,
-                    child: Text(AppLocalizations.t('Locked')),
+                    child: CommonAutoSizeText(AppLocalizations.t('Locked')),
                   ),
                   TextButton(
                     style: styleLocked,
                     onPressed: controller != null
                         ? () => controller!.setExposureOffset(0.0)
                         : null,
-                    child: Text(AppLocalizations.t('Reset Offset')),
+                    child: CommonAutoSizeText(AppLocalizations.t('Reset Offset')),
                   ),
                 ],
               ),
               Center(
-                child: Text(AppLocalizations.t('Exposure Offset')),
+                child: CommonAutoSizeText(AppLocalizations.t('Exposure Offset')),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: <Widget>[
-                  Text(_minAvailableExposureOffset.toString()),
+                  CommonAutoSizeText(_minAvailableExposureOffset.toString()),
                   Slider(
                     value: _currentExposureOffset,
                     min: _minAvailableExposureOffset,
@@ -470,7 +470,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
                         ? null
                         : _setExposureOffset,
                   ),
-                  Text(_maxAvailableExposureOffset.toString()),
+                  CommonAutoSizeText(_maxAvailableExposureOffset.toString()),
                 ],
               ),
             ],
@@ -506,7 +506,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
           child: Column(
             children: <Widget>[
               Center(
-                child: Text(AppLocalizations.t('Focus Mode')),
+                child: CommonAutoSizeText(AppLocalizations.t('Focus Mode')),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -523,14 +523,14 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
                       _showInSnackBar(
                           AppLocalizations.t('Resetting focus point'));
                     },
-                    child: Text(AppLocalizations.t('Auto')),
+                    child: CommonAutoSizeText(AppLocalizations.t('Auto')),
                   ),
                   TextButton(
                     style: styleLocked,
                     onPressed: controller != null
                         ? () => _setFocusMode(FocusMode.locked)
                         : null,
-                    child: Text(AppLocalizations.t('Locked')),
+                    child: CommonAutoSizeText(AppLocalizations.t('Locked')),
                   ),
                 ],
               ),
@@ -691,7 +691,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
 
   void _showInSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(message),
+      content: CommonAutoSizeText(message),
       duration: const Duration(seconds: 5),
     ));
   }

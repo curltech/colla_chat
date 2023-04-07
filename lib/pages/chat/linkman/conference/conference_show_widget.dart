@@ -5,6 +5,7 @@ import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_control
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -82,7 +83,7 @@ class ConferenceShowWidget extends StatelessWidget {
             List<Chip> chips = [];
             for (var option in options) {
               var chip = Chip(
-                label: Text(
+                label: CommonAutoSizeText(
                   option.label,
                   style: const TextStyle(color: Colors.black),
                 ),

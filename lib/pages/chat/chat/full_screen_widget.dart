@@ -4,6 +4,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/message/message_widget.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
@@ -61,7 +62,7 @@ class _FullScreenWidgetState extends State<FullScreenWidget> {
           if (chatMessage != null) {
             title = '${chatMessage.receiverName} - ${chatMessage.senderName}';
           }
-          return Text(
+          return CommonAutoSizeText(
             title,
             style: TextStyle(fontSize: title.length > 12 ? 20 : 24),
           );

@@ -4,6 +4,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
@@ -84,7 +85,7 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
         builder: (context, value, child) {
           if (value.isEmpty) {
             return Center(
-                child: Text(AppLocalizations.t('No active conference in pool'),
+                child: CommonAutoSizeText(AppLocalizations.t('No active conference in pool'),
                     style: const TextStyle(color: Colors.white)));
           }
           return DataListView(

@@ -1,4 +1,5 @@
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:mimecon/mimecon.dart';
 
@@ -26,8 +27,8 @@ class FileMessage extends StatelessWidget {
         size: 36,
         isOutlined: true,
       ),
-      title: Text(title),
-      subtitle: Text(mimeType),
+      title: CommonAutoSizeText(title),
+      subtitle: CommonAutoSizeText(mimeType),
       isThreeLine: false,
       dense: true,
       horizontalTitleGap: 0,

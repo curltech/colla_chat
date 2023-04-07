@@ -10,6 +10,7 @@ import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
@@ -126,7 +127,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
     if (tileData.isEmpty) {
       return Container(
           alignment: Alignment.center,
-          child: Text(AppLocalizations.t('Playlist is empty')));
+          child: CommonAutoSizeText(AppLocalizations.t('Playlist is empty')));
     }
     int crossAxisCount = 1;
     if (tileData.length > 1) {

@@ -2,6 +2,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controller.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/special_text/emoji_text.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/material.dart';
@@ -89,7 +90,7 @@ class _EmojiMessageInputWidgetState extends State<EmojiMessageInputWidget> {
                 showRecentsTab: true,
                 recentsLimit: 28,
                 replaceEmojiOnLimitExceed: false,
-                noRecents: Text(
+                noRecents: CommonAutoSizeText(
                   AppLocalizations.t('No Recents'),
                   style: const TextStyle(fontSize: 20, color: Colors.black),
                   textAlign: TextAlign.center,

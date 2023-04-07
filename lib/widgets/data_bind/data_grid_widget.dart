@@ -5,6 +5,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 
 ///Syncfusion DataGrid
 class DataGridWidget<T> extends StatefulWidget {
@@ -57,7 +58,7 @@ class _DataGridWidgetState<T> extends State<DataGridWidget> {
           label: Container(
               padding: const EdgeInsets.all(8.0),
               alignment: Alignment.center,
-              child: Text(
+              child: CommonAutoSizeText(
                 AppLocalizations.t(columnDef.label),
                 overflow: TextOverflow.ellipsis,
               )));
@@ -143,7 +144,7 @@ class ListDataGridSource<T> extends DataGridSource {
       return Container(
         alignment: Alignment.centerRight,
         padding: const EdgeInsets.all(16.0),
-        child: Text(dataGridCell.value.toString()),
+        child: CommonAutoSizeText(dataGridCell.value.toString()),
       );
     }).toList());
   }

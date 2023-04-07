@@ -1,3 +1,4 @@
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../../../l10n/localization.dart';
@@ -192,11 +193,11 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
             padding: EdgeInsets.symmetric(horizontal: 15.0),
             child: Row(children: [
               TextButton(
-                child: Text(AppLocalizations.t('Register')),
+                child: CommonAutoSizeText(AppLocalizations.t('Register')),
                 onPressed: () async {},
               ),
               TextButton(
-                child: Text(AppLocalizations.t('Reset')),
+                child: CommonAutoSizeText(AppLocalizations.t('Reset')),
                 onPressed: () async {},
               )
             ]),

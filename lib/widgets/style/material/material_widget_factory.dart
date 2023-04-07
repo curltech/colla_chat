@@ -2,6 +2,7 @@ import 'package:badges/badges.dart' as badges;
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/routers/routes.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/gestures.dart';
@@ -579,10 +580,8 @@ class MaterialWidgetFactory extends WidgetFactory {
     double? textScaleFactor,
     int? maxLines,
     String? semanticsLabel,
-    TextWidthBasis? textWidthBasis,
-    TextHeightBehavior? textHeightBehavior,
   }) {
-    return Text(
+    return CommonAutoSizeText(
       data,
       key: key,
       style: style,
@@ -595,8 +594,6 @@ class MaterialWidgetFactory extends WidgetFactory {
       textScaleFactor: textScaleFactor,
       maxLines: maxLines,
       semanticsLabel: semanticsLabel,
-      textWidthBasis: textWidthBasis,
-      textHeightBehavior: textHeightBehavior,
     );
   }
 

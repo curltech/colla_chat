@@ -5,6 +5,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -57,7 +58,7 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
     Widget securitySettingTile =
         DataListView(tileData: widget.securitySettingTileData);
     var autoLoginTile = CheckboxListTile(
-        title: Text(AppLocalizations.t('Auto Login')),
+        title: CommonAutoSizeText(AppLocalizations.t('Auto Login')),
         dense: true,
         activeColor: myself.primary,
         value: appDataProvider.autoLogin,

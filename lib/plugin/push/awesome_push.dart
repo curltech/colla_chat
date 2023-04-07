@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 
 class AwesomePush {
@@ -92,7 +93,7 @@ class AwesomePush {
           context: context,
           builder: (context) => AlertDialog(
                 backgroundColor: Color(0xfffbfbfb),
-                title: Text(
+                title: CommonAutoSizeText(
                   'Awesome Notifications needs your permission',
                   textAlign: TextAlign.center,
                   maxLines: 2,
@@ -106,13 +107,13 @@ class AwesomePush {
                       height: MediaQuery.of(context).size.height * 0.3,
                       fit: BoxFit.fitWidth,
                     ),
-                    Text(
+                    CommonAutoSizeText(
                       'To proceed, you need to enable the permissions above${channelKey?.isEmpty ?? true ? '' : ' on channel $channelKey'}:',
                       maxLines: 2,
                       textAlign: TextAlign.center,
                     ),
                     SizedBox(height: 5),
-                    Text(
+                    CommonAutoSizeText(
                       lockedPermissions
                           .join(', ')
                           .replaceAll('NotificationPermission.', ''),
@@ -128,7 +129,7 @@ class AwesomePush {
                       onPressed: () {
                         Navigator.pop(context);
                       },
-                      child: Text(
+                      child: CommonAutoSizeText(
                         'Deny',
                         style: TextStyle(color: Colors.red, fontSize: 18),
                       )),
@@ -148,7 +149,7 @@ class AwesomePush {
 
                       Navigator.pop(context);
                     },
-                    child: Text(
+                    child: CommonAutoSizeText(
                       'Allow',
                       style: TextStyle(
                           color: Colors.deepPurple,

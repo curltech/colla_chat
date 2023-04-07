@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
@@ -113,7 +114,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
               ? _position!.inMilliseconds / _duration!.inMilliseconds
               : 0.0,
         ),
-        Text(
+        CommonAutoSizeText(
           _position != null
               ? '$_positionText / $_durationText'
               : _duration != null
@@ -121,7 +122,7 @@ class _AudioPlayerWidgetState extends State<AudioPlayerWidget> {
                   : '',
           style: const TextStyle(fontSize: 16.0),
         ),
-        Text('State: $_audioPlayerState'),
+        CommonAutoSizeText('State: $_audioPlayerState'),
       ],
     );
   }

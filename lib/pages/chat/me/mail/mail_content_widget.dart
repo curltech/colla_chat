@@ -2,6 +2,7 @@ import 'package:colla_chat/pages/chat/me/mail/mail_data_provider.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:enough_mail/codecs.dart';
 import 'package:enough_mail/highlevel.dart';
@@ -57,7 +58,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
       //   mailtoDelegate: handleMailto,
       // );
     } else {
-      mimeMessageViewer = const Center(child: Text('Not support'));
+      mimeMessageViewer = const Center(child: CommonAutoSizeText('Not support'));
     }
     return mimeMessageViewer;
   }

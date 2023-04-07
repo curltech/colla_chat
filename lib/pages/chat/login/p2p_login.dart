@@ -7,6 +7,7 @@ import 'package:colla_chat/pages/chat/login/p2p_register_widget.dart';
 import 'package:colla_chat/pages/chat/login/p2p_setting_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -72,7 +73,7 @@ class _P2pLoginState extends State<P2pLogin> {
     var appBar = AppBar(
       elevation: 0.0,
       automaticallyImplyLeading: false,
-      title: Text(AppLocalizations.t('Login')),
+      title: CommonAutoSizeText(AppLocalizations.t('Login')),
       actions: [
         IconButton(
             onPressed: () {

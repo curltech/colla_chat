@@ -13,6 +13,7 @@ import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 
 /// 每条消息展示组件，我接收的消息展示在左边，我发送的消息展示在右边
@@ -179,16 +180,16 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
   Widget _buildOther(BuildContext context) {
     var sendTime = widget.chatMessage.sendTime;
     sendTime = sendTime = DateUtil.formatEasyRead(sendTime!);
-    Widget title = Text(
+    Widget title = CommonAutoSizeText(
         '${widget.chatMessage.id}:${widget.chatMessage.senderName} $sendTime',
         style: const TextStyle(fontSize: 12));
-    // Text('${widget.chatMessage.id}:${widget.chatMessage.senderName}');
+    // CommonAutoSizeText('${widget.chatMessage.id}:${widget.chatMessage.senderName}');
     if (timer != null) {
       title = Row(
         children: [
           title,
           const Icon(Icons.timer_sharp),
-          Text('$leftDeleteTime'),
+          CommonAutoSizeText('$leftDeleteTime'),
         ],
       );
     }
@@ -226,7 +227,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
   Widget _buildMe(BuildContext context) {
     var sendTime = widget.chatMessage.sendTime;
     sendTime = sendTime = DateUtil.formatEasyRead(sendTime!);
-    Widget title = Text(
+    Widget title = CommonAutoSizeText(
         '${widget.chatMessage.id}:${widget.chatMessage.senderName} $sendTime',
         style: const TextStyle(fontSize: 12));
     //Text('${widget.chatMessage.id}:${widget.chatMessage.receiverName}');
@@ -235,7 +236,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
         children: [
           title,
           const Icon(Icons.timer_sharp),
-          Text('$leftDeleteTime'),
+          CommonAutoSizeText('$leftDeleteTime'),
         ],
       );
     }

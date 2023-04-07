@@ -11,6 +11,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
@@ -138,8 +139,8 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
         myChannelChatMessageController.current = chatMessage;
         indexWidgetProvider.push('publish_channel_item');
       },
-      title: Text(title),
-      subtitle: Text(sendTime),
+      title: CommonAutoSizeText(title),
+      subtitle: CommonAutoSizeText(sendTime),
       leading: leading,
       trailing: thumbnailWidget,
     );

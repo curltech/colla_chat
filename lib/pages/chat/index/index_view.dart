@@ -120,7 +120,7 @@ class _IndexViewState extends State<IndexView>
               var name = chatMessage.senderName;
               if (name != null) {
                 children.add(
-                  Text(name,
+                  CommonAutoSizeText(name,
                       style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16,
@@ -130,7 +130,7 @@ class _IndexViewState extends State<IndexView>
               String? title = chatMessage.title;
               if (title != null) {
                 children.add(
-                  Text(title,
+                  CommonAutoSizeText(title,
                       style: const TextStyle(
                           color: Colors.white,
                           fontSize: 14,
@@ -239,8 +239,8 @@ class _IndexViewState extends State<IndexView>
         child: ListTile(
             leading: bannerAvatarImage,
             isThreeLine: false,
-            title: Text(name, style: const TextStyle(color: Colors.white)),
-            subtitle: Text(
+            title: CommonAutoSizeText(name, style: const TextStyle(color: Colors.white)),
+            subtitle: CommonAutoSizeText(
                 AppLocalizations.t('Inviting you $title chat ') +
                     videoChatMessageController!.conference!.name,
                 style: const TextStyle(color: Colors.white)),

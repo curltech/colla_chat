@@ -9,6 +9,7 @@ import 'package:colla_chat/tool/qrcode_util.dart';
 import 'package:colla_chat/tool/share_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
@@ -71,8 +72,8 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
     var children = <Widget>[
       ListTile(
           leading: myself.avatarImage,
-          title: Text(name),
-          subtitle: Text(peerId)),
+          title: CommonAutoSizeText(name),
+          subtitle: CommonAutoSizeText(peerId)),
       SizedBox(
           width: 280,
           key: globalKey,
@@ -81,7 +82,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
             child: qrImage,
           )),
       const Spacer(),
-      Text(AppLocalizations.t('Scan qrcode, add linkman')),
+      CommonAutoSizeText(AppLocalizations.t('Scan qrcode, add linkman')),
       const SizedBox(height: 30),
     ];
     return AppBarView(

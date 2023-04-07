@@ -2,6 +2,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -20,7 +21,7 @@ class AppBarWidget {
     BuildContext context, {
     bool withLeading = false, //是否有缺省的回退按钮
     Function? leadingCallBack, //回退按钮的回调
-    Widget? title = const Text(''),
+    Widget? title = const CommonAutoSizeText(''),
     bool centerTitle = false, //标题是否居中
     List<Widget>? rightWidgets, //右边的排列组件（按钮）
     List<AppBarPopupMenu>? rightPopupMenus, //右边的下拉菜单组件
@@ -60,7 +61,7 @@ class AppBarWidget {
 
   static Widget buildTitleBar({
     Color? backgroundColor,
-    Widget? title = const Text(''),
+    Widget? title = const CommonAutoSizeText(''),
     bool centerTitle = false, //标题是否居中
     List<Widget>? rightWidgets, //右边的排列组件（按钮）
     List<AppBarPopupMenu>? rightPopupMenus,
@@ -125,7 +126,7 @@ class AppBarWidget {
         PopupMenuItem<int> item;
         Widget? iconWidget = rightAction.icon;
         String text = rightAction.title ?? '';
-        Widget textWidget = Text(AppLocalizations.t(text));
+        Widget textWidget = CommonAutoSizeText(AppLocalizations.t(text));
         List<Widget> rows = [];
         if (iconWidget != null) {
           rows.add(iconWidget);

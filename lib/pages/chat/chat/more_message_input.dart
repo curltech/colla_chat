@@ -17,6 +17,7 @@ import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
@@ -129,7 +130,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     int? deleteTime = await DialogUtil.showSelectDialog<int>(
         context: context,
         title:
-            AppBarWidget.buildTitleBar(title: const Text('Select deleteTime')),
+            AppBarWidget.buildTitleBar(title: const CommonAutoSizeText('Select deleteTime')),
         items: [
           _buildOption(0),
           _buildOption(15),
@@ -210,7 +211,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     String? address;
     await SmartDialogUtil.show(
         title: AppBarWidget.buildTitleBar(
-            title: Text(AppLocalizations.t('Location map'))),
+            title: CommonAutoSizeText(AppLocalizations.t('Location map'))),
         builder: (BuildContext? context) {
           return GeolocatorUtil.buildLocationPicker(
               latitude: latitude,
@@ -256,7 +257,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     await DialogUtil.show(
         context: context,
         title:
-            AppBarWidget.buildTitleBar(title: const Text('Select one linkman')),
+            AppBarWidget.buildTitleBar(title: const CommonAutoSizeText('Select one linkman')),
         builder: (BuildContext context) {
           return LinkmanGroupSearchWidget(
               onSelected: (List<String>? selected) async {

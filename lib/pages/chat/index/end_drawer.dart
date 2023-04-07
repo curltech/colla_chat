@@ -1,3 +1,4 @@
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 
 ///右边栏，用于展示当前用户信息，当前用户的配置信息
@@ -13,19 +14,19 @@ class EndDrawer extends StatelessWidget {
           child: ListView(
             children: <Widget>[
               UserAccountsDrawerHeader(
-                accountEmail: Text('hujs@colla.cc'),
-                accountName: Text('胡劲松'),
+                accountEmail: CommonAutoSizeText('hujs@colla.cc'),
+                accountName: CommonAutoSizeText('胡劲松'),
               ),
               ListTile(
-                  leading: Icon(Icons.chat), title: Text(''), onTap: () {}),
+                  leading: Icon(Icons.chat), title: CommonAutoSizeText(''), onTap: () {}),
               ListTile(
-                  leading: Icon(Icons.contacts), title: Text(''), onTap: () {}),
+                  leading: Icon(Icons.contacts), title: CommonAutoSizeText(''), onTap: () {}),
               ListTile(
                   leading: Icon(Icons.wifi_channel),
-                  title: Text(''),
+                  title: CommonAutoSizeText(''),
                   onTap: () {}),
               ListTile(
-                  leading: Icon(Icons.person), title: Text(''), onTap: () {}),
+                  leading: Icon(Icons.person), title: CommonAutoSizeText(''), onTap: () {}),
             ],
           ),
         ));

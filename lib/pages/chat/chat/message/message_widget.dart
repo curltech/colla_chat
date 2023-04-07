@@ -34,6 +34,7 @@ import 'package:colla_chat/tool/pdf_util.dart';
 import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
@@ -368,7 +369,7 @@ class MessageWidget {
       await SmartDialogUtil.show(
           context: context,
           title: AppBarWidget.buildTitleBar(
-              title: Text(AppLocalizations.t('Location map'))),
+              title: CommonAutoSizeText(AppLocalizations.t('Location map'))),
           builder: (BuildContext? context) {
             return GeolocatorUtil.buildLocationPicker(
                 latitude: latitude,
@@ -380,7 +381,7 @@ class MessageWidget {
       await SmartDialogUtil.show(
           context: context,
           title: AppBarWidget.buildTitleBar(
-              title: Text(AppLocalizations.t('Location map'))),
+              title: CommonAutoSizeText(AppLocalizations.t('Location map'))),
           builder: (BuildContext? context) {
             return GeolocatorUtil.buildPlatformMap(
                 latitude: latitude, longitude: longitude);
@@ -560,7 +561,7 @@ class MessageWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     child: Row(children: [
-                      Expanded(child: Text(data)),
+                      Expanded(child: CommonAutoSizeText(data)),
                       readOnly
                           ? Container()
                           : InkWell(

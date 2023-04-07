@@ -1,5 +1,6 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -14,19 +15,19 @@ class BackgroundPicker extends StatelessWidget {
       body: Column(
         children: <Widget>[
           ListTile(
-            title: Text(AppLocalizations.t('Select backgroud image')),
+            title: CommonAutoSizeText(AppLocalizations.t('Select backgroud image')),
             onTap: () {
               //routePush(SelectBgPage());
             },
           ),
           ListTile(
-            title: Text(AppLocalizations.t('Select from album')),
+            title: CommonAutoSizeText(AppLocalizations.t('Select from album')),
             onTap: () {
               _openGallery();
             },
           ),
           ListTile(
-              title: Text(AppLocalizations.t('Take a photo')),
+              title: CommonAutoSizeText(AppLocalizations.t('Take a photo')),
               onTap: () {
                 _openGallery(source: ImageSource.camera);
               }),

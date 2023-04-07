@@ -8,6 +8,7 @@ import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 
 ///系统提供的分页表格只能用于静态展示，不能进行增加删除等操作
 ///因为其计算记录的方法很粗糙，某页发生增删时不适用，自己实现新的会更好
@@ -58,7 +59,7 @@ class _PaginatedDataTableState<T> extends State<PaginatedDataTable2Widget> {
     }
     for (var columnDef in widget.columnDefs) {
       var dataColumn = DataColumn2(
-          label: Text(AppLocalizations.t(columnDef.label)),
+          label: CommonAutoSizeText(AppLocalizations.t(columnDef.label)),
           numeric: columnDef.dataType == DataType.int ||
               columnDef.dataType == DataType.double,
           tooltip: columnDef.hintText,

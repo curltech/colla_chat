@@ -1,3 +1,4 @@
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -119,7 +120,7 @@ class _HtmlRteWidgetState extends State<HtmlRteWidget> {
               ),
               Padding(
                 padding: const EdgeInsets.all(8.0),
-                child: Text(result),
+                child: CommonAutoSizeText(result),
               ),
             ],
           ),

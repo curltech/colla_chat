@@ -1,12 +1,13 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 
-import '../../provider/data_list_controller.dart';
-import '../../provider/index_widget_provider.dart';
-import '../../tool/json_util.dart';
-import 'column_field_widget.dart';
 
 class DataTable2Widget<T> extends StatefulWidget {
   final List<ColumnFieldDef> columnDefs;
@@ -55,7 +56,7 @@ class _DataTable2WidgetState<T> extends State<DataTable2Widget> {
     }
     for (var columnDef in widget.columnDefs) {
       var dataColumn = DataColumn2(
-          label: Text(AppLocalizations.t(columnDef.label)),
+          label: CommonAutoSizeText(AppLocalizations.t(columnDef.label)),
           numeric: columnDef.dataType == DataType.int ||
               columnDef.dataType == DataType.double,
           tooltip: columnDef.hintText,

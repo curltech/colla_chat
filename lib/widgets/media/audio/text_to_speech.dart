@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io' show Platform;
 
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -173,7 +174,7 @@ class _TextToSpeechWidgetState extends State<TextToSpeechWidget> {
     var items = <DropdownMenuItem<String>>[];
     for (dynamic type in engines) {
       items.add(DropdownMenuItem(
-          value: type as String?, child: Text(type as String)));
+          value: type as String?, child: CommonAutoSizeText(type as String)));
     }
     return items;
   }
@@ -191,7 +192,7 @@ class _TextToSpeechWidgetState extends State<TextToSpeechWidget> {
     var items = <DropdownMenuItem<String>>[];
     for (dynamic type in languages) {
       items.add(DropdownMenuItem(
-          value: type as String?, child: Text(type as String)));
+          value: type as String?, child: CommonAutoSizeText(type as String)));
     }
     return items;
   }
@@ -243,9 +244,9 @@ class _TextToSpeechWidgetState extends State<TextToSpeechWidget> {
             if (snapshot.hasData) {
               return _enginesDropDownSection(snapshot.data);
             } else if (snapshot.hasError) {
-              return Text('Error loading engines...');
+              return CommonAutoSizeText('Error loading engines...');
             } else
-              return Text('Loading engines...');
+              return CommonAutoSizeText('Loading engines...');
           });
     } else
       return Container(width: 0, height: 0);
@@ -257,9 +258,9 @@ class _TextToSpeechWidgetState extends State<TextToSpeechWidget> {
         if (snapshot.hasData) {
           return _languageDropDownSection(snapshot.data);
         } else if (snapshot.hasError) {
-          return Text('Error loading languages...');
+          return CommonAutoSizeText('Error loading languages...');
         } else
-          return Text('Loading Languages...');
+          return CommonAutoSizeText('Loading Languages...');
       });
 
   Widget _inputSection() => Container(
@@ -316,7 +317,7 @@ class _TextToSpeechWidgetState extends State<TextToSpeechWidget> {
         ),
         Visibility(
           visible: isAndroid,
-          child: Text("Is installed: $isCurrentLanguageInstalled"),
+          child: CommonAutoSizeText("Is installed: $isCurrentLanguageInstalled"),
         ),
       ]));
 
@@ -333,7 +334,7 @@ class _TextToSpeechWidgetState extends State<TextToSpeechWidget> {
               onPressed: () => func()),
           Container(
               margin: const EdgeInsets.only(top: 8.0),
-              child: Text(label,
+              child: CommonAutoSizeText(label,
                   style: TextStyle(
                       fontSize: 12.0,
                       fontWeight: FontWeight.w400,
@@ -346,13 +347,13 @@ class _TextToSpeechWidgetState extends State<TextToSpeechWidget> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         ElevatedButton(
-          child: Text('Get max speech input length'),
+          child: CommonAutoSizeText('Get max speech input length'),
           onPressed: () async {
             _inputLength = await flutterTts.getMaxSpeechInputLength;
             setState(() {});
           },
         ),
-        Text("$_inputLength characters"),
+        CommonAutoSizeText("$_inputLength characters"),
       ],
     );
   }

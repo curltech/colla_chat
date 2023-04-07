@@ -6,6 +6,7 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
@@ -124,7 +125,7 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
         const SizedBox(
           height: 35.0,
         ),
-        Text(
+        CommonAutoSizeText(
           '接收到的消息:$message',
         ),
         TextFormField(
@@ -133,7 +134,7 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
           decoration: const InputDecoration(labelText: 'message'),
         ),
         TextButton(
-          child: const Text('点击发送文本'),
+          child: const CommonAutoSizeText('点击发送文本'),
           onPressed: () {
             _sendMessage();
           },

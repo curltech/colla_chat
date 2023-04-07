@@ -12,6 +12,7 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
@@ -209,10 +210,10 @@ class ChannelChatMessageItem extends StatelessWidget {
           Row(
             children: [
               avatarImage,
-              Text(name),
+              CommonAutoSizeText(name),
             ],
           ),
-          Text(title),
+          CommonAutoSizeText(title),
           thumbnailWidget,
         ]));
 

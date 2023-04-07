@@ -6,6 +6,7 @@ import 'package:colla_chat/transport/webrtc/local_video_render_controller.dart';
 import 'package:colla_chat/transport/webrtc/peer_video_render.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -142,7 +143,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
                 actions: <Widget>[
                   TextButton(
                     onPressed: Navigator.of(context, rootNavigator: true).pop,
-                    child: Text('OK'),
+                    child: CommonAutoSizeText('OK'),
                   )
                 ],
               ));
@@ -197,7 +198,7 @@ class _GetUserMediaWidgetState extends State<GetUserMediaWidget> {
                       .map((device) {
                     return PopupMenuItem<String>(
                       value: device.deviceId,
-                      child: Text(device.label),
+                      child: CommonAutoSizeText(device.label),
                     );
                   }).toList();
                 }

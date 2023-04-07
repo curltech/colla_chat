@@ -4,6 +4,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 
 class GroupDataListController with ChangeNotifier {
   final Map<TileData, DataListController<TileData>> controllers = {};
@@ -141,11 +142,11 @@ class _GroupDataListViewState extends State<GroupDataListView> {
       childrenPadding: const EdgeInsets.all(0),
       maintainState: true,
       leading: leading,
-      title: Text(
+      title: CommonAutoSizeText(
         AppLocalizations.t(tile.title),
       ),
       subtitle: tile.subtitle != null
-          ? Text(
+          ? CommonAutoSizeText(
               tile.subtitle!,
             )
           : null,

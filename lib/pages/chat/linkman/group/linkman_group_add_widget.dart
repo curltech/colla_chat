@@ -17,6 +17,7 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
@@ -239,7 +240,7 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
             padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 0.0),
             child: ListTile(
                 leading: Icon(Icons.image, color: myself.primary),
-                title: Text(AppLocalizations.t('avatar')),
+                title: CommonAutoSizeText(AppLocalizations.t('avatar')),
                 trailing: group.avatarImage,
                 minVerticalPadding: 0.0,
                 minLeadingWidth: 0.0,

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/audio/abstract_audio_player_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -582,7 +583,7 @@ class _PlatformMediaControlPanelState extends State<PlatformMediaControlPanel>
           if (isDesktop && widget.onPrevClicked != null) bottomPrevButton!,
           if (isDesktop && widget.onNextClicked != null) bottomNextButton!,
           positionText,
-          Text(" / ",
+          CommonAutoSizeText(" / ",
               style: TextStyle(fontSize: textSize, color: Colors.white)),
           durationText,
           const Spacer(),
@@ -766,7 +767,7 @@ class _PlatformMediaControlPanelState extends State<PlatformMediaControlPanel>
       valueListenable: displayPosition,
       builder: (context, value, child) {
         var duration = Duration(milliseconds: value);
-        return Text(_duration2TimeStr(duration),
+        return CommonAutoSizeText(_duration2TimeStr(duration),
             style: TextStyle(fontSize: textSize, color: Colors.white));
       },
     );
@@ -776,7 +777,7 @@ class _PlatformMediaControlPanelState extends State<PlatformMediaControlPanel>
     return ValueListenableBuilder<Duration>(
       valueListenable: duration,
       builder: (context, value, child) {
-        return Text(_duration2TimeStr(value),
+        return CommonAutoSizeText(_duration2TimeStr(value),
             style: TextStyle(fontSize: textSize, color: Colors.white));
       },
     );
@@ -796,7 +797,7 @@ class _PlatformMediaControlPanelState extends State<PlatformMediaControlPanel>
                   alignment: Alignment.bottomCenter,
                   child: Container(
                     margin: EdgeInsets.all(textSize / 2),
-                    child: Text(value,
+                    child: CommonAutoSizeText(value,
                         maxLines: 2,
                         textAlign: TextAlign.center,
                         style: TextStyle(

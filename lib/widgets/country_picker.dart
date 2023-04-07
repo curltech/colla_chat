@@ -3,6 +3,7 @@ import 'package:country_pickers/country_picker_cupertino.dart';
 import 'package:country_pickers/country_picker_dropdown.dart';
 import 'package:country_pickers/utils/utils.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 
 var countryPicker = CountryPickerDropdown(
   initialValue: 'CN',
@@ -30,7 +31,7 @@ Widget _buildDropdownItem(Country country) {
         SizedBox(
           width: 8.0,
         ),
-        Text("+${country.phoneCode} ${country.isoCode}"),
+        CommonAutoSizeText("+${country.phoneCode} ${country.isoCode}"),
       ],
     ),
   );
@@ -46,7 +47,7 @@ Widget _buildDropdownItem(Country country) {
 //           //searchCursorColor: Colors.pinkAccent,
 //           searchInputDecoration: InputDecoration(hintText: 'Search...'),
 //           isSearchable: true,
-//           title: Text('Select your phone code'),
+//           title: CommonAutoSizeText('Select your phone code'),
 //           onValuePicked: (Country country) {},
 //           itemFilter: (c) => ['AR', 'DE', 'GB', 'CN'].contains(c.isoCode),
 //           priorityList: [
@@ -60,9 +61,9 @@ Widget _buildDialogItem(Country country) => Row(
       children: <Widget>[
         CountryPickerUtils.getDefaultFlagImage(country),
         SizedBox(width: 8.0),
-        Text("+${country.phoneCode}"),
+        CommonAutoSizeText("+${country.phoneCode}"),
         SizedBox(width: 8.0),
-        Flexible(child: Text(country.name))
+        Flexible(child: CommonAutoSizeText(country.name))
       ],
     );
 

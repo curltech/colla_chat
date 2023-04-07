@@ -4,6 +4,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:flutter_webrtc/flutter_webrtc.dart';
@@ -113,7 +114,7 @@ class ScreenSelectDialog extends StatelessWidget {
 
   Widget _buildTitle(BuildContext context) {
     return AppBarWidget.buildTitleBar(
-        title: Text(
+        title: CommonAutoSizeText(
           AppLocalizations.t('Choose what to share'),
           style: const TextStyle(fontSize: 16, color: Colors.white),
         ),
@@ -132,7 +133,7 @@ class ScreenSelectDialog extends StatelessWidget {
       child: ButtonBar(
         children: <Widget>[
           MaterialButton(
-            child: Text(
+            child: CommonAutoSizeText(
               AppLocalizations.t('Cancel'),
               style: const TextStyle(color: Colors.black),
             ),
@@ -142,7 +143,7 @@ class ScreenSelectDialog extends StatelessWidget {
           ),
           MaterialButton(
             color: primary,
-            child: Text(
+            child: CommonAutoSizeText(
               AppLocalizations.t('Share'),
             ),
             onPressed: () {
@@ -206,12 +207,12 @@ class ScreenSelectDialog extends StatelessWidget {
             }),
         tabs: [
           Tab(
-              child: Text(
+              child: CommonAutoSizeText(
             AppLocalizations.t('Entire Screen'),
             style: const TextStyle(color: Colors.black),
           )),
           Tab(
-              child: Text(
+              child: CommonAutoSizeText(
             AppLocalizations.t('Window'),
             style: const TextStyle(color: Colors.black),
           )),
@@ -337,7 +338,7 @@ class _ThumbnailWidgetState extends State<ThumbnailWidget> {
                 : Container(),
           ),
         )),
-        Text(
+        CommonAutoSizeText(
           widget.source.name,
           style: TextStyle(
               fontSize: 12,

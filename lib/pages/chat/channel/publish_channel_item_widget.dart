@@ -173,7 +173,7 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
                       Icons.image_aspect_ratio,
                       color: myself.primary,
                     ),
-                    title: Text(AppLocalizations.t('thumbnail')),
+                    title: CommonAutoSizeText(AppLocalizations.t('thumbnail')),
                     trailing: trailing,
                     onTap: () async {
                       await _pickThumbnail(context);
@@ -183,7 +183,7 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
               valueListenable: html,
               builder: (BuildContext context, String? value, Widget? child) {
                 return ListTile(
-                    title: Text(AppLocalizations.t('Pick html file')),
+                    title: CommonAutoSizeText(AppLocalizations.t('Pick html file')),
                     leading: Icon(
                       Icons.file_open,
                       color: myself.primary,
@@ -207,13 +207,13 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
                 onPressed: () {
                   indexWidgetProvider.push('channel_message_view');
                 },
-                child: Text(AppLocalizations.t('View'))),
+                child: CommonAutoSizeText(AppLocalizations.t('View'))),
             TextButton(
                 style: StyleUtil.buildButtonStyle(),
                 onPressed: () {
                   _save();
                 },
-                child: Text(AppLocalizations.t('Save'))),
+                child: CommonAutoSizeText(AppLocalizations.t('Save'))),
             TextButton(
                 style: StyleUtil.buildButtonStyle(
                     backgroundColor: myself.primary),
@@ -230,7 +230,7 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
                     }
                   }
                 },
-                child: Text(AppLocalizations.t('Publish')))
+                child: CommonAutoSizeText(AppLocalizations.t('Publish')))
           ]),
         ]));
   }

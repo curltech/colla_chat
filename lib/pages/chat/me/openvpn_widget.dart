@@ -7,6 +7,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/src/file_picker.dart';
@@ -161,8 +162,8 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
                     }
                   },
                 ),
-                title: Text(title),
-                subtitle: Text(stage.value.name),
+                title: CommonAutoSizeText(title),
+                subtitle: CommonAutoSizeText(stage.value.name),
                 trailing: IconButton(
                   onPressed: () {
                     _pickConfig(context);
@@ -190,7 +191,7 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(style: titleStyle, AppLocalizations.t('Connection stats')),
+              CommonAutoSizeText(style: titleStyle, AppLocalizations.t('Connection stats')),
               const SizedBox(
                 height: 15.0,
               ),
@@ -207,8 +208,8 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
                       ),
                       Column(
                         children: [
-                          Text(style: dataStyle, AppLocalizations.t('Byte in')),
-                          Text(style: dataStyle, status.value.byteIn!),
+                          CommonAutoSizeText(style: dataStyle, AppLocalizations.t('Byte in')),
+                          CommonAutoSizeText(style: dataStyle, status.value.byteIn!),
                         ],
                       ),
                     ],
@@ -225,9 +226,9 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
                       ),
                       Column(
                         children: [
-                          Text(
+                          CommonAutoSizeText(
                               style: dataStyle, AppLocalizations.t('Byte out')),
-                          Text(style: dataStyle, status.value.byteOut!),
+                          CommonAutoSizeText(style: dataStyle, status.value.byteOut!),
                         ],
                       ),
                     ],
@@ -243,9 +244,9 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
                     children: [
                       Column(
                         children: [
-                          Text(
+                          CommonAutoSizeText(
                               style: dataStyle, AppLocalizations.t('Duration')),
-                          Text(style: dataStyle, status.value.duration!),
+                          CommonAutoSizeText(style: dataStyle, status.value.duration!),
                         ],
                       ),
                     ],
@@ -255,10 +256,10 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
                     children: [
                       Column(
                         children: [
-                          Text(
+                          CommonAutoSizeText(
                               style: dataStyle,
                               AppLocalizations.t('Connected on')),
-                          Text(
+                          CommonAutoSizeText(
                               style: dataStyle,
                               connectedOn != null
                                   ? connectedOn.toIso8601String()
