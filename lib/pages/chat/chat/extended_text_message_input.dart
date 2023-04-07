@@ -8,6 +8,7 @@ import 'package:colla_chat/pages/chat/linkman/group_linkman_widget.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/special_text/custom_extended_text_selection_controls.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
@@ -148,7 +149,7 @@ class _ExtendedTextMessageInputWidgetState
       key: chatMessageViewController.extendedTextKey,
       minLines: 1,
       maxLines: 8,
-      strutStyle: const StrutStyle(),
+      style: const TextStyle(fontSize: AppFontSize.mdFontSize),
       specialTextSpanBuilder: CustomSpecialTextSpanBuilder(
         showAtBackground: true,
       ),
@@ -164,12 +165,12 @@ class _ExtendedTextMessageInputWidgetState
       decoration: InputDecoration(
         fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
         filled: true,
-        border: InputBorder.none,
-        focusedBorder: InputBorder.none,
-        enabledBorder: InputBorder.none,
-        errorBorder: InputBorder.none,
-        disabledBorder: InputBorder.none,
-        focusedErrorBorder: InputBorder.none,
+        border: textFormFieldBorder,
+        focusedBorder: textFormFieldBorder,
+        enabledBorder: textFormFieldBorder,
+        errorBorder: textFormFieldBorder,
+        disabledBorder: textFormFieldBorder,
+        focusedErrorBorder: textFormFieldBorder,
         hintText: AppLocalizations.t('Please input message'),
         suffixIcon: widget.textEditingController.text.isNotEmpty
             ? InkWell(
