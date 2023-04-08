@@ -283,10 +283,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
               Icons.wifi,
               color: Colors.white,
             );
-            if (peerId == myself.peerId) {
-              widget = myself.avatarImage ?? AppImage.mdAppImage;
-            } else if (_peerConnectionStatus.value !=
-                PeerConnectionStatus.connected) {
+            if (_peerConnectionStatus.value != PeerConnectionStatus.connected) {
               widget = IconButton(
                   onPressed: () {
                     _createPeerConnection();

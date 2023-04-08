@@ -23,6 +23,8 @@ class AppDataProvider with ChangeNotifier {
   Size _totalSize = const Size(412.0, 892.0);
   double bottomBarHeight = kBottomNavigationBarHeight;
   double toolbarHeight = kToolbarHeight;
+  double topPadding = 0;
+  double bottomPadding = 0;
   String sqlite3Path = '';
   bool _autoLogin = false;
 
@@ -111,6 +113,11 @@ class AppDataProvider with ChangeNotifier {
     }
     logger.i('bottomBarHeight: $bottomBarHeight');
     logger.i('toolbarHeight: $toolbarHeight');
+    // 上下边距 （主要用于 刘海  和  内置导航键）
+    topPadding = MediaQuery.of(context).padding.top;
+    logger.i('topPadding: $topPadding');
+    bottomPadding = MediaQuery.of(context).padding.bottom;
+    logger.i('bottomPadding: $bottomPadding');
   }
 }
 

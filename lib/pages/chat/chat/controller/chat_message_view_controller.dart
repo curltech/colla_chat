@@ -28,7 +28,9 @@ class ChatMessageViewController with ChangeNotifier {
     }
     var chatMessageHeight = appDataProvider.actualSize.height -
         appDataProvider.toolbarHeight -
-        bottomHeight;
+        bottomHeight -
+        appDataProvider.topPadding -
+        appDataProvider.bottomPadding;
 
     return chatMessageHeight;
   }
