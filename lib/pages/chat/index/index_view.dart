@@ -294,9 +294,9 @@ class _IndexViewState extends State<IndexView>
         ? appDataProvider.bottomBarHeight
         : 0.0;
     Scaffold scaffold = Scaffold(
-        backgroundColor: myself.primary,
         resizeToAvoidBottomInset: true,
         primary: true,
+        appBar: AppBar(toolbarHeight: 0.0, elevation: 0.0),
         body: KeyboardDismissOnTap(
             dismissOnCapturedTaps: false,
             child: SafeArea(
