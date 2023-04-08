@@ -176,6 +176,7 @@ class Myself with ChangeNotifier {
             where: 'id=?', whereArgs: [peerProfile.id!]);
       }
       _buildThemeData();
+      _buildDarkThemeData();
       notifyListeners();
     }
   }

@@ -39,15 +39,15 @@ class _ColorPickerState extends State<ColorPicker> {
       spacing: 5,
       runSpacing: 5,
       wheelDiameter: 155,
-      heading: CommonAutoSizeText(
+      heading: Text(
         AppLocalizations.t('Select color'),
         style: themeData.textTheme.titleMedium,
       ),
-      subheading: CommonAutoSizeText(
+      subheading: Text(
         AppLocalizations.t('Select color shade'),
         style: themeData.textTheme.titleMedium,
       ),
-      wheelSubheading: CommonAutoSizeText(
+      wheelSubheading: Text(
         AppLocalizations.t('Selected color and its shades'),
         style: themeData.textTheme.titleMedium,
       ),
@@ -94,7 +94,7 @@ class _ColorPickerState extends State<ColorPicker> {
       },
     );
     return Row(children: [
-      CommonAutoSizeText(AppLocalizations.t('Seed color')),
+      Text(AppLocalizations.t('Seed color')),
       const Spacer(),
       indicator,
       const SizedBox(
