@@ -25,6 +25,7 @@ class AppDataProvider with ChangeNotifier {
   double toolbarHeight = kToolbarHeight;
   double topPadding = 0;
   double bottomPadding = 0;
+  double textScaleFactor = 1.0;
   String sqlite3Path = '';
   bool _autoLogin = false;
 
@@ -118,6 +119,9 @@ class AppDataProvider with ChangeNotifier {
     logger.i('topPadding: $topPadding');
     bottomPadding = MediaQuery.of(context).padding.bottom;
     logger.i('bottomPadding: $bottomPadding');
+
+    textScaleFactor = MediaQuery.of(context).textScaleFactor;
+    logger.i('textScaleFactor: $textScaleFactor');
   }
 }
 

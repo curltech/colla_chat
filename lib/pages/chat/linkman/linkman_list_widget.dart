@@ -613,7 +613,6 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     }
     return AppBarView(
         title: widget.title,
-        //rightWidgets: rightWidgets,
         rightWidgets: rightWidgets,
         child: _buildLinkmanListView(context));
   }
