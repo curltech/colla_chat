@@ -260,12 +260,11 @@ class DialogUtil {
   }
 
   ///返回为true，代表按的确认
-  /// 模态警告
-  static Future<bool?> alert(BuildContext context,
-      {Icon? icon, String title = 'Warning', String content = ''}) {
+  static Future<bool?> confirm(BuildContext context,
+      {Icon? icon, String title = 'Confirm', String content = ''}) {
     Icon i;
     if (icon == null) {
-      i = const Icon(Icons.warning);
+      i = const Icon(Icons.privacy_tip_outlined);
     } else {
       i = icon;
     }
@@ -296,17 +295,24 @@ class DialogUtil {
     );
   }
 
+  /// 模态警告
+  static Future<bool?> alert(BuildContext context,
+      {Icon? icon, String title = 'Warning', String content = ''}) {
+    return confirm(context,
+        title: title, content: content, icon: const Icon(Icons.info));
+  }
+
   /// 模态提示
   static Future<bool?> prompt(BuildContext context,
       {Icon? icon, String title = 'Prompt', String content = ''}) {
-    return alert(context,
+    return confirm(context,
         title: title, content: content, icon: const Icon(Icons.info));
   }
 
   /// 模态提示错误
   static Future<bool?> fault(BuildContext context,
       {Icon? icon, String title = 'Fault', String content = ''}) {
-    return alert(context,
+    return confirm(context,
         title: title,
         content: content,
         icon: const Icon(

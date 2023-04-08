@@ -162,7 +162,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget>
         return;
       }
       logger.i('create (or connect) success to $_name.');
-      DialogUtil.alert(context, content: '保存为地址吗?').then((bool? result) async {
+      DialogUtil.confirm(context, content: '保存为地址吗?').then((bool? result) async {
         if (result != null && result) {
           ///保存地址
           await mailAddressService.store(mailAddress);

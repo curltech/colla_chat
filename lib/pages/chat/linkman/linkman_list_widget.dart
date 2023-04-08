@@ -10,6 +10,7 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.da
 import 'package:colla_chat/pages/chat/linkman/conference/conference_show_view.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman/linkman_edit_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_add_widget.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -587,7 +588,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         },
         icon: const Icon(Icons.add_circle_outline),
       ),
-      IconButton(
+    ];
+    if (platformParams.mobile) {
+      rightWidgets.add(IconButton(
         onPressed: () async {
           ScanResult scanResult = await QrcodeUtil.scan();
           String content = scanResult.rawContent;
@@ -595,11 +598,19 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           PeerClient peerClient = PeerClient.fromJson(map);
           await peerClientService.store(peerClient);
           await linkmanService.storeByPeerClient(peerClient);
+          if (mounted) {
+            bool? confirm = await DialogUtil.confirm(context,
+                content: AppLocalizations.t(
+                    'Do you want add ${peerClient.name} as friend?'));
+            if (confirm != null && confirm) {
+              linkmanService.addFriend(
+                  peerClient.peerId, '${myself.name} want add you as friend');
+            }
+          }
         },
         icon: const Icon(Icons.qr_code),
-      )
-    ];
-
+      ));
+    }
     return AppBarView(
         title: widget.title,
         //rightWidgets: rightWidgets,
