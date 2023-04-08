@@ -239,7 +239,8 @@ class _IndexViewState extends State<IndexView>
         child: ListTile(
             leading: bannerAvatarImage,
             isThreeLine: false,
-            title: CommonAutoSizeText(name, style: const TextStyle(color: Colors.white)),
+            title: CommonAutoSizeText(name,
+                style: const TextStyle(color: Colors.white)),
             subtitle: CommonAutoSizeText(
                 AppLocalizations.t('Inviting you $title chat ') +
                     videoChatMessageController!.conference!.name,
@@ -287,12 +288,12 @@ class _IndexViewState extends State<IndexView>
 
   Widget _createScaffold(
       BuildContext context, IndexWidgetProvider indexWidgetProvider) {
-    var bottomNavigationBar = Offstage(
-        offstage: !indexWidgetProvider.bottomBarVisible,
-        child: const BottomBar());
-    var toolbarHeight = 0.0;
+    Widget? bottomNavigationBar =
+        indexWidgetProvider.bottomBarVisible ? const BottomBar() : null;
+    double bottomBarHeight = indexWidgetProvider.bottomBarVisible
+        ? appDataProvider.bottomBarHeight
+        : 0.0;
     Scaffold scaffold = Scaffold(
-        appBar: AppBar(toolbarHeight: toolbarHeight, elevation: 0.0),
         body: KeyboardDismissOnTap(
             dismissOnCapturedTaps: false,
             child: SafeArea(
@@ -304,7 +305,8 @@ class _IndexViewState extends State<IndexView>
               Center(
                   child: platformWidgetFactory.buildSizedBox(
                       child: widget.indexWidget,
-                      height: appDataProvider.actualSize.height - toolbarHeight,
+                      height:
+                          appDataProvider.actualSize.height - bottomBarHeight,
                       width: appDataProvider.actualSize.width)),
               Row(children: [
                 _buildChatMessageBanner(context),

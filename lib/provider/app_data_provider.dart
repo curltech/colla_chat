@@ -61,7 +61,7 @@ class AppDataProvider with ChangeNotifier {
           ? _totalSize.height
           : fixedSize.height;
       //高度还要减去底部工具栏的高度
-      height = height - bottomBarHeight;
+      // height = height - bottomBarHeight;
     }
 
     return Size(width, height);
