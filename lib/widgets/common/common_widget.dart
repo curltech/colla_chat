@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 ///平台定制的通用AutoSizeText，规定了一些参数的缺省值外，还规定了文本的样式
-///本类的目的是统一平台文本显示的样式，包括不随系统的字体大小变化
+///本类的目的是统一平台文本显示的样式，包括自动调整字体大小适应
 class CommonAutoSizeText extends AutoSizeText {
   const CommonAutoSizeText(
     String data, {
@@ -201,7 +201,7 @@ class CustomAutoSizeTextFormField extends AutoSizeTextFormField {
 }
 
 ///平台定制的通用AutoSizeTextFormField，规定了一些参数的缺省值外，还规定了边框的样式
-///本类的目的是统一平台输入框的样式，包括不随系统的字体大小变化
+///本类的目的是统一平台输入框的样式，包括自动调整字体大小适应
 class CommonAutoSizeTextFormField extends StatelessWidget {
   final TextEditingController? controller;
   final TextInputType? keyboardType;

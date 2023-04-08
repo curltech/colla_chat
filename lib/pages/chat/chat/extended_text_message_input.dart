@@ -145,6 +145,7 @@ class _ExtendedTextMessageInputWidgetState
   @override
   Widget build(BuildContext context) {
     chatMessageViewController.changeExtendedTextHeight();
+    //不随系统的字体大小变化
     return MediaQuery(
         data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
         child: ExtendedTextField(
