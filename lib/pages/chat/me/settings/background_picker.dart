@@ -15,7 +15,8 @@ class BackgroundPicker extends StatelessWidget {
       body: Column(
         children: <Widget>[
           ListTile(
-            title: CommonAutoSizeText(AppLocalizations.t('Select backgroud image')),
+            title: CommonAutoSizeText(
+                AppLocalizations.t('Select backgroud image')),
             onTap: () {
               //routePush(SelectBgPage());
             },

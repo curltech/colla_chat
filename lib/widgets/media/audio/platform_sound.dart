@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';

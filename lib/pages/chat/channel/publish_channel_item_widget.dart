@@ -108,7 +108,7 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
   }
 
   Widget _buildTextField(BuildContext context) {
-    var textFormField = AutoSizeTextFormField(
+    var textFormField = CommonAutoSizeTextFormField(
       controller: textEditingController,
       labelText: AppLocalizations.t('title'),
     );
@@ -183,7 +183,8 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
               valueListenable: html,
               builder: (BuildContext context, String? value, Widget? child) {
                 return ListTile(
-                    title: CommonAutoSizeText(AppLocalizations.t('Pick html file')),
+                    title: CommonAutoSizeText(
+                        AppLocalizations.t('Pick html file')),
                     leading: Icon(
                       Icons.file_open,
                       color: myself.primary,
@@ -215,8 +216,8 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
                 },
                 child: CommonAutoSizeText(AppLocalizations.t('Save'))),
             TextButton(
-                style: StyleUtil.buildButtonStyle(
-                    backgroundColor: myself.primary),
+                style:
+                    StyleUtil.buildButtonStyle(backgroundColor: myself.primary),
                 onPressed: () async {
                   ChatMessage? chatMessage =
                       myChannelChatMessageController.current;

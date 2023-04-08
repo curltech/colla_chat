@@ -449,12 +449,14 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
                     onPressed: controller != null
                         ? () => controller!.setExposureOffset(0.0)
                         : null,
-                    child: CommonAutoSizeText(AppLocalizations.t('Reset Offset')),
+                    child:
+                        CommonAutoSizeText(AppLocalizations.t('Reset Offset')),
                   ),
                 ],
               ),
               Center(
-                child: CommonAutoSizeText(AppLocalizations.t('Exposure Offset')),
+                child:
+                    CommonAutoSizeText(AppLocalizations.t('Exposure Offset')),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,

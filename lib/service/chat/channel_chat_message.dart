@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
-import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
@@ -85,8 +84,7 @@ class ChannelChatMessageService {
   }
 
   ///发出更新频道消息的请求
-  Future<ChatMessage?> getChannel(String peerId,
-      {String? clientId}) async {
+  Future<ChatMessage?> getChannel(String peerId, {String? clientId}) async {
     Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
     if (linkman == null) {
       return null;

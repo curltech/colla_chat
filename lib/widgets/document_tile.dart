@@ -1,5 +1,5 @@
-import 'package:flutter/material.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:flutter/material.dart';
 
 class DocumentData {
   late final Icon icon;

@@ -106,32 +106,28 @@ class DataActionCard extends StatelessWidget {
     var controller = TextEditingController();
     var addFriendTextField = Container(
         padding: const EdgeInsets.all(10.0),
-        child: TextFormField(
-            autofocus: true,
-            controller: controller,
-            keyboardType: TextInputType.text,
-            decoration: InputDecoration(
-              fillColor: Colors.black.withOpacity(0.1),
-              filled: true,
-              border: InputBorder.none,
-              labelText: label,
-              suffixIcon: IconButton(
-                onPressed: () {
-                  if (onPressed != null) {
-                    onPressed!(index, actionData.label, value: controller.text);
-                  } else if (actionData.onTap != null) {
-                    actionData.onTap!(index, actionData.label,
-                        value: controller.text);
-                  }
-                },
-                icon: const Icon(Icons.person_add),
-              ),
-            )));
+        child: CommonAutoSizeTextFormField(
+          controller: controller,
+          keyboardType: TextInputType.text,
+          labelText: label,
+          suffixIcon: IconButton(
+            onPressed: () {
+              if (onPressed != null) {
+                onPressed!(index, actionData.label, value: controller.text);
+              } else if (actionData.onTap != null) {
+                actionData.onTap!(index, actionData.label,
+                    value: controller.text);
+              }
+            },
+            icon: const Icon(Icons.person_add),
+          ),
+        ));
 
     return addFriendTextField;
   }
 
-  Widget _buildInkWellTextButton(BuildContext context, ActionData actionData, int index) {
+  Widget _buildInkWellTextButton(
+      BuildContext context, ActionData actionData, int index) {
     var label = AppLocalizations.t(actionData.label);
     var tooltip = AppLocalizations.t(actionData.tooltip ?? '');
     return InkWellTextButton(

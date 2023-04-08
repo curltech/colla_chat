@@ -25,7 +25,6 @@ import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/clipboard_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/document_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/json_util.dart';

@@ -2,7 +2,6 @@ import 'dart:math' as math;
 
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 const double _kHandleSize = 22.0;

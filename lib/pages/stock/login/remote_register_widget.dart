@@ -66,12 +66,10 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
         children: <Widget>[
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextFormField(
+              child: CommonAutoSizeTextFormField(
                 controller: nameController,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.t('Username'),
-                  prefixIcon: Icon(Icons.person),
-                ),
+                labelText: AppLocalizations.t('Username'),
+                prefixIcon: Icon(Icons.person),
                 initialValue: _name,
                 onChanged: (String val) {
                   setState(() {
@@ -83,12 +81,10 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
           SizedBox(height: 10.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextFormField(
+              child: CommonAutoSizeTextFormField(
                 //controller: loginNameController,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.t('LoginName'),
-                  prefixIcon: Icon(Icons.desktop_mac),
-                ),
+                labelText: AppLocalizations.t('LoginName'),
+                prefixIcon: Icon(Icons.desktop_mac),
                 initialValue: _loginName,
                 onChanged: (String val) {
                   setState(() {
@@ -100,12 +96,10 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
           SizedBox(height: 10.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextFormField(
+              child: CommonAutoSizeTextFormField(
                 //controller: mobileController,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.t('Mobile'),
-                  prefixIcon: Icon(Icons.mobile_friendly),
-                ),
+                labelText: AppLocalizations.t('Mobile'),
+                prefixIcon: Icon(Icons.mobile_friendly),
                 initialValue: _mobile,
                 onChanged: (String val) {
                   setState(() {
@@ -117,13 +111,11 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
           SizedBox(height: 10.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextFormField(
+              child: CommonAutoSizeTextFormField(
                 //controller: emailController,
                 keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.t('Email'),
-                  prefixIcon: Icon(Icons.email),
-                ),
+                labelText: AppLocalizations.t('Email'),
+                prefixIcon: Icon(Icons.email),
                 initialValue: _email,
                 onChanged: (String val) {
                   setState(() {
@@ -135,22 +127,20 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
           SizedBox(height: 10.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextFormField(
+              child: CommonAutoSizeTextFormField(
                 keyboardType: TextInputType.text,
                 obscureText: !_pwdShow,
                 //controller: passwordController,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.t('Password'),
-                  prefixIcon: Icon(Icons.lock),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                        _pwdShow ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () {
-                      setState(() {
-                        _pwdShow = !_pwdShow;
-                      });
-                    },
-                  ),
+                labelText: AppLocalizations.t('Password'),
+                prefixIcon: Icon(Icons.lock),
+                suffixIcon: IconButton(
+                  icon:
+                      Icon(_pwdShow ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      _pwdShow = !_pwdShow;
+                    });
+                  },
                 ),
                 initialValue: _plainPassword,
                 onChanged: (String val) {
@@ -163,22 +153,20 @@ class _RemoteRegisterWidgetState extends State<RemoteRegisterWidget> {
           SizedBox(height: 10.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: TextFormField(
+              child: CommonAutoSizeTextFormField(
                 keyboardType: TextInputType.text,
                 obscureText: !_pwdShow,
                 //controller: passwordController,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.t('Confirm Password'),
-                  prefixIcon: Icon(Icons.lock),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                        _pwdShow ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () {
-                      setState(() {
-                        _pwdShow = !_pwdShow;
-                      });
-                    },
-                  ),
+                labelText: AppLocalizations.t('Confirm Password'),
+                prefixIcon: Icon(Icons.lock),
+                suffixIcon: IconButton(
+                  icon:
+                      Icon(_pwdShow ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      _pwdShow = !_pwdShow;
+                    });
+                  },
                 ),
                 initialValue: _confirmPassword,
                 onChanged: (String val) {

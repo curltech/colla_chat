@@ -317,7 +317,8 @@ class _TextToSpeechWidgetState extends State<TextToSpeechWidget> {
         ),
         Visibility(
           visible: isAndroid,
-          child: CommonAutoSizeText("Is installed: $isCurrentLanguageInstalled"),
+          child:
+              CommonAutoSizeText("Is installed: $isCurrentLanguageInstalled"),
         ),
       ]));
 

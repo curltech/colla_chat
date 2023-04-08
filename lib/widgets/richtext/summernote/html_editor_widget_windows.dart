@@ -67,7 +67,7 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
       filePath = widget.htmlEditorOptions.filePath!;
     } else if (widget.plugins.isEmpty) {
       filePath =
-          'packages/html_editor_enhanced/assets/summernote-no-plugins.html';
+      'packages/html_editor_enhanced/assets/summernote-no-plugins.html';
     } else {
       filePath = 'packages/html_editor_enhanced/assets/summernote.html';
     }
@@ -88,7 +88,8 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
       });
       await widget.controller.editorController!.evaluateJavascript(
           source:
-              "\$('div.note-editable').outerHeight(${widget.otherOptions.height - (toolbarKey.currentContext?.size?.height ?? 0)});");
+          "\$('div.note-editable').outerHeight(${widget.otherOptions.height -
+              (toolbarKey.currentContext?.size?.height ?? 0)});");
     }
   }
 
@@ -116,12 +117,12 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
           child: Column(
             children: [
               widget.htmlToolbarOptions.toolbarPosition ==
-                      ToolbarPosition.aboveEditor
+                  ToolbarPosition.aboveEditor
                   ? ToolbarWidget(
-                      key: toolbarKey,
-                      controller: widget.controller,
-                      htmlToolbarOptions: widget.htmlToolbarOptions,
-                      callbacks: widget.callbacks)
+                  key: toolbarKey,
+                  controller: widget.controller,
+                  htmlToolbarOptions: widget.htmlToolbarOptions,
+                  callbacks: widget.callbacks)
                   : Container(height: 0, width: 0),
               Expanded(
                 child: WebViewWidget(
@@ -130,12 +131,12 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
                 ),
               ),
               widget.htmlToolbarOptions.toolbarPosition ==
-                      ToolbarPosition.belowEditor
+                  ToolbarPosition.belowEditor
                   ? ToolbarWidget(
-                      key: toolbarKey,
-                      controller: widget.controller,
-                      htmlToolbarOptions: widget.htmlToolbarOptions,
-                      callbacks: widget.callbacks)
+                  key: toolbarKey,
+                  controller: widget.controller,
+                  htmlToolbarOptions: widget.htmlToolbarOptions,
+                  callbacks: widget.callbacks)
                   : Container(height: 0, width: 0),
             ],
           ),
@@ -317,8 +318,8 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
                   args.last.contains('base64')
                       ? UploadError.jsException
                       : args.last.contains('unsupported')
-                          ? UploadError.unsupportedFile
-                          : UploadError.exceededMaxSize);
+                      ? UploadError.unsupportedFile
+                      : UploadError.exceededMaxSize);
             } else {
               var file = fileUploadFromJson(args.first.toString());
               c.onImageUploadError!.call(
@@ -327,8 +328,8 @@ class _HtmlEditorWidgetMobileState extends State<HtmlEditorWidget> {
                   args.last.contains('base64')
                       ? UploadError.jsException
                       : args.last.contains('unsupported')
-                          ? UploadError.unsupportedFile
-                          : UploadError.exceededMaxSize);
+                      ? UploadError.unsupportedFile
+                      : UploadError.exceededMaxSize);
             }
           });
     }

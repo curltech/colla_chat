@@ -58,7 +58,8 @@ class LocationMessage extends StatelessWidget {
                     children: [
                   CommonAutoSizeText(
                       '${AppLocalizations.t('Longitude')}:$longitude\n${AppLocalizations.t('Latitude')}:$latitude'),
-                  CommonAutoSizeText('${AppLocalizations.t('Address')}:$address')
+                  CommonAutoSizeText(
+                      '${AppLocalizations.t('Address')}:$address')
                 ])),
           ]),
         ),
@@ -74,7 +75,8 @@ class LocationMessage extends StatelessWidget {
             ),
             Expanded(
               child: address != null
-                  ? CommonAutoSizeText('${AppLocalizations.t('Address')}:$address',
+                  ? CommonAutoSizeText(
+                      '${AppLocalizations.t('Address')}:$address',
                       softWrap: true)
                   : CommonAutoSizeText(
                       '${AppLocalizations.t('Longitude')}:$longitude\n${AppLocalizations.t('Latitude')}:$latitude'),

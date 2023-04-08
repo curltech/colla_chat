@@ -1,6 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
@@ -88,15 +89,13 @@ class _WsAddressPickerState extends State<WsAddressPicker> {
       const SizedBox(height: 10.0),
       Padding(
           padding: const EdgeInsets.symmetric(horizontal: 5.0),
-          child: TextFormField(
+          child: CommonAutoSizeTextFormField(
             controller: _wsConnectAddressController,
             keyboardType: TextInputType.text,
-            decoration: InputDecoration(
-              labelText: AppLocalizations.t('Primary Address'),
-              prefixIcon: Icon(
-                Icons.location_city,
-                color: myself.primary,
-              ),
+            labelText: AppLocalizations.t('Primary Address'),
+            prefixIcon: Icon(
+              Icons.location_city,
+              color: myself.primary,
             ),
             //initialValue: _wsConnectAddress,
             onChanged: (String val) {

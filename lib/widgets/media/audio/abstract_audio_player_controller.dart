@@ -11,8 +11,6 @@ abstract class AbstractAudioPlayerController
   VideoPlayerValue _value = VideoPlayerValue(duration: Duration.zero);
   bool _closedCaptionFile = false;
 
-
-
   ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频
   play();
 

@@ -2,7 +2,6 @@ import 'package:colla_chat/pages/chat/channel/subscribe_channel_list_widget.dart
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/pages/chat/me/me_widget.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

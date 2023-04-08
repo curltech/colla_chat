@@ -110,17 +110,17 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        TextFormField(
+        CommonAutoSizeTextFormField(
           controller: roomController,
-          decoration: const InputDecoration(labelText: 'room'),
+          labelText: 'room',
         ),
-        TextFormField(
+        CommonAutoSizeTextFormField(
           controller: peerIdController,
-          decoration: const InputDecoration(labelText: 'peerId'),
+          labelText: 'peerId',
         ),
-        TextFormField(
+        CommonAutoSizeTextFormField(
           controller: clientIdController,
-          decoration: const InputDecoration(labelText: 'clientId'),
+          labelText: 'clientId',
         ),
         const SizedBox(
           height: 35.0,
@@ -128,10 +128,9 @@ class _DataChannelWidgetState extends State<DataChannelWidget> {
         CommonAutoSizeText(
           '接收到的消息:$message',
         ),
-        TextFormField(
+        CommonAutoSizeTextFormField(
           controller: messageController,
-          autofocus: true,
-          decoration: const InputDecoration(labelText: 'message'),
+          labelText: 'message',
         ),
         TextButton(
           child: const CommonAutoSizeText('点击发送文本'),

@@ -1,4 +1,3 @@
-import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';

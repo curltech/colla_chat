@@ -1,4 +1,3 @@
-import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
@@ -7,6 +6,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -73,7 +73,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
         linkmanController.getInitValue(linkmanColumnFieldDefs);
 
     var formInputWidget = Container(
-        padding: const EdgeInsets.all(15.0),
+        padding: const EdgeInsets.all(10.0),
         child: FormInputWidget(
           height: 330,
           onOk: (Map<String, dynamic> values) {
@@ -125,31 +125,19 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     var controller = TextEditingController();
     var addFriendTextField = Container(
         padding: const EdgeInsets.all(10.0),
-        child: TextFormField(
-            autofocus: true,
-            controller: controller,
-            keyboardType: TextInputType.text,
-            decoration: InputDecoration(
-              fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
-              filled: true,
-              border: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              errorBorder: InputBorder.none,
-              disabledBorder: InputBorder.none,
-              focusedErrorBorder: InputBorder.none,
-              labelText: AppLocalizations.t('Add friend'),
-              suffixIcon: IconButton(
-                onPressed: () {
-                  _addFriend(tip: controller.text);
-                },
-                icon: Icon(
-                  Icons.person_add,
-                  color: myself.primary,
-                ),
-              ),
-              suffixIconColor: myself.primary,
-            )));
+        child: CommonAutoSizeTextFormField(
+          controller: controller,
+          labelText: AppLocalizations.t('Add friend'),
+          suffixIcon: IconButton(
+            onPressed: () {
+              _addFriend(tip: controller.text);
+            },
+            icon: Icon(
+              Icons.person_add,
+              color: myself.primary,
+            ),
+          ),
+        ));
 
     return addFriendTextField;
   }

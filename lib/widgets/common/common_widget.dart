@@ -1,13 +1,15 @@
 import 'dart:ui';
 
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:auto_size_text_field/auto_size_text_field.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/widgets/common/auto_size_text_form_field.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+///平台定制的通用AutoSizeText，规定了一些参数的缺省值外，还规定了文本的样式
+///本类的目的是统一平台文本显示的样式，包括不随系统的字体大小变化
 class CommonAutoSizeText extends AutoSizeText {
   const CommonAutoSizeText(
     String data, {
@@ -25,7 +27,7 @@ class CommonAutoSizeText extends AutoSizeText {
     Locale? locale,
     bool? softWrap = true,
     bool wrapWords = true,
-    TextOverflow? overflow,
+    TextOverflow? overflow = TextOverflow.visible,
     Widget? overflowReplacement,
     double? textScaleFactor = 1.0,
     int? maxLines = 1,
@@ -54,8 +56,13 @@ class CommonAutoSizeText extends AutoSizeText {
         );
 }
 
-class CommonAutoSizeTextField extends AutoSizeTextField {
-  const CommonAutoSizeTextField({
+const InputBorder textFormFieldBorder = UnderlineInputBorder(
+    borderSide: BorderSide.none,
+    borderRadius: BorderRadius.all(Radius.circular(4.0)));
+
+///平台定制的AutoSizeTextFormField，规定了一些参数的缺省值
+class CustomAutoSizeTextFormField extends AutoSizeTextFormField {
+  const CustomAutoSizeTextFormField({
     Key? key,
     bool fullwidth = true,
     Key? textFieldKey,
@@ -72,6 +79,7 @@ class CommonAutoSizeTextField extends AutoSizeTextField {
     Widget? overflowReplacement,
     String? semanticsLabel,
     TextEditingController? controller,
+    String? initialValue,
     FocusNode? focusNode,
     InputDecoration decoration = const InputDecoration(),
     TextInputType? keyboardType,
@@ -90,11 +98,11 @@ class CommonAutoSizeTextField extends AutoSizeTextField {
     bool readOnly = false,
     EditableTextContextMenuBuilder? contextMenuBuilder,
     bool? showCursor,
-    int maxLength = 1,
+    int? maxLength,
     MaxLengthEnforcement? maxLengthEnforcement,
     void Function(String)? onChanged,
     void Function()? onEditingComplete,
-    Function(String)? onSubmitted,
+    Function(String)? onFieldSubmitted,
     List<TextInputFormatter>? inputFormatters,
     bool? enabled,
     double? cursorHeight,
@@ -117,6 +125,14 @@ class CommonAutoSizeTextField extends AutoSizeTextField {
     ScrollController? scrollController,
     int minLines = 1,
     double? minWidth,
+    String obscuringCharacter = '*',
+    void Function(String?)? onSaved,
+    String? Function(String?)? validator,
+    TextSelectionControls? selectionControls,
+    AutovalidateMode? autovalidateMode,
+    bool enableIMEPersonalizedLearning = true,
+    MouseCursor? mouseCursor,
+    String? restorationId,
   }) : super(
           key: key,
           fullwidth: fullwidth,
@@ -134,6 +150,7 @@ class CommonAutoSizeTextField extends AutoSizeTextField {
           overflowReplacement: overflowReplacement,
           semanticsLabel: semanticsLabel,
           controller: controller,
+          initialValue: initialValue,
           focusNode: focusNode,
           decoration: decoration,
           keyboardType: keyboardType,
@@ -156,18 +173,15 @@ class CommonAutoSizeTextField extends AutoSizeTextField {
           maxLengthEnforcement: maxLengthEnforcement,
           onChanged: onChanged,
           onEditingComplete: onEditingComplete,
-          onSubmitted: onSubmitted,
+          onFieldSubmitted: onFieldSubmitted,
           inputFormatters: inputFormatters,
           enabled: enabled,
           cursorHeight: cursorHeight,
           cursorWidth: cursorWidth,
           cursorRadius: cursorRadius,
           cursorColor: cursorColor,
-          selectionHeightStyle: selectionHeightStyle,
-          selectionWidthStyle: selectionWidthStyle,
           keyboardAppearance: keyboardAppearance,
           scrollPadding: scrollPadding,
-          dragStartBehavior: dragStartBehavior,
           enableInteractiveSelection: enableInteractiveSelection,
           onTap: onTap,
           buildCounter: buildCounter,
@@ -175,7 +189,100 @@ class CommonAutoSizeTextField extends AutoSizeTextField {
           scrollController: scrollController,
           minLines: minLines,
           minWidth: minWidth,
+          obscuringCharacter: obscuringCharacter,
+          onSaved: onSaved,
+          validator: validator,
+          selectionControls: selectionControls,
+          autovalidateMode: autovalidateMode,
+          enableIMEPersonalizedLearning: enableIMEPersonalizedLearning,
+          mouseCursor: mouseCursor,
+          restorationId: restorationId,
         );
+}
+
+///平台定制的通用AutoSizeTextFormField，规定了一些参数的缺省值外，还规定了边框的样式
+///本类的目的是统一平台输入框的样式，包括不随系统的字体大小变化
+class CommonAutoSizeTextFormField extends StatelessWidget {
+  final TextEditingController? controller;
+  final TextInputType? keyboardType;
+  final int? maxLines;
+  final int? minLines;
+  final bool readOnly;
+  final Color? fillColor;
+  final String? labelText;
+  final Widget? prefixIcon;
+  final Widget? suffixIcon;
+  final Widget? suffix;
+  final String? hintText;
+  final void Function(String)? onChanged;
+  final void Function()? onEditingComplete;
+  final Function(String)? onFieldSubmitted;
+  final void Function(String?)? onSaved;
+  final void Function()? onTap;
+  final String? Function(String?)? validator;
+  final FocusNode? focusNode;
+  final bool obscureText;
+  final String? initialValue;
+
+  const CommonAutoSizeTextFormField({
+    super.key,
+    this.controller,
+    this.keyboardType,
+    this.minLines,
+    this.fillColor,
+    this.labelText,
+    this.prefixIcon,
+    this.suffixIcon,
+    this.suffix,
+    this.hintText,
+    this.readOnly = false,
+    this.maxLines = 1,
+    this.onChanged,
+    this.onEditingComplete,
+    this.onFieldSubmitted,
+    this.onSaved,
+    this.onTap,
+    this.validator,
+    this.focusNode,
+    this.obscureText = false,
+    this.initialValue,
+  });
+
+  @override
+  build(BuildContext context) {
+    var textFormField = CustomAutoSizeTextFormField(
+      controller: controller,
+      keyboardType: keyboardType,
+      maxLines: maxLines,
+      minLines: 1,
+      readOnly: readOnly,
+      focusNode: focusNode,
+      obscureText: obscureText,
+      initialValue: initialValue,
+      validator: validator,
+      decoration: InputDecoration(
+          fillColor: fillColor ?? Colors.grey.withOpacity(AppOpacity.xlOpacity),
+          filled: true,
+          border: textFormFieldBorder,
+          focusedBorder: textFormFieldBorder,
+          enabledBorder: textFormFieldBorder,
+          errorBorder: textFormFieldBorder,
+          disabledBorder: textFormFieldBorder,
+          focusedErrorBorder: textFormFieldBorder,
+          labelText: labelText,
+          prefixIcon: prefixIcon,
+          suffixIcon: suffixIcon,
+          suffix: suffix,
+          hintText: hintText),
+      onChanged: onChanged,
+      onEditingComplete: onEditingComplete,
+      onFieldSubmitted: onFieldSubmitted,
+      onSaved: onSaved,
+      onTap: onTap,
+    );
+
+    return textFormField;
+  }
 }
 
 ///创建常用的大图标按钮
@@ -394,66 +501,5 @@ class StyleUtil {
     );
 
     return style;
-  }
-}
-
-const InputBorder textFormFieldBorder = UnderlineInputBorder(
-    borderSide: BorderSide.none,
-    borderRadius: BorderRadius.all(Radius.circular(4.0)));
-
-///创建常用的文本输入字段
-class AutoSizeTextFormField extends StatelessWidget {
-  final TextEditingController? controller;
-  final TextInputType? textInputType;
-  final int? maxLines;
-
-  final int? minLines;
-  final bool readOnly;
-  final Color? fillColor;
-  final String? labelText;
-  final Widget? prefixIcon;
-  final Widget? suffixIcon;
-  final Widget? suffix;
-  final String? hintText;
-
-  const AutoSizeTextFormField(
-      {super.key,
-      this.controller,
-      this.textInputType,
-      this.minLines,
-      this.fillColor,
-      this.labelText,
-      this.prefixIcon,
-      this.suffixIcon,
-      this.suffix,
-      this.hintText,
-      this.readOnly = false,
-      this.maxLines = 1});
-
-  @override
-  build(BuildContext context) {
-    var textFormField = TextFormField(
-      controller: controller,
-      keyboardType: textInputType,
-      maxLines: maxLines,
-      minLines: 1,
-      readOnly: readOnly,
-      decoration: InputDecoration(
-          fillColor: fillColor ?? Colors.grey.withOpacity(AppOpacity.xlOpacity),
-          filled: true,
-          border: textFormFieldBorder,
-          focusedBorder: textFormFieldBorder,
-          enabledBorder: textFormFieldBorder,
-          errorBorder: textFormFieldBorder,
-          disabledBorder: textFormFieldBorder,
-          focusedErrorBorder: textFormFieldBorder,
-          labelText: labelText,
-          prefixIcon: prefixIcon,
-          suffixIcon: suffixIcon,
-          suffix: suffix,
-          hintText: hintText),
-    );
-
-    return textFormField;
   }
 }

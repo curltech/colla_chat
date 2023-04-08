@@ -1,7 +1,6 @@
 import 'dart:developer';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:video_player_control_panel/video_player_control_panel.dart';

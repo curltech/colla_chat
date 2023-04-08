@@ -103,8 +103,8 @@ class _SettingWidgetState extends State<SettingWidget> {
                 (loginStatus != null && loginStatus!)
                     ? child
                     : Center(
-                        child:
-                            CommonAutoSizeText(AppLocalizations.t('Authenticate failure'))),
+                        child: CommonAutoSizeText(
+                            AppLocalizations.t('Authenticate failure'))),
               ],
             )));
     return setting;

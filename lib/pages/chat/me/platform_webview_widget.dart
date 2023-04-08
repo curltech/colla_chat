@@ -1,5 +1,6 @@
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/platform_webview.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -71,11 +72,8 @@ class _PlatformWebViewWidgetState extends State<PlatformWebViewWidget> {
         width: 10,
       ),
       Expanded(
-          child: TextFormField(
-        autofocus: true,
-        decoration: const InputDecoration(
-          prefixIcon: Icon(Icons.http),
-        ),
+          child: CommonAutoSizeTextFormField(
+        prefixIcon: const Icon(Icons.http),
         controller: urlTextController,
         keyboardType: TextInputType.url,
         onFieldSubmitted: (String url) {

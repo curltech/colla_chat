@@ -1,6 +1,7 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/routers/routes.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/style/neumorphic/neumorphic_container_widget.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:flutter/services.dart';
@@ -94,7 +95,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     TextEditingController? controller,
     String? initialValue,
     FocusNode? focusNode,
-    InputDecoration? decoration = const InputDecoration(),
+    InputDecoration decoration = const InputDecoration(),
     TextInputType? keyboardType,
     TextCapitalization textCapitalization = TextCapitalization.none,
     TextInputAction? textInputAction,
@@ -115,7 +116,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     bool enableSuggestions = true,
     MaxLengthEnforcement? maxLengthEnforcement,
     int? maxLines = 1,
-    int? minLines,
+    int minLines = 1,
     bool expands = false,
     int? maxLength,
     ValueChanged<String>? onChanged,
@@ -132,7 +133,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     Color? cursorColor,
     Brightness? keyboardAppearance,
     EdgeInsets scrollPadding = const EdgeInsets.all(20.0),
-    bool? enableInteractiveSelection,
+    bool enableInteractiveSelection = true,
     TextSelectionControls? selectionControls,
     InputCounterWidgetBuilder? buildCounter,
     ScrollPhysics? scrollPhysics,
@@ -144,7 +145,7 @@ class NeumorphicWidgetFactory extends WidgetFactory {
     MouseCursor? mouseCursor,
   }) {
     return Neumorphic(
-        child: TextFormField(
+        child: CustomAutoSizeTextFormField(
       key: key,
       controller: controller,
       initialValue: initialValue,
@@ -160,7 +161,6 @@ class NeumorphicWidgetFactory extends WidgetFactory {
       textAlignVertical: textAlignVertical,
       autofocus: autofocus,
       readOnly: readOnly,
-      toolbarOptions: toolbarOptions,
       showCursor: showCursor,
       obscuringCharacter: obscuringCharacter = '•',
       obscureText: obscureText,

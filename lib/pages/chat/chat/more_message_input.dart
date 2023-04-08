@@ -129,8 +129,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   _onActionDeleteTime() async {
     int? deleteTime = await DialogUtil.showSelectDialog<int>(
         context: context,
-        title:
-            AppBarWidget.buildTitleBar(title: const CommonAutoSizeText('Select deleteTime')),
+        title: AppBarWidget.buildTitleBar(
+            title: const CommonAutoSizeText('Select deleteTime')),
         items: [
           _buildOption(0),
           _buildOption(15),
@@ -256,8 +256,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   Future<void> _onActionNameCard() async {
     await DialogUtil.show(
         context: context,
-        title:
-            AppBarWidget.buildTitleBar(title: const CommonAutoSizeText('Select one linkman')),
+        title: AppBarWidget.buildTitleBar(
+            title: const CommonAutoSizeText('Select one linkman')),
         builder: (BuildContext context) {
           return LinkmanGroupSearchWidget(
               onSelected: (List<String>? selected) async {

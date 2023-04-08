@@ -412,7 +412,7 @@ class SessionOptionsWidget extends StatelessWidget {
               Container(
                   padding: EdgeInsets.only(left: 8),
                   width: 80,
-                  child: TextFormField(
+                  child: CommonAutoSizeTextFormField(
                     controller: pauseForController,
                   )),
               Container(
@@ -421,7 +421,7 @@ class SessionOptionsWidget extends StatelessWidget {
               Container(
                   padding: EdgeInsets.only(left: 8),
                   width: 80,
-                  child: TextFormField(
+                  child: CommonAutoSizeTextFormField(
                     controller: listenForController,
                   )),
             ],

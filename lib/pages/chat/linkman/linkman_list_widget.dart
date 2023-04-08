@@ -23,6 +23,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/qrcode_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
@@ -137,30 +138,20 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   _buildLinkmanSearchTextField(BuildContext context) {
     var searchTextField = Container(
         padding: const EdgeInsets.all(10.0),
-        child: TextFormField(
-            autofocus: true,
-            controller: _linkmanTextController,
-            keyboardType: TextInputType.text,
-            decoration: InputDecoration(
-              fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
-              filled: true,
-              border: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              errorBorder: InputBorder.none,
-              disabledBorder: InputBorder.none,
-              focusedErrorBorder: InputBorder.none,
-              //labelText: AppLocalizations.t('Search'),
-              suffixIcon: IconButton(
-                onPressed: () {
-                  _searchLinkman(_linkmanTextController.text);
-                },
-                icon: Icon(
-                  Icons.search,
-                  color: myself.primary,
-                ),
-              ),
-            )));
+        child: CommonAutoSizeTextFormField(
+          controller: _linkmanTextController,
+          keyboardType: TextInputType.text,
+          //labelText: AppLocalizations.t('Search'),
+          suffixIcon: IconButton(
+            onPressed: () {
+              _searchLinkman(_linkmanTextController.text);
+            },
+            icon: Icon(
+              Icons.search,
+              color: myself.primary,
+            ),
+          ),
+        ));
 
     return searchTextField;
   }
@@ -168,30 +159,20 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   _buildGroupSearchTextField(BuildContext context) {
     var searchTextField = Container(
         padding: const EdgeInsets.all(10.0),
-        child: TextFormField(
-            autofocus: true,
-            controller: _groupTextController,
-            keyboardType: TextInputType.text,
-            decoration: InputDecoration(
-              fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
-              filled: true,
-              border: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              errorBorder: InputBorder.none,
-              disabledBorder: InputBorder.none,
-              focusedErrorBorder: InputBorder.none,
-              //labelText: AppLocalizations.t('Search'),
-              suffixIcon: IconButton(
-                onPressed: () {
-                  _searchGroup(_groupTextController.text);
-                },
-                icon: Icon(
-                  Icons.search,
-                  color: myself.primary,
-                ),
-              ),
-            )));
+        child: CommonAutoSizeTextFormField(
+          controller: _groupTextController,
+          keyboardType: TextInputType.text,
+          //labelText: AppLocalizations.t('Search'),
+          suffixIcon: IconButton(
+            onPressed: () {
+              _searchGroup(_groupTextController.text);
+            },
+            icon: Icon(
+              Icons.search,
+              color: myself.primary,
+            ),
+          ),
+        ));
 
     return searchTextField;
   }
@@ -199,30 +180,20 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   _buildConferenceSearchTextField(BuildContext context) {
     var searchTextField = Container(
         padding: const EdgeInsets.all(10.0),
-        child: TextFormField(
-            autofocus: true,
-            controller: _conferenceTextController,
-            keyboardType: TextInputType.text,
-            decoration: InputDecoration(
-              fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
-              filled: true,
-              border: InputBorder.none,
-              focusedBorder: InputBorder.none,
-              enabledBorder: InputBorder.none,
-              errorBorder: InputBorder.none,
-              disabledBorder: InputBorder.none,
-              focusedErrorBorder: InputBorder.none,
-              //labelText: AppLocalizations.t('Search'),
-              suffixIcon: IconButton(
-                onPressed: () {
-                  _searchConference(_conferenceTextController.text);
-                },
-                icon: Icon(
-                  Icons.search,
-                  color: myself.primary,
-                ),
-              ),
-            )));
+        child: CommonAutoSizeTextFormField(
+          controller: _conferenceTextController,
+          keyboardType: TextInputType.text,
+          //labelText: AppLocalizations.t('Search'),
+          suffixIcon: IconButton(
+            onPressed: () {
+              _searchConference(_conferenceTextController.text);
+            },
+            icon: Icon(
+              Icons.search,
+              color: myself.primary,
+            ),
+          ),
+        ));
 
     return searchTextField;
   }

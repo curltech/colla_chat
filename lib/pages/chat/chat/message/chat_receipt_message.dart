@@ -30,9 +30,10 @@ class ChatReceiptMessage extends StatelessWidget {
       onTap: () {},
       child: ListTile(
         leading: leading,
-        title: CommonAutoSizeText(title + groupType + AppLocalizations.t('receipt')),
-        subtitle:
-            CommonAutoSizeText('$receiverName\n$groupName\n${AppLocalizations.t(content)}'),
+        title: CommonAutoSizeText(
+            title + groupType + AppLocalizations.t('receipt')),
+        subtitle: CommonAutoSizeText(
+            '$receiverName\n$groupName\n${AppLocalizations.t(content)}'),
         //dense: true,
         contentPadding: const EdgeInsets.symmetric(horizontal: 5.0),
         horizontalTitleGap: 0,

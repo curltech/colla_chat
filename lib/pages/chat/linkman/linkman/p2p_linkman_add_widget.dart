@@ -1,4 +1,3 @@
-import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
@@ -13,6 +12,7 @@ import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/validator_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -59,30 +59,20 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
   }
 
   _buildSearchTextField(BuildContext context) {
-    var searchTextField = TextFormField(
+    var searchTextField = CommonAutoSizeTextFormField(
         controller: controller,
         keyboardType: TextInputType.text,
         validator: (value) {
           return ValidatorUtil.emptyValidator(value);
         },
-        decoration: InputDecoration(
-          fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
-          filled: true,
-          border: InputBorder.none,
-          focusedBorder: InputBorder.none,
-          enabledBorder: InputBorder.none,
-          errorBorder: InputBorder.none,
-          disabledBorder: InputBorder.none,
-          focusedErrorBorder: InputBorder.none,
-          labelText: AppLocalizations.t('PeerId/Mobile/Email/Name'),
-          suffixIcon: IconButton(
-            onPressed: () {
-              _search(controller.text);
-            },
-            icon: Icon(
-              Icons.search,
-              color: myself.primary,
-            ),
+        labelText: AppLocalizations.t('PeerId/Mobile/Email/Name'),
+        suffixIcon: IconButton(
+          onPressed: () {
+            _search(controller.text);
+          },
+          icon: Icon(
+            Icons.search,
+            color: myself.primary,
           ),
         ));
 

@@ -105,8 +105,8 @@ class _DataDropdownButtonState extends State<DataDropdownButton> {
     List<DropdownMenuItem<String>> menuItems = [];
     for (var item in widget.optionController.options) {
       var label = AppLocalizations.t(item.label);
-      var menuItem =
-          DropdownMenuItem<String>(value: item.value, child: CommonAutoSizeText(label));
+      var menuItem = DropdownMenuItem<String>(
+          value: item.value, child: CommonAutoSizeText(label));
       if (item.checked) {
         selected = item.value;
       }
@@ -183,27 +183,16 @@ class _DataListSingleSelectState extends State<DataListSingleSelect> {
   }
 
   Widget _buildSearchTextField(BuildContext context) {
-    var searchTextField = TextFormField(
-      autofocus: true,
+    var searchTextField = CommonAutoSizeTextFormField(
       controller: textController,
       keyboardType: TextInputType.text,
-      decoration: InputDecoration(
-        fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
-        filled: true,
-        border: InputBorder.none,
-        focusedBorder: InputBorder.none,
-        enabledBorder: InputBorder.none,
-        errorBorder: InputBorder.none,
-        disabledBorder: InputBorder.none,
-        focusedErrorBorder: InputBorder.none,
-        suffixIcon: IconButton(
-          onPressed: () async {
-            await _search();
-          },
-          icon: Icon(
-            Icons.search,
-            color: myself.primary,
-          ),
+      suffixIcon: IconButton(
+        onPressed: () async {
+          await _search();
+        },
+        icon: Icon(
+          Icons.search,
+          color: myself.primary,
         ),
       ),
       onChanged: (String? value) async {
@@ -362,49 +351,40 @@ class _CustomSingleSelectFieldState extends State<CustomSingleSelectField> {
           Icons.arrow_drop_down,
           color: Colors.white,
         );
-    return TextFormField(
+    return CommonAutoSizeTextFormField(
       controller: textEditingController,
       readOnly: true,
       keyboardType: TextInputType.text,
       minLines: 1,
-      decoration: InputDecoration(
-        labelText: AppLocalizations.t(widget.title ?? ''),
-        fillColor: Colors.grey.withOpacity(AppOpacity.xlOpacity),
-        filled: true,
-        border: InputBorder.none,
-        focusedBorder: InputBorder.none,
-        enabledBorder: InputBorder.none,
-        errorBorder: InputBorder.none,
-        disabledBorder: InputBorder.none,
-        focusedErrorBorder: InputBorder.none,
-        prefixIcon: widget.prefix,
-        suffixIcon: InkWell(
-            child: suffix,
-            onTap: () async {
-              String? selected = await DialogUtil.show(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return DataListSingleSelect(
-                      title: widget.title,
-                      optionController: widget.optionController,
-                      onSearch: widget.onSearch,
-                      onChanged: (String? selected) {
-                        Navigator.pop(
-                          context,
-                          selected,
-                        );
-                      },
+      labelText: AppLocalizations.t(widget.title ?? ''),
+      prefixIcon: widget.prefix,
+      suffixIcon: InkWell(
+        child: suffix,
+        onTap: () async {
+          String? selected = await DialogUtil.show(
+              context: context,
+              builder: (BuildContext context) {
+                return DataListSingleSelect(
+                  title: widget.title,
+                  optionController: widget.optionController,
+                  onSearch: widget.onSearch,
+                  onChanged: (String? selected) {
+                    Navigator.pop(
+                      context,
+                      selected,
                     );
-                  });
-              widget.onChanged(selected);
-              for (var option in widget.optionController.options) {
-                selected = selected ?? '';
-                if (option.value == selected) {
-                  textEditingController.text = option.label;
-                  break;
-                }
-              }
-            }),
+                  },
+                );
+              });
+          widget.onChanged(selected);
+          for (var option in widget.optionController.options) {
+            selected = selected ?? '';
+            if (option.value == selected) {
+              textEditingController.text = option.label;
+              break;
+            }
+          }
+        },
       ),
     );
   }
@@ -479,27 +459,16 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
   }
 
   Widget _buildSearchTextField(BuildContext context) {
-    var searchTextField = TextFormField(
-      autofocus: true,
+    var searchTextField = CommonAutoSizeTextFormField(
       controller: textController,
       keyboardType: TextInputType.text,
-      decoration: InputDecoration(
-        fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
-        filled: true,
-        border: InputBorder.none,
-        focusedBorder: InputBorder.none,
-        enabledBorder: InputBorder.none,
-        errorBorder: InputBorder.none,
-        disabledBorder: InputBorder.none,
-        focusedErrorBorder: InputBorder.none,
-        suffixIcon: IconButton(
-          onPressed: () async {
-            await _search();
-          },
-          icon: Icon(
-            Icons.search,
-            color: myself.primary,
-          ),
+      suffixIcon: IconButton(
+        onPressed: () async {
+          await _search();
+        },
+        icon: Icon(
+          Icons.search,
+          color: myself.primary,
         ),
       ),
       onChanged: (String? value) async {

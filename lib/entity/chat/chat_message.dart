@@ -70,7 +70,7 @@ enum ChatMessageSubType {
   chatReceipt, // 聊天回复
   groupFile, // 群文件
   channel, //普通的频道消息
-  comment,//评论
+  comment, //评论
   getChannel, //请求获取最新的频道文
   collection,
   // 以下system消息，不在聊天界面显示

@@ -76,7 +76,6 @@ class _HtmlRteWidgetState extends State<HtmlRteWidget> {
         controller.insertLink('', '', false);
         break;
       case 'InsertNetworkImage':
-
         break;
       default:
         break;

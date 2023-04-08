@@ -46,14 +46,14 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
         children: <Widget>[
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 50.0),
-              child: TextFormField(
+              child: CommonAutoSizeTextFormField(
                 keyboardType: TextInputType.text,
                 //controller: _credentialController,
-                decoration: InputDecoration(
+
                   labelText:
                       AppLocalizations.t('Credential(Mobile/Email/LoginName)'),
                   prefixIcon: Icon(Icons.person),
-                ),
+
                 initialValue: _credential,
                 onChanged: (String val) {
                   setState(() {
@@ -65,11 +65,11 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
           SizedBox(height: 30.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 50.0),
-              child: TextFormField(
+              child: CommonAutoSizeTextFormField(
                 keyboardType: TextInputType.text,
                 obscureText: !_pwdShow,
                 //controller: passwordController,
-                decoration: InputDecoration(
+
                   labelText: AppLocalizations.t('Password'),
                   prefixIcon: Icon(Icons.lock),
                   suffixIcon: IconButton(
@@ -81,7 +81,7 @@ class _RemoteLoginWidgetState extends State<RemoteLoginWidget> {
                       });
                     },
                   ),
-                ),
+
                 initialValue: _password,
                 onChanged: (String val) {
                   setState(() {

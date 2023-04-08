@@ -1,13 +1,13 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
 
 ///基于flick实现的媒体播放器和记录器，
 class FlickVideoPlayerController extends OriginVideoPlayerController {
-  FlickVideoPlayerController(){
+  FlickVideoPlayerController() {
     fileType = FileType.media;
   }
 

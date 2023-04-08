@@ -89,7 +89,8 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
   Widget _buildMessageItem(BuildContext context, int index) {
     List<ChatMessage> messages = collectionChatMessageController.data;
     ChatMessage chatMessage = messages[index];
-    Widget chatMessageItem = ListTile(title: CommonAutoSizeText(chatMessage.title!));
+    Widget chatMessageItem =
+        ListTile(title: CommonAutoSizeText(chatMessage.title!));
 
     // index=0执行动画，对最新的消息执行动画
     if (index == 0) {

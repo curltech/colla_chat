@@ -49,8 +49,8 @@ class _BottomBarState extends State<BottomBar> {
         unselectedFontSize: 14.0,
         showSelectedLabels: true,
         showUnselectedLabels: true,
-        selectedLabelStyle:const TextStyle(fontWeight:FontWeight.bold),
-        type:BottomNavigationBarType.fixed,
+        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold),
+        type: BottomNavigationBarType.fixed,
         onTap: (int index) {
           indexWidgetProvider.currentMainIndex = index;
         },

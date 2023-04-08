@@ -20,7 +20,7 @@ class JustAudioPlayer {
     AudioLoadConfiguration? audioLoadConfiguration,
     AudioPipeline? audioPipeline,
     bool androidOffloadSchedulingEnabled = false,
-  }): super() {
+  }) : super() {
     player = AudioPlayer(
         userAgent: userAgent,
         handleInterruptions: handleInterruptions,
@@ -39,9 +39,11 @@ class JustAudioPlayer {
       await audioSession.configure(const AudioSessionConfiguration.speech());
       await audioSession.configure(const AudioSessionConfiguration(
         avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
-        avAudioSessionCategoryOptions: AVAudioSessionCategoryOptions.allowBluetooth,
+        avAudioSessionCategoryOptions:
+            AVAudioSessionCategoryOptions.allowBluetooth,
         avAudioSessionMode: AVAudioSessionMode.spokenAudio,
-        avAudioSessionRouteSharingPolicy: AVAudioSessionRouteSharingPolicy.defaultPolicy,
+        avAudioSessionRouteSharingPolicy:
+            AVAudioSessionRouteSharingPolicy.defaultPolicy,
         avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
         androidAudioAttributes: AndroidAudioAttributes(
           contentType: AndroidAudioContentType.speech,

@@ -1,4 +1,3 @@
-import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -311,7 +310,9 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
           const SizedBox(
             width: 10.0,
           ),
-          Expanded(child: CommonAutoSizeText(value.toString(), textAlign: TextAlign.start))
+          Expanded(
+              child: CommonAutoSizeText(value.toString(),
+                  textAlign: TextAlign.start))
         ]));
   }
 
@@ -347,27 +348,18 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
       }
     }
     String label = AppLocalizations.t(columnFieldDef.label);
-    var textFormField = TextFormField(
+    var textFormField = CommonAutoSizeTextFormField(
       controller: controller,
       focusNode: widget.focusNode,
       keyboardType: columnFieldDef.textInputType,
       maxLines: columnFieldDef.maxLines,
       minLines: 1,
       readOnly: columnFieldDef.readOnly,
-      decoration: InputDecoration(
-          fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
-          filled: true,
-          border: textFormFieldBorder,
-          focusedBorder: textFormFieldBorder,
-          enabledBorder: textFormFieldBorder,
-          errorBorder: textFormFieldBorder,
-          disabledBorder: textFormFieldBorder,
-          focusedErrorBorder: textFormFieldBorder,
-          labelText: label,
-          prefixIcon: _buildIcon(),
-          suffixIcon: suffixIcon,
-          suffix: suffix,
-          hintText: columnFieldDef.hintText),
+      labelText: label,
+      prefixIcon: _buildIcon(),
+      suffixIcon: suffixIcon,
+      suffix: suffix,
+      hintText: columnFieldDef.hintText,
     );
 
     return textFormField;
@@ -399,36 +391,27 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
               ))
           : null;
     }
-    var textFormField = TextFormField(
+    var textFormField = CommonAutoSizeTextFormField(
       controller: controller,
       focusNode: widget.focusNode,
       keyboardType: columnFieldDef.textInputType,
       obscureText: !pwdShow,
-      decoration: InputDecoration(
-          fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
-          filled: true,
-          border: textFormFieldBorder,
-          focusedBorder: textFormFieldBorder,
-          enabledBorder: textFormFieldBorder,
-          errorBorder: textFormFieldBorder,
-          disabledBorder: textFormFieldBorder,
-          focusedErrorBorder: textFormFieldBorder,
-          labelText: AppLocalizations.t(columnFieldDef.label),
-          prefixIcon: _buildIcon(),
-          suffixIcon: IconButton(
-            icon: Icon(
-              pwdShow ? Icons.visibility_off : Icons.visibility,
-              color: myself.primary,
-            ),
-            onPressed: () {
-              setState(() {
-                widget.controller.value = controller.value.text;
-                widget.controller.flag = !pwdShow;
-              });
-            },
-          ),
-          suffix: suffix,
-          hintText: columnFieldDef.hintText),
+      labelText: AppLocalizations.t(columnFieldDef.label),
+      prefixIcon: _buildIcon(),
+      suffixIcon: IconButton(
+        icon: Icon(
+          pwdShow ? Icons.visibility_off : Icons.visibility,
+          color: myself.primary,
+        ),
+        onPressed: () {
+          setState(() {
+            widget.controller.value = controller.value.text;
+            widget.controller.flag = !pwdShow;
+          });
+        },
+      ),
+      suffix: suffix,
+      hintText: columnFieldDef.hintText,
     );
     return textFormField;
   }
@@ -643,7 +626,8 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
       DropdownButton<String>(
         dropdownColor: Colors.grey.withOpacity(0.7),
         underline: Container(),
-        hint: CommonAutoSizeText(AppLocalizations.t(columnFieldDef.hintText ?? '')),
+        hint: CommonAutoSizeText(
+            AppLocalizations.t(columnFieldDef.hintText ?? '')),
         elevation: 0,
         value: widget.controller.value,
         items: children,
@@ -682,27 +666,26 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
               icon: const Icon(Icons.cancel, color: Colors.grey))
           : null;
     }
-    var textFormField = TextFormField(
+    var textFormField = CommonAutoSizeTextFormField(
       controller: controller,
       focusNode: widget.focusNode,
       keyboardType: columnFieldDef.textInputType,
       readOnly: true,
-      decoration: InputDecoration(
-          labelText: AppLocalizations.t(columnFieldDef.label),
-          prefixIcon: _buildIcon(),
-          suffixIcon: IconButton(
-              icon: Icon(Icons.date_range, color: myself.primary),
-              onPressed: () async {
-                DateTime? initialDate;
-                if (initialValue != null) {
-                  initialDate = DateUtil.toDateTime(initialValue);
-                }
-                var value =
-                    await _showDatePicker(context, initialDate: initialDate);
-                widget.controller.value = value;
-              }),
-          suffix: suffix,
-          hintText: columnFieldDef.hintText),
+      labelText: AppLocalizations.t(columnFieldDef.label),
+      prefixIcon: _buildIcon(),
+      suffixIcon: IconButton(
+          icon: Icon(Icons.date_range, color: myself.primary),
+          onPressed: () async {
+            DateTime? initialDate;
+            if (initialValue != null) {
+              initialDate = DateUtil.toDateTime(initialValue);
+            }
+            var value =
+                await _showDatePicker(context, initialDate: initialDate);
+            widget.controller.value = value;
+          }),
+      suffix: suffix,
+      hintText: columnFieldDef.hintText,
     );
 
     return textFormField;
@@ -780,27 +763,26 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
               icon: const Icon(Icons.cancel, color: Colors.grey))
           : null;
     }
-    var textFormField = TextFormField(
+    var textFormField = CommonAutoSizeTextFormField(
       controller: controller,
       focusNode: widget.focusNode,
       keyboardType: columnFieldDef.textInputType,
       readOnly: true,
-      decoration: InputDecoration(
-          labelText: AppLocalizations.t(columnFieldDef.label),
-          prefixIcon: _buildIcon(),
-          suffixIcon: IconButton(
-              icon: Icon(Icons.access_time_filled, color: myself.primary),
-              onPressed: () async {
-                TimeOfDay? initialTime;
-                if (initialValue != null) {
-                  initialTime = DateUtil.toTime(initialValue);
-                }
-                var value =
-                    await _showTimePicker(context, initialTime: initialTime);
-                widget.controller.value = value;
-              }),
-          suffix: suffix,
-          hintText: columnFieldDef.hintText),
+      labelText: AppLocalizations.t(columnFieldDef.label),
+      prefixIcon: _buildIcon(),
+      suffixIcon: IconButton(
+          icon: Icon(Icons.access_time_filled, color: myself.primary),
+          onPressed: () async {
+            TimeOfDay? initialTime;
+            if (initialValue != null) {
+              initialTime = DateUtil.toTime(initialValue);
+            }
+            var value =
+                await _showTimePicker(context, initialTime: initialTime);
+            widget.controller.value = value;
+          }),
+      suffix: suffix,
+      hintText: columnFieldDef.hintText,
     );
 
     return textFormField;
@@ -852,27 +834,26 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
               icon: const Icon(Icons.cancel, color: Colors.grey))
           : null;
     }
-    var textFormField = TextFormField(
+    var textFormField = CommonAutoSizeTextFormField(
       controller: controller,
       focusNode: widget.focusNode,
       keyboardType: columnFieldDef.textInputType,
       readOnly: true,
-      decoration: InputDecoration(
-          labelText: AppLocalizations.t(columnFieldDef.label),
-          prefixIcon: _buildIcon(),
-          suffixIcon: IconButton(
-              icon: Icon(Icons.date_range, color: myself.primary),
-              onPressed: () async {
-                DateTime? initialDate;
-                if (initialValue != null) {
-                  initialDate = DateUtil.toDateTime(initialValue);
-                }
-                var value = await _showDateTimePicker(context,
-                    initialDate: initialDate);
-                widget.controller.value = value;
-              }),
-          suffix: suffix,
-          hintText: columnFieldDef.hintText),
+      labelText: AppLocalizations.t(columnFieldDef.label),
+      prefixIcon: _buildIcon(),
+      suffixIcon: IconButton(
+          icon: Icon(Icons.date_range, color: myself.primary),
+          onPressed: () async {
+            DateTime? initialDate;
+            if (initialValue != null) {
+              initialDate = DateUtil.toDateTime(initialValue);
+            }
+            var value =
+                await _showDateTimePicker(context, initialDate: initialDate);
+            widget.controller.value = value;
+          }),
+      suffix: suffix,
+      hintText: columnFieldDef.hintText,
     );
 
     return textFormField;

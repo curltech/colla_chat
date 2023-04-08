@@ -64,17 +64,15 @@ class _ContactLinkmanAddWidgetState extends State<ContactLinkmanAddWidget> {
   }
 
   _buildSearchTextField(BuildContext context) {
-    var searchTextField = TextFormField(
+    var searchTextField = CommonAutoSizeTextFormField(
         controller: controller,
         keyboardType: TextInputType.text,
-        decoration: InputDecoration(
-          labelText: AppLocalizations.t('PeerId/Mobile/Email/Name'),
-          suffixIcon: IconButton(
-            onPressed: () {
-              _search(controller.text);
-            },
-            icon: const Icon(Icons.search),
-          ),
+        labelText: AppLocalizations.t('PeerId/Mobile/Email/Name'),
+        suffixIcon: IconButton(
+          onPressed: () {
+            _search(controller.text);
+          },
+          icon: const Icon(Icons.search),
         ));
 
     return searchTextField;

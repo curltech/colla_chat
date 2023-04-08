@@ -191,7 +191,8 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              CommonAutoSizeText(style: titleStyle, AppLocalizations.t('Connection stats')),
+              CommonAutoSizeText(
+                  style: titleStyle, AppLocalizations.t('Connection stats')),
               const SizedBox(
                 height: 15.0,
               ),
@@ -208,8 +209,10 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
                       ),
                       Column(
                         children: [
-                          CommonAutoSizeText(style: dataStyle, AppLocalizations.t('Byte in')),
-                          CommonAutoSizeText(style: dataStyle, status.value.byteIn!),
+                          CommonAutoSizeText(
+                              style: dataStyle, AppLocalizations.t('Byte in')),
+                          CommonAutoSizeText(
+                              style: dataStyle, status.value.byteIn!),
                         ],
                       ),
                     ],
@@ -228,7 +231,8 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
                         children: [
                           CommonAutoSizeText(
                               style: dataStyle, AppLocalizations.t('Byte out')),
-                          CommonAutoSizeText(style: dataStyle, status.value.byteOut!),
+                          CommonAutoSizeText(
+                              style: dataStyle, status.value.byteOut!),
                         ],
                       ),
                     ],
@@ -246,7 +250,8 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
                         children: [
                           CommonAutoSizeText(
                               style: dataStyle, AppLocalizations.t('Duration')),
-                          CommonAutoSizeText(style: dataStyle, status.value.duration!),
+                          CommonAutoSizeText(
+                              style: dataStyle, status.value.duration!),
                         ],
                       ),
                     ],

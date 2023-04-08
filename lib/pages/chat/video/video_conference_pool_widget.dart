@@ -85,7 +85,8 @@ class _VideoConferencePoolWidgetState extends State<VideoConferencePoolWidget> {
         builder: (context, value, child) {
           if (value.isEmpty) {
             return Center(
-                child: CommonAutoSizeText(AppLocalizations.t('No active conference in pool'),
+                child: CommonAutoSizeText(
+                    AppLocalizations.t('No active conference in pool'),
                     style: const TextStyle(color: Colors.white)));
           }
           return DataListView(

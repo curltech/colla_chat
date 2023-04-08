@@ -79,7 +79,7 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
           child: FormInputWidget(
             mainAxisAlignment: MainAxisAlignment.start,
             height: 200,
-            spacing : 10.0,
+            spacing: 10.0,
             onOk: _login,
             okLabel: 'Login',
             columnFieldDefs: p2pLoginInputFieldDef,

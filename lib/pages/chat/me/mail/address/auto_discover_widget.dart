@@ -8,7 +8,6 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:enough_mail/discover.dart';
 import 'package:flutter/material.dart';
 
-
 /// 自动邮件发现组件，一个card下的录入框和按钮组合
 class AutoDiscoverWidget extends StatefulWidget {
   const AutoDiscoverWidget({Key? key}) : super(key: key);
@@ -42,12 +41,10 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget>
           SizedBox(height: 30.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 50.0),
-              child: TextFormField(
+              child: CommonAutoSizeTextFormField(
                 keyboardType: TextInputType.text,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.t('Email'),
-                  prefixIcon: Icon(Icons.person),
-                ),
+                labelText: AppLocalizations.t('Email'),
+                prefixIcon: Icon(Icons.person),
                 initialValue: _name,
                 onChanged: (String val) {
                   setState(() {
@@ -59,17 +56,15 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget>
           SizedBox(height: 30.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 50.0),
-              child: TextFormField(
+              child: CommonAutoSizeTextFormField(
                 keyboardType: TextInputType.emailAddress,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.t('Email'),
-                  prefixIcon: Icon(Icons.email),
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.search),
-                    onPressed: () async {
-                      await _discover();
-                    },
-                  ),
+                labelText: AppLocalizations.t('Email'),
+                prefixIcon: Icon(Icons.email),
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.search),
+                  onPressed: () async {
+                    await _discover();
+                  },
                 ),
                 initialValue: _email,
                 onChanged: (String val) {
@@ -82,22 +77,20 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget>
           SizedBox(height: 30.0),
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 50.0),
-              child: TextFormField(
+              child: CommonAutoSizeTextFormField(
                 keyboardType: TextInputType.text,
                 obscureText: !_pwdShow,
                 //controller: passwordController,
-                decoration: InputDecoration(
-                  labelText: AppLocalizations.t('Password'),
-                  prefixIcon: Icon(Icons.lock),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                        _pwdShow ? Icons.visibility : Icons.visibility_off),
-                    onPressed: () {
-                      setState(() {
-                        _pwdShow = !_pwdShow;
-                      });
-                    },
-                  ),
+                labelText: AppLocalizations.t('Password'),
+                prefixIcon: Icon(Icons.lock),
+                suffixIcon: IconButton(
+                  icon:
+                      Icon(_pwdShow ? Icons.visibility : Icons.visibility_off),
+                  onPressed: () {
+                    setState(() {
+                      _pwdShow = !_pwdShow;
+                    });
+                  },
                 ),
                 initialValue: _password,
                 onChanged: (String val) {

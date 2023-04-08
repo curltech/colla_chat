@@ -56,8 +56,8 @@ class _AppBarViewState extends State<AppBarView> {
 
   @override
   Widget build(BuildContext context) {
-    Widget titleWidget =
-        widget.titleWidget ?? CommonAutoSizeText(AppLocalizations.t(widget.title ?? ''));
+    Widget titleWidget = widget.titleWidget ??
+        CommonAutoSizeText(AppLocalizations.t(widget.title ?? ''));
     return Consumer<IndexWidgetProvider>(
         builder: (context, indexWidgetProvider, child) {
       return Column(children: [

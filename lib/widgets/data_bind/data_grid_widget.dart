@@ -2,10 +2,10 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_datagrid/datagrid.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
 
 ///Syncfusion DataGrid
 class DataGridWidget<T> extends StatefulWidget {

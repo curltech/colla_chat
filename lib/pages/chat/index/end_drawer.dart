@@ -18,15 +18,21 @@ class EndDrawer extends StatelessWidget {
                 accountName: CommonAutoSizeText('胡劲松'),
               ),
               ListTile(
-                  leading: Icon(Icons.chat), title: CommonAutoSizeText(''), onTap: () {}),
+                  leading: Icon(Icons.chat),
+                  title: CommonAutoSizeText(''),
+                  onTap: () {}),
               ListTile(
-                  leading: Icon(Icons.contacts), title: CommonAutoSizeText(''), onTap: () {}),
+                  leading: Icon(Icons.contacts),
+                  title: CommonAutoSizeText(''),
+                  onTap: () {}),
               ListTile(
                   leading: Icon(Icons.wifi_channel),
                   title: CommonAutoSizeText(''),
                   onTap: () {}),
               ListTile(
-                  leading: Icon(Icons.person), title: CommonAutoSizeText(''), onTap: () {}),
+                  leading: Icon(Icons.person),
+                  title: CommonAutoSizeText(''),
+                  onTap: () {}),
             ],
           ),
         ));
