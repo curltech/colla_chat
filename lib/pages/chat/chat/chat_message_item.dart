@@ -290,7 +290,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
         Widget avatarImage = linkman.avatarImage ?? AppImage.mdAppImage;
         return InkWell(
             onTap: () {
-              strangerController.replaceAll([linkman]);
+              linkmanController.replaceAll([linkman]);
               indexWidgetProvider.push('linkman_info');
             },
             child: avatarImage);

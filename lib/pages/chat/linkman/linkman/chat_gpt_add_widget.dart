@@ -91,8 +91,8 @@ class _ChatGPTAddWidgetState extends State<ChatGPTAddWidget> {
   @override
   initState() {
     super.initState();
-    strangerController.addListener(_update);
-    linkman ??= strangerController.current;
+    linkmanController.addListener(_update);
+    linkman ??= linkmanController.current;
   }
 
   _update() {
@@ -101,7 +101,7 @@ class _ChatGPTAddWidgetState extends State<ChatGPTAddWidget> {
 
   Widget _buildFormInputWidget(BuildContext context) {
     Map<String, dynamic>? initValues =
-        strangerController.getInitValue(chatGPTColumnFieldDefs);
+        linkmanController.getInitValue(chatGPTColumnFieldDefs);
 
     var formInputWidget = Container(
         padding: const EdgeInsets.all(15.0),
@@ -177,7 +177,7 @@ class _ChatGPTAddWidgetState extends State<ChatGPTAddWidget> {
 
   @override
   void dispose() {
-    strangerController.removeListener(_update);
+    linkmanController.removeListener(_update);
     super.dispose();
   }
 }

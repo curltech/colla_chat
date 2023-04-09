@@ -31,9 +31,7 @@ import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
-final DataListController<Linkman> strangerController =
-    DataListController<Linkman>();
-final DataListController<Linkman> friendController =
+final DataListController<Linkman> linkmanController =
     DataListController<Linkman>();
 final DataListController<Group> groupController = DataListController<Group>();
 final DataListController<Conference> conferenceController =
@@ -80,14 +78,11 @@ class LinkmanListWidget extends StatefulWidget with TileDataMixin {
 
 class _LinkmanListWidgetState extends State<LinkmanListWidget>
     with TickerProviderStateMixin {
-  final TextEditingController _strangerTextController = TextEditingController();
-  final TextEditingController _friendTextController = TextEditingController();
+  final TextEditingController _linkmanTextController = TextEditingController();
   final TextEditingController _groupTextController = TextEditingController();
   final TextEditingController _conferenceTextController =
       TextEditingController();
-  final ValueNotifier<List<TileData>> _strangerTileData =
-      ValueNotifier<List<TileData>>([]);
-  final ValueNotifier<List<TileData>> _friendTileData =
+  final ValueNotifier<List<TileData>> _linkmanTileData =
       ValueNotifier<List<TileData>>([]);
   final ValueNotifier<List<TileData>> _groupTileData =
       ValueNotifier<List<TileData>>([]);
@@ -100,14 +95,12 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   @override
   initState() {
     super.initState();
-    _tabController = TabController(length: 4, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
     _tabController.addListener(_updateCurrentTab);
-    strangerController.addListener(_updateStranger);
-    friendController.addListener(_updateFriend);
+    linkmanController.addListener(_updateLinkman);
     groupController.addListener(_updateGroup);
     conferenceController.addListener(_updateConference);
-    _searchStranger(_strangerTextController.text);
-    _searchFriend(_friendTextController.text);
+    _searchLinkman(_linkmanTextController.text);
     _searchGroup(_groupTextController.text);
     _searchConference(_conferenceTextController.text);
   }
@@ -116,12 +109,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     _currentTab.value = _tabController.index;
   }
 
-  _updateStranger() {
-    _buildStrangerTileData();
-  }
-
-  _updateFriend() {
-    _buildFriendTileData();
+  _updateLinkman() {
+    _buildLinkmanTileData();
   }
 
   _updateGroup() {
@@ -132,20 +121,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     _buildConferenceTileData();
   }
 
-  _searchStranger(String key) async {
-    List<Linkman> linkmen =
-        await linkmanService.search(key, linkmanStatus: LinkmanStatus.stranger);
-    strangerController.replaceAll(linkmen);
-  }
-
-  _searchFriend(String key) async {
-    List<Linkman> linkmen = [];
-    List<Linkman> ls =
-        await linkmanService.search(key, linkmanStatus: LinkmanStatus.friend);
-    linkmen.addAll(ls);
-    ls = await linkmanService.search(key, linkmanStatus: LinkmanStatus.chatGPT);
-    linkmen.addAll(ls);
-    friendController.replaceAll(linkmen);
+  _searchLinkman(String key) async {
+    List<Linkman> linkmen = await linkmanService.search(key);
+    linkmanController.replaceAll(linkmen);
   }
 
   _searchGroup(String key) async {
@@ -158,37 +136,16 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     conferenceController.replaceAll(conferences);
   }
 
-  _buildStrangerSearchTextField(BuildContext context) {
+  _buildLinkmanSearchTextField(BuildContext context) {
     var searchTextField = Container(
         padding: const EdgeInsets.all(10.0),
         child: CommonAutoSizeTextFormField(
-          controller: _strangerTextController,
+          controller: _linkmanTextController,
           keyboardType: TextInputType.text,
           //labelText: AppLocalizations.t('Search'),
           suffixIcon: IconButton(
             onPressed: () {
-              _searchStranger(_strangerTextController.text);
-            },
-            icon: Icon(
-              Icons.search,
-              color: myself.primary,
-            ),
-          ),
-        ));
-
-    return searchTextField;
-  }
-
-  _buildFriendSearchTextField(BuildContext context) {
-    var searchTextField = Container(
-        padding: const EdgeInsets.all(10.0),
-        child: CommonAutoSizeTextFormField(
-          controller: _friendTextController,
-          keyboardType: TextInputType.text,
-          //labelText: AppLocalizations.t('Search'),
-          suffixIcon: IconButton(
-            onPressed: () {
-              _searchStranger(_friendTextController.text);
+              _searchLinkman(_linkmanTextController.text);
             },
             icon: Icon(
               Icons.search,
@@ -252,9 +209,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     await linkmanService.update({'id': id, 'subscriptStatus': status.name});
   }
 
-  //将陌生人数据转换从列表显示数据
-  _buildStrangerTileData() {
-    var linkmen = strangerController.data;
+  //将linkman和group数据转换从列表显示数据
+  _buildLinkmanTileData() {
+    var linkmen = linkmanController.data;
     List<TileData> tiles = [];
     if (linkmen.isNotEmpty) {
       for (var linkman in linkmen) {
@@ -287,11 +244,11 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             title: 'Delete',
             prefix: Icons.person_remove,
             onTap: (int index, String label, {String? subtitle}) async {
-              strangerController.currentIndex = index;
+              linkmanController.currentIndex = index;
               await linkmanService.removeByPeerId(linkman.peerId);
               await chatSummaryService.removeChatSummary(linkman.peerId);
               await chatMessageService.removeByLinkman(linkman.peerId);
-              strangerController.delete();
+              linkmanController.delete();
               if (mounted) {
                 DialogUtil.info(context,
                     content:
@@ -372,130 +329,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         tiles.add(tile);
       }
     }
-    _strangerTileData.value = tiles;
-  }
-
-  //将好友数据转换从列表显示数据
-  _buildFriendTileData() {
-    var linkmen = friendController.data;
-    List<TileData> tiles = [];
-    if (linkmen.isNotEmpty) {
-      for (var linkman in linkmen) {
-        var name = linkman.name;
-        var peerId = linkman.peerId;
-        String? linkmanStatus = linkman.linkmanStatus ?? '';
-        linkmanStatus = AppLocalizations.t(linkmanStatus);
-        if (peerId == myself.peerId) {
-          linkmanStatus = AppLocalizations.t('myself');
-        }
-        Widget? prefix = linkman.avatarImage;
-        String routeName = 'linkman_edit';
-        if (linkmanStatus == LinkmanStatus.chatGPT.name) {
-          // prefix = prefix ??
-          //     ImageUtil.buildImageWidget(
-          //         image: 'assets/images/openai.png',
-          //         width: AppIconSize.lgSize,
-          //         height: AppIconSize.lgSize);
-          routeName = 'chat_gpt_add';
-        }
-        prefix = prefix ?? AppImage.mdAppImage;
-        TileData tile = TileData(
-            prefix: prefix,
-            title: name,
-            subtitle: linkmanStatus,
-            selected: false,
-            routeName: routeName);
-        List<TileData> slideActions = [];
-        TileData deleteSlideAction = TileData(
-            title: 'Delete',
-            prefix: Icons.person_remove,
-            onTap: (int index, String label, {String? subtitle}) async {
-              strangerController.currentIndex = index;
-              await linkmanService.removeByPeerId(linkman.peerId);
-              await chatSummaryService.removeChatSummary(linkman.peerId);
-              await chatMessageService.removeByLinkman(linkman.peerId);
-              strangerController.delete();
-              if (mounted) {
-                DialogUtil.info(context,
-                    content:
-                        '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is deleted')}');
-              }
-            });
-        slideActions.add(deleteSlideAction);
-        TileData chatSlideAction = TileData(
-            title: 'Chat',
-            prefix: Icons.chat,
-            onTap: (int index, String label, {String? subtitle}) async {
-              ChatSummary? chatSummary =
-                  await chatSummaryService.findOneByPeerId(linkman.peerId);
-              chatSummary ??= await chatSummaryService.upsertByLinkman(linkman);
-              chatMessageController.chatSummary = chatSummary;
-              indexWidgetProvider.push('chat_message');
-            });
-        slideActions.add(chatSlideAction);
-        tile.slideActions = slideActions;
-
-        List<TileData> endSlideActions = [];
-        if (linkman.status == LinkmanStatus.blacklist.name) {
-          endSlideActions.add(
-            TileData(
-                title: 'Remove blacklist',
-                prefix: Icons.person_outlined,
-                onTap: (int index, String title, {String? subtitle}) async {
-                  await _changeLinkmanStatus(linkman, LinkmanStatus.stranger);
-                  if (mounted) {
-                    DialogUtil.info(context,
-                        content:
-                            '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is removed blacklist')}');
-                  }
-                }),
-          );
-        } else {
-          endSlideActions.add(TileData(
-              title: 'Add blacklist',
-              prefix: Icons.person_off,
-              onTap: (int index, String title, {String? subtitle}) async {
-                await _changeLinkmanStatus(linkman, LinkmanStatus.blacklist);
-                if (mounted) {
-                  DialogUtil.info(context,
-                      content:
-                          '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is added blacklist')}');
-                }
-              }));
-        }
-        if (linkman.status == LinkmanStatus.blacklist.name) {
-          endSlideActions.add(
-            TileData(
-                title: 'Remove subscript',
-                prefix: Icons.unsubscribe,
-                onTap: (int index, String title, {String? subtitle}) async {
-                  await _changeSubscriptStatus(linkman, LinkmanStatus.none);
-                  if (mounted) {
-                    DialogUtil.info(context,
-                        content:
-                            '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is removed subscript')}');
-                  }
-                }),
-          );
-        } else {
-          endSlideActions.add(TileData(
-              title: 'Add subscript',
-              prefix: Icons.subscriptions,
-              onTap: (int index, String title, {String? subtitle}) async {
-                await _changeSubscriptStatus(linkman, LinkmanStatus.subscript);
-                if (mounted) {
-                  DialogUtil.info(context,
-                      content:
-                          '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is added subscript')}');
-                }
-              }));
-        }
-        tile.endSlideActions = endSlideActions;
-
-        tiles.add(tile);
-      }
-    }
-    _friendTileData.value = tiles;
+    _linkmanTileData.value = tiles;
   }
 
   _buildGroupTileData() {
@@ -626,12 +460,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     _conferenceTileData.value = tiles;
   }
 
-  _onTapStranger(int index, String title, {String? subtitle, TileData? group}) {
-    strangerController.currentIndex = index;
-  }
-
-  _onTapFriend(int index, String title, {String? subtitle, TileData? group}) {
-    friendController.currentIndex = index;
+  _onTapLinkman(int index, String title, {String? subtitle, TileData? group}) {
+    linkmanController.currentIndex = index;
   }
 
   _onTapGroup(int index, String title, {String? subtitle, TileData? group}) {
@@ -649,18 +479,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           valueListenable: _currentTab,
           builder: (context, value, child) {
             return Tab(
-              icon: Icon(Icons.person_pin_outlined,
-                  color: value == 0 ? myself.primary : Colors.grey),
-              //text: AppLocalizations.t('Linkman'),
-              iconMargin: const EdgeInsets.all(0.0),
-            );
-          }),
-      ValueListenableBuilder(
-          valueListenable: _currentTab,
-          builder: (context, value, child) {
-            return Tab(
               icon: Icon(Icons.person_outline,
-                  color: value == 1 ? myself.primary : Colors.grey),
+                  color: value == 0 ? myself.primary : Colors.white),
               //text: AppLocalizations.t('Linkman'),
               iconMargin: const EdgeInsets.all(0.0),
             );
@@ -670,7 +490,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           builder: (context, value, child) {
             return Tab(
               icon: Icon(Icons.group_outlined,
-                  color: value == 2 ? myself.primary : Colors.grey),
+                  color: value == 1 ? myself.primary : Colors.white),
               //text: AppLocalizations.t('Group'),
               iconMargin: const EdgeInsets.all(0.0),
             );
@@ -680,7 +500,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           builder: (context, value, child) {
             return Tab(
               icon: Icon(Icons.meeting_room_outlined,
-                  color: value == 3 ? myself.primary : Colors.grey),
+                  color: value == 2 ? myself.primary : Colors.white),
               //text: AppLocalizations.t('Group'),
               iconMargin: const EdgeInsets.all(0.0),
             );
@@ -697,39 +517,24 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
       labelPadding: const EdgeInsets.all(0.0),
       onTap: (int index) {
         if (index == 0) {
-          _searchFriend(_friendTextController.text);
+          _searchLinkman(_linkmanTextController.text);
         } else if (index == 1) {
-          _searchStranger(_strangerTextController.text);
-        } else if (index == 2) {
           _searchGroup(_groupTextController.text);
-        } else if (index == 3) {
+        } else if (index == 2) {
           _searchConference(_conferenceTextController.text);
         }
       },
     );
 
-    var friendView = Column(children: [
-      _buildFriendSearchTextField(context),
+    var linkmanView = Column(children: [
+      _buildLinkmanSearchTextField(context),
       Expanded(
           child: ValueListenableBuilder(
-              valueListenable: _friendTileData,
+              valueListenable: _linkmanTileData,
               builder: (context, value, child) {
                 return DataListView(
                   tileData: value,
-                  onTap: _onTapFriend,
-                );
-              }))
-    ]);
-
-    var strangerView = Column(children: [
-      _buildStrangerSearchTextField(context),
-      Expanded(
-          child: ValueListenableBuilder(
-              valueListenable: _strangerTileData,
-              builder: (context, value, child) {
-                return DataListView(
-                  tileData: value,
-                  onTap: _onTapStranger,
+                  onTap: _onTapLinkman,
                 );
               }))
     ]);
@@ -763,7 +568,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     final tabBarView = KeepAliveWrapper(
         child: TabBarView(
       controller: _tabController,
-      children: [friendView, strangerView, groupView, conferenceView],
+      children: [linkmanView, groupView, conferenceView],
     ));
 
     return Column(
@@ -776,8 +581,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     List<Widget> rightWidgets = [
       IconButton(
         onPressed: () {
-          friendController.currentIndex = -1;
-          strangerController.currentIndex = -1;
+          linkmanController.currentIndex = -1;
           groupController.currentIndex = -1;
           conferenceController.currentIndex = -1;
           indexWidgetProvider.push('linkman_add');
@@ -817,7 +621,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   void dispose() {
     _tabController.removeListener(_updateCurrentTab);
     _tabController.dispose();
-    strangerController.removeListener(_updateStranger);
+    linkmanController.removeListener(_updateLinkman);
     groupController.removeListener(_updateGroup);
     groupController.removeListener(_updateConference);
     super.dispose();
