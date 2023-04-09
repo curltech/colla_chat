@@ -190,7 +190,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
   }
 
   ///发出加好友的请求
-  Future<ChatMessage> addFriend(String peerId, String title,
+  Future<ChatMessage> addFriend(String peerId, String? title,
       {TransportType transportType = TransportType.webrtc,
       CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     // 加好友会发送自己的信息，回执将收到对方的信息

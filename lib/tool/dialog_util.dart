@@ -295,6 +295,47 @@ class DialogUtil {
     );
   }
 
+  static Future<String?> showTextFormField(BuildContext context,
+      {Icon? icon, String title = 'Input', String content = ''}) {
+    Icon i;
+    if (icon == null) {
+      i = const Icon(Icons.privacy_tip_outlined);
+    } else {
+      i = icon;
+    }
+
+    return showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) {
+        TextEditingController controller = TextEditingController();
+        return AlertDialog(
+          title: Row(children: <Widget>[
+            i,
+            CommonAutoSizeText(AppLocalizations.t(title)),
+          ]),
+          content: CommonAutoSizeTextFormField(
+            keyboardType: TextInputType.text,
+            labelText: content,
+            controller: controller,
+          ),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: CommonAutoSizeText(AppLocalizations.t('Cancel')),
+            ),
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(controller.text);
+              },
+              child: CommonAutoSizeText(AppLocalizations.t('Ok')),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   /// 模态警告
   static Future<bool?> alert(BuildContext context,
       {Icon? icon, String title = 'Warning', String content = ''}) {

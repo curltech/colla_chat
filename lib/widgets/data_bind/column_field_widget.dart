@@ -396,6 +396,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
       focusNode: widget.focusNode,
       keyboardType: columnFieldDef.textInputType,
       obscureText: !pwdShow,
+      maxLines: 1,
       labelText: AppLocalizations.t(columnFieldDef.label),
       prefixIcon: _buildIcon(),
       suffixIcon: IconButton(

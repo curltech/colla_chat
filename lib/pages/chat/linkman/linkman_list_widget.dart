@@ -270,7 +270,38 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         tile.slideActions = slideActions;
 
         List<TileData> endSlideActions = [];
-        if (linkman.status == LinkmanStatus.blacklist.name) {
+        if (linkman.linkmanStatus == LinkmanStatus.friend.name) {
+          endSlideActions.add(TileData(
+              title: 'Remove friend',
+              prefix: Icons.person_remove_outlined,
+              onTap: (int index, String title, {String? subtitle}) async {
+                await _changeLinkmanStatus(linkman, LinkmanStatus.stranger);
+                if (mounted) {
+                  DialogUtil.info(context,
+                      content:
+                          '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is removed friend')}');
+                }
+              }));
+        }
+        if (linkman.linkmanStatus == LinkmanStatus.stranger.name) {
+          endSlideActions.add(TileData(
+              title: 'Add friend',
+              prefix: Icons.person_add_outlined,
+              onTap: (int index, String title, {String? subtitle}) async {
+                await _changeLinkmanStatus(linkman, LinkmanStatus.friend);
+                if (mounted) {
+                  String? tip = await DialogUtil.showTextFormField(context,
+                      content: 'Please add friend tip');
+                  await linkmanService.addFriend(linkman.peerId, tip);
+                }
+                if (mounted) {
+                  DialogUtil.info(context,
+                      content:
+                          '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is added friend')}');
+                }
+              }));
+        }
+        if (linkman.linkmanStatus == LinkmanStatus.blacklist.name) {
           endSlideActions.add(
             TileData(
                 title: 'Remove blacklist',
@@ -297,7 +328,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 }
               }));
         }
-        if (linkman.status == LinkmanStatus.blacklist.name) {
+        if (linkman.subscriptStatus == LinkmanStatus.subscript.name) {
           endSlideActions.add(
             TileData(
                 title: 'Remove subscript',

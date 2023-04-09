@@ -2,14 +2,11 @@ import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
-import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -70,7 +67,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
 
   Widget _buildFormInputWidget(BuildContext context) {
     Map<String, dynamic>? initValues =
-    linkmanController.getInitValue(linkmanColumnFieldDefs);
+        linkmanController.getInitValue(linkmanColumnFieldDefs);
 
     var formInputWidget = Container(
         padding: const EdgeInsets.all(10.0),
@@ -96,16 +93,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     linkmanChatSummaryController.refresh();
   }
 
-  _addFriend({String? tip}) async {
-    await _changeLinkmanStatus(LinkmanStatus.friend);
-    // 加好友会发送自己的信息，回执将收到对方的信息
-    await linkmanService.addFriend(linkman!.peerId, tip!);
-    if (mounted) {
-      DialogUtil.info(context,
-          content:
-              '${AppLocalizations.t('Linkman:')} ${linkman!.name}${AppLocalizations.t(' is added friend')}');
-    }
-  }
+
 
   _changeLinkmanStatus(LinkmanStatus status) async {
     int id = linkman!.id!;
@@ -121,73 +109,8 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     linkmanController.current = linkman;
   }
 
-  Widget _buildAddFriendTextField(BuildContext context) {
-    var controller = TextEditingController();
-    var addFriendTextField = Container(
-        padding: const EdgeInsets.all(10.0),
-        child: CommonAutoSizeTextFormField(
-          controller: controller,
-          labelText: AppLocalizations.t('Add friend'),
-          suffixIcon: IconButton(
-            onPressed: () {
-              _addFriend(tip: controller.text);
-            },
-            icon: Icon(
-              Icons.person_add,
-              color: myself.primary,
-            ),
-          ),
-        ));
-
-    return addFriendTextField;
-  }
-
-  Widget? _buildActionTiles(BuildContext context) {
-    TileData? tileData;
-    if (linkman != null) {
-      if (linkman!.status == LinkmanStatus.friend.name) {
-        tileData = TileData(
-            title: 'Remove friend',
-            prefix: const Icon(Icons.person_remove),
-            onTap: (int index, String title, {String? subtitle}) async {
-              await _changeLinkmanStatus(LinkmanStatus.stranger);
-              if (mounted) {
-                DialogUtil.info(context,
-                    content:
-                        '${AppLocalizations.t('Linkman:')} ${linkman!.name}${AppLocalizations.t(' is removed friend')}');
-              }
-            });
-      }
-    }
-    DataListTile? tile;
-    if (tileData != null) {
-      DataListTile(
-        tileData: tileData,
-      );
-    }
-    return tile;
-  }
-
   @override
   Widget build(BuildContext context) {
-    List<Widget> actionTiles = [];
-    if (linkman != null) {
-      if (linkman!.status != LinkmanStatus.friend.name) {
-        actionTiles.add(_buildAddFriendTextField(context));
-      }
-    }
-    Widget? tile = _buildActionTiles(context);
-    if (tile != null) {
-      actionTiles.add(const SizedBox(
-        height: 15,
-      ));
-      actionTiles.add(tile);
-    }
-    // actionTiles.add(const SizedBox(
-    //   height: 15,
-    // ));
-    actionTiles.add(_buildFormInputWidget(context));
-
     String title = 'Add linkman';
     int? id = linkman?.id;
     if (id != null) {
@@ -196,7 +119,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     var appBarView = AppBarView(
         title: title,
         withLeading: widget.withLeading,
-        child: ListView(children: actionTiles));
+        child: SingleChildScrollView(child: _buildFormInputWidget(context)));
 
     return appBarView;
   }
