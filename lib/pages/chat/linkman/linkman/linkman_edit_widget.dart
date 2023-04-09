@@ -60,8 +60,8 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
   @override
   initState() {
     super.initState();
-    linkmanController.addListener(_update);
-    linkman ??= linkmanController.current;
+    strangerController.addListener(_update);
+    linkman ??= strangerController.current;
   }
 
   _update() {
@@ -70,7 +70,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
 
   Widget _buildFormInputWidget(BuildContext context) {
     Map<String, dynamic>? initValues =
-        linkmanController.getInitValue(linkmanColumnFieldDefs);
+        strangerController.getInitValue(linkmanColumnFieldDefs);
 
     var formInputWidget = Container(
         padding: const EdgeInsets.all(10.0),
@@ -111,14 +111,14 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     int id = linkman!.id!;
     await linkmanService.update({'id': id, 'linkmanStatus': status.name});
     linkman = await linkmanService.findOne(where: 'id=?', whereArgs: [id]);
-    linkmanController.current = linkman;
+    strangerController.current = linkman;
   }
 
   _changeSubscriptStatus(LinkmanStatus status) async {
     int id = linkman!.id!;
     await linkmanService.update({'id': id, 'subscriptStatus': status.name});
     linkman = await linkmanService.findOne(where: 'id=?', whereArgs: [id]);
-    linkmanController.current = linkman;
+    strangerController.current = linkman;
   }
 
   Widget _buildAddFriendTextField(BuildContext context) {
@@ -203,7 +203,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
 
   @override
   void dispose() {
-    linkmanController.removeListener(_update);
+    strangerController.removeListener(_update);
     super.dispose();
   }
 }

@@ -33,7 +33,8 @@ class LinkmanService extends PeerPartyService<Linkman> {
     };
   }
 
-  Future<List<Linkman>> search(String key) async {
+  Future<List<Linkman>> search(String key,
+      {LinkmanStatus? linkmanStatus}) async {
     var keyword = '%$key%';
     var where = '1=1';
     List<Object> whereArgs = [];
@@ -42,10 +43,14 @@ class LinkmanService extends PeerPartyService<Linkman> {
           '$where and (peerId=? or mobile like ? or name like ? or pyName like ? or email like ?)';
       whereArgs.addAll([key, keyword, keyword, keyword, keyword]);
     }
+    if (linkmanStatus != null) {
+      where = '$where and linkmanStatus=?';
+      whereArgs.add(linkmanStatus.name);
+    }
     var linkmen = await find(
       where: where,
       whereArgs: whereArgs,
-      orderBy: 'pyName,name',
+      orderBy: 'linkmanStatus,pyName,name',
     );
     if (linkmen.isNotEmpty) {
       for (var linkman in linkmen) {

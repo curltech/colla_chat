@@ -460,7 +460,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
           builder: (context, value, child) {
             return Tab(
               icon: Icon(Icons.person_outline,
-                  color: value == 0 ? myself.primary : Colors.white),
+                  color: value == 0 ? myself.primary : Colors.grey),
               //text: AppLocalizations.t('Linkman'),
               iconMargin: const EdgeInsets.all(0.0),
             );
@@ -470,7 +470,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
           builder: (context, value, child) {
             return Tab(
               icon: Icon(Icons.group_outlined,
-                  color: value == 1 ? myself.primary : Colors.white),
+                  color: value == 1 ? myself.primary : Colors.grey),
               //text: AppLocalizations.t('Group'),
               iconMargin: const EdgeInsets.all(0.0),
             );
@@ -480,7 +480,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
           builder: (context, value, child) {
             return Tab(
               icon: Icon(Icons.meeting_room_outlined,
-                  color: value == 2 ? myself.primary : Colors.white),
+                  color: value == 2 ? myself.primary : Colors.grey),
               //text: AppLocalizations.t('Conference'),
               iconMargin: const EdgeInsets.all(0.0),
             );
