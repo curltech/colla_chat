@@ -556,22 +556,21 @@ class PeerConnectionPool {
     }
     if (signalType == SignalType.candidate.name ||
         (signalType == SignalType.sdp.name && signal.sdp!.type == 'offer')) {
-      advancedPeerConnection = await createIfNotExist(peerId,
-          clientId: clientId,
-          name: name,
-          conference: conference,
-          iceServers: iceServers);
-      if (advancedPeerConnection == null) {
-        logger.e('createIfNotExist fail');
-        return null;
-      }
-
-      ///收到对方的offer，自己应该是被叫
-      if (signalType == SignalType.sdp.name && signal.sdp!.type == 'offer') {
-        if (advancedPeerConnection.basePeerConnection.initiator) {
-          //如果自己是主叫，比较peerId，如果自己的较大，则自己继续作为主叫，忽略offer信号
-          //否则自己将作为被叫，接收offer信号
+      Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+      if (linkman != null &&
+          linkman.linkmanStatus == LinkmanStatus.friend.name) {
+        advancedPeerConnection = await createIfNotExist(peerId,
+            clientId: clientId,
+            name: name,
+            conference: conference,
+            iceServers: iceServers);
+        if (advancedPeerConnection == null) {
+          logger.e('createIfNotExist fail');
+          return null;
         }
+      } else {
+        logger.e('peerId is not friend, can not receive a webrtc connection');
+        return null;
       }
     }
     if (advancedPeerConnection != null) {
