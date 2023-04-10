@@ -15,6 +15,7 @@ import './condition_import/unsupport.dart'
 
 enum SocketStatus {
   none,
+  connecting,
   connected, // 已连接
   failed, // 失败
   closed, // 连接关闭
@@ -58,19 +59,18 @@ class Websocket extends IWebClient {
     channel!.stream.listen((dynamic data) {
       onData(data);
     }, onError: onError, onDone: onDone, cancelOnError: false);
-    status = SocketStatus.connected;
-    if (postConnected != null) {
-      postConnected!();
-    }
-    logger.i('wss address:$address websocket connected');
-    // Future.delayed(const Duration(milliseconds: 500), () {
-    //   if (postConnected != null && status == SocketStatus.connected) {
-    //     postConnected!();
-    //   }
-    // });
+    status = SocketStatus.connecting;
+    logger.i('wss address:$address websocket connecting');
   }
 
   onData(dynamic data) async {
+    if (status != SocketStatus.connected) {
+      status = SocketStatus.connected;
+      logger.i('wss address:$address websocket connected');
+      if (postConnected != null) {
+        postConnected!();
+      }
+    }
     var msg = String.fromCharCodes(data);
     if (msg.startsWith('heartbeat:')) {
       var sessionId = msg.substring(10);
@@ -93,13 +93,17 @@ class Websocket extends IWebClient {
     }
     logger.w(
         "wss address:$address websocket onDone. closeCode:$closeCode;closeReason:$closeReason");
-    status = SocketStatus.closed;
+    if (status != SocketStatus.closed) {
+      status = SocketStatus.closed;
+    }
     _reconnect();
   }
 
   onError(err) async {
     logger.e("wss address:$address websocket onError, $err");
-    status = SocketStatus.failed;
+    if (status != SocketStatus.failed) {
+      status = SocketStatus.failed;
+    }
     await _reconnect();
   }
 
