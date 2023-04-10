@@ -9,8 +9,6 @@ import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:expandable/expandable.dart';
 import 'package:flutter/material.dart';
 
-const double dialogSizeIndex = 0.8;
-
 class OptionController with ChangeNotifier {
   late List<Option<String>> _options;
 

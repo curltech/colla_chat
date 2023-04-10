@@ -1,5 +1,7 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
@@ -117,8 +119,8 @@ class DialogUtil {
       context: context,
       title: title,
       builder: (BuildContext context) {
-        return SimpleDialog(
-          children: options,
+        return Dialog(
+          child: ListView(children: options),
         );
       },
     );
@@ -238,8 +240,8 @@ class DialogUtil {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return AlertDialog(
-          content: Column(
+        return Dialog(
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
               const CircularProgressIndicator(),
@@ -262,76 +264,94 @@ class DialogUtil {
   ///返回为true，代表按的确认
   static Future<bool?> confirm(BuildContext context,
       {Icon? icon, String title = 'Confirm', String content = ''}) {
-    Icon i;
-    if (icon == null) {
-      i = const Icon(Icons.privacy_tip_outlined);
-    } else {
-      i = icon;
-    }
+    icon = icon ?? const Icon(Icons.privacy_tip_outlined);
     return showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return AlertDialog(
-          title: Row(children: <Widget>[
-            i,
-            CommonAutoSizeText(AppLocalizations.t(title)),
-          ]),
-          content: CommonAutoSizeText(content),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: CommonAutoSizeText(AppLocalizations.t('Cancel')),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-              child: CommonAutoSizeText(AppLocalizations.t('Ok')),
+        return Dialog(
+            child: Column(
+          children: [
+            Row(children: <Widget>[
+              icon!,
+              CommonAutoSizeText(AppLocalizations.t(title)),
+            ]),
+            CommonAutoSizeText(content),
+            ButtonBar(
+              children: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: CommonAutoSizeText(AppLocalizations.t('Cancel')),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true);
+                  },
+                  child: CommonAutoSizeText(AppLocalizations.t('Ok')),
+                ),
+              ],
             ),
           ],
-        );
+        ));
       },
     );
   }
 
   static Future<String?> showTextFormField(BuildContext context,
       {Icon? icon, String title = 'Input', String content = ''}) {
-    Icon i;
-    if (icon == null) {
-      i = const Icon(Icons.privacy_tip_outlined);
-    } else {
-      i = icon;
-    }
-
+    ButtonStyle style = StyleUtil.buildButtonStyle();
+    ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
+        backgroundColor: myself.primary, elevation: 10.0);
+    icon = icon ?? const Icon(Icons.privacy_tip_outlined);
+    var size = MediaQuery.of(context).size;
     return showDialog(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (context) {
         TextEditingController controller = TextEditingController();
-        return AlertDialog(
-          title: Row(children: <Widget>[
-            i,
-            CommonAutoSizeText(AppLocalizations.t(title)),
-          ]),
-          content: CommonAutoSizeTextFormField(
-            keyboardType: TextInputType.text,
-            labelText: content,
-            controller: controller,
-          ),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: CommonAutoSizeText(AppLocalizations.t('Cancel')),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(controller.text);
-              },
-              child: CommonAutoSizeText(AppLocalizations.t('Ok')),
-            ),
-          ],
-        );
+        return Center(
+            child: SizedBox(
+                width: size.width * dialogSizeIndex,
+                height: size.height * dialogSizeIndex,
+                child: Card(
+                    elevation: 0,
+                    shape: const ContinuousRectangleBorder(),
+                    child: Column(children: [
+                      AppBarWidget.buildTitleBar(
+                          title: CommonAutoSizeText(
+                        AppLocalizations.t(title),
+                        style:
+                            const TextStyle(fontSize: 16, color: Colors.white),
+                      )),
+                      Container(
+                          alignment: Alignment.center,
+                          padding: const EdgeInsets.all(10),
+                          child: Column(children: [
+                            CommonAutoSizeTextFormField(
+                              keyboardType: TextInputType.text,
+                              labelText: content,
+                              controller: controller,
+                            ),
+                            ButtonBar(
+                              children: [
+                                TextButton(
+                                  style: style,
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  child: CommonAutoSizeText(
+                                      AppLocalizations.t('Cancel')),
+                                ),
+                                TextButton(
+                                  style: mainStyle,
+                                  onPressed: () {
+                                    Navigator.of(context).pop(controller.text);
+                                  },
+                                  child: CommonAutoSizeText(
+                                      AppLocalizations.t('Ok')),
+                                ),
+                              ],
+                            ),
+                          ])),
+                    ]))));
       },
     );
   }

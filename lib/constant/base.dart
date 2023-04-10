@@ -167,3 +167,5 @@ class AppImage {
     fit: BoxFit.contain,
   );
 }
+
+const double dialogSizeIndex = 0.8;
