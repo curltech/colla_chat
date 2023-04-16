@@ -65,8 +65,8 @@ class Websocket extends IWebClient {
 
   onData(dynamic data) async {
     if (status != SocketStatus.connected) {
+      logger.i('wss address:$address websocket from $status to connected');
       status = SocketStatus.connected;
-      logger.i('wss address:$address websocket connected');
       if (postConnected != null) {
         postConnected!();
       }
@@ -113,10 +113,9 @@ class Websocket extends IWebClient {
 
   set status(SocketStatus status) {
     if (_status != status) {
+      logger.w('websocket $address status changed from $_status to $status');
       _status = status;
       if (onStatusChange != null) {
-        // peerEndpointService.update({'status': ActiveStatus.Up.name},
-        //     where: 'wsConnectAddress=?', whereArgs: [address]);
         onStatusChange!(this, status);
       }
     }
@@ -243,7 +242,6 @@ class WebsocketPool {
 
   onStatusChanged(Websocket websocket, SocketStatus status) {
     String address = websocket.address;
-    logger.w('websocket $address status changed');
     List<Function(String address, SocketStatus status)>? fns = fnsm[address];
     if (fns != null) {
       for (var fn in fns) {

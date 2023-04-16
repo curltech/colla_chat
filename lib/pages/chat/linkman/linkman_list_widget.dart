@@ -623,21 +623,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     if (platformParams.mobile) {
       rightWidgets.add(IconButton(
         onPressed: () async {
-          ScanResult scanResult = await QrcodeUtil.scan();
-          String content = scanResult.rawContent;
-          var map = JsonUtil.toJson(content);
-          PeerClient peerClient = PeerClient.fromJson(map);
-          await peerClientService.store(peerClient);
-          await linkmanService.storeByPeerClient(peerClient);
-          if (mounted) {
-            bool? confirm = await DialogUtil.confirm(context,
-                content: AppLocalizations.t(
-                    'Do you want add ${peerClient.name} as friend?'));
-            if (confirm != null && confirm) {
-              linkmanService.addFriend(
-                  peerClient.peerId, '${myself.name} want add you as friend');
-            }
-          }
+          await scanQrcode(context);
         },
         icon: const Icon(Icons.qr_code),
       ));
@@ -646,6 +632,24 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         title: widget.title,
         rightWidgets: rightWidgets,
         child: _buildLinkmanListView(context));
+  }
+
+  Future<void> scanQrcode(BuildContext context) async {
+    ScanResult scanResult = await QrcodeUtil.scan();
+    String content = scanResult.rawContent;
+    var map = JsonUtil.toJson(content);
+    PeerClient peerClient = PeerClient.fromJson(map);
+    await peerClientService.store(peerClient);
+    await linkmanService.storeByPeerClient(peerClient);
+    if (mounted) {
+      bool? confirm = await DialogUtil.confirm(context,
+          content: AppLocalizations.t(
+              'Do you want add ${peerClient.name} as friend?'));
+      if (confirm != null && confirm) {
+        linkmanService.addFriend(
+            peerClient.peerId, '${myself.name} want add you as friend');
+      }
+    }
   }
 
   @override
