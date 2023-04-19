@@ -585,7 +585,11 @@ class _ChatListWidgetState extends State<ChatListWidget>
                         await _reconnect();
                       } else {
                         //缺省的websocket如果存在，尝试重连
-                        await websocket.reconnect();
+                        if (websocket.status != SocketStatus.connected) {
+                          await websocket.reconnect();
+                        } else {
+                          _socketStatus.value = SocketStatus.connected;
+                        }
                       }
                     }
                   : null,
