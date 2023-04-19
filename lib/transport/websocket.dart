@@ -115,6 +115,11 @@ class Websocket extends IWebClient {
     if (_status != status) {
       logger.w('websocket $address status changed from $_status to $status');
       _status = status;
+      if (_status == SocketStatus.connected) {
+        websocketPool.put(address, this);
+      } else {
+        websocketPool.close(address);
+      }
       if (onStatusChange != null) {
         onStatusChange!(this, status);
       }
@@ -182,6 +187,7 @@ class Websocket extends IWebClient {
         channel = null;
         destroyHeartBeat();
         status = SocketStatus.closed;
+        websocketPool.close(address);
       }
     }
   }
@@ -266,11 +272,8 @@ class WebsocketPool {
           websocket = Websocket(defaultAddress, myselfPeerService.connect,
               peerId: defaultPeerId);
           await websocket.connect();
-          if (websocket._status == SocketStatus.connected) {
-            websockets[defaultAddress] = websocket;
-            websocket.onStatusChange = onStatusChanged;
-            _default = websocket;
-          }
+          _default = websocket;
+          websocket.onStatusChange = onStatusChanged;
         }
       }
     }
@@ -297,17 +300,18 @@ class WebsocketPool {
             Websocket(address, myselfPeerService.connect, peerId: peerId);
         websocket.onStatusChange = onStatusChanged;
         await websocket.connect();
-        if (websocket._status == SocketStatus.connected) {
-          websockets[address] = websocket;
-        } else {
-          websocket = null;
-        }
       }
     }
     if (isDefault && websocket != null) {
       _default = websocket;
     }
     return websocket;
+  }
+
+  put(String address, Websocket websocket) {
+    if (!websockets.containsKey(address)) {
+      websockets[address] = websocket;
+    }
   }
 
   close(String address) {
