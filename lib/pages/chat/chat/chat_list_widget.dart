@@ -159,7 +159,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
 
     connectivityController.addListener(_updateConnectivity);
 
-    Websocket? websocket = websocketPool.getDefault();
+    Websocket? websocket = websocketPool.defaultWebsocket;
     if (websocket != null) {
       websocketPool.registerStatusChanged(
           websocket.address, _updateWebsocketStatus);

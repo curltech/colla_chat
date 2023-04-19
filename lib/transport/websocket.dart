@@ -290,6 +290,12 @@ class WebsocketPool {
     return _default;
   }
 
+  ///获取缺省websocket
+  Websocket? get defaultWebsocket {
+    return _default;
+  }
+
+  ///获取连接的缺省websocket
   Websocket? getDefault() {
     if (_default != null && _default!.status == SocketStatus.connected) {
       return _default;
