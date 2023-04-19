@@ -291,7 +291,10 @@ class WebsocketPool {
   }
 
   Websocket? getDefault() {
-    return _default;
+    if (_default != null && _default!.status == SocketStatus.connected) {
+      return _default;
+    }
+    return null;
   }
 
   Future<Websocket?> get(String address, {bool isDefault = false}) async {
