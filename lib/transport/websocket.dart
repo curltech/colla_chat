@@ -7,6 +7,7 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webclient.dart';
+import 'package:flutter/material.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import './condition_import/unsupport.dart'
@@ -25,6 +26,7 @@ enum SocketStatus {
 const String prefix = 'wss://';
 
 class Websocket extends IWebClient {
+  Key? key;
   String? peerId;
   late String address;
   WebSocketChannel? channel;
@@ -38,6 +40,7 @@ class Websocket extends IWebClient {
   Function(Websocket websocket, SocketStatus status)? onStatusChange;
 
   Websocket(this.address, Function() postConnected, {this.peerId}) {
+    key = UniqueKey();
     if (!address.startsWith(prefix)) {
       throw 'error wss address prefix';
     }
@@ -60,6 +63,7 @@ class Websocket extends IWebClient {
       onData(data);
     }, onError: onError, onDone: onDone, cancelOnError: false);
     status = SocketStatus.connecting;
+    websocketPool.put(address, this);
     logger.i('wss address:$address websocket connecting');
   }
 
@@ -75,8 +79,9 @@ class Websocket extends IWebClient {
     if (msg.startsWith('heartbeat:')) {
       var sessionId = msg.substring(10);
       if (this.sessionId != sessionId) {
+        logger.w(
+            'wss sessionId has changed:$address from ${this.sessionId} to $sessionId');
         this.sessionId = sessionId;
-        logger.w('wss sessionId has changed:$address:${this.sessionId}');
       }
     } else {
       await chainMessageHandler.receiveRaw(data, peerId, address);
@@ -115,11 +120,6 @@ class Websocket extends IWebClient {
     if (_status != status) {
       logger.w('websocket $address status changed from $_status to $status');
       _status = status;
-      if (_status == SocketStatus.connected) {
-        websocketPool.put(address, this);
-      } else {
-        websocketPool.close(address);
-      }
       if (onStatusChange != null) {
         onStatusChange!(this, status);
       }
@@ -187,7 +187,6 @@ class Websocket extends IWebClient {
         channel = null;
         destroyHeartBeat();
         status = SocketStatus.closed;
-        websocketPool.close(address);
       }
     }
   }
@@ -202,8 +201,13 @@ class Websocket extends IWebClient {
   /// 重连机制
   Future<void> _reconnect() async {
     Timer.periodic(Duration(milliseconds: heartTimes), (timer) async {
-      if (reconnectTimes <= 0 || _status == SocketStatus.connected) {
+      if (_status == SocketStatus.connected) {
         timer.cancel();
+        return;
+      }
+      if (reconnectTimes <= 0) {
+        timer.cancel();
+        websocketPool.close(address);
         return;
       }
       reconnectTimes--;
@@ -266,12 +270,18 @@ class WebsocketPool {
       if (websockets.containsKey(defaultAddress)) {
         websocket = websockets[defaultAddress];
         _default = websocket;
-        await websocket!.reconnect();
+        if (websocket!.status == SocketStatus.connecting) {
+          return null;
+        }
+        if (websocket.status == SocketStatus.connected) {
+          return _default;
+        }
       } else {
         if (defaultAddress != null && defaultAddress.startsWith('ws')) {
           websocket = Websocket(defaultAddress, myselfPeerService.connect,
               peerId: defaultPeerId);
           await websocket.connect();
+          websockets[defaultAddress] = websocket;
           _default = websocket;
           websocket.onStatusChange = onStatusChanged;
         }
@@ -288,6 +298,15 @@ class WebsocketPool {
     Websocket? websocket;
     if (websockets.containsKey(address)) {
       websocket = websockets[address];
+      if (isDefault && websocket != null) {
+        _default = websocket;
+      }
+      if (websocket!.status == SocketStatus.connecting) {
+        return null;
+      }
+      if (websocket.status == SocketStatus.connected) {
+        return _default;
+      }
     } else {
       if (address.startsWith('ws')) {
         String? peerId;
@@ -300,17 +319,19 @@ class WebsocketPool {
             Websocket(address, myselfPeerService.connect, peerId: peerId);
         websocket.onStatusChange = onStatusChanged;
         await websocket.connect();
+        websockets[address] = websocket;
+        websocket = null;
       }
     }
-    if (isDefault && websocket != null) {
-      _default = websocket;
-    }
+
     return websocket;
   }
 
   put(String address, Websocket websocket) {
     if (!websockets.containsKey(address)) {
       websockets[address] = websocket;
+    } else {
+      logger.w('wss address:$address websocket already is exist');
     }
   }
 
