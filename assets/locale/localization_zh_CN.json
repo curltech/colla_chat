@@ -328,5 +328,8 @@
   "Byte in": "上行字节",
   "Byte out": "下行字节",
   "Duration": "连接时长",
-  "Connected on": "连接时间"
+  "Connected on": "连接时间",
+  "Do you want add": "你想加",
+  "as friend?": "作为好友?",
+  "want add you as friend": "想加你作为好友"
 }

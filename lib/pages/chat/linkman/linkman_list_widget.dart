@@ -643,14 +643,18 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     var map = JsonUtil.toJson(content);
     PeerClient peerClient = PeerClient.fromJson(map);
     await peerClientService.store(peerClient);
-    await linkmanService.storeByPeerClient(peerClient);
+    Linkman linkman = await linkmanService.storeByPeerClient(peerClient);
+    if (linkman.linkmanStatus == LinkmanStatus.friend.name) {
+      return;
+    }
     if (mounted) {
       bool? confirm = await DialogUtil.confirm(context,
-          content: AppLocalizations.t(
-              'Do you want add ${peerClient.name} as friend?'));
+          content:
+              '${AppLocalizations.t('Do you want add')} ${peerClient.name} ${AppLocalizations.t('as friend?')}');
       if (confirm != null && confirm) {
-        linkmanService.addFriend(
-            peerClient.peerId, '${myself.name} want add you as friend');
+        await _changeLinkmanStatus(linkman, LinkmanStatus.friend);
+        linkmanService.addFriend(peerClient.peerId,
+            myself.name! + AppLocalizations.t('want add you as friend'));
       }
     }
   }
