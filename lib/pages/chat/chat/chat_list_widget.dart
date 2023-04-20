@@ -217,13 +217,17 @@ class _ChatListWidgetState extends State<ChatListWidget>
     if (socketStatus != status) {
       if (_socketStatus.value == SocketStatus.connected) {
         _reconnectWebrtc();
-        DialogUtil.info(context,
-            content:
-                '$address ${AppLocalizations.t('Websocket status was changed to:')}${_socketStatus.value.name}');
+        if (mounted) {
+          DialogUtil.info(context,
+              content:
+                  '$address ${AppLocalizations.t('Websocket status was changed to:')}${_socketStatus.value.name}');
+        }
       } else {
-        DialogUtil.error(context,
-            content:
-                '$address ${AppLocalizations.t('Websocket status was changed to:')}${_socketStatus.value.name}');
+        if (mounted) {
+          DialogUtil.error(context,
+              content:
+                  '$address ${AppLocalizations.t('Websocket status was changed to:')}${_socketStatus.value.name}');
+        }
       }
     }
   }
