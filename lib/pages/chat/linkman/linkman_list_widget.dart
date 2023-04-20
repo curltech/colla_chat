@@ -217,7 +217,8 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
       for (var linkman in linkmen) {
         var name = linkman.name;
         var peerId = linkman.peerId;
-        String? linkmanStatus = linkman.linkmanStatus ?? '';
+        String? linkmanStatus =
+            linkman.linkmanStatus ?? LinkmanStatus.stranger.name;
         linkmanStatus = AppLocalizations.t(linkmanStatus);
         if (peerId == myself.peerId) {
           linkmanStatus = AppLocalizations.t('myself');
@@ -283,7 +284,9 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 }
               }));
         }
-        if (linkman.linkmanStatus == LinkmanStatus.stranger.name) {
+        if (linkman.linkmanStatus == null ||
+            linkman.linkmanStatus == LinkmanStatus.none.name ||
+            linkman.linkmanStatus == LinkmanStatus.stranger.name) {
           endSlideActions.add(TileData(
               title: 'Add friend',
               prefix: Icons.person_add_outlined,
