@@ -10,18 +10,23 @@ import 'package:flutter/material.dart';
 final List<ColumnFieldDef> peerEndpointColumnFieldDefs = [
   ColumnFieldDef(
       name: 'id',
-      label: 'id',
+      label: 'Id',
       dataType: DataType.int,
+      readOnly: true,
       prefixIcon: const Icon(Icons.perm_identity)),
   ColumnFieldDef(
-      name: 'name', label: 'name', prefixIcon: const Icon(Icons.person)),
+      name: 'name',
+      label: 'Name',
+      readOnly: true,
+      prefixIcon: const Icon(Icons.person)),
   ColumnFieldDef(
       name: 'peerId',
-      label: 'peerId',
+      label: 'PeerId',
+      readOnly: true,
       prefixIcon: const Icon(Icons.perm_identity)),
   ColumnFieldDef(
       name: 'priority',
-      label: 'priority',
+      label: 'Priority',
       prefixIcon: const Icon(Icons.low_priority)),
   ColumnFieldDef(
     name: 'wsConnectAddress',
@@ -43,7 +48,8 @@ final List<ColumnFieldDef> peerEndpointColumnFieldDefs = [
       prefixIcon: const Icon(Icons.record_voice_over)),
   ColumnFieldDef(
       name: 'status',
-      label: 'status',
+      label: 'Status',
+      readOnly: true,
       prefixIcon: const Icon(Icons.thermostat)),
 ];
 
@@ -85,7 +91,7 @@ class _PeerEndpointEditWidgetState extends State<PeerEndpointEditWidget> {
     var initValues =
         widget.controller.getInitValue(peerEndpointColumnFieldDefs);
     var formInputWidget = FormInputWidget(
-      height: 300,
+      height: 500,
       onOk: (Map<String, dynamic> values) {
         _onOk(values);
       },
@@ -93,14 +99,9 @@ class _PeerEndpointEditWidgetState extends State<PeerEndpointEditWidget> {
       initValues: initValues,
     );
 
-    return ListView(children: <Widget>[
-      Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
-          child: formInputWidget),
-      const SizedBox(
-        height: 20.0,
-      )
-    ]);
+    return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 15.0, vertical: 5.0),
+        child: formInputWidget);
   }
 
   _onOk(Map<String, dynamic> values) {

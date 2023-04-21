@@ -1,7 +1,8 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerclient/peer_client_list_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_list_widget.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/ws_address_picker.dart';
-import 'package:colla_chat/pages/chat/me/settings/myself_peer_view.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/myselfpeer/myself_peer_list_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -15,16 +16,17 @@ class AdvancedSettingWidget extends StatefulWidget with TileDataMixin {
   final PeerEndpointListWidget peerEndpointListWidget =
       PeerEndpointListWidget();
   final PeerClientListWidget peerClientListWidget = PeerClientListWidget();
-  final MyselfPeerView myselfPeerView = const MyselfPeerView();
+  final MyselfPeerListWidget myselfPeerListWidget = const MyselfPeerListWidget();
   late final List<TileData> advancedSettingTileData;
 
   AdvancedSettingWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(peerEndpointListWidget);
     indexWidgetProvider.define(peerClientListWidget);
+    indexWidgetProvider.define(myselfPeerListWidget);
     List<TileDataMixin> mixins = [
       peerEndpointListWidget,
       peerClientListWidget,
-      myselfPeerView,
+      myselfPeerListWidget,
     ];
     advancedSettingTileData = TileData.from(mixins);
     for (var tile in advancedSettingTileData) {
@@ -61,17 +63,17 @@ class _AdvancedSettingWidgetState extends State<AdvancedSettingWidget> {
 
   Widget _buildSettingWidget(BuildContext context) {
     Widget child = DataListView(tileData: widget.advancedSettingTileData);
-    var padding = const EdgeInsets.symmetric(horizontal: 15.0);
+    var padding = const EdgeInsets.symmetric(horizontal: AppPadding.mdPadding);
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: <Widget>[
-        const SizedBox(height: 30.0),
+        const SizedBox(height: AppPadding.mdPadding),
         Padding(
           padding: padding,
           child: const WsAddressPicker(),
         ),
-        const SizedBox(height: 10.0),
+        const SizedBox(height: AppPadding.mdPadding),
         child
       ],
     );

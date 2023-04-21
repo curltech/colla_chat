@@ -1,5 +1,5 @@
 import 'package:colla_chat/entity/dht/myselfpeer.dart';
-import 'package:colla_chat/service/dht/myselfpeer.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/myselfpeer/myself_peer_controller.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
@@ -18,11 +18,16 @@ class _MyselfPeerViewWidgetState extends State<MyselfPeerViewWidget> {
   @override
   initState() {
     super.initState();
+    myselfPeerController.addListener(_update);
+    myselfPeerController.init();
+  }
+
+  _update() {
     _buildMyselfPeerTileData();
   }
 
   Future<void> _buildMyselfPeerTileData() async {
-    List<MyselfPeer> myselfPeers = await myselfPeerService.findAll();
+    List<MyselfPeer> myselfPeers = myselfPeerController.data;
     if (myselfPeers.isNotEmpty) {
       List<TileData> tiles = [];
       for (var myselfPeer in myselfPeers) {

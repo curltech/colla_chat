@@ -7,9 +7,7 @@ import 'package:colla_chat/service/dht/peerendpoint.dart';
 class PeerEndpointController extends DataListController<PeerEndpoint> {
   int _defaultIndex = 0;
 
-  PeerEndpointController() {
-    init();
-  }
+  PeerEndpointController();
 
   PeerEndpoint? get defaultPeerEndpoint {
     if (data.isNotEmpty && _defaultIndex > -1 && _defaultIndex < data.length) {
@@ -32,21 +30,19 @@ class PeerEndpointController extends DataListController<PeerEndpoint> {
     }
   }
 
-  init() {
-    peerEndpointService
-        .findAllPeerEndpoint()
-        .then((List<PeerEndpoint> peerEndpoints) {
-      clear();
-      if (peerEndpoints.isNotEmpty) {
-        addAll(peerEndpoints);
-      } else {
-        for (var peerEndpoint in nodeAddressOptions.values) {
-          peerEndpointService.insert(peerEndpoint);
-          data.add(peerEndpoint);
-        }
-        notifyListeners();
+  init() async {
+    List<PeerEndpoint> peerEndpoints =
+        await peerEndpointService.findAllPeerEndpoint();
+    clear();
+    if (peerEndpoints.isNotEmpty) {
+      addAll(peerEndpoints);
+    } else {
+      for (var peerEndpoint in nodeAddressOptions.values) {
+        peerEndpointService.insert(peerEndpoint);
+        data.add(peerEndpoint);
       }
-    });
+    }
+    notifyListeners();
   }
 
   PeerEndpoint? find({String? peerId, String? address}) {

@@ -331,5 +331,13 @@
   "Connected on": "连接时间",
   "Do you want add": "你想加",
   "as friend?": "作为好友?",
-  "want add you as friend": "想加你作为好友"
+  "want add you as friend": "想加你作为好友",
+  "MyselfPeer": "本机节点",
+  "Priority": "优先级",
+  "wsConnectAddress": "websocket连接地址",
+  "httpConnectAddress": "http连接地址",
+  "libp2pConnectAddress": "libp2p连接地址",
+  "iceServers": "ice服务器",
+  "Status": "状态",
+  "PeerEndpointEdit": "定位器编辑"
 }
