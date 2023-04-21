@@ -7,7 +7,9 @@ import 'package:colla_chat/service/dht/peerendpoint.dart';
 class PeerEndpointController extends DataListController<PeerEndpoint> {
   int _defaultIndex = 0;
 
-  PeerEndpointController();
+  PeerEndpointController() {
+    init();
+  }
 
   PeerEndpoint? get defaultPeerEndpoint {
     if (data.isNotEmpty && _defaultIndex > -1 && _defaultIndex < data.length) {
