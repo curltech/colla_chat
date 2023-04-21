@@ -1,9 +1,8 @@
 import 'package:colla_chat/entity/chat/linkman.dart';
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
-import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
@@ -15,20 +14,39 @@ final List<ColumnFieldDef> linkmanColumnFieldDefs = [
       name: 'peerId',
       label: 'PeerId',
       inputType: InputType.label,
-      prefixIcon: const Icon(Icons.perm_identity)),
+      prefixIcon: Icon(
+        Icons.perm_identity,
+        color: myself.primary,
+      )),
   ColumnFieldDef(
-      name: 'name', label: 'Name', prefixIcon: const Icon(Icons.person)),
+      name: 'name',
+      label: 'Name',
+      prefixIcon: Icon(
+        Icons.person,
+        color: myself.primary,
+      )),
   ColumnFieldDef(
-      name: 'alias', label: 'Alias', prefixIcon: const Icon(Icons.person_pin)),
+      name: 'alias',
+      label: 'Alias',
+      prefixIcon: Icon(
+        Icons.person_pin,
+        color: myself.primary,
+      )),
   ColumnFieldDef(
       name: 'email',
       label: 'Email',
-      prefixIcon: const Icon(Icons.email),
+      prefixIcon: Icon(
+        Icons.email,
+        color: myself.primary,
+      ),
       textInputType: TextInputType.emailAddress),
   ColumnFieldDef(
       name: 'mobile',
       label: 'Mobile',
-      prefixIcon: const Icon(Icons.mobile_friendly)),
+      prefixIcon: Icon(
+        Icons.mobile_friendly,
+        color: myself.primary,
+      )),
 ];
 
 //联系人信息页面
@@ -92,8 +110,6 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     await linkmanService.store(linkman!);
     linkmanChatSummaryController.refresh();
   }
-
-
 
   _changeLinkmanStatus(LinkmanStatus status) async {
     int id = linkman!.id!;

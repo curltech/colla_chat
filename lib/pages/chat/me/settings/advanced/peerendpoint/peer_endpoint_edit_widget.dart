@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/dht/peerendpoint.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/peerendpoint/peer_endpoint_controller.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/dht/peerendpoint.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -13,44 +14,71 @@ final List<ColumnFieldDef> peerEndpointColumnFieldDefs = [
       label: 'Id',
       dataType: DataType.int,
       readOnly: true,
-      prefixIcon: const Icon(Icons.perm_identity)),
+      prefixIcon: Icon(
+        Icons.perm_identity,
+        color: myself.primary,
+      )),
   ColumnFieldDef(
       name: 'name',
       label: 'Name',
       readOnly: true,
-      prefixIcon: const Icon(Icons.person)),
+      prefixIcon: Icon(
+        Icons.person,
+        color: myself.primary,
+      )),
   ColumnFieldDef(
       name: 'peerId',
       label: 'PeerId',
       readOnly: true,
-      prefixIcon: const Icon(Icons.perm_identity)),
+      prefixIcon: Icon(
+        Icons.perm_identity,
+        color: myself.primary,
+      )),
   ColumnFieldDef(
       name: 'priority',
       label: 'Priority',
-      prefixIcon: const Icon(Icons.low_priority)),
+      prefixIcon: Icon(
+        Icons.low_priority,
+        color: myself.primary,
+      )),
   ColumnFieldDef(
     name: 'wsConnectAddress',
     label: 'wsConnectAddress',
-    prefixIcon: const Icon(Icons.web),
+    prefixIcon: Icon(
+      Icons.web,
+      color: myself.primary,
+    ),
   ),
   ColumnFieldDef(
       name: 'httpConnectAddress',
       label: 'httpConnectAddress',
-      prefixIcon: const Icon(Icons.http)),
+      prefixIcon: Icon(
+        Icons.http,
+        color: myself.primary,
+      )),
   ColumnFieldDef(
     name: 'libp2pConnectAddress',
     label: 'libp2pConnectAddress',
-    prefixIcon: const Icon(Icons.device_hub),
+    prefixIcon: Icon(
+      Icons.device_hub,
+      color: myself.primary,
+    ),
   ),
   ColumnFieldDef(
       name: 'iceServers',
       label: 'iceServers',
-      prefixIcon: const Icon(Icons.record_voice_over)),
+      prefixIcon: Icon(
+        Icons.record_voice_over,
+        color: myself.primary,
+      )),
   ColumnFieldDef(
       name: 'status',
       label: 'Status',
       readOnly: true,
-      prefixIcon: const Icon(Icons.thermostat)),
+      prefixIcon: Icon(
+        Icons.thermostat,
+        color: myself.primary,
+      )),
 ];
 
 //邮件内容组件

@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/dht/peerclient.dart';
-import 'package:colla_chat/provider/data_list_controller.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/peerclient/peer_client_controller.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -10,35 +11,57 @@ import 'package:flutter/material.dart';
 final List<ColumnFieldDef> peerClientColumnFieldDefs = [
   ColumnFieldDef(
       name: 'id',
-      label: 'id',
+      label: 'Id',
       dataType: DataType.int,
-      prefixIcon: const Icon(Icons.perm_identity)),
+      readOnly: true,
+      prefixIcon: Icon(
+        Icons.perm_identity,
+        color: myself.primary,
+      )),
   ColumnFieldDef(
-      name: 'name', label: 'name', prefixIcon: const Icon(Icons.person)),
+      name: 'name',
+      label: 'Name',
+      readOnly: true,
+      prefixIcon: Icon(
+        Icons.person,
+        color: myself.primary,
+      )),
   ColumnFieldDef(
       name: 'peerId',
-      label: 'peerId',
-      prefixIcon: const Icon(Icons.perm_identity)),
+      label: 'PeerId',
+      readOnly: true,
+      prefixIcon: Icon(
+        Icons.perm_identity,
+        color: myself.primary,
+      )),
   ColumnFieldDef(
-      name: 'email',
-      label: 'email',
-      prefixIcon: const Icon(Icons.email),
-      textInputType: TextInputType.emailAddress),
+    name: 'email',
+    label: 'Email',
+    prefixIcon: Icon(
+      Icons.email,
+      color: myself.primary,
+    ),
+    textInputType: TextInputType.emailAddress,
+  ),
   ColumnFieldDef(
       name: 'mobile',
-      label: 'mobile',
-      prefixIcon: const Icon(Icons.mobile_friendly)),
+      label: 'Mobile',
+      prefixIcon: Icon(
+        Icons.mobile_friendly,
+        color: myself.primary,
+      )),
   ColumnFieldDef(
       name: 'status',
-      label: 'status',
-      prefixIcon: const Icon(Icons.thermostat)),
+      label: 'Status',
+      prefixIcon: Icon(
+        Icons.thermostat,
+        color: myself.primary,
+      )),
 ];
 
-//邮件内容组件
+///客户端
 class PeerClientEditWidget extends StatefulWidget with TileDataMixin {
-  final DataPageController<PeerClient> controller;
-
-  PeerClientEditWidget({Key? key, required this.controller}) : super(key: key);
+  const PeerClientEditWidget({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _PeerClientEditWidgetState();
@@ -60,7 +83,7 @@ class _PeerClientEditWidgetState extends State<PeerClientEditWidget> {
   @override
   initState() {
     super.initState();
-    widget.controller.addListener(_update);
+    peerClientController.addListener(_update);
   }
 
   _update() {
@@ -68,9 +91,10 @@ class _PeerClientEditWidgetState extends State<PeerClientEditWidget> {
   }
 
   Widget _buildFormInputWidget(BuildContext context) {
-    var initValues = widget.controller.getInitValue(peerClientColumnFieldDefs);
+    var initValues =
+        peerClientController.getInitValue(peerClientColumnFieldDefs);
     var formInputWidget = FormInputWidget(
-      height: 300,
+      height: 500,
       onOk: (Map<String, dynamic> values) {
         _onOk(values);
       },
@@ -78,13 +102,13 @@ class _PeerClientEditWidgetState extends State<PeerClientEditWidget> {
       initValues: initValues,
     );
 
-    return ListView(children: [formInputWidget]);
+    return formInputWidget;
   }
 
   _onOk(Map<String, dynamic> values) {
     PeerClient currentPeerClient = PeerClient.fromJson(values);
     peerClientService.upsert(currentPeerClient).then((count) {
-      widget.controller.update(currentPeerClient);
+      peerClientController.update(currentPeerClient);
     });
   }
 
@@ -99,7 +123,7 @@ class _PeerClientEditWidgetState extends State<PeerClientEditWidget> {
 
   @override
   void dispose() {
-    widget.controller.removeListener(_update);
+    peerClientController.removeListener(_update);
     super.dispose();
   }
 }

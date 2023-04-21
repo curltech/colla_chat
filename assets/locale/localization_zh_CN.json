@@ -339,5 +339,6 @@
   "libp2pConnectAddress": "libp2p连接地址",
   "iceServers": "ice服务器",
   "Status": "状态",
-  "PeerEndpointEdit": "定位器编辑"
+  "PeerEndpointEdit": "定位器编辑",
+  "PeerClientEdit": "客户端编辑"
 }

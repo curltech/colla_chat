@@ -26,7 +26,7 @@ class _MyselfPeerViewWidgetState extends State<MyselfPeerViewWidget> {
     _buildMyselfPeerTileData();
   }
 
-  Future<void> _buildMyselfPeerTileData() async {
+  void _buildMyselfPeerTileData() {
     List<MyselfPeer> myselfPeers = myselfPeerController.data;
     if (myselfPeers.isNotEmpty) {
       List<TileData> tiles = [];

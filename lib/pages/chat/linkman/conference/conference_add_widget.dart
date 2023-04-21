@@ -32,13 +32,13 @@ final List<ColumnFieldDef> conferenceColumnFieldDefs = [
   ColumnFieldDef(
     name: 'name',
     label: 'Name',
-    prefixIcon: const Icon(Icons.person),
+    prefixIcon: Icon(Icons.person, color: myself.primary),
     groupName: '1',
   ),
   ColumnFieldDef(
     name: 'topic',
     label: 'Topic',
-    prefixIcon: const Icon(Icons.topic),
+    prefixIcon: Icon(Icons.topic, color: myself.primary),
     groupName: '1',
   ),
   ColumnFieldDef(
@@ -52,7 +52,7 @@ final List<ColumnFieldDef> conferenceColumnFieldDefs = [
     name: 'password',
     label: 'Password',
     inputType: InputType.password,
-    prefixIcon: const Icon(Icons.password),
+    prefixIcon: Icon(Icons.password, color: myself.primary),
     groupName: '1',
   ),
   ColumnFieldDef(
