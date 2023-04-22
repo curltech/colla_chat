@@ -194,9 +194,11 @@ class LinkmanService extends PeerPartyService<Linkman> {
       {TransportType transportType = TransportType.webrtc,
       CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     // 加好友会发送自己的信息，回执将收到对方的信息
+    Map<String, dynamic> map = JsonUtil.toJson(myself.myselfPeer);
+    PeerClient peerClient = PeerClient.fromJson(map);
     ChatMessage chatMessage = await chatMessageService.buildChatMessage(
         receiverPeerId: peerId,
-        content: myself.myselfPeer,
+        content: peerClient,
         subMessageType: ChatMessageSubType.addFriend,
         transportType: transportType,
         title: title);
@@ -207,24 +209,39 @@ class LinkmanService extends PeerPartyService<Linkman> {
   ///接收到加好友的请求，发送回执
   Future<ChatMessage> receiveAddFriend(
       ChatMessage chatMessage, MessageReceiptType receiptType) async {
-    String json = JsonUtil.toJsonString(myself.myselfPeer);
+    Map<String, dynamic> map = JsonUtil.toJson(myself.myselfPeer);
+    PeerClient peerClient = PeerClient.fromJson(map);
     ChatMessage? chatReceipt =
         await chatMessageService.buildChatReceipt(chatMessage, receiptType);
     //改变发送消息的状态为接收
     await chatMessageService.updateReceiptType(chatMessage, receiptType);
     if (receiptType == MessageReceiptType.accepted) {
-      chatReceipt.content = json;
+      chatReceipt.content = JsonUtil.toJsonString(peerClient);
     }
     return await chatMessageService.sendAndStore(chatReceipt);
   }
 
   ///接收到加好友的回执
-  Future<Linkman> receiveAddFriendReceipt(ChatMessage chatReceipt) async {
-    Uint8List data = CryptoUtil.decodeBase64(chatReceipt.content!);
-    String json = CryptoUtil.utf8ToString(data);
-    Map<String, dynamic> map = JsonUtil.toJson(json);
-    PeerClient peerClient = PeerClient.fromJson(map);
-    return await linkmanService.storeByPeerClient(peerClient);
+  Future<Linkman?> receiveAddFriendReceipt(ChatMessage chatReceipt) async {
+    var receiptType = chatReceipt.receiptType;
+    if (receiptType == MessageReceiptType.accepted.name) {
+      Uint8List data = CryptoUtil.decodeBase64(chatReceipt.content!);
+      String json = CryptoUtil.utf8ToString(data);
+      Map<String, dynamic> map = JsonUtil.toJson(json);
+      PeerClient peerClient = PeerClient.fromJson(map);
+      return await linkmanService.storeByPeerClient(peerClient);
+    } else {
+      var messageId = chatReceipt.messageId!;
+      ChatMessage? chatMessage =
+          await chatMessageService.findOriginByMessageId(messageId);
+      if (chatMessage != null) {
+        await chatMessageService.update(
+            {'receiptType': MessageReceiptType.rejected.name},
+            where: 'id=?',
+            whereArgs: [chatMessage.id!]);
+      }
+    }
+    return null;
   }
 
   ///发出更新联系人信息的请求
@@ -250,7 +267,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
     String json = chatMessageService.recoverContent(chatMessage.content!);
     Map<String, dynamic> map = JsonUtil.toJson(json);
     PeerClient peerClient = PeerClient.fromJson(map);
-    await peerClientService.store(peerClient);
+    return await linkmanService.storeByPeerClient(peerClient);
   }
 
   removeByPeerId(String peerId) {
