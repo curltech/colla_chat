@@ -7,6 +7,7 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.da
 import 'package:colla_chat/pages/chat/chat/message/message_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
@@ -106,8 +107,9 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
     if (widget.isMyself) {
       crossAxisAlignment = CrossAxisAlignment.end;
     }
+    var maxWidth = appDataProvider.actualSize.width - 70;
     return Container(
-        constraints: const BoxConstraints(minWidth: 100, maxWidth: 300),
+        constraints: BoxConstraints(minWidth: 100, maxWidth: maxWidth),
         child: Column(crossAxisAlignment: crossAxisAlignment, children: [
           Bubble(
               elevation: 0.0,

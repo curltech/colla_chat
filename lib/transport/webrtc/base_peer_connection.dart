@@ -589,7 +589,12 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return;
     }
-    var localDescription = await peerConnection.getLocalDescription();
+    RTCSessionDescription? localDescription;
+    try {
+      localDescription = await peerConnection.getLocalDescription();
+    } catch (e) {
+      logger.e('peerConnection getLocalDescription failure:$e');
+    }
     if (localDescription != null) {
       logger.w('LocalDescription sdp offer is exist:${localDescription.type}');
     }
