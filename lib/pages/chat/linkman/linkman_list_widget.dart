@@ -649,12 +649,10 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     }
     await _changeLinkmanStatus(linkman, LinkmanStatus.friend);
     if (mounted) {
-      bool? confirm = await DialogUtil.confirm(context,
-          content:
-              '${AppLocalizations.t('Do you want add')} ${peerClient.name} ${AppLocalizations.t('as friend?')}');
-      if (confirm != null && confirm) {
-        linkmanService.addFriend(peerClient.peerId,
-            myself.name! + AppLocalizations.t('want add you as friend'));
+      String? content = await DialogUtil.showTextFormField(context,
+          title: AppLocalizations.t('Add friend'));
+      if (content != null) {
+        await linkmanService.addFriend(peerClient.peerId, content);
       }
     }
   }

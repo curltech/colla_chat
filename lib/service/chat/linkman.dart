@@ -156,34 +156,34 @@ class LinkmanService extends PeerPartyService<Linkman> {
       {LinkmanStatus? linkmanStatus}) async {
     String peerId = peerClient.peerId;
     Linkman? linkman = await findCachedOneByPeerId(peerId);
-    Map<String, dynamic> map = peerClient.toJson();
     if (linkman == null) {
+      Map<String, dynamic> map = peerClient.toJson();
       linkman = Linkman.fromJson(map);
       if (linkmanStatus != null) {
-        linkman.status = linkmanStatus.name;
+        linkman.linkmanStatus = linkmanStatus.name;
       }
       linkman.id = null;
       await insert(linkman);
-      linkmen[peerId] = linkman;
-      await chatSummaryService.upsertByLinkman(linkman);
     } else {
-      int? id = linkman.id;
-      String? status = linkman.status;
-      var email = linkman.email;
-      var mobile = linkman.mobile;
-      linkman = Linkman.fromJson(map);
-      linkman.id = id;
       if (linkmanStatus != null) {
-        linkman.status = linkmanStatus.name;
-      } else {
-        linkman.status = status;
+        linkman.linkmanStatus = linkmanStatus.name;
       }
-      linkman.email = email;
-      linkman.mobile = mobile;
+      linkman.email = peerClient.email;
+      linkman.mobile = peerClient.mobile;
+      linkman.name = peerClient.name;
+      linkman.clientId = peerClient.clientId;
+      linkman.avatar = peerClient.avatar;
+      linkman.status = peerClient.status;
+      linkman.address = peerClient.address;
+      linkman.startDate = peerClient.startDate;
+      linkman.endDate = peerClient.endDate;
+      linkman.activeStatus = peerClient.activeStatus;
+      linkman.trustLevel = peerClient.trustLevel;
+      linkman.publicKey = peerClient.publicKey;
+      linkman.peerPublicKey = peerClient.peerPublicKey;
       await update(linkman);
-      linkmen[peerId] = linkman;
-      await chatSummaryService.upsertByLinkman(linkman);
     }
+    await chatSummaryService.upsertByLinkman(linkman);
     linkmen.remove(linkman.peerId);
 
     return linkman;
