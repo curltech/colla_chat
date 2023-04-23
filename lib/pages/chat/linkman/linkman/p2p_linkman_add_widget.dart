@@ -124,16 +124,16 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
           );
         } else {
           //加好友
-          if (linkman.status != LinkmanStatus.friend.name) {
+          if (linkman.linkmanStatus != LinkmanStatus.friend.name) {
             suffix = IconButton(
               iconSize: 24.0,
-              icon: Icon(Icons.mobile_friendly, color: myself.primary),
+              icon: Icon(Icons.person_add_outlined, color: myself.primary),
               onPressed: () async {
                 await linkmanService.update(
-                    {'status': LinkmanStatus.friend.name},
+                    {'linkmanStatus': LinkmanStatus.friend.name},
                     where: 'peerId=?',
                     whereArgs: [peerClient.peerId]);
-                linkman.status = LinkmanStatus.friend.name;
+                linkman.linkmanStatus = LinkmanStatus.friend.name;
                 _buildTiles(peerClients);
                 if (mounted) {
                   DialogUtil.info(context,
