@@ -425,8 +425,6 @@ class BasePeerConnection {
   ///连接状态事件
   onConnectionState(RTCPeerConnectionState state) {
     RTCPeerConnection peerConnection = this.peerConnection!;
-    // logger.i(
-    //     'connectionState:${peerConnection.connectionState},onConnectionState event:${state.name}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -448,8 +446,6 @@ class BasePeerConnection {
   ///ice连接状态事件
   onIceConnectionState(RTCIceConnectionState state) {
     RTCPeerConnection peerConnection = this.peerConnection!;
-    // logger.i(
-    //     'iceConnectionState:${peerConnection.iceConnectionState},onIceConnectionState event:${state.name}');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -470,8 +466,6 @@ class BasePeerConnection {
 
   onIceGatheringState(RTCIceGatheringState state) {
     RTCPeerConnection peerConnection = this.peerConnection!;
-    //logger.i(
-    //    'iceGatheringState:${peerConnection.iceGatheringState},onIceGatheringState event:$state');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -482,8 +476,6 @@ class BasePeerConnection {
   /// signal状态事件
   onSignalingState(RTCSignalingState state) {
     RTCPeerConnection peerConnection = this.peerConnection!;
-    // logger.i(
-    //     'signalingState:${peerConnection.signalingState},onSignalingState event:$state');
     if (status == PeerConnectionStatus.closed) {
       logger.e('PeerConnectionStatus closed');
       return;
@@ -617,7 +609,12 @@ class BasePeerConnection {
       return;
     }
 
-    var sdp = await peerConnection.getLocalDescription();
+    RTCSessionDescription? sdp;
+    try {
+      sdp = await peerConnection.getLocalDescription();
+    } catch (e) {
+      logger.e('peerConnection getLocalDescription failure:$e');
+    }
     sdp ??= offer;
     emit(WebrtcEventType.signal,
         WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
@@ -661,8 +658,12 @@ class BasePeerConnection {
       if (sdp.type != 'answer') {
         logger.e('onSignal sdp type is not answer:${sdp.type}');
       }
-      RTCSessionDescription? remoteDescription =
-          await peerConnection.getRemoteDescription();
+      RTCSessionDescription? remoteDescription;
+      try {
+        remoteDescription = await peerConnection.getRemoteDescription();
+      } catch (e) {
+        logger.e('peerConnection getRemoteDescription failure:$e');
+      }
       if (remoteDescription != null) {
         logger.w('remoteDescription is exist');
       }
@@ -710,20 +711,33 @@ class BasePeerConnection {
     }
 
     logger.i('start createAnswer');
-    RTCSessionDescription? answer = await peerConnection.getLocalDescription();
+    RTCSessionDescription? answer;
+    try {
+      answer = await peerConnection.getLocalDescription();
+    } catch (e) {
+      logger.e('peerConnection getLocalDescription failure:$e');
+    }
     if (answer != null) {
       logger.w('getLocalDescription local sdp answer is exist:${answer.type}');
     }
-    answer = await peerConnection.createAnswer(sdpConstraints);
-    logger.i('create local sdp answer:${answer.type}, and setLocalDescription');
     try {
-      await peerConnection.setLocalDescription(answer);
-      logger.i(
-          'setLocalDescription local sdp answer:${answer.type} successfully');
+      answer = await peerConnection.createAnswer(sdpConstraints);
     } catch (e) {
-      logger.e('createAnswer failure:$e');
+      logger.e('peerConnection createAnswer: $e');
+      answer = null;
     }
-    await _sendAnswer(answer);
+    if (answer != null) {
+      logger
+          .i('create local sdp answer:${answer.type}, and setLocalDescription');
+      try {
+        await peerConnection.setLocalDescription(answer);
+        logger.i(
+            'setLocalDescription local sdp answer:${answer.type} successfully');
+      } catch (e) {
+        logger.e('createAnswer failure:$e');
+      }
+      await _sendAnswer(answer);
+    }
   }
 
   //作为被叫，发送answer
@@ -734,7 +748,12 @@ class BasePeerConnection {
       return;
     }
     logger.i('send signal local sdp answer:${answer.type}');
-    var sdp = await peerConnection.getLocalDescription();
+    RTCSessionDescription? sdp;
+    try {
+      sdp = await peerConnection.getLocalDescription();
+    } catch (e) {
+      logger.e('peerConnection getLocalDescription failure:$e');
+    }
     sdp ??= answer;
     emit(WebrtcEventType.signal,
         WebrtcSignal(SignalType.sdp.name, sdp: sdp, extension: extension));
@@ -764,16 +783,29 @@ class BasePeerConnection {
         logger.e('onSignal sdp is not offer:${sdp.type}');
       }
       logger.i('start setRemoteDescription sdp offer:${sdp.type}');
-      RTCSessionDescription? remoteDescription =
-          await peerConnection.getRemoteDescription();
+      RTCSessionDescription? remoteDescription;
+      try {
+        remoteDescription = await peerConnection.getRemoteDescription();
+      } catch (e) {
+        logger.e('peerConnection getRemoteDescription failure:$e');
+      }
       if (remoteDescription != null) {
         logger.w(
             'RemoteDescription sdp offer is exist:${remoteDescription.type}');
       }
-      await peerConnection.setRemoteDescription(sdp);
+      try {
+        await peerConnection.setRemoteDescription(sdp);
+      } catch (e) {
+        logger.e('peerConnection setRemoteDescription failure:$e');
+      }
       logger.i('setRemoteDescription sdp offer:${sdp.type} successfully');
-      //如果远程描述是offer请求，则创建answer
-      remoteDescription = await peerConnection.getRemoteDescription();
+      try {
+        //如果远程描述是offer请求，则创建answer
+        remoteDescription = await peerConnection.getRemoteDescription();
+      } catch (e) {
+        logger.e('peerConnection getRemoteDescription failure:$e');
+        remoteDescription = null;
+      }
       if (remoteDescription != null && remoteDescription.type == 'offer') {
         await _createAnswer();
       } else {
@@ -781,6 +813,7 @@ class BasePeerConnection {
             .e('RemoteDescription sdp is not offer:${remoteDescription!.type}');
       }
     }
+
     //如果什么都不是，报错
     else {
       logger.e('signal called with invalid signal data');
