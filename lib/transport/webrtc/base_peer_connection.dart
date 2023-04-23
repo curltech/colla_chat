@@ -114,7 +114,8 @@ enum SignalType {
   candidate,
   sdp,
   offer,
-  answer
+  answer,
+  error,
 }
 
 class WebrtcSignal {
@@ -127,13 +128,15 @@ class WebrtcSignal {
   // sdp信息，peer的信息
   RTCSessionDescription? sdp;
   SignalExtension? extension;
+  String? error;
 
   WebrtcSignal(this.signalType,
       {this.renegotiate,
       this.transceiverRequest,
       this.candidates,
       this.sdp,
-      this.extension});
+      this.extension,
+      this.error});
 
   WebrtcSignal.fromJson(Map json) {
     signalType = json['signalType'];
@@ -157,6 +160,7 @@ class WebrtcSignal {
     if (extension != null) {
       this.extension = SignalExtension.fromJson(extension);
     }
+    error = json['error'];
   }
 
   Map<String, dynamic> toJson() {
@@ -182,6 +186,11 @@ class WebrtcSignal {
     if (extension != null) {
       json['extension'] = extension.toJson();
     }
+    var error = this.error;
+    if (error != null) {
+      json['error'] = error;
+    }
+
     return json;
   }
 }
@@ -672,6 +681,8 @@ class BasePeerConnection {
       } catch (e) {
         logger.e('setRemoteDescription failure:$e');
       }
+    } else if (signalType == SignalType.error.name) {
+      logger.e('received error signal:${webrtcSignal.error}');
     }
     //如果什么都不是，报错
     else {
@@ -812,8 +823,9 @@ class BasePeerConnection {
         logger
             .e('RemoteDescription sdp is not offer:${remoteDescription!.type}');
       }
+    } else if (signalType == SignalType.error.name) {
+      logger.e('received error signal:${webrtcSignal.error}');
     }
-
     //如果什么都不是，报错
     else {
       logger.e('signal called with invalid signal data');

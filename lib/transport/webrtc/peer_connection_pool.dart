@@ -569,7 +569,17 @@ class PeerConnectionPool {
           return null;
         }
       } else {
-        logger.e('peerId is not friend, can not receive a webrtc connection');
+        String error =
+            'peerId is not friend, can not receive a webrtc connection';
+        logger.e(error);
+        WebrtcSignal webrtcSignal =
+            WebrtcSignal(SignalType.error.name, error: error);
+        WebrtcEvent webrtcEvent = WebrtcEvent(peerId,
+            clientId: clientId,
+            name: name,
+            eventType: WebrtcEventType.signal,
+            data: webrtcSignal);
+        await advancedPeerConnection!.signal(webrtcEvent);
         return null;
       }
     }
