@@ -289,7 +289,6 @@ class BasePeerConnection {
       List<MediaStream> localStreams = const []}) async {
     start = DateTime.now().millisecondsSinceEpoch;
     id = await cryptoGraphy.getRandomAsciiString(length: 8);
-    this.extension = extension;
     try {
       if (extension.iceServers == null) {
         if (peerEndpointController.defaultPeerEndpoint != null) {
@@ -303,6 +302,7 @@ class BasePeerConnection {
           }
         }
       }
+      this.extension = extension;
       var configuration = {'iceServers': extension.iceServers};
       //1.创建连接
       this.peerConnection =
