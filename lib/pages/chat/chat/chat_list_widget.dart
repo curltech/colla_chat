@@ -248,7 +248,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
         Map<String, dynamic> map = JsonUtil.toJson(subtitle);
         subtitle = map['address'];
       }
-    } else if (subMessageType == ChatMessageSubType.videoChat.name) {
+    } else {
       subtitle = AppLocalizations.t(subMessageType);
     }
     return subtitle;
@@ -307,10 +307,11 @@ class _ChatListWidgetState extends State<ChatListWidget>
         var unreadNumber = chatSummary.unreadNumber;
         Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
         if (linkman == null) {
-          chatSummaryService.delete(entity: chatSummary);
+          //chatSummaryService.delete(entity: chatSummary);
           continue;
         }
-        var linkmanStatus = linkman.linkmanStatus ?? '';
+        var linkmanStatus =
+            linkman.linkmanStatus ?? LinkmanStatus.stranger.name;
         linkmanStatus = AppLocalizations.t(linkmanStatus);
         if (peerId == myself.peerId) {
           linkmanStatus = AppLocalizations.t('myself');

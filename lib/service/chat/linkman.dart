@@ -267,6 +267,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
     String json = chatMessageService.recoverContent(chatMessage.content!);
     Map<String, dynamic> map = JsonUtil.toJson(json);
     PeerClient peerClient = PeerClient.fromJson(map);
+    await peerClientService.store(peerClient);
     return await linkmanService.storeByPeerClient(peerClient);
   }
 

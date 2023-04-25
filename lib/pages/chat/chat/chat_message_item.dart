@@ -72,7 +72,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
             if (this.timer != null) {
               this.timer!.cancel();
               this.timer = null;
-              await chatMessageService.delete(entity: widget.chatMessage);
+              chatMessageService.delete(entity: widget.chatMessage);
               chatMessageController.delete(index: widget.index);
               logger.w(
                   'Timer.periodic delete chatMessage id: ${widget.chatMessage.id}, leftDeleteTime:$leftDeleteTime');
@@ -81,7 +81,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
           setState(() {});
         });
       } else {
-        await chatMessageService.delete(entity: widget.chatMessage);
+        chatMessageService.delete(entity: widget.chatMessage);
         chatMessageController.delete(index: widget.index);
         logger.w(
             '_buildDeleteTimer delete chatMessage id: ${widget.chatMessage.id}, leftDeleteTime:$leftDeleteTime');
@@ -107,7 +107,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
     if (widget.isMyself) {
       crossAxisAlignment = CrossAxisAlignment.end;
     }
-    var maxWidth = appDataProvider.actualSize.width - 70;
+    var maxWidth = appDataProvider.actualSize.width - 100;
     return Container(
         constraints: BoxConstraints(minWidth: 100, maxWidth: maxWidth),
         child: Column(crossAxisAlignment: crossAxisAlignment, children: [
