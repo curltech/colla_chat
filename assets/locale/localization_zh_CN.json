@@ -340,5 +340,15 @@
   "iceServers": "ice服务器",
   "Status": "状态",
   "PeerEndpointEdit": "定位器编辑",
-  "PeerClientEdit": "客户端编辑"
+  "PeerClientEdit": "客户端编辑",
+  "is requested add me as friend": "被请求加自己为好友",
+  "is removed friend": "被移除好友",
+  "is added friend": "被加好友",
+  "is deleted": "被删除",
+  "is dismiss": "被解散",
+  "is added subscript": "被订阅",
+  "is removed subscript": "被移除订阅",
+  "is added blacklist": "被加黑名单",
+  "is removed blacklist": "被移除黑名单",
+  "Request add friend": "请求加好友"
 }

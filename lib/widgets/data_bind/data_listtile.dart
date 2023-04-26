@@ -251,15 +251,18 @@ class DataListTile extends StatelessWidget {
                 subtitle: slideAction.title);
           }
         },
-        backgroundColor: Colors.grey,
+        backgroundColor: Colors.white,
         foregroundColor: myself.primary,
         icon: slideAction.prefix,
         label: AppLocalizations.t(slideAction.title),
+        borderRadius : BorderRadius.circular(0),
       );
       slidableActions.add(slidableAction);
     }
     ActionPane actionPane = ActionPane(
-      motion: const ScrollMotion(),
+      extentRatio: 0.2 * slideActions.length,
+      motion: const StretchMotion(),
+      //BehindMotion,StretchMotion,DrawerMotion,ScrollMotion
       //dismissible: DismissiblePane(onDismissed: () {}),
       children: slidableActions,
     );

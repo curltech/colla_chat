@@ -241,22 +241,43 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             selected: false,
             routeName: routeName);
         List<TileData> slideActions = [];
-        TileData deleteSlideAction = TileData(
-            title: 'Delete',
-            prefix: Icons.person_remove,
-            onTap: (int index, String label, {String? subtitle}) async {
-              linkmanController.currentIndex = index;
-              await linkmanService.removeByPeerId(linkman.peerId);
-              await chatSummaryService.removeChatSummary(linkman.peerId);
-              await chatMessageService.removeByLinkman(linkman.peerId);
-              linkmanController.delete();
-              if (mounted) {
-                DialogUtil.info(context,
-                    content:
-                        '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is deleted')}');
-              }
-            });
-        slideActions.add(deleteSlideAction);
+        if (peerId != myself.peerId) {
+          TileData deleteSlideAction = TileData(
+              title: 'Delete',
+              prefix: Icons.person_remove,
+              onTap: (int index, String label, {String? subtitle}) async {
+                linkmanController.currentIndex = index;
+                await linkmanService.removeByPeerId(linkman.peerId);
+                await chatSummaryService.removeChatSummary(linkman.peerId);
+                await chatMessageService.removeByLinkman(linkman.peerId);
+                linkmanController.delete();
+                if (mounted) {
+                  DialogUtil.info(context,
+                      content:
+                          '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is deleted')}');
+                }
+              });
+          slideActions.add(deleteSlideAction);
+        }
+        if (peerId != myself.peerId &&
+            linkmanStatus != LinkmanStatus.chatGPT.name) {
+          TileData requestSlideAction = TileData(
+              title: 'Request add friend',
+              prefix: Icons.request_quote_outlined,
+              onTap: (int index, String title, {String? subtitle}) async {
+                if (mounted) {
+                  String? tip = await DialogUtil.showTextFormField(context,
+                      content: 'Please input request add friend tip');
+                  await linkmanService.addFriend(linkman.peerId, tip);
+                }
+                if (mounted) {
+                  DialogUtil.info(context,
+                      content:
+                          '${AppLocalizations.t('Linkman:')} ${linkman.name} ${AppLocalizations.t('is requested add me as friend')}');
+                }
+              });
+          slideActions.add(requestSlideAction);
+        }
         TileData chatSlideAction = TileData(
             title: 'Chat',
             prefix: Icons.chat,
@@ -271,92 +292,91 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
         tile.slideActions = slideActions;
 
         List<TileData> endSlideActions = [];
-        if (linkman.linkmanStatus == LinkmanStatus.friend.name) {
-          endSlideActions.add(TileData(
-              title: 'Remove friend',
-              prefix: Icons.person_remove_outlined,
-              onTap: (int index, String title, {String? subtitle}) async {
-                await _changeLinkmanStatus(linkman, LinkmanStatus.stranger);
-                if (mounted) {
-                  DialogUtil.info(context,
-                      content:
-                          '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is removed friend')}');
-                }
-              }));
-        }
-        if (linkman.linkmanStatus == null ||
-            linkman.linkmanStatus == LinkmanStatus.none.name ||
-            linkman.linkmanStatus == LinkmanStatus.stranger.name) {
-          endSlideActions.add(TileData(
-              title: 'Add friend',
-              prefix: Icons.person_add_outlined,
-              onTap: (int index, String title, {String? subtitle}) async {
-                await _changeLinkmanStatus(linkman, LinkmanStatus.friend);
-                if (mounted) {
-                  String? tip = await DialogUtil.showTextFormField(context,
-                      content: 'Please add friend tip');
-                  await linkmanService.addFriend(linkman.peerId, tip);
-                }
-                if (mounted) {
-                  DialogUtil.info(context,
-                      content:
-                          '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is added friend')}');
-                }
-              }));
-        }
-        if (linkman.linkmanStatus == LinkmanStatus.blacklist.name) {
-          endSlideActions.add(
-            TileData(
-                title: 'Remove blacklist',
-                prefix: Icons.person_outlined,
+        if (peerId != myself.peerId &&
+            linkmanStatus != LinkmanStatus.chatGPT.name) {
+          if (linkman.linkmanStatus == LinkmanStatus.friend.name) {
+            endSlideActions.add(TileData(
+                title: 'Remove friend',
+                prefix: Icons.person_remove_outlined,
                 onTap: (int index, String title, {String? subtitle}) async {
                   await _changeLinkmanStatus(linkman, LinkmanStatus.stranger);
                   if (mounted) {
                     DialogUtil.info(context,
                         content:
-                            '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is removed blacklist')}');
+                            '${AppLocalizations.t('Linkman:')} ${linkman.name} ${AppLocalizations.t('is removed friend')}');
                   }
-                }),
-          );
-        } else {
-          endSlideActions.add(TileData(
-              title: 'Add blacklist',
-              prefix: Icons.person_off,
-              onTap: (int index, String title, {String? subtitle}) async {
-                await _changeLinkmanStatus(linkman, LinkmanStatus.blacklist);
-                if (mounted) {
-                  DialogUtil.info(context,
-                      content:
-                          '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is added blacklist')}');
-                }
-              }));
-        }
-        if (linkman.subscriptStatus == LinkmanStatus.subscript.name) {
-          endSlideActions.add(
-            TileData(
-                title: 'Remove subscript',
-                prefix: Icons.unsubscribe,
+                }));
+          }
+          if (linkman.linkmanStatus == null ||
+              linkman.linkmanStatus == LinkmanStatus.none.name ||
+              linkman.linkmanStatus == LinkmanStatus.stranger.name) {
+            endSlideActions.add(TileData(
+                title: 'Add friend',
+                prefix: Icons.person_add_outlined,
                 onTap: (int index, String title, {String? subtitle}) async {
-                  await _changeSubscriptStatus(linkman, LinkmanStatus.none);
+                  await _changeLinkmanStatus(linkman, LinkmanStatus.friend);
                   if (mounted) {
                     DialogUtil.info(context,
                         content:
-                            '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is removed subscript')}');
+                            '${AppLocalizations.t('Linkman:')} ${linkman.name} ${AppLocalizations.t('is added friend')}');
                   }
-                }),
-          );
-        } else {
-          endSlideActions.add(TileData(
-              title: 'Add subscript',
-              prefix: Icons.subscriptions,
-              onTap: (int index, String title, {String? subtitle}) async {
-                await _changeSubscriptStatus(linkman, LinkmanStatus.subscript);
-                if (mounted) {
-                  DialogUtil.info(context,
-                      content:
-                          '${AppLocalizations.t('Linkman:')} ${linkman.name}${AppLocalizations.t(' is added subscript')}');
-                }
-              }));
+                }));
+          }
+          if (linkman.linkmanStatus == LinkmanStatus.blacklist.name) {
+            endSlideActions.add(
+              TileData(
+                  title: 'Remove blacklist',
+                  prefix: Icons.person_outlined,
+                  onTap: (int index, String title, {String? subtitle}) async {
+                    await _changeLinkmanStatus(linkman, LinkmanStatus.stranger);
+                    if (mounted) {
+                      DialogUtil.info(context,
+                          content:
+                              '${AppLocalizations.t('Linkman:')} ${linkman.name} ${AppLocalizations.t('is removed blacklist')}');
+                    }
+                  }),
+            );
+          } else {
+            endSlideActions.add(TileData(
+                title: 'Add blacklist',
+                prefix: Icons.person_off,
+                onTap: (int index, String title, {String? subtitle}) async {
+                  await _changeLinkmanStatus(linkman, LinkmanStatus.blacklist);
+                  if (mounted) {
+                    DialogUtil.info(context,
+                        content:
+                            '${AppLocalizations.t('Linkman:')} ${linkman.name} ${AppLocalizations.t('is added blacklist')}');
+                  }
+                }));
+          }
+          if (linkman.subscriptStatus == LinkmanStatus.subscript.name) {
+            endSlideActions.add(
+              TileData(
+                  title: 'Remove subscript',
+                  prefix: Icons.unsubscribe,
+                  onTap: (int index, String title, {String? subtitle}) async {
+                    await _changeSubscriptStatus(linkman, LinkmanStatus.none);
+                    if (mounted) {
+                      DialogUtil.info(context,
+                          content:
+                              '${AppLocalizations.t('Linkman:')} ${linkman.name} ${AppLocalizations.t('is removed subscript')}');
+                    }
+                  }),
+            );
+          } else {
+            endSlideActions.add(TileData(
+                title: 'Add subscript',
+                prefix: Icons.subscriptions,
+                onTap: (int index, String title, {String? subtitle}) async {
+                  await _changeSubscriptStatus(
+                      linkman, LinkmanStatus.subscript);
+                  if (mounted) {
+                    DialogUtil.info(context,
+                        content:
+                            '${AppLocalizations.t('Linkman:')} ${linkman.name} ${AppLocalizations.t('is added subscript')}');
+                  }
+                }));
+          }
         }
         tile.endSlideActions = endSlideActions;
 
@@ -394,7 +414,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
               if (mounted) {
                 DialogUtil.info(context,
                     content:
-                        '${AppLocalizations.t('Group:')} ${group.name}${AppLocalizations.t(' is deleted')}');
+                        '${AppLocalizations.t('Group:')} ${group.name} ${AppLocalizations.t('is deleted')}');
               }
             });
         slideActions.add(deleteSlideAction);
@@ -407,7 +427,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                 if (mounted) {
                   DialogUtil.info(context,
                       content:
-                          '${AppLocalizations.t('Group:')} ${group.name}${AppLocalizations.t(' is dismiss')}');
+                          '${AppLocalizations.t('Group:')} ${group.name} ${AppLocalizations.t('is dismiss')}');
                 }
               } else {
                 DialogUtil.error(context, content: 'Must be group owner');
@@ -467,7 +487,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
               if (mounted) {
                 DialogUtil.info(context,
                     content:
-                        '${AppLocalizations.t('Conference:')} ${conference.name}${AppLocalizations.t(' is deleted')}');
+                        '${AppLocalizations.t('Conference:')} ${conference.name} ${AppLocalizations.t('is deleted')}');
               }
             });
         slideActions.add(deleteSlideAction);
@@ -514,7 +534,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           builder: (context, value, child) {
             return Tab(
               icon: Icon(Icons.person_outline,
-                  color: value == 0 ? myself.primary : Colors.grey),
+                  color: value == 0 ? myself.primary : myself.secondary),
               //text: AppLocalizations.t('Linkman'),
               iconMargin: const EdgeInsets.all(0.0),
             );
@@ -524,7 +544,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           builder: (context, value, child) {
             return Tab(
               icon: Icon(Icons.group_outlined,
-                  color: value == 1 ? myself.primary : Colors.grey),
+                  color: value == 1 ? myself.primary : myself.secondary),
               //text: AppLocalizations.t('Group'),
               iconMargin: const EdgeInsets.all(0.0),
             );
@@ -534,7 +554,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           builder: (context, value, child) {
             return Tab(
               icon: Icon(Icons.meeting_room_outlined,
-                  color: value == 2 ? myself.primary : Colors.grey),
+                  color: value == 2 ? myself.primary : myself.secondary),
               //text: AppLocalizations.t('Group'),
               iconMargin: const EdgeInsets.all(0.0),
             );
