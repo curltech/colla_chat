@@ -1,7 +1,9 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/index/bottom_bar.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
@@ -88,7 +90,20 @@ class _IndexViewState extends State<IndexView>
         bannerAvatarImage = linkman.avatarImage ?? AppImage.mdAppImage;
       }
       if (chatMessage.subMessageType == ChatMessageSubType.chat.name) {
-        chatMessageVisible.value = true;
+        String? current = indexWidgetProvider.current;
+        if (current != 'chat_message') {
+          chatMessageVisible.value = true;
+        } else {
+          ChatSummary? chatSummary = chatMessageController.chatSummary;
+          if (chatSummary == null) {
+            chatMessageVisible.value = true;
+          } else {
+            String? peerId = chatSummary.peerId;
+            if (senderPeerId != peerId) {
+              chatMessageVisible.value = true;
+            }
+          }
+        }
       }
       //新的视频邀请消息到来，创建新的视频消息控制器，原来的如果存在，新的将被忽视，占线
       if (chatMessage.subMessageType == ChatMessageSubType.videoChat.name) {

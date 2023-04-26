@@ -303,7 +303,12 @@ class BasePeerConnection {
         }
       }
       this.extension = extension;
-      var configuration = {'iceServers': extension.iceServers};
+      var configuration = {
+        ///plan-b格式是老的格式，将会淘汰
+        "sdpSemantics": "plan-b",
+        //"sdpSemantics": "unified-plan",
+        'iceServers': extension.iceServers
+      };
       //1.创建连接
       this.peerConnection =
           await createPeerConnection(configuration, pcConstraints);
@@ -906,19 +911,19 @@ class BasePeerConnection {
       logger.e('PeerConnectionStatus closed');
       return false;
     }
-    try {
-      RTCPeerConnection peerConnection = this.peerConnection!;
-      await peerConnection.addStream(stream);
-      return true;
-    } catch (e) {
-      logger.e('peer connection addLocalStream failure, $e');
-    }
-
-    ///以下是另一种做法
-    // var tracks = stream.getTracks();
-    // for (var track in tracks) {
-    //   _addLocalTrack(stream, track);
+    // try {
+    //   RTCPeerConnection peerConnection = this.peerConnection!;
+    //   await peerConnection.addStream(stream);
+    //   return true;
+    // } catch (e) {
+    //   logger.e('peer connection addLocalStream failure, $e');
     // }
+
+    ///以下是推荐的做法
+    var tracks = stream.getTracks();
+    for (var track in tracks) {
+      addLocalTrack(stream, track);
+    }
 
     return false;
   }
@@ -1011,17 +1016,48 @@ class BasePeerConnection {
     }
     RTCPeerConnection? peerConnection = this.peerConnection;
     if (peerConnection != null) {
-      try {
-        existLocal(stream);
-        await peerConnection.removeStream(stream);
-      } catch (e) {
-        logger.e('peer connection removeStream failure, $e');
+      existLocal(stream);
+      // try {
+      //   await peerConnection.removeStream(stream);
+      // } catch (e) {
+      //   logger.e('peer connection removeStream failure, $e');
+      // }
+
+      var tracks = stream.getTracks();
+      for (var track in tracks) {
+        removeTrack(stream, track);
       }
     }
-    // var tracks = stream.getTracks();
-    // for (var track in tracks) {
-    //   removeTrack(stream, track);
-    // }
+  }
+
+  /// 主动从连接中移除一个轨道，然后会激活onRemoveTrack
+  removeTrack(MediaStream stream, MediaStreamTrack track) async {
+    logger.i(
+        'removeTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id}');
+    if (status == PeerConnectionStatus.closed) {
+      logger.e('PeerConnectionStatus closed');
+      return;
+    }
+    var streamId = stream.id;
+    var trackId = track.id;
+
+    var streamSenders = trackSenders[trackId];
+    if (streamSenders != null) {
+      RTCRtpSender? sender = streamSenders[streamId];
+      if (sender == null) {
+        logger.e('Cannot remove track that was never added.');
+      } else {
+        try {
+          RTCPeerConnection? peerConnection = this.peerConnection;
+          if (peerConnection != null) {
+            await peerConnection.removeTrack(sender);
+          }
+        } catch (err) {
+          logger.e('removeTrack err $err');
+          close();
+        }
+      }
+    }
   }
 
   ///克隆远程流，可用于转发
@@ -1053,36 +1089,6 @@ class BasePeerConnection {
       }
     }
     return null;
-  }
-
-  /// 主动从连接中移除一个轨道，然后会激活onRemoveTrack
-  removeTrack(MediaStream stream, MediaStreamTrack track) async {
-    logger.i(
-        'removeTrack stream:${stream.id} ${stream.ownerTag}, track:${track.id}');
-    if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
-      return;
-    }
-    var streamId = stream.id;
-    var trackId = track.id;
-
-    var streamSenders = trackSenders[trackId];
-    if (streamSenders != null) {
-      RTCRtpSender? sender = streamSenders[streamId];
-      if (sender == null) {
-        logger.e('Cannot remove track that was never added.');
-      } else {
-        try {
-          RTCPeerConnection? peerConnection = this.peerConnection;
-          if (peerConnection != null) {
-            await peerConnection.removeTrack(sender);
-          }
-        } catch (err) {
-          logger.e('removeTrack err $err');
-          close();
-        }
-      }
-    }
   }
 
   /// 主动在连接中用一个轨道取代另一个轨道

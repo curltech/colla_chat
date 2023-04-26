@@ -64,9 +64,9 @@ class PeerVideoRender {
     String? clientId,
     String? name,
     bool audio = true,
-    int minWidth = 640,
-    int minHeight = 480,
-    int minFrameRate = 30,
+    double width = 640,
+    double height = 480,
+    int frameRate = 30,
   }) async {
     PeerVideoRender render = PeerVideoRender();
     render.peerId = peerId;
@@ -74,9 +74,9 @@ class PeerVideoRender {
     render.name = name;
     await render.createVideoMedia(
       audio: audio,
-      minWidth: minWidth,
-      minHeight: minHeight,
-      minFrameRate: minFrameRate,
+      width: width,
+      height: height,
+      frameRate: frameRate,
     );
     await render.bindRTCVideoRender();
 
@@ -135,12 +135,54 @@ class PeerVideoRender {
     return render;
   }
 
+  Map<String, dynamic> _getDefaultConstraints({
+    required double width,
+    required double height,
+    bool audio = true,
+    int frameRate = 30,
+    int minWidth = 640,
+    int minHeight = 360,
+    int minFrameRate = 15,
+    double aspectRatio = 9 / 16,
+  }) {
+    return {
+      "audio": audio
+          ? {
+              "volume": 1, // 音量 0-1
+              "sampleRate": {"exact": 48000}, // 采样率
+              "sampleSize": {"exact": 16}, // 采样位数
+              "channelCount": {"exact": 1}, // 声道
+              "echoCancellation": true, // 回音消除
+              "autoGainControl": true, // 自动增益
+              "noiseSuppression": true // 降噪
+            }
+          : false,
+      "video": {
+        "focusMode": 'continuous', // 持续对焦
+        "facingMode": 'user', // 前摄
+        "resizeMode": 'crop-and-scale', // 'none'或'crop-and-scale'
+        "frameRate": {"ideal": frameRate, 'min': minFrameRate}, // 帧率
+        "aspectRatio": aspectRatio,
+        "width": {"ideal": width, "min": minWidth},
+        "height": {"ideal": height, "min": minHeight},
+        'mandatory': {
+          'minWidth': minWidth,
+          'minHeight': minHeight,
+          'minFrameRate': minFrameRate,
+        },
+        'optional': [
+          {'DtlsSrtpKeyAgreement': true}
+        ],
+      },
+    };
+  }
+
   ///获取本机视频流
   Future<void> createVideoMedia(
       {bool audio = true,
-      int minWidth = 640,
-      int minHeight = 480,
-      int minFrameRate = 30,
+      double width = 640,
+      double height = 480,
+      int frameRate = 30,
       bool replace = false}) async {
     if (id != null) {
       if (replace) {
@@ -149,20 +191,8 @@ class PeerVideoRender {
         return;
       }
     }
-    Map<String, dynamic> mediaConstraints = <String, dynamic>{
-      'audio': audio,
-      'video': {
-        'mandatory': {
-          'minWidth': minWidth.toString(),
-          'minHeight': minHeight.toString(),
-          'minFrameRate': minFrameRate.toString(),
-        },
-        'facingMode': 'user',
-        'optional': [
-          {'DtlsSrtpKeyAgreement': true}
-        ],
-      }
-    };
+    Map<String, dynamic> mediaConstraints =
+        _getDefaultConstraints(width: width, height: height);
     var mediaStream =
         await navigator.mediaDevices.getUserMedia(mediaConstraints);
     this.mediaStream = mediaStream;

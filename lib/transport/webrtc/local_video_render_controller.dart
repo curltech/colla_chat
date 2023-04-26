@@ -189,18 +189,18 @@ class LocalVideoRenderController extends VideoRenderController {
   ///创建本地的Video render，设置当前videoChatRender，激活create和add监听事件
   Future<PeerVideoRender> createVideoMediaRender({
     bool audio = true,
-    int minWidth = 640,
-    int minHeight = 480,
-    int minFrameRate = 30,
+    double width = 640,
+    double height = 480,
+    int frameRate = 30,
   }) async {
     PeerVideoRender render = await PeerVideoRender.fromVideoMedia(
       myself.peerId!,
       clientId: myself.clientId,
       name: myself.myselfPeer.name,
       audio: audio,
-      minWidth: minWidth,
-      minHeight: minHeight,
-      minFrameRate: minFrameRate,
+      width: width,
+      height: height,
+      frameRate: frameRate,
     );
     onVideoRenderOperator(VideoRenderOperator.create.name, _mainVideoRender);
     mainVideoRender = render;
