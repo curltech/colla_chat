@@ -10,6 +10,11 @@ import 'package:colla_chat/pages/chat/chat/message/cancel_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/chat_receipt_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/extended_text_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/file_message.dart';
+import 'package:colla_chat/pages/chat/chat/message/group/add_group_member_message.dart';
+import 'package:colla_chat/pages/chat/chat/message/group/add_group_message.dart';
+import 'package:colla_chat/pages/chat/chat/message/group/dismiss_group_message.dart';
+import 'package:colla_chat/pages/chat/chat/message/group/modify_group_message.dart';
+import 'package:colla_chat/pages/chat/chat/message/group/remove_group_member_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/image_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/location_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/name_card_message.dart';
@@ -146,15 +151,15 @@ class MessageWidget {
     } else if (subMessageType == ChatMessageSubType.addFriend) {
       body = buildRequestAddFriendWidget(context, subMessageType!);
     } else if (subMessageType == ChatMessageSubType.addGroup) {
-      body = buildActionMessageWidget(context, subMessageType!);
+      body = buildAddGroupWidget(context, subMessageType!);
     } else if (subMessageType == ChatMessageSubType.modifyGroup) {
-      body = buildActionMessageWidget(context, subMessageType!);
+      body = buildModifyGroupWidget(context, subMessageType!);
     } else if (subMessageType == ChatMessageSubType.dismissGroup) {
-      body = buildActionMessageWidget(context, subMessageType!);
+      body = buildDismissGroupWidget(context, subMessageType!);
     } else if (subMessageType == ChatMessageSubType.addGroupMember) {
-      body = buildActionMessageWidget(context, subMessageType!);
+      body = buildAddGroupMemberWidget(context, subMessageType!);
     } else if (subMessageType == ChatMessageSubType.removeGroupMember) {
-      body = buildActionMessageWidget(context, subMessageType!);
+      body = buildRemoveGroupMemberWidget(context, subMessageType!);
     } else if (subMessageType == ChatMessageSubType.cancel) {
       body = buildCancelMessageWidget(context, chatMessage.content!);
     } else if (subMessageType == ChatMessageSubType.chatReceipt) {
@@ -288,6 +293,71 @@ class MessageWidget {
       key: UniqueKey(),
       isMyself: isMyself,
       senderPeerId: senderPeerId,
+    );
+  }
+
+  AddGroupMessage buildAddGroupWidget(
+      BuildContext context, ChatMessageSubType subMessageType) {
+    String? content = chatMessage.content;
+    if (content != null) {
+      content = chatMessageService.recoverContent(content);
+    }
+    return AddGroupMessage(
+      key: UniqueKey(),
+      isMyself: isMyself,
+      content: content!,
+    );
+  }
+
+  DismissGroupMessage buildDismissGroupWidget(
+      BuildContext context, ChatMessageSubType subMessageType) {
+    String? content = chatMessage.content;
+    if (content != null) {
+      content = chatMessageService.recoverContent(content);
+    }
+    return DismissGroupMessage(
+      key: UniqueKey(),
+      isMyself: isMyself,
+      content: content!,
+    );
+  }
+
+  ModifyGroupMessage buildModifyGroupWidget(
+      BuildContext context, ChatMessageSubType subMessageType) {
+    String? content = chatMessage.content;
+    if (content != null) {
+      content = chatMessageService.recoverContent(content);
+    }
+    return ModifyGroupMessage(
+      key: UniqueKey(),
+      isMyself: isMyself,
+      content: content!,
+    );
+  }
+
+  AddGroupMemberMessage buildAddGroupMemberWidget(
+      BuildContext context, ChatMessageSubType subMessageType) {
+    String? content = chatMessage.content;
+    if (content != null) {
+      content = chatMessageService.recoverContent(content);
+    }
+    return AddGroupMemberMessage(
+      key: UniqueKey(),
+      isMyself: isMyself,
+      content: content!,
+    );
+  }
+
+  RemoveGroupMemberMessage buildRemoveGroupMemberWidget(
+      BuildContext context, ChatMessageSubType subMessageType) {
+    String? content = chatMessage.content;
+    if (content != null) {
+      content = chatMessageService.recoverContent(content);
+    }
+    return RemoveGroupMemberMessage(
+      key: UniqueKey(),
+      isMyself: isMyself,
+      content: content!,
     );
   }
 
