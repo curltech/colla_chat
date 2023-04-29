@@ -29,16 +29,20 @@ class ActionMessage extends StatelessWidget {
     Color primary = myself.primary;
     Widget actionWidget = Container();
     if (subMessageType == ChatMessageSubType.addFriend) {
+      Icon icon = Icon(
+        Icons.person_add,
+        color: primary,
+      );
+      Widget prefix = isMyself
+          ? IconButton(
+              icon: icon,
+              iconSize: AppIconSize.mdSize,
+              onPressed: () {},
+            )
+          : icon;
       var tileData = TileData(
-        prefix: IconButton(
-          icon: Icon(
-            Icons.person_add,
-            color: primary,
-          ),
-          iconSize: AppIconSize.mdSize,
-          onPressed: () {},
-        ),
-        title: 'Add friend',
+        prefix: prefix,
+        title: 'Request add friend',
         dense: false,
       );
       actionWidget = DataListTile(tileData: tileData);
