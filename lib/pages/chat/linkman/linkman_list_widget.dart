@@ -670,7 +670,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     await _changeLinkmanStatus(linkman, LinkmanStatus.friend);
     if (mounted) {
       String? content = await DialogUtil.showTextFormField(context,
-          title: AppLocalizations.t('Add friend'));
+          title: AppLocalizations.t('Request add friend'));
       if (content != null) {
         await linkmanService.addFriend(peerClient.peerId, content);
       }
