@@ -48,7 +48,14 @@ class _MyselfPeerViewWidgetState extends State<MyselfPeerViewWidget> {
     var myselfPeers = ValueListenableBuilder(
         valueListenable: tiles,
         builder: (BuildContext context, List<TileData> tiles, Widget? child) {
-          return DataListView(tileData: tiles);
+          return DataListView(
+            tileData: tiles,
+            currentIndex: myselfPeerController.currentIndex,
+            onTap: (int index, String title,
+                {TileData? group, String? subtitle}) {
+              myselfPeerController.currentIndex = index;
+            },
+          );
         });
 
     return myselfPeers;

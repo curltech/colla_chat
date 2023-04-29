@@ -87,10 +87,19 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
     ]);
   }
 
-  _login(Map<String, dynamic> values) {
-    String credential = values[credentialName];
-    String password = values[passwordName];
-    myselfPeerService.login(credential, password).then((bool loginStatus) {
+  _login(Map<String, dynamic> values) async {
+    String? credential = values[credentialName];
+    String? password = values[passwordName];
+    if (credential == null) {
+      DialogUtil.error(context, content: 'Must have node credential');
+      return;
+    }
+    if (password == null) {
+      DialogUtil.error(context, content: 'Must have node password');
+      return;
+    }
+    try {
+      bool loginStatus = await myselfPeerService.login(credential, password);
       if (widget.onAuthenticate != null) {
         widget.onAuthenticate!(loginStatus);
       } else {
@@ -98,18 +107,24 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
           if (myself.autoLogin) {
             myselfPeerService.saveAutoCredential(credential, password);
           }
-          Application.router
-              .navigateTo(context, Application.index, replace: true);
+
+          if (mounted) {
+            Application.router
+                .navigateTo(context, Application.index, replace: true);
+          }
         } else {
-          DialogUtil.error(context, content: AppLocalizations.t('Login fail'));
+          if (mounted) {
+            DialogUtil.error(context,
+                content: AppLocalizations.t('Login fail'));
+          }
         }
       }
-    }).catchError((e) {
+    } catch (e) {
       if (widget.onAuthenticate != null) {
         widget.onAuthenticate!(false);
       } else {
         DialogUtil.error(context, content: e.toString());
       }
-    });
+    }
   }
 }

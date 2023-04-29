@@ -1,4 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/myselfpeer/myself_peer_controller.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -144,6 +145,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
               mobile: mobileController.text, email: email)
           .then((myselfPeer) {
         myself.myselfPeer = myselfPeer;
+        myselfPeerController.add(myselfPeer);
         Application.router
             .navigateTo(context, Application.p2pLogin, replace: true);
       }).onError((error, stackTrace) {
