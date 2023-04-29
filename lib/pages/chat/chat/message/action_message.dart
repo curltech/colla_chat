@@ -2,6 +2,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
@@ -28,25 +29,6 @@ class ActionMessage extends StatelessWidget {
   Widget build(BuildContext context) {
     Color primary = myself.primary;
     Widget actionWidget = Container();
-    if (subMessageType == ChatMessageSubType.addFriend) {
-      Icon icon = Icon(
-        Icons.person_add,
-        color: primary,
-      );
-      Widget prefix = isMyself
-          ? IconButton(
-              icon: icon,
-              iconSize: AppIconSize.mdSize,
-              onPressed: () {},
-            )
-          : icon;
-      var tileData = TileData(
-        prefix: prefix,
-        title: 'Request add friend',
-        dense: false,
-      );
-      actionWidget = DataListTile(tileData: tileData);
-    }
     if (subMessageType == ChatMessageSubType.addGroup) {
       Group group = Group.fromJson(JsonUtil.toJson(content!));
       var tileData = TileData(

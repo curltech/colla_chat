@@ -13,6 +13,7 @@ import 'package:colla_chat/pages/chat/chat/message/file_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/image_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/location_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/name_card_message.dart';
+import 'package:colla_chat/pages/chat/chat/message/request_add_friend_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/rich_text_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/url_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/video_chat_message.dart';
@@ -143,7 +144,7 @@ class MessageWidget {
     } else if (subMessageType == ChatMessageSubType.videoChat) {
       body = buildVideoChatMessageWidget(context);
     } else if (subMessageType == ChatMessageSubType.addFriend) {
-      body = buildActionMessageWidget(context, subMessageType!);
+      body = buildRequestAddFriendWidget(context, subMessageType!);
     } else if (subMessageType == ChatMessageSubType.addGroup) {
       body = buildActionMessageWidget(context, subMessageType!);
     } else if (subMessageType == ChatMessageSubType.modifyGroup) {
@@ -199,7 +200,7 @@ class MessageWidget {
       {String? value}) async {
     switch (label) {
       case 'Delete':
-        await chatMessageService
+        chatMessageService
             .delete(where: 'messageId=?', whereArgs: [chatMessage.messageId!]);
         chatMessageController.delete(index: this.index);
         break;
@@ -210,7 +211,7 @@ class MessageWidget {
             message: messageId,
             subMessageType: ChatMessageSubType.cancel,
           );
-          await chatMessageService.delete(
+          chatMessageService.delete(
               where: 'messageId=?', whereArgs: [chatMessage.messageId!]);
           chatMessageController.delete(index: this.index);
         }
@@ -277,6 +278,16 @@ class MessageWidget {
       subMessageType: subMessageType,
       title: chatMessage.title,
       content: content,
+    );
+  }
+
+  RequestAddFriendMessage buildRequestAddFriendWidget(
+      BuildContext context, ChatMessageSubType subMessageType) {
+    var senderPeerId = chatMessage.senderPeerId!;
+    return RequestAddFriendMessage(
+      key: UniqueKey(),
+      isMyself: isMyself,
+      senderPeerId: senderPeerId,
     );
   }
 
