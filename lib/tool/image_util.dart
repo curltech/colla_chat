@@ -10,6 +10,7 @@ import 'package:dio/dio.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_luban/flutter_luban.dart';
 import 'package:image/image.dart' as platform_image;
 import 'package:image_gallery_saver/image_gallery_saver.dart';
@@ -282,5 +283,116 @@ class ImageUtil {
     var name = await Luban.compressImage(compressObject);
 
     return name;
+  }
+
+  /// compress file and get Uint8List
+  static Future<Uint8List?> compressWithFile(
+    File file, {
+    int minWidth = 1920,
+    int minHeight = 1080,
+    int inSampleSize = 1,
+    int quality = 95,
+    int rotate = 0,
+    bool autoCorrectionAngle = true,
+    CompressFormat format = CompressFormat.jpeg,
+    bool keepExif = false,
+    int numberOfRetries = 5,
+  }) async {
+    var result = await FlutterImageCompress.compressWithFile(
+      file.absolute.path,
+      minWidth: minWidth,
+      minHeight: minHeight,
+      inSampleSize: inSampleSize,
+      quality: quality,
+      rotate: rotate,
+      autoCorrectionAngle: autoCorrectionAngle,
+      format: format,
+      keepExif: keepExif,
+      numberOfRetries: numberOfRetries,
+    );
+
+    return result;
+  }
+
+  /// compress file and get file.
+  static Future<File?> compressAndGetFile(
+    File file,
+    String targetPath, {
+    int minWidth = 1920,
+    int minHeight = 1080,
+    int inSampleSize = 1,
+    int quality = 95,
+    int rotate = 0,
+    bool autoCorrectionAngle = true,
+    CompressFormat format = CompressFormat.jpeg,
+    bool keepExif = false,
+    int numberOfRetries = 5,
+  }) async {
+    var result = await FlutterImageCompress.compressAndGetFile(
+      file.absolute.path,
+      targetPath,
+      minWidth: minWidth,
+      minHeight: minHeight,
+      inSampleSize: inSampleSize,
+      quality: quality,
+      rotate: rotate,
+      autoCorrectionAngle: autoCorrectionAngle,
+      format: format,
+      keepExif: keepExif,
+      numberOfRetries: numberOfRetries,
+    );
+
+    return result;
+  }
+
+  /// compress asset and get Uint8List.
+  static Future<Uint8List?> compressAssetImage(
+    String assetName, {
+    int minWidth = 1920,
+    int minHeight = 1080,
+    int quality = 95,
+    int rotate = 0,
+    bool autoCorrectionAngle = true,
+    CompressFormat format = CompressFormat.jpeg,
+    bool keepExif = false,
+  }) async {
+    var list = await FlutterImageCompress.compressAssetImage(
+      assetName,
+      minWidth: minWidth,
+      minHeight: minHeight,
+      quality: quality,
+      rotate: rotate,
+      autoCorrectionAngle: autoCorrectionAngle,
+      format: format,
+      keepExif: keepExif,
+    );
+
+    return list;
+  }
+
+  /// compress Uint8List and get another Uint8List.
+  static Future<Uint8List> compressWithList(
+    Uint8List list, {
+    int minWidth = 1920,
+    int minHeight = 1080,
+    int quality = 95,
+    int rotate = 0,
+    int inSampleSize = 1,
+    bool autoCorrectionAngle = true,
+    CompressFormat format = CompressFormat.jpeg,
+    bool keepExif = false,
+  }) async {
+    var result = await FlutterImageCompress.compressWithList(
+      list,
+      minWidth: minWidth,
+      minHeight: minHeight,
+      inSampleSize: inSampleSize,
+      quality: quality,
+      rotate: rotate,
+      autoCorrectionAngle: autoCorrectionAngle,
+      format: format,
+      keepExif: keepExif,
+    );
+    return result;
   }
 }
