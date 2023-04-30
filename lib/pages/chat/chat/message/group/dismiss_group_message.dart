@@ -17,16 +17,20 @@ class DismissGroupMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color primary = myself.primary;
+    Icon icon = Icon(
+      Icons.group_off,
+      color: primary,
+    );
+    Widget prefix = isMyself
+        ? icon
+        : IconButton(
+            icon: icon,
+            iconSize: AppIconSize.mdSize,
+            onPressed: () {},
+          );
     Group group = Group.fromJson(JsonUtil.toJson(content!));
     var tileData = TileData(
-      prefix: IconButton(
-        icon: Icon(
-          Icons.group_off,
-          color: primary,
-        ),
-        iconSize: AppIconSize.mdSize,
-        onPressed: () {},
-      ),
+      prefix: prefix,
       title: group.name,
       dense: false,
     );

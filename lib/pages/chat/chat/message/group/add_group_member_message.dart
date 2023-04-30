@@ -26,15 +26,17 @@ class AddGroupMemberMessage extends StatelessWidget {
         members.add(member);
       }
     }
+    Icon icon = Icon(
+      Icons.person_add,
+      color: primary,
+    );
+    Widget prefix = IconButton(
+      icon: icon,
+      iconSize: AppIconSize.mdSize,
+      onPressed: () {},
+    );
     var tileData = TileData(
-      prefix: IconButton(
-        icon: Icon(
-          Icons.person_add,
-          color: primary,
-        ),
-        iconSize: AppIconSize.mdSize,
-        onPressed: () {},
-      ),
+      prefix: prefix,
       title: 'Add group member',
       subtitle: members.toString(),
       dense: false,

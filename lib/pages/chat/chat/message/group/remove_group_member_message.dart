@@ -26,15 +26,17 @@ class RemoveGroupMemberMessage extends StatelessWidget {
         members.add(member);
       }
     }
+    Icon icon = Icon(
+      Icons.person_remove,
+      color: primary,
+    );
+    Widget prefix = IconButton(
+      icon: icon,
+      iconSize: AppIconSize.mdSize,
+      onPressed: () {},
+    );
     var tileData = TileData(
-      prefix: IconButton(
-        icon: Icon(
-          Icons.group_remove,
-          color: primary,
-        ),
-        iconSize: AppIconSize.mdSize,
-        onPressed: () {},
-      ),
+      prefix: prefix,
       title: 'Remove group member',
       subtitle: members.toString(),
       dense: false,

@@ -2,6 +2,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 
@@ -27,10 +28,14 @@ class RequestAddFriendMessage extends StatelessWidget {
             icon: icon,
             iconSize: AppIconSize.mdSize,
             onPressed: () async {
-              await linkmanService.update(
-                  {'linkmanStatus': LinkmanStatus.friend.name},
-                  where: 'peerId=?',
-                  whereArgs: [senderPeerId]);
+              bool? confirm = await DialogUtil.confirm(context,
+                  content: 'Do you agree to add friend?');
+              if (confirm != null && confirm) {
+                await linkmanService.update(
+                    {'linkmanStatus': LinkmanStatus.friend.name},
+                    where: 'peerId=?',
+                    whereArgs: [senderPeerId]);
+              }
             },
           );
     var tileData = TileData(
