@@ -132,7 +132,7 @@ class AdvancedPeerConnection {
           eventType: WebrtcEventType.connected,
           data: data);
       onWebrtcEvent(webrtcEvent);
-      await peerConnectionPool.onStatusChanged(webrtcEvent);
+      await peerConnectionPool.onConnected(webrtcEvent);
     });
 
     basePeerConnection.on(WebrtcEventType.status, (data) async {
