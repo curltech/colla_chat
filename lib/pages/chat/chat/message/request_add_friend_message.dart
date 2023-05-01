@@ -1,5 +1,6 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/pages/chat/chat/message/common_message.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -41,13 +42,9 @@ class RequestAddFriendMessage extends StatelessWidget {
     var tileData = TileData(
       prefix: prefix,
       title: 'Request add friend',
-      dense: false,
-    );
-    Widget actionWidget = DataListTile(tileData: tileData);
-    Widget tile = Center(
-      child: actionWidget,
+      dense: true,
     );
 
-    return Card(elevation: 0, child: tile);
+    return CommonMessage(tileData: tileData);
   }
 }

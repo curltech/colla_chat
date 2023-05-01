@@ -4,7 +4,6 @@ import 'dart:typed_data';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/chat/message/action_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/audio_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/cancel_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/chat_receipt_message.dart';
@@ -268,21 +267,6 @@ class MessageWidget {
       key: UniqueKey(),
       isMyself: isMyself,
       content: content!,
-    );
-  }
-
-  ActionMessage buildActionMessageWidget(
-      BuildContext context, ChatMessageSubType subMessageType) {
-    String? content = chatMessage.content;
-    if (content != null) {
-      content = chatMessageService.recoverContent(content);
-    }
-    return ActionMessage(
-      key: UniqueKey(),
-      isMyself: isMyself,
-      subMessageType: subMessageType,
-      title: chatMessage.title,
-      content: content,
     );
   }
 

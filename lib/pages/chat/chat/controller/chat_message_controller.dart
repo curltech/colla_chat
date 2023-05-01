@@ -328,7 +328,10 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   onImageCompletion(OpenAIImageModel openAIImageModel) async {
     if (openAIImageModel.data.isNotEmpty) {
       for (var openAIImageData in openAIImageModel.data) {
-        String url = openAIImageData.url;
+        String? url = openAIImageData.url;
+        if (url == null) {
+          return;
+        }
         Uint8List content = await ImageUtil.loadUrlImage(url);
         ChatMessage chatMessage = buildChatGPTMessage(content,
             senderPeerId: _chatSummary!.peerId,

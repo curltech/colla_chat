@@ -1,5 +1,4 @@
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
-import 'package:colla_chat/plugin/logger.dart';
 
 ///提供ChatGpt简单的文本聊天和翻译功能
 class ChatGPTChat {
@@ -35,7 +34,7 @@ class ChatGPTChat {
       Function(CTResponse?)? onComplete}) {
     final request = CompleteText(
       prompt: prompt,
-      model: Model.TextDavinci3,
+      model: Model.textDavinci3,
       temperature: temperature,
       maxTokens: maxTokens,
       topP: topP,
@@ -110,10 +109,7 @@ class ChatGPTChat {
     );
 
     openAI
-        .onChatCompletionStream(request: request)
-        .listen(onChatCompletion)
-        .onError((err) {
-      logger.i('$err');
-    });
+        .onChatCompletionSSE(request: request)
+        .listen((event) {}, onError: (e) {});
   }
 }
