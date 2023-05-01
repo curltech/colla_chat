@@ -261,7 +261,7 @@ class DataListTile extends StatelessWidget {
     }
     ActionPane actionPane = ActionPane(
       extentRatio: 0.2 * slideActions.length,
-      motion: const StretchMotion(),
+      motion: const DrawerMotion(),
       //BehindMotion,StretchMotion,DrawerMotion,ScrollMotion
       //dismissible: DismissiblePane(onDismissed: () {}),
       children: slidableActions,
