@@ -47,12 +47,12 @@ dependencies:
   images_picker: ^1.2.11
   orientation: ^1.2.0 # 控制屏幕旋转
   geolocator: ^9.0.2
-  package_info_plus: ^3.0.2
+  package_info_plus: 3.1.2
   device_info_plus: ^8.0.0
   network_info_plus: ^3.0.1
   beamer: ^1.4.1+1
   sensors_plus: ^2.0.1
-  battery_plus: ^3.0.2
+  battery_plus: 3.0.2
   flutter_contacts: ^1.1.4
   connectivity_plus: ^3.0.0
   #flutter_nearby_connections: ^1.1.1  #目前不支持ios和android之间通信，而且gradle版本配置低，需要修改
@@ -182,7 +182,7 @@ dependencies:
   permission_handler: ^10.0.0 #权限处理1
   provider: ^6.0.1 #状态管理
   pull_to_refresh_notification: ^3.0.0
-  share_plus: ^6.3.0
+  share_plus: 6.3.4
   #receive_sharing_intent: ^1.4.5 #gradle版本低的问题
   date_format: ^2.0.6
   omni_datetime_picker: ^1.0.1
@@ -224,7 +224,7 @@ dependencies:
   assets_audio_player: ^3.0.6
   audiofileplayer: ^2.1.1
   record_mp3: ^3.0.0
-  audio_waveforms: ^1.0.1
+  audio_waveforms: 1.0.4
   video_player_web: ^2.0.15
   flick_video_player: ^0.5.0 #video_player的封装
   appinio_video_player: ^1.2.0 #video_player的封装
