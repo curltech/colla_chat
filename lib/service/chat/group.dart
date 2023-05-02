@@ -138,11 +138,12 @@ class GroupService extends PeerPartyService<Group> {
     List<GroupMember> newMembers = [];
     for (var groupMemberId in participants) {
       var member = oldMembers[groupMemberId];
+      //成员不存在，创建新的
       if (member == null) {
+        GroupMember groupMember = GroupMember(groupId, groupMemberId);
         Linkman? linkman =
             await linkmanService.findCachedOneByPeerId(groupMemberId);
         if (linkman != null) {
-          GroupMember groupMember = GroupMember(groupId, groupMemberId);
           if (linkman.peerId == group.groupOwnerPeerId) {
             groupMember.memberType = MemberType.owner.name;
           } else {
@@ -153,10 +154,14 @@ class GroupService extends PeerPartyService<Group> {
           } else {
             groupMember.memberAlias = linkman.alias;
           }
-          groupMember.status = EntityStatus.effective.name;
-          await groupMemberService.store(groupMember);
-          newMembers.add(groupMember);
+        } else {
+          //加新的联系人，没有名字
+          linkman = Linkman(groupMemberId, '');
+          await linkmanService.insert(linkman);
         }
+        groupMember.status = EntityStatus.effective.name;
+        await groupMemberService.store(groupMember);
+        newMembers.add(groupMember);
       } else {
         oldMembers.remove(groupMemberId);
       }
@@ -164,7 +169,7 @@ class GroupService extends PeerPartyService<Group> {
     //处理删除的成员
     if (oldMembers.isNotEmpty) {
       for (GroupMember member in oldMembers.values) {
-        await groupMemberService.delete(entity: {'id': member.id});
+        groupMemberService.delete(entity: {'id': member.id});
       }
     }
     groups[group.peerId] = group;
@@ -266,13 +271,13 @@ class GroupService extends PeerPartyService<Group> {
   ///向群成员发送散群的消息
   dismissGroup(Group group) async {
     await groupMemberService.removeByGroupPeerId(group.peerId);
-    await groupService.delete(entity: {
+    groupService.delete(entity: {
       'peerId': group.peerId,
     });
-    await chatMessageService.delete(entity: {
+    chatMessageService.delete(entity: {
       'senderPeerId': group.peerId,
     });
-    await chatSummaryService.delete(entity: {
+    chatSummaryService.delete(entity: {
       'peerId': group.peerId,
     });
     List<ChatMessage> chatMessages =
@@ -294,16 +299,16 @@ class GroupService extends PeerPartyService<Group> {
     if (group == null) {
       return;
     }
-    await groupMemberService.delete(entity: {
+    groupMemberService.delete(entity: {
       'peerId': peerId,
     });
-    await groupService.delete(entity: {
+    groupService.delete(entity: {
       'groupPeerId': peerId,
     });
-    await chatMessageService.delete(entity: {
+    chatMessageService.delete(entity: {
       'receiverPeerId': peerId,
     });
-    await chatSummaryService.delete(entity: {
+    chatSummaryService.delete(entity: {
       'peerId': peerId,
     });
     ChatMessage? chatReceipt = await chatMessageService.buildChatReceipt(
@@ -344,7 +349,7 @@ class GroupService extends PeerPartyService<Group> {
     await chatMessageService.updateReceiptType(
         chatMessage, MessageReceiptType.accepted);
 
-    await chatMessageService.sendAndStore(chatReceipt!);
+    await chatMessageService.sendAndStore(chatReceipt);
   }
 
   ///向群成员发送删群成员的消息
@@ -368,7 +373,7 @@ class GroupService extends PeerPartyService<Group> {
     List<dynamic> maps = JsonUtil.toJson(json);
     for (var map in maps) {
       GroupMember groupMember = GroupMember.fromJson(map);
-      await groupMemberService.delete(entity: {
+      groupMemberService.delete(entity: {
         'memberPeerId': groupMember.memberPeerId,
         'groupId': groupMember.groupId
       });
@@ -478,11 +483,17 @@ class GroupMemberService extends GeneralBaseService<GroupMember> {
       groupMember.createDate = old.createDate;
     }
     await upsert(groupMember);
+    Linkman? linkman =
+        await linkmanService.findCachedOneByPeerId(groupMember.memberPeerId!);
+    if (linkman == null) {
+      linkman = Linkman(groupMember.memberPeerId!, groupMember.memberAlias!);
+      await linkmanService.insert(linkman);
+    }
   }
 
   ///删除群的组员
   removeByGroupPeerId(String peerId) async {
-    await delete(where: 'groupId=?', whereArgs: [peerId]);
+    delete(where: 'groupId=?', whereArgs: [peerId]);
   }
 }
 

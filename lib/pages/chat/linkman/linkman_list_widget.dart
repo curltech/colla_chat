@@ -423,7 +423,10 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
             prefix: Icons.group_off,
             onTap: (int index, String label, {String? subtitle}) async {
               if (group.ownerPeerId == myself.peerId) {
+                groupController.currentIndex = index;
                 await groupService.dismissGroup(group);
+                groupController.delete();
+                groupController.delete();
                 if (mounted) {
                   DialogUtil.info(context,
                       content:

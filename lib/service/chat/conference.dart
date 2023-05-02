@@ -171,10 +171,10 @@ class ConferenceService extends GeneralBaseService<Conference> {
     for (var memberPeerId in participants) {
       var member = oldMembers[memberPeerId];
       if (member == null) {
+        GroupMember groupMember = GroupMember(conferenceId, memberPeerId);
         Linkman? linkman =
             await linkmanService.findCachedOneByPeerId(memberPeerId);
         if (linkman != null) {
-          GroupMember groupMember = GroupMember(conferenceId, memberPeerId);
           if (linkman.peerId == conference.conferenceOwnerPeerId) {
             groupMember.memberType = MemberType.owner.name;
           } else {
@@ -185,10 +185,14 @@ class ConferenceService extends GeneralBaseService<Conference> {
           } else {
             groupMember.memberAlias = linkman.alias;
           }
-          groupMember.status = EntityStatus.effective.name;
-          await groupMemberService.store(groupMember);
-          newMembers.add(groupMember);
+        } else {
+          //加新的联系人，没有名字
+          linkman = Linkman(memberPeerId, '');
+          await linkmanService.insert(linkman);
         }
+        groupMember.status = EntityStatus.effective.name;
+        await groupMemberService.store(groupMember);
+        newMembers.add(groupMember);
       } else {
         oldMembers.remove(memberPeerId);
       }
@@ -197,7 +201,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
     //处理删除的成员
     if (oldMembers.isNotEmpty) {
       for (GroupMember member in oldMembers.values) {
-        await groupMemberService.delete(entity: {'id': member.id});
+        groupMemberService.delete(entity: {'id': member.id});
       }
     }
     conferences[conference.conferenceId] = conference;
@@ -207,7 +211,7 @@ class ConferenceService extends GeneralBaseService<Conference> {
   }
 
   removeByConferenceId(String conferenceId) async {
-    await delete(where: 'conferenceId=?', whereArgs: [conferenceId]);
+    delete(where: 'conferenceId=?', whereArgs: [conferenceId]);
     conferences.remove(conferenceId);
   }
 }
