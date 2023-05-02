@@ -375,7 +375,6 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
       for (var newMember in newMembers) {
         peerIds.add(newMember.memberPeerId!);
       }
-      await groupService.addGroup(current, peerIds: peerIds);
 
       //对原有的成员发送加成员消息
       await groupService.addGroupMember(current.peerId, newMembers);
