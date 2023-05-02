@@ -366,27 +366,28 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
       if (groupModified) {
         await groupService.modifyGroup(current);
       }
-      //新增加的成员
-      List<GroupMember>? newMembers = groupChange.addGroupMembers;
-      if (newMembers is List<GroupMember> && newMembers.isNotEmpty) {
-        //对增加的成员发送群消息
-        List<String> peerIds = [];
-        for (var newMember in newMembers) {
-          peerIds.add(newMember.memberPeerId!);
-        }
-        await groupService.addGroup(current, peerIds: peerIds);
-
-        //对原有的成员发送加成员消息
-        await groupService.addGroupMember(current.peerId, newMembers);
-      }
-
-      List<GroupMember>? oldMembers = groupChange.removeGroupMembers;
-      //处理删除的成员
-      if (oldMembers is List<GroupMember> && oldMembers.isNotEmpty) {
-        //对所有的成员发送组员删除的消息
-        await groupService.removeGroupMember(groupId, oldMembers);
-      }
     }
+    //新增加的成员
+    List<GroupMember>? newMembers = groupChange.addGroupMembers;
+    if (newMembers is List<GroupMember> && newMembers.isNotEmpty) {
+      //对增加的成员发送群消息
+      List<String> peerIds = [];
+      for (var newMember in newMembers) {
+        peerIds.add(newMember.memberPeerId!);
+      }
+      await groupService.addGroup(current, peerIds: peerIds);
+
+      //对原有的成员发送加成员消息
+      await groupService.addGroupMember(current.peerId, newMembers);
+    }
+
+    List<GroupMember>? oldMembers = groupChange.removeGroupMembers;
+    //处理删除的成员
+    if (oldMembers is List<GroupMember> && oldMembers.isNotEmpty) {
+      //对所有的成员发送组员删除的消息
+      await groupService.removeGroupMember(groupId, oldMembers);
+    }
+
     if (groupController.current == null) {
       groupController.add(current);
     }
