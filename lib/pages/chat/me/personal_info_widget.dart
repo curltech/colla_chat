@@ -12,6 +12,7 @@ import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/path_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -20,6 +21,7 @@ import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:provider/provider.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
@@ -173,8 +175,11 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
         Uint8List? avatar = await assets[0].originBytes;
         if (avatar != null && avatar.length > 10240) {
           double quality = 10240 * 100 / avatar.length;
+          CompressFormat? format =
+              StringUtil.enumFromString(CompressFormat.values, mimeType);
+          format = format ?? CompressFormat.jpeg;
           avatar = await ImageUtil.compressWithList(avatar,
-              quality: quality.toInt());
+              quality: quality.toInt(), format: format);
         }
         if (avatar != null) {
           await myselfPeerService.updateAvatar(peerId!, avatar);

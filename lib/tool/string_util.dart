@@ -80,9 +80,10 @@ class StringUtil {
   }
 
   ///string转枚举类型
-  static T? enumFromString<T>(Iterable<T> values, String? value) {
+  static T? enumFromString<T>(Iterable<T> values, String? value,
+      {T? defaultType}) {
     if (value == null) {
-      return null;
+      return defaultType;
     }
     try {
       return values
@@ -91,6 +92,6 @@ class StringUtil {
       logger.e('enum exception:$e');
     }
 
-    return null;
+    return defaultType;
   }
 }
