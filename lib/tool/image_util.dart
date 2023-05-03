@@ -104,29 +104,20 @@ class ImageUtil {
       BoxFit? fit = BoxFit.contain,
       bool isRadius = false,
       double radius = 8.0}) {
-    Widget imageWidget;
+    Widget imageWidget = Image.asset(
+      key: UniqueKey(),
+      AppImageFile.mdAppIconFile,
+      width: width,
+      height: height,
+      fit: fit,
+    );
     if (image == null) {
-      imageWidget = Image.asset(
-        key: UniqueKey(),
-        AppImageFile.mdAppIconFile,
-        width: width,
-        height: height,
-        fit: fit,
-      );
     } else if (ImageUtil.isBase64Img(image)) {
       Uint8List bytes = ImageUtil.decodeBase64Img(image);
       imageWidget = Image.memory(bytes, width: width, height: height, fit: fit);
     } else if (ImageUtil.isAssetsImg(image)) {
       imageWidget = Image.asset(
         image,
-        key: UniqueKey(),
-        width: width,
-        height: height,
-        fit: fit,
-      );
-    } else if (File(image).existsSync()) {
-      imageWidget = Image.file(
-        File(image),
         key: UniqueKey(),
         width: width,
         height: height,
@@ -141,13 +132,17 @@ class ImageUtil {
         fit: fit,
       );
     } else {
-      imageWidget = Image.asset(
-        AppImageFile.mdAppIconFile,
-        key: UniqueKey(),
-        width: width,
-        height: height,
-        fit: fit,
-      );
+      File file = File(image);
+      bool exist = file.existsSync();
+      if (exist) {
+        imageWidget = Image.file(
+          file,
+          key: UniqueKey(),
+          width: width,
+          height: height,
+          fit: fit,
+        );
+      }
     }
     if (isRadius) {
       imageWidget = ClipRRect(

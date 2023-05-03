@@ -25,8 +25,8 @@ class ImageMessage extends StatelessWidget {
     double? width;
     double? height;
     if (!fullScreen) {
-      width = AppImageSize.mdSize;
-      height = AppImageSize.mdSize;
+      width = AppImageSize.lgSize;
+      height = AppImageSize.lgSize;
     }
     if (thumbnail != null) {
       return ImageUtil.buildImageWidget(
