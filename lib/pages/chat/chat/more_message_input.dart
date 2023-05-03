@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -77,11 +79,11 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   @override
   initState() {
     super.initState();
-    var albumActionData = ActionData(
-        label: 'Album',
-        tooltip: 'Photo album',
-        icon: const Icon(Icons.photo_album));
     if (platformParams.ios || platformParams.android || platformParams.macos) {
+      var albumActionData = ActionData(
+          label: 'Album',
+          tooltip: 'Photo album',
+          icon: const Icon(Icons.photo_album));
       actionData.add(albumActionData);
     }
     actionData.addAll(defaultActionData);
@@ -164,17 +166,20 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       context,
     );
     if (result != null && result.isNotEmpty) {
-      List<Map<String, dynamic>> maps = await AssetUtil.toJsons(result);
-      String content = JsonUtil.toJsonString(maps);
-      await chatMessageController.sendText(
-          message: content, contentType: ChatMessageContentType.image);
+      Uint8List? data = await result[0].originBytes;
+      String? mimeType = result[0].mimeType;
+      await chatMessageController.send(
+          title: result[0].title,
+          content: data,
+          contentType: ChatMessageContentType.image,
+          mimeType: mimeType);
     }
   }
 
   ///拍照
   _onActionPicture() async {
     XFile? mediaFile;
-    var f = await DialogUtil.show(
+    await DialogUtil.show<XFile?>(
         context: context,
         builder: (BuildContext context) {
           return MobileCameraWidget(
@@ -184,14 +189,11 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
           );
         });
     if (mediaFile != null) {
-      List<int> data = await mediaFile!.readAsBytes();
+      Uint8List data = await mediaFile!.readAsBytes();
       String name = mediaFile!.name;
-      String mimeType = FileUtil.extension(name);
-      if (mediaFile!.mimeType != null) {
-        mimeType = mediaFile!.mimeType!;
-      }
+      String? mimeType = mediaFile!.mimeType;
       ChatMessageContentType contentType = ChatMessageContentType.image;
-      if (mimeType.endsWith('mp4')) {
+      if (mimeType!.endsWith('mp4')) {
         contentType = ChatMessageContentType.video;
         mimeType = ChatMessageMimeType.mp4.name;
       }
