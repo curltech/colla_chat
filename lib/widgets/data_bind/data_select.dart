@@ -753,7 +753,7 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
         );
     return Column(children: [
       SizedBox(
-          height: 180,
+          height: 140,
           child: SingleChildScrollView(
               controller: ScrollController(),
               child: _buildSelectedChips(context))),

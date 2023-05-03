@@ -268,35 +268,35 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
       ),
       _buildAvatarWidget(context),
     ];
-    var formInputWidget = Container(
-        padding: const EdgeInsets.all(15.0),
-        child: ValueListenableBuilder(
-            valueListenable: group,
-            builder: (BuildContext context, Group? group, Widget? child) {
-              Map<String, dynamic>? initValues = {};
-              if (group != null) {
-                initValues = groupController.getInitValue(groupColumnFieldDefs,
-                    entity: group);
-              }
-              return FormInputWidget(
-                height: 250,
-                onOk: (Map<String, dynamic> values) {
-                  _onOk(values).then((group) {
-                    if (group != null) {
-                      DialogUtil.info(context,
-                          content: 'Group ${group.name} is built');
-                    }
-                  });
-                },
-                columnFieldDefs: groupColumnFieldDefs,
-                initValues: initValues,
-              );
-            }));
+    var formInputWidget = ValueListenableBuilder(
+        valueListenable: group,
+        builder: (BuildContext context, Group? group, Widget? child) {
+          Map<String, dynamic>? initValues = {};
+          if (group != null) {
+            initValues = groupController.getInitValue(groupColumnFieldDefs,
+                entity: group);
+          }
+          return FormInputWidget(
+            height: 220,
+            onOk: (Map<String, dynamic> values) {
+              _onOk(values).then((group) {
+                if (group != null) {
+                  DialogUtil.info(context,
+                      content: 'Group ${group.name} is built');
+                }
+              });
+            },
+            columnFieldDefs: groupColumnFieldDefs,
+            initValues: initValues,
+          );
+        });
     children.add(formInputWidget);
 
-    return ListView(
-      children: children,
-    );
+    return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        child: ListView(
+          children: children,
+        ));
   }
 
   ///修改提交，首先分清楚增加群和修改群
@@ -392,6 +392,10 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
     }
     if (add || groupModified) {
       groupChatSummaryController.refresh();
+    }
+
+    if (add) {
+      setState(() {});
     }
 
     return current;
