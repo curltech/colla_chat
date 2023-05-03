@@ -194,7 +194,7 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
               padding: const EdgeInsets.symmetric(horizontal: 0.0),
               child: LinkmanGroupSearchWidget(
                 key: UniqueKey(),
-                selectType: SelectType.dataListMultiSelectField,
+                selectType: SelectType.chipMultiSelectField,
                 onSelected: (List<String>? selected) async {
                   if (selected != null) {
                     this.conferenceMembers.value = selected;
@@ -229,36 +229,34 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
       _buildConferenceMembersWidget(context),
       _buildConferenceOwnerWidget(context),
     ];
-    var formInputWidget = Container(
-        padding: const EdgeInsets.all(15.0),
-        child: ValueListenableBuilder(
-            valueListenable: conference,
-            builder:
-                (BuildContext context, Conference? conference, Widget? child) {
-              Map<String, dynamic>? initValues = {};
-              if (conference != null) {
-                initValues = conferenceController.getInitValue(
-                    conferenceColumnFieldDefs,
-                    entity: conference);
-              }
-              return FormInputWidget(
-                height: 300,
-                onOk: (Map<String, dynamic> values) {
-                  _onOk(values).then((conference) {
-                    if (conference != null) {
-                      DialogUtil.info(context,
-                          content: AppLocalizations.t('Built conference ') +
-                              conference.name);
-                    }
-                  });
-                },
-                columnFieldDefs: conferenceColumnFieldDefs,
-                initValues: initValues,
-              );
-            }));
+    var formInputWidget = ValueListenableBuilder(
+        valueListenable: conference,
+        builder: (BuildContext context, Conference? conference, Widget? child) {
+          Map<String, dynamic>? initValues = {};
+          if (conference != null) {
+            initValues = conferenceController
+                .getInitValue(conferenceColumnFieldDefs, entity: conference);
+          }
+          return FormInputWidget(
+            height: 270,
+            onOk: (Map<String, dynamic> values) {
+              _onOk(values).then((conference) {
+                if (conference != null) {
+                  DialogUtil.info(context,
+                      content: AppLocalizations.t('Built conference ') +
+                          conference.name);
+                }
+              });
+            },
+            columnFieldDefs: conferenceColumnFieldDefs,
+            initValues: initValues,
+          );
+        });
     children.add(formInputWidget);
 
-    return ListView(children: children);
+    return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        child: ListView(children: children));
   }
 
   //修改提交
@@ -352,6 +350,9 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
     }
     if (conferenceModified) {
       conferenceChatSummaryController.refresh();
+    }
+    if (conferenceAdd) {
+      setState(() {});
     }
 
     return current;
