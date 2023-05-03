@@ -190,15 +190,16 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         });
     if (mediaFile != null) {
       Uint8List data = await mediaFile!.readAsBytes();
-      String name = mediaFile!.name;
+      String filename = mediaFile!.name;
       String? mimeType = mediaFile!.mimeType;
+      mimeType ?? FileUtil.mimeType(filename);
       ChatMessageContentType contentType = ChatMessageContentType.image;
       if (mimeType!.endsWith('mp4')) {
         contentType = ChatMessageContentType.video;
         mimeType = ChatMessageMimeType.mp4.name;
       }
       await chatMessageController.send(
-          title: name,
+          title: filename,
           content: data,
           contentType: contentType,
           mimeType: mimeType);
@@ -284,10 +285,12 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     List<XFile> xfiles = await FileUtil.pickFiles();
     if (xfiles.isNotEmpty) {
       XFile xfile = xfiles[0];
-      List<int> data = await xfile.readAsBytes();
-      String? mimeType = FileUtil.mimeType(xfile.mimeType!);
+      Uint8List data = await xfile.readAsBytes();
+      String filename = xfile.name;
+      String? mimeType = xfile.mimeType;
+      mimeType ?? FileUtil.mimeType(filename);
       await chatMessageController.send(
-          title: FileUtil.filename(xfile.path),
+          title: filename,
           content: data,
           contentType: ChatMessageContentType.file,
           mimeType: mimeType);
