@@ -80,7 +80,9 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
             mainAxisAlignment: MainAxisAlignment.start,
             height: 200,
             spacing: 10.0,
-            onOk: _login,
+            onOk: (Map<String, dynamic> values) async {
+              await _login(values);
+            },
             okLabel: 'Login',
             columnFieldDefs: p2pLoginInputFieldDef,
           )),
