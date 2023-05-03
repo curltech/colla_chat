@@ -21,9 +21,9 @@ class CommonMessage extends StatelessWidget {
       actionWidget = DataListTile(
         tileData: tileData!,
         contentPadding: EdgeInsets.zero,
-        horizontalTitleGap: 5.0,
+        horizontalTitleGap: 0.0,
         minVerticalPadding: 0.0,
-        minLeadingWidth: 5.0,
+        minLeadingWidth: 0.0,
       );
     }
     Widget tile = Center(
