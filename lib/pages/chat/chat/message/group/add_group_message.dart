@@ -25,7 +25,7 @@ class AddGroupMessage extends StatelessWidget {
     var tileData = TileData(
       prefix: prefix,
       title: group.name,
-      dense: false,
+      dense: true,
     );
     return CommonMessage(tileData: tileData);
   }

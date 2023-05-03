@@ -21,15 +21,15 @@ class CommonMessage extends StatelessWidget {
       actionWidget = DataListTile(
         tileData: tileData!,
         contentPadding: EdgeInsets.zero,
-        horizontalTitleGap: 0.0,
+        horizontalTitleGap: 5.0,
         minVerticalPadding: 0.0,
-        minLeadingWidth: 0.0,
+        minLeadingWidth: 5.0,
       );
     }
     Widget tile = Center(
       child: actionWidget,
     );
 
-    return Card(elevation: 0, child: tile);
+    return Card(elevation: 0, margin: const EdgeInsets.all(5.0), child: tile);
   }
 }

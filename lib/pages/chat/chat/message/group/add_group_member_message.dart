@@ -34,7 +34,7 @@ class AddGroupMemberMessage extends StatelessWidget {
       prefix: prefix,
       title: 'Add group member',
       subtitle: members.toString(),
-      dense: false,
+      dense: true,
     );
     return CommonMessage(tileData: tileData);
   }

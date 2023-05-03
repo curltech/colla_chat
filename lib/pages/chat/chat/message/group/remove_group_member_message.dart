@@ -34,7 +34,7 @@ class RemoveGroupMemberMessage extends StatelessWidget {
       prefix: prefix,
       title: 'Remove group member',
       subtitle: members.toString(),
-      dense: false,
+      dense: true,
     );
     return CommonMessage(tileData: tileData);
   }
