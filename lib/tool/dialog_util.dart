@@ -270,9 +270,9 @@ class DialogUtil {
   }
 
   /// loading框
-  static loadingShow(BuildContext context,
-      {String tip = 'Loading, please waiting...'}) {
-    showDialog(
+  static Future<bool?> loadingShow(BuildContext context,
+      {String tip = 'Loading, please waiting...'}) async {
+    return await showDialog<bool>(
       context: context,
       barrierDismissible: false,
       builder: (context) {
