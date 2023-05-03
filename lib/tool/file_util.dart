@@ -287,6 +287,11 @@ class FileUtil {
     return lookupMimeType(filename);
   }
 
+  static String? subMimeType(String mimeType) {
+    int pos = mimeType.lastIndexOf('/');
+    return mimeType.substring(pos + 1);
+  }
+
   static String extensionFromMime(String mime) {
     return extensionFromMime(mime);
   }

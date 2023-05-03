@@ -27,14 +27,15 @@ class ImageMessage extends StatelessWidget {
     if (!fullScreen) {
       width = AppImageSize.lgSize;
       height = AppImageSize.lgSize;
+      if (thumbnail != null) {
+        return ImageUtil.buildImageWidget(
+          image: thumbnail,
+          width: width,
+          height: height,
+        );
+      }
     }
-    if (thumbnail != null) {
-      return ImageUtil.buildImageWidget(
-        image: thumbnail,
-        width: width,
-        height: height,
-      );
-    }
+
     Widget imageWidget = FutureBuilder(
         future: messageAttachmentService.getDecryptFilename(messageId, title),
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {

@@ -21,8 +21,6 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_luban/flutter_luban.dart';
 import 'package:image/image.dart' as platform_image;
 import 'package:image_gallery_saver/image_gallery_saver.dart';
-import 'package:path/path.dart' as p;
-import 'package:uuid/uuid.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 ///image_gallery_saver,extended_image
@@ -402,14 +400,15 @@ class ImageUtil {
   }
 
   static Future<Uint8List?> compressThumbnail(
-      {XFile? xfile, AssetEntity? assetEntity, Uint8List? image}) async {
+      {XFile? xfile,
+      AssetEntity? assetEntity,
+      Uint8List? image,
+      String extension = 'jpeg'}) async {
     Uint8List? avatar;
     Directory dir = await PathUtil.getTemporaryDirectory();
     if (image != null) {
-      var uuid = const Uuid();
-      var name = uuid.v4();
-      var path = p.join(dir.path, name);
-      xfile = XFile.fromData(image, path: path);
+      var path = await FileUtil.writeTempFile(image, extension: extension);
+      xfile = XFile(path!);
     }
     if (xfile != null) {
       int length = await xfile.length();
