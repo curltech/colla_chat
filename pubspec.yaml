@@ -173,7 +173,7 @@ dependencies:
   flutter_keyboard_visibility: ^5.4.0
   keyboard_actions: ^4.2.0
   synchronized: ^3.0.0+2
-  flutter_smart_dialog: ^4.9.0+1
+  flutter_smart_dialog: ^4.9.0+6
   pdfx: 2.2.0 #2.3.0在macos下编译错误,web下不能使用
   #pdf_flutter: ^1.1.4
   pdf: ^3.8.3

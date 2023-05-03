@@ -8,6 +8,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/routers/router_handler.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/servicelocator.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -119,9 +120,9 @@ class CollaChatApp extends StatelessWidget {
       // );
       builder: FlutterSmartDialog.init(
         //default toast widget
-        toastBuilder: (String msg) => SmartDialogUtil.defaultLoadingWidget(),
+        toastBuilder: (String msg) => DialogUtil.defaultLoadingWidget(),
         //default loading widget
-        loadingBuilder: (String msg) => SmartDialogUtil.defaultLoadingWidget(),
+        loadingBuilder: (String msg) => DialogUtil.defaultLoadingWidget(),
       ),
       // themeMode: StringUtil.enumFromString(
       //     ThemeMode.values, appDataProvider.brightness),

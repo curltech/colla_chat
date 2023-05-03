@@ -1,5 +1,6 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/login/loading.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -233,6 +234,41 @@ class DialogUtil {
     return value;
   }
 
+  ///缺省的背景图像
+  static Widget defaultLoadingWidget(
+      {BuildContext? context, String tip = 'Loading, please waiting...'}) {
+    Widget loading = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: <Widget>[
+        const SizedBox(
+          height: 20,
+        ),
+        const CircularProgressIndicator(),
+        const SizedBox(
+          height: 20,
+        ),
+        CommonAutoSizeText(AppLocalizations.t(tip)),
+        const SizedBox(
+          height: 20,
+        ),
+      ],
+    );
+    loading = Stack(
+      children: [
+        SizedBox(
+          width: double.infinity,
+          height: double.infinity,
+          child: Opacity(
+            opacity: 1.0,
+            child: loadingBackgroundImage.currentBackgroundImage(context),
+          ),
+        ),
+        Center(child: loading),
+      ],
+    );
+    return loading;
+  }
+
   /// loading框
   static loadingShow(BuildContext context,
       {String tip = 'Loading, please waiting...'}) {
@@ -241,16 +277,7 @@ class DialogUtil {
       barrierDismissible: false,
       builder: (context) {
         return Dialog(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              const CircularProgressIndicator(),
-              Padding(
-                padding: const EdgeInsets.only(top: 24.0),
-                child: CommonAutoSizeText(AppLocalizations.t(tip)),
-              )
-            ],
-          ),
+          child: defaultLoadingWidget(context: context, tip: tip),
         );
       },
     );

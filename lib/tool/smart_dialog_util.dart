@@ -1,7 +1,7 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/pages/chat/login/loading.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -44,7 +44,8 @@ class SmartDialogUtil {
         Expanded(child: child),
       ]);
     }
-    maskWidget = maskWidget ?? defaultLoadingWidget(context: context);
+    maskWidget =
+        maskWidget ?? DialogUtil.defaultLoadingWidget(context: context);
     return SmartDialog.show<T>(
       builder: (BuildContext context) {
         return child;
@@ -72,18 +73,6 @@ class SmartDialogUtil {
       bindPage: bindPage,
       bindWidget: bindWidget,
       ignoreArea: ignoreArea,
-    );
-  }
-
-  ///缺省的背景图像
-  static Widget defaultLoadingWidget({BuildContext? context}) {
-    return SizedBox(
-      width: double.infinity,
-      height: double.infinity,
-      child: Opacity(
-        opacity: 0.6,
-        child: loadingBackgroundImage.currentBackgroundImage(context),
-      ),
     );
   }
 
@@ -216,12 +205,12 @@ class SmartDialogUtil {
   /// loading框
   static loadingShow({String tip = 'Loading, please waiting...'}) {
     SmartDialog.showLoading(
-        msg: tip,
-        maskColor: myself.primary,
-        maskWidget: defaultLoadingWidget(),
-        usePenetrate: true,
-        animationType: SmartAnimationType.scale,
-        builder: (BuildContext context) => Container());
+      msg: tip,
+      maskColor: myself.primary,
+      maskWidget: DialogUtil.defaultLoadingWidget(),
+      usePenetrate: true,
+      animationType: SmartAnimationType.fade,
+    );
   }
 
   /// 关闭loading框

@@ -99,7 +99,11 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
       return;
     }
     try {
+      DialogUtil.loadingShow(context);
       bool loginStatus = await myselfPeerService.login(credential, password);
+      if (mounted) {
+        DialogUtil.loadingHide(context);
+      }
       if (widget.onAuthenticate != null) {
         widget.onAuthenticate!(loginStatus);
       } else {

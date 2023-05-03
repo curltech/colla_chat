@@ -353,5 +353,6 @@
   "Request add friend": "请求加好友",
   "Must have node credential": "必须有节点凭证",
   "Must have node password": "必须有节点密码",
-  "Linkman Information": "联系人信息"
+  "Linkman Information": "联系人信息",
+  "Loading, please waiting...": "加载中，请等待"
 }
