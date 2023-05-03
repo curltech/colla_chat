@@ -300,7 +300,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     label = '${AppLocalizations.t(label)}:';
     final value = widget.controller.value ?? '';
     return Container(
-        padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 14.0),
+        padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 14.0),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           _buildIcon()!,
           const SizedBox(
