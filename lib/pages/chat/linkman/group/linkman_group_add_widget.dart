@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/group.dart';
@@ -6,14 +8,11 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
-import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -23,10 +22,7 @@ import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
-import 'package:cross_file/cross_file.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 final List<ColumnFieldDef> groupColumnFieldDefs = [
   ColumnFieldDef(
@@ -203,22 +199,10 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
 
   Future<void> _pickAvatar(BuildContext context) async {
     Group group = this.group.value;
-    if (platformParams.desktop) {
-      List<XFile> xfiles = await FileUtil.pickFiles(type: FileType.image);
-      if (xfiles.isNotEmpty) {
-        List<int> avatar = await xfiles[0].readAsBytes();
-        group.avatar = ImageUtil.base64Img(CryptoUtil.encodeBase64(avatar));
-        groupAvatar.value = group.avatar;
-      }
-    } else if (platformParams.mobile) {
-      List<AssetEntity>? assets = await AssetUtil.pickAssets(context);
-      if (assets != null && assets.isNotEmpty) {
-        List<int>? avatar = await assets[0].originBytes;
-        if (avatar != null) {
-          group.avatar = ImageUtil.base64Img(CryptoUtil.encodeBase64(avatar));
-          groupAvatar.value = group.avatar;
-        }
-      }
+    Uint8List? avatar = await ImageUtil.pickAvatar(context);
+    if (avatar != null) {
+      group.avatar = ImageUtil.base64Img(CryptoUtil.encodeBase64(avatar));
+      groupAvatar.value = group.avatar;
     }
   }
 

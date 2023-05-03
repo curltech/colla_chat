@@ -6,14 +6,22 @@ import 'dart:ui' as ui;
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/tool/asset_util.dart';
+import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/path_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
+import 'package:cross_file/cross_file.dart';
 import 'package:dio/dio.dart';
 import 'package:extended_image/extended_image.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_luban/flutter_luban.dart';
 import 'package:image/image.dart' as platform_image;
 import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 ///image_gallery_saver,extended_image
 class ImageUtil {
@@ -394,5 +402,44 @@ class ImageUtil {
       keepExif: keepExif,
     );
     return result;
+  }
+
+  static Future<Uint8List?> pickAvatar(
+    BuildContext context,
+  ) async {
+    Uint8List? avatar;
+    if (platformParams.desktop) {
+      List<XFile> xfiles = await FileUtil.pickFiles(type: FileType.image);
+      if (xfiles.isNotEmpty) {
+        int length = await xfiles[0].length();
+        if (length > 10240) {
+          double quality = 10240 * 100 / length;
+          Directory dir = await PathUtil.getTemporaryDirectory();
+          String? filename = await ImageUtil.compress(
+              filename: xfiles[0].path,
+              path: dir.path,
+              quality: quality.toInt());
+          avatar = await FileUtil.readFile(filename!);
+        } else {
+          avatar = await xfiles[0].readAsBytes();
+        }
+      }
+    } else if (platformParams.mobile) {
+      List<AssetEntity>? assets = await AssetUtil.pickAssets(context);
+      if (assets != null && assets.isNotEmpty) {
+        String? mimeType = await assets[0].mimeTypeAsync;
+        Uint8List? avatar = await assets[0].originBytes;
+        if (avatar != null && avatar.length > 10240) {
+          double quality = 10240 * 100 / avatar.length;
+          CompressFormat? format =
+              StringUtil.enumFromString(CompressFormat.values, mimeType);
+          format = format ?? CompressFormat.jpeg;
+          avatar = await ImageUtil.compressWithList(avatar,
+              quality: quality.toInt(), format: format);
+        }
+      }
+    }
+
+    return avatar;
   }
 }
