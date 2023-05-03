@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 ///消息体：图片消息
 class ImageMessage extends StatelessWidget {
-  final String? image;
+  final String? thumbnail;
   final String messageId;
   final String? title;
   final bool isMyself;
@@ -13,7 +13,7 @@ class ImageMessage extends StatelessWidget {
 
   const ImageMessage({
     Key? key,
-    this.image,
+    this.thumbnail,
     required this.messageId,
     required this.isMyself,
     this.title,
@@ -25,33 +25,32 @@ class ImageMessage extends StatelessWidget {
     double? width;
     double? height;
     if (!fullScreen) {
-      width = AppImageSize.maxSize;
-      height = AppImageSize.maxSize;
+      width = AppImageSize.mdSize;
+      height = AppImageSize.mdSize;
     }
-    var imageWidget = FutureBuilder(
+    if (thumbnail != null) {
+      return ImageUtil.buildImageWidget(
+        image: thumbnail,
+        width: width,
+        height: height,
+      );
+    }
+    Widget imageWidget = FutureBuilder(
         future: messageAttachmentService.getDecryptFilename(messageId, title),
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-          if (image != null) {
-            return ImageUtil.buildImageWidget(
-              image: image,
-              width: width,
-              height: height,
-            );
-          }
           if (snapshot.hasData) {
             var filename = snapshot.data;
-            if (filename == null) {
-              return Container();
+            if (filename != null) {
+              return ImageUtil.buildImageWidget(
+                image: filename,
+                width: width,
+                height: height,
+              );
             }
-            return ImageUtil.buildImageWidget(
-              image: filename,
-              width: width,
-              height: height,
-            );
-          } else {
-            return ImageUtil.buildImageWidget();
           }
+          return const Icon(Icons.downloading_outlined);
         });
+
     return imageWidget;
   }
 }

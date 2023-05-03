@@ -173,6 +173,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   Future<ChatMessage?> send(
       {String? title,
       dynamic content,
+      Uint8List? thumbnail,
       ChatMessageContentType contentType = ChatMessageContentType.text,
       String? mimeType,
       String? messageId,
@@ -193,16 +194,17 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       }
     }
     ChatMessage returnChatMessage;
-    ChatMessageMimeType? chatMessageMimeType =
-        StringUtil.enumFromString<ChatMessageMimeType>(
-            ChatMessageMimeType.values, mimeType);
+    // ChatMessageMimeType? chatMessageMimeType =
+    //     StringUtil.enumFromString<ChatMessageMimeType>(
+    //         ChatMessageMimeType.values, mimeType);
     if (type == PartyType.linkman) {
       ChatMessage chatMessage = await chatMessageService.buildChatMessage(
           receiverPeerId: peerId,
           title: title,
           content: content,
+          thumbnail: thumbnail,
           contentType: contentType,
-          mimeType: chatMessageMimeType,
+          mimeType: mimeType,
           messageId: messageId,
           messageType: messageType,
           subMessageType: subMessageType,
@@ -234,7 +236,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
               title: title,
               content: content,
               contentType: contentType,
-              mimeType: chatMessageMimeType,
+              mimeType: mimeType,
               messageId: messageId,
               messageType: messageType,
               subMessageType: subMessageType,

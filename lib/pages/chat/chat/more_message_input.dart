@@ -15,6 +15,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
@@ -167,10 +168,13 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     );
     if (result != null && result.isNotEmpty) {
       Uint8List? data = await result[0].originBytes;
+      Uint8List? thumbnail =
+          await ImageUtil.compressThumbnail(assetEntity: result[0]);
       String? mimeType = result[0].mimeType;
       await chatMessageController.send(
           title: result[0].title,
           content: data,
+          thumbnail: thumbnail,
           contentType: ChatMessageContentType.image,
           mimeType: mimeType);
     }
@@ -190,6 +194,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         });
     if (mediaFile != null) {
       Uint8List data = await mediaFile!.readAsBytes();
+      Uint8List? thumbnail =
+          await ImageUtil.compressThumbnail(xfile: mediaFile);
       String filename = mediaFile!.name;
       String? mimeType = mediaFile!.mimeType;
       mimeType ?? FileUtil.mimeType(filename);
@@ -201,6 +207,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       await chatMessageController.send(
           title: filename,
           content: data,
+          thumbnail: thumbnail,
           contentType: contentType,
           mimeType: mimeType);
     }
@@ -286,12 +293,14 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     if (xfiles.isNotEmpty) {
       XFile xfile = xfiles[0];
       Uint8List data = await xfile.readAsBytes();
+      Uint8List? thumbnail = await ImageUtil.compressThumbnail(xfile: xfile);
       String filename = xfile.name;
       String? mimeType = xfile.mimeType;
       mimeType ?? FileUtil.mimeType(filename);
       await chatMessageController.send(
           title: filename,
           content: data,
+          thumbnail: thumbnail,
           contentType: ChatMessageContentType.file,
           mimeType: mimeType);
     }

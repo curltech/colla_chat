@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/channel_chat_message.dart';
@@ -93,7 +95,7 @@ class MyChannelChatMessageController extends DataMoreController<ChatMessage> {
   }
 
   Future<ChatMessage> buildChannelChatMessage(
-      String title, String content, List<int>? thumbnail) async {
+      String title, String content, Uint8List? thumbnail) async {
     ChatMessage chatMessage = await chatMessageService.buildChatMessage(
         title: title,
         content: content,
@@ -103,7 +105,7 @@ class MyChannelChatMessageController extends DataMoreController<ChatMessage> {
         transportType: TransportType.none,
         contentType: ChatMessageContentType.rich,
         status: MessageStatus.unsent.name,
-        mimeType: ChatMessageMimeType.html);
+        mimeType: ChatMessageMimeType.html.name);
 
     return chatMessage;
   }

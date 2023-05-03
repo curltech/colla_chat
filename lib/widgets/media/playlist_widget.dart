@@ -216,9 +216,9 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           maxHeight: AppIconSize.maxSize.toInt(),
           maxWidth: AppIconSize.maxSize.toInt());
     }
-    ChatMessageMimeType? chatMessageMimeType =
-        StringUtil.enumFromString<ChatMessageMimeType>(
-            ChatMessageMimeType.values, mediaFormat);
+    // ChatMessageMimeType? chatMessageMimeType =
+    //     StringUtil.enumFromString<ChatMessageMimeType>(
+    //         ChatMessageMimeType.values, mediaFormat);
     String fileType = widget.controller.fileType.name;
     ChatMessageContentType? contentType =
         StringUtil.enumFromString(ChatMessageContentType.values, fileType);
@@ -227,7 +227,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       receiverPeerId: myself.peerId!,
       messageType: ChatMessageType.collection,
       contentType: contentType,
-      mimeType: chatMessageMimeType,
+      mimeType: mediaFormat,
       title: filename,
       thumbnail: thumbnail,
     );

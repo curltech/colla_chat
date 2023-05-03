@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/datastore/datastore.dart';
@@ -22,8 +23,10 @@ import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+
 // import 'package:colla_chat/transport/nearby_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/websocket.dart';
@@ -271,7 +274,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     ChatMessageType messageType = ChatMessageType.chat,
     ChatMessageSubType subMessageType = ChatMessageSubType.chat,
     ChatMessageContentType contentType = ChatMessageContentType.text,
-    ChatMessageMimeType? mimeType,
+    String? mimeType,
     PartyType receiverType = PartyType.linkman,
     String? receiverName,
     String? groupPeerId,
@@ -279,7 +282,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     PartyType? groupType,
     String? title,
     String? receiptType,
-    List<int>? thumbnail,
+    Uint8List? thumbnail,
     String? status,
     int deleteTime = 0,
     String? parentMessageId,
@@ -342,7 +345,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       chatMessage.content = CryptoUtil.encodeBase64(data);
     }
     chatMessage.contentType = contentType.name;
-    chatMessage.mimeType = mimeType?.name;
+    chatMessage.mimeType = mimeType;
     chatMessage.status = status ?? MessageStatus.sent.name;
     chatMessage.transportType = transportType.name;
     chatMessage.deleteTime = deleteTime;
@@ -361,11 +364,11 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     ChatMessageType messageType = ChatMessageType.chat,
     ChatMessageSubType subMessageType = ChatMessageSubType.chat,
     ChatMessageContentType contentType = ChatMessageContentType.text,
-    ChatMessageMimeType? mimeType,
+    String? mimeType,
     String? title,
     String? messageId,
     String? receiptType,
-    List<int>? thumbnail,
+    Uint8List? thumbnail,
     int deleteTime = 0,
     String? parentMessageId,
     List<String>? peerIds,
@@ -689,14 +692,14 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     ChatMessageContentType? contentType = StringUtil.enumFromString(
         ChatMessageContentType.values, chatMessage.contentType);
 
-    List<int>? thumbnail;
+    Uint8List? thumbnail;
     if (chatMessage.thumbnail != null) {
       thumbnail = CryptoUtil.decodeBase64(chatMessage.thumbnail!);
     }
     Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
-    ChatMessageMimeType? chatMessageMimeType =
-        StringUtil.enumFromString<ChatMessageMimeType>(
-            ChatMessageMimeType.values, chatMessage.mimeType);
+    // ChatMessageMimeType? chatMessageMimeType =
+    //     StringUtil.enumFromString<ChatMessageMimeType>(
+    //         ChatMessageMimeType.values, chatMessage.mimeType);
     if (linkman != null) {
       ChatMessage? message = await buildChatMessage(
         receiverPeerId: peerId,
@@ -704,7 +707,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         messageType: messageType!,
         subMessageType: subMessageType!,
         contentType: contentType!,
-        mimeType: chatMessageMimeType,
+        mimeType: chatMessage.mimeType,
         receiverName: linkman.name,
         title: title,
         receiptType: chatMessage.receiptType,
@@ -721,7 +724,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           messageType: messageType!,
           subMessageType: subMessageType!,
           contentType: contentType!,
-          mimeType: chatMessageMimeType,
+          mimeType: chatMessage.mimeType,
           title: title,
           receiptType: chatMessage.receiptType,
           thumbnail: thumbnail,
@@ -767,6 +770,14 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
               contentType == ChatMessageContentType.rich.name)) {
         //保存的时候，设置内容为空
         chatMessage.content = null;
+        if (chatMessage.thumbnail == null &&
+            contentType == ChatMessageContentType.image.name) {
+          Uint8List image = CryptoUtil.decodeBase64(content);
+          Uint8List? data = await ImageUtil.compressThumbnail(image: image);
+          if (data != null) {
+            chatMessage.thumbnail = CryptoUtil.encodeBase64(data);
+          }
+        }
         attachment = true;
         messageId = chatMessage.messageId;
       }

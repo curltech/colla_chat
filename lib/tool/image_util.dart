@@ -21,6 +21,8 @@ import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_luban/flutter_luban.dart';
 import 'package:image/image.dart' as platform_image;
 import 'package:image_gallery_saver/image_gallery_saver.dart';
+import 'package:path/path.dart' as p;
+import 'package:uuid/uuid.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 ///image_gallery_saver,extended_image
@@ -404,6 +406,42 @@ class ImageUtil {
     return result;
   }
 
+  static Future<Uint8List?> compressThumbnail(
+      {XFile? xfile, AssetEntity? assetEntity, Uint8List? image}) async {
+    Uint8List? avatar;
+    Directory dir = await PathUtil.getTemporaryDirectory();
+    if (image != null) {
+      var uuid = const Uuid();
+      var name = uuid.v4();
+      var path = p.join(dir.path, name);
+      xfile = XFile.fromData(image, path: path);
+    }
+    if (xfile != null) {
+      int length = await xfile.length();
+      if (length > 10240) {
+        double quality = 10240 * 100 / length;
+        String? filename = await compress(
+            filename: xfile.path, path: dir.path, quality: quality.toInt());
+        avatar = await FileUtil.readFile(filename!);
+      } else {
+        avatar = await xfile.readAsBytes();
+      }
+    } else if (assetEntity != null) {
+      String? mimeType = await assetEntity.mimeTypeAsync;
+      Uint8List? avatar = await assetEntity.originBytes;
+      if (avatar != null && avatar.length > 10240) {
+        double quality = 10240 * 100 / avatar.length;
+        CompressFormat? format =
+            StringUtil.enumFromString(CompressFormat.values, mimeType);
+        format = format ?? CompressFormat.jpeg;
+        avatar = await compressWithList(avatar,
+            quality: quality.toInt(), format: format);
+      }
+    }
+
+    return avatar;
+  }
+
   static Future<Uint8List?> pickAvatar(
     BuildContext context,
   ) async {
@@ -411,32 +449,12 @@ class ImageUtil {
     if (platformParams.desktop) {
       List<XFile> xfiles = await FileUtil.pickFiles(type: FileType.image);
       if (xfiles.isNotEmpty) {
-        int length = await xfiles[0].length();
-        if (length > 10240) {
-          double quality = 10240 * 100 / length;
-          Directory dir = await PathUtil.getTemporaryDirectory();
-          String? filename = await ImageUtil.compress(
-              filename: xfiles[0].path,
-              path: dir.path,
-              quality: quality.toInt());
-          avatar = await FileUtil.readFile(filename!);
-        } else {
-          avatar = await xfiles[0].readAsBytes();
-        }
+        avatar = await compressThumbnail(xfile: xfiles[0]);
       }
     } else if (platformParams.mobile) {
       List<AssetEntity>? assets = await AssetUtil.pickAssets(context);
       if (assets != null && assets.isNotEmpty) {
-        String? mimeType = await assets[0].mimeTypeAsync;
-        Uint8List? avatar = await assets[0].originBytes;
-        if (avatar != null && avatar.length > 10240) {
-          double quality = 10240 * 100 / avatar.length;
-          CompressFormat? format =
-              StringUtil.enumFromString(CompressFormat.values, mimeType);
-          format = format ?? CompressFormat.jpeg;
-          avatar = await ImageUtil.compressWithList(avatar,
-              quality: quality.toInt(), format: format);
-        }
+        avatar = await compressThumbnail(assetEntity: assets[0]);
       }
     }
 

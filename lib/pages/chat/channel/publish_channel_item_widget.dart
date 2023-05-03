@@ -49,7 +49,7 @@ class PublishChannelItemWidget extends StatefulWidget with TileDataMixin {
 
 class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
   final TextEditingController textEditingController = TextEditingController();
-  ValueNotifier<List<int>?> thumbnail = ValueNotifier<List<int>?>(null);
+  ValueNotifier<Uint8List?> thumbnail = ValueNotifier<Uint8List?>(null);
   ValueNotifier<String?> html = ValueNotifier<String?>(null);
 
   @override
