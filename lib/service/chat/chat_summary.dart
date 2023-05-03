@@ -198,7 +198,10 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummary.content = chatMessage.content;
       chatSummary.contentType = chatMessage.contentType;
       chatSummary.sendReceiveTime = chatMessage.sendTime;
-      chatSummary.unreadNumber = chatSummary.unreadNumber + 1;
+      if (chatMessage.messageType == ChatMessageType.chat.name &&
+          chatMessage.subMessageType == ChatMessageSubType.chat.name) {
+        chatSummary.unreadNumber = chatSummary.unreadNumber + 1;
+      }
       chatSummary.status = chatMessage.status;
       await upsert(chatSummary);
       chatSummaries[chatSummary.peerId!] = chatSummary;
@@ -207,7 +210,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
   }
 
   removeChatSummary(String peerId) async {
-    await delete(where: 'peerId=?', whereArgs: [peerId]);
+    delete(where: 'peerId=?', whereArgs: [peerId]);
   }
 }
 

@@ -80,6 +80,7 @@ class MessageWidget {
   final bool fullScreen;
   final int index;
   bool? _isMyself;
+  bool? _isSystem;
 
   MessageWidget(this.chatMessage, this.index, {this.fullScreen = false});
 
@@ -97,6 +98,19 @@ class MessageWidget {
       _isMyself = false;
     }
     return _isMyself!;
+  }
+
+  bool get isSystem {
+    if (_isSystem != null) {
+      return _isSystem!;
+    }
+    var messageType = chatMessage.messageType;
+    if (messageType == ChatMessageType.system.name) {
+      _isSystem = true;
+    } else {
+      _isSystem = false;
+    }
+    return _isSystem!;
   }
 
   ///消息体：扩展文本，图像，声音，视频，页面，复合文本，文件，名片，位置，收藏等种类

@@ -23,6 +23,7 @@ class ChatMessageItem extends StatefulWidget {
   final int index;
 
   late final bool isMyself;
+  late final bool isSystem;
   late final MessageWidget messageWidget;
 
   ChatMessageItem({
@@ -32,6 +33,7 @@ class ChatMessageItem extends StatefulWidget {
   }) : super(key: key) {
     messageWidget = MessageWidget(chatMessage, index);
     isMyself = messageWidget.isMyself;
+    isSystem = messageWidget.isSystem;
     //logger.w('ChatMessageItem() chatMessage id: ${chatMessage.id}');
   }
 
@@ -178,13 +180,57 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
     );
   }
 
+  ///系统消息，显示在中间的消息容器
+  Widget _buildSystem(BuildContext context) {
+    var sendTime = widget.chatMessage.sendTime;
+    sendTime = sendTime = DateUtil.formatEasyRead(sendTime!);
+    //${widget.chatMessage.id}:${widget.chatMessage.senderName}
+    Widget title =
+        CommonAutoSizeText(sendTime, style: const TextStyle(fontSize: 12));
+    // CommonAutoSizeText('${widget.chatMessage.id}:${widget.chatMessage.senderName}');
+    if (timer != null) {
+      title = Row(
+        children: [
+          title,
+          const Icon(Icons.timer_sharp),
+          CommonAutoSizeText('$leftDeleteTime'),
+        ],
+      );
+    }
+    Widget body = FutureBuilder(
+      future: widget.messageWidget.buildMessageBody(context),
+      builder: (BuildContext context, AsyncSnapshot<Widget?> snapshot) {
+        if (snapshot.hasData) {
+          Widget? widget = snapshot.data;
+          if (widget != null) {
+            return widget;
+          }
+        }
+        return Container();
+      },
+    );
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 3.0),
+      child: Center(
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+            title,
+            const SizedBox(
+              width: 10,
+            ),
+            body,
+          ])),
+    );
+  }
+
   ///其他人的消息，从左到右，头像，时间，名称，消息容器
   Widget _buildOther(BuildContext context) {
     var sendTime = widget.chatMessage.sendTime;
     sendTime = sendTime = DateUtil.formatEasyRead(sendTime!);
-    Widget title = CommonAutoSizeText(
-        '${widget.chatMessage.id}:${widget.chatMessage.senderName} $sendTime',
-        style: const TextStyle(fontSize: 12));
+    //${widget.chatMessage.id}:${widget.chatMessage.senderName}
+    Widget title =
+        CommonAutoSizeText(sendTime, style: const TextStyle(fontSize: 12));
     // CommonAutoSizeText('${widget.chatMessage.id}:${widget.chatMessage.senderName}');
     if (timer != null) {
       title = Row(
@@ -229,9 +275,9 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
   Widget _buildMe(BuildContext context) {
     var sendTime = widget.chatMessage.sendTime;
     sendTime = sendTime = DateUtil.formatEasyRead(sendTime!);
-    Widget title = CommonAutoSizeText(
-        '${widget.chatMessage.id}:${widget.chatMessage.senderName} $sendTime',
-        style: const TextStyle(fontSize: 12));
+    //${widget.chatMessage.id}:${widget.chatMessage.senderName}
+    Widget title =
+        CommonAutoSizeText(sendTime, style: const TextStyle(fontSize: 12));
     //Text('${widget.chatMessage.id}:${widget.chatMessage.receiverName}');
     if (timer != null) {
       title = Row(
@@ -304,6 +350,9 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.isSystem) {
+      return _buildSystem(context);
+    }
     if (widget.isMyself) {
       return _buildMe(context);
     }
