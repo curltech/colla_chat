@@ -259,7 +259,7 @@ class DialogUtil {
           width: double.infinity,
           height: double.infinity,
           child: Opacity(
-            opacity: 1.0,
+            opacity: 0.8,
             child: loadingBackgroundImage.currentBackgroundImage(context),
           ),
         ),
