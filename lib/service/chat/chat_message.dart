@@ -12,6 +12,7 @@ import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/p2p/chain/action/chat.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_summary.dart';
@@ -806,6 +807,35 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       logger.e(
           'chatMessage ${chatMessage.messageId} store fail,${err.toString()}');
     }
+  }
+
+  Future<int> remove({String? where, List<Object>? whereArgs}) async {
+    List<ChatMessage> chatMessages =
+        await find(where: where, whereArgs: whereArgs);
+    if (chatMessages.isNotEmpty) {
+      for (ChatMessage chatMessage in chatMessages) {
+        String? content = chatMessage.content;
+        String? title = chatMessage.title;
+        String? contentType = chatMessage.contentType;
+        String? messageId = chatMessage.messageId;
+        if (content != null) {
+          if (contentType != null &&
+              (contentType == ChatMessageContentType.file.name ||
+                  contentType == ChatMessageContentType.image.name ||
+                  contentType == ChatMessageContentType.video.name ||
+                  contentType == ChatMessageContentType.audio.name ||
+                  contentType == ChatMessageContentType.rich.name)) {
+            if (!platformParams.web) {
+              final filename =
+                  await messageAttachmentService.remove(messageId!, title);
+            }
+          }
+        }
+      }
+    }
+    int count = super.delete(where: where, whereArgs: whereArgs);
+
+    return Future.value(count);
   }
 
   resend() async {

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
@@ -175,8 +176,13 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
   }
 
   ///删除消息的附件
-  removeByPeerId(String peerId) {
-    delete(where: 'groupPeerId=?', whereArgs: [peerId]);
+  remove(String messageId, String? title) async {
+    delete(where: 'messageId=?', whereArgs: [messageId]);
+    final filename = await getEncryptFilename(messageId, title);
+    File file = File(filename!);
+    if (file.existsSync()) {
+      file.delete();
+    }
   }
 }
 

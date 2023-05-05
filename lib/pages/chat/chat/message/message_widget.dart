@@ -219,7 +219,7 @@ class MessageWidget {
     switch (label) {
       case 'Delete':
         chatMessageService
-            .delete(where: 'messageId=?', whereArgs: [chatMessage.messageId!]);
+            .remove(where: 'messageId=?', whereArgs: [chatMessage.messageId!]);
         chatMessageController.delete(index: this.index);
         break;
       case 'Cancel':
