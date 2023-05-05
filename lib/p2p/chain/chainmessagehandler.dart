@@ -39,6 +39,8 @@ class ChainMessageHandler {
       String? topic,
       String? targetClientId}) async {
     ChainMessage chainMessage = ChainMessage();
+    //把负载变成字符串格式
+    var jsonStr = JsonUtil.toJsonString(data);
     //如果指出了目标客户端，则查询目标客户端的信息
     if (targetPeerId != null) {
       PeerClient? peerClient =
@@ -93,8 +95,6 @@ class ChainMessageHandler {
       topic ??= appDataProvider.topics[0];
     }
     chainMessage.topic = topic;
-    //把负载变成字符串格式
-    var jsonStr = JsonUtil.toJsonString(data);
 
     /// 把负载变成utf8的二进制的数组，方便计数和进一步的处理
     List<int> payload = CryptoUtil.stringToUtf8(jsonStr);
