@@ -133,7 +133,8 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
   }
 
   ///新的ChatMessage来了，更新ChatSummary
-  Future<ChatSummary?> upsertByChatMessage(ChatMessage chatMessage) async {
+  Future<ChatSummary?> upsertByChatMessage(ChatMessage chatMessage,
+      {bool unreadNumber = false}) async {
     if (chatMessage.messageType == ChatMessageType.system.name ||
         chatMessage.messageType == ChatMessageType.channel.name ||
         chatMessage.messageType == ChatMessageType.collection.name) {
@@ -198,9 +199,11 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummary.content = chatMessage.content;
       chatSummary.contentType = chatMessage.contentType;
       chatSummary.sendReceiveTime = chatMessage.sendTime;
-      if (chatMessage.messageType == ChatMessageType.chat.name &&
-          chatMessage.subMessageType == ChatMessageSubType.chat.name) {
-        chatSummary.unreadNumber = chatSummary.unreadNumber + 1;
+      if (unreadNumber) {
+        if (chatMessage.messageType == ChatMessageType.chat.name &&
+            chatMessage.subMessageType == ChatMessageSubType.chat.name) {
+          chatSummary.unreadNumber = chatSummary.unreadNumber + 1;
+        }
       }
       chatSummary.status = chatMessage.status;
       await upsert(chatSummary);

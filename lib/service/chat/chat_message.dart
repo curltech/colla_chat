@@ -496,7 +496,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       chatMessage.readTime = null;
       chatMessage.status = MessageStatus.received.name;
       chatMessage.id = null;
-      await store(chatMessage);
+      await store(chatMessage, unreadNumber: true);
 
       return chatMessage;
     }
@@ -748,7 +748,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
 
   /// 保存消息，对于复杂消息，存储附件
   /// 如果content为空，不用考虑附件，有可能title就是文件名
-  store(ChatMessage chatMessage, {bool updateSummary = true}) async {
+  store(ChatMessage chatMessage,
+      {bool updateSummary = true, bool unreadNumber = false}) async {
     String subMessageType = chatMessage.subMessageType;
     //signal消息暂时不保存
     if (subMessageType == ChatMessageSubType.signal.name) {
@@ -801,7 +802,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         chatMessage.content = content;
       }
       if (updateSummary) {
-        await chatSummaryService.upsertByChatMessage(chatMessage);
+        await chatSummaryService.upsertByChatMessage(chatMessage,
+            unreadNumber: unreadNumber);
       }
     } catch (err) {
       logger.e(
