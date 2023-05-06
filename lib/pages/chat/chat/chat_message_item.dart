@@ -110,28 +110,54 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
       crossAxisAlignment = CrossAxisAlignment.end;
     }
     var maxWidth = appDataProvider.actualSize.width - 100;
+    List<Widget> children = [
+      Bubble(
+          elevation: 0.0,
+          stick: true,
+          margin: const BubbleEdges.only(top: 1),
+          nip: widget.isMyself ? BubbleNip.rightTop : BubbleNip.leftTop,
+          color: widget.isMyself ? myself.primary : Colors.white,
+          padding: const BubbleEdges.all(0),
+          child: body)
+    ];
+    Widget? parentWidget = MessageWidget.buildParentChatMessageWidget(
+        readOnly: true, parentMessageId: widget.chatMessage.parentMessageId);
+    if (parentWidget != null) {
+      children.add(const SizedBox(
+        height: 2,
+      ));
+      children.add(parentWidget);
+    }
     return Container(
         constraints: BoxConstraints(minWidth: 100, maxWidth: maxWidth),
-        child: Column(crossAxisAlignment: crossAxisAlignment, children: [
-          Bubble(
-              elevation: 0.0,
-              stick: true,
-              margin: const BubbleEdges.only(top: 1),
-              nip: widget.isMyself ? BubbleNip.rightTop : BubbleNip.leftTop,
-              color: widget.isMyself ? myself.primary : Colors.white,
-              padding: const BubbleEdges.all(0),
-              child: body),
-          const SizedBox(
-            height: 2,
-          ),
-          MessageWidget.buildParentChatMessageWidget(
-              readOnly: true,
-              parentMessageId: widget.chatMessage.parentMessageId),
-        ]));
+        child:
+            Column(crossAxisAlignment: crossAxisAlignment, children: children));
   }
 
   ///矩形消息容器，内包消息体
   Widget _buildMessageContainer(BuildContext context) {
+    List<Widget> children = [
+      FutureBuilder(
+        future: widget.messageWidget.buildMessageBody(context),
+        builder: (BuildContext context, AsyncSnapshot<Widget?> snapshot) {
+          if (snapshot.hasData) {
+            Widget? widget = snapshot.data;
+            if (widget != null) {
+              return widget;
+            }
+          }
+          return Container();
+        },
+      )
+    ];
+    Widget? parentWidget = MessageWidget.buildParentChatMessageWidget(
+        readOnly: true, parentMessageId: widget.chatMessage.parentMessageId);
+    if (parentWidget != null) {
+      children.add(const SizedBox(
+        height: 2,
+      ));
+      children.add(parentWidget);
+    }
     return Row(
       mainAxisAlignment:
           widget.isMyself ? MainAxisAlignment.end : MainAxisAlignment.start,
@@ -154,28 +180,8 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
             margin: EdgeInsets.only(
                 right: widget.isMyself ? 5.0 : 0,
                 left: widget.isMyself ? 0 : 5.0),
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              FutureBuilder(
-                future: widget.messageWidget.buildMessageBody(context),
-                builder:
-                    (BuildContext context, AsyncSnapshot<Widget?> snapshot) {
-                  if (snapshot.hasData) {
-                    Widget? widget = snapshot.data;
-                    if (widget != null) {
-                      return widget;
-                    }
-                  }
-                  return Container();
-                },
-              ),
-              const SizedBox(
-                height: 2,
-              ),
-              MessageWidget.buildParentChatMessageWidget(
-                  readOnly: true,
-                  parentMessageId: widget.chatMessage.parentMessageId),
-            ]))
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end, children: children))
       ], // aligns the chatitem to right end
     );
   }
@@ -241,6 +247,15 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
         ],
       );
     }
+    List<Widget> children = [title, _buildMessageBubble(context)];
+    Widget? parentWidget = MessageWidget.buildParentChatMessageWidget(
+        readOnly: true, parentMessageId: widget.chatMessage.parentMessageId);
+    if (parentWidget != null) {
+      children.add(const SizedBox(
+        height: 2,
+      ));
+      children.add(parentWidget);
+    }
     return Container(
         margin: const EdgeInsets.symmetric(vertical: 3.0),
         child: Row(
@@ -261,13 +276,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
               ),
               Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    title,
-                    _buildMessageBubble(context),
-                    MessageWidget.buildParentChatMessageWidget(
-                        readOnly: true,
-                        parentMessageId: widget.chatMessage.parentMessageId),
-                  ]),
+                  children: children),
             ]));
   }
 

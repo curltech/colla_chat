@@ -7,6 +7,7 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.da
 import 'package:colla_chat/pages/chat/chat/message/audio_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/cancel_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/chat_receipt_message.dart';
+import 'package:colla_chat/pages/chat/chat/message/common_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/extended_text_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/file_message.dart';
 import 'package:colla_chat/pages/chat/chat/message/group/add_group_member_message.dart';
@@ -40,6 +41,7 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
@@ -359,6 +361,67 @@ class MessageWidget {
     );
   }
 
+  /// 非全屏场景下是简单的文件显示
+  /// 全屏场景下是根据文件的类型展示
+  Future<Widget> buildFileMessageWidget(BuildContext context) async {
+    String? messageId = chatMessage.messageId;
+    String? title = chatMessage.title;
+    String? extension;
+    if (title != null) {
+      extension = FileUtil.extension(title);
+    }
+    String? mimeType = chatMessage.mimeType;
+    mimeType = mimeType ?? 'text/plain';
+    Widget fileMessage = FileMessage(
+      key: UniqueKey(),
+      messageId: messageId!,
+      isMyself: isMyself,
+      title: title!,
+      mimeType: mimeType,
+    );
+    if (!fullScreen) {
+      return fileMessage;
+    }
+    if (mimeType.endsWith(ChatMessageMimeType.jpeg.name) ||
+        mimeType.endsWith(ChatMessageMimeType.jpg.name) ||
+        mimeType.endsWith(ChatMessageMimeType.png.name) ||
+        mimeType.endsWith(ChatMessageMimeType.webp.name) ||
+        mimeType.endsWith(ChatMessageMimeType.bmp.name) ||
+        mimeType.endsWith(ChatMessageMimeType.gif.name)) {
+      return buildImageMessageWidget(context);
+    }
+    if (mimeType.startsWith(ChatMessageContentType.audio.name)) {
+      return buildAudioMessageWidget(context);
+    }
+    if (mimeType.endsWith(ChatMessageMimeType.midi.name) ||
+        mimeType.endsWith(ChatMessageMimeType.wav.name) ||
+        mimeType.endsWith(ChatMessageMimeType.mp3.name)) {
+      return buildAudioMessageWidget(context);
+    }
+    if (mimeType.startsWith(ChatMessageContentType.video.name)) {
+      return buildVideoMessageWidget(context);
+    }
+    if (mimeType.endsWith(ChatMessageMimeType.mpeg.name) ||
+        mimeType.endsWith(ChatMessageMimeType.ogg.name) ||
+        mimeType.endsWith(ChatMessageMimeType.m4a.name) ||
+        mimeType.endsWith(ChatMessageMimeType.mp4.name) ||
+        mimeType.endsWith(ChatMessageMimeType.mov.name)) {
+      return buildVideoMessageWidget(context);
+    }
+    if (mimeType == 'application/pdf') {
+      return buildPdfMessageWidget(context);
+    }
+    if (extension == 'docx' ||
+        extension == 'doc' ||
+        extension == 'xlsx' ||
+        extension == 'xls' ||
+        extension == 'pptx' ||
+        extension == 'ppt') {
+      return await buildOfficeMessageWidget(context);
+    }
+    return fileMessage;
+  }
+
   VideoChatMessage buildVideoChatMessageWidget(BuildContext context) {
     return VideoChatMessage(
       key: UniqueKey(),
@@ -478,6 +541,8 @@ class MessageWidget {
     }
   }
 
+  /// 非全屏场景下是缩略图
+  /// 全屏下是原图
   ImageMessage buildImageMessageWidget(BuildContext context) {
     String? messageId = chatMessage.messageId;
     String? title = chatMessage.title;
@@ -493,6 +558,8 @@ class MessageWidget {
     );
   }
 
+  /// 非全屏场景下是视频缩略图
+  /// 全屏下是原始播放界面
   VideoMessage buildVideoMessageWidget(BuildContext context) {
     int? id = chatMessage.id;
     String? messageId = chatMessage.messageId;
@@ -508,6 +575,8 @@ class MessageWidget {
     );
   }
 
+  /// 非全屏场景下是音频简单播放界面
+  /// 全屏下是原始播放界面
   AudioMessage buildAudioMessageWidget(BuildContext context) {
     int? id = chatMessage.id;
     String? messageId = chatMessage.messageId;
@@ -521,48 +590,7 @@ class MessageWidget {
     );
   }
 
-  Future<Widget> buildFileMessageWidget(BuildContext context) async {
-    String? messageId = chatMessage.messageId;
-    String? title = chatMessage.title;
-    String? extension;
-    if (title != null) {
-      extension = FileUtil.extension(title);
-    }
-    String? mimeType = chatMessage.mimeType;
-    mimeType = mimeType ?? 'text/plain';
-    if (mimeType.startsWith('image')) {
-      return buildImageMessageWidget(context);
-    } else if (mimeType == 'application/pdf') {
-      if (fullScreen) {
-        return buildPdfMessageWidget(context);
-      }
-    } else if (mimeType.startsWith('audio')) {
-      if (fullScreen) {
-        return buildAudioMessageWidget(context);
-      }
-    } else if (mimeType.startsWith('video')) {
-      if (fullScreen) {
-        return buildVideoMessageWidget(context);
-      }
-    } else if (extension == 'docx' ||
-        extension == 'doc' ||
-        extension == 'xlsx' ||
-        extension == 'xls' ||
-        extension == 'pptx' ||
-        extension == 'ppt') {
-      if (fullScreen) {
-        return await buildOfficeMessageWidget(context);
-      }
-    }
-    return FileMessage(
-      key: UniqueKey(),
-      messageId: messageId!,
-      isMyself: isMyself,
-      title: title!,
-      mimeType: mimeType,
-    );
-  }
-
+  /// 全屏场景下pdf展示，是文件消息的子类型
   Future<Widget> buildPdfMessageWidget(BuildContext context) async {
     String? messageId = chatMessage.messageId;
     String? title = chatMessage.title;
@@ -575,9 +603,22 @@ class MessageWidget {
         return PdfUtil.buildPdfView(key: UniqueKey(), data: data);
       }
     }
-    return Container();
+    Widget prefix = IconButton(
+        onPressed: null,
+        icon: Icon(
+          Icons.extension,
+          color: myself.primary,
+        ));
+    var tileData = TileData(
+      prefix: prefix,
+      title: title ?? '',
+      subtitle: 'Not exist',
+      dense: true,
+    );
+    return CommonMessage(tileData: tileData);
   }
 
+  /// 全屏场景下office文件展示，是文件消息的子类型
   Future<Widget> buildOfficeMessageWidget(BuildContext context) async {
     String? messageId = chatMessage.messageId;
     String? title = chatMessage.title;
@@ -589,13 +630,26 @@ class MessageWidget {
       //       key: UniqueKey(), filePath: filename);
       // }
     }
-    return Container();
+    Widget prefix = IconButton(
+        onPressed: null,
+        icon: Icon(
+          Icons.extension,
+          color: myself.primary,
+        ));
+    var tileData = TileData(
+      prefix: prefix,
+      title: title ?? '',
+      subtitle: 'Not exist',
+      dense: true,
+    );
+    return CommonMessage(tileData: tileData);
   }
 
+  /// 显示引用消息，父消息
   /// 缺省是编辑模式，用于输入，会出现一个cancel按钮，parentMessageId为空，
   /// 会对chatMessageController.parentMessageId进行处理
   /// 当处于只读模式时，用于显示，parentMessageId不允许为空
-  static Widget buildParentChatMessageWidget({
+  static Widget? buildParentChatMessageWidget({
     bool readOnly = false,
     String? parentMessageId,
   }) {
@@ -604,7 +658,7 @@ class MessageWidget {
       parentMessageId = chatMessageController.parentMessageId;
     }
     if (parentMessageId == null) {
-      return Container();
+      return null;
     }
     return FutureBuilder(
       future: chatMessageService.findOriginByMessageId(parentMessageId),

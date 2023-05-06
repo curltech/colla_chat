@@ -1,5 +1,6 @@
+import 'package:colla_chat/pages/chat/chat/message/common_message.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 import 'package:mimecon/mimecon.dart';
 
@@ -20,24 +21,17 @@ class FileMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var tile = ListTile(
-      leading: Mimecon(
+    var tileData = TileData(
+      prefix: Mimecon(
         mimetype: mimeType,
         color: myself.primary,
         size: 36,
         isOutlined: true,
       ),
-      title: CommonAutoSizeText(title),
-      subtitle: CommonAutoSizeText(mimeType),
-      isThreeLine: false,
+      title: title,
+      subtitle: mimeType,
       dense: true,
-      horizontalTitleGap: 0,
-      minVerticalPadding: 0,
-      contentPadding: EdgeInsets.zero,
     );
-    return Card(
-        elevation: 0,
-        child:
-            tile); //SizedBox(height: 90, child: Card(elevation: 0, child: tile));
+    return CommonMessage(tileData: tileData);
   }
 }

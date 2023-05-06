@@ -259,18 +259,22 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
 
   ///语音录音按钮和文本输入框
   Widget _buildMessageInputWidget(BuildContext context) {
+    List<Widget> children = [
+      voiceVisible
+          ? _buildExtendedTextField(context)
+          : _buildVoiceRecordButton(context)
+    ];
+    Widget? parentWidget = MessageWidget.buildParentChatMessageWidget();
+    if (parentWidget != null) {
+      children.add(const SizedBox(
+        height: 2,
+      ));
+      children.add(parentWidget);
+    }
     return Container(
         margin: const EdgeInsets.symmetric(horizontal: 0.0, vertical: 2.0),
         alignment: Alignment.center,
-        child: Column(children: [
-          voiceVisible
-              ? _buildExtendedTextField(context)
-              : _buildVoiceRecordButton(context),
-          const SizedBox(
-            height: 2,
-          ),
-          MessageWidget.buildParentChatMessageWidget()
-        ]));
+        child: Column(children: children));
   }
 
   @override
