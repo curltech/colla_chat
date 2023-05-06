@@ -53,13 +53,16 @@ abstract class GeneralBaseService<T> {
       String? orderBy,
       int? limit,
       int? offset}) async {
-    whereArgs = whereArgs ?? [];
-    where = _buildWhere(where, whereArgs);
+    List<Object> args = [];
+    if (whereArgs != null) {
+      args.addAll(whereArgs);
+    }
+    where = _buildWhere(where, args);
     Map<dynamic, dynamic>? m = dataStore.findOne(tableName,
         where: where,
         distinct: distinct,
         columns: columns,
-        whereArgs: whereArgs,
+        whereArgs: args,
         groupBy: groupBy,
         having: having,
         orderBy: orderBy,
@@ -91,13 +94,16 @@ abstract class GeneralBaseService<T> {
     int? limit,
     int? offset,
   }) async {
-    whereArgs = whereArgs ?? [];
-    where = _buildWhere(where, whereArgs);
+    List<Object> args = [];
+    if (whereArgs != null) {
+      args.addAll(whereArgs);
+    }
+    where = _buildWhere(where, args);
     var ms = dataStore.find(tableName,
         where: where,
         distinct: distinct,
         columns: columns,
-        whereArgs: whereArgs,
+        whereArgs: args,
         groupBy: groupBy,
         having: having,
         orderBy: orderBy,
@@ -129,13 +135,16 @@ abstract class GeneralBaseService<T> {
     int limit = defaultLimit,
     int offset = defaultOffset,
   }) async {
-    whereArgs = whereArgs ?? [];
-    where = _buildWhere(where, whereArgs);
+    List<Object> args = [];
+    if (whereArgs != null) {
+      args.addAll(whereArgs);
+    }
+    where = _buildWhere(where, args);
     var page = dataStore.findPage(tableName,
         where: where,
         distinct: distinct,
         columns: columns,
-        whereArgs: whereArgs,
+        whereArgs: args,
         groupBy: groupBy,
         having: having,
         orderBy: orderBy,
@@ -282,10 +291,13 @@ abstract class GeneralBaseService<T> {
 
   /// 删除记录。根据entity的id字段作为条件删除，entity可以是Map
   int delete({dynamic entity, String? where, List<Object>? whereArgs}) {
-    whereArgs = whereArgs ?? [];
-    where = _buildWhere(where, whereArgs);
+    List<Object> args = [];
+    if (whereArgs != null) {
+      args.addAll(whereArgs);
+    }
+    where = _buildWhere(where, args);
     return dataStore.delete(tableName,
-        entity: entity, where: where, whereArgs: whereArgs);
+        entity: entity, where: where, whereArgs: args);
   }
 
   /// 更新记录。根据entity的id字段作为条件，其他字段作为更新的值，entity可以是Map
@@ -295,11 +307,14 @@ abstract class GeneralBaseService<T> {
     List<Object>? whereArgs,
   }) async {
     EntityUtil.updateTimestamp(entity);
-    whereArgs = whereArgs ?? [];
-    where = _buildWhere(where, whereArgs);
+    List<Object> args = [];
+    if (whereArgs != null) {
+      args.addAll(whereArgs);
+    }
+    where = _buildWhere(where, args);
     Map<String, dynamic> json = await encrypt(entity);
     int result =
-        dataStore.update(tableName, json, where: where, whereArgs: whereArgs);
+        dataStore.update(tableName, json, where: where, whereArgs: args);
     return result;
   }
 
