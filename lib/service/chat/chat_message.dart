@@ -24,6 +24,7 @@ import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
@@ -775,6 +776,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         if (chatMessage.thumbnail == null &&
             contentType == ChatMessageContentType.image.name) {
           Uint8List image = CryptoUtil.decodeBase64(content);
+          mimeType = FileUtil.subMimeType(mimeType!);
           Uint8List? data = await ImageUtil.compressThumbnail(
               image: image, extension: mimeType!);
           if (data != null) {

@@ -170,9 +170,11 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       // Uint8List? thumbnail =
       //     await ImageUtil.compressThumbnail(assetEntity: result[0]);
       String? mimeType = result[0].mimeType;
-      if (mimeType != null) {
-        mimeType = FileUtil.subMimeType(mimeType);
+      String? title = result[0].title;
+      if (title != null) {
+        mimeType = FileUtil.mimeType(title);
       }
+      mimeType = mimeType ?? 'text/plain';
       await chatMessageController.send(
           title: result[0].title,
           content: data,
@@ -200,7 +202,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       //     await ImageUtil.compressThumbnail(xfile: mediaFile);
       String filename = mediaFile!.name;
       String? mimeType = mediaFile!.mimeType;
-      mimeType = mimeType ?? FileUtil.extension(filename);
+      mimeType = FileUtil.mimeType(filename);
+      mimeType = mimeType ?? 'text/plain';
       ChatMessageContentType contentType = ChatMessageContentType.image;
       if (mimeType.endsWith('mp4')) {
         contentType = ChatMessageContentType.video;
@@ -298,7 +301,8 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       // Uint8List? thumbnail = await ImageUtil.compressThumbnail(xfile: xfile);
       String filename = xfile.name;
       String? mimeType = xfile.mimeType;
-      mimeType = mimeType ?? FileUtil.mimeType(filename);
+      mimeType = FileUtil.mimeType(filename);
+      mimeType = mimeType ?? 'text/plain';
       await chatMessageController.send(
           title: filename,
           content: data,
