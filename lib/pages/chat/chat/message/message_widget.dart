@@ -633,7 +633,7 @@ class MessageWidget {
     Widget prefix = IconButton(
         onPressed: null,
         icon: Icon(
-          Icons.extension,
+          Icons.extension_off,
           color: myself.primary,
         ));
     var tileData = TileData(

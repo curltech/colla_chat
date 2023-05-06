@@ -1,4 +1,5 @@
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:flutter/material.dart';
@@ -49,7 +50,12 @@ class ImageMessage extends StatelessWidget {
               );
             }
           }
-          return const Icon(Icons.downloading_outlined);
+          return IconButton(
+              onPressed: null,
+              icon: Icon(
+                Icons.extension_off,
+                color: myself.primary,
+              ));
         });
 
     return imageWidget;
