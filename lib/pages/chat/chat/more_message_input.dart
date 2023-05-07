@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
@@ -9,6 +10,7 @@ import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/mobile_camera_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -271,8 +273,6 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   Future<void> _onActionNameCard() async {
     await DialogUtil.show(
         context: context,
-        title: AppBarWidget.buildTitleBar(
-            title: const CommonAutoSizeText('Select one linkman')),
         builder: (BuildContext context) {
           return LinkmanGroupSearchWidget(
               onSelected: (List<String>? selected) async {
@@ -283,8 +283,22 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
                     String content = JsonUtil.toJsonString(linkman);
                     await chatMessageController.sendText(
                         message: content,
-                        contentType: ChatMessageContentType.card);
+                        contentType: ChatMessageContentType.card,
+                        mimeType: PartyType.linkman.name);
+                  } else {
+                    Group? group =
+                        await groupService.findCachedOneByPeerId(selected[0]);
+                    if (group != null) {
+                      String content = JsonUtil.toJsonString(group);
+                      await chatMessageController.sendText(
+                          message: content,
+                          contentType: ChatMessageContentType.card,
+                          mimeType: PartyType.group.name);
+                    }
                   }
+                }
+                if (mounted) {
+                  Navigator.pop(context);
                 }
               },
               selected: const <String>[],

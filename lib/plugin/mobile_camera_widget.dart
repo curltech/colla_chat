@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:camera/camera.dart';
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -138,7 +139,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
           child: Container(),
         ),
         Container(
-            color: Colors.white.withOpacity(0.2),
+            color: Colors.grey.withOpacity(AppOpacity.lgOpacity),
             child: Center(
                 child: Column(children: <Widget>[
               _buildCameraModeWidget(),
@@ -172,8 +173,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 CommonAutoSizeText(
-                  AppLocalizations.t('Resolution') +
-                      ': ${resolutionPreset.name}',
+                  '${AppLocalizations.t('Resolution')}: ${resolutionPreset.name}',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12.0,
@@ -181,8 +181,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
                   ),
                 ),
                 CommonAutoSizeText(
-                  AppLocalizations.t('Size') +
-                      ': ${previewSize.width.toStringAsFixed(0)}x${previewSize.height.toStringAsFixed(0)}',
+                  '${AppLocalizations.t('Size')}: ${previewSize.width.toStringAsFixed(0)}x${previewSize.height.toStringAsFixed(0)}',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 12.0,
@@ -299,7 +298,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
               icon: const Icon(Icons.flash_on),
               color: primary,
               onPressed: controller != null ? _toggleFlashMode : null,
-              tooltip: 'Toggle FlashMode',
+              tooltip: AppLocalizations.t('Toggle FlashMode'),
             ),
             // The exposure and focus mode are currently not supported on the web.
             ...!kIsWeb
@@ -309,13 +308,13 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
                       color: primary,
                       onPressed:
                           controller != null ? _toggleExposureMode : null,
-                      tooltip: 'Toggle ExposureMode',
+                      tooltip: AppLocalizations.t('Toggle ExposureMode'),
                     ),
                     IconButton(
                       icon: const Icon(Icons.filter_center_focus),
                       color: primary,
                       onPressed: controller != null ? _toggleFocusMode : null,
-                      tooltip: 'Toggle FocusMode',
+                      tooltip: AppLocalizations.t('Toggle FocusMode'),
                     )
                   ]
                 : <Widget>[],
@@ -327,7 +326,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
               color: primary,
               onPressed:
                   controller != null ? _toggleCaptureOrientationLock : null,
-              tooltip: 'Toggle CaptureOrientationLock',
+              tooltip: AppLocalizations.t('Toggle CaptureOrientationLock'),
             ),
           ],
         ),
@@ -355,7 +354,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
               onPressed: controller != null
                   ? () => _setFlashMode(FlashMode.off)
                   : null,
-              tooltip: 'Set FlashMode Off',
+              tooltip: AppLocalizations.t('Set FlashMode Off'),
             ),
             IconButton(
               icon: const Icon(Icons.flash_auto),
@@ -365,7 +364,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
               onPressed: controller != null
                   ? () => _setFlashMode(FlashMode.auto)
                   : null,
-              tooltip: 'Set FlashMode Auto',
+              tooltip: AppLocalizations.t('Set FlashMode Auto'),
             ),
             IconButton(
               icon: const Icon(Icons.flash_on),
@@ -375,7 +374,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
               onPressed: controller != null
                   ? () => _setFlashMode(FlashMode.always)
                   : null,
-              tooltip: 'Set FlashMode Always',
+              tooltip: AppLocalizations.t('Set FlashMode Always'),
             ),
             IconButton(
               icon: const Icon(Icons.highlight),
@@ -385,7 +384,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
               onPressed: controller != null
                   ? () => _setFlashMode(FlashMode.torch)
                   : null,
-              tooltip: 'Set FlashMode Torch',
+              tooltip: AppLocalizations.t('Set FlashMode Torch'),
             ),
           ],
         ),
@@ -554,7 +553,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
           icon: Icon(enableAudio ? Icons.volume_up : Icons.volume_mute),
           color: primary,
           onPressed: controller != null ? _toggleAudioMode : null,
-          tooltip: 'Toggle AudioMode',
+          tooltip: AppLocalizations.t('Toggle AudioMode'),
         ),
         IconButton(
           icon: Icon(isPicture ? Icons.camera_alt : Icons.videocam),
@@ -564,7 +563,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
               isPicture = !isPicture;
             });
           },
-          tooltip: 'Toggle Picture Video',
+          tooltip: AppLocalizations.t('Toggle Picture Video'),
         ),
         CircleTextButton(
           onPressed:
@@ -589,7 +588,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
                   ? _resumeVideoRecording
                   : _pauseVideoRecording
               : null,
-          tooltip: 'Play/Pause',
+          tooltip: AppLocalizations.t('Play/Pause'),
         ),
         IconButton(
           icon: const Icon(Icons.pause_presentation),
@@ -598,7 +597,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
                   ? Colors.red
                   : primary,
           onPressed: cameraController == null ? null : _togglePreview,
-          tooltip: 'Toggle Preview',
+          tooltip: AppLocalizations.t('Toggle Preview'),
         ),
       ],
     );
@@ -693,7 +692,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
 
   void _showInSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: CommonAutoSizeText(message),
+      content: CommonAutoSizeText(AppLocalizations.t(message)),
       duration: const Duration(seconds: 5),
     ));
   }
@@ -1077,7 +1076,7 @@ class _MobileCameraWidgetState extends State<MobileCameraWidget>
         : VideoPlayerController.file(File(mediaFile!.path));
 
     videoPlayerListener = () {
-      if (videoController != null && videoController!.value.size != null) {
+      if (videoController != null) {
         // Refreshing the state to update video player with the correct ratio.
         if (mounted) {
           setState(() {});

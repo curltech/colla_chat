@@ -472,10 +472,13 @@ class MessageWidget {
     if (content != null) {
       content = chatMessageService.recoverContent(content);
     }
+    String? mimeType = chatMessage.mimeType;
     return NameCardMessage(
       key: UniqueKey(),
       content: content!,
       isMyself: isMyself,
+      fullScreen: fullScreen,
+      mimeType: mimeType,
     );
   }
 
