@@ -91,31 +91,34 @@ class NameCardMessage extends StatelessWidget {
     Map<String, dynamic> map = JsonUtil.toJson(content);
     if (mimeType == PartyType.linkman.name) {
       Linkman linkman = Linkman.fromJson(map);
-      if (fullScreen) {
-        return _buildLinkman(linkman);
-      }
+
       peerId = linkman.peerId;
       name = linkman.name;
       avatar = linkman.avatar;
       prefix = ImageUtil.buildImageWidget(
-          image: avatar, isRadius: true, radius: 4.0);
+          image: avatar, isRadius: true, radius: 2.0);
+      linkman.avatarImage = prefix;
+      if (fullScreen) {
+        return _buildLinkman(linkman);
+      }
     }
     if (mimeType == PartyType.group.name) {
       Group group = Group.fromJson(map);
-      if (fullScreen) {
-        return _buildGroup(group);
-      }
       peerId = group.peerId;
       name = group.name;
       avatar = group.avatar;
       if (avatar != null) {
         prefix = ImageUtil.buildImageWidget(
-            image: avatar, isRadius: true, radius: 4.0);
+            image: avatar, isRadius: true, radius: 2.0);
       } else {
         prefix = Icon(
           Icons.group_outlined,
           color: myself.primary,
         );
+      }
+      group.avatarImage = prefix;
+      if (fullScreen) {
+        return _buildGroup(group);
       }
     }
     prefix = IconButton(onPressed: null, icon: prefix!);
