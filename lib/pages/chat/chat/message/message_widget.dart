@@ -484,7 +484,6 @@ class MessageWidget {
 
   LocationMessage buildLocationMessageWidget(BuildContext context) {
     String? content = chatMessage.content;
-    List<int>? data;
     if (content != null) {
       content = chatMessageService.recoverContent(content);
     }

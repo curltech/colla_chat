@@ -878,7 +878,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         Duration duration = now.difference(readTime);
         int leftDeleteTime = deleteTime - duration.inSeconds;
         if (leftDeleteTime <= 0) {
-          chatMessageService.delete(entity: chatMessage);
+          chatMessageService
+              .remove(where: 'id=?', whereArgs: [chatMessage.id!]);
         }
       }
     }

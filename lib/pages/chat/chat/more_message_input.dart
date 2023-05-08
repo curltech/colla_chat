@@ -18,7 +18,6 @@ import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -27,7 +26,6 @@ import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
@@ -110,7 +108,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         _onActionVideoChat();
         break;
       case 'Location':
-        _onActionLocation();
+        _onActionLocation(context);
         break;
       case 'Name card':
         _onActionNameCard();
@@ -133,8 +131,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   _onActionDeleteTime() async {
     int? deleteTime = await DialogUtil.showSelectDialog<int>(
         context: context,
-        title: AppBarWidget.buildTitleBar(
-            title: const CommonAutoSizeText('Select deleteTime')),
+        title: const CommonAutoSizeText('Select deleteTime'),
         items: [
           _buildOption(0),
           _buildOption(15),
@@ -221,52 +218,67 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
   }
 
   ///位置
-  void _onActionLocation() async {
+  void _onActionLocation(BuildContext context) async {
     Position position = await GeolocatorUtil.currentPosition();
     double latitude = position.latitude;
     double longitude = position.longitude;
     String? address;
-    await SmartDialogUtil.show(
-        title: AppBarWidget.buildTitleBar(
-            title: CommonAutoSizeText(AppLocalizations.t('Location map'))),
-        builder: (BuildContext? context) {
-          return GeolocatorUtil.buildLocationPicker(
-              latitude: latitude,
-              longitude: longitude,
-              onPicked: (PickedData data) {
-                longitude = data.latLong.longitude;
-                latitude = data.latLong.latitude;
-                address = data.address;
-                SmartDialog.dismiss();
-              });
-        });
-    // await SmartDialogUtil.show(
-    //     context: context,
-    //     title: AppLocalizations.t('Location map'),
-    //     builder: (BuildContext context) {
-    //       return GeolocatorUtil.buildPlatformMap(
-    //         latitude: latitude,
-    //         longitude: longitude,
-    //         onTap: (latLng) {
-    //           longitude = latLng.longitude;
-    //           latitude = latLng.latitude;
-    //         },
-    //       );
-    //     });
-    LocationPosition locationPosition;
-    if (address != null) {
-      locationPosition = LocationPosition(
-          longitude: longitude, latitude: latitude, address: address);
-    } else {
-      var json = position.toJson();
-      locationPosition = LocationPosition.fromJson(json);
+    List<Widget>? rightWidgets = [
+      IconButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          icon: const Icon(
+            Icons.close,
+            color: Colors.white,
+          )),
+    ];
+
+    if (mounted) {
+      Widget title = AppBarWidget.buildAppBar(
+        context,
+        title: CommonAutoSizeText(
+          AppLocalizations.t('Location map'),
+          style: const TextStyle(color: Colors.white),
+        ),
+        rightWidgets: rightWidgets,
+      );
+      await DialogUtil.show(
+          context: context,
+          builder: (BuildContext? context) {
+            return Dialog(
+                child: Column(children: [
+              title,
+              Expanded(
+                  child: GeolocatorUtil.buildLocationPicker(
+                      latitude: latitude,
+                      longitude: longitude,
+                      onPicked: (PickedData data) {
+                        longitude = data.latLong.longitude;
+                        latitude = data.latLong.latitude;
+                        address = data.address;
+                        Navigator.pop(context!);
+                      }))
+            ]));
+          });
+      if (address == null) {
+        return;
+      }
+      LocationPosition locationPosition;
+      if (address != null) {
+        locationPosition = LocationPosition(
+            longitude: longitude, latitude: latitude, address: address);
+      } else {
+        var json = position.toJson();
+        locationPosition = LocationPosition.fromJson(json);
+      }
+      Map<String, dynamic> map = locationPosition.toJson();
+      EntityUtil.removeNull(map);
+      JsonUtil.toJsonString(map);
+      String content = JsonUtil.toJsonString(map);
+      await chatMessageController.sendText(
+          message: content, contentType: ChatMessageContentType.location);
     }
-    Map<String, dynamic> map = locationPosition.toJson();
-    EntityUtil.removeNull(map);
-    JsonUtil.toJsonString(map);
-    String content = JsonUtil.toJsonString(map);
-    await chatMessageController.sendText(
-        message: content, contentType: ChatMessageContentType.location);
   }
 
   ///名片

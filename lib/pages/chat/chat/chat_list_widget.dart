@@ -248,7 +248,9 @@ class _ChatListWidgetState extends State<ChatListWidget>
       if (contentType == ChatMessageContentType.location.name) {
         subtitle = chatMessageService.recoverContent(content);
         Map<String, dynamic> map = JsonUtil.toJson(subtitle);
-        subtitle = map['address'];
+        String? address = map['address'];
+        address = address ?? '';
+        subtitle = address;
       }
     } else {
       subtitle = AppLocalizations.t(subMessageType);

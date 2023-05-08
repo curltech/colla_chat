@@ -118,10 +118,12 @@ class DialogUtil {
     }
     T? value = await show<T>(
       context: context,
-      title: title,
       builder: (BuildContext context) {
         return Dialog(
-          child: ListView(children: options),
+          child: Column(children: [
+            AppBarWidget.buildAppBar(context, title: title),
+            Expanded(child: ListView(children: options))
+          ]),
         );
       },
     );
@@ -146,7 +148,12 @@ class DialogUtil {
             style: checked ? style : null,
           ),
           const Spacer(),
-          checked ? const Icon(Icons.check) : Container()
+          checked
+              ? Icon(
+                  Icons.check,
+                  color: myself.primary,
+                )
+              : Container()
         ]));
   }
 

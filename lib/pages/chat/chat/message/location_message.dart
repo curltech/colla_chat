@@ -1,10 +1,12 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/chat/message/common_message.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 
 ///消息体：定位消息
 class LocationMessage extends StatelessWidget {
@@ -41,9 +43,9 @@ class LocationMessage extends StatelessWidget {
     if (thumbnail != null) {
       headingWidget = ImageUtil.buildImageWidget(image: thumbnail);
     }
-    Widget tile;
-    if (fullScreen) {
-      tile = Center(
+    Widget child;
+    if (!fullScreen) {
+      child = Center(
         child: Padding(
           padding: const EdgeInsets.all(10),
           child: Row(children: [
@@ -65,26 +67,12 @@ class LocationMessage extends StatelessWidget {
         ),
       );
     } else {
-      tile = Center(
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Row(children: [
-            headingWidget,
-            const SizedBox(
-              width: 5,
-            ),
-            Expanded(
-              child: address != null
-                  ? CommonAutoSizeText(
-                      '${AppLocalizations.t('Address')}:$address',
-                      softWrap: true)
-                  : CommonAutoSizeText(
-                      '${AppLocalizations.t('Longitude')}:$longitude\n${AppLocalizations.t('Latitude')}:$latitude'),
-            ),
-          ]),
-        ),
+      child = GeolocatorUtil.buildLocationPicker(
+        latitude: latitude,
+        longitude: longitude,
+        onPicked: (PickedData data) {},
       );
     }
-    return Card(elevation: 0, child: tile);
+    return CommonMessage(child: child);
   }
 }
