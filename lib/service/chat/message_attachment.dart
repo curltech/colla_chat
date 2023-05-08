@@ -149,10 +149,11 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
 
   ///把加密的内容写入文件，或者附件记录
   ///content直接base64解码,加密,然后写入文件
-  Future<void> store(int id, String messageId, String? title, String content,
+  Future<String?> store(int id, String messageId, String? title, String content,
       EntityState state) async {
+    String? filename;
     if (!platformParams.web) {
-      final filename = await getEncryptFilename(messageId, title);
+      filename = await getEncryptFilename(messageId, title);
       Uint8List? data = CryptoUtil.decodeBase64(content);
       if (filename != null) {
         data = await encryptContent(data);
@@ -173,6 +174,8 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
         await messageAttachmentService.update(attachment);
       }
     }
+
+    return filename;
   }
 
   ///删除消息的附件

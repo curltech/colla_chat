@@ -1,4 +1,8 @@
+import 'package:colla_chat/pages/chat/chat/message/common_message.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
+import 'package:colla_chat/tool/image_util.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:flutter/material.dart';
 
@@ -9,18 +13,40 @@ class VideoMessage extends StatelessWidget {
   final String messageId;
   final String? title;
   final bool isMyself;
+  final bool fullScreen;
 
-  const VideoMessage(
-      {Key? key,
-      required this.id,
-      required this.messageId,
-      required this.isMyself,
-      this.thumbnail,
-      this.title})
-      : super(key: key);
+  const VideoMessage({
+    Key? key,
+    required this.id,
+    required this.messageId,
+    required this.isMyself,
+    this.thumbnail,
+    this.title,
+    this.fullScreen = false,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    if (!fullScreen) {
+      Widget prefix = Icon(
+        Icons.video_call_outlined,
+        color: myself.primary,
+      );
+      prefix = IconButton(onPressed: null, icon: prefix);
+      if (thumbnail != null) {
+        prefix = ImageUtil.buildImageWidget(
+          image: thumbnail,
+        );
+      }
+      var tileData = TileData(
+        prefix: prefix,
+        title: title!,
+      );
+
+      return CommonMessage(
+        tileData: tileData,
+      );
+    }
     var videoPlayer = FutureBuilder(
         future: messageAttachmentService.getDecryptFilename(messageId, title),
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
@@ -33,7 +59,7 @@ class VideoMessage extends StatelessWidget {
               key: UniqueKey(),
               showPlaylist: false,
               filename: filename,
-              videoPlayerType: VideoPlayerType.webview,
+              videoPlayerType: VideoPlayerType.origin,
             );
           }
           return Container();

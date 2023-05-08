@@ -28,6 +28,7 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/tool/video_util.dart';
 
 // import 'package:colla_chat/transport/nearby_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
@@ -771,8 +772,6 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
               contentType == ChatMessageContentType.video.name ||
               contentType == ChatMessageContentType.audio.name ||
               contentType == ChatMessageContentType.rich.name)) {
-        //保存的时候，设置内容为空
-        chatMessage.content = null;
         if (chatMessage.thumbnail == null &&
             contentType == ChatMessageContentType.image.name) {
           Uint8List image = CryptoUtil.decodeBase64(content);
@@ -784,6 +783,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
             chatMessage.thumbnail = ImageUtil.base64Img(base64);
           }
         }
+        //保存的时候，设置内容为空
+        chatMessage.content = null;
         attachment = true;
         messageId = chatMessage.messageId;
       }
@@ -792,16 +793,32 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     try {
       await upsert(chatMessage);
       //作为附件存储内容
+      String? filename;
       if (messageId != null && attachment) {
         if (id == null) {
-          await messageAttachmentService.store(
+          filename = await messageAttachmentService.store(
               chatMessage.id!, messageId, title, content!, EntityState.insert);
         } else {
-          await messageAttachmentService.store(
+          filename = await messageAttachmentService.store(
               chatMessage.id!, messageId, title, content!, EntityState.update);
         }
         //恢复内容
         chatMessage.content = content;
+        if (filename != null) {
+          if (chatMessage.thumbnail == null &&
+              contentType == ChatMessageContentType.video.name) {
+            if (platformParams.mobile) {
+              Uint8List? data =
+                  await VideoUtil.thumbnailData(videoFile: filename);
+              if (data != null) {
+                String base64 = CryptoUtil.encodeBase64(data);
+                chatMessage.thumbnail = ImageUtil.base64Img(base64);
+                update({'thumbnail': base64},
+                    where: 'id=?', whereArgs: [chatMessage.id!]);
+              }
+            }
+          }
+        }
       }
       if (updateSummary) {
         await chatSummaryService.upsertByChatMessage(chatMessage,
@@ -840,6 +857,33 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     int count = super.delete(where: where, whereArgs: whereArgs);
 
     return Future.value(count);
+  }
+
+  /// 收藏
+  Future<ChatMessage> collect(ChatMessage chatMessage) async {
+    Map<String, dynamic> map = JsonUtil.toJson(chatMessage);
+    ChatMessage collectChatMessage = ChatMessage.fromJson(map);
+    var uuid = const Uuid();
+    String messageId = uuid.v4();
+    collectChatMessage.messageId = messageId;
+    collectChatMessage.id = null;
+    String? contentType = chatMessage.contentType;
+    if (contentType != null &&
+        (contentType == ChatMessageContentType.file.name ||
+            contentType == ChatMessageContentType.image.name ||
+            contentType == ChatMessageContentType.video.name ||
+            contentType == ChatMessageContentType.audio.name ||
+            contentType == ChatMessageContentType.rich.name)) {
+      Uint8List? data = await messageAttachmentService.findContent(
+          chatMessage.messageId!, chatMessage.title);
+      if (data != null) {
+        String content = CryptoUtil.encodeBase64(data);
+        collectChatMessage.content = content;
+      }
+    }
+    await store(collectChatMessage);
+
+    return collectChatMessage;
   }
 
   resend() async {

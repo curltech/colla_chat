@@ -220,8 +220,7 @@ class MessageWidget {
       {String? value}) async {
     switch (label) {
       case 'Delete':
-        chatMessageService
-            .remove(where: 'messageId=?', whereArgs: [chatMessage.messageId!]);
+        chatMessageService.remove(where: 'id=?', whereArgs: [chatMessage.id!]);
         chatMessageController.delete(index: this.index);
         break;
       case 'Cancel':
@@ -265,6 +264,7 @@ class MessageWidget {
         }
         break;
       case 'Collect':
+        chatMessageService.collect(chatMessage);
         break;
       case 'Refer':
         String? messageId = chatMessage.messageId;
@@ -574,6 +574,7 @@ class MessageWidget {
       title: title,
       isMyself: isMyself,
       thumbnail: thumbnail,
+      fullScreen: fullScreen,
     );
   }
 
@@ -589,6 +590,7 @@ class MessageWidget {
       messageId: messageId!,
       title: title,
       isMyself: isMyself,
+      fullScreen: fullScreen,
     );
   }
 

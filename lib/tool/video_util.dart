@@ -6,7 +6,7 @@ class VideoUtil {
   static Future<Uint8List?> thumbnailData({
     required String videoFile,
     Map<String, String>? headers,
-    ImageFormat imageFormat = ImageFormat.PNG,
+    ImageFormat imageFormat = ImageFormat.WEBP,
     int maxHeight = 0,
     int maxWidth = 0,
     int timeMs = 0,
@@ -30,7 +30,7 @@ class VideoUtil {
     required String videoFile,
     Map<String, String>? headers,
     String? thumbnailPath,
-    ImageFormat imageFormat = ImageFormat.PNG,
+    ImageFormat imageFormat = ImageFormat.WEBP,
     int maxHeight = 0,
     int maxWidth = 0,
     int timeMs = 0,
