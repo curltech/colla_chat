@@ -9,14 +9,18 @@ import 'package:flutter/material.dart';
 class ExtendedTextMessage extends StatelessWidget {
   final String content;
   final bool isMyself;
+  final bool fullScreen;
   final CustomSpecialTextSpanBuilder customSpecialTextSpanBuilder =
       CustomSpecialTextSpanBuilder();
 
-  ExtendedTextMessage({Key? key, required this.content, required this.isMyself})
+  ExtendedTextMessage(
+      {Key? key,
+      required this.content,
+      required this.isMyself,
+      this.fullScreen = false})
       : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildMessageWidget(BuildContext context) {
     return Padding(
         padding: const EdgeInsets.all(5),
         child: ExtendedText(
@@ -45,6 +49,7 @@ class ExtendedTextMessage extends StatelessWidget {
                   val = 'mailto:$val';
                 }
               }
+
               try {
                 UrlUtil.launch(val).then((bool success) {
                   if (!success) {
@@ -57,5 +62,10 @@ class ExtendedTextMessage extends StatelessWidget {
             }
           },
         ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return _buildMessageWidget(context);
   }
 }
