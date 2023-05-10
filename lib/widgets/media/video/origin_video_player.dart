@@ -59,15 +59,17 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   @override
   setCurrentIndex(int index) async {
     if (index >= -1 && index < playlist.length && currentIndex != index) {
-      PlatformMediaSource mediaSource = playlist[index];
-      var controller =
-          await OriginMediaSource.media(filename: mediaSource.filename);
-      if (controller != null) {
-        close();
-        await super.setCurrentIndex(index);
+      close();
+      await super.setCurrentIndex(index);
+      var currentMediaSource = this.currentMediaSource;
+      if (currentMediaSource != null) {
+        var controller = await OriginMediaSource.media(
+            filename: currentMediaSource.filename);
         _controller = controller;
         notifyListeners();
-        controller.play();
+        if (controller != null) {
+          controller.play();
+        }
       }
     }
   }
@@ -79,6 +81,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     bool showFullscreenButton = true,
     bool showVolumeButton = true,
   }) {
+    //Widget player = VideoPlayer(controller!);
     Widget player = controller != null
         ? JkVideoControlPanel(
             key: key,

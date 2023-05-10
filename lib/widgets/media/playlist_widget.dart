@@ -194,8 +194,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
     PlatformMediaSource mediaSource = widget.controller.playlist[index];
     var messageId = mediaSource.messageId;
     if (messageId != null) {
-      await chatMessageService
-          .delete(where: 'messageId=?', whereArgs: [messageId]);
+      chatMessageService.delete(where: 'messageId=?', whereArgs: [messageId]);
     }
   }
 
@@ -236,43 +235,59 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
 
   ///播放列表按钮
   Widget _buildPlaylistButton(BuildContext context) {
-    return ButtonBar(
+    return Container(
+        child: ButtonBar(
       children: [
-        InkWell(
-          child: const Icon(Icons.playlist_add),
-          onTap: () async {
+        IconButton(
+          icon: Icon(
+            Icons.playlist_add,
+            color: myself.primary,
+          ),
+          onPressed: () async {
             _addMediaSource();
           },
         ),
-        InkWell(
-          child: const Icon(Icons.playlist_remove),
-          onTap: () async {
+        IconButton(
+          icon: Icon(
+            Icons.playlist_remove,
+            color: myself.primary,
+          ),
+          onPressed: () async {
             var currentIndex = widget.controller.currentIndex;
             await widget.controller.remove(currentIndex);
           },
         ),
-        InkWell(
-          child: const Icon(Icons.video_collection),
-          onTap: () async {
+        IconButton(
+          icon: Icon(
+            Icons.video_collection,
+            color: myself.primary,
+          ),
+          onPressed: () async {
             await _collect();
           },
         ),
-        InkWell(
-          child: const Icon(Icons.collections),
-          onTap: () async {
+        IconButton(
+          icon: Icon(
+            Icons.collections,
+            color: myself.primary,
+          ),
+          onPressed: () async {
             var currentIndex = widget.controller.currentIndex;
             await _collectMediaSource(currentIndex);
           },
         ),
-        InkWell(
-          child: const Icon(Icons.bookmark_remove),
-          onTap: () async {
+        IconButton(
+          icon: Icon(
+            Icons.bookmark_remove,
+            color: myself.primary,
+          ),
+          onPressed: () async {
             var currentIndex = widget.controller.currentIndex;
             await _removeFromCollect(currentIndex);
           },
         ),
       ],
-    );
+    ));
   }
 
   @override

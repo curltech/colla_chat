@@ -66,6 +66,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
       String? mimeType = FileUtil.mimeType(filename);
       await chatMessageController.send(
           content: data,
+          title: FileUtil.filename(filename),
           contentType: ChatMessageContentType.audio,
           mimeType: mimeType,
           subMessageType: ChatMessageSubType.chat);

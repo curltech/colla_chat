@@ -1,6 +1,6 @@
+import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:flutter/material.dart';
@@ -33,40 +33,55 @@ class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
-  VideoPlayerType videoPlayerType = VideoPlayerType.origin;
+  VideoPlayerType videoPlayerType = VideoPlayerType.webview;
+  SwiperController swiperController = SwiperController();
 
   @override
   void initState() {
     super.initState();
   }
 
-  List<AppBarPopupMenu>? _buildRightPopupMenus() {
-    List<AppBarPopupMenu> menus = [];
-    for (var type in VideoPlayerType.values) {
-      AppBarPopupMenu menu = AppBarPopupMenu(
-          title: type.name,
-          onPressed: () {
-            setState(() {
-              videoPlayerType = type;
-            });
+  List<Widget>? _buildRightWidgets() {
+    List<Widget> children = [
+      IconButton(
+        onPressed: () {
+          swiperController.next();
+        },
+        icon: const Icon(Icons.featured_play_list_outlined),
+      ),
+      IconButton(
+        onPressed: () {
+          setState(() {
+            videoPlayerType = VideoPlayerType.webview;
           });
-      menus.add(menu);
-    }
-    return menus;
+        },
+        icon: const Icon(Icons.web_outlined),
+      ),
+      IconButton(
+        onPressed: () {
+          setState(() {
+            videoPlayerType = VideoPlayerType.origin;
+          });
+        },
+        icon: const Icon(Icons.video_call_outlined),
+      ),
+    ];
+    return children;
   }
 
   @override
   Widget build(BuildContext context) {
-    List<AppBarPopupMenu>? rightPopupMenus = _buildRightPopupMenus();
+    List<Widget>? rightWidgets = _buildRightWidgets();
     Widget child = PlatformMediaPlayer(
       key: UniqueKey(),
       showPlaylist: true,
       videoPlayerType: videoPlayerType,
+      swiperController: swiperController,
     );
     return AppBarView(
       title: widget.title,
       withLeading: true,
-      rightPopupMenus: rightPopupMenus,
+      rightWidgets: rightWidgets,
       child: child,
     );
   }

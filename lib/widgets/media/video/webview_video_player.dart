@@ -1,5 +1,3 @@
-import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/platform_webview.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:file_picker/file_picker.dart';
@@ -34,6 +32,20 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
 
   void _onWebViewCreated(PlatformWebViewController controller) {
     this.controller = controller;
+    _play();
+  }
+
+  @override
+  setCurrentIndex(int index) async {
+    if (index >= -1 && index < playlist.length && currentIndex != index) {
+      close();
+      await super.setCurrentIndex(index);
+      notifyListeners();
+
+      if (controller != null) {
+        _play();
+      }
+    }
   }
 
   @override
@@ -43,16 +55,13 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
     bool showFullscreenButton = true,
     bool showVolumeButton = true,
   }) {
-    if (currentMediaSource == null) {
-      return Center(
-          child: CommonAutoSizeText(
-        AppLocalizations.t('Please select a media file'),
-        style: const TextStyle(color: Colors.white),
-      ));
+    String? initialFilename;
+    if (currentMediaSource != null) {
+      initialFilename = currentMediaSource!.filename;
     }
     var platformWebView = PlatformWebView(
       key: key,
-      initialUrl: currentMediaSource!.filename,
+      initialFilename: initialFilename,
       onWebViewCreated: _onWebViewCreated,
     );
     return platformWebView;

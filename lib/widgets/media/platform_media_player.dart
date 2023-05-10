@@ -40,8 +40,10 @@ class PlatformMediaPlayer extends StatefulWidget {
 
   final String? filename;
   final List<int>? data;
+  SwiperController? swiperController;
+  late AbstractMediaPlayerController controller;
 
-  const PlatformMediaPlayer(
+  PlatformMediaPlayer(
       {Key? key,
       this.videoPlayerType,
       this.audioPlayerType,
@@ -54,86 +56,93 @@ class PlatformMediaPlayer extends StatefulWidget {
       this.width,
       this.height,
       this.filename,
-      this.data})
-      : super(key: key);
+      this.data,
+      this.swiperController})
+      : super(key: key) {
+    swiperController ??= SwiperController();
+    _updateMediaPlayerType();
+  }
+
+  _updateMediaPlayerType() {
+    if (videoPlayerType != null) {
+      switch (videoPlayerType) {
+        case VideoPlayerType.dart_vlc:
+          //controller = DartVlcVideoPlayerController();
+          break;
+        case VideoPlayerType.flick:
+          controller = FlickVideoPlayerController();
+          break;
+        case VideoPlayerType.origin:
+          controller = OriginVideoPlayerController();
+          break;
+        case VideoPlayerType.chewie:
+          controller = ChewieVideoPlayerController();
+          break;
+        case VideoPlayerType.webview:
+          controller = WebViewVideoPlayerController();
+          break;
+        default:
+          controller = WebViewVideoPlayerController();
+          break;
+      }
+    } else if (audioPlayerType != null) {
+      switch (audioPlayerType) {
+        case AudioPlayerType.webview:
+          controller = WebViewVideoPlayerController();
+          break;
+        case AudioPlayerType.just:
+          controller = JustAudioPlayerController();
+          break;
+        case AudioPlayerType.audioplayers:
+          controller = BlueFireAudioPlayerController();
+          break;
+        case AudioPlayerType.waveforms:
+          controller = WaveformsAudioPlayerController();
+          break;
+        default:
+          controller = WebViewVideoPlayerController();
+          break;
+      }
+    } else {
+      controller = WebViewVideoPlayerController();
+    }
+    if (filename != null) {
+      controller.add(filename: filename!);
+      controller.playlistVisible = false;
+    }
+  }
+
+  _onSelected(int index, String filename) {
+    swiperController!.move(1);
+  }
 
   @override
   State createState() => _PlatformMediaPlayerState();
 }
 
 class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
-  late AbstractMediaPlayerController controller;
-  SwiperController swiperController = SwiperController();
-
   @override
   void initState() {
     super.initState();
-    _updateMediaPlayerType();
-    controller.addListener(_update);
-    if (widget.filename != null) {
-      controller.add(filename: widget.filename!);
-      controller.playlistVisible = false;
-    }
+    widget.controller.addListener(_update);
   }
 
   _update() {
     setState(() {});
   }
 
-  _updateMediaPlayerType() {
-    switch (widget.videoPlayerType) {
-      case VideoPlayerType.dart_vlc:
-        //controller = DartVlcVideoPlayerController();
-        break;
-      case VideoPlayerType.flick:
-        controller = FlickVideoPlayerController();
-        break;
-      case VideoPlayerType.origin:
-        controller = OriginVideoPlayerController();
-        break;
-      case VideoPlayerType.chewie:
-        controller = ChewieVideoPlayerController();
-        break;
-      case VideoPlayerType.webview:
-        controller = WebViewVideoPlayerController();
-        break;
-      default:
-        break;
-    }
-    switch (widget.audioPlayerType) {
-      case AudioPlayerType.webview:
-        controller = WebViewVideoPlayerController();
-        break;
-      case AudioPlayerType.just:
-        controller = JustAudioPlayerController();
-        break;
-      case AudioPlayerType.audioplayers:
-        controller = BlueFireAudioPlayerController();
-        break;
-      case AudioPlayerType.waveforms:
-        controller = WaveformsAudioPlayerController();
-        break;
-      default:
-        break;
-    }
-  }
-
-  _onSelected(int index, String filename) {
-    swiperController.move(1);
-  }
-
   Widget _buildMediaPlayer(BuildContext context) {
     Widget mediaView;
-    Widget player = controller.buildMediaPlayer(key: UniqueKey());
+    Widget player = widget.controller.buildMediaPlayer(key: UniqueKey());
     if (widget.showPlaylist) {
       mediaView = Swiper(
         itemCount: 2,
-        controller: swiperController,
+        controller: widget.swiperController!,
         itemBuilder: (BuildContext context, int index) {
           if (index == 0) {
             return PlaylistWidget(
-              controller: controller,
-              onSelected: _onSelected,
+              controller: widget.controller,
+              onSelected: widget._onSelected,
             );
           }
           if (index == 1) {
@@ -163,8 +172,7 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
 
   @override
   void dispose() {
-    controller.removeListener(_update);
-    controller.dispose();
+    widget.controller.removeListener(_update);
     super.dispose();
   }
 }

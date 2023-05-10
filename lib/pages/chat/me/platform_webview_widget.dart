@@ -29,14 +29,11 @@ class _PlatformWebViewWidgetState extends State<PlatformWebViewWidget> {
 
   PlatformWebViewController? platformWebViewController;
 
-  String initUrl = 'https://bing.com';
-
   bool fullScreen = false;
 
   @override
   void initState() {
     super.initState();
-    urlTextController.text = initUrl;
   }
 
   Widget buildTextField() {
@@ -73,13 +70,17 @@ class _PlatformWebViewWidgetState extends State<PlatformWebViewWidget> {
       ),
       Expanded(
           child: CommonAutoSizeTextFormField(
-        prefixIcon: const Icon(Icons.http),
+        //prefixIcon: const Icon(Icons.http),
         controller: urlTextController,
         keyboardType: TextInputType.url,
         onFieldSubmitted: (String url) {
-          //String url = urlController.text;
-          if (!url.startsWith('http')) {
+          String second = url.substring(1, 2);
+          if (!url.startsWith('http') &&
+              !url.startsWith('file') &&
+              !url.startsWith('/') &&
+              second != ':') {
             url = 'https://$url';
+            urlTextController.text = url;
           }
           platformWebViewController?.load(url);
         },
@@ -111,12 +112,10 @@ class _PlatformWebViewWidgetState extends State<PlatformWebViewWidget> {
   Widget buildWebView(BuildContext context) {
     return Column(children: <Widget>[
       buildTextField(),
-      Expanded(
-          child: PlatformWebView(
-              initialUrl: initUrl,
-              onWebViewCreated: (PlatformWebViewController controller) {
-                platformWebViewController = controller;
-              }))
+      Expanded(child: PlatformWebView(
+          onWebViewCreated: (PlatformWebViewController controller) {
+        platformWebViewController = controller;
+      }))
     ]);
   }
 

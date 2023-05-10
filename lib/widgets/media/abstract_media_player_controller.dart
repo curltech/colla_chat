@@ -217,11 +217,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   remove(int index) async {
     if (index >= 0 && index < playlist.length) {
       playlist.removeAt(index);
-      if (index == 0) {
-        await setCurrentIndex(index);
-      } else {
-        await setCurrentIndex(index - 1);
-      }
+      await setCurrentIndex(index - 1);
     }
   }
 

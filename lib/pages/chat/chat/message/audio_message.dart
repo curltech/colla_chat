@@ -24,21 +24,6 @@ class AudioMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!fullScreen) {
-      Widget prefix = Icon(
-        Icons.multitrack_audio,
-        color: myself.primary,
-      );
-      prefix = IconButton(onPressed: null, icon: prefix);
-      var tileData = TileData(
-        prefix: prefix,
-        title: title!,
-      );
-
-      return CommonMessage(
-        tileData: tileData,
-      );
-    }
     var audioPlayer = FutureBuilder(
         future: messageAttachmentService.getDecryptFilename(messageId, title),
         builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
