@@ -10,8 +10,9 @@ import 'package:colla_chat/widgets/media/audio/abstract_audio_player_controller.
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
+///简单地播放音频文件，没有控制器按钮和状态
 class BlueFireAudioPlayer {
-  late AudioPlayer player;
+  AudioPlayer player = AudioPlayer();
 
   static GlobalPlatformInterface get _global => AudioPlayer.global;
 
@@ -22,7 +23,6 @@ class BlueFireAudioPlayer {
   AudioContext audioContext = const AudioContext();
 
   BlueFireAudioPlayer() {
-    player = AudioPlayer();
     _global.setGlobalAudioContext(audioContextConfig.build());
   }
 
@@ -162,9 +162,10 @@ class BlueFireAudioSource {
   }
 }
 
-///音频播放器，Android, iOS, Linux, macOS, Windows, and web.
+///完整的音频播放器，Android, iOS, Linux, macOS, Windows, and web.
+///带有控制器按钮和状态跟踪
 class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
-  late AudioPlayer player;
+  AudioPlayer player = AudioPlayer();
 
   StreamSubscription? _durationSubscription;
   StreamSubscription? _positionSubscription;
@@ -172,45 +173,45 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
   StreamSubscription? _playerStateChangeSubscription;
 
   BlueFireAudioPlayerController() : super() {
-    player = AudioPlayer();
     _initStreams();
   }
 
   void _initStreams() {
     _durationSubscription = player.onDurationChanged.listen((duration) {
-      value = VideoPlayerValue(duration: duration);
+      playerValue = VideoPlayerValue(duration: duration);
     });
 
     _positionSubscription = player.onPositionChanged.listen((position) {
-      value = VideoPlayerValue(duration: value.duration, position: position);
+      playerValue =
+          VideoPlayerValue(duration: playerValue.duration, position: position);
     });
 
     _playerCompleteSubscription = player.onPlayerComplete.listen((event) {
-      value = VideoPlayerValue(
-        duration: value.duration,
+      playerValue = VideoPlayerValue(
+        duration: playerValue.duration,
       );
     });
 
     _playerStateChangeSubscription =
         player.onPlayerStateChanged.listen((state) {
       if (state == PlayerState.completed) {
-        value = VideoPlayerValue(
-          duration: value.duration,
+        playerValue = VideoPlayerValue(
+          duration: playerValue.duration,
           isPlaying: false,
         );
       } else if (state == PlayerState.playing) {
-        value = VideoPlayerValue(
-          duration: value.duration,
+        playerValue = VideoPlayerValue(
+          duration: playerValue.duration,
           isPlaying: true,
         );
       } else if (state == PlayerState.paused) {
-        value = VideoPlayerValue(
-          duration: value.duration,
+        playerValue = VideoPlayerValue(
+          duration: playerValue.duration,
           isPlaying: false,
         );
       } else if (state == PlayerState.stopped) {
-        value = VideoPlayerValue(
-          duration: value.duration,
+        playerValue = VideoPlayerValue(
+          duration: playerValue.duration,
           isPlaying: false,
         );
       }
@@ -288,7 +289,7 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
 
   @override
   Future<double> getVolume() async {
-    return Future.value(value.volume);
+    return Future.value(playerValue.volume);
   }
 
   @override
@@ -299,7 +300,7 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
 
   @override
   Future<double> getSpeed() async {
-    return Future.value(value.playbackSpeed);
+    return Future.value(playerValue.playbackSpeed);
   }
 
   @override

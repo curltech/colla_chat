@@ -9,14 +9,14 @@ abstract class AbstractAudioPlayerController
     extends AbstractMediaPlayerController {
   int _duration = -1;
   String _durationText = '';
-  PlayerStatus playerStatus = PlayerStatus.stop;
 
   AbstractAudioPlayerController() : super() {
     fileType = FileType.any;
     allowedExtensions = ['mp3', 'wav'];
   }
 
-  VideoPlayerValue _value = const VideoPlayerValue(duration: Duration.zero);
+  VideoPlayerValue _playerValue =
+      const VideoPlayerValue(duration: Duration.zero);
   bool _closedCaptionFile = false;
 
   ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频
@@ -31,27 +31,29 @@ abstract class AbstractAudioPlayerController
   seek(Duration position, {int? index});
 
   Future<double> getSpeed() {
-    return Future.value(_value.playbackSpeed);
+    return Future.value(_playerValue.playbackSpeed);
   }
 
   setSpeed(double speed) {
-    _value = _value.copyWith(duration: _value.duration, playbackSpeed: speed);
+    _playerValue = _playerValue.copyWith(
+        duration: _playerValue.duration, playbackSpeed: speed);
   }
 
   Future<double> getVolume() {
-    return Future.value(_value.volume);
+    return Future.value(_playerValue.volume);
   }
 
   setVolume(double volume) {
-    _value = _value.copyWith(duration: _value.duration, volume: volume);
+    _playerValue =
+        _playerValue.copyWith(duration: _playerValue.duration, volume: volume);
   }
 
-  VideoPlayerValue get value {
-    return _value;
+  VideoPlayerValue get playerValue {
+    return _playerValue;
   }
 
-  set value(VideoPlayerValue value) {
-    _value = _value.copyWith(
+  set playerValue(VideoPlayerValue value) {
+    _playerValue = _playerValue.copyWith(
         duration: value.duration,
         size: value.size,
         position: value.position,
@@ -78,12 +80,10 @@ abstract class AbstractAudioPlayerController
   }
 
   Future<void> _action() async {
-    if (playerStatus == PlayerStatus.playing) {
+    if (_playerValue.isPlaying) {
       await pause();
-    } else if (playerStatus == PlayerStatus.stop) {
+    } else {
       await play();
-    } else if (playerStatus == PlayerStatus.pause) {
-      await resume();
     }
   }
 
@@ -96,14 +96,13 @@ abstract class AbstractAudioPlayerController
   }) {
     var controlText = AppLocalizations.t(_durationText);
     Icon playIcon;
-    if (playerStatus == PlayerStatus.playing) {
+    if (_playerValue.isPlaying) {
       playIcon = const Icon(Icons.pause, size: 32);
     } else {
       playIcon = const Icon(Icons.play_arrow, size: 32);
     }
     List<Widget> controls = [];
-    if (playerStatus == PlayerStatus.playing ||
-        playerStatus == PlayerStatus.pause) {
+    if (_playerValue.isPlaying) {
       controls.add(
         IconButton(
           icon: const Icon(Icons.stop, size: 32),

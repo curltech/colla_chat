@@ -167,7 +167,7 @@ class _PlatformMediaControlPanelState extends State<PlatformMediaControlPanel>
   }
 
   Future<void> _onPlayerValueChanged() async {
-    final playerValue = widget.controller.value;
+    final playerValue = widget.controller.playerValue;
     bool isInitializing = !playerValue.isInitialized && !playerValue.hasError;
 
     if (!playing.value && playerValue.isPlaying && panelVisibility.value) {
@@ -319,7 +319,7 @@ class _PlatformMediaControlPanelState extends State<PlatformMediaControlPanel>
   }
 
   String _duration2TimeStr(Duration duration) {
-    var value = widget.controller.value;
+    var value = widget.controller.playerValue;
     if (value.duration.inHours > 0) {
       return sprintf("%02d:%02d:%02d",
           [duration.inHours, duration.inMinutes % 60, duration.inSeconds % 60]);
@@ -358,7 +358,7 @@ class _PlatformMediaControlPanelState extends State<PlatformMediaControlPanel>
   }
 
   void _togglePlayPause() {
-    var value = widget.controller.value;
+    var value = widget.controller.playerValue;
     if (!value.isInitialized) return;
     if (value.isPlaying) {
       widget.controller.pause();
@@ -370,7 +370,7 @@ class _PlatformMediaControlPanelState extends State<PlatformMediaControlPanel>
   void _incrementalSeek(int ms) {
     _showPanel();
     int dst = displayPosition.value + ms;
-    var value = widget.controller.value;
+    var value = widget.controller.playerValue;
     if (dst < 0) {
       dst = 0;
     } else if (dst >= value.duration.inMilliseconds) {
@@ -439,7 +439,7 @@ class _PlatformMediaControlPanelState extends State<PlatformMediaControlPanel>
     BuildContext context,
     Widget panelWidget,
   ) {
-    var value = widget.controller.value;
+    var value = widget.controller.playerValue;
     return Focus(
       autofocus: true,
       focusNode: focusNode,
