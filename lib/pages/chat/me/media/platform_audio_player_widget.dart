@@ -1,14 +1,21 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
+import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
+import 'package:colla_chat/widgets/media/audio/player/just_audio_player.dart';
+import 'package:colla_chat/widgets/media/audio/player/waveforms_audio_player.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:colla_chat/widgets/media/video/webview_video_player.dart';
 import 'package:flutter/material.dart';
 
 ///平台标准的AudioPlayer的实现，支持标准的audioplayers，just_audio和webview
 class PlatformAudioPlayerWidget extends StatefulWidget with TileDataMixin {
-  const PlatformAudioPlayerWidget({super.key});
+  AbstractMediaPlayerController mediaPlayerController =
+      WebViewVideoPlayerController();
+  final SwiperController swiperController = SwiperController();
+
+  PlatformAudioPlayerWidget({super.key});
 
   @override
   State createState() => _PlatformAudioPlayerWidgetState();
@@ -34,39 +41,94 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
     super.initState();
   }
 
-  List<AppBarPopupMenu>? _buildRightPopupMenus() {
-    List<AppBarPopupMenu> menus = [];
-    for (var type in AudioPlayerType.values) {
-      AppBarPopupMenu menu = AppBarPopupMenu(
-          title: type.name,
-          onPressed: () {
-            setState(() {
-              audioPlayerType = type;
-            });
-          });
-      menus.add(menu);
+  List<Widget>? _buildRightWidgets() {
+    List<bool> isSelected = const [true, false, false, false];
+    if (widget.mediaPlayerController is BlueFireAudioPlayerController) {
+      isSelected = const [false, true, false, false];
     }
-    return menus;
+    if (widget.mediaPlayerController is JustAudioPlayerController) {
+      isSelected = const [false, false, true, false];
+    }
+    if (widget.mediaPlayerController is WaveformsAudioPlayerController) {
+      isSelected = const [false, false, false, true];
+    }
+    var toggleWidget = ToggleButtons(
+      selectedBorderColor: Colors.white,
+      borderColor: Colors.grey,
+      isSelected: isSelected,
+      onPressed: (int newIndex) {
+        if (newIndex == 0) {
+          setState(() {
+            widget.mediaPlayerController = WebViewVideoPlayerController();
+          });
+        } else if (newIndex == 1) {
+          setState(() {
+            widget.mediaPlayerController = BlueFireAudioPlayerController();
+          });
+        } else if (newIndex == 1) {
+          setState(() {
+            widget.mediaPlayerController = JustAudioPlayerController();
+          });
+        } else if (newIndex == 1) {
+          setState(() {
+            widget.mediaPlayerController = WaveformsAudioPlayerController();
+          });
+        }
+      },
+      children: const <Widget>[
+        Icon(
+          Icons.web_outlined,
+          color: Colors.white,
+        ),
+        Icon(
+          Icons.fireplace,
+          color: Colors.white,
+        ),
+        Icon(
+          Icons.audiotrack_outlined,
+          color: Colors.white,
+        ),
+        Icon(
+          Icons.multitrack_audio,
+          color: Colors.white,
+        ),
+      ],
+    );
+    List<Widget> children = [
+      IconButton(
+        onPressed: () {
+          widget.swiperController.next();
+        },
+        icon: const Icon(Icons.more_horiz_outlined),
+      ),
+      toggleWidget,
+      const SizedBox(
+        width: 5.0,
+      )
+    ];
+    return children;
   }
 
   @override
   Widget build(BuildContext context) {
+    List<Widget>? rightWidgets = _buildRightWidgets();
+    PlatformMediaPlayer platformMediaPlayer = PlatformMediaPlayer(
+      key: UniqueKey(),
+      showPlaylist: true,
+      mediaPlayerController: widget.mediaPlayerController,
+      swiperController: widget.swiperController,
+    );
     return AppBarView(
       title: widget.title,
       withLeading: true,
-      rightPopupMenus: _buildRightPopupMenus(),
-      child: PlatformMediaPlayer(
-        key: UniqueKey(),
-        showPlaylist: true,
-        audioPlayerType: audioPlayerType,
-        mediaPlayerController: WebViewVideoPlayerController(),
-        swiperController: SwiperController(),
-      ),
+      rightWidgets: rightWidgets,
+      child: platformMediaPlayer,
     );
   }
 
   @override
   void dispose() {
+    widget.mediaPlayerController.close();
     super.dispose();
   }
 }

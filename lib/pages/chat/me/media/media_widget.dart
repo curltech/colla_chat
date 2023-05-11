@@ -13,7 +13,7 @@ class MediaWidget extends StatelessWidget with TileDataMixin {
   final PlatformVideoPlayerWidget videoPlayerWidget =
       PlatformVideoPlayerWidget();
   final PlatformAudioPlayerWidget audioPlayerWidget =
-      const PlatformAudioPlayerWidget();
+      PlatformAudioPlayerWidget();
   final PlatformAudioRecorderWidget audioRecorderWidget =
       PlatformAudioRecorderWidget();
   late final List<TileData> mediaTileData;

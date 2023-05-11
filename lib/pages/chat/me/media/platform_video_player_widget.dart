@@ -15,9 +15,6 @@ class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
       WebViewVideoPlayerController();
   final SwiperController swiperController = SwiperController();
 
-  // AbstractMediaPlayerController originMediaPlayerController =
-  //     OriginVideoPlayerController();
-
   PlatformVideoPlayerWidget({
     Key? key,
   }) : super(key: key) {
@@ -49,29 +46,47 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
   }
 
   List<Widget>? _buildRightWidgets() {
+    List<bool> isSelected = const [true, false];
+    if (widget.mediaPlayerController is OriginVideoPlayerController) {
+      isSelected = const [false, true];
+    }
+    var toggleWidget = ToggleButtons(
+      selectedBorderColor: Colors.white,
+      borderColor: Colors.grey,
+      isSelected: isSelected,
+      onPressed: (int newIndex) {
+        if (newIndex == 0) {
+          setState(() {
+            widget.mediaPlayerController = WebViewVideoPlayerController();
+          });
+        } else if (newIndex == 1) {
+          setState(() {
+            widget.mediaPlayerController = OriginVideoPlayerController();
+          });
+        }
+      },
+      children: const <Widget>[
+        Icon(
+          Icons.web_outlined,
+          color: Colors.white,
+        ),
+        Icon(
+          Icons.video_call_outlined,
+          color: Colors.white,
+        ),
+      ],
+    );
     List<Widget> children = [
       IconButton(
         onPressed: () {
           widget.swiperController.next();
         },
-        icon: const Icon(Icons.featured_play_list_outlined),
+        icon: const Icon(Icons.more_horiz_outlined),
       ),
-      IconButton(
-        onPressed: () {
-          setState(() {
-            widget.mediaPlayerController = WebViewVideoPlayerController();
-          });
-        },
-        icon: const Icon(Icons.web_outlined),
-      ),
-      IconButton(
-        onPressed: () {
-          setState(() {
-            widget.mediaPlayerController = OriginVideoPlayerController();
-          });
-        },
-        icon: const Icon(Icons.video_call_outlined),
-      ),
+      toggleWidget,
+      const SizedBox(
+        width: 5.0,
+      )
     ];
     return children;
   }

@@ -111,6 +111,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   bool _playlistVisible = true;
   int _currentIndex = -1;
   FileType fileType = FileType.any;
+  List<String>? allowedExtensions;
 
   AbstractMediaPlayerController();
 
@@ -242,8 +243,10 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     bool lockParentWindow = false,
   }) async {
     List<PlatformMediaSource> mediaSources = [];
-    final xfiles =
-        await FileUtil.pickFiles(allowMultiple: allowMultiple, type: fileType);
+    final xfiles = await FileUtil.pickFiles(
+        allowMultiple: allowMultiple,
+        type: fileType,
+        allowedExtensions: this.allowedExtensions);
     if (xfiles.isNotEmpty) {
       for (var xfile in xfiles) {
         PlatformMediaSource? mediaSource = await add(filename: xfile.path);
