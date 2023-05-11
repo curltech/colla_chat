@@ -5,7 +5,7 @@ import 'package:video_player/video_player.dart';
 abstract class AbstractAudioPlayerController
     extends AbstractMediaPlayerController {
   AbstractAudioPlayerController() : super() {
-    fileType = FileType.audio;
+    fileType = FileType.any;
     allowedExtensions = ['mp3', 'wav'];
   }
 

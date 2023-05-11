@@ -8,7 +8,7 @@ import 'package:record/record.dart';
 ///Android, iOS, Linux, macOS, Windows, and web.
 ///在各种平台都支持的格式是m4a
 class RecordAudioRecorderController extends AbstractAudioRecorderController {
-  late final Record recorder;
+  final Record recorder = Record();
 
   StreamSubscription<RecordState>? stateSubscription;
 
@@ -17,7 +17,6 @@ class RecordAudioRecorderController extends AbstractAudioRecorderController {
   Amplitude? _amplitude;
 
   RecordAudioRecorderController() {
-    recorder = Record();
     try {
       stateSubscription ??= recorder.onStateChanged().listen((recordState) {
         state = recordState;
@@ -61,21 +60,24 @@ class RecordAudioRecorderController extends AbstractAudioRecorderController {
   }
 
   @override
-  Future<void> start({String? filename}) async {
-    //缺省的音频格式参数
-    AudioEncoder encoder = AudioEncoder.aacLc;
-    // int bitRate = 128000;
-    // int samplingRate = 44100;
-    // int numChannels = 2;
-    // InputDevice? device;
-
+  Future<void> start({
+    String? filename,
+    AudioEncoder encoder = AudioEncoder.aacLc,
+    int bitRate = 128000,
+    int samplingRate = 44100,
+    int numChannels = 2,
+    InputDevice? device,
+  }) async {
     try {
       if (await recorder.hasPermission()) {
         await super.start();
         await recorder.start(
-          path: this.filename,
-          encoder: encoder,
-        );
+            path: this.filename,
+            encoder: encoder,
+            bitRate: bitRate,
+            samplingRate: samplingRate,
+            numChannels: numChannels,
+            device: device);
         status = RecorderStatus.recording;
       }
     } catch (e) {

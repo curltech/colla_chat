@@ -1,9 +1,11 @@
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/abstract_audio_recorder_controller.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
+import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
+import 'package:colla_chat/widgets/media/audio/recorder/waveforms_audio_recorder.dart';
 import 'package:flutter/material.dart';
 
 enum MediaRecorderType {
@@ -14,6 +16,9 @@ enum MediaRecorderType {
 
 ///平台标准的record的实现
 class PlatformAudioRecorderWidget extends StatefulWidget with TileDataMixin {
+  AbstractAudioRecorderController audioRecorderController =
+      RecordAudioRecorderController();
+
   PlatformAudioRecorderWidget(
       {Key? key, AbstractAudioRecorderController? controller})
       : super(key: key);
@@ -36,8 +41,6 @@ class PlatformAudioRecorderWidget extends StatefulWidget with TileDataMixin {
 
 class _PlatformAudioRecorderWidgetState
     extends State<PlatformAudioRecorderWidget> {
-  MediaRecorderType? mediaRecorderType;
-
   @override
   void initState() {
     super.initState();
@@ -48,20 +51,48 @@ class _PlatformAudioRecorderWidgetState
     super.dispose();
   }
 
-  List<AppBarPopupMenu>? _buildRightPopupMenus() {
-    List<AppBarPopupMenu> menus = [];
-    for (var type in MediaRecorderType.values) {
-      AppBarPopupMenu menu = AppBarPopupMenu(
-          title: type.name,
-          onPressed: () {
+  List<Widget>? _buildRightWidgets() {
+    if (platformParams.mobile) {
+      List<bool> isSelected = const [true, false];
+      if (widget.audioRecorderController is WaveformsAudioRecorderController) {
+        isSelected = const [false, true];
+      }
+      var toggleWidget = ToggleButtons(
+        selectedBorderColor: Colors.white,
+        borderColor: Colors.grey,
+        isSelected: isSelected,
+        onPressed: (int newIndex) {
+          if (newIndex == 0) {
             setState(() {
-              mediaRecorderType = type;
-              logger.i('mediaRecorderType:$type');
+              widget.audioRecorderController = RecordAudioRecorderController();
             });
-          });
-      menus.add(menu);
+          } else if (newIndex == 1) {
+            setState(() {
+              widget.audioRecorderController =
+                  WaveformsAudioRecorderController();
+            });
+          }
+        },
+        children: const <Widget>[
+          Icon(
+            Icons.web_outlined,
+            color: Colors.white,
+          ),
+          Icon(
+            Icons.video_call_outlined,
+            color: Colors.white,
+          ),
+        ],
+      );
+      List<Widget> children = [
+        toggleWidget,
+        const SizedBox(
+          width: 5.0,
+        )
+      ];
+      return children;
     }
-    return menus;
+    return null;
   }
 
   @override
@@ -69,7 +100,7 @@ class _PlatformAudioRecorderWidgetState
     return AppBarView(
         title: widget.title,
         withLeading: true,
-        rightPopupMenus: _buildRightPopupMenus(),
+        rightWidgets: _buildRightWidgets(),
         child: Column(
           children: [
             const Spacer(),
@@ -77,7 +108,7 @@ class _PlatformAudioRecorderWidgetState
               onStop: (String filename) {
                 logger.i('record audio filename:$filename');
               },
-              mediaRecorderType: mediaRecorderType,
+              audioRecorderController: widget.audioRecorderController,
             ),
             const Spacer(),
           ],

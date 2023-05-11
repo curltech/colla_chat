@@ -11,6 +11,7 @@ import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
+import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 
@@ -84,6 +85,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   Widget _buildVoiceRecordButton(context) {
     return PlatformAudioRecorder(
       onStop: _onStop,
+      audioRecorderController: RecordAudioRecorderController(),
     );
   }
 

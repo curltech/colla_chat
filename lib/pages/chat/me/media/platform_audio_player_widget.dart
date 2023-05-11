@@ -65,11 +65,11 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
           setState(() {
             widget.mediaPlayerController = BlueFireAudioPlayerController();
           });
-        } else if (newIndex == 1) {
+        } else if (newIndex == 2) {
           setState(() {
             widget.mediaPlayerController = JustAudioPlayerController();
           });
-        } else if (newIndex == 1) {
+        } else if (newIndex == 3) {
           setState(() {
             widget.mediaPlayerController = WaveformsAudioPlayerController();
           });
