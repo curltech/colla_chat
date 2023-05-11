@@ -1,9 +1,16 @@
+import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 
 abstract class AbstractAudioPlayerController
     extends AbstractMediaPlayerController {
+  int _duration = -1;
+  String _durationText = '';
+  PlayerStatus playerStatus = PlayerStatus.stop;
+
   AbstractAudioPlayerController() : super() {
     fileType = FileType.any;
     allowedExtensions = ['mp3', 'wav'];
@@ -68,5 +75,71 @@ abstract class AbstractAudioPlayerController
   set closedCaptionFile(bool closedCaptionFile) {
     _closedCaptionFile = closedCaptionFile;
     notifyListeners();
+  }
+
+  Future<void> _action() async {
+    if (playerStatus == PlayerStatus.playing) {
+      await pause();
+    } else if (playerStatus == PlayerStatus.stop) {
+      await play();
+    } else if (playerStatus == PlayerStatus.pause) {
+      await resume();
+    }
+  }
+
+  @override
+  Widget buildMediaPlayer({
+    Key? key,
+    bool showClosedCaptionButton = true,
+    bool showFullscreenButton = false,
+    bool showVolumeButton = true,
+  }) {
+    var controlText = AppLocalizations.t(_durationText);
+    Icon playIcon;
+    if (playerStatus == PlayerStatus.playing) {
+      playIcon = const Icon(Icons.pause, size: 32);
+    } else {
+      playIcon = const Icon(Icons.play_arrow, size: 32);
+    }
+    List<Widget> controls = [];
+    if (playerStatus == PlayerStatus.playing ||
+        playerStatus == PlayerStatus.pause) {
+      controls.add(
+        IconButton(
+          icon: const Icon(Icons.stop, size: 32),
+          onPressed: () async {
+            await stop();
+          },
+        ),
+      );
+      controls.add(
+        const SizedBox(
+          width: 15,
+        ),
+      );
+    }
+    controls.add(
+      IconButton(
+        icon: playIcon,
+        onPressed: () async {
+          await _action();
+        },
+      ),
+    );
+    controls.add(
+      const SizedBox(
+        width: 15,
+      ),
+    );
+    controls.add(
+      CommonAutoSizeText(controlText),
+    );
+    var container = SizedBox(
+      width: 200,
+      height: 50,
+      child:
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: controls),
+    );
+    return container;
   }
 }
