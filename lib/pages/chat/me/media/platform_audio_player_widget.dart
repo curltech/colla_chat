@@ -1,7 +1,9 @@
+import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
+import 'package:colla_chat/widgets/media/video/webview_video_player.dart';
 import 'package:flutter/material.dart';
 
 ///平台标准的AudioPlayer的实现，支持标准的audioplayers，just_audio和webview
@@ -32,11 +34,6 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
     super.initState();
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   List<AppBarPopupMenu>? _buildRightPopupMenus() {
     List<AppBarPopupMenu> menus = [];
     for (var type in AudioPlayerType.values) {
@@ -59,9 +56,17 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
       withLeading: true,
       rightPopupMenus: _buildRightPopupMenus(),
       child: PlatformMediaPlayer(
-          key: UniqueKey(),
-          showPlaylist: true,
-          audioPlayerType: audioPlayerType),
+        key: UniqueKey(),
+        showPlaylist: true,
+        audioPlayerType: audioPlayerType,
+        mediaPlayerController: WebViewVideoPlayerController(),
+        swiperController: SwiperController(),
+      ),
     );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
   }
 }

@@ -2,12 +2,22 @@ import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
+import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
+import 'package:colla_chat/widgets/media/video/webview_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:video_player_win/video_player_win_plugin.dart';
 
-///平台标准的video_player的实现，缺省采用origin
+///平台标准的video_player的实现，缺省采用webview
 class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
+  AbstractMediaPlayerController mediaPlayerController =
+      WebViewVideoPlayerController();
+  final SwiperController swiperController = SwiperController();
+
+  // AbstractMediaPlayerController originMediaPlayerController =
+  //     OriginVideoPlayerController();
+
   PlatformVideoPlayerWidget({
     Key? key,
   }) : super(key: key) {
@@ -33,9 +43,6 @@ class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
-  VideoPlayerType videoPlayerType = VideoPlayerType.webview;
-  SwiperController swiperController = SwiperController();
-
   @override
   void initState() {
     super.initState();
@@ -45,14 +52,14 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
     List<Widget> children = [
       IconButton(
         onPressed: () {
-          swiperController.next();
+          widget.swiperController.next();
         },
         icon: const Icon(Icons.featured_play_list_outlined),
       ),
       IconButton(
         onPressed: () {
           setState(() {
-            videoPlayerType = VideoPlayerType.webview;
+            widget.mediaPlayerController = WebViewVideoPlayerController();
           });
         },
         icon: const Icon(Icons.web_outlined),
@@ -60,7 +67,7 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
       IconButton(
         onPressed: () {
           setState(() {
-            videoPlayerType = VideoPlayerType.origin;
+            widget.mediaPlayerController = OriginVideoPlayerController();
           });
         },
         icon: const Icon(Icons.video_call_outlined),
@@ -72,22 +79,23 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
   @override
   Widget build(BuildContext context) {
     List<Widget>? rightWidgets = _buildRightWidgets();
-    Widget child = PlatformMediaPlayer(
+    PlatformMediaPlayer platformMediaPlayer = PlatformMediaPlayer(
       key: UniqueKey(),
       showPlaylist: true,
-      videoPlayerType: videoPlayerType,
-      swiperController: swiperController,
+      mediaPlayerController: widget.mediaPlayerController,
+      swiperController: widget.swiperController,
     );
     return AppBarView(
       title: widget.title,
       withLeading: true,
       rightWidgets: rightWidgets,
-      child: child,
+      child: platformMediaPlayer,
     );
   }
 
   @override
   void dispose() {
+    widget.mediaPlayerController.close();
     super.dispose();
   }
 }

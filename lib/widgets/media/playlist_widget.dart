@@ -18,10 +18,10 @@ import 'package:flutter/material.dart';
 
 ///媒体文件播放列表
 class PlaylistWidget extends StatefulWidget {
-  final AbstractMediaPlayerController controller;
+  final AbstractMediaPlayerController mediaPlayerController;
   final Function(int index, String filename)? onSelected;
 
-  const PlaylistWidget({super.key, required this.controller, this.onSelected});
+  const PlaylistWidget({super.key, required this.mediaPlayerController, this.onSelected});
 
   @override
   State createState() => _PlaylistWidgetState();
@@ -31,7 +31,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
   @override
   void initState() {
     super.initState();
-    widget.controller.addListener(_update);
+    widget.mediaPlayerController.addListener(_update);
   }
 
   _update() {
@@ -40,7 +40,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
 
   ///从收藏的文件中加入播放列表
   _collect() async {
-    String fileType = widget.controller.fileType.name;
+    String fileType = widget.mediaPlayerController.fileType.name;
     ChatMessageContentType? contentType =
         StringUtil.enumFromString(ChatMessageContentType.values, fileType);
     contentType = contentType ?? ChatMessageContentType.media;
@@ -48,7 +48,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       ChatMessageType.collection.name,
       contentType: contentType.name,
     );
-    widget.controller.playlist.clear();
+    widget.mediaPlayerController.playlist.clear();
     List<String> filenames = [];
     List<String?> messageIds = [];
     List<Widget?> thumbnails = [];
@@ -65,7 +65,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           await _buildThumbnail(title, chatMessage.thumbnail);
       thumbnails.add(thumbnailWidget);
     }
-    widget.controller.addAll(filenames: filenames);
+    widget.mediaPlayerController.addAll(filenames: filenames);
   }
 
   Future<Widget?> _buildThumbnail(String? filename, String? thumbnail) async {
@@ -93,7 +93,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
   }
 
   Future<List<TileData>> _buildTileData(BuildContext context) async {
-    List<PlatformMediaSource> mediaSources = widget.controller.playlist;
+    List<PlatformMediaSource> mediaSources = widget.mediaPlayerController.playlist;
     List<TileData> tileData = [];
     for (var mediaSource in mediaSources) {
       var filename = mediaSource.filename;
@@ -104,7 +104,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       }
       var length = file.lengthSync();
       bool selected = false;
-      PlatformMediaSource? current = widget.controller.currentMediaSource;
+      PlatformMediaSource? current = widget.mediaPlayerController.currentMediaSource;
       if (current != null) {
         if (current.filename == filename) {
           selected = true;
@@ -175,7 +175,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       return DataListView(
         tileData: tileData,
         onTap: (int index, String title, {TileData? group, String? subtitle}) {
-          widget.controller.setCurrentIndex(index);
+          widget.mediaPlayerController.setCurrentIndex(index);
           if (widget.onSelected != null) {
             widget.onSelected!(index, title);
           }
@@ -187,11 +187,11 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
   ///选择文件加入播放列表
   _addMediaSource() async {
     List<PlatformMediaSource> mediaSources =
-        await widget.controller.sourceFilePicker();
+        await widget.mediaPlayerController.sourceFilePicker();
   }
 
   _removeFromCollect(int index) async {
-    PlatformMediaSource mediaSource = widget.controller.playlist[index];
+    PlatformMediaSource mediaSource = widget.mediaPlayerController.playlist[index];
     var messageId = mediaSource.messageId;
     if (messageId != null) {
       chatMessageService.delete(where: 'messageId=?', whereArgs: [messageId]);
@@ -200,7 +200,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
 
   ///将播放列表的文件加入收藏
   _collectMediaSource(int index) async {
-    PlatformMediaSource mediaSource = widget.controller.playlist[index];
+    PlatformMediaSource mediaSource = widget.mediaPlayerController.playlist[index];
     var filename = mediaSource.filename;
     var mediaFormat = mediaSource.mediaFormat!.name;
     File file = File(filename);
@@ -218,7 +218,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
     // ChatMessageMimeType? chatMessageMimeType =
     //     StringUtil.enumFromString<ChatMessageMimeType>(
     //         ChatMessageMimeType.values, mediaFormat);
-    String fileType = widget.controller.fileType.name;
+    String fileType = widget.mediaPlayerController.fileType.name;
     ChatMessageContentType? contentType =
         StringUtil.enumFromString(ChatMessageContentType.values, fileType);
     contentType = contentType ?? ChatMessageContentType.media;
@@ -253,8 +253,8 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
             color: myself.primary,
           ),
           onPressed: () async {
-            var currentIndex = widget.controller.currentIndex;
-            await widget.controller.remove(currentIndex);
+            var currentIndex = widget.mediaPlayerController.currentIndex;
+            await widget.mediaPlayerController.remove(currentIndex);
           },
         ),
         IconButton(
@@ -272,7 +272,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
             color: myself.primary,
           ),
           onPressed: () async {
-            var currentIndex = widget.controller.currentIndex;
+            var currentIndex = widget.mediaPlayerController.currentIndex;
             await _collectMediaSource(currentIndex);
           },
         ),
@@ -282,7 +282,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
             color: myself.primary,
           ),
           onPressed: () async {
-            var currentIndex = widget.controller.currentIndex;
+            var currentIndex = widget.mediaPlayerController.currentIndex;
             await _removeFromCollect(currentIndex);
           },
         ),
@@ -312,7 +312,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
 
   @override
   void dispose() {
-    widget.controller.removeListener(_update);
+    widget.mediaPlayerController.removeListener(_update);
     super.dispose();
   }
 }

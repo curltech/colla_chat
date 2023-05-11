@@ -27,8 +27,6 @@ enum AudioPlayerType {
 
 ///平台的媒体播放器组件
 class PlatformMediaPlayer extends StatefulWidget {
-  final VideoPlayerType? videoPlayerType;
-  final AudioPlayerType? audioPlayerType;
   final bool showClosedCaptionButton;
   final bool showFullscreenButton;
   final bool showVolumeButton;
@@ -38,30 +36,30 @@ class PlatformMediaPlayer extends StatefulWidget {
   final double? height;
   final double? width;
 
-  final String? filename;
+  final List<String>? filenames;
   final List<int>? data;
-  SwiperController? swiperController;
-  late AbstractMediaPlayerController controller;
+  final SwiperController swiperController;
+  AbstractMediaPlayerController mediaPlayerController;
+  VideoPlayerType? videoPlayerType;
+  AudioPlayerType? audioPlayerType;
 
-  PlatformMediaPlayer(
-      {Key? key,
-      this.videoPlayerType,
-      this.audioPlayerType,
-      this.showClosedCaptionButton = true,
-      this.showFullscreenButton = true,
-      this.showVolumeButton = true,
-      this.showSpeedButton = false,
-      this.showPlaylist = true,
-      this.color,
-      this.width,
-      this.height,
-      this.filename,
-      this.data,
-      this.swiperController})
-      : super(key: key) {
-    swiperController ??= SwiperController();
-    _updateMediaPlayerType();
-  }
+  PlatformMediaPlayer({
+    Key? key,
+    this.videoPlayerType,
+    this.audioPlayerType,
+    required this.mediaPlayerController,
+    required this.swiperController,
+    this.showClosedCaptionButton = true,
+    this.showFullscreenButton = true,
+    this.showVolumeButton = true,
+    this.showSpeedButton = false,
+    this.showPlaylist = true,
+    this.color,
+    this.width,
+    this.height,
+    this.filenames,
+    this.data,
+  }) : super(key: key);
 
   _updateMediaPlayerType() {
     if (videoPlayerType != null) {
@@ -70,50 +68,50 @@ class PlatformMediaPlayer extends StatefulWidget {
           //controller = DartVlcVideoPlayerController();
           break;
         case VideoPlayerType.flick:
-          controller = FlickVideoPlayerController();
+          mediaPlayerController = FlickVideoPlayerController();
           break;
         case VideoPlayerType.origin:
-          controller = OriginVideoPlayerController();
+          mediaPlayerController = OriginVideoPlayerController();
           break;
         case VideoPlayerType.chewie:
-          controller = ChewieVideoPlayerController();
+          mediaPlayerController = ChewieVideoPlayerController();
           break;
         case VideoPlayerType.webview:
-          controller = WebViewVideoPlayerController();
+          mediaPlayerController = WebViewVideoPlayerController();
           break;
         default:
-          controller = WebViewVideoPlayerController();
+          mediaPlayerController = WebViewVideoPlayerController();
           break;
       }
     } else if (audioPlayerType != null) {
       switch (audioPlayerType) {
         case AudioPlayerType.webview:
-          controller = WebViewVideoPlayerController();
+          mediaPlayerController = WebViewVideoPlayerController();
           break;
         case AudioPlayerType.just:
-          controller = JustAudioPlayerController();
+          mediaPlayerController = JustAudioPlayerController();
           break;
         case AudioPlayerType.audioplayers:
-          controller = BlueFireAudioPlayerController();
+          mediaPlayerController = BlueFireAudioPlayerController();
           break;
         case AudioPlayerType.waveforms:
-          controller = WaveformsAudioPlayerController();
+          mediaPlayerController = WaveformsAudioPlayerController();
           break;
         default:
-          controller = WebViewVideoPlayerController();
+          mediaPlayerController = WebViewVideoPlayerController();
           break;
       }
     } else {
-      controller = WebViewVideoPlayerController();
+      videoPlayerType = VideoPlayerType.webview;
+      mediaPlayerController = WebViewVideoPlayerController();
     }
-    if (filename != null) {
-      controller.add(filename: filename!);
-      controller.playlistVisible = false;
+    if (filenames != null) {
+      mediaPlayerController.addAll(filenames: filenames!);
     }
   }
 
   _onSelected(int index, String filename) {
-    swiperController!.move(1);
+    swiperController.move(1);
   }
 
   @override
@@ -124,7 +122,7 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
   @override
   void initState() {
     super.initState();
-    widget.controller.addListener(_update);
+    widget.mediaPlayerController.addListener(_update);
   }
 
   _update() {
@@ -133,15 +131,24 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
 
   Widget _buildMediaPlayer(BuildContext context) {
     Widget mediaView;
-    Widget player = widget.controller.buildMediaPlayer(key: UniqueKey());
+    Widget player =
+        widget.mediaPlayerController.buildMediaPlayer(key: UniqueKey());
+    int index = widget.swiperController.index;
+    if (widget.mediaPlayerController.currentIndex == -1) {
+      index = 0;
+    }
     if (widget.showPlaylist) {
       mediaView = Swiper(
         itemCount: 2,
-        controller: widget.swiperController!,
+        index: index,
+        controller: widget.swiperController,
+        onIndexChanged: (int index) {
+          widget.swiperController.index = index;
+        },
         itemBuilder: (BuildContext context, int index) {
           if (index == 0) {
             return PlaylistWidget(
-              controller: widget.controller,
+              mediaPlayerController: widget.mediaPlayerController,
               onSelected: widget._onSelected,
             );
           }
@@ -172,7 +179,7 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
 
   @override
   void dispose() {
-    widget.controller.removeListener(_update);
+    widget.mediaPlayerController.removeListener(_update);
     super.dispose();
   }
 }

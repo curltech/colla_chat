@@ -46,14 +46,10 @@ class OriginMediaSource {
 
 ///基于VideoPlayerControlPanel实现的媒体播放器
 class OriginVideoPlayerController extends AbstractMediaPlayerController {
-  VideoPlayerController? _controller;
+  VideoPlayerController? videoPlayerController;
 
   OriginVideoPlayerController() {
     fileType = FileType.media;
-  }
-
-  VideoPlayerController? get controller {
-    return _controller;
   }
 
   @override
@@ -63,14 +59,13 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
       await super.setCurrentIndex(index);
       var currentMediaSource = this.currentMediaSource;
       if (currentMediaSource != null) {
-        var controller = await OriginMediaSource.media(
+        videoPlayerController = await OriginMediaSource.media(
             filename: currentMediaSource.filename);
-        _controller = controller;
-        notifyListeners();
-        if (controller != null) {
-          controller.play();
+        if (videoPlayerController != null) {
+          videoPlayerController!.play();
         }
       }
+      notifyListeners();
     }
   }
 
@@ -82,10 +77,10 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     bool showVolumeButton = true,
   }) {
     //Widget player = VideoPlayer(controller!);
-    Widget player = controller != null
+    Widget player = videoPlayerController != null
         ? JkVideoControlPanel(
             key: key,
-            controller!,
+            videoPlayerController!,
             showClosedCaptionButton: showClosedCaptionButton,
             showFullscreenButton: showFullscreenButton,
             showVolumeButton: showVolumeButton,
@@ -113,43 +108,44 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
 
   @override
   close() {
-    if (_controller != null) {
-      _controller!.dispose();
-      _controller = null;
+    if (videoPlayerController != null) {
+      super.setCurrentIndex(-1);
+      videoPlayerController!.dispose();
+      videoPlayerController = null;
     }
   }
 
   ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频
   play() async {
-    var controller = this.controller;
+    var controller = videoPlayerController;
     if (controller != null) {
       controller.play();
     }
   }
 
   pause() async {
-    var controller = this.controller;
+    var controller = videoPlayerController;
     if (controller != null) {
       controller.pause();
     }
   }
 
   resume() async {
-    var controller = this.controller;
+    var controller = videoPlayerController;
     if (controller != null) {
       controller.play();
     }
   }
 
   stop() async {
-    var controller = this.controller;
+    var controller = videoPlayerController;
     if (controller != null) {
       controller.pause();
     }
   }
 
   seek(Duration position, {int? index}) async {
-    var controller = this.controller;
+    var controller = videoPlayerController;
     if (controller != null) {
       controller.seekTo(position);
     }
@@ -157,7 +153,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
 
   Future<double> getSpeed() async {
     double speed = 1.0;
-    var controller = this.controller;
+    var controller = videoPlayerController;
     if (controller != null) {
       speed = controller.value.playbackSpeed;
     }
@@ -165,7 +161,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   setSpeed(double speed) async {
-    var controller = this.controller;
+    var controller = videoPlayerController;
     if (controller != null) {
       controller.setPlaybackSpeed(speed);
     }
@@ -173,7 +169,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
 
   Future<double> getVolume() async {
     double volume = 1.0;
-    var controller = this.controller;
+    var controller = videoPlayerController;
     if (controller != null) {
       volume = controller.value.volume;
     }
@@ -181,14 +177,14 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   setVolume(double volume) async {
-    var controller = this.controller;
+    var controller = videoPlayerController;
     if (controller != null) {
       controller.setVolume(volume);
     }
   }
 
   VideoPlayerValue? get value {
-    var controller = this.controller;
+    var controller = videoPlayerController;
     if (controller != null) {
       VideoPlayerValue value = controller.value;
 

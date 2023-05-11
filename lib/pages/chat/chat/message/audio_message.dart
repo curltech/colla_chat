@@ -1,8 +1,10 @@
+import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/pages/chat/chat/message/common_message.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
+import 'package:colla_chat/widgets/media/video/webview_video_player.dart';
 import 'package:flutter/material.dart';
 
 ///消息体：声音消息
@@ -35,8 +37,10 @@ class AudioMessage extends StatelessWidget {
             return PlatformMediaPlayer(
               key: UniqueKey(),
               showPlaylist: false,
-              filename: filename,
+              filenames: [filename],
               videoPlayerType: VideoPlayerType.webview,
+              mediaPlayerController: WebViewVideoPlayerController(),
+              swiperController: SwiperController(),
             );
           }
           return Container();

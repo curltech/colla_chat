@@ -12,7 +12,7 @@ class FlickVideoPlayerController extends OriginVideoPlayerController {
   }
 
   FlickManager? _buildFlickManager() {
-    var controller = this.controller;
+    var controller = this.videoPlayerController;
     if (controller == null) {
       return null;
     }

@@ -13,7 +13,7 @@ class ChewieVideoPlayerController extends OriginVideoPlayerController {
   }
 
   ChewieController? _buildChewieController() {
-    var controller = this.controller;
+    var controller = this.videoPlayerController;
     if (controller == null) {
       return null;
     }

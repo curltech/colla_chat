@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 
 ///基于WebView实现的媒体播放器和记录器，
 class WebViewVideoPlayerController extends AbstractMediaPlayerController {
-  PlatformWebViewController? controller;
+  PlatformWebViewController? platformWebViewController;
 
   WebViewVideoPlayerController() {
     fileType = FileType.media;
@@ -25,13 +25,13 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
 
   _play() {
     var currentMediaSource = this.currentMediaSource;
-    if (controller != null && currentMediaSource != null) {
-      controller!.load(currentMediaSource.filename);
+    if (platformWebViewController != null && currentMediaSource != null) {
+      platformWebViewController!.load(currentMediaSource.filename);
     }
   }
 
-  void _onWebViewCreated(PlatformWebViewController controller) {
-    this.controller = controller;
+  void _onWebViewCreated(PlatformWebViewController platformWebViewController) {
+    this.platformWebViewController = platformWebViewController;
     _play();
   }
 
@@ -40,11 +40,10 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
     if (index >= -1 && index < playlist.length && currentIndex != index) {
       close();
       await super.setCurrentIndex(index);
-      notifyListeners();
-
-      if (controller != null) {
+      if (platformWebViewController != null) {
         _play();
       }
+      notifyListeners();
     }
   }
 
@@ -65,5 +64,10 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
       onWebViewCreated: _onWebViewCreated,
     );
     return platformWebView;
+  }
+
+  @override
+  close() {
+    super.setCurrentIndex(-1);
   }
 }
