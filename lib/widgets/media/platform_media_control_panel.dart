@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/audio/abstract_audio_player_controller.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -167,31 +168,39 @@ class _PlatformMediaControlPanelState extends State<PlatformMediaControlPanel>
   }
 
   Future<void> _onPlayerValueChanged() async {
-    final playerValue = widget.controller.playerValue;
-    bool isInitializing = !playerValue.isInitialized && !playerValue.hasError;
+    final mediaPlayerState = widget.controller.mediaPlayerState;
+    bool isInitializing =
+        mediaPlayerState.mediaPlayerStatus == MediaPlayerStatus.init;
+    bool isInitialized =
+        mediaPlayerState.mediaPlayerStatus != MediaPlayerStatus.none &&
+            mediaPlayerState.mediaPlayerStatus != MediaPlayerStatus.init;
 
-    if (!playing.value && playerValue.isPlaying && panelVisibility.value) {
+    if (!playing.value &&
+        mediaPlayerState.mediaPlayerStatus == MediaPlayerStatus.playing &&
+        panelVisibility.value) {
       // if paused -> playing, auto hide panel
       _showPanel();
     }
 
-    duration.value = playerValue.duration;
-    playing.value = playerValue.isPlaying;
-    displayPosition.value = playerValue.position.inMilliseconds;
-    volumeValue.value = playerValue.volume;
-    buffering.value = playerValue.isBuffering || isInitializing;
+    duration.value = mediaPlayerState.duration;
+    playing.value =
+        mediaPlayerState.mediaPlayerStatus == MediaPlayerStatus.playing;
+    displayPosition.value = mediaPlayerState.position.inMilliseconds;
+    volumeValue.value = mediaPlayerState.volume;
+    buffering.value =
+        mediaPlayerState.mediaPlayerStatus == MediaPlayerStatus.buffering;
 
     hasClosedCaptionFile.value = widget.controller.closedCaptionFile != null;
-    currentCaption.value = playerValue.caption.text;
+    currentCaption.value = mediaPlayerState.caption ?? '';
 
-    if (!isInitializing && aspectRatio.value != playerValue.aspectRatio) {
-      aspectRatio.value = playerValue.aspectRatio;
+    if (!isInitializing && aspectRatio.value != mediaPlayerState.aspectRatio) {
+      aspectRatio.value = mediaPlayerState.aspectRatio!;
       _onAspectRatioChanged();
     }
 
-    if (playerValue.isInitialized &&
-        playerValue.duration.inMilliseconds > 0 &&
-        playerValue.position.compareTo(playerValue.duration) >= 0) {
+    if (isInitialized &&
+        mediaPlayerState.duration.inMilliseconds > 0 &&
+        mediaPlayerState.position.compareTo(mediaPlayerState.duration) >= 0) {
       if (!isPlayEnded) {
         isPlayEnded = true;
         playing.value = false;
@@ -319,7 +328,7 @@ class _PlatformMediaControlPanelState extends State<PlatformMediaControlPanel>
   }
 
   String _duration2TimeStr(Duration duration) {
-    var value = widget.controller.playerValue;
+    var value = widget.controller.mediaPlayerState;
     if (value.duration.inHours > 0) {
       return sprintf("%02d:%02d:%02d",
           [duration.inHours, duration.inMinutes % 60, duration.inSeconds % 60]);
@@ -358,9 +367,11 @@ class _PlatformMediaControlPanelState extends State<PlatformMediaControlPanel>
   }
 
   void _togglePlayPause() {
-    var value = widget.controller.playerValue;
-    if (!value.isInitialized) return;
-    if (value.isPlaying) {
+    var mediaPlayerState = widget.controller.mediaPlayerState;
+    if (!mediaPlayerState.isInitialized) {
+      return;
+    }
+    if (mediaPlayerState.mediaPlayerStatus == MediaPlayerStatus.playing) {
       widget.controller.pause();
     } else {
       widget.controller.play();
@@ -370,7 +381,7 @@ class _PlatformMediaControlPanelState extends State<PlatformMediaControlPanel>
   void _incrementalSeek(int ms) {
     _showPanel();
     int dst = displayPosition.value + ms;
-    var value = widget.controller.playerValue;
+    var value = widget.controller.mediaPlayerState;
     if (dst < 0) {
       dst = 0;
     } else if (dst >= value.duration.inMilliseconds) {
@@ -439,7 +450,7 @@ class _PlatformMediaControlPanelState extends State<PlatformMediaControlPanel>
     BuildContext context,
     Widget panelWidget,
   ) {
-    var value = widget.controller.playerValue;
+    var value = widget.controller.mediaPlayerState;
     return Focus(
       autofocus: true,
       focusNode: focusNode,

@@ -369,6 +369,10 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
     bool showFullscreenButton = true,
     bool showVolumeButton = true,
   }) {
-    return Container();
+    return super.buildMediaPlayer(
+        key: key,
+        showClosedCaptionButton: showClosedCaptionButton,
+        showFullscreenButton: showFullscreenButton,
+        showVolumeButton: showVolumeButton);
   }
 }

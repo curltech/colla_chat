@@ -7,7 +7,60 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
-enum PlayerStatus { init, buffering, pause, playing, stop, completed }
+enum MediaPlayerStatus {
+  none,
+  init,
+  buffering,
+  pause,
+  playing,
+  stop,
+  completed
+}
+
+///媒体播放器的状态参数
+class MediaPlayerState {
+  //状态
+  MediaPlayerStatus mediaPlayerStatus = MediaPlayerStatus.none;
+
+  //总长度
+  Duration duration = Duration.zero;
+
+  //当前播放位置
+  Duration position = Duration.zero;
+
+  //音量
+  double volume = 1.0;
+
+  //速度
+  double playbackSpeed = 1.0;
+
+  //尺寸
+  Size? size;
+
+  //方向
+  int? rotationCorrection;
+
+  String? caption;
+
+  MediaPlayerState();
+
+  double? get aspectRatio {
+    if (size != null && size!.height > 0) {
+      return size!.width / size!.height;
+    }
+
+    return null;
+  }
+
+  bool get isInitialized {
+    if (mediaPlayerStatus == MediaPlayerStatus.none ||
+        mediaPlayerStatus == MediaPlayerStatus.init ||
+        mediaPlayerStatus == MediaPlayerStatus.buffering) {
+      return false;
+    }
+    return true;
+  }
+}
 
 ///媒体源的类型
 enum MediaSourceType {
@@ -112,6 +165,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   int _currentIndex = -1;
   FileType fileType = FileType.any;
   List<String>? allowedExtensions;
+  MediaPlayerState mediaPlayerState = MediaPlayerState();
 
   AbstractMediaPlayerController();
 
@@ -267,6 +321,10 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     bool showFullscreenButton = true,
     bool showVolumeButton = true,
   });
+
+  String get progressText {
+    return '${StringUtil.durationText(mediaPlayerState.position)}/${StringUtil.durationText(mediaPlayerState.duration)}';
+  }
 
   @override
   void dispose() {

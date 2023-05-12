@@ -8,7 +8,6 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/audio/abstract_audio_player_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
 
 ///简单地播放音频文件，没有控制器按钮和状态
 class BlueFireAudioPlayer {
@@ -178,42 +177,29 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
 
   void _initStreams() {
     _durationSubscription = player.onDurationChanged.listen((duration) {
-      playerValue = VideoPlayerValue(duration: duration);
+      mediaPlayerState.duration = duration;
     });
 
     _positionSubscription = player.onPositionChanged.listen((position) {
-      playerValue =
-          VideoPlayerValue(duration: playerValue.duration, position: position);
+      mediaPlayerState.position = position;
+      notifyListeners();
     });
 
     _playerCompleteSubscription = player.onPlayerComplete.listen((event) {
-      playerValue = VideoPlayerValue(
-        duration: playerValue.duration,
-      );
+      mediaPlayerState.position = mediaPlayerState.duration;
+      mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.completed;
     });
 
     _playerStateChangeSubscription =
         player.onPlayerStateChanged.listen((state) {
       if (state == PlayerState.completed) {
-        playerValue = VideoPlayerValue(
-          duration: playerValue.duration,
-          isPlaying: false,
-        );
+        mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.completed;
       } else if (state == PlayerState.playing) {
-        playerValue = VideoPlayerValue(
-          duration: playerValue.duration,
-          isPlaying: true,
-        );
+        mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.playing;
       } else if (state == PlayerState.paused) {
-        playerValue = VideoPlayerValue(
-          duration: playerValue.duration,
-          isPlaying: false,
-        );
+        mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.pause;
       } else if (state == PlayerState.stopped) {
-        playerValue = VideoPlayerValue(
-          duration: playerValue.duration,
-          isPlaying: false,
-        );
+        mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.stop;
       }
     });
   }
@@ -288,19 +274,9 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
   }
 
   @override
-  Future<double> getVolume() async {
-    return Future.value(playerValue.volume);
-  }
-
-  @override
   setVolume(double volume) async {
     await player.setVolume(volume);
     await super.setVolume(volume);
-  }
-
-  @override
-  Future<double> getSpeed() async {
-    return Future.value(playerValue.playbackSpeed);
   }
 
   @override
@@ -350,6 +326,10 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
     bool showFullscreenButton = true,
     bool showVolumeButton = true,
   }) {
-    return const Center(child: Icon(Icons.multitrack_audio));
+    return super.buildMediaPlayer(
+        key: key,
+        showClosedCaptionButton: showClosedCaptionButton,
+        showFullscreenButton: showFullscreenButton,
+        showVolumeButton: showVolumeButton);
   }
 }

@@ -3,20 +3,14 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:video_player/video_player.dart';
 
 abstract class AbstractAudioPlayerController
     extends AbstractMediaPlayerController {
-  int _duration = -1;
-  String _durationText = '';
-
   AbstractAudioPlayerController() : super() {
     fileType = FileType.any;
     allowedExtensions = ['mp3', 'wav'];
   }
 
-  VideoPlayerValue _playerValue =
-      const VideoPlayerValue(duration: Duration.zero);
   bool _closedCaptionFile = false;
 
   ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频
@@ -31,43 +25,19 @@ abstract class AbstractAudioPlayerController
   seek(Duration position, {int? index});
 
   Future<double> getSpeed() {
-    return Future.value(_playerValue.playbackSpeed);
+    return Future.value(mediaPlayerState.playbackSpeed);
   }
 
   setSpeed(double speed) {
-    _playerValue = _playerValue.copyWith(
-        duration: _playerValue.duration, playbackSpeed: speed);
+    mediaPlayerState.playbackSpeed = speed;
   }
 
   Future<double> getVolume() {
-    return Future.value(_playerValue.volume);
+    return Future.value(mediaPlayerState.volume);
   }
 
   setVolume(double volume) {
-    _playerValue =
-        _playerValue.copyWith(duration: _playerValue.duration, volume: volume);
-  }
-
-  VideoPlayerValue get playerValue {
-    return _playerValue;
-  }
-
-  set playerValue(VideoPlayerValue value) {
-    _playerValue = _playerValue.copyWith(
-        duration: value.duration,
-        size: value.size,
-        position: value.position,
-        caption: value.caption,
-        captionOffset: value.captionOffset,
-        buffered: value.buffered,
-        isInitialized: value.isInitialized,
-        isPlaying: value.isPlaying,
-        isLooping: value.isLooping,
-        isBuffering: value.isBuffering,
-        volume: value.volume,
-        playbackSpeed: value.playbackSpeed,
-        rotationCorrection: value.rotationCorrection,
-        errorDescription: value.errorDescription);
+    mediaPlayerState.volume = volume;
   }
 
   bool get closedCaptionFile {
@@ -80,7 +50,7 @@ abstract class AbstractAudioPlayerController
   }
 
   Future<void> _action() async {
-    if (_playerValue.isPlaying) {
+    if (mediaPlayerState.mediaPlayerStatus == MediaPlayerStatus.playing) {
       await pause();
     } else {
       await play();
@@ -94,44 +64,61 @@ abstract class AbstractAudioPlayerController
     bool showFullscreenButton = false,
     bool showVolumeButton = true,
   }) {
-    var controlText = AppLocalizations.t(_durationText);
-    Icon playIcon;
-    if (_playerValue.isPlaying) {
-      playIcon = const Icon(Icons.pause, size: 32);
-    } else {
-      playIcon = const Icon(Icons.play_arrow, size: 32);
-    }
+    var progressText = this.progressText;
+    Widget stopBtn = IconButton(
+      icon: const Icon(Icons.stop, size: 32),
+      onPressed: () async {
+        await stop();
+      },
+    );
+    Widget gap = const SizedBox(
+      width: 15,
+    );
     List<Widget> controls = [];
-    if (_playerValue.isPlaying) {
+    if (mediaPlayerState.mediaPlayerStatus == MediaPlayerStatus.playing) {
       controls.add(
         IconButton(
-          icon: const Icon(Icons.stop, size: 32),
+          icon: const Icon(Icons.pause, size: 32),
           onPressed: () async {
-            await stop();
+            await pause();
           },
         ),
       );
       controls.add(
-        const SizedBox(
-          width: 15,
+        gap,
+      );
+      controls.add(
+        stopBtn,
+      );
+      controls.add(
+        gap,
+      );
+    } else if (mediaPlayerState.mediaPlayerStatus == MediaPlayerStatus.stop ||
+        mediaPlayerState.mediaPlayerStatus == MediaPlayerStatus.pause ||
+        mediaPlayerState.mediaPlayerStatus == MediaPlayerStatus.completed) {
+      controls.add(
+        IconButton(
+          icon: const Icon(Icons.play_arrow, size: 32),
+          onPressed: () async {
+            await play();
+          },
         ),
       );
+      controls.add(
+        gap,
+      );
+
+      if (mediaPlayerState.mediaPlayerStatus == MediaPlayerStatus.pause) {
+        controls.add(
+          stopBtn,
+        );
+        controls.add(
+          gap,
+        );
+      }
     }
     controls.add(
-      IconButton(
-        icon: playIcon,
-        onPressed: () async {
-          await _action();
-        },
-      ),
-    );
-    controls.add(
-      const SizedBox(
-        width: 15,
-      ),
-    );
-    controls.add(
-      CommonAutoSizeText(controlText),
+      CommonAutoSizeText(progressText),
     );
     var container = SizedBox(
       width: 200,

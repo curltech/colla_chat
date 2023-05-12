@@ -94,4 +94,13 @@ class StringUtil {
 
     return defaultType;
   }
+
+  static String durationText(Duration duration) {
+    var durationText = duration.toString();
+    var pos = durationText.lastIndexOf('.');
+    durationText = durationText.substring(0, pos);
+    //'${duration.inHours}:${duration.inMinutes}:${duration.inSeconds}';
+
+    return durationText;
+  }
 }
