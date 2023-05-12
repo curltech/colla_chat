@@ -1,12 +1,14 @@
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/abstract_audio_recorder_controller.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/waveforms_audio_recorder.dart';
 import 'package:flutter/material.dart';
+import 'package:record/record.dart';
 
 enum MediaRecorderType {
   record,
@@ -51,6 +53,84 @@ class _PlatformAudioRecorderWidgetState
     super.dispose();
   }
 
+  Widget _buildAudioFormats() {
+    List<bool> isSelected = const [true, false, false, false];
+    if (widget.audioRecorderController is RecordAudioRecorderController) {
+      RecordAudioRecorderController recordAudioRecorderController =
+          widget.audioRecorderController as RecordAudioRecorderController;
+      if (recordAudioRecorderController.encoder == AudioEncoder.aacLc) {
+        isSelected = const [true, false, false, false];
+      }
+      if (recordAudioRecorderController.encoder == AudioEncoder.amrWb) {
+        isSelected = const [false, true, false, false];
+      }
+      if (recordAudioRecorderController.encoder == AudioEncoder.pcm8bit) {
+        isSelected = const [false, false, true, false];
+      }
+      if (recordAudioRecorderController.encoder == AudioEncoder.wav) {
+        isSelected = const [false, false, false, true];
+      }
+    }
+    var toggleWidget = ToggleButtons(
+      selectedBorderColor: Colors.white,
+      borderColor: Colors.grey,
+      isSelected: isSelected,
+      onPressed: (int newIndex) {
+        if (newIndex == 0) {
+          if (widget.audioRecorderController is RecordAudioRecorderController) {
+            RecordAudioRecorderController recordAudioRecorderController =
+                widget.audioRecorderController as RecordAudioRecorderController;
+            setState(() {
+              recordAudioRecorderController.encoder = AudioEncoder.aacLc;
+            });
+          }
+        } else if (newIndex == 1) {
+          if (widget.audioRecorderController is RecordAudioRecorderController) {
+            RecordAudioRecorderController recordAudioRecorderController =
+                widget.audioRecorderController as RecordAudioRecorderController;
+            setState(() {
+              recordAudioRecorderController.encoder = AudioEncoder.amrWb;
+            });
+          }
+        } else if (newIndex == 2) {
+          if (widget.audioRecorderController is RecordAudioRecorderController) {
+            RecordAudioRecorderController recordAudioRecorderController =
+                widget.audioRecorderController as RecordAudioRecorderController;
+            setState(() {
+              recordAudioRecorderController.encoder = AudioEncoder.pcm8bit;
+            });
+          }
+        } else if (newIndex == 3) {
+          if (widget.audioRecorderController is RecordAudioRecorderController) {
+            RecordAudioRecorderController recordAudioRecorderController =
+                widget.audioRecorderController as RecordAudioRecorderController;
+            setState(() {
+              recordAudioRecorderController.encoder = AudioEncoder.wav;
+            });
+          }
+        }
+      },
+      children: <Widget>[
+        Container(
+            padding: const EdgeInsets.all(10.0),
+            child: const CommonAutoSizeText('aacLc')),
+        Container(
+            padding: const EdgeInsets.all(10.0),
+            child: const CommonAutoSizeText('amrWb')),
+        Container(
+            padding: const EdgeInsets.all(10.0),
+            child: const CommonAutoSizeText('pcm8bit')),
+        Container(
+            padding: const EdgeInsets.all(10.0),
+            child: const CommonAutoSizeText('wav')),
+      ],
+    );
+    return SizedBox(
+      height: 60,
+      child: toggleWidget,
+    );
+  }
+
   List<Widget>? _buildRightWidgets() {
     if (platformParams.mobile) {
       List<bool> isSelected = const [true, false];
@@ -74,14 +154,8 @@ class _PlatformAudioRecorderWidgetState
           }
         },
         children: const <Widget>[
-          Icon(
-            Icons.web_outlined,
-            color: Colors.white,
-          ),
-          Icon(
-            Icons.video_call_outlined,
-            color: Colors.white,
-          ),
+          CommonAutoSizeText('Record'),
+          CommonAutoSizeText('Waveforms'),
         ],
       );
       List<Widget> children = [
@@ -103,10 +177,14 @@ class _PlatformAudioRecorderWidgetState
         rightWidgets: _buildRightWidgets(),
         child: Column(
           children: [
+            _buildAudioFormats(),
             const Spacer(),
             PlatformAudioRecorder(
               onStop: (String filename) {
-                logger.i('record audio filename:$filename');
+                if (mounted) {
+                  DialogUtil.info(context,
+                      content: 'record audio filename:$filename');
+                }
               },
               audioRecorderController: widget.audioRecorderController,
             ),

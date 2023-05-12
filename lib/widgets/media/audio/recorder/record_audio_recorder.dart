@@ -10,6 +10,12 @@ import 'package:record/record.dart';
 class RecordAudioRecorderController extends AbstractAudioRecorderController {
   final Record recorder = Record();
 
+  AudioEncoder encoder = AudioEncoder.aacLc;
+  int bitRate = 128000;
+  int samplingRate = 44100;
+  int numChannels = 2;
+  InputDevice? device;
+
   StreamSubscription<RecordState>? stateSubscription;
 
   //振幅
@@ -62,21 +68,22 @@ class RecordAudioRecorderController extends AbstractAudioRecorderController {
   @override
   Future<void> start({
     String? filename,
-    AudioEncoder encoder = AudioEncoder.aacLc,
-    int bitRate = 128000,
-    int samplingRate = 44100,
-    int numChannels = 2,
+    AudioEncoder? encoder,
+    int? bitRate,
+    int? samplingRate,
+    int? numChannels,
     InputDevice? device,
   }) async {
     try {
       if (await recorder.hasPermission()) {
+        this.filename = null;
         await super.start();
         await recorder.start(
             path: this.filename,
-            encoder: encoder,
-            bitRate: bitRate,
-            samplingRate: samplingRate,
-            numChannels: numChannels,
+            encoder: encoder ?? this.encoder,
+            bitRate: bitRate ?? this.bitRate,
+            samplingRate: samplingRate ?? this.samplingRate,
+            numChannels: numChannels ?? this.numChannels,
             device: device);
         status = RecorderStatus.recording;
       }

@@ -83,12 +83,12 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
   @override
   void dispose() {
     widget.audioRecorderController.removeListener(_update);
-    widget.audioRecorderController.dispose();
     super.dispose();
   }
 
   Widget _buildRecorderWidget(BuildContext context) {
-    var controlText = AppLocalizations.t(widget.audioRecorderController.durationText);
+    var controlText =
+        AppLocalizations.t(widget.audioRecorderController.durationText);
     Icon playIcon;
     if (widget.audioRecorderController.status == RecorderStatus.recording) {
       playIcon = const Icon(Icons.pause, size: 32);

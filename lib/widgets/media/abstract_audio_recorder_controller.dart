@@ -1,6 +1,8 @@
 import 'dart:async';
 
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:flutter/material.dart';
+import 'package:record/record.dart';
 
 enum RecorderStatus { pause, recording, stop }
 
@@ -86,11 +88,7 @@ abstract class AbstractAudioRecorderController with ChangeNotifier {
 
   _changeDurationText() {
     var duration = Duration(seconds: _duration);
-    var durationText = duration.toString();
-    var pos = durationText.lastIndexOf('.');
-    durationText = durationText.substring(0, pos);
-    //'${duration.inHours}:${duration.inMinutes}:${duration.inSeconds}';
 
-    _durationText = durationText;
+    _durationText = StringUtil.durationText(duration);
   }
 }
