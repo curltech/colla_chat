@@ -57,11 +57,12 @@ class VideoMessage extends StatelessWidget {
             if (filename == null) {
               return Container();
             }
+            var mediaPlayerController = OriginVideoPlayerController();
+            mediaPlayerController.addAll(filenames: [filename]);
             return PlatformMediaPlayer(
               key: UniqueKey(),
               showPlaylist: false,
-              filenames: [filename],
-              mediaPlayerController: OriginVideoPlayerController(),
+              mediaPlayerController: mediaPlayerController,
               swiperController: SwiperController(),
             );
           }

@@ -1,13 +1,6 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
-import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
-import 'package:colla_chat/widgets/media/audio/player/just_audio_player.dart';
-import 'package:colla_chat/widgets/media/audio/player/waveforms_audio_player.dart';
 import 'package:colla_chat/widgets/media/playlist_widget.dart';
-import 'package:colla_chat/widgets/media/video/chewie_video_player.dart';
-import 'package:colla_chat/widgets/media/video/flick_video_player.dart';
-import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
-import 'package:colla_chat/widgets/media/video/webview_video_player.dart';
 import 'package:flutter/material.dart';
 
 enum VideoPlayerType {
@@ -35,18 +28,12 @@ class PlatformMediaPlayer extends StatefulWidget {
   final Color? color;
   final double? height;
   final double? width;
-
-  final List<String>? filenames;
   final List<int>? data;
   final SwiperController swiperController;
   AbstractMediaPlayerController mediaPlayerController;
-  VideoPlayerType? videoPlayerType;
-  AudioPlayerType? audioPlayerType;
 
   PlatformMediaPlayer({
     Key? key,
-    this.videoPlayerType,
-    this.audioPlayerType,
     required this.mediaPlayerController,
     required this.swiperController,
     this.showClosedCaptionButton = true,
@@ -57,58 +44,8 @@ class PlatformMediaPlayer extends StatefulWidget {
     this.color,
     this.width,
     this.height,
-    this.filenames,
     this.data,
   }) : super(key: key);
-
-  _updateMediaPlayerType() {
-    if (videoPlayerType != null) {
-      switch (videoPlayerType) {
-        case VideoPlayerType.dart_vlc:
-          //controller = DartVlcVideoPlayerController();
-          break;
-        case VideoPlayerType.flick:
-          mediaPlayerController = FlickVideoPlayerController();
-          break;
-        case VideoPlayerType.origin:
-          mediaPlayerController = OriginVideoPlayerController();
-          break;
-        case VideoPlayerType.chewie:
-          mediaPlayerController = ChewieVideoPlayerController();
-          break;
-        case VideoPlayerType.webview:
-          mediaPlayerController = WebViewVideoPlayerController();
-          break;
-        default:
-          mediaPlayerController = WebViewVideoPlayerController();
-          break;
-      }
-    } else if (audioPlayerType != null) {
-      switch (audioPlayerType) {
-        case AudioPlayerType.webview:
-          mediaPlayerController = WebViewVideoPlayerController();
-          break;
-        case AudioPlayerType.just:
-          mediaPlayerController = JustAudioPlayerController();
-          break;
-        case AudioPlayerType.audioplayers:
-          mediaPlayerController = BlueFireAudioPlayerController();
-          break;
-        case AudioPlayerType.waveforms:
-          mediaPlayerController = WaveformsAudioPlayerController();
-          break;
-        default:
-          mediaPlayerController = WebViewVideoPlayerController();
-          break;
-      }
-    } else {
-      videoPlayerType = VideoPlayerType.webview;
-      mediaPlayerController = WebViewVideoPlayerController();
-    }
-    if (filenames != null) {
-      mediaPlayerController.addAll(filenames: filenames!);
-    }
-  }
 
   _onSelected(int index, String filename) {
     swiperController.move(1);
