@@ -8,11 +8,12 @@ import 'package:flutter/material.dart';
 ///基于flick实现的媒体播放器和记录器，
 class FlickVideoPlayerController extends OriginVideoPlayerController {
   FlickVideoPlayerController() {
-    fileType = FileType.media;
+    fileType = FileType.any;
+    allowedExtensions = ['mp3', 'wav', 'mp4', 'm4a', 'mov', 'mpeg', 'aac'];
   }
 
   FlickManager? _buildFlickManager() {
-    var controller = this.videoPlayerController;
+    var controller = videoPlayerController;
     if (controller == null) {
       return null;
     }

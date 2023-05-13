@@ -16,13 +16,13 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
   @override
   next() {
     super.next();
-    _play();
+    play();
   }
 
   @override
   previous() {
     super.previous();
-    _play();
+    play();
   }
 
   String getMediaHtml(String filename, {bool autoplay = false}) {
@@ -39,18 +39,16 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
     return html;
   }
 
-  _play() {
+  play() {
     var currentMediaSource = this.currentMediaSource;
     if (platformWebViewController != null && currentMediaSource != null) {
       platformWebViewController!.load(currentMediaSource.filename);
-      // String html = getMediaHtml(currentMediaSource.filename);
-      // platformWebViewController!.loadHtml(html);
     }
   }
 
   void _onWebViewCreated(PlatformWebViewController platformWebViewController) {
     this.platformWebViewController = platformWebViewController;
-    _play();
+    // play();
   }
 
   @override
@@ -58,9 +56,9 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
     if (index >= -1 && index < playlist.length && currentIndex != index) {
       close();
       await super.setCurrentIndex(index);
-      if (platformWebViewController != null) {
-        _play();
-      }
+      // if (platformWebViewController != null) {
+      //   _play();
+      // }
       notifyListeners();
     }
   }
