@@ -2,14 +2,15 @@ import 'dart:async';
 
 import 'package:another_audio_recorder/another_audio_recorder.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/media/abstract_audio_recorder_controller.dart';
-import 'package:path_provider/path_provider.dart';
 
-///仅支持移动设备，aac,wav两种格式，支持mp3
+///仅支持移动设备，aac,wav两种格式，支持aac和wav
 class AnotherAudioRecorderController extends AbstractAudioRecorderController {
   AnotherAudioRecorder? recorder;
   Recording? _current;
+  AudioFormat audioFormat = AudioFormat.AAC;
+  int sampleRate = 16000;
 
   AnotherAudioRecorderController();
 
@@ -31,19 +32,21 @@ class AnotherAudioRecorderController extends AbstractAudioRecorderController {
   }
 
   @override
-  Future<void> start() async {
-    AudioFormat audioFormat = AudioFormat.AAC;
-    int sampleRate = 16000;
+  Future<void> start({
+    AudioFormat? audioFormat,
+    int? sampleRate,
+  }) async {
     try {
       bool permission = await hasPermission();
       if (permission) {
-        if (filename == null) {
-          final dir = await getTemporaryDirectory();
-          var name = DateUtil.currentDate();
-          filename = '${dir.path}/$name.ma4';
+        String extension = 'ma4';
+        AudioFormat format = audioFormat ?? this.audioFormat;
+        if (format == AudioFormat.WAV) {
+          extension = 'wav';
         }
+        filename = await FileUtil.getTempFilename(extension: extension);
         recorder = AnotherAudioRecorder(filename!,
-            audioFormat: audioFormat, sampleRate: sampleRate);
+            audioFormat: format, sampleRate: sampleRate ?? this.sampleRate);
         await recorder!.initialized;
         await super.start();
         await recorder!.start();

@@ -13,14 +13,42 @@ class StackMultiIcon extends StatelessWidget {
   }
 }
 
-class AnimateMultiIcon extends StatefulWidget {
+class AnimateMultiIconController with ChangeNotifier {
   final List<Widget> icons;
   final Duration duration;
+  int index = 0;
+  bool playState = false;
 
-  const AnimateMultiIcon(
-      {super.key,
-      required this.icons,
-      this.duration = const Duration(milliseconds: 150)});
+  AnimateMultiIconController(this.icons,
+      {this.duration = const Duration(milliseconds: 150)});
+
+  togglePlay() {
+    if (playState) {
+      playState = false;
+      return;
+    }
+    playState = true;
+    Future.doWhile(() async {
+      await Future.delayed(duration, () {
+        index++;
+        if (index >= icons.length) {
+          index = 0;
+        }
+        notifyListeners();
+      });
+
+      return playState;
+    });
+  }
+}
+
+class AnimateMultiIcon extends StatefulWidget {
+  final AnimateMultiIconController animateMultiIconController;
+
+  const AnimateMultiIcon({
+    super.key,
+    required this.animateMultiIconController,
+  });
 
   @override
   State<StatefulWidget> createState() {
@@ -29,27 +57,25 @@ class AnimateMultiIcon extends StatefulWidget {
 }
 
 class _AnimateMultiIconStat extends State<AnimateMultiIcon> {
-  int index = 0;
-
   @override
   initState() {
     super.initState();
-    Future.doWhile(() async {
-      if (index >= widget.icons.length) {
-        index = 0;
-      }
-      await Future.delayed(widget.duration, () {
-        if (mounted) {
-          setState(() {});
-        }
-      });
-      index++;
-      return true;
-    });
+    widget.animateMultiIconController.addListener(_update);
+  }
+
+  _update() {
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    return widget.icons[index];
+    return widget.animateMultiIconController
+        .icons[widget.animateMultiIconController.index];
+  }
+
+  @override
+  void dispose() {
+    widget.animateMultiIconController.removeListener(_update);
+    super.dispose();
   }
 }

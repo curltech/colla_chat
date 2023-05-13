@@ -32,28 +32,41 @@ class FileUtil {
     return filename;
   }
 
-  static Future<String?> writeTempFile(List<int> bytes,
+  static Future<String> getTempFilename(
       {String? filename, String? extension}) async {
+    String tempFilename;
     if (StringUtil.isEmpty(filename)) {
       final dir = await getTemporaryDirectory();
       var uuid = const Uuid();
       var name = uuid.v4();
       if (extension != null) {
-        filename = p.join(dir.path, '$name.$extension');
+        tempFilename = p.join(dir.path, '$name.$extension');
       } else {
-        filename = p.join(dir.path, name);
+        tempFilename = p.join(dir.path, name);
       }
-    } else if (!filename!.contains(p.separator)) {
+    } else {
       final dir = await getTemporaryDirectory();
       if (extension != null) {
-        filename = p.join(dir.path, '$filename.$extension');
+        tempFilename = p.join(dir.path, '$filename.$extension');
       } else {
-        filename = p.join(dir.path, filename);
+        tempFilename = p.join(dir.path, filename);
       }
     }
-    final file = File(filename);
-    await file.writeAsBytes(bytes);
+
+    return tempFilename;
+  }
+
+  static Future<String?> writeTempFile(List<int> bytes,
+      {String? filename, String? extension}) async {
+    String tempFilename =
+        await getTempFilename(filename: filename, extension: extension);
+    final file = File(tempFilename);
     bool exist = await file.exists();
+    if (exist) {
+      file.deleteSync();
+    }
+    await file.writeAsBytes(bytes);
+    exist = await file.exists();
     if (!exist) {
       return null;
     }

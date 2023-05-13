@@ -29,13 +29,13 @@ class PlatformMediaPlayer extends StatefulWidget {
   final double? height;
   final double? width;
   final List<int>? data;
-  final SwiperController swiperController;
+  final SwiperController? swiperController;
   AbstractMediaPlayerController mediaPlayerController;
 
   PlatformMediaPlayer({
     Key? key,
     required this.mediaPlayerController,
-    required this.swiperController,
+    this.swiperController,
     this.showClosedCaptionButton = true,
     this.showFullscreenButton = true,
     this.showVolumeButton = true,
@@ -48,7 +48,7 @@ class PlatformMediaPlayer extends StatefulWidget {
   }) : super(key: key);
 
   _onSelected(int index, String filename) {
-    swiperController.move(1);
+    swiperController!.move(1);
   }
 
   @override
@@ -70,17 +70,17 @@ class _PlatformMediaPlayerState extends State<PlatformMediaPlayer> {
     Widget mediaView;
     Widget player =
         widget.mediaPlayerController.buildMediaPlayer(key: UniqueKey());
-    int index = widget.swiperController.index;
-    if (widget.mediaPlayerController.currentIndex == -1) {
-      index = 0;
-    }
-    if (widget.showPlaylist) {
+    if (widget.showPlaylist && widget.swiperController != null) {
+      int index = widget.swiperController!.index;
+      if (widget.mediaPlayerController.currentIndex == -1) {
+        index = 0;
+      }
       mediaView = Swiper(
         itemCount: 2,
         index: index,
         controller: widget.swiperController,
         onIndexChanged: (int index) {
-          widget.swiperController.index = index;
+          widget.swiperController!.index = index;
         },
         itemBuilder: (BuildContext context, int index) {
           if (index == 0) {

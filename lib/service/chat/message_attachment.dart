@@ -64,14 +64,25 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
     } else {
       filename = messageId;
     }
+    String tempFilename = await FileUtil.getTempFilename(filename: filename);
+    var file = File(tempFilename);
+    bool exist = await file.exists();
+    if (exist) {
+      return tempFilename;
+    }
     String contentPath = p.join(myself.myPath, 'content');
     if (!platformParams.web) {
-      Uint8List? data = await FileUtil.readFile(p.join(contentPath, filename));
+      String path = p.join(contentPath, filename);
+      Uint8List? data = await FileUtil.readFile(path);
       if (data != null) {
         data = await decryptContent(data);
         if (data != null) {
-          filename = await FileUtil.writeTempFile(data, filename: filename);
-          return filename;
+          try {
+            filename = await FileUtil.writeTempFile(data, filename: filename);
+            return filename;
+          } catch (e) {
+            logger.e('writeTempFile $filename failure:$e');
+          }
         }
       }
     } else {

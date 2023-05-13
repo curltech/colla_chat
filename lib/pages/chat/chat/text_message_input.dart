@@ -1,19 +1,23 @@
 import 'dart:async';
 
+import 'package:another_audio_recorder/another_audio_recorder.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/extended_text_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/message/message_widget.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
+import 'package:colla_chat/widgets/media/audio/recorder/another_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
+import 'package:record/record.dart';
 
 ///发送文本消息的输入框和按钮，
 ///包括声音按钮，扩展文本输入框，emoji按钮，其他多种格式输入按钮和发送按钮
@@ -83,10 +87,26 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
 
   ///语音录音按钮
   Widget _buildVoiceRecordButton(context) {
-    return PlatformAudioRecorder(
-      onStop: _onStop,
-      audioRecorderController: RecordAudioRecorderController(),
-    );
+    PlatformAudioRecorder platformAudioRecorder;
+    if (platformParams.mobile) {
+      AnotherAudioRecorderController audioRecorderController =
+          AnotherAudioRecorderController();
+      audioRecorderController.audioFormat = AudioFormat.WAV;
+      platformAudioRecorder = PlatformAudioRecorder(
+        onStop: _onStop,
+        audioRecorderController: audioRecorderController,
+      );
+    } else {
+      RecordAudioRecorderController audioRecorderController =
+          RecordAudioRecorderController();
+      audioRecorderController.encoder = AudioEncoder.wav;
+      platformAudioRecorder = PlatformAudioRecorder(
+        onStop: _onStop,
+        audioRecorderController: audioRecorderController,
+      );
+    }
+
+    return platformAudioRecorder;
   }
 
   bool _hasValue() {

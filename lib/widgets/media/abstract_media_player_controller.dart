@@ -254,6 +254,13 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     return mediaSources;
   }
 
+  clear() {
+    close();
+    playlist.clear();
+    _currentIndex = -1;
+    notifyListeners();
+  }
+
   Future<PlatformMediaSource?> insert(int index,
       {required String filename}) async {
     for (var mediaSource in playlist) {

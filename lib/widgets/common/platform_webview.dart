@@ -31,6 +31,14 @@ class PlatformWebViewController with ChangeNotifier {
     return platformWebViewController;
   }
 
+  loadHtml(String html) async {
+    if (webViewController != null) {
+      await webViewController!.loadHtmlString(html);
+    } else if (inAppWebViewController != null) {
+      await inAppWebViewController!.loadData(data: html);
+    }
+  }
+
   load(String? filename) async {
     if (StringUtil.isEmpty(filename)) {
       String html = """<html><body></body></html>""";

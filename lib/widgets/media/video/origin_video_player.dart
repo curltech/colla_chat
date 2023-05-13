@@ -77,7 +77,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     bool showFullscreenButton = true,
     bool showVolumeButton = true,
   }) {
-    //Widget player = VideoPlayer(controller!);
+    // Widget player = VideoPlayer(videoPlayerController!);
     Widget player = videoPlayerController != null
         ? JkVideoControlPanel(
             key: key,

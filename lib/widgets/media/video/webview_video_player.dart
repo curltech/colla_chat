@@ -1,3 +1,4 @@
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/common/platform_webview.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:file_picker/file_picker.dart';
@@ -9,7 +10,7 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
 
   WebViewVideoPlayerController() {
     fileType = FileType.any;
-    allowedExtensions = ['mp3','wav', 'mp4', 'm4a', 'mov', 'mpeg', 'aac'];
+    allowedExtensions = ['mp3', 'wav', 'mp4', 'm4a', 'mov', 'mpeg', 'aac'];
   }
 
   @override
@@ -24,10 +25,26 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
     _play();
   }
 
+  String getMediaHtml(String filename, {bool autoplay = false}) {
+    String autoplayStr = autoplay ? 'autoplay' : '';
+    String? typeTag = FileUtil.mimeType(filename);
+    String? mediaTag = 'video';
+    if (typeTag != null &&
+        (typeTag.endsWith('mp3') || typeTag.endsWith('wav'))) {
+      mediaTag = 'audio';
+    }
+    String html =
+        '<p align=center><$mediaTag controls="controls" $autoplayStr><source src="file:///$filename" type="$typeTag"></$mediaTag></p>';
+
+    return html;
+  }
+
   _play() {
     var currentMediaSource = this.currentMediaSource;
     if (platformWebViewController != null && currentMediaSource != null) {
       platformWebViewController!.load(currentMediaSource.filename);
+      // String html = getMediaHtml(currentMediaSource.filename);
+      // platformWebViewController!.loadHtml(html);
     }
   }
 

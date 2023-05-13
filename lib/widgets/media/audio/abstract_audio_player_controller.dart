@@ -72,7 +72,7 @@ abstract class AbstractAudioPlayerController
       },
     );
     Widget gap = const SizedBox(
-      width: 15,
+      width: 0,
     );
     List<Widget> controls = [];
     if (mediaPlayerState.mediaPlayerStatus == MediaPlayerStatus.playing) {
@@ -121,10 +121,10 @@ abstract class AbstractAudioPlayerController
       CommonAutoSizeText(progressText),
     );
     var container = SizedBox(
-      width: 200,
+      width: 240,
       height: 50,
       child:
-          Row(mainAxisAlignment: MainAxisAlignment.center, children: controls),
+          Row(mainAxisAlignment: MainAxisAlignment.start, children: controls),
     );
     return container;
   }

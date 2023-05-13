@@ -1,10 +1,14 @@
 import 'dart:async';
 
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_audio_recorder_controller.dart';
+import 'package:colla_chat/widgets/media/audio/recorder/another_audio_recorder.dart';
+import 'package:colla_chat/widgets/media/audio/recorder/record_audio_recorder.dart';
 import 'package:flutter/material.dart';
+import 'package:record/record.dart';
 
 ///采用record和another实现的音频记录器组件
 class PlatformAudioRecorder extends StatefulWidget {
@@ -13,13 +17,29 @@ class PlatformAudioRecorder extends StatefulWidget {
   final double width;
   final double height;
 
-  const PlatformAudioRecorder({
+  PlatformAudioRecorder({
     Key? key,
     required this.audioRecorderController,
     this.width = 250,
     this.height = 48,
     this.onStop,
-  }) : super(key: key);
+  }) : super(key: key) {
+    if (audioRecorderController is RecordAudioRecorderController) {
+      RecordAudioRecorderController recordAudioRecorderController =
+          audioRecorderController as RecordAudioRecorderController;
+      if (recordAudioRecorderController.encoder == AudioEncoder.wav) {
+        if (platformParams.ios || platformParams.macos) {
+          logger.e(
+              'Not support wav in ios and macos, please use another recorder');
+        }
+      }
+    }
+    if (audioRecorderController is AnotherAudioRecorderController) {
+      if (!platformParams.mobile) {
+        logger.e('Not support non mobile, please use record recorder');
+      }
+    }
+  }
 
   @override
   State createState() => _PlatformAudioRecorderState();
@@ -50,6 +70,20 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
 
   Future<void> _start() async {
     try {
+      if (widget.audioRecorderController is RecordAudioRecorderController) {
+        RecordAudioRecorderController recordAudioRecorderController =
+            widget.audioRecorderController as RecordAudioRecorderController;
+        if (recordAudioRecorderController.encoder == AudioEncoder.wav) {
+          if (platformParams.ios || platformParams.macos) {
+            throw 'Not support wav in ios and macos, please use another recorder';
+          }
+        }
+      }
+      if (widget.audioRecorderController is AnotherAudioRecorderController) {
+        if (!platformParams.mobile) {
+          throw 'Not support non mobile, please use record recorder';
+        }
+      }
       await widget.audioRecorderController.start();
     } catch (e) {
       logger.e(e);

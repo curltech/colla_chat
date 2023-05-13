@@ -96,6 +96,9 @@ class StringUtil {
   }
 
   static String durationText(Duration duration) {
+    if (duration.inSeconds < 0) {
+      duration = Duration.zero;
+    }
     var durationText = duration.toString();
     var pos = durationText.lastIndexOf('.');
     durationText = durationText.substring(0, pos);
