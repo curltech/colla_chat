@@ -52,6 +52,9 @@ class _AudioMessageState extends State<AudioMessage> {
         valueListenable: filename,
         builder: (context, filename, child) {
           if (filename != null) {
+            if (widget.fullScreen) {
+              audioMessagePlayerController.autoplay = true;
+            }
             audioMessagePlayerController.clear();
             audioMessagePlayerController.addAll(filenames: [filename]);
 
