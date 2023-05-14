@@ -1,5 +1,8 @@
 import 'package:card_swiper/card_swiper.dart';
+import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
@@ -119,7 +122,8 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
       swiperController: widget.swiperController,
     );
     return AppBarView(
-      title: widget.title,
+      titleWidget: CommonAutoSizeText(AppLocalizations.t(widget.title),
+          style: const TextStyle(fontSize: AppFontSize.mdFontSize)),
       withLeading: true,
       rightWidgets: rightWidgets,
       child: platformMediaPlayer,

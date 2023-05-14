@@ -536,7 +536,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           valueListenable: _currentTab,
           builder: (context, value, child) {
             return Tab(
-              icon: Icon(Icons.person_outline,
+              icon: Icon(Icons.person,
                   color: value == 0 ? myself.primary : myself.secondary),
               //text: AppLocalizations.t('Linkman'),
               iconMargin: const EdgeInsets.all(0.0),
@@ -546,7 +546,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           valueListenable: _currentTab,
           builder: (context, value, child) {
             return Tab(
-              icon: Icon(Icons.group_outlined,
+              icon: Icon(Icons.group,
                   color: value == 1 ? myself.primary : myself.secondary),
               //text: AppLocalizations.t('Group'),
               iconMargin: const EdgeInsets.all(0.0),
@@ -556,7 +556,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
           valueListenable: _currentTab,
           builder: (context, value, child) {
             return Tab(
-              icon: Icon(Icons.meeting_room_outlined,
+              icon: Icon(Icons.meeting_room,
                   color: value == 2 ? myself.primary : myself.secondary),
               //text: AppLocalizations.t('Group'),
               iconMargin: const EdgeInsets.all(0.0),
