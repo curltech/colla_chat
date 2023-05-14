@@ -163,7 +163,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   List<PlatformMediaSource> playlist = [];
   bool _playlistVisible = true;
   int _currentIndex = -1;
-  FileType fileType = FileType.any;
+  FileType fileType = FileType.custom;
   List<String>? allowedExtensions;
   MediaPlayerState mediaPlayerState = MediaPlayerState();
   bool autoplay = false;

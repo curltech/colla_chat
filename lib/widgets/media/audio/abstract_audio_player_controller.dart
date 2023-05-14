@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 abstract class AbstractAudioPlayerController
     extends AbstractMediaPlayerController {
   AbstractAudioPlayerController() : super() {
-    fileType = FileType.any;
+    fileType = FileType.custom;
     allowedExtensions = ['mp3', 'wav'];
   }
 
