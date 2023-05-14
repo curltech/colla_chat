@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 ///平台标准的AudioPlayer的实现，支持标准的audioplayers，just_audio和webview
 class PlatformAudioPlayerWidget extends StatefulWidget with TileDataMixin {
   AbstractMediaPlayerController mediaPlayerController =
-      WebViewVideoPlayerController();
+      globalBlueFireAudioPlayerController;
   final SwiperController swiperController = SwiperController();
 
   PlatformAudioPlayerWidget({super.key});
@@ -59,19 +59,19 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
       onPressed: (int newIndex) {
         if (newIndex == 0) {
           setState(() {
-            widget.mediaPlayerController = WebViewVideoPlayerController();
+            widget.mediaPlayerController = globalWebViewVideoPlayerController;
           });
         } else if (newIndex == 1) {
           setState(() {
-            widget.mediaPlayerController = BlueFireAudioPlayerController();
+            widget.mediaPlayerController = globalBlueFireAudioPlayerController;
           });
         } else if (newIndex == 2) {
           setState(() {
-            widget.mediaPlayerController = JustAudioPlayerController();
+            widget.mediaPlayerController = globalJustAudioPlayerController;
           });
         } else if (newIndex == 3) {
           setState(() {
-            widget.mediaPlayerController = WaveformsAudioPlayerController();
+            widget.mediaPlayerController = globalWaveformsAudioPlayerController;
           });
         }
       },

@@ -1,4 +1,3 @@
-import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:file_picker/file_picker.dart';
@@ -93,9 +92,7 @@ abstract class AbstractAudioPlayerController
       controls.add(
         gap,
       );
-    } else if (mediaPlayerState.mediaPlayerStatus == MediaPlayerStatus.stop ||
-        mediaPlayerState.mediaPlayerStatus == MediaPlayerStatus.pause ||
-        mediaPlayerState.mediaPlayerStatus == MediaPlayerStatus.completed) {
+    } else {
       controls.add(
         IconButton(
           icon: const Icon(Icons.play_arrow, size: 32),
@@ -124,7 +121,7 @@ abstract class AbstractAudioPlayerController
       width: 240,
       height: 50,
       child:
-          Row(mainAxisAlignment: MainAxisAlignment.start, children: controls),
+          Row(mainAxisAlignment: MainAxisAlignment.center, children: controls),
     );
     return container;
   }

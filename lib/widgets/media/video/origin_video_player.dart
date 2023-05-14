@@ -50,7 +50,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
 
   OriginVideoPlayerController() {
     fileType = FileType.any;
-    allowedExtensions = ['mp3','wav', 'mp4', 'm4a', 'mov', 'mpeg', 'aac'];
+    allowedExtensions = ['mp3', 'wav', 'mp4', 'm4a', 'mov', 'mpeg', 'aac'];
   }
 
   @override
@@ -194,3 +194,6 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     return null;
   }
 }
+
+final OriginVideoPlayerController globalOriginVideoPlayerController =
+    OriginVideoPlayerController();

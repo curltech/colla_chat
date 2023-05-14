@@ -137,3 +137,6 @@ class RecordAudioRecorderController extends AbstractAudioRecorderController {
     super.dispose();
   }
 }
+
+final RecordAudioRecorderController globalRecordAudioRecorderController =
+    RecordAudioRecorderController();

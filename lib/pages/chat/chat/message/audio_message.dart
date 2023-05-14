@@ -4,18 +4,6 @@ import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dar
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:flutter/material.dart';
 
-///非全屏模式下，音频消息中用于播放音频的简单播放器
-final BlueFireAudioPlayer simpleAudioMessagePlayer = BlueFireAudioPlayer();
-
-///全屏模式下，音频消息中用于播放音频的复杂播放器
-final BlueFireAudioPlayerController audioMessagePlayerController =
-    BlueFireAudioPlayerController();
-final PlatformMediaPlayer audioMessagePlayer = PlatformMediaPlayer(
-  key: UniqueKey(),
-  showPlaylist: false,
-  mediaPlayerController: audioMessagePlayerController,
-);
-
 ///消息体：声音消息
 class AudioMessage extends StatelessWidget {
   final int id;
@@ -46,6 +34,13 @@ class AudioMessage extends StatelessWidget {
         valueListenable: filename,
         builder: (context, filename, child) {
           if (filename != null) {
+            final BlueFireAudioPlayerController audioMessagePlayerController =
+                BlueFireAudioPlayerController();
+            final PlatformMediaPlayer audioMessagePlayer = PlatformMediaPlayer(
+              key: UniqueKey(),
+              showPlaylist: false,
+              mediaPlayerController: audioMessagePlayerController,
+            );
             audioMessagePlayerController.clear();
             audioMessagePlayerController.addAll(filenames: [filename]);
 

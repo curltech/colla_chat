@@ -58,8 +58,8 @@ class JustAudioPlayer {
         //_player.pause();
       });
       audioSession.interruptionEventStream.listen((event) {
-        print('interruption begin: ${event.begin}');
-        print('interruption type: ${event.type}');
+        logger.i('interruption begin: ${event.begin}');
+        logger.i('interruption type: ${event.type}');
         if (event.begin) {
           switch (event.type) {
             case AudioInterruptionType.duck:
@@ -94,8 +94,8 @@ class JustAudioPlayer {
         }
       });
       audioSession.devicesChangedEventStream.listen((event) {
-        print('Devices added: ${event.devicesAdded}');
-        print('Devices removed: ${event.devicesRemoved}');
+        logger.i('Devices added: ${event.devicesAdded}');
+        logger.i('Devices removed: ${event.devicesRemoved}');
       });
       await audioSession.setActive(true);
     });
@@ -144,6 +144,8 @@ class JustAudioPlayer {
     await player.setLoopMode(mode ? LoopMode.all : LoopMode.off);
   }
 }
+
+final JustAudioPlayer globalJustAudioPlayer = JustAudioPlayer();
 
 ///采用just_audio和record实现的音频的播放和记录，适用于Android, iOS, Linux, macOS, Windows, and web.
 class JustAudioSource {
@@ -194,7 +196,7 @@ class JustAudioSource {
 ///JustAudio音频播放器，Android, iOS, Linux, macOS, Windows, and web.
 ///还可以产生音频播放的波形图形组件
 class JustAudioPlayerController extends AbstractAudioPlayerController {
-  late AudioPlayer player;
+  JustAudioPlayer? player;
 
   ///当前版本还不支持windows
   // ConcatenatingAudioSource playlist = ConcatenatingAudioSource(
@@ -214,8 +216,9 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
     AudioLoadConfiguration? audioLoadConfiguration,
     AudioPipeline? audioPipeline,
     bool androidOffloadSchedulingEnabled = false,
+    this.player,
   }) {
-    player = AudioPlayer(
+    this.player ??= JustAudioPlayer(
         userAgent: userAgent,
         handleInterruptions: handleInterruptions,
         androidApplyAudioAttributes: androidApplyAudioAttributes,
@@ -223,6 +226,7 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
         audioLoadConfiguration: audioLoadConfiguration,
         audioPipeline: audioPipeline,
         androidOffloadSchedulingEnabled: androidOffloadSchedulingEnabled);
+    AudioPlayer player = this.player!.player;
     player.playerStateStream.listen((state) {
       logger.i('player state:${state.processingState.name}');
     });
@@ -252,53 +256,47 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
   ///设置当前的通用MediaSource，并转换成特定实现的媒体源，并进行设置
   @override
   setCurrentIndex(int index) async {
-    super.setCurrentIndex(index);
+    if (currentIndex >= 0 && currentIndex < playlist.length) {
+      close();
+      await super.setCurrentIndex(index);
+      notifyListeners();
+    }
+  }
+
+  @override
+  play() async {
     if (currentIndex >= 0 && currentIndex < playlist.length) {
       PlatformMediaSource? currentMediaSource = this.currentMediaSource;
       if (currentMediaSource != null) {
-        AudioSource source =
-            JustAudioSource.fromMediaSource(currentMediaSource);
-        var audioSource = player.audioSource;
-        if (audioSource != source) {
-          try {
-            await player.setAudioSource(
-              source,
-            );
-            notifyListeners();
-          } catch (e) {
-            logger.e('$e');
-          }
+        try {
+          await player!.play(currentMediaSource.filename);
+          playlistVisible = false;
+          notifyListeners();
+        } catch (e) {
+          logger.e('$e');
         }
       }
     }
   }
 
   @override
-  play() async {
-    var audioSource = player.audioSource;
-    if (audioSource != null) {
-      await player.play();
-    }
-  }
-
-  @override
   pause() async {
-    await player.pause();
+    await player!.pause();
   }
 
   @override
   stop() async {
-    await player.stop();
+    await player!.stop();
   }
 
   @override
   resume() async {
-    await player.play();
+    await play();
   }
 
   @override
   dispose() async {
-    await player.dispose();
+    await player!.player.dispose();
     super.dispose();
   }
 
@@ -309,7 +307,7 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
     }
     if (position != null) {
       try {
-        await player.seek(position, index: index);
+        await player!.player.seek(position, index: index);
       } catch (e) {
         logger.e('seek failure:$e');
       }
@@ -317,47 +315,48 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
   }
 
   setLoopMode(LoopMode mode) async {
-    await player.setLoopMode(mode);
+    await player!.player.setLoopMode(mode);
   }
 
   Future<Duration?> getDuration() async {
-    return player.duration;
+    return player!.player.duration;
   }
 
   Future<Duration?> getPosition() async {
-    return player.position;
+    return player!.player.position;
   }
 
   Future<Duration?> getBufferedPosition() async {
-    return player.bufferedPosition;
+    return player!.player.bufferedPosition;
   }
 
   @override
   Future<double> getVolume() async {
-    return Future.value(player.volume);
+    return Future.value(player!.player.volume);
   }
 
   @override
   setVolume(double volume) async {
-    await player.setVolume(volume);
+    await player!.player.setVolume(volume);
   }
 
+  @override
   Future<double> getSpeed() async {
-    return Future.value(player.speed);
+    return Future.value(player!.player.speed);
   }
 
   @override
   setSpeed(double speed) async {
-    await player.setSpeed(speed);
+    await player!.player.setSpeed(speed);
   }
 
   /// Collects the data useful for displaying in a seek bar, using a handy
   /// feature of rx_dart to combine the 3 streams of interest into one.
   Stream<PositionData> get positionDataStream {
     return Rx.combineLatest3<Duration, Duration, Duration?, PositionData>(
-        player.positionStream,
-        player.bufferedPositionStream,
-        player.durationStream,
+        player!.player.positionStream,
+        player!.player.bufferedPositionStream,
+        player!.player.durationStream,
         (position, bufferedPosition, duration) => PositionData(
             position, bufferedPosition, duration ?? Duration.zero));
   }
@@ -376,3 +375,6 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
         showVolumeButton: showVolumeButton);
   }
 }
+
+final JustAudioPlayerController globalJustAudioPlayerController =
+    JustAudioPlayerController();

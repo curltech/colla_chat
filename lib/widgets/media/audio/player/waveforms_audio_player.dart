@@ -126,3 +126,6 @@ class WaveformsAudioPlayerController extends AbstractAudioPlayerController {
     );
   }
 }
+
+final WaveformsAudioPlayerController globalWaveformsAudioPlayerController =
+    WaveformsAudioPlayerController();

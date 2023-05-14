@@ -31,7 +31,7 @@ class BlueFireAudioPlayer {
     bool? respectSilence,
     bool? stayAwake,
   }) async {
-    await _global.setGlobalAudioContext(_build(
+    await _global.setGlobalAudioContext(_buildAudioContextConfig(
         forceSpeaker: forceSpeaker,
         duckAudio: duckAudio,
         respectSilence: respectSilence,
@@ -44,7 +44,7 @@ class BlueFireAudioPlayer {
     bool? respectSilence,
     bool? stayAwake,
   }) async {
-    audioContext = _build(
+    audioContext = _buildAudioContextConfig(
         forceSpeaker: forceSpeaker,
         duckAudio: duckAudio,
         respectSilence: respectSilence,
@@ -54,7 +54,7 @@ class BlueFireAudioPlayer {
     }
   }
 
-  AudioContext _build({
+  AudioContext _buildAudioContextConfig({
     bool? forceSpeaker,
     bool? duckAudio,
     bool? respectSilence,
@@ -80,19 +80,6 @@ class BlueFireAudioPlayer {
         options: [AVAudioSessionOptions.defaultToSpeaker]);
   }
 
-  Source _audioSource({required String filename}) {
-    Source source;
-    if (filename.startsWith('assets/')) {
-      source = AssetSource(filename.substring(7));
-    } else if (filename.startsWith('http')) {
-      source = UrlSource(filename);
-    } else {
-      source = DeviceFileSource(filename);
-    }
-
-    return source;
-  }
-
   play(
     String filename, {
     double? volume,
@@ -102,7 +89,7 @@ class BlueFireAudioPlayer {
     PlayerMode? mode,
   }) async {
     try {
-      Source source = _audioSource(filename: filename);
+      Source source = BlueFireAudioSource.audioSource(filename: filename);
       await player.play(source,
           volume: volume,
           balance: balance,
@@ -135,6 +122,10 @@ class BlueFireAudioPlayer {
   }
 }
 
+///全局的BlueFireAudioPlayer音频播放器，可以直接播放音频文件
+final BlueFireAudioPlayer globalBlueFireAudioPlayer = BlueFireAudioPlayer();
+
+///BlueFire的音频源类，提供将其他形式比如文件转换成BlueFire音频源的静态方法
 class BlueFireAudioSource {
   static Source mediaStream(
       {required Uint8List data, required ChatMessageMimeType mediaFormat}) {
@@ -164,18 +155,20 @@ class BlueFireAudioSource {
 ///完整的音频播放器，Android, iOS, Linux, macOS, Windows, and web.
 ///带有控制器按钮和状态跟踪
 class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
-  AudioPlayer player = AudioPlayer();
+  BlueFireAudioPlayer? player;
 
   StreamSubscription? _durationSubscription;
   StreamSubscription? _positionSubscription;
   StreamSubscription? _playerCompleteSubscription;
   StreamSubscription? _playerStateChangeSubscription;
 
-  BlueFireAudioPlayerController() : super() {
+  BlueFireAudioPlayerController({this.player}) : super() {
     _initStreams();
   }
 
   void _initStreams() {
+    this.player ??= BlueFireAudioPlayer();
+    var player = this.player!.player;
     _durationSubscription = player.onDurationChanged.listen((duration) {
       mediaPlayerState.duration = duration;
     });
@@ -209,7 +202,7 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
     if (index >= -1 && index < playlist.length && currentIndex != index) {
       close();
       await super.setCurrentIndex(index);
-      play();
+      notifyListeners();
     }
   }
 
@@ -219,9 +212,8 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
     if (currentIndex >= 0 && currentIndex < playlist.length) {
       PlatformMediaSource? currentMediaSource = this.currentMediaSource;
       if (currentMediaSource != null) {
-        Source source = BlueFireAudioSource.fromMediaSource(currentMediaSource);
         try {
-          await player.play(source);
+          await player!.play(currentMediaSource.filename);
           playlistVisible = false;
           notifyListeners();
         } catch (e) {
@@ -233,34 +225,34 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
 
   @override
   pause() async {
-    await player.pause();
+    await player!.pause();
     notifyListeners();
   }
 
   @override
   stop() async {
-    await player.stop();
+    await player!.stop();
     playlistVisible = true;
   }
 
   @override
   resume() async {
-    await player.resume();
+    await player!.resume();
     notifyListeners();
   }
 
   @override
   dispose() async {
-    await player.release();
+    await player!.release();
     super.dispose();
   }
 
   Future<Duration?> getDuration() async {
-    return await player.getDuration();
+    return await player!.player.getDuration();
   }
 
   Future<Duration?> getPosition() async {
-    return await player.getCurrentPosition();
+    return await player!.player.getCurrentPosition();
   }
 
   Future<Duration?> getBufferedPosition() async {
@@ -270,27 +262,27 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
   @override
   seek(Duration position, {int? index}) async {
     await setCurrentIndex(index!);
-    await player.seek(position);
+    await player!.player.seek(position);
   }
 
   @override
   setVolume(double volume) async {
-    await player.setVolume(volume);
+    await player!.player.setVolume(volume);
     await super.setVolume(volume);
   }
 
   @override
   setSpeed(double speed) async {
-    await player.setPlaybackRate(speed);
+    await player!.player.setPlaybackRate(speed);
     await super.setSpeed(speed);
   }
 
   setPlayerMode(PlayerMode playerMode) async {
-    await player.setPlayerMode(playerMode); // half speed
+    await player!.player.setPlayerMode(playerMode); // half speed
   }
 
   setReleaseMode(ReleaseMode releaseMode) async {
-    await player.setReleaseMode(releaseMode); // half speed
+    await player!.player.setReleaseMode(releaseMode); // half speed
   }
 
   setGlobalAudioContext(AudioContext ctx) async {
@@ -298,23 +290,23 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
   }
 
   setAudioContext(AudioContext ctx) async {
-    player.setAudioContext(ctx);
+    player!.player.setAudioContext(ctx);
   }
 
   onPositionChanged(Function(Duration duration) fn) {
-    player.onPositionChanged.listen((Duration duration) {
+    player!.player.onPositionChanged.listen((Duration duration) {
       fn(duration);
     });
   }
 
   onPlayerComplete(Function(dynamic event) fn) {
-    player.onPlayerComplete.listen((dynamic event) {
+    player!.player.onPlayerComplete.listen((dynamic event) {
       fn(event);
     });
   }
 
   onDurationChanged(Function(Duration duration) fn) {
-    player.onDurationChanged.listen((Duration duration) {
+    player!.player.onDurationChanged.listen((Duration duration) {
       fn(duration);
     });
   }
@@ -333,3 +325,6 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
         showVolumeButton: showVolumeButton);
   }
 }
+
+final BlueFireAudioPlayerController globalBlueFireAudioPlayerController =
+    BlueFireAudioPlayerController();

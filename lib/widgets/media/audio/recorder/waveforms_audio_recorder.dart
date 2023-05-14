@@ -89,3 +89,6 @@ class WaveformsAudioRecorderController extends AbstractAudioRecorderController {
     super.dispose();
   }
 }
+
+final WaveformsAudioRecorderController globalWaveformsAudioRecorderController =
+    WaveformsAudioRecorderController();

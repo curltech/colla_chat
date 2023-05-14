@@ -19,7 +19,7 @@ enum MediaRecorderType {
 ///平台标准的record的实现
 class PlatformAudioRecorderWidget extends StatefulWidget with TileDataMixin {
   AbstractAudioRecorderController audioRecorderController =
-      RecordAudioRecorderController();
+      globalRecordAudioRecorderController;
 
   PlatformAudioRecorderWidget(
       {Key? key, AbstractAudioRecorderController? controller})
@@ -144,12 +144,13 @@ class _PlatformAudioRecorderWidgetState
         onPressed: (int newIndex) {
           if (newIndex == 0) {
             setState(() {
-              widget.audioRecorderController = RecordAudioRecorderController();
+              widget.audioRecorderController =
+                  globalRecordAudioRecorderController;
             });
           } else if (newIndex == 1) {
             setState(() {
               widget.audioRecorderController =
-                  WaveformsAudioRecorderController();
+                  globalWaveformsAudioRecorderController;
             });
           }
         },

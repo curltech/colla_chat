@@ -12,7 +12,7 @@ import 'package:video_player_win/video_player_win_plugin.dart';
 ///平台标准的video_player的实现，缺省采用webview
 class PlatformVideoPlayerWidget extends StatefulWidget with TileDataMixin {
   AbstractMediaPlayerController mediaPlayerController =
-      WebViewVideoPlayerController();
+      globalOriginVideoPlayerController;
   final SwiperController swiperController = SwiperController();
 
   PlatformVideoPlayerWidget({
@@ -57,11 +57,11 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
       onPressed: (int newIndex) {
         if (newIndex == 0) {
           setState(() {
-            widget.mediaPlayerController = WebViewVideoPlayerController();
+            widget.mediaPlayerController = globalWebViewVideoPlayerController;
           });
         } else if (newIndex == 1) {
           setState(() {
-            widget.mediaPlayerController = OriginVideoPlayerController();
+            widget.mediaPlayerController = globalOriginVideoPlayerController;
           });
         }
       },

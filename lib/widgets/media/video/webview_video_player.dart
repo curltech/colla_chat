@@ -87,3 +87,6 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
     super.setCurrentIndex(-1);
   }
 }
+
+final WebViewVideoPlayerController globalWebViewVideoPlayerController =
+    WebViewVideoPlayerController();
