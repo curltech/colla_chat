@@ -7,15 +7,6 @@ import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
 import 'package:flutter/material.dart';
 
-///视频消息中用于播放视频的控制器和播放器
-final OriginVideoPlayerController videoMessagePlayerController =
-    OriginVideoPlayerController();
-final PlatformMediaPlayer videoMessagePlayer = PlatformMediaPlayer(
-  key: UniqueKey(),
-  showPlaylist: false,
-  mediaPlayerController: videoMessagePlayerController,
-);
-
 ///消息体：视频消息
 class VideoMessage extends StatelessWidget {
   final int id;
@@ -24,8 +15,9 @@ class VideoMessage extends StatelessWidget {
   final String? title;
   final bool isMyself;
   final bool fullScreen;
+  ValueNotifier<String?> filename = ValueNotifier<String?>(null);
 
-  const VideoMessage({
+  VideoMessage({
     Key? key,
     required this.id,
     required this.messageId,
@@ -33,7 +25,15 @@ class VideoMessage extends StatelessWidget {
     this.thumbnail,
     this.title,
     this.fullScreen = false,
-  }) : super(key: key);
+  }) : super(key: key) {
+    if (fullScreen) {
+      messageAttachmentService
+          .getDecryptFilename(messageId, title)
+          .then((filename) {
+        this.filename.value = filename;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,14 +57,18 @@ class VideoMessage extends StatelessWidget {
         tileData: tileData,
       );
     }
-    var videoPlayer = FutureBuilder(
-        future: messageAttachmentService.getDecryptFilename(messageId, title),
-        builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-          if (snapshot.hasData) {
-            var filename = snapshot.data;
-            if (filename == null) {
-              return Container();
-            }
+    var videoPlayer = ValueListenableBuilder<String?>(
+        valueListenable: filename,
+        builder: (context, filename, child) {
+          if (filename != null) {
+            ///视频消息中用于播放视频的控制器和播放器
+            final OriginVideoPlayerController videoMessagePlayerController =
+                OriginVideoPlayerController();
+            final PlatformMediaPlayer videoMessagePlayer = PlatformMediaPlayer(
+              key: UniqueKey(),
+              showPlaylist: false,
+              mediaPlayerController: videoMessagePlayerController,
+            );
             videoMessagePlayerController.clear();
             videoMessagePlayerController.addAll(filenames: [filename]);
             return videoMessagePlayer;
