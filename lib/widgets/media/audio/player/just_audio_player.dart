@@ -260,6 +260,9 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
       close();
       await super.setCurrentIndex(index);
       notifyListeners();
+      if (autoplay) {
+        play();
+      }
     }
   }
 
@@ -270,8 +273,6 @@ class JustAudioPlayerController extends AbstractAudioPlayerController {
       if (currentMediaSource != null) {
         try {
           await player!.play(currentMediaSource.filename);
-          playlistVisible = false;
-          notifyListeners();
         } catch (e) {
           logger.e('$e');
         }

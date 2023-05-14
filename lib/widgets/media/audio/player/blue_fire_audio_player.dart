@@ -203,6 +203,9 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
       close();
       await super.setCurrentIndex(index);
       notifyListeners();
+      if (autoplay) {
+        play();
+      }
     }
   }
 
@@ -220,8 +223,6 @@ class BlueFireAudioPlayerController extends AbstractAudioPlayerController {
       if (currentMediaSource != null) {
         try {
           await player!.play(currentMediaSource.filename);
-          playlistVisible = false;
-          notifyListeners();
         } catch (e) {
           logger.e('$e');
         }

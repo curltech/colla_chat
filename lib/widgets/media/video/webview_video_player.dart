@@ -56,10 +56,10 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
     if (index >= -1 && index < playlist.length && currentIndex != index) {
       close();
       await super.setCurrentIndex(index);
-      // if (platformWebViewController != null) {
-      //   _play();
-      // }
       notifyListeners();
+      if (autoplay && platformWebViewController != null) {
+        play();
+      }
     }
   }
 

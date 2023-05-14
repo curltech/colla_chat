@@ -166,6 +166,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
   FileType fileType = FileType.any;
   List<String>? allowedExtensions;
   MediaPlayerState mediaPlayerState = MediaPlayerState();
+  bool autoplay = false;
 
   AbstractMediaPlayerController();
 
@@ -258,7 +259,6 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     close();
     playlist.clear();
     _currentIndex = -1;
-    // notifyListeners();
   }
 
   Future<PlatformMediaSource?> insert(int index,

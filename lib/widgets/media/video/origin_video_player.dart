@@ -62,11 +62,11 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
       if (currentMediaSource != null) {
         videoPlayerController = await OriginMediaSource.media(
             filename: currentMediaSource.filename);
-        // if (videoPlayerController != null) {
-        //   videoPlayerController!.play();
-        // }
+        notifyListeners();
+        if (autoplay && videoPlayerController != null) {
+          play();
+        }
       }
-      notifyListeners();
     }
   }
 
