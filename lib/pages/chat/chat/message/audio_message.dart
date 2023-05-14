@@ -5,7 +5,7 @@ import 'package:colla_chat/widgets/media/platform_media_player.dart';
 import 'package:flutter/material.dart';
 
 ///消息体：声音消息
-class AudioMessage extends StatelessWidget {
+class AudioMessage extends StatefulWidget {
   final int id;
   final String messageId;
   final String? title;
@@ -29,18 +29,30 @@ class AudioMessage extends StatelessWidget {
   }
 
   @override
+  State<StatefulWidget> createState() => _AudioMessageState();
+}
+
+class _AudioMessageState extends State<AudioMessage> {
+  final BlueFireAudioPlayerController audioMessagePlayerController =
+      BlueFireAudioPlayerController();
+  late final PlatformMediaPlayer audioMessagePlayer;
+
+  @override
+  void initState() {
+    audioMessagePlayer = PlatformMediaPlayer(
+      key: UniqueKey(),
+      showPlaylist: false,
+      mediaPlayerController: audioMessagePlayerController,
+    );
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     var audioPlayer = ValueListenableBuilder<String?>(
-        valueListenable: filename,
+        valueListenable: widget.filename,
         builder: (context, filename, child) {
           if (filename != null) {
-            final BlueFireAudioPlayerController audioMessagePlayerController =
-                BlueFireAudioPlayerController();
-            final PlatformMediaPlayer audioMessagePlayer = PlatformMediaPlayer(
-              key: UniqueKey(),
-              showPlaylist: false,
-              mediaPlayerController: audioMessagePlayerController,
-            );
             audioMessagePlayerController.clear();
             audioMessagePlayerController.addAll(filenames: [filename]);
 
@@ -48,9 +60,17 @@ class AudioMessage extends StatelessWidget {
           }
           return Container();
         });
-
+    if (widget.fullScreen) {
+      return audioPlayer;
+    }
     return CommonMessage(
       child: audioPlayer,
     );
+  }
+
+  @override
+  void dispose() {
+    audioMessagePlayerController.close();
+    super.dispose();
   }
 }

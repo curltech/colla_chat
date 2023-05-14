@@ -8,7 +8,7 @@ import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
 import 'package:flutter/material.dart';
 
 ///消息体：视频消息
-class VideoMessage extends StatelessWidget {
+class VideoMessage extends StatefulWidget {
   final int id;
   final String? thumbnail;
   final String messageId;
@@ -36,21 +36,41 @@ class VideoMessage extends StatelessWidget {
   }
 
   @override
+  State<StatefulWidget> createState() => _VideoMessageState();
+}
+
+class _VideoMessageState extends State<VideoMessage> {
+  ///视频消息中用于播放视频的控制器和播放器
+  final OriginVideoPlayerController videoMessagePlayerController =
+      OriginVideoPlayerController();
+  late final PlatformMediaPlayer videoMessagePlayer;
+
+  @override
+  void initState() {
+    videoMessagePlayer = PlatformMediaPlayer(
+      key: UniqueKey(),
+      showPlaylist: false,
+      mediaPlayerController: videoMessagePlayerController,
+    );
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    if (!fullScreen) {
+    if (!widget.fullScreen) {
       Widget prefix = Icon(
         Icons.video_call_outlined,
         color: myself.primary,
       );
       prefix = IconButton(onPressed: null, icon: prefix);
-      if (thumbnail != null) {
+      if (widget.thumbnail != null) {
         prefix = ImageUtil.buildImageWidget(
-          image: thumbnail,
+          image: widget.thumbnail,
         );
       }
       var tileData = TileData(
         prefix: prefix,
-        title: title!,
+        title: widget.title!,
       );
 
       return CommonMessage(
@@ -58,17 +78,9 @@ class VideoMessage extends StatelessWidget {
       );
     }
     var videoPlayer = ValueListenableBuilder<String?>(
-        valueListenable: filename,
+        valueListenable: widget.filename,
         builder: (context, filename, child) {
           if (filename != null) {
-            ///视频消息中用于播放视频的控制器和播放器
-            final OriginVideoPlayerController videoMessagePlayerController =
-                OriginVideoPlayerController();
-            final PlatformMediaPlayer videoMessagePlayer = PlatformMediaPlayer(
-              key: UniqueKey(),
-              showPlaylist: false,
-              mediaPlayerController: videoMessagePlayerController,
-            );
             videoMessagePlayerController.clear();
             videoMessagePlayerController.addAll(filenames: [filename]);
             return videoMessagePlayer;
@@ -76,5 +88,11 @@ class VideoMessage extends StatelessWidget {
           return Container();
         });
     return videoPlayer;
+  }
+
+  @override
+  void dispose() {
+    videoMessagePlayerController.close();
+    super.dispose();
   }
 }
