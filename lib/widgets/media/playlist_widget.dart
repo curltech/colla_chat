@@ -5,6 +5,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/tool/image_util.dart';
@@ -21,7 +22,8 @@ class PlaylistWidget extends StatefulWidget {
   final AbstractMediaPlayerController mediaPlayerController;
   final Function(int index, String filename)? onSelected;
 
-  const PlaylistWidget({super.key, required this.mediaPlayerController, this.onSelected});
+  const PlaylistWidget(
+      {super.key, required this.mediaPlayerController, this.onSelected});
 
   @override
   State createState() => _PlaylistWidgetState();
@@ -78,10 +80,14 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
     } else {
       Uint8List? data;
       if (platformParams.mobile && filename != null) {
-        data = await VideoUtil.thumbnailData(
-            videoFile: filename,
-            maxHeight: AppIconSize.maxSize.toInt(),
-            maxWidth: AppIconSize.maxSize.toInt());
+        try {
+          data = await VideoUtil.thumbnailData(
+              videoFile: filename,
+              maxHeight: AppIconSize.maxSize.toInt(),
+              maxWidth: AppIconSize.maxSize.toInt());
+        } catch (e) {
+          logger.e('thumbnailData failure:$e');
+        }
       }
       if (data != null) {
         thumbnailWidget = ImageUtil.buildMemoryImageWidget(data,
@@ -93,7 +99,8 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
   }
 
   Future<List<TileData>> _buildTileData(BuildContext context) async {
-    List<PlatformMediaSource> mediaSources = widget.mediaPlayerController.playlist;
+    List<PlatformMediaSource> mediaSources =
+        widget.mediaPlayerController.playlist;
     List<TileData> tileData = [];
     for (var mediaSource in mediaSources) {
       var filename = mediaSource.filename;
@@ -104,7 +111,8 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       }
       var length = file.lengthSync();
       bool selected = false;
-      PlatformMediaSource? current = widget.mediaPlayerController.currentMediaSource;
+      PlatformMediaSource? current =
+          widget.mediaPlayerController.currentMediaSource;
       if (current != null) {
         if (current.filename == filename) {
           selected = true;
@@ -139,19 +147,29 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
         List<Widget> children = [];
         if (tile.prefix != null) {
           children.add(tile.prefix);
+          children.add(const Spacer());
         }
-        children.add(const Spacer());
-        children.add(Text(
+        children.add(CommonAutoSizeText(
           tile.title,
-          style: const TextStyle(fontSize: AppFontSize.minFontSize),
+          //style: const TextStyle(fontSize: AppFontSize.minFontSize),
         ));
         if (tile.subtitle != null) {
-          children.add(Text(
+          children.add(const SizedBox(
+            height: 2.0,
+          ));
+          children.add(CommonAutoSizeText(
             tile.subtitle!,
-            style: const TextStyle(fontSize: AppFontSize.minFontSize),
+            //style: const TextStyle(fontSize: AppFontSize.minFontSize),
           ));
         }
-        var thumbnail = Column(children: children);
+        var thumbnail = Card(
+            elevation: 0.0,
+            shape: const ContinuousRectangleBorder(),
+            color: Colors.white.withOpacity(AppOpacity.mdOpacity),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: children));
         thumbnails.add(thumbnail);
       }
 
@@ -191,7 +209,8 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
   }
 
   _removeFromCollect(int index) async {
-    PlatformMediaSource mediaSource = widget.mediaPlayerController.playlist[index];
+    PlatformMediaSource mediaSource =
+        widget.mediaPlayerController.playlist[index];
     var messageId = mediaSource.messageId;
     if (messageId != null) {
       chatMessageService.delete(where: 'messageId=?', whereArgs: [messageId]);
@@ -200,7 +219,8 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
 
   ///将播放列表的文件加入收藏
   _collectMediaSource(int index) async {
-    PlatformMediaSource mediaSource = widget.mediaPlayerController.playlist[index];
+    PlatformMediaSource mediaSource =
+        widget.mediaPlayerController.playlist[index];
     var filename = mediaSource.filename;
     var mediaFormat = mediaSource.mediaFormat!.name;
     File file = File(filename);

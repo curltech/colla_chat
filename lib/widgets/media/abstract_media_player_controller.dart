@@ -215,6 +215,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
     for (var mediaSource in playlist) {
       var name = mediaSource.filename;
       if (name == filename) {
+        notifyListeners();
         return null;
       }
     }
