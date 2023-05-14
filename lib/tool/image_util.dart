@@ -420,16 +420,21 @@ class ImageUtil {
       } else {
         avatar = await xfile.readAsBytes();
       }
+      return avatar;
     } else if (assetEntity != null) {
       String? mimeType = await assetEntity.mimeTypeAsync;
       Uint8List? avatar = await assetEntity.originBytes;
       if (avatar != null && avatar.length > 10240) {
         double quality = 10240 * 100 / avatar.length;
+        mimeType = FileUtil.subMimeType(mimeType!);
+        mimeType = mimeType ?? 'jpeg';
         CompressFormat? format =
             StringUtil.enumFromString(CompressFormat.values, mimeType);
         format = format ?? CompressFormat.jpeg;
         avatar = await compressWithList(avatar,
             quality: quality.toInt(), format: format);
+
+        return avatar;
       }
     }
 
