@@ -23,12 +23,12 @@ class RequestAddFriendMessage extends StatelessWidget {
       Icons.person_add,
       color: primary,
     );
-    Widget prefix = isMyself
-        ? icon
-        : IconButton(
-            icon: icon,
-            iconSize: AppIconSize.mdSize,
-            onPressed: () async {
+    Widget prefix = IconButton(
+      icon: icon,
+      iconSize: AppIconSize.mdSize,
+      onPressed: isMyself
+          ? null
+          : () async {
               bool? confirm = await DialogUtil.confirm(context,
                   content: 'Do you agree to add friend?');
               if (confirm != null && confirm) {
@@ -38,7 +38,7 @@ class RequestAddFriendMessage extends StatelessWidget {
                     whereArgs: [senderPeerId]);
               }
             },
-          );
+    );
     var tileData = TileData(
       prefix: prefix,
       title: 'Request add friend',
