@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/message/audio_message.dart';
@@ -28,6 +29,7 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/clipboard_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -164,7 +166,7 @@ class MessageWidget {
     } else if (subMessageType == ChatMessageSubType.videoChat) {
       body = buildVideoChatMessageWidget(context);
     } else if (subMessageType == ChatMessageSubType.addFriend) {
-      body = buildRequestAddFriendWidget(context, subMessageType!);
+      body = await buildRequestAddFriendWidget(context, subMessageType!);
     } else if (subMessageType == ChatMessageSubType.addGroup) {
       body = buildAddGroupWidget(context, subMessageType!);
     } else if (subMessageType == ChatMessageSubType.modifyGroup) {
@@ -286,13 +288,19 @@ class MessageWidget {
     );
   }
 
-  RequestAddFriendMessage buildRequestAddFriendWidget(
-      BuildContext context, ChatMessageSubType subMessageType) {
+  Future<RequestAddFriendMessage> buildRequestAddFriendWidget(
+      BuildContext context, ChatMessageSubType subMessageType) async {
     var senderPeerId = chatMessage.senderPeerId!;
+    bool isFriend = false;
+    Linkman? linkman = await linkmanService.findCachedOneByPeerId(senderPeerId);
+    if (linkman != null && linkman.linkmanStatus == LinkmanStatus.friend.name) {
+      isFriend = true;
+    }
     return RequestAddFriendMessage(
       key: UniqueKey(),
       isMyself: isMyself,
       senderPeerId: senderPeerId,
+      isFriend: isFriend,
     );
   }
 

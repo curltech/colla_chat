@@ -299,6 +299,9 @@ class DialogUtil {
   static Future<bool?> confirm(BuildContext context,
       {Icon? icon, String title = 'Confirm', String content = ''}) {
     icon = icon ?? const Icon(Icons.privacy_tip_outlined);
+    ButtonStyle style = StyleUtil.buildButtonStyle();
+    ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
+        backgroundColor: myself.primary, elevation: 10.0);
     return showDialog(
       context: context,
       barrierDismissible: false,
@@ -306,18 +309,27 @@ class DialogUtil {
         return Dialog(
             child: Column(
           children: [
-            Row(children: <Widget>[
-              icon!,
-              CommonAutoSizeText(AppLocalizations.t(title)),
-            ]),
+            AppBarWidget.buildTitleBar(
+                title: CommonAutoSizeText(
+              AppLocalizations.t(title),
+              style: const TextStyle(fontSize: 16, color: Colors.white),
+            )),
+            const SizedBox(
+              height: 25.0,
+            ),
             CommonAutoSizeText(content),
+            const SizedBox(
+              height: 25.0,
+            ),
             ButtonBar(
               children: <Widget>[
                 TextButton(
+                  style: style,
                   onPressed: () => Navigator.of(context).pop(),
                   child: CommonAutoSizeText(AppLocalizations.t('Cancel')),
                 ),
                 TextButton(
+                  style: mainStyle,
                   onPressed: () {
                     Navigator.of(context).pop(true);
                   },

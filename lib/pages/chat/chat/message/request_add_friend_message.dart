@@ -11,9 +11,13 @@ import 'package:flutter/material.dart';
 class RequestAddFriendMessage extends StatelessWidget {
   final String senderPeerId;
   final bool isMyself;
+  final bool isFriend;
 
   const RequestAddFriendMessage(
-      {Key? key, required this.senderPeerId, required this.isMyself})
+      {Key? key,
+      required this.senderPeerId,
+      required this.isMyself,
+      required this.isFriend})
       : super(key: key);
 
   @override
@@ -26,7 +30,7 @@ class RequestAddFriendMessage extends StatelessWidget {
     Widget prefix = IconButton(
       icon: icon,
       iconSize: AppIconSize.mdSize,
-      onPressed: isMyself
+      onPressed: isMyself || isFriend
           ? null
           : () async {
               bool? confirm = await DialogUtil.confirm(context,
