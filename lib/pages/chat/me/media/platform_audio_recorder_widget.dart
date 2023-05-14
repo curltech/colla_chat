@@ -74,6 +74,7 @@ class _PlatformAudioRecorderWidgetState
     var toggleWidget = ToggleButtons(
       selectedBorderColor: Colors.white,
       borderColor: Colors.grey,
+      color: Colors.white,
       isSelected: isSelected,
       onPressed: (int newIndex) {
         if (newIndex == 0) {
@@ -155,8 +156,14 @@ class _PlatformAudioRecorderWidgetState
           }
         },
         children: const <Widget>[
-          CommonAutoSizeText('Record'),
-          CommonAutoSizeText('Waveforms'),
+          Icon(
+            Icons.record_voice_over_outlined,
+            color: Colors.white,
+          ),
+          Icon(
+            Icons.multitrack_audio,
+            color: Colors.white,
+          ),
         ],
       );
       List<Widget> children = [
