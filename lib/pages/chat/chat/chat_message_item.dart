@@ -116,7 +116,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
           stick: true,
           margin: const BubbleEdges.only(top: 1),
           nip: widget.isMyself ? BubbleNip.rightTop : BubbleNip.leftTop,
-          color: widget.isMyself ? myself.primary : Colors.white,
+          color: widget.isMyself ? myself.primary : myself.secondary,
           padding: const BubbleEdges.all(0),
           child: body)
     ];
@@ -166,7 +166,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
             constraints: const BoxConstraints(minWidth: 100, maxWidth: 300.0),
             decoration: BoxDecoration(
-              color: widget.isMyself ? myself.primary : Colors.white,
+              color: widget.isMyself ? myself.primary : myself.secondary,
               borderRadius: BorderRadius.only(
                 bottomLeft: const Radius.circular(8.0),
                 bottomRight: const Radius.circular(8.0),
