@@ -15,7 +15,6 @@ class VideoMessage extends StatefulWidget {
   final String? title;
   final bool isMyself;
   final bool fullScreen;
-  ValueNotifier<String?> filename = ValueNotifier<String?>(null);
 
   VideoMessage({
     Key? key,
@@ -25,15 +24,7 @@ class VideoMessage extends StatefulWidget {
     this.thumbnail,
     this.title,
     this.fullScreen = false,
-  }) : super(key: key) {
-    if (fullScreen) {
-      messageAttachmentService
-          .getDecryptFilename(messageId, title)
-          .then((filename) {
-        this.filename.value = filename;
-      });
-    }
-  }
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _VideoMessageState();
@@ -44,9 +35,17 @@ class _VideoMessageState extends State<VideoMessage> {
   final OriginVideoPlayerController videoMessagePlayerController =
       OriginVideoPlayerController();
   late final PlatformMediaPlayer videoMessagePlayer;
+  ValueNotifier<String?> filename = ValueNotifier<String?>(null);
 
   @override
   void initState() {
+    if (widget.fullScreen) {
+      messageAttachmentService
+          .getDecryptFilename(widget.messageId, widget.title)
+          .then((filename) {
+        this.filename.value = filename;
+      });
+    }
     videoMessagePlayer = PlatformMediaPlayer(
       key: UniqueKey(),
       showPlaylist: false,
@@ -78,7 +77,7 @@ class _VideoMessageState extends State<VideoMessage> {
       );
     }
     var videoPlayer = ValueListenableBuilder<String?>(
-        valueListenable: widget.filename,
+        valueListenable: filename,
         builder: (context, filename, child) {
           if (filename != null) {
             videoMessagePlayerController.clear();

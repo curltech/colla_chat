@@ -11,22 +11,15 @@ class AudioMessage extends StatefulWidget {
   final String? title;
   final bool isMyself;
   final bool fullScreen;
-  ValueNotifier<String?> filename = ValueNotifier<String?>(null);
 
-  AudioMessage({
+  const AudioMessage({
     Key? key,
     required this.id,
     required this.messageId,
     required this.isMyself,
     this.title,
     this.fullScreen = false,
-  }) : super(key: key) {
-    messageAttachmentService
-        .getDecryptFilename(messageId, title)
-        .then((filename) {
-      this.filename.value = filename;
-    });
-  }
+  }) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _AudioMessageState();
@@ -36,9 +29,15 @@ class _AudioMessageState extends State<AudioMessage> {
   final BlueFireAudioPlayerController audioMessagePlayerController =
       BlueFireAudioPlayerController();
   late final PlatformMediaPlayer audioMessagePlayer;
+  ValueNotifier<String?> filename = ValueNotifier<String?>(null);
 
   @override
   void initState() {
+    messageAttachmentService
+        .getDecryptFilename(widget.messageId, widget.title)
+        .then((filename) {
+      this.filename.value = filename;
+    });
     audioMessagePlayer = PlatformMediaPlayer(
       key: UniqueKey(),
       showPlaylist: false,
@@ -50,7 +49,7 @@ class _AudioMessageState extends State<AudioMessage> {
   @override
   Widget build(BuildContext context) {
     var audioPlayer = ValueListenableBuilder<String?>(
-        valueListenable: widget.filename,
+        valueListenable: filename,
         builder: (context, filename, child) {
           if (filename != null) {
             audioMessagePlayerController.clear();
