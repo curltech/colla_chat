@@ -26,8 +26,8 @@ class ExtendedTextMessage extends StatelessWidget {
         child: ExtendedText(
           key: UniqueKey(),
           content,
-          style: TextStyle(
-            color: isMyself ? Colors.white : Colors.black,
+          style: const TextStyle(
+            color: Colors.white, //isMyself ? Colors.white : Colors.black,
             //fontSize: 16.0,
           ),
           specialTextSpanBuilder: customSpecialTextSpanBuilder,
