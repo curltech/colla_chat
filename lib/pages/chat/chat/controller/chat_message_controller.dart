@@ -261,6 +261,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     }
     _deleteTime = 0;
     _parentMessageId = null;
+    transportType = TransportType.webrtc;
     notifyListeners();
 
     return returnChatMessage;

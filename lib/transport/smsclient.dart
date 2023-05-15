@@ -12,7 +12,7 @@ import 'package:colla_chat/transport/webclient.dart';
 import 'package:telephony/telephony.dart';
 
 onBackgroundMessage(SmsMessage message) async {
-  smsClientPool.onMessage(message);
+  smsClient.onMessage(message);
 }
 
 class MobileState {
@@ -64,11 +64,10 @@ class SmsClient extends IWebClient {
         onBackgroundMessage: onBackgroundMessage);
   }
 
-  register(String name, Function func) {}
-
   Future<bool> sendMsg(String message, String mobile,
       {bool defaultApp = false}) async {
     try {
+      //android下发送有问题
       await telephony.sendSms(
           to: mobile,
           message: message,
@@ -85,18 +84,18 @@ class SmsClient extends IWebClient {
 
   @override
   dynamic send(String url, dynamic data) async {
-    var message = JsonUtil.toJsonString(data);
-
+    String message;
+    if (data is String) {
+      message = data;
+    } else {
+      message = JsonUtil.toJsonString(data);
+    }
     return await sendMsg(message, url);
   }
 
   @override
   dynamic get(String url) {
     return send(url, '');
-  }
-
-  onMessage(SmsMessage message) async {
-    smsClientPool.onMessage(message);
   }
 
   Future<List<SmsMessage>> getInboxSms() async {
@@ -124,14 +123,6 @@ class SmsClient extends IWebClient {
 
     return messages;
   }
-}
-
-class SmsClientPool {
-  String mobile;
-  final SmsClient smsClient = SmsClient();
-
-  //本机的手机号码
-  SmsClientPool(this.mobile);
 
   onMessage(SmsMessage message) async {
     var mobile = message.address;
@@ -170,7 +161,7 @@ class SmsClientPool {
     }
   }
 
-  dynamic send(dynamic data, String targetPeerId, String targetClientId,
+  dynamic sendMessage(dynamic data, String targetPeerId, String targetClientId,
       {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     PeerClient? peerClient =
         await peerClientService.findCachedOneByPeerId(targetPeerId);
@@ -196,4 +187,4 @@ class SmsClientPool {
   }
 }
 
-final SmsClientPool smsClientPool = SmsClientPool('');
+final SmsClient smsClient = SmsClient();

@@ -662,7 +662,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         }
       }
       if (transportType == TransportType.sms.name) {
-        bool success = await smsClientPool.send(chatMessage,
+        bool success = await smsClient.sendMessage(chatMessage,
             chatMessage.receiverPeerId!, chatMessage.receiverClientId!);
         if (success) {
           chatMessage.status = MessageStatus.sent.name;

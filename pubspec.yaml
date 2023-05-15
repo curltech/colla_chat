@@ -72,7 +72,14 @@ dependencies:
   dio_http2_adapter: ^2.1.0
   web_socket_channel: ^2.2.0
   #cached_network_image: ^3.0.0
-  telephony: 0.2.0
+  #flutter_sms: ^2.3.3 #android compile failure
+  #sms_advanced: ^1.0.2
+  #flutter_sms_plus: ^1.0.1
+  #telephony: ^0.2.0
+  telephony: #不再维护了
+    git:
+      url: https://github.com/suhardik/s_telephony.git
+      ref: develop
   openvpn_flutter: ^1.2.2
 
   #界面

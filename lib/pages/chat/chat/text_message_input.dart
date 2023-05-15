@@ -252,7 +252,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
     if (transportType == null) {
       return null;
     }
-    chatMessageController.transportType = transportType;
+    chatMessageController.transportType = transportType; 
     _send();
   }
 

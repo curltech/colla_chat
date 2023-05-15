@@ -35,6 +35,7 @@ import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/service/stock/account.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/transport/smsclient.dart';
 
 class ServiceLocator {
   static Map<String, GeneralBaseService> services = {};
@@ -105,6 +106,7 @@ class ServiceLocator {
     bool loginStatus = await myselfPeerService.autoLogin();
     logger.i(
         'AutoLogin setting:${appDataProvider.autoLogin},AutoLogin status:$loginStatus');
+    var s = smsClient;
 
     return loginStatus;
   }
