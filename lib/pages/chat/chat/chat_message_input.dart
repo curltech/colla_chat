@@ -4,6 +4,7 @@ import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controll
 import 'package:colla_chat/pages/chat/chat/emoji_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/more_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/text_message_input.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:flutter/material.dart';
 
@@ -49,8 +50,10 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
 
   ///发送文本消息
   Future<void> onSendPressed() async {
-    _play();
-    await chatMessageController.sendText(message: textEditingController.text);
+    if (StringUtil.isNotEmpty(textEditingController.text)) {
+      _play();
+      await chatMessageController.sendText(message: textEditingController.text);
+    }
   }
 
   void onEmojiPressed() {

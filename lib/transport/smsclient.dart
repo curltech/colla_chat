@@ -1,8 +1,12 @@
+import 'dart:typed_data';
+
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
+import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
@@ -99,7 +103,7 @@ class SmsClient extends IWebClient {
 
   onMessage(SmsMessage message) async {
     var mobile = message.address;
-    var body = message.body;
+    String? body = message.body;
     if (body == null) {
       return;
     }
@@ -113,7 +117,7 @@ class SmsClient extends IWebClient {
     PeerClient? peerClient = peerClients[0];
     var peerId = peerClient.peerId;
     var clientId = peerClient.clientId;
-    var data = CryptoUtil.decodeBase64(body);
+    Uint8List data = CryptoUtil.decodeBase64(body);
     int cryptOption = data[data.length - 1];
     SecurityContextService? securityContextService =
         ServiceLocator.securityContextServices[cryptOption];
@@ -126,11 +130,16 @@ class SmsClient extends IWebClient {
     bool result = await securityContextService.decrypt(securityContext);
     if (result) {
       body = CryptoUtil.utf8ToString(securityContext.payload);
-      Map<String, dynamic> json = JsonUtil.toJson(body);
-      ChatMessage chatMessage = ChatMessage.fromJson(json);
-      chatMessageService.receiveChatMessage(chatMessage);
-      // var response =
-      //     await chainMessageHandler.receiveRaw(body.codeUnits, '', '');
+      ChatMessage chatMessage = await chatMessageService.buildChatMessage(
+        receiverPeerId: myself.peerId,
+        receiverName: myself.name,
+        content: body,
+        transportType: TransportType.sms,
+      );
+      chatMessage.senderPeerId = peerClient.peerId;
+      chatMessage.senderClientId = peerClient.clientId;
+      chatMessage.senderName = peerClient.name;
+      globalChatMessageController.receiveChatMessage(chatMessage);
     }
   }
 
@@ -148,7 +157,12 @@ class SmsClient extends IWebClient {
       SecurityContext securityContext = SecurityContext();
       securityContext.targetPeerId = targetPeerId;
       securityContext.targetClientId = targetClientId;
-      var jsonStr = JsonUtil.toJsonString(data);
+      String jsonStr;
+      if (data is String) {
+        jsonStr = data;
+      } else {
+        jsonStr = JsonUtil.toJsonString(data);
+      }
       List<int> payload = CryptoUtil.stringToUtf8(jsonStr);
       securityContext.payload = payload;
       bool result = await securityContextService.encrypt(securityContext);
