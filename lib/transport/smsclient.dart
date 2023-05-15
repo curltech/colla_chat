@@ -64,30 +64,35 @@ class SmsClient extends IWebClient {
         onBackgroundMessage: onBackgroundMessage);
   }
 
-  @override
   register(String name, Function func) {}
 
-  sendMsg(String message, String mobile, {bool defaultApp = false}) async {
-    var result = telephony.sendSms(
-        to: mobile,
-        message: message,
-        isMultipart: true,
-        statusListener: (SendStatus status) {
-          logger.i(status);
-        });
-    return result;
+  Future<bool> sendMsg(String message, String mobile,
+      {bool defaultApp = false}) async {
+    try {
+      await telephony.sendSms(
+          to: mobile,
+          message: message,
+          isMultipart: true,
+          statusListener: (SendStatus status) {
+            logger.i(status);
+          });
+      return Future.value(true);
+    } catch (e) {
+      logger.e('send message failure:$e');
+    }
+    return Future.value(false);
   }
 
   @override
-  send(String mobile, dynamic data) async {
+  dynamic send(String url, dynamic data) async {
     var message = JsonUtil.toJsonString(data);
 
-    return await sendMsg(message, mobile);
+    return await sendMsg(message, url);
   }
 
   @override
-  dynamic get(String mobile) {
-    return send(mobile, '');
+  dynamic get(String url) {
+    return send(url, '');
   }
 
   onMessage(SmsMessage message) async {
@@ -165,7 +170,7 @@ class SmsClientPool {
     }
   }
 
-  Future<void> send(List<int> data, String targetPeerId, String targetClientId,
+  dynamic send(dynamic data, String targetPeerId, String targetClientId,
       {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
     PeerClient? peerClient =
         await peerClientService.findCachedOneByPeerId(targetPeerId);
@@ -179,8 +184,9 @@ class SmsClientPool {
       SecurityContext securityContext = SecurityContext();
       securityContext.targetPeerId = targetPeerId;
       securityContext.targetClientId = targetClientId;
-      //List<int> data = CryptoUtil.stringToUtf8(message);
-      securityContext.payload = data;
+      var jsonStr = JsonUtil.toJsonString(data);
+      List<int> payload = CryptoUtil.stringToUtf8(jsonStr);
+      securityContext.payload = payload;
       bool result = await securityContextService.encrypt(securityContext);
       if (result) {
         data = CryptoUtil.concat(securityContext.payload, [cryptOptionIndex]);

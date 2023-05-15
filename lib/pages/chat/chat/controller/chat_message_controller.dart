@@ -22,9 +22,18 @@ enum ChatGPTAction { chat, image, audio, translate, extract }
 ///好友或者群的消息控制器，包含某个连接的所有消息
 class ChatMessageController extends DataMoreController<ChatMessage> {
   ChatSummary? _chatSummary;
+
+  //发送方式
+  TransportType transportType = TransportType.webrtc;
+
+  //是否是chatGPT聊天和chatGPT方式
   ChatGPT? chatGPT;
   ChatGPTAction chatGPTAction = ChatGPTAction.chat;
+
+  //调度删除时间
   int _deleteTime = 0;
+
+  //引用的消息
   String? _parentMessageId;
 
   ChatSummary? get chatSummary {
@@ -208,6 +217,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
           messageId: messageId,
           messageType: messageType,
           subMessageType: subMessageType,
+          transportType: transportType,
           deleteTime: _deleteTime,
           parentMessageId: _parentMessageId);
       if (chatGPT == null) {
@@ -240,6 +250,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
               messageId: messageId,
               messageType: messageType,
               subMessageType: subMessageType,
+              transportType: transportType,
               peerIds: peerIds,
               deleteTime: _deleteTime,
               parentMessageId: _parentMessageId);

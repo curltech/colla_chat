@@ -38,9 +38,8 @@ class WebClient extends IWebClient {
       return _wsDefault?.send(url, data);
     } else if (_httpDefault != null) {
       return _httpDefault?.send(url, data);
-    } else {
-      throw 'NoWebClient';
     }
+    return false;
   }
 
   @override

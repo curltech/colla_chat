@@ -29,6 +29,7 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
+import 'package:colla_chat/transport/smsclient.dart';
 
 // import 'package:colla_chat/transport/nearby_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
@@ -370,6 +371,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String? mimeType,
     String? title,
     String? messageId,
+    TransportType transportType = TransportType.webrtc,
     String? receiptType,
     Uint8List? thumbnail,
     int deleteTime = 0,
@@ -400,6 +402,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         subMessageType: subMessageType,
         contentType: contentType,
         mimeType: mimeType,
+        transportType: transportType,
         receiverType: groupType,
         receiverName: groupName,
         groupPeerId: groupPeerId,
@@ -436,6 +439,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         subMessageType: subMessageType,
         contentType: contentType,
         mimeType: mimeType,
+        transportType: transportType,
         receiverName: receiverName,
         groupPeerId: groupPeerId,
         groupName: groupName,
@@ -648,13 +652,6 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           chatMessage.status = MessageStatus.sent.name;
         }
       }
-      // if (transportType == TransportType.nearby.name) {
-      //   bool success = await nearbyConnectionPool.send(
-      //       chatMessage.receiverPeerId!, chatMessage);
-      //   if (success) {
-      //     chatMessage.status = MessageStatus.sent.name;
-      //   }
-      // }
       if (transportType == TransportType.websocket.name) {
         try {
           chatAction.chat(chatMessage, peerId,
@@ -664,6 +661,20 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           chatMessage.status = MessageStatus.unsent.name;
         }
       }
+      if (transportType == TransportType.sms.name) {
+        bool success = await smsClientPool.send(chatMessage,
+            chatMessage.receiverPeerId!, chatMessage.receiverClientId!);
+        if (success) {
+          chatMessage.status = MessageStatus.sent.name;
+        }
+      }
+      // if (transportType == TransportType.nearby.name) {
+      //   bool success = await nearbyConnectionPool.send(
+      //       chatMessage.receiverPeerId!, chatMessage);
+      //   if (success) {
+      //     chatMessage.status = MessageStatus.sent.name;
+      //   }
+      // }
     } else {
       chatMessage.transportType = TransportType.none.name;
       chatMessage.status = MessageStatus.sent.name;

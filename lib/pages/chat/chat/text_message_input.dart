@@ -11,6 +11,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/transport/openai/openai_chat_gpt.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/another_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
@@ -46,8 +47,9 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
   bool sendVisible = false;
   bool moreVisible = false;
   bool voiceRecording = false;
-  ValueNotifier<ChatGPTAction> chatGPTAction =
-      ValueNotifier<ChatGPTAction>(ChatGPTAction.chat);
+
+  // ValueNotifier<ChatGPTAction> chatGPTAction =
+  //     ValueNotifier<ChatGPTAction>(ChatGPTAction.chat);
 
   @override
   void initState() {
@@ -114,15 +116,17 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
     return StringUtil.isNotEmpty(value);
   }
 
-  List<ActionData> _buildChatGPTAction() {
+  List<ActionData> _buildChatGPTSendAction() {
     ChatGPTAction chatGPTAction = chatMessageController.chatGPTAction;
-    final List<ActionData> chatGPTPopActionData = [
+    final List<ActionData> chatGPTPopActions = [
       ActionData(
           label: ChatGPTAction.chat.name,
           tooltip: 'Chat message',
           icon: Icon(
             Icons.chat,
-            color: ChatGPTAction.chat == chatGPTAction ? myself.primary : null,
+            color: ChatGPTAction.chat == chatGPTAction
+                ? myself.primary
+                : myself.secondary,
           )),
       ActionData(
           label: ChatGPTAction.translate.name,
@@ -131,22 +135,25 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
             Icons.translate,
             color: ChatGPTAction.translate == chatGPTAction
                 ? myself.primary
-                : null,
+                : myself.secondary,
           )),
       ActionData(
           label: ChatGPTAction.extract.name,
           tooltip: 'Extract message',
           icon: Icon(
             Icons.summarize_outlined,
-            color:
-                ChatGPTAction.extract == chatGPTAction ? myself.primary : null,
+            color: ChatGPTAction.extract == chatGPTAction
+                ? myself.primary
+                : myself.secondary,
           )),
       ActionData(
         label: ChatGPTAction.image.name,
         tooltip: 'Create image',
         icon: Icon(
           Icons.image_outlined,
-          color: ChatGPTAction.image == chatGPTAction ? myself.primary : null,
+          color: ChatGPTAction.image == chatGPTAction
+              ? myself.primary
+              : myself.secondary,
         ),
       ),
       ActionData(
@@ -154,17 +161,79 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
         tooltip: 'Transcription audio',
         icon: Icon(
           Icons.multitrack_audio,
-          color: ChatGPTAction.audio == chatGPTAction ? myself.primary : null,
+          color: ChatGPTAction.audio == chatGPTAction
+              ? myself.primary
+              : myself.secondary,
         ),
       ),
     ];
 
-    return chatGPTPopActionData;
+    return chatGPTPopActions;
+  }
+
+  List<ActionData> _buildTransportTypeSendAction() {
+    TransportType transportType = chatMessageController.transportType;
+    final List<ActionData> transportTypeActions = [
+      ActionData(
+          label: TransportType.webrtc.name,
+          tooltip: 'Webrtc send',
+          icon: Icon(
+            Icons.webhook_rounded,
+            color: TransportType.webrtc == transportType
+                ? myself.primary
+                : myself.secondary,
+          )),
+      ActionData(
+          label: TransportType.email.name,
+          tooltip: 'Email send',
+          icon: Icon(
+            Icons.email,
+            color: TransportType.email == transportType
+                ? myself.primary
+                : myself.secondary,
+          )),
+      ActionData(
+        label: TransportType.sfu.name,
+        tooltip: 'SFU send',
+        icon: Icon(
+          Icons.center_focus_strong,
+          color: TransportType.sfu == transportType
+              ? myself.primary
+              : myself.secondary,
+        ),
+      ),
+      ActionData(
+        label: TransportType.nearby.name,
+        tooltip: 'Nearby send',
+        icon: Icon(
+          Icons.near_me_outlined,
+          color: TransportType.nearby == transportType
+              ? myself.primary
+              : myself.secondary,
+        ),
+      ),
+    ];
+
+    if (platformParams.mobile) {
+      transportTypeActions.add(
+        ActionData(
+            label: TransportType.sms.name,
+            tooltip: 'SMS send',
+            icon: Icon(
+              Icons.sms,
+              color: TransportType.sms == transportType
+                  ? myself.primary
+                  : myself.secondary,
+            )),
+      );
+    }
+
+    return transportTypeActions;
   }
 
   ///各种不同的ChatGPT的prompt的消息发送命令
   ///比如文本聊天，翻译，提取摘要，文本生成图片
-  _onSend(BuildContext context, int index, String label,
+  _onChatGPTSend(BuildContext context, int index, String label,
       {String? value}) async {
     ChatGPTAction? chatGPTAction =
         StringUtil.enumFromString(ChatGPTAction.values, label);
@@ -172,7 +241,18 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
       return null;
     }
     chatMessageController.chatGPTAction = chatGPTAction;
-    this.chatGPTAction.value = chatGPTAction;
+    // this.chatGPTAction.value = chatGPTAction;
+    _send();
+  }
+
+  _onTransportSend(BuildContext context, int index, String label,
+      {String? value}) async {
+    TransportType? transportType =
+        StringUtil.enumFromString(TransportType.values, label);
+    if (transportType == null) {
+      return null;
+    }
+    chatMessageController.transportType = transportType;
     _send();
   }
 
@@ -198,26 +278,29 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
         ));
 
     ///长按弹出式菜单
+    ChatGPT? chatGPT = chatMessageController.chatGPT;
     CustomPopupMenuController menuController = CustomPopupMenuController();
     Widget menu = MenuUtil.buildPopupMenu(
         child: sendButton,
         controller: menuController,
         menuBuilder: () {
           return Card(
-            child: ValueListenableBuilder(
-                valueListenable: chatGPTAction,
-                builder: (BuildContext context, value, Widget? child) {
-                  return DataActionCard(
-                      onPressed: (int index, String label, {String? value}) {
-                        menuController.hideMenu();
-                        _onSend(context, index, label, value: value);
-                      },
-                      crossAxisCount: 4,
-                      actions: _buildChatGPTAction(),
-                      height: 140,
-                      width: 320,
-                      size: 20);
-                }),
+            child: DataActionCard(
+                onPressed: (int index, String label, {String? value}) {
+                  menuController.hideMenu();
+                  if (chatGPT == null) {
+                    _onTransportSend(context, index, label, value: value);
+                  } else {
+                    _onChatGPTSend(context, index, label, value: value);
+                  }
+                },
+                crossAxisCount: 4,
+                actions: chatGPT != null
+                    ? _buildChatGPTSendAction()
+                    : _buildTransportTypeSendAction(),
+                height: 140,
+                width: 320,
+                size: 20),
           );
         },
         pressType: PressType.longPress);
