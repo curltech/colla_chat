@@ -2,13 +2,13 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
-import 'package:colla_chat/entity/dht/peerclient.dart';
+import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
-import 'package:colla_chat/service/dht/peerclient.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -109,14 +109,13 @@ class SmsClient extends IWebClient {
     }
     logger
         .i('${DateTime.now().toUtc()}:got a message from mobile: $mobile sms');
-    List<PeerClient> peerClients =
-        await peerClientService.findByMobile(mobile!);
-    if (peerClients.isEmpty) {
+    List<Linkman> linkmen = await linkmanService.findByMobile(mobile!);
+    if (linkmen.isEmpty) {
       return;
     }
-    PeerClient? peerClient = peerClients[0];
-    var peerId = peerClient.peerId;
-    var clientId = peerClient.clientId;
+    Linkman? linkman = linkmen[0];
+    var peerId = linkman.peerId;
+    var clientId = linkman.clientId;
     Uint8List data = CryptoUtil.decodeBase64(body);
     int cryptOption = data[data.length - 1];
     SecurityContextService? securityContextService =
@@ -136,19 +135,18 @@ class SmsClient extends IWebClient {
         content: body,
         transportType: TransportType.sms,
       );
-      chatMessage.senderPeerId = peerClient.peerId;
-      chatMessage.senderClientId = peerClient.clientId;
-      chatMessage.senderName = peerClient.name;
+      chatMessage.senderPeerId = linkman.peerId;
+      chatMessage.senderClientId = linkman.clientId;
+      chatMessage.senderName = linkman.name;
       globalChatMessageController.receiveChatMessage(chatMessage);
     }
   }
 
   dynamic sendMessage(dynamic data, String targetPeerId, String targetClientId,
       {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
-    PeerClient? peerClient =
-        await peerClientService.findCachedOneByPeerId(targetPeerId);
-    if (peerClient != null) {
-      var mobile = peerClient.mobile;
+    Linkman? linkman = await linkmanService.findCachedOneByPeerId(targetPeerId);
+    if (linkman != null) {
+      var mobile = linkman.mobile;
       int cryptOptionIndex = cryptoOption.index;
       SecurityContextService? securityContextService =
           ServiceLocator.securityContextServices[cryptOptionIndex];
