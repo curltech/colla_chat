@@ -30,6 +30,7 @@
     <uses-permission android:name="android.permission.RECEIVE_MMS"/>
 
     <!-- Permissions options for the `phone` group -->
+    <uses-permission android:name="android.permission.READ_PHONE_NUMBERS" />
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
     <uses-permission android:name="android.permission.CALL_PHONE"/>
     <uses-permission android:name="android.permission.ADD_VOICEMAIL"/>

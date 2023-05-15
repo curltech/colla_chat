@@ -58,7 +58,6 @@ class SmsClient extends IWebClient {
     };
     telephony.listenIncomingSms(
         onNewMessage: (SmsMessage message) {
-          // Handle message
           onMessage(message);
         },
         onBackgroundMessage: onBackgroundMessage);
