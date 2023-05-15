@@ -878,6 +878,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String messageId = uuid.v4();
     collectChatMessage.messageId = messageId;
     collectChatMessage.id = null;
+    collectChatMessage.messageType = ChatMessageType.collection.name;
     String? contentType = chatMessage.contentType;
     if (contentType != null &&
         (contentType == ChatMessageContentType.file.name ||

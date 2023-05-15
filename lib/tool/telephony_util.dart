@@ -2,8 +2,9 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:telephony/telephony.dart';
 
 class TelephonyUtil {
+  static Telephony telephony = Telephony.backgroundInstance;
+
   static send(String data, String recipient) async {
-    final Telephony telephony = Telephony.backgroundInstance;
     var result = telephony.sendSms(
         to: recipient,
         message: data,
@@ -16,7 +17,6 @@ class TelephonyUtil {
 
   static Future<List<SmsMessage>> getInboxSms(
       String address, String keyword) async {
-    final Telephony telephony = Telephony.backgroundInstance;
     List<SmsMessage> messages = await telephony.getInboxSms(
         columns: [SmsColumn.ADDRESS, SmsColumn.BODY],
         filter: SmsFilter.where(SmsColumn.ADDRESS)
@@ -32,7 +32,6 @@ class TelephonyUtil {
 
   static Future<List<SmsConversation>> getConversations(
       String msgCount, String threadId) async {
-    final Telephony telephony = Telephony.backgroundInstance;
     List<SmsConversation> messages = await telephony.getConversations(
         filter: ConversationFilter.where(ConversationColumn.MSG_COUNT)
             .equals(msgCount)
@@ -43,7 +42,6 @@ class TelephonyUtil {
   }
 
   static register(dynamic Function(SmsMessage)? fn) {
-    final Telephony telephony = Telephony.backgroundInstance;
     telephony.listenIncomingSms(
       onNewMessage: (SmsMessage message) {
         if (fn != null) {
@@ -55,15 +53,27 @@ class TelephonyUtil {
   }
 
   static Future<bool?> isSmsCapable() async {
-    final Telephony telephony = Telephony.backgroundInstance;
     bool? canSendSms = await telephony.isSmsCapable;
     return canSendSms;
   }
 
   static Future<SimState> simState() async {
-    final Telephony telephony = Telephony.backgroundInstance;
     SimState simState = await telephony.simState;
 
     return simState;
+  }
+
+  static Future<bool?> requestPhoneAndSmsPermissions() async {
+    bool? success = await telephony.requestPhoneAndSmsPermissions;
+
+    return success;
+  }
+
+  static Future<void> dialPhoneNumber(String mobile) async {
+    return await telephony.dialPhoneNumber(mobile);
+  }
+
+  static Future<void> openDialer(String mobile) async {
+    return await telephony.openDialer(mobile);
   }
 }

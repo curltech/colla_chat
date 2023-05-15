@@ -15,38 +15,6 @@ onBackgroundMessage(SmsMessage message) async {
   smsClient.onMessage(message);
 }
 
-class MobileState {
-  final Telephony telephony = Telephony.backgroundInstance;
-
-  // Check if a device is capable of sending SMS
-  Future<bool?> isSmsCapable() async {
-    bool? canSendSms = await telephony.isSmsCapable;
-
-    return canSendSms;
-  }
-
-  // Get sim state
-  Future<SimState> simState() async {
-    SimState simState = await telephony.simState;
-
-    return simState;
-  }
-
-  Future<bool?> requestPhoneAndSmsPermissions() async {
-    bool? success = await telephony.requestPhoneAndSmsPermissions;
-
-    return success;
-  }
-
-  Future<void> dialPhoneNumber(String mobile) async {
-    return await telephony.dialPhoneNumber(mobile);
-  }
-
-  Future<void> openDialer(String mobile) async {
-    return await telephony.openDialer(mobile);
-  }
-}
-
 ///短信访问客户端
 class SmsClient extends IWebClient {
   final Telephony telephony = Telephony.backgroundInstance;
@@ -93,22 +61,28 @@ class SmsClient extends IWebClient {
   }
 
   @override
-  dynamic get(String url) {
-    return send(url, '');
-  }
-
-  Future<List<SmsMessage>> getInboxSms() async {
+  dynamic get(String address) async {
     List<SmsMessage> messages = await telephony.getInboxSms(
         columns: [SmsColumn.ADDRESS, SmsColumn.BODY],
-        filter: SmsFilter.where(SmsColumn.ADDRESS)
-            .equals("1234567890")
-            .and(SmsColumn.BODY)
-            .like("starwars"),
+        filter: SmsFilter.where(SmsColumn.ADDRESS).equals(address),
         sortOrder: [
           OrderBy(SmsColumn.ADDRESS, sort: Sort.ASC),
           OrderBy(SmsColumn.BODY)
         ]);
+    return messages;
+  }
 
+  Future<List<SmsMessage>> getInboxSms(String address, String keyword) async {
+    List<SmsMessage> messages = await telephony.getInboxSms(
+        columns: [SmsColumn.ADDRESS, SmsColumn.BODY],
+        filter: SmsFilter.where(SmsColumn.ADDRESS)
+            .equals(address)
+            .and(SmsColumn.BODY)
+            .like(keyword),
+        sortOrder: [
+          OrderBy(SmsColumn.ADDRESS, sort: Sort.ASC),
+          OrderBy(SmsColumn.BODY)
+        ]);
     return messages;
   }
 

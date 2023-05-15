@@ -116,9 +116,6 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
       case 'File':
         _onActionFile();
         break;
-      case 'Voice':
-        _onActionVoice();
-        break;
       case 'Collection':
         _onActionCollection();
         break;
@@ -337,8 +334,6 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
           mimeType: mimeType);
     }
   }
-
-  void _onActionVoice() {}
 
   ///收藏
   void _onActionCollection() {}
