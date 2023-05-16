@@ -54,6 +54,7 @@ class _MyselfPeerViewWidgetState extends State<MyselfPeerViewWidget> {
             onTap: (int index, String title,
                 {TileData? group, String? subtitle}) {
               myselfPeerController.currentIndex = index;
+              Navigator.pop(context);
             },
           );
         });

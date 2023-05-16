@@ -1,7 +1,6 @@
 import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/login/loading.dart';
-import 'package:colla_chat/pages/chat/login/myself_peer_view_widget.dart';
 import 'package:colla_chat/pages/chat/login/p2p_login_widget.dart';
 import 'package:colla_chat/pages/chat/login/p2p_register_widget.dart';
 import 'package:colla_chat/pages/chat/login/p2p_setting_widget.dart';
@@ -17,8 +16,9 @@ class P2pLogin extends StatefulWidget {
   final P2pLoginWidget p2pLoginWidget = const P2pLoginWidget();
   final P2pRegisterWidget p2pRegisterWidget = const P2pRegisterWidget();
   final P2pSettingWidget p2pSettingWidget = const P2pSettingWidget();
-  final MyselfPeerViewWidget myselfPeerViewWidget =
-      const MyselfPeerViewWidget();
+
+  // final MyselfPeerViewWidget myselfPeerViewWidget =
+  //     const MyselfPeerViewWidget();
   late final List<Widget> _children;
   late final SwiperController controller = SwiperController();
 
@@ -28,7 +28,7 @@ class P2pLogin extends StatefulWidget {
       p2pLoginWidget,
       p2pRegisterWidget,
       p2pSettingWidget,
-      myselfPeerViewWidget,
+      // myselfPeerViewWidget,
     ];
   }
 
@@ -95,13 +95,13 @@ class _P2pLoginState extends State<P2pLogin> {
           icon: const Icon(Icons.settings, color: Colors.white),
           tooltip: AppLocalizations.t('Setting'),
         ),
-        IconButton(
-          onPressed: () {
-            _animateToPage(3);
-          },
-          icon: const Icon(Icons.account_circle, color: Colors.white),
-          tooltip: AppLocalizations.t('Myself'),
-        ),
+        // IconButton(
+        //   onPressed: () {
+        //     _animateToPage(3);
+        //   },
+        //   icon: const Icon(Icons.account_circle, color: Colors.white),
+        //   tooltip: AppLocalizations.t('Myself'),
+        // ),
       ],
     );
     var workspace = Center(

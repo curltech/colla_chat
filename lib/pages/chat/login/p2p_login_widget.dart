@@ -1,11 +1,15 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/login/myself_peer_view_widget.dart';
+import 'package:colla_chat/pages/chat/me/settings/advanced/myselfpeer/myself_peer_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/widgets/common/app_bar_widget.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
@@ -21,17 +25,39 @@ class P2pLoginWidget extends StatefulWidget {
 }
 
 class _P2pLoginWidgetState extends State<P2pLoginWidget> {
-  final List<ColumnFieldDef> p2pLoginInputFieldDef = [
-    ColumnFieldDef(
+  final List<ColumnFieldDef> p2pLoginInputFieldDef = [];
+
+  @override
+  void initState() {
+    super.initState();
+    init();
+    _lastLogin();
+  }
+
+  init() {
+    p2pLoginInputFieldDef.add(ColumnFieldDef(
       name: 'credential',
       label: 'Credential(Mobile/Email/LoginName)',
-      prefixIcon: Icon(
-        Icons.person,
-        color: myself.primary,
+      prefixIcon: IconButton(
+        icon: Icon(Icons.person, color: myself.primary),
+        onPressed: () async {
+          await DialogUtil.show(context: context, builder: _buildMyselfPeers);
+          var myselfPeer = myselfPeerController.current;
+          if (myselfPeer != null) {
+            String? credential = myselfPeer.loginName;
+            if (StringUtil.isNotEmpty(credential)) {
+              ColumnFieldDef def = p2pLoginInputFieldDef[0];
+              def.initValue = credential;
+              if (mounted) {
+                setState(() {});
+              }
+            }
+          }
+        },
       ),
       cancel: true,
-    ),
-    ColumnFieldDef(
+    ));
+    p2pLoginInputFieldDef.add(ColumnFieldDef(
       name: 'password',
       label: 'Password',
       inputType: InputType.password,
@@ -39,13 +65,18 @@ class _P2pLoginWidgetState extends State<P2pLoginWidget> {
         Icons.password,
         color: myself.primary,
       ),
-    ),
-  ];
+    ));
+  }
 
-  @override
-  void initState() {
-    super.initState();
-    _lastLogin();
+  Widget _buildMyselfPeers(BuildContext context) {
+    return Dialog(
+        child: Column(children: [
+      AppBarWidget.buildAppBar(
+        context,
+        title: CommonAutoSizeText(AppLocalizations.t('Select login peer')),
+      ),
+      const MyselfPeerViewWidget()
+    ]));
   }
 
   ///获取最后一次登录的用户名
