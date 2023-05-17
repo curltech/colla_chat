@@ -1,9 +1,16 @@
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/collection/collection_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/me/collection/collection_item_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 
 //收藏的页面
@@ -12,10 +19,13 @@ class CollectionListWidget extends StatefulWidget with TileDataMixin {
   final Function()? onScrollMax;
   final Function()? onScrollMin;
   final ScrollController scrollController = ScrollController();
+  final CollectionItemWidget collectionItemWidget = CollectionItemWidget();
 
   CollectionListWidget(
       {Key? key, this.onRefresh, this.onScrollMax, this.onScrollMin})
-      : super(key: key);
+      : super(key: key) {
+    indexWidgetProvider.define(collectionItemWidget);
+  }
 
   @override
   State createState() => _CollectionListWidgetState();
@@ -47,6 +57,7 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
     scrollController.addListener(_onScroll);
     animateController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 500));
+    collectionChatMessageController.latest();
   }
 
   _update() {
@@ -85,12 +96,79 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
     }
   }
 
+  String _buildSubtitle(
+      {required String subMessageType, String? contentType, String? content}) {
+    String subtitle = '';
+    if (subMessageType == ChatMessageSubType.chat.name) {
+      content = content ?? '';
+      if (contentType == null ||
+          contentType == ChatMessageContentType.text.name) {
+        subtitle = chatMessageService.recoverContent(content);
+      }
+      if (contentType == ChatMessageContentType.location.name) {
+        subtitle = chatMessageService.recoverContent(content);
+        Map<String, dynamic> map = JsonUtil.toJson(subtitle);
+        String? address = map['address'];
+        address = address ?? '';
+        subtitle = address;
+      }
+    } else {
+      subtitle = AppLocalizations.t(subMessageType);
+    }
+    return subtitle;
+  }
+
+  TileData _buildCollectionTileData(ChatMessage chatMessage) {
+    var id = chatMessage.id;
+    var senderPeerId = chatMessage.senderPeerId ?? '';
+    var senderName = chatMessage.senderName ?? '';
+    var title = chatMessage.title ?? senderName;
+    var subMessageType = chatMessage.subMessageType;
+    var sendTime = chatMessage.sendTime;
+    if (sendTime != null) {
+      sendTime = DateUtil.formatEasyRead(sendTime);
+    } else {
+      sendTime = '';
+    }
+    var subtitle = _buildSubtitle(
+        subMessageType: subMessageType ?? '',
+        contentType: chatMessage.contentType,
+        content: chatMessage.content);
+
+    TileData tile = TileData(
+        title: title,
+        titleTail: sendTime,
+        subtitle: subtitle,
+        dense: true,
+        selected: false,
+        isThreeLine: false,
+        routeName: 'collection_item');
+    List<TileData> slideActions = [];
+    TileData deleteSlideAction = TileData(
+        title: 'Delete',
+        prefix: Icons.bookmark_remove,
+        onTap: (int index, String label, {String? subtitle}) async {
+          await chatMessageService.remove(where: 'id=?', whereArgs: [id!]);
+          collectionChatMessageController.delete();
+        });
+    slideActions.add(deleteSlideAction);
+    tile.slideActions = slideActions;
+    return tile;
+  }
+
+  _onTapCollection(int index, String title,
+      {String? subtitle, TileData? group}) {
+    collectionChatMessageController.currentIndex = index;
+  }
+
   ///创建每一条消息
   Widget _buildMessageItem(BuildContext context, int index) {
     List<ChatMessage> messages = collectionChatMessageController.data;
     ChatMessage chatMessage = messages[index];
-    Widget chatMessageItem =
-        ListTile(title: CommonAutoSizeText(chatMessage.title!));
+    Widget chatMessageItem = DataListTile(
+      tileData: _buildCollectionTileData(chatMessage),
+      onTap: _onTapCollection,
+    );
 
     // index=0执行动画，对最新的消息执行动画
     if (index == 0) {
@@ -121,7 +199,7 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
             child: ListView.builder(
               controller: widget.scrollController,
               padding: const EdgeInsets.all(8.0),
-              reverse: true,
+              reverse: false,
               //消息组件渲染
               itemBuilder: _buildMessageItem,
               //消息条目数
@@ -134,8 +212,13 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
   @override
   Widget build(BuildContext context) {
     var chatMessageWidget = _buildChatMessageWidget(context);
+    var appBarView = AppBarView(
+      title: widget.title,
+      withLeading: widget.withLeading,
+      child: chatMessageWidget,
+    );
 
-    return chatMessageWidget;
+    return appBarView;
   }
 
   @override

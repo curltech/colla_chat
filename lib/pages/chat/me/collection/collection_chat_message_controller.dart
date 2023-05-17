@@ -39,11 +39,8 @@ class CollectionChatMessageController extends DataMoreController<ChatMessage> {
     if (data.isNotEmpty) {
       sendTime = data[0].sendTime;
     }
-    List<ChatMessage>? chatMessages = await chatMessageService.findByGreaterId(
-        peerId: myself.peerId!,
-        messageType: ChatMessageType.collection.name,
-        sendTime: sendTime,
-        limit: limit);
+    List<ChatMessage>? chatMessages = await chatMessageService
+        .findByMessageType(ChatMessageType.collection.name, sendTime: sendTime);
     if (chatMessages.isNotEmpty) {
       data.insertAll(0, chatMessages);
       notifyListeners();

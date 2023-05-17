@@ -103,6 +103,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String? subMessageType,
     String? contentType,
     String? mimeType,
+    String? sendTime,
     int limit = defaultLimit,
     int offset = defaultOffset,
   }) async {
@@ -124,10 +125,14 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       where = '$where and mimeType=?';
       whereArgs.add(mimeType);
     }
+    if (sendTime != null) {
+      where = '$where and sendTime>?';
+      whereArgs.add(sendTime);
+    }
     var chatMessages = await find(
         where: where,
         whereArgs: whereArgs,
-        orderBy: 'id desc',
+        orderBy: sendTime == null ? 'id desc' : 'sendTime desc',
         offset: offset,
         limit: limit);
 
