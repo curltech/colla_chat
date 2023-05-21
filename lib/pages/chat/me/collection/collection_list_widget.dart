@@ -8,13 +8,11 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:flutter/material.dart';
 
-//收藏的页面
-class CollectionListWidget extends StatefulWidget with TileDataMixin {
+//收藏的清单组件
+class CollectionListWidget extends StatefulWidget {
   final Future<void> Function()? onRefresh;
   final Function()? onScrollMax;
   final Function()? onScrollMin;
@@ -29,18 +27,6 @@ class CollectionListWidget extends StatefulWidget with TileDataMixin {
 
   @override
   State createState() => _CollectionListWidgetState();
-
-  @override
-  bool get withLeading => true;
-
-  @override
-  String get routeName => 'collection';
-
-  @override
-  IconData get iconData => Icons.collections;
-
-  @override
-  String get title => 'Collection';
 }
 
 class _CollectionListWidgetState extends State<CollectionListWidget>
@@ -161,8 +147,8 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
     collectionChatMessageController.currentIndex = index;
   }
 
-  ///创建每一条消息
-  Widget _buildMessageItem(BuildContext context, int index) {
+  ///创建每一条收藏消息
+  Widget _buildCollectionItem(BuildContext context, int index) {
     List<ChatMessage> messages = collectionChatMessageController.data;
     ChatMessage chatMessage = messages[index];
     Widget chatMessageItem = DataListTile(
@@ -188,8 +174,8 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
     return chatMessageItem;
   }
 
-  ///创建消息显示面板，包含消息的输入框
-  Widget _buildChatMessageWidget(BuildContext context) {
+  ///创建收藏信息的列表
+  Widget _buildCollectionWidget(BuildContext context) {
     return Column(children: <Widget>[
       Flexible(
         //使用列表渲染消息
@@ -201,7 +187,7 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
               padding: const EdgeInsets.all(8.0),
               reverse: false,
               //消息组件渲染
-              itemBuilder: _buildMessageItem,
+              itemBuilder: _buildCollectionItem,
               //消息条目数
               itemCount: collectionChatMessageController.data.length,
             )),
@@ -211,14 +197,9 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
 
   @override
   Widget build(BuildContext context) {
-    var chatMessageWidget = _buildChatMessageWidget(context);
-    var appBarView = AppBarView(
-      title: widget.title,
-      withLeading: widget.withLeading,
-      child: chatMessageWidget,
-    );
+    var collectionWidget = _buildCollectionWidget(context);
 
-    return appBarView;
+    return collectionWidget;
   }
 
   @override

@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
@@ -7,17 +8,21 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
+import 'package:colla_chat/pages/chat/me/collection/collection_chat_message_controller.dart';
+import 'package:colla_chat/pages/chat/me/collection/collection_list_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/mobile_camera_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/entity_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -335,8 +340,50 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
     }
   }
 
-  ///收藏
-  void _onActionCollection() {}
+  ///选择收藏，并发送收藏的内容成为消息
+  Future<void> _onActionCollection() async {
+    if (mounted) {
+      await DialogUtil.show(
+          context: context,
+          builder: (BuildContext context) {
+            return Dialog(
+              child: CollectionListWidget(),
+            );
+          });
+      var collection = collectionChatMessageController.current;
+      if (collection != null) {
+        Uint8List? thumbnail;
+        if (collection.thumbnail != null) {
+          thumbnail = CryptoUtil.decodeBase64(collection.thumbnail!);
+        }
+        ChatMessageContentType? contentType = StringUtil.enumFromString(
+            ChatMessageContentType.values, collection.contentType);
+        contentType ??= ChatMessageContentType.text;
+        ChatMessageType? messageType = StringUtil.enumFromString(
+            ChatMessageType.values, collection.messageType);
+        messageType ??= ChatMessageType.chat;
+        ChatMessageSubType? subMessageType = StringUtil.enumFromString(
+            ChatMessageSubType.values, collection.subMessageType);
+        subMessageType ??= ChatMessageSubType.chat;
+        Uint8List? content;
+        if (collection.content == null) {
+          content = await messageAttachmentService.findContent(
+              collection.messageId!, collection.title);
+        } else {
+          content = CryptoUtil.decodeBase64(collection.content!);
+        }
+        chatMessageController.send(
+          title: collection.title,
+          content: content,
+          thumbnail: thumbnail,
+          contentType: contentType,
+          mimeType: collection.mimeType,
+          messageType: messageType,
+          subMessageType: subMessageType,
+        );
+      }
+    }
+  }
 
   Widget _buildActionCard(BuildContext context) {
     return Container(

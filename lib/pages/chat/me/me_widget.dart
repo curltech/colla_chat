@@ -1,4 +1,4 @@
-import 'package:colla_chat/pages/chat/me/collection/collection_list_widget.dart';
+import 'package:colla_chat/pages/chat/me/collection/collection_list_view.dart';
 import 'package:colla_chat/pages/chat/me/mail/mail_widget.dart';
 import 'package:colla_chat/pages/chat/me/me_head_widget.dart';
 import 'package:colla_chat/pages/chat/me/media/media_widget.dart';
@@ -17,7 +17,7 @@ import 'package:flutter/material.dart';
 //我的页面，带有路由回调函数
 class MeWidget extends StatelessWidget with TileDataMixin {
   final PersonalInfoWidget personalInfoWidget = const PersonalInfoWidget();
-  final CollectionListWidget collectionListWidget = CollectionListWidget();
+  final CollectionListView collectionListView = CollectionListView();
   final SettingWidget settingWidget = SettingWidget();
   final MailWidget mailWidget = MailWidget();
   final WebrtcWidget webrtcWidget = WebrtcWidget();
@@ -28,7 +28,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   late final List<TileData> meTileData;
 
   MeWidget({Key? key}) : super(key: key) {
-    indexWidgetProvider.define(collectionListWidget);
+    indexWidgetProvider.define(collectionListView);
     indexWidgetProvider.define(settingWidget);
     indexWidgetProvider.define(personalInfoWidget);
     indexWidgetProvider.define(mailWidget);
@@ -38,7 +38,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(openVpnWidget);
     List<TileDataMixin> mixins = [
       settingWidget,
-      collectionListWidget,
+      collectionListView,
       mailWidget,
       webrtcWidget,
       webViewWidget,

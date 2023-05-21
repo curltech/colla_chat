@@ -46,6 +46,11 @@ class CollectionChatMessageController extends DataMoreController<ChatMessage> {
       notifyListeners();
     }
   }
+
+  ///收藏变成消息
+  collection() {
+    chatMessageService.buildChatMessage();
+  }
 }
 
 ///好友或者群的消息控制器，包含某个连接的所有消息
