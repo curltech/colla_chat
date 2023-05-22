@@ -58,8 +58,8 @@ class _CollectionItemWidgetState extends State<CollectionItemWidget> {
         builder: (context, value, child) {
           ChatMessage? chatMessage = collectionChatMessageController.current;
           var title = AppLocalizations.t(widget.title);
-          if (chatMessage != null) {
-            title = '${chatMessage.receiverName} - ${chatMessage.senderName}';
+          if (chatMessage != null && chatMessage.title != null) {
+            title = chatMessage.title!;
           }
           return CommonAutoSizeText(
             title,

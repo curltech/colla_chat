@@ -1,4 +1,5 @@
 import 'package:colla_chat/pages/chat/me/collection/collection_item_widget.dart';
+import 'package:colla_chat/pages/chat/me/collection/collection_list_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -37,11 +38,11 @@ class CollectionListView extends StatefulWidget with TileDataMixin {
 class _CollectionListViewState extends State<CollectionListView> {
   @override
   Widget build(BuildContext context) {
-    final CollectionItemWidget collectionItemWidget = CollectionItemWidget();
+    final CollectionListWidget collectionListWidget = CollectionListWidget();
     var appBarView = AppBarView(
       title: widget.title,
       withLeading: widget.withLeading,
-      child: collectionItemWidget,
+      child: collectionListWidget,
     );
 
     return appBarView;

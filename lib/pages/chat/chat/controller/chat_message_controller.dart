@@ -101,15 +101,20 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     if (_chatSummary != null) {
       if (_chatSummary!.partyType == PartyType.linkman.name) {
         chatMessages = await chatMessageService.findByPeerId(
-            peerId: _chatSummary!.peerId!, offset: data.length, limit: limit);
+            peerId: _chatSummary!.peerId!,
+            messageType: ChatMessageType.chat.name,
+            offset: data.length,
+            limit: limit);
       } else if (_chatSummary!.partyType == PartyType.group.name) {
         chatMessages = await chatMessageService.findByPeerId(
             groupPeerId: _chatSummary!.peerId!,
+            messageType: ChatMessageType.chat.name,
             offset: data.length,
             limit: limit);
       } else if (_chatSummary!.partyType == PartyType.conference.name) {
         chatMessages = await chatMessageService.findByPeerId(
             groupPeerId: _chatSummary!.peerId!,
+            messageType: ChatMessageType.chat.name,
             offset: data.length,
             limit: limit);
       }
@@ -139,15 +144,20 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     if (_chatSummary != null) {
       if (_chatSummary!.partyType == PartyType.linkman.name) {
         chatMessages = await chatMessageService.findByGreaterId(
-            peerId: _chatSummary!.peerId!, sendTime: sendTime, limit: limit);
+            peerId: _chatSummary!.peerId!,
+            messageType: ChatMessageType.chat.name,
+            sendTime: sendTime,
+            limit: limit);
       } else if (_chatSummary!.partyType == PartyType.group.name) {
         chatMessages = await chatMessageService.findByGreaterId(
             groupPeerId: _chatSummary!.peerId!,
+            messageType: ChatMessageType.chat.name,
             sendTime: sendTime,
             limit: limit);
       } else if (_chatSummary!.partyType == PartyType.conference.name) {
         chatMessages = await chatMessageService.findByGreaterId(
             groupPeerId: _chatSummary!.peerId!,
+            messageType: ChatMessageType.chat.name,
             sendTime: sendTime,
             limit: limit);
       }

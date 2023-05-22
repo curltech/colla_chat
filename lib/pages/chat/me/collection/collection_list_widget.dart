@@ -152,6 +152,7 @@ class _CollectionListWidgetState extends State<CollectionListWidget>
     List<ChatMessage> messages = collectionChatMessageController.data;
     ChatMessage chatMessage = messages[index];
     Widget chatMessageItem = DataListTile(
+      index: index,
       tileData: _buildCollectionTileData(chatMessage),
       onTap: _onTapCollection,
     );

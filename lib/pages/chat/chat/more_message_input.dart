@@ -347,7 +347,14 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
           context: context,
           builder: (BuildContext context) {
             return Dialog(
-              child: CollectionListWidget(),
+              child: Column(children: [
+                AppBarWidget.buildAppBar(
+                  context,
+                  title: CommonAutoSizeText(
+                      AppLocalizations.t('Select collect message')),
+                ),
+                Expanded(child: CollectionListWidget())
+              ]),
             );
           });
       var collection = collectionChatMessageController.current;
@@ -359,9 +366,9 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         ChatMessageContentType? contentType = StringUtil.enumFromString(
             ChatMessageContentType.values, collection.contentType);
         contentType ??= ChatMessageContentType.text;
-        ChatMessageType? messageType = StringUtil.enumFromString(
-            ChatMessageType.values, collection.messageType);
-        messageType ??= ChatMessageType.chat;
+        // ChatMessageType? messageType = StringUtil.enumFromString(
+        //     ChatMessageType.values, collection.messageType);
+        // messageType ??= ChatMessageType.chat;
         ChatMessageSubType? subMessageType = StringUtil.enumFromString(
             ChatMessageSubType.values, collection.subMessageType);
         subMessageType ??= ChatMessageSubType.chat;
@@ -378,7 +385,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
           thumbnail: thumbnail,
           contentType: contentType,
           mimeType: collection.mimeType,
-          messageType: messageType,
+          messageType: ChatMessageType.chat,
           subMessageType: subMessageType,
         );
       }
