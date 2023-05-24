@@ -48,6 +48,7 @@ import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
+import 'package:share_plus/share_plus.dart';
 
 final List<ActionData> messagePopActionData = [
   ActionData(
@@ -76,6 +77,8 @@ final List<ActionData> messagePopActionData = [
       label: 'Collect',
       tooltip: 'Collect message',
       icon: const Icon(Icons.collections)),
+  ActionData(
+      label: 'Share', tooltip: 'Share', icon: const Icon(Icons.share_outlined)),
 ];
 
 ///每种消息的显示组件
@@ -271,6 +274,37 @@ class MessageWidget {
       case 'Refer':
         String? messageId = chatMessage.messageId;
         chatMessageController.parentMessageId = messageId;
+        break;
+      case 'Share':
+        final box = context.findRenderObject() as RenderBox?;
+        String subMessageType = chatMessage.subMessageType;
+        if (subMessageType == ChatMessageSubType.chat.name) {
+          String contentType = chatMessage.contentType!;
+          if (contentType == ChatMessageContentType.text.name) {
+            Share.share(
+              chatMessage.content!,
+              subject: chatMessage.contentType,
+              sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+            );
+          }
+          if (contentType == ChatMessageContentType.file.name ||
+              contentType == ChatMessageContentType.video.name ||
+              contentType == ChatMessageContentType.audio.name ||
+              contentType == ChatMessageContentType.media.name ||
+              contentType == ChatMessageContentType.rich.name ||
+              contentType == ChatMessageContentType.image.name) {
+            String? filename = await messageAttachmentService
+                .getDecryptFilename(chatMessage.messageId!, chatMessage.title);
+            if (filename != null) {
+              Share.shareXFiles(
+                [XFile(filename)],
+                text: chatMessage.content,
+                subject: chatMessage.contentType,
+                sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+              );
+            }
+          }
+        }
         break;
       default:
     }

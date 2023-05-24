@@ -90,6 +90,10 @@ class _FullScreenWidgetState extends State<FullScreenWidget> {
     );
   }
 
+  _shareChatMessage(){
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return AppBarView(
