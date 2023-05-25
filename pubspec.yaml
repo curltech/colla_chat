@@ -93,7 +93,7 @@ dependencies:
   #international_phone_input: ^1.0.4
   phone_numbers_parser: ^7.0.0+1
   font_awesome_flutter: ^10.1.0
-  flushbar: ^1.10.4
+  #flushbar: ^1.10.4
   #share: ^0.6.5
   flutter_emoji: ^2.4.0
   emoji_picker_flutter: ^1.5.2
@@ -190,7 +190,9 @@ dependencies:
   provider: ^6.0.1 #状态管理
   pull_to_refresh_notification: ^3.0.0
   share_plus: 6.3.4
-  #receive_sharing_intent: ^1.4.5 #gradle版本低的问题
+  receive_sharing_intent: #^1.4.6 #gradle版本低的问题
+    git:
+      url: https://github.com/AyushmanG26/receive_sharing_intent.git
   date_format: ^2.0.6
   omni_datetime_picker: ^1.0.1
   toggle_switch: ^2.0.1
