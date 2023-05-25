@@ -95,8 +95,8 @@ class _ExtendedTextMessageInputWidgetState
 
     final TextSpan oldTextSpan = specialTextSpanBuilder.build(value.text);
 
-    textEditingValue =
-        handleSpecialTextSpanDelete(textEditingValue, value, oldTextSpan, null);
+    // textEditingValue =
+    //     handleSpecialTextSpanDelete(textEditingValue, value, oldTextSpan, null);
 
     widget.textEditingController.value = textEditingValue;
   }

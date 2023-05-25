@@ -97,7 +97,7 @@ class FluentWidgetFactory extends WidgetFactory {
     FormFieldSetter<String>? onSaved,
     FormFieldValidator<String>? validator,
     List<TextInputFormatter>? inputFormatters,
-    bool? enabled,
+    bool enabled = true,
     double cursorWidth = 2.0,
     double? cursorHeight,
     Radius? cursorRadius,
