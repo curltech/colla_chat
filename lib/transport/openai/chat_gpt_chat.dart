@@ -8,7 +8,7 @@ class ChatGPTChat {
     openAI = OpenAI.instance.build(
         token: apiKey,
         baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 5)),
-        isLog: true);
+        enableLog: true);
   }
 
   ///如果需要翻译，prompt经过本函数处理

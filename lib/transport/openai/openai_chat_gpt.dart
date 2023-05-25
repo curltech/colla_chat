@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:dart_openai/openai.dart';
+import 'package:dart_openai/dart_openai.dart';
 
 ///提供ChatGpt完整的功能，包括聊天，翻译，训练，优化，设置规则，图像生成，语音识别
 ///
