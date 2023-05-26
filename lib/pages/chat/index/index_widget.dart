@@ -63,7 +63,9 @@ class _IndexWidgetState extends State<IndexWidget>
         .listen((List<SharedMediaFile> value) {
       logger.i("Shared:${_sharedFiles.map((f) => f.path).join(",") ?? ""}");
       _sharedFiles = value;
-      _shareChatMessage(file: _sharedFiles.first);
+      if (_sharedFiles.isNotEmpty) {
+        _shareChatMessage(file: _sharedFiles.first);
+      }
     }, onError: (err) {
       logger.e("getIntentDataStream error: $err");
     });
@@ -71,14 +73,18 @@ class _IndexWidgetState extends State<IndexWidget>
     // 应用关闭时分享的媒体文件
     ReceiveSharingIntent.getInitialMedia().then((List<SharedMediaFile> value) {
       _sharedFiles = value;
-      _shareChatMessage(file: _sharedFiles.first);
+      if (_sharedFiles.isNotEmpty) {
+        _shareChatMessage(file: _sharedFiles.first);
+      }
     });
 
     // 应用打开时分享的文本
     _intentDataStreamSubscription =
         ReceiveSharingIntent.getTextStream().listen((String value) {
       _sharedText = value;
-      _shareChatMessage(content: _sharedText);
+      if (_sharedText.isNotEmpty) {
+        _shareChatMessage(content: _sharedText);
+      }
     }, onError: (err) {
       logger.e("getLinkStream error: $err");
     });
@@ -86,7 +92,9 @@ class _IndexWidgetState extends State<IndexWidget>
     // 应用关闭时分享的文本
     ReceiveSharingIntent.getInitialText().then((String? value) {
       _sharedText = value!;
-      _shareChatMessage(content: _sharedText);
+      if (_sharedText.isNotEmpty) {
+        _shareChatMessage(content: _sharedText);
+      }
     });
   }
 

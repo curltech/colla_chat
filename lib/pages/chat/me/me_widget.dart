@@ -1,4 +1,5 @@
 import 'package:colla_chat/pages/chat/me/collection/collection_list_view.dart';
+import 'package:colla_chat/pages/chat/me/logger_console_view.dart';
 import 'package:colla_chat/pages/chat/me/mail/mail_widget.dart';
 import 'package:colla_chat/pages/chat/me/me_head_widget.dart';
 import 'package:colla_chat/pages/chat/me/media/media_widget.dart';
@@ -24,6 +25,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   final MediaWidget mediaWidget = MediaWidget();
   final PlatformWebViewWidget webViewWidget = PlatformWebViewWidget();
   final OpenVpnWidget openVpnWidget = const OpenVpnWidget();
+  final LoggerConsoleView loggerConsoleView = const LoggerConsoleView();
 
   late final List<TileData> meTileData;
 
@@ -36,6 +38,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(webViewWidget);
     indexWidgetProvider.define(mediaWidget);
     indexWidgetProvider.define(openVpnWidget);
+    indexWidgetProvider.define(loggerConsoleView);
     List<TileDataMixin> mixins = [
       settingWidget,
       collectionListView,
@@ -44,6 +47,7 @@ class MeWidget extends StatelessWidget with TileDataMixin {
       webViewWidget,
       mediaWidget,
       openVpnWidget,
+      loggerConsoleView,
     ];
     meTileData = TileData.from(mixins);
     for (var tile in meTileData) {

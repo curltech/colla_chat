@@ -1,10 +1,17 @@
+import 'dart:typed_data';
+
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
-class LocalNotification {
+/// flutter_local_notifications实现的本地通知服务
+class FlutterLocalNotification {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
       FlutterLocalNotificationsPlugin();
+
+  FlutterLocalNotification() {
+    init();
+  }
 
   ///初始化本地通知组件
   init() async {
@@ -25,6 +32,7 @@ class LocalNotification {
         onDidReceiveNotificationResponse: onDidReceiveNotificationResponse);
   }
 
+  ///老版本的ios需要处理
   onDidReceiveLocalNotification(
       int id, String? title, String? body, String? payload) {}
 
@@ -35,10 +43,6 @@ class LocalNotification {
     if (notificationResponse.payload != null) {
       logger.i('notification payload: $payload');
     }
-    // await Navigator.push(
-    //   context,
-    //   MaterialPageRoute<void>(builder: (context) => SecondScreen(payload)),
-    // );
   }
 
   ///apple平台获取权限
@@ -69,18 +73,31 @@ class LocalNotification {
     return result;
   }
 
-  ///发送通知
-  show(int id, String? title, String? body, String? payload) async {
-    const AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails('your channel id', 'your channel name',
-            channelDescription: 'your channel description',
+  ///发送本地通知
+  show(String? title, String? body, String? payload,
+      {bool vibration = false}) async {
+    var vibrationPattern = Int64List(4);
+    vibrationPattern[0] = 0;
+    vibrationPattern[1] = 1000;
+    vibrationPattern[2] = 5000;
+    vibrationPattern[3] = 2000;
+    AndroidNotificationDetails androidNotificationDetails =
+        AndroidNotificationDetails(
+            'CollaChat notification', 'CollaChat notification',
+            channelDescription: 'CollaChat notification description',
             importance: Importance.max,
             priority: Priority.high,
+            vibrationPattern: vibration ? vibrationPattern : null,
+            enableVibration: vibration,
             ticker: 'ticker');
-    const NotificationDetails notificationDetails =
+    NotificationDetails notificationDetails =
         NotificationDetails(android: androidNotificationDetails);
-    await flutterLocalNotificationsPlugin
-        .show(id, title, body, notificationDetails, payload: payload);
+    try {
+      await flutterLocalNotificationsPlugin
+          .show(0, title, body, notificationDetails, payload: payload);
+    } catch (ex) {
+      logger.e('flutterLocalNotifications show message failure:$ex');
+    }
   }
 
   ///用户点击通知后获取细节
@@ -101,4 +118,4 @@ class LocalNotification {
   }
 }
 
-final localNotification = LocalNotification();
+final flutterLocalNotification = FlutterLocalNotification();

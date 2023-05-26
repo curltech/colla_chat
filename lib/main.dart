@@ -9,7 +9,6 @@ import 'package:colla_chat/routers/router_handler.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
-import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -42,19 +41,7 @@ Future<void> setCert() async {
       .setTrustedCertificatesBytes(data.buffer.asUint8List());
 }
 
-///启动背景服务
-Future<bool> startForegroundService() async {
-  const androidConfig = FlutterBackgroundAndroidConfig(
-    notificationTitle: 'CollaChat',
-    notificationText: '',
-    notificationImportance: AndroidNotificationImportance.Default,
-    notificationIcon: AndroidResource(
-        name: 'background_icon',
-        defType: 'drawable'), // Default is ic_launcher from folder mipmap
-  );
-  await FlutterBackground.initialize(androidConfig: androidConfig);
-  return FlutterBackground.enableBackgroundExecution();
-}
+
 
 ///应用主函数，使用runApp加载主应用Widget
 void main(List<String> args) async {

@@ -85,6 +85,11 @@
 
     <!-- Permissions options for the `alarm` group -->
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
+    <!-- Permissions options for the `background` group -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <application
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
@@ -95,7 +100,7 @@
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:exported="true"
             android:hardwareAccelerated="true"
-            android:launchMode="singleTop"
+            android:launchMode="singleTask"
             android:theme="@style/LaunchTheme"
             android:windowSoftInputMode="adjustResize">
             <!-- Specifies an Android theme to apply to this Activity as soon as
@@ -112,13 +117,14 @@
             <!--TODO:  Add this filter, if you want support share into your app-->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <!--TODO:  Add this filter, if you want support opening urls into your app-->
                 <data
-                        android:scheme="https"
-                        android:host="example.com"
-                        android:pathPrefix="/invite"/>
+                    android:host="example.com"
+                    android:pathPrefix="/invite"
+                    android:scheme="https" />
             </intent-filter>
 
             <!--TODO: Add this filter, if you want to support sharing text into your app-->
@@ -178,5 +184,8 @@
                 <action android:name="android.provider.Telephony.SMS_RECEIVED" />
             </intent-filter>
         </receiver>
+        <service
+            android:name="de.julianassmann.flutter_background.IsolateHolderService"
+            android:exported="false" />
     </application>
 </manifest>

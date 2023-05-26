@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'package:classic_logger/classic_logger.dart' as classic_logger;
 import 'package:colla_chat/provider/myself.dart';
+import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:path/path.dart' as p;
+import 'package:synchronized/extension.dart';
 
 class CustomLogger {
   late Logger _logger;
@@ -95,6 +97,7 @@ class FileOutput extends LogOutput {
 
   @override
   void output(OutputEvent event) {
+    loggerController.append(event.lines);
     if (file != null) {
       event.lines.forEach(print);
       IOSink sink = file!.openWrite(mode: FileMode.append);
@@ -147,3 +150,67 @@ class ClassicLogger {
 }
 
 final logger = customLogger;
+
+class LoggerController with ChangeNotifier {
+  int total = 100;
+  final List<String> _logs = [];
+
+  append(List<String> logs) async {
+    if (_logs.length >= 100) {
+      await synchronized(() async {
+        _logs.removeRange(0, logs.length);
+      });
+    }
+    await synchronized(() async {
+      return _logs.addAll(logs);
+    });
+
+    notifyListeners();
+  }
+
+  List<String> get logs {
+    return _logs;
+  }
+}
+
+final LoggerController loggerController = LoggerController();
+
+class LoggerConsoleWidget extends StatefulWidget {
+  const LoggerConsoleWidget({Key? key}) : super(key: key);
+
+  @override
+  State<LoggerConsoleWidget> createState() => _LoggerConsoleWidgetState();
+}
+
+class _LoggerConsoleWidgetState extends State<LoggerConsoleWidget> {
+  @override
+  void initState() {
+    super.initState();
+    loggerController.addListener(_update);
+  }
+
+  _update() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void dispose() {
+    loggerController.removeListener(_update);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      reverse: true,
+      shrinkWrap: true,
+      itemCount: loggerController.logs.length,
+      itemBuilder: (context, index) {
+        final log = loggerController.logs.elementAt(index);
+        return Text(log);
+      },
+    );
+  }
+}

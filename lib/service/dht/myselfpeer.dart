@@ -11,6 +11,7 @@ import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/p2p/chain/action/connect.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/backgroud_service.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/plugin/security_storage.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -243,7 +244,22 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
         return false;
       }
 
-      ///2.连接篇p2p的节点，把自己的信息注册上去
+      ///2.启动android后台服务
+      if (platformParams.android) {
+        try {
+          bool enabled =
+              await androidBackgroundService.enableBackgroundExecution();
+          if (enabled) {
+            logger.i('androidBackgroundService enabled');
+          } else {
+            logger.e('androidBackgroundService failure');
+          }
+        } catch (e) {
+          logger.e('androidBackgroundService failure:$e');
+        }
+      }
+
+      ///3.连接篇p2p的节点，把自己的信息注册上去
       await connect();
       await postLogin();
       return true;
