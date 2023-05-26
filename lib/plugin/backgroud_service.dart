@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/p2p/chain/action/ping.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:device_info_plus/device_info_plus.dart';
@@ -21,6 +22,7 @@ class AndroidBackgroundService {
     enableWifiLock: true,
     showBadge: true,
   );
+  Timer? _heartTimer;
 
   ///请求权限
   Future<bool> requestPermission() async {
@@ -53,6 +55,13 @@ class AndroidBackgroundService {
     if (hasPermissions) {
       final backgroundExecution =
           await FlutterBackground.enableBackgroundExecution();
+      if (backgroundExecution) {
+        _heartTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
+          pingAction.ping('hello');
+          logger.i('pingAction ping hello');
+        });
+      }
+
       return backgroundExecution;
     }
     return false;
@@ -63,6 +72,10 @@ class AndroidBackgroundService {
     bool enabled = FlutterBackground.isBackgroundExecutionEnabled;
     if (enabled) {
       await FlutterBackground.disableBackgroundExecution();
+      if (_heartTimer != null) {
+        _heartTimer!.cancel();
+        _heartTimer = null;
+      }
     }
   }
 }

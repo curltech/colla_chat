@@ -149,7 +149,8 @@ class _PeerEndpointListWidgetState extends State<PeerEndpointListWidget> {
     if (peerEndpoint.libp2pConnectAddress == null) {
       libp2pLight = grey;
     } else {
-      var response = await pingAction.ping('hello', peerEndpoint.peerId);
+      var response =
+          await pingAction.ping('hello', targetPeerId: peerEndpoint.peerId);
       if (response) {
         libp2pLight = red;
       } else {

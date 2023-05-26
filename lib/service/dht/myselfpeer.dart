@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/crypto/signalprotocol.dart';
@@ -9,6 +11,7 @@ import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/dht/peerprofile.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/p2p/chain/action/connect.dart';
+import 'package:colla_chat/p2p/chain/action/ping.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/backgroud_service.dart';
