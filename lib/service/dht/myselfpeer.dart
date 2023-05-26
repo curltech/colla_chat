@@ -259,6 +259,19 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
         }
       }
 
+      if (platformParams.mobile) {
+        try {
+          bool success = await backgroundService.start();
+          if (success) {
+            logger.i('backgroundService start');
+          } else {
+            logger.e('backgroundService start failure');
+          }
+        } catch (e) {
+          logger.e('backgroundService start failure:$e');
+        }
+      }
+
       ///3.连接篇p2p的节点，把自己的信息注册上去
       await connect();
       await postLogin();
