@@ -81,8 +81,8 @@ class _IndexWidgetState extends State<IndexWidget>
     // 应用打开时分享的文本
     _intentDataStreamSubscription =
         ReceiveSharingIntent.getTextStream().listen((String value) {
-      _sharedText = value;
-      if (_sharedText.isNotEmpty) {
+      if (value.isNotEmpty) {
+        _sharedText = value;
         _shareChatMessage(content: _sharedText);
       }
     }, onError: (err) {
@@ -91,9 +91,11 @@ class _IndexWidgetState extends State<IndexWidget>
 
     // 应用关闭时分享的文本
     ReceiveSharingIntent.getInitialText().then((String? value) {
-      _sharedText = value!;
-      if (_sharedText.isNotEmpty) {
-        _shareChatMessage(content: _sharedText);
+      if (value != null) {
+        _sharedText = value;
+        if (_sharedText.isNotEmpty) {
+          _shareChatMessage(content: _sharedText);
+        }
       }
     });
   }

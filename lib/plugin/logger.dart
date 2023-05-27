@@ -196,21 +196,31 @@ class _LoggerConsoleWidgetState extends State<LoggerConsoleWidget> {
   }
 
   @override
-  void dispose() {
-    loggerController.removeListener(_update);
-    super.dispose();
+  Widget build(BuildContext context) {
+    return InkWell(
+        onDoubleTap: () {
+          setState(() {
+            loggerController.logs.clear();
+          });
+        },
+        child: Card(
+            elevation: 0.0,
+            margin: EdgeInsets.zero,
+            shape: const ContinuousRectangleBorder(),
+            child: ListView.builder(
+              reverse: true,
+              shrinkWrap: true,
+              itemCount: loggerController.logs.length,
+              itemBuilder: (context, index) {
+                final log = loggerController.logs.elementAt(index);
+                return Text(log);
+              },
+            )));
   }
 
   @override
-  Widget build(BuildContext context) {
-    return ListView.builder(
-      reverse: true,
-      shrinkWrap: true,
-      itemCount: loggerController.logs.length,
-      itemBuilder: (context, index) {
-        final log = loggerController.logs.elementAt(index);
-        return Text(log);
-      },
-    );
+  void dispose() {
+    loggerController.removeListener(_update);
+    super.dispose();
   }
 }

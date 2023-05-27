@@ -57,7 +57,7 @@ class AndroidBackgroundService {
           await FlutterBackground.enableBackgroundExecution();
       if (backgroundExecution) {
         _heartTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
-          pingAction.ping('hello');
+          pingAction.ping({'content': 'hello'});
           logger.i('pingAction ping hello');
         });
       }
