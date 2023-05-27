@@ -355,5 +355,6 @@
   "Must have node password": "必须有节点密码",
   "Linkman Information": "联系人信息",
   "Loading, please waiting...": "加载中，请等待",
-  "Logger console": "日志"
+  "Logger console": "日志",
+  "Select login peer": "选择登录账号"
 }

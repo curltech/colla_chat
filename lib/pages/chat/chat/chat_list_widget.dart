@@ -25,6 +25,7 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/websocket.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -217,6 +218,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
     var status = _socketStatus.value;
     _socketStatus.value = socketStatus;
     if (socketStatus != status) {
+      ///websocket连接后所有的friend的webrtc重连
       if (_socketStatus.value == SocketStatus.connected) {
         _reconnectWebrtc();
         if (mounted) {
@@ -234,7 +236,20 @@ class _ChatListWidgetState extends State<ChatListWidget>
     }
   }
 
-  _reconnectWebrtc() {}
+  ///所有的friend的webrtc重连
+  _reconnectWebrtc() async {
+    List<Linkman> linkmen = await linkmanService
+        .find(where: 'linkmanStatus=?', whereArgs: [LinkmanStatus.friend.name]);
+    if (linkmen.isNotEmpty) {
+      for (Linkman linkman in linkmen) {
+        String peerId = linkman.peerId;
+        if (myself.peerId == peerId) {
+          continue;
+        }
+        peerConnectionPool.create(peerId);
+      }
+    }
+  }
 
   String _buildSubtitle(
       {required String subMessageType, String? contentType, String? content}) {

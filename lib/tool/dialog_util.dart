@@ -284,6 +284,7 @@ class DialogUtil {
       barrierDismissible: false,
       builder: (context) {
         return Dialog(
+          insetPadding: EdgeInsets.zero,
           child: defaultLoadingWidget(context: context, tip: tip),
         );
       },

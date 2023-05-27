@@ -47,7 +47,7 @@ class AndroidBackgroundService {
   }
 
   ///初始化并启动后台服务
-  Future<bool> enableBackgroundExecution() async {
+  Future<bool> enableBackgroundExecution({bool heartTimer = false}) async {
     bool hasPermissions = await requestPermission();
     if (hasPermissions) {}
     hasPermissions = await FlutterBackground.initialize(androidConfig: config);
@@ -55,7 +55,7 @@ class AndroidBackgroundService {
     if (hasPermissions) {
       final backgroundExecution =
           await FlutterBackground.enableBackgroundExecution();
-      if (backgroundExecution) {
+      if (backgroundExecution && heartTimer) {
         _heartTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
           pingAction.ping({'content': 'hello'});
           logger.i('pingAction ping hello');

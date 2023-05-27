@@ -710,4 +710,4 @@ class PeerConnectionPool {
   }
 }
 
-final peerConnectionPool = PeerConnectionPool();
+final PeerConnectionPool peerConnectionPool = PeerConnectionPool();
