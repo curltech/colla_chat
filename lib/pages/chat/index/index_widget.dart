@@ -105,6 +105,12 @@ class _IndexWidgetState extends State<IndexWidget>
     if (file == null && content == null) {
       return;
     }
+    String? title;
+    int pos = content!.indexOf('http');
+    if (pos > -1) {
+      title = content.substring(0, pos);
+      content = '#${content.substring(pos)}#';
+    }
     await DialogUtil.show(
         context: context,
         builder: (BuildContext context) {
@@ -130,7 +136,8 @@ class _IndexWidgetState extends State<IndexWidget>
                       chatMessageController.chatSummary = current;
                       indexWidgetProvider.push('chat_message');
                       if (content != null) {
-                        await chatMessageController.sendText(message: content);
+                        await chatMessageController.sendText(
+                            title: title, message: content);
                       }
                       if (file != null) {
                         String filename = file.path;

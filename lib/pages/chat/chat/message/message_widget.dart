@@ -276,37 +276,41 @@ class MessageWidget {
         chatMessageController.parentMessageId = messageId;
         break;
       case 'Share':
-        final box = context.findRenderObject() as RenderBox?;
-        String subMessageType = chatMessage.subMessageType;
-        if (subMessageType == ChatMessageSubType.chat.name) {
-          String contentType = chatMessage.contentType!;
-          if (contentType == ChatMessageContentType.text.name) {
-            Share.share(
-              chatMessage.content!,
-              subject: chatMessage.contentType,
-              sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
-            );
-          }
-          if (contentType == ChatMessageContentType.file.name ||
-              contentType == ChatMessageContentType.video.name ||
-              contentType == ChatMessageContentType.audio.name ||
-              contentType == ChatMessageContentType.media.name ||
-              contentType == ChatMessageContentType.rich.name ||
-              contentType == ChatMessageContentType.image.name) {
-            String? filename = await messageAttachmentService
-                .getDecryptFilename(chatMessage.messageId!, chatMessage.title);
-            if (filename != null) {
-              Share.shareXFiles(
-                [XFile(filename)],
-                text: chatMessage.content,
-                subject: chatMessage.contentType,
-                sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
-              );
-            }
-          }
-        }
+        await _share(context);
         break;
       default:
+    }
+  }
+
+  Future<void> _share(BuildContext context) async {
+    final box = context.findRenderObject() as RenderBox?;
+    String subMessageType = chatMessage.subMessageType;
+    if (subMessageType == ChatMessageSubType.chat.name) {
+      String contentType = chatMessage.contentType!;
+      if (contentType == ChatMessageContentType.text.name) {
+        Share.share(
+          chatMessage.content!,
+          subject: chatMessage.contentType,
+          sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+        );
+      }
+      if (contentType == ChatMessageContentType.file.name ||
+          contentType == ChatMessageContentType.video.name ||
+          contentType == ChatMessageContentType.audio.name ||
+          contentType == ChatMessageContentType.media.name ||
+          contentType == ChatMessageContentType.rich.name ||
+          contentType == ChatMessageContentType.image.name) {
+        String? filename = await messageAttachmentService
+            .getDecryptFilename(chatMessage.messageId!, chatMessage.title);
+        if (filename != null) {
+          Share.shareXFiles(
+            [XFile(filename)],
+            text: chatMessage.content,
+            subject: chatMessage.contentType,
+            sharePositionOrigin: box!.localToGlobal(Offset.zero) & box.size,
+          );
+        }
+      }
     }
   }
 
