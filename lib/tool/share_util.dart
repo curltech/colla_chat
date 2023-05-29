@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:colla_chat/tool/xfile_util.dart';
+
 // import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -9,21 +10,6 @@ class ShareUtil {
       {String? subject, Rect? sharePositionOrigin}) async {
     return await Share.shareWithResult(text,
         subject: subject, sharePositionOrigin: sharePositionOrigin);
-  }
-
-  @Deprecated("Use shareXFiles instead.")
-  static Future<void> shareFiles(
-    List<String> filenames, {
-    List<String>? mimeTypes,
-    String? subject,
-    String? text,
-    Rect? sharePositionOrigin,
-  }) async {
-    return await Share.shareFiles(filenames,
-        mimeTypes: mimeTypes,
-        subject: subject,
-        text: text,
-        sharePositionOrigin: sharePositionOrigin);
   }
 
   static Future<ShareResult> shareXFiles(

@@ -106,7 +106,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
       case 2:
         Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
         var path = await FileUtil.writeFile(bytes, myself.peerId!);
-        ShareUtil.shareFiles([path]);
+        ShareUtil.shareXFiles([path]);
         break;
       case 3:
         setState(() {

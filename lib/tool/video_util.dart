@@ -1,8 +1,10 @@
 import 'dart:typed_data';
 
+import 'package:fc_native_video_thumbnail/fc_native_video_thumbnail.dart';
 import 'package:video_thumbnail/video_thumbnail.dart';
 
 class VideoUtil {
+  ///支持ANDROID，IOS
   static Future<Uint8List?> thumbnailData({
     required String videoFile,
     Map<String, String>? headers,
@@ -26,6 +28,7 @@ class VideoUtil {
     return data;
   }
 
+  ///支持ANDROID，IOS
   static Future<String?> thumbnailFile({
     required String videoFile,
     Map<String, String>? headers,
@@ -49,5 +52,26 @@ class VideoUtil {
     );
 
     return file;
+  }
+
+  ///支持ANDROID，IOS，MACOS，WINDOWS
+  static Future<void> videoThumbnail({
+    required String srcFile,
+    required String destFile,
+    required int width,
+    required int height,
+    bool keepAspectRatio = true,
+    String? format,
+    int quality = 30,
+  }) async {
+    final plugin = FcNativeVideoThumbnail();
+    await plugin.getVideoThumbnail(
+        srcFile: srcFile,
+        destFile: destFile,
+        width: width,
+        height: height,
+        keepAspectRatio: keepAspectRatio,
+        format: format,
+        quality: quality);
   }
 }
