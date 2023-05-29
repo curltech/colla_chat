@@ -160,6 +160,7 @@ class Myself with ChangeNotifier {
     // );
     FlexSchemeColor darkColor = FlexSchemeColor.from(
       primary: primaryColor,
+      secondary: secondaryColor,
       brightness: Brightness.dark,
     );
     _darkThemeData = FlexThemeData.dark(
