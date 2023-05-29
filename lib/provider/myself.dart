@@ -65,11 +65,32 @@ class Myself with ChangeNotifier {
       scheme =
           StringUtil.enumFromString(FlexScheme.values, peerProfile.scheme!);
     }
+
+    if (scheme != null) {
+      _themeData = FlexThemeData.light(
+        scheme: scheme,
+      );
+      return;
+    }
+    TextTheme textTheme = const TextTheme();
+    // final ColorScheme colorScheme = SeedColorScheme.fromSeeds(
+    //   brightness: Brightness.light,
+    //   primaryKey: primaryColor,
+    //   secondaryKey: secondaryColor,
+    //   neutralKey: primaryColor,
+    //   tertiaryKey: primaryColor,
+    //   tones: FlexTones.vivid(Brightness.light),
+    // );
+    // _themeData = ThemeData.from(
+    //   colorScheme: colorScheme,
+    //   textTheme: textTheme,
+    //   useMaterial3: true,
+    // );
     FlexSchemeColor lightColor = FlexSchemeColor.from(
       primary: primaryColor,
+      secondary: secondaryColor,
       brightness: Brightness.light,
     );
-    TextTheme textTheme = const TextTheme();
     _themeData = FlexThemeData.light(
       colors: scheme == null ? lightColor : null,
       scheme: scheme,
@@ -117,12 +138,30 @@ class Myself with ChangeNotifier {
       darkScheme =
           StringUtil.enumFromString(FlexScheme.values, peerProfile.darkScheme!);
     }
+    if (darkScheme != null) {
+      _themeData = FlexThemeData.dark(
+        scheme: darkScheme,
+      );
+      return;
+    }
+    TextTheme textTheme = const TextTheme();
+    // final ColorScheme colorScheme = SeedColorScheme.fromSeeds(
+    //   brightness: Brightness.dark,
+    //   primaryKey: primaryColor,
+    //   secondaryKey: secondaryColor,
+    //   neutralKey: primaryColor,
+    //   tertiaryKey: primaryColor,
+    //   tones: FlexTones.vivid(Brightness.dark),
+    // );
+    // _darkThemeData = ThemeData.from(
+    //   colorScheme: colorScheme,
+    //   textTheme: textTheme,
+    //   useMaterial3: true,
+    // );
     FlexSchemeColor darkColor = FlexSchemeColor.from(
       primary: primaryColor,
       brightness: Brightness.dark,
     );
-    TextTheme textTheme = const TextTheme();
-
     _darkThemeData = FlexThemeData.dark(
       colors: darkScheme == null ? darkColor : null,
       scheme: darkScheme,
@@ -168,6 +207,13 @@ class Myself with ChangeNotifier {
     return Color(peerProfile.primaryColor);
   }
 
+  Color? get secondaryColor {
+    if (peerProfile.secondaryColor != null) {
+      return Color(peerProfile.secondaryColor!);
+    }
+    return null;
+  }
+
   set primaryColor(Color color) {
     if (peerProfile.primaryColor != color.value) {
       peerProfile.primaryColor = color.value;
@@ -181,19 +227,16 @@ class Myself with ChangeNotifier {
     }
   }
 
-  Color get darkPrimaryColor {
-    return Color(peerProfile.darkPrimaryColor);
-  }
-
-  set darkPrimaryColor(Color color) {
-    if (peerProfile.darkPrimaryColor != color.value) {
-      peerProfile.darkPrimaryColor = color.value;
+  set secondaryColor(Color? color) {
+    if (peerProfile.secondaryColor != color?.value) {
+      peerProfile.secondaryColor = color?.value;
       if (peerProfile.id != null) {
         peerProfileService.update(
-            {'darkPrimaryColor': peerProfile.darkPrimaryColor},
+            {'secondaryColor': peerProfile.secondaryColor},
             where: 'id=?',
             whereArgs: [peerProfile.id!]);
       }
+      _buildThemeData();
       _buildDarkThemeData();
       notifyListeners();
     }

@@ -6,6 +6,7 @@ import 'package:colla_chat/pages/chat/login/p2p_register_widget.dart';
 import 'package:colla_chat/pages/chat/login/p2p_setting_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:flutter/material.dart';
@@ -70,11 +71,10 @@ class _P2pLoginState extends State<P2pLogin> {
       },
       index: index,
     );
-    var appBar = AppBar(
-      elevation: 0.0,
-      automaticallyImplyLeading: false,
+    var appBar = AppBarWidget.buildAppBar(
+      context,
       title: CommonAutoSizeText(AppLocalizations.t('Login')),
-      actions: [
+      rightWidgets: [
         IconButton(
             onPressed: () {
               _animateToPage(0);
@@ -95,15 +95,9 @@ class _P2pLoginState extends State<P2pLogin> {
           icon: const Icon(Icons.settings, color: Colors.white),
           tooltip: AppLocalizations.t('Setting'),
         ),
-        // IconButton(
-        //   onPressed: () {
-        //     _animateToPage(3);
-        //   },
-        //   icon: const Icon(Icons.account_circle, color: Colors.white),
-        //   tooltip: AppLocalizations.t('Myself'),
-        // ),
       ],
     );
+
     var workspace = Center(
         child: platformWidgetFactory.buildSizedBox(
       height: appDataProvider.actualSize.height,

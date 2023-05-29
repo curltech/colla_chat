@@ -18,6 +18,8 @@ class AppBarPopupMenu {
 class AppBarWidget {
   static AppBar buildAppBar(
     BuildContext context, {
+    Color? backgroundColor,
+    Color? foregroundColor,
     bool withLeading = false, //是否有缺省的回退按钮
     Function? leadingCallBack, //回退按钮的回调
     Widget? title = const CommonAutoSizeText(''),
@@ -36,17 +38,25 @@ class AppBarWidget {
 
     ///然后加上右边的下拉组件
     var action = popMenuButton(
-        rightPopupMenus: rightPopupMenus, rightWidgets: rightWidgets);
+        foregroundColor: foregroundColor,
+        rightPopupMenus: rightPopupMenus,
+        rightWidgets: rightWidgets);
     if (action != null) {
       actions.add(action);
     }
 
     ///左边的回退按钮
     var leading = backButton(context,
-        withLeading: withLeading, leadingCallBack: leadingCallBack);
+        foregroundColor: foregroundColor,
+        withLeading: withLeading,
+        leadingCallBack: leadingCallBack);
+    // backgroundColor ??= myself.primary;
+    // foregroundColor ??= Colors.white;
     AppBar appBar = AppBar(
       title: title,
       elevation: 0,
+      backgroundColor: backgroundColor,
+      foregroundColor: foregroundColor,
       centerTitle: centerTitle,
       automaticallyImplyLeading: false,
       leading: leading,
@@ -58,18 +68,22 @@ class AppBarWidget {
 
   static Widget buildTitleBar({
     Color? backgroundColor,
+    Color? foregroundColor,
     Widget? title = const CommonAutoSizeText(''),
     bool centerTitle = false, //标题是否居中
     List<Widget>? rightWidgets, //右边的排列组件（按钮）
     List<AppBarPopupMenu>? rightPopupMenus,
   }) {
     backgroundColor = backgroundColor ?? myself.primary;
+    foregroundColor ??= Colors.white;
     var actions = <Widget>[const Spacer()];
     if (rightWidgets != null && rightWidgets.isNotEmpty) {
       actions.addAll(rightWidgets);
     }
     var action = popMenuButton(
-        rightPopupMenus: rightPopupMenus, rightWidgets: rightWidgets);
+        foregroundColor: foregroundColor,
+        rightPopupMenus: rightPopupMenus,
+        rightWidgets: rightWidgets);
     if (action != null) {
       actions.add(action);
     }
@@ -87,14 +101,19 @@ class AppBarWidget {
     );
   }
 
-  static Widget? backButton(BuildContext context,
-      {bool withLeading = false, final Function? leadingCallBack}) {
+  static Widget? backButton(
+    BuildContext context, {
+    bool withLeading = false,
+    final Function? leadingCallBack,
+    Color? foregroundColor,
+  }) {
     Widget? leadingButton;
+    // foregroundColor ??= Colors.white;
 
     ///是否加上回退按钮，如果回调存在，调用回调函数，然后回退路由
     if (withLeading) {
       leadingButton = IconButton(
-        icon: const Icon(Icons.chevron_left, color: Colors.white),
+        icon: Icon(Icons.chevron_left, color: foregroundColor),
         onPressed: () {
           if (leadingCallBack != null) {
             leadingCallBack();
@@ -109,10 +128,12 @@ class AppBarWidget {
   }
 
   static PopupMenuButton<int>? popMenuButton({
+    Color? foregroundColor,
     List<AppBarPopupMenu>? rightPopupMenus,
     List<Widget>? rightWidgets,
   }) {
     PopupMenuButton<int>? popMenuButton;
+    // foregroundColor ??= Colors.white;
 
     ///左右边的下拉按钮
     if (rightPopupMenus != null && rightPopupMenus.isNotEmpty) {
@@ -148,9 +169,9 @@ class AppBarWidget {
         itemBuilder: (BuildContext context) {
           return items;
         },
-        icon: const Icon(
+        icon: Icon(
           Icons.more_vert,
-          color: Colors.white,
+          color: foregroundColor,
         ),
         //调用下拉按钮的回调函数，参数为按钮序号
         onSelected: (int index) async {

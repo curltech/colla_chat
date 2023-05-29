@@ -17,7 +17,7 @@ class PeerProfile extends StatusEntity {
   // 个性化配置
   String locale = 'zh_CN';
   int primaryColor = Colors.cyan.value;
-  int darkPrimaryColor = Colors.cyan.value;
+  int? secondaryColor;
   String? scheme;
   String? darkScheme;
   String themeMode = ThemeMode.system.name;
@@ -58,7 +58,7 @@ class PeerProfile extends StatusEntity {
         userId = json['userId'],
         username = json['username'],
         primaryColor = json['primaryColor'] ?? Colors.cyan.value,
-        darkPrimaryColor = json['darkPrimaryColor'] ?? Colors.cyan.value,
+        secondaryColor = json['secondaryColor'] ?? Colors.cyan.value,
         scheme = json['scheme'],
         darkScheme = json['darkScheme'],
         themeMode = json['themeMode'],
@@ -106,7 +106,7 @@ class PeerProfile extends StatusEntity {
       'userId': userId,
       'username': username,
       'primaryColor': primaryColor,
-      'darkPrimaryColor': darkPrimaryColor,
+      'secondaryColor': secondaryColor,
       'scheme': scheme,
       'darkScheme': darkScheme,
       'themeMode': themeMode,
