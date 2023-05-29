@@ -54,7 +54,8 @@ dependencies:
   beamer: ^1.4.1+1
   sensors_plus: ^2.0.1
   battery_plus: 3.0.2
-  flutter_contacts: ^1.1.4
+  flutter_contacts: ^1.1.6
+  fast_contacts: ^3.0.3
   connectivity_plus: ^3.0.0
   #flutter_nearby_connections: ^1.1.1  #目前不支持ios和android之间通信，而且gradle版本配置低，需要修改
   mimecon: ^0.0.2
@@ -107,9 +108,10 @@ dependencies:
   #awesome_select: ^6.0.0
   #multi_select_flutter: ^4.1.2
   chips_choice: ^3.0.0
-  password_strength_checker: ^1.2.2
-  fancy_password_field: ^2.0.0
-  flutter_pw_validator: ^1.6.0
+  #fancy_password_field: ^2.0.0
+  flutter_pw_validator: ^1.6.0 #FlutterPwValidator放在TextFormField下面显示校验结果
+  fzregex: ^2.0.0 #静态方法：Fzregex.hasMatch
+  pinput: ^2.2.31
   phone_number: ^1.0.0
   #sim_info: ^0.1.3
   phone_form_field: ^7.0.5
