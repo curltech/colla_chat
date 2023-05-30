@@ -81,10 +81,10 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       Uint8List? data;
       if (platformParams.mobile && filename != null) {
         try {
-          data = await VideoUtil.thumbnailData(
+          data = await VideoUtil.videoThumbnailData(
               videoFile: filename,
-              maxHeight: AppIconSize.maxSize.toInt(),
-              maxWidth: AppIconSize.maxSize.toInt());
+              height: AppIconSize.maxSize.toInt(),
+              width: AppIconSize.maxSize.toInt());
         } catch (e) {
           logger.e('thumbnailData failure:$e');
         }
@@ -230,10 +230,10 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
     }
     Uint8List? thumbnail;
     if (platformParams.mobile) {
-      thumbnail = await VideoUtil.thumbnailData(
+      thumbnail = await VideoUtil.videoThumbnailData(
           videoFile: filename,
-          maxHeight: AppIconSize.maxSize.toInt(),
-          maxWidth: AppIconSize.maxSize.toInt());
+          height: AppIconSize.maxSize.toInt(),
+          width: AppIconSize.maxSize.toInt());
     }
     // ChatMessageMimeType? chatMessageMimeType =
     //     StringUtil.enumFromString<ChatMessageMimeType>(

@@ -17,6 +17,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
 class FileUtil {
+  ///写内容到文件
   static Future<String> writeFile(List<int> bytes, String filename) async {
     if (!filename.contains(p.separator)) {
       final dir = await PathUtil.getApplicationDirectory();
@@ -32,6 +33,7 @@ class FileUtil {
     return filename;
   }
 
+  ///获取一个临时文件名
   static Future<String> getTempFilename(
       {String? filename, String? extension}) async {
     String tempFilename;
@@ -56,6 +58,7 @@ class FileUtil {
     return tempFilename;
   }
 
+  ///写内容到临时文件
   static Future<String?> writeTempFile(List<int> bytes,
       {String? filename, String? extension}) async {
     String tempFilename =
@@ -74,6 +77,7 @@ class FileUtil {
     return filename;
   }
 
+  ///读文件内容
   static Future<Uint8List?> readFile(String filename) async {
     if (filename.startsWith('assets')) {
       return await _readAssetData(filename);
@@ -100,6 +104,7 @@ class FileUtil {
     return asset.buffer.asUint8List();
   }
 
+  ///选择文件对话框
   static Future<List<XFile>> pickFiles({
     String? dialogTitle,
     String? initialDirectory,
@@ -141,6 +146,7 @@ class FileUtil {
     return xfiles;
   }
 
+  ///选择文件对话框
   static Future<List<XFile>> selectFiles({
     List<String>? allowedExtensions,
   }) async {
@@ -154,6 +160,7 @@ class FileUtil {
     return files;
   }
 
+  ///选择目录对话框
   static Future<String?> directoryPathPicker({
     String? dialogTitle,
     bool lockParentWindow = false,
@@ -187,6 +194,7 @@ class FileUtil {
     return outputFile;
   }
 
+  ///保存文件
   static Future<String> saveFile(
     String name,
     Uint8List bytes,
@@ -197,7 +205,7 @@ class FileUtil {
         .saveFile(name, bytes, ext, mimeType: mimeType);
   }
 
-  ///仅支持ios,android
+  ///仅支持ios,android，另存为文件
   static Future<String> saveAsFile(
     String name,
     Uint8List bytes,
