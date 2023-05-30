@@ -61,7 +61,7 @@ class VideoUtil {
     int height = 768,
     bool keepAspectRatio = true,
     String? format,
-    int quality = 30,
+    int quality = 10,
   }) async {
     String thumbnailPath = await FileUtil.getTempFilename();
     await videoThumbnailFile(
@@ -85,7 +85,7 @@ class VideoUtil {
     int height = 768,
     bool keepAspectRatio = true,
     String? format,
-    int quality = 30,
+    int quality = 10,
   }) async {
     final plugin = FcNativeVideoThumbnail();
     await plugin.getVideoThumbnail(
