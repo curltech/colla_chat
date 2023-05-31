@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:bubble/bubble.dart';
-import 'package:chat_bubbles/bubbles/bubble_special_three.dart';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
