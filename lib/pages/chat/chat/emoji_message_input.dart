@@ -87,7 +87,6 @@ class _EmojiMessageInputWidgetState extends State<EmojiMessageInputWidget> {
                 skinToneDialogBgColor: Colors.white.withOpacity(0.0),
                 skinToneIndicatorColor: Colors.grey,
                 enableSkinTones: true,
-                showRecentsTab: true,
                 recentsLimit: 28,
                 replaceEmojiOnLimitExceed: false,
                 noRecents: CommonAutoSizeText(
