@@ -823,7 +823,9 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         if (filename != null) {
           if (chatMessage.thumbnail == null &&
               contentType == ChatMessageContentType.video.name) {
-            if (platformParams.mobile) {
+            if (platformParams.mobile ||
+                platformParams.macos ||
+                platformParams.windows) {
               Uint8List? data =
                   await VideoUtil.videoThumbnailData(videoFile: filename);
               if (data != null) {

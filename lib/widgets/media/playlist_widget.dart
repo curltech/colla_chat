@@ -79,7 +79,10 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           height: AppIconSize.maxSize);
     } else {
       Uint8List? data;
-      if (platformParams.mobile && filename != null) {
+      if ((platformParams.mobile ||
+              platformParams.macos ||
+              platformParams.windows) &&
+          filename != null) {
         try {
           data = await VideoUtil.videoThumbnailData(
               videoFile: filename,
@@ -229,7 +232,9 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       return;
     }
     Uint8List? thumbnail;
-    if (platformParams.mobile) {
+    if (platformParams.mobile ||
+        platformParams.macos ||
+        platformParams.windows) {
       thumbnail = await VideoUtil.videoThumbnailData(
           videoFile: filename,
           height: AppIconSize.maxSize.toInt(),

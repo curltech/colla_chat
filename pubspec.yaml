@@ -75,7 +75,7 @@ dependencies:
   web_socket_channel: ^2.2.0
   #cached_network_image: ^3.0.0
   #flutter_sms: ^2.3.3 #android compile failure
-  #sms_advanced: ^1.0.2 #ios不支持接收
+  sms_advanced: ^1.0.2 #ios不支持接收
   #flutter_sms_plus: ^1.0.1 #不支持ios
   #telephony: ^0.2.0
   telephony: #不再维护了

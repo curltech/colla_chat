@@ -6,12 +6,13 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/qrcode_util.dart';
-import 'package:colla_chat/tool/share_util.dart';
+import 'package:colla_chat/tool/xfile_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
+import 'package:share_plus/share_plus.dart';
 
 class QrcodeWidget extends StatefulWidget with TileDataMixin {
   final List<AppBarPopupMenu> menus = [
@@ -106,7 +107,7 @@ class _QrcodeWidgetState extends State<QrcodeWidget> {
       case 2:
         Uint8List bytes = await ImageUtil.clipImageBytes(globalKey!);
         var path = await FileUtil.writeFile(bytes, myself.peerId!);
-        ShareUtil.shareXFiles([path]);
+        Share.shareXFiles([XFileUtil.open(path)]);
         break;
       case 3:
         setState(() {
