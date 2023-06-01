@@ -38,7 +38,7 @@ dependencies:
   path_provider: ^2.0.11
   image_picker: ^0.8.7 #选取图库
   advance_image_picker: ^0.1.7+1
-  url_launcher: ^6.1.6 #打开系统浏览器
+  url_launcher: ^6.1.11 #打开系统浏览器
   open_file: ^3.2.1 #打开文件, 和最新device_info有版本冲突
   camera_windows: ^0.2.1+2
   camera_web: ^0.3.1+3
@@ -75,7 +75,7 @@ dependencies:
   web_socket_channel: ^2.2.0
   #cached_network_image: ^3.0.0
   #flutter_sms: ^2.3.3 #android compile failure
-  sms_advanced: ^1.0.2 #ios不支持接收
+  #sms_advanced: ^1.0.2 #android版本有问题
   #flutter_sms_plus: ^1.0.1 #不支持ios
   #telephony: ^0.2.0
   telephony: #不再维护了
