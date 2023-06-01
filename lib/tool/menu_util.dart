@@ -160,8 +160,8 @@ class MenuUtil {
     Color barrierColor = Colors.black12,
     double arrowSize = 10.0,
     double horizontalMargin = 10.0,
-    double verticalMargin = 10.0,
-    PreferredPosition? position,
+    double verticalMargin = -10.0,
+    PreferredPosition position = PreferredPosition.top,
     void Function(bool)? menuOnChange,
     bool enablePassEvent = true,
   }) {

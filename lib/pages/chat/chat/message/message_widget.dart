@@ -36,7 +36,6 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/tool/pdf_util.dart';
 import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
@@ -45,7 +44,6 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
-import 'package:custom_pop_up_menu/custom_pop_up_menu.dart';
 import 'package:flutter/material.dart';
 import 'package:location_picker_flutter_map/location_picker_flutter_map.dart';
 import 'package:share_plus/share_plus.dart';
@@ -195,27 +193,28 @@ class MessageWidget {
             chatMessageController.currentIndex = index;
             indexWidgetProvider.push('full_screen');
           },
-          child: body);
-
-      ///长按弹出式菜单
-      CustomPopupMenuController menuController = CustomPopupMenuController();
-      body = MenuUtil.buildPopupMenu(
-          child: body,
-          controller: menuController,
-          menuBuilder: () {
-            return Card(
-                child: DataActionCard(
-                    onPressed: (int index, String label, {String? value}) {
-                      menuController.hideMenu();
-                      _onMessagePopAction(context, index, label, value: value);
-                    },
-                    crossAxisCount: 4,
-                    actions: messagePopActionData,
-                    height: 140,
-                    width: 320,
-                    size: 20));
+          onLongPress: () async {
+            await DialogUtil.show(
+              context: context,
+              builder: (BuildContext context) {
+                return Dialog(
+                    elevation: 0.0,
+                    insetPadding: EdgeInsets.zero,
+                    child: DataActionCard(
+                        onPressed: (int index, String label, {String? value}) {
+                          Navigator.pop(context);
+                          _onMessagePopAction(context, index, label,
+                              value: value);
+                        },
+                        crossAxisCount: 4,
+                        actions: messagePopActionData,
+                        height: 140,
+                        width: 320,
+                        size: 20));
+              },
+            );
           },
-          pressType: PressType.longPress);
+          child: body);
     }
 
     return body;
@@ -300,8 +299,8 @@ class MessageWidget {
           contentType == ChatMessageContentType.media.name ||
           contentType == ChatMessageContentType.rich.name ||
           contentType == ChatMessageContentType.image.name) {
-        String? filename = await messageAttachmentService
-            .getDecryptFilename(chatMessage.messageId!, chatMessage.title);
+        String? filename = await messageAttachmentService.getDecryptFilename(
+            chatMessage.messageId!, chatMessage.title);
         if (filename != null) {
           Share.shareXFiles(
             [XFile(filename)],
