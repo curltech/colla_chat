@@ -17,7 +17,7 @@ class LoggerConsoleView extends StatefulWidget with TileDataMixin {
   String get routeName => 'logger';
 
   @override
-  IconData get iconData => Icons.settings_applications;
+  IconData get iconData => Icons.terminal;
 
   @override
   String get title => 'Logger console';

@@ -822,7 +822,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         chatMessage.content = content;
         if (filename != null) {
           if (chatMessage.thumbnail == null &&
-              contentType == ChatMessageContentType.video.name) {
+              (contentType == ChatMessageContentType.video.name)) {
             if (platformParams.mobile ||
                 platformParams.macos ||
                 platformParams.windows) {
