@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 
 ///基础的数组数据控制器
 class DataListController<T> with ChangeNotifier {
-  String? key;
+  Key key = UniqueKey();
   List<T> data = <T>[];
   int _currentIndex = -1;
 

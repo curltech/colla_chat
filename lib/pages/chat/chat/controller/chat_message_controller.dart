@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
@@ -15,6 +13,7 @@ import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/openai/openai_chat_gpt.dart';
 import 'package:dart_openai/dart_openai.dart';
+import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 
 enum ChatGPTAction { chat, image, audio, translate, extract }
