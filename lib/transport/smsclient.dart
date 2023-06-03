@@ -101,6 +101,7 @@ class SmsClient extends IWebClient {
     return messages;
   }
 
+  ///接收到加密的短信
   onMessage(SmsMessage message) async {
     var mobile = message.address;
     String? body = message.body;
@@ -114,9 +115,16 @@ class SmsClient extends IWebClient {
       return;
     }
     Linkman? linkman = linkmen[0];
+    if (linkman != null) {
+      receiveChatMessage(linkman, body);
+    }
+  }
+
+  ///接收到加密的短信内容
+  receiveChatMessage(Linkman linkman, String message) async {
     var peerId = linkman.peerId;
     var clientId = linkman.clientId;
-    Uint8List data = CryptoUtil.decodeBase64(body);
+    Uint8List data = CryptoUtil.decodeBase64(message);
     int cryptOption = data[data.length - 1];
     SecurityContextService? securityContextService =
         ServiceLocator.securityContextServices[cryptOption];
@@ -128,11 +136,11 @@ class SmsClient extends IWebClient {
     securityContext.payload = data.sublist(0, data.length - 1);
     bool result = await securityContextService.decrypt(securityContext);
     if (result) {
-      body = CryptoUtil.utf8ToString(securityContext.payload);
+      message = CryptoUtil.utf8ToString(securityContext.payload);
       ChatMessage chatMessage = await chatMessageService.buildChatMessage(
         receiverPeerId: myself.peerId,
         receiverName: myself.name,
-        content: body,
+        content: message,
         transportType: TransportType.sms,
       );
       chatMessage.senderPeerId = linkman.peerId;

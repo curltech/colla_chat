@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/chat_summary.dart';
 import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -13,6 +14,7 @@ import 'package:colla_chat/pages/chat/me/collection/collection_list_widget.dart'
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/mobile_camera_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
@@ -23,6 +25,7 @@ import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/geolocator_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/transport/smsclient.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -65,6 +68,10 @@ final List<ActionData> defaultActionData = [
       label: 'Collection',
       tooltip: 'Collection',
       icon: const Icon(Icons.collections)),
+  ActionData(
+      label: 'Receive sms',
+      tooltip: 'Receive sms',
+      icon: const Icon(Icons.sms)),
 ];
 
 ///非文本的其他多种格式输入面板，包括照片等
@@ -123,6 +130,9 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
         break;
       case 'Collection':
         _onActionCollection();
+        break;
+      case 'Receive sms':
+        _onActionReceiveSms();
         break;
       default:
         break;
@@ -389,6 +399,51 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
           subMessageType: subMessageType,
         );
       }
+    }
+  }
+
+  ///接收到加密短信
+  _onActionReceiveSms() async {
+    TextEditingController controller = TextEditingController();
+    await DialogUtil.show(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+              child: Column(children: [
+            CommonAutoSizeTextFormField(
+              minLines: 4,
+              maxLines: 6,
+              controller: controller,
+            ),
+            ButtonBar(children: [
+              IconButton(
+                  onPressed: () {
+                    controller.text = '';
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(
+                    Icons.cancel_outlined,
+                    color: Colors.grey,
+                  )),
+              IconButton(
+                  onPressed: () {
+                    Navigator.pop(context, controller.text);
+                  },
+                  icon: Icon(
+                    Icons.check,
+                    color: myself.primary,
+                  )),
+            ]),
+          ]));
+        });
+    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    if (chatSummary == null) {
+      return;
+    }
+    Linkman? linkman =
+        await linkmanService.findCachedOneByPeerId(chatSummary.peerId!);
+    if (linkman != null && controller.text.isNotEmpty) {
+      smsClient.receiveChatMessage(linkman, controller.text);
     }
   }
 
