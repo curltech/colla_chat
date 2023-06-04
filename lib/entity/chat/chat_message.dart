@@ -40,6 +40,12 @@ enum ChatMessageMimeType {
   m4a,
   mp4,
   mov,
+  rmvb,
+  avi,
+  wmv,
+  mkv,
+  mpg,
+  aac,
 }
 
 // 消息类型（messageType）,system消息不在聊天界面显示

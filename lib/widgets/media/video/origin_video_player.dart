@@ -13,7 +13,7 @@ import 'package:video_player_control_panel/video_player_control_panel.dart';
 class OriginMediaSource {
   static Future<VideoPlayerController?> media(
       {required String filename}) async {
-    VideoPlayerController videoPlayerController;
+    VideoPlayerController? videoPlayerController;
     if (filename.startsWith('assets/')) {
       videoPlayerController = VideoPlayerController.asset(filename);
     } else if (filename.startsWith('http')) {
@@ -21,10 +21,15 @@ class OriginMediaSource {
     } else {
       videoPlayerController = VideoPlayerController.file(File(filename));
     }
-    await videoPlayerController.initialize();
-    if (!videoPlayerController.value.isInitialized) {
+    try {
+      await videoPlayerController.initialize();
+      if (!videoPlayerController.value.isInitialized) {
+        logger.e("controller.initialize() failed");
+        videoPlayerController = null;
+      }
+    } catch (e) {
       logger.e("controller.initialize() failed");
-      return null;
+      videoPlayerController = null;
     }
 
     return videoPlayerController;
