@@ -823,17 +823,13 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         if (filename != null) {
           if (chatMessage.thumbnail == null &&
               (contentType == ChatMessageContentType.video.name)) {
-            if (platformParams.mobile ||
-                platformParams.macos ||
-                platformParams.windows) {
-              Uint8List? data =
-                  await VideoUtil.videoThumbnailData(videoFile: filename);
-              if (data != null) {
-                String base64 = CryptoUtil.encodeBase64(data);
-                chatMessage.thumbnail = ImageUtil.base64Img(base64);
-                update({'thumbnail': base64},
-                    where: 'id=?', whereArgs: [chatMessage.id!]);
-              }
+            Uint8List? data =
+                await VideoUtil.getByteThumbnail(videoFile: filename);
+            if (data != null) {
+              String base64 = CryptoUtil.encodeBase64(data);
+              chatMessage.thumbnail = ImageUtil.base64Img(base64);
+              update({'thumbnail': base64},
+                  where: 'id=?', whereArgs: [chatMessage.id!]);
             }
           }
         }

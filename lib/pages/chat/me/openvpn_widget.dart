@@ -52,7 +52,7 @@ class _OpenVpnWidgetState extends State<OpenVpnWidget> {
     openvpn.initialize(
       groupIdentifier: "openvpn.curltech.io",
       providerBundleIdentifier: "openvpn.curltech.io.CollaChat",
-      localizedDescription: "CurlTech OpenVpn",
+      localizedDescription: "CurlTech OpenVPN",
       lastStage: (stage) {
         this.stage.value = stage;
       },

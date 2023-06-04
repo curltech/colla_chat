@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:fc_native_video_thumbnail/fc_native_video_thumbnail.dart';
 import 'package:video_compress/video_compress.dart';
@@ -102,8 +103,8 @@ class VideoUtil {
   }
 
   ///ANDROID,IOS,MACOS
-  static Future<MediaInfo?> compressVideo(
-    String path, {
+  static Future<MediaInfo?> compressVideo({
+    required String videoFile,
     VideoQuality quality = VideoQuality.DefaultQuality,
     bool deleteOrigin = false,
     int? startTime,
@@ -112,7 +113,7 @@ class VideoUtil {
     int frameRate = 30,
   }) async {
     MediaInfo? mediaInfo = await VideoCompress.compressVideo(
-      path,
+      videoFile,
       quality: quality,
       deleteOrigin: deleteOrigin,
       startTime: startTime,
@@ -125,26 +126,34 @@ class VideoUtil {
   }
 
   ///ANDROID,IOS,MACOS
-  static Future<Uint8List?> getByteThumbnail(
-    String path, {
+  static Future<Uint8List?> getByteThumbnail({
+    required String videoFile,
     int quality = 10,
     int position = -1,
   }) async {
-    final thumbnail = await VideoCompress.getByteThumbnail(path,
-        quality: quality, // default(100)
-        position: position // default(-1)
-        );
+    if (platformParams.windows) {
+      final thumbnail =
+          await videoThumbnailData(videoFile: videoFile, quality: quality);
 
-    return thumbnail;
+      return thumbnail;
+    }
+    if (platformParams.mobile || platformParams.macos) {
+      final thumbnail = await VideoCompress.getByteThumbnail(videoFile,
+          quality: quality, // default(100)
+          position: position // default(-1)
+          );
+
+      return thumbnail;
+    }
   }
 
   ///ANDROID,IOS,MACOS
-  static Future<File> getFileThumbnail(
-    String path, {
+  static Future<File> getFileThumbnail({
+    required String videoFile,
     int quality = 10,
     int position = -1,
   }) async {
-    final thumbnailFile = await VideoCompress.getFileThumbnail(path,
+    final thumbnailFile = await VideoCompress.getFileThumbnail(videoFile,
         quality: quality, // default(100)
         position: position // default(-1)
         );
@@ -153,8 +162,8 @@ class VideoUtil {
   }
 
   ///ANDROID,IOS,MACOS
-  static Future<MediaInfo> getMediaInfo(String path) async {
-    final info = await VideoCompress.getMediaInfo(path);
+  static Future<MediaInfo> getMediaInfo(String videoFile) async {
+    final info = await VideoCompress.getMediaInfo(videoFile);
 
     return info;
   }

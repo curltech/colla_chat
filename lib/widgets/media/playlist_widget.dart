@@ -79,15 +79,9 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           height: AppIconSize.maxSize);
     } else {
       Uint8List? data;
-      if ((platformParams.mobile ||
-              platformParams.macos ||
-              platformParams.windows) &&
-          filename != null) {
+      if (filename != null) {
         try {
-          data = await VideoUtil.videoThumbnailData(
-              videoFile: filename,
-              height: AppIconSize.maxSize.toInt(),
-              width: AppIconSize.maxSize.toInt());
+          data = await VideoUtil.getByteThumbnail(videoFile: filename);
         } catch (e) {
           logger.e('thumbnailData failure:$e');
         }
@@ -231,15 +225,8 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
     if (!exist) {
       return;
     }
-    Uint8List? thumbnail;
-    if (platformParams.mobile ||
-        platformParams.macos ||
-        platformParams.windows) {
-      thumbnail = await VideoUtil.videoThumbnailData(
-          videoFile: filename,
-          height: AppIconSize.maxSize.toInt(),
-          width: AppIconSize.maxSize.toInt());
-    }
+    Uint8List? thumbnail = await VideoUtil.getByteThumbnail(
+          videoFile: filename);
     // ChatMessageMimeType? chatMessageMimeType =
     //     StringUtil.enumFromString<ChatMessageMimeType>(
     //         ChatMessageMimeType.values, mediaFormat);
