@@ -12,9 +12,9 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_background/flutter_background.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart' as inapp;
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_meedu_videoplayer/init_meedu_player.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
@@ -40,8 +40,6 @@ Future<void> setCert() async {
   SecurityContext.defaultContext
       .setTrustedCertificatesBytes(data.buffer.asUint8List());
 }
-
-
 
 ///应用主函数，使用runApp加载主应用Widget
 void main(List<String> args) async {
@@ -70,6 +68,7 @@ void main(List<String> args) async {
   if (platformParams.windows || platformParams.macos || platformParams.linux) {
     windowManager.ensureInitialized();
   }
+  await initMeeduPlayer();
 
   ///加载主应用组件
   runApp(MultiProvider(providers: [

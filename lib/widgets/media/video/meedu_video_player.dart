@@ -6,7 +6,6 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_meedu_videoplayer/meedu_player.dart';
 
 class MeeduMediaSource {
@@ -61,13 +60,8 @@ class MeeduVideoPlayerController extends AbstractMediaPlayerController {
       'mkv',
       'mpg'
     ];
-    initMeeduPlayer(iosUseMediaKit: false).then((value) {
-      meeduPlayerController = MeeduPlayerController(
-          screenManager: const ScreenManager(orientations: [
-            DeviceOrientation.portraitUp,
-          ]),
-          enabledControls: const EnabledControls(doubleTapToSeek: false));
-    });
+
+    meeduPlayerController = MeeduPlayerController();
   }
 
   @override
@@ -78,7 +72,7 @@ class MeeduVideoPlayerController extends AbstractMediaPlayerController {
       var currentMediaSource = this.currentMediaSource;
       if (currentMediaSource != null) {
         notifyListeners();
-        if (autoplay && meeduPlayerController != null) {
+        if (meeduPlayerController != null) {
           DataSource? dataSource = await MeeduMediaSource.media(
               filename: currentMediaSource.filename);
           meeduPlayerController!.setDataSource(dataSource!, autoplay: autoplay);
@@ -108,9 +102,8 @@ class MeeduVideoPlayerController extends AbstractMediaPlayerController {
   @override
   close() {
     if (meeduPlayerController != null) {
+      stop();
       super.setCurrentIndex(-1);
-      meeduPlayerController!.dispose();
-      meeduPlayerController = null;
     }
   }
 
