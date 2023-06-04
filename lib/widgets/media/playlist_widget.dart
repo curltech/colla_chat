@@ -8,6 +8,7 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
@@ -87,8 +88,12 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
         }
       }
       if (data != null) {
-        thumbnailWidget = ImageUtil.buildMemoryImageWidget(data,
-            width: AppIconSize.maxSize, height: AppIconSize.maxSize);
+        thumbnailWidget = ImageUtil.buildMemoryImageWidget(
+          data,
+          fit: BoxFit.cover,
+          // width: AppIconSize.maxSize,
+          // height: AppIconSize.maxSize
+        );
       }
     }
 
@@ -118,7 +123,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       Widget? thumbnailWidget = await _buildThumbnail(filename, null);
       TileData tile = TileData(
           prefix: thumbnailWidget,
-          title: filename,
+          title: FileUtil.filename(filename),
           subtitle: '$length',
           selected: selected);
       tileData.add(tile);
@@ -134,18 +139,15 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           alignment: Alignment.center,
           child: CommonAutoSizeText(AppLocalizations.t('Playlist is empty')));
     }
-    int crossAxisCount = 1;
-    if (tileData.length > 1) {
-      crossAxisCount = 2;
-    }
+    int crossAxisCount = 3;
+    // if (tileData.length > 1) {
+    //   crossAxisCount = 2;
+    // }
     List<Widget> thumbnails = [];
-    if (platformParams.mobile) {
+    if (platformParams.mobile || platformParams.windows) {
       for (var tile in tileData) {
         List<Widget> children = [];
-        if (tile.prefix != null) {
-          children.add(tile.prefix);
-          children.add(const Spacer());
-        }
+        children.add(const Spacer());
         children.add(CommonAutoSizeText(
           tile.title,
           //style: const TextStyle(fontSize: AppFontSize.minFontSize),
@@ -162,11 +164,16 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
         var thumbnail = Card(
             elevation: 0.0,
             shape: const ContinuousRectangleBorder(),
-            color: Colors.white.withOpacity(AppOpacity.mdOpacity),
-            child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: children));
+            //color: Colors.white.withOpacity(AppOpacity.mdOpacity),
+            child: Stack(
+              children: [
+                tile.prefix,
+                Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: children)
+              ],
+            ));
         thumbnails.add(thumbnail);
       }
 
@@ -225,8 +232,8 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
     if (!exist) {
       return;
     }
-    Uint8List? thumbnail = await VideoUtil.getByteThumbnail(
-          videoFile: filename);
+    Uint8List? thumbnail =
+        await VideoUtil.getByteThumbnail(videoFile: filename);
     // ChatMessageMimeType? chatMessageMimeType =
     //     StringUtil.enumFromString<ChatMessageMimeType>(
     //         ChatMessageMimeType.values, mediaFormat);
@@ -247,8 +254,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
 
   ///播放列表按钮
   Widget _buildPlaylistButton(BuildContext context) {
-    return Container(
-        child: ButtonBar(
+    return ButtonBar(
       children: [
         IconButton(
           icon: Icon(
@@ -299,7 +305,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           },
         ),
       ],
-    ));
+    );
   }
 
   @override
