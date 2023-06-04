@@ -242,9 +242,10 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
     return ButtonBar(
       children: [
         IconButton(
+          color: myself.primary,
           icon: const Icon(
             Icons.playlist_add,
-            color: Colors.white, //myself.primary,
+            color: Colors.white,
           ),
           onPressed: () async {
             _addMediaSource();
@@ -252,6 +253,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           tooltip: AppLocalizations.t('Add video file'),
         ),
         IconButton(
+          color: myself.primary,
           icon: const Icon(
             Icons.playlist_remove,
             color: Colors.white, //myself.primary,
@@ -263,6 +265,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           tooltip: AppLocalizations.t('Remove video file'),
         ),
         IconButton(
+          color: myself.primary,
           icon: const Icon(
             Icons.video_collection,
             color: Colors.white, //myself.primary,
@@ -273,6 +276,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           tooltip: AppLocalizations.t('Select collect file'),
         ),
         IconButton(
+          color: myself.primary,
           icon: const Icon(
             Icons.collections,
             color: Colors.white, //myself.primary,
@@ -284,6 +288,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           tooltip: AppLocalizations.t('Collect video file'),
         ),
         IconButton(
+          color: myself.primary,
           icon: const Icon(
             Icons.bookmark_remove,
             color: Colors.white, //myself.primary,
