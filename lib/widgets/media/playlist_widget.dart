@@ -137,7 +137,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
               var thumbnail = Container(
                   decoration: tile.selected ?? false
                       ? BoxDecoration(
-                          border: Border.all(width: 1, color: myself.primary))
+                          border: Border.all(width: 2, color: myself.primary))
                       : null,
                   padding: EdgeInsets.zero,
                   child: Card(
@@ -163,9 +163,9 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
                     //横轴元素个数
                     crossAxisCount: crossAxisCount,
                     //纵轴间距
-                    mainAxisSpacing: 1.0,
+                    mainAxisSpacing: 4.0,
                     //横轴间距
-                    crossAxisSpacing: 1.0,
+                    crossAxisSpacing: 4.0,
                     //子组件宽高长度比例
                     childAspectRatio: 1),
                 itemBuilder: (BuildContext context, int index) {
