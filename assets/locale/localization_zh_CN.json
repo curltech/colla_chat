@@ -357,5 +357,11 @@
   "Loading, please waiting...": "加载中，请等待",
   "Logger console": "日志",
   "Select login peer": "选择登录账号",
-  "Contact": "电话本"
+  "Contact": "电话本",
+  "webrtc": "点对点",
+  "email": "邮件",
+  "sfu": "点对点转发",
+  "nearby": "附近",
+  "SMS receive": "短信接收",
+  "SMS send": "短信发送"
 }

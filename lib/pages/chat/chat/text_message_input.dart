@@ -2,16 +2,20 @@ import 'dart:async';
 
 import 'package:another_audio_recorder/another_audio_recorder.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/entity/chat/chat_summary.dart';
+import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/extended_text_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/message/message_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/menu_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/openai/openai_chat_gpt.dart';
+import 'package:colla_chat/transport/smsclient.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/another_audio_recorder.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/platform_audio_recorder.dart';
@@ -228,6 +232,14 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
       );
     }
 
+    transportTypeActions.add(ActionData(
+        label: 'SMS receive',
+        tooltip: 'SMS receive',
+        icon: Icon(
+          Icons.try_sms_star,
+          color: myself.primary,
+        )));
+
     return transportTypeActions;
   }
 
@@ -247,13 +259,17 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
 
   _onTransportSend(BuildContext context, int index, String label,
       {String? value}) async {
-    TransportType? transportType =
-        StringUtil.enumFromString(TransportType.values, label);
-    if (transportType == null) {
-      return null;
+    if (label == 'SMS receive') {
+      _onActionReceiveSms();
+    } else {
+      TransportType? transportType =
+          StringUtil.enumFromString(TransportType.values, label);
+      if (transportType == null) {
+        return null;
+      }
+      chatMessageController.transportType = transportType;
+      _send();
     }
-    chatMessageController.transportType = transportType; 
-    _send();
   }
 
   _send() {
@@ -261,6 +277,21 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
       widget.onSendPressed!();
       widget.textEditingController.clear();
     }
+  }
+
+  ///接收到加密短信
+  _onActionReceiveSms() async {
+    ChatSummary? chatSummary = chatMessageController.chatSummary;
+    if (chatSummary == null) {
+      return;
+    }
+    Linkman? linkman =
+        await linkmanService.findCachedOneByPeerId(chatSummary.peerId!);
+    String text = widget.textEditingController.text;
+    if (linkman != null && text.isNotEmpty) {
+      smsClient.receiveChatMessage(linkman, text);
+    }
+    widget.textEditingController.clear();
   }
 
   ///弹出ChatGPT的命令菜单
