@@ -19,13 +19,19 @@ class OriginMediaSource {
     } else if (filename.startsWith('http')) {
       videoPlayerController = VideoPlayerController.network(filename);
     } else {
-      videoPlayerController = VideoPlayerController.file(File(filename));
+      File file = File(filename);
+      bool exists = file.existsSync();
+      if (exists) {
+        videoPlayerController = VideoPlayerController.file(file);
+      }
     }
     try {
-      await videoPlayerController.initialize();
-      if (!videoPlayerController.value.isInitialized) {
-        logger.e("controller.initialize() failed");
-        videoPlayerController = null;
+      if (videoPlayerController != null) {
+        await videoPlayerController.initialize();
+        if (!videoPlayerController.value.isInitialized) {
+          logger.e("controller.initialize() failed");
+          videoPlayerController = null;
+        }
       }
     } catch (e) {
       logger.e("controller.initialize() failed");

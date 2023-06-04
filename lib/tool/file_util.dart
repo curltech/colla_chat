@@ -133,12 +133,18 @@ class FileUtil {
 
     if (result != null) {
       for (var file in result.files) {
-        Uint8List? data = await FileUtil.readFile(file.path!);
-        XFile xfile = XFile.fromData(data!,
-            mimeType: file.extension,
-            name: file.name,
-            length: file.size,
-            path: file.path);
+        //Uint8List? data = await FileUtil.readFile(file.path!);
+        // XFile xfile = XFile.fromData(data!,
+        //     mimeType: file.extension,
+        //     name: file.name,
+        //     length: file.size,
+        //     path: file.path);
+        XFile xfile = XFile(
+          file.path!,
+          length: file.size,
+          name: file.name,
+          mimeType: file.extension,
+        );
         xfiles.add(xfile);
       }
     }

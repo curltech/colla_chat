@@ -31,7 +31,7 @@ class ChatGPTChat {
       double frequencyPenalty = .0,
       double presencePenalty = .0,
       List<String>? stop,
-      Function(CTResponse?)? onComplete}) {
+      Function(dynamic)? onComplete}) {
     final request = CompleteText(
       prompt: prompt,
       model: Model.textDavinci3,
@@ -42,7 +42,7 @@ class ChatGPTChat {
       presencePenalty: presencePenalty,
       stop: stop,
     );
-    Stream<CTResponse?> response =
+    Stream<dynamic> response =
         openAI.onCompletion(request: request).asStream();
     response.listen(onComplete).onError((err) {});
   }

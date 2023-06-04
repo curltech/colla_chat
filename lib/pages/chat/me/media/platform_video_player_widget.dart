@@ -4,6 +4,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:colla_chat/widgets/media/platform_media_player.dart';
+import 'package:colla_chat/widgets/media/video/meedu_video_player.dart';
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
 import 'package:colla_chat/widgets/media/video/webview_video_player.dart';
 import 'package:flutter/material.dart';
@@ -46,9 +47,12 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
   }
 
   List<Widget>? _buildRightWidgets() {
-    List<bool> isSelected = const [true, false];
+    List<bool> isSelected = const [true, false, false];
+    if (widget.mediaPlayerController is MeeduVideoPlayerController) {
+      isSelected = const [false, true, false];
+    }
     if (widget.mediaPlayerController is OriginVideoPlayerController) {
-      isSelected = const [false, true];
+      isSelected = const [false, false, true];
     }
     var toggleWidget = ToggleButtons(
       selectedBorderColor: Colors.white,
@@ -61,6 +65,10 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
           });
         } else if (newIndex == 1) {
           setState(() {
+            widget.mediaPlayerController = globalMeeduVideoPlayerController;
+          });
+        } else if (newIndex == 2) {
+          setState(() {
             widget.mediaPlayerController = globalOriginVideoPlayerController;
           });
         }
@@ -72,6 +80,10 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
         ),
         Icon(
           Icons.video_call_outlined,
+          color: Colors.white,
+        ),
+        Icon(
+          Icons.video_camera_back_outlined,
           color: Colors.white,
         ),
       ],
