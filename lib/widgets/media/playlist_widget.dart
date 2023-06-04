@@ -242,9 +242,9 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
     return ButtonBar(
       children: [
         IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.playlist_add,
-            color: myself.primary,
+            color: Colors.white, //myself.primary,
           ),
           onPressed: () async {
             _addMediaSource();
@@ -252,9 +252,9 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           tooltip: AppLocalizations.t('Add video file'),
         ),
         IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.playlist_remove,
-            color: myself.primary,
+            color: Colors.white, //myself.primary,
           ),
           onPressed: () async {
             var currentIndex = widget.mediaPlayerController.currentIndex;
@@ -263,9 +263,9 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           tooltip: AppLocalizations.t('Remove video file'),
         ),
         IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.video_collection,
-            color: myself.primary,
+            color: Colors.white, //myself.primary,
           ),
           onPressed: () async {
             await _collect();
@@ -273,9 +273,9 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           tooltip: AppLocalizations.t('Select collect file'),
         ),
         IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.collections,
-            color: myself.primary,
+            color: Colors.white, //myself.primary,
           ),
           onPressed: () async {
             var currentIndex = widget.mediaPlayerController.currentIndex;
@@ -284,9 +284,9 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           tooltip: AppLocalizations.t('Collect video file'),
         ),
         IconButton(
-          icon: Icon(
+          icon: const Icon(
             Icons.bookmark_remove,
-            color: myself.primary,
+            color: Colors.white, //myself.primary,
           ),
           onPressed: () async {
             var currentIndex = widget.mediaPlayerController.currentIndex;
