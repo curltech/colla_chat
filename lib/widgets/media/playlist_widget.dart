@@ -5,11 +5,10 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/tool/video_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -31,14 +30,17 @@ class PlaylistWidget extends StatefulWidget {
 }
 
 class _PlaylistWidgetState extends State<PlaylistWidget> {
+  ValueNotifier<List<TileData>> tileData = ValueNotifier<List<TileData>>([]);
+
   @override
   void initState() {
     super.initState();
     widget.mediaPlayerController.addListener(_update);
+    _update();
   }
 
   _update() {
-    setState(() {});
+    _buildTileData();
   }
 
   ///从收藏的文件中加入播放列表
@@ -53,54 +55,24 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
     );
     widget.mediaPlayerController.playlist.clear();
     List<String> filenames = [];
-    List<String?> messageIds = [];
-    List<Widget?> thumbnails = [];
     for (var chatMessage in chatMessages) {
       var title = chatMessage.title!;
-      File file = File(title);
-      bool exist = file.existsSync();
-      if (!exist) {
-        continue;
+      var messageId = chatMessage.messageId!;
+      String? filename =
+          await messageAttachmentService.getDecryptFilename(messageId, title);
+      if (filename != null) {
+        File file = File(filename);
+        bool exist = file.existsSync();
+        if (!exist) {
+          continue;
+        }
+        filenames.add(filename);
       }
-      filenames.add(title);
-      messageIds.add(chatMessage.messageId);
-      Widget? thumbnailWidget =
-          await _buildThumbnail(title, chatMessage.thumbnail);
-      thumbnails.add(thumbnailWidget);
     }
     widget.mediaPlayerController.addAll(filenames: filenames);
   }
 
-  Future<Widget?> _buildThumbnail(String? filename, String? thumbnail) async {
-    Widget? thumbnailWidget;
-    if (thumbnail != null) {
-      thumbnailWidget = ImageUtil.buildImageWidget(
-          image: thumbnail,
-          width: AppIconSize.maxSize,
-          height: AppIconSize.maxSize);
-    } else {
-      Uint8List? data;
-      if (filename != null) {
-        try {
-          data = await VideoUtil.getByteThumbnail(videoFile: filename);
-        } catch (e) {
-          logger.e('thumbnailData failure:$e');
-        }
-      }
-      if (data != null) {
-        thumbnailWidget = ImageUtil.buildMemoryImageWidget(
-          data,
-          fit: BoxFit.cover,
-          // width: AppIconSize.maxSize,
-          // height: AppIconSize.maxSize
-        );
-      }
-    }
-
-    return thumbnailWidget;
-  }
-
-  Future<List<TileData>> _buildTileData(BuildContext context) async {
+  Future<void> _buildTileData() async {
     List<PlatformMediaSource> mediaSources =
         widget.mediaPlayerController.playlist;
     List<TileData> tileData = [];
@@ -120,7 +92,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           selected = true;
         }
       }
-      Widget? thumbnailWidget = await _buildThumbnail(filename, null);
+      Widget? thumbnailWidget = mediaSource.thumbnailWidget;
       TileData tile = TileData(
           prefix: thumbnailWidget,
           title: FileUtil.filename(filename),
@@ -129,81 +101,94 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       tileData.add(tile);
     }
 
-    return tileData;
+    this.tileData.value = tileData;
   }
 
   Future<Widget> _buildThumbnailView(BuildContext context) async {
-    List<TileData> tileData = await _buildTileData(context);
-    if (tileData.isEmpty) {
-      return Container(
-          alignment: Alignment.center,
-          child: CommonAutoSizeText(AppLocalizations.t('Playlist is empty')));
-    }
-    int crossAxisCount = 3;
-    // if (tileData.length > 1) {
-    //   crossAxisCount = 2;
-    // }
-    List<Widget> thumbnails = [];
-    if (platformParams.mobile || platformParams.windows) {
-      for (var tile in tileData) {
-        List<Widget> children = [];
-        children.add(const Spacer());
-        children.add(CommonAutoSizeText(
-          tile.title,
-          //style: const TextStyle(fontSize: AppFontSize.minFontSize),
-        ));
-        if (tile.subtitle != null) {
-          children.add(const SizedBox(
-            height: 2.0,
-          ));
-          children.add(CommonAutoSizeText(
-            tile.subtitle!,
-            //style: const TextStyle(fontSize: AppFontSize.minFontSize),
-          ));
-        }
-        var thumbnail = Card(
-            elevation: 0.0,
-            shape: const ContinuousRectangleBorder(),
-            //color: Colors.white.withOpacity(AppOpacity.mdOpacity),
-            child: Stack(
-              children: [
-                tile.prefix,
-                Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: children)
-              ],
-            ));
-        thumbnails.add(thumbnail);
-      }
-
-      return GridView.builder(
-          itemCount: tileData.length,
-          //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              //横轴元素个数
-              crossAxisCount: crossAxisCount,
-              //纵轴间距
-              mainAxisSpacing: 1.0,
-              //横轴间距
-              crossAxisSpacing: 1.0,
-              //子组件宽高长度比例
-              childAspectRatio: 1),
-          itemBuilder: (BuildContext context, int index) {
-            //Widget Function(BuildContext context, int index)
-            return thumbnails[index];
-          });
-    } else {
-      return DataListView(
-        tileData: tileData,
-        onTap: (int index, String title, {TileData? group, String? subtitle}) {
-          widget.mediaPlayerController.setCurrentIndex(index);
-          if (widget.onSelected != null) {
-            widget.onSelected!(index, title);
+    return ValueListenableBuilder(
+        valueListenable: tileData,
+        builder:
+            (BuildContext context, List<TileData> tileData, Widget? child) {
+          if (tileData.isEmpty) {
+            return Container(
+                alignment: Alignment.center,
+                child: CommonAutoSizeText(
+                    AppLocalizations.t('Playlist is empty')));
           }
-        },
-      );
-    }
+          int crossAxisCount = 3;
+          List<Widget> thumbnails = [];
+          if (platformParams.mobile || platformParams.windows) {
+            for (var tile in tileData) {
+              List<Widget> children = [];
+              children.add(const Spacer());
+              children.add(CommonAutoSizeText(
+                tile.title,
+                style: const TextStyle(fontSize: AppFontSize.minFontSize),
+              ));
+              if (tile.subtitle != null) {
+                children.add(const SizedBox(
+                  height: 2.0,
+                ));
+                children.add(CommonAutoSizeText(
+                  tile.subtitle!,
+                  style: const TextStyle(fontSize: AppFontSize.minFontSize),
+                ));
+              }
+              var thumbnail = Container(
+                  decoration: tile.selected ?? false
+                      ? BoxDecoration(
+                          border: Border.all(width: 1, color: myself.primary))
+                      : null,
+                  padding: EdgeInsets.zero,
+                  child: Card(
+                      elevation: 0.0,
+                      margin: EdgeInsets.zero,
+                      shape: const ContinuousRectangleBorder(),
+                      child: Stack(
+                        children: [
+                          tile.prefix ?? Container(),
+                          Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: children)
+                        ],
+                      )));
+              thumbnails.add(thumbnail);
+            }
+
+            return GridView.builder(
+                itemCount: tileData.length,
+                //SliverGridDelegateWithFixedCrossAxisCount 构建一个横轴固定数量Widget
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                    //横轴元素个数
+                    crossAxisCount: crossAxisCount,
+                    //纵轴间距
+                    mainAxisSpacing: 1.0,
+                    //横轴间距
+                    crossAxisSpacing: 1.0,
+                    //子组件宽高长度比例
+                    childAspectRatio: 1),
+                itemBuilder: (BuildContext context, int index) {
+                  //Widget Function(BuildContext context, int index)
+                  return InkWell(
+                      child: thumbnails[index],
+                      onTap: () {
+                        widget.mediaPlayerController.setCurrentIndex(index);
+                      });
+                });
+          } else {
+            return DataListView(
+              tileData: tileData,
+              onTap: (int index, String title,
+                  {TileData? group, String? subtitle}) {
+                widget.mediaPlayerController.setCurrentIndex(index);
+                if (widget.onSelected != null) {
+                  widget.onSelected!(index, title);
+                }
+              },
+            );
+          }
+        });
   }
 
   ///选择文件加入播放列表
@@ -264,6 +249,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           onPressed: () async {
             _addMediaSource();
           },
+          tooltip: AppLocalizations.t('Add video file'),
         ),
         IconButton(
           icon: Icon(
@@ -274,6 +260,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
             var currentIndex = widget.mediaPlayerController.currentIndex;
             await widget.mediaPlayerController.remove(currentIndex);
           },
+          tooltip: AppLocalizations.t('Remove video file'),
         ),
         IconButton(
           icon: Icon(
@@ -283,6 +270,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
           onPressed: () async {
             await _collect();
           },
+          tooltip: AppLocalizations.t('Select collect file'),
         ),
         IconButton(
           icon: Icon(
@@ -293,6 +281,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
             var currentIndex = widget.mediaPlayerController.currentIndex;
             await _collectMediaSource(currentIndex);
           },
+          tooltip: AppLocalizations.t('Collect video file'),
         ),
         IconButton(
           icon: Icon(
@@ -303,6 +292,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
             var currentIndex = widget.mediaPlayerController.currentIndex;
             await _removeFromCollect(currentIndex);
           },
+          tooltip: AppLocalizations.t('Remove collect file'),
         ),
       ],
     );

@@ -363,5 +363,10 @@
   "sfu": "点对点转发",
   "nearby": "附近",
   "SMS receive": "短信接收",
-  "SMS send": "短信发送"
+  "SMS send": "短信发送",
+  "Add video file": "增加视频文件",
+  "Remove video file": "移除视频文件",
+  "Collect video file": "从收藏增加文件",
+  "Select collect file": "收藏文件",
+  "Remove collect file": "从收藏移除文件"
 }

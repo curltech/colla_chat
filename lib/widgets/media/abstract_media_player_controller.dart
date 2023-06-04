@@ -2,8 +2,11 @@ import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/tool/video_util.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 
@@ -78,13 +81,15 @@ class PlatformMediaSource {
 
   //下面两个字段用于媒体收藏功能
   String? messageId;
-  Widget? thumbnail;
+  Widget? thumbnailWidget;
+  Uint8List? thumbnail;
 
   PlatformMediaSource({
     required this.filename,
-    required this.mediaSourceType,
+    this.mediaSourceType = MediaSourceType.buffer,
     this.mediaFormat,
     this.messageId,
+    this.thumbnailWidget,
     this.thumbnail,
   });
 
@@ -93,16 +98,14 @@ class PlatformMediaSource {
       required ChatMessageMimeType mediaFormat}) async {
     String? filename =
         await FileUtil.writeTempFile(data, extension: mediaFormat.name);
-    PlatformMediaSource? mediaSource = PlatformMediaSource(
-        filename: filename!,
-        mediaSourceType: MediaSourceType.buffer,
-        mediaFormat: mediaFormat);
+    PlatformMediaSource? mediaSource =
+        await media(filename: filename!, mediaFormat: mediaFormat);
 
     return mediaSource;
   }
 
-  static PlatformMediaSource? media(
-      {required String filename, ChatMessageMimeType? mediaFormat}) {
+  static Future<PlatformMediaSource?> media(
+      {required String filename, ChatMessageMimeType? mediaFormat}) async {
     PlatformMediaSource mediaSource;
     if (mediaFormat == null) {
       int pos = filename.lastIndexOf('.');
@@ -128,15 +131,33 @@ class PlatformMediaSource {
           filename: filename,
           mediaSourceType: MediaSourceType.file,
           mediaFormat: mediaFormat);
+      String? mimeType = FileUtil.mimeType(filename);
+      if (mimeType != null && mimeType.startsWith('video')) {
+        try {
+          Uint8List? data =
+              await VideoUtil.getByteThumbnail(videoFile: filename);
+          if (data != null) {
+            mediaSource.thumbnail ??= data;
+            Widget? thumbnailWidget = ImageUtil.buildMemoryImageWidget(
+              data,
+              fit: BoxFit.cover,
+            );
+            mediaSource.thumbnailWidget ??= thumbnailWidget;
+          }
+        } catch (e) {
+          logger.e('thumbnailData failure:$e');
+        }
+      }
     }
 
     return mediaSource;
   }
 
-  static List<PlatformMediaSource> playlist(List<String> filenames) {
+  static Future<List<PlatformMediaSource>> playlist(
+      List<String> filenames) async {
     List<PlatformMediaSource> playlist = [];
     for (var filename in filenames) {
-      PlatformMediaSource? mediaSource = media(filename: filename);
+      PlatformMediaSource? mediaSource = await media(filename: filename);
       if (mediaSource != null) {
         playlist.add(mediaSource);
       }
@@ -220,10 +241,9 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
       }
     }
     PlatformMediaSource? mediaSource =
-        PlatformMediaSource.media(filename: filename);
+        await PlatformMediaSource.media(filename: filename);
     if (mediaSource != null) {
       mediaSource.messageId = messageId;
-      mediaSource.thumbnail = thumbnail;
       playlist.add(mediaSource);
       await setCurrentIndex(playlist.length - 1);
     }
@@ -236,15 +256,12 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
       List<String?>? messageIds,
       List<Widget?>? thumbnails}) async {
     List<PlatformMediaSource> mediaSources =
-        PlatformMediaSource.playlist(filenames);
+        await PlatformMediaSource.playlist(filenames);
     if (messageIds != null && messageIds.isNotEmpty) {
       for (var i = 0; i < mediaSources.length; i++) {
         var mediaSource = mediaSources[i];
         if (messageIds.length > i) {
           mediaSource.messageId = messageIds[i];
-        }
-        if (thumbnails != null && thumbnails.length > i) {
-          mediaSource.thumbnail = thumbnails[i];
         }
       }
     }
@@ -271,7 +288,7 @@ abstract class AbstractMediaPlayerController with ChangeNotifier {
       }
     }
     PlatformMediaSource? mediaSource =
-        PlatformMediaSource.media(filename: filename);
+        await PlatformMediaSource.media(filename: filename);
     if (mediaSource != null) {
       playlist.insert(index, mediaSource);
       await setCurrentIndex(index);
