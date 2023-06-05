@@ -82,11 +82,11 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     if (index >= -1 && index < playlist.length && currentIndex != index) {
       close();
       await super.setCurrentIndex(index);
+      notifyListeners();
       var currentMediaSource = this.currentMediaSource;
       if (currentMediaSource != null) {
         videoPlayerController = await OriginMediaSource.media(
             filename: currentMediaSource.filename);
-        notifyListeners();
         if (autoplay && videoPlayerController != null) {
           play();
         }

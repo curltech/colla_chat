@@ -51,6 +51,9 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
     if (widget.mediaPlayerController is MeeduVideoPlayerController) {
       isSelected = const [false, true, false];
     }
+    // if (widget.mediaPlayerController is MediaKitVideoPlayerController) {
+    //   isSelected = const [false, false, true, false];
+    // }
     if (widget.mediaPlayerController is OriginVideoPlayerController) {
       isSelected = const [false, false, true];
     }

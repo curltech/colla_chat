@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_meedu_videoplayer/meedu_player.dart';
 
 class MeeduMediaSource {
-  static Future<DataSource?> media({required String filename}) async {
+  static DataSource? media({required String filename}) {
     DataSource? dataSource;
     if (filename.startsWith('assets/')) {
       dataSource = DataSource(type: DataSourceType.asset, source: filename);
@@ -26,11 +26,11 @@ class MeeduMediaSource {
     return dataSource;
   }
 
-  static Future<List<DataSource>> fromMediaSource(
-      List<PlatformMediaSource> mediaSources) async {
+  static List<DataSource> fromMediaSource(
+      List<PlatformMediaSource> mediaSources) {
     List<DataSource> dataSources = [];
     for (var mediaSource in mediaSources) {
-      var dataSource = await media(filename: mediaSource.filename);
+      var dataSource = media(filename: mediaSource.filename);
       if (dataSource != null) {
         dataSources.add(dataSource);
       }
@@ -69,12 +69,12 @@ class MeeduVideoPlayerController extends AbstractMediaPlayerController {
     if (index >= -1 && index < playlist.length && currentIndex != index) {
       close();
       await super.setCurrentIndex(index);
+      notifyListeners();
       var currentMediaSource = this.currentMediaSource;
       if (currentMediaSource != null) {
-        notifyListeners();
         if (meeduPlayerController != null) {
-          DataSource? dataSource = await MeeduMediaSource.media(
-              filename: currentMediaSource.filename);
+          DataSource? dataSource =
+              MeeduMediaSource.media(filename: currentMediaSource.filename);
           meeduPlayerController!.setDataSource(dataSource!, autoplay: autoplay);
         }
       }
@@ -112,6 +112,21 @@ class MeeduVideoPlayerController extends AbstractMediaPlayerController {
     var controller = meeduPlayerController;
     if (controller != null) {
       controller.play();
+    }
+  }
+
+  playAsFullscreen(BuildContext context) {
+    var controller = meeduPlayerController;
+    if (controller != null) {
+      var currentMediaSource = this.currentMediaSource;
+      if (currentMediaSource != null) {
+        if (meeduPlayerController != null) {
+          DataSource? dataSource =
+              MeeduMediaSource.media(filename: currentMediaSource.filename);
+          meeduPlayerController!.launchAsFullscreen(context,
+              autoplay: true, dataSource: dataSource!);
+        }
+      }
     }
   }
 
