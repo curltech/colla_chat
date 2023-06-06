@@ -60,8 +60,9 @@ class MeeduVideoPlayerController extends AbstractMediaPlayerController {
       'mkv',
       'mpg'
     ];
-
-    meeduPlayerController = MeeduPlayerController();
+    initMeeduPlayer().then((value) {
+      meeduPlayerController = MeeduPlayerController();
+    });
   }
 
   @override

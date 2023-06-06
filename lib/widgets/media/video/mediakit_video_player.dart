@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
@@ -42,10 +43,13 @@ class MediaKitMediaSource {
 
 ///基于MediaKit实现的媒体播放器
 class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
-  final Player player = Player();
-  VideoController? videoController;
+  late final Player player;
+  late final VideoController videoController;
+
   double volume = 1.0;
   double speed = 1.0;
+
+  ValueNotifier<bool> playing = ValueNotifier<bool>(false);
 
   MediaKitVideoPlayerController() {
     fileType = FileType.custom;
@@ -63,13 +67,32 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
       'mkv',
       'mpg'
     ];
+
     MediaKit.ensureInitialized();
+    player = Player();
     videoController = VideoController(player);
     player.streams.playlist.listen((e) {});
-    player.streams.playing.listen((e) {});
-    player.streams.completed.listen((e) {});
-    player.streams.position.listen((e) {});
-    player.streams.duration.listen((e) {});
+    player.streams.playing.listen((e) {
+      if (e) {
+        mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.playing;
+        playing.value = true;
+      } else {
+        mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.stop;
+        playing.value = false;
+      }
+    });
+    player.streams.completed.listen((e) {
+      if (e) {
+        mediaPlayerState.mediaPlayerStatus = MediaPlayerStatus.completed;
+        playing.value = false;
+      }
+    });
+    player.streams.position.listen((e) {
+      mediaPlayerState.position = e;
+    });
+    player.streams.duration.listen((e) {
+      mediaPlayerState.duration = e;
+    });
     player.streams.volume.listen((e) {
       volume = e;
     });
@@ -91,7 +114,7 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
         Media? media =
             MediaKitMediaSource.media(filename: currentMediaSource.filename);
         if (media != null) {
-          await player.open(media);
+          player.open(media);
         }
       }
     }
@@ -105,61 +128,72 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
     bool showVolumeButton = true,
   }) {
     var currentMediaSource = this.currentMediaSource;
-    Widget player = currentMediaSource != null
-        ? Video(
-            controller: videoController!,
-          )
-        : Center(
-            child: CommonAutoSizeText(
-            AppLocalizations.t('Please select a media file'),
-            style: const TextStyle(color: Colors.white),
-          ));
+    Widget player;
+    if (currentMediaSource != null) {
+      player = Video(
+        controller: videoController,
+      );
 
+      Widget playerControlPanel = ValueListenableBuilder(
+          valueListenable: playing,
+          builder: (BuildContext context, bool playing, Widget? child) {
+            return Container(
+                alignment: Alignment.center,
+                child: IconButton(
+                    iconSize: AppIconSize.lgSize,
+                    color: Colors.white,
+                    onPressed: () {
+                      if (playing) {
+                        pause();
+                      } else {
+                        play();
+                      }
+                    },
+                    icon: playing
+                        ? const Icon(Icons.pause)
+                        : const Icon(Icons.play_arrow)));
+          });
+      player = Stack(
+        children: [
+          player,
+          playerControlPanel,
+        ],
+      );
+    } else {
+      player = Center(
+          child: CommonAutoSizeText(
+        AppLocalizations.t('Please select a media file'),
+        style: const TextStyle(color: Colors.white),
+      ));
+    }
     return player;
   }
 
   @override
   close() {
-    if (videoController != null) {
-      stop();
-      super.setCurrentIndex(-1);
-    }
+    stop();
+    super.setCurrentIndex(-1);
   }
 
   ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频
   play() async {
-    var controller = videoController;
-    if (controller != null) {
-      await player.play();
-    }
+    await player.play();
   }
 
   pause() async {
-    var controller = videoController;
-    if (controller != null) {
-      await player.pause();
-    }
+    await player.pause();
   }
 
   resume() async {
-    var controller = videoController;
-    if (controller != null) {
-      await player.play();
-    }
+    await player.play();
   }
 
   stop() async {
-    var controller = videoController;
-    if (controller != null) {
-      await player.pause();
-    }
+    await player.pause();
   }
 
   seek(Duration position, {int? index}) async {
-    var controller = videoController;
-    if (controller != null) {
-      await player.seek(position);
-    }
+    await player.seek(position);
   }
 
   Future<double> getSpeed() async {
@@ -167,10 +201,7 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   setSpeed(double speed) async {
-    var controller = videoController;
-    if (controller != null) {
-      await player.setRate(speed);
-    }
+    await player.setRate(speed);
   }
 
   Future<double> getVolume() async {
@@ -178,10 +209,7 @@ class MediaKitVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   setVolume(double volume) async {
-    var controller = videoController;
-    if (controller != null) {
-      await player.setVolume(volume);
-    }
+    await player.setVolume(volume);
   }
 }
 
