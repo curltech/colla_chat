@@ -252,20 +252,28 @@ class _ChatListWidgetState extends State<ChatListWidget>
   }
 
   String _buildSubtitle(
-      {required String subMessageType, String? contentType, String? content}) {
+      {required String subMessageType,
+      String? title,
+      String? contentType,
+      String? content}) {
     String subtitle = '';
     if (subMessageType == ChatMessageSubType.chat.name) {
-      content = content ?? '';
       if (contentType == null ||
           contentType == ChatMessageContentType.text.name) {
-        subtitle = chatMessageService.recoverContent(content);
+        if (content != null && content.isNotEmpty) {
+          subtitle = chatMessageService.recoverContent(content);
+        }
       }
       if (contentType == ChatMessageContentType.location.name) {
-        subtitle = chatMessageService.recoverContent(content);
         Map<String, dynamic> map = JsonUtil.toJson(subtitle);
         String? address = map['address'];
         address = address ?? '';
         subtitle = address;
+      }
+      if (subtitle.isEmpty) {
+        if (title != null && title.isNotEmpty) {
+          subtitle = title;
+        }
       }
     } else {
       subtitle = AppLocalizations.t(subMessageType);
@@ -321,6 +329,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
         }
         subtitle = _buildSubtitle(
             subMessageType: subMessageType ?? '',
+            title: title,
             contentType: chatSummary.contentType,
             content: chatSummary.content);
         var unreadNumber = chatSummary.unreadNumber;
@@ -399,6 +408,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
         sendReceiveTime = DateUtil.formatEasyRead(sendReceiveTime);
         subtitle = _buildSubtitle(
             subMessageType: subMessageType!,
+            title: title,
             contentType: chatSummary.contentType,
             content: chatSummary.content);
         var unreadNumber = chatSummary.unreadNumber;
@@ -433,6 +443,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
             : '';
         subtitle = _buildSubtitle(
             subMessageType: subMessageType!,
+            title: title,
             contentType: chatSummary.contentType,
             content: chatSummary.content);
         var unreadNumber = chatSummary.unreadNumber;
