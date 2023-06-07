@@ -5,6 +5,7 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 ///基于Chewie实现的媒体播放器和记录器，
 class ChewieVideoPlayerController extends OriginVideoPlayerController {
@@ -14,7 +15,7 @@ class ChewieVideoPlayerController extends OriginVideoPlayerController {
   }
 
   ChewieController? _buildChewieController() {
-    var controller = videoPlayerController;
+    var controller = videoPlayerController.value;
     if (controller == null) {
       return null;
     }
@@ -56,17 +57,25 @@ class ChewieVideoPlayerController extends OriginVideoPlayerController {
     bool showFullscreenButton = true,
     bool showVolumeButton = true,
   }) {
-    ChewieController? chewieController = _buildChewieController();
-    Widget player = chewieController != null
-        ? Chewie(
-            key: key,
-            controller: chewieController,
-          )
-        : Center(
-            child: CommonAutoSizeText(
+    Widget player = ValueListenableBuilder(
+        valueListenable: videoPlayerController,
+        builder: (BuildContext context,
+            VideoPlayerController? videoPlayerController, Widget? child) {
+          if (videoPlayerController != null) {
+            ChewieController? chewieController = _buildChewieController();
+            if (chewieController != null) {
+              return Chewie(
+                key: key,
+                controller: chewieController,
+              );
+            }
+          }
+          return Center(
+              child: CommonAutoSizeText(
             AppLocalizations.t('Please select a media file'),
             style: const TextStyle(color: Colors.white),
           ));
+        });
 
     return player;
   }

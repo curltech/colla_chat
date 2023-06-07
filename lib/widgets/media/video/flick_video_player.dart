@@ -4,6 +4,7 @@ import 'package:colla_chat/widgets/media/video/origin_video_player.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flick_video_player/flick_video_player.dart';
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
 ///基于flick实现的媒体播放器和记录器，
 class FlickVideoPlayerController extends OriginVideoPlayerController {
@@ -13,7 +14,7 @@ class FlickVideoPlayerController extends OriginVideoPlayerController {
   }
 
   FlickManager? _buildFlickManager() {
-    var controller = videoPlayerController;
+    var controller = videoPlayerController.value;
     if (controller == null) {
       return null;
     }
@@ -33,21 +34,28 @@ class FlickVideoPlayerController extends OriginVideoPlayerController {
     bool showFullscreenButton = true,
     bool showVolumeButton = true,
   }) {
-    Widget flickVideoWithControls = const FlickVideoWithControls(
-        videoFit: BoxFit.contain, controls: FlickPortraitControls());
-    FlickManager? flickManager = _buildFlickManager();
-    Widget player = flickManager != null
-        ? FlickVideoPlayer(
-            key: key,
-            flickManager: flickManager,
-            flickVideoWithControls: flickVideoWithControls,
-          )
-        : Center(
-            child: CommonAutoSizeText(
+    Widget player = ValueListenableBuilder(
+        valueListenable: videoPlayerController,
+        builder: (BuildContext context,
+            VideoPlayerController? videoPlayerController, Widget? child) {
+          if (videoPlayerController != null) {
+            Widget flickVideoWithControls = const FlickVideoWithControls(
+                videoFit: BoxFit.contain, controls: FlickPortraitControls());
+            FlickManager? flickManager = _buildFlickManager();
+            if (flickManager != null) {
+              return FlickVideoPlayer(
+                key: key,
+                flickManager: flickManager,
+                flickVideoWithControls: flickVideoWithControls,
+              );
+            }
+          }
+          return Center(
+              child: CommonAutoSizeText(
             AppLocalizations.t('Please select a media file'),
             style: const TextStyle(color: Colors.white),
           ));
-
+        });
     return player;
   }
 }

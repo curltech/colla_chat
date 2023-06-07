@@ -42,7 +42,8 @@ class MeeduMediaSource {
 
 ///基于VideoPlayerControlPanel实现的媒体播放器
 class MeeduVideoPlayerController extends AbstractMediaPlayerController {
-  MeeduPlayerController? meeduPlayerController;
+  ValueNotifier<MeeduPlayerController?> meeduPlayerController =
+      ValueNotifier<MeeduPlayerController?>(null);
 
   MeeduVideoPlayerController() {
     fileType = FileType.custom;
@@ -61,7 +62,7 @@ class MeeduVideoPlayerController extends AbstractMediaPlayerController {
       'mpg'
     ];
     initMeeduPlayer().then((value) {
-      meeduPlayerController = MeeduPlayerController();
+      meeduPlayerController.value = MeeduPlayerController();
     });
   }
 
@@ -73,10 +74,11 @@ class MeeduVideoPlayerController extends AbstractMediaPlayerController {
       notifyListeners();
       var currentMediaSource = this.currentMediaSource;
       if (currentMediaSource != null) {
-        if (meeduPlayerController != null) {
+        if (meeduPlayerController.value != null) {
           DataSource? dataSource =
               MeeduMediaSource.media(filename: currentMediaSource.filename);
-          meeduPlayerController!.setDataSource(dataSource!, autoplay: autoplay);
+          meeduPlayerController.value!
+              .setDataSource(dataSource!, autoplay: autoplay);
         }
       }
     }
@@ -89,20 +91,25 @@ class MeeduVideoPlayerController extends AbstractMediaPlayerController {
     bool showFullscreenButton = true,
     bool showVolumeButton = true,
   }) {
-    Widget player = meeduPlayerController != null
-        ? MeeduVideoPlayer(controller: meeduPlayerController!)
-        : Center(
-            child: CommonAutoSizeText(
+    Widget player = ValueListenableBuilder(
+        valueListenable: meeduPlayerController,
+        builder: (BuildContext context,
+            MeeduPlayerController? meeduPlayerController, Widget? child) {
+          if (meeduPlayerController != null) {
+            return MeeduVideoPlayer(controller: meeduPlayerController);
+          }
+          return Center(
+              child: CommonAutoSizeText(
             AppLocalizations.t('Please select a media file'),
             style: const TextStyle(color: Colors.white),
           ));
-
+        });
     return player;
   }
 
   @override
   close() {
-    if (meeduPlayerController != null) {
+    if (meeduPlayerController.value != null) {
       stop();
       super.setCurrentIndex(-1);
     }
@@ -110,50 +117,48 @@ class MeeduVideoPlayerController extends AbstractMediaPlayerController {
 
   ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频
   play() async {
-    var controller = meeduPlayerController;
+    var controller = meeduPlayerController.value;
     if (controller != null) {
       controller.play();
     }
   }
 
   playAsFullscreen(BuildContext context) {
-    var controller = meeduPlayerController;
+    var controller = meeduPlayerController.value;
     if (controller != null) {
       var currentMediaSource = this.currentMediaSource;
       if (currentMediaSource != null) {
-        if (meeduPlayerController != null) {
-          DataSource? dataSource =
-              MeeduMediaSource.media(filename: currentMediaSource.filename);
-          meeduPlayerController!.launchAsFullscreen(context,
-              autoplay: true, dataSource: dataSource!);
-        }
+        DataSource? dataSource =
+            MeeduMediaSource.media(filename: currentMediaSource.filename);
+        controller.launchAsFullscreen(context,
+            autoplay: true, dataSource: dataSource!);
       }
     }
   }
 
   pause() async {
-    var controller = meeduPlayerController;
+    var controller = meeduPlayerController.value;
     if (controller != null) {
       controller.pause();
     }
   }
 
   resume() async {
-    var controller = meeduPlayerController;
+    var controller = meeduPlayerController.value;
     if (controller != null) {
       controller.play();
     }
   }
 
   stop() async {
-    var controller = meeduPlayerController;
+    var controller = meeduPlayerController.value;
     if (controller != null) {
       controller.pause();
     }
   }
 
   seek(Duration position, {int? index}) async {
-    var controller = meeduPlayerController;
+    var controller = meeduPlayerController.value;
     if (controller != null) {
       controller.seekTo(position);
     }
@@ -161,7 +166,7 @@ class MeeduVideoPlayerController extends AbstractMediaPlayerController {
 
   Future<double> getSpeed() async {
     double speed = 1.0;
-    var controller = meeduPlayerController;
+    var controller = meeduPlayerController.value;
     if (controller != null) {
       speed = controller.playbackSpeed;
     }
@@ -169,7 +174,7 @@ class MeeduVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   setSpeed(double speed) async {
-    var controller = meeduPlayerController;
+    var controller = meeduPlayerController.value;
     if (controller != null) {
       controller.setPlaybackSpeed(speed);
     }
@@ -177,7 +182,7 @@ class MeeduVideoPlayerController extends AbstractMediaPlayerController {
 
   Future<double> getVolume() async {
     double volume = 1.0;
-    var controller = meeduPlayerController;
+    var controller = meeduPlayerController.value;
     if (controller != null) {
       volume = controller.volume.value;
     }
@@ -185,7 +190,7 @@ class MeeduVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   setVolume(double volume) async {
-    var controller = meeduPlayerController;
+    var controller = meeduPlayerController.value;
     if (controller != null) {
       controller.setVolume(volume);
     }

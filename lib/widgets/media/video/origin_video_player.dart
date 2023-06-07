@@ -57,7 +57,8 @@ class OriginMediaSource {
 
 ///基于VideoPlayerControlPanel实现的媒体播放器
 class OriginVideoPlayerController extends AbstractMediaPlayerController {
-  VideoPlayerController? videoPlayerController;
+  ValueNotifier<VideoPlayerController?> videoPlayerController =
+      ValueNotifier<VideoPlayerController?>(null);
 
   OriginVideoPlayerController() {
     fileType = FileType.custom;
@@ -85,9 +86,9 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
       notifyListeners();
       var currentMediaSource = this.currentMediaSource;
       if (currentMediaSource != null) {
-        videoPlayerController = await OriginMediaSource.media(
+        videoPlayerController.value = await OriginMediaSource.media(
             filename: currentMediaSource.filename);
-        if (autoplay && videoPlayerController != null) {
+        if (autoplay && videoPlayerController.value != null) {
           play();
         }
       }
@@ -102,75 +103,81 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
     bool showVolumeButton = true,
   }) {
     // Widget player = VideoPlayer(videoPlayerController!);
-    Widget player = videoPlayerController != null
-        ? JkVideoControlPanel(
-            key: key,
-            videoPlayerController!,
-            showClosedCaptionButton: showClosedCaptionButton,
-            showFullscreenButton: showFullscreenButton,
-            showVolumeButton: showVolumeButton,
-            onPrevClicked: (currentIndex <= 0)
-                ? null
-                : () {
-                    previous();
-                  },
-            onNextClicked:
-                (currentIndex == -1 || currentIndex >= playlist.length - 1)
-                    ? null
-                    : () {
-                        next();
-                      },
-            onPlayEnded: next,
-          )
-        : Center(
-            child: CommonAutoSizeText(
+    Widget player = ValueListenableBuilder(
+        valueListenable: videoPlayerController,
+        builder: (BuildContext context,
+            VideoPlayerController? videoPlayerController, Widget? child) {
+          if (videoPlayerController != null) {
+            return JkVideoControlPanel(
+              key: key,
+              videoPlayerController,
+              showClosedCaptionButton: showClosedCaptionButton,
+              showFullscreenButton: showFullscreenButton,
+              showVolumeButton: showVolumeButton,
+              onPrevClicked: (currentIndex <= 0)
+                  ? null
+                  : () {
+                      previous();
+                    },
+              onNextClicked:
+                  (currentIndex == -1 || currentIndex >= playlist.length - 1)
+                      ? null
+                      : () {
+                          next();
+                        },
+              onPlayEnded: next,
+            );
+          }
+          return Center(
+              child: CommonAutoSizeText(
             AppLocalizations.t('Please select a media file'),
             style: const TextStyle(color: Colors.white),
           ));
+        });
 
     return player;
   }
 
   @override
   close() {
-    if (videoPlayerController != null) {
+    if (videoPlayerController.value != null) {
       super.setCurrentIndex(-1);
-      videoPlayerController!.dispose();
-      videoPlayerController = null;
+      videoPlayerController.value!.dispose();
+      videoPlayerController.value = null;
     }
   }
 
   ///基本的视频控制功能使用平台自定义的控制面板才需要，比如音频
   play() async {
-    var controller = videoPlayerController;
+    var controller = videoPlayerController.value;
     if (controller != null) {
       controller.play();
     }
   }
 
   pause() async {
-    var controller = videoPlayerController;
+    var controller = videoPlayerController.value;
     if (controller != null) {
       controller.pause();
     }
   }
 
   resume() async {
-    var controller = videoPlayerController;
+    var controller = videoPlayerController.value;
     if (controller != null) {
       controller.play();
     }
   }
 
   stop() async {
-    var controller = videoPlayerController;
+    var controller = videoPlayerController.value;
     if (controller != null) {
       controller.pause();
     }
   }
 
   seek(Duration position, {int? index}) async {
-    var controller = videoPlayerController;
+    var controller = videoPlayerController.value;
     if (controller != null) {
       controller.seekTo(position);
     }
@@ -178,7 +185,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
 
   Future<double> getSpeed() async {
     double speed = 1.0;
-    var controller = videoPlayerController;
+    var controller = videoPlayerController.value;
     if (controller != null) {
       speed = controller.value.playbackSpeed;
     }
@@ -186,7 +193,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   setSpeed(double speed) async {
-    var controller = videoPlayerController;
+    var controller = videoPlayerController.value;
     if (controller != null) {
       controller.setPlaybackSpeed(speed);
     }
@@ -194,7 +201,7 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
 
   Future<double> getVolume() async {
     double volume = 1.0;
-    var controller = videoPlayerController;
+    var controller = videoPlayerController.value;
     if (controller != null) {
       volume = controller.value.volume;
     }
@@ -202,14 +209,14 @@ class OriginVideoPlayerController extends AbstractMediaPlayerController {
   }
 
   setVolume(double volume) async {
-    var controller = videoPlayerController;
+    var controller = videoPlayerController.value;
     if (controller != null) {
       controller.setVolume(volume);
     }
   }
 
   VideoPlayerValue? get value {
-    var controller = videoPlayerController;
+    var controller = videoPlayerController.value;
     if (controller != null) {
       VideoPlayerValue value = controller.value;
 
