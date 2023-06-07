@@ -60,6 +60,13 @@ const InputBorder textFormFieldBorder = UnderlineInputBorder(
     borderSide: BorderSide.none,
     borderRadius: BorderRadius.all(Radius.circular(4.0)));
 
+const InputBorder outlineTextFormFieldBorder = OutlineInputBorder(
+    borderSide: BorderSide(
+      color: Colors.white,
+      width: 1.0,
+    ),
+    borderRadius: BorderRadius.all(Radius.circular(4.0)));
+
 ///平台定制的AutoSizeTextFormField，规定了一些参数的缺省值
 class CustomAutoSizeTextFormField extends AutoSizeTextFormField {
   const CustomAutoSizeTextFormField({
@@ -93,7 +100,7 @@ class CustomAutoSizeTextFormField extends AutoSizeTextFormField {
     SmartDashesType? smartDashesType,
     SmartQuotesType? smartQuotesType,
     bool enableSuggestions = true,
-    int? maxLines ,
+    int? maxLines,
     bool expands = false,
     bool readOnly = false,
     EditableTextContextMenuBuilder? contextMenuBuilder,
@@ -209,6 +216,8 @@ class CommonAutoSizeTextFormField extends StatelessWidget {
   final int? minLines;
   final bool readOnly;
   final Color? fillColor;
+  final Color? focusColor;
+  final Color? hoverColor;
   final String? labelText;
   final Widget? prefixIcon;
   final Widget? suffixIcon;
@@ -230,13 +239,15 @@ class CommonAutoSizeTextFormField extends StatelessWidget {
     this.keyboardType,
     this.minLines,
     this.fillColor,
+    this.focusColor,
+    this.hoverColor,
     this.labelText,
     this.prefixIcon,
     this.suffixIcon,
     this.suffix,
     this.hintText,
     this.readOnly = false,
-    this.maxLines ,
+    this.maxLines,
     this.onChanged,
     this.onEditingComplete,
     this.onFieldSubmitted,
@@ -262,9 +273,13 @@ class CommonAutoSizeTextFormField extends StatelessWidget {
       validator: validator,
       decoration: InputDecoration(
           fillColor: fillColor ?? Colors.grey.withOpacity(AppOpacity.xlOpacity),
+          focusColor:
+              focusColor ?? Colors.grey.withOpacity(AppOpacity.xlOpacity),
+          hoverColor:
+              hoverColor ?? Colors.grey.withOpacity(AppOpacity.xlOpacity),
           filled: true,
           border: textFormFieldBorder,
-          focusedBorder: textFormFieldBorder,
+          focusedBorder: outlineTextFormFieldBorder,
           enabledBorder: textFormFieldBorder,
           errorBorder: textFormFieldBorder,
           disabledBorder: textFormFieldBorder,
