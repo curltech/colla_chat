@@ -96,7 +96,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
     PlatformAudioRecorder platformAudioRecorder;
     if (platformParams.mobile) {
       AnotherAudioRecorderController audioRecorderController =
-          AnotherAudioRecorderController();
+          globalAnotherAudioRecorderController;
       audioRecorderController.audioFormat = AudioFormat.WAV;
       platformAudioRecorder = PlatformAudioRecorder(
         onStop: _onStop,
@@ -104,7 +104,7 @@ class _TextMessageInputWidgetState extends State<TextMessageInputWidget> {
       );
     } else {
       RecordAudioRecorderController audioRecorderController =
-          RecordAudioRecorderController();
+          globalRecordAudioRecorderController;
       audioRecorderController.encoder = AudioEncoder.wav;
       platformAudioRecorder = PlatformAudioRecorder(
         onStop: _onStop,
