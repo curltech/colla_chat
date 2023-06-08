@@ -59,16 +59,19 @@ class _PlatformAudioRecorderWidgetState
       RecordAudioRecorderController recordAudioRecorderController =
           widget.audioRecorderController as RecordAudioRecorderController;
       if (recordAudioRecorderController.encoder == AudioEncoder.aacLc) {
-        isSelected = const [true, false, false, false];
+        isSelected = const [true, false, false, false, false];
       }
-      if (recordAudioRecorderController.encoder == AudioEncoder.amrWb) {
-        isSelected = const [false, true, false, false];
+      if (recordAudioRecorderController.encoder == AudioEncoder.aacHe) {
+        isSelected = const [false, true, false, false, false];
       }
       if (recordAudioRecorderController.encoder == AudioEncoder.pcm8bit) {
-        isSelected = const [false, false, true, false];
+        isSelected = const [false, false, true, false, false];
+      }
+      if (recordAudioRecorderController.encoder == AudioEncoder.opus) {
+        isSelected = const [false, false, false, true, false];
       }
       if (recordAudioRecorderController.encoder == AudioEncoder.wav) {
-        isSelected = const [false, false, false, true];
+        isSelected = const [false, false, false, false, true];
       }
     }
     var toggleWidget = ToggleButtons(
@@ -90,7 +93,7 @@ class _PlatformAudioRecorderWidgetState
             RecordAudioRecorderController recordAudioRecorderController =
                 widget.audioRecorderController as RecordAudioRecorderController;
             setState(() {
-              recordAudioRecorderController.encoder = AudioEncoder.amrWb;
+              recordAudioRecorderController.encoder = AudioEncoder.aacHe;
             });
           }
         } else if (newIndex == 2) {
@@ -106,6 +109,14 @@ class _PlatformAudioRecorderWidgetState
             RecordAudioRecorderController recordAudioRecorderController =
                 widget.audioRecorderController as RecordAudioRecorderController;
             setState(() {
+              recordAudioRecorderController.encoder = AudioEncoder.opus;
+            });
+          }
+        } else if (newIndex == 4) {
+          if (widget.audioRecorderController is RecordAudioRecorderController) {
+            RecordAudioRecorderController recordAudioRecorderController =
+                widget.audioRecorderController as RecordAudioRecorderController;
+            setState(() {
               recordAudioRecorderController.encoder = AudioEncoder.wav;
             });
           }
@@ -117,10 +128,13 @@ class _PlatformAudioRecorderWidgetState
             child: const CommonAutoSizeText('aacLc')),
         Container(
             padding: const EdgeInsets.all(10.0),
-            child: const CommonAutoSizeText('amrWb')),
+            child: const CommonAutoSizeText('aacHe')),
         Container(
             padding: const EdgeInsets.all(10.0),
             child: const CommonAutoSizeText('pcm8bit')),
+        Container(
+            padding: const EdgeInsets.all(10.0),
+            child: const CommonAutoSizeText('opus')),
         Container(
             padding: const EdgeInsets.all(10.0),
             child: const CommonAutoSizeText('wav')),

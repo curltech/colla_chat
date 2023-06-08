@@ -31,6 +31,7 @@ enum ChatMessageMimeType {
   webm,
   ogg,
   wav,
+  opus,
   xml,
   pdf,
   csv,

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/media/abstract_audio_recorder_controller.dart';
 import 'package:colla_chat/widgets/media/audio/recorder/another_audio_recorder.dart';
@@ -125,16 +126,16 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
         AppLocalizations.t(widget.audioRecorderController.durationText);
     Icon playIcon;
     if (widget.audioRecorderController.status == RecorderStatus.recording) {
-      playIcon = const Icon(
+      playIcon = Icon(
         Icons.pause,
         size: 32,
-        color: Colors.white,
+        color: myself.primary,
       );
     } else {
-      playIcon = const Icon(
+      playIcon = Icon(
         Icons.play_arrow,
         size: 32,
-        color: Colors.white,
+        color: myself.primary,
       );
     }
     List<Widget> controls = [];
@@ -142,10 +143,10 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
         widget.audioRecorderController.status == RecorderStatus.pause) {
       controls.add(
         IconButton(
-          icon: const Icon(
+          icon: Icon(
             Icons.stop,
             size: 32,
-            color: Colors.white,
+            color: myself.primary,
           ),
           onPressed: () async {
             await _stop();
@@ -174,7 +175,7 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
     controls.add(
       CommonAutoSizeText(
         controlText,
-        style: const TextStyle(color: Colors.white),
+        // style: const TextStyle(color: Colors.white),
       ),
     );
     var container = SizedBox(

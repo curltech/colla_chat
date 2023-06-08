@@ -10,7 +10,16 @@ class WebViewVideoPlayerController extends AbstractMediaPlayerController {
 
   WebViewVideoPlayerController() {
     fileType = FileType.custom;
-    allowedExtensions = ['mp3', 'wav', 'mp4', 'm4a', 'mov', 'mpeg', 'aac'];
+    allowedExtensions = [
+      'mp3',
+      'wav',
+      'mp4',
+      'm4a',
+      'mov',
+      'mpeg',
+      'aac',
+      'opus'
+    ];
   }
 
   @override
