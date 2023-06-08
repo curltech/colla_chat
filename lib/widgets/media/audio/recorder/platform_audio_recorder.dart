@@ -125,16 +125,28 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
         AppLocalizations.t(widget.audioRecorderController.durationText);
     Icon playIcon;
     if (widget.audioRecorderController.status == RecorderStatus.recording) {
-      playIcon = const Icon(Icons.pause, size: 32);
+      playIcon = const Icon(
+        Icons.pause,
+        size: 32,
+        color: Colors.white,
+      );
     } else {
-      playIcon = const Icon(Icons.play_arrow, size: 32);
+      playIcon = const Icon(
+        Icons.play_arrow,
+        size: 32,
+        color: Colors.white,
+      );
     }
     List<Widget> controls = [];
     if (widget.audioRecorderController.status == RecorderStatus.recording ||
         widget.audioRecorderController.status == RecorderStatus.pause) {
       controls.add(
         IconButton(
-          icon: const Icon(Icons.stop, size: 32),
+          icon: const Icon(
+            Icons.stop,
+            size: 32,
+            color: Colors.white,
+          ),
           onPressed: () async {
             await _stop();
           },
@@ -160,7 +172,10 @@ class _PlatformAudioRecorderState extends State<PlatformAudioRecorder> {
       ),
     );
     controls.add(
-      CommonAutoSizeText(controlText),
+      CommonAutoSizeText(
+        controlText,
+        style: const TextStyle(color: Colors.white),
+      ),
     );
     var container = SizedBox(
       width: widget.width,

@@ -82,22 +82,30 @@ class _PlatformVideoPlayerWidgetState extends State<PlatformVideoPlayerWidget> {
         }
       },
       children: const <Widget>[
-        Icon(
-          Icons.web_outlined,
-          color: Colors.white,
-        ),
-        Icon(
+        Tooltip(
+            message: 'WebView',
+            child: Icon(
+              Icons.web_outlined,
+              color: Colors.white,
+            )),
+        Tooltip(
+          message: 'Meedu',
+          child: Icon(
           Icons.video_call_outlined,
           color: Colors.white,
-        ),
-        Icon(
+        )),
+        Tooltip(
+          message: 'MediaKit',
+          child:Icon(
           Icons.media_bluetooth_on,
           color: Colors.white,
-        ),
-        Icon(
+        )),
+        Tooltip(
+          message: 'Origin',
+          child:Icon(
           Icons.video_camera_back_outlined,
           color: Colors.white,
-        ),
+        )),
       ],
     );
     List<Widget> children = [

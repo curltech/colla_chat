@@ -65,7 +65,11 @@ abstract class AbstractAudioPlayerController
   }) {
     var progressText = this.progressText;
     Widget stopBtn = IconButton(
-      icon: const Icon(Icons.stop_rounded, size: 32),
+      icon: const Icon(
+        Icons.stop_rounded,
+        size: 32,
+        color: Colors.white,
+      ),
       onPressed: () async {
         await stop();
       },
@@ -77,7 +81,11 @@ abstract class AbstractAudioPlayerController
     if (mediaPlayerState.mediaPlayerStatus == MediaPlayerStatus.playing) {
       controls.add(
         IconButton(
-          icon: const Icon(Icons.pause_rounded, size: 32),
+          icon: const Icon(
+            Icons.pause_rounded,
+            size: 32,
+            color: Colors.white,
+          ),
           onPressed: () async {
             await pause();
           },
@@ -95,7 +103,11 @@ abstract class AbstractAudioPlayerController
     } else {
       controls.add(
         IconButton(
-          icon: const Icon(Icons.play_arrow_rounded, size: 32),
+          icon: const Icon(
+            Icons.play_arrow_rounded,
+            size: 32,
+            color: Colors.white,
+          ),
           onPressed: () async {
             await play();
           },
@@ -115,7 +127,10 @@ abstract class AbstractAudioPlayerController
       }
     }
     controls.add(
-      CommonAutoSizeText(progressText),
+      CommonAutoSizeText(
+        progressText,
+        style: const TextStyle(color: Colors.white),
+      ),
     );
     var container = SizedBox(
       width: 240,

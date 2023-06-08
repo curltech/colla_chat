@@ -79,22 +79,30 @@ class _PlatformAudioPlayerWidgetState extends State<PlatformAudioPlayerWidget> {
         }
       },
       children: const <Widget>[
-        Icon(
-          Icons.web_outlined,
-          color: Colors.white,
-        ),
-        Icon(
-          Icons.fireplace,
-          color: Colors.white,
-        ),
-        Icon(
-          Icons.audiotrack_outlined,
-          color: Colors.white,
-        ),
-        Icon(
-          Icons.multitrack_audio,
-          color: Colors.white,
-        ),
+        Tooltip(
+            message: 'WebView',
+            child: Icon(
+              Icons.web_outlined,
+              color: Colors.white,
+            )),
+        Tooltip(
+            message: 'BlueFire',
+            child: Icon(
+              Icons.fireplace,
+              color: Colors.white,
+            )),
+        Tooltip(
+            message: 'Just',
+            child: Icon(
+              Icons.audiotrack_outlined,
+              color: Colors.white,
+            )),
+        Tooltip(
+            message: 'Waveforms',
+            child: Icon(
+              Icons.multitrack_audio,
+              color: Colors.white,
+            )),
       ],
     );
     List<Widget> children = [
