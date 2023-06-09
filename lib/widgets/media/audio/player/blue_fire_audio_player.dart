@@ -13,7 +13,7 @@ import 'package:flutter/material.dart';
 class BlueFireAudioPlayer {
   AudioPlayer player = AudioPlayer();
 
-  static GlobalPlatformInterface get _global => AudioPlayer.global;
+  static GlobalAudioScope get _global => AudioPlayer.global;
 
   // Set config for all platforms
   AudioContextConfig audioContextConfig = AudioContextConfig();

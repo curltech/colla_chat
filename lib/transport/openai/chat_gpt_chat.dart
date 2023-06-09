@@ -34,7 +34,7 @@ class ChatGPTChat {
       Function(dynamic)? onComplete}) {
     final request = CompleteText(
       prompt: prompt,
-      model: Model.textDavinci3,
+      model: TextDavinci3Model(),
       temperature: temperature,
       maxTokens: maxTokens,
       topP: topP,
@@ -42,8 +42,7 @@ class ChatGPTChat {
       presencePenalty: presencePenalty,
       stop: stop,
     );
-    Stream<dynamic> response =
-        openAI.onCompletion(request: request).asStream();
+    Stream<dynamic> response = openAI.onCompletion(request: request).asStream();
     response.listen(onComplete).onError((err) {});
   }
 
