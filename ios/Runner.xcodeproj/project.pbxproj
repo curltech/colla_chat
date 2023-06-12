@@ -17,6 +17,8 @@
 		F41955F42A361F68008F271E /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F41955F32A361F68008F271E /* ShareViewController.swift */; };
 		F41955F72A361F68008F271E /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F41955F52A361F68008F271E /* MainInterface.storyboard */; };
 		F41955FB2A361F68008F271E /* Share Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F41955F12A361F68008F271E /* Share Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		F455125E2A3749E300DBE275 /* SharingFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = F455125D2A3749E300DBE275 /* SharingFile.swift */; };
+		F45512602A374A0F00DBE275 /* SharingFileType.swift in Sources */ = {isa = PBXBuildFile; fileRef = F455125F2A374A0F00DBE275 /* SharingFileType.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -77,6 +79,8 @@
 		F41955F82A361F68008F271E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		F41956012A362526008F271E /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		F41956022A36260C008F271E /* Share Extension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "Share Extension.entitlements"; sourceTree = "<group>"; };
+		F455125D2A3749E300DBE275 /* SharingFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingFile.swift; sourceTree = "<group>"; };
+		F455125F2A374A0F00DBE275 /* SharingFileType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharingFileType.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -171,6 +175,8 @@
 				F41955F32A361F68008F271E /* ShareViewController.swift */,
 				F41955F52A361F68008F271E /* MainInterface.storyboard */,
 				F41955F82A361F68008F271E /* Info.plist */,
+				F455125D2A3749E300DBE275 /* SharingFile.swift */,
+				F455125F2A374A0F00DBE275 /* SharingFileType.swift */,
 			);
 			path = "Share Extension";
 			sourceTree = "<group>";
@@ -327,6 +333,7 @@
 			files = (
 			);
 			inputPaths = (
+				"${TARGET_BUILD_DIR}/${INFOPLIST_PATH}",
 			);
 			name = "Thin Binary";
 			outputPaths = (
@@ -383,6 +390,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F455125E2A3749E300DBE275 /* SharingFile.swift in Sources */,
+				F45512602A374A0F00DBE275 /* SharingFileType.swift in Sources */,
 				F41955F42A361F68008F271E /* ShareViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -625,6 +634,8 @@
 				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = 6T8MC3433B;
 				ENABLE_BITCODE = NO;
@@ -635,6 +646,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.curltech.collaChat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -651,6 +663,8 @@
 				BUILD_LIBRARY_FOR_DISTRIBUTION = NO;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = "$(FLUTTER_BUILD_NUMBER)";
 				DEVELOPMENT_TEAM = 6T8MC3433B;
 				ENABLE_BITCODE = NO;
@@ -661,6 +675,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.curltech.collaChat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -682,7 +697,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Share Extension/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Share Extension";
+				INFOPLIST_KEY_CFBundleDisplayName = "Sharing Extension";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -693,7 +708,7 @@
 				MARKETING_VERSION = 1.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.curltech.collaChat.Share-Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = io.curltech.collaChat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
@@ -719,7 +734,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Share Extension/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Share Extension";
+				INFOPLIST_KEY_CFBundleDisplayName = "Sharing Extension";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -729,7 +744,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.curltech.collaChat.Share-Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = io.curltech.collaChat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -754,7 +769,7 @@
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Share Extension/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = "Share Extension";
+				INFOPLIST_KEY_CFBundleDisplayName = "Sharing Extension";
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 16.4;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -764,7 +779,7 @@
 				);
 				MARKETING_VERSION = 1.0;
 				MTL_FAST_MATH = YES;
-				PRODUCT_BUNDLE_IDENTIFIER = "io.curltech.collaChat.Share-Extension";
+				PRODUCT_BUNDLE_IDENTIFIER = io.curltech.collaChat;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SKIP_INSTALL = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
