@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
@@ -232,7 +233,7 @@ class _PlaylistWidgetState extends State<PlaylistWidget> {
       contentType: contentType,
       mimeType: mediaFormat,
       title: filename,
-      thumbnail: thumbnail,
+      thumbnail: CryptoUtil.encodeBase64(thumbnail!),
     );
     await chatMessageService.store(chatMessage);
   }

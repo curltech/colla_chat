@@ -21,8 +21,9 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_sharing_intent/flutter_sharing_intent.dart';
+import 'package:flutter_sharing_intent/model/sharing_file.dart';
 import 'package:provider/provider.dart';
-import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 ///主工作区，是PageView
 class IndexWidget extends StatefulWidget {
@@ -44,8 +45,7 @@ class IndexWidget extends StatefulWidget {
 class _IndexWidgetState extends State<IndexWidget>
     with SingleTickerProviderStateMixin {
   late StreamSubscription _intentDataStreamSubscription;
-  late List<SharedMediaFile> _sharedFiles;
-  late String _sharedText;
+  late List<SharedFile> _sharedFiles;
 
   @override
   void initState() {
@@ -59,57 +59,34 @@ class _IndexWidgetState extends State<IndexWidget>
       return;
     }
     // 应用打开时分享的媒体文件
-    _intentDataStreamSubscription = ReceiveSharingIntent.getMediaStream()
-        .listen((List<SharedMediaFile> value) {
-      logger.i("Shared:${_sharedFiles.map((f) => f.path).join(",") ?? ""}");
+    _intentDataStreamSubscription = FlutterSharingIntent.instance
+        .getMediaStream()
+        .listen((List<SharedFile> value) {
       _sharedFiles = value;
       if (_sharedFiles.isNotEmpty) {
-        _shareChatMessage(file: _sharedFiles.first);
+        _shareChatMessage(_sharedFiles.first);
       }
     }, onError: (err) {
       logger.e("getIntentDataStream error: $err");
     });
 
     // 应用关闭时分享的媒体文件
-    ReceiveSharingIntent.getInitialMedia().then((List<SharedMediaFile> value) {
+    FlutterSharingIntent.instance
+        .getInitialSharing()
+        .then((List<SharedFile> value) {
       _sharedFiles = value;
       if (_sharedFiles.isNotEmpty) {
-        _shareChatMessage(file: _sharedFiles.first);
-      }
-    });
-
-    // 应用打开时分享的文本
-    _intentDataStreamSubscription =
-        ReceiveSharingIntent.getTextStream().listen((String value) {
-      if (value.isNotEmpty) {
-        _sharedText = value;
-        _shareChatMessage(content: _sharedText);
-      }
-    }, onError: (err) {
-      logger.e("getLinkStream error: $err");
-    });
-
-    // 应用关闭时分享的文本
-    ReceiveSharingIntent.getInitialText().then((String? value) {
-      if (value != null) {
-        _sharedText = value;
-        if (_sharedText.isNotEmpty) {
-          _shareChatMessage(content: _sharedText);
-        }
+        _shareChatMessage(_sharedFiles.first);
       }
     });
   }
 
-  Future<void> _shareChatMessage(
-      {SharedMediaFile? file, String? content}) async {
-    if (file == null && content == null) {
-      return;
-    }
-    String? title;
-    int pos = content!.indexOf('http');
-    if (pos > -1) {
-      title = content.substring(0, pos);
-      content = '#${content.substring(pos)}#';
+  Future<void> _shareChatMessage(SharedFile file) async {
+    String? content = file.value;
+    String? thumbnail = file.thumbnail;
+    SharedMediaType type = file.type;
+    if (type == SharedMediaType.URL) {
+      content = '#$content#';
     }
     await DialogUtil.show(
         context: context,
@@ -135,13 +112,27 @@ class _IndexWidgetState extends State<IndexWidget>
                     if (current != null) {
                       chatMessageController.chatSummary = current;
                       indexWidgetProvider.push('chat_message');
-                      if (content != null) {
+                      if (type == SharedMediaType.TEXT ||
+                          type == SharedMediaType.URL) {
+                        ChatMessageContentType contentType =
+                            ChatMessageContentType.text;
+                        if (type == SharedMediaType.URL) {
+                          contentType = ChatMessageContentType.url;
+                        }
                         await chatMessageController.sendText(
-                            title: title, message: content);
-                      }
-                      if (file != null) {
-                        String filename = file.path;
-                        String? thumbnail = file.thumbnail;
+                            message: content, contentType: contentType);
+                      } else if (type == SharedMediaType.VIDEO ||
+                          type == SharedMediaType.IMAGE ||
+                          type == SharedMediaType.FILE) {
+                        ChatMessageContentType contentType =
+                            ChatMessageContentType.file;
+                        if (type == SharedMediaType.VIDEO) {
+                          contentType = ChatMessageContentType.video;
+                        }
+                        if (type == SharedMediaType.IMAGE) {
+                          contentType = ChatMessageContentType.image;
+                        }
+                        String filename = content!;
                         Uint8List? data = await FileUtil.readFile(filename);
                         if (data != null) {
                           String? mimeType = FileUtil.mimeType(filename);
@@ -149,8 +140,8 @@ class _IndexWidgetState extends State<IndexWidget>
                           await chatMessageController.send(
                               title: filename,
                               content: data,
-                              // thumbnail: thumbnail,
-                              contentType: ChatMessageContentType.file,
+                              thumbnail: thumbnail,
+                              contentType: contentType,
                               mimeType: mimeType);
                         }
                       }
@@ -195,5 +186,11 @@ class _IndexWidgetState extends State<IndexWidget>
   Widget build(BuildContext context) {
     var pageView = _createPageView(context);
     return pageView;
+  }
+
+  @override
+  void dispose() {
+    _intentDataStreamSubscription.cancel();
+    super.dispose();
   }
 }

@@ -154,7 +154,7 @@ class MessageWidget {
         case ChatMessageContentType.rich:
           body = buildRichTextMessageWidget(context);
           break;
-        case ChatMessageContentType.link:
+        case ChatMessageContentType.url:
           body = buildUrlMessageWidget(context);
           break;
         case ChatMessageContentType.location:

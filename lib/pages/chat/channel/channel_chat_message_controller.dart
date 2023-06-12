@@ -95,7 +95,7 @@ class MyChannelChatMessageController extends DataMoreController<ChatMessage> {
   }
 
   Future<ChatMessage> buildChannelChatMessage(
-      String title, String content, Uint8List? thumbnail) async {
+      String title, String content, String? thumbnail) async {
     ChatMessage chatMessage = await chatMessageService.buildChatMessage(
         title: title,
         content: content,

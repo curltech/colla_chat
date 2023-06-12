@@ -291,7 +291,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     PartyType? groupType,
     String? title,
     String? receiptType,
-    Uint8List? thumbnail,
+    String? thumbnail, // CryptoUtil.encodeBase64
     String? status,
     int deleteTime = 0,
     String? parentMessageId,
@@ -337,9 +337,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     }
     chatMessage.title = title;
     chatMessage.receiptType = receiptType;
-    if (thumbnail != null) {
-      chatMessage.thumbnail = CryptoUtil.encodeBase64(thumbnail);
-    }
+    chatMessage.thumbnail = thumbnail;
 
     if (content != null) {
       List<int> data;
@@ -378,7 +376,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String? messageId,
     TransportType transportType = TransportType.webrtc,
     String? receiptType,
-    Uint8List? thumbnail,
+    String? thumbnail,
     int deleteTime = 0,
     String? parentMessageId,
     List<String>? peerIds,
@@ -711,10 +709,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     ChatMessageContentType? contentType = StringUtil.enumFromString(
         ChatMessageContentType.values, chatMessage.contentType);
 
-    Uint8List? thumbnail;
-    if (chatMessage.thumbnail != null) {
-      thumbnail = CryptoUtil.decodeBase64(chatMessage.thumbnail!);
-    }
+    String? thumbnail = chatMessage.thumbnail!;
     Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
     // ChatMessageMimeType? chatMessageMimeType =
     //     StringUtil.enumFromString<ChatMessageMimeType>(

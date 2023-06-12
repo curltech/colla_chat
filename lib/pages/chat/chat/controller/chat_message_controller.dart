@@ -191,7 +191,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
   Future<ChatMessage?> send(
       {String? title,
       dynamic content,
-      Uint8List? thumbnail,
+      String? thumbnail,
       ChatMessageContentType contentType = ChatMessageContentType.text,
       String? mimeType,
       String? messageId,

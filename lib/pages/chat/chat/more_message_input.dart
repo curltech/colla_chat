@@ -359,10 +359,7 @@ class _MoreMessageInputState extends State<MoreMessageInput> {
           });
       var collection = collectionChatMessageController.current;
       if (collection != null) {
-        Uint8List? thumbnail;
-        if (collection.thumbnail != null) {
-          thumbnail = CryptoUtil.decodeBase64(collection.thumbnail!);
-        }
+        String? thumbnail = collection.thumbnail!;
         ChatMessageContentType? contentType = StringUtil.enumFromString(
             ChatMessageContentType.values, collection.contentType);
         contentType ??= ChatMessageContentType.text;

@@ -49,7 +49,7 @@ class PublishChannelItemWidget extends StatefulWidget with TileDataMixin {
 
 class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
   final TextEditingController textEditingController = TextEditingController();
-  ValueNotifier<Uint8List?> thumbnail = ValueNotifier<Uint8List?>(null);
+  ValueNotifier<String?> thumbnail = ValueNotifier<String?>(null);
   ValueNotifier<String?> html = ValueNotifier<String?>(null);
 
   @override
@@ -61,7 +61,7 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
         textEditingController.text = chatMessage.title!;
       }
       if (chatMessage.thumbnail != null) {
-        thumbnail.value = CryptoUtil.decodeBase64(chatMessage.thumbnail!);
+        thumbnail.value = chatMessage.thumbnail!;
       }
       _init(chatMessage);
     }
@@ -94,7 +94,7 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
     if (chatMessage != null) {
       chatMessage.title = title;
       chatMessage.content = chatMessageService.processContent(html.value!);
-      chatMessage.thumbnail = CryptoUtil.encodeBase64(thumbnail.value!);
+      chatMessage.thumbnail = thumbnail.value;
     } else {
       chatMessage = await myChannelChatMessageController
           .buildChannelChatMessage(title, html.value!, thumbnail.value);
@@ -122,12 +122,14 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
     if (platformParams.desktop) {
       List<XFile> xfiles = await FileUtil.pickFiles(type: FileType.image);
       if (xfiles.isNotEmpty) {
-        thumbnail.value = await xfiles[0].readAsBytes();
+        var data = await xfiles[0].readAsBytes();
+        thumbnail.value = CryptoUtil.encodeBase64(data);
       }
     } else if (platformParams.mobile) {
       List<AssetEntity>? assets = await AssetUtil.pickAssets(context);
       if (assets != null && assets.isNotEmpty) {
-        thumbnail.value = await assets[0].originBytes;
+        var data = await assets[0].originBytes;
+        thumbnail.value = CryptoUtil.encodeBase64(data!);
       }
     }
   }
@@ -160,11 +162,11 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
           ),
           ValueListenableBuilder(
               valueListenable: thumbnail,
-              builder: (BuildContext context, List<int>? value, Widget? child) {
+              builder: (BuildContext context, String? value, Widget? child) {
                 Widget? trailing;
                 if (value != null) {
                   trailing = ImageUtil.buildMemoryImageWidget(
-                      value as Uint8List,
+                      CryptoUtil.decodeBase64(value),
                       height: AppImageSize.mdSize,
                       width: AppImageSize.mdSize);
                 }

@@ -12,7 +12,7 @@ enum ChatMessageContentType {
   display,
   card,
   channel,
-  link,
+  url,
   location,
   action,
 }
