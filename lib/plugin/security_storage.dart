@@ -1,3 +1,4 @@
+import 'package:colla_chat/platform.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import 'logger.dart';
@@ -8,7 +9,20 @@ class LocalSecurityStorage {
 
   save(String key, String value) async {
     try {
-      return await _secureStorage.write(key: key, value: value);
+      const iOptions =
+          IOSOptions(accessibility: KeychainAccessibility.unlocked);
+      AndroidOptions aOptions = const AndroidOptions(
+        encryptedSharedPreferences: true,
+      );
+      if (platformParams.android) {
+        return await _secureStorage.write(
+            key: key, value: value, aOptions: aOptions);
+      } else if (platformParams.ios) {
+        return await _secureStorage.write(
+            key: key, value: value, iOptions: iOptions);
+      } else {
+        return await _secureStorage.write(key: key, value: value);
+      }
     } catch (e) {
       logger.e('LocalSecurityStorage save:$e');
     }
