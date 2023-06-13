@@ -5,6 +5,7 @@ import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/entity/dht/base.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -12,6 +13,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/chat_summary.dart';
 import 'package:colla_chat/service/chat/peer_party.dart';
+import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/image_util.dart';
@@ -140,24 +142,24 @@ class LinkmanService extends PeerPartyService<Linkman> {
     if (old == null) {
       linkman.id = null;
       await insert(linkman);
-      linkmen[linkman.peerId] = linkman;
-      await chatSummaryService.upsertByLinkman(linkman);
     } else {
       linkman.id = old.id;
       await update(linkman);
-      linkmen[linkman.peerId] = linkman;
-      await chatSummaryService.upsertByLinkman(linkman);
     }
+    linkmen[linkman.peerId] = linkman;
+    peerClientService.storeByPeerEntity(linkman);
+    myselfPeerService.storeByPeerEntity(linkman);
+    chatSummaryService.upsertByLinkman(linkman);
     linkmen.remove(linkman.peerId);
   }
 
-  ///通过peerclient增加或者修改
-  Future<Linkman> storeByPeerClient(PeerClient peerClient,
+  ///通过peerEntity增加或者修改
+  Future<Linkman> storeByPeerEntity(PeerEntity peerEntity,
       {LinkmanStatus? linkmanStatus}) async {
-    String peerId = peerClient.peerId;
+    String peerId = peerEntity.peerId;
     Linkman? linkman = await findCachedOneByPeerId(peerId);
     if (linkman == null) {
-      Map<String, dynamic> map = peerClient.toJson();
+      Map<String, dynamic> map = peerEntity.toJson();
       linkman = Linkman.fromJson(map);
       if (linkmanStatus != null) {
         linkman.linkmanStatus = linkmanStatus.name;
@@ -168,19 +170,19 @@ class LinkmanService extends PeerPartyService<Linkman> {
       if (linkmanStatus != null) {
         linkman.linkmanStatus = linkmanStatus.name;
       }
-      linkman.email = peerClient.email;
-      linkman.mobile = peerClient.mobile;
-      linkman.name = peerClient.name;
-      linkman.clientId = peerClient.clientId;
-      linkman.avatar = peerClient.avatar;
-      linkman.status = peerClient.status;
-      linkman.address = peerClient.address;
-      linkman.startDate = peerClient.startDate;
-      linkman.endDate = peerClient.endDate;
-      linkman.activeStatus = peerClient.activeStatus;
-      linkman.trustLevel = peerClient.trustLevel;
-      linkman.publicKey = peerClient.publicKey;
-      linkman.peerPublicKey = peerClient.peerPublicKey;
+      linkman.email = peerEntity.email;
+      linkman.mobile = peerEntity.mobile;
+      linkman.name = peerEntity.name;
+      linkman.clientId = peerEntity.clientId;
+      linkman.avatar = peerEntity.avatar;
+      linkman.status = peerEntity.status;
+      linkman.address = peerEntity.address;
+      linkman.startDate = peerEntity.startDate;
+      linkman.endDate = peerEntity.endDate;
+      linkman.activeStatus = peerEntity.activeStatus;
+      linkman.trustLevel = peerEntity.trustLevel;
+      linkman.publicKey = peerEntity.publicKey;
+      linkman.peerPublicKey = peerEntity.peerPublicKey;
       await update(linkman);
     }
     await chatSummaryService.upsertByLinkman(linkman);
@@ -229,7 +231,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
       String json = CryptoUtil.utf8ToString(data);
       Map<String, dynamic> map = JsonUtil.toJson(json);
       PeerClient peerClient = PeerClient.fromJson(map);
-      return await linkmanService.storeByPeerClient(peerClient);
+      return await linkmanService.storeByPeerEntity(peerClient);
     } else {
       var messageId = chatReceipt.messageId!;
       ChatMessage? chatMessage =
@@ -268,7 +270,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
     Map<String, dynamic> map = JsonUtil.toJson(json);
     PeerClient peerClient = PeerClient.fromJson(map);
     await peerClientService.store(peerClient);
-    return await linkmanService.storeByPeerClient(peerClient);
+    return await linkmanService.storeByPeerEntity(peerClient);
   }
 
   removeByPeerId(String peerId) {

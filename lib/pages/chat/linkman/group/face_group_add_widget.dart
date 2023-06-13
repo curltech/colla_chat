@@ -96,7 +96,7 @@ class _FaceGroupAddWidgetState extends State<FaceGroupAddWidget> {
                 onPressed: () async {
                   logger.i('add peerClient:$subtitle as linkman');
                   Linkman linkman =
-                      await linkmanService.storeByPeerClient(peerClient);
+                      await linkmanService.storeByPeerEntity(peerClient);
                   await linkmanService.update(
                       {'id': linkman.id, 'status': LinkmanStatus.friend.name});
                 },

@@ -113,7 +113,7 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
             onPressed: () async {
               await peerClientService.store(peerClient,
                   mobile: false, email: false);
-              await linkmanService.storeByPeerClient(peerClient);
+              await linkmanService.storeByPeerEntity(peerClient);
               _buildTiles(peerClients);
               if (mounted) {
                 DialogUtil.info(context,

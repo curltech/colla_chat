@@ -141,7 +141,7 @@ class _ContactLinkmanAddWidgetState extends State<ContactLinkmanAddWidget> {
             contactMap.remove(hash);
             peerClient.mobile = contact.mobile;
             Linkman linkman =
-                await linkmanService.storeByPeerClient(peerClient);
+                await linkmanService.storeByPeerEntity(peerClient);
             await linkmanService.update({
               'id': linkman.id,
               'status': LinkmanStatus.friend.name

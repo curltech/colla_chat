@@ -666,7 +666,7 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
     var map = JsonUtil.toJson(content);
     PeerClient peerClient = PeerClient.fromJson(map);
     await peerClientService.store(peerClient);
-    Linkman linkman = await linkmanService.storeByPeerClient(peerClient);
+    Linkman linkman = await linkmanService.storeByPeerEntity(peerClient);
     if (linkman.linkmanStatus == LinkmanStatus.friend.name) {
       return;
     }

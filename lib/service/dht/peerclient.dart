@@ -1,10 +1,13 @@
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/cryptography.dart';
+import 'package:colla_chat/entity/dht/base.dart';
 import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/dht/peerprofile.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/dht/base.dart';
+import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/service/dht/peerprofile.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/image_util.dart';
@@ -143,6 +146,8 @@ class PeerClientService extends PeerEntityService<PeerClient> {
     if (!peerClients.containsKey(peerId)) {
       peerClients[peerId] = {};
     }
+    linkmanService.storeByPeerEntity(peerClient);
+    myselfPeerService.storeByPeerEntity(peerClient);
     peerClients[peerId]![clientId] = peerClient;
     await refresh(peerId, clientId: clientId);
   }
@@ -157,6 +162,36 @@ class PeerClientService extends PeerEntityService<PeerClient> {
     refresh(peerId);
 
     return data;
+  }
+
+  ///通过peerEntity修改
+  Future<PeerClient> storeByPeerEntity(PeerEntity peerEntity) async {
+    String peerId = peerEntity.peerId;
+    PeerClient? peerClient = await findCachedOneByPeerId(peerId);
+    if (peerClient == null) {
+      Map<String, dynamic> map = peerEntity.toJson();
+      peerClient = PeerClient.fromJson(map);
+      peerClient.id = null;
+      await insert(peerClient);
+    } else {
+      peerClient.email = peerEntity.email;
+      peerClient.mobile = peerEntity.mobile;
+      peerClient.name = peerEntity.name;
+      peerClient.clientId = peerEntity.clientId;
+      peerClient.avatar = peerEntity.avatar;
+      peerClient.status = peerEntity.status;
+      peerClient.address = peerEntity.address;
+      peerClient.startDate = peerEntity.startDate;
+      peerClient.endDate = peerEntity.endDate;
+      peerClient.activeStatus = peerEntity.activeStatus;
+      peerClient.trustLevel = peerEntity.trustLevel;
+      peerClient.publicKey = peerEntity.publicKey;
+      peerClient.peerPublicKey = peerEntity.peerPublicKey;
+      await update(peerClient);
+    }
+    peerClients.remove(peerClient.peerId);
+
+    return peerClient;
   }
 }
 

@@ -104,6 +104,36 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     return peer;
   }
 
+  ///通过peerEntity修改
+  Future<MyselfPeer?> storeByPeerEntity(PeerEntity peerEntity) async {
+    String peerId = peerEntity.peerId;
+    MyselfPeer? myselfPeer = await findOneByPeerId(peerId);
+    if (myselfPeer != null) {
+      myselfPeer.email = peerEntity.email;
+      myselfPeer.mobile = peerEntity.mobile;
+      myselfPeer.name = peerEntity.name;
+      myselfPeer.clientId = peerEntity.clientId;
+      myselfPeer.avatar = peerEntity.avatar;
+      myselfPeer.status = peerEntity.status;
+      myselfPeer.address = peerEntity.address;
+      myselfPeer.startDate = peerEntity.startDate;
+      myselfPeer.endDate = peerEntity.endDate;
+      myselfPeer.activeStatus = peerEntity.activeStatus;
+      myselfPeer.trustLevel = peerEntity.trustLevel;
+      await update(myselfPeer);
+      if (peerId == myself.peerId) {
+        myself.myselfPeer = myselfPeer;
+        PeerProfile? peerProfile =
+            await peerProfileService.findCachedOneByPeerId(peerId);
+        if (peerProfile != null) {
+          myselfPeer.peerProfile = peerProfile;
+        }
+      }
+    }
+
+    return myselfPeer;
+  }
+
   /// 注册新的p2p账户
   Future<MyselfPeer> register(String name, String loginName, String password,
       {String? code, String? mobile, String? email}) async {
@@ -211,7 +241,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     //最后一次成功登录的用户名
     String lastLogin = JsonUtil.toJsonString({credentialName: credential});
     await localSecurityStorage.save(lastLoginName, lastLogin);
-    var m=await localSecurityStorage.getAll();
+    var m = await localSecurityStorage.getAll();
   }
 
   ///获取最后一次登录的用户名和密码，如果都存在，快捷登录
@@ -233,7 +263,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
   /// 登录，验证本地账户，连接p2p服务节点，注册成功
   Future<bool> login(String credential, String password) async {
     ///本地查找账户
-    var myselfPeer = await myselfPeerService.findOneByLogin(credential);
+    MyselfPeer? myselfPeer = await myselfPeerService.findOneByLogin(credential);
     if (myselfPeer != null) {
       /// 1.验证账户与密码匹配
       try {
@@ -359,8 +389,8 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     }
     var json = JsonUtil.toJson(myself);
     PeerClient peerClient = PeerClient.fromJson(json);
-    await peerClientService.store(peerClient);
-    await linkmanService.storeByPeerClient(peerClient);
+    peerClientService.store(peerClient);
+    linkmanService.storeByPeerEntity(peerClient);
   }
 
   @override
