@@ -31,8 +31,8 @@ class _LocalePickerState extends State<LocalePicker> {
     for (var localeOption in localeOptions) {
       Option<String> option =
           Option<String>(localeOption.label, localeOption.value.toString());
-
-      if (myself.locale.toString() == option.value) {
+      String tag = '${myself.locale.languageCode}_${myself.locale.countryCode}';
+      if (tag == option.value) {
         option.checked = true;
       }
       options.add(option);

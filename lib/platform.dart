@@ -58,6 +58,12 @@ class PlatformParams {
 
     try {
       var locales = io.Platform.localeName.split('_');
+      if (locales.length == 3) {
+        locale = Locale.fromSubtags(
+            languageCode: locales[0],
+            scriptCode: locales[1],
+            countryCode: locales[2]);
+      }
       if (locales.length == 2) {
         locale = Locale(locales[0], locales[1]);
       }

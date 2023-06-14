@@ -338,7 +338,13 @@ class Myself with ChangeNotifier {
 
   /// locale操作
   Locale get locale {
-    return LocaleUtil.getLocale(peerProfile.locale);
+    if (peerProfile.id != null) {
+      return LocaleUtil.getLocale(peerProfile.locale);
+    } else if (platformParams.locale != null) {
+      return platformParams.locale!;
+    } else {
+      return LocaleUtil.getLocale(peerProfile.locale);
+    }
   }
 
   set locale(Locale locale) {
