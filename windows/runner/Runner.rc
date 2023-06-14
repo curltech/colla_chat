@@ -93,9 +93,9 @@ BEGIN
             VALUE "FileDescription", "colla_chat" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "colla_chat" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2023 io.curltech. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2023 io.curltech.colla. All rights reserved." "\0"
             VALUE "OriginalFilename", "colla_chat.exe" "\0"
-            VALUE "ProductName", "colla_chat" "\0"
+            VALUE "ProductName", "CollaChat" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

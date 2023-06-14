@@ -342,7 +342,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
             linkman.linkmanStatus ?? LinkmanStatus.stranger.name;
         linkmanStatus = AppLocalizations.t(linkmanStatus);
         if (peerId == myself.peerId) {
-          linkmanStatus = AppLocalizations.t('myself');
+          linkmanStatus = AppLocalizations.t('Me');
         }
         name = '$name($linkmanStatus)';
         var avatarImage = linkman.avatarImage;
@@ -643,11 +643,10 @@ class _ChatListWidgetState extends State<ChatListWidget>
       width: 10.0,
     ));
 
-    return KeepAliveWrapper(
-        child: AppBarView(
-            title: title,
-            rightWidgets: rightWidgets,
-            child: _buildChatListView(context)));
+    return AppBarView(
+        title: title,
+        rightWidgets: rightWidgets,
+        child: _buildChatListView(context));
   }
 
   @override

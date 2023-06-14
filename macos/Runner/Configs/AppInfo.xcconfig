@@ -11,4 +11,4 @@ PRODUCT_NAME = CollaChat
 PRODUCT_BUNDLE_IDENTIFIER = io.curltech.colla
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2023 io.curltech. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2023 io.curltech.colla. All rights reserved.
