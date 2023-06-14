@@ -4,7 +4,7 @@
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.curltech.io.collaChat</string>
+		<string>group.io.curltech.colla</string>
 	</array>
 </dict>
 </plist>
