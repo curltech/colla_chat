@@ -6,9 +6,9 @@ import 'package:flutter/material.dart';
 
 /// 不同语言版本的下拉选择框的选项
 final localeOptions = [
+  Option('English', LocaleUtil.getLocale('en_US')),
   Option('中文', LocaleUtil.getLocale('zh_CN')),
   Option('繁体中文', LocaleUtil.getLocale('zh_TW')),
-  Option('English', LocaleUtil.getLocale('en_US')),
   Option('日本語', LocaleUtil.getLocale('ja_JP')),
   Option('한국어', LocaleUtil.getLocale('ko_KR'))
 ];

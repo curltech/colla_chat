@@ -363,13 +363,14 @@ dependency_overrides:
   provider: ^6.0.1
   geolocator: ^9.0.2
   apple_maps_flutter: ^1.2.0
-  webview_flutter: ^4.0.6
-  #webview_flutter_android: ^3.1.1
-  #webview_flutter_wkwebview: ^3.0.1
-  #webview_flutter_web: ^0.1.0+4
-  #webview_flutter_platform_interface: ^2.0.0
+  webview_flutter: ^4.2.2
+  webview_flutter_android: ^3.7.1
+  webview_flutter_wkwebview: ^3.4.4
+  webview_flutter_web: ^0.2.2+1
+  webview_flutter_platform_interface: ^2.3.1
   webview_win_floating: #2.0.0 #webView for
     git: https://github.com/jakky1/webview_win_floating.git
+  desktop_webview_window: ^0.2.0
   sprintf: ^7.0.0
   flex_color_picker: ^3.1.0
   permission_handler: ^10.2.0

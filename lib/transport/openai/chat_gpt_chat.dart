@@ -48,7 +48,7 @@ class ChatGPTChat {
 
   Future<List<dynamic>> chatCompletion({
     required ChatModel model,
-    required List<Map<String, String>> messages,
+    required List<Messages> messages,
     double? temperature = .3,
     double? topP = 1.0,
     int? n = 1,
@@ -80,7 +80,7 @@ class ChatGPTChat {
 
   void chatCompletionStream(
       {required ChatModel model,
-      required List<Map<String, String>> messages,
+        required List<Messages> messages,
       double? temperature = .3,
       double? topP = 1.0,
       int? n = 1,
