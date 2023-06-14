@@ -23,16 +23,14 @@ final List<ColumnFieldDef> p2pRegisterInputFieldDef = [
       prefixIcon: Icon(
         Icons.person,
         color: myself.primary,
-      ),
-      initValue: '胡劲松'),
+      )),
   ColumnFieldDef(
       name: 'loginName',
       label: 'LoginName',
       prefixIcon: Icon(
         Icons.mobile_friendly,
         color: myself.primary,
-      ),
-      initValue: '13609619603'),
+      )),
   ColumnFieldDef(
       name: 'email',
       label: 'Email',
@@ -40,13 +38,11 @@ final List<ColumnFieldDef> p2pRegisterInputFieldDef = [
         Icons.email,
         color: myself.primary,
       ),
-      initValue: 'hujs@colla.cc',
       textInputType: TextInputType.emailAddress),
   ColumnFieldDef(
       name: 'plainPassword',
       label: 'PlainPassword',
       inputType: InputType.password,
-      initValue: '1234',
       prefixIcon: Icon(
         Icons.password,
         color: myself.primary,
@@ -55,7 +51,6 @@ final List<ColumnFieldDef> p2pRegisterInputFieldDef = [
       name: 'confirmPassword',
       label: 'ConfirmPassword',
       inputType: InputType.password,
-      initValue: '1234',
       prefixIcon: Icon(
         Icons.confirmation_num,
         color: myself.primary,
@@ -77,7 +72,6 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
   @override
   void initState() {
     super.initState();
-    mobileController.text = '13609619603';
   }
 
   @override
