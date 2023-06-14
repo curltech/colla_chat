@@ -58,7 +58,7 @@ abstract class StatusEntity extends BaseEntity {
   String? statusReason;
   String? statusDate;
 
-  StatusEntity();
+  StatusEntity() : super();
 
   StatusEntity.fromJson(Map json)
       : status = json['status'],

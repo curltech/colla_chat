@@ -52,7 +52,7 @@ class PeerProfileService extends PeerEntityService<PeerProfile> {
           peerProfiles[peerId] = {};
         }
         peerProfiles[peerId]![clientId_] = peerProfile_;
-        if (clientId == peerProfile_.clientId) {
+        if (clientId == null || clientId == peerProfile_.clientId) {
           peerProfile = peerProfile_;
         }
       }

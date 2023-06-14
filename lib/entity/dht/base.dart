@@ -43,9 +43,10 @@ abstract class PeerEntity extends StatusEntity {
   //不存储数据库
   Widget? avatarImage;
   Widget? avatarIcon;
-  late PeerProfile peerProfile;
+  PeerProfile? peerProfile;
 
-  PeerEntity(this.peerId, this.name, {this.clientId = unknownClientId}) {
+  PeerEntity(this.peerId, this.name, {this.clientId = unknownClientId})
+      : super() {
     peerProfile = PeerProfile(peerId, clientId: clientId);
   }
 

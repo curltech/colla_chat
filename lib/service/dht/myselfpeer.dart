@@ -122,11 +122,11 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       myselfPeer.trustLevel = peerEntity.trustLevel;
       await update(myselfPeer);
       if (peerId == myself.peerId) {
-        myself.myselfPeer = myselfPeer;
         PeerProfile? peerProfile =
             await peerProfileService.findCachedOneByPeerId(peerId);
         if (peerProfile != null) {
           myselfPeer.peerProfile = peerProfile;
+          myself.myselfPeer = myselfPeer;
         }
       }
     }

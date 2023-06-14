@@ -147,7 +147,6 @@ class PeerClientService extends PeerEntityService<PeerClient> {
       peerClients[peerId] = {};
     }
     linkmanService.storeByPeerEntity(peerClient);
-    myselfPeerService.storeByPeerEntity(peerClient);
     peerClients[peerId]![clientId] = peerClient;
     await refresh(peerId, clientId: clientId);
   }

@@ -47,7 +47,7 @@ class PeerProfile extends StatusEntity {
   String? currency;
   String? lastTransactionTime;
 
-  PeerProfile(this.peerId, {this.clientId = unknownClientId});
+  PeerProfile(this.peerId, {this.clientId = unknownClientId}) : super();
 
   PeerProfile.fromJson(Map json)
       : peerId = json['peerId'],

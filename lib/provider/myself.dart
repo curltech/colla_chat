@@ -17,6 +17,7 @@ import 'package:path/path.dart' as p;
 /// 在登录成功后被初始化
 /// 可以随时获取本节点的信息
 class Myself with ChangeNotifier {
+  Key key = UniqueKey();
   int? id;
   String? peerId;
   String? name;
@@ -51,7 +52,7 @@ class Myself with ChangeNotifier {
   }
 
   PeerProfile get peerProfile {
-    return myselfPeer.peerProfile;
+    return myselfPeer.peerProfile!;
   }
 
   set peerProfile(PeerProfile peerProfile) {
