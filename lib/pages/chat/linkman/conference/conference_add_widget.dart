@@ -339,6 +339,10 @@ class _ConferenceAddWidgetState extends State<ConferenceAddWidget> {
     }
     current.participants = conferenceMembers.value;
     await conferenceService.store(current);
+    if (mounted) {
+      DialogUtil.info(context,
+          content: AppLocalizations.t('Conference has stored completely'));
+    }
     conference.value = current;
     //发出新增的会议邀请消息
     if (conferenceAdd) {

@@ -340,6 +340,10 @@ class _LinkmanGroupAddWidgetState extends State<LinkmanGroupAddWidget> {
     }
     current.participants = groupMembers.value;
     GroupChange groupChange = await groupService.store(current);
+    if (mounted) {
+      DialogUtil.info(context,
+          content: AppLocalizations.t('Group has stored completely'));
+    }
     group.value = current;
     var groupId = current.peerId;
 

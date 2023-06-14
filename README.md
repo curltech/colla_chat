@@ -1,6 +1,6 @@
-# colla_chat
+# CollaChat
 
-A CollaChat Flutter project.
+A Collaboration Chat Flutter project.
 
 ## Getting Started
 

@@ -1,8 +1,10 @@
 import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
@@ -109,6 +111,10 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     linkman!.email = currentLinkman.email;
     await linkmanService.store(linkman!);
     linkmanChatSummaryController.refresh();
+    if (mounted) {
+      DialogUtil.info(context,
+          content: AppLocalizations.t('Linkman has stored completely'));
+    }
   }
 
   _changeLinkmanStatus(LinkmanStatus status) async {
