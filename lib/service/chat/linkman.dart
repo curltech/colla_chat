@@ -137,6 +137,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
   ///而采用webrtc时，直接是chatmessage，content里面是实际的信息
   Future<void> requestLinkman(Linkman linkman) async {}
 
+  ///保存新的联系人信息，同时修改自己，peerClient和chatSummary的信息
   Future<void> store(Linkman linkman) async {
     Linkman? old = await findCachedOneByPeerId(linkman.peerId);
     if (old == null) {
@@ -147,13 +148,13 @@ class LinkmanService extends PeerPartyService<Linkman> {
       await update(linkman);
     }
     linkmen[linkman.peerId] = linkman;
-    peerClientService.storeByPeerEntity(linkman);
-    myselfPeerService.storeByPeerEntity(linkman);
-    chatSummaryService.upsertByLinkman(linkman);
+    await peerClientService.storeByPeerEntity(linkman);
+    await myselfPeerService.storeByPeerEntity(linkman);
+    await chatSummaryService.upsertByLinkman(linkman);
     linkmen.remove(linkman.peerId);
   }
 
-  ///通过peerEntity增加或者修改
+  ///只保存新Linkman信息
   Future<Linkman> storeByPeerEntity(PeerEntity peerEntity,
       {LinkmanStatus? linkmanStatus}) async {
     String peerId = peerEntity.peerId;
@@ -185,7 +186,6 @@ class LinkmanService extends PeerPartyService<Linkman> {
       linkman.peerPublicKey = peerEntity.peerPublicKey;
       await update(linkman);
     }
-    await chatSummaryService.upsertByLinkman(linkman);
     linkmen.remove(linkman.peerId);
 
     return linkman;
@@ -264,13 +264,14 @@ class LinkmanService extends PeerPartyService<Linkman> {
         cryptoOption: cryptoOption);
   }
 
-  ///接收到更新联系人信息的请求
+  ///接收到更新联系人信息的请求，会同时修改消息和联系人
   receiveModifyLinkman(ChatMessage chatMessage) async {
     String json = chatMessageService.recoverContent(chatMessage.content!);
     Map<String, dynamic> map = JsonUtil.toJson(json);
-    PeerClient peerClient = PeerClient.fromJson(map);
-    await peerClientService.store(peerClient);
-    return await linkmanService.storeByPeerEntity(peerClient);
+    Linkman linkman = Linkman.fromJson(map);
+    await store(linkman);
+
+    return linkman;
   }
 
   removeByPeerId(String peerId) {

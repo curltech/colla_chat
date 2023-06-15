@@ -73,6 +73,7 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
     return chatSummary;
   }
 
+  ///只保存新的联系人信息，名称
   Future<ChatSummary> upsertByLinkman(Linkman linkman) async {
     ChatSummary? chatSummary = await findCachedOneByPeerId(linkman.peerId);
     if (chatSummary == null) {
@@ -88,7 +89,8 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
       chatSummaries[chatSummary.peerId!] = chatSummary;
     } else {
       chatSummary.name = linkman.name;
-      await upsert(chatSummary);
+      await update({'name': linkman.name},
+          where: 'peerId=?', whereArgs: [linkman.peerId]);
     }
 
     return chatSummary;

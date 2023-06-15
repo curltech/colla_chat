@@ -113,14 +113,13 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
             onPressed: () async {
               await peerClientService.store(peerClient,
                   mobile: false, email: false);
-              await linkmanService.storeByPeerEntity(peerClient);
               _buildTiles(peerClients);
               if (mounted) {
                 DialogUtil.info(context,
-                    content: AppLocalizations.t('Add peerClient as linkman:') +
-                        peerId);
+                    content: '${AppLocalizations.t('Add peerClient as linkman')}:$peerId');
               }
             },
+            tooltip: AppLocalizations.t('Add peerClient as linkman'),
           );
         } else {
           //加好友
@@ -137,10 +136,10 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
                 _buildTiles(peerClients);
                 if (mounted) {
                   DialogUtil.info(context,
-                      content: AppLocalizations.t('Add peerClient as friend:') +
-                          peerId);
+                      content: '${AppLocalizations.t('Add peerClient as friend')}:$peerId');
                 }
               },
+              tooltip: AppLocalizations.t('Add peerClient as friend'),
             );
           } else {
             suffix = const SizedBox(
@@ -181,8 +180,13 @@ class _P2pLinkmanAddWidgetState extends State<P2pLinkmanAddWidget> {
     return AppBarView(
         withLeading: true,
         title: widget.title,
-        child:
-            Column(children: [_buildSearchTextField(context), dataListView]));
+        child: Column(children: [
+          const SizedBox(
+            height: 15,
+          ),
+          _buildSearchTextField(context),
+          dataListView
+        ]));
   }
 
   @override

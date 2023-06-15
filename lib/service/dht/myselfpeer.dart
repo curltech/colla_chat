@@ -104,7 +104,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     return peer;
   }
 
-  ///通过peerEntity修改
+  ///只保存新的自己的信息
   Future<MyselfPeer?> storeByPeerEntity(PeerEntity peerEntity) async {
     String peerId = peerEntity.peerId;
     MyselfPeer? myselfPeer = await findOneByPeerId(peerId);
