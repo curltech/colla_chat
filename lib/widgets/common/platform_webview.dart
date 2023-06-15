@@ -1,18 +1,23 @@
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/widgets/common/base_fl_webview.dart';
 import 'package:colla_chat/widgets/common/flutter_webview.dart';
 import 'package:colla_chat/widgets/common/inapp_webview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart' as inapp;
 import 'package:webview_flutter/webview_flutter.dart' as webview;
+import 'package:fl_webview/fl_webview.dart';
 
 class PlatformWebViewController with ChangeNotifier {
   inapp.InAppWebViewController? inAppWebViewController;
   webview.WebViewController? webViewController;
+  FlWebViewController? flWebViewController;
 
   ///包装两种webview的实现
   PlatformWebViewController(
-      {this.webViewController, this.inAppWebViewController});
+      {this.webViewController,
+      this.inAppWebViewController,
+      this.flWebViewController});
 
   static PlatformWebViewController from(dynamic controller) {
     PlatformWebViewController platformWebViewController =
@@ -20,12 +25,19 @@ class PlatformWebViewController with ChangeNotifier {
     if (controller is webview.WebViewController) {
       platformWebViewController.webViewController = controller;
       platformWebViewController.inAppWebViewController = null;
+      platformWebViewController.flWebViewController = null;
     } else if (controller is inapp.InAppWebViewController) {
       platformWebViewController.webViewController = null;
       platformWebViewController.inAppWebViewController = controller;
+      platformWebViewController.flWebViewController = null;
+    } else if (controller is FlWebViewController) {
+      platformWebViewController.webViewController = null;
+      platformWebViewController.inAppWebViewController = null;
+      platformWebViewController.flWebViewController = controller;
     } else {
       platformWebViewController.webViewController = null;
       platformWebViewController.inAppWebViewController = null;
+      platformWebViewController.flWebViewController = null;
     }
 
     return platformWebViewController;
@@ -36,6 +48,8 @@ class PlatformWebViewController with ChangeNotifier {
       await webViewController!.loadHtmlString(html);
     } else if (inAppWebViewController != null) {
       await inAppWebViewController!.loadData(data: html);
+    } else if (flWebViewController != null) {
+      await flWebViewController!.loadUrl(LoadUrlRequest(html));
     }
   }
 
@@ -62,6 +76,8 @@ class PlatformWebViewController with ChangeNotifier {
         inapp.URLRequest urlRequest =
             inapp.URLRequest(url: Uri.parse(filename));
         await inAppWebViewController!.loadUrl(urlRequest: urlRequest);
+      } else if (flWebViewController != null) {
+        await flWebViewController!.loadUrl(LoadUrlRequest(filename));
       }
     } else {
       if (webViewController != null) {
@@ -151,6 +167,15 @@ class _PlatformWebViewState extends State<PlatformWebView> {
         html: widget.html,
         initialFilename: widget.initialFilename,
         onWebViewCreated: (webview.WebViewController controller) {
+          _onWebViewCreated(controller);
+        },
+      );
+    } else if (platformParams.macos) {
+      platformWebView = BaseFlWebView(
+        initialUrl: widget.initialUrl!,
+        html: widget.html,
+        initialFilename: widget.initialFilename,
+        onWebViewCreated: (FlWebViewController controller) {
           _onWebViewCreated(controller);
         },
       );
