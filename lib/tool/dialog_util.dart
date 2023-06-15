@@ -375,16 +375,23 @@ class DialogUtil {
                           alignment: Alignment.center,
                           padding: const EdgeInsets.all(10),
                           child: Column(children: [
+                            const SizedBox(
+                              height: 15,
+                            ),
                             CommonAutoSizeTextFormField(
                               keyboardType: TextInputType.text,
                               labelText: content,
                               controller: controller,
                             ),
+                            const SizedBox(
+                              height: 15,
+                            ),
                             ButtonBar(
                               children: [
                                 TextButton(
                                   style: style,
-                                  onPressed: () => Navigator.of(context).pop(),
+                                  onPressed: () =>
+                                      Navigator.of(context).pop(null),
                                   child: CommonAutoSizeText(
                                       AppLocalizations.t('Cancel')),
                                 ),

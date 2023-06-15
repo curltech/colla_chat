@@ -271,13 +271,14 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
                       tip: AppLocalizations.t('I am ') + myself.name!,
                       content: AppLocalizations.t(
                           'Please input request add friend tip'));
-                  tip = tip ?? AppLocalizations.t('I am ') + myself.name!;
-                  await linkmanService.addFriend(linkman.peerId, tip);
-                }
-                if (mounted) {
-                  DialogUtil.info(context,
-                      content:
+                  if (tip != null) {
+                    await linkmanService.addFriend(linkman.peerId, tip);
+                    if (mounted) {
+                      DialogUtil.info(context,
+                          content:
                           '${AppLocalizations.t('Linkman:')} ${linkman.name} ${AppLocalizations.t('is requested add me as friend')}');
+                    }
+                  }
                 }
               });
           slideActions.add(requestSlideAction);
