@@ -326,7 +326,9 @@ class MessageWidget {
   }
 
   Future<RequestAddFriendMessage> buildRequestAddFriendWidget(
-      BuildContext context, ChatMessageSubType subMessageType) async {
+    BuildContext context,
+    ChatMessageSubType subMessageType,
+  ) async {
     var senderPeerId = chatMessage.senderPeerId!;
     bool isFriend = false;
     Linkman? linkman = await linkmanService.findCachedOneByPeerId(senderPeerId);
@@ -338,6 +340,7 @@ class MessageWidget {
       isMyself: isMyself,
       senderPeerId: senderPeerId,
       isFriend: isFriend,
+      title: chatMessage.title,
     );
   }
 

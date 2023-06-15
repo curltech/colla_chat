@@ -369,5 +369,8 @@
   "Remove video file": "移除视频文件",
   "Collect video file": "从收藏增加文件",
   "Select collect file": "收藏文件",
-  "Remove collect file": "从收藏移除文件"
+  "Remove collect file": "从收藏移除文件",
+  "Please input request add friend tip": "请求加好友的提示",
+  "Do you agree to add friend?": "同意加好友吗？",
+  "I am ": "我是"
 }

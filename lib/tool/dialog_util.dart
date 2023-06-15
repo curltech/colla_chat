@@ -345,7 +345,7 @@ class DialogUtil {
   }
 
   static Future<String?> showTextFormField(BuildContext context,
-      {Icon? icon, String title = 'Input', String content = ''}) {
+      {Icon? icon, String title = '', String content = '', String tip = ''}) {
     ButtonStyle style = StyleUtil.buildButtonStyle();
     ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);
@@ -356,6 +356,7 @@ class DialogUtil {
       barrierDismissible: true,
       builder: (context) {
         TextEditingController controller = TextEditingController();
+        controller.text = tip;
         return Center(
             child: SizedBox(
                 width: size.width * dialogSizeIndex,

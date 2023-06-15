@@ -267,7 +267,11 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
               onTap: (int index, String title, {String? subtitle}) async {
                 if (mounted) {
                   String? tip = await DialogUtil.showTextFormField(context,
-                      content: 'Please input request add friend tip');
+                      title: AppLocalizations.t('Request add friend'),
+                      tip: AppLocalizations.t('I am ') + myself.name!,
+                      content: AppLocalizations.t(
+                          'Please input request add friend tip'));
+                  tip = tip ?? AppLocalizations.t('I am ') + myself.name!;
                   await linkmanService.addFriend(linkman.peerId, tip);
                 }
                 if (mounted) {
