@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/channel_chat_message.dart';

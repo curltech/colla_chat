@@ -23,6 +23,9 @@ class AppDataProvider with ChangeNotifier {
   Size _totalSize = const Size(412.0, 892.0);
   double bottomBarHeight = kBottomNavigationBarHeight;
   double toolbarHeight = kToolbarHeight;
+  double leftBarWidth = 100;
+  double mainViewWidth = 300;
+  double dividerWidth = 1;
   double topPadding = 0;
   double bottomPadding = 0;
   double textScaleFactor = 1.0;
@@ -49,20 +52,20 @@ class AppDataProvider with ChangeNotifier {
     return const Size(412.0, 892.0);
   }
 
-  ///实际的屏幕尺寸，也是玻璃等特殊效果的尺寸，对移动设备来说，与总尺寸一致，
-  ///对桌面来说，是登录等小页面的尺寸，露出后面的背景图像
-  Size get actualSize {
-    Size fixedSize = designSize;
+  ///竖屏尺寸，在竖屏的情况下，等于总尺寸，
+  ///在横屏的情况下，用于登录等小页面的尺寸，露出后面的背景图像，等于竖屏设计尺寸与实际尺寸取较小值
+  ///宽度必须小于450
+  Size get portraitSize {
     double width = _totalSize.width;
     double height = _totalSize.height;
-    //桌面需要根据固定的尺寸来计算
-    if (!platformParams.mobile) {
-      width = _totalSize.width < fixedSize.width
+    //横屏需要根据固定的尺寸来计算
+    if (landscape || (!landscape && _totalSize.width > 450)) {
+      width = _totalSize.width < designSize.width
           ? _totalSize.width
-          : fixedSize.width;
-      height = _totalSize.height < fixedSize.height
+          : designSize.width;
+      height = _totalSize.height < designSize.height
           ? _totalSize.height
-          : fixedSize.height;
+          : designSize.height;
       //高度还要减去底部工具栏的高度
       // height = height - bottomBarHeight;
     }
@@ -70,12 +73,32 @@ class AppDataProvider with ChangeNotifier {
     return Size(width, height);
   }
 
+  ///横屏，宽度大于高度并且宽度大于左边菜单宽度加上2个主视图宽度
   bool get landscape {
-    return _totalSize.height > _totalSize.width;
+    return _totalSize.height < _totalSize.width &&
+        _totalSize.width > (dividerWidth + leftBarWidth + mainViewWidth * 2);
   }
 
-  bool get portrait {
-    return _totalSize.height < _totalSize.width;
+  ///计算实际的主视图宽度
+  double get actualMainViewWidth {
+    double width = portraitSize.width;
+    if (landscape) {
+      width = (totalSize.width - leftBarWidth) / 3;
+      if (width < mainViewWidth) {
+        width = mainViewWidth;
+      }
+    }
+    return width;
+  }
+
+  ///计算实际的主视图宽度
+  double get actualCurrentViewWidth {
+    double width = portraitSize.width;
+    if (landscape) {
+      width =
+          totalSize.width - leftBarWidth - actualMainViewWidth - dividerWidth;
+    }
+    return width;
   }
 
   double get keyboardHeight {

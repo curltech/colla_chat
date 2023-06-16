@@ -4,6 +4,7 @@ import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/channel/channel_message_view.dart';
 import 'package:colla_chat/pages/chat/channel/publish_channel_list_widget.dart';
@@ -158,15 +159,17 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
     var channelChatMessageWidget = _buildChannelChatMessageWidget(context);
     List<Widget>? rightWidgets = [
       IconButton(
-          onPressed: () async {
-            myChannelChatMessageController.clear(notify: false);
-            await myChannelChatMessageController.previous(limit: defaultLimit);
-            indexWidgetProvider.push('publish_channel');
-          },
-          icon: const Icon(
-            Icons.edit,
-            color: Colors.white,
-          )),
+        onPressed: () async {
+          myChannelChatMessageController.clear(notify: false);
+          await myChannelChatMessageController.previous(limit: defaultLimit);
+          indexWidgetProvider.push('publish_channel');
+        },
+        icon: const Icon(
+          Icons.edit,
+          color: Colors.white,
+        ),
+        tooltip: AppLocalizations.t('Edit document'),
+      ),
     ];
     return AppBarView(
         centerTitle: false,

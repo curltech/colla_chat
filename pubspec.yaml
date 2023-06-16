@@ -298,16 +298,17 @@ dependencies:
   #应用
   #  flutter_filereader: 3.0.0 #引入x5浏览器
   i18n_extension: ^8.0.0
-  #quill_html_editor: ^2.1.6
+  quill_html_editor: ^2.1.9
   html_editor_enhanced: ^2.5.1
-  #  flutter_quill: ^7.0.1
+  flutter_quill: ^7.2.6
+  flutter_quill_extensions: ^0.3.2
   #git: https://github.com/singerdmx/flutter-quill.git
   #  flutter_quill_extensions: ^0.1.0
   #git: https://github.com/singerdmx/flutter-quill.git/flutter_quill_extensions
   #  visual_editor:
   #    git: https://github.com/visual-space/visual-editor.git
   #youtube_player_flutter_quill: ^8.2.2
-  flutter_rte: ^0.4.9
+  flutter_rte: ^0.4.13
   universal_html: ^2.0.8
   enough_mail: ^2.1.0
   enough_media: ^2.2.0
@@ -367,7 +368,6 @@ dependency_overrides:
   webview_flutter_android: ^3.7.1
   webview_flutter_wkwebview: ^3.4.4
   webview_flutter_web: ^0.2.2+1
-  fl_webview: ^1.0.1 #for macos
   webview_flutter_platform_interface: ^2.3.1
   webview_win_floating: #2.0.0 #webView for
     git: https://github.com/jakky1/webview_win_floating.git

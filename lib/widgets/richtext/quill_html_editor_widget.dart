@@ -1,17 +1,17 @@
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rte/flutter_rte.dart';
+import 'package:quill_html_editor/quill_html_editor.dart';
 
-///html_editor_enhanced一样的实现，用于移动和web，但是是用webview实现的
-///所以可以用于其他
-class HtmlRteWidget extends StatefulWidget {
+///quill_html_editor一样的实现，用于移动和web
+class QuillHtmlEditorWidget extends StatefulWidget {
   final double height;
   final String? initialText;
   final Function(String? result)? onSubmit;
 
-  const HtmlRteWidget({
+  const QuillHtmlEditorWidget({
     Key? key,
     required this.height,
     this.initialText,
@@ -19,12 +19,12 @@ class HtmlRteWidget extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State createState() => _HtmlRteWidgetState();
+  State createState() => _QuillHtmlEditorWidgetState();
 }
 
-class _HtmlRteWidgetState extends State<HtmlRteWidget> {
+class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
   String result = '';
-  final HtmlEditorController controller = HtmlEditorController();
+  final QuillEditorController controller = QuillEditorController();
 
   @override
   void initState() {
@@ -32,8 +32,24 @@ class _HtmlRteWidgetState extends State<HtmlRteWidget> {
   }
 
   Widget _buildEditor() {
-    return HtmlEditor(
+    return QuillHtmlEditor(
+      text: "",
+      hintText: 'Hint text goes here',
       controller: controller,
+      isEnabled: true,
+      minHeight: 500,
+      hintTextAlign: TextAlign.start,
+      padding: const EdgeInsets.only(left: 10, top: 10),
+      hintTextPadding: const EdgeInsets.only(left: 20),
+      backgroundColor: Colors.white,
+      onFocusChanged: (hasFocus) => logger.i('has focus $hasFocus'),
+      onTextChanged: (text) => logger.i('widget text change $text'),
+      onEditorCreated: () async {
+        await controller.setText('');
+      },
+      onEditorResized: (height) => logger.i('Editor resized $height'),
+      onSelectionChanged: (sel) =>
+          logger.i('index ${sel.index}, range ${sel.length}'),
     );
   }
 
@@ -70,21 +86,22 @@ class _HtmlRteWidgetState extends State<HtmlRteWidget> {
         controller.redo();
         break;
       case 'Enable':
-        controller.enable();
+        controller.enableEditor(true);
         break;
       case 'Disable':
-        controller.disable();
+        controller.enableEditor(false);
         break;
       case 'InsertText':
         controller.insertText('');
         break;
       case 'InsertHtml':
-        controller.insertHtml('');
-        break;
-      case 'InsertLink':
-        controller.insertLink('', '', false);
+        controller.insertText('');
         break;
       case 'InsertNetworkImage':
+        controller.embedImage('');
+        break;
+      case 'InsertNetworkVideo':
+        controller.embedVideo('');
         break;
       default:
         break;
@@ -114,7 +131,7 @@ class _HtmlRteWidgetState extends State<HtmlRteWidget> {
     return GestureDetector(
         onTap: () {
           if (!kIsWeb) {
-            controller.clearFocus();
+            controller.unFocus();
           }
         },
         child: SingleChildScrollView(

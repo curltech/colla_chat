@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:html_editor_enhanced/html_editor.dart';
 
+///html_editor_enhanced实现，用于移动和web
 class HtmlEditorWidget extends StatefulWidget {
   final double height;
   final String? initialText;
@@ -175,6 +176,7 @@ class _HtmlEditorWidgetState extends State<HtmlEditorWidget> {
         },
       ),
     );
+    //提交编辑的数据
     actionData.add(
       ActionData(
         label: 'Submit',

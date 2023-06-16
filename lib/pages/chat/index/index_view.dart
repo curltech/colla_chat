@@ -1,33 +1,48 @@
+import 'dart:async';
+import 'dart:typed_data';
+
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/chat_summary.dart';
+import 'package:colla_chat/entity/chat/group.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/index/bottom_bar.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/index/index_widget.dart';
+import 'package:colla_chat/pages/chat/index/landscape_index_widget.dart';
+import 'package:colla_chat/pages/chat/index/portrait_index_widget.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/login/loading.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
+import 'package:colla_chat/service/chat/chat_summary.dart';
+import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/transport/webrtc/remote_video_render_controller.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/media/audio/player/blue_fire_audio_player.dart';
 import 'package:colla_chat/widgets/special_text/custom_special_text_span_builder.dart';
 import 'package:colla_chat/widgets/style/platform_widget_factory.dart';
 import 'package:extended_text/extended_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:flutter_sharing_intent/flutter_sharing_intent.dart';
+import 'package:flutter_sharing_intent/model/sharing_file.dart';
 import 'package:provider/provider.dart';
 
 class IndexView extends StatefulWidget {
   final String title;
-  final indexWidget = IndexWidget();
+  final PortraitIndexWidget portraitIndexWidget = PortraitIndexWidget();
+  final LandscapeIndexWidget landscapeIndexWidget = LandscapeIndexWidget();
 
   IndexView({Key? key, required this.title}) : super(key: key);
 
@@ -50,9 +65,13 @@ class _IndexViewState extends State<IndexView>
   //JustAudioPlayer audioPlayer = JustAudioPlayer();
   Widget bannerAvatarImage = AppImage.mdAppImage;
 
+  late StreamSubscription _intentDataStreamSubscription;
+  late List<SharedFile> _sharedFiles;
+
   @override
   void initState() {
     super.initState();
+    _initShare();
     try {
       audioPlayer = BlueFireAudioPlayer();
     } catch (e) {
@@ -61,6 +80,34 @@ class _IndexViewState extends State<IndexView>
     globalChatMessageController.addListener(_updateGlobalChatMessage);
     myself.addListener(_update);
     appDataProvider.addListener(_update);
+  }
+
+  ///初始化应用数据接受分享的监听器
+  _initShare() {
+    if (!platformParams.mobile) {
+      return;
+    }
+    // 应用打开时分享的媒体文件
+    _intentDataStreamSubscription = FlutterSharingIntent.instance
+        .getMediaStream()
+        .listen((List<SharedFile> value) {
+      _sharedFiles = value;
+      if (_sharedFiles.isNotEmpty) {
+        _shareChatMessage(_sharedFiles.first);
+      }
+    }, onError: (err) {
+      logger.e("getIntentDataStream error: $err");
+    });
+
+    // 应用关闭时分享的媒体文件
+    FlutterSharingIntent.instance
+        .getInitialSharing()
+        .then((List<SharedFile> value) {
+      _sharedFiles = value;
+      if (_sharedFiles.isNotEmpty) {
+        _shareChatMessage(_sharedFiles.first);
+      }
+    });
   }
 
   ///myself和appDataProvider发生变化后刷新整个界面
@@ -302,6 +349,82 @@ class _IndexViewState extends State<IndexView>
     );
   }
 
+  Future<void> _shareChatMessage(SharedFile file) async {
+    String? content = file.value;
+    String? thumbnail = file.thumbnail;
+    SharedMediaType type = file.type;
+    if (type == SharedMediaType.URL) {
+      content = '#$content#';
+    }
+    await DialogUtil.show(
+        context: context,
+        builder: (BuildContext context) {
+          return LinkmanGroupSearchWidget(
+              onSelected: (List<String>? selected) async {
+                if (selected != null && selected.isNotEmpty) {
+                  String? receivePeerId;
+                  Linkman? linkman =
+                      await linkmanService.findCachedOneByPeerId(selected[0]);
+                  if (linkman != null) {
+                    receivePeerId = linkman.peerId;
+                  } else {
+                    Group? group =
+                        await groupService.findCachedOneByPeerId(selected[0]);
+                    if (group != null) {
+                      receivePeerId = group.peerId;
+                    }
+                  }
+                  if (receivePeerId != null) {
+                    ChatSummary? current = await chatSummaryService
+                        .findCachedOneByPeerId(receivePeerId);
+                    if (current != null) {
+                      chatMessageController.chatSummary = current;
+                      indexWidgetProvider.push('chat_message');
+                      if (type == SharedMediaType.TEXT ||
+                          type == SharedMediaType.URL) {
+                        ChatMessageContentType contentType =
+                            ChatMessageContentType.text;
+                        if (type == SharedMediaType.URL) {
+                          contentType = ChatMessageContentType.url;
+                        }
+                        await chatMessageController.sendText(
+                            message: content, contentType: contentType);
+                      } else if (type == SharedMediaType.VIDEO ||
+                          type == SharedMediaType.IMAGE ||
+                          type == SharedMediaType.FILE) {
+                        ChatMessageContentType contentType =
+                            ChatMessageContentType.file;
+                        if (type == SharedMediaType.VIDEO) {
+                          contentType = ChatMessageContentType.video;
+                        }
+                        if (type == SharedMediaType.IMAGE) {
+                          contentType = ChatMessageContentType.image;
+                        }
+                        String filename = content!;
+                        Uint8List? data = await FileUtil.readFile(filename);
+                        if (data != null) {
+                          String? mimeType = FileUtil.mimeType(filename);
+                          mimeType = mimeType ?? 'text/plain';
+                          await chatMessageController.send(
+                              title: filename,
+                              content: data,
+                              thumbnail: thumbnail,
+                              contentType: contentType,
+                              mimeType: mimeType);
+                        }
+                      }
+                    }
+                  }
+                }
+                if (mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              selected: const <String>[],
+              selectType: SelectType.chipMultiSelect);
+        });
+  }
+
   Widget _createScaffold(
       BuildContext context, IndexWidgetProvider indexWidgetProvider) {
     Widget? bottomNavigationBar =
@@ -309,6 +432,12 @@ class _IndexViewState extends State<IndexView>
     double bottomBarHeight = indexWidgetProvider.bottomBarVisible
         ? appDataProvider.bottomBarHeight
         : 0.0;
+    double width = appDataProvider.totalSize.width;
+    double height = appDataProvider.totalSize.height;
+    if (!appDataProvider.landscape) {
+      width = appDataProvider.portraitSize.width;
+      height = appDataProvider.portraitSize.height - bottomBarHeight;
+    }
     Scaffold scaffold = Scaffold(
         resizeToAvoidBottomInset: true,
         primary: true,
@@ -323,17 +452,19 @@ class _IndexViewState extends State<IndexView>
               ),
               Center(
                   child: platformWidgetFactory.buildSizedBox(
-                      child: widget.indexWidget,
-                      height:
-                          appDataProvider.actualSize.height - bottomBarHeight,
-                      width: appDataProvider.actualSize.width)),
+                      child: !appDataProvider.landscape
+                          ? widget.portraitIndexWidget
+                          : widget.landscapeIndexWidget,
+                      height: height,
+                      width: width)),
               Row(children: [
                 _buildChatMessageBanner(context),
                 _buildVideoChatMessageBanner(context)
               ]),
             ]))),
         //endDrawer: endDrawer,
-        bottomNavigationBar: bottomNavigationBar);
+        bottomNavigationBar:
+            !appDataProvider.landscape ? bottomNavigationBar : null);
 
     return scaffold;
   }
@@ -353,6 +484,7 @@ class _IndexViewState extends State<IndexView>
     globalChatMessageController.removeListener(_updateGlobalChatMessage);
     myself.removeListener(_update);
     appDataProvider.removeListener(_update);
+    _intentDataStreamSubscription.cancel();
     super.dispose();
   }
 }

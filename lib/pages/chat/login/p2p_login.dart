@@ -100,8 +100,8 @@ class _P2pLoginState extends State<P2pLogin> {
 
     var workspace = Center(
         child: platformWidgetFactory.buildSizedBox(
-      height: appDataProvider.actualSize.height,
-      width: appDataProvider.actualSize.width,
+      height: appDataProvider.portraitSize.height,
+      width: appDataProvider.portraitSize.width,
       child: pageView,
     ));
     return Scaffold(

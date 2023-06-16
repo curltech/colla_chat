@@ -1,17 +1,18 @@
+import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_rte/flutter_rte.dart';
+import 'package:flutter_quill/flutter_quill.dart';
 
-///html_editor_enhanced一样的实现，用于移动和web，但是是用webview实现的
-///所以可以用于其他
-class HtmlRteWidget extends StatefulWidget {
+///quill_editor一样的实现，用于IOS,LINUX,MACOS,WINDOWS
+class QuillEditorWidget extends StatefulWidget {
   final double height;
   final String? initialText;
   final Function(String? result)? onSubmit;
 
-  const HtmlRteWidget({
+  const QuillEditorWidget({
     Key? key,
     required this.height,
     this.initialText,
@@ -19,12 +20,12 @@ class HtmlRteWidget extends StatefulWidget {
   }) : super(key: key);
 
   @override
-  State createState() => _HtmlRteWidgetState();
+  State createState() => _QuillEditorWidgetState();
 }
 
-class _HtmlRteWidgetState extends State<HtmlRteWidget> {
+class _QuillEditorWidgetState extends State<QuillEditorWidget> {
   String result = '';
-  final HtmlEditorController controller = HtmlEditorController();
+  final QuillController controller = QuillController.basic();
 
   @override
   void initState() {
@@ -32,8 +33,10 @@ class _HtmlRteWidgetState extends State<HtmlRteWidget> {
   }
 
   Widget _buildEditor() {
-    return HtmlEditor(
+    return QuillEditor.basic(
       controller: controller,
+      locale: myself.locale,
+      readOnly: false, // true for view only mode
     );
   }
 
@@ -69,23 +72,6 @@ class _HtmlRteWidgetState extends State<HtmlRteWidget> {
       case 'Redo':
         controller.redo();
         break;
-      case 'Enable':
-        controller.enable();
-        break;
-      case 'Disable':
-        controller.disable();
-        break;
-      case 'InsertText':
-        controller.insertText('');
-        break;
-      case 'InsertHtml':
-        controller.insertHtml('');
-        break;
-      case 'InsertLink':
-        controller.insertLink('', '', false);
-        break;
-      case 'InsertNetworkImage':
-        break;
       default:
         break;
     }
@@ -112,27 +98,26 @@ class _HtmlRteWidgetState extends State<HtmlRteWidget> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: () {
-          if (!kIsWeb) {
-            controller.clearFocus();
-          }
-        },
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              _buildEditor(),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: _buildCustomButton(),
+        child: Card(
+            elevation: 0.0,
+            margin: EdgeInsets.zero,
+            shape: const ContinuousRectangleBorder(),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  _buildEditor(),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: _buildCustomButton(),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: CommonAutoSizeText(result),
+                  ),
+                ],
               ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CommonAutoSizeText(result),
-              ),
-            ],
-          ),
-        ));
+            )));
   }
 
   @override

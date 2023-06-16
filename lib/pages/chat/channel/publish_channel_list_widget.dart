@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/channel/publish_channel_item_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -184,14 +185,16 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
     var channelChatMessageWidget = _buildChannelChatMessageWidget(context);
     List<Widget>? rightWidgets = [
       IconButton(
-          onPressed: () {
-            myChannelChatMessageController.current = null;
-            indexWidgetProvider.push('publish_channel_item');
-          },
-          icon: const Icon(
-            Icons.note_add,
-            color: Colors.white,
-          )),
+        onPressed: () {
+          myChannelChatMessageController.current = null;
+          indexWidgetProvider.push('publish_channel_item');
+        },
+        icon: const Icon(
+          Icons.note_add,
+          color: Colors.white,
+        ),
+        tooltip: AppLocalizations.t('Add new document'),
+      ),
     ];
     return AppBarView(
         centerTitle: false,

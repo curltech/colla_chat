@@ -21,7 +21,7 @@ import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/richtext/html_editor_widget.dart';
+import 'package:colla_chat/widgets/richtext/platform_editor_widget.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:file_picker/src/file_picker.dart';
 import 'package:flutter/material.dart';
@@ -156,6 +156,9 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
     return Container(
         padding: const EdgeInsets.symmetric(vertical: 5.0, horizontal: 15.0),
         child: Column(children: [
+          const SizedBox(
+            height: 15.0,
+          ),
           _buildTextField(context),
           const SizedBox(
             height: 5.0,
@@ -240,34 +243,35 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
 
   Widget _buildChannelItemView(BuildContext context) {
     Widget view = _buildActionWidget(context);
-    if (platformParams.mobile) {
-      Widget swiper = Swiper(
-        controller: SwiperController(),
-        itemCount: 2,
-        index: 0,
-        itemBuilder: (BuildContext context, int index) {
-          if (index == 1) {
-            return HtmlEditorWidget(
-              height: appDataProvider.actualSize.height -
-                  appDataProvider.toolbarHeight,
-              onSubmit: _onSubmit,
-            );
-          }
-          return view;
-        },
-        onIndexChanged: (int index) {
-          logger.i('changed to index $index');
-        },
-        // pagination: SwiperPagination(
-        //     builder: DotSwiperPaginationBuilder(
-        //   activeColor: myself.primary,
-        //   color: Colors.white,
-        //   activeSize: 15,)
-        // ),
-      );
-      return swiper;
-    }
-    return view;
+    SwiperController controller = SwiperController();
+    Widget swiper = Swiper(
+      controller: controller,
+      onTap: (int index) {
+        controller.next();
+      },
+      itemCount: 2,
+      index: 0,
+      itemBuilder: (BuildContext context, int index) {
+        if (index == 1) {
+          return PlatformEditorWidget(
+            height: appDataProvider.portraitSize.height -
+                appDataProvider.toolbarHeight,
+            onSubmit: _onSubmit,
+          );
+        }
+        return view;
+      },
+      onIndexChanged: (int index) {
+        logger.i('changed to index $index');
+      },
+      pagination: SwiperPagination(
+          builder: DotSwiperPaginationBuilder(
+        activeColor: myself.primary,
+        color: myself.secondary,
+        activeSize: 15,
+      )),
+    );
+    return swiper;
   }
 
   @override

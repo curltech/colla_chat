@@ -109,7 +109,13 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
     if (widget.isMyself) {
       crossAxisAlignment = CrossAxisAlignment.end;
     }
-    var maxWidth = appDataProvider.actualSize.width - 100;
+    double maxWidth = appDataProvider.portraitSize.width - 100;
+    if (appDataProvider.landscape) {
+      maxWidth = appDataProvider.actualCurrentViewWidth - 100;
+      if (maxWidth > 450) {
+        maxWidth = 450;
+      }
+    }
     List<Widget> children = [
       Bubble(
           elevation: 0.0,
