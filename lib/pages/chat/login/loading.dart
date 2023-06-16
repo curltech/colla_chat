@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:card_swiper/card_swiper.dart';
@@ -102,28 +103,17 @@ class _LoadingState extends State<Loading> {
     // if (myself.getBrightness(context) == Brightness.dark) {
     //   count = loadingBackgroundImage.darkBackgroudImages.length;
     // }
-    var random = Random.secure();
-    loadingBackgroundImage.currentIndex = random.nextInt(count);
     if (widget.autoPlay) {
-      bool positive = true;
-      Future.doWhile(() async {
-        if (loadingBackgroundImage.currentIndex >= count - 1) {
-          positive = false;
-        }
-        if (loadingBackgroundImage.currentIndex == 0) {
-          positive = true;
-        }
+      Timer.periodic(const Duration(seconds: 60), (timer) {
+        var random = Random.secure();
+        loadingBackgroundImage.currentIndex = random.nextInt(count);
         try {
-          if (positive) {
-            widget.controller.next();
-          } else {
-            widget.controller.previous();
+          if (loadingBackgroundImage.currentIndex < count) {
+            widget.controller.move(loadingBackgroundImage.currentIndex);
           }
         } catch (e) {
           logger.e(e);
         }
-        await Future.delayed(const Duration(seconds: 60));
-        return true;
       });
     }
   }

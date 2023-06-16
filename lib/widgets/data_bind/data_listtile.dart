@@ -148,7 +148,7 @@ class DataListTile extends StatelessWidget {
       if (suffix is Widget) {
         trailing.add(suffix);
       } else if (suffix is String) {
-        trailing.add(Text(
+        trailing.add(CommonAutoSizeText(
           suffix,
           softWrap: true,
           overflow: TextOverflow.ellipsis,
