@@ -301,10 +301,11 @@ dependencies:
   quill_html_editor: ^2.1.9
   html_editor_enhanced: ^2.5.1
   flutter_quill: ^7.2.6
-  flutter_quill_extensions: ^0.3.2
   #git: https://github.com/singerdmx/flutter-quill.git
-  #  flutter_quill_extensions: ^0.1.0
-  #git: https://github.com/singerdmx/flutter-quill.git/flutter_quill_extensions
+  flutter_quill_extensions: #^0.3.2
+    git:
+      url: https://github.com/singerdmx/flutter-quill.git
+      path: flutter_quill_extensions
   #  visual_editor:
   #    git: https://github.com/visual-space/visual-editor.git
   #youtube_player_flutter_quill: ^8.2.2
