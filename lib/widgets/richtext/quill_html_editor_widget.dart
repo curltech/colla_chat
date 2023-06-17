@@ -35,7 +35,8 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
   }
 
   Widget _buildToolBar() {
-    return ToolBar.scroll(
+    return SizedBox(
+        child: ToolBar.scroll(
       toolBarColor: Colors.grey,
       padding: const EdgeInsets.all(8),
       iconSize: 25,
@@ -43,7 +44,7 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
       activeIconColor: myself.primary,
       controller: controller,
       crossAxisAlignment: CrossAxisAlignment.center,
-      direction: Axis.vertical,
+      //direction: Axis.vertical,
       customButtons: [
         InkWell(
             onTap: () {
@@ -65,7 +66,7 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
               color: Colors.black,
             )),
       ],
-    );
+    ));
   }
 
   Widget _buildQuillHtmlEditor() {
@@ -171,7 +172,7 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
   @override
   Widget build(BuildContext context) {
     return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.start,
       children: <Widget>[
         _buildToolBar(),
         Expanded(child: _buildQuillHtmlEditor()),
