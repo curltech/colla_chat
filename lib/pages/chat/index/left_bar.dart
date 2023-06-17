@@ -63,8 +63,18 @@ class _LeftBarState extends State<LeftBar> {
           width: appDataProvider.leftBarWidth,
           child: Column(
             children: [
+              Row(
+                children: [
+                  const Spacer(),
+                  IconButton(
+                      onPressed: () {
+                        appDataProvider.toggleMainView();
+                      },
+                      icon: const Icon(Icons.horizontal_split))
+                ],
+              ),
               const SizedBox(
-                height: 25.0,
+                height: 15.0,
               ),
               _createLeftBarItem(
                 context,

@@ -81,6 +81,9 @@ class AppDataProvider with ChangeNotifier {
 
   ///计算实际的主视图宽度
   double get actualMainViewWidth {
+    if (mainViewWidth == 0.0) {
+      return 0.0;
+    }
     double width = portraitSize.width;
     if (landscape) {
       width = (totalSize.width - leftBarWidth) / 3;
@@ -91,7 +94,16 @@ class AppDataProvider with ChangeNotifier {
     return width;
   }
 
-  ///计算实际的主视图宽度
+  toggleMainView() {
+    if (mainViewWidth == 0.0) {
+      mainViewWidth = 300.0;
+    } else {
+      mainViewWidth = 0.0;
+    }
+    notifyListeners();
+  }
+
+  ///计算实际的当前视图宽度
   double get actualCurrentViewWidth {
     double width = portraitSize.width;
     if (landscape) {

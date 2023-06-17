@@ -28,20 +28,35 @@ class LandscapeIndexWidget extends StatefulWidget {
 
 class _LandscapeIndexWidgetState extends State<LandscapeIndexWidget>
     with SingleTickerProviderStateMixin {
+  ValueNotifier<double> actualMainViewWidth =
+      ValueNotifier<double>(appDataProvider.actualMainViewWidth);
+
   @override
   void initState() {
     super.initState();
+    appDataProvider.addListener(_update);
+  }
+
+  _update() {
+    actualMainViewWidth.value = appDataProvider.actualMainViewWidth;
   }
 
   ///主菜单视图
   Widget _createMainView(BuildContext context) {
     var mainView = Consumer<IndexWidgetProvider>(
         builder: (context, indexWidgetProvider, child) {
-      double width = appDataProvider.actualMainViewWidth;
-      return SizedBox(
-          width: width,
-          child:
-              indexWidgetProvider.views[indexWidgetProvider.currentMainIndex]);
+      return ValueListenableBuilder(
+          valueListenable: actualMainViewWidth,
+          builder: (BuildContext context, double actualMainViewWidth,
+              Widget? child) {
+            if (actualMainViewWidth > 0.0) {
+              return SizedBox(
+                  width: actualMainViewWidth,
+                  child: indexWidgetProvider
+                      .views[indexWidgetProvider.currentMainIndex]);
+            }
+            return Container();
+          });
     });
 
     return mainView;
