@@ -29,18 +29,18 @@ class _PlatformEditorWidgetState extends State<PlatformEditorWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (platformParams.mobile || platformParams.web) {
+    if (platformParams.mobile || platformParams.web || platformParams.windows) {
+      return QuillHtmlEditorWidget(
+        height: widget.height,
+        initialText: widget.initialText,
+        onSubmit: widget.onSubmit,
+      );
       return HtmlEditorWidget(
         height: widget.height,
         initialText: widget.initialText,
         onSubmit: widget.onSubmit,
       );
       return HtmlRteWidget(
-        height: widget.height,
-        initialText: widget.initialText,
-        onSubmit: widget.onSubmit,
-      );
-      return QuillHtmlEditorWidget(
         height: widget.height,
         initialText: widget.initialText,
         onSubmit: widget.onSubmit,

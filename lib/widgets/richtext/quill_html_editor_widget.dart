@@ -1,7 +1,6 @@
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:quill_html_editor/quill_html_editor.dart';
 
@@ -24,20 +23,62 @@ class QuillHtmlEditorWidget extends StatefulWidget {
 
 class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
   String result = '';
-  final QuillEditorController controller = QuillEditorController();
+  late final QuillEditorController controller;
 
   @override
   void initState() {
     super.initState();
+    controller = QuillEditorController();
+    controller.onTextChanged((text) {
+      debugPrint('listening to $text');
+    });
   }
 
-  Widget _buildEditor() {
+  Widget _buildToolBar() {
+    return ToolBar.scroll(
+      toolBarColor: Colors.grey,
+      padding: const EdgeInsets.all(8),
+      iconSize: 25,
+      iconColor: Colors.black,
+      activeIconColor: myself.primary,
+      controller: controller,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      direction: Axis.vertical,
+      customButtons: [
+        InkWell(
+            onTap: () {
+              controller.unFocus();
+            },
+            child: const Icon(
+              Icons.favorite,
+              color: Colors.black,
+            )),
+        InkWell(
+            onTap: () async {
+              var selectedText = await controller.getSelectedText();
+              logger.i('selectedText $selectedText');
+              var selectedHtmlText = await controller.getSelectedHtmlText();
+              logger.i('selectedHtmlText $selectedHtmlText');
+            },
+            child: const Icon(
+              Icons.add_circle,
+              color: Colors.black,
+            )),
+      ],
+    );
+  }
+
+  Widget _buildQuillHtmlEditor() {
     return QuillHtmlEditor(
       text: "",
       hintText: 'Hint text goes here',
       controller: controller,
       isEnabled: true,
       minHeight: 500,
+      textStyle: const TextStyle(
+          fontSize: 18, color: Colors.black, fontWeight: FontWeight.normal),
+      hintTextStyle: const TextStyle(
+          fontSize: 18, color: Colors.black12, fontWeight: FontWeight.normal),
       hintTextAlign: TextAlign.start,
       padding: const EdgeInsets.only(left: 10, top: 10),
       hintTextPadding: const EdgeInsets.only(left: 20),
@@ -45,7 +86,8 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
       onFocusChanged: (hasFocus) => logger.i('has focus $hasFocus'),
       onTextChanged: (text) => logger.i('widget text change $text'),
       onEditorCreated: () async {
-        await controller.setText('');
+        logger.i('Editor has been loaded');
+        await controller.setText('Testing text on load');
       },
       onEditorResized: (height) => logger.i('Editor resized $height'),
       onSelectionChanged: (sel) =>
@@ -128,28 +170,13 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-        onTap: () {
-          if (!kIsWeb) {
-            controller.unFocus();
-          }
-        },
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              _buildEditor(),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: _buildCustomButton(),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CommonAutoSizeText(result),
-              ),
-            ],
-          ),
-        ));
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        _buildToolBar(),
+        Expanded(child: _buildQuillHtmlEditor()),
+      ],
+    );
   }
 
   @override
