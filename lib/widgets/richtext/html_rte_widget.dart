@@ -1,4 +1,3 @@
-import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -24,16 +23,32 @@ class HtmlRteWidget extends StatefulWidget {
 
 class _HtmlRteWidgetState extends State<HtmlRteWidget> {
   String result = '';
-  final HtmlEditorController controller = HtmlEditorController();
+  late final HtmlEditorController controller;
 
   @override
   void initState() {
     super.initState();
+    controller = HtmlEditorController(
+      toolbarOptions: HtmlToolbarOptions(
+          toolbarType: ToolbarType.nativeScrollable,
+          backgroundColor: Colors.transparent,
+          toolbarPosition: ToolbarPosition.custom),
+    );
+    HtmlToolbarOptions toolbarOptions = controller.toolbarOptions;
+    toolbarOptions.toolbarPosition = ToolbarPosition.aboveEditor;
+    toolbarOptions.toolbarType = ToolbarType.nativeExpandable;
+    toolbarOptions.initiallyExpanded = false;
+    toolbarOptions.backgroundColor = Colors.white;
+    controller.editorOptions.decoration = BoxDecoration(
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
+        border: Border.all(color: Colors.white, width: 2));
+    controller.callbacks.onChangeContent = (s) {};
   }
 
-  Widget _buildEditor() {
+  Widget _buildHtmlRteEditor() {
     return HtmlEditor(
       controller: controller,
+      height: 250,
     );
   }
 
@@ -121,15 +136,7 @@ class _HtmlRteWidgetState extends State<HtmlRteWidget> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              _buildEditor(),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: _buildCustomButton(),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: CommonAutoSizeText(result),
-              ),
+              _buildHtmlRteEditor(),
             ],
           ),
         ));

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:cross_file/cross_file.dart';
@@ -10,10 +11,9 @@ import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
-import 'package:flutter_quill/extensions.dart';
-import 'package:flutter_quill_extensions/embeds/embed_types.dart';
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 
 ///quill_editor一样的实现，用于IOS,LINUX,MACOS,WINDOWS
 class QuillEditorWidget extends StatefulWidget {
@@ -51,6 +51,18 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     }
     controller = QuillController(
         document: doc, selection: const TextSelection.collapsed(offset: 0));
+  }
+
+  ///转换成html
+  String toHtml() {
+    final Delta delta = controller.document.toDelta();
+    final deltaJson = delta.toJson();
+    final converter = QuillDeltaToHtmlConverter(
+      List.castFrom(deltaJson),
+      ConverterOptions.forEmail(),
+    );
+
+    return converter.convert();
   }
 
   Future<String?> _onImagePaste(Uint8List imageBytes) async {
@@ -136,6 +148,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
 
   Widget _buildQuillEditor(BuildContext context) {
     Widget quillEditor = QuillEditor(
+      locale: myself.locale,
       controller: controller,
       scrollController: ScrollController(),
       scrollable: true,
@@ -167,6 +180,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     );
     if (platformParams.web) {
       quillEditor = QuillEditor(
+          locale: myself.locale,
           controller: controller,
           scrollController: ScrollController(),
           scrollable: true,
@@ -194,6 +208,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
           ]);
     }
     var toolbar = QuillToolbar.basic(
+      locale: myself.locale,
       controller: controller,
       embedButtons: FlutterQuillEmbeds.buttons(
         // provide a callback to enable picking images from device.
@@ -211,6 +226,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     );
     if (platformParams.web) {
       toolbar = QuillToolbar.basic(
+        locale: myself.locale,
         controller: controller,
         embedButtons: FlutterQuillEmbeds.buttons(
           onImagePickCallback: _onMediaPickCallback,
@@ -222,6 +238,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     }
     if (platformParams.desktop) {
       toolbar = QuillToolbar.basic(
+        locale: myself.locale,
         controller: controller,
         embedButtons: FlutterQuillEmbeds.buttons(
           onImagePickCallback: _onMediaPickCallback,
