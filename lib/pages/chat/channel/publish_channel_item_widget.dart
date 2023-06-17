@@ -51,6 +51,7 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
   final TextEditingController textEditingController = TextEditingController();
   ValueNotifier<String?> thumbnail = ValueNotifier<String?>(null);
   ValueNotifier<String?> html = ValueNotifier<String?>(null);
+  SwiperController controller = SwiperController();
 
   @override
   void initState() {
@@ -110,7 +111,7 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
   Widget _buildTextField(BuildContext context) {
     var textFormField = CommonAutoSizeTextFormField(
       controller: textEditingController,
-      labelText: AppLocalizations.t('title'),
+      labelText: AppLocalizations.t('Title'),
     );
 
     return textFormField;
@@ -243,12 +244,8 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
 
   Widget _buildChannelItemView(BuildContext context) {
     Widget view = _buildActionWidget(context);
-    SwiperController controller = SwiperController();
     Widget swiper = Swiper(
       controller: controller,
-      onTap: (int index) {
-        controller.next();
-      },
       itemCount: 2,
       index: 0,
       itemBuilder: (BuildContext context, int index) {
@@ -264,12 +261,12 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
       onIndexChanged: (int index) {
         logger.i('changed to index $index');
       },
-      pagination: SwiperPagination(
-          builder: DotSwiperPaginationBuilder(
-        activeColor: myself.primary,
-        color: myself.secondary,
-        activeSize: 15,
-      )),
+      // pagination: SwiperPagination(
+      //     builder: DotSwiperPaginationBuilder(
+      //   activeColor: myself.primary,
+      //   color: myself.secondary,
+      //   activeSize: 15,
+      // )),
     );
     return swiper;
   }
@@ -280,6 +277,13 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
       centerTitle: false,
       withLeading: true,
       title: widget.title,
+      rightWidgets: [
+        IconButton(
+            onPressed: () {
+              controller.next();
+            },
+            icon: const Icon(Icons.more_horiz_outlined))
+      ],
       child: _buildChannelItemView(context),
     );
   }
@@ -287,6 +291,7 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
   @override
   void dispose() {
     textEditingController.dispose();
+    controller.dispose();
     super.dispose();
   }
 }

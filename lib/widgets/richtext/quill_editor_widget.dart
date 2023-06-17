@@ -232,27 +232,31 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
       );
     }
 
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: <Widget>[
-        Expanded(
-          flex: 15,
-          child: Container(
-            color: Colors.white,
-            padding: const EdgeInsets.only(left: 16, right: 16),
-            child: quillEditor,
-          ),
-        ),
-        platformParams.web
-            ? Expanded(
-                child: Container(
-                padding:
-                    const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-                child: toolbar,
-              ))
-            : Container(child: toolbar)
-      ],
-    );
+    return Card(
+        elevation: 0.0,
+        margin: EdgeInsets.zero,
+        shape: const ContinuousRectangleBorder(),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: <Widget>[
+            Expanded(
+              flex: 15,
+              child: Container(
+                color: Colors.white,
+                padding: const EdgeInsets.only(left: 16, right: 16),
+                child: quillEditor,
+              ),
+            ),
+            platformParams.web
+                ? Expanded(
+                    child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                    child: toolbar,
+                  ))
+                : Container(child: toolbar)
+          ],
+        ));
   }
 
   @override
