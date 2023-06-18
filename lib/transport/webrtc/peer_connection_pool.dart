@@ -556,7 +556,7 @@ class PeerConnectionPool {
     }
     if (signalType == SignalType.candidate.name ||
         (signalType == SignalType.sdp.name && signal.sdp!.type == 'offer')) {
-      Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+      Linkman? linkman = await linkmanService.findOneByPeerId(peerId);
       if (linkman != null &&
           linkman.linkmanStatus == LinkmanStatus.friend.name) {
         advancedPeerConnection = await createIfNotExist(peerId,
@@ -570,7 +570,7 @@ class PeerConnectionPool {
         }
       } else {
         String error =
-            'peerId is not friend, can not receive a webrtc connection';
+            'peerId:$peerId name:${linkman!.name} is not friend, can not receive a webrtc connection';
         logger.e(error);
         WebrtcSignal webrtcSignal =
             WebrtcSignal(SignalType.error.name, error: error);
