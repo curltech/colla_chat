@@ -32,6 +32,7 @@ import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
+import 'package:visibility_detector/visibility_detector.dart';
 
 /// 聊天界面，包括文本聊天，视频通话呼叫，视频通话，全屏展示四个组件
 /// 支持群聊
@@ -73,6 +74,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
   final ValueNotifier<ChatSummary?> _chatSummary =
       ValueNotifier<ChatSummary?>(chatMessageController.chatSummary);
   final ValueNotifier<double> chatMessageHeight = ValueNotifier<double>(0);
+  double visibleFraction = 0.0;
 
   @override
   void initState() {
@@ -161,6 +163,7 @@ class _ChatMessageViewState extends State<ChatMessageView> {
     } else {
       List<AdvancedPeerConnection> advancedPeerConnections =
           peerConnectionPool.get(peerId);
+      //如果连接不存在，则创建新连接
       if (advancedPeerConnections.isEmpty) {
         AdvancedPeerConnection? advancedPeerConnection =
             await peerConnectionPool.create(peerId);
@@ -206,17 +209,13 @@ class _ChatMessageViewState extends State<ChatMessageView> {
         if (mounted) {
           DialogUtil.info(context,
               content:
-              '${AppLocalizations.t(
-                  'PeerConnection status was changed from ')}${oldStatus
-                  .name}${AppLocalizations.t(' to ')}${status.name}');
+                  '${AppLocalizations.t('PeerConnection status was changed from ')}${oldStatus.name}${AppLocalizations.t(' to ')}${status.name}');
         }
       } else {
         if (mounted) {
           DialogUtil.error(context,
               content:
-              '${AppLocalizations.t(
-                  'PeerConnection status was changed from ')}${oldStatus
-                  .name}${AppLocalizations.t(' to ')}${status.name}');
+                  '${AppLocalizations.t('PeerConnection status was changed from ')}${oldStatus.name}${AppLocalizations.t(' to ')}${status.name}');
         }
       }
     }
@@ -255,17 +254,26 @@ class _ChatMessageViewState extends State<ChatMessageView> {
           return SizedBox(height: value, child: widget.chatMessageWidget);
         });
 
-    return KeyboardActions(
-        autoScroll: true,
-        config: _buildKeyboardActionsConfig(context),
-        child: Column(children: <Widget>[
-          chatMessageWidget,
-          Divider(
-            color: Colors.white.withOpacity(AppOpacity.xlOpacity),
-            height: 1.0,
-          ),
-          widget.chatMessageInputWidget
-        ]));
+    return VisibilityDetector(
+        key: UniqueKey(),
+        onVisibilityChanged: (VisibilityInfo visibilityInfo) {
+          if (visibleFraction == 0.0 && visibilityInfo.visibleFraction > 0) {
+            logger.i('ChatMessageView visibleFraction from 0 to >0');
+            _createPeerConnection();
+          }
+          visibleFraction = visibilityInfo.visibleFraction;
+        },
+        child: KeyboardActions(
+            autoScroll: true,
+            config: _buildKeyboardActionsConfig(context),
+            child: Column(children: <Widget>[
+              chatMessageWidget,
+              Divider(
+                color: Colors.white.withOpacity(AppOpacity.xlOpacity),
+                height: 1.0,
+              ),
+              widget.chatMessageInputWidget
+            ])));
   }
 
   @override

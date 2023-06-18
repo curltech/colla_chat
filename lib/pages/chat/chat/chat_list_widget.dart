@@ -25,6 +25,7 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/transport/webrtc/advanced_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/websocket.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -246,7 +247,12 @@ class _ChatListWidgetState extends State<ChatListWidget>
         if (myself.peerId == peerId) {
           continue;
         }
-        peerConnectionPool.create(peerId);
+        List<AdvancedPeerConnection> advancedPeerConnections =
+            peerConnectionPool.get(peerId);
+        //如果连接不存在，则创建新连接
+        if (advancedPeerConnections.isEmpty) {
+          peerConnectionPool.create(peerId);
+        }
       }
     }
   }
