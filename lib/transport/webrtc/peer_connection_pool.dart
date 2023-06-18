@@ -570,7 +570,7 @@ class PeerConnectionPool {
         }
       } else {
         String error =
-            'peerId:$peerId name:${linkman!.name} is not friend, can not receive a webrtc connection';
+            'peerId:$peerId name:${linkman?.name} is not friend, can not receive a webrtc connection';
         logger.e(error);
         WebrtcSignal webrtcSignal =
             WebrtcSignal(SignalType.error.name, error: error);
