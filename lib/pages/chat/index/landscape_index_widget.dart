@@ -95,6 +95,7 @@ class _LandscapeIndexWidgetState extends State<LandscapeIndexWidget>
   Widget build(BuildContext context) {
     var pageView = Row(children: [
       const LeftBar(),
+      VerticalDivider(width: appDataProvider.dividerWidth),
       _createMainView(context),
       VerticalDivider(width: appDataProvider.dividerWidth),
       Expanded(child: _createPageView(context)),

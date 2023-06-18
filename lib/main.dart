@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -42,31 +43,18 @@ Future<void> setCert() async {
 
 ///应用主函数，使用runApp加载主应用Widget
 void main(List<String> args) async {
-  //logger.i(args.toString());
-  //初始化服务类
-  // 也初始化了Provider管理的全局状态数据
-  //  多状态的MultiProvider(
-  //       providers: [
-  //         ChangeNotifierProvider(create: (context) => AppProfile()),
-  //         Provider(create: (context) => AppProfile()),
-  //       ],
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  ///6.x.x
-  // if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
-  //   await inapp.InAppWebViewController.setWebContentsDebuggingEnabled(true);
-  // }
+
   bool loginStatus = await ServiceLocator.init();
-  if (platformParams.windows) {
-    WindowsWebViewPlatform.registerWith();
-  }
-  if (platformParams.android) {
-    inapp.AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
-  }
-  if (platformParams.windows || platformParams.macos || platformParams.linux) {
-    windowManager.ensureInitialized();
-  }
+  _initWebView();
+  await _initDesktopWindows();
+
+  SystemChannels.lifecycle.setMessageHandler((msg) async {
+    logger.i('SystemChannels> $msg');
+    return msg;
+  });
 
   ///加载主应用组件
   runApp(MultiProvider(providers: [
@@ -74,11 +62,58 @@ void main(List<String> args) async {
   ], child: CollaChatApp(loginStatus: loginStatus)));
 }
 
+void _initWebView() {
+  if (platformParams.windows) {
+    WindowsWebViewPlatform.registerWith();
+  }
+  ///6.x.x
+  // if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+  //   await inapp.InAppWebViewController.setWebContentsDebuggingEnabled(true);
+  // }
+  if (platformParams.android) {
+    inapp.AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+  }
+}
+
+Future<void> _initDesktopWindows() async {
+  if (platformParams.windows || platformParams.macos || platformParams.linux) {
+    await windowManager.ensureInitialized();
+    WindowOptions windowOptions = const WindowOptions(
+      title: 'CollaChat',
+      center: true,
+    );
+    windowManager.waitUntilReadyToShow(windowOptions, () async {
+      await windowManager.show();
+      await windowManager.focus();
+    });
+  }
+}
+
 ///应用是一个无态的组件
-class CollaChatApp extends StatelessWidget {
+class CollaChatApp extends StatefulWidget {
   final bool loginStatus;
 
   const CollaChatApp({Key? key, required this.loginStatus}) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() {
+    return _CollaChatAppState();
+  }
+}
+
+class _CollaChatAppState extends State<CollaChatApp>
+    with WidgetsBindingObserver {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    logger.i('app switch new state:$state');
+  }
 
   Widget _buildMaterialApp(BuildContext context, Widget? child) {
     return MaterialApp(
@@ -92,7 +127,7 @@ class CollaChatApp extends StatelessWidget {
       themeMode: myself.themeMode,
 
       ///Scaffold 是 Material 库中提供的一个 widget，它提供了默认的导航栏、标题和包含主屏幕 widget 树的 body 属性
-      home: loginStatus ? indexView : p2pLogin,
+      home: widget.loginStatus ? indexView : p2pLogin,
       onGenerateRoute: Application.router.generator,
       // 初始化FlutterSmartDialog
       navigatorObservers: [FlutterSmartDialog.observer],
@@ -156,5 +191,11 @@ class CollaChatApp extends StatelessWidget {
               splitScreenMode: true,
               builder: _buildMaterialApp);
         }));
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
   }
 }

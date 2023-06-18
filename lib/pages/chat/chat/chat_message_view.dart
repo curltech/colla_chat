@@ -33,6 +33,8 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:visibility_detector/visibility_detector.dart';
+import 'package:wakelock/wakelock.dart';
+import 'package:window_manager/window_manager.dart';
 
 /// 聊天界面，包括文本聊天，视频通话呼叫，视频通话，全屏展示四个组件
 /// 支持群聊
@@ -68,7 +70,8 @@ class ChatMessageView extends StatefulWidget with TileDataMixin {
   String get title => 'ChatMessage';
 }
 
-class _ChatMessageViewState extends State<ChatMessageView> {
+class _ChatMessageViewState extends State<ChatMessageView>
+    with WidgetsBindingObserver, WindowListener {
   final ValueNotifier<PeerConnectionStatus> _peerConnectionStatus =
       ValueNotifier<PeerConnectionStatus>(PeerConnectionStatus.none);
   final ValueNotifier<ChatSummary?> _chatSummary =
@@ -79,10 +82,48 @@ class _ChatMessageViewState extends State<ChatMessageView> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    windowManager.addListener(this);
     chatMessageViewController.addListener(_update);
     _createPeerConnection();
     _buildReadStatus();
     _update();
+    Wakelock.enable();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    logger.i('app switch new state:$state');
+    switch (state) {
+      case AppLifecycleState.resumed:
+        _createPeerConnection();
+        break;
+      case AppLifecycleState.paused:
+        break;
+      case AppLifecycleState.inactive:
+        break;
+      case AppLifecycleState.detached:
+        break;
+      default:
+        break;
+    }
+  }
+
+  @override
+  void didChangeMetrics() {
+    super.didChangeMetrics();
+    logger.i('app change metrics');
+  }
+
+  @override
+  void onWindowEvent(String eventName) {
+    logger.i('[WindowManager] onWindowEvent: $eventName');
+  }
+
+  @override
+  void onWindowRestore() {
+    _createPeerConnection();
   }
 
   _update() {
@@ -213,9 +254,9 @@ class _ChatMessageViewState extends State<ChatMessageView> {
         }
       } else {
         if (mounted) {
-          DialogUtil.error(context,
-              content:
-                  '${AppLocalizations.t('PeerConnection status was changed from ')}${oldStatus.name}${AppLocalizations.t(' to ')}${status.name}');
+          // DialogUtil.error(context,
+          //     content:
+          //         '${AppLocalizations.t('PeerConnection status was changed from ')}${oldStatus.name}${AppLocalizations.t(' to ')}${status.name}');
         }
       }
     }
@@ -248,32 +289,37 @@ class _ChatMessageViewState extends State<ChatMessageView> {
 
   ///创建消息显示面板，包含消息的输入框
   Widget _buildChatMessageWidget(BuildContext context) {
-    final Widget chatMessageWidget = ValueListenableBuilder(
+    final Widget chatMessageView = ValueListenableBuilder(
         valueListenable: chatMessageHeight,
         builder: (BuildContext context, double value, Widget? child) {
-          return SizedBox(height: value, child: widget.chatMessageWidget);
+          var height=chatMessageViewController.chatMessageHeight;
+          Widget chatMessageWidget =
+              SizedBox(height: height, child: widget.chatMessageWidget);
+          return VisibilityDetector(
+              key: UniqueKey(),
+              onVisibilityChanged: (VisibilityInfo visibilityInfo) {
+                if (visibleFraction == 0.0 &&
+                    visibilityInfo.visibleFraction > 0) {
+                  logger.i(
+                      'ChatMessageView visibleFraction from 0 to ${visibilityInfo.visibleFraction}');
+                  _createPeerConnection();
+                }
+                visibleFraction = visibilityInfo.visibleFraction;
+              },
+              child: KeyboardActions(
+                  autoScroll: true,
+                  config: _buildKeyboardActionsConfig(context),
+                  child: Column(children: <Widget>[
+                    chatMessageWidget,
+                    Divider(
+                      color: Colors.white.withOpacity(AppOpacity.xlOpacity),
+                      height: 1.0,
+                    ),
+                    widget.chatMessageInputWidget
+                  ])));
         });
 
-    return VisibilityDetector(
-        key: UniqueKey(),
-        onVisibilityChanged: (VisibilityInfo visibilityInfo) {
-          if (visibleFraction == 0.0 && visibilityInfo.visibleFraction > 0) {
-            logger.i('ChatMessageView visibleFraction from 0 to >0');
-            _createPeerConnection();
-          }
-          visibleFraction = visibilityInfo.visibleFraction;
-        },
-        child: KeyboardActions(
-            autoScroll: true,
-            config: _buildKeyboardActionsConfig(context),
-            child: Column(children: <Widget>[
-              chatMessageWidget,
-              Divider(
-                color: Colors.white.withOpacity(AppOpacity.xlOpacity),
-                height: 1.0,
-              ),
-              widget.chatMessageInputWidget
-            ])));
+    return chatMessageView;
   }
 
   @override
@@ -348,6 +394,9 @@ class _ChatMessageViewState extends State<ChatMessageView> {
       peerConnectionPool.unregisterWebrtcEvent(chatSummary.peerId!,
           WebrtcEventType.status, _updatePeerConnectionStatus);
     }
+    WidgetsBinding.instance.removeObserver(this);
+    windowManager.removeListener(this);
+    Wakelock.disable();
     super.dispose();
   }
 }

@@ -229,9 +229,9 @@ class _ChatListWidgetState extends State<ChatListWidget>
         }
       } else {
         if (mounted) {
-          DialogUtil.error(context,
-              content:
-                  '$address ${AppLocalizations.t('Websocket status was changed to:')}${_socketStatus.value.name}');
+          // DialogUtil.error(context,
+          //     content:
+          //         '$address ${AppLocalizations.t('Websocket status was changed to:')}${_socketStatus.value.name}');
         }
       }
     }

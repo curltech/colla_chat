@@ -109,11 +109,11 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
     if (widget.isMyself) {
       crossAxisAlignment = CrossAxisAlignment.end;
     }
-    double maxWidth = appDataProvider.portraitSize.width - 100;
+    double width = appDataProvider.portraitSize.width - 100;
     if (appDataProvider.landscape) {
-      maxWidth = appDataProvider.actualCurrentViewWidth - 100;
-      if (maxWidth > 450) {
-        maxWidth = 450;
+      width = appDataProvider.actualCurrentViewWidth - 100;
+      if (width > 400) {
+        width = 400;
       }
     }
     List<Widget> children = [
@@ -135,8 +135,8 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
       ));
       children.add(parentWidget);
     }
-    return Container(
-        constraints: BoxConstraints(minWidth: 100, maxWidth: maxWidth),
+    return SizedBox(
+        width: width,
         child:
             Column(crossAxisAlignment: crossAxisAlignment, children: children));
   }
@@ -165,13 +165,20 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
       ));
       children.add(parentWidget);
     }
+    double width = appDataProvider.portraitSize.width - 100;
+    if (appDataProvider.landscape) {
+      width = appDataProvider.actualCurrentViewWidth - 100;
+      if (width > 400) {
+        width = 400;
+      }
+    }
     return Row(
       mainAxisAlignment:
           widget.isMyself ? MainAxisAlignment.end : MainAxisAlignment.start,
       children: <Widget>[
         Container(
             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
-            constraints: const BoxConstraints(minWidth: 100, maxWidth: 300.0),
+            width: width,
             decoration: BoxDecoration(
               color: widget.isMyself ? myself.primary : Colors.white,
               //myself.secondary,
