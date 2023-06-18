@@ -144,8 +144,16 @@ class LinkmanService extends PeerPartyService<Linkman> {
       linkman.id = null;
       await insert(linkman);
     } else {
-      linkman.id = old.id;
-      await update(linkman);
+      old.email = linkman.email;
+      old.mobile = linkman.mobile;
+      old.name = linkman.name;
+      old.clientId = linkman.clientId;
+      old.avatar = linkman.avatar;
+      old.status = linkman.status;
+      old.address = linkman.address;
+      old.startDate = linkman.startDate;
+      old.endDate = linkman.endDate;
+      await update(old);
     }
     linkmen[linkman.peerId] = linkman;
     await peerClientService.storeByPeerEntity(linkman);
@@ -180,10 +188,6 @@ class LinkmanService extends PeerPartyService<Linkman> {
       linkman.address = peerEntity.address;
       linkman.startDate = peerEntity.startDate;
       linkman.endDate = peerEntity.endDate;
-      linkman.activeStatus = peerEntity.activeStatus;
-      linkman.trustLevel = peerEntity.trustLevel;
-      linkman.publicKey = peerEntity.publicKey;
-      linkman.peerPublicKey = peerEntity.peerPublicKey;
       await update(linkman);
     }
     linkmen.remove(linkman.peerId);
