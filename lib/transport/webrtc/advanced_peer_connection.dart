@@ -72,7 +72,12 @@ class AdvancedPeerConnection {
   onWebrtcEvent(WebrtcEvent event) {
     String peerId = event.peerId;
     WebrtcEventType eventType = event.eventType;
-    logger.w('Webrtc peer connection $peerId webrtcEvent $eventType coming');
+    //logger.w('Webrtc peer connection $peerId webrtcEvent $eventType coming');
+    var data = event.data;
+    if (data != null && data is WebrtcSignal) {
+      logger.w(
+          'Webrtc peer connection $peerId webrtcEvent $eventType coming, and signalType:${data.signalType}');
+    }
     List<Future<void> Function(WebrtcEvent)>? fns = fnsm[eventType.name];
     if (fns != null) {
       for (var fn in fns) {

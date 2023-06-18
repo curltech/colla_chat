@@ -337,11 +337,13 @@ class WebsocketPool {
   }
 
   put(String address, Websocket websocket) {
-    if (!websockets.containsKey(address)) {
-      websockets[address] = websocket;
-    } else {
-      logger.w('wss address:$address websocket already is exist');
+    if (websockets.containsKey(address)) {
+      var exist = websockets[address];
+      logger.w(
+          'wss address:$address websocket already is exist:${exist!.status}');
+      exist.close();
     }
+    websockets[address] = websocket;
   }
 
   close(String address) {
