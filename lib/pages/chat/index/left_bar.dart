@@ -19,6 +19,8 @@ class LeftBar extends StatefulWidget {
 }
 
 class _LeftBarState extends State<LeftBar> {
+  ValueNotifier<bool> mainViewVisible = ValueNotifier<bool>(true);
+
   @override
   initState() {
     super.initState();
@@ -66,11 +68,21 @@ class _LeftBarState extends State<LeftBar> {
               Row(
                 children: [
                   const Spacer(),
-                  IconButton(
-                      onPressed: () {
-                        appDataProvider.toggleMainView();
-                      },
-                      icon: const Icon(Icons.horizontal_split))
+                  ValueListenableBuilder(
+                      valueListenable: mainViewVisible,
+                      builder: (BuildContext context, bool mainViewVisible,
+                          Widget? child) {
+                        return IconButton(
+                            onPressed: () {
+                              this.mainViewVisible.value =
+                                  !this.mainViewVisible.value;
+                              appDataProvider.toggleMainView();
+                            },
+                            icon: mainViewVisible
+                                ? const Icon(Icons.keyboard_double_arrow_left)
+                                : const Icon(
+                                    Icons.keyboard_double_arrow_right));
+                      }),
                 ],
               ),
               const SizedBox(
