@@ -122,6 +122,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     await linkmanService.update({'id': id, 'linkmanStatus': status.name});
     linkman = await linkmanService.findOne(where: 'id=?', whereArgs: [id]);
     linkmanController.current = linkman;
+    linkmanService.linkmen.remove(linkman!.peerId);
   }
 
   _changeSubscriptStatus(LinkmanStatus status) async {
@@ -129,6 +130,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     await linkmanService.update({'id': id, 'subscriptStatus': status.name});
     linkman = await linkmanService.findOne(where: 'id=?', whereArgs: [id]);
     linkmanController.current = linkman;
+    linkmanService.linkmen.remove(linkman!.peerId);
   }
 
   @override

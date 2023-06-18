@@ -202,11 +202,13 @@ class _LinkmanListWidgetState extends State<LinkmanListWidget>
   _changeLinkmanStatus(Linkman linkman, LinkmanStatus status) async {
     int id = linkman.id!;
     await linkmanService.update({'id': id, 'linkmanStatus': status.name});
+    linkmanService.linkmen.remove(linkman.peerId);
   }
 
   _changeSubscriptStatus(Linkman linkman, LinkmanStatus status) async {
     int id = linkman.id!;
     await linkmanService.update({'id': id, 'subscriptStatus': status.name});
+    linkmanService.linkmen.remove(linkman.peerId);
   }
 
   //将linkman和group数据转换从列表显示数据

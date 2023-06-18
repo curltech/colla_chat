@@ -556,7 +556,7 @@ class PeerConnectionPool {
     }
     if (signalType == SignalType.candidate.name ||
         (signalType == SignalType.sdp.name && signal.sdp!.type == 'offer')) {
-      Linkman? linkman = await linkmanService.findOneByPeerId(peerId);
+      Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
       if (linkman != null &&
           linkman.linkmanStatus == LinkmanStatus.friend.name) {
         advancedPeerConnection = await createIfNotExist(peerId,
