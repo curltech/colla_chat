@@ -38,6 +38,7 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_sharing_intent/flutter_sharing_intent.dart';
 import 'package:flutter_sharing_intent/model/sharing_file.dart';
 import 'package:provider/provider.dart';
+import 'package:system_tray/system_tray.dart';
 
 class IndexView extends StatefulWidget {
   final String title;
@@ -80,6 +81,45 @@ class _IndexViewState extends State<IndexView>
     globalChatMessageController.addListener(_updateGlobalChatMessage);
     myself.addListener(_update);
     appDataProvider.addListener(_update);
+    _initSystemTray();
+  }
+
+  Future<void> _initSystemTray() async {
+    if (!platformParams.desktop) {
+      return;
+    }
+    String path = 'assets/images/colla-white.png';
+
+    final AppWindow appWindow = AppWindow();
+    final SystemTray systemTray = SystemTray();
+
+    // We first init the systray menu
+    await systemTray.initSystemTray(
+      toolTip: AppLocalizations.t("CollaChat"),
+      iconPath: path,
+    );
+    final Menu menu = Menu();
+    await menu.buildFrom([
+      MenuItemLabel(
+          label: AppLocalizations.t('Show'),
+          onClicked: (menuItem) => appWindow.show()),
+      MenuItemLabel(
+          label: AppLocalizations.t('Hide'),
+          onClicked: (menuItem) => appWindow.hide()),
+      MenuItemLabel(
+          label: AppLocalizations.t('Exit'),
+          onClicked: (menuItem) => appWindow.close()),
+    ]);
+    await systemTray.setContextMenu(menu);
+    systemTray.registerSystemTrayEventHandler((eventName) {
+      if (eventName == kSystemTrayEventClick) {
+        systemTray.popUpContextMenu();
+      } else if (eventName == kSystemTrayEventRightClick) {
+        systemTray.popUpContextMenu();
+      } else if (eventName == kSystemTrayEventDoubleClick) {
+        appWindow.show();
+      }
+    });
   }
 
   ///初始化应用数据接受分享的监听器
