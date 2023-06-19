@@ -50,7 +50,8 @@ class PublishChannelItemWidget extends StatefulWidget with TileDataMixin {
 class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
   final TextEditingController textEditingController = TextEditingController();
   ValueNotifier<String?> thumbnail = ValueNotifier<String?>(null);
-  ValueNotifier<String?> html = ValueNotifier<String?>(null);
+  ValueNotifier<String?> documentText = ValueNotifier<String?>(null);
+  ChatMessageMimeType mimeType = ChatMessageMimeType.html;
   SwiperController controller = SwiperController();
 
   @override
@@ -72,12 +73,13 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
     var bytes = await messageAttachmentService.findContent(
         chatMessage.messageId!, chatMessage.title!);
     if (bytes != null) {
-      html.value = CryptoUtil.utf8ToString(bytes);
+      documentText.value = CryptoUtil.utf8ToString(bytes);
     }
   }
 
-  Future<void> _onSubmit(String? result) async {
-    html.value = result!;
+  Future<void> _onSubmit(String? result, ChatMessageMimeType mimeType) async {
+    documentText.value = result;
+    this.mimeType = mimeType;
   }
 
   Future<void> _save() async {
@@ -86,7 +88,7 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
       DialogUtil.error(context, content: AppLocalizations.t('Must be title'));
       return;
     }
-    if (StringUtil.isEmpty(html.value)) {
+    if (StringUtil.isEmpty(documentText.value)) {
       DialogUtil.error(context,
           content: AppLocalizations.t('Must be html content'));
       return;
@@ -94,13 +96,15 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
     ChatMessage? chatMessage = myChannelChatMessageController.current;
     if (chatMessage != null) {
       chatMessage.title = title;
-      chatMessage.content = chatMessageService.processContent(html.value!);
+      chatMessage.content =
+          chatMessageService.processContent(documentText.value!);
       chatMessage.thumbnail = thumbnail.value;
     } else {
       chatMessage = await myChannelChatMessageController
-          .buildChannelChatMessage(title, html.value!, thumbnail.value);
+          .buildChannelChatMessage(title, documentText.value!, thumbnail.value);
       myChannelChatMessageController.current = chatMessage;
     }
+    chatMessage.mimeType = mimeType.name;
     await chatMessageService.store(chatMessage);
     if (mounted) {
       DialogUtil.info(context,
@@ -142,13 +146,13 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
       List<XFile> xfiles = await FileUtil.pickFiles(type: FileType.any);
       if (xfiles.isNotEmpty) {
         Uint8List bytes = await xfiles[0].readAsBytes();
-        html.value = CryptoUtil.utf8ToString(bytes);
+        documentText.value = CryptoUtil.utf8ToString(bytes);
       }
     } else if (platformParams.mobile) {
       List<AssetEntity>? assets = await AssetUtil.pickAssets(context);
       if (assets != null && assets.isNotEmpty) {
         Uint8List? bytes = await assets[0].originBytes;
-        html.value = CryptoUtil.utf8ToString(bytes!);
+        documentText.value = CryptoUtil.utf8ToString(bytes!);
       }
     }
   }
@@ -186,7 +190,7 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
                     });
               }),
           ValueListenableBuilder(
-              valueListenable: html,
+              valueListenable: documentText,
               builder: (BuildContext context, String? value, Widget? child) {
                 return ListTile(
                     title: CommonAutoSizeText(
@@ -195,7 +199,7 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
                       Icons.file_open,
                       color: myself.primary,
                     ),
-                    trailing: html.value != null
+                    trailing: documentText.value != null
                         ? Icon(
                             Icons.check_circle,
                             color: myself.primary,

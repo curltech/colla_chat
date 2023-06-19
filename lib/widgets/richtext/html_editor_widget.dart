@@ -1,8 +1,11 @@
 import 'dart:async';
 
+import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/tool/document_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/smart_dialog_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:file_picker/file_picker.dart';
@@ -14,18 +17,22 @@ import 'package:html_editor_enhanced/html_editor.dart';
 class HtmlEditorWidget extends StatefulWidget {
   final double height;
   final String? initialText;
-  final Function(String? result)? onSubmit;
+  final ChatMessageMimeType mimeType;
+  final Function(String? result, ChatMessageMimeType mimeType)? onSubmit;
 
-  const HtmlEditorWidget(
-      {Key? key, required this.height, this.initialText, this.onSubmit})
-      : super(key: key);
+  const HtmlEditorWidget({
+    Key? key,
+    required this.height,
+    this.initialText,
+    this.onSubmit,
+    this.mimeType = ChatMessageMimeType.html,
+  }) : super(key: key);
 
   @override
   State createState() => _HtmlEditorWidgetState();
 }
 
 class _HtmlEditorWidgetState extends State<HtmlEditorWidget> {
-  String? result;
   final HtmlEditorController controller = HtmlEditorController();
 
   @override
@@ -34,6 +41,14 @@ class _HtmlEditorWidgetState extends State<HtmlEditorWidget> {
   }
 
   Widget _buildHtmlEditor(BuildContext context) {
+    if (widget.initialText != null) {
+      var html = widget.initialText!;
+      if (widget.mimeType == ChatMessageMimeType.json) {
+        var deltaJson = JsonUtil.toJson(html);
+        html = DocumentUtil.jsonToHtml(deltaJson);
+      }
+      controller.setText(html);
+    }
     return HtmlEditor(
       controller: controller,
       htmlEditorOptions: HtmlEditorOptions(
@@ -115,6 +130,19 @@ class _HtmlEditorWidgetState extends State<HtmlEditorWidget> {
             video: true, audio: true, table: true, hr: true, otherFile: true),
       ],
       toolbarItemHeight: 36,
+      customToolbarButtons: [
+        Tooltip(
+            message: AppLocalizations.t('Confirm'),
+            child: InkWell(
+              onTap: () async {
+                if (widget.onSubmit != null) {
+                  String html = await controller.getText();
+                  widget.onSubmit!(html, ChatMessageMimeType.html);
+                }
+              },
+              child: const Icon(Icons.check),
+            )),
+      ],
       gridViewHorizontalSpacing: 5,
       gridViewVerticalSpacing: 5,
       onButtonPressed: (ButtonType type, bool? status, Function? updateStatus) {
@@ -182,14 +210,9 @@ class _HtmlEditorWidgetState extends State<HtmlEditorWidget> {
         label: 'Submit',
         icon: const Icon(Icons.save),
         onTap: (int index, String label, {String? value}) async {
-          var txt = await controller.getText();
-          result = txt;
+          var html = await controller.getText();
           if (widget.onSubmit != null) {
-            widget.onSubmit!(result);
-          }
-          if (txt.contains('src=\"data:')) {
-            txt =
-                '<text removed due to base-64 data, displaying the text could cause the app to crash>';
+            widget.onSubmit!(html, ChatMessageMimeType.html);
           }
         },
       ),
@@ -392,7 +415,7 @@ class _HtmlEditorWidgetState extends State<HtmlEditorWidget> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (!kIsWeb) {
+        if (!platformParams.web) {
           controller.clearFocus();
         }
       },

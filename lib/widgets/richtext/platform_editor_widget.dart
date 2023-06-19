@@ -1,3 +1,4 @@
+import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/richtext/html_editor_widget.dart';
 import 'package:colla_chat/widgets/richtext/html_rte_widget.dart';
@@ -8,7 +9,7 @@ import 'package:flutter/material.dart';
 class PlatformEditorWidget extends StatefulWidget {
   final double height;
   final String? initialText;
-  final Function(String? result) onSubmit;
+  final Function(String? result, ChatMessageMimeType mimeType) onSubmit;
 
   const PlatformEditorWidget(
       {Key? key,

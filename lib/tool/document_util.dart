@@ -1,20 +1,40 @@
+import 'package:colla_chat/tool/json_util.dart';
+import 'package:flutter_quill/flutter_quill.dart';
+import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 
+class DocumentUtil {
+  ///转换成Delta
+  static Delta jsonToDelta(List<dynamic> deltaJson) {
+    Delta delta = Delta.fromJson(deltaJson);
 
-// import 'package:flutter_filereader/flutter_filereader.dart';
-//
-// class DocumentUtil {
-//   /// IOS docx,doc,xlsx,xls,pptx,ppt,pdf,txt,jpg,jpeg,png
-//   /// Android docx,doc,xlsx,xls,pptx,ppt,pdf,txt
-//   static Widget buildFileReaderView({Key? key, required String filePath}) {
-//     if (platformParams.mobile) {
-//       FileReaderView view = FileReaderView(
-//         key: key,
-//         filePath: filePath,
-//       );
-//
-//       return view;
-//     } else {
-//       return PlatformWebView(initialUrl: filePath);
-//     }
-//   }
-// }
+    return delta;
+  }
+
+  ///转换成json
+  static String deltaToJson(Delta delta) {
+    final deltaJson = delta.toJson();
+
+    return JsonUtil.toJsonString(deltaJson);
+  }
+
+  ///转换成html
+  static String deltaToHtml(Delta delta) {
+    final deltaJson = delta.toJson();
+    final converter = QuillDeltaToHtmlConverter(
+      List.castFrom(deltaJson),
+      ConverterOptions.forEmail(),
+    );
+
+    return converter.convert();
+  }
+
+  ///转换成html
+  static String jsonToHtml(List<dynamic> deltaJson) {
+    final converter = QuillDeltaToHtmlConverter(
+      List.castFrom(deltaJson),
+      ConverterOptions.forEmail(),
+    );
+
+    return converter.convert();
+  }
+}

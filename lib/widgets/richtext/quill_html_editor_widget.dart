@@ -1,5 +1,8 @@
+import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 import 'package:quill_html_editor/quill_html_editor.dart';
@@ -8,12 +11,14 @@ import 'package:quill_html_editor/quill_html_editor.dart';
 class QuillHtmlEditorWidget extends StatefulWidget {
   final double height;
   final String? initialText;
-  final Function(String? result)? onSubmit;
+  final ChatMessageMimeType mimeType;
+  final Function(String? result, ChatMessageMimeType mimeType)? onSubmit;
 
   const QuillHtmlEditorWidget({
     Key? key,
     required this.height,
     this.initialText,
+    this.mimeType = ChatMessageMimeType.html,
     this.onSubmit,
   }) : super(key: key);
 
@@ -22,13 +27,21 @@ class QuillHtmlEditorWidget extends StatefulWidget {
 }
 
 class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
-  String result = '';
   late final QuillEditorController controller;
 
   @override
   void initState() {
     super.initState();
     controller = QuillEditorController();
+    if (widget.initialText != null) {
+      if (widget.mimeType == ChatMessageMimeType.json) {
+        var delta = JsonUtil.toJson(widget.initialText!);
+        controller.setDelta(delta);
+      }
+      if (widget.mimeType == ChatMessageMimeType.html) {
+        controller.setText(widget.initialText!);
+      }
+    }
     controller.onTextChanged((text) {
       debugPrint('listening to $text');
     });
@@ -46,25 +59,18 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
       crossAxisAlignment: CrossAxisAlignment.center,
       //direction: Axis.vertical,
       customButtons: [
-        InkWell(
-            onTap: () {
-              controller.unFocus();
-            },
-            child: const Icon(
-              Icons.favorite,
-              color: Colors.black,
-            )),
-        InkWell(
-            onTap: () async {
-              var selectedText = await controller.getSelectedText();
-              logger.i('selectedText $selectedText');
-              var selectedHtmlText = await controller.getSelectedHtmlText();
-              logger.i('selectedHtmlText $selectedHtmlText');
-            },
-            child: const Icon(
-              Icons.add_circle,
-              color: Colors.black,
-            )),
+        Tooltip(
+            message: AppLocalizations.t('Confirm'),
+            child: InkWell(
+                onTap: () async {
+                  if (widget.onSubmit != null) {
+                    String html = await controller.getText();
+                    widget.onSubmit!(html, ChatMessageMimeType.html);
+                  }
+                },
+                child: const Icon(
+                  Icons.check,
+                ))),
       ],
     ));
   }

@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/document_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:filesystem_picker/filesystem_picker.dart';
@@ -13,19 +16,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:vsc_quill_delta_to_html/vsc_quill_delta_to_html.dart';
 
 ///quill_editor一样的实现，用于IOS,LINUX,MACOS,WINDOWS
 class QuillEditorWidget extends StatefulWidget {
   final double height;
   final String? initialText;
-  final Function(String? result)? onSubmit;
+  final ChatMessageMimeType mimeType;
+  final Function(String? result, ChatMessageMimeType mimeType)? onSubmit;
 
   const QuillEditorWidget({
     Key? key,
     required this.height,
     this.initialText,
     this.onSubmit,
+    this.mimeType = ChatMessageMimeType.json,
   }) : super(key: key);
 
   @override
@@ -42,7 +46,9 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     super.initState();
     if (widget.initialText != null) {
       try {
-        doc = Document.fromJson(jsonDecode(widget.initialText!));
+        if (widget.mimeType == ChatMessageMimeType.json) {
+          doc = Document.fromJson(JsonUtil.toJson(widget.initialText!));
+        }
       } catch (e) {
         doc = Document();
       }
@@ -51,18 +57,6 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     }
     controller = QuillController(
         document: doc, selection: const TextSelection.collapsed(offset: 0));
-  }
-
-  ///转换成html
-  String toHtml() {
-    final Delta delta = controller.document.toDelta();
-    final deltaJson = delta.toJson();
-    final converter = QuillDeltaToHtmlConverter(
-      List.castFrom(deltaJson),
-      ConverterOptions.forEmail(),
-    );
-
-    return converter.convert();
   }
 
   Future<String?> _onImagePaste(Uint8List imageBytes) async {
@@ -146,6 +140,103 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     );
   }
 
+  /// 定制媒体选择界面
+  Future<MediaPickSetting?> _selectMediaPickSetting(BuildContext context) =>
+      showDialog<MediaPickSetting>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          contentPadding: EdgeInsets.zero,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextButton.icon(
+                icon: const Icon(Icons.collections),
+                label: CommonAutoSizeText(AppLocalizations.t('Gallery')),
+                onPressed: () => Navigator.pop(ctx, MediaPickSetting.Gallery),
+              ),
+              TextButton.icon(
+                icon: const Icon(Icons.link),
+                label: CommonAutoSizeText(AppLocalizations.t('Link')),
+                onPressed: () => Navigator.pop(ctx, MediaPickSetting.Link),
+              )
+            ],
+          ),
+        ),
+      );
+
+  // ignore: unused_element
+  Future<MediaPickSetting?> _selectCameraPickSetting(BuildContext context) =>
+      showDialog<MediaPickSetting>(
+        context: context,
+        builder: (ctx) => AlertDialog(
+          contentPadding: EdgeInsets.zero,
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextButton.icon(
+                icon: const Icon(Icons.camera),
+                label:
+                    CommonAutoSizeText(AppLocalizations.t('Capture a photo')),
+                onPressed: () => Navigator.pop(ctx, MediaPickSetting.Camera),
+              ),
+              TextButton.icon(
+                icon: const Icon(Icons.video_call),
+                label:
+                    CommonAutoSizeText(AppLocalizations.t('Capture a video')),
+                onPressed: () => Navigator.pop(ctx, MediaPickSetting.Video),
+              )
+            ],
+          ),
+        ),
+      );
+
+  Widget _buildQuillToolbar(BuildContext context) {
+    var customButtons = <QuillCustomButton>[
+      QuillCustomButton(
+          icon: Icons.check,
+          onTap: () {
+            if (widget.onSubmit != null) {
+              String jsonStr = DocumentUtil.deltaToJson(doc.toDelta());
+              widget.onSubmit!(jsonStr, ChatMessageMimeType.json);
+            }
+          },
+          tooltip: AppLocalizations.t('Confirm')),
+    ];
+    var toolbar = QuillToolbar.basic(
+      locale: myself.locale,
+      controller: controller,
+      toolbarIconAlignment: WrapAlignment.start,
+      toolbarIconCrossAlignment: WrapCrossAlignment.start,
+      embedButtons: FlutterQuillEmbeds.buttons(
+        onImagePickCallback: _onMediaPickCallback,
+        onVideoPickCallback: _onMediaPickCallback,
+        // uncomment to provide a custom "pick from" dialog.
+        // mediaPickSettingSelector: _selectMediaPickSetting,
+        // uncomment to provide a custom "pick from" dialog.
+        // cameraPickSettingSelector: _selectCameraPickSetting,
+      ),
+      customButtons: customButtons,
+      showAlignmentButtons: true,
+      afterButtonPressed: _focusNode.requestFocus,
+    );
+    if (platformParams.web) {
+      toolbar = QuillToolbar.basic(
+        locale: myself.locale,
+        controller: controller,
+        toolbarIconAlignment: WrapAlignment.start,
+        toolbarIconCrossAlignment: WrapCrossAlignment.start,
+        embedButtons: FlutterQuillEmbeds.buttons(
+          onImagePickCallback: _onMediaPickCallback,
+          webImagePickImpl: _webImagePickImpl,
+        ),
+        customButtons: customButtons,
+        showAlignmentButtons: true,
+        afterButtonPressed: _focusNode.requestFocus,
+      );
+    }
+    return toolbar;
+  }
+
   Widget _buildQuillEditor(BuildContext context) {
     Widget quillEditor = QuillEditor(
       locale: myself.locale,
@@ -207,47 +298,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
             NotesEmbedBuilder(addEditNote: _addEditNote),
           ]);
     }
-    var toolbar = QuillToolbar.basic(
-      locale: myself.locale,
-      controller: controller,
-      embedButtons: FlutterQuillEmbeds.buttons(
-        // provide a callback to enable picking images from device.
-        // if omit, "image" button only allows adding images from url.
-        // same goes for videos.
-        onImagePickCallback: _onMediaPickCallback,
-        onVideoPickCallback: _onMediaPickCallback,
-        // uncomment to provide a custom "pick from" dialog.
-        // mediaPickSettingSelector: _selectMediaPickSetting,
-        // uncomment to provide a custom "pick from" dialog.
-        // cameraPickSettingSelector: _selectCameraPickSetting,
-      ),
-      showAlignmentButtons: true,
-      afterButtonPressed: _focusNode.requestFocus,
-    );
-    if (platformParams.web) {
-      toolbar = QuillToolbar.basic(
-        locale: myself.locale,
-        controller: controller,
-        embedButtons: FlutterQuillEmbeds.buttons(
-          onImagePickCallback: _onMediaPickCallback,
-          webImagePickImpl: _webImagePickImpl,
-        ),
-        showAlignmentButtons: true,
-        afterButtonPressed: _focusNode.requestFocus,
-      );
-    }
-    if (platformParams.desktop) {
-      toolbar = QuillToolbar.basic(
-        locale: myself.locale,
-        controller: controller,
-        embedButtons: FlutterQuillEmbeds.buttons(
-          onImagePickCallback: _onMediaPickCallback,
-          filePickImpl: openFileSystemPickerForDesktop,
-        ),
-        showAlignmentButtons: true,
-        afterButtonPressed: _focusNode.requestFocus,
-      );
-    }
+    var toolbar = _buildQuillToolbar(context);
 
     return Card(
         elevation: 0.0,

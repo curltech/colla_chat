@@ -1,3 +1,6 @@
+import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/tool/document_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -8,12 +11,14 @@ import 'package:flutter_rte/flutter_rte.dart';
 class HtmlRteWidget extends StatefulWidget {
   final double height;
   final String? initialText;
-  final Function(String? result)? onSubmit;
+  final ChatMessageMimeType mimeType;
+  final Function(String? result, ChatMessageMimeType mimeType)? onSubmit;
 
   const HtmlRteWidget({
     Key? key,
     required this.height,
     this.initialText,
+    this.mimeType = ChatMessageMimeType.html,
     this.onSubmit,
   }) : super(key: key);
 
@@ -22,27 +27,52 @@ class HtmlRteWidget extends StatefulWidget {
 }
 
 class _HtmlRteWidgetState extends State<HtmlRteWidget> {
-  String result = '';
   late final HtmlEditorController controller;
 
   @override
   void initState() {
     super.initState();
     controller = HtmlEditorController(
-      toolbarOptions: HtmlToolbarOptions(
-          toolbarType: ToolbarType.nativeScrollable,
-          backgroundColor: Colors.transparent,
-          toolbarPosition: ToolbarPosition.custom),
+      toolbarOptions: _buildToolbarOptions(),
     );
-    HtmlToolbarOptions toolbarOptions = controller.toolbarOptions;
+    controller.editorOptions.decoration = BoxDecoration(
+        borderRadius: const BorderRadius.all(Radius.circular(10)),
+        border: Border.all(color: Colors.white, width: 2));
+    if (widget.initialText != null) {
+      var html = widget.initialText!;
+      if (widget.mimeType == ChatMessageMimeType.json) {
+        var deltaJson = JsonUtil.toJson(html);
+        html = DocumentUtil.jsonToHtml(deltaJson);
+      }
+      controller.setInitialText(html);
+    }
+    controller.callbacks.onChangeContent = (s) {};
+  }
+
+  HtmlToolbarOptions _buildToolbarOptions() {
+    var toolbarOptions = HtmlToolbarOptions(
+        toolbarType: ToolbarType.nativeScrollable,
+        backgroundColor: Colors.transparent,
+        toolbarPosition: ToolbarPosition.custom,
+        customButtonGroups: [
+          CustomButtonGroup(buttons: [
+            CustomToolbarButton(
+                icon: Icons.check,
+                action: () async {
+                  if (widget.onSubmit != null) {
+                    String html = await controller.getText();
+                    widget.onSubmit!(html, ChatMessageMimeType.html);
+                  }
+                },
+                isSelected: false),
+          ]),
+        ]);
     toolbarOptions.toolbarPosition = ToolbarPosition.aboveEditor;
     toolbarOptions.toolbarType = ToolbarType.nativeExpandable;
     toolbarOptions.initiallyExpanded = false;
     toolbarOptions.backgroundColor = Colors.white;
-    controller.editorOptions.decoration = BoxDecoration(
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
-        border: Border.all(color: Colors.white, width: 2));
-    controller.callbacks.onChangeContent = (s) {};
+
+    return toolbarOptions;
   }
 
   Widget _buildHtmlRteEditor() {

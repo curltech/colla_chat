@@ -5,6 +5,8 @@ enum ChatMessageContentType {
   rich, // 根据场景包含类型不同，如非系统类型、可搜索类型等
   image,
   text,
+  html,
+  json,
   file,
   audio,
   video,
@@ -20,6 +22,7 @@ enum ChatMessageContentType {
 enum ChatMessageMimeType {
   text,
   html,
+  json,
   gif,
   png,
   jpeg,
