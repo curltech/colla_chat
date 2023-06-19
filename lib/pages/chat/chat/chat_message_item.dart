@@ -119,7 +119,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
     List<Widget> children = [
       Bubble(
           elevation: 0.0,
-          stick: true,
+          stick: false,
           margin: const BubbleEdges.only(top: 1),
           nip: widget.isMyself ? BubbleNip.rightTop : BubbleNip.leftTop,
           color: widget.isMyself ? myself.primary : Colors.white,
