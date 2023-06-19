@@ -24,7 +24,7 @@ class AppDataProvider with ChangeNotifier {
   double bottomBarHeight = kBottomNavigationBarHeight;
   double toolbarHeight = kToolbarHeight;
   double leftBarWidth = 90;
-  double mainViewWidth = 300;
+  double mainViewWidth = 412;
   double dividerWidth = 1;
   double topPadding = 0;
   double bottomPadding = 0;
@@ -59,7 +59,7 @@ class AppDataProvider with ChangeNotifier {
     double width = _totalSize.width;
     double height = _totalSize.height;
     //横屏需要根据固定的尺寸来计算
-    if (landscape || (!landscape && _totalSize.width > 450)) {
+    if (landscape || (!landscape && _totalSize.width > designSize.width)) {
       width = _totalSize.width < designSize.width
           ? _totalSize.width
           : designSize.width;
@@ -96,7 +96,7 @@ class AppDataProvider with ChangeNotifier {
 
   toggleMainView() {
     if (mainViewWidth == 0.0) {
-      mainViewWidth = 300.0;
+      mainViewWidth = designSize.width;
     } else {
       mainViewWidth = 0.0;
     }

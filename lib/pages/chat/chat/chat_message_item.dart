@@ -109,11 +109,11 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
     if (widget.isMyself) {
       crossAxisAlignment = CrossAxisAlignment.end;
     }
-    double width = appDataProvider.portraitSize.width - 100;
+    double width = appDataProvider.portraitSize.width - 150;
     if (appDataProvider.landscape) {
-      width = appDataProvider.actualCurrentViewWidth - 100;
-      if (width > 400) {
-        width = 400;
+      width = appDataProvider.actualCurrentViewWidth - 150;
+      if (width > appDataProvider.designSize.width) {
+        width = appDataProvider.designSize.width;
       }
     }
     List<Widget> children = [
@@ -165,11 +165,11 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
       ));
       children.add(parentWidget);
     }
-    double width = appDataProvider.portraitSize.width - 100;
+    double width = appDataProvider.portraitSize.width - 150;
     if (appDataProvider.landscape) {
-      width = appDataProvider.actualCurrentViewWidth - 100;
-      if (width > 400) {
-        width = 400;
+      width = appDataProvider.actualCurrentViewWidth - 150;
+      if (width > appDataProvider.designSize.width) {
+        width = appDataProvider.designSize.width;
       }
     }
     return Row(
