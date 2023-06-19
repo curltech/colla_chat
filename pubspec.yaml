@@ -370,7 +370,7 @@ dependency_overrides:
   device_info_plus: ^8.0.0
   ffi: ^2.0.1
   flutter_ion: ^1.0.0
-  flutter_webrtc: ^0.9.31
+  flutter_webrtc: ^0.9.34
   analyzer: ^5.2.0
   provider: ^6.0.1
   geolocator: ^9.0.2
