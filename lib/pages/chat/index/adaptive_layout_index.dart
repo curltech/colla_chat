@@ -83,14 +83,10 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
       config: <Breakpoint, SlotLayoutConfig>{
         appDataProvider.mediumBreakpoint: SlotLayout.from(
           key: const Key('Body Medium'),
-          // inAnimation: AdaptiveScaffold.leftInOut,
-          // outAnimation: AdaptiveScaffold.leftOutIn,
           builder: (_) => _buildBodyView(),
         ),
         appDataProvider.largeBreakpoint: SlotLayout.from(
           key: const Key('Body Large'),
-          // inAnimation: AdaptiveScaffold.leftInOut,
-          // outAnimation: AdaptiveScaffold.leftOutIn,
           builder: (_) => _buildBodyView(),
         ),
       },
@@ -133,17 +129,17 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
       config: <Breakpoint, SlotLayoutConfig>{
         appDataProvider.smallBreakpoint: SlotLayout.from(
           key: const Key('Secondary body'),
-          // outAnimation: AdaptiveScaffold.stayOnScreen,
+          outAnimation: AdaptiveScaffold.stayOnScreen,
           builder: (_) => _buildSecondaryBodyView(),
         ),
         appDataProvider.mediumBreakpoint: SlotLayout.from(
           key: const Key('Secondary body'),
-          // outAnimation: AdaptiveScaffold.stayOnScreen,
+          outAnimation: AdaptiveScaffold.stayOnScreen,
           builder: (_) => _buildSecondaryBodyView(),
         ),
         appDataProvider.largeBreakpoint: SlotLayout.from(
           key: const Key('Secondary body'),
-          //outAnimation: AdaptiveScaffold.stayOnScreen,
+          outAnimation: AdaptiveScaffold.stayOnScreen,
           builder: (_) => _buildSecondaryBodyView(),
         )
       },
