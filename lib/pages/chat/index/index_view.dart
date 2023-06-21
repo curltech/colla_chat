@@ -9,10 +9,8 @@ import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/video_chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/index/bottom_bar.dart';
+import 'package:colla_chat/pages/chat/index/adaptive_layout_index.dart';
 import 'package:colla_chat/pages/chat/index/global_chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/index/landscape_index_widget.dart';
-import 'package:colla_chat/pages/chat/index/portrait_index_widget.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/login/loading.dart';
 import 'package:colla_chat/platform.dart';
@@ -42,8 +40,7 @@ import 'package:system_tray/system_tray.dart';
 
 class IndexView extends StatefulWidget {
   final String title;
-  final PortraitIndexWidget portraitIndexWidget = PortraitIndexWidget();
-  final LandscapeIndexWidget landscapeIndexWidget = LandscapeIndexWidget();
+  final AdaptiveLayoutIndex adaptiveLayoutIndex = AdaptiveLayoutIndex();
 
   IndexView({Key? key, required this.title}) : super(key: key);
 
@@ -467,44 +464,35 @@ class _IndexViewState extends State<IndexView>
 
   Widget _createScaffold(
       BuildContext context, IndexWidgetProvider indexWidgetProvider) {
-    Widget? bottomNavigationBar =
-        indexWidgetProvider.bottomBarVisible ? const BottomBar() : null;
-    double bottomBarHeight = indexWidgetProvider.bottomBarVisible
-        ? appDataProvider.bottomBarHeight
-        : 0.0;
     double width = appDataProvider.totalSize.width;
     double height = appDataProvider.totalSize.height;
     if (!appDataProvider.landscape) {
       width = appDataProvider.portraitSize.width;
-      height = appDataProvider.portraitSize.height - bottomBarHeight;
+      height = appDataProvider.portraitSize.height;
     }
     Scaffold scaffold = Scaffold(
-        resizeToAvoidBottomInset: true,
-        primary: true,
-        appBar: AppBar(toolbarHeight: 0.0, elevation: 0.0),
-        body: KeyboardDismissOnTap(
-            dismissOnCapturedTaps: false,
-            child: SafeArea(
-                child: Stack(children: <Widget>[
-              Opacity(
-                opacity: 1,
-                child: loadingWidget,
-              ),
-              Center(
-                  child: platformWidgetFactory.buildSizedBox(
-                      child: !appDataProvider.landscape
-                          ? widget.portraitIndexWidget
-                          : widget.landscapeIndexWidget,
-                      height: height,
-                      width: width)),
-              Row(children: [
-                _buildChatMessageBanner(context),
-                _buildVideoChatMessageBanner(context)
-              ]),
-            ]))),
-        //endDrawer: endDrawer,
-        bottomNavigationBar:
-            !appDataProvider.landscape ? bottomNavigationBar : null);
+      resizeToAvoidBottomInset: true,
+      primary: true,
+      appBar: AppBar(toolbarHeight: 0.0, elevation: 0.0),
+      body: KeyboardDismissOnTap(
+          dismissOnCapturedTaps: false,
+          child: SafeArea(
+              child: Stack(children: <Widget>[
+            Opacity(
+              opacity: 1,
+              child: loadingWidget,
+            ),
+            Center(
+                child: platformWidgetFactory.buildSizedBox(
+                    child: widget.adaptiveLayoutIndex,
+                    height: height,
+                    width: width)),
+            Row(children: [
+              _buildChatMessageBanner(context),
+              _buildVideoChatMessageBanner(context)
+            ]),
+          ]))),
+    );
 
     return scaffold;
   }

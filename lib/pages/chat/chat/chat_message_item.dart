@@ -109,12 +109,9 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
     if (widget.isMyself) {
       crossAxisAlignment = CrossAxisAlignment.end;
     }
-    double width = appDataProvider.portraitSize.width - 150;
-    if (appDataProvider.landscape) {
-      width = appDataProvider.actualCurrentViewWidth - 150;
-      if (width > appDataProvider.designSize.width) {
-        width = appDataProvider.designSize.width;
-      }
+    double width = appDataProvider.secondaryBodyWidth - 80;
+    if (width > 300) {
+      width = 300;
     }
     List<Widget> children = [
       Bubble(
@@ -167,7 +164,7 @@ class _ChatMessageItemState extends State<ChatMessageItem> {
     }
     double width = appDataProvider.portraitSize.width - 150;
     if (appDataProvider.landscape) {
-      width = appDataProvider.actualCurrentViewWidth - 150;
+      width = appDataProvider.secondaryBodyWidth - 150;
       if (width > appDataProvider.designSize.width) {
         width = appDataProvider.designSize.width;
       }

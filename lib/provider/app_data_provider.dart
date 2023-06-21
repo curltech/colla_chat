@@ -3,6 +3,7 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/locale_util.dart';
 import 'package:colla_chat/widgets/data_bind/base.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
 
 /// 不同语言版本的下拉选择框的选项
 final localeOptions = [
@@ -23,8 +24,9 @@ class AppDataProvider with ChangeNotifier {
   Size _totalSize = const Size(412.0, 892.0);
   double bottomBarHeight = kBottomNavigationBarHeight;
   double toolbarHeight = kToolbarHeight;
-  double leftBarWidth = 90;
-  double mainViewWidth = 412;
+  double primaryNavigationWidth = 145;
+  double mediumPrimaryNavigationWidth = 90;
+  double _bodyRatio = 0.4;
   double dividerWidth = 1;
   double topPadding = 0;
   double bottomPadding = 0;
@@ -39,14 +41,6 @@ class AppDataProvider with ChangeNotifier {
     return _totalSize;
   }
 
-  Size get workspaceSize {
-    double width = _totalSize.width;
-    double height = _totalSize.height;
-    height = height - bottomBarHeight;
-
-    return Size(width, height);
-  }
-
   Size get designSize {
     //特殊效果的尺寸，宽度最大是412，高度最大是892
     return const Size(412.0, 892.0);
@@ -54,7 +48,6 @@ class AppDataProvider with ChangeNotifier {
 
   ///竖屏尺寸，在竖屏的情况下，等于总尺寸，
   ///在横屏的情况下，用于登录等小页面的尺寸，露出后面的背景图像，等于竖屏设计尺寸与实际尺寸取较小值
-  ///宽度必须小于450
   Size get portraitSize {
     double width = _totalSize.width;
     double height = _totalSize.height;
@@ -66,49 +59,83 @@ class AppDataProvider with ChangeNotifier {
       height = _totalSize.height < designSize.height
           ? _totalSize.height
           : designSize.height;
-      //高度还要减去底部工具栏的高度
-      // height = height - bottomBarHeight;
     }
 
     return Size(width, height);
   }
 
-  ///横屏，宽度大于高度并且宽度大于左边菜单宽度加上2个主视图宽度
+  static const double smallBreakpointLimit = 600;
+  static const double largeBreakpointLimit = 1000;
+
   bool get landscape {
-    return _totalSize.height < _totalSize.width &&
-        _totalSize.width > (dividerWidth + leftBarWidth + mainViewWidth * 2);
+    return _totalSize.width >= smallBreakpointLimit;
+  }
+
+  ///竖屏，宽度小于700
+  WidthPlatformBreakpoint get smallBreakpoint {
+    return const WidthPlatformBreakpoint(end: smallBreakpointLimit);
+  }
+
+  ///横屏，宽度大于700
+  WidthPlatformBreakpoint get mediumBreakpoint {
+    return const WidthPlatformBreakpoint(
+        begin: smallBreakpointLimit, end: largeBreakpointLimit);
+  }
+
+  WidthPlatformBreakpoint get largeBreakpoint {
+    return const WidthPlatformBreakpoint(begin: largeBreakpointLimit);
   }
 
   ///计算实际的主视图宽度
-  double get actualMainViewWidth {
-    if (mainViewWidth == 0.0) {
-      return 0.0;
-    }
+  double get bodyWidth {
     double width = portraitSize.width;
-    if (landscape) {
-      width = (totalSize.width - leftBarWidth) / 3;
-      if (width < mainViewWidth) {
-        width = mainViewWidth;
-      }
+    if (_totalSize.width >= largeBreakpointLimit) {
+      width = totalSize.width - primaryNavigationWidth;
+      width = width * _bodyRatio;
+    } else if (_totalSize.width >= smallBreakpointLimit) {
+      width = totalSize.width - mediumPrimaryNavigationWidth;
+      width = width * _bodyRatio;
+    } else {
+      width = 0.0;
     }
     return width;
   }
 
-  toggleMainView() {
-    if (mainViewWidth == 0.0) {
-      mainViewWidth = designSize.width;
+  double get bodyRatio {
+    return _bodyRatio;
+  }
+
+  set bodyRatio(double bodyRatio) {
+    if (_bodyRatio != bodyRatio) {
+      _bodyRatio = bodyRatio;
+      notifyListeners();
+    }
+  }
+
+  toggleBody() {
+    if (_bodyRatio == 0.0) {
+      if (_totalSize.width >= largeBreakpointLimit) {
+        _bodyRatio = 0.4;
+      } else if (_totalSize.width >= smallBreakpointLimit) {
+        _bodyRatio = 0.5;
+      }
     } else {
-      mainViewWidth = 0.0;
+      _bodyRatio = 0.0;
     }
     notifyListeners();
   }
 
   ///计算实际的当前视图宽度
-  double get actualCurrentViewWidth {
+  double get secondaryBodyWidth {
     double width = portraitSize.width;
-    if (landscape) {
-      width =
-          totalSize.width - leftBarWidth - actualMainViewWidth - dividerWidth;
+    if (_totalSize.width >= largeBreakpointLimit) {
+      width = totalSize.width - primaryNavigationWidth;
+      width = width * (1 - _bodyRatio);
+    } else if (_totalSize.width >= smallBreakpointLimit) {
+      width = totalSize.width - mediumPrimaryNavigationWidth;
+      width = width * (1 - _bodyRatio);
+    } else {
+      width = portraitSize.width;
     }
     return width;
   }
@@ -140,6 +167,13 @@ class AppDataProvider with ChangeNotifier {
     if (totalSize.width != _totalSize.width ||
         totalSize.height != _totalSize.height) {
       _totalSize = totalSize;
+      if (_bodyRatio > 0.0) {
+        if (_totalSize.width >= largeBreakpointLimit) {
+          _bodyRatio = 0.4;
+        } else if (_totalSize.width >= smallBreakpointLimit) {
+          _bodyRatio = 0.5;
+        }
+      }
       logger.i('Total size: $_totalSize');
     }
     var bottom = MediaQuery.of(context).viewInsets.bottom;

@@ -101,11 +101,6 @@ dependencies:
   #share: ^0.6.5
   flutter_emoji: ^2.4.0
   emoji_picker_flutter: ^1.5.2
-  animated_bottom_navigation_bar: ^1.1.0+1
-  flutter_animate: ^4.1.0
-  auto_animated: ^3.1.0 #对滚动视图内的元素定义动画
-  animations: ^2.0.7
-  animate_do: ^3.0.2
   fluro: ^2.0.3
   flutter_multi_formatter: ^2.5.1
   #flutter_awesome_select: ^6.5.0
@@ -149,7 +144,6 @@ dependencies:
   fluentui_system_icons: ^1.1.201 #FluentIcons.access_time_24_regular
   macos_ui: ^1.11.1
   flutter_material_color_picker: ^1.1.0+2
-  animated_text_kit: ^4.2.1
   after_layout: ^1.1.0
   snapping_sheet: ^3.1.0
 
@@ -180,6 +174,15 @@ dependencies:
   auto_size_text: ^3.0.0
   auto_size_text_field: ^2.2.1
   responsive_sizer: ^3.1.1
+
+  #界面效果动画
+  flutter_adaptive_scaffold: ^0.1.5
+  animated_bottom_navigation_bar: ^1.2.0
+  flutter_animate: ^4.1.0
+  auto_animated: ^3.1.0 #对滚动视图内的元素定义动画
+  animations: ^2.0.7
+  animate_do: ^3.0.2
+  animated_text_kit: ^4.2.1
 
   #安全加密
   cryptography: ^2.0.5 #ecc,aes
@@ -356,6 +359,7 @@ dependencies:
   awesome_notifications_fcm: ^0.7.4+1 #对minsdk有要求
   flutter_native_splash: ^2.2.19
   system_tray: ^2.0.2
+  tray_manager: ^0.2.0
   #openai_gpt3_api:
   dart_openai: ^1.9.1
   chat_gpt_sdk: ^2.0.4
