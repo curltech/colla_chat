@@ -116,14 +116,17 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
         const SizedBox(height: 10.0),
         Container(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
-            alignment: Alignment.centerLeft,
-            child: ListTile(
-              title: CommonAutoSizeText(AppLocalizations.t('Restore peer')),
-              leading: Icon(
+            alignment: Alignment.centerRight,
+            child: TextButton.icon(
+              label: CommonAutoSizeText(
+                AppLocalizations.t('Restore peer'),
+                style: const TextStyle(color: Colors.white),
+              ),
+              icon: Icon(
                 Icons.restore,
                 color: myself.primary,
               ),
-              onTap: () {
+              onPressed: () {
                 _restore();
               },
             )),
