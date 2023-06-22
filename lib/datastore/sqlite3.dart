@@ -1,12 +1,14 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
+import 'package:colla_chat/service/general_base.dart';
+import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/entity_util.dart';
-import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/type_util.dart';
 import 'package:sqlite3/common.dart';
@@ -14,9 +16,6 @@ import 'package:sqlite3/common.dart';
 import './condition_import/unsupport.dart'
     if (dart.library.html) './condition_import/web.dart'
     if (dart.library.io) './condition_import/desktop.dart' as sqlite3_open;
-import '../service/general_base.dart';
-import '../service/servicelocator.dart';
-import 'datastore.dart';
 
 /// 适用于移动手机（无数据限制），desktop和chrome浏览器的sqlite3的数据库（50M数据限制）
 class Sqlite3 extends DataStore {

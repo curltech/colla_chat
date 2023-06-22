@@ -59,6 +59,18 @@ class PeerProfileService extends PeerEntityService<PeerProfile> {
     }
     return peerProfile;
   }
+
+  ///保存MyselfPeer，同时保存对应的PeerClient和Linkman
+  Future<void> store(PeerProfile peerProfile) async {
+    PeerProfile? old =
+        await findOne(where: 'peerId=?', whereArgs: [peerProfile.peerId]);
+    if (old == null) {
+      await insert(peerProfile);
+    } else {
+      peerProfile.id = old.id;
+      await update(peerProfile);
+    }
+  }
 }
 
 final peerProfileService = PeerProfileService(

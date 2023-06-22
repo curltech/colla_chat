@@ -11,7 +11,6 @@ import 'package:colla_chat/entity/dht/peerclient.dart';
 import 'package:colla_chat/entity/dht/peerprofile.dart';
 import 'package:colla_chat/entity/p2p/chain_message.dart';
 import 'package:colla_chat/p2p/chain/action/connect.dart';
-import 'package:colla_chat/p2p/chain/action/ping.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/backgroud_service.dart';
@@ -385,12 +384,13 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     if (myselfPeer == null) {
       await insert(myself);
     } else {
+      myself.id = myselfPeer.id;
       await update(myself);
     }
     var json = JsonUtil.toJson(myself);
     PeerClient peerClient = PeerClient.fromJson(json);
-    peerClientService.store(peerClient);
-    linkmanService.storeByPeerEntity(peerClient);
+    await peerClientService.storeByPeerEntity(peerClient);
+    await linkmanService.storeByPeerEntity(peerClient);
   }
 
   @override
@@ -415,6 +415,35 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     await linkmanService.updateAvatar(peerId, avatar);
 
     return data;
+  }
+
+  Future<String?> backup(String peerId) async {
+    MyselfPeer? myselfPeer = await findOneByPeerId(peerId);
+    if (myselfPeer != null) {
+      PeerProfile? peerProfile =
+          await peerProfileService.findOneByPeerId(peerId);
+      if (peerProfile != null) {
+        myselfPeer.peerProfile = peerProfile;
+      }
+
+      String backup = JsonUtil.toJsonString(myselfPeer);
+
+      return backup;
+    }
+
+    return null;
+  }
+
+  Future<String> restore(String backup) async {
+    Map<String, dynamic> map = JsonUtil.toJson(backup);
+    MyselfPeer myselfPeer = MyselfPeer.fromJson(map);
+    store(myselfPeer);
+    PeerProfile? peerProfile = myselfPeer.peerProfile;
+    if (peerProfile != null) {
+      await peerProfileService.store(peerProfile);
+    }
+
+    return myselfPeer.peerId;
   }
 }
 
