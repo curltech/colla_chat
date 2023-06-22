@@ -162,7 +162,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
         Container(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
             child: FormInputWidget(
-              height: 460,
+              height: 380,
               onOk: _onOk,
               okLabel: 'Register',
               columnFieldDefs: p2pRegisterInputFieldDef,
