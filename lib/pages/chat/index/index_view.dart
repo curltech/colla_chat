@@ -118,7 +118,7 @@ class _IndexViewState extends State<IndexView>
       } else if (eventName == kSystemTrayEventRightClick) {
         platformParams.windows
             ? systemTray.popUpContextMenu()
-            : appWindow.show();
+            : systemTray.popUpContextMenu();
       }
     });
   }
