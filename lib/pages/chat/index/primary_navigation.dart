@@ -87,8 +87,6 @@ class PrimaryNavigation {
         });
   }
 
-
-
   NavigationRailDestination slideInNavigationRailDestination({
     required double begin,
     required AnimationController controller,
@@ -124,28 +122,40 @@ class PrimaryNavigation {
       slideInNavigationRailDestination(
         label: Text(indexWidgetProvider.getLabel(0)),
         icon: const Icon(Icons.chat),
-        selectedIcon: const Icon(Icons.chat),
+        selectedIcon: const Icon(
+          Icons.chat,
+          size: AppIconSize.mdSize,
+        ),
         begin: -1,
         controller: _chatSlideController!,
       ),
       slideInNavigationRailDestination(
         label: Text(indexWidgetProvider.getLabel(1)),
         icon: const Icon(Icons.contacts),
-        selectedIcon: const Icon(Icons.contacts),
+        selectedIcon: const Icon(
+          Icons.contacts,
+          size: AppIconSize.mdSize,
+        ),
         begin: -2,
         controller: _linkmanSlideController!,
       ),
       slideInNavigationRailDestination(
         label: Text(indexWidgetProvider.getLabel(2)),
         icon: const Icon(Icons.wifi_channel),
-        selectedIcon: const Icon(Icons.wifi_channel),
+        selectedIcon: const Icon(
+          Icons.wifi_channel,
+          size: AppIconSize.mdSize,
+        ),
         begin: -3,
         controller: _channelSlideController!,
       ),
       slideInNavigationRailDestination(
         label: Text(indexWidgetProvider.getLabel(3)),
         icon: const Icon(Icons.person),
-        selectedIcon: const Icon(Icons.person),
+        selectedIcon: const Icon(
+          Icons.person,
+          size: AppIconSize.mdSize,
+        ),
         begin: -4,
         controller: _meSlideController!,
       ),

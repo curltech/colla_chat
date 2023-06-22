@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
@@ -36,22 +37,34 @@ class BottomNavigation {
       NavigationDestination(
         label: indexWidgetProvider.getLabel(0),
         icon: const Icon(Icons.chat),
-        selectedIcon: const Icon(Icons.chat),
+        selectedIcon: const Icon(
+          Icons.chat,
+          size: AppIconSize.mdSize,
+        ),
       ),
       NavigationDestination(
         label: indexWidgetProvider.getLabel(1),
         icon: const Icon(Icons.contacts),
-        selectedIcon: const Icon(Icons.contacts),
+        selectedIcon: const Icon(
+          Icons.contacts,
+          size: AppIconSize.mdSize,
+        ),
       ),
       NavigationDestination(
         label: indexWidgetProvider.getLabel(2),
         icon: const Icon(Icons.wifi_channel),
-        selectedIcon: const Icon(Icons.wifi_channel),
+        selectedIcon: const Icon(
+          Icons.wifi_channel,
+          size: AppIconSize.mdSize,
+        ),
       ),
       NavigationDestination(
         label: indexWidgetProvider.getLabel(3),
         icon: const Icon(Icons.person),
-        selectedIcon: const Icon(Icons.person),
+        selectedIcon: const Icon(
+          Icons.person,
+          size: AppIconSize.mdSize,
+        ),
       ),
     ];
   }
