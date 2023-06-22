@@ -85,7 +85,9 @@ class _IndexViewState extends State<IndexView>
     if (!platformParams.desktop) {
       return;
     }
-    String path = 'assets/images/colla-white.png';
+    String path = platformParams.windows
+        ? 'assets/icons/favicon-32x32.ico'
+        : 'assets/images/colla-white.png';
 
     final AppWindow appWindow = AppWindow();
     final SystemTray systemTray = SystemTray();
