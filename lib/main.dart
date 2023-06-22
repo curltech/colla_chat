@@ -46,7 +46,6 @@ void main(List<String> args) async {
   WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-
   bool loginStatus = await ServiceLocator.init();
   _initWebView();
   await _initDesktopWindows();
@@ -66,6 +65,7 @@ void _initWebView() {
   if (platformParams.windows) {
     WindowsWebViewPlatform.registerWith();
   }
+
   ///6.x.x
   // if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
   //   await inapp.InAppWebViewController.setWebContentsDebuggingEnabled(true);
@@ -81,6 +81,8 @@ Future<void> _initDesktopWindows() async {
     WindowOptions windowOptions = const WindowOptions(
       title: 'CollaChat',
       center: true,
+      titleBarStyle: TitleBarStyle.normal,
+      windowButtonVisibility: false,
     );
     windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.show();
