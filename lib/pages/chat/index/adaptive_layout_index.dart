@@ -27,31 +27,11 @@ class AdaptiveLayoutIndex extends StatefulWidget {
 
 class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
     with TickerProviderStateMixin {
-  // 主菜单项对应的动画控制器
-  late AnimationController _chatSlideController;
-  late AnimationController _linkmanSlideController;
-  late AnimationController _channelSlideController;
-  late AnimationController _meSlideController;
-
   @override
   void initState() {
     appDataProvider.addListener(_update);
-    _chatSlideController = AnimationController(
-      duration: const Duration(milliseconds: 100),
-      vsync: this,
-    )..forward();
-    _linkmanSlideController = AnimationController(
-      duration: const Duration(milliseconds: 120),
-      vsync: this,
-    )..forward();
-    _channelSlideController = AnimationController(
-      duration: const Duration(milliseconds: 140),
-      vsync: this,
-    )..forward();
-    _meSlideController = AnimationController(
-      duration: const Duration(milliseconds: 160),
-      vsync: this,
-    )..forward();
+    primaryNavigation.initController(this);
+    primaryNavigation.forward();
     super.initState();
   }
 
@@ -169,11 +149,8 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
 
   @override
   void dispose() {
-    _chatSlideController.dispose();
-    _linkmanSlideController.dispose();
-    _channelSlideController.dispose();
-    _meSlideController.dispose();
     appDataProvider.removeListener(_update);
+    primaryNavigation.dispose();
     super.dispose();
   }
 }

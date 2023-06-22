@@ -11,6 +11,38 @@ import 'package:provider/provider.dart';
 class PrimaryNavigation {
   ValueNotifier<bool> mainViewVisible = ValueNotifier<bool>(true);
 
+  // 主菜单项对应的动画控制器
+  AnimationController? _chatSlideController;
+  AnimationController? _linkmanSlideController;
+  AnimationController? _channelSlideController;
+  AnimationController? _meSlideController;
+
+  initController(TickerProvider vsync) {
+    _chatSlideController = AnimationController(
+      duration: const Duration(milliseconds: 100),
+      vsync: vsync,
+    )..forward();
+    _linkmanSlideController = AnimationController(
+      duration: const Duration(milliseconds: 120),
+      vsync: vsync,
+    )..forward();
+    _channelSlideController = AnimationController(
+      duration: const Duration(milliseconds: 140),
+      vsync: vsync,
+    )..forward();
+    _meSlideController = AnimationController(
+      duration: const Duration(milliseconds: 160),
+      vsync: vsync,
+    )..forward();
+  }
+
+  forward() {
+    _chatSlideController?.forward();
+    _linkmanSlideController?.forward();
+    _channelSlideController?.forward();
+    _meSlideController?.forward();
+  }
+
   Widget _createNavigationDestinationItem(
       IndexWidgetProvider indexWidgetProvider, int index, Icon icon,
       {String? label, String? tooltip}) {
@@ -55,29 +87,7 @@ class PrimaryNavigation {
         });
   }
 
-  NavigationDestination _slideInNavigationDestination({
-    required double begin,
-    required AnimationController controller,
-    required Widget icon,
-    required String label,
-    Widget? selectedIcon,
-    String? tooltip,
-  }) {
-    return NavigationDestination(
-      icon: SlideTransition(
-        position: Tween<Offset>(
-          begin: Offset(begin, 0),
-          end: Offset.zero,
-        ).animate(
-          CurvedAnimation(parent: controller, curve: Curves.easeInOutCubic),
-        ),
-        child: icon,
-      ),
-      selectedIcon: selectedIcon,
-      label: label,
-      tooltip: tooltip,
-    );
-  }
+
 
   NavigationRailDestination slideInNavigationRailDestination({
     required double begin,
@@ -100,6 +110,10 @@ class PrimaryNavigation {
         child: icon,
       ),
       label: label,
+      selectedIcon: selectedIcon,
+      indicatorColor: indicatorColor,
+      indicatorShape: indicatorShape,
+      padding: padding,
     );
   }
 
@@ -107,25 +121,33 @@ class PrimaryNavigation {
   List<NavigationRailDestination> _buildNavigationRailDestination(
       IndexWidgetProvider indexWidgetProvider) {
     return <NavigationRailDestination>[
-      NavigationRailDestination(
+      slideInNavigationRailDestination(
         label: Text(indexWidgetProvider.getLabel(0)),
         icon: const Icon(Icons.chat),
         selectedIcon: const Icon(Icons.chat),
+        begin: -1,
+        controller: _chatSlideController!,
       ),
-      NavigationRailDestination(
+      slideInNavigationRailDestination(
         label: Text(indexWidgetProvider.getLabel(1)),
         icon: const Icon(Icons.contacts),
         selectedIcon: const Icon(Icons.contacts),
+        begin: -2,
+        controller: _linkmanSlideController!,
       ),
-      NavigationRailDestination(
+      slideInNavigationRailDestination(
         label: Text(indexWidgetProvider.getLabel(2)),
         icon: const Icon(Icons.wifi_channel),
         selectedIcon: const Icon(Icons.wifi_channel),
+        begin: -3,
+        controller: _channelSlideController!,
       ),
-      NavigationRailDestination(
+      slideInNavigationRailDestination(
         label: Text(indexWidgetProvider.getLabel(3)),
         icon: const Icon(Icons.person),
         selectedIcon: const Icon(Icons.person),
+        begin: -4,
+        controller: _meSlideController!,
       ),
     ];
   }
@@ -203,6 +225,13 @@ class PrimaryNavigation {
         ),
       },
     );
+  }
+
+  dispose() {
+    _chatSlideController?.dispose();
+    _linkmanSlideController?.dispose();
+    _channelSlideController?.dispose();
+    _meSlideController?.dispose();
   }
 }
 
