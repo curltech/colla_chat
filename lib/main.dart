@@ -82,7 +82,7 @@ Future<void> _initDesktopWindows() async {
       title: 'CollaChat',
       center: true,
       titleBarStyle: TitleBarStyle.normal,
-      windowButtonVisibility: false,
+      windowButtonVisibility: true,
     );
     windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.show();
