@@ -92,7 +92,7 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
           }) async {
             await _pickAvatar(
               context,
-              peerId,
+              peerId!,
             );
           }),
       TileData(
@@ -137,11 +137,11 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
 
   Future<void> _pickAvatar(
     BuildContext context,
-    String? peerId,
+    String peerId,
   ) async {
     Uint8List? avatar = await ImageUtil.pickAvatar(context);
     if (avatar != null) {
-      await myselfPeerService.updateAvatar(peerId!, avatar);
+      await myselfPeerService.updateAvatar(peerId, avatar);
       setState(() {});
     }
   }

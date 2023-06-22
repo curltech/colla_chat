@@ -92,7 +92,7 @@ class _LinkmanEditWidgetState extends State<LinkmanEditWidget> {
     var formInputWidget = Container(
         padding: const EdgeInsets.all(10.0),
         child: FormInputWidget(
-          height: 330,
+          height: 430,
           onOk: (Map<String, dynamic> values) {
             _onOk(values);
           },

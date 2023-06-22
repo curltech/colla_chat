@@ -1,3 +1,6 @@
+import 'dart:typed_data';
+
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/advanced/myselfpeer/myself_peer_controller.dart';
 import 'package:colla_chat/platform.dart';
@@ -6,8 +9,10 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/mobile_util.dart';
 import 'package:colla_chat/tool/phone_number_util.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:flutter/material.dart';
@@ -68,10 +73,23 @@ class P2pRegisterWidget extends StatefulWidget {
 class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
   String _countryCode = 'CN';
   TextEditingController mobileController = TextEditingController();
+  ValueNotifier<String?> peerId = ValueNotifier<String?>(null);
+  ValueNotifier<Uint8List?> avatar = ValueNotifier<Uint8List?>(null);
 
   @override
   void initState() {
     super.initState();
+  }
+
+  Future<void> _pickAvatar(
+    BuildContext context,
+    String peerId,
+  ) async {
+    Uint8List? avatar = await ImageUtil.pickAvatar(context);
+    if (avatar != null) {
+      await myselfPeerService.updateAvatar(peerId, avatar);
+      this.avatar.value = avatar;
+    }
   }
 
   @override
@@ -115,6 +133,32 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
             disableLengthCheck: true,
           ),
         ),
+        ValueListenableBuilder(
+            valueListenable: peerId,
+            builder: (BuildContext context, String? peerId, Widget? child) {
+              if (peerId != null) {
+                Widget avatarImage = ValueListenableBuilder(
+                    valueListenable: avatar,
+                    builder: (BuildContext context, Uint8List? avatar,
+                        Widget? child) {
+                      if (avatar != null) {
+                        return ImageUtil.buildMemoryImageWidget(avatar);
+                      }
+                      return AppImage.mdAppImage;
+                    });
+
+                return ListTile(
+                    title: CommonAutoSizeText(AppLocalizations.t('Avatar')),
+                    trailing: avatarImage,
+                    onTap: () async {
+                      await _pickAvatar(
+                        context,
+                        peerId,
+                      );
+                    });
+              }
+              return Container();
+            }),
         Container(
             padding: const EdgeInsets.symmetric(horizontal: 15.0),
             child: FormInputWidget(
@@ -140,8 +184,9 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
           .then((myselfPeer) {
         myself.myselfPeer = myselfPeer;
         myselfPeerController.add(myselfPeer);
-        Application.router
-            .navigateTo(context, Application.p2pLogin, replace: true);
+        peerId.value = myselfPeer.peerId;
+        // Application.router
+        //     .navigateTo(context, Application.p2pLogin, replace: true);
       }).onError((error, stackTrace) {
         DialogUtil.error(context, content: error.toString());
       });
