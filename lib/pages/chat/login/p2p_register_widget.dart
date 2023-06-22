@@ -8,18 +8,22 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
+import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/mobile_util.dart';
 import 'package:colla_chat/tool/phone_number_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
+import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
 import 'package:phone_numbers_parser/phone_numbers_parser.dart'
     as phone_numbers_parser;
+import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 final List<ColumnFieldDef> p2pRegisterInputFieldDef = [
   ColumnFieldDef(
@@ -92,11 +96,37 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
     }
   }
 
+  Future<void> _restore() async {
+    String? backup;
+    if (platformParams.desktop) {
+      List<XFile> xfiles = await FileUtil.pickFiles();
+      if (xfiles.isNotEmpty) {
+        backup = await xfiles[0].readAsString();
+      }
+    } else if (platformParams.mobile) {
+      List<AssetEntity>? assets = await AssetUtil.pickAssets(context);
+      if (assets != null && assets.isNotEmpty) {}
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView(
       children: <Widget>[
         const SizedBox(height: 10.0),
+        Container(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            alignment: Alignment.centerLeft,
+            child: ListTile(
+              title: CommonAutoSizeText(AppLocalizations.t('Restore peer')),
+              leading: Icon(
+                Icons.restore,
+                color: myself.primary,
+              ),
+              onTap: () {
+                _restore();
+              },
+            )),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           child: IntlPhoneField(
