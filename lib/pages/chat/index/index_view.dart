@@ -112,11 +112,13 @@ class _IndexViewState extends State<IndexView>
     await systemTray.setContextMenu(menu);
     systemTray.registerSystemTrayEventHandler((eventName) {
       if (eventName == kSystemTrayEventClick) {
-        systemTray.popUpContextMenu();
+        platformParams.windows
+            ? appWindow.show()
+            : systemTray.popUpContextMenu();
       } else if (eventName == kSystemTrayEventRightClick) {
-        systemTray.popUpContextMenu();
-      } else if (eventName == kSystemTrayEventDoubleClick) {
-        appWindow.show();
+        platformParams.windows
+            ? systemTray.popUpContextMenu()
+            : appWindow.show();
       }
     });
   }
