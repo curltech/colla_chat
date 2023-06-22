@@ -7,10 +7,17 @@ Future<CommonDatabase> openSqlite3({String name = 'colla_chat.db'}) async {
   var byteData = await rootBundle.load('assets/wasm/sqlite3.wasm');
   var source = byteData.buffer.asUint8List();
 
-  WasmSqlite3 wasmSqlite3 =
-      await WasmSqlite3.load(source, SqliteEnvironment(fileSystem: fs));
-  CommonDatabase db = wasmSqlite3.open(name);
-  //await fs.flush();
+  try {
+    WasmSqlite3 wasmSqlite3 =
+        await WasmSqlite3.load(source, SqliteEnvironment(fileSystem: fs));
+    CommonDatabase db = wasmSqlite3.open(name);
+    int userVersion = db.userVersion;
+    print('wasm sqlite3 db userVersion is $userVersion');
 
-  return db;
+    return db;
+  } catch (e) {
+    print('wasm sqlite3 db open failure:$e');
+  }
+
+  throw UnimplementedError('web');
 }

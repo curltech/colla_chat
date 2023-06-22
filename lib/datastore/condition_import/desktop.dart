@@ -15,13 +15,26 @@ Future<CommonDatabase> openSqlite3({String name = 'colla_chat.db'}) async {
     if (dbFolder != null) {
       path = p.join(dbFolder.path, name);
       File file = File(path);
-      if (file.existsSync()) {
-        print('sqlite3 db $path exist');
-      }
-      CommonDatabase db = sqlite3.open(path);
-      appDataProvider.sqlite3Path = path;
 
-      return db;
+      try {
+        CommonDatabase db;
+        if (file.existsSync()) {
+          print('sqlite3 db $path exist, will be opened');
+          db = sqlite3.open(path, mode: OpenMode.readWrite);
+          db.userVersion = 1;
+        } else {
+          print('sqlite3 db $path is not exist,will be created');
+          db = sqlite3.open(path, mode: OpenMode.readWriteCreate);
+          db.userVersion = 0;
+        }
+        int userVersion = db.userVersion;
+        print('sqlite3 db $path is set userVersion:$userVersion');
+        appDataProvider.sqlite3Path = path;
+
+        return db;
+      } catch (e) {
+        print('sqlite3 db $path open failure:$e');
+      }
     }
   }
 

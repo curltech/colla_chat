@@ -1,10 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:colla_chat/datastore/sql_builder.dart';
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/tool/entity_util.dart';
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/type_util.dart';
 import 'package:sqlite3/common.dart';
@@ -35,18 +37,18 @@ class Sqlite3 extends DataStore {
       print('sqlite3 db get userVersion failure:$e');
     }
     if (userVersion == 0) {
-      print('sqlite3 db ${appDataProvider.sqlite3Path} will be re-create');
+      print('sqlite3 db ${appDataProvider.sqlite3Path} table will be created');
       for (GeneralBaseService service in ServiceLocator.services.values) {
         try {
           create(service.tableName, service.fields, service.indexFields);
         } catch (e) {
-          print('sqlite3 init create exception:$e');
+          print('sqlite3 init create table exception:$e');
         }
       }
       try {
         db.userVersion = 1;
       } catch (e) {
-        print('sqlite3 db set userVersion failure:$e');
+        print('sqlite3 db set userVersion 1 failure:$e');
       }
     }
     for (GeneralBaseService service in ServiceLocator.services.values) {
@@ -55,12 +57,36 @@ class Sqlite3 extends DataStore {
   }
 
   reset() {
-    db.userVersion = 0;
+    File file = File(appDataProvider.sqlite3Path);
+    if (file.existsSync()) {
+      file.deleteSync();
+    }
   }
 
   /// 关闭数据库
   close() {
     db.dispose();
+  }
+
+  File? backup() {
+    File file = File(appDataProvider.sqlite3Path);
+    if (file.existsSync()) {
+      return file.copySync('${appDataProvider.sqlite3Path}.bak');
+    }
+    return null;
+  }
+
+  restore() {
+    File file = File(appDataProvider.sqlite3Path);
+    if (file.existsSync()) {
+      close();
+      file.renameSync('${appDataProvider.sqlite3Path}.ret');
+    }
+    file = File('${appDataProvider.sqlite3Path}.bak');
+    if (file.existsSync()) {
+      file.renameSync(appDataProvider.sqlite3Path);
+    }
+    open();
   }
 
   /// 删除数据库
