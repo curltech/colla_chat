@@ -372,5 +372,16 @@
   "Remove collect file": "从收藏移除文件",
   "Please input request add friend tip": "请求加好友的提示",
   "Do you agree to add friend?": "同意加好友吗？",
-  "I am ": "我是"
+  "I am ": "我是",
+  "Auto login": "自动登录",
+  "Backup": "备份数据库",
+  "Restore": "恢复数据库",
+  "Backup peer": "备份当前账户",
+  "Restore peer": "恢复账户",
+  "Backup data": "备份当前账户数据",
+  "Restore peer": "恢复账户数据",
+  "Successfully backup peer filename": "成功备份当前账户到文件",
+  "Successfully restore peer filename": "成功恢复账户文件",
+  "Successfully backup colla.db": "成功备份数据库colla.db",
+  "Successfully restore colla.db and reopen": "成功恢复数据库colla.db并重新打开"
 }

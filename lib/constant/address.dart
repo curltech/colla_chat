@@ -6,35 +6,20 @@ final Map<String, PeerEndpoint> nodeAddressOptions = {
   'default': PeerEndpoint(
       name: 'default',
       priority: 0,
-      wsConnectAddress: 'wss://192.168.1.10:9090/websocket',
-      httpConnectAddress: 'https://192.168.1.10:9090',
-      peerId: '12D3KooWBiuFtWRQ5qrUmT5AFbJ6NXCqM9oKCMBUA3Dncm2mhLx8',
-      libp2pConnectAddress:
-          '/ip4/192.168.1.10/tcp/5720/wss/p2p/12D3KooWBiuFtWRQ5qrUmT5AFbJ6NXCqM9oKCMBUA3Dncm2mhLx8',
-      iceServers: [
-        //{"url": "stun:stun.l.google.com:19302"},
-        {
-          'url': 'stun:192.168.1.10:3478',
-        },
-        // {
-        //   'url': 'turn:192.168.1.10:3478',
-        // }
-      ]),
-  'South Korea': PeerEndpoint(
-      name: 'South Korea',
       wsConnectAddress: 'wss://kr.curltech.cc:9090/websocket',
       httpConnectAddress: 'https://kr.curltech.cc:9090',
-      peerId: '12D3KooWJk2AP2JcawJgScGPqtHXMaDwYUDBxNMjyGEEwPH3ghrD',
+      peerId: '12D3KooWBiuFtWRQ5qrUmT5AFbJ6NXCqM9oKCMBUA3Dncm2mhLx8',
       libp2pConnectAddress:
-          '/dns4/kr.curltech.cc/tcp/5720/wss/p2p/12D3KooWJk2AP2JcawJgScGPqtHXMaDwYUDBxNMjyGEEwPH3ghrD',
+          '/ip4/kr.curltech.cc/tcp/5720/wss/p2p/12D3KooWBiuFtWRQ5qrUmT5AFbJ6NXCqM9oKCMBUA3Dncm2mhLx8',
       iceServers: [
         {
-          'urls': 'stun:kr.curltech.cc:3478',
+          'url': 'stun:kr.curltech.cc:3478',
         },
-        {
-          'urls': 'turn:kr.curltech.cc:3478',
-        }
-      ])
+        // {
+        //   'url': 'turn:kr.curltech.cc:3478',
+        // },
+        //{"url": "stun:stun.l.google.com:19302"},
+      ]),
 };
 
 /// 地址选择框的选项

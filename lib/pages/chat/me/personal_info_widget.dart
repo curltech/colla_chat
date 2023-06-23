@@ -53,22 +53,18 @@ class _PersonalInfoWidgetState extends State<PersonalInfoWidget>
 
     var indexWidgetProvider =
         Provider.of<IndexWidgetProvider>(context, listen: false);
-    return TextButton(
-        style: style,
-        onPressed: () {
-          myselfPeerService.logout();
-          indexWidgetProvider.pop(context: context);
-          indexWidgetProvider.currentMainIndex = 0;
-          Application.router
-              .navigateTo(context, Application.p2pLogin, replace: true);
-        },
-        child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Expanded(child: CommonAutoSizeText(AppLocalizations.t('Logout'))),
-          const SizedBox(
-            width: 5,
-          ),
-          const Icon(Icons.exit_to_app)
-        ]));
+    return TextButton.icon(
+      style: style,
+      icon: const Icon(Icons.exit_to_app),
+      label: CommonAutoSizeText(AppLocalizations.t('Logout')),
+      onPressed: () {
+        myselfPeerService.logout();
+        indexWidgetProvider.pop(context: context);
+        indexWidgetProvider.currentMainIndex = 0;
+        Application.router
+            .navigateTo(context, Application.p2pLogin, replace: true);
+      },
+    );
   }
 
   @override

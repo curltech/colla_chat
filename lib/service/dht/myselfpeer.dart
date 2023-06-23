@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/crypto/cryptography.dart';
@@ -27,10 +28,12 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/network_connectivity.dart';
+import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/tool/phone_number_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:flutter/material.dart';
+import 'package:path/path.dart' as p;
 
 const String autoLoginName = 'autoLogin';
 const String lastLoginName = 'lastLogin';
@@ -420,6 +423,7 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
   Future<String?> backup(String peerId) async {
     MyselfPeer? myselfPeer = await findOneByPeerId(peerId);
     if (myselfPeer != null) {
+      String name = myselfPeer.name;
       PeerProfile? peerProfile =
           await peerProfileService.findOneByPeerId(peerId);
       if (peerProfile != null) {
@@ -427,8 +431,16 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
       }
 
       String backup = JsonUtil.toJsonString(myselfPeer);
+      final dbFolder = await PathUtil.getApplicationDirectory();
+      if (dbFolder != null) {
+        String d = DateUtil.formatDate(DateUtil.currentDateTime(),
+            format: 'yyyy-MM-dd');
+        String path = p.join(dbFolder.path, '${name}_${peerId}_$d.json');
+        File file = File(path);
+        file.writeAsStringSync(backup);
 
-      return backup;
+        return path;
+      }
     }
 
     return null;
