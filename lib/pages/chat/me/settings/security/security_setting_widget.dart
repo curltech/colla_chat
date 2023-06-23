@@ -150,8 +150,17 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
     Widget securitySettingTile =
         DataListView(tileData: widget.securitySettingTileData);
     var autoLoginTile = CheckboxListTile(
-        title: CommonAutoSizeText(AppLocalizations.t('Auto login')),
-        dense: true,
+        title: Row(children: [
+          Icon(
+            Icons.auto_mode,
+            color: myself.secondary,
+          ),
+          const SizedBox(
+            width: 15.0,
+          ),
+          CommonAutoSizeText(AppLocalizations.t('Auto login')),
+        ]),
+        dense: false,
         activeColor: myself.primary,
         value: appDataProvider.autoLogin,
         onChanged: (bool? autoLogin) async {
