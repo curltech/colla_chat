@@ -379,7 +379,7 @@
   "Backup peer": "备份当前账户",
   "Restore peer": "恢复账户",
   "Backup data": "备份当前账户数据",
-  "Restore peer": "恢复账户数据",
+  "Restore data": "恢复账户数据",
   "Successfully backup peer filename": "成功备份当前账户到文件",
   "Successfully restore peer filename": "成功恢复账户文件",
   "Successfully backup colla.db": "成功备份数据库colla.db",
