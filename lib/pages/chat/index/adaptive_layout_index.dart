@@ -4,6 +4,7 @@ import 'package:colla_chat/pages/chat/index/bottom_navigation.dart';
 import 'package:colla_chat/pages/chat/index/primary_navigation.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/pages/chat/me/me_widget.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
@@ -84,7 +85,10 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
       return PageView.builder(
         physics: physics,
         controller: indexWidgetProvider.controller,
-        onPageChanged: (int index) {},
+        onPageChanged: (int index) {
+          logger.i('PageChanged:$index');
+          //indexWidgetProvider.pop(context: context);
+        },
         itemCount: indexWidgetProvider.views.length,
         itemBuilder: (BuildContext context, int index) {
           if (index > 3 || appDataProvider.smallBreakpoint.isActive(context)) {

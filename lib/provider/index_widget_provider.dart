@@ -27,6 +27,8 @@ class IndexWidgetProvider with ChangeNotifier {
   //当前的主视图，左边栏和底部栏的指示，范围0-3
   int _currentMainIndex = 0;
 
+  bool popAction = false;
+
   IndexWidgetProvider();
 
   ///初始化主菜单视图
@@ -151,6 +153,10 @@ class IndexWidgetProvider with ChangeNotifier {
 
   ///弹出最新的，跳转到第二新的
   pop({BuildContext? context}) {
+    // if (popAction) {
+    //   popAction = false;
+    //   return;
+    // }
     //桌面工作区模式
     if (!useNavigator || !platformParams.mobile) {
       var controller = this.controller;
@@ -168,6 +174,7 @@ class IndexWidgetProvider with ChangeNotifier {
         if (index < mainViews.length) {
           index = _currentMainIndex;
         }
+        popAction = true;
         controller.animateToPage(index,
             duration: animateDuration, curve: Curves.easeInOut);
         notifyListeners();
@@ -176,6 +183,7 @@ class IndexWidgetProvider with ChangeNotifier {
       }
     } else {
       if (context != null) {
+        popAction = true;
         NavigatorUtil.goBack(context);
       } else {
         logger.e('pop error, no context');
