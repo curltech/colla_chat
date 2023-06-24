@@ -159,7 +159,10 @@ class ChainMessageHandler {
           targetConnectAddress.startsWith('ws')) {
         var websocket = await websocketPool.get(targetConnectAddress);
         // var websocket = websocketPool.getDefault();
-        if (websocket != null) {
+        if (websocket == null || websocket.status != SocketStatus.connected) {
+          Future.delayed(const Duration(seconds: 1));
+        }
+        if (websocket != null && websocket.status == SocketStatus.connected) {
           var data = MessageSerializer.marshal(chainMessage);
           success = await websocket.sendMsg(data);
         }
@@ -168,7 +171,10 @@ class ChainMessageHandler {
           connectAddress != null &&
           connectAddress.startsWith('ws')) {
         var websocket = await websocketPool.get(connectAddress);
-        if (websocket != null) {
+        if (websocket == null || websocket.status != SocketStatus.connected) {
+          Future.delayed(const Duration(seconds: 1));
+        }
+        if (websocket != null && websocket.status == SocketStatus.connected) {
           var data = MessageSerializer.marshal(chainMessage);
           success = await websocket.sendMsg(data);
         }
