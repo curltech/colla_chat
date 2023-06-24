@@ -1,3 +1,4 @@
+import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -21,7 +22,7 @@ class IndexWidgetProvider with ChangeNotifier {
   ///当前出现在工作区的视图，0-3是主视图，始终都在，然后每进入一个新视图，则添加
   ///每退出一个则删除，
   List<TileDataMixin> views = [];
-  PageController? controller;
+  SwiperController? controller;
 
   //当前的主视图，左边栏和底部栏的指示，范围0-3
   int _currentMainIndex = 0;
@@ -31,7 +32,7 @@ class IndexWidgetProvider with ChangeNotifier {
   IndexWidgetProvider();
 
   ///初始化主菜单视图
-  init(PageController controller, List<TileDataMixin> views) {
+  init(SwiperController controller, List<TileDataMixin> views) {
     this.controller = controller;
     for (TileDataMixin view in views) {
       define(view);
@@ -80,8 +81,7 @@ class IndexWidgetProvider with ChangeNotifier {
         views.removeRange(4, views.length);
       }
       //controller.jumpToPage(index);
-      controller.animateToPage(index,
-          duration: animateDuration, curve: Curves.easeInOut);
+      controller.move(index);
       notifyListeners();
     }
   }
@@ -125,8 +125,7 @@ class IndexWidgetProvider with ChangeNotifier {
       index = views.length - 1;
     }
     if (index < allViews.length) {
-      controller.animateToPage(index,
-          duration: animateDuration, curve: Curves.easeInOut);
+      controller.move(index);
       notifyListeners();
     }
   }
@@ -153,8 +152,7 @@ class IndexWidgetProvider with ChangeNotifier {
         index = _currentMainIndex;
       }
       popAction = true;
-      controller.animateToPage(index,
-          duration: animateDuration, curve: Curves.easeInOut);
+      controller.move(index);
       notifyListeners();
     }
   }

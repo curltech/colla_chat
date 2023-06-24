@@ -1,3 +1,4 @@
+import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/pages/chat/channel/subscribe_channel_list_widget.dart';
 import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/index/bottom_navigation.dart';
@@ -14,7 +15,7 @@ import 'package:provider/provider.dart';
 ///自动适配的主页面结构
 class AdaptiveLayoutIndex extends StatefulWidget {
   AdaptiveLayoutIndex({super.key}) {
-    indexWidgetProvider.init(PageController(), [
+    indexWidgetProvider.init(SwiperController(), [
       ChatListWidget(),
       LinkmanListWidget(),
       SubscribeChannelListWidget(),
@@ -82,10 +83,11 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
       if (!indexWidgetProvider.bottomBarVisible) {
         physics = null;
       }
-      return PageView.builder(
+      return Swiper(
         physics: physics,
+        //transformer:AccordionTransformer(),
         controller: indexWidgetProvider.controller,
-        onPageChanged: (int index) {
+        onIndexChanged: (int index) {
           logger.i('PageChanged:$index');
           //indexWidgetProvider.pop(context: context);
         },

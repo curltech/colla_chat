@@ -149,6 +149,9 @@ dependencies:
   #flutter_swiper: 1.1.6 # Flutter 轮播图 https://github.com/best-flutter/flutter_swiper
   #flutter_swiper_null_safety: any
   card_swiper: ^2.0.4
+  flutter_card_swiper: ^5.1.0
+  another_transformer_page_view: ^2.0.1
+  appinio_swiper: ^2.0.2
   flutter_screenutil: ^5.5.3 # Flutter 屏幕适配 https://github.com/OpenFlutter/flutter_screenutil
 
   flex_color_scheme: ^7.1.2
