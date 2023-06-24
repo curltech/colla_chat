@@ -8,6 +8,7 @@ import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/transport/webclient.dart';
 import 'package:flutter/material.dart';
+import 'package:synchronized/synchronized.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import './condition_import/unsupport.dart'
@@ -218,6 +219,7 @@ class Websocket extends IWebClient {
 }
 
 class WebsocketPool {
+  Lock lock = Lock();
   var websockets = <String, Websocket>{};
   Websocket? _default;
 
@@ -259,8 +261,14 @@ class WebsocketPool {
     }
   }
 
-  ///初始化缺省websocket的连接，尝试连接缺省socket
   Future<Websocket?> connect() async {
+    return await lock.synchronized(() async {
+      return _connect();
+    });
+  }
+
+  ///初始化缺省websocket的连接，尝试连接缺省socket
+  Future<Websocket?> _connect() async {
     var defaultPeerEndpoint = peerEndpointController.defaultPeerEndpoint;
     if (defaultPeerEndpoint != null) {
       var defaultAddress = defaultPeerEndpoint.wsConnectAddress;
@@ -317,8 +325,14 @@ class WebsocketPool {
     return null;
   }
 
-  ///获取或者连接指定地址的websocket的连接，并可以根据参数是否设置为缺省
   Future<Websocket?> get(String address, {bool isDefault = false}) async {
+    return await lock.synchronized(() async {
+      return _get(address, isDefault: isDefault);
+    });
+  }
+
+  ///获取或者连接指定地址的websocket的连接，并可以根据参数是否设置为缺省
+  Future<Websocket?> _get(String address, {bool isDefault = false}) async {
     Websocket? websocket;
     if (websockets.containsKey(address)) {
       websocket = websockets[address];
@@ -361,7 +375,13 @@ class WebsocketPool {
     return websocket;
   }
 
-  close(String address) {
+  Future<Websocket?> close(String address) async {
+    return await lock.synchronized(() async {
+      return _close(address);
+    });
+  }
+
+  _close(String address) {
     if (websockets.containsKey(address)) {
       var websocket = websockets[address];
       if (websocket != null) {
