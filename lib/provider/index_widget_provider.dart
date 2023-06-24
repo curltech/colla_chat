@@ -8,8 +8,6 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 
-///主菜单和对应的主视图
-final List<String> mainViews = ['chat', 'linkman', 'channel', 'me'];
 const bool useNavigator = false;
 const animateDuration = Duration(milliseconds: 500);
 
@@ -17,6 +15,9 @@ const animateDuration = Duration(milliseconds: 500);
 class IndexWidgetProvider with ChangeNotifier {
   //所以可以出现在工作区的视图，0-3是主视图，其余是副视图，
   Map<String, TileDataMixin> allViews = {};
+
+  ///主菜单和对应的主视图
+  final List<String> mainViews = [];
 
   ///当前出现在工作区的视图，0-3是主视图，始终都在，然后每进入一个新视图，则添加
   ///每退出一个则删除，
@@ -33,6 +34,7 @@ class IndexWidgetProvider with ChangeNotifier {
     this.controller = controller;
     for (TileDataMixin view in views) {
       define(view);
+      mainViews.add(view.routeName);
       this.views.add(view);
     }
   }
