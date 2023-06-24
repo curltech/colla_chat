@@ -13,12 +13,12 @@ import 'package:provider/provider.dart';
 ///自动适配的主页面结构
 class AdaptiveLayoutIndex extends StatefulWidget {
   AdaptiveLayoutIndex({super.key}) {
-    PageController controller = PageController();
-    indexWidgetProvider.controller = controller;
-    indexWidgetProvider.define(ChatListWidget());
-    indexWidgetProvider.define(LinkmanListWidget());
-    indexWidgetProvider.define(SubscribeChannelListWidget());
-    indexWidgetProvider.define(MeWidget());
+    indexWidgetProvider.init(PageController(), [
+      ChatListWidget(),
+      LinkmanListWidget(),
+      SubscribeChannelListWidget(),
+      MeWidget()
+    ]);
   }
 
   @override

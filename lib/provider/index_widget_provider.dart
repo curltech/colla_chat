@@ -13,29 +13,6 @@ final List<String> mainViews = ['chat', 'linkman', 'channel', 'me'];
 const bool useNavigator = false;
 const animateDuration = Duration(milliseconds: 500);
 
-class TileDataMixinWidget extends StatelessWidget with TileDataMixin {
-  const TileDataMixinWidget({Key? key}) : super(key: key);
-
-  @override
-  bool get withLeading => true;
-
-  @override
-  String get routeName => 'empty';
-
-  @override
-  IconData get iconData => Icons.hourglass_empty;
-
-  @override
-  String get title => 'Empty';
-
-  @override
-  Widget build(BuildContext context) {
-    return Container();
-  }
-}
-
-const TileDataMixinWidget empty = TileDataMixinWidget();
-
 /// 主工作区的视图状态管理器，维护了主工作区的控制器，视图列表，当前视图
 class IndexWidgetProvider with ChangeNotifier {
   //所以可以出现在工作区的视图，0-3是主视图，其余是副视图，
@@ -43,7 +20,7 @@ class IndexWidgetProvider with ChangeNotifier {
 
   ///当前出现在工作区的视图，0-3是主视图，始终都在，然后每进入一个新视图，则添加
   ///每退出一个则删除，
-  List<TileDataMixin> views = [empty, empty, empty, empty];
+  List<TileDataMixin> views = [];
   PageController? controller;
 
   //当前的主视图，左边栏和底部栏的指示，范围0-3
@@ -51,15 +28,20 @@ class IndexWidgetProvider with ChangeNotifier {
 
   IndexWidgetProvider();
 
+  ///初始化主菜单视图
+  init(PageController controller, List<TileDataMixin> views) {
+    this.controller = controller;
+    for (TileDataMixin view in views) {
+      define(view);
+      this.views.add(view);
+    }
+  }
+
   ///增加新的视图，不能在initState和build构建方法中调用listen=true，
   ///因为本方法会引起整个pageview视图的重新构建
   define(TileDataMixin view, {bool listen = false}) {
     if (!useNavigator || !platformParams.mobile) {
       allViews[view.routeName] = view;
-      int viewIndex = mainViews.indexOf(view.routeName);
-      if (viewIndex > -1 && viewIndex < mainViews.length) {
-        views[viewIndex] = view;
-      }
     } else {
       Application.router.define('/${view.routeName}', handler: Handler(
           handlerFunc:
