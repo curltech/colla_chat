@@ -383,5 +383,6 @@
   "Successfully backup peer filename": "成功备份当前账户到文件",
   "Successfully restore peer filename": "成功恢复账户文件",
   "Successfully backup colla.db": "成功备份数据库colla.db",
-  "Successfully restore colla.db and reopen": "成功恢复数据库colla.db并重新打开"
+  "Successfully restore colla.db and reopen": "成功恢复数据库colla.db并重新打开",
+  "Authenticate failure": "账户验证失败"
 }
