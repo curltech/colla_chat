@@ -33,6 +33,10 @@ class Websocket extends IWebClient {
   WebSocketChannel? channel;
   String? sessionId;
   SocketStatus _status = SocketStatus.closed;
+
+  // 连接没有完成时的消息缓存和缓存的锁
+  final List<dynamic> messages = [];
+  Lock lock = Lock();
   Duration pingInterval = const Duration(seconds: 30);
   Map<String, dynamic> headers = {};
   Timer? heartBeat; // 心跳定时器
@@ -123,6 +127,19 @@ class Websocket extends IWebClient {
       if (onStatusChange != null) {
         onStatusChange!(this, status);
       }
+      //当状态变为连接的时候，发送缓存的消息
+      if (status == SocketStatus.connected) {
+        lock.synchronized(() {
+          if (messages.isNotEmpty) {
+            for (var message in messages) {
+              if (channel != null) {
+                channel!.sink.add(message);
+              }
+            }
+            messages.clear();
+          }
+        });
+      }
     }
   }
 
@@ -152,13 +169,18 @@ class Websocket extends IWebClient {
       channel!.sink.add(data);
       return true;
     } else {
-      logger.e('status is not connected');
-      await reconnect();
-      if (channel != null && _status == SocketStatus.connected) {
-        return sendMsg(data);
-      } else {
+      if (_status == SocketStatus.closed) {
         return false;
       }
+      logger.e('status is not connected，cached');
+      lock.synchronized(() {
+        messages.add(data);
+      });
+      if (_status != SocketStatus.connecting &&
+          _status != SocketStatus.reconnecting) {
+        await reconnect();
+      }
+      return false;
     }
   }
 
