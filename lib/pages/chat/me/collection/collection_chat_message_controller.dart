@@ -20,9 +20,8 @@ class CollectionChatMessageController extends DataMoreController<ChatMessage> {
 
   ///访问数据库获取更老的消息
   @override
-  Future<void> previous({int? limit}) async {
-    List<ChatMessage>? chatMessages;
-    chatMessages = await chatMessageService.findByPeerId(
+  Future<int> previous({int? limit}) async {
+    List<ChatMessage> chatMessages = await chatMessageService.findByPeerId(
         peerId: myself.peerId!,
         messageType: ChatMessageType.collection.name,
         offset: data.length,
@@ -30,21 +29,23 @@ class CollectionChatMessageController extends DataMoreController<ChatMessage> {
     if (chatMessages.isNotEmpty) {
       addAll(chatMessages);
     }
+    return chatMessages.length;
   }
 
   ///访问数据库获取最新的消息
   @override
-  Future<void> latest({int? limit}) async {
+  Future<int> latest({int? limit}) async {
     String? sendTime;
     if (data.isNotEmpty) {
       sendTime = data[0].sendTime;
     }
-    List<ChatMessage>? chatMessages = await chatMessageService
+    List<ChatMessage> chatMessages = await chatMessageService
         .findByMessageType(ChatMessageType.collection.name, sendTime: sendTime);
     if (chatMessages.isNotEmpty) {
       data.insertAll(0, chatMessages);
       notifyListeners();
     }
+    return chatMessages.length;
   }
 
   ///收藏变成消息

@@ -1,14 +1,21 @@
+import 'dart:io';
+
+import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/security/password_widget.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
+import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
 
 /// 安全设置组件，包括修改密码，登录选项（免登录设置），加密选项（加密算法，signal）
@@ -54,12 +61,106 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
     setState(() {});
   }
 
+  Widget _buildBackupTileWidget() {
+    List<TileData> tiles = [
+      TileData(title: 'Backup', prefix: Icons.backup),
+      TileData(title: 'Restore', prefix: Icons.restore),
+      TileData(title: 'Backup peer', prefix: Icons.backup_table),
+      TileData(title: 'Restore peer', prefix: Icons.restore_page),
+    ];
+
+    return DataListView(tileData: tiles, onTap: _onTap);
+  }
+
+  _onTap(int index, String title, {TileData? group, String? subtitle}) {
+    switch (title) {
+      case 'Backup':
+        _backup();
+        break;
+      case 'Restore':
+        _restore();
+        break;
+      case 'Backup peer':
+        _backupPeer();
+        break;
+      case 'Restore peer':
+        _restorePeer();
+        break;
+      default:
+        break;
+    }
+  }
+
+  ///备份整个colla.db文件
+  _backup() {
+    File? file = sqlite3.backup();
+    if (file != null) {
+      if (mounted) {
+        DialogUtil.info(context,
+            content:
+                '${AppLocalizations.t('Successfully backup colla.db')} ${file.path}');
+      }
+    }
+  }
+
+  ///从备份的colla.db.bak文件恢复
+  void _restore() {
+    sqlite3.restore();
+    if (mounted) {
+      DialogUtil.info(context,
+          content:
+              AppLocalizations.t('Successfully restore colla.db and reopen'));
+    }
+  }
+
+  ///备份当前的peer的登录信息到json文件
+  Future<void> _backupPeer() async {
+    String? peerId = myself.peerId;
+    if (peerId != null) {
+      String? filename = await myselfPeerService.backup(peerId);
+      if (filename != null) {
+        if (mounted) {
+          DialogUtil.info(context,
+              content:
+                  '${AppLocalizations.t('Successfully backup peer filename')} $filename');
+        }
+      }
+    }
+  }
+
+  ///从备份的peer的登录信息json文件恢复到数据库
+  Future<void> _restorePeer() async {
+    Directory? initialDirectory = await PathUtil.getApplicationDirectory();
+    if (initialDirectory != null) {
+      List<XFile> xfiles = await FileUtil.selectFiles(
+          initialDirectory: initialDirectory.path, allowedExtensions: ['json']);
+      if (xfiles.isNotEmpty) {
+        String backup = await xfiles.first.readAsString();
+        await myselfPeerService.restore(backup);
+        if (mounted) {
+          DialogUtil.info(context,
+              content:
+                  '${AppLocalizations.t('Successfully restore peer filename')} ${xfiles.first.path}');
+        }
+      }
+    }
+  }
+
   Widget _buildSettingWidget(BuildContext context) {
     Widget securitySettingTile =
         DataListView(tileData: widget.securitySettingTileData);
     var autoLoginTile = CheckboxListTile(
-        title: CommonAutoSizeText(AppLocalizations.t('Auto Login')),
-        dense: true,
+        title: Row(children: [
+          Icon(
+            Icons.auto_mode,
+            color: myself.secondary,
+          ),
+          const SizedBox(
+            width: 15.0,
+          ),
+          CommonAutoSizeText(AppLocalizations.t('Auto login')),
+        ]),
+        dense: false,
         activeColor: myself.primary,
         value: appDataProvider.autoLogin,
         onChanged: (bool? autoLogin) async {
@@ -81,7 +182,11 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
     return Column(
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.center,
-      children: <Widget>[securitySettingTile, autoLoginTile],
+      children: <Widget>[
+        securitySettingTile,
+        autoLoginTile,
+        _buildBackupTileWidget()
+      ],
     );
   }
 

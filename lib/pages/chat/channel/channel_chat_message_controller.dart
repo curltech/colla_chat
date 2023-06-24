@@ -21,28 +21,29 @@ class ChannelChatMessageController extends DataMoreController<ChatMessage> {
 
   ///访问数据库获取更老的消息
   @override
-  Future<void> previous({int? limit}) async {
-    List<ChatMessage>? chatMessages;
-    chatMessages = await channelChatMessageService.findOthersByPeerId(
-        offset: data.length, limit: limit);
+  Future<int> previous({int? limit}) async {
+    List<ChatMessage> chatMessages = await channelChatMessageService
+        .findOthersByPeerId(offset: data.length, limit: limit);
     if (chatMessages.isNotEmpty) {
       addAll(chatMessages);
     }
+    return chatMessages.length;
   }
 
   ///访问数据库获取最新的消息
   @override
-  Future<void> latest({int? limit}) async {
+  Future<int> latest({int? limit}) async {
     String? sendTime;
     if (data.isNotEmpty) {
       sendTime = data[0].sendTime;
     }
-    List<ChatMessage>? chatMessages = await channelChatMessageService
+    List<ChatMessage> chatMessages = await channelChatMessageService
         .findOthersByGreaterId(sendTime: sendTime, limit: limit);
     if (chatMessages.isNotEmpty) {
       data.insertAll(0, chatMessages);
       notifyListeners();
     }
+    return chatMessages.length;
   }
 }
 
@@ -67,18 +68,19 @@ class MyChannelChatMessageController extends DataMoreController<ChatMessage> {
 
   ///访问数据库获取更老的消息
   @override
-  Future<void> previous({String? status, int? limit}) async {
+  Future<int> previous({String? status, int? limit}) async {
     List<ChatMessage>? chatMessages;
     chatMessages = await channelChatMessageService.findMyselfByPeerId(
         status: status, offset: data.length, limit: limit);
     if (chatMessages.isNotEmpty) {
       addAll(chatMessages);
     }
+    return chatMessages.length;
   }
 
   ///访问数据库获取最新的消息
   @override
-  Future<void> latest({String? status, int? limit}) async {
+  Future<int> latest({String? status, int? limit}) async {
     String? sendTime;
     if (data.isNotEmpty) {
       sendTime = data[0].sendTime;
@@ -90,6 +92,7 @@ class MyChannelChatMessageController extends DataMoreController<ChatMessage> {
       data.insertAll(0, chatMessages);
       notifyListeners();
     }
+    return chatMessages.length;
   }
 
   Future<ChatMessage> buildChannelChatMessage(

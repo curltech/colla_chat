@@ -59,7 +59,11 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         chatGPT = null;
       }
       clear(notify: false);
-      previous(limit: defaultLimit);
+      previous(limit: defaultLimit).then((int count) {
+        if (count == 0) {
+          notifyListeners();
+        }
+      });
     }
   }
 
@@ -86,15 +90,15 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
 
   ///访问数据库获取比当前数据更老的消息，如果当前数据为空，从最新的开始
   @override
-  Future<void> previous({int? limit}) async {
+  Future<int> previous({int? limit}) async {
     var chatSummary = _chatSummary;
     if (chatSummary == null) {
       clear(notify: false);
-      return;
+      return 0;
     }
     if (chatSummary.peerId == null) {
       clear(notify: false);
-      return;
+      return 0;
     }
     List<ChatMessage>? chatMessages;
     if (_chatSummary != null) {
@@ -119,21 +123,25 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       }
       if (chatMessages != null && chatMessages.isNotEmpty) {
         addAll(chatMessages);
+
+        return chatMessages.length;
       }
     }
+
+    return 0;
   }
 
   ///访问数据库获取比当前的最新的消息更新的消息
   @override
-  Future<void> latest({int? limit}) async {
+  Future<int> latest({int? limit}) async {
     var chatSummary = _chatSummary;
     if (chatSummary == null) {
       clear(notify: false);
-      return;
+      return 0;
     }
     if (chatSummary.peerId == null) {
       clear(notify: false);
-      return;
+      return 0;
     }
     String? sendTime;
     if (data.isNotEmpty) {
@@ -163,8 +171,12 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
       if (chatMessages != null && chatMessages.isNotEmpty) {
         data.insertAll(0, chatMessages);
         notifyListeners();
+
+        return chatMessages.length;
       }
     }
+
+    return 0;
   }
 
   ///发送文本消息,发送命令消息目标可以是linkman，也可以是群，取决于当前chatSummary

@@ -4,6 +4,7 @@ import 'package:colla_chat/pages/chat/index/bottom_navigation.dart';
 import 'package:colla_chat/pages/chat/index/primary_navigation.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
 import 'package:colla_chat/pages/chat/me/me_widget.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:flutter/material.dart';
@@ -13,12 +14,12 @@ import 'package:provider/provider.dart';
 ///自动适配的主页面结构
 class AdaptiveLayoutIndex extends StatefulWidget {
   AdaptiveLayoutIndex({super.key}) {
-    PageController controller = PageController();
-    indexWidgetProvider.controller = controller;
-    indexWidgetProvider.define(ChatListWidget());
-    indexWidgetProvider.define(LinkmanListWidget());
-    indexWidgetProvider.define(SubscribeChannelListWidget());
-    indexWidgetProvider.define(MeWidget());
+    indexWidgetProvider.init(PageController(), [
+      ChatListWidget(),
+      LinkmanListWidget(),
+      SubscribeChannelListWidget(),
+      MeWidget()
+    ]);
   }
 
   @override
@@ -74,7 +75,7 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
   }
 
   ///SecondaryBody视图
-  Widget _buildSecondaryBodyView() {
+  Widget _buildSecondaryBodyView(BuildContext context) {
     var pageView = Consumer<IndexWidgetProvider>(
         builder: (context, indexWidgetProvider, child) {
       ScrollPhysics? physics = const NeverScrollableScrollPhysics();
@@ -85,7 +86,8 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
         physics: physics,
         controller: indexWidgetProvider.controller,
         onPageChanged: (int index) {
-          indexWidgetProvider.currentIndex = index;
+          logger.i('PageChanged:$index');
+          //indexWidgetProvider.pop(context: context);
         },
         itemCount: indexWidgetProvider.views.length,
         itemBuilder: (BuildContext context, int index) {
@@ -104,23 +106,23 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
   }
 
   /// 放置SecondaryBody
-  SlotLayout _buildSecondaryBody() {
+  SlotLayout _buildSecondaryBody(BuildContext context) {
     return SlotLayout(
       config: <Breakpoint, SlotLayoutConfig>{
         appDataProvider.smallBreakpoint: SlotLayout.from(
           key: const Key('Secondary body'),
           outAnimation: AdaptiveScaffold.stayOnScreen,
-          builder: (_) => _buildSecondaryBodyView(),
+          builder: (_) => _buildSecondaryBodyView(context),
         ),
         appDataProvider.mediumBreakpoint: SlotLayout.from(
           key: const Key('Secondary body'),
           outAnimation: AdaptiveScaffold.stayOnScreen,
-          builder: (_) => _buildSecondaryBodyView(),
+          builder: (_) => _buildSecondaryBodyView(context),
         ),
         appDataProvider.largeBreakpoint: SlotLayout.from(
           key: const Key('Secondary body'),
           outAnimation: AdaptiveScaffold.stayOnScreen,
-          builder: (_) => _buildSecondaryBodyView(),
+          builder: (_) => _buildSecondaryBodyView(context),
         )
       },
     );
@@ -138,7 +140,7 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
       return AdaptiveLayout(
           primaryNavigation: primaryNavigation.build(indexWidgetProvider),
           body: _buildBody(),
-          secondaryBody: _buildSecondaryBody(),
+          secondaryBody: _buildSecondaryBody(context),
           bodyRatio: bodyRatio,
           bottomNavigation:
               indexWidgetProvider.bottomBarVisible && !appDataProvider.landscape

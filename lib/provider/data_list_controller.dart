@@ -331,8 +331,8 @@ abstract class DataMoreController<T> extends DataListController<T> {
   }) : super(data: data, currentIndex: currentIndex);
 
   ///取更多旧的数据，添加
-  Future<void> previous({int? limit});
+  Future<int> previous({int? limit});
 
   ///取更多新的数据，添加
-  Future<void> latest({int? limit});
+  Future<int> latest({int? limit});
 }

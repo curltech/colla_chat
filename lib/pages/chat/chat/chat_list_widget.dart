@@ -30,7 +30,6 @@ import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/websocket.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
-import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -204,13 +203,17 @@ class _ChatListWidgetState extends State<ChatListWidget>
   _updateConnectivity() {
     var result = connectivityController.connectivityResult;
     if (result == ConnectivityResult.none) {
-      DialogUtil.error(context,
-          content: AppLocalizations.t('Connectivity were break down'));
+      if (mounted) {
+        DialogUtil.error(context,
+            content: AppLocalizations.t('Connectivity were break down'));
+      }
     } else {
       _reconnect();
-      DialogUtil.info(context,
-          content: AppLocalizations.t('Connectivity status was changed to:') +
-              result.name);
+      if (mounted) {
+        DialogUtil.info(context,
+            content: AppLocalizations.t('Connectivity status was changed to:') +
+                result.name);
+      }
     }
     _connectivityResult.value = result;
   }
@@ -397,6 +400,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
         });
     slideActions.add(deleteSlideAction);
     tile.slideActions = slideActions;
+
     return tile;
   }
 

@@ -103,7 +103,7 @@ class FileUtil {
     return asset.buffer.asUint8List();
   }
 
-  ///选择文件对话框
+  ///选择文件对话框，适用于所有的平台
   static Future<List<XFile>> pickFiles({
     String? dialogTitle,
     String? initialDirectory,
@@ -132,12 +132,6 @@ class FileUtil {
 
     if (result != null) {
       for (var file in result.files) {
-        //Uint8List? data = await FileUtil.readFile(file.path!);
-        // XFile xfile = XFile.fromData(data!,
-        //     mimeType: file.extension,
-        //     name: file.name,
-        //     length: file.size,
-        //     path: file.path);
         XFile xfile = XFile(
           file.path!,
           length: file.size,
@@ -151,21 +145,25 @@ class FileUtil {
     return xfiles;
   }
 
-  ///选择文件对话框
+  ///选择文件对话框,android不适用
   static Future<List<XFile>> selectFiles({
+    String? initialDirectory,
     List<String>? allowedExtensions,
+    String? confirmButtonText,
   }) async {
     XTypeGroup typeGroup = XTypeGroup(
       extensions: allowedExtensions,
     );
-    final List<XFile> files = await openFiles(acceptedTypeGroups: <XTypeGroup>[
-      typeGroup,
-    ]);
+    final List<XFile> files = await openFiles(
+        initialDirectory: initialDirectory,
+        acceptedTypeGroups: <XTypeGroup>[
+          typeGroup,
+        ]);
 
     return files;
   }
 
-  ///选择目录对话框
+  ///选择目录对话框，适用于所有的平台
   static Future<String?> directoryPathPicker({
     String? dialogTitle,
     bool lockParentWindow = false,
@@ -179,7 +177,7 @@ class FileUtil {
     return selectedDirectory;
   }
 
-  ///不支持ios,android,web
+  ///保存文件对话框，适用于所有的平台
   static Future<String?> saveFilePicker({
     String? dialogTitle,
     String? fileName,

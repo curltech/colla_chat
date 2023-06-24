@@ -383,3 +383,5 @@ class Sqlite3 extends DataStore {
     return results;
   }
 }
+
+final Sqlite3 sqlite3 = Sqlite3();
