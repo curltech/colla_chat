@@ -203,13 +203,17 @@ class _ChatListWidgetState extends State<ChatListWidget>
   _updateConnectivity() {
     var result = connectivityController.connectivityResult;
     if (result == ConnectivityResult.none) {
-      DialogUtil.error(context,
-          content: AppLocalizations.t('Connectivity were break down'));
+      if (mounted) {
+        DialogUtil.error(context,
+            content: AppLocalizations.t('Connectivity were break down'));
+      }
     } else {
       _reconnect();
-      DialogUtil.info(context,
-          content: AppLocalizations.t('Connectivity status was changed to:') +
-              result.name);
+      if (mounted) {
+        DialogUtil.info(context,
+            content: AppLocalizations.t('Connectivity status was changed to:') +
+                result.name);
+      }
     }
     _connectivityResult.value = result;
   }
