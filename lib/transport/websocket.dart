@@ -63,7 +63,6 @@ class Websocket extends IWebClient {
       onData(data);
     }, onError: onError, onDone: onDone, cancelOnError: false);
     status = SocketStatus.connecting;
-    websocketPool.put(address, this);
     logger.i('wss address:$address websocket connecting');
   }
 
@@ -260,23 +259,34 @@ class WebsocketPool {
     }
   }
 
-  ///初始化websocket的连接，尝试连接缺省socket
+  ///初始化缺省websocket的连接，尝试连接缺省socket
   Future<Websocket?> connect() async {
     var defaultPeerEndpoint = peerEndpointController.defaultPeerEndpoint;
     if (defaultPeerEndpoint != null) {
       var defaultAddress = defaultPeerEndpoint.wsConnectAddress;
       var defaultPeerId = defaultPeerEndpoint.peerId;
       Websocket? websocket;
+      //如果已经存在，且是连接或者在连接中，直接返回
       if (websockets.containsKey(defaultAddress)) {
         websocket = websockets[defaultAddress];
+        logger.w(
+            'wss defaultAddress:$defaultAddress websocket is exist:${websocket!.status}');
         _default = websocket;
-        if (websocket!.status == SocketStatus.connecting) {
-          return null;
-        }
-        if (websocket.status == SocketStatus.connected) {
+        if (websocket.status == SocketStatus.connected ||
+            websocket.status == SocketStatus.reconnecting ||
+            websocket.status == SocketStatus.connecting) {
           return _default;
         }
-      } else {
+        //如果已经关闭，从池中移除
+        if (websocket.status == SocketStatus.closed ||
+            websocket.status == SocketStatus.none ||
+            websocket.status == SocketStatus.failed) {
+          websockets.remove(defaultAddress);
+          websocket = null;
+        }
+      }
+      //如果不存在或者已经关闭，创建新的连接
+      if (websocket == null) {
         if (defaultAddress != null && defaultAddress.startsWith('ws')) {
           websocket = Websocket(defaultAddress, myselfPeerService.connect,
               peerId: defaultPeerId);
@@ -286,6 +296,8 @@ class WebsocketPool {
           websocket.onStatusChange = onStatusChanged;
         }
       }
+    } else {
+      logger.e('defaultPeerEndpoint is not exist');
     }
     return _default;
   }
@@ -297,26 +309,37 @@ class WebsocketPool {
 
   ///获取连接的缺省websocket
   Websocket? getDefault() {
-    if (_default != null && _default!.status == SocketStatus.connected) {
+    if (_default != null && _default!.status == SocketStatus.connected ||
+        _default!.status == SocketStatus.reconnecting ||
+        _default!.status == SocketStatus.connecting) {
       return _default;
     }
     return null;
   }
 
+  ///获取或者连接指定地址的websocket的连接，并可以根据参数是否设置为缺省
   Future<Websocket?> get(String address, {bool isDefault = false}) async {
     Websocket? websocket;
     if (websockets.containsKey(address)) {
       websocket = websockets[address];
-      if (isDefault && websocket != null) {
-        _default = websocket;
+      logger.w('wss address:$address websocket is exist:${websocket!.status}');
+      if (websocket.status == SocketStatus.connected ||
+          websocket.status == SocketStatus.reconnecting ||
+          websocket.status == SocketStatus.connecting) {
+        if (isDefault) {
+          _default = websocket;
+        }
+        return websocket;
       }
-      if (websocket!.status == SocketStatus.connecting) {
-        return null;
+      //如果已经关闭，从池中移除
+      if (websocket.status == SocketStatus.closed ||
+          websocket.status == SocketStatus.none ||
+          websocket.status == SocketStatus.failed) {
+        websockets.remove(address);
+        websocket = null;
       }
-      if (websocket.status == SocketStatus.connected) {
-        return _default;
-      }
-    } else {
+    }
+    if (websocket == null) {
       if (address.startsWith('ws')) {
         String? peerId;
         PeerEndpoint? peerEndpoint =
@@ -329,21 +352,13 @@ class WebsocketPool {
         websocket.onStatusChange = onStatusChanged;
         await websocket.connect();
         websockets[address] = websocket;
-        websocket = null;
+        if (isDefault) {
+          _default = websocket;
+        }
       }
     }
 
     return websocket;
-  }
-
-  put(String address, Websocket websocket) {
-    if (websockets.containsKey(address)) {
-      var exist = websockets[address];
-      logger.w(
-          'wss address:$address websocket already is exist:${exist!.status}');
-      exist.close();
-    }
-    websockets[address] = websocket;
   }
 
   close(String address) {
