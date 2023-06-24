@@ -104,7 +104,9 @@ class _SettingWidgetState extends State<SettingWidget> {
                     ? child
                     : Center(
                         child: CommonAutoSizeText(
-                            AppLocalizations.t('Authenticate failure'))),
+                        AppLocalizations.t('Authenticate failure'),
+                        style: const TextStyle(color: Colors.white),
+                      )),
               ],
             )));
     return setting;

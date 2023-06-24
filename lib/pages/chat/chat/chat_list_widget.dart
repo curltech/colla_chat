@@ -30,7 +30,6 @@ import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/transport/websocket.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
-import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
@@ -397,6 +396,7 @@ class _ChatListWidgetState extends State<ChatListWidget>
         });
     slideActions.add(deleteSlideAction);
     tile.slideActions = slideActions;
+
     return tile;
   }
 

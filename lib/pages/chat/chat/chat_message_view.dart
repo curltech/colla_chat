@@ -84,10 +84,11 @@ class _ChatMessageViewState extends State<ChatMessageView>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     windowManager.addListener(this);
-    chatMessageViewController.addListener(_update);
+    chatMessageController.addListener(_updateChatMessage);
+    chatMessageViewController.addListener(_updateChatMessageView);
     _createPeerConnection();
     _buildReadStatus();
-    _update();
+    _updateChatMessageView();
     Wakelock.enable();
   }
 
@@ -126,8 +127,12 @@ class _ChatMessageViewState extends State<ChatMessageView>
     _createPeerConnection();
   }
 
-  _update() {
+  _updateChatMessageView() {
     chatMessageHeight.value = chatMessageViewController.chatMessageHeight;
+  }
+
+  _updateChatMessage() {
+    _chatSummary.value = chatMessageController.chatSummary;
   }
 
   ///更新为已读状态
@@ -292,7 +297,7 @@ class _ChatMessageViewState extends State<ChatMessageView>
     final Widget chatMessageView = ValueListenableBuilder(
         valueListenable: chatMessageHeight,
         builder: (BuildContext context, double value, Widget? child) {
-          var height=chatMessageViewController.chatMessageHeight;
+          var height = chatMessageViewController.chatMessageHeight;
           Widget chatMessageWidget =
               SizedBox(height: height, child: widget.chatMessageWidget);
           return VisibilityDetector(
@@ -322,20 +327,9 @@ class _ChatMessageViewState extends State<ChatMessageView>
     return chatMessageView;
   }
 
-  @override
-  Widget build(BuildContext context) {
-    var chatSummary = _chatSummary.value;
-    if (chatSummary == null) {
-      return AppBarView(
-          title: AppLocalizations.t('No current chatSummary'),
-          withLeading: widget.withLeading,
-          child: Container());
-    }
-    String peerId = chatSummary.peerId!;
-    String name = chatSummary.name!;
+  List<Widget> _buildRightWidgets(
+      BuildContext context, ChatSummary chatSummary) {
     String partyType = chatSummary.partyType!;
-    String title = AppLocalizations.t(name);
-    Widget titleWidget = CommonAutoSizeText(title);
     List<Widget> rightWidgets = [];
     if (partyType == PartyType.linkman.name) {
       var peerConnectionStatusWidget = ValueListenableBuilder(
@@ -376,19 +370,40 @@ class _ChatMessageViewState extends State<ChatMessageView>
           },
           icon: const Icon(Icons.more_vert)));
     }
-    var appBarView = KeepAliveWrapper(
-        child: AppBarView(
-            titleWidget: titleWidget,
-            withLeading: widget.withLeading,
-            rightWidgets: rightWidgets,
-            child: _buildChatMessageWidget(context)));
+
+    return rightWidgets;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Widget chatMessageWidget = _buildChatMessageWidget(context);
+    Widget appBarView = ValueListenableBuilder(
+        valueListenable: _chatSummary,
+        builder:
+            (BuildContext context, ChatSummary? chatSummary, Widget? child) {
+          if (chatSummary != null) {
+            String name = chatSummary.name!;
+            String title = AppLocalizations.t(name);
+            return AppBarView(
+                titleWidget: CommonAutoSizeText(title),
+                withLeading: widget.withLeading,
+                rightWidgets: _buildRightWidgets(context, chatSummary),
+                child: chatMessageWidget);
+          }
+          return AppBarView(
+              titleWidget: CommonAutoSizeText(
+                  AppLocalizations.t('No current chatSummary')),
+              withLeading: widget.withLeading,
+              child: chatMessageWidget);
+        });
 
     return appBarView;
   }
 
   @override
   void dispose() {
-    chatMessageViewController.removeListener(_update);
+    chatMessageController.removeListener(_updateChatMessage);
+    chatMessageViewController.removeListener(_updateChatMessageView);
     var chatSummary = _chatSummary.value;
     if (chatSummary != null) {
       peerConnectionPool.unregisterWebrtcEvent(chatSummary.peerId!,

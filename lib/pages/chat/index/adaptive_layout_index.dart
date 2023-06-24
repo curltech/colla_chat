@@ -74,7 +74,7 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
   }
 
   ///SecondaryBody视图
-  Widget _buildSecondaryBodyView() {
+  Widget _buildSecondaryBodyView(BuildContext context) {
     var pageView = Consumer<IndexWidgetProvider>(
         builder: (context, indexWidgetProvider, child) {
       ScrollPhysics? physics = const NeverScrollableScrollPhysics();
@@ -84,9 +84,7 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
       return PageView.builder(
         physics: physics,
         controller: indexWidgetProvider.controller,
-        onPageChanged: (int index) {
-          indexWidgetProvider.currentIndex = index;
-        },
+        onPageChanged: (int index) {},
         itemCount: indexWidgetProvider.views.length,
         itemBuilder: (BuildContext context, int index) {
           if (index > 3 || appDataProvider.smallBreakpoint.isActive(context)) {
@@ -104,23 +102,23 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
   }
 
   /// 放置SecondaryBody
-  SlotLayout _buildSecondaryBody() {
+  SlotLayout _buildSecondaryBody(BuildContext context) {
     return SlotLayout(
       config: <Breakpoint, SlotLayoutConfig>{
         appDataProvider.smallBreakpoint: SlotLayout.from(
           key: const Key('Secondary body'),
           outAnimation: AdaptiveScaffold.stayOnScreen,
-          builder: (_) => _buildSecondaryBodyView(),
+          builder: (_) => _buildSecondaryBodyView(context),
         ),
         appDataProvider.mediumBreakpoint: SlotLayout.from(
           key: const Key('Secondary body'),
           outAnimation: AdaptiveScaffold.stayOnScreen,
-          builder: (_) => _buildSecondaryBodyView(),
+          builder: (_) => _buildSecondaryBodyView(context),
         ),
         appDataProvider.largeBreakpoint: SlotLayout.from(
           key: const Key('Secondary body'),
           outAnimation: AdaptiveScaffold.stayOnScreen,
-          builder: (_) => _buildSecondaryBodyView(),
+          builder: (_) => _buildSecondaryBodyView(context),
         )
       },
     );
@@ -138,7 +136,7 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
       return AdaptiveLayout(
           primaryNavigation: primaryNavigation.build(indexWidgetProvider),
           body: _buildBody(),
-          secondaryBody: _buildSecondaryBody(),
+          secondaryBody: _buildSecondaryBody(context),
           bodyRatio: bodyRatio,
           bottomNavigation:
               indexWidgetProvider.bottomBarVisible && !appDataProvider.landscape
