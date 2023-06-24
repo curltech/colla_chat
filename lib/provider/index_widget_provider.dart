@@ -8,7 +8,6 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 
-const bool useNavigator = false;
 const animateDuration = Duration(milliseconds: 500);
 
 /// 主工作区的视图状态管理器，维护了主工作区的控制器，视图列表，当前视图
@@ -44,15 +43,7 @@ class IndexWidgetProvider with ChangeNotifier {
   ///增加新的视图，不能在initState和build构建方法中调用listen=true，
   ///因为本方法会引起整个pageview视图的重新构建
   define(TileDataMixin view, {bool listen = false}) {
-    if (!useNavigator || !platformParams.mobile) {
-      allViews[view.routeName] = view;
-    } else {
-      Application.router.define('/${view.routeName}', handler: Handler(
-          handlerFunc:
-              (BuildContext? context, Map<String, List<String>> params) {
-        return view;
-      }));
-    }
+    allViews[view.routeName] = view;
     if (listen) {
       notifyListeners();
     }
@@ -120,34 +111,23 @@ class IndexWidgetProvider with ChangeNotifier {
       logger.e('mainview: $name can not be push stack');
       return;
     }
-    //桌面工作区模式
-    if (!useNavigator || !platformParams.mobile) {
-      var controller = this.controller;
-      if (controller == null) {
-        logger.e('swiperController is not exist');
-        return;
-      }
-      //判断要进入的页面是否已在工作区
-      int index = views.indexOf(view);
-      if (index == -1) {
-        //不是主页面，增加到工作区
-        views.add(view);
-        index = views.length - 1;
-      }
-      if (index < allViews.length) {
-        controller.animateToPage(index,
-            duration: animateDuration, curve: Curves.easeInOut);
-        notifyListeners();
-      } else {
-        logger.e('$name error,not exist');
-      }
-    } else {
-      //移动版路由模式
-      if (context != null) {
-        NavigatorUtil.jump(context, '/$name');
-      } else {
-        logger.e('jump to $name error, no context');
-      }
+
+    var controller = this.controller;
+    if (controller == null) {
+      logger.e('swiperController is not exist');
+      return;
+    }
+    //判断要进入的页面是否已在工作区
+    int index = views.indexOf(view);
+    if (index == -1) {
+      //不是主页面，增加到工作区
+      views.add(view);
+      index = views.length - 1;
+    }
+    if (index < allViews.length) {
+      controller.animateToPage(index,
+          duration: animateDuration, curve: Curves.easeInOut);
+      notifyListeners();
     }
   }
 
@@ -157,37 +137,25 @@ class IndexWidgetProvider with ChangeNotifier {
     //   popAction = false;
     //   return;
     // }
-    //桌面工作区模式
-    if (!useNavigator || !platformParams.mobile) {
-      var controller = this.controller;
-      if (controller == null) {
-        logger.e('swiperController is not exist');
-        return;
-      }
+    var controller = this.controller;
+    if (controller == null) {
+      logger.e('swiperController is not exist');
+      return;
+    }
 
-      //堆栈有头视图，可以弹出
-      int index = views.length - 1;
-      //头视图在工作区内
-      if (index >= mainViews.length) {
-        views.removeLast();
-        index = views.length - 1;
-        if (index < mainViews.length) {
-          index = _currentMainIndex;
-        }
-        popAction = true;
-        controller.animateToPage(index,
-            duration: animateDuration, curve: Curves.easeInOut);
-        notifyListeners();
-      } else {
-        logger.e('head is not in workspace');
+    //堆栈有头视图，可以弹出
+    int index = views.length - 1;
+    //头视图在工作区内
+    if (index >= mainViews.length) {
+      views.removeLast();
+      index = views.length - 1;
+      if (index < mainViews.length) {
+        index = _currentMainIndex;
       }
-    } else {
-      if (context != null) {
-        popAction = true;
-        NavigatorUtil.goBack(context);
-      } else {
-        logger.e('pop error, no context');
-      }
+      popAction = true;
+      controller.animateToPage(index,
+          duration: animateDuration, curve: Curves.easeInOut);
+      notifyListeners();
     }
   }
 
