@@ -423,35 +423,36 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
   Future<String?> backup(String peerId) async {
     MyselfPeer? myselfPeer = await findOneByPeerId(peerId);
     if (myselfPeer != null) {
+      Map<String, dynamic> myselfPeerMap = JsonUtil.toJson(myselfPeer);
       String name = myselfPeer.name;
       PeerProfile? peerProfile =
           await peerProfileService.findOneByPeerId(peerId);
       if (peerProfile != null) {
-        myselfPeer.peerProfile = peerProfile;
+        Map<String, dynamic> peerProfileMap = JsonUtil.toJson(peerProfile);
+        myselfPeerMap['peerProfile'] = peerProfileMap;
       }
 
-      String backup = JsonUtil.toJsonString(myselfPeer);
-      final dbFolder = await PathUtil.getApplicationDirectory();
-      if (dbFolder != null) {
-        String d = DateUtil.formatDate(DateUtil.currentDateTime(),
-            format: 'yyyy-MM-dd');
-        String path = p.join(dbFolder.path, '${name}_${peerId}_$d.json');
-        File file = File(path);
-        file.writeAsStringSync(backup);
+      String backup = JsonUtil.toJsonString(myselfPeerMap);
+      var current = DateTime.now();
+      var filename =
+          '${name}_$peerId-${current.year}-${current.month}-${current.day}.json';
+      filename = p.join(platformParams.path, name, filename);
+      File file = File(filename);
+      file.writeAsStringSync(backup);
 
-        return path;
-      }
+      return filename;
     }
 
     return null;
   }
 
   Future<String> restore(String backup) async {
-    Map<String, dynamic> map = JsonUtil.toJson(backup);
-    MyselfPeer myselfPeer = MyselfPeer.fromJson(map);
+    Map<String, dynamic> myselfPeerMap = JsonUtil.toJson(backup);
+    MyselfPeer myselfPeer = MyselfPeer.fromJson(myselfPeerMap);
     store(myselfPeer);
-    PeerProfile? peerProfile = myselfPeer.peerProfile;
-    if (peerProfile != null) {
+    Map<String, dynamic>? peerProfileMap = myselfPeerMap['peerProfile'];
+    if (peerProfileMap != null) {
+      PeerProfile peerProfile = PeerProfile.fromJson(peerProfileMap);
       await peerProfileService.store(peerProfile);
     }
 

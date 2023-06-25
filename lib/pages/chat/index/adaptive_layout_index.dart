@@ -85,7 +85,6 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
       }
       return Swiper(
         physics: physics,
-        //transformer:AccordionTransformer(),
         controller: indexWidgetProvider.controller,
         onIndexChanged: (int index) {
           logger.i('PageChanged:$index');

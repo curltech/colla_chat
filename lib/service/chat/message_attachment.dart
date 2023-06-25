@@ -30,13 +30,6 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
   ///假如title不为空，而且文件存在，则title就是实际的文件名，直接返回
   ///否则，组合messageId和title，取在应用用户的内容路径下
   Future<String?> getEncryptFilename(String messageId, String? title) async {
-    // if (title != null) {
-    //   File file = File(title);
-    //   bool exist = file.existsSync();
-    //   if (exist) {
-    //     return title;
-    //   }
-    // }
     String contentPath = p.join(myself.myPath, 'content');
     String? filename;
     if (!platformParams.web) {
@@ -55,11 +48,6 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
   Future<String?> getDecryptFilename(String messageId, String? title) async {
     String? filename;
     if (title != null) {
-      // File file = File(title);
-      // bool exist = file.existsSync();
-      // if (exist) {
-      //   return title;
-      // }
       filename = '${messageId}_$title';
     } else {
       filename = messageId;

@@ -69,4 +69,40 @@ class PathUtil {
     final dir = await path.getDownloadsDirectory();
     return dir;
   }
+
+  static Directory? createDir(String path) {
+    var dir = Directory(path);
+    bool exist = dir.existsSync();
+    if (!exist) {
+      dir.createSync(recursive: true);
+
+      return dir;
+    }
+    return null;
+  }
+
+  static List<FileSystemEntity> listFile(String path,
+      {String? start, String? end}) {
+    var dir = Directory(path);
+    List<FileSystemEntity> matches = [];
+    bool exist = dir.existsSync();
+    if (exist) {
+      List<FileSystemEntity> files = dir.listSync();
+      for (var file in files) {
+        String filename = file.path;
+        bool startMatch = true;
+        bool endMatch = true;
+        if (start != null) {
+          startMatch = filename.startsWith(start);
+        }
+        if (end != null) {
+          endMatch = filename.endsWith(end);
+        }
+        if (startMatch && endMatch) {
+          matches.add(file);
+        }
+      }
+    }
+    return matches;
+  }
 }

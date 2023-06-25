@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:colla_chat/datastore/sqlite3.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/me/settings/security/password_widget.dart';
+import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -67,6 +68,7 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
       TileData(title: 'Restore', prefix: Icons.restore),
       TileData(title: 'Backup peer', prefix: Icons.backup_table),
       TileData(title: 'Restore peer', prefix: Icons.restore_page),
+      TileData(title: 'Clean log', prefix: Icons.cleaning_services),
     ];
 
     return DataListView(tileData: tiles, onTap: _onTap);
@@ -85,6 +87,9 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
         break;
       case 'Restore peer':
         _restorePeer();
+        break;
+      case 'Clean log':
+        _cleanLog();
         break;
       default:
         break;
@@ -130,19 +135,37 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
 
   ///从备份的peer的登录信息json文件恢复到数据库
   Future<void> _restorePeer() async {
-    Directory? initialDirectory = await PathUtil.getApplicationDirectory();
-    if (initialDirectory != null) {
-      List<XFile> xfiles = await FileUtil.selectFiles(
-          initialDirectory: initialDirectory.path, allowedExtensions: ['json']);
-      if (xfiles.isNotEmpty) {
-        String backup = await xfiles.first.readAsString();
-        await myselfPeerService.restore(backup);
-        if (mounted) {
-          DialogUtil.info(context,
-              content:
-                  '${AppLocalizations.t('Successfully restore peer filename')} ${xfiles.first.path}');
-        }
+    List<XFile> xfiles = await FileUtil.selectFiles(
+        initialDirectory: platformParams.path, allowedExtensions: ['json']);
+    if (xfiles.isNotEmpty) {
+      String backup = await xfiles.first.readAsString();
+      await myselfPeerService.restore(backup);
+      if (mounted) {
+        DialogUtil.info(context,
+            content:
+                '${AppLocalizations.t('Successfully restore peer filename')} ${xfiles.first.path}');
       }
+    }
+  }
+
+  ///清楚当前账户的日志
+  void _cleanLog() {
+    List<FileSystemEntity> files =
+        PathUtil.listFile(platformParams.path, end: '.log');
+    if (files.isNotEmpty) {
+      for (var file in files) {
+        file.deleteSync();
+      }
+    }
+    files = PathUtil.listFile(myself.myPath, end: '.log');
+    if (files.isNotEmpty) {
+      for (var file in files) {
+        file.deleteSync();
+      }
+    }
+    if (mounted) {
+      DialogUtil.info(context,
+          content: AppLocalizations.t('Successfully clean all log files'));
     }
   }
 

@@ -1,15 +1,12 @@
+import 'package:another_transformer_page_view/another_transformer_page_view.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/routers/navigator_util.dart';
-import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 
-const animateDuration = Duration(milliseconds: 500);
+const animateDuration = Duration(milliseconds: 1000);
 
 /// 主工作区的视图状态管理器，维护了主工作区的控制器，视图列表，当前视图
 class IndexWidgetProvider with ChangeNotifier {
