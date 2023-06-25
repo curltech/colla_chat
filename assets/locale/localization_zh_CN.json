@@ -390,5 +390,7 @@
   "Successfully restore colla.db and reopen": "成功恢复数据库colla.db并重新打开",
   "Authenticate failure": "账户验证失败",
   "Clean log": "清除日志",
-  "Successfully clean all log files": "成功地清除所有的日志文件"
+  "Successfully clean all log files": "成功地清除所有的日志文件",
+  "Show": "显示",
+  "Hide": "隐藏"
 }
