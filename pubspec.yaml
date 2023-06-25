@@ -196,7 +196,7 @@ dependencies:
   openpgp: ^3.2.8 #rsa,sha
   libsignal_protocol_dart: ^0.6.5
   crypto: ^3.0.1 #sha
-  archive: any
+  archive: ^3.3.7
   uuid: 3.0.7
   local_auth: any
   #基本开发工具

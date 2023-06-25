@@ -7,6 +7,7 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
@@ -68,6 +69,8 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
       TileData(title: 'Restore', prefix: Icons.restore),
       TileData(title: 'Backup peer', prefix: Icons.backup_table),
       TileData(title: 'Restore peer', prefix: Icons.restore_page),
+      TileData(title: 'Backup attachment', prefix: Icons.copy),
+      TileData(title: 'Restore attachment', prefix: Icons.paste),
       TileData(title: 'Clean log', prefix: Icons.cleaning_services),
     ];
 
@@ -87,6 +90,12 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
         break;
       case 'Restore peer':
         _restorePeer();
+        break;
+      case 'Backup attachment':
+        _backupAttachment();
+        break;
+      case 'Restore attachment':
+        _restoreAttachment();
         break;
       case 'Clean log':
         _cleanLog();
@@ -144,6 +153,41 @@ class _SecuritySettingWidgetState extends State<SecuritySettingWidget> {
         DialogUtil.info(context,
             content:
                 '${AppLocalizations.t('Successfully restore peer filename')} ${xfiles.first.path}');
+      }
+    }
+  }
+
+  ///备份当前的peer的附件
+  Future<void> _backupAttachment() async {
+    String? peerId = myself.peerId;
+    if (peerId != null) {
+      String? filename = await messageAttachmentService.backup(peerId);
+      if (filename != null) {
+        if (mounted) {
+          DialogUtil.info(context,
+              content:
+                  '${AppLocalizations.t('Successfully backup attachment filename')} $filename');
+        }
+      }
+    }
+  }
+
+  ///从备份的peer的附件文件恢复
+  Future<String?> _restoreAttachment() async {
+    String? peerId = myself.peerId;
+    if (peerId != null) {
+      List<XFile> xfiles = await FileUtil.selectFiles(
+          initialDirectory: platformParams.path, allowedExtensions: ['tgz']);
+      if (xfiles.isNotEmpty) {
+        String? path =
+            await messageAttachmentService.restore(peerId, xfiles.first.path);
+        if (path != null) {
+          if (mounted) {
+            DialogUtil.info(context,
+                content:
+                    '${AppLocalizations.t('Successfully restore attachment path')} $path');
+          }
+        }
       }
     }
   }

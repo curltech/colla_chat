@@ -4,13 +4,16 @@ import 'dart:typed_data';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/base.dart';
 import 'package:colla_chat/entity/chat/message_attachment.dart';
+import 'package:colla_chat/entity/dht/myselfpeer.dart';
 import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/service/servicelocator.dart';
+import 'package:colla_chat/tool/archive_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:path/path.dart' as p;
 
@@ -185,6 +188,36 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
     if (file.existsSync()) {
       file.delete();
     }
+  }
+
+  ///备份附件目录
+  Future<String?> backup(String peerId) async {
+    MyselfPeer? myselfPeer = await myselfPeerService.findOneByPeerId(peerId);
+    if (myselfPeer != null) {
+      String name = myselfPeer.name;
+      String contentPath = p.join(platformParams.path, name, 'content');
+      var current = DateTime.now();
+      var outputPath =
+          '${name}_$peerId-${current.year}-${current.month}-${current.day}.tgz';
+      outputPath = p.join(platformParams.path, name, outputPath);
+      ArchiveUtil.compress(contentPath, outputPath);
+
+      return outputPath;
+    }
+    return null;
+  }
+
+  ///恢复附件目录
+  Future<String?> restore(String peerId, String inputPath) async {
+    MyselfPeer? myselfPeer = await myselfPeerService.findOneByPeerId(peerId);
+    if (myselfPeer != null) {
+      String name = myselfPeer.name;
+      String contentPath = p.join(platformParams.path, name);
+      ArchiveUtil.uncompress(inputPath, contentPath);
+
+      return contentPath;
+    }
+    return null;
   }
 }
 
