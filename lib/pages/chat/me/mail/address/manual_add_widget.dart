@@ -1,18 +1,29 @@
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
 /// 邮件地址手工注册组件，一个card下的录入框和按钮组合
-class ManualAddWidget extends StatefulWidget {
+class ManualAddWidget extends StatefulWidget with TileDataMixin {
   const ManualAddWidget({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() => _ManualAddWidgetState();
+
+  @override
+  String get routeName => 'mail_address_manual_add';
+
+  @override
+  bool get withLeading => true;
+
+  @override
+  IconData get iconData => Icons.handyman;
+
+  @override
+  String get title => 'MailAddressManualAdd';
 }
 
-class _ManualAddWidgetState extends State<ManualAddWidget>
-    with AutomaticKeepAliveClientMixin {
-  final _formKey = GlobalKey<FormState>();
+class _ManualAddWidgetState extends State<ManualAddWidget> {
   String? _personalName;
   String? _password;
   String? _email;
@@ -29,14 +40,14 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
 
   Widget _buildSmtp() {
     return ExpansionTile(
-      leading: Icon(Icons.send),
-      title: CommonAutoSizeText('Smtp'),
+      leading: const Icon(Icons.send),
+      title: const CommonAutoSizeText('Smtp'),
       initiallyExpanded: false,
       children: <Widget>[
         Column(children: <Widget>[
-          SizedBox(height: 10.0),
+          const SizedBox(height: 10.0),
           Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
+              padding: const EdgeInsets.symmetric(horizontal: 15.0),
               child: Switch(
                 value: _smtpServerSecure,
                 onChanged: (bool val) {
@@ -49,6 +60,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
               child: CommonAutoSizeTextFormField(
+                controller: TextEditingController(),
                 labelText: AppLocalizations.t('SmtpServerHost'),
                 prefixIcon: Icon(Icons.desktop_mac),
                 initialValue: _smtpServerHost,
@@ -63,6 +75,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
           Padding(
               padding: EdgeInsets.symmetric(horizontal: 15.0),
               child: CommonAutoSizeTextFormField(
+                controller: TextEditingController(),
                 keyboardType: TextInputType.number,
                 labelText: AppLocalizations.t('SmtpServerPort'),
                 prefixIcon: Icon(Icons.router),
@@ -101,6 +114,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
             Padding(
                 padding: EdgeInsets.symmetric(horizontal: 15.0),
                 child: CommonAutoSizeTextFormField(
+                  controller: TextEditingController(),
                   labelText: AppLocalizations.t('ImapServerHost'),
                   prefixIcon: Icon(Icons.desktop_mac),
                   initialValue: _imapServerHost,
@@ -115,6 +129,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
             Padding(
                 padding: EdgeInsets.symmetric(horizontal: 15.0),
                 child: CommonAutoSizeTextFormField(
+                  controller: TextEditingController(),
                   keyboardType: TextInputType.number,
                   labelText: AppLocalizations.t('ImapServerPort'),
                   prefixIcon: Icon(Icons.router),
@@ -152,6 +167,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
             Padding(
                 padding: EdgeInsets.symmetric(horizontal: 15.0),
                 child: CommonAutoSizeTextFormField(
+                  controller: TextEditingController(),
                   labelText: AppLocalizations.t('PopServerHost'),
                   prefixIcon: Icon(Icons.desktop_mac),
                   initialValue: _popServerHost,
@@ -166,6 +182,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
             Padding(
                 padding: EdgeInsets.symmetric(horizontal: 15.0),
                 child: CommonAutoSizeTextFormField(
+                  controller: TextEditingController(),
                   keyboardType: TextInputType.number,
                   labelText: AppLocalizations.t('PopServerPort'),
                   prefixIcon: Icon(Icons.router),
@@ -188,7 +205,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
         Padding(
             padding: EdgeInsets.symmetric(horizontal: 15.0),
             child: CommonAutoSizeTextFormField(
-              //controller: nameController,
+              controller: TextEditingController(),
               labelText: AppLocalizations.t('Username'),
               prefixIcon: Icon(Icons.person),
               initialValue: _personalName,
@@ -203,6 +220,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
         Padding(
             padding: EdgeInsets.symmetric(horizontal: 15.0),
             child: CommonAutoSizeTextFormField(
+              controller: TextEditingController(),
               keyboardType: TextInputType.emailAddress,
               labelText: AppLocalizations.t('Email'),
               prefixIcon: Icon(Icons.email),
@@ -218,8 +236,10 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
         Padding(
             padding: EdgeInsets.symmetric(horizontal: 15.0),
             child: CommonAutoSizeTextFormField(
+              controller: TextEditingController(),
               keyboardType: TextInputType.text,
               obscureText: !_pwdShow,
+              maxLines: 1,
               //controller: passwordController,
               labelText: AppLocalizations.t('Password'),
               prefixIcon: Icon(Icons.lock),
@@ -277,7 +297,4 @@ class _ManualAddWidgetState extends State<ManualAddWidget>
   }
 
   Future<void> _connect() async {}
-
-  @override
-  bool get wantKeepAlive => true;
 }

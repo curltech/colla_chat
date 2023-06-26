@@ -1,51 +1,76 @@
-import 'package:colla_chat/pages/chat/me/mail/address/address_add.dart';
+import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/pages/chat/me/mail/mail_address_widget.dart';
+import 'package:colla_chat/pages/chat/me/mail/mail_content_widget.dart';
 import 'package:colla_chat/pages/chat/me/mail/mail_list_widget.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
-import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
-import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
 
-//mail页面
-class MailWidget extends StatelessWidget with TileDataMixin {
-  late final List<TileData> mailTileData;
+///邮件应用总体视图，由三个子视图组成
+///第一个是邮件地址视图，列出邮件地址的列表和邮件地址下的目录结构
+///第二个是邮件列表视图，列出邮件地址目录下的邮件列表，在窄屏时的缺省进入视图
+///第一个和第二个视图合用一个视图展示，宽屏时在body部分展示，邮件列表视图的左上角有按钮，弹出邮件地址视图对话框
+///第三个是邮件内容视图，显示邮件的具体内容，在secondary body部分展示
+class MailWidget extends StatefulWidget with TileDataMixin {
+  final MailAddressWidget mailAddressWidget = MailAddressWidget();
+  final MailListWidget mailListWidget = const MailListWidget();
+  final MailContentWidget mailContentWidget = const MailContentWidget();
 
   MailWidget({Key? key}) : super(key: key) {
-    AddressAddWidget addressAddWidget = const AddressAddWidget();
-    // MailView mailView = MailView();
-    MailAddressWidget mailAddressWidget = const MailAddressWidget();
-    MailListWidget mailListWidget = const MailListWidget();
-    List<TileDataMixin> mixins = [
-      addressAddWidget,
-      mailAddressWidget,
-      mailListWidget,
-    ];
-    mailTileData = TileData.from(mixins);
-    for (var tile in mailTileData) {
-      tile.dense = true;
-    }
+    indexWidgetProvider.define(mailContentWidget);
   }
 
   @override
-  Widget build(BuildContext context) {
-    Widget child = DataListView(tileData: mailTileData);
-    var webrtc = KeepAliveWrapper(
-        child:
-            AppBarView(title: title, withLeading: withLeading, child: child));
-    return webrtc;
-  }
-
-  @override
-  bool get withLeading => true;
+  State<StatefulWidget> createState() => _MailWidgetState();
 
   @override
   String get routeName => 'mail';
+
+  @override
+  bool get withLeading => true;
 
   @override
   IconData get iconData => Icons.email;
 
   @override
   String get title => 'Mail';
+}
+
+class _MailWidgetState extends State<MailWidget> {
+  @override
+  initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    SwiperController controller = SwiperController();
+    var view = Swiper(
+        itemCount: 2,
+        controller: controller,
+        itemBuilder: (BuildContext context, int index) {
+          if (index == 0) {
+            return widget.mailAddressWidget;
+          }
+          if (index == 1) {
+            return widget.mailListWidget;
+          }
+          return Container();
+        });
+    List<Widget> rightWidgets = [
+      IconButton(
+          onPressed: () {
+            controller.next();
+          },
+          icon: const Icon(Icons.menu)),
+    ];
+    var appBarView = AppBarView(
+        title: widget.title,
+        withLeading: widget.withLeading,
+        rightWidgets: rightWidgets,
+        child: view);
+
+    return appBarView;
+  }
 }

@@ -6,6 +6,7 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
+import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:provider/provider.dart';
@@ -117,13 +118,31 @@ class FormInputController with ChangeNotifier {
   }
 }
 
+class FormButtonDef {
+  final String label;
+  ButtonStyle? buttonStyle;
+  Widget? icon;
+  String? tooltip;
+  Function(Map<String, dynamic> values)? onTap;
+
+  FormButtonDef(
+      {required this.label,
+      this.buttonStyle,
+      this.icon,
+      this.tooltip,
+      this.onTap}) {
+    buttonStyle = buttonStyle ??
+        StyleUtil.buildButtonStyle(
+            backgroundColor: myself.primary, elevation: 10.0);
+  }
+}
+
 class FormInputWidget extends StatefulWidget {
   final Map<String, dynamic>? initValues;
   late final FormInputController controller;
-
-  final Function(Map<String, dynamic>)? onOk;
+  final List<FormButtonDef>? formButtonDefs;
+  final Function(Map<String, dynamic> values)? onOk;
   final String okLabel;
-  final String resetLabel;
   final double height; //高度
   final MainAxisAlignment mainAxisAlignment;
   final double spacing;
@@ -135,9 +154,9 @@ class FormInputWidget extends StatefulWidget {
     Key? key,
     required List<ColumnFieldDef> columnFieldDefs,
     this.initValues,
+    this.formButtonDefs,
     this.onOk,
     this.okLabel = 'Ok',
-    this.resetLabel = 'Reset',
     required this.height,
     this.mainAxisAlignment = MainAxisAlignment.start,
     this.spacing = 0.0,
@@ -254,26 +273,41 @@ class _FormInputWidgetState extends State<FormInputWidget> {
     ButtonStyle style = StyleUtil.buildButtonStyle();
     ButtonStyle mainStyle = StyleUtil.buildButtonStyle(
         backgroundColor: myself.primary, elevation: 10.0);
-    if (widget.onOk != null) {
-      return ButtonBar(children: [
-        TextButton(
-          style: style,
-          child: CommonAutoSizeText(AppLocalizations.t(widget.resetLabel)),
-          onPressed: () {
-            widget.controller.clear();
-          },
-        ),
-        TextButton(
-          style: mainStyle,
-          child: CommonAutoSizeText(AppLocalizations.t(widget.okLabel)),
-          onPressed: () {
+    List<Widget> btns = [];
+    if (widget.formButtonDefs == null) {
+      btns.add(TextButton(
+        style: style,
+        child: CommonAutoSizeText(AppLocalizations.t('Reset')),
+        onPressed: () {
+          widget.controller.clear();
+        },
+      ));
+      btns.add(TextButton(
+        style: mainStyle,
+        child: CommonAutoSizeText(AppLocalizations.t(widget.okLabel!)),
+        onPressed: () {
+          if (widget.onOk != null) {
             var values = widget.controller.getValues();
             widget.onOk!(values);
+          }
+        },
+      ));
+    } else {
+      for (FormButtonDef formButtonDef in widget.formButtonDefs!) {
+        btns.add(TextButton(
+          style: formButtonDef.buttonStyle,
+          child: CommonAutoSizeText(AppLocalizations.t(formButtonDef.label)),
+          onPressed: () {
+            if (formButtonDef.onTap != null) {
+              var values = widget.controller.getValues();
+              formButtonDef.onTap!(values);
+            }
           },
-        ),
-      ]);
+        ));
+      }
     }
-    return Container();
+
+    return ButtonBar(children: btns);
   }
 
   Widget _buildFormSwiper(BuildContext context) {

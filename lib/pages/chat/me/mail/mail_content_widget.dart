@@ -1,4 +1,4 @@
-import 'package:colla_chat/pages/chat/me/mail/mail_data_provider.dart';
+import 'package:colla_chat/pages/chat/me/mail/mail_address_controller.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -8,7 +8,7 @@ import 'package:enough_mail/highlevel.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-//邮件内容组件
+///邮件内容子视图
 class MailContentWidget extends StatefulWidget with TileDataMixin {
   const MailContentWidget({Key? key}) : super(key: key);
 
@@ -29,16 +29,13 @@ class MailContentWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _MailContentWidgetState extends State<MailContentWidget> {
-  late Widget mimeMessageViewer;
-
   @override
   initState() {
     super.initState();
-    mimeMessageViewer = _build(context);
   }
 
   Widget _buildMimeMessageViewer(
-      BuildContext context, MailDataProvider mailAddressProvider) {
+      BuildContext context, MailAddressController mailAddressProvider) {
     var currentChatMessage = mailAddressProvider.currentChatMessage;
     MimeMessage mimeMessage;
     if (currentChatMessage != null) {
@@ -91,8 +88,8 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     setState(() {});
   }
 
-  Widget _build(BuildContext context) {
-    return Consumer<MailDataProvider>(
+  Widget _buildMailContentWidget(BuildContext context) {
+    return Consumer<MailAddressController>(
         builder: (context, mailAddressProvider, child) {
       Widget mimeMessageViewer = Container();
       mimeMessageViewer = _buildMimeMessageViewer(context, mailAddressProvider);
@@ -105,7 +102,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     var appBarView = AppBarView(
         title: widget.title,
         withLeading: widget.withLeading,
-        child: mimeMessageViewer);
+        child: _buildMailContentWidget(context));
     return appBarView;
   }
 }

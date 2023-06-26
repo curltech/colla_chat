@@ -477,7 +477,7 @@ class AutoSizeTextFormField extends StatefulWidget {
     this.maxLines = 1,
     this.expands = false,
     this.readOnly = false,
-    EditableTextContextMenuBuilder? contextMenuBuilder,
+    this.contextMenuBuilder,
     this.showCursor,
     this.maxLength,
     this.maxLengthEnforcement,
@@ -524,19 +524,18 @@ class AutoSizeTextFormField extends StatefulWidget {
             maxLength > 0),
         keyboardType = keyboardType ??
             (maxLines == 1 ? TextInputType.text : TextInputType.multiline),
-        contextMenuBuilder = contextMenuBuilder,
         super(key: key);
 
   /// The text to display.
   ///
   /// This will be null if a [textSpan] is provided instead.
-  String get data => controller!.text;
+  String? get data => controller!.text;
 
   /// {@macro flutter.rendering.editable.selectionEnabled}
   bool get selectionEnabled => enableInteractiveSelection;
 
   @override
-  _AutoSizeTextFormFieldState createState() => _AutoSizeTextFormFieldState();
+  State createState() => _AutoSizeTextFormFieldState();
 }
 
 class _AutoSizeTextFormFieldState extends State<AutoSizeTextFormField> {
@@ -577,15 +576,24 @@ class _AutoSizeTextFormFieldState extends State<AutoSizeTextFormField> {
   void initState() {
     super.initState();
 
-    widget.controller!.addListener(() {
-      if (this.mounted) {
-        this.setState(() {});
-      }
-    });
+    // widget.controller!.addListener(() {
+    //   if (mounted) {
+    //     setState(() {});
+    //   }
+    // });
   }
 
   Widget _buildTextField(double fontSize, TextStyle style, int? maxLines) {
-    return Container(
+    String? initialValue = widget.initialValue;
+    if (widget.controller != null && initialValue != null) {
+      widget.controller!.value = TextEditingValue(
+          text: initialValue,
+          selection: TextSelection.fromPosition(TextPosition(
+              offset: widget.initialValue!.length,
+              affinity: TextAffinity.downstream)));
+      initialValue = null;
+    }
+    return SizedBox(
       width: widget.fullwidth
           ? double.infinity
           : math.max(fontSize, _textSpanWidth),
@@ -597,7 +605,7 @@ class _AutoSizeTextFormFieldState extends State<AutoSizeTextFormField> {
         buildCounter: widget.buildCounter,
         contextMenuBuilder: widget.contextMenuBuilder,
         controller: widget.controller,
-        initialValue: widget.initialValue,
+        initialValue: initialValue,
         cursorColor: widget.cursorColor,
         cursorRadius: widget.cursorRadius,
         cursorWidth: widget.cursorWidth,
@@ -725,10 +733,12 @@ class _AutoSizeTextFormFieldState extends State<AutoSizeTextFormField> {
       List<String?> words = text.toPlainText().split(RegExp('\\s+'));
 
       // Adds prefix and suffix text
-      if (widget.decoration.prefixText != null)
+      if (widget.decoration.prefixText != null) {
         words.add(widget.decoration.prefixText);
-      if (widget.decoration.suffixText != null)
+      }
+      if (widget.decoration.suffixText != null) {
         words.add(widget.decoration.suffixText);
+      }
 
       var wordWrapTp = TextPainter(
         text: TextSpan(
@@ -744,10 +754,10 @@ class _AutoSizeTextFormFieldState extends State<AutoSizeTextFormField> {
       );
 
       wordWrapTp.layout(maxWidth: constraintWidth);
-      double _width = (widget.decoration.contentPadding != null)
+      double width = (widget.decoration.contentPadding != null)
           ? wordWrapTp.width + widget.decoration.contentPadding!.horizontal
           : wordWrapTp.width;
-      _textSpanWidth = math.max(_width, widget.minWidth ?? 0);
+      _textSpanWidth = math.max(width, widget.minWidth ?? 0);
 
       if (wordWrapTp.didExceedMaxLines ||
           wordWrapTp.width > constraints.maxWidth) {
@@ -757,7 +767,7 @@ class _AutoSizeTextFormFieldState extends State<AutoSizeTextFormField> {
 
     String word = text.toPlainText();
 
-    if (word.length > 0) {
+    if (word.isNotEmpty) {
       // replace all \n with 'space with \n' to prevent dropping last character to new line
       var textContents = text.text ?? '';
       word = textContents.replaceAll('\n', ' \n');
@@ -789,7 +799,7 @@ class _AutoSizeTextFormFieldState extends State<AutoSizeTextFormField> {
     );
 
     tp.layout(maxWidth: constraintWidth);
-    double _width = (widget.decoration.contentPadding != null)
+    double width0 = (widget.decoration.contentPadding != null)
         ? tp.width + widget.decoration.contentPadding!.horizontal
         : tp.width;
 
@@ -797,7 +807,7 @@ class _AutoSizeTextFormFieldState extends State<AutoSizeTextFormField> {
         ? tp.height + widget.decoration.contentPadding!.vertical
         : tp.height;
 
-    _textSpanWidth = math.max(_width, widget.minWidth ?? 0);
+    _textSpanWidth = math.max(width0, widget.minWidth ?? 0);
 
     if (maxLines == null) {
       if (_height >= constraintHeight) {
@@ -806,7 +816,7 @@ class _AutoSizeTextFormFieldState extends State<AutoSizeTextFormField> {
         return true;
       }
     } else {
-      if (_width >= constraintWidth) {
+      if (width0 >= constraintWidth) {
         return false;
       } else {
         return true;

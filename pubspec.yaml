@@ -205,7 +205,7 @@ dependencies:
   flutter_keyboard_visibility: ^5.4.0
   keyboard_actions: ^4.2.0
   synchronized: ^3.0.0+2
-  flutter_smart_dialog: ^4.9.0+6
+  flutter_smart_dialog: ^4.9.2
   #pdf_flutter: ^1.1.4
   pdf: ^3.8.3
   #syncfusion_flutter_pdfviewer: ^20.3.49

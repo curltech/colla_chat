@@ -1,43 +1,35 @@
-import 'package:colla_chat/pages/chat/me/mail/mail_data_provider.dart';
+import 'package:colla_chat/pages/chat/me/mail/address/auto_discover_widget.dart';
+import 'package:colla_chat/pages/chat/me/mail/address/manual_add_widget.dart';
+import 'package:colla_chat/pages/chat/me/mail/mail_address_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
-//邮件地址组件，带有回退回调函数
-class MailAddressWidget extends StatefulWidget with TileDataMixin {
-  const MailAddressWidget({Key? key}) : super(key: key);
+///邮件地址子视图
+class MailAddressWidget extends StatefulWidget {
+  final AutoDiscoverWidget autoDiscoverWidget = const AutoDiscoverWidget();
+  final ManualAddWidget manualAddWidget = const ManualAddWidget();
+
+  MailAddressWidget({Key? key}) : super(key: key) {
+    indexWidgetProvider.define(autoDiscoverWidget);
+    indexWidgetProvider.define(manualAddWidget);
+  }
 
   @override
   State<StatefulWidget> createState() => _MailAddressWidgetState();
-
-  @override
-  String get routeName => 'mail_address';
-
-  @override
-  bool get withLeading => true;
-
-  @override
-  IconData get iconData => Icons.email;
-
-  @override
-  String get title => 'MailAddress';
 }
 
 class _MailAddressWidgetState extends State<MailAddressWidget> {
-  late Widget mailAddressWidget;
-
   @override
   initState() {
     super.initState();
-    mailAddressWidget = _build(context);
   }
 
-  Icon _createIcon(String name) {
+  ///创建邮件地址的目录的图标
+  Icon _createDirectoryIcon(String name) {
     Icon icon;
     switch (name) {
       case 'inbox':
@@ -82,59 +74,65 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
 
   _onTap(int index, String title, {String? subtitle, TileData? group}) {
     logger.w('index: $index, title: $title,onTap MailListWidget');
-    var mailAddressProvider =
-        Provider.of<MailDataProvider>(context, listen: false);
-    mailAddressProvider.setCurrentMailboxName(title);
+    mailAddressController.setCurrentMailboxName(title);
   }
 
-  Widget _build(BuildContext context) {
-    return Consumer<MailDataProvider>(
-        builder: (context, mailAddressProvider, child) {
-      Map<TileData, List<TileData>> mailAddressTileData = {};
-      var mailAddresses = mailAddressProvider.mailAddresses;
-      if (mailAddresses.isNotEmpty) {
-        for (var mailAddress in mailAddresses) {
-          TileData key = TileData(
-              title: mailAddress.email, prefix: const Icon(Icons.email));
-          List<enough_mail.Mailbox?>? mailboxes =
-              mailAddressProvider.getMailboxes(mailAddress.email);
-          if (mailboxes != null && mailboxes.isNotEmpty) {
-            List<TileData> tiles = [];
-            for (var mailbox in mailboxes) {
-              if (mailbox != null) {
-                Icon icon;
-                var flags = mailbox.flags;
-                if (flags.isNotEmpty) {
-                  enough_mail.MailboxFlag flag = flags[0];
-                  icon = _createIcon(flag.name);
-                } else {
-                  icon = _createIcon(mailbox.name);
-                }
-                TileData tile = TileData(
-                    title: mailbox.name, prefix: icon, routeName: 'mails');
-                tiles.add(tile);
+  Widget _buildMailAddressWidget(BuildContext context) {
+    Map<TileData, List<TileData>> mailAddressTileData = {};
+    var mailAddresses = mailAddressController.mailAddresses;
+    if (mailAddresses.isNotEmpty) {
+      for (var mailAddress in mailAddresses) {
+        TileData key =
+            TileData(title: mailAddress.email, prefix: const Icon(Icons.email));
+        List<enough_mail.Mailbox?>? mailboxes =
+            mailAddressController.getMailboxes(mailAddress.email);
+        if (mailboxes != null && mailboxes.isNotEmpty) {
+          List<TileData> tiles = [];
+          for (var mailbox in mailboxes) {
+            if (mailbox != null) {
+              Icon icon;
+              var flags = mailbox.flags;
+              if (flags.isNotEmpty) {
+                enough_mail.MailboxFlag flag = flags[0];
+                icon = _createDirectoryIcon(flag.name);
+              } else {
+                icon = _createDirectoryIcon(mailbox.name);
               }
+              TileData tile = TileData(
+                  title: mailbox.name, prefix: icon, routeName: 'mails');
+              tiles.add(tile);
             }
-            mailAddressTileData[key] = tiles;
           }
+          mailAddressTileData[key] = tiles;
         }
       }
-      var mailAddressWidget = GroupDataListView(
-        tileData: mailAddressTileData,
-        onTap: _onTap,
-      );
+    }
+    var mailAddressWidget = GroupDataListView(
+      tileData: mailAddressTileData,
+      onTap: _onTap,
+    );
 
-      return mailAddressWidget;
-    });
+    return mailAddressWidget;
   }
 
   @override
   Widget build(BuildContext context) {
-    var appBarView = AppBarView(
-        title: widget.title,
-        withLeading: widget.withLeading,
-        child: mailAddressWidget);
-
-    return appBarView;
+    return Column(children: [
+      ButtonBar(children: [
+        IconButton(
+            onPressed: () {
+              indexWidgetProvider.push('mail_address_auto_discover');
+            },
+            icon: const Icon(Icons.auto_mode),
+            tooltip: 'Auto discover address'),
+        IconButton(
+            onPressed: () {
+              indexWidgetProvider.push('mail_address_manual_add');
+            },
+            icon: const Icon(Icons.handyman),
+            tooltip: 'Manual add address')
+      ]),
+      _buildMailAddressWidget(context)
+    ]);
   }
 }

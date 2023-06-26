@@ -8,8 +8,8 @@ import 'package:colla_chat/transport/emailclient.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:flutter/material.dart';
 
-/// 邮件数据的状态管理器，每个地址有多个邮箱，每个邮箱包含多个邮件
-class MailDataProvider with ChangeNotifier {
+/// 邮件地址控制器，每个地址有多个邮箱，每个邮箱包含多个邮件
+class MailAddressController with ChangeNotifier {
   final Map<String, MailAddress> _mailAddress = {};
   final Map<String, Map<String, enough_mail.Mailbox?>> _addressMailboxes = {};
   final Map<String, Map<String, List<ChatMessage>>> _addressChatMessagePages =
@@ -21,7 +21,7 @@ class MailDataProvider with ChangeNotifier {
   int _currentIndex = 0;
 
   ///构造函数从数据库获取所有的邮件地址，初始化邮箱数据
-  MailDataProvider() {
+  MailAddressController() {
     mailAddressService
         .findAllMailAddress()
         .then((List<MailAddress> mailAddresses) {
@@ -451,4 +451,4 @@ class MailDataProvider with ChangeNotifier {
   }
 }
 
-final mailDataProvider = MailDataProvider();
+final mailAddressController = MailAddressController();
