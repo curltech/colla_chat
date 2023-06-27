@@ -1,4 +1,5 @@
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -265,7 +266,7 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    var view= Card(
         child: SingleChildScrollView(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -294,6 +295,13 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
         ],
       ),
     ));
+
+    var appBarView = AppBarView(
+        title: widget.title,
+        withLeading: widget.withLeading,
+        child: view);
+
+    return appBarView;
   }
 
   Future<void> _connect() async {}

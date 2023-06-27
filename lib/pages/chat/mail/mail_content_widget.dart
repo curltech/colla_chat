@@ -1,4 +1,4 @@
-import 'package:colla_chat/pages/chat/me/mail/mail_address_controller.dart';
+import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';

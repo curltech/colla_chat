@@ -1,6 +1,6 @@
-import 'package:colla_chat/pages/chat/me/mail/address/auto_discover_widget.dart';
-import 'package:colla_chat/pages/chat/me/mail/address/manual_add_widget.dart';
-import 'package:colla_chat/pages/chat/me/mail/mail_address_controller.dart';
+import 'package:colla_chat/pages/chat/mail/address/auto_discover_widget.dart';
+import 'package:colla_chat/pages/chat/mail/address/manual_add_widget.dart';
+import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';

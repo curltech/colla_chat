@@ -4,6 +4,7 @@ import 'package:colla_chat/pages/chat/chat/chat_list_widget.dart';
 import 'package:colla_chat/pages/chat/index/bottom_navigation.dart';
 import 'package:colla_chat/pages/chat/index/primary_navigation.dart';
 import 'package:colla_chat/pages/chat/linkman/linkman_list_widget.dart';
+import 'package:colla_chat/pages/chat/mail/mail_widget.dart';
 import 'package:colla_chat/pages/chat/me/me_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
@@ -15,10 +16,11 @@ import 'package:provider/provider.dart';
 ///自动适配的主页面结构
 class AdaptiveLayoutIndex extends StatefulWidget {
   AdaptiveLayoutIndex({super.key}) {
-    indexWidgetProvider.init(SwiperController(), [
+    indexWidgetProvider.initMainView(SwiperController(), [
       ChatListWidget(),
       LinkmanListWidget(),
       SubscribeChannelListWidget(),
+      MailWidget(),
       MeWidget()
     ]);
   }
@@ -92,7 +94,8 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
         },
         itemCount: indexWidgetProvider.views.length,
         itemBuilder: (BuildContext context, int index) {
-          if (index > 3 || appDataProvider.smallBreakpoint.isActive(context)) {
+          if (index >= indexWidgetProvider.mainViews.length ||
+              appDataProvider.smallBreakpoint.isActive(context)) {
             var view = indexWidgetProvider.views[index];
 
             return view;

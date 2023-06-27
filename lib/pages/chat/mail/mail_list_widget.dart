@@ -1,14 +1,9 @@
 import 'package:colla_chat/entity/chat/chat_message.dart';
-import 'package:colla_chat/pages/chat/me/mail/mail_address_controller.dart';
+import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
-import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
-import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
-import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 ///邮件列表子视图
 class MailListWidget extends StatefulWidget {
@@ -58,7 +53,7 @@ class _MailListWidgetState extends State<MailListWidget> {
     return Column(children: [
       ButtonBar(children: [
         IconButton(
-            onPressed: () {}, icon: const Icon(Icons.add), tooltip: 'New mail')
+            onPressed: () {}, icon: const Icon(Icons.edit_note), tooltip: 'New mail')
       ]),
       _buildMailListWidget(context)
     ]);

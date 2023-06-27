@@ -1,4 +1,3 @@
-import 'package:another_transformer_page_view/another_transformer_page_view.dart';
 import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -10,18 +9,18 @@ const animateDuration = Duration(milliseconds: 1000);
 
 /// 主工作区的视图状态管理器，维护了主工作区的控制器，视图列表，当前视图
 class IndexWidgetProvider with ChangeNotifier {
-  //所以可以出现在工作区的视图，0-3是主视图，其余是副视图，
+  //所以可以出现在工作区的视图，开始序号是是主视图，其余是副视图，
   Map<String, TileDataMixin> allViews = {};
 
   ///主菜单和对应的主视图
   final List<String> mainViews = [];
 
-  ///当前出现在工作区的视图，0-3是主视图，始终都在，然后每进入一个新视图，则添加
+  ///当前出现在工作区的视图，mainViews是主视图，始终都在，然后每进入一个新视图，则添加
   ///每退出一个则删除，
   List<TileDataMixin> views = [];
   SwiperController? controller;
 
-  //当前的主视图，左边栏和底部栏的指示，范围0-3
+  //当前的主视图，左边栏和底部栏的指示，范围0-mainViews.length-1
   int _currentMainIndex = 0;
 
   bool popAction = false;
@@ -29,7 +28,7 @@ class IndexWidgetProvider with ChangeNotifier {
   IndexWidgetProvider();
 
   ///初始化主菜单视图
-  init(SwiperController controller, List<TileDataMixin> views) {
+  initMainView(SwiperController controller, List<TileDataMixin> views) {
     this.controller = controller;
     for (TileDataMixin view in views) {
       define(view);
@@ -74,8 +73,8 @@ class IndexWidgetProvider with ChangeNotifier {
         logger.e('swiperController is not exist');
         return;
       }
-      if (views.length > 4) {
-        views.removeRange(4, views.length);
+      if (views.length > mainViews.length) {
+        views.removeRange(mainViews.length, views.length);
       }
       //controller.jumpToPage(index);
       controller.move(index);
@@ -163,17 +162,12 @@ class IndexWidgetProvider with ChangeNotifier {
   }
 
   String getLabel(int index) {
-    var widgetLabels = {
-      'chat': AppLocalizations.t('Chat'),
-      'linkman': AppLocalizations.t('Linkman'),
-      'channel': AppLocalizations.t('Channel'),
-      'me': AppLocalizations.t('Me'),
-    };
     String name = mainViews[index];
-    String? label = widgetLabels[name];
-    label = label ?? '';
-
-    return label;
+    TileDataMixin? widget = allViews[name];
+    if (widget != null) {
+      return AppLocalizations.t(widget.title ?? '');
+    }
+    return '';
   }
 }
 

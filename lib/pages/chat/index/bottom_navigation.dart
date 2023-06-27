@@ -1,8 +1,9 @@
 import 'package:colla_chat/constant/base.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
-import 'package:provider/provider.dart';
 
 ///mobile底边栏，用于指示当前主页面
 class BottomNavigation {
@@ -33,40 +34,21 @@ class BottomNavigation {
   ///小屏幕的bottomNavigation
   List<NavigationDestination> _buildNavigationDestination(
       IndexWidgetProvider indexWidgetProvider) {
-    return <NavigationDestination>[
-      NavigationDestination(
-        label: indexWidgetProvider.getLabel(0),
-        icon: const Icon(Icons.chat),
-        selectedIcon: const Icon(
-          Icons.chat,
-          size: AppIconSize.mdSize,
-        ),
-      ),
-      NavigationDestination(
-        label: indexWidgetProvider.getLabel(1),
-        icon: const Icon(Icons.contacts),
-        selectedIcon: const Icon(
-          Icons.contacts,
-          size: AppIconSize.mdSize,
-        ),
-      ),
-      NavigationDestination(
-        label: indexWidgetProvider.getLabel(2),
-        icon: const Icon(Icons.wifi_channel),
-        selectedIcon: const Icon(
-          Icons.wifi_channel,
-          size: AppIconSize.mdSize,
-        ),
-      ),
-      NavigationDestination(
-        label: indexWidgetProvider.getLabel(3),
-        icon: const Icon(Icons.person),
-        selectedIcon: const Icon(
-          Icons.person,
-          size: AppIconSize.mdSize,
-        ),
-      ),
-    ];
+    List<NavigationDestination> destinations = [];
+    for (String mainView in indexWidgetProvider.mainViews) {
+      TileDataMixin? view = indexWidgetProvider.allViews[mainView];
+      if (view != null) {
+        destinations.add(NavigationDestination(
+          label: AppLocalizations.t(view.title),
+          icon: Icon(view.iconData),
+          selectedIcon: Icon(
+            view.iconData,
+            size: AppIconSize.mdSize,
+          ),
+        ));
+      }
+    }
+    return destinations;
   }
 
   SlotLayout build(IndexWidgetProvider indexWidgetProvider) {

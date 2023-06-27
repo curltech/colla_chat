@@ -1,7 +1,6 @@
 import 'package:colla_chat/pages/chat/me/collection/collection_list_view.dart';
 import 'package:colla_chat/pages/chat/me/contact_widget.dart';
 import 'package:colla_chat/pages/chat/me/logger_console_view.dart';
-import 'package:colla_chat/pages/chat/me/mail/mail_widget.dart';
 import 'package:colla_chat/pages/chat/me/me_head_widget.dart';
 import 'package:colla_chat/pages/chat/me/media/media_widget.dart';
 import 'package:colla_chat/pages/chat/me/openvpn_widget.dart';
@@ -21,7 +20,6 @@ class MeWidget extends StatelessWidget with TileDataMixin {
   final PersonalInfoWidget personalInfoWidget = const PersonalInfoWidget();
   final CollectionListView collectionListView = CollectionListView();
   final SettingWidget settingWidget = SettingWidget();
-  final MailWidget mailWidget = MailWidget();
   final WebrtcWidget webrtcWidget = WebrtcWidget();
   final MediaWidget mediaWidget = MediaWidget();
   final PlatformWebViewWidget webViewWidget = PlatformWebViewWidget();
@@ -36,7 +34,6 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     indexWidgetProvider.define(settingWidget);
     indexWidgetProvider.define(personalInfoWidget);
     indexWidgetProvider.define(contactWidget);
-    indexWidgetProvider.define(mailWidget);
     indexWidgetProvider.define(webrtcWidget);
     indexWidgetProvider.define(webViewWidget);
     indexWidgetProvider.define(mediaWidget);
@@ -45,7 +42,6 @@ class MeWidget extends StatelessWidget with TileDataMixin {
     List<TileDataMixin> mixins = [
       settingWidget,
       collectionListView,
-      mailWidget,
       contactWidget,
       webrtcWidget,
       webViewWidget,
