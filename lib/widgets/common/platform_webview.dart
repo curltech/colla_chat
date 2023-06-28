@@ -116,11 +116,10 @@ class PlatformWebViewController with ChangeNotifier {
       browserSettings: inapp.InAppBrowserSettings(
         hideUrlBar: false,
         toolbarTopBackgroundColor: myself.primary,
-        presentationStyle: inapp.ModalPresentationStyle.CURRENT_CONTEXT,
+        presentationStyle: inapp.ModalPresentationStyle.POPOVER,
       ),
       webViewSettings: inapp.InAppWebViewSettings(
-        useOnLoadResource: true,
-      ),
+          useOnLoadResource: true, javaScriptEnabled: true),
     );
 
     return settings;
