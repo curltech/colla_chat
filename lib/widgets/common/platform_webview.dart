@@ -9,6 +9,7 @@ import 'package:webview_flutter/webview_flutter.dart' as webview;
 class PlatformWebViewController with ChangeNotifier {
   inapp.InAppWebViewController? inAppWebViewController;
   webview.WebViewController? webViewController;
+  final inapp.InAppBrowser browser = inapp.InAppBrowser();
 
   ///包装两种webview的实现
   PlatformWebViewController({
@@ -38,6 +39,15 @@ class PlatformWebViewController with ChangeNotifier {
       await webViewController!.loadHtmlString(html);
     } else if (inAppWebViewController != null) {
       await inAppWebViewController!.loadData(data: html);
+    } else {
+      if (platformParams.macos) {
+        inapp.URLRequest urlRequest = inapp.URLRequest(url: inapp.WebUri(html));
+        var settings = inapp.InAppBrowserClassSettings(
+            browserSettings: inapp.InAppBrowserSettings(hideUrlBar: false),
+            webViewSettings:
+                inapp.InAppWebViewSettings(javaScriptEnabled: true));
+        browser.openUrlRequest(urlRequest: urlRequest, settings: settings);
+      }
     }
   }
 
@@ -72,6 +82,16 @@ class PlatformWebViewController with ChangeNotifier {
         inapp.URLRequest urlRequest =
             inapp.URLRequest(url: inapp.WebUri('file:$filename'));
         await inAppWebViewController!.loadUrl(urlRequest: urlRequest);
+      } else {
+        if (platformParams.macos) {
+          inapp.URLRequest urlRequest =
+              inapp.URLRequest(url: inapp.WebUri(filename));
+          var settings = inapp.InAppBrowserClassSettings(
+              browserSettings: inapp.InAppBrowserSettings(hideUrlBar: false),
+              webViewSettings:
+                  inapp.InAppWebViewSettings(javaScriptEnabled: true));
+          browser.openUrlRequest(urlRequest: urlRequest, settings: settings);
+        }
       }
     }
   }
