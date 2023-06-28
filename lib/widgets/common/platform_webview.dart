@@ -1,4 +1,5 @@
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/flutter_webview.dart';
 import 'package:colla_chat/widgets/common/inapp_webview.dart';
@@ -41,12 +42,10 @@ class PlatformWebViewController with ChangeNotifier {
       await inAppWebViewController!.loadData(data: html);
     } else {
       if (platformParams.macos) {
-        inapp.URLRequest urlRequest = inapp.URLRequest(url: inapp.WebUri(html));
-        var settings = inapp.InAppBrowserClassSettings(
-            browserSettings: inapp.InAppBrowserSettings(hideUrlBar: false),
-            webViewSettings:
-                inapp.InAppWebViewSettings(javaScriptEnabled: true));
-        browser.openUrlRequest(urlRequest: urlRequest, settings: settings);
+        if (platformParams.macos) {
+          var settings = _getSettings();
+          browser.openData(data: html, settings: settings);
+        }
       }
     }
   }
@@ -58,14 +57,26 @@ class PlatformWebViewController with ChangeNotifier {
         await webViewController!.loadHtmlString(html);
       } else if (inAppWebViewController != null) {
         await inAppWebViewController!.loadData(data: html);
+      } else {
+        if (platformParams.macos) {
+          var settings = _getSettings();
+          browser.openData(data: html, settings: settings);
+        }
       }
-      return;
     }
     if (filename!.startsWith('assets')) {
       if (webViewController != null) {
         await webViewController!.loadFlutterAsset(filename);
       } else if (inAppWebViewController != null) {
         await inAppWebViewController!.loadFile(assetFilePath: filename);
+      } else {
+        if (platformParams.macos) {
+          var settings = _getSettings();
+          browser.openFile(
+            assetFilePath: filename,
+            settings: settings,
+          );
+        }
       }
     } else if (filename.startsWith('http')) {
       if (webViewController != null) {
@@ -74,6 +85,13 @@ class PlatformWebViewController with ChangeNotifier {
         inapp.URLRequest urlRequest =
             inapp.URLRequest(url: inapp.WebUri(filename));
         await inAppWebViewController!.loadUrl(urlRequest: urlRequest);
+      } else {
+        if (platformParams.macos) {
+          inapp.URLRequest urlRequest =
+              inapp.URLRequest(url: inapp.WebUri(filename));
+          var settings = _getSettings();
+          browser.openUrlRequest(urlRequest: urlRequest, settings: settings);
+        }
       }
     } else {
       if (webViewController != null) {
@@ -85,15 +103,27 @@ class PlatformWebViewController with ChangeNotifier {
       } else {
         if (platformParams.macos) {
           inapp.URLRequest urlRequest =
-              inapp.URLRequest(url: inapp.WebUri(filename));
-          var settings = inapp.InAppBrowserClassSettings(
-              browserSettings: inapp.InAppBrowserSettings(hideUrlBar: false),
-              webViewSettings:
-                  inapp.InAppWebViewSettings(javaScriptEnabled: true));
+              inapp.URLRequest(url: inapp.WebUri('file:$filename'));
+          var settings = _getSettings();
           browser.openUrlRequest(urlRequest: urlRequest, settings: settings);
         }
       }
     }
+  }
+
+  inapp.InAppBrowserClassSettings _getSettings() {
+    var settings = inapp.InAppBrowserClassSettings(
+      browserSettings: inapp.InAppBrowserSettings(
+        hideUrlBar: false,
+        toolbarTopBackgroundColor: myself.primary,
+        presentationStyle: inapp.ModalPresentationStyle.CURRENT_CONTEXT,
+      ),
+      webViewSettings: inapp.InAppWebViewSettings(
+        useOnLoadResource: true,
+      ),
+    );
+
+    return settings;
   }
 
   reload() async {

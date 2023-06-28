@@ -27,7 +27,8 @@ class PlatformWebViewWidget extends StatefulWidget with TileDataMixin {
 class _PlatformWebViewWidgetState extends State<PlatformWebViewWidget> {
   final urlTextController = TextEditingController();
 
-  PlatformWebViewController? platformWebViewController;
+  PlatformWebViewController platformWebViewController =
+      PlatformWebViewController();
 
   bool fullScreen = false;
 
@@ -44,7 +45,7 @@ class _PlatformWebViewWidgetState extends State<PlatformWebViewWidget> {
       InkWell(
         child: const Icon(Icons.arrow_back),
         onTap: () {
-          platformWebViewController?.goBack();
+          platformWebViewController.goBack();
         },
       ),
       const SizedBox(
@@ -53,7 +54,7 @@ class _PlatformWebViewWidgetState extends State<PlatformWebViewWidget> {
       InkWell(
         child: const Icon(Icons.arrow_forward),
         onTap: () {
-          platformWebViewController?.goForward();
+          platformWebViewController.goForward();
         },
       ),
       const SizedBox(
@@ -62,7 +63,7 @@ class _PlatformWebViewWidgetState extends State<PlatformWebViewWidget> {
       InkWell(
         child: const Icon(Icons.refresh),
         onTap: () {
-          platformWebViewController?.reload();
+          platformWebViewController.reload();
         },
       ),
       const SizedBox(
@@ -82,7 +83,7 @@ class _PlatformWebViewWidgetState extends State<PlatformWebViewWidget> {
             url = 'https://$url';
             urlTextController.text = url;
           }
-          platformWebViewController?.load(url);
+          platformWebViewController.load(url);
         },
       )),
       const SizedBox(
@@ -114,7 +115,10 @@ class _PlatformWebViewWidgetState extends State<PlatformWebViewWidget> {
       buildTextField(),
       Expanded(child: PlatformWebView(
           onWebViewCreated: (PlatformWebViewController controller) {
-        platformWebViewController = controller;
+        platformWebViewController.inAppWebViewController =
+            controller.inAppWebViewController;
+        platformWebViewController.webViewController =
+            controller.webViewController;
       }))
     ]);
   }
