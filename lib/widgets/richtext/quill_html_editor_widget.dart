@@ -60,7 +60,7 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
       //direction: Axis.vertical,
       customButtons: [
         Tooltip(
-            message: AppLocalizations.t('Confirm'),
+            message: AppLocalizations.t('Submit'),
             child: InkWell(
                 onTap: () async {
                   if (widget.onSubmit != null) {

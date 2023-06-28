@@ -132,7 +132,7 @@ class _HtmlEditorWidgetState extends State<HtmlEditorWidget> {
       toolbarItemHeight: 36,
       customToolbarButtons: [
         Tooltip(
-            message: AppLocalizations.t('Confirm'),
+            message: AppLocalizations.t('Submit'),
             child: InkWell(
               onTap: () async {
                 if (widget.onSubmit != null) {

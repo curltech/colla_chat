@@ -200,7 +200,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
               widget.onSubmit!(jsonStr, ChatMessageMimeType.json);
             }
           },
-          tooltip: AppLocalizations.t('Confirm')),
+          tooltip: AppLocalizations.t('Submit')),
     ];
     var toolbar = QuillToolbar.basic(
       locale: myself.locale,
