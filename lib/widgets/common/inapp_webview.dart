@@ -24,6 +24,7 @@ class FlutterInAppWebView extends StatefulWidget {
 class _FlutterInAppWebViewState extends State<FlutterInAppWebView> {
   PullToRefreshController pullToRefreshController = PullToRefreshController();
   InAppWebViewController? controller;
+  HeadlessInAppWebView? headlessInAppWebView;
 
   @override
   void initState() {
@@ -70,7 +71,7 @@ class _FlutterInAppWebViewState extends State<FlutterInAppWebView> {
   Widget build(BuildContext context) {
     InAppWebViewSettings settings = _getSetting();
     Widget inAppWebView;
-    if (platformParams.mobile || platformParams.macos || platformParams.web) {
+    if (platformParams.mobile || platformParams.web) {
       inAppWebView = InAppWebView(
         initialUrlRequest: widget.initialUrl != null
             ? URLRequest(url: WebUri(widget.initialUrl!))
@@ -111,10 +112,58 @@ class _FlutterInAppWebViewState extends State<FlutterInAppWebView> {
       if (widget.html != null) {
         controller!.loadData(data: widget.html!);
       }
+    } else if (platformParams.macos) {
+      headlessInAppWebView = HeadlessInAppWebView(
+        initialUrlRequest: widget.initialUrl != null
+            ? URLRequest(url: WebUri(widget.initialUrl!))
+            : null,
+        initialFile: widget.initialFilename,
+        // 5.x.x initialOptions: settings,
+        initialSettings: settings,
+        onWebViewCreated: _onWebViewCreated,
+        pullToRefreshController: pullToRefreshController,
+        onLoadStart: (controller, url) {},
+        // 5.x.x androidOnPermissionRequest: (controller, origin, resources) async {
+        //   return PermissionRequestResponse(
+        //       resources: resources,
+        //       action: PermissionRequestResponseAction.GRANT);
+        // },
+        onPermissionRequest: (controller, origin) async {
+          return PermissionResponse(
+              resources: [], action: PermissionResponseAction.DENY);
+        },
+        shouldOverrideUrlLoading: (controller, navigationAction) async {},
+        onLoadStop: (controller, url) async {
+          pullToRefreshController.endRefreshing();
+        },
+        // 5.x.x onLoadError: (controller, url, code, message) {
+        //   pullToRefreshController.endRefreshing();
+        // },
+        onReceivedError: (controller, url, err) {
+          pullToRefreshController.endRefreshing();
+        },
+        onProgressChanged: (controller, progress) {
+          if (progress == 100) {
+            pullToRefreshController.endRefreshing();
+          }
+        },
+        onUpdateVisitedHistory: (controller, url, androidIsReload) {},
+        onConsoleMessage: (controller, consoleMessage) {},
+      );
+      headlessInAppWebView!.run();
+      inAppWebView = Container();
     } else {
       inAppWebView = Container();
     }
 
     return inAppWebView;
+  }
+
+  @override
+  void dispose() {
+    if (headlessInAppWebView != null) {
+      headlessInAppWebView!.dispose();
+    }
+    super.dispose();
   }
 }

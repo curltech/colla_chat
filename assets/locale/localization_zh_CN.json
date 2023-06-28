@@ -392,5 +392,19 @@
   "Clean log": "清除日志",
   "Successfully clean all log files": "成功地清除所有的日志文件",
   "Show": "显示",
-  "Hide": "隐藏"
+  "Hide": "隐藏",
+  "Mail address": "邮件地址",
+  "Mail list": "邮件列表",
+  "New mail": "新邮件",
+  "Discover": "发现",
+  "Connect": "连接",
+  "Auto discover address": "自动发现地址",
+  "Manual add address": "手工添加地址",
+  "Email or name is empty": "邮件或者名称为空",
+  "Save mail address?": "是否保存为邮件地址?",
+  "Auto discover successfully": "自动发现成功",
+  "Auto discover failure": "自动发现失败",
+  "Auto discovery config is null": "自动发现配置为空",
+  "MailAddressAutoDiscover": "邮件地址自动发现",
+  "MailAddressManualAdd": "邮件地址手工添加"
 }

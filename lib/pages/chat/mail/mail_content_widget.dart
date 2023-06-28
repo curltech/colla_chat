@@ -1,12 +1,11 @@
 import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:enough_mail/highlevel.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 
 ///邮件内容子视图
 class MailContentWidget extends StatefulWidget with TileDataMixin {
@@ -40,19 +39,16 @@ class _MailContentWidgetState extends State<MailContentWidget> {
   }
 
   Widget _buildMimeMessageViewer(BuildContext context) {
-    MimeMessage? mimeMessage = mailAddressController
+    MimeMessage mimeMessage = mailAddressController
         .currentMimeMessages![mailAddressController.currentMailIndex];
-    mimeMessage ??= MimeMessage();
     Widget mimeMessageViewer;
-    if (platformParams.android || platformParams.ios) {
-      mimeMessageViewer = Container();
-
+    if (platformParams.mobile || platformParams.macos) {
       ///在ios下会引发启动崩溃
-      // mimeMessageViewer = MimeMessageViewer(
-      //   mimeMessage: mimeMessage,
-      //   blockExternalImages: false,
-      //   mailtoDelegate: handleMailto,
-      // );
+      mimeMessageViewer = MimeMessageViewer(
+        mimeMessage: mimeMessage,
+        blockExternalImages: false,
+        mailtoDelegate: handleMailto,
+      );
     } else {
       mimeMessageViewer =
           const Center(child: CommonAutoSizeText('Not support'));
