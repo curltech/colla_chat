@@ -55,18 +55,17 @@ class _MailContentWidgetState extends State<MailContentWidget> {
         mailtoDelegate: handleMailto,
       );
     } else {
-      mimeMessageViewer = PlatformWebView(
-          onWebViewCreated: (PlatformWebViewController controller) {
-        platformWebViewController.inAppWebViewController =
-            controller.inAppWebViewController;
-        platformWebViewController.webViewController =
-            controller.webViewController;
-      });
       String html = EmailMessageUtil.convertToHtml(mimeMessage);
-      platformWebViewController.loadHtml(html);
-      // mimeMessageViewer =
-      //     const Center(child: CommonAutoSizeText('Not support'));
+      mimeMessageViewer = PlatformWebView(
+          html: html,
+          onWebViewCreated: (PlatformWebViewController controller) {
+            platformWebViewController.inAppWebViewController =
+                controller.inAppWebViewController;
+            platformWebViewController.webViewController =
+                controller.webViewController;
+          });
     }
+
     return mimeMessageViewer;
   }
 

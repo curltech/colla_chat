@@ -4,7 +4,11 @@ import 'dart:typed_data';
 import 'package:colla_chat/platform.dart';
 import 'package:flutter/material.dart';
 import 'package:pdfx/pdfx.dart';
+import 'package:printing/printing.dart';
+import 'package:pdf/pdf.dart' as pdf;
+import 'package:pdf/widgets.dart' as pw;
 
+///显示pdf文件
 class PdfUtil {
   ///读取pdf文件
   static Future<PdfDocument>? buildPdfDocument(
@@ -23,6 +27,7 @@ class PdfUtil {
     return pdfDocument;
   }
 
+  ///读取pdf文件，创建pdf控制器
   static BasePdfController? buildPdfController(
       {String? filename, FutureOr<Uint8List>? data}) {
     BasePdfController? pdfController;
@@ -43,6 +48,7 @@ class PdfUtil {
     return pdfController;
   }
 
+  ///读取pdf文件，创建pdf控制器，创建pdf显示视图
   static Widget buildPdfView(
       {Key? key, String? filename, FutureOr<Uint8List>? data}) {
     BasePdfController? pdfController =
@@ -66,6 +72,7 @@ class PdfUtil {
     return view;
   }
 
+  ///根据控制器，创建pdf视图
   static Widget buildPdfWidget(
       {Key? key, required BasePdfController pdfController}) {
     Widget? view;
@@ -83,5 +90,90 @@ class PdfUtil {
     view = view ?? Container();
 
     return view;
+  }
+
+  ///转换html字符串为pdf数据
+  static Future<Uint8List> convertHtml(String html) async {
+    return await Printing.convertHtml(
+      format: pdf.PdfPageFormat.standard,
+      html: html,
+    );
+  }
+
+  ///显示pdf数据
+  static PdfPreview buildPdfPreview({
+    Key? key,
+    FutureOr<Uint8List> Function(pdf.PdfPageFormat)? build,
+    Uint8List? data,
+    pdf.PdfPageFormat? initialPageFormat,
+    bool allowPrinting = true,
+    bool allowSharing = true,
+    double? maxPageWidth,
+    bool canChangePageFormat = true,
+    bool canChangeOrientation = true,
+    bool canDebug = true,
+    List<Widget>? actions,
+    Map<String, pdf.PdfPageFormat> pageFormats =
+        const <String, pdf.PdfPageFormat>{
+      'A4': pdf.PdfPageFormat.a4,
+      'Letter': pdf.PdfPageFormat.letter,
+    },
+    Widget Function(BuildContext, Object)? onError,
+    void Function(BuildContext)? onPrinted,
+    void Function(BuildContext, dynamic)? onPrintError,
+    void Function(BuildContext)? onShared,
+    Decoration? scrollViewDecoration,
+    Decoration? pdfPreviewPageDecoration,
+    String? pdfFileName,
+    bool useActions = true,
+    List<int>? pages,
+    bool dynamicLayout = true,
+    String? shareActionExtraBody,
+    String? shareActionExtraSubject,
+    List<String>? shareActionExtraEmails,
+    EdgeInsets? previewPageMargin,
+    EdgeInsets? padding,
+    bool shouldRepaint = false,
+    Widget? loadingWidget,
+    void Function(pdf.PdfPageFormat)? onPageFormatChanged,
+    double? dpi,
+  }) {
+    if (build == null && data != null) {
+      build = (pdf.PdfPageFormat format) {
+        return data;
+      };
+    }
+    return PdfPreview(
+      key: key,
+      build: build!,
+      initialPageFormat: initialPageFormat,
+      allowPrinting: allowPrinting,
+      allowSharing: allowSharing,
+      maxPageWidth: maxPageWidth,
+      canChangePageFormat: canChangePageFormat,
+      canChangeOrientation: canChangeOrientation,
+      canDebug: canDebug,
+      actions: actions,
+      pageFormats: pageFormats,
+      onError: onError,
+      onPrinted: onPrinted,
+      onPrintError: onPrintError,
+      onShared: onShared,
+      scrollViewDecoration: scrollViewDecoration,
+      pdfPreviewPageDecoration: pdfPreviewPageDecoration,
+      pdfFileName: pdfFileName,
+      useActions: useActions,
+      pages: pages,
+      dynamicLayout: dynamicLayout,
+      shareActionExtraBody: shareActionExtraBody,
+      shareActionExtraSubject: shareActionExtraSubject,
+      shareActionExtraEmails: shareActionExtraEmails,
+      previewPageMargin: previewPageMargin,
+      padding: padding,
+      shouldRepaint: shouldRepaint,
+      loadingWidget: loadingWidget,
+      onPageFormatChanged: onPageFormatChanged,
+      dpi: dpi,
+    );
   }
 }

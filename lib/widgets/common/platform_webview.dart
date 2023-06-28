@@ -2,6 +2,7 @@ import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/flutter_webview.dart';
+import 'package:colla_chat/widgets/common/html_webview.dart';
 import 'package:colla_chat/widgets/common/inapp_webview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart' as inapp;
@@ -42,10 +43,8 @@ class PlatformWebViewController with ChangeNotifier {
       await inAppWebViewController!.loadData(data: html);
     } else {
       if (platformParams.macos) {
-        if (platformParams.macos) {
-          var settings = _getSettings();
-          browser.openData(data: html, settings: settings);
-        }
+        var settings = _getSettings();
+        browser.openData(data: html, settings: settings);
       }
     }
   }
@@ -169,7 +168,7 @@ class PlatformWebView extends StatefulWidget {
 
   const PlatformWebView(
       {super.key,
-      this.initialUrl = 'bing.com',
+      this.initialUrl,
       this.html,
       this.initialFilename,
       this.onWebViewCreated});

@@ -24,6 +24,7 @@ class FlutterInAppWebView extends StatefulWidget {
 class _FlutterInAppWebViewState extends State<FlutterInAppWebView> {
   PullToRefreshController pullToRefreshController = PullToRefreshController();
   InAppWebViewController? controller;
+  final InAppBrowser browser = InAppBrowser();
 
   @override
   void initState() {
@@ -114,8 +115,14 @@ class _FlutterInAppWebViewState extends State<FlutterInAppWebView> {
       if (widget.html != null) {
         controller!.loadData(data: widget.html!);
       }
-    } else if (platformParams.macos) {
+    } else if (platformParams.macos && widget.html != null) {
       inAppWebView = Container();
+      var settings = InAppBrowserClassSettings(
+          browserSettings: InAppBrowserSettings(
+              presentationStyle: ModalPresentationStyle.AUTOMATIC,
+              hideUrlBar: false),
+          webViewSettings: InAppWebViewSettings(javaScriptEnabled: true));
+      browser.openData(data: widget.html!, settings: settings);
     } else {
       inAppWebView = Container();
     }
@@ -125,6 +132,7 @@ class _FlutterInAppWebViewState extends State<FlutterInAppWebView> {
 
   @override
   void dispose() {
+    browser.close();
     super.dispose();
   }
 }

@@ -207,7 +207,6 @@ dependencies:
   synchronized: ^3.0.0+2
   flutter_smart_dialog: ^4.9.2
   #pdf_flutter: ^1.1.4
-  pdf: ^3.8.3
   #syncfusion_flutter_pdfviewer: ^20.3.49
   json_annotation: ^4.3.0
   permission_handler: ^10.0.0 #权限处理1
@@ -242,6 +241,8 @@ dependencies:
   #flutter_inappwebview: ^5.7.2+3
   #flutter_webview_pro: ^3.0.1+4
   #easy_web_view: ^1.6.0
+  flutter_html: ^3.0.0-beta.2
+  any_link_preview: ^3.0.1 #预览link
 
   # 多媒体
   #flutter_audio_waveforms: any
@@ -313,6 +314,7 @@ dependencies:
   html_editor_enhanced: ^2.5.1
   flutter_quill: ^7.2.6
   vsc_quill_delta_to_html: ^1.0.3
+  light_html_editor: ^0.3.1
   #git: https://github.com/singerdmx/flutter-quill.git
   flutter_quill_extensions: #^0.3.2
     git:
@@ -380,6 +382,7 @@ dependency_overrides:
   provider: ^6.0.1
   geolocator: ^9.0.2
   apple_maps_flutter: ^1.2.0
+  http: ^1.1.0
   flutter_inappwebview: ^6.0.0-beta.24+1
   webview_flutter: ^4.2.2
   webview_flutter_android: ^3.7.1
@@ -388,7 +391,7 @@ dependency_overrides:
   webview_flutter_platform_interface: ^2.3.1
   webview_win_floating: #2.0.0 #webView for
     git: https://github.com/jakky1/webview_win_floating.git
-  desktop_webview_window: ^0.2.0
+  #  desktop_webview_window: ^0.2.0
   sprintf: ^7.0.0
   flex_color_picker: ^3.1.0
   permission_handler: ^10.2.0
@@ -408,6 +411,8 @@ dependency_overrides:
   dio: ^5.0.2 #^4.0.6 openai
   audio_video_progress_bar: ^1.0.0
   pdfx: 2.2.0 #2.3.0在macos下编译错误,web下不能使用
+  printing: ^5.11.0 #所有平台，使用pdf，把一些其他的格式转换成pdf并显示
+  pdf: ^3.10.4 #所有平台，创建pdf
   record: ^5.0.0-beta.1
   visibility_detector: ^0.4.0+2 #组建可见性的大小发生变化
   focus_detector: ^2.0.1 #组建在界面上消失或者出现
