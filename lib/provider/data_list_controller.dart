@@ -45,6 +45,7 @@ class DataListController<T> with ChangeNotifier {
     return _currentIndex;
   }
 
+  ///设置当前数据索引
   set currentIndex(int index) {
     if (index < -1 || index > data.length - 1) {
       return;

@@ -31,18 +31,18 @@ class MailContentWidget extends StatefulWidget with TileDataMixin {
 class _MailContentWidgetState extends State<MailContentWidget> {
   @override
   initState() {
+    mailAddressController.addListener(_update);
     super.initState();
   }
 
-  Widget _buildMimeMessageViewer(
-      BuildContext context, MailAddressController mailAddressProvider) {
-    var currentChatMessage = mailAddressProvider.currentChatMessage;
-    MimeMessage mimeMessage;
-    if (currentChatMessage != null) {
-      mimeMessage = EmailMessageUtil.convertToMimeMessage(currentChatMessage);
-    } else {
-      mimeMessage = MimeMessage();
-    }
+  _update() {
+    setState(() {});
+  }
+
+  Widget _buildMimeMessageViewer(BuildContext context) {
+    MimeMessage? mimeMessage = mailAddressController
+        .currentMimeMessages![mailAddressController.currentMailIndex];
+    mimeMessage ??= MimeMessage();
     Widget mimeMessageViewer;
     if (platformParams.android || platformParams.ios) {
       mimeMessageViewer = Container();
@@ -89,12 +89,9 @@ class _MailContentWidgetState extends State<MailContentWidget> {
   }
 
   Widget _buildMailContentWidget(BuildContext context) {
-    return Consumer<MailAddressController>(
-        builder: (context, mailAddressProvider, child) {
-      Widget mimeMessageViewer = Container();
-      mimeMessageViewer = _buildMimeMessageViewer(context, mailAddressProvider);
-      return mimeMessageViewer;
-    });
+    Widget mimeMessageViewer = _buildMimeMessageViewer(context);
+
+    return mimeMessageViewer;
   }
 
   @override
@@ -104,5 +101,11 @@ class _MailContentWidgetState extends State<MailContentWidget> {
         withLeading: widget.withLeading,
         child: _buildMailContentWidget(context));
     return appBarView;
+  }
+
+  @override
+  void dispose() {
+    mailAddressController.removeListener(_update);
+    super.dispose();
   }
 }

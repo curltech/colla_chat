@@ -1,4 +1,5 @@
 import 'package:card_swiper/card_swiper.dart';
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/mail/mail_address_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_content_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_list_widget.dart';
@@ -16,6 +17,7 @@ class MailWidget extends StatefulWidget with TileDataMixin {
   final MailAddressWidget mailAddressWidget = MailAddressWidget();
   final MailListWidget mailListWidget = const MailListWidget();
   final MailContentWidget mailContentWidget = const MailContentWidget();
+  final SwiperController controller = SwiperController();
 
   MailWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(mailContentWidget);
@@ -28,7 +30,7 @@ class MailWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'mail';
 
   @override
-  bool get withLeading => true;
+  bool get withLeading => false;
 
   @override
   IconData get iconData => Icons.email;
@@ -40,15 +42,19 @@ class MailWidget extends StatefulWidget with TileDataMixin {
 class _MailWidgetState extends State<MailWidget> {
   @override
   initState() {
+    widget.controller.addListener(_update);
     super.initState();
+  }
+
+  _update() {
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    SwiperController controller = SwiperController();
     var view = Swiper(
         itemCount: 2,
-        controller: controller,
+        controller: widget.controller,
         itemBuilder: (BuildContext context, int index) {
           if (index == 0) {
             return widget.mailAddressWidget;
@@ -61,16 +67,45 @@ class _MailWidgetState extends State<MailWidget> {
     List<Widget> rightWidgets = [
       IconButton(
           onPressed: () {
-            controller.next();
+            widget.controller.index = widget.controller.index == 0 ? 1 : 0;
+            widget.controller.next();
           },
           icon: const Icon(Icons.menu)),
     ];
+    if (widget.controller.index == 0) {
+      rightWidgets.add(IconButton(
+          onPressed: () {
+            indexWidgetProvider.push('mail_address_auto_discover');
+          },
+          icon: const Icon(Icons.auto_mode),
+          tooltip: AppLocalizations.t('Auto discover address')));
+      rightWidgets.add(IconButton(
+          onPressed: () {
+            indexWidgetProvider.push('mail_address_manual_add');
+          },
+          icon: const Icon(Icons.handyman),
+          tooltip: AppLocalizations.t('Manual add address')));
+    }
+    if (widget.controller.index == 1) {
+      rightWidgets.add(IconButton(
+          onPressed: () {
+            indexWidgetProvider.push('mail_address_manual_add');
+          },
+          icon: const Icon(Icons.edit_note),
+          tooltip: AppLocalizations.t('New mail')));
+    }
     var appBarView = AppBarView(
-        title: widget.title,
+        title: widget.controller.index == 0 ? 'Mail address' : 'Mail list',
         withLeading: widget.withLeading,
         rightWidgets: rightWidgets,
         child: view);
 
     return appBarView;
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_update);
+    super.dispose();
   }
 }

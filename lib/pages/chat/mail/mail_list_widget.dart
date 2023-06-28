@@ -1,8 +1,9 @@
-import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
+import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/material.dart';
 
 ///邮件列表子视图
@@ -16,19 +17,28 @@ class MailListWidget extends StatefulWidget {
 class _MailListWidgetState extends State<MailListWidget> {
   @override
   initState() {
+    mailAddressController.addListener(_update);
+    mailAddressController.findMoreMimeMessages();
     super.initState();
   }
 
-  _onTap(int index, String title, {String? subtitle, TileData? group}) {
-    logger.w('index: $index, title: $title,onTap MailListWidget');
+  _update() {
+    setState(() {});
   }
 
-  List<TileData> _convert(List<ChatMessage> chatMessages) {
+  _onTap(int index, String title, {String? subtitle, TileData? group}) {
+    mailAddressController.currentMailIndex = index;
+    indexWidgetProvider.push('mail_content');
+  }
+
+  List<TileData> _convertMimeMessage(List<MimeMessage> mimeMessages) {
     List<TileData> tiles = [];
-    if (chatMessages.isNotEmpty) {
-      for (var chatMessage in chatMessages) {
-        var title = chatMessage.title ?? '';
-        TileData tile = TileData(title: title);
+    if (mimeMessages.isNotEmpty) {
+      for (var mimeMessage in mimeMessages) {
+        var title = mimeMessage.decodeSubject();
+        var subtitle = mimeMessage.decodeSender();
+        TileData tile =
+            TileData(title: title ?? '', subtitle: subtitle.toString());
         tiles.add(tile);
       }
     }
@@ -37,25 +47,26 @@ class _MailListWidgetState extends State<MailListWidget> {
   }
 
   Widget _buildMailListWidget(BuildContext context) {
-    var currentChatMessagePages = mailAddressController.currentChatMessagePage;
-    List<ChatMessage> currentChatMessages = [];
-    if (currentChatMessagePages != null) {
-      currentChatMessages = currentChatMessagePages;
-    }
-    var tiles = _convert(currentChatMessages);
-    var dataListView = DataListView(onTap: _onTap, tileData: tiles);
+    List<MimeMessage>? currentMimeMessages =
+        mailAddressController.currentMimeMessages;
+    if (currentMimeMessages != null) {
+      var tiles = _convertMimeMessage(currentMimeMessages);
+      var dataListView = DataListView(onTap: _onTap, tileData: tiles);
 
-    return dataListView;
+      return dataListView;
+    }
+
+    return Container();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(children: [
-      ButtonBar(children: [
-        IconButton(
-            onPressed: () {}, icon: const Icon(Icons.edit_note), tooltip: 'New mail')
-      ]),
-      _buildMailListWidget(context)
-    ]);
+    return _buildMailListWidget(context);
+  }
+
+  @override
+  void dispose() {
+    mailAddressController.removeListener(_update);
+    super.dispose();
   }
 }

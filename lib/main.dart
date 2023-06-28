@@ -61,20 +61,28 @@ void main(List<String> args) async {
   ], child: CollaChatApp(loginStatus: loginStatus)));
 }
 
+///初始化内置浏览器，webview_flutter和inapp两个实现
 void _initWebView() {
   if (platformParams.windows) {
     WindowsWebViewPlatform.registerWith();
   }
-
-  ///6.x.x
-  // if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
-  //   await inapp.InAppWebViewController.setWebContentsDebuggingEnabled(true);
-  // }
-  if (platformParams.android) {
-    inapp.AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+  //对android平台一些特定初始化设置
+  int inAppWebViewVersion = 6;
+  if (inAppWebViewVersion == 6) {
+    ///6.x.x
+    if (platformParams.android) {
+      inapp.InAppWebViewController.setWebContentsDebuggingEnabled(true);
+    }
+  }
+  if (inAppWebViewVersion == 5) {
+    ///5.x.x
+    if (platformParams.android) {
+      inapp.AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+    }
   }
 }
 
+///初始化桌面平台的窗口管理
 Future<void> _initDesktopWindows() async {
   if (platformParams.windows || platformParams.macos || platformParams.linux) {
     await windowManager.ensureInitialized();

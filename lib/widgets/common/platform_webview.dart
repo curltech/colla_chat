@@ -62,7 +62,7 @@ class PlatformWebViewController with ChangeNotifier {
         await webViewController!.loadRequest(Uri.parse(filename));
       } else if (inAppWebViewController != null) {
         inapp.URLRequest urlRequest =
-            inapp.URLRequest(url: Uri.parse(filename));
+            inapp.URLRequest(url: inapp.WebUri(filename));
         await inAppWebViewController!.loadUrl(urlRequest: urlRequest);
       }
     } else {
@@ -70,7 +70,7 @@ class PlatformWebViewController with ChangeNotifier {
         await webViewController!.loadFile(filename);
       } else if (inAppWebViewController != null) {
         inapp.URLRequest urlRequest =
-            inapp.URLRequest(url: Uri.parse('file:$filename'));
+            inapp.URLRequest(url: inapp.WebUri('file:$filename'));
         await inAppWebViewController!.loadUrl(urlRequest: urlRequest);
       }
     }

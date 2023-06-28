@@ -5,6 +5,7 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
@@ -32,7 +33,8 @@ class AutoDiscoverWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
-  ClientConfig? config;
+  ValueNotifier<ClientConfig?> clientConfig =
+      ValueNotifier<ClientConfig?>(null);
 
   @override
   void initState() {
@@ -62,7 +64,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
       ColumnFieldDef(
           name: 'password',
           label: 'Password',
-          initValue: 'OZJBOVNGLGCWAZZX',
+          initValue: 'GRDCGOUASMNEBSTH',
           prefixIcon: Icon(
             Icons.password,
             color: myself.primary,
@@ -77,7 +79,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
     var formInputWidget = Container(
         padding: const EdgeInsets.all(10.0),
         child: FormInputWidget(
-          height: 330,
+          height: 250,
           formButtonDefs: [
             FormButtonDef(
                 label: 'Discover',
@@ -97,24 +99,34 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
   }
 
   Future<void> _discover(Map<String, dynamic> values) async {
-    String? name = values['name'];
     String? email = values['email'];
-    if (StringUtil.isEmpty(email) || StringUtil.isEmpty(name)) {
-      logger.e('email or name is empty');
+    if (StringUtil.isEmpty(email)) {
       if (mounted) {
-        DialogUtil.error(context, content: 'email or name is empty');
+        DialogUtil.error(context, content: 'Email is empty');
       }
       return;
     }
-    ClientConfig? config = await EmailMessageUtil.discover(email!);
-    if (config != null) {
+    try {
+      DialogUtil.loadingShow(context,
+          tip: 'Auto discovering email server, please waiting...');
+      ClientConfig? clientConfig = await EmailMessageUtil.discover(email!);
       if (mounted) {
-        DialogUtil.info(context, content: 'auto discover successfully');
+        DialogUtil.loadingHide(context);
       }
-      this.config = config;
-    } else {
+      if (clientConfig != null) {
+        if (mounted) {
+          DialogUtil.info(context, content: 'Auto discover successfully');
+        }
+        this.clientConfig.value = clientConfig;
+      } else {
+        if (mounted) {
+          DialogUtil.error(context, content: 'Auto discover failure');
+        }
+      }
+    } catch (e) {
+      logger.e('Auto discover failure:$e');
       if (mounted) {
-        DialogUtil.error(context, content: 'auto discover failure');
+        DialogUtil.error(context, content: 'Auto discover failure');
       }
     }
   }
@@ -128,29 +140,35 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
         StringUtil.isEmpty(password)) {
       logger.e('email or name or password is empty');
       if (mounted) {
-        DialogUtil.error(context, content: 'email or name is empty');
+        DialogUtil.error(context, content: 'Email or name is empty');
       }
       return;
     }
-    var config = this.config;
-    if (config == null) {
+    var clientConfig = this.clientConfig.value;
+    if (clientConfig == null) {
       logger.e('auto discover config is null');
       if (mounted) {
-        DialogUtil.error(context, content: 'auto dicover config is null');
+        DialogUtil.error(context, content: 'Auto discovery config is null');
       }
       return;
     }
     var mailAddress =
-        EmailMessageUtil.buildDiscoverMailAddress(email!, name!, config);
-    EmailClient? emailClient = await EmailClientPool.instance
-        .create(mailAddress, password!, config: this.config);
+        EmailMessageUtil.buildDiscoverMailAddress(email!, name!, clientConfig);
+    DialogUtil.loadingShow(context,
+        tip: 'Auto connecting email server, please waiting...');
+    EmailClient? emailClient = await emailClientPool
+        .create(mailAddress, password!, config: clientConfig);
+    if (mounted) {
+      DialogUtil.loadingHide(context);
+    }
     if (emailClient == null) {
       logger.e('create (or connect) fail to $name.');
       return;
     }
     logger.i('create (or connect) success to $name.');
     if (mounted) {
-      bool? result = await DialogUtil.confirm(context, content: '保存为地址吗?');
+      bool? result =
+          await DialogUtil.confirm(context, content: 'Save mail address?');
 
       if (result != null && result) {
         ///保存地址
@@ -159,12 +177,54 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
     }
   }
 
+  static List<Widget> clientConfigWidget(ClientConfig clientConfig) {
+    List<Widget> configWidgets = [];
+    for (final ConfigEmailProvider provider in clientConfig.emailProviders!) {
+      configWidgets
+          .add(CommonAutoSizeText('displayName:${provider.displayName ?? ''}'));
+      configWidgets
+          .add(CommonAutoSizeText('domains:${provider.domains.toString()}'));
+      configWidgets.add(const CommonAutoSizeText('preferredIncomingServer:'));
+      configWidgets.add(Container(
+          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+          child:
+              CommonAutoSizeText(provider.preferredIncomingServer.toString())));
+      configWidgets.add(const CommonAutoSizeText('preferredOutgoingServer:'));
+      configWidgets.add(Container(
+          padding: const EdgeInsets.symmetric(horizontal: 15.0),
+          child:
+              CommonAutoSizeText(provider.preferredOutgoingServer.toString())));
+    }
+    return configWidgets;
+  }
+
   @override
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
         title: widget.title,
         withLeading: widget.withLeading,
-        child: _buildFormInputWidget(context));
+        child: Column(children: [
+          _buildFormInputWidget(context),
+          Expanded(
+              child: ValueListenableBuilder(
+                  valueListenable: clientConfig,
+                  builder: (BuildContext context, ClientConfig? clientConfig,
+                      Widget? child) {
+                    if (clientConfig != null) {
+                      return Card(
+                          elevation: 0.0,
+                          margin: EdgeInsets.zero,
+                          shape: const ContinuousRectangleBorder(),
+                          child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 5.0, horizontal: 15.0),
+                              child: ListView(
+                                children: clientConfigWidget(clientConfig),
+                              )));
+                    }
+                    return Container();
+                  }))
+        ]));
 
     return appBarView;
   }

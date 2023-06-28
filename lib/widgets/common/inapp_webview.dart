@@ -7,6 +7,7 @@ class FlutterInAppWebView extends StatefulWidget {
   final String? initialUrl;
   final String? html;
   final String? initialFilename;
+  final int inAppWebViewVersion = 6;
   final void Function(InAppWebViewController controller)? onWebViewCreated;
 
   const FlutterInAppWebView(
@@ -21,32 +22,41 @@ class FlutterInAppWebView extends StatefulWidget {
 }
 
 class _FlutterInAppWebViewState extends State<FlutterInAppWebView> {
-  InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
-      crossPlatform: InAppWebViewOptions(
-        useShouldOverrideUrlLoading: true,
-        mediaPlaybackRequiresUserGesture: false,
-      ),
-      android: AndroidInAppWebViewOptions(
-        useHybridComposition: true,
-      ),
-      ios: IOSInAppWebViewOptions(
-        allowsInlineMediaPlayback: true,
-      ));
-
-  ///6.x.x
-  // InAppWebViewSettings settings = InAppWebViewSettings(
-  //     useShouldOverrideUrlLoading: true,
-  //     mediaPlaybackRequiresUserGesture: false,
-  //     allowsInlineMediaPlayback: true,
-  //     iframeAllow: "camera; microphone",
-  //     iframeAllowFullscreen: true);
-
   PullToRefreshController pullToRefreshController = PullToRefreshController();
   InAppWebViewController? controller;
 
   @override
   void initState() {
     super.initState();
+  }
+
+  _getSetting() {
+    if (widget.inAppWebViewVersion == 5) {
+      InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
+          crossPlatform: InAppWebViewOptions(
+            useShouldOverrideUrlLoading: true,
+            mediaPlaybackRequiresUserGesture: false,
+          ),
+          android: AndroidInAppWebViewOptions(
+            useHybridComposition: true,
+          ),
+          ios: IOSInAppWebViewOptions(
+            allowsInlineMediaPlayback: true,
+          ));
+
+      return options;
+    }
+    if (widget.inAppWebViewVersion == 6) {
+      ///6.x.x
+      InAppWebViewSettings settings = InAppWebViewSettings(
+          useShouldOverrideUrlLoading: true,
+          mediaPlaybackRequiresUserGesture: false,
+          allowsInlineMediaPlayback: true,
+          iframeAllow: "camera; microphone",
+          iframeAllowFullscreen: true);
+
+      return settings;
+    }
   }
 
   _onWebViewCreated(InAppWebViewController controller) {
@@ -58,28 +68,36 @@ class _FlutterInAppWebViewState extends State<FlutterInAppWebView> {
 
   @override
   Widget build(BuildContext context) {
+    InAppWebViewSettings settings = _getSetting();
     Widget inAppWebView;
-    if (platformParams.mobile || platformParams.web) {
+    if (platformParams.mobile || platformParams.macos || platformParams.web) {
       inAppWebView = InAppWebView(
         initialUrlRequest: widget.initialUrl != null
-            ? URLRequest(url: Uri.parse(widget.initialUrl!))
+            ? URLRequest(url: WebUri(widget.initialUrl!))
             : null,
         initialFile: widget.initialFilename,
-        initialOptions: options,
-        // initialSettings: settings,
+        // 5.x.x initialOptions: settings,
+        initialSettings: settings,
         onWebViewCreated: _onWebViewCreated,
         pullToRefreshController: pullToRefreshController,
         onLoadStart: (controller, url) {},
-        androidOnPermissionRequest: (controller, origin, resources) async {
-          return PermissionRequestResponse(
-              resources: resources,
-              action: PermissionRequestResponseAction.GRANT);
+        // 5.x.x androidOnPermissionRequest: (controller, origin, resources) async {
+        //   return PermissionRequestResponse(
+        //       resources: resources,
+        //       action: PermissionRequestResponseAction.GRANT);
+        // },
+        onPermissionRequest: (controller, origin) async {
+          return PermissionResponse(
+              resources: [], action: PermissionResponseAction.DENY);
         },
         shouldOverrideUrlLoading: (controller, navigationAction) async {},
         onLoadStop: (controller, url) async {
           pullToRefreshController.endRefreshing();
         },
-        onLoadError: (controller, url, code, message) {
+        // 5.x.x onLoadError: (controller, url, code, message) {
+        //   pullToRefreshController.endRefreshing();
+        // },
+        onReceivedError: (controller, url, err) {
           pullToRefreshController.endRefreshing();
         },
         onProgressChanged: (controller, progress) {

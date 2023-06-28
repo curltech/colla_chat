@@ -99,6 +99,7 @@ class EmailMessageUtil {
     return message;
   }
 
+  ///转换邮件地址实体信息到邮件地址配置
   static enough_mail.ClientConfig? buildDiscoverConfig(
       entity.MailAddress mailAddress) {
     enough_mail.ClientConfig config = enough_mail.ClientConfig();
@@ -145,29 +146,13 @@ class EmailMessageUtil {
   static Future<enough_mail.ClientConfig?> discover(String email) async {
     final config =
         await enough_mail.Discover.discover(email, isLogEnabled: false);
-    if (config != null) {
-      for (final provider in config.emailProviders!) {
-        logger.i('provider: ${provider.displayName}');
-        logger.i('provider-domains: ${provider.domains}');
-        logger.i('documentation-url: ${provider.documentationUrl}');
-        logger.i('Incoming:');
-        provider.incomingServers?.forEach(logger.i);
-        logger.i(provider.preferredIncomingServer);
-        logger.i('Outgoing:');
-        provider.outgoingServers?.forEach(logger.i);
-        logger.i(provider.preferredOutgoingServer);
-      }
-    } else {
-      logger.e('Unable to auto-discover settings for $email');
-    }
 
     return config;
   }
 
-  ///自动发现邮件配置，产生新的邮件地址
+  ///传入email，name和邮件地址配置参数，产生新的邮件地址实体
   static entity.MailAddress buildDiscoverMailAddress(
       String email, String name, ClientConfig config) {
-    logger.i('config displayName: ${config.displayName}.');
     entity.MailAddress mailAddress =
         entity.MailAddress(email: email, name: name);
 
@@ -220,7 +205,7 @@ class EmailMessageUtil {
       vendor: 'myclient',
       nonStandardFields: {'support-email': 'testmail@test.com'});
 
-  ///用自动发现的配置创建邮件客户端
+  ///用邮件地址配置创建邮件客户端
   static enough_mail.MailClient createMailClient(
       {required String name,
       required String email,
@@ -232,7 +217,6 @@ class EmailMessageUtil {
 
     final mailClient =
         enough_mail.MailClient(account, isLogEnabled: true, clientId: clientId);
-    logger.i(mailClient.serverId);
 
     return mailClient;
   }
@@ -252,7 +236,7 @@ class EmailClient {
     required this.mailAddress,
   });
 
-  ///统一的连接方法，先用自动发现的参数连接，不成功再用imap等手工配置的参数
+  ///统一的连接方法，先用邮件地址参数连接，不成功再用imap和pop手工配置的参数连接
   Future<bool> connect(String? password, {ClientConfig? config}) async {
     if (password != null && mailAddress.password != password) {
       mailAddress.password = password;
@@ -279,7 +263,7 @@ class EmailClient {
         (smtpClient != null && (imapClient != null || popClient != null)));
   }
 
-  ///用mailaddress参数解析出自动发现的config进行连接
+  ///邮件客户端连接，可以传入密码和邮件地址参数，如果没有则使用当前邮件客户端的数据
   Future<bool> mailClientConnect(
       {String? password, ClientConfig? config}) async {
     if (password != null && mailAddress.password != password) {
@@ -342,9 +326,10 @@ class EmailClient {
     final enough_mail.MailClient? mailClient = this.mailClient;
     if (mailClient != null) {
       final mailboxes = await mailClient.listMailboxes(order: order);
-      logger.i(mailboxes);
+
       return mailboxes;
     }
+
     return null;
   }
 
@@ -405,7 +390,7 @@ class EmailClient {
   }
 
   ///用邮件客户端获取消息
-  Future<List<MimeMessage>?> fetchMessages(
+  Future<List<enough_mail.MimeMessage>?> fetchMessages(
       {int limit = defaultLimit,
       FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
       Mailbox? mailbox,
@@ -413,17 +398,18 @@ class EmailClient {
     final enough_mail.MailClient? mailClient = this.mailClient;
     if (mailClient != null && mailbox != null) {
       int total = mailbox.messagesExists;
+      int page = Pagination.getPage(offset, limit);
       final messages = await mailClient.fetchMessages(
           count: limit,
           fetchPreference: fetchPreference,
           mailbox: mailbox,
-          page: Pagination.getPage(offset, limit));
+          page: page);
       return messages;
     }
     return null;
   }
 
-  Future<List<MimeMessage>?> fetchMessagesNextPage(
+  Future<List<enough_mail.MimeMessage>?> fetchMessagesNextPage(
     PagedMessageSequence pagedSequence, {
     Mailbox? mailbox,
     FetchPreference fetchPreference = FetchPreference.fullWhenWithinSize,
@@ -439,7 +425,7 @@ class EmailClient {
     return null;
   }
 
-  Future<DeleteResult?> deleteMessage(MimeMessage message,
+  Future<DeleteResult?> deleteMessage(enough_mail.MimeMessage message,
       {bool expunge = false}) async {
     final enough_mail.MailClient? mailClient = this.mailClient;
     if (mailClient != null) {
@@ -449,7 +435,7 @@ class EmailClient {
   }
 
   Future<DeleteResult?> deleteMessages(MessageSequence sequence,
-      {bool expunge = false, List<MimeMessage>? messages}) async {
+      {bool expunge = false, List<enough_mail.MimeMessage>? messages}) async {
     final enough_mail.MailClient? mailClient = this.mailClient;
     if (mailClient != null) {
       return await mailClient.deleteMessages(sequence,
@@ -917,24 +903,13 @@ class EmailClient {
 }
 
 class EmailClientPool {
-  static final EmailClientPool _instance = EmailClientPool();
-  static bool initStatus = false;
-
-  /// 初始化连接池，设置缺省mailClientclient，返回连接池
-  static EmailClientPool get instance {
-    if (!initStatus) {
-      initStatus = true;
-    }
-    return _instance;
-  }
-
   var mailClients = <String, EmailClient>{};
   EmailClient? _default;
 
   EmailClientPool();
 
   ///在连接池中创建一个邮件的连接，必须连接成功才能创建
-  ///传入的邮件地址参数必须含有email，或者有自动发现的配置，或者有imap和smtp的配置
+  ///传入的邮件地址实体参数必须含有email字段，或者有自动发现的配置，或者有imap和smtp的配置
   Future<EmailClient?> create(entity.MailAddress mailAddress, String password,
       {ClientConfig? config}) async {
     var emails = mailAddress.email.split('@');
@@ -1001,3 +976,5 @@ class EmailClientPool {
     return _default;
   }
 }
+
+final EmailClientPool emailClientPool = EmailClientPool();
