@@ -4,6 +4,7 @@ import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/mailaddress.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
+import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/material.dart';
 
 class CommonMailBox {
@@ -180,11 +181,28 @@ class MailAddressController extends DataListController<entity.MailAddress> {
     return mimeMessages;
   }
 
+  MimeMessage? get currentMimeMessage {
+    var currentMimeMessages = this.currentMimeMessages;
+    if (currentMimeMessages != null && _currentMailIndex >= 0) {
+      return currentMimeMessages[_currentMailIndex];
+    }
+
+    return null;
+  }
+
+  set currentMimeMessage(MimeMessage? mimeMessage) {
+    var currentMimeMessages = this.currentMimeMessages;
+    if (currentMimeMessages != null && _currentMailIndex >= 0) {
+      currentMimeMessages[_currentMailIndex] = mimeMessage!;
+    }
+  }
+
   ///以下是从数据库取邮件的部分
 
   ///从邮件服务器中取当前地址当前邮箱的下一页的邮件数据，放入数据提供者的数组中
-  ///而且转换成charMessage,放入数据提供者的数组中
-  findMoreMimeMessages() async {
+  findMoreMimeMessages({
+    FetchPreference fetchPreference = FetchPreference.envelope,
+  }) async {
     if (current == null) {
       return;
     }
@@ -202,11 +220,38 @@ class MailAddressController extends DataListController<entity.MailAddress> {
     var currentMimeMessages = this.currentMimeMessages;
     if (currentMimeMessages != null) {
       offset = currentMimeMessages.length;
-      List<enough_mail.MimeMessage>? mimeMessages = await emailClient
-          .fetchMessages(mailbox: currentMailbox, offset: offset);
+      List<enough_mail.MimeMessage>? mimeMessages =
+          await emailClient.fetchMessages(
+              mailbox: currentMailbox,
+              offset: offset,
+              fetchPreference: fetchPreference);
       if (mimeMessages != null && mimeMessages.isNotEmpty) {
         currentMimeMessages.addAll(mimeMessages);
         notifyListeners();
+      }
+    }
+  }
+
+  Future<void> updateMimeMessageContent() async {
+    if (current == null) {
+      return;
+    }
+    String email = current!.email;
+    EmailClient? emailClient = emailClientPool.get(email);
+    if (emailClient == null) {
+      return;
+    }
+
+    enough_mail.MimeMessage? mimeMessage = currentMimeMessage;
+    if (mimeMessage != null) {
+      MimeMessage? mimeMessageContent = mimeMessage.decodeContentMessage();
+      if (mimeMessageContent == null) {
+        enough_mail.MimeMessage? mimeMsg =
+            await emailClient.fetchMessageContents(mimeMessage);
+        if (mimeMsg != null) {
+          mimeMsg.envelope = mimeMessage.envelope;
+          currentMimeMessage = mimeMsg;
+        }
       }
     }
   }

@@ -409,6 +409,27 @@ class EmailClient {
     return null;
   }
 
+  ///获取完整的消息，用于先前获取了消息的FetchPreference.envelope情况下
+  Future<enough_mail.MimeMessage?> fetchMessageContents(
+    MimeMessage message, {
+    int? maxSize,
+    bool markAsSeen = false,
+    List<MediaToptype>? includedInlineTypes,
+    Duration? responseTimeout,
+  }) async {
+    final enough_mail.MailClient? mailClient = this.mailClient;
+    if (mailClient != null) {
+      message = await mailClient.fetchMessageContents(message,
+          maxSize: maxSize,
+          markAsSeen: markAsSeen,
+          includedInlineTypes: includedInlineTypes,
+          responseTimeout: responseTimeout);
+
+      return message;
+    }
+    return null;
+  }
+
   Future<List<enough_mail.MimeMessage>?> fetchMessagesNextPage(
     PagedMessageSequence pagedSequence, {
     Mailbox? mailbox,

@@ -1,6 +1,7 @@
 import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
+import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:enough_mail/enough_mail.dart';
@@ -35,10 +36,21 @@ class _MailListWidgetState extends State<MailListWidget> {
     List<TileData> tiles = [];
     if (mimeMessages.isNotEmpty) {
       for (var mimeMessage in mimeMessages) {
-        var title = mimeMessage.decodeSubject();
-        var subtitle = mimeMessage.decodeSender();
-        TileData tile =
-            TileData(title: title ?? '', subtitle: subtitle.toString());
+        var title = mimeMessage.envelope?.subject;
+        var subtitle = mimeMessage.envelope?.sender?.personalName;
+        subtitle = subtitle ?? '';
+        var email = mimeMessage.envelope?.sender?.email;
+        email = email ?? '';
+        subtitle = '$subtitle[$email]';
+        var sendDate = mimeMessage.envelope?.date;
+        var titleTail = '';
+        if (sendDate != null) {
+          titleTail = DateUtil.formatEasyRead(sendDate.toIso8601String());
+        }
+        TileData tile = TileData(
+            title: title ?? '',
+            titleTail: titleTail,
+            subtitle: subtitle.toString());
         tiles.add(tile);
       }
     }

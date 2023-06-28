@@ -32,6 +32,7 @@ class MailContentWidget extends StatefulWidget with TileDataMixin {
 class _MailContentWidgetState extends State<MailContentWidget> {
   PlatformWebViewController platformWebViewController =
       PlatformWebViewController();
+  ValueNotifier<MimeMessage?> mimeMessage = ValueNotifier<MimeMessage?>(null);
 
   @override
   initState() {
@@ -40,33 +41,47 @@ class _MailContentWidgetState extends State<MailContentWidget> {
   }
 
   _update() {
-    setState(() {});
+    _updateMimeMessageViewer();
+  }
+
+  Future<void> _updateMimeMessageViewer() async {
+    MimeMessage? mimeMessage = mailAddressController.currentMimeMessage;
+    if (mimeMessage != null) {
+      await mailAddressController.updateMimeMessageContent();
+      this.mimeMessage.value = mailAddressController.currentMimeMessage;
+    }
   }
 
   Widget _buildMimeMessageViewer(BuildContext context) {
-    MimeMessage mimeMessage = mailAddressController
-        .currentMimeMessages![mailAddressController.currentMailIndex];
-    Widget mimeMessageViewer;
-    if (platformParams.mobile) {
-      ///在ios下会引发启动崩溃
-      mimeMessageViewer = MimeMessageViewer(
-        mimeMessage: mimeMessage,
-        blockExternalImages: false,
-        mailtoDelegate: handleMailto,
-      );
-    } else {
-      String html = EmailMessageUtil.convertToHtml(mimeMessage);
-      mimeMessageViewer = PlatformWebView(
-          html: html,
-          onWebViewCreated: (PlatformWebViewController controller) {
-            platformWebViewController.inAppWebViewController =
-                controller.inAppWebViewController;
-            platformWebViewController.webViewController =
-                controller.webViewController;
-          });
-    }
+    return ValueListenableBuilder(
+        valueListenable: mimeMessage,
+        builder:
+            (BuildContext context, MimeMessage? mimeMessage, Widget? child) {
+          Widget mimeMessageViewer;
+          if (mimeMessage == null) {
+            return Container();
+          }
+          if (platformParams.mobile) {
+            ///在ios下会引发启动崩溃
+            mimeMessageViewer = MimeMessageViewer(
+              mimeMessage: mimeMessage,
+              blockExternalImages: false,
+              mailtoDelegate: handleMailto,
+            );
+          } else {
+            String html = EmailMessageUtil.convertToHtml(mimeMessage);
+            mimeMessageViewer = PlatformWebView(
+                html: html,
+                onWebViewCreated: (PlatformWebViewController controller) {
+                  platformWebViewController.inAppWebViewController =
+                      controller.inAppWebViewController;
+                  platformWebViewController.webViewController =
+                      controller.webViewController;
+                });
+          }
 
-    return mimeMessageViewer;
+          return mimeMessageViewer;
+        });
   }
 
   Future<dynamic> handleMailto(Uri mailto, MimeMessage mimeMessage) async {
@@ -97,18 +112,12 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     setState(() {});
   }
 
-  Widget _buildMailContentWidget(BuildContext context) {
-    Widget mimeMessageViewer = _buildMimeMessageViewer(context);
-
-    return mimeMessageViewer;
-  }
-
   @override
   Widget build(BuildContext context) {
     var appBarView = AppBarView(
         title: widget.title,
         withLeading: widget.withLeading,
-        child: _buildMailContentWidget(context));
+        child: _buildMimeMessageViewer(context));
     return appBarView;
   }
 
