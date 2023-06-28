@@ -1,7 +1,9 @@
 import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/platform_webview.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:enough_mail/highlevel.dart';
 import 'package:flutter/material.dart';
@@ -28,6 +30,9 @@ class MailContentWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _MailContentWidgetState extends State<MailContentWidget> {
+  PlatformWebViewController platformWebViewController =
+      PlatformWebViewController();
+
   @override
   initState() {
     mailAddressController.addListener(_update);
@@ -42,7 +47,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     MimeMessage mimeMessage = mailAddressController
         .currentMimeMessages![mailAddressController.currentMailIndex];
     Widget mimeMessageViewer;
-    if (platformParams.mobile || platformParams.macos) {
+    if (platformParams.mobile) {
       ///在ios下会引发启动崩溃
       mimeMessageViewer = MimeMessageViewer(
         mimeMessage: mimeMessage,
@@ -50,8 +55,17 @@ class _MailContentWidgetState extends State<MailContentWidget> {
         mailtoDelegate: handleMailto,
       );
     } else {
-      mimeMessageViewer =
-          const Center(child: CommonAutoSizeText('Not support'));
+      mimeMessageViewer = PlatformWebView(
+          onWebViewCreated: (PlatformWebViewController controller) {
+        platformWebViewController.inAppWebViewController =
+            controller.inAppWebViewController;
+        platformWebViewController.webViewController =
+            controller.webViewController;
+      });
+      String html = EmailMessageUtil.convertToHtml(mimeMessage);
+      platformWebViewController.loadHtml(html);
+      // mimeMessageViewer =
+      //     const Center(child: CommonAutoSizeText('Not support'));
     }
     return mimeMessageViewer;
   }
