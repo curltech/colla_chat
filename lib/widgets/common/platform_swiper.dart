@@ -160,7 +160,14 @@ class _PlatformSwiperState extends State<PlatformSwiper> {
   CardSwiper _buildCardSwiper() {
     return CardSwiper(
       key: widget.key,
-      cardBuilder: widget.itemBuilder,
+      cardBuilder: (
+        BuildContext context,
+        int index,
+        int horizontalOffsetPercentage,
+        int verticalOffsetPercentage,
+      ) {
+        widget.itemBuilder(context, index);
+      },
       cardsCount: widget.itemCount,
       controller: CardSwiperController(),
       initialIndex: widget.index ?? 0,

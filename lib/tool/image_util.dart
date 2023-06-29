@@ -318,7 +318,7 @@ class ImageUtil {
   }
 
   /// compress file and get file.
-  static Future<File?> compressAndGetFile(
+  static Future<XFile?> compressAndGetFile(
     File file,
     String targetPath, {
     int minWidth = 1920,

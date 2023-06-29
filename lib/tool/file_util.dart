@@ -202,20 +202,21 @@ class FileUtil {
     String name,
     Uint8List bytes,
     String ext, {
-    MimeType mimeType = MimeType.OTHER,
+    MimeType mimeType = MimeType.other,
   }) async {
     return await FileSaver.instance
-        .saveFile(name, bytes, ext, mimeType: mimeType);
+        .saveFile(bytes: bytes, ext: ext, mimeType: mimeType, name: name);
   }
 
   ///仅支持ios,android，另存为文件
-  static Future<String> saveAsFile(
+  static Future<String?> saveAsFile(
     String name,
     Uint8List bytes,
     String ext, {
-    MimeType mimeType = MimeType.OTHER,
+    MimeType mimeType = MimeType.other,
   }) async {
-    return await FileSaver.instance.saveAs(name, bytes, ext, mimeType);
+    return await FileSaver.instance
+        .saveAs(name: name, bytes: bytes, ext: ext, mimeType: mimeType);
   }
 
   static Future<String?> open({

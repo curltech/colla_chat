@@ -8,8 +8,7 @@ Future<CommonDatabase> openSqlite3({String name = 'colla_chat.db'}) async {
   var source = byteData.buffer.asUint8List();
 
   try {
-    WasmSqlite3 wasmSqlite3 =
-        await WasmSqlite3.load(source, SqliteEnvironment(fileSystem: fs));
+    WasmSqlite3 wasmSqlite3 = await WasmSqlite3.load(source);
     CommonDatabase db = wasmSqlite3.open(name);
     int userVersion = db.userVersion;
     print('wasm sqlite3 db userVersion is $userVersion');
