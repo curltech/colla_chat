@@ -1,8 +1,6 @@
 import 'package:colla_chat/platform.dart';
-import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/flutter_webview.dart';
-import 'package:colla_chat/widgets/common/html_webview.dart';
 import 'package:colla_chat/widgets/common/inapp_webview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart' as inapp;
@@ -112,14 +110,10 @@ class PlatformWebViewController with ChangeNotifier {
 
   inapp.InAppBrowserClassSettings _getSettings() {
     var settings = inapp.InAppBrowserClassSettings(
-      browserSettings: inapp.InAppBrowserSettings(
-        hideUrlBar: false,
-        toolbarTopBackgroundColor: myself.primary,
-        presentationStyle: inapp.ModalPresentationStyle.POPOVER,
-      ),
-      webViewSettings: inapp.InAppWebViewSettings(
-          useOnLoadResource: true, javaScriptEnabled: true),
-    );
+        browserSettings: inapp.InAppBrowserSettings(
+            presentationStyle: inapp.ModalPresentationStyle.AUTOMATIC,
+            hideUrlBar: false),
+        webViewSettings: inapp.InAppWebViewSettings(javaScriptEnabled: true));
 
     return settings;
   }
@@ -160,61 +154,55 @@ class PlatformWebViewController with ChangeNotifier {
 }
 
 /// 平台Webview，打开一个内部的浏览器窗口，可以用来观看网页，音频，视频文件，office文件
-class PlatformWebView extends StatefulWidget {
+class PlatformWebView extends StatelessWidget {
   final String? initialUrl;
   final String? html;
   final String? initialFilename;
   final void Function(PlatformWebViewController controller)? onWebViewCreated;
 
-  const PlatformWebView(
+  late final PlatformWebViewController? webViewController;
+  late final Widget platformWebView;
+
+  PlatformWebView(
       {super.key,
       this.initialUrl,
       this.html,
       this.initialFilename,
-      this.onWebViewCreated});
-
-  @override
-  State createState() => _PlatformWebViewState();
-}
-
-class _PlatformWebViewState extends State<PlatformWebView> {
-  PlatformWebViewController? webViewController;
-
-  @override
-  void initState() {
-    super.initState();
+      this.onWebViewCreated}) {
+    _buildPlatformWebView();
   }
 
   _onWebViewCreated(dynamic controller) {
     webViewController = PlatformWebViewController.from(controller);
-    if (widget.onWebViewCreated != null) {
-      widget.onWebViewCreated!(webViewController!);
+    if (onWebViewCreated != null) {
+      onWebViewCreated!(webViewController!);
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    Widget platformWebView;
+  void _buildPlatformWebView() {
     if (platformParams.windows || platformParams.mobile || platformParams.web) {
       platformWebView = FlutterWebView(
-        initialUrl: widget.initialUrl,
-        html: widget.html,
-        initialFilename: widget.initialFilename,
+        initialUrl: initialUrl,
+        html: html,
+        initialFilename: initialFilename,
         onWebViewCreated: (webview.WebViewController controller) {
           _onWebViewCreated(controller);
         },
       );
     } else {
       platformWebView = FlutterInAppWebView(
-        initialUrl: widget.initialUrl,
-        html: widget.html,
-        initialFilename: widget.initialFilename,
+        initialUrl: initialUrl,
+        html: html,
+        initialFilename: initialFilename,
         onWebViewCreated: (inapp.InAppWebViewController controller) {
           _onWebViewCreated(controller);
         },
       );
     }
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return platformWebView;
   }
 }

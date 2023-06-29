@@ -1,38 +1,33 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 /// InAppWebView，打开一个内部的浏览器窗口，可以用来观看网页，音频，视频文件，office文件
-class FlutterInAppWebView extends StatefulWidget {
+class FlutterInAppWebView extends StatelessWidget {
   final String? initialUrl;
   final String? html;
   final String? initialFilename;
   final int inAppWebViewVersion = 6;
   final void Function(InAppWebViewController controller)? onWebViewCreated;
 
-  const FlutterInAppWebView(
+  PullToRefreshController pullToRefreshController = PullToRefreshController();
+  late final InAppWebViewController? controller;
+  late final Widget inAppWebView;
+  final InAppBrowser browser = InAppBrowser();
+
+  FlutterInAppWebView(
       {super.key,
       this.initialUrl,
       this.html,
       this.initialFilename,
-      this.onWebViewCreated});
-
-  @override
-  State createState() => _FlutterInAppWebViewState();
-}
-
-class _FlutterInAppWebViewState extends State<FlutterInAppWebView> {
-  PullToRefreshController pullToRefreshController = PullToRefreshController();
-  InAppWebViewController? controller;
-  final InAppBrowser browser = InAppBrowser();
-
-  @override
-  void initState() {
-    super.initState();
+      this.onWebViewCreated}) {
+    _buildInAppWebView();
   }
 
   _getSetting() {
-    if (widget.inAppWebViewVersion == 5) {
+    if (inAppWebViewVersion == 5) {
       InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
           crossPlatform: InAppWebViewOptions(
             useShouldOverrideUrlLoading: true,
@@ -47,7 +42,7 @@ class _FlutterInAppWebViewState extends State<FlutterInAppWebView> {
 
       return options;
     }
-    if (widget.inAppWebViewVersion == 6) {
+    if (inAppWebViewVersion == 6) {
       ///6.x.x
       InAppWebViewSettings settings = InAppWebViewSettings(
           useShouldOverrideUrlLoading: true,
@@ -62,24 +57,21 @@ class _FlutterInAppWebViewState extends State<FlutterInAppWebView> {
 
   _onWebViewCreated(InAppWebViewController controller) {
     this.controller = controller;
-    if (widget.onWebViewCreated != null) {
-      widget.onWebViewCreated!(controller);
+    if (onWebViewCreated != null) {
+      onWebViewCreated!(controller);
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildInAppWebView() {
     InAppWebViewSettings settings = _getSetting();
-    Widget inAppWebView;
-    URLRequest? urlRequest = widget.initialUrl != null
-        ? URLRequest(url: WebUri(widget.initialUrl!))
-        : null;
+    URLRequest? urlRequest =
+        initialUrl != null ? URLRequest(url: WebUri(initialUrl!)) : null;
 
     ///移动和web直接使用InAppWebView
     if (platformParams.mobile || platformParams.web) {
       inAppWebView = InAppWebView(
         initialUrlRequest: urlRequest,
-        initialFile: widget.initialFilename,
+        initialFile: initialFilename,
         // 5.x.x initialOptions: settings,
         initialSettings: settings,
         onWebViewCreated: _onWebViewCreated,
@@ -112,27 +104,24 @@ class _FlutterInAppWebViewState extends State<FlutterInAppWebView> {
         onUpdateVisitedHistory: (controller, url, androidIsReload) {},
         onConsoleMessage: (controller, consoleMessage) {},
       );
-      if (widget.html != null) {
-        controller!.loadData(data: widget.html!);
+      if (html != null) {
+        controller!.loadData(data: html!);
       }
-    } else if (platformParams.macos && widget.html != null) {
-      inAppWebView = Container();
-      var settings = InAppBrowserClassSettings(
-          browserSettings: InAppBrowserSettings(
-              presentationStyle: ModalPresentationStyle.AUTOMATIC,
-              hideUrlBar: false),
-          webViewSettings: InAppWebViewSettings(javaScriptEnabled: true));
-      browser.openData(data: widget.html!, settings: settings);
+    } else if (platformParams.macos && html != null) {
+      inAppWebView = Center(
+          child: CommonAutoSizeText(
+              AppLocalizations.t('Only supported in App browser')));
     } else {
-      inAppWebView = Container();
+      inAppWebView = Center(
+          child:
+              CommonAutoSizeText(AppLocalizations.t('Not supported platform')));
     }
 
     return inAppWebView;
   }
 
   @override
-  void dispose() {
-    browser.close();
-    super.dispose();
+  Widget build(BuildContext context) {
+    return inAppWebView;
   }
 }
