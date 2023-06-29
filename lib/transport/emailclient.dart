@@ -60,7 +60,7 @@ class EmailMessageUtil {
     return HtmlToPlainTextConverter.convert(htmlText);
   }
 
-  ///转换邮件信息为聊天信息
+  ///转换邮件消息为平台消息，整个邮件通过序列化方法转换成平台消息的content部分
   static ChatMessage convertToChatMessage(enough_mail.MimeMessage message) {
     ChatMessage chatMessage = ChatMessage();
     chatMessage.id = message.guid;
@@ -92,6 +92,7 @@ class EmailMessageUtil {
     return chatMessage;
   }
 
+  ///转换平台的消息到邮件消息，平台消息的content部分反序列化成邮件消息
   static enough_mail.MimeMessage convertToMimeMessage(ChatMessage chatMessage) {
     enough_mail.MimeMessage message =
         enough_mail.MimeMessage.parseFromText(chatMessage.content!);
@@ -199,11 +200,12 @@ class EmailMessageUtil {
     return mailAddress;
   }
 
+  ///识别本APP的客户端Id
   static const clientId = Id(
-      name: 'myname',
-      version: '1.0.0',
-      vendor: 'myclient',
-      nonStandardFields: {'support-email': 'testmail@test.com'});
+      name: 'CollaChat',
+      version: '1.2.0',
+      vendor: 'curltech.io',
+      nonStandardFields: {'support-email': 'hujs@curltech.io'});
 
   ///用邮件地址配置创建邮件客户端
   static enough_mail.MailClient createMailClient(

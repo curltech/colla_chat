@@ -3,6 +3,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/mail/mail_address_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_content_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_list_widget.dart';
+import 'package:colla_chat/pages/chat/mail/new_mail_widget.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -17,10 +18,12 @@ class MailWidget extends StatefulWidget with TileDataMixin {
   final MailAddressWidget mailAddressWidget = MailAddressWidget();
   final MailListWidget mailListWidget = const MailListWidget();
   final MailContentWidget mailContentWidget = const MailContentWidget();
+  final NewMailWidget newMailWidget = const NewMailWidget();
   final SwiperController controller = SwiperController();
 
   MailWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(mailContentWidget);
+    indexWidgetProvider.define(newMailWidget);
   }
 
   @override
@@ -89,7 +92,7 @@ class _MailWidgetState extends State<MailWidget> {
     if (widget.controller.index == 1) {
       rightWidgets.add(IconButton(
           onPressed: () {
-            indexWidgetProvider.push('mail_address_manual_add');
+            indexWidgetProvider.push('new_mail');
           },
           icon: const Icon(Icons.edit_note),
           tooltip: AppLocalizations.t('New mail')));

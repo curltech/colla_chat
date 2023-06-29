@@ -31,7 +31,7 @@ class _HtmlLightWidgetState extends State<HtmlLightWidget> {
   @override
   void initState() {
     super.initState();
-    controller = HtmlEditorController(text: widget.initialText!);
+    controller = HtmlEditorController(text: widget.initialText ?? '');
   }
 
   List<ActionData> _buildActionData() {

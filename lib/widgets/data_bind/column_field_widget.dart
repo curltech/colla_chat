@@ -108,8 +108,6 @@ class ColumnFieldDef {
       this.customWidget});
 }
 
-enum ColumnFieldMode { edit, label, custom }
-
 ///存储字段的真实值和文本显示值
 class ColumnFieldController with ChangeNotifier {
   final ColumnFieldDef columnFieldDef;
@@ -121,17 +119,16 @@ class ColumnFieldController with ChangeNotifier {
 
   //文本框的值
   TextEditingController? _controller;
-  late ColumnFieldMode _mode;
 
-  ColumnFieldController(this.columnFieldDef,
-      {dynamic value,
-      dynamic flag,
-      TextEditingController? controller,
-      ColumnFieldMode mode = ColumnFieldMode.label}) {
+  ColumnFieldController(
+    this.columnFieldDef, {
+    dynamic value,
+    dynamic flag,
+    TextEditingController? controller,
+  }) {
     _value = value;
     _flag = flag;
     _controller = controller;
-    _mode = mode;
   }
 
   ///获取真实值
@@ -209,17 +206,6 @@ class ColumnFieldController with ChangeNotifier {
     }
   }
 
-  ColumnFieldMode get mode {
-    return _mode;
-  }
-
-  set mode(ColumnFieldMode mode) {
-    if (_mode != mode) {
-      _mode = mode;
-      notifyListeners();
-    }
-  }
-
   set controller(TextEditingController? controller) {
     _controller = controller;
   }
@@ -229,8 +215,7 @@ class ColumnFieldController with ChangeNotifier {
     if (controller != null) {
       controller.clear();
     } else {
-      if (mode == ColumnFieldMode.label ||
-          columnFieldDef.inputType == InputType.label) {
+      if (columnFieldDef.inputType == InputType.label) {
       } else {
         if (_value != null) {
           _value = null;
@@ -302,7 +287,7 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
     return Container(
         padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 14.0),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          _buildIcon()!,
+          _buildIcon() ?? Container(),
           const SizedBox(
             width: 10.0,
           ),
@@ -981,60 +966,51 @@ class _ColumnFieldWidgetState extends State<ColumnFieldWidget> {
   @override
   Widget build(BuildContext context) {
     Widget columnFieldWidget;
-    var mode = widget.controller.mode;
-    if (mode == ColumnFieldMode.custom) {
-      var customWidget = widget.controller.columnFieldDef.customWidget;
-      if (customWidget != null) {
-        columnFieldWidget = customWidget;
-        return columnFieldWidget;
-      }
+    var customWidget = widget.controller.columnFieldDef.customWidget;
+    if (customWidget != null) {
+      columnFieldWidget = customWidget;
+      return columnFieldWidget;
     }
-    if (mode == ColumnFieldMode.label) {
-      columnFieldWidget = _buildLabel(context);
-    } else if (mode == ColumnFieldMode.edit) {
-      var inputType = widget.controller.columnFieldDef.inputType;
-      switch (inputType) {
-        case InputType.label:
-          columnFieldWidget = _buildLabel(context);
-          break;
-        case InputType.text:
-          columnFieldWidget = _buildTextFormField(context);
-          break;
-        case InputType.password:
-          columnFieldWidget = _buildPasswordField(context);
-          break;
-        case InputType.togglebuttons:
-          columnFieldWidget = _buildToggleButtonsField(context);
-          break;
-        case InputType.checkbox:
-          columnFieldWidget = _buildCheckboxField(context);
-          break;
-        case InputType.radio:
-          columnFieldWidget = _buildRadioField(context);
-          break;
-        case InputType.select:
-          columnFieldWidget = _buildDropdownButton(context);
-          break;
-        case InputType.toggle:
-          columnFieldWidget = _buildToggleField(context);
-          break;
-        case InputType.switcher:
-          columnFieldWidget = _buildSwitchField(context);
-          break;
-        case InputType.date:
-          columnFieldWidget = _buildInputDate(context);
-          break;
-        case InputType.time:
-          columnFieldWidget = _buildInputTime(context);
-          break;
-        case InputType.datetime:
-          columnFieldWidget = _buildInputDateTime(context);
-          break;
-        default:
-          columnFieldWidget = _buildTextFormField(context);
-      }
-    } else {
-      columnFieldWidget = _buildTextFormField(context);
+    var inputType = widget.controller.columnFieldDef.inputType;
+    switch (inputType) {
+      case InputType.label:
+        columnFieldWidget = _buildLabel(context);
+        break;
+      case InputType.text:
+        columnFieldWidget = _buildTextFormField(context);
+        break;
+      case InputType.password:
+        columnFieldWidget = _buildPasswordField(context);
+        break;
+      case InputType.togglebuttons:
+        columnFieldWidget = _buildToggleButtonsField(context);
+        break;
+      case InputType.checkbox:
+        columnFieldWidget = _buildCheckboxField(context);
+        break;
+      case InputType.radio:
+        columnFieldWidget = _buildRadioField(context);
+        break;
+      case InputType.select:
+        columnFieldWidget = _buildDropdownButton(context);
+        break;
+      case InputType.toggle:
+        columnFieldWidget = _buildToggleField(context);
+        break;
+      case InputType.switcher:
+        columnFieldWidget = _buildSwitchField(context);
+        break;
+      case InputType.date:
+        columnFieldWidget = _buildInputDate(context);
+        break;
+      case InputType.time:
+        columnFieldWidget = _buildInputTime(context);
+        break;
+      case InputType.datetime:
+        columnFieldWidget = _buildInputDateTime(context);
+        break;
+      default:
+        columnFieldWidget = _buildTextFormField(context);
     }
     return columnFieldWidget;
   }

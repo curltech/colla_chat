@@ -2,9 +2,7 @@ import 'package:colla_chat/entity/chat/mailaddress.dart';
 import 'package:colla_chat/pages/chat/mail/address/auto_discover_widget.dart';
 import 'package:colla_chat/pages/chat/mail/address/manual_add_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_group_listview.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
@@ -83,6 +81,7 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
               tiles.add(tile);
             }
           }
+          mailAddressController.currentMailboxName = mailboxes.first!.name;
         }
         mailAddressTileData[key] = tiles;
       }

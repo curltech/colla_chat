@@ -89,7 +89,7 @@ class _EnoughHtmlEditorWidgetState extends State<EnoughHtmlEditorWidget> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: 400,
+      height: 400,
       child: Column(
         children: [
           if (controller == null) ...{
@@ -112,13 +112,14 @@ class _EnoughHtmlEditorWidgetState extends State<EnoughHtmlEditorWidget> {
                   )),
             ),
           },
-          HtmlEditor(
-            initialContent: widget.initialText!,
+          Expanded(child: HtmlEditor(
+            key: UniqueKey(),
+            initialContent: widget.initialText ?? '',
             minHeight: 200,
             onCreated: (api) {
               controller = api;
             },
-          ),
+          )),
         ],
       ),
     );

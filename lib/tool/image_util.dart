@@ -441,44 +441,6 @@ class ImageUtil {
     return avatar;
   }
 
-  ///所有平台，选择图像或者媒体，对桌面平台，也可选择文件
-  static Future<List<dynamic>> pickImage({
-    BuildContext? context,
-    String? dialogTitle,
-    String? initialDirectory,
-    FileType type = FileType.image,
-    List<String>? allowedExtensions,
-    dynamic Function(FilePickerStatus)? onFileLoading,
-    bool allowCompression = true,
-    bool allowMultiple = false,
-    bool withData = false,
-    bool withReadStream = false,
-    bool lockParentWindow = false,
-    AssetPickerConfig pickerConfig = const AssetPickerConfig(),
-  }) async {
-    if (platformParams.desktop) {
-      List<XFile> xfiles = await FileUtil.pickFiles(
-          dialogTitle: dialogTitle,
-          initialDirectory: initialDirectory,
-          allowedExtensions: allowedExtensions,
-          allowCompression: allowCompression,
-          allowMultiple: allowMultiple,
-          withData: withData,
-          withReadStream: withReadStream,
-          lockParentWindow: lockParentWindow,
-          type: FileType.image);
-      return xfiles;
-    } else if (platformParams.mobile && context != null) {
-      List<AssetEntity>? assets =
-          await AssetUtil.pickAssets(context, pickerConfig: pickerConfig);
-      assets = assets ?? [];
-
-      return assets;
-    }
-
-    return [];
-  }
-
   ///所有平台，选择图像，并进行压缩，用于头像
   static Future<Uint8List?> pickAvatar(
     BuildContext? context,

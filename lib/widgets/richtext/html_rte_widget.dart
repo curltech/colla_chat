@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rte/flutter_rte.dart';
 
 ///html_editor_enhanced一样的实现，用于移动和web，但是是用webview实现的
-///所以可以用于其他
+///所以可以用于其他除macos外的平台
 class HtmlRteWidget extends StatefulWidget {
   final double height;
   final String? initialText;

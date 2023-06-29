@@ -246,7 +246,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
       focusNode: _focusNode,
       autoFocus: false,
       readOnly: false,
-      placeholder: AppLocalizations.t('Add content'),
+      // placeholder: AppLocalizations.t('Add content'),
       enableSelectionToolbar: platformParams.mobile,
       expands: false,
       padding: EdgeInsets.zero,
@@ -278,7 +278,6 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
           focusNode: _focusNode,
           autoFocus: false,
           readOnly: false,
-          placeholder: 'Add content',
           expands: false,
           padding: EdgeInsets.zero,
           customStyles: DefaultStyles(
@@ -307,6 +306,14 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
+            platformParams.web
+                ? Expanded(
+                    child: Container(
+                    padding:
+                        const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+                    child: toolbar,
+                  ))
+                : Container(child: toolbar),
             Expanded(
               flex: 15,
               child: Container(
@@ -315,14 +322,6 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
                 child: quillEditor,
               ),
             ),
-            platformParams.web
-                ? Expanded(
-                    child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-                    child: toolbar,
-                  ))
-                : Container(child: toolbar)
           ],
         ));
   }

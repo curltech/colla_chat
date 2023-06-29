@@ -1,5 +1,4 @@
 import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';

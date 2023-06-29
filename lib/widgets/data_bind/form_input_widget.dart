@@ -6,7 +6,6 @@ import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
-import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
 import 'package:provider/provider.dart';
@@ -106,14 +105,6 @@ class FormInputController with ChangeNotifier {
       if (controller.value != value) {
         controller.value = value;
       }
-    }
-  }
-
-  ///外部设置值
-  setMode(String name, ColumnFieldMode mode) {
-    var controller = controllers[name];
-    if (controller != null) {
-      controller.mode = mode;
     }
   }
 }
@@ -239,9 +230,9 @@ class _FormInputWidgetState extends State<FormInputWidget> {
         initValue = widget.initValues![name];
       }
       ColumnFieldController columnFieldController = ColumnFieldController(
-          columnFieldDef,
-          value: initValue,
-          mode: ColumnFieldMode.edit);
+        columnFieldDef,
+        value: initValue,
+      );
       widget.controller
           .setController(columnFieldDef.name, columnFieldController);
       Widget columnFieldWidget = ColumnFieldWidget(
