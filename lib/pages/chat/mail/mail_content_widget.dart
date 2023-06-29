@@ -1,6 +1,7 @@
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/platform_webview.dart';
@@ -86,8 +87,13 @@ class _MailContentWidgetState extends State<MailContentWidget> {
             );
           } else {
             String html = EmailMessageUtil.convertToHtml(mimeMessage);
+            FileUtil.writeTempFile(CryptoUtil.stringToUtf8(html),
+                    extension: 'html')
+                .then((filename) {
+              platformWebViewController!.load(filename);
+            });
+
             mimeMessageViewer = platformWebView!;
-            platformWebViewController!.loadHtml(html);
           }
 
           return mimeMessageViewer;

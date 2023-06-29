@@ -73,7 +73,7 @@ class FileUtil {
       return null;
     }
 
-    return filename;
+    return tempFilename;
   }
 
   ///读文件内容
