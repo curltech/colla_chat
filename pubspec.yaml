@@ -411,7 +411,12 @@ dependency_overrides:
   dio: ^5.0.2 #^4.0.6 openai
   audio_video_progress_bar: ^1.0.0
   pdfx: 2.2.0 #2.3.0在macos下编译错误,web下不能使用
-  printing: ^5.11.0 #所有平台，使用pdf，把一些其他的格式转换成pdf并显示
+  #printing: ^5.11.0 #所有平台，使用pdf，把一些其他的格式转换成pdf并显示，目前windows下有bug
+  #  printing:
+  #    git:
+  #      url: https://github.com/DavBfr/dart_pdf
+  #      ref: master
+  #      path: printing
   pdf: ^3.10.4 #所有平台，创建pdf
   record: ^5.0.0-beta.1
   visibility_detector: ^0.4.0+2 #组建可见性的大小发生变化
