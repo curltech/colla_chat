@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
@@ -34,95 +35,60 @@ class _EnoughHtmlEditorWidgetState extends State<EnoughHtmlEditorWidget> {
     super.initState();
   }
 
-  List<ActionData> _buildActionData() {
-    List<ActionData> actionData = [];
-    actionData.add(
-      ActionData(label: 'Undo', icon: const Icon(Icons.undo)),
-    );
-    actionData.add(
-      ActionData(label: 'Reset', icon: const Icon(Icons.clear)),
-    );
-    actionData.add(
-      ActionData(label: 'Redo', icon: const Icon(Icons.redo)),
-    );
-    actionData.add(
-      ActionData(label: 'Enable', icon: const Icon(Icons.comment_sharp)),
-    );
-    actionData.add(
-      ActionData(label: 'Disable', icon: const Icon(Icons.comments_disabled)),
-    );
-    return actionData;
-  }
-
-  Future<void> _onAction(BuildContext context, int index, String name,
-      {String? value}) async {
-    switch (name) {
-      case 'Undo':
-        break;
-      case 'Reset':
-        break;
-      case 'InsertNetworkImage':
-        break;
-      default:
-        break;
+  Widget _buildHtmlEditorControls() {
+    if (controller == null) {
+      return const PlatformProgressIndicator();
+    } else {
+      return SliverHeaderHtmlEditorControls(
+        editorApi: controller,
+        suffix: Tooltip(
+            message: AppLocalizations.t('Submit'),
+            child: InkWell(
+              onTap: () async {
+                if (widget.onSubmit != null) {
+                  String html = await controller!.getFullHtml();
+                  widget.onSubmit!(html, ChatMessageMimeType.html);
+                }
+              },
+              child: const Icon(
+                Icons.check,
+              ),
+            )),
+      );
     }
   }
 
-  Widget _buildCustomButton() {
-    return Visibility(
-        visible: true,
-        child: Center(
-            child: Card(
-                child: DataActionCard(
-                    onPressed: (int index, String label, {String? value}) {
-                      _onAction(context, index, label, value: value);
-                    },
-                    showLabel: false,
-                    showTooltip: false,
-                    crossAxisCount: 4,
-                    actions: _buildActionData(),
-                    // height: 120,
-                    //width: 320,
-                    size: 20))));
+  HtmlEditor _buildHtmlEditor() {
+    return HtmlEditor(
+      key: UniqueKey(),
+      initialContent: widget.initialText ?? '',
+      minHeight: 200,
+      onCreated: (api) {
+        controller = api;
+        if (widget.initialText != null) {
+          var html = widget.initialText!;
+          controller!.setText(html);
+        }
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 400,
-      child: Column(
-        children: [
-          if (controller == null) ...{
-            const PlatformProgressIndicator(),
-          } else ...{
-            SliverHeaderHtmlEditorControls(
-              editorApi: controller,
-              suffix: Tooltip(
-                  message: AppLocalizations.t('Submit'),
-                  child: InkWell(
-                    onTap: () async {
-                      if (widget.onSubmit != null) {
-                        String html = await controller!.getFullHtml();
-                        widget.onSubmit!(html, ChatMessageMimeType.html);
-                      }
-                    },
-                    child: const Icon(
-                      Icons.check,
-                    ),
-                  )),
+    return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        color: myself.getBackgroundColor(context).withOpacity(0.6),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            _buildHtmlEditorControls(),
+            const SizedBox(
+              height: 10.0,
             ),
-          },
-          Expanded(child: HtmlEditor(
-            key: UniqueKey(),
-            initialContent: widget.initialText ?? '',
-            minHeight: 200,
-            onCreated: (api) {
-              controller = api;
-            },
-          )),
-        ],
-      ),
-    );
+            Expanded(child: _buildHtmlEditor()),
+          ],
+        ));
   }
 
   @override

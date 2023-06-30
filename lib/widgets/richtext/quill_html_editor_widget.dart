@@ -96,6 +96,7 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
     var toolbar = _buildQuillToolbar(context);
     return Container(
         padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        color: myself.getBackgroundColor(context).withOpacity(0.6),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
