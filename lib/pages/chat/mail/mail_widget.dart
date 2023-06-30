@@ -60,12 +60,8 @@ class _MailWidgetState extends State<MailWidget> {
       openRatio: 0.6,
       openScale: 1,
       controller: controller,
-      drawer: widget.mailAddressWidget,
-      child: Card(
-          elevation: 0,
-          margin: EdgeInsets.zero,
-          shape: const ContinuousRectangleBorder(),
-          child: widget.mailListWidget),
+      drawer: open ? widget.mailAddressWidget : Container(),
+      child: widget.mailListWidget,
     );
 
     return advancedDrawer;
@@ -100,7 +96,7 @@ class _MailWidgetState extends State<MailWidget> {
   Widget build(BuildContext context) {
     Widget body;
     if (appDataProvider.smallBreakpoint.isActive(context)) {
-      body = _buildAdvancedDrawer();//_buildDraggableHome();
+      body = _buildAdvancedDrawer(); //_buildDraggableHome();
     } else {
       body = _buildAdvancedDrawer();
     }
