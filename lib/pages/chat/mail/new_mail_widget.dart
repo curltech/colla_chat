@@ -3,7 +3,9 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/tool/document_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -51,8 +53,13 @@ class _NewMailWidgetState extends State<NewMailWidget> {
   _update() {}
 
   /// html编辑完成
-  _onSubmit(String? html, ChatMessageMimeType mimeType) {
-    if (html != null) {
+  _onSubmit(String? content, ChatMessageMimeType mimeType) {
+    if (content != null) {
+      String html = content;
+      if (mimeType == ChatMessageMimeType.json) {
+        List<dynamic> deltaJson = JsonUtil.toJson(content);
+        html = DocumentUtil.jsonToHtml(deltaJson);
+      }
       _addTextHtml(html);
     }
   }
@@ -156,7 +163,7 @@ class _NewMailWidgetState extends State<NewMailWidget> {
   /// 附件显示区
   Widget _buildAttachmentChips(BuildContext context) {
     return Container(
-        color: Colors.grey,
+        color: myself.getBackgroundColor(context).withOpacity(0.6),
         height: 100,
         child: ValueListenableBuilder(
             valueListenable: attachmentPartBuilders,

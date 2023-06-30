@@ -179,6 +179,7 @@ class PrimaryNavigation {
             //inAnimation: AdaptiveScaffold.leftOutIn,
             builder: (_) {
               return AdaptiveScaffold.standardNavigationRail(
+                backgroundColor: Colors.black.withOpacity(0.0),
                 width: appDataProvider.primaryNavigationWidth,
                 selectedIndex: indexWidgetProvider.currentMainIndex,
                 onDestinationSelected: (int index) {

@@ -1,9 +1,7 @@
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:flutter/material.dart';
 import 'package:quill_html_editor/quill_html_editor.dart';
 
@@ -12,14 +10,16 @@ class QuillHtmlEditorWidget extends StatefulWidget {
   final double height;
   final String? initialText;
   final ChatMessageMimeType mimeType;
+  final bool withMultiMedia;
   final Function(String? result, ChatMessageMimeType mimeType)? onSubmit;
 
   const QuillHtmlEditorWidget({
     Key? key,
     required this.height,
     this.initialText,
-    this.mimeType = ChatMessageMimeType.html,
+    this.mimeType = ChatMessageMimeType.json,
     this.onSubmit,
+    this.withMultiMedia = false,
   }) : super(key: key);
 
   @override
@@ -27,12 +27,13 @@ class QuillHtmlEditorWidget extends StatefulWidget {
 }
 
 class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
-  late final QuillEditorController controller;
+  final QuillEditorController controller = QuillEditorController();
 
   @override
   void initState() {
     super.initState();
-    controller = QuillEditorController();
+
+    ///初始化数据的是json和html格式则可以编辑
     if (widget.initialText != null) {
       if (widget.mimeType == ChatMessageMimeType.json) {
         var delta = JsonUtil.toJson(widget.initialText!);
@@ -42,148 +43,77 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
         controller.setText(widget.initialText!);
       }
     }
-    controller.onTextChanged((text) {
-      debugPrint('listening to $text');
-    });
   }
 
-  Widget _buildToolBar() {
-    return SizedBox(
-        child: ToolBar.scroll(
-      toolBarColor: Colors.grey,
-      padding: const EdgeInsets.all(8),
-      iconSize: 25,
-      iconColor: Colors.black,
-      activeIconColor: myself.primary,
-      controller: controller,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      //direction: Axis.vertical,
-      customButtons: [
-        Tooltip(
-            message: AppLocalizations.t('Submit'),
-            child: InkWell(
-                onTap: () async {
-                  if (widget.onSubmit != null) {
-                    String html = await controller.getText();
-                    widget.onSubmit!(html, ChatMessageMimeType.html);
-                  }
-                },
-                child: const Icon(
-                  Icons.check,
-                ))),
-      ],
-    ));
+  Widget _buildQuillToolbar(BuildContext context) {
+    List<ToolBarStyle> toolBarConfig = [];
+    for (ToolBarStyle toolBarStyle in ToolBarStyle.values) {
+      if (widget.withMultiMedia ||
+          (toolBarStyle != ToolBarStyle.link &&
+              toolBarStyle != ToolBarStyle.image &&
+              toolBarStyle != ToolBarStyle.video)) {
+        toolBarConfig.add(toolBarStyle);
+      }
+    }
+    var customButtons = [
+      Tooltip(
+          message: AppLocalizations.t('Submit'),
+          child: InkWell(
+              onTap: () async {
+                if (widget.onSubmit != null) {
+                  String html = await controller.getText();
+                  widget.onSubmit!(html, ChatMessageMimeType.html);
+
+                  // var delta = await controller.getDelta();
+                  // String deltaJson = JsonUtil.toJsonString(delta);
+                  // widget.onSubmit!(deltaJson, ChatMessageMimeType.json);
+                }
+              },
+              child: const Icon(
+                Icons.check,
+              ))),
+    ];
+    return ToolBar(
+        toolBarColor: Colors.white,
+        padding: const EdgeInsets.all(8),
+        iconSize: 25,
+        iconColor: Colors.black,
+        activeIconColor: myself.primary,
+        controller: controller,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        toolBarConfig: toolBarConfig,
+        customButtons: customButtons);
   }
 
-  Widget _buildQuillHtmlEditor() {
-    return QuillHtmlEditor(
-      text: "",
-      hintText: 'Hint text goes here',
+  Widget _buildQuillHtmlEditor(BuildContext context) {
+    Widget quillHtmlEditor = QuillHtmlEditor(
       controller: controller,
       isEnabled: true,
-      minHeight: 500,
-      textStyle: const TextStyle(
-          fontSize: 18, color: Colors.black, fontWeight: FontWeight.normal),
-      hintTextStyle: const TextStyle(
-          fontSize: 18, color: Colors.black12, fontWeight: FontWeight.normal),
+      minHeight: 200,
       hintTextAlign: TextAlign.start,
-      padding: const EdgeInsets.only(left: 10, top: 10),
-      hintTextPadding: const EdgeInsets.only(left: 20),
-      backgroundColor: Colors.white,
-      onFocusChanged: (hasFocus) => logger.i('has focus $hasFocus'),
-      onTextChanged: (text) => logger.i('widget text change $text'),
-      onEditorCreated: () async {
-        logger.i('Editor has been loaded');
-        await controller.setText('Testing text on load');
-      },
-      onEditorResized: (height) => logger.i('Editor resized $height'),
-      onSelectionChanged: (sel) =>
-          logger.i('index ${sel.index}, range ${sel.length}'),
+      backgroundColor: myself.getBackgroundColor(context).withOpacity(0.6),
     );
-  }
-
-  List<ActionData> _buildActionData() {
-    List<ActionData> actionData = [];
-    actionData.add(
-      ActionData(label: 'Undo', icon: const Icon(Icons.undo)),
-    );
-    actionData.add(
-      ActionData(label: 'Reset', icon: const Icon(Icons.clear)),
-    );
-    actionData.add(
-      ActionData(label: 'Redo', icon: const Icon(Icons.redo)),
-    );
-    actionData.add(
-      ActionData(label: 'Enable', icon: const Icon(Icons.comment_sharp)),
-    );
-    actionData.add(
-      ActionData(label: 'Disable', icon: const Icon(Icons.comments_disabled)),
-    );
-    return actionData;
-  }
-
-  Future<void> _onAction(BuildContext context, int index, String name,
-      {String? value}) async {
-    switch (name) {
-      case 'Undo':
-        controller.undo();
-        break;
-      case 'Reset':
-        controller.clear();
-        break;
-      case 'Redo':
-        controller.redo();
-        break;
-      case 'Enable':
-        controller.enableEditor(true);
-        break;
-      case 'Disable':
-        controller.enableEditor(false);
-        break;
-      case 'InsertText':
-        controller.insertText('');
-        break;
-      case 'InsertHtml':
-        controller.insertText('');
-        break;
-      case 'InsertNetworkImage':
-        controller.embedImage('');
-        break;
-      case 'InsertNetworkVideo':
-        controller.embedVideo('');
-        break;
-      default:
-        break;
-    }
-  }
-
-  Widget _buildCustomButton() {
-    return Visibility(
-        visible: true,
-        child: Center(
-            child: Card(
-                child: DataActionCard(
-                    onPressed: (int index, String label, {String? value}) {
-                      _onAction(context, index, label, value: value);
-                    },
-                    showLabel: false,
-                    showTooltip: false,
-                    crossAxisCount: 4,
-                    actions: _buildActionData(),
-                    // height: 120,
-                    //width: 320,
-                    size: 20))));
+    var toolbar = _buildQuillToolbar(context);
+    return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            toolbar,
+            const SizedBox(
+              height: 10.0,
+            ),
+            Expanded(
+              child: quillHtmlEditor,
+            ),
+          ],
+        ));
   }
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.start,
-      children: <Widget>[
-        _buildToolBar(),
-        Expanded(child: _buildQuillHtmlEditor()),
-      ],
-    );
+    return _buildQuillHtmlEditor(context);
   }
 
   @override

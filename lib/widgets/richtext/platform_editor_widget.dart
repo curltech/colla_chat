@@ -31,7 +31,7 @@ class _PlatformEditorWidgetState extends State<PlatformEditorWidget> {
 
   @override
   Widget build(BuildContext context) {
-    if (platformParams.macos) {
+    if (platformParams.desktop) {
       return QuillEditorWidget(
         height: widget.height,
         initialText: widget.initialText,

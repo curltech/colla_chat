@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/document_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
@@ -17,11 +16,13 @@ import 'package:flutter_quill/flutter_quill.dart';
 import 'package:flutter_quill_extensions/flutter_quill_extensions.dart';
 import 'package:path_provider/path_provider.dart';
 
-///quill_editor一样的实现，用于IOS,LINUX,MACOS,WINDOWS
+///quill_editor的实现，用于IOS,LINUX,MACOS,WINDOWS桌面平台
+///编辑的时候是quill可识别的json格式，完成后可转换成html格式，就不可以再编辑了
 class QuillEditorWidget extends StatefulWidget {
   final double height;
   final String? initialText;
   final ChatMessageMimeType mimeType;
+  final bool withMultiMedia;
   final Function(String? result, ChatMessageMimeType mimeType)? onSubmit;
 
   const QuillEditorWidget({
@@ -30,6 +31,7 @@ class QuillEditorWidget extends StatefulWidget {
     this.initialText,
     this.onSubmit,
     this.mimeType = ChatMessageMimeType.json,
+    this.withMultiMedia = false,
   }) : super(key: key);
 
   @override
@@ -44,6 +46,8 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
   @override
   void initState() {
     super.initState();
+
+    ///初始化数据的是json格式则可以编辑
     if (widget.initialText != null) {
       try {
         if (widget.mimeType == ChatMessageMimeType.json) {
@@ -191,6 +195,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
       );
 
   Widget _buildQuillToolbar(BuildContext context) {
+    ///定制提交按钮
     var customButtons = <QuillCustomButton>[
       QuillCustomButton(
           icon: Icons.check,
@@ -202,38 +207,35 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
           },
           tooltip: AppLocalizations.t('Submit')),
     ];
-    var toolbar = QuillToolbar.basic(
-      locale: myself.locale,
-      controller: controller,
-      toolbarIconAlignment: WrapAlignment.start,
-      toolbarIconCrossAlignment: WrapCrossAlignment.start,
-      embedButtons: FlutterQuillEmbeds.buttons(
+    List<
+            Widget Function(
+                QuillController, double, QuillIconTheme?, QuillDialogTheme?)>?
+        embedButtons;
+    if (widget.withMultiMedia) {
+      embedButtons = FlutterQuillEmbeds.buttons(
         onImagePickCallback: _onMediaPickCallback,
         onVideoPickCallback: _onMediaPickCallback,
         // uncomment to provide a custom "pick from" dialog.
         // mediaPickSettingSelector: _selectMediaPickSetting,
         // uncomment to provide a custom "pick from" dialog.
         // cameraPickSettingSelector: _selectCameraPickSetting,
-      ),
+      );
+    }
+    var toolbar = QuillToolbar.basic(
+      locale: myself.locale,
+      controller: controller,
+      toolbarIconAlignment: WrapAlignment.start,
+      toolbarIconCrossAlignment: WrapCrossAlignment.start,
+      toolbarSectionSpacing: 1,
+      sectionDividerSpace: 1,
+      multiRowsDisplay: true,
+      showLink: false,
+      embedButtons: embedButtons,
       customButtons: customButtons,
       showAlignmentButtons: true,
       afterButtonPressed: _focusNode.requestFocus,
     );
-    if (platformParams.web) {
-      toolbar = QuillToolbar.basic(
-        locale: myself.locale,
-        controller: controller,
-        toolbarIconAlignment: WrapAlignment.start,
-        toolbarIconCrossAlignment: WrapCrossAlignment.start,
-        embedButtons: FlutterQuillEmbeds.buttons(
-          onImagePickCallback: _onMediaPickCallback,
-          webImagePickImpl: _webImagePickImpl,
-        ),
-        customButtons: customButtons,
-        showAlignmentButtons: true,
-        afterButtonPressed: _focusNode.requestFocus,
-      );
-    }
+
     return toolbar;
   }
 
@@ -246,83 +248,36 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
       focusNode: _focusNode,
       autoFocus: false,
       readOnly: false,
-      // placeholder: AppLocalizations.t('Add content'),
-      enableSelectionToolbar: platformParams.mobile,
+      enableSelectionToolbar: true,
       expands: false,
       padding: EdgeInsets.zero,
       onImagePaste: _onImagePaste,
-      customStyles: DefaultStyles(
-        h1: DefaultTextBlockStyle(
-            const TextStyle(
-              fontSize: 32,
-              color: Colors.black,
-              height: 1.15,
-              fontWeight: FontWeight.w300,
-            ),
-            const VerticalSpacing(16, 0),
-            const VerticalSpacing(0, 0),
-            null),
-        sizeSmall: const TextStyle(fontSize: 9),
-      ),
       embedBuilders: [
         ...FlutterQuillEmbeds.builders(),
         NotesEmbedBuilder(addEditNote: _addEditNote)
       ],
     );
-    if (platformParams.web) {
-      quillEditor = QuillEditor(
-          locale: myself.locale,
-          controller: controller,
-          scrollController: ScrollController(),
-          scrollable: true,
-          focusNode: _focusNode,
-          autoFocus: false,
-          readOnly: false,
-          expands: false,
-          padding: EdgeInsets.zero,
-          customStyles: DefaultStyles(
-            h1: DefaultTextBlockStyle(
-                const TextStyle(
-                  fontSize: 32,
-                  color: Colors.black,
-                  height: 1.15,
-                  fontWeight: FontWeight.w300,
-                ),
-                const VerticalSpacing(16, 0),
-                const VerticalSpacing(0, 0),
-                null),
-            sizeSmall: const TextStyle(fontSize: 9),
-          ),
-          embedBuilders: [
-            NotesEmbedBuilder(addEditNote: _addEditNote),
-          ]);
-    }
     var toolbar = _buildQuillToolbar(context);
 
     return Card(
+        color: myself.getBackgroundColor(context).withOpacity(0.6),
         elevation: 0.0,
         margin: EdgeInsets.zero,
         shape: const ContinuousRectangleBorder(),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: <Widget>[
-            platformParams.web
-                ? Expanded(
-                    child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-                    child: toolbar,
-                  ))
-                : Container(child: toolbar),
-            Expanded(
-              flex: 15,
-              child: Container(
-                color: Colors.white,
-                padding: const EdgeInsets.only(left: 16, right: 16),
-                child: quillEditor,
-              ),
-            ),
-          ],
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10.0),
+          child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                toolbar,
+                const SizedBox(
+                  height: 10.0,
+                ),
+                Expanded(
+                  child: quillEditor,
+                ),
+              ]),
         ));
   }
 

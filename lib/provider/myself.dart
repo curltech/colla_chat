@@ -324,6 +324,14 @@ class Myself with ChangeNotifier {
     }
   }
 
+  Color getBackgroundColor(BuildContext context) {
+    Brightness brightness = getBrightness(context);
+    if (brightness == Brightness.light) {
+      return Colors.white;
+    }
+    return Colors.black;
+  }
+
   String get myPath {
     return p.join(platformParams.path, name ?? '');
   }

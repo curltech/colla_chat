@@ -406,5 +406,18 @@
   "Auto discover failure": "自动发现失败",
   "Auto discovery config is null": "自动发现配置为空",
   "MailAddressAutoDiscover": "邮件地址自动发现",
-  "MailAddressManualAdd": "邮件地址手工添加"
+  "MailAddressManualAdd": "邮件地址手工添加",
+  "INBOX": "收件箱",
+  "DRAFTS": "草稿箱",
+  "SENT": "已发送",
+  "TRASH": "已删除",
+  "JUNK": "垃圾邮件",
+  "MARK": "标记邮件",
+  "BACKUP": "备份邮件",
+  "ADS": "广告邮件",
+  "VIRUS": "病毒文件夹",
+  "SUBSCRIPT": "订阅邮件",
+  "Receipt": "收件人",
+  "Subject": "主题",
+  "Submit": "提交"
 }
