@@ -18,12 +18,17 @@ class _MailListWidgetState extends State<MailListWidget> {
   @override
   initState() {
     mailAddressController.addListener(_update);
-    mailAddressController.findMoreMimeMessages();
     super.initState();
+    mailAddressController.findMoreMimeMessages();
   }
 
   _update() {
-    setState(() {});
+    setState(() {
+      var currentMimeMessages = mailAddressController.currentMimeMessages;
+      if (currentMimeMessages == null || currentMimeMessages.isEmpty) {
+        mailAddressController.findMoreMimeMessages();
+      }
+    });
   }
 
   _onTap(int index, String title, {String? subtitle, TileData? group}) {
@@ -34,6 +39,7 @@ class _MailListWidgetState extends State<MailListWidget> {
   List<TileData> _convertMimeMessage(List<MimeMessage> mimeMessages) {
     List<TileData> tiles = [];
     if (mimeMessages.isNotEmpty) {
+      int i = 0;
       for (var mimeMessage in mimeMessages) {
         var title = mimeMessage.envelope?.subject;
         var subtitle = mimeMessage.envelope?.sender?.personalName;
@@ -49,8 +55,10 @@ class _MailListWidgetState extends State<MailListWidget> {
         TileData tile = TileData(
             title: title ?? '',
             titleTail: titleTail,
-            subtitle: subtitle.toString());
+            subtitle: subtitle.toString(),
+            selected: mailAddressController.currentMailIndex == i);
         tiles.add(tile);
+        i++;
       }
     }
 
@@ -62,7 +70,8 @@ class _MailListWidgetState extends State<MailListWidget> {
         mailAddressController.currentMimeMessages;
     if (currentMimeMessages != null) {
       var tiles = _convertMimeMessage(currentMimeMessages);
-      var dataListView = DataListView(onTap: _onTap, tileData: tiles);
+      var dataListView =
+          DataListView(reverse: true, onTap: _onTap, tileData: tiles);
 
       return dataListView;
     }

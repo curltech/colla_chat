@@ -1,18 +1,12 @@
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/mailaddress.dart' as entity;
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
 import 'package:colla_chat/service/chat/mailaddress.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/material.dart';
-
-class CommonMailBox {
-  final String name;
-  final IconData iconData;
-
-  const CommonMailBox(this.name, this.iconData);
-}
 
 /// 邮件地址控制器，每个地址有多个邮箱，每个邮箱包含多个邮件
 class MailAddressController extends DataListController<entity.MailAddress> {
@@ -27,27 +21,43 @@ class MailAddressController extends DataListController<entity.MailAddress> {
       _addressMimeMessages = {};
 
   ///当前的邮箱名称
-  String _currentMailboxName = '';
+  String? _currentMailboxName;
 
   ///当前的邮件
   int _currentMailIndex = -1;
 
+  final Map<String, IconData> _mailBoxIcons = {};
+
   ///常用的邮箱名称
-  static const List<CommonMailBox> mailBoxes = [
-    CommonMailBox('inbox', Icons.inbox),
-    CommonMailBox('drafts', Icons.drafts),
-    CommonMailBox('sent', Icons.send),
-    CommonMailBox('trash', Icons.delete),
-    CommonMailBox('junk', Icons.garage),
-    CommonMailBox('mark', Icons.flag),
-    CommonMailBox('backup', Icons.backup),
-    CommonMailBox('ads', Icons.ads_click),
-    CommonMailBox('virus', Icons.coronavirus),
-    CommonMailBox('subscript', Icons.subscript),
-  ];
+  static const Map<String, IconData> mailBoxeIcons = {
+    'INBOX': Icons.inbox,
+    'DRAFTS': Icons.drafts,
+    'SENT': Icons.send,
+    'TRASH': Icons.delete,
+    'JUNK': Icons.garage,
+    'MARK': Icons.flag,
+    'BACKUP': Icons.backup,
+    'ADS': Icons.ads_click,
+    'VIRUS': Icons.coronavirus,
+    'SUBSCRIPT': Icons.subscript,
+  };
 
   ///构造函数从数据库获取所有的邮件地址，初始化邮箱数据
-  MailAddressController();
+  MailAddressController() {
+    for (var mailBoxeIcon in mailBoxeIcons.entries) {
+      String name = mailBoxeIcon.key;
+      String localeName = AppLocalizations.t(name);
+      _mailBoxIcons[name] = mailBoxeIcon.value;
+      _mailBoxIcons[localeName] = mailBoxeIcon.value;
+    }
+  }
+
+  ///创建邮件地址的目录的图标
+  IconData? findDirectoryIcon(String name) {
+    IconData? iconData = _mailBoxIcons[name];
+
+    return iconData ?? Icons.folder;
+  }
 
   ///以下是与邮件地址相关的部分
   ///重新获取所有的邮件地址实体，对没有连接的进行连接，设置缺省邮件地址
@@ -64,18 +74,22 @@ class MailAddressController extends DataListController<entity.MailAddress> {
         }
       }
     }
-    notifyListeners();
+    if (data.isNotEmpty) {
+      currentIndex = 0;
+    } else {
+      currentIndex = -1;
+    }
   }
 
   ///以下是与邮件邮箱相关的部分
 
-  ///当前邮箱
-  String get currentMailboxName {
+  ///当前邮箱名称
+  String? get currentMailboxName {
     return _currentMailboxName;
   }
 
   ///设置当前邮箱名称
-  set currentMailboxName(String currentMailboxName) {
+  set currentMailboxName(String? currentMailboxName) {
     if (_currentMailboxName != currentMailboxName) {
       _currentMailboxName = currentMailboxName;
       notifyListeners();
@@ -120,13 +134,18 @@ class MailAddressController extends DataListController<entity.MailAddress> {
       _addressMimeMessages[email] = addressMimeMessages;
     }
     Map<String, enough_mail.Mailbox> mailboxMap = {};
-    for (var mailbox in mailboxes) {
-      if (mailbox != null) {
-        mailboxMap[mailbox.name] = mailbox;
-        if (!addressMimeMessages.containsKey(mailbox.name)) {
-          addressMimeMessages[mailbox.name] = <enough_mail.MimeMessage>[];
+    if (mailboxes.isNotEmpty) {
+      for (var mailbox in mailboxes) {
+        if (mailbox != null) {
+          mailboxMap[mailbox.name] = mailbox;
+          if (!addressMimeMessages.containsKey(mailbox.name)) {
+            addressMimeMessages[mailbox.name] = <enough_mail.MimeMessage>[];
+          }
         }
       }
+      _currentMailboxName = mailboxes.first?.name;
+    } else {
+      _currentMailboxName = null;
     }
     _addressMailboxes[email] = mailboxMap;
     if (listen) {
@@ -227,7 +246,7 @@ class MailAddressController extends DataListController<entity.MailAddress> {
               fetchPreference: fetchPreference);
       if (mimeMessages != null && mimeMessages.isNotEmpty) {
         currentMimeMessages.addAll(mimeMessages);
-        notifyListeners();
+        currentMailIndex = currentMimeMessages.length - 1;
       }
     }
   }

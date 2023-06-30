@@ -1,13 +1,17 @@
-import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/mail/mail_address_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_content_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_list_widget.dart';
 import 'package:colla_chat/pages/chat/mail/new_mail_widget.dart';
+import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:draggable_home/draggable_home.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_advanced_drawer/flutter_advanced_drawer.dart';
+import 'package:sliding_up_panel2/sliding_up_panel2.dart';
 
 ///邮件应用总体视图，由三个子视图组成
 ///第一个是邮件地址视图，列出邮件地址的列表和邮件地址下的目录结构
@@ -19,7 +23,6 @@ class MailWidget extends StatefulWidget with TileDataMixin {
   final MailListWidget mailListWidget = const MailListWidget();
   final MailContentWidget mailContentWidget = const MailContentWidget();
   final NewMailWidget newMailWidget = const NewMailWidget();
-  final SwiperController controller = SwiperController();
 
   MailWidget({Key? key}) : super(key: key) {
     indexWidgetProvider.define(mailContentWidget);
@@ -43,39 +46,74 @@ class MailWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _MailWidgetState extends State<MailWidget> {
+  final AdvancedDrawerController controller = AdvancedDrawerController();
+  bool open = false;
+
   @override
   initState() {
-    widget.controller.addListener(_update);
     super.initState();
   }
 
-  _update() {
-    setState(() {});
+  AdvancedDrawer _buildAdvancedDrawer() {
+    AdvancedDrawer advancedDrawer = AdvancedDrawer(
+      backdropColor: Colors.white.withOpacity(0),
+      openRatio: 0.6,
+      openScale: 1,
+      controller: controller,
+      drawer: widget.mailAddressWidget,
+      child: Card(
+          elevation: 0,
+          margin: EdgeInsets.zero,
+          shape: const ContinuousRectangleBorder(),
+          child: widget.mailListWidget),
+    );
+
+    return advancedDrawer;
+  }
+
+  SlidingUpPanel _buildSlidingUpPanel() {
+    SlidingUpPanel slidingUpPanel = SlidingUpPanel(
+      panelBuilder: () {
+        return widget.mailListWidget;
+      },
+      body: widget.mailAddressWidget,
+    );
+
+    return slidingUpPanel;
+  }
+
+  DraggableHome _buildDraggableHome() {
+    DraggableHome draggableHome = DraggableHome(
+      fullyStretchable: true,
+      title: const Text('Title'),
+      leading: const Icon(Icons.arrow_back_ios),
+      expandedBody: const Text('Expanded Body'),
+      headerBottomBar: const Text('HeaderBottomBar'),
+      headerWidget: widget.mailListWidget,
+      body: [widget.mailAddressWidget],
+    );
+
+    return draggableHome;
   }
 
   @override
   Widget build(BuildContext context) {
-    var view = Swiper(
-        itemCount: 2,
-        controller: widget.controller,
-        itemBuilder: (BuildContext context, int index) {
-          if (index == 0) {
-            return widget.mailAddressWidget;
-          }
-          if (index == 1) {
-            return widget.mailListWidget;
-          }
-          return Container();
-        });
+    Widget body;
+    if (appDataProvider.smallBreakpoint.isActive(context)) {
+      body = _buildAdvancedDrawer();//_buildDraggableHome();
+    } else {
+      body = _buildAdvancedDrawer();
+    }
     List<Widget> rightWidgets = [
       IconButton(
           onPressed: () {
-            widget.controller.index = widget.controller.index == 0 ? 1 : 0;
-            widget.controller.next();
+            controller.toggleDrawer();
+            open = !open;
+            setState(() {});
           },
           icon: const Icon(Icons.menu)),
     ];
-    if (widget.controller.index == 0) {
+    if (open) {
       rightWidgets.add(IconButton(
           onPressed: () {
             indexWidgetProvider.push('mail_address_auto_discover');
@@ -88,8 +126,7 @@ class _MailWidgetState extends State<MailWidget> {
           },
           icon: const Icon(Icons.handyman),
           tooltip: AppLocalizations.t('Manual add address')));
-    }
-    if (widget.controller.index == 1) {
+    } else {
       rightWidgets.add(IconButton(
           onPressed: () {
             indexWidgetProvider.push('new_mail');
@@ -97,18 +134,18 @@ class _MailWidgetState extends State<MailWidget> {
           icon: const Icon(Icons.edit_note),
           tooltip: AppLocalizations.t('New mail')));
     }
+
     var appBarView = AppBarView(
-        title: widget.controller.index == 0 ? 'Mail address' : 'Mail list',
+        title: open ? 'Mail address' : 'Mail list',
         withLeading: widget.withLeading,
         rightWidgets: rightWidgets,
-        child: view);
+        child: body);
 
     return appBarView;
   }
 
   @override
   void dispose() {
-    widget.controller.removeListener(_update);
     super.dispose();
   }
 }

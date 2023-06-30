@@ -67,6 +67,7 @@ class AppDataProvider with ChangeNotifier {
   static const double smallBreakpointLimit = 600;
   static const double largeBreakpointLimit = 1000;
 
+  ///横屏
   bool get landscape {
     return _totalSize.width >= smallBreakpointLimit;
   }

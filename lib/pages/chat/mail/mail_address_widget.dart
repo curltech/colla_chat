@@ -34,16 +34,6 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
     setState(() {});
   }
 
-  ///创建邮件地址的目录的图标
-  IconData? _createDirectoryIcon(String name) {
-    for (var mailBox in MailAddressController.mailBoxes) {
-      if (mailBox.name == name) {
-        return mailBox.iconData;
-      }
-    }
-    return Icons.folder;
-  }
-
   _onTap(int index, String title, {String? subtitle, TileData? group}) {
     int i = 0;
     for (MailAddress mailAddress in mailAddressController.data) {
@@ -60,30 +50,31 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
     Map<TileData, List<TileData>> mailAddressTileData = {};
     var mailAddresses = mailAddressController.data;
     if (mailAddresses.isNotEmpty) {
+      int i = 0;
       for (var mailAddress in mailAddresses) {
-        TileData key =
-            TileData(title: mailAddress.email, subtitle: mailAddress.name);
+        TileData groupTile = TileData(
+            title: mailAddress.email,
+            subtitle: mailAddress.name,
+            selected: mailAddressController.currentIndex == i);
         List<TileData> tiles = [];
         List<enough_mail.Mailbox?>? mailboxes =
             mailAddressController.getMailboxes(mailAddress.email);
         if (mailboxes != null && mailboxes.isNotEmpty) {
+          String? currentMailboxName = mailAddressController.currentMailboxName;
           for (var mailbox in mailboxes) {
             if (mailbox != null) {
-              Icon icon;
-              var flags = mailbox.flags;
-              if (flags.isNotEmpty) {
-                enough_mail.MailboxFlag flag = flags[0];
-                icon = Icon(_createDirectoryIcon(flag.name));
-              } else {
-                icon = Icon(_createDirectoryIcon(mailbox.name));
-              }
-              TileData tile = TileData(title: mailbox.name, prefix: icon);
+              Icon icon =
+                  Icon(mailAddressController.findDirectoryIcon(mailbox.name));
+              TileData tile = TileData(
+                  title: mailbox.name,
+                  prefix: icon,
+                  selected: currentMailboxName == mailbox.name);
               tiles.add(tile);
             }
           }
-          mailAddressController.currentMailboxName = mailboxes.first!.name;
         }
-        mailAddressTileData[key] = tiles;
+        mailAddressTileData[groupTile] = tiles;
+        i++;
       }
     }
     var mailAddressWidget = GroupDataListView(

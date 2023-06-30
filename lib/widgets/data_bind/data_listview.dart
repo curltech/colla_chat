@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 ///外部可能有ListView或者PageView等滚动视图，所以shrinkWrap: true,
 class DataListView extends StatefulWidget {
   final TileData? group;
+  final bool reverse;
   late final DataListController<TileData> controller;
   final ScrollController scrollController = ScrollController();
   final Function()? onScrollMax;
@@ -28,6 +29,7 @@ class DataListView extends StatefulWidget {
       int? currentIndex,
       DataListController<TileData>? controller,
       this.group,
+      this.reverse = false,
       this.onScrollMax,
       this.onScrollMin,
       this.onRefresh,
@@ -120,6 +122,7 @@ class _DataListViewState extends State<DataListView> {
             //该属性将决定列表的长度是否仅包裹其内容的长度。
             // 当 ListView 嵌在一个无限长的容器组件中时， shrinkWrap 必须为true
             shrinkWrap: true,
+            reverse: widget.reverse,
             itemCount: widget.controller.length,
             //physics: const NeverScrollableScrollPhysics(),
             controller: widget.scrollController,
