@@ -110,13 +110,13 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
             limit: limit);
       } else if (_chatSummary!.partyType == PartyType.group.name) {
         chatMessages = await chatMessageService.findByPeerId(
-            groupPeerId: _chatSummary!.peerId!,
+            groupId: _chatSummary!.peerId!,
             messageType: ChatMessageType.chat.name,
             offset: data.length,
             limit: limit);
       } else if (_chatSummary!.partyType == PartyType.conference.name) {
         chatMessages = await chatMessageService.findByPeerId(
-            groupPeerId: _chatSummary!.peerId!,
+            groupId: _chatSummary!.peerId!,
             messageType: ChatMessageType.chat.name,
             offset: data.length,
             limit: limit);
@@ -157,13 +157,13 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
             limit: limit);
       } else if (_chatSummary!.partyType == PartyType.group.name) {
         chatMessages = await chatMessageService.findByGreaterId(
-            groupPeerId: _chatSummary!.peerId!,
+            groupId: _chatSummary!.peerId!,
             messageType: ChatMessageType.chat.name,
             sendTime: sendTime,
             limit: limit);
       } else if (_chatSummary!.partyType == PartyType.conference.name) {
         chatMessages = await chatMessageService.findByGreaterId(
-            groupPeerId: _chatSummary!.peerId!,
+            groupId: _chatSummary!.peerId!,
             messageType: ChatMessageType.chat.name,
             sendTime: sendTime,
             limit: limit);
@@ -242,7 +242,8 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
           deleteTime: _deleteTime,
           parentMessageId: _parentMessageId);
       if (chatGPT == null) {
-        returnChatMessage = await chatMessageService.sendAndStore(chatMessage);
+        returnChatMessage =
+            (await chatMessageService.sendAndStore(chatMessage)).first;
       } else {
         await chatMessageService.store(chatMessage);
         returnChatMessage = chatMessage;
@@ -262,23 +263,20 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
         }
       }
     } else {
-      List<ChatMessage> chatMessages =
-          await chatMessageService.buildGroupChatMessage(peerId, type,
-              title: title,
-              content: content,
-              contentType: contentType,
-              mimeType: mimeType,
-              messageId: messageId,
-              messageType: messageType,
-              subMessageType: subMessageType,
-              transportType: transportType,
-              peerIds: peerIds,
-              deleteTime: _deleteTime,
-              parentMessageId: _parentMessageId);
-      for (var chatMessage in chatMessages) {
-        await chatMessageService.sendAndStore(chatMessage);
-      }
-      returnChatMessage = chatMessages[0];
+      ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
+          peerId, type,
+          title: title,
+          content: content,
+          contentType: contentType,
+          mimeType: mimeType,
+          messageId: messageId,
+          messageType: messageType,
+          subMessageType: subMessageType,
+          transportType: transportType,
+          deleteTime: _deleteTime,
+          parentMessageId: _parentMessageId);
+      await chatMessageService.sendAndStore(chatMessage, peerIds: peerIds);
+      returnChatMessage = chatMessage;
     }
     _deleteTime = 0;
     _parentMessageId = null;
@@ -318,6 +316,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     }
   }
 
+  ///接收到chatGPT的消息回复
   ChatMessage buildChatGPTMessage(
     dynamic content, {
     String? senderPeerId,
@@ -338,6 +337,8 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     var current = DateUtil.currentDate();
     chatMessage.sendTime = current;
     chatMessage.readTime = current;
+
+    ///把消息的接收者填写成自己myself
     chatMessage.receiverPeerId = myself.peerId;
     chatMessage.receiverType = PartyType.linkman.name;
     chatMessage.receiverClientId = myself.clientId;
@@ -357,6 +358,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
     chatMessage.deleteTime = deleteTime;
     chatMessage.parentMessageId = parentMessageId;
     chatMessage.id = null;
+
     return chatMessage;
   }
 

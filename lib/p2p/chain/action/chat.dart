@@ -1,4 +1,5 @@
 import 'package:colla_chat/entity/p2p/chain_message.dart';
+import 'package:colla_chat/entity/p2p/security_context.dart';
 import 'package:colla_chat/p2p/chain/baseaction.dart';
 
 ///普通发送和接受消息的Action，服务器端支持根据目标peerId进行转发

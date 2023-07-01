@@ -589,17 +589,13 @@ class PeerConnectionPool {
   }
 
   /// 向peer发送信息，如果是多个，遍历发送
-  /// 发送数据，带加密选项，传入数据为对象，先转换成json字符串，然后utf-8，再加密，最后发送
-  Future<bool> send(String peerId, dynamic data,
-      {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
+  Future<bool> send(String peerId, List<int> data) async {
     List<AdvancedPeerConnection> peerConnections = get(peerId);
     if (peerConnections.isNotEmpty) {
       List<Future<bool>> ps = [];
-      //logger.w('send signal:${peerConnections.length}');
       for (var peerConnection in peerConnections) {
         if (peerConnection.status == PeerConnectionStatus.connected) {
-          Future<bool> p =
-              peerConnection.send(data, cryptoOption: cryptoOption);
+          Future<bool> p = peerConnection.send(data);
           //logger.w('send signal');
           ps.add(p);
         }

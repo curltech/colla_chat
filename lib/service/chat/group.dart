@@ -206,17 +206,16 @@ class GroupService extends PeerPartyService<Group> {
   ///向联系人发送加群的消息，群成员在group的participants中
   ///发送的目标在peerIds参数中，如果peerIds为空，则在group的participants中
   addGroup(Group group, {List<String>? peerIds}) async {
-    List<ChatMessage> chatMessages =
-        await chatMessageService.buildGroupChatMessage(
+    ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
       group.peerId,
       PartyType.group,
       content: group,
       subMessageType: ChatMessageSubType.addGroup,
+    );
+    await chatMessageService.sendAndStore(
+      chatMessage,
       peerIds: peerIds,
     );
-    for (var chatMessage in chatMessages) {
-      await chatMessageService.sendAndStore(chatMessage);
-    }
   }
 
   ///接收加群的消息，自动完成加群，发送回执
@@ -241,17 +240,16 @@ class GroupService extends PeerPartyService<Group> {
 
   ///向群成员发送群属性变化的消息
   modifyGroup(Group group, {List<String>? peerIds}) async {
-    List<ChatMessage> chatMessages =
-        await chatMessageService.buildGroupChatMessage(
+    ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
       group.peerId,
       PartyType.group,
       content: group,
       subMessageType: ChatMessageSubType.modifyGroup,
+    );
+    await chatMessageService.sendAndStore(
+      chatMessage,
       peerIds: peerIds,
     );
-    for (var chatMessage in chatMessages) {
-      await chatMessageService.sendAndStore(chatMessage);
-    }
   }
 
   ///接收变群的消息，完成变群，发送回执
@@ -270,7 +268,7 @@ class GroupService extends PeerPartyService<Group> {
 
   ///向群成员发送散群的消息
   dismissGroup(Group group) async {
-    await groupMemberService.removeByGroupPeerId(group.peerId);
+    await groupMemberService.removeBygroupId(group.peerId);
     groupService.delete(entity: {
       'peerId': group.peerId,
     });
@@ -280,17 +278,14 @@ class GroupService extends PeerPartyService<Group> {
     chatSummaryService.delete(entity: {
       'peerId': group.peerId,
     });
-    List<ChatMessage> chatMessages =
-        await chatMessageService.buildGroupChatMessage(
+    ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
       group.peerId,
       PartyType.group,
       title: group.peerId,
       content: group.name,
       subMessageType: ChatMessageSubType.dismissGroup,
     );
-    for (var chatMessage in chatMessages) {
-      await chatMessageService.sendAndStore(chatMessage);
-    }
+    await chatMessageService.sendAndStore(chatMessage);
   }
 
   receiveDismissGroup(ChatMessage chatMessage) async {
@@ -303,7 +298,7 @@ class GroupService extends PeerPartyService<Group> {
       'peerId': peerId,
     });
     groupService.delete(entity: {
-      'groupPeerId': peerId,
+      'groupId': peerId,
     });
     chatMessageService.delete(entity: {
       'receiverPeerId': peerId,
@@ -322,17 +317,14 @@ class GroupService extends PeerPartyService<Group> {
   ///向群成员发送加群成员的消息
   addGroupMember(String groupId, List<GroupMember> groupMembers,
       {List<String>? peerIds}) async {
-    List<ChatMessage> chatMessages =
-        await chatMessageService.buildGroupChatMessage(
-      groupId,
-      PartyType.group,
-      content: groupMembers,
-      subMessageType: ChatMessageSubType.addGroupMember,
+    ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
+        groupId, PartyType.group,
+        content: groupMembers,
+        subMessageType: ChatMessageSubType.addGroupMember);
+    await chatMessageService.sendAndStore(
+      chatMessage,
       peerIds: peerIds,
     );
-    for (var chatMessage in chatMessages) {
-      await chatMessageService.sendAndStore(chatMessage);
-    }
   }
 
   receiveAddGroupMember(ChatMessage chatMessage) async {
@@ -355,17 +347,16 @@ class GroupService extends PeerPartyService<Group> {
   ///向群成员发送删群成员的消息
   removeGroupMember(String groupId, List<GroupMember> groupMembers,
       {List<String>? peerIds}) async {
-    List<ChatMessage> chatMessages =
-        await chatMessageService.buildGroupChatMessage(
+    ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
       groupId,
       PartyType.group,
       content: groupMembers,
       subMessageType: ChatMessageSubType.removeGroupMember,
+    );
+    await chatMessageService.sendAndStore(
+      chatMessage,
       peerIds: peerIds,
     );
-    for (var chatMessage in chatMessages) {
-      await chatMessageService.sendAndStore(chatMessage);
-    }
   }
 
   receiveRemoveGroupMember(ChatMessage chatMessage) async {
@@ -389,16 +380,13 @@ class GroupService extends PeerPartyService<Group> {
 
   ///向群成员发送群文件的消息
   groupFile(String groupId, List<int> data) async {
-    List<ChatMessage> chatMessages =
-        await chatMessageService.buildGroupChatMessage(
+    ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
       groupId,
       PartyType.group,
       content: data,
       subMessageType: ChatMessageSubType.groupFile,
     );
-    for (var chatMessage in chatMessages) {
-      await chatMessageService.sendAndStore(chatMessage);
-    }
+    await chatMessageService.sendAndStore(chatMessage);
   }
 
   receiveGroupFile(ChatMessage chatMessage) async {
@@ -413,7 +401,7 @@ class GroupService extends PeerPartyService<Group> {
   }
 
   ///删除群
-  removeByGroupPeerId(String peerId) async {
+  removeBygroupId(String peerId) async {
     await delete(where: 'peerId=?', whereArgs: [peerId]);
     groups.remove(peerId);
   }
@@ -450,6 +438,18 @@ class GroupMemberService extends GeneralBaseService<GroupMember> {
         await find(where: where, whereArgs: whereArgs);
 
     return groupMembers;
+  }
+
+  Future<List<String>> findPeerIdsByGroupId(String groupId) async {
+    List<String> peerIds = <String>[];
+    List<GroupMember> groupMembers =
+        await groupMemberService.findByGroupId(groupId);
+    if (groupMembers.isNotEmpty) {
+      for (var groupMember in groupMembers) {
+        peerIds.add(groupMember.memberPeerId!);
+      }
+    }
+    return peerIds;
   }
 
   Future<GroupMember?> findOneByGroupId(
@@ -492,7 +492,7 @@ class GroupMemberService extends GeneralBaseService<GroupMember> {
   }
 
   ///删除群的组员
-  removeByGroupPeerId(String peerId) async {
+  removeBygroupId(String peerId) async {
     delete(where: 'groupId=?', whereArgs: [peerId]);
   }
 }

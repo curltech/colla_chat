@@ -138,18 +138,20 @@ class ChatMessage extends StatusEntity {
   String? senderName;
   String? senderAddress;
   String? sendTime; // 发送时间
-  ///如果我作为发送者向别人或者群发送消息，此时direct为send
-  ///receiver填写别人或者群的信息
-  ///此时发送者的信息可以不填写
+
+  ///receiver五个字段填写接收者的信息
+  ///消息发送时如果接收者是个人的时候可以填写，是群和会议的时候，信息不填写，在接收到信息后可以由接收方填写自己
   String? receiverPeerId; // 目标的唯一id标识（单聊对应linkman-peerId，群聊对应group-peerId）
   String? receiverClientId;
   String? receiverType; // 包括：Linkman(单聊),Group(群聊),Conference(会议),
   String? receiverName;
-  String?
-      groupPeerId; // 目标的唯一id标识（单聊对应linkman-peerId，群聊对应group-peerId，会议对应conferenceId）
-  String? groupName;
-  String? groupType;
   String? receiverAddress;
+
+  ///和群以及会议相关的字段
+  String?
+      groupId; // 目标的唯一id标识（单聊对应linkman-peerId，群聊对应group-peerId，会议对应conferenceId）
+  String? groupName;
+  String? groupType; // 包括：Group(群聊),Conference(会议),
   String? receiveTime; // 接收时间
   String? receiptTime; // 发送回执时间
   String? readTime; // 阅读时间
@@ -184,16 +186,16 @@ class ChatMessage extends StatusEntity {
   ChatMessage();
 
   ChatMessage.fromJson(Map json)
-      : receiverType = json['receiverType'],
-        transportType = json['transportType'] ?? TransportType.webrtc.name,
+      : transportType = json['transportType'] ?? TransportType.webrtc.name,
         direct = json['direct'],
         receiverPeerId = json['receiverPeerId'],
+        receiverType = json['receiverType'],
         receiverClientId = json['receiverClientId'],
         receiverName = json['receiverName'],
-        groupPeerId = json['groupPeerId'],
+        receiverAddress = json['receiverAddress'],
+        groupId = json['groupId'],
         groupName = json['groupName'],
         groupType = json['groupType'],
-        receiverAddress = json['receiverAddress'],
         messageId = json['messageId'],
         messageType = json['messageType'] ?? ChatMessageType.chat.name,
         subMessageType = json['subMessageType'] ?? ChatMessageSubType.chat.name,
@@ -246,14 +248,14 @@ class ChatMessage extends StatusEntity {
     json.addAll({
       'transportType': transportType,
       'direct': direct,
-      'receiverType': receiverType,
       'receiverPeerId': receiverPeerId,
+      'receiverType': receiverType,
       'receiverClientId': receiverClientId,
       'receiverName': receiverName,
-      'groupPeerId': groupPeerId,
+      'receiverAddress': receiverAddress,
+      'groupId': groupId,
       'groupName': groupName,
       'groupType': groupType,
-      'receiverAddress': receiverAddress,
       'messageId': messageId,
       'messageType': messageType,
       'subMessageType': subMessageType,

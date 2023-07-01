@@ -127,7 +127,7 @@ class _ExtendedTextMessageInputWidgetState
     var chatSummary = chatMessageController.chatSummary;
     if (chatSummary != null) {
       if (chatSummary.partyType == PartyType.group.name) {
-        var groupPeerId = chatSummary.peerId;
+        var groupId = chatSummary.peerId;
         await DialogUtil.show(
             context: context,
             builder: (BuildContext context) {
@@ -135,7 +135,7 @@ class _ExtendedTextMessageInputWidgetState
                 selectType: SelectType.singleSelect,
                 onSelected: _onSelected,
                 selected: const <String>[],
-                groupPeerId: groupPeerId!,
+                groupId: groupId!,
               );
             });
       }

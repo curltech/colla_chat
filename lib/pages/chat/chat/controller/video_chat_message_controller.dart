@@ -46,7 +46,7 @@ class VideoChatMessageController with ChangeNotifier {
   String? name;
 
   //当前的群编号，说明正在群中聊天
-  String? groupPeerId;
+  String? groupId;
 
   //当前的联系人编号和名称，说明正在一对一聊天
   String? peerId;
@@ -145,7 +145,7 @@ class VideoChatMessageController with ChangeNotifier {
     _chatReceipts = {};
     partyType = null;
     peerId = null;
-    groupPeerId = null;
+    groupId = null;
     _conference = null;
     if (chatSummary == null) {
       globalChatMessageController.unregisterReceiver(
@@ -157,7 +157,7 @@ class VideoChatMessageController with ChangeNotifier {
       peerId = chatSummary.peerId!;
       name = chatSummary.name!;
     } else if (partyType == PartyType.group.name) {
-      groupPeerId = chatSummary.peerId!;
+      groupId = chatSummary.peerId!;
       name = chatSummary.name!;
     } else if (partyType == PartyType.conference.name) {
       //conference的会议信息保存，_chatSummary中获取peerId，就是conferenceId
@@ -200,6 +200,8 @@ class VideoChatMessageController with ChangeNotifier {
   ///根据_chatMessage查找对应的chatSummary
   Future<ChatSummary?> _findChatSummary() async {
     ChatSummary? chatSummary;
+
+    ///个人的消息receiverPeerId不为空
     if (_chatMessage!.groupType == null) {
       if (_chatMessage!.direct == ChatDirect.send.name) {
         chatSummary = await chatSummaryService
@@ -313,9 +315,9 @@ class VideoChatMessageController with ChangeNotifier {
     }
     var partyType = this.partyType;
     if (partyType == PartyType.conference.name) {}
-    var groupPeerId = this.groupPeerId;
+    var groupId = this.groupId;
     if (partyType == PartyType.group.name) {
-      if (groupPeerId == null) {
+      if (groupId == null) {
         return;
       }
     }
@@ -339,7 +341,7 @@ class VideoChatMessageController with ChangeNotifier {
             .toIso8601String(),
         participants: participants);
     if (partyType == PartyType.group.name) {
-      _conference!.groupPeerId = groupPeerId;
+      _conference!.groupId = groupId;
       _conference!.groupName = name;
       _conference!.groupType = partyType;
     }
@@ -355,8 +357,7 @@ class VideoChatMessageController with ChangeNotifier {
   ///对linkman模式下，conference是临时的，不保存数据库
   ///对group和conference模式下，conference是永久的，保存数据库，可以以后重新加入
   static Future<ChatMessage?> invite(Conference conference) async {
-    List<ChatMessage> chatMessages =
-        await chatMessageService.buildGroupChatMessage(
+    ChatMessage chatMessage = await chatMessageService.buildGroupChatMessage(
       conference.conferenceId,
       PartyType.conference,
       title: conference.video
@@ -365,12 +366,11 @@ class VideoChatMessageController with ChangeNotifier {
       content: conference,
       messageId: conference.conferenceId,
       subMessageType: ChatMessageSubType.videoChat,
-      peerIds: conference.participants,
     );
-    for (var chatMessage in chatMessages) {
-      await chatMessageService.sendAndStore(chatMessage);
-    }
-    return chatMessages[0];
+    await chatMessageService.sendAndStore(chatMessage,
+        peerIds: conference.participants);
+
+    return chatMessage;
   }
 
   ///1.发送视频通邀请话消息,此时消息必须有content,包含conference信息

@@ -151,7 +151,7 @@ class SmsClient extends IWebClient {
   }
 
   dynamic sendMessage(dynamic data, String targetPeerId, String targetClientId,
-      {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
+      {CryptoOption cryptoOption = CryptoOption.linkman}) async {
     Linkman? linkman = await linkmanService.findCachedOneByPeerId(targetPeerId);
     if (linkman != null) {
       var mobile = linkman.mobile;
@@ -159,7 +159,7 @@ class SmsClient extends IWebClient {
       SecurityContextService? securityContextService =
           ServiceLocator.securityContextServices[cryptOptionIndex];
       securityContextService =
-          securityContextService ?? cryptographySecurityContextService;
+          securityContextService ?? linkmanCryptographySecurityContextService;
       SecurityContext securityContext = SecurityContext();
       securityContext.targetPeerId = targetPeerId;
       securityContext.targetClientId = targetClientId;

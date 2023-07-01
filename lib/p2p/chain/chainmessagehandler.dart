@@ -268,7 +268,7 @@ class ChainMessageHandler {
     securityContext.payload = payload;
     try {
       bool result =
-          await cryptographySecurityContextService.encrypt(securityContext);
+          await linkmanCryptographySecurityContextService.encrypt(securityContext);
       if (result) {
         chainMessage.transportPayload =
             CryptoUtil.encodeBase64(securityContext.payload);
@@ -278,7 +278,6 @@ class ChainMessageHandler {
             securityContext.previousPublicKeyPayloadSignature;
         chainMessage.needCompress = securityContext.needCompress;
         chainMessage.needEncrypt = securityContext.needEncrypt;
-        chainMessage.payloadKey = securityContext.payloadKey;
       }
     } catch (err) {
       logger.e('ChainMessage encrypt error:${err.toString()}');
@@ -299,7 +298,6 @@ class ChainMessageHandler {
     securityContext.payloadSignature = chainMessage.payloadSignature;
     securityContext.previousPublicKeyPayloadSignature =
         chainMessage.previousPublicKeyPayloadSignature;
-    securityContext.payloadKey = chainMessage.payloadKey;
     var targetPeerId = chainMessage.targetPeerId;
     targetPeerId ??= chainMessage.connectPeerId;
     securityContext.targetPeerId = targetPeerId;
@@ -308,7 +306,7 @@ class ChainMessageHandler {
         CryptoUtil.decodeBase64(chainMessage.transportPayload!);
     try {
       var result =
-          await cryptographySecurityContextService.decrypt(securityContext);
+          await linkmanCryptographySecurityContextService.decrypt(securityContext);
       if (result) {
         chainMessage.needCompress = securityContext.needCompress;
         chainMessage.needEncrypt = securityContext.needEncrypt;

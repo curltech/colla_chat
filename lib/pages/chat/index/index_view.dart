@@ -172,7 +172,7 @@ class _IndexViewState extends State<IndexView>
     ChatMessage? chatMessage = globalChatMessageController.chatMessage;
     if (chatMessage != null) {
       String senderPeerId = chatMessage.senderPeerId!;
-      String? groupPeerId = chatMessage.groupPeerId;
+      String? groupId = chatMessage.groupId;
       Linkman? linkman =
           await linkmanService.findCachedOneByPeerId(senderPeerId);
       if (linkman != null) {
@@ -188,7 +188,7 @@ class _IndexViewState extends State<IndexView>
             chatMessageVisible.value = true;
           } else {
             String? peerId = chatSummary.peerId;
-            if (senderPeerId != peerId && groupPeerId != peerId) {
+            if (senderPeerId != peerId && groupId != peerId) {
               chatMessageVisible.value = true;
             }
           }

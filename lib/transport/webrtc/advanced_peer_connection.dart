@@ -343,20 +343,8 @@ class AdvancedPeerConnection {
 
   ///收到数据，先解密，然后转换成还原utf-8字符串，再将json字符串变成map对象
   onMessage(List<int> data) async {
-    int cryptOption = data[data.length - 1];
-    SecurityContextService? securityContextService =
-        ServiceLocator.securityContextServices[cryptOption];
-    securityContextService =
-        securityContextService ?? noneSecurityContextService;
-    SecurityContext securityContext = SecurityContext();
-    securityContext.srcPeerId = peerId;
-    securityContext.targetClientId = clientId;
-    securityContext.payload = data.sublist(0, data.length - 1);
-    bool result = await securityContextService.decrypt(securityContext);
-    if (result) {
-      String jsonStr = CryptoUtil.utf8ToString(securityContext.payload);
-      var json = JsonUtil.toJson(jsonStr);
-      ChatMessage chatMessage = ChatMessage.fromJson(json);
+    ChatMessage? chatMessage = await chatMessageService.decrypt(data);
+    if (chatMessage != null) {
       //对消息进行业务处理
       await globalChatMessageController.receiveChatMessage(chatMessage);
 
@@ -367,30 +355,15 @@ class AdvancedPeerConnection {
           data: chatMessage);
       onWebrtcEvent(webrtcEvent);
       await peerConnectionPool.onMessage(webrtcEvent);
+    } else {
+      logger.e('Received chatMessage but decrypt failure');
     }
   }
 
-  ///发送数据，带加密选项，传入数据为对象，先转换成json字符串，然后utf-8，再加密，最后发送
-  Future<bool> send(dynamic obj,
-      {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
+  ///发送数据
+  Future<bool> send(List<int> data) async {
     if (connected) {
-      var jsonStr = JsonUtil.toJsonString(obj);
-      List<int> data = CryptoUtil.stringToUtf8(jsonStr);
-      int cryptOptionIndex = cryptoOption.index;
-      SecurityContextService? securityContextService =
-          ServiceLocator.securityContextServices[cryptOptionIndex];
-      securityContextService =
-          securityContextService ?? cryptographySecurityContextService;
-      SecurityContext securityContext = SecurityContext();
-      securityContext.targetPeerId = peerId;
-      securityContext.targetClientId = clientId;
-      securityContext.payload = data;
-      bool result = await securityContextService.encrypt(securityContext);
-      if (result) {
-        data = CryptoUtil.concat(securityContext.payload, [cryptOptionIndex]);
-        return await basePeerConnection.send(data);
-      }
-      return false;
+      return await basePeerConnection.send(data);
     } else {
       logger.e(
           'send failed , peerId:$peerId clientId:$clientId webrtc connection state is not connected');

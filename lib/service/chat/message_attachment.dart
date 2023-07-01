@@ -125,7 +125,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
     SecurityContext securityContext = SecurityContext();
     securityContext.payload = data;
     var result =
-        await cryptographySecurityContextService.encrypt(securityContext);
+        await linkmanCryptographySecurityContextService.encrypt(securityContext);
     if (result) {
       var encrypted = securityContext.payload;
       return encrypted;
@@ -140,7 +140,7 @@ class MessageAttachmentService extends GeneralBaseService<MessageAttachment> {
     SecurityContext securityContext = SecurityContext();
     securityContext.payload = data;
     var result =
-        await cryptographySecurityContextService.decrypt(securityContext);
+        await linkmanCryptographySecurityContextService.decrypt(securityContext);
     if (result) {
       var decrypted = securityContext.payload;
       return decrypted;

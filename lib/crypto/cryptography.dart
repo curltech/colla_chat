@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:colla_chat/crypto/util.dart';
 import 'package:cryptography/cryptography.dart';
-//import 'package:cryptography_flutter/cryptography_flutter.dart';
 
 class CryptoGraphy {
   CryptoGraphy() {
@@ -25,7 +24,7 @@ class CryptoGraphy {
     return hash.bytes;
   }
 
-  static const randomBytesLength = 32;
+  static const int randomBytesLength = 32;
 
   /// 随机字节数组
   Future<List<int>> getRandomBytes({int length = randomBytesLength}) async {

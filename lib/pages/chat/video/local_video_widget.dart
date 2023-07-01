@@ -294,8 +294,8 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                 selectType: SelectType.chipMultiSelect);
           });
     } else if (partyType == PartyType.group.name) {
-      var groupPeerId = chatSummary.peerId;
-      if (groupPeerId == null) {
+      var groupId = chatSummary.peerId;
+      if (groupId == null) {
         return participants;
       }
       if (mounted) {
@@ -308,7 +308,7 @@ class _LocalVideoWidgetState extends State<LocalVideoWidget> {
                   Navigator.pop(context, participants);
                 },
                 selected: const <String>[],
-                groupPeerId: groupPeerId,
+                groupId: groupId,
               );
             });
       }

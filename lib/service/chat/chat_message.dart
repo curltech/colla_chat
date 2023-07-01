@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:colla_chat/crypto/cryptography.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/base.dart';
@@ -22,6 +23,7 @@ import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/service/dht/peerclient.dart';
 import 'package:colla_chat/service/general_base.dart';
+import 'package:colla_chat/service/p2p/security_context.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
@@ -141,7 +143,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
 
   Future<List<ChatMessage>> findByPeerId(
       {String? peerId,
-      String? groupPeerId,
+      String? groupId,
       String? direct,
       String? messageType,
       String? subMessageType,
@@ -153,7 +155,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     List<Object> whereArgs = [];
     if (peerId != null) {
       where =
-          '$where and groupPeerId is null and subMessageType!=? and ((senderPeerId=? and receiverPeerId=?) or (senderPeerId=? and receiverPeerId=?))';
+          '$where and groupId is null and subMessageType!=? and ((senderPeerId=? and receiverPeerId=?) or (senderPeerId=? and receiverPeerId=?))';
       whereArgs.add(ChatMessageSubType.chatReceipt.name);
       whereArgs.add(peerId);
       whereArgs.add(myselfPeerId);
@@ -161,13 +163,13 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       whereArgs.add(peerId);
     }
     //当通过群peerId查询群消息时，发送的群消息会拆分到个体的消息记录需要排除，否则重复显示
-    else if (groupPeerId != null) {
+    else if (groupId != null) {
       where =
-          '$where and receiverPeerId!=senderPeerId and groupPeerId=? and subMessageType!=? and ((senderPeerId=? and receiverPeerId=?) or receiverPeerId=?)';
-      whereArgs.add(groupPeerId);
+          '$where and receiverPeerId!=senderPeerId and groupId=? and subMessageType!=? and ((senderPeerId=? and receiverPeerId=?) or receiverPeerId=?)';
+      whereArgs.add(groupId);
       whereArgs.add(ChatMessageSubType.chatReceipt.name);
       whereArgs.add(myselfPeerId);
-      whereArgs.add(groupPeerId);
+      whereArgs.add(groupId);
       whereArgs.add(myselfPeerId);
     }
     if (direct != null) {
@@ -199,7 +201,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
 
   Future<List<ChatMessage>> findByGreaterId(
       {String? peerId,
-      String? groupPeerId,
+      String? groupId,
       String? direct,
       String? messageType,
       String? subMessageType,
@@ -211,7 +213,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     List<Object> whereArgs = [];
     if (peerId != null) {
       where =
-          '$where and groupPeerId is null and subMessageType!=? and ((senderPeerId=? and receiverPeerId=?) or (senderPeerId=? and receiverPeerId=?))';
+          '$where and groupId is null and subMessageType!=? and ((senderPeerId=? and receiverPeerId=?) or (senderPeerId=? and receiverPeerId=?))';
       whereArgs.add(ChatMessageSubType.chatReceipt.name);
       whereArgs.add(peerId);
       whereArgs.add(myselfPeerId);
@@ -219,13 +221,13 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       whereArgs.add(peerId);
     }
     //当通过群peerId查询群消息时，发送的群消息会拆分到个体的消息记录需要排除，否则重复显示
-    else if (groupPeerId != null) {
+    else if (groupId != null) {
       where =
-          '$where and receiverPeerId!=senderPeerId and groupPeerId=? and subMessageType!=? and ((senderPeerId=? and receiverPeerId=?) or receiverPeerId=?)';
-      whereArgs.add(groupPeerId);
+          '$where and receiverPeerId!=senderPeerId and groupId=? and subMessageType!=? and ((senderPeerId=? and receiverPeerId=?) or receiverPeerId=?)';
+      whereArgs.add(groupId);
       whereArgs.add(ChatMessageSubType.chatReceipt.name);
       whereArgs.add(myselfPeerId);
-      whereArgs.add(groupPeerId);
+      whereArgs.add(groupId);
       whereArgs.add(myselfPeerId);
     }
     if (messageType != null) {
@@ -286,7 +288,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String? mimeType,
     PartyType receiverType = PartyType.linkman,
     String? receiverName,
-    String? groupPeerId,
+    String? groupId,
     String? groupName,
     PartyType? groupType,
     String? title,
@@ -329,8 +331,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     chatMessage.receiverType = receiverType.name;
     chatMessage.receiverClientId = clientId;
     chatMessage.receiverName = receiverName;
-    if (groupPeerId != null) {
-      chatMessage.groupPeerId = groupPeerId;
+    if (groupId != null) {
+      chatMessage.groupId = groupId;
       chatMessage.groupName = groupName;
       groupType = groupType ?? PartyType.group;
       chatMessage.groupType = groupType.name;
@@ -363,9 +365,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return chatMessage;
   }
 
-  //未填写的字段：transportType,senderAddress,receiverAddress,receiveTime,actualReceiveTime,readTime,destroyTime
-  Future<List<ChatMessage>> buildGroupChatMessage(
-    String groupPeerId,
+  ///创建群和会议消息，将发送给群和会议的消息分拆成单个的消息
+  ///接收者5个字段不填写，保证分拆的每个消息完全一样
+  Future<ChatMessage> buildGroupChatMessage(
+    String groupId,
     PartyType groupType, {
     dynamic content,
     ChatMessageType messageType = ChatMessageType.chat,
@@ -379,26 +382,23 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String? thumbnail,
     int deleteTime = 0,
     String? parentMessageId,
-    List<String>? peerIds,
   }) async {
-    List<ChatMessage> chatMessages = [];
     String? groupName;
     if (groupType == PartyType.group) {
-      Group? group = await groupService.findCachedOneByPeerId(groupPeerId);
+      Group? group = await groupService.findCachedOneByPeerId(groupId);
       if (group != null) {
         groupName = group.name;
       }
     }
     if (groupType == PartyType.conference) {
       Conference? conference =
-          await conferenceService.findCachedOneByConferenceId(groupPeerId);
+          await conferenceService.findCachedOneByConferenceId(groupId);
       if (conference != null) {
         groupName = conference.name;
       }
     }
 
     var groupChatMessage = await buildChatMessage(
-        receiverPeerId: groupPeerId,
         content: content,
         messageId: messageId,
         messageType: messageType,
@@ -408,7 +408,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         transportType: transportType,
         receiverType: groupType,
         receiverName: groupName,
-        groupPeerId: groupPeerId,
+        groupId: groupId,
         groupName: groupName,
         groupType: groupType,
         title: title,
@@ -416,47 +416,24 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         thumbnail: thumbnail,
         deleteTime: deleteTime,
         parentMessageId: parentMessageId);
-    chatMessages.add(groupChatMessage);
-    messageId = groupChatMessage.messageId;
 
-    if (peerIds == null) {
-      peerIds = <String>[];
-      List<GroupMember> groupMembers =
-          await groupMemberService.findByGroupId(groupPeerId);
-      if (groupMembers.isNotEmpty) {
-        for (var groupMember in groupMembers) {
-          peerIds.add(groupMember.memberPeerId!);
-        }
-      }
+    return groupChatMessage;
+  }
+
+  ///收到消息后填写接收者字段，状态字段，接收时间
+  _writeReceiveChatMessage(ChatMessage chatMessage) {
+    chatMessage.receiverPeerId = myself.peerId;
+    chatMessage.receiverClientId = myself.clientId;
+    if (chatMessage.groupType != null) {
+      chatMessage.receiverType = chatMessage.groupType;
+    } else {
+      chatMessage.receiverType = PartyType.linkman.name;
     }
-    for (var peerId in peerIds) {
-      Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
-      if (linkman == null) {
-        continue;
-      }
-      var receiverName = linkman.name;
-      ChatMessage chatMessage = await buildChatMessage(
-        receiverPeerId: peerId,
-        messageId: messageId,
-        messageType: messageType,
-        subMessageType: subMessageType,
-        contentType: contentType,
-        mimeType: mimeType,
-        transportType: transportType,
-        receiverName: receiverName,
-        groupPeerId: groupPeerId,
-        groupName: groupName,
-        groupType: groupType,
-        deleteTime: deleteTime,
-        parentMessageId: parentMessageId,
-      );
-      chatMessage.title = groupChatMessage.title;
-      chatMessage.content = groupChatMessage.content;
-      chatMessage.receiptType = groupChatMessage.receiptType;
-      chatMessage.thumbnail = groupChatMessage.thumbnail;
-      chatMessages.add(chatMessage);
-    }
-    return chatMessages;
+    chatMessage.receiverName = myself.name;
+    chatMessage.direct = ChatDirect.receive.name;
+    chatMessage.receiveTime = DateUtil.currentDate();
+    chatMessage.readTime = null;
+    chatMessage.status = MessageStatus.received.name;
   }
 
   ///接受到普通消息或者回执，修改状态并保存
@@ -466,7 +443,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     String? subMessageType = chatMessage.subMessageType;
     String? groupType = chatMessage.groupType;
     String? messageId = chatMessage.messageId;
-    //收到回执，更新原消息
+
+    ///收到回执，更新原消息
     if (subMessageType == ChatMessageSubType.chatReceipt.name) {
       if (groupType == null) {
         if (messageId == null) {
@@ -489,10 +467,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         return originChatMessage;
       } else {
         //如果是对群消息的回复，直接保存
-        chatMessage.direct = ChatDirect.receive.name;
-        chatMessage.receiveTime = DateUtil.currentDate();
-        chatMessage.readTime = null;
-        chatMessage.status = MessageStatus.received.name;
+        _writeReceiveChatMessage(chatMessage);
         chatMessage.id = null;
         await store(chatMessage);
 
@@ -500,10 +475,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       }
     } else {
       //收到一般消息，保存
-      chatMessage.direct = ChatDirect.receive.name;
-      chatMessage.receiveTime = DateUtil.currentDate();
-      chatMessage.readTime = null;
-      chatMessage.status = MessageStatus.received.name;
+      _writeReceiveChatMessage(chatMessage);
       chatMessage.id = null;
       await store(chatMessage, unreadNumber: true);
 
@@ -541,7 +513,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       messageId: chatMessage.messageId,
       messageType: messageType!,
       subMessageType: ChatMessageSubType.chatReceipt,
-      groupPeerId: chatMessage.groupPeerId,
+      groupId: chatMessage.groupId,
       groupName: chatMessage.groupName,
       groupType: groupType,
       title: chatMessage.title,
@@ -598,19 +570,19 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         whereArgs: [chatMessage.id!]);
   }
 
-  ///创建群回执消息，如果peerIds为空，通过groupPeerId查询成员表决定
+  ///创建群回执消息，如果peerIds为空，通过groupId查询成员表决定
   Future<List<ChatMessage>> buildGroupChatReceipt(
     ChatMessage chatMessage,
     MessageReceiptType receiptType, {
     List<String>? peerIds,
   }) async {
-    String groupPeerId = chatMessage.groupPeerId!;
+    String groupId = chatMessage.groupId!;
     List<ChatMessage> chatReceipts = [];
 
     if (peerIds == null) {
       peerIds = <String>[];
       List<GroupMember> groupMembers =
-          await groupMemberService.findByGroupId(groupPeerId);
+          await groupMemberService.findByGroupId(groupId);
       if (groupMembers.isNotEmpty) {
         for (var groupMember in groupMembers) {
           peerIds.add(groupMember.memberPeerId!);
@@ -635,69 +607,183 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return chatReceipts;
   }
 
-  ///发送消息，并更新发送状态字段
-  Future<ChatMessage> send(ChatMessage chatMessage,
-      {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
-    var peerId = chatMessage.receiverPeerId;
-    var receiverType = chatMessage.receiverType;
-    if (peerId != null &&
-        peerId != myself.peerId &&
-        receiverType != PartyType.group.name &&
-        receiverType != PartyType.conference.name) {
-      var transportType = chatMessage.transportType;
-      if (transportType == TransportType.webrtc.name) {
-        bool success = await peerConnectionPool.send(peerId, chatMessage,
-            cryptoOption: cryptoOption);
-        if (!success) {
-          transportType = TransportType.websocket.name;
-          chatMessage.transportType = TransportType.websocket.name;
-        } else {
-          chatMessage.status = MessageStatus.sent.name;
+  ///加密消息，要么对非组的消息进行加密，要么对组消息进行加密，返回可发送的多条消息
+  Future<Map<String, List<int>>> encrypt(ChatMessage chatMessage,
+      {CryptoOption? cryptoOption, List<String>? peerIds}) async {
+    Map<String, List<int>> encryptData = {};
+    if (cryptoOption == null) {
+      if (chatMessage.groupType == null) {
+        cryptoOption = CryptoOption.linkman;
+      } else {
+        cryptoOption = CryptoOption.group;
+      }
+    }
+    var jsonStr = JsonUtil.toJsonString(chatMessage);
+    List<int> data = CryptoUtil.stringToUtf8(jsonStr);
+    int cryptOptionIndex = cryptoOption.index;
+    SecurityContextService? securityContextService =
+        ServiceLocator.securityContextServices[cryptOptionIndex];
+    securityContextService =
+        securityContextService ?? linkmanCryptographySecurityContextService;
+    SecurityContext securityContext = SecurityContext();
+    securityContext.payload = data;
+    if (chatMessage.receiverPeerId != null) {
+      if (chatMessage.receiverPeerId != myself.peerId) {
+        securityContext.targetPeerId = chatMessage.receiverPeerId;
+        securityContext.targetClientId = chatMessage.receiverClientId;
+        bool result = await securityContextService.encrypt(securityContext);
+        if (result) {
+          data = CryptoUtil.concat(
+              securityContext.payload, [CryptoOption.linkman.index]);
+          encryptData[chatMessage.receiverPeerId!] = data;
+
+          return encryptData;
         }
       }
-      if (transportType == TransportType.websocket.name) {
-        try {
-          chatAction.chat(chatMessage, peerId,
-              payloadType: PayloadType.chatMessage.name);
-          chatMessage.status = MessageStatus.sent.name;
-        } catch (err) {
-          chatMessage.status = MessageStatus.unsent.name;
+    } else if (chatMessage.groupId != null) {
+      ///再根据群进行消息的复制成多条进行处理
+      if (peerIds == null || peerIds.isEmpty) {
+        String groupId = chatMessage.groupId!;
+        peerIds = await groupMemberService.findPeerIdsByGroupId(groupId);
+      }
+      if (peerIds.isNotEmpty) {
+        for (var peerId in peerIds) {
+          chatMessage.receiverPeerId = peerId;
+          Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+          if (linkman != null && linkman.peerId != myself.peerId) {
+            securityContext.targetPeerId = linkman.peerId;
+            securityContext.targetClientId = linkman.clientId;
+            bool result = await securityContextService.encrypt(securityContext);
+            if (result) {
+              ///对群加密来说，返回的是通用的加密后数据
+              List<int> encryptedKey =
+                  CryptoUtil.decodeBase64(securityContext.payloadKey!);
+              encryptedKey =
+                  CryptoUtil.concat(encryptedKey, [CryptoOption.group.index]);
+              data = CryptoUtil.concat(securityContext.payload, encryptedKey);
+              encryptData[peerId] = data;
+            }
+          }
         }
       }
-      if (transportType == TransportType.sms.name) {
-        bool success = await smsClient.sendMessage(chatMessage.content,
-            chatMessage.receiverPeerId!, chatMessage.receiverClientId!);
-        if (success) {
-          chatMessage.status = MessageStatus.sent.name;
-        }
-      }
-      // if (transportType == TransportType.nearby.name) {
-      //   bool success = await nearbyConnectionPool.send(
-      //       chatMessage.receiverPeerId!, chatMessage);
-      //   if (success) {
-      //     chatMessage.status = MessageStatus.sent.name;
-      //   }
-      // }
-    } else {
-      chatMessage.transportType = TransportType.none.name;
-      chatMessage.status = MessageStatus.sent.name;
     }
 
-    return chatMessage;
+    return encryptData;
   }
 
-  ///发送单条消息，并保存本地，由于是先发送后保存，所以新消息的id，createDate等字段是空的
-  Future<ChatMessage> sendAndStore(ChatMessage chatMessage,
-      {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
-    await send(chatMessage, cryptoOption: cryptoOption);
-    await chatMessageService.store(chatMessage);
+  Future<ChatMessage?> decrypt(List<int> data) async {
+    ///数据的最后一位是加密方式，还有32位的加密的密钥
+    int cryptOption = data[data.length - 1];
+    SecurityContextService? securityContextService =
+        ServiceLocator.securityContextServices[cryptOption];
+    securityContextService =
+        securityContextService ?? noneSecurityContextService;
+    SecurityContext securityContext = SecurityContext();
+    if (cryptOption == CryptoOption.linkman.index) {
+      securityContext.payload = data.sublist(0, data.length - 1);
+    }
+    if (cryptOption == CryptoOption.group.index) {
+      List<int> payloadKey = data.sublist(
+          data.length - CryptoGraphy.randomBytesLength - 1, data.length - 1);
+      securityContext.payloadKey = CryptoUtil.encodeBase64(payloadKey);
+      securityContext.payload =
+          data.sublist(0, data.length - CryptoGraphy.randomBytesLength - 1);
+    }
+    bool result = await securityContextService.decrypt(securityContext);
+    if (result) {
+      String jsonStr = CryptoUtil.utf8ToString(securityContext.payload);
+      var json = JsonUtil.toJson(jsonStr);
+      ChatMessage chatMessage = ChatMessage.fromJson(json);
 
-    return chatMessage;
+      return chatMessage;
+    }
+    return null;
+  }
+
+  ///发送消息，并更新发送状态字段，如果chatMessage的groupType不为空，则是群消息，支持群发
+  ///以特定的发送方式发送数据，返回实际成功的发送方式
+  Future<List<ChatMessage>> send(ChatMessage chatMessage,
+      {CryptoOption? cryptoOption, List<String>? peerIds}) async {
+    ///对消息进行分拆和加密
+    List<ChatMessage> chatMessages = await split(chatMessage, peerIds: peerIds);
+    Map<String, List<int>> encryptData = await encrypt(chatMessage,
+        cryptoOption: cryptoOption, peerIds: peerIds);
+    for (var chatMessage in chatMessages) {
+      String? peerId = chatMessage.receiverPeerId;
+      if (peerId == null || peerId == myself.peerId) {
+        continue;
+      }
+      List<int>? data = encryptData[peerId];
+      if (data == null) {
+        continue;
+      }
+      await _send(chatMessage, data);
+    }
+
+    return chatMessages;
+  }
+
+  ///对单条消息和对应的加密数据进行发送
+  Future<void> _send(ChatMessage chatMessage, List<int> data) async {
+    String? peerId = chatMessage.receiverPeerId;
+    if (peerId == null || peerId == myself.peerId) {
+      return;
+    }
+    var transportType = chatMessage.transportType;
+    String? factTransportType;
+    if (transportType == TransportType.webrtc.name) {
+      bool success = await peerConnectionPool.send(peerId, data);
+      if (success) {
+        factTransportType = TransportType.webrtc.name;
+      } else {
+        transportType = TransportType.websocket.name;
+      }
+    }
+    if (factTransportType == null &&
+        transportType == TransportType.websocket.name) {
+      try {
+        bool success = await chatAction.chat(chatMessage, peerId,
+            payloadType: PayloadType.chatMessage.name);
+        if (success) {
+          factTransportType = TransportType.websocket.name;
+        }
+      } catch (err) {
+        logger.e('chatAction chat failure:$err');
+      }
+    }
+    if (factTransportType == null && transportType == TransportType.sms.name) {
+      bool success = await smsClient.sendMessage(chatMessage.content,
+          chatMessage.receiverPeerId!, chatMessage.receiverClientId!);
+      if (success) {
+        factTransportType = TransportType.sms.name;
+      }
+    }
+    if (factTransportType != null) {
+      chatMessage.transportType = factTransportType;
+      chatMessage.status = MessageStatus.sent.name;
+    } else {
+      chatMessage.status = MessageStatus.unsent.name;
+    }
+  }
+
+  ///发送消息，并保存本地，由于是先发送后保存，所以新消息的id，createDate等字段是空的
+  ///如果是群消息，则需要群发
+  Future<List<ChatMessage>> sendAndStore(ChatMessage chatMessage,
+      {CryptoOption cryptoOption = CryptoOption.linkman,
+      List<String>? peerIds}) async {
+    List<ChatMessage> chatMessages =
+        await send(chatMessage, cryptoOption: cryptoOption, peerIds: peerIds);
+    if (chatMessages.isNotEmpty) {
+      for (var msg in chatMessages) {
+        await chatMessageService.store(msg);
+      }
+    }
+    return chatMessages;
   }
 
   ///转发消息
-  Future<ChatMessage?> forward(ChatMessage chatMessage, String peerId,
-      {CryptoOption cryptoOption = CryptoOption.cryptography}) async {
+  Future<List<ChatMessage>?> forward(ChatMessage chatMessage, String peerId,
+      {CryptoOption cryptoOption = CryptoOption.linkman}) async {
     String? title = chatMessage.title;
     String? messageId = chatMessage.messageId;
     dynamic content = chatMessage.content;
@@ -731,7 +817,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     } else {
       Group? group = await groupService.findCachedOneByPeerId(peerId);
       if (group != null) {
-        List<ChatMessage> messages = await buildGroupChatMessage(
+        ChatMessage groupMessage = await buildGroupChatMessage(
           peerId,
           PartyType.group,
           content: content,
@@ -743,26 +829,54 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           receiptType: chatMessage.receiptType,
           thumbnail: thumbnail,
         );
-        ChatMessage? msg;
-        int i = 0;
-        for (var message in messages) {
-          if (i == 0) {
-            msg = await sendAndStore(message, cryptoOption: cryptoOption);
-          } else {
-            await sendAndStore(message, cryptoOption: cryptoOption);
-          }
-          i++;
-        }
-        return msg;
+        return await sendAndStore(groupMessage, cryptoOption: cryptoOption);
       }
     }
+
     return null;
   }
 
-  /// 保存消息，对于复杂消息，存储附件
+  /// 如果是群消息，拆分多条消息
+  /// 如果是非群消息返回单条的数组
+  Future<List<ChatMessage>> split(ChatMessage chatMessage,
+      {List<String>? peerIds}) async {
+    List<ChatMessage> chatMessages = [chatMessage];
+
+    ///对组消息进行拆分
+    if (chatMessage.groupId != null && chatMessage.receiverPeerId == null) {
+      ///再根据群进行消息的复制成多条进行处理
+      if (peerIds == null || peerIds.isEmpty) {
+        String groupId = chatMessage.groupId!;
+        peerIds = await groupMemberService.findPeerIdsByGroupId(groupId);
+      }
+      if (peerIds.isNotEmpty) {
+        for (var peerId in peerIds) {
+          Map<String, dynamic> map = JsonUtil.toJson(chatMessage);
+          ChatMessage msg = ChatMessage.fromJson(map);
+          msg.receiverPeerId = peerId;
+          Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
+          if (linkman != null) {
+            msg.receiverName = linkman.name;
+            msg.receiverClientId = linkman.clientId;
+            msg.receiverType = PartyType.linkman.name;
+            msg.receiverAddress = linkman.address;
+          }
+          chatMessages.add(msg);
+        }
+      }
+    }
+    return chatMessages;
+  }
+
+  /// 保存单条消息，对于复杂消息，存储附件
   /// 如果content为空，不用考虑附件，有可能title就是文件名
   store(ChatMessage chatMessage,
       {bool updateSummary = true, bool unreadNumber = false}) async {
+    if (chatMessage.receiverPeerId == myself.peerId) {
+      chatMessage.transportType = TransportType.none.name;
+      chatMessage.status = MessageStatus.sent.name;
+    }
+
     String subMessageType = chatMessage.subMessageType;
     //signal消息暂时不保存
     if (subMessageType == ChatMessageSubType.signal.name) {
@@ -900,12 +1014,15 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     List<ChatMessage> chatMessages =
         await findByPeerId(status: MessageStatus.unsent.name);
     for (var chatMessage in chatMessages) {
-      send(chatMessage).then((ChatMessage value) {
-        if (value.status != MessageStatus.unsent.name) {
-          update({'status': value.status},
-              where: 'id=?', whereArgs: [value.id!]);
+      if (chatMessage.receiverPeerId != null) {
+        List<ChatMessage> chatMessages = await send(chatMessage);
+        for (var chatMessage in chatMessages) {
+          if (chatMessage.status != MessageStatus.unsent.name) {
+            update({'status': chatMessage.status},
+                where: 'id=?', whereArgs: [chatMessage.id!]);
+          }
         }
-      });
+      }
     }
   }
 
@@ -944,13 +1061,13 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     var myselfPeerId = myself.peerId!;
     delete(
         where:
-            'groupPeerId is null and ((senderPeerId=? and receiverPeerId=?) or (senderPeerId=? and receiverPeerId=?))',
+            'groupId is null and ((senderPeerId=? and receiverPeerId=?) or (senderPeerId=? and receiverPeerId=?))',
         whereArgs: [peerId, myselfPeerId, myselfPeerId, peerId]);
   }
 
   ///删除group的消息
   removeByGroup(String peerId) {
-    delete(where: 'groupPeerId=?', whereArgs: [peerId]);
+    delete(where: 'groupId=?', whereArgs: [peerId]);
   }
 }
 

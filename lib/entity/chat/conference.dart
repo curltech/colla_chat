@@ -8,7 +8,7 @@ class Conference extends StatusEntity {
   String? topic;
   String? conferenceOwnerPeerId; // 发起人
   String? conferenceOwnerName; // 发起人
-  String? groupPeerId; // 如果是从群中发起的会议，设置为群的编号
+  String? groupId; // 如果是从群中发起的会议，设置为群的编号
   String? groupName;
   String? groupType;
   String? password; // 密码
@@ -32,7 +32,7 @@ class Conference extends StatusEntity {
       this.startDate,
       this.endDate,
       this.video = true,
-      this.groupPeerId,
+      this.groupId,
       this.groupName,
       this.groupType,
       this.participants = const <String>[]});
@@ -43,7 +43,7 @@ class Conference extends StatusEntity {
         topic = json['topic'],
         conferenceOwnerPeerId = json['conferenceOwnerPeerId'],
         conferenceOwnerName = json['conferenceOwnerName'],
-        groupPeerId = json['groupPeerId'],
+        groupId = json['groupId'],
         groupName = json['groupName'],
         groupType = json['groupType'],
         password = json['password'],
@@ -83,7 +83,7 @@ class Conference extends StatusEntity {
       'topic': topic,
       'conferenceOwnerPeerId': conferenceOwnerPeerId,
       'conferenceOwnerName': conferenceOwnerName,
-      'groupPeerId': groupPeerId,
+      'groupId': groupId,
       'groupName': groupName,
       'groupType': groupType,
       'password': password,

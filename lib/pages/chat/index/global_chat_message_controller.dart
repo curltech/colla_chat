@@ -157,7 +157,7 @@ class GlobalChatMessageController with ChangeNotifier {
         chatMessageController.chatSummary != null) {
       var peerId = chatMessageController.chatSummary!.peerId;
       if (chatMessage.senderPeerId == peerId ||
-          chatMessage.groupPeerId == peerId) {
+          chatMessage.groupId == peerId) {
         chatMessageController.notifyListeners();
       }
     }
@@ -232,7 +232,7 @@ class GlobalChatMessageController with ChangeNotifier {
         subMessageType: ChatMessageSubType.preKeyBundle,
         content: json);
     await chatMessageService.sendAndStore(chatMessage,
-        cryptoOption: CryptoOption.cryptography);
+        cryptoOption: CryptoOption.linkman);
     logger.i('peerId: $peerId clientId:$clientId sent PreKeyBundle');
   }
 }

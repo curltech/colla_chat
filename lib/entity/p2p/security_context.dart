@@ -1,7 +1,7 @@
-enum CryptoOption { none, compress, cryptography, web, openpgp, signal }
+enum CryptoOption { none, compress, linkman, group, web, openpgp, signal }
 
 class SecurityContext {
-  int cryptoOptionIndex = CryptoOption.cryptography.index;
+  int cryptoOptionIndex = CryptoOption.linkman.index;
   String? targetPeerId;
   String? targetClientId;
   String? srcPeerId;
@@ -14,9 +14,12 @@ class SecurityContext {
   /// 二进制的消息，将被加密或者解密
   dynamic payload;
 
-  /// 经过目标peer的公钥加密过的对称密钥，这个对称密钥是随机生成，每次不同，用于加密payload
   /// 如果为null，表示直接ecc加解密，无对称密钥，如果不为空，secretKey为空，表示产生一个新的对称密钥返回
+  /// 经过目标peer的公钥加密过的对称密钥，这个对称密钥是随机生成，每次不同，用于加密payload
   String? payloadKey;
+
+  ///未加密的对称密码加密的密码，如果不为空则直接使用，用于群加密
+  ///如果为空，则表示第一次加密，需要随机数生成，可以用于群加密的后续peer
   List<int>? secretKey;
 
   /// 负载json的源peer的签名
@@ -29,7 +32,7 @@ class SecurityContext {
 
   SecurityContext.fromJson(Map json)
       : cryptoOptionIndex =
-            json['cryptoOptionIndex'] ?? CryptoOption.cryptography.index,
+            json['cryptoOptionIndex'] ?? CryptoOption.linkman.index,
         payloadSignature = json['payloadSignature'],
         previousPublicKeyPayloadSignature =
             json['previousPublicKeyPayloadSignature'],

@@ -82,10 +82,12 @@ class ServiceLocator {
         noneSecurityContextService;
     securityContextServices[CryptoOption.compress.index] =
         compressSecurityContextService;
-    securityContextServices[CryptoOption.cryptography.index] =
-        cryptographySecurityContextService;
+    securityContextServices[CryptoOption.linkman.index] =
+        linkmanCryptographySecurityContextService;
+    securityContextServices[CryptoOption.group.index] =
+        groupCryptographySecurityContextService;
     securityContextServices[CryptoOption.signal.index] =
-        signalSecurityContextService;
+        signalCryptographySecurityContextService;
 
     await sqlite3.open();
     await AppLocalizations.init();

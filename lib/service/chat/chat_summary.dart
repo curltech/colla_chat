@@ -147,17 +147,17 @@ class ChatSummaryService extends GeneralBaseService<ChatSummary> {
         chatMessage.subMessageType == ChatMessageSubType.preKeyBundle.name) {
       return null;
     }
-    var groupPeerId = chatMessage.groupPeerId;
+    var groupId = chatMessage.groupId;
     var senderPeerId = chatMessage.senderPeerId;
     var receiverPeerId = chatMessage.receiverPeerId;
     var senderClientId = chatMessage.senderClientId;
     var receiverClientId = chatMessage.receiverClientId;
     ChatSummary? chatSummary;
-    if (groupPeerId != null) {
-      chatSummary = await findCachedOneByPeerId(groupPeerId);
+    if (groupId != null) {
+      chatSummary = await findCachedOneByPeerId(groupId);
       if (chatSummary == null) {
         chatSummary = ChatSummary();
-        chatSummary.peerId = groupPeerId;
+        chatSummary.peerId = groupId;
         chatSummary.partyType = chatMessage.groupType;
         chatSummary.name = chatMessage.groupName;
         chatSummary.sendReceiveTime = chatMessage.sendTime;

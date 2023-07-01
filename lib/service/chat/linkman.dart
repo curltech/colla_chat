@@ -198,7 +198,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
   ///发出加好友的请求
   Future<ChatMessage> addFriend(String peerId, String? title,
       {TransportType transportType = TransportType.webrtc,
-      CryptoOption cryptoOption = CryptoOption.cryptography}) async {
+      CryptoOption cryptoOption = CryptoOption.linkman}) async {
     // 加好友会发送自己的信息，回执将收到对方的信息
     Map<String, dynamic> map = JsonUtil.toJson(myself.myselfPeer);
     PeerClient peerClient = PeerClient.fromJson(map);
@@ -208,8 +208,10 @@ class LinkmanService extends PeerPartyService<Linkman> {
         subMessageType: ChatMessageSubType.addFriend,
         transportType: transportType,
         title: title);
-    return await chatMessageService.sendAndStore(chatMessage,
-        cryptoOption: cryptoOption);
+    List<ChatMessage> chatMessages = await chatMessageService
+        .sendAndStore(chatMessage, cryptoOption: cryptoOption);
+
+    return chatMessages.first;
   }
 
   ///接收到加好友的请求，发送回执
@@ -224,7 +226,10 @@ class LinkmanService extends PeerPartyService<Linkman> {
     if (receiptType == MessageReceiptType.accepted) {
       chatReceipt.content = JsonUtil.toJsonString(peerClient);
     }
-    return await chatMessageService.sendAndStore(chatReceipt);
+    List<ChatMessage> chatMessages =
+        await chatMessageService.sendAndStore(chatMessage);
+
+    return chatMessages.first;
   }
 
   ///接收到加好友的回执
@@ -253,7 +258,7 @@ class LinkmanService extends PeerPartyService<Linkman> {
   ///发出更新联系人信息的请求
   Future<ChatMessage> modifyLinkman(String peerId,
       {String? clientId,
-      CryptoOption cryptoOption = CryptoOption.cryptography}) async {
+      CryptoOption cryptoOption = CryptoOption.linkman}) async {
     // 加好友会发送自己的信息，回执将收到对方的信息
     Map<String, dynamic> map = JsonUtil.toJson(myself.myselfPeer);
     PeerClient peerClient = PeerClient.fromJson(map);
@@ -264,8 +269,10 @@ class LinkmanService extends PeerPartyService<Linkman> {
       messageType: ChatMessageType.system,
       subMessageType: ChatMessageSubType.modifyLinkman,
     );
-    return await chatMessageService.sendAndStore(chatMessage,
-        cryptoOption: cryptoOption);
+    List<ChatMessage> chatMessages = await chatMessageService
+        .sendAndStore(chatMessage, cryptoOption: cryptoOption);
+
+    return chatMessages.first;
   }
 
   ///接收到更新联系人信息的请求，会同时修改消息和联系人

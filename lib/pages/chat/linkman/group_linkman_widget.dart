@@ -10,14 +10,14 @@ class GroupLinkmanWidget extends StatefulWidget {
   final Function(List<String>) onSelected; //获取返回的选择
   final List<String> selected;
   final SelectType selectType;
-  final String groupPeerId;
+  final String groupId;
 
   const GroupLinkmanWidget({
     Key? key,
     required this.onSelected,
     required this.selected,
     this.selectType = SelectType.chipMultiSelect,
-    required this.groupPeerId,
+    required this.groupId,
   }) : super(key: key);
 
   @override
@@ -34,7 +34,7 @@ class _GroupLinkmanWidgetState extends State<GroupLinkmanWidget> {
   }
 
   Future<String?> _findGroupName() async {
-    Group? group = await groupService.findCachedOneByPeerId(widget.groupPeerId);
+    Group? group = await groupService.findCachedOneByPeerId(widget.groupId);
     if (group != null) {
       return group.name;
     }
@@ -45,7 +45,7 @@ class _GroupLinkmanWidgetState extends State<GroupLinkmanWidget> {
   Future<List<Option<String>>> _buildOptions() async {
     title = await _findGroupName();
     var groupMembers =
-        await groupMemberService.findByGroupId(widget.groupPeerId);
+        await groupMemberService.findByGroupId(widget.groupId);
     List<Option<String>> options = [];
     for (GroupMember groupMember in groupMembers) {
       String? memberPeerId = groupMember.memberPeerId;

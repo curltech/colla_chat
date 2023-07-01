@@ -70,7 +70,7 @@ abstract class GeneralBaseService<T> {
         offset: offset);
     if (m != null) {
       var o = post(m);
-      var json = await decrypt(o);
+      var json = await _decryptFields(o);
       o = post(json);
       return o;
     }
@@ -114,7 +114,7 @@ abstract class GeneralBaseService<T> {
     if (ms.isNotEmpty) {
       for (var m in ms) {
         var o = post(m);
-        var json = await decrypt(o);
+        var json = await _decryptFields(o);
         o = post(json);
         os.add(o);
       }
@@ -155,7 +155,7 @@ abstract class GeneralBaseService<T> {
     if (ms.isNotEmpty) {
       for (var m in ms) {
         var o = post(m);
-        var json = await decrypt(o);
+        var json = await _decryptFields(o);
         o = post(json);
         os.add(o);
       }
@@ -203,11 +203,10 @@ abstract class GeneralBaseService<T> {
   ///payloadKey：null，直接ecc加密
   ///‘’，产生新的对称密钥并返回
   ///有值，用于加密,secretKey有值，用于加密
-  Future<Map<String, dynamic>> encrypt(dynamic entity,
+  Future<Map<String, dynamic>> _encryptFields(dynamic entity,
       {bool needCompress = true,
       bool needEncrypt = true,
       bool needSign = false,
-      String? payloadKey,
       List<int>? secretKey}) async {
     Map<String, dynamic> json = JsonUtil.toJson(entity) as Map<String, dynamic>;
     if (encryptFields.isNotEmpty) {
@@ -215,7 +214,6 @@ abstract class GeneralBaseService<T> {
       securityContext.needCompress = needCompress;
       securityContext.needEncrypt = needEncrypt;
       securityContext.needSign = needSign;
-      securityContext.payloadKey = payloadKey;
       securityContext.secretKey = secretKey;
       for (var encryptField in encryptFields) {
         String? value = json[encryptField];
@@ -223,12 +221,12 @@ abstract class GeneralBaseService<T> {
           try {
             List<int> raw = CryptoUtil.stringToUtf8(value!);
             securityContext.payload = raw;
-            var result = await cryptographySecurityContextService
+            var result = await linkmanCryptographySecurityContextService
                 .encrypt(securityContext);
             if (result) {
-              json[encryptField] =
-                  CryptoUtil.encodeBase64(securityContext.payload);
-              json['payloadKey'] = securityContext.payloadKey;
+              List<int> data = CryptoUtil.concat(
+                  securityContext.payload, [CryptoOption.linkman.index]);
+              json[encryptField] = CryptoUtil.encodeBase64(data);
               json['payloadHash'] = securityContext.payloadHash;
               json['needCompress'] = securityContext.needCompress;
               json['needEncrypt'] = securityContext.needEncrypt;
@@ -244,26 +242,25 @@ abstract class GeneralBaseService<T> {
 
   ///payloadKey：空，直接ecc解密
   ///有值，用于加密,secretKey有值，用于解密
-  Future<Map<String, dynamic>> decrypt(T entity,
+  Future<Map<String, dynamic>> _decryptFields(T entity,
       {bool needCompress = true,
       bool needEncrypt = true,
       bool needSign = false,
-      String? payloadKey,
       List<int>? secretKey}) async {
     Map<String, dynamic> json = JsonUtil.toJson(entity) as Map<String, dynamic>;
     SecurityContext securityContext = SecurityContext();
     securityContext.needCompress = needCompress;
     securityContext.needEncrypt = needEncrypt;
     securityContext.needSign = needSign;
-    securityContext.payloadKey = payloadKey;
     securityContext.secretKey = secretKey;
     if (encryptFields.isNotEmpty) {
       for (var encryptField in encryptFields) {
         String? value = json[encryptField];
         if (StringUtil.isNotEmpty(value)) {
           try {
-            securityContext.payload = CryptoUtil.decodeBase64(value!);
-            var result = await cryptographySecurityContextService
+            List<int> data = CryptoUtil.decodeBase64(value!);
+            securityContext.payload = data.sublist(0, data.length - 1);
+            var result = await linkmanCryptographySecurityContextService
                 .decrypt(securityContext);
             if (result) {
               var data = securityContext.payload;
@@ -280,7 +277,7 @@ abstract class GeneralBaseService<T> {
 
   Future<int> insert(dynamic entity) async {
     EntityUtil.createTimestamp(entity);
-    Map<String, dynamic> json = await encrypt(entity);
+    Map<String, dynamic> json = await _encryptFields(entity);
     int key = dataStore.insert(tableName, json);
     Object? id = EntityUtil.getId(entity);
     if (id == null) {
@@ -312,7 +309,7 @@ abstract class GeneralBaseService<T> {
       args.addAll(whereArgs);
     }
     where = _buildWhere(where, args);
-    Map<String, dynamic> json = await encrypt(entity);
+    Map<String, dynamic> json = await _encryptFields(entity);
     int result =
         dataStore.update(tableName, json, where: where, whereArgs: args);
     return result;
@@ -322,7 +319,7 @@ abstract class GeneralBaseService<T> {
   save(List<T> entities, [dynamic ignore, dynamic parent]) async {
     List<Map<String, dynamic>> operators = [];
     for (var entity in entities) {
-      Map<String, dynamic> json = await encrypt(entity);
+      Map<String, dynamic> json = await _encryptFields(entity);
       operators.add({'table': tableName, 'entity': json});
     }
     return dataStore.transaction(operators);
