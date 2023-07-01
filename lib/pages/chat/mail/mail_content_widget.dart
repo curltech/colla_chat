@@ -1,4 +1,5 @@
 import 'dart:io';
+
 import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/path_util.dart';
@@ -74,9 +75,9 @@ class _MailContentWidgetState extends State<MailContentWidget> {
           this.mimeMessage.value = mimeMessage;
         } else if (platformParams.windows) {
           int? uid = mimeMessage.uid;
-          String? messageId = mimeMessage.envelope?.messageId;
+          String? sender = mimeMessage.envelope?.sender?.email;
           Directory tempDir = await PathUtil.getTemporaryDirectory();
-          String filename = p.join(tempDir.path, '${messageId}_$uid.html');
+          String filename = p.join(tempDir.path, '${sender}_$uid.html');
           File file = File(filename);
           bool exist = file.existsSync();
           if (!exist) {
