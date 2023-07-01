@@ -365,7 +365,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return chatMessage;
   }
 
-  ///创建群和会议消息，将发送给群和会议的消息分拆成单个的消息
+  ///创建群和会议消息，填写消息的群字段
   ///接收者5个字段不填写，保证分拆的每个消息完全一样
   Future<ChatMessage> buildGroupChatMessage(
     String groupId,
@@ -406,8 +406,6 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         contentType: contentType,
         mimeType: mimeType,
         transportType: transportType,
-        receiverType: groupType,
-        receiverName: groupName,
         groupId: groupId,
         groupName: groupName,
         groupType: groupType,
