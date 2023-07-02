@@ -206,15 +206,13 @@ abstract class GeneralBaseService<T> {
   Future<Map<String, dynamic>> _encryptFields(dynamic entity,
       {bool needCompress = true,
       bool needEncrypt = true,
-      bool needSign = false,
-      List<int>? secretKey}) async {
+      bool needSign = false}) async {
     Map<String, dynamic> json = JsonUtil.toJson(entity) as Map<String, dynamic>;
     if (encryptFields.isNotEmpty) {
       SecurityContext securityContext = SecurityContext();
       securityContext.needCompress = needCompress;
       securityContext.needEncrypt = needEncrypt;
       securityContext.needSign = needSign;
-      securityContext.secretKey = secretKey;
       for (var encryptField in encryptFields) {
         String? value = json[encryptField];
         if (StringUtil.isNotEmpty(value)) {
@@ -245,14 +243,12 @@ abstract class GeneralBaseService<T> {
   Future<Map<String, dynamic>> _decryptFields(T entity,
       {bool needCompress = true,
       bool needEncrypt = true,
-      bool needSign = false,
-      List<int>? secretKey}) async {
+      bool needSign = false}) async {
     Map<String, dynamic> json = JsonUtil.toJson(entity) as Map<String, dynamic>;
     SecurityContext securityContext = SecurityContext();
     securityContext.needCompress = needCompress;
     securityContext.needEncrypt = needEncrypt;
     securityContext.needSign = needSign;
-    securityContext.secretKey = secretKey;
     if (encryptFields.isNotEmpty) {
       for (var encryptField in encryptFields) {
         String? value = json[encryptField];
