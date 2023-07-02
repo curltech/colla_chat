@@ -7,14 +7,12 @@ class ChatAction extends BaseAction {
   ChatAction(MsgType msgType) : super(msgType);
 
   Future<bool> chat(dynamic data, String targetPeerId,
-      {String? payloadType}) async {
-    ChainMessage chainMessage =
-        await prepareSend(data, targetPeerId: targetPeerId);
-    chainMessage.needEncrypt = true;
+      {PayloadType? payloadType, bool needEncrypt = true}) async {
+    ChainMessage chainMessage = await prepareSend(data,
+        targetPeerId: targetPeerId, payloadType: payloadType);
+    chainMessage.needEncrypt = needEncrypt;
     chainMessage.needSlice = true;
-    if (payloadType != null) {
-      chainMessage.payloadType = payloadType;
-    }
+
     return await send(chainMessage);
   }
 }

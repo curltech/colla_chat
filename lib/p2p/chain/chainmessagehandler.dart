@@ -31,16 +31,15 @@ class ChainMessageHandler {
 
   ///发送前的预处理，设置消息的初始值
   ///如果targetPeerId不为空，指的是目标peerclient，否则是直接向connectPeerId的peerendpoint发送信息
-  ///传入数据为对象，先转换成json字符串，然后utf-8格式的List<int>
-  Future<ChainMessage> prepareSend(dynamic data, MsgType msgType,
+  Future<ChainMessage> prepareSend(List<int> data, MsgType msgType,
       {String? connectAddress,
       String? connectPeerId,
       String? targetPeerId,
       String? topic,
-      String? targetClientId}) async {
+      String? targetClientId,
+      PayloadType? payloadType}) async {
     ChainMessage chainMessage = ChainMessage();
-    //把负载变成字符串格式
-    var jsonStr = JsonUtil.toJsonString(data);
+
     //如果指出了目标客户端，则查询目标客户端的信息
     if (targetPeerId != null) {
       PeerClient? peerClient =
@@ -95,11 +94,8 @@ class ChainMessageHandler {
       topic ??= appDataProvider.topics[0];
     }
     chainMessage.topic = topic;
-
-    /// 把负载变成utf8的二进制的数组，方便计数和进一步的处理
-    List<int> payload = CryptoUtil.stringToUtf8(jsonStr);
-    chainMessage.payload = payload;
-    chainMessage.payloadType = PayloadType.map.name;
+    chainMessage.payload = data;
+    chainMessage.payloadType = payloadType?.name;
     chainMessage.messageType = msgType.name;
     chainMessage.messageDirect = MsgDirect.Request.name;
     var uuid = const Uuid();
@@ -267,8 +263,8 @@ class ChainMessageHandler {
     // }
     securityContext.payload = payload;
     try {
-      bool result =
-          await linkmanCryptographySecurityContextService.encrypt(securityContext);
+      bool result = await linkmanCryptographySecurityContextService
+          .encrypt(securityContext);
       if (result) {
         chainMessage.transportPayload =
             CryptoUtil.encodeBase64(securityContext.payload);
@@ -305,8 +301,8 @@ class ChainMessageHandler {
     securityContext.payload =
         CryptoUtil.decodeBase64(chainMessage.transportPayload!);
     try {
-      var result =
-          await linkmanCryptographySecurityContextService.decrypt(securityContext);
+      var result = await linkmanCryptographySecurityContextService
+          .decrypt(securityContext);
       if (result) {
         chainMessage.needCompress = securityContext.needCompress;
         chainMessage.needEncrypt = securityContext.needEncrypt;

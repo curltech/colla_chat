@@ -150,6 +150,9 @@ abstract class CryptographySecurityContextService
     }
     List<int> data = JsonUtil.toUintList(payload);
     List<int>? secretKey = securityContext.secretKey;
+    if (secretKey != null) {
+      logger.w('secretKey is exist, no sign,no compress, no encrypt');
+    }
     // 1.设置签名（本地保存前加密不签名），只有在加密的情况下才设置签名
     var peerId = myself.peerId;
     if (needSign && secretKey == null) {
@@ -338,6 +341,7 @@ class LinkmanCryptographySecurityContextService
     }
 
     //直接加密，不用给定的密钥
+    logger.i('linkman encrypt');
     data =
         await cryptoGraphy.eccEncrypt(data, remotePublicKey: targetPublicKey);
 
@@ -390,6 +394,7 @@ class GroupCryptographySecurityContextService
     /// 安全上下文中没有加密key表示第一次加密，key随机数产生，
     /// 否则表示第n次，要采用同样的加密key做多次加密
     List<int>? secretKey = securityContext.secretKey;
+    logger.i('group encrypt and secretKey:${secretKey != null}');
     if (secretKey == null) {
       secretKey = await cryptoGraphy.getRandomBytes();
       securityContext.secretKey = secretKey;

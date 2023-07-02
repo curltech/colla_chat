@@ -18,6 +18,7 @@ enum PayloadType {
   dataBlocks,
   string,
   map,
+  list //List<int>
 }
 
 class NamespacePrefix {
@@ -95,18 +96,32 @@ abstract class BaseAction {
   ///发送前的预处理，设置消息的初始值
   ///如果targetPeerId不为空，指的是目标peerclient，否则是直接向connectPeerId的peerendpoint发送信息
   ///传入数据为对象，先转换成json字符串，然后utf-8格式的List<int>
-  Future<ChainMessage> prepareSend(dynamic data,
+  Future<ChainMessage> prepareSend(dynamic msg,
       {String? connectAddress,
       String? connectPeerId,
       String? targetPeerId,
       String? topic,
-      String? targetClientId}) async {
+      String? targetClientId,
+      PayloadType? payloadType}) async {
+    List<int> data;
+    if (payloadType == PayloadType.string) {
+      /// 字符串数据转换成utf-8二进制
+      data = CryptoUtil.stringToUtf8(msg);
+    } else if (payloadType == PayloadType.list) {
+      ///二进制数据直接使用
+      data = msg;
+    } else {
+      ///其他数据先转换成json字符串，然后转换成utf-8二进制
+      String payloadStr = JsonUtil.toJsonString(msg);
+      data = CryptoUtil.stringToUtf8(payloadStr);
+    }
     return chainMessageHandler.prepareSend(data, msgType,
         connectAddress: connectAddress,
         connectPeerId: connectPeerId,
         targetPeerId: targetPeerId,
         topic: topic,
-        targetClientId: targetClientId);
+        targetClientId: targetClientId,
+        payloadType: payloadType);
   }
 
   /// 主动发送消息，在发送之前对消息进行必要的分片处理
@@ -167,9 +182,19 @@ abstract class BaseAction {
   ///将消息负载转换成具体类型的消息负载
   ///将List<int>数据还原utf-8字符串，然后转换成对象
   Future<void> transferPayload(ChainMessage chainMessage) async {
-    var payload = chainMessage.payload;
-    String data = CryptoUtil.utf8ToString(payload);
-    var json = JsonUtil.toJson(data);
-    chainMessage.payload = json;
+    ///返回是是utf-8二进制
+    List<int> data = chainMessage.payload;
+    dynamic payload;
+    var payloadType = chainMessage.payloadType;
+    if (payloadType == PayloadType.string.name) {
+      payload = CryptoUtil.utf8ToString(data);
+    } else if (payloadType == PayloadType.list.name) {
+      payload = chainMessage.payload;
+    } else {
+      String payloadstr = CryptoUtil.utf8ToString(data);
+      payload = JsonUtil.toJson(payloadstr);
+    }
+
+    chainMessage.payload = payload;
   }
 }

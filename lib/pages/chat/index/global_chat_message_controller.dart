@@ -75,7 +75,17 @@ class GlobalChatMessageController with ChangeNotifier {
       logger.e('chainMessage.srcPeerId is null');
       return;
     }
-    if (chainMessage.payloadType == PayloadType.chatMessage.name) {
+
+    ///如果是密文发送，chat无需加密的情况下，对群发的时候统一加密有帮助
+    if (chainMessage.payloadType == PayloadType.list.name) {
+      ChatMessage? msg = await chatMessageService.decrypt(chainMessage.payload);
+      if (msg != null) {
+        await receiveChatMessage(msg);
+      } else {
+        logger.e('onChat response decrypt failure');
+      }
+    } else if (chainMessage.payloadType == PayloadType.chatMessage.name) {
+      ///如果是明文发送，chat自己加密的情况下
       ChatMessage chatMessage = ChatMessage.fromJson(chainMessage.payload);
       await receiveChatMessage(chatMessage);
     }
@@ -156,8 +166,7 @@ class GlobalChatMessageController with ChangeNotifier {
     if (chatMessage.messageType != ChatMessageType.system.name &&
         chatMessageController.chatSummary != null) {
       var peerId = chatMessageController.chatSummary!.peerId;
-      if (chatMessage.senderPeerId == peerId ||
-          chatMessage.groupId == peerId) {
+      if (chatMessage.senderPeerId == peerId || chatMessage.groupId == peerId) {
         chatMessageController.notifyListeners();
       }
     }

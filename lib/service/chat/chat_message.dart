@@ -626,6 +626,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     SecurityContext securityContext = SecurityContext();
     securityContext.payload = data;
     if (chatMessage.receiverPeerId != null) {
+      logger
+          .i('this is linkman chatMessage, will be encrypted by linkman mode');
       if (chatMessage.receiverPeerId != myself.peerId) {
         securityContext.targetPeerId = chatMessage.receiverPeerId;
         securityContext.targetClientId = chatMessage.receiverClientId;
@@ -639,6 +641,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
         }
       }
     } else if (chatMessage.groupId != null) {
+      logger.i('this is group chatMessage, will be encrypted once');
+
       ///再根据群进行消息的复制成多条进行处理
       if (peerIds == null || peerIds.isEmpty) {
         String groupId = chatMessage.groupId!;
@@ -722,6 +726,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   }
 
   ///对单条消息和对应的加密数据进行发送
+  ///对webrtc和websocket来说是发送已经加密的数据，因为单发和群发的加密方式不一样
+  ///对sms来说是发送文本内容，也是自己进行加密，加密的时机不一样
   Future<void> _send(ChatMessage chatMessage, List<int> data) async {
     String? peerId = chatMessage.receiverPeerId;
     if (peerId == null || peerId == myself.peerId) {
@@ -740,8 +746,13 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     if (factTransportType == null &&
         transportType == TransportType.websocket.name) {
       try {
-        bool success = await chatAction.chat(chatMessage, peerId,
-            payloadType: PayloadType.chatMessage.name);
+        ///chatMessage已经加密，所以chatAction无需加密
+        bool success = await chatAction.chat(data, peerId,
+            payloadType: PayloadType.list, needEncrypt: false);
+
+        ///另一种做法是不加密，由chatAction加密
+        // bool success = await chatAction.chat(chatMessage, peerId,
+        //     payloadType: PayloadType.chatMessage, needEncrypt: true);
         if (success) {
           factTransportType = TransportType.websocket.name;
         }
@@ -843,6 +854,7 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     ///对组消息进行拆分
     if (chatMessage.groupId != null && chatMessage.receiverPeerId == null) {
       ///再根据群进行消息的复制成多条进行处理
+      logger.i('this is group chatMessage, will be split');
       if (peerIds == null || peerIds.isEmpty) {
         String groupId = chatMessage.groupId!;
         peerIds = await groupMemberService.findPeerIdsByGroupId(groupId);
@@ -862,6 +874,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
           chatMessages.add(msg);
         }
       }
+    } else {
+      logger.i('this is linkman chatMessage, will be not split');
     }
     return chatMessages;
   }
