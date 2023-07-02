@@ -151,11 +151,12 @@ abstract class CryptographySecurityContextService
     List<int> data = JsonUtil.toUintList(payload);
     List<int>? secretKey = securityContext.secretKey;
     if (secretKey != null) {
-      logger.w('secretKey is exist, no sign,no compress, no encrypt');
+      logger.w(
+          'secretKey is exist,needSign:$needSign,needCompress:$needCompress');
     }
     // 1.设置签名（本地保存前加密不签名），只有在加密的情况下才设置签名
     var peerId = myself.peerId;
-    if (needSign && secretKey == null) {
+    if (needSign) {
       if (peerId != null) {
         /// 签名，并且用上一次过期的私钥也签名
         var myselfPrivateKey = myself.privateKey;
@@ -178,7 +179,7 @@ abstract class CryptographySecurityContextService
       }
     }
     //2. 压缩数据
-    if (needCompress && secretKey == null) {
+    if (needCompress) {
       if (data.length < compressLimit) {
         securityContext.needCompress = false;
         needCompress = false;

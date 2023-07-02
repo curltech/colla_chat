@@ -650,6 +650,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
       }
       if (peerIds.isNotEmpty) {
         for (var peerId in peerIds) {
+          if (securityContext.secretKey != null) {
+            securityContext.needSign = false;
+            securityContext.needCompress = false;
+          }
           chatMessage.receiverPeerId = peerId;
           Linkman? linkman = await linkmanService.findCachedOneByPeerId(peerId);
           if (linkman != null && linkman.peerId != myself.peerId) {
