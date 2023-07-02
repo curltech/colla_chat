@@ -31,7 +31,7 @@ target 'Runner' do
   use_frameworks!
   use_modular_headers!
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-  pod 'PhoneNumberKit/PhoneNumberKitCore', :git => 'https://github.com/marmelroy/PhoneNumberKit', :tag => '3.6.3'
+  pod 'PhoneNumberKit/PhoneNumberKitCore', :git => 'https://github.com/marmelroy/PhoneNumberKit'
 end
 
 post_install do |installer|
