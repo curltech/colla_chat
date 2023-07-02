@@ -75,7 +75,7 @@ class P2pRegisterWidget extends StatefulWidget {
 }
 
 class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
-  String _countryCode = 'CN';
+  ValueNotifier<String> countryCode = ValueNotifier<String>('CN');
   TextEditingController mobileController = TextEditingController();
   ValueNotifier<String?> peerId = ValueNotifier<String?>(null);
   ValueNotifier<Uint8List?> avatar = ValueNotifier<Uint8List?>(null);
@@ -84,8 +84,7 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
   void initState() {
     super.initState();
     MobileUtil.carrierRegionCode().then((value) {
-      // _countryCode = value;
-      logger.i('region code:$value');
+      countryCode.value = value;
     });
   }
 
@@ -136,41 +135,47 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
             )),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
-          child: IntlPhoneField(
-            languageCode: myself.locale.languageCode,
-            pickerDialogStyle: PickerDialogStyle(),
-            invalidNumberMessage: AppLocalizations.t('Invalid Mobile Number'),
-            controller: mobileController,
-            initialCountryCode: _countryCode,
-            decoration: InputDecoration(
-              labelText: AppLocalizations.t('Mobile'),
-              suffixIcon: platformParams.android
-                  ? IconButton(
-                      onPressed: () async {
-                        String? mobile = await MobileUtil.getMobileNumber();
-                        if (mobile != null) {
-                          int pos = mobile.indexOf('+');
-                          if (pos > -1) {
-                            mobile = mobile.substring(pos);
-                          }
-                          phone_numbers_parser.PhoneNumber phoneNumber =
-                              PhoneNumberUtil.fromRaw(mobile);
-                          mobileController.text = phoneNumber.nsn;
-                        }
-                      },
-                      icon: Icon(
-                        Icons.mobile_screen_share,
-                        color: myself.primary,
-                      ))
-                  : null,
-            ),
-            onChanged: (PhoneNumber phoneNumber) {
-              // mobileController.text = phoneNumber.number;
+          child: ValueListenableBuilder(
+            valueListenable: countryCode,
+            builder: (BuildContext context, String countryCode, Widget? child) {
+              return IntlPhoneField(
+                languageCode: myself.locale.languageCode,
+                pickerDialogStyle: PickerDialogStyle(),
+                invalidNumberMessage:
+                    AppLocalizations.t('Invalid Mobile Number'),
+                controller: mobileController,
+                initialCountryCode: countryCode,
+                decoration: InputDecoration(
+                  labelText: AppLocalizations.t('Mobile'),
+                  suffixIcon: platformParams.android
+                      ? IconButton(
+                          onPressed: () async {
+                            String? mobile = await MobileUtil.getMobileNumber();
+                            if (mobile != null) {
+                              int pos = mobile.indexOf('+');
+                              if (pos > -1) {
+                                mobile = mobile.substring(pos);
+                              }
+                              phone_numbers_parser.PhoneNumber phoneNumber =
+                                  PhoneNumberUtil.fromRaw(mobile);
+                              mobileController.text = phoneNumber.nsn;
+                            }
+                          },
+                          icon: Icon(
+                            Icons.mobile_screen_share,
+                            color: myself.primary,
+                          ))
+                      : null,
+                ),
+                onChanged: (PhoneNumber phoneNumber) {
+                  // mobileController.text = phoneNumber.number;
+                },
+                onCountryChanged: (country) {
+                  this.countryCode.value = country.name;
+                },
+                disableLengthCheck: true,
+              );
             },
-            onCountryChanged: (country) {
-              _countryCode = country.name;
-            },
-            disableLengthCheck: true,
           ),
         ),
         ValueListenableBuilder(
