@@ -605,7 +605,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return chatReceipts;
   }
 
-  ///加密消息，要么对非组的消息进行加密，要么对组消息进行加密，返回可发送的多条消息
+  ///加密消息，要么对非组的消息或者拆分后的群消息进行linkman方式加密，
+  ///要么对组消息进行加密，返回可发送的多条消息
   Future<Map<String, List<int>>> encrypt(ChatMessage chatMessage,
       {CryptoOption? cryptoOption, List<String>? peerIds}) async {
     Map<String, List<int>> encryptData = {};
@@ -734,7 +735,11 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   ///对sms来说是发送文本内容，也是自己进行加密，加密的时机不一样
   Future<void> _send(ChatMessage chatMessage, List<int> data) async {
     String? peerId = chatMessage.receiverPeerId;
+
+    ///未被分拆的群消息或者发送给自己的消息取消发送
     if (peerId == null || peerId == myself.peerId) {
+      chatMessage.transportType = TransportType.none.name;
+      chatMessage.status = MessageStatus.sent.name;
       return;
     }
     var transportType = chatMessage.transportType;
@@ -853,8 +858,8 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
     return null;
   }
 
-  /// 如果是群消息，拆分多条消息
-  /// 如果是非群消息返回单条的数组
+  /// 如果是群消息，拆分多条消息，拆分后的接收者信息被填充
+  /// 如果是非群消息或者拆分过的群消息返回单条消息的数组
   Future<List<ChatMessage>> split(ChatMessage chatMessage,
       {List<String>? peerIds}) async {
     List<ChatMessage> chatMessages = [chatMessage];
