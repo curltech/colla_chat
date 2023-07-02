@@ -1,44 +1,43 @@
 import 'package:colla_chat/tool/string_util.dart';
-import 'package:phone_number/phone_number.dart' as phone_number;
-import 'package:phone_numbers_parser/phone_numbers_parser.dart'
-    as phone_numbers_parser;
+import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 
 class PhoneNumberUtil {
-  static Future<phone_number.PhoneNumber> parse(String phoneNumberStr,
-      {String? regionCode}) async {
-    //phone_number.RegionInfo region = phone_number.RegionInfo(name:'US',code:'en',prefix: 1);
-    phone_number.PhoneNumber phoneNumber = await phone_number.PhoneNumberUtil()
-        .parse(phoneNumberStr, regionCode: regionCode);
+  static PhoneNumber parse(
+    String phoneNumberStr, {
+    IsoCode? callerCountry,
+    IsoCode? destinationCountry,
+  }) {
+    PhoneNumber phoneNumber = PhoneNumber.parse(phoneNumberStr,
+        callerCountry: callerCountry, destinationCountry: destinationCountry);
 
     return phoneNumber;
   }
 
-  static Future<bool> validate(String phoneNumberStr, String regionCode) async {
-    bool isValidate = await phone_number.PhoneNumberUtil()
-        .validate(phoneNumberStr, regionCode: regionCode);
+  static PhoneNumber fromIsoCode(IsoCode isoCode, String phoneNumber) {
+    return PhoneNumber.parse(
+      phoneNumber,
+      callerCountry: isoCode,
+    );
+  }
+
+  static PhoneNumber fromRaw(String phoneNumber) {
+    return PhoneNumber.parse(phoneNumber);
+  }
+
+  static bool validate(PhoneNumber phoneNumber, {PhoneNumberType? type}) {
+    bool isValidate = phoneNumber.isValid(type: type);
 
     return isValidate;
   }
 
-  static Future<String> format(String phoneNumberStr, String regionCode) async {
-    String formatted =
-        await phone_number.PhoneNumberUtil().format(phoneNumberStr, regionCode);
+  static String format(PhoneNumber phoneNumber, {IsoCode? isoCode}) {
+    String formatted = phoneNumber.getFormattedNsn(isoCode: isoCode);
 
     return formatted;
   }
 
-  static Future<List<phone_number.RegionInfo>> allSupportedRegions(
-      {String? locale}) async {
-    List<phone_number.RegionInfo> regions = await phone_number.PhoneNumberUtil()
-        .allSupportedRegions(locale: locale);
-
-    return regions;
-  }
-
-  static Future<String> carrierRegionCode() async {
-    String code = await phone_number.PhoneNumberUtil().carrierRegionCode();
-
-    return code;
+  static List<IsoCode> allSupportedRegions() {
+    return IsoCode.values;
   }
 
   // 格式化手机号为344
@@ -57,34 +56,5 @@ class PhoneNumberUtil {
   // 电话格式化
   static String formatPhone(String zoneCode, String mobile) {
     return "+$zoneCode ${formatMobile344(mobile)}";
-  }
-
-  static phone_numbers_parser.PhoneNumber fromNational(
-      phone_numbers_parser.IsoCode isoCode, String phoneNumber) {
-    return phone_numbers_parser.PhoneNumber.parse(
-      phoneNumber,
-      callerCountry: isoCode,
-    );
-  }
-
-  static phone_numbers_parser.PhoneNumber fromIsoCode(
-      phone_numbers_parser.IsoCode isoCode, String phoneNumber) {
-    return phone_numbers_parser.PhoneNumber.parse(
-      phoneNumber,
-      callerCountry: isoCode,
-    );
-  }
-
-  static phone_numbers_parser.PhoneNumber fromRaw(String phoneNumber) {
-    return phone_numbers_parser.PhoneNumber.parse(phoneNumber);
-  }
-
-  static isValid(phone_numbers_parser.PhoneNumber phoneNumber,
-      phone_numbers_parser.PhoneNumberType type) {
-    return phoneNumber.isValid(type: type);
-  }
-
-  static formatNsn(phone_numbers_parser.PhoneNumber phoneNumber) {
-    return phoneNumber.getFormattedNsn();
   }
 }

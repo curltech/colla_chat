@@ -6,7 +6,6 @@ import 'package:colla_chat/pages/chat/me/settings/advanced/myselfpeer/myself_pee
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/routers/routes.dart';
 import 'package:colla_chat/service/dht/myselfpeer.dart';
 import 'package:colla_chat/tool/asset_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -19,6 +18,7 @@ import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
 import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
 import 'package:cross_file/cross_file.dart';
 import 'package:flutter/material.dart';
+import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
 import 'package:phone_numbers_parser/phone_numbers_parser.dart'
@@ -83,6 +83,10 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
   @override
   void initState() {
     super.initState();
+    MobileUtil.carrierRegionCode().then((value) {
+      // _countryCode = value;
+      logger.i('region code:$value');
+    });
   }
 
   Future<void> _pickAvatar(
@@ -133,6 +137,9 @@ class _P2pRegisterWidgetState extends State<P2pRegisterWidget> {
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 15.0),
           child: IntlPhoneField(
+            languageCode: myself.locale.languageCode,
+            pickerDialogStyle: PickerDialogStyle(),
+            invalidNumberMessage: AppLocalizations.t('Invalid Mobile Number'),
             controller: mobileController,
             initialCountryCode: _countryCode,
             decoration: InputDecoration(

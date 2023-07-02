@@ -28,12 +28,12 @@ import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/image_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/network_connectivity.dart';
-import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/tool/phone_number_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart' as p;
+import 'package:phone_numbers_parser/phone_numbers_parser.dart';
 
 const String autoLoginName = 'autoLogin';
 const String lastLoginName = 'lastLogin';
@@ -142,14 +142,17 @@ class MyselfPeerService extends PeerEntityService<MyselfPeer> {
     if (code != null && mobile != null) {
       var isPhoneNumberValid = false;
       try {
-        isPhoneNumberValid = await PhoneNumberUtil.validate(mobile, code);
+        IsoCode? isoCode = StringUtil.enumFromString(IsoCode.values, code);
+        PhoneNumber phoneNumber = PhoneNumberUtil.fromIsoCode(isoCode!, mobile);
+        isPhoneNumberValid = PhoneNumberUtil.validate(phoneNumber);
+
+        if (!isPhoneNumberValid) {
+          throw 'Invalid mobile number';
+        }
+        mobile = PhoneNumberUtil.format(phoneNumber, isoCode: isoCode);
       } catch (e) {
         logger.e(e);
       }
-      if (!isPhoneNumberValid) {
-        throw 'Invalid mobile number';
-      }
-      mobile = await PhoneNumberUtil.format(mobile, code);
     }
     var peer = await findOneByName(name);
     if (peer != null) {
