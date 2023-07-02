@@ -106,13 +106,11 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
       }
       return;
     }
+
+    DialogUtil.loadingShow(context,
+        tip: 'Auto discovering email server,\n please waiting...');
     try {
-      DialogUtil.loadingShow(context,
-          tip: 'Auto discovering email server, please waiting...');
       ClientConfig? clientConfig = await EmailMessageUtil.discover(email!);
-      if (mounted) {
-        DialogUtil.loadingHide(context);
-      }
       if (clientConfig != null) {
         if (mounted) {
           DialogUtil.info(context, content: 'Auto discover successfully');
@@ -128,6 +126,9 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
       if (mounted) {
         DialogUtil.error(context, content: 'Auto discover failure');
       }
+    }
+    if (mounted) {
+      DialogUtil.loadingHide(context);
     }
   }
 
