@@ -243,7 +243,7 @@ class ChatMessageController extends DataMoreController<ChatMessage> {
           parentMessageId: _parentMessageId);
       if (chatGPT == null) {
         returnChatMessage =
-            (await chatMessageService.sendAndStore(chatMessage)).first;
+            (await chatMessageService.sendAndStore(chatMessage,peerIds:peerIds)).first;
       } else {
         await chatMessageService.store(chatMessage);
         returnChatMessage = chatMessage;
