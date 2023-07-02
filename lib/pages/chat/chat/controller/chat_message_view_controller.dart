@@ -49,7 +49,6 @@ class ChatMessageViewController with ChangeNotifier {
           _chatMessageInputHeight != chatMessageInputHeight) {
         _chatMessageInputHeight = chatMessageInputHeight;
         logger.i('chatMessageInputHeight: $_chatMessageInputHeight');
-        notifyListeners();
       }
     });
   }

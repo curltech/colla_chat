@@ -1258,7 +1258,7 @@ class BasePeerConnection {
   ///关闭连接
   close() async {
     if (status == PeerConnectionStatus.closed) {
-      logger.e('PeerConnectionStatus closed');
+      logger.w('PeerConnectionStatus closed');
       return;
     }
     //trackSenders = {};

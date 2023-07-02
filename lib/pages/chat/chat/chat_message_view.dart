@@ -28,7 +28,6 @@ import 'package:colla_chat/transport/webrtc/base_peer_connection.dart';
 import 'package:colla_chat/transport/webrtc/peer_connection_pool.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
-import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 import 'package:keyboard_actions/keyboard_actions.dart';
@@ -43,7 +42,7 @@ class ChatMessageView extends StatefulWidget with TileDataMixin {
   final VideoChatWidget videoChatWidget = VideoChatWidget();
   final ChatMessageWidget chatMessageWidget = ChatMessageWidget();
   final ChatMessageInputWidget chatMessageInputWidget =
-      const ChatMessageInputWidget();
+      ChatMessageInputWidget();
 
   ChatMessageView({
     Key? key,

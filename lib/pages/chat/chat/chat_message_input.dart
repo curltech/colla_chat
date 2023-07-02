@@ -14,25 +14,26 @@ import 'controller/chat_message_controller.dart';
 ///第一行：包括声音按钮，扩展文本输入框，emoji按钮，其他多种格式输入按钮和发送按钮
 ///第二行：emoji面板，其他多种格式输入面板
 class ChatMessageInputWidget extends StatefulWidget {
+  ///扩展文本输入框的控制器
+  final TextEditingController textEditingController = TextEditingController();
+
   final Future<void> Function(int index, String name, {String? value})?
       onAction;
 
-  const ChatMessageInputWidget({Key? key, this.onAction}) : super(key: key);
+  ChatMessageInputWidget({Key? key, this.onAction}) : super(key: key);
 
   @override
   State createState() => _ChatMessageInputWidgetState();
 }
 
 class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
-  ///扩展文本输入框的控制器
-  final TextEditingController textEditingController = TextEditingController();
   BlueFireAudioPlayer audioPlayer = BlueFireAudioPlayer();
 
   @override
   void initState() {
     super.initState();
     chatMessageViewController.addListener(_update);
-    textEditingController.clear();
+    //textEditingController.clear();
   }
 
   _update() {
@@ -50,9 +51,10 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
 
   ///发送文本消息
   Future<void> onSendPressed() async {
-    if (StringUtil.isNotEmpty(textEditingController.text)) {
+    if (StringUtil.isNotEmpty(widget.textEditingController.text)) {
       _play();
-      await chatMessageController.sendText(message: textEditingController.text);
+      await chatMessageController.sendText(
+          message: widget.textEditingController.text);
     }
   }
 
@@ -77,7 +79,7 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
   }
 
   void _insertText(String text) {
-    final TextEditingValue value = textEditingController.value;
+    final TextEditingValue value = widget.textEditingController.value;
     final int start = value.selection.baseOffset;
     int end = value.selection.extentOffset;
     if (value.selection.isValid) {
@@ -95,12 +97,12 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
         end = start;
       }
 
-      textEditingController.value = value.copyWith(
+      widget.textEditingController.value = value.copyWith(
           text: newText,
           selection: value.selection.copyWith(
               baseOffset: end + text.length, extentOffset: end + text.length));
     } else {
-      textEditingController.value = TextEditingValue(
+      widget.textEditingController.value = TextEditingValue(
           text: text,
           selection:
               TextSelection.fromPosition(TextPosition(offset: text.length)));
@@ -114,7 +116,7 @@ class _ChatMessageInputWidgetState extends State<ChatMessageInputWidget> {
   Widget _buildChatMessageInput(BuildContext context) {
     List<Widget> children = [
       TextMessageInputWidget(
-        textEditingController: textEditingController,
+        textEditingController: widget.textEditingController,
         onEmojiPressed: onEmojiPressed,
         onMorePressed: onMorePressed,
         onSendPressed: onSendPressed,

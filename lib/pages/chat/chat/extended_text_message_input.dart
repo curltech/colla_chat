@@ -5,6 +5,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controller.dart';
 import 'package:colla_chat/pages/chat/linkman/group_linkman_widget.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
@@ -147,48 +148,55 @@ class _ExtendedTextMessageInputWidgetState
     chatMessageViewController.changeExtendedTextHeight();
     //不随系统的字体大小变化
     return MediaQuery(
-        data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
-        child: ExtendedTextField(
-          key: chatMessageViewController.extendedTextKey,
-          minLines: 1,
-          maxLines: 8,
-          style: const TextStyle(fontSize: AppFontSize.mdFontSize),
-          specialTextSpanBuilder: CustomSpecialTextSpanBuilder(
-            showAtBackground: true,
-          ),
-          controller: widget.textEditingController,
-          selectionControls: extendedMaterialTextSelectionControls,
-          focusNode: chatMessageViewController.focusNode,
-          onChanged: (String value) async {
-            if (value == '@') {
-              await _selectGroupLinkman();
-            }
-          },
-          //onChanged: onChanged,
-          decoration: InputDecoration(
-            fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
-            filled: true,
-            border: textFormFieldBorder,
-            focusedBorder: textFormFieldBorder,
-            enabledBorder: textFormFieldBorder,
-            errorBorder: textFormFieldBorder,
-            disabledBorder: textFormFieldBorder,
-            focusedErrorBorder: textFormFieldBorder,
-            hintText: AppLocalizations.t('Please input message'),
-            suffixIcon: widget.textEditingController.text.isNotEmpty
-                ? InkWell(
-                    onTap: () {
-                      widget.textEditingController.clear();
-                    },
-                    child: Icon(
-                      Icons.clear_rounded,
-                      color: myself.primary,
-                    ),
-                  )
-                : null,
-            //isCollapsed: true,
-          ),
-          //textDirection: TextDirection.rtl,
-        ));
+      data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+      child: ExtendedTextField(
+        key: chatMessageViewController.extendedTextKey,
+        minLines: 1,
+        maxLines: 8,
+        style: const TextStyle(fontSize: AppFontSize.mdFontSize),
+        specialTextSpanBuilder: CustomSpecialTextSpanBuilder(
+          showAtBackground: true,
+        ),
+        controller: widget.textEditingController,
+        selectionControls: extendedMaterialTextSelectionControls,
+        focusNode: chatMessageViewController.focusNode,
+        onChanged: (String value) async {
+          if (value == '@') {
+            await _selectGroupLinkman();
+          }
+        },
+        //onChanged: onChanged,
+        decoration: InputDecoration(
+          fillColor: Colors.grey.withOpacity(AppOpacity.lgOpacity),
+          filled: true,
+          border: textFormFieldBorder,
+          focusedBorder: textFormFieldBorder,
+          enabledBorder: textFormFieldBorder,
+          errorBorder: textFormFieldBorder,
+          disabledBorder: textFormFieldBorder,
+          focusedErrorBorder: textFormFieldBorder,
+          hintText: AppLocalizations.t('Please input message'),
+          suffixIcon: widget.textEditingController.text.isNotEmpty
+              ? InkWell(
+                  onTap: () {
+                    widget.textEditingController.clear();
+                  },
+                  child: Icon(
+                    Icons.clear_rounded,
+                    color: myself.primary,
+                  ),
+                )
+              : null,
+          //isCollapsed: true,
+        ),
+        onEditingComplete: () {
+          logger.i('onEditingComplete');
+        },
+        onSubmitted: (value) {
+          logger.i('onSubmitted');
+        },
+        //textDirection: TextDirection.rtl,
+      ),
+    );
   }
 }

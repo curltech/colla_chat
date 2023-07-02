@@ -784,6 +784,10 @@ class ChatMessageService extends GeneralBaseService<ChatMessage> {
   Future<List<ChatMessage>> sendAndStore(ChatMessage chatMessage,
       {CryptoOption cryptoOption = CryptoOption.linkman,
       List<String>? peerIds}) async {
+    if (chatMessage.receiverPeerId == myself.peerId) {
+      await chatMessageService.store(chatMessage);
+      return [chatMessage];
+    }
     List<ChatMessage> chatMessages =
         await send(chatMessage, cryptoOption: cryptoOption, peerIds: peerIds);
     if (chatMessages.isNotEmpty) {
