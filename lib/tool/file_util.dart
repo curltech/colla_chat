@@ -71,7 +71,7 @@ class FileUtil {
     if (exist) {
       file.deleteSync();
     }
-    await file.writeAsBytes(bytes);
+    await file.writeAsBytes(bytes, flush: true);
     exist = await file.exists();
     if (!exist) {
       return null;

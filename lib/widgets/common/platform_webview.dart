@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/flutter_webview.dart';
 import 'package:colla_chat/widgets/common/html_webview.dart';
@@ -6,6 +10,7 @@ import 'package:colla_chat/widgets/common/inapp_webview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart' as inapp;
 import 'package:webview_flutter/webview_flutter.dart' as webview;
+import 'package:path/path.dart' as p;
 
 class PlatformWebViewController with ChangeNotifier {
   inapp.InAppWebViewController? inAppWebViewController;
@@ -37,7 +42,18 @@ class PlatformWebViewController with ChangeNotifier {
 
   loadHtml(String html) async {
     if (webViewController != null) {
-      await webViewController!.loadHtmlString(html);
+      if (platformParams.windows) {
+        Directory tempDir = await PathUtil.getTemporaryDirectory();
+        String filename = await FileUtil.getTempFilename(extension: 'html');
+        File file = File(filename);
+        bool exist = file.existsSync();
+        if (!exist) {
+          file.writeAsStringSync(html, flush: true);
+        }
+        await webViewController!.loadFile(filename);
+      } else {
+        await webViewController!.loadHtmlString(html);
+      }
     } else if (inAppWebViewController != null) {
       await inAppWebViewController!.loadData(data: html);
     } else {
