@@ -165,7 +165,13 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
     }
     if (emailClient == null) {
       logger.e('create (or connect) fail to $name.');
+      if (mounted) {
+        DialogUtil.confirm(context, content: 'Connect failure');
+      }
       return;
+    }
+    if (mounted) {
+      DialogUtil.confirm(context, content: 'Connect successfully');
     }
     logger.i('create (or connect) success to $name.');
     EmailAddress? emailAddress =
