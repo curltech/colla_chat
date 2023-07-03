@@ -236,12 +236,12 @@ class _ManualAddWidgetState extends State<ManualAddWidget> {
     if (emailClient == null) {
       logger.e('Connect fail to $name.');
       if (mounted) {
-        DialogUtil.confirm(context, content: 'Connect failure');
+        DialogUtil.info(context, content: 'Connect failure');
       }
       return;
     }
     if (mounted) {
-      DialogUtil.confirm(context, content: 'Connect successfully');
+      DialogUtil.info(context, content: 'Connect successfully');
     }
     logger.i('create (or connect) success to $name.');
     EmailAddress? emailAddress =
