@@ -241,6 +241,8 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
 
   Widget _buildQuillEditor(BuildContext context) {
     Widget quillEditor = QuillEditor(
+      minHeight: 200,
+      maxHeight: widget.height,
       locale: myself.locale,
       controller: controller,
       scrollController: ScrollController(),
@@ -274,7 +276,8 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
                 const SizedBox(
                   height: 10.0,
                 ),
-                Expanded(
+                SizedBox(
+                  height: widget.height,
                   child: quillEditor,
                 ),
               ]),

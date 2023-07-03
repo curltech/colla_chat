@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_html/flutter_html.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 
-/// flutter_html，显示html字符串
+/// flutter_widget_from_html，简单地渲染html，不用浏览器实现
 class HtmlWebView extends StatefulWidget {
   final String html;
 
@@ -22,8 +22,11 @@ class _HtmlWebViewState extends State<HtmlWebView> {
 
   @override
   Widget build(context) {
-    return Html(
-      data: widget.html,
-    );
+    return SingleChildScrollView(
+        padding: EdgeInsets.zero,
+        child:
+        HtmlWidget(
+          widget.html,
+        ));
   }
 }

@@ -1,9 +1,11 @@
+import 'package:colla_chat/entity/chat/emailaddress.dart';
 import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
 import 'package:colla_chat/pages/chat/mail/mail_address_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_content_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_list_widget.dart';
 import 'package:colla_chat/pages/chat/mail/new_mail_widget.dart';
-import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -47,11 +49,14 @@ class MailWidget extends StatefulWidget with TileDataMixin {
 
 class _MailWidgetState extends State<MailWidget> {
   final AdvancedDrawerController controller = AdvancedDrawerController();
-  bool open = false;
 
   @override
   initState() {
+    controller.addListener(() {
+      setState(() {});
+    });
     super.initState();
+    mailAddressController.refresh();
   }
 
   AdvancedDrawer _buildAdvancedDrawer() {
@@ -60,7 +65,7 @@ class _MailWidgetState extends State<MailWidget> {
       openRatio: 0.6,
       openScale: 1,
       controller: controller,
-      drawer: open ? widget.mailAddressWidget : Container(),
+      drawer: controller.value.visible ? widget.mailAddressWidget : Container(),
       child: widget.mailListWidget,
     );
 
@@ -100,16 +105,15 @@ class _MailWidgetState extends State<MailWidget> {
     } else {
       body = _buildAdvancedDrawer();
     }
+    //open ? controller.showDrawer() : controller.hideDrawer();
     List<Widget> rightWidgets = [
       IconButton(
           onPressed: () {
             controller.toggleDrawer();
-            open = !open;
-            setState(() {});
           },
           icon: const Icon(Icons.menu)),
     ];
-    if (open) {
+    if (controller.value.visible) {
       rightWidgets.add(IconButton(
           onPressed: () {
             indexWidgetProvider.push('mail_address_auto_discover');
@@ -130,9 +134,17 @@ class _MailWidgetState extends State<MailWidget> {
           icon: const Icon(Icons.edit_note),
           tooltip: AppLocalizations.t('New mail')));
     }
-
+    EmailAddress? current = mailAddressController.current;
+    String? currentMailboxName = mailAddressController.currentMailboxName;
+    String? title = 'Mail list';
+    if (current != null) {
+      title = current.email;
+      if (currentMailboxName != null) {
+        title = '$title($currentMailboxName)';
+      }
+    }
     var appBarView = AppBarView(
-        title: open ? 'Mail address' : 'Mail list',
+        title: controller.value.visible ? 'Mail address' : title,
         withLeading: widget.withLeading,
         rightWidgets: rightWidgets,
         child: body);

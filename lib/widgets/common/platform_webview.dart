@@ -1,6 +1,7 @@
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/flutter_webview.dart';
+import 'package:colla_chat/widgets/common/html_webview.dart';
 import 'package:colla_chat/widgets/common/inapp_webview.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart' as inapp;
@@ -188,6 +189,11 @@ class PlatformWebView extends StatelessWidget {
         onWebViewCreated: (webview.WebViewController controller) {
           _onWebViewCreated(controller);
         },
+      );
+    }
+    if (platformParams.macos) {
+      platformWebView = HtmlWebView(
+        html: html!,
       );
     } else {
       platformWebView = FlutterInAppWebView(

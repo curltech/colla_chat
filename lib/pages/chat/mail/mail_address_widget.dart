@@ -26,7 +26,6 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
   @override
   initState() {
     mailAddressController.addListener(_update);
-    mailAddressController.refresh();
     super.initState();
   }
 

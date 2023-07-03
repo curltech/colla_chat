@@ -1,7 +1,6 @@
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/widgets/richtext/html_editor_widget.dart';
-import 'package:colla_chat/widgets/richtext/html_light_widget.dart';
 import 'package:colla_chat/widgets/richtext/html_rte_widget.dart';
 import 'package:colla_chat/widgets/richtext/quill_editor_widget.dart';
 import 'package:colla_chat/widgets/richtext/quill_html_editor_widget.dart';
@@ -44,12 +43,6 @@ class _PlatformEditorWidgetState extends State<PlatformEditorWidget> {
         initialText: widget.initialText,
         onSubmit: widget.onSubmit,
       );
-
-      return HtmlEditorWidget(
-        height: widget.height,
-        initialText: widget.initialText,
-        onSubmit: widget.onSubmit,
-      );
     }
     if (platformParams.windows) {
       return HtmlRteWidget(
@@ -58,7 +51,7 @@ class _PlatformEditorWidgetState extends State<PlatformEditorWidget> {
         onSubmit: widget.onSubmit,
       );
     }
-    return HtmlLightWidget(
+    return HtmlEditorWidget(
       height: widget.height,
       initialText: widget.initialText,
       onSubmit: widget.onSubmit,
