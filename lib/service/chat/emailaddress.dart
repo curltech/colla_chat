@@ -1,24 +1,23 @@
+import 'package:colla_chat/entity/chat/emailaddress.dart';
+import 'package:colla_chat/service/general_base.dart';
 import 'package:colla_chat/service/servicelocator.dart';
 
-import '../../entity/chat/mailaddress.dart';
-import '../general_base.dart';
-
-class MailAddressService extends GeneralBaseService<MailAddress> {
-  MailAddressService(
+class EmailAddressService extends GeneralBaseService<EmailAddress> {
+  EmailAddressService(
       {required super.tableName,
       required super.fields,
       required super.indexFields}) {
     post = (Map map) {
-      return MailAddress.fromJson(map);
+      return EmailAddress.fromJson(map);
     };
   }
 
-  Future<List<MailAddress>> findAllMailAddress() async {
+  Future<List<EmailAddress>> findAllMailAddress() async {
     var mailAddress = await find();
     return mailAddress;
   }
 
-  Future<MailAddress?> findByMailAddress(String email) async {
+  Future<EmailAddress?> findByMailAddress(String email) async {
     var mailAddress = await findOne(
       where: 'email=?',
       whereArgs: [email],
@@ -26,8 +25,8 @@ class MailAddressService extends GeneralBaseService<MailAddress> {
     return mailAddress;
   }
 
-  store(MailAddress mailAddress) async {
-    MailAddress? old = await findByMailAddress(mailAddress.email);
+  store(EmailAddress mailAddress) async {
+    EmailAddress? old = await findByMailAddress(mailAddress.email);
     if (old != null) {
       mailAddress.id = old.id;
       await update(mailAddress);
@@ -37,7 +36,7 @@ class MailAddressService extends GeneralBaseService<MailAddress> {
   }
 }
 
-final mailAddressService = MailAddressService(
+final emailAddressService = EmailAddressService(
     tableName: "chat_mailaddress",
     indexFields: ['ownerPeerId', 'email', 'name'],
-    fields: ServiceLocator.buildFields(MailAddress(name: '', email: '@'), []));
+    fields: ServiceLocator.buildFields(EmailAddress(name: '', email: '@'), []));

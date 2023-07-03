@@ -1,10 +1,18 @@
-import 'package:colla_chat/l10n/localization.dart';
+import 'package:colla_chat/entity/chat/emailaddress.dart';
+import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/service/chat/emailaddress.dart';
+import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/string_util.dart';
+import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
-import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
+import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
+import 'package:colla_chat/widgets/data_bind/form_input_widget.dart';
+import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/material.dart';
 
-/// 邮件地址手工注册组件，一个card下的录入框和按钮组合
+/// 邮件地址手工注册组件，录入框和按钮组合
 class ManualAddWidget extends StatefulWidget with TileDataMixin {
   const ManualAddWidget({Key? key}) : super(key: key);
 
@@ -25,284 +33,231 @@ class ManualAddWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _ManualAddWidgetState extends State<ManualAddWidget> {
-  String? _personalName;
-  String? _password;
-  String? _email;
-  String? _imapServerHost;
-  String _imapServerPort = '993';
-  bool _imapServerSecure = true;
-  String? _popServerHost;
-  String _popServerPort = '995';
-  bool _popServerSecure = true;
-  String? _smtpServerHost;
-  String _smtpServerPort = '465';
-  bool _smtpServerSecure = true;
-  bool _pwdShow = false;
+  static const String imapServerPort = '993';
+  static const String popServerPort = '995';
+  static const String smtpServerPort = '465';
 
-  Widget _buildSmtp() {
-    return ExpansionTile(
-      leading: const Icon(Icons.send),
-      title: const CommonAutoSizeText('Smtp'),
-      initiallyExpanded: false,
-      children: <Widget>[
-        Column(children: <Widget>[
-          const SizedBox(height: 10.0),
-          Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 15.0),
-              child: Switch(
-                value: _smtpServerSecure,
-                onChanged: (bool val) {
-                  setState(() {
-                    _smtpServerSecure = val;
-                  });
-                },
-              )),
-          SizedBox(height: 10.0),
-          Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: CommonAutoSizeTextFormField(
-                controller: TextEditingController(),
-                labelText: AppLocalizations.t('SmtpServerHost'),
-                prefixIcon: Icon(Icons.desktop_mac),
-                initialValue: _smtpServerHost,
-                onChanged: (String val) {
-                  setState(() {
-                    _smtpServerHost = val;
-                  });
-                },
-                onFieldSubmitted: (String val) {},
-              )),
-          SizedBox(height: 10.0),
-          Padding(
-              padding: EdgeInsets.symmetric(horizontal: 15.0),
-              child: CommonAutoSizeTextFormField(
-                controller: TextEditingController(),
-                keyboardType: TextInputType.number,
-                labelText: AppLocalizations.t('SmtpServerPort'),
-                prefixIcon: Icon(Icons.router),
-                initialValue: _smtpServerPort,
-                onChanged: (String val) {
-                  setState(() {
-                    _smtpServerPort = val;
-                  });
-                },
-                onFieldSubmitted: (String val) {},
-              )),
-        ]),
-      ],
-    );
+  List<ColumnFieldDef> _getManualDiscoveryColumnFieldDefs() {
+    final List<ColumnFieldDef> manualDiscoveryColumnFieldDefs = [
+      ColumnFieldDef(
+          name: 'name',
+          label: 'Name',
+          initValue: '胡劲松',
+          prefixIcon: Icon(
+            Icons.person,
+            color: myself.primary,
+          )),
+      ColumnFieldDef(
+        name: 'email',
+        label: 'Email',
+        initValue: 'hujs06@163.com',
+        prefixIcon: Icon(
+          Icons.email,
+          color: myself.primary,
+        ),
+        textInputType: TextInputType.emailAddress,
+      ),
+      ColumnFieldDef(
+          name: 'password',
+          label: 'Password',
+          initValue: 'GRDCGOUASMNEBSTH',
+          prefixIcon: Icon(
+            Icons.password,
+            color: myself.primary,
+          ),
+          inputType: InputType.password),
+      ColumnFieldDef(
+        name: 'smtpServerHost',
+        label: 'SmtpServerHost',
+        prefixIcon: Icon(
+          Icons.desktop_mac,
+          color: myself.primary,
+        ),
+        initValue: 'smtp.163.com',
+      ),
+      ColumnFieldDef(
+        name: 'smtpServerPort',
+        label: 'SmtpServerPort',
+        prefixIcon: Icon(
+          Icons.router,
+          color: myself.primary,
+        ),
+        initValue: smtpServerPort,
+      ),
+      ColumnFieldDef(
+        name: 'imapServerHost',
+        label: 'ImapServerHost',
+        prefixIcon: Icon(
+          Icons.desktop_mac,
+          color: myself.primary,
+        ),
+        initValue: 'imap.163.com',
+      ),
+      ColumnFieldDef(
+        name: 'imapServerPort',
+        label: 'ImapServerPort',
+        prefixIcon: Icon(
+          Icons.router,
+          color: myself.primary,
+        ),
+        initValue: imapServerPort,
+      ),
+      ColumnFieldDef(
+        name: 'popServerHost',
+        label: 'PopServerHost',
+        prefixIcon: Icon(
+          Icons.desktop_mac,
+          color: myself.primary,
+        ),
+        initValue: 'pop.163.com',
+      ),
+      ColumnFieldDef(
+        name: 'popServerPort',
+        label: 'PopServerPort',
+        prefixIcon: Icon(
+          Icons.router,
+          color: myself.primary,
+        ),
+        initValue: popServerPort,
+      )
+    ];
+
+    return manualDiscoveryColumnFieldDefs;
   }
 
-  Widget _buildImap() {
-    return ExpansionTile(
-        leading: Icon(Icons.receipt),
-        title: CommonAutoSizeText('Imap'),
-        initiallyExpanded: false,
-        children: <Widget>[
-          Column(children: <Widget>[
-            SizedBox(height: 10.0),
-            Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15.0),
-                child: Switch(
-                  value: _imapServerSecure,
-                  onChanged: (bool val) {
-                    setState(() {
-                      _imapServerSecure = val;
-                    });
-                  },
-                )),
-            SizedBox(height: 10.0),
-            Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15.0),
-                child: CommonAutoSizeTextFormField(
-                  controller: TextEditingController(),
-                  labelText: AppLocalizations.t('ImapServerHost'),
-                  prefixIcon: Icon(Icons.desktop_mac),
-                  initialValue: _imapServerHost,
-                  onChanged: (String val) {
-                    setState(() {
-                      _imapServerHost = val;
-                    });
-                  },
-                  onFieldSubmitted: (String val) {},
-                )),
-            SizedBox(height: 10.0),
-            Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15.0),
-                child: CommonAutoSizeTextFormField(
-                  controller: TextEditingController(),
-                  keyboardType: TextInputType.number,
-                  labelText: AppLocalizations.t('ImapServerPort'),
-                  prefixIcon: Icon(Icons.router),
-                  initialValue: _imapServerPort,
-                  onChanged: (String val) {
-                    setState(() {
-                      _imapServerPort = val;
-                    });
-                  },
-                  onFieldSubmitted: (String val) {},
-                )),
-          ])
-        ]);
+  Widget _buildFormInputWidget(BuildContext context) {
+    var formInputWidget = Container(
+        padding: const EdgeInsets.all(10.0),
+        child: FormInputWidget(
+          height: 550,
+          formButtonDefs: [
+            FormButtonDef(
+                label: 'Connect',
+                onTap: (Map<String, dynamic> values) {
+                  _connect(values);
+                }),
+          ],
+          columnFieldDefs: _getManualDiscoveryColumnFieldDefs(),
+        ));
+
+    return formInputWidget;
   }
 
-  Widget _buildPop() {
-    return ExpansionTile(
-        leading: Icon(Icons.receipt),
-        title: CommonAutoSizeText('Pop3'),
-        initiallyExpanded: false,
-        children: <Widget>[
-          Column(children: <Widget>[
-            SizedBox(height: 10.0),
-            Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15.0),
-                child: Switch(
-                  value: _popServerSecure,
-                  onChanged: (bool val) {
-                    setState(() {
-                      _popServerSecure = val;
-                    });
-                  },
-                )),
-            SizedBox(height: 10.0),
-            Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15.0),
-                child: CommonAutoSizeTextFormField(
-                  controller: TextEditingController(),
-                  labelText: AppLocalizations.t('PopServerHost'),
-                  prefixIcon: Icon(Icons.desktop_mac),
-                  initialValue: _popServerHost,
-                  onChanged: (String val) {
-                    setState(() {
-                      _popServerHost = val;
-                    });
-                  },
-                  onFieldSubmitted: (String val) {},
-                )),
-            SizedBox(height: 10.0),
-            Padding(
-                padding: EdgeInsets.symmetric(horizontal: 15.0),
-                child: CommonAutoSizeTextFormField(
-                  controller: TextEditingController(),
-                  keyboardType: TextInputType.number,
-                  labelText: AppLocalizations.t('PopServerPort'),
-                  prefixIcon: Icon(Icons.router),
-                  initialValue: _popServerPort,
-                  onChanged: (String val) {
-                    setState(() {
-                      _popServerPort = val;
-                    });
-                  },
-                  onFieldSubmitted: (String val) {},
-                ))
-          ])
-        ]);
-  }
+  _connect(Map<String, dynamic> values) async {
+    String? name = values['name'];
+    String? email = values['email'];
+    String? password = values['password'];
+    if (StringUtil.isEmpty(email) ||
+        StringUtil.isEmpty(name) ||
+        StringUtil.isEmpty(password)) {
+      logger.e('email or name or password is empty');
+      if (mounted) {
+        DialogUtil.error(context, content: 'Email or name is empty');
+      }
+      return;
+    }
+    String? smtpServerHost = values['smtpServerHost'];
+    String? smtpServerPort = values['smtpServerPort'];
+    if (StringUtil.isEmpty(smtpServerHost) ||
+        StringUtil.isEmpty(smtpServerPort)) {
+      logger.e('smtpServerHost or smtpServerPort  is empty');
+      if (mounted) {
+        DialogUtil.error(context,
+            content: 'smtpServerHost or smtpServerPort is empty');
+      }
+      return;
+    }
+    String? imapServerHost = values['imapServerHost'];
+    String? imapServerPort = values['imapServerPort'];
+    if (StringUtil.isEmpty(imapServerHost) ||
+        StringUtil.isEmpty(imapServerPort)) {
+      logger.e('imapServerHost or imapServerPort  is empty');
+      if (mounted) {
+        DialogUtil.error(context,
+            content: 'imapServerHost or imapServerPort is empty');
+      }
+      return;
+    }
 
-  Widget _buildEmail() {
-    return Column(
-      children: [
-        SizedBox(height: 10.0),
-        Padding(
-            padding: EdgeInsets.symmetric(horizontal: 15.0),
-            child: CommonAutoSizeTextFormField(
-              controller: TextEditingController(),
-              labelText: AppLocalizations.t('Username'),
-              prefixIcon: Icon(Icons.person),
-              initialValue: _personalName,
-              onChanged: (String val) {
-                setState(() {
-                  _personalName = val;
-                });
-              },
-              onFieldSubmitted: (String val) {},
-            )),
-        SizedBox(height: 10.0),
-        Padding(
-            padding: EdgeInsets.symmetric(horizontal: 15.0),
-            child: CommonAutoSizeTextFormField(
-              controller: TextEditingController(),
-              keyboardType: TextInputType.emailAddress,
-              labelText: AppLocalizations.t('Email'),
-              prefixIcon: Icon(Icons.email),
-              initialValue: _email,
-              onChanged: (String val) {
-                setState(() {
-                  _email = val;
-                });
-              },
-              onFieldSubmitted: (String val) {},
-            )),
-        SizedBox(height: 10.0),
-        Padding(
-            padding: EdgeInsets.symmetric(horizontal: 15.0),
-            child: CommonAutoSizeTextFormField(
-              controller: TextEditingController(),
-              keyboardType: TextInputType.text,
-              obscureText: !_pwdShow,
-              maxLines: 1,
-              //controller: passwordController,
-              labelText: AppLocalizations.t('Password'),
-              prefixIcon: Icon(Icons.lock),
-              suffixIcon: IconButton(
-                icon: Icon(_pwdShow ? Icons.visibility : Icons.visibility_off),
-                onPressed: () {
-                  setState(() {
-                    _pwdShow = !_pwdShow;
-                  });
-                },
-              ),
-              initialValue: _password,
-              onChanged: (String val) {
-                setState(() {
-                  _password = val;
-                });
-              },
-              onFieldSubmitted: (String val) {},
-            )),
-      ],
-    );
+    var emails = email!.split('@');
+    String domain = emails[1];
+    List<String?>? domains = [domain];
+    String? displayName = domain;
+    String? displayShortName = name;
+    List<ServerConfig>? incomingServers = [
+      ServerConfig(
+        type: ServerType.imap,
+        hostname: imapServerHost,
+        port: int.parse(imapServerPort!),
+        socketType: SocketType.ssl,
+        authentication: Authentication.passwordClearText,
+        usernameType: UsernameType.emailAddress,
+      )
+    ];
+    String? popServerHost = values['popServerHost'];
+    String? popServerPort = values['popServerPort'];
+    if (StringUtil.isNotEmpty(popServerHost) ||
+        StringUtil.isNotEmpty(popServerPort)) {
+      incomingServers.add(ServerConfig(
+        type: ServerType.pop,
+        hostname: popServerHost,
+        port: int.parse(popServerPort!),
+        socketType: SocketType.ssl,
+        authentication: Authentication.passwordClearText,
+        usernameType: UsernameType.emailAddress,
+      ));
+    }
+    List<ServerConfig>? outgoingServers = [
+      ServerConfig(
+        type: ServerType.smtp,
+        hostname: smtpServerHost,
+        port: int.parse(smtpServerPort!),
+        socketType: SocketType.ssl,
+        authentication: Authentication.passwordClearText,
+        usernameType: UsernameType.emailAddress,
+      )
+    ];
+    ConfigEmailProvider emailProviders = ConfigEmailProvider(
+        domains: domains,
+        displayName: displayName,
+        displayShortName: displayShortName,
+        incomingServers: incomingServers,
+        outgoingServers: outgoingServers);
+    ClientConfig clientConfig = ClientConfig(emailProviders: [emailProviders]);
+    var mailAddress =
+        EmailMessageUtil.buildDiscoverMailAddress(email, name!, clientConfig);
+    DialogUtil.loadingShow(context,
+        tip: 'Manual connecting email server,\n please waiting...');
+    EmailClient? emailClient = await emailClientPool
+        .create(mailAddress, password!, config: clientConfig);
+    if (mounted) {
+      DialogUtil.loadingHide(context);
+    }
+    if (emailClient == null) {
+      logger.e('create (or connect) fail to $name.');
+      return;
+    }
+    logger.i('create (or connect) success to $name.');
+    EmailAddress? emailAddress =
+        await emailAddressService.findByMailAddress(email);
+    if (emailAddress == null && mounted) {
+      bool? result =
+          await DialogUtil.confirm(context, content: 'Save new mail address?');
+
+      if (result != null && result) {
+        ///保存地址
+        await emailAddressService.store(mailAddress);
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    var view= Card(
-        child: SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: <Widget>[
-          _buildEmail(),
-          _buildSmtp(),
-          _buildImap(),
-          _buildPop(),
-          SizedBox(height: 10.0),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 15.0),
-            child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-              TextButton(
-                child: CommonAutoSizeText(AppLocalizations.t('Connect')),
-                onPressed: () async {
-                  await _connect();
-                },
-              ),
-              TextButton(
-                child: CommonAutoSizeText(AppLocalizations.t('Add')),
-                onPressed: () async {},
-              )
-            ]),
-          )
-        ],
-      ),
-    ));
-
     var appBarView = AppBarView(
         title: widget.title,
         withLeading: widget.withLeading,
-        child: view);
+        child: _buildFormInputWidget(context));
 
     return appBarView;
   }
-
-  Future<void> _connect() async {}
 }

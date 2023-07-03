@@ -91,8 +91,6 @@ dependencies:
   flutter_animated_icons: ^1.0.0
   country_pickers: ^2.0.0
   country_picker: ^2.0.15
-  #international_phone_input: ^1.0.4
-  phone_numbers_parser: ^8.0.0
   font_awesome_flutter: ^10.1.0
   #flushbar: ^1.10.4
   #share: ^0.6.5
@@ -107,13 +105,13 @@ dependencies:
   #fancy_password_field: ^2.0.0
   flutter_pw_validator: ^1.6.0 #FlutterPwValidator放在TextFormField下面显示校验结果
   fzregex: ^2.0.0 #静态方法：Fzregex.hasMatch
-  #pinput: ^2.2.31
-  phone_number: ^2.0.1
+  phone_number: ^2.0.1 #仅支持ios和android，解析电话号码
   #sim_info: ^0.1.3
-  phone_form_field: ^8.1.0
+  phone_form_field: ^8.1.0 #支持所有平台，电话号码的录入字段
   #flutter-international-phone-input:
-  intl_phone_field: ^3.1.0
-  mobile_number: ^2.1.1
+  intl_phone_field: ^3.2.0 #支持所有平台，电话号码的录入字段
+  mobile_number: ^2.1.1 #仅支持android，获取电话号码，ios无此功能
+  phone_numbers_parser: ^8.0.0 #支持所有的平台
   badges: ^3.0.2
   extended_list: any
   glassmorphism: ^3.0.0

@@ -1,4 +1,4 @@
-import 'package:colla_chat/entity/chat/mailaddress.dart';
+import 'package:colla_chat/entity/chat/emailaddress.dart';
 import 'package:colla_chat/pages/chat/mail/address/auto_discover_widget.dart';
 import 'package:colla_chat/pages/chat/mail/address/manual_add_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
@@ -36,8 +36,8 @@ class _MailAddressWidgetState extends State<MailAddressWidget> {
 
   _onTap(int index, String title, {String? subtitle, TileData? group}) {
     int i = 0;
-    for (MailAddress mailAddress in mailAddressController.data) {
-      if (mailAddress.email == group!.title) {
+    for (EmailAddress emailAddress in mailAddressController.data) {
+      if (emailAddress.email == group!.title) {
         mailAddressController.currentIndex = i;
         break;
       }

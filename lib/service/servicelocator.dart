@@ -22,7 +22,7 @@ import 'package:colla_chat/service/chat/conference.dart';
 import 'package:colla_chat/service/chat/contact.dart';
 import 'package:colla_chat/service/chat/group.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
-import 'package:colla_chat/service/chat/mailaddress.dart';
+import 'package:colla_chat/service/chat/emailaddress.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/service/chat/peer_party.dart';
 import 'package:colla_chat/service/dht/chainapp.dart';
@@ -68,7 +68,7 @@ class ServiceLocator {
     services['messageAttachmentService'] = messageAttachmentService;
     services['receiveService'] = receiveService;
     services['chatSummaryService'] = chatSummaryService;
-    services['mailAddressService'] = mailAddressService;
+    services['mailAddressService'] = emailAddressService;
     services['conferenceService'] = conferenceService;
 
     actions[MsgType.CONNECT] = connectAction;

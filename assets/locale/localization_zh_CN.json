@@ -419,5 +419,13 @@
   "SUBSCRIPT": "订阅邮件",
   "Receipt": "收件人",
   "Subject": "主题",
-  "Submit": "提交"
+  "Submit": "提交",
+  "Save new mail address?": "保存为新的邮件地址吗？",
+  "Auto discovering email server,\\n please waiting...": "正在自动发现邮件服务器，请等待...",
+  "Auto connecting email server,\\n please waiting...": "正在自动连接邮件服务器，请等待...",
+  "Manual connecting email server,\\n please waiting...": "正在手动发现邮件服务器，请等待...",
+  "Email or name is empty": "邮件或者名称为空",
+  "Auto discovery config is null": "自动发现配置为空",
+  "smtpServerHost or smtpServerPort is empty": "smtp主机地址或者端口为空",
+  "imapServerHost or imapServerPort is empty": "imap主机地址或者端口为空"
 }

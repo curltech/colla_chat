@@ -1,17 +1,17 @@
 import 'package:colla_chat/datastore/datastore.dart';
-import 'package:colla_chat/entity/chat/mailaddress.dart' as entity;
+import 'package:colla_chat/entity/chat/emailaddress.dart' as entity;
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/data_list_controller.dart';
-import 'package:colla_chat/service/chat/mailaddress.dart';
+import 'package:colla_chat/service/chat/emailaddress.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:enough_mail/enough_mail.dart' as enough_mail;
 import 'package:enough_mail/enough_mail.dart';
 import 'package:flutter/material.dart';
 
 /// 邮件地址控制器，每个地址有多个邮箱，每个邮箱包含多个邮件
-class MailAddressController extends DataListController<entity.MailAddress> {
+class MailAddressController extends DataListController<entity.EmailAddress> {
   ///缺省的邮件地址
-  entity.MailAddress? defaultMailAddress;
+  entity.EmailAddress? defaultMailAddress;
 
   ///邮件地址，邮箱名称和邮箱的映射
   final Map<String, Map<String, enough_mail.Mailbox>> _addressMailboxes = {};
@@ -62,7 +62,7 @@ class MailAddressController extends DataListController<entity.MailAddress> {
   ///以下是与邮件地址相关的部分
   ///重新获取所有的邮件地址实体，对没有连接的进行连接，设置缺省邮件地址
   refresh() async {
-    data = await mailAddressService.findAllMailAddress();
+    data = await emailAddressService.findAllMailAddress();
     if (data.isNotEmpty) {
       for (var mailAddress in data) {
         String email = mailAddress.email;
@@ -97,7 +97,7 @@ class MailAddressController extends DataListController<entity.MailAddress> {
   }
 
   ///连接特定的邮件地址服务器，获取地址的所有的邮箱
-  connectMailAddress(entity.MailAddress mailAddress,
+  connectMailAddress(entity.EmailAddress mailAddress,
       {bool listen = true}) async {
     var password = mailAddress.password;
     if (password != null) {

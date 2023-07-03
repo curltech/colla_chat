@@ -1,6 +1,7 @@
+import 'package:colla_chat/entity/chat/emailaddress.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/service/chat/mailaddress.dart';
+import 'package:colla_chat/service/chat/emailaddress.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
@@ -156,7 +157,7 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
     var mailAddress =
         EmailMessageUtil.buildDiscoverMailAddress(email!, name!, clientConfig);
     DialogUtil.loadingShow(context,
-        tip: 'Auto connecting email server, please waiting...');
+        tip: 'Auto connecting email server,\n please waiting...');
     EmailClient? emailClient = await emailClientPool
         .create(mailAddress, password!, config: clientConfig);
     if (mounted) {
@@ -167,13 +168,15 @@ class _AutoDiscoverWidgetState extends State<AutoDiscoverWidget> {
       return;
     }
     logger.i('create (or connect) success to $name.');
-    if (mounted) {
+    EmailAddress? emailAddress =
+        await emailAddressService.findByMailAddress(email);
+    if (emailAddress == null && mounted) {
       bool? result =
-          await DialogUtil.confirm(context, content: 'Save mail address?');
+          await DialogUtil.confirm(context, content: 'Save new mail address?');
 
       if (result != null && result) {
         ///保存地址
-        await mailAddressService.store(mailAddress);
+        await emailAddressService.store(mailAddress);
       }
     }
   }

@@ -1,7 +1,7 @@
 import '../base.dart';
 
 /// 邮件地址
-class MailAddress extends BaseEntity {
+class EmailAddress extends BaseEntity {
   String name;
   String email;
   String? username;
@@ -21,7 +21,7 @@ class MailAddress extends BaseEntity {
   String? smtpServerConfig;
   bool isDefault = false;
 
-  MailAddress(
+  EmailAddress(
       {required this.name,
       required this.email,
       this.username,
@@ -38,7 +38,7 @@ class MailAddress extends BaseEntity {
     domain = emails[1];
   }
 
-  MailAddress.fromJson(Map json)
+  EmailAddress.fromJson(Map json)
       : name = json['name'],
         username = json['username'],
         password = json['password'],

@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
-import 'package:colla_chat/entity/chat/mailaddress.dart' as entity;
+import 'package:colla_chat/entity/chat/emailaddress.dart' as entity;
 import 'package:colla_chat/entity/chat/message_attachment.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -102,7 +102,7 @@ class EmailMessageUtil {
 
   ///转换邮件地址实体信息到邮件地址配置
   static enough_mail.ClientConfig? buildDiscoverConfig(
-      entity.MailAddress mailAddress) {
+      entity.EmailAddress mailAddress) {
     enough_mail.ClientConfig config = enough_mail.ClientConfig();
     bool incoming = false;
     bool outcoming = false;
@@ -152,10 +152,10 @@ class EmailMessageUtil {
   }
 
   ///传入email，name和邮件地址配置参数，产生新的邮件地址实体
-  static entity.MailAddress buildDiscoverMailAddress(
+  static entity.EmailAddress buildDiscoverMailAddress(
       String email, String name, ClientConfig config) {
-    entity.MailAddress mailAddress =
-        entity.MailAddress(email: email, name: name);
+    entity.EmailAddress mailAddress =
+        entity.EmailAddress(email: email, name: name);
 
     for (final provider in config.emailProviders!) {
       ServerConfig? imapServerConfig = provider.preferredIncomingImapServer;
@@ -225,7 +225,7 @@ class EmailMessageUtil {
 }
 
 class EmailClient {
-  entity.MailAddress mailAddress;
+  entity.EmailAddress mailAddress;
 
   ///mailClient是自动发现产生的客户端
   ClientConfig? config;
@@ -933,7 +933,7 @@ class EmailClientPool {
 
   ///在连接池中创建一个邮件的连接，必须连接成功才能创建
   ///传入的邮件地址实体参数必须含有email字段，或者有自动发现的配置，或者有imap和smtp的配置
-  Future<EmailClient?> create(entity.MailAddress mailAddress, String password,
+  Future<EmailClient?> create(entity.EmailAddress mailAddress, String password,
       {ClientConfig? config}) async {
     var emails = mailAddress.email.split('@');
     if (emails.length != 2) {
