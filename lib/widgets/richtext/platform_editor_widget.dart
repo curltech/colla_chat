@@ -6,16 +6,14 @@ import 'package:colla_chat/widgets/richtext/quill_editor_widget.dart';
 import 'package:colla_chat/widgets/richtext/quill_html_editor_widget.dart';
 import 'package:flutter/material.dart';
 
+///要么加expanded，要么设置height，否则使用缺省的高度
 class PlatformEditorWidget extends StatefulWidget {
-  final double height;
+  final double? height;
   final String? initialText;
   final Function(String? result, ChatMessageMimeType mimeType) onSubmit;
 
   const PlatformEditorWidget(
-      {Key? key,
-      this.initialText,
-      required this.height,
-      required this.onSubmit})
+      {Key? key, this.initialText, this.height, required this.onSubmit})
       : super(key: key);
 
   @override

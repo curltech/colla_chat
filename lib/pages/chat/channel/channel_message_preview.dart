@@ -9,26 +9,26 @@ import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
 //频道消息的展示页面
-class ChannelMessageView extends StatefulWidget with TileDataMixin {
-  ChannelMessageView({Key? key}) : super(key: key);
+class ChannelMessagePreview extends StatefulWidget with TileDataMixin {
+  ChannelMessagePreview({Key? key}) : super(key: key);
 
   @override
-  State createState() => _ChannelMessageViewState();
+  State createState() => _ChannelMessagePreviewState();
 
   @override
   bool get withLeading => true;
 
   @override
-  String get routeName => 'channel_message_view';
+  String get routeName => 'channel_message_preview';
 
   @override
   IconData get iconData => Icons.view_agenda;
 
   @override
-  String get title => 'ChannelMessageView';
+  String get title => 'ChannelMessagePreview';
 }
 
-class _ChannelMessageViewState extends State<ChannelMessageView>
+class _ChannelMessagePreviewState extends State<ChannelMessagePreview>
     with TickerProviderStateMixin {
   @override
   void initState() {

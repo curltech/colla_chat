@@ -16,14 +16,14 @@ import 'package:colla_chat/widgets/richtext/platform_editor_widget.dart';
 import 'package:flutter/material.dart';
 
 ///自己发布频道消息编辑页面
-class PublishChannelItemWidget extends StatefulWidget with TileDataMixin {
-  PublishChannelItemWidget({Key? key}) : super(key: key);
+class PublishChannelEditWidget extends StatefulWidget with TileDataMixin {
+  PublishChannelEditWidget({Key? key}) : super(key: key);
 
   @override
-  State createState() => _PublishChannelItemWidgetState();
+  State createState() => _PublishChannelEditWidgetState();
 
   @override
-  String get routeName => 'publish_channel_item';
+  String get routeName => 'publish_channel_edit';
 
   @override
   bool get withLeading => true;
@@ -32,10 +32,10 @@ class PublishChannelItemWidget extends StatefulWidget with TileDataMixin {
   IconData get iconData => Icons.edit;
 
   @override
-  String get title => 'Publish Channel Item';
+  String get title => 'Publish Channel Edit';
 }
 
-class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
+class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
   final TextEditingController textEditingController = TextEditingController();
   ValueNotifier<String?> thumbnail = ValueNotifier<String?>(null);
   ValueNotifier<String?> documentText = ValueNotifier<String?>(null);
@@ -69,6 +69,7 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
   Future<void> _onSubmit(String? result, ChatMessageMimeType mimeType) async {
     documentText.value = result;
     this.mimeType = mimeType;
+    await _save();
   }
 
   ///保存到数据库为草案，采用原生的可编辑模式，发布后才转换成统一的html格式，便不可更改
@@ -112,17 +113,30 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
   }
 
   Widget _buildChannelItemView(BuildContext context) {
-    Widget titleWidget = _buildTitleTextField(context);
+    Widget titleWidget = Container(
+        padding: const EdgeInsets.all(10.0),
+        child: _buildTitleTextField(context));
     Widget view = Column(children: [
       titleWidget,
-      PlatformEditorWidget(
-        height:
-            appDataProvider.portraitSize.height - appDataProvider.toolbarHeight,
+      Expanded(
+          child: PlatformEditorWidget(
         onSubmit: _onSubmit,
-      )
+      ))
     ]);
 
     return view;
+  }
+
+  ///将编辑的内容正式发布，统一采用html格式保存和发送，原先保存的草案要转换格式，更新状态
+  _publish() async {
+    ChatMessage? chatMessage = myChannelChatMessageController.current;
+    if (chatMessage != null) {
+      await myChannelChatMessageController.publish(chatMessage.messageId!);
+      if (mounted) {
+        DialogUtil.info(context,
+            content: AppLocalizations.t('Publish channel successfully'));
+      }
+    }
   }
 
   @override
@@ -142,16 +156,7 @@ class _PublishChannelItemWidgetState extends State<PublishChannelItemWidget> {
         IconButton(
           icon: const Icon(Icons.publish),
           onPressed: () async {
-            ChatMessage? chatMessage = myChannelChatMessageController.current;
-            if (chatMessage != null) {
-              await myChannelChatMessageController
-                  .publish(chatMessage.messageId!);
-              if (mounted) {
-                DialogUtil.info(context,
-                    content:
-                        AppLocalizations.t('Publish channel successfully'));
-              }
-            }
+            await _publish();
           },
           tooltip: AppLocalizations.t('Publish'),
         )

@@ -5,7 +5,7 @@ import 'package:colla_chat/datastore/datastore.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/channel/publish_channel_item_widget.dart';
+import 'package:colla_chat/pages/chat/channel/publish_channel_edit_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
@@ -22,8 +22,8 @@ class PublishChannelListWidget extends StatefulWidget with TileDataMixin {
   final Function()? onScrollMax;
   final Function()? onScrollMin;
   final ScrollController scrollController = ScrollController();
-  final PublishChannelItemWidget publishChannelItemWidget =
-      PublishChannelItemWidget();
+  final PublishChannelEditWidget publishChannelEditWidget =
+      PublishChannelEditWidget();
 
   PublishChannelListWidget({
     Key? key,
@@ -31,7 +31,7 @@ class PublishChannelListWidget extends StatefulWidget with TileDataMixin {
     this.onScrollMax,
     this.onScrollMin,
   }) : super(key: key) {
-    indexWidgetProvider.define(publishChannelItemWidget);
+    indexWidgetProvider.define(publishChannelEditWidget);
   }
 
   @override

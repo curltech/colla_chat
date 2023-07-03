@@ -18,8 +18,9 @@ import 'package:path_provider/path_provider.dart';
 
 ///quill_editor的实现，用于IOS,LINUX,MACOS,WINDOWS桌面平台
 ///编辑的时候是quill可识别的json格式，完成后可转换成html格式，就不可以再编辑了
+///缺省的最小高度200
 class QuillEditorWidget extends StatefulWidget {
-  final double height;
+  final double? height;
   final String? initialText;
   final ChatMessageMimeType mimeType;
   final bool withMultiMedia;
@@ -27,7 +28,7 @@ class QuillEditorWidget extends StatefulWidget {
 
   const QuillEditorWidget({
     Key? key,
-    required this.height,
+    this.height,
     this.initialText,
     this.onSubmit,
     this.mimeType = ChatMessageMimeType.json,

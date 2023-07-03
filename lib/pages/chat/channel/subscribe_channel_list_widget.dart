@@ -6,7 +6,7 @@ import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/entity/chat/linkman.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.dart';
-import 'package:colla_chat/pages/chat/channel/channel_message_view.dart';
+import 'package:colla_chat/pages/chat/channel/channel_message_preview.dart';
 import 'package:colla_chat/pages/chat/channel/publish_channel_list_widget.dart';
 import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
@@ -25,7 +25,7 @@ class SubscribeChannelListWidget extends StatefulWidget with TileDataMixin {
   final ScrollController scrollController = ScrollController();
   final PublishChannelListWidget publishChannelListWidget =
       PublishChannelListWidget();
-  final ChannelMessageView channelMessageView = ChannelMessageView();
+  final ChannelMessagePreview channelMessagePreview = ChannelMessagePreview();
 
   SubscribeChannelListWidget({
     Key? key,
@@ -34,7 +34,7 @@ class SubscribeChannelListWidget extends StatefulWidget with TileDataMixin {
     this.onScrollMin,
   }) : super(key: key) {
     indexWidgetProvider.define(publishChannelListWidget);
-    indexWidgetProvider.define(channelMessageView);
+    indexWidgetProvider.define(channelMessagePreview);
   }
 
   @override

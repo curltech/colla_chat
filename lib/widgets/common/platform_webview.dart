@@ -190,8 +190,7 @@ class PlatformWebView extends StatelessWidget {
           _onWebViewCreated(controller);
         },
       );
-    }
-    if (platformParams.macos) {
+    } else if (platformParams.macos) {
       platformWebView = HtmlWebView(
         html: html!,
       );

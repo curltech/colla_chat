@@ -15,8 +15,9 @@ import 'package:flutter/material.dart';
 import 'package:html_editor_enhanced/html_editor.dart';
 
 ///html_editor_enhanced实现，用于移动和web
+///缺省的高度400
 class HtmlEditorWidget extends StatefulWidget {
-  final double height;
+  final double? height;
   final String? initialText;
   final ChatMessageMimeType mimeType;
   final bool withMultiMedia;
@@ -24,7 +25,7 @@ class HtmlEditorWidget extends StatefulWidget {
 
   const HtmlEditorWidget({
     Key? key,
-    required this.height,
+    this.height,
     this.initialText,
     this.onSubmit,
     this.mimeType = ChatMessageMimeType.html,
@@ -101,6 +102,10 @@ class _HtmlEditorWidgetState extends State<HtmlEditorWidget> {
   }
 
   Widget _buildHtmlEditor(BuildContext context) {
+    OtherOptions otherOptions = const OtherOptions();
+    if (widget.height != null) {
+      otherOptions = OtherOptions(height: widget.height!);
+    }
     return HtmlEditor(
       controller: controller,
       htmlEditorOptions: HtmlEditorOptions(
@@ -108,7 +113,7 @@ class _HtmlEditorWidgetState extends State<HtmlEditorWidget> {
         initialText: widget.initialText,
       ),
       htmlToolbarOptions: _buildHtmlToolbarOptions(),
-      otherOptions: OtherOptions(height: widget.height),
+      otherOptions: otherOptions,
     );
   }
 

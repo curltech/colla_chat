@@ -1,23 +1,22 @@
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/myself.dart';
-import 'package:colla_chat/widgets/data_bind/data_action_card.dart';
 import 'package:enough_html_editor/enough_html_editor.dart';
 import 'package:enough_platform_widgets/enough_platform_widgets.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 ///EnoughHtmlEditor的实现，用于简单的编辑，inappwebview实现
-///应用于移动平台
+///应用于移动平台，最小高度200
 class EnoughHtmlEditorWidget extends StatefulWidget {
-  final double height;
+  final double? height;
   final String? initialText;
   final ChatMessageMimeType mimeType;
   final Function(String? result, ChatMessageMimeType mimeType)? onSubmit;
 
   const EnoughHtmlEditorWidget({
     Key? key,
-    required this.height,
+    this.height,
     this.initialText,
     this.mimeType = ChatMessageMimeType.html,
     this.onSubmit,

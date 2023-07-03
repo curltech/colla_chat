@@ -1,24 +1,17 @@
 import 'dart:io';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
-import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/document_util.dart';
 import 'package:colla_chat/tool/file_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
-import 'package:colla_chat/tool/path_util.dart';
-import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
-import 'package:colla_chat/widgets/common/platform_webview.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
-import 'package:colla_chat/widgets/richtext/enough_html_editor_widget.dart';
 import 'package:colla_chat/widgets/richtext/platform_editor_widget.dart';
 import 'package:enough_mail/highlevel.dart';
-import 'package:enough_mail_flutter/enough_mail_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:path/path.dart' as p;
 
 ///邮件内容子视图
 class NewMailWidget extends StatefulWidget with TileDataMixin {
@@ -52,7 +45,7 @@ class _NewMailWidgetState extends State<NewMailWidget> {
 
   _update() {}
 
-  /// html编辑完成
+  /// html编辑完成，草案原始格式暂存到chatMessage中
   _onSubmit(String? content, ChatMessageMimeType mimeType) {
     if (content != null) {
       String html = content;
@@ -153,7 +146,6 @@ class _NewMailWidgetState extends State<NewMailWidget> {
   /// html编辑器
   Widget _buildEnoughHtmlEditorWidget(BuildContext context) {
     PlatformEditorWidget platformEditorWidget = PlatformEditorWidget(
-      height: 400,
       onSubmit: _onSubmit,
     );
 
@@ -198,11 +190,17 @@ class _NewMailWidgetState extends State<NewMailWidget> {
             }));
   }
 
+  ///发送邮件，首先将邮件的编辑部分转换成html格式，对邮件的各个组成部分加密，目标为多人时采用群加密方式，然后发送
+  _send(){
+
+  }
+
   @override
   Widget build(BuildContext context) {
     List<Widget> rightWidgets = [
-      IconButton(onPressed: () {}, icon: const Icon(Icons.save)),
-      IconButton(onPressed: () {}, icon: const Icon(Icons.send)),
+      IconButton(onPressed: () {
+        _send();
+      }, icon: const Icon(Icons.send)),
     ];
     var appBarView = AppBarView(
         title: widget.title,

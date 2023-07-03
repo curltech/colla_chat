@@ -6,8 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:quill_html_editor/quill_html_editor.dart';
 
 ///quill_html_editor一样的实现，用于移动和web
+///缺省的最小高度200
 class QuillHtmlEditorWidget extends StatefulWidget {
-  final double height;
+  final double? height;
   final String? initialText;
   final ChatMessageMimeType mimeType;
   final bool withMultiMedia;
@@ -15,7 +16,7 @@ class QuillHtmlEditorWidget extends StatefulWidget {
 
   const QuillHtmlEditorWidget({
     Key? key,
-    required this.height,
+    this.height,
     this.initialText,
     this.mimeType = ChatMessageMimeType.json,
     this.onSubmit,
@@ -105,9 +106,7 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
             const SizedBox(
               height: 10.0,
             ),
-            Expanded(
-              child: quillHtmlEditor,
-            ),
+            quillHtmlEditor,
           ],
         ));
   }

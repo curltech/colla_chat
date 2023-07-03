@@ -50,7 +50,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     mailAddressController.addListener(_update);
     super.initState();
 
-    ///桌面环境下用浏览器显示html邮件内容
+    ///windows桌面环境下用webview显示html文件方式的邮件内容，后面用load方式装载
     if (!platformParams.mobile && !platformParams.macos) {
       platformWebViewController = PlatformWebViewController();
       platformWebView = PlatformWebView(
@@ -78,6 +78,7 @@ class _MailContentWidgetState extends State<MailContentWidget> {
       }
       mimeMessage = mailAddressController.currentMimeMessage;
       if (mimeMessage != null) {
+        ///windows平台采用文件加载的方式，避免中文乱码
         if (platformParams.windows) {
           int? uid = mimeMessage.uid;
           String? sender = mimeMessage.envelope?.sender?.email;
@@ -90,9 +91,13 @@ class _MailContentWidgetState extends State<MailContentWidget> {
             file.writeAsStringSync(html!, flush: true);
             html = null;
           }
-        } else {
+        } else if (platformParams.macos) {
+          ///macos平台，可以直接使用html字符串
           html = EmailMessageUtil.convertToHtml(mimeMessage);
+          filename = null;
         }
+
+        ///其他平台，移动平台，不使用文件或者html字符串，而采用邮件的显示组建
       }
     } else {
       html = null;
@@ -114,6 +119,8 @@ class _MailContentWidgetState extends State<MailContentWidget> {
             if (mimeMessageContent == null) {
               return Text(AppLocalizations.t('MimeMessage is no content'));
             }
+
+            ///移动平台使用邮件的显示组建
             if (platformParams.mobile) {
               ///在ios下会引发启动崩溃
               MimeMessageViewer mimeMessageViewer = MimeMessageViewer(
@@ -123,8 +130,10 @@ class _MailContentWidgetState extends State<MailContentWidget> {
               );
               return mimeMessageViewer;
             } else if (platformParams.macos) {
+              ///macos使用html字符串
               return PlatformWebView(html: html);
             } else {
+              ///windows平台使用文件
               platformWebViewController!.load(filename);
               return platformWebView!;
             }

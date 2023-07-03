@@ -8,15 +8,16 @@ import 'package:flutter_rte/flutter_rte.dart';
 
 ///html_editor_enhanced一样的实现，用于移动和web，但是是用webview实现的
 ///所以可以用于其他除macos外的平台
+///缺省的最小高度200
 class HtmlRteWidget extends StatefulWidget {
-  final double height;
+  final double? height;
   final String? initialText;
   final ChatMessageMimeType mimeType;
   final Function(String? result, ChatMessageMimeType mimeType)? onSubmit;
 
   const HtmlRteWidget({
     Key? key,
-    required this.height,
+    this.height,
     this.initialText,
     this.mimeType = ChatMessageMimeType.html,
     this.onSubmit,
@@ -84,7 +85,8 @@ class _HtmlRteWidgetState extends State<HtmlRteWidget> {
   Widget _buildHtmlRteEditor(BuildContext context) {
     HtmlEditor htmlRteEditor = HtmlEditor(
       controller: controller,
-      height: 200,
+      minHeight: 200,
+      height: widget.height,
     );
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10.0),
