@@ -128,6 +128,7 @@ class PrimaryNavigation {
         destinations.add(slideInNavigationRailDestination(
           label: Text(AppLocalizations.t(view.title)),
           icon: Icon(view.iconData),
+          padding: EdgeInsets.zero,
           selectedIcon: Icon(
             view.iconData,
             size: AppIconSize.mdSize,
@@ -161,60 +162,67 @@ class PrimaryNavigation {
             key: const Key('Primary Navigation Medium'),
             //在布局中放置AdaptiveScaffold标准侧边栏
             builder: (BuildContext context) {
-              return AdaptiveScaffold.standardNavigationRail(
-                width: appDataProvider.mediumPrimaryNavigationWidth,
-                selectedIndex: indexWidgetProvider.currentMainIndex,
-                onDestinationSelected: (int index) {
-                  indexWidgetProvider.currentMainIndex = index;
-                },
-                padding: const EdgeInsets.all(0.0),
-                leading: _buildAppBar(context),
-                destinations: destinations,
-                selectedIconTheme: IconThemeData(
-                  color: myself.primary,
-                ),
-                unselectedIconTheme: const IconThemeData(
-                  color: Colors.grey,
-                ),
-                selectedLabelTextStyle: const TextStyle(
-                    fontSize: AppFontSize.mdFontSize,
-                    fontWeight: FontWeight.bold),
-                unSelectedLabelTextStyle: const TextStyle(
-                  fontSize: AppFontSize.smFontSize,
-                ),
-              );
+              return Card(
+                  elevation: 0.0,
+                  shape: const ContinuousRectangleBorder(),
+                  margin: EdgeInsets.zero,
+                  child: AdaptiveScaffold.standardNavigationRail(
+                    width: appDataProvider.mediumPrimaryNavigationWidth,
+                    selectedIndex: indexWidgetProvider.currentMainIndex,
+                    onDestinationSelected: (int index) {
+                      indexWidgetProvider.currentMainIndex = index;
+                    },
+                    padding: const EdgeInsets.all(0.0),
+                    leading: _buildAppBar(context),
+                    destinations: destinations,
+                    selectedIconTheme: IconThemeData(
+                      color: myself.primary,
+                    ),
+                    unselectedIconTheme: const IconThemeData(
+                      color: Colors.grey,
+                    ),
+                    selectedLabelTextStyle: const TextStyle(
+                        fontSize: AppFontSize.mdFontSize,
+                        fontWeight: FontWeight.bold),
+                    unSelectedLabelTextStyle: const TextStyle(
+                      fontSize: AppFontSize.smFontSize,
+                    ),
+                  ));
             }),
         appDataProvider.largeBreakpoint: SlotLayout.from(
             key: const Key('Primary Navigation Large'),
             //inAnimation: AdaptiveScaffold.leftOutIn,
             builder: (BuildContext context) {
-              return AdaptiveScaffold.standardNavigationRail(
-                backgroundColor: Colors.black.withOpacity(0.0),
-                width: appDataProvider.primaryNavigationWidth,
-                selectedIndex: indexWidgetProvider.currentMainIndex,
-                onDestinationSelected: (int index) {
-                  indexWidgetProvider.currentMainIndex = index;
-                },
-                padding: const EdgeInsets.all(0.0),
-                leading: _buildAppBar(context),
-                destinations: destinations,
-                extended: true,
-                trailing: trailingNavRail,
-                selectedIconTheme: IconThemeData(
-                  color: myself.primary,
-                ),
-                unselectedIconTheme: const IconThemeData(
-                  color: Colors.grey,
-                ),
-                selectedLabelTextStyle: TextStyle(
-                    color: myself.primary,
-                    fontSize: AppFontSize.mdFontSize,
-                    fontWeight: FontWeight.bold),
-                unSelectedLabelTextStyle: const TextStyle(
-                  color: Colors.grey,
-                  fontSize: AppFontSize.smFontSize,
-                ),
-              );
+              return Card(
+                  elevation: 0.0,
+                  shape: const ContinuousRectangleBorder(),
+                  margin: EdgeInsets.zero,
+                  child: AdaptiveScaffold.standardNavigationRail(
+                    width: appDataProvider.primaryNavigationWidth,
+                    selectedIndex: indexWidgetProvider.currentMainIndex,
+                    onDestinationSelected: (int index) {
+                      indexWidgetProvider.currentMainIndex = index;
+                    },
+                    padding: const EdgeInsets.all(0.0),
+                    leading: _buildAppBar(context),
+                    destinations: destinations,
+                    extended: true,
+                    trailing: trailingNavRail,
+                    selectedIconTheme: IconThemeData(
+                      color: myself.primary,
+                    ),
+                    unselectedIconTheme: const IconThemeData(
+                      color: Colors.grey,
+                    ),
+                    selectedLabelTextStyle: TextStyle(
+                        color: myself.primary,
+                        fontSize: AppFontSize.mdFontSize,
+                        fontWeight: FontWeight.bold),
+                    unSelectedLabelTextStyle: const TextStyle(
+                      color: Colors.grey,
+                      fontSize: AppFontSize.smFontSize,
+                    ),
+                  ));
             }),
       },
     );
