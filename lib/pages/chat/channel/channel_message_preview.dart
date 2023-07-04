@@ -59,10 +59,11 @@ class _ChannelMessagePreviewState extends State<ChannelMessagePreview>
     if (chatMessage == null) {
       return Container();
     }
+
     return AppBarView(
       centerTitle: false,
       withLeading: true,
-      title: widget.title,
+      title: chatMessage.title,
       child: FutureBuilder(
           future: _buildHtml(),
           builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
