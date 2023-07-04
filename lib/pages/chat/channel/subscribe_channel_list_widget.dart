@@ -44,13 +44,13 @@ class SubscribeChannelListWidget extends StatefulWidget with TileDataMixin {
   bool get withLeading => true;
 
   @override
-  String get routeName => 'channel';
+  String get routeName => 'subscribe_channel';
 
   @override
-  IconData get iconData => Icons.wifi_channel;
+  IconData get iconData => Icons.my_library_books;
 
   @override
-  String get title => 'Channel';
+  String get title => 'Subscribe channel';
 }
 
 class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
@@ -65,6 +65,7 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
     scrollController.addListener(_onScroll);
     animateController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 500));
+    channelChatMessageController.latest();
   }
 
   _update() {
@@ -165,10 +166,10 @@ class _SubscribeChannelListWidgetState extends State<SubscribeChannelListWidget>
           indexWidgetProvider.push('publish_channel');
         },
         icon: const Icon(
-          Icons.edit,
+          Icons.my_library_add,
           color: Colors.white,
         ),
-        tooltip: AppLocalizations.t('Edit document'),
+        tooltip: AppLocalizations.t('Publish channel'),
       ),
     ];
     return AppBarView(

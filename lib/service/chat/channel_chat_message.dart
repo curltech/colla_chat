@@ -7,26 +7,9 @@ import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/linkman.dart';
 
 class ChannelChatMessageService {
-  ///获取所有的其他人的频道消息
+  ///获取所有的其他人发出的，接收人是自己的频道消息
   Future<List<ChatMessage>> findOthersByPeerId(
-      {String? peerId, int? offset, int? limit}) async {
-    var myselfPeerId = myself.peerId!;
-    String where = 'messageType=? and receiverPeerId=?';
-    List<Object> whereArgs = [ChatMessageType.channel.name, myselfPeerId];
-    if (peerId != null) {
-      where = '$where and senderPeerId=?';
-      whereArgs.add(peerId);
-    }
-    return await chatMessageService.find(
-        where: where,
-        whereArgs: whereArgs,
-        orderBy: 'sendTime desc',
-        offset: offset,
-        limit: limit);
-  }
-
-  Future<List<ChatMessage>> findOthersByGreaterId(
-      {String? peerId, String? sendTime, int? limit}) async {
+      {String? peerId, String? sendTime, int? offset, int? limit}) async {
     var myselfPeerId = myself.peerId!;
     String where = 'messageType=? and receiverPeerId=?';
     List<Object> whereArgs = [ChatMessageType.channel.name, myselfPeerId];
@@ -42,29 +25,13 @@ class ChannelChatMessageService {
         where: where,
         whereArgs: whereArgs,
         orderBy: 'sendTime desc',
+        offset: offset,
         limit: limit);
   }
 
-  ///获取自己的频道消息
+  ///获取自己发出的频道消息，接收者是空的
   Future<List<ChatMessage>> findMyselfByPeerId(
-      {String? status, int? offset, int? limit}) async {
-    var myselfPeerId = myself.peerId!;
-    String where = 'messageType=? and senderPeerId=?';
-    List<Object> whereArgs = [ChatMessageType.channel.name, myselfPeerId];
-    if (status != null) {
-      where = '$where and status=?';
-      whereArgs.add(status);
-    }
-    return await chatMessageService.find(
-        where: where,
-        whereArgs: whereArgs,
-        orderBy: 'sendTime desc',
-        offset: offset,
-        limit: limit);
-  }
-
-  Future<List<ChatMessage>> findMyselfByGreaterId(
-      {String? status, String? sendTime, int? limit}) async {
+      {String? status, String? sendTime, int? offset, int? limit}) async {
     var myselfPeerId = myself.peerId!;
     String where = 'messageType=? and senderPeerId=?';
     List<Object> whereArgs = [ChatMessageType.channel.name, myselfPeerId];
@@ -80,6 +47,7 @@ class ChannelChatMessageService {
         where: where,
         whereArgs: whereArgs,
         orderBy: 'sendTime desc',
+        offset: offset,
         limit: limit);
   }
 
@@ -117,7 +85,7 @@ class ChannelChatMessageService {
       return;
     }
     String? sendTime = chatMessage.sendTime;
-    List<ChatMessage> chatMessages = await findMyselfByGreaterId(
+    List<ChatMessage> chatMessages = await findMyselfByPeerId(
         status: MessageStatus.published.name, sendTime: sendTime);
     if (chatMessages.isNotEmpty) {
       for (var msg in chatMessages) {

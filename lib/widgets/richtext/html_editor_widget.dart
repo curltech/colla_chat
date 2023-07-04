@@ -21,8 +21,8 @@ class HtmlEditorWidget extends StatefulWidget {
   final String? initialText;
   final ChatMessageMimeType mimeType;
   final bool withMultiMedia;
-  final Function(String? result, ChatMessageMimeType mimeType)? onSubmit;
-  final Function(String? content, ChatMessageMimeType mimeType)? onPreview;
+  final Function(String result, ChatMessageMimeType mimeType)? onSubmit;
+  final Function(String content, ChatMessageMimeType mimeType)? onPreview;
 
   const HtmlEditorWidget({
     Key? key,

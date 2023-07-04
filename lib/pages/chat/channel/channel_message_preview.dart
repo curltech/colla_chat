@@ -1,8 +1,10 @@
 import 'dart:typed_data';
 
+import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/webview/platform_webview.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
@@ -35,7 +37,7 @@ class _ChannelMessagePreviewState extends State<ChannelMessagePreview>
     super.initState();
   }
 
-  Future<String?> _buildFilename(BuildContext context) async {
+  Future<String?> _buildHtml() async {
     var chatMessage = myChannelChatMessageController.current;
     if (chatMessage == null) {
       return null;
@@ -43,10 +45,11 @@ class _ChannelMessagePreviewState extends State<ChannelMessagePreview>
     Uint8List? bytes = await messageAttachmentService.findContent(
         chatMessage.messageId!, chatMessage.title);
     if (bytes != null) {
-      String? filename = await FileUtil.writeTempFile(bytes,
-          filename: chatMessage.messageId, extension: 'html');
-      return filename;
+      String content = CryptoUtil.utf8ToString(bytes);
+
+      return content;
     }
+
     return null;
   }
 
@@ -61,17 +64,16 @@ class _ChannelMessagePreviewState extends State<ChannelMessagePreview>
       withLeading: true,
       title: widget.title,
       child: FutureBuilder(
-          future: _buildFilename(context),
+          future: _buildHtml(),
           builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
-            if (!snapshot.hasData) {
-              return Container();
+            if (snapshot.connectionState != ConnectionState.done) {
+              return LoadingUtil.buildLoadingIndicator();
             }
-            var filename = snapshot.data;
-            if (filename == null || filename.isEmpty) {
-              return Container();
+            String? html = snapshot.data;
+            if (html != null) {
+              return PlatformWebView(html: html);
             }
-
-            return PlatformWebView(initialFilename: filename);
+            return Container();
           }),
     );
   }

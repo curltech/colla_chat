@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/tool/file_util.dart';
+import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/webview/flutter_webview.dart';
@@ -178,7 +179,6 @@ class PlatformWebView extends StatelessWidget {
   final void Function(PlatformWebViewController controller)? onWebViewCreated;
 
   late final PlatformWebViewController? webViewController;
-  late final Widget platformWebView;
 
   PlatformWebView(
       {super.key,
@@ -196,8 +196,55 @@ class PlatformWebView extends StatelessWidget {
     }
   }
 
-  void _buildPlatformWebView() {
-    if (platformParams.windows || platformParams.mobile || platformParams.web) {
+  Future<String?> readHtml(String filename) async {
+    File file = File(filename);
+    bool exist = file.existsSync();
+    if (exist) {
+      return await file.readAsString();
+    }
+    return null;
+  }
+
+  Future<String> writeHtml(String html) async {
+    String filename = await FileUtil.getTempFilename(extension: 'html');
+    File file = File(filename);
+    bool exist = file.existsSync();
+    if (exist) {
+      file.deleteSync();
+    }
+    file.writeAsStringSync(html, flush: true);
+
+    return filename;
+  }
+
+  Widget _buildPlatformWebView() {
+    Widget platformWebView;
+    if (platformParams.windows) {
+      if (html != null) {
+        platformWebView = FutureBuilder(
+            future: writeHtml(html!),
+            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+              if (snapshot.connectionState != ConnectionState.done) {
+                return LoadingUtil.buildLoadingIndicator();
+              }
+              String filename = snapshot.data;
+              return FlutterWebView(
+                initialFilename: filename,
+                onWebViewCreated: (webview.WebViewController controller) {
+                  _onWebViewCreated(controller);
+                },
+              );
+            });
+      } else {
+        platformWebView = FlutterWebView(
+          initialUrl: initialUrl,
+          initialFilename: initialFilename,
+          onWebViewCreated: (webview.WebViewController controller) {
+            _onWebViewCreated(controller);
+          },
+        );
+      }
+    } else if (platformParams.mobile || platformParams.web) {
       platformWebView = FlutterWebView(
         initialUrl: initialUrl,
         html: html,
@@ -207,9 +254,28 @@ class PlatformWebView extends StatelessWidget {
         },
       );
     } else if (platformParams.macos) {
-      platformWebView = HtmlWebView(
-        html: html!,
-      );
+      if (html != null) {
+        platformWebView = HtmlWebView(
+          html: html!,
+        );
+      } else if (initialFilename != null) {
+        platformWebView = FutureBuilder(
+            future: readHtml(initialFilename!),
+            builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+              if (snapshot.connectionState != ConnectionState.done) {
+                return LoadingUtil.buildLoadingIndicator();
+              }
+              String? html = snapshot.data;
+              if (html != null) {
+                return HtmlWebView(
+                  html: html,
+                );
+              }
+              return Container();
+            });
+      } else {
+        platformWebView = Container();
+      }
     } else {
       platformWebView = FlutterInAppWebView(
         initialUrl: initialUrl,
@@ -220,10 +286,12 @@ class PlatformWebView extends StatelessWidget {
         },
       );
     }
+
+    return platformWebView;
   }
 
   @override
   Widget build(BuildContext context) {
-    return platformWebView;
+    return _buildPlatformWebView();
   }
 }

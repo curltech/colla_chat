@@ -38,7 +38,7 @@ class ChannelChatMessageController extends DataMoreController<ChatMessage> {
       sendTime = data[0].sendTime;
     }
     List<ChatMessage> chatMessages = await channelChatMessageService
-        .findOthersByGreaterId(sendTime: sendTime, limit: limit);
+        .findOthersByPeerId(sendTime: sendTime, limit: limit);
     if (chatMessages.isNotEmpty) {
       data.insertAll(0, chatMessages);
       notifyListeners();
@@ -86,7 +86,7 @@ class MyChannelChatMessageController extends DataMoreController<ChatMessage> {
       sendTime = data[0].sendTime;
     }
     List<ChatMessage>? chatMessages =
-        await channelChatMessageService.findMyselfByGreaterId(
+        await channelChatMessageService.findMyselfByPeerId(
             status: status, sendTime: sendTime, limit: limit);
     if (chatMessages.isNotEmpty) {
       data.insertAll(0, chatMessages);

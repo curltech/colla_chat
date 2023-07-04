@@ -12,7 +12,8 @@ class EnoughHtmlEditorWidget extends StatefulWidget {
   final double? height;
   final String? initialText;
   final ChatMessageMimeType mimeType;
-  final Function(String? result, ChatMessageMimeType mimeType)? onSubmit;
+  final Function(String content, ChatMessageMimeType mimeType)? onSubmit;
+  final Function(String content, ChatMessageMimeType mimeType)? onPreview;
 
   const EnoughHtmlEditorWidget({
     Key? key,
@@ -20,6 +21,7 @@ class EnoughHtmlEditorWidget extends StatefulWidget {
     this.initialText,
     this.mimeType = ChatMessageMimeType.html,
     this.onSubmit,
+    this.onPreview,
   }) : super(key: key);
 
   @override
@@ -39,21 +41,37 @@ class _EnoughHtmlEditorWidgetState extends State<EnoughHtmlEditorWidget> {
       return const PlatformProgressIndicator();
     } else {
       return SliverHeaderHtmlEditorControls(
-        editorApi: controller,
-        suffix: Tooltip(
-            message: AppLocalizations.t('Submit'),
-            child: InkWell(
-              onTap: () async {
-                if (widget.onSubmit != null) {
-                  String html = await controller!.getFullHtml();
-                  widget.onSubmit!(html, ChatMessageMimeType.html);
-                }
-              },
-              child: const Icon(
-                Icons.check,
-              ),
-            )),
-      );
+          editorApi: controller,
+          suffix: ButtonBar(
+            children: [
+              Tooltip(
+                  message: AppLocalizations.t('Preview'),
+                  child: InkWell(
+                    onTap: () async {
+                      if (widget.onPreview != null) {
+                        String html = await controller!.getFullHtml();
+                        widget.onPreview!(html, ChatMessageMimeType.html);
+                      }
+                    },
+                    child: const Icon(
+                      Icons.check,
+                    ),
+                  )),
+              Tooltip(
+                  message: AppLocalizations.t('Submit'),
+                  child: InkWell(
+                    onTap: () async {
+                      if (widget.onSubmit != null) {
+                        String html = await controller!.getFullHtml();
+                        widget.onSubmit!(html, ChatMessageMimeType.html);
+                      }
+                    },
+                    child: const Icon(
+                      Icons.check,
+                    ),
+                  )),
+            ],
+          ));
     }
   }
 

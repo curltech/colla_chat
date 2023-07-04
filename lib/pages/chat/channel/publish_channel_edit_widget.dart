@@ -1,4 +1,3 @@
-import 'package:card_swiper/card_swiper.dart';
 import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
@@ -9,6 +8,7 @@ import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/document_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
+import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -40,32 +40,33 @@ class PublishChannelEditWidget extends StatefulWidget with TileDataMixin {
 
 class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
   ValueNotifier<String?> thumbnail = ValueNotifier<String?>(null);
-  ValueNotifier<String?> documentText = ValueNotifier<String?>(null);
-  ChatMessageMimeType mimeType = ChatMessageMimeType.html;
-  SwiperController controller = SwiperController();
   final TextEditingController textEditingController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+  }
+
+  Future<String?> _findContent() async {
     ChatMessage? chatMessage = myChannelChatMessageController.current;
     if (chatMessage != null) {
+      String mimeType = chatMessage.mimeType!;
       if (chatMessage.title != null) {
         textEditingController.text = chatMessage.title!;
       }
       if (chatMessage.thumbnail != null) {
         thumbnail.value = chatMessage.thumbnail!;
       }
-      _init(chatMessage);
-    }
-  }
+      var bytes = await messageAttachmentService.findContent(
+          chatMessage.messageId!, chatMessage.title!);
+      if (bytes != null) {
+        String content = CryptoUtil.utf8ToString(bytes);
 
-  _init(ChatMessage chatMessage) async {
-    var bytes = await messageAttachmentService.findContent(
-        chatMessage.messageId!, chatMessage.title!);
-    if (bytes != null) {
-      documentText.value = CryptoUtil.utf8ToString(bytes);
+        return content;
+      }
     }
+
+    return null;
   }
 
   _onPreview(String? content, ChatMessageMimeType mimeType) {
@@ -94,12 +95,12 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
       return;
     }
     ChatMessage? chatMessage = myChannelChatMessageController.current;
+    bool newDocument = false;
     if (chatMessage != null) {
       String? status = chatMessage.status;
       if (status != MessageStatus.published.name) {
         chatMessage.title = title;
-        chatMessage.content =
-            chatMessageService.processContent(documentText.value!);
+        chatMessage.content = chatMessageService.processContent(content!);
         chatMessage.thumbnail = thumbnail.value;
       } else {
         if (mounted) {
@@ -110,11 +111,15 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
       }
     } else {
       chatMessage = await myChannelChatMessageController
-          .buildChannelChatMessage(title, documentText.value!, thumbnail.value);
+          .buildChannelChatMessage(title, content!, thumbnail.value);
       myChannelChatMessageController.current = chatMessage;
+      newDocument = true;
     }
     chatMessage.mimeType = mimeType.name;
     await chatMessageService.store(chatMessage);
+    if (newDocument) {
+      myChannelChatMessageController.add(chatMessage);
+    }
     if (mounted) {
       DialogUtil.info(context,
           content: AppLocalizations.t('Save draft content successfully'));
@@ -127,7 +132,7 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
     if (chatMessage == null) {
       return;
     }
-    String mimeType = chatMessage.messageType;
+    String? mimeType = chatMessage.mimeType;
     if (mimeType == ChatMessageMimeType.json.name) {
       var bytes = await messageAttachmentService.findContent(
           chatMessage.messageId!, chatMessage.title!);
@@ -135,12 +140,12 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
         String json = CryptoUtil.utf8ToString(bytes);
         var deltaJson = JsonUtil.toJson(json);
         var html = DocumentUtil.jsonToHtml(deltaJson);
-        chatMessage.messageType = ChatMessageMimeType.html.name;
+        chatMessage.mimeType = ChatMessageMimeType.html.name;
         chatMessage.content = chatMessageService.processContent(html);
       }
       chatMessage.status = MessageStatus.published.name;
       await chatMessageService.store(chatMessage);
-    } else {
+    } else if (mimeType == ChatMessageMimeType.html.name) {
       await myChannelChatMessageController.publish(chatMessage.messageId!);
     }
 
@@ -163,15 +168,24 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
     Widget titleWidget = Container(
         padding: const EdgeInsets.all(10.0),
         child: _buildTitleTextField(context));
-    Widget view = Column(children: [
-      titleWidget,
-      Expanded(
-          child: KeepAliveWrapper(
-              child: PlatformEditorWidget(
-        onPreview: _onPreview,
-        onSubmit: _onSubmit,
-      )))
-    ]);
+    Widget view = FutureBuilder(
+        future: _findContent(),
+        builder: (BuildContext context, AsyncSnapshot<String?> snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return LoadingUtil.buildLoadingIndicator();
+          }
+          String? content = snapshot.data;
+          return Column(children: [
+            titleWidget,
+            Expanded(
+                child: KeepAliveWrapper(
+                    child: PlatformEditorWidget(
+              initialText: content,
+              onPreview: _onPreview,
+              onSubmit: _onSubmit,
+            )))
+          ]);
+        });
 
     return view;
   }
@@ -197,7 +211,6 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
 
   @override
   void dispose() {
-    controller.dispose();
     super.dispose();
   }
 }

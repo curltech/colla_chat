@@ -4,6 +4,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
+import 'package:colla_chat/tool/loading_util.dart';
 import 'package:colla_chat/tool/path_util.dart';
 import 'package:colla_chat/transport/emailclient.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
@@ -111,6 +112,9 @@ class _MailContentWidgetState extends State<MailContentWidget> {
     Widget mimeMessageViewer = FutureBuilder(
         future: findMimeMessage(),
         builder: (BuildContext context, AsyncSnapshot<MimeMessage?> snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return LoadingUtil.buildLoadingIndicator();
+          }
           MimeMessage? mimeMessage = snapshot.data;
           if (mimeMessage != null) {
             MimeMessage? mimeMessageContent =
@@ -138,13 +142,8 @@ class _MailContentWidgetState extends State<MailContentWidget> {
             }
           }
           return Center(
-              child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const CircularProgressIndicator(),
-              Text(AppLocalizations.t("Loading, please waiting...")),
-            ],
-          ));
+            child: Text(AppLocalizations.t("Have no mimeMessage")),
+          );
         });
     return mimeMessageViewer;
   }

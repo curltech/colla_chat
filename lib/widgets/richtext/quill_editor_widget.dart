@@ -24,8 +24,8 @@ class QuillEditorWidget extends StatefulWidget {
   final String? initialText;
   final ChatMessageMimeType mimeType;
   final bool withMultiMedia;
-  final Function(String? content, ChatMessageMimeType mimeType)? onSubmit;
-  final Function(String? content, ChatMessageMimeType mimeType)? onPreview;
+  final Function(String content, ChatMessageMimeType mimeType)? onSubmit;
+  final Function(String content, ChatMessageMimeType mimeType)? onPreview;
 
   const QuillEditorWidget({
     Key? key,

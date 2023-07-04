@@ -13,8 +13,8 @@ class HtmlRteWidget extends StatefulWidget {
   final double? height;
   final String? initialText;
   final ChatMessageMimeType mimeType;
-  final Function(String? content, ChatMessageMimeType mimeType)? onSubmit;
-  final Function(String? content, ChatMessageMimeType mimeType)? onPreview;
+  final Function(String content, ChatMessageMimeType mimeType)? onSubmit;
+  final Function(String content, ChatMessageMimeType mimeType)? onPreview;
 
   const HtmlRteWidget(
       {Key? key,

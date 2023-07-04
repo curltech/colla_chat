@@ -1,6 +1,9 @@
+import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/tool/date_util.dart';
+import 'package:colla_chat/tool/loading_util.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
 import 'package:enough_mail/enough_mail.dart';
@@ -23,12 +26,18 @@ class _MailListWidgetState extends State<MailListWidget> {
   }
 
   _update() {
-    setState(() {
-      var currentMimeMessages = mailAddressController.currentMimeMessages;
-      if (currentMimeMessages == null || currentMimeMessages.isEmpty) {
-        mailAddressController.findMoreMimeMessages();
-      }
-    });
+    setState(() {});
+  }
+
+  Future<List<MimeMessage>?> findMoreMimeMessages() async {
+    List<MimeMessage>? currentMimeMessages =
+        mailAddressController.currentMimeMessages;
+    if (currentMimeMessages == null || currentMimeMessages.isEmpty) {
+      await mailAddressController.findMoreMimeMessages();
+    }
+    currentMimeMessages = mailAddressController.currentMimeMessages;
+
+    return currentMimeMessages;
   }
 
   _onTap(int index, String title, {String? subtitle, TileData? group}) {
@@ -66,17 +75,26 @@ class _MailListWidgetState extends State<MailListWidget> {
   }
 
   Widget _buildMailListWidget(BuildContext context) {
-    List<MimeMessage>? currentMimeMessages =
-        mailAddressController.currentMimeMessages;
-    if (currentMimeMessages != null) {
-      var tiles = _convertMimeMessage(currentMimeMessages);
-      var dataListView =
-          DataListView(reverse: true, onTap: _onTap, tileData: tiles);
+    var dataListView = FutureBuilder(
+        future: findMoreMimeMessages(),
+        builder:
+            (BuildContext context, AsyncSnapshot<List<MimeMessage>?> snapshot) {
+          if (!snapshot.hasData) {
+            return LoadingUtil.buildCircularLoadingWidget();
+          }
+          List<MimeMessage>? mimeMessages = snapshot.data;
+          if (mimeMessages != null) {
+            var tiles = _convertMimeMessage(mimeMessages);
 
-      return dataListView;
-    }
+            return DataListView(reverse: true, onTap: _onTap, tileData: tiles);
+          }
 
-    return Container();
+          return Center(
+              child: CommonAutoSizeText(
+                  AppLocalizations.t('Have no MimeMessages')));
+        });
+
+    return dataListView;
   }
 
   @override

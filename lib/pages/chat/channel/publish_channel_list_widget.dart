@@ -44,10 +44,10 @@ class PublishChannelListWidget extends StatefulWidget with TileDataMixin {
   String get routeName => 'publish_channel';
 
   @override
-  IconData get iconData => Icons.publish;
+  IconData get iconData => Icons.my_library_add;
 
   @override
-  String get title => 'PublishChannel';
+  String get title => 'Publish channel';
 }
 
 class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
@@ -62,6 +62,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
     scrollController.addListener(_onScroll);
     animateController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 500));
+    myChannelChatMessageController.latest();
   }
 
   _update() {
@@ -138,7 +139,12 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
     Widget chatMessageItem = ListTile(
       onTap: () {
         myChannelChatMessageController.current = chatMessage;
-        indexWidgetProvider.push('publish_channel_edit');
+        if (chatMessage.status == MessageStatus.draft.name) {
+          indexWidgetProvider.push('publish_channel_edit');
+        }
+        if (chatMessage.status == MessageStatus.published.name) {
+          indexWidgetProvider.push('channel_message_preview');
+        }
       },
       title: CommonAutoSizeText(title),
       subtitle: CommonAutoSizeText(sendTime),

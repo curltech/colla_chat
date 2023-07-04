@@ -11,8 +11,8 @@ import 'package:flutter/material.dart';
 class PlatformEditorWidget extends StatefulWidget {
   final double? height;
   final String? initialText;
-  Function(String? content, ChatMessageMimeType mimeType)? onSubmit;
-  Function(String? content, ChatMessageMimeType mimeType)? onPreview;
+  Function(String content, ChatMessageMimeType mimeType)? onSubmit;
+  Function(String content, ChatMessageMimeType mimeType)? onPreview;
 
   PlatformEditorWidget({
     Key? key,
@@ -49,7 +49,7 @@ class _PlatformEditorWidgetState extends State<PlatformEditorWidget> {
         height: widget.height,
         initialText: widget.initialText,
         onSubmit: widget.onSubmit,
-            onPreview: widget.onPreview,
+        onPreview: widget.onPreview,
       ));
     }
     if (platformParams.windows) {
@@ -58,7 +58,7 @@ class _PlatformEditorWidgetState extends State<PlatformEditorWidget> {
         height: widget.height,
         initialText: widget.initialText,
         onSubmit: widget.onSubmit,
-            onPreview: widget.onPreview,
+        onPreview: widget.onPreview,
       ));
     }
     return KeepAliveWrapper(
@@ -66,7 +66,7 @@ class _PlatformEditorWidgetState extends State<PlatformEditorWidget> {
       height: widget.height,
       initialText: widget.initialText,
       onSubmit: widget.onSubmit,
-          onPreview: widget.onPreview,
+      onPreview: widget.onPreview,
     ));
   }
 }
