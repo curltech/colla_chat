@@ -315,7 +315,6 @@
   "false": "否",
   "Playlist is empty": "播放列表空",
   "Please select a media file": "选择媒体文件",
-  "PublishChannel": "文章列表",
   "Publish Channel Item": "编辑文章",
   "ChannelMessageView": "文章浏览",
   "thumbnail": "缩略图",
@@ -439,5 +438,7 @@
   "Must have content": "必须有内容",
   "Document already was published, can not be updated": "文章已经发布，不能修改",
   "Save draft content successfully": "草案保存成功",
-  "Publish document successfully": "文章发布成功"
+  "Publish document successfully": "文章发布成功",
+  "Subscribe channel": "频道",
+  "Publish channel": "发布"
 }
