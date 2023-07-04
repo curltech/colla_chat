@@ -22,12 +22,14 @@ class HtmlEditorWidget extends StatefulWidget {
   final ChatMessageMimeType mimeType;
   final bool withMultiMedia;
   final Function(String? result, ChatMessageMimeType mimeType)? onSubmit;
+  final Function(String? content, ChatMessageMimeType mimeType)? onPreview;
 
   const HtmlEditorWidget({
     Key? key,
     this.height,
     this.initialText,
     this.onSubmit,
+    this.onPreview,
     this.mimeType = ChatMessageMimeType.html,
     this.withMultiMedia = false,
   }) : super(key: key);
@@ -54,6 +56,17 @@ class _HtmlEditorWidgetState extends State<HtmlEditorWidget> {
   HtmlToolbarOptions _buildHtmlToolbarOptions() {
     var customToolbarButtons = [
       Tooltip(
+          message: AppLocalizations.t('Preview'),
+          child: InkWell(
+            onTap: () async {
+              if (widget.onPreview != null) {
+                String html = await controller.getText();
+                widget.onPreview!(html, ChatMessageMimeType.html);
+              }
+            },
+            child: const Icon(Icons.preview),
+          )),
+      Tooltip(
           message: AppLocalizations.t('Submit'),
           child: InkWell(
             onTap: () async {
@@ -67,7 +80,7 @@ class _HtmlEditorWidgetState extends State<HtmlEditorWidget> {
     ];
     return HtmlToolbarOptions(
       toolbarPosition: ToolbarPosition.aboveEditor,
-      toolbarType: ToolbarType.nativeExpandable,
+      toolbarType: ToolbarType.nativeScrollable,
       initiallyExpanded: true,
       defaultToolbarButtons: [
         const StyleButtons(),

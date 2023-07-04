@@ -14,14 +14,16 @@ class HtmlRteWidget extends StatefulWidget {
   final String? initialText;
   final ChatMessageMimeType mimeType;
   final Function(String? content, ChatMessageMimeType mimeType)? onSubmit;
+  final Function(String? content, ChatMessageMimeType mimeType)? onPreview;
 
-  const HtmlRteWidget({
-    Key? key,
-    this.height,
-    this.initialText,
-    this.mimeType = ChatMessageMimeType.html,
-    this.onSubmit,
-  }) : super(key: key);
+  const HtmlRteWidget(
+      {Key? key,
+      this.height,
+      this.initialText,
+      this.mimeType = ChatMessageMimeType.html,
+      this.onSubmit,
+      this.onPreview})
+      : super(key: key);
 
   @override
   State createState() => _HtmlRteWidgetState();
@@ -52,6 +54,15 @@ class _HtmlRteWidgetState extends State<HtmlRteWidget> {
     var customButtonGroups = [
       CustomButtonGroup(buttons: [
         CustomToolbarButton(
+            icon: Icons.preview,
+            action: () async {
+              if (widget.onPreview != null) {
+                String html = await controller.getText();
+                widget.onPreview!(html, ChatMessageMimeType.html);
+              }
+            },
+            isSelected: false),
+        CustomToolbarButton(
             icon: Icons.check,
             action: () async {
               if (widget.onSubmit != null) {
@@ -66,6 +77,7 @@ class _HtmlRteWidgetState extends State<HtmlRteWidget> {
         toolbarType: ToolbarType.nativeScrollable,
         backgroundColor: Colors.transparent,
         toolbarPosition: ToolbarPosition.aboveEditor,
+      initiallyExpanded: true,
         defaultToolbarButtons: const [
           VoiceToTextButtons(),
           OtherButtons(),
@@ -76,7 +88,12 @@ class _HtmlRteWidgetState extends State<HtmlRteWidget> {
           InsertButtons(),
           OtherButtons()
         ],
-        customButtonGroups: customButtonGroups);
+      toolbarItemHeight: 36,
+        customButtonGroups: customButtonGroups,
+      gridViewHorizontalSpacing: 1,
+      gridViewVerticalSpacing: 1,
+    );
+
     controller.toolbarOptions = toolbarOptions;
 
     return toolbarOptions;

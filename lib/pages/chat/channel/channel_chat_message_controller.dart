@@ -105,7 +105,7 @@ class MyChannelChatMessageController extends DataMoreController<ChatMessage> {
         subMessageType: ChatMessageSubType.channel,
         transportType: TransportType.none,
         contentType: ChatMessageContentType.rich,
-        status: MessageStatus.unsent.name,
+        status: MessageStatus.draft.name,
         mimeType: ChatMessageMimeType.html.name);
 
     return chatMessage;

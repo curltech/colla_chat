@@ -13,6 +13,7 @@ class QuillHtmlEditorWidget extends StatefulWidget {
   final ChatMessageMimeType mimeType;
   final bool withMultiMedia;
   final Function(String? content, ChatMessageMimeType mimeType)? onSubmit;
+  final Function(String? content, ChatMessageMimeType mimeType)? onPreview;
 
   const QuillHtmlEditorWidget({
     Key? key,
@@ -20,6 +21,7 @@ class QuillHtmlEditorWidget extends StatefulWidget {
     this.initialText,
     this.mimeType = ChatMessageMimeType.json,
     this.onSubmit,
+    this.onPreview,
     this.withMultiMedia = false,
   }) : super(key: key);
 
@@ -57,6 +59,22 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
       }
     }
     var customButtons = [
+      Tooltip(
+          message: AppLocalizations.t('Preview'),
+          child: InkWell(
+              onTap: () async {
+                if (widget.onPreview != null) {
+                  String html = await controller.getText();
+                  widget.onPreview!(html, ChatMessageMimeType.html);
+
+                  // var delta = await controller.getDelta();
+                  // String deltaJson = JsonUtil.toJsonString(delta);
+                  // widget.onSubmit!(deltaJson, ChatMessageMimeType.json);
+                }
+              },
+              child: const Icon(
+                Icons.preview,
+              ))),
       Tooltip(
           message: AppLocalizations.t('Submit'),
           child: InkWell(
@@ -102,9 +120,17 @@ class _QuillHtmlEditorWidgetState extends State<QuillHtmlEditorWidget> {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
+            const SizedBox(
+              height: 5.0,
+            ),
             toolbar,
             const SizedBox(
-              height: 10.0,
+              height: 5.0,
+            ),
+            Divider(
+              height: 1.0,
+              thickness: 1.0,
+              color: myself.primary,
             ),
             quillHtmlEditor,
           ],

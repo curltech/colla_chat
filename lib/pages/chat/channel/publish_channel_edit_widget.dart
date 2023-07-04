@@ -7,6 +7,8 @@ import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
+import 'package:colla_chat/tool/document_util.dart';
+import 'package:colla_chat/tool/json_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
@@ -66,31 +68,46 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
     }
   }
 
+  _onPreview(String? content, ChatMessageMimeType mimeType) {
+    if (mimeType == ChatMessageMimeType.html) {
+      indexWidgetProvider.push('html_preview');
+      htmlPreviewController.title = textEditingController.text;
+      htmlPreviewController.html = content;
+    }
+  }
+
   ///编辑器提交表示暂存，原生的格式，json或者html
   Future<void> _onSubmit(String? content, ChatMessageMimeType mimeType) async {
-    documentText.value = content;
-    this.mimeType = mimeType;
-    await _save();
+    await _save(content, mimeType);
   }
 
   ///保存到数据库为草案，采用原生的可编辑模式，发布后才转换成统一的html格式，便不可更改
-  Future<void> _save() async {
+  Future<void> _save(String? content, ChatMessageMimeType mimeType) async {
     String title = textEditingController.text;
     if (StringUtil.isEmpty(title)) {
-      DialogUtil.error(context, content: AppLocalizations.t('Must be title'));
+      DialogUtil.error(context, content: AppLocalizations.t('Must have title'));
       return;
     }
-    if (StringUtil.isEmpty(documentText.value)) {
+    if (StringUtil.isEmpty(content)) {
       DialogUtil.error(context,
-          content: AppLocalizations.t('Must be html content'));
+          content: AppLocalizations.t('Must have content'));
       return;
     }
     ChatMessage? chatMessage = myChannelChatMessageController.current;
     if (chatMessage != null) {
-      chatMessage.title = title;
-      chatMessage.content =
-          chatMessageService.processContent(documentText.value!);
-      chatMessage.thumbnail = thumbnail.value;
+      String? status = chatMessage.status;
+      if (status != MessageStatus.published.name) {
+        chatMessage.title = title;
+        chatMessage.content =
+            chatMessageService.processContent(documentText.value!);
+        chatMessage.thumbnail = thumbnail.value;
+      } else {
+        if (mounted) {
+          DialogUtil.info(context,
+              content: 'Document already was published, can not be updated');
+        }
+        return;
+      }
     } else {
       chatMessage = await myChannelChatMessageController
           .buildChannelChatMessage(title, documentText.value!, thumbnail.value);
@@ -100,7 +117,36 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
     await chatMessageService.store(chatMessage);
     if (mounted) {
       DialogUtil.info(context,
-          content: AppLocalizations.t('Save html file successfully'));
+          content: AppLocalizations.t('Save draft content successfully'));
+    }
+  }
+
+  ///将编辑的内容正式发布，统一采用html格式保存和发送，原先保存的草案要转换格式，更新状态
+  _publish() async {
+    ChatMessage? chatMessage = myChannelChatMessageController.current;
+    if (chatMessage == null) {
+      return;
+    }
+    String mimeType = chatMessage.messageType;
+    if (mimeType == ChatMessageMimeType.json.name) {
+      var bytes = await messageAttachmentService.findContent(
+          chatMessage.messageId!, chatMessage.title!);
+      if (bytes != null) {
+        String json = CryptoUtil.utf8ToString(bytes);
+        var deltaJson = JsonUtil.toJson(json);
+        var html = DocumentUtil.jsonToHtml(deltaJson);
+        chatMessage.messageType = ChatMessageMimeType.html.name;
+        chatMessage.content = chatMessageService.processContent(html);
+      }
+      chatMessage.status = MessageStatus.published.name;
+      await chatMessageService.store(chatMessage);
+    } else {
+      await myChannelChatMessageController.publish(chatMessage.messageId!);
+    }
+
+    if (mounted) {
+      DialogUtil.info(context,
+          content: AppLocalizations.t('Publish document successfully'));
     }
   }
 
@@ -111,14 +157,6 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
     );
 
     return textFormField;
-  }
-
-  _onPreview(String? content, ChatMessageMimeType mimeType) {
-    if (mimeType == ChatMessageMimeType.html) {
-      indexWidgetProvider.push('html_preview');
-      htmlPreviewController.title = textEditingController.text;
-      htmlPreviewController.html = content;
-    }
   }
 
   Widget _buildChannelItemView(BuildContext context) {
@@ -136,18 +174,6 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
     ]);
 
     return view;
-  }
-
-  ///将编辑的内容正式发布，统一采用html格式保存和发送，原先保存的草案要转换格式，更新状态
-  _publish() async {
-    ChatMessage? chatMessage = myChannelChatMessageController.current;
-    if (chatMessage != null) {
-      await myChannelChatMessageController.publish(chatMessage.messageId!);
-      if (mounted) {
-        DialogUtil.info(context,
-            content: AppLocalizations.t('Publish channel successfully'));
-      }
-    }
   }
 
   @override

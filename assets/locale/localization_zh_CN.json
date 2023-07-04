@@ -424,18 +424,20 @@
   "Auto discovering email server,\n please waiting...": "正在自动发现邮件服务器，请等待...",
   "Auto connecting email server,\n please waiting...": "正在自动连接邮件服务器，请等待...",
   "Manual connecting email server,\n please waiting...": "正在手动发现邮件服务器，请等待...",
-  "Email or name is empty": "邮件或者名称为空",
-  "Auto discovery config is null": "自动发现配置为空",
   "smtpServerHost or smtpServerPort is empty": "smtp主机地址或者端口为空",
   "imapServerHost or imapServerPort is empty": "imap主机地址或者端口为空",
   "Connect failure": "连接失败",
   "Connect successfully": "连接成功",
   "Preview": "预览",
   "Title": "标题",
-  "Publish Channel Edit": "渠道文章编辑",
+  "Publish Channel Edit": "频道文章编辑",
   "Add new document": "增加新文章",
   "Edit document": "编辑文章",
   "Open main view": "显示主视图",
-  "Close main view": "隐藏主视图"
-
+  "Close main view": "隐藏主视图",
+  "Must have title": "必须有标题",
+  "Must have content": "必须有内容",
+  "Document already was published, can not be updated": "文章已经发布，不能修改",
+  "Save draft content successfully": "草案保存成功",
+  "Publish document successfully": "文章发布成功"
 }

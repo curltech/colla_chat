@@ -49,6 +49,7 @@ class _PlatformEditorWidgetState extends State<PlatformEditorWidget> {
         height: widget.height,
         initialText: widget.initialText,
         onSubmit: widget.onSubmit,
+            onPreview: widget.onPreview,
       ));
     }
     if (platformParams.windows) {
@@ -57,6 +58,7 @@ class _PlatformEditorWidgetState extends State<PlatformEditorWidget> {
         height: widget.height,
         initialText: widget.initialText,
         onSubmit: widget.onSubmit,
+            onPreview: widget.onPreview,
       ));
     }
     return KeepAliveWrapper(
@@ -64,6 +66,7 @@ class _PlatformEditorWidgetState extends State<PlatformEditorWidget> {
       height: widget.height,
       initialText: widget.initialText,
       onSubmit: widget.onSubmit,
+          onPreview: widget.onPreview,
     ));
   }
 }

@@ -91,6 +91,7 @@ enum ChatMessageSubType {
 }
 
 enum MessageStatus {
+  draft,
   unsent, //未发送成功
   send, //发了，不知是否成功
   sent, //发送成功
