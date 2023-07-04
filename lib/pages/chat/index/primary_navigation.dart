@@ -3,6 +3,7 @@ import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/provider/myself.dart';
+import 'package:colla_chat/widgets/common/app_bar_widget.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
@@ -64,18 +65,27 @@ class PrimaryNavigation {
     return item;
   }
 
-  Widget _createLeadingButton() {
+  Widget _buildAppBar(BuildContext context) {
+    if (appDataProvider.smallBreakpoint.isActive(context)) {
+      return Container();
+    }
     return ValueListenableBuilder(
         valueListenable: mainViewVisible,
         builder: (BuildContext context, bool mainViewVisible, Widget? child) {
-          return IconButton(
-              onPressed: () {
-                this.mainViewVisible.value = !this.mainViewVisible.value;
-                appDataProvider.toggleBody();
-              },
-              icon: mainViewVisible
-                  ? const Icon(Icons.menu_open)
-                  : const Icon(Icons.menu_book));
+          return ButtonBar(children: [
+            IconButton(
+                color: myself.primary,
+                tooltip: mainViewVisible
+                    ? AppLocalizations.t('Close main view')
+                    : AppLocalizations.t('Open main view'),
+                onPressed: () {
+                  this.mainViewVisible.value = !this.mainViewVisible.value;
+                  appDataProvider.toggleBody();
+                },
+                icon: mainViewVisible
+                    ? const Icon(Icons.menu_open)
+                    : const Icon(Icons.menu_book))
+          ]);
         });
   }
 
@@ -150,7 +160,7 @@ class PrimaryNavigation {
             //inAnimation: AdaptiveScaffold.leftOutIn,
             key: const Key('Primary Navigation Medium'),
             //在布局中放置AdaptiveScaffold标准侧边栏
-            builder: (_) {
+            builder: (BuildContext context) {
               return AdaptiveScaffold.standardNavigationRail(
                 width: appDataProvider.mediumPrimaryNavigationWidth,
                 selectedIndex: indexWidgetProvider.currentMainIndex,
@@ -158,7 +168,7 @@ class PrimaryNavigation {
                   indexWidgetProvider.currentMainIndex = index;
                 },
                 padding: const EdgeInsets.all(0.0),
-                leading: _createLeadingButton(),
+                leading: _buildAppBar(context),
                 destinations: destinations,
                 selectedIconTheme: IconThemeData(
                   color: myself.primary,
@@ -177,7 +187,7 @@ class PrimaryNavigation {
         appDataProvider.largeBreakpoint: SlotLayout.from(
             key: const Key('Primary Navigation Large'),
             //inAnimation: AdaptiveScaffold.leftOutIn,
-            builder: (_) {
+            builder: (BuildContext context) {
               return AdaptiveScaffold.standardNavigationRail(
                 backgroundColor: Colors.black.withOpacity(0.0),
                 width: appDataProvider.primaryNavigationWidth,
@@ -186,7 +196,7 @@ class PrimaryNavigation {
                   indexWidgetProvider.currentMainIndex = index;
                 },
                 padding: const EdgeInsets.all(0.0),
-                leading: _createLeadingButton(),
+                leading: _buildAppBar(context),
                 destinations: destinations,
                 extended: true,
                 trailing: trailingNavRail,

@@ -138,7 +138,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
     Widget chatMessageItem = ListTile(
       onTap: () {
         myChannelChatMessageController.current = chatMessage;
-        indexWidgetProvider.push('publish_channel_item');
+        indexWidgetProvider.push('publish_channel_edit');
       },
       title: CommonAutoSizeText(title),
       subtitle: CommonAutoSizeText(sendTime),
@@ -187,7 +187,7 @@ class _PublishChannelListWidgetState extends State<PublishChannelListWidget>
       IconButton(
         onPressed: () {
           myChannelChatMessageController.current = null;
-          indexWidgetProvider.push('publish_channel_item');
+          indexWidgetProvider.push('publish_channel_edit');
         },
         icon: const Icon(
           Icons.note_add,

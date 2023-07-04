@@ -55,9 +55,6 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
       Expanded(
           child:
               indexWidgetProvider.views[indexWidgetProvider.currentMainIndex]),
-      const VerticalDivider(
-        width: 1.0,
-      ),
     ]);
   }
 
@@ -94,14 +91,21 @@ class _AdaptiveLayoutIndexState extends State<AdaptiveLayoutIndex>
         },
         itemCount: indexWidgetProvider.views.length,
         itemBuilder: (BuildContext context, int index) {
+          Widget view;
           if (index >= indexWidgetProvider.mainViews.length ||
               appDataProvider.smallBreakpoint.isActive(context)) {
-            var view = indexWidgetProvider.views[index];
-
-            return view;
+            view = indexWidgetProvider.views[index];
           } else {
-            return Container();
+            view = Container();
           }
+          return Row(
+            children: [
+              const VerticalDivider(
+                width: 1.0,
+              ),
+              Expanded(child: view)
+            ],
+          );
         },
       );
     });

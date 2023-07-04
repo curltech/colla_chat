@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:colla_chat/entity/chat/chat_message.dart';
+import 'package:colla_chat/pages/chat/linkman/linkman_group_search_widget.dart';
 import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
 import 'package:colla_chat/provider/myself.dart';
 import 'package:colla_chat/tool/document_util.dart';
@@ -9,6 +10,7 @@ import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/column_field_widget.dart';
+import 'package:colla_chat/widgets/data_bind/data_select.dart';
 import 'package:colla_chat/widgets/richtext/platform_editor_widget.dart';
 import 'package:enough_mail/highlevel.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +36,9 @@ class NewMailWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _NewMailWidgetState extends State<NewMailWidget> {
+  //已经选择的收件人
+  ValueNotifier<List<String>> receipts = ValueNotifier([]);
+
   ///邮件消息的构造器
   MessageBuilder builder = MessageBuilder.prepareMultipartAlternativeMessage();
 
@@ -55,6 +60,29 @@ class _NewMailWidgetState extends State<NewMailWidget> {
       }
       _addTextHtml(html);
     }
+  }
+
+  //收件人，联系人显示和选择界面
+  Widget _buildReceiptsWidget(BuildContext context) {
+    var selector = ValueListenableBuilder(
+        valueListenable: receipts,
+        builder: (BuildContext context, List<String> receipts, Widget? child) {
+          return Container(
+              padding: const EdgeInsets.symmetric(horizontal: 0.0),
+              child: LinkmanGroupSearchWidget(
+                key: UniqueKey(),
+                selectType: SelectType.chipMultiSelectField,
+                onSelected: (List<String>? selected) async {
+                  if (selected != null) {
+                    this.receipts.value = selected;
+                  }
+                },
+                selected: this.receipts.value,
+                includeGroup: false,
+              ));
+        });
+
+    return selector;
   }
 
   ///设置邮件的地址和主题
@@ -131,9 +159,7 @@ class _NewMailWidgetState extends State<NewMailWidget> {
     return Container(
         padding: const EdgeInsets.all(10.0),
         child: Column(children: [
-          ColumnFieldWidget(
-            controller: receiptColumnFieldController,
-          ),
+          _buildReceiptsWidget(context),
           const SizedBox(
             height: 10.0,
           ),
@@ -191,16 +217,16 @@ class _NewMailWidgetState extends State<NewMailWidget> {
   }
 
   ///发送邮件，首先将邮件的编辑部分转换成html格式，对邮件的各个组成部分加密，目标为多人时采用群加密方式，然后发送
-  _send(){
-
-  }
+  _send() {}
 
   @override
   Widget build(BuildContext context) {
     List<Widget> rightWidgets = [
-      IconButton(onPressed: () {
-        _send();
-      }, icon: const Icon(Icons.send)),
+      IconButton(
+          onPressed: () {
+            _send();
+          },
+          icon: const Icon(Icons.send)),
     ];
     var appBarView = AppBarView(
         title: widget.title,

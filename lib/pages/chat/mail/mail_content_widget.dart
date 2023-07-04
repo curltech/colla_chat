@@ -179,8 +179,13 @@ class _MailContentWidgetState extends State<MailContentWidget> {
 
   @override
   Widget build(BuildContext context) {
+    String? title = widget.title;
+    MimeMessage? mimeMessage = mailAddressController.currentMimeMessage;
+    if (mimeMessage != null) {
+      title = mimeMessage.envelope?.subject;
+    }
     var appBarView = AppBarView(
-        title: widget.title,
+        title: title,
         withLeading: widget.withLeading,
         child: Card(
             elevation: 0.0,

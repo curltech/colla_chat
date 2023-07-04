@@ -108,10 +108,13 @@ class _MailWidgetState extends State<MailWidget> {
     //open ? controller.showDrawer() : controller.hideDrawer();
     List<Widget> rightWidgets = [
       IconButton(
+          tooltip: AppLocalizations.t('Toggle mail address view'),
           onPressed: () {
             controller.toggleDrawer();
           },
-          icon: const Icon(Icons.menu)),
+          icon: controller.value.visible
+              ? const Icon(Icons.toggle_off)
+              : const Icon(Icons.toggle_on)),
     ];
     if (controller.value.visible) {
       rightWidgets.add(IconButton(
@@ -131,7 +134,7 @@ class _MailWidgetState extends State<MailWidget> {
           onPressed: () {
             indexWidgetProvider.push('new_mail');
           },
-          icon: const Icon(Icons.edit_note),
+          icon: const Icon(Icons.note_add),
           tooltip: AppLocalizations.t('New mail')));
     }
     EmailAddress? current = mailAddressController.current;

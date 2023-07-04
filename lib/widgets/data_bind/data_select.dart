@@ -408,7 +408,7 @@ enum SelectType {
   singleSelectField,
 }
 
-///利用Chip实现的多选对组件类，可以包装到对话框中
+///利用datalist和Chip实现的多选对组件类，可以包装到对话框中
 ///利用回调函数onConfirm回传选择的值
 class CustomMultiSelect extends StatefulWidget {
   final OptionController optionController;
@@ -513,8 +513,11 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
             chips.add(chip);
           }
           return Wrap(
-            spacing: 10,
-            runSpacing: 10,
+            spacing: 5,
+            runSpacing: 5,
+            alignment: WrapAlignment.start,
+            crossAxisAlignment: WrapCrossAlignment.start,
+            runAlignment: WrapAlignment.start,
             children: chips,
           );
         });
@@ -646,6 +649,7 @@ class _CustomMultiSelectState extends State<CustomMultiSelect> {
 
 ///利用Chip实现的多选字段组件类，将ChipMultiSelect包装到对话框中
 ///利用回调函数onConfirm回传选择的值
+///具有可展开面板和带增加按钮的面板两种样式
 class CustomMultiSelectField extends StatefulWidget {
   final Future<void> Function(String keyword)? onSearch;
   final Function(List<String>? value)? onConfirm;
@@ -654,7 +658,7 @@ class CustomMultiSelectField extends StatefulWidget {
   final Widget? suffix;
   final SelectType selectType;
   final OptionController optionController;
-  final bool expandable;
+  final double? height;
 
   const CustomMultiSelectField(
       {Key? key,
@@ -664,7 +668,7 @@ class CustomMultiSelectField extends StatefulWidget {
       required this.title,
       this.prefix,
       this.suffix,
-      this.expandable = false,
+      this.height = 40,
       this.selectType = SelectType.chipMultiSelect})
       : super(key: key);
 
@@ -711,8 +715,11 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
           }
           if (chips.isNotEmpty) {
             return Wrap(
-              spacing: 10,
-              runSpacing: 10,
+              spacing: 5,
+              runSpacing: 5,
+              alignment: WrapAlignment.start,
+              crossAxisAlignment: WrapCrossAlignment.start,
+              runAlignment: WrapAlignment.start,
               children: chips,
             );
           } else {
@@ -722,46 +729,16 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
   }
 
   ///ExpandablePanel样式，以及弹出的选择对话框
-  Widget _buildExpandablePanelField(BuildContext context) {
+  Widget _buildMultiSelectField(BuildContext context) {
     return Column(children: [
-      ExpandablePanel(
-        theme: const ExpandableThemeData(
-          iconColor: Colors.white,
+      ListTile(
+        leading: widget.prefix!,
+        trailing: const Icon(
+          Icons.navigate_next,
+          color: Colors.white,
         ),
-        header: Container(
-            padding:
-                const EdgeInsets.symmetric(vertical: 10.0, horizontal: 15.0),
-            child: Row(children: [
-              widget.prefix!,
-              const SizedBox(
-                width: 20,
-              ),
-              CommonAutoSizeText(AppLocalizations.t(widget.title ?? '')),
-            ])),
-        collapsed: Container(),
-        expanded: _buildButtonField(context),
-      ),
-    ]);
-  }
-
-  ///增加按钮样式，以及弹出的选择对话框
-  Widget _buildButtonField(BuildContext context) {
-    var suffix = widget.suffix ??
-        Icon(
-          Icons.add_circle_outline,
-          color: myself.primary,
-        );
-    return Column(children: [
-      SizedBox(
-          height: 140,
-          child: SingleChildScrollView(
-              controller: ScrollController(),
-              child: _buildSelectedChips(context))),
-      const SizedBox(
-        height: 5.0,
-      ),
-      TextButton(
-        onPressed: () async {
+        title: CommonAutoSizeText(AppLocalizations.t(widget.title ?? '')),
+        onTap: () async {
           List<String>? selected = await DialogUtil.show(
               context: context,
               builder: (BuildContext context) {
@@ -782,16 +759,24 @@ class _CustomMultiSelectFieldState extends State<CustomMultiSelectField> {
             widget.onConfirm!(selected);
           }
         },
-        child: suffix,
       ),
+      _buildChipPanel(context)
     ]);
+  }
+
+  ///带增加按钮面板样式，以及弹出的选择对话框
+  Widget _buildChipPanel(BuildContext context) {
+    return SizedBox(
+        height: widget.height,
+        child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            controller: ScrollController(),
+            child: _buildSelectedChips(context)));
   }
 
   @override
   Widget build(BuildContext context) {
-    return widget.expandable
-        ? _buildExpandablePanelField(context)
-        : _buildButtonField(context);
+    return _buildMultiSelectField(context);
   }
 
   @override
