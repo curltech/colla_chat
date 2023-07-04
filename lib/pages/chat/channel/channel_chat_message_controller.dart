@@ -85,9 +85,8 @@ class MyChannelChatMessageController extends DataMoreController<ChatMessage> {
     if (data.isNotEmpty) {
       sendTime = data[0].sendTime;
     }
-    List<ChatMessage>? chatMessages =
-        await channelChatMessageService.findMyselfByPeerId(
-            status: status, sendTime: sendTime, limit: limit);
+    List<ChatMessage>? chatMessages = await channelChatMessageService
+        .findMyselfByPeerId(status: status, sendTime: sendTime, limit: limit);
     if (chatMessages.isNotEmpty) {
       data.insertAll(0, chatMessages);
       notifyListeners();

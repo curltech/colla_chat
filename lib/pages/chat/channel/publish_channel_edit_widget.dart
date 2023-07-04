@@ -5,6 +5,7 @@ import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.da
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
+import 'package:colla_chat/tool/date_util.dart';
 import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/document_util.dart';
 import 'package:colla_chat/tool/json_util.dart';
@@ -144,6 +145,7 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
         chatMessage.content = chatMessageService.processContent(html);
       }
       chatMessage.status = MessageStatus.published.name;
+      chatMessage.sendTime = DateUtil.currentDate();
       await chatMessageService.store(chatMessage);
     } else if (mimeType == ChatMessageMimeType.html.name) {
       await myChannelChatMessageController.publish(chatMessage.messageId!);
