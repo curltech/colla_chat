@@ -24,13 +24,15 @@ class QuillEditorWidget extends StatefulWidget {
   final String? initialText;
   final ChatMessageMimeType mimeType;
   final bool withMultiMedia;
-  final Function(String? result, ChatMessageMimeType mimeType)? onSubmit;
+  final Function(String? content, ChatMessageMimeType mimeType)? onSubmit;
+  final Function(String? content, ChatMessageMimeType mimeType)? onPreview;
 
   const QuillEditorWidget({
     Key? key,
     this.height,
     this.initialText,
     this.onSubmit,
+    this.onPreview,
     this.mimeType = ChatMessageMimeType.json,
     this.withMultiMedia = false,
   }) : super(key: key);
@@ -42,7 +44,7 @@ class QuillEditorWidget extends StatefulWidget {
 class _QuillEditorWidgetState extends State<QuillEditorWidget> {
   final FocusNode _focusNode = FocusNode();
   late Document doc;
-  late final QuillController controller;
+  late final QuillController quillController;
 
   @override
   void initState() {
@@ -60,7 +62,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     } else {
       doc = Document();
     }
-    controller = QuillController(
+    quillController = QuillController(
         document: doc, selection: const TextSelection.collapsed(offset: 0));
   }
 
@@ -104,16 +106,16 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     final block = BlockEmbed.custom(
       NotesBlockEmbed.fromDocument(quillEditorController.document),
     );
-    final index = controller.selection.baseOffset;
-    final length = controller.selection.extentOffset - index;
+    final index = quillController.selection.baseOffset;
+    final length = quillController.selection.extentOffset - index;
 
     if (isEditing) {
       final offset =
-          getEmbedNode(controller, controller.selection.start).offset;
-      controller.replaceText(
+          getEmbedNode(quillController, quillController.selection.start).offset;
+      quillController.replaceText(
           offset, 1, block, TextSelection.collapsed(offset: offset));
     } else {
-      controller.replaceText(index, length, block, null);
+      quillController.replaceText(index, length, block, null);
     }
   }
 
@@ -199,6 +201,15 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     ///定制提交按钮
     var customButtons = <QuillCustomButton>[
       QuillCustomButton(
+          icon: Icons.preview,
+          onTap: () async {
+            if (widget.onPreview != null) {
+              String html = DocumentUtil.deltaToHtml(doc.toDelta());
+              widget.onPreview!(html, ChatMessageMimeType.html);
+            }
+          },
+          tooltip: AppLocalizations.t('Preview')),
+      QuillCustomButton(
           icon: Icons.check,
           onTap: () {
             if (widget.onSubmit != null) {
@@ -224,7 +235,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
     }
     var toolbar = QuillToolbar.basic(
       locale: myself.locale,
-      controller: controller,
+      controller: quillController,
       toolbarIconAlignment: WrapAlignment.start,
       toolbarIconCrossAlignment: WrapCrossAlignment.start,
       toolbarSectionSpacing: 1,
@@ -245,7 +256,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
       minHeight: 200,
       maxHeight: widget.height,
       locale: myself.locale,
-      controller: controller,
+      controller: quillController,
       scrollController: ScrollController(),
       scrollable: true,
       focusNode: _focusNode,
@@ -260,6 +271,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
         NotesEmbedBuilder(addEditNote: _addEditNote)
       ],
     );
+
     var toolbar = _buildQuillToolbar(context);
 
     return Card(
@@ -273,9 +285,20 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
+                const SizedBox(
+                  height: 5.0,
+                ),
                 toolbar,
                 const SizedBox(
-                  height: 10.0,
+                  height: 5.0,
+                ),
+                Divider(
+                  height: 1.0,
+                  thickness: 1.0,
+                  color: myself.primary,
+                ),
+                const SizedBox(
+                  height: 5.0,
                 ),
                 SizedBox(
                   height: widget.height,
@@ -292,7 +315,7 @@ class _QuillEditorWidgetState extends State<QuillEditorWidget> {
 
   @override
   void dispose() {
-    controller.dispose();
+    quillController.dispose();
     super.dispose();
   }
 }

@@ -33,6 +33,7 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/data_bind/data_listtile.dart';
 import 'package:colla_chat/widgets/data_bind/data_listview.dart';
+import 'package:colla_chat/widgets/webview/html_preview_widget.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 
@@ -110,6 +111,7 @@ class ChatListWidget extends StatefulWidget with TileDataMixin {
     websocketPool.getDefault();
     indexWidgetProvider.define(ChatMessageView());
     indexWidgetProvider.define(const LinkmanInfoWidget());
+    indexWidgetProvider.define(const HtmlPreviewWidget());
   }
 
   @override

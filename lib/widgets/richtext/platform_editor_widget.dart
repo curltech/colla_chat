@@ -1,5 +1,6 @@
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/platform.dart';
+import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/richtext/html_editor_widget.dart';
 import 'package:colla_chat/widgets/richtext/html_rte_widget.dart';
 import 'package:colla_chat/widgets/richtext/quill_editor_widget.dart';
@@ -10,11 +11,16 @@ import 'package:flutter/material.dart';
 class PlatformEditorWidget extends StatefulWidget {
   final double? height;
   final String? initialText;
-  final Function(String? result, ChatMessageMimeType mimeType) onSubmit;
+  Function(String? content, ChatMessageMimeType mimeType)? onSubmit;
+  Function(String? content, ChatMessageMimeType mimeType)? onPreview;
 
-  const PlatformEditorWidget(
-      {Key? key, this.initialText, this.height, required this.onSubmit})
-      : super(key: key);
+  PlatformEditorWidget({
+    Key? key,
+    this.initialText,
+    this.height,
+    this.onSubmit,
+    this.onPreview,
+  }) : super(key: key);
 
   @override
   State createState() => _PlatformEditorWidgetState();
@@ -29,30 +35,35 @@ class _PlatformEditorWidgetState extends State<PlatformEditorWidget> {
   @override
   Widget build(BuildContext context) {
     if (platformParams.desktop) {
-      return QuillEditorWidget(
+      return KeepAliveWrapper(
+          child: QuillEditorWidget(
         height: widget.height,
         initialText: widget.initialText,
         onSubmit: widget.onSubmit,
-      );
+        onPreview: widget.onPreview,
+      ));
     }
     if (platformParams.mobile || platformParams.web) {
-      return QuillHtmlEditorWidget(
+      return KeepAliveWrapper(
+          child: QuillHtmlEditorWidget(
         height: widget.height,
         initialText: widget.initialText,
         onSubmit: widget.onSubmit,
-      );
+      ));
     }
     if (platformParams.windows) {
-      return HtmlRteWidget(
+      return KeepAliveWrapper(
+          child: HtmlRteWidget(
         height: widget.height,
         initialText: widget.initialText,
         onSubmit: widget.onSubmit,
-      );
+      ));
     }
-    return HtmlEditorWidget(
+    return KeepAliveWrapper(
+        child: HtmlEditorWidget(
       height: widget.height,
       initialText: widget.initialText,
       onSubmit: widget.onSubmit,
-    );
+    ));
   }
 }

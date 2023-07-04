@@ -429,5 +429,13 @@
   "smtpServerHost or smtpServerPort is empty": "smtp主机地址或者端口为空",
   "imapServerHost or imapServerPort is empty": "imap主机地址或者端口为空",
   "Connect failure": "连接失败",
-  "Connect successfully": "连接成功"
+  "Connect successfully": "连接成功",
+  "Preview": "预览",
+  "Title": "标题",
+  "Publish Channel Edit": "渠道文章编辑",
+  "Add new document": "增加新文章",
+  "Edit document": "编辑文章",
+  "Open main view": "显示主视图",
+  "Close main view": "隐藏主视图"
+
 }

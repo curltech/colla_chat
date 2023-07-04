@@ -1,4 +1,4 @@
-import 'package:colla_chat/widgets/common/platform_webview.dart';
+import 'package:colla_chat/widgets/webview/platform_webview.dart';
 import 'package:flutter/material.dart';
 
 class WebViewWidget extends StatefulWidget {

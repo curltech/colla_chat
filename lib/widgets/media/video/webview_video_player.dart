@@ -1,5 +1,5 @@
 import 'package:colla_chat/tool/file_util.dart';
-import 'package:colla_chat/widgets/common/platform_webview.dart';
+import 'package:colla_chat/widgets/webview/platform_webview.dart';
 import 'package:colla_chat/widgets/media/abstract_media_player_controller.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';

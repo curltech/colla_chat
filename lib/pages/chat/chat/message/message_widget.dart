@@ -191,7 +191,7 @@ class MessageWidget {
       body = InkWell(
           onDoubleTap: () {
             chatMessageController.currentIndex = index;
-            indexWidgetProvider.push('full_screen');
+            indexWidgetProvider.push('full_screen_chat_message');
           },
           onLongPress: () async {
             await DialogUtil.show(

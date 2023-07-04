@@ -12,7 +12,7 @@ class QuillHtmlEditorWidget extends StatefulWidget {
   final String? initialText;
   final ChatMessageMimeType mimeType;
   final bool withMultiMedia;
-  final Function(String? result, ChatMessageMimeType mimeType)? onSubmit;
+  final Function(String? content, ChatMessageMimeType mimeType)? onSubmit;
 
   const QuillHtmlEditorWidget({
     Key? key,

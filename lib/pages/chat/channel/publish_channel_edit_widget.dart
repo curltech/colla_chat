@@ -3,7 +3,6 @@ import 'package:colla_chat/crypto/util.dart';
 import 'package:colla_chat/entity/chat/chat_message.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/channel/channel_chat_message_controller.dart';
-import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/service/chat/chat_message.dart';
 import 'package:colla_chat/service/chat/message_attachment.dart';
@@ -11,8 +10,10 @@ import 'package:colla_chat/tool/dialog_util.dart';
 import 'package:colla_chat/tool/string_util.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
 import 'package:colla_chat/widgets/common/common_widget.dart';
+import 'package:colla_chat/widgets/common/keep_alive_wrapper.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:colla_chat/widgets/richtext/platform_editor_widget.dart';
+import 'package:colla_chat/widgets/webview/html_preview_widget.dart';
 import 'package:flutter/material.dart';
 
 ///自己发布频道消息编辑页面
@@ -36,11 +37,11 @@ class PublishChannelEditWidget extends StatefulWidget with TileDataMixin {
 }
 
 class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
-  final TextEditingController textEditingController = TextEditingController();
   ValueNotifier<String?> thumbnail = ValueNotifier<String?>(null);
   ValueNotifier<String?> documentText = ValueNotifier<String?>(null);
   ChatMessageMimeType mimeType = ChatMessageMimeType.html;
   SwiperController controller = SwiperController();
+  final TextEditingController textEditingController = TextEditingController();
 
   @override
   void initState() {
@@ -66,8 +67,8 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
   }
 
   ///编辑器提交表示暂存，原生的格式，json或者html
-  Future<void> _onSubmit(String? result, ChatMessageMimeType mimeType) async {
-    documentText.value = result;
+  Future<void> _onSubmit(String? content, ChatMessageMimeType mimeType) async {
+    documentText.value = content;
     this.mimeType = mimeType;
     await _save();
   }
@@ -112,6 +113,14 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
     return textFormField;
   }
 
+  _onPreview(String? content, ChatMessageMimeType mimeType) {
+    if (mimeType == ChatMessageMimeType.html) {
+      indexWidgetProvider.push('html_preview');
+      htmlPreviewController.title = textEditingController.text;
+      htmlPreviewController.html = content;
+    }
+  }
+
   Widget _buildChannelItemView(BuildContext context) {
     Widget titleWidget = Container(
         padding: const EdgeInsets.all(10.0),
@@ -119,9 +128,11 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
     Widget view = Column(children: [
       titleWidget,
       Expanded(
-          child: PlatformEditorWidget(
+          child: KeepAliveWrapper(
+              child: PlatformEditorWidget(
+        onPreview: _onPreview,
         onSubmit: _onSubmit,
-      ))
+      )))
     ]);
 
     return view;
@@ -147,13 +158,6 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
       title: widget.title,
       rightWidgets: [
         IconButton(
-          icon: const Icon(Icons.preview),
-          onPressed: () {
-            indexWidgetProvider.push('channel_message_view');
-          },
-          tooltip: AppLocalizations.t('Preview'),
-        ),
-        IconButton(
           icon: const Icon(Icons.publish),
           onPressed: () async {
             await _publish();
@@ -167,7 +171,6 @@ class _PublishChannelEditWidgetState extends State<PublishChannelEditWidget> {
 
   @override
   void dispose() {
-    textEditingController.dispose();
     controller.dispose();
     super.dispose();
   }

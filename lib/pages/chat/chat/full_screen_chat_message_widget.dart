@@ -8,28 +8,29 @@ import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:flutter/material.dart';
 
-class FullScreenWidget extends StatefulWidget with TileDataMixin {
-  const FullScreenWidget({Key? key}) : super(key: key);
+class FullScreenChatMessageWidget extends StatefulWidget with TileDataMixin {
+  const FullScreenChatMessageWidget({Key? key}) : super(key: key);
 
   @override
   State<StatefulWidget> createState() {
-    return _FullScreenWidgetState();
+    return _FullScreenChatMessageWidgetState();
   }
 
   @override
   bool get withLeading => true;
 
   @override
-  String get routeName => 'full_screen';
+  String get routeName => 'full_screen_chat_message';
 
   @override
   IconData get iconData => Icons.fullscreen;
 
   @override
-  String get title => 'FullScreen';
+  String get title => 'FullScreenChatMessage';
 }
 
-class _FullScreenWidgetState extends State<FullScreenWidget> {
+class _FullScreenChatMessageWidgetState
+    extends State<FullScreenChatMessageWidget> {
   SwiperController swiperController = SwiperController();
   final index = ValueNotifier<int>(chatMessageController.currentIndex);
 
@@ -90,9 +91,7 @@ class _FullScreenWidgetState extends State<FullScreenWidget> {
     );
   }
 
-  _shareChatMessage(){
-
-  }
+  _shareChatMessage() {}
 
   @override
   Widget build(BuildContext context) {

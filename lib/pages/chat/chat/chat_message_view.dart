@@ -9,7 +9,7 @@ import 'package:colla_chat/pages/chat/chat/chat_message_input.dart';
 import 'package:colla_chat/pages/chat/chat/chat_message_widget.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_controller.dart';
 import 'package:colla_chat/pages/chat/chat/controller/chat_message_view_controller.dart';
-import 'package:colla_chat/pages/chat/chat/full_screen_widget.dart';
+import 'package:colla_chat/pages/chat/chat/full_screen_chat_message_widget.dart';
 import 'package:colla_chat/pages/chat/chat/video_chat_widget.dart';
 import 'package:colla_chat/platform.dart';
 import 'package:colla_chat/plugin/logger.dart';
@@ -38,7 +38,8 @@ import 'package:window_manager/window_manager.dart';
 /// 聊天界面，包括文本聊天，视频通话呼叫，视频通话，全屏展示四个组件
 /// 支持群聊
 class ChatMessageView extends StatefulWidget with TileDataMixin {
-  final FullScreenWidget fullScreenWidget = const FullScreenWidget();
+  final FullScreenChatMessageWidget fullScreenChatMessageWidget =
+      const FullScreenChatMessageWidget();
   final VideoChatWidget videoChatWidget = VideoChatWidget();
   final ChatMessageWidget chatMessageWidget = ChatMessageWidget();
   final ChatMessageInputWidget chatMessageInputWidget =
@@ -47,7 +48,7 @@ class ChatMessageView extends StatefulWidget with TileDataMixin {
   ChatMessageView({
     Key? key,
   }) : super(key: key) {
-    indexWidgetProvider.define(fullScreenWidget);
+    indexWidgetProvider.define(fullScreenChatMessageWidget);
     indexWidgetProvider.define(videoChatWidget);
   }
 
