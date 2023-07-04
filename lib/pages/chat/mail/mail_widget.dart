@@ -1,3 +1,4 @@
+import 'package:colla_chat/constant/base.dart';
 import 'package:colla_chat/entity/chat/emailaddress.dart';
 import 'package:colla_chat/l10n/localization.dart';
 import 'package:colla_chat/pages/chat/mail/mail_address_controller.dart';
@@ -9,6 +10,7 @@ import 'package:colla_chat/plugin/logger.dart';
 import 'package:colla_chat/provider/app_data_provider.dart';
 import 'package:colla_chat/provider/index_widget_provider.dart';
 import 'package:colla_chat/widgets/common/app_bar_view.dart';
+import 'package:colla_chat/widgets/common/common_widget.dart';
 import 'package:colla_chat/widgets/common/widget_mixin.dart';
 import 'package:draggable_home/draggable_home.dart';
 import 'package:flutter/material.dart';
@@ -147,7 +149,13 @@ class _MailWidgetState extends State<MailWidget> {
       }
     }
     var appBarView = AppBarView(
-        title: controller.value.visible ? 'Mail address' : title,
+        title: controller.value.visible ? 'Mail address' : null,
+        titleWidget: controller.value.visible
+            ? null
+            : CommonAutoSizeText(
+                title,
+                style: const TextStyle(fontSize: AppFontSize.smFontSize),
+              ),
         withLeading: widget.withLeading,
         rightWidgets: rightWidgets,
         child: body);
